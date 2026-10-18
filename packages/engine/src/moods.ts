@@ -5,6 +5,7 @@ import { moodOf, riseChance, type DecidedMood } from "./domain/province/decided.
 import { provinceConfig } from "./domain/province/model.ts";
 import { storeMonths } from "./food.ts";
 import { OFFICIALS } from "./recruit.ts";
+import { BELIEF_GRIEVANCES, hasBelief } from "./peoples.ts";
 
 /**
  * Moods (milestone 3): each province holds grievances, and their count sets
@@ -14,7 +15,7 @@ import { OFFICIALS } from "./recruit.ts";
  */
 
 /** The grievances this game tracks so far, one bit each (province §5.22). */
-export const GRIEVANCES = ["Hungry", "Conscription", "Soldiers quartered", "Ungoverned", "Foreign rule", "Bloodshed", "Heavy taxes"] as const;
+export const GRIEVANCES = ["Hungry", "Conscription", "Soldiers quartered", "Ungoverned", "Foreign rule", "Bloodshed", "Heavy taxes", "Grasping officials", "Banned language", "Wrong faith", "Persecuted"] as const;
 export type GrievanceName = (typeof GRIEVANCES)[number];
 const bit = (g: GrievanceName) => 1 << GRIEVANCES.indexOf(g);
 
@@ -45,6 +46,8 @@ export function grievanceCount(world: World, p: number): number {
   for (; g; g &= g - 1) n++;
   // Heavy taxes count once at heavy and twice at crushing (PROV-167).
   if (world.provinceGrievances[p]! & bit("Heavy taxes")) n += Math.max(0, taxWeight(world, p) - 1);
+  // Persecuted counts as two (RELG-052).
+  if (world.provinceGrievances[p]! & bit("Persecuted")) n++;
   return n;
 }
 
@@ -70,11 +73,13 @@ export function moodIndex(world: World, p: number): number {
 export function moodShare(world: World, p: number): number {
   // No grievances is calm: most provinces, most of the time.
   if (!world.provinceGrievances[p]) return 1;
+  // A province rebels hold sends its owner nothing (REBL-035).
+  if (world.provinceRebels[p]) return 0;
   return moodIndex(world, p) >= 2 ? provinceConfig.tax.riots_factor : 1;
 }
 
 /** Culture of a realm (its name book), or the realm itself when the book has none. */
-function cultureKey(world: World, nationId: string): string {
+export function cultureKey(world: World, nationId: string): string {
   return world.rules.names?.nations[nationId] ?? nationId;
 }
 
@@ -114,11 +119,13 @@ export function monthlyMoods(world: World, news: News[]): void {
     if (share < rc.conscription_below || (has("Conscription") && share < rc.conscription_ends_at)) now |= bit("Conscription");
     if (world.provinceArmyMonths[p]! > quartered) now |= bit("Soldiers quartered");
     if (ungoverned(world, p)) now |= bit("Ungoverned");
-    const first = world.rules.provinces[p]!.owner;
-    if (first && cultureKey(world, first) !== cultureKey(world, world.nationIds[owner]!)) now |= bit("Foreign rule");
+    // Tongue and faith grievances, as culture and religion work them out (peoples.ts).
+    // A province that won its own rule (REBL-057) has no Foreign rule.
+    for (const b of BELIEF_GRIEVANCES) if (hasBelief(world, p, b) && !(b === "Foreign rule" && world.provinceSelfRule[p])) now |= bit(b);
     const battle = world.provinceBattleYear[p]!;
     if (battle >= 0 && world.date.year - battle < g.bloodshed_years) now |= bit("Bloodshed");
     if (taxWeight(world, p) > 0) now |= bit("Heavy taxes");
+    if (world.provinceGrasping[p]) now |= bit("Grasping officials");
     const before = MOODS.indexOf(moodOf(grievanceCount(world, p), isJudge(world.provinceOfficial[p]!)).mood);
     world.provinceGrievances[p] = now;
     const after = moodIndex(world, p);
@@ -129,7 +136,7 @@ export function monthlyMoods(world: World, news: News[]): void {
   }
 }
 
-/** Monthly chance a plotting province would rise (shown on the card; rebels rising is the rebellions milestone). */
+/** Monthly chance a plotting province rises by itself (REBL-005; rebels.ts rolls it). */
 export function risingChance(world: World, p: number): number {
   return riseChance(grievanceCount(world, p));
 }

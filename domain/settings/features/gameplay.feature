@@ -58,6 +58,18 @@ Feature: Gameplay settings
       | 2×    | 0.25    |
       | 4×    | 0.125   |
 
+  @SET-131
+  Scenario Outline: Turn playback speed
+    Given "Turn playback speed" is "<speed>"
+    When the week plays out after End turn
+    Then each day of the week plays back in <seconds> seconds
+
+    Examples:
+      | speed | seconds |
+      | 1×    | 0.3     |
+      | 2×    | 0.15    |
+      | 4×    | 0.075   |
+
   @SET-066
   Scenario Outline: Open the turn report
     Given "Open the turn report" is "<value>"

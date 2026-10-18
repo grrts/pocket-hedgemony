@@ -53,7 +53,7 @@
     "Homeland": {
       "grievances": ["Foreign rule", "Far from the throne"],
       "demand": "self-rule, then independence",
-      "joiners": "everyone of the homeland's tongue",
+      "joiners": "everyone of the homeland's language",
       "classes": [],
       "leader": "local"
     },
@@ -67,7 +67,7 @@
     "Lord": {
       "grievances": ["Harsh lord"],
       "demand": "the lord's want",
-      "joiners": "the lord's retinue and officials, and his people of his faith and tongue",
+      "joiners": "the lord's retinue and officials, and his people of his faith and language",
       "classes": [],
       "leader": "the lord himself"
     },
@@ -85,6 +85,16 @@
       "classes": ["craftsmen", "market folk", "clergy", "clerks", "scholars"],
       "leader": "local"
     }
+  },
+  "other_grievance_causes": {
+    "Burned homes": "Hunger",
+    "Plague": "Hunger",
+    "Requisitioned": "Hunger",
+    "Bloodshed": "Hunger",
+    "Persecuted": "Hunger",
+    "Ungoverned": "Tax",
+    "Grasping officials": "Tax",
+    "Banned language": "Homeland"
   },
   "faith_or_tongue_causes": ["Faith", "Homeland"],
   "clergy_scholars_causes": ["Faith", "New ideas"],
@@ -115,7 +125,7 @@
   "spread": {
     "higher": [
       "same grievance",
-      "shares faith or tongue",
+      "shares faith or language",
       "roads, rivers and traders",
       "many homeless",
       "owner's army away at war",
@@ -170,12 +180,23 @@
     "new_preacher_after_months": 12,
     "disloyal_lord_revolt_chance": 0.05,
     "leader_cunning": 3,
-    "leader_might": 1
+    "leader_might": 1,
+    "talk_usually_chance": 0.75,
+    "talk_rarely_chance": 0.15,
+    "talk_other_chance": 0.3,
+    "bribe_melt_chance": 0.5,
+    "melts_below_men": 200,
+    "march_days_per_province": 7,
+    "grant_food_months": 4,
+    "light_tax_years_granted": 10
   },
   "_provisional": [
     "new_ideas.min_support", "provisional.spread_chance_per_month", "provisional.talk_gold_per_province",
     "provisional.bribe_gold_per_100_rebels", "provisional.grant_points", "provisional.grant_months",
     "provisional.pardon_calm_factor", "provisional.new_preacher_after_months",
-    "provisional.disloyal_lord_revolt_chance", "provisional.leader_cunning", "provisional.leader_might"
+    "provisional.disloyal_lord_revolt_chance", "provisional.leader_cunning", "provisional.leader_might",
+    "provisional.talk_usually_chance", "provisional.talk_rarely_chance", "provisional.talk_other_chance",
+    "provisional.bribe_melt_chance", "provisional.melts_below_men", "provisional.march_days_per_province",
+    "provisional.grant_food_months", "provisional.light_tax_years_granted"
   ]
 }

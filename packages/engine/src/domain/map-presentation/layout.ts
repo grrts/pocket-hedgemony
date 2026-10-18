@@ -178,7 +178,7 @@ export function mapHud(o: { width: number; height: number; shape: Shape; safe?: 
   const plaques = Math.min(o.plaques ?? 4, o.shape === "Short wide" ? topBarMaxPlaques() : Infinity);
   for (let i = 0; i < plaques; i++) out.push({ name: `plaque ${i + 1}`, x: left + (s + g) * (i + 2), y: top, w: s, h: s, frequent: true });
   out.push({ name: "End turn", x: right - s, y: bottom - s, w: s, h: s, risky: true });
-  const tools = ["map lens", "go to capital", "Realm book"];
+  const tools = ["map mode", "go to capital", "Realm book"];
   // The column hangs from the top bar, or sits above End turn with one target of room (Tall).
   const columnBottom = lay.toolColumn === "right edge above End turn" ? bottom - s - g - s - g : top + s + g + tools.length * (s + g);
   tools.forEach((name, i) => {

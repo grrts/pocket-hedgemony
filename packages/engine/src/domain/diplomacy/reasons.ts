@@ -1,7 +1,7 @@
 import { monthsBetween } from "./dates.ts";
 import { config } from "./rules.ts";
 import { alliesOf, enemiesOf, hasFact, overlord, stance } from "./relations.ts";
-import { borders, country, neighbours, oathsBroken, standing, strength, type Ask, type Count, type Diplomacy, type Reason } from "./model.ts";
+import { borders, country, neighbours, notorietyPoints, oathsBroken, standing, strength, type Ask, type Count, type Diplomacy, type Reason } from "./model.ts";
 
 /**
  * The reasons count (diplomacy 5): the asked country lists named reasons with
@@ -157,10 +157,33 @@ function common(d: Diplomacy, ask: Ask, days?: DaysFn): Reason[] {
   if (shared.length) out.push({ name: `We share an enemy (${shared.join(", ")})`, number: R.share_an_enemy });
   const frontier = d.taken.filter((t) => t.by === asker && d.provinces[t.province]?.borders.includes(asked)).length;
   if (frontier) out.push({ name: "You threaten our frontier", number: R.frontier_threat_per_province * frontier });
+  out.push(...notorietyReasons(d, ask.action, asker, asked));
   const allies = alliesOf(d.graph, asked).length;
   out.push({ name: "We already have allies", number: Math.min(0, R.allies_beyond_free.per_extra * (allies - R.allies_beyond_free.free)) });
   for (const row of d.revolutionRows) {
     if (row.country === asker && country(d, asked).form === row.againstForm && (!row.until || d.date < row.until)) out.push({ name: row.name, number: row.number });
+  }
+  return out;
+}
+
+/** The asks in which the asked country counts the asker's notoriety against it (DIPL-223). */
+export const NOTORIETY_ASKS = ["propose_alliance", "arrange_marriage", "pledge_protection"];
+
+/**
+ * DIPL-223: -1 per 5 of the asker's notoriety in an alliance, marriage or
+ * pledge count made with it; and, when pledging protection to a country, +1 per
+ * 5 of the notoriety of its most notorious neighbour (the one it needs
+ * protecting from). `asker` pledges to `asked` for a pledge.
+ */
+export function notorietyReasons(d: Diplomacy, action: string, asker: string, asked: string): Reason[] {
+  if (!NOTORIETY_ASKS.includes(action)) return [];
+  const out: Reason[] = [];
+  const own = notorietyPoints(d, action === "pledge_protection" ? asked : asker);
+  if (own > 0) out.push({ name: "Notoriety", number: -own });
+  if (action === "pledge_protection") {
+    let worst = 0;
+    for (const n of neighbours(d, asked)) if (n !== asker) worst = Math.max(worst, notorietyPoints(d, n));
+    if (worst > 0) out.push({ name: "A notorious neighbour", number: worst });
   }
   return out;
 }
@@ -275,6 +298,18 @@ export function leagueCount(d: Diplomacy, c: string, x: string, members: number)
   reasons.push({ name: "Same faith as X", number: sameFaith(d, c, x) ? L.same_faith : 0 });
   const total = reasons.reduce((s, r) => s + r.number, 0);
   return { ask: { action: "join_league", asker: x, asked: c }, reasons, total, yes: total > 0 };
+}
+
+/**
+ * The count an AI makes of joining a league against X (DIPL-158, DIPL-223):
+ * the league count's rows and +1 per 5 of X's notoriety, the AI's own weighing
+ * of X's name abroad.
+ */
+export function aiLeagueCount(d: Diplomacy, c: string, x: string, members: number): Count {
+  const base = leagueCount(d, c, x, members);
+  const reasons: Reason[] = [...base.reasons, { name: "X's notoriety", number: notorietyPoints(d, x) }];
+  const total = reasons.reduce((s, r) => s + r.number, 0);
+  return { ...base, reasons, total, yes: total > 0 };
 }
 
 /** A reason by name (a missing reason reads as 0). */

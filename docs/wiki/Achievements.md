@@ -1,6 +1,6 @@
 # Achievements
 
-Achievements are goals you can earn across your campaigns: a first harvest, a castle taken by terms, a century without a broken oath, Constantinople held past 1460. There are 71 at launch, the same list on Steam, Game Center and Google Play Games. They are earned only in ironman campaigns, and they never give anything inside the game: no bonus, no unlocked nation, no cosmetic.
+Achievements are goals you can earn across your campaigns: a first harvest, a castle taken by terms, a century without a broken oath, Constantinople held past 1460. There are 75 at launch, the same list on Steam, Game Center and Google Play Games. They are earned only in ironman campaigns, and they never give anything inside the game: no bonus, no unlocked nation, no cosmetic.
 
 ## How it works
 
@@ -17,12 +17,12 @@ Achievements are goals you can earn across your campaigns: a first harvest, a ca
 
 | Tier | Points | Meant for | At launch |
 |---|---|---|---|
-| Copper | 5 | One action, or a goal most players reach in their first campaign | 38 |
-| Silver | 10 | A goal you aim for | 21 |
-| Gold | 20 | A whole campaign shaped around it | 10 |
-| Crown | 40 | The hardest | 2 |
+| Copper | 5 | One action, or a goal most players reach in their first campaign | 39 |
+| Silver | 10 | A goal you aim for | 22 |
+| Gold | 20 | A whole campaign shaped around it | 11 |
+| Crown | 40 | The hardest | 3 |
 
-Points show on Game Center and Google Play, not Steam. The list holds at most 100 achievements, ever, counting retired ones. Every achievement's points are a multiple of 5 and at most 40, and the total is at most 1,000. Launch ships 71 achievements worth 680 points, keeping 29 slots and 320 points for updates; after any update at least 10 slots and 100 points stay in reserve, and spare points should go mostly to new copper and silver goals. If a score or victory is added to the game, it gets its own achievements from the reserve. Names are at most 24 characters and texts at most 100.
+Points show on Game Center and Google Play, not Steam. The list holds at most 100 achievements, ever, counting retired ones. Every achievement's points are a multiple of 5 and at most 40, and the total is at most 1,000. Launch ships 75 achievements worth 755 points, keeping 25 slots and 245 points for updates; after any update at least 10 slots and 100 points stay in reserve, and spare points should go mostly to new copper and silver goals. If a score or victory is added to the game, it gets its own achievements from the reserve. Names are at most 24 characters and texts at most 100.
 
 These limits are the strictest of the three stores:
 
@@ -36,7 +36,9 @@ These limits are the strictest of the three stores:
 
 ### Scope and hidden achievements
 
-Most achievements are **campaign** scope: the whole condition must be met inside one game. Three are **lifetime**: their counter adds up across games in your player profile and is mirrored to the store's progress where it has one. There is no hidden achievement at launch; `hidden` is kept for later event chains whose very existence is the surprise. A hidden achievement shows as "Hidden achievement" with its tier, its name and text secret until earned.
+Most achievements are **campaign** scope: the whole condition must be met inside one game. Seven are **lifetime**: their counter adds up across games in your player profile and is mirrored to the store's progress where it has one. There is no hidden achievement at launch; `hidden` is kept for later event chains whose very existence is the surprise. A hidden achievement shows as "Hidden achievement" with its tier, its name and text secret until earned.
+
+Some achievements are **levels of a ladder**: one count at rising steps. The harvest ladder counts province harvests (each of your provinces that brings in its harvest adds one) across all your campaigns: *First Harvest* at 1, then *Ten Harvests*, *A Hundred Harvests*, *A Thousand Harvests* and *Ten Thousand Harvests*. Each level is its own achievement with its own points, as the stores have no levels, but the game shows the ladder as one badge marked with the level reached, such as 3/5.
 
 ### When tests run
 
@@ -84,7 +86,7 @@ An achievement's `id` is never renamed after release, and every store id comes f
 
 Each achievement has one 32 × 32 icon in the game's pixel-art palette, with a 2-pixel frame in its tier's colour (copper, silver, gold, crown purple-gold). Icons are scaled with nearest-neighbour and no smoothing: × 2 for Steam (64) and × 16 for Game Center and Google Play (512). Steam's locked image uses the grey "unknown land" parchment tones of the map's fog. Each icon shows what the achievement is about, never a real flag or coat of arms.
 
-### The 71 achievements
+### The 75 achievements
 
 All thresholds are provisional placeholders for balancing.
 
@@ -101,18 +103,22 @@ All thresholds are provisional placeholders for balancing.
 | Ink on the Treaty | copper | A war ends with a peace treaty you signed |
 | A Year in the Ledger | copper | You have played 12 months |
 
-**Realm** (8, 55 points)
+**Realm** (12, 130 points)
 
 | Name | Tier | Earned when |
 |---|---|---|
 | Full Granaries | silver | With at least 10 provinces, 60 months with no hungry province (progress) |
-| The Famine Rule | copper | You release the famine rule to a province and nobody there dies of famine that year |
+| Famine Relief | copper | You release famine relief to a province and nobody there dies of famine that year |
 | Seven Fat Years | copper | Your capital has a good harvest or better 7 years in a row (progress) |
 | Clean Books | copper | You repay a loan of at least 1,000 |
 | Counting House | silver | You hold 10,000 gold (progress) |
 | Many Hearths | silver | Your realm has 10 million people (progress) |
 | Where Roads Meet | copper | You own a trade hub |
 | Long Reach | copper | Any castle reaches 3 rings |
+| Ten Harvests | copper | Bring in 10 province harvests across your campaigns (lifetime; harvest ladder level 2) |
+| A Hundred Harvests | silver | 100 province harvests (lifetime; level 3) |
+| A Thousand Harvests | gold | 1,000 province harvests (lifetime; level 4) |
+| Ten Thousand Harvests | crown | 10,000 province harvests (lifetime; level 5) |
 
 **Lords and rule** (6, 35 points)
 
@@ -216,6 +222,13 @@ All thresholds are provisional placeholders for balancing.
 - **The turn report** gets one line per unlock, with a jump to where it happened when there is a place (the castle, the battlefield).
 - **Eligibility** shows on the pause menu and the new game screen, with a one-time warning before you lose it.
 
+### In the playable build today
+
+- Tap the **trophy** in the side tools (under the speaker), or *Achievements* at the foot of *Choose your realm*. The Achievements card opens in the side panel: earned of 75 and points of 755 at the top, the eligibility line, a filter (*All*, *Within reach*, *Earned*), then one row of badges per category with its own count. Tap a badge for its text, tier and points, this campaign's progress bar, and the date you earned it. The harvest ladder is one badge in First steps with its level in the corner (3/5); its detail lists every level with its target and date and a bar to the next level, counted across all your campaigns.
+- A badge is the tier's frame round the category's sign (a coin for Realm, swords for War, an anchor for Sea…) until the 71 icons are drawn. Grey means locked; a dashed frame means **Not in the game yet**: 23 rows read systems the build does not have yet (charters, rulers and succession, trade hubs, winter quarters, marshals, styles, voyages and colonies, rebellions, regions of the world), and they stay locked until those land.
+- When you earn one, a banner slides in under the date bar for three seconds and a line goes into the News; tap the banner to open the card at it. The trophy carries a red dot until you have looked. *Achievement toasts* in Settings → Gameplay (the cog) turns the banner off; achievements still unlock.
+- Tests run at the end of each week's turn, after everything else. What you earn is kept on this device, apart from any campaign, so it stays when you start again or reload. The build has no saves yet, so every campaign counts as ironman.
+
 ## How it connects
 
 - [Saving](Saving): the three save flags, the player profile and its cloud sync, demo carry-over.
@@ -225,7 +238,7 @@ All thresholds are provisional placeholders for balancing.
 - [Music and sound](Music-and-Sound): the unlock sound.
 - [Tutorial and help](Tutorial-and-Help): tutorial saves are never ironman, so the tutorial earns none.
 - [Your realm](Your-Realm): harvests, food policy, gold, loans, people, castle reach, lords, ruler years, succession, schools, scholars, trade ships, oaths.
-- [Provinces](Provinces): hungry provinces, the famine rule, officials, charters, provinces gained.
+- [Provinces](Provinces): hungry provinces, famine relief, officials, charters, provinces gained.
 - [Research](Research): inventions, eras, first in the world.
 - [Recruiting](Recruiting): regiments trained, the Marshal.
 - [Warfare](Warfare): battles, sieges, wars, winter quarters, commander styles.

@@ -21,7 +21,7 @@ Feature: Officials and their types
       | muster master    | recruits refilling 25 % faster                                                          |
       | customs officer  | +15 % trade ratio gain                                                                  |
       | chaplain         | faith mix moving twice as fast toward the ruler's faith                                 |
-      | schoolmaster     | tongue mix moving twice as fast toward the ruler's tongue and students graduating a year sooner |
+      | schoolmaster     | language mix moving twice as fast toward the ruler's language and students graduating a year sooner |
       | warden           | a garrison fighting 25 % better, walls repairing twice as fast and a castle store rotting half as fast |
       | colonial governor | no effect of its own                                                                   |
 
@@ -101,8 +101,8 @@ Feature: Officials and their types
     Then the country card shows 40 officials
 
   @PROV-299 @placeholder
-  Scenario Outline: Officials learn by tongue
-    Given an official of the "<official>" tongue runs a province of the "<people>" tongue
+  Scenario Outline: Officials learn by language
+    Given an official of the "<official>" language runs a province of the "<people>" language
     Then he learns the province in <years> years
 
     Examples:
@@ -179,3 +179,32 @@ Feature: Officials and their types
     When the player opens the Officials tab of the country card
     Then it lists every official of the realm with his type, province, years served and effect
     And it lists the empty posts
+
+  @PROV-333 @PROV-335 @placeholder
+  Scenario: Hiring an official for an empty post
+    # config: province.officials.hire.gold
+    Given the province "Troyes" is royal
+    And the province "Rouen" is royal with its post empty
+    And a "steward" official has served 6 years in "Troyes"
+    And the country "France" has 60 gold
+    When the country "France" hires a "steward" for "Rouen"
+    Then the "steward" runs "Rouen" at half his effect
+    And the country "France" has 35 gold left
+    When the country "France" tries to hire a "judge" for "Angers", held by the lord "Anjou"
+    Then it is refused because he serves the lord, not the crown
+
+  @PROV-333 @PROV-334
+  Scenario: A type no one serves in comes only from abroad
+    Given the province "Rouen" is royal with its post empty
+    And no "customs officer" serves in a royal post of "France"
+    When the country "France" tries to hire a "customs officer" for "Rouen"
+    Then it is refused because no one at home knows the trade
+    When the country "France" hires a foreign "customs officer" for "Rouen"
+    Then the "customs officer" runs "Rouen" at half his effect
+
+  @PROV-340
+  Scenario: A province just taken waits for a decision
+    Given the player plays the country "Castile"
+    When a neighbour hands the country "Castile" one of its provinces
+    Then the province's post stands empty
+    And End turn waits until the player fills the post, grants it to a lord or keeps it royal

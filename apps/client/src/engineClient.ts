@@ -20,7 +20,7 @@ export class EngineClient {
   private workerAnswered = false;
   private nextId = 1;
   private sent: EngineRequest[] = [];
-  private pending = new Map<number, { resolve: (s: Snapshot) => void; reject: (e: Error) => void }>();
+  private pending = new Map<number, { resolve: (r: EngineResponse) => void; reject: (e: Error) => void }>();
 
   constructor(opts: { forceMainThread?: boolean } = {}) {
     if (opts.forceMainThread) {
@@ -51,7 +51,15 @@ export class EngineClient {
     };
   }
 
-  send(req: Request): Promise<Snapshot> {
+  /** Sends a request that answers with a snapshot. */
+  async send(req: Request): Promise<Snapshot> {
+    const r = await this.request(req);
+    if (r.type !== "snapshot") throw new Error(r.type === "error" || r.type === "refused" ? r.message : `unexpected ${r.type}`);
+    return r.snapshot;
+  }
+
+  /** Sends any request and gives back the engine's answer as it came (saves answer with "saved" or "refused"). */
+  request(req: Request): Promise<EngineResponse> {
     const full = { ...req, id: this.nextId++ } as EngineRequest;
     return new Promise((resolve, reject) => {
       this.pending.set(full.id, { resolve, reject });
@@ -86,7 +94,7 @@ export class EngineClient {
     const p = this.pending.get(msg.id);
     if (!p) return;
     this.pending.delete(msg.id);
-    if (msg.type === "snapshot") p.resolve(msg.snapshot);
-    else p.reject(new Error(msg.message));
+    if (msg.type === "error") p.reject(new Error(msg.message));
+    else p.resolve(msg);
   }
 }

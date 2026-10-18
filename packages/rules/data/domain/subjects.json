@@ -322,6 +322,10 @@
   "kin": {
    "arrow": 1,
    "from_design": "ties.kin"
+  },
+  "withholds_tribute": {
+   "arrow": -2,
+   "note": "While the subject withholds its tribute; it also steps one toward Disloyal each season end (SUBJ-132, D-SUBJ-31)"
   }
  },
  "tribute_levels": {
@@ -411,5 +415,34 @@
   "reach_multiplier": 3,
   "reach_per_own_subject": 1,
   "overlord_can_act_on_sub_subjects": false
+ },
+ "crowns": {
+  "$comment": "Personal unions in the game (SUBJ-126, SUBJ-127, D-SUBJ-30): a yearly roll stands in for a ruler dying without an heir until rulers age.",
+  "heirless_per_year": 0.02,
+  "no_heir_share": 0.25,
+  "claim_years": 20
+ },
+ "playing_as_subject": {
+  "$comment": "The player's side of the tie in the game (SUBJ-131 … SUBJ-139, D-SUBJ-31). Placeholders.",
+  "cautious_when": {
+   "dimensions": [
+    "unrest_risk",
+    "external_threat_exposure"
+   ],
+   "levels": [
+    "high",
+    "very_high"
+   ]
+  },
+  "turn_the_tables": {
+   "needs": "outgrown: more provinces than the overlord",
+   "peace_voice_share_over": 0.75,
+   "kind_with_land_path": "vassal",
+   "kind_otherwise": "tributary"
+  }
+ },
+ "map": {
+  "$comment": "How subjects are drawn on the map (subjects-design 10.3, SUBJ-093): at world zoom a subject is washed in its direct overlord's colour with a diagonal hatch this many map pixels wide in its own colour.",
+  "world_zoom_hatch_px": 2
  }
 }

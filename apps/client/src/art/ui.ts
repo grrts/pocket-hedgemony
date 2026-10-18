@@ -8,7 +8,7 @@
  * edges repeat, scaled up by whole steps so pixels stay square.
  */
 
-import { FLAG_H, FLAG_W, flagGrid } from "./flags.ts";
+import { FLAG_H, FLAG_W, flagCanvasSize, flagGrid } from "./flags.ts";
 
 type Px = (x: number, y: number, c: string) => void;
 
@@ -261,6 +261,7 @@ export const ICONS = {
     "kkkkkkkkkkkk",
   ],
   collapse: ["kk....kk", "kwk..kwk", ".kwkkwk.", "..kwwk..", "...kk..."],
+  back: ["...kk", "..kwk", ".kwk.", "kwk..", "kwk..", ".kwk.", "..kwk", "...kk"],
   close: ["kk....kk", "kwk..kwk", ".kwkkwk.", "..kwwk..", "..kwwk..", ".kwkkwk.", "kwk..kwk", "kk....kk"],
   scroll: [
     ".kkkkkkkk.",
@@ -285,6 +286,8 @@ export const ICONS = {
     "kddddddddk",
     "kkkkkkkkkk",
   ],
+  // A church with a cross: a head of the faith's seat (RELG-138).
+  seat: ["....k....", "...kyk...", "....k....", "..kkkkk..", ".kwwwwwk.", "kwwkkkwwk", "kwwkbkwwk", "kkkkkkkkk"],
   speaker: ["....kk.....", "...kwk...k.", "kkkwwk.k..k", "kwwwwk..k.k", "kwwwwk..k.k", "kwwwwk..k.k", "kkkwwk.k..k", "...kwk...k.", "....kk....."],
   mute: ["....kk.....", "...kwk.....", "kkkwwkr...r", "kwwwwk.r.r.", "kwwwwk..r..", "kwwwwk.r.r.", "kkkwwkr...r", "...kwk.....", "....kk....."],
   hammer: [
@@ -299,6 +302,31 @@ export const ICONS = {
     "...kbk....",
     "...kkk....",
   ],
+  menu: ["kkkkkkkkkk", "kwwwwwwwwk", "kkkkkkkkkk", "..........", "kkkkkkkkkk", "kwwwwwwwwk", "kkkkkkkkkk", "..........", "kkkkkkkkkk", "kwwwwwwwwk", "kkkkkkkkkk"],
+  trophy: [
+    "kkkkkkkkkk",
+    "kyygggggdk",
+    "kygkyggddk",
+    "kygkyggddk",
+    ".kygggddk.",
+    "..kyggdk..",
+    "...kgdk...",
+    "....kk....",
+    "...kgdk...",
+    "..kbbbbk..",
+    "..kkkkkk..",
+  ],
+  cog: [
+    "...kkk...",
+    ".kkkgkkk.",
+    ".kggggdk.",
+    "kkggkgdkk",
+    "kggk.kgdk",
+    "kkggkddkk",
+    ".kgddddk.",
+    ".kkkdkkk.",
+    "...kkk...",
+  ],
   anchor: [
     "...kkk...",
     "...kik...",
@@ -310,6 +338,18 @@ export const ICONS = {
     "kk.kik.kk",
     ".kkkikkk.",
     "..kkkkk..",
+  ],
+  /** Auto turns (SHELL-159): two play marks, one week after another. */
+  auto: [
+    "k....k....",
+    "kk...kk...",
+    "kyk..kyk..",
+    "kyyk.kyyk.",
+    "kyyykkyyyk",
+    "kyyk.kyyk.",
+    "kyk..kyk..",
+    "kk...kk...",
+    "k....k....",
   ],
 } as const;
 
@@ -375,8 +415,9 @@ export function flagCanvas(nation: FlagOf, scale = 1): HTMLCanvasElement {
   const cloth = flagGrid(nation.id) ?? Array.from({ length: FLAG_H }, () => Array<string>(FLAG_W).fill(nation.color));
   const w = FLAG_W + 2;
   const canvas = document.createElement("canvas");
-  canvas.width = w * scale;
-  canvas.height = (FLAG_H + 3) * scale;
+  const size = flagCanvasSize(scale);
+  canvas.width = size.w;
+  canvas.height = size.h;
   const ctx = canvas.getContext("2d", { willReadFrequently: true })!;
   const rect = (x: number, y: number, rw: number, rh: number, c: string) => {
     ctx.fillStyle = c;

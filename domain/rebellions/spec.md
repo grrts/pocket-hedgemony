@@ -26,7 +26,7 @@ answer it, and what the rebels get if they win.
 - How a rising is tagged by a revolution, the camps that replace the join table, and the regime applied when
   a tagged rising wins or is crushed: **revolutions** (the hook is a seam, see 11 and D-REBL-4).
 - The secret "fund rebels" action itself, its gold and its chance of being caught: **diplomacy**.
-- Faith policy rows, preachers, houses of worship: **religion**. Tongues and nationalism: **culture**.
+- Faith policy rows, preachers, houses of worship: **religion**. Languages and nationalism: **culture**.
 - Independence wars of subjects: **subjects** (8.2), which are ordinary wars, not risings.
 - The global order of the turn and its monthly steps: **time-and-turns**.
 - How risings are drawn on the map at each zoom: **map-presentation**.
@@ -74,7 +74,7 @@ Newest decision first.
 | Great revolt | More than 5 provinces, or the capital's province, or a whole lord's land: civil war. | Rebellion |
 | Lord's revolt | A rising led by a lord whose loyalty is *In revolt*, with his retinue. | |
 | Resistance | A rising of local people in a colony whose tiles settlers took; same rules, demand is their tiles back. | Rebels |
-| Bloodshed | Grievance for 20 years in every province of the same faith or tongue after a massacre. | |
+| Bloodshed | Grievance for 20 years in every province of the same faith or language after a massacre. | |
 | Neighbour in revolt | Grievance a province gets when a neighbouring province has rebels with a grievance it shares. | |
 | Pardon / Punish the leaders / Massacre | The three treatments after beating a rising. | |
 | Rebel band | The warfare kind rebels fight as. | |
@@ -177,9 +177,9 @@ Newest decision first.
   lord's want (land, an office, lower taxes, independence); Pretender – the pretender on the throne, or the
   province handed to them; New ideas – a new kind of government. [rebellions §2.3]
 - REBL-015 The game shall draw most joiners by cause: Hunger – farmers and homeless; Tax – farmers, craftsmen,
-  market folk; Faith – everyone of that faith; Homeland – everyone of the homeland's tongue; Town – homeless,
+  market folk; Faith – everyone of that faith; Homeland – everyone of the homeland's language; Town – homeless,
   craftsmen, market folk; Lord – the lord's retinue and officials plus the people of his land who share his
-  faith and tongue; Pretender – lords who back the pretender plus anyone with a grievance; New ideas –
+  faith and language; Pretender – lords who back the pretender plus anyone with a grievance; New ideas –
   townsfolk and scholars first. [rebellions §2.3]
 - REBL-016 When settlers take local people's tiles in a colony, the game shall raise a resistance of the
   local people instead of rebels: the same rules, with their own named leaders and the demand to get their
@@ -205,7 +205,7 @@ Newest decision first.
 - REBL-023 When men join a rising, the game shall take them out of their classes and leave their job slots
   empty. [rebellions §3.1]
 - REBL-024 While a rising grows, each month the game shall draw these shares of each class's men: homeless
-  30 %; the class the cause speaks to 10 %; everyone sharing the faith or tongue (faith and homeland risings)
+  30 %; the class the cause speaks to 10 %; everyone sharing the faith or language (faith and homeland risings)
   8 %; other classes 2 %; clergy and scholars only in faith and new-ideas risings; a lord's retinue all of it
   at once. [rebellions §3.1]
 - REBL-025 When a rising has drawn its share, or its cause is fixed, the game shall stop it growing.
@@ -234,12 +234,12 @@ Newest decision first.
 - REBL-035 While a province is held by a rising (tier Rising or above), the game shall send none of its tax,
   recruits, food or trade to the owner, and its official shall flee. [rebellions §4.1]
 - REBL-036 While a rising is a Rebellion, the game shall apply the Rising effects in each province, make
-  neighbouring lords of the same faith or tongue waver, and let rebels besiege castles. [rebellions §4.1]
+  neighbouring lords of the same faith or language waver, and let rebels besiege castles. [rebellions §4.1]
 - REBL-037 While a rising is a Great revolt, the game shall run it as a civil war: every lord picks a side by
   loyalty, allies may stay out, and rival AIs may attack. [rebellions §4.1]
 - REBL-038 Each month the game shall roll for each rising to spread to each neighbouring province, with a
   higher chance when the neighbour has the same grievance (and it gets *Neighbour in revolt*), shares the
-  rebels' faith or tongue, is connected by roads, rivers and traders, has many homeless, when the owner's army
+  rebels' faith or language, is connected by roads, rivers and traders, has many homeless, when the owner's army
   is away at war, when the owner answered with a massacre, and when a rival pays the rebels; and a lower
   chance when the neighbour shares no grievance, a garrisoned castle sits on the road between, a judge runs
   the neighbour (riots there need one more grievance), the owner's army is in the region, the owner pardoned
@@ -247,10 +247,10 @@ Newest decision first.
 - REBL-039 When a neighbouring province has rebels with a grievance a province shares, the game shall give
   that province *Neighbour in revolt* until those rebels are beaten or satisfied. [rebellions §4.2;
   province stats §12.1]
-- REBL-040 When a disloyal lord whose faith or tongue matches the rebels joins with his retinue, the game shall
+- REBL-040 When a disloyal lord whose faith or language matches the rebels joins with his retinue, the game shall
   turn the rising into a lord's revolt with Soldiers' arms. [rebellions §4.3]
 - REBL-041 When a rising is answered with a massacre, the game shall add *Bloodshed* for 20 years to every
-  province of the same faith or tongue. [rebellions §4.3, §5.1; province stats §12.1]
+  province of the same faith or language. [rebellions §4.3, §5.1; province stats §12.1]
 - REBL-042 While rebels hold a province, the game shall loot one town building a season (the market first),
   kill or drive out officials, burn tiles when they forage, and make scholars flee. [rebellions §4.3;
   buildings]
@@ -279,7 +279,7 @@ Newest decision first.
 - REBL-050 After a victory over a rising, the game shall let the owner choose Pardon (survivors return to their
   classes, the province calms faster, the leader may rise again), Punish the leaders (the leader is executed;
   that province gets no new rising from the same cause for 10 years) or Massacre (no rising in that province
-  for 20 years; *Bloodshed* across every province of the same faith or tongue; lords of that faith or tongue
+  for 20 years; *Bloodshed* across every province of the same faith or language; lords of that faith or language
   waver). [rebellions §5.1]
 
 ### 5.7 Preventing risings
@@ -333,6 +333,18 @@ Newest decision first.
   chances, the sparks, join shares per class and cause, arms steps and their sources, spread chances, how long
   rebels must hold out to win, the *Bloodshed* length, and what each cause wins. [rebellions §8]
 
+### 5.12 In the game (first slice, milestone 6)
+
+- REBL-065 Each month, after the grievances are counted, the game shall apply the sparks since the last month (a province's tax raised, its owner's army beaten in or next to it) to rioting provinces, roll each plotting province's rising chance, and start a rising whose cause comes by D-REBL-7 from the province's grievances; its men come from the province's recruits by the class shares of 3.1, three months' share at once, and a rising of fewer than 200 men stays riots. [REBL-004, REBL-005, D-REBL-1, D-REBL-16]
+- REBL-066 A rising's band shall stand in its province on the map in the rebels' colour, its land hatched in that colour; it musters each month while its cause holds, eats from the store where it stands, shrinks a tenth a month without food or above tools unprotected (REBL-048), spreads at 10 % a month to each neighbour with 3 or more grievances, besieges the castles of its land and, once a Rebellion, marches a province a week on the nearest castle of the owner beside its land, by the warfare siege rules; a castle taken arms it (captured castle store) and joins its province to the rising. [REBL-027, REBL-031, REBL-032, REBL-036, REBL-038, D-REBL-6]
+- REBL-067 An army of the owner with a commander standing where the band stands fights it at once by the warfare battle rules, the rebels as *rebel band* companies counted by arms × the *Locals know the land* factor, led by their leader. Won, the rebels scatter (REBL-049) and the owner gives the verdict (the AI punishes the leaders); lost, the army falls back and the defeat is a spark nearby. An army that stands four weeks in a held province the band is not in takes it back. [REBL-022, REBL-029, REBL-049, REBL-050]
+- REBL-068 Answers in the game: **Grant** — Hunger: the castle granary feeding their land fills their stores to 4 months; Tax: tax back to normal where heavier, else a step lighter, and the musters in their land end; Homeland: self-rule (*Foreign rule* no longer counts there, tax light for good, D-REBL-11); Town: the owner's armies there march out and tax stays light 10 years; the realm's other plotting provinces of that cause are 5 points likelier to rise for 12 months. **Talk** — 10 gold a province, once a month, 75 in 100 for hunger, tax and town, 15 for faith and homeland, 30 otherwise, for half the grant. **Bribe** — 1 gold per 100 rebels (twice for a lord or pretender): the leader leaves, and half the time the rising melts away. **Wait** — no order. **Attack** — a march. A won rising (12 months held, or the capital's castle taken): Tax and Town keep their tax light 10 years; Hunger empties the castles into their stores and their lords turn disloyal; Homeland breaks away to the realm that held them in 1444 when it stands, else rules itself. [REBL-045 … REBL-048, REBL-056, REBL-057, D-REBL-16]
+- REBL-069 Risings, verdicts, locks, light-tax charters and self-rule shall be kept in the save. [SAVE]
+
+#### How the player uses it
+- REBL-070 Where: a rising begins with an alert over the map ("Rising in Cuenca after a tax rise: the miller of Cuenca leads 1,200 men over heavy taxes…") with Go there; the province card then opens with the **rebellion card** (REBL-063): cause and grievance, demand, leader and what he brings, men and who joins, arms and their factor, what it holds, food, any siege or march, spread, and a bar of months held of 12. Below, the five answers as 44-point buttons with their gold and odds: Grant demand (a first tap shows what it gives up, then Grant and Cancel), Talk, Bribe leader, Attack (sends the player's nearest free army, named with its men; disabled with "no army free" when there is none) and Wait (folds the card). A beaten rising's alert opens the same card with the verdict: Pardon, Punish the leaders, Massacre (which asks once more). Another realm's rising shows its card without answers. [X-19, REBL-063]
+- REBL-071 Grouping and overview: everything about one rising sits on its province's card. The realm's **Provinces** tab opens with an Uprisings block (was Risings), a row per rising (tier, place, grievance, men, provinces, months held) and per beaten rising waiting on a verdict, each opening its province; held provinces sort first and read "Held by rebels". The General tab carries one red line, "Uprisings: n · m beaten, waiting on you", that opens the Provinces tab. A plotting province's mood line gives its monthly chance to rise; a rioting one says a new burden there starts a rising. Phone: the card fits the side panel in the Wide and Tall layouts, the answers flow to as many columns as fit (one on a narrow panel), every button is at least 44 points high, nothing needs hover and the panel never scrolls sideways; a phone held upright is asked to turn sideways, as for the whole game. [X-19, SHELL-108, SHELL-109, SHELL-114]
+
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
@@ -358,7 +370,7 @@ The secret "fund rebels" order is a diplomacy command (diplomacy 6.11); this con
 | ProvinceLooted | Rebels loot a town building (one a season) | province, building | buildings, province |
 | RebelsDefeated | An army beats the rebels | rising, battle | warfare, province (homeless), revolutions (crushed) |
 | RisingEnded | Granted, talked, bribed and melted, starved, or scattered | rising, how | province, revolutions (`rising_crushed` for a tagged rising) |
-| MassacreCommitted | Massacre chosen | rising, faith, tongue | province (*Bloodshed* ×20 years), realm (lords waver) |
+| MassacreCommitted | Massacre chosen | rising, faith, language | province (*Bloodshed* ×20 years), realm (lords waver) |
 | RebelsWon | 12 months held or capital taken | rising, cause, provinces | province, realm, government (new ideas), subjects/scenario (new country), revolutions (`rising_won`) |
 | ResistanceStarted | Settlers take local people's tiles | colony province, people | exploration, province |
 
@@ -441,7 +453,7 @@ groups.
 | events | upstream | Published Language | `rebels` effect, `rebels_active` condition, `unrest` → grievances, sparks from events, `separatism_risk` |
 | diplomacy | upstream | Customer–Supplier | Fund rebels (secret), *Foreign agitators* / *Foreign meddling* (D-REBL-3), envoy flees when the host country falls to rebels |
 | religion | upstream | Customer–Supplier | Faith risings' demand, preachers as leaders, sparks from faith policy and houses (D-REBL-2) |
-| culture | upstream | Customer–Supplier | Homeland risings draw 8 % of the tongue; with nationalism 0.5+ they demand a new country; *Banned tongue* grievance |
+| culture | upstream | Customer–Supplier | Homeland risings draw 8 % of the language; with nationalism 0.5+ they demand a new country; *Banned language* grievance |
 | government | downstream | Customer–Supplier | A won New ideas rising sets a form; over-cap lords become disloyal |
 | subjects | downstream | Customer–Supplier | A lord leaving with his land (rebellions 6) |
 | recruiting | upstream | Customer–Supplier | Recruits lost to rebels (D-REBL-14) |
@@ -471,14 +483,15 @@ Decided on 17 October 2026 under DECISIONS.md (latest decision wins, simpler rul
 - **D-REBL-4** (was OQ-REBL-4) Revolution hook adopted: a rising may carry `revolution: <event id>`; its joiners follow that revolution's camps instead of the 3.1 table; `rising_won` / `rising_crushed` are applied when it wins, is beaten or melts away. "Risen" is the *Rising* tier, and a province whose castle a revolution camp holds counts as Risen (X-9). A Fight starts a tagged rising at the normal tier, not a great revolt. The simpler of the two readings.
 - **D-REBL-5** (was OQ-REBL-5) Event-tree `rebels {type, size}`: it starts a rising in the province at once; type maps to cause (peasant → Hunger, religious → Faith, noble → Lord, separatist, independence and anticolonial → Homeland, revolutionary → New ideas); its men are size (small 0.5 … huge 4.0) × the province's recruit pool, by class shares. `unrest_spawn` and `unrest_guaranteed` are not used (the game has no unrest meter). `rebels_active {type}` is true while a rising of the mapped cause is active.
 - **D-REBL-6** (was OQ-REBL-6) Provisional numbers in `rebellions.json`: spread 10 % a month to each neighbouring province with 3+ grievances; a Talk costs 10 gold per province the rising holds; a bribe costs 1 gold per 100 rebels; a grant raises the monthly rising chance of the realm's other Plotting provinces by 5 points for 12 months; a pardoned province loses its rising grievances twice as fast; a faith rising finds a new preacher-leader after 12 months; after a Massacre lords waver one step.
-- **D-REBL-7** (was OQ-REBL-7) Causes of the other grievances: *Burned homes*, *Plague*, *Requisitioned* → Hunger; *Bloodshed*, *Persecuted* → Faith when the rising's people differ in faith, else Hunger; *Ungoverned*, *Grasping officials* → Tax; *Banned tongue* → Homeland; *Neighbour in revolt* → the neighbour's cause. Heaviest = the grievance with the largest count (counts-as-two counts 2); ties go by the cause table's order (Hunger, Tax, Faith, Homeland, Town, Lord, Pretender, New ideas).
+- **D-REBL-7** (was OQ-REBL-7) Causes of the other grievances: *Burned homes*, *Plague*, *Requisitioned* → Hunger; *Bloodshed*, *Persecuted* → Faith when the rising's people differ in faith, else Hunger; *Ungoverned*, *Grasping officials* → Tax; *Banned language* → Homeland; *Neighbour in revolt* → the neighbour's cause. Heaviest = the grievance with the largest count (counts-as-two counts 2); ties go by the cause table's order (Hunger, Tax, Faith, Homeland, Town, Lord, Pretender, New ideas).
 - **D-REBL-8** (was OQ-REBL-8) Great revolt: a rising in or next to the capital's province is a great revolt at once (4.3); 4.1 is read the same way. One rule.
 - **D-REBL-9** (was OQ-REBL-9) A Disloyal lord revolts on a monthly roll of 5 % (provisional), the same as the lowest Plotting chance. No new mechanic beyond a number.
 - **D-REBL-10** (was OQ-REBL-10) A rebel leader's Logistics works as for any commander (food and moving); a "Cunning, little Might" leader has Cunning 3 and Might 1 (provisional). Warfare's commander rules are reused.
-- **D-REBL-11** (was OQ-REBL-11) Homeland demands: below nationalism 0.5 "self-rule" is granted as an *Own tongue* charter in the provinces they hold (accepted in a Talk); at 0.5 or more they demand a new country (CULT-075, D-CULT-16). A won homeland rising breaks away as before. Culture's lever already exists.
+- **D-REBL-11** (was OQ-REBL-11) Homeland demands: below nationalism 0.5 "self-rule" is granted as an *Own language* charter in the provinces they hold (accepted in a Talk); at 0.5 or more they demand a new country (CULT-075, D-CULT-16). A won homeland rising breaks away as before. Culture's lever already exists.
 - **D-REBL-12** (was OQ-REBL-12) New ideas cause: the province's event-tree ideology support for liberalism, socialism, communism or nationalism at 0.3 or more, from the age of revolutions. The same 0.3 threshold culture uses.
 - **D-REBL-13** (was OQ-REBL-13) Both exist and do not overlap: exploration's local aggression roll covers founding a colony; rebellions' resistance covers settled land taken by conquest or treaty. Colonies take only free tiles (province 12.3).
 - **D-REBL-14** (was OQ-REBL-14) Armed veterans: none. Disbanded men never keep their arms (X-7, Leroy 17 Oct), so a rising never starts armed from veterans and there is no new arms step.
+- **D-REBL-16** First game slice (milestone 6, provisional): the game's grievances are the eight it tracks (*Hungry*, *Conscription*, *Soldiers quartered*, *Ungoverned*, *Foreign rule*, *Bloodshed*, *Heavy taxes*, *Grasping officials*), so its risings are Hunger, Tax, Homeland and Town ones; the sparks played are a tax raised and a lost battle; a band is one army per rising that walks a province a week; leaders' wants, lords' revolts, looting, forges, official flight and funded rebels wait on their contexts. The other demands are granted as light tax for 10 years. The numbers in REBL-068 are `provisional` in rebellions.json, with a *massacre* cause added to the realm's loyalty-down list for "lords waver one step". It is the smallest game that runs the design's rising, band, answers and win on the grievances the game has.
 - **D-REBL-15** (was OQ-REBL-15) A *Riot* is a province state shown on the province card, not a rising object; the rebellion card appears only when a rising starts. The card is for risings.
 
 ## 14. Traceability
@@ -515,3 +528,5 @@ Decided on 17 October 2026 under DECISIONS.md (latest decision wins, simpler rul
 | REBL-059, 060, 061, 062 | other-systems.feature | Other systems |
 | REBL-063 | other-systems.feature | The rebellion card (Troyes) |
 | REBL-064 | none | Configuration only; checked by the config schema, not by behaviour |
+| REBL-065 … REBL-069 | — | Engine: packages/engine/test/rebels.test.ts (spark, hold, grant, bribe, battle and verdict, win, AI, save) |
+| REBL-070, REBL-071 | — | Presentation: apps/client/src/ui/rebels.ts, the rebellion card and Uprisings block; screenshots from apps/client/scripts/rebels-shots.mjs |

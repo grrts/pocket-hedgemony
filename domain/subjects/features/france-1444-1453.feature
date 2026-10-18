@@ -1,12 +1,12 @@
 @context-subjects
 Feature: France, 1444 to 1453
   As the French player
-  I want to manage eleven subjects with a reach of seven
+  I want to manage eleven subjects with a subject limit of seven
   So that I learn the subject buttons and reasons in one worked example
 
   Background:
     Given the date is "1444-11-11"
-    And the country "France" has high administrative capacity and subject reach 7
+    And the country "France" has high administrative capacity and subject limit 7
     And "France" has 10 vassals and the appanage "Dauphiné"
 
   @SUBJ-036 @SUBJ-058
@@ -15,22 +15,22 @@ Feature: France, 1444 to 1453
     When the scenario starts
     Then "Brittany" starts "Wavering"
     And "Armagnac" starts "Loyal"
-    And "France" uses 11 reach of 7
+    And "France" uses 11 of its subject limit of 7
     And "Brittany" and "Foix" have the reason "Stretched thin"
-    And the 4 furthest subjects of "France" have 1 more down arrow from being over reach
+    And the 4 furthest subjects of "France" have 1 more down arrow from being over the subject limit
 
   @SUBJ-064 @SUBJ-066 @SUBJ-067
   Scenario: Folding in the Dauphiné
     Given "Dauphiné" is a Loyal Vassal with "Kin", a subject since 1349, with 3 provinces
     When "France" sends one envoy to fold it in for 3 months
     Then the Dauphin is a great lord inside the realm of "France"
-    And "France" uses 10 reach of 7
+    And "France" uses 10 of its subject limit of 7
 
   @SUBJ-064
   Scenario: Folding in two small vassals
-    Given "France" uses 10 reach of 7
+    Given "France" uses 10 of its subject limit of 7
     When "France" folds in "French minor lordships" and "Nevers" over the next years
-    Then "France" uses 8 reach of 7
+    Then "France" uses 8 of its subject limit of 7
     And the lord capacity of "France" fills up instead
 
   @SUBJ-030 @SUBJ-040 @SUBJ-043

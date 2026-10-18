@@ -1,4 +1,5 @@
 import { expect } from "vitest";
+import { advance, applyNow, campaignView, createWorld, setPlayer, STEPS_PER_DAY, type World } from "@ph/engine";
 import { loadDefaultRuleset } from "@ph/rules";
 import { createDayLoop, endCampaign, endTurn, newCampaign, requestSave, campaignOf, scheduleBattle, type Battle, type DayLoop } from "@ph/engine/domain/time-and-turns";
 import { battleMarks, recolourUploads, tapTargetMin, visibleMapArea, recentreForCard, type Window } from "@ph/engine/domain/map-presentation";
@@ -10,6 +11,7 @@ import {
   adCard,
   applyPreset,
   answerEndTurnQuestion,
+  endTurnInAuto,
   answerEvent,
   answerFirstRun,
   appBackgrounded,
@@ -69,7 +71,7 @@ import {
   longPressOrHoverOnly,
   longTurnStrip,
   lookAtMap,
-  mainMenu,
+  startColumn,
   mapAccepts,
   mapDimmed,
   mapHud,
@@ -134,7 +136,7 @@ import {
   isValidEndDate,
   ledger,
   loadList,
-  mainMenuFocus,
+  startFocus,
   muteButtons,
   mutesForSave,
   outcomeOf,
@@ -162,9 +164,12 @@ import {
   tapNameTab,
   tapOnMap,
   tapRealm,
-  tapToStart,
+  firstStartInput,
+  openStartScreen,
+  openWiki,
+  startBackgroundMoves,
   textField,
-  titleScreen,
+  startScreen,
   top,
   topBar,
   topCard,
@@ -185,6 +190,36 @@ import {
   type PromptDevice,
   type Shell,
   type Tip,
+  BATTLE_STEP_MS,
+  COUNTRY_CARD_TABS,
+  IN_CAMPAIGN_SCREENS,
+  WATCH_STEP_MS,
+  answerPeaceOffer,
+  bannerAt,
+  bannerTapBox,
+  battleStrip,
+  begins,
+  countryCardTabs,
+  countryTabHolds,
+  deskOf,
+  dispatchesButton,
+  dispatchesView,
+  fitsWindow,
+  homeCheck,
+  homeOf,
+  logDispatches,
+  openCountryCard,
+  openDispatches,
+  overviewOf,
+  pressKey,
+  putOffPeaceOffer,
+  screenLayout,
+  selectArmy,
+  tapAlert,
+  waitingForYou,
+  watchRound,
+  watchedBattleEnds,
+  type Tracked,
 } from "@ph/engine/domain/game-shell";
 import { steps, type Scenario } from "../src/registry.ts";
 
@@ -386,7 +421,8 @@ Then("the screen {string} shows one card with one choice", (s, id: string) => {
 
 Then("the screen {string} follows once every card is answered", (s, id: string) => {
   while (s.start.cards.length) answerFirstRun(s.start, "English");
-  expectTop(s, id as FrameId);
+  // The title opens with its menu already shown (SHELL-149).
+  expect(sh(s).stack.map((f) => f.id)).toEqual(id === "title" ? ["title", "main_menu"] : [id]);
   s.profile = s.start.profile;
 });
 
@@ -447,7 +483,7 @@ When("the player goes from the screen {string} to the map of a new campaign", (s
   const shell = sh(s);
   expect(s.start.path[0]).toBe(from);
   while (s.start.cards.length) answerFirstRun(s.start, "English");
-  tapToStart(shell, "touch");
+  firstStartInput(shell, "touch");
   const nc = openNewCampaign(shell, { suggested: SUGGESTED, lastOptions: ["normal"] });
   quickStart(shell, nc);
   continueCampaign(shell, { realm: nc.realm!, date: { year: 1444, month: 11 }, borders: "1444" });
@@ -485,10 +521,7 @@ Then("the screen {string} is shown", (s, id: string) => {
     else expectTop(s, id as FrameId);
     return;
   }
-  if (id === "title") {
-    replaceAll(shell, { id: "title" });
-    s.title = titleScreen(shell.platform, s.summary ?? null);
-  } else if (id === "map") {
+  if (id === "title") openStartScreen(shell); else if (id === "map") {
     ensureCampaign(s);
     s.hud = mapHud({ width: shell.window.width, height: shell.window.height, shape: shell.shape, safe: s.safe });
   } else if (id === "realm_book") {
@@ -500,48 +533,9 @@ Then("the screen {string} is shown", (s, id: string) => {
   } else replaceAll(shell, { id: id as FrameId });
 });
 
-Then(/^the background is the real map at world zoom drifting slowly over (.+)$/, (s, region: string) => {
-  const bg = s.title.background;
-  expect(bg).toMatchObject({ renderer: "map", zoom: "World", drift: "slow" });
-  if (region === "a region of the 1444 world") expect(bg.over).toBe(region);
-  else {
-    expect(region).toBe(`the realm "${bg.over}" in its current borders read from the latest save's summary`);
-    expect(bg.bordersFrom).toBe("the latest save's summary");
-  }
-});
-
-Then("the map is drawn by the same renderer as the campaign map", (s) => expect(s.title.background.renderer).toBe("map"));
-
-When("the player gives a {string}", (s, input: string) => {
-  tapToStart(sh(s), input as never);
-  acted(s);
-});
-
-Then("the main menu folds open", (s) => {
-  const shell = sh(s);
-  expectTop(s, "main_menu");
-  expect(shell.stack.at(-2)?.id).toBe("title");
-  expect(screen("main_menu").kind).toBe("Same screen");
-});
-
 Then("the track {string} starts", (s, track: string) => {
   expect(sh(s).track).toBe(track);
   expect(sh(s).events).toContainEqual({ type: "TitleDismissed" });
-});
-
-Then("a settings cog is shown that opens the screen {string} straight away", (s, id: string) => expect(s.title.cog).toBe(id));
-Then("the version number is shown in a corner", (s) => expect(s.title.version).toBe(true));
-Then(/^the Quit cross (is shown|is not shown)$/, (s, shown: string) => expect(s.title.quit).toBe(shown === "is shown"));
-
-When("the player taps to start", (s) => {
-  tapToStart(sh(s), "touch");
-  acted(s);
-});
-
-Then("the {string} line folds open into the main menu in the same place", (s, line: string) => {
-  expect(line).toBe(SHELL.strings.tapToStart);
-  expectTop(s, "main_menu");
-  expect(sh(s).stack.at(-2)?.id).toBe("title");
 });
 
 When("the player presses Back", (s) => {
@@ -551,21 +545,9 @@ When("the player presses Back", (s) => {
   acted(s);
 });
 
-Then(/^"Tap to start" is shown( again)?$/, (s) => {
-  expectTop(s, "title");
-  expect(screen("title").firstFocus).toBe("Tap to start");
-});
-
 Given("a campaign as {string} exists with its newest save in May 1503", (s, realm: string) => {
   s.summary = { realm, date: MAY_1503, borders: "May 1503" } satisfies CampaignSummary;
   s.sh = newShell({ platform: "Android" });
-});
-
-Then("the main menu shows {string} labelled {string} with the banner of {string}", (s, entry: string, label: string, banner: string) => {
-  const menu = mainMenu({ campaign: s.summary, saves: 1, tutorialFinished: true, platform: sh(s).platform, edition: sh(s).edition });
-  expect(menu[0]).toMatchObject({ label: entry, detail: label });
-  expect(label.startsWith(banner)).toBe(true);
-  expect(campaignLabel(banner, s.summary.date)).toBe(label);
 });
 
 When("the player picks {string}", (s, entry: string) => {
@@ -577,9 +559,10 @@ When("the player picks {string}", (s, entry: string) => {
   }
   const t = topId(shell);
   if (t === "main_menu" || (!t && entry === "New campaign")) {
-    if (entry === "Continue") continueCampaign(shell, s.summary);
+    if (entry === "Play") playFromStart(s);
     else if (entry === "New campaign") s.nc = openNewCampaign(shell, { suggested: SUGGESTED, lastOptions: s.lastOptions ?? ["normal"] });
-    else throw new Error(`main menu entry ${entry}`);
+    else if (entry === "Wiki") s.wiki = openWiki(shell);
+    else throw new Error(`start screen entry ${entry}`);
     return;
   }
   if (t === "map" && SHELL.gameMenu.includes(entry)) openGameMenu(shell);
@@ -630,14 +613,8 @@ When("the main menu is shown", (s) => {
     expectTop(s, "main_menu");
     return;
   }
-  replaceAll(shell, { id: "title" });
-  push(shell, { id: "main_menu" });
-  const state = s.menuState ?? { campaign: null, saves: 0, tutorialFinished: false };
-  s.menu = mainMenu({ ...state, platform: shell.platform, edition: shell.edition });
-});
-
-Then("the main menu shows the entries {string}", (s, entries: string) => {
-  expect(s.menu.map((e: { label: string }) => e.label).join(", ")).toBe(entries);
+  openStartScreen(shell);
+  s.menu = startColumn({ ...menuStateOf(s), platform: shell.platform, edition: shell.edition });
 });
 
 Given("the game is {string}", (s, edition: string) => {
@@ -649,7 +626,7 @@ Given("the tutorial is finished", (s) => {
   s.tutorialFinished = true;
 });
 
-When("the player opens {string} on the main menu", (s, entry: string) => {
+When("the player opens {string} on the start screen", (s, entry: string) => {
   expect(entry).toBe("More");
   s.more = moreMenu(sh(s).edition, s.tutorialFinished === true);
 });
@@ -862,7 +839,9 @@ Then("the screen {string} opens with no confirmation", (s, id: string) => {
 });
 
 Then("the screen {string} opens with no question", (s, id: string) => {
-  expect(s.loadResult).toEqual({ loading: true });
+  // Load from the game menu (SHELL-068) or Play on the start screen after the first-launch question (SHELL-131).
+  if (s.loadResult) expect(s.loadResult).toEqual({ loading: true });
+  else expect(s.flq).toBeNull();
   expectTop(s, id as FrameId);
 });
 
@@ -1017,7 +996,7 @@ When("the player taps empty map", (s) => {
   acted(s);
 });
 
-When("the player folds it away", (s) => {
+When("the player minimises it", (s) => {
   foldAway(sh(s));
   acted(s);
 });
@@ -1248,7 +1227,7 @@ Given("the province card of {string} is open", (s, province: string) => {
   openCard(ensureCampaign(s), { kind: "province", name: province });
 });
 
-When("the player folds the card away", (s) => {
+When("the player minimises the card", (s) => {
   foldAway(sh(s));
 });
 
@@ -1461,6 +1440,11 @@ Given("the setting {string} is {string}", (s, setting: string, value: string) =>
 });
 
 When("the player taps End turn", (s) => {
+  // With Auto turns in play (auto-turns.feature), End turn stops them at the week's end or pauses the week (SHELL-160).
+  if (s.auto) {
+    if (s.playing && endTurnInAuto(s.auto) === "pause") s.paused = !s.paused;
+    return;
+  }
   const shell = sh(s);
   s.depth = shell.stack.length;
   s.endTurn = pressEndTurn(shell);
@@ -1649,7 +1633,9 @@ Then("the battle appears on the map", (s) => {
 Then(/^the battle (is listed|is not listed) in the turn report$/, (s, listed: string) => {
   const report = turnOf(sh(s)).report;
   expect(report.some((l: string) => l.includes("Badajoz"))).toBe(listed === "is listed");
-  if (listed === "is listed") expectTop(s, "turn_report");
+  // The report goes into the Dispatches log and never opens by itself (SHELL-147).
+  expect(dispatchesView(sh(s)).days.flatMap((d) => d.lines).some((l) => l.includes("Badajoz"))).toBe(listed === "is listed");
+  expectTop(s, "map");
 });
 
 Given("the battle at {string} was fought last turn", (s, place: string) => {
@@ -1763,10 +1749,14 @@ When("the turn ends", (s) => {
   runTurn(shell, s.month);
 });
 
-Then("the turn report slides in from the edge as a card, each line jumping to its place", (s) => {
-  expectTop(s, "turn_report");
-  expect(layerOf("turn_report")).toBe("card");
+Then("the report goes into the Dispatches without opening, each line jumping to its place", (s) => {
+  expectTop(s, "map");
   expect(turnOf(sh(s)).report).toHaveLength(2);
+  expect(dispatchesView(sh(s)).days[0]!.lines).toEqual(["Troyes grew", "A trader reached Venice"]);
+  expect(dispatchesButton(sh(s)).count).toBe(2);
+  // Opened from the top bar, the log is a card over the map.
+  openDispatches(sh(s));
+  expect(layerOf("turn_report")).toBe("card");
 });
 
 Then("no turn report opens and only the date in the top bar changes", (s) => {
@@ -2002,7 +1992,7 @@ Then("the player can answer it or put it off one turn", (s) => {
   expect(back(sh(s))).toBe("put off");
 });
 
-When("the player opens the map lens picker from the tool column", (s) => {
+When("the player opens the map mode picker from the tool column", (s) => {
   openLensPicker(sh(s));
 });
 
@@ -2208,14 +2198,14 @@ Given("the system closed the app", (s) => {
 });
 
 Then("{string} points at the save written when the app went to the background", (s, entry: string) => {
-  const menu = mainMenu({ campaign: s.summary, saves: 1, tutorialFinished: true, platform: sh(s).platform, edition: sh(s).edition });
+  const menu = startColumn({ campaign: s.summary, saves: 1, tutorialFinished: true, platform: sh(s).platform, edition: sh(s).edition });
   expect(menu[0]).toMatchObject({ label: entry, detail: campaignLabel("Portugal", MAY_1503) });
   expect(s.summary.borders).toBe("background save");
 });
 
 When("the player continues", (s) => {
   const shell = sh(s);
-  tapToStart(shell, "touch");
+  firstStartInput(shell, "touch");
   continueCampaign(shell, s.summary, "background save");
   loadingFinished(shell);
   s.strip = pickedUpStrip();
@@ -2610,7 +2600,7 @@ When("any screen opens", (s) => {
 
 Then("its defined first focus has the gold focus frame", (s) => {
   for (const f of s.focus) expect(f.frame).toBe("gold");
-  expect(s.focus.map((f: { element: string }) => f.element)).toEqual(["Continue", "your capital or last army", "Return to the map", "first warning", "Main menu"]);
+  expect(s.focus.map((f: { element: string }) => f.element)).toEqual(["Play", "your capital or last army", "Return to the map", "first warning", "Main menu"]);
   expect(firstFocus("map", "touch")).toBeNull();
 });
 
@@ -3011,15 +3001,13 @@ Given("no campaign exists", (s) => {
 
 When("the main menu opens", (s) => {
   const shell = sh(s);
-  replaceAll(shell, { id: "title" });
-  tapToStart(shell, "touch");
-  const state = s.menuState ?? { campaign: null, saves: 0, tutorialFinished: false };
-  s.focusOverride = mainMenuFocus({ ...state, platform: shell.platform, edition: shell.edition });
+  openStartScreen(shell);
+  s.focusOverride = startFocus({ ...menuStateOf(s), platform: shell.platform, edition: shell.edition });
   acted(s);
 });
 
 Given("the game is launched for the first time and no campaign exists", (s) => {
-  replaceAll(sh(s), { id: "title" });
+  openStartScreen(sh(s));
   s.firstLaunch = { asked: false, campaignExists: false };
 });
 
@@ -3045,16 +3033,11 @@ Given("the first-launch question was answered", (s) => {
   s.firstLaunch = { asked: true, campaignExists: false };
 });
 
-When("the game is started again and the player taps to start", (s) => {
-  replaceAll(sh(s), { id: "title" });
-  tapToStart(sh(s), "touch");
-  s.flq = firstLaunchQuestion(s.firstLaunch);
+When("the game is started again and the player picks {string}", (s, entry: string) => {
+  expect(entry).toBe("Play");
+  openStartScreen(sh(s));
+  playFromStart(s);
   acted(s);
-});
-
-Then("the main menu folds open with no question", (s) => {
-  expect(s.flq).toBeNull();
-  expectTop(s, "main_menu");
 });
 
 // The turn (SHELL-073, SHELL-074)
@@ -3160,4 +3143,508 @@ When("{int} more turns are played", (s, n: number) => {
     while (topId(sh(s)) !== "map") pop(sh(s));
     playWeek(s);
   }
+});
+
+// ---------------------------------------------------------------------------
+// The desk over the map: dispatches, alerts, the week waiting at a battle, AI peace offers,
+// the country card, picking commanders and Space (SHELL-138..148, playtest feedback)
+
+Given("an AI realm at war with the player offers peace", (s) => {
+  ensureCampaign(s);
+  s.offer = { id: "peace-1", from: "Burgundy", terms: "white" as const };
+  s.month = { loop: monthLoop([]), events: [], report: [], offers: [s.offer] };
+});
+
+Then("the offer shows in the turn report and in Waiting for you", (s) => {
+  const shell = sh(s);
+  expect(turnOf(shell).report).toContain("Burgundy offers peace");
+  expect(dispatchesView(shell).waiting).toContain("Burgundy offers peace");
+  expect(waitingForYou(shell)).toContain("A peace offer: Burgundy");
+  expect(deskOf(shell).alerts).toContainEqual(expect.objectContaining({ text: "Burgundy offers peace.", buttons: ["Answer"] }));
+  expect(dispatchesButton(shell)).toMatchObject({ blinks: true, place: "top bar" });
+});
+
+Then("the realm's Diplomacy tab is marked until the offer is answered or put off", (s) => {
+  const shell = sh(s);
+  const marked = (realm: string) => countryCardTabs(shell, realm).find((t) => t.name === "Diplomacy")!.marked;
+  expect(marked("Burgundy")).toBe(true);
+  expect(marked("France")).toBe(true);
+  expect(marked("England")).toBe(false);
+  // Put off: the offer still waits in the Dispatches, unmarked until the next turn.
+  putOffPeaceOffer(shell, s.offer.id);
+  expect(marked("Burgundy")).toBe(false);
+  expect(dispatchesView(shell).waiting).toContain("Burgundy offers peace");
+  pressEndTurn(shell);
+  expect(marked("Burgundy")).toBe(true);
+  // Answered: the mark and the Waiting for you line go.
+  answerPeaceOffer(shell, s.offer.id, false);
+  expect(marked("Burgundy")).toBe(false);
+  expect(waitingForYou(shell)).not.toContain("A peace offer: Burgundy");
+});
+
+const LAST_WEEK = "1503-05-01";
+const THIS_WEEK = "1503-05-08";
+
+Given("the player's realm fought a battle last week", (s) => {
+  const shell = ensureCampaign(s);
+  shell.campaign!.day = 1;
+  logDispatches(shell, [{ day: LAST_WEEK, text: "Your army won the battle at Troyes", mine: true, province: "Troyes" }, { day: LAST_WEEK, text: "England and Scotland make peace", mine: false }]);
+  // The player read last week's dispatches.
+  openDispatches(shell);
+  pop(shell);
+  expect(dispatchesButton(shell).count).toBe(0);
+});
+
+When("the player ends the turn and the week plays out", (s) => {
+  const shell = sh(s);
+  s.month = { loop: monthLoop([]), events: [], report: ["The levies of Champagne gather", "A trader reached Venice"] };
+  pressEndTurn(shell);
+  runTurn(shell, s.month);
+});
+
+Then("the Dispatches do not open by themselves", (s) => expectTop(s, "map"));
+
+Then("the Dispatches button counts the new dispatches about the player's realm", (s) => {
+  expect(dispatchesButton(sh(s))).toMatchObject({ count: 2, blinks: false });
+});
+
+When("the player taps the Dispatches button", (s) => {
+  openDispatches(sh(s));
+  s.view = dispatchesView(sh(s));
+});
+
+Then("this week's dispatches are listed first under their day", (s) => {
+  expectTop(s, "turn_report");
+  expect(s.view.days[0]).toEqual({ day: THIS_WEEK, lines: ["The levies of Champagne gather", "A trader reached Venice"] });
+  expect(dispatchesButton(sh(s)).count).toBe(0);
+});
+
+Then("last week's battle is still listed under its day", (s) => {
+  expect(s.view.days[1]).toEqual({ day: LAST_WEEK, lines: ["Your army won the battle at Troyes", "England and Scotland make peace"] });
+  // The log can show only what concerns the player's realm.
+  deskOf(sh(s)).onlyMine = true;
+  expect(dispatchesView(sh(s)).days[1]!.lines).toEqual(["Your army won the battle at Troyes"]);
+});
+
+Given("the turn is playing", (s) => {
+  const shell = ensureCampaign(s);
+  pressEndTurn(shell);
+  expect(turnOf(shell).phase).toBe("in progress");
+  s.camera = { ...shell.camera };
+});
+
+When(/^(a battle between the player's army and an enemy|an enemy's siege of the player's castle|the player's siege of an enemy castle) begins in a province$/, (s, what: string) => {
+  s.province = "Champagne";
+  s.alert = begins(sh(s), { kind: what.startsWith("a battle") ? "battle" : "siege", province: s.province });
+});
+
+Then("an alert over the map says so with Go there", (s) => {
+  expect(s.alert.buttons).toContain("Go there");
+  expect(s.alert.text).toContain(s.province);
+  expect(deskOf(sh(s)).alerts).toContain(s.alert);
+  expect(deskOf(sh(s)).alerts.length).toBeLessThanOrEqual(SHELL.desk.alertsShown);
+});
+
+When("the player taps Go there", (s) => tapAlert(sh(s), s.alert, "Go there"));
+
+Then("the map is centred on that province and the province is selected", (s) => {
+  expect(sh(s).camera.on).toBe(s.province);
+  expect(sh(s).selection).toEqual({ kind: "province", name: s.province });
+});
+
+When("a battle between the player's army and an enemy begins", (s) => {
+  s.province = "Champagne";
+  s.battle = { place: "Champagne", sides: [{ realm: "France", men: 12000, start: 12000 }, { realm: "England", men: 9000, start: 9000 }], round: 0, rounds: 6 };
+  s.alert = begins(sh(s), { kind: "battle", province: s.province });
+});
+
+Then("the week pauses and an alert over the map says so with Watch", (s) => {
+  const d = deskOf(sh(s));
+  expect(d.paused).toBe(true);
+  expect(s.alert).toMatchObject({ text: "A battle has begun at Champagne. The week waits.", stays: true });
+  expect(s.alert.buttons).toContain("Watch");
+  // The map no longer flies there by itself.
+  expect(sh(s).camera).toEqual(s.camera);
+});
+
+When("the player taps Watch", (s) => tapAlert(sh(s), s.alert, "Watch", s.battle));
+
+Then("the map is centred on the battle and the week plays on more slowly", (s) => {
+  const d = deskOf(sh(s));
+  expect(sh(s).camera.on).toBe("Champagne");
+  expect(d.paused).toBe(false);
+  expect(d.stepMs).toBe(WATCH_STEP_MS);
+  expect(WATCH_STEP_MS).toBeGreaterThan(BATTLE_STEP_MS);
+  // The alert stays until the battle ends.
+  expect(d.alerts).toContain(s.alert);
+});
+
+Then("a strip over the map shows both realms' men left and the round of the battle", (s) => {
+  watchRound(sh(s), [11400, 8100]);
+  expect(battleStrip(sh(s))).toMatchObject({ sides: ["France 11400 of 12000", "England 8100 of 9000"], round: "round 1 of 6" });
+});
+
+When("the battle ends", (s) => watchedBattleEnds(sh(s), "France won at Champagne: England broke and fled."));
+
+Then("the strip says who won", (s) => {
+  expect(battleStrip(sh(s))!.result).toBe("France won at Champagne: England broke and fled.");
+  expect(deskOf(sh(s)).alerts).not.toContain(s.alert);
+  expect(deskOf(sh(s)).stepMs).toBe(BATTLE_STEP_MS);
+});
+
+Given("the camera shows {string}", (s, place: string) => {
+  const shell = sh(s);
+  shell.camera = { x: 412, y: 236, zoom: 4, on: place, level: "Local" };
+  s.camera = { ...shell.camera };
+});
+
+When("the player selects an army on the map", (s) => selectArmy(sh(s), "army of Jean de Dunois"));
+
+Then("the camera neither moves nor zooms", (s) => {
+  expect(sh(s).selection).toEqual({ kind: "army", name: "army of Jean de Dunois" });
+  expect(sh(s).camera).toEqual(s.camera);
+});
+
+When("the player opens a country card", (s) => {
+  s.card = openCountryCard(sh(s), "Burgundy");
+});
+
+Then("it has the tabs General, Diplomacy, Trade and Army in that order", (s) => {
+  expect(countryCardTabs(sh(s), "Burgundy").map((t) => t.name)).toEqual(["General", "Diplomacy", "Trade", "Army"]);
+  expect(COUNTRY_CARD_TABS).toEqual(["General", "Diplomacy", "Trade", "Army"]);
+});
+
+Then("it opens on General", (s) => {
+  expect(topCard(sh(s))).toMatchObject({ kind: "realm", name: "Burgundy", tab: "General" });
+});
+
+Then("the peace table and declare war open from the Diplomacy tab", (s) => {
+  for (const item of ["the peace table", "declare war", "offer peace", "ask for peace"]) expect(homeOf(item)).toBe("Diplomacy");
+  expect(countryTabHolds("General")).not.toContain("declare war");
+  expect(countryTabHolds("General")).not.toContain("the peace table");
+});
+
+When("the player taps a commander in the Army list", (s) => {
+  s.camera = { ...sh(s).camera };
+  selectArmy(sh(s), "army of La Hire");
+});
+
+Then("that commander's army is selected", (s) => {
+  expect(sh(s).selection).toEqual({ kind: "army", name: "army of La Hire" });
+  expect(sh(s).camera).toEqual(s.camera);
+});
+
+Then("army banners take taps of at least 44 points", (s) => {
+  const small = { x: 100, y: 100, w: 20, h: 30 };
+  const box = bannerTapBox(small);
+  expect(box.w).toBeGreaterThanOrEqual(44);
+  expect(box.h).toBeGreaterThanOrEqual(44);
+  // A tap at the box's edge picks the banner; where two boxes overlap, the nearest banner wins.
+  const other = { x: 130, y: 100, w: 20, h: 30 };
+  expect(bannerAt([small, other], box.x + 1, box.y + 1)).toBe(small);
+  expect(bannerAt([small, other], 138, 115)).toBe(other);
+  expect(bannerAt([small, other], 300, 300)).toBeUndefined();
+});
+
+When("the player presses Space", (s) => {
+  s.spaceOutcome = pressKey(ensureCampaign(s), "Space");
+});
+
+Then("the turn ends as if End turn were tapped", (s) => {
+  expect(s.spaceOutcome).toEqual({ result: "turn started" });
+  expectTop(s, "turn");
+});
+
+Then("while a text field has focus, Space types a space and the turn does not end", (s) => {
+  const shell = newShell();
+  enterCampaign(shell, { realm: "France", date: MAY_1503 });
+  expect(pressKey(shell, "Space", true)).toBe("typed");
+  expect(turnOf(shell).phase).toBe("orders");
+  // The confirmation setting and unanswered events still apply.
+  shell.settings.confirmEndTurn = "Always";
+  expect(pressKey(shell, "Space")).toMatchObject({ result: "question" });
+});
+
+Given("a player-facing feature of the subject {string}", (s, subject: string) => {
+  s.home = homeCheck(subject);
+});
+
+Then("all its actions and figures are on the Diplomacy tab of the country card", (s) => {
+  expect(s.home.home).toBe("Diplomacy");
+  for (const item of ["declare war", "offer peace", "ask for peace", "the peace table", "peace offers", "envoys", "standing"]) expect(s.home.items).toContain(item);
+  for (const item of s.home.items) expect(homeOf(item)).toBe("Diplomacy");
+});
+
+Then("none of them sit on an unrelated panel", (s) => expect(s.home.elsewhere).toEqual([]));
+
+Given("the player has armies, garrison troops and warnings", (s) => {
+  s.tracked = ["armies", "garrison troops", "warnings"] satisfies Tracked[];
+});
+
+Then("the Army list, each province's Garrison tab and the Needs attention screen show their state at a glance", (s) => {
+  const views = (s.tracked as Tracked[]).map(overviewOf);
+  expect(views.map((v) => v.overview)).toEqual(["Army list", "Garrison tab", attentionTitle()]);
+  for (const v of views) expect(v.shows.length).toBeGreaterThan(0);
+  // Anything waiting for an answer has its overview too: the Dispatches.
+  expect(overviewOf("waiting for an answer").overview).toBe("Dispatches");
+});
+
+Then("each line opens its detail in one tap", (s) => {
+  for (const t of s.tracked as Tracked[]) expect(overviewOf(t).taps).toBe(1);
+});
+
+Given("a phone held in landscape", (s) => {
+  s.window = { width: 844, height: 390, device: "phone" };
+  expect(classifyShape(s.window)).toBe("Short wide");
+});
+
+When("any in-campaign screen or card opens", (s) => {
+  s.layouts = IN_CAMPAIGN_SCREENS.map((id) => ({ id, layer: layerOf(id), breaks: fitsWindow(id, s.window, "Short wide"), layout: screenLayout(id, s.window, "Short wide") }));
+  expect(s.layouts.map((l: { id: string }) => l.id)).toEqual(expect.arrayContaining(["card", "realm_book", "battle", "siege", "peace", "attention", "turn_report", "game_menu"]));
+});
+
+Then("it fits the window with every tap target at least 44 points and nothing behind the notch or home indicator", (s) => {
+  for (const l of s.layouts) {
+    expect(l.breaks, l.id).toEqual([]);
+    for (const r of l.layout.targets) expect(Math.min(r.w, r.h), `${l.id} ${r.name}`).toBeGreaterThanOrEqual(44);
+  }
+  // The Tall layout fits as well (a tablet held upright).
+  for (const id of IN_CAMPAIGN_SCREENS) expect(fitsWindow(id, { width: 820, height: 1180 }, "Tall", { top: 24, right: 0, bottom: 20, left: 0 }), id).toEqual([]);
+});
+
+Then("the map stays visible beside the card where the card allows", (s) => {
+  for (const l of s.layouts) {
+    if (l.layer === "card" || l.layer === "overlay") expect(l.layout.mapBeside.w, l.id).toBeGreaterThan(s.window.width / 3);
+    else expect(l.layout.mapBeside).toBeNull();
+  }
+});
+// The start screen (SHELL-149..158)
+
+/** The campaign, saves and tutorial behind the start screen's column, from the scenario's Givens. */
+function menuStateOf(s: any): Pick<MenuContext, "campaign" | "saves" | "tutorialFinished"> {
+  if (s.menuState) return s.menuState;
+  return s.summary ? { campaign: s.summary, saves: 1, tutorialFinished: true } : { campaign: null, saves: 0, tutorialFinished: false };
+}
+
+/** Play: Loading with the newest save, or the first-launch question the first time, or New campaign (SHELL-153). */
+function playFromStart(s: any): void {
+  const shell = sh(s);
+  const play = startColumn({ ...menuStateOf(s), platform: shell.platform, edition: shell.edition })[0]!;
+  if (play.target === "loading") return continueCampaign(shell, s.summary);
+  s.flq = firstLaunchQuestion(s.firstLaunch ?? { asked: true, campaignExists: false });
+  if (!s.flq) s.nc = openNewCampaign(shell, { suggested: SUGGESTED, lastOptions: s.lastOptions ?? ["normal"] });
+}
+
+Given("the game has booted and the first-run questions are answered", (s) => {
+  s.sh = newShell({ platform: "Android" });
+});
+
+When("the start screen opens", (s) => {
+  const shell = sh(s);
+  if (s.acted) {
+    expectTop(s, "main_menu");
+    expect(shell.stack.map((f) => f.id)).toEqual(["title", "main_menu"]);
+  } else openStartScreen(shell);
+  const summary = s.summary ?? (shell.startRealm ? { realm: shell.startRealm, date: MAY_1503, borders: "the latest save's summary" } : null);
+  s.startView = startScreen({ platform: shell.platform, edition: shell.edition, summary });
+  s.menu = startColumn({ ...menuStateOf(s), platform: shell.platform, edition: shell.edition });
+});
+
+Given(/^the start screen is shown( with nothing over it)?$/, (s) => {
+  openStartScreen(sh(s));
+});
+
+Then("the start screen shows its menu without waiting for a tap", (s) => {
+  expect(sh(s).stack.map((f) => f.id)).toEqual(["title", "main_menu"]);
+  expect(sh(s).events).not.toContainEqual({ type: "TitleDismissed" });
+});
+
+When("the player first touches the start screen", (s) => {
+  firstStartInput(sh(s), "touch");
+  acted(s);
+});
+
+Then(/^the background is the real map at region zoom panning slowly over (.+)$/, (s, region: string) => {
+  const bg = s.startView.background;
+  expect(bg).toMatchObject({ renderer: "map", zoom: "Region", pan: "slow" });
+  if (region === "one of the 1444 regions listed in the start regions") {
+    expect(SHELL.start.regions).toContain(bg.over);
+    expect(bg.bordersFrom).toBe("1444");
+  } else {
+    expect(region).toBe(`the realm "${bg.over}" in its borders and season from the latest save's summary`);
+    expect(bg.bordersFrom).toBe("the latest save's summary");
+  }
+});
+
+Then("the background takes no input and runs no simulation", (s) => {
+  expect(s.startView.background).toMatchObject({ input: false, simulation: false });
+});
+
+Then("the background still pans at Battery saver's frame rate", () => {
+  expect(startBackgroundMoves(true)).toBe(true);
+});
+
+Then("the column shows {string}", (s, entries: string) => {
+  expect(s.menu.map((e: { label: string }) => e.label).join(", ")).toBe(entries);
+});
+
+Then("{string} shows the banner of {string} and {string} under it", (s, entry: string, banner: string, label: string) => {
+  expect(s.menu[0]).toMatchObject({ label: entry, banner, detail: label });
+  expect(campaignLabel(banner, s.summary.date)).toBe(label);
+});
+
+Given("no campaign exists and the first-launch question was answered", (s) => {
+  s.sh = newShell({ platform: "Android" });
+  s.menuState = { campaign: null, saves: 0, tutorialFinished: false };
+  s.firstLaunch = { asked: true, campaignExists: false };
+});
+
+When("the player picks {string} on the start screen", (s, entry: string) => {
+  expect(entry).toBe("Play");
+  if (topId(sh(s)) !== "main_menu") openStartScreen(sh(s));
+  playFromStart(s);
+  acted(s);
+});
+
+Then("the icon row shows {string}, each with its name", (s, icons: string) => {
+  expect(s.startView.icons.join(", ")).toBe(icons);
+});
+
+Then("the system browser opens the wiki address", (s) => {
+  expect(s.wiki.url).toBe(SHELL.start.wikiUrl);
+  expect(sh(s).events).toContainEqual({ type: "WikiOpened", url: SHELL.start.wikiUrl });
+});
+
+Then("the game stays on the start screen", (s) => {
+  expect(sh(s).stack.map((f) => f.id)).toEqual(["title", "main_menu"]);
+});
+
+Then("the version number is shown in the lower right corner", (s) => expect(s.startView.version).toBe("lower right"));
+
+Then("the {string} ribbon is shown beside the logo", (s, label: string) => {
+  expect(s.startView.ribbon).toBe(true);
+  expect(fullGameRibbon(sh(s).edition)).toMatchObject({ label });
+});
+
+Then("the start screen stays", (s) => {
+  expect(s.backResult).toBe("nothing");
+  expect(sh(s).stack.map((f) => f.id)).toEqual(["title", "main_menu"]);
+});
+
+Then("the background pans over the realm {string}", (s, realm: string) => {
+  expect(s.startView.background).toMatchObject({ over: realm, bordersFrom: "the latest save's summary" });
+});
+
+Given("a campaign as {string} is being played", (s, realm: string) => {
+  loadCampaign(s, realm).campaign!.unsavedTurns = 0;
+});
+
+When("the player picks {string} and it is done", (s, entry: string) => {
+  const shell = sh(s);
+  openGameMenu(shell);
+  s.picked = pickGameMenu(shell, entry);
+  acted(s);
+});
+
+// Campaign end and score in play (SHELL-162 to SHELL-164): the engine's world
+
+const PLAY_RULES = loadDefaultRuleset();
+
+function playWorld(s: Scenario): World {
+  return s.playWorld as World;
+}
+
+const landOf = (w: World, n: number): number[] => {
+  const out: number[] = [];
+  for (let p = 0; p < w.provinceCount; p++) if (!w.provinceWater[p] && w.provinceOwner[p] === n) out.push(p);
+  return out;
+};
+
+Given("a game as {string} begins", (s, realm: string) => {
+  const w = createWorld(PLAY_RULES, 1);
+  setPlayer(w, w.nationIndex.get(realm)!);
+  s.playWorld = w;
+});
+
+Given("a game as {string} begins with the end date {string}", (s, realm: string, end: string) => {
+  const w = createWorld(PLAY_RULES, 1);
+  setPlayer(w, w.nationIndex.get(realm)!);
+  w.campaign.endDate = end;
+  s.playWorld = w;
+});
+
+Then("every realm's card shows its three scores with a rank in each", (s) => {
+  const v = campaignView(playWorld(s));
+  for (let n = 0; n < playWorld(s).nationCount; n++) for (let k = 0; k < 3; k++) {
+    expect(Number.isFinite(v.scores[n * 3 + k])).toBe(true);
+    expect(v.ranks[n * 3 + k]).toBeGreaterThan(0);
+  }
+});
+
+Then("the player's Score card shows Economy as yearly income plus the bank and Power as provinces plus army power", (s) => {
+  const m = campaignView(playWorld(s)).mine!;
+  expect(Math.abs(m.scores[0] - (m.income + m.bank))).toBeLessThanOrEqual(1);
+  expect(Math.abs(m.scores[1] - (m.provinces + m.army))).toBeLessThanOrEqual(1);
+  expect(m.provinces).toBeGreaterThan(0);
+});
+
+Then("the score ledger lists the five leading realms and the player", (s) => {
+  const w = playWorld(s);
+  const v = campaignView(w);
+  expect(v.ledger.length).toBeGreaterThanOrEqual(5);
+  expect(v.ledger.slice(0, 5).every((r, i, a) => i === 0 || a[i - 1]!.ranks.reduce((x, y) => x + y) <= r.ranks.reduce((x, y) => x + y))).toBe(true);
+  expect(v.ledger.some((r) => r.nation === w.player)).toBe(true);
+});
+
+When("the game plays {int} days", (s, days: number) => {
+  advance(playWorld(s), STEPS_PER_DAY * days);
+});
+
+When("the game plays into January 1445", (s) => {
+  const w = playWorld(s);
+  for (let i = 0; i < 60 && !(w.date.year === 1445 && w.date.month === 1); i++) advance(w, STEPS_PER_DAY);
+  // The 1st's monthly steps run as its day begins.
+  advance(w, STEPS_PER_DAY);
+});
+
+When("{string} takes two thirds of the lands of {string} and {string} the rest", (s, a: string, loser: string, b: string) => {
+  const w = playWorld(s);
+  const [na, nl, nb] = [a, loser, b].map((x) => w.nationIndex.get(x)!);
+  landOf(w, nl!).forEach((p, i) => (w.provinceOwner[p] = i % 3 === 0 ? nb! : na!));
+});
+
+Given("{string} holds every land province", (s, realm: string) => {
+  const w = playWorld(s);
+  const n = w.nationIndex.get(realm)!;
+  for (let p = 0; p < w.provinceCount; p++) if (!w.provinceWater[p]) w.provinceOwner[p] = n;
+});
+
+Then("the end card reads {string}", (s, line: string) => expect(campaignView(playWorld(s)).ending?.headline).toBe(line));
+
+Then("the end card offers {string}", (s, list: string) => expect(campaignView(playWorld(s)).ending?.choices.join(", ")).toBe(list));
+
+Then("the clock no longer runs", (s) => {
+  const w = playWorld(s);
+  const day = w.day;
+  advance(w, STEPS_PER_DAY * 7);
+  expect(w.day).toBe(day);
+});
+
+When("the player chooses to play on as {string}", (s, realm: string) => {
+  const w = playWorld(s);
+  expect(applyNow(w, { type: "playOn", nation: w.nationIndex.get(realm)! }, w.player).rejectedOrders).toEqual([]);
+});
+
+When("the player chooses to keep playing", (s) => {
+  const w = playWorld(s);
+  expect(applyNow(w, { type: "keepPlaying" }, w.player).rejectedOrders).toEqual([]);
+});
+
+Then("the clock runs again as {string}", (s, realm: string) => {
+  const w = playWorld(s);
+  expect(w.player).toBe(w.nationIndex.get(realm));
+  expect(campaignView(w).ending).toBeNull();
+  const day = w.day;
+  advance(w, STEPS_PER_DAY);
+  expect(w.day).toBe(day + 1);
 });

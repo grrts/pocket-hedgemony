@@ -55,11 +55,11 @@ Newest decision first.
 | Term | Meaning | Not to be confused with |
 |---|---|---|
 | Levy (the act) | Calling men up from one or more provinces; one slider, no class or province settings | Calling the lords (warfare 3.2) |
-| Levies (the men) | Untrained men with farm tools, fighting as levy foot | A trained regiment that is still of the levy kind |
-| Levy foot | The weakest arm; what levies are before training (strength 1.0) | — |
-| Regiment | A warfare company whose arm is set by training | A standing regiment (a regiment signed on) |
-| Arm | What a regiment fights as (pikes, archers, light horse …), warfare 2.2 | Kind |
-| Kind | Where soldiers come from: levy, retinue, hired company, standing regiment, garrison (warfare 2.3); training does not change it | Arm |
+| Levies (the men) | Untrained men with farm tools, fighting as levy infantry | A trained regiment that is still of the levy kind |
+| Levy infantry (was Levy foot) | The weakest troop type; what levies are before training (strength 1.0). Its id stays `levy foot`; Heavy infantry (was Armoured foot) and Light cavalry (was Light horse) are renamed the same way | — |
+| Regiment | A warfare company whose troop type is set by training | A standing regiment (a regiment signed on) |
+| Troop type (was Arm) | What a regiment fights as (pikes, archers, light cavalry …), warfare 2.2 | Kind |
+| Kind | Where soldiers come from: levy, retinue, hired company, standing regiment, garrison (warfare 2.3); training does not change it | Troop type |
 | Fighting-age men | About a quarter of a province's people; the only people who can be called | Men who can be called |
 | Call share | The share of a class's fighting-age men that can be called | — |
 | Men who can be called (ceiling) | Sum over classes of fighting-age men × call share; a hard ceiling | Recruits here (the current pool) |
@@ -68,12 +68,12 @@ Newest decision first.
 | Veterans here | Men home from war who were trained or stood in a battle | — |
 | Conscription | The province grievance (province 12.1) given when a province's pool is drawn too low | W15 Mass conscription |
 | Gathering / muster | The 2 weeks (3 days with W18) in which levied men gather as levies, as one army in the drawn province that gives the most men | — |
-| Pay group | Foot, gunners, horse, knights or gun crews: what an arm is paid (D-RECR-9) | Arm |
+| Pay group | Foot, gunners, horse, knights or gun crews: what a troop type is paid (D-RECR-9) | Troop type |
 | Levy money | Gold paid up front for food on the road to the muster | Pay |
 | Free months | The first 3 months a levy serves without pay, counted from the day it has gathered (warfare 2.3, D-RECR-8) | — |
 | Training place | A castle or a drill yard (or its barracks step) of yours | — |
 | Training room | How many men a training place trains at once | Garrison room |
-| Retraining | Training a regiment to a newer arm, at half months and half gold, keeping drill and scars | — |
+| Retraining | Training a regiment to a newer troop type, at half months and half gold, keeping drill and scars | — |
 | Signing on | Making a trained regiment a standing regiment (needs W12) | — |
 | Soldiers quartered | The burden of soldiers quartered on the people (warfare 6.6) | — |
 | Official | A crown appointee running a province, with a type and years served (province 10.2) | Lord |
@@ -103,7 +103,7 @@ Newest decision first.
 - Holds: men by province and by class, owner, gathering place, day gathered, months served, months paid.
 - INV-RECR-5: Men taken from each class are proportional to that class's share of the men who can be called;
   men taken from each province of a region are proportional to that province's share of the region's men.
-- INV-RECR-6: A levy is always of arm levy foot when it arrives.
+- INV-RECR-6: A levy is always of arm levy infantry when it arrives.
 
 **TrainingOrder** (identity: training order id)
 - Holds: training place, arm, men (and their veteran share), months left, gold paid, loads, horses or animals taken.
@@ -143,7 +143,7 @@ Newest decision first.
 - RECR-002 The recruiting system shall let each class give at most its call share of its fighting-age men: homeless 24 %, herders 16 %, farmers 12 %, woodsmen 12 %, miners 8 %, seafolk 8 %, craftsmen 8 %, market folk 6 %, clerks 4 %, clergy and scholars 0. [recruiting §2.2]
 - RECR-003 The recruiting system shall set a province's men who can be called (its ceiling) to the sum over its classes of fighting-age men times call share. [recruiting §2.2]
 - RECR-004 If any levy, war or invention would take a province's men who can be called past its ceiling, then the recruiting system shall hold it at the ceiling. [recruiting §2.2]
-- RECR-005 The recruiting system shall make every levied man levy foot regardless of the class he came from. [recruiting §2.2, v2 change]
+- RECR-005 The recruiting system shall make every levied man levy infantry regardless of the class he came from. [recruiting §2.2, v2 change]
 - RECR-006 Where the realm has W15 Mass conscription, the recruiting system shall raise every class's call share by half (homeless 36 %, farmers 18 % …), keeping the ceiling a share of fighting-age men. [recruiting §2.5]
 - RECR-007 Students shall be callable from the same pool as levies, as a class with the clerks' call share of 4 % of their fighting-age men, while clergy and scholars shall not. [recruiting §2.2, §6.2; D-RECR-13]
 
@@ -153,7 +153,7 @@ Newest decision first.
 - RECR-010 When a levy is made, the recruiting system shall take men from every class in proportion to that class's share of the men who can be called, with no player setting. [recruiting §2.3]
 - RECR-011 When a levy is drawn from a region, the recruiting system shall take men from every province in the region by its share of the region's men. [recruiting §2.3] *Replaced in part by RECR-104 (playtest feedback).*
 - RECR-012 When a levy is made, the recruiting system shall include veterans by their share of the pool. [recruiting §2.4]
-- RECR-013 When a levy is made, the recruiting system shall have the men gather in 2 weeks as levies who can march and fight at once as levy foot. [recruiting §1, §2.1] *Replaced in part by RECR-106, RECR-107 (playtest feedback).*
+- RECR-013 When a levy is made, the recruiting system shall have the men gather in 2 weeks as levies who can march and fight at once as levy infantry. [recruiting §1, §2.1] *Replaced in part by RECR-106, RECR-107 (playtest feedback).*
 - RECR-014 Where the realm has W18 Railway mobilization, the recruiting system shall have levies gather in 3 days instead of 2 weeks. [recruiting §2.5; D-RECR-12] *Replaced in part by RECR-106 (playtest feedback).*
 - RECR-015 When a levy is made, the recruiting system shall charge levy money of 20 gold per 1,000 men up front. [recruiting §3.1]
 - RECR-016 While a levy gathers, the recruiting system shall have it eat 1 ration per man a month from the province's local store. [recruiting §3.2]
@@ -195,7 +195,7 @@ Newest decision first.
 - RECR-046 Where a Marshal is the official in a province, the recruiting system shall make training there 25 % faster. [recruiting §4.1, §7.2]
 - RECR-047 The recruiting system shall train veterans among the levies in half the time, so a regiment mostly of veterans finishes early. [recruiting §4.2, §2.4]
 - RECR-048 When a regiment retrains to a newer arm, the recruiting system shall take half the months and half the gold and keep its drill and scars. [recruiting §4.2]
-- RECR-049 If levies are called out of training to fight, then they shall go as levy foot and lose the months spent. [recruiting §4.2]
+- RECR-049 If levies are called out of training to fight, then they shall go as levy infantry and lose the months spent. [recruiting §4.2]
 - RECR-050 While a castle or town is under siege, the recruiting system shall stop all training in it. [recruiting §4.2]
 - RECR-051 When training finishes, the regiment shall have its arm, drill 3 (4 if trained under a Marshal), pay by its arm's pay group (RECR-102), and break point 30 % plus troop level, keeping its kind. [recruiting §4.3, §7.2, §1]
 - RECR-052 The recruiting system shall leave untrained levies at drill 0 and break point 25 %. [recruiting §4.3]
@@ -207,7 +207,7 @@ Newest decision first.
 - RECR-056 While a regiment is signed on, its men shall be gone from their province's pool and their slots stay empty. [recruiting §4.5]
 - RECR-057 While a standing regiment is housed in a barracks in peace, the recruiting system shall give no Soldiers quartered to the province; without a barracks, it is quartered on the people like any army in winter. [recruiting §4.5, §4.1]
 - RECR-058 The recruiting system shall let a lord levy and train his retinue from his lands by the same rules, with his own wealth and at his own castles. [recruiting §4.6]
-- RECR-059 The recruiting system shall have a lord's traits decide what he trains: Warlike knights and armoured foot, Greedy keeps levies. [recruiting §4.6]
+- RECR-059 The recruiting system shall have a lord's traits decide what he trains: Warlike knights and heavy infantry, Greedy keeps levies. [recruiting §4.6]
 
 ### What recruiting gives back
 - RECR-060 When a levy takes homeless men, the province shall have less theft and begging and may lose the Homeless state. [recruiting §6.1]
@@ -252,7 +252,7 @@ Newest decision first.
 - RECR-093 An official commander shall bring no retinue of their own. [recruiting §7.5]
 - RECR-094 If an official commander is killed or captured, then the realm shall lose a commander and an official; ransom brings both back. [recruiting §7.5]
 - RECR-095 When any commander with 8 victories has led the same regiments 5 years, they shall become "their man"; a commissioned official with 6 victories shall ask for land; refusing makes them Ambitious; granting turns them into a lord with their old soldiers as his retinue. [recruiting §7.5; warfare 4.6; D-RECR-16]
-- RECR-096 The recruiting system shall let the ruler and heirs lead, lords lead only their own retinues (as a captain in a royal army), hired captains come with their free companies, and exiles who ask to serve become officials of the type closest to their past; the other origins and their catches are warfare's (X-7). [recruiting §7.6; X-7]
+- RECR-096 The recruiting system shall let the ruler and heirs lead, lords lead only their own retinues (as a captain in a royal army), hired captains come with their mercenary companies, and exiles who ask to serve become officials of the type closest to their past; the other origins and their catches are warfare's (X-7). [recruiting §7.6; X-7]
 
 ### AI and phone
 - RECR-097 The AI shall use the same levy and training commands, with its catalogue personality setting how much of its pool it levies and what it trains. [recruiting §9]
@@ -262,7 +262,7 @@ Newest decision first.
 
 ### Decided rules (17 October 2026)
 - RECR-101 The recruiting system shall count a levy's 3 free months from the day it has gathered, so training that ends within 3 months owes no pay and knights (9 months) owe 6 months. [recruiting §4.4; D-RECR-8]
-- RECR-102 The recruiting system shall pay each arm by its pay group: foot (armoured foot, pikes, archers) 0.2, gunners (hand gunners, pike and shot, musketeers, line infantry, riflemen) 0.25, horse (light horse, camel riders, horse archers) 0.4, knights (knights and lancers, war elephants) 0.6 gold a man a month, gun crews 1 gold per crew of 15. [recruiting §4.3; D-RECR-9]
+- RECR-102 The recruiting system shall pay each arm by its pay group: foot (heavy infantry, pikes, archers) 0.2, gunners (hand gunners, pike and shot, musketeers, line infantry, riflemen) 0.25, horse (light cavalry, camel riders, horse archers) 0.4, knights (knights and lancers, war elephants) 0.6 gold a man a month, gun crews 1 gold per crew of 15. [recruiting §4.3; D-RECR-9]
 - RECR-103 When a levy is made, the recruiting system shall gather it as one army in the drawn province that gives the most men (ties: the first by id), and, where the realm has set "New regiments go to", order the gathered army to march there. [recruiting §2.1; warfare 3.1; troop-movement §8; D-RECR-15] *Replaced in part by RECR-104, RECR-107 (playtest feedback).*
 
 ### Playtest feedback (17 October 2026)
@@ -287,6 +287,24 @@ Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision
 - RECR-118 Grouping: the queue sits under the button in the same tab, one row per thousand with "gathering" or "waiting" and the weeks until it has gathered, and a × on the last row; troops that have gathered show just below, under "Troops without a commander". [F-38; X-19]
 - RECR-119 Overview: the realm's Military tab lists every province with a recruit queue, its count and when all will have gathered; tapping one opens that province's Garrison tab. [F-38; X-19]
 - RECR-120 Phone: in landscape the button spans the panel, each row is at least 48 points tall and the × at least 44 × 44, and nothing needs hover. [F-38; X-19]
+- RECR-121 The Recruit button shall show, under its label, the thousand it calls as a percent of the men who can be called in the province, and when all queued thousands will have gathered; the queue rows count down in days, since a thousand gathers in 14 days, or 3 with W18 Railway mobilization (RECR-105, RECR-106). [F-18; X-19]
+
+#### How the player uses it: picking up garrison troops and training
+- RECR-122 Where: the player picks garrison troops up from either side. On the province's Garrison tab, each row of troops without a commander has, per commander standing there, "‹name› takes 1,000" and "‹name› takes all"; on the commander screen, "Take in 1,000" and "Take in all" under "Garrison here". Both act at once (RECR-108). A commander at court is put at their head with "Lead: ‹name›". [F-15; X-19]
+- RECR-123 Training is ordered on the commander screen only: its Train block names the arms the realm knows, each with months and gold, and a − / + stepper picks how many thousand levy foot train (the rest stay levy foot). Away from a castle or drill yard of the realm's own the block says so and offers nothing to press; while training is held it says why (RECR-109). Garrison troops can't train until picked up (RECR-107). [F-14; X-19]
+- RECR-124 Grouping and overview: everything about one army (troops by arm, drill, break point, food, pay, training, split, merge, leave as garrison, pick up) sits on its commander screen; everything about troops without a commander sits on the province's Garrison tab; the realm's Military tab lists the recruit queues and opens each Garrison tab (RECR-119). [F-14; F-17; X-19]
+- RECR-125 Phone: in landscape both screens fit the side panel in the Wide and Tall layouts; every button on them, the small ones in troop rows included, is at least 44 points high, the stepper's − and + at least 44 × 64, and nothing needs hover (each button spells out what it does). Portrait on a phone shows the turn-the-phone screen, as everywhere in the game. [F-14; X-19]
+
+#### Names and ranks in the realm's language (feedback 125)
+- RECR-121 The recruiting system shall name every commander, admiral and hired captain in the language of the realm's culture (`names.json`), in that language's order: family name first where the language puts it first (Chinese, Japanese, Korean, Vietnamese, Hungarian). The 1444 start's historical commanders keep their own names in their own language ("Hunyadi János", "Gjergj Kastrioti", "Konstantinos Palaiologos"), and a realm the map data gives only a stand-in general gets one named in its culture. [F-125; F-33]
+- RECR-122 The recruiting system shall give each commander the rank of his post in the realm's language, from the culture's `ranks`: `general` while he leads an army or waits at court, `admiral` while he leads a fleet; the rank goes where the language puts it ("Almirante Fernão Coutinho", "Hosokawa Katsumoto Taishō"), and a culture with no word for the post shows the name alone. The rank follows the post: an admiral sent back to court is a general again. [F-125]
+- RECR-123 The recruiting system shall name a mercenary company's captain in the culture of the realm the company gathers in, keeping the company's own given name for him, with that culture's `captain` rank ("Hauptmann Ulrich von Hallwyl", "Condottiero Niccolò Piccinino"); he keeps that name in any realm's service. [F-125; WAR-213]
+
+#### How the player uses it: names and ranks
+- RECR-124 Where: the ranked name is the commander's name everywhere the player meets him: the army row on a province card, the commander screen's title, the Military tab's Commanders list, a fleet's name ("Kapudan Mehmed Pasha's fleet") on the Navy tab and port, the army picker, and the Mercenaries tab; short buttons ("Lead: …", "Join …") keep the bare name. Dispatches keep the bare name. [F-125; X-19]
+- RECR-125 Grouping: under the ranked name, the same small line that shows his skills begins with the post in plain English, "commander", "admiral" or "hired captain", so a rank the player does not know is never the only clue. [F-125; X-19]
+- RECR-126 Overview: the Military tab's Commanders list shows every commander of the realm with his rank and post, and the Navy tab every fleet under its admiral's ranked name. [F-125; X-19]
+- RECR-127 Phone: a ranked name wraps inside its card instead of widening the panel, keeps the portrait and buttons at 44 points, and needs no hover to read the post. [F-125; X-19]
 
 ## 6. Commands
 
@@ -295,7 +313,7 @@ Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision
 | Levy(provinces or region, men) | player / AI | men ≤ sum of Recruits here in the chosen provinces; provinces are the realm's (royal) | Men taken by class and province share; gold and gathering food charged; levies gather | LevyRaised, ConscriptionGrievanceGiven (if threshold crossed) |
 | Train(levies, arm, men, training place) | player / AI | arm unlocked; training place is the realm's castle or drill yard; room free; stores hold arms, powder, animals | Men walk to the place and start; months, gold, needs taken | TrainingStarted |
 | Retrain(regiment, newer arm, place) | player / AI | as Train; regiment already trained | Half months, half gold; drill and scars kept | TrainingStarted |
-| CallOutOfTraining(order) | player / AI | order under way | Men go as levy foot; months lost | TrainingAbandoned |
+| CallOutOfTraining(order) | player / AI | order under way | Men go as levy infantry; months lost | TrainingAbandoned |
 | SignOn(regiment) | player / AI | W12; regiment trained | Becomes standing; pay 1.5×; men leave pool for good | RegimentSignedOn |
 | Disband(army, arms choice, settle to?) | player / AI | — | Men home or to a settler province; arms choice applied | ArmyDisbanded |
 | Commission(official, army, role, empty-province choice) | player / AI | official not commissioned; for deputy: 20 clerks; for lord: a loyal neighbouring lord | Commander or captain with type skills; 10 gold; province run as chosen | OfficialCommissioned |
@@ -438,8 +456,8 @@ Decided on 17 October 2026 (domain/DECISIONS.md). None of recruiting's questions
 - **D-RECR-5** (was OQ-RECR-5) Province and recruiting v3: province takes the per-province ceiling by class share, Fallen from here, Veterans here, the muster master's faster refill only, the Marshal type and the deputy; disbanded men go to the emptiest slots first and become homeless only when none is free (X-7). The latest decision wins.
 - **D-RECR-6** (was OQ-RECR-6) Country stats: the Commanders row gains "commissioning an official" (X-7). The latest decision wins.
 - **D-RECR-7** (was OQ-RECR-7) Engine: the per-province pool, pay by arm after 3 free months and rations by place in this context's rules replace the realm-wide pool, flat upkeep and flat rations of `turn.ts` and `defines.json`; moving the engine core onto them is a request to the game build. The domain spec is the newer design.
-- **D-RECR-8** (was OQ-RECR-8) Free months: the 3 free months count from the day the levy has gathered (RECR-101), so pikes and light horse train free and knights owe 6 months. It makes both of the design's examples hold.
-- **D-RECR-9** (was OQ-RECR-9) Pay groups: foot = armoured foot, pikes, archers; gunners = hand gunners, pike and shot, musketeers, line infantry, riflemen; horse = light horse, camel riders, horse archers; knights = knights and lancers, war elephants; gun crews = gun crews (RECR-102). Each arm goes to the group it most resembles, with no new group.
+- **D-RECR-8** (was OQ-RECR-8) Free months: the 3 free months count from the day the levy has gathered (RECR-101), so pikes and light cavalry train free and knights owe 6 months. It makes both of the design's examples hold.
+- **D-RECR-9** (was OQ-RECR-9) Pay groups: foot = heavy infantry, pikes, archers; gunners = hand gunners, pike and shot, musketeers, line infantry, riflemen; horse = light cavalry, camel riders, horse archers; knights = knights and lancers, war elephants; gun crews = gun crews (RECR-102). Each arm goes to the group it most resembles, with no new group.
 - **D-RECR-10** (was OQ-RECR-10) Conscription threshold: measured on Recruits here after the levy against the ceiling; with W15 the threshold is a tenth even when the province has fallen, otherwise a third with fallen and a quarter without. The later invention replaces the rule it was made to relax.
 - **D-RECR-11** (was OQ-RECR-11) Yearly rules: refill, Fallen and Veterans fading run once, in the turn in which 1 January falls (X-2 yearly steps, X-18); training ticks monthly; births stay cut for 10 years from the year men fell. Running a yearly rule once a year needs no monthly split.
 - **D-RECR-12** (was OQ-RECR-12) W18 Railway mobilization: levies gather in 3 days instead of 14 (provisional); W18's +1 % troop cap in warfare is a separate effect and also applies. Recruiting is the latest design and only needed a number.
@@ -491,7 +509,10 @@ Decided on 17 October 2026 (domain/DECISIONS.md). None of recruiting's questions
 | RECR-100 | recruit-pool.feature | The monthly update ticks training down / The yearly step runs when January begins |
 | Worked example (§5, §8) | champagne-1444.feature | Champagne late summer 1444 |
 | RECR-104–107 | levy.feature | The levy screen for Troyes; Levies gather a thousand at a time; Gathered levies wait as garrison troops |
-| RECR-108–110, 112 | training.feature | A commander picks up garrison troops; Giving a training order; The commander screen; Leaving troops as a garrison |
+| RECR-108–110, 112 | training.feature | A commander picks up garrison troops; Giving a training order; Training only at a castle; The commander screen; Leaving troops as a garrison |
+| RECR-121–125 | — | Presentation only: checked on phone screenshots in landscape |
 | RECR-111 | commissioning-officials.feature | New commanders come from officials |
 | RECR-113 | training.feature | Trained levies stay until sent home |
 | RECR-114, 115 | commissioning-officials.feature; ai-recruiting.feature | A commission costs 50 gold; The AI commissions only for troops it has |
+| RECR-121–123 | commander-names.feature | Names in the realm's language; The rank follows the post; A mercenary company's captain |
+| RECR-124–127 | — | Presentation only (client UI) |

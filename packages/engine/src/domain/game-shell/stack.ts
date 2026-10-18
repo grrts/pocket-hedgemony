@@ -162,6 +162,8 @@ export interface Shell {
   /** Settings the shell reads. */
   settings: { confirmEndTurn: "Off" | "When the Attention screen has lines" | "Always" };
   events: DomainEvent[];
+  /** The realm the start screen's map pans over, the one just left (SHELL-158). */
+  startRealm?: string;
   /** The summary of the save being loaded. */
   pendingLoad?: { realm: string; date: GameDate; borders?: string };
 }
@@ -223,13 +225,24 @@ export function replaceAll(sh: Shell, f: Frame): void {
   push(sh, f);
 }
 
+/**
+ * Opens the start screen with its menu already shown: the `title` frame keeps
+ * its id so music and sound key on it, and the menu over it is the same
+ * screen, so Back leaves the start screen as a whole (SHELL-149, SHELL-157).
+ * Leaving a campaign passes its realm, which the map then pans over (SHELL-158).
+ */
+export function openStartScreen(sh: Shell, realm?: string): void {
+  replaceAll(sh, { id: "title" });
+  push(sh, { id: "main_menu" });
+  if (realm) sh.startRealm = realm;
+}
+
 // ---------------------------------------------------------------------------
 // Back (INV-SHELL-1, SHELL-002, SHELL-045, SHELL-090, SHELL-118)
 
 export type BackResult =
   | "popped"
   | "game menu opened"
-  | "tap to start"
   | "left the app"
   | "previous step"
   | "put off"
@@ -251,15 +264,14 @@ export function back(sh: Shell): BackResult {
     case "game_over":
     case "campaign_end":
       return "nothing";
+    // The title and its menu are one start screen: Back leaves the app on Android and does nothing elsewhere (SHELL-157).
     case "title":
+    case "main_menu":
       if (sh.platform === "Android") {
         sh.leftApp = true;
         return "left the app";
       }
       return "nothing";
-    case "main_menu":
-      pop(sh);
-      return "tap to start";
     case "new_campaign":
       if ((f.step ?? 1) > 1) {
         f.step = (f.step ?? 1) - 1;
@@ -306,7 +318,7 @@ export function back(sh: Shell): BackResult {
       return f.id === "event" || (f.id === "peace" && f.openedFrom === "an incoming offer") ? "put off" : "popped";
     case "final_result":
     case "error":
-      replaceAll(sh, { id: "main_menu" });
+      openStartScreen(sh);
       return "popped";
     default:
       pop(sh);
@@ -538,7 +550,7 @@ export function gameMenuEntries(platform: Platform, ironman: boolean, o: GameMen
     .filter((e) => e !== "Quit" || hasQuit(platform))
     .filter((e) => e !== "Load" || !ironman)
     .map((e) => (e === "Save" && ironman ? "Save and quit" : e))
-    .map((e) => (e === "Achievements" && o.canEarnAchievements === false ? config.strings.achievementsOff : e));
+    .map((e) => (e === "Achievements" && o.canEarnAchievements === false ? config.strings.playedOn : e));
   if (o.tutorial) out.splice(1, 0, ...config.tutorialMenuLines);
   return out;
 }
@@ -564,11 +576,12 @@ export function leaveCampaign(sh: Shell, how: "Exit to main menu" | "Quit"): Lea
 
 function finishLeaving(sh: Shell, how: "Exit to main menu" | "Quit"): void {
   sh.events.push({ type: "CampaignLeft" });
+  const realm = sh.campaign?.realm;
   sh.campaign = null;
   if (how === "Quit") {
     sh.leftApp = true;
     sh.stack = [];
-  } else replaceAll(sh, { id: "main_menu" });
+  } else openStartScreen(sh, realm);
 }
 
 /** Picks an entry on the game menu. */

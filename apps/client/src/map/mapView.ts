@@ -25,6 +25,9 @@ export interface FrameStats {
 
 export interface MapViewEvents {
   onTap(screenX: number, screenY: number, province: number): void;
+  /** A finger held still on the map for the long-press time (SUBJ-138); a tap is not sent after it. */
+  onLongPress?(screenX: number, screenY: number, province: number): void;
+  longPressMs?(): number;
   drawOverlay(o: OverlayContext): void;
 }
 
@@ -42,7 +45,11 @@ export class MapView {
   private dirty = true;
   private pointers = new Map<number, { x: number; y: number }>();
   private gesture: { moved: number; pinchDist: number; startZoom: number } | null = null;
+  private pressTimer: ReturnType<typeof setTimeout> | null = null;
   private lastAnim = 0;
+  private lastFrame = 0;
+  /** Battery saver's knobs (settings): frames a second at most, ms between idle animation frames (0 = none), the overlay's pixel ratio cap. */
+  private power = { maxFps: 60, animMs: 200, dprCap: 2 };
   private root: HTMLElement;
   /** The view's size in CSS pixels, kept from the last resize: reading it from the page on every call forces layout. */
   private viewW = 0;
@@ -68,8 +75,10 @@ export class MapView {
     new ResizeObserver(() => this.resize()).observe(root);
     this.resize();
     const frame = (t: number) => {
-      // Waves and the selection blink only need a few frames a second.
-      if (this.dirty || t - this.lastAnim > 200) {
+      // Waves and the selection blink only need a few frames a second; the frame cap holds the rest back.
+      const capped = t - this.lastFrame < 1000 / this.power.maxFps - 1;
+      if (!capped && (this.dirty || (this.power.animMs > 0 && t - this.lastAnim > this.power.animMs))) {
+        this.lastFrame = t;
         // Cleared before drawing, so a drawOverlay that is still animating
         // (marching armies) can ask for the very next frame.
         this.dirty = false;
@@ -91,6 +100,14 @@ export class MapView {
     this.dirty = true;
   }
 
+  /** Takes the performance settings at once (SET-003). */
+  setPower(power: { maxFps: number; animMs: number; dprCap: number }): void {
+    const sharper = power.dprCap !== this.power.dprCap;
+    this.power = power;
+    if (sharper) this.resize();
+    this.invalidate();
+  }
+
   lookAt(x: number, y: number, zoom = this.camera.zoom): void {
     this.camera = { x, y, zoom: Math.min(this.maxZoom, Math.max(this.minZoom, zoom)) };
     this.clamp();
@@ -98,7 +115,7 @@ export class MapView {
   }
 
   private resize(): void {
-    this.dpr = Math.min(window.devicePixelRatio || 1, 2);
+    this.dpr = Math.min(window.devicePixelRatio || 1, this.power.dprCap);
     const w = (this.viewW = this.root.clientWidth);
     const h = (this.viewH = this.root.clientHeight);
     // The map is pixel art, so it is drawn at one pixel per CSS pixel and
@@ -189,7 +206,19 @@ export class MapView {
     el.addEventListener("pointerdown", (e) => {
       el.setPointerCapture(e.pointerId);
       this.pointers.set(e.pointerId, local(e));
-      if (this.pointers.size === 1) this.gesture = { moved: 0, pinchDist: 0, startZoom: this.camera.zoom };
+      if (this.pointers.size === 1) {
+        this.gesture = { moved: 0, pinchDist: 0, startZoom: this.camera.zoom };
+        const at = local(e);
+        if (this.events.onLongPress) {
+          this.pressTimer = setTimeout(() => {
+            this.pressTimer = null;
+            if (!this.gesture || this.gesture.moved >= 8 || this.pointers.size !== 1) return;
+            // Held still: the long-press opens the card, and the lift that follows is no tap.
+            this.gesture.moved = 99;
+            this.events.onLongPress!(at.x, at.y, this.provinceAt(at.x, at.y));
+          }, this.events.longPressMs?.() ?? 500);
+        }
+      }
       if (this.pointers.size === 2) {
         const [a, b] = [...this.pointers.values()];
         this.gesture = { moved: 99, pinchDist: Math.hypot(a!.x - b!.x, a!.y - b!.y), startZoom: this.camera.zoom };
@@ -218,6 +247,8 @@ export class MapView {
     });
 
     const end = (e: PointerEvent) => {
+      if (this.pressTimer) clearTimeout(this.pressTimer);
+      this.pressTimer = null;
       const p = this.pointers.get(e.pointerId);
       this.pointers.delete(e.pointerId);
       if (p && this.gesture && this.pointers.size === 0) {

@@ -170,10 +170,13 @@
     "needs_invention_for_abroad": "T3"
   },
   "route": {
+    "$comment": "D-TRADE-21: a route is a start and an end, walked there and back; the planner finds the way, drawn toward the most populated land: a province's days count divided by 1 + busy_weight x its people over the world's average, at most busy_cap times the average.",
     "min_stops": 2,
-    "max_stops": 8,
-    "default_mode": "loop",
-    "toll_counts_as_days": 2
+    "max_stops": 2,
+    "default_mode": "there_and_back",
+    "toll_counts_as_days": 2,
+    "busy_weight": 1,
+    "busy_cap": 3
   },
   "tolls": {
     "none": 0,
@@ -349,8 +352,6 @@
         "label": "galley line",
         "stops": [
           "Venice",
-          "Corfu",
-          "Candia",
           "Alexandria"
         ]
       },
@@ -365,8 +366,6 @@
         "country": "Genoa",
         "stops": [
           "Genoa",
-          "Chios",
-          "Pera",
           "Caffa"
         ]
       },
@@ -374,7 +373,12 @@
         "country": "Lübeck",
         "stops": [
           "Lübeck",
-          "Bergen",
+          "Bergen"
+        ]
+      },
+      {
+        "country": "Lübeck",
+        "stops": [
           "Lübeck",
           "Bruges"
         ]
@@ -392,7 +396,6 @@
         "label": "caravan",
         "stops": [
           "Florence",
-          "Bologna",
           "Venice"
         ]
       },
@@ -401,7 +404,6 @@
         "label": "camel caravan",
         "stops": [
           "Timbuktu",
-          "Taghaza",
           "Sijilmasa"
         ]
       },
@@ -410,9 +412,14 @@
         "label": "dhow",
         "stops": [
           "Kilwa",
-          "Sofala",
+          "Sofala"
+        ]
+      },
+      {
+        "country": "Kilwa",
+        "label": "dhow",
+        "stops": [
           "Kilwa",
-          "Mombasa",
           "Malindi"
         ]
       },
@@ -421,7 +428,6 @@
         "label": "dhow",
         "stops": [
           "Calicut",
-          "Hormuz",
           "Aden"
         ]
       },
@@ -437,7 +443,6 @@
         "country": "Malacca",
         "stops": [
           "Malacca",
-          "Pasai",
           "Calicut"
         ]
       },
@@ -446,7 +451,13 @@
         "label": "junk",
         "stops": [
           "Naha",
-          "Fuzhou",
+          "Fuzhou"
+        ]
+      },
+      {
+        "country": "Ryukyu",
+        "label": "junk",
+        "stops": [
           "Naha",
           "Hakata"
         ]
@@ -598,6 +609,8 @@
     "collect.foreign_market_fee",
     "deposit.bills_of_exchange_fee",
     "route.toll_counts_as_days",
+    "route.busy_weight",
+    "route.busy_cap",
     "tolls.low",
     "tolls.high",
     "danger",
@@ -613,6 +626,22 @@
     "ai",
     "hubs",
     "event_mapping.trade_index_reference_per_year",
-    "materials.no_route_markup"
-  ]
+    "materials.no_route_markup",
+    "game"
+  ],
+  "game": {
+    "$comment": "D-TRADE-20, the game's first slice of trade (provisional). value_scale turns goods gold into the treasury's gold so the world's trade income in 1444 is about what the old flat trade line paid; purse_scale does the same for purses. Craftsmen make crafts (finished goods) and the food surplus is grain until the craft and food buildings make their own wares. The AI looks for loops within its reach in days, counts a quiet road as this ratio, and founds at most one trader a year while it has fewer than this many times its starting traders, plus one. A loop bringing at least ai_keep_route_over_upkeep times its upkeep is kept at the yearly look.",
+    "value_scale": 0.08,
+    "purse_scale": 0.2,
+    "food_loads_per_thousand_fed": 1,
+    "crafts_loads_per_thousand": 1,
+    "leg_max_days": 150,
+    "ai_reach_days_land": 60,
+    "ai_reach_days_sea": 60,
+    "ai_ratio_floor": 20,
+    "ai_candidates": 8,
+    "ai_max_traders_per_start": 2,
+    "ai_found_reserve": 3,
+    "ai_keep_route_over_upkeep": 4
+  }
 }

@@ -1,17 +1,37 @@
+import { armyDead } from "./fallen.ts";
+import { W as WARFARE } from "./domain/warfare/index.ts";
 import { monthlyPeople } from "./living.ts";
+import { monthlyBelief } from "./belief.ts";
 import { setFood, setFoodPreset } from "./castleFood.ts";
 import { aiTreasury, repayLoan, runLedger, setTax, takeLoan } from "./treasury.ts";
 import { monthlyFood } from "./food.ts";
-import { callStudentsToArms, foundSchool, monthlyResearch, setSeats, setStudy } from "./research.ts";
+import { callStudentsToArms, foundSchool, monthlyResearch, moveQueued as moveQueuedStudy, queuePath, queueStudy, setSeats, setStudy, unqueue } from "./research.ts";
 import { aiChanges, monthlyChanges, orderChange, stopChange } from "./conversion.ts";
-import { breakAlliance, makeDemand, monthlyStatecraft, sendEnvoy, syncCountries } from "./statecraft.ts";
+import { answerAsk, breakAlliance, libraryEvents, makeDemand, monthlyStatecraft, sendEnvoy, syncCountries } from "./statecraft.ts";
+import { monthlyConquest } from "./conquest.ts";
+import { backersOf, bondOf, riseUp, subjectAction, subjectChoice } from "./subjects.ts";
+import { court, recallCourting } from "./courting.ts";
 import { aiWorks, cancelWork, judgeNeglect, mineYear, monthlyWorks, moveQueued, orderWork } from "./works.ts";
 import { monthlyMoods } from "./moods.ts";
-import { swapOfficials } from "./officials.ts";
-import { giveGift, grantFief, inAnyWar, monthlyLords, seizeFief } from "./lords.ts";
+import { answerRebels, dailyRebels, monthlyRebels, verdictOrder } from "./rebels.ts";
+import { answerRevolution, lockedOrder, monthlyRevolutions } from "./revolutions.ts";
+import { answerEvent, monthlyEvents } from "./events.ts";
+import { heritageChoice, monthlyHeritage, payCounsel } from "./heritage.ts";
+import { monthlyGovernment, reform } from "./government.ts";
+import { dismissTrader, draftTradeRoute, foundTrader, monthlyTrade, setTradeRoute, type GameTraderKind } from "./trade.ts";
+import { monthlyNavy, navyOrder, stepNavy, type NavyOrder } from "./navy.ts";
+import { hiredFleetOrder, monthlyHiredFleets, type HireOrder } from "./hiredFleets.ts";
+import { dailyExploration, exploreOrder, monthlyColonies, stepVoyages, type ExploreOrder } from "./colonies.ts";
+import { monthlyPeoples, setFaithPolicy, setTonguePolicy } from "./peoples.ts";
+import { claimCaliphate, faithHeadsWars, monthlyFaithHeads, raiseOwnPatriarch, sendConclaveGold } from "./faithHeads.ts";
+import { hireOfficial, settleLand, swapOfficials } from "./officials.ts";
+import { giveGift, grantFief, inAnyWar, lordGetsBuilding, monthlyLords, seizeFief } from "./lords.ts";
+import { clockStopped, dailyEndCheck, keepPlaying, playOn, weeklyEndCheck, yearlyScores } from "./campaignEnd.ts";
+import { noteMoment, turnEndAchievements } from "./achievements.ts";
+import { empireOrder, monthlyInstitutions, type EmpireOrder } from "./institutions.ts";
 import { addDays, DAYS_PER_RATION_MONTH, DAYS_PER_TURN } from "./calendar.ts";
 import { corridor, monthlyRations, refillRations, wagonRations, planRoute, planTilePath, tileStepHours, type MarchingArmy } from "./march.ts";
-import { marchMap, NO_PATH, tileMarch, updateWeather, type World } from "./world.ts";
+import { foodCarriedPct, marchMap, NO_PATH, tileMarch, updateWeather, type World } from "./world.ts";
 import {
   aiCollect,
   appointCommander,
@@ -59,8 +79,13 @@ import {
 export type Order =
   /** March to a province, to the given tile in it if any (else its centre). */
   | { type: "move"; army: number; to: number; tile?: number }
-  | { type: "declareWar"; target: number }
-  | { type: "offerPeace"; target: number; terms: PeaceTerms }
+  /** Declare war with an aim the realm holds (else the best it holds, else no aim, WAR-178); `breakTruce` breaks a truce first (WAR-179). */
+  | { type: "declareWar"; target: number; aim?: string; province?: number; breakTruce?: boolean }
+  | { type: "conclaveGold"; gold: number }
+  | { type: "claimCaliphate" }
+  | { type: "raiseOwnPatriarch" }
+  /** Offer peace; `provinces` and `gold` are the terms chosen at the peace table: asked with "take", given with "give" (WAR-242); none means the most the war allows. */
+  | { type: "offerPeace"; target: number; terms: PeaceTerms; provinces?: number[]; gold?: number }
   | { type: "answerCall"; call: string; yes: boolean }
   /** Take or turn down a peace the AI offers (its id in the snapshot's peaceOffers). */
   | { type: "answerPeace"; offer: number; yes: boolean }
@@ -69,7 +94,7 @@ export type Order =
   /** Take the last thousand off a province's recruit queue, with its levy money back. */
   | { type: "cancelRecruit"; province: number }
   /** The army's commander takes in the garrison troops where it stands. */
-  | { type: "pickUp"; army: number }
+  | { type: "pickUp"; army: number; men?: number }
   /** Commission a province's official as a commander; release one back to his post. */
   | { type: "commission"; province: number }
   | { type: "release"; commander: number }
@@ -95,8 +120,17 @@ export type Order =
   | { type: "seizeFief"; province: number }
   /** Move officials between two royal provinces: they swap posts, or one takes the other's empty post (AssignOfficial). */
   | { type: "swapOfficials"; a: number; b: number }
+  /** Hire an official of a type (an OFFICIALS index) into an empty royal post; a foreign specialist costs more (HireOfficial). */
+  | { type: "hireOfficial"; province: number; official: number; foreign: boolean }
+  /** Keep a province just taken as royal land with its post empty for now (SettleLand, PROV-340). */
+  | { type: "settleLand"; province: number }
   /** Research: choose the invention to study, how many students to keep, empty the schools into recruits, found a school in a town. */
   | { type: "setStudy"; invention: string }
+  /** The study queue (RSCH-108 to RSCH-110): add one, queue the path to one, take one out, move one a place earlier (-1) or later (1). */
+  | { type: "queueStudy"; invention: string }
+  | { type: "queuePath"; invention: string }
+  | { type: "unqueueStudy"; invention: string }
+  | { type: "moveQueuedStudy"; invention: string; by: number }
   | { type: "setSeats"; n: number }
   | { type: "callStudentsToArms" }
   | { type: "foundSchool"; province: number }
@@ -111,10 +145,52 @@ export type Order =
   | { type: "sendEnvoy"; target: number; action: string }
   | { type: "breakAlliance"; target: number }
   | { type: "makeDemand"; target: number; kind: string; province?: number }
+  /** Agree to, give in to or refuse an envoy's ask at the player's court (its id in the snapshot's statecraft asks, DIPL-212). */
+  | { type: "answerAsk"; ask: string; yes: boolean }
+  /** The overlord's action on its subject: set the tribute (with `level`), send a gift, loosen or release it (SUBJ-037 to SUBJ-046). */
+  | { type: "subjectAction"; subject: number; action: "tribute" | "gift" | "loosen" | "release" | "resident" | "recall" | "hostage" | "send_heir_home" | "tighten" | "fold_in" | "merge"; level?: string }
+  /** Send an envoy to court lord `lord` of realm `target`, or subject `target` without a lord; `recall` calls him home (DIPL-215). */
+  | { type: "court"; target: number; lord?: number; recall?: boolean }
+  /** A Disloyal subject rises against its overlord (SUBJ-076, SUBJ-077). */
+  | { type: "riseUp" }
+  /** A subject's own choices toward its overlord: stop paying, pay again, ask politely to loosen (SUBJ-131). */
+  | { type: "subjectChoice"; action: "stop_paying" | "pay" | "ask_loosen" }
   | { type: "stopChange"; province: number }
+  /** Answer an event or take a decision waiting for the realm, with one of its options (AnswerEvent, EVT-044). */
+  | { type: "answerEvent"; event: string; option: string }
+  /** Heritage: pay the court's counsel to read one sealed ambition (HER-024); choose which heyday sleeps or which legacy goes (HER-013, HER-030). */
+  | { type: "heritageCounsel"; ambition: string }
+  | { type: "heritageChoice"; id: string }
+  /** Reform the government into one of its next forms (GOV-027). */
+  | { type: "reform"; to: string }
+  /** Found a trader in an own city (TRADE-003), set its route of 2 to 8 cities (TRADE-050), draw one for its preview (TRADE-054), or dismiss it (TRADE-006). */
+  | { type: "foundTrader"; city: number; kind: GameTraderKind }
+  | { type: "setTradeRoute"; trader: number; stops: number[] }
+  | { type: "draftTradeRoute"; trader: number; stops: number[] }
+  | { type: "dismissTrader"; trader: number }
+  /** Set the realm's Tongue policy (CULT-038), or a faith's policy from the next New Year (RELG-055). */
+  | { type: "tonguePolicy"; policy: string }
+  | { type: "faithPolicy"; faith: string; policy: string }
   /** Set a Food policy setting for the realm (castle -1) or one castle's own value (null: follow the realm again); or fill it all from a preset. */
   | { type: "setFood"; castle: number; key: string; value: string | number | null }
-  | { type: "foodPreset"; name: string };
+  | { type: "foodPreset"; name: string }
+  /** Answer a rising against the player: grant its demand, talk or bribe its leader (REBL-045 to REBL-047); waiting needs no order, attacking is a march. */
+  | { type: "answerRebels"; rising: number; answer: "grant" | "talk" | "bribe" }
+  /** The verdict on a beaten rising: Pardon, Punish the leaders or Massacre (REBL-050). */
+  | { type: "treatRebels"; rising: number; treatment: "Pardon" | "Punish the leaders" | "Massacre" }
+  /** The answer to the player's revolution: Lead, Bend or Fight (REVO-084). */
+  | { type: "answerRevolution"; stance: "lead" | "bend" | "fight" }
+  /** Ports, sailors and fleets: muster, buy a ship, sail, board, land, admiral, merge, split, disband (navy.ts). */
+  | NavyOrder
+  /** Hire a free or lent fleet, or dismiss one (hiredFleets.ts). */
+  | HireOrder
+  /** Voyages, colonial governors and colonies: explore, hire, embark, load, unload, found, abandon, dismiss (colonies.ts). */
+  | ExploreOrder
+  /** The Empire: stand for the crown, vote, seek a vote, grant a seat, admit a member (institutions.ts). */
+  | EmpireOrder
+  /** After world domination, play on to the end date; after game over, play on as another realm (SHELL-164). */
+  | { type: "keepPlaying" }
+  | { type: "playOn"; nation: number };
 
 export type MoveOrder = Extract<Order, { type: "move" }>;
 
@@ -147,8 +223,11 @@ export function applyNow(world: World, order: Order, actingNation: number): Turn
 export function advance(world: World, steps: number): News[] {
   const news: News[] = [];
   for (let s = 0; s < steps; s++) {
+    if (clockStopped(world)) break;
     if (world.step === 0) startDay(world, news);
     stepMarches(world, HOURS_PER_STEP);
+    stepNavy(world, HOURS_PER_STEP, news);
+    stepVoyages(world, news);
     engage(world, news);
     fightRound(world, news);
     for (let i = 0; i < world.armies.count; i++) if (world.armies.alive[i] && world.armies.men[i]! < 1) world.armies.alive[i] = 0;
@@ -183,11 +262,21 @@ function startDay(world: World, news: News[]): void {
   if (world.day > 0 && world.date.day === 1) {
     monthlyPeople(world, news);
     monthlyFood(world, news);
+    monthlyGovernment(world, news);
+    monthlyPeoples(world, news);
+    monthlyFaithHeads(world, news);
+    monthlyBelief(world, news);
     monthlyMoods(world, news);
+    monthlyRebels(world, news);
+    monthlyRevolutions(world, news);
     monthlyLords(world, (n) => !inAnyWar(world, n), news);
     monthlyRecruits(world, news);
     monthlyResearch(world, news);
+    monthlyTrade(world, news);
     runLedger(world, true);
+    monthlyNavy(world, news);
+    monthlyHiredFleets(world, news);
+    monthlyColonies(world, news);
     judgeNeglect(world);
     if (world.date.month === 1) mineYear(world, news);
     monthlyWorks(world, news);
@@ -197,19 +286,34 @@ function startDay(world: World, news: News[]): void {
     aiTreasury(world, news);
     monthlyDiplomacy(world, news);
     monthlyStatecraft(world, news);
+    // Lands taken over the last 20 years each month; the league check each January (DIPL-221).
+    monthlyConquest(world, news);
+    // Institutions read standing and forms and add war aims, so they come after diplomacy and before the wars (INST §9).
+    monthlyInstitutions(world, news);
     aiDeclarations(world, news);
+    // A war just declared may be censured, or call a patron to a holy place (RELG-147, RELG-149).
+    faithHeadsWars(world, news);
+    // A demand made before war may reach the player's court this month (DIPL-213).
+    libraryEvents(world, news);
     aiRaise(world, news);
+    // Events come last in the month, after every other system (X-2).
+    monthlyEvents(world, news);
+    if (world.date.month === 1) yearlyScores(world, news);
+    monthlyHeritage(world, news);
   }
   if (world.day % DAYS_PER_TURN === 0) aiMarches(world);
 }
 
 function endDay(world: World, news: News[]): void {
   feedArmies(world);
+  dailyExploration(world);
   runOccupation(world, world.date.day === 1, news);
+  dailyRebels(world, news);
   world.date = addDays(world.date, 1);
   world.day++;
   updateWeather(world);
   syncDate(world);
+  dailyEndCheck(world, news);
   if (world.day % DAYS_PER_TURN === 0) {
     weeklyMusters(world, news);
     aiCollect(world, news);
@@ -217,16 +321,32 @@ function endDay(world: World, news: News[]): void {
     // The player's ledger is kept current each week; every realm's is worked out when the month turns.
     if (world.player >= 0) runLedger(world, false, world.player);
     answerAiCalls(world, news);
+    weeklyEndCheck(world, news);
+    // Achievement tests read the turn's final values, last of all (ACH-033).
+    turnEndAchievements(world);
     world.turn++;
   }
 }
 
 function applyOrder(world: World, order: Order, actingNation: number, news: News[]): string | null {
+  const locked = lockedOrder(world, actingNation, order);
+  if (locked) return locked;
   switch (order.type) {
-    case "declareWar":
-      return declareWar(world, actingNation, order.target, news);
+    case "keepPlaying":
+      return keepPlaying(world);
+    case "playOn":
+      return playOn(world, order.nation);
+    case "declareWar": {
+      const why = declareWar(world, actingNation, order.target, news, {
+        ...(order.aim ? { aim: order.aim } : {}),
+        ...(order.province !== undefined && world.provinceIds[order.province] ? { province: world.provinceIds[order.province] } : {}),
+        ...(order.breakTruce ? { breakTruce: true } : {}),
+      });
+      if (!why) faithHeadsWars(world, news);
+      return why;
+    }
     case "offerPeace":
-      return offerPeace(world, actingNation, order.target, order.terms, news);
+      return offerPeace(world, actingNation, order.target, order.terms, news, false, order.provinces ?? [], order.gold ?? 0);
     case "answerPeace":
       return answerPeace(world, order.offer, order.yes, news);
     case "answerCall": {
@@ -240,7 +360,7 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
     case "cancelRecruit":
       return cancelRecruit(world, actingNation, order.province);
     case "pickUp":
-      return pickUp(world, actingNation, order.army);
+      return pickUp(world, actingNation, order.army, order.men);
     case "commission":
       return commissionOfficial(world, actingNation, order.province, news);
     case "release":
@@ -277,8 +397,23 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
       if (!reason) runLedger(world, false);
       return reason;
     }
+    case "settleLand":
+      return settleLand(world, actingNation, order.province);
+    case "hireOfficial": {
+      const reason = hireOfficial(world, actingNation, order.province, order.official, !!order.foreign, news);
+      if (!reason) runLedger(world, false);
+      return reason;
+    }
     case "setStudy":
       return setStudy(world, actingNation, order.invention);
+    case "queueStudy":
+      return queueStudy(world, actingNation, order.invention);
+    case "queuePath":
+      return queuePath(world, actingNation, order.invention);
+    case "unqueueStudy":
+      return unqueue(world, actingNation, order.invention);
+    case "moveQueuedStudy":
+      return moveQueuedStudy(world, actingNation, order.invention, order.by < 0 ? -1 : 1);
     case "setSeats":
       return setSeats(world, actingNation, order.n);
     case "callStudentsToArms":
@@ -290,6 +425,7 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
     }
     case "build": {
       const reason = orderWork(world, actingNation, order.province, order.work, news);
+      if (!reason) lordGetsBuilding(world, order.province, news);
       if (!reason) runLedger(world, false);
       return reason;
     }
@@ -299,9 +435,11 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
       return reason;
     }
     case "setFood":
-      return setFood(world, actingNation, order.castle, order.key, order.value);
-    case "foodPreset":
-      return setFoodPreset(world, actingNation, order.name);
+    case "foodPreset": {
+      const reason = order.type === "setFood" ? setFood(world, actingNation, order.castle, order.key, order.value) : setFoodPreset(world, actingNation, order.name);
+      if (!reason) noteMoment(world, actingNation, "food_policy_changed", { food_policy_changed: true });
+      return reason;
+    }
     case "changeTile": {
       const reason = orderChange(world, actingNation, order.province, order.change);
       if (!reason) runLedger(world, false);
@@ -309,6 +447,26 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
     }
     case "stopChange":
       return stopChange(world, actingNation, order.province);
+    case "reform":
+      return reform(world, actingNation, order.to, news);
+    case "foundTrader":
+      return foundTrader(world, actingNation, order.city, order.kind);
+    case "setTradeRoute":
+      return setTradeRoute(world, actingNation, order.trader, order.stops);
+    case "draftTradeRoute":
+      return draftTradeRoute(world, actingNation, order.trader, order.stops);
+    case "dismissTrader":
+      return dismissTrader(world, actingNation, order.trader);
+    case "tonguePolicy":
+      return setTonguePolicy(world, actingNation, order.policy);
+    case "conclaveGold":
+      return sendConclaveGold(world, actingNation, order.gold);
+    case "claimCaliphate":
+      return claimCaliphate(world, actingNation, news);
+    case "raiseOwnPatriarch":
+      return raiseOwnPatriarch(world, actingNation, news);
+    case "faithPolicy":
+      return setFaithPolicy(world, actingNation, order.faith, order.policy);
     case "sendEnvoy": {
       syncCountries(world);
       const reason = sendEnvoy(world, actingNation, order.target, order.action);
@@ -317,13 +475,54 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
     }
     case "breakAlliance":
       return breakAlliance(world, actingNation, order.target);
+    case "heritageCounsel":
+      return payCounsel(world, actingNation, order.ambition);
+    case "heritageChoice":
+      return heritageChoice(world, actingNation, order.id);
+    case "answerEvent":
+      return answerEvent(world, actingNation, order.event, order.option, news);
     case "makeDemand":
       syncCountries(world);
       return makeDemand(world, actingNation, order.target, order.kind, order.province ?? -1);
+    case "answerAsk": {
+      const reason = answerAsk(world, actingNation, order.ask, order.yes, news);
+      if (!reason) runLedger(world, false);
+      return reason;
+    }
+    case "riseUp": {
+      // The first realm that would back the rising joins it (SUBJ-133).
+      const b = bondOf(world, actingNation);
+      const o = b ? world.nationIndex.get(b.overlord) : undefined;
+      return riseUp(world, actingNation, news, o === undefined ? undefined : backersOf(world, actingNation, o)[0]);
+    }
+    case "subjectChoice": {
+      const reason = subjectChoice(world, actingNation, order.action, news);
+      if (!reason) runLedger(world, false);
+      return reason;
+    }
+    case "court":
+      return order.recall ? recallCourting(world, actingNation, order.target, order.lord) : court(world, actingNation, order.target, order.lord);
+    case "subjectAction": {
+      const reason = subjectAction(world, actingNation, order.subject, order.action, news, order.level);
+      if (!reason) runLedger(world, false);
+      return reason;
+    }
+    case "answerRebels":
+      return answerRebels(world, actingNation, order.rising, order.answer, news);
+    case "treatRebels":
+      return verdictOrder(world, actingNation, order.rising, order.treatment, news);
+    case "empire":
+      return empireOrder(world, actingNation, order, news);
+    case "answerRevolution":
+      return answerRevolution(world, actingNation, order.stance, news);
     case "moveBuild":
       return moveQueued(world, actingNation, order.province, order.work, order.by);
     case "move":
       return orderMarch(world, order, actingNation);
+    case "navy":
+      return order.do === "hire" || order.do === "dismiss" ? hiredFleetOrder(world, order, actingNation, news) : navyOrder(world, order, actingNation, news);
+    case "explore":
+      return exploreOrder(world, order, actingNation, news);
   }
 }
 
@@ -582,14 +781,20 @@ function stepMarches(world: World, hours: number): void {
  * What the land can't make up is hunger: men desert and die, and horses are
  * eaten.
  */
+const HUNGER_DEAD_SHARE = WARFARE.hunger.die / (WARFARE.hunger.die + WARFARE.hunger.desert);
+
 function feedArmies(world: World): void {
   const d = world.rules.defines.march;
   const map = marchMap(world);
   const a = world.armies;
   const day = 1 / DAYS_PER_RATION_MONTH;
+  // What each realm's wagons hold (RSCH-094: half without B01), read once per realm per day.
+  const carried = new Int16Array(world.nationCount).fill(-1);
   for (let i = 0; i < a.count; i++) {
     if (!a.alive[i]) continue;
-    const army = { ...marching(world, i), campaigning: campaigning(world, i) };
+    const n = a.owner[i]!;
+    if (carried[n]! < 0) carried[n] = foodCarriedPct(world, n);
+    const army = { ...marching(world, i), campaigning: campaigning(world, i), foodCarriedPct: carried[n]! };
     const need = monthlyRations(d, army) * day;
     a.food[i] = a.food[i]! - need;
     const room = wagonRations(d, army) - a.food[i]!;
@@ -601,7 +806,10 @@ function feedArmies(world: World): void {
     if (a.food[i]! < 0) {
       const short = Math.min(1, -a.food[i]! / need);
       const loss = d.hungerLossPerMonth * day * short;
-      a.men[i] = Math.round(a.men[i]! * (1 - loss));
+      const before = a.men[i]!;
+      a.men[i] = Math.round(before * (1 - loss));
+      // Of the men hunger takes, those who die (warfare hunger: die against desert) are missed at home (WAR-226).
+      armyDead(world, i, (before - a.men[i]!) * HUNGER_DEAD_SHARE);
       a.horse[i] = Math.round(a.horse[i]! * (1 - loss));
       a.food[i] = 0;
     }

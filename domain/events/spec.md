@@ -28,7 +28,7 @@ contexts extend, and the data build that validates all of it.
   **trade** (trade 12), **government** (government 5), **diplomacy** (diplomacy 11), **subjects** (subjects 11).
 - Rising mechanics behind the `rebels` effect: **rebellions**.
 - The revolution layer (signs, stances, regimes) built on events: **revolutions**.
-- Faith waves and faith policy: **religion**. Tongues and nationalism: **culture**. Heritage: **national-strengths**.
+- Faith waves and faith policy: **religion**. Languages and nationalism: **culture**. Heritage: **national-strengths**.
 - How an event card looks and how unanswered events block End turn: **game-shell**. Music tags: **audio**.
 - Tutorial-only scripted events: **onboarding**.
 - Where events run in the turn, and in which turn their monthly work runs: **time-and-turns**.
@@ -228,7 +228,9 @@ Newest decision first.
   opinion, stat, rank, government, religion, religion_share, culture_group, innovation, ideology, tech,
   colonial_presence, trade_presence, rebels_active, subject_count, event, event_active, period_active,
   age_active, flag, any_country, all_countries, count_countries) with logic all, any, not, at_least.
-  [vocabulary.yaml]
+  [vocabulary.yaml] Subjects adds `subject_loyalty {who, target, op, step}` (the more loyal step is the
+  higher: `>= wavering` is Loyal or Wavering), `subject_count … by_reach: true` (subjects weighed by their
+  reach weights, else a head count) and `relation … kind` (the subject bond's kind) (D-EVT-11, SUBJ-097).
 - EVT-026 The game shall resolve targets as `$role`, an entity id, `province:<id>`, `area:<id>`,
   `region:<id>`, `global`, or `this` inside any_country, all_countries and count_countries. [vocabulary.yaml]
 - EVT-027 The game shall have no condition that reads whether a country is played by a person: `is_human` is
@@ -292,7 +294,9 @@ Newest decision first.
 - EVT-046 The game shall apply only effect types declared in the vocabulary: modifier, stat, transfer,
   create_country, annex, vassalize, release, war, peace, casus_belli, relation, rebels, spread, population,
   move_population, set_flag, start_period, end_period, unlock, government, religion, trade_route, colony.
-  [vocabulary.yaml]
+  [vocabulary.yaml] Subjects adds `change_subject_kind {who, target, kind}` (a kind, or `tighten` /
+  `loosen`), `add_subject_reason {target, reason, months}` (a subjects reason id, its arrow from subjects
+  config) and `remove_subject_reason {target, reason}` (D-EVT-11, SUBJ-097).
 - EVT-047 The game shall apply a `stat` change as a one-off delta, `+n` / `-n` or `+n%` / `-n%`. [vocabulary.yaml]
 - EVT-048 When a `rebels` effect applies, the game shall start a rising in the target province at once (the
   event is a spark), taking its men from the province's recruit pool: small 1/8, medium 1/4, large 1/2, huge
@@ -378,6 +382,49 @@ Newest decision first.
   of the event and of the chosen option if the rising won, or their `rising_crushed` effects if it was
   crushed. Sibling contexts add their conditions and effects as one evaluator each (EVT-050).
   [revolutions changes-for-other-designs; D-EVT-11]
+
+### 5.15 Events in the game (milestone 6, first slice)
+
+The event tree now runs in the game's month for every realm (D-EVT-17). The library keeps every rule above;
+a bridge shows it the game as the tree's own world, and lands what the game already simulates.
+
+- EVT-069 When a campaign starts, the game shall load the campaign's events (the tree's 247 events whose history
+  starts before the end date, no tutorial-only ones), every age, period and modifier, start the 1444 periods,
+  and check the ages and periods of the start year at once. [EVT-002, EVT-011, EVT-015; D-EVT-17]
+- EVT-070 Each month, as the last of the month's work, the game shall show the tree every realm under its tree id
+  (aliases where the map's id differs), whether it exists, its wars, alliances, subjects and truces, its land
+  neighbours, its gold, debt and men under arms (army_strength in thousands), its legitimacy as the share of its
+  lords who are Loyal and its integration_strain as the share of its provinces with a grievance (D-EVT-4), its
+  stability from the realm's step (Steady +1, Uneasy 0, Troubled −1, Crumbling −3), and who owns and holds each
+  map province of a mapped place; then it shall run the tree's month (spec 9). [EVT-054 … EVT-056; D-EVT-17]
+- EVT-071 When an event or decision is for an AI realm, the AI shall answer it at once by the option weights of
+  EVT-042; an event with no chooser is rolled the same way. [EVT-040, EVT-042; spec 12]
+- EVT-072 When an event fires for the player, or a decision is offered to the player, the game shall keep it
+  waiting until the player answers it; nothing answers it for them and it never lapses. [EVT-044; D-EVT-8]
+- EVT-073 The game shall land on the game what it already simulates: a `transfer` hands the map provinces of
+  the place to the realm, an `annex` hands it all of the target's land, a `treasury` or `debt` change moves the
+  realm's gold or debt (a `%` change of what it holds, a number at the game's gold scale), and a change to
+  legitimacy or stability is kept on top of the realm's own reading. Every other effect stays in the tree's world,
+  where later events read it. [EVT-045, EVT-056; D-EVT-17]
+- EVT-074 When an event fires for a realm or the AI answers one, the News shall say so ("Fall of
+  Constantinople: Ottomans chooses “Imperial capital”"); a major event is told to every realm, any other to the
+  realms in it and those close to them. [EVT-066; game-shell SHELL-082]
+- EVT-075 The event tree's state (its world, ages and periods, what fired, events waiting for an answer, boosts
+  and its dice) shall be kept in the save. [saves; D-EVT-17]
+
+#### How the player uses it: the event card
+- EVT-076 Where: when an event fires for the player, the week pauses and the event card opens over the map,
+  one event at a time, oldest first (SHELL-080). The card shows the event's name, the year it happened in
+  history, the tree's summary of what happened then, *Whatever you choose* with the event's own effects, and
+  each option as a 44-point button with its effects listed under it in words ("You: gold +15%", "Constantinople
+  passes to you"), the historical option marked *As in history*. Tapping an option answers it; the next waiting
+  event follows, and when none is left the paused week plays on. *Look at the map* folds the card into the End
+  turn button, which shows a scroll with the count of waiting events; while any waits, End turn opens the
+  oldest instead of ending the turn (SHELL-070, SHELL-081, EVT-044). Grouping and overview: every event is one
+  card; the News keeps a line for each event that fired, so the history of the campaign reads there, and
+  waiting events sit at the top of the News with an *Answer* button. Phone: the card is a sheet over the
+  map in the Wide and Tall layouts, inside the safe areas, its text scrolling while the options stay in reach,
+  every button at least 44 points high, nothing that needs hover. [X-19, SHELL-070, SHELL-080, SHELL-081]
 
 ## 6. Commands
 
@@ -474,10 +521,10 @@ before achievements and the autosave. The age and period checks run in the event
 | rebellions | downstream | Customer–Supplier | `rebels` effect starts a rising from the recruit pool (EVT-048); `rebels_active` reads risings; `unrest` lands as one named grievance; events as sparks; the end of a tagged rising (EVT-068) |
 | revolutions | downstream (they extend this) | Customer–Supplier | Adopted (D-EVT-11), registered by revolutions: conditions grievance, class_share, lords, war_lost; effects regime, lock; param rebels.revolution; tiers rising_won, rising_crushed; event field revolution with rearm (one_time may fire again); flags revolutionary_regime, emigre_court, reaction_regime, revolution_funded; areas hokuriku, old_castile; entities ikko_ikki_kaga, comuneros, tay_son, donghak_movement, russian_opposition_1905, iranian_constitutionalists; 7 unverified sources; 26 extended and 10 new events; build.py EFFECT_TIERS |
 | religion | downstream (they extend this) | Customer–Supplier | Adopted (D-EVT-11), registered by religion: religions hussite, jain, asian_traditional; conditions faith_policy, holds_holy_place, faith_wave_active; effects faith_wave, faith_policy, preachers; entities tumed, gelug_order, old_believers, gowa_tallo, merina_kingdom; 7 modifiers; 8 unverified sources; 10 new events; faith_wave patches on protestant_reformation, council_of_trent, safavid_rise, sikh_panth_founded, futa_jallon_jihad, sokoto_jihad; flags religious_persecution_active, missionary_persecution, inquisition_established set by religion (D-EVT-16) |
-| culture | downstream (they extend this) | Customer–Supplier | Adopted (D-EVT-11, D-EVT-12): culture groups celtic, baltic, caucasian, hebrew; effects tongue_spread, set_court_tongue, merge_tongues, move_people; conditions court_tongue, tongue_share, kin_of, cousin_of, stranger_to; engine-raised events "the court goes native" and "new tongues abroad"; culture effects on listed events; nationalism read from ideology_support |
+| culture | downstream (they extend this) | Customer–Supplier | Adopted (D-EVT-11, D-EVT-12): culture groups celtic, baltic, caucasian, hebrew; effects tongue_spread, set_court_tongue, merge_tongues, move_people; conditions court_tongue, tongue_share, kin_of, cousin_of, stranger_to; engine-raised events "the court goes native" and "new languages abroad"; culture effects on listed events; nationalism read from ideology_support |
 | subjects | downstream (they extend this) | Customer–Supplier | vassalize, release, relation subject/overlord/personal_union, subject_count, create_country subject_of, doctrine_of_lapse; adopted (D-EVT-11) subject_loyalty, add_subject_reason, remove_subject_reason, change_subject_kind |
 | diplomacy | downstream (they extend this) | Customer–Supplier | opinion → ledger standing; trust and notoriety are diplomacy's derived values, an event's change lands as an Oath broken or a Notorious deed (D-EVT-14); relation types to relation actions; adopted effects war_aim, league, pretender (D-EVT-11) |
-| national-strengths | downstream (they extend this) | Customer–Supplier | Ages for heydays; condition language; adopted (D-EVT-11) effects grant_legacy, wake_heyday, stir_ambition, shed_burden and condition heritage; requested missing events, areas, hubs and sea ids |
+| national-strengths | downstream (they extend this) | Customer–Supplier | Ages for golden ages; condition language; adopted (D-EVT-11) effects grant_legacy, wake_heyday, stir_ambition, shed_burden and condition heritage; requested missing events, areas, hubs and sea ids |
 | buildings | downstream (they extend this) | Customer–Supplier | Adopted (D-EVT-11) effects add_building, remove_building, damage_buildings, building_step and condition has_building; landmarks founded by events |
 | exploration | downstream | Customer–Supplier | `age_of_exploration` gates exploration per region; colonial_presence |
 | warfare | downstream | Customer–Supplier | war, peace, casus_belli; prestige from victories |
@@ -558,6 +605,18 @@ before achievements and the autosave. The age and period checks run in the event
 - **D-EVT-16** (was OQ-EVT-16) The religion flags: religious_persecution_active, missionary_persecution and
   inquisition_established are set by religion's own rules (`set_by: religion` in the events data). Religion
   was designed later.
+- **D-EVT-17** First game slice of events (milestone 6, provisional): the bridge maps 13 realm ids of the map to
+  the tree's (ottomans → ottoman, mamluks → mamluk, timurids → timurid_empire and so on) and 20 of the tree's
+  places to map provinces by name (Constantinople is Istanbul, Granada is Granada, Málaga and Almería, Guyenne is
+  Gironde, Landes, Dordogne and Lot-et-Garonne …), in `events-places.json`; a place not yet mapped covers no
+  provinces, so a condition on it does not hold and its events wait for the mapping. The tree's own statistics
+  start at one value for every realm (prestige 0, war weariness 0, administration 50, the three tech tracks 6,
+  literacy 5, military quality 40, naval reach 10, navy 0) and every mapped place (control 60, prosperity 10,
+  literacy 5), until the realm and province contexts give them; stability's steps sit at +1, 0, −1 and −3.
+  An AI realm takes up a decision as soon as it is offered. Events roll their own dice, so they never shift the
+  rest of the turn. Only land, gold, debt, legitimacy and stability land on the game in this slice (EVT-073); war,
+  peace, subjects, rebels, buildings and people from events land when their bridges are built. Quick defaults so
+  the game can play history now; each is replaced when its context lands.
 
 ## 14. Traceability
 
@@ -577,3 +636,5 @@ before achievements and the autosave. The age and period checks run in the event
 | EVT-060 – 065 | data-validation.feature | Layers, localization, checks, coverage |
 | EVT-066 – 067 | principles.feature | Music tags, tutorial-only events |
 | EVT-068 | effects.feature | The end of a tagged rising applies its tier |
+| EVT-069 … EVT-075 | — | Engine: packages/engine/test/events.test.ts (ages and periods at the start, the AI's Fall of Constantinople, the player's card and answer, the save) |
+| EVT-076 | — | Presentation: apps/client/src/ui/events.ts, the event card |

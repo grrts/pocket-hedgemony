@@ -12,7 +12,7 @@ In scope:
   loading with tips (S7).
 - In a campaign: the map (G1), cards (G2), the Realm book (G3), the game menu (G4), the turn as seen on screen
   (End turn, G5 turn in progress, G6 battles, G7 events, G8 turn report), the Attention screen (G9), and the
-  other in-campaign screens (battle viewer, siege view, peace table, map lens picker, confirmation).
+  other in-campaign screens (battle viewer, siege view, peace table, map mode picker, confirmation).
 - How a campaign ends: game over (E1), campaign end (E2), final result (E3), and the victory conditions as far
   as they reach the screen flow.
 - Interruptions: leaving and coming back (R1), purchases, the failure screen (X1).
@@ -25,7 +25,7 @@ In scope:
 Not in scope (owned by …):
 - Save slots, autosave, ironman, cloud saves, what the Load list holds → `saves`.
 - Every setting and its values, the Settings screen itself → `settings`.
-- Map rendering, zoom levels and what each zoom shows, map lenses → `map-presentation`.
+- Map rendering, zoom levels and what each zoom shows, map modes → `map-presentation`.
 - The achievement list and the achievement screen's content → `achievements`.
 - Tutorial campaign, tips text, the Almanac (the in-game encyclopedia), first-time hints, what goes on the
   Needs attention list → `onboarding`.
@@ -71,7 +71,7 @@ Newest decision first.
 | Map (G1) | Home during a campaign; always loaded underneath | The title's drifting map background |
 | Card (G2) | One thing on the map (province, army, commander, country, lord, castle, rebellion, sea zone) over part of the screen | A full screen |
 | Name tab | The tab in the lower left that shows the selected thing's name; tapping it opens its card | A Realm book tab |
-| Fold away | Shrinking a card back to its name tab | Closing a card |
+| Minimise (was Fold away) | Shrinking a card back to its name tab | Closing a card |
 | Fold-out | A gain-and-lose list opened inside a card | A new screen |
 | Realm book (G3) | One full screen with up to six tabs for realm-wide screens | A card |
 | Modal | A screen that needs an answer before anything else (event, peace offer, confirmation, game menu) | A card |
@@ -191,10 +191,10 @@ Newest decision first.
 
 ### 5.3 Title and main menu
 
-- SHELL-016: The title screen shall show the real map at world zoom drifting slowly across a region, drawn by the map renderer; while a campaign is in progress it shall drift over the player's realm in its current borders, read from the latest save's summary rather than the whole save. [screen-flow §3 S3, §10.5]
-- SHELL-017: When the title screen receives any touch, click, key or controller button, the game shell shall treat it as Tap to start and the `title` track shall start. [screen-flow §3 S3]
-- SHELL-018: The title screen shall show a small settings cog that opens Settings straight away, a ✕ that quits on desktop only, and the version number in a corner. [screen-flow §3 S3]
-- SHELL-019: When the player taps to start, the "Tap to start" line shall fold open into the main menu in the same place on the same screen, and Back from the main menu shall return to "Tap to start". [screen-flow §3 S4]
+- SHELL-016: The title screen shall show the real map at world zoom drifting slowly across a region, drawn by the map renderer; while a campaign is in progress it shall drift over the player's realm in its current borders, read from the latest save's summary rather than the whole save. [screen-flow §3 S3, §10.5] *Replaced by SHELL-150 (start screen, 18 Oct): region zoom.*
+- SHELL-017: When the title screen receives any touch, click, key or controller button, the game shell shall treat it as Tap to start and the `title` track shall start. [screen-flow §3 S3] *Replaced by SHELL-149: no Tap to start.*
+- SHELL-018: The title screen shall show a small settings cog that opens Settings straight away, a ✕ that quits on desktop only, and the version number in a corner. [screen-flow §3 S3] *Replaced by SHELL-154: the cog and Quit move into the icon row.*
+- SHELL-019: When the player taps to start, the "Tap to start" line shall fold open into the main menu in the same place on the same screen, and Back from the main menu shall return to "Tap to start". [screen-flow §3 S4] *Replaced by SHELL-149: the menu shows straight away.*
 - SHELL-020: While a campaign exists, the main menu shall show Continue, labelled with the realm's banner, name and in-game date ("France · May 1503"), which goes to Loading with the newest save. [screen-flow §3 S4]
 - SHELL-021: The main menu shall always show New campaign, which goes to S5. [screen-flow §3 S4]
 - SHELL-022: While any save exists, the main menu shall show Load, which goes to S6. [screen-flow §3 S4]
@@ -220,16 +220,16 @@ Newest decision first.
 - SHELL-039: When the player loads a save from the main menu, the game shell shall go to Loading with no confirmation. [screen-flow §3 S6]
 - SHELL-040: When the player loads from the game menu while the current campaign has unsaved turns, the game shell shall first ask "Leave <date> unsaved? · Save first · Leave · Cancel". [screen-flow §3 S6, §4.5]
 - SHELL-041: The loading screen shall show a tip from the one tips table in the config, tagged by era, region and whether it is for new players, picking one that fits the realm and date; tapping or pressing left and right shall show another. [screen-flow §3 S7]
-- SHELL-042: The loading screen's bar shall show the real loading steps ("Reading the save", "Drawing the borders", "Waking the courts") rather than a fake timer. [screen-flow §3 S7]
+- SHELL-042: The loading screen's bar shall show the real loading steps ("Reading the save", "Drawing the borders", "Waking the courts") rather than a fake timer, and its rider, road, bar and dots shall keep moving while the game is busy, so the player can see it has not frozen. [screen-flow §3 S7]
 - SHELL-043: When loading finishes, the game shell shall go straight to the map without asking for a tap, but shall keep a tip on screen for at least 2 s after it appeared before fading. [screen-flow §3 S7; placeholder]
 - SHELL-044: While the loading screen is shown, the `load_resume` track shall play. [screen-flow §3 S7]
 
 ### 5.5 Layers, map and cards
 
-- SHELL-045: The game shell shall treat in-campaign screens as four layers: the map (Back opens the game menu), cards (closed by Back, ✕, tapping empty map or folding away), full screens (Back or ✕ returns to whatever was below) and modals (closed only by their own buttons; Back means "decide later" where that is allowed). [screen-flow §4.1]
+- SHELL-045: The game shell shall treat in-campaign screens as four layers: the map (Back opens the game menu), cards (closed by Back, ✕, tapping empty map or minimising), full screens (Back or ✕ returns to whatever was below) and modals (closed only by their own buttons; Back means "decide later" where that is allowed). [screen-flow §4.1]
 - SHELL-046: When a card opens another card, the game shell shall stack it on the card stack, show a "Back to <name>" button at the bottom of the card for the card below, and clear the card stack when the player taps empty map. [screen-flow §4.1]
 - SHELL-047: The map's top bar shall show the realm name and banner (opening the country card), the date, gold with its monthly change, and levies; on a phone it shall hold at most five plaques and move the rest into the country card. [screen-flow §4.2]
-- SHELL-048: The map's tool column at the right edge shall hold map lens, go to capital, and Realm book. [screen-flow §4.2]
+- SHELL-048: The map's tool column at the right edge shall hold map mode, go to capital, and Realm book. [screen-flow §4.2]
 - SHELL-049: The End turn button (the hourglass, lower right) shall carry a badge counting the items on the Attention screen, and tapping the badge or pressing the controller's "next" button (d-pad right) shall open the Attention screen. [screen-flow §4.2; D-SHELL-7]
 - SHELL-050: The Attention bell next to the date shall light up while the Attention screen holds a warning and shall open it; it shall be the only place the game warns the player. [screen-flow §4.2]
 - SHELL-051: The map shall show a game menu button (a small three-line icon) in the upper left next to the banner. [screen-flow §4.2]
@@ -272,7 +272,7 @@ Newest decision first.
 - SHELL-079: If the app goes to the background while a player battle runs, then it shall come back to the same battle at the same step; if the app was killed, the Resume save and the orders journal shall replay the month to that battle with the same result. [screen-flow §4.6 G6; X-1; D-SHELL-5, D-SHELL-23]
 - SHELL-080: When events arise, they shall open one at a time as a modal card (picture, text, two or three options, each option showing its effects on tap or focus), queued in date order. [screen-flow §4.6 G7]
 - SHELL-081: When the player presses Look at the map on an event, the event shall shrink into the badge on End turn so the player can check something before answering. [screen-flow §4.6 G7]
-- SHELL-082: When the turn ends and something worth reporting happened (a notice an owning context marks for the player's turn report), the turn report shall slide in from the edge as a card listing what happened, each line jumping to its place on the map or its card, and shall close on the first map tap; if nothing worth reporting happened, only the date in the top bar shall change. [screen-flow §4.6 G8; D-SHELL-22]
+- SHELL-082: When the turn ends and something worth reporting happened (a notice an owning context marks for the player's turn report), the turn report shall slide in from the edge as a card listing what happened, each line jumping to its place on the map or its card, and shall close on the first map tap; if nothing worth reporting happened, only the date in the top bar shall change. [screen-flow §4.6 G8; D-SHELL-22] *Replaced in part by SHELL-147 (playtest feedback): the report goes into the Dispatches log and never slides in by itself.*
 
 ### 5.9 Attention screen
 
@@ -289,7 +289,7 @@ Newest decision first.
 - SHELL-090: When the player presses Back in the battle view while player battles run, the game shell shall return to the map while they keep running in 4-hour steps (the switcher reopens the view); in a replay, Back shall return where the replay was opened. [X-1] [screen-flow §4.7, §9]
 - SHELL-091: The siege view shall be a full screen opened from a besieged castle at local zoom or from its card, and Back shall return to the map at the castle. [screen-flow §4.7]
 - SHELL-092: The peace table shall be a modal opened from the Abroad tab, an enemy's country card, or an incoming offer, returning where it was opened; an incoming offer shall not be dismissable, only answered or put off one turn. [screen-flow §4.7] *Replaced in part by SHELL-140 (the enemy's country card means its Diplomacy tab) (playtest feedback).*
-- SHELL-093: The map lens picker shall be a small pop-over from the tool column returning to the map, and a confirmation shall be a small modal for destructive actions only, returning to the screen below unchanged. [screen-flow §4.7]
+- SHELL-093: The map mode picker shall be a small pop-over from the tool column returning to the map, and a confirmation shall be a small modal for destructive actions only, returning to the screen below unchanged. [screen-flow §4.7]
 
 ### 5.11 How a campaign ends
 
@@ -331,7 +331,7 @@ Newest decision first.
 - SHELL-120: On cards, the book and menus, touch shall work as: tap presses; drag scrolls; pinch does nothing; long press shows the item's explanation (the same text a tooltip shows on desktop). Long press shall never do anything that cannot also be reached by tap; it only explains, and any button inside an explanation is also on the item itself. [screen-flow §8.2; D-SHELL-10]
 - SHELL-121: The game shell shall use three controller action sets: Map (the map, G1), Battle (the battle viewer) and Menu (every other screen: S1–S7, Settings, Achievements, cards, the Realm book, events, confirmations and the game menu), plus the settings' Text layer while a text field is open; Menu offers move focus, select, back, the bumpers to switch tabs or step through the card stack, and Show on map. [screen-flow §8.3; settings §6.3; D-SHELL-8]
 - SHELL-122: In the Map action set, the game shell shall offer a free cursor on the left stick that snaps gently to provinces, armies and castles, pan on the right stick, zoom on the triggers, select, context actions, next army on the bumpers, the next waiting item on d-pad right, open the Realm book, open the game menu with a short press of Menu, and End turn by holding Menu for 0.5 s; on a keyboard, End turn is Enter held for 0.5 s. [screen-flow §8.3; tutorial §8.2; placeholder; D-SHELL-7]
-- SHELL-123: While a controller or keyboard is in use, focus shall always be visible as the gold frame used for the chosen map lens, every screen shall have its defined first focus, and the focus order shall follow reading order. [screen-flow §8.3]
+- SHELL-123: While a controller or keyboard is in use, focus shall always be visible as the gold frame used for the chosen map mode, every screen shall have its defined first focus, and the focus order shall follow reading order. [screen-flow §8.3]
 - SHELL-124: The game shell shall hold the screen list of screen flow §9 (id, kind, first focus, Back target, music, owner of content) as the single catalogue that code, music and sound key on. [screen-flow §9]
 - SHELL-125: While a Steam Controller or Steam Deck trackpad is in use, it shall act as a mouse on the map through Steam Input and the game shall show the mouse pointer; otherwise it shall show the stick cursor. [screen-flow §8.3]
 - SHELL-126: The game shell shall show button prompts matching the last device used (no prompts for touch, the controller's own glyphs for Xbox, PlayStation, Steam or Switch-style controllers, keys for a keyboard), switching at once when the device changes. [screen-flow §8.3]
@@ -359,18 +359,63 @@ Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision
 - SHELL-141: When the AI offers peace to the player, the game shell shall show the offer in the turn report, list it in Waiting for you, and mark the country's Diplomacy tab until it is answered or put off (SHELL-092). [F-10]
 - SHELL-142: The game shell shall give army banners tap targets of at least 44 points, select an army when its commander is tapped in the Army list, and let several armies be selected at once (MOVE-127). [F-21]
 - SHELL-143: On a keyboard, the game shell shall end the turn when Space is pressed once on the map, exactly as a tap on End turn does (the confirmation setting and unanswered events still apply); Enter held for 0.5 s keeps working, and Space does nothing while a text field has focus. [F-27]
-- SHELL-147: The game shell shall keep the turn report as a Dispatches log that never opens by itself: it opens from the Dispatches button in the top bar, keeps the past weeks' dispatches newest first under a heading per day, and can show everything or only what concerns the player's realm; the button shows how many dispatches about the player's realm came since it was last opened, plus calls to arms and peace offers waiting. When a battle or a siege of the player's begins (the player's armies attack or are attacked, besiege or are besieged), and when a call to arms or a peace offer arrives, the game shell shall show a short alert over the map, under the top bar, with Go there (centres the map on the province and selects it) or Answer (opens the Dispatches); alerts go away on their own and everything they say is also in the log. *Replaces the turn report sliding in (SHELL-082).* [F-72]
+  How the player uses it (SHELL-138 to SHELL-143):
+  - Picking commanders. The player taps a commander's banner on the map, or a commander in the Army list (the button over the map that lists the realm's commanders, any number chosen at once). Either one selects the army and the camera stays exactly where the player left it, so the march they plan stays in view; only panning, zooming and a line's map button (Show on map) move it. A banner takes a tap anywhere in a box of at least 44 points around it, and where two boxes overlap the banner nearest the finger wins. The Army list is the overview of the realm's armies: each line names the commander, his men and where he stands, one tap selects.
+  - The country card. A realm on the map, its name tab or any realm button opens its country card on General. Every country card starts its tab row with General, Diplomacy, Trade and Army in that order; the player's own card adds its realm-only tabs (Government, Treasury, Learning, Officials and the rest) after these four. General holds the summary lines (REALM-176); Diplomacy holds every war and peace action, declare war, the peace terms and the peace offers from that realm; Trade holds its wealth and trade lines; Army its soldiers, recruits and commanders, and on the player's own card the war room (the Military tab of WAR-214 and REALM-205 is this Army tab).
+  - A peace offer from the AI. It arrives with an alert over the map with Answer, and waits at the top of the News under Waiting for you with Make peace, Fight on and Later, and on the realm's Diplomacy tab. Later puts it off until the next turn. While it waits, a dot marks the Diplomacy tab on that realm's card and on the player's own card, and the News button counts it and blinks: the button is the overview of everything waiting for an answer.
+  - Space. With a keyboard, Space on the map ends the turn, and while the week plays it pauses and resumes it; the End turn button's label names the key so it is found without hover. In a text field Space only types. Touch and controllers are unchanged.
+  - Phone in landscape. The tab row is one row of 44-point tabs that scrolls sideways inside the side sheet (Wide) or the bottom sheet (Tall), the map stays live beside or above the card, and the mark is a dot beside the tab name, never colour alone. Nothing needs hover.
+- SHELL-147: The game shell shall keep the turn report as a News log (was Dispatches) that never opens by itself: it opens from the News button in the top bar, keeps the past weeks' news newest first under a heading per day, and can show everything or only what concerns the player's realm; the button shows how many news items about the player's realm came since it was last opened, plus calls to arms and peace offers waiting. When a battle or a siege of the player's begins (the player's armies attack or are attacked, besiege or are besieged), and when a call to arms or a peace offer arrives, the game shell shall show a short alert over the map, under the top bar, with Go there (centres the map on the province and selects it) or Answer (opens the News); alerts go away on their own and everything they say is also in the log. *Replaces the turn report sliding in (SHELL-082).* [F-72]
 
-  How the player uses it: the Dispatches button sits in the top bar beside the date and treasury, and a tap opens the log as the one card for news, with calls to arms and offers at the top. The button is the overview: its count and its blinking when something waits say at a glance whether anything needs the player. Alerts stack under the top bar, at most three, clear of the side tools and the End turn button; Go there, Answer and the dismiss cross are 44-point buttons. On a phone in landscape Go there leaves the province card folded so the battle or siege stays in view; in the Wide desktop layout the card opens beside the map. Nothing needs hover.
+  How the player uses it: the News button sits in the top bar beside the date and treasury, and a tap opens the log as the one card for news, with calls to arms and offers at the top. The button is the overview: its count and its blinking when something waits say at a glance whether anything needs the player. Alerts stack under the top bar, at most three, clear of the side tools and the End turn button; Go there, Answer and the dismiss cross are 44-point buttons. On a phone in landscape Go there leaves the province card folded so the battle or siege stays in view; in the Wide desktop layout the card opens beside the map. Nothing needs hover.
 - SHELL-148: When a battle of the player's begins while the week plays, the game shell shall pause the week and alert "A battle has begun at <province>. The week waits." with Watch; the alert stays until the battle ends. Watch flies the map to the battle, plays on at a slower pace for every 4-hour step while the player watches (`WATCH_STEP_MS` 1.2 s, provisional), and shows a battle strip over the map with both realms, the men each has left against the men they started with, and the round of the rounds the battle lasts; when the battle ends the strip says how. End turn instead plays on without watching. *Changes SHELL-076 to SHELL-079: the map no longer flies to a battle by itself; the week waits for the player.* [F-73]
 
-  How the player uses it: the alert drops in under the top bar and the End turn button shows paused, so the player sees at once that the week waits and why. One tap on Watch (44 points) goes there; the strip sits along the bottom between the overview button and End turn so the fight on the map stays in view in the Wide and Tall layouts, and its cross stops watching. The battle on the map and the strip are the overview of the fight; the Dispatches keep the result. Nothing needs hover.
+  How the player uses it: the alert drops in under the top bar and the End turn button shows paused, so the player sees at once that the week waits and why. One tap on Watch (44 points) goes there; the strip sits along the bottom between the overview button and End turn so the fight on the map stays in view in the Wide and Tall layouts, and its cross stops watching. The battle on the map and the strip are the overview of the fight; the News keeps the result. Nothing needs hover.
+- SHELL-159: When the player goes from one screen of the panel to another (a province card and its tab, a country card and its tab, a commander, an official, a lord, a fleet, the News or the Achievements), the game shell shall keep the screen left behind on a screen history of at most 20 screens, and a Back button in the card's header shall return to the last one and take it off; a redraw of the same screen (as the week plays) adds nothing, closing the card clears the history, and the device's back gesture does the same as Back while the history holds a screen. *Replaces the "Back to <name>" button of SHELL-046.* [F-119]
+
+  How the player uses it: Back is the arrow at the left of the card's header, beside Minimise and the cross, a 44-point button that shows only while there is somewhere to go back to, so the header itself says whether the player came from another screen. One tap returns to the screen before, on the tab it was left on; tapping again keeps stepping back. On a phone in landscape the three header buttons sit in a row at the right of the title in the Wide and Tall layouts, and the phone's back gesture steps back too. Nothing needs hover.
+
+### Start screen (Leroy, 18 October 2026)
+Leroy asked for an actual start screen: a Play button, the moving map zoomed in behind it, Settings and Load on it, and a link to the web wiki. It is the latest decision, so it replaces the title and main menu's "Tap to start" step: the title (S3) and the main menu (S4) become one start screen (screen id `title`, kept so music and sound keep keying on it). The entries of SHELL-020 to SHELL-029 keep their rules except where these say otherwise.
+
+- SHELL-149: When boot (and the first-run questions, SHELL-012) finish, the game shell shall open the start screen with its menu already shown, and shall not wait for a Tap to start. *Replaces SHELL-017 and SHELL-019; the `title` track starts on the first touch, click, key or button anywhere on the start screen, as browsers and phones allow sound only after one.* [Leroy 18 Oct]
+- SHELL-150: The start screen's background shall be the real map drawn by the campaign map renderer at region zoom (the zoom that shows provinces, towns and castles, `shell.start_zoom`), panning slowly (`shell.start_pan_speed`) along a path and turning gently at its ends; while a campaign is in progress the path runs over the player's realm in its borders and season from the latest save's summary, otherwise over the 1444 regions listed in `shell.start_regions`, one region per start. The background takes no input, runs no simulation, and is drawn behind a parchment band so the menu stays readable. *Replaces SHELL-016's world zoom.* [Leroy 18 Oct]
+- SHELL-151: While Battery saver is on, the start screen's background shall keep panning at Battery saver's lower frame rate rather than stop, since the moving map is the screen's look. [Leroy 18 Oct; settings §3.1]
+- SHELL-152: The start screen shall show, in one column: Play (large and wax-red, the first entry and first focus), then New campaign while a campaign is in progress, Load while any save exists, and Tutorial until the tutorial is finished. *Replaces SHELL-020, SHELL-021, SHELL-026 and SHELL-027 where they differ.* [Leroy 18 Oct]
+- SHELL-153: While a campaign is in progress, Play shall read "Play" with the realm's banner, name and in-game date under it ("France · May 1503") and go to Loading with the newest save; otherwise Play shall open New campaign, after the first-launch question the first time (SHELL-131). [Leroy 18 Oct; SHELL-004]
+- SHELL-154: The start screen shall show under the column one row of icon buttons with their names: Settings (opens Settings as an overlay, D-SHELL-12), Achievements, Wiki, More (Almanac, Credits, Unlock or Buy the full game, and Tutorial once it is finished) and, on desktop and Steam only, Quit. *Replaces SHELL-018's corner cog and ✕ and SHELL-024's More list where they differ.* [Leroy 18 Oct]
+- SHELL-155: When the player picks Wiki, the game shell shall open the web wiki at `shell.wiki_url` in the system browser (the Steam overlay browser on Steam), leaving the game on the start screen as it was; when the device is offline the browser says so, and the game asks nothing. [Leroy 18 Oct]
+- SHELL-156: The start screen shall show the version number small in the lower right corner and, in the free tier, the Full game ribbon (SHELL-029) beside the logo. [Leroy 18 Oct]
+- SHELL-157: When the player presses Back on the start screen with nothing open over it, the game shell shall leave the app on Android and do nothing elsewhere. *Replaces the start-screen part of SHELL-118.* [Leroy 18 Oct]
+- SHELL-158: When the player picks Exit to main menu in a campaign, the game shell shall return to the start screen, its background now panning over the realm just left. [Leroy 18 Oct; SHELL-086]
+
+  How the player uses it: the game opens on the start screen, so one tap on Play is the whole way back into a campaign, or into New campaign with none. Everything else sits beside Play in two groups: the column holds the ways into a campaign (Play, New campaign, Load, Tutorial), and the icon row holds the things around play (Settings, Achievements, Wiki, More, Quit), so nothing is spread over other screens. The Play button is the overview: its banner, realm and date say at a glance which campaign waits, and the map panning behind it shows that realm's land. On a phone in landscape (Short wide) the logo sits top left, the column and icon row fill the left third on the parchment band inside the safe areas, and the map pans across the right two thirds; in the Tall layout (a tablet held upright) the logo and map fill the top half and the column and row are centred below; in the Large and Far layouts the column keeps a fixed width on the left. Play is at least 56 points tall, every other entry and icon button at least 44 points with 8 between, each icon button has its name under it, and nothing needs hover. A phone held upright shows "Turn your phone sideways" here too (SHELL-113).
+
+### Auto turns (Leroy, 18 October 2026)
+Leroy asked for an auto turn mode for single player that can be paused, and decided that pausing finishes the current week. Auto turns only change when End turn is pressed, never what happens in a week (X-15): the same orders give the same weeks with auto turns on or off.
+
+- SHELL-159: In a single-player campaign the game shell shall offer Auto turns, switched by an Auto button beside End turn (and Shift+Space on a keyboard). While Auto turns are on, each week starts by itself when the one before has finished playing and its saves are written, at the Turn playback speed (SET-131). Auto turns are off whenever a campaign is started or loaded, and are not offered in a campaign with more than one player. [Leroy 18 Oct]
+- SHELL-160: While Auto turns are on and a week plays, a tap on End turn or Auto (or Space) shall stop Auto turns at the end of the current week instead of pausing it: the week plays to its end, then no new week starts and the orders phase opens. End turn and Auto show "Stops at the end of this week" until then, and a second tap on Auto before the week ends keeps Auto turns on. With Auto turns off, End turn pauses and resumes the week as before (SHELL-143). [Leroy 18 Oct]
+- SHELL-161: Auto turns shall stop by themselves at the end of the week in which any of these happens, and the alert over the map that says what happened is the reason: an event waits for an answer, one of the player's battles or sieges begins, a war is declared on or by the player's realm, a call to arms, a peace offer or an envoy waits for an answer, beaten rebels wait for a verdict, the scholars have nothing to study, or one of the player's armies reaches the end of its march ("Your army has reached <province>." with Go there, said only while Auto turns are on). The pauses a week already makes keep happening at once (an event, a revolution, a battle, SHELL-148). Auto turns also stop before a new week would start while End turn cannot start one (an event or a revolution waiting, or land just taken without a decision, PROV-340), and End turn then opens what blocks it. [Leroy 18 Oct]
+
+  How the player uses it: the Auto button sits right beside End turn in the corner the player's hand is on, the only place that controls time, with a 44-point tap target, the double play mark and the word Auto. Lit, it shows Auto turns are on, and the hourglass turns on End turn as every week plays; while it stops at the end of the week it blinks and says so. The End turn corner is the overview: off, on or stopping is readable there at a glance, and an alert under the top bar says why Auto turns stopped. On a phone in landscape the two buttons stand together above the safe area in the Wide and Tall layouts and keep clear of the alerts and the battle strip; nothing needs hover, and a long press is not needed.
+
+### 5.16 Campaign end and score in play (18 October)
+The first playable slice of SHELL-094 to SHELL-100, SHELL-129 and SHELL-130, and of the score line on the country card (REALM-156). The wrap-up events, the closing sequence over the borders by era, Look back, achievements and Credits wait for their own slices; the card below stands for the game over card and the final result until then.
+
+- SHELL-162: The game shell shall show on the General tab of every realm's country card a **Score** line with the realm's Economy, Power and Technology scores as last worked out (at the start of the campaign and in each January turn, REALM-173) and its rank in each among the realms that still exist ("Economy 412 · 3rd, Power 58 · 5th, Technology 24 · 1st"); on the player's card a tap on the line opens the **Score** tab of the card with the breakdown (SHELL-163) and the date the scores were worked out. [REALM-151 to REALM-153, REALM-156, REALM-173; X-19]
+- SHELL-163: The **Score** tab of the player's country card shall show the player's breakdown, Economy as yearly income plus the bank (gold less debt), Power as provinces held (subjects' at half) plus army power, Technology as inventions known weighted by era, each with its rank; then the ledger of the five leading realms and the player with their three scores, the player's row marked; it opens from the Score line or its tab, and each realm in the ledger opens that realm's card. [SHELL-099, D-SHELL-22; REALM-151 to REALM-153, REALM-160]
+- SHELL-164: When the end date is reached, when the player's realm no longer exists (it holds no land province, after holding one) or when the January turn finds the player's world domination (REALM-154), the game shall stop the clock at once, work out the scores, and show the **end card** over the map: a headline with the date (at the end date "The campaign ends · 31 August 1939"; at game over the SHELL-094 line, "Burgundy was annexed by France" for one taker or "Burgundy was divided between France and Austria" for more; "World domination · 1700"), the outcome line of SHELL-130 (at game over, the ranks the realm held last), the Score tab's breakdown and ledger, and the realm's highs (largest size in provinces, years lasted, battles won). Its choices: after the end date **Look at the map** and **New game** (no playing on, SHELL-100); after game over **Play on as another realm** with the line "Achievements end for this campaign" (SHELL-096) and **New game**; after world domination **Keep playing** (on to the end date, SHELL-129) and **New game**. Look at the map closes the card and puts **Campaign over** where End turn was, reopening the card; Play on as another realm closes the card for a pick of any realm on the map, whose card offers **Rule <realm>** and plays on from the same day. [SHELL-094 to SHELL-100, SHELL-129, SHELL-130; X-12; D-SHELL-1]
+
+  How the player uses it: during play the overview is the **Score** line on the General tab of the country card, one tap from the realm button in the top bar; it reads the three scores with a rank each, so the player sees at a glance where they stand, and a tap opens the Score tab with how each score is made. Every other realm's card shows the same line without the breakdown, so the player can compare. When the campaign ends the clock stops and the end card opens by itself in the panel, so it can't be missed; it is the one home for how the campaign ended, the outcome, the breakdown, the ledger and the highs, with its two choices as 44-point buttons at the bottom. On a phone in landscape it is the side panel (Wide) or the lower sheet (Tall) like every card, scrolling down, never sideways; the ledger is a four-column table of short numbers that fits 320 points. Nothing needs hover. Upright phones get the turn-sideways screen as everywhere else.
 
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
 |---|---|---|---|---|
 | TapToStart | player | Title showing | Main menu folds open; `title` track starts | `TitleDismissed` |
+| Play | player | Start screen | Loading with the newest save, or New campaign (first-launch question the first time) | `CampaignLoadRequested` or `ScreenOpened(new_campaign)` |
+| OpenWiki | player | Start screen | System browser opens `shell.wiki_url`; the game stays on the start screen | — |
 | AnswerFirstRunQuestion | player | First run; question card showing | Answer stored; next question or title | `FirstRunAnswered` |
 | ContinueCampaign | player | A campaign exists | Loading with the newest save | `CampaignLoadRequested` |
 | StartNewCampaign | player | — | S5 step 1 | `ScreenOpened(new_campaign)` |
@@ -389,6 +434,7 @@ Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision
 | OpenGameMenu | player | Map | Game menu over dimmed map | `ScreenOpened(game_menu)` |
 | ExitToMainMenu / Quit | player | Game menu | Question if unsaved turns (ironman: save and exit) | `CampaignLeft` |
 | EndTurn | player | No unanswered event; not in progress | Turn starts (confirmation if Settings asks) | `EndTurnPressed` |
+| SwitchAutoTurns | player | Single-player campaign | Auto turns on (a week starts if none plays), or stopping at the end of the playing week, or off (SHELL-159, SHELL-160) | — |
 | AnswerEvent | player | Event modal open | Option chosen (events) | `EventAnswered` |
 | LookAtMap | player | Event modal open | Event shrinks into the End turn badge | — |
 | Retreat | player | A player battle running | That battle ends with a retreat at this step | `BattleRetreatOrdered` |
@@ -412,7 +458,7 @@ sent as data.
 | Event | When | Payload | Consumed by (context) |
 |---|---|---|---|
 | `ScreenOpened` / `ScreenClosed` | A screen enters or leaves the stack | screen id, tab (realm book) | audio (screen rules 5.2, `diplomacy` mood on Abroad), onboarding |
-| `TitleDismissed` | Tap to start | — | audio (sound may start) |
+| `TitleDismissed` | Tap to start; since SHELL-149 the first input on the start screen | — | audio (sound may start) |
 | `FirstRunAnswered` | A first-run card answered | language or consent value | settings |
 | `CampaignStarted` | Begin pressed | realm, options | scenario-setup, saves, time-and-turns |
 | `CampaignLoadRequested` | Continue, Load, Restore the last save | save id | saves |
@@ -488,6 +534,10 @@ are listed in its `_provisional` array.
 | `shell.end_date_earliest_year` | Earliest end date a campaign may choose (31 August of that year) | 1494 | yes (provisional) | game-shell.json `endDateEarliestYear` |
 | `shell.domination_share` | Share of the world's settled land provinces for world domination | 0.5 | no (X-12) | game-shell.json `dominationShare` |
 | `shell.ledger_leaders` | Realms beside the player on the final result | 5 | yes (provisional) | game-shell.json `ledgerLeaders` |
+| `shell.start_zoom` | Zoom of the start screen's background | region zoom | yes (provisional) | game-shell.json `startZoom` |
+| `shell.start_pan_speed` | How fast the start screen's background pans | 6 map pixels a second | yes (provisional) | game-shell.json `startPanSpeed` |
+| `shell.start_regions` | 1444 regions the background pans over when no campaign is in progress | Bosporus, Venice and the Adriatic, the Low Countries, the Nile delta, the Kinai, the Ganges delta | yes (provisional) | game-shell.json `startRegions` |
+| `shell.wiki_url` | Address of the web wiki | `https://github.com/grrts/pocket-hedgemony/wiki` (placeholder until the wiki in `docs/wiki/` is published on the web) | yes (release task) | game-shell.json `wikiUrl` |
 | `shell.campaign_end_date_default` | Default end date | 31 August 1939 | no (decided) | campaign rules |
 | `attention.*` | Warnings and thresholds | one table; first lines from warfare 14 | yes | one config table (unnamed) |
 | `tips.*` | Loading tips with era, region, new-player tags | written by the tutorial thread | — | tips table |
@@ -631,7 +681,7 @@ Decided on 17 October 2026 under `domain/DECISIONS.md`. No question stays open.
 | SHELL-054 | map-and-cards.feature | Card in a tall window |
 | SHELL-055 | map-and-cards.feature | Card in a large window |
 | SHELL-056 | map-and-cards.feature | A tap selects, a second tap opens |
-| SHELL-057 | map-and-cards.feature | Fold away and reopen |
+| SHELL-057 | map-and-cards.feature | Minimise and reopen |
 | SHELL-058 | map-and-cards.feature | Gain and lose lists fold out inside the card |
 | SHELL-059 | realm-book.feature | Tabs and what they hold |
 | SHELL-059 | realm-book.feature | The book opens on the last tab used |
@@ -679,7 +729,7 @@ Decided on 17 October 2026 under `domain/DECISIONS.md`. No question stays open.
 | SHELL-091 | in-campaign-screens.feature | Siege view |
 | SHELL-092 | in-campaign-screens.feature | Peace table |
 | SHELL-092 | in-campaign-screens.feature | Incoming peace offers must be answered or put off |
-| SHELL-093 | in-campaign-screens.feature | Lens picker and confirmations |
+| SHELL-093 | in-campaign-screens.feature | Map mode picker and confirmations |
 | SHELL-094 | campaign-end.feature | Game over when the realm no longer exists |
 | SHELL-094 | campaign-end.feature | The game over line names what happened |
 | SHELL-095 | campaign-end.feature | Choices after game over |
@@ -750,6 +800,22 @@ Decided on 17 October 2026 under `domain/DECISIONS.md`. No question stays open.
 | SHELL-141 | in-campaign-screens.feature | An AI peace offer waits for an answer |
 | SHELL-142 | map-and-cards.feature | Picking commanders is easy |
 | SHELL-143 | navigation-by-input.feature | Space ends the turn |
-| SHELL-147 | in-campaign-screens.feature | The Dispatches log keeps past weeks; A battle or siege begins |
+| SHELL-147 | in-campaign-screens.feature | The News log keeps past weeks; A battle or siege begins |
 | SHELL-148 | in-campaign-screens.feature | The week waits at a battle |
+| SHELL-159 | auto-turns.feature | Auto turns play week after week; Auto turns are off after loading |
+| SHELL-160 | auto-turns.feature | Pausing finishes the current week; Tapping Auto again keeps it on; End turn pauses as before with Auto turns off |
+| SHELL-161 | auto-turns.feature | Auto turns stop by themselves; A blocked End turn stops Auto turns |
+| SHELL-149 | start-screen.feature | The start screen opens with its menu shown |
+| SHELL-150 | start-screen.feature | The map pans behind the start screen at region zoom |
+| SHELL-151 | start-screen.feature | Battery saver keeps the map moving |
+| SHELL-152 | start-screen.feature | The column of ways into a campaign |
+| SHELL-153 | start-screen.feature | Play continues the campaign in progress; Play with no campaign opens New campaign |
+| SHELL-154 | start-screen.feature | The icon row |
+| SHELL-155 | start-screen.feature | The Wiki opens in the browser |
+| SHELL-156 | start-screen.feature | Version and Full game ribbon |
+| SHELL-157 | start-screen.feature | Back on the start screen |
+| SHELL-158 | start-screen.feature | Exit to main menu returns to the start screen |
+| SHELL-159 | map-and-cards.feature | Back returns to the screen before |
+| SHELL-162, 163 | campaign-end.feature | The score line and the Score card |
+| SHELL-164 | campaign-end.feature | The end card when the end date comes; The end card at game over; The end card after world domination |
 | SHELL-144–146 | layout-by-shape.feature | Each subject has one home; Important things have an overview; Every screen fits a phone in landscape |

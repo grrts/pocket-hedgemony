@@ -1,4 +1,7 @@
-import { knows, provinceConfig, type CastleStep, type Loyalty, type Official, type Province, type ProvinceConfig, type RoadStep, type TaxRate, type TollRate } from "./model.ts";
+import { buildingWorks } from "./land.ts";
+import { troubleShare } from "./people.ts";
+import { homelessCut } from "./decided.ts";
+import { knows, provinceConfig, townsfolk, workplaces, type CastleStep, type Loyalty, type Official, type Province, type ProvinceConfig, type RoadStep, type TaxRate, type TollRate } from "./model.ts";
 
 /** Who rules the province and what it pays: tax, tolls, roads, governance, officials, lords, charters, defence (§7.2–§11). */
 
@@ -57,6 +60,35 @@ export function forceTaxDown(p: Province, realmDefault: TaxRate = "normal", cfg:
 /** Tax owed in a year from what the province owes at its rate: riots halve it (PROV-162). */
 export function taxOwed(goldAtRate: number, riots: boolean, cfg: ProvinceConfig = provinceConfig): number {
   return riots ? goldAtRate * cfg.tax.riots_factor : goldAtRate;
+}
+
+export interface TaxOwedYear {
+  /** Gold at the normal rate from the workers in the land buildings that work (not burned or fallow). */
+  buildings: number;
+  /** Gold at the normal rate from the townsfolk. */
+  townsfolk: number;
+  /** The rate's factor against normal. */
+  rate: number;
+  /** Share the troublesome homeless take off (D-PROV-1). */
+  homelessCut: number;
+  total: number;
+}
+
+/**
+ * Tax owed in a year (PROV-161, PROV-162, D-PROV-33): the value of what its working land buildings
+ * make and its townsfolk at its rate, less the homeless share and half under riots. Burned and fallow
+ * tiles make nothing, so they owe nothing. Tolls are trade's and never counted here.
+ */
+export function taxOwedYear(p: Province, rate: TaxRate, riots = false, cfg: ProvinceConfig = provinceConfig): TaxOwedYear {
+  const o = cfg.tax.owed;
+  let workers = 0;
+  for (const w of workplaces(p, cfg)) if (w.kind === "tile" && w.building && buildingWorks(p, w.index)) workers += w.workers;
+  const buildings = (workers / 1000) * o.per_1000_building_workers;
+  const town = (townsfolk(p, cfg) / 1000) * o.per_1000_townsfolk;
+  const factor = (o.rate_factor as Record<TaxRate, number>)[rate];
+  const cut = homelessCut(troubleShare(p, cfg), cfg);
+  const total = taxOwed((buildings + town) * factor * (1 - cut), riots, cfg);
+  return { buildings, townsfolk: town, rate: factor, homelessCut: cut, total };
 }
 
 /** A lord keeps half of what is collected in his province either way (PROV-165). */
@@ -118,9 +150,40 @@ export function isRiverProvince(p: Province): boolean {
   return p.river || p.canal;
 }
 
-/** Days to the capital or the nearest seat, by the fastest route (PROV-173). */
-export function daysToCapital(capitalDays: number, seatDays: number[] = []): number {
-  return Math.min(capitalDays, ...seatDays);
+export interface Route {
+  days: number;
+  by: "road" | "river" | "sea";
+}
+
+export interface TravelConditions {
+  winter?: boolean;
+  enemyOnRoad?: boolean;
+  roadBroken?: boolean;
+  seaClosed?: boolean;
+}
+
+/**
+ * Days a route takes as things stand (PROV-173, D-PROV-34): winter slows roads and rivers by half,
+ * an enemy army on the road or a broken road doubles a road's days (the detour), and a sea route
+ * closed in war is no route at all.
+ */
+export function routeDays(r: Route, c: TravelConditions = {}, cfg: ProvinceConfig = provinceConfig): number {
+  const t = cfg.roads.travel;
+  if (r.by === "sea") return c.seaClosed ? Infinity : r.days;
+  let days = r.days * (c.winter ? t.winter : 1);
+  if (r.by === "road" && c.enemyOnRoad) days *= t.enemy_army;
+  if (r.by === "road" && c.roadBroken) days *= t.broken_road;
+  return days;
+}
+
+/** Days to the capital or the nearest seat, by the fastest of the road, river or sea routes to each (PROV-173). */
+export function fastestDays(routes: Route[], c: TravelConditions = {}, cfg: ProvinceConfig = provinceConfig): number {
+  return Math.min(...routes.map((r) => routeDays(r, c, cfg)));
+}
+
+/** Days to the capital or the nearest seat by road, the fastest route as things stand (PROV-173). */
+export function daysToCapital(capitalDays: number, seatDays: number[] = [], c: TravelConditions = {}, cfg: ProvinceConfig = provinceConfig): number {
+  return fastestDays([capitalDays, ...seatDays].map((days) => ({ days, by: "road" as const })), c, cfg);
 }
 
 // ---------------------------------------------------------------- governance
@@ -269,6 +332,54 @@ export function moveOfficial(from: Province, to: Province): Official | null {
   to.official = { ...o, yearsServed: 0 };
   refreshGovernance(to);
   return to.official;
+}
+
+/** Why the crown can't move or commission the official of a province, or null: a lord's official serves him (PROV-303, PROV-202). */
+export function servesTheLord(p: Province): string | null {
+  return p.lord !== null || (p.official !== null && p.official.employer !== "ruler") ? "he serves the lord, not the crown" : null;
+}
+
+/**
+ * Moves the official of `from` to `to` (PROV-303): the two swap posts, or he
+ * takes the empty post and leaves his own empty. Whoever moves keeps his name
+ * and type and starts again at half (PROV-192). Returns why not, or null.
+ */
+export function moveOrSwapOfficial(from: Province, to: Province): string | null {
+  const why = servesTheLord(from) ?? servesTheLord(to);
+  if (why) return why;
+  if (!from.official) return "the post stands empty";
+  const there = to.official;
+  to.official = { ...from.official, yearsServed: 0 };
+  from.official = there ? { ...there, yearsServed: 0 } : null;
+  refreshGovernance(from);
+  refreshGovernance(to);
+  return null;
+}
+
+/** Gold up front to hire an official: a foreign specialist costs more (PROV-333, PROV-334). */
+export function hirePrice(foreign: boolean, cfg: ProvinceConfig = provinceConfig): number {
+  return cfg.officials.hire.gold * (foreign ? cfg.officials.hire.foreign_multiplier : 1);
+}
+
+/**
+ * Why an official of `type` can't be hired into province p's post, or null
+ * (PROV-333 to 335): the post must be an empty royal one, and a native hire
+ * needs the type serving in another royal post of the realm (`serving`).
+ */
+export function cannotHire(p: Province, type: string, foreign: boolean, serving: readonly string[], gold: number, cfg: ProvinceConfig = provinceConfig): string | null {
+  if (!(cfg.officials.types as string[]).includes(type) || type === "colonial governor") return "no such type";
+  if (p.lord !== null) return "he serves the lord, not the crown";
+  if (p.official) return "the post is filled";
+  if (!foreign && !serving.includes(type)) return "no one at home knows the trade";
+  if (gold < hirePrice(foreign, cfg)) return "not enough gold";
+  return null;
+}
+
+/** Hires an official into province p's empty post (PROV-333): he starts at half. Returns the gold paid. */
+export function hireIntoPost(p: Province, o: Official, foreign: boolean, cfg: ProvinceConfig = provinceConfig): number {
+  p.official = { ...o, yearsServed: 0 };
+  refreshGovernance(p);
+  return hirePrice(foreign, cfg);
 }
 
 /** A colonial governor holding a governor slot does not count against the officials cap (PROV-193). */

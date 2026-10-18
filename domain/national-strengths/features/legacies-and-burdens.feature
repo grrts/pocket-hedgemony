@@ -1,5 +1,5 @@
 @context-national-strengths
-Feature: Legacies and burdens
+Feature: Legacies and weaknesses
   As a country
   I want permanent rewards for what I achieved and a weakness I can overcome
   So that the campaign leaves its mark
@@ -13,8 +13,8 @@ Feature: Legacies and burdens
     Examples:
       | way                                                   |
       | an ambition is done                                   |
-      | a heyday awake 25 years ends and leaves its mark      |
-      | its burden is shed and turned                         |
+      | a golden age active 25 years ends and leaves its mark |
+      | its weakness is overcome and turned                   |
 
   @HER-030
   Scenario: A sixth legacy
@@ -31,21 +31,21 @@ Feature: Legacies and burdens
     And it gives one more trader and customs officers 20 % stronger on the coast
 
   @HER-032 @HER-033
-  Scenario: Shedding a burden
-    Given the country "Kongo" carries the burden "contested succession" with lords one step less loyal
-    When its shed condition holds
-    Then the burden is gone
+  Scenario: Overcoming a weakness
+    Given the country "Kongo" has the weakness "contested succession" with lords one step less loyal
+    When the condition to overcome it holds
+    Then the weakness is gone
     And the turned legacy "Settled succession" is granted
     And a new ruler or a disputed heir no longer shakes the lords
 
   @HER-034
-  Scenario Outline: Burdens can't be bought off
-    Given the country "Poland" carries the burden "elected crown"
+  Scenario Outline: Weaknesses can't be bought off
+    Given the country "Poland" has the weakness "elected crown"
     When <attempt>
-    Then the burden is <result>
+    Then the weakness is <result>
 
     Examples:
-      | attempt                                 | result |
-      | "Poland" offers gold to remove it       | kept   |
-      | its shed condition holds                | shed   |
-      | a reform event applies shed_burden      | shed   |
+      | attempt                                 | result   |
+      | "Poland" offers gold to remove it       | kept     |
+      | the condition to overcome it holds      | overcome |
+      | a reform event applies shed_burden      | overcome |

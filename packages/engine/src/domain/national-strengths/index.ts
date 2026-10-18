@@ -2,6 +2,7 @@ import config from "../../../../rules/data/domain/national-strengths.json" with 
 import examples from "../../../../rules/data/domain/national-strengths-examples.json" with { type: "json" };
 import type { Rng } from "../../rng.ts";
 import mapSetup from "../../../../rules/data/domain/scenario-setup-map.json" with { type: "json" };
+import gazetteer from "../../../../rules/data/domain/national-strengths-places.json" with { type: "json" };
 import { ERAS, eraIndex, type Era } from "../research/index.ts";
 import { lonLatOf, pixelOf } from "../world-map/index.ts";
 
@@ -255,6 +256,10 @@ export interface CountryFacts {
   trade?: Record<string, number>;
   /** Years it has owned an annexed country's capital and held a majority of its homeland, by that country (HER-060). */
   homelandHeldYears?: Record<string, number>;
+  /** Share (0-1) of each target's provinces it owns, for `owns` with a `min_share`. */
+  shares?: Record<string, number>;
+  /** Countries whose land borders its own (borders). */
+  borders?: string[];
 }
 
 export interface WorldFacts {
@@ -355,7 +360,7 @@ export function holds(c: Condition, w: WorldFacts, self: string): boolean {
     case "exists":
       return who(v.who) in w.countries && cf(v.who).exists !== false;
     case "owns":
-      return (cf(v.who).owns ?? []).includes(v.where);
+      return v.min_share !== undefined ? (cf(v.who).shares?.[v.where] ?? 0) >= v.min_share : (cf(v.who).owns ?? []).includes(v.where);
     case "date":
       return (v.min === undefined || w.year >= v.min) && (v.max === undefined || w.year <= v.max);
     case "event":
@@ -384,8 +389,13 @@ export function holds(c: Condition, w: WorldFacts, self: string): boolean {
       }
       return compare(subjects.size, v.op ?? ">=", v.value);
     }
+    case "borders": {
+      const near = cf(v.who).borders ?? [];
+      return v.other ? near.includes(who(v.other)) : near.length > 0;
+    }
     default:
-      throw new Error(`Condition type ${type} is not read by heritage yet`);
+      // A condition on state no context in play keeps yet (a religion's share, a period) does not hold.
+      return false;
   }
 }
 
@@ -447,7 +457,8 @@ export interface Heritage {
   /** Ambitions drawn: the open ones and those done or lost. */
   ambitions: { item: Ambition; state: AmbitionState; warmth: number; band: Band }[];
   legacies: Legacy[];
-  burden: { item: Burden; state: "held" | "shed" } | null;
+  /** `armed` false: its shed condition held on the first day, so it sheds only once that has failed (HER-084). */
+  burden: { item: Burden; state: "held" | "shed"; armed?: boolean } | null;
   /** Annexed birthrights held until they wake (HER-059). */
   claims: { from: string; item: Birthright }[];
   counselYear: number | null;
@@ -521,7 +532,7 @@ export function drawAmbitions(h: Heritage, rng: Rng, opts: { mode?: HistoryMode;
     const historical = eligible.filter((a) => a.historical);
     const from = needHistorical && historical.length ? historical : eligible;
     const pick = from[rng.int(from.length)]!;
-    if (opts.world && holds(pick.goal, opts.world, h.country)) {
+    if (opts.world && (holds(pick.goal, opts.world, h.country) || lostAlready(pick, opts.world, h.country))) {
       putBack.add(pick.id);
       h.log.push({ type: "AmbitionPutBack", id: pick.id });
       continue;
@@ -534,8 +545,14 @@ export function drawAmbitions(h: Heritage, rng: Rng, opts: { mode?: HistoryMode;
   return drawn;
 }
 
-/** The campaign starts: draw 3 (HER-015, HER-023). */
+/** An ambition that could only be lost: its deadline gone or its fail holding (HER-023). */
+function lostAlready(a: Ambition, w: WorldFacts, self: string): boolean {
+  return (a.window !== undefined && w.year > a.window[1]) || (a.fail !== undefined && holds(a.fail, w, self));
+}
+
+/** The campaign starts: draw 3 (HER-015, HER-023); a burden already shed on the first day waits until its condition fails once (HER-084). */
 export function startCampaign(h: Heritage, rng: Rng, world: WorldFacts, mode: HistoryMode = "drawn"): Ambition[] {
+  if (h.burden && holds(h.burden.item.shed, world, h.country)) h.burden.armed = false;
   return drawAmbitions(h, rng, { mode, world, start: true });
 }
 
@@ -606,7 +623,7 @@ function stir(h: Heritage, a: Heritage["ambitions"][number], w: WorldFacts | nul
   if (a.state !== "sealed") return;
   a.state = "stirred";
   if (w) setBand(h, a, warmth(a.item.goal, w, h.country));
-  h.digest.push(`A seal cracks: ${a.item.hint}`);
+  h.digest.push(`An ambition is revealed: ${a.item.hint}`);
   h.log.push({ type: "AmbitionStirred", id: a.item.id });
 }
 
@@ -681,9 +698,14 @@ export function evaluate(h: Heritage, w: WorldFacts, rng?: Rng): HeritageEvent[]
     if (a.state === "sealed" && holds(am.stir, w, self)) stir(h, a, w);
     else setBand(h, a, warmth(am.goal, w, self));
   }
-  if (finished && rng && RULES.ambitions.redraw_on_complete_or_fail) drawAmbitions(h, rng);
+  if (finished && rng && RULES.ambitions.redraw_on_complete_or_fail) drawAmbitions(h, rng, { world: w });
   // 4. The burden (HER-032, HER-033).
-  if (h.burden?.state === "held" && holds(h.burden.item.shed, w, self)) shedBurden(h);
+  if (h.burden?.state === "held") {
+    const shed = holds(h.burden.item.shed, w, self);
+    if (h.burden.armed === false) {
+      if (!shed) h.burden.armed = true;
+    } else if (shed) shedBurden(h);
+  }
   return h.log.slice(from);
 }
 
@@ -911,7 +933,7 @@ export function ambitionView(a: Heritage["ambitions"][number]): AmbitionView {
 }
 
 export interface CardRow {
-  row: "Birthright" | "Heyday" | "Ambitions" | "Burden" | "Legacies";
+  row: "Birthright" | "Golden age" | "Ambitions" | "Weakness" | "Legacies";
   lines: string[];
   greyed?: boolean;
   /** Tapping the row: full text, history note and what it changes (HER-002). */
@@ -924,9 +946,9 @@ export function card(h: Heritage, ageName: (id: string) => string = (id) => id):
   const awake = h.heydays.filter((x) => x.state === "awake");
   return [
     { row: "Birthright", lines: h.birthrights.map((b) => b.item.name), greyed: h.birthrights.every((b) => b.dormant), details: h.birthrights.map((b) => detail(b.item)) },
-    { row: "Heyday", lines: awake.map((x) => `${x.item.name} (${ageName(x.item.age)} · awake)`), details: awake.map((x) => detail(x.item)) },
+    { row: "Golden age", lines: awake.map((x) => `${x.item.name} (${ageName(x.item.age)} · active)`), details: awake.map((x) => detail(x.item)) },
     { row: "Ambitions", lines: openAmbitions(h).map((a) => a.item.hint), details: [] },
-    { row: "Burden", lines: h.burden?.state === "held" ? [h.burden.item.name] : [], details: h.burden?.state === "held" ? [detail(h.burden.item)] : [] },
+    { row: "Weakness", lines: h.burden?.state === "held" ? [h.burden.item.name] : [], details: h.burden?.state === "held" ? [detail(h.burden.item)] : [] },
     { row: "Legacies", lines: h.legacies.length ? h.legacies.map((l) => l.name) : ["none yet"], details: h.legacies.map(detail) },
   ];
 }
@@ -1427,13 +1449,15 @@ export function mergeAuthored(generated: HeritageData, authored: Partial<Heritag
 
 // ---------------------------------------------------------------- place names (HER-044, D-HER-16)
 
-/** Where a place name sits: a scenario-map capital or port of that name. */
+/** Where a place name sits: a scenario-map capital or port of that name, else the heritage gazetteer's (national-strengths-places.json). */
 export function placeLonLat(name: string, provinces: readonly { id: string; x?: number; y?: number }[] = []): { lon: number; lat: number } | null {
   const n = mapSetup.nations.find((x) => x.name === name);
   if (n) return { lon: n.capital[0]!, lat: n.capital[1]! };
   const port = (mapSetup.ports as unknown as [string, string, string][]).find((p) => p[0] === name);
   const prov = port ? provinces.find((p) => p.id === port[2]) : undefined;
-  return prov && prov.x !== undefined && prov.y !== undefined ? lonLatOf(prov.x, prov.y) : null;
+  if (prov && prov.x !== undefined && prov.y !== undefined) return lonLatOf(prov.x, prov.y);
+  const at = (gazetteer.places as unknown as Record<string, [number, number]>)[name];
+  return at ? { lon: at[0], lat: at[1] } : null;
 }
 
 /**

@@ -1,3 +1,4 @@
+import * as subj from "../subjects/index.ts";
 import { eventsConfig, exists, now, type Condition, type World } from "./model.ts";
 
 /**
@@ -17,7 +18,15 @@ export interface Ctx {
 export type LeafEval = (params: Record<string, unknown>, w: World, ctx: Ctx) => boolean;
 
 /** A role named in a condition that has no holder yet. */
-export class UnboundRole extends Error {}
+/** Thrown when a condition names a role not yet bound; thrown often while binding, so it skips the stack trace. */
+export class UnboundRole extends Error {
+  constructor(role: string) {
+    const limit = Error.stackTraceLimit;
+    Error.stackTraceLimit = 0;
+    super(role);
+    Error.stackTraceLimit = limit;
+  }
+}
 
 const LOGIC = new Set(["all", "any", "not", "at_least"]);
 
@@ -56,13 +65,20 @@ export function resolve(target: unknown, ctx: Ctx): string[] {
 
 /** The type and params of a leaf, with the data's shorthands (`{event: id}`, `{exists: id}`, `{period_active: id}`). */
 export function leaf(c: Condition): [string, Record<string, unknown>] {
+  const known = parsed.get(c);
+  if (known) return known;
   const entries = Object.entries(c);
   if (entries.length !== 1) throw new Error(`A condition leaf has one key: ${JSON.stringify(c)}`);
   const [type, raw] = entries[0]!;
-  if (raw !== null && typeof raw === "object" && !Array.isArray(raw)) return [type, raw as Record<string, unknown>];
-  const short: Record<string, string> = { event: "id", event_active: "id", period_active: "id", age_active: "id", exists: "who", war_ongoing: "war" };
-  return [type, { [short[type] ?? "value"]: raw }];
+  const out: [string, Record<string, unknown>] =
+    raw !== null && typeof raw === "object" && !Array.isArray(raw) ? [type, raw as Record<string, unknown>] : [type, { [SHORT[type] ?? "value"]: raw }];
+  parsed.set(c, out);
+  return out;
 }
+
+const SHORT: Record<string, string> = { event: "id", event_active: "id", period_active: "id", age_active: "id", exists: "who", war_ongoing: "war" };
+/** Leaves are read every month, so each is parsed once. */
+const parsed = new WeakMap<Condition, [string, Record<string, unknown>]>();
 
 function statOf(w: World, id: string, stat: string): number | string | undefined {
   const c = w.countries[id];
@@ -98,6 +114,27 @@ function hasRelation(w: World, a: string, b: string, type: string): boolean {
   if (type === "subject") return has(a, b, "subject") || has(b, a, "overlord");
   if (type === "overlord") return has(a, b, "overlord") || has(b, a, "subject");
   return has(a, b, type) || (["alliance", "rivalry", "truce", "trade_pact", "personal_union"].includes(type) && has(b, a, type));
+}
+
+/** The kind of the subject bond behind a subject / overlord / personal_union relation (SUBJ-097), if the world keeps it. */
+function subjectKind(w: World, a: string, b: string, type: string): string | undefined {
+  if (!w.subjects || (type !== "subject" && type !== "overlord" && type !== "personal_union")) return undefined;
+  return subj.relationByEvent(w.subjects, a, b, type).kind;
+}
+
+/**
+ * Direct subjects of `id`, a head count or by reach weights (`by_reach: true`,
+ * SUBJ-097). A subject the world keeps no bond for counts as the relations data's plain subject.
+ */
+function subjectCount(w: World, id: string, byReach: boolean): number {
+  const mine = Object.keys(w.countries).filter((o) => o !== id && hasRelation(w, o, id, "subject"));
+  if (!byReach) return mine.length;
+  const t = now(w);
+  const bondOf = (o: string, over: string) => (w.subjects?.[o]?.overlord === over ? w.subjects[o]! : subj.bondFromRelation(o, over, t));
+  const list = mine.map((o) => bondOf(o, id));
+  // their own subjects raise their weight (SUBJ-059)
+  for (const o of mine) for (const x of Object.keys(w.countries)) if (x !== o && hasRelation(w, x, o, "subject")) list.push(bondOf(x, o));
+  return subj.subjectCountByEvent(list, id, true);
 }
 
 function countries(w: World, where: unknown): string[] {
@@ -145,7 +182,8 @@ export const CONDITIONS: Record<string, LeafEval> = {
   borders: (p, w, ctx) => some(resolve(p.who, ctx), (a) => resolve(p.other, ctx).some((b) => (w.countries[a]?.borders ?? []).includes(b) || (w.countries[b]?.borders ?? []).includes(a))),
   at_war: (p, w, ctx) => some(resolve(p.who, ctx), (a) => (p.other === undefined ? atWar(w, a) : resolve(p.other, ctx).some((b) => atWar(w, a, b)))),
   war_ongoing: (p, w) => w.wars[String(p.war)]?.ongoing === true,
-  relation: (p, w, ctx) => some(resolve(p.who, ctx), (a) => resolve(p.other, ctx).some((b) => hasRelation(w, a, b, String(p.type)))),
+  relation: (p, w, ctx) =>
+    some(resolve(p.who, ctx), (a) => resolve(p.other, ctx).some((b) => hasRelation(w, a, b, String(p.type)) && (p.kind === undefined || subjectKind(w, a, b, String(p.type)) === p.kind))),
   opinion: (p, w, ctx) => some(resolve(p.who, ctx), (a) => resolve(p.other, ctx).some((b) => compare(w.countries[a]?.opinions?.[b] ?? 0, String(p.op), Number(p.value)))),
   stat: (p, w, ctx) => some(resolve(p.who, ctx), (id) => compare(statOf(w, id, String(p.stat)), String(p.op), p.value as number | string)),
   rank: (p, w, ctx) =>
@@ -171,8 +209,9 @@ export const CONDITIONS: Record<string, LeafEval> = {
   colonial_presence: (p, w, ctx) => some(resolve(p.who, ctx), (id) => compare(w.countries[id]?.colonies?.[String(p.where)] ?? 0, String(p.op), Number(p.value))),
   trade_presence: (p, w, ctx) => some(resolve(p.who, ctx), (id) => compare(w.countries[id]?.tradePresence?.[String(p.hub)] ?? 0, String(p.op), Number(p.value))),
   rebels_active: (p, w, ctx) => some(resolve(p.who, ctx), (id) => (w.countries[id]?.rebels ?? []).some((t) => p.type === undefined || p.type === "any" || t === p.type)),
-  subject_count: (p, w, ctx) =>
-    some(resolve(p.who, ctx), (id) => compare(Object.keys(w.countries).filter((o) => o !== id && hasRelation(w, o, id, "subject")).length, String(p.op), Number(p.value))),
+  subject_count: (p, w, ctx) => some(resolve(p.who, ctx), (id) => compare(subjectCount(w, id, p.by_reach === true), String(p.op), Number(p.value))),
+  subject_loyalty: (p, w, ctx) =>
+    some(resolve(p.who, ctx), (who) => resolve(p.target, ctx).some((t) => subj.subjectLoyaltyHolds(w.subjects ? subj.bondUnder(w.subjects, who, t) : undefined, String(p.op), String(p.step)))),
   event: (p, w) => occurred(w, String(p.id), p.outcome, p.within_years, p.by as { role: string; who: string } | undefined),
   event_active: (p, w) => w.running.some((r) => r.event === p.id),
   period_active: (p, w) => w.periods.includes(String(p.id)),
@@ -209,6 +248,30 @@ export function holdsIfBound(c: Condition | null | undefined, w: World, ctx: Ctx
     if (e instanceof UnboundRole) return undefined;
     throw e;
   }
+}
+
+/**
+ * Like `holdsIfBound`, but decides what it can leaf by leaf: an `all` with one
+ * false part is false, an `any` with one true part is true, whatever the unbound roles hold.
+ */
+export function holdsSoFar(c: Condition | null | undefined, w: World, ctx: Ctx): boolean | undefined {
+  if (c === null || c === undefined) return true;
+  const parts = Array.isArray(c) ? (c as Condition[]) : "all" in c ? (c.all as Condition[]) : "any" in c ? (c.any as Condition[]) : null;
+  if (parts) {
+    const want = !Array.isArray(c) && "any" in c;
+    let open = false;
+    for (const x of parts) {
+      const v = holdsSoFar(x, w, ctx);
+      if (v === want) return want;
+      if (v === undefined) open = true;
+    }
+    return open ? undefined : !want;
+  }
+  if ("not" in c) {
+    const v = holdsSoFar(c.not as Condition, w, ctx);
+    return v === undefined ? undefined : !v;
+  }
+  return holdsIfBound(c, w, ctx);
 }
 
 /** Walks every leaf of a condition tree. */

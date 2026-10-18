@@ -39,9 +39,9 @@ The buildings themselves (cost, slot, jobs) belong to [Buildings](Buildings).
 
 ### The 27 forms
 
-Each form sets the officials and lords it supports, a change to subject reach, its colonial range in sea zones, its succession, and the forms it can reform into next.
+Each form sets the officials and lords it supports, a change to the subject limit, its colonial range in sea zones, its succession, and the forms it can reform into next.
 
-| Form | Family | Officials | Lords | Subject reach | Colonial range | Succession | Next forms |
+| Form | Family | Officials | Lords | Subject limit | Colonial range | Succession | Next forms |
 |---|---|---|---|---|---|---|---|
 | Feudal realm | house | 6 | 8 | 0 | 20 | eldest heir | diet, absolute, elective |
 | Diet monarchy | house | 8 | 10 | 0 | 20 | eldest heir | absolute, constitutional monarchy |
@@ -71,15 +71,15 @@ Each form sets the officials and lords it supports, a change to subject reach, i
 | Company rule | modern | 8 | 4 | +2 | 40 | owners appoint | colonial government |
 | Colonial government | modern | 6 | 4 | none | 15 | overlord appoints | |
 
-- **Subject reach** starts from the catalogue's administrative capacity (very low 2, low 3, moderate 5, high 7, very high 9) and the form adds or takes away. A colonial government has none and can't hold subjects. See [Subjects](Subjects).
+- **Subject limit** starts from the catalogue's administrative capacity (very low 2, low 3, moderate 5, high 7, very high 9) and the form adds or takes away. A colonial government has none and can't hold subjects. See [Subjects](Subjects).
 - **Colonial range** is how many sea zones from your nearest port or colony you may found a colony. See [Exploration-and-Colonies](Exploration-and-Colonies).
-- **Self-run forms**: under a clan council or chiefdom, provinces of your own people need no official, so *Ungoverned* never appears there; provinces of another people still need one. A province is of your own people when its largest tongue is your realm's tongue. A related tongue doesn't count: under Gowa (Makassarese), Buginese Bone still needs an official.
+- **Self-run forms**: under a clan council or chiefdom, provinces of your own people need no official, so *Ungoverned* never appears there; provinces of another people still need one. A province is of your own people when its largest language is your realm's language. A related language doesn't count: under Gowa (Makassarese), Buginese Bone still needs an official.
 - **Monarchies**: the forms that count as monarchies (for example for the Inquisition, see [Religion](Religion)) are every house form plus the chiefly and warrior monarchies: paramount chiefdom, tribute empire, warlord domain, shogunate and soldier emirs.
 - A colonial governor holding a governor slot doesn't count toward the officials cap; once his colony is founded he counts as its official.
 
 ### Reforms
 
-A reform changes your form to one of its next forms. It needs every listed item, costs gold from the treasury, and makes some lords lose a loyalty step: those with the lowest loyalty first, then the biggest, the same order as at New Year. If a need isn't met or the treasury is short, the reform is refused. Once it passes, both caps, subject reach, colonial range and succession follow the new form. The list below is complete: a feudal realm, for example, cannot jump straight to a constitutional monarchy, but goes through a diet or absolute monarchy first. A prince-bishopric or military order "takes a reformed faith" when its state faith is no longer the faith it was founded in.
+A reform changes your form to one of its next forms. It needs every listed item, costs gold from the treasury, and makes some lords lose a loyalty step: those with the lowest loyalty first, then the biggest, the same order as at New Year. If a need isn't met or the treasury is short, the reform is refused. Once it passes, both caps, the subject limit, colonial range and succession follow the new form. The list below is complete: a feudal realm, for example, cannot jump straight to a constitutional monarchy, but goes through a diet or absolute monarchy first. A prince-bishopric or military order "takes a reformed faith" when its state faith is no longer the faith it was founded in.
 
 These are the reforms you can order:
 
@@ -154,6 +154,22 @@ A confederation, a military junta and a party state list the constitutional repu
 | one_party_state, communist, fascist | party state |
 | military_junta | military junta |
 
+### Hordes and technology
+
+A **horde** is a realm with the Horde form: the Great Horde, Crimea, Kazan, the Nogais, the Uzbeks, Moghulistan, the Oirats, the Mongols and the Qara Qoyunlu in 1444.
+
+**How far behind.** A steppe horde starts level with anyone in the horse (riding, composite-bow horse archery, horse breeding) and one era level behind its settled neighbours (Muscovy, the Ottomans, the Timurids, Ming) in everything else: no stone castles, no steel or gunpowder, no knights or wagon forts, no feudal grants or royal chancery. It keeps writing, written law and temple schools, and the Islamic hordes keep madrasas.
+
+**Why it is strong.** Horse archers, the *Feigned flight* style, herds that give horses and horse-only raids make a horde win most field battles in Era I and about half in Era II.
+
+**Why it fades.** Without castles or siege guns it takes castles slowly, so it lives from raids and tribute more than conquest, and a neighbour can often buy peace for less than the raids cost. Few towns, few schools and 2 officials keep its research slow. Once its enemies field field guns (W8) and flintlocks (W11), from Era III, horse archers keep only scouting and raiding.
+
+**How it catches up.** Any realm pays less for an invention from an earlier era than today: 25 % less per era behind, at most 50 %, before the discount from neighbours and trade partners, and never below a fifth of the cost. So what the world already knows is cheap to learn. A horde can also **settle**: reform to a Household realm (a palace in a town, 150 gold); it keeps everything it knows, horse archers included, and gains officials (2 → 10) but has fewer lords (10 → 4).
+
+**Where you see it.** The Learning tab's overview says how many inventions your neighbours know that you don't, and each invention's sheet shows its "Behind the times" discount. A horde's Government tab says how long its riders stay strong and what settling changes. Another realm's card says how many inventions it is ahead of or behind you.
+
+All numbers here are provisional, set against balance targets: a horde's Technology score about half of Muscovy's in 1444; a horde that studies closes the gap by about 1550; field wins against an equal settled army 6 in 10 in Era I, 5 in 10 in Era II and at most 1 in 4 from Era III; and at least a third of a horde's gold from raids and tribute in Era I.
+
 ### The start in 1444
 
 Each catalogue record gets its start form by the first rule that applies: a hand-set override (75 of them), then text rules on the catalogue's government form text in order (some only for certain entity types, some skipping them), then for kingdoms a rule by region (in Southeast Asia tier A and B kingdoms become tribute empires and tier C paramount chiefdoms; a kingdom in a region with no rule becomes a feudal realm), then the entity type table, then the default chiefdom. Nobody starts as an absolute monarchy, constitutional monarchy, constitutional republic, military junta, party state or company rule. Each country starts with the catalogue's historical houses as lords (none if it has only one province), and its caps come from its start form and its start buildings.
@@ -170,12 +186,23 @@ Each month any change that happens by itself is applied, the caps are recomputed
 
 - **The government card**: the form and the ruler; each cap as "x of y" with its parts (the form and each building); subjects as "x of y"; the next forms with each need shown met or not; and a Reform action.
 
+### In the game now
+
+Open your realm (tap its name in the top bar) and choose the **Government** tab, next to General:
+
+- **Your form** and its family.
+- **Officials x of y** and **Lords x of y**, each with a bar and its parts. Until cap buildings can be built, each cap has a part *Custom since 1444*: what your realm held above its form at the start, so nobody starts over a cap. Conquests, new officials and a reform to a smaller form can push you over; the cap turns red and says what follows. Tap a cap to open the Officials or Lords tab, where you can move or commission officials and grant or take back fiefs.
+- **Laws of the realm**: succession, how far your colonies may reach, and how many subjects you can hold against your reach.
+- **Reform**: a card for each form you can become, with the change in officials and lords, each need ✓ or ✗, the gold (the design's gold × 0.2, so 100 is 20) and the lords who will slip. Tap Reform, then confirm. Forms that come only by revolution, event or a condition say so. Needs for buildings, traders, families and alliances can't be met yet; inventions and province, lord and subject counts can.
+
+The General tab shows one line with your form and both caps, red when you are over, that opens the tab. Other realms' cards show their form. AI realms reform each January when they meet the needs with twice the gold.
+
 ## How it connects
 
 - [Buildings](Buildings): which cap buildings stand and at what step.
 - [Provinces](Provinces): officials hired, *Grasping officials*, self-run provinces and *Ungoverned*.
 - [Your-Realm](Your-Realm): lords, their provinces and loyalty, the treasury, and succession by form.
-- [Subjects](Subjects): subject reach and its change by form.
+- [Subjects](Subjects): the subject limit and its change by form.
 - [Exploration-and-Colonies](Exploration-and-Colonies): colonial range and colonial governors.
 - [Revolutions](Revolutions): regimes set forms, era ignored.
 - [Rebellions](Rebellions): a won *New ideas* rising sets a form.
@@ -183,12 +210,12 @@ Each month any change that happens by itself is applied, the caps are recomputed
 - [Research](Research): G1, G2, G3, G4, G6, G9, G11, G14 and W12 as needs.
 - [National-Strengths](National-Strengths): additions to caps (for example +2 officials for Venice).
 - [Religion](Religion): a change of state faith opens the faith forms' reform; the Inquisition is open to monarchies.
-- [Culture](Culture): a province's largest tongue, which decides "own people" for self-run forms.
+- [Culture](Culture): a province's largest language, which decides "own people" for self-run forms.
 - [Warfare](Warfare): army coups and the shogun's capital.
 - [Trade](Trade): traders abroad and trade debt as reform needs.
 - [Diplomacy](Diplomacy): alliances with neighbours as a need.
 - [The-1444-Start](The-1444-Start): start forms and lords.
-- [Map-and-Lenses](Map-and-Lenses): the government card.
+- [Map and Map Modes](Map-and-Lenses): the government card.
 
 ## Numbers
 
@@ -211,6 +238,8 @@ All numbers are **placeholders** in `government/config/government.yaml` (and `st
 | `reforms[]` | the reforms table |
 | `revolution_ignores_era` | true (decided) |
 | `event_tree_map.<value>` | set, keep_if_in, before_G14 |
+| `research.behind_discount_pct_per_era` / `_cap_pct` | 25 % per era / 50 % (provisional) |
+| `hordes.balance.*` | start score 0.5 of Muscovy; catch up by 1550; field wins 0.6 / 0.5 / 0.25; raids and tribute ≥ 1/3 of gold (provisional targets) |
 | start-form rules | 75 overrides, text rules, kingdom by region, entity type, default chiefdom |
 
 ## Still open

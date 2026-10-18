@@ -43,7 +43,7 @@ Feature: Map and cards
       | card        | presses Back              | the card closes                              |
       | card        | presses the cross         | the card closes                              |
       | card        | taps empty map            | the card closes                              |
-      | card        | folds it away             | the card shrinks to its name tab             |
+      | card        | minimises it              | the card shrinks to its name tab             |
       | full screen | presses Back              | the screen below is shown                    |
       | full screen | presses the cross         | the screen below is shown                    |
       | modal       | presses Back where deciding later is allowed | the modal is put off            |
@@ -77,7 +77,7 @@ Feature: Map and cards
   @SHELL-048
   Scenario: Tool column
     When the screen "map" is drawn
-    Then the tool column at the right edge holds "map lens", "go to capital" and "Realm book"
+    Then the tool column at the right edge holds "map mode", "go to capital" and "Realm book"
 
   @SHELL-049
   Scenario Outline: End turn badge opens Attention
@@ -153,9 +153,9 @@ Feature: Map and cards
       | taps the province "Seine-et-Marne" again |
 
   @SHELL-057
-  Scenario: Fold away and reopen
+  Scenario: Minimise and reopen
     Given the province card of "Champagne" is open
-    When the player folds the card away
+    When the player minimises the card
     Then only the name tab "Champagne" is shown
     When the player taps the name tab
     Then the province card of "Champagne" opens again
@@ -185,3 +185,18 @@ Feature: Map and cards
     When the player taps a commander in the Army list
     Then that commander's army is selected
     And army banners take taps of at least 44 points
+
+  @SHELL-159 @feedback-119
+  Scenario: Back returns to the screen before
+    Given the province card of "Champagne" is open
+    When the player opens the country card of "France" from it
+    And the player opens the Lords tab
+    Then the card's header shows a Back button
+    When the player presses Back
+    Then the country card of "France" shows its General tab
+    When the player presses Back
+    Then the province card of "Champagne" is shown
+    And the card's header shows no Back button
+    When the player opens the country card of "France" from it
+    And the player closes the card
+    Then the screen history is empty

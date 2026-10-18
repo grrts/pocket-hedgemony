@@ -343,8 +343,22 @@ export function orderShape(order: Order): string {
       return "seize a fief";
     case "swapOfficials":
       return "move an official to another province";
+    case "hireOfficial":
+      return "hire an official";
+    case "settleLand":
+      return "keep new land as royal land";
+    case "answerRevolution":
+      return "answer the revolution";
     case "setStudy":
       return "choose what to study";
+    case "queueStudy":
+      return "add to the study queue";
+    case "queuePath":
+      return "queue the path to an invention";
+    case "unqueueStudy":
+      return "take a study off the queue";
+    case "moveQueuedStudy":
+      return "move a queued study";
     case "setSeats":
       return "set school seats to fill";
     case "callStudentsToArms":
@@ -365,12 +379,70 @@ export function orderShape(order: Order): string {
       return "break an alliance";
     case "makeDemand":
       return "make a demand";
+    case "heritageCounsel":
+      return "ask the court about an ambition";
+    case "heritageChoice":
+      return "choose a golden age or legacy";
+    case "answerEvent":
+      return "answer an event";
+    case "answerAsk":
+      return "answer an envoy";
+    case "subjectAction":
+      return "act on a subject";
+    case "riseUp":
+      return "rise against an overlord";
+    case "subjectChoice":
+      return "a subject's choice toward its overlord";
+    case "court":
+      return "court a foreign lord or subject";
     case "moveBuild":
       return "move a work in the province's queue";
     case "setFood":
       return "set the food policy";
     case "foodPreset":
       return "fill the food policy from a preset";
+    case "reform":
+      return "reform the government";
+    case "foundTrader":
+      return "found a trader";
+    case "setTradeRoute":
+      return "set a trader's route";
+    case "draftTradeRoute":
+      return "draw a trader's route";
+    case "dismissTrader":
+      return "dismiss a trader";
+    case "answerRevolution":
+      return "answer a revolution";
+    case "answerRebels":
+      return "answer a rising";
+    case "answerRevolution":
+      return "answer the revolution";
+    case "treatRebels":
+      return "judge beaten rebels";
+    case "answerRevolution":
+      return "answer a revolution";
+    case "navy":
+      return `navy: ${order.do}`;
+    case "explore":
+      return `explore: ${order.do}`;
+    case "tonguePolicy":
+      return "set the Language policy";
+    case "faithPolicy":
+      return "set a Faith policy";
+    case "conclaveGold":
+      return "send gold to the conclave";
+    case "claimCaliphate":
+      return "claim the caliphate";
+    case "raiseOwnPatriarch":
+      return "raise our own patriarch";
+    case "answerRevolution":
+      return "answer the revolution";
+    case "empire":
+      return "act in the Empire";
+    case "keepPlaying":
+      return "keep playing after a win";
+    case "playOn":
+      return "play on as another realm";
   }
 }
 

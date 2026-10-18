@@ -1,11 +1,19 @@
 @context-naval
 Feature: Sailors
   As a player or AI country
-  I want to muster sailors from the people of my ports
+  I want to recruit sailors from the people of my ports
   So that my ships have crews, at the cost of empty boats and slots at home
 
   Background:
     Given the province "Lagos" is a port of the country "Portugal"
+
+  @NAVY-148 @placeholder
+  Scenario: Sailors are mustered through the port's queue
+    # config: naval.game.queues.musterBatch, musterQueueMax, naval.muster.days (D-NAVY-33)
+    Given no sailors are on their way to the port "Lagos"
+    When 120 sailors are mustered into the queue of the port "Lagos" on day 0
+    Then they come in as batches of 50, 50 and 20 on days 14, 28 and 42
+    And a muster of 400 more sailors is refused because the queue holds at most 10 batches
 
   @NAVY-022 @NAVY-023
   Scenario: Mustering changes people into sailors who leave their slots empty
@@ -18,7 +26,7 @@ Feature: Sailors
   @NAVY-024
   Scenario: Only provinces with a harbour can be picked for a muster
     Given the province "Arguin" has no harbour
-    When the country "Portugal" opens Muster sailors from the country card
+    When the country "Portugal" opens Recruit sailors from the country card
     Then the province "Lagos" can be picked
     And the province "Arguin" cannot be picked
 

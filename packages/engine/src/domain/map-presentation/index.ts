@@ -12,6 +12,8 @@ import { MOVE, foodColour, type FoodColour } from "../troop-movement/index.ts";
 import { STEPS_PER_DAY, hemisphereOf, isWetSeason, seasonOf, turnSpan, type CalendarDay, type WetClimate } from "../time-and-turns/index.ts";
 
 export * from "./layout.ts";
+export * from "./livingMap.ts";
+export * from "./onMap.ts";
 
 // ---------------------------------------------------------------------------
 // Zoom levels and rendering (VIEW-001..006, INV-VIEW-2)
@@ -360,10 +362,10 @@ export function faithLens(p: { majority: string; communities: { faith: string; s
   return { colour: p.majority, hatched: big.length > 0, hatchFaiths: big.map((c) => c.faith), icon: p.holyPlace ? "holy place" : null };
 }
 
-/** Tongue lens: tongue family far out, tongue at Region, or kin / cousin / stranger with the toggle (VIEW-024). */
-export function tongueLensColouring(zoom: Zoom, kinToggle: boolean): "tongue family" | "tongue" | "kin, cousin or stranger" {
-  if (kinToggle) return "kin, cousin or stranger";
-  return zoom === "World" ? "tongue family" : "tongue";
+/** Language lens: language family far out, language at Region, or same language / related / foreign with the toggle (VIEW-024). */
+export function tongueLensColouring(zoom: Zoom, kinToggle: boolean): "language family" | "language" | "same language, related or foreign" {
+  if (kinToggle) return "same language, related or foreign";
+  return zoom === "World" ? "language family" : "language";
 }
 
 /** Homelands of peoples without a country are outlined on the Tongue lens (VIEW-024). */

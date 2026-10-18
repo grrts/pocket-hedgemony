@@ -25,6 +25,8 @@ export interface MarchingArmy {
   logistics: number;
   /** On campaign (at war, or abroad) men eat double (REALM-054); left out, the army eats as it would at home. */
   campaigning?: boolean;
+  /** Percent of the food its wagons hold: 50 without B01 *Wheel and carts* (RSCH-094); left out, all of it. */
+  foodCarriedPct?: number;
 }
 
 export function groundOf(terrain: Terrain): Ground | null {
@@ -42,7 +44,7 @@ export function monthlyRations(d: MarchDefines, a: MarchingArmy): number {
 
 /** Rations an army's wagons hold: its months carried of eating on campaign. */
 export function wagonRations(d: MarchDefines, a: MarchingArmy): number {
-  return monthlyRations(d, { ...a, campaigning: true }) * d.monthsCarried;
+  return monthlyRations(d, { ...a, campaigning: true }) * d.monthsCarried * ((a.foodCarriedPct ?? 100) / 100);
 }
 
 /**
@@ -334,6 +336,86 @@ export function planTilePath(m: TileMarch, from: number, to: number, allowed: Ui
     for (let t = to; t !== from; t = s.prev[local(t)]!) tiles.push(t);
     tiles.reverse();
     result = { tiles: Int32Array.from(tiles), hours: Float32Array.from(tiles, (t) => s.g[local(t)]!) };
+  }
+  s.g.fill(Infinity, 0, bw * bh);
+  s.closed.fill(0, 0, bw * bh);
+  return result;
+}
+
+/**
+ * Shortest sail over water tiles from one tile to another (A* on distance,
+ * eight ways round), only through tiles of the sea zones marked in `zones`;
+ * null when there is none. Fleets sail a zone at a time, so the search spans
+ * two zones (feedback 122).
+ */
+export function planSeaPath(grid: TileGrid, rowWidth: Float32Array, from: number, to: number, zones: Uint8Array): Int32Array | null {
+  const W = grid.width;
+  if (from === to || grid.cell[to] !== WATER) return null;
+  let x0 = W;
+  let y0 = grid.height;
+  let x1 = -1;
+  let y1 = -1;
+  const widen = (t: number) => {
+    const x = t % W;
+    const y = (t - x) / W;
+    ((x0 = Math.min(x0, x)), (y0 = Math.min(y0, y)), (x1 = Math.max(x1, x)), (y1 = Math.max(y1, y)));
+  };
+  for (let p = 0; p < zones.length; p++) {
+    if (!zones[p] || grid.bounds[p * 4 + 2]! < 0) continue;
+    widen(grid.bounds[p * 4 + 1]! * W + grid.bounds[p * 4]!);
+    widen(grid.bounds[p * 4 + 3]! * W + grid.bounds[p * 4 + 2]!);
+  }
+  widen(from);
+  widen(to);
+  const bw = x1 - x0 + 1;
+  const bh = y1 - y0 + 1;
+  const s = scratch(bw * bh);
+  const local = (t: number) => (Math.floor(t / W) - y0) * bw + (t % W) - x0;
+  const tx = to % W;
+  const ty = Math.floor(to / W);
+  const estimate = (x: number, y: number) => Math.max(Math.abs(x - tx) * rowWidth[y]!, Math.abs(y - ty));
+  const heap = s.heap;
+  heap.size = 0;
+  s.g[local(from)] = 0;
+  heapPush(heap, estimate(from % W, Math.floor(from / W)), from);
+  let found = false;
+  while (heap.size) {
+    const t = heapPop(heap);
+    const lt = local(t);
+    if (s.closed[lt]) continue;
+    s.closed[lt] = 1;
+    if (t === to) {
+      found = true;
+      break;
+    }
+    const x = t % W;
+    const y = (t - x) / W;
+    const base = s.g[lt]!;
+    for (let dy = -1; dy <= 1; dy++) {
+      const ny = y + dy;
+      if (ny < y0 || ny > y1) continue;
+      for (let dx = -1; dx <= 1; dx++) {
+        if (!dx && !dy) continue;
+        const nx = x + dx;
+        if (nx < x0 || nx > x1) continue;
+        const n = ny * W + nx;
+        const ln = (ny - y0) * bw + nx - x0;
+        if (s.closed[ln] || grid.cell[n] !== WATER) continue;
+        const z = grid.province[n]! - 1;
+        if (n !== to && (z < 0 || !zones[z])) continue;
+        const c = base + (dx === 0 ? 1 : dy === 0 ? rowWidth[ny]! : Math.hypot(1, rowWidth[ny]!));
+        if (c >= s.g[ln]!) continue;
+        s.g[ln] = c;
+        s.prev[ln] = t;
+        heapPush(heap, c + estimate(nx, ny), n);
+      }
+    }
+  }
+  let result: Int32Array | null = null;
+  if (found) {
+    const tiles: number[] = [];
+    for (let t = to; t !== from; t = s.prev[local(t)]!) tiles.push(t);
+    result = Int32Array.from(tiles.reverse());
   }
   s.g.fill(Infinity, 0, bw * bh);
   s.closed.fill(0, 0, bw * bh);

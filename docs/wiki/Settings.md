@@ -2,6 +2,19 @@
 
 Settings let you shape how Pocket Hegemony looks, sounds and handles on your device, from interface scale and colour vision to controller buttons and battery use. They never change the rules, balance or the computer players: anything that would is a campaign rule, chosen when you start a new game. Most settings pick sensible defaults from the kind of device you play on, apply at once, and follow you between devices if you sign in.
 
+## Where you find it
+
+Open Settings from the cog in the side tools, from the game menu (the three-line button at the top left of the map, or `Esc`) or from the start screen. Sections are on the left and their rows on the right; in a tall window the sections come first. Each row says what it does under its name, a red dot marks a value you changed, and a long press on the name (or a right-click) puts it back. Reset this section is at the end of each section.
+
+What the game has built so far:
+
+- **Gameplay**: Tutorial hints (with how many of the six are done) and Reset tutorial and hints; Achievement toasts; Autosave and Autosaves kept per campaign; Turn playback speed (1×, 2×, 4×: how fast the week plays out after End turn) and Battle playback speed.
+- **Graphics**: Battery saver (Off, Auto, On) and the knobs it moves: Frame rate cap, Sharpness and Animations. Rows it moves say "Set by Battery saver". Auto follows your device's battery where the browser reports it.
+- **Audio**: Master, Music on or off and its volume, Effects volume and Interface sounds. The speaker button's Sound card changes the same settings.
+- **Accessibility**: Text size (Normal, Large, Larger) for the cards, menus and alerts.
+
+Other rows join the screen as the game builds what they do.
+
 ## How it works
 
 ### The principles
@@ -84,7 +97,7 @@ These are chosen on the new game screen, saved in the campaign, and shown read-o
 - the campaign end date (default 31 August 1939);
 - whether music eras follow the calendar or technology.
 
-The lens menu's "Parchment over unknown lands" stays a display switch, because it only hides unknown lands visually. It would become a campaign rule only if fog ever hid information the computer uses.
+The map mode menu's "Hide unexplored lands" stays a display switch, because it only hides unknown lands visually. It would become a campaign rule only if fog ever hid information the computer uses.
 
 ### Graphics
 
@@ -191,7 +204,7 @@ Default keys:
 | Zoom | wheel, `+` / `−`, `Q` / `E` |
 | End turn | `Enter` (hold 0.5 s, or press twice when Hold actions is off) |
 | Game menu | `Esc` |
-| Map lenses (realms, terrain, people, wealth, walls, food) | `1` to `6`, `Tab` cycles |
+| Map modes (realms, terrain, people, wealth, walls, food) | `1` to `6`, `Tab` cycles |
 | Next / previous army | `.` / `,` |
 | Next notification | `N` |
 | Turn report | `R` |
@@ -226,7 +239,7 @@ Default controller layout (Xbox names):
 | X | action menu | reset row | order a retreat |
 | Y | info card | long description | commander's line |
 | LB / RB | previous / next army | previous / next tab | previous / next running battle |
-| D-pad up / down | cycle lenses | move focus | |
+| D-pad up / down | cycle map modes | move focus | |
 | D-pad left / right | previous / next notification | step a value | |
 | View | turn report; hold 0.5 s for End turn | | |
 | Menu | game menu | close the panel | game menu |
@@ -240,7 +253,7 @@ The official Steam Input configuration for the Steam Controller and Steam Deck a
 | Setting | Options | Default |
 |---|---|---|
 | Colour vision | Default, Red-weak, Green-weak, Blue-weak, No colour | Default |
-| Patterns on lenses | On, Off | Off (On with No colour) |
+| Patterns on map modes | On, Off | Off (On with No colour) |
 | Borders | Normal, Thick, High contrast | Normal |
 | Text size | Normal (17 px), Large (20 px), Larger (24 px), before interface scale | per profile |
 | Font | Pixel, Plain | Pixel |
@@ -251,8 +264,8 @@ The official Steam Input configuration for the Steam Controller and Steam Deck a
 | Hold actions | On, Off | On |
 | Screen reader support | Follow system | |
 
-- **Colour vision** swaps nation colours to a second assignment from the same 32-colour palette, chosen so neighbours stay distinguishable for that vision type, and each lens's colour ramp to a safe one (blue to orange instead of red to green). No colour uses greys with patterns. Every mode keeps the map's season colours (snow, spring green, autumn gold, the wet season) apart: the colour-blind modes shift them with the safe ramp and No colour uses tile patterns. Seasons cannot be switched off.
-- **Patterns on lenses** adds hatching, dots and stripes by band, so a lens reads without colour.
+- **Colour vision** swaps nation colours to a second assignment from the same 32-colour palette, chosen so neighbours stay distinguishable for that vision type, and each map mode's colour ramp to a safe one (blue to orange instead of red to green). No colour uses greys with patterns. Every mode keeps the map's season colours (snow, spring green, autumn gold, the wet season) apart: the colour-blind modes shift them with the safe ramp and No colour uses tile patterns. Seasons cannot be switched off.
+- **Patterns on map modes** adds hatching, dots and stripes by band, so a map mode reads without colour.
 - **High contrast borders** draw nation borders in black and white ink two art pixels wide.
 - **Text size**: panels reflow and cards grow taller, not smaller.
 - **Plain font** replaces the pixel font and the blackletter titles with a clear, openly licensed sans such as Atkinson Hyperlegible.
@@ -304,7 +317,7 @@ The Settings screen with its nine sections, the changed dot, per-row and per-sec
 - [Saving](Saving): the autosave values, the Cloud saves row, Wi-Fi only, account and devices; personal settings ride the same account sync and store backups.
 - [Screens and navigation](Screens-and-Navigation): where Settings opens, Confirm End turn, the turn report, the Far layout, scale and text size, prompts, hold actions, main hand, Android back.
 - [Music and sound](Music-and-Sound): buses, volumes, music variety, zoom mix, ambience, haptics, captions, reduced intensity, mono and background play.
-- [Map and lenses](Map-and-Lenses): sharpness, map detail, animations, frame cap, colour vision, borders, patterns, place names and the parchment switch.
+- [Map and Map Modes](Map-and-Lenses): sharpness, map detail, animations, frame cap, colour vision, borders, patterns, place names and the parchment switch.
 - [Tutorial and help](Tutorial-and-Help): tutorial hints and their reset, tooltips and their delay, detailed tooltips.
 - [Achievements](Achievements): the toast switch; achievements only count in ironman.
 - [The 1444 start](The-1444-Start): the campaign rules shown read-only.

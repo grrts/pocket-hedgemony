@@ -43,13 +43,17 @@ Feature: Unlock the catalogue
     Examples:
       | id | name | moment | test | tier | points | scope |
       | full_granaries | Full Granaries | turn_end | {provinces_min: 10, months_no_hungry_province: 60} | silver | 10 | campaign |
-      | famine_averted | The Famine Rule | year_end | {famine_rule_released_to_province: true, famine_deaths_in_that_province: 0} | copper | 5 | campaign |
+      | famine_averted | Famine Relief   | year_end | {famine_rule_released_to_province: true, famine_deaths_in_that_province: 0} | copper | 5 | campaign |
       | seven_good_harvests | Seven Fat Years | harvest | {capital_harvest_at_least: good, years_in_a_row: 7} | copper | 5 | campaign |
       | debt_repaid | Clean Books | loan_closed | {loan_size_min: 1000, closed_by: repaid} | copper | 5 | campaign |
       | treasury_10000 | Counting House | turn_end | {gold_min: 10000} | silver | 10 | campaign |
       | people_10m | Many Hearths | turn_end | {people_min: 10000000} | silver | 10 | campaign |
       | trade_hub_held | Where Roads Meet | province_gained | {owns_trade_hub: 1} | copper | 5 | campaign |
       | castle_reach_3 | Long Reach | turn_end | {any_castle_reach_min: 3} | copper | 5 | campaign |
+      | harvests_10 | Ten Harvests | harvest | {provinces_harvested_min: 10} | copper | 5 | lifetime |
+      | harvests_100 | A Hundred Harvests | harvest | {provinces_harvested_min: 100} | silver | 10 | lifetime |
+      | harvests_1000 | A Thousand Harvests | harvest | {provinces_harvested_min: 1000} | gold | 20 | lifetime |
+      | harvests_10000 | Ten Thousand Harvests | harvest | {provinces_harvested_min: 10000} | crown | 40 | lifetime |
 
   @ACH-015 @ACH-018 @placeholder
   Scenario Outline: Lords and rule achievement "<name>" unlocks on its moment

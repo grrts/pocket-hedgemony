@@ -157,6 +157,32 @@ export function causeOf(i: CauseInputs): Cause | null {
   return null;
 }
 
+/** The cause one grievance speaks for: the cause table's own, else the other grievances' row (D-REBL-7). */
+export function causeOfGrievance(grievance: string): Cause | null {
+  for (const [c, def] of Object.entries(CAUSES) as [Cause, (typeof CAUSES)[Cause]][]) if (def.grievances.includes(grievance)) return c;
+  return ((config.other_grievance_causes as Record<string, Cause>)[grievance] as Cause | undefined) ?? null;
+}
+
+/**
+ * The cause of a rising from the province's grievances (REBL-013, D-REBL-7):
+ * the cause with the most weight behind it (a grievance that counts as two
+ * weighs two), ties by the cause table's order. Returns the cause and the
+ * heaviest grievance behind it.
+ */
+export function heaviestCause(grievances: readonly { name: string; weight: number }[]): { cause: Cause; grievance: string } | null {
+  const weight = new Map<Cause, number>();
+  const top = new Map<Cause, { name: string; weight: number }>();
+  for (const g of grievances) {
+    const c = causeOfGrievance(g.name);
+    if (!c) continue;
+    weight.set(c, (weight.get(c) ?? 0) + g.weight);
+    if (!top.has(c) || top.get(c)!.weight < g.weight) top.set(c, g);
+  }
+  let best: Cause | null = null;
+  for (const c of Object.keys(CAUSES) as Cause[]) if ((weight.get(c) ?? 0) > (best ? weight.get(best)! : 0)) best = c;
+  return best ? { cause: best, grievance: top.get(best)!.name } : null;
+}
+
 export function demandOf(cause: Cause): string {
   return CAUSES[cause].demand;
 }

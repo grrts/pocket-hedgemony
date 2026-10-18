@@ -13,6 +13,7 @@ what each country knows in 1444, and which inventions are in scope for a campaig
 - How research works (§7.3) and the research tree rules (research-tree "Rules").
 - The full tree: every invention, its parent, extra needs, era, unlocks and start regions (research-tree "The tree").
 - Scope cut: Era VIII out; Era VII cut at 1939 (gap-lists items 22 and decisions).
+- The two eras before 1444 (Ancient and Medieval), each realm's start group and its standing (Leroy, 18 Oct; D-RSCH-21).
 
 **Not in scope (owned by …)**
 - What each invention does in another system where that system gives the numbers: warfare §12 (W, B, S), trade §11
@@ -25,6 +26,7 @@ what each country knows in 1444, and which inventions are in scope for a campaig
 ## 2. Sources
 
 Newest decision first.
+0. Leroy, 18 Oct 2026 (project chat): one single tree, reaching further into the past so some countries start behind; design each kingdom's starting technologies (D-RSCH-21).
 1. `planning/gap-lists.md` (16 Oct 2026): decisions (campaign to 31 August 1939; research Era VIII and the 1939–1960 part
    of Era VII out of scope; multiplayer-friendly) and item 22 (drop Era VIII, cut Era VII at 1939, scholar-year costs
    are placeholders).
@@ -46,17 +48,22 @@ Newest decision first.
 | Scholar | A graduate working in schools and court; produces most research | Official |
 | Scholar-year | One scholar's research for one year; the unit of invention cost | Gold |
 | Invention | One node of the tree: a real, datable technique or institution | Technology score |
-| Root | *Settled life*, known by everyone | Bough |
-| Bough | One of the four first branches, known by every country at the start: R1 Tilling and building, R2 Fire and metal, R3 Counting and records, R4 Boats | Era |
+| Root | *Settled life*, known by everyone | Branch |
+| Branch (was Bough) | One of the four first branches, known by every country at the start: R1 Tilling and building, R2 Fire and metal, R3 Counting and records, R4 Boats; drawn as a band of the one tree, never as a separate tree (RSCH-100) | Era |
 | Parent | The invention a node grows from; must be known to study it | Also needs |
-| Also needs | Extra inventions, possibly from another bough, that must also be known | Parent |
+| Also needs | Extra inventions, possibly from another branch, that must also be known | Parent |
 | "or" | Either listed invention is enough | |
-| Era | I 1444–1500, II 1500–1600, III 1600–1700, IV 1700–1800, V 1800–1870, VI 1870–1914, VII 1914–1960 (cut at 1939), VIII 1960 on (out of scope) | Age (event tree) |
+| Era | Ancient (before 600) and Medieval (600–1443) before the start, then I 1444–1500, II 1500–1600, III 1600–1700, IV 1700–1800, V 1800–1870, VI 1870–1914, VII 1914–1960 (cut at 1939), VIII 1960 on (out of scope) | Age (event tree) |
 | Studying ahead | Studying an invention of an era later than the current date | |
 | Spread | Discount from neighbours and trade partners who already know an invention | |
 | Trade partner | A country whose traders deposit in, or collect in, your cities or yours in theirs (trade §9) | Ally |
 | Contact invention (⇄) | An invention that opens only after a contact event | |
 | Event-tree invention (★) | One of the 20 inventions whose ids the event tree already uses | |
+| Past invention | An invention of the Ancient or Medieval era: part of the 1444 baseline that some realms lack | Era I invention |
+| Without it | What lacking a past invention costs a realm, below the 1444 baseline (RSCH-094) | Unlock |
+| Start group | The set of realms that start with the same knowledge (§5.11) | Culture group, start label |
+| Standing | The latest era of which a realm knows a quarter of the inventions, every earlier era too (RSCH-097) | Technology score |
+| Behind the times | Standing earlier than the era of the current date | |
 | Academy-level school | A school of the academy type (L12) or better, allowing two studies at once | |
 
 ## 4. Domain model
@@ -69,13 +76,14 @@ seats to fill (player setting); students (per school, with years enrolled); scho
 - INV-RSCH-1: a known invention is never lost.
 - INV-RSCH-2: at most one study at a time, two once the country has an academy-level school.
 - INV-RSCH-3: an invention can be studied only if its parent (or one of its "or" alternatives) and all its "also needs" are known, and, for a contact invention, its contact event has happened.
-- INV-RSCH-4: every country knows the root and the four boughs.
+- INV-RSCH-4: every country knows the root and the four branches.
 - INV-RSCH-5: Era VIII inventions are never studied; Era VII inventions only within the campaign (to 31 August 1939).
 
 **Invention tree** (identity: one tree; config)
 Holds: one row per invention with `id`, `parent`, `also_needs`, `era`, `unlocks`, `start_regions`.
 - INV-RSCH-6: the tree is a single tree from one root; every invention has one parent (or alternatives) on the tree.
 - INV-RSCH-7: the 20 ★ ids are unchanged so events keep working.
+- INV-RSCH-8: every map nation belongs to exactly one start group, and every start set is complete (RSCH-098, RSCH-099).
 
 ### Entities and value objects
 - **School** (entity, in a province): type and seats, students enrolled, open or closed.
@@ -125,16 +133,16 @@ Holds: one row per invention with `id`, `parent`, `also_needs`, `era`, `unlocks`
 - RSCH-036: Inventions that change research itself shall apply: L5 *printing* (inventions spread +20 %, schools cost less), C1 *Paper making* (schools cost less), L4 *Metal movable type* (students cost less), L6 and L11 (scholars +research), L3 *Observatories* (+research for Learning and Sea inventions), L10 (scholars work into old age), L14 *Encyclopedias* (spread +20 %), L20 *Research laboratories* (research +50 %), L21 *Radio* (faster spread of news and inventions), with the numbers of RSCH-069 and RSCH-074. [research-tree, D-RSCH-8, D-RSCH-12]
 
 ### 5.5 The tree
-- RSCH-040: The tree shall be one tree from the root *Settled life*, splitting into four boughs (R1 Tilling and building, R2 Fire and metal, R3 Counting and records, R4 Boats), with inventions branching era by era and many needing an invention from another bough. [research-tree intro]
+- RSCH-040: The tree shall be one tree from the root *Settled life*, splitting into four branches (R1 Tilling and building, R2 Fire and metal, R3 Counting and records, R4 Boats), with inventions branching era by era and many needing an invention from another branch. [research-tree intro]
 - RSCH-041: The letter in an invention id (F, C, T, S, W, B, G, L) shall only describe what it is about and shall not form a separate tree. [research-tree intro]
-- RSCH-042: The tree shall hold the 174 inventions of §5.8, each unlocking what its row says. [research-tree]
+- RSCH-042: The tree shall hold the 174 inventions of §5.8, each unlocking what its row says, and the 13 past inventions of RSCH-092: 187 rows. [research-tree, D-RSCH-21]
 - RSCH-043: The 20 ★ inventions shall keep their ids so the event tree keeps working; the event tree's `tech_*` and `innovation` read inventions from the tree. [research-tree intro, country-stats §11]
 - RSCH-044: Each invention shall be one config row with `id`, `parent`, `also_needs`, `era`, `unlocks` and `start_regions`, and new inventions (e.g. Andean terrace farming, Ethiopian church schools, Javanese irrigation) can be hung on any branch without code. [research-tree Rules]
 - RSCH-045: The 12 Era VIII inventions shall be out of scope and never studied; of Era VII, L23 and L24 shall never be studied and the other 16 may be studied until 31 August 1939 (RSCH-062, RSCH-063). [gap-lists decisions, item 22, X-14, D-RSCH-1, D-RSCH-2]
 
 ### 5.6 Start
 - RSCH-050: At the start every country shall know the root and the four boughs. [research-tree Rules]
-- RSCH-051: At the start each country shall also know the inventions it historically knew: "start:" names who typically knows each in 1444, and the catalogue's `institutional_development` and region decide the exact set (e.g. East Asian courts printing and the examination system, Iberians ocean ships under way, Timurid lands observatories), worked out as RSCH-076 states. [research-tree Rules, §7.3, §10, D-RSCH-11]
+- RSCH-051: *(Replaced by RSCH-098, built 18 Oct, D-RSCH-21.)* At the start each country shall also know the inventions it historically knew: "start:" names who typically knows each in 1444, and the catalogue's `institutional_development` and region decide the exact set (e.g. East Asian courts printing and the examination system, Iberians ocean ships under way, Timurid lands observatories), worked out as RSCH-076 states. [research-tree Rules, §7.3, §10, D-RSCH-11]
 
 ### 5.7 Reading research elsewhere
 - RSCH-060: The event tree's `literacy` shall read scholars and schools per thousand people. [country-stats §11]
@@ -142,13 +150,13 @@ Holds: one row per invention with `id`, `parent`, `also_needs`, `era`, `unlocks`
 
 ### 5.8 The full invention list
 
-Each row is one config row. "Parent" R1–R4 means the bough. "Or parent" lists alternatives that can stand for the
+Each row is one config row. "Parent" R1–R4 means the branch. "Or parent" lists alternatives that can stand for the
 parent. "Scope" applies the 16 Oct campaign span decision. Effect texts are the tree's; where another design gives the
 effect in numbers (warfare §12, trade §11, exploration §4) that design owns the numbers; the rows carry trade v2's T-branch
 effects (D-RSCH-4) and the edits of D-RSCH-5. Era VII rows are in play until 31 August 1939 with effects trimmed to what
 they did by then; L23 and L24 are dropped (D-RSCH-1).
 
-| Id | Name | Era | Bough | Parent | Or parent | Also needs | Unlocks | Start (who typically knows it in 1444) | Event tree ★ | Contact ⇄ | Scope |
+| Id | Name | Era | Branch | Parent | Or parent | Also needs | Unlocks | Start (who typically knows it in 1444) | Event tree ★ | Contact ⇄ | Scope |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | B1 | Stone castles | I | R1 | R1 | — | — | Castles | Most settled realms |  |  | in scope |
 | B5 | bastion_fortification | II | R1 | B1 | — | W3 Bombards | Castles resist guns | — | ★ |  | in scope |
@@ -333,14 +341,14 @@ they did by then; L23 and L24 are dropped (D-RSCH-1).
 - RSCH-066: G8 shall also let a country ask for passage; G3 and G10 shall take effect only while the realm has a chancery; W15 shall give +50 % recruits and W12 a troop cap of +0.5 % of people. There is no staff college: academy graduates are the commanders' school. [diplomacy §18, buildings §18, warfare §12, X-7, D-RSCH-5]
 - RSCH-067: Each monthly research step shall add a twelfth of the year's scholar-years to the current study or studies, and an invention shall be known in the month its progress reaches its cost. [X-2, D-RSCH-6]
 - RSCH-068: With two studies, each shall get half the scholar-years; one open academy anywhere in the realm shall be enough for two studies. [D-RSCH-7]
-- RSCH-069: L5, L14 and L21 shall each raise the discount per neighbour or trade partner by a fifth of the base (10 % → 12 % → 14 % → 16 %); the 60 % cap shall not change, and a neighbour of the same tongue family shall count once like any other. [D-RSCH-8]
+- RSCH-069: L5, L14 and L21 shall each raise the discount per neighbour or trade partner by a fifth of the base (10 % → 12 % → 14 % → 16 %); the 60 % cap shall not change, and a neighbour of the same language family shall count once like any other. [D-RSCH-8]
 - RSCH-070: With L18 each province without a school shall have 10 village-school seats, which cost no upkeep. School upkeep shall be a temple or monastery school 2 gold a year, a madrasa or university 4, an academy 6. [D-RSCH-9]
 - RSCH-071: When a country occupies an enemy province with an open school, each of its current studies that the enemy knows shall gain 10 % of its cost before discounts, once per province per war. [D-RSCH-10]
 - RSCH-072: When a battle is fought in a province with an open school, the school shall be sacked (lost) with a chance of 25 %; then half the province's scholars flee to the first peaceful neighbouring country in nation-index order, or are lost when none is at peace. [D-RSCH-10]
 - RSCH-073: Each January, the richest neighbour with at least twice a country's gold shall poach 1 in 20 of its scholars. [D-RSCH-10]
 - RSCH-074: L6 and L11 shall each give +10 % research, L20 +50 %, L3 +20 % toward Learning (L) and Sea (S) inventions; C1, L4 and L5 shall each make school upkeep 10 % lower. [D-RSCH-12]
 - RSCH-075: Each January a country shall lose 1 in 30 of its scholars to old age, 1 in 60 once it knows L10. [D-RSCH-12]
-- RSCH-076: A map nation shall start knowing the root, the four boughs, every invention whose start regions name a group the research data puts it in, the extra inventions the data lists for it (Ming and Korea: L5 printing), and everything those need; `institutional_development` is not used, and no study starts with progress. [D-RSCH-11]
+- RSCH-076: *(Replaced by RSCH-098, built 18 Oct, D-RSCH-21.)* A map nation shall start knowing the root, the four boughs, every invention whose start regions name a group the research data puts it in, the extra inventions the data lists for it (Ming and Korea: L5 printing), and everything those need; `institutional_development` is not used, and no study starts with progress. [D-RSCH-11]
 - RSCH-077: F9 shall open for a country when exploration reports its Atlantic crossing; the countries of the Americas know it from the start. [D-RSCH-13]
 - RSCH-078: The AI shall study the eligible invention that costs it least now, ties by id; it shall fill every empty seat while at peace and none while at war, and call students to arms only while at war with no recruits left. [D-RSCH-14]
 - RSCH-079: Students shall be taken from recruits and graduates counted as scholars without a sex; whether a scholar named to a role is a woman shall be the realm's women-in-roles roll. [D-RSCH-15]
@@ -350,19 +358,179 @@ they did by then; L23 and L24 are dropped (D-RSCH-1).
 - RSCH-083: The player shall found a school in a town of theirs (25,000 people or more, or the capital) that has none, for the temple school's gold and months (buildings `school` step 1: 60 gold, 12 months; a madrasa where the realm knows L2); it opens when the months have passed. Choosing another study shall drop the progress on the current one. [D-RSCH-19]
 
 ### How the player uses it
-- RSCH-084: The player shall find research in a Learning tab of their own country card (Realm book → Learning). It opens on an overview: the current study with a progress bar, its scholar-years and the time left at the current pace, then one line with scholars, students, scholar-years a year, how many of the tree's inventions are known and the current era (or "Nothing is being studied" and where to choose). Below it the tab has two parts, Tree and Schools. **Tree** draws the invention tree one bough at a time (a tab per bough, each with how many of its inventions are known and how many can be studied): the bough at the left, a column per era, each invention on a line from its parent, an "also needs" in the same bough as a dashed line; every invention reads as known, being studied, can be studied (◆) or locked. Tapping an invention opens its sheet: what it does, what it grows from and what it also needs (each marked known or not, and tapping one shows it in the tree), and its one action. Only an invention that can be studied (RSCH-033) has a Study button, with its cost in scholar-years, the time at the realm's pace, the neighbours who know it and whether it is ahead of its time; a locked one says what to learn first and has no button. **Schools** holds the students (a stepper of 44-point buttons, five seats a step, saying each student is a man the army can't raise), Call students to arms in a fold that says what it costs, the schools, and Found a school, opening a list of the towns where one can go with its gold and months. [X-19, D-RSCH-20]
-- RSCH-085: Everything about research and schools shall sit in that one tab; elsewhere the game only points to it (the commander's Train list names the arms not yet known with a button to the Learning tab). [X-19]
+- RSCH-084: *(The branch tabs of the Tree part are replaced by RSCH-100 to RSCH-106, D-RSCH-21.)* The player shall find research in a Research tab of their own country card (Realm book → Learning). It opens on an overview: the current study with a progress bar, its scholar-years and the time left at the current pace, then one line with scholars, students, scholar-years a year, how many of the tree's inventions are known and the current era (or "Nothing is being studied" and where to choose). Below it the tab has two parts, Tree and Schools. **Tree** draws the invention tree one branch at a time (a tab per branch, each with how many of its inventions are known and how many can be studied): the branch at the left, a column per era, each invention on a line from its parent, an "also needs" in the same branch as a dashed line; every invention reads as known, being studied, can be studied (◆) or locked. Tapping an invention opens its sheet: what it does, what it grows from and what it also needs (each marked known or not, and tapping one shows it in the tree), and its one action. Only an invention that can be studied (RSCH-033) has a Study button, with its cost in scholar-years, the time at the realm's pace, the neighbours who know it and whether it is ahead of its time; a locked one says what to learn first and has no button. **Schools** holds the students (a stepper of 44-point buttons, five seats a step, saying each student is a man the army can't raise), Call students to arms in a fold that says what it costs, the schools, and Found a school, opening a list of the towns where one can go with its gold and months. [X-19, D-RSCH-20]
+- RSCH-085: Everything about research and schools shall sit in that one tab; elsewhere the game only points to it (the commander's Train list names the arms not yet known with a button to the Research tab). [X-19]
 - RSCH-086: Before a Study button would drop progress on the current study, the invention's sheet shall say how many scholar-years would be lost, and the button shall read Switch to this study. [X-19, D-RSCH-19, D-RSCH-20]
 - RSCH-087: The schools' upkeep shall be its own line of the Treasury ledger (Schools). [X-19, RSCH-021]
-- RSCH-088: The General tab of the player's country card shall carry one line, "Studying X · N % · scholars S" (or "Nothing studied · choose what to study"), that opens the Learning tab; another realm's card shall show how many inventions it knows and what it studies. [X-19]
-- RSCH-089: When the player's realm learns an invention, an alert shall say "Learned X. Choose the next study." with an Open button to the Learning tab; while nothing is studied, one alert shall ask the player to choose (at the start and after each invention), the same way. [X-19]
-- RSCH-090: The Learning tab shall work on a phone in landscape and in the Tall layout: inside the safe areas, every button, tree node and fold at least 44 points tall, nothing that needs hover, and the page never scrolling sideways; the tree scrolls by dragging inside its own frame, and where the tab is at least 500 points wide the invention's sheet stands beside the tree, otherwise above it. [X-19, SHELL-108, SHELL-109, SHELL-114, D-RSCH-20]
+- RSCH-088: The General tab of the player's country card shall carry one line, "Studying X · N % · scholars S" (or "Nothing studied · choose what to study"), that opens the Research tab; another realm's card shall show how many inventions it knows and what it studies. [X-19]
+- RSCH-089: *(With a queue, only when the queue is empty: RSCH-108.)* When the player's realm learns an invention, an alert shall say "Learned X. Choose the next study." with an Open button to the Research tab; while nothing is studied, one alert shall ask the player to choose (at the start and after each invention), the same way. [X-19]
+- RSCH-090: The Research tab shall work on a phone in landscape and in the Tall layout: inside the safe areas, every button, tree node and fold at least 44 points tall, nothing that needs hover, and the page never scrolling sideways; the tree scrolls by dragging inside its own frame, and where the tab is at least 500 points wide the invention's sheet stands beside the tree, otherwise above it. [X-19, SHELL-108, SHELL-109, SHELL-114, D-RSCH-20]
+
+### 5.10 One tree that reaches back before 1444 (18 October 2026, Leroy)
+
+Leroy: the game must have one single tree, not a tree split in four, and the tree must reach further into the past
+so that some countries start on the back foot. These rules replace the bough-by-bough drawing of RSCH-084 and the
+start sets of RSCH-051 and RSCH-076 (D-RSCH-21). Nothing already in the tree changes id, and the 20 ★ ids stay.
+
+**Two eras before 1444**
+- RSCH-091: The tree shall have two eras before Era I: **Ancient** (`A`, before 600) and **Medieval** (`M`, 600 to 1443). Their inventions are the **past inventions**: what a realm of 1444 may or may not already know. [Leroy 18 Oct, D-RSCH-21]
+- RSCH-092: The tree shall hold these 13 past inventions, one config row each like any other (RSCH-044), bringing it to 187 rows:
+
+| Id | Name | Era | Bough | Parent | Also needs | What it opens | Without it (RSCH-094) |
+|---|---|---|---|---|---|---|---|
+| F01 | Ox plough | A | R1 | R1 | — | F02 | Farmland harvests one step worse |
+| F02 | Heavy plough | M | R1 | F01 | — | F1 Three-field rotation | — |
+| F03 | Riding and pack animals | A | R1 | R1 | — | F11, W1, W2, T1 | No horse regiments and no camel caravans |
+| B01 | Wheel and carts | A | R1 | R1 | — | F5 mills, W4 wagon fort | Armies carry half the food |
+| B02 | Dressed stone | A | R1 | R1 | — | B1 Stone castles | — |
+| C01 | Iron smelting | A | R2 | R2 | — | C02, C2 Blast furnace, W6 | Regiments fight 20 % weaker |
+| C02 | Steel forging | M | R2 | C01 | — | W2 Heavy armoured cavalry | — |
+| C03 | Gunpowder | M | R2 | R2 | — | W3 Bombards | — |
+| G01 | Writing | A | R3 | R3 | — | G1 Written law codes, L1, L2, C1 Paper making, L01 | — |
+| T01 | Coinage | A | R3 | R3 | — | T2 Double-entry bookkeeping, T4 Paper money | — |
+| L01 | Positional numbers | M | R3 | G01 | — | T2 Double-entry bookkeeping | — |
+| S01 | Sail | A | R4 | R4 | — | S1 compass, S2 rigging, S02, T5 | — |
+| S02 | Sternpost rudder | M | R4 | S01 | — | S4 Carrack and caravel | — |
+
+- RSCH-093: These Era I and II rows shall take new needs from the past inventions, everything else in their rows unchanged: B1 parent B02; F1 parent F02; F5 also needs B01; F11 parent F03; C1 also needs G01; C2 parent C01; W1 also needs F03; W2 parent C02 and also needs F03; W3 also needs C03; W4 also needs B01; W6 also needs C01; G1 parent G01; L1 parent G01 or G6 *Quipu and knot records*; L2 parent G01; T1 also needs F03; T2 parent T01 and also needs L01; T4 also needs T01; T5 also needs S01; S1 and S2 parent S01; S4 also needs S02. [D-RSCH-21]
+- RSCH-094: A past invention a realm lacks shall hold it below the 1444 baseline, so realms that know it play exactly as now: without F01 its farmland harvests one step worse (province owns the step); without F03 it raises no horse regiments and sends no camel caravans (recruiting, warfare and trade own these); without B01 its armies carry half the food (troop-movement owns the carrying); without C01 its regiments fight 20 % weaker (warfare owns the strength). The other past inventions only open later ones. @placeholder [D-RSCH-21]
+- RSCH-095: A past invention shall cost Ancient 10 and Medieval 15 scholar-years before discounts, is never studied ahead, and takes the spread discount from neighbours and trade partners like any invention (RSCH-034), so a realm next to realms that know it catches up fastest. @placeholder [D-RSCH-21]
+- RSCH-096: For a realm of the Americas, F03 *Riding and pack animals* shall be a contact invention: it opens when exploration reports that realm's first contact with a realm from across the ocean, as F9 opens with the Atlantic crossing (RSCH-077). [D-RSCH-21]
+
+**Standing**
+- RSCH-097: A realm's **standing** shall be the latest era, from Ancient on, for which it knows at least a quarter of that era's inventions in scope and a quarter of every earlier era's (Ancient is the floor). A realm whose standing is earlier than the era of the current date is **behind the times** by the eras between. The standing is read by realm, AI and the Hordes design; it changes nothing by itself. @placeholder [D-RSCH-21]
+
+**Starting knowledge**
+- RSCH-098: Every map nation shall belong to exactly one **start group** (§5.11). It starts knowing the root, the four boughs, its group's past inventions and Era I and II inventions, plus its own additions, minus its own removals; nothing else, and no study under way. Start labels (`start_regions`) stay on the rows as history notes and no longer decide the start. [D-RSCH-21]
+- RSCH-099: A start set shall be complete: every invention in it has its parent (or an alternative) and everything it also needs in the same set; a data check refuses a start set that is not. [D-RSCH-21]
+
+### 5.10a Tree, queue and selection on one screen (18 October 2026, Leroy, feedback 113)
+
+- RSCH-107: The Learning tab shall open on one screen holding the tree, the study queue and what is selected together; Schools is a second part reached by one button in the tab's header, so studying never needs a second part. The queue sits as a strip along the top: the current study (two with an academy) with its progress bar and time left, then the queued inventions in order, each a 44-point chip with its time; the selected invention's sheet stands beside the tree (500 points wide or more) or below the queue strip, otherwise; with nothing picked, the sheet shows the current study. [Leroy 18 Oct, feedback 113, X-19]
+- RSCH-108: A realm shall keep a **study queue** of up to 5 inventions after its current study. When a study is learned, the first queued invention whose needs are now known becomes the current study at once, with no progress lost and no alert asking to choose; the "choose the next study" alert of RSCH-089 comes only when the queue is empty. A queued invention whose needs are no longer met when its turn comes is skipped and stays in the queue, marked waiting. @placeholder [feedback 113, D-RSCH-22]
+- RSCH-109: An invention's sheet shall carry one action that fits it: Study now (nothing being studied), Add to queue (its needs are known or queued ahead of it), or Queue the path (its needs are not yet met: the missing needs, in an order that can be studied, then the invention, with the total scholar-years and time shown before the tap); a known invention has no action. Study now never drops progress; replacing the current study stays the explicit Switch to this study of RSCH-086. If the path would make the queue longer than 5, the sheet says so and queues none of it. [feedback 113, D-RSCH-22]
+- RSCH-110: In the tree, queued inventions shall carry their place number (1 to 5) and a path being considered (the picked invention's missing needs) shall be drawn highlighted, so the player sees in the tree what the queue will study. In the queue strip, tapping a chip selects it in the tree; dragging a chip (or its ◀ ▶ buttons, 44 points each) changes the order, and ✕ removes it. [feedback 113, X-19]
+- RSCH-111: In the Tall layout the screen stacks the queue strip (scrolling sideways inside itself only), the tree frame, and the sheet as a panel that slides up from the bottom when something is picked and closes with its own ✕; nothing scrolls the page sideways and every chip and button is at least 44 points. [feedback 113, X-19, RSCH-106]
+
+### 5.11 Start groups (18 October 2026)
+
+The start of every one of the 137 map nations. The standing column is what RSCH-097 gives with these sets.
+Past inventions by id (RSCH-092); Era I and II by the ids of §5.8. The Hordes, African start and tribal designs
+may move realms between groups or change a group's set; this table is the data they change.
+
+| Group | Realms | Past inventions known (of 13) | Era I and II inventions known | Standing in 1444 |
+|---|---|---|---|---|
+| Latin Christendom (`latin`) | england, scotland, ireland, france, burgundy, brittany, provence, savoy, lorraine, navarre, castile, aragon, portugal, milan, venice, genoa, florence, modena, papal_states, naples, austria, bohemia, bavaria, wurttemberg, palatinate, cologne, hesse, saxony, brandenburg, luneburg, hamburg, mecklenburg, pomerania, switzerland, teutonic_order, livonian_order, denmark, sweden, norway, poland, lithuania, hungary, ragusa, cyprus, knights_of_rhodes | all 13 | B1, F1, F4, F5, C1, C2, W2, W3, G1, G2, G5, L1, S1 | Era I |
+| Orthodox Europe (`orthodox`) | byzantium, moldavia, wallachia, serbia, bosnia, albania, georgia, trebizond, muscovy, novgorod, pskov, tver, ryazan | all but L01 | B1, F1, F4, F5, C1, C2, W2, G1, G2, G5, L1 | Era I |
+| Islamic heartlands (`islamic`) | ottomans, karaman, candar, dulkadir, aq_qoyunlu, qara_qoyunlu, shirvan, mamluks, hejaz, yemen, oman, timurids, granada, morocco, tlemcen, tunis | all but F02 | B1, C1, C2, C4, F3, F4, F5, G1, G5, L1, L2, T1, W1, W2 | Era I |
+| Settled khanates (`khanates`) | kazan, crimea, uzbek_khanate | F01, F03, B01, B02, C01, G01, T01 | B1, C1, G1, L1, L2, T1, W1, F11 | Ancient |
+| Steppe hordes (`hordes`) | great_horde, nogai, moghulistan, oirat, mongols, jurchens | F03, B01, C01, G01 | G1, W1, F11 | Ancient |
+| Himalaya (`himalaya`) | tibet | F01, F03, B01, B02, C01, G01, T01 | B1, C1, G1, G5, L1 | Ancient |
+| South Asia (`south_asia`) | delhi, jaunpur, bengal, bahmanis, vijayanagar, gujarat, malwa, mewar, orissa, gondwana, kashmir, multan, sindh, ahom | all but F02 | B1, C1, C2, C4, F4, F5, G1, G2, G5, L1, W1, W2, L9 | Era I |
+| China (`china`) | ming | all 13 | B1, B2, B3, C1, C2, C3, C4, F2, F4, F5, F7, G1, G3, G4, L1, L2, L3, L5, T4, W3, W4, W5, S1, S2, L9 | Era I |
+| Korea (`korea`) | korea | all 13 | B1, C1, C2, C3, F2, F4, F5, F7, G1, G3, G4, G5, L1, L4, L5, S1, S2, W3 | Era I |
+| Japan (`japan`) | japan | all but F02, C03 | B1, C1, C2, C4, F2, F4, F5, G1, G2, G5, L1, S1, S2, W2 | Era I |
+| Mainland Southeast Asia (`se_mainland`) | dai_viet, champa, lan_xang, lan_na, ayutthaya, khmer, ava, pegu | all but F02, L01, S02 | B1, C1, C2, C4, F2, F4, G1, G5, L1 | Medieval / Era I |
+| Maritime Southeast Asia (`se_maritime`) | majapahit, malacca, brunei | all but F02, L01, S02 | C1, C4, F2, F4, G1, G5, L1, S2, S3, T5 | Era I |
+| Christian Horn (`horn`) | ethiopia | F01, F03, B02, C01, G01 | B1, C1, G1, G5, L1 | Ancient |
+| Swahili and Somali coast (`swahili_somali`) | adal, ajuran, kilwa | F03, B02, C01, G01, T01, S01 | C1, F4, G1, L1, L2, S2, T5 | Ancient |
+| Sahel empires (`sahel`) | mali, songhai, jolof, kano, kanem_bornu | F03, C01, G01 | B4, C1, F4, G1, L1, L2, T1, L9 | Ancient |
+| Volta kingdoms (`volta`) | mossi | F03, C01 | B4 | Ancient |
+| Forest and plateau Africa (`forest_africa`) | benin, kongo, mutapa | C01 | B4, F4 | Ancient |
+| Mesoamerica (`mesoamerica`) | aztecs, zapotec, maya, purepecha | B02, G01 | F4, G1, L1, F9 | Ancient |
+| Andes (`andes`) | inca, chimu, muisca | B02, S01 | F3, F4, G6, F9 | Ancient |
+| North American peoples (`north_america`) | iroquois, huron, cherokee, creek, pueblo | none | F4, F9 | Ancient |
+
+| Realm | Also knows | Does not know |
+|---|---|---|
+| adal | F01 | — |
+| ajuran | B1 | — |
+| aragon | S2, T2, T3 | — |
+| ayutthaya | S2 | — |
+| aztecs | F6 | — |
+| bahmanis | L2 | — |
+| bengal | L2, S1, S2 | — |
+| benin | L9 | — |
+| bohemia | W4 | — |
+| brunei | L2 | — |
+| burgundy | T2, T3, F8 | — |
+| byzantium | L01, S1, S2, G3, T2 | — |
+| castile | S2, S4, F11 | — |
+| champa | S2 | — |
+| chimu | — | G6 |
+| cologne | T2, T3 | — |
+| cyprus | S2 | — |
+| dai_viet | C3, G4, W3 | — |
+| delhi | L2 | — |
+| florence | T2, T3 | — |
+| genoa | T2, T3, S2, S4 | — |
+| gondwana | — | C03 |
+| granada | S1, S2 | — |
+| gujarat | L2, S1, S2, T5 | — |
+| hamburg | T2, T3 | — |
+| hejaz | F11 | — |
+| hungary | W4 | — |
+| inca | B1, B2, F6, L1 | — |
+| jaunpur | L2 | — |
+| jurchens | F01 | — |
+| kashmir | L2 | — |
+| kilwa | B1 | — |
+| knights_of_rhodes | S2 | — |
+| luneburg | T2, T3 | — |
+| majapahit | B1 | — |
+| malacca | L2 | — |
+| mali | B2 | — |
+| malwa | L2 | — |
+| mamluks | C5, S1, S2, T2, F11 | — |
+| maya | L01 | — |
+| milan | T2, T3 | — |
+| modena | T2 | — |
+| morocco | S1, S2 | — |
+| muisca | — | B02, S01 |
+| multan | L2 | — |
+| muscovy | W4 | — |
+| mutapa | B02 | — |
+| naples | S2 | — |
+| navarre | F11 | — |
+| oman | T5, S1, S2, F11 | — |
+| ottomans | B2, G3, S1, S2, W3, W5, C5, L9 | — |
+| papal_states | T2 | — |
+| pegu | S2, T5 | — |
+| portugal | S2, S4 | — |
+| provence | S2 | — |
+| pueblo | B02, F3 | — |
+| purepecha | — | G01, G1, L1 |
+| ragusa | T2, S2 | — |
+| scotland | W6 | — |
+| sindh | L2 | — |
+| switzerland | W6 | — |
+| timurids | L3, W3 | — |
+| tunis | S1, S2 | — |
+| venice | T2, T3, C5, G3, S2 | — |
+| vijayanagar | S1, S2, T5 | — |
+| yemen | T5, S1, S2, F11 | — |
+
+What the groups give in 1444: Latin, Orthodox, Islamic, South Asian and East Asian realms stand in Era I with 23 to
+38 inventions, maritime Southeast Asia in Era I with 21, and mainland Southeast Asia is split between Medieval and Era I; the khanates, hordes, Tibet, the Horn,
+the Swahili coast and the Sahel stand in Ancient with 7 to 15; Forest Africa stands in Ancient with 3 or 4 (iron but no
+horses), and Mesoamerica, the Andes and North America in Ancient with 2 to 10, without iron or horses. No African realm south of the Sahara starts with B1 *Stone
+castles*: they defend with B4 earthworks until they learn dressed stone.
+
+### How the player uses the one tree
+- RSCH-100: The Tree part of the Learning tab shall draw the whole tree as one picture, never one bough at a time: the root *Settled life* at the left, then a column per era (Ancient, Medieval, I to VII), and the four boughs as four horizontal bands of the same picture, each with its name pinned at the left edge while the tree scrolls. The era headings stay pinned along the top, the era of the current date marked "Now". Parent lines are always drawn, across bands too; an "also needs" line, in any band, is drawn only for the picked invention, highlighted, and its sheet lists them. This replaces the bough tabs of RSCH-084. [Leroy 18 Oct, X-19]
+- RSCH-101: The tree shall have two zoom levels: **Close up**, with named 44-point nodes, and **Whole tree**, where the full tree fits the frame, each invention a dot in its state's colour and each band and era labelled, so the player sees at a glance how far each bough reaches. A Whole tree / Close up button and a pinch inside the frame switch levels; tapping a place in the Whole tree opens Close up there. [X-19]
+- RSCH-102: Above the tree a row of 44-point chips shall jump to what matters, opening its sheet: "My study", "Can study ◆ n" (each tap the next one), and, while the realm lacks any, "Catch up n" (each tap the next past invention it can study). [X-19]
+- RSCH-103: The Learning overview shall show the realm's standing next to the era: "Era I · abreast of the times", or "Ancient · behind the times by 2 eras · 9 past inventions to catch up", which opens the tree at the first one. A past invention's sheet says what it opens and its "Without it" line (RSCH-094). [X-19]
+- RSCH-104: Another realm's country card shall show its standing and how many inventions it knows that the player's realm does not; those are the ones it makes cheaper as a neighbour or trade partner (RSCH-034). [X-19]
+- RSCH-105: The nation picker at the start of a campaign shall show each realm's standing ("Starts in Ancient", "Starts in Era I") next to its name, so the player knows a realm starts behind before choosing it; the game shell places it. [X-19]
+- RSCH-106: The one tree shall work on a phone in landscape and in the Tall layout: inside the safe areas; the tree frame takes the tab's full width; in Wide the band names sit in a pinned column, in Tall (under 500 points wide) they shrink to a coloured strip with the bough's first letter; nodes, chips and the zoom button at least 44 points; dragging scrolls inside the frame and the page never scrolls sideways; nothing needs hover; the sheet stands beside the tree where the tab is at least 500 points wide, otherwise above it (RSCH-090). [X-19, SHELL-108, SHELL-109, SHELL-114]
 
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
 |---|---|---|---|---|
 | SetStudy(invention) | player / AI | Eligible (parent, or, also needs, contact, scope) | Becomes the current study | StudyChanged |
+| SetQueue(inventions) | player / AI | At most 5; each eligible once those before it are known | Replaces the study queue | QueueChanged |
 | SetSecondStudy(invention) | player / AI | Has an academy-level school; eligible | Second study set | StudyChanged |
 | SetSeatsToFill(school or realm, n) | player / AI | n ≤ seats; recruits available | Students enrolled from recruits | StudentsEnrolled |
 | CallStudentsToArms() | player / AI | Students enrolled | Schools emptied into recruits; research stops | StudentsCalledToArms |
@@ -375,7 +543,8 @@ they did by then; L23 and L24 are dropped (D-RSCH-1).
 | Event | When | Payload | Consumed by |
 |---|---|---|---|
 | InventionLearned | Progress reaches cost; stolen; start | country, invention | province (unlocks), buildings, warfare, trade, exploration, diplomacy, government, realm (Technology score), events |
-| StudyChanged | Command | country, invention(s) | AI, game-shell |
+| StudyChanged | Command; next queued study starts | country, invention(s) | AI, game-shell |
+| QueueChanged | SetQueue | country, inventions | game-shell |
 | StudentsEnrolled / StudentsCalledToArms | Commands | country, count | realm (recruits), province |
 | StudentsGraduated | After 5 years | country, count, path | realm, province (officials) |
 | SchoolSacked / SchoolClosed | War, unpaid upkeep, religious change | province, school | province, buildings |
@@ -390,7 +559,7 @@ they did by then; L23 and L24 are dropped (D-RSCH-1).
 - When exploration or events report a contact event, then open the matching contact inventions.
 - When province reports famine or plague, then lose students and scholars there.
 - When warfare reports an occupied enemy province with an open school, then each current study the enemy knows gains 10 % of its cost, once per province per war (RSCH-071).
-- A neighbour of the same tongue family counts once, like any other neighbour (D-RSCH-8: culture's request to count it double is not taken).
+- A neighbour of the same language family counts once, like any other neighbour (D-RSCH-8: culture's request to count it double is not taken).
 
 ## 9. Monthly step
 
@@ -406,8 +575,8 @@ On era boundaries (by date): costs of studying ahead change.
 
 | Key | Meaning | Value in the design | Placeholder? | Config file |
 |---|---|---|---|---|
-| research.era_cost | Scholar-years by era | I 20, II 40, III 80, IV 150, V 250, VI 400, VII 650, VIII 1000 | yes | research config |
-| research.era_dates | Era start years | I 1444, II 1500, III 1600, IV 1700, V 1800, VI 1870, VII 1914 (cut 31 Aug 1939), VIII 1960 | no | research config |
+| research.era_cost | Scholar-years by era | A 10, M 15, I 20, II 40, III 80, IV 150, V 250, VI 400, VII 650, VIII 1000 | yes | research config |
+| research.era_dates | Era start years | A before 600, M 600, I 1444, II 1500, III 1600, IV 1700, V 1800, VI 1870, VII 1914 (cut 31 Aug 1939), VIII 1960 | no | research config |
 | research.ahead_multiplier | Cost per era ahead | ×2 | yes | research config |
 | research.spread_per_partner | Discount per neighbour or trade partner | 10 % | yes | research config |
 | research.spread_cap | Maximum discount | 60 % | yes | research config |
@@ -416,7 +585,7 @@ On era boundaries (by date): costs of studying ahead change.
 | research.graduation_years | Years to graduate | 5 | yes | research config |
 | research.studies_with_academy | Studies at once with academy-level school | 2 | yes | research config |
 | research.school_seats | Seats per school type | temple/monastery 20, madrasa 30, university 60, academy 100 | yes | research config / buildings config |
-| inventions[] | One row per invention: `id`, `parent`, `also_needs`, `era`, `unlocks`, `start_regions` | 174 rows (§5.8) | era costs placeholder | research tree config |
+| inventions[] | One row per invention: `id`, `parent`, `also_needs`, `era`, `unlocks`, `start_regions` | 174 rows (§5.8) and 13 past rows (RSCH-092) | era costs placeholder | research tree config |
 | dropped_inventions | Era VII inventions never studied | L23, L24 | no | research.json |
 | research_months_per_year | Monthly steps a year's progress is split over | 12 | yes | research.json |
 | second_study_share | Share of scholar-years each of two studies gets | 0.5 | yes | research.json |
@@ -426,7 +595,13 @@ On era boundaries (by date): costs of studying ahead change.
 | sack_chance_pct, sack_scholars_flee_share | Sack chance and share of scholars who flee | 25 %, half | yes | research.json |
 | poach_gold_ratio, poach_one_in | Gold ratio for poaching, share poached | 2×, 1 in 20 | yes | research.json |
 | old_age_one_in | Scholars lost to old age a year | 1 in 30 (1 in 60 with L10) | yes | research.json |
-| start_region_members, start_extra | Which map nations each start label covers; extra start inventions | table | yes | research.json |
+| start_groups | Per group: members, past inventions, Era I and II inventions (§5.11) | 20 groups | yes | research.json |
+| start_add, start_remove | Per realm: inventions added to or removed from its group's set (§5.11) | table | yes | research.json |
+| without | What lacking F01, F03, B01, C01 costs (RSCH-094) | F01 −1 harvest step; F03 no horse regiments or caravans; B01 half the food carried; C01 −20 % strength | yes | research.json |
+| queue_length | Inventions a study queue holds after the current study | 5 | yes | research.json |
+| standing_share | Share of an era's inventions that gives standing in it | 0.25 | yes | research.json |
+| regional_contacts | Inventions that open only on a contact for the realms of some start groups | F03 on first contact across the ocean for mesoamerica, andes and north_america (RSCH-096); F9's contact stays on its row (RSCH-077) | no | research.json |
+| past_eras, era_names | The eras before 1444 and their names | A Ancient, M Medieval | no | research.json |
 
 The file is `packages/rules/data/domain/research.json`; its `_provisional` list names the provisional values.
 
@@ -449,12 +624,17 @@ The file is `packages/rules/data/domain/research.json`; its `_provisional` list 
 | religion | upstream | Customer–Supplier | A change of faith closes the other faith's schools |
 | national-strengths | upstream | Conformist | `invention_cost_pct`, `knows` levers |
 | events | upstream | Anti-Corruption Layer | ★ ids for `tech_*`/`innovation`; `literacy`; contact events |
-| scenario-setup | upstream | Customer–Supplier | Map nations; research data maps each start label to nations (D-RSCH-11) |
+| scenario-setup | upstream | Customer–Supplier | Map nations; each belongs to one start group in the research data (RSCH-098, D-RSCH-21) |
+| warfare, recruiting | downstream | Customer–Supplier | Without C01 regiments fight 20 % weaker; without F03 no horse regiments (RSCH-094) |
+| troop-movement | downstream | Customer–Supplier | Without B01 armies carry half the food (RSCH-094) |
+| province | downstream | Customer–Supplier | Without F01 farmland harvests one step worse (RSCH-094) |
+| game-shell | downstream | Customer–Supplier | Each realm's standing for the nation picker and country cards (RSCH-104, RSCH-105) |
 | time-and-turns | upstream | Conformist | Current date for eras and studying ahead; campaign end 31 August 1939 |
 
 ## 12. AI
 
 - An isolationist AI fills its schools and avoids war; a hegemon seeker keeps recruits for the army instead of students (country stats §11).
+- A realm behind the times studies its missing past inventions first, since they cost least (RSCH-095, RSCH-078).
 - The AI studies the eligible invention that costs it least now, ties by id; it fills every seat in peace, none at war, and calls students to arms only at war with no recruits left (RSCH-078, D-RSCH-14).
 
 ## 13. Decisions and open questions
@@ -477,8 +657,10 @@ The file is `packages/rules/data/domain/research.json`; its `_provisional` list 
 - **D-RSCH-16** (was OQ-RSCH-16) Guano: F16's +1 harvest step lasts 30 years from the year it is learned and then simply ends; F19 gives its own +2. The plain reading of "for 30 years".
 - **D-RSCH-17** (was OQ-RSCH-17) Examination system: without G4 only a new graduate may be made an official, of his school's types; with G4 a working scholar may be made an official of any type at any time. That is the one thing G4 adds to the general rule.
 - **D-RSCH-18** (17 Oct, milestone 4) Starting schools and scholars: the designs give none, so every realm starts with one school in its capital (a madrasa with L2, else a temple or monastery school, founded by the clergy where it knows neither L1 nor L2), half its seats filled with cohorts of the last five years, and 5 scholars (2 without L1 or L2). Research then moves from 1444 for every realm and graduations come every January, while no realm begins ahead of what it knows.
-- **D-RSCH-19** (17 Oct, milestone 4, first slice) Founding schools and switching studies: a school is founded from the Learning tab in a town (25,000 people, the map's town size, or the capital) for buildings' temple-school step (60 gold, 12 months, taken as treasury gold), a madrasa where the realm knows L2 since buildings gives that step no cost; choosing another study drops the progress on the old one. One study at a time; the academy's second study, stealing, sacking, poaching, foreign scholars and contact events wait for later slices. The simplest rules that let the player act now; the buildings context will take schools into its build list.
-- **D-RSCH-20** (17 Oct, Leroy's feedback 88) The Learning tab shows the tree: the first tab listed the inventions open to study by era, which hid the tree and read as if any invention could be picked, among too many controls. Now the tab is an overview plus two parts, Tree (drawn bough by bough; Study only on an invention whose needs are known, a locked one saying what to learn first) and Schools (seats, students to arms, schools, founding). The rules of what may be studied are unchanged (RSCH-031, RSCH-033).
+- **D-RSCH-19** (17 Oct, milestone 4, first slice) Founding schools and switching studies: a school is founded from the Research tab in a town (25,000 people, the map's town size, or the capital) for buildings' temple-school step (60 gold, 12 months, taken as treasury gold), a madrasa where the realm knows L2 since buildings gives that step no cost; choosing another study drops the progress on the old one. One study at a time; the academy's second study, stealing, sacking, poaching, foreign scholars and contact events wait for later slices. The simplest rules that let the player act now; the buildings context will take schools into its build list.
+- **D-RSCH-20** (17 Oct, Leroy's feedback 88) The Research tab shows the tree: the first tab listed the inventions open to study by era, which hid the tree and read as if any invention could be picked, among too many controls. Now the tab is an overview plus two parts, Tree (drawn branch by branch; Study only on an invention whose needs are known, a locked one saying what to learn first) and Schools (seats, students to arms, schools, founding). The rules of what may be studied are unchanged (RSCH-031, RSCH-033).
+- **D-RSCH-21** (18 Oct, Leroy) One tree reaching back before 1444, and start groups: Leroy asked for one single tree, not the four branch tabs, reaching further into the past so some countries start behind, and for each kingdom's starting technologies. The tree is now drawn as one picture with the branches as bands and a whole-tree zoom (RSCH-100 to RSCH-106); two eras before 1444 add 13 past inventions that Era I rows now need (RSCH-091 to RSCH-096); a realm that lacks one plays below the 1444 baseline, so realms that know them play exactly as today and only the laggards change. Start labels gave thin, uneven sets (France knew 12 inventions, Kongo knew stone castles), so every map nation now belongs to one of 20 start groups with complete sets (RSCH-098, RSCH-099, §5.11), and a realm's standing names how far behind it starts (RSCH-097). Penalties, costs and the standing share are provisional for the balancing model; the Hordes, African start and tribal designs tune their groups.
+- **D-RSCH-22** (18 Oct, Leroy's feedback 113) Tree, queue and selection on one screen: the Research tab still split the tree from the action, and a realm could only hold one study, so each invention ended in an alert and a fresh choice. Now one screen holds the queue strip, the tree and the selected invention's sheet (RSCH-107, RSCH-111); a queue of 5 carries on by itself (RSCH-108); Queue the path lets the player tap a far invention and get every step to it (RSCH-109); the tree shows queue places (RSCH-110). The AI keeps choosing one study at a time (RSCH-078). The queue length is provisional.
 
 ## 14. Traceability
 
@@ -512,14 +694,14 @@ Every requirement has at least one scenario. The invention list (§5.8) is check
 | RSCH-034 | cost-and-eligibility.feature | Spread from neighbours and trade partners |
 | RSCH-035 | cost-and-eligibility.feature | Contact inventions need a contact event |
 | RSCH-036 | cost-and-eligibility.feature | Inventions that change research itself |
-| RSCH-040 | invention-tree.feature | One root, four boughs, letters are only labels |
-| RSCH-041 | invention-tree.feature | One root, four boughs, letters are only labels |
+| RSCH-040 | invention-tree.feature | One root, four branches, letters are only labels |
+| RSCH-041 | invention-tree.feature | One root, four branches, letters are only labels |
 | RSCH-042 | invention-tree.feature | The tree holds 174 inventions |
 | RSCH-042 | invention-tree.feature | Inventions unlock what their row says |
 | RSCH-043 | invention-tree.feature | Event-tree inventions keep their ids |
 | RSCH-044 | invention-tree.feature | A new invention is one config row |
 | RSCH-045 | invention-tree.feature | Scope of eras |
-| RSCH-050 | starting-knowledge.feature | Everyone knows the root and the boughs |
+| RSCH-050 | starting-knowledge.feature | Everyone knows the root and the branches |
 | RSCH-051 | starting-knowledge.feature | Historical starting inventions |
 | RSCH-060 | research-readers.feature | Literacy reads scholars and schools per thousand people |
 | RSCH-061 | research-readers.feature | The Technology score reads inventions weighted by era cost |
@@ -547,3 +729,11 @@ Every requirement has at least one scenario. The invention list (§5.8) is check
 | RSCH-081 | schools-and-students.feature | Who may be made an official |
 | RSCH-084 … RSCH-090 | — | Client screens; checked by apps/client/scripts/research-shots.mjs (tap targets, no sideways scroll) |
 | RSCH-082, RSCH-083 | — | Wiring of the first slice; checked by packages/engine/test/research.test.ts |
+| RSCH-091, RSCH-092, RSCH-093, RSCH-095 | past-eras.feature | Two eras before 1444; Past inventions open the Era I rows; A past invention is cheap and spreads |
+| RSCH-094 | past-eras.feature | Without a past invention a realm plays below the baseline |
+| RSCH-096 | past-eras.feature | Horses reach the Americas only by contact |
+| RSCH-097 | past-eras.feature | Standing |
+| RSCH-098, RSCH-099 | start-groups.feature | Every realm starts from its group; Start sets are complete; Who starts behind |
+| RSCH-100 … RSCH-106 | — | Client screens; checked by apps/client/scripts/research-shots.mjs and apps/client/src/ui/learning.test.ts (one picture, zoom, tap targets, no sideways scroll) |
+| RSCH-108, RSCH-109 | study-queue.feature | The next queued study starts by itself; Queue the path; A full queue takes no path |
+| RSCH-107, RSCH-110, RSCH-111 | — | Client screens; checked by apps/client/scripts/research-shots.mjs |

@@ -6,9 +6,10 @@ import { harvestClimate, harvestMonth, harvestMonthsAt, rollBaseHarvest, rotSeas
 import { knownSet } from "./research.ts";
 import { officialBonus } from "./officials.ts";
 import { worksFood } from "./works.ts";
-import { atHarvest, FOOD_CLASSES, huntingYear } from "./land.ts";
+import { atHarvest, FOOD_CLASSES, huntingYear, wearYear } from "./land.ts";
 import { shareFood } from "./castleFood.ts";
 import { provinceConfig } from "./domain/province/model.ts";
+import { heritageSteps } from "./heritage.ts";
 
 /** The most of a province a year's famine takes (feedback 93). */
 const FAMINE_YEAR_SHARE = provinceConfig.famine.year_share;
@@ -110,6 +111,17 @@ function regionOf(world: World, p: number): number {
   return Math.floor((lat + 90) / 10) * 64 + Math.min(63, Math.max(0, Math.floor(((def.x ?? 0) / width) * 36)));
 }
 
+/** One dispatch per realm for the harvests that failed this harvest month, naming them (REALM-220). */
+export function reportFailedHarvests(world: World, failed: readonly number[], news: News[]): void {
+  const byOwner = new Map<number, number[]>();
+  for (const p of failed) byOwner.set(world.provinceOwner[p]!, [...(byOwner.get(world.provinceOwner[p]!) ?? []), p]);
+  for (const [owner, ps] of byOwner) {
+    const names = ps.slice(0, 3).map((p) => world.rules.provinces[p]!.name);
+    const list = names.length > 1 && ps.length <= 3 ? `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}` : names.join(", ");
+    news.push({ kind: "famine", text: `The harvest failed in ${list}${ps.length > 3 ? ` and ${ps.length - 3} more` : ""}`, nations: [owner], province: ps[0]! });
+  }
+}
+
 /**
  * The monthly food step: harvests where this is the harvest month, the
  * month's catch and herds, eating, seasonal rot, then famine and relief.
@@ -122,6 +134,8 @@ export function monthlyFood(world: World, news: News[]): void {
     world.provinceStarved.fill(0);
     // The hunting year: game regrows or thins, and the north rolls its winters (feedback 81).
     huntingYear(world, (p) => regionOf(world, p));
+    // The wearing year: overworked fields wear, rested ones recover (PROV-034, PROV-035).
+    wearYear(world);
   }
 
   // Harvests: each province rolls its own, then its region's weather (rolled once, read by each climate) and war move it a band.
@@ -138,7 +152,8 @@ export function monthlyFood(world: World, news: News[]): void {
     // Hostile armies in the province burn or eat the crop: one band worse.
     const war = world.provinceOccupier[p]! >= 0 || world.sieges.has(p) ? -1 : 0;
     // Inventions give harvest steps, each a band better (PROV-295).
-    const steps = world.provinceOwner[p]! >= 0 ? world.researchHarvest[world.provinceOwner[p]!]! : 0;
+    // Heritage adds its own (harvest_steps).
+    const steps = world.provinceOwner[p]! >= 0 ? world.researchHarvest[world.provinceOwner[p]!]! + heritageSteps(world, world.provinceOwner[p]!, "harvest_steps") : 0;
     const base = HARVESTS.indexOf(rollBaseHarvest(world.rng));
     const roll = Math.max(0, Math.min(HARVESTS.length - 1, base + weather + war + steps));
     world.provinceHarvest[p] = roll;
@@ -149,13 +164,7 @@ export function monthlyFood(world: World, news: News[]): void {
     // Farms raise the harvest (works). Two harvests a year bring half the year's food each.
     store[p] = store[p]! + worksFood(world, p, "farmers") * harvestMultiplier(HARVESTS[roll]!) * (12 / months.length) * steward;
   }
-  // One dispatch per realm for its failed harvests.
-  const byOwner = new Map<number, number[]>();
-  for (const p of failed) byOwner.set(world.provinceOwner[p]!, [...(byOwner.get(world.provinceOwner[p]!) ?? []), p]);
-  for (const [owner, ps] of byOwner) {
-    const names = ps.slice(0, 3).map((p) => world.rules.provinces[p]!.name).join(", ");
-    news.push({ kind: "famine", text: `The harvest failed in ${names}${ps.length > 3 ? ` and ${ps.length - 3} more` : ""}`, nations: [owner], province: ps[0]! });
-  }
+  reportFailedHarvests(world, failed, news);
 
   const season = month % 3 === 0;
   for (let p = 0; p < P; p++) {

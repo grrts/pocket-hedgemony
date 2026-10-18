@@ -4,11 +4,18 @@ import { allNationPay, ungoverned } from "./recruit.ts";
 import { emptyProvinceEffect } from "./domain/recruiting/index.ts";
 import { interestPct, loanCap, realmConfig } from "./domain/realm/index.ts";
 import { moodShare } from "./moods.ts";
+import { taxCapped, taxRaised } from "./rebels.ts";
 import { crownShare, inAnyWar, loyaltyStep } from "./lords.ts";
 import { officialBonus } from "./officials.ts";
 import { schoolUpkeepMonthly } from "./research.ts";
-import { provinceUpkeep, worksTrade } from "./works.ts";
-import { TRIBUTE_SHARE, tributaries } from "./statecraft.ts";
+import { provinceUpkeep } from "./works.ts";
+import { tradeLine, tradeTaxFactor } from "./trade.ts";
+import { subjectPayments } from "./subjects.ts";
+import { heritageFactor, heritageTaxReach } from "./heritage.ts";
+import { navyCosts } from "./navy.ts";
+import { governorWages } from "./colonies.ts";
+import { W as WARFARE } from "./domain/warfare/index.ts";
+import { empireDues, empireTax } from "./institutions.ts";
 
 /**
  * Tax rates and the treasury ledger (milestone 3): each province pays at its
@@ -23,7 +30,7 @@ export const NORMAL_TAX = 2;
 const HEAVY_TAX = 3;
 
 /** Lines of the ledger, in the order the snapshot sends them. */
-export const LEDGER = ["tax", "trade", "army pay", "officials", "interest", "works", "schools", "grain", "tribute"] as const;
+export const LEDGER = ["tax", "trade", "army pay", "officials", "interest", "works", "schools", "grain", "tribute", "navy"] as const;
 export const LEDGER_LINES = LEDGER.length;
 const TAX = 0;
 const TRADE = 1;
@@ -34,6 +41,7 @@ const WORKS_UPKEEP = 5;
 const SCHOOLS = 6;
 const GRAIN = 7;
 const TRIBUTE = 8;
+const NAVY = 9;
 
 /** Nothing invented yet: interest and loan caps are the realm context's for a realm without banks. */
 const KNOWN: ReadonlySet<string> = new Set();
@@ -86,20 +94,27 @@ export function provinceTax(world: World, p: number, holder: number, share = cro
   const { economy } = world.rules.defines;
   // A tax collector brings more of it in (province officials table: +20 % reaching you).
   const collector = officialBonus(world, p, "Tax collector", "tax_reach");
-  return world.provincePopulation[p]! * economy.goldPerThousandPeoplePerMonth * taxFactor(world, taxRateOf(world, p, holder)) * share * collector;
+  // Restricted faiths pay a quarter more on their share, Persecuted ones nothing (RELG-050, RELG-052); heritage may raise or lower what reaches the holder (tax_reach_pct, HER-078).
+  // A busy province owes more: 1 % for every 4 points of its trade ratio (TRADE-088).
+  return world.provincePopulation[p]! * economy.goldPerThousandPeoplePerMonth * taxFactor(world, taxRateOf(world, p, holder)) * share * collector * world.provinceFaithTax[p]! * heritageTaxReach(world, p) * tradeTaxFactor(world, p);
 }
 
-/** Trade and market gold a province gives its holder in a month (not taxed by rate). */
-export function provinceTrade(world: World, p: number, share = crownTake(world, p)): number {
-  // A customs officer raises what trade brings (province officials table: +15 %).
-  const customs = officialBonus(world, p, "Customs officer", "trade_ratio_gain");
-  // Markets, harbours and roads bring more (works).
-  return world.provinceWealth[p]! * world.rules.defines.economy.goldPerWealthPerMonth * share * customs * worksTrade(world, p);
+/**
+ * Tax a province sends whoever holds it this month: all of it to its owner, or, while it is
+ * occupied, `warfare.occupation.tax_share` of what it would pay its owner to the occupier; the
+ * rest is lost to the war (WAR-224, replacing the tax part of PROV-184).
+ */
+export function heldTax(world: World, p: number, share = crownTake(world, p)): number {
+  const holder = controller(world, p);
+  if (holder < 0) return 0;
+  const owner = world.provinceOwner[p]!;
+  if (holder === owner || owner < 0) return provinceTax(world, p, holder, share);
+  return provinceTax(world, p, owner, share) * WARFARE.occupation.tax_share;
 }
 
 /** Monthly interest on a realm's debt (REALM-164: 10 % a year). */
 export function monthlyInterest(world: World, n: number): number {
-  return (world.nationDebt[n]! * interestPct(KNOWN)) / 100 / 12;
+  return (world.nationDebt[n]! * interestPct(KNOWN) * heritageFactor(world, n, "loan_interest_pct")) / 100 / 12;
 }
 
 /**
@@ -117,30 +132,44 @@ export function runLedger(world: World, pay: boolean, only = -1): void {
     const owner = world.provinceOwner[p]!;
     if (only >= 0 && owner !== only && controller(world, p) !== only) continue;
     if (owner >= 0 && (only < 0 || owner === only)) {
-      if (world.provinceOfficial[p]! >= 0) L[owner * LEDGER_LINES + WAGES] = L[owner * LEDGER_LINES + WAGES]! - wage;
+      if (world.provinceOfficial[p]! >= 0) L[owner * LEDGER_LINES + WAGES] = L[owner * LEDGER_LINES + WAGES]! - wage * heritageFactor(world, owner, "official_wage_pct");
       // And the upkeep of its works (works).
       L[owner * LEDGER_LINES + WORKS_UPKEEP] = L[owner * LEDGER_LINES + WORKS_UPKEEP]! - provinceUpkeep(world, p);
     }
-    // An occupier collects the tax (WAR occupation: tax, recruits, food, trade).
+    // Whoever holds it collects the tax; an occupier only its share (WAR-224).
     const holder = controller(world, p);
     if (holder < 0 || (only >= 0 && holder !== only)) continue;
-    const share = crownTake(world, p);
-    L[holder * LEDGER_LINES + TAX] = L[holder * LEDGER_LINES + TAX]! + provinceTax(world, p, holder, share);
-    L[holder * LEDGER_LINES + TRADE] = L[holder * LEDGER_LINES + TRADE]! + provinceTrade(world, p, share);
+    L[holder * LEDGER_LINES + TAX] = L[holder * LEDGER_LINES + TAX]! + heldTax(world, p);
   }
-  // A Tributary sends its overlord a share of its tax and trade (SUBJ-005).
-  for (const [payer, receiver] of tributaries(world)) {
+  // Trade is what each realm's traders deposited last month, with market fees paid to it, less their upkeep (TRADE-064).
+  for (let n = 0; n < world.nationCount; n++) if (only < 0 || n === only) L[n * LEDGER_LINES + TRADE] = tradeLine(world, n);
+  // Each subject sends its overlord its kind's share, by tribute level and loyalty: a Vassal of its taxes, the rest of tax and trade (SUBJ-005).
+  for (const [payer, receiver, share, taxOnly] of subjectPayments(world)) {
     if (only >= 0 && payer !== only && receiver !== only) continue;
-    const gold = Math.max(0, L[payer * LEDGER_LINES + TAX]! + L[payer * LEDGER_LINES + TRADE]!) * TRIBUTE_SHARE;
+    const gold = Math.max(0, L[payer * LEDGER_LINES + TAX]! + (taxOnly ? 0 : L[payer * LEDGER_LINES + TRADE]!)) * share;
+    if (only < 0 || payer === only) L[payer * LEDGER_LINES + TRIBUTE] = L[payer * LEDGER_LINES + TRIBUTE]! - gold;
+    if (only < 0 || receiver === only) L[receiver * LEDGER_LINES + TRIBUTE] = L[receiver * LEDGER_LINES + TRIBUTE]! + gold;
+  }
+  // After the Common Tax each member pays the Emperor its share of the month's tax, on the tribute line (INST-045).
+  for (const [payer, receiver, share] of empireTax(world)) {
+    if (only >= 0 && payer !== only && receiver !== only) continue;
+    const gold = Math.max(0, L[payer * LEDGER_LINES + TAX]!) * share;
     if (only < 0 || payer === only) L[payer * LEDGER_LINES + TRIBUTE] = L[payer * LEDGER_LINES + TRIBUTE]! - gold;
     if (only < 0 || receiver === only) L[receiver * LEDGER_LINES + TRIBUTE] = L[receiver * LEDGER_LINES + TRIBUTE]! + gold;
   }
   const armyPay = allNationPay(world);
+  const navy = navyCosts(world);
+  const governors = governorWages(world);
   for (let n = only >= 0 ? only : 0; n < (only >= 0 ? only + 1 : world.nationCount); n++) {
     L[n * LEDGER_LINES + PAY] = -armyPay[n]!;
     L[n * LEDGER_LINES + SCHOOLS] = -schoolUpkeepMonthly(world, n);
+    L[n * LEDGER_LINES + NAVY] = -navy[n]!;
+    // Colonial governors are officials: their wages join the officials' line (EXPL-025).
+    L[n * LEDGER_LINES + WAGES] = L[n * LEDGER_LINES + WAGES]! - governors[n]!;
     // Grain sold to the treasury this month (REALM-026, castleFood.ts).
     L[n * LEDGER_LINES + GRAIN] = world.nationGrainGold[n]!;
+    // The Emperor's dues from the members come in with the tribute (INST-032).
+    L[n * LEDGER_LINES + TRIBUTE] = L[n * LEDGER_LINES + TRIBUTE]! + empireDues(world, n);
     sumLedger(world, n);
   }
   if (!pay) return;
@@ -178,7 +207,13 @@ export function setTax(world: World, n: number, province: number, rate: number, 
   if (!Number.isInteger(rate) || rate < -1 || rate >= TAX_RATES.length) return "no such tax rate";
   if (province < 0 && rate < 0) return "the realm needs a default rate";
   if (province >= 0 && (province >= world.provinceCount || world.provinceOwner[province] !== n)) return "not your province";
+  if (province >= 0) {
+    const capped = taxCapped(world, province, rate);
+    if (capped) return capped;
+  }
+  const was = province >= 0 ? taxRateOf(world, province, n) : world.nationTaxDefault[n]!;
   applyRate(world, n, province, rate, news);
+  if ((province >= 0 ? taxRateOf(world, province, n) : rate) > was) taxRaised(world, n, province);
   // The ledger shows the new sums at once.
   runLedger(world, false);
   return null;

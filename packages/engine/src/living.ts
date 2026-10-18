@@ -2,6 +2,7 @@ import type { World } from "./world.ts";
 import { birthRate, deathModifiers, deathRate } from "./domain/province/people.ts";
 import { CLASSES, type ClassName } from "./domain/province/model.ts";
 import type { News } from "./war.ts";
+import { heritageFactor } from "./heritage.ts";
 
 /**
  * A living realm (milestone 3): each province's people by class, born and
@@ -74,6 +75,21 @@ export function classesOf(world: World, p: number): Record<ClassName, number> {
   return out;
 }
 
+/**
+ * Takes `men` dead soldiers from a province's people: a levy takes every class by its share (X-7),
+ * so its dead come from every class by its share too (WAR-226). Returns the people taken, in thousands.
+ */
+export function takePeople(world: World, p: number, men: number): number {
+  const people = world.provincePopulation[p]!;
+  if (!(men > 0) || !(people > 0)) return 0;
+  const taken = Math.min(people, men / 1000);
+  const keep = 1 - taken / people;
+  const cls = world.provinceClasses;
+  for (let c = 0; c < CLASS_COUNT; c++) cls[p * CLASS_COUNT + c] = cls[p * CLASS_COUNT + c]! * keep;
+  world.provincePopulation[p] = people - taken;
+  return taken;
+}
+
 /** Yearly birth and death rates per class (province context PROV-100, PROV-103; clergy don't marry). */
 const BIRTHS = CLASS_NAMES.map((c) => birthRate(c));
 const DEATHS = CLASS_NAMES.map((c) => deathRate(c));
@@ -96,10 +112,13 @@ export function monthlyPeople(world: World, _news: News[]): void {
   for (let p = 0; p < world.provinceCount; p++) {
     if (world.provinceWater[p]) continue;
     const extra = atWar(world, p, fighting) ? war.everyone : 0;
+    // Heritage speeds or slows growth (growth_pct), never a decline.
+    const growth = heritageFactor(world, world.provinceOwner[p]!, "growth_pct");
     let total = 0;
     for (let c = 0; c < CLASS_COUNT; c++) {
       const i = p * CLASS_COUNT + c;
-      const rate = BIRTHS[c]! - DEATHS[c]! - extra;
+      const net = BIRTHS[c]! - DEATHS[c]! - extra;
+      const rate = net > 0 ? net * growth : net;
       cls[i] = Math.max(0, cls[i]! * (1 + rate / 12));
       total += cls[i]!;
     }

@@ -99,6 +99,7 @@ import {
   type Tie,
   type WarAnswer,
 } from "@ph/engine/domain/subjects";
+import { STEPS, aiRival, cardFromBelow, opensCard, payAgain, stopPaying, subjectCard, subjectsLens, turnTheTables, type RivalOverlord, type SubjectCard } from "@ph/engine/domain/subjects";
 import {
   breakSubjectPeace,
   breakSubjectWar,
@@ -283,7 +284,7 @@ Then("{string} is a lord of {string} with a lord card filled from the catalogue'
   expect(bonds(s).has(name)).toBe(false);
 });
 
-Given("the subject {string} is of the kind {string}", (s, name: string, kind: string) => {
+Given("the subject {string} is of the type {string}", (s, name: string, kind: string) => {
   bond(s, name, { kind: kindFromName(kind) });
 });
 
@@ -426,7 +427,7 @@ Then(/^"([^"]+)" owes "([^"]+)" (.+)$/, (s, _o: string, name: string, owed: stri
   expect(overlordOwes(bond(s, name).kind)).toEqual(OWED[owed]);
 });
 
-Then("its reasons include a kind drift of {int}", (s, drift: number) => {
+Then("its reasons include a type drift of {int}", (s, drift: number) => {
   const b = only(s);
   expect(kindDrift(b.kind)).toBe(drift);
   const r = reasonsOf(b, now(s)).find((x) => x.id === "drift");
@@ -526,7 +527,11 @@ Given(/^the subject "([^"]+)" is (Loyal|Wavering|Disloyal|In revolt)$/, (s, name
 
 When("the player opens the card of {string}", (s, name: string) => {
   const b = bond(s, name);
-  s.card = { reasons: currentReasons(s, name), buttons: cardButtons(b.overlord, b, now(s), { reachable: true, lordRoom: true }), bond: b };
+  const reasons = currentReasons(s, name);
+  const ctx = { reachable: true, lordRoom: true };
+  // The realm's own facts as the game reads them from the map (the design's Brittany: 6 provinces, 3,500 men, 180 gold).
+  const realm = { name, provinces: 6, army: 3500, treasury: 180, ownSubjects: [...bonds(s).values()].filter((x) => x.overlord === name).map((x) => x.subject) };
+  s.card = { reasons, buttons: cardButtons(b.overlord, b, now(s), ctx), bond: b, view: subjectCard(b, realm, reasons, payTribute(b, 100, 100), now(s), ctx) };
 });
 
 Then("every reason shows as a named badge pointing up or down", (s) => {
@@ -755,7 +760,7 @@ Then("{string} pays only a token", (s, name: string) => {
   expect(baseShare(bond(s, name))).toBe(0.01);
 });
 
-When("{string} counts its reach", (s, overlord: string) => {
+When("{string} counts its subjects against its subject limit", (s, overlord: string) => {
   s.weights = Object.fromEntries([...bonds(s).values()].filter((b) => b.overlord === overlord).map((b) => [b.subject, reachWeight(b, ownCount(s, b.subject))]));
 });
 
@@ -1086,15 +1091,15 @@ Given("the country {string} has the catalogue administrative capacity {string} a
   s.capacity = { [c]: capacity.replace(/\s+/g, "_") };
 });
 
-When("its reach is counted", (s) => {
+When("its subject limit is counted", (s) => {
   s.acted = true;
 });
 
-Then("the subject reach of {string} is {int}", (s, c: string, reach: number) => {
+Then("the subject limit of {string} is {int}", (s, c: string, reach: number) => {
   expect(reachFromCapacity(s.capacity[c], 0)).toBe(reach);
 });
 
-Given("the country {string} has a lord capacity and a subject reach", (s, c: string) => {
+Given("the country {string} has a lord capacity and a subject limit", (s, c: string) => {
   s.lordsOf = { [c]: 3 };
   s.reachBefore = reachFromCapacity("high", 0);
 });
@@ -1103,11 +1108,11 @@ When("{string} gains a lord", (s, c: string) => {
   s.lordsOf[c] += 1;
 });
 
-Then("its subject reach is unchanged", (s) => {
+Then("its subject limit is unchanged", (s) => {
   expect(reachFromCapacity("high", 0)).toBe(s.reachBefore);
 });
 
-Given("the country {string} has reach {int}", (s, c: string, reach: number) => {
+Given("the country {string} has a subject limit of {int}", (s, c: string, reach: number) => {
   s.reach ??= {};
   s.reach[c] = reach;
 });
@@ -1133,7 +1138,7 @@ function applyStretched(s: Scenario, overlord: string): void {
   }
 }
 
-Then("{string} uses {int} reach of {int}", (s, c: string, used: number, reach: number) => {
+Then("{string} uses {int} of its subject limit of {int}", (s, c: string, used: number, reach: number) => {
   if (!s.acted) {
     // As a Given: earlier fold-ins (the example's step) brought reach used down to this.
     const r = roster(s, c);
@@ -1155,7 +1160,7 @@ Given(new RegExp(`^"([^"]+)" is an? ${KIND} of "([^"]+)"$`), (s, name: string, k
   bond(s, name, { kind: kindFromName(kind), overlord });
 });
 
-When("the reach of {string} is counted", (s, overlord: string) => {
+When("the subject limit used by {string} is counted", (s, overlord: string) => {
   s.weights = Object.fromEntries(roster(s, overlord).map((e) => [e.bond.subject, reachWeight(e.bond, e.ownSubjects)]));
 });
 
@@ -1178,7 +1183,7 @@ Then("{string} has no buttons on {string}", (s) => {
   expect(s.card.buttons).toEqual([]);
 });
 
-Then("{string} counts nothing in the reach of {string} and pays it nothing", (s, name: string, overlord: string) => {
+Then("{string} counts nothing toward the subject limit of {string} and pays it nothing", (s, name: string, overlord: string) => {
   expect(roster(s, overlord).some((e) => e.bond.subject === name)).toBe(false);
   expect(bond(s, name).overlord).not.toBe(overlord);
 });
@@ -1792,7 +1797,7 @@ Then("{string} no longer counts against the lord capacity of {string}", (s, name
   expect(s.raised.country.name).toBe(name);
 });
 
-Then("{string} counts against the subject reach of {string}", (s, name: string, ruler: string) => {
+Then("{string} counts against the subject limit of {string}", (s, name: string, ruler: string) => {
   expect(roster(s, ruler).map((e) => e.bond.subject)).toContain(name);
   expect(reachUsed(roster(s, ruler))).toBe(1);
 });
@@ -1815,7 +1820,7 @@ Then("{string} may make friends abroad of its own", (s, name: string) => {
 // France 1444 (the worked example)
 // ---------------------------------------------------------------------------
 
-Given("the country {string} has high administrative capacity and subject reach {int}", (s, c: string, reach: number) => {
+Given("the country {string} has high administrative capacity and subject limit {int}", (s, c: string, reach: number) => {
   expect(reachFromCapacity("high", 0)).toBe(reach);
   s.reach ??= {};
   s.reach[c] = reach;
@@ -1865,11 +1870,15 @@ Given(/^the AI overlord "([^"]+)" (.+)$/, (s, o: string, situation: string) => {
 });
 
 When("the AI turn runs", (s) => {
+  if (s.aiRival) {
+    s.ai = aiRival(rivalsOf(s));
+    return;
+  }
   if (s.aiOverlord) {
     const o = s.aiOverlord as string;
     const sitText = s.aiSituation as string;
-    if (sitText.startsWith("is at reach")) {
-      const [, used, reach] = /reach (\d+) of (\d+)/.exec(sitText)!;
+    if (sitText.startsWith("is at subject limit")) {
+      const [, used, reach] = /subject limit (\d+) of (\d+)/.exec(sitText)!;
       s.ai = { accepts: (w: number) => aiAcceptsNewSubject(Number(used), Number(reach), w) };
       return;
     }
@@ -1941,11 +1950,11 @@ Given("the player plays the Loyal Vassal {string} of the AI country {string}", (
   bond(s, name, { kind: "vassal", overlord, loyalty: "loyal" });
 });
 
-Given(/^"([^"]+)" (is cautious|is over its reach|is neither cautious nor over reach)$/, (s, _o: string, state: string) => {
-  s.askOverlord = { cautious: state === "is cautious", overReach: state === "is over its reach" };
+Given(/^"([^"]+)" (is cautious|is over its subject limit|is neither cautious nor over its subject limit)$/, (s, _o: string, state: string) => {
+  s.askOverlord = { cautious: state === "is cautious", overReach: state === "is over its subject limit" };
 });
 
-When("{string} sends an envoy to ask politely for a looser kind", (s, name: string) => {
+When("{string} sends an envoy to ask politely for a looser type", (s, name: string) => {
   s.ask = grantsLoosenAsk(bond(s, name), s.askOverlord);
 });
 
@@ -2020,14 +2029,14 @@ Then("{string} and {string} have the reason {string}", (s, a: string, b: string,
   for (const n of [a, b]) expect(currentReasons(s, bond(s, n).subject).map((r) => r.label)).toContain(label);
 });
 
-Then(/^the (\d+) furthest subjects of "([^"]+)" have 1 more down arrow from being over reach$/, (s, n: string, o: string) => {
+Then(/^the (\d+) furthest subjects of "([^"]+)" have 1 more down arrow from being over the subject limit$/, (s, n: string, o: string) => {
   const arrows = overReachArrows(s, o);
   const r = roster(s, o).sort((a, b) => b.distance - a.distance);
   for (const e of r.slice(0, Number(n))) expect(arrows.get(e.bond.subject)).toBe(-2);
   s.furthest = Number(n);
 });
 
-Then("the other subjects of {string} have no more down arrows from being over reach", (s, o: string) => {
+Then("the other subjects of {string} have no more down arrows from being over the subject limit", (s, o: string) => {
   const arrows = overReachArrows(s, o);
   const r = roster(s, o).sort((a, b) => b.distance - a.distance);
   for (const e of r.slice(s.furthest)) expect(arrows.get(e.bond.subject)).toBe(-1);
@@ -2116,7 +2125,7 @@ Given(/^"([^"]+)" is a (Loyal|Wavering|Disloyal) Vassal of "([^"]+)"$/, (s, name
 
 Given("{string} borders {string}, a rival of {string}", (s, _name: string, rival: string) => void (s.rival = rival));
 
-Given("{string} has {int} reach free", (s, _r: string, n: number) => void (s.rivalReachFree = n));
+Given("{string} has {int} free under its subject limit", (s, _r: string, n: number) => void (s.rivalReachFree = n));
 
 When("{string} asks to change masters", (s, name: string) => {
   s.acted = true;
@@ -2141,7 +2150,7 @@ Given("the country {string} declares {string} against {string} over its Disloyal
   s.focus = name;
 });
 
-Then("the war is on {string}, who defends, and {string} answers by its kind and loyalty", (s, o: string) => {
+Then("the war is on {string}, who defends, and {string} answers by its type and loyalty", (s, o: string) => {
   expect(s.war.target).toBe(o);
   expect(s.war.defender).toBe(o);
   expect(s.war.subjectAnswer).toBe("refuses");
@@ -2197,7 +2206,7 @@ Then("no other subject of {string} gains or loses a reason", (s) => expect(curre
 
 Then("{string} stays {string}", (s, name: string, step: string) => expect(stepName(bond(s, name).loyalty)).toBe(step));
 
-Given("the country {string} has reach {int} and {int} subjects of weight {int}", (s, o: string, reach: number, n: number, _w: number) => {
+Given("the country {string} has a subject limit of {int} and {int} subjects of weight {int}", (s, o: string, reach: number, n: number, _w: number) => {
   s.reach ??= {};
   s.reach[o] = reach;
   for (let i = 0; i < n; i++) bond(s, `subject ${i + 1}`, { overlord: o, kind: "vassal" });
@@ -2226,3 +2235,239 @@ When("events add down reasons to {string} through 1448", (s, name: string) => {
 });
 
 Then("{string} can fall to {string} by 1448", (s, name: string, step: string) => expect(stepName(bond(s, name).loyalty)).toBe(step));
+
+// ---------------------------------------------------------------------------
+// Playing as a subject: the card from below, stopping payment, turning the tables (SUBJ-102, SUBJ-104)
+// ---------------------------------------------------------------------------
+
+Given("the player plays {string}, a Vassal of {string}", (s, name: string, overlord: string) => {
+  bond(s, name, { kind: "vassal", overlord });
+  // The design's Brittany: the same faith as France, courted by England.
+  Object.assign(sit(s, name), { sameFaith: true, courted: true });
+  s.player = name;
+});
+
+When("the player opens the overlord view", (s) => {
+  const b = bond(s, s.player);
+  s.below = cardFromBelow(b, currentReasons(s, s.player), { backers: ["England"], overlordWars: [], married: false, overlord: { cautious: false, overReach: false } });
+});
+
+Then("the player sees the same badges that move the loyalty of {string}", (s, name: string) => {
+  expect(s.below.badges.length).toBeGreaterThan(0);
+  expect(s.below.badges).toEqual(currentReasons(s, name));
+});
+
+Then(/^the player may pay and be protected, stop paying, seek a backer, wait for a bad war of "([^"]+)", or marry into the house of "([^"]+)"$/, (s) => {
+  const ids = (s.below.choices as { id: string }[]).map((c) => c.id);
+  for (const id of ["pay", "stop_paying", "seek_backer", "wait_bad_war", "marry"]) expect(ids).toContain(id);
+  // Paying is what it does now; stopping and finding the backer England are open to it.
+  const choice = (id: string) => (s.below.choices as { id: string; locked: string | null }[]).find((c) => c.id === id)!;
+  expect(choice("pay").locked).toBe("you pay already");
+  expect(choice("stop_paying").locked).toBeNull();
+  expect(choice("seek_backer").locked).toBeNull();
+  expect(choice("marry").locked).toBeNull();
+});
+
+Given("the player plays the Loyal Vassal {string}", (s, name: string) => {
+  bond(s, name, { kind: "vassal", loyalty: "loyal" });
+  // Its arrows alone would raise it: whatever moves it down is the withheld tribute.
+  extra(s, name).push({ id: "up", label: "up", arrow: 2 });
+  s.player = name;
+});
+
+When("the player stops paying", (s) => {
+  stopPaying(bond(s, s.player));
+});
+
+Then("{string} moves toward {string} one step at a time", (s, name: string, target: string) => {
+  const b = bond(s, name);
+  expect(payTribute(b, 100, 100).gold).toBe(0);
+  expect(currentReasons(s, name).map((r) => r.label)).toContain("Withholds tribute");
+  const seen: Step[] = [b.loyalty];
+  for (let season = 0; season < 12; season++) {
+    s.now = now(s) + 3;
+    const after = seasonCount(b, arrows(currentReasons(s, name)).total, now(s));
+    if (after !== seen[seen.length - 1]) seen.push(after);
+  }
+  expect(seen).toEqual(["loyal", "wavering", stepFromName(target)]);
+  // Paying again ends the reason, and the tribute flows by loyalty once more.
+  payAgain(b);
+  expect(currentReasons(s, name).map((r) => r.label)).not.toContain("Withholds tribute");
+});
+
+Given("the player's subject {string} has outgrown its overlord {string}", (s, name: string, overlord: string) => {
+  bond(s, name, { overlord, loyalty: "disloyal" });
+  s.tables = { subjectProvinces: 9, overlordProvinces: 6, landPath: true, won: false };
+});
+
+When("{string} wins its independence war", (s) => {
+  s.tables.won = true;
+});
+
+When("{string} makes peace with enough peace voices of {string} for it", (s) => {
+  s.tablesKind = turnTheTables({ ...s.tables, peaceShare: 0.8 });
+  s.tablesTooFew = turnTheTables({ ...s.tables, peaceShare: 0.6 });
+  s.tablesSmaller = turnTheTables({ ...s.tables, subjectProvinces: 5, peaceShare: 0.8 });
+});
+
+Then("{string} may become the subject of {string} in the same peace", (s, overlord: string, name: string) => {
+  expect(s.tablesKind).toBe("vassal");
+  const turned = newBond({ subject: overlord, overlord: name, kind: s.tablesKind }, now(s));
+  expect(turned.overlord).toBe(name);
+  // Not without the voices, nor for a subject that has not outgrown its overlord.
+  expect(s.tablesTooFew).toBeNull();
+  expect(s.tablesSmaller).toBeNull();
+});
+
+// ---------------------------------------------------------------------------
+// The AI as a rival (SUBJ-100)
+// ---------------------------------------------------------------------------
+
+function rivalsOf(s: Scenario): RivalOverlord[] {
+  return (s.aiRival.rivals as string[]).map((o) => ({ overlord: o, subjects: [...bonds(s).values()].filter((b) => b.overlord === o) }));
+}
+
+Given("the AI country {string} is a rival of {string}", (s, ai: string, rival: string) => {
+  s.aiRival = { ai, rivals: [rival] };
+});
+
+Given("{string} is a Wavering subject of {string}", (s, name: string, overlord: string) => {
+  bond(s, name, { overlord, loyalty: "wavering" });
+});
+
+Then("{string} may send an envoy to court {string}", (s, _ai: string, name: string) => {
+  expect(s.ai.court).toBe(name);
+});
+
+Then(/^"([^"]+)" picks "Break a subject" against the overlord with the most Disloyal subjects among its rivals$/, (s) => {
+  // With no Disloyal subject among its rivals it picks no one.
+  expect(s.ai.breakAgainst).toBeNull();
+  const first = (s.aiRival.rivals as string[])[0]!;
+  bond(s, "Armagnac", { overlord: first, loyalty: "disloyal" });
+  expect(aiRival(rivalsOf(s)).breakAgainst).toBe(first);
+  // A second rival with more Disloyal subjects draws it instead.
+  s.aiRival.rivals.push("Castile");
+  bond(s, "Granada", { overlord: "Castile", loyalty: "disloyal", kind: "tributary" });
+  bond(s, "Navarre", { overlord: "Castile", loyalty: "disloyal" });
+  expect(aiRival(rivalsOf(s)).breakAgainst).toBe("Castile");
+});
+
+// ---------------------------------------------------------------------------
+// The subjects list and the subject card (SUBJ-091, SUBJ-092)
+// ---------------------------------------------------------------------------
+
+Given("{string} uses {int} of {int} reach and receives {int} gold and {int} grain a month in tribute", (s, overlord: string, used: number, reach: number, gold: number, grain: number) => {
+  s.header = { used, reach, gold, grain };
+  s.listOwner = overlord;
+  // The design's list (10.1): Brittany, Armagnac, Granada and Sicily.
+  bond(s, "Brittany", { overlord, kind: "vassal", loyalty: "wavering" });
+  Object.assign(sit(s, "Brittany"), { courted: true, sameFaith: true });
+  bond(s, "Armagnac", { overlord, kind: "vassal", loyalty: "loyal" });
+  Object.assign(sit(s, "Armagnac"), { sameFaith: true, sameCulture: true });
+  bond(s, "Granada", { overlord, kind: "tributary", loyalty: "disloyal" });
+  Object.assign(sit(s, "Granada"), { sameFaith: false });
+  bond(s, "Sicily", { overlord, kind: "union", loyalty: "loyal" });
+});
+
+When("the player opens the subjects tab of the country card", (s) => {
+  const mine = [...bonds(s).values()].filter((b) => b.overlord === s.listOwner);
+  s.list = subjectsList(mine.map((b) => ({ bond: b, reasons: currentReasons(s, b.subject), paysGold: payTribute(b, 100, 100).gold })), s.header);
+});
+
+Then("the header reads {string} and {string}", (s, header: string, tribute: string) => {
+  expect(s.list.header).toBe(header);
+  expect(s.list.tribute).toBe(tribute);
+});
+
+Then("the rows are sorted by loyalty, worst first", (s) => {
+  const steps = (s.list.rows as { loyalty: string }[]).map((r) => STEPS.indexOf(stepFromName(r.loyalty)));
+  expect(steps).toEqual([...steps].sort((a, b) => b - a));
+  expect(s.list.rows[0].name).toBe("Granada");
+});
+
+Then("each row shows the kind icon, name, loyalty, up and down arrow counts, what it pays and its worst reason", (s) => {
+  for (const row of s.list.rows as { icon: string; name: string; loyalty: string; arrows: string; pays: string; worst: string }[]) {
+    const b = bond(s, row.name);
+    expect(row.icon).toBe(kindIcon(b.kind));
+    expect(row.loyalty).toBe(stepName(b.loyalty));
+    const a = arrows(currentReasons(s, row.name));
+    expect(row.arrows).toBe(`▲${a.up} ▼${a.down}`);
+    expect(row.pays).toMatch(/^pays \d+$/);
+    expect(row.worst).toBe(currentReasons(s, row.name).filter((r) => r.arrow < 0).sort((x, y) => x.arrow - y.arrow)[0]?.label ?? "");
+  }
+});
+
+Then("the card has the lord card's frame", (s) => {
+  expect((s.card.view as SubjectCard).frame).toBe("lord");
+});
+
+Then(/^it shows "([^"]+)", (.+), age (\d+), (House .+)$/, (s, kind: string, ruler: string, age: string, house: string) => {
+  const v = s.card.view as SubjectCard;
+  expect(v.kind).toBe(kind);
+  expect(v.ruler).toBe(`${ruler}, age ${age} · ${house}`);
+});
+
+Then("it shows its provinces, army, treasury and its own subjects", (s) => {
+  const v = s.card.view as SubjectCard;
+  expect(v.facts).toEqual({ provinces: 6, army: 3500, treasury: 180, ownSubjects: [] });
+});
+
+Then("it shows its loyalty with each up and down reason", (s) => {
+  const v = s.card.view as SubjectCard;
+  expect(v.loyalty).toBe(stepName(s.card.bond.loyalty));
+  expect([...v.up, ...v.down].map((r) => r.label).sort()).toEqual((s.card.reasons as Reason[]).map((r) => r.label).sort());
+  expect(v.up.every((r) => r.arrow > 0) && v.down.every((r) => r.arrow < 0)).toBe(true);
+});
+
+Then("it shows what it pays and how it comes when called", (s) => {
+  const v = s.card.view as SubjectCard;
+  expect(v.pays).toMatch(/^Pays \d+ gold \(normal\)$/);
+  expect(v.comes).toBe("Comes when called: at once, with its whole army");
+});
+
+Then(/^it shows the buttons (.+) and (.+)$/, (s, list: string, last: string) => {
+  const v = s.card.view as SubjectCard;
+  expect(v.buttons.map((b) => b.action)).toEqual([...list.split(", "), last]);
+});
+
+// ---------------------------------------------------------------------------
+// The subjects lens and opening a card from the map (SUBJ-095, SUBJ-096)
+// ---------------------------------------------------------------------------
+
+Given("{string} courts {string}, a subject of the player's {string}", (s, courter: string, name: string, player: string) => {
+  bond(s, name, { overlord: player, loyalty: "wavering" });
+  bond(s, "Armagnac", { overlord: player, loyalty: "loyal" });
+  bond(s, "Granada", { overlord: player, loyalty: "disloyal" });
+  bond(s, "Wales", { overlord: courter, loyalty: "loyal" });
+  s.courting = [{ by: courter, target: name }];
+  s.player = player;
+});
+
+When("the player opens the subjects lens", (s) => {
+  s.lens = subjectsLens(s.player, [...bonds(s).values()], s.courting, (realm) => `the capital of ${realm}`);
+});
+
+Then("the subjects of {string} are coloured by loyalty", (s, player: string) => {
+  const colours = s.lens.colours as Map<string, string>;
+  const mine = [...bonds(s).values()].filter((b) => b.overlord === player);
+  expect([...colours.keys()].sort()).toEqual(mine.map((b) => b.subject).sort());
+  for (const b of mine) expect(colours.get(b.subject)).toBe({ loyal: "green", wavering: "amber", disloyal: "red", in_revolt: "red" }[b.loyalty]);
+});
+
+Then("a line runs from the capital of {string} to {string}", (s, courter: string, name: string) => {
+  expect(s.lens.lines).toEqual([{ from: `the capital of ${courter}`, to: name }]);
+});
+
+Given(/^the player uses (touch|a controller)$/, (s, input: string) => {
+  s.input = input === "touch" ? "touch" : "controller";
+});
+
+When(/^the player (long-presses|selects it and presses the card button) on "([^"]+)"$/, (s, gesture: string, name: string) => {
+  s.opened = opensCard(s.input, gesture === "long-presses" ? "long-press" : "card button") ? name : null;
+  // A plain tap only picks the province.
+  expect(opensCard(s.input, "tap")).toBe(false);
+});
+
+Then("the card of {string} opens", (s, name: string) => {
+  expect(s.opened).toBe(name);
+});

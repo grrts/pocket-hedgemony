@@ -1301,6 +1301,9 @@ Then("the rebels accept", (s) => {
 });
 Given(/^the country "([^"]+)" is (\w+)$/, (s, name: string, faith: string) => {
   realm(s, name, faith);
+  // The heads of the faith steps read it too (faith-heads.steps.ts); "censured" there is a state, not a faith.
+  (s.fhFaiths ??= {})[name] = faith;
+  s.fhMe ??= name;
 });
 When(
   /^(its neighbour persecutes protestants in a province bordering Brandenburg|its preacher is killed in a foreign realm|a protestant holy place is held by another faith)$/,
@@ -1805,9 +1808,6 @@ Then(/^the holy places of the Pope, the Ecumenical Patriarch, a Caliph's claim a
   expect((s.heads1444 as { id: string }[]).map((h) => h.id)).not.toContain("dalai_lama");
   expect(G.churchHeads(Number(year)).map((h) => h.id)).toContain("dalai_lama");
 });
-Then("religion gives church heads no rules of their own", (s) => {
-  for (const h of s.heads1600 as Record<string, unknown>[]) expect(Object.keys(h).sort()).toEqual(["id", "name", "place"]);
-});
 
 Given(/^the people of "([^"]+)" convert to (\w+)$/, (s, name: string, faith: string) => {
   const p = prov(s, name, { orthodox: 0.6, catholic: 0.4 }, { people: 100000 });
@@ -1815,10 +1815,10 @@ Given(/^the people of "([^"]+)" convert to (\w+)$/, (s, name: string, faith: str
   s.tongueBefore = { ...s.tongues.people };
   p.mix = { [faith]: 1 };
 });
-Then("their tongue does not change", (s) => {
+Then("their language does not change", (s) => {
   expect(s.tongues.people).toEqual(s.tongueBefore);
 });
-Then("the faith grievances and tongue grievances stay separate", (s) => {
+Then("the faith grievances and language grievances stay separate", (s) => {
   const p = provinces(s)[0]!;
   const faith = Object.keys(G.faithGrievances(p, G.newRealm("Hungary", "catholic")));
   const tongue = C.updateGrievances(s.tongues, C.newCountryCulture("hungary", "Bosnian"));

@@ -63,7 +63,7 @@ Newest decision first.
 | Toll | Gold a trader pays from its purse at a toll point (bridge, ford, pass, river mouth, strait) | Market fee |
 | City (for trade) | A settlement of city or great-city size, or one with a market or trading post | Town size "city" alone |
 | Stop | A city on a route | A province walked through |
-| Route | 2 to 8 stops in order, with a mode: loop, there and back, once | Path |
+| Route | A start and an end, walked there and back or once; the planner finds the way through the busiest land (D-TRADE-21) | Path |
 | Path | The provinces between two stops chosen by the route planner | Route |
 | Deposit | Emptying the whole purse into the treasury in a city of the trader's own country | Collection |
 | Bills of exchange | With T3, depositing in a foreign city with a counting house or bank for a 10 % fee | — |
@@ -80,7 +80,7 @@ Newest decision first.
 - Holds: kind, owner, home city, crew (class, count), route (stops, mode), purse, hold, position (province or sea zone),
   progress (days walked to next), months of unpaid upkeep, set to trade (ships).
 - INV-TRADE-1: 0 ≤ purse ≤ purse size of its kind.
-- INV-TRADE-2: A route has 2 to 8 stops and every stop is a city.
+- INV-TRADE-2: A route has a start and an end, two different cities (D-TRADE-21).
 - INV-TRADE-3: A river barge stays on its river; a land trader never enters a sea zone; a trade ship enters port provinces only.
 - INV-TRADE-4: A lord's trader deposits only into its lord's wealth and can't be steered by the crown.
 - Stored: about 12 small numbers (kind, home, crew, purse, route of up to 8 stops, position, progress).
@@ -124,7 +124,7 @@ Newest decision first.
   (serves 8); trading house +100 % (serves 16); caravanserai +25 % for land traders (stops bandits); warehouse +25 %;
   harbour +25 % for ships (needed to dock); counting house +10 % (foreign deposits); bank +25 % (foreign deposits);
   every working craft building (loom house, forge, kiln, tannery, press, brewery) +5 % each. No market: serves 2.
-- **Route** value: stops, mode (loop default, there and back, once), cached paths.
+- **Route** value: start and end, mode (there and back default, once), cached paths.
 
 ### Formulas
 ```
@@ -197,7 +197,7 @@ its ratio in about seven months.
 - TRADE-039 While a province has homeless over 5 %, the trade context shall lower its ratio gain by 5 % for every 5 % of homeless. [trade §4.3]
 - TRADE-040 While a province is under plague quarantine, the trade context shall set its ratio to 0 and let no trader enter. [trade §4.3]
 - TRADE-041 While an enemy army or a siege is in a province, the trade context shall give it no ratio gain that month. [trade §4.3]
-- TRADE-042 While a port is blockaded, the trade context shall let no ship enter it and stop its sea-lane gain. [trade §4.3, §8.2]
+- TRADE-042 While a port is blockaded, the trade context shall let no ship enter it and stop its sea-lane gain. [trade §4.3, §8.2] *When a port is blockaded, which trade ships may pass and the prize money are now set by NAVY-155 to NAVY-158 (playtest feedback).*
 
 ### 5.5 Collecting
 - TRADE-043 When a trader enters a province, the trade context shall on that day collect trade value × trade ratio × hold × visit share (0.2) × crowding into its purse. [trade §4.4]
@@ -209,9 +209,9 @@ its ratio in about seven months.
 
 ### 5.6 Routes
 - TRADE-049 The trade context shall accept as a stop only a city: a settlement of city or great-city size, or one with a market or a trading post. [trade §5.1, §17 decision]
-- TRADE-050 The trade context shall accept 2 to 8 stops per route. [trade §5.1]
-- TRADE-051 The trade context shall run a route as loop (default), there and back (reverse at the last stop) or once (wait at the last stop for orders). [trade §5.1]
-- TRADE-052 The trade context shall find the path between two stops by the shared route planner using the trader's step days and may-enter rule: fewest days, avoiding forbidden provinces, preferring lower tolls when two paths are close (a toll counts as 2 days). [trade §5.1]
+- TRADE-050 The trade context shall accept a route of a start and an end, two different cities, and nothing more: the player never draws the way between them. [trade §5.1; D-TRADE-21]
+- TRADE-051 The trade context shall run a route there and back (default: reverse at the end) or once (wait at the end for orders). [trade §5.1; D-TRADE-21]
+- TRADE-052 The trade context shall find the way between the start and the end by the shared route planner using the trader's step days and may-enter rule: fewest days, each land province's days divided by 1 + `route.busy_weight` × its people over the world's average (at most `route.busy_cap` times), so the way goes through the most populated land; avoiding forbidden provinces, preferring lower tolls when two paths are close (a toll counts as 2 days). [trade §5.1; D-TRADE-21]
 - TRADE-053 The trade context shall give every province walked through between stops the ratio gain and a collection. [trade §5.1]
 - TRADE-054 When the player sets a route, the game shall show before confirming: loop days, provinces collected in per loop, the best ones, expected gold a month after fees and tolls, tolls, danger and crowding, with red marks for closed borders, quarantines, enemy armies and snowed passes. [trade §5.2]
 - TRADE-055 The trade context shall compute Expect as the planned collections over one loop at this month's ratios, minus fees and tolls, divided by the loop's months. [trade §5.2]
@@ -308,6 +308,29 @@ its ratio in about seven months.
 - TRADE-127 When a building buys a material in a province no trade route touches (no route stop, no trader passing in 12 months), the trade context shall charge 25 % more. (D-TRADE-7, X-6)
 - TRADE-128 The trade context shall apply heritage levers: `trade_balance_pct` and `traders_passing_pct` on ratio gain, `trader_gain_pct` on each deposit, `trader_count` as extra starting traders. (D-TRADE-7, D-TRADE-18, X-6)
 
+### 5.15 Trade in the game (first slice)
+Trade now runs in the game's month (D-TRADE-20): every province has goods and a trade value, traders walk there and back between trade cities, ratios rise and fall, and the ledger's Trade line is what traders deposit, not a flat sum from wealth. Tolls, pacts and embargoes, risks on the road, lords' traders, ships other than the cog, the "once" mode, crafts appearing and inputs along routes come with their contexts.
+
+- TRADE-129 Each January and when a campaign starts, the game shall count each land province's goods: the wares its works make (timber and furs, stone, ore, salt, wool and hides), its food surplus as grain, and crafts made by its craftsmen (a stand-in for the craft buildings, D-TRADE-20), and price them by tier (crafts as finished goods, wares without a tier as staples). [TRADE-025 … TRADE-027; D-TRADE-20]
+- TRADE-130 The game shall turn goods into trade value by TRADE-025 with the market step's weight (weekly market, yearly fair, trading house) and, for ships, the harbour's; the weights are halved while the realm neglects its works; the trade value is scaled into the treasury's gold by `trade.game.value_scale`. [TRADE-025, TRADE-029; D-TRADE-20]
+- TRADE-131 A province shall be a trade stop for land traders when it is of city size or has a market, and for ships when it has a harbour. [TRADE-049; D-TRADE-20]
+- TRADE-132 On the first day of each month, before the ledger is paid, the game shall walk every trader through the month just past at its kind's step days (TRADE-014, TRADE-015, TRADE-017, TRADE-021), counting it once as passing in each province it stood in and half in each port on a sea lane it sailed, collecting on entering a province (TRADE-043, TRADE-045, TRADE-047, TRADE-048), collecting nothing on unclaimed land, and depositing its purse in each trade stop of its own realm that its realm holds. [TRADE-031 … TRADE-048, TRADE-060, TRADE-063]
+- TRADE-133 The game shall then move every province's ratio by TRADE-031, with a customs officer's share added and riots' taken off, and no gain where an enemy holds it or lays siege. [TRADE-031, TRADE-035, TRADE-038, TRADE-041, TRADE-118]
+- TRADE-134 The ledger's Trade line shall be the realm's deposits and the market fees paid to it in the month just past, less its traders' upkeep (the kind's upkeep at the works' gold scale; a ship's is naval's); a realm unpaid for 6 months in a row loses the trader. Tax owed rises by TRADE-088. [TRADE-007, TRADE-008, TRADE-064, TRADE-088]
+- TRADE-135 A realm may found a pack caravan or river barge in an own, unoccupied city with a market, a camel caravan where the city is desert or drylands or it knows T1, a barge only on a river, and a cog from an own port with a harbour; it pays the kind's gold at the works' gold scale (a cog naval's gold), and the crew (50 market folk, or 30 seafolk for a cog) leave the city, refused if there are too few. A founded trader starts on the best loop the AI would pick from its city. [TRADE-003, TRADE-016 … TRADE-018, TRADE-120; D-TRADE-2]
+- TRADE-136 A realm may set a trader's route as a start and an end, two different trade stops, walked there and back (D-TRADE-21); each way is the planner's fewest days for the kind, a land province counting less the more people live there (TRADE-052), never through the land of a realm at war with it nor land its enemies hold; the trader walks from where it stands. A trader whose way is shut plans its way again the next month, and the card says why. [TRADE-050 … TRADE-052, D-TRADE-21, TRADE-056, TRADE-057, TRADE-066, TRADE-067]
+- TRADE-137 A realm may dismiss a trader; its crew go back to its home city. [TRADE-006]
+- TRADE-138 When a campaign starts, each realm shall get its starting traders by TRADE-110 (the hand-made routes where their cities are on the map, otherwise the AI's best loops, from its best cities, a ship from every other port), and 24 months of their walking shall set the starting ratios, the last of them counted as the month before the start. [TRADE-110 … TRADE-112]
+- TRADE-139 Once a year, a twelfth of them each month, each AI trader shall be set on its best route from its home to one city within reach, there and back through the busiest land, crowded cities counting half; and an AI realm with starting traders shall found one more when its best route beats upkeep by its margin, while it has at most twice its starting traders. [TRADE-113 … TRADE-115; D-TRADE-20, D-TRADE-21]
+- TRADE-140 Traders, their purses, routes and the ratios shall be kept in the save. [SAVE]
+
+#### How the player uses it
+- TRADE-141 Where: the player's realm card has a **Trade** tab next to Treasury. From the top: **Last month**, the deposits, market fees and upkeep that make the Trade line; **Traders**, one card per trader, best first, with its kind and home, its route ("Paris → Lyon and back", days there and back), a purse bar, about how much it brings a month, what it deposited last month and, in red, what is wrong; each card has **Route**, **Show** and **Dismiss** (Dismiss asks again before it acts). Then **Found a trader**: the realm's cities that can found one, best first, each with a 44-point button per kind showing its gold and upkeep, greyed with the reason when it can't. Then **Busiest cities**: the realm's trade cities by value and ratio, each opening its province. [X-19, TRADE-098, TRADE-100]
+- TRADE-142 Route: tapping **Route** closes the card, turns on the Trade map mode and shows the route bar along the bottom of the map: "Tap where it starts, then where it goes". The first tap on a trade stop is where it starts, the second where it goes, and a further one moves where it goes (a tap elsewhere says why not); the player never draws the way: the planner finds it through the busiest land (D-TRADE-21). The bar shows the two as "From" and "To" chips with the preview (days there and back, provinces it collects in, about how much a month after fees, the best provinces) and the reason in red when it can't be set. **Undo**, **Cancel** and **Confirm**; tapping where it goes again also confirms. The way is drawn on the map while it is chosen. [X-19, TRADE-054, TRADE-096, D-TRADE-21]
+- TRADE-143 Map: the **Trade** lens colours provinces by trade ratio, the provinces the player doesn't see in parchment; zoomed in to regional it draws each of the player's traders' ways there and back as a dotted line with the trader where it stands and its purse, and a coin on each trade stop. The province card has a Trade line: its value a month, its ratio, traders passing last month and its top goods, or "not seen" for a province the player doesn't see. [X-19, TRADE-093, TRADE-094, TRADE-121]
+- TRADE-144 Grouping and overview: everything about traders is in the Trade tab; the General tab carries one line, "Trade: N traders · +x gold a month", that opens it, and the Treasury's Trade line is the same number. A trader given up for want of pay reaches the News. [X-19, TRADE-099]
+- TRADE-145 Phone: the tab fits the side panel in the Wide and Tall layouts, trader cards and found buttons wrap to one column on a narrow panel, the route bar stays inside the safe areas above the map's bottom edge and wraps its buttons, every button is at least 44 points high, nothing needs hover and the panel never scrolls sideways. [X-19, SHELL-108, SHELL-109, SHELL-114]
+
 ## 6. Commands
 
 | Command | Who | Preconditions | Result | Events |
@@ -379,8 +402,9 @@ Yearly: trade value with wares made; AI reroutes and dismissals. The global orde
 | `collect.trade_pact_fee` | Fee with a pact | 0 | yes | trade-config |
 | `deposit.bills_of_exchange_fee` | Fee abroad | 0.10 | yes | trade-config |
 | `deposit.lord_city.to_treasury` | Lord's city share | 1.00 | decided | trade-config |
-| `route.min_stops` / `max_stops` | Stops | 2 / 8 | yes | trade-config |
-| `route.default_mode` | Mode | loop | — | trade-config |
+| `route.min_stops` / `max_stops` | Stops: a start and an end | 2 / 2 | decided | trade-config |
+| `route.default_mode` | Mode | there and back | decided | trade-config |
+| `route.busy_weight` / `busy_cap` | Pull of populous land on the planner | 1 / 3 | yes | trade-config |
 | `route.toll_counts_as_days` | Toll as days | 2 | yes | trade-config |
 | `danger.bandit_chance_per_month` | Bandits | 0.05 | yes | trade-config |
 | `danger.bandit_when.homeless_share_over` | Bandit homeless share | 0.20 | yes | trade-config |
@@ -474,6 +498,8 @@ Changes the design asks of other files (§14), recorded here; not edited:
 - **D-TRADE-17** (was OQ-TRADE-17) Hubs: config names 10 hubs (alexandria, amsterdam, malacca_strait, venice, genoa, seville, bruges_antwerp, tabriz, aleppo, volga) as provisional province and sea-zone sets; `trade_index` = trade income over the last 12 months ÷ 100 gold × 100 for every country (provisional). Simple and readable by triggers.
 - **D-TRADE-18** (was OQ-TRADE-18) The v1 README text is superseded by collect-on-enter; `trader_gain_pct` is a percentage on each deposit (X-6). The latest decision wins.
 - **D-TRADE-19** (was OQ-TRADE-19) Food surplus = food made in the province this year minus what its people eat, never below 0, whatever the store holds. Simplest measurable rule.
+- **D-TRADE-20** First game slice (milestone 8, provisional): goods are what the game already makes (works' wares, food surplus as grain) plus crafts by craftsmen until the craft buildings make wares; trade value is scaled into the treasury's gold (`trade.game.value_scale`, so the world's trade income in 1444 is about the old flat Trade line) and so are purses; trader gold and upkeep use the works' gold scale. Trade runs once a month on its first day. Kinds in the slice: pack and camel caravans, river barges and the cog. The AI reroutes a twelfth of its traders each month, and only realms with starting traders found more, at most twice as many. Tolls, pacts, embargoes, risks, lords' traders and the other ships wait on their contexts. The smallest slice that replaces the flat line with traders the player steers.
+- **D-TRADE-21** Routes are a start and an end (Leroy, 18 October): the player sets only where a trader starts and where it goes, never the way or stops between; the planner finds the way there and back, drawn toward the most populated land (each land province's days divided by 1 + `route.busy_weight` × its people over the world's average, at most `route.busy_cap` times), since busy land is where trade is. The loop mode goes, there and back is the default, once stays. The 1444 routes are each a start and an end (the old multi-stop ones split into pairs). Supersedes TRADE-050's 2 to 8 stops.
 
 ## 14. Traceability
 
@@ -502,3 +528,5 @@ Changes the design asks of other files (§14), recorded here; not edited:
 | TRADE-126 | trade-value.feature | What the food surplus is |
 | TRADE-127 | trade-effects.feature | Materials cost more where no trade route touches |
 | TRADE-128 | deposits.feature, start-ai-performance.feature | A heritage lever on deposits; The heritage lever trader_count |
+| TRADE-129 … TRADE-140 | — | Engine: packages/engine/test/trade.test.ts (goods, value, stops, the month, ratios, the Trade line, founding, routes, dismissing, the start, the AI, saves) |
+| TRADE-141 … TRADE-145 | — | Presentation: apps/client/src/ui/trade.ts, the Trade tab, route bar and lens; screenshots from apps/client/scripts/trade-shots.mjs |

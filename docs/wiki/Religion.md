@@ -57,7 +57,7 @@ Hold slows change but never stops it. A province where one faith has three house
 
 *Worked example: East Bengal, 1444 to 1700.* East Bengal is 70 % hindu, 25 % asian_traditional and 5 % sunni, with 2 hindu temples and a sunni lord, under a sunni ruler. The forest is cleared and a mosque is granted on each of 3 new field tiles. Now sunni has 3.5 pull (three mosques and the lord), hindu 2 (two temples) and asian_traditional 1 (its sacred places). The mix settles toward sunni 54 %, hindu 31 % and asian_traditional 15 %. Once asian_traditional falls below a quarter it loses its sacred-places pull, and by about 1700 East Bengal is mostly sunni.
 
-**Small and new faiths.** A faith under 1 % with no house of its own is removed. A fourth faith arriving gets in only if it is larger than the smallest of the three. Then the smallest of the four joins the province's majority faith, so nobody simply vanishes. Tongues work the same way.
+**Small and new faiths.** A faith under 1 % with no house of its own is removed. A fourth faith arriving gets in only if it is larger than the smallest of the three. Then the smallest of the four joins the province's majority faith, so nobody simply vanishes. Languages work the same way.
 
 **Hidden believers.** For 100 years after a Persecuted faith's houses in a province are closed, that faith stays at 2 % or more there, unless an Inquisition removes the floor. If catholic is Persecuted in Japan and its houses in Nagasaki were closed 40 years ago, it stays at 2 %; after 100 years, or with an Inquisition, it may fall lower.
 
@@ -182,7 +182,30 @@ Holy places are a fixed list of named provinces, each with its faiths and its 14
 
 Amritsar appears as a holy place only once the founding of the Sikh Panth has happened, not before 1577. A holy place is always held by whoever owns its province.
 
-Holding a holy place of your own faith gives +1 preacher, the pilgrimage shrine there and 200 more traders passing through each year. Holding one of a faith you don't share lets every ruler of that faith use *Defend the faith* against you with that province as the prize. Pilgrims still come if you tolerate their faith and keep a house of it there. The holy places where church heads sit (the Pope, the Ecumenical Patriarch, a Caliph's claim, the Dalai Lama from 1578) are marked, but church heads have no rules here yet.
+Holding a holy place of your own faith gives +1 preacher, the pilgrimage shrine there and 200 more traders passing through each year. Holding one of a faith you don't share lets every ruler of that faith use *Defend the faith* against you with that province as the prize. Pilgrims still come if you tolerate their faith and keep a house of it there. The holy places where church heads sit (the Pope, the Ecumenical Patriarch, a Caliph's claim, the Dalai Lama from 1578) are marked, and the heads have rules of their own, below.
+
+### Heads of the faith
+
+Five faiths have a head with a seat. Nothing here is a meter: a head works through ties, wrongs, preachers, lords, war aims and calls to arms.
+
+| Head | Faith | Seat | How the patron is chosen |
+|---|---|---|---|
+| The Pope | catholic | Rome | A conclave when the Pope dies, or whoever holds Rome if the Papal States lose it |
+| The Ecumenical Patriarch | orthodox | Constantinople | Whoever holds the seat, or its overlord |
+| The Catholicos | oriental_christian | Echmiadzin | Whoever holds the seat, or its overlord |
+| The Caliph | sunni | Mecca and Medina | A Sunni ruler who holds both, directly or as overlord, and takes *Claim the caliphate* |
+| The Dalai Lama (from 1578) | vajrayana | Lhasa | Whoever chose him in *Altan Khan and the Dalai Lama*, until Lhasa changes hands |
+
+Anglican and Protestant churches are headed by their own crowns, and every other faith has no head.
+
+- **The patron** of a head who shares his faith gets the tie *The Pope favours us* (+15) with every realm of the faith and 1 more preacher. He owes them help: when a ruler of another faith attacks a fellow believer who holds a holy place, the patron gets a call to arms, and refusing it is an oath broken. A patron who changes faith loses the patronage and is *Betrayed the faith* (−30, fading over 30 years) with all of them.
+- **A patron of another faith** (the Ottomans in Constantinople, say) gets nothing but this: every community of the head's faith in his realm counts as served.
+- **Taking a seat** by war from a fellow believer of the head is *Seized the seat* (−20) with his faith; taking it from a ruler of another faith is *Freed the seat* (+20).
+- **The conclave** sits for one month when the Pope dies. Each Catholic realm casts a vote per cardinal and may send gold, 20 gold a vote, up to as many gold votes as it has cardinals. Rome casts 10 votes; if Rome wins or ties, the Pope is Italian and has no patron.
+- **Censure.** Declaring war on a ruler of your own faith, to take land, for tribute, to raid or with no aim, brings the head's censure: *Censured by the Pope* (−25) with every realm of the faith while the war lasts and fading over 10 years after, your lords of the faith waver once, and every fellow believer holds the *Punish* aim against you. A peace that gives back everything you took ends it at once. Crown-headed churches are never censured.
+- **Raise our own patriarch**, once, for an Orthodox realm with a great Orthodox house in its capital while Constantinople is held by another faith, for 40 gold: its church becomes crown-headed and it gets 1 more preacher.
+
+In 1444 the Pope has no patron, Byzantium is the Ecumenical Patriarch's patron, the Qara Qoyunlu the Catholicos's, and the Mamluks hold the Caliph's claim as overlord of the Hejaz.
 
 ### What each faith does differently
 
@@ -245,7 +268,7 @@ Each country gets its ruler's faith from the catalogue, and each province the mi
 - *Defend the faith* also opens when a neighbour persecutes your faith in a province bordering yours, when your preacher is killed or expelled, and when a holy place of your faith is held by another faith.
 - Schools have a faith, and persecution drives scholars abroad.
 - Diplomacy gets the fact "same faith" (better starting opinion) and the *Allow preachers* leave.
-- Faith and tongue stay two separate mixes with two separate grievances.
+- Faith and language stay two separate mixes with two separate grievances.
 
 ### The computer players
 
@@ -263,7 +286,24 @@ Once a year, alongside traders and the trade balance: pulls, hold and the 3 % mo
 - **Province card, Faith line**: each faith's share and whether it is rising or falling. Tap it to see this year's pulls for each faith with their sources, each community's state, and how fast the mix is moving and toward which faith. For example, Rouen at catholic 61 % falling, protestant 37 % rising and jewish 2 % shows the protestant community served by its own church and Tolerated, and the jewish 2 % as below a community with no grievance.
 - **Country card, Faith row**: for example "Catholic · 78 % of people · 3 more faiths · 2 preachers · holds no holy place". Tap it to open the **Faith policy screen**, with one row per faith. Preachers are also listed under Abroad.
 - **Faith %** is the share of people of the state faith or a faith layered with it. Ming, with 10 % confucian_ritual, 50 % mahayana, 30 % daoist and 10 % asian_traditional not yet layered, has a Faith % of 90.
-- **The Faith lens**: at world zoom, provinces coloured by majority faith, hatched where another faith's community is 30 % or more, with holy-place icons. At region zoom, houses as town sprites, preachers as walking figures and waves as a spreading tint. At local zoom, the Faith line.
+- **The Faith map mode**: at world zoom, provinces coloured by majority faith, hatched where another faith's community is 30 % or more, with holy-place icons. At region zoom, houses as town sprites, preachers as walking figures and waves as a spreading tint. At local zoom, the Faith line.
+
+### In the game now
+
+Every province starts in 1444 with up to three faiths from its realm's start mix, with area overrides (Hussite Bohemia, Orthodox Balkans under the Ottomans). Communities of a tenth or more start with a house of worship where their faith has one.
+
+- **Province card, Faith line**: each faith's share with ↑ or ↓. Tap it for this year's pulls per faith and their sources (houses, your capital, your policy), each community's state, any grievance, and how many points a year the mix moves toward which faith.
+- **Your realm card, Peoples tab**: the state faith, Faith %, and a card per faith in your realm with its share, people and provinces. The state faith is Established; every other faith has three buttons, **Tolerated**, **Restricted** and **Persecuted**, which are your tolerance for that faith. A change is shown as pending and takes effect at New Year; tap the current policy to cancel it.
+  - Tolerated: houses stand, normal tax.
+  - Restricted: a quarter more tax from its people, no new houses, your faith pulls harder; *Wrong faith* where it is the majority.
+  - Persecuted: its houses close at New Year and its people pay no tax, your faith pulls twice as hard; *Persecuted*, which counts as two grievances, wherever it is a tenth or more.
+- **The Faiths map mode**: provinces coloured by majority faith, hatched where a second faith holds 30 % or more.
+- Faiths move each New Year, a fraction of a point at a time.
+
+- **Head of the faith card**, on the Peoples tab under the faith cards: the head, his seat and who holds it, the patron, what the patron gets and owes, and the one action open now (*Send gold to the conclave* with − and +, *Claim the caliphate*, *Raise our own patriarch*), or why it is not open. The Faith line on every realm's General tab carries a badge: *Patron of the Pope*, *Caliph*, *Heads its church* or a red *Censured*. Before you declare war, the Diplomacy tab warns you if the head will censure it and what it costs. The Faiths map mode marks each seat; tap one, or its button in the key, to open that head's card.
+- For now a cardinal is a Catholic house in a province of 300,000 people or more, and a great Orthodox house is any Orthodox house in the capital.
+
+Not in yet: building or paying for houses, preachers, expulsion and the Inquisition, changing the state faith, holy places, lords' faith, faith waves, and the computer players changing their policy.
 
 ## How it connects
 
@@ -282,7 +322,7 @@ Once a year, alongside traders and the trade balance: pulls, hold and the 3 % mo
 - [Subjects](Subjects): preachers enter subjects without permission.
 - [Revolutions](Revolutions): faith revolutions use waves; regimes may lead to the church events.
 - [The-1444-Start](The-1444-Start): the ruler's faith and each province's starting mix.
-- [Map-and-Lenses](Map-and-Lenses): the Faith lens, house sprites, preachers and wave tint.
+- [Map and Map Modes](Map-and-Lenses): the Faith map mode, house sprites, preachers and wave tint.
 - [Time-and-Turns](Time-and-Turns): the yearly slot and New Year policy changes.
 
 ## Numbers
@@ -351,4 +391,4 @@ Nothing. Every question about religion has been decided.
 
 - Spec: `domain/religion/spec.md` in the game repository.
 - Features: `domain/religion/features/`: `faiths.feature`, `faith-mix.feature` (one year's move, East Bengal), `faith-buildings.feature`, `communities-and-policy.feature`, `expulsion-and-inquisition.feature` (the Alhambra decree), `preachers.feature`, `state-faith.feature`, `holy-places.feature`, `faith-rules.feature`, `faith-waves-and-events.feature`, `religion-uses.feature`, `religion-view.feature` and `religion-ai.feature`.
-- Code: `packages/engine/src/domain/religion/`, with its numbers in `packages/rules/data/domain/religion.json`.
+- Code: `packages/engine/src/domain/religion/`, with its numbers in `packages/rules/data/domain/religion.json`. The game wiring is `packages/engine/src/peoples.ts`; the panels are `apps/client/src/ui/belief.ts`.

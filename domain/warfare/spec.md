@@ -11,7 +11,7 @@ this changes from era I to era VII as inventions arrive.
 - Companies: men, drill, scars, arms, pay owed, months out; arms (troop types) and their needs; kinds (levy,
   retinue, hired company, standing regiment, garrison, rebel band); elephants and camels as their own types.
 - The realm's soldier stats: soldiers, arms store, powder store, prisoners, victories and defeats, troop cap.
-- The army side of raising and keeping an army: calling the lords, hiring free companies, upkeep, pay,
+- The army side of raising and keeping an army: calling the lords, hiring mercenary companies, upkeep, pay,
   desertion, disbanding.
 - Commanders and captains: skills, traits, origins (the warfare side), wounds, age, death, defection;
   commander styles, their approaches, adoption, staleness and learning.
@@ -71,12 +71,12 @@ Newest decision first.
 
 | Term | Meaning | Not to be confused with |
 |---|---|---|
-| Company | A group of usually 500 to 1,000 men of one kind and one arm, keeping its own counts | Army (a body of companies under one commander) |
-| Regiment | Recruiting's word for a company whose arm was set by training | — |
-| Arm | How a company fights (levy foot, pikes, knights …), with a strength per man, needs and roles; the troop type | Kind |
-| Kind | Where soldiers come from: levy, retinue, hired company, standing regiment, garrison, rebel band | Arm |
-| Strength per man | An arm's fighting worth per man, by era (config) | Hits |
-| Role | What an arm does in a sector: Line, Brace, Shock, Shot, Light, Heavy, Guns, Air (era VII) | Approach |
+| Company | A group of usually 500 to 1,000 men of one kind and one troop type, keeping its own counts | Army (a body of companies under one commander) |
+| Regiment | Recruiting's word for a company whose troop type was set by training | — |
+| Troop type (was Arm) | How a company fights (levy infantry, pikes, knights …), with a strength per man, needs and roles. Config and older text still say arm; ids such as `levy foot` stay | Kind |
+| Kind | Where soldiers come from: levy, retinue, hired company, standing regiment, garrison, rebel band | Troop type |
+| Strength per man | A troop type's fighting worth per man, by era (config) | Hits |
+| Role | What a troop type does in a sector: Line, Brace, Shock, Shot, Light, Heavy, Guns, Air (era VII) | Approach |
 | Drill | Months a company has trained together (0 to 24, D-WAR-9) | Scars |
 | Scars | Battles a company stood through without breaking (0 to 5) | Victories |
 | Troop level | 1 Raw, 2 Drilled, 3 Seasoned, 4 Veteran, 5 Elite, read from drill and scars | — |
@@ -100,7 +100,7 @@ Newest decision first.
 | Style | A real, named way of war tied to countries and eras (for example *Charge en haie*) | Approach |
 | Approach | One of eight battle behaviours behind every style: Breakthrough, Steadfast, Envelopment, Skirmish, Ambush, Entrenchment, Bombardment, Assault | Style |
 | Stale | A style facing the enemy inventions or styles that historically beat it | Obsolete |
-| Obsolete | An arm replaced by an invention the enemy knows | Stale |
+| Obsolete | A troop type replaced by an invention the enemy knows | Stale |
 | Adopted style | A style taken by a country not in its *From* list | — |
 | Battlefield | The row of up to 7 sectors taken from the province's middle tiles | — |
 | Sector | One tile of the battlefield, with a room and effects | — |
@@ -128,6 +128,10 @@ Newest decision first.
 | Occupation | Holding an enemy province by taking its castle or holding it a season | — |
 | Raid (army) | A horse-only army that burns and loots instead of besieging or occupying | Raid (war aim) |
 | Peace voices | The people who count in a realm, each saying peace or war | War score (not used) |
+| Demand cost | A province's price at the peace table, from its people, wealth, walls, coast, river, capital and nearness (WAR-240) | Province value in trade |
+| Settlement capacity | What the war lets one side ask of the other, in demand-cost points, from what it won (WAR-241) | War score (not used) |
+| Peace table | The war card section where terms are combined within the capacity (WAR-248) | Peace offer |
+| Surrender | A beaten AI side's unconditional peace: the victor asks anything the rules allow (WAR-245) | Siege surrender (WAR-170) |
 | Victories / Defeats | Battles won and lost (country: last 20 years; commander: lifetime record) | Scars |
 | Fallen | All killed, counted on the country (country 6) | — |
 | Era | Research era I 1444–1500, II 1500–1600, III 1600–1700, IV 1700–1800, V 1800–1870, VI 1870–1914, VII 1914–1939 (cut) | — |
@@ -195,7 +199,7 @@ Newest decision first.
 - **Approach** (value): deployment rule, order priority list, needs, shines, struggles.
 - **Peace voice** (value): holder (lord, royal province, capital, ruler), weight, says peace / war / none.
 - **Prisoner** (entity): person or company, rank, owner, ration eaten.
-- **Free company** (entity): name, captain, men, arm, drill, scars, price, contract months, region.
+- **Mercenary company** (entity): name, captain, men, arm, drill, scars, price, contract months, region.
 - **Rumour** (value): approximate size and place of an unseen army, wrong by up to a third.
 
 ### Domain services
@@ -212,8 +216,8 @@ Newest decision first.
 
 | Arm | Strength per man | Needs per 100 men | Roles | Unlocked by |
 |---|---|---|---|---|
-| Levy foot (spears, bows, farm tools) | 1.0 | Nothing | Line | Start |
-| Armoured foot | 1.3 | 1 load of arms | Line, Heavy | Start |
+| Levy infantry (spears, bows, farm tools) | 1.0 | Nothing | Line | Start |
+| Heavy infantry | 1.3 | 1 load of arms | Line, Heavy | Start |
 | Archers | 1.1 | 1 load of arms | Shot | Start |
 | Pikes | 1.2 | 1 load of arms | Brace | W6 Pike squares |
 | Hand gunners | 1.4 | 1 arms, 1 powder a battle | Shot | W5 Gunpowder infantry |
@@ -221,7 +225,7 @@ Newest decision first.
 | Musketeers (volley) | 2.0 | 2 arms, 2 powder | Shot | W9 Volley fire drill |
 | Line infantry (flintlock) | 2.6 | 2 arms, 2 powder | Line, Brace, Shot | W11 Flintlock and bayonet |
 | Riflemen | 3.5 → 5.0 | 3 arms, 3 powder | Shot, Light | W16, W17 |
-| Light horse | 2.0 | 100 horses | Shock, Light | Start |
+| Light cavalry | 2.0 | 100 horses | Shock, Light | Start |
 | Horse archers | 2.5 | 100 horses, 1 arms | Shot, Light (Shock against broken enemies) | W1 Composite-bow horse archery |
 | Knights and lancers | 3.5 | 100 horses (+50 remounts), 2 arms | Shock, Heavy | W2 Heavy armoured cavalry |
 | Camel riders | 2.0 | 100 camels (as horses) | Shock, Light; no desert penalty | Desert and Sahel realms at start |
@@ -235,11 +239,11 @@ Newest decision first.
 
 | Role | I | II | III | IV | V | VI | VII (to 1939) |
 |---|---|---|---|---|---|---|---|
-| Line | Levy foot, armoured foot | Armoured foot | Musketeers | Line infantry | Line infantry | Riflemen | Infantry |
+| Line | Levy infantry, heavy infantry | Heavy infantry | Musketeers | Line infantry | Line infantry | Riflemen | Infantry |
 | Brace | Pikes (W6), dismounted men-at-arms | Pike and shot (W7) | Pike and shot | Line infantry with bayonets (W11) | Infantry squares | Entrenched riflemen | Machine gunners, anti-tank teams |
 | Shot | Archers, crossbows, longbows, hand gunners (W5) | Arquebusiers | Musketeers (W9) | Line infantry | Riflemen (W16) | Breech-loading riflemen (W17), machine guns (W19) | Infantry, machine guns |
 | Shock | Knights (W2), elephants, camel riders | Gendarmes, lancers | Cuirassiers, hussars | Dragoons, cuirassiers | Cuirassiers, lancers | Cavalry (obsolete against W19) | Tanks (W21) |
-| Light | Light horse, horse archers (W1) | Horse archers, light horse | Hussars, Cossacks | Light infantry, hussars | Skirmishers, riflemen | Mounted rifles | Reconnaissance troops |
+| Light | Light cavalry, horse archers (W1) | Horse archers, light cavalry | Hussars, Cossacks | Light infantry, hussars | Skirmishers, riflemen | Mounted rifles | Reconnaissance troops |
 | Heavy | Plate armour (knights, men-at-arms) | Plate (fading: Shot ignores Heavy from W5) | Cuirass | none | none | none | Armour plating (tanks) |
 | Guns | Bombards (W3) | Field guns (W8), Ottoman and Mughal cart guns | Regimental guns | Field artillery | Massed artillery, horse artillery (W13) | Quick-firing artillery (W20) | Howitzers firing beyond sight |
 | Air | — | — | — | — | — | — | Aircraft (W22): hit any sector or camp, ignore cover |
@@ -304,7 +308,7 @@ Newest decision first.
 | I | Wagenburg | Bohemia, Hungary, Poland-Lithuania | W4 | Entrenchment | Can dig in even on a day it marched; dug sectors block Turn and Drive | W8 |
 | I | Braccesca | Italian states (condottieri) | — | Breakthrough | Rotates Shock for free: a charged-out company is replaced by a fresh one each bell | W7 |
 | I | Sforzesca | Milan and Italian states (condottieri) | — | Steadfast | Commit reserve gives ×1.5 hits in the bell it arrives | W9 |
-| I | A la jineta | Castile, Granada, Portugal | — | Skirmish | Light horse can Drive into the camp from any won sector | W11 |
+| I | A la jineta | Castile, Granada, Portugal | — | Skirmish | Light cavalry can Drive into the camp from any won sector | W11 |
 | I | Furusiyya | Mamluk Sultanate | W1 | Skirmish | Horse archers can also charge as Shock in the same battle | W5 massed with W3 in the field |
 | I | Feigned flight | Great Horde, Crimea, Kazan, Uzbeks, Timurids, Oirats, Kazakhs, Nogais | W1 | Skirmish | Shock that charges horse archers and misses is −25 % next bell | W11 |
 | I | Tabur cengi | Ottomans | W3 | Bombardment | The centre counts as dug in | W9 on the enemy side |
@@ -383,7 +387,7 @@ Newest decision first.
 - WAR-007 When 5 years pass without a battle for a company, the warfare system shall take 1 scar from it. [warfare §2.1, §7.4]
 - WAR-008 When a company is disbanded, the warfare system shall reset its drill (and scars). [warfare §2.1, §3.5, §7.4]
 - WAR-009 The warfare system shall add loads of arms to a company when issued from the store at raising and when captured on a won field, and remove them with killed and fled men, when left on a lost field, and when sold at disbanding. [warfare §2.1]
-- WAR-010 If a company carries fewer loads of arms than its arm needs, then the warfare system shall have it fight as the next arm down (armoured foot as levy foot). [warfare §2.1]
+- WAR-010 If a company carries fewer loads of arms than its arm needs, then the warfare system shall have it fight as the next arm down (heavy infantry as levy infantry). [warfare §2.1]
 - WAR-011 The warfare system shall give each arm a strength per man by era, its needs per 100 men, its roles and the invention that unlocks it, as in the arms table (config). [warfare §2.2, §7.3]
 - WAR-012 The warfare system shall treat war elephants and camel riders as their own arms: elephants at 6.0 per man, 8 men to an elephant, −50 % in forest and jungle, from studs in South and Southeast Asia; camel riders at 2.0 with 100 camels per 100 men and no desert penalty, known at start in desert and Sahel realms. [warfare §2.2, §7.3, §19; gap-lists 16 Oct]
 - WAR-013 Where a company's arm uses powder, the warfare system shall take its powder per battle (or per month of siege firing for bombards) from the realm's powder store, and if the store has none, then its guns and hand guns shall not fire in battle. [warfare §2.2, §2.4, §3.4]
@@ -422,13 +426,13 @@ Newest decision first.
 
 ### 5.5 Raising and keeping an army
 
-- WAR-037 When levies are raised (recruiting), the warfare system shall receive them as levy-kind companies of levy foot, gathered in the province's castle or town after 2 weeks (days with W18 along railways). [warfare §3.1, §12; recruiting §1, §2.5]
+- WAR-037 When levies are raised (recruiting), the warfare system shall receive them as levy-kind companies of levy infantry, gathered in the province's castle or town after 2 weeks (days with W18 along railways). [warfare §3.1, §12; recruiting §1, §2.5]
 - WAR-038 When the player or AI calls the lords, the warfare system shall answer each lord by loyalty: loyal brings his whole retinue in 3 weeks and may lead it as a captain; wavering brings half, after 6 weeks, and goes home after 6 months unless the war aim is his Want; disloyal refuses and calling him again makes him angrier; a lord in revolt's retinue is a rebel army. [warfare §3.2]
 - WAR-039 When the war aim is a lord's Want, the warfare system shall bring him even when wavering and keep him to the end. [warfare §3.2]
 - WAR-040 When a lord's lands are occupied by the enemy, the warfare system shall send him and his retinue to defend them. [warfare §3.2]
-- WAR-041 The warfare system shall offer named free companies with a captain in the regions where they historically gathered (config), each showing men, arm, drill, scars and price. [warfare §3.3]
-- WAR-042 When a contract is signed, the warfare system shall add the free company for the contracted months for gold up front plus monthly pay, using no recruits. [warfare §3.3] *Replaced in part by WAR-210, WAR-211 (playtest feedback).*
-- WAR-043 When a hire contract ends, its pay is owed as in WAR-019, or an enemy outbids, the warfare system shall remove the free company. [warfare §3.3]
+- WAR-041 The warfare system shall offer named mercenary companies with a captain in the regions where they historically gathered (config), each showing men, arm, drill, scars and price. [warfare §3.3]
+- WAR-042 When a contract is signed, the warfare system shall add the mercenary company for the contracted months for gold up front plus monthly pay, using no recruits. [warfare §3.3] *Replaced in part by WAR-210, WAR-211 (playtest feedback).*
+- WAR-043 When a hire contract ends, its pay is owed as in WAR-019, or an enemy outbids, the warfare system shall remove the mercenary company. [warfare §3.3]
 - WAR-044 Each month, the warfare system shall charge the treasury pay for every company except retinues and levies in their first 3 months. [warfare §3.4]
 - WAR-045 At the weekly step at the end of every turn (X-18), the warfare system shall feed an army a week's share (7 ÷ 30) of its monthly rations (2 per soldier on campaign, 3 per horse and 1 per prisoner a month), from the province at home and from its food reserve abroad. [warfare §3.4, §6.1; X-3, X-18]
 - WAR-046 When a company is disbanded, the warfare system shall return its men to their home province's recruit pool and its arms to the store. [warfare §3.5]
@@ -459,7 +463,7 @@ Newest decision first.
 
 - WAR-066 While an army is on forced march, the warfare system shall double its sickness, make its levies desert 2 % a week, and give it −10 % strength for the first day of a battle it arrives into. [warfare §5.1, §7.8]
 - WAR-067 While an army marches Careful, the warfare system shall not let it be ambushed and shall let its scouts see two provinces ahead. [warfare §5.1]
-- WAR-068 The warfare system shall show a realm the enemy armies in its own provinces, in provinces next to its armies and castles, and as far as its scouts ride: every 500 light horse, horse archers or camel riders see one province further. [warfare §5.4]
+- WAR-068 The warfare system shall show a realm the enemy armies in its own provinces, in provinces next to its armies and castles, and as far as its scouts ride: every 500 light cavalry, horse archers or camel riders see one province further. [warfare §5.4]
 - WAR-069 The warfare system shall show armies further away as rumours of their size and place that can be wrong by up to a third. [warfare §5.4]
 - WAR-070 The warfare system shall work out rumours and scouting only for armies near the player. [warfare §16]
 
@@ -571,7 +575,7 @@ Newest decision first.
 - WAR-150 When a realm learns the invention that makes one of its arms obsolete, the warfare system shall no longer let it raise that arm. [eras §3]
 - WAR-151 When a company re-arms to a new arm, the warfare system shall take its loads of arms and powder and drop it one level. [eras §3]
 - WAR-152 The warfare system shall use the era's drill months and level bonuses: I 2/4/8, −10/0/+10/+20/+30, +5/+10/+15; II 3/6/12, same bonuses; III 4/8/12, −15/0/+15/+25/+35, +5/+10/+15; IV 6/12/18, −20/0/+15/+30/+45, +5/+10/+20; V 3/6/18, −15/0/+15/+25/+40, +5/+10/+20; VI 6/12/24, −25/0/+20/+35/+50, +10/+15/+20; VII 6/12/24, −30/0/+25/+45/+70, +10/+15/+25 (drill months for Drilled/Seasoned/Elite; hits at levels 1–5; break point at levels 3–5). [eras §4]
-- WAR-153 The warfare system shall apply the era notes on levels: era I knights and men-at-arms start at level 3 and levies can't pass level 3 without becoming standing troops; era II pike and shot below level 2 fight as levy foot; era III musketeers below level 2 shoot at half with W9; era IV linear tactics need level 2 to change sector in a bell; era VI a realm with W18 can call up former soldiers at level 2 (reservists); era VII level 4 and 5 companies can infiltrate (*Stoßtrupptaktik*). [eras §4]
+- WAR-153 The warfare system shall apply the era notes on levels: era I knights and men-at-arms start at level 3 and levies can't pass level 3 without becoming standing troops; era II pike and shot below level 2 fight as levy infantry; era III musketeers below level 2 shoot at half with W9; era IV linear tactics need level 2 to change sector in a bell; era VI a realm with W18 can call up former soldiers at level 2 (reservists); era VII level 4 and 5 companies can infiltrate (*Stoßtrupptaktik*). [eras §4]
 - WAR-154 When a realm learns an invention that changes a company's arm or role, the warfare system shall drop that company one level until it has drilled the new era's Drilled months. [eras §4]
 - WAR-155 The warfare system shall apply Might by era: I +8 % hits and +3 % break point per point in his sector, with a 1 in 5 chance of wound, capture or death if his sector is lost; II +7 % and +3 %; III–IV +5 % and +2 %; V +4 % and +2 % with a 1 in 10 risk; VI no sector, +3 % hits and +1 % break point to the whole army per point, at risk only if the camp is taken; VII +2 % and +1 % for the army and +10 % per point to Drive orders. [eras §6]
 - WAR-156 The warfare system shall apply Cunning by era as orders at Cunning 0–1 / 2–3 / 4–5: I 1/2/2 with orders to other sectors arriving next bell; II 1/2/3 with orders to sectors 3+ away arriving next bell; III–IV 1/2/3 all the same bell; V 1/2/3, +1 with W14; VI 2/2/3, captains give their own orders; VII 2/3/4, +1 with W23. [eras §6]
@@ -594,13 +598,13 @@ Newest decision first.
 - WAR-170 The warfare system shall end a siege by honours of war (garrison marches out with arms to the nearest friendly castle, castle taken whole; terms kept build trust, breaking them is an oath broken), surrender (garrison become prisoners), storm (garrison killed or taken; besieger chooses Spare, Plunder or Raze), relief (a castle-side army wins against the besiegers; the garrison joins as a reserve with +10 % strength), or lifting (the besiegers leave). [warfare §8.5]
 - WAR-171 When a stormed castle is plundered, the warfare system shall give gold equal to a year of the province's tax owed, burn 1 in 3 town buildings, kill or drive off 10 % of townsfolk, and add *Burned homes*; when it is razed, it shall destroy the castle. [warfare §8.5; province §11]
 - WAR-172 The warfare system shall have an AI garrison accept honours when it has a breach or under a month of food and no relief army within 10 days; it shall never accept terms from a Cruel commander. [warfare §8.5]
-- WAR-173 The warfare system shall let a besieger bribe the garrison's captain only when its pay is owed 2 months or more, the castle belongs to a disloyal or wavering lord, or the captain's tongue differs from his ruler's; a Greedy commander inside takes it; a Greedy commander outside pockets a tenth. [warfare §8.6]
+- WAR-173 The warfare system shall let a besieger bribe the garrison's captain only when its pay is owed 2 months or more, the castle belongs to a disloyal or wavering lord, or the captain's language differs from his ruler's; a Greedy commander inside takes it; a Greedy commander outside pockets a tenth. [warfare §8.6]
 - WAR-174 When an army takes a castle, the warfare system shall give it the castle store and the province's food spread (castle as food hub). [warfare §8.7, §6.3]
 
 ### 5.18 Occupation and raids
 
 - WAR-175 When an army takes a province's castle, or holds a province with no castle for a season, the warfare system shall mark the province occupied: the occupier gets its tax, recruits, food and trade, and its lord wavers toward the side holding his land. [warfare §9.1]
-- WAR-220 When armies of more than one realm besiege or hold the same province, the warfare system shall give it to the realm that began the siege or the hold, not to the strongest; the strongest takes over only when several arrive on the same day or the first realm's armies leave. How the player uses it: the dispatch "X lays siege to Y" names who will take the province, and the province's siege view (F-32) shows the same realm as the besieger. [F-45]
+- WAR-220 When armies of more than one realm besiege or hold the same province, the warfare system shall give it to the realm that began the siege or the hold, not to the strongest; the strongest takes over only when several arrive on the same day or the first realm's armies leave. How the player uses it: the news line "X lays siege to Y" names who will take the province, and the province's siege view (F-32) shows the same realm as the besieger. [F-45]
 - WAR-176 While an army is a horse-only army with orders Raid, the warfare system shall not let it besiege or occupy; each week in a province it burns one tile and takes loot (gold from market and town, herds and horses from pasture) up to 1 load per 50 riders, then moves on; castles there may sally. [warfare §9.2, §5.1]
 
 ### 5.19 War state and peace
@@ -629,7 +633,7 @@ Newest decision first.
 ### 5.21 AI
 
 - WAR-194 The warfare system shall set an AI country's standing orders from its catalogue risk tolerance (low: wait, retreat at 1 to 1; medium: attack, retreat at 3 to 2; high: attack, retreat at 2 to 1) and its commanders' starting styles from the era's styles of its culture group. [warfare §15; D-WAR-14]
-- WAR-195 The warfare system shall have the AI choose which kinds it raises (for example Castile noble retinues and frontier light horse; a city republic hired companies) and whether it besieges or raids, from its personality. [warfare §15] A high-risk AI raids with horse-only armies; the others besiege. [D-WAR-14]
+- WAR-195 The warfare system shall have the AI choose which kinds it raises (for example Castile noble retinues and frontier light cavalry; a city republic hired companies) and whether it besieges or raids, from its personality. [warfare §15] A high-risk AI raids with horse-only armies; the others besiege. [D-WAR-14]
 - WAR-196 The warfare system shall set the share of peace voices an AI needs before it makes peace from its risk tolerance (a low-risk AI offers peace at a third; a hegemon seeker only when forced). [warfare §15]
 - WAR-197 The warfare system shall give the AI only the forage limits, food reserves and peace voices the player sees; it shall not cheat on food. [warfare §15]
 
@@ -654,23 +658,104 @@ Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision
 - WAR-207 The warfare system shall fight every battle one round per 4-hour step (X-1) and publish after each round each side's men, morale and losses so far; no battle is resolved in one go. [F-8; X-1]
 - WAR-208 The warfare system shall publish each siege's progress (days held, breaches, garrison left, food left in the castle) whenever it changes, for the map and the siege view. [F-9]
 - WAR-209 The warfare system shall never let an army exist without a commander: soldiers with no commander are their province's garrison troops (recruiting RECR-107), not an army. If an army loses its commander and no captain can take over, then it shall halt; in its own realm's land it becomes the garrison troops of the province it stands in, and abroad it waits there until a commander joins it. [F-13]
-- WAR-210 When a contract with a free company is signed, the warfare system shall take the gold up front and have the company arrive at the realm's capital after the days it needs to march there from where it gathers, shown on the hire screen; until it arrives it is not on the map and cannot fight. While the capital is besieged or occupied, no company can be hired. [F-19; playtest feedback]
+- WAR-210 When a contract with a mercenary company is signed, the warfare system shall take the gold up front and have the company arrive at the realm's capital after the days it needs to march there from where it gathers, shown on the hire screen; until it arrives it is not on the map and cannot fight. While the capital is besieged or occupied, no company can be hired. [F-19; playtest feedback]
 - WAR-212 The warfare system shall give levies no service term: a levy company, trained or not, never goes home on its own and stays until its realm disbands it or leaves it as a garrison; lords' retinues and hired companies keep their own rules. [F-23]
 - WAR-211 The warfare system shall have every hired company led by its own captain as the commander of its own army, who leaves with the company when the contract ends; a hired company never takes one of the realm's commanders. [F-19]
-- WAR-213 The warfare system shall offer free companies of the age's groups, each gathered where its group historically gathered, with a random size between the age's smallest and largest company (300 to 3,000 men, config) and a random mix of arms within its group's ranges; about six are for hire at once, some move on each month and new ones gather, and a realm may hire those that reach its capital within 16 weeks. A hired company arrives with exactly the men and arms it was offered with. [F-53; replaces the fixed 1,000-man company of milestone 2]
+- WAR-213 The warfare system shall offer mercenary companies of the age's groups, each gathered where its group historically gathered, with a random size between the age's smallest and largest company (300 to 3,000 men, config) and a random mix of arms within its group's ranges; about six are for hire at once, some move on each month and new ones gather, and a realm may hire those that reach its capital within 16 weeks. A hired company arrives with exactly the men and arms it was offered with. [F-53; replaces the fixed 1,000-man company of milestone 2]
 
-#### How the player uses it: free companies
-- WAR-214 Where: the player opens their country card and taps the Mercenaries tab; each company for hire is a card with a Hire button, which is greyed with the reason when the capital is besieged or the treasury is short. [F-52; X-19]
-- WAR-215 Grouping: the tab holds everything about free companies and nothing else: "Your companies" (in service, with a Command button, and on the way, with the weeks left) above "For hire". Each card shows the company's name and group, a bar of its arms with the men of each, its men and captain, the weeks to the capital and its pay a month. [F-52; X-19]
-- WAR-216 Overview: the top of the tab gives the companies in service, their men and their pay a month; the Military tab keeps one line ("Free companies: 2 in service, 1 on the way, 5 for hire") that opens the Mercenaries tab. [F-52; X-19]
+#### How the player uses it: mercenary companies
+- WAR-214 Where: the player opens their country card's Military tab and taps its Mercenary companies button, which opens the companies' page with a Back to Military button (no tab of its own, feedback 114); each company for hire is a card with a Hire button, which is greyed with the reason when the capital is besieged or the treasury is short. [F-52; X-19]
+- WAR-215 Grouping: the page holds everything about mercenary companies and nothing else: "Your companies" (in service, with a Command button, and on the way, with the weeks left) above "For hire". Each card shows the company's name and group, a bar of its arms with the men of each, its men and captain, the weeks to the capital and its pay a month. [F-52; X-19]
+- WAR-216 Overview: the top of the page gives the companies in service, their men and their pay a month; the Military tab keeps one line ("Mercenary companies: 2 in service, 1 on the way, 5 for hire") that opens the companies' page, and the Military tab stays lit while it is open. [F-52; F-114; X-19]
 - WAR-217 Phone: in landscape the cards are one column across the panel, the Hire and Command buttons are at least 44 × 44 points, the tabs wrap rather than scroll, and nothing needs hover. [F-52; X-19]
+
+### 5.24 The price of war (X-21, Leroy 18 Oct)
+Leroy, 18 October: war has too few downsides and feels overpowered; it should be balanced through diplomacy. These
+rules are the latest decision and replace what they name; the balance model (BAL-014 to BAL-017) checks them.
+
+- WAR-221 The warfare system shall count each side's peace voices in the game by WAR-180, from lords, royal provinces and the capital, in place of the stand-in share of people occupied, and shall apply WAR-181 and WAR-182 to player and AI alike: an obliged ruler who refuses loses a step of loyalty from every lord each season, and levies desert twice as fast. [X-21; WAR-180 to WAR-182]
+- WAR-222 The warfare system shall apply WAR-178 (a war with no fitting aim makes lords who aren't Warlike waver) and WAR-179 (breaking a truce makes every lord waver a step) in the game. [X-21]
+- WAR-223 When a war has lasted `warfare.peace.long_war_years` (2, provisional), every lord of a war leader who isn't Warlike and whose Want is not the war's aim shall say peace with all his voices until the war ends. [X-21]
+- WAR-224 While a province is occupied, the warfare system shall give the occupier `warfare.occupation.tax_share` (half, provisional) of its tax and none of its trade; the rest is lost to the war. This replaces the tax and trade part of PROV-184; recruits and food stay as PROV-184 says. [X-21]
+- WAR-225 While its realm is at war, a levy company shall be paid from its first month; the three free months (F-23) count only for levies kept while the realm is at peace. [X-21; F-23]
+- WAR-226 Men killed in battle, in a siege or a storm, or dead of hunger or sickness shall be taken from the people of the province and class they were levied from, besides counting in *Fallen from here* (X-7), so a war lowers that province's people, tax and recruits for years. [X-21; X-7]
+- WAR-227 A peace shall cede at most `warfare.peace.max_ceded_share` (a third, provisional, rounded up) of the loser's provinces, chosen by the asker among those it occupies, and the loser's capital only when it is the loser's last province; a realm is taken whole only by diplomacy (subjects, unions and folding in, DIPL-224). [X-21]
+- WAR-228 The AI shall declare war only when all of these hold: its side's strength, with the allies that would answer its calls, beats the target's side, with the target's allies, pledgers and every league member against the AI, by `warfare.ai.declare_strength_ratio`; its treasury covers `warfare.ai.war_chest_months` (6, provisional) of the pay its armies would draw at war; its own peace voices would not say peace on the day it declares; and its notoriety is under `diplomacy.ai.notoriety_restraint` (50, provisional) unless its personality is Warlike or a hegemon seeker. [X-21; WAR-196; DIPL-174]
+
+#### How the player uses it: the price of war
+- WAR-229 Where: Declare war on another realm's Diplomacy tab opens the declare sheet, which shows a *Price of war* block above Confirm: who will be called against you (allies, pledgers, league members, each with soldiers), the neighbours who will hold *Threatened us* and how many, your lords who will waver, a truce you would break, the monthly pay of your armies at war, and the most land one peace can take ("at most 4 of their 11 provinces"). Lines that hurt are marked in red with an icon, and each opens its reason on tap. [X-21; X-19]
+- WAR-230 Grouping: everything about a running war sits on its war card in the Diplomacy tab, reached also from the war plaque: the aim, both sides' peace voices as a bar with the half mark, months at war and the long-war mark, provinces occupied each way, and the most one peace can take now. No war fact is spread over other tabs. [X-21; X-19; F-11]
+- WAR-231 Overview: the war plaque in the top bar (REALM-205) shows each war's peace voices for your side as a small bar that turns amber past a third and red past half, when a peace becomes obliged; tapping it opens the war card. [X-21; X-19]
+- WAR-232 Phone: in landscape the declare sheet is two columns in the Wide layout (price on the left, terms on the right) and one scrolling column in the Tall layout, with Confirm pinned inside the safe area; every line and button is at least 44 points tall, bars carry their number as text so colour is never the only sign, and nothing needs hover. [X-21; X-19]
+
+### 5.25 Peace settlement scoring (X-23, Leroy 18 Oct)
+Leroy, 18 October: how much a country can demand from a beaten enemy is scored from how the war went; every province
+has a configurable demand cost; demands are combined within the capacity; the AI answers by the same counts (accept,
+counter or refuse); a decisively beaten AI may surrender unconditionally. The capacity is this game's own: it is
+drawn from what was won (land held, the capital, battles) and weighed by armies and the peace voices (WAR-180), not
+from a war score. WAR-184's preconditions and WAR-227's peace limit still hold. All numbers are
+`warfare.settlement.*` and provisional.
+
+- WAR-240 The warfare system shall give each province a demand cost: `province_cost.base`, plus
+  `per_sqrt_thousand_people` times the square root of its people in thousands, plus `per_wealth` times its wealth,
+  plus `castle` when it has walls, `coastal` on the coast and `river` on a river; times `capital_multiplier` for a
+  realm's capital and `not_bordering_multiplier` when it does not touch the asking side's land; rounded, at least 1.
+  [X-23]
+- WAR-241 The warfare system shall give the asking side a settlement capacity against the giving side: the giving
+  side's realm value (the demand cost of all its land) times what was won, the sum of `capacity_weights.land_held`
+  times the share of that value the asking side holds, `capital_held` when it holds the giving leader's capital, and
+  `battles` times the giving side's men lost in this war's battles beyond the asking side's, against those men plus
+  its strength now; raised by the factor 1 + `armies` times the asking side's edge in strength (1 − theirs ÷ ours,
+  at least 0) + `will_to_fight` times the giving side's share of peace voices; rounded down, never above the realm
+  value. Nothing won gives no capacity. It is recomputed from the war's state, never stored (INV-WAR-19). [X-23]
+- WAR-242 The warfare system shall let the asking side combine demands: provinces of the giving side it holds
+  (WAR-184), at most WAR-227's share of each giving realm's provinces and its capital only with its last, and gold up
+  to the giving realm's treasury; a demand costs its provinces' costs plus one point for each `gold_per_point` gold,
+  rounded up. [X-23; WAR-184; WAR-227]
+- WAR-243 When a demand is put to an AI realm, the warfare system shall have it sign when the demand costs no more
+  than the capacity; otherwise offer back the dearest of the asked provinces that fit, within the limits, and as
+  much of the asked gold as the rest buys; and refuse when nothing fits. [X-23; WAR-183]
+- WAR-244 When an AI realm asks for peace terms, the warfare system shall have it spend the capacity the same way:
+  the dearest provinces it holds that still fit, within the limits, and gold up to their treasury with the rest; the
+  AI offers the player this when it is losing and its voices want peace, and asks it of the player when the player's
+  voices want peace and it holds the player's land. Between AI realms these terms end the war when the loser's
+  voices want peace (WAR-183). [X-23; DIPL-195]
+- WAR-245 The warfare system shall count an AI side as beaten when at least `surrender.peace_share` of its voices
+  say peace, its strength is at most `surrender.army_ratio` of the enemy's, and the enemy holds its leader's capital
+  or at least `surrender.land_share` of its realm value; a beaten AI surrenders unconditionally, and the news says
+  so. The player never surrenders by the game's choice. [X-23]
+- WAR-246 While a side has surrendered, its capacity shall be its whole realm value, and it signs any demand the
+  rules allow (WAR-242); an AI victor signs its fullest terms at once; a player victor is sent a surrender offer with
+  the fullest terms, and may instead ask anything else at the peace table. [X-23; WAR-185]
+- WAR-247 When an AI realm counters the player's demand, the warfare system shall send the player its counter as a
+  peace offer that names the provinces and gold, standing until the month is out like any peace offer. [X-23;
+  DIPL-195]
+
+#### How the player uses it: the peace table
+- WAR-248 Where: an enemy's card, Diplomacy tab, under *At war*: the *Peace table*. It says whether the peace ends
+  the whole war, what the war lets you ask and what all their land is worth, a bar of what you ask against what is
+  allowed with both numbers as text and whether they will sign, and *Where the N comes from* (a tap opens the five
+  parts with their points). Under it *Their land you hold*: one 44-point toggle for each province, with its price and
+  why it can't be asked (their capital, the peace limit); then gold with − and + buttons a step at a time. The draft
+  starts as the most the war allows. *Offer these terms*, *Ask the most the war allows*, *White peace* and *Give up*
+  close it. A counter or a surrender arrives as a peace offer in the dispatches and on their card, naming what it
+  gives, with *Make peace* and *Fight on*. [X-23; X-19; DIPL-196]
+- WAR-249 Grouping and overview: the peace table is the only place terms are made, on the war card next to the
+  war's other facts (WAR-230); the war plaque (WAR-231) and the dispatches, which count peace offers, are the
+  overview; a surrender is also told in the news. [X-23; X-19]
+- WAR-250 Phone: in the Wide and Tall layouts the province toggles sit two or three side by side when the card is
+  wide and one to a row when it is narrow; every toggle and button is at least 44 points high, the bar carries its
+  numbers as text so colour is never the only sign, the parts open on a tap and nothing needs hover; checked with
+  `apps/client/scripts/peace-table-shots.mjs` on a small and a large phone held sideways and a desktop. [X-23; X-19]
+- WAR-251 The warfare system shall score settlements the same for player and AI, from the same config, with no
+  randomness: the same war state always gives the same costs, capacity, answer and terms. [X-23; WAR-183; X-15]
 
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
 |---|---|---|---|---|
 | CallLords(lords?) | player / AI | At war or preparing | Lords answer by loyalty (WAR-038) | LordAnswered |
-| HireCompany(company, months) | player / AI | Free company offered in reach; under troop cap; gold | Company joins; gold paid | CompanyHired |
+| HireCompany(company, months) | player / AI | Mercenary company offered in reach; under troop cap; gold | Company joins; gold paid | CompanyHired |
 | PayArrears(army) | player / AI | Gold | Pay owed cleared | — |
 | DisbandCompany(company) | player / AI | — | Men to recruits, arms to store | CompanyDisbanded |
 | AppointCommander(army, person) / AppointCaptain | player / AI | Person available | Leads the army / a sector | CommanderAppointed |
@@ -691,6 +776,7 @@ Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision
 | SetAcademyStyle(academy, style) | player / AI | Academy; teacher who knows the style | Adoption path | StyleAdopted (later) |
 | CommissionWargames(commander) | player / AI | Era VI+; peace | +1 Cunning after a year, once per era | — |
 | AcceptPeace(terms) / RefusePeace | player / AI | Offer received (diplomacy) | War ends / loyalty penalties | WarEnded |
+| OfferTerms(enemy, provinces, gold) | player / AI | At war; WAR-242 | Signed, countered or refused by WAR-243 | WarEnded / TermsCountered / TermsRefused |
 
 Re-arming a company (WAR-151) is ordered through recruiting's retraining. March, Raid speed, Besiege as a march
 order, Board, Land and Split/Join are troop-movement commands.
@@ -713,6 +799,8 @@ order, Board, Land and Split/Join are troop-movement commands.
 | LootTaken | Raid or sack | gold, herds, horses | realm, recruiting (a tenth home on disband) |
 | PeaceVoicesChanged / PeaceVoicesPassedHalf / PassedThreeQuarters | Recomputed | war, side, shares | diplomacy, game-shell |
 | WarEnded | Peace or other ending | war, ending kind | diplomacy (truce), realm |
+| TermsCountered / TermsRefused | WAR-243 | war, asker, what fits | game-shell (peace offer card) |
+| Surrendered | WAR-245 | war, beaten side, victor | diplomacy, game-shell news |
 | LevyDeserted / CompanyDeserted | Desertion | company, men | recruiting (men home), province |
 | FieldsBurned | Burn the fields | province | province |
 | StyleAdopted / StyleLearned | Adoption or learning | country / commander, style | map-presentation |
@@ -721,7 +809,7 @@ order, Board, Land and Split/Join are troop-movement commands.
 
 ## 8. Policies (reactions to other contexts)
 
-- When recruiting delivers levies or a trained regiment, then warfare adds it as a company (levy foot, drill 0;
+- When recruiting delivers levies or a trained regiment, then warfare adds it as a company (levy infantry, drill 0;
   trained regiment at drill 3, or 4 from a Marshal's province).
 - When recruiting commissions an official, then warfare makes a commander with the given skills, trait and style.
 - When troop-movement reports two hostile armies in one province at the end of a day, then warfare runs the
@@ -857,13 +945,22 @@ file `packages/rules/data/domain/warfare.json` (D-WAR-17).
 | warfare.peace.tribute_years / open_roads_years | Terms | 20 / 10 | yes | warfare |
 | warfare.raid_war_months | Raid war length | 12 | yes | warfare |
 | diplomacy.truce_years | Truce | 5 (+5 if provinces moved or subject made); replaces warfare's 10 | yes | diplomacy |
+| warfare.peace.long_war_years | Years before lords who aren't Warlike say peace (WAR-223) | 2 | yes | warfare |
+| warfare.occupation.tax_share | Share of an occupied province's tax the occupier gets (WAR-224) | half | yes | warfare |
+| warfare.peace.max_ceded_share | Most of the loser's provinces one peace cedes (WAR-227) | a third, rounded up | yes | warfare |
+| warfare.settlement.province_cost.* | Demand cost of a province (WAR-240) | base 2; 0.5 per √thousand people; 1 per wealth; castle 2; coast 1; river 0.5; capital ×1.5; not bordering ×1.25 | yes | warfare |
+| warfare.settlement.capacity_weights.* | Capacity parts (WAR-241) | land held 0.5; capital 0.15; battles 0.15; armies 0.1; will to fight 0.25 | yes | warfare |
+| warfare.settlement.gold_per_point | Gold one point buys (WAR-242) | 25 | yes | warfare |
+| warfare.settlement.surrender.* | When an AI side is beaten (WAR-245) | 75 % peace voices; strength at most a quarter; capital or half the land held | yes | warfare |
+| warfare.ai.war_chest_months | Months of war pay the AI must hold to declare (WAR-228) | 6 | yes | warfare |
+| warfare.ai.declare_strength_ratio | How much stronger the AI's side must be to declare (WAR-228; the engine's `war.aiDeclareStrengthRatio`) | 2 | yes | warfare |
 
 ## 11. Seams
 
 | Other context | Direction | Pattern | What crosses |
 |---|---|---|---|
 | troop-movement | downstream (MOVE consumes WAR rules) / upstream (MOVE supplies contacts) | Partnership | WAR → MOVE: march-order effects, scouting range, standing orders, battle start/withdraw rule, forage limit, food reserve, castle garrisoned state, broken army. MOVE → WAR: daily positions, contacts, arrival in castle province, days walked, march order. |
-| recruiting | upstream | Customer–Supplier | Levies (levy foot, drill 0), trained regiments (arm, drill 3/4), standing regiments signed on, commissioned officials as commanders (skills, trait, style), retinues trained by lords; WAR returns disbanded men, deserters and Fallen |
+| recruiting | upstream | Customer–Supplier | Levies (levy infantry, drill 0), trained regiments (arm, drill 3/4), standing regiments signed on, commissioned officials as commanders (skills, trait, style), retinues trained by lords; WAR returns disbanded men, deserters and Fallen |
 | naval | downstream | Published Language | Bell rules (§7) for sea battles on 3 sectors; approaches usable at sea (Breakthrough, Steadfast, Skirmish, Bombardment); commander skills/traits for admirals; prisoners; food reserve aboard; castle capture taking ships in port; blockade cutting sea supply to a castle |
 | diplomacy | upstream (aims, declarations, peace offers, truce) / downstream (peace voices, occupation, victories) | Customer–Supplier | DIPL → WAR: war declared with aim, sides, allies joined, separate peace, peace terms signed, truce length. WAR → DIPL: peace voices, occupied provinces, capital occupied, prisoners, Lands taken from no-aim wars, oaths broken (terms, truce) |
 | province | upstream / downstream | Customer–Supplier | PROV → WAR: ground table (3.1), tile row, local store, foraging rating, sickness, castle store, grievances (content), people, officials. WAR → PROV: Requisitioned, Hungry, Soldiers quartered, Burned homes, burned tiles, sack effects, occupation, homeless from returning soldiers |
@@ -874,7 +971,7 @@ file `packages/rules/data/domain/warfare.json` (D-WAR-17).
 | rebellions | upstream | Customer–Supplier | Rebel bands formed (kind Rebel band); WAR → REBL battles |
 | government | upstream | Conformist | Ruler warlike, regency, succession war |
 | subjects | upstream | Conformist | Subject armies joining by kind; "Break a subject", "Become a subject" terms |
-| culture | upstream | Conformist | Homeland tongue (+10 % locals, +5 % break point, guerrilla styles), culture group for style fallback, captain's tongue for bribes |
+| culture | upstream | Conformist | Homeland language (+10 % locals, +5 % break point, guerrilla styles), culture group for style fallback, captain's language for bribes |
 | religion | upstream | Conformist | Persecution flag for *Defend the faith* |
 | events | downstream | Published Language | `prestige` ← victories, `war_weariness` ← Fallen and peace voices; events offering the throne to "their man" generals |
 | scenario-setup | upstream | Conformist | Risk tolerance for AI standing orders (D-WAR-14); starting styles per country (*From* column), capture warfare realms, starting castles, start inventions |
@@ -916,7 +1013,7 @@ file `packages/rules/data/domain/warfare.json` (D-WAR-17).
   hits and stays afloat loses one hull step, and hits equal to its strength sink or take it;
   higher-Cunning admiral slips away at night; repairs in harbour (shipyard ×2); soldiers aboard a lost ship
   drown or are captured. [warfare §11.2]
-- Fleet orders Blockade, Carry (landing a day per 5,000 men), Hunt, Escort; storms follow naval's rule (D-NAVY-7):
+- Fleet orders Blockade, Carry (landing a day per 5,000 men), Hunt, Escort (blockades are now set by naval's NAVY-155 to NAVY-159: no order, a fleet at war lying still; prize money and peace weight; F-123); storms follow naval's rule (D-NAVY-7):
   1 in 20 ships a month at sea in storm season, a struck ship losing one hull step and a wrecked one sinking. [warfare §11.3]
 - Naval adds crew share, boarding (on Close order or ram, land bell rules on one sector), prizes, sunk crews,
   pirates and ports at war. [naval §8]
@@ -1013,12 +1110,12 @@ Decided on 17 October 2026 (domain/DECISIONS.md). None of warfare's questions is
 | WAR-034 | features/troop-cap-and-soldier-stats.feature | Allies count on their own cap |
 | WAR-035 | features/troop-cap-and-soldier-stats.feature | Over the cap |
 | WAR-036 | features/troop-cap-and-soldier-stats.feature | One army has no size cap |
-| WAR-037 | features/raising-and-keeping.feature | Levies arrive from recruiting as levy foot; With railway mobilization the levy gathers in days |
+| WAR-037 | features/raising-and-keeping.feature | Levies arrive from recruiting as levy infantry; With railway mobilization the levy gathers in days |
 | WAR-038 | features/raising-and-keeping.feature | Lords answer the summons by loyalty |
 | WAR-039 | features/raising-and-keeping.feature | A lord whose Want is the war aim comes and stays |
 | WAR-040 | features/raising-and-keeping.feature | A lord leaves to defend his occupied lands |
-| WAR-041 | features/raising-and-keeping.feature | Free companies are found where they historically gathered |
-| WAR-042 | features/raising-and-keeping.feature | Hiring a free company takes no recruits |
+| WAR-041 | features/raising-and-keeping.feature | Mercenary companies are found where they historically gathered |
+| WAR-042 | features/raising-and-keeping.feature | Hiring a mercenary company takes no recruits |
 | WAR-043 | features/raising-and-keeping.feature | Losing a hired company |
 | WAR-044 | features/raising-and-keeping.feature | Who is paid from the treasury |
 | WAR-045 | features/raising-and-keeping.feature | An army eats rations by where it stands |
@@ -1191,7 +1288,10 @@ Decided on 17 October 2026 (domain/DECISIONS.md). None of warfare's questions is
 | WAR-207 | features/battle-setup.feature | A battle is fought round by round with its state published |
 | WAR-208 | features/sieges.feature | A siege publishes its progress |
 | WAR-209 | features/commanders.feature | No army without a commander |
-| WAR-210, 211 | features/raising-and-keeping.feature | Hiring a free company takes no recruits; A hired company arrives after its march |
+| WAR-210, 211 | features/raising-and-keeping.feature | Hiring a mercenary company takes no recruits; A hired company arrives after its march |
 | WAR-212 | features/kinds-and-break-points.feature | Levies stay until the realm sends them home |
-| WAR-213 | features/raising-and-keeping.feature | Free companies of the age, each its own size and mix |
-| WAR-214 to 217 | features/raising-and-keeping.feature | The Mercenaries tab |
+| WAR-213 | features/raising-and-keeping.feature | Mercenary companies of the age, each its own size and mix |
+| WAR-214 to 217 | features/raising-and-keeping.feature | The mercenary companies page |
+| WAR-221 … WAR-228 | features/price-of-war.feature | Peace voices in the game; Refusing an obliged peace costs the ruler; A war with no fitting aim in the game; Lords tire of a long war; Occupation does not pay for the war; Levies at war are paid at once; The dead are missed at home; One peace cannot swallow a realm; The AI counts the price before declaring |
+| WAR-229 … WAR-232 | features/price-of-war.feature | The declare sheet shows the price of war; The war card |
+| WAR-240 … WAR-251 | features/peace-settlement.feature | What a province costs to demand; Capacity comes from what was won; Combining demands within the rules; The AI answers a demand; The AI asks by the same counts; A beaten AI surrenders; The peace table |

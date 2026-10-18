@@ -1,7 +1,7 @@
 @context-subjects
-Feature: Ladder of rule and kinds of subject
+Feature: Ladder of rule and types of subject
   As an overlord
-  I want six kinds of subject, each owing and keeping different things
+  I want six types of subject, each owing and keeping different things
   So that subjects are a real third way to hold land besides officials and lords
 
   @SUBJ-001
@@ -36,8 +36,8 @@ Feature: Ladder of rule and kinds of subject
     Then "Alençon" is a lord of "France" with a lord card filled from the catalogue's history
 
   @SUBJ-004
-  Scenario Outline: Six kinds and their icons
-    Given the subject "S" is of the kind "<kind>"
+  Scenario Outline: Six types and their icons
+    Given the subject "S" is of the type "<kind>"
     When the game evaluates it
     Then its icon is "<icon>"
 
@@ -51,7 +51,7 @@ Feature: Ladder of rule and kinds of subject
       | Protectorate | key         |
 
   @SUBJ-005 @SUBJ-006 @placeholder
-  Scenario Outline: What each kind pays at normal tribute
+  Scenario Outline: What each type pays at normal tribute
     # config: kinds.*.pays_share
     Given the subject "S" is a Loyal "<kind>" with an income of 100 gold a month at normal tribute
     When the month ends
@@ -97,7 +97,7 @@ Feature: Ladder of rule and kinds of subject
       | Protectorate | Loyal    | when called                   | comes                                  |
 
   @SUBJ-009
-  Scenario Outline: Own diplomacy by kind
+  Scenario Outline: Own diplomacy by type
     Given the subject "S" is a "<kind>" of "O"
     When "S" <act>
     Then the act is <result>
@@ -143,11 +143,11 @@ Feature: Ladder of rule and kinds of subject
       | Protectorate | defence                                        |
 
   @SUBJ-012 @placeholder
-  Scenario Outline: A kind's drift
+  Scenario Outline: A type's drift
     # config: kinds.*.drift
     Given the subject "S" is a "<kind>"
     When the game evaluates it
-    Then its reasons include a kind drift of <drift>
+    Then its reasons include a type drift of <drift>
 
     Examples:
       | kind         | drift |

@@ -1,21 +1,21 @@
 @context-research
 Feature: One invention tree
   As the game
-  I want a single tree from one root that grows back into itself across boughs
+  I want a single tree from one root that grows back into itself across branches
   So that no country can climb far up one side without reaching across
 
   @RSCH-040 @RSCH-041
-  Scenario: One root, four boughs, letters are only labels
+  Scenario: One root, four branches, letters are only labels
     Given the invention tree config
     When the tree is loaded
-    Then it has one root "Settled life" with the boughs R1 "Tilling and building", R2 "Fire and metal", R3 "Counting and records" and R4 "Boats"
-    And "W10 Supply magazines" grows on the bough "Tilling and building" although its letter is W
+    Then it has one root "Settled life" with the branches R1 "Tilling and building", R2 "Fire and metal", R3 "Counting and records" and R4 "Boats"
+    And "W10 Supply magazines" grows on the branch "Tilling and building" although its letter is W
 
   @RSCH-042
-  Scenario: The tree holds 174 inventions
+  Scenario: The tree holds 187 inventions
     Given the invention tree config
     When the tree is loaded
-    Then it holds 174 inventions: 43 of era I, 27 of era II, 18 of era III, 20 of era IV, 19 of era V, 17 of era VI, 18 of era VII and 12 of era VIII
+    Then it holds 187 inventions: 8 of era A, 5 of era M, 43 of era I, 27 of era II, 18 of era III, 20 of era IV, 19 of era V, 17 of era VI, 18 of era VII and 12 of era VIII
 
   @RSCH-042
   Scenario Outline: Inventions unlock what their row says

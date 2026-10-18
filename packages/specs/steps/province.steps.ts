@@ -1,5 +1,7 @@
 import { expect } from "vitest";
-import { Rng } from "@ph/engine";
+import { applyNow, ARMS, cedeProvince, createWorld, garrisonView, KIND, newLands, officialEffect as gameOfficialEffect, Rng, spawnArmy, yearsServed, type GarrisonView } from "@ph/engine";
+import { loadDefaultRuleset } from "@ph/rules";
+import { commanderAt, levyGame, province } from "./levy-game.ts";
 import * as P from "@ph/engine/domain/province";
 import type { Ground, Province, ClassName, TaxRate, Use, Lord, Official } from "@ph/engine/domain/province";
 import { steps, type Scenario } from "../src/registry.ts";
@@ -465,7 +467,7 @@ When("an enemy attacks the garrison of {string}", (s, name: string) => {
 Then("the defender fights from the walls under the warfare castle rules", (s) => {
   expect(s.walls).toBe(true);
 });
-Given("a defending army of the province's homeland tongue", (s) => {
+Given("a defending army of the province's homeland language", (s) => {
   s.homelandArmy = true;
 });
 Given("the province has the ground {string}", (s, g: string) => {
@@ -570,7 +572,7 @@ const TILE_KINDS: Record<string, { use: Use; ground?: Ground; ctx?: P.PlaceConte
   "fields by a shore": { use: "Fields", extra: (p) => void addTile(p, "Shore") },
   "fields on hills": { use: "Fields", ground: "hills" },
   "fields on tropical ground": { use: "Fields", ctx: { tropical: true } },
-  "mountains with a seam": { use: "Waste", ground: "mountains", ctx: { seam: true } },
+  "mountains with an ore deposit": { use: "Waste", ground: "mountains", ctx: { seam: true } },
   "shore on a warm coast": { use: "Shore", ctx: { dryOrWarmCoast: true } },
   "shore with a harbour": { use: "Shore", extra: (p) => void addTile(p, "Shore", "harbour") },
   "shore on a river": { use: "Shore", river: true },
@@ -628,7 +630,7 @@ Then("it may build a bastion fort only with {string} and a star fort only with {
   known(s).push(b6);
   expect(P.castleStepsAllowed(cur(s))).toContain("star fort");
 });
-Given(/^the province "([^"]+)" has a silver mine with (\d+) years? of seams left(?: and ([\d,]+) miners)?$/, (s, name: string, years: string, miners?: string) => {
+Given(/^the province "([^"]+)" has a silver mine with (\d+) years? of ore left(?: and ([\d,]+) miners)?$/, (s, name: string, years: string, miners?: string) => {
   const p = prov(s, name, "mountains");
   s.tileIdx = addTile(p, "Waste", "mine");
   p.tiles[s.tileIdx]!.seams = Number(years);
@@ -642,7 +644,7 @@ When("the year of digging ends", (s) => {
   P.digYear(cur(s));
   P.balanceClasses(cur(s));
 });
-Then("the mine has 0 seams left and closes", (s) => {
+Then("the mine has no ore left and closes", (s) => {
   const t = cur(s).tiles[s.tileIdx]!;
   expect(t.seams).toBe(0);
   expect(t.building).toBeNull();
@@ -654,10 +656,10 @@ Then("its miners become homeless", (s) => {
 Then("the town shrinks", (s) => {
   expect(P.peopleAtWork(cur(s))).toBe(s.atWork - 6000);
 });
-When("a prospecting event adds {int} years of seams", (s, n: number) => {
+When("a prospecting event adds {int} years of ore", (s, n: number) => {
   P.addSeams(cur(s), s.tileIdx, n);
 });
-Then("the mine has {int} years of seams left", (s, n: number) => {
+Then("the mine has {int} years of ore left", (s, n: number) => {
   expect(cur(s).tiles[s.tileIdx]!.seams).toBe(n);
 });
 Given("the province {string} has a shipyard", (s, name: string) => {
@@ -1351,12 +1353,12 @@ Given("the country {string} is Catholic", (s) => {
 Then(/^the country's Faith is (\d+) %$/, (s, v: string) => {
   expect(P.weightedShare(s.faithRows, s.rulerFaith)).toBeCloseTo(Number(v) / 100);
 });
-Given("the province {string} has tongues French 94 % and Flemish 6 %", (s, name: string) => {
+Given("the province {string} has languages French 94 % and Flemish 6 %", (s, name: string) => {
   const p = prov(s, name);
   p.tongue = P.topThree({ French: 0.94, Flemish: 0.06 });
   p.faith = P.topThree({ Catholic: 0.9, Cathar: 0.04, Jewish: 0.03, Muslim: 0.02, Hussite: 0.01 });
 });
-Then("the province stores at most three tongues and three faiths", (s) => {
+Then("the province stores at most three languages and three faiths", (s) => {
   expect(Object.keys(cur(s).tongue).length).toBeLessThanOrEqual(3);
   expect(Object.keys(cur(s).faith)).toEqual(["Catholic", "Cathar", "Jewish"]);
 });
@@ -1640,8 +1642,8 @@ Then("{string} no longer counts as a river province", (s, name: string) => {
 });
 Given("the province {string} is {int} days from {string} by road", (s, name: string, days: number) => {
   prov(s, name);
-  s.route = { capital: days, seats: [] as number[] };
-  work(s, () => (s.days = P.daysToCapital(s.route.capital, s.route.seats)));
+  s.route = { capital: days, seats: [] as number[], cond: {} as P.TravelConditions };
+  work(s, () => (s.days = P.daysToCapital(s.route.capital, s.route.seats, s.route.cond)));
 });
 Given("nothing blocks the road", () => {});
 Given("a seat stands 2 days away", (s) => {
@@ -1649,6 +1651,15 @@ Given("a seat stands 2 days away", (s) => {
 });
 Then("the days to capital of {string} are {int}", (s, _n: string, d: number) => {
   expect(s.days).toBe(d);
+});
+Given("it is winter", (s) => {
+  s.route.cond.winter = true;
+});
+Given("an enemy army stands on the road", (s) => {
+  s.route.cond.enemyOnRoad = true;
+});
+Then(/^the days to capital of "([^"]+)" are more than (\d+)$/, (s, _n: string, d: string) => {
+  expect(s.days).toBeGreaterThan(Number(d));
 });
 Given("the province {string} is {int} days from the capital or a seat", (s, name: string, d: number) => {
   prov(s, name).daysToCapital = d;
@@ -1746,7 +1757,7 @@ Then("the province {string} is no longer a homeland of the Moors", (s, name: str
 Given("the province {string} is the homeland of the Bretons", (s, name: string) => {
   prov(s, name).homeland = ["Breton"];
 });
-Given("it is held by a ruler of the French tongue", (s) => {
+Given("it is held by a ruler of the French language", (s) => {
   cur(s).holderTongue = "French";
 });
 Then("the province {string} has the {string} grievance", (s, name: string, g: string) => {
@@ -1789,7 +1800,7 @@ const EFFECTS: Record<string, P.OfficialEffect> = {
   "recruits refilling 25 % faster": { recruit_refill: 0.25 },
   "+15 % trade ratio gain": { trade_ratio_gain: 0.15 },
   "faith mix moving twice as fast toward the ruler's faith": { faith_shift: 2 },
-  "tongue mix moving twice as fast toward the ruler's tongue and students graduating a year sooner": { tongue_shift: 2, graduate_sooner_years: 1 },
+  "language mix moving twice as fast toward the ruler's language and students graduating a year sooner": { tongue_shift: 2, graduate_sooner_years: 1 },
   "a garrison fighting 25 % better, walls repairing twice as fast and a castle store rotting half as fast": { garrison: 0.25, walls_repair: 2, castle_store_rot: 0.5 },
   "no effect of its own": {},
 };
@@ -1884,6 +1895,111 @@ Given("the country {string} has 18 officials in royal provinces and 22 elsewhere
 });
 Then("the country card shows {int} officials", (s, n: number) => {
   expect(P.countryOfficials(s.roster)).toBe(n);
+});
+
+// Moving, swapping and hiring officials (PROV-303, PROV-333 to 335).
+Given("the province {string} is royal with its post empty", (s, name: string) => {
+  const p = prov(s, name);
+  p.lord = null;
+  p.official = null;
+  P.refreshGovernance(p);
+});
+When("the country {string} moves the official of {string} to {string}", (s, _c: string, from: string, to: string) => {
+  s.before = { [from]: prov(s, from).official, [to]: prov(s, to).official };
+  expect(P.moveOrSwapOfficial(prov(s, from), prov(s, to))).toBeNull();
+});
+Then(/^the "([^"]+)" runs "([^"]+)"(?: under his own name,)? at half his effect$/, (s, type: string, name: string) => {
+  const o = prov(s, name).official!;
+  expect(o.type).toBe(type);
+  // Under his own name: the same official as before the move, when he moved.
+  const was = Object.values((s.before ?? {}) as Record<string, Official | null>).find((x) => x?.type === type);
+  if (was) expect(o.id).toBe(was.id);
+  expect(P.officialEffectShare(o.yearsServed)).toBe(0.5);
+  expect(prov(s, name).governedBy).toBe("official");
+});
+Then("the post in {string} stands empty", (s, name: string) => {
+  expect(prov(s, name).official).toBeNull();
+  expect(P.governanceGives(prov(s, name)).ungoverned).toBe(true);
+});
+Given("the lord {string} holds {string} with an official of his own", (s, l: string, name: string) => {
+  const p = prov(s, name);
+  p.lord = l;
+  p.official = official("steward", 3, l);
+  P.refreshGovernance(p);
+});
+When("the country {string} tries to move the official of {string}", (s, _c: string, name: string) => {
+  s.refusal = P.moveOrSwapOfficial(prov(s, name), prov(s, "Paris"));
+  expect(prov(s, name).official?.employer).not.toBe("ruler");
+});
+When("the country {string} tries to commission the official of {string}", (s, _c: string, name: string) => {
+  s.refusal = P.servesTheLord(prov(s, name));
+});
+Then(/^it is refused because (.+)$/, (s, why: string) => {
+  expect(s.refusal).toBe(why);
+});
+/** Types serving in the realm's royal posts other than province `but`. */
+const serving = (s: Scenario, but: string): string[] =>
+  Object.entries((s.provinces ?? {}) as Record<string, Province>).filter(([n, p]) => n !== but && p.lord === null && p.official).map(([, p]) => p.official!.type);
+const hire = (s: Scenario, type: string, name: string, foreign: boolean) => {
+  const p = prov(s, name);
+  const gold = s.gold ?? 1e9;
+  s.refusal = P.cannotHire(p, type, foreign, serving(s, name), gold);
+  if (s.refusal) return;
+  s.paid = P.hireIntoPost(p, official(type, 0), foreign);
+  s.gold = gold - s.paid;
+};
+Given("the country {string} has {int} gold", (s, _c: string, gold: number) => {
+  s.gold = gold;
+});
+Given("the country {string} has gold to hire an official", (s) => {
+  s.gold = 1000;
+  prov(s, "Troyes").official = official("master of works", 4);
+  prov(s, "Rouen").official = null;
+});
+When(/^the country "[^"]+" (tries to hire|hires) an? (foreign )?"([^"]+)" for "([^"]+)"$/, (s, how: string, foreign: string | undefined, type: string, name: string) => {
+  hire(s, type, name, !!foreign);
+  if (how === "hires") expect(s.refusal).toBeNull();
+});
+When(/^the country "[^"]+" hires a foreign ([^"]+)$/, (s, type: string) => {
+  hire(s, type, "Rouen", true);
+  expect(s.refusal).toBeNull();
+});
+Then("it pays more than for a native {}", (s, type: string) => {
+  expect(s.paid).toBeGreaterThan(P.hirePrice(false));
+});
+Then("the country {string} has {int} gold left", (s, _c: string, gold: number) => {
+  expect(s.gold).toBe(gold);
+});
+When("the country {string} tries to hire a {string} for {string}, held by the lord {string}", (s, _c: string, type: string, name: string, l: string) => {
+  const p = prov(s, name);
+  p.lord = l;
+  p.official = null;
+  hire(s, type, name, false);
+});
+Given("no {string} serves in a royal post of {string}", (s, type: string) => {
+  expect(serving(s, "").includes(type)).toBe(false);
+});
+
+// Officials in the game (PROV-304, PROV-305).
+When("a new campaign starts", (s) => {
+  s.game = createWorld(loadDefaultRuleset(), 1);
+});
+Then("each official has served between 0 and 10 years in his province", (s) => {
+  const w = s.game;
+  const years: number[] = [];
+  for (let p = 0; p < w.provinceCount; p++) if (w.provinceOfficial[p] >= 0) years.push(yearsServed(w, p));
+  expect(years.length).toBeGreaterThan(100);
+  expect(Math.min(...years)).toBeGreaterThanOrEqual(0);
+  expect(Math.max(...years)).toBeLessThanOrEqual(10);
+  s.years = years;
+});
+Then("not every official has served the same number of years", (s) => {
+  expect(new Set(s.years.map((y: number) => Math.floor(y))).size).toBeGreaterThan(5);
+});
+Then(/^his effect shows as waiting until (buildings|schools) are in the game$/, (s, system: string) => {
+  const o = cur(s).official!;
+  const type = o.type[0]!.toUpperCase() + o.type.slice(1);
+  expect(gameOfficialEffect(type, o.yearsServed).note).toBe(`Takes effect when ${system} arrive`);
 });
 
 // ---------------------------------------------------------------- lords
@@ -2017,7 +2133,7 @@ const GAINS: Record<string, (e: P.CharterEffect) => boolean> = {
   "no armies wintering there": (e) => e.noWinterQuarters === true,
   "its minority faith worshipping openly": (e) => e.minorityFaithOpen === true,
   "no tolls": (e) => e.noTolls === true,
-  "faster digging and new seams": (e) => e.fasterDigging === true && e.newSeams === true,
+  "faster digging and new ore deposits": (e) => e.fasterDigging === true && e.newSeams === true,
 };
 const COSTS: Record<string, (e: P.CharterEffect) => boolean> = {
   "a little gold": (e) => e.costsGold === true,
@@ -2096,7 +2212,7 @@ Then("a merchant house runs the mine", (s) => {
 Then("the country gets half the mine's output", (s) => {
   expect(s.effect.ownerOutputShare).toBe(0.5);
 });
-Then("the mine digs faster and finds new seams", (s) => {
+Then("the mine digs faster and finds new ore deposits", (s) => {
   expect(s.effect.fasterDigging && s.effect.newSeams).toBe(true);
 });
 
@@ -2241,12 +2357,12 @@ Given("the province {string} has recruits below a quarter of the pool", (s, name
 When("recruits refill to half", (s) => {
   cur(s).recruits = 500;
 });
-Given("the province {string} is a homeland held by a ruler of another tongue", (s, name: string) => {
+Given("the province {string} is a homeland held by a ruler of another language", (s, name: string) => {
   const p = prov(s, name);
   p.homeland = ["Breton"];
   p.holderTongue = "French";
 });
-When("a lord of the local tongue is granted it", (s) => {
+When("a lord of the local language is granted it", (s) => {
   const p = cur(s);
   p.lord = "Duke of Brittany";
   p.holderTongue = "Breton";
@@ -2315,7 +2431,7 @@ Given("the province {string} borders a province whose rebels share one of its gr
 When("those rebels are beaten", (s) => {
   cur(s).neighbourRebels = [];
 });
-Given(/^the province "([^"]+)" is held by a lord who is (Cruel|Greedy|hostile to the people's faith|hostile to the people's tongue)$/, (s, name: string, trait: string) => {
+Given(/^the province "([^"]+)" is held by a lord who is (Cruel|Greedy|hostile to the people's faith|hostile to the people's language)$/, (s, name: string, trait: string) => {
   const p = prov(s, name);
   p.lord = "the lord";
   p.lordTraits = [trait.replace("the people's ", "")];
@@ -2861,7 +2977,7 @@ Then(/^the town is a "([^"]+)" covering (\d+) town tiles$/, (s, size: string, t:
 });
 
 // officials and lords (D-PROV-13, D-PROV-23, D-PROV-24)
-Given(/^an official of the "([^"]+)" tongue runs a province of the "([^"]+)" tongue$/, (s, o: string, p: string) => {
+Given(/^an official of the "([^"]+)" language runs a province of the "([^"]+)" language$/, (s, o: string, p: string) => {
   s.kin = o === p ? "own" : p === "Picard" ? "cousin" : "stranger";
 });
 Then(/^he learns the province in (\d+) years$/, (s, n: string) => {
@@ -2924,4 +3040,231 @@ Then(/^(at most 10 gold|nothing|less than with a free road) reaches the treasury
   if (what === "nothing") expect(got).toBe(0);
   else if (what === "at most 10 gold") expect(got).toBeLessThanOrEqual(10);
   else expect(got).toBeLessThan(P.reachesTreasury(20, { ...s.reach, blockedDays: 0 }));
+});
+
+// ---------------------------------------------------------------- land and health (wearing, woods, fever land, sickness, tax owed)
+
+When("fire burns the woods", (s) => {
+  expect(P.loseWoods(cur(s), s.tileIdx)).toBe(true);
+});
+When("timber is cut faster than it regrows", (s) => {
+  const p = cur(s);
+  const woods = p.tiles.filter((t) => t.use === "Woods").length;
+  expect(P.timberYear(p, woods * cfg.woods.regrow_loads_per_tile + 1)).toBe(s.tileIdx);
+});
+When("the province's starting tile mix is set", (s) => {
+  const p = cur(s);
+  p.tiles = P.startingTileMix(p.ground, 10).map((u) => P.tile(u));
+});
+Then("most of its land tiles are pasture", (s) => {
+  const p = cur(s);
+  expect(countUse(p, "Pasture")).toBeGreaterThan(p.tiles.length / 2);
+});
+
+Given("the province {string} has a fields tile farmed for decades with more people than the farm needs", (s, name: string) => {
+  const p = prov(s, name);
+  s.tileIdx = addTile(p, "Fields", "farm");
+  addTile(p, "Town");
+  p.people.farmers = P.slotsByClass(p).farmers + 5000;
+  p.tiles[s.tileIdx]!.overworkedYears = cfg.worn.overwork_years - 1;
+});
+Given("the country {string} knows no rotation invention", (s) => {
+  expect(cfg.worn.rotation_inventions.some((id) => P.knows(cur(s), id))).toBe(false);
+  expect(P.wearYears(cur(s))).toBe(cfg.worn.overwork_years);
+});
+Then("the tile gives half its output", (s) => {
+  const p = cur(s);
+  const worn = P.tileFood(p, s.tileIdx, 12000, ["normal"]);
+  const sound = P.tileFood({ ...p, tiles: p.tiles.map((t) => ({ ...t, state: null })) }, s.tileIdx, 12000, ["normal"]);
+  expect(worn).toBeCloseTo(sound * cfg.worn.output);
+});
+When("the tile goes 5 years without use", (s) => {
+  const p = cur(s);
+  p.people.farmers = 0;
+  for (let y = 0; y < 5; y++) P.yearEndLand(p);
+});
+Then("the tile is no longer {string}", (s, st: string) => {
+  expect(cur(s).tiles[s.tileIdx]!.state).not.toBe(st);
+});
+Then("fields in French provinces wear out less often than without it", (s) => {
+  const p = cur(s);
+  expect(P.wearYears(p)).toBeGreaterThan(P.wearYears(P.newProvince("Without", p.ground)));
+});
+
+/** Provinces of the examples that lie in the tropics. */
+const TROPICS = ["Guinea", "Bengal", "Malacca", "Yucatan"];
+function feverProvince(s: Scenario, name: string, ground: Ground, marsh: number): Province {
+  const p = prov(s, name, ground);
+  p.ground = ground;
+  p.tropical = TROPICS.includes(name);
+  for (let i = 0; i < marsh; i++) addTile(p, "Marsh");
+  for (let i = 0; i < 3; i++) addTile(p, "Fields");
+  return p;
+}
+const FEVER = cfg.fever_land.steps as P.FeverStep[];
+Given(/^the province "([^"]+)" has the ground "([^"]+)" and (\d+) marsh tiles$/, (s, name: string, g: string, n: string) => {
+  feverProvince(s, name, g as Ground, Number(n));
+});
+Then("its fever land is set by ground and climate, made worse by marsh tiles", (s) => {
+  const p = cur(s);
+  const parts = P.feverLandParts(p);
+  expect(parts.ground).toBeGreaterThan(0);
+  expect(parts.step).toBe(FEVER[Math.min(FEVER.length - 1, parts.ground + parts.climate + parts.marsh)]);
+  const dry = { ...p, tiles: p.tiles.filter((t) => t.use !== "Marsh") };
+  expect(FEVER.indexOf(parts.step)).toBeGreaterThanOrEqual(FEVER.indexOf(P.feverLand(dry)));
+  if (parts.marsh > 0) expect(FEVER.indexOf(parts.step)).toBeGreaterThan(FEVER.indexOf(P.feverLand(dry)));
+  s.feverBefore = FEVER.indexOf(parts.step);
+});
+When("the country knows quinine", (s) => {
+  known(s).push("quinine");
+});
+When("the marsh tiles are drained", (s) => {
+  const p = cur(s);
+  known(s).push("Polder drainage");
+  p.tiles.forEach((t, i) => t.use === "Marsh" && expect(P.changeTileUse(p, i, "drain")).toBe(true));
+});
+Then("its fever land falls", (s) => {
+  expect(FEVER.indexOf(P.feverLand(cur(s)))).toBeLessThan(s.feverBefore);
+});
+Given(/^the province "([^"]+)" has "(none|mild|harsh|deadly)" fever land$/, (s, name: string, step: P.FeverStep) => {
+  // Jungle in the tropics is deadly; drop a step at a time by leaving the tropics, then the jungle.
+  const at = FEVER.indexOf(step);
+  const p = feverProvince(s, name, at >= 2 ? "jungle" : at === 1 ? "marsh" : "farmland", 0);
+  p.tropical = at === 3;
+  expect(P.feverLand(p)).toBe(step);
+});
+When(/^settlers born in "([^"]+)" live there for a month$/, (s) => {
+  const p = cur(s);
+  const base = P.deathRate("farmers") / 12;
+  s.settlersDied = 1000 * base + P.feverDeaths(1000, P.feverLand(p), false);
+  s.localsDied = 1000 * base + P.feverDeaths(1000, P.feverLand(p), true);
+});
+Then("the settlers die faster than the locals", (s) => {
+  expect(s.settlersDied).toBeGreaterThan(s.localsDied);
+});
+Then("soldiers and settlers from elsewhere die there", (s) => {
+  const p = cur(s);
+  expect(P.feverDeathRate(P.feverLand(p), false)).toBeGreaterThan(0);
+  expect(P.armySickness(10000, P.groundTroops(p.ground).sickness, false, true)).toBeGreaterThan(0);
+});
+Then("locals mostly don't", (s) => {
+  const p = cur(s);
+  const step = P.feverLand(p);
+  expect(P.feverDeathRate(step, true)).toBeLessThanOrEqual(P.feverDeathRate(step, false) * cfg.fever_land.local_share);
+  expect(P.armySickness(10000, P.groundTroops(p.ground).sickness, true, true)).toBeLessThan(P.armySickness(10000, P.groundTroops(p.ground).sickness, false, true));
+});
+
+Given(/^an army of men born in "([^"]+)" stays a month in a province with the ground "([^"]+)"$/, (s, _from: string, g: string) => {
+  s.sickGround = g as Ground;
+});
+Given("a local army stays a month in the same province", (s) => {
+  s.localArmy = true;
+});
+Then("both armies lose men to {string} sickness", (s, sick: string) => {
+  const sickness = P.groundTroops(s.sickGround).sickness;
+  expect(sickness).toBe(sick);
+  s.foreignLost = P.armySickness(10000, sickness, false);
+  s.localLost = P.armySickness(10000, sickness, true);
+  expect(s.foreignLost).toBeGreaterThan(0);
+  expect(s.localLost).toBeGreaterThan(0);
+});
+Then(/^the army from "([^"]+)" loses more$/, (s) => {
+  expect(s.foreignLost).toBeGreaterThan(s.localLost);
+});
+
+When("a farm tile burns and its people lose homes", (s) => {
+  remember(s);
+  const p = cur(s);
+  P.burnTile(p, p.tiles.findIndex((t) => t.building === "farm"), { stay: true });
+  P.balanceClasses(p);
+});
+
+/** Troyes with its farms, a town of craftsmen and market folk, and a bridge. */
+function taxedTroyes(s: Scenario, name: string): Province {
+  const p = prov(s, name);
+  fullFarms(p);
+  p.town.push("loom house");
+  p.people.craftsmen = 1500;
+  p.people["market folk"] = 2400;
+  return p;
+}
+Given("the province {string} has buildings, townsfolk and a toll point", (s, name: string) => {
+  P.setToll(taxedTroyes(s, name), "bridge", "high");
+});
+When("its tax owed for the year is worked out", (s) => {
+  s.taxYear = P.taxOwedYear(cur(s), "normal");
+});
+Then("it comes from the value of what its buildings make and its townsfolk", (s) => {
+  const t = s.taxYear as P.TaxOwedYear;
+  expect(t.buildings).toBeGreaterThan(0);
+  expect(t.townsfolk).toBeGreaterThan(0);
+  expect(t.total).toBeCloseTo((t.buildings + t.townsfolk) * t.rate * (1 - t.homelessCut));
+});
+Then("the tolls are counted in trade, not in tax owed", (s) => {
+  const p = cur(s);
+  expect(Object.keys(s.taxYear)).not.toContain("tolls");
+  const free = { ...p, tolls: Object.fromEntries(Object.keys(p.tolls).map((k) => [k, "none" as P.TollRate])) };
+  expect(P.taxOwedYear(free, "normal").total).toBe(s.taxYear.total);
+});
+Given(/^the province "([^"]+)" has (burned tiles|fallow tiles|homeless people)$/, (s, name: string, what: string) => {
+  const p = taxedTroyes(s, name);
+  const without = structuredClone(p);
+  if (what === "burned tiles") P.burnTile(p, 0);
+  if (what === "fallow tiles") p.tiles[0]!.state = "Fallow";
+  if (what === "homeless people") p.people.homeless = Math.round(P.totalPeople(p) * 0.15);
+  work(s, () => {
+    s.taxWith = P.taxOwedYear(p, "normal").total;
+    s.taxWithout = P.taxOwedYear(without, "normal").total;
+  });
+});
+Then("its tax owed is lower than without it", (s) => {
+  expect(s.taxWith).toBeLessThan(s.taxWithout);
+});
+
+// ---------------------------------------------------------------- the Garrison tab (PROV-302), on the 1444 map with France playing
+
+Given('the province "Troyes" has 2000 garrison troops and 1000 levies still gathering', (s) => {
+  const g = levyGame(s);
+  const p = province(g, "Troyes");
+  spawnArmy(g.w, g.n, p, 2000, -1, 0, { kind: KIND.levy, drill: 1 });
+  g.w.musters.push({ nation: g.n, province: p, men: 1000, daysLeft: 9 });
+  s.present = commanderAt(g, p);
+});
+When('the player opens the Garrison tab of "Troyes"', (s) => {
+  const g = levyGame(s);
+  s.garrisonTab = garrisonView(g.w, g.n, province(g, "Troyes"));
+});
+Then("it lists the 2000 troops by arm and drill", (s) => {
+  const tab = s.garrisonTab as GarrisonView;
+  expect(tab.troops).toHaveLength(1);
+  expect(tab.troops[0]!.men).toBe(2000);
+  expect(tab.troops[0]!.byArm[ARMS.indexOf("levy foot")]).toBeCloseTo(2000, 0);
+  expect(tab.troops[0]!.drill).toBe(1);
+});
+Then("it lists the gathering levies with the days left", (s) => {
+  expect((s.garrisonTab as GarrisonView).gathering).toEqual([{ men: 1000, daysLeft: 9, state: "gathering" }]);
+});
+Then("it lists the commanders present who can pick them up", (s) => {
+  expect((s.garrisonTab as GarrisonView).commanders).toEqual([s.present]);
+});
+
+// Land just taken (PROV-340).
+Given("the player plays the country {string}", (s, c: string) => {
+  s.game = createWorld(loadDefaultRuleset(), 1);
+  s.me = s.game.nationIndex.get(c.toLowerCase())!;
+  s.game.player = s.me;
+});
+When("a neighbour hands the country {string} one of its provinces", (s) => {
+  const w = s.game;
+  s.taken = Array.from({ length: w.provinceCount }, (_, p) => p).find((p) => w.provinceOwner[p] >= 0 && w.provinceOwner[p] !== s.me && w.provinceOfficial[p] >= 0)!;
+  cedeProvince(w, s.taken, s.me, []);
+});
+Then("the province's post stands empty", (s) => {
+  expect(s.game.provinceOfficial[s.taken]).toBe(-1);
+  expect(s.game.provinceLord[s.taken]).toBe(-1);
+});
+Then("End turn waits until the player fills the post, grants it to a lord or keeps it royal", (s) => {
+  expect(newLands(s.game, s.me)).toEqual([s.taken]);
+  expect(applyNow(s.game, { type: "settleLand", province: s.taken }, s.me).rejectedOrders).toEqual([]);
+  expect(newLands(s.game, s.me)).toEqual([]);
 });

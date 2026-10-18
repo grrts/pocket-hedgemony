@@ -47,10 +47,10 @@ Feature: How other systems use religion
     Then the Faith % of "Ming" is 90
 
   @RELG-114
-  Scenario: Faith and tongue stay separate
+  Scenario: Faith and language stay separate
     Given the people of "Bosnia" convert to sunni
-    Then their tongue does not change
-    And the faith grievances and tongue grievances stay separate
+    Then their language does not change
+    And the faith grievances and language grievances stay separate
 
   @RELG-115
   Scenario: No faith meters

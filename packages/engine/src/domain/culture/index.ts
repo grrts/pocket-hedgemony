@@ -1,4 +1,5 @@
 import config from "../../../../rules/data/domain/culture.json" with { type: "json" };
+import start from "../../../../rules/data/domain/culture-start-1444.json" with { type: "json" };
 import { localsBonus } from "../province/index.ts";
 import { REGIONS, type Ground } from "../world-map/index.ts";
 
@@ -28,7 +29,10 @@ export interface Tongue {
   local_names?: string[];
 }
 
-const TONGUES: Tongue[] = [...(config.tongues as Tongue[]), ...(config.tongues_added as Tongue[])];
+/** The config's tongues, then those the 1444 start adds (CULT-086); a start row with the same id fills in a family the config left open. */
+const START_TONGUES = Object.entries(start.tongues as Record<string, Omit<Tongue, "id">>).map(([id, t]) => ({ id, ...t }) as Tongue);
+const TONGUES: Tongue[] = [...(config.tongues as Tongue[]), ...(config.tongues_added as Tongue[])].map((t) => START_TONGUES.find((s) => s.id === t.id) ?? t);
+for (const t of START_TONGUES) if (!TONGUES.some((x) => x.id === t.id)) TONGUES.push(t);
 const norm = (s: string) => s.trim().toLowerCase().replace(/[\s-]+/g, "_");
 
 // ---------------------------------------------------------------- 5.1 tongues and families
@@ -45,9 +49,15 @@ export function tongues(): Tongue[] {
 
 /** A tongue by id or name (case and spaces ignored). */
 export function tongue(idOrName: string): Tongue | undefined {
+  const hit = BY_KEY.get(idOrName);
+  if (hit) return hit;
   const k = norm(idOrName);
-  return TONGUES.find((t) => t.id === k || norm(t.name) === k);
+  const t = TONGUES.find((t) => t.id === k || norm(t.name) === k);
+  if (t) BY_KEY.set(idOrName, t);
+  return t;
 }
+/** Tongues already looked up, by the key they were asked for (drift asks for the same few each year). */
+const BY_KEY = new Map<string, Tongue>();
 
 /** A tongue that must exist. */
 export function mustTongue(idOrName: string): Tongue {
@@ -158,7 +168,7 @@ export interface CourtTongueChanged {
   musicPaletteFromNextTrack: true;
 }
 
-/** A dynasty of another tongue, an event or *Take their tongue* sets the court tongue (CULT-010, CULT-011). */
+/** A dynasty of another tongue, an event or *Take their language* sets the court tongue (CULT-010, CULT-011). */
 export function setCourtTongue(cc: CountryCulture, to: string): CourtTongueChanged | null {
   const t = mustTongue(to).id;
   if (t === cc.court) return null;
@@ -225,7 +235,7 @@ export interface ProvinceTongues {
   /** The province's main ground and whether it touches the sea, for the way-of-life rule (CULT-027, CULT-092). */
   ground?: Ground;
   coastal?: boolean;
-  /** Grievances from culture standing here (*Foreign rule*, *Banned tongue*, *Broken charter*). */
+  /** Grievances from culture standing here (*Foreign rule*, *Banned language*, *Broken charter*). */
   grievances: string[];
   /** Taken with *Gather our kin*: no *Foreign rule* (CULT-060). */
   gatheredKin?: boolean;
@@ -272,22 +282,22 @@ export function hasForeignRule(p: ProvinceTongues, cc: CountryCulture): boolean 
 }
 
 /**
- * *Banned tongue* (CULT-040, CULT-044): under *Impose*, where most people are
+ * *Banned language* (CULT-040, CULT-044): under *Impose*, where most people are
  * strangers (cousins once nationalism is 0.3); ends with Let be / Teach, an
  * *Own tongue* charter, or a kin majority.
  */
 export function hasBannedTongue(p: ProvinceTongues, cc: CountryCulture): boolean {
   if (policyIn(cc, p.id) !== "impose" || p.ownTongueCharter !== null) return false;
-  // An official of the local tongue keeps *Banned tongue* away (CULT-052, D-CULT-11).
+  // An official of the local tongue keeps *Banned language* away (CULT-052, D-CULT-11).
   if (p.governor.kind === "official" && p.governor.tongue !== undefined && mustTongue(p.governor.tongue).id === majorityTongue(p)) return false;
   return relationTo(cc.court, majorityTongue(p), p.nationalism) === "stranger";
 }
 
 /** Works out culture's grievances in a province, keeping others (e.g. *Broken charter*). */
 export function updateGrievances(p: ProvinceTongues, cc: CountryCulture): string[] {
-  const keep = p.grievances.filter((g) => g !== "Foreign rule" && g !== "Banned tongue");
+  const keep = p.grievances.filter((g) => g !== "Foreign rule" && g !== "Banned language");
   if (hasForeignRule(p, cc)) keep.push("Foreign rule");
-  if (hasBannedTongue(p, cc)) keep.push("Banned tongue");
+  if (hasBannedTongue(p, cc)) keep.push("Banned language");
   p.grievances = keep;
   return keep;
 }
@@ -349,14 +359,14 @@ export function driftMultipliers(c: DriftCase): { name: string; value: number }[
   const t = mustTongue(c.drifting);
   const nat = c.nationalism ?? 0;
   if (c.townClass) out.push({ name: "town classes", value: m.town_classes });
-  if (relationTo(c.pull, c.drifting, nat) === "cousin") out.push({ name: "cousins of the pull tongue", value: config.relation.cousin.drift_multiplier });
-  if (c.school) out.push({ name: "school in the pull tongue", value: m.school_in_pull_tongue });
+  if (relationTo(c.pull, c.drifting, nat) === "cousin") out.push({ name: "related to the language it drifts toward", value: config.relation.cousin.drift_multiplier });
+  if (c.school) out.push({ name: "school in the language it drifts toward", value: m.school_in_pull_tongue });
   if (c.schoolmaster) out.push({ name: "Schoolmaster", value: m.schoolmaster_official });
-  if (c.towardCourt && c.policy) out.push({ name: `Tongue policy ${c.policy}`, value: policyDriftMultiplier(c.policy) });
+  if (c.towardCourt && c.policy) out.push({ name: `Language policy ${c.policy}`, value: policyDriftMultiplier(c.policy) });
   if (c.homeland) out.push({ name: "homeland", value: m.homeland_of_drifting_tongue });
   if (livesInOwnLand(t.way_of_life, c.ground, c.coastal)) out.push({ name: "way of life in its own land", value: m.way_of_life_in_own_land });
   if (t.diaspora) out.push({ name: "trading people", value: m.diaspora });
-  if (c.towardCourt && c.ownTongueCharter) out.push({ name: "Own tongue charter", value: m.own_tongue_charter });
+  if (c.towardCourt && c.ownTongueCharter) out.push({ name: "Own-language charter", value: m.own_tongue_charter });
   if (nat >= COUSINS_BECOME_STRANGERS_AT) out.push({ name: "nationalism", value: m.nationalism_0_3 });
   for (const inv of c.inventions ?? []) {
     const v = (m.inventions as Record<string, number>)[inv];
@@ -449,7 +459,7 @@ export function dropSmallTongues(p: ProvinceTongues, into: string = majorityTong
 /** The drift explanation on the Tongue line: pull tongue, rates and reasons (CULT-081). */
 export function driftExplanation(p: ProvinceTongues, cc: CountryCulture): { pull: string; why: string; groups: { tongue: string; rate: number; multipliers: string[] }[] } {
   const pull = pullTongue(p, cc);
-  const why = pull === cc.court ? `held ${p.yearsHeld} years and governed for the court` : "the majority tongue";
+  const why = pull === cc.court ? `held ${p.yearsHeld} years and governed for the court` : "the majority language";
   const groups = Object.keys(p.people)
     .filter((t) => t !== pull)
     .map((t) => {
@@ -689,7 +699,7 @@ export function newChecks(): CultureChecks {
 export interface CourtGoesNative {
   country: string;
   majority: string;
-  choices: ["Take their tongue", "Keep ours"];
+  choices: ["Take their language", "Keep ours"];
   year: number;
 }
 
@@ -706,11 +716,11 @@ export function checkCourtGoesNative(cc: CountryCulture, checks: CultureChecks, 
   if (year - checks.courtSmallSince < e.for_years || year < checks.nextCheck) return null;
   const major = Object.entries(people).find(([t, n]) => t !== cc.court && n / all > e.other_tongue_above);
   if (!major) return null;
-  return { country: cc.id, majority: major[0], choices: ["Take their tongue", "Keep ours"], year };
+  return { country: cc.id, majority: major[0], choices: ["Take their language", "Keep ours"], year };
 }
 
 /** Answers *The court goes native* (CULT-070, CULT-071). */
-export function answerCourtGoesNative(cc: CountryCulture, checks: CultureChecks, ev: CourtGoesNative, choice: "Take their tongue" | "Keep ours", lords: { name: string; tongue: string }[] = []): { changed: CourtTongueChanged | null; wavering: string[] } {
+export function answerCourtGoesNative(cc: CountryCulture, checks: CultureChecks, ev: CourtGoesNative, choice: "Take their language" | "Keep ours", lords: { name: string; tongue: string }[] = []): { changed: CourtTongueChanged | null; wavering: string[] } {
   if (choice === "Keep ours") {
     checks.nextCheck = ev.year + config.engine_events.court_goes_native.recheck_years;
     return { changed: null, wavering: [] };
@@ -838,7 +848,7 @@ export function dotColour(r: Relation): string {
 export function tongueLine(p: ProvinceTongues, cc: CountryCulture): { text: string; dots: Record<string, string> } {
   const all = totalPeople(p);
   const rows = Object.entries(p.people).sort((a, b) => b[1] - a[1]);
-  const text = "Tongue " + rows.map(([t, n]) => `${mustTongue(t).name} ${Math.round((n / all) * 100)} %`).join(" · ");
+  const text = "Language " + rows.map(([t, n]) => `${mustTongue(t).name} ${Math.round((n / all) * 100)} %`).join(" · ");
   const dots: Record<string, string> = {};
   for (const [t] of rows) dots[mustTongue(t).name] = dotColour(relationTo(cc.court, t, p.nationalism));
   return { text, dots };
@@ -880,7 +890,7 @@ export function peoplesScreen(cc: CountryCulture, rows: PeoplesRowInput[]): { po
       if (r.homeland) notes.push("homeland");
       if (r.grievances.length === 1) notes.push(r.grievances[0]!);
       else if (r.grievances.length > 1) notes.push(`${r.grievances.length} grievances`);
-      if (r.charter) notes.push("Own-tongue charter");
+      if (r.charter) notes.push("Own-language charter");
       if (r.lords > 0) notes.push(`${r.lords} lord${r.lords > 1 ? "s" : ""}`);
       if (r.driftingTo) notes.push(`drifting to ${mustTongue(r.driftingTo).name}`);
       if (r.tradeBonusIn.length) notes.push(`+${config.effects.trading_people.trade_value * 100} % trade in ${r.tradeBonusIn.join(", ")}`);
@@ -919,13 +929,13 @@ export function peoplesRowLongPress(
   return { lords: realm.lords.filter(of).map((l) => l.name), officials: realm.officials.filter(of).map((o) => o.name), risings: realm.risings.filter(of).map((r) => r.province) };
 }
 
-/** What the Tongue lens colours by (CULT-085). */
+/** What the Language lens colours by (CULT-085). */
 export function lensColouring(zoom: "far" | "regional", realmToggle = false): string {
   if (realmToggle) return config.lens.realm_toggle;
   return zoom === "far" ? config.lens.far : config.lens.regional;
 }
 
-/** Homelands outlined on the Tongue lens: those of peoples without a country (CULT-085). */
+/** Homelands outlined on the Language lens: those of peoples without a country (CULT-085). */
 export function outlinedHomelands(tonguesWithHomeland: string[], courtTongues: string[]): string[] {
   const courts = new Set(courtTongues.map((t) => mustTongue(t).id));
   return tonguesWithHomeland.map((t) => mustTongue(t).id).filter((t) => !courts.has(t));

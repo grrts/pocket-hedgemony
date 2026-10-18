@@ -7,8 +7,8 @@ Feature: Traders and trade ships
   @TRADE-001 @TRADE-100
   Scenario: The trader card
     Given the country "France" has a pack caravan "Caravan of Troyes" with 50 market folk
-    And its route is "Troyes ▸ Dijon ▸ Geneva ▸ Dijon ▸ Troyes" on a loop of 38 days
-    And it is in "Langres" on day 12 of 15 to "Dijon"
+    And its route is "Troyes ▸ Geneva" on a loop of 38 days
+    And it is in "Langres" on day 12 of 19 to "Geneva"
     And its purse holds 6.1 of 10 gold
     When the player opens the trader card
     Then the card shows kind, crew, route, loop days, position, purse, last collections, fees and tolls, danger and an upkeep of 0.5 gold a month

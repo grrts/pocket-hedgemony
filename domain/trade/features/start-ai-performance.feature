@@ -25,13 +25,16 @@ Feature: Starting trade, the AI and speed
     Then "<country>" has the starting route "<route>"
 
     Examples:
-      | country  | route                                                  |
-      | Venice   | galley line Venice ▸ Corfu ▸ Candia ▸ Alexandria       |
-      | Genoa    | Genoa ▸ Chios ▸ Pera ▸ Caffa                           |
-      | Lübeck   | Lübeck ▸ Bergen ▸ Lübeck ▸ Bruges                      |
-      | Mali     | camel caravan Timbuktu ▸ Taghaza ▸ Sijilmasa           |
-      | Kilwa    | dhow Kilwa ▸ Sofala ▸ Kilwa ▸ Mombasa ▸ Malindi         |
-      | Ryukyu   | junk Naha ▸ Fuzhou ▸ Naha ▸ Hakata                     |
+      | country | route                              |
+      | Venice  | galley line Venice ▸ Alexandria    |
+      | Genoa   | Genoa ▸ Caffa                      |
+      | Lübeck  | Lübeck ▸ Bergen                    |
+      | Lübeck  | Lübeck ▸ Bruges                    |
+      | Mali    | camel caravan Timbuktu ▸ Sijilmasa |
+      | Kilwa   | dhow Kilwa ▸ Sofala                |
+      | Kilwa   | dhow Kilwa ▸ Malindi               |
+      | Ryukyu  | junk Naha ▸ Fuzhou                 |
+      | Ryukyu  | junk Naha ▸ Hakata                 |
 
   @TRADE-111
   Scenario: Coastal countries start with ships

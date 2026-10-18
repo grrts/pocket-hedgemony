@@ -78,7 +78,7 @@ A revolution stopped by Bend, by a crushed rising, or by a Path that applies no 
 
 ### Regimes
 
-A regime is the package of rules an outcome leaves behind: form of rule, ruler, lords, church, faith, tongue, levy, land, towns, trade, research, decrees, locks, grievances ended and added, flags, reactions abroad, risks and a one-line "loop" that sums up how it plays.
+A regime is the package of rules an outcome leaves behind: form of rule, ruler, lords, church, faith, language, levy, land, towns, trade, research, decrees, locks, grievances ended and added, flags, reactions abroad, risks and a one-line "loop" that sums up how it plays.
 
 - **Form.** The regime sets the form of rule from the [Government](Government) forms. `keep` leaves the form as it is; `old_form` restores the form held before the last revolutionary regime, which the game remembers. A revolution can grant a form before its era. Crown and assembly gives a constitutional monarchy, or a diet monarchy if the country lacks G14 Written constitution.
 - **Numbers come from the form.** A regime never sets its own caps on officials or lords.
@@ -109,7 +109,7 @@ The 33 regimes:
 | Free republic | constitutional republic | replaced | arm the people, divide the estates | trade income halves while unrecognised |
 | Creole republic | constitutional republic | elected | general's pact, call the assembly | a general seizes the presidency |
 | Parliamentary republic | constitutional republic | deposed | call the assembly, sell bonds | extremist risings in a crisis |
-| Committee rule | constitutional monarchy with an army power base | kept | officers to the provinces, call the assembly | other tongues' separatist signs come faster |
+| Committee rule | constitutional monarchy with an army power base | kept | officers to the provinces, call the assembly | other languages' separatist signs come faster |
 | Warlord republic | constitutional republic | elected | buy a warlord, general's pact | warlords fight each other |
 | Secular republic | party state | elected | script and schools, sell church lands | a faith rising sign for 20 years |
 | Agrarian reform | keep | kept | divide the estates | landowners fund risings for 20 years |
@@ -127,7 +127,7 @@ The 33 regimes:
 | Reaction | keep | kept | censorship | revolution needs one sign fewer for 20 years |
 | Restored monarchy | the old form | replaced | none | revoking charters can re-fire the revolution |
 
-The locks, grievance changes, flags, reactions abroad and the full lords, church, faith, tongue, levy, land, towns, trade and research lines of each regime are in the data.
+The locks, grievance changes, flags, reactions abroad and the full lords, church, faith, language, levy, land, towns, trade and research lines of each regime are in the data.
 
 ### Decrees
 
@@ -277,8 +277,23 @@ The family stance labels (lead / bend / fight):
 - **The revolution card** on the country screen, about 40 characters wide to fit a phone. For France in 1789 it reads "FRENCH REVOLUTION", brewing, "Breaks out at 4 of 6 signs", with the lit signs first ("Debt above 2,000 gold", "A quarter want a constitution", "The crown is distrusted"), each with how to ease it ("Cut court and army; tax lords"), and the sparks with their multipliers. The bar is neutral, amber at `warn_at` and red at `need`.
 - **"What happens if it breaks out"** opens the stances and the regime each leads to.
 - **Banners.** When a revolution breaks out or ends in another country, a one-line banner ("Revolution in France: the Bastille has fallen") appears, but only for neighbours, rivals and Great Powers. Tapping it opens that country's card.
-- **The revolution lens** shades provinces by how many of the revolution's province-level signs they meet and hatches risen provinces in the revolution's colour.
+- **The revolution map mode** shades provinces by how many of the revolution's province-level signs they meet and hatches risen provinces in the revolution's colour.
 - **The regime card** on the government screen shows the regime's loop line, its decrees as buttons and its locks greyed out.
+
+### In the game today
+
+The 36 historical revolutions read ideologies, legitimacy and ages the game does not track yet, so the first slice gives every realm one revolution of its own, built from the two oldest families. A monarchy with no hunger has an **Estates and towns** revolution (as the Fronde and the Comuneros); a realm that is hungry, or not a monarchy, has a **Peasant and agrarian** one (as the Tay Son and Donghak risings).
+
+- **Signs** (3 of 6 to break out, amber at 2): *Heavy taxes* in a quarter of the realm; *Hungry* in a fifth; a tenth rioting or plotting; two or more lords Wavering or worse; debt above a year's income; rebels holding your land, or rebels who won against you in the last 5 years. Under the reaction regime one sign fewer is enough, for 20 years.
+- **Breaking out**: a red card breaks out on a roll of 1 in 12 a month, 1 in 6 while two or more lords are Disloyal, never in the month it turned red and never within 3 years of the last revolution, Bend or crushed rising.
+- **Where you see it**: the Stability plaque in the top bar carries a mark while a revolution brews (amber) or may break out (red); tap it for the General tab, where the Revolution block under the four pillars lists the lit signs first, each with a button to the tab that eases it, and folds out what each answer would do.
+- **When it breaks out**: a full-screen card asks how you answer, and End turn waits for it.
+  - Estates: **Share power** makes you a diet monarchy (League of towns, crushing taxes locked); **Grant charters** fixes the tax at light for 10 years wherever it is heavy, and the revolution is stopped, not solved; **Break them** raises a town rising in your most restless province.
+  - Agrarian: **Divide the land** (Land to the villages: no more fiefs granted, every lord loses a loyalty step); **Cut taxes and open the granaries** (light tax for 10 years where it is heavy, castle granaries opened where people are hungry; stopped, not solved); **Crush the bands** raises a hunger rising.
+- **The struggle**: the rising plays as any other on the map. If it wins, an estates revolution makes you a merchant republic with an elected ruler; an agrarian one puts the rising's leader on your throne, your house goes abroad as pretenders, every lord wavers and tax stays light for 10 years. If it is beaten, starves or is bribed away, the Reaction follows: bloodshed where they rose, and the revolution comes back sooner. If you grant or talk out its demand, it is stopped, not solved.
+- **Rebels who win**: an ordinary rising that wins against you lights the rebels sign, and if your card is then red, or the rebels took your capital's castle, the revolution has won at once.
+- **Government tab**: the regime under your form, its loop line and since when, your ruler, the form before the revolution, and its locks greyed out. Locked orders are refused with "locked by the revolution".
+- **Other realms**: computer realms go through the same rules and pick Fight, Bend or Lead by weight, Fight more often when their armies outnumber the rising. A neighbour's revolution is a line in your News.
 
 ## How it connects
 
@@ -287,14 +302,14 @@ The family stance labels (lead / bend / fight):
 - [Government](Government): regimes set forms, in any era, and restore the old form.
 - [Diplomacy](Diplomacy): "Different form of rule", the counter-revolution reason, and the funding action.
 - [Subjects](Subjects): settler colonies going independent through a Disloyal colony.
-- [Culture](Culture): nationalism thresholds read by liberal and national signs; regimes can set the court tongue.
+- [Culture](Culture): nationalism thresholds read by liberal and national signs; regimes can set the court language.
 - [Religion](Religion): the faith wave, and church events that follow a revolutionary regime.
-- [National strengths](National-Strengths): a won revolution may shed a burden or grant a legacy (a hook only).
+- [National strengths](National-Strengths): a won revolution may overcome a weakness or grant a legacy (a hook only).
 - [Warfare](Warfare): generals growing too big, and a winning general switching the regime.
 - [Provinces](Provinces): grievances and class shares feed the signs; regimes end and add grievances.
 - [Your realm](Your-Realm): lords' loyalty and land, stability and debt; locks on fiefs and titles.
 - [Research](Research): G14 Written constitution decides the crown and assembly form.
-- [Map and lenses](Map-and-Lenses): the revolution lens.
+- [Map and Map Modes](Map-and-Lenses): the revolution map mode.
 - [Screens and navigation](Screens-and-Navigation): banner, card and regime card.
 - [Music and sound](Music-and-Sound): the revolution music tag.
 

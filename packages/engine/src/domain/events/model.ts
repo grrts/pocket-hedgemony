@@ -1,3 +1,4 @@
+import type { SubjectBond } from "../subjects/index.ts";
 import rawConfig from "../../../../rules/data/domain/events.json" with { type: "json" };
 import rawTree from "../../../../rules/data/domain/events-tree.json" with { type: "json" };
 
@@ -52,7 +53,8 @@ export interface RoleDef {
 
 export interface Availability {
   earliest: number;
-  latest: number;
+  /** null: open to the campaign's end. */
+  latest: number | null;
   mode: "mandatory" | "approximate" | "reference";
   repeat: "one_time" | "recurring" | "process";
   cooldown_years?: number;
@@ -307,6 +309,8 @@ export interface World {
   casusBelli: { who: string; against: string; type: string; until?: number }[];
   modifiers: ModifierInstance[];
   rebels: Rebels[];
+  /** Subject bonds by subject id, written by vassalize, create_country subject_of and the subject keys (SUBJ-097); absent until one is made. */
+  subjects?: Record<string, SubjectBond>;
 }
 
 export function emptyWorld(year = 1444, month = 1): World {

@@ -134,3 +134,38 @@ Feature: How a campaign ends
     Given a campaign as "France" that is not ironman reaches its end date
     When the screen "final_result" is shown
     Then instead of a list of achievements it reads "Achievements are earned only in ironman campaigns"
+
+  @SHELL-162 @SHELL-163
+  Scenario: The score line and the Score card
+    Given a game as "france" begins
+    Then every realm's card shows its three scores with a rank in each
+    And the player's Score card shows Economy as yearly income plus the bank and Power as provinces plus army power
+    And the score ledger lists the five leading realms and the player
+
+  @SHELL-164
+  Scenario: The end card when the end date comes
+    Given a game as "france" begins with the end date "1444-11-13"
+    When the game plays 3 days
+    Then the end card reads "The campaign ends · 13 November 1444"
+    And the end card offers "Look at the map, New game"
+    And the clock no longer runs
+
+  @SHELL-164
+  Scenario: The end card at game over
+    Given a game as "france" begins
+    When "england" takes two thirds of the lands of "france" and "burgundy" the rest
+    And the game plays 7 days
+    Then the end card reads "France was divided between England and Burgundy · 1444"
+    And the end card offers "Play on as another realm, New game"
+    When the player chooses to play on as "burgundy"
+    Then the clock runs again as "burgundy"
+
+  @SHELL-164
+  Scenario: The end card after world domination
+    Given a game as "france" begins
+    And "france" holds every land province
+    When the game plays into January 1445
+    Then the end card reads "World domination · 1445"
+    And the end card offers "Keep playing, New game"
+    When the player chooses to keep playing
+    Then the clock runs again as "france"

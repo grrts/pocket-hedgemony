@@ -1,9 +1,28 @@
+import { realmConfig } from "./domain/realm/index.ts";
+import { rulerViews, type RulerView } from "./rulers.ts";
+import { fallenEffect, type FallenEffect } from "./fallen.ts";
+import { lowFaith, lowTongue } from "./belief.ts";
+import { heritageViews, type HeritageView } from "./heritage.ts";
 import { statecraftView, type StatecraftView } from "./statecraft.ts";
+import { achievementsView, startAchievements } from "./achievements.ts";
+import { eventCards, type EventCard } from "./events.ts";
+import { diplomacyLensView, type DiplomacyLensView } from "./diplomacyLens.ts";
 import { giftGold } from "./lords.ts";
 import { stabilityOf, type Stability } from "./stability.ts";
+import { governmentView, realmForms, realmTitles, type GovernmentView } from "./government.ts";
+import type { Titles } from "./domain/realm/index.ts";
+import { goodsOf, kindRow, TRADER_KINDS, tradePaths, tradeSeen, tradeValueAt, tradeView, type KindRow, type TradePath, type TradeView } from "./trade.ts";
+import { LIVING_MAP } from "./domain/map-presentation/livingMap.ts";
+import { rebelsView, type RebelsView } from "./rebels.ts";
+import { revolutionView, type RevolutionView } from "./revolutions.ts";
+import { empireView, institutionsLens, type EmpireView } from "./institutions.ts";
+import { peoplesSnapshot, type PeoplesSnapshot } from "./peoples.ts";
+import { faithHeadsView, type FaithHeadsView } from "./faithHeads.ts";
+import { campaignView, setPlayer, type CampaignView } from "./campaignEnd.ts";
 import { GRIEVANCES, moodIndex, MOODS } from "./moods.ts";
 import { CLASS_NAMES } from "./living.ts";
-import { canBorrow, LEDGER, loanDebt, loanUnsettlesLords, LEDGER_LINES, NORMAL_TAX, provinceTax, TAX_RATES } from "./treasury.ts";
+import { canBorrow, heldTax, LEDGER, loanDebt, loanUnsettlesLords, LEDGER_LINES, NORMAL_TAX, TAX_RATES } from "./treasury.ts";
+import { feverOf, FEVER_STEPS } from "./land.ts";
 import { CLIMATES, harvestMonthsOf, HARVESTS, provinceClimates, storeMonths } from "./food.ts";
 import { badWeatherName } from "./domain/realm/index.ts";
 import { foodView, mapNetwork, type FoodView } from "./castleFood.ts";
@@ -13,12 +32,22 @@ import type { GameDate, Ruleset } from "@ph/rules";
 import { hashWorld } from "./hash.ts";
 import { advance, applyNow, campaigning, HOURS_PER_STEP, mayMarchInto, processTurn, refillHere, type Order } from "./turn.ts";
 import { createWorld, tileMarch, type World } from "./world.ts";
+import { settlementsView, type SettlementView } from "./settlement.ts";
 import { armyBreak, controller, relationState, SIEGE_MONTH_DAYS, type News } from "./war.ts";
+import { foodMonths } from "./domain/warfare/index.ts";
+import { battleSides } from "./domain/map-presentation/index.ts";
 import { tileStepHours } from "./march.ts";
-import { tileGridFromImages } from "./tiles.ts";
+import { tileGridFromImages, type TileGrid } from "./tiles.ts";
+import { navyView, type NavyView } from "./navy.ts";
+import { fleetOffersView, type FleetOfferView } from "./hiredFleets.ts";
+import { openSave, writeSave, memoryStorage, type Campaign, type SaveHeader, type SaveKind, type Platform as SavePlatform } from "./domain/saves/index.ts";
+import { Rng } from "./rng.ts";
+import { explorationView, type ExplorationView } from "./colonies.ts";
 import { realmResearch, researchView, type ResearchView } from "./research.ts";
-import { officialAt, yearsServed } from "./officials.ts";
-import { armyPay, armyRations, ARMS, menByArm, companyMen, companyPay, companyWeeks, freeCompaniesFor, type FreeCompany, nationPay, OFFICIALS, weeksToGather } from "./recruit.ts";
+import { newLands, officialAt, yearsServed } from "./officials.ts";
+import { armyPay, armyRations, ARMS, menByArm, companyMen, companyPay, companyWeeks, freeCompaniesFor, type FreeCompany, nationPay, OFFICIALS, daysToGather, gatherDays, garrisonViews, trainingGrounds, type GarrisonView } from "./recruit.ts";
+import { warPeaceView, type WarPeaceView } from "./peace.ts";
+import { subjectTies } from "./subjects.ts";
 
 /** A free company as the UI shows it: men by arm, only the arms it has. */
 export interface CompanyView {
@@ -40,13 +69,27 @@ const companyView = (c: FreeCompany): CompanyView => ({
 /** Messages the UI thread sends to the engine worker. */
 export type EngineRequest =
   /** `map` is the map's images as the UI decoded them, so armies march over its tiles; without it they stand still. */
-  | { id: number; type: "newGame"; seed: number; playerNation: string; map?: MapTiles }
+  | { id: number; type: "newGame"; seed: number; playerNation: string; map?: MapTiles; endDate?: string }
   /** Plays a whole week at once (the start-up probe and the benchmarks). */
   | { id: number; type: "endTurn"; orders: Order[] }
   /** Plays the clock on by some 4-hour steps (six a day). */
   | { id: number; type: "advance"; steps: number }
   /** An order that acts at once (everything but moves: war and peace, recruiting, training, commanders). */
-  | { id: number; type: "act"; order: Order };
+  | { id: number; type: "act"; order: Order }
+  /**
+   * Writes a save of the world as it is now, at a turn boundary (domain/saves).
+   * `listing` holds the first bytes (the header) of the saves already kept, so
+   * the engine can rotate them out; the UI thread does the storing.
+   */
+  | { id: number; type: "save"; kind: SaveKind; campaign: Campaign; listing: readonly SaveListing[]; device: string; platform: SavePlatform; gameVersion: string; now: number; name?: string; replace?: string; keep?: number }
+  /** Opens a save in place of the game in progress; `map` as for newGame, needed once per engine. */
+  | { id: number; type: "load"; bytes: Uint8Array; map?: MapTiles; acceptModified?: boolean };
+
+/** A save already kept: its path and its header's bytes. */
+export interface SaveListing {
+  path: string;
+  head: Uint8Array;
+}
 
 /** The decoded map images: province id + 1 per pixel (0 = water), and the terrain image's RGB. */
 export interface MapTiles {
@@ -59,6 +102,10 @@ export interface MapTiles {
 /** Messages the engine worker sends back. */
 export type EngineResponse =
   | { id: number; type: "snapshot"; snapshot: Snapshot }
+  /** A save written: the file to keep, the files it replaces, and the campaign's ironman head. */
+  | { id: number; type: "saved"; path: string; header: SaveHeader; bytes: Uint8Array; removed: string[]; ironmanHead?: string }
+  /** A save that did not open, and why, in the player's words; `canAccept` when opening anyway is allowed. */
+  | { id: number; type: "refused"; message: string; canAccept: boolean }
   | { id: number; type: "error"; message: string };
 
 /**
@@ -73,6 +120,7 @@ export interface Snapshot {
   /** Hour of the day (0, 4, 8 … 20). */
   hour: number;
   playerNation: number;
+  /** worldHash at the end of a whole turn or a new game; empty for a day or step played (hashing the world costs more than the day). */
   hash: string;
   computeMs: number;
   rejectedOrders: { order: Order; reason: string }[];
@@ -83,20 +131,45 @@ export interface Snapshot {
   provinceClosed: Uint8Array;
   /** What happened this turn (or from the last order) that concerns the player. */
   news: News[];
+  /** Achievements: unlocks since the last snapshot (once), the campaign's earned list, progress values and eligibility; null before a realm is chosen. */
+  achievements: ReturnType<typeof achievementsView>;
   /** Wars under way, by nation index. */
-  wars: { id: string; attackers: number[]; defenders: number[]; start: string }[];
+  wars: {
+    id: string;
+    attackers: number[];
+    defenders: number[];
+    start: string;
+    /** The war card's peace facts (WAR-221 to WAR-231): aim, months, the long-war mark, both leaders' peace voices and the most one peace may take from each; null for a war whose leaders are gone. */
+    peace: WarPeaceView | null;
+  }[];
   /** Peace offered to the player by an AI war leader, until the next month: terms as the AI sends them ("give": it gives up land the player holds). */
-  peaceOffers: { id: number; from: number; terms: "take" | "white" | "give" }[];
+  peaceOffers: { id: number; from: number; terms: "take" | "white" | "give" | "dissolve" | "master"; provinces?: number[]; gold?: number; counter?: boolean; surrender?: boolean }[];
+  /** The peace table against each realm the player is at war with: what the war lets the player ask, and what each province costs (WAR-240 … WAR-248). */
+  settlements: SettlementView[];
   /** Calls to arms waiting for the player's answer. */
-  calls: { id: string; caller: number; against: number; kind: "offensive" | "defensive" }[];
+  calls: { id: string; caller: number; against: number; kind: "offensive" | "defensive"; via: "alliance" | "pledge" | "league" | "subject" | "empire" }[];
   /** The player's standing with every other nation that has one. */
   relations: { nation: number; state: "war" | "truce" | "alliance" | "subject" | "overlord"; until?: string }[];
+  /** Events and decisions waiting for the player's answer, oldest first (milestone 6). */
+  events: EventCard[];
   /** Envoys, answers and what other realms think of the player (milestone 5); null without a player. */
   statecraft: StatecraftView | null;
+  /** Each realm's heritage in play by nation index (null: none recorded); ambitions only for the player's realm (HER-078). */
+  heritage: (HeritageView | null)[];
+  /** Each realm's ruler by nation index (REALM-240). */
+  rulers: RulerView[];
+  /** The player's fallen of the last ten years and what they do (REALM-241); null without a player. */
+  fallen: FallenEffect | null;
+  /** Whether the player's Faith % or Tongue % is low enough to stir risings (REALM-238), and the bar. */
+  beliefLow: { faith: boolean; tongue: boolean; under: number } | null;
+  /** The map's diplomacy lens: each realm's relation to the player, leagues, envoys on the road and war aims (DIPL-209); null without a player. */
+  diplomacyLens: DiplomacyLensView | null;
   /** Sieges under way: months gone, how far into the next siege month (0..1), breaches and men inside. */
-  sieges: { province: number; by: number; months: number; progress: number; breaches: number; garrison: number }[];
+  /** Sieges under way, with their progress for the map and the siege view (WAR-208, VIEW-078): days held, months of food left (null while nobody eats). */
+  sieges: { province: number; by: number; days: number; months: number; progress: number; breaches: number; garrison: number; foodMonths: number | null }[];
   /** Battles being fought: where, each side's leading realm with its men now and at the start, and rounds fought of all. */
-  battles: { id: number; tile: number; province: number; attacker: number; defender: number; attMen: number; defMen: number; attStart: number; defStart: number; round: number; rounds: number; player: boolean }[];
+  /** Battles being fought, with each side's men and morale left after the rounds so far (WAR-207, VIEW-077). */
+  battles: { id: number; tile: number; province: number; attacker: number; defender: number; attMen: number; defMen: number; attStart: number; defStart: number; attMorale: number; defMorale: number; round: number; rounds: number; player: boolean }[];
   /** Width of the tile grid (tile = y * width + x, in map pixels). */
   tileWidth: number;
   nationTreasury: Float64Array;
@@ -136,6 +209,9 @@ export interface Snapshot {
   provinceWeather: Int8Array;
   provinceClimate: Int8Array;
   provinceHarvestMonths: number[][];
+  /** Each province's fever land (index into feverSteps: none, mild, harsh, deadly), PROV-243. */
+  provinceFever: Int8Array;
+  feverSteps: readonly string[];
   climates: readonly string[];
   /** What bad weather is called in each climate (drought, floods, bad weather). */
   badWeather: readonly string[];
@@ -152,11 +228,56 @@ export interface Snapshot {
   /** Every lord (index = provinceLord's value): name, house, realm, loyalty and provinces held; the gold a gift costs. */
   lords: { name: string; house: string; nation: number; loyalty: string; lands: number }[];
   provinceLord: Int16Array;
+  /** Each realm's direct overlord by nation index, -1 when it is nobody's subject (SUBJ-093: the world-zoom map washes a subject in it). */
+  nationOverlord: Int16Array;
   giftGold: number;
   /** The player's stability: the weakest of its lords, subjects, officials and provinces (REALM-199); null before a realm is chosen. */
   stability: Stability | null;
-  /** The player's men gathering in provinces: men still to come, weeks to the next thousand and to the last. */
-  musters: { province: number; men: number; weeksLeft: number; weeksAll: number }[];
+  /** The player's revolution card, its regime and ruler (REVO-090 to REVO-092); null before a realm is chosen. */
+  revolution: RevolutionView | null;
+  /** The Empire card (INST-081): Emperor, hold, seats and votes, members, the hold record; null without an Empire. */
+  empire: EmpireView | null;
+  /** The Institutions map mode (INST-084): per realm 0 none, 1 member, 2 elector, 3 Emperor; imperial provinces held by outsiders. */
+  institutionsLens: { realm: Uint8Array; outsiderLand: Uint8Array };
+  /** The player's Government tab: form, both caps, the form's laws and the next forms (GOV-064); null before a realm is chosen. */
+  government: GovernmentView | null;
+  /** Risings in every realm (the player's with their card and answers), the player's beaten risings waiting for a verdict, and each plotting province's monthly chance to rise (REBL-063). */
+  rebels: RebelsView;
+  /** Rising holding each province (its id), 0 = none. */
+  provinceRebels: Int32Array;
+  /** Every realm's government form by name, for its card. */
+  realmForms: string[];
+  /** What every realm calls its lords and officials (REALM-242). */
+  realmTitles: Titles[];
+  /** The player's Trade tab: last month's trade, its traders, where it can found more, its busiest cities and the route being drawn (TRADE-130 to TRADE-140); null before a realm is chosen. */
+  trade: TradeView | null;
+  /** The kinds of trader, with their gold, upkeep, hold, purse and crew. */
+  traderKinds: KindRow[];
+  /** Every province's trade value (gold a month), trade ratio (0 to 100), traders passing last month, and whether it is a trade stop (bit 1 city, bit 2 port). */
+  provinceTradeValue: Float32Array;
+  provinceTradeRatio: Uint8Array;
+  provinceTradePassing: Uint8Array;
+  provinceTradeCity: Uint8Array;
+  /** Provinces whose trade the player sees: its own and those on its traders' loops (D-TRADE-13). */
+  provinceTradeSeen: Uint8Array;
+  /** The busy trade paths the player may see, busiest first, for the traders drawn on the living map (VIEW-132). */
+  tradePaths: TradePath[];
+  /** What each province the player sees trades: its goods, most gold first, with loads a year and gold a month. */
+  provinceGoods: Record<number, { ware: string; loads: number; gold: number }[]>;
+  /** Tongues and faiths of every province and realm; the UI reads them with peoples.ts (tongueLine, faithLine, peoplesView). */
+  peoples: PeoplesSnapshot;
+  /** Win scores, ranks, the player's breakdown and ledger, and how the campaign ended. */
+  campaign: CampaignView;
+  /** Heads of the faith: seats, each realm's Faith-line badge, the player's Head of the faith card and the censure a war would bring (RELG-135 to RELG-138). */
+  faithHeads: FaithHeadsView;
+  /** The player's men gathering in provinces: men still to come, days to the next thousand and to the last. */
+  musters: { province: number; men: number; daysLeft: number; daysAll: number }[];
+  /** Days each thousand of the player's levy takes to gather (RECR-106). */
+  gatherDays: number;
+  /** The Garrison tab of each province where the player has men gathering or troops without a commander (PROV-302). */
+  garrisons: GarrisonView[];
+  /** The player's provinces where an army can train now: a castle or drill yard of its own, not besieged (RECR-109). */
+  trainingGrounds: number[];
   /** The player's free companies on their way to the capital. */
   mercs: (CompanyView & { weeksLeft: number })[];
   /** Free companies the player can hire: their pay a month (paid at once on hiring) and weeks to reach the capital. */
@@ -167,8 +288,18 @@ export interface Snapshot {
   provinceOfficialName: (string | null)[];
   /** Years the official at each post has served there, to one decimal (0 when empty); his effect grows to full at 5 (see officialEffect). */
   provinceOfficialYears: number[];
+  /** Realm a foreign specialist at each post came from (nation index), -1 = one of the realm's own (PROV-334). */
+  provinceOfficialFrom: number[];
+  /** The player's provinces just taken that wait for a decision before the turn ends: fill the post, grant it, or keep it royal (PROV-340). */
+  newLands: number[];
   /** Every commander: who they serve (-1 = none), their skills and record, the army they lead (index in armies, -1 = at court) and the province they left as an official (-1 = none). */
-  commanders: { name: string; owner: number; might: number; cunning: number; logistics: number; victories: number; defeats: number; army: number; home: number; origin: string }[];
+  commanders: { name: string; owner: number; might: number; cunning: number; logistics: number; victories: number; defeats: number; army: number; home: number; origin: string; fleet: number }[];
+  /** Ports, sailors and fleets: every fleet for the map, the player's ports and fleets in full (navy.ts). */
+  navy: NavyView;
+  /** Fleets the player can hire now, free fleets first (hiredFleets.ts, F-115). */
+  fleetsForHire: FleetOfferView[];
+  /** The player's charts, colonial governors and colonies, and every colony being founded that they have charted (colonies.ts). */
+  exploration: ExplorationView;
   armies: {
     id: Int32Array;
     owner: Int16Array;
@@ -211,10 +342,10 @@ export interface Snapshot {
   };
   /** Arm names for armies.byArm. */
   arms: readonly string[];
-  /** The player's research for the Learning tab (null before a realm is chosen). */
+  /** The player's research for the Research tab (null before a realm is chosen). */
   research: ResearchView | null;
-  /** Every realm's research at a glance, by nation index: inventions known, its study and how far along (%). */
-  realmResearch: { known: number; study: string | null; pct: number }[];
+  /** Every realm's research at a glance, by nation index: inventions known, its study and how far along (%), its standing, eras behind the times, and how many inventions it knows that the player's realm does not (RSCH-104). */
+  realmResearch: { known: number; study: string | null; pct: number; standing: string; behind: number; ahead: number }[];
   /** Works (milestone 4): their names, each step's name and what it does, and the step built of each in each province (works.length per province, 0 = none). */
   works: readonly string[];
   workSteps: { name: string; effect: string }[][];
@@ -259,11 +390,13 @@ export interface HostReply {
 export function createEngineHost(loadRules: () => Ruleset, now: () => number = () => performance.now()) {
   let world: World | null = null;
   let player = -1;
+  /** The map's tiles from the last newGame or load, for loading saves onto. */
+  let grid: TileGrid | undefined;
 
-  function snapshot(id: number, started: number, rejectedOrders: Snapshot["rejectedOrders"], news: News[] = []): HostReply {
+  function snapshot(id: number, started: number, rejectedOrders: Snapshot["rejectedOrders"], news: News[] = [], withHash = true): HostReply {
     const w = world!;
     const idx = (ids: string[]) => ids.map((x) => w.nationIndex.get(x)!).filter((n) => n !== undefined);
-    const wars = w.diplomacy.wars.map((x) => ({ id: x.id, attackers: idx(x.attackers), defenders: idx(x.defenders), start: x.start }));
+    const wars = w.diplomacy.wars.map((x) => ({ id: x.id, attackers: idx(x.attackers), defenders: idx(x.defenders), start: x.start, peace: warPeaceView(w, x) }));
     // The player hears of what involves them, their partners and their neighbours' wars.
     const close = new Set<number>([player]);
     for (const x of wars) if (x.attackers.includes(player) || x.defenders.includes(player)) for (const n of [...x.attackers, ...x.defenders]) close.add(n);
@@ -289,23 +422,35 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       date: { ...w.date },
       hour: w.step * HOURS_PER_STEP,
       playerNation: player,
-      hash: hashWorld(w),
+      hash: withHash ? hashWorld(w) : "",
       computeMs: now() - started,
       rejectedOrders,
       provinceOwner: w.provinceOwner.slice(),
       provinceOccupier: w.provinceOccupier.slice(),
       provinceClosed: closedTo(w, player),
-      news: news.filter((x) => x.nations.some((n) => close.has(n)) || x.kind === "war" || x.kind === "destroyed"),
+      achievements: achievementsView(w),
+      news: news.filter((x) => x.nations.some((n) => close.has(n)) || x.kind === "war" || x.kind === "destroyed" || x.major),
       wars,
       peaceOffers: w.peaceOffers.map((o) => ({ ...o })),
+      settlements: settlementsView(w),
       calls: w.diplomacy.calls
         .filter((c) => !c.answer && c.called === w.nationIds[player])
-        .map((c) => ({ id: c.id, caller: w.nationIndex.get(c.caller)!, against: w.nationIndex.get(c.against)!, kind: c.kind as "offensive" | "defensive" })),
+        .map((c) => ({ id: c.id, caller: w.nationIndex.get(c.caller)!, against: w.nationIndex.get(c.against)!, kind: c.kind as "offensive" | "defensive", via: c.via })),
       relations,
       statecraft: statecraftView(w, player),
-      sieges: [...w.sieges].map(([p, st]) => ({ province: p, by: st.by, months: st.siege.months, progress: (st.days % SIEGE_MONTH_DAYS) / SIEGE_MONTH_DAYS, breaches: st.siege.breaches, garrison: Math.round(st.siege.garrison) })),
+      heritage: heritageViews(w),
+      rulers: rulerViews(w),
+      fallen: player >= 0 ? fallenEffect(w, player) : null,
+      beliefLow: player >= 0 ? { faith: lowFaith(w, player), tongue: lowTongue(w, player), under: realmConfig.belief.low_percent } : null,
+      events: eventCards(w, player),
+      diplomacyLens: diplomacyLensView(w, player),
+      sieges: [...w.sieges].map(([p, st]) => {
+        const food = foodMonths(st.siege);
+        return { province: p, by: st.by, days: st.days, months: st.siege.months, progress: (st.days % SIEGE_MONTH_DAYS) / SIEGE_MONTH_DAYS, breaches: st.siege.breaches, garrison: Math.round(st.siege.garrison), foodMonths: Number.isFinite(food) ? food : null };
+      }),
       battles: w.battles.map((b) => {
         const men = (slots: number[]) => slots.reduce((t, s) => t + (a.alive[s] ? a.men[s]! : 0), 0);
+        const [att, def] = battleSides({ attMen: men(b.attackers), defMen: men(b.defenders), attStart: b.attStart, defStart: b.defStart, round: b.round, rounds: b.rounds, attackerWins: b.attackerWins });
         return {
           id: b.id,
           tile: b.tile,
@@ -316,6 +461,8 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
           defMen: men(b.defenders),
           attStart: b.attStart,
           defStart: b.defStart,
+          attMorale: att.moraleLeft,
+          defMorale: def.moraleLeft,
           round: b.round,
           rounds: b.rounds,
           player: [...b.attackers, ...b.defenders].some((s) => a.owner[s] === player),
@@ -334,10 +481,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       classNames: CLASS_NAMES,
       taxRates: TAX_RATES,
       provinceTax: w.provinceTax.slice(),
-      provinceTaxGold: Float32Array.from({ length: w.provinceCount }, (_, p) => {
-        const holder = controller(w, p);
-        return holder >= 0 ? provinceTax(w, p, holder) : 0;
-      }),
+      provinceTaxGold: Float32Array.from({ length: w.provinceCount }, (_, p) => heldTax(w, p)),
       taxDefault: player >= 0 ? w.nationTaxDefault[player]! : NORMAL_TAX,
       ledger: player >= 0 ? LEDGER.map((line, k) => ({ line, gold: w.nationLedger[player * LEDGER_LINES + k]! })) : [],
       debt: player >= 0 ? w.nationDebt[player]! : 0,
@@ -351,6 +495,8 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       harvests: HARVESTS,
       provinceWeather: w.provinceWeather.slice(),
       provinceClimate: provinceClimates(w).slice(),
+      provinceFever: Int8Array.from({ length: w.provinceCount }, (_, p) => feverOf(w, p)),
+      feverSteps: FEVER_STEPS,
       provinceHarvestMonths: Array.from({ length: w.provinceCount }, (_, p) => (w.provinceWater[p] ? [] : harvestMonthsOf(w, p))),
       climates: CLIMATES,
       badWeather: CLIMATES.map(badWeatherName),
@@ -366,14 +512,47 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         return w.lords.map((l, k) => ({ name: l.name, house: l.house, nation: l.nation, loyalty: l.loyalty, lands: lands[k]! }));
       })(),
       provinceLord: w.provinceLord.slice(),
+      nationOverlord: (() => {
+        const out = new Int16Array(w.nationIds.length).fill(-1);
+        for (const t of subjectTies(w)) out[t.s] = t.o;
+        return out;
+      })(),
       giftGold: giftGold(w),
       stability: player >= 0 ? stabilityOf(w, player) : null,
-      musters: w.musters.filter((m) => m.nation === player).map((m) => ({ province: m.province, men: m.men, weeksLeft: m.weeksLeft, weeksAll: weeksToGather(w, m) })),
+      revolution: player >= 0 ? revolutionView(w, player) : null,
+      empire: empireView(w, player),
+      institutionsLens: institutionsLens(w),
+      government: player >= 0 ? governmentView(w, player) : null,
+      rebels: rebelsView(w),
+      provinceRebels: w.provinceRebels.slice(),
+      realmForms: realmForms(w),
+      realmTitles: realmTitles(w),
+      trade: player >= 0 ? tradeView(w, player) : null,
+      traderKinds: TRADER_KINDS.map((k) => kindRow(w, k)),
+      provinceTradeValue: Float32Array.from({ length: w.provinceCount }, (_, p) => tradeValueAt(w, p)),
+      provinceTradeRatio: Uint8Array.from(w.provinceTradeRatio, (r) => Math.round(r)),
+      provinceTradePassing: Uint8Array.from(w.provincePassed, (x) => Math.min(255, Math.round(x))),
+      provinceTradeCity: w.provinceTradeCity.slice(),
+      ...(() => {
+        const seen = tradeSeen(w, player);
+        const goods: Snapshot["provinceGoods"] = {};
+        for (let p = 0; p < w.provinceCount; p++) if (seen[p] && !w.provinceWater[p]) goods[p] = goodsOf(w, p).map((g) => ({ ware: g.ware, loads: g.loads, gold: g.gold }));
+        return { provinceTradeSeen: seen, provinceGoods: goods, tradePaths: tradePaths(w, player, LIVING_MAP.traders.maxPaths, player >= 0 ? seen : null) };
+      })(),
+      peoples: peoplesSnapshot(w),
+      campaign: campaignView(w),
+      faithHeads: faithHeadsView(w, player),
+      musters: w.musters.filter((m) => m.nation === player).map((m) => ({ province: m.province, men: m.men, daysLeft: m.daysLeft, daysAll: daysToGather(w, m) })),
+      gatherDays: player >= 0 ? gatherDays(w, player) : 14,
+      garrisons: player >= 0 ? garrisonViews(w, player) : [],
+      trainingGrounds: player >= 0 ? trainingGrounds(w, player) : [],
       mercs: w.mercs.filter((m) => m.nation === player).map((m) => ({ ...companyView(m.company), weeksLeft: m.weeksLeft })),
-      freeCompanies: player >= 0 ? freeCompaniesFor(w, player).map((c) => ({ ...companyView(c), id: c.id, pay: companyPay(w, c), weeks: companyWeeks(w, c, player) })) : [],
+      freeCompanies: player >= 0 ? freeCompaniesFor(w, player).map((c) => ({ ...companyView(c), id: c.id, pay: companyPay(w, c, player), weeks: companyWeeks(w, c, player) })) : [],
       provinceOfficial: Array.from(w.provinceOfficial, (o) => (o >= 0 ? OFFICIALS[o]! : null)),
       provinceOfficialName: Array.from({ length: w.provinceCount }, (_, p) => officialAt(w, p)),
       provinceOfficialYears: Array.from({ length: w.provinceCount }, (_, p) => Math.floor(yearsServed(w, p) * 10) / 10),
+      provinceOfficialFrom: Array.from(w.provinceOfficialFrom),
+      newLands: player >= 0 ? newLands(w, player) : [],
       commanders: w.commanders.map((c, k) => ({
         name: c.name,
         owner: w.commanderOwner[k]!,
@@ -385,7 +564,11 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         army: live.findIndex((slot) => a.commander[slot] === k),
         home: w.commanderHome[k]!,
         origin: c.origin ?? "",
+        fleet: w.navy.fleets.find((f) => f.admiral === k)?.id ?? -1,
       })),
+      navy: navyView(w, player),
+      fleetsForHire: player >= 0 ? fleetOffersView(w, player) : [],
+      exploration: explorationView(w, player),
       arms: ARMS,
       research: player >= 0 ? researchView(w, player, ARMS) : null,
       realmResearch: realmResearch(w),
@@ -448,13 +631,21 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       snap.provinceHarvest,
       snap.provinceWeather,
       snap.provinceClimate,
+      snap.provinceFever,
       snap.provinceStarved,
       snap.provinceCastle,
       snap.provinceRing,
       snap.provinceGrievances,
       snap.provinceMood,
+      snap.provinceRebels,
+      snap.rebels.chance,
       snap.provinceLord,
       snap.provinceWorks,
+      snap.provinceTradeValue,
+      snap.provinceTradeRatio,
+      snap.provinceTradePassing,
+      snap.provinceTradeCity,
+      snap.provinceTradeSeen,
       ...Object.values(snap.armies).filter((v): v is Int32Array | Int16Array => ArrayBuffer.isView(v)),
       ...snap.armies.path,
     ].map((arr) => arr.buffer as ArrayBuffer);
@@ -463,18 +654,21 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
     return { response: { id, type: "snapshot", snapshot: snap }, transfer };
   }
 
-  return function handle(req: EngineRequest): HostReply {
+  function handle(req: EngineRequest): HostReply {
     const started = now();
     try {
       switch (req.type) {
         case "newGame": {
           const rules = loadRules();
-          const grid = req.map ? tileGridFromImages(rules, req.map.width, req.map.height, req.map.province, req.map.terrain) : undefined;
+          grid = req.map ? tileGridFromImages(rules, req.map.width, req.map.height, req.map.province, req.map.terrain) : undefined;
           world = createWorld(rules, req.seed, grid);
           const idx = world.nationIndex.get(req.playerNation);
           if (idx === undefined) throw new Error(`unknown nation ${req.playerNation}`);
           player = idx;
-          world.player = idx;
+          setPlayer(world, idx);
+          // A nearer end date (YYYY-MM-DD), for trying the end card (SHELL-164).
+          if (req.endDate && /^\d{4}-\d\d-\d\d$/.test(req.endDate)) world.campaign.endDate = req.endDate;
+          startAchievements(world);
           return snapshot(req.id, started, []);
         }
         case "endTurn": {
@@ -485,18 +679,50 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         case "advance": {
           if (!world) throw new Error("no game in progress");
           const news = advance(world, Math.max(1, Math.min(req.steps, 42)));
-          return snapshot(req.id, started, [], news);
+          return snapshot(req.id, started, [], news, false);
         }
         case "act": {
           if (!world) throw new Error("no game in progress");
           const report = applyNow(world, req.order, player);
+          // Playing on as another realm changes who the player is (SHELL-096).
+          player = world.player;
           return snapshot(req.id, started, report.rejectedOrders, report.news);
+        }
+        case "save": {
+          if (!world) throw new Error("no game in progress");
+          const storage = memoryStorage();
+          for (const e of req.listing) storage.files.set(e.path, e.head);
+          const ctx = { storage, rules: world.rules, rng: new Rng(req.now >>> 0), device: req.device, platform: req.platform, gameVersion: req.gameVersion, now: req.now };
+          const campaign = { ...req.campaign };
+          const w = writeSave(ctx, campaign, world, req.kind, { ...(req.name ? { name: req.name } : {}), ...(req.replace ? { replace: req.replace } : {}), ...(req.keep ? { keep: req.keep } : {}) });
+          const reply: EngineResponse = { id: req.id, type: "saved", path: w.path, header: w.header, bytes: w.bytes, removed: w.removed, ...(campaign.ironmanHead ? { ironmanHead: campaign.ironmanHead } : {}) };
+          return { response: reply, transfer: [w.bytes.buffer as ArrayBuffer] };
+        }
+        case "load": {
+          const rules = loadRules();
+          if (req.map) grid = tileGridFromImages(rules, req.map.width, req.map.height, req.map.province, req.map.terrain);
+          const r = openSave(req.bytes, { rules, fullGame: true, ...(grid ? { tiles: grid } : {}), ...(req.acceptModified ? { acceptModified: true } : {}) });
+          if (r.kind !== "opened") return { response: { id: req.id, type: "refused", message: "message" in r ? r.message : "This ironman save does not match its check.", canAccept: r.kind === "hash warning" }, transfer: [] };
+          const idx = r.world.nationIndex.get(r.game.playerNation);
+          if (idx === undefined) throw new Error(`unknown nation ${r.game.playerNation}`);
+          world = r.world;
+          player = idx;
+          world.player = idx;
+          return snapshot(req.id, started, []);
         }
       }
     } catch (e) {
       return { response: { id: req.id, type: "error", message: e instanceof Error ? e.message : String(e) }, transfer: [] };
     }
-  };
+  }
+
+  /**
+   * The world in play, for headless tools that measure it (packages/sim's
+   * balance runs read metrics the snapshot does not carry). Read-only by
+   * contract: the game's screens never call it, and nothing may write through it.
+   */
+  const current = (): Readonly<World> | null => world;
+  return Object.assign(handle, { world: current });
 }
 
 /** Hours an army still has to march along the tiles it has planned (left of a march planned a province at a time: none). */

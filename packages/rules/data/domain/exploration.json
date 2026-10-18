@@ -120,6 +120,33 @@
       "landing"
     ]
   },
+  "game": {
+    "$comment": "The game's first slice (EXPL-075, D-EXPL-20): a realm's region for the age gate where the event tree's 1444 polity list has no entry, by the catalogue's region group; what the AI does with its exploration ships.",
+    "catalogue_regions": {
+      "eu_": "europe",
+      "as_anatolia_caucasus": "middle_east",
+      "as_levant_egypt_arabia": "middle_east",
+      "as_iran_transoxiana": "middle_east",
+      "as_steppe_siberia": "central_asia",
+      "as_china_inner_asia": "east_asia",
+      "as_japan_korea": "east_asia",
+      "as_se_asia_": "southeast_asia",
+      "as_south_asia_": "south_asia",
+      "af_north_sahara": "north_africa",
+      "af_": "sub_saharan_africa",
+      "am_north": "north_america",
+      "am_mesoamerica_caribbean": "central_america",
+      "am_south": "south_america",
+      "oc_": "oceania"
+    },
+    "fallback_region": "europe",
+    "ai": {
+      "ship": "caravel",
+      "explorers": 1,
+      "most_zones_out": 25,
+      "reserve_gold": 20
+    }
+  },
   "_provisional": [
     "governor_slots",
     "s3_min_range",
@@ -135,6 +162,7 @@
     "governor_hire_gold",
     "governor_wage_per_year",
     "governor_age_when_hired",
-    "ai.stores_margin"
+    "ai.stores_margin",
+    "game.ai"
   ]
 }

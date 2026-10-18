@@ -3,7 +3,8 @@ import { loadMapTiles } from "../src/node/mapTiles.ts";
 import { loadDefaultRuleset } from "@ph/rules";
 import { createWorld, processTurn, type World } from "../src/index.ts";
 import { restoreWorld, worldChunks } from "../src/domain/saves/world-chunks.ts";
-import { demandableProvinces, giftGold, monthlyStatecraft, seatsOf, standingOf, statecraftView, tributaries, whyNotDemand, whyNotEnvoy } from "../src/statecraft.ts";
+import { subjectPayments, subjectTies } from "../src/subjects.ts";
+import { demandableProvinces, giftGold, makeDemand, monthlyStatecraft, sendEnvoy, seatsOf, standingOf, statecraftView, whyNotDemand, whyNotEnvoy } from "../src/statecraft.ts";
 import * as dip from "../src/domain/diplomacy/index.ts";
 
 const rules = loadDefaultRuleset();
@@ -23,11 +24,12 @@ describe("statecraft (milestone 5)", () => {
     const me = nation(w, "castile");
     const them = nation(w, "portugal");
     w.player = me;
-    expect(seatsOf(w, me)).toEqual({ seats: 2, free: 2 });
+    // 1 seat, 1 for more than 10 provinces, 1 envoy at court from Castile's standing abroad (REALM-130).
+    expect(seatsOf(w, me)).toEqual({ seats: 3, free: 3 });
     const before = standingOf(w, them, me).standing;
     const r = processTurn(w, [{ type: "sendEnvoy", target: them, action: "courtesy_visit" }], me);
     expect(r.rejectedOrders).toEqual([]);
-    expect(seatsOf(w, me).free).toBe(1);
+    expect(seatsOf(w, me).free).toBe(2);
     expect(whyNotEnvoy(w, me, them, "send_gift")).toBe("an envoy is already on the way");
     const news = months(w, 4, me);
     expect(standingOf(w, them, me).standing).toBe(before + 15);
@@ -59,6 +61,7 @@ describe("statecraft (milestone 5)", () => {
     processTurn(w, [{ type: "sendEnvoy", target: nation(w, "portugal"), action: "send_gift" }], me);
     expect(w.nationTreasury[me]).toBeLessThanOrEqual(100 - giftGold(w) + 1);
     processTurn(w, [{ type: "sendEnvoy", target: nation(w, "france"), action: "courtesy_visit" }], me);
+    processTurn(w, [{ type: "sendEnvoy", target: nation(w, "england"), action: "courtesy_visit" }], me);
     expect(whyNotEnvoy(w, me, nation(w, "navarre"), "courtesy_visit")).toBe("no free envoy: every seat is taken");
     const fresh = createWorld(rules, 1, tiles);
     fresh.player = me;
@@ -72,9 +75,11 @@ describe("statecraft (milestone 5)", () => {
     const marriages = w.diplomacy.marriages.length;
     const allies = () => w.diplomacy.graph.relations.filter((r) => r.type === "alliance").length;
     const alliances = allies();
-    months(w, 24, -1);
-    expect(w.diplomacy.marriages.length - marriages + allies() - alliances).toBeGreaterThan(2);
-  });
+    const made = () => w.diplomacy.marriages.length - marriages + allies() - alliances;
+    // Courts take their time: play up to four years, a year at a time, until more than two are made.
+    for (let y = 0; y < 4 && made() <= 2; y++) months(w, 12, -1);
+    expect(made()).toBeGreaterThan(2);
+  }, 60000);
 
   it("demands tribute of a weak neighbour: counted from −60, and a yes makes them a Tributary that pays (DIPL-111 to DIPL-114)", () => {
     const w = createWorld(rules, 1, tiles);
@@ -90,7 +95,7 @@ describe("statecraft (milestone 5)", () => {
     expect(letter.reasons[0]!.number).toBe(-60);
     const tributary = dip.relations.overlord(w.diplomacy.graph, "navarre") === "castile";
     expect(tributary).toBe(letter.answer === "yes");
-    if (tributary) expect(tributaries(w)).toContainEqual([them, me]);
+    if (tributary) expect(subjectPayments(w).some(([a, b]) => a === them && b === me)).toBe(true);
     else expect(dip.warAimsOf(w.diplomacy, "castile", "navarre").some((a) => a.aim === "tribute")).toBe(true);
     expect(standingOf(w, them, me).lines.some((l) => /Threatened/.test(l.name))).toBe(true);
   });
@@ -112,10 +117,76 @@ describe("statecraft (milestone 5)", () => {
   });
 
   it("lets AI realms demand before they go to war (DIPL-180)", () => {
+    // Demands are rare and the world's course is chancy: play up to six years until one is made.
     const w = createWorld(rules, 1, tiles);
-    months(w, 36, -1);
-    const demands = w.diplomacy.letters.filter((l) => l.action === "demand").length + w.diplomacy.refusedDemands.length + tributaries(w).length;
-    expect(demands).toBeGreaterThan(0);
+    const demands = () => w.diplomacy.letters.filter((l) => l.action === "demand").length + w.diplomacy.refusedDemands.length + subjectTies(w).filter((t) => t.r.origin === "game").length;
+    for (let y = 0; y < 6 && !demands(); y++) months(w, 12, -1);
+    expect(demands()).toBeGreaterThan(0);
+  }, 60000);
+
+  /** Runs until an envoy of `from` waits at the player's court, and returns its ask. */
+  function askArrives(w: World, player: number, from: number) {
+    for (let k = 0; k < 400; k++) {
+      const a = statecraftView(w, player)!.asks.find((x) => x.from === from);
+      if (a) return a;
+      processTurn(w, [], player);
+    }
+    throw new Error("no ask arrived");
+  }
+
+  it("waits for the player to answer a demand, and giving in makes them a Tributary at once (DIPL-211, DIPL-212)", () => {
+    const w = createWorld(rules, 1, tiles);
+    const asker = nation(w, "castile");
+    const me = nation(w, "navarre");
+    w.player = me;
+    expect(makeDemand(w, asker, me, "pay_tribute")).toBeNull();
+    const ask = askArrives(w, me, asker);
+    expect(ask.action).toBe("demand");
+    expect(ask.kind).toBe("pay_tribute");
+    expect(dip.relations.overlord(w.diplomacy.graph, "navarre")).toBeNull();
+    const r = processTurn(w, [{ type: "answerAsk", ask: ask.id, yes: true }], me);
+    expect(r.rejectedOrders).toEqual([]);
+    expect(dip.relations.overlord(w.diplomacy.graph, "navarre")).toBe("castile");
+    expect(statecraftView(w, me)!.asks).toEqual([]);
+    expect(r.news.some((x) => /You give in to Castile's demand/.test(x.text))).toBe(true);
+    months(w, 3, me);
+    expect(w.diplomacy.letters.some((l) => l.to === "castile" && l.from === "navarre" && l.action === "demand" && l.answer === "yes")).toBe(true);
+  });
+
+  it("gives the asker a war aim when the player refuses, and counts silence as a refusal (DIPL-211)", () => {
+    const w = createWorld(rules, 1, tiles);
+    const asker = nation(w, "castile");
+    const me = nation(w, "navarre");
+    w.player = me;
+    const p = demandableProvinces(w, asker, me)[0]!;
+    expect(makeDemand(w, asker, me, "hand_over_province", p)).toBeNull();
+    const ask = askArrives(w, me, asker);
+    expect(ask.province?.province).toBe(p);
+    expect(processTurn(w, [{ type: "answerAsk", ask: ask.id, yes: false }], me).rejectedOrders).toEqual([]);
+    expect(w.provinceOwner[p]).toBe(me);
+    expect(dip.warAimsOf(w.diplomacy, "castile", "navarre").some((a) => a.aim === "take_land")).toBe(true);
+    expect(processTurn(w, [{ type: "answerAsk", ask: ask.id, yes: true }], me).rejectedOrders.length).toBe(1);
+
+    const quiet = createWorld(rules, 1, tiles);
+    quiet.player = me;
+    expect(makeDemand(quiet, asker, me, "pay_tribute")).toBeNull();
+    askArrives(quiet, me, asker);
+    months(quiet, 2, me);
+    // Castile's envoy has left; another court's may have come since.
+    expect(statecraftView(quiet, me)!.asks.filter((x) => x.from === asker)).toEqual([]);
+    expect(quiet.diplomacy.refusedDemands.some((x) => x.asker === "castile" && x.asked === "navarre")).toBe(true);
+  });
+
+  it("lets the player agree to an alliance an AI court proposes (DIPL-211, DIPL-212)", () => {
+    const w = createWorld(rules, 1, tiles);
+    const asker = nation(w, "portugal");
+    const me = nation(w, "castile");
+    w.player = me;
+    expect(sendEnvoy(w, asker, me, "propose_alliance")).toBeNull();
+    const ask = askArrives(w, me, asker);
+    expect(ask.action).toBe("propose_alliance");
+    expect(processTurn(w, [{ type: "answerAsk", ask: ask.id, yes: true }], me).rejectedOrders).toEqual([]);
+    expect(dip.relations.has(w.diplomacy.graph, "alliance", "portugal", "castile")).toBe(true);
   });
 
   it("keeps envoys, letters and alliances through a save", () => {

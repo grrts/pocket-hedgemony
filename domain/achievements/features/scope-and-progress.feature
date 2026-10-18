@@ -19,6 +19,15 @@ Feature: Campaign and lifetime scope, and progress bars
     And the achievement "paths_not_taken" unlocks
     And the counter is mirrored to the store's progress
 
+  @ACH-084 @ACH-085
+  Scenario: A ladder earns its levels as the count climbs
+    Given the profile counts 8 province harvests
+    And the achievement "first_harvest" has unlocked
+    When an eligible campaign brings in 95 province harvests
+    Then the lifetime counter "provinces_harvested" reaches 103
+    And the achievements "harvests_10" and "harvests_100" unlock at the same harvest
+    And the ladder "harvests" stands at level 3 of 5, with "harvests_1000" next
+
   @ACH-044 @ACH-046 @placeholder
   Scenario: Game Center shows percent complete
     Given the achievement "scholars_100" has the progress target 100

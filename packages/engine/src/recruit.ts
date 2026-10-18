@@ -1,14 +1,19 @@
-import { crownShare } from "./lords.ts";
+import { crownShare, inAnyWar } from "./lords.ts";
+import { refillPaces } from "./fallen.ts";
 import { moodShare } from "./moods.ts";
 import * as rc from "./domain/recruiting/index.ts";
 import * as wf from "./domain/warfare/index.ts";
-import { officialName, personName } from "./names.ts";
-import { OFFICIALS, officialBonus } from "./officials.ts";
+import { mix, officialName, personName, rankedName } from "./names.ts";
+import { OFFICIALS, officialAt, officialBonus } from "./officials.ts";
 import { monthlyRations, wagonRations } from "./march.ts";
 import { campaigning, halt, isMarching } from "./turn.ts";
-import { spawnArmy, type World } from "./world.ts";
-import { atWar, controller, wallsOf, type News } from "./war.ts";
+import { foodCarriedPct, spawnArmy, type World } from "./world.ts";
+import { armyBreak, atWar, controller, wallsOf, type News } from "./war.ts";
 import { armUnlocked, knownSet } from "./research.ts";
+import { heritageFactor } from "./heritage.ts";
+import { noteRegiment } from "./achievements.ts";
+import { W as WORK, worksAt } from "./works.ts";
+import { refusingPeace } from "./peace.ts";
 
 /**
  * Milestone 2, armies that cost something: wires the recruiting context (who
@@ -16,7 +21,8 @@ import { armUnlocked, knownSet } from "./research.ts";
  * context's troop cap, company kinds and commanders into the weekly turn.
  *
  * The flow follows Leroy's design: recruit men a thousand at a time from one
- * province's people; each thousand takes two weeks to gather, then stands in
+ * province's people; each thousand takes 14 days to gather (3 with railway
+ * mobilization), then stands in
  * the province as its garrison. Troops without a commander can't march: a
  * commander (commissioned from a province's official) leads them or picks
  * them up. Training happens in the army, from its commander's screen.
@@ -36,6 +42,10 @@ export function armIndex(arm: string): number {
   return i;
 }
 
+/** A troop type's name as the player reads it in news and reasons; the ids stay as they are. */
+const ARM_NAME: Record<string, string> = { "levy foot": "levy infantry", "armoured foot": "heavy infantry", "light horse": "light cavalry" };
+export const armName = (arm: string): string => ARM_NAME[arm] ?? arm;
+
 export const isHorseArm = (arm: string): boolean => (HORSE_ARMS as readonly string[]).includes(arm);
 
 /** Company kinds an army can be, by the warfare context's names. */
@@ -48,8 +58,8 @@ export interface Muster {
   province: number;
   /** Men still to gather. */
   men: number;
-  /** Weeks until the next thousand has gathered. */
-  weeksLeft: number;
+  /** Days until the next thousand has gathered (RECR-106). */
+  daysLeft: number;
 }
 
 /** A free company: a named band under its captain, gathered at a home capital, with its men by arm (in ARMS order). */
@@ -57,6 +67,7 @@ export interface FreeCompany {
   id: number;
   group: string;
   name: string;
+  /** The captain's name with his rank, in the language of the company's home (feedback 125). */
   captain: string;
   /** Province it gathers at, -1 = unknown. */
   home: number;
@@ -89,6 +100,10 @@ export function createRecruitState(P: number, N: number) {
     provinceOfficialSeed: new Int16Array(P),
     /** Day the official at each post took it up (world.day): his years served count from it. */
     provinceOfficialSince: new Int32Array(P),
+    /** Realm a foreign specialist came from, -1 = one of the realm's own (PROV-334). */
+    provinceOfficialFrom: new Int16Array(P).fill(-1),
+    /** New land waiting for its owner's decision (officials.ts provinceTaken). */
+    provinceNewLand: new Uint8Array(P),
     /** Province each commander was commissioned from, -1 = none. */
     commanderHome: [] as number[],
     /** Name seed of each commander commissioned from an official (-1 = none), so he goes back to a post as himself. */
@@ -139,6 +154,9 @@ export function idleCommanders(world: World, n: number): number[] {
   return out.sort((x, y) => score(y) - score(x) || x - y);
 }
 
+/** Gold a commission costs once (RECR-114). */
+export const COMMISSION_GOLD = rc.recruitingConfig.commissionCost;
+
 /**
  * Commission a province's official as a commander: he gets his type's skills and waits at court
  * (RECR-069..073). The post is left empty: the province pays half its tax and gives half its
@@ -149,13 +167,12 @@ export function commissionOfficial(world: World, n: number, p: number, news: New
   if (world.provinceLord[p]! >= 0) return `${provinceName(world, p)} is a lord's: his official serves the lord, not the crown`;
   const type = world.provinceOfficial[p]!;
   if (type < 0) return `${provinceName(world, p)} has no official to spare`;
-  const cost = world.rules.defines.recruit.commanderGold;
+  const { commission, cost } = rc.commission({ official: OFFICIALS[type]!, type: OFFICIALS[type]!, province: world.provinceIds[p]! });
   if (cost > world.nationTreasury[n]!) return "not enough gold";
-  const { commission } = rc.commission({ official: OFFICIALS[type]!, type: OFFICIALS[type]!, province: world.provinceIds[p]! });
   const skills = commission.skills ?? { might: 1, cunning: 1, logistics: 1 };
   // The official himself takes the command, under his own name.
   const seed = world.provinceOfficialSeed[p]!;
-  const name = officialName(world.rules, seed, n);
+  const name = officialAt(world, p)!;
   world.nationTreasury[n] = world.nationTreasury[n]! - cost;
   const c = addCommander(world, n, wf.newCommander(name, { ...skills, origin: OFFICIALS[type]! }));
   world.commanderHome[c] = p;
@@ -175,7 +192,7 @@ export function releaseCommander(world: World, n: number, c: number): string | n
   const type = OFFICIALS.indexOf(world.commanders[c]!.origin as (typeof OFFICIALS)[number]);
   const seed = world.commanderSeed[c]! >= 0 ? world.commanderSeed[c]! : home;
   // Back at his own post he keeps his years there; if someone else held it meanwhile he starts again.
-  if (world.provinceOfficialSeed[home] !== seed) world.provinceOfficialSince[home] = world.day;
+  if (world.provinceOfficialSeed[home] !== seed) (world.provinceOfficialSince[home] = world.day), (world.provinceOfficialFrom[home] = -1);
   world.provinceOfficial[home] = Math.max(0, type);
   world.provinceOfficialSeed[home] = seed;
   world.commanderOwner[c] = -1;
@@ -186,7 +203,7 @@ export function releaseCommander(world: World, n: number, c: number): string | n
 function newCaptain(world: World, n: number, name?: string): number {
   const skill = () => 1 + world.rng.int(3);
   const capital = world.rules.provinces.find((p) => p.id === world.rules.nations[n]!.capital)?.name ?? "";
-  return addCommander(world, n, wf.newCommander(`Captain ${name ?? personName(world.rules, n, world.rng.int(1 << 30), capital)}`, { might: skill(), cunning: skill(), logistics: skill(), origin: "a hired captain" }));
+  return addCommander(world, n, wf.newCommander(name ?? rankedName(world.rules, n, personName(world.rules, n, world.rng.int(1 << 30), capital), "captain"), { might: skill(), cunning: skill(), logistics: skill(), origin: "a hired captain" }));
 }
 
 /** Battles teach commanders: victories grow Might, defeats are counted (WAR-050, WAR-052). */
@@ -229,17 +246,17 @@ const kindMultiplier = (kind: number) => (wf.W.kinds as Record<string, { pay: { 
 
 /**
  * Treasury gold an army costs this month: pay by arm times its kind's multiplier
- * (a levy is free for its first 3 months, a hired company costs three times)
- * (RECR-017, warfare kinds).
+ * (a levy kept at peace is free for its first 3 months, F-23; at war it is paid from its first,
+ * WAR-225; a hired company costs three times) (RECR-017, warfare kinds).
  */
 export function armyPay(world: World, slot: number): number {
   const a = world.armies;
   const kind = a.kind[slot]!;
-  if (kind === KIND.levy && a.monthsOut[slot]! <= wf.W.levy.free_months) return 0;
+  if (kind === KIND.levy && a.monthsOut[slot]! <= wf.W.levy.free_months && !inAnyWar(world, a.owner[slot]!)) return 0;
   const by = menByArm(world, slot);
   let pay = 0;
   ARMS.forEach((arm, k) => (pay += armPay(arm, by[k]!)));
-  return gold(world, pay * kindMultiplier(kind));
+  return gold(world, pay * kindMultiplier(kind)) * (kind === KIND.hired ? heritageFactor(world, a.owner[slot]!, "hired_company_cost_pct") : 1);
 }
 
 /**
@@ -323,7 +340,7 @@ export function sendHome(world: World, n: number, men: number): void {
 
 /** Where a realm may call men: a province it owns and holds, not besieged, with no enemy army in it. */
 function callingPlace(world: World, n: number, p: number): string | null {
-  if (p < 0 || p >= world.provinceCount || world.provinceWater[p]) return "no such province";
+  if (!Number.isInteger(p) || p < 0 || p >= world.provinceCount || world.provinceWater[p]) return "no such province";
   if (world.provinceOwner[p] !== n || world.provinceOccupier[p]! >= 0) return `${provinceName(world, p)} is not in your hands`;
   if (world.sieges.has(p)) return `${provinceName(world, p)} is under siege`;
   const a = world.armies;
@@ -344,24 +361,42 @@ export function canCall(world: World, n: number): number {
  * province as troops without a commander (RECR-008..018).
  */
 export function recruit(world: World, n: number, p: number, thousands: number, news: News[]): string | null {
+  const refused = recruitRefusal(world, n, p, thousands);
+  if (refused) return refused;
+  const men = Math.round(thousands) * LEVY_UNIT;
+  const queued = world.musters.find((m) => m.nation === n && m.province === p);
+  world.provinceRecruits[p] = Math.max(0, world.provinceRecruits[p]! - men);
+  world.nationTreasury[n] = world.nationTreasury[n]! - gold(world, rc.levyMoney(men));
+  const days = gatherDays(world, n);
+  if (queued) queued.men += men;
+  else world.musters.push({ nation: n, province: p, men, daysLeft: days });
+  recount(world);
+  if (n === world.player) news.push({ kind: "raised", text: `${fmt(men)} men of ${provinceName(world, p)} are called up; they gather a thousand every ${days} days.`, nations: [n], province: p });
+  return null;
+}
+
+/** Men in a levy step: a levy is called in whole thousands (RECR-105, `levyUnit`). */
+export const LEVY_UNIT: number = rc.recruitingConfig.levyUnit;
+
+/** Days each thousand of a realm's levy takes to gather: 14, or 3 with W18 Railway mobilization (RECR-106). */
+export function gatherDays(world: World, n: number): number {
+  return rc.gatheringDays(knownSet(world, n));
+}
+
+/** Why a realm can't call `thousands` more thousands in a province now, or null when it can (the Recruit button says it). */
+export function recruitRefusal(world: World, n: number, p: number, thousands: number): string | null {
   const where = callingPlace(world, n, p);
   if (where) return where;
-  const men = Math.round(thousands) * 1000;
+  // A lord's men answer his call for his retinue, not the crown's levy (RECR Levy: royal provinces).
+  if (world.provinceLord[p]! >= 0) return `${provinceName(world, p)} is ${world.lords[world.provinceLord[p]!]!.name}'s land: its men answer his call, not yours`;
+  const men = Math.round(thousands) * LEVY_UNIT;
   if (men <= 0) return "no men asked for";
   const queued = world.musters.find((m) => m.nation === n && m.province === p);
   const max = world.rules.defines.recruit.queueMax;
   if (men > world.provinceRecruits[p]! + 0.5) return `${provinceName(world, p)} has only ${fmt(world.provinceRecruits[p]!)} men left to call`;
-  if ((queued ? Math.ceil(queued.men / 1000) : 0) + men / 1000 > max) return `the recruit queue at ${provinceName(world, p)} is full: at most ${max} thousands wait to gather`;
+  if ((queued ? Math.ceil(queued.men / LEVY_UNIT) : 0) + men / LEVY_UNIT > max) return `the recruit queue at ${provinceName(world, p)} is full: at most ${max} thousands wait to gather`;
   if (!wf.overCap(world.nationCapUsed[n]! + men, world.nationTroopCap[n]!).canRaise) return "that would go over your troop cap";
-  const cost = gold(world, rc.levyMoney(men));
-  if (cost > world.nationTreasury[n]!) return "not enough gold";
-  world.provinceRecruits[p] = Math.max(0, world.provinceRecruits[p]! - men);
-  world.nationTreasury[n] = world.nationTreasury[n]! - cost;
-  const weeks = world.rules.defines.recruit.gatherWeeks;
-  if (queued) queued.men += men;
-  else world.musters.push({ nation: n, province: p, men, weeksLeft: weeks });
-  recount(world);
-  if (n === world.player) news.push({ kind: "raised", text: `${fmt(men)} men of ${provinceName(world, p)} are called up; they gather a thousand every ${weeks} weeks.`, nations: [n], province: p });
+  if (gold(world, rc.levyMoney(men)) > world.nationTreasury[n]!) return "not enough gold";
   return null;
 }
 
@@ -383,9 +418,9 @@ export function cancelRecruit(world: World, n: number, p: number): string | null
   return null;
 }
 
-/** Weeks until all the men called in a province have gathered. */
-export function weeksToGather(world: World, m: Muster): number {
-  return m.weeksLeft + (Math.ceil(m.men / 1000) - 1) * world.rules.defines.recruit.gatherWeeks;
+/** Days until all the men called in a province have gathered. */
+export function daysToGather(world: World, m: Muster): number {
+  return m.daysLeft + (Math.ceil(m.men / LEVY_UNIT) - 1) * gatherDays(world, m.nation);
 }
 
 /** Troops of a realm in a province with no commander: its garrison, by army slot. */
@@ -393,6 +428,114 @@ export function garrisonTroops(world: World, n: number, p: number): number[] {
   const a = world.armies;
   const out: number[] = [];
   for (let i = 0; i < a.count; i++) if (a.alive[i] && a.owner[i] === n && a.location[i] === p && a.commander[i]! < 0) out.push(i);
+  return out;
+}
+
+/** A province's Garrison tab for its realm (PROV-302, RECR-107, RECR-118). */
+export interface GarrisonView {
+  province: number;
+  /** Troops without a commander: their army id, men, men by arm (ARMS order), drill and kind. */
+  troops: { army: number; men: number; byArm: number[]; drill: number; kind: number }[];
+  /** Each thousand called and not yet gathered, oldest first: the first gathers, the rest wait. */
+  gathering: { men: number; daysLeft: number; state: "gathering" | "waiting" }[];
+  /** Commanders standing here at the head of an army of the realm, who can pick the troops up. */
+  commanders: { commander: number; army: number }[];
+}
+
+/** The Garrison tab of province p for realm n. */
+export function garrisonView(world: World, n: number, p: number): GarrisonView {
+  return garrisonViews(world, n, p)[0] ?? { province: p, troops: [], gathering: [], commanders: [] };
+}
+
+/**
+ * The Garrison tabs of every province where realm n has men gathering or troops
+ * without a commander (or only province `only`), in one pass over the armies.
+ */
+export function garrisonViews(world: World, n: number, only = -1): GarrisonView[] {
+  const views = new Map<number, GarrisonView>();
+  const view = (p: number) => {
+    let v = views.get(p);
+    if (!v) views.set(p, (v = { province: p, troops: [], gathering: [], commanders: [] }));
+    return v;
+  };
+  const a = world.armies;
+  for (let i = 0; i < a.count; i++) {
+    if (!a.alive[i] || a.owner[i] !== n || a.commander[i]! >= 0) continue;
+    const p = a.location[i]!;
+    if (only >= 0 && p !== only) continue;
+    view(p).troops.push({ army: i, men: a.men[i]!, byArm: menByArm(world, i), drill: a.drill[i]!, kind: a.kind[i]! });
+  }
+  const days = gatherDays(world, n);
+  for (const m of world.musters) {
+    if (m.nation !== n || (only >= 0 && m.province !== only)) continue;
+    const queued = Math.ceil(m.men / LEVY_UNIT);
+    view(m.province).gathering = Array.from({ length: queued }, (_, k) => ({
+      men: k === queued - 1 ? m.men - (queued - 1) * LEVY_UNIT : LEVY_UNIT,
+      daysLeft: m.daysLeft + k * days,
+      state: k === 0 ? "gathering" : "waiting",
+    }));
+  }
+  for (let i = 0; i < a.count; i++) {
+    if (!a.alive[i] || a.owner[i] !== n || a.commander[i]! < 0) continue;
+    const v = views.get(a.location[i]!);
+    if (v && v.troops.some((t) => t.kind === a.kind[i])) v.commanders.push({ commander: a.commander[i]!, army: i });
+  }
+  return [...views.values()].sort((x, y) => x.province - y.province);
+}
+
+/** What the commander screen shows of an army (RECR-110). */
+export interface CommanderScreen {
+  commander: { name: string; might: number; cunning: number; logistics: number };
+  /** Men by arm (ARMS order) and the army's kind ("levy" or "hired company"). */
+  byArm: number[];
+  kind: string;
+  drill: number;
+  /** Share of its men it can lose before it breaks. */
+  breakPoint: number;
+  /** One row per arm it has, with what can be done with it. */
+  companies: { arm: string; men: number; actions: ("split" | "leave as garrison" | "send home")[] }[];
+  /** Armies of the realm here it can merge with. */
+  mergeWith: number[];
+  food: { reserve: number; perDay: number; perMonth: number };
+  payPerMonth: number;
+  training: { arm: string; men: number; monthsLeft: number } | null;
+  /** True where it stands at a castle or drill yard of its own (RECR-109). */
+  canTrain: boolean;
+}
+
+/** The commander screen of an army led by a commander of realm n, or null for troops without one. */
+export function commanderScreen(world: World, n: number, army: number): CommanderScreen | null {
+  const a = world.armies;
+  if (army < 0 || army >= a.count || !a.alive[army] || a.owner[army] !== n || a.commander[army]! < 0) return null;
+  const c = world.commanders[a.commander[army]!]!;
+  const by = menByArm(world, army);
+  const hired = a.kind[army] === KIND.hired;
+  const perMonth = armyRations(world, army);
+  const p = a.location[army]!;
+  const mergeWith: number[] = [];
+  for (let i = 0; i < a.count; i++) if (i !== army && a.alive[i] && a.owner[i] === n && a.location[i] === p && a.kind[i] === a.kind[army] && a.commander[i]! >= 0) mergeWith.push(i);
+  return {
+    commander: { name: c.name, might: c.might, cunning: c.cunning, logistics: c.logistics },
+    byArm: by,
+    kind: KIND_NAMES[a.kind[army]!]!,
+    drill: a.drill[army]!,
+    breakPoint: armyBreak(world, army),
+    companies: ARMS.map((arm, k) => ({ arm, men: by[k]! })).filter((x) => x.men >= 1).map((x) => ({ ...x, actions: hired ? ["split"] : ["split", "leave as garrison", "send home"] })),
+    mergeWith,
+    food: { reserve: a.food[army]!, perDay: perMonth / RATION_MONTH_DAYS, perMonth },
+    payPerMonth: armyPay(world, army),
+    training: a.trainArm[army]! >= 0 ? { arm: ARMS[a.trainArm[army]!]!, men: a.trainMen[army]!, monthsLeft: a.trainLeft[army]! } : null,
+    canTrain: !hired && trainingGround(world, n, p),
+  };
+}
+
+/** Days a month of rations is counted over on the commander screen. */
+const RATION_MONTH_DAYS = 30;
+
+/** Provinces of realm n where its armies can train now (RECR-109). */
+export function trainingGrounds(world: World, n: number): number[] {
+  const out: number[] = [];
+  for (let p = 0; p < world.provinceCount; p++) if (world.provinceOwner[p] === n && trainingGround(world, n, p)) out.push(p);
   return out;
 }
 
@@ -409,24 +552,54 @@ function addToGarrison(world: World, n: number, p: number, men: number): void {
   by[LEVY] = by[LEVY]! + men;
   a.drill[troop] = (a.drill[troop]! * before) / (before + men);
   a.monthsOut[troop] = Math.round((a.monthsOut[troop]! * before) / (before + men));
+  if (men > before) a.home[troop] = p;
   setByArm(world, troop, by);
-  a.food[troop] = a.food[troop]! + wagonRations(world.rules.defines.march, { men, horse: 0, logistics: 0 });
+  a.food[troop] = a.food[troop]! + wagonRations(world.rules.defines.march, { men, horse: 0, logistics: 0, foodCarriedPct: foodCarriedPct(world, n) });
 }
 
-/** An army's commander takes in the province's garrison troops of its own kind where it stands. */
-export function pickUp(world: World, n: number, army: number): string | null {
+/**
+ * An army's commander takes in the province's garrison troops of its own kind where it stands,
+ * at once: all of them, or `men` of them (whole thousands from the levy screen), each arm by its
+ * share (RECR-108).
+ */
+export function pickUp(world: World, n: number, army: number, men?: number): string | null {
   const a = world.armies;
   if (army < 0 || army >= a.count || !a.alive[army] || a.owner[army] !== n) return "no such army of yours";
   if (a.commander[army]! < 0) return "troops without a commander can't take in others";
   const troops = garrisonTroops(world, n, a.location[army]!).filter((i) => a.kind[i] === a.kind[army]);
   if (!troops.length) return `no troops wait in ${provinceName(world, a.location[army]!)}`;
-  for (const t of troops) mergeArmies(world, n, t, army);
+  let want = men === undefined ? Infinity : Math.round(men);
+  if (want < 1) return "no men asked for";
+  for (const t of troops) {
+    if (want < 1) break;
+    const here = a.men[t]!;
+    if (here <= want + 0.5) {
+      want -= here;
+      mergeArmies(world, n, t, army);
+      continue;
+    }
+    // Part of this troop: its arms by their share, with its drill and months out.
+    const share = want / here;
+    const from = menByArm(world, t);
+    const into = menByArm(world, army);
+    const before = a.men[army]!;
+    setByArm(world, t, from.map((v) => v * (1 - share)));
+    setByArm(world, army, into.map((v, k) => v + from[k]! * share));
+    const total = a.men[army]!;
+    a.drill[army] = total > 0 ? (a.drill[army]! * before + a.drill[t]! * want) / total : 0;
+    a.monthsOut[army] = total > 0 ? Math.round((a.monthsOut[army]! * before + a.monthsOut[t]! * want) / total) : 0;
+    if (want > before) a.home[army] = a.home[t]!;
+    a.food[army] = a.food[army]! + a.food[t]! * share;
+    a.food[t] = a.food[t]! * (1 - share);
+    holdTraining(world, t);
+    want = 0;
+  }
   return null;
 }
 
-/** Where an army may train: a province of its own realm, held, not besieged, with a stone castle (capitals have one) (RECR-109). */
+/** Where an army may train: a province of its own realm, held, not besieged, with a castle (capitals have one) or a drill yard (RECR-109). */
 export function trainingGround(world: World, n: number, p: number): boolean {
-  return controller(world, p) === n && world.provinceOwner[p] === n && !world.sieges.has(p) && wallsOf(world, p) === "stone castle";
+  return controller(world, p) === n && world.provinceOwner[p] === n && !world.sieges.has(p) && (wallsOf(world, p) !== null || worksAt(world, p, WORK["drill yard"]) > 0);
 }
 
 /**
@@ -437,11 +610,13 @@ export function trainingGround(world: World, n: number, p: number): boolean {
 export function trainTroops(world: World, n: number, army: number, arm: string, men: number, news: News[]): string | null {
   const a = world.armies;
   if (army < 0 || army >= a.count || !a.alive[army] || a.owner[army] !== n) return "no such army of yours";
-  if (a.trainArm[army]! >= 0) return `already training ${ARMS[a.trainArm[army]!]}`;
-  if (arm === rc.LEVY_ARM || !world.rules.defines.recruit.armsAtStart.includes(arm) || !armUnlocked(world, n, arm)) return `you can't train ${arm} yet`;
+  // Garrison troops train only once a commander has picked them up (RECR-107).
+  if (a.commander[army]! < 0) return "troops without a commander can't train: a commander must pick them up first";
+  if (a.trainArm[army]! >= 0) return `already training ${armName(ARMS[a.trainArm[army]!]!)}`;
+  if (arm === rc.LEVY_ARM || !world.rules.defines.recruit.armsAtStart.includes(arm) || !armUnlocked(world, n, arm)) return `you can't train ${armName(arm)} yet`;
   men = Math.round(Math.min(men, menByArm(world, army)[LEVY]!));
-  if (men < 1) return "no levy foot to train";
-  if (!trainingGround(world, n, a.location[army]!)) return "men train only at a castle of your own: march the army to one";
+  if (men < 1) return "no levy infantry to train";
+  if (!trainingGround(world, n, a.location[army]!)) return "men train only at a castle or drill yard of your own: march the army to one";
   const cost = rc.trainingCost(arm, men);
   const g = gold(world, cost.gold);
   if (g > world.nationTreasury[n]!) return "not enough gold";
@@ -449,7 +624,7 @@ export function trainTroops(world: World, n: number, army: number, arm: string, 
   a.trainArm[army] = armIndex(arm);
   a.trainMen[army] = men;
   a.trainLeft[army] = Math.max(1, Math.ceil(cost.months));
-  if (n === world.player) news.push({ kind: "raised", text: `${fmt(men)} levy foot begin training as ${arm}: ${Math.ceil(cost.months)} months, ${g.toFixed(1)} gold.`, nations: [n], province: a.location[army]! });
+  if (n === world.player) news.push({ kind: "raised", text: `${fmt(men)} levy infantry begin training as ${armName(arm)}: ${Math.ceil(cost.months)} months, ${g.toFixed(1)} gold.`, nations: [n], province: a.location[army]! });
   return null;
 }
 
@@ -461,7 +636,7 @@ export function dismissTroops(world: World, n: number, army: number, arm: string
   if (k < 0) return `no arm ${arm}`;
   const by = menByArm(world, army);
   men = Math.round(Math.min(men, by[k]!));
-  if (men < 1) return `no ${arm} to send home`;
+  if (men < 1) return `no ${armName(arm)} to send home`;
   if (men >= a.men[army]! - 0.5) return disbandArmy(world, n, army);
   by[k] = by[k]! - men;
   setByArm(world, army, by);
@@ -481,14 +656,14 @@ export function splitTroops(world: World, n: number, army: number, arm: string, 
   if (c >= 0 && !idleCommanders(world, n).includes(c)) return "that commander already leads an army";
   const by = menByArm(world, army);
   men = Math.round(Math.min(men, by[k]!));
-  if (men < 1) return `no ${arm} to split off`;
+  if (men < 1) return `no ${armName(arm)} to split off`;
   if (men >= a.men[army]! - 0.5) return "leave some men with the army";
   const share = men / a.men[army]!;
   by[k] = by[k]! - men;
   setByArm(world, army, by);
   holdTraining(world, army);
   const horse = isHorseArm(arm);
-  const slot = spawnArmy(world, n, a.location[army]!, men, c, horse ? men : 0, { kind: a.kind[army]!, drill: a.drill[army]!, tile: a.tile[army]!, ...(horse ? { horseArm: arm } : { foot: arm }) });
+  const slot = spawnArmy(world, n, a.location[army]!, men, c, horse ? men : 0, { kind: a.kind[army]!, drill: a.drill[army]!, tile: a.tile[army]!, home: a.home[army]!, ...(horse ? { horseArm: arm } : { foot: arm }) });
   a.monthsOut[slot] = a.monthsOut[army]!;
   // The new army takes its share of the wagons, not a full set.
   a.food[slot] = a.food[army]! * share;
@@ -543,7 +718,13 @@ function newFreeCompany(world: World): FreeCompany | null {
   // Rounding: the largest arm takes up the difference, so the company has exactly its men.
   const big = byArm.indexOf(Math.max(...byArm));
   byArm[big] = byArm[big]! + men - byArm.reduce((t, m) => t + m, 0);
-  return { id, group: def.group, name: pick(free(def)), captain: pick(def.captains), home: capitalOf(world, pick(homesOf(def))), byArm };
+  const name = pick(free(def));
+  const given = pick(def.captains);
+  const from = pick(homesOf(def));
+  const home = capitalOf(world, from);
+  // The captain is named and ranked in the language of the land the company gathers in (feedback 125): "Hauptmann Ulrich von Hallwyl".
+  const captain = rankedName(world.rules, from, personName(world.rules, from, mix(id, 125), provinceName(world, home), given), "captain");
+  return { id, group: def.group, name, captain, home, byArm };
 }
 
 /** Each month a free company may move on, and new ones gather until the age's number are for hire (warfare free_companies). */
@@ -579,8 +760,8 @@ export function freeCompaniesFor(world: World, n: number): FreeCompany[] {
 }
 
 /** Treasury gold a free company costs a month: its arms' pay times the hired multiplier. */
-export function companyPay(world: World, c: FreeCompany): number {
-  return gold(world, ARMS.reduce((t, arm, k) => t + armPay(arm, c.byArm[k]!), 0) * kindMultiplier(KIND.hired));
+export function companyPay(world: World, c: FreeCompany, n = -1): number {
+  return gold(world, ARMS.reduce((t, arm, k) => t + armPay(arm, c.byArm[k]!), 0) * kindMultiplier(KIND.hired)) * heritageFactor(world, n, "hired_company_cost_pct");
 }
 
 /**
@@ -595,7 +776,7 @@ export function hireCompany(world: World, n: number, id: number, news: News[]): 
   const cap = capitalOf(world, n);
   if (controller(world, cap) !== n || world.sieges.has(cap)) return "your capital is under siege: no company will come";
   if (!wf.overCap(world.nationCapUsed[n]! + men, world.nationTroopCap[n]!).canRaise) return "that would go over your troop cap";
-  const cost = companyPay(world, c);
+  const cost = companyPay(world, c, n);
   if (cost > world.nationTreasury[n]!) return "not enough gold";
   world.nationTreasury[n] = world.nationTreasury[n]! - cost;
   const weeks = companyWeeks(world, c, n);
@@ -618,6 +799,8 @@ export function mergeArmies(world: World, n: number, from: number, into: number)
   const men = a.men[from]! + a.men[into]!;
   a.drill[into] = men > 0 ? (a.drill[from]! * a.men[from]! + a.drill[into]! * a.men[into]!) / men : 0;
   a.monthsOut[into] = men > 0 ? Math.round((a.monthsOut[from]! * a.men[from]! + a.monthsOut[into]! * a.men[into]!) / men) : 0;
+  // One home per army: the larger part's (WAR-226).
+  if (a.men[from]! > a.men[into]!) a.home[into] = a.home[from]!;
   setByArm(world, into, byI.map((v, k) => v + byF[k]!));
   a.food[into] = a.food[into]! + a.food[from]!;
   if (a.trainArm[into]! < 0 && a.trainArm[from]! >= 0) {
@@ -656,7 +839,7 @@ export function appointCommander(world: World, n: number, army: number, commande
 }
 
 /** Send an army home: levies go back to the pools, a hired company and its captain leave; the commander returns to court. */
-export function disbandArmy(world: World, n: number, army: number): string | null {
+export function disbandArmy(world: World, n: number, army: number, recountAfter = true): string | null {
   const a = world.armies;
   if (army < 0 || army >= a.count || !a.alive[army]) return "no such army";
   if (a.owner[army] !== n) return "not your army";
@@ -666,7 +849,7 @@ export function disbandArmy(world: World, n: number, army: number): string | nul
   } else sendHome(world, n, a.men[army]!);
   a.alive[army] = 0;
   halt(world, army);
-  recount(world);
+  if (recountAfter) recount(world);
   return null;
 }
 
@@ -688,20 +871,24 @@ export function recount(world: World): void {
 // ---------------------------------------------------------------- the turn
 
 /** Each week: a thousand men gather in each province calling them; mercenaries march in; recruits where an enemy holds the land scatter. */
-export function weeklyMusters(world: World, news: News[]): void {
-  const weeks = world.rules.defines.recruit.gatherWeeks;
+export function weeklyMusters(world: World, news: News[], days = 7): void {
   world.musters = world.musters.filter((m) => {
     if (controller(world, m.province) !== m.nation) {
       sendHome(world, m.nation, m.men);
       if (m.nation === world.player) news.push({ kind: "refused", text: `${fmt(m.men)} men called up at ${provinceName(world, m.province)} scatter home as the enemy takes it.`, nations: [m.nation], province: m.province });
       return false;
     }
-    if (--m.weeksLeft > 0) return true;
-    const men = Math.min(1000, m.men);
-    addToGarrison(world, m.nation, m.province, men);
-    m.men -= men;
-    m.weeksLeft = weeks;
-    if (m.nation === world.player) news.push({ kind: "raised", text: `${fmt(men)} men have gathered at ${provinceName(world, m.province)} and wait for a commander.`, nations: [m.nation], province: m.province });
+    m.daysLeft -= days;
+    // One thousand at a time; with railway mobilization several may gather in one week (RECR-106).
+    let gathered = 0;
+    while (m.daysLeft <= 0 && m.men >= 1) {
+      const men = Math.min(LEVY_UNIT, m.men);
+      addToGarrison(world, m.nation, m.province, men);
+      m.men -= men;
+      m.daysLeft += gatherDays(world, m.nation);
+      gathered += men;
+    }
+    if (gathered && m.nation === world.player) news.push({ kind: "raised", text: `${fmt(gathered)} men have gathered at ${provinceName(world, m.province)} and wait for a commander.`, nations: [m.nation], province: m.province });
     return m.men >= 1;
   });
   world.mercs = world.mercs.filter((m) => {
@@ -728,11 +915,15 @@ export function weeklyMusters(world: World, news: News[]): void {
 export function monthlyRecruits(world: World, news: News[]): void {
   const rate = rc.refillRate() / 12;
   const empty = rc.emptyProvinceEffect("Leave it").recruits;
+  // Many fallen in the last ten years slow the refill (REALM-096).
+  const fallen = refillPaces(world);
   for (let p = 0; p < world.provinceCount; p++) {
     const pool = { recruits: world.provinceRecruits[p]!, ceiling: world.provinceRecruitCeiling[p]! };
     // A muster master refills the pool faster (province officials table: +25 %).
     const muster = officialBonus(world, p, "Muster master", "recruit_refill");
-    rc.refill(pool as rc.ProvincePool, 1, rate * muster * (ungoverned(world, p) ? empty : 1) * moodShare(world, p) * crownShare(world, p));
+    const heritage = heritageFactor(world, world.provinceOwner[p]!, "recruit_refill_pct");
+    const owner = world.provinceOwner[p]!;
+    rc.refill(pool as rc.ProvincePool, 1, rate * muster * heritage * (owner >= 0 ? fallen[owner]! : 1) * (ungoverned(world, p) ? empty : 1) * moodShare(world, p) * crownShare(world, p));
     world.provinceRecruits[p] = pool.recruits;
   }
   recomputeCap(world);
@@ -740,13 +931,16 @@ export function monthlyRecruits(world: World, news: News[]): void {
   const a = world.armies;
   const deserted = new Float64Array(world.nationCount);
   const broke = world.nationTreasury.map((t) => (t < 0 ? 1 : 0));
+  const refusing = Array.from({ length: world.nationCount }, (_, n) => refusingPeace(world, n));
   for (let i = 0; i < a.count; i++) {
     if (!a.alive[i]) continue;
     const n = a.owner[i]!;
     a.monthsOut[i] = Math.min(65535, a.monthsOut[i]! + 1);
     const kind = a.kind[i]!;
     // Levies don't go home on their own: once raised, the player decides (Leroy's design, over RECR-053).
-    const desert = (kind === KIND.levy ? wf.overCap(world.nationCapUsed[n]!, world.nationTroopCap[n]!).levyDesertion : 0) + (broke[n] ? world.rules.defines.recruit.unpaidDesertion : 0);
+    let desert = (kind === KIND.levy ? wf.overCap(world.nationCapUsed[n]!, world.nationTroopCap[n]!).levyDesertion : 0) + (broke[n] ? world.rules.defines.recruit.unpaidDesertion : 0);
+    // A ruler refusing a peace his voices oblige him to take: levies desert twice as fast, from at least the old going-home pace (WAR-181).
+    if (kind === KIND.levy && refusing[n]) desert = Math.max(desert, wf.W.levy.go_home_rate) * wf.W.peace.refuse_desertion;
     const share = Math.min(1, desert);
     if (share > 0) {
       const lost = Math.round(a.men[i]! * share);
@@ -788,9 +982,10 @@ function trainMonth(world: World, i: number, news: News[]): void {
   setByArm(world, i, by);
   a.trainArm[i] = -1;
   a.trainMen[i] = 0;
+  noteRegiment(world, a.owner[i]!);
   if (a.owner[i] === world.player) {
     const c = a.commander[i]!;
-    news.push({ kind: "raised", text: `${fmt(men)} men of ${c >= 0 ? world.commanders[c]!.name : "an army"}'s army finish their training as ${arm}.`, nations: [a.owner[i]!], province: p });
+    news.push({ kind: "raised", text: `${fmt(men)} men of ${c >= 0 ? world.commanders[c]!.name : "an army"}'s army finish their training as ${armName(arm)}.`, nations: [a.owner[i]!], province: p });
   }
 }
 
@@ -805,14 +1000,17 @@ export function aiRecruits(world: World, news: News[], atWarNow: (n: number) => 
   const a = world.armies;
   const levyPer1000 = gold(world, rc.levyPay(1000, 99));
   const atWar = Uint8Array.from({ length: world.nationCount }, (_, n) => (atWarNow(n) ? 1 : 0));
-  // At peace, levies go home before their pay begins (one pass over the armies for every realm).
+  // At peace, levies go home before their pay begins (one pass over the armies for every realm, one recount after it).
+  let sent = false;
   for (let i = 0; i < a.count; i++) {
     const n = a.owner[i]!;
-    if (a.alive[i] && n !== world.player && !world.nationGone[n] && !atWar[n] && a.kind[i] === KIND.levy && a.monthsOut[i]! >= wf.W.levy.free_months) disbandArmy(world, n, i);
+    if (a.alive[i] && n !== world.player && !world.nationGone[n] && !atWar[n] && a.kind[i] === KIND.levy && a.monthsOut[i]! >= wf.W.levy.free_months) sent = disbandArmy(world, n, i, false) === null || sent;
   }
+  if (sent) recount(world);
   for (let n = 0; n < world.nationCount; n++) {
     if (n === world.player || world.nationGone[n] || !atWar[n]) continue;
-    if (world.nationTreasury[n]! < 0) continue;
+    // Men it could not put under a commander would only stand as garrisons (feedback 28).
+    if (world.nationTreasury[n]! < COMMISSION_GOLD && !idleCommanders(world, n).length) continue;
     const cap = capitalOf(world, n);
     if (callingPlace(world, n, cap)) continue;
     // Keep the levies' future pay within half the income.
@@ -826,7 +1024,6 @@ export function aiRecruits(world: World, news: News[], atWarNow: (n: number) => 
   }
 }
 
-const AI_COMMAND_MIN_MEN = 3000;
 const AI_MEN_PER_COMMANDER = 8000;
 const commandersOf = (world: World, n: number) => world.commanderOwner.reduce((t, o) => t + (o === n ? 1 : 0), 0);
 
@@ -866,9 +1063,10 @@ export function aiCollect(world: World, news: News[]): void {
     }
     let free = idle.get(n) ?? [];
     if (!free.length) {
-      // Commissions cost and empty a post, so the AI makes one only for a stack worth leading,
-      // and keeps about one commander to each 8,000 men it has under arms (feedback 28).
-      if (a.men[i]! < AI_COMMAND_MIN_MEN || commandersOf(world, n) >= 1 + world.nationCapUsed[n]! / AI_MEN_PER_COMMANDER) continue;
+      // Commissions cost and empty a post, so the AI makes one only for at least
+      // `aiCommissionMinMen` men without a commander, and keeps about one commander
+      // to each 8,000 men it has under arms (RECR-115, feedback 28).
+      if (a.men[i]! < rc.recruitingConfig.aiCommissionMinMen || commandersOf(world, n) >= 1 + world.nationCapUsed[n]! / AI_MEN_PER_COMMANDER) continue;
       let post = -1;
       // A lord's official serves the lord, so only royal posts can give a commander.
       for (let p = 0; p < world.provinceCount && post < 0; p++) if (world.provinceOwner[p] === n && world.provinceLord[p]! < 0 && world.provinceOfficial[p]! >= 0) post = p;

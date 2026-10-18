@@ -1,6 +1,6 @@
 {
  "$comment": "Warfare (domain/warfare/spec.md). One warfare config file (WAR-199). Every value is a placeholder from warfare-design v5, warfare-eras and warfare-styles (spec §10); key names follow spec §10. Era VIII and the part of era VII after 31 August 1939 are out of scope.",
- "_provisional": ["hits_per_bell", "kinds", "flee", "troop_cap", "drill_max", "sectors.Shore.attack_across", "ai.standing_orders", "ai.raids_at", "amounts", "later_arms", "levels_by_era", "era_scale"],
+ "_provisional": ["hits_per_bell", "kinds", "flee", "troop_cap", "drill_max", "sectors.Shore.attack_across", "ai.standing_orders", "ai.raids_at", "ai.war_chest_months", "amounts", "later_arms", "levels_by_era", "era_scale", "occupation.tax_share"],
  "$decisions": "D-WAR-1..21 (spec §13). Standing regiments break at 30 % (D-WAR-15), the Shore sector costs -20 % across a river (D-WAR-5), drill runs to 24 (D-WAR-9).",
  "skill_growth": {
   "$comment": "WAR-158, D-WAR-13: the staff college is the academy of eras VI-VII.",
@@ -28,7 +28,7 @@
  "days_per_week": 7,
  "days_per_month": 30,
  "arms": {
-  "levy foot": { "label": "Levy foot (spears, bows, farm tools)", "strength": 1.0, "unit": "man", "needs": {}, "roles": ["Line"], "unlock": "start", "foot": true },
+  "levy foot": { "label": "Levy infantry (spears, bows, farm tools)", "strength": 1.0, "unit": "man", "needs": {}, "roles": ["Line"], "unlock": "start", "foot": true },
   "armoured foot": { "strength": 1.3, "unit": "man", "needs": { "arms": 1 }, "roles": ["Line", "Heavy"], "unlock": "start", "foot": true, "next_down": "levy foot" },
   "archers": { "strength": 1.1, "unit": "man", "needs": { "arms": 1 }, "roles": ["Shot"], "unlock": "start", "foot": true, "shoots": "arrows" },
   "pikes": { "strength": 1.2, "unit": "man", "needs": { "arms": 1 }, "roles": ["Brace"], "unlock": "W6", "foot": true, "spears": true },
@@ -262,7 +262,7 @@
  "ai_honours": { "relief_days": 10, "food_months": 1 },
  "bribe": { "pay_owed_months": 2, "greedy_outside_share": 0.1 },
  "raid": { "riders_per_load": 50, "tiles_per_week": 1 },
- "occupation": { "hold_months": 3 },
+ "occupation": { "hold_months": 3, "$comment": "WAR-224 (X-21): an occupier gets this share of an occupied province's tax and none of its trade; the rest is lost to the war.", "tax_share": 0.5 },
  "peace": {
   "capital_share": 0.3333333333333333,
   "warlike_ignore": 0.25,
@@ -272,7 +272,18 @@
   "open_roads_years": 10,
   "royal_grievances": ["Conscription", "Soldiers quartered", "Burned homes", "Hungry", "Heavy taxes"],
   "royal_grievances_needed": 2,
-  "refuse_desertion": 2
+  "refuse_desertion": 2,
+  "$comment": "X-21 (Leroy, 18 Oct): long_war_years (WAR-223) and max_ceded_share (WAR-227) are provisional, for the balance model to tune.",
+  "long_war_years": 2,
+  "max_ceded_share": 0.3333333333333333,
+  "_provisional": ["long_war_years", "max_ceded_share"]
+ },
+ "settlement": {
+  "$comment": "Peace settlement scoring (WAR-240..WAR-251, Leroy X-23). Each province has a demand cost; the war's outcome gives the winner a capacity in the same points; demands that fit are signed, the AI counters or refuses the rest. All values provisional.",
+  "province_cost": { "base": 2, "per_sqrt_thousand_people": 0.5, "per_wealth": 1, "castle": 2, "coastal": 1, "river": 0.5, "capital_multiplier": 1.5, "not_bordering_multiplier": 1.25 },
+  "capacity_weights": { "land_held": 0.5, "capital_held": 0.15, "battles": 0.15, "armies": 0.1, "will_to_fight": 0.25 },
+  "gold_per_point": 25,
+  "surrender": { "peace_share": 0.75, "army_ratio": 0.25, "land_share": 0.5 }
  },
  "raid_war_months": 12,
  "notifications": {
@@ -312,7 +323,8 @@
   "kinds_raised": { "Castile": ["noble retinues", "frontier light horse"], "city republic": ["hired companies"] },
   "peace_at": { "low risk": 0.3333333333333333, "hegemon seeker": "forced" },
   "standing_orders": { "low": { "order": "wait", "retreat": "1 to 1" }, "medium": { "order": "attack", "retreat": "3 to 2" }, "high": { "order": "attack", "retreat": "2 to 1" } },
-  "raids_at": ["high"]
+  "raids_at": ["high"],
+  "war_chest_months": 6
  },
  "style_region_fallback": { "Sahel": "Furusiyya", "Andes": "Three battles" },
  "adoption": { "officers": 3, "years": 5, "lessons": 3, "lessons_years": 10, "alliance_battles": 3, "first_battle_strength": 0.5 },
@@ -388,5 +400,23 @@
   { "era": "VII", "name": "Motti", "from": "Finland", "needs": [], "approach": "Ambush", "rule": "Sprung companies split an enemy sector in two: each half fights alone", "effects": { "split_sector": true }, "stale": [["W22"]], "kind": "foot", "after_1939": true },
   { "era": "VII", "name": "People's war", "from": "Chinese communists, Yugoslav partisans, other partisans", "needs": [], "approach": "Ambush", "rule": "In occupied homeland provinces, rebel bands form for you each month", "effects": { "rebel_bands_occupied": true }, "stale": [], "kind": "foot", "after_1939": true },
   { "era": "VII", "name": "Banzai charge", "from": "Japan", "needs": [], "approach": "Assault", "rule": "Breaks are delayed by one bell; losses x2 for both sides", "effects": { "break_delay_bells": 1, "losses": 2 }, "stale": [["W19"]], "kind": "foot", "after_1939": true }
- ]
+ ],
+ "ships": {
+  "$comment": "Warfare 11.1 (warfare owns ships' fighting strength and room, D-NAVY-5): what each ship fights with and how many men it carries. Turtle ships fight 80 near their home coast and 20 at sea; until home coasts exist they count 20. Caravel and fluyt are naval's proposal (naval §10); steamer, small craft and voyaging canoe are provisional.",
+  "galley": { "fights": 20, "carries": 200 },
+  "cog": { "fights": 5, "carries": 300 },
+  "junk": { "fights": 5, "carries": 300 },
+  "dhow": { "fights": 5, "carries": 300 },
+  "war canoe fleet": { "fights": 8, "carries": 100 },
+  "carrack": { "fights": 15, "carries": 400 },
+  "armed carrack": { "fights": 40, "carries": 300 },
+  "galleon": { "fights": 60, "carries": 500 },
+  "turtle ship": { "fights": 20, "carries": 0 },
+  "ship of the line": { "fights": 150, "carries": 0 },
+  "caravel": { "fights": 8, "carries": 60 },
+  "fluyt": { "fights": 2, "carries": 300 },
+  "steamer": { "fights": 5, "carries": 600 },
+  "small craft": { "fights": 0, "carries": 10 },
+  "voyaging canoe": { "fights": 0, "carries": 20 }
+ }
 }

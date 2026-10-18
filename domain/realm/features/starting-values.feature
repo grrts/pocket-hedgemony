@@ -13,17 +13,17 @@ Feature: Starting values rules
     Then that rating sets its <stats>
 
     Examples:
-      | assessment                                   | stats                                                    |
-      | economic_strength and fiscal_resilience      | gold and debt                                            |
-      | manpower_potential                           | recruits                                                 |
-      | military_capability                          | soldiers, commanders and horses                          |
-      | naval_capability                             | ships                                                    |
-      | administrative_capacity                      | officials and how many provinces start royal             |
-      | political_stability and unrest_risk          | lords' starting loyalty and provinces in revolt          |
-      | territorial_cohesion                         | number of lords, how much land they hold, and tongue     |
-      | institutional_development                    | schools, scholars and starting inventions                |
-      | trade_access                                 | starting traders                                         |
-      | diplomatic_influence                         | extra officials at court ready to go abroad as envoys    |
+      | assessment                              | stats                                                  |
+      | economic_strength and fiscal_resilience | gold and debt                                          |
+      | manpower_potential                      | recruits                                               |
+      | military_capability                     | soldiers, commanders and horses                        |
+      | naval_capability                        | ships                                                  |
+      | administrative_capacity                 | officials and how many provinces start royal           |
+      | political_stability and unrest_risk     | lords' starting loyalty and provinces in revolt        |
+      | territorial_cohesion                    | number of lords, how much land they hold, and language |
+      | institutional_development               | schools, scholars and starting inventions              |
+      | trade_access                            | starting traders                                       |
+      | diplomatic_influence                    | extra officials at court ready to go abroad as envoys  |
 
   @REALM-131 @REALM-166 @placeholder
   Scenario: Low confidence widens the random range
@@ -49,3 +49,22 @@ Feature: Starting values rules
     And the armies of "France" stand in different provinces
     And "France" has one commander for each 8,000 men under arms, at least one
     And each commander of "France" leads an army, the first in its capital
+
+  @REALM-230 @placeholder
+  Scenario: The world starts each realm from its assessments
+    # config: starting
+    Given the game starts with the country "France"
+    Then "France" starts with 8 months of its tax and trade in gold, within 10 %
+    And "France" starts owing half its gold
+    And the levies of "France" start between 90 % and all of its levy ceiling
+    And "France" starts with 3 envoys at court, each an envoy seat
+    And the empty posts of "Castile" are its royal provinces farthest from its capital
+    And a realm with no catalogue assessment starts with 50 gold
+
+  @REALM-231
+  Scenario: AI realms call men only with someone to lead them
+    Given the game starts with the AI country "Castile"
+    And every commander of "Castile" leads an army
+    When the AI of "Castile" calls up men for a war with 10 gold
+    Then the AI of "Castile" calls no men
+    But with 200 gold the AI of "Castile" calls men

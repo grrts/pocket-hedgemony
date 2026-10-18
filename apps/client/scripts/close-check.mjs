@@ -68,7 +68,22 @@ try {
   await check("province", () => page.evaluate(() => window.__phSelect("p1601")));
   await check("dispatches", () => page.tap(".hud [data-news]"));
   for (const tab of [null, "treasury", "diplomacy", "military", "officials", "lords", "learning"]) await check(`realm ${tab ?? "general"}`, realm(tab));
-  await check("official", then(realm("officials"), () => page.tap("[data-official]")));
+  await check(
+    "declare sheet",
+    then(
+      () =>
+        page.evaluate(() => {
+          const b = document.createElement("button");
+          b.dataset.realm = String(window.__phNation("portugal"));
+          b.dataset.realmOpen = "diplomacy";
+          document.body.append(b);
+          b.click();
+          b.remove();
+        }),
+      () => page.tap("[data-declare]"),
+    ),
+  );
+  await check("official",then(realm("officials"), () => page.tap("[data-official]")));
   await check("commander", then(realm("military"), () => page.tap("[data-command]")));
   await check("realm after a commander", realm(null));
   await check("province after a commander", then(realm("military"), () => page.tap("[data-command]"), () => page.evaluate(() => window.__phSelect("p1601"))));

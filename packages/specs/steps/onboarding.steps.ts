@@ -1523,3 +1523,59 @@ Then(/^the goals list is (shown|not shown)$/, (s, shown: string) => {
   expect(T.goalsVisible(s.goals, 0, s.settingOn)).toBe(shown === "shown");
   expect(T.goalsVisible(s.goals, 0)).toBe(true);
 });
+
+// ---------------------------------------------------------------- first-campaign hints (TUT-121 … TUT-126)
+
+const hintIds = (list: string) => list.split(",").map((x) => x.trim());
+function hints(s: Scenario): T.HintsState {
+  return (s.hints ??= T.newHints());
+}
+Given("a player with no hints done", (s) => {
+  s.hints = T.newHints();
+});
+Given("a player with the hints {string} done", (s, list: string) => {
+  s.hints = T.newHints();
+  for (const id of hintIds(list)) T.dismissHint(s.hints, id);
+});
+When("the player does {string}", (s, action: string) => {
+  T.hintAction(hints(s), action);
+});
+When("the player dismisses the hint {string}", (s, id: string) => {
+  T.dismissHint(hints(s), id);
+});
+When("the player starts another campaign", (s) => {
+  // What is done is the player's, kept outside the save (TUT-124).
+  s.hints = T.loadHints(JSON.parse(JSON.stringify(hints(s))));
+});
+When(/^the player turns "Tutorial hints" (on|off)$/, (s, v: string) => {
+  T.setHints(hints(s), v === "on");
+});
+When(/^the player picks "Reset tutorial and hints"$/, (s) => {
+  T.resetHints(hints(s));
+});
+When("an event card is open", (s) => {
+  s.moment = { eventOpen: true };
+});
+When("a turn plays", (s) => {
+  s.moment = { turnPlaying: true };
+});
+Then("the hint shown is {string}", (s, id: string) => {
+  expect(T.currentHint(hints(s), s.moment)?.id).toBe(id);
+});
+Then("the open hints are {string}", (s, list: string) => {
+  expect(T.openHints(hints(s)).map((h) => h.id)).toEqual(hintIds(list));
+  for (const h of T.openHints(hints(s))) expect(h.line.length).toBeLessThanOrEqual(cfg.max_chars ?? 140);
+});
+Then("the hint {string} is done", (s, id: string) => {
+  expect(hints(s).done).toContain(id);
+});
+Then("no hint is done", (s) => {
+  expect(hints(s).done).toEqual([]);
+});
+Then("no hint is shown", (s) => {
+  expect(T.currentHint(hints(s), s.moment)).toBeNull();
+});
+Then("the Settings row reads {string}", (s, text: string) => {
+  const p = T.hintsProgress(hints(s));
+  expect(`${p.done} of ${p.of} done`).toBe(text);
+});

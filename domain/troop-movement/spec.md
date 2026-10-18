@@ -299,7 +299,7 @@ Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision
 - MOVE-120 The route planner shall plan routes over map tiles (the map-grid pixels of world-map), choosing the path of least total tile weight, where a tile's weight is the days to cross its tile type (`movement.tile_days.<tile type>`, provisional) times its state factor; the province an army is in is the province that owns its tile, and the road, season, march order, guns, column, horse and Cunning factors of MOVE-011 apply to the tile weights. [F-4]
 - MOVE-121 While a tile lies under snow (winter cover from latitude 50° toward the pole and on mountains, X-17), the movement system shall multiply its weight by `movement.snow_factor` (provisional); closed tiles (snow passes MOVE-030, glacier MOVE-033) stay closed. [F-4; X-17]
 - MOVE-122 The movement system shall keep tile weights tuned so that marching keeps today's pace: an army on foot cannot march from Mexico City to southern Québec in 2 months (about 172 days on foot and 126 all on horseback today). [F-4; Leroy 17 Oct]
-- MOVE-123 On each day, or each 4-hour step while a player battle runs, the movement system shall advance every marching army along its tile path by the tiles its walked days pay for, so its position changes as the days pass and never jumps at the end of the turn. [F-2]
+- MOVE-123 On each day, or each 4-hour step while a player battle runs, the movement system shall advance every marching army along its tile path by the tiles its walked days pay for, so its position changes as the days pass and never jumps at the end of the turn. [F-2] *Fleets now also move tile by tile over water tiles (NAVY-148) and meet within their own sighting range of 20 to 30 tiles in the same sea zone (NAVY-150) (playtest feedback).*
 - MOVE-124 The movement system shall publish every army's current tile, route tiles and commander, so the map can draw the commander where the army stands. [F-3]
 - MOVE-125 The movement system shall make an army walk exactly the tile path the route preview showed, and the planner shall never return a path through a closed or impassable tile or through a province with a hostile garrisoned castle (INV-MOVE-4, INV-MOVE-5). [F-1]
 - MOVE-126 When two hostile armies stand in the same province and their tiles come within engagement range, 10 tiles plus one per 2 points of the better commander's Cunning, at most 15 (`movement.engage_tiles_base` 10, `movement.engage_tiles_max` 15, provisional), the movement system shall make contact and start the battle rules where the defender stands; armies in different provinces never meet, however close. [F-20; playtest feedback]
@@ -310,6 +310,9 @@ Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision
 - MOVE-131 Grouping: the marks belong to choosing a march, with the commander list's "tap the map to send" hint and the refusal "you need war or passage"; they draw on the map itself, not in a panel. [F-76; X-19]
 - MOVE-132 Overview: the closed borders are the overview of where the player's armies may go; the realm's diplomacy screen, where passage is asked for, says why. [F-76; X-19]
 - MOVE-133 Phone: the game plays in landscape (Wide and Tall); the line is about three screen pixels wide whatever the zoom and the wash leaves the terrain readable; nothing needs hover, and a tap on closed land is refused with the reason as before. [F-76; X-19]
+#### How the player uses it: stopping a march
+- MOVE-134 While a player's army or fleet has a route, the client shall offer to halt it where it stands in one tap: Halt beside Move on the army's card, "Halt it where it stands" in the commander list while a chosen army marches and Stop here beside Sail on the fleet's card; each sends a march (or sail) order to the tile (sea zone, port) it stands on, which is a Halt (MOVE-115). [F-128]
+- MOVE-135 Where, grouping, overview and phone: the halt sits with the march order it cancels (the army's card and the commander list; a banner tapped again does not halt, so a double tap cannot stop an army by accident) and nowhere else; the commander list's "marching to" line is the overview of which armies are under way; every halt button is at least 44 points high, shown only while there is a route, and nothing needs hover. [F-128; X-19]
 
 ## 6. Commands
 
@@ -493,3 +496,5 @@ Decided on 17 October 2026 (domain/DECISIONS.md). None of troop-movement's quest
 | MOVE-127 | moving-many-armies.feature | Several armies selected at once march together |
 | MOVE-129 | route-preview-and-notices.feature | The map marks land the chosen armies may not enter |
 | MOVE-130–133 | — | presentation only (how the marks are reached and drawn) |
+| MOVE-134 | orders.feature | The player halts a marching army in one tap |
+| MOVE-135 | — | presentation only (where the halt buttons sit) |

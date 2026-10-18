@@ -967,7 +967,7 @@ export function countryCard(c: CardInput): { text: string; stat: Stat | "schools
     { text: `Lords ${c.lords.length} named: ${count("Loyal")} loyal, ${count("Wavering")} wavering, ${count("Disloyal")} disloyal`, stat: "lords" },
     { text: `Schools ${c.schools.count} (${grouped(c.schools.students)} students, ${grouped(c.schools.scholars)} scholars) · studying: ${c.schools.study ?? "nothing"} ${c.schools.progressPct ?? 0} %`, stat: "schools" },
     { text: `Faith ${c.faithPct} %`, stat: "faith" },
-    { text: `Tongue ${c.tonguePct} %`, stat: "tongue" },
+    { text: `Language ${c.tonguePct} %`, stat: "tongue" },
     { text: `In revolt ${c.inRevolt}`, stat: "in_revolt" },
     { text: `Allies ${c.allies}`, stat: "allies" },
     { text: `Enemies ${c.enemies}`, stat: "enemies" },
@@ -980,6 +980,15 @@ export function countryCard(c: CardInput): { text: string; stat: Stat | "schools
     lines.push({ text: `Technology ${ordinal(c.ranks.technology)}`, stat: "schools" });
   }
   return lines;
+}
+
+/** Lines REALM-176 moves off the General tab to the Diplomacy tab. */
+const DIPLOMACY_STATS = new Set<string>(["allies", "enemies", "oaths_broken"]);
+
+/** The country card split by tab (REALM-176): the General tab keeps the summary lines, the Diplomacy tab takes Allies, Enemies and Oaths broken. */
+export function cardTabs(c: CardInput): { general: string[]; diplomacy: string[] } {
+  const lines = countryCard(c);
+  return { general: lines.filter((l) => !DIPLOMACY_STATS.has(l.stat)).map((l) => l.text), diplomacy: lines.filter((l) => DIPLOMACY_STATS.has(l.stat)).map((l) => l.text) };
 }
 
 /** Re-exported so callers can check an invention's realm effects (e.g. officials per province). */
@@ -1061,12 +1070,15 @@ export type Confidence = "low" | "medium" | "high";
 export interface StartingCounts {
   gold: number;
   debt: number;
-  recruits: number;
+  /** Share of the levy ceiling already gathered at the start (0..1). */
+  recruitShare: number;
   soldiers: number;
   commanders: number;
   horses: number;
   ships: number;
   royalShare: number;
+  /** Officials per royal province: below 1 leaves the farthest posts empty. */
+  officialsPerRoyal: number;
   officials: number;
   lordsLoyalShare: number;
   provincesInRevolt: number;
@@ -1079,35 +1091,47 @@ export interface StartingCounts {
 
 /**
  * Starting counts from the catalogue's assessments (REALM-130, REALM-166):
- * each level picks a value from the realm data, scaled by people where the data
- * says so, then spread by a seeded random factor whose width follows the
- * catalogue's confidence (REALM-131): ±25 % low, ±10 % medium, ±5 % high.
+ * each level picks a value from the realm data: months of the realm's tax and
+ * trade for gold, a share of the levy ceiling for recruits, per thousand
+ * people for soldiers, horses, ships and scholars, then spread by a seeded
+ * random factor whose width follows the catalogue's confidence (REALM-131):
+ * ±25 % low, ±10 % medium, ±5 % high. `confidence` is one for the whole
+ * country or one per assessment (missing ones count as medium); an unknown
+ * level counts as moderate (D-SETUP-6).
  */
 export function startingCounts(
-  levels: Partial<Record<string, Level>>,
+  levels: Partial<Record<string, Level | "unknown">>,
   people: number,
   provinces: number,
-  confidence: Confidence,
+  confidence: Confidence | Partial<Record<string, Confidence>>,
   rng: Rng,
+  monthIncome = 0,
 ): StartingCounts {
   const st = config.starting;
-  const idx = (dim: string): number => Math.max(0, st.levels.indexOf(levels[dim] ?? "moderate"));
-  const spread = st.spread_by_confidence[confidence];
-  const jitter = (v: number): number => Math.round(v * (1 + (rng.next() * 2 - 1) * spread));
-  const per = (key: keyof typeof st.per_thousand_people, dim: string): number => jitter(people * st.per_thousand_people[key][idx(dim)]!);
-  const gold = per("gold", "economic_strength");
+  const idx = (dim: string): number => {
+    const i = st.levels.indexOf(levels[dim] ?? "moderate");
+    return i < 0 ? 2 : i;
+  };
+  const spreadOf = (dim: string): number => st.spread_by_confidence[typeof confidence === "string" ? confidence : (confidence[dim] ?? "medium")];
+  const factor = (dim: string): number => 1 + (rng.next() * 2 - 1) * spreadOf(dim);
+  const jitter = (v: number, dim: string): number => Math.round(v * factor(dim));
+  const per = (key: keyof typeof st.per_thousand_people, dim: string): number => jitter(people * st.per_thousand_people[key][idx(dim)]!, dim);
+  const gold = jitter(Math.max(st.gold_floor, monthIncome * st.gold_months_of_income[idx("economic_strength")]!), "economic_strength");
   const royalShare = st.royal_share[idx("administrative_capacity")]!;
   const royal = Math.round(provinces * royalShare);
+  const recruitShare = Math.min(1, st.levies_share_of_ceiling[idx("manpower_potential")]! * factor("manpower_potential"));
+  const officialsPerRoyal = st.officials_per_royal_province[idx("administrative_capacity")]! * factor("administrative_capacity");
   return {
     gold,
     debt: Math.round(gold * st.debt_share_of_gold[idx("fiscal_resilience")]!),
-    recruits: per("recruits", "manpower_potential"),
+    recruitShare,
     soldiers: per("soldiers", "military_capability"),
     commanders: st.commanders[idx("military_capability")]!,
     horses: per("horses", "military_capability"),
     ships: per("ships", "naval_capability"),
     royalShare,
-    officials: Math.round(royal * st.officials_per_royal_province[idx("administrative_capacity")]!),
+    officialsPerRoyal,
+    officials: Math.round(royal * officialsPerRoyal),
     lordsLoyalShare: (st.lords_loyal_share[idx("political_stability")]! + st.lords_loyal_share[4 - idx("unrest_risk")]!) / 2,
     provincesInRevolt: Math.round(provinces * st.revolt_share[4 - idx("unrest_risk")]!),
     lords: provinces <= 1 ? 0 : Math.round((provinces - royal) / st.lords_per_provinces[idx("territorial_cohesion")]!),
@@ -1121,7 +1145,7 @@ export function startingCounts(
 /** Which counts each assessment sets (REALM-130). */
 export const ASSESSMENT_SETS: Record<string, (keyof StartingCounts)[]> = {
   "economic_strength and fiscal_resilience": ["gold", "debt"],
-  manpower_potential: ["recruits"],
+  manpower_potential: ["recruitShare"],
   military_capability: ["soldiers", "commanders", "horses"],
   naval_capability: ["ships"],
   administrative_capacity: ["officials", "royalShare"],
@@ -1358,4 +1382,23 @@ export function standingFrom1444(relations: readonly Relation1444[], country: st
   const mine = relations.filter((r) => r.source === country || r.target === country);
   const of = (type: string) => mine.filter((r) => r.type === type).map(other).sort();
   return { allies: of("alliance"), rivals: of("rival"), subjects: mine.filter((r) => r.type === "subject" && r.target === country).map((r) => r.source).sort(), enemies: of("at_war") };
+}
+
+// ---------------------------------------------------------------- titles
+
+/** What a realm calls its lords and its officials, singular and plural (REALM-242). */
+export interface Titles {
+  lord: string;
+  lords: string;
+  official: string;
+  officials: string;
+}
+
+/**
+ * A realm's titles: its court language's family first, then its government
+ * form's family, then the default (REALM-242). Only words: no rule reads them.
+ */
+export function titlesFor(languageFamily: string, formFamily: string): Titles {
+  const t = config.titles as { default: Titles; by_form_family: Record<string, Partial<Titles>>; by_language_family: Record<string, Partial<Titles>> };
+  return { ...t.default, ...t.by_form_family[formFamily], ...t.by_language_family[languageFamily] };
 }

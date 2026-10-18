@@ -22,6 +22,10 @@ export interface RealmLord {
   loyalty: Loyalty;
   /** Up-causes counted toward the next step, for a great lord (REALM-162). */
   upCredit: number;
+  /** His two traits (REALM-070); unset, they are drawn from his name (lordTraits). */
+  traits?: string[];
+  /** His Want, a province id (REALM-070); unset, it is worked out from his lands' borders (lordWant). */
+  want?: string;
 }
 
 export interface LordState {
@@ -192,4 +196,14 @@ export function monthlyLords(world: World, atPeace: (n: number) => boolean, news
     // REALM-171 gives when it has 20 domain gold; here, when the treasury holds two gifts.
     if (world.nationTreasury[l.nation]! >= giftGold(world) * 2) giveGift(world, l.nation, k);
   });
+}
+
+/**
+ * The crown pays for a building in a lord's province (PROV-206): the building
+ * is his, and he takes it as a gift, a step more loyal, unless he is in revolt.
+ */
+export function lordGetsBuilding(world: World, p: number, news: News[]): void {
+  const lord = world.provinceLord[p]!;
+  if (lord < 0 || world.lords[lord]!.loyalty === "In revolt") return;
+  loyaltyStep(world, lord, "gift_of_gold", news);
 }

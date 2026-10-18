@@ -6,10 +6,12 @@ import { LEDGER, LEDGER_LINES } from "./treasury.ts";
 import { buildingType, siteKind, townAtLeast, type TownSize } from "./domain/buildings/index.ts";
 import { invention, startingKnowledgeFor } from "./domain/research/index.ts";
 import { CHANGES, changeRows, changeTitle, changeUses, changing, type ChangeRow } from "./conversion.ts";
-import { classFood, FOOD_CLASSES, jobSlots, precious, roughWaste, saltCoast, seamWare, tileCount, tilesOf, tileWares, USES, type FoodClass, type UseName } from "./land.ts";
+import { classFood, FOOD_CLASSES, jobSlots, precious, roughWaste, saltCoast, seamWare, tileCount, tilesOf, tileWares, USES, wearYearsOf, wornFields, type FoodClass, type UseName } from "./land.ts";
 import { CLASS_COUNT, CLASS_NAMES } from "./living.ts";
 import { yearlyFood } from "./food.ts";
 import { provinceConfig } from "./domain/province/model.ts";
+import { tradeConfig } from "./domain/trade/index.ts";
+import { heritageFactor } from "./heritage.ts";
 
 const provinceMines = provinceConfig.mines;
 const MINE_ANCHORS = new Set(Object.keys(provinceMines.anchors));
@@ -29,15 +31,15 @@ const MINE_ANCHORS = new Set(Object.keys(provinceMines.anchors));
  */
 
 /** The works of this slice, as named in the buildings data. */
-export const WORKS = ["farm", "ranch", "fishery", "lumber camp", "quarry", "market", "harbour", "drill yard", "road", "castle", "granary", "hunting lodge", "mine", "saltworks"] as const;
+export const WORKS = ["farm", "ranch", "fishery", "lumber camp", "quarry", "market", "harbour", "drill yard", "road", "castle", "granary", "hunting lodge", "mine", "saltworks", "shipyard"] as const;
 export type WorkName = (typeof WORKS)[number];
 export const WORK_COUNT = WORKS.length;
 export const workIndex = (name: string): number => (WORKS as readonly string[]).indexOf(name);
 
-const W = Object.fromEntries(WORKS.map((w, k) => [w, k])) as Record<WorkName, number>;
+export const W = Object.fromEntries(WORKS.map((w, k) => [w, k])) as Record<WorkName, number>;
 
 /** The highest step of each work this slice builds (later steps need inventions or wares not simulated yet). */
-const TOP: Record<WorkName, number> = { farm: 3, ranch: 1, fishery: 1, "lumber camp": 1, quarry: 1, market: 3, harbour: 3, "drill yard": 2, road: 2, castle: 2, granary: 1, "hunting lodge": 1, mine: 1, saltworks: 1 };
+const TOP: Record<WorkName, number> = { farm: 3, ranch: 1, fishery: 1, "lumber camp": 1, quarry: 1, market: 3, harbour: 3, "drill yard": 2, road: 2, castle: 2, granary: 1, "hunting lodge": 1, mine: 1, saltworks: 1, shipyard: 3 };
 
 export interface Site {
   nation: number;
@@ -108,8 +110,8 @@ export const slotsOf = (world: World, p: number): number => world.rules.defines.
 export function slotsUsed(world: World, p: number, pend?: Pending): number {
   let used = 0;
   for (let k = 0; k < WORK_COUNT; k++) {
-    // The granary is part of the castle and takes no slot (BLD-008).
-    if (k === W.granary) continue;
+    // The granary is part of the castle and takes no slot (BLD-008); the shipyard is part of the harbour and takes none either (D-NAVY-33).
+    if (k === W.granary || k === W.shipyard) continue;
     if (worksAt(world, p, k) > 0) used++;
     else if (pend ? pend.step[p * WORK_COUNT + k]! > 0 : world.sites.some((x) => x.province === p && x.work === k) || world.workQueue.some((x) => x.province === p && x.work === k)) used++;
   }
@@ -158,6 +160,7 @@ function placeFits(world: World, p: number, name: WorkName): boolean {
       return saltCoast(world, p);
     case "fishery":
     case "harbour":
+    case "shipyard":
       return coastal;
     case "granary":
       return hasCastle(world, p);
@@ -177,6 +180,7 @@ export function workCost(world: World, p: number, work: number, step: number): {
   let gold = (c.gold ?? 0) * d.goldScale;
   if (c.timber && worksAt(world, p, W["lumber camp"]) > 0) gold *= 1 - d.materialsAtHandSaving;
   if ((c.stone || c.bricks) && worksAt(world, p, W.quarry) > 0) gold *= 1 - d.materialsAtHandSaving;
+  gold *= heritageFactor(world, world.provinceOwner[p]!, "building_cost_pct");
   return { gold: Math.round(gold * 10) / 10, months: c.months ?? 0 };
 }
 
@@ -226,9 +230,11 @@ export function whyNot(world: World, n: number, p: number, work: number, pend?: 
   const name = WORKS[work]!;
   if (world.provinceOwner[p] !== n) return "not your province";
   if (world.provinceWater[p]) return "no land to build on";
-  if (!placeFits(world, p, name)) return name === "fishery" || name === "harbour" ? "needs a coast" : name === "granary" ? "needs a castle" : name === "saltworks" ? "needs a shore that is dry or warm" : LAND_USE[name] ? `needs ${LAND_USE[name]} in the province` : `the land doesn't suit a ${name}`;
+  if (!placeFits(world, p, name)) return name === "fishery" || name === "harbour" || name === "shipyard" ? "needs a coast" : name === "granary" ? "needs a castle" : name === "saltworks" ? "needs a shore that is dry or warm" : LAND_USE[name] ? `needs ${LAND_USE[name]} in the province` : `the land doesn't suit a ${name}`;
+  // A shipyard's slipways run down into a harbour (buildings needs_building).
+  if (name === "shipyard" && worksAt(world, p, W.harbour) === 0) return "needs a harbour first";
   if (name === "mine" && worksAt(world, p, work) === 0) {
-    if (!seamWare(world, p)) return "no seam has been found here";
+    if (!seamWare(world, p)) return "no ore deposit has been found here";
     if (!timberInReach(world, p)) return "needs timber: a lumber camp here or next door";
   }
   const step = nextStep(world, p, work, pend);
@@ -239,7 +245,7 @@ export function whyNot(world: World, n: number, p: number, work: number, pend?: 
   if (needs.min_town && !townAtLeast(townSize(world, p), needs.min_town)) return `needs a ${needs.min_town.replace("_", " ")} or bigger`;
   if (needs.charter) return `needs a ${needs.charter}`;
   if (needs.any_of?.includes("river") && !world.provinceRiver[p]) return "needs a river";
-  if (step === 1 && slotsUsed(world, p, pend) >= slotsOf(world, p)) return `no free slot: all ${slotsOf(world, p)} are taken`;
+  if (step === 1 && name !== "shipyard" && slotsUsed(world, p, pend) >= slotsOf(world, p)) return `no free slot: all ${slotsOf(world, p)} are taken`;
   if (pend ? pend.step[p * WORK_COUNT + work]! > 0 : siteOf(world, p, work) || world.workQueue.some((q) => q.province === p && q.work === work)) return "already ordered";
   return null;
 }
@@ -427,25 +433,16 @@ export function timberInReach(world: World, p: number): boolean {
 }
 
 /** Trade a mine adds, in camp-trade steps: one, three for silver or gold (feedback 87). */
-function mineTrade(world: World, p: number): number {
-  if (worksAt(world, p, W.mine) === 0) return 0;
-  const ware = seamWare(world, p);
-  const t = provinceMines.trade;
-  return ware ? (precious(ware) ? t.precious : t.base) : 0;
-}
-
-/** Trade a province's works add (market, harbour, road, lumber camp, quarry, mine and saltworks), as a factor on its trade. */
-export function worksTrade(world: World, p: number): number {
-  const d = world.rules.defines.works;
-  const at = (w: WorkName) => worksAt(world, p, W[w]);
-  const gain = d.marketTrade * at("market") + d.harbourTrade * at("harbour") + d.roadTrade * at("road") + d.campTrade * ((at("lumber camp") > 0 ? 1 : 0) + (at("quarry") > 0 ? 1 : 0) + (at("saltworks") > 0 ? 1 : 0) + mineTrade(world, p));
-  return 1 + gain * share(world, p);
-}
-
 /** Food a class brings in a year at a normal harvest, in thousands fed: on its tiles at the rate its building (farm, ranch, fishery) gives, the rest on bare land. */
 export function worksFood(world: World, p: number, cls: "farmers" | "herders" | "seafolk" | "woodsmen"): number {
   const step = cls === "farmers" ? worksAt(world, p, W.farm) : cls === "herders" ? worksAt(world, p, W.ranch) : cls === "seafolk" ? worksAt(world, p, W.fishery) : worksAt(world, p, W["hunting lodge"]);
   return classFood(world, p, cls, step, share(world, p)) * world.provinceLandYield[p]!;
+}
+
+/** A market step's trade effect: its weight, the visits it serves, and that traders are founded there (TRADE-029, TRADE-048, D-TRADE-2). */
+function marketEffect(step: number): string {
+  const w = tradeConfig.value.building_weights[(["weekly_market", "yearly_fair", "trading_house"] as const)[Math.min(step, 3) - 1]!];
+  return `Trade value +${Math.round(w.weight * 100)} %; ${w.serves} trader visits a month at full value; traders can be founded here`;
 }
 
 /** Hours of marching in a province against none: a track and a road speed armies on. */
@@ -529,18 +526,30 @@ export function aiWorks(world: World, news: News[]): void {
   for (const s of world.sites) busy[s.nation]!++;
   // Each realm's provinces, to take one in turn.
   const lands: number[][] = Array.from({ length: world.nationCount }, () => []);
+  const pend = pending(world);
+  // A realm with a harbour and no shipyard builds one first, in its biggest harbour, so it can muster sailors and build ships (D-NAVY-33).
+  const yards = new Uint8Array(world.nationCount);
   for (let p = 0; p < world.provinceCount; p++) {
     const n = world.provinceOwner[p]!;
-    if (n >= 0 && !world.provinceWater[p]) lands[n]!.push(p);
+    if (n < 0 || world.provinceWater[p]) continue;
+    lands[n]!.push(p);
+    if (worksAt(world, p, W.shipyard) > 0 || pend.step[p * WORK_COUNT + W.shipyard]! > 0) yards[n] = 1;
   }
   const month = world.date.year * 12 + world.date.month;
   const reserveMin = world.rules.defines.works.aiReserveGold;
-  const pend = pending(world);
   for (let n = 0; n < world.nationCount; n++) {
     const land = lands[n]!;
-    if (n === world.player || world.nationGone[n] || !land.length || busy[n]! >= AI_BUSY_SITES || world.nationTreasury[n]! < reserveMin || inAnyWar(world, n)) continue;
-    const p = land[(month + n) % land.length]!;
+    if (n === world.player || world.nationGone[n] || !land.length || world.nationTreasury[n]! < reserveMin || inAnyWar(world, n)) continue;
     const reserve = Math.max(reserveMin, 12 * worksUpkeep(world, n));
+    // The first shipyard comes before the other works, however busy the realm is.
+    let y = -1;
+    if (!yards[n]) for (const q of land) if (worksAt(world, q, W.harbour) > (y < 0 ? 0 : worksAt(world, y, W.harbour)) && !whyNot(world, n, q, W.shipyard, pend)) y = q;
+    if (y >= 0 && world.nationTreasury[n]! - workCost(world, y, W.shipyard, 1).gold >= reserve) {
+      orderWork(world, n, y, W.shipyard, news, pend);
+      continue;
+    }
+    if (busy[n]! >= AI_BUSY_SITES) continue;
+    const p = land[(month + n) % land.length]!;
     for (const name of AI_ORDER) {
       const work = W[name];
       if (name === "castle" && !borders(world, p, n)) continue;
@@ -583,21 +592,25 @@ export function workEffect(world: World, work: number, step: number): string {
     case "hunting lodge":
       return `The woods: work for ${people(jobSlots("hunting lodge"))} hunters on every woods tile, who bring in half as much again; furs in the northern woods`;
     case "lumber camp":
-      return `Works needing timber here cost ${pct(d.materialsAtHandSaving)} less; trade +${pct(d.campTrade)}`;
+      return `Works needing timber here cost ${pct(d.materialsAtHandSaving)} less; its timber is traded`;
     case "quarry":
-      return `Works needing stone here cost ${pct(d.materialsAtHandSaving)} less; trade +${pct(d.campTrade)}`;
+      return `Works needing stone here cost ${pct(d.materialsAtHandSaving)} less; its stone is traded`;
     case "mine":
-      return `Work for ${people(jobSlots("mine"))} miners digging the seam; trade +${pct(d.campTrade * provinceMines.trade.base)}, or +${pct(d.campTrade * provinceMines.trade.precious)} for silver or gold. The seam runs out after its years of digging`;
+      return `Work for ${people(jobSlots("mine"))} miners digging the ore; its ore is traded, silver and gold dearest. The ore deposit runs out after its years of digging`;
     case "saltworks":
-      return `Work for ${people(jobSlots("saltworks"))} salt makers; salt for the realm; trade +${pct(d.campTrade)}`;
+      return `Work for ${people(jobSlots("saltworks"))} salt makers; salt for the realm and for trade`;
     case "market":
-      return `Trade +${pct(d.marketTrade * step)}`;
+      return marketEffect(step);
+    case "shipyard": {
+      const slips = stepOf("shipyard", step).slipways ?? 1;
+      return `Sailors are mustered and ships built here, ${slips} at a time${step >= 3 ? ", ships of the line too" : step >= 2 ? ", carracks and galleons too" : ""}`;
+    }
     case "harbour":
-      return `Trade +${pct(d.harbourTrade * step)}`;
+      return `Ships stop and trade here; its trade value +${pct(tradeConfig.value.building_weights.harbour.weight)} to ships`;
     case "drill yard":
       return `Recruits +${pct(d.drillYardRecruits * step)}`;
     case "road":
-      return `Armies march ${pct(d.roadSpeed * step)} faster here; trade +${pct(d.roadTrade * step)}`;
+      return `Armies march ${pct(d.roadSpeed * step)} faster here, and traders with them`;
     case "granary": {
       const f = world.rules.defines.castleFood;
       return `The castle store holds ${f.granaryStoreMonths} months instead of ${f.castleStoreMonths}, and rots half as fast`;
@@ -660,6 +673,10 @@ export interface LandTileRow {
   changes: ChangeRow[];
   /** The change under way on this tile, if any. */
   changing?: { title: string; to: UseName; monthsLeft: number; months: number };
+  /** Fields only: worn by overwork, it gives half until it rests (PROV-034, PROV-035). */
+  worn?: { restedYears: number; restYears: number };
+  /** Fields only: years the fields have been farmed with more farmers than they hold, and the years that wears one. */
+  overwork?: { years: number; wearsAt: number };
 }
 
 /** The work that works each tile use, and the class on it. */
@@ -699,8 +716,14 @@ export function landSheet(world: World, p: number): LandTileRow[] {
     const changes = changeRows(world, world.provinceOwner[p]!, p, use);
     // A change takes the last tile of its use, so it shows on the last of the use's row.
     const under = changing(world, p) && changeUses(CHANGES[world.provinceChange[p]!]!)[0] === use;
+    // Worn fields are the last of the use's row and feed half what a sound one does.
+    const worn = use === "fields" ? wornFields(world, p) : 0;
+    const sound = fed / (count - worn * (1 - provinceConfig.worn.output));
+    const overwork = use === "fields" && world.provinceOverwork[p]! > 0 ? { years: world.provinceOverwork[p]!, wearsAt: Math.round(wearYearsOf(world, p)) } : undefined;
     for (let i = 0; i < count; i++) {
-      const row: LandTileRow = { use, building, workers: workers / count, feeds: fed / count, ware, changes, ...(game ? { game } : {}), ...(seam ? { seam } : {}) };
+      const isWorn = i >= count - worn;
+      const row: LandTileRow = { use, building, workers: workers / count, feeds: isWorn ? sound * provinceConfig.worn.output : sound, ware, changes, ...(game ? { game } : {}), ...(seam ? { seam } : {}), ...(overwork ? { overwork } : {}) };
+      if (isWorn) row.worn = { restedYears: world.provinceRested[p]!, restYears: provinceConfig.worn.recovery_years };
       if (under && i === count - 1) row.changing = { title: changeTitle(CHANGES[world.provinceChange[p]!]!), to: changeUses(CHANGES[world.provinceChange[p]!]!)[1], monthsLeft: world.provinceChangeLeft[p]!, months: world.provinceChangeMonths[p]! };
       rows.push(row);
     }

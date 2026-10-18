@@ -941,12 +941,14 @@ function noBuildData(s: Scenario, what: string): void {
   const re: Record<string, RegExp> = {
     adjacency: /adj|neighbo/i,
     terrain: /terrain|ground/i,
-    water: /water/i,
-    rivers: /river/i,
+    // As keys: a realm's heritage names its strengths by id, and "the embanked river" is no build data.
+    water: /"[^"]*water[^"]*"\s*:/i,
+    rivers: /"[^"]*river[^"]*"\s*:/i,
     "province shapes": /shape|"x"|"y"|polygon/i,
   };
+  const loose: Record<string, RegExp> = { water: /water/i, rivers: /river/i };
   expect(s.chunkText).not.toMatch(re[what]!);
-  for (const a of s.chunkArrays as string[]) expect(a).not.toMatch(re[what]!);
+  for (const a of s.chunkArrays as string[]) expect(a).not.toMatch(loose[what] ?? re[what]!);
 }
 
 function gridRules(ids: string[], pops: number[]): Ruleset {
@@ -1471,7 +1473,7 @@ Given("a save from before a balance patch", (s) => {
   s.saveBytes = s.pre.bytes;
 });
 When("it is loaded after the patch", (s) => {
-  s.buildRules = { ...RULES, defines: { ...RULES.defines, economy: { ...RULES.defines.economy, goldPerWealthPerMonth: RULES.defines.economy.goldPerWealthPerMonth * 2 } } };
+  s.buildRules = { ...RULES, defines: { ...RULES.defines, economy: { ...RULES.defines.economy, goldPerThousandPeoplePerMonth: RULES.defines.economy.goldPerThousandPeoplePerMonth * 2 } } };
   loadSave(s);
 });
 Then("the turn already saved is unchanged", (s) => {
@@ -1489,7 +1491,8 @@ Then("the new rules apply from the next turn on with the saved Rng state", (s) =
     processTurn(old.world, [], 0);
   }
   const n = patched.nationIndex.get("castile")!;
-  expect(patched.nationTreasury[n]).not.toBe(old.world.nationTreasury[n]);
+  // The AI pays its debt off with gold above a year's upkeep, so gold less debt shows the patch.
+  expect(patched.nationTreasury[n]! - patched.nationDebt[n]!).not.toBeCloseTo(old.world.nationTreasury[n]! - old.world.nationDebt[n]!, 6);
   expect(patched.rules).toBe(s.buildRules);
 });
 Then("the save is not corrupted", (s) => {

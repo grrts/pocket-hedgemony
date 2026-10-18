@@ -1,0 +1,1883 @@
+import warfareData from "../../rules/data/domain/warfare.json" with { type: "json" };
+import * as nv from "./domain/naval/index.ts";
+import type { World } from "./world.ts";
+import { atWar, controller, relationState, tileDistance, type News } from "./war.ts";
+import { knows } from "./research.ts";
+import * as rs from "./domain/research/index.ts";
+import { slotsOf, slotsUsed, WORK_COUNT, workIndex, worksAt, workStepName } from "./works.ts";
+import { classesOf } from "./living.ts";
+import { armyOf, idleCommanders } from "./recruit.ts";
+import { halt, mayMarchInto } from "./turn.ts";
+import { isCharted, whyNoExploration } from "./exploration.ts";
+import { noteMoment } from "./achievements.ts";
+import { planSeaPath } from "./march.ts";
+import { WATER } from "./tiles.ts";
+import { tradeValueAt } from "./trade.ts";
+
+/**
+ * Ports, sailors, ships and fleets in play (domain/naval/spec.md), on the
+ * rules of the naval library. Ports are provinces with a harbour; their
+ * people are mustered as sailors, who wait in port until a ship is bought
+ * for them. Fleets plan their voyages over the sea zones and sail them tile
+ * by tile, a step of the clock at a time (feedback 122); they fight enemy
+ * fleets they sight in their zone, round by round, carry an army from a port
+ * to a shore, and at war lie off an enemy's coast to blockade it.
+ */
+
+const C = nv.navalConfig;
+const G = C.game;
+const SHIPS = warfareData.ships as unknown as Record<string, { fights: number; carries: number }>;
+/** The harbour among the works (looked up when first needed: works.ts loads after this module). */
+let HARBOUR = -1;
+const harbourWork = (): number => (HARBOUR >= 0 ? HARBOUR : (HARBOUR = workIndex("harbour")));
+let YARD = -1;
+const yardWork = (): number => (YARD >= 0 ? YARD : (YARD = workIndex("shipyard")));
+const Q = G.queues;
+/** The type that replaces each on the upgrade path (D-NAVY-33). */
+const UPGRADES = C.upgrades as unknown as Record<string, string | undefined>;
+const HULLS = C.hullSteps;
+const WRECKED = HULLS.length - 1;
+const LEAKING = HULLS.indexOf("leaking");
+
+/** Ships a port can be asked for, in the order the port card lists them. Small craft wait on fishing. */
+export const SHIP_TYPES = ["cog", "junk", "dhow", "caravel", "voyaging canoe", "galley", "war canoe fleet", "carrack", "fluyt", "armed carrack", "galleon", "turtle ship", "ship of the line", "steamer"] as const;
+const TRADE_SHIPS = new Set(["cog", "junk", "dhow"]);
+
+export interface NavyShip {
+  id: number;
+  type: string;
+  /** Sailors aboard. */
+  crew: number;
+  /** Hull step: index into naval hullSteps (0 sound … 3 wrecked). */
+  hull: number;
+  /** Zones it can still sail before it must dock. */
+  supply: number;
+  /** Hits taken in the battle being fought. */
+  damage: number;
+  /** Months since its hull last wore a step. */
+  wear: number;
+  /** Years since launch. */
+  age: number;
+  /** Port its crew was mustered at. */
+  home: number;
+  /** Colony stores in the hold, apart from its supply (exploration ships only, EXPL-044). */
+  stores?: number;
+}
+
+export interface NavyFleet {
+  id: number;
+  owner: number;
+  /** Province it is in: a sea zone (the zone of its tile), or a port it lies in. */
+  at: number;
+  /** Map tile it stands on: water of its zone, or the anchorage of its port; -1 until placed (NAVY-147). */
+  tile: number;
+  /** Tiles of the leg it is sailing, to the next province of its route, and how many it has sailed (NAVY-148). */
+  path: number[];
+  pathAt: number;
+  /** Hours the leg takes, 0 = no leg planned yet. */
+  legHours: number;
+  /** Spot of the last zone it sails to, -1 = the zone's centre (NAVY-149). */
+  goal: number;
+  /** The post its leader holds (NAVY-152). */
+  post: nv.Post;
+  /** It lay off an enemy's coast closing ports at the last look (NAVY-160). */
+  blockading: boolean;
+  /** Provinces still to sail through, the last a port to put into or a zone to wait in. */
+  route: number[];
+  /** Hours sailed on the leg toward the next province. */
+  progress: number;
+  /** Commander leading it, -1 = none. */
+  admiral: number;
+  ships: NavyShip[];
+  /** Army aboard (its slot), -1 = none. */
+  army: number;
+  /** Shore to land the army on when the voyage ends, -1 = none. */
+  landAt: number;
+  /** Hours of landing left, while the army goes ashore. */
+  landing: number;
+  /** Sea battle it is fighting (its id), -1 = none. */
+  battle: number;
+  /** Beaten and running for port: it can't be caught until it docks. */
+  fleeing: boolean;
+  /** A hired fleet's contract (F-115, hiredFleets.ts); absent for the realm's own ships. */
+  hire?: FleetHire;
+}
+
+/** What a hired fleet is and who is paid for it: a free fleet, or a realm's own fleet lent out. */
+export interface FleetHire {
+  name: string;
+  /** The free fleet's group, or the lending realm's name. */
+  group: string;
+  /** The realm that lent it, -1 for a free fleet. */
+  from: number;
+  /** Gold a month, paid by the hirer (to the lender, for a lent fleet). */
+  pay: number;
+  /** Its own captain, the fleet's admiral, who leaves with it. */
+  captain: number;
+  /** Dismissed or unpaid: it goes once its army is ashore and its battle over. */
+  leaving?: boolean;
+}
+
+/** A free fleet waiting for a contract where it gathered (F-115). */
+export interface FreeFleet {
+  id: number;
+  group: string;
+  name: string;
+  captain: string;
+  /** Its captain's Might, Cunning and Logistics. */
+  skills: [number, number, number];
+  /** The sea zone it gathered in. */
+  at: number;
+  /** Its ships by type, one entry a ship. */
+  ships: string[];
+}
+
+/** A ship ordered in a port and paid for, waiting its turn for a slipway and its crew (D-NAVY-33). */
+export interface NavyOrdered {
+  province: number;
+  owner: number;
+  type: string;
+  /** Gold paid, given back if the order is taken off the queue. */
+  gold: number;
+}
+
+export interface NavyHull {
+  province: number;
+  owner: number;
+  type: string;
+  monthsLeft: number;
+  months: number;
+  crew: number;
+  /** Building on a slipway (every hull since D-NAVY-33; older saves may hold one on the harbour's beach). */
+  slipway: boolean;
+}
+
+export interface SeaBattle {
+  id: number;
+  zone: number;
+  /** Where it is fought: the tile of the fleet first sighted (NAVY-151). */
+  tile: number;
+  /** Fleet ids on each side. */
+  sides: [number[], number[]];
+  /** Each side's strength when it began. */
+  start: [number, number];
+  /** Ships each side has lost. */
+  lost: [number, number];
+  round: number;
+  /** Realm leading each side. */
+  leaders: [number, number];
+}
+
+export interface NavyState {
+  /** The province of the Venetian Arsenal, which builds as shipyard step 4 (NAVY-014), -1 = none. The other shipyards are works. */
+  arsenal: number;
+  /** Sailors waiting in each port. */
+  sailors: Float32Array;
+  /** Sailors from each province serving anywhere (in port, building, aboard), mustering included. */
+  away: Float32Array;
+  /** Months the sailors in each port have waited. */
+  waited: Uint8Array;
+  /** Sailors being mustered, a batch each, in the order they come in: each batch is ready muster.days after the one before it in its port (D-NAVY-33). */
+  musters: { province: number; owner: number; sailors: number; day: number }[];
+  /** Ships ordered and waiting their turn in each port's queue, oldest first. */
+  orders: NavyOrdered[];
+  hulls: NavyHull[];
+  fleets: NavyFleet[];
+  battles: SeaBattle[];
+  seq: number;
+  /** Per sea zone: zones to the nearest coast (0 beside land), 255 = far. */
+  coastDist: Uint8Array;
+  /** 1 for open-ocean zones. */
+  ocean: Uint8Array;
+  /** 1 for zones that freeze in winter (NAVY-125), 1 for zones of the monsoon seas (NAVY-092). */
+  frozen: Uint8Array;
+  monsoon: Uint8Array;
+  /** Per province: realm + 1 of a fleet blockading it (a closed port, or a zone held), 0 = none; and that fleet's id (NAVY-155, NAVY-156). */
+  blockade: Int16Array;
+  blockadeFleet: Int32Array;
+  /** Per province: 1 for a port of a realm whose commodore lies in a zone beside it (NAVY-154). */
+  guarded: Uint8Array;
+  /** Per sea zone: realms whose commodore lies there, escorting their trade ships (NAVY-157). */
+  escorts: Map<number, number[]>;
+  /** Prize money each realm took last month (NAVY-158), and purses seized this month so far (NAVY-157). */
+  prize: Float64Array;
+  seized: Float64Array;
+  /** Free fleets for hire (F-115), shared by every realm that can reach them. */
+  forHire: FreeFleet[];
+  hireSeq: number;
+}
+
+export function createNavyState(P: number): NavyState {
+  return {
+    arsenal: -1,
+    sailors: new Float32Array(P),
+    away: new Float32Array(P),
+    waited: new Uint8Array(P),
+    musters: [],
+    orders: [],
+    hulls: [],
+    fleets: [],
+    battles: [],
+    seq: 0,
+    blockade: new Int16Array(P),
+    blockadeFleet: new Int32Array(P),
+    guarded: new Uint8Array(P),
+    escorts: new Map(),
+    prize: new Float64Array(0),
+    seized: new Float64Array(0),
+    coastDist: new Uint8Array(P).fill(255),
+    ocean: new Uint8Array(P),
+    frozen: new Uint8Array(P),
+    monsoon: new Uint8Array(P),
+    forHire: [],
+    hireSeq: 0,
+  };
+}
+
+// ---------------------------------------------------------------- the 1444 ports
+
+/**
+ * The sea as the fleets see it, and the ports of 1444 (NAVY-013, NAVY-014):
+ * each placed province gets at least its starting harbour, and its shipyard.
+ */
+export function seedNavy(world: World): void {
+  const v = world.navy;
+  const P = world.provinceCount;
+  const frozenNames = C.frozenSeas.zones;
+  const monsoonNames = C.monsoon.seas;
+  const queue: number[] = [];
+  for (let p = 0; p < P; p++) {
+    if (!world.provinceWater[p]) continue;
+    const def = world.rules.provinces[p]!;
+    v.ocean[p] = def.terrain === "ocean" ? 1 : 0;
+    v.frozen[p] = frozenNames.some((n) => def.name.startsWith(n)) ? 1 : 0;
+    v.monsoon[p] = monsoonNames.some((n) => def.name.startsWith(n)) ? 1 : 0;
+    for (let k = world.adjStart[p]!; k < world.adjStart[p + 1]!; k++) {
+      if (!world.provinceWater[world.adjList[k]!]) {
+        v.coastDist[p] = 0;
+        queue.push(p);
+        break;
+      }
+    }
+  }
+  for (let i = 0; i < queue.length; i++) {
+    const p = queue[i]!;
+    for (let k = world.adjStart[p]!; k < world.adjStart[p + 1]!; k++) {
+      const q = world.adjList[k]!;
+      if (world.provinceWater[q] && v.coastDist[q] === 255) {
+        v.coastDist[q] = Math.min(254, v.coastDist[p]! + 1);
+        queue.push(q);
+      }
+    }
+  }
+  const knowsS4 = (holder: string) => {
+    const n = world.nationIndex.get(holder);
+    return n !== undefined && knows(world, n, C.startShipyard.invention);
+  };
+  for (const row of nv.startPortsTable(knowsS4)) {
+    const p = world.provinceIndex.get(row.province);
+    if (p === undefined || world.provinceWater[p] || !world.rules.provinces[p]!.coastal) continue;
+    const k = p * WORK_COUNT + harbourWork();
+    // A new harbour needs a free slot, as any work; a harbour standing is raised to its 1444 step.
+    if (!world.provinceWorks[k] && slotsUsed(world, p) >= slotsOf(world, p)) continue;
+    world.provinceWorks[k] = Math.max(world.provinceWorks[k]!, row.harbour);
+    // The 1444 shipyard, part of the harbour (it takes no slot); the Arsenal builds as a naval dockyard.
+    const y = p * WORK_COUNT + yardWork();
+    if (row.shipyard <= 0) continue;
+    world.provinceWorks[y] = Math.max(world.provinceWorks[y]!, Math.min(3, row.shipyard));
+    if (row.shipyard >= C.arsenalStep) v.arsenal = p;
+  }
+}
+
+// ---------------------------------------------------------------- ports and sailors
+
+export const harbourStep = (world: World, p: number): number => (world.provinceWater[p] || !world.rules.provinces[p]!.coastal ? 0 : worksAt(world, p, harbourWork()));
+export const isPort = (world: World, p: number): boolean => harbourStep(world, p) > 0;
+export const berthsOf = (world: World, p: number): number => nv.berths({ harbourStep: harbourStep(world, p), shoreTile: true });
+/** Slipways working. Timber is bought in until trade carries wares, so a yard without a lumber camp near still works (D-NAVY-32). */
+export const slipwaysOf = (world: World, p: number): number => nv.slipways({ shipyardStep: shipyardOf(world, p) });
+/** The shipyard step of a province: its shipyard work, or 4 for the Venetian Arsenal while a yard stands there. */
+export function shipyardOf(world: World, p: number): number {
+  const step = worksAt(world, p, yardWork());
+  return step > 0 && p === world.navy.arsenal ? C.arsenalStep : step;
+}
+
+/** Sailors a muster can still call in a port province (NAVY-025, NAVY-027): its callable men less those already away, within its levy pool. */
+export function callable(world: World, p: number): number {
+  let sum = 0;
+  for (const [c, k] of Object.entries(classesOf(world, p))) sum += k * 1000 * C.fightingAgeShare * nv.musterShare(c);
+  return Math.max(0, Math.floor(Math.min(sum - world.navy.away[p]!, world.provinceRecruits[p]!)));
+}
+
+/** Gold of a ship's price, in the treasury's gold. */
+export const shipGold = (type: string): number => Math.round(nv.shipRow(type).gold * G.goldScale * 10) / 10;
+export const musterGold = (sailors: number): number => Math.round(sailors * C.muster.bountyPerSailor * G.wageScale * 100) / 100;
+export const fightsOf = (type: string): number => SHIPS[type]?.fights ?? 0;
+export const carriesOf = (type: string): number => SHIPS[type]?.carries ?? 0;
+
+/** The trade ship of the sea a port lies on (NAVY-049): the junk in East and Southeast Asia, the dhow on the Indian Ocean and Red Sea, the cog elsewhere. */
+export function localTradeShip(world: World, p: number): string {
+  const m = world.rules.map;
+  const def = world.rules.provinces[p]!;
+  if (!m || def.x === undefined || def.y === undefined) return "cog";
+  const lon = def.x / m.pxPerDeg - 180;
+  const lat = m.latTop - def.y / m.pxPerDeg;
+  if (lon >= 95 && lat > -15) return "junk";
+  if (lon >= 32 && lon < 95 && lat < 32) return "dhow";
+  return "cog";
+}
+
+/**
+ * Why port p can't build a ship of this type for realm n at all, or null: the
+ * sea's own trade ship, the invention, the exploration unlock, and a shipyard
+ * of the step the hull needs (NAVY-045, NAVY-049, D-NAVY-33). Gold and the
+ * queue are not asked here.
+ */
+function whyNotBuildable(world: World, n: number, p: number, type: string): string | null {
+  if (TRADE_SHIPS.has(type) && type !== localTradeShip(world, p)) return `this sea builds the ${localTradeShip(world, p)}`;
+  const row = nv.shipRow(type);
+  if (row.unlock && !knows(world, n, row.unlock)) return `needs ${inventionName(world, row.unlock)}`;
+  if (row.family === "exploration") {
+    const why = whyNoExploration(world, n);
+    if (why) return why;
+  }
+  const yard = shipyardOf(world, p);
+  if (!yard) return "needs a shipyard";
+  if (!nv.shipyardAllows(yard, type)) return `needs a ${workStepName(yardWork(), Number(row.builtAt))} here`;
+  return null;
+}
+
+/** The newest type further along this one's upgrade path that port p can build for realm n, or null: then this type is no longer offered (D-NAVY-33). */
+export const replacedBy = (world: World, n: number, p: number, type: string): string | null => nv.replacedBy(type, (t) => !whyNotBuildable(world, n, p, t));
+
+/** Why realm n can't order a ship of this type in port p now, or null (NAVY-042..048, D-NAVY-33). Its crew need not wait in port yet: the order waits in the queue for them. */
+export function whyNotShip(world: World, n: number, p: number, type: string): string | null {
+  const why = whyNotBuildable(world, n, p, type);
+  if (why) return why;
+  const newer = replacedBy(world, n, p, type);
+  if (newer) return `replaced by the ${newer}`;
+  if (queuedShips(world, p) >= Q.shipQueueMax) return `the queue is full: at most ${Q.shipQueueMax} ships wait here`;
+  if (world.nationTreasury[n]! < shipGold(type)) return "not enough gold";
+  return null;
+}
+
+const inventionName = (_world: World, id: string): string => rs.invention(id).name.replace(/_/g, " ");
+const queuedShips = (world: World, p: number): number => world.navy.orders.reduce((k, o) => k + (o.province === p ? 1 : 0), 0);
+const freeSlipways = (world: World, p: number): number => slipwaysOf(world, p) - world.navy.hulls.reduce((k, h) => k + (h.province === p ? 1 : 0), 0);
+
+/** Why a ship waiting in port p's queue is not on a slipway yet: no slipway free, or its crew not yet in port; ships behind it wait their turn. */
+function waitingFor(world: World, o: NavyOrdered, first: boolean, slips: number): string {
+  if (!first) return "waiting its turn";
+  if (slips <= 0) return "waiting for a slipway";
+  return `waiting for ${fmtCount(nv.shipRow(o.type).crew - Math.floor(world.navy.sailors[o.province]!))} more sailors`;
+}
+const fmtCount = (k: number): string => Math.max(1, Math.ceil(k)).toLocaleString("en");
+
+/**
+ * Lays down the ships waiting in the ports' queues, oldest first in each port:
+ * the first waiting ship takes a free slipway once its whole crew waits in
+ * port; the ships behind it wait their turn (D-NAVY-33). An order in a port
+ * its realm has lost is dropped and its gold given back.
+ */
+export function layDown(world: World, news: News[], only = -1): void {
+  const v = world.navy;
+  if (!v.orders.length) return;
+  const stuck = new Set<number>();
+  v.orders = v.orders.filter((o) => {
+    const p = o.province;
+    if (only >= 0 && p !== only) return true;
+    if (world.provinceOwner[p] !== o.owner) {
+      world.nationTreasury[o.owner] = world.nationTreasury[o.owner]! + o.gold;
+      return false;
+    }
+    if (stuck.has(p)) return true;
+    const row = nv.shipRow(o.type);
+    if (world.provinceOccupier[p]! >= 0 || freeSlipways(world, p) <= 0 || v.sailors[p]! < row.crew) {
+      stuck.add(p);
+      return true;
+    }
+    v.sailors[p] = v.sailors[p]! - row.crew;
+    v.waited[p] = 0;
+    v.hulls.push({ province: p, owner: o.owner, type: o.type, monthsLeft: row.months, months: row.months, crew: row.crew, slipway: true });
+    if (o.owner === world.player) news.push({ kind: "built", text: `A ${o.type} is laid down at ${provinceName(world, p)}: ${plural(row.months, "month")} to launch.`, nations: [o.owner], province: p });
+    return false;
+  });
+}
+
+const plural = (k: number, one: string): string => `${k} ${k === 1 ? one : `${one}s`}`;
+
+// ---------------------------------------------------------------- ships and fleets
+
+export const newShip = (world: World, type: string, crew: number, home: number): NavyShip => ({ id: ++world.navy.seq, type, crew, hull: 0, supply: nv.fullSupply(type), damage: 0, wear: 0, age: 0, home });
+
+export const crewNeed = (s: NavyShip): number => nv.shipRow(s.type).crew;
+const crewShare = (s: NavyShip): number => Math.min(1, s.crew / Math.max(1, crewNeed(s)));
+
+/** What a ship fights with now: its strength by its crew share, half without supply, less on a leaking or wrecked hull (NAVY-063, NAVY-088). */
+export function shipStrength(s: NavyShip): number {
+  return fightsOf(s.type) * crewShare(s) * (s.supply <= 0 ? C.outOfSupply.strengthCap : 1) * (s.hull >= LEAKING ? 0.5 : 1);
+}
+
+export const fleetStrength = (f: NavyFleet): number => f.ships.reduce((t, s) => t + shipStrength(s), 0);
+/** Men a fleet can carry: each horse takes the room of 4 (NAVY-096). */
+export const fleetRoom = (f: NavyFleet): number => f.ships.reduce((t, s) => t + carriesOf(s.type) * (s.hull < WRECKED ? 1 : 0), 0);
+export const armyRoom = (world: World, slot: number): number => world.armies.men[slot]! + world.armies.horse[slot]! * (C.room.horse - 1);
+export const fleetById = (world: World, id: number): NavyFleet | undefined => world.navy.fleets.find((f) => f.id === id);
+
+/** A fleet of nothing but exploration ships: the only fleets that sail into uncharted zones (INV-EXPL-3). */
+export const allExplorers = (f: Pick<NavyFleet, "ships">): boolean => f.ships.length > 0 && f.ships.every((s) => nv.shipRow(s.type).family === "exploration");
+
+/** Warships or a fleet carrying an army need an admiral to leave port; trade ships sail without (NAVY-065, NAVY-066). */
+export const needsAdmiral = (f: NavyFleet): boolean => f.army >= 0 || f.ships.some((s) => nv.isWarship(s.type));
+
+/** The fleet of realm n lying in port p without an admiral, which a new ship joins; exploration ships keep a fleet of their own, so they may explore (EXPL-069). */
+function portFleet(world: World, n: number, p: number, type: string): NavyFleet {
+  const v = world.navy;
+  const explorer = nv.shipRow(type).family === "exploration";
+  const f = v.fleets.find((x) => x.owner === n && x.at === p && x.admiral < 0 && x.army < 0 && !x.route.length && x.battle < 0 && allExplorers(x) === explorer);
+  if (f) return f;
+  return newFleet(world, n, p, anchorage(world, p));
+}
+
+/** A new fleet of realm n, with no ships yet, at province p on tile t. */
+export function newFleet(world: World, n: number, p: number, t: number): NavyFleet {
+  const v = world.navy;
+  const f: NavyFleet = { id: ++v.seq, owner: n, at: p, tile: t, path: [], pathAt: 0, legHours: 0, goal: -1, post: "admiral", blockading: false, route: [], progress: 0, admiral: -1, ships: [], army: -1, landAt: -1, landing: 0, battle: -1, fleeing: false };
+  v.fleets.push(f);
+  return f;
+}
+
+// ---------------------------------------------------------------- tiles at sea (NAVY-147..149)
+
+const anchorageCache = new WeakMap<World, Map<number, number>>();
+
+/** The water tile of zone z nearest tile t (or -1 when the zone has no tiles). */
+function nearestInZone(world: World, z: number, t: number): number {
+  const g = world.tiles;
+  const W = g.width;
+  if (g.bounds[z * 4 + 2]! < 0) return -1;
+  if (g.province[t]! - 1 === z && g.cell[t] === WATER) return t;
+  const tx = t % W;
+  const ty = (t - tx) / W;
+  let best = -1;
+  let bestD = Infinity;
+  for (let y = g.bounds[z * 4 + 1]!; y <= g.bounds[z * 4 + 3]!; y++) {
+    const wy = world.rowWidth[y] ?? 1;
+    for (let x = g.bounds[z * 4]!, i = y * W + x; x <= g.bounds[z * 4 + 2]!; x++, i++) {
+      if (g.province[i]! - 1 !== z || g.cell[i] !== WATER) continue;
+      const d = ((x - tx) * wy) ** 2 + (y - ty) ** 2;
+      if (d < bestD) ((bestD = d), (best = i));
+    }
+  }
+  return best;
+}
+
+/** Where ships lie off land province p: the water beside it nearest its centre, in a zone beside it (NAVY-147). */
+export function anchorage(world: World, p: number): number {
+  let m = anchorageCache.get(world);
+  if (!m) anchorageCache.set(world, (m = new Map()));
+  let t = m.get(p);
+  if (t !== undefined) return t;
+  const c = world.tiles.centre[p]!;
+  t = -1;
+  let bestD = Infinity;
+  for (let k = world.adjStart[p]!; k < world.adjStart[p + 1]!; k++) {
+    const z = world.adjList[k]!;
+    if (!world.provinceWater[z]) continue;
+    const u = c >= 0 ? nearestInZone(world, z, c) : world.tiles.centre[z]!;
+    if (u < 0) continue;
+    const d = c >= 0 ? tileDistance(world, u, c) : 0;
+    if (d < bestD) ((bestD = d), (t = u));
+  }
+  m.set(p, t);
+  return t;
+}
+
+/** The tile a fleet stands on where it is now, when it has none (a new fleet, a save from another map). */
+function placeTile(world: World, f: NavyFleet): number {
+  return world.provinceWater[f.at] ? world.tiles.centre[f.at]! : anchorage(world, f.at);
+}
+
+/** The sea zone of a tile, or -1 on land or water in no zone. */
+const zoneOf = (world: World, t: number): number => (t >= 0 && world.tiles.cell[t] === WATER ? world.tiles.province[t]! - 1 : -1);
+
+const legZones = new WeakMap<World, Uint8Array>();
+
+/** The leg to the next province of the fleet's route: the tiles over the water from where it is to that zone's spot, or the port's anchorage (NAVY-148). */
+function planLeg(world: World, f: NavyFleet): void {
+  const next = f.route[0]!;
+  const last = f.route.length === 1;
+  let end: number;
+  if (!world.provinceWater[next]) end = anchorage(world, next);
+  else if (last && f.goal >= 0 && zoneOf(world, f.goal) === next) end = f.goal;
+  else if (last && f.landAt >= 0) end = nearestInZone(world, next, world.tiles.centre[f.landAt]!);
+  else end = world.tiles.centre[next]!;
+  f.pathAt = 0;
+  const within = !!world.provinceWater[next] && zoneOf(world, f.tile) === next;
+  if (end < 0 || f.tile < 0 || end === f.tile || world.tiles.coarse) {
+    f.path = end >= 0 && end !== f.tile ? [end] : [];
+    f.legHours = legHours(world, f, next, within);
+    return;
+  }
+  let zones = legZones.get(world);
+  if (!zones) legZones.set(world, (zones = new Uint8Array(world.provinceCount)));
+  zones.fill(0);
+  const here = zoneOf(world, f.tile);
+  if (here >= 0) zones[here] = 1;
+  if (world.provinceWater[next]) zones[next] = 1;
+  else zones[zoneOf(world, end)] = 1;
+  const way = planSeaPath(world.tiles, world.rowWidth, f.tile, end, zones);
+  // Without a way over the two zones' water the fleet goes zone to zone.
+  f.path = way ? Array.from(way) : [end];
+  f.legHours = legHours(world, f, next, within);
+}
+
+/** The rules of who may sail where for a fleet (NAVY-091, NAVY-092): coasts, the ocean near them with the compass, any ocean with ocean navigation. */
+export interface SeaReach {
+  galley: boolean;
+  /** Only voyaging canoes: they cross open ocean from the start (EXPL-008). */
+  canoe: boolean;
+  near: boolean;
+  far: boolean;
+  monsoon: boolean;
+  frozen: boolean;
+}
+
+export function reachOf(world: World, f: Pick<NavyFleet, "owner" | "ships">): SeaReach {
+  const n = f.owner;
+  const types = f.ships.map((s) => s.type);
+  return {
+    galley: types.some((t) => nv.shipRow(t).galley || nv.shipRow(t).stepDays.ocean === null),
+    canoe: types.length > 0 && types.every((t) => t === "voyaging canoe"),
+    near: knows(world, n, C.seaInventions.compass),
+    far: knows(world, n, C.seaInventions.ocean),
+    monsoon: types.length > 0 && types.every((t) => C.monsoon.ships.includes(t)) && knows(world, n, C.monsoon.needs),
+    frozen: C.frozenSeas.months.includes(world.date.month),
+  };
+}
+
+export function mayEnterZone(world: World, r: SeaReach, q: number): boolean {
+  const v = world.navy;
+  if (!world.provinceWater[q]) return false;
+  if (r.frozen && v.frozen[q]) return false;
+  if (!v.ocean[q]) return true;
+  if (r.galley) return false;
+  return r.canoe || r.far || (r.near && v.coastDist[q]! <= C.oceanReachWithS1) || (r.monsoon && !!v.monsoon[q]);
+}
+
+/** Who may put into port p: its own realm and partners take food, realms at peace pay gold, enemies none (NAVY-081). */
+export function dockRight(world: World, n: number, p: number): "food" | "gold" | null {
+  if (!isPort(world, p)) return null;
+  const holder = controller(world, p);
+  if (holder < 0) return null;
+  if (holder === n) return "food";
+  const tie = relationState(world, n, holder).state;
+  if (tie === "war") return null;
+  return tie === "alliance" || tie === "subject" || tie === "overlord" ? "food" : "gold";
+}
+
+/** Days the fleet takes to cross zone q: its slowest ship's, longer for a leaking hull or short crew, shorter by its admiral's Cunning (NAVY-062, NAVY-063, NAVY-070, INV-NAVY-7). */
+export function zoneDays(world: World, f: NavyFleet, q: number): number {
+  const water = world.navy.ocean[q] ? "ocean" : "sea";
+  let days = 0;
+  for (const s of f.ships) {
+    const base = nv.shipRow(s.type).stepDays[water] ?? Infinity;
+    days = Math.max(days, (base * (s.hull >= LEAKING ? C.leakingDaysMultiplier : 1)) / Math.max(C.minCrewToSail, crewShare(s)));
+  }
+  const cunning = f.admiral >= 0 ? world.commanders[f.admiral]!.cunning : 0;
+  return days * Math.max(0.5, 1 - C.admiral.cunningDays * cunning);
+}
+
+/**
+ * The quickest voyage from where the fleet is to any province `goal` accepts,
+ * over the zones it may enter (a port only as the last step). Dijkstra on days.
+ */
+export function planVoyage(world: World, f: NavyFleet, goal: (p: number) => boolean, opts: { knownWaters?: boolean } = {}): { path: number[]; days: number } | null {
+  const r = reachOf(world, f);
+  // Only exploration ships sail into the parchment; other fleets keep to charted zones (EXPL-016), except hired crews coming in by waters they know (F-115).
+  const blind = !opts.knownWaters && !allExplorers(f);
+  const dist = new Map<number, number>([[f.at, 0]]);
+  const prev = new Map<number, number>();
+  const done = new Set<number>();
+  // A binary heap of [days, province].
+  const heap: [number, number][] = [];
+  const push = (c: number, p: number) => {
+    heap.push([c, p]);
+    for (let i = heap.length - 1; i > 0; ) {
+      const up = (i - 1) >> 1;
+      if (heap[up]![0] <= c) break;
+      [heap[up], heap[i]] = [heap[i]!, heap[up]!];
+      i = up;
+    }
+  };
+  const pop = (): [number, number] => {
+    const top = heap[0]!;
+    const last = heap.pop()!;
+    if (heap.length) {
+      heap[0] = last;
+      for (let i = 0; ; ) {
+        const l = 2 * i + 1;
+        if (l >= heap.length) break;
+        const m = l + 1 < heap.length && heap[l + 1]![0] < heap[l]![0] ? l + 1 : l;
+        if (heap[m]![0] >= heap[i]![0]) break;
+        [heap[m], heap[i]] = [heap[i]!, heap[m]!];
+        i = m;
+      }
+    }
+    return top;
+  };
+  push(0, f.at);
+  while (heap.length) {
+    const [d, p] = pop();
+    if (done.has(p)) continue;
+    done.add(p);
+    if (p !== f.at && goal(p)) {
+      const path: number[] = [];
+      for (let x = p; x !== f.at; x = prev.get(x)!) path.push(x);
+      return { path: path.reverse(), days: d };
+    }
+    // Ports are ends of a voyage, never passed through.
+    if (p !== f.at && !world.provinceWater[p]) continue;
+    for (let k = world.adjStart[p]!; k < world.adjStart[p + 1]!; k++) {
+      const q = world.adjList[k]!;
+      if (done.has(q) || (blind && !isCharted(world, f.owner, q))) continue;
+      let cost: number;
+      if (world.provinceWater[q]) {
+        if (!mayEnterZone(world, r, q)) continue;
+        cost = zoneDays(world, f, q);
+      } else {
+        if (!goal(q)) continue;
+        cost = G.dockDays;
+      }
+      const c = d + cost;
+      if (c < (dist.get(q) ?? Infinity)) {
+        dist.set(q, c);
+        prev.set(q, p);
+        push(c, q);
+      }
+    }
+  }
+  return null;
+}
+
+/** Days left on a fleet's voyage. */
+export function voyageDays(world: World, f: NavyFleet): number {
+  let d = 0;
+  for (const q of f.route) d += world.provinceWater[q] ? zoneDays(world, f, q) : G.dockDays;
+  return Math.max(0, d - f.progress / 24) + (f.landing > 0 ? f.landing / 24 : 0);
+}
+
+// ---------------------------------------------------------------- orders
+
+export type NavyOrder =
+  /** Muster sailors in a port of the realm's, joining its muster queue a batch at a time (NAVY-024, D-NAVY-33). */
+  | { type: "navy"; do: "muster"; province: number; sailors: number }
+  /** Take the last batch off a port's muster queue: the bounty and the men come back. */
+  | { type: "navy"; do: "unmuster"; province: number }
+  /** Order a ship in a port: paid now, it joins the port's queue and is laid down when a slipway and its crew are there (NAVY-042, D-NAVY-33). */
+  | { type: "navy"; do: "buy"; province: number; ship: string }
+  /** Take the last ship waiting in a port's queue off it, for its gold back. */
+  | { type: "navy"; do: "unorder"; province: number }
+  /** Sail to a sea zone, a port to put into, or a shore to land the army aboard on; in battle, sail away from it. */
+  /** Sail to a sea zone (to the tapped spot of it when `tile` is given), a port to put into, or a shore to land the army aboard on; in battle, sail away from it. */
+  | { type: "navy"; do: "sail"; fleet: number; to: number; tile?: number }
+  /** Take an army standing in the fleet's port aboard; put it ashore in the port the fleet lies in. */
+  | { type: "navy"; do: "board"; fleet: number; army: number }
+  | { type: "navy"; do: "unload"; fleet: number }
+  /** Put a commander at the head of the fleet (-1 sends him back to court), in the post given or the one that fits the fleet. */
+  | { type: "navy"; do: "admiral"; fleet: number; commander: number; post?: nv.Post }
+  /** Change the post the fleet's leader holds: admiral, commodore or viceroy (NAVY-153). */
+  | { type: "navy"; do: "post"; fleet: number; post: nv.Post }
+  /** Join another fleet in the same place; part one ship off as a fleet of its own. */
+  | { type: "navy"; do: "merge"; fleet: number; into: number }
+  | { type: "navy"; do: "split"; fleet: number; ship: number }
+  /** Break the fleet up in port: its crews go back to the sailors waiting there. */
+  | { type: "navy"; do: "disband"; fleet: number };
+
+export function navyOrder(world: World, o: NavyOrder, n: number, news: News[]): string | null {
+  switch (o.do) {
+    case "muster":
+      return muster(world, n, o.province, o.sailors);
+    case "unmuster":
+      return cancelMuster(world, n, o.province);
+    case "buy":
+      return buyShip(world, n, o.province, o.ship, news);
+    case "unorder":
+      return cancelShip(world, n, o.province);
+    case "sail":
+      return sailFleet(world, n, o.fleet, o.to, o.tile);
+    case "board":
+      return board(world, n, o.fleet, o.army);
+    case "unload": {
+      const f = fleetById(world, o.fleet);
+      if (!f || f.owner !== n) return "no such fleet of yours";
+      if (f.army < 0) return "no army aboard";
+      if (world.provinceWater[f.at]) return "the fleet is at sea: send it to a shore to land the army";
+      return land(world, f, f.at) ? null : "the army may not go ashore here";
+    }
+    case "admiral":
+      return setAdmiral(world, n, o.fleet, o.commander, o.post);
+    case "post": {
+      const f = fleetById(world, o.fleet);
+      if (!f || f.owner !== n) return "no such fleet of yours";
+      if (!nv.isPost(o.post)) return "no such post";
+      if (f.admiral < 0) return "the fleet has no leader to hold a post";
+      f.post = o.post;
+      return null;
+    }
+    case "merge":
+      return merge(world, n, o.fleet, o.into);
+    case "split":
+      return split(world, n, o.fleet, o.ship);
+    case "disband":
+      return disband(world, n, o.fleet);
+  }
+}
+
+/**
+ * Musters sailors in a port with a shipyard (NAVY-024, D-NAVY-33): the bounty
+ * now, and the men join the port's muster queue in batches of musterBatch,
+ * each ready muster.days after the batch before it.
+ */
+export function muster(world: World, n: number, p: number, count: number): string | null {
+  if (p < 0 || p >= world.provinceCount || world.provinceOwner[p] !== n) return "not your province";
+  if (!isPort(world, p)) return "sailors are mustered only in a port: build a harbour first";
+  if (!shipyardOf(world, p)) return "sailors are mustered only at a shipyard: build one here first";
+  if (world.provinceOccupier[p]! >= 0) return "the enemy holds the port";
+  count = Math.floor(count);
+  if (count < 1) return "muster at least one sailor";
+  const v = world.navy;
+  const batches = nv.musterBatches(count, v.musters.filter((m) => m.province === p), world.day);
+  if (!batches) return `the muster queue is full: at most ${Q.musterQueueMax} batches wait here`;
+  if (count > callable(world, p)) return "not that many men here can go to sea";
+  const gold = musterGold(count);
+  if (world.nationTreasury[n]! < gold) return "not enough gold for the bounty";
+  world.nationTreasury[n] = world.nationTreasury[n]! - gold;
+  world.provinceRecruits[p] = Math.max(0, world.provinceRecruits[p]! - count);
+  v.away[p] = v.away[p]! + count;
+  for (const b of batches) v.musters.push({ province: p, owner: n, ...b });
+  return null;
+}
+
+/** Takes the last batch off a port's muster queue: its bounty comes back and its men go back to the levy pool. */
+export function cancelMuster(world: World, n: number, p: number): string | null {
+  const v = world.navy;
+  let i = -1;
+  v.musters.forEach((m, k) => {
+    if (m.province === p && m.owner === n && (i < 0 || m.day >= v.musters[i]!.day)) i = k;
+  });
+  if (i < 0) return "no sailors are being mustered here";
+  const m = v.musters.splice(i, 1)[0]!;
+  world.nationTreasury[n] = world.nationTreasury[n]! + musterGold(m.sailors);
+  world.provinceRecruits[p] = world.provinceRecruits[p]! + m.sailors;
+  v.away[p] = Math.max(0, v.away[p]! - m.sailors);
+  return null;
+}
+
+/** Orders a ship in a port (NAVY-042, D-NAVY-33): its gold now, then it waits in the port's queue for a slipway and its crew. */
+export function buyShip(world: World, n: number, p: number, type: string, news: News[] = []): string | null {
+  if (p < 0 || p >= world.provinceCount || world.provinceOwner[p] !== n) return "not your province";
+  if (!isPort(world, p)) return "ships are bought only in a port";
+  if (world.provinceOccupier[p]! >= 0) return "the enemy holds the port";
+  if (!(SHIP_TYPES as readonly string[]).includes(type)) return "no such ship";
+  const why = whyNotShip(world, n, p, type);
+  if (why) return why;
+  const gold = shipGold(type);
+  world.nationTreasury[n] = world.nationTreasury[n]! - gold;
+  world.navy.orders.push({ province: p, owner: n, type, gold });
+  const before = world.navy.hulls.length;
+  layDown(world, news, p);
+  if (n === world.player && world.navy.hulls.length === before) news.push({ kind: "built", text: `A ${type} is ordered at ${provinceName(world, p)}; it waits in the queue for a slipway and its crew.`, nations: [n], province: p });
+  return null;
+}
+
+/** Takes the last ship waiting in a port's queue off it, for its gold back; a hull on a slipway can't be. */
+export function cancelShip(world: World, n: number, p: number): string | null {
+  const v = world.navy;
+  let i = -1;
+  v.orders.forEach((o, k) => {
+    if (o.province === p && o.owner === n) i = k;
+  });
+  if (i < 0) return "no ship waits in the queue here";
+  const o = v.orders.splice(i, 1)[0]!;
+  world.nationTreasury[n] = world.nationTreasury[n]! + o.gold;
+  return null;
+}
+
+function sailFleet(world: World, n: number, id: number, to: number, tile?: number): string | null {
+  const f = fleetById(world, id);
+  if (!f || f.owner !== n) return "no such fleet of yours";
+  if (to < 0 || to >= world.provinceCount) return "no such place";
+  if (f.landing > 0) return "the army is going ashore";
+  if (needsAdmiral(f) && f.admiral < 0) return "warships and troop ships need a leader to sail: give the fleet an admiral, commodore or viceroy";
+  if (f.ships.some((s) => crewShare(s) < C.minCrewToSail)) return "a ship has less than a quarter of its crew";
+  const spot = tile !== undefined && world.provinceWater[to] && zoneOf(world, tile) === to ? tile : -1;
+  if (to === f.at && f.battle < 0 && (spot < 0 || spot === f.tile)) {
+    setCourse(f, []);
+    f.landAt = -1;
+    return null;
+  }
+  let plan: { path: number[]; days: number } | null;
+  let landAt = -1;
+  if (world.provinceWater[to]) plan = to === f.at ? { path: [to], days: 0 } : planVoyage(world, f, (p) => p === to);
+  // With an army aboard, a port that isn't a friend's is a shore to land on.
+  else if (dockRight(world, n, to) === "food" || (dockRight(world, n, to) && f.army < 0)) plan = planVoyage(world, f, (p) => p === to);
+  else if (f.army >= 0) {
+    if (!world.rules.provinces[to]!.coastal) return "the army can only be landed on a coast";
+    if (!mayMarchInto(world, n, to)) return "you have no right to land there: you need war or passage";
+    const shore = new Set<number>();
+    for (let k = world.adjStart[to]!; k < world.adjStart[to + 1]!; k++) if (world.provinceWater[world.adjList[k]!]) shore.add(world.adjList[k]!);
+    plan = shore.has(f.at) ? { path: [], days: 0 } : planVoyage(world, f, (p) => shore.has(p));
+    landAt = to;
+  } else return isPort(world, to) ? "you may not put into that port: it is an enemy's" : "no port of yours or a friend's there: tap a port or the sea";
+  if (!plan) return "no way there by sea for these ships (their research, galleys or ice)";
+  if (f.battle >= 0) leaveBattle(world, f);
+  setCourse(f, plan.path);
+  f.landAt = landAt;
+  f.goal = spot;
+  f.fleeing = false;
+  return null;
+}
+
+/** A new course over the zones: the leg under way is dropped and planned again from where the fleet stands. */
+export function setCourse(f: NavyFleet, route: number[]): void {
+  f.route = route;
+  f.path = [];
+  f.pathAt = 0;
+  f.legHours = 0;
+  f.progress = 0;
+  f.goal = -1;
+}
+
+function board(world: World, n: number, id: number, slot: number): string | null {
+  const f = fleetById(world, id);
+  const a = world.armies;
+  if (!f || f.owner !== n) return "no such fleet of yours";
+  if (slot < 0 || slot >= a.count || !a.alive[slot] || a.owner[slot] !== n) return "no such army of yours";
+  if (world.provinceWater[f.at] || a.location[slot] !== f.at) return "the army must stand in the port the fleet lies in";
+  if (f.army >= 0) return "the fleet already carries an army";
+  if (a.battle[slot]! >= 0 || a.retreating[slot]) return "the army can't board now";
+  if (armyRoom(world, slot) > fleetRoom(f)) return `not enough room: the ships carry ${fleetRoom(f).toLocaleString("en-US")} men, the army needs ${Math.round(armyRoom(world, slot)).toLocaleString("en-US")} (a horse takes the room of ${C.room.horse})`;
+  halt(world, slot);
+  f.army = slot;
+  a.retreating[slot] = 1;
+  return null;
+}
+
+/** The army aboard goes ashore in province p, where its fleet lies or beside it. */
+function land(world: World, f: NavyFleet, p: number): boolean {
+  const a = world.armies;
+  const slot = f.army;
+  if (slot < 0 || !a.alive[slot]) {
+    f.army = -1;
+    return false;
+  }
+  if (!mayMarchInto(world, f.owner, p)) return false;
+  a.location[slot] = p;
+  a.tile[slot] = world.tiles.centre[p]!;
+  a.retreating[slot] = 0;
+  a.cameFrom[slot] = -1;
+  halt(world, slot);
+  f.army = -1;
+  f.landAt = -1;
+  f.landing = 0;
+  return true;
+}
+
+function setAdmiral(world: World, n: number, id: number, c: number, post?: nv.Post): string | null {
+  const f = fleetById(world, id);
+  if (!f || f.owner !== n) return "no such fleet of yours";
+  if (f.hire) return "a hired fleet keeps its own captain";
+  if (c < 0) {
+    if (world.provinceWater[f.at] && needsAdmiral(f)) return "a fleet at sea keeps its admiral until it is in port";
+    f.admiral = -1;
+    return null;
+  }
+  if (c >= world.commanderIds.length || world.commanderOwner[c] !== n) return "no such commander of yours";
+  if (post !== undefined && !nv.isPost(post)) return "no such post";
+  if (armyOf(world, c) >= 0) return "that commander leads an army";
+  if (world.navy.fleets.some((x) => x.admiral === c && x !== f)) return "that commander already leads a fleet";
+  // A new leader takes the post that fits the fleet unless one is named; the same leader keeps his unless told (NAVY-153).
+  if (post !== undefined) f.post = post;
+  else if (f.admiral !== c) f.post = nv.fittingPost(f.ships.map((s) => s.type));
+  f.admiral = c;
+  return null;
+}
+
+function merge(world: World, n: number, id: number, into: number): string | null {
+  const f = fleetById(world, id);
+  const g = fleetById(world, into);
+  if (!f || !g || f === g || f.owner !== n || g.owner !== n) return "no such fleet of yours";
+  if (f.hire || g.hire) return "a hired fleet sails on its own, under its own captain";
+  if (f.at !== g.at || f.battle >= 0 || g.battle >= 0 || f.landing > 0 || g.landing > 0) return "the fleets must lie in the same place, out of battle";
+  if (f.army >= 0 && g.army >= 0) return "both fleets carry an army";
+  g.ships.push(...f.ships);
+  if (g.army < 0) g.army = f.army;
+  if (g.admiral < 0) g.admiral = f.admiral;
+  world.navy.fleets.splice(world.navy.fleets.indexOf(f), 1);
+  return null;
+}
+
+function split(world: World, n: number, id: number, shipId: number): string | null {
+  const f = fleetById(world, id);
+  if (!f || f.owner !== n) return "no such fleet of yours";
+  const k = f.ships.findIndex((s) => s.id === shipId);
+  if (k < 0) return "no such ship in the fleet";
+  if (f.hire) return "a hired fleet keeps its ships together";
+  if (f.ships.length < 2) return "the fleet has only that ship";
+  if (f.battle >= 0) return "the fleet is fighting";
+  if (f.army >= 0 && armyRoom(world, f.army) > fleetRoom({ ...f, ships: f.ships.filter((_, i) => i !== k) })) return "the army aboard needs that ship's room";
+  const [ship] = f.ships.splice(k, 1);
+  newFleet(world, n, f.at, f.tile).ships.push(ship!);
+  return null;
+}
+
+function disband(world: World, n: number, id: number): string | null {
+  const f = fleetById(world, id);
+  if (!f || f.owner !== n) return "no such fleet of yours";
+  if (f.hire) return "a hired fleet is dismissed, not laid up";
+  if (world.provinceWater[f.at]) return "a fleet is broken up only in port";
+  if (f.army >= 0 && !land(world, f, f.at)) return "the army aboard may not go ashore here";
+  const v = world.navy;
+  const own = world.provinceOwner[f.at] === n;
+  for (const s of f.ships) payOff(world, s, own ? f.at : -1);
+  v.fleets.splice(v.fleets.indexOf(f), 1);
+  return null;
+}
+
+/** A crew leaves its ship: into the sailors waiting in port p, or home (p = -1). */
+function payOff(world: World, s: NavyShip, p: number): void {
+  const v = world.navy;
+  if (s.home >= 0) v.away[s.home] = Math.max(0, v.away[s.home]! - s.crew);
+  if (p >= 0) {
+    v.sailors[p] = v.sailors[p]! + s.crew;
+    v.away[p] = v.away[p]! + s.crew;
+  }
+}
+
+// ---------------------------------------------------------------- each step
+
+/** A step of the clock (4 hours): musters come in, fleets sail and land, and sea battles fight a round (X-1, X-2: fleets after armies). */
+export function stepNavy(world: World, hours: number, news: News[]): void {
+  const v = world.navy;
+  if (world.step === 0 && v.musters.length) {
+    v.musters = v.musters.filter((m) => {
+      if (m.day > world.day) return true;
+      if (world.provinceOwner[m.province] === m.owner) v.sailors[m.province] = v.sailors[m.province]! + m.sailors;
+      else v.away[m.province] = Math.max(0, v.away[m.province]! - m.sailors);
+      return false;
+    });
+  }
+  // Ships waiting in a queue are laid down as their crews come in (D-NAVY-33).
+  if (world.step === 0) layDown(world, news);
+  if (!v.fleets.length) {
+    if (v.blockade.some((x) => x !== 0)) refreshBlockades(world, news);
+    return;
+  }
+  const a = world.armies;
+  for (const f of v.fleets) {
+    if (f.tile < 0) f.tile = placeTile(world, f);
+    // An admiral given an army by the AI's levy leaves the fleet.
+    if (f.admiral >= 0 && world.step === 0 && armyOf(world, f.admiral) >= 0) f.admiral = -1;
+    if (f.battle < 0) sailStep(world, f, hours);
+    if (f.army >= 0) {
+      if (!a.alive[f.army] || a.owner[f.army] !== f.owner) f.army = -1;
+      else {
+        // The army aboard goes where its ships go, out of reach of battles on land.
+        a.location[f.army] = f.at;
+        a.retreating[f.army] = 1;
+      }
+    }
+  }
+  seaBattles(world, news);
+  refreshBlockades(world, news);
+}
+
+// ---------------------------------------------------------------- blockades (NAVY-155..160)
+
+/** Whether fleet f blockades now: at war, a warship and a leader aboard, lying still at sea (NAVY-155). */
+export function blockades(world: World, f: NavyFleet): boolean {
+  return nv.blockades({
+    atWar: inWar(world, f.owner),
+    atSea: !!world.provinceWater[f.at],
+    types: f.ships.map((s) => s.type),
+    hasLeader: f.admiral >= 0,
+    sailing: f.route.length > 0,
+    inBattle: f.battle >= 0,
+    fleeing: f.fleeing,
+    landing: f.landing > 0,
+  });
+}
+
+/** Whether realm n is in any war. */
+function inWar(world: World, n: number): boolean {
+  const id = world.nationIds[n]!;
+  return world.diplomacy.wars.some((w) => w.attackers.includes(id) || w.defenders.includes(id));
+}
+
+/** The coastal provinces beside zone z that realms at war with n hold: the ports a blockade there closes (NAVY-156). */
+export function closedBy(world: World, n: number, z: number): number[] {
+  const out: number[] = [];
+  for (let k = world.adjStart[z]!; k < world.adjStart[z + 1]!; k++) {
+    const p = world.adjList[k]!;
+    if (world.provinceWater[p] || !world.rules.provinces[p]!.coastal) continue;
+    const holder = controller(world, p);
+    if (holder >= 0 && holder !== n && atWar(world, n, holder)) out.push(p);
+  }
+  return out;
+}
+
+/**
+ * Works out where blockades stand (each step): the zones held and the ports
+ * closed, the commodores escorting their trade ships and the ports they
+ * guard; the player hears when a blockade of theirs begins, and when the
+ * enemy closes one of their ports (NAVY-154..160).
+ */
+export function refreshBlockades(world: World, news: News[]): void {
+  const v = world.navy;
+  const before = v.blockade.slice();
+  v.blockade.fill(0);
+  v.blockadeFleet.fill(0);
+  v.guarded.fill(0);
+  v.escorts.clear();
+  for (const f of v.fleets) {
+    const still = !!world.provinceWater[f.at] && !f.route.length && f.battle < 0 && !f.fleeing && f.ships.length > 0;
+    if (still && f.admiral >= 0 && f.post === "commodore") {
+      const list = v.escorts.get(f.at);
+      if (list) list.push(f.owner);
+      else v.escorts.set(f.at, [f.owner]);
+      for (let k = world.adjStart[f.at]!; k < world.adjStart[f.at + 1]!; k++) {
+        const p = world.adjList[k]!;
+        if (!world.provinceWater[p] && world.provinceOwner[p] === f.owner) v.guarded[p] = 1;
+      }
+    }
+    const was = f.blockading;
+    f.blockading = blockades(world, f);
+    if (!f.blockading) continue;
+    const ports = closedBy(world, f.owner, f.at);
+    if (!ports.length) {
+      f.blockading = false;
+      continue;
+    }
+    if (!v.blockade[f.at]) ((v.blockade[f.at] = f.owner + 1), (v.blockadeFleet[f.at] = f.id));
+    for (const p of ports) if (!v.blockade[p]) ((v.blockade[p] = f.owner + 1), (v.blockadeFleet[p] = f.id));
+    if (!was && f.owner === world.player) {
+      const whose = nationName(world, controller(world, ports[0]!));
+      news.push({ kind: "war", text: `Your fleet lies off the coast in the ${zoneName(world, f.at)} and closes ${ports.length === 1 ? `the port of ${provinceName(world, ports[0]!)}` : `${ports.length} ports of ${whose}`}: their trade ships can't pass, and prizes come to you.`, nations: [f.owner], province: f.at });
+    }
+  }
+  if (world.player < 0) return;
+  // The player's ports newly closed, one line for each realm closing them.
+  const closed = new Map<number, number[]>();
+  for (let p = 0; p < world.provinceCount; p++) {
+    if (!v.blockade[p] || before[p] === v.blockade[p] || world.provinceWater[p] || world.provinceOwner[p] !== world.player) continue;
+    const list = closed.get(v.blockade[p]! - 1);
+    if (list) list.push(p);
+    else closed.set(v.blockade[p]! - 1, [p]);
+  }
+  for (const [by, ports] of closed) {
+    const names = ports.map((p) => provinceName(world, p));
+    const list = names.length === 1 ? names[0]! : `${names.slice(0, -1).join(", ")} and ${names.at(-1)}`;
+    news.push({ kind: "war", text: `${nationName(world, by)}'s ships blockade ${list}: no trade gains there until they are driven off.`, nations: [world.player, by], province: ports[0]! });
+  }
+}
+
+/** Whether a trade ship of realm n may pass zone z: not while an enemy blockades it, unless a commodore of n's lies there (NAVY-157). */
+export function tradeShipMayPass(world: World, n: number, z: number): boolean {
+  const b = world.navy.blockade[z]!;
+  if (!b || !world.provinceWater[z] || !atWar(world, n, b - 1)) return true;
+  return nv.tradeShipPasses(true, world.navy.escorts.get(z)?.includes(n) ?? false);
+}
+
+/** Per-realm prize arrays, sized to the realms. */
+function prizeArrays(world: World): NavyState {
+  const v = world.navy;
+  if (v.prize.length !== world.nationCount) v.prize = new Float64Array(world.nationCount);
+  if (v.seized.length !== world.nationCount) v.seized = new Float64Array(world.nationCount);
+  return v;
+}
+
+/** The month's prize money: each closed port pays its blockading realm a share of its sea trade, with the purses seized this month (NAVY-157, NAVY-158). */
+function blockadePrizes(world: World): void {
+  const v = prizeArrays(world);
+  v.prize.set(v.seized);
+  v.seized.fill(0);
+  for (let p = 0; p < world.provinceCount; p++) {
+    const b = v.blockade[p]!;
+    if (!b || world.provinceWater[p]) continue;
+    const f = fleetById(world, v.blockadeFleet[p]!);
+    const gold = nv.blockadePrize(tradeValueAt(world, p, true), world.provinceTradeRatio[p]!, f?.post ?? "admiral");
+    v.prize[b - 1] = v.prize[b - 1]! + gold;
+    world.nationTreasury[b - 1] = world.nationTreasury[b - 1]! + gold;
+  }
+}
+
+
+function sailStep(world: World, f: NavyFleet, hours: number): void {
+  if (f.landing > 0) {
+    f.landing -= hours;
+    if (f.landing <= 0 && !land(world, f, f.landAt)) {
+      f.landing = 0;
+      f.landAt = -1;
+    }
+    return;
+  }
+  if (!f.route.length) {
+    f.progress = 0;
+    return;
+  }
+  f.progress += hours;
+  const r = reachOf(world, f);
+  while (f.route.length) {
+    const next = f.route[0]!;
+    const water = !!world.provinceWater[next];
+    if (water ? !mayEnterZone(world, r, next) : !dockRight(world, f.owner, next)) {
+      setCourse(f, []);
+      break;
+    }
+    if (f.legHours <= 0) planLeg(world, f);
+    const need = f.legHours;
+    // The ship moves along the leg's tiles as its hours pass (NAVY-148); the zone it is in is its tile's.
+    const along = Math.min(f.path.length, Math.floor((f.path.length * Math.min(f.progress, need)) / need));
+    while (f.pathAt < along) {
+      f.tile = f.path[f.pathAt++]!;
+      const z = zoneOf(world, f.tile);
+      if (z >= 0 && z !== f.at) {
+        f.at = z;
+        useSupply(f);
+      }
+    }
+    if (f.progress < need) break;
+    f.progress -= need;
+    f.route.shift();
+    f.path = [];
+    f.pathAt = 0;
+    f.legHours = 0;
+    if (water) {
+      if (f.at !== next) {
+        f.at = next;
+        useSupply(f);
+      }
+    } else {
+      f.at = next;
+      dock(world, f);
+      f.route = [];
+    }
+  }
+  if (f.route.length) return;
+  f.progress = 0;
+  f.fleeing = false;
+  f.goal = -1;
+  if (f.landAt >= 0 && f.army >= 0) f.landing = Math.max(1, (world.armies.men[f.army]! / G.menLandedPerDay) * 24);
+}
+
+/** Hours the leg into `next` takes: the zone's days as ever, a port's docking time, or, for a move within the zone it is in, its share of the zone's breadth. */
+function legHours(world: World, f: NavyFleet, next: number, within: boolean): number {
+  if (!world.provinceWater[next]) return G.dockDays * 24;
+  const hours = zoneDays(world, f, next) * 24;
+  if (!within || world.tiles.coarse) return hours;
+  const b = world.tiles.bounds;
+  const span = Math.max(1, b[next * 4 + 2]! - b[next * 4]!, b[next * 4 + 3]! - b[next * 4 + 1]!);
+  return Math.max(1, hours * Math.min(1, f.path.length / span));
+}
+
+/** A zone sailed uses a zone of supply; ships without any lose a tenth of their crew (NAVY-085, NAVY-088). */
+function useSupply(f: NavyFleet): void {
+  for (const s of f.ships) {
+    if (s.supply > 0) s.supply--;
+    else s.crew = Math.floor(s.crew * (1 - C.outOfSupply.crewLossPerZone));
+  }
+}
+
+/** Putting into port: every ship takes on full supply, the port's food in a friendly port, gold in a neutral one; an army aboard goes ashore (NAVY-082, NAVY-083). */
+function dock(world: World, f: NavyFleet): void {
+  resupply(world, f);
+  if (f.army >= 0) land(world, f, f.at);
+}
+
+/** Every ship of a fleet in port takes on full supply, paid in the port's food or in gold (NAVY-082, EXPL-018). */
+export function resupply(world: World, f: NavyFleet): void {
+  const p = f.at;
+  const pays = dockRight(world, f.owner, p);
+  let rations = 0;
+  let gold = 0;
+  for (const s of f.ships) {
+    const zones = nv.fullSupply(s.type) - s.supply;
+    if (zones <= 0) continue;
+    rations += zones * s.crew * C.resupplyFoodPerZone;
+    gold += zones * s.crew * C.resupplyGoldPerZone * G.wageScale;
+    s.supply = nv.fullSupply(s.type);
+  }
+  if (pays === "food") world.provinceStore[p] = world.provinceStore[p]! - rations / 1000;
+  else if (pays === "gold") {
+    const holder = controller(world, p);
+    world.nationTreasury[f.owner] = world.nationTreasury[f.owner]! - gold;
+    if (holder >= 0) world.nationTreasury[holder] = world.nationTreasury[holder]! + gold;
+  }
+}
+
+// ---------------------------------------------------------------- sea battles
+
+/** Tiles within which a fleet sights an enemy fleet in its zone: its leader's Cunning over a base, within bounds; anywhere in the zone on a grid with no shape (NAVY-150). */
+export function seaRange(world: World, f: NavyFleet): number {
+  if (world.tiles.coarse) return Infinity;
+  return nv.seaEngageTiles(f.admiral >= 0 ? world.commanders[f.admiral]!.cunning : null);
+}
+
+/**
+ * Fleets of realms at war meet only in the same sea zone, once one sights the
+ * other within its range (NAVY-150); a fleet within range of a sea battle in
+ * its zone joins the side of its friends (NAVY-151). Each running battle then
+ * fights a round (X-1, NAVY-098, NAVY-118).
+ */
+function seaBattles(world: World, news: News[]): void {
+  const v = world.navy;
+  if (!world.diplomacy.wars.length && !v.battles.length) return;
+  const byZone = new Map<number, NavyFleet[]>();
+  for (const f of v.fleets) {
+    if (!world.provinceWater[f.at] || f.fleeing || !f.ships.length) continue;
+    if (f.tile < 0) f.tile = placeTile(world, f);
+    const list = byZone.get(f.at);
+    if (list) list.push(f);
+    else byZone.set(f.at, [f]);
+  }
+  const near = (f: NavyFleet, t: number) => world.tiles.coarse || tileDistance(world, f.tile, t) <= seaRange(world, f);
+  const join = (b: SeaBattle, list: NavyFleet[]) => {
+    for (const f of list) {
+      if (f.battle >= 0 || !near(f, b.tile)) continue;
+      const side = b.sides.findIndex((ids) => ids.some((id) => atWar(world, f.owner, fleetById(world, id)!.owner)));
+      if (side < 0) continue;
+      const other = (1 - side) as 0 | 1;
+      b.sides[other].push(f.id);
+      b.start[other] += fleetStrength(f);
+      f.battle = b.id;
+    }
+  };
+  for (const [zone, list] of byZone) {
+    if (list.length < 2) continue;
+    for (const b of v.battles) if (b.zone === zone) join(b, list);
+    for (const f of list) {
+      if (f.battle >= 0 || f.landing > 0) continue;
+      let foe: NavyFleet | null = null;
+      let best = Infinity;
+      for (const g of list) {
+        if (g === f || g.battle >= 0 || !atWar(world, f.owner, g.owner)) continue;
+        const d = world.tiles.coarse ? 0 : tileDistance(world, f.tile, g.tile);
+        if (d <= seaRange(world, f) && d < best) ((best = d), (foe = g));
+      }
+      if (!foe) continue;
+      const b: SeaBattle = { id: ++v.seq, zone, tile: foe.tile, sides: [[f.id], [foe.id]], start: [fleetStrength(f), fleetStrength(foe)], lost: [0, 0], round: 0, leaders: [f.owner, foe.owner] };
+      f.battle = b.id;
+      foe.battle = b.id;
+      v.battles.push(b);
+      join(b, list);
+      const players = list.some((x) => x.battle === b.id && x.owner === world.player);
+      news.push({ kind: "battle", text: `A sea battle begins in the ${zoneName(world, zone)}: ${nationName(world, b.leaders[0])} against ${nationName(world, b.leaders[1])}.`, nations: [b.leaders[0], b.leaders[1]], province: zone, ...(players ? { begins: true as const } : {}) });
+    }
+  }
+  for (const b of [...v.battles]) fightSeaRound(world, b, news);
+}
+
+function sideFleets(world: World, b: SeaBattle, s: 0 | 1): NavyFleet[] {
+  return b.sides[s].map((id) => fleetById(world, id)).filter((f): f is NavyFleet => !!f && f.battle === b.id);
+}
+
+function fightSeaRound(world: World, b: SeaBattle, news: News[]): void {
+  const sides = [sideFleets(world, b, 0), sideFleets(world, b, 1)] as const;
+  const ocean = !!world.navy.ocean[b.zone];
+  const hits = [0, 1].map((s) =>
+    sides[s]!.reduce((t, f) => {
+      // An admiral's Might counts in full, a commodore's or viceroy's in part (NAVY-152).
+      const might = f.admiral >= 0 ? nv.battleMight(world.commanders[f.admiral]!.might, f.post) : 0;
+      // Galleys are half as strong on the open ocean; shooting ships ×1.5 in the first round of each day (warfare 11.2).
+      const own = f.ships.reduce((x, sh) => x + shipStrength(sh) * (ocean && nv.shipRow(sh.type).galley ? 0.5 : 1) * (world.step === 0 && nv.shipRow(sh.type).shoots ? 1.5 : 1), 0);
+      return t + own * (1 + C.admiral.mightHits * might);
+    }, 0) * G.roundHits * (1 + G.roundSpread * (world.rng.next() * 2 - 1)),
+  );
+  for (const s of [0, 1] as const) takeHits(world, b, sides[1 - s]!, hits[s]!, 1 - s);
+  b.round++;
+  const now = [0, 1].map((s) => sides[s]!.reduce((t, f) => t + fleetStrength(f), 0));
+  const broken = [0, 1].map((s) => now[s]! <= b.start[s]! * G.breakShare || now[s]! <= 0);
+  if (!broken[0] && !broken[1] && b.round < G.maxRounds) return;
+  // The side left weaker for its start is beaten and runs for port; the other holds the sea.
+  const loser: 0 | 1 = broken[0] && !broken[1] ? 0 : broken[1] && !broken[0] ? 1 : now[0]! / Math.max(1, b.start[0]!) < now[1]! / Math.max(1, b.start[1]!) ? 0 : 1;
+  endSeaBattle(world, b, loser, news);
+}
+
+/** Hits land on the line's first ships, the strongest, each taking hits up to its strength and then sinking (D-NAVY-6). */
+function takeHits(world: World, b: SeaBattle, fleets: readonly NavyFleet[], hits: number, side: number): void {
+  const line: [NavyFleet, NavyShip][] = [];
+  for (const f of fleets) for (const s of f.ships) line.push([f, s]);
+  line.sort((x, y) => fightsOf(y[1].type) - fightsOf(x[1].type) || x[1].id - y[1].id);
+  for (const [, s] of line) {
+    if (hits <= 0) break;
+    const room = Math.max(1, fightsOf(s.type)) - s.damage;
+    const h = Math.min(room, hits);
+    s.damage += h;
+    hits -= h;
+  }
+  for (const f of fleets) {
+    const room = fleetRoom(f);
+    const sunk = f.ships.filter((s) => s.damage >= Math.max(1, fightsOf(s.type)));
+    if (!sunk.length) continue;
+    f.ships = f.ships.filter((s) => !sunk.includes(s));
+    b.lost[side as 0 | 1] += sunk.length;
+    for (const s of sunk) if (s.home >= 0) world.navy.away[s.home] = Math.max(0, world.navy.away[s.home]! - s.crew);
+    // Soldiers aboard a lost ship drown or are taken (warfare 11.2).
+    if (f.army >= 0 && world.armies.alive[f.army]) {
+      const left = room > 0 ? fleetRoom(f) / room : 0;
+      const a = world.armies;
+      a.men[f.army] = Math.floor(a.men[f.army]! * left);
+      a.horse[f.army] = Math.floor(a.horse[f.army]! * left);
+      if (a.men[f.army]! < 1) {
+        a.alive[f.army] = 0;
+        f.army = -1;
+      }
+    }
+  }
+}
+
+function endSeaBattle(world: World, b: SeaBattle, loser: 0 | 1, news: News[]): void {
+  const v = world.navy;
+  const winner = (1 - loser) as 0 | 1;
+  for (const s of [0, 1] as const) {
+    for (const f of sideFleets(world, b, s)) {
+      f.battle = -1;
+      for (const sh of f.ships) {
+        if (sh.damage > 0) sh.hull = Math.min(WRECKED, sh.hull + C.battleHullStepsLost);
+        sh.damage = 0;
+      }
+      if (f.admiral >= 0) {
+        const c = world.commanders[f.admiral]!;
+        if (s === winner) c.victories++;
+        else c.defeats++;
+      }
+      if (s === loser && f.ships.length) runForPort(world, f);
+    }
+  }
+  v.battles.splice(v.battles.indexOf(b), 1);
+  for (const s of [0, 1] as const) noteMoment(world, b.leaders[s], "sea_battle_end", { player_won: s === winner }, b.zone);
+  dropEmpty(world);
+  const who = (s: 0 | 1) => nationName(world, b.leaders[s]);
+  news.push({
+    kind: "battle",
+    text: `The sea battle in the ${zoneName(world, b.zone)} is over: ${who(winner)} holds the sea. ${who(0)} lost ${b.lost[0]} ship${b.lost[0] === 1 ? "" : "s"}, ${who(1)} ${b.lost[1]}.`,
+    nations: [b.leaders[0], b.leaders[1]],
+    province: b.zone,
+  });
+}
+
+/** A fleet leaves the battle it is in (a retreat ordered at any step, X-1). */
+function leaveBattle(world: World, f: NavyFleet): void {
+  const b = world.navy.battles.find((x) => x.id === f.battle);
+  f.battle = -1;
+  f.fleeing = true;
+  for (const s of f.ships) {
+    if (s.damage > 0) s.hull = Math.min(WRECKED, s.hull + C.battleHullStepsLost);
+    s.damage = 0;
+  }
+  if (!b) return;
+  const side = b.sides[0].includes(f.id) ? 0 : 1;
+  if (!sideFleets(world, b, side).length) endSeaBattle(world, b, side, []);
+}
+
+/** A beaten fleet makes for the nearest port of its own or a friend's. */
+function runForPort(world: World, f: NavyFleet): void {
+  f.fleeing = true;
+  f.landAt = -1;
+  const plan = planVoyage(world, f, (p) => dockRight(world, f.owner, p) === "food");
+  setCourse(f, plan ? plan.path : []);
+}
+
+function dropEmpty(world: World): void {
+  const v = world.navy;
+  v.fleets = v.fleets.filter((f) => {
+    if (f.ships.length) return true;
+    if (f.army >= 0 && world.armies.alive[f.army]) world.armies.alive[f.army] = 0;
+    // A hired fleet's captain goes with its last ship (F-115).
+    if (f.hire && f.hire.captain >= 0) world.commanderOwner[f.hire.captain] = -1;
+    return false;
+  });
+}
+
+// ---------------------------------------------------------------- each month
+
+/** The month's naval steps (naval §9): hulls launched, sailors fed and drifting home, hulls wearing and refitting, ships ageing, and the AI's ships. */
+export function monthlyNavy(world: World, news: News[]): void {
+  const v = world.navy;
+  // Launch finished hulls into the port's fleet.
+  v.hulls = v.hulls.filter((h) => {
+    if (--h.monthsLeft > 0) return true;
+    if (world.provinceOwner[h.province] !== h.owner) return false;
+    portFleet(world, h.owner, h.province, h.type).ships.push(newShip(world, h.type, h.crew, h.province));
+    if (h.owner === world.player) news.push({ kind: "built", text: `A ${h.type} is launched at ${provinceName(world, h.province)}.`, nations: [h.owner], province: h.province });
+    return false;
+  });
+  // A slipway freed by a launch takes the next ship in the queue.
+  layDown(world, news);
+  // Sailors in port eat from the province store; after 6 months with no ship building for them, a tenth drift home (NAVY-029, NAVY-030).
+  for (let p = 0; p < world.provinceCount; p++) {
+    const s = v.sailors[p]!;
+    if (s <= 0) continue;
+    world.provinceStore[p] = world.provinceStore[p]! - (s * C.rationInPort) / 1000;
+    v.waited[p] = Math.min(255, v.waited[p]! + 1);
+    if (v.waited[p]! > C.driftHome.afterMonths && !v.hulls.some((h) => h.province === p) && !v.orders.some((o) => o.province === p)) {
+      const gone = Math.ceil(s * C.driftHome.share);
+      v.sailors[p] = s - gone;
+      v.away[p] = Math.max(0, v.away[p]! - gone);
+    }
+  }
+  const january = world.date.month === 1;
+  for (const f of v.fleets) {
+    const atSea = !!world.provinceWater[f.at];
+    // Refit in a berth at harbour 2, or at any shipyard; twice as fast with a shipyard (NAVY-061, NAVY-084).
+    const refit = !atSea && dockRight(world, f.owner, f.at) === "food" && nv.mayRefit({ harbourStep: harbourStep(world, f.at), shipyardStep: shipyardOf(world, f.at), inBerth: true });
+    for (const s of f.ships) {
+      if (!atSea) world.provinceStore[f.at] = world.provinceStore[f.at]! - (s.crew * C.rationInPort) / 1000;
+      if (refit && s.hull > 0 && s.hull < WRECKED) s.hull = Math.max(0, s.hull - (shipyardOf(world, f.at) > 0 ? 2 : 1));
+      // A hull wears a step every 6 months at sea and every 3 years in port (NAVY-060, NAVY-076).
+      s.wear++;
+      if (s.wear >= (atSea ? C.rotMonths["at sea"] : C.rotMonths["in port"])) {
+        s.wear = 0;
+        s.hull = Math.min(WRECKED, s.hull + 1);
+      }
+      if (january) s.age++;
+    }
+  }
+  blockadePrizes(world);
+  aiNavy(world, news);
+}
+
+/** Gold each realm pays its ships and sailors a month (NAVY-076, NAVY-029): upkeep, and wages at sea, in port and waiting. */
+export function navyCosts(world: World): Float64Array {
+  const v = world.navy;
+  const cost = new Float64Array(world.nationCount);
+  for (const f of v.fleets) {
+    // A hired fleet costs its contract instead, paid to the realm that lent it (F-115).
+    if (f.hire) {
+      cost[f.owner] = cost[f.owner]! + f.hire.pay;
+      if (f.hire.from >= 0) cost[f.hire.from] = cost[f.hire.from]! - f.hire.pay;
+      continue;
+    }
+    const wage = world.provinceWater[f.at] ? C.wageAtSea : C.wageInPort;
+    let t = 0;
+    for (const s of f.ships) t += nv.shipRow(s.type).upkeep * G.goldScale + s.crew * wage * G.wageScale;
+    cost[f.owner] = cost[f.owner]! + t;
+  }
+  for (const h of v.hulls) cost[h.owner] = cost[h.owner]! + h.crew * C.wageInPort * G.wageScale;
+  for (let p = 0; p < world.provinceCount; p++) {
+    const s = v.sailors[p]!;
+    const o = world.provinceOwner[p]!;
+    if (s > 0 && o >= 0) cost[o] = cost[o]! + s * C.wageInPort * G.wageScale;
+  }
+  return cost;
+}
+
+// ---------------------------------------------------------------- the AI
+
+/**
+ * The AI's ships, once a month: a realm with ports keeps a few ships (one for
+ * every two ports, at most four), mustering their crews first; a fleet with
+ * no admiral takes an idle commander; at war, a fleet hunts enemy fleets it
+ * outnumbers near by, and at peace a fleet at sea goes home (naval §11).
+ */
+function aiNavy(world: World, news: News[]): void {
+  const v = world.navy;
+  const ai = G.ai;
+  const ports: number[][] = Array.from({ length: world.nationCount }, () => []);
+  for (let p = 0; p < world.provinceCount; p++) {
+    const o = world.provinceOwner[p]!;
+    // Only a port with a shipyard musters and builds (D-NAVY-33); the AI's works build one where it has none.
+    if (o >= 0 && o !== world.player && world.provinceOccupier[p]! < 0 && isPort(world, p) && shipyardOf(world, p) > 0) ports[o]!.push(p);
+  }
+  const ships = new Int32Array(world.nationCount);
+  for (const f of v.fleets) ships[f.owner] = ships[f.owner]! + f.ships.length;
+  for (const h of v.hulls) ships[h.owner] = ships[h.owner]! + 1;
+  for (const o of v.orders) ships[o.owner] = ships[o.owner]! + 1;
+  for (let n = 0; n < world.nationCount; n++) {
+    const mine = ports[n]!;
+    if (!mine.length || world.nationGone[n] || ships[n]! >= Math.min(ai.maxShips, Math.ceil(mine.length / ai.portsPerShip))) continue;
+    // The port with the best yard, then the biggest harbour.
+    const port = mine.reduce((b, p) => (shipyardOf(world, p) * 4 + harbourStep(world, p) > shipyardOf(world, b) * 4 + harbourStep(world, b) ? p : b), mine[0]!);
+    const type = aiShip(world, n, port);
+    if (world.nationTreasury[n]! < ai.reserveGold + shipGold(type)) continue;
+    const crew = nv.shipRow(type).crew;
+    if (v.sailors[port]! >= crew) buyShip(world, n, port, type, news);
+    else if (!v.musters.some((m) => m.province === port)) {
+      const want = Math.min(Math.ceil(crew - v.sailors[port]!), Q.musterBatch * Q.musterQueueMax);
+      if (callable(world, port) >= want) muster(world, n, port, want);
+    }
+  }
+  const idle = new Map<number, number[]>();
+  for (const f of v.fleets) {
+    // Exploration ships are the exploration AI's (colonies.ts).
+    if (f.owner === world.player || f.battle >= 0 || !f.ships.length || allExplorers(f)) continue;
+    if (f.admiral < 0) {
+      if (!idle.has(f.owner)) idle.set(f.owner, idleCommanders(world, f.owner).filter((c) => !v.fleets.some((x) => x.admiral === c)));
+      const c = idle.get(f.owner)!.shift();
+      if (c !== undefined) {
+        f.admiral = c;
+        f.post = nv.fittingPost(f.ships.map((s) => s.type));
+      }
+    }
+    if (f.route.length || f.army >= 0) continue;
+    const enemy = world.diplomacy.wars.length && f.admiral >= 0 ? huntTarget(world, f) : null;
+    if (enemy) {
+      // Sail to where the enemy fleet was seen, so it comes within sight (NAVY-150).
+      const plan = enemy.at === f.at ? { path: [f.at] } : planVoyage(world, f, (p) => p === enemy.at);
+      if (plan) {
+        setCourse(f, plan.path);
+        f.goal = enemy.tile;
+      }
+      continue;
+    }
+    if (f.blockading) continue;
+    const off = world.diplomacy.wars.length && f.admiral >= 0 && f.ships.some((sh) => nv.isWarship(sh.type)) ? blockadeTarget(world, f) : -1;
+    if (off >= 0) {
+      const plan = off === f.at ? null : planVoyage(world, f, (p) => p === off);
+      if (plan) setCourse(f, plan.path);
+    } else if (world.provinceWater[f.at]) runForPort(world, f);
+  }
+}
+
+/** The ship an AI realm builds in its port: the strongest warship it can, else its sea's trade ship. */
+export function aiShip(world: World, n: number, p: number): string {
+  let best = localTradeShip(world, p);
+  for (const t of SHIP_TYPES) {
+    if (!nv.isWarship(t)) continue;
+    if (whyNotBuildable(world, n, p, t)) continue;
+    if (fightsOf(t) > fightsOf(best)) best = t;
+  }
+  return best;
+}
+
+/** An enemy fleet near by that this fleet outnumbers, or null. */
+function huntTarget(world: World, f: NavyFleet): NavyFleet | null {
+  const v = world.navy;
+  const mine = fleetStrength(f);
+  const foes = new Map<number, number>();
+  const seen1 = new Map<number, NavyFleet>();
+  for (const g of v.fleets) {
+    if (!world.provinceWater[g.at] || !atWar(world, f.owner, g.owner)) continue;
+    foes.set(g.at, (foes.get(g.at) ?? 0) + fleetStrength(g));
+    if (!seen1.has(g.at)) seen1.set(g.at, g);
+  }
+  if (!foes.size) return null;
+  const r = reachOf(world, f);
+  const seen = new Map<number, number>([[f.at, 0]]);
+  const queue = [f.at];
+  for (let i = 0; i < queue.length; i++) {
+    const p = queue[i]!;
+    const d = seen.get(p)!;
+    const foe = foes.get(p);
+    if (foe !== undefined && mine > foe * G.ai.huntEdge) return seen1.get(p)!;
+    if (d >= G.ai.huntZones) continue;
+    for (let k = world.adjStart[p]!; k < world.adjStart[p + 1]!; k++) {
+      const q = world.adjList[k]!;
+      if (seen.has(q) || !mayEnterZone(world, r, q)) continue;
+      seen.set(q, d + 1);
+      queue.push(q);
+    }
+  }
+  return null;
+}
+
+/** The nearest zone, within the hunting reach, beside an enemy's coast with the most ports to close; -1 = none (NAVY-155). */
+function blockadeTarget(world: World, f: NavyFleet): number {
+  const r = reachOf(world, f);
+  const start = world.provinceWater[f.at] ? f.at : zoneOf(world, f.tile);
+  if (start < 0) return -1;
+  const seen = new Map<number, number>([[start, 0]]);
+  const queue = [start];
+  let best = -1;
+  let bestPorts = 0;
+  for (let i = 0; i < queue.length; i++) {
+    const p = queue[i]!;
+    const d = seen.get(p)!;
+    const ports = closedBy(world, f.owner, p).filter((q) => isPort(world, q)).length;
+    if (ports > bestPorts) ((best = p), (bestPorts = ports));
+    if (best >= 0 && d >= seen.get(best)! + 1) break;
+    if (d >= G.ai.huntZones) continue;
+    for (let k = world.adjStart[p]!; k < world.adjStart[p + 1]!; k++) {
+      const q = world.adjList[k]!;
+      if (seen.has(q) || !mayEnterZone(world, r, q)) continue;
+      seen.set(q, d + 1);
+      queue.push(q);
+    }
+  }
+  return best;
+}
+
+// ---------------------------------------------------------------- what the player sees
+
+export interface FleetView {
+  id: number;
+  owner: number;
+  at: number;
+  /** Map tile it stands on (map pixel index, -1 unknown), and the tiles of the leg ahead of it (NAVY-149). */
+  tile: number;
+  path: number[];
+  route: number[];
+  /** Its leader's post (NAVY-152). */
+  post: nv.Post;
+  /** Tiles within which it sights an enemy fleet in its zone (0 = anywhere in the zone) (NAVY-150). */
+  sight: number;
+  /** Ports its blockade closes (NAVY-156). */
+  blockading: number[];
+  ships: number;
+  strength: number;
+  admiral: number;
+  /** Army aboard (its id), -1 = none, and its men. */
+  army: number;
+  men: number;
+  landAt: number;
+  battle: boolean;
+  fleeing: boolean;
+  days: number;
+  /** Nothing but exploration ships: it may explore (EXPL-069). */
+  explorers: boolean;
+  /** It needs an admiral to sail (warships or an army aboard). */
+  needsAdmiral: boolean;
+  /** A hired fleet's name, who offers it (-1 a free fleet) and its pay a month; null for the realm's own (F-115). */
+  hired: { name: string; group: string; from: number; pay: number; leaving: boolean } | null;
+}
+
+export interface NavyView {
+  /** Every fleet, for the map; the player's in full in `mine`. */
+  fleets: FleetView[];
+  mine: {
+    id: number;
+    room: number;
+    cost: number;
+    ships: { id: number; type: string; crew: number; crewNeed: number; hull: string; supply: number; supplyMax: number; fights: number; carries: number; age: number; stores: number; storesMax: number }[];
+  }[];
+  ports: {
+    province: number;
+    harbour: number;
+    shipyard: number;
+    berths: number;
+    berthsUsed: number;
+    slipways: number;
+    sailors: number;
+    callable: number;
+    mustering: number;
+    blockaded: boolean;
+    building: { type: string; monthsLeft: number; months: number }[];
+    /** Batches of sailors on their way, in the order they come in, and the days until each does. */
+    musterQueue: { sailors: number; days: number }[];
+    /** Ships ordered and waiting their turn, oldest first, and what each waits for. */
+    queue: { type: string; crew: number; gold: number; waiting: string }[];
+    /** Sailors the waiting ships still need beyond those ready in port and on their way. */
+    crewShort: number;
+    /** Ship types the port builds for the realm now, newest on each upgrade path only (D-NAVY-33); why not orderable now (gold, a full queue), or null. */
+    ships: { type: string; gold: number; crew: number; months: number; fights: number; carries: number; family: string; why: string | null }[];
+    /** The next types along the paths of those offered, not yet buildable here, and what they need. */
+    later: { type: string; why: string }[];
+  }[];
+  battles: { zone: number; tile: number; leaders: [number, number]; strength: [number, number]; start: [number, number]; lost: [number, number]; round: number; mine: boolean }[];
+  /** Gold the player's ships and sailors cost a month. */
+  cost: number;
+  musterGoldEach: number;
+  /** Sailors in a muster batch and the days each takes; the most batches and ships a port's queues hold (D-NAVY-33). */
+  queues: { musterBatch: number; musterDays: number; musterQueueMax: number; shipQueueMax: number };
+  /** Armies aboard a fleet (their ids), which stand off the map. */
+  aboard: number[];
+  /** Every blockade at sea: the zone held, its realm and fleet, the ports closed and their realm (NAVY-156). */
+  blockades: { zone: number; owner: number; fleet: number; ports: number[]; against: number; prize: number }[];
+  /** Prize money the player took last month (NAVY-158), and the posts a leader may hold. */
+  prize: number;
+  posts: { key: nv.Post; name: string; does: string }[];
+}
+
+export function navyView(world: World, n: number): NavyView {
+  const v = world.navy;
+  const blockades: NavyView["blockades"] = [];
+  const fleets: FleetView[] = v.fleets.map((f) => {
+    const ports = f.blockading ? closedBy(world, f.owner, f.at) : [];
+    // About what the ports it closes pay a month at today's trade (NAVY-158).
+    const prize = ports.reduce((t, p) => t + (v.blockadeFleet[p] === f.id ? nv.blockadePrize(tradeValueAt(world, p, true), world.provinceTradeRatio[p]!, f.post) : 0), 0);
+    if (ports.length) blockades.push({ zone: f.at, owner: f.owner, fleet: f.id, ports, against: controller(world, ports[0]!), prize: Math.round(prize * 10) / 10 });
+    const sight = seaRange(world, f);
+    return {
+    id: f.id,
+    owner: f.owner,
+    at: f.at,
+    tile: f.tile,
+    path: f.path.slice(f.pathAt),
+    route: f.route.slice(),
+    post: f.post,
+    sight: Number.isFinite(sight) ? sight : 0,
+    blockading: ports,
+    ships: f.ships.length,
+    strength: Math.round(fleetStrength(f)),
+    admiral: f.admiral,
+    army: f.army,
+    men: f.army >= 0 ? world.armies.men[f.army]! : 0,
+    landAt: f.landAt,
+    battle: f.battle >= 0,
+    fleeing: f.fleeing,
+    days: f.owner === n ? Math.round(voyageDays(world, f) * 10) / 10 : 0,
+    explorers: allExplorers(f),
+    needsAdmiral: needsAdmiral(f),
+    hired: f.hire ? { name: f.hire.name, group: f.hire.group, from: f.hire.from, pay: Math.round(f.hire.pay * 100) / 100, leaving: !!f.hire.leaving } : null,
+    };
+  });
+  const costs = navyCosts(world);
+  const mine = v.fleets
+    .filter((f) => f.owner === n)
+    .map((f) => {
+      const wage = world.provinceWater[f.at] ? C.wageAtSea : C.wageInPort;
+      return {
+        id: f.id,
+        room: fleetRoom(f),
+        cost: f.hire ? f.hire.pay : f.ships.reduce((t, s) => t + nv.shipRow(s.type).upkeep * G.goldScale + s.crew * wage * G.wageScale, 0),
+        ships: f.ships.map((s) => ({ id: s.id, type: s.type, crew: s.crew, crewNeed: crewNeed(s), hull: HULLS[s.hull]!, supply: s.supply, supplyMax: nv.fullSupply(s.type), fights: fightsOf(s.type), carries: carriesOf(s.type), age: s.age, stores: s.stores ?? 0, storesMax: nv.shipRow(s.type).colonyStores ?? 0 })),
+      };
+    });
+  const ports: NavyView["ports"] = [];
+  if (n >= 0) {
+    for (let p = 0; p < world.provinceCount; p++) {
+      if (world.provinceOwner[p] !== n || !isPort(world, p)) continue;
+      const used = v.fleets.reduce((t, f) => t + (f.at === p ? f.ships.reduce((x, s) => x + nv.berthsTaken(s.type), 0) : 0), 0);
+      ports.push({
+        province: p,
+        harbour: harbourStep(world, p),
+        shipyard: shipyardOf(world, p),
+        berths: berthsOf(world, p),
+        berthsUsed: used,
+        slipways: slipwaysOf(world, p),
+        sailors: Math.floor(v.sailors[p]!),
+        callable: callable(world, p),
+        mustering: v.musters.reduce((t, m) => t + (m.province === p ? m.sailors : 0), 0),
+        blockaded: blockaded(world, p),
+        building: v.hulls.filter((h) => h.province === p).map((h) => ({ type: h.type, monthsLeft: h.monthsLeft, months: h.months })),
+        ...portQueues(world, n, p),
+      });
+    }
+  }
+  const aboard = v.fleets.filter((f) => f.army >= 0).map((f) => f.army);
+  const battles = v.battles.map((b) => {
+    const strength = [0, 1].map((s) => sideFleets(world, b, s as 0 | 1).reduce((t, f) => t + fleetStrength(f), 0)) as [number, number];
+    const mineHere = [...b.sides[0], ...b.sides[1]].some((id) => fleetById(world, id)?.owner === n);
+    return { zone: b.zone, tile: b.tile, leaders: b.leaders, strength: strength.map(Math.round) as [number, number], start: b.start.map(Math.round) as [number, number], lost: b.lost, round: b.round, mine: mineHere };
+  });
+  const posts = nv.POSTS.map((key) => ({ key, name: nv.postRow(key).name, does: nv.postRow(key).does }));
+  const prize = n >= 0 && v.prize.length > n ? Math.round(v.prize[n]! * 10) / 10 : 0;
+  return { fleets, mine, ports, battles, cost: n >= 0 ? costs[n]! : 0, musterGoldEach: C.muster.bountyPerSailor * G.wageScale, queues: { musterBatch: Q.musterBatch, musterDays: C.muster.days, musterQueueMax: Q.musterQueueMax, shipQueueMax: Q.shipQueueMax }, aboard, blockades, prize, posts };
+}
+
+/** A port's queues and the ships it offers on the upgrade path (D-NAVY-33), for the Port tab. */
+function portQueues(world: World, n: number, p: number): Pick<NavyView["ports"][number], "musterQueue" | "queue" | "crewShort" | "ships" | "later"> {
+  const v = world.navy;
+  const musterQueue = v.musters.filter((m) => m.province === p).sort((a, b) => a.day - b.day).map((m) => ({ sailors: m.sailors, days: Math.max(0, Math.ceil(m.day - world.day)) }));
+  const slips = freeSlipways(world, p);
+  const mine = v.orders.filter((o) => o.province === p);
+  const queue = mine.map((o, i) => ({ type: o.type, crew: nv.shipRow(o.type).crew, gold: o.gold, waiting: waitingFor(world, o, i === 0, slips) }));
+  const coming = v.sailors[p]! + musterQueue.reduce((t, m) => t + m.sailors, 0);
+  const crewShort = Math.max(0, Math.ceil(queue.reduce((t, o) => t + o.crew, 0) - coming));
+  const offered = SHIP_TYPES.filter((t) => !whyNotBuildable(world, n, p, t) && !replacedBy(world, n, p, t));
+  const ships = offered.map((t) => {
+    const row = nv.shipRow(t);
+    return { type: t, gold: shipGold(t), crew: row.crew, months: row.months, fights: fightsOf(t), carries: carriesOf(t), family: row.family, why: whyNotShip(world, n, p, t) };
+  });
+  const later: { type: string; why: string }[] = [];
+  for (const t of offered) {
+    const next = UPGRADES[t];
+    if (next && !offered.includes(next as (typeof SHIP_TYPES)[number]) && !later.some((x) => x.type === next)) later.push({ type: next, why: whyNotBuildable(world, n, p, next) ?? "" });
+  }
+  return { musterQueue, queue, crewShort, ships, later };
+}
+
+/** An enemy fleet lies off the port and closes it (NAVY-106, NAVY-156). */
+export const blockaded = (world: World, p: number): boolean => world.navy.blockade[p]! > 0;
+
+const provinceName = (world: World, p: number) => world.rules.provinces[p]!.name;
+const zoneName = (world: World, p: number) => world.rules.provinces[p]!.name;
+const nationName = (world: World, n: number) => world.rules.nations[n]?.name ?? "someone";
+
+// ---------------------------------------------------------------- saves
+
+/** The navy as a save holds it: provinces by id, realms by index, the same fleets and hulls. */
+export interface SavedNavy {
+  /** shipyard: the province's shipyard step, which older saves kept here and not as a work. */
+  ports: Record<string, { shipyard: number; sailors: number; away: number; waited: number }>;
+  musters: NavyState["musters"];
+  /** Ships waiting in the ports' queues (since D-NAVY-33). */
+  orders?: NavyOrdered[];
+  hulls: NavyHull[];
+  fleets: NavyFleet[];
+  battles: SeaBattle[];
+  seq: number;
+  /** Prize money each realm took last month (absent in older saves). */
+  prize?: number[];
+  forHire?: FreeFleet[];
+  hireSeq?: number;
+}
+
+export function saveNavy(world: World): SavedNavy {
+  const v = world.navy;
+  const ports: SavedNavy["ports"] = {};
+  for (let p = 0; p < world.provinceCount; p++) {
+    const yard = shipyardOf(world, p);
+    if (yard || v.sailors[p] || v.away[p]) ports[world.provinceIds[p]!] = { shipyard: yard, sailors: v.sailors[p]!, away: v.away[p]!, waited: v.waited[p]! };
+  }
+  return { ports, musters: v.musters, orders: v.orders, hulls: v.hulls, fleets: v.fleets, battles: v.battles, seq: v.seq, prize: Array.from(v.prize), forHire: v.forHire, hireSeq: v.hireSeq };
+}
+
+/** Puts a saved navy back, its provinces and realms mapped to this build's; what has no place in it is dropped. */
+export function restoreNavy(world: World, saved: SavedNavy, mapN: (old: number) => number, mapP: (old: number) => number, mapC: (old: number) => number): void {
+  const v = world.navy;
+  v.arsenal = -1;
+  for (const [id, x] of Object.entries(saved.ports)) {
+    const p = world.provinceIndex.get(id);
+    if (p === undefined) continue;
+    // Older saves kept the shipyard here, not as a work: it becomes one.
+    const k = p * WORK_COUNT + yardWork();
+    if (x.shipyard > 0 && !world.provinceWorks[k]) world.provinceWorks[k] = Math.min(3, x.shipyard);
+    if (x.shipyard >= C.arsenalStep) v.arsenal = p;
+    v.sailors[p] = x.sailors;
+    v.away[p] = x.away;
+    v.waited[p] = x.waited;
+  }
+  v.musters = saved.musters.map((m) => ({ ...m, owner: mapN(m.owner), province: mapP(m.province) })).filter((m) => m.owner >= 0 && m.province >= 0);
+  v.orders = (saved.orders ?? []).map((o) => ({ ...o, owner: mapN(o.owner), province: mapP(o.province) })).filter((o) => o.owner >= 0 && o.province >= 0);
+  v.hulls = saved.hulls.map((h) => ({ ...h, owner: mapN(h.owner), province: mapP(h.province) })).filter((h) => h.owner >= 0 && h.province >= 0);
+  v.fleets = saved.fleets
+    .map((f) => {
+      const at = mapP(f.at);
+      // A tile on this map's water of the fleet's zone (or off its port) stands; otherwise the fleet is placed again, and plans its leg again (NAVY-147).
+      const t = f.tile ?? -1;
+      const sameMap = t >= 0 && t < world.tiles.cell.length && at >= 0 && (world.provinceWater[at] ? zoneOf(world, t) === at : zoneOf(world, t) >= 0);
+      const path = sameMap ? (f.path ?? []).filter((x) => zoneOf(world, x) >= 0) : [];
+      const leg = sameMap && path.length === (f.path ?? []).length;
+      return {
+        ...f,
+        owner: mapN(f.owner),
+        at,
+        tile: sameMap ? t : -1,
+        path: leg ? path : [],
+        pathAt: leg ? (f.pathAt ?? 0) : 0,
+        legHours: leg ? (f.legHours ?? 0) : 0,
+        goal: sameMap && (f.goal ?? -1) >= 0 && zoneOf(world, f.goal) >= 0 ? f.goal : -1,
+        post: nv.isPost(f.post) ? f.post : ("admiral" as const),
+        blockading: !!f.blockading,
+        route: f.route.map(mapP),
+        landAt: f.landAt < 0 ? -1 : mapP(f.landAt),
+        admiral: f.admiral < 0 ? -1 : mapC(f.admiral),
+        ships: f.ships.map((s) => ({ ...s, home: s.home < 0 ? -1 : mapP(s.home) })),
+        ...(f.hire ? { hire: { ...f.hire, from: f.hire.from < 0 ? -1 : mapN(f.hire.from), captain: f.hire.captain < 0 ? -1 : mapC(f.hire.captain) } } : {}),
+      };
+    })
+    .filter((f) => f.owner >= 0 && f.at >= 0 && !f.route.includes(-1));
+  v.battles = saved.battles.map((b) => ({ ...b, zone: mapP(b.zone), tile: b.tile ?? -1, leaders: [mapN(b.leaders[0]), mapN(b.leaders[1])] as [number, number] }));
+  v.seq = saved.seq;
+  v.forHire = (saved.forHire ?? []).map((x) => ({ ...x, at: mapP(x.at) })).filter((x) => x.at >= 0);
+  v.hireSeq = saved.hireSeq ?? 0;
+  v.prize = new Float64Array(saved.prize?.length ? world.nationCount : 0);
+  saved.prize?.forEach((gold, old) => {
+    const n = mapN(old);
+    if (n >= 0) v.prize[n] = gold;
+  });
+  for (const b of v.battles) if (b.tile < 0) b.tile = world.tiles.centre[b.zone]!;
+  refreshBlockades(world, []);
+}

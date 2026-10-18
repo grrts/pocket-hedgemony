@@ -324,6 +324,7 @@ export interface SeaProvince {
  */
 export function musterSailors(p: SeaProvince, count: number, port: Port): SailorGroup {
   if (!isPort(port)) throw new Error("only a port musters sailors");
+  if (port.shipyardStep <= 0) throw new Error("only a port with a shipyard musters sailors");
   const callable = callableToSea(p.people);
   const total = Object.values(callable).reduce((a, b) => a + b, 0);
   if (count > total + 1e-9) throw new Error(`only ${Math.floor(total)} can be called`);
@@ -502,64 +503,94 @@ export function unlocked(type: string, b: Pick<Buyer, "known" | "explorationUnlo
 export type OrderResult = { ok: true; hull: Hull; gold: number; timber: number } | { ok: false; reason: string };
 
 /**
- * Orders a ship in a port (NAVY-042..048, NAVY-051, NAVY-053, NAVY-054): type unlocked, its whole crew among the
- * sailors in port (assigned to the hull), a free slipway of the step it needs or the harbour for small hulls
- * (one at a time, half as long again), gold and timber paid at once. A blockaded port still builds.
+ * Orders a ship in a port (NAVY-042, NAVY-045, NAVY-051, NAVY-053, NAVY-147, NAVY-149; D-NAVY-33): type
+ * unlocked, a shipyard of the step it needs, room in the port's ship queue, gold and timber paid at once. The
+ * hull goes on a free slipway with its whole crew when both are there, else it waits in the queue. A blockaded
+ * port still builds.
  */
 export function orderShip(port: Port, type: string, b: Buyer, o: { abroad?: boolean } = {}): OrderResult {
   const r = shipRow(type);
   if (!unlocked(type, b)) return { ok: false, reason: "not unlocked" };
-  const anyShore = r.builtAt === "any shore";
-  if (!anyShore && !isPort(port)) return { ok: false, reason: "not a port" };
-  if (anyShore && !isPort(port) && !(port.seafolk ?? 0)) return { ok: false, reason: "no seafolk" };
-  if (port.sailorsInPort < r.crew) return { ok: false, reason: `needs a crew of ${r.crew}` };
+  // Small craft are the fishery's boats, launched from any shore with seafolk (NAVY-054).
+  if (r.family === "small craft") {
+    if (!isPort(port) && !(port.seafolk ?? 0)) return { ok: false, reason: "no seafolk" };
+    if (port.sailorsInPort < r.crew) return { ok: false, reason: `needs a crew of ${r.crew}` };
+    if (b.gold < r.gold || b.timber < r.timber) return { ok: false, reason: "not enough gold or timber" };
+    b.gold -= r.gold;
+    b.timber -= r.timber;
+    port.sailorsInPort -= r.crew;
+    const craft: Hull = { type, owner: b.name, crew: r.crew, monthsLeft: r.months, on: "harbour" };
+    port.hulls.push(craft);
+    return { ok: true, hull: craft, gold: r.gold, timber: r.timber };
+  }
+  if (!isPort(port)) return { ok: false, reason: "not a port" };
+  if (port.shipyardStep <= 0) return { ok: false, reason: "needs a shipyard" };
+  if (!shipyardAllows(port.shipyardStep, type)) return { ok: false, reason: `needs shipyard step ${r.builtAt}` };
+  if (port.hulls.filter((h) => h.on === "waiting").length >= config.game.queues.shipQueueMax) return { ok: false, reason: "the queue is full" };
   const gold = r.gold * (o.abroad ? config.abroadPriceMultiplier : 1);
   if (b.gold < gold || b.timber < r.timber) return { ok: false, reason: "not enough gold or timber" };
-  let on: Hull["on"];
-  let months = r.months;
-  if (anyShore) on = "harbour";
-  else {
-    const freeSlip = slipways(port) - port.hulls.filter((h) => h.on === "slipway").length;
-    if (freeSlip > 0 && shipyardAllows(port.shipyardStep, type)) on = "slipway";
-    else if (r.builtAt === "harbour") {
-      on = port.hulls.some((h) => h.on === "harbour") ? "waiting" : "harbour";
-      months = r.months * config.harbourBuildMonthsMultiplier;
-    } else return { ok: false, reason: typeof r.builtAt === "number" && !shipyardAllows(port.shipyardStep, type) ? `needs shipyard step ${r.builtAt}` : "no free slipway" };
-  }
   b.gold -= gold;
   b.timber -= r.timber;
-  port.sailorsInPort -= r.crew;
-  const hull: Hull = { type, owner: b.name, crew: r.crew, monthsLeft: round(months), on };
+  const hull: Hull = { type, owner: b.name, crew: 0, monthsLeft: r.months, on: "waiting" };
   port.hulls.push(hull);
+  layDownWaiting(port);
   return { ok: true, hull, gold, timber: r.timber };
+}
+
+/** The first ship waiting in a port's queue goes on a free slipway once its whole crew is in port; those behind it wait their turn (NAVY-149). */
+export function layDownWaiting(port: Port): void {
+  for (const h of port.hulls) {
+    if (h.on !== "waiting") continue;
+    const crew = shipRow(h.type).crew;
+    if (port.hulls.filter((x) => x.on === "slipway").length >= slipways(port) || port.sailorsInPort < crew) return;
+    port.sailorsInPort -= crew;
+    h.crew = crew;
+    h.on = "slipway";
+  }
+}
+
+/** The newest type further along a type's upgrade path that `buildable` allows, or null: then the type is no longer offered (NAVY-150). */
+export function replacedBy(type: string, buildable: (t: string) => boolean): string | null {
+  const path = config.upgrades as unknown as Record<string, string | undefined>;
+  let found: string | null = null;
+  for (let t = path[type]; t; t = path[t]) if (buildable(t)) found = t;
+  return found;
+}
+
+/** The batches a muster of `count` sailors joins the port's queue as, each ready muster.days after the one before; null when the queue can't hold them (NAVY-148). */
+export function musterBatches(count: number, queued: readonly { day: number }[], today: number): { sailors: number; day: number }[] | null {
+  const q = config.game.queues;
+  const out: { sailors: number; day: number }[] = [];
+  let day = queued.reduce((d, m) => Math.max(d, m.day), today);
+  for (let left = count; left > 0; left -= q.musterBatch) out.push({ sailors: Math.min(q.musterBatch, left), day: (day += config.muster.days) });
+  return queued.length + out.length > q.musterQueueMax ? null : out;
 }
 
 /** Buying a hull abroad: a great port with a shipyard of a realm at peace that agrees, your crew waiting there; 1.5 times the gold (NAVY-053). */
 export function orderShipAbroad(port: Port & { tier?: string }, type: string, b: Buyer, o: { atPeace: boolean; ownerAgrees: boolean }): OrderResult {
   if (port.tier !== "great" || port.shipyardStep <= 0) return { ok: false, reason: "not a great port with a shipyard" };
   if (!o.atPeace || !o.ownerAgrees) return { ok: false, reason: "no sale" };
+  // The buyer's crew must already wait there: a hull abroad never waits for one.
+  if (port.sailorsInPort < shipRow(type).crew) return { ok: false, reason: `needs a crew of ${shipRow(type).crew}` };
   return orderShip(port, type, b, { abroad: true });
 }
 
 /** Ships that shoot need their guns (cast or bought as for gun crews) and powder for each voyage (NAVY-050). */
 export const shootingNeeds = (type: string): string[] => (shipRow(type).shoots ? ["guns", "powder each voyage"] : []);
 
-/** A month of building: hulls advance; the waiting harbour hull starts when the harbour frees; finished ships launch (NAVY-048). */
+/** A month of building: hulls on the slipways advance; finished ships launch and the queue's next ship takes the freed slipway (NAVY-149). */
 export function advanceHulls(port: Port, mkId: (h: Hull) => string): Ship[] {
   const launched: Ship[] = [];
-  for (const h of port.hulls) if (h.on !== "waiting") h.monthsLeft = round(h.monthsLeft - 1);
+  for (const h of port.hulls) if (h.on === "slipway") h.monthsLeft = round(h.monthsLeft - 1);
   for (const h of [...port.hulls]) {
-    if (h.on === "waiting" || h.monthsLeft > 0) continue;
+    if (h.on !== "slipway" || h.monthsLeft > 0) continue;
     port.hulls.splice(port.hulls.indexOf(h), 1);
     const s = newShip(mkId(h), h.type, h.owner, h.crew);
     s.state = "in port";
     putIn(port, s);
     launched.push(s);
   }
-  if (!port.hulls.some((h) => h.on === "harbour")) {
-    const next = port.hulls.find((h) => h.on === "waiting");
-    if (next) next.on = "harbour";
-  }
+  layDownWaiting(port);
   return launched;
 }
 
@@ -1152,3 +1183,52 @@ export function portMonth(port: Port, o: { shipBuilding?: boolean; mkId?: (h: Hu
 
 /** A sea battle is fought on at most 3 sectors (NAVY-116). */
 export const seaBattleSectors = (wanted: number): number => Math.min(wanted, config.seaBattleMaxSectors);
+
+// ---------------------------------------------------------------- fleets at sea (NAVY-147..)
+
+/** A fleet leader's post (feedback 124): admiral for war, commodore for trade, viceroy for exploration and colonies. */
+export type Post = "admiral" | "commodore" | "viceroy";
+export const POSTS: readonly Post[] = ["admiral", "commodore", "viceroy"];
+export interface PostRow {
+  name: string;
+  does: string;
+  mightShare: number;
+  tradeGain?: number;
+  prizeFactor?: number;
+  chartRings?: number;
+  colonyStart?: number;
+}
+export const postRow = (post: Post): PostRow => (config.admiralPosts as unknown as Record<Post, PostRow>)[post];
+export const isPost = (x: unknown): x is Post => typeof x === "string" && (POSTS as readonly string[]).includes(x);
+
+/** The post that fits a fleet when a leader is appointed: trade ships only a commodore, exploration ships only a viceroy, else an admiral (NAVY-153). */
+export function fittingPost(types: readonly string[]): Post {
+  if (types.length && types.every((t) => shipRow(t).family === "trade")) return "commodore";
+  if (types.length && types.every((t) => shipRow(t).family === "exploration")) return "viceroy";
+  return "admiral";
+}
+
+/** The Might a leader brings to a sea battle: in full as admiral, a share in other posts (NAVY-152). */
+export const battleMight = (might: number, post: Post): number => might * postRow(post).mightShare;
+
+/** Tiles within which a fleet meets an enemy fleet in its own zone: base plus a tile per point of its leader's Cunning, at most max (NAVY-150). */
+export function seaEngageTiles(cunning: number | null): number {
+  const e = config.seaEngage;
+  return Math.min(e.max, e.base + (cunning === null ? 0 : Math.max(0, cunning) * e.perCunning));
+}
+
+/** Whether a fleet blockades: its realm at war, a warship and a leader aboard, lying still at sea (NAVY-155). */
+export function blockades(f: { atWar: boolean; atSea: boolean; types: readonly string[]; hasLeader: boolean; sailing: boolean; inBattle: boolean; fleeing: boolean; landing: boolean }): boolean {
+  return f.atWar && f.atSea && f.hasLeader && !f.sailing && !f.inBattle && !f.fleeing && !f.landing && f.types.some(isWarship);
+}
+
+/** A month's prize money from a port a blockade closes: a share of its sea trade value at its trade ratio, more under a commodore (NAVY-158). */
+export function blockadePrize(seaValuePerMonth: number, tradeRatio: number, post: Post): number {
+  return seaValuePerMonth * (Math.max(0, Math.min(100, tradeRatio)) / 100) * config.blockade.prizeShare * (postRow(post).prizeFactor ?? 1);
+}
+
+/** Whether a blocked realm's trade ship may pass a zone a blockade holds: only with a commodore of its own lying there (NAVY-157). */
+export const tradeShipPasses = (blockaded: boolean, ownCommodoreThere: boolean): boolean => !blockaded || ownCommodoreThere;
+
+/** People of a blockaded port that count toward its side's wish for peace, as a share of occupied land (NAVY-159). */
+export const blockadePeaceWeight = (): number => config.blockade.peaceWeight;

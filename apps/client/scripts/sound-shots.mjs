@@ -45,6 +45,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
     });
     await page.waitForTimeout(300);
     await page.click("[data-declare]");
+    await page.click("[data-declare-confirm]");
     await page.evaluate(() => window.__phMarchOn("portugal"));
     for (let t = 0; t < 8; t++) {
       await page.click("#fab");

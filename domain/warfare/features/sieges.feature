@@ -215,12 +215,12 @@ Feature: Sieges
     Then the bribe <works>
 
     Examples:
-      | condition                                              | works        |
-      | garrison is owed 2 months of pay                       | can work     |
-      | lord is wavering                                       | can work     |
-      | lord is disloyal                                       | can work     |
-      | captain speaks a tongue different from his ruler's     | can work     |
-      | garrison is paid and loyal, of its ruler's tongue      | cannot work  |
+      | condition                                            | works       |
+      | garrison is owed 2 months of pay                     | can work    |
+      | lord is wavering                                     | can work    |
+      | lord is disloyal                                     | can work    |
+      | captain speaks a language different from his ruler's | can work    |
+      | garrison is paid and loyal, of its ruler's language  | cannot work |
 
   @WAR-173
   Scenario: Greedy commanders and bribes

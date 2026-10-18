@@ -9,7 +9,7 @@ This wiki explains every system in the game and how it works. Each page is writt
 - [How a turn works](Time-and-Turns): one week per turn, the days inside it, and when the campaign ends.
 - [The 1444 start](The-1444-Start): which realms exist and which you can play.
 - [Your realm](Your-Realm) and [Provinces](Provinces): the two cards everything else feeds.
-- [Map and lenses](Map-and-Lenses): what the map shows at each zoom.
+- [Map and Map Modes](Map-and-Lenses): what the map shows at each zoom.
 
 ## Land and economy
 
@@ -37,8 +37,9 @@ This wiki explains every system in the game and how it works. Each page is writt
 |---|---|
 | [Diplomacy](Diplomacy) | Envoys, relations, the reasons count, war aims, peace and truces |
 | [Subjects](Subjects) | Overlords and subjects, loyalty, folding a subject in |
+| [Institutions](Institutions) | The Empire: hold, seats and elections, the Emperor's duties |
 | [Government](Government) | Forms of rule, the caps on officials and lords, reforms |
-| [Culture](Culture) | Tongues, kin and strangers, how tongues drift |
+| [Culture](Culture) | Languages, how close each is to yours, how languages drift |
 | [Religion](Religion) | Faiths, the faith mix, preachers, holy places |
 | [Rebellions](Rebellions) | Grievances, risings and how to answer them |
 
@@ -48,7 +49,7 @@ This wiki explains every system in the game and how it works. Each page is writt
 |---|---|
 | [Historical events](Historical-Events) | Ages, periods and events with choices |
 | [Revolutions](Revolutions) | Revolutions that change how a country plays |
-| [National strengths](National-Strengths) | Each realm's heritage: birthright, heydays, ambitions, legacies, burden |
+| [National strengths](National-Strengths) | Each realm's heritage: birthright, golden ages, ambitions, legacies, weakness |
 
 ## Around the game
 
