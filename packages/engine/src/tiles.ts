@@ -9,13 +9,13 @@ import type { Ground, Ruleset } from "@ph/rules";
 export interface TileGrid {
   width: number;
   height: number;
-  /** Province index + 1 per tile; 0 is water. */
+  /** Province index + 1 per tile: the land province, or on water the sea zone (0 for water in no zone). Land is told by the cell, not by this. */
   province: Uint16Array;
   /** Per tile: the ground (index in GROUNDS, low 4 bits), a river (bit 4) and its height class (HEIGHT_KM, top 3 bits). */
   cell: Uint8Array;
-  /** A tile near each province's centre, inside the province (-1 for water zones). */
+  /** A tile near each province's centre, inside the province (a sea zone's own water for a zone; -1 when it has no tiles). */
   centre: Int32Array;
-  /** Each province's box of tiles: min x, min y, max x, max y (empty for water zones). */
+  /** Each province's box of tiles: min x, min y, max x, max y (empty when it has no tiles). */
   bounds: Int32Array;
   /** One tile per province with no shape to it (pointTileGrid): armies march a province a step. */
   coarse?: boolean;
@@ -44,6 +44,7 @@ export const HEIGHT_KM = [0.1, 0.5, 0.7, 1.3, 2.1, 3.0, 3.6] as const;
 const TERRAIN_HEIGHT: Partial<Record<(typeof TILE_TERRAINS)[number], number>> = { hills: 1, badlands: 2, highlands: 3, mountains: 4, glacier: 5, snowpeaks: 6 };
 
 export const WATER = 15;
+const isSea = (terrain: string | undefined): boolean => terrain === "sea" || terrain === "ocean";
 export const groundOfCell = (c: number): number => c & 15;
 export const riverOfCell = (c: number): boolean => (c & 16) !== 0;
 export const heightOfCell = (c: number): number => HEIGHT_KM[c >> 5]!;
@@ -63,11 +64,13 @@ export function tileGridFromImages(rules: Ruleset, width: number, height: number
     const r = terrain[t * terrainStride]!;
     const g = terrain[t * terrainStride + 1]!;
     const land = p > 0 && (g === 0 || g >= 64);
-    province[t] = land ? p : 0;
     if (!land) {
+      // Water keeps its sea zone, so fleets sail tile by tile (feedback 122).
+      province[t] = p > 0 && isSea(rules.provinces[p - 1]?.terrain) ? p : 0;
       cell[t] = WATER;
       continue;
     }
+    province[t] = p;
     const name = TILE_TERRAINS[r] ?? "grassland";
     cell[t] = groundIndex.get(TERRAIN_GROUND[name])! | (g >= 64 ? 16 : 0) | ((TERRAIN_HEIGHT[name] ?? 0) << 5);
   }
@@ -91,13 +94,14 @@ export function blockTileGrid(rules: Ruleset, columns: number, side: number): Ti
     const g = groundIndex.get(p.terrain as Ground);
     for (let y = y0; y < y0 + side; y++) {
       for (let x = x0; x < x0 + side; x++) {
-        if (g === undefined) continue;
+        // A sea zone is a block of water tiles of its own.
+        if (g === undefined && !isSea(p.terrain)) continue;
         province[y * width + x] = i + 1;
-        cell[y * width + x] = g | (p.river ? 16 : 0);
+        if (g !== undefined) cell[y * width + x] = g | (p.river ? 16 : 0);
       }
     }
   });
-  const centre = Int32Array.from(rules.provinces, (p, i) => (GROUNDS.includes(p.terrain as Ground) ? (Math.floor(i / columns) * side + (side >> 1)) * width + (i % columns) * side + (side >> 1) : -1));
+  const centre = Int32Array.from(rules.provinces, (p, i) => (GROUNDS.includes(p.terrain as Ground) || isSea(p.terrain) ? (Math.floor(i / columns) * side + (side >> 1)) * width + (i % columns) * side + (side >> 1) : -1));
   return { width, height, province, cell, centre, bounds: findBounds(rules.provinces.length, width, height, province) };
 }
 

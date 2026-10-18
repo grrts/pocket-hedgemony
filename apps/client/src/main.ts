@@ -59,7 +59,7 @@ import { seasonBytes } from "./map/renderer.ts";
 import { detectRuntime, type Diagnostics } from "./platform.ts";
 import { sound } from "./audio/sound.ts";
 import { eventCardHtml, waitingEventsHtml } from "./ui/events.ts";
-import { fleetButton, fleetCard, navyTab, portTab } from "./ui/navy.ts";
+import { fleetButton, fleetCard, fleetTitle, navyTab, portTab } from "./ui/navy.ts";
 import { colonyCard, coloniesTab, colonySection, exploreSection, voyageBar } from "./ui/explore.ts";
 import { achievementName, achievementsCard, loadProfile, saveProfile, takeAchievements, toastHtml, unseen, type Filter as AchFilter } from "./ui/achievements.ts";
 import { Hints, type HintTarget } from "./ui/hints.ts";
@@ -162,6 +162,10 @@ let stepStart = 0;
 let stepMs = 0;
 /** Where each army was drawn when the latest snapshot arrived, by army id, for walking on from there. */
 let drawnAt = new Map<number, [number, number]>();
+/** Where each fleet was drawn when the latest snapshot arrived, by fleet id, and the tiles it had ahead, for gliding on over them. */
+let fleetFrom = new Map<number, { at: [number, number]; path: number[] }>();
+/** The spot of the sea the player tapped for each fleet's voyage, so its course is drawn to it (NAVY-134). */
+const sailGoal = new Map<number, { zone: number; tile: number }>();
 /**
  * End turn plays the week a day at a time (TIME-076), and a 4-hour step at a
  * time while the player fights, at the speeds set in Settings → Gameplay
@@ -1199,12 +1203,17 @@ function drawOverlay(o: OverlayContext): void {
         }) || animating;
     }
     pruneBattles(snapshot.battles.map((b) => b.id));
+    const tiled = snapshot.tileWidth === rules.map!.width;
     for (const b of snapshot.navy.battles) {
       if (!isKnown(b.zone)) continue;
-      const [sx, sy] = o.toScreen(provinces[b.zone]!.x!, provinces[b.zone]!.y!);
+      // Fought where the defender stands (NAVY-136).
+      const [sx, sy] = o.toScreen(...(tiled && b.tile >= 0 ? tileXY(b.tile) : ([provinces[b.zone]!.x!, provinces[b.zone]!.y!] as [number, number])));
       if (onScreen(sx, sy)) swords(ctx, sx, sy - 18 * tokenUnit(zoom), 3 * spriteScale);
     }
   }
+
+  // Ports closed by blockades, at every zoom (NAVY-148).
+  if (snapshot) drawBlockades(o, ctx, Math.max(2, spriteScale - 1), onScreen);
 
   // Armies and their commanders, once zoomed in past the realm names (feedback 31).
   // Troops without a commander stay off the map, in their province's garrison (RECR-107).
@@ -1386,7 +1395,11 @@ function armyPosition(k: number): [number, number] {
   const trail = s.armies.trail[k]!;
   const t = stepMs ? (performance.now() - stepStart) / stepMs : 1;
   if (!from || !trail.length || t >= 1) return end;
-  const pts = [from, ...trail.map(tileXY)];
+  return alongPoints([from, ...trail.map(tileXY)], t);
+}
+
+/** The point a share t (0 to 1) of the way along a line of map points. */
+function alongPoints(pts: [number, number][], t: number): [number, number] {
   const f = t * (pts.length - 1);
   const i = Math.floor(f);
   const [ax, ay] = pts[i]!;
@@ -1395,6 +1408,23 @@ function armyPosition(k: number): [number, number] {
   if (bx - ax > rules.map!.width / 2) bx -= rules.map!.width;
   if (ax - bx > rules.map!.width / 2) bx += rules.map!.width;
   return [ax + (bx - ax) * (f - i), ay + (by - ay) * (f - i)];
+}
+
+/**
+ * Where to draw a fleet: on its tile, gliding over the tiles it sailed since
+ * the latest snapshot, as armies walk (NAVY-132, NAVY-133); without tiles, in
+ * its zone or off its port.
+ */
+function fleetPosition(f: FleetView): [number, number] {
+  const s = snapshot!;
+  if (f.tile < 0 || s.tileWidth !== rules.map!.width) return fleetXY(f);
+  const end = tileXY(f.tile);
+  const from = fleetFrom.get(f.id);
+  const t = stepMs ? (performance.now() - stepStart) / stepMs : 1;
+  if (!from || t >= 1) return end;
+  // The tiles it had ahead up to where it is now; straight on when it sailed off them (a new leg).
+  const i = from.path.indexOf(f.tile);
+  return alongPoints([from.at, ...(i >= 0 ? from.path.slice(0, i + 1) : [f.tile]).map(tileXY)], t);
 }
 
 /** Two crossed swords, r pixels from the middle to each tip. */
@@ -1428,37 +1458,132 @@ function fleetXY(f: FleetView): [number, number] {
   return [p.x! + (z.x! - p.x!) * 0.4, p.y! + (z.y! - p.y!) * 0.4];
 }
 
-/** Every known fleet as a ship in its realm's colours with its ship count, and the player's voyages as routes; true while one sails. */
+/**
+ * Every known fleet as a ship in its realm's colours with its ship count, on
+ * its tile; the player's voyages as courses through the water, tile by tile
+ * and then zone by zone (NAVY-134); and the sighting ring of the fleet chosen
+ * to sail (NAVY-148). True while one sails.
+ */
 function drawFleets(o: OverlayContext, ctx: CanvasRenderingContext2D, u: number, now: number, onScreen: (x: number, y: number, pad?: number) => boolean): boolean {
   const s = snapshot!;
+  const tiled = s.tileWidth === rules.map!.width;
   let moving = false;
   for (const f of s.navy.fleets) {
-    if (f.owner !== s.playerNation || !f.route.length) continue;
-    const pts = [o.toScreen(...fleetXY(f)), ...f.route.map((q) => o.toScreen(provinces[q]!.x!, provinces[q]!.y!))];
+    if (f.owner !== s.playerNation) continue;
+    if (!f.route.length) {
+      sailGoal.delete(f.id);
+      continue;
+    }
+    const pts = [o.toScreen(...fleetPosition(f))];
+    const path = tiled && f.tile >= 0 ? f.path : [];
+    for (const t of path) pts.push(o.toScreen(...tileXY(t)));
+    // The zones past this leg, the last to the spot tapped.
+    const goal = sailGoal.get(f.id);
+    const zones = path.length ? f.route.slice(1) : f.route;
+    zones.forEach((q, i) => pts.push(o.toScreen(...(tiled && goal && i === zones.length - 1 && goal.zone === q ? tileXY(goal.tile) : ([provinces[q]!.x!, provinces[q]!.y!] as [number, number])))));
     drawRoute(ctx, { pts, u, color: nations[s.playerNation]!.color, weeks: [], t: now, viewWidth: o.width });
   }
   // The course being drawn for explorers, in gold over the sea (EXPL-069).
   const draft = exploring && s.navy.fleets.find((f) => f.id === exploring!.fleet);
   if (draft && exploring!.path.length) {
-    const pts = [o.toScreen(...fleetXY(draft)), ...exploring!.path.map((q) => o.toScreen(provinces[q]!.x!, provinces[q]!.y!))];
+    const pts = [o.toScreen(...fleetPosition(draft)), ...exploring!.path.map((q) => o.toScreen(provinces[q]!.x!, provinces[q]!.y!))];
     drawRoute(ctx, { pts, u, color: PALETTE.gold, weeks: [], t: now, viewWidth: o.width });
+  }
+  // The fleet chosen to sail sights enemies within this ring in its zone (NAVY-135); 0 is the whole zone, so no ring.
+  const chosen = sailing >= 0 && tiled ? s.navy.fleets.find((f) => f.id === sailing && f.owner === s.playerNation && f.sight > 0 && f.tile >= 0) : undefined;
+  if (chosen) {
+    const [mx, my] = fleetPosition(chosen);
+    const [cx, cy] = o.toScreen(mx, my);
+    const r = Math.abs(o.toScreen(mx + chosen.sight, my)[0] - cx);
+    if (onScreen(cx, cy, r)) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.globalAlpha = 0.12;
+      ctx.fillStyle = nations[chosen.owner]!.color;
+      ctx.fill();
+      ctx.globalAlpha = 0.55;
+      ctx.setLineDash([3 * u, 3 * u]);
+      ctx.lineWidth = u;
+      ctx.strokeStyle = PALETTE.paper;
+      ctx.stroke();
+      ctx.restore();
+    }
   }
   fleetHitBoxes = [];
   const stack = new Map<number, number>();
   for (const f of s.navy.fleets) {
     if (!f.ships || !isKnown(f.at)) continue;
-    const nth = stack.get(f.at) ?? 0;
-    stack.set(f.at, nth + 1);
-    let [sx, sy] = o.toScreen(...fleetXY(f));
+    // Fleets on one tile (or in one port) fan out behind the first.
+    const key = tiled && f.tile >= 0 ? f.tile : -1 - f.at;
+    const nth = stack.get(key) ?? 0;
+    stack.set(key, nth + 1);
+    let [sx, sy] = o.toScreen(...fleetPosition(f));
     sx += nth * 8 * u;
     sy -= nth * 3 * u;
     if (!onScreen(sx, sy)) continue;
     const realm = nations[f.owner]!;
-    const box = drawToken(ctx, { x: sx, y: sy, u: 2, color: realm.color, men: f.ships, naval: true, flag: flagCanvas(realm, 1), dir: 1, moving: f.route.length > 0, selected: fleetView === f.id || sailing === f.id, t: now });
+    const dir = fleetFacing(f);
+    const box = drawToken(ctx, { x: sx, y: sy, u: 2, color: realm.color, men: f.ships, naval: true, flag: flagCanvas(realm, 1), dir, moving: f.route.length > 0, selected: fleetView === f.id || sailing === f.id, t: now });
     fleetHitBoxes.push({ id: f.id, mine: f.owner === s.playerNation, ...box });
     moving ||= f.route.length > 0;
   }
   return moving;
+}
+
+/** The way each fleet last faced (by id), so it keeps facing that way when it lies still. */
+const fleetFacingOf = new Map<number, 1 | -1>();
+/** East (1) or west (-1): the way a fleet sails, toward the next tile of its course. */
+function fleetFacing(f: FleetView): 1 | -1 {
+  const w = snapshot!.tileWidth;
+  const next = f.path[0] ?? -1;
+  let dx = f.tile >= 0 && next >= 0 ? (next % w) - (f.tile % w) : 0;
+  if (Math.abs(dx) > w / 2) dx = -dx;
+  const dir = dx > 0 ? 1 : dx < 0 ? -1 : (fleetFacingOf.get(f.id) ?? 1);
+  fleetFacingOf.set(f.id, dir);
+  return dir;
+}
+
+/**
+ * Ports a blockade closes: a small chain in the blockader's colour at the
+ * port, toward the sea it is closed from (NAVY-148), big enough to read from
+ * the whole world out.
+ */
+function drawBlockades(o: OverlayContext, ctx: CanvasRenderingContext2D, u: number, onScreen: (x: number, y: number, pad?: number) => boolean): void {
+  const s = snapshot;
+  if (!s) return;
+  for (const b of s.navy.blockades) {
+    const z = provinces[b.zone]!;
+    for (const p of b.ports) {
+      if (!isKnown(p)) continue;
+      const q = provinces[p]!;
+      // From the port's centre a little way toward the zone, onto its coast.
+      const dx = z.x! - q.x!, dy = z.y! - q.y!;
+      const d = Math.hypot(dx, dy) || 1;
+      const k = Math.min(0.5, 6 / d);
+      const [sx, sy] = o.toScreen(q.x! + dx * k, q.y! + dy * k);
+      if (onScreen(sx, sy)) chainMark(ctx, sx, sy, u, nations[b.owner]!.color);
+    }
+  }
+}
+
+/** Two links of chain, ink round a colour, centred on x, y. */
+function chainMark(ctx: CanvasRenderingContext2D, x: number, y: number, u: number, color: string): void {
+  const left = Math.round(x - 5 * u);
+  const top = Math.round(y - 4 * u);
+  // Each link is a 6 × 4 ring; the second lies over the first, down and to the right.
+  for (const [lx, ly] of [[0, 0], [4, 3]] as const) {
+    const ax = left + lx * u, ay = top + ly * u;
+    ctx.fillStyle = PALETTE.ink;
+    ctx.fillRect(ax - u, ay - u, 8 * u, 6 * u);
+    ctx.fillStyle = color;
+    ctx.fillRect(ax, ay, 6 * u, 4 * u);
+    ctx.fillStyle = PALETTE.ink;
+    ctx.fillRect(ax + u, ay + u, 4 * u, 2 * u);
+  }
+  // The first link passes over the second where they cross.
+  ctx.fillStyle = color;
+  ctx.fillRect(left + 4 * u, top + 3 * u, u, u);
 }
 
 /** Colonies being founded: a small flag of the founder over a ring that fills as the colony grows (EXPL-052, EXPL-073). */
@@ -1614,7 +1739,12 @@ function onTap(sx: number, sy: number, province: number): void {
     const fleet = sailing;
     sailing = -1;
     sound.sfx("army_order_move");
-    void act({ type: "navy", do: "sail", fleet, to: province });
+    // On the sea, the fleet sails to the very spot tapped (NAVY-134).
+    const [mx, my] = view.toMap(sx, sy);
+    const tile = isWater[province] && snapshot.tileWidth === rules.map!.width ? Math.floor(my) * snapshot.tileWidth + Math.floor(mx) : undefined;
+    if (tile !== undefined) sailGoal.set(fleet, { zone: province, tile });
+    else sailGoal.delete(fleet);
+    void act({ type: "navy", do: "sail", fleet, to: province, ...(tile !== undefined ? { tile } : {}) });
     return;
   }
   sailing = -1;
@@ -1783,10 +1913,10 @@ function renderVoyageBar(): void {
   });
 }
 
-/** A fleet's name on a button: its admiral's, else what it is. */
+/** A fleet's name on a button: its leader's with his post, else what it is. */
 function fleetLabel(id: number): string {
   const f = snapshot?.navy.fleets.find((x) => x.id === id);
-  return !f ? "a lost fleet" : f.admiral >= 0 ? `${cmdOf(f.admiral).name}'s fleet` : f.explorers ? "the explorers" : "the fleet";
+  return !f ? "a lost fleet" : f.admiral >= 0 ? fleetTitle(f, (c) => cmdOf(c).name) : f.explorers ? "the explorers" : "the fleet";
 }
 
 /** Opens a fleet's card. */
@@ -1964,6 +2094,9 @@ async function act(order: Order): Promise<void> {
 function takeSnapshot(next: Snapshot, ms: number): void {
   const at = new Map<number, [number, number]>();
   if (snapshot) for (let k = 0; k < snapshot.armies.id.length; k++) at.set(snapshot.armies.id[k]!, armyPosition(k));
+  const ships = new Map<number, { at: [number, number]; path: number[] }>();
+  if (snapshot) for (const f of snapshot.navy.fleets) ships.set(f.id, { at: fleetPosition(f), path: f.path });
+  fleetFrom = ships;
   snapshot = next;
   setPortraitYear(next.date.year);
   hearAchievements(next);
@@ -3332,10 +3465,11 @@ function bindNavyLinks(): void {
 function renderPort(pi: number): void {
   const s = snapshot!;
   const port = s.navy.ports.find((x) => x.province === pi)!;
+  const by = s.navy.blockades.find((b) => b.ports.includes(pi))?.owner ?? -1;
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(provinces[pi]!.name)}</h2>${closeButton()}</header>
     ${provinceTabs()}
-    ${portTab(port, { gold: s.nationTreasury[s.playerNation]!, musterGoldEach: s.navy.musterGoldEach, fleetsHere: s.navy.fleets.filter((f) => f.owner === s.playerNation && f.at === pi), admiralName: (c) => cmdOf(c).name })}`;
+    ${portTab(port, { gold: s.nationTreasury[s.playerNation]!, musterGoldEach: s.navy.musterGoldEach, fleetsHere: s.navy.fleets.filter((f) => f.owner === s.playerNation && f.at === pi), admiralName: (c) => cmdOf(c).name, blockadedBy: by >= 0 ? nations[by]!.name : undefined })}`;
   bindClose();
   showPanel(true);
   bindProvinceTabs();
@@ -3365,7 +3499,7 @@ function renderFleet(id: number): void {
         .filter((k) => s.armies.owner[k] === me && s.armies.location[k] === f.at && s.armies.commander[k]! >= 0 && s.armies.battle[k]! < 0 && !aboard.has(s.armies.id[k]!))
         .map((k) => ({ id: s.armies.id[k]!, name: cmdOf(s.armies.commander[k]!).name, men: s.armies.men[k]!, room: s.armies.men[k]! + s.armies.horse[k]! * 3 }))
     : [];
-  const name = f.admiral >= 0 ? `${cmdOf(f.admiral).name}'s fleet` : f.explorers ? "Explorers" : "Fleet";
+  const name = fleetTitle(f, (c) => cmdOf(c).name, "Fleet");
   const ex = s.exploration;
   const pname = (p: number) => provinces[p]!.name;
   let explore = "";
@@ -3411,6 +3545,10 @@ function renderFleet(id: number): void {
       inPort,
       me,
       explore,
+      posts: v.posts,
+      realmName: (n) => nations[n]!.name,
+      blockade: v.blockades.find((b) => b.fleet === id),
+      prize: v.prize,
     })}`;
   bindClose();
   showPanel(true);
@@ -3428,6 +3566,7 @@ function renderFleet(id: number): void {
     renderPanel();
   });
   panel.querySelectorAll<HTMLButtonElement>("[data-fleet-admiral]").forEach((b) => b.addEventListener("click", () => order({ do: "admiral", commander: Number(b.dataset.fleetAdmiral) })));
+  panel.querySelectorAll<HTMLButtonElement>("[data-fleet-post]").forEach((b) => b.addEventListener("click", () => order({ do: "post", post: b.dataset.fleetPost })));
   panel.querySelectorAll<HTMLButtonElement>("[data-fleet-board]").forEach((b) => b.addEventListener("click", () => order({ do: "board", army: Number(b.dataset.fleetBoard) })));
   panel.querySelector("[data-fleet-unload]")?.addEventListener("click", () => order({ do: "unload" }));
   panel.querySelectorAll<HTMLButtonElement>("[data-fleet-split]").forEach((b) => b.addEventListener("click", () => order({ do: "split", ship: Number(b.dataset.fleetSplit) })));
@@ -3522,7 +3661,7 @@ function renderArmy(id: number): void {
             .join("")}</div>${armsNotKnown.length ? `<p class="hint">Not known yet: ${armsNotKnown.map((a) => esc(ARM_LABEL[a] ?? a)).join(", ")}. <button class="paper" data-realm="${me}" data-realm-open="learning">Learning</button></p>` : ""}`
         : `<p class="hint">No levy foot left to train.</p>`}`}
     ${garrison.length ? `<div class="choices"><button class="wax" data-pickup="${id}">Take in the garrison here: ${fmt(garrison.reduce((t, j) => t + s.armies.men[j]!, 0))} men</button></div>` : ""}
-    ${shipsHere.length ? `<h3 class="sub">Board ships</h3><div class="choices">${shipsHere.map((f) => `<button class="paper" data-board-fleet="${f.id}">${icon("anchor", 1)}Board ${f.admiral >= 0 ? `${esc(cmdOf(f.admiral).name)}'s fleet` : "the fleet without an admiral"} · room for ${fmt(s.navy.mine.find((m) => m.id === f.id)?.room ?? 0)}</button>`).join("")}</div>` : ""}
+    ${shipsHere.length ? `<h3 class="sub">Board ships</h3><div class="choices">${shipsHere.map((f) => `<button class="paper" data-board-fleet="${f.id}">${icon("anchor", 1)}Board ${esc(fleetTitle(f, (c) => cmdOf(c).name, "the fleet without a leader"))} · room for ${fmt(s.navy.mine.find((m) => m.id === f.id)?.room ?? 0)}</button>`).join("")}</div>` : ""}
     ${others.length ? `<h3 class="sub">Join another army here</h3><div class="choices">${others.map((j) => `<button class="paper" data-merge="${s.armies.id[j]!}">Into ${esc(cmdOf(s.armies.commander[j]!).name)}'s army</button>`).join("")}</div>` : ""}
     ${hired ? "" : `<h3 class="sub">Command</h3>
     <div class="choices">
@@ -3966,7 +4105,7 @@ function renderRealm(r: number): void {
     : realmTab === "trade" && s?.trade ? tradeTab(s.trade, s, (p) => provinces[p]!.name)
     : realmTab === "food" ? foodTab(s!, (p) => provinces[p]!.name, (p) => (mapImage ? provinceThumb(mapImage, provinces.length, p, n.color) : ""), own)
     : realmTab === "military" ? warRoomSection()
-    : realmTab === "navy" ? navyTab(s!.navy, r, { name: (p) => provinces[p]!.name, admiralName: (c) => cmdOf(c).name })
+    : realmTab === "navy" ? navyTab(s!.navy, r, { name: (p) => provinces[p]!.name, admiralName: (c) => cmdOf(c).name, realmName: (n) => nations[n]!.name })
     : realmTab === "colonies" ? coloniesTab(s!.exploration, { name: (p) => provinces[p]!.name, fleetName: fleetLabel, inRange: s!.exploration.sites.reduce((t, x) => t + (x === 1 ? 1 : 0), 0) })
     : realmTab === "mercenaries" ? mercenarySection()
     : realmTab === "lords" ? realmLords(r)
@@ -5126,6 +5265,20 @@ Object.assign(globalThis, {
     if (p < 0) return null;
     await act({ type: "commission", province: p });
     return snapshot.rejectedOrders.map((r) => r.reason);
+  },
+  /** Declares war on a realm by id (scripts/navy-shots.mjs: a blockade). */
+  __phWar: (id: string) => act({ type: "declareWar", target: nationIndex.get(id)! }).then(() => snapshot?.rejectedOrders.map((r) => r.reason) ?? []),
+  /** The nearest sea zone, over the sea from port p, that lies beside a coastal province of a realm by id. */
+  __phSeaBy: (id: string, p: number) => {
+    const n = nationIndex.get(id)!;
+    const start = neighborIdx[p]!.filter((q) => isWater[q]);
+    const seen = new Set(start);
+    for (let i = 0; i < start.length; i++) {
+      const z = start[i]!;
+      if (neighborIdx[z]!.some((q) => !isWater[q] && owners[q] === n)) return z;
+      for (const q of neighborIdx[z]!) if (isWater[q] && !seen.has(q)) (seen.add(q), start.push(q));
+    }
+    return -1;
   },
   /** A coastal sea zone two zones out from a port. */
   __phSeaNear: (p: number) => {

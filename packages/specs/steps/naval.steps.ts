@@ -1880,3 +1880,82 @@ When(re('a fleet plans a route into the "([^"]+)"'), (s, z: string) => {
 Then(re('a port on the "([^"]+)" (can|cannot) launch or take in ships'), (s, z: string, c: string) => {
   expect(N.portIceBound(z, s.month)).toBe(c === "cannot");
 });
+
+// ---------------------------------------------------------------- fleets at sea (NAVY-135..144, feedback 122..127)
+
+Given(re("a fleet whose leader has Cunning (\\d+)"), (s, c: string) => {
+  s.seaCunning = num(c);
+});
+Given("a fleet with no leader", (s) => {
+  s.seaCunning = null;
+});
+Then(re("the fleet sights enemy fleets in its own sea zone within (\\d+) tiles"), (s, n: string) => {
+  expect(N.seaEngageTiles(s.seaCunning)).toBe(num(n));
+});
+
+const shipList = (t: string): string[] => t.split(",").map((x) => x.trim()).filter(Boolean);
+Given(re("a fleet made up of ([a-z ]+(?:, [a-z ]+)*)"), (s, list: string) => {
+  s.seaTypes = shipList(list);
+});
+When("a leader is appointed to the fleet", (s) => {
+  s.post = N.fittingPost(s.seaTypes);
+});
+Then(re('the leader holds the post "(admiral|commodore|viceroy)"'), (s, post: string) => {
+  expect(s.post).toBe(post);
+});
+
+Given(re('a fleet leader with Might (\\d+) in the post "(admiral|commodore|viceroy)"'), (s, might: string, post: string) => {
+  expect(N.isPost(post)).toBe(true);
+  s.leaderMight = num(might);
+  s.post = post;
+});
+Then(re("his Might counts as ([\\d.]+) in a sea battle"), (s, might: string) => {
+  near(N.battleMight(s.leaderMight, s.post), num(might));
+});
+
+Given(
+  re("a ([a-z ]+) fleet (with a leader|with no leader), its realm (at war|at peace), (lying still in a sea zone|sailing a voyage|in a sea battle|running for port|landing an army|lying in port)"),
+  (s, type: string, leader: string, war: string, where: string) => {
+    s.blockadeFleet = {
+      types: [type],
+      hasLeader: leader === "with a leader",
+      atWar: war === "at war",
+      atSea: where !== "lying in port",
+      sailing: where === "sailing a voyage",
+      inBattle: where === "in a sea battle",
+      fleeing: where === "running for port",
+      landing: where === "landing an army",
+    };
+  },
+);
+Then(re("the fleet (blockades|does not blockade)"), (s, b: string) => {
+  expect(N.blockades(s.blockadeFleet)).toBe(b === "blockades");
+});
+
+Given(re("a sea zone that (no blockade closes|a blockade closes)"), (s, b: string) => {
+  s.zoneBlockaded = b === "a blockade closes";
+});
+Given(re("(no commodore|a commodore) of its realm lies there"), (s, c: string) => {
+  s.ownCommodore = c === "a commodore";
+});
+Then(re("a trade ship of the blocked realm (passes|may not pass) the zone"), (s, p: string) => {
+  expect(N.tradeShipPasses(s.zoneBlockaded, s.ownCommodore)).toBe(p === "passes");
+});
+
+Given(re("a closed port whose sea trade value is ([\\d.]+) gold a month at a trade ratio of ([\\d.]+)"), (s, v: string, r: string) => {
+  s.portSeaValue = num(v);
+  s.portRatio = num(r);
+});
+When(re('the month\'s prize money is taken by a fleet under its "(admiral|commodore|viceroy)"'), (s, post: N.Post) => {
+  s.prize = N.blockadePrize(s.portSeaValue, s.portRatio, post);
+});
+Then(re("the blockading realm takes ([\\d.]+) gold"), (s, g: string) => {
+  near(s.prize, num(g));
+});
+
+Given("the blockade config of the design", (s) => {
+  s.peaceWeight = N.blockadePeaceWeight();
+});
+Then(re("each closed port counts as ([\\d.]+) of an occupied province when its side weighs peace"), (s, w: string) => {
+  near(s.peaceWeight, num(w));
+});

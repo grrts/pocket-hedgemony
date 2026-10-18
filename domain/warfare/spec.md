@@ -916,7 +916,7 @@ file `packages/rules/data/domain/warfare.json` (D-WAR-17).
   hits and stays afloat loses one hull step, and hits equal to its strength sink or take it;
   higher-Cunning admiral slips away at night; repairs in harbour (shipyard ×2); soldiers aboard a lost ship
   drown or are captured. [warfare §11.2]
-- Fleet orders Blockade, Carry (landing a day per 5,000 men), Hunt, Escort; storms follow naval's rule (D-NAVY-7):
+- Fleet orders Blockade, Carry (landing a day per 5,000 men), Hunt, Escort (blockades are now set by naval's NAVY-140 to NAVY-144: no order, a fleet at war lying still; prize money and peace weight; F-123); storms follow naval's rule (D-NAVY-7):
   1 in 20 ships a month at sea in storm season, a struck ship losing one hull step and a wrecked one sinking. [warfare §11.3]
 - Naval adds crew share, boarding (on Close order or ram, land bell rules on one sector), prizes, sunk crews,
   pirates and ports at war. [naval §8]

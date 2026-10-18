@@ -197,7 +197,7 @@ its ratio in about seven months.
 - TRADE-039 While a province has homeless over 5 %, the trade context shall lower its ratio gain by 5 % for every 5 % of homeless. [trade §4.3]
 - TRADE-040 While a province is under plague quarantine, the trade context shall set its ratio to 0 and let no trader enter. [trade §4.3]
 - TRADE-041 While an enemy army or a siege is in a province, the trade context shall give it no ratio gain that month. [trade §4.3]
-- TRADE-042 While a port is blockaded, the trade context shall let no ship enter it and stop its sea-lane gain. [trade §4.3, §8.2]
+- TRADE-042 While a port is blockaded, the trade context shall let no ship enter it and stop its sea-lane gain. [trade §4.3, §8.2] *When a port is blockaded, which trade ships may pass and the prize money are now set by NAVY-140 to NAVY-143 (playtest feedback).*
 
 ### 5.5 Collecting
 - TRADE-043 When a trader enters a province, the trade context shall on that day collect trade value × trade ratio × hold × visit share (0.2) × crowding into its purse. [trade §4.4]

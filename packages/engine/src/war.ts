@@ -5,6 +5,7 @@ import type { Ground } from "@ph/rules";
 import { independencePeace, subjectAnswersCall } from "./subjects.ts";
 import * as dip from "./domain/diplomacy/index.ts";
 import * as wf from "./domain/warfare/index.ts";
+import navalData from "../../rules/data/domain/naval.json" with { type: "json" };
 import { planRoute } from "./march.ts";
 import { GROUNDS } from "./tiles.ts";
 import { halt, marchTo, routeBars } from "./turn.ts";
@@ -696,10 +697,14 @@ function occupy(world: World, p: number, by: number, text: string, news: News[])
 
 export type PeaceTerms = "take" | "white" | "give";
 
+/** A blockaded port weighs this share of a lost province in its side's wish for peace (NAVY-144). */
+const BLOCKADE_PEACE_WEIGHT = navalData.blockade.peaceWeight;
+
 /**
  * How ready a side is to make peace, as a share of its voices (WAR-181): the
- * land and people it has lost to occupation, a third more for its capital, and
- * up to a quarter more when its armies are outnumbered three to one.
+ * land and people it has lost to occupation (a port the enemy blockades
+ * counting half), a third more for its capital, and up to a quarter more
+ * when its armies are outnumbered three to one.
  */
 export function peaceShare(world: World, side: number[], enemySide: number[]): number {
   let people = 0;
@@ -713,6 +718,9 @@ export function peaceShare(world: World, side: number[], enemySide: number[]): n
     if (world.provinceOccupier[p]! >= 0) {
       lost += world.provincePopulation[p]!;
       if (world.rules.nations[o]!.capital === world.provinceIds[p] && o === side[0]) capital = wf.W.peace.capital_share;
+    } else if (world.navy.blockade[p]! > 0 && enemySide.includes(world.navy.blockade[p]! - 1)) {
+      // A port the enemy's ships close weighs as half a lost province (NAVY-144).
+      lost += world.provincePopulation[p]! * BLOCKADE_PEACE_WEIGHT;
     }
   }
   const field = (s: number[]) => s.reduce((t, n) => t + strength(world, n), 0);

@@ -19,7 +19,7 @@ import {
   type ColonialGovernor,
   type ColonyFounding,
 } from "./exploration.ts";
-import { allExplorers, buyShip, callable, dockRight, fleetById, isPort, mayEnterZone, muster, planVoyage, reachOf, resupply, shipGold, whyNotShip, type NavyFleet } from "./navy.ts";
+import { allExplorers, buyShip, callable, dockRight, fleetById, isPort, mayEnterZone, muster, planVoyage, reachOf, resupply, setCourse, shipGold, whyNotShip, type NavyFleet } from "./navy.ts";
 
 /**
  * Voyages into the fog, colonial governors and colonies being founded, as the
@@ -102,8 +102,7 @@ export function giveVoyage(world: World, n: number, id: number, path: readonly n
   }
   if (f.ships.some((s) => s.crew < nv.shipRow(s.type).crew * NC.minCrewToSail)) return "a ship has less than a quarter of its crew";
   resupply(world, f);
-  f.route = path.slice();
-  f.progress = 0;
+  setCourse(f, path.slice());
   f.landAt = -1;
   f.fleeing = false;
   const e = world.explore;
@@ -158,7 +157,7 @@ export function stepVoyages(world: World, news: News[]): void {
     if (home >= 0 && left <= home) {
       const plan = planVoyage(world, f, (p) => !world.provinceWater[p] && dockRight(world, f.owner, p) !== null);
       if (plan) {
-        f.route = plan.path;
+        setCourse(f, plan.path);
         v.turnedBack = true;
       }
     }
@@ -306,7 +305,9 @@ function foundColony(world: World, n: number, id: number, p: number, news: News[
   g.fleet = -1;
   g.colony = p;
   g.homeward = false;
-  world.explore.colonies.push({ province: p, owner: n, governor: g.id, progress: CFG.progress_start, aggression, food: 0, lastChange: 0 });
+  // A colony a viceroy's fleet founds starts ahead (NAVY-139).
+  const ahead = f.admiral >= 0 ? (nv.postRow(f.post).colonyStart ?? 0) : 0;
+  world.explore.colonies.push({ province: p, owner: n, governor: g.id, progress: CFG.progress_start + ahead, aggression, food: 0, lastChange: 0 });
   if (n === world.player) news.push({ kind: "colony", text: `${g.name} goes ashore at ${name(world, p)} and starts a colony. The locals are ${aggression.toLowerCase()}.`, nations: [n], province: p });
   return null;
 }
@@ -486,7 +487,7 @@ function aiExploration(world: World, news: News[]): void {
         const to = hungry ? hungry.province : target;
         resupply(world, f);
         const plan = planVoyage(world, f, (p) => !!world.provinceWater[p] && besides(world, p, to));
-        if (plan) f.route = plan.path;
+        if (plan) setCourse(f, plan.path);
         continue;
       }
       const course = courseIntoFog(world, f, AI.most_zones_out);
@@ -498,7 +499,7 @@ function aiExploration(world: World, news: News[]): void {
 /** Sails an explorer home to a port of its own realm. */
 function aiHome(world: World, f: NavyFleet): void {
   const home = planVoyage(world, f, (p) => !world.provinceWater[p] && world.provinceOwner[p] === f.owner && isPort(world, p));
-  if (home) f.route = home.path;
+  if (home) setCourse(f, home.path);
 }
 
 /** Food a colony still needs, with the AI's margin: its level's months to go × 20 rations × 1.25 (EXPL-062). */

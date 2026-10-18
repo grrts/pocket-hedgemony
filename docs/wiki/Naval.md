@@ -98,7 +98,7 @@ A ship short of crew fights in proportion to its crew share and needs more days 
 
 ### Admirals
 
-A fleet of warships or troop carriers can't leave port without an admiral, though such ships can still defend the port in its own zone. Trade ships sail with no admiral on the routes trade gives them.
+A fleet of warships or troop carriers can't leave port without a leader (an admiral, a commodore or a viceroy, see [Fleets at sea](#fleets-at-sea)), though such ships can still defend the port in its own zone. Trade ships sail with no admiral on the routes trade gives them.
 
 An official is commissioned as admiral by the same act as an army commander in [Recruiting](Recruiting): he leaves the province he ran (left, another official moved in, a deputy named or the lord next door asked) and returns to a province of your choice when released. Years served in a port province count double. A large fleet can have up to two **vice-admirals**, officials or lords, each leading part of the line. An admiral takes the realm's current sea style.
 
@@ -168,7 +168,7 @@ Sea battles are fought over time, in rounds of 4 hours. While one of your fleets
 - When an admiral gives a **Close** order or a galley rams, its soldiers aboard fight the enemy ship's crew and soldiers by the land bell rules on a single sector, and the ship whose defenders break is taken.
 - A ship taken, or one that strikes to a stronger fleet in a hunt, becomes the winner's if a **prize crew** of at least a quarter of its crew is put aboard from the fleet; otherwise it is burned. Its own crew become prisoners or prize crew.
 - When a ship sinks, a third of its crew swim ashore or are picked up by the winner as prisoners, and the rest drown.
-- An enemy fleet in a port's zone blockades the port. An army that takes a port province's castle takes every ship there that has not sailed and the hulls on its slipways.
+- An enemy fleet at war lying still in a port's zone blockades the port (see [Fleets at sea](#fleets-at-sea)). An army that takes a port province's castle takes every ship there that has not sailed and the hulls on its slipways.
 
 **Pirates.** Each pirate coast in config (the wokou in the East China Sea, Barbary and Aegean corsairs, the Orang Laut in the Malacca strait, the Caribbean later) has a pirate fleet with no country, hunting trade ships in its home zones and one zone beyond. Each season in which trade ships passed and no warship hunted there, it gains a ship; ships taken or sunk are removed. Burning its base ends the fleet until trade brings it back. Where a pirate people is also a catalogue record (wokou, Orang Laut), the same fleet can belong to a lord or be hired.
 
@@ -200,7 +200,29 @@ The first slice of ships is playable:
 - **Navy tab.** Your realm card's Navy tab is the overview: ships, sailors, the month's cost, battles, every fleet and every port. The cost is also the *Ships and sailors* line of the Treasury.
 - **The AI** keeps one ship for every two ports (at most four), puts a commander at their head, and at war hunts enemy fleets it outnumbers near by.
 
-Prices are the design's scaled to the game's treasury (ships ×0.1, wages ×0.01), and timber is bought in, so any shipyard can build. Winds, storms, blockades, trade and piracy come in later slices.
+Prices are the design's scaled to the game's treasury (ships ×0.1, wages ×0.01), and timber is bought in, so any shipyard can build. Winds, storms and piracy come in later slices.
+
+### Fleets at sea
+
+These rules come from Leroy's afternoon playtest of 18 October.
+
+**Sailing tile by tile.** A fleet stands on one water tile of its sea zone. In port it lies at the port's anchorage, the water tile beside the port. A voyage is still planned zone by zone, with the same winds, reach, charts and ice. The ship then sails over the water tiles, one leg per zone, toward the next zone's centre, the port it puts into or the shore where its army lands. Each leg takes as many days as the zone always did, spread over its tiles. So the ship glides across the sea as the days pass instead of jumping. You can tap any spot of the sea and the fleet sails to that spot, with its course drawn through the water.
+
+**Sighting range.** Enemy fleets meet only when they are in the same sea zone, just as armies only meet in the same province. Even then they must come within sight of each other. A fleet sees 20 tiles, plus 1 tile for each point of its leader's Cunning, up to 30 tiles. Armies see only 10 to 15. Choose a fleet and its sighting ring shows on the map. A fleet that comes within range of a sea battle in its zone joins its side. The battle is fought where the defender stands. Fleets in port, fleets running for port after a defeat and fleets of realms not at war never meet.
+
+**Three posts.** Every fleet leader holds one of three posts. You pick it on the fleet card with three buttons in one row, and you can change it at any time for free. When you appoint a leader, the game picks the post that fits the fleet: commodore for trade ships only, viceroy for exploration ships only, otherwise admiral. Any of the three lets warships and troop ships leave port.
+
+| Post | For | What he does |
+|---|---|---|
+| Admiral | war | His Might and Cunning count in full in sea battles. |
+| Commodore | trade | Your trade ships pass enemy blockades in the zone where his fleet lies. Your ports beside that zone gain trade ratio 25 % faster. A blockade he holds takes 1.5 times the prize money. His Might counts half in battle. |
+| Viceroy | exploration and colonies | His fleet charts two rings of sea zones around it instead of one. A colony founded from his fleet starts 10 points ahead. His Might counts half in battle. |
+
+**Blockades.** A blockade needs no order. A fleet blockades when its realm is at war, it has at least one warship and a leader, and it lies still in a sea zone: not sailing, not landing an army, not fighting and not running for port. It closes every coastal province beside its zone held by a realm at war with it. A closed port gains no trade ratio, and its Port tab says who blockades it. The enemy's trade ships may not sail through the zone. They go round it or wait, and one caught there loses its purse to you as a prize. A commodore of their own lying in the zone takes them through.
+
+**Prize money.** Each month you take half of each closed port's sea trade for the month: its value to ships times its trade ratio. A port worth 20 gold a month to ships at a trade ratio of 40 pays you 4 gold, or 6 gold under a commodore. The fleet card says it plainly: "Blockading 3 ports of Castile: about 4 gold a month in prizes". Blockades also wear the enemy down. Each closed port counts half as much as an occupied province when they weigh making peace.
+
+**Where to see it.** You hear when your fleet starts a blockade and when an enemy closes your ports. Your Navy tab lists the blockades you hold and the ones you suffer, with their ports and prize money, and the month's prize money. On the map a closed port wears a chain mark in the blockader's colour.
 
 ## How it connects
 
@@ -261,6 +283,9 @@ All values are **placeholders** in one naval config file (keys proposed by the s
 | `naval.small_craft` | 6 sailors; 10 men or a load |
 | `naval.room.horse` / `gun` | 4 / 20 men |
 | `naval.ai.fleet_ai_radius_zones` | 10 |
+| `seaEngage` | sighting range 20 tiles, +1 per point of Cunning, at most 30 |
+| `admiralPosts` | Might counts in full for an admiral, half for a commodore or viceroy; commodore trade gain 25 %, prize ×1.5; viceroy two rings charted, colony 10 points ahead |
+| `blockade` | prize money half of a closed port's sea trade; a closed port weighs half an occupied province |
 | `naval.ships`, `naval.step_days`, `naval.admirals_by_official` | the tables above |
 
 Ports data: `naval/data/ports-1444.tsv` (hand-edited) and the generated `ports-1444.json` and `start-ports.json`, made by `naval/tools/place_ports.py`.
@@ -289,6 +314,6 @@ Nothing in the rules. Balancing is a tuning pass on the numbers.
 
 ## For developers
 
-- Spec: `domain/naval/spec.md` in the game repository, requirement code **NAVY** (NAVY-001 to NAVY-117).
-- Features: `domain/naval/features/`, including `ports.feature`, `sailors.feature` (the Lagos muster), `buying-ships.feature`, `admirals.feature` (Rui Vaz of Lagos), `sailing.feature` and `sea-combat.feature`.
+- Spec: `domain/naval/spec.md` in the game repository, requirement code **NAVY** (NAVY-001 to NAVY-149; fleets at sea are NAVY-132 to NAVY-149).
+- Features: `domain/naval/features/`, including `ports.feature`, `sailors.feature` (the Lagos muster), `buying-ships.feature`, `admirals.feature` (Rui Vaz of Lagos), `sailing.feature`, `sea-combat.feature` and `fleets-at-sea.feature` (sighting range, posts, blockades and prize money).
 - Code: there is no `packages/engine/src/domain/naval/` yet. The port placer is `naval/tools/place_ports.py` in the designs.
