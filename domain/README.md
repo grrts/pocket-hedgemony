@@ -14,7 +14,7 @@ Every system of Pocket Hegemony as a bounded context: a domain spec (`spec.md`, 
 | [Game shell](game-shell/spec.md) | SHELL | 148 | 15 | 403 | 24 | 0 |
 | [Government](government/spec.md) | GOV | 57 | 6 | 261 | 17 | 0 |
 | [Map presentation](map-presentation/spec.md) | VIEW | 87 | 9 | 166 | 9 | 1 |
-| [National strengths](national-strengths/spec.md) | HER | 79 | 12 | 137 | 17 | 0 |
+| [National strengths](national-strengths/spec.md) | HER | 83 | 13 | 141 | 18 | 0 |
 | [Naval](naval/spec.md) | NAVY | 125 | 9 | 259 | 29 | 0 |
 | [Onboarding](onboarding/spec.md) | TUT | 120 | 15 | 179 | 15 | 0 |
 | [Province](province/spec.md) | PROV | 216 | 26 | 612 | 29 | 0 |
@@ -25,7 +25,7 @@ Every system of Pocket Hegemony as a bounded context: a domain spec (`spec.md`, 
 | [Research](research/spec.md) | RSCH | 63 | 7 | 133 | 20 | 0 |
 | [Revolutions](revolutions/spec.md) | REVO | 81 | 14 | 235 | 15 | 1 |
 | [Saves](saves/spec.md) | SAVE | 104 | 11 | 212 | 15 | 1 |
-| [Scenario setup](scenario-setup/spec.md) | SETUP | 58 | 7 | 160 | 17 | 0 |
+| [Scenario setup](scenario-setup/spec.md) | SETUP | 59 | 7 | 164 | 17 | 0 |
 | [Settings](settings/spec.md) | SET | 130 | 12 | 394 | 18 | 1 |
 | [Subjects and overlords](subjects/spec.md) | SUBJ | 110 | 17 | 298 | 25 | 0 |
 | [Time and turns](time-and-turns/spec.md) | TIME | 76 | 7 | 181 | 15 | 0 |
@@ -33,6 +33,6 @@ Every system of Pocket Hegemony as a bounded context: a domain spec (`spec.md`, 
 | [Troop movement](troop-movement/spec.md) | MOVE | 133 | 12 | 246 | 20 | 0 |
 | [Warfare](warfare/spec.md) | WAR | 218 | 17 | 654 | 21 | 0 |
 | [World map](world-map/spec.md) | MAP | 50 | 6 | 175 | 12 | 0 |
-| **All 29 contexts** | | 3298 | 357 | 7919 | 552 | 8 |
+| **All 29 contexts** | | 3303 | 358 | 7927 | 553 | 8 |
 
 Scenarios count each row of a Scenario Outline's examples.

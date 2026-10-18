@@ -186,6 +186,8 @@ The computer always knows its own ambitions and treats them as goals with weight
 
 ## What you see
 
+- **In the game today.** Every realm's card has a **Heritage** line on its General tab, naming its birthright and its burden. Tap it, or the **Heritage** tab, to see the birthright, each heyday with the age it belongs to, and the burden; tap any of them for its full text and history note. Under them, **In 1444** shows how the chronicles judge the realm at the start: Strength (economy, manpower, army, navy, trade, standing abroad), Government (reach of rule, finances, stability, institutions, cohesion, prospects) and Dangers (unrest, threat from outside), each as five steps with a word, with a question mark where the chronicles are unsure. The tab is there for every realm, also before you pick one. 110 of the 137 realms on the map have heritage; the rest say none is recorded yet. Ambitions, legacies and heydays waking follow when heritage is checked each turn.
+
 - **The country card** gets one Heritage row: the birthright icon, the awake heyday icon, three ambition seals and the burden icon. Tapping it opens the Heritage sheet.
 - **The heritage card** shows five rows, never more: Birthright, Heyday, Ambitions, Burden and Legacies ("none yet" when empty). Tapping a row shows its full text, its history note and what it changes. A dormant birthright is greyed.
 - **Seal moments.** When a seal cracks or warmth rises from warm to hot, a small quiet animation plays and one line goes into the monthly digest.

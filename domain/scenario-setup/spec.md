@@ -216,6 +216,7 @@ Newest decision first.
 - SETUP-048 (Ubiquitous): The map's nations shall be the realms and the playable list; capitals, colours and commanders come from the map nations data, and rulers from the matched catalogue record. [gap-lists item 25; X-13; D-SETUP-1, D-SETUP-3, D-SETUP-13]
 - SETUP-049 (Ubiquitous): The map setup shall use catalogue ids for countries. [country-relations README; trade §13.1; religion §2.3; X-13] The 37 map ids that differ are matched through the rename table in `scenario-setup.json` (D-SETUP-1).
 - SETUP-050 (Ubiquitous): A colony shall be founded only in a province no country owns; land of a tribe that is a country (a chiefdom or clan council in the 1444 list) can only be taken by war or treaty. [exploration §5.1, §10; province-stats §12.3; X-13] Only a representation that owns map provinces is a country (D-SETUP-2).
+- SETUP-059 (Ubiquitous): Each realm shall carry its catalogue `administrative_capacity` as a rank from 1 (very low) to 5 (very high), 0 where it has no record, for the contexts that read how far its rule reaches (subjects). [X-13; D-SETUP-1; national-strengths D-HER-18]
 
 ### 5.7 Playable realms and campaign rules
 
@@ -400,6 +401,7 @@ Nothing after the start. Before the first turn: build the starting world, then t
 | SETUP-049 | catalogue-to-map.feature | Map nations use catalogue ids |
 | SETUP-050 | catalogue-to-map.feature | Only land no realm on the map owns can be colonised |
 | SETUP-050 | catalogue-to-map.feature | A catalogue record that owns no map province is not a realm |
+| SETUP-059 | catalogue-to-map.feature | Each realm carries its administrative capacity |
 | SETUP-051 | new-campaign.feature | The free tier offers the Ottomans and France |
 | SETUP-051 | new-campaign.feature | The tutorial is played as the Ottomans |
 | SETUP-052 | new-campaign.feature | A locked realm leads to Unlock and comes back chosen |

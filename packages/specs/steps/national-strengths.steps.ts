@@ -1,6 +1,6 @@
 import { expect } from "vitest";
 import { steps, type Scenario } from "../src/registry.ts";
-import { Rng } from "@ph/engine";
+import { realmStrengths, Rng } from "@ph/engine";
 import { loadDefaultRuleset, type ProvinceDef } from "@ph/rules";
 import type { Era } from "@ph/engine/domain/research";
 import * as N from "@ph/engine/domain/national-strengths";
@@ -1742,4 +1742,46 @@ Then("its heritage works exactly as in the full game", (s) => {
   N.startCampaign(full, new Rng(5), N.emptyWorld());
   expect(s.free).toEqual(full);
   expect(N.card(s.free)).toEqual(N.card(full));
+});
+
+// ---------------------------------------------------------------- realms on the map (HER-080)
+
+const mapRealm = (name: string): string => {
+  const n = loadDefaultRuleset().nations.find((x) => x.name === name || x.id === name);
+  if (!n) throw new Error(`no map nation ${name}`);
+  return n.id;
+};
+Given("the realm {string} on the map", (s, name: string) => {
+  s.realm = mapRealm(name);
+});
+When("its strengths are read", (s) => {
+  s.strengths = realmStrengths(s.realm);
+});
+Then("its birthright is {string}", (s, name: string) => {
+  expect(s.strengths.heritage.birthright.name).toBe(name);
+  expect(s.strengths.heritage.birthright.why).toBeTruthy();
+});
+Then("its burden is {string}", (s, name: string) => {
+  expect(s.strengths.heritage.burden.name).toBe(name);
+});
+Then(/^its heydays belong to the (.+)$/, (s, ages: string) => {
+  expect(s.strengths.heritage.heydays.map((d: { ageName: string }) => d.ageName)).toEqual(ages.split(", "));
+});
+Then("it has no heritage and no assessments", (s) => {
+  expect(s.strengths).toMatchObject({ catalogue: null, heritage: null, assessments: [] });
+});
+Given("the map's realms", (s) => {
+  s.realms = loadDefaultRuleset().nations.map((n) => n.id);
+});
+When("their strengths are read", (s) => {
+  s.all = s.realms.map((id: string) => realmStrengths(id));
+});
+Then("{int} realms have a birthright and every heyday names its age", (s, count: number) => {
+  const withHeritage = s.all.filter((r: ReturnType<typeof realmStrengths>) => r.heritage);
+  expect(withHeritage).toHaveLength(count);
+  for (const r of withHeritage) {
+    expect(r.heritage!.birthright.name).toBeTruthy();
+    expect(r.assessments).toHaveLength(14);
+    for (const d of r.heritage!.heydays) expect(d.ageName).toMatch(/^(Age of |Cold War)/);
+  }
 });

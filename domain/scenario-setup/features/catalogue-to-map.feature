@@ -44,3 +44,16 @@ Feature: Putting the catalogue on the map
     Given the catalogue record "silesia" owns no map province
     When the starting world is built
     Then it is reference data and not a realm
+
+  @SETUP-059
+  Scenario Outline: Each realm carries its administrative capacity
+    Given the map nation "<map id>"
+    When the starting world is built
+    Then the realm's administrative capacity is <rank>
+
+    Examples:
+      | map id   | rank |
+      | france   | 4    |
+      | venice   | 5    |
+      | mali     | 3    |
+      | ireland  | 0    |
