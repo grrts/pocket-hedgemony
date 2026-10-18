@@ -49,3 +49,22 @@ Feature: Starting values rules
     And the armies of "France" stand in different provinces
     And "France" has one commander for each 8,000 men under arms, at least one
     And each commander of "France" leads an army, the first in its capital
+
+  @REALM-230 @placeholder
+  Scenario: The world starts each realm from its assessments
+    # config: starting
+    Given the game starts with the country "France"
+    Then "France" starts with 8 months of its tax and trade in gold, within 10 %
+    And "France" starts owing half its gold
+    And the levies of "France" start between 90 % and all of its levy ceiling
+    And "France" starts with 3 envoys at court, each an envoy seat
+    And the empty posts of "Castile" are its royal provinces farthest from its capital
+    And a realm with no catalogue assessment starts with 50 gold
+
+  @REALM-231
+  Scenario: AI realms call men only with someone to lead them
+    Given the game starts with the AI country "Castile"
+    And every commander of "Castile" leads an army
+    When the AI of "Castile" calls up men for a war with 10 gold
+    Then the AI of "Castile" calls no men
+    But with 200 gold the AI of "Castile" calls men
