@@ -93,6 +93,7 @@ export function hashWorld(world: World): string {
   feed(world.nationFaithPending);
   feed(world.provinceOfficialSeed);
   feed(world.provinceOfficialSince);
+  feed(world.provinceOfficialFrom);
   feed(live(a.trainArm));
   feed(live(a.trainMen));
   feed(live(a.trainLeft));

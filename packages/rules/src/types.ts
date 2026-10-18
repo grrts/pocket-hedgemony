@@ -120,8 +120,6 @@ export interface RecruitDefines {
   unpaidDesertion: number;
   /** Weekly turns a free company takes to arrive at the least; farther homes take longer. */
   mercenaryWeeks: number;
-  /** Gold to commission an official as a commander. */
-  commanderGold: number;
   /** First names for commanders the realm hires. */
   commanderNames: string[];
 }

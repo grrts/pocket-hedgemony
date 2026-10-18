@@ -1,4 +1,4 @@
-import { officialEffect, type Snapshot } from "@ph/engine";
+import { officialEffect, OFFICIALS, type Snapshot } from "@ph/engine";
 import type { Ruleset } from "@ph/rules";
 import { sprite } from "../art/sprites.ts";
 import { lookOfCulture, portrait, type Look } from "../art/portraits.ts";
@@ -43,6 +43,8 @@ export interface Official {
   post: string;
   /** Years served in this province; his effect grows to full at 5. */
   years: number;
+  /** Realm a foreign specialist came from, -1 = one of the realm's own. */
+  from: number;
 }
 
 /** The official in province p's post as the snapshot gives it, or null when the post stands empty. */
@@ -50,7 +52,7 @@ export function officialOf(s: Snapshot, p: number, owner: number): Official | nu
   const post = s.provinceOfficial[p];
   const name = s.provinceOfficialName[p];
   if (!post || !name || owner < 0) return null;
-  return { province: p, name, post, years: s.provinceOfficialYears[p] ?? 0 };
+  return { province: p, name, post, years: s.provinceOfficialYears[p] ?? 0, from: s.provinceOfficialFrom?.[p] ?? -1 };
 }
 
 export function officialPortrait(rules: Ruleset, o: Official, nation: number, scale = 3): string {
@@ -73,13 +75,14 @@ export function effectText(o: Official): string {
 }
 
 /** The official as a card on the province's overview: portrait, name and post, his effect, and a button to their screen. */
-export function officialCard(rules: Ruleset, o: Official | null, nation: number, mine: boolean, servesLord = false): string {
+export function officialCard(rules: Ruleset, o: Official | null, nation: number, mine: boolean, servesLord = false, fill = -1): string {
   const place = rules.provinces[o?.province ?? 0]?.name ?? "";
   if (!o)
-    return `<div class="army person empty-post"><span class="portrait-slot"></span><span class="who"><b>No official</b><br><small>The post stands empty: half tax and recruits until it is filled again.${mine ? " Move an official here from his screen." : ""}</small></span></div>`;
+    return `<div class="army person empty-post"><span class="portrait-slot"></span><span class="who"><b>No official</b><br><small>The post stands empty: half tax and recruits until it is filled again.</small></span>
+      ${mine && !servesLord && fill >= 0 ? `<span class="army-buttons"><button class="paper small" data-official="${fill}">Fill the post</button></span>` : ""}</div>`;
   const e = officialEffect(o.post, o.years);
   return `<div class="army person">${officialPortrait(rules, o, nation)}
-    <span class="who"><b>${esc(o.name)}</b><br><small>${esc(o.post)} of ${esc(place)}${servesLord ? ". He serves the lord." : ""}</small><br>
+    <span class="who"><b>${esc(o.name)}</b><br><small>${esc(o.post)} of ${esc(place)}${o.from >= 0 ? `, from ${esc(rules.nations[o.from]!.name)}` : ""}${servesLord ? ". He serves the lord." : ""}</small><br>
     <small class="effect">${esc(effectText(o))}</small> ${servicePips(o.years, e.share)}</span>
     ${mine ? `<span class="army-buttons"><button class="paper small" data-official="${o.province}">Official</button></span>` : ""}</div>`;
 }
@@ -94,10 +97,12 @@ export function officialsTab(rules: Ruleset, list: { province: number; official:
   const empty = list.filter((x) => !x.official);
   const types = new Map<string, number>();
   for (const o of filled) types.set(o.post, (types.get(o.post) ?? 0) + 1);
+  const missing = OFFICIALS.filter((t) => !types.has(t));
   filled.sort((a, b) => a.post.localeCompare(b.post) || b.years - a.years);
   return `<p><b>${filled.length}</b> officials run your royal provinces: ${[...types].sort((a, b) => b[1] - a[1]).map(([t, c]) => `${c} ${esc(c === 1 ? t.toLowerCase() : plural(t.toLowerCase()))}`).join(", ")}.${lordPosts ? ` Your lords' own officials run their ${lordPosts} provinces.` : ""}</p>
+    ${missing.length ? `<p class="hint">No royal post has ${missing.map((t) => `a ${esc(t.toLowerCase())}`).join(", ")}: those come only as foreign specialists.</p>` : ""}
     <p class="hint">Each type helps the province it runs, at half in his first year and in full after 5 years there. Open an official to move him where his type helps most.</p>
-    ${empty.length ? `<h3 class="sub">Empty posts · ${empty.length}</h3><p class="hint">Half tax and recruits until an official is moved in.</p><p>${empty.map((x) => `<button class="paper small" data-show-province="${x.province}">${esc(rules.provinces[x.province]!.name)}</button>`).join(" ")}</p>` : ""}
+    ${empty.length ? `<h3 class="sub">Empty posts · ${empty.length}</h3><p class="hint">Half tax and recruits until an official is moved in or hired. Tap one to fill it.</p><p class="post-buttons">${empty.map((x) => `<button class="paper small" data-official="${x.province}">${esc(rules.provinces[x.province]!.name)}</button>`).join(" ")}</p>` : ""}
     <h3 class="sub">In post · ${filled.length}</h3>
     <div class="lord-list">${filled
       .map((o) => {
@@ -125,7 +130,7 @@ export function officialScreen(rules: Ruleset, o: Official, nation: number, gold
   const place = rules.provinces[o.province]!.name;
   const e = officialEffect(o.post, o.years);
   return `<div class="person-card">${officialPortrait(rules, o, nation, 5)}
-      <div><p><b>${esc(o.name)}</b></p><p>${esc(o.post)} of ${esc(place)}</p><p class="hint">The ${esc(o.post.toLowerCase())} ${POST_DUTIES[o.post] ?? "serves the realm"}.</p></div>
+      <div><p><b>${esc(o.name)}</b></p><p>${esc(o.post)} of ${esc(place)}</p>${o.from >= 0 ? `<p><small>A foreign specialist from ${esc(rules.nations[o.from]!.name)}</small></p>` : ""}<p class="hint">The ${esc(o.post.toLowerCase())} ${POST_DUTIES[o.post] ?? "serves the realm"}.</p></div>
     </div>
     <dl class="facts">
       <dt>Province</dt><dd><button class="paper capital" data-show-province="${o.province}">${esc(place)}</button></dd>
@@ -144,7 +149,49 @@ export function officialScreen(rules: Ruleset, o: Official, nation: number, gold
     ${allMoves ? "" : `<button class="paper small more" data-moves-all>Show every province</button>`}
     <h3 class="sub">Command</h3>
     <p class="hint">Commissioned, ${esc(o.name)} waits at court to lead an army. The post stands empty meanwhile: half tax and recruits.</p>
-    <div class="choices"><button class="wax" data-commission="${o.province}" ${gold > treasury ? "disabled" : ""}>Commission as commander · ${gold} gold</button></div>`;
+    <div class="choices"><button class="wax" data-commission="${o.province}" ${gold > treasury ? "disabled" : ""}>Commission as commander · ${gold} gold</button></div>
+    ${gold > treasury ? `<p class="hint">Not enough gold: the commission costs ${gold}.</p>` : ""}`;
+}
+
+/** A type the empty post could be filled with by hiring: what it would do here, and whether one can be found at home. */
+export interface HireRow {
+  /** Index in OFFICIALS. */
+  type: number;
+  /** Someone of this type serves in another royal post, so one can be hired at home. */
+  home: boolean;
+}
+
+/**
+ * An empty post's screen (PROV-336): first the realm's officials who could
+ * move in, best fit for this province first, then each type to hire, at
+ * home or from abroad, with what he would do here in his first year.
+ */
+export function postScreen(rules: Ruleset, province: number, moves: MoveOption[], allMoves: boolean, hires: HireRow[], price: { home: number; foreign: number }, treasury: number): string {
+  const place = rules.provinces[province]!.name;
+  const hireButton = (r: HireRow, foreign: boolean) => {
+    const gold = foreign ? price.foreign : price.home;
+    const why = !foreign && !r.home ? "No one at home knows this trade" : gold > treasury ? `Not enough gold: ${gold} needed` : "";
+    return `<button class="paper small${foreign ? "" : " wax"}" data-hire="${province}" data-hire-type="${r.type}" data-hire-foreign="${foreign ? 1 : 0}" ${why ? `disabled title="${why}"` : ""}>${foreign ? "Foreign" : "Hire"} · ${gold} gold</button>`;
+  };
+  return `<p>The post at <button class="paper capital" data-show-province="${province}">${esc(place)}</button> stands empty: the province pays half its tax and gives half its recruits until it is filled.</p>
+    <h3 class="sub">Move an official here</h3>
+    <p class="hint">He leaves his own post empty, or you fill it next. A new post starts him at half his effect. Best fit for ${esc(place)} first.</p>
+    ${moves.length ? `<div class="place-list">${moves
+      .map((m) => `<div class="place-row">
+        <button class="place" data-official="${m.province}" title="Open ${esc(m.other!.name)}">
+          <img class="thumb" src="${m.thumb}" alt="" width="48" height="48"><span><b>${esc(m.other!.name)}</b><small>${esc(m.other!.post)} of ${esc(rules.provinces[m.province]!.name)} · here: ${esc(officialEffect(m.other!.post, 0).lines.join(", "))}</small></span>
+        </button><button class="paper small" data-swap="${m.province}" data-swap-to="${province}">Move here</button></div>`)
+      .join("")}</div>
+    ${allMoves ? "" : `<button class="paper small more" data-moves-all>Show every official</button>`}` : `<p class="hint">No other royal province has an official to spare.</p>`}
+    <h3 class="sub">Hire an official</h3>
+    <p class="hint">Gold up front. A type no royal post of yours has can only come from abroad, as a foreign specialist at ${price.foreign} gold.</p>
+    <div class="hire-list">${hires
+      .map((r) => {
+        const post = OFFICIALS[r.type]!;
+        return `<div class="hire-row"><span><b>${esc(post)}</b><small>${esc(officialEffect(post, 0).lines.join(", "))} in the first year${officialEffect(post, 0).note ? ` · ${esc(officialEffect(post, 0).note!.toLowerCase())}` : ""}</small>${r.home ? "" : "<small>No one at home knows this trade</small>"}</span>
+          <span class="hire-buttons">${hireButton(r, false)}${hireButton(r, true)}</span></div>`;
+      })
+      .join("")}</div>`;
 }
 
 export interface SiegeInfo {

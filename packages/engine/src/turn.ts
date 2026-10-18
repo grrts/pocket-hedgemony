@@ -16,7 +16,7 @@ import { monthlyGovernment, reform } from "./government.ts";
 import { monthlyNavy, navyOrder, stepNavy, type NavyOrder } from "./navy.ts";
 import { dailyExploration, exploreOrder, monthlyColonies, stepVoyages, type ExploreOrder } from "./colonies.ts";
 import { monthlyPeoples, setFaithPolicy, setTonguePolicy } from "./peoples.ts";
-import { swapOfficials } from "./officials.ts";
+import { hireOfficial, swapOfficials } from "./officials.ts";
 import { giveGift, grantFief, inAnyWar, monthlyLords, seizeFief } from "./lords.ts";
 import { noteMoment, turnEndAchievements } from "./achievements.ts";
 import { addDays, DAYS_PER_RATION_MONTH, DAYS_PER_TURN } from "./calendar.ts";
@@ -105,6 +105,8 @@ export type Order =
   | { type: "seizeFief"; province: number }
   /** Move officials between two royal provinces: they swap posts, or one takes the other's empty post (AssignOfficial). */
   | { type: "swapOfficials"; a: number; b: number }
+  /** Hire an official of a type (an OFFICIALS index) into an empty royal post; a foreign specialist costs more (HireOfficial). */
+  | { type: "hireOfficial"; province: number; official: number; foreign: boolean }
   /** Research: choose the invention to study, how many students to keep, empty the schools into recruits, found a school in a town. */
   | { type: "setStudy"; invention: string }
   | { type: "setSeats"; n: number }
@@ -326,6 +328,11 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
     case "swapOfficials": {
       const reason = swapOfficials(world, actingNation, order.a, order.b, news);
       // The ledger shows the new sums at once.
+      if (!reason) runLedger(world, false);
+      return reason;
+    }
+    case "hireOfficial": {
+      const reason = hireOfficial(world, actingNation, order.province, order.official, !!order.foreign, news);
       if (!reason) runLedger(world, false);
       return reason;
     }

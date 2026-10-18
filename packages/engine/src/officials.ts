@@ -1,7 +1,7 @@
 import type { World } from "./world.ts";
 import type { News } from "./war.ts";
 import { officialName } from "./names.ts";
-import { officialEffectShare } from "./domain/province/rule.ts";
+import { hirePrice, officialEffectShare } from "./domain/province/rule.ts";
 import { provinceConfig } from "./domain/province/model.ts";
 
 /**
@@ -27,7 +27,9 @@ export function yearsServed(world: World, p: number): number {
 export function officialAt(world: World, p: number): string | null {
   const owner = world.provinceOwner[p]!;
   if (owner < 0 || world.provinceOfficial[p]! < 0) return null;
-  return officialName(world.rules, world.provinceOfficialSeed[p]!, owner);
+  // A foreign specialist bears a name of the realm he came from (PROV-334).
+  const from = world.provinceOfficialFrom[p]!;
+  return officialName(world.rules, world.provinceOfficialSeed[p]!, from >= 0 ? from : owner);
 }
 
 /** A type's effects in the province config, by the engine's name for it ("Tax collector" → "tax collector"). */
@@ -104,7 +106,7 @@ export function seedOfficials(world: World): void {
   for (let p = 0; p < world.provinceCount; p++) {
     world.provinceOfficialSeed[p] = p;
     const months = (Math.imul(p + 1, 0x9e3779b1) >>> 0) % 121;
-    world.provinceOfficialSince[p] = world.day - Math.round((months / 12) * YEAR_DAYS);
+    world.provinceOfficialSince[p] = world.day - Math.floor((months / 12) * YEAR_DAYS);
   }
 }
 
@@ -128,10 +130,13 @@ export function swapOfficials(world: World, n: number, a: number, b: number, new
   const nameA = officialAt(world, a);
   const nameB = officialAt(world, b);
   const sa = world.provinceOfficialSeed[a]!;
+  const fa = world.provinceOfficialFrom[a]!;
   world.provinceOfficial[a] = tb;
   world.provinceOfficial[b] = ta;
   world.provinceOfficialSeed[a] = world.provinceOfficialSeed[b]!;
   world.provinceOfficialSeed[b] = sa;
+  world.provinceOfficialFrom[a] = world.provinceOfficialFrom[b]!;
+  world.provinceOfficialFrom[b] = fa;
   world.provinceOfficialSince[a] = world.provinceOfficialSince[b] = world.day;
   if (n === world.player) {
     const pa = world.rules.provinces[a]!.name;
@@ -142,6 +147,56 @@ export function swapOfficials(world: World, n: number, a: number, b: number, new
     if (tb >= 0) parts.push(moved(nameB!, tb, pb, pa));
     const empty = ta < 0 ? pb : tb < 0 ? pa : null;
     news.push({ kind: "raised", text: `${parts.join("; ")}.${empty ? ` The post at ${empty} stands empty.` : ""} A new post starts him at half his effect.`, nations: [n], province: b });
+  }
+  return null;
+}
+
+/** Official types serving in a realm's royal posts, but province `except`'s: the ones it can hire at home (PROV-333). */
+export function nativeTypes(world: World, n: number, except = -1): Set<number> {
+  const out = new Set<number>();
+  for (let p = 0; p < world.provinceCount; p++) {
+    if (p !== except && world.provinceOwner[p] === n && world.provinceLord[p]! < 0 && world.provinceOfficial[p]! >= 0) out.add(world.provinceOfficial[p]!);
+  }
+  return out;
+}
+
+/** Gold to hire an official into an empty post: a foreign specialist costs more (PROV-333, PROV-334). */
+export const hireGold = (foreign: boolean): number => hirePrice(foreign);
+
+/** A realm next to the post for a foreign specialist to come from; else the next realm in the list. */
+function abroad(world: World, n: number, p: number): number {
+  for (let k = world.adjStart[p]!, end = world.adjStart[p + 1]!; k < end; k++) {
+    const o = world.provinceOwner[world.adjList[k]!]!;
+    if (o >= 0 && o !== n) return o;
+  }
+  for (let k = 1; k < world.nationCount; k++) if (!world.nationGone[(n + k) % world.nationCount]) return (n + k) % world.nationCount;
+  return n;
+}
+
+/**
+ * Hires an official of `type` (an OFFICIALS index) into province p's empty
+ * royal post (HireOfficial, PROV-333 to 335): gold up front, and he starts at
+ * half his effect. A type serving in none of the realm's other royal posts
+ * can only come from abroad, as a foreign specialist who costs more.
+ */
+export function hireOfficial(world: World, n: number, p: number, type: number, foreign: boolean, news: News[]): string | null {
+  if (!Number.isInteger(p) || p < 0 || p >= world.provinceCount || world.provinceOwner[p] !== n) return "not your province";
+  const place = world.rules.provinces[p]!.name;
+  if (world.provinceLord[p]! >= 0) return `${place} is a lord's: his own officials serve him, not the crown`;
+  if (world.provinceOfficial[p]! >= 0) return `${place} has an official already`;
+  if (!Number.isInteger(type) || type < 0 || type >= OFFICIALS.length) return "no such kind of official";
+  if (!foreign && !nativeTypes(world, n, p).has(type)) return `no one at home knows the ${OFFICIALS[type]!.toLowerCase()}'s trade: hire one from abroad`;
+  const gold = hireGold(foreign);
+  if (world.nationTreasury[n]! < gold) return "not enough gold";
+  world.nationTreasury[n] = world.nationTreasury[n]! - gold;
+  world.provinceOfficial[p] = type;
+  // A new man: his name comes from a seed no official of this post has carried at the start.
+  world.provinceOfficialSeed[p] = (p + world.day * 31) % world.provinceCount;
+  world.provinceOfficialSince[p] = world.day;
+  world.provinceOfficialFrom[p] = foreign ? abroad(world, n, p) : -1;
+  if (n === world.player) {
+    const from = foreign ? ` from ${world.rules.nations[world.provinceOfficialFrom[p]!]!.name}` : "";
+    news.push({ kind: "raised", text: `${officialAt(world, p)}, a ${OFFICIALS[type]!.toLowerCase()}${from}, takes up the post at ${place} for ${gold} gold. A new post starts him at half his effect.`, nations: [n], province: p });
   }
   return null;
 }

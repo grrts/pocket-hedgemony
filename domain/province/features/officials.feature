@@ -179,3 +179,25 @@ Feature: Officials and their types
     When the player opens the Officials tab of the country card
     Then it lists every official of the realm with his type, province, years served and effect
     And it lists the empty posts
+
+  @PROV-333 @PROV-335 @placeholder
+  Scenario: Hiring an official for an empty post
+    # config: province.officials.hire.gold
+    Given the province "Troyes" is royal
+    And the province "Rouen" is royal with its post empty
+    And a "steward" official has served 6 years in "Troyes"
+    And the country "France" has 60 gold
+    When the country "France" hires a "steward" for "Rouen"
+    Then the "steward" runs "Rouen" at half his effect
+    And the country "France" has 35 gold left
+    When the country "France" tries to hire a "judge" for "Angers", held by the lord "Anjou"
+    Then it is refused because he serves the lord, not the crown
+
+  @PROV-333 @PROV-334
+  Scenario: A type no one serves in comes only from abroad
+    Given the province "Rouen" is royal with its post empty
+    And no "customs officer" serves in a royal post of "France"
+    When the country "France" tries to hire a "customs officer" for "Rouen"
+    Then it is refused because no one at home knows the trade
+    When the country "France" hires a foreign "customs officer" for "Rouen"
+    Then the "customs officer" runs "Rouen" at half his effect

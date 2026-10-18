@@ -133,6 +133,8 @@ export interface World extends LivingState, TreasuryState, FoodState, MoodState,
   provinceOfficialSeed: Int16Array;
   /** Day (world.day) the official at each post took it up; his years served count from it. */
   provinceOfficialSince: Int32Array;
+  /** Realm a foreign specialist at each post came from, -1 = one of the realm's own (PROV-334). */
+  provinceOfficialFrom: Int16Array;
   /** Province each commander was commissioned from, -1 = none. */
   commanderHome: number[];
   /** Name seed of each commander commissioned from an official, -1 = none. */

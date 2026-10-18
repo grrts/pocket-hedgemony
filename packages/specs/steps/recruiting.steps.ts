@@ -2,7 +2,8 @@ import { expect } from "vitest";
 import * as R from "@ph/engine/domain/recruiting";
 import { provinceConfig } from "@ph/engine/domain/province";
 import { type MoveWorld, type Place } from "@ph/engine/domain/troop-movement";
-import { Rng } from "@ph/engine";
+import { commissionOfficial, createWorld, OFFICIALS, recruit, Rng, weeklyMusters, type World } from "@ph/engine";
+import { loadDefaultRuleset } from "@ph/rules";
 import { steps, type Scenario } from "../src/registry.ts";
 
 const { Given, When, Then } = steps("recruiting");
@@ -578,8 +579,8 @@ Then("the Marshal's best skill is 2", (s) => {
   expect(R.idleMarshal(3, 9)).toBe(3);
 });
 
-Then("the country pays 10 gold once", (s) => {
-  expect(s.cost).toBe(10);
+Then("the country pays 50 gold once", (s) => {
+  expect(s.cost).toBe(50);
 });
 Then(re("the field wage is (\\d+) gold a month"), (s, w: string) => {
   expect(s.commission.wage).toBe(num(w));
@@ -1482,4 +1483,51 @@ Then('1400 veterans return to "Troyes" and will train in half the time', (s) => 
   R.veteransHome(s.troyesPool, 1400);
   expect(s.troyesPool.veterans).toBe(1400);
   expect(R.trainingCost("pikes", 1400, { veteranShare: 1 }).months).toBe(R.trainingCost("pikes", 1400).months / 2);
+});
+
+// ---------------------------------------------------------------- commanders in the game (RECR-111, RECR-114)
+
+/** A game in 1444 with France's royal province whose official is of `type`, else its capital. */
+function gameFrance(s: Scenario): { w: World; n: number } {
+  if (!s.game) s.game = createWorld(loadDefaultRuleset(), 1);
+  const w: World = s.game;
+  return { w, n: w.nationIndex.get("france")! };
+}
+function royalPostOf(w: World, n: number, type: string): number {
+  for (let p = 0; p < w.provinceCount; p++) if (w.provinceOwner[p] === n && w.provinceLord[p]! < 0 && OFFICIALS[w.provinceOfficial[p]!] === type) return p;
+  throw new Error(`no royal ${type}`);
+}
+Given('the country "France" raises a new army', (s) => {
+  const { w, n } = gameFrance(s);
+  const capital = w.provinceIndex.get(w.rules.nations[n]!.capital)!;
+  w.nationTreasury[n] = 10_000;
+  s.commanders = w.commanderIds.length;
+  s.armies = w.armies.count;
+  expect(recruit(w, n, capital, 1, [])).toBeNull();
+  for (let k = 0; k < 8; k++) weeklyMusters(w, []);
+  s.at = capital;
+});
+Then("the army has no commander until the player commissions an official or one already serving takes it", (s) => {
+  const { w, n } = gameFrance(s);
+  // The men stand in the province without a commander: no commander was made for them.
+  expect(w.commanderIds.length).toBe(s.commanders);
+  expect(commissionOfficial(w, n, royalPostOf(w, n, "Steward"), [])).toBeNull();
+  expect(w.commanderIds.length).toBe(s.commanders + 1);
+});
+Then("no commander is attached to an army by default", (s) => {
+  const { w } = gameFrance(s);
+  for (let i = s.armies; i < w.armies.count; i++) if (w.armies.alive[i]) expect(w.armies.commander[i]).toBe(-1);
+});
+Given('the country "France" has 60 gold', (s) => {
+  const { w, n } = gameFrance(s);
+  w.nationTreasury[n] = 60;
+});
+When('the player commissions the steward of "Reims"', (s) => {
+  const { w, n } = gameFrance(s);
+  // Reims stands for any royal province of France with a steward.
+  expect(commissionOfficial(w, n, royalPostOf(w, n, "Steward"), [])).toBeNull();
+});
+Then("France has 10 gold left", (s) => {
+  const { w, n } = gameFrance(s);
+  expect(w.nationTreasury[n]).toBe(10);
 });

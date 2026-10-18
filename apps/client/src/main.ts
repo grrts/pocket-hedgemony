@@ -47,7 +47,7 @@ import { firstOpen, learningBough, learningLine, learningTab, newLearningUi, rea
 import { provinceWorks } from "./ui/works.ts";
 import { provinceLand } from "./ui/land.ts";
 import { castleFoodLine, castlesOpen, foodLine, foodTab } from "./ui/food.ts";
-import { commanderPortrait, officialCard, officialOf, officialScreen, officialsTab, paintSiege, siegeView, type SiegeInfo } from "./ui/people.ts";
+import { commanderPortrait, officialCard, officialOf, officialScreen, officialsTab, paintSiege, postScreen, siegeView, type SiegeInfo } from "./ui/people.ts";
 import { governanceCard, LOYALTY_ORDER, lordScreen, lordsTab, type LordLands, type LordView, type ProvinceRow } from "./ui/lords.ts";
 import { loadMapImage, type MapImage } from "./map/loadMap.ts";
 import { provinceThumb } from "./map/provinceThumb.ts";
@@ -63,7 +63,7 @@ import { achievementName, achievementsCard, loadProfile, saveProfile, takeAchiev
 import { Hints, type HintTarget } from "./ui/hints.ts";
 import type { Hint } from "@ph/engine/domain/onboarding";
 import { musicFacts, newFactMemory, playerPalette, playerWars, remember, type FactMemory } from "./audio/facts.ts";
-import { Rng } from "@ph/engine";
+import { COMMISSION_GOLD, hireGold, OFFICIALS, Rng } from "@ph/engine";
 import { autosaveDue, continueTarget, longDate, newCampaign, newManualSave, savesConfig, type Campaign, type Platform as SavePlatform } from "@ph/engine/domain/saves";
 import { SaveStore, type StoredSave } from "./saves/store.ts";
 import { autosaveEvery, autosavesKept, battleStepMs, dayMs, mapPower, onPrefs, setPref, textZoom } from "./settings/prefs.ts";
@@ -2515,11 +2515,12 @@ function renderOfficial(pi: number): void {
   const s = snapshot!;
   const o = officialOf(s, pi, owners[pi]!);
   // A lord's official serves the lord: his screen (and its commission) is not the crown's (feedback 62).
-  if (!o || owners[pi] !== s.playerNation || s.provinceLord[pi]! >= 0) {
+  if (owners[pi] !== s.playerNation || s.provinceLord[pi]! >= 0) {
     officialView = -1;
     renderPanel();
     return;
   }
+  if (!o) return renderPost(pi);
   const me = s.playerNation;
   const options: { p: number; score: number; fit: string }[] = [];
   for (let p = 0; p < owners.length; p++) {
@@ -2536,7 +2537,7 @@ function renderOfficial(pi: number): void {
   }));
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(o.name)}</h2>${closeButton()}</header>
-    ${officialScreen(rules, o, me, rules.defines.recruit.commanderGold, s.nationTreasury[me]!, moves, movesAll || options.length <= 6)}
+    ${officialScreen(rules, o, me, COMMISSION_GOLD, s.nationTreasury[me]!, moves, movesAll || options.length <= 6)}
     <button class="back" data-back>${icon("scroll", 2)}Back to the officials</button>`;
   bindClose();
   showPanel(true);
@@ -2553,6 +2554,70 @@ function renderOfficial(pi: number): void {
         officialView = to;
         newsView = false;
         movesAll = false;
+        panel.scrollTop = 0;
+        renderPanel();
+      });
+    }),
+  );
+  panel.querySelector("[data-back]")?.addEventListener("click", () => {
+    officialView = -1;
+    realmView = s.playerNation;
+    realmTab = "officials";
+    renderPanel();
+  });
+}
+
+/** An empty royal post's screen (PROV-336): officials who could move in, best fit first, then each type to hire at home or from abroad. */
+function renderPost(pi: number): void {
+  const s = snapshot!;
+  const me = s.playerNation;
+  const home = new Set<string>();
+  const options: { p: number; score: number }[] = [];
+  for (let p = 0; p < owners.length; p++) {
+    if (p === pi || owners[p] !== me || s.provinceLord[p]! >= 0) continue;
+    const other = officialOf(s, p, me);
+    if (!other) continue;
+    home.add(other.post);
+    options.push({ p, score: moveFit(other.post, pi)[0] });
+  }
+  // Each type ranked by how well it suits this province, against the others here.
+  const rank = new Map(OFFICIALS.map((t) => [t, moveFit(t, pi)[0]]));
+  options.sort((a, b) => rank.get(s.provinceOfficial[b.p] as (typeof OFFICIALS)[number])! - rank.get(s.provinceOfficial[a.p] as (typeof OFFICIALS)[number])! || b.score - a.score || a.p - b.p);
+  const moves = (movesAll ? options : options.slice(0, 4)).map(({ p }) => ({
+    province: p,
+    thumb: mapImage ? provinceThumb(mapImage, provinces.length, p, nations[me]!.color) : "",
+    other: officialOf(s, p, me),
+    fit: "",
+  }));
+  const hires = OFFICIALS.map((t, type) => ({ type, home: home.has(t) }));
+  panel.innerHTML = `
+    <header><h2 class="ribbon">Post at ${esc(provinces[pi]!.name)}</h2>${closeButton()}</header>
+    ${postScreen(rules, pi, moves, movesAll || options.length <= 4, hires, { home: hireGold(false), foreign: hireGold(true) }, s.nationTreasury[me]!)}
+    <button class="back" data-back>${icon("scroll", 2)}Back to the officials</button>`;
+  bindClose();
+  showPanel(true);
+  panel.querySelector("[data-moves-all]")?.addEventListener("click", () => {
+    movesAll = true;
+    renderPanel();
+  });
+  panel.querySelectorAll<HTMLButtonElement>("[data-swap]").forEach((b) =>
+    b.addEventListener("click", () => {
+      void act({ type: "swapOfficials", a: Number(b.dataset.swap), b: pi }).then(() => {
+        if (!snapshot || snapshot.rejectedOrders.length) return;
+        newsView = false;
+        movesAll = false;
+        panel.scrollTop = 0;
+        renderPanel();
+      });
+    }),
+  );
+  // After hiring, the screen turns into the new official's own.
+  panel.querySelectorAll<HTMLButtonElement>("[data-hire]").forEach((b) =>
+    b.addEventListener("click", () => {
+      if (b.disabled) return;
+      void act({ type: "hireOfficial", province: pi, official: Number(b.dataset.hireType), foreign: b.dataset.hireForeign === "1" }).then(() => {
+        if (!snapshot || snapshot.rejectedOrders.length) return;
+        newsView = false;
         panel.scrollTop = 0;
         renderPanel();
       });
@@ -2656,7 +2721,7 @@ function governanceSection(pi: number, own: number, mine: boolean, official: Ret
   // A lord's official serves him: no button to the screen that would commission him (feedback 62).
   const officialHtml = lord && official
     ? officialCard(rules, official, own, false, true)
-    : officialCard(rules, official, own, mine);
+    : officialCard(rules, official, own, mine, false, pi);
   return governanceCard(rules, { lord, mine, isCapital, province: pi, official: officialHtml, grantOpen, takers });
 }
 

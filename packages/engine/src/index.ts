@@ -8,8 +8,8 @@ export { processTurn, applyNow, advance, STEPS_PER_DAY, STEPS_PER_TURN, HOURS_PE
 export { atWar, controller, engageRange, offerPeace, peaceShare, relationState, wallsOf, warBetween, SIEGE_MONTH_DAYS, type Battle, type News, type PeaceTerms } from "./war.ts";
 export { hashWorld } from "./hash.ts";
 export { cultureOf, officialName, personName } from "./names.ts";
-export { officialEffect, OFFICIALS, type OfficialEffectView } from "./officials.ts";
-export { aiRecruits, ARMS, FOOT_ARMS, HORSE_ARMS, KIND, KIND_NAMES, isHorseArm } from "./recruit.ts";
+export { hireGold, officialEffect, OFFICIALS, yearsServed, type OfficialEffectView } from "./officials.ts";
+export { aiRecruits, ARMS, COMMISSION_GOLD, commissionOfficial, FOOT_ARMS, HORSE_ARMS, KIND, KIND_NAMES, isHorseArm, recruit, weeklyMusters } from "./recruit.ts";
 export { CLASS_NAMES, CLASS_COUNT } from "./living.ts";
 export { NOT_YET as ACHIEVEMENTS_NOT_YET, type Unlock as AchievementUnlock } from "./achievements.ts";
 export { createEngineHost, type EngineRequest, type EngineResponse, type MapTiles, type Snapshot, type HostReply, type SaveListing } from "./protocol.ts";

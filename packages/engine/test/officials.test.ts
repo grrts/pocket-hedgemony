@@ -2,7 +2,8 @@ import { describe, expect, it } from "vitest";
 import { loadMapTiles } from "../src/node/mapTiles.ts";
 import { loadDefaultRuleset } from "@ph/rules";
 import { applyNow, createEngineHost, createWorld, officialEffect, OFFICIALS, provinceTax, type Order, type World } from "../src/index.ts";
-import { officialAt, yearsServed } from "../src/officials.ts";
+import { hireGold, nativeTypes, officialAt, yearsServed } from "../src/officials.ts";
+import { COMMISSION_GOLD } from "../src/recruit.ts";
 import { worldChunks, restoreWorld } from "../src/domain/saves/world-chunks.ts";
 
 const rules = loadDefaultRuleset();
@@ -111,5 +112,47 @@ describe("officials", () => {
     const p = s.provinceOfficial.findIndex((o) => o !== null);
     expect(typeof s.provinceOfficialName[p]).toBe("string");
     expect(s.provinceOfficialYears[p]).toBeGreaterThanOrEqual(0);
+  });
+
+  it("hires an official into an empty post; a foreign specialist costs more and bears a foreign name", () => {
+    const { w, me, a, b } = setup();
+    ok(w, { type: "commission", province: a }, me);
+    expect(w.provinceOfficial[a]).toBe(-1);
+    const home = [...nativeTypes(w, me, a)][0]!;
+    w.nationTreasury[me] = 1000;
+    ok(w, { type: "hireOfficial", province: a, official: home, foreign: false }, me);
+    expect(w.nationTreasury[me]).toBe(1000 - hireGold(false));
+    expect(w.provinceOfficial[a]).toBe(home);
+    expect(yearsServed(w, a)).toBe(0);
+    expect(refused(w, { type: "hireOfficial", province: a, official: home, foreign: false }, me)).toMatch(/already/);
+    // Empty b and hire a foreign specialist of a type no royal post of the realm has.
+    ok(w, { type: "commission", province: b }, me);
+    for (let p = 0; p < w.provinceCount; p++) if (p !== b && w.provinceOwner[p] === me && w.provinceLord[p]! < 0 && w.provinceOfficial[p] === 2) w.provinceOfficial[p] = 0;
+    expect(refused(w, { type: "hireOfficial", province: b, official: 2, foreign: false }, me)).toMatch(/no one at home/);
+    const gold = w.nationTreasury[me]!;
+    ok(w, { type: "hireOfficial", province: b, official: 2, foreign: true }, me);
+    expect(gold - w.nationTreasury[me]!).toBe(hireGold(true));
+    expect(hireGold(true)).toBeGreaterThan(hireGold(false));
+    expect(w.provinceOfficialFrom[b]).not.toBe(me);
+    expect(w.provinceOfficialFrom[b]).toBeGreaterThanOrEqual(0);
+    // He keeps his origin through a save.
+    const back = restoreWorld(new Map(worldChunks(w, { playerNation: "castile", options: {} as never }).map((c) => [c.id, c])), rules, {}, tiles).world;
+    expect(officialAt(back, b)).toBe(officialAt(w, b));
+  });
+
+  it("won't hire into a lord's province", () => {
+    const w = createWorld(rules, 1, tiles);
+    const me = w.nationIndex.get("castile")!;
+    const p = lordHeld(w, me)[0]!;
+    w.provinceOfficial[p] = -1;
+    expect(refused(w, { type: "hireOfficial", province: p, official: 0, foreign: true }, me)).toMatch(/lord/);
+  });
+
+  it("charges the commission's gold once", () => {
+    const { w, me, a } = setup();
+    w.nationTreasury[me] = 60;
+    ok(w, { type: "commission", province: a }, me);
+    expect(COMMISSION_GOLD).toBe(50);
+    expect(w.nationTreasury[me]).toBe(10);
   });
 });
