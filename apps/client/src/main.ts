@@ -82,7 +82,7 @@ import { detailBands } from "@ph/engine/domain/map-presentation";
 import { TownLayer, townInfo } from "./map/towns.ts";
 import { musicFacts, newFactMemory, playerPalette, playerWars, remember, type FactMemory } from "./audio/facts.ts";
 import { COMMISSION_GOLD, hireGold, OFFICIALS, Rng } from "@ph/engine";
-import { SHELL as SHELL_RULES, endTurnInAuto, endTurnLabel, newAutoTurns, startColumn, startIcons, stopAuto, switchAuto, weekPlayed, type AutoStop, type Platform as ShellPlatform } from "@ph/engine/domain/game-shell";
+import { BATTLE_STEP_MS, bannerAt, COUNTRY_CARD_TABS, endTurnInAuto, endTurnLabel, keyEndsTurn, newAutoTurns, SHELL as SHELL_RULES, startColumn, startIcons, stopAuto, switchAuto, WATCH_STEP_MS, weekPlayed, type AutoStop, type Platform as ShellPlatform } from "@ph/engine/domain/game-shell";
 import { autosaveDue, continueTarget, longDate, newCampaign, newManualSave, savesConfig, type Campaign, type Platform as SavePlatform } from "@ph/engine/domain/saves";
 import { SaveStore, type StoredSave } from "./saves/store.ts";
 import { animationsPref, autosaveEvery, autosavesKept, battleStepMs, dayMs, mapDetail, mapPower, onPrefs, setPref, textZoom } from "./settings/prefs.ts";
@@ -180,6 +180,9 @@ const DISPATCHES_KEPT = 400;
 let unread = 0;
 /** The log shows only what concerns the player's realm. */
 let dispatchesMine = false;
+/** Peace offers the player put off until next week (Later). */
+const putOffOffers = new Set<number>();
+/** Peace offers waiting for an answer and not put off. */
 /** Calls to arms and peace offers the player was already alerted to. */
 const alerted = new Set<string>();
 /** The dispatches are open in the panel. */
@@ -207,8 +210,6 @@ const sailGoal = new Map<number, { zone: number; tile: number }>();
  * (SET-131, SET-065). A 4-hour step takes 500 ms at 1×, and 1200 ms while the
  * player watches the battle, so its rounds can be followed (feedback 73).
  */
-const BATTLE_STEP_MS = 500;
-const WATCH_STEP_MS = 1200;
 let playing = false;
 let paused = false;
 /** Auto turns (SHELL-159..161): weeks start by themselves until the player or something that needs them stops them; off after every load. */
@@ -345,7 +346,7 @@ fab.addEventListener("click", () => void endTurn());
 autoButton.addEventListener("click", () => switchAutoTurns());
 // Space ends the turn, and pauses or resumes it while it plays (feedback 27); Shift+Space switches Auto turns (SHELL-159).
 document.addEventListener("keydown", (e) => {
-  if (e.code !== "Space" || (e.target as HTMLElement).closest("input, textarea, select")) return;
+  if (!keyEndsTurn(e.code, !!(e.target as HTMLElement).closest("input, textarea, select"))) return;
   e.preventDefault();
   if (e.repeat) return;
   if (e.shiftKey) switchAutoTurns();
@@ -1989,7 +1990,8 @@ function onTap(sx: number, sy: number, province: number): void {
   }
   // Armies sit on top of provinces, so check them first, with some room around each for fingers.
   const PAD = 8;
-  const hit = armyHitBoxes.find((b) => sx >= b.x - PAD && sx <= b.x + b.w + PAD && sy >= b.y - PAD && sy <= b.y + b.h + PAD);
+  // A banner takes taps in a box of at least 44 points; where boxes overlap, the nearest banner wins (feedback 21).
+  const hit = bannerAt(armyHitBoxes, sx, sy);
   const fleetHit = fleetHitBoxes.find((b) => b.mine && sx >= b.x - PAD && sx <= b.x + b.w + PAD && sy >= b.y - PAD && sy <= b.y + b.h + PAD);
   // Close in, one of the player's caravans, barges or ships opens its card in the Trade tab; others fall through to the land (VIEW-125).
   const traderHit = !hit && !fleetHit && !selected.size && sailing < 0 ? traderHitBoxes.find((b) => b.mine >= 0 && sx >= b.x && sx <= b.x + b.w && sy >= b.y && sy <= b.y + b.h) : undefined;
@@ -2339,7 +2341,7 @@ function renderHud(): void {
   // The plaques, their order and what each opens come from the engine's top-bar model (REALM-205).
   const open = (o: Opens) => (o && "card" in o && o.tab ? ` data-realm-open="${o.tab}"` : "");
   hud.innerHTML = `<button class="icon-only game-menu" data-shell="menu" title="Game menu" aria-label="Game menu">${icon("menu", 2)}</button>
-    ` + topBar(s, unread, asksOf(s).length + empireAsks(s.empire))
+    ` + topBar({ ...s, peaceOffers: s.peaceOffers.filter((o) => !putOffOffers.has(o.id)) }, unread, asksOf(s).length + empireAsks(s.empire))
     .map((p) => {
       switch (p.key) {
         case "realm":
@@ -2605,10 +2607,12 @@ function alertPlayer(text: string, what: "swords" | "castle" | "crown" | "scroll
   el.setAttribute("role", "status");
   if (to.battle) el.dataset.battle = String(to.province);
   el.innerHTML = `${icon(what, 2)}<span>${esc(text)}</span>${
-    to.battle ? `<button class="wax go-there">${icon("swords", 1)}Watch</button>` : to.tab && snapshot ? `<button class="wax go-there" data-realm="${snapshot.playerNation}" data-realm-open="${to.tab}">Open</button>` : to.province !== undefined ? `<button class="wax go-there">${icon("map", 1)}Go there</button>` : to.answer ? `<button class="wax go-there">Answer</button>` : ""
+    to.battle ? `<button class="wax go-there">${icon("swords", 1)}Watch</button><button class="paper look-there">${icon("map", 1)}Go there</button>` : to.tab && snapshot ? `<button class="wax go-there" data-realm="${snapshot.playerNation}" data-realm-open="${to.tab}">Open</button>` : to.province !== undefined ? `<button class="wax go-there">${icon("map", 1)}Go there</button>` : to.answer ? `<button class="wax go-there">Answer</button>` : ""
   }<button class="paper dismiss" aria-label="Dismiss">${icon("close", 1)}</button>`;
   const remove = () => el.remove();
   el.querySelector(".dismiss")!.addEventListener("click", remove);
+  // A battle's Go there only looks: the alert stays while the week waits on it.
+  el.querySelector(".look-there")?.addEventListener("click", () => goThere(to.province!));
   el.querySelector(".go-there")?.addEventListener("click", () => {
     remove();
     if (to.battle && to.province !== undefined) watchBattle(to.province);
@@ -2748,6 +2752,7 @@ function renderNews(): void {
   panel.innerHTML = `
     <header><h2 class="ribbon">News</h2>${closeButton()}</header>
     <nav class="tabs"><button class="tab${dispatchesMine ? "" : " on"}" data-news-mine="0">Everything</button><button class="tab${dispatchesMine ? " on" : ""}" data-news-mine="1">Your realm</button></nav>
+    ${s.events.length || asksOf(s).length || s.peaceOffers.length || s.calls.length ? `<h3 class="sub">Waiting for you</h3>` : ""}
     ${waitingEventsHtml(s.events)}
     ${asksHtml()}
     ${s.peaceOffers.map(offerHtml).join("")}
@@ -4454,9 +4459,10 @@ function offerHtml(o: Snapshot["peaceOffers"][number]): string {
     : o.terms === "take" ? "it asks for the land it holds of yours"
     : o.terms === "dissolve" ? "it dissolves the Empire; no land changes hands"
     : "a white peace, no land changes hands";
+  const later = putOffOffers.has(o.id);
   return `<div class="call framed-soft">
-    <p>${icon("crown", 2)} ${realmButton(o.from, "diplomacy")} offers peace: ${what}. The offer stands until the month is out.</p>
-    <div class="choices"><button class="wax" data-offer="${o.id}" data-yes="1">Make peace</button><button class="paper" data-offer="${o.id}" data-yes="0">Fight on</button></div>
+    <p>${icon("crown", 2)} ${realmButton(o.from, "diplomacy")} offers peace: ${what}. The offer waits for your answer${later ? "; put off until next week" : ""}.</p>
+    <div class="choices"><button class="wax" data-offer="${o.id}" data-yes="1">Make peace</button><button class="paper" data-offer="${o.id}" data-yes="0">Fight on</button>${later ? "" : `<button class="paper" data-offer-later="${o.id}">Later</button>`}</div>
   </div>`;
 }
 
@@ -4476,6 +4482,14 @@ function asksHtml(from?: number): string {
 }
 
 function bindOffers(): void {
+  // Later: the offer still waits here, but marks nothing until next week (SHELL-092, SHELL-141).
+  panel.querySelectorAll<HTMLButtonElement>("[data-offer-later]").forEach((b) =>
+    b.addEventListener("click", () => {
+      putOffOffers.add(Number(b.dataset.offerLater));
+      renderHud();
+      renderPanel();
+    }),
+  );
   panel.querySelectorAll<HTMLButtonElement>("[data-offer]").forEach((b) =>
     b.addEventListener("click", () => void act({ type: "answerPeace", offer: Number(b.dataset.offer), yes: b.dataset.yes === "1" })),
   );
@@ -4687,6 +4701,39 @@ function treasurySection(): string {
     </div>` : ""}`;
 }
 
+/** Every country card starts with these tabs, in this order (SHELL-139); the Army tab is the war room on your own card. */
+const COUNTRY_TAB_KEYS: Record<string, "general" | "diplomacy" | "trade" | "military"> = { General: "general", Diplomacy: "diplomacy", Trade: "trade", Army: "military" };
+const COUNTRY_TABS = COUNTRY_CARD_TABS.map((label) => [COUNTRY_TAB_KEYS[label]!, label] as const);
+
+/** A realm's Trade tab: its wealth, its richest lands, and for your own realm what trade brought this month. */
+function realmTradeTab(r: number, own: number[], wealth: number, mine: boolean): string {
+  const s = snapshot!;
+  const traded = mine ? s.ledger.find((x) => x.line === "trade")?.gold ?? 0 : null;
+  const richest = [...own].sort((a, b) => provinces[b]!.wealth - provinces[a]!.wealth || a - b).slice(0, 5);
+  return `<dl class="facts">
+      <dt>Wealth</dt><dd>${icon("coin", 1)} ${wealth} across its ${own.length} province${own.length === 1 ? "" : "s"}</dd>
+      ${traded === null ? "" : `<dt>Trade</dt><dd>${traded >= 0 ? "+" : ""}${gold2(traded)} gold this month</dd>`}
+    </dl>
+    ${richest.length ? `<h3 class="sub">Richest lands</h3><div class="nations">${richest
+      .map((i) => `<button class="paper" data-show-province="${i}">${icon("coin", 1)}${esc(provinces[i]!.name)} <small>wealth ${provinces[i]!.wealth}</small></button>`)
+      .join("")}</div>` : ""}
+    <button class="paper" data-lens-open="wealth">${icon("map", 1)}Show wealth on the map</button>
+    ${mine ? "" : `<p class="hint">Trade pacts and embargoes with ${esc(nations[r]!.name)} are made by envoy from its Diplomacy tab.</p>`}`;
+}
+
+/** Another realm's Army tab: its armies, the men it can call, and its commanders. */
+function realmArmyTab(r: number, armyCount: number, men: number): string {
+  const s = snapshot!;
+  const list = s.commanders.filter((c) => c.owner === r);
+  return `<dl class="facts">
+      <dt>Armies</dt><dd>${armyCount} in the field, ${fmt(men)} men</dd>
+      <dt>Recruits</dt><dd>${fmt(s.nationLevies[r]!)} men who can be called</dd>
+    </dl>
+    ${list.length ? `<h3 class="sub">Commanders</h3>${list
+      .map((c) => `<div class="army">${commanderPortrait(rules, c.name, r)}<span class="who"><b>${esc(titledOf(c))}</b><br><small>${roleOf(c)} · might ${c.might} · cunning ${c.cunning} · logistics ${c.logistics}</small></span></div>`)
+      .join("")}` : `<p class="hint">No commanders.</p>`}`;
+}
+
 function renderRealm(r: number): void {
   const n = nations[r]!;
   const s = snapshot;
@@ -4704,11 +4751,13 @@ function renderRealm(r: number): void {
   const men = armies.reduce((t, k) => t + s!.armies.men[k]!, 0);
   const inc = s ? s.nationMonthlyIncome[r]! : 0;
   const mine = !!s && s.playerNation === r;
-  if ((!s && realmTab !== "heritage") || (s && (realmTab === "government" || realmTab === "peoples" || realmTab === "treasury" || realmTab === "trade" || realmTab === "food" || realmTab === "military" || realmTab === "mercenaries" || realmTab === "officials" || realmTab === "lords" || realmTab === "provinces" || realmTab === "learning" || realmTab === "navy" || realmTab === "hireFleets" || realmTab === "colonies") && !mine)) realmTab = "general";
+  if ((!s && realmTab !== "heritage") || (s && (realmTab === "government" || realmTab === "peoples" || realmTab === "treasury" || realmTab === "food" || realmTab === "mercenaries" || realmTab === "officials" || realmTab === "lords" || realmTab === "provinces" || realmTab === "learning" || realmTab === "navy" || realmTab === "hireFleets" || realmTab === "colonies") && !mine)) realmTab = "general";
   const strengths = realmStrengths(n.id);
   const peoples = s ? peoplesView(beliefData(s.peoples), r, s.provincePeople) : null;
   // Pages opened from a tab keep that tab lit: free companies under Military (feedback 114), the Hire a fleet screen under Navy (F-115).
-  const tab = (key: typeof realmTab, label: string) => `<button class="tab${realmTab === key || (key === "military" && realmTab === "mercenaries") || (key === "navy" && realmTab === "hireFleets") ? " on" : ""}" data-realm-tab="${key}">${label}</button>`;
+  const tab = (key: typeof realmTab, label: string, marked = false) => `<button class="tab${realmTab === key || (key === "military" && realmTab === "mercenaries") || (key === "navy" && realmTab === "hireFleets") ? " on" : ""}${marked ? " marked" : ""}" data-realm-tab="${key}"${marked ? ` aria-label="${label}: waits for your answer"` : ""}>${label}</button>`;
+  // A peace offer or an envoy waiting for an answer marks the Diplomacy tab, on that realm's card and on your own (SHELL-141).
+  const answerWaits = !!s && (s.peaceOffers.some((o) => (mine || o.from === r) && !putOffOffers.has(o.id)) || asksOf(s).some((a) => mine || a.from === r));
   const general = `
     <div class="realm-card">
       <img class="banner" src="${flagUrl(n, 6)}" alt="">
@@ -4720,26 +4769,17 @@ function renderRealm(r: number): void {
     <dl class="facts">
       ${s?.rulers[r] ? rulerLines(s.rulers[r]!) : ""}
       <dt>People</dt><dd>${fmt(people)}</dd>
-      <dt>Wealth</dt><dd>${icon("coin", 1)} ${wealth} across its lands</dd>
       ${s ? `<dt>Treasury</dt><dd>${mine ? `<button class="paper" data-realm-open-tab="treasury" title="Open the ledger">${icon("coin", 1)}${fmt(s.nationTreasury[r]!)} gold <small>${inc >= 0 ? "+" : ""}${inc.toFixed(1)} a month</small></button>` : `${fmt(s.nationTreasury[r]!)} gold <small>${inc >= 0 ? "+" : ""}${inc.toFixed(1)} a month</small>`}</dd>
       ${mine && s.trade ? tradeLine(s.trade) : ""}
       ${mine ? risingsLine(s.rebels, r) : ""}
       ${mine && s.government ? governmentLine(s.government) : `<dt>Government</dt><dd>${esc(s.realmForms[r] ?? "")}</dd>`}
       ${peoples ? beliefLines(peoples, mine, mine ? s.beliefLow : null, faithBadgeHtml(s.faithHeads?.badges[r] ?? null)) : ""}
-      <dt>Recruits</dt><dd>${fmt(s.nationLevies[r]!)} men who can be called</dd>
-      <dt>Armies</dt><dd>${armies.length} in the field, ${fmt(men)} men</dd>
       ${mine && s.fallen ? fallenLine(s.fallen) : ""}
       ${mine && s.research ? learningLine(s.research) : realmLearningLine(s.realmResearch[r])}
       ${mine ? foodLine(s, own) : ""}` : ""}
       <dt>Lands</dt><dd>${topLands.map(([t, c]) => `${t} ${c}`).join(" · ")}</dd>
       ${heritageLine(strengths, s?.heritage[r] ?? null)}
     </dl>
-    ${mine ? "" : (() => {
-      const list = s ? s.commanders.filter((c) => c.owner === r) : n.commanders;
-      return list.length ? `<h3 class="sub">Commanders</h3>${list
-        .map((c) => `<div class="army">${commanderPortrait(rules, c.name, r)}<span class="who"><b>${esc("owner" in c ? titledOf(c) : rankedName(rules, r, c.name, "general"))}</b><br><small>${"owner" in c ? `${roleOf(c)} · ` : ""}might ${c.might} · cunning ${c.cunning} · logistics ${c.logistics}</small></span></div>`)
-        .join("")}` : "";
-    })()}
     ${neighbours.size ? `<h3 class="sub">Neighbours</h3><div class="nations">${[...neighbours]
       .map((j) => `<button class="paper nation" data-realm="${j}">${pennant(nations[j]!)}${esc(nations[j]!.name)}</button>`)
       .join("")}</div>` : ""}
@@ -4750,13 +4790,14 @@ function renderRealm(r: number): void {
     : realmTab === "government" && s?.government ? governmentTab(s.government, s.revolution)
     : realmTab === "peoples" && peoples ? peoplesTab(peoples) + headCardHtml(s?.faithHeads?.card ?? null, (n) => nations[n]!.name, true)
     : realmTab === "treasury" ? treasurySection()
-    : realmTab === "trade" && s?.trade ? tradeTab(s.trade, s, (p) => provinces[p]!.name)
+    : realmTab === "trade" && mine && s?.trade ? tradeTab(s.trade, s, (p) => provinces[p]!.name)
     : realmTab === "food" ? foodTab(s!, (p) => provinces[p]!.name, (p) => (mapImage ? provinceThumb(mapImage, provinces.length, p, n.color) : ""), own)
-    : realmTab === "military" ? warRoomSection()
+    : realmTab === "trade" ? realmTradeTab(r, own, wealth, mine)
+    : realmTab === "military" ? (mine ? warRoomSection() : realmArmyTab(r, armies.length, men))
     : realmTab === "navy" ? navyTab(s!.navy, r, { name: (p) => provinces[p]!.name, admiralName: titled, realmName: (n) => nations[n]!.name, forHire: s!.fleetsForHire.length })
     : realmTab === "hireFleets" ? hireFleetsTab(s!.navy, s!.fleetsForHire, r, { name: (p) => provinces[p]!.name, admiralName: titled, realm: (x) => realmButton(x), hasPort: s!.navy.ports.length > 0 })
     : realmTab === "colonies" ? coloniesTab(s!.exploration, { name: (p) => provinces[p]!.name, fleetName: fleetLabel, inRange: s!.exploration.sites.reduce((t, x) => t + (x === 1 ? 1 : 0), 0) })
-    : realmTab === "mercenaries" ? `<button class="paper small" data-realm-open-tab="military">${icon("scroll", 1)}Back to Military</button>${mercenarySection()}`
+    : realmTab === "mercenaries" ? `<button class="paper small" data-realm-open-tab="military">${icon("scroll", 1)}Back to Army</button>${mercenarySection()}`
     : realmTab === "lords" ? realmLords(r)
     : realmTab === "provinces" ? provincesTab(r)
     : realmTab === "learning" && s?.research ? learningTab(rules, s.research, s.nationTreasury[r]!, learningUi)
@@ -4764,12 +4805,13 @@ function renderRealm(r: number): void {
     : general;
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(n.name)}</h2>${closeButton()}</header>
-    ${s ? `<nav class="tabs">${tab("general", "General")}${mine ? tab("government", "Government") + tab("peoples", "Peoples") : ""}${tab("heritage", "Heritage")}${mine ? tab("treasury", "Treasury") + tab("trade", "Trade") + tab("food", "Food") + tab("provinces", "Provinces") + tab("learning", "Research") : ""}${tab("diplomacy", "Diplomacy")}${mine ? tab("military", "Military") + tab("navy", "Navy") + tab("colonies", "Colonies") + tab("officials", cap(titlesOf(r).officials)) + tab("lords", cap(titlesOf(r).lords)) : ""}</nav>` : `<nav class="tabs">${tab("general", "General")}${tab("heritage", "Heritage")}</nav>`}
+    ${s ? `<nav class="tabs">${COUNTRY_TABS.map(([key, label]) => tab(key, label, key === "diplomacy" && answerWaits)).join("")}${mine ? tab("government", "Government") + tab("peoples", "Peoples") + tab("treasury", "Treasury") + tab("food", "Food") + tab("provinces", "Provinces") + tab("learning", "Research") + tab("navy", "Navy") + tab("colonies", "Colonies") + tab("officials", cap(titlesOf(r).officials)) + tab("lords", cap(titlesOf(r).lords)) : ""}${tab("heritage", "Heritage")}</nav>` : `<nav class="tabs">${tab("general", "General")}${tab("heritage", "Heritage")}</nav>`}
     ${content}`;
   bindClose();
   showPanel(true);
   bindNavyLinks();
   panel.querySelectorAll("[data-show-charts]").forEach((b) => b.addEventListener("click", () => setLens("charts")));
+  panel.querySelectorAll<HTMLButtonElement>("[data-lens-open]").forEach((b) => b.addEventListener("click", () => setLens(b.dataset.lensOpen as Lens)));
   panel.querySelector("[data-go]")?.addEventListener("click", () => {
     realmView = -1;
     selectedProvince = capIdx;
@@ -5476,6 +5518,8 @@ async function endTurn(): Promise<void> {
   // Saves still waiting for a quiet moment wait for the end of this week instead.
   clearTimeout(afterTurnTimer);
   selected.clear();
+  // Offers put off last week wait to be answered again.
+  putOffOffers.clear();
   sound.sfx("turn_end");
   hints.did("turn ended");
   if (factMem) factMem.battleThisTurn = false;
@@ -6368,6 +6412,16 @@ Object.assign(globalThis, {
     view.lookAt(p.x!, p.y!, 8);
     return p.id;
   },
+  /** Shows a peace offer from a realm as if its AI had sent it, for screenshots (a short play-through rarely reaches one). */
+  __phPretendOffer: (id: string, terms: "take" | "white" | "give" = "white") => {
+    if (!snapshot) return;
+    snapshot.peaceOffers.push({ id: 900000 + snapshot.peaceOffers.length, from: nationIndex.get(id)!, terms });
+    logNews({ ...snapshot, news: [], rejectedOrders: [] });
+    renderHud();
+    renderPanel();
+  },
+  /** The camera as x, y and zoom, to check that selecting moves nothing (SHELL-138). */
+  __phCamera: () => ({ ...view.camera }),
   __phLookAtWar: () => {
     const p = snapshot?.sieges[0]?.province ?? occupiers.findIndex((o) => o >= 0);
     if (p >= 0) view.lookAt(provinces[p]!.x!, provinces[p]!.y!, 4);

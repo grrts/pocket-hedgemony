@@ -970,7 +970,9 @@ export interface PeaceOffer {
  * (feedback 10), by the counts it uses between AI realms: when it is losing,
  * it gives up what the player holds; when the player's people want peace
  * and it holds the player's land, it asks for that; after a long war, or
- * when its own people want peace, a white peace. An offer lasts a month.
+ * when its own people want peace, a white peace. An offer waits until the
+ * player answers it or the war ends (SHELL-141): a later month may change
+ * its terms, never add a second offer from the same realm.
  */
 function aiOffersPeace(world: World, war: dip.War, ai: number, news: News[]): void {
   const sa = sidesOf(world, war, ai);
@@ -982,7 +984,10 @@ function aiOffersPeace(world: World, war: dip.War, ai: number, news: News[]): vo
   const won = sa.theirs.reduce((t, l) => t + cededProvinces(world, l, sa.ours).length, 0);
   const terms: PeaceTerms | null = aiObliged && lost ? "give" : playerObliged && won ? "take" : aiObliged || rel.aiMustAcceptPeace(months) ? "white" : null;
   if (!terms) return;
-  world.peaceOffers.push({ id: world.turn * 100 + world.peaceOffers.length, from: ai, terms });
+  const waiting = world.peaceOffers.find((o) => o.from === ai);
+  if (waiting?.terms === terms) return;
+  if (waiting) waiting.terms = terms;
+  else world.peaceOffers.push({ id: world.turn * 100 + world.peaceOffers.length, from: ai, terms });
   const what = terms === "give" ? `and gives up the ${lost} province${lost === 1 ? "" : "s"} you hold` : terms === "take" ? `if you give up the ${won} province${won === 1 ? "" : "s"} it holds` : "with no land changing hands";
   news.push({ kind: "peace", text: `${name(world, ai)} offers peace ${what}.`, nations: [ai, world.player] });
 }
@@ -1005,12 +1010,8 @@ export function monthlyDiplomacy(world: World, news: News[]): void {
   const d = world.diplomacy;
   rel.expireTruces(d.graph);
   d.calls = d.calls.filter((c) => d.wars.some((w) => w.id === c.war));
-  // An offer left unanswered for a month is refused (WAR-181).
-  for (const o of world.peaceOffers) {
-    const war = warBetween(world, o.from, world.player);
-    if (war) refusedPeace(world, world.player, war, news);
-  }
-  world.peaceOffers = [];
+  // An offer waits for the player's answer while its war lasts (playtest feedback).
+  world.peaceOffers = world.peaceOffers.filter((o) => warBetween(world, o.from, world.player));
   monthlyRefusals(world, news);
   // AI wars end by the same counts: the losing leader gives up what it has lost, or both tire of it.
   for (const war of [...d.wars]) {

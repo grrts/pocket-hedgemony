@@ -611,6 +611,27 @@ button.icon-only {
   }
 }
 
+/* A phone held sideways (Short wide): the card is a side sheet on the left, 45 % wide
+   (map-presentation layout.cardPhoneWidthShare), and the map stays live beside it (SHELL-053, SHELL-146). */
+@media (max-height: 500px) and (min-width: 560px) {
+  .panel:not(.chooser) {
+    right: auto;
+    width: max(45vw, 320px);
+    padding: 4px 8px 8px max(8px, env(safe-area-inset-left));
+  }
+
+}
+
+/* With the card open on a larger phone, alerts sit over the map beside it, clear of the side tools;
+   on a small one the map is too narrow for them, so they stay centred over the card. */
+@media (max-height: 500px) and (min-width: 800px) {
+  :root:has(#panel:not([hidden]):not(.chooser)) .alerts {
+    left: calc(max(45vw, 320px) + 6px);
+    transform: none;
+    width: calc(100vw - max(45vw, 320px) - 12px - max(110px, 60px + env(safe-area-inset-right)));
+  }
+}
+
 @media (min-width: 900px) and (min-height: 600px) {
   .panel,
   .panel.chooser {
@@ -653,6 +674,7 @@ button.icon-only {
   gap: 4px;
 }
 
+/* Fold and Close take 44-point taps like every button (SHELL-146). */
 .panel-buttons button {
   width: 44px;
   height: 44px;
@@ -1310,7 +1332,8 @@ button.small {
 .tabs .tab {
   flex: 1 0 auto;
   max-width: 180px;
-  min-height: 40px;
+  /* A 44-point tap target, like every button (SHELL-146). */
+  min-height: 44px;
   padding: 6px 10px 2px;
   border: 4px solid var(--wood-dark);
   border-bottom-width: 4px;
@@ -1326,6 +1349,18 @@ button.small {
 
 .tabs .tab:active:not(:disabled) {
   transform: none;
+}
+
+/* Something waits for an answer here (a peace offer, an envoy): a red seal beside the name (SHELL-141). */
+.tabs .tab.marked::after {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-left: 6px;
+  vertical-align: 3px;
+  background: var(--wax, #a8323e);
+  box-shadow: 0 0 0 2px var(--wood-dark);
 }
 
 .tabs .tab.on {
@@ -4135,12 +4170,6 @@ button.paper.over {
   justify-content: space-between;
   gap: 8px;
   flex: none;
-}
-
-.shell-card .panel-buttons button {
-  width: 44px;
-  height: 44px;
-  min-height: 44px;
 }
 
 .shell-card .ribbon .px-icon {

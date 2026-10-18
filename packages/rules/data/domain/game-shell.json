@@ -586,7 +586,9 @@
     "turnStripAfterSeconds",
     "controllerEndTurnHoldSeconds",
     "endDateEarliestYear",
-    "ledgerLeaders"
+    "ledgerLeaders",
+    "desk.watchStepMs",
+    "desk.alertSeconds"
   ],
   "battleSteps": {
     "hoursPerStep": 4,
@@ -599,5 +601,111 @@
   "turn": {
     "days": 7,
     "dateFormat": "{day} {month} {year}"
+  },
+  "desk": {
+    "$comment": "Dispatches log, alerts over the map, the week waiting at a battle, AI peace offers and the country card (SHELL-138 to SHELL-148).",
+    "dispatchesKept": 400,
+    "alertsShown": 3,
+    "alertSeconds": 12,
+    "watchStepMs": 1200,
+    "battleStepMs": 500,
+    "countryCardTabs": [
+      "General",
+      "Diplomacy",
+      "Trade",
+      "Army"
+    ],
+    "tabHolds": {
+      "General": [
+        "ruler",
+        "gold",
+        "food",
+        "people",
+        "castles",
+        "officials",
+        "lords",
+        "schools",
+        "faith",
+        "tongue",
+        "in revolt",
+        "fallen"
+      ],
+      "Diplomacy": [
+        "standing",
+        "envoys",
+        "allies",
+        "enemies",
+        "oaths broken",
+        "declare war",
+        "offer peace",
+        "ask for peace",
+        "the peace table",
+        "peace offers"
+      ],
+      "Trade": [
+        "wealth",
+        "trade income",
+        "trade pacts",
+        "embargoes"
+      ],
+      "Army": [
+        "soldiers",
+        "recruits",
+        "horses",
+        "commanders",
+        "ships"
+      ]
+    },
+    "subjects": {
+      "diplomacy": "Diplomacy",
+      "trade": "Trade",
+      "army": "Army"
+    },
+    "overviews": {
+      "armies": {
+        "overview": "Army list",
+        "shows": [
+          "commander",
+          "men",
+          "where"
+        ],
+        "opens": "the army"
+      },
+      "garrison troops": {
+        "overview": "Garrison tab",
+        "shows": [
+          "troops without a commander",
+          "levies gathering",
+          "commanders present"
+        ],
+        "opens": "the troops"
+      },
+      "warnings": {
+        "overview": "Needs attention",
+        "shows": [
+          "what is wrong",
+          "where"
+        ],
+        "opens": "Show"
+      },
+      "waiting for an answer": {
+        "overview": "Dispatches",
+        "shows": [
+          "calls to arms",
+          "peace offers",
+          "events"
+        ],
+        "opens": "Answer"
+      }
+    },
+    "phoneSafeArea": {
+      "top": 0,
+      "right": 47,
+      "bottom": 21,
+      "left": 47
+    },
+    "keys": {
+      "Space": "End turn"
+    }
   }
 }

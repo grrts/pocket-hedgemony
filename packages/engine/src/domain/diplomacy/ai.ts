@@ -212,3 +212,21 @@ export function envoyPicker(d: Diplomacy, c: string, target: string): { official
 
 /** Where the card sits (DIPL-187). */
 export const cardPlacement = (orientation: "portrait" | "landscape") => (orientation === "landscape" ? "right of the map" : "over the map");
+
+/**
+ * A country card's tabs, as diplomacy fills them (DIPL-196, game-shell SHELL-139,
+ * realm REALM-176): nothing of diplomacy's on General; on Diplomacy the standing
+ * lines (allies, enemies, oaths broken, envoys, leagues), the envoy missions and
+ * every war and peace action, each open or with why not.
+ */
+export function countryCardTabs(d: Diplomacy, viewer: string, c: string): { General: string[]; Diplomacy: { lines: string[]; actions: { label: string; whyNot?: string }[] } } {
+  const atWar = d.wars.some((w) => (w.attackers.includes(viewer) && w.defenders.includes(c)) || (w.defenders.includes(viewer) && w.attackers.includes(c)));
+  const peace = (label: string) => (atWar ? { label } : { label, whyNot: "not at war" });
+  return {
+    General: [],
+    Diplomacy: {
+      lines: cardLine(d, c),
+      actions: [...diplomacyCard(d, viewer, c).buttons.map((b) => ({ label: b.label })), atWar ? { label: "Declare war", whyNot: "already at war" } : { label: "Declare war" }, peace("Offer peace"), peace("Ask for peace"), peace("Peace table")],
+    },
+  };
+}

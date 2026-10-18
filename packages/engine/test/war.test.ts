@@ -75,6 +75,24 @@ describe("war and conquest", () => {
     expect(w.peaceOffers).toEqual([]);
   }, 60000);
 
+  it("keeps an AI peace offer waiting until the player answers, one per realm (SHELL-141)", () => {
+    const w = createWorld(rules, 7, tiles);
+    const me = n(w, "castile");
+    w.player = me;
+    const foe = n(w, "portugal");
+    applyNow(w, { type: "declareWar", target: foe }, me);
+    for (let p = 0; p < w.provinceCount; p++) if (w.provinceOwner[p] === foe) w.provinceOccupier[p] = me;
+    let offer;
+    for (let t = 0; t < 8 && !offer; t++) {
+      processTurn(w, [], me);
+      offer = w.peaceOffers.find((o) => o.from === foe);
+    }
+    expect(offer).toBeDefined();
+    // Two more months pass unanswered: the same offer still waits, and only one.
+    for (let t = 0; t < 9; t++) processTurn(w, [], me);
+    expect(w.peaceOffers.filter((o) => o.from === foe)).toEqual([offer]);
+  }, 60000);
+
   it("sends a province's garrison troops into a battle fought in it (RECR-107)", () => {
     const w = createWorld(rules, 7, tiles);
     const me = n(w, "castile");
