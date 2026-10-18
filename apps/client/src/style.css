@@ -4063,3 +4063,315 @@ small.why {
   align-content: flex-start;
   max-height: calc(100dvh - env(safe-area-inset-top) - 52px - max(10px, env(safe-area-inset-bottom)) - 76px);
 }
+
+/* Revolutions (REVO-090 to REVO-093): the mark on the Stability plaque, the
+   Revolution block under the pillars, the full-screen choice card and the
+   regime card on the Government tab. */
+.plaque.stability {
+  position: relative;
+}
+
+.revo-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  margin-left: 2px;
+  border: 2px solid var(--outline);
+  background: #e0a030;
+  color: var(--outline);
+  font-size: 16px;
+  line-height: 1;
+}
+
+.revo-mark.red {
+  background: var(--cloth);
+  color: var(--paper-light);
+  animation: revo-blink 1.2s steps(2) infinite;
+}
+
+@keyframes revo-blink {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.revolution {
+  margin: 4px 0 10px;
+  padding: 6px 8px;
+}
+
+.revolution.amber {
+  box-shadow: inset 4px 0 0 #e0a030;
+}
+
+.revolution.red {
+  box-shadow: inset 4px 0 0 var(--cloth);
+}
+
+.revolution p {
+  margin: 2px 0 6px;
+}
+
+.revo-quiet {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.revo-bar {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.revo-bar .progress {
+  margin-top: 0;
+}
+
+.progress.amber i {
+  background: #e0a030;
+}
+
+.progress.red i {
+  background: var(--cloth);
+}
+
+.revo-signs {
+  display: grid;
+  gap: 4px;
+}
+
+.revo-sign {
+  display: grid;
+  grid-template-columns: 1.2em minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  text-align: left;
+  font-size: 17px;
+}
+
+.revo-sign span {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  font-weight: 400;
+  overflow-wrap: anywhere;
+}
+
+.revo-sign b {
+  font-weight: 400;
+}
+
+.revo-sign.lit b {
+  font-weight: 600;
+}
+
+.revo-sign small {
+  color: var(--ink-soft);
+}
+
+.revo-sign:not(.lit) {
+  opacity: 0.72;
+}
+
+.revo-sign.lit i {
+  color: var(--cloth);
+}
+
+.revo-sign em {
+  font-style: normal;
+  color: var(--ink-soft);
+  font-size: 0.85em;
+}
+
+.revo-lines {
+  margin: 6px 0;
+  padding-left: 1.1em;
+}
+
+.revo-lines li.lit {
+  color: var(--cloth);
+}
+
+.revo-lines button {
+  min-height: 44px;
+}
+
+.revo-fold summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.revo-stances {
+  margin: 0;
+}
+
+.revo-stances dt {
+  margin-top: 6px;
+  font-weight: 600;
+}
+
+.revo-stances dd {
+  margin: 0;
+}
+
+.revo-stances ul {
+  margin: 0;
+  padding-left: 1.1em;
+}
+
+/* The choice card covers the map inside the safe areas; it cannot be folded away. */
+.revolution-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+  background: rgb(20 10 4 / 0.6);
+}
+
+.revolution-card {
+  display: flex;
+  flex-direction: column;
+  width: min(720px, 100%);
+  max-height: 100%;
+  padding: 4px 8px 8px;
+  animation: alert-in 0.2s steps(4);
+}
+
+.revolution-card .ribbon {
+  white-space: normal;
+  overflow: visible;
+}
+
+.revolution-card header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.revolution-card header small {
+  color: var(--ink-soft);
+}
+
+.revolution-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow: auto;
+}
+
+.revolution-card .sub {
+  margin: 8px 0 4px;
+  font: 600 18px/1 var(--body);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.revolution-card p {
+  margin: 4px 0;
+}
+
+.revolution-stances {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.revolution-stances .stance {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-height: 44px;
+  padding: 6px 10px;
+  text-align: left;
+}
+
+.revolution-stances .stance .name {
+  font-size: 1.1em;
+}
+
+.revolution-stances .stance .does {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.8em;
+  font-weight: 400;
+  line-height: 1.15;
+}
+
+/* A short landscape screen: the story and the answers side by side. */
+@media (max-height: 500px) and (min-width: 540px) {
+  .revolution-body {
+    flex-direction: row;
+    overflow: hidden;
+  }
+
+  .revolution-story,
+  .revolution-stances {
+    flex: 1 1 50%;
+    min-width: 0;
+    overflow: auto;
+  }
+
+  .revolution-card .sub {
+    margin-top: 2px;
+  }
+}
+
+.regime {
+  margin: 4px 0 10px;
+  padding: 6px 8px;
+}
+
+.regime .sub {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.regime-locks {
+  display: grid;
+  gap: 4px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.regime-locks li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 4px 8px;
+  border: 2px dashed var(--ink-soft);
+  color: var(--ink-soft);
+  opacity: 0.8;
+}
+
+.regime-locks li b {
+  text-decoration: line-through;
+}
+
+.revo-locked {
+  opacity: 0.6;
+}
+
+.revo-locked .locked-note {
+  display: block;
+  font-size: 0.7em;
+  font-weight: 400;
+}
