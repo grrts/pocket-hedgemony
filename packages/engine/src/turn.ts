@@ -6,6 +6,7 @@ import { callStudentsToArms, foundSchool, monthlyResearch, setSeats, setStudy } 
 import { aiChanges, monthlyChanges, orderChange, stopChange } from "./conversion.ts";
 import { answerAsk, breakAlliance, libraryEvents, makeDemand, monthlyStatecraft, sendEnvoy, syncCountries } from "./statecraft.ts";
 import { riseUp, subjectAction } from "./subjects.ts";
+import { court, recallCourting } from "./courting.ts";
 import { aiWorks, cancelWork, judgeNeglect, mineYear, monthlyWorks, moveQueued, orderWork } from "./works.ts";
 import { monthlyMoods } from "./moods.ts";
 import { answerRebels, dailyRebels, monthlyRebels, verdictOrder } from "./rebels.ts";
@@ -125,6 +126,8 @@ export type Order =
   | { type: "answerAsk"; ask: string; yes: boolean }
   /** The overlord's action on its subject: set the tribute (with `level`), send a gift, loosen or release it (SUBJ-037 to SUBJ-046). */
   | { type: "subjectAction"; subject: number; action: "tribute" | "gift" | "loosen" | "release" | "resident" | "recall" | "hostage" | "send_heir_home" | "tighten" | "fold_in" | "merge"; level?: string }
+  /** Send an envoy to court lord `lord` of realm `target`, or subject `target` without a lord; `recall` calls him home (DIPL-215). */
+  | { type: "court"; target: number; lord?: number; recall?: boolean }
   /** A Disloyal subject rises against its overlord (SUBJ-076, SUBJ-077). */
   | { type: "riseUp" }
   | { type: "stopChange"; province: number }
@@ -405,6 +408,8 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
     }
     case "riseUp":
       return riseUp(world, actingNation, news);
+    case "court":
+      return order.recall ? recallCourting(world, actingNation, order.target, order.lord) : court(world, actingNation, order.target, order.lord);
     case "subjectAction": {
       const reason = subjectAction(world, actingNation, order.subject, order.action, news, order.level);
       if (!reason) runLedger(world, false);
