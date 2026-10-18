@@ -656,7 +656,7 @@ export function appointCommander(world: World, n: number, army: number, commande
 }
 
 /** Send an army home: levies go back to the pools, a hired company and its captain leave; the commander returns to court. */
-export function disbandArmy(world: World, n: number, army: number): string | null {
+export function disbandArmy(world: World, n: number, army: number, recountAfter = true): string | null {
   const a = world.armies;
   if (army < 0 || army >= a.count || !a.alive[army]) return "no such army";
   if (a.owner[army] !== n) return "not your army";
@@ -666,7 +666,7 @@ export function disbandArmy(world: World, n: number, army: number): string | nul
   } else sendHome(world, n, a.men[army]!);
   a.alive[army] = 0;
   halt(world, army);
-  recount(world);
+  if (recountAfter) recount(world);
   return null;
 }
 
@@ -805,11 +805,13 @@ export function aiRecruits(world: World, news: News[], atWarNow: (n: number) => 
   const a = world.armies;
   const levyPer1000 = gold(world, rc.levyPay(1000, 99));
   const atWar = Uint8Array.from({ length: world.nationCount }, (_, n) => (atWarNow(n) ? 1 : 0));
-  // At peace, levies go home before their pay begins (one pass over the armies for every realm).
+  // At peace, levies go home before their pay begins (one pass over the armies for every realm, one recount after it).
+  let sent = false;
   for (let i = 0; i < a.count; i++) {
     const n = a.owner[i]!;
-    if (a.alive[i] && n !== world.player && !world.nationGone[n] && !atWar[n] && a.kind[i] === KIND.levy && a.monthsOut[i]! >= wf.W.levy.free_months) disbandArmy(world, n, i);
+    if (a.alive[i] && n !== world.player && !world.nationGone[n] && !atWar[n] && a.kind[i] === KIND.levy && a.monthsOut[i]! >= wf.W.levy.free_months) sent = disbandArmy(world, n, i, false) === null || sent;
   }
+  if (sent) recount(world);
   for (let n = 0; n < world.nationCount; n++) {
     if (n === world.player || world.nationGone[n] || !atWar[n]) continue;
     // Men it could not put under a commander would only stand as garrisons (feedback 28).
