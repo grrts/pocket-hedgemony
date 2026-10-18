@@ -55,6 +55,7 @@ import { governmentLine, governmentTab, governmentUi } from "./ui/government.ts"
 import { isShipKind, provinceTradeLine, routeBar, stopBit, tradeLine, tradeTab, tradeUi, type Routing } from "./ui/trade.ts";
 import { beliefData, beliefFacts, beliefLines, beliefUi, peoplesTab } from "./ui/belief.ts";
 import { censureWarningHtml, faithBadgeHtml, headCardHtml, seatKeyHtml } from "./ui/faithHeads.ts";
+import { declareSheetHtml, nameAbroadHtml, warCardHtml, warPlaqueBars } from "./ui/priceOfWar.ts";
 import { closeUpPoint, firstShown, jumpTarget, learningLine, learningTab, newLearningUi, nodeAt, realmLearningLine, startStanding } from "./ui/learning.ts";
 import { provinceWorks } from "./ui/works.ts";
 import { provinceLand } from "./ui/land.ts";
@@ -239,6 +240,8 @@ let headView: string | null = null;
 /** Which tab of a country's overview is open (feedback 12). */
 type RealmTab = "general" | "government" | "peoples" | "heritage" | "treasury" | "trade" | "food" | "diplomacy" | "military" | "mercenaries" | "officials" | "lords" | "provinces" | "learning" | "navy" | "hireFleets" | "colonies" | "score";
 let realmTab: RealmTab = "general";
+/** The realm whose declare sheet is open (WAR-229), -1 for none. */
+let declareFor = -1;
 /** What the player left open in the Research tab (tree or Schools, the zoom, the tapped invention, folds, scroll), kept across redraws. */
 const learningUi = newLearningUi();
 /** The study the player was last told to choose for (known count), so the alert comes once each time. */
@@ -372,10 +375,16 @@ document.addEventListener("click", (e) => {
   realmView = Number(b.dataset.realm);
   officialView = -1;
   lordView = -1;
+  declareFor = -1;
   realmTab = (b.dataset.realmOpen as typeof realmTab | undefined) ?? "general";
   newsView = false;
   panelCollapsed = false;
   renderPanel();
+});
+// The war plaque opens the Diplomacy tab at the first war's card (WAR-231).
+document.addEventListener("click", (e) => {
+  if (!(e.target as HTMLElement).closest("[data-war-focus]")) return;
+  panel.querySelector<HTMLElement>("[data-war-card]")?.scrollIntoView({ block: "start" });
 });
 document.addEventListener("click", (e) => {
   if (!(e.target as HTMLElement).closest("[data-news]")) return;
@@ -2377,7 +2386,7 @@ function renderHud(): void {
         case "stability":
           return stabilityPlaque(s.stability!, me, s.revolution);
         case "war":
-          return `<button class="plaque at-war" data-realm="${me}"${open(p.opens)} title="Your wars">${icon("swords", 1)}At war</button>`;
+          return `<button class="plaque at-war" data-realm="${me}"${open(p.opens)} data-war-focus title="Your wars: your side's peace voices, amber past a third, red past half">${icon("swords", 1)}At war${warPlaqueBars(myWarsRaw(), me)}</button>`;
         case "dispatches":
           return `<button class="plaque dispatches${p.urgent ? " urgent" : ""}" data-news title="News: everything that happened, newest first">${icon("scroll", 1)}${p.count || ""}</button>`;
       }
@@ -2392,6 +2401,33 @@ function myWars(): { id: string; ours: number[]; theirs: number[]; start: string
   return snapshot.wars
     .filter((w) => w.attackers.includes(me) || w.defenders.includes(me))
     .map((w) => (w.attackers.includes(me) ? { id: w.id, ours: w.attackers, theirs: w.defenders, start: w.start } : { id: w.id, ours: w.defenders, theirs: w.attackers, start: w.start }));
+}
+
+/** The snapshot's wars the player fights, with their peace facts (WAR-230). */
+const myWarsRaw = () => (snapshot ? snapshot.wars.filter((w) => w.attackers.includes(snapshot!.playerNation) || w.defenders.includes(snapshot!.playerNation)) : []);
+
+/** Provinces of the enemy side the player's side occupies, and of the player's side the enemy occupies. */
+function occupiedEachWay(ours: number[], theirs: number[]): { taken: number; lost: number } {
+  const o = new Set(ours);
+  const t = new Set(theirs);
+  let taken = 0;
+  let lost = 0;
+  for (let i = 0; i < provinces.length; i++) {
+    if (t.has(owners[i]!) && o.has(occupiers[i]!)) taken++;
+    if (o.has(owners[i]!) && t.has(occupiers[i]!)) lost++;
+  }
+  return { taken, lost };
+}
+
+/** A running war's card (WAR-230). */
+function warCard(id: string): string {
+  const s = snapshot!;
+  const w = s.wars.find((x) => x.id === id);
+  if (!w) return "";
+  const me = s.playerNation;
+  const attacker = w.attackers.includes(me);
+  const { taken, lost } = occupiedEachWay(attacker ? w.attackers : w.defenders, attacker ? w.defenders : w.attackers);
+  return warCardHtml(w, me, { name: (n) => nations[n]!.name, taken, lost, provinceName: (p) => provinces[p]!.name, titles: titlesOf(me) });
 }
 
 const relationOf = (n: number) => snapshot?.relations.find((r) => r.nation === n) ?? null;
@@ -3093,7 +3129,8 @@ function renderHead(id: string): void {
 }
 
 function renderPanelCard(): void {
-  const shows = `${achView}/${empireOpen}/${newsView}/${realmView}/${realmTab}/${officialView}/${lordView}/${armyView}/${fleetView}/${selectedProvince}/${provinceTab}`;
+  panel.classList.remove("declaring");
+  const shows = `${achView}/${empireOpen}/${newsView}/${realmView}/${realmTab}/${declareFor}/${officialView}/${lordView}/${armyView}/${fleetView}/${selectedProvince}/${provinceTab}`;
   if (shows !== panelShows) {
     panelShows = shows;
     panel.scrollTop = 0;
@@ -3120,7 +3157,9 @@ function renderPanelCard(): void {
     return;
   }
   if (realmView >= 0) {
-    renderRealm(realmView);
+    if (declareFor >= 0 && (declareFor !== realmView || !snapshot)) declareFor = -1;
+    if (declareFor >= 0) renderDeclareSheet(declareFor);
+    else renderRealm(realmView);
     return;
   }
   if (officialView >= 0 && snapshot) {
@@ -4504,18 +4543,11 @@ function relationsSection(r: number): string {
   const war = myWars().find((w) => w.theirs.includes(r));
   if (war) {
     // Land each side holds of the other's, for the peace terms.
-    const ours = new Set(war.ours);
-    const theirs = new Set(war.theirs);
-    let taken = 0;
-    let lost = 0;
-    for (let i = 0; i < provinces.length; i++) {
-      if (theirs.has(owners[i]!) && ours.has(occupiers[i]!)) taken++;
-      if (ours.has(owners[i]!) && theirs.has(occupiers[i]!)) lost++;
-    }
+    const { taken, lost } = occupiedEachWay(war.ours, war.theirs);
     const leaders = s.wars.find((w) => w.id === war.id)!;
     const whole = [leaders.attackers[0], leaders.defenders[0]].includes(me) && [leaders.attackers[0], leaders.defenders[0]].includes(r);
     return `<h3 class="sub">At war</h3>
-      <p>Since ${monthText(war.start)}. With you: ${war.ours.map((n) => esc(nations[n]!.name)).join(", ")}. Against you: ${war.theirs.map((n) => esc(nations[n]!.name)).join(", ")}.</p>
+      ${warCard(war.id)}
       <p class="hint">${whole ? "Peace with them ends the whole war." : "A separate peace: the rest of the war goes on."} Your side holds ${taken} of their provinces; they hold ${lost} of yours.</p>
       <div class="choices">
         <button class="wax" data-peace="take" ${taken ? "" : "disabled"}>${icon("crown", 1)}Peace: take ${taken} province${taken === 1 ? "" : "s"}</button>
@@ -4537,7 +4569,44 @@ function relationsSection(r: number): string {
     ${rel?.state === "overlord" ? subjectCard(s.statecraft, r, (n) => realmButton(n, "diplomacy"), nations[r]!.name) : ""}
     ${rel?.state === "subject" && s.statecraft?.subjects?.overlord?.overlord === r ? overlordCard(s.statecraft, (n) => realmButton(n, "diplomacy")) : ""}
     ${realmStatecraft(s.statecraft, r, rel?.state === "alliance", false)}
-    ${rel ? "" : `<h3 class="sub">War</h3>${censureWarningHtml(s.faithHeads?.censure[r])}<div class="choices"><button class="wax" data-declare="${r}">${icon("swords", 1)}Declare war</button></div>`}`;
+    ${rel && rel.state !== "truce" ? "" : `<h3 class="sub">War</h3><div class="choices"><button class="wax" data-declare="${r}">${icon("swords", 1)}Declare war</button></div><p class="hint">Shows the price of war before you confirm.</p>`}`;
+}
+
+/**
+ * The declare sheet (WAR-229, WAR-232): the price of war beside the terms, the
+ * faith head's censure above Confirm, and Confirm pinned at the foot. Confirm
+ * breaks a truce when one holds; Back returns to the realm's Diplomacy tab.
+ */
+function renderDeclareSheet(r: number): void {
+  const s = snapshot!;
+  const me = s.playerNation;
+  const price = s.statecraft?.realms[r]?.price ?? null;
+  panel.innerHTML = `
+    <header><h2 class="ribbon">War on ${esc(nations[r]!.name)}?</h2>${closeButton()}</header>
+    ${declareSheetHtml({
+      target: r,
+      price,
+      name: (n) => nations[n]!.name,
+      titles: titlesOf(me),
+      income: s.nationMonthlyIncome[me]!,
+      nameAbroad: s.statecraft?.nameAbroad ?? null,
+      me,
+      censure: censureWarningHtml(s.faithHeads?.censure[r]),
+    })}`;
+  panel.classList.add("declaring");
+  bindClose();
+  showPanel(true);
+  panel.querySelector("[data-declare-back]")?.addEventListener("click", () => {
+    declareFor = -1;
+    realmTab = "diplomacy";
+    renderPanel();
+  });
+  panel.querySelector<HTMLButtonElement>("[data-declare-confirm]")?.addEventListener("click", (e) => {
+    const breakTruce = !!(e.currentTarget as HTMLButtonElement).dataset.breakTruce;
+    declareFor = -1;
+    realmTab = "diplomacy";
+    void act({ type: "declareWar", target: r, ...(breakTruce ? { breakTruce: true } : {}) });
+  });
 }
 
 /** In the player's war for independence: make the old overlord its own subject in the peace (SUBJ-135, SUBJ-140). */
@@ -4601,12 +4670,11 @@ function myDiplomacySection(): string {
   const s = snapshot!;
   const ties = s.relations.filter((x) => x.state !== "war");
   const STATE = { truce: "Truce", alliance: "Ally", subject: "Your overlord", overlord: "Your subject", war: "At war" } as const;
-  return `${asksHtml()}${s.peaceOffers.map(offerHtml).join("")}
+  // Your name abroad opens the tab (DIPL-225), then what waits for an answer, then each war's card (WAR-230).
+  return `${s.statecraft ? nameAbroadHtml(s.statecraft.nameAbroad, (n) => nations[n]!.name) : ""}${asksHtml()}${s.peaceOffers.map(offerHtml).join("")}
     ${institutionsRows(s.empire, institutionsUi)}
     <h3 class="sub">Wars</h3>
-    ${myWars().length ? myWars()
-      .map((w) => `<p>${icon("swords", 1)} Against ${w.theirs.map((n) => realmButton(n, "diplomacy")).join(" ")} <small>since ${monthText(w.start)}</small></p>`)
-      .join("") : `<p class="hint">At peace with the world.</p>`}
+    ${myWars().length ? myWars().map((w) => warCard(w.id)).join("") : `<p class="hint">At peace with the world.</p>`}
     <p class="hint">Open a realm to send it an envoy, declare war on it or offer it peace.</p>
     ${mySubjects(s.statecraft, (n) => realmButton(n, "diplomacy"))}
     ${myHouse(s.statecraft, (n) => realmButton(n, "diplomacy"))}
@@ -4925,7 +4993,11 @@ function renderRealm(r: number): void {
   panel.querySelectorAll<HTMLButtonElement>("[data-peace]").forEach((b) =>
     b.addEventListener("click", () => void act({ type: "offerPeace", target: r, terms: b.dataset.peace as PeaceTerms })),
   );
-  panel.querySelector<HTMLButtonElement>("[data-declare]")?.addEventListener("click", () => void act({ type: "declareWar", target: r }));
+  // Declaring opens the declare sheet with the price of war first (WAR-229).
+  panel.querySelector<HTMLButtonElement>("[data-declare]")?.addEventListener("click", () => {
+    declareFor = r;
+    renderPanel();
+  });
   panel.querySelectorAll<HTMLButtonElement>("[data-envoy]").forEach((b) => b.addEventListener("click", () => void act({ type: "sendEnvoy", target: r, action: b.dataset.envoy! })));
   panel.querySelector<HTMLButtonElement>("[data-rise]")?.addEventListener("click", () => void act({ type: "riseUp" }));
   panel.querySelectorAll<HTMLButtonElement>("[data-subject-choice]").forEach((b) => b.addEventListener("click", () => void act({ type: "subjectChoice", action: b.dataset.subjectChoice as "stop_paying" | "pay" | "ask_loosen" })));
@@ -5330,6 +5402,7 @@ function bindClose(): void {
     achView = false;
     empireOpen = false;
     headView = null;
+    declareFor = -1;
     selectedProvince = -1;
     selected.clear();
     restyleProvinces();
@@ -6465,6 +6538,13 @@ Object.assign(globalThis, {
   },
   /** Sends one of the player's envoys to a realm by id, on a mission (ENVOY_ACTIONS). */
   __phEnvoy: (id: string, action = "courtesy_visit") => act({ type: "sendEnvoy", target: nationIndex.get(id)!, action }),
+  /** Redraws the open Your name abroad card from a given view by realm ids, to check how a league looks (price-of-war-shots.mjs). */
+  __phNameAbroad: (v: { notoriety: number; landsTaken: number; threshold: number; leagues: { members: [string, number][] }[] }) => {
+    const el = panel.querySelector("#name-abroad");
+    const word = v.notoriety >= 75 ? "Hated" : v.notoriety >= 50 ? "Feared" : v.notoriety >= 25 ? "Watched" : "Trusted";
+    const leagues = v.leagues.map((l) => ({ target: snapshot!.playerNation, members: l.members.map(([id, soldiers]) => ({ nation: nationIndex.get(id)!, soldiers })) }));
+    if (el) el.outerHTML = nameAbroadHtml({ ...v, word, leagues }, (n) => nations[n]!.name);
+  },
   /** Id of the province the player's first army with a commander stands in. */
   __phArmyProvince: () => {
     if (!snapshot) return null;
