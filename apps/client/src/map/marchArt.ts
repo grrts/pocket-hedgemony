@@ -432,7 +432,7 @@ export function drawBattle(ctx: Ctx, b: BattleStyle): boolean {
 
 /**
  * One side's strength: its men on a plate in its colour, a bar under it emptying as men fall, and
- * a gold bar under that emptying as its morale goes. Grows away from x by `side`.
+ * a pale bar under that emptying as its morale goes. Grows away from x by `side`.
  */
 function sideBar(ctx: Ctx, x: number, top: number, u: number, men: number, start: number, morale: number, color: string, side: -1 | 1): void {
   const w = 22 * u;
@@ -447,7 +447,7 @@ function sideBar(ctx: Ctx, x: number, top: number, u: number, men: number, start
     ctx.fillRect(side < 0 ? left + w - u - fill : left + u, top + row * u, fill, 2 * u);
   };
   bar(10, men / Math.max(1, start), color);
-  bar(13, morale, PALETTE.gold);
+  bar(13, morale, PALETTE.paper);
   drawPlate(ctx, menShort(men), left + w / 2, top, u, color);
 }
 

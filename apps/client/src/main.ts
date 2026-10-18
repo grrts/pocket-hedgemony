@@ -1357,7 +1357,7 @@ function drawFleets(o: OverlayContext, ctx: CanvasRenderingContext2D, u: number,
     if (!onScreen(sx, sy)) continue;
     const realm = nations[f.owner]!;
     const box = drawToken(ctx, { x: sx, y: sy, u: 2, color: realm.color, men: f.ships, naval: true, flag: flagCanvas(realm, 1), dir: 1, moving: f.route.length > 0, selected: fleetView === f.id || sailing === f.id, t: now });
-    fleetHitBoxes.push({ id: f.id, mine: f.owner === s.playerNation, ...box });
+    fleetHitBoxes.push({ id: f.id, mine: f.owner === s.playerNation, ...box.tap });
     moving ||= f.route.length > 0;
   }
   return moving;

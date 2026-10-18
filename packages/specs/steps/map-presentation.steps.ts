@@ -120,11 +120,10 @@ import {
 import { foodMonths as wfFoodMonths, newSiege as wfNewSiege, siegeMonth as wfSiegeMonth } from "@ph/engine/domain/warfare";
 import { decodeRgb } from "@ph/engine/node";
 import { fileURLToPath } from "node:url";
-import { FLAG_COLORS, FLAG_H, FLAG_W, flagGrid } from "../../../apps/client/src/art/flags.ts";
 import { steps, type Scenario } from "../src/registry.ts";
 // The client's own art code, for the map figures and portraits (VIEW-084 to VIEW-087).
 import { apparentAge, commanderGrid, commanderKit, commanderSpriteSize, eraOfYear } from "../../../apps/client/src/art/commanders.ts";
-import { FLAG_COLORS, flagCanvasSize, flagColors, flagGrid } from "../../../apps/client/src/art/flags.ts";
+import { FLAG_COLORS, FLAG_H, FLAG_W, flagCanvasSize, flagColors, flagGrid } from "../../../apps/client/src/art/flags.ts";
 import { lookOfCulture, portraitDress } from "../../../apps/client/src/art/portraits.ts";
 import { armyFigureUnit, armyNameShown, tokenFigure, tokenLayout } from "../../../apps/client/src/map/marchArt.ts";
 
@@ -217,7 +216,7 @@ Then("it is a light dash over a dark outline", (s) => {
 
 // VIEW-076: the clock ticks through a real turn a day at a time; through a player battle, by 4-hour steps.
 Then("the top bar's date ticks one day at a time", (s) => {
-  const host = createEngineHost(loadDefaultRuleset);
+  const host: (m: unknown) => any = createEngineHost(loadDefaultRuleset) as never;
   let snap = host({ id: 1, type: "newGame", seed: 1, playerNation: "france" }).response.snapshot;
   const turn = snap.turn;
   const dayNo = (d: { year: number; month: number; day: number }) => Date.UTC(d.year, d.month - 1, d.day) / 86_400_000;
