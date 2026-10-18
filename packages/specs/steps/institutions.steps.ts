@@ -8,7 +8,7 @@ import { steps, type Scenario } from "../src/registry.ts";
 const { Given, When, Then } = steps("institutions");
 
 /**
- * Institutions slice 1 (INST-001 to INST-034, INST-080 to INST-085). The
+ * Institutions slices 1 and 2 (INST-001 to INST-051, INST-080 to INST-085). The
  * Empire's rules are checked on the domain's own Empire (a Diplomacy and
  * realms the scenario sets up) where the feature names no campaign, and on a
  * whole 1444 world where it does: a new campaign, wars, envoys, the ledger.
@@ -376,11 +376,24 @@ When("a call to defend the Empire concerns the player", (s) => {
 });
 Then("an answer card with two 44-point buttons waits in the dispatches and on Needs attention", (s) => {
   const w = world(s);
+  if (s.dietAsk) {
+    expect(view(s).reforms.diet).toMatchObject({ reform: "public_peace", playerVote: null });
+    expect(I.institutionCard("Short wide").minTap).toBeGreaterThanOrEqual(44);
+    return;
+  }
   const waiting = w.diplomacy.calls.filter((c) => !c.answer && c.called === w.nationIds[w.player]);
   expect(waiting.map((c) => c.via)).toContain("empire");
   expect(I.institutionCard("Short wide").minTap).toBeGreaterThanOrEqual(44);
 });
 Then("silence counts as {string}", (s, silence: string) => {
+  const w = world(s);
+  if (s.dietAsk) {
+    // The player has not voted: the forecast counts them as no (INST-083).
+    expect(I.SILENCE.diet).toBe(silence);
+    const e = I.withReforms(empire(s));
+    expect(G.dietForecast(w, e, e.diet!.reform).votes[w.nationIds[w.player]!]).toBe("no");
+    return;
+  }
   expect(I.SILENCE.defence).toBe(silence);
   monthStep(s, 1444, 12);
   expect(s.call.answer).toBe("no");
@@ -411,3 +424,290 @@ Then(/^it sits as a (side sheet|bottom sheet) inside the safe areas$/, (s, sheet
 });
 Then("every fold header, row and button is at least 44 points high", (s) => expect(s.card.minTap).toBeGreaterThanOrEqual(44));
 Then("nothing needs hover", (s) => expect(s.card.hover).toBe(false));
+
+// ---------------------------------------------------------------- the Diet and the reforms (INST-034, INST-040 to INST-048)
+
+const reformed = (s: S): I.ReformedEmpire => I.withReforms(empire(s));
+const reformId = (name: string) => I.REFORMS.find((r) => r.name === name.replace(/^the /i, "").replace(/ reform$/, ""))!.id;
+function pass(s: S, id: I.ReformId): void {
+  if (s.w) G.passReform(s.w, id, s.news);
+  else reformed(s).reforms.push(id);
+}
+
+Given(/^the (Public Peace|Imperial Court|Circles reform|Common Tax|Imperial Army|Hereditary Crown) has passed$/, (s, name: string) => {
+  const id = reformId(name);
+  // The Hereditary Crown is checked on the domain's own Empire, with rulers the scenario names; the rest in a campaign.
+  if (id !== "hereditary_crown") world(s);
+  // Reforms pass in order: the ones before it have passed too.
+  for (const r of I.REFORMS) {
+    if (r.id === id) break;
+    pass(s, r.id);
+  }
+  pass(s, id);
+});
+Given("the Public Peace has not passed", (s) => expect(I.passed(reformed(s), "public_peace")).toBe(false));
+Then("the Diet can only be called on the Public Peace", (s) => {
+  const e = reformed(s);
+  e.hold = 60;
+  expect(I.nextReform(e)).toBe("public_peace");
+  expect(I.callDiet(e, "1450-01-01")?.reform).toBe("public_peace");
+});
+Given("the last Diet sat {int} years ago", (s, years: number) => {
+  reformed(s).lastDiet = DIP.addMonths("1450-01", -years * 12);
+});
+Then(/^the Emperor (may|may not) call the Diet$/, (s, may: string) => {
+  const why = I.whyNotCallDiet(reformed(s), "1450-01-01");
+  if (may === "may") expect(why).toBeNull();
+  else expect(why).not.toBeNull();
+});
+Given("a Diet sits on the Public Peace with {int} members, {int} of them electors", (s, members: number, electors: number) => {
+  const e = reformed(s);
+  e.hold = 60;
+  e.members = e.members.slice(0, members);
+  // Give the church seats to members so the electors among the members number as the scenario says.
+  const without = e.members.filter((m) => !I.seatOf(e, m) && m !== e.holder);
+  for (const seat of e.seats) if (seat.church || !seat.realm || !e.members.includes(seat.realm)) Object.assign(seat, { church: false, realm: without.shift() ?? null });
+  expect(e.members.filter((m) => I.seatOf(e, m))).toHaveLength(electors);
+  expect(I.callDiet(e, "1450-01-01")?.reform).toBe("public_peace");
+  s.holdBefore = e.hold;
+});
+Given("{int} electors and {int} other members vote yes", (s, ey: number, my: number) => {
+  const e = reformed(s);
+  s.dietVotes = {} as Record<string, "yes" | "no">;
+  let a = ey, b = my;
+  for (const m of e.members) {
+    const elector = !!I.seatOf(e, m);
+    const yes = elector ? a-- > 0 : b-- > 0;
+    s.dietVotes[m] = yes ? "yes" : "no";
+  }
+});
+Given("a Diet sits on the Imperial Court with hold {int}", (s, hold: number) => {
+  const e = reformed(s);
+  e.reforms.push("public_peace");
+  e.hold = hold;
+  expect(I.callDiet(e, "1450-01-01")?.reform).toBe("imperial_court");
+});
+Given("over half the votes are no", (s) => {
+  s.dietVotes = Object.fromEntries(reformed(s).members.map((m) => [m, "no"]));
+});
+When("the Diet ends", (s) => {
+  const e = reformed(s);
+  s.tally = I.weigh(e, s.dietVotes);
+  s.dietOut = I.endDiet(e, s.tally, "1450-02-01");
+});
+Then("the votes are {int} yes to {int} no", (s, yes: number, no: number) => expect(s.tally).toEqual({ yes, no }));
+Then("the Public Peace passes and the hold falls by {int}", (s, n: number) => {
+  expect(s.dietOut).toEqual({ reform: "public_peace", passed: true });
+  expect(reformed(s).reforms).toContain("public_peace");
+  expect(empire(s).hold).toBe(s.holdBefore - n);
+});
+Then("the Imperial Court has not passed", (s) => {
+  expect(s.dietOut).toEqual({ reform: "imperial_court", passed: false });
+  expect(I.passed(reformed(s), "imperial_court")).toBe(false);
+});
+
+// Breakers of the Peace (INST-034, INST-042)
+function declareAny(s: S, a: number, b: number): void {
+  const w = world(s);
+  expect(G.declareWar(w, a, b, s.news)).toBeNull();
+}
+When(/^"([^"]+)" declares war on "([^"]+)"$/, (s, a: string, b: string) => declareAny(s, nation(s, a), nation(s, b)));
+When("the Emperor declares war on the member {string}", (s, b: string) => declareAny(s, nation(s, empire(s).holder!), nation(s, b)));
+Then("{string} is a Breaker of the Peace", (s, name: string) => expect(I.isBreaker(reformed(s), idOf(name), dipl(s).date)).toBe(true));
+Then("the Emperor is a Breaker of the Peace", (s) => expect(I.isBreaker(reformed(s), empire(s).holder!, dipl(s).date)).toBe(true));
+Then("the Emperor and every member hold a war aim on {string}", (s, name: string) => {
+  const e = empire(s);
+  for (const m of e.members.filter((x) => x !== idOf(name))) expect(DIP.holdsAim(dipl(s), m, idOf(name), "breaker_of_the_peace")).toBe(true);
+});
+Then("the Emperor is called to defend {string}", (s, member: string) => {
+  expect(defenceCall(s, member)).toMatchObject({ called: empire(s).holder, kind: "defensive" });
+});
+
+// The Imperial Court (INST-043)
+function landAim(s: S, plaintiff: string, defendant: string): string {
+  const w = world(s);
+  const d = nation(s, defendant);
+  const p = w.provinceOwner.indexOf(d);
+  const prov = w.provinceIds[p]!;
+  w.diplomacy.aims.push({ holder: idOf(plaintiff), target: idOf(defendant), aim: "take_land", province: prov, source: "an old claim" });
+  // The plaintiff stands well with the Emperor, so the court rules for it.
+  w.diplomacy.standingOverride[DIP.key(idOf(plaintiff), empire(s).holder!)] = 100;
+  return prov;
+}
+Given("{string} holds a war aim on a province of {string}", (s, a: string, b: string) => {
+  s.courtProvince = landAim(s, a, b);
+});
+When("{string} takes it to court and the ruling is for {string}", (s, a: string, b: string) => {
+  const w = world(s);
+  const t = a === b ? s.courtProvince : s.courtProvince;
+  const defendant = w.provinceOwner[w.provinceIndex.get(t)!]!;
+  s.defendant = defendant;
+  expect(G.takeToCourt(w, nation(s, a), defendant, t, s.news)).toBeNull();
+  const ruling = reformed(s).rulings.at(-1)!;
+  expect(ruling).toMatchObject({ plaintiff: idOf(b), forPlaintiff: true });
+});
+Then("the province moves to {string} with no war", (s, name: string) => {
+  const w = world(s);
+  expect(w.provinceOwner[w.provinceIndex.get(s.courtProvince)!]).toBe(nation(s, name));
+  expect(G.warBetween(w, nation(s, name), s.defendant)).toBeUndefined();
+});
+Given("the Imperial Court has ruled that {string} hands a province to {string}", (s, defendant: string, plaintiff: string) => {
+  const w = world(s);
+  for (const r of I.REFORMS.slice(0, 2)) G.passReform(w, r.id, s.news);
+  // The player plays the losing side, so the ruling waits on their answer.
+  w.player = nation(s, defendant);
+  const prov = landAim(s, plaintiff, defendant);
+  expect(G.takeToCourt(w, nation(s, plaintiff), nation(s, defendant), prov, s.news)).toBeNull();
+  expect(G.empireView(w, w.player)!.reforms.rulings).toHaveLength(1);
+});
+When("{string} refuses the ruling", (s, name: string) => {
+  const w = world(s);
+  const id = G.empireView(w, w.player)!.reforms.rulings[0]!.id;
+  expect(G.empireOrder(w, nation(s, name), { type: "empire", do: "ruling", id, yes: false }, s.news)).toBeNull();
+});
+
+// Circles, the Common Tax, the Imperial Army, the Hereditary Crown, One Realm (INST-044 to INST-048)
+Given("{string} and {string} are in the same circle", (s, a: string, b: string) => {
+  expect(I.circleOf(idOf(a))).not.toBeNull();
+  expect(I.circleOf(idOf(a))).toBe(I.circleOf(idOf(b)));
+});
+Then("{string} joins the defence of {string}", (s, a: string, b: string) => {
+  const war = G.warBetween(world(s), nation(s, b), nation(s, "Poland"))!;
+  expect(war.defenders).toContain(idOf(a));
+});
+Given("{string} collects {int} gold of tax in a month", (s, name: string, gold: number) => {
+  s.taxOf = { realm: idOf(name), gold };
+});
+When("the month ends", (s) => {
+  G.runLedger(world(s), false);
+});
+Then("{string} pays {int} gold to the Emperor", (s, name: string, gold: number) => {
+  const w = world(s);
+  expect(I.commonTax(empire(s), s.taxOf.gold)).toBe(gold);
+  const row = G.empireTax(w).find(([payer]) => payer === nation(s, name))!;
+  expect(row[1]).toBe(nation(s, empire(s).holder!));
+  expect(s.taxOf.gold * row[2]).toBe(gold);
+});
+Then("the Emperor receives no dues", (s) => {
+  const w = world(s);
+  expect(G.empireDues(w, nation(s, empire(s).holder!))).toBe(0);
+});
+Given("{string} has {int} soldiers", (s, name: string, n: number) => {
+  s.contingentFrom = { realm: idOf(name), soldiers: n };
+});
+When("the Emperor defends the Empire in a war", (s) => {
+  s.contingent = I.contingentMen(s.contingentFrom.soldiers);
+});
+Then("the Emperor commands a contingent of {int} soldiers of {string} until the peace", (s, men: number) => expect(s.contingent).toBe(men));
+When("the Emperor's realm gets a new ruler", (s) => {
+  pure(s);
+  s.rulers.set(empire(s).holder!, "Albert");
+});
+Then("no election is held and the new ruler holds the crown", (s) => {
+  const e = empire(s);
+  expect(I.electionDue(e, "1450-01-01", (id) => s.rulers.get(id) ?? "Frederick")).toBeNull();
+  expect(e.election).toBeNull();
+  expect(e.holderRuler).toBe("Albert");
+});
+Given("the six reforms before One Realm have passed and hold is {int}", (s, hold: number) => {
+  const w = world(s);
+  for (const r of I.REFORMS.slice(0, 6)) G.passReform(w, r.id, s.news);
+  empire(s).hold = hold;
+  s.formerMembers = empire(s).members.filter((m) => m !== empire(s).holder);
+  s.landOf = new Map(s.formerMembers.map((m: string) => [m, [...w.provinceOwner].flatMap((o, p) => (o === w.nationIndex.get(m) ? [p] : []))]));
+  expect(I.whyNotCallDiet(reformed(s), w.diplomacy.date)).toBeNull();
+});
+When("One Realm passes", (s) => G.passReform(world(s), "one_realm", s.news));
+Then("the ruler of every other member is a great lord of the Emperor with his land, Wavering", (s) => {
+  const w = world(s);
+  const emperor = nation(s, empire(s).holder!);
+  for (const m of s.formerMembers as string[]) {
+    const land: number[] = s.landOf.get(m);
+    for (const p of land) {
+      expect(w.provinceOwner[p]).toBe(emperor);
+      const lord = w.lords[w.provinceLord[p]!]!;
+      expect(lord).toMatchObject({ nation: emperor, loyalty: "Wavering", house: w.rules.nations[w.nationIndex.get(m)!]!.name });
+    }
+  }
+});
+Then("the Empire has ended", (s) => expect(empire(s).ended).toMatchObject({ how: "one_realm" }));
+
+// ---------------------------------------------------------------- the faith settlements and the end (INST-050, INST-051)
+
+Given("{string} is the largest member without a seat", (s, name: string) => {
+  const w = world(s);
+  const e = empire(s);
+  const size = (id: string) => [...w.provinceOwner].filter((o) => o === w.nationIndex.get(id)).length;
+  const others = e.members.filter((m) => !I.seatOf(e, m) && m !== e.holder && m !== idOf(name));
+  // The 1444 map decides; the scenario only holds when no other member without a seat is larger.
+  for (const m of others) expect(size(m)).toBeLessThanOrEqual(size(idOf(name)));
+});
+When("the event {string} fires", (s, ev: string) => {
+  const w = world(s);
+  w.diplomacy.flags.push(ev);
+  monthStep(s, 1444, 12);
+});
+Then("{string} holds an eighth seat", (s, name: string) => {
+  expect(empire(s).seats).toHaveLength(8);
+  expect(reformed(s).eighthSeat).toBe(idOf(name));
+  expect(I.seatOf(empire(s), idOf(name))).not.toBeNull();
+});
+Given("the event {string} has fired", (s, ev: string) => {
+  world(s).diplomacy.flags.push(ev);
+});
+Given("{string} is Protestant and the Emperor is Catholic", (s, name: string) => {
+  const w = world(s);
+  w.nationStateFaith[nation(s, name)] = G.FAITH_IDS.indexOf("protestant");
+  expect(G.FAITH_IDS[w.nationStateFaith[nation(s, empire(s).holder!)]!]).toBe("catholic");
+});
+Then("the hold record has no loss for the faith of {string}", (s) => {
+  expect(empire(s).record.some((l) => l.cause.startsWith("Members of another faith"))).toBe(false);
+});
+Given("the Empire's hold has stood at 0 for {int} years in a row", (s, years: number) => {
+  world(s);
+  const e = reformed(s);
+  e.hold = 0;
+  // This year is the last of them: it is counted when January begins.
+  e.zeroYears = years - 1;
+  s.formerMembers = [...e.members];
+});
+Then("the Empire is dissolved", (s) => expect(empire(s).ended).not.toBeNull());
+Then("every former member is a free realm", (s) => {
+  const e = empire(s);
+  for (const m of s.formerMembers as string[]) expect(I.isMember(e, m)).toBe(false);
+  expect(I.roleOf(e, e.holder!)).toBeNull();
+});
+Given("it is era IV", (s) => {
+  world(s).diplomacy.era = "IV";
+});
+Given("{string}, not a member, has won a war against the Emperor", (s, name: string) => {
+  const w = world(s);
+  const a = nation(s, name), emperor = nation(s, empire(s).holder!);
+  expect(I.isMember(empire(s), idOf(name))).toBe(false);
+  declareAny(s, a, emperor);
+  // Every province of the Emperor's side is in the winner's hands.
+  const war = G.warBetween(w, a, emperor)!;
+  const side = new Set(war.defenders.map((id) => w.nationIndex.get(id)!));
+  for (let p = 0; p < w.provinceCount; p++) if (side.has(w.provinceOwner[p]!)) w.provinceOccupier[p] = a;
+});
+When("{string} takes the peace term {string}", (s, name: string, term: string) => {
+  expect(term).toBe("Dissolve the Empire");
+  expect(G.offerPeace(world(s), nation(s, name), nation(s, empire(s).holder!), "dissolve", s.news)).toBeNull();
+});
+Then("no realm holds the war aim {string}", (s, aim: string) => {
+  const d = dipl(s);
+  expect(d.aims.some((a) => DIP.aimName(a.aim) === aim)).toBe(false);
+  monthStep(s, 1445, 1);
+  expect(d.aims.some((a) => DIP.aimName(a.aim) === aim)).toBe(false);
+});
+
+// ---------------------------------------------------------------- a Diet vote on screen (INST-083)
+
+When("a Diet vote concerns the player", (s) => {
+  const w = world(s);
+  w.player = nation(s, "Saxony");
+  const e = reformed(s);
+  e.hold = 60;
+  expect(G.callTheDiet(w, e, s.news)).toBeNull();
+  s.dietAsk = true;
+});

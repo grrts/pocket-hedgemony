@@ -16,7 +16,7 @@ import { noteBattle, notePeace, noteSiege } from "./achievements.ts";
 import { demandableProvinces, makeDemand, whyNotDemand } from "./statecraft.ts";
 import { heritageFactor } from "./heritage.ts";
 import { lostBattle } from "./rebels.ts";
-import { aiAnswersDefence, defenceCalls } from "./institutions.ts";
+import { aiAnswersDefence, defenceCalls, dissolveEmpire, whyNotDissolveTerm } from "./institutions.ts";
 
 /**
  * Milestone 1, war and conquest: wires the diplomacy context (who is at war,
@@ -714,7 +714,8 @@ function occupy(world: World, p: number, by: number, text: string, news: News[])
 
 // ---------------------------------------------------------------- peace
 
-export type PeaceTerms = "take" | "white" | "give";
+/** "dissolve" is the peace term *Dissolve the Empire* a non-member who beat the Emperor may take from era IV (INST-051). */
+export type PeaceTerms = "take" | "white" | "give" | "dissolve";
 
 /**
  * How ready a side is to make peace, as a share of its voices (WAR-181): the
@@ -769,6 +770,10 @@ export function offerPeace(world: World, a: number, b: number, terms: PeaceTerms
   if (!war) return "you are not at war with them";
   const leaders = [war.declarer, war.target].map((id) => world.nationIndex.get(id)!);
   const whole = leaders.includes(a) && leaders.includes(b);
+  if (terms === "dissolve") {
+    const why = whyNotDissolveTerm(world, a, b);
+    if (why) return why;
+  }
   const { ours, theirs } = sidesOf(world, war, a);
   const sideA = whole ? ours : [a];
   const sideB = whole ? theirs : [b];
@@ -780,7 +785,7 @@ export function offerPeace(world: World, a: number, b: number, terms: PeaceTerms
     const months = dip.monthsBetween(war.start, dip.monthOf(world.diplomacy.date));
     const exhausted = rel.aiMustAcceptPeace(months) && occupiedBy(world, sideA, sideB).length === 0;
     const accepts =
-      terms === "white"
+      terms === "white" || terms === "dissolve"
         ? share > wf.W.peace.half || exhausted
         : ceded.length > 0 && wf.aiAccepts(share, ceded.map((p) => ({ kind: "cede", province: world.provinceIds[p]! })), { occupiedByEnemy: ceded.map((p) => world.provinceIds[p]!), treasury: world.nationTreasury[b]! });
     if (!accepts) {
@@ -789,6 +794,7 @@ export function offerPeace(world: World, a: number, b: number, terms: PeaceTerms
     }
   }
   makePeace(world, war, whole, a, b, ceded, news);
+  if (terms === "dissolve") dissolveEmpire(world, "peace_term", news);
   return null;
 }
 
