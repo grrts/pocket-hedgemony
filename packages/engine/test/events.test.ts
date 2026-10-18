@@ -2,8 +2,10 @@ import { describe, expect, it } from "vitest";
 import { loadMapTiles } from "../src/node/mapTiles.ts";
 import { loadDefaultRuleset } from "@ph/rules";
 import { createWorld, processTurn, type World } from "../src/index.ts";
-import { answerEvent, createGameEvents, eventCards, monthlyEvents, restoreEvents, saveEvents } from "../src/events.ts";
+import { answerEvent, applyEventEffects, createGameEvents, eventConditionHolds, eventCards, monthlyEvents, restoreEvents, saveEvents } from "../src/events.ts";
 import { declareWar, type News } from "../src/war.ts";
+import { bondOf, subjectTies } from "../src/subjects.ts";
+import * as dip from "../src/domain/diplomacy/index.ts";
 
 const rules = loadDefaultRuleset();
 const tiles = loadMapTiles(rules);
@@ -85,5 +87,40 @@ describe("historical events (milestone 6)", () => {
     const r = processTurn(w, [{ type: "answerEvent", event: "fall_of_constantinople", option: "imperial_capital" }], me);
     expect(r.rejectedOrders).toEqual([]);
     expect(w.events!.state.world.history.find((h) => h.event === "fall_of_constantinople")?.option).toBe("imperial_capital");
+  });
+});
+
+describe("events and subjects (SUBJ-097)", () => {
+  it("makes, loosens, weighs and frees the game's own subjects", () => {
+    const w = createWorld(rules, 1, tiles);
+    const castile = nation(w, "castile");
+    const navarre = nation(w, "navarre");
+    const granada = nation(w, "granada");
+    const news: News[] = [];
+    expect(bondOf(w, navarre)).toBeNull();
+    applyEventEffects(w, [{ vassalize: { who: "castile", target: "navarre", type: "puppet" } }], news);
+    expect(bondOf(w, navarre)).toMatchObject({ overlord: "castile", kind: "protectorate", loyalty: "loyal" });
+    expect(news.some((x) => /Navarre becomes a protectorate of Castile/.test(x.text))).toBe(true);
+    expect(w.events!.state.world.subjects).toBeUndefined();
+    // the loyalty test reads the real bond: Granada starts Wavering
+    expect(eventConditionHolds(w, { subject_loyalty: { who: "castile", target: "granada", op: "==", step: "wavering" } })).toBe(true);
+    expect(eventConditionHolds(w, { subject_loyalty: { who: "castile", target: "navarre", op: "==", step: "loyal" } })).toBe(true);
+    expect(eventConditionHolds(w, { relation: { who: "navarre", other: "castile", type: "subject", kind: "protectorate" } })).toBe(true);
+    const heads = subjectTies(w).filter((t) => t.o === castile).length;
+    expect(eventConditionHolds(w, { subject_count: { who: "castile", op: "==", value: heads } })).toBe(true);
+    // Granada a Tributary (0.5), Navarre a Protectorate (1): by reach less than a head count
+    expect(eventConditionHolds(w, { subject_count: { who: "castile", op: "<", value: heads, by_reach: true } })).toBe(true);
+    applyEventEffects(w, [{ change_subject_kind: { who: "castile", target: "navarre", kind: "loosen" } }], news);
+    expect(bondOf(w, navarre)!.kind).toBe("tributary");
+    expect(w.diplomacy.graph.relations.find((r) => r.type === "subject" && r.source === "navarre")!.subject_kind).toBe("tributary");
+    applyEventEffects(w, [{ add_subject_reason: { target: "granada", reason: "lost_war", months: 36 } }], news);
+    const now = w.date.year * 12 + w.date.month - 1;
+    expect(bondOf(w, granada)!.reasons.find((r) => r.id === "lost_war")).toMatchObject({ arrow: -1, from: now, until: now + 36 });
+    applyEventEffects(w, [{ remove_subject_reason: { target: "granada", reason: "lost_war" } }], news);
+    expect(bondOf(w, granada)!.reasons.some((r) => r.id === "lost_war")).toBe(false);
+    applyEventEffects(w, [{ release: { who: "castile", target: "navarre" } }], news);
+    expect(bondOf(w, navarre)).toBeNull();
+    expect(dip.relations.stance(w.diplomacy.graph, "navarre", "castile")).toBe("friendly");
+    expect(eventConditionHolds(w, { relation: { who: "navarre", other: "castile", type: "subject" } })).toBe(false);
   });
 });

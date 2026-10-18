@@ -144,7 +144,8 @@
    "relation": [
     "who",
     "other",
-    "type"
+    "type",
+    "kind"
    ],
    "opinion": [
     "who",
@@ -219,7 +220,14 @@
    "subject_count": [
     "who",
     "op",
-    "value"
+    "value",
+    "by_reach"
+   ],
+   "subject_loyalty": [
+    "who",
+    "target",
+    "op",
+    "step"
    ],
    "event": [
     "id",
@@ -288,6 +296,20 @@
    "release": [
     "who",
     "target"
+   ],
+   "change_subject_kind": [
+    "who",
+    "target",
+    "kind"
+   ],
+   "add_subject_reason": [
+    "target",
+    "reason",
+    "months"
+   ],
+   "remove_subject_reason": [
+    "target",
+    "reason"
    ],
    "war": [
     "id",

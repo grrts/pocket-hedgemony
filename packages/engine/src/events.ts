@@ -2,6 +2,8 @@ import campaign from "../../rules/data/domain/events-campaign.json" with { type:
 import bridge from "../../rules/data/domain/events-places.json" with { type: "json" };
 import * as evt from "./domain/events/index.ts";
 import * as dip from "./domain/diplomacy/index.ts";
+import * as subj from "./domain/subjects/index.ts";
+import { bondOf, bondsChanged, makeSubject, monthNow, subjectTies } from "./subjects.ts";
 import { Rng } from "./rng.ts";
 import { stabilityOf } from "./stability.ts";
 import { cedeProvince, controller, type News } from "./war.ts";
@@ -72,6 +74,7 @@ export function createGameEvents(world: World): GameEvents {
   // Opinion is the standing one court holds of another (D-EVT-4, diplomacy's ledger), read only when asked.
   state.conditions.opinion = (p, _w, ctx) =>
     evt.resolve(p.who, ctx).some((a) => evt.resolve(p.other, ctx).some((b) => evt.compare(opinionOf(world, g, a, b), String(p.op), Number(p.value))));
+  subjectConditions(world, g);
   sync(world, g);
   evt.yearlyAgeCheck(state, world.date.year);
   evt.periodCheck(state, world.date.year);
@@ -80,6 +83,52 @@ export function createGameEvents(world: World): GameEvents {
   for (const ev of Object.values(state.events)) evt.eligible(state, ev);
   state.bound = bound;
   return g;
+}
+
+/** The game's own bond of the realm `subject` under `overlord` (tree ids), if both are realms and the tie stands. */
+function realBond(world: World, g: GameEvents, overlord: string, subject: string): subj.SubjectBond | undefined {
+  const s = g.nationOf.get(subject);
+  const o = g.nationOf.get(overlord);
+  if (s === undefined || o === undefined) return undefined;
+  const b = bondOf(world, s);
+  return b && b.overlord === world.nationIds[o] ? b : undefined;
+}
+
+/**
+ * The subject keys read the game's own bonds (SUBJ-097): `subject_loyalty`
+ * tests the bond's loyalty, `subject_count by_reach` weighs the realm's
+ * subjects by kind, and `relation … kind` reads the bond's kind. Ids that are
+ * not realms of the game keep the tree's own reading.
+ */
+function subjectConditions(world: World, g: GameEvents): void {
+  const c = g.state.conditions!;
+  const tree = evt.CONDITIONS;
+  c.subject_loyalty = (p, w, ctx) =>
+    evt.resolve(p.who, ctx).some((who) =>
+      evt.resolve(p.target, ctx).some((t) =>
+        g.nationOf.has(who) && g.nationOf.has(t) ? subj.subjectLoyaltyHolds(realBond(world, g, who, t), String(p.op), String(p.step)) : tree.subject_loyalty!({ ...p, who, target: t }, w, ctx),
+      ),
+    );
+  c.subject_count = (p, w, ctx) => {
+    if (p.by_reach !== true) return tree.subject_count!(p, w, ctx);
+    return evt.resolve(p.who, ctx).some((id) => {
+      const n = g.nationOf.get(id);
+      if (n === undefined) return tree.subject_count!({ ...p, who: id }, w, ctx);
+      const bonds = subjectTies(world).map((t) => t.bond);
+      return evt.compare(subj.subjectCountByEvent(bonds, world.nationIds[n]!, true), String(p.op), Number(p.value));
+    });
+  };
+  c.relation = (p, w, ctx) => {
+    if (p.kind === undefined) return tree.relation!(p, w, ctx);
+    const type = String(p.type);
+    return evt.resolve(p.who, ctx).some((a) =>
+      evt.resolve(p.other, ctx).some((b) => {
+        if (!g.nationOf.has(a) || !g.nationOf.has(b)) return tree.relation!({ ...p, who: a, other: b }, w, ctx);
+        const bond = type === "subject" ? realBond(world, g, b, a) : type === "overlord" ? realBond(world, g, a, b) : type === "personal_union" ? [realBond(world, g, b, a), realBond(world, g, a, b)].find((x) => x?.kind === "union") : undefined;
+        return bond?.kind === p.kind;
+      }),
+    );
+  };
 }
 
 /** A tree statistic, with legitimacy and stability read from the realm (D-EVT-4, D-EVT-17). */
@@ -111,6 +160,8 @@ function sync(world: World, g: GameEvents): void {
   const d = world.diplomacy;
   w.year = world.date.year;
   w.month = world.date.month;
+  // the game's subject bonds are the truth: the tree's own copies live only for the month's effects
+  delete w.subjects;
   g.stability.clear();
   const soldiers = new Float64Array(world.nationCount);
   const a = world.armies;
@@ -213,6 +264,22 @@ export function answerEvent(world: World, nation: number, event: string, option:
   return null;
 }
 
+/** Applies effects as an event's chosen option would, and lands them on the game (scripted history, tests). */
+export function applyEventEffects(world: World, effects: evt.Effect[], news: News[], roles: Record<string, string[]> = {}): void {
+  const g = (world.events ??= createGameEvents(world));
+  sync(world, g);
+  const s = g.state;
+  const applied = evt.applyEffects(effects, s.world, { roles, ...(s.conditions ? { conditions: s.conditions } : {}), ...(s.effects ? { effects: s.effects } : {}) });
+  land(world, g, applied.map((a) => ({ type: "EffectApplied", effect: a.type, target: a.target, values: a.values })), news);
+}
+
+/** Whether a condition holds for the game as it stands (scripted history, tests). */
+export function eventConditionHolds(world: World, condition: evt.Condition, roles: Record<string, string[]> = {}): boolean {
+  const g = (world.events ??= createGameEvents(world));
+  sync(world, g);
+  return evt.holds(condition, g.state.world, { roles, ...(g.state.conditions ? { conditions: g.state.conditions } : {}) });
+}
+
 const label = (key: string, fallback: string): string => data.localization[key] ?? fallback;
 const humanize = (id: string): string => id.replace(/^(province|area|region):/, "").replace(/_/g, " ");
 export const eventTitle = (id: string): string => label(`event.${id}.name`, humanize(id));
@@ -254,7 +321,16 @@ function land(world: World, g: GameEvents, log: evt.DomainEvent[], news: News[])
       news.push({ kind: "event", text: `${eventTitle(ev.id)}: ${who} chooses “${optionName(ev.id, String(e.option))}”.`, nations, ...(ev.importance === "major" ? { major: true as const } : {}) });
     } else if (e.type === "EffectApplied") landEffect(world, g, e, news);
   }
+  delete s.world.subjects;
 }
+
+/** Envoys the overlord keeps at a subject's court, recalled when the tie ends or the kind changes (as subjects.ts does on release). */
+function recallSubjectEnvoys(world: World, b: subj.SubjectBond, actions: readonly string[]): void {
+  const d = world.diplomacy;
+  d.envoys = d.envoys.filter((e) => !(e.country === b.overlord && e.target === b.subject && actions.includes(e.action) && e.status === "resident"));
+}
+
+const KIND_WORDS: Record<subj.Kind, string> = { vassal: "a vassal", tributary: "a tributary", union: "a union", march: "a march", colony: "a colony", protectorate: "a protectorate" };
 
 function landEffect(world: World, g: GameEvents, e: evt.DomainEvent, news: News[]): void {
   const v = e.values as Record<string, unknown>;
@@ -288,10 +364,69 @@ function landEffect(world: World, g: GameEvents, e: evt.DomainEvent, news: News[
       }
       return;
     }
-    case "relation":
     case "vassalize": {
-      const other = String(v.other ?? v.who);
-      const type = e.effect === "vassalize" ? "subject" : String(v.type);
+      // an event makes a subject of the mapped kind (SUBJ-015, SUBJ-097); the game keeps the tie and its bond
+      const o = g.nationOf.get(String(v.who));
+      if (n !== undefined && o !== undefined) {
+        if (world.nationGone[n] || world.nationGone[o]) return;
+        const kind = (v.subjectKind as subj.Kind | undefined) ?? subj.kindFromEventType(String(v.kind ?? "vassal")).kind;
+        const cur = bondOf(world, n);
+        if (cur) return; // a subject has one overlord: the event cannot take it from another
+        try {
+          makeSubject(world, n, o, kind);
+        } catch {
+          return; // a tie the diplomacy rules refuse (a cycle of overlords)
+        }
+        const b = bondOf(world, n);
+        if (b && v.stage) b.stage = v.stage as subj.ColonyStage;
+        bondsChanged(world);
+        news.push({ kind: "event", text: `${world.rules.nations[n]!.name} becomes ${KIND_WORDS[kind]} of ${world.rules.nations[o]!.name}.`, nations: [n, o] });
+        return;
+      }
+      const other = String(v.who);
+      g.eventRelations = g.eventRelations.filter((r) => !(r.who === target && r.other === other && r.type === "subject"));
+      g.eventRelations.push({ who: target!, other, type: "subject" });
+      return;
+    }
+    case "release": {
+      const who = String(v.who);
+      g.eventRelations = g.eventRelations.filter((r) => !(r.who === target && r.other === who && r.type === "subject") && !(r.who === who && r.other === target && r.type === "overlord"));
+      const b = realBond(world, g, who, target!);
+      if (!b) return;
+      recallSubjectEnvoys(world, b, ["subject_resident", "subject_tighten", "subject_fold_in"]);
+      dip.relations.releaseSubject(world.diplomacy.graph, b.subject);
+      bondsChanged(world);
+      const o = g.nationOf.get(who)!;
+      news.push({ kind: "event", text: `${world.rules.nations[n!]!.name} is released by ${world.rules.nations[o]!.name} and goes free as a friend.`, nations: [n!, o] });
+      return;
+    }
+    case "change_subject_kind": {
+      const b = realBond(world, g, String(v.who), target!);
+      if (!b) return;
+      const r = subj.changeSubjectKindByEvent(b, String(v.kind), monthNow(world));
+      if (!r.ok) return;
+      recallSubjectEnvoys(world, b, ["subject_tighten", "subject_fold_in"]);
+      const rec = world.diplomacy.graph.relations.find((x) => x.type === "subject" && x.source === b.subject);
+      if (rec) rec.subject_kind = b.kind;
+      bondsChanged(world);
+      const o = g.nationOf.get(String(v.who))!;
+      news.push({ kind: "event", text: `${world.rules.nations[n!]!.name} is now ${KIND_WORDS[b.kind]} of ${world.rules.nations[o]!.name}.`, nations: [n!, o] });
+      return;
+    }
+    case "add_subject_reason":
+    case "remove_subject_reason": {
+      // a reason on the subject's loyalty, by id, for the months given (SUBJ-035, SUBJ-097)
+      if (n === undefined) return;
+      const b = bondOf(world, n);
+      if (!b) return;
+      if (e.effect === "add_subject_reason") subj.addSubjectReasonByEvent(b, String(v.reason), v.months === undefined ? undefined : Number(v.months), monthNow(world));
+      else subj.removeSubjectReasonByEvent(b, String(v.reason));
+      bondsChanged(world);
+      return;
+    }
+    case "relation": {
+      const other = String(v.other);
+      const type = String(v.type);
       g.eventRelations = g.eventRelations.filter((r) => !(r.who === target && r.other === other && r.type === type));
       if (v.set !== false) g.eventRelations.push({ who: target!, other, type });
       return;
@@ -386,6 +521,15 @@ function describe(world: World, g: GameEvents, e: evt.Effect, roles: Record<stri
     case "release":
       text = `${cap(who(p.target))} ${who(p.target) === "you" ? "are" : "is"} released by ${who(p.who)}`;
       break;
+    case "change_subject_kind":
+      text = `${cap(who(p.target))}: the tie to ${who(p.who)} is ${p.kind === "tighten" ? "tightened" : p.kind === "loosen" ? "loosened" : `now ${humanize(String(p.kind))}`}`;
+      break;
+    case "add_subject_reason":
+    case "remove_subject_reason": {
+      const label = subj.reasonLabel(String(p.reason));
+      text = type === "remove_subject_reason" ? `${cap(who(p.target))}: “${label}” no longer weighs on loyalty` : `${cap(who(p.target))}: loyalty reason “${label}”${p.months === undefined ? "" : ` for ${Number(p.months)} months`}`;
+      break;
+    }
     case "create_country":
       text = `${nameOf(world, g, String(p.entity))} is founded`;
       break;
