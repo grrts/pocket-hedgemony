@@ -35,6 +35,8 @@ export interface Tile {
   change: { to: Use; monthsLeft: number } | null;
   /** Years in a row nobody worked the tile (fields grow back to woods; worn recovers). */
   idleYears: number;
+  /** Years in a row the tile was farmed with more farmers than the province's slots hold (it wears, PROV-034). */
+  overworkedYears: number;
   /** Years of digging left, for a mine. */
   seams: number;
   /** A farm with a mill (F5). */
@@ -135,6 +137,8 @@ export interface Province {
   requisitionedMonthsAgo: number | null;
   /** Days to the capital or nearest seat. */
   daysToCapital: number;
+  /** The province lies in the tropics: its fever land is a step worse (PROV-243). */
+  tropical: boolean;
   /** Years since a rising of this province's faith or tongue was massacred; null if none in memory. */
   bloodshedYears: number | null;
   /** Neighbouring rebels that share one of this province's grievances. */
@@ -156,7 +160,7 @@ export interface Province {
 }
 
 export function tile(use: Use, building: string | null = null): Tile {
-  return { use, building, state: null, change: null, idleYears: 0, seams: 0, mill: false, river: false, local: false };
+  return { use, building, state: null, change: null, idleYears: 0, overworkedYears: 0, seams: 0, mill: false, river: false, local: false };
 }
 
 export function emptyClasses(): Record<ClassName, number> {
@@ -214,6 +218,7 @@ export function newProvince(id: string, ground: Ground, init: Partial<Province> 
     armyMonths: 0,
     requisitionedMonthsAgo: null,
     daysToCapital: 0,
+    tropical: false,
     bloodshedYears: null,
     neighbourRebels: [],
     timber: 0,

@@ -15,7 +15,7 @@ import { realmConfig } from "./domain/realm/index.ts";
 import { createLivingState, seedClasses, type LivingState } from "./living.ts";
 import { addCommander, ARMS, armIndex, createRecruitState, recount, FOOT_ARMS, HORSE_ARMS, KIND, OFFICIALS, type FreeCompany, type Mercenary, type Muster, refreshFreeCompanies } from "./recruit.ts";
 import { seedOfficials } from "./officials.ts";
-import { createResearchState, seedResearch, type ResearchState } from "./research.ts";
+import { createResearchState, seedResearch, withoutOf, type ResearchState } from "./research.ts";
 import { createWorksState, seedWorks, type WorksState } from "./works.ts";
 import { createLandState, seedLand, type LandState } from "./land.ts";
 import { createConversionState, type ConversionState } from "./conversion.ts";
@@ -301,8 +301,13 @@ export function spawnArmy(world: World, owner: number, location: number, men: nu
   // Wagons start full.
   const d = world.rules.defines.march;
   const logistics = commander >= 0 ? world.commanderLogistics[commander]! : 0;
-  pool.food[slot] = wagonRations(d, { men, horse, logistics });
+  pool.food[slot] = wagonRations(d, { men, horse, logistics, foodCarriedPct: foodCarriedPct(world, owner) });
   return slot;
+}
+
+/** Percent of the food realm n's armies carry: half without B01 *Wheel and carts* (RSCH-094); all of it before research is seeded. */
+export function foodCarriedPct(world: World, n: number): number {
+  return world.research[n] ? withoutOf(world, n).foodCarriedPct : 100;
 }
 
 function growArmyPool(old: ArmyPool): ArmyPool {
@@ -504,6 +509,8 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     }
   });
   seedResearch(world);
+  // The starting armies' wagons were filled before research was known: a realm without B01 carries half (RSCH-094).
+  for (let i = 0; i < world.armies.count; i++) if (world.armies.alive[i]) world.armies.food[i] = (world.armies.food[i]! * foodCarriedPct(world, world.armies.owner[i]!)) / 100;
   if (opts.seedTrade !== false) seedTrade(world);
   seedNavy(world);
   // Realms that had ships in 1444 start with them, and free fleets gather for hire (F-115).

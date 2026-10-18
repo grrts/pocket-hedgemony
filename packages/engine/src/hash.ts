@@ -43,6 +43,9 @@ export function hashWorld(world: World): string {
   feed(world.provinceTiles);
   feed(world.provinceGame);
   feed(world.provinceHardWinter);
+  feed(world.provinceWorn);
+  feed(world.provinceOverwork);
+  feed(world.provinceRested);
   feed(world.provinceSeam);
   feed(world.provinceSeamYears);
   feed(world.provinceChangeTile);

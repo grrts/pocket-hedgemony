@@ -54,7 +54,7 @@ import { governmentLine, governmentTab, governmentUi } from "./ui/government.ts"
 import { isShipKind, provinceTradeLine, routeBar, stopBit, tradeLine, tradeTab, tradeUi, type Routing } from "./ui/trade.ts";
 import { beliefData, beliefFacts, beliefLines, beliefUi, peoplesTab } from "./ui/belief.ts";
 import { censureWarningHtml, faithBadgeHtml, headCardHtml, seatKeyHtml } from "./ui/faithHeads.ts";
-import { firstOpen, learningBough, learningLine, learningTab, newLearningUi, realmLearningLine, scrollFor } from "./ui/learning.ts";
+import { closeUpPoint, firstShown, jumpTarget, learningLine, learningTab, newLearningUi, nodeAt, realmLearningLine, startStanding } from "./ui/learning.ts";
 import { provinceWorks } from "./ui/works.ts";
 import { provinceLand } from "./ui/land.ts";
 import { castleFoodLine, castleFoodSettings, foodLine, foodTab } from "./ui/food.ts";
@@ -80,7 +80,7 @@ import { nameOnMap, playbackAdvance, playbackHour } from "@ph/engine/domain/map-
 import { provinceLevy } from "@ph/engine/domain/recruiting";
 import { musicFacts, newFactMemory, playerPalette, playerWars, remember, type FactMemory } from "./audio/facts.ts";
 import { COMMISSION_GOLD, hireGold, OFFICIALS, Rng } from "@ph/engine";
-import { SHELL as SHELL_RULES, startColumn, startIcons, type Platform as ShellPlatform } from "@ph/engine/domain/game-shell";
+import { SHELL as SHELL_RULES, endTurnInAuto, endTurnLabel, newAutoTurns, startColumn, startIcons, stopAuto, switchAuto, weekPlayed, type AutoStop, type Platform as ShellPlatform } from "@ph/engine/domain/game-shell";
 import { autosaveDue, continueTarget, longDate, newCampaign, newManualSave, savesConfig, type Campaign, type Platform as SavePlatform } from "@ph/engine/domain/saves";
 import { SaveStore, type StoredSave } from "./saves/store.ts";
 import { animationsPref, autosaveEvery, autosavesKept, battleStepMs, dayMs, mapDetail, mapPower, onPrefs, setPref, textZoom } from "./settings/prefs.ts";
@@ -203,6 +203,10 @@ const BATTLE_STEP_MS = 500;
 const WATCH_STEP_MS = 1200;
 let playing = false;
 let paused = false;
+/** Auto turns (SHELL-159..161): weeks start by themselves until the player or something that needs them stops them; off after every load. */
+let auto = newAutoTurns();
+/** Auto turns are starting the next week themselves, not the player's tap. */
+let autoStarting = false;
 /** Resumes a paused playback. */
 let resume: (() => void) | null = null;
 /** An order is on its way to the engine. */
@@ -220,7 +224,7 @@ let headView: string | null = null;
 /** Which tab of a country's overview is open (feedback 12). */
 type RealmTab = "general" | "government" | "peoples" | "heritage" | "treasury" | "trade" | "food" | "diplomacy" | "military" | "mercenaries" | "officials" | "lords" | "provinces" | "learning" | "navy" | "hireFleets" | "colonies";
 let realmTab: RealmTab = "general";
-/** What the player left open in the Learning tab (Tree or Schools, the bough, the tapped invention, folds, scroll), kept across redraws. */
+/** What the player left open in the Research tab (tree or Schools, the zoom, the tapped invention, folds, scroll), kept across redraws. */
 const learningUi = newLearningUi();
 /** The study the player was last told to choose for (known count), so the alert comes once each time. */
 let askedStudy = -1;
@@ -282,10 +286,12 @@ app.innerHTML = `
   <section class="event-card framed" id="event-card" role="dialog" aria-labelledby="event-title" hidden></section>
   <div class="revolution-sheet" id="revolution-card" hidden></div>
   <div class="rotate" role="alert"><div class="framed">${icon("map", 4)}<p><b>Turn your phone sideways</b><br>Pocket Hegemony plays in landscape.</p></div></div>
+  <button class="paper auto-turns" id="auto-turns" aria-pressed="false" data-sfx="none" hidden>${icon("auto", 2)}<span>Auto</span></button>
   <button class="wax fab end-turn" id="fab" title="End turn" data-sfx="none" hidden>${icon("hourglass", 3, "End turn")}<span class="badge" hidden></span></button>`;
 const hud = document.querySelector<HTMLElement>("#hud")!;
 const panel = document.querySelector<HTMLElement>("#panel")!;
 const fab = document.querySelector<HTMLButtonElement>("#fab")!;
+const autoButton = document.querySelector<HTMLButtonElement>("#auto-turns")!;
 const reopen = document.querySelector<HTMLButtonElement>("#reopen")!;
 const armyList = document.querySelector<HTMLElement>("#army-list")!;
 const armyButton = document.querySelector<HTMLButtonElement>("#armies")!;
@@ -328,11 +334,14 @@ armyButton.addEventListener("click", () => {
   renderArmyList();
 });
 fab.addEventListener("click", () => void endTurn());
-// Space ends the turn, and pauses or resumes it while it plays (feedback 27).
+autoButton.addEventListener("click", () => switchAutoTurns());
+// Space ends the turn, and pauses or resumes it while it plays (feedback 27); Shift+Space switches Auto turns (SHELL-159).
 document.addEventListener("keydown", (e) => {
   if (e.code !== "Space" || (e.target as HTMLElement).closest("input, textarea, select")) return;
   e.preventDefault();
-  if (!e.repeat) void endTurn();
+  if (e.repeat) return;
+  if (e.shiftKey) switchAutoTurns();
+  else void endTurn();
 });
 // A focused button would also take the Space as a click.
 document.addEventListener("keyup", (e) => {
@@ -2228,7 +2237,13 @@ function logNews(s: Snapshot): void {
   for (const x of news) {
     // A work of the player's finished: said over the map, with Go there.
     if (x.kind === "built" && x.nations.includes(me) && x.province !== undefined) alertPlayer(x.text, "castle", { province: x.province });
+    // A war of the player's realm stops Auto turns at the end of the week, and an alert says why (SHELL-161).
+    if (x.kind === "war" && x.nations.includes(me) && auto.state === "on") {
+      stopAuto(auto, "war");
+      alertPlayer(x.text, "swords");
+    }
     if (!x.begins || x.province === undefined || !x.nations.includes(me)) continue;
+    stopAuto(auto, x.kind === "battle" ? "battle" : "siege");
     if (x.kind !== "battle") {
       alertPlayer(x.text, "castle", { province: x.province });
       continue;
@@ -2268,26 +2283,31 @@ function logNews(s: Snapshot): void {
     if (alerted.has(`call ${c.id}`)) continue;
     alerted.add(`call ${c.id}`);
     alertPlayer(`${nations[c.caller]!.name} calls you to arms against ${nations[c.against]!.name}.`, "swords", { answer: true });
+    stopAuto(auto, "call");
   }
   for (const o of s.peaceOffers) {
     if (alerted.has(`peace ${o.id}`)) continue;
     alerted.add(`peace ${o.id}`);
     alertPlayer(`${nations[o.from]!.name} offers peace.`, "crown", { answer: true });
+    stopAuto(auto, "peace");
   }
   for (const v of s.rebels.verdicts) {
     if (alerted.has(`verdict ${v.id}`)) continue;
     alerted.add(`verdict ${v.id}`);
     alertPlayer(`The rebels of ${provinces[v.province]!.name} are beaten: choose their fate.`, "crown", { province: v.province });
+    stopAuto(auto, "rebels");
   }
   for (const a of asksOf(s)) {
     if (alerted.has(`ask ${a.id}`)) continue;
     alerted.add(`ask ${a.id}`);
     alertPlayer(`${nations[a.from]!.name}'s envoy waits for your answer.`, "scroll", { answer: true });
+    stopAuto(auto, "envoy");
   }
   // A new event for the player opens its card, and the week waits for the answer (EVT-044, EVT-076).
   const fresh = s.events.filter((c) => !eventsSeen.has(c.event));
   for (const c of fresh) eventsSeen.add(c.event);
   if (fresh.length) {
+    stopAuto(auto, "event");
     eventFolded = false;
     if (playing && !paused) {
       paused = true;
@@ -2296,6 +2316,7 @@ function logNews(s: Snapshot): void {
   }
   renderEventCard();
   // A revolution breaking out covers the map, and the week waits for the answer (REVO-091).
+  if (s.revolution?.outbreak) stopAuto(auto, "revolution");
   if (s.revolution?.outbreak && playing && !paused) {
     paused = true;
     pausedForEvent = true;
@@ -2357,11 +2378,13 @@ function openEventCard(): void {
   renderActions();
 }
 
-/** While nothing is studied, one alert asks the player to choose (once for each thing learned); `told` when a Learned alert already said so. */
+/** While nothing is studied and nothing is queued, one alert asks the player to choose (once for each thing learned); `told` when a Learned alert already said so. */
 function askForStudy(s: Snapshot, told = false): void {
   const r = s.research;
-  if (!r || r.study || !r.options.length || askedStudy === r.known.length) return;
+  // A queue carries on by itself: only an empty one asks (RSCH-089, RSCH-108).
+  if (!r || r.study || r.queue.length || !r.options.length || askedStudy === r.known.length) return;
   askedStudy = r.known.length;
+  stopAuto(auto, "study");
   if (!told) alertPlayer("Choose what your scholars study.", "scroll", { tab: "learning" });
 }
 
@@ -2558,6 +2581,13 @@ function renderNews(): void {
 /** The End turn button in the corner; while the week plays, it pauses and resumes. */
 function renderActions(): void {
   fab.hidden = !snapshot;
+  autoButton.hidden = !snapshot;
+  autoButton.classList.toggle("on", auto.state === "on");
+  autoButton.classList.toggle("stopping", auto.state === "stopping");
+  autoButton.setAttribute("aria-pressed", String(auto.state === "on"));
+  const stopping = endTurnLabel(auto);
+  autoButton.querySelector("span")!.textContent = stopping ?? "Auto";
+  autoButton.title = stopping ? `${stopping}: tap to keep Auto turns on (Shift+Space)` : auto.state === "on" ? "Auto turns on: tap to stop at the end of this week (Shift+Space)" : "Auto turns: play week after week (Shift+Space)";
   fab.classList.toggle("playing", playing);
   fab.classList.toggle("paused", paused);
   const waiting = snapshot?.events.length ?? 0;
@@ -2577,7 +2607,7 @@ function renderActions(): void {
     : playing
       ? paused
         ? "Play on (Space)"
-        : "Pause (Space)"
+        : stopping ?? (auto.state === "on" ? "Stop Auto turns at the end of this week (Space)" : "Pause (Space)")
       : `End turn (Space): on to ${dateText(addDays(snapshot.date, DAYS_PER_TURN))}`;
   renderArmyList();
 }
@@ -2594,6 +2624,8 @@ function showPanel(open: boolean, reopenIcon: "scroll" | "crown" = "scroll"): vo
     armyList.hidden = true;
   }
   panel.classList.toggle("chooser", reopenIcon === "crown");
+  // The Research tab's one screen takes a wider card on a desktop (RSCH-107).
+  panel.classList.toggle("research", open && !!panel.querySelector(".learn-screen:not(.schools-part)"));
   panel.hidden = !open || panelCollapsed;
   // While a course is drawn the voyage bar stands in for the folded card (EXPL-074).
   reopen.hidden = !open || !panelCollapsed || !!exploring;
@@ -2816,7 +2848,8 @@ function renderPanelCard(): void {
       <div class="nations">${FEATURED.filter((id) => nationIndex.has(id))
         .map((id) => {
           const n = nations[nationIndex.get(id)!]!;
-          return `<button class="paper nation" data-nation="${n.id}">${pennant(n)}${esc(n.name)}</button>`;
+          // Each realm's standing at the start, so a realm that starts behind says so before it is chosen (RSCH-105).
+          return `<button class="paper nation" data-nation="${n.id}">${pennant(n)}<span class="nation-name">${esc(n.name)}<small class="starts">${esc(startStanding(n.id))}</small></span></button>`;
         })
         .join("")}</div>
       <p class="hint">Or tap any realm on the map: ${nations.length} to choose from. <a href="./style.html">Art test page</a></p>
@@ -4050,7 +4083,7 @@ function renderArmy(id: number): void {
               const g = (cost.gold * trainMen * rules.defines.recruit.goldScale) / 1000;
               return `<button class="paper" data-train="${a}" ${g > s.nationTreasury[me]! ? "disabled" : ""}>${ARM_LABEL[a]} · ${cost.months} mo · ${g.toFixed(2)} gold</button>`;
             })
-            .join("")}</div>${armsNotKnown.length ? `<p class="hint">Not known yet: ${armsNotKnown.map((a) => esc(ARM_LABEL[a] ?? a)).join(", ")}. <button class="paper" data-realm="${me}" data-realm-open="learning">Learning</button></p>` : ""}`
+            .join("")}</div>${armsNotKnown.length ? `<p class="hint">Not known yet: ${armsNotKnown.map((a) => esc(ARM_LABEL[a] ?? a)).join(", ")}. <button class="paper" data-realm="${me}" data-realm-open="learning">Research</button></p>` : ""}`
         : `<p class="hint">No levy foot left to train.</p>`}`}
     ${(() => {
       const waiting = garrison.reduce((t, j) => t + s.armies.men[j]!, 0);
@@ -4453,7 +4486,7 @@ function renderRealm(r: number): void {
   const general = `
     <div class="realm-card">
       <img class="banner" src="${flagUrl(n, 6)}" alt="">
-      <p>${s && s.playerNation === r ? "<b>Your realm</b>" : "<b>Realm</b>"} · ${own.length} province${own.length === 1 ? "" : "s"} ${s ? empireBadgeHtml(s.empire, r) : ""}<br>
+      <p>${s && s.playerNation === r ? "<b>Your realm</b>" : "<b>Realm</b>"} · ${own.length} province${own.length === 1 ? "" : "s"} ${s ? empireBadgeHtml(s.empire, r) : ""}${!s ? ` · <b class="starts">${esc(startStanding(n.id))}</b>` : ""}<br>
       Capital <button class="paper capital" data-go="${capIdx}">${icon("castle", 1)}${esc(provinces[capIdx]!.name)}</button></p>
     </div>
     ${mine && s?.stability ? stabilitySection(s.stability, titlesOf(r)) : ""}
@@ -4505,7 +4538,7 @@ function renderRealm(r: number): void {
     : general;
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(n.name)}</h2>${closeButton()}</header>
-    ${s ? `<nav class="tabs">${tab("general", "General")}${mine ? tab("government", "Government") + tab("peoples", "Peoples") : ""}${tab("heritage", "Heritage")}${mine ? tab("treasury", "Treasury") + tab("trade", "Trade") + tab("food", "Food") + tab("provinces", "Provinces") + tab("learning", "Learning") : ""}${tab("diplomacy", "Diplomacy")}${mine ? tab("military", "Military") + tab("navy", "Navy") + tab("colonies", "Colonies") + tab("officials", cap(titlesOf(r).officials)) + tab("lords", cap(titlesOf(r).lords)) : ""}</nav>` : `<nav class="tabs">${tab("general", "General")}${tab("heritage", "Heritage")}</nav>`}
+    ${s ? `<nav class="tabs">${tab("general", "General")}${mine ? tab("government", "Government") + tab("peoples", "Peoples") : ""}${tab("heritage", "Heritage")}${mine ? tab("treasury", "Treasury") + tab("trade", "Trade") + tab("food", "Food") + tab("provinces", "Provinces") + tab("learning", "Research") : ""}${tab("diplomacy", "Diplomacy")}${mine ? tab("military", "Military") + tab("navy", "Navy") + tab("colonies", "Colonies") + tab("officials", cap(titlesOf(r).officials)) + tab("lords", cap(titlesOf(r).lords)) : ""}</nav>` : `<nav class="tabs">${tab("general", "General")}${tab("heritage", "Heritage")}</nav>`}
     ${content}`;
   bindClose();
   showPanel(true);
@@ -4785,65 +4818,128 @@ routeBarEl.addEventListener("click", (e) => {
   } else if (b.dataset.routeConfirm !== undefined) void confirmRoute();
 });
 
-/** The Learning tab's buttons: Tree or Schools, the boughs, tapping an invention, study, seats, students to arms, found a school; its folds and the tree's scroll stay as the player left them. */
+/**
+ * The Research tab's buttons (RSCH-100 to RSCH-111): Schools and back, tapping
+ * an invention (in the tree, the queue strip or a sheet), the jump chips, the
+ * zoom button and pinch, a place tapped in the whole tree, the sheet's action
+ * and ✕, the queue's ◀ ▶ ✕, seats, students to arms and founding a school.
+ * Its folds and the tree's scroll stay as the player left them.
+ */
 function bindLearning(): void {
-  panel.querySelectorAll<HTMLButtonElement>("[data-learn-part]").forEach((b) =>
-    b.addEventListener("click", () => {
-      learningUi.part = b.dataset.learnPart as typeof learningUi.part;
-      renderPanel();
-    }),
-  );
-  panel.querySelectorAll<HTMLButtonElement>("[data-bough]").forEach((b) =>
-    b.addEventListener("click", () => {
-      learningUi.bough = b.dataset.bough!;
-      learningUi.pick = null;
-      renderPanel();
-    }),
-  );
-  panel.querySelectorAll<HTMLButtonElement>("[data-pick]").forEach((b) =>
-    b.addEventListener("click", () => {
-      const id = b.dataset.pick!;
-      const fromSheet = !!b.closest(".pick-sheet");
-      learningUi.pick = id;
-      if (fromSheet) {
-        // A need tapped in the sheet: show it in its own bough, scrolled into view.
-        const bough = learningBough(snapshot!.research!, { ...learningUi, bough: "" });
-        learningUi.bough = bough;
-        const at = scrollFor(bough, id);
-        if (at) learningUi.scroll.set(bough, at);
+  const r = snapshot?.research;
+  const screen = panel.querySelector<HTMLElement>(".learn-screen");
+  if (!screen || !r) return;
+  const on = <T extends HTMLElement>(sel: string, run: (el: T, e: Event) => void) => screen.querySelectorAll<T>(sel).forEach((el) => el.addEventListener("click", (e) => run(el, e)));
+  /** Picks an invention: its sheet opens (sliding up in Tall) and, unless tapped in the tree itself, the tree brings it into view. */
+  const pick = (id: string, center: boolean) => {
+    if (learningUi.pick !== id) learningUi.slide = true;
+    learningUi.pick = id;
+    if (center) learningUi.center = id;
+    renderPanel();
+  };
+  on("[data-learn-part]", (b) => {
+    learningUi.part = b.dataset.learnPart as typeof learningUi.part;
+    renderPanel();
+  });
+  on("[data-inv]", (b) => pick(b.dataset.inv!, !b.closest(".tree-view")));
+  on("[data-jump]", (b) => {
+    const id = jumpTarget(r, b.dataset.jump!, learningUi.pick);
+    if (!id) return;
+    learningUi.zoom = "close";
+    pick(id, true);
+  });
+  on("[data-zoom]", () => {
+    learningUi.zoom = learningUi.zoom === "close" ? "whole" : "close";
+    if (learningUi.zoom === "close") learningUi.center = learningUi.pick ?? firstShown(r);
+    renderPanel();
+  });
+  /** Close up at a place of the whole tree, given in screen coordinates. */
+  const closeUpAt = (x: number, y: number) => {
+    const plot = screen.querySelector<HTMLElement>("[data-whole]");
+    if (!plot) return;
+    const box = plot.getBoundingClientRect();
+    learningUi.zoom = "close";
+    learningUi.center = { fx: Math.min(1, Math.max(0, (x - box.left) / box.width)), fy: Math.min(1, Math.max(0, (y - box.top) / box.height)) };
+    renderPanel();
+  };
+  on<HTMLElement>("[data-whole]", (_, e) => closeUpAt((e as MouseEvent).clientX, (e as MouseEvent).clientY));
+  on("[data-sheet-close]", () => {
+    learningUi.pick = null;
+    renderPanel();
+  });
+  on("[data-study]", (b) => {
+    learningUi.pick = null;
+    void actInTreasury({ type: "setStudy", invention: b.dataset.study! });
+  });
+  on("[data-queue-study]", (b) => void actInTreasury({ type: "queueStudy", invention: b.dataset.queueStudy! }));
+  on("[data-queue-path]", (b) => void actInTreasury({ type: "queuePath", invention: b.dataset.queuePath! }));
+  on("[data-move]", (b) => void actInTreasury({ type: "moveQueuedStudy", invention: b.dataset.move!, by: Number(b.dataset.by) as -1 | 1 }));
+  on("[data-unqueue]", (b) => {
+    if (learningUi.pick === b.dataset.unqueue) learningUi.pick = null;
+    void actInTreasury({ type: "unqueueStudy", invention: b.dataset.unqueue! });
+  });
+  // The tree frame: Close up keeps its scroll, or brings what was asked for into the middle.
+  const frame = screen.querySelector<HTMLElement>(".tree-view");
+  if (frame?.classList.contains("close")) {
+    const want = learningUi.center ?? (learningUi.scroll ? null : firstShown(r));
+    learningUi.center = null;
+    if (want) {
+      const lw = parseFloat(getComputedStyle(frame).getPropertyValue("--lw")) || 0;
+      const node = typeof want === "string" ? nodeAt(want) : null;
+      const p = node ? { x: node.x + node.w / 2, y: node.y + node.h / 2 } : typeof want === "string" ? null : closeUpPoint(want.fx, want.fy);
+      if (p) {
+        frame.scrollLeft = lw + p.x - frame.clientWidth / 2;
+        frame.scrollTop = p.y - frame.clientHeight / 2;
       }
-      renderPanel();
-      panel.querySelector(".pick-sheet")?.scrollIntoView({ block: "nearest" });
-    }),
-  );
-  const treeView = panel.querySelector<HTMLElement>(".tree-view");
-  if (treeView && snapshot?.research) {
-    const bough = treeView.dataset.tree!;
-    const at = learningUi.scroll.get(bough) ?? scrollFor(bough, learningUi.pick ?? firstOpen(snapshot.research, bough));
-    if (at) {
-      treeView.scrollLeft = at.left;
-      treeView.scrollTop = at.top;
+    } else if (learningUi.scroll) {
+      frame.scrollLeft = learningUi.scroll.left;
+      frame.scrollTop = learningUi.scroll.top;
     }
-    treeView.addEventListener("scroll", () => learningUi.scroll.set(bough, { left: treeView.scrollLeft, top: treeView.scrollTop }), { passive: true });
+    learningUi.scroll = { left: frame.scrollLeft, top: frame.scrollTop };
+    frame.addEventListener("scroll", () => (learningUi.scroll = { left: frame.scrollLeft, top: frame.scrollTop }), { passive: true });
   }
-  panel.querySelectorAll<HTMLButtonElement>("[data-study]").forEach((b) =>
-    b.addEventListener("click", () => {
-      learningUi.pick = null;
-      void actInTreasury({ type: "setStudy", invention: b.dataset.study! });
-    }),
-  );
-  panel.querySelectorAll<HTMLButtonElement>("[data-seats]").forEach((b) => b.addEventListener("click", () => void actInTreasury({ type: "setSeats", n: Number(b.dataset.seats) })));
-  panel.querySelector<HTMLButtonElement>("[data-call-students]")?.addEventListener("click", () => {
+  // Pinch inside the frame switches the zoom: fingers together for the whole tree, apart for Close up there (RSCH-101).
+  if (frame) {
+    let start = 0;
+    const spread = (e: TouchEvent) => Math.hypot(e.touches[0]!.clientX - e.touches[1]!.clientX, e.touches[0]!.clientY - e.touches[1]!.clientY);
+    frame.addEventListener("touchstart", (e) => (start = e.touches.length === 2 ? spread(e) : 0), { passive: true });
+    frame.addEventListener("touchend", () => (start = 0), { passive: true });
+    frame.addEventListener(
+      "touchmove",
+      (e) => {
+        if (e.touches.length !== 2 || !start) return;
+        const ratio = spread(e) / start;
+        if (learningUi.zoom === "close" && ratio < 0.75) {
+          start = 0;
+          learningUi.zoom = "whole";
+          renderPanel();
+        } else if (learningUi.zoom === "whole" && ratio > 1.33) {
+          start = 0;
+          closeUpAt((e.touches[0]!.clientX + e.touches[1]!.clientX) / 2, (e.touches[0]!.clientY + e.touches[1]!.clientY) / 2);
+        }
+      },
+      { passive: true },
+    );
+    // A trackpad's pinch comes as a wheel with Ctrl held.
+    frame.addEventListener("wheel", (e) => {
+      if (!e.ctrlKey) return;
+      e.preventDefault();
+      if (e.deltaY > 0 && learningUi.zoom === "close") {
+        learningUi.zoom = "whole";
+        renderPanel();
+      } else if (e.deltaY < 0 && learningUi.zoom === "whole") closeUpAt(e.clientX, e.clientY);
+    });
+  }
+  on("[data-seats]", (b) => void actInTreasury({ type: "setSeats", n: Number(b.dataset.seats) }));
+  on("[data-call-students]", () => {
     learningUi.open.delete("arms");
     void actInTreasury({ type: "callStudentsToArms" });
   });
-  panel.querySelectorAll<HTMLButtonElement>("[data-found-school]").forEach((b) =>
-    b.addEventListener("click", () => {
-      learningUi.open.delete("found");
-      void actInTreasury({ type: "foundSchool", province: Number(b.dataset.foundSchool) });
-    }),
-  );
-  panel.querySelectorAll<HTMLDetailsElement>("details[data-keep]").forEach((d) =>
+  on("[data-found-school]", (b) => {
+    learningUi.open.delete("found");
+    void actInTreasury({ type: "foundSchool", province: Number(b.dataset.foundSchool) });
+  });
+  screen.querySelectorAll<HTMLDetailsElement>("details[data-keep]").forEach((d) =>
     d.addEventListener("toggle", () => (d.open ? learningUi.open.add(d.dataset.keep!) : learningUi.open.delete(d.dataset.keep!))),
   );
 }
@@ -4987,6 +5083,7 @@ async function startGame(nation: string): Promise<void> {
 /** Puts a new or loaded game on screen, from a clean slate. */
 function enterGame(snap: Snapshot): void {
   snapshot = null;
+  auto = newAutoTurns();
   takeSnapshot(snap, 0);
   const nation = nations[snap.playerNation]!.id;
   playClock = performance.now();
@@ -5131,7 +5228,18 @@ async function endTurn(): Promise<void> {
     renderPanel();
     return;
   }
+  // Between two weeks of Auto turns, while the saves are written, a tap stops them before the next week (SHELL-160).
+  if (!playing && auto.state === "on" && !autoStarting) {
+    auto.state = "off";
+    renderActions();
+    return;
+  }
   if (playing) {
+    // With Auto turns on, pausing finishes the current week (SHELL-160); a week waiting for the player still plays on.
+    if (!paused && endTurnInAuto(auto) !== "pause") {
+      renderActions();
+      return;
+    }
     paused = !paused;
     if (!paused) resume?.();
     renderActions();
@@ -5155,6 +5263,8 @@ async function endTurn(): Promise<void> {
     const battle = snapshot.battles.some((b) => b.player);
     const ms = battle ? (watching && !watching.result ? (WATCH_STEP_MS * battleStepMs()) / BATTLE_STEP_MS : battleStepMs()) : dayMs();
     const t0 = performance.now();
+    // Armies of the player's on the march, to tell when one arrives while Auto turns run (SHELL-161).
+    const marching = auto.state === "on" ? marchingArmies() : null;
     // The steps run in the engine worker; the map stays live meanwhile.
     performance.mark("turn-sent");
     // The date ticks a day at a time, and a 4-hour step at a time through the player's battle (VIEW-076).
@@ -5165,6 +5275,7 @@ async function endTurn(): Promise<void> {
     hearSnapshot();
     if (battle) sound.sfx(shotSound(next.date.year), 0.7);
     logNews(next);
+    if (marching) sayArrivals(marching);
     restyleProvinces();
     renderHud();
     if (!panel.hidden) renderPanel();
@@ -5193,6 +5304,80 @@ async function endTurn(): Promise<void> {
   renderPanel();
   renderActions();
   renderDiagnostics();
+  afterWeekInAuto();
+}
+
+/** The player's armies on the march, by id. */
+function marchingArmies(): Set<number> {
+  const a = snapshot!.armies;
+  const out = new Set<number>();
+  for (let i = 0; i < a.id.length; i++) if (a.owner[i] === snapshot!.playerNation && a.route[i]?.length) out.add(a.id[i]!);
+  return out;
+}
+
+/** An army that was marching and now stands at the end of its march, out of battle, stops Auto turns (SHELL-161). */
+function sayArrivals(marching: Set<number>): void {
+  const a = snapshot!.armies;
+  for (let i = 0; i < a.id.length; i++) {
+    if (!marching.has(a.id[i]!) || a.route[i]?.length || a.battle[i] !== -1) continue;
+    const at = a.location[i]!;
+    alertPlayer(`Your army has reached ${provinces[at]?.name ?? "its goal"}.`, "swords", { province: at });
+    stopAuto(auto, "arrived");
+  }
+}
+
+/** What keeps End turn from starting a week, as a reason for Auto turns to stop (SHELL-161). */
+function endTurnBlocked(): AutoStop | null {
+  if (!snapshot) return "player";
+  if (snapshot.events.length) return "event";
+  if (snapshot.revolution?.outbreak) return "revolution";
+  if (snapshot.newLands?.length) return "new lands";
+  return null;
+}
+
+/**
+ * A week has played: with Auto turns on, its saves are written now rather
+ * than at a quiet moment, then the next week starts (SHELL-159); otherwise
+ * Auto turns go off, and End turn opens whatever blocks it.
+ */
+function afterWeekInAuto(): void {
+  if (auto.state === "off") return;
+  const blocked = endTurnBlocked();
+  if (weekPlayed(auto, blocked) === "orders") {
+    renderActions();
+    if (blocked && blocked !== "player") void endTurn();
+    return;
+  }
+  clearTimeout(afterTurnTimer);
+  afterTurnTimer = 0;
+  const from = savesOwedFrom;
+  savesOwedFrom = null;
+  void savesAfterTurn(from).then(() => {
+    // The player may have switched Auto turns off, or started the week themselves, while the saves were written.
+    if (auto.state === "on" && !playing) startAutoWeek();
+    else if (auto.state !== "on" && !playing) {
+      auto.state = "off";
+      renderActions();
+    }
+  });
+}
+
+/** Auto turns start a week the way End turn does. */
+function startAutoWeek(): void {
+  autoStarting = true;
+  void endTurn();
+  autoStarting = false;
+}
+
+/** The Auto button and Shift+Space (SHELL-159, SHELL-160). */
+function switchAutoTurns(): void {
+  if (!snapshot) return;
+  if (switchAuto(auto, playing).startWeek) startAutoWeek();
+  if (auto.state === "on" && !playing) {
+    // End turn found something waiting for the player: Auto turns stay off.
+    auto.state = "off";
+  }
+  renderActions();
 }
 
 function renderDiagnostics(): void {
@@ -5830,6 +6015,12 @@ Object.assign(globalThis, {
     const mine = [...snapshot.armies.id.keys()].filter((j) => snapshot!.armies.owner[j] === snapshot!.playerNation);
     const k = mine.find((j) => snapshot!.armies.commander[j]! >= 0) ?? mine[0];
     return k === undefined ? null : provinces[snapshot.armies.location[k]!]!.id;
+  },
+  /** The first of the player's provinces with a worn field, by id (screenshots). */
+  __phWorn: () => {
+    if (!snapshot) return null;
+    const p = Object.keys(snapshot.landSheets).find((k) => snapshot!.landSheets[Number(k)]!.some((t) => t.worn));
+    return p === undefined ? null : provinces[Number(p)]!.id;
   },
   /** Where a province's centre is on screen, by id (CSS pixels in the map). */
   __phScreenOf: (id: string) => {

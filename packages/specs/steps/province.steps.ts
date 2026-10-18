@@ -1642,8 +1642,8 @@ Then("{string} no longer counts as a river province", (s, name: string) => {
 });
 Given("the province {string} is {int} days from {string} by road", (s, name: string, days: number) => {
   prov(s, name);
-  s.route = { capital: days, seats: [] as number[] };
-  work(s, () => (s.days = P.daysToCapital(s.route.capital, s.route.seats)));
+  s.route = { capital: days, seats: [] as number[], cond: {} as P.TravelConditions };
+  work(s, () => (s.days = P.daysToCapital(s.route.capital, s.route.seats, s.route.cond)));
 });
 Given("nothing blocks the road", () => {});
 Given("a seat stands 2 days away", (s) => {
@@ -1651,6 +1651,15 @@ Given("a seat stands 2 days away", (s) => {
 });
 Then("the days to capital of {string} are {int}", (s, _n: string, d: number) => {
   expect(s.days).toBe(d);
+});
+Given("it is winter", (s) => {
+  s.route.cond.winter = true;
+});
+Given("an enemy army stands on the road", (s) => {
+  s.route.cond.enemyOnRoad = true;
+});
+Then(/^the days to capital of "([^"]+)" are more than (\d+)$/, (s, _n: string, d: string) => {
+  expect(s.days).toBeGreaterThan(Number(d));
 });
 Given("the province {string} is {int} days from the capital or a seat", (s, name: string, d: number) => {
   prov(s, name).daysToCapital = d;
@@ -3031,6 +3040,185 @@ Then(/^(at most 10 gold|nothing|less than with a free road) reaches the treasury
   if (what === "nothing") expect(got).toBe(0);
   else if (what === "at most 10 gold") expect(got).toBeLessThanOrEqual(10);
   else expect(got).toBeLessThan(P.reachesTreasury(20, { ...s.reach, blockedDays: 0 }));
+});
+
+// ---------------------------------------------------------------- land and health (wearing, woods, fever land, sickness, tax owed)
+
+When("fire burns the woods", (s) => {
+  expect(P.loseWoods(cur(s), s.tileIdx)).toBe(true);
+});
+When("timber is cut faster than it regrows", (s) => {
+  const p = cur(s);
+  const woods = p.tiles.filter((t) => t.use === "Woods").length;
+  expect(P.timberYear(p, woods * cfg.woods.regrow_loads_per_tile + 1)).toBe(s.tileIdx);
+});
+When("the province's starting tile mix is set", (s) => {
+  const p = cur(s);
+  p.tiles = P.startingTileMix(p.ground, 10).map((u) => P.tile(u));
+});
+Then("most of its land tiles are pasture", (s) => {
+  const p = cur(s);
+  expect(countUse(p, "Pasture")).toBeGreaterThan(p.tiles.length / 2);
+});
+
+Given("the province {string} has a fields tile farmed for decades with more people than the farm needs", (s, name: string) => {
+  const p = prov(s, name);
+  s.tileIdx = addTile(p, "Fields", "farm");
+  addTile(p, "Town");
+  p.people.farmers = P.slotsByClass(p).farmers + 5000;
+  p.tiles[s.tileIdx]!.overworkedYears = cfg.worn.overwork_years - 1;
+});
+Given("the country {string} knows no rotation invention", (s) => {
+  expect(cfg.worn.rotation_inventions.some((id) => P.knows(cur(s), id))).toBe(false);
+  expect(P.wearYears(cur(s))).toBe(cfg.worn.overwork_years);
+});
+Then("the tile gives half its output", (s) => {
+  const p = cur(s);
+  const worn = P.tileFood(p, s.tileIdx, 12000, ["normal"]);
+  const sound = P.tileFood({ ...p, tiles: p.tiles.map((t) => ({ ...t, state: null })) }, s.tileIdx, 12000, ["normal"]);
+  expect(worn).toBeCloseTo(sound * cfg.worn.output);
+});
+When("the tile goes 5 years without use", (s) => {
+  const p = cur(s);
+  p.people.farmers = 0;
+  for (let y = 0; y < 5; y++) P.yearEndLand(p);
+});
+Then("the tile is no longer {string}", (s, st: string) => {
+  expect(cur(s).tiles[s.tileIdx]!.state).not.toBe(st);
+});
+Then("fields in French provinces wear out less often than without it", (s) => {
+  const p = cur(s);
+  expect(P.wearYears(p)).toBeGreaterThan(P.wearYears(P.newProvince("Without", p.ground)));
+});
+
+/** Provinces of the examples that lie in the tropics. */
+const TROPICS = ["Guinea", "Bengal", "Malacca", "Yucatan"];
+function feverProvince(s: Scenario, name: string, ground: Ground, marsh: number): Province {
+  const p = prov(s, name, ground);
+  p.ground = ground;
+  p.tropical = TROPICS.includes(name);
+  for (let i = 0; i < marsh; i++) addTile(p, "Marsh");
+  for (let i = 0; i < 3; i++) addTile(p, "Fields");
+  return p;
+}
+const FEVER = cfg.fever_land.steps as P.FeverStep[];
+Given(/^the province "([^"]+)" has the ground "([^"]+)" and (\d+) marsh tiles$/, (s, name: string, g: string, n: string) => {
+  feverProvince(s, name, g as Ground, Number(n));
+});
+Then("its fever land is set by ground and climate, made worse by marsh tiles", (s) => {
+  const p = cur(s);
+  const parts = P.feverLandParts(p);
+  expect(parts.ground).toBeGreaterThan(0);
+  expect(parts.step).toBe(FEVER[Math.min(FEVER.length - 1, parts.ground + parts.climate + parts.marsh)]);
+  const dry = { ...p, tiles: p.tiles.filter((t) => t.use !== "Marsh") };
+  expect(FEVER.indexOf(parts.step)).toBeGreaterThanOrEqual(FEVER.indexOf(P.feverLand(dry)));
+  if (parts.marsh > 0) expect(FEVER.indexOf(parts.step)).toBeGreaterThan(FEVER.indexOf(P.feverLand(dry)));
+  s.feverBefore = FEVER.indexOf(parts.step);
+});
+When("the country knows quinine", (s) => {
+  known(s).push("quinine");
+});
+When("the marsh tiles are drained", (s) => {
+  const p = cur(s);
+  known(s).push("Polder drainage");
+  p.tiles.forEach((t, i) => t.use === "Marsh" && expect(P.changeTileUse(p, i, "drain")).toBe(true));
+});
+Then("its fever land falls", (s) => {
+  expect(FEVER.indexOf(P.feverLand(cur(s)))).toBeLessThan(s.feverBefore);
+});
+Given(/^the province "([^"]+)" has "(none|mild|harsh|deadly)" fever land$/, (s, name: string, step: P.FeverStep) => {
+  // Jungle in the tropics is deadly; drop a step at a time by leaving the tropics, then the jungle.
+  const at = FEVER.indexOf(step);
+  const p = feverProvince(s, name, at >= 2 ? "jungle" : at === 1 ? "marsh" : "farmland", 0);
+  p.tropical = at === 3;
+  expect(P.feverLand(p)).toBe(step);
+});
+When(/^settlers born in "([^"]+)" live there for a month$/, (s) => {
+  const p = cur(s);
+  const base = P.deathRate("farmers") / 12;
+  s.settlersDied = 1000 * base + P.feverDeaths(1000, P.feverLand(p), false);
+  s.localsDied = 1000 * base + P.feverDeaths(1000, P.feverLand(p), true);
+});
+Then("the settlers die faster than the locals", (s) => {
+  expect(s.settlersDied).toBeGreaterThan(s.localsDied);
+});
+Then("soldiers and settlers from elsewhere die there", (s) => {
+  const p = cur(s);
+  expect(P.feverDeathRate(P.feverLand(p), false)).toBeGreaterThan(0);
+  expect(P.armySickness(10000, P.groundTroops(p.ground).sickness, false, true)).toBeGreaterThan(0);
+});
+Then("locals mostly don't", (s) => {
+  const p = cur(s);
+  const step = P.feverLand(p);
+  expect(P.feverDeathRate(step, true)).toBeLessThanOrEqual(P.feverDeathRate(step, false) * cfg.fever_land.local_share);
+  expect(P.armySickness(10000, P.groundTroops(p.ground).sickness, true, true)).toBeLessThan(P.armySickness(10000, P.groundTroops(p.ground).sickness, false, true));
+});
+
+Given(/^an army of men born in "([^"]+)" stays a month in a province with the ground "([^"]+)"$/, (s, _from: string, g: string) => {
+  s.sickGround = g as Ground;
+});
+Given("a local army stays a month in the same province", (s) => {
+  s.localArmy = true;
+});
+Then("both armies lose men to {string} sickness", (s, sick: string) => {
+  const sickness = P.groundTroops(s.sickGround).sickness;
+  expect(sickness).toBe(sick);
+  s.foreignLost = P.armySickness(10000, sickness, false);
+  s.localLost = P.armySickness(10000, sickness, true);
+  expect(s.foreignLost).toBeGreaterThan(0);
+  expect(s.localLost).toBeGreaterThan(0);
+});
+Then(/^the army from "([^"]+)" loses more$/, (s) => {
+  expect(s.foreignLost).toBeGreaterThan(s.localLost);
+});
+
+When("a farm tile burns and its people lose homes", (s) => {
+  remember(s);
+  const p = cur(s);
+  P.burnTile(p, p.tiles.findIndex((t) => t.building === "farm"), { stay: true });
+  P.balanceClasses(p);
+});
+
+/** Troyes with its farms, a town of craftsmen and market folk, and a bridge. */
+function taxedTroyes(s: Scenario, name: string): Province {
+  const p = prov(s, name);
+  fullFarms(p);
+  p.town.push("loom house");
+  p.people.craftsmen = 1500;
+  p.people["market folk"] = 2400;
+  return p;
+}
+Given("the province {string} has buildings, townsfolk and a toll point", (s, name: string) => {
+  P.setToll(taxedTroyes(s, name), "bridge", "high");
+});
+When("its tax owed for the year is worked out", (s) => {
+  s.taxYear = P.taxOwedYear(cur(s), "normal");
+});
+Then("it comes from the value of what its buildings make and its townsfolk", (s) => {
+  const t = s.taxYear as P.TaxOwedYear;
+  expect(t.buildings).toBeGreaterThan(0);
+  expect(t.townsfolk).toBeGreaterThan(0);
+  expect(t.total).toBeCloseTo((t.buildings + t.townsfolk) * t.rate * (1 - t.homelessCut));
+});
+Then("the tolls are counted in trade, not in tax owed", (s) => {
+  const p = cur(s);
+  expect(Object.keys(s.taxYear)).not.toContain("tolls");
+  const free = { ...p, tolls: Object.fromEntries(Object.keys(p.tolls).map((k) => [k, "none" as P.TollRate])) };
+  expect(P.taxOwedYear(free, "normal").total).toBe(s.taxYear.total);
+});
+Given(/^the province "([^"]+)" has (burned tiles|fallow tiles|homeless people)$/, (s, name: string, what: string) => {
+  const p = taxedTroyes(s, name);
+  const without = structuredClone(p);
+  if (what === "burned tiles") P.burnTile(p, 0);
+  if (what === "fallow tiles") p.tiles[0]!.state = "Fallow";
+  if (what === "homeless people") p.people.homeless = Math.round(P.totalPeople(p) * 0.15);
+  work(s, () => {
+    s.taxWith = P.taxOwedYear(p, "normal").total;
+    s.taxWithout = P.taxOwedYear(without, "normal").total;
+  });
+});
+Then("its tax owed is lower than without it", (s) => {
+  expect(s.taxWith).toBeLessThan(s.taxWithout);
 });
 
 // ---------------------------------------------------------------- the Garrison tab (PROV-302), on the 1444 map with France playing

@@ -74,6 +74,7 @@ A modal accepts no input to the screens below until it is answered or put off.
 - **Top bar:** realm name and banner (opens the country card), the date, gold with its monthly change, and levies. On a phone it holds at most five plaques; the rest move into the country card.
 - **Tool column** on the right edge: map lens, go to capital, and Realm book.
 - **End turn** (the hourglass, lower right) carries a badge counting the items on the Attention screen. Tapping the badge, or the controller's "next" button, opens the Attention screen.
+- **Auto** (just above End turn) lets the weeks play one after another in a single-player campaign; a tap stops it at the end of the current week. See [Time and Turns](Time-and-Turns#auto-turns).
 - **Attention bell** next to the date lights while the Attention screen holds a warning, and opens it. It is the only place the game warns you; there is no advisor.
 - **Game menu button**, a small three-line icon in the upper left next to the banner.
 - The local zoom's tile-row view is still the map, not a separate screen.
