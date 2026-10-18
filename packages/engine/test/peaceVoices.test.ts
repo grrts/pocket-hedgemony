@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { loadMapTiles } from "../src/node/mapTiles.ts";
 import { loadDefaultRuleset } from "@ph/rules";
 import { applyNow, createWorld, relationState, spawnArmy, type World } from "../src/index.ts";
@@ -8,6 +8,10 @@ import { warBetween } from "../src/war.ts";
 import { cededProvinces, maxCeded, monthlyRefusals, peaceVoices, refusingPeace, warPeaceView, type GameWar } from "../src/peace.ts";
 import * as dip from "../src/domain/diplomacy/index.ts";
 import * as wf from "../src/domain/warfare/index.ts";
+
+// These scenarios measure the war-price rules alone: a head of the faith's censure of a war on
+// fellow believers makes lords waver too (RELG-149), and is tested with the faith heads.
+vi.mock("../src/faithHeads.ts", async (importOriginal) => ({ ...(await importOriginal<typeof import("../src/faithHeads.ts")>()), faithHeadsWars: () => {} }));
 
 /** The price of war, peace part (X-21): domain/warfare/features/price-of-war.feature. */
 
