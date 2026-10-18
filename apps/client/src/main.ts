@@ -21,6 +21,7 @@ import {
 } from "@ph/engine";
 import type { GameDate } from "@ph/rules";
 import { askCard, mySubjects, myStatecraft, realmStatecraft, subjectCard } from "./ui/statecraft.ts";
+import { rebelsUi, risingCard, risingsLine, risingsOverview, verdictCard, type Attacker } from "./ui/rebels.ts";
 import { heritageLine, heritageTab } from "./ui/heritage.ts";
 import { loadDefaultRuleset } from "@ph/rules";
 import { hexToRgb, PALETTE, TERRAINS } from "./art/palette.ts";
@@ -78,6 +79,9 @@ const provinceIndex = new Map(provinces.map((p, i) => [p.id, i]));
 const nationIndex = new Map(nations.map((n, i) => [n.id, i]));
 const nationRgb = nations.map((n) => hexToRgb(n.color));
 const unownedRgb = hexToRgb(PALETTE.unowned);
+/** Rebels' colour: land they hold is hatched in it, their bands carry it (REBL-066). */
+const REBEL_COLOR = "#2b1d1a";
+const rebelRgb = hexToRgb(REBEL_COLOR);
 /** A commander by index, as the engine last reported him. */
 const cmdOf = (c: number) => snapshot!.commanders[c]!;
 const neighborIdx = provinces.map((p) => p.neighbors.map((id) => provinceIndex.get(id)!));
@@ -599,7 +603,8 @@ function restyleProvinces(): void {
     const o = owners[i]!;
     const occ = occupiers[i]!;
     // Occupied land is hatched in the occupier's colour; borders stay the owner's.
-    const hatched = (occ >= 0 && lens === "realms") || (lens === "diplomacy" && o >= 0 && relationTo(o) === "war");
+    const rebels = !!snapshot?.provinceRebels[i];
+    const hatched = ((occ >= 0 || rebels) && lens === "realms") || (lens === "diplomacy" && o >= 0 && relationTo(o) === "war");
     const lord = snapshot ? snapshot.provinceLord[i]! : -1;
     const lit = litLord >= 0 && lord === litLord;
     const flags = (i === selectedProvince ? 1 : 0) | (lit ? 2 : 0) | (isKnown(i) ? 0 : 4) | (hatched ? 8 : 0);
@@ -607,7 +612,7 @@ function restyleProvinces(): void {
     // Under the diplomacy lens, a league against the player gets the same red border (DIPL-183).
     const closed = (selected.size > 0 && !!snapshot?.provinceClosed[i]) || (lens === "diplomacy" && o >= 0 && snapshot?.diplomacyLens?.league[o] === 1);
     // While a lord's lands are lit, the rest of the land fades to grey so they stand out.
-    view.renderer.setProvinceStyle(i, isWater[i] ? unownedRgb : hatched && lens === "realms" ? nationRgb[occ]! : lensColor(i), o, terrainIdx[i]!, flags, isWater[i], lord, litLord >= 0 && !lit, closed);
+    view.renderer.setProvinceStyle(i, isWater[i] ? unownedRgb : hatched && lens === "realms" ? (rebels ? rebelRgb : nationRgb[occ]!) : lensColor(i), o, terrainIdx[i]!, flags, isWater[i], lord, litLord >= 0 && !lit, closed);
   }
   // Seasons move on a week a turn, so they are only worked out when a week starts.
   const date = previewMonth ? { year: 1444, month: previewMonth, day: previewDay } : (weekStart ?? rules.defines.startDate);
@@ -758,6 +763,12 @@ function drawOverlay(o: OverlayContext): void {
       if (!onScreen(sx, sy)) continue;
       drawSiegeMark(ctx, sx, sy - 10 * tokenUnit(zoom), tokenUnit(zoom), nations[st.by]!.color, st.months, st.progress);
     }
+    for (const r of snapshot.rebels.risings) {
+      if (!r.siege || !isKnown(r.siege.province)) continue;
+      const p = provinces[r.siege.province]!;
+      const [sx, sy] = o.toScreen(p.x!, p.y!);
+      if (onScreen(sx, sy)) drawSiegeMark(ctx, sx, sy - 10 * tokenUnit(zoom), tokenUnit(zoom), REBEL_COLOR, r.siege.months, r.siege.progress);
+    }
   }
 
   // The diplomacy lens, zoomed in to regional: envoys riding their dotted roads, and a sword over each realm the player holds a war aim on (DIPL-184).
@@ -857,6 +868,17 @@ function drawOverlay(o: OverlayContext): void {
         ctx.textBaseline = "top";
         pixelText(ctx, name, sx, box.y + box.h + 2, 10);
       }
+    }
+  }
+  // Rebel bands where they stand, in the rebels' colour with no flag (REBL-066); a tap on the province opens their card.
+  if (snapshot && zoom >= ARMY_ZOOM) {
+    const now = performance.now();
+    for (const r of snapshot.rebels.risings) {
+      if (!isKnown(r.location)) continue;
+      const [sx, sy] = o.toScreen(...tileXY(r.tile));
+      if (!onScreen(sx, sy)) continue;
+      drawToken(ctx, { x: sx - 6 * tokenUnit(zoom), y: sy, u: 2, color: REBEL_COLOR, men: r.men, dir: -1, moving: r.target >= 0, selected: false, t: now });
+      animating ||= r.target >= 0;
     }
   }
   if (animating) view.invalidate();
@@ -1305,7 +1327,7 @@ function applySnapshot(): void {
 
 const NEWS_ICON: Record<News["kind"], "swords" | "castle" | "crown" | "scroll"> = {
   war: "swords", joined: "swords", call: "swords", battle: "swords", peace: "crown", siege: "castle", occupied: "castle", freed: "castle", raised: "swords", refused: "scroll", destroyed: "crown", famine: "scroll", unrest: "scroll",
-  invention: "scroll", built: "castle", envoy: "scroll", reform: "crown",
+  invention: "scroll", built: "castle", envoy: "scroll", reform: "crown", rebels: "swords",
 };
 
 /**
@@ -1356,6 +1378,11 @@ function logNews(s: Snapshot): void {
     if (alerted.has(`peace ${o.id}`)) continue;
     alerted.add(`peace ${o.id}`);
     alertPlayer(`${nations[o.from]!.name} offers peace.`, "crown", { answer: true });
+  }
+  for (const v of s.rebels.verdicts) {
+    if (alerted.has(`verdict ${v.id}`)) continue;
+    alerted.add(`verdict ${v.id}`);
+    alertPlayer(`The rebels of ${provinces[v.province]!.name} are beaten: choose their fate.`, "crown", { province: v.province });
   }
   for (const a of asksOf(s)) {
     if (alerted.has(`ask ${a.id}`)) continue;
@@ -1635,6 +1662,7 @@ function renderPanel(): void {
     ${mineHere ? provinceTabs() : ""}
     <p class="owner">${owner ? `<button class="realm-link" data-realm="${own}" title="Open ${esc(owner.name)}">${pennant(owner, 3)}<b>${esc(owner.name)}</b></button>` : "<b>Unclaimed land</b>"}</p>
     <p class="province-kind">${esc(provinceKind(p, !!owner && owner.capital === p.id))}</p>
+    ${snapshot ? rebelsHere(selectedProvince) : ""}
     ${snapshot && own >= 0 && official !== undefined ? governanceSection(selectedProvince, own, mineHere, official) : ""}
     ${siege ? siegeView(rules, siege) : ""}
     <dl class="facts">
@@ -1672,6 +1700,7 @@ function renderPanel(): void {
   bindCommand();
   bindProvinceTabs();
   bindNationButtons();
+  bindRebels();
   bindTax(selectedProvince);
   bindLords();
   panel.querySelector("[data-realm-open-food]")?.addEventListener("click", () => {
@@ -1686,6 +1715,66 @@ function renderPanel(): void {
 function provinceKind(p: (typeof provinces)[number], capital: boolean): string {
   const seat = capital ? "Capital city" : SETTLEMENT_NAMES[settlementOf(p.population)];
   return [`${seat} in ${p.terrain}`, p.river ? "river" : "", p.coastal ? "coast" : ""].filter(Boolean).join(" · ");
+}
+
+/** The beaten risings of p waiting on the player, then the rebellion card of the rising holding it (REBL-063, REBL-065). */
+function rebelsHere(p: number): string {
+  const s = snapshot!;
+  const name = (q: number) => provinces[q]!.name;
+  const verdicts = s.rebels.verdicts.filter((v) => v.province === p).map((v) => verdictCard(v, name)).join("");
+  const r = s.provinceRebels[p] ? s.rebels.risings.find((x) => x.id === s.provinceRebels[p]) : undefined;
+  if (!r) return verdicts;
+  const mine = r.owner === s.playerNation;
+  return verdicts + risingCard(r, name, mine, mine ? attackerFor(r.location) : null);
+}
+
+/** The player's nearest army that can march on rebels in province p: with a commander, not fighting or falling back. */
+function attackerFor(p: number): Attacker | null {
+  const s = snapshot!;
+  const to = provinces[p]!;
+  let best: Attacker | null = null;
+  let dist = Infinity;
+  for (let k = 0; k < s.armies.id.length; k++) {
+    if (s.armies.owner[k] !== s.playerNation || s.armies.commander[k]! < 0 || s.armies.battle[k]! >= 0) continue;
+    const at = provinces[s.armies.location[k]!]!;
+    const d = Math.hypot(at.x! - to.x!, at.y! - to.y!) - s.armies.men[k]! / 1e6;
+    if (d < dist) ((dist = d), (best = { army: s.armies.id[k]!, name: cmdOf(s.armies.commander[k]!).name, men: s.armies.men[k]! }));
+  }
+  return best;
+}
+
+/** The rebellion card's buttons: the answers (granting asks once more), attack, wait, and the verdicts. */
+function bindRebels(): void {
+  panel.querySelectorAll<HTMLButtonElement>("[data-rebels-ask]").forEach((b) =>
+    b.addEventListener("click", () => {
+      rebelsUi.confirm = b.dataset.rebelsAsk!;
+      renderPanel();
+    }),
+  );
+  panel.querySelectorAll<HTMLButtonElement>("[data-rebels-cancel]").forEach((b) =>
+    b.addEventListener("click", () => {
+      rebelsUi.confirm = null;
+      renderPanel();
+    }),
+  );
+  panel.querySelectorAll<HTMLButtonElement>("[data-rebels-answer]").forEach((b) =>
+    b.addEventListener("click", () => {
+      const [rising, answer] = b.dataset.rebelsAnswer!.split(":");
+      rebelsUi.confirm = null;
+      void actHere({ type: "answerRebels", rising: Number(rising), answer: answer as "grant" | "talk" | "bribe" });
+    }),
+  );
+  panel.querySelectorAll<HTMLButtonElement>("[data-rebels-verdict]").forEach((b) =>
+    b.addEventListener("click", () => {
+      rebelsUi.confirm = null;
+      void actHere({ type: "treatRebels", rising: Number(b.dataset.rebelsVerdict), treatment: b.dataset.treatment as "Pardon" | "Punish the leaders" | "Massacre" });
+    }),
+  );
+  panel.querySelectorAll<HTMLButtonElement>("[data-rebels-attack]").forEach((b) =>
+    b.addEventListener("click", () => void actHere({ type: "move", army: Number(b.dataset.rebelsAttack), to: Number(b.dataset.rebelsTo) })),
+  );
+  // Waiting is no order: the card folds away and the clock plays on.
+  panel.querySelector("[data-rebels-wait]")?.addEventListener("click", () => showPanel(false));
 }
 
 /** The siege of province p as the siege view shows it, or null when there is none. */
@@ -2008,7 +2097,7 @@ function provincesTab(r: number): string {
   const s = snapshot!;
   const list: number[] = [];
   for (let p = 0; p < owners.length; p++) if (owners[p] === r) list.push(p);
-  const trouble = (p: number) => s.provinceMood[p]! * 10 + (s.provinceFoodMonths[p]! < 1 ? 15 : s.provinceFoodMonths[p]! < 3 ? 5 : 0) + (s.provinceGrievances[p]! ? 1 : 0);
+  const trouble = (p: number) => (s.provinceRebels[p] ? 100 : 0) + s.provinceMood[p]! * 10 + (s.provinceFoodMonths[p]! < 1 ? 15 : s.provinceFoodMonths[p]! < 3 ? 5 : 0) + (s.provinceGrievances[p]! ? 1 : 0);
   const by = {
     trouble: (a: number, b: number) => trouble(b) - trouble(a),
     people: (a: number, b: number) => s.provincePeople[b]! - s.provincePeople[a]!,
@@ -2036,13 +2125,13 @@ function provincesTab(r: number): string {
       const months = s.provinceFoodMonths[p]!;
       const l = s.provinceLord[p]!;
       const post = s.provinceOfficial[p];
-      const bad = s.provinceMood[p]! >= 2 || months < 1;
+      const bad = s.provinceMood[p]! >= 2 || months < 1 || s.provinceRebels[p]! > 0;
       const gov = l >= 0 ? `Lord ${esc(s.lords[l]!.house)}` : post ? `Royal · ${esc(post.toLowerCase())}` : "Royal · <b>no official</b>";
       const fix = provinceSort === "short" ? `<small>Land feeds ${Math.round(landShare(p) * 100)} % · ${esc(foodFix(p))}</small>` : "";
       return `<div class="province-row${bad ? " bad" : ""}">
         <button class="place" ${provinceSort === "short" ? `data-open-land="${p}"` : `data-open-province="${p}"`} title="Open ${esc(provinces[p]!.name)}">
           <img class="thumb" src="${mapImage ? provinceThumb(mapImage, provinces.length, p, color) : ""}" alt="" width="48" height="48">
-          <span class="place-name"><b>${esc(provinces[p]!.name)}</b><small>${MOOD_LABEL[s.provinceMood[p]!]} · ${gov}</small>${fix}</span>
+          <span class="place-name"><b>${esc(provinces[p]!.name)}</b><small>${s.provinceRebels[p] ? "<b>Held by rebels</b>" : MOOD_LABEL[s.provinceMood[p]!]} · ${gov}</small>${fix}</span>
           <span class="place-stats"><small>${fmt(Math.round(s.provincePeople[p]! * 1000))} people</small><small>${months.toFixed(1)} months food${s.provinceHarvest[p]! >= 0 && s.provinceHarvest[p]! <= 1 ? ` · ${s.harvests[s.provinceHarvest[p]!]!} harvest` : ""}</small><small>${gold2(s.provinceTaxGold[p]!)} gold</small></span>
         </button>
         <button class="paper small map-go" data-map-province="${p}" title="Show ${esc(provinces[p]!.name)} on the map" aria-label="Show on the map">${icon("scroll", 1)}Map</button>
@@ -2052,6 +2141,7 @@ function provincesTab(r: number): string {
   const sortButton = (key: typeof provinceSort, label: string) => `<button class="tab${provinceSort === key ? " on" : ""}" data-province-sort="${key}">${label}</button>`;
   return `<p><b>${fmt(Math.round(people * 1000))}</b> people in ${list.length} provinces paying <b>${gold2(tax)}</b> gold a month. ${hungry ? `<b>${hungry} hungry</b>, ` : ""}${low ? `${low} low on food, ` : ""}${restless ? `<b>${restless} rioting or plotting</b>, ` : ""}${grumbling ? `${grumbling} grumbling.` : hungry || low || restless ? "the rest content." : "All fed and calm."}</p>
     ${harvests}
+    ${r === s.playerNation ? risingsOverview(s.rebels, r, (q) => provinces[q]!.name) : ""}
     <nav class="tabs small">${sortButton("trouble", "Trouble first")}${sortButton("people", "Most people")}${sortButton("food", "Least food")}${sortButton("tax", "Most tax")}${sortButton("short", "Short of food")}</nav>
     ${provinceSort === "short" && !shown.length ? `<p class="hint">Every province's land feeds its people in a normal year.</p>` : ""}
     <div class="province-list">${rows}</div>`;
@@ -2141,8 +2231,10 @@ function moodFacts(pi: number): string {
   const mood = s.moods[s.provinceMood[pi]!]!;
   const g = s.provinceGrievances[pi]!;
   const names = s.grievanceNames.filter((_, k) => g & (1 << k));
-  const effect = mood === "rioting" || mood === "plotting" ? " · half tax and recruits" : "";
-  return `<dt>Mood</dt><dd><b>${mood[0]!.toUpperCase() + mood.slice(1)}</b>${effect}</dd>
+  const held = s.provinceRebels[pi]! > 0;
+  const chance = s.rebels.chance[pi]!;
+  const effect = held ? " · held by rebels: nothing reaches you" : mood === "rioting" || mood === "plotting" ? ` · half tax and recruits${chance > 0 ? ` · ${Math.round(chance * 100)} in 100 a month to rise` : mood === "rioting" ? " · a new burden here starts a rising" : ""}` : "";
+  return `<dt>Mood</dt><dd><b>${held ? "Risen" : mood[0]!.toUpperCase() + mood.slice(1)}</b>${effect}</dd>
       ${names.length ? `<dt>Grievances</dt><dd>${names.map((n) => `<span title="${esc(GRIEVANCE_FIX[n] ?? "")}">${esc(n)}</span>`).join(", ")}</dd>` : ""}`;
 }
 
@@ -2848,6 +2940,7 @@ function renderRealm(r: number): void {
       <dt>People</dt><dd>${fmt(people)}</dd>
       <dt>Wealth</dt><dd>${icon("coin", 1)} ${wealth} across its lands</dd>
       ${s ? `<dt>Treasury</dt><dd>${mine ? `<button class="paper" data-realm-open-tab="treasury" title="Open the ledger">${icon("coin", 1)}${fmt(s.nationTreasury[r]!)} gold <small>${inc >= 0 ? "+" : ""}${inc.toFixed(1)} a month</small></button>` : `${fmt(s.nationTreasury[r]!)} gold <small>${inc >= 0 ? "+" : ""}${inc.toFixed(1)} a month</small>`}</dd>
+      ${mine ? risingsLine(s.rebels, r) : ""}
       ${mine && s.government ? governmentLine(s.government) : `<dt>Government</dt><dd>${esc(s.realmForms[r] ?? "")}</dd>`}
       <dt>Recruits</dt><dd>${fmt(s.nationLevies[r]!)} men who can be called</dd>
       <dt>Armies</dt><dd>${armies.length} in the field, ${fmt(men)} men</dd>
@@ -3254,6 +3347,12 @@ Object.assign(globalThis, {
   __phTurn: () => snapshot?.turn ?? -1,
   /** Id of the player's capital province. */
   __phCapital: () => (snapshot ? nations[snapshot.playerNation]!.capital : null),
+  /** Opens a province's card by id. */
+  __phOpenProvince: (id: string) => {
+    const i = provinceIndex.get(id);
+    if (i !== undefined) goToProvince(i, false);
+    return i;
+  },
   /** Sends every army of the player with a commander toward a realm's capital, unless it is already on its way. */
   __phMarchOn: async (id: string) => {
     if (!snapshot) return;

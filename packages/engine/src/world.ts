@@ -23,6 +23,7 @@ import { syncCountries } from "./statecraft.ts";
 import { createCastleFoodState, seedCastleStores, type CastleFoodState } from "./castleFood.ts";
 import { createGovernmentState, seedGovernment, type GovernmentState } from "./government.ts";
 import { adminCapacityRank } from "./realmStrengths.ts";
+import { createRebelState, type RebelState } from "./rebels.ts";
 
 /**
  * Simulation state stored as parallel typed arrays (one array per field,
@@ -30,7 +31,7 @@ import { adminCapacityRank } from "./realmStrengths.ts";
  * cache-friendly to iterate every turn and lets whole arrays be copied or
  * transferred to the UI thread without serialising objects.
  */
-export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState {
+export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState, RebelState {
   rules: Ruleset;
   /** Weeks played. */
   turn: number;
@@ -407,6 +408,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     ...createConversionState(P),
     ...createCastleFoodState(P, N),
     ...createGovernmentState(P, N),
+    ...createRebelState(P, N),
   };
   world.diplomacy = createWarState(world);
   seedClasses(world);
