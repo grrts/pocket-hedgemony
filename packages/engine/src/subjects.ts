@@ -2,6 +2,7 @@ import type { World } from "./world.ts";
 import { checkDestroyed, declareWar, peaceShare, strength, type News } from "./war.ts";
 import { personName } from "./names.ts";
 import { capsOf } from "./government.ts";
+import { FAITH_IDS, FAITH_POLICIES, NO_FAITH, NO_TONGUE } from "./peoples.ts";
 import * as dip from "./domain/diplomacy/index.ts";
 import * as subj from "./domain/subjects/index.ts";
 import config from "../../rules/data/domain/subjects.json" with { type: "json" };
@@ -18,8 +19,14 @@ import config from "../../rules/data/domain/subjects.json" with { type: "json" }
 const rel = dip.relations;
 type Bond = subj.SubjectBond;
 
-/** Subject reach until the catalogue's administrative capacity is read: moderate, 5 (SUBJ-056, D-SUBJ-26). */
+/** Reach of a realm whose administrative capacity the catalogue does not know: moderate, 5 (SUBJ-056, D-SUBJ-28). */
 export const REACH = subj.reachFromCapacity("moderate");
+const CAPACITY = [null, "very_low", "low", "moderate", "high", "very_high"] as const;
+
+/** A realm's subject reach from its catalogue administrative capacity, moderate when unknown (SUBJ-056, D-SUBJ-28). */
+export function reachOf(world: World, n: number): number {
+  return subj.reachFromCapacity(CAPACITY[world.nationAdminCapacity[n] ?? 0] ?? "moderate");
+}
 
 /** The game's month count, the bonds' clock. */
 export const monthNow = (world: World): number => world.date.year * 12 + world.date.month - 1;
@@ -110,12 +117,18 @@ function situation(world: World, s: number, o: number, ownSubjects: number, thin
   const cs = dip.country(d, a);
   const co = dip.country(d, b);
   const culture = (id: string) => world.rules.names?.nations[id];
+  // Court tongue and state faith from the 1444 culture and faith seed (D-SUBJ-28); the name books stand in for a realm without a court tongue.
+  const ts = world.nationCourt[s]!, to = world.nationCourt[o]!;
+  const fs = world.nationStateFaith[s]!, fo = world.nationStateFaith[o]!;
+  const sameCulture = ts !== NO_TONGUE && to !== NO_TONGUE ? ts === to : culture(a) && culture(b) ? culture(a) === culture(b) : undefined;
+  const faith = fs !== NO_FAITH && fo !== NO_FAITH ? { sameFaith: fs === fo, persecuted: fs !== fo && FAITH_POLICIES[world.nationFaithPolicy[o * FAITH_IDS.length + fs]!] === "persecuted" } : {};
   const stance = rel.stance(g, a, b);
   const theirs = new Set(rel.enemiesOf(g, a));
   return {
     overlordSoldiers: co.soldiers ?? 0,
     subjectSoldiers: cs.soldiers ?? 0,
-    ...(culture(a) && culture(b) ? { sameCulture: culture(a) === culture(b) } : {}),
+    ...(sameCulture === undefined ? {} : { sameCulture }),
+    ...faith,
     overlordProvinces: co.provinces ?? 1,
     subjectProvinces: cs.provinces ?? 1,
     stance: stance === "hostile" || stance === "rival" ? stance : null,
@@ -137,7 +150,7 @@ function stretched(world: World, ties: ReturnType<typeof subjectTies>): Map<stri
     list.push({ bond: t.bond, ownSubjects: own.get(t.s) ?? 0, distance: Math.hypot((ps?.x ?? 0) - (po?.x ?? 0), (ps?.y ?? 0) - (po?.y ?? 0)) });
     byOverlord.set(t.o, list);
   }
-  for (const roster of byOverlord.values()) for (const [k, v] of subj.stretchedThin(roster, REACH)) out.set(k, v);
+  for (const [o, roster] of byOverlord) for (const [k, v] of subj.stretchedThin(roster, reachOf(world, o))) out.set(k, v);
   return out;
 }
 
@@ -516,7 +529,7 @@ export function aiOverlords(world: World, news: News[]): void {
 export function aiMayTakeSubject(world: World, n: number): boolean {
   const mine = subjectTies(world).filter((t) => t.o === n);
   const used = subj.reachUsed(mine.map((t) => ({ bond: t.bond, ownSubjects: 0, distance: 0 })));
-  return subj.aiAcceptsNewSubject(used, REACH, subj.reachWeight({ kind: "tributary", ties: [] }));
+  return subj.aiAcceptsNewSubject(used, reachOf(world, n), subj.reachWeight({ kind: "tributary", ties: [] }));
 }
 
 // ---------------------------------------------------------------- the view
@@ -598,7 +611,7 @@ export function subjectsView(world: World, player: number, ledgerTribute: (n: nu
   const subjects = mine.map(one).sort((x, y) => order.indexOf(y.loyalty.toLowerCase().replace(" ", "_") as subj.Step) - order.indexOf(x.loyalty.toLowerCase().replace(" ", "_") as subj.Step));
   const above = ties.find((t) => t.s === player);
   return {
-    reach: REACH,
+    reach: reachOf(world, player),
     used: subj.reachUsed(mine.map((t) => ({ bond: t.bond, ownSubjects: own.get(t.s) ?? 0, distance: 0 }))),
     gold: subjects.reduce((n, x) => n + x.pays, 0),
     subjects,
