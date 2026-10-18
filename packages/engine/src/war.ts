@@ -11,11 +11,13 @@ import { GROUNDS } from "./tiles.ts";
 import { halt, marchTo, routeBars } from "./turn.ts";
 import { marchMap, NO_PATH, type World } from "./world.ts";
 import { aiRecruits, ARMS, canCall, commanderBattle, KIND, KIND_NAMES, menByArm, sendHome } from "./recruit.ts";
+import { withoutOf } from "./research.ts";
 import { officialBonus, provinceTaken } from "./officials.ts";
 import { noteBattle, notePeace, noteSiege } from "./achievements.ts";
 import { demandableProvinces, makeDemand, whyNotDemand } from "./statecraft.ts";
 import { heritageFactor } from "./heritage.ts";
 import { lostBattle } from "./rebels.ts";
+import { aiAnswersDefence, defenceCalls } from "./institutions.ts";
 
 /**
  * Milestone 1, war and conquest: wires the diplomacy context (who is at war,
@@ -166,6 +168,8 @@ export function declareWar(world: World, a: number, b: number, news: News[]): st
     const n = world.nationIndex.get(id)!;
     if (n !== a && n !== b) news.push({ kind: "joined", text: `${name(world, n)} joins the war on the side of ${name(world, war.attackers.includes(id) ? a : b)}.`, nations: [n, a, b] });
   }
+  // A war on a member of the Empire calls the Emperor to defend it (INST-030).
+  if (world.empire) defenceCalls(world, world.empire, news);
   answerAiCalls(world, news);
   return null;
 }
@@ -178,7 +182,7 @@ export function answerAiCalls(world: World, news: News[]): void {
     if (n === world.player) continue;
     const enemy = world.nationIndex.get(call.against)!;
     // A subject answers its overlord by its loyalty and kind (SUBJ-028, SUBJ-038).
-    const yes = call.via === "subject" ? subjectAnswersCall(world, n) : call.kind === "defensive" || (!dip.warOf(d, call.called) && strength(world, n) * 2 >= strength(world, enemy));
+    const yes = call.via === "subject" ? subjectAnswersCall(world, n) : call.via === "empire" ? aiAnswersDefence(world, call) : call.kind === "defensive" || (!dip.warOf(d, call.called) && strength(world, n) * 2 >= strength(world, enemy));
     answerCall(world, call, yes, news);
   }
 }
@@ -449,8 +453,9 @@ function resolve(world: World, b: Battle): void {
   const [attArmy, attLead] = battleArmy(world, att, an);
   const [defArmy, defLead] = battleArmy(world, def, dn);
   const r = wf.fightBattle({
-    attacker: { country: an, army: attArmy, known: new Set(), homeland: world.provinceOwner[b.province] === attOwner },
-    defender: { country: dn, army: defArmy, known: new Set(), homeland: world.provinceOwner[b.province] === defOwner },
+    // Without C01 *Iron smelting* a realm's regiments fight 20 % weaker (RSCH-094).
+    attacker: { country: an, army: attArmy, known: new Set(), homeland: world.provinceOwner[b.province] === attOwner, strengthPct: withoutOf(world, attOwner).strengthPct },
+    defender: { country: dn, army: defArmy, known: new Set(), homeland: world.provinceOwner[b.province] === defOwner, strengthPct: withoutOf(world, defOwner).strengthPct },
     sectors: wf.battlefield(battleRow(ground), { ground, era }),
     ground,
     era,

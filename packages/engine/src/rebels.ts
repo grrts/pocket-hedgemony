@@ -6,6 +6,7 @@ import { battleArmy, battleRow, cedeProvince, nearest, SIEGE_MONTH_DAYS, wallsOf
 import { cultureKey, grievanceCount, grievancesOf, moodIndex, risingChance, taxWeight } from "./moods.ts";
 import { storeMonths } from "./food.ts";
 import { commanderBattle } from "./recruit.ts";
+import { withoutOf } from "./research.ts";
 import { halt, marchTo } from "./turn.ts";
 import { loyaltyStep } from "./lords.ts";
 import { NORMAL_TAX, runLedger, taxRateOf, TAX_RATES } from "./treasury.ts";
@@ -479,7 +480,8 @@ function fight(world: World, b: Band, slots: number[], news: News[]): void {
   const [own, lead] = battleArmy(world, slots, me);
   const era = wf.eraOfYear(world.date.year);
   const r = wf.fightBattle({
-    attacker: { country: me, army: own, known: new Set(), homeland: true },
+    // Without C01 *Iron smelting* the realm's regiments fight 20 % weaker (RSCH-094).
+    attacker: { country: me, army: own, known: new Set(), homeland: true, strengthPct: withoutOf(world, b.owner).strengthPct },
     defender: { country: "rebels", army: rebelArmy(world, b, factor), known: new Set(), homeland: true },
     sectors: wf.battlefield(battleRow(ground), { ground, era }),
     ground,

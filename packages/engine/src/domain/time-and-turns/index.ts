@@ -351,6 +351,14 @@ export function orderShape(order: Order): string {
       return "answer the revolution";
     case "setStudy":
       return "choose what to study";
+    case "queueStudy":
+      return "add to the study queue";
+    case "queuePath":
+      return "queue the path to an invention";
+    case "unqueueStudy":
+      return "take a study off the queue";
+    case "moveQueuedStudy":
+      return "move a queued study";
     case "setSeats":
       return "set school seats to fill";
     case "callStudentsToArms":
@@ -429,6 +437,8 @@ export function orderShape(order: Order): string {
       return "raise our own patriarch";
     case "answerRevolution":
       return "answer the revolution";
+    case "empire":
+      return "act in the Empire";
   }
 }
 

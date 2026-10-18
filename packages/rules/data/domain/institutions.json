@@ -1,0 +1,53 @@
+{
+ "$comment": "Institutions (domain/institutions/spec.md, INST): the Empire and the Shogunate. Values from the institutions design of 18 October 2026 (/mnt/project-files/institutions/institutions-design.md). Every number is a placeholder balancing knob. members_1444 is the design's worked X-13 match of the catalogue's imperial estates to map realms (OQ-INST-1: the Teutonic Order, nominal in the catalogue, is left out as the design lists it).",
+ "hold": {
+  "words": [
+   { "min": 80, "word": "Strong" },
+   { "min": 50, "word": "Firm" },
+   { "min": 20, "word": "Weak" },
+   { "min": 0, "word": "Hollow" }
+  ]
+ },
+ "empire": {
+  "name": "The Empire",
+  "office": "Emperor",
+  "holder_1444": "austria",
+  "members_1444": ["austria", "bavaria", "bohemia", "brandenburg", "cologne", "hamburg", "hesse", "lorraine", "luneburg", "mecklenburg", "palatinate", "pomerania", "saxony", "wurttemberg", "switzerland", "milan", "savoy", "modena"],
+  "seats_1444": [
+   { "name": "Mainz", "church": true },
+   { "name": "Cologne", "realm": "cologne" },
+   { "name": "Trier", "church": true },
+   { "name": "Bohemia", "realm": "bohemia" },
+   { "name": "Palatinate", "realm": "palatinate" },
+   { "name": "Saxony", "realm": "saxony" },
+   { "name": "Brandenburg", "realm": "brandenburg" }
+  ],
+  "faith": "catholic",
+  "head_of_faith": "papal_states",
+  "hold_start": 35,
+  "election_years_without_rulers": 25,
+  "election_months": 1,
+  "candidates_by_soldiers": 3,
+  "seek_vote": { "gift_gold": 30, "tie": 15, "fade_years": 10 },
+  "vote": {
+   "standing_divisor": 4,
+   "same_faith": 10,
+   "sitting_house": 15,
+   "strength_per_multiple": 5,
+   "strength_max": 20,
+   "at_war": -50
+  },
+  "defence": { "answer": 10, "refuse": -15, "wrong": -25, "wrong_fade_years": 20, "answer_months": 1 },
+  "dues_per_member": 1,
+  "hold_year": {
+   "peace": 2,
+   "member_war": -3,
+   "outsider_province": -2,
+   "outsider_max": -10,
+   "member_left": -5,
+   "other_faith": -1,
+   "augsburg_factor": 0.5
+  },
+  "admit": { "base": 0, "standing_divisor": 4, "same_faith": 10, "emperor_stronger": 10 }
+ }
+}
