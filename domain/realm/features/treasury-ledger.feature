@@ -65,6 +65,7 @@ Feature: Tax rates and the treasury ledger
   Scenario: Borrowing adds the interest to the debt at once
     # config: debt.interest_pct, debt.loan_cap_years_income, debt.interest_added_at_once_years
     Given the game starts with the country "Castile"
+    And "Castile" has paid off the debt it started with
     Then lenders would let "Castile" owe a year's tax and trade
     When "Castile" borrows 100 gold
     Then "Castile" has 100 gold more and owes 110 gold
@@ -76,6 +77,7 @@ Feature: Tax rates and the treasury ledger
   @REALM-181 @REALM-188
   Scenario: Repaying
     Given the game starts with the country "Castile"
+    And "Castile" has paid off the debt it started with
     And "Castile" borrows 100 gold
     When "Castile" repays 40 gold
     Then "Castile" owes 70 gold
@@ -96,6 +98,7 @@ Feature: Tax rates and the treasury ledger
   @REALM-182 @REALM-171
   Scenario Outline: The AI's treasury
     Given the game starts with the AI country "Hungary"
+    And "Hungary" has paid off the debt it started with
     And "Hungary" is <state> with <gold> gold
     When the AI plans its treasury
     Then the realm tax default of "Hungary" is "<tax>"

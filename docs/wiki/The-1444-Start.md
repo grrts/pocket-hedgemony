@@ -89,7 +89,17 @@ Each country's starting counts are set from its assessments:
 | Trade access | Merchants and access to grain prices |
 | Diplomatic influence | Extra officials at court ready to go abroad |
 
-A **low confidence** in the catalogue gives a wider random range for the starting counts, so each campaign starts a little differently. Each level multiplies the starting count: very low by 0.5, low by 0.75, medium by 1, high by 1.25 and very high by 1.5, and an unknown level counts as medium. Low confidence lets the count vary by up to 20 % either way.
+How the numbers come out (all provisional, in `starting` in `realm.json`):
+
+| Starting number | Set by | Very low → very high |
+|---|---|---|
+| Gold | Economic strength | 1, 2, 3, 5 or 8 months of the realm's tax and trade (at least 10 gold) |
+| Debt | Fiscal resilience | 1.5, 1, 0.5, 0.25 or 0 times its starting gold, never more than lenders allow |
+| Levies already gathered | Manpower potential | 50, 65, 80, 90 or 100 % of each province's levy ceiling |
+| Officials at their posts | Administrative capacity | 0.5, 0.7, 0.9, 1 or 1.2 per royal province; the posts farthest from the capital stand empty |
+| Envoys at court | Diplomatic influence | 0, 1, 1, 2 or 3, each an extra envoy seat |
+
+Each number is spread at random by how sure the catalogue is of that assessment: up to 25 % either way for low confidence, 10 % for medium and 5 % for high, so an uncertain realm starts a little differently each campaign. The campaign's seed fixes the spread, so the same seed gives the same start. An unknown level counts as moderate. The country card's **Heritage** tab shows each assessment with the starting number it sets under its bar.
 
 Other starting facts:
 
@@ -159,7 +169,7 @@ Settlement regions range from dense, rich ones (the Low Countries at 30 people p
 | About 15 % of other owned provinces | An old ring fort |
 | Unowned provinces | None |
 
-The engine starts every nation with 50 gold, levies of 4 men per thousand people, and 20 % horse in starting armies (all placeholders). A realm's men under arms all start in armies under a commander, spread over its land: one army per commander, the first in the capital. It gets one commander for every 8,000 men, at least one and at most eight (more only if an army would pass 30,000).
+A realm the catalogue does not assess starts with the engine's 50 gold, every province's levies at their ceiling, and 20 % horse in starting armies (all placeholders). A realm's men under arms all start in armies under a commander, spread over its land: one army per commander, the first in the capital. It gets one commander for every 8,000 men, at least one and at most eight (more only if an army would pass 30,000).
 
 ### From catalogue to map
 
@@ -232,7 +242,7 @@ The screens themselves are on [Screens and Navigation](Screens-and-Navigation).
 | Levies | `levies.menPerThousandPeople` | 4 | Yes |
 | Horse in starting armies | `march.startingHorseShare` | 0.2 | Yes |
 | Men per starting commander, most commanders | `starting_armies` (realm.json) | 8,000; 8 | Yes |
-| Low-confidence range | `scenario-setup.json` | ±20 % | Yes |
+| Starting tables and confidence spread | `starting` (realm.json) | see above; ±25 / 10 / 5 % | Yes |
 | Free realms | store config | the Ottomans, France | No |
 
 ## How the start is settled
@@ -240,7 +250,7 @@ The screens themselves are on [Screens and Navigation](Screens-and-Navigation).
 - **The date.** Every campaign, and the tutorial, starts on 11 November 1444. Mehmed II rules the Ottomans, and the union of Poland and Hungary has ended.
 - **Provinces.** People, wealth and castles come from the map. A province's people are counted in thousands, so Aube (Troyes) has 305 thousand.
 - **Strengths and reach.** Each realm carries its record's assessments and heritage, shown on its card's Heritage tab ([National Strengths](National-Strengths)), and its administrative capacity as a rank from 1 to 5 (0 without a record), which subjects will read for how far its rule reaches.
-- **Treasury and armies.** Each realm's starting gold, debt and recruits come from its assessment; the flat 50 gold and levies apply only to a realm without one.
+- **Treasury, levies, officials and envoys.** Each realm's starting gold, debt, gathered levies, officials and envoys at court come from its assessment; the flat 50 gold and full levies apply only to a realm without one.
 - **Relations.** Alliances, rivalries and wars at the start come from the relations list.
 - **Events.** "Historical" events follow history closely; "free" events allow plausible changes.
 - **Commanders.** Commander numbers come from the map's nation data, so Dunois has Cunning 3.

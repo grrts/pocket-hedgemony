@@ -25,6 +25,7 @@ import { createGameEvents, type GameEvents } from "./events.ts";
 import { createGovernmentState, seedGovernment, type GovernmentState } from "./government.ts";
 import { adminCapacityRank } from "./realmStrengths.ts";
 import { createNavyState, seedNavy, type NavyState } from "./navy.ts";
+import { seedStartingPosts, seedStartingPurse } from "./startingCounts.ts";
 
 /**
  * Simulation state stored as parallel typed arrays (one array per field,
@@ -432,6 +433,8 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     // Every province of a realm starts with an official, of a type dealt out in turn.
     if (provinceOwner[p]! >= 0) world.provinceOfficial[p] = p % OFFICIALS.length;
   }
+  // Levies gathered and officials at their posts follow the catalogue (REALM-130).
+  seedStartingPosts(world);
   world.commanderHome = commanderIds.map(() => -1);
   world.commanderSeed = commanderIds.map(() => -1);
   seedOfficials(world);
@@ -457,6 +460,8 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   refreshFreeCompanies(world);
   // The ledger is worked out from the start, so lenders and the treasury card know the realm's income.
   runLedger(world, false);
+  // Gold, debt and envoys at court follow the catalogue, as months of that income (REALM-130).
+  seedStartingPurse(world);
   // Envoy seats and AI answers read each realm's provinces, gold and soldiers from the start.
   syncCountries(world);
 
