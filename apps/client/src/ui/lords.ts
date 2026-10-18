@@ -94,7 +94,7 @@ export function lordScreen(
   rules: Ruleset,
   l: LordView,
   ll: LordLands,
-  o: { lit: boolean; gift: number; treasury: number; mine: boolean; holdings: ProvinceRow[]; grants: ProvinceRow[]; allGrants: boolean },
+  o: { lit: boolean; gift: number; treasury: number; mine: boolean; holdings: ProvinceRow[]; grants: ProvinceRow[]; allGrants: boolean; court?: string },
 ): string {
   const row = (r: ProvinceRow, button: string) => `<div class="place-row">
       <button class="place" data-show-province="${r.province}" title="Show ${esc(r.name)} on the map">
@@ -107,6 +107,7 @@ export function lordScreen(
       <button class="wax" data-lord-light="${l.k}" aria-pressed="${o.lit}">${o.lit ? "Stop showing his lands" : "Show his lands on the map"}</button>
       ${o.mine && l.loyalty !== "Loyal" ? `<button class="paper" data-gift="${l.k}" ${o.treasury < o.gift ? "disabled" : ""} title="A gift of gold raises his loyalty a step">Gift · ${o.gift} gold</button>` : ""}
     </div>
+    ${o.court ?? ""}
     <dl class="facts">
       <dt>Lands</dt><dd>${ll.provinces.length} province${ll.provinces.length === 1 ? "" : "s"}, ${fmt(ll.people * 1000)} people</dd>
       <dt>To you</dt><dd>${gold2(ll.crownGold)} gold a month${l.loyalty === "Loyal" || l.loyalty === "Wavering" ? " (half of their tax)" : ""}</dd>
@@ -132,7 +133,7 @@ export function governanceCard(
   const lordRow = o.lord
     ? `<div class="army person">${lordPortrait(rules, o.lord, 3)}
         <span class="who"><b>${esc(o.lord.name)}</b><br><small>Lord · House ${esc(o.lord.house)}</small><br>${loyaltyBadge(o.lord.loyalty)}</span>
-        <span class="army-buttons">${o.mine ? `<button class="paper small" data-lord-open="${o.lord.k}">Lord</button><button class="paper small" data-seize="${o.province}" title="Take it back as royal land: he loses a step, and every other lord notices">Seize</button>` : ""}</span>
+        <span class="army-buttons"><button class="paper small" data-lord-open="${o.lord.k}">Lord</button>${o.mine ? `<button class="paper small" data-seize="${o.province}" title="Take it back as royal land: he loses a step, and every other lord notices">Seize</button>` : ""}</span>
       </div>`
     : `<div class="army person royal"><span class="crest">♛</span>
         <span class="who"><b>Royal land</b><br><small>Not granted to any lord. ${o.isCapital ? "The capital stays royal." : o.mine ? "All its tax and recruits reach you." : "Its tax and recruits go to the crown."}</small></span>
