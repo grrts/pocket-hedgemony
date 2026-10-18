@@ -395,6 +395,8 @@ export function orderShape(order: Order): string {
       return "draw a trader's route";
     case "dismissTrader":
       return "dismiss a trader";
+    case "answerRevolution":
+      return "answer a revolution";
     case "answerRebels":
       return "answer a rising";
     case "treatRebels":

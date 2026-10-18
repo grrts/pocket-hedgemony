@@ -8,6 +8,7 @@ import { stabilityOf, type Stability } from "./stability.ts";
 import { governmentView, realmForms, type GovernmentView } from "./government.ts";
 import { goodsOf, kindRow, TRADER_KINDS, tradeSeen, tradeValueAt, tradeView, type KindRow, type TradeView } from "./trade.ts";
 import { rebelsView, type RebelsView } from "./rebels.ts";
+import { revolutionView, type RevolutionView } from "./revolutions.ts";
 import { peoplesSnapshot, type PeoplesSnapshot } from "./peoples.ts";
 import { GRIEVANCES, moodIndex, MOODS } from "./moods.ts";
 import { CLASS_NAMES } from "./living.ts";
@@ -194,6 +195,8 @@ export interface Snapshot {
   giftGold: number;
   /** The player's stability: the weakest of its lords, subjects, officials and provinces (REALM-199); null before a realm is chosen. */
   stability: Stability | null;
+  /** The player's revolution card, its regime and ruler (REVO-090 to REVO-092); null before a realm is chosen. */
+  revolution: RevolutionView | null;
   /** The player's Government tab: form, both caps, the form's laws and the next forms (GOV-064); null before a realm is chosen. */
   government: GovernmentView | null;
   /** Risings in every realm (the player's with their card and answers), the player's beaten risings waiting for a verdict, and each plotting province's monthly chance to rise (REBL-063). */
@@ -440,6 +443,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       provinceLord: w.provinceLord.slice(),
       giftGold: giftGold(w),
       stability: player >= 0 ? stabilityOf(w, player) : null,
+      revolution: player >= 0 ? revolutionView(w, player) : null,
       government: player >= 0 ? governmentView(w, player) : null,
       rebels: rebelsView(w),
       provinceRebels: w.provinceRebels.slice(),
