@@ -186,6 +186,15 @@ A turn is one week; these steps run once a month, at the end of the turn in whic
 - **The subjects lens**: your subjects coloured by loyalty, with a line to each courted subject from the courting country's capital.
 - Long-press a subject on the map (or select it and press the card button on a controller) to open its card.
 
+### Subjects in the game today
+
+- **Where**: your realm's **Diplomacy** tab lists your *Subjects*: how much of your reach (5 for now) they use, the tribute they send each month, and a row per subject with its kind, loyalty, arrows up and down, what it pays and its worst reason. Tap a subject to open its card.
+- **The subject's card** (its own Diplomacy tab): its loyalty and every reason behind it as a badge, what it pays and how it comes to your wars, and your actions: set the tribute (*None*, *Light*, *Normal*, *Heavy*, *Crushing*), *Send a gift* (six months of its income, +1 for 5 years), *Loosen to tributary* (Vassal or Protectorate, +2 for 10 years) and *Release* (it goes free as your friend).
+- **What they pay**: the kind's share times the tribute level, all of it while Loyal, half while Wavering and nothing while Disloyal. A Vassal pays 10 in 100 of its taxes; a Tributary 15 in 100 of its income. It shows as *Tribute* in your Treasury tab.
+- **Loyalty** is counted at the end of every season: two more arrows up than down raise it a step, two more down lower it, never twice the same way within a year. You hear when it moves. A Disloyal subject refuses your calls to arms.
+- **Making subjects**: send an envoy to *Offer overlordship* to a smaller realm (it becomes your tributary) or *Ask for protection* of a larger one (you become its vassal), or demand tribute. The other realms offer overlordship too.
+- **Not yet**: folding in, tightening, residents, hostages, risings and the subjects lens come later; faith and distance give no reasons yet.
+
 ## How it connects
 
 - [Diplomacy](Diplomacy): the Subject relation record, independence wars, release, envoys, marriages, protection asks, courting and inherited crowns.

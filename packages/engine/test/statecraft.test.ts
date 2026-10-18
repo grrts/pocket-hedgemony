@@ -3,7 +3,8 @@ import { loadMapTiles } from "../src/node/mapTiles.ts";
 import { loadDefaultRuleset } from "@ph/rules";
 import { createWorld, processTurn, type World } from "../src/index.ts";
 import { restoreWorld, worldChunks } from "../src/domain/saves/world-chunks.ts";
-import { demandableProvinces, giftGold, monthlyStatecraft, seatsOf, standingOf, statecraftView, tributaries, whyNotDemand, whyNotEnvoy } from "../src/statecraft.ts";
+import { subjectPayments, subjectTies } from "../src/subjects.ts";
+import { demandableProvinces, giftGold, monthlyStatecraft, seatsOf, standingOf, statecraftView, whyNotDemand, whyNotEnvoy } from "../src/statecraft.ts";
 import * as dip from "../src/domain/diplomacy/index.ts";
 
 const rules = loadDefaultRuleset();
@@ -90,7 +91,7 @@ describe("statecraft (milestone 5)", () => {
     expect(letter.reasons[0]!.number).toBe(-60);
     const tributary = dip.relations.overlord(w.diplomacy.graph, "navarre") === "castile";
     expect(tributary).toBe(letter.answer === "yes");
-    if (tributary) expect(tributaries(w)).toContainEqual([them, me]);
+    if (tributary) expect(subjectPayments(w).some(([a, b]) => a === them && b === me)).toBe(true);
     else expect(dip.warAimsOf(w.diplomacy, "castile", "navarre").some((a) => a.aim === "tribute")).toBe(true);
     expect(standingOf(w, them, me).lines.some((l) => /Threatened/.test(l.name))).toBe(true);
   });
@@ -114,7 +115,7 @@ describe("statecraft (milestone 5)", () => {
   it("lets AI realms demand before they go to war (DIPL-180)", () => {
     const w = createWorld(rules, 1, tiles);
     months(w, 36, -1);
-    const demands = w.diplomacy.letters.filter((l) => l.action === "demand").length + w.diplomacy.refusedDemands.length + tributaries(w).length;
+    const demands = w.diplomacy.letters.filter((l) => l.action === "demand").length + w.diplomacy.refusedDemands.length + subjectTies(w).filter((t) => t.r.origin === "game").length;
     expect(demands).toBeGreaterThan(0);
   });
 
