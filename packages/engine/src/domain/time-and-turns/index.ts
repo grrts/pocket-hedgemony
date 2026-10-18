@@ -367,6 +367,8 @@ export function orderShape(order: Order): string {
       return "make a demand";
     case "answerEvent":
       return "answer an event";
+    case "answerAsk":
+      return "answer an envoy";
     case "subjectAction":
       return "act on a subject";
     case "moveBuild":
@@ -375,6 +377,8 @@ export function orderShape(order: Order): string {
       return "set the food policy";
     case "foodPreset":
       return "fill the food policy from a preset";
+    case "reform":
+      return "reform the government";
   }
 }
 

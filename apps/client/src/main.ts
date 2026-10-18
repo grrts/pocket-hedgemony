@@ -20,7 +20,7 @@ import {
   WORKS,
 } from "@ph/engine";
 import type { GameDate } from "@ph/rules";
-import { mySubjects, myStatecraft, realmStatecraft, subjectCard } from "./ui/statecraft.ts";
+import { askCard, mySubjects, myStatecraft, realmStatecraft, subjectCard } from "./ui/statecraft.ts";
 import { heritageLine, heritageTab } from "./ui/heritage.ts";
 import { loadDefaultRuleset } from "@ph/rules";
 import { hexToRgb, PALETTE, TERRAINS } from "./art/palette.ts";
@@ -31,6 +31,7 @@ import { lookOfCulture, setPortraitYear } from "./art/portraits.ts";
 import { EngineClient } from "./engineClient.ts";
 import { hideLoading, loadingStage, painted, showLoading } from "./loading.ts";
 import { stabilityPlaque, stabilitySection } from "./ui/stability.ts";
+import { governmentLine, governmentTab, governmentUi } from "./ui/government.ts";
 import { firstOpen, learningBough, learningLine, learningTab, newLearningUi, realmLearningLine, scrollFor } from "./ui/learning.ts";
 import { provinceWorks } from "./ui/works.ts";
 import { provinceLand } from "./ui/land.ts";
@@ -145,7 +146,7 @@ let realmView = -1;
 /** The army whose commander's screen is open (army id), or -1. */
 let armyView = -1;
 /** Which tab of a country's overview is open (feedback 12). */
-let realmTab: "general" | "heritage" | "treasury" | "food" | "diplomacy" | "military" | "mercenaries" | "officials" | "lords" | "provinces" | "learning" = "general";
+let realmTab: "general" | "government" | "heritage" | "treasury" | "food" | "diplomacy" | "military" | "mercenaries" | "officials" | "lords" | "provinces" | "learning" = "general";
 /** What the player left open in the Learning tab (Tree or Schools, the bough, the tapped invention, folds, scroll), kept across redraws. */
 const learningUi = newLearningUi();
 /** The study the player was last told to choose for (known count), so the alert comes once each time. */
@@ -1253,7 +1254,7 @@ function renderHud(): void {
     <button class="plaque" data-realm="${me}" data-realm-open="treasury" title="Treasury: gold, and change per month. Opens the ledger">${icon("coin", 1)}${fmt(s.nationTreasury[me]!)} <small class="${inc < 0 ? "down" : ""}">${inc >= 0 ? "+" : ""}${inc.toFixed(1)}</small></button>
     ${s.stability ? stabilityPlaque(s.stability, me) : ""}
     ${myWars().length ? `<button class="plaque at-war" data-realm="${me}" data-realm-open="diplomacy" title="Your wars">${icon("swords", 1)}At war</button>` : ""}
-    <button class="plaque dispatches${s.calls.length || s.peaceOffers.length ? " urgent" : ""}" data-news title="Dispatches: everything that happened, newest first">${icon("scroll", 1)}${unread + s.calls.length + s.peaceOffers.length || ""}</button>`;
+    <button class="plaque dispatches${s.calls.length || s.peaceOffers.length || asksOf(s).length ? " urgent" : ""}" data-news title="Dispatches: everything that happened, newest first">${icon("scroll", 1)}${unread + s.calls.length + s.peaceOffers.length + asksOf(s).length || ""}</button>`;
 }
 
 /** Wars the player fights, with the player's side first. */
@@ -1313,7 +1314,7 @@ function applySnapshot(): void {
 
 const NEWS_ICON: Record<News["kind"], "swords" | "castle" | "crown" | "scroll"> = {
   war: "swords", joined: "swords", call: "swords", battle: "swords", peace: "crown", siege: "castle", occupied: "castle", freed: "castle", raised: "swords", refused: "scroll", destroyed: "crown", famine: "scroll", unrest: "scroll",
-  invention: "scroll", built: "castle", envoy: "scroll", event: "scroll",
+  invention: "scroll", built: "castle", envoy: "scroll", event: "scroll", reform: "crown",
 };
 
 /**
@@ -1364,6 +1365,11 @@ function logNews(s: Snapshot): void {
     if (alerted.has(`peace ${o.id}`)) continue;
     alerted.add(`peace ${o.id}`);
     alertPlayer(`${nations[o.from]!.name} offers peace.`, "crown", { answer: true });
+  }
+  for (const a of asksOf(s)) {
+    if (alerted.has(`ask ${a.id}`)) continue;
+    alerted.add(`ask ${a.id}`);
+    alertPlayer(`${nations[a.from]!.name}'s envoy waits for your answer.`, "scroll", { answer: true });
   }
   // A new event for the player opens its card, and the week waits for the answer (EVT-044, EVT-076).
   const fresh = s.events.filter((c) => !eventsSeen.has(c.event));
@@ -1525,6 +1531,7 @@ function renderNews(): void {
     <header><h2 class="ribbon">Dispatches</h2>${closeButton()}</header>
     <nav class="tabs"><button class="tab${dispatchesMine ? "" : " on"}" data-news-mine="0">Everything</button><button class="tab${dispatchesMine ? " on" : ""}" data-news-mine="1">Your realm</button></nav>
     ${waitingEventsHtml(s.events)}
+    ${asksHtml()}
     ${s.peaceOffers.map(offerHtml).join("")}
     ${s.calls
       .map(
@@ -2197,6 +2204,7 @@ const GRIEVANCE_FIX: Record<string, string> = {
   "Foreign rule": "the people were not yours in 1444",
   Bloodshed: "a battle was fought here; it fades after 20 years",
   "Heavy taxes": "ends when the tax is normal or lighter; crushing counts twice",
+  "Grasping officials": "the realm has more officials than its cap; ends when it is back within (Government tab)",
 };
 
 /** A province's mood and its grievances, with what each needs to end. */
@@ -2633,12 +2641,26 @@ function offerHtml(o: Snapshot["peaceOffers"][number]): string {
 }
 
 function offersFrom(r: number): string {
-  return snapshot!.peaceOffers.filter((o) => o.from === r).map(offerHtml).join("");
+  return asksHtml(r) + snapshot!.peaceOffers.filter((o) => o.from === r).map(offerHtml).join("");
+}
+
+/** Envoys waiting at the player's court for an answer (DIPL-214). */
+const asksOf = (s: Snapshot) => s.statecraft?.asks ?? [];
+
+/** The answer cards of envoys at your court, all of them or one realm's. */
+function asksHtml(from?: number): string {
+  return asksOf(snapshot!)
+    .filter((a) => from === undefined || a.from === from)
+    .map((a) => askCard(a, (n) => realmButton(n, "diplomacy")))
+    .join("");
 }
 
 function bindOffers(): void {
   panel.querySelectorAll<HTMLButtonElement>("[data-offer]").forEach((b) =>
     b.addEventListener("click", () => void act({ type: "answerPeace", offer: Number(b.dataset.offer), yes: b.dataset.yes === "1" })),
+  );
+  panel.querySelectorAll<HTMLButtonElement>("[data-ask]").forEach((b) =>
+    b.addEventListener("click", () => void act({ type: "answerAsk", ask: b.dataset.ask!, yes: b.dataset.yes === "1" })),
   );
 }
 
@@ -2647,7 +2669,7 @@ function myDiplomacySection(): string {
   const s = snapshot!;
   const ties = s.relations.filter((x) => x.state !== "war");
   const STATE = { truce: "Truce", alliance: "Ally", subject: "Your overlord", overlord: "Your subject", war: "At war" } as const;
-  return `${s.peaceOffers.map(offerHtml).join("")}
+  return `${asksHtml()}${s.peaceOffers.map(offerHtml).join("")}
     <h3 class="sub">Wars</h3>
     ${myWars().length ? myWars()
       .map((w) => `<p>${icon("swords", 1)} Against ${w.theirs.map((n) => realmButton(n, "diplomacy")).join(" ")} <small>since ${monthText(w.start)}</small></p>`)
@@ -2884,7 +2906,7 @@ function renderRealm(r: number): void {
   const inc = s ? s.nationMonthlyIncome[r]! : 0;
   const back = selectedProvince >= 0 && owners[selectedProvince] === r ? provinces[selectedProvince]! : null;
   const mine = !!s && s.playerNation === r;
-  if ((!s && realmTab !== "heritage") || (s && (realmTab === "treasury" || realmTab === "food" || realmTab === "military" || realmTab === "mercenaries" || realmTab === "officials" || realmTab === "lords" || realmTab === "provinces" || realmTab === "learning") && !mine)) realmTab = "general";
+  if ((!s && realmTab !== "heritage") || (s && (realmTab === "government" || realmTab === "treasury" || realmTab === "food" || realmTab === "military" || realmTab === "mercenaries" || realmTab === "officials" || realmTab === "lords" || realmTab === "provinces" || realmTab === "learning") && !mine)) realmTab = "general";
   const strengths = realmStrengths(n.id);
   const tab = (key: typeof realmTab, label: string) => `<button class="tab${realmTab === key ? " on" : ""}" data-realm-tab="${key}">${label}</button>`;
   const general = `
@@ -2898,6 +2920,7 @@ function renderRealm(r: number): void {
       <dt>People</dt><dd>${fmt(people)}</dd>
       <dt>Wealth</dt><dd>${icon("coin", 1)} ${wealth} across its lands</dd>
       ${s ? `<dt>Treasury</dt><dd>${mine ? `<button class="paper" data-realm-open-tab="treasury" title="Open the ledger">${icon("coin", 1)}${fmt(s.nationTreasury[r]!)} gold <small>${inc >= 0 ? "+" : ""}${inc.toFixed(1)} a month</small></button>` : `${fmt(s.nationTreasury[r]!)} gold <small>${inc >= 0 ? "+" : ""}${inc.toFixed(1)} a month</small>`}</dd>
+      ${mine && s.government ? governmentLine(s.government) : `<dt>Government</dt><dd>${esc(s.realmForms[r] ?? "")}</dd>`}
       <dt>Recruits</dt><dd>${fmt(s.nationLevies[r]!)} men who can be called</dd>
       <dt>Armies</dt><dd>${armies.length} in the field, ${fmt(men)} men</dd>
       ${mine && s.research ? learningLine(s.research) : realmLearningLine(s.realmResearch[r])}
@@ -2918,6 +2941,7 @@ function renderRealm(r: number): void {
   const content =
     realmTab === "heritage" ? heritageTab(strengths)
     : realmTab === "diplomacy" ? (mine ? myDiplomacySection() : offersFrom(r) + relationsSection(r))
+    : realmTab === "government" && s?.government ? governmentTab(s.government)
     : realmTab === "treasury" ? treasurySection()
     : realmTab === "food" ? foodTab(s!, (p) => provinces[p]!.name, (p) => (mapImage ? provinceThumb(mapImage, provinces.length, p, n.color) : ""), own)
     : realmTab === "military" ? warRoomSection()
@@ -2929,7 +2953,7 @@ function renderRealm(r: number): void {
     : general;
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(n.name)}</h2>${closeButton()}</header>
-    ${s ? `<nav class="tabs">${tab("general", "General")}${tab("heritage", "Heritage")}${mine ? tab("treasury", "Treasury") + tab("food", "Food") + tab("provinces", "Provinces") + tab("learning", "Learning") : ""}${tab("diplomacy", "Diplomacy")}${mine ? tab("military", "Military") + tab("officials", "Officials") + tab("lords", "Lords") + tab("mercenaries", "Mercenaries") : ""}</nav>` : `<nav class="tabs">${tab("general", "General")}${tab("heritage", "Heritage")}</nav>`}
+    ${s ? `<nav class="tabs">${tab("general", "General")}${mine ? tab("government", "Government") : ""}${tab("heritage", "Heritage")}${mine ? tab("treasury", "Treasury") + tab("food", "Food") + tab("provinces", "Provinces") + tab("learning", "Learning") : ""}${tab("diplomacy", "Diplomacy")}${mine ? tab("military", "Military") + tab("officials", "Officials") + tab("lords", "Lords") + tab("mercenaries", "Mercenaries") : ""}</nav>` : `<nav class="tabs">${tab("general", "General")}${tab("heritage", "Heritage")}</nav>`}
     ${content}
     ${back ? `<button class="back" data-back>${icon("scroll", 2)}Back to ${esc(back.name)}</button>` : ""}`;
   bindClose();
@@ -2991,6 +3015,20 @@ function renderRealm(r: number): void {
       renderPanel();
     }),
   );
+  panel.querySelectorAll<HTMLButtonElement>("[data-reform-ask]").forEach((b) =>
+    b.addEventListener("click", () => {
+      governmentUi.confirm = b.dataset.reformAsk!;
+      renderPanel();
+    }),
+  );
+  panel.querySelector<HTMLButtonElement>("[data-reform-cancel]")?.addEventListener("click", () => {
+    governmentUi.confirm = null;
+    renderPanel();
+  });
+  panel.querySelector<HTMLButtonElement>("[data-reform]")?.addEventListener("click", (e) => {
+    governmentUi.confirm = null;
+    void act({ type: "reform", to: (e.currentTarget as HTMLButtonElement).dataset.reform! });
+  });
   bindOffers();
   bindCommand();
   bindTax(-1);

@@ -8,11 +8,11 @@ Every system of Pocket Hegemony as a bounded context: a domain spec (`spec.md`, 
 | [Audio](audio/spec.md) | AUD | 143 | 15 | 290 | 14 | 1 |
 | [Buildings](buildings/spec.md) | BLD | 175 | 20 | 344 | 23 | 0 |
 | [Culture](culture/spec.md) | CULT | 93 | 7 | 191 | 17 | 0 |
-| [Diplomacy](diplomacy/spec.md) | DIPL | 210 | 23 | 519 | 36 | 0 |
+| [Diplomacy](diplomacy/spec.md) | DIPL | 214 | 23 | 519 | 37 | 0 |
 | [Events](events/spec.md) | EVT | 76 | 10 | 191 | 17 | 0 |
 | [Exploration](exploration/spec.md) | EXPL | 68 | 6 | 126 | 18 | 0 |
 | [Game shell](game-shell/spec.md) | SHELL | 148 | 15 | 403 | 24 | 0 |
-| [Government](government/spec.md) | GOV | 57 | 6 | 261 | 17 | 0 |
+| [Government](government/spec.md) | GOV | 66 | 6 | 261 | 18 | 0 |
 | [Map presentation](map-presentation/spec.md) | VIEW | 87 | 9 | 166 | 9 | 1 |
 | [National strengths](national-strengths/spec.md) | HER | 83 | 13 | 141 | 18 | 0 |
 | [Naval](naval/spec.md) | NAVY | 125 | 9 | 259 | 29 | 0 |
@@ -33,6 +33,6 @@ Every system of Pocket Hegemony as a bounded context: a domain spec (`spec.md`, 
 | [Troop movement](troop-movement/spec.md) | MOVE | 133 | 12 | 246 | 20 | 0 |
 | [Warfare](warfare/spec.md) | WAR | 218 | 17 | 654 | 21 | 0 |
 | [World map](world-map/spec.md) | MAP | 50 | 6 | 175 | 12 | 0 |
-| **All 29 contexts** | | 3320 | 358 | 7927 | 555 | 8 |
+| **All 29 contexts** | | 3333 | 358 | 7927 | 557 | 8 |
 
 Scenarios count each row of a Scenario Outline's examples.

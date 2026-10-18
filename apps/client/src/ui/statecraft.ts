@@ -149,3 +149,41 @@ export function subjectCard(v: StatecraftView | null, r: number): string {
       ${btn("release", "Release", row.why.release, "They go free as your friend.")}
     </div>`;
 }
+
+type AskRow = StatecraftView["asks"][number];
+
+/** What an ask at your court is, and what agreeing and refusing do, in the card's words (DIPL-214). */
+function askWords(a: AskRow): { asks: string; yes: string; no: string; agree: string } {
+  switch (a.action) {
+    case "demand":
+      return a.kind === "pay_tribute"
+        ? { asks: "demands that you pay tribute", agree: "Give in", yes: "You become their tributary: 15 in 100 of your tax and trade each month, with no war.", no: "They hold a war aim on you for 5 years, and if they attack over it your allies get no call." }
+        : {
+            asks: `demands ${a.province ? `${a.province.name}${a.province.capital ? ", your capital" : ""}` : "a province"}`,
+            agree: "Give in",
+            yes: "The province is theirs at once, with no war; you will remember it (Took our land).",
+            no: "They hold a war aim on it for 5 years, and if they attack over it your allies get no call.",
+          };
+    case "propose_alliance":
+      return { asks: "proposes an alliance", agree: "Agree", yes: "Allies answer each other's calls to arms; refusing a defensive call breaks it.", no: "Nothing changes between you." };
+    case "arrange_marriage":
+      return { asks: "proposes a royal marriage", agree: "Agree", yes: "Married houses think better of each other (+15), and a marriage can bring a claim when a ruler dies without an heir.", no: "Nothing changes between you." };
+    case "offer_overlordship":
+      return { asks: "offers to take you under its protection", agree: "Agree", yes: "You become their tributary: they defend you, you send them 15 in 100 of your income each month.", no: "Nothing changes between you." };
+    case "ask_protection":
+      return { asks: "asks for your protection", agree: "Agree", yes: "They become your tributary: 15 in 100 of their income each month, and you owe them defence.", no: "Nothing changes between you." };
+    default:
+      return { asks: `asks you to ${missionName(a.action)}`, agree: "Agree", yes: "", no: "" };
+  }
+}
+
+/** An envoy waiting at your court, as an answer card with Agree or Give in, and Refuse (DIPL-214). */
+export function askCard(a: AskRow, realmButton: (n: number) => string): string {
+  const w = askWords(a);
+  return `<div class="call framed-soft">
+    <p>${icon("scroll", 2)} An envoy of ${realmButton(a.from)} ${esc(w.asks)}.</p>
+    <dl class="facts ask-terms"><dt>${w.agree}</dt><dd>${esc(w.yes)}</dd><dt>Refuse</dt><dd>${esc(w.no)}</dd></dl>
+    <p class="hint">He waits at your court until ${monthText(a.until)}; no answer by then is a refusal.</p>
+    <div class="choices"><button class="${a.action === "demand" ? "paper" : "wax"}" data-ask="${esc(a.id)}" data-yes="1">${w.agree}</button><button class="${a.action === "demand" ? "wax" : "paper"}" data-ask="${esc(a.id)}" data-yes="0">Refuse</button></div>
+  </div>`;
+}
