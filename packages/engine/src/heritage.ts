@@ -172,11 +172,11 @@ export function ageClock(world: World): { active: string[]; ended: string[] } {
 /**
  * The provinces of each area, region and named province heritage owns or
  * scopes a lever to: the event tree's table (D-EVT-17), then the heritage
- * gazetteer's boxes and points (D-HER-16), worked out once.
+ * gazetteer's boxes and points (D-HER-16), worked out once per ruleset.
  */
-const targetCache = new WeakMap<World, Map<string, number[]>>();
+const targetCache = new WeakMap<World["rules"], Map<string, number[]>>();
 function targets(world: World): Map<string, number[]> {
-  let m = targetCache.get(world);
+  let m = targetCache.get(world.rules);
   if (m) return m;
   m = new Map();
   for (const [key, ids] of Object.entries(places.places as Record<string, string[]>)) m.set(key, ids.map((id) => world.provinceIndex.get(id) ?? -1).filter((p) => p >= 0));
@@ -193,14 +193,14 @@ function targets(world: World): Map<string, number[]> {
     }
     if (best >= 0) m.set(key, [best]);
   }
-  targetCache.set(world, m);
+  targetCache.set(world.rules, m);
   return m;
 }
 
-/** Heritage place names bound once to their province (D-HER-16). */
-const bound = new WeakMap<World, Map<string, number>>();
+/** Heritage place names bound once per ruleset to their province (D-HER-16). */
+const bound = new WeakMap<World["rules"], Map<string, number>>();
 function placeProvinces(world: World, g: GameHeritage): Map<string, number> {
-  let m = bound.get(world);
+  let m = bound.get(world.rules);
   if (m) return m;
   m = new Map();
   const names = new Set<string>();
@@ -211,7 +211,7 @@ function placeProvinces(world: World, g: GameHeritage): Map<string, number> {
     const p = id ? world.provinceIndex.get(id) : undefined;
     if (p !== undefined) m.set(name, p);
   }
-  bound.set(world, m);
+  bound.set(world.rules, m);
   return m;
 }
 
@@ -244,17 +244,17 @@ const SEAS: Record<string, [number, number, number, number]> = {
   java_sea: [105, -8, 120, -2],
 };
 
-/** The named seas each sea zone belongs to, worked out once. */
-const seaNames = new WeakMap<World, string[][]>();
+/** The named seas each sea zone belongs to, worked out once per ruleset. */
+const seaNames = new WeakMap<World["rules"], string[][]>();
 function seasOf(world: World): string[][] {
-  let out = seaNames.get(world);
+  let out = seaNames.get(world.rules);
   if (out) return out;
   out = world.rules.provinces.map((p, k) => {
     if (!world.provinceWater[k] || p.x === undefined || p.y === undefined) return [];
     const { lon, lat } = lonLatOf(p.x, p.y);
     return Object.entries(SEAS).filter(([, [w, s, e, n]]) => lon >= w && lon <= e && lat >= s && lat <= n).map(([id]) => id);
   });
-  seaNames.set(world, out);
+  seaNames.set(world.rules, out);
   return out;
 }
 
