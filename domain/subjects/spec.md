@@ -389,6 +389,20 @@ Newest decision first.
 - SUBJ-109 When a subject's ruler dies without an heir, the subjects context shall apply SUBJ-071 and SUBJ-072 and ignore foreign marriage claims (diplomacy 6.2). [subjects 7.1; D-SUBJ-22]
 - SUBJ-110 The subjects context shall stop the seasonal count at Disloyal; a subject goes In revolt only by SUBJ-076. [subjects 3.1, 8.2; D-SUBJ-24]
 
+### 5.19 Subjects in the game today
+
+The first game slice of subjects (milestone 5, D-SUBJ-26) runs the kinds, loyalty, tribute and four overlord actions on every subject tie in the diplomacy graph. Folding in, tightening, residents, hostages, risings and independence wars come in later slices.
+
+- SUBJ-111 Each month every subject shall send its overlord its kind's share times the tribute level times what its loyalty pays (Loyal all, Wavering half, Disloyal nothing): a Vassal out of its taxes, every other kind out of its tax and trade, shown as the *Tribute* line of both treasuries' ledgers. [SUBJ-005, SUBJ-026, SUBJ-037; D-SUBJ-26]
+- SUBJ-112 Each subject tie shall carry its bond (kind, loyalty, tribute level, timed reasons) in the save; a 1444 subject starts from its data's autonomy and stance (SUBJ-036), and a subject the game makes (a demand given in to, an agreement) starts Loyal and held from that month. [SUBJ-036, SUBJ-065]
+- SUBJ-113 At the end of March, June, September and December each subject's reasons shall be counted and move its loyalty by SUBJ-030 and SUBJ-031, from what the game knows: soldiers, provinces, people (the realms' name books), stance, a common enemy, its own subjects, tribute level, gifts, kind's drift and *Stretched thin* against a reach of 5 for every realm; the player hears when its subjects' or its own loyalty moves. [SUBJ-030 … SUBJ-034, SUBJ-058; D-SUBJ-26]
+- SUBJ-114 A Vassal or Protectorate called to its overlord's war shall answer by its loyalty, and a Disloyal one refuses; a Union joins unless Disloyal and a Tributary is never called (D-DIPL-10). [SUBJ-008, SUBJ-028, SUBJ-038]
+- SUBJ-115 The overlord shall be able to set the tribute level, send a gift (six months of the subject's income, +1 for 5 years), loosen a Vassal or Protectorate to a Tributary (+2 for 10 years) and release a subject (free and Friendly); each unavailable action names why. AI overlords loosen a Disloyal subject while at war. [SUBJ-037, SUBJ-039, SUBJ-045, SUBJ-046, SUBJ-048, SUBJ-098]
+- SUBJ-116 A realm shall be able to send an envoy to *Offer overlordship* to a smaller realm, or to *Ask for protection* of a larger one, when neither has an overlord or alliance with the other; a yes makes the smaller realm a Tributary, or a Vassal when it asked. Once a year an AI court weighs offering overlordship to the neighbour that thinks best of it, within its reach plus 1. [SUBJ-086, SUBJ-098; DIPL-197]
+
+#### How the player uses it: subjects
+- SUBJ-117 Where: the player's own realm card, Diplomacy tab, *Subjects*: reach used of reach and the month's tribute, then one 44-point row per subject (worst loyalty first) with kind, loyalty, up and down arrows, what it pays and its worst reason; tapping the realm opens the subject's own Diplomacy tab, where *Your vassal* (or tributary, …) shows its loyalty, every reason as a named badge, what it pays and how it comes to war, five tribute buttons and *Send a gift*, *Loosen to tributary* and *Release*, each with what it does or why not. A realm that is someone's subject sees *Your overlord* with its own badges. *Offer overlordship* and *Ask for protection* sit with the other envoy missions. Grouping and overview: everything about subjects sits on the Diplomacy tabs; the realm card's Stability plaque shows the subjects pillar at a glance and opens the Diplomacy tab; the Treasury tab's *Tribute* line totals what they pay. Phone: rows, badges and tribute buttons wrap in the Tall layout, every button at least 44 points, nothing that needs hover. [X-19, SUBJ-091, SUBJ-092]
+
 ## 6. Commands
 
 | Command | Who | Preconditions | Result | Events emitted |
@@ -559,6 +573,7 @@ All in `subjects/config/subject-rules.json`; all placeholders.
 - **D-SUBJ-23** (was OQ-SUBJ-23) Colonies: "mostly settlers" means more than 50 % settler people; settlers in a Settled colony become a peace voice. Outposts stay Loyal and have no count; the seasonal count starts at Settled. These are the simplest readings.
 - **D-SUBJ-24** (was OQ-SUBJ-24) In revolt: the seasonal count stops at Disloyal; a subject goes In revolt only by the conditions of 8.2 (a backer, the overlord losing, or an event). It keeps risings deliberate.
 - **D-SUBJ-25** (was OQ-SUBJ-25) Reason names: "Official lent" (+1), "Hostage harmed" (−2) and "Force used" (−1). Kin and Hostage at court are separate ties and stack (+2). Each reason is named once.
+- **D-SUBJ-26** First game slice of subjects (milestone 5, provisional): every realm has a subject reach of 5 (moderate) until the catalogue's administrative capacity is read; faith and *Far away* give no reasons yet (no faith data, no distance rule); grain tribute, residents, hostages, tightening, folding in, risings and the subjects lens wait for their slices. A subject's loyalty is counted only at season ends, so the turn stays cheap.
 
 ## 14. Traceability
 
@@ -697,3 +712,5 @@ All in `subjects/config/subject-rules.json`; all placeholders.
 | SUBJ-108 | raising-lords.feature | What a raised lord becomes |
 | SUBJ-109 | folding-in.feature | Inheriting a subject |
 | SUBJ-110 | loyalty.feature | The seasonal count |
+| SUBJ-111 … SUBJ-116 | — | Engine: packages/engine/test/subjects.test.ts (1444 bonds, payments by kind and loyalty, season count, gift, loosen and release, agreements, save) |
+| SUBJ-117 | — | Presentation: apps/client/src/ui/statecraft.ts, Subjects and the subject card |

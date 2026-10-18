@@ -2610,4 +2610,46 @@ button.paper.over {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 6px;
+/* ---- Subjects on the Diplomacy tab (SUBJ-091, SUBJ-092) ---- */
+
+/* Loyalty steps tinted green, ochre, orange and red, as the subjects config names them. */
+.loyalty-loyal { color: #3d6b2a; }
+.loyalty-wavering { color: #8a6a12; }
+.loyalty-disloyal { color: #a4521a; }
+.loyalty-in-revolt { color: var(--cloth); }
+
+.subject-row {
+  min-height: 44px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  border-top: 1px solid var(--outline);
+}
+
+/* Named reasons as badges pointing up or down; they wrap on a narrow phone. */
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 4px 0;
+}
+.badge {
+  border: 1px solid var(--outline);
+  padding: 1px 6px;
+  font-size: 0.85em;
+  background: var(--paper-light);
+}
+.badge.up { color: #3d6b2a; }
+.badge.down { color: #a4521a; }
+
+/* Five tribute levels: 44-point buttons that wrap to two rows in Tall layout. */
+.choices.tribute {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.choices.tribute button {
+  flex: 1 1 4.5em;
+  min-height: 44px;
 }
