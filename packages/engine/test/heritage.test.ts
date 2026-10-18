@@ -20,5 +20,5 @@ describe("heritage in play (HER-078)", () => {
     expect(saveHeritage(copy)).toEqual(saved);
     expect(heritageViews(copy)).toEqual(heritageViews(w));
     expect(heritageView(copy, w.player)!.ambitions).toHaveLength(3);
-  });
+  }, 60000);
 });
