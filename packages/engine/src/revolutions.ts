@@ -1,3 +1,4 @@
+import { revolutionRuler } from "./rulers.ts";
 import type { World } from "./world.ts";
 import type { News } from "./war.ts";
 import type { Order } from "./turn.ts";
@@ -377,6 +378,8 @@ export function applyRegime(world: World, n: number, id: string, leader: string 
   if (reg.ruler === "replaced") ((r.ruler = leader ?? "a leader of the rising"), (r.rulerRule = "replaced"), (r.emigre = true));
   else if (reg.ruler === "elected") ((r.ruler = ""), (r.rulerRule = "elected"));
   else if (reg.ruler === "deposed") ((r.ruler = ""), (r.rulerRule = "elected"), (r.emigre = true));
+  // The ruler on the General tab follows (REALM-233): the rising's leader, or an elected one.
+  if (reg.ruler === "replaced" || reg.ruler === "elected" || reg.ruler === "deposed") revolutionRuler(world, n, reg.ruler === "replaced" ? r.ruler : null);
   r.locks = [...(reg.locks ?? [])];
   r.regime = id;
   r.regimeSince = when(world);

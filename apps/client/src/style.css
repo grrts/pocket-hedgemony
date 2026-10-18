@@ -3335,16 +3335,6 @@ button.paper.over {
   padding: 0 4px;
   font-size: 19px;
 }
-/* The two modes sit in the row like the other buttons, so the row wraps only when it must. */
-.route-mode {
-  display: contents;
-}
-.route-mode button.on {
-  border-image-source: var(--ui-btn-paper-down);
-}
-.route-mode button.on::before {
-  content: "● ";
-}
 /* On a short phone the bar keeps to the essentials, so the map above stays tappable. */
 @media (max-height: 420px) {
   .route-bar .best {
@@ -4013,6 +4003,51 @@ small.why {
   border-style: dashed;
   opacity: 0.6;
 }
+/* A ladder's level, such as 3/5, in the badge's corner (ACH-086). */
+.ach-badge {
+  position: relative;
+}
+.ach-level {
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  padding: 0 3px;
+  font: 600 12px/14px var(--body);
+  font-style: normal;
+  color: var(--paper-light);
+  background: var(--outline);
+  text-shadow: none;
+}
+.ach-levels {
+  grid-column: 1 / -1;
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+}
+.ach-levels li {
+  display: grid;
+  grid-template-columns: 20px 1fr auto;
+  gap: 6px;
+  align-items: center;
+  padding: 3px 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.15);
+  opacity: 0.7;
+}
+.ach-levels li.earned {
+  opacity: 1;
+}
+.ach-levels li > b {
+  font-size: 17px;
+  text-align: center;
+}
+.ach-levels li em {
+  font-style: normal;
+  white-space: nowrap;
+}
+.ach-levels li.earned em {
+  color: #3d6b2a;
+  font-weight: 600;
+}
 
 .ach-head {
   display: flex;
@@ -4289,6 +4324,32 @@ small.why {
   flex-wrap: wrap-reverse;
   align-content: flex-start;
   max-height: calc(100dvh - env(safe-area-inset-top) - 52px - max(10px, env(safe-area-inset-bottom)) - 76px);
+}
+
+/* The ruler's traits on the General tab (REALM-240): each trait with what it does, wrapping on a phone. */
+.facts dd.traits {
+  gap: 2px 10px;
+}
+.facts dd.ruler {
+  gap: 2px 6px;
+}
+/* What the fallen do, on its own line so it wraps on a narrow panel (REALM-241). */
+.facts dd small.line {
+  flex: 1 1 100%;
+  min-width: 0;
+  white-space: normal;
+}
+.facts dd.traits span {
+  display: inline-flex;
+  gap: 4px;
+  align-items: baseline;
+}
+/* A low Faith % or Tongue % says what it stirs under its button (REALM-238). */
+.facts dd em.warn {
+  flex: 1 1 100%;
+  font-style: normal;
+  font-weight: 400;
+  font-size: 14px;
 }
 
 /* Revolutions (REVO-090 to REVO-093): the mark on the Stability plaque, the

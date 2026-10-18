@@ -10,7 +10,7 @@ import { CLASS_COUNT, classIndex } from "../src/living.ts";
 import { workIndex, WORK_COUNT, worksAt } from "../src/works.ts";
 import { tradeConfig } from "../src/domain/trade/index.ts";
 import {
-  bestRoute, dismissTrader, draftTradeRoute, estimateLoop, foundProblem, foundTrader, isTradeStop, kindRow, loopPath, monthlyTrade, provinceWares,
+  bestRoute, dismissTrader, draftTradeRoute, estimateLoop, foundProblem, foundTrader, isTradeStop, kindRow, loopPath, monthlyTrade, provinceWares, refreshTradeValues,
   routeProblem, setTradeRoute, startCount, tradeLine, tradeTaxFactor, tradeValueAt, tradeView, warePrice,
 } from "../src/trade.ts";
 
@@ -69,7 +69,7 @@ describe("trade in the game (TRADE-129 to TRADE-140)", () => {
     expect(startCount(w, ven)).toBe(6);
     expect(w.traders.filter((t) => t.owner === ven).length).toBeGreaterThan(0);
     expect(w.traders.filter((t) => t.owner === fra).length).toBeLessThanOrEqual(startCount(w, fra));
-    for (const t of w.traders) expect(t.stops.length).toBeGreaterThanOrEqual(2);
+    for (const t of w.traders) expect(t.stops.length).toBe(2);
     expect(Array.from(w.provinceTradeRatio).filter((r) => r > 0).length).toBeGreaterThan(200);
     // The ledger opens with a month of trade in it.
     expect(w.nationLedger[ven * LEDGER_LINES + LEDGER.indexOf("trade")]).toBeGreaterThan(0);
@@ -140,13 +140,14 @@ describe("trade in the game (TRADE-129 to TRADE-140)", () => {
     expect(foundProblem(x, fra, city, "pack_caravan")).toMatch(/^needs .* gold$/);
   });
 
-  it("sets a route of 2 to 8 trade stops, refuses others, previews a drawn one and dismisses a trader (TRADE-136, TRADE-137)", () => {
+  it("sets a route from one trade stop to another, refuses others, previews a drawn one and dismisses a trader (TRADE-136, TRADE-137)", () => {
     const x = createWorld(rules, 1, tiles);
     x.player = fra;
     const t = x.traders.find((y) => y.owner === fra && y.kind !== "cog_junk_dhow")!;
     const stops = own(x, fra).filter((p) => isTradeStop(x, p, t.kind)).slice(0, 3);
-    expect(routeProblem(x, fra, t.kind, stops.slice(0, 1))).toBe("a route needs at least 2 stops");
-    expect(routeProblem(x, fra, t.kind, Array(9).fill(stops[0]))).toBe("a route has at most 8 stops");
+    expect(routeProblem(x, fra, t.kind, stops.slice(0, 1))).toBe("a route has a start and an end");
+    expect(routeProblem(x, fra, t.kind, stops.slice(0, 3))).toBe("a route has a start and an end");
+    expect(routeProblem(x, fra, t.kind, [stops[0]!, stops[0]!])).toBe("pick two different cities");
     const village = [...Array(x.provinceCount).keys()].find((p) => !x.provinceWater[p] && x.provinceOwner[p]! >= 0 && !isTradeStop(x, p, t.kind) && x.provinceOwner[p] === fra) ?? [...Array(x.provinceCount).keys()].find((p) => !x.provinceWater[p] && !isTradeStop(x, p, t.kind))!;
     expect(routeProblem(x, fra, t.kind, [stops[0]!, village])).toMatch(/is not a city or a market town$/);
     expect(setTradeRoute(x, nation(x, "england"), t.id, stops)).toBe("not your trader");
@@ -155,11 +156,10 @@ describe("trade in the game (TRADE-129 to TRADE-140)", () => {
     expect(draft.stops).toEqual(stops.slice(0, 2));
     expect(draft.why).toBeNull();
     expect(draft.loopDays).toBeGreaterThan(0);
-    expect(setTradeRoute(x, fra, t.id, stops.slice(0, 2), "there_and_back")).toBeNull();
+    expect(setTradeRoute(x, fra, t.id, stops.slice(0, 2))).toBeNull();
     expect(t.stops).toEqual(stops.slice(0, 2));
-    expect(t.mode).toBe("there_and_back");
     expect(x.tradeDraft).toBeNull();
-    const path = loopPath(x, fra, t.kind, t.stops, t.mode)!;
+    const path = loopPath(x, fra, t.kind, t.stops)!;
     expect(path[0]).toBe(stops[0]);
     expect(path).toContain(stops[1]);
     const home = t.home;
@@ -167,6 +167,21 @@ describe("trade in the game (TRADE-129 to TRADE-140)", () => {
     expect(dismissTrader(x, fra, t.id)).toBeNull();
     expect(x.traders.includes(t)).toBe(false);
     expect(x.provinceClasses[home * CLASS_COUNT + MARKET_FOLK]).toBeCloseTo(folk + kindRow(x, t.kind).crew / 1000, 5);
+  });
+
+  it("plans the way through the most populated land (TRADE-136, D-TRADE-21)", () => {
+    const x = createWorld(rules, 1, tiles);
+    // A land trader whose way out passes through a few provinces between its two cities.
+    const t = x.traders.find((y) => y.kind !== "cog_junk_dhow" && (loopPath(x, y.owner, y.kind, y.stops) ?? []).indexOf(y.stops[1]!) >= 4)!;
+    const there = (y: number[]) => y.slice(1, y.indexOf(t.stops[1]!));
+    const before = there(loopPath(x, t.owner, t.kind, t.stops)!);
+    const people = (ps: number[]) => ps.reduce((a, p) => a + x.provincePopulation[p]!, 0) / ps.length;
+    // Empty the land it walks through: the planner now takes a way through land where people live.
+    for (const p of before) x.provincePopulation[p] = 0;
+    refreshTradeValues(x);
+    const after = there(loopPath(x, t.owner, t.kind, t.stops)!);
+    expect(after).not.toEqual(before);
+    expect(people(after)).toBeGreaterThan(people(before));
   });
 
   it("never plans a way through the land of a realm at war with the trader's (TRADE-136)", () => {
@@ -185,13 +200,13 @@ describe("trade in the game (TRADE-129 to TRADE-140)", () => {
     if (again) expect(again.some((q) => x.provinceOwner[q] === foe)).toBe(false);
   });
 
-  it("finds the AI a paying loop from a city (TRADE-139)", () => {
+  it("finds the AI a paying route from a city to one other (TRADE-139)", () => {
     const x = createWorld(rules, 1, tiles);
     const city = own(x, fra).find((p) => worksAt(x, p, workIndex("market")) > 0)!;
     const stops = bestRoute(x, fra, "pack_caravan", city);
     expect(stops).not.toBeNull();
     expect(stops![0]).toBe(city);
-    expect(stops!.length).toBeGreaterThanOrEqual(2);
+    expect(stops!.length).toBe(2);
     expect(estimateLoop(x, fra, "pack_caravan", loopPath(x, fra, "pack_caravan", stops!)!, tradeConfig.game.ai_ratio_floor).expected).toBeGreaterThan(0);
   });
 
