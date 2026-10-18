@@ -148,7 +148,7 @@ function leaderSection(f: FleetView, o: { admiralName: (c: number) => string; id
   return `
     <h3 class="sub">Leader</h3>
     ${f.admiral >= 0
-      ? `<p>${esc(o.admiralName(f.admiral))}, ${esc((post?.name ?? f.post).toLowerCase())} of the fleet.</p>
+      ? `<p><b>${esc(o.admiralName(f.admiral))}</b> <small>(${esc((post?.name ?? f.post).toLowerCase())})</small></p>
         <div class="fleet-posts" role="group" aria-label="Post">${o.posts.map((p) => `<button class="paper${p.key === f.post ? " on" : ""}" data-fleet-post="${p.key}" aria-pressed="${p.key === f.post}">${esc(p.name)}</button>`).join("")}</div>
         ${post ? `<p class="hint">${esc(post.does)}</p>` : ""}`
       : ""}
