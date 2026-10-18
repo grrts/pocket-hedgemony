@@ -282,6 +282,60 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 |---|---|---|---|
 | audio | upstream | Conformist | Terrain under the camera (ambience, province knock pitch), ocean vs coast |
 
+## balance ↔ buildings (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| balance | upstream | Open Host Service | Works commands for the Builder strategy |
+
+## balance ↔ diplomacy (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| balance | upstream | Open Host Service | Lands taken, notoriety, leagues, standing, commands for the Diplomat strategy |
+
+## balance ↔ realm (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| balance | upstream | Open Host Service | Scores, treasury, ledger lines, stability pillars |
+
+## balance ↔ rebellions (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| balance | upstream | Open Host Service | Rebels risen |
+
+## balance ↔ research (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| balance | upstream | Open Host Service | Inventions known |
+
+## balance ↔ scenario-setup (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| balance | upstream | Conformist | The 1444 world, probe realms by id |
+
+## balance ↔ subjects (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| balance | upstream | Open Host Service | Subjects held, folding in |
+
+## balance ↔ time-and-turns (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| balance | upstream | Conformist | The turn, played headless; the date; the January turn |
+
+## balance ↔ warfare (one-sided)
+
+| Said by | Other side is | Pattern | What crosses |
+|---|---|---|---|
+| balance | upstream | Open Host Service | Wars, battles, losses, peace voices, peace outcomes; the war-price rules it checks |
+
 ## buildings ↔ culture (one-sided)
 
 | Said by | Other side is | Pattern | What crosses |

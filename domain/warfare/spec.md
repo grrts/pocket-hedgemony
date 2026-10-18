@@ -665,6 +665,25 @@ Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision
 - WAR-216 Overview: the top of the page gives the companies in service, their men and their pay a month; the Military tab keeps one line ("Free companies: 2 in service, 1 on the way, 5 for hire") that opens the companies' page, and the Military tab stays lit while it is open. [F-52; F-114; X-19]
 - WAR-217 Phone: in landscape the cards are one column across the panel, the Hire and Command buttons are at least 44 × 44 points, the tabs wrap rather than scroll, and nothing needs hover. [F-52; X-19]
 
+### 5.24 The price of war (X-21, Leroy 18 Oct)
+Leroy, 18 October: war has too few downsides and feels overpowered; it should be balanced through diplomacy. These
+rules are the latest decision and replace what they name; the balance model (BAL-014 to BAL-017) checks them.
+
+- WAR-221 The warfare system shall count each side's peace voices in the game by WAR-180, from lords, royal provinces and the capital, in place of the stand-in share of people occupied, and shall apply WAR-181 and WAR-182 to player and AI alike: an obliged ruler who refuses loses a step of loyalty from every lord each season, and levies desert twice as fast. [X-21; WAR-180 to WAR-182]
+- WAR-222 The warfare system shall apply WAR-178 (a war with no fitting aim makes lords who aren't Warlike waver) and WAR-179 (breaking a truce makes every lord waver a step) in the game. [X-21]
+- WAR-223 When a war has lasted `warfare.peace.long_war_years` (2, provisional), every lord of a war leader who isn't Warlike and whose Want is not the war's aim shall say peace with all his voices until the war ends. [X-21]
+- WAR-224 While a province is occupied, the warfare system shall give the occupier `warfare.occupation.tax_share` (half, provisional) of its tax and none of its trade; the rest is lost to the war. This replaces the tax and trade part of PROV-184; recruits and food stay as PROV-184 says. [X-21]
+- WAR-225 While its realm is at war, a levy company shall be paid from its first month; the three free months (F-23) count only for levies kept while the realm is at peace. [X-21; F-23]
+- WAR-226 Men killed in battle, in a siege or a storm, or dead of hunger or sickness shall be taken from the people of the province and class they were levied from, besides counting in *Fallen from here* (X-7), so a war lowers that province's people, tax and recruits for years. [X-21; X-7]
+- WAR-227 A peace shall cede at most `warfare.peace.max_ceded_share` (a third, provisional, rounded up) of the loser's provinces, chosen by the asker among those it occupies, and the loser's capital only when it is the loser's last province; a realm is taken whole only by diplomacy (subjects, unions and folding in, DIPL-224). [X-21]
+- WAR-228 The AI shall declare war only when all of these hold: its side's strength, with the allies that would answer its calls, beats the target's side, with the target's allies, pledgers and every league member against the AI, by `warfare.ai.declare_strength_ratio`; its treasury covers `warfare.ai.war_chest_months` (6, provisional) of the pay its armies would draw at war; its own peace voices would not say peace on the day it declares; and its notoriety is under `diplomacy.ai.notoriety_restraint` (50, provisional) unless its personality is Warlike or a hegemon seeker. [X-21; WAR-196; DIPL-174]
+
+#### How the player uses it: the price of war
+- WAR-229 Where: Declare war on another realm's Diplomacy tab opens the declare sheet, which shows a *Price of war* block above Confirm: who will be called against you (allies, pledgers, league members, each with soldiers), the neighbours who will hold *Threatened us* and how many, your lords who will waver, a truce you would break, the monthly pay of your armies at war, and the most land one peace can take ("at most 4 of their 11 provinces"). Lines that hurt are marked in red with an icon, and each opens its reason on tap. [X-21; X-19]
+- WAR-230 Grouping: everything about a running war sits on its war card in the Diplomacy tab, reached also from the war plaque: the aim, both sides' peace voices as a bar with the half mark, months at war and the long-war mark, provinces occupied each way, and the most one peace can take now. No war fact is spread over other tabs. [X-21; X-19; F-11]
+- WAR-231 Overview: the war plaque in the top bar (REALM-205) shows each war's peace voices for your side as a small bar that turns amber past a third and red past half, when a peace becomes obliged; tapping it opens the war card. [X-21; X-19]
+- WAR-232 Phone: in landscape the declare sheet is two columns in the Wide layout (price on the left, terms on the right) and one scrolling column in the Tall layout, with Confirm pinned inside the safe area; every line and button is at least 44 points tall, bars carry their number as text so colour is never the only sign, and nothing needs hover. [X-21; X-19]
+
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
@@ -857,6 +876,11 @@ file `packages/rules/data/domain/warfare.json` (D-WAR-17).
 | warfare.peace.tribute_years / open_roads_years | Terms | 20 / 10 | yes | warfare |
 | warfare.raid_war_months | Raid war length | 12 | yes | warfare |
 | diplomacy.truce_years | Truce | 5 (+5 if provinces moved or subject made); replaces warfare's 10 | yes | diplomacy |
+| warfare.peace.long_war_years | Years before lords who aren't Warlike say peace (WAR-223) | 2 | yes | warfare |
+| warfare.occupation.tax_share | Share of an occupied province's tax the occupier gets (WAR-224) | half | yes | warfare |
+| warfare.peace.max_ceded_share | Most of the loser's provinces one peace cedes (WAR-227) | a third, rounded up | yes | warfare |
+| warfare.ai.war_chest_months | Months of war pay the AI must hold to declare (WAR-228) | 6 | yes | warfare |
+| warfare.ai.declare_strength_ratio | How much stronger the AI's side must be to declare (WAR-228; the engine's `war.aiDeclareStrengthRatio`) | 2 | yes | warfare |
 
 ## 11. Seams
 
@@ -1195,3 +1219,5 @@ Decided on 17 October 2026 (domain/DECISIONS.md). None of warfare's questions is
 | WAR-212 | features/kinds-and-break-points.feature | Levies stay until the realm sends them home |
 | WAR-213 | features/raising-and-keeping.feature | Free companies of the age, each its own size and mix |
 | WAR-214 to 217 | features/raising-and-keeping.feature | The free companies page |
+| WAR-221 … WAR-228 | features/price-of-war.feature | Peace voices in the game; Refusing an obliged peace costs the ruler; A war with no fitting aim in the game; Lords tire of a long war; Occupation does not pay for the war; Levies at war are paid at once; The dead are missed at home; One peace cannot swallow a realm; The AI counts the price before declaring |
+| WAR-229 … WAR-232 | features/price-of-war.feature | The declare sheet shows the price of war; The war card |
