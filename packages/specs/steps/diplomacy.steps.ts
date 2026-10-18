@@ -2487,3 +2487,61 @@ Then("the envoy picker shows each available official, the days on the road, and 
 Given("the screen is in landscape", (s) => void (s.orientation = "landscape"));
 When("the player opens the card of {string}", (s) => void act(s));
 Then("the card sits on the right of the map instead of covering it", (s) => expect(D.cardPlacement(s.orientation)).toBe("right of the map"));
+
+// ---------------------------------------------------------------- the AI offers peace to the player; war and peace on the Diplomacy tab (playtest feedback)
+
+Given("the player is at war with an AI realm", (s) => {
+  setDate(s, "1450-03-01");
+  D.declareWar(w(s), "Castile", "Portugal");
+  s.player = "Castile";
+  s.ai = "Portugal";
+  // Castile holds two of Portugal's provinces.
+  s.held = { "Castile>Portugal": 2 };
+});
+
+Given("over half of the AI realm's peace voices want peace", (s) => {
+  c(s, s.ai).peaceVoicesForPeace = 0.6;
+  c(s, s.player).peaceVoicesForPeace = 0.2;
+});
+
+When("the month's diplomacy runs", (s) => {
+  setDate(s, "1450-04-01");
+  const held = (a: string, b: string) => s.held[`${a}>${b}`] ?? 0;
+  s.offers = D.aiPeaceOffers(w(s), s.player, held);
+  // A month later the offer still waits, one per realm, its terms brought up to date.
+  setDate(s, "1450-05-01");
+  s.later = D.aiPeaceOffers(w(s), s.player, held, s.offers);
+});
+
+Then("the AI realm sends the player a peace offer to answer", (s) => {
+  expect(s.offers).toEqual([{ from: "Portugal", to: "Castile", terms: "give" }]);
+  expect(s.later).toEqual([{ from: "Portugal", to: "Castile", terms: "give" }]);
+  // The same count as between AI realms: the player's people tired and Portugal holding land asks for it; nothing tired fights on.
+  expect(D.aiPeaceTerms({ ourShare: 0.2, theirShare: 0.7, weHold: 3, theyHold: 0, months: 4 })).toBe("take");
+  expect(D.aiPeaceTerms({ ourShare: 0.6, theirShare: 0.1, weHold: 0, theyHold: 0, months: 4 })).toBe("white");
+  expect(D.aiPeaceTerms({ ourShare: 0.2, theirShare: 0.2, weHold: 1, theyHold: 1, months: 4 })).toBeNull();
+});
+
+When("the player opens the country card of {string}", (s, x: string) => {
+  s.cardTabs = D.countryCardTabs(w(s), "Hungary", x);
+  D.declareWar(w(s), "Hungary", x);
+  s.atWarTabs = D.countryCardTabs(w(s), "Hungary", x);
+});
+
+Then("declare war, offer peace and ask for peace are on its Diplomacy tab", (s) => {
+  const labels = (t: { label: string }[]) => t.map((x) => x.label);
+  for (const a of ["Declare war", "Offer peace", "Ask for peace", "Peace table"]) {
+    expect(labels(s.cardTabs.Diplomacy.actions)).toContain(a);
+    expect(labels(s.atWarTabs.Diplomacy.actions)).toContain(a);
+  }
+  // At peace Declare war is open; at war the peace actions are.
+  expect(s.cardTabs.Diplomacy.actions.find((x: { label: string }) => x.label === "Declare war").whyNot).toBeUndefined();
+  expect(s.atWarTabs.Diplomacy.actions.find((x: { label: string }) => x.label === "Offer peace").whyNot).toBeUndefined();
+  // Allies, enemies and oaths broken move there too (REALM-176).
+  expect(s.atWarTabs.Diplomacy.lines).toContain("Enemies 1");
+});
+
+Then("they are not on its General tab", (s) => {
+  expect(s.cardTabs.General).toEqual([]);
+  expect(s.atWarTabs.General).toEqual([]);
+});

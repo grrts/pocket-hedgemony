@@ -884,19 +884,20 @@ export interface PeaceOffer {
  * (feedback 10), by the counts it uses between AI realms: when it is losing,
  * it gives up what the player holds; when the player's people want peace
  * and it holds the player's land, it asks for that; after a long war, or
- * when its own people want peace, a white peace. An offer lasts a month.
+ * when its own people want peace, a white peace. An offer waits until the
+ * player answers it or the war ends (SHELL-141): a later month may change
+ * its terms, never add a second offer from the same realm.
  */
 function aiOffersPeace(world: World, war: dip.War, ai: number, news: News[]): void {
   const sa = sidesOf(world, war, ai);
-  const shareAi = peaceShare(world, sa.ours, sa.theirs);
-  const sharePlayer = peaceShare(world, sa.theirs, sa.ours);
-  const months = dip.monthsBetween(war.start, dip.monthOf(world.diplomacy.date));
   const lost = occupiedBy(world, sa.ours, sa.theirs).length;
   const won = occupiedBy(world, sa.theirs, sa.ours).length;
-  const terms: PeaceTerms | null =
-    shareAi > wf.W.peace.half && lost ? "give" : sharePlayer > wf.W.peace.half && won ? "take" : shareAi > wf.W.peace.half || rel.aiMustAcceptPeace(months) ? "white" : null;
+  const terms = aiPeaceCount(world, war, sa, lost, won);
   if (!terms) return;
-  world.peaceOffers.push({ id: world.turn * 100 + world.peaceOffers.length, from: ai, terms });
+  const waiting = world.peaceOffers.find((o) => o.from === ai);
+  if (waiting?.terms === terms) return;
+  if (waiting) waiting.terms = terms;
+  else world.peaceOffers.push({ id: world.turn * 100 + world.peaceOffers.length, from: ai, terms });
   const what = terms === "give" ? `and gives up the ${lost} province${lost === 1 ? "" : "s"} you hold` : terms === "take" ? `if you give up the ${won} province${won === 1 ? "" : "s"} it holds` : "with no land changing hands";
   news.push({ kind: "peace", text: `${name(world, ai)} offers peace ${what}.`, nations: [ai, world.player] });
 }
@@ -917,7 +918,8 @@ export function monthlyDiplomacy(world: World, news: News[]): void {
   const d = world.diplomacy;
   rel.expireTruces(d.graph);
   d.calls = d.calls.filter((c) => d.wars.some((w) => w.id === c.war));
-  world.peaceOffers = [];
+  // An offer waits for the player's answer while its war lasts.
+  world.peaceOffers = world.peaceOffers.filter((o) => warBetween(world, o.from, world.player));
   // AI wars end by the same counts: the losing leader gives up what it has lost, or both tire of it.
   for (const war of [...d.wars]) {
     const att = world.nationIndex.get(war.declarer)!;
@@ -927,14 +929,26 @@ export function monthlyDiplomacy(world: World, news: News[]): void {
       aiOffersPeace(world, war, att === world.player ? def : att, news);
       continue;
     }
+    // The attacker counts first, then the defender: the same count the player's enemies use (DIPL-195).
     const sa = sidesOf(world, war, att);
-    const shareDef = peaceShare(world, sa.theirs, sa.ours);
-    const shareAtt = peaceShare(world, sa.ours, sa.theirs);
-    const months = dip.monthsBetween(war.start, dip.monthOf(d.date));
-    if (shareDef > wf.W.peace.half && occupiedBy(world, sa.theirs, sa.ours).length) offerPeace(world, att, def, "take", news, true);
-    else if (shareAtt > wf.W.peace.half && occupiedBy(world, sa.ours, sa.theirs).length) offerPeace(world, def, att, "take", news, true);
-    else if (rel.aiMustAcceptPeace(months)) offerPeace(world, att, def, "white", news, true);
+    const attHolds = occupiedBy(world, sa.theirs, sa.ours).length;
+    const defHolds = occupiedBy(world, sa.ours, sa.theirs).length;
+    const byAtt = aiPeaceCount(world, war, sa, defHolds, attHolds);
+    const byDef = byAtt ? null : aiPeaceCount(world, war, { ours: sa.theirs, theirs: sa.ours }, attHolds, defHolds);
+    if (byAtt) offerPeace(world, att, def, byAtt, news, true);
+    else if (byDef) offerPeace(world, def, att, byDef, news, true);
   }
+}
+
+/** The terms the AI side `sa.ours` settles for (domain diplomacy's count): `lost` of its provinces held by the other side, `won` of theirs held by it. */
+function aiPeaceCount(world: World, war: dip.War, sa: { ours: number[]; theirs: number[] }, lost: number, won: number): PeaceTerms | null {
+  return dip.aiPeaceTerms({
+    ourShare: peaceShare(world, sa.ours, sa.theirs),
+    theirShare: peaceShare(world, sa.theirs, sa.ours),
+    weHold: won,
+    theyHold: lost,
+    months: dip.monthsBetween(war.start, dip.monthOf(world.diplomacy.date)),
+  });
 }
 
 // ---------------------------------------------------------------- AI

@@ -668,6 +668,12 @@ Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision
 - DIPL-195 The AI shall offer peace to the player by the same rules it uses to make peace between AI realms (peace voices, exhaustion, WAR-196), sending the player an incoming peace offer to answer (game-shell SHELL-092). [F-10]
 - DIPL-196 The diplomacy context shall put a country's war and peace actions (declare war, offer or ask peace, open the peace table) on the Diplomacy tab of its country card. [F-11]
 
+#### How the player uses it: war, peace and AI peace offers
+- Where: another realm's country card, Diplomacy tab (DIPL-196, SHELL-140). At peace the tab ends with *Declare war*; at war the missions give way to the war: who fights on each side, the land each side holds of the other's, and the peace terms as 44-point buttons (*Peace: take N provinces*, *White peace*, *Give up N provinces*). Nothing about war or peace sits on the General tab.
+- An AI peace offer (DIPL-195) comes from the AI war leader in the month's diplomacy, by the counts it uses between AI realms: it gives up what the player holds when its own peace voices pass half and it has lost land, asks for what it holds when the player's pass half, and offers a white peace when its own pass half or the war has run its course. The offer waits until the player answers it or the war ends; a later month may change its terms, never add a second offer from the same realm. It shows in one line what it gives or asks, with *Make peace*, *Fight on* and *Later*.
+- Grouping and overview: the offer lives on the realm's Diplomacy tab and, with everything else waiting for an answer, at the top of the Dispatches; a dot on the Diplomacy tab and the Dispatches count show it at a glance (SHELL-141).
+- Phone: the tab fits the side panel in the Wide and Tall layouts, every button at least 44 points, nothing that needs hover.
+
 ### 5.25 Envoys in the game (milestone 5, first slice)
 The library's envoys, asks, answers and ledgers now run in the game's month for every realm (D-DIPL-35). This slice wires four missions: propose an alliance, arrange a marriage, a courtesy visit and a gift. Demands follow in 5.26; subjects, passage and the rest in later slices.
 
