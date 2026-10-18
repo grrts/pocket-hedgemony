@@ -63,6 +63,7 @@ Newest decision first.
 | Siege reserve | Months of food a castle keeps and never spreads | Army food reserve (warfare) |
 | Royal province | A province held directly, without a lord | Lord's province |
 | Official | A person who runs one royal province; also the source of envoys | Lord |
+| Titles | What a realm calls its lords and officials, by its culture (daimyo, boyar, chief); words only | Post type (Warden, Judge) |
 | Lord | A named holder of land with his own retinue, wealth, traits, want, loyalty and heir | Courtier; subject ruler |
 | Retinue | A lord's own soldiers raised from his lands | Levy |
 | Loyalty | Loyal, Wavering, Disloyal, In revolt | Opinion (diplomacy) |
@@ -388,6 +389,13 @@ The ruler and family rules of §5.11, the Fallen line of §5.10 and the faith an
 #### How the player uses it: the ruler, the fallen and belief
 - REALM-240: The ruler lives on the General tab of the country card, of every realm, under the Stability section: the Ruler line (title, name, age and years on the throne), the Regent while there is one, the Traits line with what each trait does in a few words, and the Heir with age, or, with none, who would follow under the realm's law. A ruler's death, a child coming of age and a birth reach the player as a dispatch with the crown icon that opens his own General tab. [REALM-100 to REALM-104, X-19]
 - REALM-241: The Fallen (10 yrs) line on the player's General tab shows the count with what it does: how much slower recruits refill and the share of voices it adds for peace. A low Faith % or Tongue % marks its button on the General tab and says under it, in one line, what it stirs (faith risings, lords of other faiths wavering; separatists, slower officials). The overview is the General tab itself, opened from the Stability plaque. On a phone in landscape these are lines of the side panel in the Wide and Tall layouts, traits wrap under the label, nothing needs hover and each button is at least 44 points high. [REALM-096, REALM-065, REALM-066, X-19]
+### 5.24 Titles by culture (Leroy, 18 October)
+Lords and officials are called what their own culture called them, so a Mongol realm has noyans and a Haudenosaunee one has chiefs. The rules are the same everywhere; only the words change (REALM-242).
+
+- REALM-242: A realm's lords and officials shall carry its culture's titles, singular and plural, from `titles` in the realm data: by the family of its court language first (boyar and voivode for Slavic, bey and subashi for Turkic, daimyo and daikan for Japanese, ras and shum for Ethiopian, tlatoani and calpixqui for Nahua, kuraka and tocricoc for Andean, sachem for Algonquian, chief for Iroquoian, Bantu and Mande), then by its government form's family (a kin form calls them chiefs and headmen), then lord and official. A realm that changes its court language or its form takes the new words. Titles are words only: no rule reads them. [Leroy 18 October; provisional]
+
+#### How the player uses it: titles
+- REALM-243: The player reads the titles wherever lords and officials show, with no screen of their own: the country card's tabs (Lords and Officials become, for example, Daimyo and Daikan), the two Stability pillars on the General tab, the Lords map mode, the Lords tab and a lord's screen, the Officials tab and an official's screen, and the "Governed by" card of a province. Another realm's card uses that realm's words, so the player sees whose court it is. The post types (Warden, Tax collector, Judge and the rest) stay the same everywhere. On a phone in landscape the words take the place of the old labels in the Wide and Tall layouts; the longest plural tab label (Myothugyis, Tocricocs) is no longer than Mercenaries, and nothing needs hover. [X-19]
 
 ## 6. Commands
 
@@ -767,3 +775,5 @@ Every requirement has at least one scenario. REALM-005 and REALM-156 are also pr
 | REALM-239 | people-and-land.feature | Revolt spreads to neighbours |
 | REALM-240 | — | Presentation only: checked on phone screenshots in landscape (apps/client/scripts/ruler-shots.mjs) |
 | REALM-241 | — | Presentation only: checked on phone screenshots in landscape (apps/client/scripts/ruler-shots.mjs) |
+| REALM-242 | lords.feature | Lords and officials take their culture's titles |
+| REALM-243 | — | Presentation only: the labels that read the titles (packages/engine/test/titles.test.ts and phone screenshots) |

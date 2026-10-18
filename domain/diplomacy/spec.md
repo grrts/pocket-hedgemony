@@ -722,6 +722,20 @@ An envoy can now be stationed at a foreign court to work against its ruler: on o
 #### How the player uses it: courting
 - DIPL-220 Where: a foreign lord's screen (a tap on his land opens the province, whose *Governed by* row has a *Lord* button) shows *Court him* under his loyalty: a 44-point button with one line on what it does (he loses a step each season, defects with his land after a year if Disloyal and next to you, and each season there is 1 in 4 they find out), or a disabled button with why not; while your envoy is there it says since when and offers *Recall your envoy*. On another realm's subject, the Diplomacy tab shows *Court their loyalty* with the other missions, and *Recall your envoy* while he is there. Your own Diplomacy tab lists every courting envoy with your envoys abroad (whom he courts and since when); when they are found out, or a lord defects, a dispatch says so. On your own subject's card, *Courted* shows as a badge, and with a resident there the card names who courts it. Grouping and overview: courting sits with the envoys, on the lord's screen and the Diplomacy tabs; your Diplomacy tab's envoys list is the overview of what your envoys are doing, and the *Subjects* lens draws a dotted line from the courting realm's capital to each of your subjects you know to be courted and to each subject you court. Phone: buttons at least 44 points high in the Wide and Tall layouts, nothing that needs hover; the lines are drawn on the map and need no tap of their own. [X-19, DIPL-202, SUBJ-095, SUBJ-117]
 
+### 5.30 Neighbours answer conquest (X-21, Leroy 18 Oct)
+War is balanced through diplomacy: taking land costs standing with everyone nearby, a conqueror meets leagues,
+and whole realms are gained by diplomacy rather than one war. The latest decision; the balance model checks it
+(BAL-016).
+
+- DIPL-221 The diplomacy context shall run the yearly league check (DIPL-157 to DIPL-164) in the game's yearly steps, counting Lands taken only for provinces taken in the last 20 years, and shall call league members into a war X declares on any of them (DIPL-160). [X-21]
+- DIPL-222 When a peace or a demand cedes provinces, the diplomacy context shall give every country that borders the taker or a ceded province, other than the taker's allies and subjects and the country that lost them, the wrong *Grabbed land near us* (`diplomacy.wrongs.grabbed_land_near_us`, −5 per province, provisional), fading over 20 years. [X-21]
+- DIPL-223 The diplomacy context shall expose notoriety (DIPL-174) in the game, and every AI shall count it toward the notorious country: −1 per 5 notoriety in alliance, marriage and pledge counts it makes with that country, and +1 per 5 notoriety when it counts pledging protection to that country's neighbours or joining a league against it. [X-21; DIPL-174]
+- DIPL-224 Taking a subject by agreement, a demand given in, a union and folding in a subject (subjects) shall not be bound by the peace limit of WAR-227 and add Lands taken only where diplomacy and subjects already say so, so a whole realm is gained by diplomacy, not by one war. [X-21]
+
+#### How the player uses it: your name abroad
+- DIPL-225 Where and grouping: your own country card's Diplomacy tab opens with a *Your name abroad* card: notoriety as a word (Trusted under 25, Watched 25 to 49, Feared 50 to 74, Hated 75 or more), Lands taken in the last 20 years as a bar against the era's league threshold ("6 of 8 before a league"), and every league against you with its members and their soldiers. The declare sheet's *Price of war* (WAR-229) links to it, and nothing about your standing abroad sits elsewhere. [X-21; X-19; DIPL-080]
+- DIPL-226 Overview and phone: the diplomacy lens keeps the red border for a league against you (DIPL-183), and the card lists leagues before anything else when one stands. In landscape the card is one column inside the safe area, its rows are at least 44 points tall and open their reasons on tap, the bar shows its numbers as text, and nothing needs hover. [X-21; X-19]
+
 ### 5.31 A compact Diplomacy tab (milestone 5)
 Leroy found the Diplomacy tab's buttons far too large: each action was a full-width bar across the card, so on a phone held sideways the missions alone took three screens to scroll. This changes how the tab is laid out, not what it holds or does.
 
@@ -892,6 +906,8 @@ The steps run after subjects and government in the global order (X-2, D-DIPL-31)
 | `modifiers.*` other keys | AI weights, trade access, fact weights | retired except the stance weights (D-DIPL-6) | yes | relation-rules.json |
 | `compatibility`, `precedence`, `actions` | Matrix, order, actions | section 4 | rule | relation-rules.json |
 | `subject_kinds`, `autonomy_levels` | Eight kinds, five levels | section 4 | rule | relation-rules.json |
+| diplomacy.wrongs.grabbed_land_near_us | Wrong for land taken near a country (DIPL-222) | −5 per province, fades over 20 years | yes | diplomacy |
+| diplomacy.ai.notoriety_restraint | Notoriety above which an AI that isn't Warlike or a hegemon seeker declares no war (WAR-228) | 50 | yes | diplomacy |
 
 ## 11. Seams
 
@@ -1266,4 +1282,6 @@ The steps run after subjects and government in the global order (X-2, D-DIPL-31)
 | DIPL-214 | — | Presentation: apps/client/src/ui/statecraft.ts, the answer card |
 | DIPL-215 … DIPL-219 | — | Engine: packages/engine/test/courting.test.ts (court a lord and a subject, the season's step, defection, discovery, AI) |
 | DIPL-220 | — | Presentation: apps/client/src/ui/statecraft.ts and apps/client/src/main.ts, Court him, Court their loyalty and the Subjects lens lines |
+| DIPL-221 … DIPL-224 | features/neighbours-answer-conquest.feature | The league check runs each year; Grabbed land near us; The AI counts notoriety; A whole realm is gained by diplomacy |
+| DIPL-225 … DIPL-226 | features/neighbours-answer-conquest.feature | Your name abroad |
 | DIPL-227 | — | Presentation: apps/client/src/ui/statecraft.ts, apps/client/src/style.css (`.missions`, `.diplomacy-tab`); apps/client/scripts/diplomacy-tab-shots.mjs |

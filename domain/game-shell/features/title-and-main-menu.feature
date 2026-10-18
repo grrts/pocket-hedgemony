@@ -1,86 +1,19 @@
 @context-game-shell
 Feature: Title and main menu
   As a player
-  I want a title that shows my own realm and a short menu
-  So that I am back in my campaign in two taps
+  I want a short menu on the start screen
+  So that I am back in my campaign in one tap
 
-  @SHELL-016
-  Scenario Outline: Title background drifts over the world map
-    Given <campaign state>
-    When the screen "title" is shown
-    Then the background is the real map at world zoom drifting slowly over <region>
-    And the map is drawn by the same renderer as the campaign map
-
-    Examples:
-      | campaign state                                        | region                                                         |
-      | no campaign is in progress                             | a region of the 1444 world                                     |
-      | the campaign as "France" in May 1503 is in progress    | the realm "France" in its current borders read from the latest save's summary |
-
-  @SHELL-017
-  Scenario Outline: Any input counts as Tap to start
-    Given the screen "title" is shown
-    When the player gives a "<input>"
-    Then the main menu folds open
-    And the track "title" starts
-
-    Examples:
-      | input             |
-      | touch             |
-      | click             |
-      | key press         |
-      | controller button |
-
-  @SHELL-018
-  Scenario Outline: Title corner controls
-    Given the game runs on "<platform>"
-    When the screen "title" is shown
-    Then a settings cog is shown that opens the screen "settings" straight away
-    And the version number is shown in a corner
-    And the Quit cross <quit>
-
-    Examples:
-      | platform | quit         |
-      | desktop  | is shown     |
-      | Android  | is not shown |
-      | iOS      | is not shown |
-
-  @SHELL-019 @SHELL-118
-  Scenario: The menu is the same screen as the title
-    Given the screen "title" is shown
-    When the player taps to start
-    Then the "Tap to start" line folds open into the main menu in the same place
-    When the player presses Back
-    Then "Tap to start" is shown again
-
-  @SHELL-004 @SHELL-020
-  Scenario: Continue is two taps from a cold start
-    Given a campaign as "France" exists with its newest save in May 1503
-    When the player starts the game
-    And the player taps to start
-    Then the main menu shows "Continue" labelled "France · May 1503" with the banner of "France"
-    When the player picks "Continue"
-    Then the screen "loading" opens with the newest save
-    And the map of "France" follows
-
-  @SHELL-020 @SHELL-021 @SHELL-022 @SHELL-023 @SHELL-024 @SHELL-025
-  Scenario Outline: Main menu entries
-    Given <state>
-    And the game runs on "<platform>"
-    When the main menu is shown
-    Then the main menu shows the entries "<entries>"
-
-    Examples:
-      | state                                                   | platform | entries                                                     |
-      | no save exists and the tutorial is not finished          | Android  | New campaign, Tutorial, More                                |
-      | a campaign and saves exist and the tutorial is finished  | Android  | Continue, New campaign, Load, More                          |
-      | a campaign and saves exist and the tutorial is not finished | desktop | Continue, New campaign, Load, Tutorial, More, Quit         |
-      | no save exists and the tutorial is finished               | Steam    | New campaign, More, Quit                                    |
+  # Since 18 October 2026 the title and the main menu are one start screen with
+  # its menu already shown (start-screen.feature, SHELL-149 to SHELL-158). Its
+  # background, column, icon row and Back are specified there; these scenarios
+  # keep the main menu's rules that still hold (SHELL-023 to SHELL-029, SHELL-131).
 
   @SHELL-023 @SHELL-024
   Scenario Outline: More holds the secondary screens
     Given the game is "<edition>"
     And the tutorial is finished
-    When the player opens "More" on the main menu
+    When the player opens "More" on the start screen
     Then "More" holds "<entries>"
 
     Examples:
@@ -88,22 +21,22 @@ Feature: Title and main menu
       | the full game   | Settings, Achievements, Almanac, Unlock, Credits, Tutorial      |
       | the Steam demo  | Settings, Achievements, Almanac, Buy the full game, Credits, Tutorial |
 
-  @SHELL-026
-  Scenario Outline: First focus on the main menu
+  @SHELL-026 @SHELL-152
+  Scenario Outline: First focus on the start screen
     Given <state>
     When the main menu opens
     Then focus is on "<focus>"
 
     Examples:
-      | state                  | focus        |
-      | a campaign exists      | Continue     |
-      | no campaign exists     | New campaign |
+      | state                  | focus |
+      | a campaign exists      | Play  |
+      | no campaign exists     | Play  |
 
-  @SHELL-027
+  @SHELL-027 @SHELL-152
   Scenario: First entry stands out
     Given a campaign exists
     When the main menu is shown
-    Then "Continue" is large and wax-red
+    Then "Play" is large and wax-red
     And the other entries are paper buttons
 
   @SHELL-028
@@ -129,7 +62,7 @@ Feature: Title and main menu
     When the main menu is shown
     Then no ad card is shown
 
-  @SHELL-029
+  @SHELL-029 @SHELL-156
   Scenario: Full game ribbon in the free tier
     Given the game is the free tier
     When the main menu is shown
@@ -140,7 +73,7 @@ Feature: Title and main menu
   @SHELL-131
   Scenario Outline: The first-launch question
     Given the game is launched for the first time and no campaign exists
-    When the player taps to start
+    When the player picks "Play" on the start screen
     Then the question "New to Pocket Hegemony?" is asked with "Play the tutorial, Guided campaign, I know the way"
     And focus is on "Play the tutorial"
     When the player picks "<choice>"
@@ -155,5 +88,5 @@ Feature: Title and main menu
   @SHELL-131
   Scenario: The first-launch question is asked only once
     Given the first-launch question was answered
-    When the game is started again and the player taps to start
-    Then the main menu folds open with no question
+    When the game is started again and the player picks "Play"
+    Then the screen "new_campaign" opens with no question

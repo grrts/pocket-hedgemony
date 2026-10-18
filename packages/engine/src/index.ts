@@ -7,7 +7,7 @@ export { placeClimate, provinceClimate, seasonName, dayOfYear, snowCover, type P
 export { processTurn, applyNow, advance, STEPS_PER_DAY, STEPS_PER_TURN, HOURS_PER_STEP, type Order, type MoveOrder, type TurnReport } from "./turn.ts";
 export { atWar, cedeProvince, controller, engageRange, offerPeace, peaceShare, relationState, wallsOf, warBetween, SIEGE_MONTH_DAYS, type Battle, type News, type PeaceTerms } from "./war.ts";
 export { hashWorld } from "./hash.ts";
-export { cultureOf, officialName, personName } from "./names.ts";
+export { cultureOf, officialName, personName, rankedName } from "./names.ts";
 export { hireGold, newLands, officialEffect, OFFICIALS, yearsServed, type OfficialEffectView } from "./officials.ts";
 export { aiCollect, aiRecruits, ARMS, COMMISSION_GOLD, commanderScreen, commissionOfficial, type CommanderScreen, FOOT_ARMS, HORSE_ARMS, KIND, KIND_NAMES, LEVY_UNIT, garrisonTroops, garrisonView, gatherDays, idleCommanders, isHorseArm, menByArm, monthlyRecruits, recruit, recruitRefusal, trainingGround, type GarrisonView } from "./recruit.ts";
 export { CLASS_NAMES, CLASS_COUNT } from "./living.ts";
@@ -23,9 +23,11 @@ export { WORKS, WORK_COUNT, workIndex, type LandTileRow, type WorkRow } from "./
 export { USES, type UseName } from "./land.ts";
 export { CHANGES, type ChangeName, type ChangeRow } from "./conversion.ts";
 export { castleCap, FOOD_SETTINGS, foodView, mapNetwork, reachOf, setFood, setFoodPreset, shareFood, SURPLUS_RULES, type CastleView, type FoodView } from "./castleFood.ts";
-export { capsOf, formOf, governmentView, type GovernmentView, type NextFormView } from "./government.ts";
+export { capsOf, formOf, governmentView, realmTitles, type GovernmentView, type NextFormView } from "./government.ts";
+export { titlesFor, type Titles } from "./domain/realm/index.ts";
 export { TRADER_KINDS, traderKindName, type FoundOption, type GameTraderKind, type KindRow, type RouteEstimate, type TradeView, type TraderView } from "./trade.ts";
 export { FAITH_FAMILY, FAITH_IDS, FAITH_POLICIES, faithLine, faithName, NO_FAITH, NO_TONGUE, peoplesDataOf, peoplesView, SLOTS, TONGUE_FAMILY, TONGUE_IDS, TONGUE_POLICIES, tongueLine, tongueName, type FaithRow, type PeoplesSnapshot, type PeoplesView, type TongueLine, type TongueRow } from "./peoples.ts";
+export { censurePreview, faithBadge, faithHeadsView, headCard, type FaithHeadsView, type HeadCard } from "./faithHeads.ts";
 export { ENVOY_ACTIONS, type EnvoyAction, type StatecraftView } from "./statecraft.ts";
 export { type RebelsView, type RisingView } from "./rebels.ts";
 export { type RegimeView, type RevolutionView, type Sign as RevolutionSign, type StanceView } from "./revolutions.ts";

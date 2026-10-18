@@ -69,7 +69,7 @@ import {
   longPressOrHoverOnly,
   longTurnStrip,
   lookAtMap,
-  mainMenu,
+  startColumn,
   mapAccepts,
   mapDimmed,
   mapHud,
@@ -134,7 +134,7 @@ import {
   isValidEndDate,
   ledger,
   loadList,
-  mainMenuFocus,
+  startFocus,
   muteButtons,
   mutesForSave,
   outcomeOf,
@@ -162,9 +162,12 @@ import {
   tapNameTab,
   tapOnMap,
   tapRealm,
-  tapToStart,
+  firstStartInput,
+  openStartScreen,
+  openWiki,
+  startBackgroundMoves,
   textField,
-  titleScreen,
+  startScreen,
   top,
   topBar,
   topCard,
@@ -386,7 +389,8 @@ Then("the screen {string} shows one card with one choice", (s, id: string) => {
 
 Then("the screen {string} follows once every card is answered", (s, id: string) => {
   while (s.start.cards.length) answerFirstRun(s.start, "English");
-  expectTop(s, id as FrameId);
+  // The title opens with its menu already shown (SHELL-149).
+  expect(sh(s).stack.map((f) => f.id)).toEqual(id === "title" ? ["title", "main_menu"] : [id]);
   s.profile = s.start.profile;
 });
 
@@ -447,7 +451,7 @@ When("the player goes from the screen {string} to the map of a new campaign", (s
   const shell = sh(s);
   expect(s.start.path[0]).toBe(from);
   while (s.start.cards.length) answerFirstRun(s.start, "English");
-  tapToStart(shell, "touch");
+  firstStartInput(shell, "touch");
   const nc = openNewCampaign(shell, { suggested: SUGGESTED, lastOptions: ["normal"] });
   quickStart(shell, nc);
   continueCampaign(shell, { realm: nc.realm!, date: { year: 1444, month: 11 }, borders: "1444" });
@@ -485,10 +489,7 @@ Then("the screen {string} is shown", (s, id: string) => {
     else expectTop(s, id as FrameId);
     return;
   }
-  if (id === "title") {
-    replaceAll(shell, { id: "title" });
-    s.title = titleScreen(shell.platform, s.summary ?? null);
-  } else if (id === "map") {
+  if (id === "title") openStartScreen(shell); else if (id === "map") {
     ensureCampaign(s);
     s.hud = mapHud({ width: shell.window.width, height: shell.window.height, shape: shell.shape, safe: s.safe });
   } else if (id === "realm_book") {
@@ -500,48 +501,9 @@ Then("the screen {string} is shown", (s, id: string) => {
   } else replaceAll(shell, { id: id as FrameId });
 });
 
-Then(/^the background is the real map at world zoom drifting slowly over (.+)$/, (s, region: string) => {
-  const bg = s.title.background;
-  expect(bg).toMatchObject({ renderer: "map", zoom: "World", drift: "slow" });
-  if (region === "a region of the 1444 world") expect(bg.over).toBe(region);
-  else {
-    expect(region).toBe(`the realm "${bg.over}" in its current borders read from the latest save's summary`);
-    expect(bg.bordersFrom).toBe("the latest save's summary");
-  }
-});
-
-Then("the map is drawn by the same renderer as the campaign map", (s) => expect(s.title.background.renderer).toBe("map"));
-
-When("the player gives a {string}", (s, input: string) => {
-  tapToStart(sh(s), input as never);
-  acted(s);
-});
-
-Then("the main menu folds open", (s) => {
-  const shell = sh(s);
-  expectTop(s, "main_menu");
-  expect(shell.stack.at(-2)?.id).toBe("title");
-  expect(screen("main_menu").kind).toBe("Same screen");
-});
-
 Then("the track {string} starts", (s, track: string) => {
   expect(sh(s).track).toBe(track);
   expect(sh(s).events).toContainEqual({ type: "TitleDismissed" });
-});
-
-Then("a settings cog is shown that opens the screen {string} straight away", (s, id: string) => expect(s.title.cog).toBe(id));
-Then("the version number is shown in a corner", (s) => expect(s.title.version).toBe(true));
-Then(/^the Quit cross (is shown|is not shown)$/, (s, shown: string) => expect(s.title.quit).toBe(shown === "is shown"));
-
-When("the player taps to start", (s) => {
-  tapToStart(sh(s), "touch");
-  acted(s);
-});
-
-Then("the {string} line folds open into the main menu in the same place", (s, line: string) => {
-  expect(line).toBe(SHELL.strings.tapToStart);
-  expectTop(s, "main_menu");
-  expect(sh(s).stack.at(-2)?.id).toBe("title");
 });
 
 When("the player presses Back", (s) => {
@@ -551,21 +513,9 @@ When("the player presses Back", (s) => {
   acted(s);
 });
 
-Then(/^"Tap to start" is shown( again)?$/, (s) => {
-  expectTop(s, "title");
-  expect(screen("title").firstFocus).toBe("Tap to start");
-});
-
 Given("a campaign as {string} exists with its newest save in May 1503", (s, realm: string) => {
   s.summary = { realm, date: MAY_1503, borders: "May 1503" } satisfies CampaignSummary;
   s.sh = newShell({ platform: "Android" });
-});
-
-Then("the main menu shows {string} labelled {string} with the banner of {string}", (s, entry: string, label: string, banner: string) => {
-  const menu = mainMenu({ campaign: s.summary, saves: 1, tutorialFinished: true, platform: sh(s).platform, edition: sh(s).edition });
-  expect(menu[0]).toMatchObject({ label: entry, detail: label });
-  expect(label.startsWith(banner)).toBe(true);
-  expect(campaignLabel(banner, s.summary.date)).toBe(label);
 });
 
 When("the player picks {string}", (s, entry: string) => {
@@ -577,9 +527,10 @@ When("the player picks {string}", (s, entry: string) => {
   }
   const t = topId(shell);
   if (t === "main_menu" || (!t && entry === "New campaign")) {
-    if (entry === "Continue") continueCampaign(shell, s.summary);
+    if (entry === "Play") playFromStart(s);
     else if (entry === "New campaign") s.nc = openNewCampaign(shell, { suggested: SUGGESTED, lastOptions: s.lastOptions ?? ["normal"] });
-    else throw new Error(`main menu entry ${entry}`);
+    else if (entry === "Wiki") s.wiki = openWiki(shell);
+    else throw new Error(`start screen entry ${entry}`);
     return;
   }
   if (t === "map" && SHELL.gameMenu.includes(entry)) openGameMenu(shell);
@@ -630,14 +581,8 @@ When("the main menu is shown", (s) => {
     expectTop(s, "main_menu");
     return;
   }
-  replaceAll(shell, { id: "title" });
-  push(shell, { id: "main_menu" });
-  const state = s.menuState ?? { campaign: null, saves: 0, tutorialFinished: false };
-  s.menu = mainMenu({ ...state, platform: shell.platform, edition: shell.edition });
-});
-
-Then("the main menu shows the entries {string}", (s, entries: string) => {
-  expect(s.menu.map((e: { label: string }) => e.label).join(", ")).toBe(entries);
+  openStartScreen(shell);
+  s.menu = startColumn({ ...menuStateOf(s), platform: shell.platform, edition: shell.edition });
 });
 
 Given("the game is {string}", (s, edition: string) => {
@@ -649,7 +594,7 @@ Given("the tutorial is finished", (s) => {
   s.tutorialFinished = true;
 });
 
-When("the player opens {string} on the main menu", (s, entry: string) => {
+When("the player opens {string} on the start screen", (s, entry: string) => {
   expect(entry).toBe("More");
   s.more = moreMenu(sh(s).edition, s.tutorialFinished === true);
 });
@@ -862,7 +807,9 @@ Then("the screen {string} opens with no confirmation", (s, id: string) => {
 });
 
 Then("the screen {string} opens with no question", (s, id: string) => {
-  expect(s.loadResult).toEqual({ loading: true });
+  // Load from the game menu (SHELL-068) or Play on the start screen after the first-launch question (SHELL-131).
+  if (s.loadResult) expect(s.loadResult).toEqual({ loading: true });
+  else expect(s.flq).toBeNull();
   expectTop(s, id as FrameId);
 });
 
@@ -2208,14 +2155,14 @@ Given("the system closed the app", (s) => {
 });
 
 Then("{string} points at the save written when the app went to the background", (s, entry: string) => {
-  const menu = mainMenu({ campaign: s.summary, saves: 1, tutorialFinished: true, platform: sh(s).platform, edition: sh(s).edition });
+  const menu = startColumn({ campaign: s.summary, saves: 1, tutorialFinished: true, platform: sh(s).platform, edition: sh(s).edition });
   expect(menu[0]).toMatchObject({ label: entry, detail: campaignLabel("Portugal", MAY_1503) });
   expect(s.summary.borders).toBe("background save");
 });
 
 When("the player continues", (s) => {
   const shell = sh(s);
-  tapToStart(shell, "touch");
+  firstStartInput(shell, "touch");
   continueCampaign(shell, s.summary, "background save");
   loadingFinished(shell);
   s.strip = pickedUpStrip();
@@ -2610,7 +2557,7 @@ When("any screen opens", (s) => {
 
 Then("its defined first focus has the gold focus frame", (s) => {
   for (const f of s.focus) expect(f.frame).toBe("gold");
-  expect(s.focus.map((f: { element: string }) => f.element)).toEqual(["Continue", "your capital or last army", "Return to the map", "first warning", "Main menu"]);
+  expect(s.focus.map((f: { element: string }) => f.element)).toEqual(["Play", "your capital or last army", "Return to the map", "first warning", "Main menu"]);
   expect(firstFocus("map", "touch")).toBeNull();
 });
 
@@ -3011,15 +2958,13 @@ Given("no campaign exists", (s) => {
 
 When("the main menu opens", (s) => {
   const shell = sh(s);
-  replaceAll(shell, { id: "title" });
-  tapToStart(shell, "touch");
-  const state = s.menuState ?? { campaign: null, saves: 0, tutorialFinished: false };
-  s.focusOverride = mainMenuFocus({ ...state, platform: shell.platform, edition: shell.edition });
+  openStartScreen(shell);
+  s.focusOverride = startFocus({ ...menuStateOf(s), platform: shell.platform, edition: shell.edition });
   acted(s);
 });
 
 Given("the game is launched for the first time and no campaign exists", (s) => {
-  replaceAll(sh(s), { id: "title" });
+  openStartScreen(sh(s));
   s.firstLaunch = { asked: false, campaignExists: false };
 });
 
@@ -3045,16 +2990,11 @@ Given("the first-launch question was answered", (s) => {
   s.firstLaunch = { asked: true, campaignExists: false };
 });
 
-When("the game is started again and the player taps to start", (s) => {
-  replaceAll(sh(s), { id: "title" });
-  tapToStart(sh(s), "touch");
-  s.flq = firstLaunchQuestion(s.firstLaunch);
+When("the game is started again and the player picks {string}", (s, entry: string) => {
+  expect(entry).toBe("Play");
+  openStartScreen(sh(s));
+  playFromStart(s);
   acted(s);
-});
-
-Then("the main menu folds open with no question", (s) => {
-  expect(s.flq).toBeNull();
-  expectTop(s, "main_menu");
 });
 
 // The turn (SHELL-073, SHELL-074)
@@ -3160,4 +3100,133 @@ When("{int} more turns are played", (s, n: number) => {
     while (topId(sh(s)) !== "map") pop(sh(s));
     playWeek(s);
   }
+});
+
+// ---------------------------------------------------------------------------
+// The start screen (SHELL-149..158)
+
+/** The campaign, saves and tutorial behind the start screen's column, from the scenario's Givens. */
+function menuStateOf(s: any): Pick<MenuContext, "campaign" | "saves" | "tutorialFinished"> {
+  if (s.menuState) return s.menuState;
+  return s.summary ? { campaign: s.summary, saves: 1, tutorialFinished: true } : { campaign: null, saves: 0, tutorialFinished: false };
+}
+
+/** Play: Loading with the newest save, or the first-launch question the first time, or New campaign (SHELL-153). */
+function playFromStart(s: any): void {
+  const shell = sh(s);
+  const play = startColumn({ ...menuStateOf(s), platform: shell.platform, edition: shell.edition })[0]!;
+  if (play.target === "loading") return continueCampaign(shell, s.summary);
+  s.flq = firstLaunchQuestion(s.firstLaunch ?? { asked: true, campaignExists: false });
+  if (!s.flq) s.nc = openNewCampaign(shell, { suggested: SUGGESTED, lastOptions: s.lastOptions ?? ["normal"] });
+}
+
+Given("the game has booted and the first-run questions are answered", (s) => {
+  s.sh = newShell({ platform: "Android" });
+});
+
+When("the start screen opens", (s) => {
+  const shell = sh(s);
+  if (s.acted) {
+    expectTop(s, "main_menu");
+    expect(shell.stack.map((f) => f.id)).toEqual(["title", "main_menu"]);
+  } else openStartScreen(shell);
+  const summary = s.summary ?? (shell.startRealm ? { realm: shell.startRealm, date: MAY_1503, borders: "the latest save's summary" } : null);
+  s.startView = startScreen({ platform: shell.platform, edition: shell.edition, summary });
+  s.menu = startColumn({ ...menuStateOf(s), platform: shell.platform, edition: shell.edition });
+});
+
+Given(/^the start screen is shown( with nothing over it)?$/, (s) => {
+  openStartScreen(sh(s));
+});
+
+Then("the start screen shows its menu without waiting for a tap", (s) => {
+  expect(sh(s).stack.map((f) => f.id)).toEqual(["title", "main_menu"]);
+  expect(sh(s).events).not.toContainEqual({ type: "TitleDismissed" });
+});
+
+When("the player first touches the start screen", (s) => {
+  firstStartInput(sh(s), "touch");
+  acted(s);
+});
+
+Then(/^the background is the real map at region zoom panning slowly over (.+)$/, (s, region: string) => {
+  const bg = s.startView.background;
+  expect(bg).toMatchObject({ renderer: "map", zoom: "Region", pan: "slow" });
+  if (region === "one of the 1444 regions listed in the start regions") {
+    expect(SHELL.start.regions).toContain(bg.over);
+    expect(bg.bordersFrom).toBe("1444");
+  } else {
+    expect(region).toBe(`the realm "${bg.over}" in its borders and season from the latest save's summary`);
+    expect(bg.bordersFrom).toBe("the latest save's summary");
+  }
+});
+
+Then("the background takes no input and runs no simulation", (s) => {
+  expect(s.startView.background).toMatchObject({ input: false, simulation: false });
+});
+
+Then("the background still pans at Battery saver's frame rate", () => {
+  expect(startBackgroundMoves(true)).toBe(true);
+});
+
+Then("the column shows {string}", (s, entries: string) => {
+  expect(s.menu.map((e: { label: string }) => e.label).join(", ")).toBe(entries);
+});
+
+Then("{string} shows the banner of {string} and {string} under it", (s, entry: string, banner: string, label: string) => {
+  expect(s.menu[0]).toMatchObject({ label: entry, banner, detail: label });
+  expect(campaignLabel(banner, s.summary.date)).toBe(label);
+});
+
+Given("no campaign exists and the first-launch question was answered", (s) => {
+  s.sh = newShell({ platform: "Android" });
+  s.menuState = { campaign: null, saves: 0, tutorialFinished: false };
+  s.firstLaunch = { asked: true, campaignExists: false };
+});
+
+When("the player picks {string} on the start screen", (s, entry: string) => {
+  expect(entry).toBe("Play");
+  if (topId(sh(s)) !== "main_menu") openStartScreen(sh(s));
+  playFromStart(s);
+  acted(s);
+});
+
+Then("the icon row shows {string}, each with its name", (s, icons: string) => {
+  expect(s.startView.icons.join(", ")).toBe(icons);
+});
+
+Then("the system browser opens the wiki address", (s) => {
+  expect(s.wiki.url).toBe(SHELL.start.wikiUrl);
+  expect(sh(s).events).toContainEqual({ type: "WikiOpened", url: SHELL.start.wikiUrl });
+});
+
+Then("the game stays on the start screen", (s) => {
+  expect(sh(s).stack.map((f) => f.id)).toEqual(["title", "main_menu"]);
+});
+
+Then("the version number is shown in the lower right corner", (s) => expect(s.startView.version).toBe("lower right"));
+
+Then("the {string} ribbon is shown beside the logo", (s, label: string) => {
+  expect(s.startView.ribbon).toBe(true);
+  expect(fullGameRibbon(sh(s).edition)).toMatchObject({ label });
+});
+
+Then("the start screen stays", (s) => {
+  expect(s.backResult).toBe("nothing");
+  expect(sh(s).stack.map((f) => f.id)).toEqual(["title", "main_menu"]);
+});
+
+Then("the background pans over the realm {string}", (s, realm: string) => {
+  expect(s.startView.background).toMatchObject({ over: realm, bordersFrom: "the latest save's summary" });
+});
+
+Given("a campaign as {string} is being played", (s, realm: string) => {
+  loadCampaign(s, realm).campaign!.unsavedTurns = 0;
+});
+
+When("the player picks {string} and it is done", (s, entry: string) => {
+  const shell = sh(s);
+  openGameMenu(shell);
+  s.picked = pickGameMenu(shell, entry);
+  acted(s);
 });
