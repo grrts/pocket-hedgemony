@@ -252,6 +252,28 @@ export const SPRITES = {
     "..t.t..t.t.",
     "..t.t..t.t.",
   ],
+  /** A land trader on its loop: a pack mule under a bale in the realm's colour (TRADE-143). */
+  caravan: [
+    "....NNNN...",
+    "...NLLLNn..",
+    "ab.bNNNnbb.",
+    "abbbbbbbbbb",
+    "..bbbbbbb.b",
+    "..t.t..t.t.",
+    "..t.t..t.t.",
+  ],
+  /** A trade ship on its loop: a cog under a sail in the realm's colour (TRADE-143). */
+  cog: [
+    ".....t.....",
+    "....NNN....",
+    "...NLLNn...",
+    "...NLLNn...",
+    "....NNN....",
+    ".....t.....",
+    "bbbbbbbbbbb",
+    ".bbbbbbbbb.",
+    "..bbbbbbb..",
+  ],
   /** Move order arrow head. */
   flag: [
     "kk....",
