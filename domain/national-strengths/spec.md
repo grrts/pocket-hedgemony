@@ -265,6 +265,12 @@ Build report: 706 countries with heritage (58 hand-written, 648 generated), 3,55
 - HER-073 The nation picker shall show each country's birthright and burden, a count of sealed ambitions, and its heydays as the ages they belong to. [ns §9]
 - HER-074 The heritage context shall give every country the same system in every tier; the free tier only limits which countries can be picked. [ns §9]
 
+### How the player uses it
+- HER-080 The game shall give every realm on the map the heritage of its matched catalogue record (scenario-setup D-SETUP-1): its birthright, heydays and burden; a realm with no heritage in the build says that none is recorded. Ambitions and legacies join when heritage is evaluated each turn (HER-078). [X-19; build/heritage-all.json; D-HER-18]
+- HER-081 The realm card's General tab shall carry one Heritage line, the overview at a glance, naming the realm's birthright and its burden; tapping it opens the realm card's Heritage tab. The Heritage tab is offered for every realm, the player's own and others, before and during a campaign, so the realm picker shows it too (HER-073). [X-19; HER-070]
+- HER-082 The Heritage tab shall hold everything about the realm's strengths in one place: the birthright, each heyday with its age, and the burden, each a row that opens on a tap to its full text and history note (HER-002); under them the realm's 1444 assessments from the catalogue in three groups (Strength, Government, Dangers) as five-step bars with the level in words, marked uncertain where the catalogue's confidence is low. [X-19; scenario-setup SETUP-009]
+- HER-083 The Heritage tab shall work on a phone in landscape: 44-point rows in one column in the Tall layout, the assessment groups side by side where the panel is wide enough, inside the safe areas, and nothing that needs hover. [X-19]
+
 ### 5.14 Build and data
 - HER-075 The build shall refresh ids from other designs (`extract_vocab.py`), rebuild archetypes (`make_archetypes.py`), and generate, merge, validate and write `build/` (`build_heritage.py`, with `--check FILE` for one authored file). [ns §12; README]
 - HER-076 When heritage is built, the report shall list budget overruns, unknown ids (levers, ages, events, inventions, styles, buildings, countries, areas) and place names still to bind. [ns §12]
@@ -443,6 +449,12 @@ Requests to other designs (`requests-to-other-designs.md`), worked around, nothi
 - **D-HER-16** (was OQ-HER-16) Unbound ids: a place name binds to the land province nearest the scenario map's place of
   that name (a capital or a port); a name the map does not hold stays in places-to-bind.md and its condition is false
   until bound; the other requested ids stay worked around with place names. A rule binds most names without hand work.
+- **D-HER-18** (18 Oct, Leroy: give each realm its strengths and assessments on the realm card) The map's realms take
+  the heritage of their matched catalogue record from the heritage build, extracted per realm with
+  `tools/domain-data/extract_realm_strengths.py` into `national-strengths-realms.json` with the record's assessments,
+  so the client reads 137 rows, not the whole build. 110 realms have heritage; the 27 without (no record, or a record
+  the build gives none, such as the Swiss Confederation) show that none is recorded. The card shows the parts that do
+  not need the turn's evaluation; ambitions, legacies and the awake state follow with HER-078.
 - **D-HER-17** (was OQ-HER-17) Formed countries beyond the caps: the formed country keeps the forming country's own
   birthright and adds its own; any other birthright of the forming country becomes a dormant claim again. Legacies
   cannot exceed 5, since a formed heritage brings none, and a burden stays at most one (the formed country's, or else
@@ -467,4 +479,6 @@ Requests to other designs (`requests-to-other-designs.md`), worked around, nothi
 | HER-078 | ambitions.feature | Heritage counts time month by month |
 | HER-079 | ambitions.feature | The AI puts its weakest heyday to sleep; The AI lets its weakest legacy go |
 | HER-070..074 | heritage-on-the-phone.feature | all scenarios |
+| HER-080 | realm-heritage.feature | all scenarios |
+| HER-081..083 | — | Client screens; checked by apps/client/src/ui/heritage.test.ts and phone screenshots |
 | HER-075..077 | heritage-generation.feature | Build and report |
