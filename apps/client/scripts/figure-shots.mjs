@@ -33,17 +33,7 @@ await page.evaluate(() => window.__phLookAtArmy(20));
 await page.waitForTimeout(300);
 await shot("army-markers");
 // A war with Portugal: march on it until a battle or siege shows.
-await page.evaluate(() => {
-  const b = document.createElement("button");
-  b.dataset.realm = String(window.__phNation("portugal"));
-  document.body.append(b);
-  b.click();
-  b.remove();
-});
-await page.waitForTimeout(300);
-await page.click("[data-realm-tab=diplomacy]").catch(() => {});
-await page.waitForTimeout(200);
-await page.click("[data-declare]");
+await page.evaluate(() => window.__phWar("portugal"));
 await page.waitForTimeout(300);
 await page.click(".panel .close").catch(() => {});
 let battle = false;
@@ -59,6 +49,14 @@ for (let t = 0; t < 12 && !(battle && siege); t++) {
   for (const sel of ["#event-card button", "#overlay button", ".revolution-sheet button"]) await page.locator(sel).first().click({ timeout: 500 }).catch(() => {});
   const before = await page.evaluate(() => window.__phTurn());
   await page.click(".end-turn");
+  if (t === 0) {
+    // The week plays: the column sets off behind its banner, a few moments apart.
+    for (let i = 1; i <= 4; i++) {
+      await page.evaluate(() => window.__phLookAtArmy(24));
+      await page.waitForTimeout(350);
+      await shot(`march-${i}`);
+    }
+  }
   const ended = await page.waitForFunction((n) => window.__phTurn() > n, before, { timeout: 60000 }).catch(() => null);
   if (!ended) {
     // The week waits on a battle: look at it close in, as figures, then with Markers off.

@@ -65,6 +65,7 @@ import { commanderPortrait, officialCard, officialOf, officialScreen, officialsT
 import { governanceCard, LOYALTY_ORDER, lordScreen, lordsTab, type LordLands, type LordView, type ProvinceRow } from "./ui/lords.ts";
 import { loadMapImage, type MapImage } from "./map/loadMap.ts";
 import { provinceThumb } from "./map/provinceThumb.ts";
+import { stepTroop, type Pt, type Troop } from "./map/troops.ts";
 import { armyFigureUnit, armyNameShown, brackets, drawBattle, drawClash, drawFormation, drawPlate, drawRoute, drawSiegeMark, drawTents, drawToken, menShort, pruneBattles, weekEnds } from "./map/marchArt.ts";
 import { MapView, type OverlayContext } from "./map/mapView.ts";
 import { clockDays, placeMovers } from "./map/traders.ts";
@@ -80,6 +81,7 @@ import { Hints, type HintTarget } from "./ui/hints.ts";
 import type { Hint } from "@ph/engine/domain/onboarding";
 import {
   animatedFigures,
+  bandArtPixels,
   bandFade,
   figuresAnimate,
   figuresLeft,
@@ -1526,12 +1528,14 @@ function drawOverlay(o: OverlayContext): void {
         // Besiegers ring the town; the others stand, or march in a column, on their tile.
         const location = s.armies.location[k]!;
         const state: FormationState = besieged.get(location) === s.armies.owner[k] ? "besieging" : moving || s.armies.path[k]!.length ? "marching" : "standing";
-        const at = state === "besieging" ? o.toScreen(provinces[location]!.x!, provinces[location]!.y!) : [cx + nth * 16 * liv.u, cy - nth * 4 * liv.u];
+        // Its point on the map: the town it besieges, or where it stands, stacked armies side by side.
+        const point: [number, number] = state === "besieging" ? [provinces[location]!.x!, provinces[location]!.y!] : [px + (nth * 16 * liv.u) / zoom, py - (nth * 4 * liv.u) / zoom];
+        const at = o.toScreen(...point);
         const horse = s.armies.horse[k]!;
         const men = s.armies.men[k]!;
         const heading = state === "standing" ? ([dir, 0] as const) : armyHeading(k, dir);
         pieces.push({
-          id, x: at[0]!, y: at[1]!, color: realm.color, men, name, state, facing: heading, selected: selected.has(id), seed: location,
+          id, key: `a${id}`, point, x: at[0]!, y: at[1]!, color: realm.color, men, name, state, facing: heading, selected: selected.has(id), seed: location,
           figures: formation({ men, foot: men - horse, horse, wagons: s.armies.food[k]! > 0, state, band: "living", facing: heading }),
         });
       }
@@ -1557,14 +1561,18 @@ function drawOverlay(o: OverlayContext): void {
       for (const r of s.rebels.risings) {
         if (!isKnown(r.location)) continue;
         const state: FormationState = r.siege ? "besieging" : r.target >= 0 ? "marching" : "standing";
-        const at = r.siege ? o.toScreen(provinces[r.siege.province]!.x!, provinces[r.siege.province]!.y!) : o.toScreen(...tileXY(r.tile));
+        const point: [number, number] = r.siege ? [provinces[r.siege.province]!.x!, provinces[r.siege.province]!.y!] : tileXY(r.tile);
+        const at = o.toScreen(...point);
         const heading = rebelHeading(r.location, r.target);
         pieces.push({
-          x: at[0]!, y: at[1]!, color: REBEL_COLOR, men: r.men, state, facing: heading, selected: false, seed: r.location,
+          key: `r${r.id}`, point, x: at[0]!, y: at[1]!, color: REBEL_COLOR, men: r.men, state, facing: heading, selected: false, seed: r.location,
           figures: formation({ men: r.men, state, band: "living", facing: heading, rebel: true }),
         });
       }
-    figuresTicking = drawLivingPieces(ctx, pieces, liv, now, o, onScreen) || figuresTicking;
+    const drawn = drawLivingPieces(ctx, pieces, liv, now, o, onScreen);
+    figuresTicking ||= drawn.ticking;
+    // Figures on their way somewhere move every frame, so their walk is smooth.
+    animating ||= drawn.walking;
     drawColonies(o, ctx, u, onScreen);
     animating = drawFleets(o, ctx, u, now, onScreen) || animating;
   }
@@ -1643,6 +1651,9 @@ const ARMY_ZOOM = 3.5;
 /** CSS pixels per art pixel of the army tokens, routes and battles. */
 const tokenUnit = (zoom: number) => (zoom >= 12 ? 3 : 2);
 
+/** Where each troop's figures stood last frame, by piece key. */
+const troops = new Map<string, Troop>();
+
 /** Markers: men and names over every army close in (VIEW-126), remembered on this device. */
 const MARKERS_KEY = "ph.markers";
 let markersOn = (() => {
@@ -1671,6 +1682,10 @@ function livingView(zoom: number): LivingView {
 interface LivingPiece {
   /** The army's id for its tap box; rebels have none and open from their province. */
   id?: number;
+  /** Which troop it is between frames, so its figures walk on from where they stood. */
+  key: string;
+  /** Its point on the map, and on screen. */
+  point: Pt;
   x: number;
   y: number;
   color: string;
@@ -1712,16 +1727,29 @@ function rebelHeading(from: number, to: number): readonly [number, number] {
  * At most `maxAnimated` figures move, the nearest the screen's centre first (VIEW-130).
  * Returns whether any figure moves, so the overlay ticks again.
  */
-function drawLivingPieces(ctx: CanvasRenderingContext2D, pieces: LivingPiece[], liv: LivingView, now: number, o: OverlayContext, onScreen: (x: number, y: number, pad?: number) => boolean): boolean {
+function drawLivingPieces(ctx: CanvasRenderingContext2D, pieces: LivingPiece[], liv: LivingView, now: number, o: OverlayContext, onScreen: (x: number, y: number, pad?: number) => boolean): { ticking: boolean; walking: boolean } {
   const u = liv.u;
   const shown = pieces.filter((p) => onScreen(p.x, p.y, 30 * u)).map((p) => ({ p, distance: Math.hypot(p.x - o.width / 2, p.y - o.height / 2) }));
   const moving = animatedFigures(shown.filter((e) => figuresAnimate(liv.animations, e.p.state)), (e) => e.p.figures.length);
   const step = Math.floor(now / (2000 / LIVING_MAP.figures.frameRate)) % 2;
+  let walking = false;
   ctx.globalAlpha = liv.living;
   for (const { p } of shown.sort((a, b) => a.p.y - b.p.y)) {
     if (p.state === "besieging") drawTents(ctx, p.x, p.y, u, p.color, LIVING_MAP.figures.siegeRing + 4, p.seed);
-    const animated = shown.some((e) => e.p === p && moving.has(e));
-    const box = drawFormation(ctx, { x: p.x, y: p.y, u, color: p.color, figures: p.figures, facing: p.facing, frame: animated ? (step as 0 | 1) : 0 });
+    // The figures walk to their places, the column along the banner-bearer's road, rather than jump (feedback on VIEW-118).
+    const art = bandArtPixels("living");
+    const moved = stepTroop(troops.get(p.key), {
+      point: p.point, offsets: p.figures.map((f): Pt => [f.x / art, f.y / art]), marching: p.state === "marching",
+      facing: [p.facing[0], p.facing[1]], now, still: liv.animations === "Off",
+    });
+    troops.set(p.key, moved.troop);
+    walking ||= moved.walking;
+    const figures = p.figures.map((f, i) => {
+      const [sx, sy] = o.toScreen(...moved.troop.at[i]!);
+      return { ...f, x: (sx - p.x) / u, y: (sy - p.y) / u };
+    });
+    const animated = moved.walking || shown.some((e) => e.p === p && moving.has(e));
+    const box = drawFormation(ctx, { x: p.x, y: p.y, u, color: p.color, figures, facing: p.facing, frame: animated ? (step as 0 | 1) : 0 });
     if (p.selected) brackets(ctx, box.x, box.y, box.w, box.h, u, 1 + (Math.floor(now / 260) % 2), PALETTE.gold);
     const labels = pieceLabels("living", { markers: markersOn, selected: p.selected });
     let bottom = box.y + box.h;
@@ -1737,7 +1765,9 @@ function drawLivingPieces(ctx: CanvasRenderingContext2D, pieces: LivingPiece[], 
     }
   }
   ctx.globalAlpha = 1;
-  return moving.size > 0;
+  // Forget troops not drawn for a while; they take their places at once when seen again.
+  for (const [key, t] of troops) if (now - t.t > 5000) troops.delete(key);
+  return { ticking: moving.size > 0, walking };
 }
 
 /**
