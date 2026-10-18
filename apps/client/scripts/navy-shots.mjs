@@ -1,6 +1,6 @@
 // Ships and ports as Portugal (naval spec, How the player uses it): the Port tab of Lisbon, mustering sailors and
 // ordering a cog and a galley, the fleet on the map, its card with a leader and his three posts, the sighting ring
-// of the fleet chosen to sail, sailing by tapping the sea, and the Navy tab; then war on Castile and a blockade off
+// of the fleet chosen to sail, sailing by tapping the sea, and the Navy tab; then war on a neighbour and a blockade off
 // its coast: the chain marks on the map, the fleet card's blockade line and the Navy tab's Blockades (NAVY-146..149);
 // on a small and a large phone held sideways, a phone held upright (asked to turn), and a desktop.
 // Usage: pnpm build && node scripts/navy-shots.mjs <outDir>
@@ -35,6 +35,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   await page.click("[data-nation=portugal]");
   await page.waitForSelector(".hud [data-news]", { timeout: 60000 });
   await page.waitForTimeout(500);
+  await page.locator("[data-hint=stop]").first().click({ timeout: 3000 }).catch(() => {});
   const lisbonId = await page.evaluate(() => window.__phCapital());
   await page.evaluate((id) => window.__phSelect(id), lisbonId);
   await page.waitForTimeout(300);
@@ -66,6 +67,13 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   await page.waitForTimeout(200);
   await page.click("[data-tab=port]");
   await page.waitForTimeout(200);
+  for (let t = 0; t < 6 && !(await page.locator("[data-port-buy=cog]:not([disabled])").count()); t++) {
+    await endTurn();
+    await page.evaluate((id) => window.__phSelect(id), lisbonId);
+    await page.waitForTimeout(200);
+    await page.click("[data-tab=port]");
+    await page.waitForTimeout(200);
+  }
   await page.click("[data-port-buy=cog]");
   await page.waitForTimeout(300);
   await shot("2-port-building");
@@ -97,6 +105,9 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   await page.evaluate(([x, y]) => window.__phMap.lookAt(x, y, 8), [x, y]);
   await page.waitForTimeout(600);
   await shot("3-fleet-on-map");
+  // No leader yet when gold ran short: the realm's general leaves his army to lead the fleet.
+  console.log(name, "free commander", await page.evaluate(() => window.__phFreeCommander()));
+  await page.locator("[data-hint=stop]").first().click({ timeout: 2000 }).catch(() => {});
   // Its card from the Navy tab.
   await page.click(".hud button.realm");
   await page.waitForTimeout(300);
@@ -123,13 +134,13 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   console.log(name, "title", await page.evaluate(() => document.querySelector(".panel h2")?.textContent));
   await page.click("[data-fleet-post=admiral]");
   await page.waitForTimeout(300);
-  // Sail: tap Sail (the sighting ring shows round the chosen fleet), then a sea zone to the west.
+  // Sail: tap Sail (the sighting ring shows round the chosen fleet), then a spot of the sea off Lisbon (galleys keep to the coast).
   await page.click("[data-fleet-sail]");
   await page.waitForTimeout(300);
   await page.evaluate(([x, y]) => window.__phMap.lookAt(x, y, 4), [x, y]);
   await page.waitForTimeout(400);
   await shot("5d-chosen-ring");
-  const zone = await page.evaluate((p) => window.__phSeaNear(p), lisbon);
+  const zone = await page.evaluate((p) => window.__phSeaNear(p, 1), lisbon);
   const [zx, zy] = await page.evaluate((p) => window.__phPoint(p), zone);
   await page.evaluate(([x, y]) => window.__phMap.lookAt(x, y, 8), [zx, zy]);
   await page.waitForTimeout(400);
@@ -141,10 +152,19 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   await shot("6-sailing");
   await endTurn();
   await shot("7-at-sea");
-  // War on Castile, and the fleet sent to lie off its coast: a blockade (NAVY-140, NAVY-141).
-  console.log(name, "war", await page.evaluate(() => window.__phWar("castile")));
-  const off = await page.evaluate((p) => window.__phSeaBy("castile", p), lisbon);
-  console.log(name, "sail to blockade", off, await page.evaluate(([fleet, to]) => window.__phNavyOrder({ do: "sail", fleet, to }), [flagship, off]));
+  // War on the nearest realm whose coast these ships can reach (galleys keep to the coast), and the fleet sent to lie
+  // off that coast: a blockade (NAVY-140, NAVY-141).
+  let off = -1;
+  for (const foe of await page.evaluate((p) => window.__phCoastRealms(p), lisbon)) {
+    for (const z of await page.evaluate(([id, p]) => window.__phSeaBy(id, p), [foe, lisbon])) {
+      const no = await page.evaluate(([fleet, to]) => window.__phNavyOrder({ do: "sail", fleet, to }), [flagship, z]);
+      if (no.length) continue;
+      console.log(name, "war on", foe, JSON.stringify(await page.evaluate((id) => window.__phWar(id), foe)), "sail to", z);
+      off = z;
+      break;
+    }
+    if (off >= 0) break;
+  }
   const blockading = () => page.evaluate((id) => window.__phNavy().fleets.find((f) => f.id === id)?.blockading.length ?? 0, flagship);
   for (let t = 0; t < 12 && !(await blockading()); t++) await endTurn();
   console.log(name, "blockades", JSON.stringify(await page.evaluate(() => ({ b: window.__phNavy().blockades, prize: window.__phNavy().prize }))));

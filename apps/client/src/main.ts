@@ -5305,24 +5305,49 @@ Object.assign(globalThis, {
     await act({ type: "commission", province: p });
     return snapshot.rejectedOrders.map((r) => r.reason);
   },
+  /** Takes the commander off the player's first led army, as the army card's leave button does (a fleet's leader when gold is short). */
+  __phFreeCommander: async () => {
+    if (!snapshot) return null;
+    const a = snapshot.armies;
+    const slot = a.id.findIndex((_, i) => a.owner[i] === snapshot!.playerNation && a.commander[i]! >= 0);
+    if (slot < 0) return null;
+    await act({ type: "appoint", army: a.id[slot]!, commander: -1 });
+    return snapshot.rejectedOrders.map((r) => r.reason);
+  },
   /** Declares war on a realm by id (scripts/navy-shots.mjs: a blockade). */
   __phWar: (id: string) => act({ type: "declareWar", target: nationIndex.get(id)! }).then(() => snapshot?.rejectedOrders.map((r) => r.reason) ?? []),
-  /** The nearest sea zone, over the sea from port p, that lies beside a coastal province of a realm by id. */
+  /** The nearest sea zones (up to eight, nearest first), over the sea from port p, that lie beside a coastal province of a realm by id. */
   __phSeaBy: (id: string, p: number) => {
     const n = nationIndex.get(id)!;
     const start = neighborIdx[p]!.filter((q) => isWater[q]);
     const seen = new Set(start);
-    for (let i = 0; i < start.length; i++) {
+    const found: number[] = [];
+    for (let i = 0; i < start.length && found.length < 8; i++) {
       const z = start[i]!;
-      if (neighborIdx[z]!.some((q) => !isWater[q] && owners[q] === n)) return z;
+      if (neighborIdx[z]!.some((q) => !isWater[q] && owners[q] === n)) found.push(z);
       for (const q of neighborIdx[z]!) if (isWater[q] && !seen.has(q)) (seen.add(q), start.push(q));
     }
-    return -1;
+    return found;
   },
-  /** A coastal sea zone two zones out from a port. */
-  __phSeaNear: (p: number) => {
+  /** Realms (ids, nearest first) with a coast on the seas around port p, the player's own left out. */
+  __phCoastRealms: (p: number) => {
+    const start = neighborIdx[p]!.filter((q) => isWater[q]);
+    const seen = new Set(start);
+    const found: string[] = [];
+    for (let i = 0; i < start.length && i < 60; i++) {
+      for (const q of neighborIdx[start[i]!]!) {
+        if (isWater[q]) {
+          if (!seen.has(q)) (seen.add(q), start.push(q));
+        } else if (owners[q]! >= 0 && owners[q] !== snapshot?.playerNation && !found.includes(nations[owners[q]!]!.id)) found.push(nations[owners[q]!]!.id);
+      }
+    }
+    return found;
+  },
+  /** A coastal sea zone two zones out from a port, or the one beside it when `out` is 1. */
+  __phSeaNear: (p: number, out = 2) => {
     const first = neighborIdx[p]!.find((q) => isWater[q]);
-    return first === undefined ? -1 : (neighborIdx[first]!.find((q) => isWater[q] && !neighborIdx[q]!.includes(p)) ?? first);
+    if (first === undefined || out < 2) return first ?? -1;
+    return neighborIdx[first]!.find((q) => isWater[q] && !neighborIdx[q]!.includes(p)) ?? first;
   },
   /** Province index by id, and its map point. */
   __phProvince: (id: string) => provinceIndex.get(id),
