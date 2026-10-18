@@ -70,7 +70,7 @@ import { seasonBytes } from "./map/renderer.ts";
 import { detectRuntime, type Diagnostics } from "./platform.ts";
 import { sound } from "./audio/sound.ts";
 import { eventCardHtml, waitingEventsHtml } from "./ui/events.ts";
-import { electionAnswerCard, empireBadgeHtml, empireCard, empireUi, institutionsKey, institutionsRows, type InstitutionsUi } from "./ui/institutions.ts";
+import { dietAnswerCard, electionAnswerCard, empireAsks, empireBadgeHtml, empireCard, empireUi, institutionsKey, institutionsRows, rulingAnswerCards, type InstitutionsUi } from "./ui/institutions.ts";
 import { fleetButton, fleetCard, hireFleetsTab, navyTab, portTab } from "./ui/navy.ts";
 import { colonyCard, coloniesTab, colonySection, exploreSection, voyageBar } from "./ui/explore.ts";
 import { achievementName, achievementsCard, loadProfile, saveProfile, takeAchievements, tileKey, toastHtml, unseen, type Filter as AchFilter } from "./ui/achievements.ts";
@@ -2353,7 +2353,7 @@ function renderHud(): void {
   // The plaques, their order and what each opens come from the engine's top-bar model (REALM-205).
   const open = (o: Opens) => (o && "card" in o && o.tab ? ` data-realm-open="${o.tab}"` : "");
   hud.innerHTML = `<button class="icon-only game-menu" data-shell="menu" title="Game menu" aria-label="Game menu">${icon("menu", 2)}</button>
-    ` + topBar(s, unread, asksOf(s).length)
+    ` + topBar(s, unread, asksOf(s).length + empireAsks(s.empire))
     .map((p) => {
       switch (p.key) {
         case "realm":
@@ -2727,6 +2727,7 @@ const institutionsUi: InstitutionsUi = {
   pennant: (n) => pennant(nations[n]!),
   month: monthText,
   faith: (f) => (f ? faithName(f) : "no faith"),
+  province: (p) => provinces[p]?.name ?? "",
 };
 
 /** The Empire card (INST-081): header and the folds Election, Reforms, Members and Hold, over the map. */
@@ -2760,6 +2761,13 @@ function bindEmpire(): void {
   panel.querySelectorAll<HTMLButtonElement>("[data-stand]").forEach((b) => b.addEventListener("click", () => void act({ type: "empire", do: "stand", on: b.dataset.stand === "1" }).then(again)));
   panel.querySelectorAll<HTMLButtonElement>("[data-grant-seat]").forEach((b) => b.addEventListener("click", () => void act({ type: "empire", do: "grantSeat", seat: b.dataset.grantSeat!, realm: Number(b.dataset.grantRealm) }).then(again)));
   panel.querySelectorAll<HTMLButtonElement>("[data-admit]").forEach((b) => b.addEventListener("click", () => void act({ type: "empire", do: "admit", realm: Number(b.dataset.admit) }).then(again)));
+  panel.querySelectorAll<HTMLButtonElement>("[data-call-diet]").forEach((b) => b.addEventListener("click", () => void act({ type: "empire", do: "callDiet" }).then(again)));
+  panel.querySelectorAll<HTMLButtonElement>("[data-diet-vote]").forEach((b) => b.addEventListener("click", () => void act({ type: "empire", do: "dietVote", yes: b.dataset.dietVote === "1" }).then(again)));
+  // The court order names the province by its id; the view gives its index.
+  panel.querySelectorAll<HTMLButtonElement>("[data-court-province]").forEach((b) =>
+    b.addEventListener("click", () => void act({ type: "empire", do: "court", realm: Number(b.dataset.courtRealm), province: provinces[Number(b.dataset.courtProvince)]!.id }).then(again)),
+  );
+  panel.querySelectorAll<HTMLButtonElement>("[data-ruling]").forEach((b) => b.addEventListener("click", () => void act({ type: "empire", do: "ruling", id: b.dataset.ruling!, yes: b.dataset.yes === "1" }).then(again)));
 }
 
 /** The dispatches: calls to arms and offers to answer, then the log of everything that happened, newest first. */
@@ -2782,6 +2790,8 @@ function renderNews(): void {
     ${asksHtml()}
     ${s.peaceOffers.map(offerHtml).join("")}
     ${electionAnswerCard(s.empire, institutionsUi)}
+    ${dietAnswerCard(s.empire, institutionsUi)}
+    ${rulingAnswerCards(s.empire, institutionsUi)}
     ${s.calls
       .map((c) =>
         c.via === "empire"
@@ -4448,7 +4458,9 @@ function relationsSection(r: number): string {
         <button class="wax" data-peace="take" ${taken ? "" : "disabled"}>${icon("crown", 1)}Peace: take ${taken} province${taken === 1 ? "" : "s"}</button>
         <button class="paper" data-peace="white">White peace</button>
         ${lost ? `<button class="paper" data-peace="give">Give up ${lost} province${lost === 1 ? "" : "s"}</button>` : ""}
+        ${s.empire && s.empire.emperor === r && !s.empire.dissolveWhyNot ? `<button class="paper" data-peace="dissolve">${icon("crown", 1)}Dissolve the Empire</button>` : ""}
       </div>
+      ${s.empire && s.empire.emperor === r && !s.empire.dissolveWhyNot ? `<p class="hint">Dissolve the Empire: every member becomes a free realm and every imperial war aim ends; no land changes hands.</p>` : ""}
       ${realmStatecraft(s.statecraft, r, false, true)}`;
   }
   const line =
@@ -4502,7 +4514,11 @@ function renderDeclareSheet(r: number): void {
 
 /** Peace offered to the player, with the choice to take it. */
 function offerHtml(o: Snapshot["peaceOffers"][number]): string {
-  const what = o.terms === "give" ? "it gives up the land you hold of theirs" : o.terms === "take" ? "it asks for the land it holds of yours" : "a white peace, no land changes hands";
+  const what =
+    o.terms === "give" ? "it gives up the land you hold of theirs"
+    : o.terms === "take" ? "it asks for the land it holds of yours"
+    : o.terms === "dissolve" ? "it dissolves the Empire; no land changes hands"
+    : "a white peace, no land changes hands";
   return `<div class="call framed-soft">
     <p>${icon("crown", 2)} ${realmButton(o.from, "diplomacy")} offers peace: ${what}. The offer stands until the month is out.</p>
     <div class="choices"><button class="wax" data-offer="${o.id}" data-yes="1">Make peace</button><button class="paper" data-offer="${o.id}" data-yes="0">Fight on</button></div>
@@ -6237,6 +6253,14 @@ Object.assign(globalThis, {
   __phExploration: () => (snapshot ? { ...snapshot.exploration, charted: undefined, sites: undefined, coastDist: undefined, ocean: undefined } : null),
   /** The exploration cards' builders, to show states a short play-through can't reach (a governor aboard, a colony growing). */
   __phExploreUi: { colonySection, colonyCard, coloniesTab },
+  /** The Empire's view, and a staged one in its place until the next snapshot: a Diet or a ruling takes years of play (scripts/institutions-shots.mjs). */
+  __phEmpire: () => snapshot?.empire ?? null,
+  __phStageEmpire: (v: NonNullable<Snapshot["empire"]>) => {
+    if (!snapshot) return;
+    snapshot.empire = v;
+    renderHud();
+    renderPanel();
+  },
   /** A sea zone k zones out from port p that a fleet with this ocean reach may enter, the farthest found first. */
   __phSeaOut: (p: number, k: number, reach = -1) => {
     const ex = snapshot!.exploration;

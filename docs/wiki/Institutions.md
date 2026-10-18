@@ -49,11 +49,41 @@ Most votes win; a tie goes to the sitting house, then to the candidate with more
 - **Defend the Empire.** When a realm outside the Empire declares war on a member, or holds a member's imperial land in a war, the Emperor is called to defend it. Answering gives +10 hold. Refusing, or saying nothing for a month, costs 15 hold, and the attacked member and every elector hold the wrong *Left us to our fate* toward him.
 - **Dues.** Each month the Emperor receives 1 gold per member times hold ÷ 100, on the Tribute line of the treasury.
 - He grants vacant seats and asks realms to join.
+- He is bound by every reform like any member.
+
+### The Diet and the reforms
+While hold is 50 or more, the Emperor may call the **Diet**, at most once every five years, on the next reform of the ladder. The reforms pass in order:
+
+| Reform | What it does |
+|---|---|
+| Public Peace | A member that declares war on another member is a **Breaker of the Peace**: for ten years the Emperor and every member hold a war aim on it, and the Emperor is called to defend its victim. |
+| Imperial Court | A member with a war aim on another member's province may take it to court instead of to war. The court rules by the aim, both sides' standing toward the Emperor and the hold. A ruling for the plaintiff moves the province with no war; refusing it makes the refuser a Breaker of the Peace. Saying nothing for a month hands it over. |
+| Circles | When an outsider attacks a member, every member of its circle joins the defence. The circles: Austrian, Bavarian, Swabian, Upper Rhenish, Electoral Rhenish, Lower Saxon and Upper Saxon. |
+| Common Tax | Every member pays 5 in 100 of its tax to the Emperor each month, in place of the dues. |
+| Imperial Army | When the Emperor answers a call to defend the Empire, he raises a contingent of a tenth of every member's soldiers at his capital for the war; it goes home with the peace. |
+| Hereditary Crown | The Emperor's heir takes the crown; no more elections. |
+| One Realm | Needs hold 80. Every other member's ruler becomes a great lord of the Emperor with his land, Wavering, and the Empire becomes one realm. |
+
+The Diet sits for a month. Every member votes yes or no by its reasons; an elector's vote counts twice, and over half the votes pass it. Passing spends 30 hold and failing 10. If you are a member you vote on an answer card; saying nothing counts as no.
+
+| A member's reason to vote yes | |
+|---|---:|
+| The reform itself | Public Peace +10, Imperial Court and Circles +5, Common Tax and Imperial Army −10, Hereditary Crown −25, One Realm −40 |
+| The Empire's hold | ÷ 10 |
+| Standing toward the Emperor | ÷ 4 |
+| Same faith as the Emperor | +10 |
+| An outsider holds imperial land next to us | +15 |
+| Small beside the Emperor (or strong beside him) | +5 (or −5) for each multiple, at most 20 |
+
+### Faith and the end
+- After the **Peace of Westphalia** an eighth seat goes to the largest member without one, and a member's faith no longer costs hold.
+- The Empire is **dissolved** when its hold has stood at 0 for five years in a row, or when a realm outside it that beat the Emperor in a war takes the peace term **Dissolve the Empire** (from era IV). Every member is then a free realm and every imperial war aim ends.
 
 ## Where you find it
 - **Your Diplomacy tab** has an Institutions row while you belong to one: "The Empire · Emperor: Austria · Hold 35 Weak · You: Elector". Tap it for the Empire card.
 - **A member's country card** shows a badge, Emperor, Elector or Empire, that opens the Empire card.
-- **The Empire card** has a header (the Emperor, the hold bar, your role) and four folds: **Election** (each seat and whom it would vote for today, the tally, Stand for the crown, a seat's reasons and Seek their vote), **Reforms** (the ladder of reforms; the Diet comes in a later build), **Members** (each member with its land, faith, seat and badges) and **Hold** (the year's gains and losses).
-- **News** carries the call to defend a member and the election's vote as answer cards.
+- **The Empire card** has a header (the Emperor, the hold bar, your role) and four folds: **Election** (each seat and whom it would vote for today, the tally, Stand for the crown, a seat's reasons and Seek their vote), **Reforms** (the ladder with the passed reforms ticked, the next one's effect, its cost and today's forecast, *Call the Diet* for the Emperor, *Vote yes* and *Vote no* while the Diet sits, and *Take to court* once the Imperial Court has passed), **Members** (each member with its land, faith, seat and badges) and **Hold** (the year's gains and losses).
+- **News** carries the call to defend a member, the election's vote, a sitting Diet and a court ruling against you as answer cards.
+- **The peace sheet** offers *Dissolve the Empire* when you are at war with the Emperor, not a member, and it is era IV or later.
 - **The Institutions map mode** colours the Emperor gold and the members light gold, marks the seats and hatches imperial land held by outsiders.
 - On a phone the card is a side sheet in the Wide layout and a bottom sheet in the Tall layout; every row and button is a full 44-point tap.

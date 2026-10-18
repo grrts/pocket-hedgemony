@@ -9,7 +9,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **OQ-ACH-10** (achievements): (release task) The list is compared once against EU4's published list before release. The store retry interval is 5 minutes (provisional) and the toast uses audio's achievement stinger.
 - **OQ-AUD-13** (audio): Palette reviewers and listening approval (release task): each palette needs a paid reviewer of its tradition, and every track needs Leroy's listening approval, before release.
 - **OQ-INST-1** (institutions): The X-13 match of catalogue imperial estates to map realms (Bavaria, Württemberg, Hamburg, Pomerania, Switzerland, Modena are split or renamed in the catalogue): the data list decides; it needs one pass of review.
-- **OQ-INST-2** (institutions): The ten circles on a 137-realm map: which map realms sit in which circle (data).
+- **OQ-INST-2** (institutions): The ten circles on a 137-realm map: which map realms sit in which circle (data). Slice 2 default: the historical circles matched to the map members (Austrian, Bavarian, Swabian, Upper Rhenish, Electoral Rhenish, Lower Saxon, Upper Saxon); Bohemia, Switzerland and the Italian members sit in none.
 - **OQ-INST-3** (institutions): Which great houses Japan starts with as lords depends on the realm data's great-house list (D-REALM-10); the shogunate needs at least the 22 shugo houses of the catalogue.
 - **OQ-INST-4** (institutions): The heads of faith design may give the Papacy powers over the Emperor (crowning); the church seats then read that design.
 - **OQ-VIEW-8** (map-presentation): (release task) Budgets on real devices: targets on a low-end Android phone, an older iPhone, Steam Deck and Steam Machine need device tests.

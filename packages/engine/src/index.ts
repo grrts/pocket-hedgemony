@@ -33,7 +33,7 @@ export { censurePreview, faithBadge, faithHeadsView, headCard, type FaithHeadsVi
 export { ENVOY_ACTIONS, type EnvoyAction, type StatecraftView } from "./statecraft.ts";
 export { type RebelsView, type RisingView } from "./rebels.ts";
 export { type RegimeView, type RevolutionView, type Sign as RevolutionSign, type StanceView } from "./revolutions.ts";
-export { admit, defenceCalls, empireDues, empireOrder, empireView, headOfFaith, institutionsLens, monthlyInstitutions, realmsOf, seekVote, type EmpireOrder, type EmpireView, type MemberView, type SeatView } from "./institutions.ts";
+export { admit, answerRuling, callTheDiet, courtAims, passReform, defenceCalls, dietForecast, dissolveEmpire, empireDues, empireOrder, empireTax, empireView, headOfFaith, institutionsLens, monthlyInstitutions, realmsOf, seekVote, takeToCourt, whyNotDissolveTerm, type EmpireOrder, type EmpireView, type MemberView, type ReformsView, type SeatView } from "./institutions.ts";
 export type { EventCard } from "./events.ts";
 export { adminCapacityRank, ASSESSMENT_DIMENSIONS, LEVEL_RANK, realmAssessment, realmStrengths, RISK_DIMENSIONS, type AssessmentConfidence, type AssessmentLevel, type HeritageLine, type RealmAssessment, type RealmHeritage, type RealmHeyday, type RealmStrengths } from "./realmStrengths.ts";
 export { effectInPlay, heritageChoice, heritageFactor, heritageTaxReach, heritageView, IN_PLAY, monthlyHeritage, type HeritageView } from "./heritage.ts";

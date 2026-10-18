@@ -5,4 +5,5 @@
  * deterministic; numbers come from rules/data/domain/institutions.json.
  */
 export * from "./empire.ts";
+export * from "./diet.ts";
 export * from "./screens.ts";
