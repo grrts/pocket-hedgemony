@@ -191,10 +191,10 @@ Newest decision first.
 
 ### 5.3 Title and main menu
 
-- SHELL-016: The title screen shall show the real map at world zoom drifting slowly across a region, drawn by the map renderer; while a campaign is in progress it shall drift over the player's realm in its current borders, read from the latest save's summary rather than the whole save. [screen-flow §3 S3, §10.5]
-- SHELL-017: When the title screen receives any touch, click, key or controller button, the game shell shall treat it as Tap to start and the `title` track shall start. [screen-flow §3 S3]
-- SHELL-018: The title screen shall show a small settings cog that opens Settings straight away, a ✕ that quits on desktop only, and the version number in a corner. [screen-flow §3 S3]
-- SHELL-019: When the player taps to start, the "Tap to start" line shall fold open into the main menu in the same place on the same screen, and Back from the main menu shall return to "Tap to start". [screen-flow §3 S4]
+- SHELL-016: The title screen shall show the real map at world zoom drifting slowly across a region, drawn by the map renderer; while a campaign is in progress it shall drift over the player's realm in its current borders, read from the latest save's summary rather than the whole save. [screen-flow §3 S3, §10.5] *Replaced by SHELL-150 (start screen, 18 Oct): region zoom.*
+- SHELL-017: When the title screen receives any touch, click, key or controller button, the game shell shall treat it as Tap to start and the `title` track shall start. [screen-flow §3 S3] *Replaced by SHELL-149: no Tap to start.*
+- SHELL-018: The title screen shall show a small settings cog that opens Settings straight away, a ✕ that quits on desktop only, and the version number in a corner. [screen-flow §3 S3] *Replaced by SHELL-154: the cog and Quit move into the icon row.*
+- SHELL-019: When the player taps to start, the "Tap to start" line shall fold open into the main menu in the same place on the same screen, and Back from the main menu shall return to "Tap to start". [screen-flow §3 S4] *Replaced by SHELL-149: the menu shows straight away.*
 - SHELL-020: While a campaign exists, the main menu shall show Continue, labelled with the realm's banner, name and in-game date ("France · May 1503"), which goes to Loading with the newest save. [screen-flow §3 S4]
 - SHELL-021: The main menu shall always show New campaign, which goes to S5. [screen-flow §3 S4]
 - SHELL-022: While any save exists, the main menu shall show Load, which goes to S6. [screen-flow §3 S4]
@@ -365,15 +365,33 @@ Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision
 - SHELL-148: When a battle of the player's begins while the week plays, the game shell shall pause the week and alert "A battle has begun at <province>. The week waits." with Watch; the alert stays until the battle ends. Watch flies the map to the battle, plays on at a slower pace for every 4-hour step while the player watches (`WATCH_STEP_MS` 1.2 s, provisional), and shows a battle strip over the map with both realms, the men each has left against the men they started with, and the round of the rounds the battle lasts; when the battle ends the strip says how. End turn instead plays on without watching. *Changes SHELL-076 to SHELL-079: the map no longer flies to a battle by itself; the week waits for the player.* [F-73]
 
   How the player uses it: the alert drops in under the top bar and the End turn button shows paused, so the player sees at once that the week waits and why. One tap on Watch (44 points) goes there; the strip sits along the bottom between the overview button and End turn so the fight on the map stays in view in the Wide and Tall layouts, and its cross stops watching. The battle on the map and the strip are the overview of the fight; the Dispatches keep the result. Nothing needs hover.
-- SHELL-149: When the player goes from one screen of the panel to another (a province card and its tab, a country card and its tab, a commander, an official, a lord, a fleet, the Dispatches or the Achievements), the game shell shall keep the screen left behind on a screen history of at most 20 screens, and a Back button in the card's header shall return to the last one and take it off; a redraw of the same screen (as the week plays) adds nothing, closing the card clears the history, and the device's back gesture does the same as Back while the history holds a screen. *Replaces the "Back to <name>" button of SHELL-046.* [F-119]
+- SHELL-159: When the player goes from one screen of the panel to another (a province card and its tab, a country card and its tab, a commander, an official, a lord, a fleet, the Dispatches or the Achievements), the game shell shall keep the screen left behind on a screen history of at most 20 screens, and a Back button in the card's header shall return to the last one and take it off; a redraw of the same screen (as the week plays) adds nothing, closing the card clears the history, and the device's back gesture does the same as Back while the history holds a screen. *Replaces the "Back to <name>" button of SHELL-046.* [F-119]
 
   How the player uses it: Back is the arrow at the left of the card's header, beside Fold away and the cross, a 44-point button that shows only while there is somewhere to go back to, so the header itself says whether the player came from another screen. One tap returns to the screen before, on the tab it was left on; tapping again keeps stepping back. On a phone in landscape the three header buttons sit in a row at the right of the title in the Wide and Tall layouts, and the phone's back gesture steps back too. Nothing needs hover.
+
+### Start screen (Leroy, 18 October 2026)
+Leroy asked for an actual start screen: a Play button, the moving map zoomed in behind it, Settings and Load on it, and a link to the web wiki. It is the latest decision, so it replaces the title and main menu's "Tap to start" step: the title (S3) and the main menu (S4) become one start screen (screen id `title`, kept so music and sound keep keying on it). The entries of SHELL-020 to SHELL-029 keep their rules except where these say otherwise.
+
+- SHELL-149: When boot (and the first-run questions, SHELL-012) finish, the game shell shall open the start screen with its menu already shown, and shall not wait for a Tap to start. *Replaces SHELL-017 and SHELL-019; the `title` track starts on the first touch, click, key or button anywhere on the start screen, as browsers and phones allow sound only after one.* [Leroy 18 Oct]
+- SHELL-150: The start screen's background shall be the real map drawn by the campaign map renderer at region zoom (the zoom that shows provinces, towns and castles, `shell.start_zoom`), panning slowly (`shell.start_pan_speed`) along a path and turning gently at its ends; while a campaign is in progress the path runs over the player's realm in its borders and season from the latest save's summary, otherwise over the 1444 regions listed in `shell.start_regions`, one region per start. The background takes no input, runs no simulation, and is drawn behind a parchment band so the menu stays readable. *Replaces SHELL-016's world zoom.* [Leroy 18 Oct]
+- SHELL-151: While Battery saver is on, the start screen's background shall keep panning at Battery saver's lower frame rate rather than stop, since the moving map is the screen's look. [Leroy 18 Oct; settings §3.1]
+- SHELL-152: The start screen shall show, in one column: Play (large and wax-red, the first entry and first focus), then New campaign while a campaign is in progress, Load while any save exists, and Tutorial until the tutorial is finished. *Replaces SHELL-020, SHELL-021, SHELL-026 and SHELL-027 where they differ.* [Leroy 18 Oct]
+- SHELL-153: While a campaign is in progress, Play shall read "Play" with the realm's banner, name and in-game date under it ("France · May 1503") and go to Loading with the newest save; otherwise Play shall open New campaign, after the first-launch question the first time (SHELL-131). [Leroy 18 Oct; SHELL-004]
+- SHELL-154: The start screen shall show under the column one row of icon buttons with their names: Settings (opens Settings as an overlay, D-SHELL-12), Achievements, Wiki, More (Almanac, Credits, Unlock or Buy the full game, and Tutorial once it is finished) and, on desktop and Steam only, Quit. *Replaces SHELL-018's corner cog and ✕ and SHELL-024's More list where they differ.* [Leroy 18 Oct]
+- SHELL-155: When the player picks Wiki, the game shell shall open the web wiki at `shell.wiki_url` in the system browser (the Steam overlay browser on Steam), leaving the game on the start screen as it was; when the device is offline the browser says so, and the game asks nothing. [Leroy 18 Oct]
+- SHELL-156: The start screen shall show the version number small in the lower right corner and, in the free tier, the Full game ribbon (SHELL-029) beside the logo. [Leroy 18 Oct]
+- SHELL-157: When the player presses Back on the start screen with nothing open over it, the game shell shall leave the app on Android and do nothing elsewhere. *Replaces the start-screen part of SHELL-118.* [Leroy 18 Oct]
+- SHELL-158: When the player picks Exit to main menu in a campaign, the game shell shall return to the start screen, its background now panning over the realm just left. [Leroy 18 Oct; SHELL-086]
+
+  How the player uses it: the game opens on the start screen, so one tap on Play is the whole way back into a campaign, or into New campaign with none. Everything else sits beside Play in two groups: the column holds the ways into a campaign (Play, New campaign, Load, Tutorial), and the icon row holds the things around play (Settings, Achievements, Wiki, More, Quit), so nothing is spread over other screens. The Play button is the overview: its banner, realm and date say at a glance which campaign waits, and the map panning behind it shows that realm's land. On a phone in landscape (Short wide) the logo sits top left, the column and icon row fill the left third on the parchment band inside the safe areas, and the map pans across the right two thirds; in the Tall layout (a tablet held upright) the logo and map fill the top half and the column and row are centred below; in the Large and Far layouts the column keeps a fixed width on the left. Play is at least 56 points tall, every other entry and icon button at least 44 points with 8 between, each icon button has its name under it, and nothing needs hover. A phone held upright shows "Turn your phone sideways" here too (SHELL-113).
 
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
 |---|---|---|---|---|
 | TapToStart | player | Title showing | Main menu folds open; `title` track starts | `TitleDismissed` |
+| Play | player | Start screen | Loading with the newest save, or New campaign (first-launch question the first time) | `CampaignLoadRequested` or `ScreenOpened(new_campaign)` |
+| OpenWiki | player | Start screen | System browser opens `shell.wiki_url`; the game stays on the start screen | — |
 | AnswerFirstRunQuestion | player | First run; question card showing | Answer stored; next question or title | `FirstRunAnswered` |
 | ContinueCampaign | player | A campaign exists | Loading with the newest save | `CampaignLoadRequested` |
 | StartNewCampaign | player | — | S5 step 1 | `ScreenOpened(new_campaign)` |
@@ -415,7 +433,7 @@ sent as data.
 | Event | When | Payload | Consumed by (context) |
 |---|---|---|---|
 | `ScreenOpened` / `ScreenClosed` | A screen enters or leaves the stack | screen id, tab (realm book) | audio (screen rules 5.2, `diplomacy` mood on Abroad), onboarding |
-| `TitleDismissed` | Tap to start | — | audio (sound may start) |
+| `TitleDismissed` | Tap to start; since SHELL-149 the first input on the start screen | — | audio (sound may start) |
 | `FirstRunAnswered` | A first-run card answered | language or consent value | settings |
 | `CampaignStarted` | Begin pressed | realm, options | scenario-setup, saves, time-and-turns |
 | `CampaignLoadRequested` | Continue, Load, Restore the last save | save id | saves |
@@ -491,6 +509,10 @@ are listed in its `_provisional` array.
 | `shell.end_date_earliest_year` | Earliest end date a campaign may choose (31 August of that year) | 1494 | yes (provisional) | game-shell.json `endDateEarliestYear` |
 | `shell.domination_share` | Share of the world's settled land provinces for world domination | 0.5 | no (X-12) | game-shell.json `dominationShare` |
 | `shell.ledger_leaders` | Realms beside the player on the final result | 5 | yes (provisional) | game-shell.json `ledgerLeaders` |
+| `shell.start_zoom` | Zoom of the start screen's background | region zoom | yes (provisional) | game-shell.json `startZoom` |
+| `shell.start_pan_speed` | How fast the start screen's background pans | 6 map pixels a second | yes (provisional) | game-shell.json `startPanSpeed` |
+| `shell.start_regions` | 1444 regions the background pans over when no campaign is in progress | Bosporus, Venice and the Adriatic, the Low Countries, the Nile delta, the Kinai, the Ganges delta | yes (provisional) | game-shell.json `startRegions` |
+| `shell.wiki_url` | Address of the web wiki | `https://github.com/grrts/pocket-hedgemony/wiki` (placeholder until the wiki in `docs/wiki/` is published on the web) | yes (release task) | game-shell.json `wikiUrl` |
 | `shell.campaign_end_date_default` | Default end date | 31 August 1939 | no (decided) | campaign rules |
 | `attention.*` | Warnings and thresholds | one table; first lines from warfare 14 | yes | one config table (unnamed) |
 | `tips.*` | Loading tips with era, region, new-player tags | written by the tutorial thread | — | tips table |
@@ -755,5 +777,15 @@ Decided on 17 October 2026 under `domain/DECISIONS.md`. No question stays open.
 | SHELL-143 | navigation-by-input.feature | Space ends the turn |
 | SHELL-147 | in-campaign-screens.feature | The Dispatches log keeps past weeks; A battle or siege begins |
 | SHELL-148 | in-campaign-screens.feature | The week waits at a battle |
-| SHELL-149 | map-and-cards.feature | Back returns to the screen before |
+| SHELL-149 | start-screen.feature | The start screen opens with its menu shown |
+| SHELL-150 | start-screen.feature | The map pans behind the start screen at region zoom |
+| SHELL-151 | start-screen.feature | Battery saver keeps the map moving |
+| SHELL-152 | start-screen.feature | The column of ways into a campaign |
+| SHELL-153 | start-screen.feature | Play continues the campaign in progress; Play with no campaign opens New campaign |
+| SHELL-154 | start-screen.feature | The icon row |
+| SHELL-155 | start-screen.feature | The Wiki opens in the browser |
+| SHELL-156 | start-screen.feature | Version and Full game ribbon |
+| SHELL-157 | start-screen.feature | Back on the start screen |
+| SHELL-158 | start-screen.feature | Exit to main menu returns to the start screen |
+| SHELL-159 | map-and-cards.feature | Back returns to the screen before |
 | SHELL-144–146 | layout-by-shape.feature | Each subject has one home; Important things have an overview; Every screen fits a phone in landscape |

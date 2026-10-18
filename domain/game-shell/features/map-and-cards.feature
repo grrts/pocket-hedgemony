@@ -186,7 +186,7 @@ Feature: Map and cards
     Then that commander's army is selected
     And army banners take taps of at least 44 points
 
-  @SHELL-149 @feedback-119
+  @SHELL-159 @feedback-119
   Scenario: Back returns to the screen before
     Given the province card of "Champagne" is open
     When the player opens the country card of "France" from it
