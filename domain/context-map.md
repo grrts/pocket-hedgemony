@@ -2,7 +2,7 @@
 
 Pocket Hegemony is split into 31 bounded contexts. Each one owns a part of the game's rules and its own words for them. This page shows how the contexts fit together and where the seams between them sit. The full detail is in two generated files:
 
-- [context-map-seams.md](context-map-seams.md): every pair of contexts, with what each side says crosses between them (327 pairs).
+- [context-map-seams.md](context-map-seams.md): every pair of contexts, with what each side says crosses between them (331 pairs).
 - [open-questions.md](open-questions.md): every gap and contradiction the specs found, and how each was decided.
 - [DECISIONS.md](DECISIONS.md): the decisions that cross several contexts, and the rules used to decide.
 

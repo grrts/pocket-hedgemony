@@ -9,7 +9,7 @@ export { atWar, controller, engageRange, offerPeace, peaceShare, relationState, 
 export { hashWorld } from "./hash.ts";
 export { cultureOf, officialName, personName } from "./names.ts";
 export { officialEffect, OFFICIALS, type OfficialEffectView } from "./officials.ts";
-export { aiRecruits, ARMS, FOOT_ARMS, HORSE_ARMS, KIND, KIND_NAMES, isHorseArm } from "./recruit.ts";
+export { aiCollect, aiRecruits, ARMS, commanderScreen, type CommanderScreen, FOOT_ARMS, HORSE_ARMS, KIND, KIND_NAMES, LEVY_UNIT, garrisonTroops, garrisonView, gatherDays, idleCommanders, isHorseArm, menByArm, monthlyRecruits, recruitRefusal, trainingGround, type GarrisonView } from "./recruit.ts";
 export { CLASS_NAMES, CLASS_COUNT } from "./living.ts";
 export { NOT_YET as ACHIEVEMENTS_NOT_YET, type Unlock as AchievementUnlock } from "./achievements.ts";
 export { createEngineHost, type EngineRequest, type EngineResponse, type MapTiles, type Snapshot, type HostReply, type SaveListing } from "./protocol.ts";
