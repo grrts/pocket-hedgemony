@@ -188,14 +188,14 @@ A turn is one week; these steps run once a month, at the end of the turn in whic
 
 ### Subjects in the game today
 
-- **Where**: your realm's **Diplomacy** tab lists your *Subjects*: how much of your reach (5 for now) they use, the tribute they send each month, and a row per subject with its kind, loyalty, arrows up and down, what it pays and its worst reason. Tap a subject to open its card.
+- **Where**: your realm's **Diplomacy** tab lists your *Subjects*: how much of your reach they use (from your administrative capacity: 2 to 9, 5 where it is unknown), the tribute they send each month, and a row per subject with its kind, loyalty, arrows up and down, what it pays and its worst reason. Tap a subject to open its card.
 - **The subject's card** (its own Diplomacy tab): its loyalty and every reason behind it as a badge, what it pays and how it comes to your wars, and your actions: set the tribute (*None*, *Light*, *Normal*, *Heavy*, *Crushing*), *Send a gift* (six months of its income, +1 for 5 years), *Loosen to tributary* (Vassal or Protectorate, +2 for 10 years) and *Release* (it goes free as your friend).
 - **What they pay**: the kind's share times the tribute level, all of it while Loyal, half while Wavering and nothing while Disloyal. A Vassal pays 10 in 100 of its taxes; a Tributary 15 in 100 of its income. It shows as *Tribute* in your Treasury tab.
 - **Loyalty** is counted at the end of every season: two more arrows up than down raise it a step, two more down lower it, never twice the same way within a year. You hear when it moves. A Disloyal subject refuses your calls to arms.
 - **Making subjects**: send an envoy to *Offer overlordship* to a smaller realm (it becomes your tributary) or *Ask for protection* of a larger one (you become its vassal), or demand tribute. The other realms offer overlordship too.
 - **Your envoys at their court**: *Station a resident* (+1 loyalty, takes one of your envoys while he stays), *Tighten to vassal* (a Loyal tributary, one envoy for 6 months) and *Fold into your realm* (Loyal for 10 years, a subject for 20, sharing a border, and room under your lords cap; one envoy for a month per province). When folding in completes, their land is yours, held by their ruler as one of your lords, and the country leaves the map. Other realms fold in their subjects too, one at a time.
 - **Rising**: a Disloyal subject may rise and declare its independence war. The other realms' subjects rise when their overlord is losing a war elsewhere or a stronger enemy of it waits next door, and their Disloyal neighbours rise with them. Lose land in the peace and the subject is taken back one kind tighter (its fellow subjects remember the force used); otherwise it is free. If you are a subject and Disloyal, *Rise for independence* is on your Diplomacy tab.
-- **Not yet**: hostages, backers that join the war, merging crowns and the subjects map lens come later; faith and distance give no reasons yet.
+- **Not yet**: hostages, backers that join the war, merging crowns and the subjects map lens come later; distance gives no reason yet. Faith and tongue do: the same state faith or court tongue pulls a subject closer, a different faith pushes it away, more so where you persecute it.
 
 ## How it connects
 
