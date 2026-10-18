@@ -341,6 +341,7 @@ function founded(world: World, c: ColonyFounding, news: News[]): void {
   world.provinceOfficial[p] = OFFICIALS.indexOf("Warden");
   world.provinceOfficialSeed[p] = p;
   world.provinceOfficialSince[p] = world.day;
+  world.provinceOfficialFrom[p] = -1;
   e.founded[p] = n;
   chartAround(world, n, p);
   addBorders(world, n);

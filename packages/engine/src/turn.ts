@@ -15,12 +15,13 @@ import { answerRevolution, lockedOrder, monthlyRevolutions } from "./revolutions
 import { answerEvent, monthlyEvents } from "./events.ts";
 import { heritageChoice, monthlyHeritage, payCounsel } from "./heritage.ts";
 import { monthlyGovernment, reform } from "./government.ts";
-import { dismissTrader, draftTradeRoute, foundTrader, monthlyTrade, setTradeRoute, type GameRouteMode, type GameTraderKind } from "./trade.ts";
+import { dismissTrader, draftTradeRoute, foundTrader, monthlyTrade, setTradeRoute, type GameTraderKind } from "./trade.ts";
 import { monthlyNavy, navyOrder, stepNavy, type NavyOrder } from "./navy.ts";
+import { hiredFleetOrder, monthlyHiredFleets, type HireOrder } from "./hiredFleets.ts";
 import { dailyExploration, exploreOrder, monthlyColonies, stepVoyages, type ExploreOrder } from "./colonies.ts";
 import { monthlyPeoples, setFaithPolicy, setTonguePolicy } from "./peoples.ts";
-import { swapOfficials } from "./officials.ts";
-import { giveGift, grantFief, inAnyWar, monthlyLords, seizeFief } from "./lords.ts";
+import { hireOfficial, settleLand, swapOfficials } from "./officials.ts";
+import { giveGift, grantFief, inAnyWar, lordGetsBuilding, monthlyLords, seizeFief } from "./lords.ts";
 import { noteMoment, turnEndAchievements } from "./achievements.ts";
 import { addDays, DAYS_PER_RATION_MONTH, DAYS_PER_TURN } from "./calendar.ts";
 import { corridor, monthlyRations, refillRations, wagonRations, planRoute, planTilePath, tileStepHours, type MarchingArmy } from "./march.ts";
@@ -108,6 +109,10 @@ export type Order =
   | { type: "seizeFief"; province: number }
   /** Move officials between two royal provinces: they swap posts, or one takes the other's empty post (AssignOfficial). */
   | { type: "swapOfficials"; a: number; b: number }
+  /** Hire an official of a type (an OFFICIALS index) into an empty royal post; a foreign specialist costs more (HireOfficial). */
+  | { type: "hireOfficial"; province: number; official: number; foreign: boolean }
+  /** Keep a province just taken as royal land with its post empty for now (SettleLand, PROV-340). */
+  | { type: "settleLand"; province: number }
   /** Research: choose the invention to study, how many students to keep, empty the schools into recruits, found a school in a town. */
   | { type: "setStudy"; invention: string }
   | { type: "setSeats"; n: number }
@@ -142,8 +147,8 @@ export type Order =
   | { type: "reform"; to: string }
   /** Found a trader in an own city (TRADE-003), set its route of 2 to 8 cities (TRADE-050), draw one for its preview (TRADE-054), or dismiss it (TRADE-006). */
   | { type: "foundTrader"; city: number; kind: GameTraderKind }
-  | { type: "setTradeRoute"; trader: number; stops: number[]; mode?: GameRouteMode }
-  | { type: "draftTradeRoute"; trader: number; stops: number[]; mode?: GameRouteMode }
+  | { type: "setTradeRoute"; trader: number; stops: number[] }
+  | { type: "draftTradeRoute"; trader: number; stops: number[] }
   | { type: "dismissTrader"; trader: number }
   /** Set the realm's Tongue policy (CULT-038), or a faith's policy from the next New Year (RELG-055). */
   | { type: "tonguePolicy"; policy: string }
@@ -159,6 +164,8 @@ export type Order =
   | { type: "answerRevolution"; stance: "lead" | "bend" | "fight" }
   /** Ports, sailors and fleets: muster, buy a ship, sail, board, land, admiral, merge, split, disband (navy.ts). */
   | NavyOrder
+  /** Hire a free or lent fleet, or dismiss one (hiredFleets.ts). */
+  | HireOrder
   /** Voyages, colonial governors and colonies: explore, hire, embark, load, unload, found, abandon, dismiss (colonies.ts). */
   | ExploreOrder;
 
@@ -243,6 +250,7 @@ function startDay(world: World, news: News[]): void {
     monthlyTrade(world, news);
     runLedger(world, true);
     monthlyNavy(world, news);
+    monthlyHiredFleets(world, news);
     monthlyColonies(world, news);
     judgeNeglect(world);
     if (world.date.month === 1) mineYear(world, news);
@@ -344,6 +352,13 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
       if (!reason) runLedger(world, false);
       return reason;
     }
+    case "settleLand":
+      return settleLand(world, actingNation, order.province);
+    case "hireOfficial": {
+      const reason = hireOfficial(world, actingNation, order.province, order.official, !!order.foreign, news);
+      if (!reason) runLedger(world, false);
+      return reason;
+    }
     case "setStudy":
       return setStudy(world, actingNation, order.invention);
     case "setSeats":
@@ -357,6 +372,7 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
     }
     case "build": {
       const reason = orderWork(world, actingNation, order.province, order.work, news);
+      if (!reason) lordGetsBuilding(world, order.province, news);
       if (!reason) runLedger(world, false);
       return reason;
     }
@@ -383,9 +399,9 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
     case "foundTrader":
       return foundTrader(world, actingNation, order.city, order.kind);
     case "setTradeRoute":
-      return setTradeRoute(world, actingNation, order.trader, order.stops, order.mode);
+      return setTradeRoute(world, actingNation, order.trader, order.stops);
     case "draftTradeRoute":
-      return draftTradeRoute(world, actingNation, order.trader, order.stops, order.mode);
+      return draftTradeRoute(world, actingNation, order.trader, order.stops);
     case "dismissTrader":
       return dismissTrader(world, actingNation, order.trader);
     case "tonguePolicy":
@@ -434,7 +450,7 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
     case "move":
       return orderMarch(world, order, actingNation);
     case "navy":
-      return navyOrder(world, order, actingNation, news);
+      return order.do === "hire" || order.do === "dismiss" ? hiredFleetOrder(world, order, actingNation, news) : navyOrder(world, order, actingNation, news);
     case "explore":
       return exploreOrder(world, order, actingNation, news);
   }

@@ -201,7 +201,8 @@
       "warden": { "garrison": 0.25, "walls_repair": 2, "castle_store_rot": 0.5 },
       "colonial governor": {}
     },
-    "school_trains": { "madrasa": ["judge", "chaplain"], "university": ["judge", "steward"], "academy": ["master of works", "warden"] }
+    "school_trains": { "madrasa": ["judge", "chaplain"], "university": ["judge", "steward"], "academy": ["master of works", "warden"] },
+    "hire": { "gold": 25, "foreign_multiplier": 2, "provisional": true }
   },
   "loyalty": ["In revolt", "Disloyal", "Wavering", "Loyal"],
   "homeland": { "years": 100 },

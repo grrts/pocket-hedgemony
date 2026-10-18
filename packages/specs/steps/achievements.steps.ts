@@ -192,7 +192,24 @@ When("the country {string} completes 10 years of play", (s, realm: string) => {
   A.countLifetime(profile(s), campaign(s), "distinct_realms_played_10_years", realm);
 });
 Then(/^the lifetime counter "([^"]*)" (?:stays at|reaches) (\d+)$/, (s, counter: string, n: string) => {
-  expect(profile(s).lifetime[counter]?.length ?? 0).toBe(Number(n));
+  expect(profile(s).totals[counter] ?? profile(s).lifetime[counter]?.length ?? 0).toBe(Number(n));
+});
+
+// Ladders (ACH-084, ACH-085)
+Given("the profile counts {int} province harvests", (s, n: number) => {
+  profile(s).totals.provinces_harvested = n;
+});
+When("an eligible campaign brings in {int} province harvests", (s, n: number) => {
+  s.c = A.newCampaign({ ironman: true });
+  A.addLifetime(profile(s), s.c, "provinces_harvested", n);
+  occur(s, "harvest", { harvests_seen: 1 });
+});
+Then("the achievements {string} and {string} unlock at the same harvest", (s, a: string, b: string) => {
+  expect(s.last.unlocked.map((u: A.AchievementUnlocked) => u.id)).toEqual(expect.arrayContaining([a, b]));
+});
+Then("the ladder {string} stands at level {int} of {int}, with {string} next", (s, ladder: string, level: number, of: number, next: string) => {
+  const st = A.ladderState(A.ladders()[ladder]!, profile(s).unlocked);
+  expect([st.level, st.of, st.next?.id]).toEqual([level, of, next]);
 });
 
 Given("the campaign is an unbroken ironman campaign", (s) => {
@@ -251,7 +268,7 @@ Then("the country gains no bonus, no unlocked nation and no cosmetic", (s) => {
   const u: A.AchievementUnlocked = s.last.unlocked[0];
   expect(Object.keys(u).sort()).toEqual(["date", "id", "tier", "type"]);
   expect(s.facts).toEqual(s.factsBefore);
-  const fields = new Set(["id", "name", "text", "category", "tier", "hidden", "scope", "moment", "test", "progress", "full_game", "refs"]);
+  const fields = new Set(["id", "name", "text", "category", "tier", "hidden", "scope", "moment", "test", "progress", "full_game", "ladder", "refs"]);
   for (const d of A.ACHIEVEMENTS) for (const k of Object.keys(d)) expect(fields.has(k), `${d.id}.${k}`).toBe(true);
 });
 
