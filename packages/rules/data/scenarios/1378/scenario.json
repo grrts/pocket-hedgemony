@@ -1,0 +1,23 @@
+{
+  "$comment": "The 1378 start scenario (X-25, milestone 10 step 5), being built. Not bundled yet: the game still starts from scenarios/1444 until the switch-over (step 7). Its data is written region by region under regions/<region>/, so the threads building each region never edit the same file; packages/rules/src/scenarios.ts joins the regions in the order below. Each region folder holds files with the same names and shapes as scenarios/1444, carrying only that region's entries.",
+  "id": "1378",
+  "name": "Autumn 1378",
+  "date": { "year": 1378, "month": 9, "day": 20 },
+  "eras": {
+    "$comment": "Era I is stretched back to the start (plan-1378.md 3.2, decided 19 Oct 2026).",
+    "start": "I",
+    "before_start": ["A", "M"]
+  },
+  "regions": ["europe-west", "east", "asia", "africa-americas"],
+  "files": {
+    "regions/<region>/map-nations.json": "the region's map nations with their capitals (SETUP-040)",
+    "regions/<region>/map-owners.json": "owner rules handing the region's provinces to its nations, first match wins (SETUP-041); the regions' rules are joined in the order of regions",
+    "regions/<region>/sleeping-realms.json": "realms born after the start, asleep until they wake (SETUP-080, X-25): { realms: [...] }",
+    "regions/<region>/rulers.json": "each map realm's ruler on the start day (REALM-233): { rulers: { id: ruler } }",
+    "regions/<region>/culture-start.json": "court tongues, province tongues and faiths on the start day (CULT-094): { tongues, realms }",
+    "regions/<region>/relations.json": "relations between realms on the start day (DIPL-020): { relations: [...] }, a relation sits in the region of its source",
+    "regions/<region>/subjects.json": "subject records on the start day (SUBJ): { subjects: [...] }",
+    "regions/<region>/subjects-rulers.json": "rulers the subjects context names: { rulers: { id: ruler } }",
+    "regions/<region>/ports.json": "towns placed as ports on the start day (NAVY-013): { towns: [...] }"
+  }
+}
