@@ -75,5 +75,6 @@
   {"id": "great_horde", "name": "Mamai's Horde", "capital": [35.09, 45.06], "color": "#a35a2a", "commanders": [{"name": "Mamai", "might": 3, "cunning": 4, "logistics": 3}], "army": 30000},
   {"id": "white_horde", "name": "White Horde", "capital": [68.1, 44.0], "color": "#e0d6b0", "commanders": [{"name": "Tokhtamysh", "might": 3, "cunning": 3, "logistics": 2}], "army": 15000},
   {"id": "arab_shah_horde", "name": "Arab Shah's Horde", "capital": [45.65, 48.6], "commanders": [{"name": "Arab Shah", "might": 3, "cunning": 2, "logistics": 2}]},
-  {"id": "volga_bulgaria", "name": "Bulgar Emirates", "capital": [49.06, 54.98]}
+  {"id": "volga_bulgaria", "name": "Bulgar Emirates", "capital": [49.06, 54.98]},
+  {"id": "mamluks", "name": "Mamluk Sultanate", "capital": [31.24, 30.04], "color": "#d9a066", "commanders": [{"name": "Barquq", "might": 3, "cunning": 4, "logistics": 3}, {"name": "Baraka", "might": 3, "cunning": 2, "logistics": 2}], "army": 30000}
 ]
