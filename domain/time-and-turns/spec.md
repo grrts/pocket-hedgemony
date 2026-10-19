@@ -95,7 +95,7 @@ Newest decision first.
 | Reference day | 11 November 1444: the day the country catalogue and relations describe; the same as the start date | — |
 | End date | The date the campaign stops; default 31 August 1939, one setting chosen at campaign start | Game over (the player's realm is gone) |
 | Age | An event-tree situation with a baseline, a window, start and end conditions and forced start and end dates | An era |
-| Era | A dated band of the research and warfare trees that follows the calendar: I 1444–1500 … VII 1914 to the end date (X-14) | An age |
+| Era | A dated band of the research and warfare trees that follows the calendar: I 1378–1500 … VII 1914 to the end date (X-14) | An age |
 | Out of scope | Content after 31 August 1939: Era VIII, the 1939–1960 part of Era VII, the Second World War events and the Decolonization, Cold War and Globalization ages | — |
 
 ## 4. Domain model
@@ -135,7 +135,7 @@ Newest decision first.
   year, regions. In scope: Gunpowder Empires, Exploration, Reformations, Atlantic Empires, Crisis and
   Absolutism, Revolutions, Industrialization, Imperialism, World Wars. Out of scope: Decolonization, Cold
   War, Globalization.
-- **Era** (value, owned by research/warfare, read here): I 1444–1500 · II 1500–1600 · III 1600–1700 ·
+- **Era** (value, owned by research/warfare, read here): I 1378–1500 · II 1500–1600 · III 1600–1700 ·
   IV 1700–1800 · V 1800–1870 · VI 1870–1914 · VII 1914 to the end date. Era VIII is dropped (X-14).
 
 ### Domain services
@@ -441,7 +441,7 @@ the turn in which a new month, season or year begins (X-18). What each system do
 - **D-TIME-6** (was OQ-TIME-6) Year boundary: yearly steps run in the January turn, five-yearly steps in the January turn of years divisible by 5, and the yearly "traders and trade balance" step is dropped. X-4 and X-6 settle it.
 - **D-TIME-7** (was OQ-TIME-7) Interrupted turns: a backgrounded app pauses the turn and carries on; a killed app processes the turn again from the last turn-boundary save with the same orders, which gives the same result because the turn is deterministic. Both texts hold for their own case, so the simpler reading keeps both.
 - **D-TIME-8** (was OQ-TIME-8) Ages past 1939: an age or period whose window opens before 31 August 1939 is cut at the end date (the Age of World Wars runs to the end), and an age that would start on a post-1939 event, the Age of Decolonization, never starts. X-14 settles it.
-- **D-TIME-9** (was OQ-TIME-9) Eras: eras follow the calendar, I 1444–1500 to VII 1914 to the end date, and Era VIII is dropped. X-14 settles it.
+- **D-TIME-9** (was OQ-TIME-9) Eras: eras follow the calendar, I 1378–1500 to VII 1914 to the end date, and Era VIII is dropped. X-14 settles it.
 - **D-TIME-10** (was OQ-TIME-10) When victory is judged: world domination (half of the world's settled land provinces owned or held as subjects) is checked in every January turn and wins at once without ending the campaign; the Economy, Power and Technology leaders are judged only on 31 August 1939, with ties sharing the win; realm owns the score formulas. X-12 settles it.
 - **D-TIME-11** (was OQ-TIME-11) Campaign seed: setup and any warm-up (such as trade's months of traders) draw from the campaign's one `Rng` before turn 0 and move neither the date nor the turn counter. One seed and one generator is the simplest rule that keeps a campaign reproducible.
 - **D-TIME-12** (was OQ-TIME-12) Several acting nations: the player's orders are taken first, then each AI realm's in ascending nation index, each realm's in the order given. X-2 settles it.

@@ -577,7 +577,7 @@ Audio runs on the client main thread and never feeds back into the engine.
 | Key | Meaning | Value in the design | Placeholder? | Config file |
 |---|---|---|---|---|
 | `eras.basis` | calendar or technology | calendar | no (decided) | music.yaml |
-| `eras.bands` | Era start years | I 1444, II 1520, III 1650, IV 1790, V 1870 (W2) | yes ("design values for a first pass") | music.yaml |
+| `eras.bands` | Era start years | I 1378 (the start), II 1520, III 1650, IV 1790, V 1870 (W2) | yes ("design values for a first pass") | music.yaml |
 | `eras.campaign_end` | Music stops | 1939-08-31 | no | music.yaml |
 | `palettes.*` | Culture group → palette | as palette table | yes | music.yaml |
 | `palettes.split.turkic` | Longitude split | west of 55 → mena, else steppe | yes | music.yaml |

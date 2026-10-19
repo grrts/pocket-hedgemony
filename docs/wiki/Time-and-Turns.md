@@ -154,7 +154,7 @@ Which hemisphere a province is in comes from its latitude. Wet seasons follow th
 
 | Era | Years |
 |---|---|
-| I | 1444 to 1500 |
+| I | the start (1378) to 1500 |
 | II | 1500 to 1600 |
 | III | 1600 to 1700 |
 | IV | 1700 to 1800 |
