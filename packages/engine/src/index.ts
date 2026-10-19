@@ -52,3 +52,4 @@ export { reportFailedHarvests } from "./food.ts";
 export { grabbedLand, joinsLeague, leagueView, monthlyConquest, nameAbroadView, notorietyWord, type LeagueView, type NameAbroadView, type NotorietyWord } from "./conquest.ts";
 export { aiWarPay, heedsNoNotoriety, maxCededProvinces, priceContext, priceOfWar, warPay, whyAiWontDeclare, wouldSayPeaceAtDeclaration, type PriceContext, type PriceOfWar, type PriceOfWarCall } from "./priceOfWar.ts";
 export { makeSubject } from "./subjects.ts";
+export { restoreSleeping, saveSleeping, spareSleepers, wakeRealm, type Waking, type WokenRealm } from "./sleeping.ts";
