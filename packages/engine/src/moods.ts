@@ -7,6 +7,7 @@ import { storeMonths } from "./food.ts";
 import { OFFICIALS } from "./recruit.ts";
 import { BELIEF_GRIEVANCES, hasBelief } from "./peoples.ts";
 import { farFromThrone } from "./throne.ts";
+import { newlyTaken } from "./newlyTaken.ts";
 
 /**
  * Moods (milestone 3): each province holds grievances, and their count sets
@@ -16,9 +17,11 @@ import { farFromThrone } from "./throne.ts";
  */
 
 /** The grievances this game tracks so far, one bit each (province §5.22). */
-export const GRIEVANCES = ["Hungry", "Conscription", "Soldiers quartered", "Ungoverned", "Foreign rule", "Bloodshed", "Heavy taxes", "Grasping officials", "Banned language", "Wrong faith", "Persecuted", "Plague", "Far from the throne"] as const;
+export const GRIEVANCES = ["Hungry", "Conscription", "Soldiers quartered", "Ungoverned", "Foreign rule", "Bloodshed", "Heavy taxes", "Grasping officials", "Banned language", "Wrong faith", "Persecuted", "Plague", "Far from the throne", "Newly taken"] as const;
 export type GrievanceName = (typeof GRIEVANCES)[number];
 const bit = (g: GrievanceName) => 1 << GRIEVANCES.indexOf(g);
+const FAR = bit("Far from the throne");
+const NEWLY = bit("Newly taken");
 
 export const MOODS: readonly DecidedMood[] = ["calm", "grumbling", "rioting", "plotting"];
 
@@ -130,7 +133,9 @@ export function monthlyMoods(world: World, news: News[]): void {
     // An outbreak raging here is a grievance (PROV-356).
     if (world.provincePlague[p] === 2) now |= bit("Plague");
     // Royal land too far from the capital (PROV-174, X-28).
-    if (farFromThrone(world, p)) now |= bit("Far from the throne");
+    if (farFromThrone(world, p)) now |= FAR;
+    // Land taken from another realm in the last ten years (X-28).
+    if (world.provinceTakenYear[p]! >= 0 && newlyTaken(world, p)) now |= NEWLY;
     const before = MOODS.indexOf(moodOf(grievanceCount(world, p), isJudge(world.provinceOfficial[p]!)).mood);
     world.provinceGrievances[p] = now;
     const after = moodIndex(world, p);

@@ -59,3 +59,24 @@ Feature: Stability, read from lords, subjects, officials and provinces
     Given the player rules "France"
     Then the top bar shows the realm, the date, gold, stability, the war plaque while at war and the News button
     And every plaque has the same height and type
+
+  @REALM-299 @placeholder
+  Scenario Outline: Low stability costs tax, recruits and risings
+    # config: realm.stability.effects
+    Given a realm that reads <step>
+    Then its provinces send the crown <share> of their tax and recruit refill
+    And its plotting provinces rise <rising> times as often
+
+    Examples:
+      | step      | share | rising |
+      | Steady    | 1     | 1      |
+      | Uneasy    | 1     | 1      |
+      | Troubled  | 0.9   | 1.5    |
+      | Crumbling | 0.75  | 2      |
+
+  @REALM-298 @placeholder
+  Scenario: A default troubles the realm
+    # config: realm.debt.default.troubled_years (2)
+    Given a realm that defaulted on its debts last year
+    Then its treasury pillar reads Troubled
+    And two years after the default it reads Steady again

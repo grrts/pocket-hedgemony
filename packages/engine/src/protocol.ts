@@ -30,7 +30,7 @@ import { campaignView, setPlayer, type CampaignView } from "./campaignEnd.ts";
 import { GRIEVANCES, moodIndex, MOODS } from "./moods.ts";
 import { PLAGUE_STEPS, quarantineTaxShare } from "./plague.ts";
 import { CLASS_NAMES } from "./living.ts";
-import { canBorrow, heldTax, LEDGER, loanDebt, loanUnsettlesLords, LEDGER_LINES, NORMAL_TAX, TAX_RATES } from "./treasury.ts";
+import { canBorrow, debtTrouble, heldTax, LEDGER, loanDebt, loanUnsettlesLords, LEDGER_LINES, NORMAL_TAX, TAX_RATES } from "./treasury.ts";
 import { feverOf, FEVER_STEPS } from "./land.ts";
 import { CLIMATES, harvestMonthsOf, HARVESTS, provinceClimates, storeMonths } from "./food.ts";
 import { badWeatherName } from "./domain/realm/index.ts";
@@ -214,6 +214,8 @@ export interface Snapshot {
   debtLimit: number;
   loanDebtFactor: number;
   loanUnsettlesLords: boolean;
+  /** The player's road to default and after (X-28): monthly steps left before a default (0 = not broke), and the year lenders stop refusing after one (-1 = they lend). */
+  debtTrouble: { monthsLeft: number; refuseUntil: number; defaulted: number };
   /** Months of eating in each province's store, its last harvest (index into harvests, -1 = none yet) and people starved there this year (thousands). */
   provinceFoodMonths: Float32Array;
   provinceHarvest: Int8Array;
@@ -249,6 +251,8 @@ export interface Snapshot {
   moods: readonly string[];
   /** Days from each owned province to its realm's capital, at most THRONE.farCap (PROV-173, X-28). */
   provinceDaysToCapital: Uint8Array;
+  /** Year each province was taken from another realm, -1 = none; newly taken for NEWLY_TAKEN_YEARS after (X-28). */
+  provinceTakenYear: Int16Array;
   /** Every lord (index = provinceLord's value): name, house, realm, loyalty and provinces held; the gold a gift costs. */
   /** Lords by index; age, heir and gone for REALM-273 (a gone lord's line died out and he is listed nowhere). */
   lords: { name: string; house: string; nation: number; loyalty: string; lands: number; age: number; heir: { name: string; age: number } | null; gone: boolean; /** The chance an assassin sent after him succeeds (REALM-281). */ assassinChance: number; traits: string[]; title?: string; note?: string; historical?: boolean }[];
@@ -532,6 +536,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       debtLimit: player >= 0 ? w.nationDebt[player]! + canBorrow(w, player) * loanDebt(1) : 0,
       loanDebtFactor: loanDebt(1),
       loanUnsettlesLords: player >= 0 && loanUnsettlesLords(w, player),
+      debtTrouble: player >= 0 ? debtTrouble(w, player) : { monthsLeft: 0, refuseUntil: -1, defaulted: -1 },
       provinceFoodMonths: Float32Array.from({ length: w.provinceCount }, (_, p) => storeMonths(w, p)),
       provinceHarvest: w.provinceHarvest.slice(),
       provinceStarved: w.provinceStarved.slice(),
@@ -555,6 +560,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       grievanceNames: GRIEVANCES,
       moods: MOODS,
       provinceDaysToCapital: w.provinceDaysToCapital.slice(),
+      provinceTakenYear: w.provinceTakenYear.slice(),
       lords: (() => {
         const lands = new Int32Array(w.lords.length);
         for (let p = 0; p < w.provinceCount; p++) if (w.provinceLord[p]! >= 0) lands[w.provinceLord[p]!]!++;
@@ -706,6 +712,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       snap.provinceGrievances,
       snap.provinceMood,
       snap.provinceDaysToCapital,
+      snap.provinceTakenYear,
       snap.provinceRebels,
       snap.rebels.chance,
       snap.provinceLord,

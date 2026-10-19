@@ -299,6 +299,12 @@ settlement, settlers, local people's tiles.
 - PROV-175: Days to capital shall be counted from the realm's capital over its own land (each step the march's days to cross both grounds, plus a day for a river) and the sea (`far_from_throne.sea_zone_days` a sea zone); a realm that has lost its capital counts from its most populous province, and a province it can't reach over its land or the sea is as far as can be. They are worked out again in the monthly step whenever land has changed hands. [X-28]
 - PROV-176: While royal land is far from the throne, it shall send the crown `far_from_throne.cut_per_10_days` (0.1) less of its tax and recruit refill for every 10 days past the limit, down to `far_from_throne.least_share` (half, at 80 days). A province a lord holds is run from his seat: it is never far from the throne. [X-28]
 
+- PROV-177: For `newly_taken.years` (10) after a province is taken from another realm by a peace or handed over by a demand, it shall have *Newly taken*, one grievance (so foreign rule and the wrong faith together riot), whose rebels rise for their homeland. Land taken in from tribes, colonies and land held since the start are not newly taken. [X-28]
+- PROV-178: While newly taken, a province shall cost its owner `newly_taken.upkeep_share_of_tax` (half) of its tax at the normal rate again each month, on the ledger's *Holding new land* line. [X-28]
+
+#### How the player uses it: newly taken land
+- The province card's Overview shows *Newly taken* with the year it was taken and the year it ends, and that it costs garrisons and clerks; *Newly taken* is listed with its grievances. The Treasury tab's ledger shows the whole cost as *Holding new land*, so the price of conquest reads at a glance. Works by tap on a phone in either layout. [X-28]
+
 #### How the player uses it: far from the throne
 - The province card's Overview shows *To capital* with the days, and for far royal land the share it loses (for example "far from the throne: −20 % tax and recruits"); its Tax line says the same under the gold, so the player sees why it pays less. A lord's land far away says its lord runs it from his seat. [X-28]
 - *Far from the throne* is listed with the province's grievances and counts toward its mood like the rest. [X-28]
@@ -641,6 +647,8 @@ province config file but no file name or keys; keys below are proposed by this s
 | province.tax.no_official | Share without official | half | yes | province config |
 | province.tax.lord_share | Lord keeps | half | yes | province config |
 | province.tax.free_travel_days | Days before travel losses | 5 | yes | province config |
+| province.newly_taken.years | Years a taken province stays newly taken | 10 (X-28) | yes | province config |
+| province.newly_taken.upkeep_share_of_tax | Upkeep of newly taken land, as a share of its tax at the normal rate | 0.5 (X-28) | yes | province config |
 | province.far_from_throne.days | Days to capital limit | 30 (example) | yes | province config |
 | province.far_from_throne.cut_per_10_days | Share of tax and recruits lost every 10 days past the limit | 0.1 (X-28) | yes | province config |
 | province.far_from_throne.least_share | Least share a far province still sends | 0.5 (X-28) | yes | province config |
@@ -898,6 +906,8 @@ Every requirement has at least one scenario. PROV-292 (card layout) is also pres
 | PROV-174 | roads-and-travel.feature | Far from the throne |
 | PROV-175 | roads-and-travel.feature | Days to capital are counted over the realm's land and the sea |
 | PROV-176 | roads-and-travel.feature | Far royal land sends less; a lord's land is never far |
+| PROV-177 | — | Covered by engine test (packages/engine/test/newlyTaken.test.ts: holds the grievance for ten years) |
+| PROV-178 | — | Covered by engine test (packages/engine/test/newlyTaken.test.ts: costs upkeep on the New land line) |
 | PROV-180 | governance.feature | A province changes owner |
 | PROV-181 | governance.feature | What governance gives |
 | PROV-181 | governance.feature | A subject ruler governs a subject's province |

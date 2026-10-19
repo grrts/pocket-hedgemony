@@ -16,12 +16,12 @@ export const FAR_CAP = Math.min(255, Math.ceil(F.days + (10 * (1 - F.least_share
 export interface ThroneState {
   /** Days from each province to its owner's capital, at most FAR_CAP. */
   provinceDaysToCapital: Uint8Array;
-  /** A key of who owns what when the days were last worked out; derived, so not saved (-1 = work them out). */
-  throneKey: number;
+  /** A key per realm of the land it held when its days were last worked out; derived, so not saved (empty = work them all out). */
+  throneKeys: Uint32Array;
 }
 
 export function createThroneState(P: number): ThroneState {
-  return { provinceDaysToCapital: new Uint8Array(P), throneKey: -1 };
+  return { provinceDaysToCapital: new Uint8Array(P), throneKeys: new Uint32Array(0) };
 }
 
 /** A realm's seat of rule: its capital while it holds it, else its most populous province (the court moves); -1 with no land. */
@@ -122,7 +122,7 @@ function walkFrom(world: World, n: number): void {
   }
 }
 
-/** Days from every owned province to its realm's seat (the monthly step, and after land changes hands). */
+/** Days from every owned province to its realm's seat (on load, and the first time). */
 export function allThroneDays(world: World): void {
   const P = world.provinceCount;
   if (dist.length < P) ((dist = new Float32Array(P)), (stamp = new Int32Array(P)), (walk = 0));
@@ -136,14 +136,33 @@ export function allThroneDays(world: World): void {
   for (let n = 0; n < world.nationCount; n++) if (landed[n]) walkFrom(world, n);
 }
 
-/** Works the days out again when land has changed hands since the last time (the monthly step; cheap otherwise). */
+/**
+ * Works the days out again for each realm whose land has changed since the last time (the monthly
+ * step): a key per realm of the provinces it holds says which; the rest keep theirs.
+ */
 export function monthlyThrone(world: World): void {
-  let key = 0;
-  for (let p = 0; p < world.provinceCount; p++) key = (Math.imul(key, 31) + world.provinceOwner[p]! + 2) | 0;
-  key >>>= 0;
-  if (key === world.throneKey) return;
-  world.throneKey = key;
-  allThroneDays(world);
+  const N = world.nationCount;
+  const P = world.provinceCount;
+  const keys = new Uint32Array(N);
+  for (let p = 0; p < P; p++) {
+    const o = world.provinceOwner[p]!;
+    if (o >= 0) keys[o] = (keys[o]! + Math.imul(p + 1, 2654435761)) >>> 0;
+  }
+  const old = world.throneKeys;
+  world.throneKeys = keys;
+  if (old.length !== N) return allThroneDays(world);
+  const changed = new Uint8Array(N);
+  let any = false;
+  for (let n = 0; n < N; n++) if (keys[n] !== old[n]) ((changed[n] = 1), (any = true));
+  if (!any) return;
+  if (dist.length < P) ((dist = new Float32Array(P)), (stamp = new Int32Array(P)), (walk = 0));
+  const out = world.provinceDaysToCapital;
+  for (let p = 0; p < P; p++) {
+    const o = world.provinceOwner[p]!;
+    if (o < 0) out[p] = 0;
+    else if (changed[o]) out[p] = FAR_CAP;
+  }
+  for (let n = 0; n < N; n++) if (changed[n]) walkFrom(world, n);
 }
 
 /** Whether a province has Far from the throne: royal land further from the capital than `far_from_throne.days` (PROV-174, X-28). */

@@ -3,7 +3,7 @@ import { W as WARFARE } from "./domain/warfare/index.ts";
 import { monthlyPeople } from "./living.ts";
 import { monthlyBelief } from "./belief.ts";
 import { setFood, setFoodPreset } from "./castleFood.ts";
-import { aiTreasury, repayLoan, runLedger, setTax, takeLoan } from "./treasury.ts";
+import { aiTreasury, monthlyDebts, repayLoan, runLedger, setTax, takeLoan } from "./treasury.ts";
 import { monthlyFood } from "./food.ts";
 import { callStudentsToArms, foundSchool, monthlyResearch, moveQueued as moveQueuedStudy, queuePath, queueStudy, setSeats, setStudy, unqueue } from "./research.ts";
 import { aiChanges, monthlyChanges, orderChange, stopChange } from "./conversion.ts";
@@ -14,6 +14,7 @@ import { court, recallCourting } from "./courting.ts";
 import { aiWorks, cancelWork, judgeNeglect, mineYear, monthlyWorks, moveQueued, orderWork } from "./works.ts";
 import { monthlyMoods } from "./moods.ts";
 import { monthlyThrone } from "./throne.ts";
+import { monthlyStability } from "./stability.ts";
 import { answerRebels, dailyRebels, monthlyRebels, verdictOrder } from "./rebels.ts";
 import { answerRevolution, lockedOrder, monthlyRevolutions } from "./revolutions.ts";
 import { answerEvent, monthlyEvents } from "./events.ts";
@@ -295,6 +296,8 @@ function startDay(world: World, news: News[]): void {
     // Days to each capital, if land changed hands, before the grievances read them (X-28).
     monthlyThrone(world);
     monthlyMoods(world, news);
+    // Each realm's stability, read once for the month: low stability costs tax, recruits and risings (X-28).
+    monthlyStability(world);
     monthlyRebels(world, news);
     monthlyRevolutions(world, news);
     monthlyLords(world, (n) => !inAnyWar(world, n), news);
@@ -314,6 +317,8 @@ function startDay(world: World, news: News[]): void {
     monthlyChanges(world, news);
     aiChanges(world);
     aiTreasury(world, news);
+    // A realm broke for months defaults on its debts (X-28).
+    monthlyDebts(world, news);
     monthlyDiplomacy(world, news);
     monthlyStatecraft(world, news);
     // Lands taken over the last 20 years each month; the league check each January (DIPL-221).

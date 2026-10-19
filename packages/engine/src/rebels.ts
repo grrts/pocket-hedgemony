@@ -1,4 +1,5 @@
 import type { World } from "./world.ts";
+import { stabilityEffect } from "./stability.ts";
 import { spareSleepers, wakeRealm } from "./sleeping.ts";
 import { beliefRevoltFactor } from "./belief.ts";
 import * as rb from "./domain/rebellions/index.ts";
@@ -149,8 +150,10 @@ function neighbours(world: World, p: number): number[] {
 
 /** A plotting province's monthly chance to rise, by its heaviest cause: faith and separatist risings come more often in a realm of low faith or tongue (REALM-238). */
 export function risingChanceIn(world: World, p: number): number {
-  const chance = risingChance(world, p);
-  if (chance <= 0) return chance;
+  const base = risingChance(world, p);
+  if (base <= 0) return base;
+  // A Troubled or Crumbling realm's plotting provinces rise more often (X-28).
+  const chance = Math.min(1, base * stabilityEffect(world, world.provinceOwner[p]!).rising);
   const found = rb.heaviestCause(weighted(world, p));
   return found ? Math.min(1, chance * beliefRevoltFactor(world, world.provinceOwner[p]!, found.cause)) : chance;
 }

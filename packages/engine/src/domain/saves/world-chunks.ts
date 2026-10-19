@@ -28,6 +28,7 @@ import { Rng } from "../../rng.ts";
 import type { Order } from "../../turn.ts";
 import { createArmyPool, createWorld, type World } from "../../world.ts";
 import { monthlyThrone } from "../../throne.ts";
+import { monthlyStability } from "../../stability.ts";
 import { groundOfCell, WATER, type TileGrid } from "../../tiles.ts";
 import type { Battle, SiegeState } from "../../war.ts";
 import { addCommander, ARMS, type FreeCompany, type Mercenary, type Muster } from "../../recruit.ts";
@@ -104,7 +105,7 @@ export function worldChunks(world: World, game: SavedGame): RawChunk[] {
     packChunk("provinces", V.provinces, {
       // Sieges under way, by province (occupation and garrisons are arrays below); the ground is the map's, not the save's.
       meta: { sieges: [...world.sieges].map(([p, st]) => [p, { ...st, siege: { ...st.siege, ground: undefined } }]), workNames: WORKS },
-      arrays: { owner: world.provinceOwner, population: world.provincePopulation, wealth: world.provinceWealth, recruits: world.provinceRecruits, official: world.provinceOfficial, officialSeed: world.provinceOfficialSeed, officialSince: world.provinceOfficialSince, officialFrom: world.provinceOfficialFrom, officialAge: world.provinceOfficialAge, newLand: world.provinceNewLand, classes: world.provinceClasses, tax: world.provinceTax, food: world.provinceStore, harvest: world.provinceHarvest, weather: world.provinceWeather, starved: world.provinceStarved, grievances: Int32Array.from(world.provinceGrievances), armyMonths: world.provinceArmyMonths, battleYear: world.provinceBattleYear, lord: world.provinceLord, occupier: world.provinceOccupier, hold: world.provinceHold, holdBy: world.provinceHoldBy, garrison: world.provinceGarrison, works: world.provinceWorks, tiles: world.provinceTiles, castleStore: world.castleStore, game: world.provinceGame, hardWinter: world.provinceHardWinter, worn: world.provinceWorn, overwork: world.provinceOverwork, rested: world.provinceRested, seam: world.provinceSeam, seamYears: world.provinceSeamYears, changeTile: world.provinceChangeTile, change: world.provinceChange, changeLeft: world.provinceChangeLeft, changeMonths: world.provinceChangeMonths, changeGold: world.provinceChangeGold, ...tradeProvinceArrays(world) },
+      arrays: { owner: world.provinceOwner, population: world.provincePopulation, wealth: world.provinceWealth, recruits: world.provinceRecruits, official: world.provinceOfficial, officialSeed: world.provinceOfficialSeed, officialSince: world.provinceOfficialSince, officialFrom: world.provinceOfficialFrom, officialAge: world.provinceOfficialAge, newLand: world.provinceNewLand, takenYear: world.provinceTakenYear, classes: world.provinceClasses, tax: world.provinceTax, food: world.provinceStore, harvest: world.provinceHarvest, weather: world.provinceWeather, starved: world.provinceStarved, grievances: Int32Array.from(world.provinceGrievances), armyMonths: world.provinceArmyMonths, battleYear: world.provinceBattleYear, lord: world.provinceLord, occupier: world.provinceOccupier, hold: world.provinceHold, holdBy: world.provinceHoldBy, garrison: world.provinceGarrison, works: world.provinceWorks, tiles: world.provinceTiles, castleStore: world.castleStore, game: world.provinceGame, hardWinter: world.provinceHardWinter, worn: world.provinceWorn, overwork: world.provinceOverwork, rested: world.provinceRested, seam: world.provinceSeam, seamYears: world.provinceSeamYears, changeTile: world.provinceChangeTile, change: world.provinceChange, changeLeft: world.provinceChangeLeft, changeMonths: world.provinceChangeMonths, changeGold: world.provinceChangeGold, ...tradeProvinceArrays(world) },
     }),
     packChunk("nations", V.nations, {
       // Works being built and waiting, with works by name so a build with other works still reads them.
@@ -119,6 +120,8 @@ export function worldChunks(world: World, game: SavedGame): RawChunk[] {
         manualPosts: world.nationManualPosts,
         debt: world.nationDebt,
         loanMonth: world.nationLoanMonth,
+        brokeMonths: world.nationBrokeMonths,
+        defaultYear: world.nationDefaultYear,
         ledger: world.nationLedger,
         tradeLast: world.nationTrade,
         neglect: world.nationNeglect,
@@ -265,6 +268,8 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
         if (prov.officialSince) world.provinceOfficialSince[t.index] = prov.officialSince[old]!;
         // A foreign specialist's realm; saves from before hiring have none.
         if (prov.newLand) world.provinceNewLand[t.index] = prov.newLand[old]!;
+        // The year it was taken from another realm (X-28); saves from before have none newly taken.
+        if (prov.takenYear) world.provinceTakenYear[t.index] = prov.takenYear[old]!;
         // Officials' ages; saves from before people aged draw them from each man's seed.
         if (prov.officialAge) world.provinceOfficialAge[t.index] = prov.officialAge[old]!;
         if (prov.officialFrom) world.provinceOfficialFrom[t.index] = prov.officialFrom[old]! < 0 ? -1 : nationMap[prov.officialFrom[old]!]!;
@@ -341,6 +346,9 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
     if (nat.manualPosts) world.nationManualPosts[n] = nat.manualPosts[old]!;
     if (nat.debt) world.nationDebt[n] = nat.debt[old]!;
     if (nat.loanMonth) world.nationLoanMonth[n] = nat.loanMonth[old]!;
+    // Months broke and the last default (X-28); saves from before have none.
+    if (nat.brokeMonths) world.nationBrokeMonths[n] = nat.brokeMonths[old]!;
+    if (nat.defaultYear) world.nationDefaultYear[n] = nat.defaultYear[old]!;
     // Saves from before a ledger line was added hold fewer lines a realm; the ledger is worked out again each week.
     const lines = nat.ledger ? Math.min(LEDGER_LINES, nat.ledger.length / ids.nations.length) : 0;
     if (nat.ledger) world.nationLedger.set(nat.ledger.subarray(old * lines, old * lines + lines), n * LEDGER_LINES);
@@ -544,7 +552,10 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
   if (!natMeta.trade) seedTrade(world);
 
   // Days to each capital are derived from who owns what: worked out for the land as loaded (X-28).
+  world.throneKeys = new Uint32Array(0);
   monthlyThrone(world);
+  // So is each realm's stability step.
+  monthlyStability(world);
 
   const events = chunks.has("events") ? (unpackChunk(chunks.get("events")!).meta as unknown as EventsState) : { ...EMPTY_EVENTS };
   const history = chunks.has("history") ? ((unpackChunk(chunks.get("history")!).meta.timeline as unknown[]) ?? []) : [];

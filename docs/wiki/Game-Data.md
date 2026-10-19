@@ -8,8 +8,8 @@ Keys are written as in the config. Shares are fractions (0.25 is 25 %). A value 
 |---|---|---|---|
 | [Core values](Data-Defines) | 321 | `defines.json` |  |
 | [Time and turns](Data-Time-and-Turns) | 373 | `domain/time-and-turns.json` | [Time and Turns](Time-and-Turns) |
-| [Realm](Data-Realm) | 888 | `domain/realm.json` | [Your Realm](Your-Realm) |
-| [Province](Data-Province) | 925 | `domain/province.json` | [Provinces](Provinces) |
+| [Realm](Data-Realm) | 901 | `domain/realm.json` | [Your Realm](Your-Realm) |
+| [Province](Data-Province) | 928 | `domain/province.json` | [Provinces](Provinces) |
 | [Buildings](Data-Buildings) | 1503 | `domain/buildings.json` | [Buildings](Buildings) |
 | [Trade](Data-Trade) | 316 | `domain/trade.json` | [Trade](Trade) |
 | [Research](Data-Research) | 2138 | `domain/research.json` | [Research](Research) |
@@ -25,7 +25,7 @@ Keys are written as in the config. Shares are fractions (0.25 is 25 %). A value 
 | [Diplomacy](Data-Diplomacy) | 765 | `domain/diplomacy.json` | [Diplomacy](Diplomacy) |
 | [Religion](Data-Religion) | 754 | `domain/religion.json` | [Religion](Religion) |
 | [Culture](Data-Culture) | 354 | `domain/culture.json` | [Culture](Culture) |
-| [Rebellions](Data-Rebellions) | 221 | `domain/rebellions.json` | [Rebellions](Rebellions) |
+| [Rebellions](Data-Rebellions) | 222 | `domain/rebellions.json` | [Rebellions](Rebellions) |
 | [Revolutions](Data-Revolutions) | 3186 | `domain/revolutions.json` | [Revolutions](Revolutions) |
 | [National strengths](Data-National-Strengths) | 2438 | `domain/national-strengths.json` | [National Strengths](National-Strengths) |
 | [Events](Data-Events) | 560 | `domain/events.json` | [Historical Events](Historical-Events) |

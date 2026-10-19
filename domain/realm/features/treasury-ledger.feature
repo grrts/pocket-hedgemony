@@ -129,3 +129,13 @@ Feature: Tax rates and the treasury ledger
     Given the player rules "France"
     When the player taps the gold plaque
     Then the Treasury tab of the country card opens
+
+  @REALM-300 @REALM-301 @placeholder
+  Scenario: Broke and heading for a default
+    # config: realm.debt.default
+    Given Castile's gold is below zero and lenders will lend it no more
+    When three monthly steps pass with nothing changed
+    Then the player is warned at the first two that the crown will default
+    And at the third Castile defaults: its debt is gone and its gold is nothing
+    And each of its lords falls two steps of loyalty, none below Disloyal
+    And lenders refuse Castile for five years

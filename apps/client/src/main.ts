@@ -35,6 +35,10 @@ import {
   treasuryView,
   type Opens,
   shareAtDays,
+  STABILITY,
+  STABILITY_EFFECTS,
+  DEFAULT_RULE,
+  takenUntil,
   THRONE,
 } from "@ph/engine";
 import type { GameDate } from "@ph/rules";
@@ -4362,6 +4366,7 @@ function renderPanelCard(): void {
       <dt>Walls</dt><dd>${wallsAt(selectedProvince) ? WALL_NAMES[wallsAt(selectedProvince)!] : "None"}</dd>
       ${occupiers[selectedProvince]! >= 0 ? `<dt>Occupied</dt><dd>by ${esc(nations[occupiers[selectedProvince]!]!.name)}</dd>` : ""}
       ${mineHere ? throneFact(selectedProvince) : ""}
+      ${mineHere ? newLandFact(selectedProvince) : ""}
       ${mineHere ? taxLine(selectedProvince) : ""}
     </dl>
     ${mineHere ? rateButtons(snapshot!.provinceTax[selectedProvince]!, "province") : ""}
@@ -5122,6 +5127,7 @@ const GRIEVANCE_FIX: Record<string, string> = {
   "Grasping officials": "the realm has more officials than its cap; ends when it is back within (Government tab)",
   Plague: "an outbreak rages here; ends when it burns out",
   "Far from the throne": "royal land more than a month from the capital; ends when a lord holds it or the capital is nearer",
+  "Newly taken": "taken from another realm in the last 10 years; fades with time",
 };
 
 /** A province's mood and its grievances, with what each needs to end. */
@@ -6011,12 +6017,22 @@ function throneFact(p: number): string {
   return `<dt>To capital</dt><dd>${say}${note}</dd>`;
 }
 
+/** Land taken from another realm: what holding it costs, and until when (X-28). */
+function newLandFact(p: number): string {
+  const s = snapshot!;
+  const y = s.provinceTakenYear[p]!;
+  if (y < 0 || s.date.year >= takenUntil(y)) return "";
+  return `<dt>Newly taken</dt><dd>in ${y} · until ${takenUntil(y)} it costs garrisons and clerks (Holding new land on the Treasury tab) and holds the Newly taken grievance</dd>`;
+}
+
 /** Why a province sends less than its rate says, each with its share kept back (X-28). */
 function taxCuts(p: number): string {
   const s = snapshot!;
   const cuts: string[] = [];
   const days = s.provinceDaysToCapital[p]!;
   if (s.provinceLord[p]! < 0 && days > THRONE.days) cuts.push(`${cutPct(1 - shareAtDays(days))} lost on the road: ${days >= THRONE.farCap ? `${THRONE.farCap}+` : days} days from the capital`);
+  const st = s.stability ? STABILITY_EFFECTS[s.stability.step]! : null;
+  if (st && st.tax < 1) cuts.push(`${cutPct(1 - st.tax)}: the realm is ${STABILITY[s.stability!.step]!.toLowerCase()} (General tab)`);
   return cuts.length ? `<br><small>${cuts.join("<br>")}</small>` : "";
 }
 const cutPct = (x: number) => `−${Math.round(x * 100)} %`;
@@ -6070,6 +6086,14 @@ async function actInTreasury(order: Order): Promise<void> {
  * loan costs said before the borrow buttons (REALM-184, REALM-198). What it
  * shows comes from the engine's treasuryView model.
  */
+/** The road to default, or what a default left behind (X-28): said on the Treasury tab before it happens. */
+function defaultNote(d: { monthsLeft: number; refuseUntil: number; defaulted: number }): string {
+  if (d.monthsLeft > 0)
+    return `<p class="hint warn"><b>The treasury is empty and lenders give no more.</b> Unless gold comes in, the crown defaults in ${d.monthsLeft === 1 ? "a month" : `${d.monthsLeft} months`}: the debt is gone, but the lords turn away, the realm is troubled for ${DEFAULT_RULE.troubledYears} years and lenders refuse it for ${DEFAULT_RULE.refuseYears}. Raise the tax, send soldiers home or sell grain.</p>`;
+  if (d.refuseUntil >= 0) return `<p class="hint warn">The crown defaulted in ${d.defaulted}: lenders refuse it until ${d.refuseUntil}.</p>`;
+  return "";
+}
+
 function treasurySection(): string {
   const s = snapshot!;
   const t = treasuryView(s);
@@ -6090,6 +6114,7 @@ function treasurySection(): string {
         <div class="purse-note">${lasts}</div>
       </div>
     </div>
+    ${defaultNote(s.debtTrouble)}
     <h3 class="sub">This month</h3>
     <div class="flow" role="img" aria-label="Gold in ${gold2(income)}, gold out ${gold2(spending)} a month">
       <span class="in" style="flex:${income.toFixed(3)}">In ${gold2(income)}</span><span class="out" style="flex:${spending.toFixed(3)}">Out ${gold2(spending)}</span>

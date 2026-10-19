@@ -111,7 +111,7 @@ Then("it shows the stability step, what it means and one row for each pillar wit
   expect(v.step).toBe(s.snap.stability!.step);
   expect(v.words).toBe(STABILITY[v.step]);
   expect(v.note.length).toBeGreaterThan(0);
-  expect(v.pillars.map((p: any) => p.key)).toEqual(["lords", "subjects", "officials", "provinces"]);
+  expect(v.pillars.map((p: any) => p.key)).toEqual(["lords", "subjects", "officials", "provinces", "treasury"]);
   for (const [k, p] of v.pillars.entries()) {
     expect(p.step).toBe(s.snap.stability!.pillars[k]!.step);
     expect(p.words).toBe(STABILITY[p.step]);

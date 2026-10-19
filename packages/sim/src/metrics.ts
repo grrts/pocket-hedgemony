@@ -44,6 +44,8 @@ export interface RealmYear {
   subjectsPower: number;
   treasury: number;
   debt: number;
+  /** It defaulted on its debts since the last row (REALM-301, X-28). */
+  defaulted?: boolean;
   /** Net income over the months since the last row (a year, after the first). */
   income: number;
   /** Gold by ledger line over the same months (+ in, − out). */
@@ -370,6 +372,7 @@ export function createRecorder(run: string, w: Readonly<World>, c: BalanceConfig
         subjectsPower: round(subjectProvinces[n]! * realmConfig.win.subject_province_weight),
         treasury: round(w.nationTreasury[n]!),
         debt: round(debt),
+        defaulted: w.nationDefaultYear[n]! >= 0 && w.nationDefaultYear[n]! >= year - 1 && w.nationDefaultYear[n]! <= year,
         income: round(start ? 0 : income[n]!),
         ledger: lines,
         soldiers: soldiers[n]!,

@@ -200,6 +200,7 @@
   },
   "tolls": { "rates": ["none", "low", "high"], "points": ["bridge", "ford", "pass", "river mouth", "strait"] },
   "roads": { "steps": ["none", "track", "road", "paved road", "turnpike", "railway"], "canal_inventions": ["B3", "Canal locks"], "travel": { "$comment": "D-PROV-34: winter slows roads and rivers; an enemy army on the road or a broken road forces a detour; a sea route closed in war is no route.", "winter": 1.5, "enemy_army": 2, "broken_road": 2 } },
+  "newly_taken": { "$comment": "X-28: for years after a province is taken from another realm by a peace or a demand, it has Newly taken (one grievance) and costs its owner upkeep_share_of_tax of its tax at the normal rate again each month, on the ledger's New land line. Provisional.", "years": 10, "upkeep_share_of_tax": 0.5, "provisional": true },
   "far_from_throne": { "$comment": "PROV-173, PROV-174, X-28: days from a royal province to the capital over the realm's own land (the march's crossing days) and the sea (sea_zone_days a zone). Past days it has Far from the throne and sends the crown cut_per_10_days less tax and recruits for every 10 days beyond, down to least_share. A lord's province is run from his seat and is never far. Provisional.", "days": 30, "cut_per_10_days": 0.1, "least_share": 0.5, "sea_zone_days": 8, "provisional": true },
   "officials": {
     "full_effect_years": 5,

@@ -6,6 +6,8 @@ import { emptyProvinceEffect } from "./domain/recruiting/index.ts";
 import { interestPct, loanCap, realmConfig } from "./domain/realm/index.ts";
 import { moodShare } from "./moods.ts";
 import { throneShare } from "./throne.ts";
+import { stabilityEffect } from "./stability.ts";
+import { newLandUpkeep } from "./newlyTaken.ts";
 import { taxCapped, taxRaised } from "./rebels.ts";
 import { crownShare, inAnyWar, loyaltyStep } from "./lords.ts";
 import { officialBonus } from "./officials.ts";
@@ -33,7 +35,7 @@ export const NORMAL_TAX = 2;
 const HEAVY_TAX = 3;
 
 /** Lines of the ledger, in the order the snapshot sends them. */
-export const LEDGER = ["tax", "trade", "army pay", "officials", "interest", "works", "schools", "grain", "tribute", "navy", "furs"] as const;
+export const LEDGER = ["tax", "trade", "army pay", "officials", "interest", "works", "schools", "grain", "tribute", "navy", "furs", "new land"] as const;
 export const LEDGER_LINES = LEDGER.length;
 const TAX = 0;
 const TRADE = 1;
@@ -46,6 +48,7 @@ const GRAIN = 7;
 const TRIBUTE = 8;
 const NAVY = 9;
 const FURS = 10;
+const NEW_LAND = 11;
 
 /** Nothing invented yet: interest and loan caps are the realm context's for a realm without banks. */
 const KNOWN: ReadonlySet<string> = new Set();
@@ -61,6 +64,10 @@ export interface TreasuryState {
   nationLedger: Float64Array;
   /** Month (year × 12 + month) of each realm's last loan that unsettled its lords, or a long time ago. */
   nationLoanMonth: Int32Array;
+  /** Monthly steps in a row each realm has been broke: gold below zero and nothing more to borrow (X-28). */
+  nationBrokeMonths: Uint8Array;
+  /** Year each realm last defaulted on its debts, -1 = never (X-28). */
+  nationDefaultYear: Int16Array;
 }
 
 export function createTreasuryState(P: number, N: number): TreasuryState {
@@ -70,6 +77,8 @@ export function createTreasuryState(P: number, N: number): TreasuryState {
     nationDebt: new Float64Array(N),
     nationLedger: new Float64Array(N * LEDGER_LINES),
     nationLoanMonth: new Int32Array(N).fill(-1e6),
+    nationBrokeMonths: new Uint8Array(N),
+    nationDefaultYear: new Int16Array(N).fill(-1),
   };
 }
 
@@ -88,10 +97,11 @@ export function taxFactor(world: World, rate: number): number {
 /**
  * What of a province's tax and trade reaches the crown: a province whose official was commissioned
  * pays half (recruiting RECR-083, "Leave it"), rioting or plotting provinces pay half (PROV-162), and
- * a lord keeps his share (REALM-072), and royal land far from the throne sends less (PROV-174, X-28).
+ * a lord keeps his share (REALM-072), royal land far from the throne sends less (PROV-174), and a
+ * Troubled or Crumbling realm collects less (X-28).
  */
 export function crownTake(world: World, p: number): number {
-  return (ungoverned(world, p) ? emptyProvinceEffect("Leave it").tax : 1) * moodShare(world, p) * crownShare(world, p) * throneShare(world, p);
+  return (ungoverned(world, p) ? emptyProvinceEffect("Leave it").tax : 1) * moodShare(world, p) * crownShare(world, p) * throneShare(world, p) * stabilityEffect(world, world.provinceOwner[p]!).tax;
 }
 
 export function provinceTax(world: World, p: number, holder: number, share = crownTake(world, p)): number {
@@ -139,6 +149,8 @@ export function runLedger(world: World, pay: boolean, only = -1): void {
       if (world.provinceOfficial[p]! >= 0) L[owner * LEDGER_LINES + WAGES] = L[owner * LEDGER_LINES + WAGES]! - wage * heritageFactor(world, owner, "official_wage_pct");
       // And the upkeep of its works (works).
       L[owner * LEDGER_LINES + WORKS_UPKEEP] = L[owner * LEDGER_LINES + WORKS_UPKEEP]! - provinceUpkeep(world, p);
+      // And the garrisons and clerks that hold newly taken land (X-28).
+      L[owner * LEDGER_LINES + NEW_LAND] = L[owner * LEDGER_LINES + NEW_LAND]! - newLandUpkeep(world, p);
     }
     // Whoever holds it collects the tax; an occupier only its share (WAR-224).
     const holder = controller(world, p);
@@ -199,6 +211,8 @@ function sumLedger(world: World, n: number): void {
 
 /** Gold a realm could borrow now: lenders let it owe up to a year's tax and trade (REALM-164), so what it owes and the new loan's interest come off. */
 export function canBorrow(world: World, n: number): number {
+  // Lenders refuse a realm that defaulted for years after (X-28).
+  if (lendersRefuse(world, n)) return 0;
   const year = 12 * (world.nationLedger[n * LEDGER_LINES + TAX]! + world.nationLedger[n * LEDGER_LINES + TRADE]!);
   return Math.max(0, loanCap(year, KNOWN) - world.nationDebt[n]!) / loanDebt(1);
 }
@@ -295,3 +309,78 @@ export function aiTreasury(world: World, news: News[]): void {
     }
   }
 }
+
+// ------------------------------------------------------------ default (X-28)
+
+const DEFAULT = realmConfig.debt.default;
+
+/** Whether lenders still refuse realm n after its default. */
+export function lendersRefuse(world: World, n: number): boolean {
+  const y = world.nationDefaultYear[n]!;
+  return y >= 0 && world.date.year - y < DEFAULT.lenders_refuse_years;
+}
+
+/** Whether realm n's default still weighs on its stability (Troubled), and the year that ends; null when not. */
+export function defaultWeighs(world: World, n: number): number | null {
+  const y = world.nationDefaultYear[n]!;
+  return y >= 0 && world.date.year - y < DEFAULT.troubled_years ? y + DEFAULT.troubled_years : null;
+}
+
+/** Whether realm n is broke now: its gold is below zero and lenders would not cover it. */
+export function isBroke(world: World, n: number): boolean {
+  const gold = world.nationTreasury[n]!;
+  return gold < 0 && canBorrow(world, n) < -gold;
+}
+
+/** Monthly steps a broke realm has left before it defaults, for the warning. */
+export const monthsToDefault = (world: World, n: number): number => Math.max(0, DEFAULT.broke_months - world.nationBrokeMonths[n]!);
+
+/**
+ * The monthly debt check, after the AI has borrowed (X-28): a realm broke for
+ * `debt.default.broke_months` monthly steps in a row defaults. Its debt is
+ * gone and its gold set to nothing; each of its lords takes the crown
+ * defaulted cause `lord_steps` times; it reads Troubled for `troubled_years`
+ * and lenders refuse it for `lenders_refuse_years`. The player is warned at
+ * each step before.
+ */
+export function monthlyDebts(world: World, news: News[]): void {
+  for (let n = 0; n < world.nationCount; n++) {
+    if (world.nationGone[n] || world.nationAsleep[n]) continue;
+    if (!isBroke(world, n)) {
+      world.nationBrokeMonths[n] = 0;
+      continue;
+    }
+    world.nationBrokeMonths[n] = Math.min(255, world.nationBrokeMonths[n]! + 1);
+    const left = monthsToDefault(world, n);
+    if (left > 0) {
+      if (n === world.player) news.push({ kind: "unrest", text: `The treasury is empty and lenders will give no more: unless gold comes in, the crown defaults on its debts in ${left === 1 ? "a month" : `${left} months`} (Treasury tab).`, nations: [n] });
+      continue;
+    }
+    defaultOn(world, n, news);
+  }
+}
+
+/** Realm n defaults on its debts. */
+export function defaultOn(world: World, n: number, news: News[]): void {
+  world.nationDebt[n] = 0;
+  world.nationTreasury[n] = 0;
+  world.nationBrokeMonths[n] = 0;
+  world.nationDefaultYear[n] = world.date.year;
+  world.lords.forEach((l, k) => {
+    if (l.nation !== n || l.gone) return;
+    for (let i = 0; i < DEFAULT.lord_steps; i++) loyaltyStep(world, k, "crown_defaulted", news);
+  });
+  sumLedger(world, n);
+  const name = world.rules.nations[n]!.name;
+  news.push({ kind: "unrest", text: n === world.player ? `The crown defaults on its debts. What it owed is gone, but the lords turn away, the realm is troubled until ${world.date.year + DEFAULT.troubled_years} and lenders refuse it until ${world.date.year + DEFAULT.lenders_refuse_years}.` : `${name} defaults on its debts.`, nations: [n] });
+}
+
+/** The player's road to default and after, for the Treasury tab (X-28). */
+export function debtTrouble(world: World, n: number): { monthsLeft: number; refuseUntil: number; defaulted: number } {
+  const broke = world.nationBrokeMonths[n]!;
+  const y = world.nationDefaultYear[n]!;
+  return { monthsLeft: broke > 0 ? Math.max(1, monthsToDefault(world, n)) : 0, refuseUntil: lendersRefuse(world, n) ? y + DEFAULT.lenders_refuse_years : -1, defaulted: y };
+}
+
+/** The rule's numbers, for the Treasury tab. */
+export const DEFAULT_RULE = { brokeMonths: DEFAULT.broke_months, troubledYears: DEFAULT.troubled_years, refuseYears: DEFAULT.lenders_refuse_years } as const;

@@ -2518,6 +2518,11 @@
      "level": 3
     },
     {
+     "id": "newly-taken",
+     "text": "Newly taken",
+     "level": 2
+    },
+    {
      "id": "far-from-throne",
      "text": "Far from throne",
      "level": 2
@@ -2874,6 +2879,11 @@
      "level": 2
     },
     {
+     "id": "default",
+     "text": "Default",
+     "level": 3
+    },
+    {
      "id": "officials-per-province",
      "text": "Officials per province",
      "level": 2
@@ -2902,6 +2912,21 @@
      "id": "restless-share-provisional",
      "text": "Restless share (provisional)",
      "level": 3
+    },
+    {
+     "id": "effects",
+     "text": "Effects",
+     "level": 3
+    },
+    {
+     "id": "troubled",
+     "text": "Troubled",
+     "level": 4
+    },
+    {
+     "id": "crumbling",
+     "text": "Crumbling",
+     "level": 4
     },
     {
      "id": "titles-provisional",

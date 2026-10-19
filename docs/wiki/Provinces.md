@@ -335,6 +335,7 @@ There is no anger meter. A province has a list of **grievances**, each a named c
 | Harsh lord | The lord is Cruel or Greedy, or hostile to the people's faith or language | The lord changes |
 | Broken charter | A charter revoked in the last 20 years | Time |
 | Far from the throne | Royal land with days to capital above the limit | Granting it to a lord; land nearer the capital |
+| Newly taken | Taken from another realm in the last 10 years | Time |
 | Plague | An outbreak here | It burns out |
 | Bloodshed | A rising of the same faith or language was massacred in the last 20 years | Time |
 | Requisitioned | An army, yours or anyone's, takes food from the store | A season after the last taking |

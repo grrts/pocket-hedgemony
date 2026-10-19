@@ -327,14 +327,20 @@ Leroy's milestone 3 playtest (feedback 59, 61, 71). It is the latest decision, s
 ### 5.19 Stability (playtest feedback, 17 October)
 Leroy's feedback F-75: stability is a meaningful reading of the state of lords, subjects and officials. It stays a reading, not a stored number (D-AUD-2: there is no stability stat); events keep reading stability as REALM-140 maps it.
 
-- REALM-199: A realm's stability shall be read from four pillars, lords, subjects, officials and provinces, each on one of the steps Steady, Uneasy, Troubled and Crumbling (`stability.steps`); the realm stands at the step of its weakest pillar. [F-75, REALM-140, D-AUD-2]
+- REALM-199: A realm's stability shall be read from its pillars, lords, subjects, officials, provinces and (X-28) treasury, each on one of the steps Steady, Uneasy, Troubled and Crumbling (`stability.steps`); the realm stands at the step of its weakest pillar. [F-75, REALM-140, D-AUD-2]
 - REALM-200: The lords pillar shall count the realm's lords who hold land, and the subjects pillar its subjects, by loyalty: Crumbling while any is In revolt, Troubled while any is Disloyal, Uneasy while fewer than half are Loyal (`stability.loyal_share_for_steady`), else Steady; no lords or no subjects is Steady. Until the subjects context's seasonal count is built, a subject's loyalty is its 1444 starting step (SUBJ-036). [F-75, REALM-086, SUBJ-026, SUBJ-036]
 - REALM-201: The officials pillar shall count the realm's royal provinces whose official's post stands empty (REALM-064): none Steady, up to a quarter Uneasy, up to a half Troubled, more Crumbling (`stability.empty_posts_share`, provisional). A lord's provinces are run by his own officials (PROV-202) and are not counted. Officials over the officials cap reach stability through the *Grasping officials* grievance (GOV-005) and a judge through the riot bar (PROV-236), both in the provinces pillar. [F-75, REALM-063, REALM-064]
+- REALM-298: The treasury pillar shall be Troubled for `debt.default.troubled_years` (2) after the realm defaults on its debts (REALM-301), Uneasy while it is broke and heading for a default, else Steady. [X-28]
+- REALM-299: Low stability shall cost the realm (`stability.effects`, provisional): while Troubled, its provinces send the crown 10 % less tax and recruit refill and its plotting provinces rise half as often again; while Crumbling, 25 % less and twice as often. Steady and Uneasy cost nothing. The step is read once a month in the monthly step, after the moods. [X-28]
+- REALM-300: A realm shall be broke while its gold is below zero and lenders would not lend enough to cover it. [X-28]
+- REALM-301: When a realm has been broke for `debt.default.broke_months` (3) monthly steps in a row, it shall default on its debts: what it owes is gone and its gold set to nothing; each of its lords takes the *crown defaulted* loyalty cause twice (`debt.default.lord_steps`; none below Disloyal); and lenders refuse it for `debt.default.lenders_refuse_years` (5). The AI defaults by the same rule, after its own borrowing. [X-28]
 - REALM-202: The provinces pillar shall count the realm's provinces rioting or plotting (PROV-230 to PROV-236): none Steady, any rioting Uneasy, any plotting or a tenth of the provinces Troubled, a quarter Crumbling (`stability.restless_share`, provisional; a quarter as D-AUD-2's unrest). [F-75, REALM-067, D-AUD-2]
 
 #### How the player uses it: stability and the top bar
 - REALM-203: The stability plaque in the top bar is stability's overview: it shows the step in words with the crown icon, plain at Steady, amber at Uneasy, in red cloth at Troubled and blinking at Crumbling, and tapping it opens the General tab of the player's country card. [F-75, X-19]
 - REALM-204: The General tab of the player's country card shall open with a Stability section: the step, one line on what it means, and one row per pillar (Lords and Subjects by loyalty, Officials as royal posts filled or standing empty, Provinces by mood) with that pillar's step; tapping a row opens the tab that mends it: Lords, Diplomacy, Officials or Provinces. [F-75, X-19]
+- REALM-302: The Stability section shall say, under the step's line, what the step costs (for example "The crown gets 10 % less tax and 10 % fewer recruits, and plotting provinces rise 50 % more often"), or for a step that costs nothing what the first costly step would; a Treasury row (opening the Treasury tab) says "Paying its way", the months left before a default, or the default's year and when it stops weighing. A province's Tax line on its card names each cut with its share: the realm's stability, and far from the throne (PROV-176). [X-28, X-19]
+- REALM-303: While the player is broke, each monthly step brings a warning to the news, and the Treasury tab shows under the purse that the crown defaults in so many months unless gold comes in, and what a default costs; after a default it says until when lenders refuse. The ledger has a *Holding new land* line for newly taken provinces (PROV-178). The stability plaque stays the overview: it turns amber once broke and red cloth after a default. [X-28, X-19]
 - REALM-205: The top bar shall show, in this order, the realm's flag and name, the date, gold with its change a month, stability, the war plaque while at war, and the News button; every plaque is the same height (36 px drawn, 44 px to tap) and type, and the troop count moves off the bar to the Military tab, where it is already shown. On a phone the game plays in landscape (the turn-your-phone notice covers portrait), and the bar fits the width of a landscape phone. [F-74, X-19]
 
 ### 5.20 Castles share food, surplus and granaries (feedback 84, 85)
@@ -528,6 +534,11 @@ All numbers are placeholders ("Numbers are placeholders for config"). The file i
 | food.surplus.options | Surplus | keep, sell to the treasury, send to capital castle, send to subjects or allies | no | realm.json |
 | food.lords_castles | Following by loyalty | loyal all, wavering half, disloyal none | yes | realm config |
 | food.presets | Presets | Feed the people; Fortress realm; War footing; Merchant (see REALM-049) | yes | realm config |
+| stability.effects | Tax and recruit share and rising factor at Troubled and Crumbling | 0.9 / 0.9 / ×1.5; 0.75 / 0.75 / ×2 (X-28) | yes | realm.json |
+| debt.default.broke_months | Monthly steps broke before a default | 3 (X-28) | yes | realm.json |
+| debt.default.lord_steps | Loyalty steps each lord falls at a default | 2 (X-28) | yes | realm.json |
+| debt.default.troubled_years | Years the treasury pillar reads Troubled after a default | 2 (X-28) | yes | realm.json |
+| debt.default.lenders_refuse_years | Years lenders refuse after a default | 5 (X-28) | yes | realm.json |
 | food.campaign_eat | Soldiers on campaign eat | ×2 | yes | realm config |
 | food.horse_eats | A horse eats like | 3 men | yes | realm config |
 | food_year.transfer_loss_per_province | Loss moving food between castles | 2 % per province | yes | realm.json |
@@ -835,4 +846,10 @@ Every requirement has at least one scenario. REALM-005 and REALM-156 are also pr
 | REALM-295 | — | Covered by engine test (packages/engine/test/historicalLordEvents.test.ts: one event per figure, the player's card) |
 | REALM-296 | — | Covered by engine test (packages/engine/test/historicalLordEvents.test.ts: joins, takes over, never another historical lord's land, only once) |
 | REALM-297 | — | Covered by engine test (packages/engine/test/historicalLordEvents.test.ts: one event per later figure) |
+| REALM-298 | stability.feature | A default troubles the realm |
+| REALM-299 | stability.feature | Low stability costs tax, recruits and risings |
+| REALM-300 | treasury-ledger.feature | Broke and heading for a default |
+| REALM-301 | treasury-ledger.feature | Broke and heading for a default |
+| REALM-302 | — | Presentation; the words are covered by engine test (packages/engine/test/stabilityCosts.test.ts: says what each step costs) |
+| REALM-303 | — | Presentation; the warning and the state behind it are covered by engine test (packages/engine/test/default.test.ts) |
 | REALM-294 | — | Presentation only: checked on phone screenshots in landscape (apps/client/scripts/historical-lords-shots.mjs) |
