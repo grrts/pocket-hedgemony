@@ -339,6 +339,18 @@ An AI garrison accepts honours when it has a breach or under a month of food and
 
 A siege shows its progress on the map: how long the castle has held, its breaches, and the garrison and food left inside.
 
+#### Castles starve besiegers
+
+*Leroy, 19 October:* castles should help smaller realms hold out longer and make the attacker's food run out faster. A castle its owner still holds has gathered the land's food in behind its walls, so an invader living off that land goes hungry sooner:
+
+- **Foragers find less.** An army foraging on the land of a realm it is at war with finds less in a province with that realm's castle: 30 % less beside an earthwork ring fort, 45 % beside a stone castle (a capital counts as at least one), 60 % a bastion fort, 70 % a star fort and 80 % a concrete fortress. In the provinces the castle reaches (1 ring, 2 with a road at the castle, as for its food) foragers find half that cut: 23 % less near a stone castle. Where several castles reach, the biggest cut counts. The food they miss stays in the province.
+- **Besiegers eat more.** An army besieging a castle eats more from camp fevers and sallies against its foragers: a quarter more round a stone castle (15 % an earthwork, 30 % a bastion fort, 35 % a star fort, 40 % a concrete fortress), on top of its campaign rations. Its wagons hold no more, so they empty sooner.
+- **Only against the enemy.** Your own armies, an ally's and anyone not at war with the castle's owner forage as before, and a castle the enemy has taken or occupies gathers nothing in. A besieged castle still does.
+
+**Example.** A Castilian army of 10,000 lays siege to Setúbal, Portugal's capital. Foragers there find 45 % less than on open land, and the men eat a quarter more, so wagons holding two months of campaign food empty in about 1.6 months once there is nothing left to forage. The army card says so: *foragers find 45 % less: Setúbal's castle has gathered the food in · besieging: men eat 25 % more from camp fevers and sallies*.
+
+**Where you see it.** Your army's food line, on its row in the province card and on its commander screen, gives the reasons in words whenever they apply, and its months of food already count them. A province card's Walls line says what its castle keeps from enemy foragers, and the castle row of the build sheet says it for the step you would build, so you know what a castle adds to your defence. The numbers are provisional (`warfare.castle_supply`).
+
 ### Occupation and raids
 
 Taking a province's castle, or holding a province with no castle for a season, **occupies** it: you get its tax, recruits, food and trade, and its lord wavers toward the side holding his land. A horse-only army set to **Raid** can't besiege or occupy; each week it burns one tile and takes loot (gold from market and town, herds and horses from pasture) up to 1 load per 50 riders, then moves on, and castles there may sally.
@@ -389,6 +401,7 @@ During the turn, inside the day loop: contacts, the withdraw check and battles; 
 - **The battle report**: who fought, where, the result, the losses and a one-line reason. Any battle can be replayed later from its notice.
 - **The battle playback**: the tile row, companies as blocks with level chevrons, the camps, and a one-line action per bell ("Dunois commits his knights to the pastures").
 - **The forage limit**, shown when you drag an army over a province.
+- **Why an army goes hungry**: its food line names an enemy castle that has gathered the food in and the extra eating while besieging; a province's Walls line says what its castle keeps from enemy foragers.
 - **Rumours** of unseen armies.
 - **Notifications** for battle won or lost (with the reason), a breach, terms offered, peace voices passing half, pay owed and an army hungry.
 - **The war aim**, shown to everyone.
@@ -456,6 +469,8 @@ All warfare values live in `packages/rules/data/domain/warfare.json`; most are p
 | `warfare.siege.close_ratio`, `shot_per_month`, `b7_multiplier` | 3; bombard 2, field gun 1; ×1.5 |
 | `warfare.siege.repair_men`, `sally_share`, `fever_after_months` | 200, a third, 3 |
 | `warfare.storm.room_per_breach` / `losses` / `scaling` | 500 / ×1.5 / ×2 |
+| `warfare.castle_supply.forage_cut_by_step` / `reach_share` | 30 / 45 / 60 / 70 / 80 %; half in the castle's reach |
+| `warfare.castle_supply.besieger_eat_by_step` | ×1.15 / 1.25 / 1.3 / 1.35 / 1.4 |
 | `warfare.raid.loot_per_riders` | 1 load per 50 riders |
 | `warfare.peace.capital_share` / `warlike_ignore` / `half` / `three_quarters` | a third / a quarter / 50 % / 75 % |
 | `warfare.peace.tribute_years` / `open_roads_years`, `warfare.raid_war_months` | 20 / 10, 12 |

@@ -13,6 +13,7 @@ import { yearlyFood } from "./food.ts";
 import { provinceConfig } from "./domain/province/model.ts";
 import { tradeConfig } from "./domain/trade/index.ts";
 import { heritageFactor } from "./heritage.ts";
+import { wallsFoodText } from "./castleSupply.ts";
 
 const provinceMines = provinceConfig.mines;
 const MINE_ANCHORS = new Set(Object.keys(provinceMines.anchors));
@@ -618,8 +619,11 @@ export function workEffect(world: World, work: number, step: number): string {
       const f = world.rules.defines.castleFood;
       return `The castle store holds ${f.granaryStoreMonths} months instead of ${f.castleStoreMonths}, and rots half as fast`;
     }
-    case "castle":
-      return step >= 2 ? "Stone walls: armies must besiege it, and enemies can't march past" : "Earthwork walls: a smaller garrison holds out against a siege";
+    case "castle": {
+      const walls = step >= 2 ? "Stone walls: armies must besiege it, and enemies can't march past" : "Earthwork walls: a smaller garrison holds out against a siege";
+      // The castle gathers the land's food in: enemy foragers find less, besiegers eat more (WAR-267).
+      return `${walls}. ${wallsFoodText(step)}`;
+    }
   }
 }
 

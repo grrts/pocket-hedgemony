@@ -39,6 +39,7 @@ import { empireOrder, monthlyInstitutions, type EmpireOrder } from "./institutio
 import { shogunateOrder, type ShogunateOrder } from "./shogunate.ts";
 import { huntOf, monthlyTribes, tribesOrder, type TribesOrder } from "./tribes.ts";
 import { isPlagueWeek, setQuarantine, weeklyPlague } from "./plague.ts";
+import { besiegerEat, castleCutAt, type CastleCut } from "./castleSupply.ts";
 import { addDays, DAYS_PER_RATION_MONTH, DAYS_PER_TURN } from "./calendar.ts";
 import { corridor, monthlyRations, rations, refillRations, wagonRations, planRoute, planTilePath, tileStepHours, type MarchingArmy } from "./march.ts";
 import { foodCarriedPct, marchMap, NO_PATH, tileMarch, updateWeather, type World } from "./world.ts";
@@ -665,7 +666,17 @@ export function refillHere(world: World, slot: number, map = marchMap(world)): n
   const owner = world.provinceOwner[p]! >= 0 ? world.provinceOwner[p]! : huntOf(world, p);
   const enemy = owner >= 0 && atWar(world, owner, world.armies.owner[slot]!);
   const reserve = enemy ? 0 : world.provincePopulation[p]! * 1000 * d.homeReserveMonths;
-  return refillRations(d, map.ground[p]!, Math.max(0, world.provinceStore[p]!) * 1000, reserve);
+  const found = refillRations(d, map.ground[p]!, Math.max(0, world.provinceStore[p]!) * 1000, reserve);
+  // On enemy land, the owner's castles have gathered the food in behind their walls (WAR-263, WAR-264).
+  return enemy && found > 0 ? found * (1 - castleCutAt(world, p).share) : found;
+}
+
+/** The castle keeping food from an army's foragers where it stands, and how much (WAR-266); none off enemy land. */
+export function forageCut(world: World, slot: number): CastleCut {
+  const p = world.armies.location[slot]!;
+  if (p < 0 || world.provinceWater[p]) return { castle: -1, share: 0 };
+  const owner = world.provinceOwner[p]!;
+  return owner >= 0 && atWar(world, owner, world.armies.owner[slot]!) ? castleCutAt(world, p) : { castle: -1, share: 0 };
 }
 
 /** An army is on campaign while its realm is at war or it stands outside its own land (REALM-054). */
@@ -871,7 +882,8 @@ function feedArmies(world: World): void {
     if (carried[n]! < 0) carried[n] = foodCarriedPct(world, n);
     const c = a.commander[i]!;
     const logistics = c >= 0 ? world.commanderLogistics[c]! : 0;
-    const need = rations(d, a.men[i]!, a.horse[i]!, logistics, campaigning(world, i)) * day;
+    // Besiegers eat more, from camp fevers and sallies against their foragers (WAR-265).
+    const need = rations(d, a.men[i]!, a.horse[i]!, logistics, campaigning(world, i)) * day * besiegerEat(world, i);
     a.food[i] = a.food[i]! - need;
     // wagonRations: the months carried of eating on campaign.
     const room = rations(d, a.men[i]!, a.horse[i]!, logistics, true) * d.monthsCarried * (carried[n]! / 100) - a.food[i]!;

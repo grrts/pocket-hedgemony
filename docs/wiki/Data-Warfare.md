@@ -612,6 +612,17 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 | `fever_mul` | 2 |
 | `ration` | 1 |
 
+## Castle supply
+
+> Castles starve besiegers (Leroy, 19 Oct; WAR-263 to WAR-269): a held castle gathers the land's food behind its walls, so enemy foragers find less in its province (by castle step: earthwork, stone, bastion, star, concrete) and reach\_share of that in the provinces it reaches by road; armies besieging it eat more by its step.
+
+| Key | Value |
+|---|---|
+| `provisional` | yes |
+| `forage_cut_by_step` | 0.3, 0.45, 0.6, 0.7, 0.8 |
+| `reach_share` | 0.5 |
+| `besieger_eat_by_step` | 1.15, 1.25, 1.3, 1.35, 1.4 |
+
 ## Storm
 
 | Key | Value |

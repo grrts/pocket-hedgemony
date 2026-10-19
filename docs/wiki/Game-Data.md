@@ -14,7 +14,7 @@ Keys are written as in the config. Shares are fractions (0.25 is 25 %). A value 
 | [Trade](Data-Trade) | 323 | `domain/trade.json` | [Trade](Trade) |
 | [Research](Data-Research) | 2138 | `domain/research.json` | [Research](Research) |
 | [Institutions](Data-Institutions) | 161 | `domain/institutions.json` | [Institutions](Institutions) |
-| [Warfare](Data-Warfare) | 1673 | `domain/warfare.json` | [Warfare](Warfare) |
+| [Warfare](Data-Warfare) | 1685 | `domain/warfare.json` | [Warfare](Warfare) |
 | [Recruiting](Data-Recruiting) | 266 | `domain/recruiting.json` | [Recruiting](Recruiting) |
 | [Troop movement](Data-Troop-Movement) | 112 | `domain/troop-movement.json` | [Troop Movement](Troop-Movement) |
 | [Naval](Data-Naval) | 664 | `domain/naval.json` | [Naval](Naval) |
