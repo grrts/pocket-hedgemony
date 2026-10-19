@@ -420,12 +420,12 @@ rate = net × heritage growth, when net is above 0; net otherwise
 class people = class people × (1 + rate ÷ 12)
 </code></pre>
 <ul>
-<li>Births: farmers, herders, woodsmen, seafolk, homeless (0.04); miners (0.035); craftsmen, market folk, clerks (0.03); clergy (0.005); scholars (0.01).</li>
+<li>Births: farmers, herders, woodsmen, seafolk (0.036); homeless (0.04); miners (0.035); craftsmen, market folk, clerks (0.03); clergy (0.005); scholars (0.01).</li>
 <li>Deaths: land classes and clergy and scholars (0.03); miners (0.04); craftsmen, market folk, clerks (0.035); homeless (0.05).</li>
 <li>War: <code>province.death_modifiers.war</code> (0.01) while the province is occupied, besieged or fought in.</li>
 <li>Plague: <code>province.decided.birth_points.plague</code> (−1 point, so 0.01) while plague is in the province.</li>
 </ul>
-<p>Other birth and death changes (food store, peace, hunger, burned tiles) are not in the game yet. Famine deaths are under Food.</p>
+<p>Food does not change births: a hungry province goes on having children, and its shortage shows as famine. Other birth and death changes (peace, burned tiles) are not in the game yet. Famine deaths are under Food.</p>
 <p>Source: <code>packages/engine/src/living.ts</code> (monthlyPeople); <code>packages/engine/src/domain/province/people.ts</code> (birthRate, deathRate, deathModifiers)</p>
 <h3 id="grievances-and-mood"><a class="anchor" href="#grievances-and-mood" aria-label="Link to this section">#</a>Grievances and mood</h3>
 <pre><code>count = grievances held + (taxWeight − 1 when Heavy taxes is held) + 1 more when Persecuted

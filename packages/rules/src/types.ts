@@ -367,6 +367,8 @@ export interface LaterLordDef extends HistoricalLordDef {
   realm: string;
   /** His history year. */
   year: number;
+  /** He takes over the lord who holds his seat, lands and all (REALM-296), instead of joining as a new lord. */
+  takes_over?: boolean;
 }
 
 /** The start's historical lords: seated on the start day by realm, and those events bring in later by id. */

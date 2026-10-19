@@ -237,6 +237,15 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 | `bare_per_worker` | 0.67 |
 | `harvest_order` | failed, poor, normal, good, bumper |
 
+### Balance
+
+> D-PROV-36: a normal year's food against what the people eat. Under short the province grows less than it eats and the card and the Food tab ask for a farm; under tight one poor harvest brings famine.
+
+| Key | Value |
+|---|---|
+| `short` | 1 |
+| `tight` | 1.05 |
+
 ### Harvest
 
 | Key | Value |
@@ -317,10 +326,10 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 
 | Key | Value |
 |---|---|
-| `farmers` | 0.04 |
-| `herders` | 0.04 |
-| `woodsmen` | 0.04 |
-| `seafolk` | 0.04 |
+| `farmers` | 0.036 |
+| `herders` | 0.036 |
+| `woodsmen` | 0.036 |
+| `seafolk` | 0.036 |
 | `miners` | 0.035 |
 | `craftsmen` | 0.03 |
 | `market folk` | 0.03 |
@@ -797,10 +806,7 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 
 | Key | Value |
 |---|---|
-| `food over 6 months` | 0.5 |
 | `10 years of peace` | 0.5 |
-| `food under 3 months` | -1 |
-| `Hungry` | -2 |
 | `war` | -1 |
 | `plague` | -1 |
 
