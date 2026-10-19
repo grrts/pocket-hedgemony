@@ -14,6 +14,7 @@ await page.goto("http://localhost:4176/");
 await page.waitForSelector(".map-layer", { timeout: 60000 });
 await page.waitForSelector("[data-nation=castile]", { timeout: 60000 });
 await page.click("[data-nation=castile]");
+await page.click("[data-begin]");
 await page.waitForSelector(".hud [data-news]", { timeout: 60000 });
 await page.waitForTimeout(500);
 await page.evaluate(() => window.__phMoveTo("p1325"));

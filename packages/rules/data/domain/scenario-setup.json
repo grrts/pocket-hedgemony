@@ -248,7 +248,14 @@
         "normal": { "ai_war_chance": 1, "ai_income": 1, "player_rising_chance": 1 },
         "hard": { "ai_war_chance": 1.5, "ai_income": 1.25, "player_rising_chance": 1.25 }
       }
-    }
+    },
+    "events": {
+      "$comment": "SETUP-054, D-SETUP-21: the events choice of the options step, as the events spec offers it (EVT-036, D-EVT-9); each maps to an event-tree preset through events_presets. Plausible by default, the game as balanced. Provisional pending Leroy.",
+      "values": ["historical", "plausible", "free"],
+      "default": "plausible"
+    },
+    "fog_default": true,
+    "ironman_default": false
   },
   "map_to_catalogue": {
     "$comment": "X-13, D-SETUP-1: the 37 map ids that are not catalogue ids. A record id, or null where no record matches and the map's own data is kept.",
@@ -305,7 +312,8 @@
   },
   "events_presets": {
     "historical": "historical",
-    "free": "plausible"
+    "plausible": "plausible",
+    "free": "divergent"
   },
   "risk_tolerance_levels": {
     "very_low": "low",

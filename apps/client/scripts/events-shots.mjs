@@ -13,6 +13,7 @@ page.on("pageerror", (e) => console.log("pageerror:", e.message));
 await page.goto("http://localhost:4177/");
 await page.waitForSelector(".map-layer", { timeout: 30000 });
 await page.click("[data-nation=ottomans]");
+await page.click("[data-begin]");
 await page.waitForFunction(() => window.__phTurn() >= 0, null, { timeout: 60000 });
 await page.waitForTimeout(2000);
 await page.evaluate(() => {

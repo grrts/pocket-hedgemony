@@ -21,6 +21,7 @@ for (const [name, device] of all.filter(([n]) => !process.env.ONLY || process.en
     b.dataset.nation = id;
     b.click();
   }, nation);
+  await page.click("[data-begin]");
   await page.waitForSelector(".hud [data-news]", { timeout: 60000 });
   await page.waitForTimeout(1000);
   // To the first January: the wearing year runs then.

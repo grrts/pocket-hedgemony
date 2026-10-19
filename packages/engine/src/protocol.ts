@@ -51,6 +51,7 @@ import { tileStepHours } from "./march.ts";
 import { tileGridFromImages, type TileGrid } from "./tiles.ts";
 import { navyView, type NavyView } from "./navy.ts";
 import { fleetOffersView, type FleetOfferView } from "./hiredFleets.ts";
+import { newGameChoices, worldOptionsOf, type NewGameChoices } from "./domain/scenario-setup/campaign.ts";
 import { openSave, writeSave, memoryStorage, type Campaign, type SaveHeader, type SaveKind, type Platform as SavePlatform } from "./domain/saves/index.ts";
 import { Rng } from "./rng.ts";
 import { explorationView, type ExplorationView } from "./colonies.ts";
@@ -81,7 +82,11 @@ const companyView = (c: FreeCompany): CompanyView => ({
 /** Messages the UI thread sends to the engine worker. */
 export type EngineRequest =
   /** `map` is the map's images as the UI decoded them, so armies march over its tiles; without it they stand still. */
-  | { id: number; type: "newGame"; seed: number; playerNation: string; map?: MapTiles; endDate?: string; chapterYears?: number; goals?: GoalDef[]; /** The campaign's difficulty, as the save library's options name it; normal when not given (SETUP-099). */ difficulty?: string }
+  /**
+   * `difficulty` is the campaign's difficulty, as the save library's options name it; normal when not given (SETUP-099).
+   * `choices` are the options step's other campaign rules (SETUP-054); without them the world plays as before (the probes, tests).
+   */
+  | { id: number; type: "newGame"; seed: number; playerNation: string; map?: MapTiles; endDate?: string; chapterYears?: number; goals?: GoalDef[]; difficulty?: string; choices?: Partial<NewGameChoices> }
   /** Plays a whole week at once (the start-up probe and the benchmarks). */
   | { id: number; type: "endTurn"; orders: Order[] }
   /** Plays the clock on by some 4-hour steps (six a day). */
@@ -742,22 +747,26 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         case "newGame": {
           const rules = loadRules();
           grid = req.map ? tileGridFromImages(rules, req.map.width, req.map.height, req.map.province, req.map.terrain) : undefined;
-          world = createWorld(rules, req.seed, grid);
+          const choices = req.choices ? newGameChoices(req.choices) : null;
+          // The rules the world reads (events preset, fog); difficulty lives on world.campaign (SETUP-099).
+          world = createWorld(rules, req.seed, grid, choices ? { options: worldOptionsOf(choices) } : {});
           const idx = world.nationIndex.get(req.playerNation);
           if (idx === undefined) throw new Error(`unknown nation ${req.playerNation}`);
           player = idx;
           setPlayer(world, idx);
+          if (choices) world.campaign.endDate = choices.endDate;
           // A nearer end date (YYYY-MM-DD), for trying the end card (SHELL-164).
           if (req.endDate && /^\d{4}-\d\d-\d\d$/.test(req.endDate)) world.campaign.endDate = req.endDate;
           if (req.chapterYears && req.chapterYears > 0) world.campaign.chapterYears = Math.round(req.chapterYears);
           // The difficulty chosen at new game, fixed for the campaign (SETUP-099).
-          setDifficulty(world, req.difficulty);
+          setDifficulty(world, req.difficulty ?? req.choices?.difficulty);
           // Goals of the caller's own, for trying the Chronicle and the Aims fold (EVT-112, EVT-113).
           if (req.goals) {
             world.goals = createGoals(world, req.goals);
             monthlyGoals(world, false);
           }
-          startAchievements(world);
+          // Only an ironman campaign earns achievements (ACH-034).
+          startAchievements(world, choices ? { ironman: choices.ironman } : {});
           return snapshot(req.id, started, []);
         }
         case "endTurn": {

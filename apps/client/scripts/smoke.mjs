@@ -28,6 +28,7 @@ async function check(name, expectedMode, setup, path = "") {
   if (path.includes("start")) await page.click(".start-play");
   // Play one turn through the real UI too.
   await page.click("[data-nation=france]");
+  await page.click("[data-begin]");
   await page.click(".end-turn");
   await page.waitForSelector(".turn-label .day:text('27 Sep 1378')");
   const ok = d.engineError === null && d.engineMode === expectedMode;

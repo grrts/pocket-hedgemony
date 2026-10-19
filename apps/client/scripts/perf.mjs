@@ -12,6 +12,7 @@ page.on("pageerror", (e) => console.log("pageerror:", e.message));
 await page.goto("http://localhost:4176/?perf");
 await page.waitForFunction(() => globalThis.__phMap, null, { timeout: 30000 });
 await page.click("[data-nation=france]");
+await page.click("[data-begin]");
 // Playing starts once the first turn is on screen; loading the map before that is not play.
 await page.waitForSelector(".end-turn", { timeout: 60000 });
 await page.waitForTimeout(1000);

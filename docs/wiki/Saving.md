@@ -174,8 +174,8 @@ With the Steam demo and the full game on the same computer, the full game finds 
 
 ### Ironman
 
-- Chosen only when a campaign starts, and it cannot be turned off.
-- No manual Save, no Load of earlier points, no console or debug tools.
+- Chosen only when a campaign starts, and it cannot be turned off: the **Ironman** row on the *Rules of the campaign* card before Begin ([The 1378 start](The-1378-Start#campaign-rules)).
+- No manual Save, no Load of earlier points, no console or debug tools. In the game today the game menu has no Save in an ironman campaign, the Load card lists the ironman campaign as one line marked *Ironman* (and not at all while you play it), and the ironman save takes the place of the Resume save after every week and when you leave.
 - Export is allowed as a backup. Importing an ironman save starts it on this device; the copy on the old device is then no longer the newest. Importing an ironman save needs a connection: offline you see "Connect to import an ironman save."
 - The server accepts an ironman upload only if the save it names as its parent is still the campaign's newest ironman save. Otherwise the second device is told to load the newer game first.
 - If two devices played the same ironman campaign offline and the line has split, the game asks once: "Keep the game from Steam Deck (June 1530) or from this phone (Feb 1528)?", recommends the one further along, and removes the other line.

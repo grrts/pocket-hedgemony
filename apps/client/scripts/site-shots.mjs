@@ -49,8 +49,9 @@ async function start(device, nation = "ottomans") {
   await page.goto(`http://localhost:${PORT}/?new`);
   await page.waitForSelector(`[data-nation=${nation}]`, { timeout: 60000 });
   await page.click(`[data-nation=${nation}]`);
-  const begin = page.locator(`.wax.play[data-nation=${nation}]`);
-  if (await begin.count()) await begin.click();
+  const rule = page.locator(`.wax.play[data-nation=${nation}]`);
+  if (await rule.count()) await rule.click();
+  await page.click("[data-begin]");
   await page.waitForSelector(".hud [data-news]", { timeout: 60000 });
   await page.waitForTimeout(800);
   await page.locator("[data-hint=stop]").first().click().catch(() => {});

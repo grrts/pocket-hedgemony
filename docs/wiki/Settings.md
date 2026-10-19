@@ -92,12 +92,14 @@ These are chosen on the new game screen, saved in the campaign, and shown read-o
 - difficulty (Easy, Normal or Hard; what each changes is in [The 1378 start](The-1378-Start#difficulty));
 - AI temper;
 - fog of war;
-- historical or free events;
+- historical, plausible or free events (plausible by default);
 - ironman (achievements only count in ironman);
 - the campaign end date (default 31 August 1939);
 - whether music eras follow the calendar or technology.
 
 The map mode menu's "Hide unexplored lands" stays a display switch, because it only hides unknown lands visually. It would become a campaign rule only if fog ever hid information the computer uses.
+
+In this build the campaign rules are difficulty, events, fog of war, ironman and the end date, chosen on the *Rules of the campaign* card ([The 1378 start](The-1378-Start#campaign-rules)), and the game menu shows them read-only in one line under the date. With fog of war off, "Hide unexplored lands" gives way to a line saying every land is shown. While an ironman campaign is played, Settings hides Autosave and Autosaves kept.
 
 ### Graphics
 

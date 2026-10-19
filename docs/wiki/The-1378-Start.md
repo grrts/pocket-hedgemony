@@ -304,7 +304,17 @@ A **colony** can be founded only in a province no country owns. Land of a tribe 
 
 ### Campaign rules
 
-At new game you set the **campaign rules**: difficulty, AI temper, fog, historical, plausible or free events, ironman, and the end date (default 31 August 1939). Presets fill the whole step at once. The rules are saved with the campaign, can't be changed afterwards, and are shown read-only under Pause, Campaign rules.
+At new game you set the **campaign rules** on one card, *Rules of the campaign*, after choosing your realm:
+
+| Rule | Choices | Default | What it does |
+|---|---|---|---|
+| Difficulty | Easy, Normal, Hard | Normal | How readily AI realms go to war, how much gold their income pays in, and how restless your provinces are ([Difficulty](#difficulty) below). |
+| Events | Historical, Plausible, Free | Plausible | Historical leans the event tree hard on what happened, Plausible (the game as balanced) is in between, and Free lets history go its own way. It also shakes how far realms keep their historical goals. The default and the number of choices are provisional. |
+| Fog of war | On, Off | On | On, lands you have not charted stay under parchment; off, the whole map is shown from the start. What the AI knows is the same either way. |
+| Ironman | Off, On | Off | On, the campaign keeps one save, written after every week and when you leave; there is no Save in the game menu and no going back to an earlier point. Only an ironman campaign earns [achievements](Achievements). |
+| Ends | 31 August of a year from 1494 to 1939 | 1939 | The day the campaign ends and the final scores are given. |
+
+The card starts from the choices of your last new game on this device. The rules are saved with the campaign and in every save, can't be changed afterwards, and the game menu shows them in one line under the date. AI temper and presets that fill the whole step are planned but not in the game yet.
 
 ### Difficulty
 
@@ -324,11 +334,11 @@ A new game starts from a **seed**, your nation and the options, and gets a rando
 
 - **Realm picker**: the "Choose your realm" sheet over the map, titled **Autumn 1378**. It opens on the **suggested realms**: the great powers of each part of the world and a start for each part of Africa (Mali, Benin, Tio, Ethiopia and Kilwa; Kongo is not founded yet). Or tap any realm on the map. A realm's card names its ruler on the start day and says the campaign starts on 20 September 1378. Locked realms show a padlock and a button to Unlock.
 - **Region**: the select at the top of the sheet lists every region that has realms, with how many: Europe, the Middle East, North Africa, Sub-Saharan Africa, South Asia, Central and North Asia, East Asia, Southeast Asia, North America, Mesoamerica and Central America, and South America. Choosing a region frames its realms on the map, and the sheet lists every realm of the region from A to Z, one row each with its pennant, name, size and its standing at the start. A realm of one province is never only a speck to hit: tap its row. Regions follow the event tree's macro-regions; the Sahel, West, Central, East and Southern Africa (Ethiopia and the Somali coast too) are Sub-Saharan Africa, the Maghreb, Egypt and the Sahara are North Africa.
-- **The realm's card**: tapping a row, or one of a realm's provinces on the map, shows the realm at a glance: its ruler, its form of government, provinces, people and what it is strong in, and one line **Ways to grow**, for example "Ways to grow: 3 smaller neighbours · 4 free provinces · 1 port". It counts the realms next to it by land that have fewer provinces (tributaries it could make), the free land that borders it, and its trade at the start: gold fields, trade and caravan towns, and ports. **Rule** starts the game as that realm; ✕ goes back to the list.
-- On a phone held sideways the sheet sits at the left with the map beside it; held upright, or in a narrow window, the sheet sits along the bottom under the map. Every row and button is at least 44 points high and nothing needs hover.
-- **Campaign rules step**: difficulty, AI temper, fog, events, ironman and end date, with presets.
-- **Quick start**: skips to Begin with the last options used and the realm last tapped (or the first suggested one).
-- **Pause, Campaign rules**: the rules of the running campaign, read-only.
+- **The realm's card**: tapping a row, or one of a realm's provinces on the map, shows the realm at a glance: its ruler, its form of government, provinces, people and what it is strong in, and one line **Ways to grow**, for example "Ways to grow: 3 smaller neighbours · 4 free provinces · 1 port". It counts the realms next to it by land that have fewer provinces (tributaries it could make), the free land that borders it, and its trade at the start: gold fields, trade and caravan towns, and ports. **Rule** opens the campaign rules for that realm; ✕ goes back to the list.
+- **Rules of the campaign**: tapping a suggested realm, or Rule on a realm's card, turns the sheet into one card with the realm's banner and start day, a row of buttons for each rule (difficulty, events, fog of war, ironman) and a select for the end year, a few lines saying what the chosen rules mean, and **Begin as …**, which starts the game. ✕ goes back to the realms and keeps your choices.
+- On a phone held sideways the sheet sits at the left with the map beside it (the rules card a little wider, two rules to a row, so every rule and Begin fit without scrolling); held upright, or in a narrow window, the sheet sits along the bottom under the map. Every row and button is at least 44 points high, Begin stays at the foot of the card, and nothing needs hover.
+- **Quick start** (planned): skips to Begin with the last options used and the realm last tapped (or the first suggested one).
+- **Game menu**: the rules of the running campaign, read-only, in one line under the date.
 
 The screens themselves are on [Screens and Navigation](Screens-and-Navigation).
 

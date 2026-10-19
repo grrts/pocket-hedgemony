@@ -52,6 +52,8 @@ One screen in three steps, with a strip at the top ("Realm · Options · Begin")
 2. **Options.** Difficulty, AI aggression, fog, historical or free events, ironman, and the end date, with presets that fill the whole step. Difficulty is a row of Easy, Normal (chosen) and Hard, each with one line on what it changes ([The 1378 start](The-1378-Start#difficulty)). The end date is 31 August of any year from 1494 to 1939; 31 August 1939 is the default.
 3. **Begin.** A summary card (banner, ruler, capital, start date, options) and one big Begin button.
 
+**In this build** steps 2 and 3 are one card, *Rules of the campaign*, opened by tapping a suggested realm or Rule on a realm's card: the realm's banner and start day, one row of buttons per rule (Difficulty Easy, Normal or Hard; Events Historical, Plausible or Free (Plausible by default); Fog of war On or Off; Ironman Off or On), the end year, a few lines on what the chosen rules mean, and **Begin as …**. It starts from your last new game's choices. AI aggression, presets and Quick start are not in yet. What each rule does is in [The 1378 start](The-1378-Start#campaign-rules).
+
 ### Load and loading
 
 The Load screen lists every save in one list, newest first (not grouped by campaign), each with banner, realm, in-game date, the real date saved and an autosave or ironman mark. Tapping one shows its card with Load and Delete. Loading from the main menu needs no confirmation. Loading from the game menu with unsaved turns first asks "Leave <date> unsaved? · Save first · Leave · Cancel".
