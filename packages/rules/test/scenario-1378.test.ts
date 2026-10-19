@@ -18,7 +18,7 @@ type Lonlat = [number, number];
 type Region = {
   key: string;
   nations: { id: string; name: string; capital: Lonlat; color?: string }[];
-  owners: { nation: string; countries: string[]; regions?: string[]; bbox?: number[] }[];
+  owners: { nation: string | null; countries: string[]; admin1?: string[]; regions?: string[]; bbox?: number[] }[];
   rulers: Record<string, unknown>;
   relations: { relations: { id: string; source: string; target: string }[]; facts?: { id: string; source: string; target: string }[]; entities?: { id: string; name: string }[] };
   subjects: { subjects: [string, string, string, string, number | null][]; stances?: [string, string, string][] };
@@ -78,7 +78,7 @@ describe("the 1378 scenario (X-25)", () => {
           expect(isLonlat(n.capital), `${n.id} capital`).toBe(true);
         }
         for (const o of r.owners) {
-          expect(nationIds.has(o.nation), `owner rule for unknown nation ${o.nation}`).toBe(true);
+          if (o.nation !== null) expect(nationIds.has(o.nation), `owner rule for unknown nation ${o.nation}`).toBe(true);
           expect(o.countries.length, `${o.nation} rule names no country`).toBeGreaterThan(0);
           if (o.bbox) expect(o.bbox[0]! < o.bbox[2]! && o.bbox[1]! < o.bbox[3]!, `${o.nation} bbox`).toBe(true);
         }

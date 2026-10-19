@@ -11,7 +11,7 @@
   "regions": ["europe-west", "east", "asia", "africa-americas"],
   "files": {
     "regions/<key>/map-nations.json": "the region's map nations with their capitals (SETUP-040)",
-    "regions/<key>/map-owners.json": "owner rules handing the region's provinces to map nations, first match wins (SETUP-041); scoped by country, so the regions' order does not matter",
+    "regions/<key>/map-owners.json": "owner rules handing the region's provinces to map nations, first match wins (SETUP-041); regions are joined in the order listed in regions, so a rule in another region's country is narrowed by admin1 or bbox",
     "regions/<key>/rulers.json": "each map realm's ruler on the start day (REALM-233)",
     "regions/<key>/culture-start.json": "court tongues, province tongues and faiths on the start day (CULT-094)",
     "regions/<key>/relations.json": "relations and facts between realms on the start day (DIPL-020, SETUP-022)",
