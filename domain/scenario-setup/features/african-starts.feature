@@ -15,7 +15,7 @@ Feature: African starts
       | oyo     | af_west           | playable country |
       | loango  | af_central_south  | playable country |
       | buganda | af_northeast_east | playable country |
-      | kayor   | af_west           | playable subject |
+      | sine    | af_west           | playable subject |
 
   @SETUP-061
   Scenario Outline: Stateless peoples with a homeland become small realms
@@ -51,8 +51,9 @@ Feature: African starts
 
     Examples:
       | subject | overlord |
-      | kayor   | jolof    |
+      | sine    | jolof    |
       | sofala  | kilwa    |
+      | hadiya  | ethiopia |
 
   @SETUP-063 @placeholder
   Scenario Outline: New nations take unowned land around their capitals by size
@@ -63,10 +64,10 @@ Feature: African starts
 
     Examples:
       | record         | level     | provinces |
-      | nupe           | moderate  | 3         |
-      | oyo            | moderate  | 3         |
+      | kitara         | moderate  | 3         |
+      | buganda        | low       | 2         |
       | san            | very low  | 1         |
-      | igbo_societies | high      | 5         |
+      | igbo_societies | moderate  | 3         |
 
   @SETUP-063
   Scenario: New nations grow one province a round in turn
@@ -75,13 +76,20 @@ Feature: African starts
     Then the nation with the lower nation index takes it in the first round
     And the other nation takes another unowned neighbour in the same round
 
+  @SETUP-063
+  Scenario: A new nation's own owner rule comes before a broad rule
+    Given an owner rule of the new nation "katsina" names the province a broad rule gives "kano"
+    When the starting world is built
+    Then "katsina" owns that province and "kano" keeps its capital
+    And every province keeps the id it had before the new nations were added
+
   @SETUP-064
   Scenario: A capital inside another realm leaves the record as reference data
-    Given the catalogue record "timbuktu" has its capital in a province the realm "Mali" owns
-    And no owner rule gives "timbuktu" land
+    Given the catalogue record "kayor" has its capital in a province the realm "jolof" owns
+    And no owner rule gives "kayor" land
     When the starting world is built
-    Then "timbuktu" is reference data and not a realm
-    And the map build's report lists "timbuktu"
+    Then "kayor" is reference data and not a realm
+    And the map build's report lists "kayor"
 
   @SETUP-065
   Scenario: Land left over stays free and colonisable

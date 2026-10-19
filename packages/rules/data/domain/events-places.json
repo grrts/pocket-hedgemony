@@ -13,7 +13,7 @@
     "iroquois": "haudenosaunee",
     "huron": "wendat",
     "maya": "maya_states",
-    "kano": "hausa_states"
+    "kano": "hausa_states", "japan": "ashikaga", "korea": "joseon", "khmer": "cambodia"
   },
   "places": {
     "province:constantinople": ["p1662"],

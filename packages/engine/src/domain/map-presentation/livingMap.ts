@@ -667,6 +667,25 @@ export function hullsInPort(hulls: number, berths: number): { atBerth: number; w
   return { atBerth, waiting: hulls - atBerth };
 }
 
+/**
+ * The berths of a port town, as map pixels: the water pixels next to its town
+ * pixels, the docks' first, then in the town's growth order, every
+ * `berthSpacing`th one, so hulls lie along the waterfront without
+ * overlapping (VIEW-122). `town` is the docks pixel (if any) and then the rest.
+ */
+export function berthSpots(grid: LandGrid, town: readonly number[]): number[] {
+  const seen = new Set<number>();
+  const water: number[] = [];
+  for (const t of town) {
+    for (const n of neighbours4(grid, t)) {
+      if (n < 0 || !isWater(grid, n) || seen.has(n)) continue;
+      seen.add(n);
+      water.push(n);
+    }
+  }
+  return water.filter((_, i) => i % L.hulls.berthSpacing === 0);
+}
+
 export interface TradePathFeed {
   id: number;
   medium: "land" | "river" | "sea";

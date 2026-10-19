@@ -501,6 +501,62 @@
    "building": "mine",
    "from_year": 1545,
    "by_event": true
+  },
+  {
+   "id": "Timbuktu market",
+   "province": "Southeast Timbuktu",
+   "building": "market",
+   "town": "Sahel trade town",
+   "from_year": 1444
+  },
+  {
+   "id": "Djenné market",
+   "province": "Mopti",
+   "building": "market",
+   "town": "Sahel trade town",
+   "from_year": 1444
+  },
+  {
+   "id": "Gao market",
+   "province": "Gao",
+   "building": "market",
+   "town": "Sahel trade town",
+   "from_year": 1444
+  },
+  {
+   "id": "Kano market",
+   "province": "Kano",
+   "building": "market",
+   "town": "Sahel trade town",
+   "from_year": 1444
+  },
+  {
+   "id": "Agadez market",
+   "province": "Southwest Agadez",
+   "building": "market",
+   "town": "Sahel trade town",
+   "from_year": 1444
+  },
+  {
+   "id": "Kilwa market",
+   "province": "Lindi",
+   "building": "market",
+   "town": "Swahili coast town",
+   "from_year": 1444
+  },
+  {
+   "id": "Mombasa market",
+   "province": "Coast",
+   "building": "market",
+   "town": "Swahili coast town",
+   "from_year": 1444
+  },
+  {
+   "id": "Mogadishu market",
+   "province": "Shabeellaha Hoose",
+   "building": "market",
+   "town": "Swahili coast town",
+   "from_year": 1444
   }
  ],
  "inventions": {

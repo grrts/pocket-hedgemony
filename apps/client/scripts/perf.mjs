@@ -23,8 +23,13 @@ await page.evaluate(() => {
 
 // CI shades the map on a software GPU at about 120 ms a frame, which made the
 // pans below take minutes. The map's shading is not budgeted here (only the
-// overlay's CPU time is), so it is switched off while panning and animating,
-// timed on its own for the report, and back on before the turns are played.
+// overlay's CPU time is), so it is switched off for the whole check and timed
+// on its own for the report. It stays off while the turns play too: on a
+// phone the GPU shades the map, but here the software GPU takes 200 to 300 ms
+// of CPU a frame from the cores the worker and the main thread need, which
+// made a day's apply on the main thread a third slower than the same code
+// with the map dark. Applying a day still uploads the provinces' textures
+// (restyleProvinces), so that part of the GPU's work is still timed.
 const mapFrameMs = await page.evaluate(
   () =>
     new Promise((done) => {
@@ -41,13 +46,7 @@ const mapFrameMs = await page.evaluate(
       requestAnimationFrame(step);
     }),
 );
-const shadeMap = (on) =>
-  page.evaluate((on) => {
-    const r = globalThis.__phMap.renderer;
-    if (!on) ((r.realDraw = r.draw), (r.draw = () => {}));
-    else if (r.realDraw) ((r.draw = r.realDraw), delete r.realDraw);
-  }, on);
-await shadeMap(false);
+await page.evaluate(() => (globalThis.__phMap.renderer.draw = () => {}));
 
 const pan = (zoom) =>
   page.evaluate(
@@ -106,7 +105,6 @@ const ANIM_SHARE = 0.9;
 if (animFrames < ANIM_SHARE) failed = true;
 console.log(`${animFrames >= ANIM_SHARE ? "PASS" : "FAIL"} animating overlay redrawn on ${(animFrames * 100).toFixed(0)}% of frames (budget ${ANIM_SHARE * 100}%)`);
 
-await shadeMap(true);
 
 // Ending turns: each day (or battle step) of the week as it plays, the engine
 // worker's answer, then taking it in on the main thread. Turns are played

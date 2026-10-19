@@ -47,6 +47,8 @@ export interface ColonyFounding {
   food: number;
   /** Progress made last month, for the card's "a month" figure. */
   lastChange: number;
+  /** Founded on land a tribe gave up: with the consent of the local people (TRIBE-024). */
+  consent?: boolean;
 }
 
 export interface ExplorationState {

@@ -2,7 +2,7 @@ import type { Ruleset } from "@ph/rules";
 import { FAITH_FAMILY, LandGridScan, SLOTS, WORKS, type LandGrid, type Snapshot } from "@ph/engine";
 import {
   hamletCount, hamletSpots, keepsRoad, LIVING_MAP, roadLines, settlementByte, townCellKinds, townCells, townFootprint, townGrowthOrder, townPeopleThousands, townPlan,
-  worksSpot, neighbours4, roadPath, type CellKind, type RoadLine, type TownPlan,
+  worksSpot, neighbours4, roadPath, berthSpots, type CellKind, type RoadLine, type TownPlan,
 } from "@ph/engine/domain/map-presentation";
 import type { MapImage } from "./loadMap.ts";
 
@@ -28,6 +28,8 @@ interface ProvinceTown {
   key: string;
   tiles: Map<number, CellKind>;
   hamlets: number[];
+  /** Where its hulls lie in port, worked out when first asked for (VIEW-122). */
+  berths?: number[];
 }
 
 /** Per province: walls (0 none, 1 palisade, 2 stone), road grade, worship variant, and the town style (VIEW-110, VIEW-113, VIEW-131). */
@@ -89,6 +91,18 @@ export class TownLayer {
 
   get grid(): LandGrid {
     return this.gridReady!;
+  }
+
+  /** A port town's berths, as map pixels, the docks' first; empty until its town is laid (VIEW-122). */
+  berths(p: number): number[] {
+    const town = this.towns.get(p);
+    if (!town) return [];
+    if (!town.berths) {
+      const cells = [...town.tiles].filter(([, k]) => k !== "works");
+      const docks = cells.filter(([, k]) => k === "docks").map(([t]) => t);
+      town.berths = berthSpots(this.grid, [...docks, ...cells.map(([t]) => t).filter((t) => !docks.includes(t))]);
+    }
+    return town.berths;
   }
 
   /** The box of map pixels whose byte changed since the last call, or null. */

@@ -7,7 +7,7 @@ Feature: The tribal AI and hunting grounds
   @TRIBE-031
   Scenario: The AI claims the most-peopled land it may
     Given the AI country "Huron" has a free place in its range and no claim under way
-    And it may claim "Southwest Québec 2" with 49 people and "Southeast Michigan 2" with 31 people
+    And it may claim "Southwest Québec 2" with 49 people and "Southeast Ontario 5" with 31 people
     When the monthly step runs
     Then "Huron" claims "Southwest Québec 2"
 
@@ -21,8 +21,8 @@ Feature: The tribal AI and hunting grounds
 
   @TRIBE-033 @placeholder
   Scenario: A colonial AI asks first
-    Given the AI country "Castile" wants to found a colony in "Northeast Florida"
-    And "Northeast Florida" is a hunting ground of "Creek"
+    Given the AI country "Castile" wants to found a colony in "Southeast Mississippi"
+    And "Southeast Mississippi" is a hunting ground of "Creek"
     And "Castile" holds at least 20 gold
-    Then "Castile" asks "Creek" for "Northeast Florida" offering 10 gold
+    Then "Castile" asks "Creek" for "Southeast Mississippi" offering 10 gold
     And "Castile" founds there only after "Creek" has answered

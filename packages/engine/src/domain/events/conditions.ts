@@ -1,5 +1,5 @@
 import * as subj from "../subjects/index.ts";
-import { eventsConfig, exists, now, type Condition, type World } from "./model.ts";
+import { eventsConfig, exists, inRegion, now, type Condition, type World } from "./model.ts";
 
 /**
  * The condition language (vocabulary.yaml): logic all, any, not, at_least and
@@ -139,7 +139,7 @@ function subjectCount(w: World, id: string, byReach: boolean): number {
 
 function countries(w: World, where: unknown): string[] {
   return Object.entries(w.countries)
-    .filter(([, c]) => c.exists !== false && (where === undefined || `region:${c.region}` === where))
+    .filter(([, c]) => c.exists !== false && (where === undefined || inRegion(c.region, where)))
     .map(([id]) => id);
 }
 

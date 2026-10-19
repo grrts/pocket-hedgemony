@@ -1,7 +1,8 @@
 # Performance requirements
 
 Hard budgets for the game on a mid-range phone. They are not goals: a change
-that breaks one fails CI. Two scripts check them:
+that breaks one fails CI on main. Two scripts check them, on pushes to main
+(not on pull requests, where a busy runner made them fail on noise):
 
 - `pnpm bench` (packages/engine/bench/turn.bench.ts) times the engine itself.
 - `pnpm --filter @ph/client perf` (apps/client/scripts/perf.mjs) runs the
@@ -38,8 +39,12 @@ Rules that keep it there:
 
 GPU time is not measured in CI (it runs on a software GPU, about 120 ms a
 frame); the map's frame time is reported only. So perf turns the map's
-shading off while it pans and animates, which keeps the check under a
-minute, and back on before it ends turns.
+shading off for the whole check, which keeps it under a minute. It stays
+off while the turns play: the software GPU's 200 to 300 ms of CPU a frame
+took the cores the worker and the main thread need, which no phone's GPU
+does, and made applying a day a third slower than the same code with the
+map dark. Applying a day still uploads the provinces' textures, so that is
+still timed.
 
 ## Ending a turn
 

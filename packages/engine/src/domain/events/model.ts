@@ -1,6 +1,7 @@
 import type { SubjectBond } from "../subjects/index.ts";
 import rawConfig from "../../../../rules/data/domain/events.json" with { type: "json" };
 import rawTree from "../../../../rules/data/domain/events-tree.json" with { type: "json" };
+import geography from "../../../../rules/data/domain/exploration-regions.json" with { type: "json" };
 
 /**
  * The event tree's data model (event-tree/schema/event-tree.d.ts, as the
@@ -335,4 +336,12 @@ export function exists(w: World, id: string): boolean {
   const c = w.countries[id];
   if (c) return c.exists !== false;
   return Object.values(w.places).some((p) => (p.groups?.[id] ?? 0) > 0);
+}
+
+const PARENTS = geography.parents as Record<string, string | null>;
+
+/** A country's region lies in `where` when it is that region or inside it: "region:europe" holds the realms of region:germany. */
+export function inRegion(region: string | undefined, where: unknown): boolean {
+  for (let r = region; r; r = PARENTS[r] ?? undefined) if (`region:${r}` === where) return true;
+  return false;
 }

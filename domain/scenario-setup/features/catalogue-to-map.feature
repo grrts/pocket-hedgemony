@@ -6,11 +6,11 @@ Feature: Putting the catalogue on the map
 
   @SETUP-048
   Scenario: The map's nations are the realms and the playable list
-    Given the map's 137 nations
+    Given the map's 237 nations
     When the starting world is built
     Then every map nation is a realm with provinces, a capital, a colour and commanders
     And every map nation is playable
-    And 100 of them are catalogue ids and the other 37 go through the rename table
+    And 200 of them are catalogue ids and the other 37 go through the rename table
 
   @SETUP-049
   Scenario Outline: Map nations use catalogue ids

@@ -1091,7 +1091,7 @@ Given("the research data with start groups", (s) => {
 });
 
 When("every map nation is looked up", (s) => {
-  s.nations = loadDefaultRuleset().nations.map((n) => n.id);
+  s.nations = loadDefaultRuleset().nations.filter((n) => !n.asleep).map((n) => n.id);
   s.memberships = s.nations.map((id: string) => Object.values(s.groups as Record<string, { realms: string[] }>).filter((g) => g.realms.includes(id)).length);
 });
 

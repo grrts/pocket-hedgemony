@@ -192,6 +192,14 @@ export interface NationDef {
   commanders: CommanderDef[];
   /** Men under arms at the start (1444), a rough historical estimate; realms without one start with a quarter of their troop cap. */
   army?: number;
+  /** A sleeping realm (SETUP-080): listed from the start, holding nothing until it wakes. */
+  asleep?: true;
+  /** A spare sleeper with no name of its own, named and coloured when it wakes (SETUP-081). */
+  spare?: true;
+  /** The event tree's ids for this realm, besides its own id (SETUP-080). */
+  tree?: string[];
+  /** A sleeping realm's home land: the provinces it wakes on when nothing else names its land (SETUP-084). */
+  home?: string[];
 }
 
 export type Terrain =

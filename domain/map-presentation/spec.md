@@ -234,7 +234,7 @@ Leroy asked for towns, boats and commanders to match the detail of the world map
 Zoom bands
 - VIEW-100 (State-driven): While at Local zoom, the map shall be in one of three bands by camera zoom (CSS pixels per map pixel): icons from 4 to under 16 (`livingFrom`), as Local zoom draws today; living from 16 to under 40 (`streetFrom`), with town footprints, hamlets, roads, figure armies, hull fleets and traders and the icons hidden; street from 40 to 96 (`streetTo`), the same at double art density. The three zoom levels World, Region and Local do not change. [living-map-design §2]
 - VIEW-101 (State-driven): While the camera zoom is between `livingFrom - livingFade` (14) and `livingFrom` (16), the icons shall fade out as the living pieces fade in, so pinching across never pops. [living-map-design §2, §5.4]
-- VIEW-102 (Ubiquitous): In the living band, every piece (towns, figures, ships, roads) shall be drawn in the ground's own art pixels, at `u = max(2, zoom / 8)` CSS pixels per art pixel, and at street level at `u = zoom / 16`, so at zoom 16 a piece is as big as today's tokens and nothing looks pasted on. [living-map-design §1.1, §2, §4]
+- VIEW-102 (Ubiquitous): In the living band, every piece (towns, figures, ships, roads) shall be drawn in the ground's own art pixels, at `u = max(2, zoom / 8)` CSS pixels per art pixel, and at street level at `u = zoom / 16`, so at zoom 16 a piece is as big as today's tokens and nothing looks pasted on; town buildings are the exception, painted at 16 × 16 art pixels per map pixel in both bands (twice the living ground's density, the street ground's own) so houses, keeps and docks show their detail, while roads keep the ground's art pixels (feedback 126). [living-map-design §1.1, §2, §4]
 - VIEW-103 (State-driven): While at street level, the terrain shall be drawn at 16 × 16 art pixels per map pixel, handing over from 8 × 8 at zoom 40 as 4 × 4 hands over to 8 × 8, and the tiles refined by seeded detail (stones, tufts, single trees, furrows) so they don't look blocky. [living-map-design §2, §3.5]
 - VIEW-104 (Optional): Where Map detail is Low, the map shall draw icons at every zoom with the closest zoom 40; where Medium, the living band and no street level (closest zoom 40), with reduced life; where High, both bands (closest zoom 96) and full life (SET-041). [living-map-design §6]
 
@@ -259,7 +259,7 @@ Moving pieces
 - VIEW-119 (State-driven): While a battle runs, the two sides' figures shall face each other on the battle tile with their front ranks clashing, and each round take away figures as the side's men fall (VIEW-077). [living-map-design §4.1]
 - VIEW-120 (State-driven): While an army besieges a town, its figures shall stand in a ring round the walls among tents; rebels are the same figures in the rebel colour with no banner; and in the living band the commander's token is replaced by the banner-bearer, whose name shows on selection, or always at street level. [living-map-design §4.1]
 - VIEW-121 (State-driven): While a fleet is at sea in the living band, it shall be drawn as one hull per `shipsPerHull` ships (5 living, 1 street), at most 8 or 24 hulls, sailing in a loose formation round the fleet's point with wakes while it moves, in the ship types of the naval design once they exist and a generic sailing ship until then. [living-map-design §4.2]
-- VIEW-122 (State-driven): While a fleet is in port, its hulls shall lie at the docks' berths, as many as the harbour has berths (`harbourMarks`); a naval battle shows the hulls facing off on the zone with smoke. [living-map-design §4.2]
+- VIEW-122 (State-driven): While a fleet is in port, its hulls shall lie at the docks' berths, one berth for every `berthSpacing` (2) water pixels along the town's waterfront, from the docks out, with the rest waiting off the docks; a naval battle shows the hulls facing off on the zone with smoke. [living-map-design §4.2]
 - VIEW-123 (State-driven): While a trade path is busy, the living band shall show up to 3 movers on it (a caravan of mules and carts on land, a barge on a navigable river, a trading ship at sea), spaced evenly and moving with the game clock from a start seeded by the path, so they never jump between frames or turns. [living-map-design §4.3]
 - VIEW-124 (Ubiquitous): In the living band, envoys shall ride in the band's art pixels, explorers sail as a single ship along the voyage path, colonists' carts head for the colony site, and life (people in town streets and at the market at street level, chimney smoke, flags on keeps) shall be decoration only. [living-map-design §4.4]
 
@@ -272,12 +272,24 @@ How the player uses it
 - VIEW-130 (Ubiquitous): The overlay shall animate at most `maxAnimated` (60) figures at about 10 frames a second, the nearest the screen's centre first, from sprite caches keyed by piece, colour and whole `u` with least-recently-used eviction; towns cost the tiled tiers one extra texture read, and the budgets do not change (VIEW-054). [living-map-design §1.5, §6]
 - VIEW-131 (Ubiquitous): Town buildings shall take their culture group's style (`townStyles`: roof and wall colours from the 32-colour palette and a house variant set), with one generic set until a group has its own, and a hand-made landmark (`landmarks`, per province) replaces the generic keep or worship cell where one exists. [living-map-design §3.4]
 - VIEW-132 (Ubiquitous): The snapshot shall carry the busy trade paths the player may see for the living map: traders sharing a loop and a way of going (land, river or sea) are one path, with its loop province by province, its trader count, the realm of its first trader for the colours and one of the player's traders on it; a path is kept where its loop enters a province whose trade the player sees (D-TRADE-13), busiest first, at most `livingMap.traders.maxPaths` (200). A tap on a mover of a path the player has a trader on opens that trader's card in the Trade tab; others give way to the province beneath, as there is no card for another realm's trader. [living-map-design §4.3, §7]
+- VIEW-134 (Ubiquitous): In the living band, the figures, hulls, traders and tents, and the town tiles with their keeps, walls, markets and houses of worship, shall be drawn at twice the ground's art density (two by two of their pixels to each art pixel of the ground, 16 × 16 to a map pixel for town tiles), so castles, towns, boats and commanders show their detail at the size VIEW-102 sets; roads stay in the ground's own art pixels so they meet it, and the coarser sprites remain the icons further out (feedback 126, Leroy).
 
 #### How the player uses it: the living map
 1. Where: the player pinches past the Local icons and nothing else is new. A tap on a town cell opens its province card, a tap on a formation or fleet its own card, a tap on a moving caravan the trade path's card; taps go to the piece first, then the province.
 2. Grouping: this is a way of drawing, not a new screen; each piece keeps its existing card, and the one new control, **Markers**, sits with the map mode buttons in the map controls.
 3. Overview: army sizes, sieges, battles and building works keep their overviews (the army list, the battle bar, the Works and Garrison tabs); in the band each has a picture (town states, figures lost, breaches) so the map alone still tells the story, and the numbers stay in the cards.
-4. Phone: every formation, fleet and caravan has a tap box of at least 44 points even when its figures are smaller; Markers brings back the plates for players who want the numbers, and the selected piece always shows its plate and route; nothing needs hover; plates and tap boxes stay inside the safe areas in the Wide and Tall layouts; pinching across 14 to 16 cross-fades with no pop. At zoom 16 a phone held sideways shows about 53 × 22 map pixels, at 40 about 21 × 9 and at 96 about 9 × 4, one city.
+4. Phone: every formation, fleet and caravan has a tap box of at least 44 points even when its figures are smaller; Markers brings back the plates for players who want the numbers, and the selected piece always shows its plate and route; nothing needs hover; plates and tap boxes stay inside the safe areas in the Wide and Tall layouts; pinching across 14 to 16 cross-fades with no pop. The detailed figures and town tiles (VIEW-134) draw at the screen's own pixels, so on a phone their half art pixels stay sharp and a figure keeps the size of the coarse one it replaced. At zoom 16 a phone held sideways shows about 53 × 22 map pixels, at 40 about 21 × 9 and at 96 about 9 × 4, one city.
+
+### Realm names that never overlap (18 October 2026)
+Leroy's playtest: zoomed out, Portugal's name lay over Castile's and the Livonian Order's over Pskov's.
+
+- VIEW-133 (Ubiquitous): Zoomed out, no two realm names shall overlap. The player's realm is named first, then the others largest first; a name that would cover one already placed moves to another of its realm's provinces nearest its middle (`LABEL_ANCHORS`, 6), then shrinks a step at a time (`LABEL_SHRINK`, 0.85) down to the smallest realm name (9 pixels), and a name with no room left waits for a closer zoom. [feedback, Leroy 18 October 2026]
+
+#### How the player uses it: realm names
+1. Where: on the map itself, zoomed out to World and Region; nothing new to tap. Pinching in brings back the names that had no room, larger.
+2. Grouping: a realm's name sits on its own land, on its middle province or one near it, never on a neighbour's name.
+3. Overview: the zoomed-out map is the overview of who holds what; every name on it can be read whole, and the player's own realm is always named.
+4. Phone: the same rule in the Wide and Tall layouts and at every zoom; names stay at least 9 pixels tall; nothing needs hover.
 
 ## 6. Commands
 
@@ -346,7 +358,7 @@ re-renders only open panels.
 | `livingMap.growRadius`, `growth` | Town growth order | 8 pixels; jitter and river, coast, mountain and marsh weights | Yes | `map-presentation.json` |
 | `livingMap.hamlets` | Hamlets and tracks | 40 thousand rural per hamlet, at most 6, 4 apart, tracks within 8 | Yes | `map-presentation.json` |
 | `livingMap.figures` | Figures | 1,000 / 250 men a figure, 12 / 40 at most, 60 animated at 10 fps | Yes | `map-presentation.json` |
-| `livingMap.hulls` | Hulls | 5 / 1 ships a hull, 8 / 24 at most | Yes | `map-presentation.json` |
+| `livingMap.hulls` | Hulls | 5 / 1 ships a hull, 8 / 24 at most, a berth every 2 water pixels along the waterfront | Yes | `map-presentation.json` |
 | `livingMap.traders.maxMovers` | Movers per trade path | 3 | Yes | `map-presentation.json` |
 | `livingMap.traders.maxPaths` | Trade paths in the snapshot feed | 200 | Yes | `map-presentation.json` |
 | `livingMap.byDetail` | Bands and life by Map detail | Low off, Medium living, High living and street | Yes | `map-presentation.json` |
@@ -530,3 +542,5 @@ None. AI nations run in the same worker turn, which the turn budgets cover (VIEW
 | VIEW-130 | living-map.feature | At most 60 figures move at once |
 | VIEW-131 | — | presentation only: culture styles and landmarks are art |
 | VIEW-132 | living-map.feature | The snapshot feeds the busy trade paths |
+| VIEW-133 | zoom-content.feature | Realm names never overlap |
+| VIEW-134 | — | presentation only: detailed figures and town tiles are art |

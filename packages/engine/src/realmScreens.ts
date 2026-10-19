@@ -177,7 +177,7 @@ export function taxLine(s: Pick<Snapshot, "provinceTax" | "taxDefault" | "provin
 
 // ------------------------------------------------------------ the Treasury tab (REALM-184, REALM-198)
 
-const LEDGER_LABEL: Record<string, string> = { grain: "Grain sold", tax: "Tax", trade: "Trade", "army pay": "Army pay", officials: "Officials' wages", interest: "Debt interest", schools: "Schools", tribute: "Tribute", navy: "Ships and sailors" };
+const LEDGER_LABEL: Record<string, string> = { grain: "Grain sold", tax: "Tax", trade: "Trade", "army pay": "Army pay", officials: "Officials' wages", interest: "Debt interest", schools: "Schools", tribute: "Tribute", navy: "Ships and sailors", furs: "Furs and hides" };
 
 export interface LedgerRow {
   line: string;

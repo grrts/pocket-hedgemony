@@ -6,6 +6,7 @@ import { deriveAll } from "./mapping.ts";
 import {
   balance,
   eventsConfig,
+  inRegion,
   monthIndex,
   now,
   type AgeDef,
@@ -272,7 +273,7 @@ export function roleCandidates(s: EventState, ev: EventDef, role: string): strin
   const out: string[] = [];
   for (const id in s.world.countries) {
     const c = s.world.countries[id]!;
-    if (c.exists === false || (sel.where !== undefined && `region:${c.region}` !== sel.where)) continue;
+    if (c.exists === false || (sel.where !== undefined && !inRegion(c.region, sel.where))) continue;
     ctx.this = id;
     if (holdsIfBound(sel.condition, s.world, ctx) === true) out.push(id);
   }

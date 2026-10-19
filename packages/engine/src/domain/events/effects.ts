@@ -142,21 +142,23 @@ export const EFFECTS: Record<string, EffectEval> = {
     const id = String(p.entity);
     const c = country(w, id);
     c.exists = true;
+    // The realms it is made from, by their ids: the game reads them to wake the realm on its map (SETUP-084).
+    const from = p.from === undefined ? undefined : all(p.from, ctx);
+    let over: string | undefined;
     if (p.where !== undefined) {
-      const from = p.from === undefined ? undefined : all(p.from, ctx);
       for (const k of provincesOf(w, String(p.where))) {
         const pr = place(w, k);
         if (!from || pr.owner === undefined || from.includes(pr.owner)) pr.owner = id;
       }
     }
     if (p.subject_of !== undefined) {
-      const [over] = resolve(p.subject_of, ctx);
+      [over] = resolve(p.subject_of, ctx);
       relate(w, id, over!, "subject", true);
       relate(w, over!, id, "overlord", true);
       const kind = p.kind === undefined ? undefined : subj.kindFromName(String(p.kind));
       bonds(w)[id] = subj.subjectFromEvent({ key: "create_country", ...(kind ? { kind } : {}) }, id, over!, now(w));
     }
-    out.push({ type: "create_country", target: id, values: { ...p } });
+    out.push({ type: "create_country", target: id, values: { ...p, ...(from ? { from } : {}), ...(over !== undefined ? { subject_of: over } : {}) } });
   },
   annex: (p, w, ctx, out) => {
     const [who] = resolve(p.who, ctx);

@@ -745,6 +745,82 @@ button.icon-only {
   justify-content: flex-start;
 }
 
+/* The realm picker's Region select and the region's list, one 44-point row per realm (SETUP-072, SETUP-075):
+   the list scrolls with the sheet, never sideways; rows take two columns where the sheet is wide enough. */
+.pick-region {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0 8px;
+  min-width: 0;
+}
+
+.pick-region > span {
+  font: 600 21px/1 var(--body);
+}
+
+.pick-region select {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 8px;
+  border-style: solid;
+  border-width: 8px;
+  border-image: var(--ui-btn-paper) 4 fill / 8px stretch;
+  background: none;
+  border-radius: 0;
+  color: var(--ink);
+  font: 600 19px/1 var(--body);
+  text-overflow: ellipsis;
+}
+
+.pick-region select option {
+  background: #f1e3c0;
+  color: #3a2414;
+}
+
+.pick-count {
+  margin: 0 0 4px;
+}
+
+.pick-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 210px), 1fr));
+  gap: 8px;
+  margin: 0 0 8px;
+  padding: 0;
+  list-style: none;
+}
+
+.pick-list .pick-row {
+  width: 100%;
+  min-height: 52px;
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.pick-list .nation-name {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 0;
+  line-height: 1;
+  overflow-wrap: anywhere;
+}
+
+.pick-list small.starts {
+  font-size: 15px;
+  color: var(--ink-soft);
+}
+
+.ways-to-grow {
+  margin: 6px 0;
+  padding: 6px 8px;
+  border-left: 4px solid var(--cloth);
+  background: rgb(58 36 20 / 0.06);
+}
+
 .army {
   display: flex;
   align-items: center;
@@ -829,6 +905,12 @@ button.capital {
   border-width: 4px;
   border-image-width: 4px;
   font-size: 20px;
+}
+
+/* Tap targets of 44 points even where they read as links: a province's realm, a realm's capital (SETUP-075). */
+.panel .owner button.realm-link,
+.realm-card button.capital {
+  min-height: 44px;
 }
 
 .facts small {
@@ -1124,6 +1206,52 @@ button.small {
 .alert .dismiss {
   width: 44px;
   padding: 0;
+}
+
+/* The founding card (SETUP-092 to SETUP-094): a major dispatch in the alerts'
+   place, inside the safe areas: the new realm's flag and name, what it was
+   made from, and its two 44-point buttons under them. */
+.alert.founding {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  padding: 6px 6px 4px 8px;
+}
+
+.founding-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.founding-head > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.founding-head small {
+  display: block;
+  color: var(--ink-soft);
+}
+
+.founding-head b {
+  display: block;
+  font-size: 1.2em;
+}
+
+.founding-head p {
+  margin: 2px 0 0;
+}
+
+.founding-choices {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.alert .founding-choices button {
+  min-width: 44px;
 }
 
 /* The battle being watched (feedback 73): along the bottom, between the
@@ -2513,6 +2641,14 @@ button.learning-line {
   line-height: 1.1;
   padding: 2px 6px;
   white-space: normal;
+}
+button.law-line {
+  justify-content: flex-start;
+  text-align: left;
+  line-height: 1.1;
+  padding: 2px 6px;
+  white-space: normal;
+  min-height: 44px;
 }
 button.learning-line.idle {
   color: var(--cloth);
@@ -5894,6 +6030,55 @@ small.why {
 .lens-key .swatch.seat {
   box-shadow: inset 0 0 0 3px #7a4c2a;
 }
+/* The Shogunate card (INST-082): a great house is a framed block, its lord's row then Summon and Confirm, each 44 points. */
+.houses {
+  display: grid;
+  gap: 6px;
+}
+.house-row {
+  padding: 4px 6px;
+}
+.house-row .house-lord {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  min-height: 44px;
+  text-align: left;
+}
+.house-row .house-lord small {
+  color: var(--ink-soft);
+  font-size: 0.85em;
+}
+.house-row .choices {
+  margin: 4px 0 0;
+}
+.house-row button {
+  min-height: 44px;
+}
+.house-row .hint {
+  margin: 2px 0 0;
+}
+.empire-card button[disabled] {
+  opacity: 0.6;
+}
+/* The warning line while hold is Weak or lower: an icon and its words, never colour alone. */
+.shogun-warn {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 6px 0;
+  padding: 4px 8px;
+  border: 2px solid #b13e53;
+  background: var(--paper-light);
+  font-weight: 600;
+}
+.oath-ask .inst-fold {
+  margin: 6px 0;
+}
+.lens-key .swatch.house {
+  border-style: dashed;
+}
 /* Heads of the faith (RELG-135 to RELG-138): one card in the Peoples tab's column; the two lists side by side when there is room. */
 .faith-head {
   padding: 6px 8px;
@@ -6322,4 +6507,134 @@ details.pow-line > .hint {
 }
 .league-members button.realm-link {
   min-height: 44px;
+}
+
+/* ---- Hunting grounds (TRIBE-026 to TRIBE-030): one column, 44-point buttons, every reason written under its button ---- */
+.hunt-tab,
+.hunt-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.hunt-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 4px 0;
+  padding: 0;
+  list-style: none;
+}
+.hunt-rows > li {
+  min-width: 0;
+}
+.hunt-ground {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-bottom: 6px;
+  border-bottom: 2px dotted var(--outline);
+}
+.hunt-ground.ready {
+  padding-left: 6px;
+  border-left: 4px solid var(--brass);
+}
+.hunt-ground .ready-mark {
+  color: var(--forest, #38b764);
+}
+button.hunt-open {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  width: 100%;
+  min-height: 44px;
+  text-align: left;
+}
+button.hunt-open > span {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+button.hunt-open small {
+  font-weight: normal;
+}
+.hunt-acts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.hunt-act {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 180px;
+  min-width: 0;
+}
+.hunt-act button {
+  width: 100%;
+  min-height: 44px;
+}
+.hunt-settlers {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  border: 2px solid #b13e53;
+  background: rgba(177, 62, 83, 0.14);
+  color: #b13e53;
+  font-weight: 600;
+}
+.hunt-settlers > span {
+  flex: 1 1 160px;
+  min-width: 0;
+}
+.hunt-settlers button {
+  flex: none;
+  min-height: 44px;
+}
+.hunt-ask {
+  padding: 6px;
+}
+.hunt-ask p {
+  margin: 0 0 4px;
+}
+.hunt-reasons {
+  margin: 4px 0;
+}
+.hunt-confirm {
+  flex: 1 1 100%;
+  padding: 6px;
+}
+.hunt-confirm p {
+  margin: 0 0 4px;
+}
+.hunt-bar {
+  margin: 4px 0;
+}
+.hunt-claim p {
+  margin: 4px 0 0;
+}
+small.why.hunt-note {
+  color: #b13e53;
+  opacity: 1;
+}
+.hunt-why {
+  margin: 6px 0 0;
+}
+.lens-key .swatch.hunt-hatch {
+  background: #c9c2ae repeating-linear-gradient(-45deg, #306082 0 3px, transparent 3px 9px) !important;
+}
+.hunt-tab .px-icon,
+.hunt-card .px-icon {
+  margin-right: 4px;
+}
+button.realm-link.hunt-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  margin: 0;
+  text-align: left;
 }

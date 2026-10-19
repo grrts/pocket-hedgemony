@@ -412,6 +412,22 @@ a bridge shows it the game as the tree's own world, and lands what the game alre
 - EVT-075 The event tree's state (its world, ages and periods, what fired, events waiting for an answer, boosts
   and its dice) shall be kept in the save. [saves; D-EVT-17]
 
+- EVT-077 When a `create_country` effect fires, the game shall found the realm on the map (SETUP-083 to
+  SETUP-090): the realm's sleeping realm wakes, or a gone map realm wakes again; a realm the list does not hold
+  takes the first spare sleeper under the tree's name for it. With no `where` and realms named in `from`, those
+  realms form it (a union); with a `where`, it takes the map provinces of that place, only those the `from` realms
+  hold when it names them, and holds a truce with the realm it broke from; a place the map does not know yet
+  gives it its home land; `subject_of` makes it that realm's subject. With no land to give, nothing wakes and the
+  effect stays in the tree's world. [EVT-045; X-24; D-EVT-18]
+- EVT-078 The tree shall know a founded realm under the id the event gave it from then on, and a save shall keep
+  it. [EVT-075; SETUP-091; D-EVT-18]
+- EVT-079 The game shall show the tree each realm's region, so a `where: region:<id>` limit binds: the tree's
+  region for the realm where it has one, else that of the nearest realm it has one for; a founded realm takes the
+  region of whoever held its capital in 1444. A region holds the regions inside it (region:europe holds
+  region:germany). [EVT-030; D-EVT-18]
+- EVT-080 The map's Japan, Korea and Khmer shall be the tree's Ashikaga, Joseon and Cambodia, as the catalogue
+  has them, so the events written for them fire (the Ōnin War, the Imjin War). [D-EVT-17; D-EVT-18]
+
 #### How the player uses it: the event card
 - EVT-076 Where: when an event fires for the player, the week pauses and the event card opens over the map,
   one event at a time, oldest first (SHELL-080). The card shows the event's name, the year it happened in
@@ -617,6 +633,12 @@ before achievements and the autosave. The age and period checks run in the event
   rest of the turn. Only land, gold, debt, legitimacy and stability land on the game in this slice (EVT-073); war,
   peace, subjects, rebels, buildings and people from events land when their bridges are built. Quick defaults so
   the game can play history now; each is replaced when its context lands.
+- **D-EVT-18** Founding events (Leroy, 18 Oct; X-24): a `create_country` founds the realm on the map through
+  the sleeping realms (EVT-077, EVT-078). The bridge also gives every realm a region, the tree's own or its
+  nearest neighbour's as a stand-in, and reads a region as holding the regions inside it, because before this no
+  `where: region:` limit could bind (EVT-079); and it aliases japan, korea and khmer to the catalogue's ashikaga,
+  joseon and cambodia (EVT-080). The tree's later "japan" and "korea" (Meiji Japan, the Korean Empire) are other
+  entities and are founded when their events say so.
 
 ## 14. Traceability
 
@@ -638,3 +660,4 @@ before achievements and the autosave. The age and period checks run in the event
 | EVT-068 | effects.feature | The end of a tagged rising applies its tier |
 | EVT-069 … EVT-075 | — | Engine: packages/engine/test/events.test.ts (ages and periods at the start, the AI's Fall of Constantinople, the player's card and answer, the save) |
 | EVT-076 | — | Presentation: apps/client/src/ui/events.ts, the event card |
+| EVT-077 – 080 | founding.feature | Founding events wake sleeping realms; regions and aliases bind |

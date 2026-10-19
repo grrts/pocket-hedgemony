@@ -5,6 +5,7 @@ import { castleFoodHashData } from "./castleFood.ts";
 import { rebelsHashData } from "./rebels.ts";
 import { revolutionsHashData } from "./revolutions.ts";
 import { institutionsHashData } from "./institutions.ts";
+import { tribesHashData } from "./tribes.ts";
 import type { World } from "./world.ts";
 
 /**
@@ -25,6 +26,8 @@ export function hashWorld(world: World): string {
   feed(world.provinceOccupier);
   feed(world.provinceGarrison);
   feed(world.nationTreasury);
+  // Who sleeps (SETUP-082).
+  feed(world.nationAsleep);
   feed(world.nationLevies);
   feed(world.provinceRecruits);
   feed(world.provincePopulation);
@@ -93,6 +96,7 @@ export function hashWorld(world: World): string {
   feed(rebelsHashData(world));
   feed(revolutionsHashData(world));
   feed(institutionsHashData(world));
+  feed(tribesHashData(world));
   feed(world.provinceLightTax);
   feed(world.provinceSelfRule);
   feed(world.provinceTongue);
