@@ -292,6 +292,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-HER-21**: (18 Oct, the coordinator's brief) Heritage is evaluated monthly, in the month's block right after the
 - **D-HER-22**: (18 Oct) Levers in play: the nine of HER-088, the ones whose rule the game already has. A lever narrowed
 - **D-HER-23**: (19 Oct, X-27, Leroy) Ambitions in plain sight: an open ambition shows its name, plain goal and progress,
+- **D-HER-24**: (19 Oct, X-27) The written ambitions live in three files by region beside the heritage build, keyed by map
 - **D-HER-17**: (was OQ-HER-17) Formed countries beyond the caps: the formed country keeps the forming country's own
 
 ### Naval (naval)

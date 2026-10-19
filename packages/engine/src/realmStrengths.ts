@@ -1,5 +1,8 @@
 import data from "../../rules/data/domain/national-strengths-realms.json" with { type: "json" };
-import type { HeritageData } from "./domain/national-strengths/index.ts";
+import west from "../../rules/data/domain/ambitions/common-west.json" with { type: "json" };
+import east from "../../rules/data/domain/ambitions/east-africa.json" with { type: "json" };
+import asia from "../../rules/data/domain/ambitions/asia-americas.json" with { type: "json" };
+import type { Ambition, HeritageData } from "./domain/national-strengths/index.ts";
 
 /**
  * Each map realm's national strengths and catalogue assessments
@@ -66,6 +69,19 @@ export const RISK_DIMENSIONS: readonly string[] = ["unrest_risk", "external_thre
 /** A level as 1 (very low) to 5 (very high), 0 for unknown. */
 export const LEVEL_RANK: Readonly<Record<AssessmentLevel, number>> = { unknown: 0, very_low: 1, low: 2, moderate: 3, high: 4, very_high: 5 };
 
+/**
+ * Ambitions written beside the heritage build (X-27, HER-014): common ones
+ * every realm with heritage may draw, each with a requirement that makes it
+ * fit, and more for each realm by its map id, many of them chained.
+ */
+type AmbitionsFile = { common?: Ambition[]; realms: Record<string, Ambition[]> };
+const WRITTEN = [west, east, asia] as unknown as AmbitionsFile[];
+export const COMMON_AMBITIONS: readonly Ambition[] = WRITTEN.flatMap((f) => f.common ?? []);
+const EXTRA: Record<string, Ambition[]> = {};
+for (const f of WRITTEN) for (const [id, list] of Object.entries(f.realms)) (EXTRA[id] ??= []).push(...list);
+/** The ambitions written for one map realm beyond the heritage build. */
+export const extraAmbitions = (mapId: string): readonly Ambition[] => EXTRA[mapId] ?? [];
+
 const EMPTY: RealmStrengths = { catalogue: null, assessments: [], heritage: null };
 
 /** A map realm's catalogue record, assessments and heritage. */
@@ -86,7 +102,8 @@ export function realmHeritageData(mapId: string): HeritageData | null {
   const row = ROWS[mapId];
   if (!row?.heritage) return null;
   const h = row.heritage as unknown as HeritageData;
-  return { id: row.catalogue ?? mapId, authored: row.heritage.authored, birthright: h.birthright, heydays: h.heydays, ambitions: h.ambitions ?? [], burden: h.burden ?? null };
+  const ambitions = [...(h.ambitions ?? []), ...extraAmbitions(mapId), ...COMMON_AMBITIONS];
+  return { id: row.catalogue ?? mapId, authored: row.heritage.authored, birthright: h.birthright, heydays: h.heydays, ambitions, burden: h.burden ?? null };
 }
 
 /** The id heritage conditions use for a map realm: its catalogue record's, else its own (D-SETUP-1). */
