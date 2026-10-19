@@ -3180,6 +3180,8 @@ function renderEventCard(): void {
     eventFolded = true;
     renderEventCard();
     renderActions();
+    // An everyday event about a province shows it (EVT-121).
+    if (card.province !== undefined) goToProvince(card.province, true);
   });
   eventCard.querySelectorAll<HTMLButtonElement>("[data-event-option]").forEach((b) =>
     b.addEventListener("click", async () => {

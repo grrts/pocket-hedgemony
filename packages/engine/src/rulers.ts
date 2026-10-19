@@ -65,7 +65,7 @@ export function throneLaw(world: World, n: number): ThroneLaw {
   return law === "eldest son" && (realmConfig.daughters_inherit_crown as string[]).includes(world.nationIds[n]!) ? "eldest child" : law;
 }
 
-const dynastic = (law: ThroneLaw) => law === "eldest son" || law === "eldest child";
+export const dynastic = (law: ThroneLaw) => law === "eldest son" || law === "eldest child";
 
 /** A given name of the realm's culture, for a ruler, heir or kinsman the records don't name. */
 function givenName(world: World, n: number): string {
@@ -82,7 +82,7 @@ function drawTraits(rng: Rng): string[] {
 }
 
 /** A child born to the ruler: a daughter only where daughters may inherit the crown (REALM-107). */
-function child(world: World, n: number, age: number): Heir {
+export function child(world: World, n: number, age: number): Heir {
   const daughters = (realmConfig.daughters_inherit_crown as string[]).includes(world.nationIds[n]!);
   const sex = daughters && world.rulerRng.next() < R.daughter_heir ? "f" : "m";
   return { name: givenName(world, n), age, sex, relation: "child" };

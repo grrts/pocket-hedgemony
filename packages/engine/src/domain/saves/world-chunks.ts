@@ -3,6 +3,7 @@ import { CLASS_COUNT, rescaleClasses } from "../../living.ts";
 import { LEDGER_LINES } from "../../treasury.ts";
 import { restoreResearch, saveResearch, type SavedResearch } from "../../research.ts";
 import { restoreEvents, saveEvents, type SavedEvents } from "../../events.ts";
+import { restoreEveryday, saveEveryday, type SavedEveryday } from "../../everyday.ts";
 import { restoreHeritage, saveHeritage, type SavedRealmHeritage } from "../../heritage.ts";
 import { restoreRulers, saveRulers } from "../../rulers.ts";
 import { restoreFaithHeads, saveFaithHeads, type SavedFaithHeads } from "../../faithHeads.ts";
@@ -105,7 +106,7 @@ export function worldChunks(world: World, game: SavedGame): RawChunk[] {
     }),
     packChunk("nations", V.nations, {
       // Works being built and waiting, with works by name so a build with other works still reads them.
-      meta: { research: saveResearch(world), sites: world.sites.map((s) => ({ ...s, work: WORKS[s.work] })), workQueue: world.workQueue.map((q) => ({ ...q, work: WORKS[q.work] })), lords: world.lords, musters: world.musters, mercs: world.mercs, freeCompanies: world.freeCompanies, freeCompanySeq: world.freeCompanySeq, commanderHome: world.commanderHome, commanderSeed: world.commanderSeed, foodPolicy: world.foodPolicy, diplomacy: { ...world.diplomacy, events: [] }, government: saveGovernment(world), events: saveEvents(world), navy: saveNavy(world), exploration: saveExploration(world), peoples: savePeoples(world), rebels: saveRebels(world), heritage: saveHeritage(world), revolutions: saveRevolutions(world), trade: saveTrade(world), rulers: saveRulers(world), fallen: saveFallen(world), institutions: saveInstitutions(world), tribes: saveTribes(world), faithHeads: saveFaithHeads(world), campaign: saveCampaignEnd(world), sleeping: saveSleeping(world), goals: saveGoals(world) },
+      meta: { research: saveResearch(world), sites: world.sites.map((s) => ({ ...s, work: WORKS[s.work] })), workQueue: world.workQueue.map((q) => ({ ...q, work: WORKS[q.work] })), lords: world.lords, musters: world.musters, mercs: world.mercs, freeCompanies: world.freeCompanies, freeCompanySeq: world.freeCompanySeq, commanderHome: world.commanderHome, commanderSeed: world.commanderSeed, foodPolicy: world.foodPolicy, diplomacy: { ...world.diplomacy, events: [] }, government: saveGovernment(world), events: saveEvents(world), everyday: saveEveryday(world), navy: saveNavy(world), exploration: saveExploration(world), peoples: savePeoples(world), rebels: saveRebels(world), heritage: saveHeritage(world), revolutions: saveRevolutions(world), trade: saveTrade(world), rulers: saveRulers(world), fallen: saveFallen(world), institutions: saveInstitutions(world), tribes: saveTribes(world), faithHeads: saveFaithHeads(world), campaign: saveCampaignEnd(world), sleeping: saveSleeping(world), goals: saveGoals(world) },
       arrays: {
         treasury: world.nationTreasury,
         levies: world.nationLevies,
@@ -347,7 +348,7 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
     if (!name || owner < 0 || nationMap[owner]! < 0) return -1;
     return addCommander(world, nationMap[owner]!, newCommander(name), id);
   });
-  const natMeta = need("nations").meta as { research?: SavedResearch; lords?: RealmLord[]; musters?: Muster[]; mercs?: OldMercenary[]; freeCompanies?: FreeCompany[]; freeCompanySeq?: number; commanderHome?: number[]; commanderSeed?: number[]; foodPolicy?: FoodPolicyScreen[]; diplomacy?: World["diplomacy"]; government?: SavedGovernment; events?: SavedEvents; navy?: SavedNavy; exploration?: SavedExploration; peoples?: SavedPeoples; rebels?: SavedRebels; heritage?: Record<string, SavedRealmHeritage>; revolutions?: SavedRevolutions; trade?: SavedTrade; rulers?: ReturnType<typeof saveRulers>; fallen?: SavedFallen; institutions?: ReturnType<typeof saveInstitutions>; tribes?: SavedTribes; faithHeads?: SavedFaithHeads; campaign?: SavedCampaignEnd; sleeping?: { asleep: string[]; woken: WokenRealm[] }; goals?: ReturnType<typeof saveGoals> };
+  const natMeta = need("nations").meta as { research?: SavedResearch; lords?: RealmLord[]; musters?: Muster[]; mercs?: OldMercenary[]; freeCompanies?: FreeCompany[]; freeCompanySeq?: number; commanderHome?: number[]; commanderSeed?: number[]; foodPolicy?: FoodPolicyScreen[]; diplomacy?: World["diplomacy"]; government?: SavedGovernment; events?: SavedEvents; everyday?: SavedEveryday; navy?: SavedNavy; exploration?: SavedExploration; peoples?: SavedPeoples; rebels?: SavedRebels; heritage?: Record<string, SavedRealmHeritage>; revolutions?: SavedRevolutions; trade?: SavedTrade; rulers?: ReturnType<typeof saveRulers>; fallen?: SavedFallen; institutions?: ReturnType<typeof saveInstitutions>; tribes?: SavedTribes; faithHeads?: SavedFaithHeads; campaign?: SavedCampaignEnd; sleeping?: { asleep: string[]; woken: WokenRealm[] }; goals?: ReturnType<typeof saveGoals> };
   // Who sleeps, and what each woken realm is called (SETUP-091), before anything reads the realms.
   restoreSleeping(world, natMeta.sleeping);
   const mapP = (old: number) => world.provinceIndex.get(ids.provinces[old]!) ?? -1;
@@ -379,6 +380,7 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
   if (natMeta.diplomacy) world.diplomacy = natMeta.diplomacy;
   // The event tree (ages, periods, what fired, events waiting for an answer); a save from before it starts the tree afresh.
   if (natMeta.events) restoreEvents(world, natMeta.events);
+  restoreEveryday(world, natMeta.everyday);
   // Heritage by realm (heydays, ambitions, legacies, burden); a save from before it draws afresh.
   if (natMeta.heritage) restoreHeritage(world, natMeta.heritage);
   // Rulers and the fallen by realm; a save from before them keeps the rulers the seed drew and counts no fallen.

@@ -684,6 +684,70 @@ toward, and whether each is on course, bent or gone (plan-1378 §4.6).
   safe areas; nothing needs hover. Checked with `apps/client/scripts/chronicle-shots.mjs` on a phone held sideways
   and upright. [X-19; plan-1378 §4.6]
 
+### 5.22 Everyday events (feedback 152, 19 October 2026)
+
+The historical events give a realm a choice about once in three years (research/play-hook.md); everyday events
+add small ones about the realm's own people and stores, so something asks the player to choose every few months.
+Leroy (19 Oct): officials dying, children born, lords dying, things happening to lords and lords changing their
+opinion of you, and stores losing a big part of their grain; and not so many that play turns tedious. They are
+drawn from what the game already holds (officials, lords and their loyalty, the ruler and heir, the food stores),
+from `packages/rules/data/domain/events-everyday.json`, and stand beside the event tree: they are not tree events
+and do not count toward its pool (EVT-033). Every number is a placeholder for balance (D-EVT-22).
+
+- EVT-115 Each realm shall draw one everyday event every `months_between` months (3 to 6, rolled after each
+  draw), its first within `first_within_months` (4) of the start, so realms do not all draw in the same month.
+  @placeholder [feedback 152; D-EVT-22]
+- EVT-116 When a realm draws, the game shall pick by `weight` among the everyday events the realm could have now,
+  each bound to who and where it is about; a realm with nothing to bind draws nothing that month. The AI answers
+  at once by the options' `ai` weights; the player's waits on the event card (EVT-044). [feedback 152]
+- EVT-117 While an event, historical or everyday, waits for the player's answer, no new everyday event shall
+  come to the player; the draw waits a month at a time. A decision the player may take or leave (EVT-031) does not
+  hold one back. [Leroy, 19 Oct: "not too much, so the gameplay doesn't feel too tedious"]
+- EVT-118 Everyday events shall be: an official's death (a royal post with an official), a lord's death, a lord
+  slighted at court (Loyal or Wavering), a lord speaking well of you (Wavering or Disloyal), two lords quarrelling,
+  a lord hurt, a child born to the ruler (a ruler of an age to have children under a law of heirs by blood, with no
+  regent), the heir falling ill (an heir under the age of a child ruler), and grain lost from a province's store
+  (rot, fire, rats) where it holds at least `food.min_store_months` (3) months and `food.min_store` (2) thousand
+  months of food. A lord in revolt or with no land is never drawn. [feedback 152; REALM-088, REALM-089]
+- EVT-119 Every everyday event shall have two or three options, each with its effects shown in words, at least one
+  costing nothing. [EVT-039; feedback 152]
+- EVT-120 If an option costs more gold than the realm holds, or asks for a second lord the realm does not have,
+  then the game shall not offer it. [EVT-041]
+- EVT-121 The player's everyday events shall show on the event card with the realm's own story instead of a year
+  in history, marked *In your realm*. [EVT-076]
+- EVT-122 An official's death shall leave the post to a new man: the deputy, who starts at half the post's effect
+  (PROV-192); a seasoned man sent for, for gold, who keeps the post's years and so its effect; or a lord's kinsman,
+  who starts at half and makes that lord a step more loyal. [PROV-192; REALM-088 office at court]
+- EVT-123 A lord's death shall pass his lands to his son, as loyal as his father; the crown may ask a fee (gold,
+  the son a step less loyal, heavy taxes) or take the lands for the crown, making them royal land and every other
+  lord of the realm a step less loyal (land seized from another). [PROV-200, PROV-201; REALM-089]
+- EVT-124 A child born to a ruler with no heir shall be the heir. A feast costs gold and makes the two least loyal
+  lords a step more loyal; promising the child to a lord's house makes him a step more loyal (marriage into the
+  ruling house). [REALM-100 to REALM-107, REALM-088]
+- EVT-125 A lord's loyalty shall move a step by the realm's causes (REALM-088, REALM-089): a gift of gold, his want
+  granted, an office at court, marriage into the ruling house up; heavy taxes, land seized from him, grain
+  requisitioned, and the new *slighted at court* down. [REALM-088, REALM-089]
+- EVT-126 Grain lost from a store shall be gone when the event fires, whatever is chosen; buying grain (gold) or
+  requisitioning it from the province's lord, else another lord (a step less loyal), makes half of it good.
+  [feedback 152; PROV-104]
+- EVT-127 If the player trusts the sick heir to prayer, then the heir shall die with the chance the option shows
+  (3 in 10). [feedback 152]
+- EVT-128 The everyday events' state (each realm's next draw, the player's waiting events, the count and the dice)
+  shall be kept in the save; a save from before them starts the draws afresh. [EVT-075]
+
+#### How the player uses it: everyday events
+- EVT-129 Where: nothing new to find. An everyday event opens the same event card over the map and pauses the week
+  (EVT-076): its title names who or where ("Death of Gilles de Chabannes", "Grain rots at Creuse"), *In your
+  realm* in place of the history line, the story in one or two sentences, *Whatever you choose* for grain already
+  lost, and each option as a 44-point button with its cost and effect in words ("You: gold −25", "Charles de
+  Brézé: a step more loyal"). *Look at the map* folds the card into End turn and, for an event about a province,
+  opens that province. Grouping: every event is one card; lords, officials, the heir and stores stay on their own
+  cards, where the result shows (the lord's loyalty, the post's years, the heir on the General tab, the store on the
+  Land tab). Overview: the News keeps a line for each, with what was chosen, and the realm's Lords list and
+  Provinces list stay the overviews of loyalty and food. Phone: the card is the sheet it already is, in the Wide
+  and Tall layouts, inside the safe areas, options in reach, nothing that needs hover. Rate: about two or three a
+  year per realm, never stacking (EVT-117). [X-19; EVT-076]
+
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
@@ -907,6 +971,15 @@ before achievements and the autosave. The age and period checks run in the event
   the great powers by provinces held (EVT-083). Exploration's gate reads the tree's own age when the tree runs
   (EXPL-076). Conditions name only events the tree has; the bridge events of 1378 to 1444 will start and end
   the new periods when they are written (plan-1378 step 6).
+- **D-EVT-22** Everyday events (feedback 152; integrator's picks under Leroy's rule of quick decisions, 19 Oct):
+  kept apart from the event tree in their own file and engine module, because they act on what the tree cannot
+  see (officials, lords, heirs, stores); they reuse the tree's card, News lines and AnswerEvent order. The rate
+  (one every 3 to 6 months, none while one waits) is set below the 2 to 4 months of the research so play stays
+  light, as Leroy asked; `months_between` tunes it. Effects use only what the game already has; one new loyalty
+  cause, *slighted at court*, joins the down list. Province disease is its own mechanic (province PROV-240 to
+  PROV-242) and comes in the next change. The deaths of officials and lords roll on their own for now; once the
+  shared ageing and death of people lands (the "Death across all people" work), they fire from it instead.
+
 - **D-EVT-21** The East's bridge events (milestone 10, step 6; integrator's picks, 19 Oct): 46 new events and 7
   re-dated ones (EVT-090 to EVT-093). Realms go by tree ids, places by 1444 province ids in the file's own
   `places`. The Horde union of east.md is Tokhtamysh's event: the Golden Horde absorbs the White Horde and Arab
@@ -963,3 +1036,5 @@ before achievements and the autosave. The age and period checks run in the event
 | EVT-100 – 108 | historical-goals.feature | A goal ends with its reason; the seed shakes the goals; a goal's pull fades after its window; a goal draws the AI's war but not past its price; an ally goal sends an envoy; the player is never steered. Engine: packages/engine/test/goals.test.ts; data: packages/rules/test/goals-1378.test.ts |
 | EVT-109 – 111 | chronicle.feature | A turning point happened as in history; late; bent when its goals are gone; gone when invalidated. Engine: packages/engine/test/goals.test.ts |
 | EVT-112 – 114 | — | Presentation: apps/client/src/ui/chronicle.ts, the History tab and the Aims fold; apps/client/scripts/chronicle-shots.mjs |
+| EVT-115 – 128 | everyday.feature | A choice every few months; none while one waits; an official's death; an option the realm cannot pay; spoiled grain; a lord's death; a child born heirless. Engine: packages/engine/test/everyday.test.ts |
+| EVT-129 | — | Presentation: apps/client/src/ui/events.ts, the event card |
