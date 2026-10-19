@@ -1,0 +1,26 @@
+[
+ {
+  "id": "hejaz",
+  "name": "Hejaz",
+  "capital": [
+   39.83,
+   21.42
+  ]
+ },
+ {
+  "id": "yemen",
+  "name": "Yemen",
+  "capital": [
+   44.2,
+   15.35
+  ]
+ },
+ {
+  "id": "oman",
+  "name": "Oman",
+  "capital": [
+   57.53,
+   22.93
+  ]
+ }
+]

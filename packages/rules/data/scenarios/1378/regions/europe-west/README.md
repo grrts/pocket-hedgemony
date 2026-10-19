@@ -13,7 +13,7 @@ a ruler and tongues for every map nation, 184 relations and 44 facts on the star
 **Map scale.** Map provinces in western Europe are about 15,000–20,000 km², so realms smaller than that (Jülich,
 Berg, Werle, Lübeck, Mantua, Lucca and the like) stay catalogue records with relations and subject rows but no land.
 Two map capitals in one province break the map generator, so a few capitals are moved to a nearby residence
-(Brandenburg at Berlin, Mainz at Eltville, Trier at Koblenz); the notes below say where.
+(Brandenburg at Berlin, Mainz at Eltville, Trier at Koblenz, and Venice at Mestre, since the lagoon point fell into Padua's province when the regions were joined); the notes below say where.
 
 **Owner rules** are ordered enclaves first (land a western realm holds abroad: Venice's Crete, Negroponte, Modon,
 Coron and Tenedos; Genoa's Corsica, Chios, Famagusta and Crimean coast; Habsburg Alsace; Norway's Orkney), then the
