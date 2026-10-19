@@ -8,7 +8,8 @@ import { lonLatOf, pixelOf } from "../world-map/index.ts";
 
 /**
  * National strengths (domain/national-strengths/spec.md): a country's
- * heritage of birthright, heydays, hidden ambitions, legacies and burden;
+ * heritage of birthright, heydays, ambitions (goals in plain sight, rewards
+ * hidden until earned, X-27), legacies and burden;
  * the levers they pull and what they cost; the heritage conditions; budgets;
  * archetype generation; and what happens when countries change hands. The
  * rules, levers and archetypes live in rules/data/domain/national-strengths.json
@@ -74,11 +75,16 @@ export interface Ambition {
   id: string;
   name: string;
   theme: Theme;
-  hint: string;
+  /** The build's riddle, no longer shown (X-27). */
+  hint?: string;
+  /** The plain goal, shown while the ambition is open (X-27). */
   text: string;
   historical?: boolean;
   window?: [number, number];
-  stir: Condition;
+  /** The build's hint condition, retired with hidden goals (X-27). */
+  stir?: Condition;
+  /** Drawn only while this holds: an earlier ambition done, an event, a coast (HER-090). */
+  requires?: Condition;
   goal: Condition;
   fail?: Condition;
   age?: string;
@@ -399,7 +405,7 @@ export function holds(c: Condition, w: WorldFacts, self: string): boolean {
   }
 }
 
-// ---------------------------------------------------------------- warmth (HER-021, HER-022)
+// ---------------------------------------------------------------- progress (HER-018, HER-021, HER-022)
 
 /** The leaves of a condition tree (all, any and not are branches; a `not` counts as one leaf). */
 export function leaves(c: Condition): Condition[] {
@@ -408,37 +414,69 @@ export function leaves(c: Condition): Condition[] {
   return [c];
 }
 
+/** A count-like leaf's number now and its target, for `count` and `subject_count` reaching up to a value; null for any other leaf. */
+function counted(c: Condition, w: WorldFacts, self: string): { now: number; target: number } | null {
+  const [type, v] = Object.entries(c)[0]!;
+  if (!(v.op ?? ">=").startsWith(">")) return null;
+  const who = v.who === "this" || v.who === undefined ? self : String(v.who);
+  if (type === "count") {
+    const cf = country(w, who);
+    return { now: cf.counts?.[v.thing] ?? 0, target: countTarget(v.value, cf.start?.[v.thing] ?? 0) + (v.op === ">" ? 1 : 0) };
+  }
+  if (type === "subject_count") {
+    let now = 0;
+    while (holds({ subject_count: { who, op: ">=", value: now + 1 } }, w, self)) now++;
+    return { now, target: Number(v.value) + (v.op === ">" ? 1 : 0) };
+  }
+  return null;
+}
+
 /** How far a leaf is met: a count leaf partly, by how far it has come; any other leaf 0 or 1. */
 export function leafShare(c: Condition, w: WorldFacts, self: string): number {
-  const [type, v] = Object.entries(c)[0]!;
-  if (type === "count" && (v.op ?? ">=").startsWith(">")) {
-    const cf = country(w, v.who === "this" || v.who === undefined ? self : v.who);
-    const target = countTarget(v.value, cf.start?.[v.thing] ?? 0);
-    if (target <= 0) return 1;
-    return Math.min(1, (cf.counts?.[v.thing] ?? 0) / target);
-  }
+  const n = counted(c, w, self);
+  if (n) return n.target <= 0 ? 1 : Math.min(1, n.now / n.target);
   return holds(c, w, self) ? 1 : 0;
 }
 
-/** Warmth: the share of the goal's leaves that hold. */
-export function warmth(goal: Condition, w: WorldFacts, self: string): number {
+/** The share of a goal that is met: the mean of its leaves (HER-021). */
+export function goalShare(goal: Condition, w: WorldFacts, self: string): number {
   const ls = leaves(goal);
   return ls.reduce((n, l) => n + leafShare(l, w, self), 0) / ls.length;
 }
 
-export type Band = "cold" | "warm" | "hot";
+/** Progress as the player reads it, "have of need" (HER-018). */
+export interface Progress {
+  have: number;
+  need: number;
+}
 
-export function band(share: number): Band {
-  const b = RULES.ambitions.warmth_bands;
-  if (share >= b.hot) return "hot";
-  if (share >= b.warm) return "warm";
-  return "cold";
+/**
+ * Progress on a goal (HER-018): a count against its target; a goal of
+ * several parts, the parts met; one of several ways, the way nearest done;
+ * a yes-or-no goal, 0 or 1 of 1 (HER-022).
+ */
+export function progress(goal: Condition, w: WorldFacts, self: string): Progress {
+  const [type, v] = Object.entries(goal)[0]!;
+  if (type === "all" || type === "any") {
+    const parts = v as Condition[];
+    if (parts.length === 1) return progress(parts[0]!, w, self);
+    if (type === "all") return { have: parts.filter((p) => holds(p, w, self)).length, need: parts.length };
+    const best = parts.reduce((a, b) => (goalShare(b, w, self) > goalShare(a, w, self) + 1e-9 ? b : a));
+    return progress(best, w, self);
+  }
+  const n = counted(goal, w, self);
+  if (n && n.target > 1) {
+    const need = Math.ceil(n.target - 1e-9);
+    return { have: Math.min(need, Math.floor(n.now + 1e-9)), need };
+  }
+  return { have: holds(goal, w, self) ? 1 : 0, need: 1 };
 }
 
 // ---------------------------------------------------------------- the heritage aggregate
 
 export type HeydayState = "waiting" | "awake" | "asleep" | "ended";
-export type AmbitionState = "sealed" | "stirred" | "done" | "lost";
+/** An ambition drawn: open (its goal and progress shown, X-27), or settled as done or lost. */
+export type AmbitionState = "open" | "done" | "lost";
 
 export interface HeritageEvent {
   type: string;
@@ -454,8 +492,8 @@ export interface Heritage {
   pool: Ambition[];
   /** Age entries waiting for their age (HER-026). */
   waitingForAge: Ambition[];
-  /** Ambitions drawn: the open ones and those done or lost. */
-  ambitions: { item: Ambition; state: AmbitionState; warmth: number; band: Band }[];
+  /** Ambitions drawn: the open ones and those done or lost; `share` of the goal met, `near` once it is within reach (HER-021). */
+  ambitions: { item: Ambition; state: AmbitionState; share: number; near: boolean }[];
   legacies: Legacy[];
   /** `armed` false: its shed condition held on the first day, so it sheds only once that has failed (HER-084). */
   burden: { item: Burden; state: "held" | "shed"; armed?: boolean } | null;
@@ -491,7 +529,7 @@ export function newHeritage(country: string, data: HeritageData): Heritage {
   };
 }
 
-export const isOpen = (s: AmbitionState): boolean => s === "sealed" || s === "stirred";
+export const isOpen = (s: AmbitionState): boolean => s === "open";
 
 export function openAmbitions(h: Heritage): Heritage["ambitions"] {
   return h.ambitions.filter((a) => isOpen(a.state));
@@ -518,11 +556,15 @@ export type HistoryMode = "drawn" | "historical_only";
 /**
  * Draws ambitions until 3 are open: at the start at least one is tagged
  * historical (HER-015); "Historical only" draws only those (HER-027). With a
- * world, a goal that already holds is put back and another drawn (HER-023).
+ * world, a goal that already holds is put back and another drawn (HER-023),
+ * and one whose requirement fails stays in the pool (HER-090); without a
+ * world, no ambition with a requirement is drawn. `except` stays in the pool.
  */
-export function drawAmbitions(h: Heritage, rng: Rng, opts: { mode?: HistoryMode; world?: WorldFacts; start?: boolean } = {}): Ambition[] {
+export function drawAmbitions(h: Heritage, rng: Rng, opts: { mode?: HistoryMode; world?: WorldFacts; start?: boolean; except?: string } = {}): Ambition[] {
   const drawn: Ambition[] = [];
-  const putBack = new Set<string>();
+  const putBack = new Set<string>(opts.except ? [opts.except] : []);
+  const w = opts.world;
+  for (const a of h.pool) if (a.requires && (!w || !holds(a.requires, w, h.country))) putBack.add(a.id);
   const mode = opts.mode ?? (RULES.ambitions.history_mode_setting.default as HistoryMode);
   for (;;) {
     if (openAmbitions(h).length >= RULES.ambitions.active) break;
@@ -532,13 +574,13 @@ export function drawAmbitions(h: Heritage, rng: Rng, opts: { mode?: HistoryMode;
     const historical = eligible.filter((a) => a.historical);
     const from = needHistorical && historical.length ? historical : eligible;
     const pick = from[rng.int(from.length)]!;
-    if (opts.world && (holds(pick.goal, opts.world, h.country) || lostAlready(pick, opts.world, h.country))) {
+    if (w && (holds(pick.goal, w, h.country) || lostAlready(pick, w, h.country))) {
       putBack.add(pick.id);
       h.log.push({ type: "AmbitionPutBack", id: pick.id });
       continue;
     }
     h.pool = h.pool.filter((a) => a.id !== pick.id);
-    h.ambitions.push({ item: pick, state: "sealed", warmth: 0, band: "cold" });
+    h.ambitions.push({ item: pick, state: "open", share: w ? goalShare(pick.goal, w, h.country) : 0, near: false });
     h.log.push({ type: "AmbitionDrawn", id: pick.id });
     drawn.push(pick);
   }
@@ -609,22 +651,15 @@ function endHeyday(h: Heritage, hd: Heritage["heydays"][number]): void {
   }
 }
 
-function setBand(h: Heritage, a: Heritage["ambitions"][number], share: number): void {
-  const next = band(share);
-  if (a.state === "stirred" && a.band === "warm" && next === "hot") {
-    h.digest.push(`${a.item.hint} — hot`);
-    h.log.push({ type: "WarmthChanged", id: a.item.id, detail: "hot" });
+/** The share of an open ambition's goal met; the first time it comes within reach, one digest line (HER-021, HER-071). */
+function measure(h: Heritage, a: Heritage["ambitions"][number], w: WorldFacts): void {
+  a.share = goalShare(a.item.goal, w, h.country);
+  if (!a.near && a.share >= RULES.ambitions.within_reach - 1e-9 && a.share < 1) {
+    a.near = true;
+    const p = progress(a.item.goal, w, h.country);
+    h.digest.push(`${a.item.name} is within reach: ${p.have} of ${p.need}.`);
+    h.log.push({ type: "AmbitionNear", id: a.item.id });
   }
-  a.warmth = share;
-  a.band = next;
-}
-
-function stir(h: Heritage, a: Heritage["ambitions"][number], w: WorldFacts | null): void {
-  if (a.state !== "sealed") return;
-  a.state = "stirred";
-  if (w) setBand(h, a, warmth(a.item.goal, w, h.country));
-  h.digest.push(`An ambition is revealed: ${a.item.hint}`);
-  h.log.push({ type: "AmbitionStirred", id: a.item.id });
 }
 
 function finish(h: Heritage, a: Heritage["ambitions"][number], state: "done" | "lost"): void {
@@ -681,7 +716,7 @@ export function evaluate(h: Heritage, w: WorldFacts, rng?: Rng): HeritageEvent[]
       if (!h.slept.includes(hd.item.id)) h.ask = { kind: "sleep_heyday", waking: hd.item.id, awake: awake.map((x) => x.item.id) };
     }
   }
-  // 3. Ambitions (HER-016..022).
+  // 3. Ambitions (HER-018..022).
   let finished = 0;
   for (const a of openAmbitions(h)) {
     const am = a.item;
@@ -695,8 +730,7 @@ export function evaluate(h: Heritage, w: WorldFacts, rng?: Rng): HeritageEvent[]
       finished++;
       continue;
     }
-    if (a.state === "sealed" && holds(am.stir, w, self)) stir(h, a, w);
-    else setBand(h, a, warmth(am.goal, w, self));
+    measure(h, a, w);
   }
   if (finished && rng && RULES.ambitions.redraw_on_complete_or_fail) drawAmbitions(h, rng, { world: w });
   // 4. The burden (HER-032, HER-033).
@@ -785,17 +819,17 @@ export function shedBurden(h: Heritage): Legacy | null {
 }
 
 /**
- * What a resident envoy learns (HER-025, D-HER-11): after envoy_reveal_years
- * at the court, the hint and warmth of one of the host's open ambitions,
- * never its plain goal.
+ * What a resident envoy learns (HER-025, D-HER-11, X-27): after
+ * envoy_reveal_years at the court, the name, goal and progress of one of the
+ * host's open ambitions, never its reward.
  */
-export function envoyReading(host: Heritage, yearsResident: number, rng: Rng): { hint: string; theme: Theme; band: Band } | null {
+export function envoyReading(host: Heritage, yearsResident: number, rng: Rng, w: WorldFacts): { name: string; goal: string; theme: Theme; progress: Progress } | null {
   if (yearsResident < RULES.ambitions.envoy_reveal_years) return null;
   const open = openAmbitions(host);
   if (!open.length) return null;
   const a = open[rng.int(open.length)]!;
   host.log.push({ type: "AmbitionRead", id: a.item.id });
-  return { hint: a.item.hint, theme: a.item.theme, band: a.band };
+  return { name: a.item.name, goal: a.item.text, theme: a.item.theme, progress: progress(a.item.goal, w, host.country) };
 }
 
 /**
@@ -822,18 +856,35 @@ export function counselGold(era: Era): number {
   return g;
 }
 
-/** Counsel: gold by era, once every 10 years; stirs one ambition at once and shows its warmth (HER-024). */
-export function payCounsel(h: Heritage, ambition: string, w: WorldFacts, era: Era, treasury: { gold: number }): { ok: true; gold: number } | { ok: false; reason: "too_soon" | "gold" | "not_open" } {
+/**
+ * Counsel, a new aim (HER-024, X-27): gold by era, once every 10 years; one
+ * open ambition goes back to the pool and another is drawn in its place at
+ * once. Refused when the pool has nothing else to draw.
+ */
+export function payCounsel(h: Heritage, ambition: string, w: WorldFacts, era: Era, treasury: { gold: number }, rng: Rng): { ok: true; gold: number; drawn: Ambition } | { ok: false; reason: "too_soon" | "gold" | "not_open" | "none_left" } {
   if (h.counselYear !== null && w.year - h.counselYear < RULES.ambitions.counsel.cooldown_years) return { ok: false, reason: "too_soon" };
   const a = openAmbitions(h).find((x) => x.item.id === ambition);
   if (!a) return { ok: false, reason: "not_open" };
   const gold = counselGold(era);
   if (treasury.gold < gold) return { ok: false, reason: "gold" };
+  const at = h.ambitions.indexOf(a);
+  const before = { pool: h.pool, ambitions: h.ambitions, log: h.log.length };
+  h.ambitions = h.ambitions.filter((x) => x !== a);
+  const [drawn] = drawAmbitions(h, rng, { world: w, except: a.item.id });
+  if (!drawn) {
+    h.pool = before.pool;
+    h.ambitions = before.ambitions;
+    h.log.length = before.log;
+    return { ok: false, reason: "none_left" };
+  }
+  // The new aim takes the old one's place in the list; the old one can be drawn again later.
+  const fresh = h.ambitions.pop()!;
+  h.ambitions.splice(at, 0, fresh);
+  h.pool.push(a.item);
   treasury.gold -= gold;
   h.counselYear = w.year;
-  stir(h, a, w);
-  setBand(h, a, warmth(a.item.goal, w, h.country));
-  return { ok: true, gold };
+  h.log.push({ type: "AmbitionSetAside", id: a.item.id });
+  return { ok: true, gold, drawn };
 }
 
 export const ERA_LIST: readonly Era[] = ERAS;
@@ -846,12 +897,6 @@ export function wakeHeydayByEvent(h: Heritage, id: string, years: number, w: Wor
   evaluate(h, w);
 }
 
-/** `stir_ambition {on, id}` (HER-066). */
-export function stirAmbitionByEvent(h: Heritage, id: string, w: WorldFacts): void {
-  const a = openAmbitions(h).find((x) => x.item.id === id);
-  if (!a) throw new Error(`No open ambition ${id}`);
-  stir(h, a, w);
-}
 
 // ---------------------------------------------------------------- effects in play (HER-035..037, HER-061)
 
@@ -907,28 +952,34 @@ export function optionOpen(h: Heritage, event: string, option: string): boolean 
 
 // ---------------------------------------------------------------- what the player sees (HER-001, HER-002, HER-016..020, HER-070, HER-073)
 
+/** An ambition as its own realm sees it (HER-016..020, X-27). */
 export interface AmbitionView {
   theme: Theme;
-  hint: string;
-  warmth?: Band | "done";
-  legacy?: string;
+  name: string;
+  /** The plain goal, always shown. */
+  goal: string;
+  /** Have of need while open (HER-018). */
+  progress?: Progress;
+  /** Within reach (HER-021). */
+  near?: boolean;
+  /** The promised legacy's name: all of the reward shown while open (HER-017). */
+  legacy: string;
+  great?: boolean;
+  /** What the legacy gives, only once the ambition is done (HER-019). */
+  reward?: string;
   deadline?: number;
-  /** Only once done or lost (HER-016, HER-019, HER-020). */
-  plainGoal?: string;
   state: AmbitionState;
 }
 
-export function ambitionView(a: Heritage["ambitions"][number]): AmbitionView {
-  const v: AmbitionView = { theme: a.item.theme, hint: a.item.hint, state: a.state };
-  if (a.state === "stirred") {
-    v.warmth = a.band;
-    v.legacy = a.item.legacy.name;
+export function ambitionView(a: Heritage["ambitions"][number], w?: WorldFacts, self = ""): AmbitionView {
+  const v: AmbitionView = { theme: a.item.theme, name: a.item.name, goal: a.item.text, legacy: a.item.legacy.name, state: a.state };
+  if (a.item.legacy.great) v.great = true;
+  if (a.state === "open") {
+    if (w) v.progress = progress(a.item.goal, w, self);
+    if (a.near) v.near = true;
     if (a.item.window) v.deadline = a.item.window[1];
   }
-  if (a.state === "done" || a.state === "lost") {
-    v.plainGoal = a.item.text;
-    if (a.state === "done") v.warmth = "done";
-  }
+  if (a.state === "done") v.reward = a.item.legacy.text;
   return v;
 }
 
@@ -947,28 +998,28 @@ export function card(h: Heritage, ageName: (id: string) => string = (id) => id):
   return [
     { row: "Birthright", lines: h.birthrights.map((b) => b.item.name), greyed: h.birthrights.every((b) => b.dormant), details: h.birthrights.map((b) => detail(b.item)) },
     { row: "Golden age", lines: awake.map((x) => `${x.item.name} (${ageName(x.item.age)} · active)`), details: awake.map((x) => detail(x.item)) },
-    { row: "Ambitions", lines: openAmbitions(h).map((a) => a.item.hint), details: [] },
+    { row: "Ambitions", lines: openAmbitions(h).map((a) => a.item.name), details: [] },
     { row: "Weakness", lines: h.burden?.state === "held" ? [h.burden.item.name] : [], details: h.burden?.state === "held" ? [detail(h.burden.item)] : [] },
     { row: "Legacies", lines: h.legacies.length ? h.legacies.map((l) => l.name) : ["none yet"], details: h.legacies.map(detail) },
   ];
 }
 
-/** The nation picker: birthright, burden, sealed ambitions counted, heydays as their ages (HER-073). */
-export function pickerSummary(d: HeritageData): { birthright: string; burden: string | null; sealedAmbitions: number; heydayAges: string[] } {
+/** The nation picker: birthright, burden, ambitions counted, heydays as their ages (HER-073). */
+export function pickerSummary(d: HeritageData): { birthright: string; burden: string | null; ambitions: number; heydayAges: string[] } {
   return {
     birthright: d.birthright.name,
     burden: d.burden?.name ?? null,
-    sealedAmbitions: Math.min(RULES.ambitions.active, d.ambitions.filter((a) => !a.age).length),
+    ambitions: Math.min(RULES.ambitions.active, d.ambitions.filter((a) => !a.age).length),
     heydayAges: d.heydays.map((h) => h.age),
   };
 }
 
-/** The Heritage row of the country card: birthright, awake heyday, three seals, burden; opens the sheet (HER-070). */
-export function heritageRow(h: Heritage): { birthright: string; heyday: string | null; seals: AmbitionState[]; burden: string | null; opens: "Heritage sheet" } {
+/** The Heritage row of the country card: birthright, awake heyday, the open ambitions' shares, burden; opens the sheet (HER-070). */
+export function heritageRow(h: Heritage): { birthright: string; heyday: string | null; ambitions: number[]; burden: string | null; opens: "Heritage sheet" } {
   return {
     birthright: h.birthrights[0]!.item.id,
     heyday: h.heydays.find((x) => x.state === "awake")?.item.id ?? null,
-    seals: openAmbitions(h).map((a) => a.state),
+    ambitions: openAmbitions(h).map((a) => a.share),
     burden: h.burden?.state === "held" ? h.burden.item.id : null,
     opens: "Heritage sheet",
   };
@@ -976,12 +1027,12 @@ export function heritageRow(h: Heritage): { birthright: string; heyday: string |
 
 /**
  * What the map shimmers over (HER-072): the places and areas named by each
- * hot open ambition. The map draws a faint shimmer only: no outline, no name.
+ * open ambition within reach. The map draws a faint shimmer only: no outline, no name.
  */
 export function shimmer(h: Heritage): { places: string[]; outline: false; named: false }[] {
   const out: { places: string[]; outline: false; named: false }[] = [];
   for (const a of openAmbitions(h)) {
-    if (a.band !== "hot") continue;
+    if (!a.near) continue;
     const places = leaves(a.item.goal).flatMap((l) => {
       const [type, v] = Object.entries(l)[0]!;
       if (type === "holds_place") return [String(v.place)];
