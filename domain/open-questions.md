@@ -173,6 +173,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-EVT-18**: Founding events (Leroy, 18 Oct; X-24): a `create_country` founds the realm on the map through
 - **D-EVT-19**: Ages and periods from 1378 (Leroy, 18 Oct; plan-1378 §3.1; milestone 10, step 4): a new age, the
 - **D-EVT-21**: The East's bridge events (milestone 10, step 6; integrator's picks, 19 Oct): 46 new events and 7
+- **D-EVT-20**: Bridge events of the West (plan-1378 §5; milestone 10, step 6; quick calls by the integrator under
 - **D-EVT-22**: Bridge events for Asia, Africa and the Americas (milestone 10, step 6; 19 Oct 2026): the region
 
 ### Exploration (exploration)

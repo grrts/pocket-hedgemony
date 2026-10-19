@@ -25,14 +25,13 @@ describe("historical events (milestone 6)", () => {
     expect(g.state.world.ages).toContain("age_of_gunpowder_empires");
     expect(g.state.world.periods).toContain("p_ottoman_expansion");
     expect(Object.keys(g.state.events).length).toBeGreaterThan(200);
-    // the bridge events of 1378 to 1444 stand in the history as already fought (EVT-095)
-    const settled = g.state.world.history.length;
     const news: News[] = [];
     for (let m = 0; m < 24; m++) {
       w.date = { ...w.date, month: (m % 12) + 1, year: 1445 + Math.floor(m / 12) };
       monthlyEvents(w, news);
     }
-    expect(w.events!.state.world.history.slice(settled).every((h) => h.year >= 1445)).toBe(true);
+    // The bridge events of 1378 to 1444 are history already (EVT-087); nothing fires before the months played.
+    expect(w.events!.state.world.history.filter((h) => h.year >= 1444).every((h) => h.year >= 1445)).toBe(true);
   });
 
   it("at the 1444 start the ages and periods of 1378 that still hold are under way, the rest are over (EVT-013, EVT-015, EVT-081)", () => {
