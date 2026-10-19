@@ -1,34 +1,41 @@
 import { describe, expect, it } from "vitest";
-import { alongLoop, clockDays, placeMovers } from "./traders.ts";
+import type { TraderWalk } from "@ph/engine";
+import { onLeg, placeTrader } from "./traders.ts";
 
-describe("traders on the living map (VIEW-123)", () => {
-  const square: [number, number][] = [[0, 0], [10, 0], [10, 10], [0, 10]];
+const walk = (o: Partial<TraderWalk>): TraderWalk => ({ id: 1, owner: 0, medium: "land", from: 0, to: 1, progress: 0, tiles: new Int32Array(0), mine: true, ...o });
+// Tiles 0..9 in a row; provinces' centres at x = 0, 10 and 20.
+const tileAt = (t: number) => [t, 0] as const;
+const centre = (p: number) => [p * 10, 0] as const;
 
-  it("walks a loop by length, wrapping round", () => {
-    expect(alongLoop(square, 0)).toMatchObject({ x: 0, y: 0, leg: 0 });
-    expect(alongLoop(square, 0.125)).toMatchObject({ x: 5, y: 0, leg: 0 });
-    expect(alongLoop(square, 0.5)).toMatchObject({ x: 10, y: 10 });
-    expect(alongLoop(square, 1.625)).toMatchObject({ x: 5, y: 10, leg: 2 });
+describe("traders on the living map walk as armies do (VIEW-123)", () => {
+  it("steps along the leg's tiles by the share walked, heading the way it goes", () => {
+    expect(onLeg([[0, 0], [1, 0], [2, 0]], 0.75)).toMatchObject({ x: 1.5, y: 0, ux: 1, uy: 0 });
+    expect(onLeg([[0, 0], [0, 4]], 0.5)).toMatchObject({ x: 0, y: 2, uy: 1 });
   });
 
-  it("goes there and back along a two-stop path, facing the way it goes", () => {
-    const line: [number, number][] = [[0, 0], [10, 0]];
-    expect(alongLoop(line, 0.25)).toMatchObject({ x: 5, dx: 10 });
-    expect(alongLoop(line, 0.75)).toMatchObject({ x: 5, dx: -10 });
+  it("walks on along the same leg over the step from the previous day", () => {
+    const tiles = Int32Array.of(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+    const before = walk({ progress: 0.2, tiles });
+    const now = walk({ progress: 0.4, tiles });
+    expect(placeTrader(now, before, 0, tileAt, centre).x).toBeCloseTo(2, 9);
+    expect(placeTrader(now, before, 0.5, tileAt, centre).x).toBeCloseTo(3, 9);
+    expect(placeTrader(now, before, 1, tileAt, centre).x).toBeCloseTo(4, 9);
   });
 
-  it("draws a caravan, barge or ship by the path's medium, and keeps them steady", () => {
-    const centre = (p: number) => square[p]!;
-    const land = placeMovers({ id: 3, medium: "land", path: [0, 1, 2, 3], traders: 5 }, 100, centre);
-    expect(land).toHaveLength(3);
-    expect(land.every((m) => m.sprite === "caravanTrain")).toBe(true);
-    expect(placeMovers({ id: 3, medium: "river", path: [0, 1], traders: 1 }, 100, centre)[0]!.sprite).toBe("barge");
-    expect(placeMovers({ id: 3, medium: "sea", path: [0, 1], traders: 2 }, 100, centre).map((m) => m.sprite)).toEqual(["cog", "cog"]);
-    const later = placeMovers({ id: 3, medium: "land", path: [0, 1, 2, 3], traders: 5 }, 100.01, centre);
-    later.forEach((m, i) => expect(Math.hypot(m.x - land[i]!.x, m.y - land[i]!.y)).toBeLessThan(0.1));
+  it("finishes the last leg, then starts the next, when it enters a province", () => {
+    const before = walk({ from: 0, to: 1, progress: 0.8 });
+    const now = walk({ from: 1, to: 2, progress: 0.2 });
+    // 0.2 of the way to go, then 0.2 on: halfway through the step it is just entering province 1.
+    expect(placeTrader(now, before, 0, tileAt, centre).x).toBeCloseTo(8, 9);
+    expect(placeTrader(now, before, 0.5, tileAt, centre).x).toBeCloseTo(10, 9);
+    expect(placeTrader(now, before, 1, tileAt, centre).x).toBeCloseTo(12, 9);
   });
 
-  it("runs the clock on over a new year", () => {
-    expect(clockDays({ year: 1445, month: 1, day: 1 }, 0) - clockDays({ year: 1444, month: 12, day: 31 }, 12)).toBeCloseTo(0.5, 9);
+  it("stands where the game has it after a new route, and sails between zone centres at sea", () => {
+    expect(placeTrader(walk({ from: 1, to: 2, progress: 0.5 }), walk({ from: 5, to: 6 }), 0, tileAt, centre).x).toBeCloseTo(15, 9);
+    const ship = placeTrader(walk({ medium: "sea", from: 0, to: 2, progress: 0.25 }), undefined, 1, tileAt, centre);
+    expect(ship).toMatchObject({ x: 5, sprite: "cog" });
+    expect(placeTrader(walk({ medium: "river" }), undefined, 1, tileAt, centre).sprite).toBe("barge");
+    expect(placeTrader(walk({}), undefined, 1, tileAt, centre).sprite).toBe("caravanTrain");
   });
 });

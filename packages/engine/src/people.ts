@@ -42,6 +42,8 @@ export interface PersonDeath {
   cause: DeathCause;
   /** An official's post as he left it: its type (an OFFICIALS index) and the day he took it, for whoever fills it next. */
   post?: { type: number; since: number };
+  /** A commander's army slot and fleet id the moment before he died, -1 for none: what is left without a leader (leaderless.ts). */
+  led?: { army: number; fleet: number };
 }
 
 export type DeathListener = (world: World, death: PersonDeath, news: News[]) => void;
@@ -269,7 +271,7 @@ export function personDies(world: World, who: PersonRef, cause: DeathCause, news
   if (lord >= 0) return personDies(world, { kind: "lord", lord }, cause, news);
   const d = describe(world, who);
   if (!d) return;
-  const death: PersonDeath = { who, cause, ...d };
+  const death: PersonDeath = { who, cause, ...d, ...(who.kind === "commander" ? { led: ledBy(world, who.c) } : {}) };
   switch (who.kind) {
     case "ruler":
       rulerDies(world, who.n, news);
@@ -291,6 +293,14 @@ export function personDies(world: World, who: PersonRef, cause: DeathCause, news
       break;
   }
   for (const fn of [...listeners()]) fn(world, death, news);
+}
+
+/** The army and fleet a commander leads, -1 for none. */
+function ledBy(world: World, c: number): { army: number; fleet: number } {
+  const a = world.armies;
+  let army = -1;
+  for (let i = 0; i < a.count && army < 0; i++) if (a.alive[i] && a.commander[i] === c) army = i;
+  return { army, fleet: world.navy.fleets.find((f) => f.admiral === c)?.id ?? -1 };
 }
 
 /** The losing commander of a battle may fall (WAR-062, REALM-276): 1 in 20, twice that when Reckless. */

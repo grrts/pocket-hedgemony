@@ -16,6 +16,7 @@ import {
   type PeaceTerms,
   type PlaceClimate,
   type Snapshot,
+  type TraderWalk,
   realmStrengths,
   WORKS,
   peoplesView,
@@ -53,7 +54,7 @@ import { cap, DEFAULT_TITLES } from "./ui/titles.ts";
 import { endCard, scoreLine, scoreTab } from "./ui/score.ts";
 import { lockRevolutionButtons, revolutionCardHtml, revolutionSection } from "./ui/revolution.ts";
 import { governmentTab, governmentUi } from "./ui/government.ts";
-import { isShipKind, provinceTradeLine, routeBar, stopBit, tradeTab, tradeUi, type Routing } from "./ui/trade.ts";
+import { isShipKind, provinceTradeLine, routeBar, stopBit, tradeTab, traderCardHtml, tradeUi, type Routing } from "./ui/trade.ts";
 import { beliefData, beliefFacts, beliefLines, beliefUi, peoplesTab } from "./ui/belief.ts";
 import { censureWarningHtml, faithBadgeHtml, headCardHtml, seatKeyHtml } from "./ui/faithHeads.ts";
 import { declareSheetHtml, nameAbroadHtml, warCardHtml, warPlaqueBars } from "./ui/priceOfWar.ts";
@@ -72,7 +73,7 @@ import { drawPlagueMark, plagueCard } from "./ui/plague.ts";
 import { stepTroop, type Pt, type Troop } from "./map/troops.ts";
 import { armyFigureUnit, armyNameShown, brackets, drawBattle, drawClash, drawFormation, drawPlate, drawRoute, drawSiegeMark, drawTents, drawToken, menShort, pruneBattles, weekEnds } from "./map/marchArt.ts";
 import { MapView, type OverlayContext } from "./map/mapView.ts";
-import { clockDays, placeMovers } from "./map/traders.ts";
+import { placeTrader } from "./map/traders.ts";
 import { seasonBytes } from "./map/renderer.ts";
 import { detectRuntime, type Diagnostics } from "./platform.ts";
 import { sound } from "./audio/sound.ts";
@@ -109,8 +110,8 @@ import {
   type FormationState,
 } from "@ph/engine/domain/map-presentation";
 import { provinceLevy } from "@ph/engine/domain/recruiting";
-import { detailBands, EFFECTS, holderOf, momentParticles, moments, momentSeconds, momentsShown, type MomentKind } from "@ph/engine/domain/map-presentation";
-import { ParticleField } from "./map/particles.ts";
+import { chimneysShown, detailBands, EFFECTS, holderOf, loopingEffects, momentParticles, moments, momentSeconds, momentsShown, snowing, type MomentKind } from "@ph/engine/domain/map-presentation";
+import { ParticleField, Shape } from "./map/particles.ts";
 import { TownLayer, townInfo } from "./map/towns.ts";
 import { bedUnderCamera, musicFacts, newFactMemory, playerPalette, playerWars, remember, type FactMemory } from "./audio/facts.ts";
 import { COMMISSION_GOLD, commissionSkills, hireGold, OFFICIALS, Rng, startFormOf } from "@ph/engine";
@@ -282,8 +283,8 @@ const selected = new Set<number>();
 let stepStart = 0;
 /** How long the latest step is shown for, in ms: armies walk their trail over it. */
 let stepMs = 0;
-/** The game clock (days) the previous snapshot stood at: traders walk on from it over the step (VIEW-123). */
-let clockFrom = 0;
+/** Each trader's walk in the previous snapshot, by id: it walks on from there over the step (VIEW-123). */
+let walkedBefore = new Map<number, TraderWalk>();
 /** Where each army was drawn when the latest snapshot arrived, by army id, for walking on from there. */
 let drawnAt = new Map<number, [number, number]>();
 /** Where each fleet was drawn when the latest snapshot arrived, by fleet id, and the tiles it had ahead, for gliding on over them. */
@@ -343,6 +344,8 @@ let provinceTab: ProvinceTab = "overview";
 /** The player's fleet whose card is open (its id), and the fleet waiting for a tap on where to sail (-1 = none). */
 let fleetView = -1;
 let sailing = -1;
+/** The player's trader whose card is open (its id), or -1 (TRADE-153). */
+let traderView = -1;
 /** A course being drawn for a fleet of explorers (EXPL-069): its zones, where each leg ends (for Undo), and the low-supply choice. */
 let exploring: { fleet: number; path: number[]; legs: number[]; carryOn: boolean } | null = null;
 /** The tile tapped on the Land tab, or -1. */
@@ -352,6 +355,8 @@ type Lens = "realms" | "terrain" | "people" | "wealth" | "walls" | "food" | "lor
 let lens: Lens = "realms";
 /** The trader route being drawn on the map, or null when the map is not in route mode (TRADE-142). */
 let routing: Routing | null = null;
+/** Whether the route being drawn was started from the trader's own card, which it returns to. */
+let routeFromCard = false;
 /** Parchment over lands the player's realm doesn't know yet (a toggle while it's judged). */
 let fogOn = true;
 /** Provinces the player has charted (bit p of byte p >> 3, EXPL-010), or null before a realm is chosen. */
@@ -560,6 +565,7 @@ document.addEventListener("click", (e) => {
   lordView = -1;
   armyView = -1;
   fleetView = -1;
+  traderView = -1;
   panelCollapsed = false;
   renderPanel();
 });
@@ -599,6 +605,7 @@ function openAchievements(at: string | null = null): void {
   lordView = -1;
   armyView = -1;
   fleetView = -1;
+  traderView = -1;
   newsView = false;
   realmView = -1;
   panelCollapsed = false;
@@ -1196,6 +1203,7 @@ function restyleProvinces(): void {
     seasonKey = key;
     const s = nextSeason?.key === key ? nextSeason.data : seasonsFor(date);
     view.renderer.setProvinceSeasons(s);
+    seasonNow = s;
     if (!previewMonth) {
       const next = addDays(date, DAYS_PER_TURN);
       setTimeout(() => (nextSeason = { key: dateKey(next), data: seasonsFor(next) }), 50);
@@ -1476,8 +1484,11 @@ function drawOverlay(o: OverlayContext): void {
     }
   }
 
+  // The trader whose card is open: its way there and back under any map mode (TRADE-154).
+  const following = drawFollowedTrader(o, onScreen);
+  const banking = drawBankings(o, onScreen);
   // Close in, traders walk their paths; about ten frames a second is enough for them, as for the hammers (VIEW-130).
-  if (drawTraders(o, onScreen) && !traderTick) traderTick = setTimeout(() => ((traderTick = 0), view.invalidate()), 100);
+  if ((drawTraders(o, onScreen) || following || banking) && !traderTick) traderTick = setTimeout(() => ((traderTick = 0), view.invalidate()), 100);
 
   // The Faiths map mode marks each head of the faith's seat; a tap on it opens his card (RELG-138).
   if (lens === "faiths" && snapshot && zoom >= 1.1) {
@@ -1512,6 +1523,19 @@ function drawOverlay(o: OverlayContext): void {
     for (const t of tv.traders) loop(t.path, color);
     const draft = routing && tv.draft?.trader === routing.trader ? tv.draft : null;
     if (draft) loop(draft.path, PALETTE.gold);
+    // While where it starts is set, each city it could go to carries its gold a month, the best three starred (TRADE-155).
+    if (routing && draft && routing.stops.length >= 1) {
+      const upkeep = tv.traders.find((x) => x.id === routing!.trader)?.upkeep ?? 0;
+      const barTop = routeBarEl.hidden ? Infinity : routeBarEl.getBoundingClientRect().top - o.ctx.canvas.getBoundingClientRect().top;
+      draft.options.forEach((opt, k) => {
+        if (routing!.stops[1] === opt.city) return;
+        const [sx, sy] = at(opt.city);
+        if (!onScreen(sx, sy, 16) || sy > barTop - 12 * u) return;
+        const g = opt.expected - upkeep;
+        const text = `${g >= 0 ? "+" : "-"}${Math.abs(g).toFixed(1)}`;
+        drawPlate(ctx, k < 3 ? `★ ${text}` : text, sx, sy - 18 * u, u);
+      });
+    }
     // Close in, the walking traders take over from these icons (VIEW-101).
     const iconAlpha = bandFade(zoom, mapDetail()).icons;
     ctx.save();
@@ -1645,7 +1669,9 @@ function drawOverlay(o: OverlayContext): void {
     const besieged = new Map(s.sieges.map((st) => [st.province, st.by]));
     for (let k = 0; k < s.armies.id.length; k++) {
       const cmd = s.armies.commander[k]!;
-      if (cmd < 0 || !isKnown(s.armies.location[k]!) || aboard.has(s.armies.id[k]!)) continue;
+      // Troops without a commander are drawn only while they walk (home, after their general died: RECR-136), close in and with no banner.
+      const walking = cmd < 0 && (s.armies.route[k]!.length > 0 || s.armies.path[k]!.length > 0);
+      if ((cmd < 0 && !walking) || !isKnown(s.armies.location[k]!) || aboard.has(s.armies.id[k]!)) continue;
       const tile = s.armies.tile[k]!;
       // Fighting armies are drawn in their battle.
       if (s.armies.battle[k]! >= 0 && inBattle.has(tile)) continue;
@@ -1659,7 +1685,7 @@ function drawOverlay(o: OverlayContext): void {
       const id = s.armies.id[k]!;
       const moving = performance.now() - stepStart < stepMs && s.armies.trail[k]!.length > 0;
       const realm = nations[s.armies.owner[k]!]!;
-      const name = cmdOf(cmd).name;
+      const name = cmd >= 0 ? cmdOf(cmd).name : "";
       const dir = armyFacing(k);
       if (liv.living > 0) {
         // Besiegers ring the town; the others stand, or march in a column, on their tile.
@@ -1672,11 +1698,12 @@ function drawOverlay(o: OverlayContext): void {
         const men = s.armies.men[k]!;
         const heading = state === "standing" ? ([dir, 0] as const) : armyHeading(k, dir);
         pieces.push({
-          id, key: `a${id}`, point, x: at[0]!, y: at[1]!, color: realm.color, men, name, state, facing: heading, selected: selected.has(id), seed: location,
+          // Leaderless troops walking home take no orders, so they have nothing to tap.
+          ...(walking ? {} : { id }), key: `a${id}`, point, x: at[0]!, y: at[1]!, color: realm.color, men, name, state, facing: heading, selected: selected.has(id), seed: location,
           figures: formation({ men, foot: men - horse, horse, wagons: s.armies.food[k]! > 0, state, band: "living", facing: heading }),
         });
       }
-      if (liv.icons <= 0 || !onScreen(sx, sy)) continue;
+      if (walking || liv.icons <= 0 || !onScreen(sx, sy)) continue;
       // The commander in their realm's colours, kit of the era and age (feedback 56), at one size at every zoom (feedback 57).
       ctx.globalAlpha = liv.icons;
       const token = drawToken(ctx, {
@@ -2057,53 +2084,184 @@ let armyHitBoxes: { id: number; x: number; y: number; w: number; h: number }[] =
 /** Traders drawn close in, with their tap boxes: a tap on one of the player's opens its card in the Trade tab (VIEW-125). */
 let traderHitBoxes: { mine: number; x: number; y: number; w: number; h: number }[] = [];
 
-/** The traders' game clock: from the previous snapshot's to this one's over the step, so they walk on without jumps (VIEW-123). */
-function traderClock(): number {
-  const s = snapshot!;
-  const to = clockDays(s.date, s.hour);
-  const t = stepMs ? Math.min(1, (performance.now() - stepStart) / stepMs) : 1;
-  return to - clockFrom > 0 && to - clockFrom <= 2 ? clockFrom + (to - clockFrom) * t : to;
-}
-
 /**
- * Close in, the busy trade paths the player sees carry their caravans, barges
- * and ships in the ground's art pixels, fading in as the icons fade out
- * (VIEW-101, VIEW-123). Returns true while they are walking.
+ * Close in, every trader the player sees is drawn where the daily walk has it,
+ * stepping along its leg's tiles as an army does and walking on over the step,
+ * fading in as the icons fade out (VIEW-101, VIEW-123). Returns true while they walk.
  */
 function drawTraders(o: OverlayContext, onScreen: (x: number, y: number, pad?: number) => boolean): boolean {
   traderHitBoxes = [];
   const s = snapshot;
   const detail = mapDetail();
   const fade = bandFade(o.zoom, detail).living;
-  if (!s || fade <= 0 || !s.tradePaths?.length) return false;
+  if (!s || fade <= 0 || !s.traderWalks?.length) return false;
   const { ctx } = o;
   const u = Math.max(1, Math.round(pieceUnit(Math.max(o.zoom, LIVING_MAP.livingFrom), detail)));
   const moving = figuresAnimate(animationsPref(), "marching");
-  const days = moving ? traderClock() : clockDays(s.date, s.hour);
+  const t = moving && stepMs ? (performance.now() - stepStart) / stepMs : 1;
   const centre = (p: number) => [provinces[p]!.x!, provinces[p]!.y!] as const;
   ctx.save();
   ctx.globalAlpha = fade;
-  for (const path of s.tradePaths) {
-    const color = nations[path.owner]?.color ?? PALETTE.clay;
-    for (const m of placeMovers(path, days, centre)) {
-      if (!isKnown(m.from) || !isKnown(m.to)) continue;
-      // Each keeps to the right of its way, so two meeting pass side by side.
-      const [px, py] = o.toScreen(m.x, m.y);
-      const sx = px - m.uy * 5 * u, sy = py + m.ux * 5 * u;
-      if (!onScreen(sx, sy)) continue;
-      // Caravans and barges are drawn walking left, the ship sailing right.
-      const east = m.sprite === "cog" ? m.right : !m.right;
-      const { img, w, h } = figureSprite(m.sprite, color, u, east ? 1 : -1);
-      const x = Math.round(sx - w / 2);
-      const y = Math.round(sy - h + u);
-      ctx.drawImage(img, x, y, w, h);
-      const box = tapBox(w, h, 1);
-      traderHitBoxes.push({ mine: path.mine, x: x + w / 2 - box.w / 2, y: y + h / 2 - box.h / 2, w: box.w, h: box.h });
+  for (const w of s.traderWalks) {
+    if (!isKnown(w.from) || !isKnown(w.to)) continue;
+    const color = nations[w.owner]?.color ?? PALETTE.clay;
+    const m = placeTrader(w, walkedBefore.get(w.id), t, tileXY, centre);
+    // Each keeps to the right of its way, so two meeting pass side by side.
+    const [px, py] = o.toScreen(m.x, m.y);
+    const sx = px - m.uy * 5 * u, sy = py + m.ux * 5 * u;
+    if (!onScreen(sx, sy)) continue;
+    // Caravans and barges are drawn walking left, the ship sailing right.
+    const right = m.ux > 0;
+    const east = m.sprite === "cog" ? right : !right;
+    const { img, w: iw, h: ih } = figureSprite(m.sprite, color, u, east ? 1 : -1);
+    const x = Math.round(sx - iw / 2);
+    const y = Math.round(sy - ih + u);
+    // The trader whose card is open stands in brackets, as a chosen army does (TRADE-154).
+    if (w.id === traderView) brackets(ctx, x - u, y - u, iw + 2 * u, ih + 2 * u, u, Math.floor(performance.now() / 300) % 2, PALETTE.gold);
+    ctx.drawImage(img, x, y, iw, ih);
+    // A coin glints over a trader as it collects (TRADE-157).
+    const glint = glints.get(w.id);
+    if (glint !== undefined) {
+      const age = performance.now() - glint;
+      const coin = coinImages[0]!;
+      if (age > GLINT_MS) glints.delete(w.id);
+      else if (age >= 0 && coin.complete) ctx.drawImage(coin, Math.round(x + iw / 2 - coin.width / 2), Math.round(y - coin.height - (moving ? (age / GLINT_MS) * 4 * u : 0)));
     }
+    const box = tapBox(iw, ih, 1);
+    traderHitBoxes.push({ mine: w.mine ? w.id : -1, x: x + iw / 2 - box.w / 2, y: y + ih / 2 - box.h / 2, w: box.w, h: box.h });
   }
   ctx.restore();
-  return moving && performance.now() - stepStart < stepMs;
+  return (moving && performance.now() - stepStart < stepMs) || glints.size > 0;
 }
+
+/** Gold the player's traders banked, by city, as it shows on the map; and the traders glinting as they collect (TRADE-157). */
+const bankings: { province: number; gold: number; born: number }[] = [];
+const glints = new Map<number, number>();
+const GLINT_MS = 500;
+const BANK_MS = 1900;
+let lastClink = 0;
+
+/** Takes in what the player's traders collected and banked since the last snapshot, spread over the step it plays in. */
+function hearTradeFeed(next: Snapshot, ms: number): void {
+  const feed = next.tradeFeed ?? [];
+  if (!feed.length) return;
+  const now = performance.now();
+  const banked = new Map<number, number>();
+  feed.forEach((f, i) => {
+    if (f.deposit) banked.set(f.province, (banked.get(f.province) ?? 0) + f.gold);
+    else glints.set(f.trader, now + (i / feed.length) * ms);
+  });
+  let k = 0;
+  for (const [province, gold] of banked) bankings.push({ province, gold, born: now + (k++ / banked.size) * Math.min(ms, 800) });
+  if (bankings.length > 40) bankings.splice(0, bankings.length - 40);
+  if (banked.size) {
+    // A quiet clink, at most once a second, and the treasury figure lifts.
+    if (now - lastClink > 1000) {
+      sound.sfx("econ_income");
+      lastClink = now;
+    }
+    // After the HUD is drawn again for this snapshot.
+    if (animationsPref() !== "Off")
+      requestAnimationFrame(() => {
+        const plaque = document.querySelector<HTMLElement>(".plaque.gold");
+        plaque?.classList.add("banked");
+        setTimeout(() => plaque?.classList.remove("banked"), 700);
+      });
+  }
+  view.invalidate();
+}
+
+/**
+ * Banking on the map (TRADE-157): from regional zoom in, under any map mode, a coin drops into the city where a
+ * trader banked and its gold rises over it and fades; still where Animations is Off. Under the Trade map mode, the
+ * player's busy trade cities (ratio over half) twinkle now and then. Returns true while anything is shown.
+ */
+function drawBankings(o: OverlayContext, onScreen: (x: number, y: number, pad?: number) => boolean): boolean {
+  const now = performance.now();
+  for (let i = bankings.length - 1; i >= 0; i--) if (now - bankings[i]!.born > BANK_MS) bankings.splice(i, 1);
+  const s = snapshot;
+  if (!s || o.zoom < REGIONAL_ZOOM) return bankings.length > 0;
+  const { ctx } = o;
+  const u = tokenUnit(o.zoom);
+  const still = animationsPref() === "Off";
+  const coin = coinImages[u >= 3 ? 1 : 0]!;
+  let twinkling = false;
+  if (lens === "trade" && !still && coin.complete)
+    for (let p = 0; p < provinces.length; p++) {
+      if (owners[p] !== s.playerNation || !s.provinceTradeCity[p] || s.provinceTradeRatio[p]! <= 50) continue;
+      twinkling = true;
+      // Each city twinkles for a fifth of a second every three, at its own moment.
+      if ((now + p * 397) % 3000 > 200) continue;
+      const [sx, sy] = o.toScreen(provinces[p]!.x!, provinces[p]!.y!);
+      if (!onScreen(sx, sy)) continue;
+      ctx.fillStyle = PALETTE.paper;
+      ctx.fillRect(Math.round(sx + 9 * u), Math.round(sy - 9 * u), u, 3 * u);
+      ctx.fillRect(Math.round(sx + 8 * u), Math.round(sy - 8 * u), 3 * u, u);
+    }
+  for (const b of bankings) {
+    const age = now - b.born;
+    if (age < 0 || !isKnown(b.province)) continue;
+    const [sx, sy] = o.toScreen(provinces[b.province]!.x!, provinces[b.province]!.y!);
+    if (!onScreen(sx, sy, 40)) continue;
+    const drop = still ? 1 : Math.min(1, age / 300);
+    const fade = Math.max(0, (age - BANK_MS * 0.65) / (BANK_MS * 0.35));
+    ctx.save();
+    ctx.globalAlpha = 1 - fade;
+    if (coin.complete) ctx.drawImage(coin, Math.round(sx - coin.width / 2), Math.round(sy - coin.height - 2 * u - (1 - drop) * 20 * u));
+    const rise = still ? 0 : Math.min(1, age / 1200) * 12 * u;
+    if (age > 200 || still) drawPlate(ctx, `+${b.gold >= 10 ? Math.round(b.gold) : b.gold.toFixed(1)}`, sx, sy - coin.height - 14 * u - rise, u);
+    ctx.restore();
+  }
+  return bankings.length > 0 || twinkling;
+}
+/**
+ * The trader whose card is open (TRADE-154): its whole loop dotted in the realm's colour, the way ahead to the stop
+ * it heads for as a march trail with the stop's standard, the other stop marked, and a coin on each province its
+ * gold came from on its last trip. Returns true while it is drawn, so the trail flows.
+ */
+function drawFollowedTrader(o: OverlayContext, onScreen: (x: number, y: number, pad?: number) => boolean): boolean {
+  const t = traderView >= 0 && !routing ? snapshot?.trade?.traders.find((x) => x.id === traderView) : undefined;
+  if (!t || t.path.length < 2) return false;
+  const { ctx } = o;
+  const u = tokenUnit(o.zoom);
+  const color = nations[snapshot!.playerNation]!.color;
+  const at = (p: number) => o.toScreen(provinces[p]!.x!, provinces[p]!.y!);
+  const L = t.path.length;
+  for (let k = 0; k < L; k++) dottedLine(ctx, at(t.path[k]!), at(t.path[(k + 1) % L]!), u, color, o.width, o.height);
+  // Where its gold came from: a coin by each province.
+  const coin = coinImages[u >= 3 ? 1 : 0]!;
+  if (coin.complete)
+    for (const x of t.sources) {
+      const [sx, sy] = at(x.province);
+      if (onScreen(sx, sy, 16)) ctx.drawImage(coin, Math.round(sx - coin.width / 2), Math.round(sy - coin.height / 2));
+    }
+  // The way ahead, from where it walks to the stop it heads for.
+  const walk = snapshot!.traderWalks.find((w) => w.id === t.id);
+  const pts: [number, number][] = [];
+  if (walk) {
+    const m = placeTrader(walk, walkedBefore.get(walk.id), 1, tileXY, (p) => [provinces[p]!.x!, provinces[p]!.y!]);
+    pts.push(o.toScreen(m.x, m.y) as [number, number]);
+  } else pts.push(at(t.at) as [number, number]);
+  for (let i = t.pathAt; i !== t.path.indexOf(t.heading) || pts.length === 1; i = (i + 1) % L) {
+    pts.push(at(t.path[(i + 1) % L]!) as [number, number]);
+    if (pts.length > L + 1) break;
+  }
+  drawRoute(ctx, { pts, u, color, weeks: [], t: performance.now(), viewWidth: o.width });
+  // The other stop: a small gold square.
+  const other = t.stops.find((p) => p !== t.heading);
+  if (other !== undefined) {
+    const [sx, sy] = at(other);
+    if (onScreen(sx, sy)) {
+      const r = 5 * u;
+      ctx.fillStyle = PALETTE.ink;
+      ctx.fillRect(Math.round(sx - r / 2 - u), Math.round(sy - r / 2 - u), r + 2 * u, r + 2 * u);
+      ctx.fillStyle = PALETTE.gold;
+      ctx.fillRect(Math.round(sx - r / 2), Math.round(sy - r / 2), r, r);
+    }
+  }
+  return true;
+}
+
 let fleetHitBoxes: { id: number; mine: boolean; x: number; y: number; w: number; h: number }[] = [];
 
 /** Where a fleet is drawn: in its sea zone, or in a port just off the coast toward the sea. */
@@ -2188,7 +2346,8 @@ function drawFleets(o: OverlayContext, ctx: CanvasRenderingContext2D, u: number,
       const box = drawHulls(o, f, liv, now, onScreen, selected, berthsUsed);
       if (box && liv.living >= 0.5) fleetHitBoxes.push({ id: f.id, mine, ...box });
     }
-    if (liv.icons <= 0) continue;
+    // Ships whose admiral died sail home with no fleet token: only their hulls show, close in (RECR-137).
+    if (liv.icons <= 0 || (f.admiral < 0 && f.fleeing)) continue;
     // Fleets on one tile (or in one port) fan out behind the first.
     const key = tiled && f.tile >= 0 ? f.tile : -1 - f.at;
     const nth = stack.get(key) ?? 0;
@@ -2510,6 +2669,7 @@ function onLongPress(_sx: number, _sy: number, province: number): void {
 function onTap(sx: number, sy: number, province: number): void {
   // While a route is drawn, a tap picks its next stop (TRADE-142).
   if (routing) return routeTap(province);
+  traderView = -1;
   officialView = -1;
   achView = false;
   // Drawing a course: each tap on the sea adds a leg; the bar over the map says what it takes (EXPL-069).
@@ -2549,6 +2709,7 @@ function onTap(sx: number, sy: number, province: number): void {
   }
   sailing = -1;
   fleetView = -1;
+  traderView = -1;
   if (hit && snapshot && snapshot.armies.owner[armySlot(hit.id)] === snapshot.playerNation) {
     // With armies chosen, another one joins them (or leaves, tapped again); else it is the one chosen.
     if (selected.size && !selected.has(hit.id)) selected.add(hit.id);
@@ -2735,6 +2896,7 @@ function fleetLabel(id: number): string {
 /** Opens a fleet's card. */
 function openFleet(id: number): void {
   fleetView = id;
+  traderView = -1;
   sailing = -1;
   armyView = -1;
   realmView = -1;
@@ -2864,6 +3026,54 @@ function armySlot(id: number): number {
 // ---- HUD and panels ----
 const pennant = (nation: FlagOf, scale = 2) => `<img class="px-icon flag" src="${flagUrl(nation, scale)}" alt="">`;
 
+// The top bar's one-shot animations (SHELL-174, SHELL-175, SHELL-177): what each plaque last showed and when its animation began.
+const hudShot = { nation: -1, goldFrom: 0, goldTo: NaN, goldAt: -1e9, day: "", dayAt: -1e9, unread: 0, unreadAt: -1e9 };
+let goldTick = 0;
+const GOLD_MS = 300;
+
+/** Whether the interface plays its small animations: not with Animations Off or the system's reduced motion. */
+const uiMotion = () => animationsPref() !== "Off" && !matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/** The gold the plaque shows now: it counts from the old value to the new in 6 steps. */
+function goldShown(): number {
+  const k = Math.min(6, Math.floor(((performance.now() - hudShot.goldAt) / GOLD_MS) * 6));
+  return k >= 6 ? hudShot.goldTo : hudShot.goldFrom + ((hudShot.goldTo - hudShot.goldFrom) * k) / 6;
+}
+
+/** Writes each counting step into the gold plaque, whichever render drew it, until the count is done. */
+function tickGold(): void {
+  const el = hud.querySelector(".gold-n");
+  if (el) el.textContent = fmt(goldShown());
+  goldTick = goldShown() === hudShot.goldTo ? 0 : window.setTimeout(tickGold, GOLD_MS / 6);
+  // The tint goes once the count is done.
+  if (!goldTick) el?.classList.remove("up", "down");
+}
+
+/** A class attribute that adds `shot` while an animation begun at `at` still runs, delayed so a re-render carries it on rather than restarting it. */
+function shotClass(base: string, shot: string, at: number, ms: number): string {
+  const t = performance.now() - at;
+  return t < ms ? `class="${base} ${shot}" style="animation-delay:-${Math.round(t)}ms"` : `class="${base}"`;
+}
+
+/** Notes what changed on the plaques since the last render and starts their animations. */
+function noteHudChanges(me: number, gold: number, day: string, count: number): void {
+  const now = performance.now();
+  const moving = uiMotion() && hudShot.nation === me;
+  if (gold !== hudShot.goldTo) {
+    // A new value counts on from what the plaque shows, even mid-count.
+    hudShot.goldFrom = moving ? goldShown() : gold;
+    hudShot.goldTo = gold;
+    hudShot.goldAt = moving ? now : -1e9;
+    clearTimeout(goldTick);
+    if (moving) goldTick = window.setTimeout(tickGold, GOLD_MS / 6);
+  }
+  if (day !== hudShot.day && moving) hudShot.dayAt = now;
+  if (count > hudShot.unread && moving) hudShot.unreadAt = now;
+  hudShot.day = day;
+  hudShot.unread = count;
+  hudShot.nation = me;
+}
+
 function renderHud(): void {
   if (!snapshot) {
     hud.innerHTML = `
@@ -2876,22 +3086,26 @@ function renderHud(): void {
   const n = nations[me]!;
   // The plaques, their order and what each opens come from the engine's top-bar model (REALM-205).
   const open = (o: Opens) => (o && "card" in o && o.tab ? ` data-realm-open="${o.tab}"` : "");
+  const bar = topBar({ ...s, peaceOffers: s.peaceOffers.filter((o) => !putOffOffers.has(o.id)) }, unread, asksOf(s).length + empireAsks(s.empire) + shogunateAsks(s.shogunate));
+  const goldP = bar.find((p) => p.key === "gold");
+  const newsP = bar.find((p) => p.key === "dispatches");
+  noteHudChanges(me, goldP?.key === "gold" ? goldP.gold : hudShot.goldTo, dateText(s.date, true), newsP?.key === "dispatches" ? newsP.count : 0);
   hud.innerHTML = `<button class="icon-only game-menu" data-shell="menu" title="Game menu" aria-label="Game menu">${icon("menu", 2)}<span class="dot" hidden></span></button>
-    ` + topBar({ ...s, peaceOffers: s.peaceOffers.filter((o) => !putOffOffers.has(o.id)) }, unread, asksOf(s).length + empireAsks(s.empire) + shogunateAsks(s.shogunate))
+    ` + bar
     .map((p) => {
       switch (p.key) {
         case "realm":
           return `<button class="realm" data-realm="${me}" title="Your realm">${pennant(n, 2)}<b>${esc(n.name)}</b></button>`;
         case "date":
-          return `<span class="plaque turn-label" title="${dateText(s.date)}, ${seasonName(latOf(provinces[provinceIndex.get(n.capital)!]!), s.date.month).toLowerCase()}: one turn is a week">${dateText(s.date, true)}${clockText(playbackHour(s.hour, s.battles.some((b) => b.player)))}</span>`;
+          return `<span class="plaque turn-label" title="${dateText(s.date)}, ${seasonName(latOf(provinces[provinceIndex.get(n.capital)!]!), s.date.month).toLowerCase()}: one turn is a week"><span ${shotClass("day", "flip", hudShot.dayAt, 200)}>${dateText(s.date, true)}</span>${clockText(playbackHour(s.hour, s.battles.some((b) => b.player)))}</span>`;
         case "gold":
-          return `<button class="plaque gold" data-realm="${me}"${open(p.opens)} title="Treasury: gold, and change per month. Opens the ledger">${icon("coin", 1)}${fmt(p.gold)} <small class="${p.falling ? "down" : ""}">${p.perMonth >= 0 ? "+" : ""}${p.perMonth.toFixed(1)}</small></button>`;
+          return `<button class="plaque gold" data-realm="${me}"${open(p.opens)} title="Treasury: gold, and change per month. Opens the ledger">${icon("coin", 1)}<span class="gold-n${goldShown() === p.gold ? "" : p.gold > hudShot.goldFrom ? " up" : " down"}">${fmt(goldShown())}</span> <small class="${p.falling ? "down" : ""}">${p.perMonth >= 0 ? "+" : ""}${p.perMonth.toFixed(1)}</small><i ${shotClass("gold-pop", p.gold > hudShot.goldFrom ? "up" : "down", hudShot.goldAt, 600)} aria-hidden="true">${icon("coin", 1)}</i></button>`;
         case "stability":
           return stabilityPlaque(s.stability!, me, s.revolution);
         case "war":
           return `<button class="plaque at-war" data-realm="${me}"${open(p.opens)} data-war-focus title="Your wars: your side's peace voices, amber past a third, red past half">${icon("swords", 1)}At war${warPlaqueBars(myWarsRaw(), me)}</button>`;
         case "dispatches":
-          return `<button class="plaque dispatches${p.urgent ? " urgent" : ""}" data-news title="News: everything that happened, newest first">${icon("scroll", 1)}${p.count || ""}</button>`;
+          return `<button ${shotClass(`plaque dispatches${p.urgent ? " urgent" : ""}`, "bounce", hudShot.unreadAt, 300)} data-news title="News: everything that happened, newest first">${icon("scroll", 1)}${p.count || ""}</button>`;
       }
     })
     .join("\n    ");
@@ -2996,7 +3210,8 @@ async function act(order: Order): Promise<void> {
 function takeSnapshot(next: Snapshot, ms: number): void {
   const at = new Map<number, [number, number]>();
   if (snapshot) for (let k = 0; k < snapshot.armies.id.length; k++) at.set(snapshot.armies.id[k]!, armyPosition(k));
-  clockFrom = snapshot ? traderClock() : clockDays(next.date, next.hour);
+  walkedBefore = new Map((snapshot?.traderWalks ?? []).map((w) => [w.id, w]));
+  hearTradeFeed(next, ms);
   const ships = new Map<number, { at: [number, number]; path: number[] }>();
   if (snapshot) for (const f of snapshot.navy.fleets) ships.set(f.id, { at: fleetPosition(f), path: f.path });
   fleetFrom = ships;
@@ -3055,23 +3270,93 @@ function playMoments(before: Snapshot | null, next: Snapshot): void {
     if (sx < -40 || sy < -40 || sx > view.width + 40 || sy > view.height + 40) continue;
     const colour = m.nation >= 0 ? nations[m.nation]!.color : PALETTE.paper;
     particles.moment(m.kind, p.x!, p.y!, momentParticles(m.kind, animations), momentSeconds(m.kind), colour);
+    momentUntil = Math.max(momentUntil, performance.now() + momentSeconds(m.kind) * 1000);
   }
   if (particles.count) view.invalidate();
 }
 
-/** Moves the particles on to now and draws them, asking for the next frame at the effects' frame rate while any live. */
+/** Moves the particles on to now and draws them, asking for the next frame while any live: at the effects' frame rate during a moment, slower for the looping ones. */
 function drawParticles(o: OverlayContext): void {
   const now = performance.now();
   // A long gap (the tab hidden, the map idle) is not played out: the particles go on from where they were.
   particles.step(Math.min(0.1, Math.max(0, (now - (particleClock || now)) / 1000)));
   particleClock = now;
+  if (now - lastEmit >= EFFECTS.emitMs) {
+    lastEmit = now;
+    if (loopingEffects(animationsPref(), batteryOn()) && momentsShown(o.zoom)) emitLoops(o);
+  }
   if (!particles.count) {
     particleClock = 0;
     return;
   }
   // In art pixels a little bigger than the tokens', so a moment reads at arm's length, and the living band's close in (VIEW-102).
   particles.draw(o.ctx, o.toScreen, Math.max(3, Math.round(o.zoom / 8)), o.width, o.height);
-  if (!particleTick) particleTick = setTimeout(() => ((particleTick = 0), view.invalidate()), 1000 / EFFECTS.frameRate);
+  const rate = now < momentUntil ? EFFECTS.frameRate : EFFECTS.loopFrameRate;
+  if (!particleTick) particleTick = setTimeout(() => ((particleTick = 0), view.invalidate()), 1000 / rate);
+}
+
+/** The province temperatures this week, °C, from the season bytes the map is drawn with (seasonBytes). */
+let seasonNow: Uint8Array | null = null;
+const celsiusOf = (p: number) => (seasonNow ? (seasonNow[p * 4]! / 255) * 127.5 - 60 : 10);
+/** When the looping emitters last ran, and until when a moment keeps the particles at full frame rate. */
+let lastEmit = 0;
+let momentUntil = 0;
+
+/**
+ * The living world's looping effects (VIEW-146..VIEW-149), a few particles
+ * at a time on what is on screen: smoke from the towns' chimneys close in,
+ * riot smoke over risings, snow over provinces below freezing, and now and
+ * then a flock of birds. Each kind keeps under its own cap.
+ */
+function emitLoops(o: OverlayContext): void {
+  if (!snapshot) return;
+  const r = Math.random;
+  const pad = 40;
+  const on = (x: number, y: number) => {
+    const [sx, sy] = o.toScreen(x, y);
+    return sx > -pad && sy > -pad && sx < o.width + pad && sy < o.height + pad;
+  };
+  const W = view.map.width;
+  // Chimney smoke, close in, from the towns on screen.
+  if (chimneysShown(o.zoom) && townLayer && particles.countOf(Shape.Smoke) < EFFECTS.chimneys.maxPuffs)
+    for (let p = 0; p < provinces.length; p++) {
+      const at = provinces[p]!;
+      if (at.x === undefined || !on(at.x, at.y!) || !isKnown(p)) continue;
+      for (const t of townLayer.chimneys(p)) {
+        if (r() > EFFECTS.chimneys.puffChance) continue;
+        particles.add(Shape.Smoke, (t % W) + 0.5, Math.floor(t / W) + 0.3, 0, -2, r() * 2 - 1, -4 - r() * 3, 2 + r(), r() < 0.5 ? PALETTE.mist : PALETTE.steel);
+      }
+    }
+  // A thicker dark column over each standing rising.
+  for (const rising of snapshot.rebels.risings) {
+    const at = provinces[rising.location]!;
+    if (!isKnown(rising.location) || !on(at.x!, at.y!) || r() > 0.6) continue;
+    particles.add(Shape.Smoke, at.x!, at.y!, r() * 4 - 2, -3, r() * 2 - 1, -7 - r() * 4, 2.5, r() < 0.5 ? PALETTE.slate : PALETTE.ink);
+  }
+  // Snow over the provinces on screen below freezing, falling a short way and gone.
+  if (seasonNow && particles.countOf(Shape.Snow) < EFFECTS.snow.maxFlakes)
+    for (let k = 0; k < EFFECTS.snow.perEmit; k++) {
+      const sx = r() * o.width;
+      const sy = r() * o.height;
+      const p = view.provinceAt(sx, sy);
+      if (p < 0 || isWater[p] || !snowing(celsiusOf(p))) continue;
+      const [mx, my] = view.toMap(sx, sy);
+      particles.add(Shape.Snow, mx, my, 0, -12, 0, 6 + r() * 3, 2 + r(), PALETTE.paper);
+    }
+  // Now and then a flock crosses the land; gulls, white, by the coast.
+  if (particles.countOf(Shape.Bird) === 0 && r() < EFFECTS.birds.chance) {
+    const sx = o.width * (0.2 + r() * 0.6);
+    const sy = o.height * (0.2 + r() * 0.6);
+    const p = view.provinceAt(sx, sy);
+    if (p >= 0 && !isWater[p]) {
+      const [mx, my] = view.toMap(sx, sy);
+      const dir = r() < 0.5 ? -1 : 1;
+      const n = EFFECTS.birds.flockMin + Math.floor(r() * (EFFECTS.birds.flockMax - EFFECTS.birds.flockMin + 1));
+      const colour = provinces[p]!.coastal ? PALETTE.paper : PALETTE.ink;
+      // In a loose V behind the leader.
+      for (let k = 0; k < n; k++) particles.add(Shape.Bird, mx, my, -dir * k * 4 + r() * 2, (k % 2 ? 1 : -1) * Math.ceil(k / 2) * 2, dir * 16, -1 + r() * 2, 7, colour);
+    }
+  }
 }
 
 /** Takes in a fresh snapshot's map state. */
@@ -3254,9 +3539,12 @@ function logNews(s: Snapshot): void {
 /** The player's revolution's choice card while it waits on a stance (REVO-091): it cannot be folded away. */
 function renderRevolutionCard(): void {
   const v = snapshot?.revolution;
+  const opening = revolutionCard.hidden;
   revolutionCard.hidden = !v?.outbreak;
   if (!v?.outbreak) return;
   revolutionCard.innerHTML = revolutionCardHtml(v, nations[snapshot!.playerNation]!.name);
+  // The card unrolls when it first shows, not on each re-render (SHELL-176).
+  if (opening) revolutionCard.firstElementChild!.classList.add("unroll");
   revolutionCard.querySelectorAll<HTMLButtonElement>("[data-revolution-stance]").forEach((b) =>
     b.addEventListener("click", async () => {
       await act({ type: "answerRevolution", stance: b.dataset.revolutionStance as "lead" | "bend" | "fight" });
@@ -3660,7 +3948,7 @@ function showPanel(open: boolean, reopenIcon: "scroll" | "crown" = "scroll"): vo
   // While a course is drawn the voyage bar stands in for the folded card (EXPL-074).
   reopen.hidden = !open || !panelCollapsed || !!exploring;
   const what =
-    reopenIcon === "crown" ? "Choose a realm" : empireOpen ? "The Empire" : shogunateOpen ? "The Shogunate" : newsView ? "News" : fleetView >= 0 ? (sailing >= 0 ? "Fleet: tap where to sail" : "Fleet") : realmView >= 0 ? nations[realmView]!.name : selectedProvince >= 0 ? provinces[selectedProvince]!.name : "";
+    reopenIcon === "crown" ? "Choose a realm" : empireOpen ? "The Empire" : shogunateOpen ? "The Shogunate" : newsView ? "News" : fleetView >= 0 ? (sailing >= 0 ? "Fleet: tap where to sail" : "Fleet") : traderView >= 0 ? "Trader" : realmView >= 0 ? nations[realmView]!.name : selectedProvince >= 0 ? provinces[selectedProvince]!.name : "";
   reopen.innerHTML = `${icon(reopenIcon, 3)}<span>${esc(what)}</span>`;
   reopen.title = `Open the overview: ${what}`;
   panel.querySelector(".fold")?.addEventListener("click", () => {
@@ -3682,6 +3970,7 @@ interface Screen {
   lord: number;
   army: number;
   fleet: number;
+  trader: number;
   province: number;
   provinceTab: ProvinceTab;
 }
@@ -3701,13 +3990,13 @@ let backIgnore = false;
 /** The screen the panel shows now, or null when it is closed. */
 function currentScreen(): Screen | null {
   if (!snapshot) return null;
-  const s: Screen = { ach: achView, news: newsView, realm: realmView, realmTab, official: officialView, lord: lordView, army: armyView, fleet: fleetView, province: selectedProvince, provinceTab };
+  const s: Screen = { ach: achView, news: newsView, realm: realmView, realmTab, official: officialView, lord: lordView, army: armyView, fleet: fleetView, trader: traderView, province: selectedProvince, provinceTab };
   return screenKey(s) ? s : null;
 }
 
 /** What the player sees of a screen, the first view set as renderPanelCard picks it: two screens that look alike are one. */
 function screenKey(s: Screen): string {
-  return s.ach ? "ach" : s.news ? "news" : s.realm >= 0 ? `realm ${s.realm} ${s.realmTab}` : s.official >= 0 ? `official ${s.official}` : s.lord >= 0 ? `lord ${s.lord}` : s.army >= 0 ? `army ${s.army}` : s.fleet >= 0 ? `fleet ${s.fleet}` : s.province >= 0 ? `province ${s.province} ${s.provinceTab}` : "";
+  return s.ach ? "ach" : s.news ? "news" : s.realm >= 0 ? `realm ${s.realm} ${s.realmTab}` : s.official >= 0 ? `official ${s.official}` : s.lord >= 0 ? `lord ${s.lord}` : s.army >= 0 ? `army ${s.army}` : s.fleet >= 0 ? `fleet ${s.fleet}` : s.trader >= 0 ? `trader ${s.trader}` : s.province >= 0 ? `province ${s.province} ${s.provinceTab}` : "";
 }
 
 /** After a redraw: a new screen puts the one before on the history; a closed panel clears it. */
@@ -3744,6 +4033,7 @@ function goBack(): void {
   lordView = s.lord;
   armyView = s.army;
   fleetView = s.fleet;
+  traderView = s.trader;
   sailing = -1;
   grantOpen = false;
   selectedProvince = s.province;
@@ -3880,7 +4170,7 @@ function frameProvinces(list: readonly number[], maxZoom = 8): void {
 
 function renderPanelCard(): void {
   panel.classList.remove("declaring");
-  const shows = `${achView}/${empireOpen}/${shogunateOpen}/${newsView}/${realmView}/${realmTab}/${declareFor}/${officialView}/${lordView}/${armyView}/${fleetView}/${selectedProvince}/${provinceTab}`;
+  const shows = `${achView}/${empireOpen}/${shogunateOpen}/${newsView}/${realmView}/${realmTab}/${declareFor}/${officialView}/${lordView}/${armyView}/${fleetView}/${traderView}/${selectedProvince}/${provinceTab}`;
   if (shows !== panelShows) {
     panelShows = shows;
     panel.scrollTop = 0;
@@ -3936,6 +4226,11 @@ function renderPanelCard(): void {
   }
   fleetView = -1;
   sailing = -1;
+  if (traderView >= 0 && snapshot?.trade?.traders.some((t) => t.id === traderView)) {
+    renderTrader(traderView);
+    return;
+  }
+  traderView = -1;
   if (!snapshot && selectedProvince < 0 && startOn) {
     showStart();
     showPanel(false);
@@ -5079,6 +5374,7 @@ function bindNavyLinks(): void {
     b.addEventListener("click", () => {
       realmView = -1;
       fleetView = -1;
+      traderView = -1;
       selectedProvince = Number(b.dataset.portOpen);
       provinceTab = "port";
       restyleProvinces();
@@ -6128,6 +6424,13 @@ function bindTrade(): void {
   const id = (b: HTMLElement, key: string) => Number(b.dataset[key]);
   panel.querySelectorAll<HTMLButtonElement>("[data-trader-route]").forEach((b) => b.addEventListener("click", () => startRoute(id(b, "traderRoute"))));
   panel.querySelectorAll<HTMLButtonElement>("[data-trader-show]").forEach((b) => b.addEventListener("click", () => showTrader(id(b, "traderShow"))));
+  panel.querySelectorAll<HTMLButtonElement>("[data-trader-open]").forEach((b) => b.addEventListener("click", () => openTraderCard(id(b, "traderOpen"))));
+  // Use all better routes: each trader takes its best one, in turn (TRADE-156).
+  panel.querySelector<HTMLButtonElement>("[data-trader-use-all]")?.addEventListener("click", async (e) => {
+    (e.currentTarget as HTMLButtonElement).disabled = true;
+    for (const t of snapshot?.trade?.traders ?? []) if (t.better[0]) await act({ type: "setTradeRoute", trader: t.id, stops: t.better[0].stops.slice() });
+    renderPanel();
+  });
   panel.querySelectorAll<HTMLButtonElement>("[data-trader-ask]").forEach((b) =>
     b.addEventListener("click", () => {
       tradeUi.dismiss = id(b, "traderAsk");
@@ -6151,7 +6454,7 @@ function bindTrade(): void {
   });
 }
 
-/** A trader tapped on the map: the player's Trade tab opens at its card. */
+/** A trader tapped on the map or a row of the Trade tab: its own card opens, and its way is drawn on the map (TRADE-153, TRADE-154). */
 function openTraderCard(id: number): void {
   sound.sfx("map_select_province");
   selected.clear();
@@ -6162,31 +6465,60 @@ function openTraderCard(id: number): void {
   lordView = -1;
   newsView = false;
   achView = false;
-  realmView = snapshot!.playerNation;
-  realmTab = "trade";
+  realmView = -1;
+  traderView = id;
+  tradeUi.dismiss = -1;
   panelCollapsed = false;
   restyleProvinces();
   renderArmyList();
   renderPanel();
   renderActions();
-  panel.querySelector(`[data-trader-show="${id}"]`)?.closest(".trader")?.scrollIntoView({ block: "nearest" });
+  view.invalidate();
 }
 
-/** Show on a trader card: the map centres on the trader, zoomed in to regional, under the trade lens. */
+/** The trader card in the panel (TRADE-153): its buttons set a better route, change where it goes, find it or dismiss it. */
+function renderTrader(id: number): void {
+  const s = snapshot!;
+  const t = s.trade!.traders.find((x) => x.id === id)!;
+  const name = (p: number) => provinces[p]!.name;
+  panel.innerHTML = `
+    <header><h2 class="ribbon">${esc(t.name)}</h2>${closeButton()}</header>
+    ${traderCardHtml(t, name, (p) => owners[p] !== s.playerNation)}`;
+  bindClose();
+  showPanel(true);
+  bindTrade();
+  const num = (b: HTMLElement, key: string) => Number(b.dataset[key]);
+  panel.querySelectorAll<HTMLButtonElement>("[data-trader-use]").forEach((b) =>
+    b.addEventListener("click", () => {
+      void act({ type: "setTradeRoute", trader: id, stops: [num(b, "useFrom"), num(b, "useTo")] }).then(() => {
+        if (!snapshot?.rejectedOrders.length) sound.sfx("map_select_province");
+      });
+    }),
+  );
+  panel.querySelector<HTMLButtonElement>("[data-trader-dest]")?.addEventListener("click", () => startRoute(id, true));
+  panel.querySelector<HTMLButtonElement>("[data-trader-dismiss]")?.addEventListener("click", () => (traderView = -1));
+}
+
+/** Find on a trader card (Show in the Trade tab): its card opens and the map centres on it, close in where it walks (TRADE-153). */
 function showTrader(id: number): void {
   const t = snapshot?.trade?.traders.find((x) => x.id === id);
   if (!t) return;
+  if (traderView !== id) openTraderCard(id);
   panelCollapsed = foldOnPhone();
-  setLens("trade");
-  view.lookAt(provinces[t.at]!.x!, provinces[t.at]!.y!, Math.max(view.camera.zoom, 3));
+  view.lookAt(provinces[t.at]!.x!, provinces[t.at]!.y!, Math.max(view.camera.zoom, LIVING_MAP.livingFrom));
   renderPanel();
 }
 
-/** Route on a trader card: the card closes, the trade lens comes on and the route bar waits for taps on the map. */
-function startRoute(id: number): void {
+/**
+ * Route on a trader card: the card closes, the trade lens comes on and the route bar waits for taps on the map;
+ * Change destination keeps where it starts and waits only for where it goes (TRADE-155).
+ */
+function startRoute(id: number, keepStart = false): void {
   const t = snapshot?.trade?.traders.find((x) => x.id === id);
   if (!t) return;
-  routing = { trader: id, kind: t.kind, stops: [], note: null };
+  routeFromCard = traderView === id;
+  traderView = -1;
+  routing = { trader: id, kind: t.kind, stops: keepStart && t.stops.length ? [t.stops[0]!] : [], note: null };
   realmView = -1;
   selectedProvince = -1;
   officialView = -1;
@@ -6240,11 +6572,15 @@ async function sendDraft(): Promise<void> {
   renderRouteBar();
 }
 
-/** Leaves route mode; the realm card waits on the Trade tab, folded on a phone so the new route stays in view. */
+/** Leaves route mode; the trader's card or the Trade tab waits where it was opened from, folded on a phone so the new route stays in view. */
 function leaveRoute(): void {
+  const id = routing?.trader ?? -1;
   routing = null;
   renderRouteBar();
-  if (snapshot) {
+  if (snapshot && routeFromCard && snapshot.trade?.traders.some((t) => t.id === id)) {
+    traderView = id;
+    panelCollapsed = foldOnPhone();
+  } else if (snapshot) {
     realmView = snapshot.playerNation;
     realmTab = "trade";
     panelCollapsed = foldOnPhone();
@@ -6280,6 +6616,8 @@ routeBarEl.addEventListener("click", (e) => {
     void act({ type: "draftTradeRoute", trader: r.trader, stops: [] });
     leaveRoute();
   } else if (b.dataset.routeConfirm !== undefined) void confirmRoute();
+  // One of the best cities from where it starts, picked from the bar (TRADE-155).
+  else if (b.dataset.routePick !== undefined) routeTap(Number(b.dataset.routePick));
 });
 
 /**
@@ -6415,6 +6753,7 @@ function bindClose(): void {
     lordView = -1;
     armyView = -1;
     fleetView = -1;
+    traderView = -1;
     sailing = -1;
     grantOpen = false;
     newsView = false;
@@ -6461,6 +6800,7 @@ function openProvinceTab(i: number, tab: typeof provinceTab): void {
   realmView = -1;
   armyView = -1;
   fleetView = -1;
+  traderView = -1;
   newsView = false;
   selected.clear();
   selectedProvince = i;
@@ -7612,6 +7952,7 @@ overlay.addEventListener("click", (e) => {
 /** Settings apply at once (SET-003): text size, the map's battery knobs, and the cards that show them. */
 function applyPrefs(): void {
   document.documentElement.style.setProperty("--text-zoom", String(textZoom()));
+  document.documentElement.dataset.animations = animationsPref().toLowerCase();
   view?.setPower(mapPower());
   if (!soundMenu.hidden) renderSoundMenu();
   renderSoundButton();
@@ -7676,6 +8017,11 @@ Object.assign(globalThis, {
     newsView = false;
     panelCollapsed = false;
     renderPanel();
+  },
+  /** Stages this temperature, °C, in every province for the snow until the next week: winter takes months of play (scripts/effects-shots.mjs). */
+  __phStageCelsius: (c: number) => {
+    seasonNow = new Uint8Array(provinces.length * 4);
+    for (let i = 0; i < provinces.length; i++) seasonBytes(seasonNow, i, c, 0, 0, 0);
   },
   /** Plays a map moment at province p, in a realm's colour: the things that cause one take a war or years of play (scripts/effects-shots.mjs). */
   __phMoment: (kind: MomentKind, p: number, nation = snapshot?.playerNation ?? 0) => {
@@ -7832,10 +8178,12 @@ Object.assign(globalThis, {
   __phTraderPath: () => (snapshot?.trade?.traders[0]?.path ?? []).map((p) => provinces[p]!.id),
   /** The traders drawn close in, with their tap boxes in CSS pixels (VIEW-123, VIEW-125). */
   __phTraderBoxes: () => traderHitBoxes.slice(),
-  /** Centres the map on the first walking trader of the player's busiest path, at a zoom. */
+  /** Gold banked on the map now, coins still showing (TRADE-157). */
+  __phBankings: () => bankings.length,
+  /** Centres the map on the player's first trader walking over land, at a zoom. */
   __phLookAtTrader: (zoom: number) => {
-    const path = snapshot?.tradePaths.find((p) => p.mine >= 0) ?? snapshot?.tradePaths[0];
-    const m = path && placeMovers(path, clockDays(snapshot!.date, snapshot!.hour), (p) => [provinces[p]!.x!, provinces[p]!.y!])[0];
+    const w = snapshot?.traderWalks.find((x) => x.mine && x.medium === "land" && x.from !== x.to) ?? snapshot?.traderWalks[0];
+    const m = w && placeTrader(w, undefined, 1, tileXY, (p) => [provinces[p]!.x!, provinces[p]!.y!]);
     if (m) view.lookAt(m.x, m.y, zoom);
   },
   /** Centres the map on a province by id, at a zoom. */

@@ -17,7 +17,7 @@ import { assassinationGold } from "./assassination.ts";
 import { stabilityOf, type Stability } from "./stability.ts";
 import { governmentView, realmForms, realmTitles, type GovernmentView } from "./government.ts";
 import type { Titles } from "./domain/realm/index.ts";
-import { goodsOf, kindRow, TRADER_KINDS, tradePaths, tradeSeen, tradeValueAt, tradeView, type KindRow, type TradePath, type TradeView } from "./trade.ts";
+import { goodsOf, kindRow, TRADER_KINDS, tradeSeen, traderWalks, tradeValueAt, tradeView, type KindRow, type TradeFeedItem, type TradeView, type TraderWalk } from "./trade.ts";
 import { LIVING_MAP } from "./domain/map-presentation/livingMap.ts";
 import { rebelsView, type RebelsView } from "./rebels.ts";
 import { revolutionView, type RevolutionView } from "./revolutions.ts";
@@ -291,8 +291,10 @@ export interface Snapshot {
   provinceTradeCity: Uint8Array;
   /** Provinces whose trade the player sees: its own and those on its traders' loops (D-TRADE-13). */
   provinceTradeSeen: Uint8Array;
-  /** The busy trade paths the player may see, busiest first, for the traders drawn on the living map (VIEW-132). */
-  tradePaths: TradePath[];
+  /** The traders the player may see, where the daily walk has them, for the living map (VIEW-132). */
+  traderWalks: TraderWalk[];
+  /** The player's traders' collections and deposits since the last snapshot, oldest first, for the map to show (TRADE-152). */
+  tradeFeed: TradeFeedItem[];
   /** What each province the player sees trades: its goods, most gold first, with loads a year and gold a month. */
   provinceGoods: Record<number, { ware: string; loads: number; gold: number }[]>;
   /** Tongues and faiths of every province and realm; the UI reads them with peoples.ts (tongueLine, faithLine, peoplesView). */
@@ -576,6 +578,8 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       realmTitles: realmTitles(w),
       trade: player >= 0 ? tradeView(w, player) : null,
       traderKinds: TRADER_KINDS.map((k) => kindRow(w, k)),
+      // Read once: the next snapshot carries only what came after.
+      tradeFeed: w.tradeFeed.splice(0),
       provinceTradeValue: Float32Array.from({ length: w.provinceCount }, (_, p) => tradeValueAt(w, p)),
       provinceTradeRatio: Uint8Array.from(w.provinceTradeRatio, (r) => Math.round(r)),
       provinceTradePassing: Uint8Array.from(w.provincePassed, (x) => Math.min(255, Math.round(x))),
@@ -584,7 +588,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         const seen = tradeSeen(w, player);
         const goods: Snapshot["provinceGoods"] = {};
         for (let p = 0; p < w.provinceCount; p++) if (seen[p] && !w.provinceWater[p]) goods[p] = goodsOf(w, p).map((g) => ({ ware: g.ware, loads: g.loads, gold: g.gold }));
-        return { provinceTradeSeen: seen, provinceGoods: goods, tradePaths: tradePaths(w, player, LIVING_MAP.traders.maxPaths, player >= 0 ? seen : null) };
+        return { provinceTradeSeen: seen, provinceGoods: goods, traderWalks: traderWalks(w, player, LIVING_MAP.traders.maxTraders, player >= 0 ? seen : null).map((t) => ({ ...t, tiles: t.tiles.slice() })) };
       })(),
       peoples: peoplesSnapshot(w),
       campaign: campaignView(w),

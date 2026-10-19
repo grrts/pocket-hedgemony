@@ -163,7 +163,7 @@ button {
 
 button:active:not(:disabled) {
   border-image-source: var(--ui-btn-down);
-  transform: translateY(2px);
+  translate: 0 2px;
 }
 
 button:disabled {
@@ -1340,7 +1340,7 @@ button.small {
   flex-direction: column;
   padding: 4px 8px 8px;
   z-index: 9;
-  animation: alert-in 0.2s steps(4);
+  animation: unroll 0.24s steps(4);
 }
 
 /* Long event names wrap rather than lose their end. */
@@ -1462,6 +1462,13 @@ button.small {
   }
 }
 
+/* Event and revolution cards unroll from the top like a scroll (SHELL-176). */
+@keyframes unroll {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+}
+
 /* Every plaque in the top bar is the same height, type and padding (feedback 74). */
 .hud .plaque {
   position: relative;
@@ -1472,6 +1479,100 @@ button.small {
   border-width: 4px;
   font: 600 20px/1 var(--body);
   text-shadow: none;
+}
+
+/* A pressed plaque stays paper and sinks a pixel (SHELL-173). */
+.hud button.plaque:active:not(:disabled) {
+  border-image-source: var(--ui-btn-paper-down);
+  translate: 0 1px;
+}
+
+/* The gold counts to its new value, tinted green when it rose and red when it fell (SHELL-174). */
+.hud .gold-n.up {
+  color: #3d6b2a;
+}
+
+.hud .gold-n.down {
+  color: var(--cloth);
+}
+
+/* A coin pops up from the plaque and fades out in steps. */
+.hud .gold-pop {
+  display: none;
+  position: absolute;
+  left: 2px;
+  top: 8px;
+  pointer-events: none;
+}
+
+.hud .gold-pop.up,
+.hud .gold-pop.down {
+  display: block;
+  animation: coin-pop 0.6s steps(6) both;
+}
+
+.hud .gold-pop.up img {
+  filter: drop-shadow(1px 0 0 #3d6b2a) drop-shadow(-1px 0 0 #3d6b2a) drop-shadow(0 1px 0 #3d6b2a) drop-shadow(0 -1px 0 #3d6b2a);
+}
+
+.hud .gold-pop.down img {
+  filter: drop-shadow(1px 0 0 var(--cloth)) drop-shadow(-1px 0 0 var(--cloth)) drop-shadow(0 1px 0 var(--cloth)) drop-shadow(0 -1px 0 var(--cloth));
+}
+
+@keyframes coin-pop {
+  to {
+    transform: translateY(-12px);
+    opacity: 0;
+  }
+}
+
+/* The day drops into place in two steps when the date changes (SHELL-175). */
+.hud .turn-label {
+  overflow: hidden;
+}
+
+.hud .day.flip {
+  display: inline-block;
+  animation: day-flip 0.2s steps(2);
+}
+
+@keyframes day-flip {
+  from {
+    transform: translateY(-10px);
+  }
+}
+
+/* The dispatches plaque bounces once when news comes in (SHELL-177). */
+.hud .dispatches.bounce {
+  animation: plaque-bounce 0.3s steps(2);
+}
+
+@keyframes plaque-bounce {
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+/* None of these play with Animations Off or reduced motion. */
+:root[data-animations="off"] :is(.event-card, .revolution-card, .hud .day, .hud .dispatches.bounce) {
+  animation: none;
+}
+
+:root[data-animations="off"] .hud .gold-pop {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .event-card,
+  .revolution-card,
+  .hud .day,
+  .hud .dispatches.bounce {
+    animation: none;
+  }
+
+  .hud .gold-pop {
+    display: none;
+  }
 }
 
 /* The plaques draw 36 px high but take taps over the bar's full 44 px. */
@@ -1567,7 +1668,7 @@ button.small {
 }
 
 .tabs .tab:active:not(:disabled) {
-  transform: none;
+  translate: none;
 }
 
 /* Something waits for an answer here (a peace offer, an envoy): a red seal beside the name (SHELL-141). */
@@ -4346,6 +4447,175 @@ button.paper.over {
   gap: 2px;
   font-size: 19px;
 }
+/* A trader's own card (TRADE-153): Now, Route, Better routes with Use, where its gold comes from, its buttons. */
+.trader-card p {
+  margin: 0 0 4px;
+  overflow-wrap: anywhere;
+}
+.trader-card small {
+  color: var(--ink-soft);
+}
+.trader-card .route-ends {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0 0 4px;
+}
+.trader-card .trader-buttons,
+.trader-card .confirm-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  margin-top: 8px;
+}
+.trader-card .trader-buttons button,
+.trader-card .confirm-row button {
+  min-height: 44px;
+  padding: 0 4px;
+  gap: 2px;
+}
+.trader-card .better {
+  list-style: none;
+  margin: 0 0 4px;
+  padding: 0;
+}
+.trader-card .better li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0;
+  border-bottom: 1px dashed var(--ink-soft);
+}
+.trader-card .better li span {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.trader-card .better button {
+  min-height: 44px;
+  min-width: 64px;
+}
+.sources {
+  margin: 0 0 4px;
+}
+.source-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+}
+.source-row button.link {
+  justify-content: flex-start;
+  gap: 4px;
+  border: 0;
+  border-image: none;
+  padding: 0;
+  min-height: 44px;
+  font: inherit;
+  color: var(--ink);
+  text-shadow: none;
+  text-decoration: underline;
+  text-align: left;
+}
+.src-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--paper-light);
+  border: 1px solid var(--ink-soft);
+}
+.src-bar i {
+  display: block;
+  height: 100%;
+  background: var(--brass);
+}
+.trader-card .foreign,
+.better-mark {
+  color: var(--cloth);
+}
+.better-mark {
+  color: #a8741a;
+}
+button.link {
+  background: none;
+  border: 0;
+  padding: 0;
+  min-height: 44px;
+  font: inherit;
+  color: inherit;
+  text-decoration: underline;
+  text-align: left;
+  cursor: pointer;
+}
+/* The best cities from where a route starts, as buttons in the route bar (TRADE-155). */
+.route-picks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+.route-picks button {
+  min-height: 44px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 2px 8px;
+}
+/* The Trade tab's traders, one row each, opening the trader's card (TRADE-156). */
+.trader-rows {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+  gap: 4px;
+}
+.trader-row {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+  min-height: 44px;
+  padding: 4px 8px;
+  text-align: left;
+  color: var(--ink);
+  text-shadow: none;
+}
+.trader-row .row-top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.trader-row .row-gold {
+  margin-left: auto;
+}
+.trader-row .row-route {
+  color: var(--ink-soft);
+  overflow-wrap: anywhere;
+}
+.trader-row .mark {
+  font-style: normal;
+}
+.trader-row .mark.bad {
+  color: var(--cloth);
+}
+.trader-row .mark.better {
+  color: #a8741a;
+}
+.trader-row.bad {
+  outline: 2px solid var(--cloth);
+}
+.use-all {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 6px;
+}
+.use-all p {
+  margin: 0;
+  flex: 1 1 200px;
+}
+.use-all button {
+  min-height: 44px;
+}
 /* Found a trader: a city, then one button per kind with its gold and upkeep, greyed with the reason. */
 .found-city {
   margin: 4px 0 8px;
@@ -5784,7 +6054,11 @@ small.why {
   width: min(720px, 100%);
   max-height: 100%;
   padding: 4px 8px 8px;
-  animation: alert-in 0.2s steps(4);
+}
+
+/* It unrolls only when it first shows, not on each re-render (SHELL-176). */
+.revolution-card.unroll {
+  animation: unroll 0.24s steps(4);
 }
 
 .revolution-card .ribbon {
@@ -6691,7 +6965,7 @@ button[data-call-lords] {
   box-shadow: inset 0 4px 0 var(--brass), inset 0 6px 0 var(--brass-light);
 }
 .panel .sections .section:active:not(:disabled) {
-  transform: none;
+  translate: none;
 }
 /* Something waits for an answer in Diplomacy: the red seal of SHELL-141, in the section's corner. */
 .panel .sections .section.marked::after {
@@ -6959,6 +7233,24 @@ div.chron-row {
   color: var(--ink-soft);
 }
 
+/* The treasury lifts when a trader banks gold (TRADE-157). */
+.plaque.gold.banked {
+  animation: banked 0.6s steps(4) 1;
+}
+@keyframes banked {
+  0% {
+    transform: translateY(0);
+    filter: brightness(1);
+  }
+  40% {
+    transform: translateY(-3px);
+    filter: brightness(1.25);
+  }
+  100% {
+    transform: translateY(0);
+    filter: brightness(1);
+  }
+}
 /* Sending an assassin after a lord (REALM-284): the confirm card on his screen, two 44-point buttons side by side. */
 .assassin-ask {
   padding: 6px 8px;

@@ -72,8 +72,10 @@ describe("a living realm: food", () => {
       // Two years with nothing in the store, the realm's or the castles': the harvests fail and nobody can help.
       for (const q of realm) w.provinceStore[q] = 0;
       w.castleStore.fill(0);
+      const starvedBefore = w.provinceStarved[p]!;
       processTurn(w, [], -1);
-      worst = Math.max(worst, w.provinceStarved[p]! / (w.provincePopulation[p]! + w.provinceStarved[p]!));
+      // Judged in the weeks people starve: afterwards levies and moves shift the province while the starved stay counted.
+      if (w.provinceStarved[p]! > starvedBefore) worst = Math.max(worst, w.provinceStarved[p]! / (w.provincePopulation[p]! + w.provinceStarved[p]!));
     }
     expect(worst).toBeGreaterThan(0.1);
     // People who come and go after the famine (refugees, births) move the share by a hair.
