@@ -1321,7 +1321,7 @@ function drawOverlay(o: OverlayContext): void {
       const [sx, sy] = o.toScreen(p.x!, p.y!);
       if (!onScreen(sx, sy)) return;
       const color = nations[own]!.color;
-      const img = sprite(settlementOf(p.population), color, sc);
+      const img = sprite(settlementOf(peopleNow(i)), color, sc);
       const x = Math.round(sx - img.width / 2);
       const y = Math.round(sy - img.height / 2);
       const walls = wallsAt(i);
@@ -2378,11 +2378,23 @@ function drawColonies(o: OverlayContext, ctx: CanvasRenderingContext2D, u: numbe
 }
 
 /** Settlement drawn for a province by its people (thousands). */
-function settlementOf(population: number): "village" | "town" | "city" {
-  return population >= 200 ? "city" : population >= 25 ? "town" : "village";
+/** A province's people now, in thousands: the snapshot's, else the 1444 map's. */
+function peopleNow(i: number): number {
+  return snapshot ? snapshot.provincePeople[i]! : provinces[i]!.population;
 }
 
-const SETTLEMENT_NAMES = { village: "Village", town: "Town", city: "City" };
+/** Town-size steps passed by a province's people (defines.works.townPeople): 0 a hamlet up to 5 a great city, as the buildings read it (BLD-149). */
+function townStep(population: number): number {
+  return rules.defines.works.townPeople.filter((at) => population >= at).length;
+}
+
+/** The map's settlement sprite for a province's people: a village up to a village, a town from a market town, a city from a city. */
+function settlementOf(population: number): "village" | "town" | "city" {
+  const step = townStep(population);
+  return step >= 4 ? "city" : step >= 2 ? "town" : "village";
+}
+
+const TOWN_NAMES = ["Hamlet", "Village", "Market town", "Town", "City", "Great city"];
 const WALL_NAMES = { castle: "Stone castle", fort: "Earthwork ring fort" };
 
 /** The hammer's angle at a time, in radians (its head points left, so lifting it back turns it clockwise): lifted over 0.6 s, brought down in 0.15 s past upright onto the work, resting 0.25 s. */
@@ -4015,7 +4027,7 @@ function renderPanelCard(): void {
     <header><h2 class="ribbon">${owner ? pennant(owner, 2) : ""}${esc(p.name)}</h2>${closeButton()}</header>
     ${mineHere ? provinceTabs() : ""}
     <p class="owner">${owner ? `<button class="realm-link" data-realm="${own}" title="Open ${esc(owner.name)}"><b>${esc(owner.name)}</b></button>` : snapshot && !isWater[selectedProvince] ? groundHead(snapshot.tribes, selectedProvince, tribesUiOf()) : "<b>Unclaimed land</b>"}</p>
-    <p class="province-kind">${esc(provinceKind(p, !!owner && owner.capital === p.id))}</p>
+    <p class="province-kind">${esc(provinceKind(p, selectedProvince, !!owner && owner.capital === p.id))}</p>
     ${snapshot && !owner ? groundSection(snapshot.tribes, selectedProvince, tribesUiOf()) : ""}
     ${snapshot ? settleSection(selectedProvince) : ""}
     ${snapshot ? rebelsHere(selectedProvince) : ""}
@@ -4120,8 +4132,9 @@ function settleSection(p: number): string {
 }
 
 /** What kind of province p is, after the realm that rules it (feedback 78): its seat and land, then river and coast. */
-function provinceKind(p: (typeof provinces)[number], capital: boolean): string {
-  const seat = capital ? "Capital city" : SETTLEMENT_NAMES[settlementOf(p.population)];
+function provinceKind(p: (typeof provinces)[number], i: number, capital: boolean): string {
+  // The town grows and shrinks with its people; capitals keep their title.
+  const seat = capital ? "Capital city" : TOWN_NAMES[townStep(peopleNow(i))]!;
   return [`${seat} in ${p.terrain}`, p.river ? "river" : "", p.coastal ? "coast" : ""].filter(Boolean).join(" · ");
 }
 
