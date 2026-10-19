@@ -72,24 +72,39 @@ interface PairIndex {
   rel: RelationRecord[];
   seen: number;
   pairs: Map<string, RelationRecord[]>;
+  /** Each country's records, as source or target, in graph order. */
+  countries: Map<string, RelationRecord[]>;
 }
 const pairIndexes = new WeakMap<RelationGraph, PairIndex>();
 const pairOf = (a: string, b: string) => (a < b ? `${a}|${b}` : `${b}|${a}`);
+const push = (m: Map<string, RelationRecord[]>, k: string, r: RelationRecord) => {
+  const list = m.get(k);
+  if (list) list.push(r);
+  else m.set(k, [r]);
+};
 
-function recordsOf(g: RelationGraph, a: string, b: string): readonly RelationRecord[] {
+function indexOf(g: RelationGraph): PairIndex {
   let ix = pairIndexes.get(g);
   if (!ix || ix.rel !== g.relations || ix.seen > g.relations.length) {
-    ix = { rel: g.relations, seen: 0, pairs: new Map() };
+    ix = { rel: g.relations, seen: 0, pairs: new Map(), countries: new Map() };
     pairIndexes.set(g, ix);
   }
   for (; ix.seen < g.relations.length; ix.seen++) {
     const r = g.relations[ix.seen]!;
-    const k = pairOf(r.source, r.target);
-    const list = ix.pairs.get(k);
-    if (list) list.push(r);
-    else ix.pairs.set(k, [r]);
+    push(ix.pairs, pairOf(r.source, r.target), r);
+    push(ix.countries, r.source, r);
+    if (r.target !== r.source) push(ix.countries, r.target, r);
   }
-  return ix.pairs.get(pairOf(a, b)) ?? NONE;
+  return ix;
+}
+
+function recordsOf(g: RelationGraph, a: string, b: string): readonly RelationRecord[] {
+  return indexOf(g).pairs.get(pairOf(a, b)) ?? NONE;
+}
+
+/** Every record with c as source or target, in graph order. */
+function recordsWith(g: RelationGraph, c: string): readonly RelationRecord[] {
+  return indexOf(g).countries.get(c) ?? NONE;
 }
 const NONE: readonly RelationRecord[] = [];
 
@@ -110,7 +125,7 @@ function stanceRecord(g: RelationGraph, a: string, b: string): RelationRecord | 
 /** Every country a holds a stored stance toward, with that stance, in one pass over the relations. */
 export function storedStancesOf(g: RelationGraph, a: string): Map<string, string> {
   const out = new Map<string, string>();
-  for (const r of g.relations) {
+  for (const r of recordsWith(g, a)) {
     if (layerOf(r.type) !== "stance") continue;
     const c = r.source === a ? r.target : r.direction === "mutual" && r.target === a ? r.source : null;
     if (c !== null && !out.has(c)) out.set(c, r.type);
@@ -144,11 +159,11 @@ export function stateOf(g: RelationGraph, a: string, b: string): string | null {
 
 /** Overlord of a country, read from its Subject record; never stored (DIPL-001). */
 export function overlord(g: RelationGraph, c: string): string | null {
-  return g.relations.find((r) => r.type === "subject" && r.source === c)?.target ?? null;
+  return recordsWith(g, c).find((r) => r.type === "subject" && r.source === c)?.target ?? null;
 }
 
 export function subjectsOf(g: RelationGraph, c: string): string[] {
-  return g.relations.filter((r) => r.type === "subject" && r.target === c).map((r) => r.source);
+  return recordsWith(g, c).filter((r) => r.type === "subject" && r.target === c).map((r) => r.source);
 }
 
 export function relationsBetween(g: RelationGraph, a: string, b: string): RelationRecord[] {
@@ -165,11 +180,11 @@ export function hasFact(g: RelationGraph, fact: string, a: string, b: string, or
 
 /** Countries a country is at war with. */
 export function enemiesOf(g: RelationGraph, c: string): string[] {
-  return g.relations.filter((r) => r.type === "at_war" && (r.source === c || r.target === c)).map((r) => (r.source === c ? r.target : r.source));
+  return recordsWith(g, c).filter((r) => r.type === "at_war").map((r) => (r.source === c ? r.target : r.source));
 }
 
 export function alliesOf(g: RelationGraph, c: string): string[] {
-  return g.relations.filter((r) => r.type === "alliance" && (r.source === c || r.target === c)).map((r) => (r.source === c ? r.target : r.source));
+  return recordsWith(g, c).filter((r) => r.type === "alliance").map((r) => (r.source === c ? r.target : r.source));
 }
 
 // ---------------------------------------------------------------- primitives

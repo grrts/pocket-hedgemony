@@ -6,9 +6,10 @@ that breaks one fails CI on main. Two scripts check them, on pushes to main
 
 - `pnpm bench` (packages/engine/bench/turn.bench.ts) times the engine itself.
 - `pnpm --filter @ph/client perf` (apps/client/scripts/perf.mjs) runs the
-  built game in mobile Chromium, pans the map at five zooms, plays one
-  warm-up turn and then ends three turns (21 days). CI runners share their
-  CPUs with the software GPU, so a day now and then stalls for a CPU: the day
+  built game in mobile Chromium, pans the map at five zooms, plays three
+  warm-up turns and then ends three turns (21 days); when the week stops for
+  an event or a revolution it takes the first answer, as a player would. CI
+  runners share their CPUs with the software GPU, so a day now and then stalls for a CPU: the day
   budgets are judged on the third slowest of the 21 days (about the 90th
   percentile), and when those turns break a budget it plays three more, up to
   three attempts; one attempt must meet every budget. `--report` prints the
@@ -88,7 +89,10 @@ Dragging an army plans a route each time the target changes.
 - Applying a turn: 4 to 6 ms (was 14 to 26 ms, from converting every
   province's season on the main thread; before that 4.3 s, from re-encoding
   sprite images on every panel render).
-- Worker answer: about 50 ms.
+- Worker answer: about 50 ms. The 1378 start's 315 realms took it to about
+  75 ms (most of it the Diplomacy tab's view of every realm, whose lookups
+  scanned every relation in the world); with the relations indexed by realm
+  it is about 55 ms.
 - Engine turn: 0.2 ms at 5,000 provinces, 0.4 ms at 20,000.
 - Animation: every frame (was one in five, so marching armies moved at
   5 fps: the redraw request made while drawing was wiped right after).
