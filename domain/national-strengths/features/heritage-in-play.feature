@@ -2,7 +2,7 @@
 Feature: Heritage in play
   As a player
   I want my realm's heritage to live in the campaign
-  So that its strengths, hidden goals and weakness change what my realm can do as history moves
+  So that its strengths, goals and weakness change what my realm can do as history moves
 
   @HER-078
   Scenario: Heritage is evaluated each month in the game
@@ -39,14 +39,14 @@ Feature: Heritage in play
     And the birthright of "Aragon" is in force
     And the birthright of "Muscovy" is in force
 
-  @HER-085
+  @HER-085 @HER-091
   Scenario: The Heritage tab shows heritage in play
     Given a new campaign as "France"
     When the player reads the Heritage tab of "France"
-    Then it shows 3 ambitions with their hints, never their plain goals
+    Then it shows 3 ambitions with their goals and progress, never their rewards
     And it shows each golden age's state
     When the player reads the Heritage tab of "England"
-    Then it counts 3 hidden ambitions and shows none of them
+    Then it counts 3 open ambitions and shows none of them
 
   @HER-086
   Scenario: A choice waits on the Heritage tab
