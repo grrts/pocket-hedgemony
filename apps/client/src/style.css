@@ -7267,3 +7267,31 @@ div.chron-row {
   grid-template-columns: 1fr 1fr;
   gap: 6px;
 }
+
+/* ---- Chapters (SHELL-183, SHELL-184) ---- */
+
+.score-part .made.chapter {
+  grid-column: 1 / -1;
+}
+
+.chapter-due {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  margin: 6px 0;
+}
+
+.chapter-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 6px 0;
+}
+
+.chapter-list button {
+  min-height: 44px;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}

@@ -633,7 +633,7 @@
     }
   ],
   "victory": {
-    "dominationShare": 0.5,
+    "dominationShare": 1,
     "checkMonth": 1,
     "ways": [
       "world domination",
