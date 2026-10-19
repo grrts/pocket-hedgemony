@@ -6323,3 +6323,133 @@ details.pow-line > .hint {
 .league-members button.realm-link {
   min-height: 44px;
 }
+
+/* ---- Hunting grounds (TRIBE-026 to TRIBE-030): one column, 44-point buttons, every reason written under its button ---- */
+.hunt-tab,
+.hunt-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.hunt-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 4px 0;
+  padding: 0;
+  list-style: none;
+}
+.hunt-rows > li {
+  min-width: 0;
+}
+.hunt-ground {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-bottom: 6px;
+  border-bottom: 2px dotted var(--outline);
+}
+.hunt-ground.ready {
+  padding-left: 6px;
+  border-left: 4px solid var(--brass);
+}
+.hunt-ground .ready-mark {
+  color: var(--forest, #38b764);
+}
+button.hunt-open {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  width: 100%;
+  min-height: 44px;
+  text-align: left;
+}
+button.hunt-open > span {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+button.hunt-open small {
+  font-weight: normal;
+}
+.hunt-acts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.hunt-act {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 180px;
+  min-width: 0;
+}
+.hunt-act button {
+  width: 100%;
+  min-height: 44px;
+}
+.hunt-settlers {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  border: 2px solid #b13e53;
+  background: rgba(177, 62, 83, 0.14);
+  color: #b13e53;
+  font-weight: 600;
+}
+.hunt-settlers > span {
+  flex: 1 1 160px;
+  min-width: 0;
+}
+.hunt-settlers button {
+  flex: none;
+  min-height: 44px;
+}
+.hunt-ask {
+  padding: 6px;
+}
+.hunt-ask p {
+  margin: 0 0 4px;
+}
+.hunt-reasons {
+  margin: 4px 0;
+}
+.hunt-confirm {
+  flex: 1 1 100%;
+  padding: 6px;
+}
+.hunt-confirm p {
+  margin: 0 0 4px;
+}
+.hunt-bar {
+  margin: 4px 0;
+}
+.hunt-claim p {
+  margin: 4px 0 0;
+}
+small.why.hunt-note {
+  color: #b13e53;
+  opacity: 1;
+}
+.hunt-why {
+  margin: 6px 0 0;
+}
+.lens-key .swatch.hunt-hatch {
+  background: #c9c2ae repeating-linear-gradient(-45deg, #306082 0 3px, transparent 3px 9px) !important;
+}
+.hunt-tab .px-icon,
+.hunt-card .px-icon {
+  margin-right: 4px;
+}
+button.realm-link.hunt-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  margin: 0;
+  text-align: left;
+}

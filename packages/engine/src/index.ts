@@ -52,3 +52,8 @@ export { reportFailedHarvests } from "./food.ts";
 export { grabbedLand, joinsLeague, leagueView, monthlyConquest, nameAbroadView, notorietyWord, type LeagueView, type NameAbroadView, type NotorietyWord } from "./conquest.ts";
 export { aiWarPay, heedsNoNotoriety, maxCededProvinces, priceContext, priceOfWar, warPay, whyAiWontDeclare, wouldSayPeaceAtDeclaration, type PriceContext, type PriceOfWar, type PriceOfWarCall } from "./priceOfWar.ts";
 export { makeSubject } from "./subjects.ts";
+export { aiWaitsToFound, answerLandAsk, askForLand, claimGround, colonyStarts, fursOf, huntOf, groundsOf, makeGround, isTribal, landAskCount, leaveGround, monthlyTribes, ownPeople, rangeOf, seedTribes, selfRun, takeIn, tribeName, tribesView, whyNotAskLand, whyNotClaim, whyNotTakeIn, type GroundRow, type TribesOrder, type TribesView } from "./tribes.ts";
+export { refillHere } from "./turn.ts";
+export { setForm } from "./government.ts";
+export { inAnyWar } from "./lords.ts";
+export { ungoverned } from "./recruit.ts";
