@@ -37,8 +37,8 @@ function month(s: S): void {
   E.monthlyEvents(w, s.bwNews);
 }
 
-Given("a campaign starts on today's map in 1444", (s) => at(s, 1444, 11));
-Given("a campaign starts on today's map on 20 September 1378", (s) => at(s, 1378, 9));
+Given("a campaign starts on today's map in 1444", (s) => void at(s, 1444, 11));
+Given("a campaign starts on today's map on 20 September 1378", (s) => void at(s, 1378, 9));
 
 Then("the tree counts {string} as history with the choice {string}", (s, id: string, option: string) =>
   expect(history(s).find((h) => h.event === id)?.option).toBe(option),
