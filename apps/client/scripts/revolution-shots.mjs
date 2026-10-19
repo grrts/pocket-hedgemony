@@ -112,6 +112,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   await shot("general-fold");
   console.log(name, "general", JSON.stringify(await tooSmall(".panel")));
   // The Government tab's regime card.
+  await page.click("#panel [data-realm-section=Realm]").catch(() => {});
   await page.click("[data-realm-tab=government]");
   await page.waitForTimeout(300);
   await page.evaluate(async (v) => {

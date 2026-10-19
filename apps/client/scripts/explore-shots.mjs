@@ -73,6 +73,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   await page.click(".panel .close").catch(() => {});
   await tap(".hud button.realm");
   await page.waitForTimeout(300);
+  await tap("#panel [data-realm-section=Military]").catch(() => {});
   await tap("[data-realm-tab=navy]");
   await page.waitForTimeout(300);
   await tap("[data-fleet-open]");
@@ -118,6 +119,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   // The Colonies tab, before ocean navigation.
   await tap(".hud button.realm");
   await page.waitForTimeout(300);
+  await tap("#panel [data-realm-section=Lands]").catch(() => {});
   await tap("[data-realm-tab=colonies]");
   await page.waitForTimeout(300);
   await shot("7-colonies-tab-not-yet");

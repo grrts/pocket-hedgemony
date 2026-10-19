@@ -153,8 +153,8 @@ Newest decision first.
 ### 5.6 Layout by window shape
 
 - VIEW-039 (Ubiquitous): Screens shall be laid out by the shape of the window, not by the device. [screen-flow §1.5, §7.1]
-- VIEW-040 (State-driven): While the window is Short wide (phones in landscape, height under 500 CSS px), the map shall come first, cards are side sheets on the left (45 % of the screen), the Realm book's tabs a left icon rail, and the top bar one thin row. [screen-flow §7.1, §4.3]
-- VIEW-041 (State-driven): While the window is Tall (tablets in portrait, desktop windows taller than wide), cards shall be bottom sheets (55 % height, draggable), the Realm book's tabs a bottom icon row, and the tool column on the right edge above End turn. [screen-flow §7.1, §4.3]
+- VIEW-040 (State-driven): While the window is Short wide (phones in landscape, height under 500 CSS px), the map shall come first, cards are side sheets on the left (45 % of the screen), the Realm book's sections one row of icons with names (SHELL-167), and the top bar one thin row. [screen-flow §7.1, §4.3]
+- VIEW-041 (State-driven): While the window is Tall (tablets in portrait, desktop windows taller than wide), cards shall be bottom sheets (55 % height, draggable), the Realm book's sections one row of icons with names (SHELL-167), and the tool column on the right edge above End turn. [screen-flow §7.1, §4.3]
 - VIEW-042 (State-driven): While the window is Large (tablets in landscape, desktop, Steam Deck 1280 × 800), side sheets shall have a fixed width (380 px at UI scale 1), menus are centred with a maximum width, and nothing stretches edge to edge. [screen-flow §7.1, §4.3]
 - VIEW-043 (State-driven): While the window is Far (TV and Steam Machine), the Large layout shall be used with UI scale raised so body text is about 1/30 of screen height, thicker focus frames, and nothing in the outer 5 % of the screen. [screen-flow §7.1; settings §3.1]
 - VIEW-044 (Ubiquitous): Phones shall play in landscape only, in every screen; a phone held upright shows "Turn your phone sideways". [screen-flow §7.2, decided 16 Oct; settings §11.1]

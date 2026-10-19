@@ -46,6 +46,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   await page.click("[data-hint=stop]").catch(() => {});
   await page.click(".hud button.realm");
   await page.waitForTimeout(300);
+  await page.click("#panel [data-realm-section=Research]").catch(() => {});
   await page.click("[data-realm-tab=peoples]");
   await page.waitForTimeout(300);
   await page.locator(".faith-head").scrollIntoViewIfNeeded();

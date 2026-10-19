@@ -145,8 +145,8 @@ Screens are laid out by the **shape of the window**, not by the device:
 
 | Window shape | Typical device | Layout |
 |---|---|---|
-| Short wide | Phones in landscape (height under 500 CSS px) | Map first; cards are side sheets on the left (45 % of the screen); the Realm book's tabs are a left icon rail; the top bar is one thin row |
-| Tall | Tablets in portrait, desktop windows taller than wide | Cards are bottom sheets (55 % height, draggable); Realm book tabs a bottom icon row; the tool column on the right edge above End turn |
+| Short wide | Phones in landscape (height under 500 CSS px) | Map first; cards are side sheets on the left (45 % of the screen); the Realm book's six sections are one row of icons with names; the top bar is one thin row |
+| Tall | Tablets in portrait, desktop windows taller than wide | Cards are bottom sheets (55 % height, draggable); the Realm book's sections the same one row; the tool column on the right edge above End turn |
 | Large | Tablets in landscape, desktop, Steam Deck (1280 × 800) | Side sheets have a fixed width (380 px at UI scale 1); menus centred with a maximum width; nothing stretches edge to edge |
 | Far | TV and Steam Machine | The Large layout with the UI scaled up so body text is about 1/30 of the screen height, thicker focus frames, and nothing in the outer 5 % of the screen |
 
