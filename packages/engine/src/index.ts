@@ -26,7 +26,7 @@ export { WORKS, WORK_COUNT, workIndex, type LandTileRow, type WorkRow } from "./
 export { USES, type UseName } from "./land.ts";
 export { CHANGES, type ChangeName, type ChangeRow } from "./conversion.ts";
 export { castleCap, FOOD_SETTINGS, foodView, mapNetwork, reachOf, setFood, setFoodPreset, shareFood, SURPLUS_RULES, type CastleView, type FoodView } from "./castleFood.ts";
-export { capsOf, formOf, governmentView, realmTitles, type GovernmentView, type NextFormView } from "./government.ts";
+export { capsOf, formOf, governmentView, realmTitles, startFormOf, type GovernmentView, type NextFormView } from "./government.ts";
 export { titlesFor, type Titles } from "./domain/realm/index.ts";
 export { TRADER_KINDS, traderKindName, type FoundOption, type GameTraderKind, type KindRow, type RouteEstimate, type TradePath, type TradeView, type TraderView } from "./trade.ts";
 export { tradePaths, tradeSeen } from "./trade.ts";

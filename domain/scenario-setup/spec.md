@@ -3,7 +3,7 @@
 ## 1. Purpose and scope
 
 This context owns the 1444 start: which political entities exist (the country catalogue's 963 records),
-what kind of actor each is in the game (its representation), how the catalogue is put onto the map (137
+what kind of actor each is in the game (its representation), how the catalogue is put onto the map (237
 map nations today), each country's start form of government, the qualitative starting assessments and how
 they become starting counts, each province's starting values and where they come from, the campaign rules
 chosen at new game, and which realms can be played (the free tier). It turns research data into a starting
@@ -55,7 +55,7 @@ Newest decision first.
     19 facts).
 12. `screen-flow/screen-flow-design.md` S5 (new campaign); `settings/settings-design.md` §4.3 (campaign
     rules); `save-system/README.md` §4.2, §6.1, §9 (`newGame`); `tutorial/tutorial-design.md` §3.
-13. Repository: `README.md` (the world map, 137 nations); `tools/mapgen/nations-1444.json`,
+13. Repository: `README.md` (the world map, 237 nations); `tools/mapgen/nations-1444.json`,
     `owners-1444.json`, `owners.ts`, `config.json` (`settlement`, `palette`);
     `packages/rules/data/defines.json` (`economy.startingTreasury`, `levies`, `march.startingHorseShare`).
 
@@ -63,7 +63,7 @@ Newest decision first.
 
 | Term | Meaning | Not to be confused with |
 |---|---|---|
-| Catalogue | The 963 researched records of 1444 political entities, with no numeric game statistics | The map's 137 nations |
+| Catalogue | The 963 researched records of 1444 political entities, with no numeric game statistics | The map's 237 nations |
 | Record | One catalogue entry, with a stable snake_case `id` | A map nation |
 | Reference day | 11 November 1444, the day the catalogue and relations describe | The campaign start date |
 | Representation | How a record appears in the game: playable country, playable subject, decentralised polity, collective institution, non-state actor, internal estate, background only | Sovereignty (a historical classification) |
@@ -77,7 +77,7 @@ Newest decision first.
 | Detail tier | A (major powers), B (significant secondary), C (minor); sets prose depth only | — |
 | Assessment | A qualitative starting level per dimension: very low, low, moderate, high, very high, unknown, with justification and confidence | A number |
 | Start form | The government form a record starts with in 1444 | A reform |
-| Map nation | One of the 137 nations in `nations-1444.json` that own provinces on today's map | A record |
+| Map nation | One of the 237 nations in `nations-1444.json` that own provinces on today's map | A record |
 | Owner rule | A rule in `owners-1444.json` handing provinces to a map nation; first match wins | — |
 | Stand-in rule | A placeholder rule (castles, wealth) used until the province data is researched | — |
 | Campaign rules | Options chosen at new game and saved with the campaign: difficulty, AI temper, fog, events, ironman, end date | Settings |
@@ -206,7 +206,7 @@ Newest decision first.
 
 ### 5.5 The 1444 map setup (today's build)
 
-- SETUP-040 (Ubiquitous): The map's 1444 setup shall list 137 nations, each with a capital (longitude and latitude), a colour and commanders (name, might, cunning, logistics). [README; nations-1444.json]
+- SETUP-040 (Ubiquitous): The map's 1444 setup shall list 237 nations (137 placed by hand, 100 added from the catalogue by SETUP-060, SETUP-061 and TRIBE-002), each with a capital (longitude and latitude), a colour and commanders (name, might, cunning, logistics). [README; nations-1444.json]
 - SETUP-041 (Ubiquitous): Provinces shall be handed to nations by owner rules checked in order, the first match winning, by modern country, region name, or a longitude and latitude box; borders are an approximation of 1444, not an atlas. [README; owners-1444.json]
 - SETUP-042 (Unwanted): If a nation ends up with no province, then it shall not be in the built nation list. [owners.ts]
 - SETUP-043 (Ubiquitous): Each nation's colour shall be a palette colour (32 colours) not taken by a neighbouring nation. [owners.ts; config.json `palette`]
@@ -254,12 +254,17 @@ too much in terms of gameplay").
   for events, as do group records whose land another realm owns. [X-20; SETUP-005; D-SETUP-9]
 - SETUP-062 (Ubiquitous): A record that becomes a map nation shall keep its catalogue id (so no rename is needed), its
   assessments, its faith and its relations: a playable subject starts under the overlord the relations file names
-  (Kayor, Baol and Waalo under Jolof; Sofala and Mafia under Kilwa), or independent where the relations file names
-  none (D-SETUP-10). [X-20; SETUP-022]
+  (Sine under Jolof; Sofala under Kilwa; Hadiya under Ethiopia; the Canarian lordship under Castile), or
+  independent where the relations file names none (D-SETUP-10). Kayor, Baol and Waalo have their capitals in Jolof's
+  one province and Mafia in Kilwa's, so they stay reference data (SETUP-064). [X-20; SETUP-022]
 - SETUP-063 (Ubiquitous): A new African nation shall take only land no realm owns: first the provinces its owner rule
   names, if it has one, then, from all new capitals at once, one unowned neighbouring province per nation per round
-  in ascending nation index, until each has its size from its `manpower_potential` (very low 1, low 2, moderate 3,
-  high 5, very high 8, unknown 2 provinces). [X-20] @placeholder `scenario_setup.africa.size_by_manpower`
+  in ascending nation index (the one with the most people, the lowest id on a tie), until each has its size from its
+  `manpower_potential` (very low 1, low 2, moderate 3, high 5, very high 8, unknown 2 provinces) or no unowned
+  neighbour is left. A new nation's own owner rules come before every other rule, so it can take back land a broad
+  modern-country rule gave a neighbour (the Hausa towns from Kano, Timbuktu from Songhai, the Guanche islands from
+  Castile); they decide owners only, never how provinces are cut, so every province keeps its id. [X-20]
+  @placeholder `scenario_setup.africa.size_by_manpower`
 - SETUP-064 (Unwanted): If a new nation's capital lies in a province another realm owns and no owner rule gives it
   land, then it shall stay reference data, and the map build's report shall list it. [X-20; SETUP-042]
 - SETUP-065 (Ubiquitous): African land still unowned after SETUP-063 (most of the deep Sahara and parts of the
@@ -422,6 +427,7 @@ Nothing after the start. Before the first turn: build the starting world, then t
 - **D-SETUP-16** (was OQ-SETUP-16) Coverage and certainty: a disputed, partial or stub record enters play only if it owns map provinces, and low confidence only widens its start range (D-SETUP-6). X-13 settles it.
 - **D-SETUP-17** (was OQ-SETUP-17) Population scale: the map's figure is the province's people in thousands (Aube 305 thousand); the Troyes card's 72,000 is a town-sized illustration, not data. The map is the only complete set.
 - **D-SETUP-18** African starts (Leroy, 18 Oct; X-20): in the four African regions, D-SETUP-2's "only a representation that owns map provinces is a realm" now applies after the catalogue's playable countries, subjects and peoples are given the unowned land around their capitals (SETUP-060 to SETUP-065); elsewhere D-SETUP-2 stands. Leroy asked for more of the historical states and tribes, even very small ones, and as little change to the rules of play as possible.
+- **D-SETUP-19** Added realms and the province grid (18 Oct; X-20, D-TRIBE-3): realms added from the catalogue (`grows` in the map nations data) take provinces as the map already cuts them, and never keep a piece of land apart the way the hand-placed capitals do, so every province keeps its id and every file that names provinces (ports, event places, anchors) stays valid. Sub-Saharan provinces are large (about 50,000 km² each), so where two capitals fall in one province the first in nation order keeps it and the other stays reference data (Kayor, Baol and Waalo in Jolof's province; Lamu and Pate in Mombasa's). The build lists them in `scenario-setup-report.json`. A finer African grid is a map change of its own. The start-date plan (1378) extends the same rows: a realm's capital, its own owner rules and `grows`.
 
 ## 14. Traceability
 
@@ -504,6 +510,7 @@ Nothing after the start. Before the first turn: build the starting world, then t
 | SETUP-061 | african-starts.feature | Migrations, raiders and background records stay reference data |
 | SETUP-062 | african-starts.feature | A playable subject starts under the overlord the relations file names |
 | SETUP-063 | african-starts.feature | New nations take unowned land around their capitals by size |
+| SETUP-063 | african-starts.feature | A new nation's own owner rule comes before a broad rule |
 | SETUP-064 | african-starts.feature | A capital inside another realm leaves the record as reference data |
 | SETUP-065 | african-starts.feature | Land left over stays free and colonisable |
 | SETUP-066 | african-starts.feature | A new nation gets a colour and a commander |

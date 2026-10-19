@@ -101,7 +101,10 @@ import { provinceLevy } from "@ph/engine/domain/recruiting";
 import { detailBands } from "@ph/engine/domain/map-presentation";
 import { TownLayer, townInfo } from "./map/towns.ts";
 import { musicFacts, newFactMemory, playerPalette, playerWars, remember, type FactMemory } from "./audio/facts.ts";
-import { COMMISSION_GOLD, hireGold, OFFICIALS, Rng } from "@ph/engine";
+import { COMMISSION_GOLD, hireGold, OFFICIALS, Rng, startFormOf } from "@ph/engine";
+import { formName } from "@ph/engine/domain/government";
+import { PICKER_REGIONS, pickerRegions, startTrade, waysToGrow } from "@ph/engine/domain/scenario-setup";
+import { pickerCardHtml, regionListHtml, regionSelectHtml, strongIn, strongInWords, waysToGrowHtml } from "./ui/realmPicker.ts";
 import { BATTLE_STEP_MS, bannerAt, COUNTRY_CARD_TABS, endTurnInAuto, endTurnLabel, keyEndsTurn, newAutoTurns, SHELL as SHELL_RULES, startColumn, startIcons, stopAuto, switchAuto, WATCH_STEP_MS, weekPlayed, type AutoStop, type Platform as ShellPlatform } from "@ph/engine/domain/game-shell";
 import { autosaveDue, continueTarget, longDate, newCampaign, newManualSave, savesConfig, type Campaign, type Platform as SavePlatform } from "@ph/engine/domain/saves";
 import { SaveStore, type StoredSave } from "./saves/store.ts";
@@ -128,7 +131,8 @@ const diagnostics: Diagnostics = {
 // Read by the wrapper smoke tests.
 (globalThis as { __phDiagnostics?: Diagnostics }).__phDiagnostics = diagnostics;
 
-const FEATURED = ["france", "england", "castile", "portugal", "ottomans", "byzantium", "austria", "muscovy", "ming", "aztecs", "inca", "mali"];
+// The suggested realms: the great powers of each part of the world, and one start per part of Africa (SETUP-074).
+const FEATURED = ["france", "england", "castile", "portugal", "ottomans", "byzantium", "austria", "muscovy", "ming", "aztecs", "inca", "mali", "benin", "kongo", "ethiopia", "kilwa"];
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 /** "11 November 1444", or "11 Nov 1444" short. */
 /** The hour beside the date in the top bar, while the player's battle runs (VIEW-076). */
@@ -165,6 +169,11 @@ neighborIdx.forEach((n, i) => (neighborStart[i + 1] = neighborStart[i]! + n.leng
 const neighborList = Int32Array.from(neighborIdx.flat());
 const terrainIdx = Int8Array.from(provinces, (p) => TERRAINS.indexOf(p.terrain as (typeof TERRAINS)[number]));
 const isWater = provinces.map((p) => p.terrain === "sea" || p.terrain === "ocean");
+// The realm picker's region of each realm and the start's trade, for its Region select and Ways to grow (SETUP-072, SETUP-073).
+const realmRegion = pickerRegions(nations.map((n) => ({ id: n.id, x: provinces[provinceIndex.get(n.capital)!]!.x!, y: provinces[provinceIndex.get(n.capital)!]!.y! })));
+const START_TRADE = startTrade(provinces);
+/** The region the picker shows, "" for the suggested realms. */
+let pickRegion = "";
 const march = rules.defines.march;
 const marchGraph: MarchMap = (() => {
   const adjStart = new Int32Array(provinces.length + 1);
@@ -3444,6 +3453,60 @@ function renderHead(id: string): void {
   showPanel(true);
 }
 
+/** The realms of a picker region, by index. */
+function regionRealms(region: string): number[] {
+  return nations.flatMap((_, r) => (realmRegion[r] === region && realmSize(r) > 0 ? [r] : []));
+}
+
+function realmProvinces(r: number): number[] {
+  const out: number[] = [];
+  owners.forEach((o, i) => o === r && out.push(i));
+  return out;
+}
+
+function realmSize(r: number): number {
+  let n = 0;
+  for (let i = 0; i < owners.length; i++) if (owners[i] === r) n++;
+  return n;
+}
+
+/** A realm at a glance on its card before a game starts, with Ways to grow (SETUP-073). */
+function pickerCard(r: number): string {
+  const own = realmProvinces(r);
+  return pickerCardHtml({
+    form: formName(startFormOf(nations[r]!.id)),
+    provinces: own.length,
+    people: fmt(own.reduce((t, i) => t + provinces[i]!.population, 0) * 1000),
+    strong: strongIn(nations[r]!.id),
+    ways: waysToGrow({ owners, neighbors: neighborIdx, water: isWater, trade: START_TRADE }, r),
+  });
+}
+
+/**
+ * Frames provinces in the part of the map the card leaves open: right of a
+ * side sheet (Wide), above a bottom sheet (Tall), under the top bar (SETUP-072).
+ */
+function frameProvinces(list: readonly number[], maxZoom = 8): void {
+  if (!view || !list.length) return;
+  const xs = list.map((p) => provinces[p]!.x!);
+  const ys = list.map((p) => provinces[p]!.y!);
+  const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
+  const W = app.clientWidth;
+  const H = app.clientHeight;
+  const top = 44;
+  let left = 0;
+  let bottom = H;
+  if (!panel.hidden) {
+    const r = panel.getBoundingClientRect();
+    if (r.width < W * 0.7) left = r.right;
+    else bottom = r.top;
+  }
+  const w = Math.max(80, W - left);
+  const h = Math.max(80, bottom - top);
+  const zoom = Math.min(maxZoom, w / ((x1 - x0) * 1.1 + 30), h / ((y1 - y0) * 1.1 + 30));
+  view.lookAt((x0 + x1) / 2 - (left + w / 2 - W / 2) / zoom, (y0 + y1) / 2 - (top + h / 2 - H / 2) / zoom, zoom);
+}
+
 function renderPanelCard(): void {
   panel.classList.remove("declaring");
   const shows = `${achView}/${empireOpen}/${newsView}/${realmView}/${realmTab}/${declareFor}/${officialView}/${lordView}/${armyView}/${fleetView}/${selectedProvince}/${provinceTab}`;
@@ -3503,19 +3566,32 @@ function renderPanelCard(): void {
     return;
   }
   if (!snapshot && selectedProvince < 0) {
+    const regionName = PICKER_REGIONS.find((r) => r.id === pickRegion)?.name ?? "";
+    const featured = `<div class="nations">${FEATURED.filter((id) => nationIndex.has(id))
+      .map((id) => {
+        const n = nations[nationIndex.get(id)!]!;
+        // Each realm's standing at the start, so a realm that starts behind says so before it is chosen (RSCH-105).
+        return `<button class="paper nation" data-nation="${n.id}">${pennant(n)}<span class="nation-name">${esc(n.name)}<small class="starts">${esc(startStanding(n.id))}</small></span></button>`;
+      })
+      .join("")}</div>
+      <p class="hint">Or choose a region above, or tap any realm on the map: ${nations.length} to choose from. <a href="./style.html">Art test page</a></p>`;
     panel.innerHTML = `
       <header><h2 class="ribbon">Choose your realm</h2><span class="panel-buttons"><button class="fold" aria-label="Minimise">${icon("collapse", 2)}</button><button class="close" data-start-back aria-label="Back to the start screen">${icon("close", 2)}</button></span></header>
-      <div class="nations">${FEATURED.filter((id) => nationIndex.has(id))
-        .map((id) => {
-          const n = nations[nationIndex.get(id)!]!;
-          // Each realm's standing at the start, so a realm that starts behind says so before it is chosen (RSCH-105).
-          return `<button class="paper nation" data-nation="${n.id}">${pennant(n)}<span class="nation-name">${esc(n.name)}<small class="starts">${esc(startStanding(n.id))}</small></span></button>`;
-        })
-        .join("")}</div>
-      <p class="hint">Or tap any realm on the map: ${nations.length} to choose from. <a href="./style.html">Art test page</a></p>
+      ${regionSelectHtml(PICKER_REGIONS.map((r) => ({ ...r, count: realmRegion.filter((x) => x === r.id).length })), pickRegion, nations.length)}
+      ${pickRegion ? regionListHtml(regionName, regionRealms(pickRegion).map((r) => ({ index: r, name: nations[r]!.name, provinces: realmSize(r), standing: startStanding(nations[r]!.id), pennant: pennant(nations[r]!) }))) : featured}
       <button class="paper ach-open" data-ach-open>${icon("trophy", 2)}Achievements<small>${Object.keys(achProfile.unlocked).length} earned · every campaign can earn them</small></button>
       <p class="diag" id="diag">${diagnosticsLine()}</p>`;
     bindNationButtons();
+    panel.querySelector<HTMLSelectElement>("[data-pick-region]")!.addEventListener("change", (e) => {
+      pickRegion = (e.target as HTMLSelectElement).value;
+      panelShows = "";
+      renderPanel();
+      if (pickRegion) frameProvinces(regionRealms(pickRegion).flatMap((r) => realmProvinces(r)));
+    });
+    // A row opens the realm's card ([data-realm]); the map then frames the realm beside or above the card.
+    panel.querySelectorAll<HTMLButtonElement>("[data-pick-realm]").forEach((b) =>
+      b.addEventListener("click", () => requestAnimationFrame(() => frameProvinces(realmProvinces(Number(b.dataset.pickRealm)), 6))),
+    );
     panel.querySelector("[data-ach-open]")!.addEventListener("click", () => openAchievements());
     panel.querySelector("[data-start-back]")!.addEventListener("click", () => {
       startOn = true;
@@ -3609,6 +3685,7 @@ function renderPanelCard(): void {
         </div>`;
       })
       .join("")}
+    ${!snapshot && owner ? `<h3 class="sub">${esc(owner.name)} at a glance</h3>${pickerCard(own)}` : ""}
     ${!snapshot && owner ? `<button class="wax play" data-nation="${owner.id}">${icon("crown", 2)}Rule ${esc(owner.name)}</button>` : ""}`;
   bindClose();
   showPanel(true);
@@ -5271,6 +5348,7 @@ function renderRealm(r: number): void {
       <p>${s && s.playerNation === r ? "<b>Your realm</b>" : "<b>Realm</b>"} · ${own.length} province${own.length === 1 ? "" : "s"} ${s ? empireBadgeHtml(s.empire, r) : ""}${!s ? ` · <b class="starts">${esc(startStanding(n.id))}</b>` : ""}<br>
       Capital <button class="paper capital" data-go="${capIdx}">${icon("castle", 1)}${esc(provinces[capIdx]!.name)}</button></p>
     </div>
+    ${!s ? waysToGrowHtml(waysToGrow({ owners, neighbors: neighborIdx, water: isWater, trade: START_TRADE }, r)) : ""}
     ${mine && s?.stability ? stabilitySection(s.stability, titlesOf(r)) : ""}
     ${mine && s?.revolution ? revolutionSection(s.revolution) : ""}
     <dl class="facts">
@@ -5285,6 +5363,7 @@ function renderRealm(r: number): void {
       ${mine && s.fallen ? fallenLine(s.fallen) : ""}
       ${mine && s.research ? learningLine(s.research) : realmLearningLine(s.realmResearch[r])}
       ${mine ? foodLine(s, own) : ""}` : ""}
+      ${!s ? `<dt>Government</dt><dd>${esc(formName(startFormOf(n.id)))}</dd><dt>Strong in</dt><dd>${esc(strongInWords(n.id))}</dd>` : ""}
       <dt>Lands</dt><dd>${topLands.map(([t, c]) => `${t} ${c}`).join(" · ")}</dd>
       ${heritageLine(strengths, s?.heritage[r] ?? null)}
     </dl>

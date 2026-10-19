@@ -29,10 +29,13 @@ Feature: Tribal realms and the new tribes of 1444
     When a campaign starts
     Then "<record>" is a realm on the map with <provinces> provinces
 
+    # Florida is three provinces: the Creek and the Timucua hold every land
+    # neighbour of the Apalachee and Calusa capitals, so the tier B tribes
+    # have no free neighbour to take (TRIBE-003).
     Examples:
       | record     | tier | provinces |
-      | apalachee  | B    | 2         |
-      | calusa     | B    | 2         |
+      | apalachee  | B    | 1         |
+      | calusa     | B    | 1         |
       | lenape     | C    | 1         |
       | timucua    | C    | 1         |
 

@@ -172,7 +172,7 @@
     "ware_weights": { "iron": 45, "copper": 20, "tin": 8, "silver": 12, "gold": 5, "salt": 10 },
     "years_min": 40,
     "years_max": 160,
-    "anchors": { "Středočeský": { "ware": "silver", "years": 120, "mine": "Kutná Hora" }, "Dalarna": { "ware": "copper", "years": 300, "mine": "Falun" } },
+    "anchors": { "Středočeský": { "ware": "silver", "years": 120, "mine": "Kutná Hora" }, "Dalarna": { "ware": "copper", "years": 300, "mine": "Falun" }, "South Kayes": { "ware": "gold", "years": 300, "mine": "Bambuk gold field" }, "Siguiri": { "ware": "gold", "years": 300, "mine": "Bure gold field" }, "Ashanti": { "ware": "gold", "years": 300, "mine": "Akan forest gold" }, "Masvingo": { "ware": "gold", "years": 200, "mine": "Zimbabwe plateau gold" }, "Manicaland": { "ware": "gold", "years": 200, "mine": "Manyika gold" } },
     "trade": { "base": 1, "precious": 3 },
     "precious": ["silver", "gold"],
     "timber_reach": 1,
