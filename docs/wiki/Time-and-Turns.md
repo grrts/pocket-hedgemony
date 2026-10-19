@@ -16,7 +16,7 @@ Before the first turn, the game sets up the world and lets the traders warm up t
 
 There are two ways to win.
 
-- **World domination.** If your realm owns, or holds as subjects, half of the world's settled land provinces, you win. This is checked in the turn in which 1 January falls, and the win counts at once. You may keep playing to the end date afterwards.
+- **World domination.** If your realm owns, or holds as subjects, every settled land province of the world, you win. This is checked in the turn in which 1 January falls, and the win counts at once. You may keep playing to the end date afterwards.
 - **Best at the end.** The campaign ends on **31 August 1939**. On that day the realm leading the Economy score, the realm leading the Power score and the realm leading the Technology score each win in that score. No margin is needed, and realms that tie share the win. The scores are worked out each January for the realm book, but the winner is only judged at the end.
 
 A campaign that reaches the end without a win shows the final scores and your rank. The end date is chosen when you start a campaign and saved with it. When it is reached, the campaign ends with the final wrap-up events, a closing sequence and the final result. There is no playing on past it.
@@ -186,7 +186,7 @@ Every value the game uses, made from its config so it always matches the game: [
 | Seasonal turns | the turns in which 1 March, 1 June, 1 September or 1 December falls | No |
 | Harvest | September north, March south; paddies both | No |
 | Yearly turn | the turn in which 1 January falls | No |
-| World domination | half the settled land provinces, checked each January | No |
+| World domination | the whole world's settled land provinces, checked each January | No |
 | Campaign end date | 31 August 1939 (default) | No |
 | Wet seasons | as listed above | Yes |
 | How often pool events roll | every month | Yes |

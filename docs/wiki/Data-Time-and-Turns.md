@@ -184,7 +184,7 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 
 | Key | Value |
 |---|---|
-| `dominationShare` | 0.5 |
+| `dominationShare` | 1 |
 | `checkMonth` | 1 |
 | `ways` | world domination, best at the end |
 | `scores` | Economy, Power, Technology |

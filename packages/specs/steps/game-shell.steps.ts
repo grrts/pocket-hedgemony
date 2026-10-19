@@ -2766,7 +2766,7 @@ Then("no win fires", (s) => {
 
 Given("a campaign as {string} has won by world domination in January 1700", (s, realm: string) => {
   const shell = loadCampaign(s, realm, { year: 1700, month: 1 });
-  expect(checkDomination(shell, 1, 1100, 2000)).toBe(true);
+  expect(checkDomination(shell, 1, 2000, 2000)).toBe(true);
   startCampaignEnd(shell, [], "world domination");
   closingSequence(shell, ["1444", "1700"]);
   s.final = finalResult(shell, { ledger: ["Ottomans"], outcome: "Victory: World domination", achievements: [] });

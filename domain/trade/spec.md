@@ -387,6 +387,23 @@ realm sees what trade earns and where it comes from, and the map shows gold bein
   labels are drawn only for cities on screen and never under the route bar; nothing needs hover. [X-19, SHELL-108,
   SHELL-109, SHELL-114]
 
+### 5.17 Home slots (trade rework, 19 October)
+Leroy chose A on the balance card (F-162, `trade/trade-rework.md` §2.5): founding traders without end paid, since
+upkeep was a twentieth of what a poor route brought. A city now homes a few traders, and they cost enough that a poor
+route loses money.
+
+- TRADE-159 A city shall be home to at most `trade.game.homes.by_market_step` traders by its market step (none without a
+  market, 1 for a weekly market, 2 for a yearly fair, 4 for a trading house) and `homes.port` more with a harbour;
+  founding there is refused while that many are at home ("home to 2 already; a bigger market homes more"). Traders over
+  that from the 1444 start stay, but none more is founded there until one is gone. (D-TRADE-23) [F-162, TRADE-135]
+- TRADE-160 A trader's upkeep and founding gold shall be the kind's (TRADE-134, TRADE-135) times
+  `homes.upkeep_factor` and `homes.found_factor`; the AI keeps a route bringing at least `ai_keep_route_over_upkeep` times
+  its upkeep, and founds from its first city with a slot free. (D-TRADE-23) [F-162, TRADE-134, TRADE-135]
+- TRADE-161 How the player uses it: the Trade tab's Found a trader shows each city's "home to x of y", red when full,
+  and says how many traders each market step homes; a full city's kinds are greyed out with the reason. The trader
+  card's Route line already gives what it brings after upkeep, so a losing route reads in red there and in the Traders
+  rows. [F-162, X-19, TRADE-153, TRADE-156]
+
 ## 6. Commands
 
 | Command | Who | Preconditions | Result | Events |
@@ -558,6 +575,7 @@ Changes the design asks of other files (§14), recorded here; not edited:
 - **D-TRADE-21** Routes are a start and an end (Leroy, 18 October): the player sets only where a trader starts and where it goes, never the way or stops between; the planner finds the way there and back, drawn toward the most populated land (each land province's days divided by 1 + `route.busy_weight` × its people over the world's average, at most `route.busy_cap` times), since busy land is where trade is. The loop mode goes, there and back is the default, once stays. The 1444 routes are each a start and an end (the old multi-stop ones split into pairs). Supersedes TRADE-050's 2 to 8 stops.
 
 - **D-TRADE-22** Honest estimates (trade rework, 19 October): the playtest found the screens' "about x a month" 30 % to 300 % above what traders brought, since it ignored crowding and let the purse overfill on long loops. The estimate now walks the loop with its purse and last month's crowding (TRADE-147), and better routes are offered only on that estimate (TRADE-148). Without an honest number, suggestions and the AI's reroute mislead.
+- **D-TRADE-23** Home slots (trade rework, 19 October, Leroy chose A of three): the playtest saw France found 121 caravans for +114 gold a month, as upkeep (0.1) was a twentieth of a poor route. Rather than stronger crowding (B, spam still pays) or leaving the numbers (C), each city homes 1 trader per market step (a fair 2, a trading house 4) and a port 1 more, upkeep is four times and founding three times what it was. A poor long route then loses money, so better routes and Dismiss matter. The AI's keep bar went from 4 to 1 times upkeep so the same routes are kept.
 
 ## 14. Traceability
 
@@ -590,3 +608,4 @@ Changes the design asks of other files (§14), recorded here; not edited:
 | TRADE-141 … TRADE-145 | — | Presentation: apps/client/src/ui/trade.ts, the Trade tab, route bar and lens; screenshots from apps/client/scripts/trade-shots.mjs |
 | TRADE-146 … TRADE-152 | — | Engine: packages/engine/test/trade.test.ts (following and steering a trader: where it walks and its sources, the honest estimate, better routes, options while choosing, the realm's sums, the map feed, saves) |
 | TRADE-153 … TRADE-158 | — | Presentation: apps/client/src/ui/trade.ts, the trader card, its way on the map, the Trade tab overview, banking on the map |
+| TRADE-159 … TRADE-161 | — | Engine: packages/engine/test/trade.test.ts (founding: home slots, upkeep and founding gold); presentation: apps/client/src/ui/trade.ts, Found a trader |

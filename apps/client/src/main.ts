@@ -51,7 +51,7 @@ import { EngineClient } from "./engineClient.ts";
 import { hideLoading, loadingStage, painted, setLoadingStart, showLoading } from "./loading.ts";
 import { stabilityPlaque, stabilitySection } from "./ui/stability.ts";
 import { cap, DEFAULT_TITLES } from "./ui/titles.ts";
-import { endCard, scoreLine, scoreTab } from "./ui/score.ts";
+import { chapterCard, endCard, scoreLine, scoreTab } from "./ui/score.ts";
 import { lockRevolutionButtons, revolutionCardHtml, revolutionSection } from "./ui/revolution.ts";
 import { governmentTab, governmentUi } from "./ui/government.ts";
 import { isShipKind, provinceTradeLine, routeBar, stopBit, tradeTab, traderCardHtml, tradeUi, type Routing } from "./ui/trade.ts";
@@ -277,6 +277,11 @@ let shogunateOpen = false;
 /** The end card is open (SHELL-164); `endShown` is the ending it last opened for, so it opens by itself once. */
 let endView = false;
 let endShown = "";
+/** The chapter card open, by its place in the chapters closed (SHELL-183), or -1; `chaptersShown` is how many have opened by themselves. */
+let chapterView = -1;
+let chaptersShown = -1;
+/** What the panel showed beneath when the chapter card opened: once the player opens something else, the card gives way. */
+let chapterOver: string | null = null;
 /** After game over, the player is picking a realm to play on as (SHELL-095). */
 let pickingPlayOn = false;
 let selectedProvince = -1;
@@ -3201,6 +3206,7 @@ async function act(order: Order): Promise<void> {
   for (const r of snapshot.rejectedOrders) alertPlayer(`Not done: ${r.reason}.`, "scroll");
   if (!snapshot.campaign.ending) pickingPlayOn = false;
   watchEnding();
+  watchChapter();
   // An order the game took ticks off its first-campaign hint; a refused one ticks nothing (TUT-122).
   if (!snapshot.rejectedOrders.length) hints.did(order.type);
   restyleProvinces();
@@ -3384,6 +3390,7 @@ function renderEnd(): void {
     ${endCard(v, (j) => nations[j]!.name)}`;
   bindClose();
   showPanel(true);
+  bindChapterButtons();
   panel.querySelectorAll<HTMLButtonElement>("[data-realm]").forEach((b) =>
     b.addEventListener("click", () => {
       endView = false;
@@ -3409,6 +3416,69 @@ function renderEnd(): void {
       }
       renderPanel();
       renderActions();
+    }),
+  );
+}
+
+/** The chapter card (SHELL-183): the hundred years just closed, with Play on and Score. */
+function renderChapter(): void {
+  const v = snapshot!.campaign;
+  const c = v.chapters[chapterView]!;
+  panel.innerHTML = `
+    <header><h2 class="ribbon">Chapter ${["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"][c.n - 1] ?? c.n}</h2>${closeButton()}</header>
+    ${chapterCard(v, chapterView, (j) => nations[j]!.name)}`;
+  bindClose();
+  showPanel(true);
+  panel.querySelectorAll<HTMLButtonElement>("[data-realm]").forEach((b) =>
+    b.addEventListener("click", () => {
+      chapterView = -1;
+      realmView = Number(b.dataset.realm);
+      realmTab = "general";
+      renderPanel();
+    }),
+  );
+  panel.querySelectorAll<HTMLButtonElement>("[data-chapter-close]").forEach((b) =>
+    b.addEventListener("click", () => {
+      chapterView = -1;
+      if (b.dataset.chapterClose === "score") {
+        realmView = snapshot!.playerNation;
+        realmTab = "score";
+        renderPanel();
+        return;
+      }
+      showPanel(false);
+    }),
+  );
+}
+
+/** A chapter just closed: its card opens by itself, once, and Auto turns stop at the end of the week (SHELL-183). */
+function watchChapter(): void {
+  const closed = snapshot?.campaign.chapters ?? [];
+  const n = closed.filter((c) => !c.last).length;
+  // The first snapshot of a campaign, or a load, opens nothing: those chapters were seen before.
+  if (chaptersShown < 0 || n < chaptersShown) {
+    chaptersShown = n;
+    return;
+  }
+  if (n === chaptersShown) return;
+  chaptersShown = n;
+  if (snapshot!.campaign.ending) return;
+  // The last chapter closes with the campaign, on the end card; any other is the newest.
+  chapterView = closed.length - (closed.at(-1)?.last ? 2 : 1);
+  chapterOver = null;
+  stopAuto(auto, "chapter");
+  panelCollapsed = false;
+  sound.sfx("turn_month_new_year");
+}
+
+/** A closed chapter in the Score tab or on the end card opens its card again (SHELL-184). */
+function bindChapterButtons(): void {
+  panel.querySelectorAll<HTMLButtonElement>("[data-chapter]").forEach((b) =>
+    b.addEventListener("click", () => {
+      endView = false;
+      chapterView = Number(b.dataset.chapter);
+      chapterOver = null;
+      renderPanel();
     }),
   );
 }
@@ -4182,6 +4252,12 @@ function renderPanelCard(): void {
     renderEnd();
     return;
   }
+  if (chapterView >= 0 && chapterOver === null) chapterOver = shows;
+  if (chapterView >= 0 && chapterOver === shows && snapshot?.campaign.chapters[chapterView]) {
+    renderChapter();
+    return;
+  }
+  chapterView = -1;
   if (achView) {
     renderAchievements();
     return;
@@ -6358,6 +6434,7 @@ function renderRealm(r: number): void {
   panel.querySelectorAll<HTMLButtonElement>("[data-heritage-choice]").forEach((b) =>
     b.addEventListener("click", () => void actHere({ type: "heritageChoice", id: b.dataset.heritageChoice! })),
   );
+  bindChapterButtons();
   panel.querySelectorAll<HTMLButtonElement>("[data-realm-open-tab]").forEach((b) =>
     b.addEventListener("click", () => {
       realmTab = b.dataset.realmOpenTab as typeof realmTab;
@@ -6767,6 +6844,7 @@ function bindClose(): void {
     grantOpen = false;
     newsView = false;
     endView = false;
+    chapterView = -1;
     realmView = -1;
     achView = false;
     empireOpen = false;
@@ -6796,9 +6874,12 @@ const goalsParam = (): GoalDef[] | undefined => {
 const goalDefs: readonly GoalDef[] = goalsParam() ?? startGoals;
 
 /** ?end=YYYY-MM-DD brings the end date near, to try the end card (SHELL-164). */
-const endDateParam = (): { endDate?: string } => {
-  const end = new URLSearchParams(location.search).get("end");
-  return end ? { endDate: end } : {};
+const endDateParam = (): { endDate?: string; chapterYears?: number } => {
+  const q = new URLSearchParams(location.search);
+  const end = q.get("end");
+  // ?chapter=1 closes a chapter every year, to look at the chapter card (SHELL-183).
+  const chapter = Number(q.get("chapter"));
+  return { ...(end ? { endDate: end } : {}), ...(chapter > 0 ? { chapterYears: chapter } : {}) };
 };
 // ---- first-campaign hints ----
 
@@ -7053,6 +7134,8 @@ function enterGame(snap: Snapshot): void {
   newsView = false;
   endView = false;
   endShown = "";
+  chapterView = -1;
+  chaptersShown = -1;
   pickingPlayOn = false;
   grantOpen = false;
   selected.clear();
@@ -7264,9 +7347,10 @@ async function endTurn(): Promise<void> {
     logNews(next);
     if (marching) sayArrivals(marching);
     watchEnding();
+    watchChapter();
     restyleProvinces();
     renderHud();
-    if (!panel.hidden || endView) renderPanel();
+    if (!panel.hidden || endView || chapterView >= 0) renderPanel();
     renderActions();
     // Budgets in docs/performance.md, checked by scripts/perf.mjs: each step's answer, and taking it in.
     performance.measure("turn-wait", "turn-sent", "turn-arrived");
@@ -8343,6 +8427,17 @@ Object.assign(globalThis, {
     snapshot.peaceOffers.push({ id: 900000 + snapshot.peaceOffers.length, from: nationIndex.get(id)!, terms });
     logNews({ ...snapshot, news: [], rejectedOrders: [] });
     renderHud();
+    renderPanel();
+  },
+  /** A chapter as if it had just closed, from the standings now, to look at the chapter card (SHELL-183). */
+  __phPretendChapter: () => {
+    if (!snapshot) return;
+    const v = snapshot.campaign;
+    const me = snapshot.playerNation;
+    const leaders = [0, 1, 2].map((k) => v.ledger.filter((r) => r.ranks[k] === 1).map((r) => r.nation)) as [number[], number[], number[]];
+    const mine = v.ledger.find((r) => r.nation === me);
+    v.chapters = [...v.chapters, { n: v.chapter.n, from: v.chapter.from, to: v.chapter.to, realm: me, growth: mine?.growth ?? [1, 1, 1], ranks: mine?.ranks ?? [1, 1, 1], realms: v.realms, leaders, leaderGrowth: [0, 1, 2].map((k) => v.ledger.find((r) => r.ranks[k] === 1)?.growth[k] ?? 1) as [number, number, number], ledger: v.ledger.map((r) => ({ nation: r.nation, growth: r.growth, ranks: r.ranks })), last: false }];
+    watchChapter();
     renderPanel();
   },
   /** The camera as x, y and zoom, to check that selecting moves nothing (SHELL-138). */
