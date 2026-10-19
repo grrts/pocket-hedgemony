@@ -15,6 +15,8 @@ const regionsDir = join(dir, "regions");
 const present: string[] = existsSync(regionsDir) ? readdirSync(regionsDir).filter((k) => statSync(join(regionsDir, k)).isDirectory()) : [];
 
 type Lonlat = [number, number];
+/** An owner-rule selector: the land a rule would pick, for places that must survive a new map. */
+type Selector = { countries: string[]; admin1?: string[]; regions?: string[]; bbox?: number[] };
 type Region = {
   key: string;
   nations: { id: string; name: string; capital: Lonlat; color?: string }[];
@@ -23,7 +25,7 @@ type Region = {
   relations: { relations: { id: string; source: string; target: string }[]; facts?: { id: string; source: string; target: string }[]; entities?: { id: string; name: string }[] };
   subjects: { subjects: [string, string, string, string, number | null][]; stances?: [string, string, string][] };
   culture: { tongues?: Record<string, { name: string; family: string; way_of_life: string }>; realms: Record<string, { court: string; mix: [string, number][]; local: Record<string, unknown>; faith?: string }> };
-  sleeping: { realms: { id: string; name: string; capital: string | Lonlat; home: (string | Lonlat)[] }[] };
+  sleeping: { realms: { id: string; name: string; capital: string | Lonlat; home: (string | Lonlat | Selector)[] }[] };
 };
 
 const read = (key: string, file: string, empty: unknown) => {
@@ -48,7 +50,8 @@ const known = (id: string) => nationIds.has(id) || sleepingIds.has(id) || entity
 const tongues = new Set([...Object.keys(culture1444.tongues), ...regions.flatMap((r) => Object.keys(r.culture.tongues ?? {}))]);
 const provinceIds = new Set((provinces1444 as { id: string }[]).map((p) => p.id));
 const isLonlat = (c: unknown) => Array.isArray(c) && c.length === 2 && Math.abs(c[0]) <= 180 && Math.abs(c[1]) <= 90;
-const place = (c: string | Lonlat) => (typeof c === "string" ? provinceIds.has(c) : isLonlat(c));
+const place = (c: string | Lonlat | Selector) =>
+  typeof c === "string" ? provinceIds.has(c) : Array.isArray(c) ? isLonlat(c) : Array.isArray(c?.countries) && c.countries.length > 0;
 
 describe("the 1378 scenario (X-25)", () => {
   it("starts on 20 September 1378 in Era I", () => {
