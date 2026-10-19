@@ -159,6 +159,8 @@ export interface World extends LivingState, TreasuryState, FoodState, MoodState,
   provinceOfficialFrom: Int16Array;
   /** 1 while a province the player has just taken waits for him to fill its post, grant it or keep it royal (PROV-340). */
   provinceNewLand: Uint8Array;
+  /** 1 where the player has turned Auto-fill posts off, so his realm's empty posts wait for him (PROV-342). */
+  nationManualPosts: Uint8Array;
   /** Province each commander was commissioned from, -1 = none. */
   commanderHome: number[];
   /** Name seed of each commander commissioned from an official, -1 = none. */

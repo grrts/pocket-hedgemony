@@ -494,6 +494,13 @@ document.addEventListener("click", (e) => {
     renderPanel();
   });
 });
+// Auto-fill posts on or off, and Fill all, on the Officials tab (PROV-348).
+document.addEventListener("click", (e) => {
+  const t = e.target as HTMLElement;
+  const auto = t.closest<HTMLButtonElement>("[data-auto-fill]");
+  if (auto) void act({ type: "autoFillPosts", on: auto.dataset.autoFill === "1" }).then(() => renderPanel());
+  if (t.closest("[data-fill-posts]")) void act({ type: "fillPosts" }).then(() => renderPanel());
+});
 // New land kept as royal land with its post empty (PROV-340).
 document.addEventListener("click", (e) => {
   const b = (e.target as HTMLElement).closest<HTMLButtonElement>("[data-settle]");
@@ -4169,7 +4176,7 @@ function renderOfficial(pi: number): void {
   }));
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(o.name)}</h2>${closeButton()}</header>
-    ${officialScreen(rules, o, me, COMMISSION_GOLD, s.nationTreasury[me]!, moves, movesAll || options.length <= 6, titlesOf(me))}
+    ${officialScreen(rules, o, me, COMMISSION_GOLD, s.nationTreasury[me]!, moves, movesAll || options.length <= 6, titlesOf(me), s.posts.fit[pi] ?? null)}
     <button class="back" data-back>${icon("scroll", 2)}Back to the officials</button>`;
   bindClose();
   showPanel(true);
@@ -4191,6 +4198,33 @@ function renderOfficial(pi: number): void {
       });
     }),
   );
+  // Replace him with the best fit in one step; the screen turns into the new official's own (PROV-345).
+  panel.querySelector<HTMLButtonElement>("[data-replace]")?.addEventListener("click", (e) => {
+    const b = e.currentTarget as HTMLButtonElement;
+    if (b.disabled) return;
+    void act({ type: "dismissOfficial", province: pi, hire: { official: Number(b.dataset.replaceType), foreign: b.dataset.replaceForeign === "1" } }).then(() => {
+      if (!snapshot || snapshot.rejectedOrders.length) return;
+      newsView = false;
+      panel.scrollTop = 0;
+      renderPanel();
+    });
+  });
+  // Dismiss asks once more in place, so a stray tap does not lose him (PROV-351); then the post's screen follows.
+  panel.querySelector<HTMLButtonElement>("[data-dismiss]")?.addEventListener("click", (e) => {
+    const b = e.currentTarget as HTMLButtonElement;
+    if (!b.dataset.confirm) {
+      b.dataset.confirm = "1";
+      b.classList.add("wax");
+      b.textContent = `Dismiss ${o.name}? Yes`;
+      return;
+    }
+    void act({ type: "dismissOfficial", province: pi }).then(() => {
+      if (!snapshot || snapshot.rejectedOrders.length) return;
+      newsView = false;
+      panel.scrollTop = 0;
+      renderPanel();
+    });
+  });
   panel.querySelector("[data-back]")?.addEventListener("click", () => {
     officialView = -1;
     realmView = s.playerNation;
@@ -4224,7 +4258,7 @@ function renderPost(pi: number): void {
   const hires = OFFICIALS.map((t, type) => ({ type, home: home.has(t) }));
   panel.innerHTML = `
     <header><h2 class="ribbon">Post at ${esc(provinces[pi]!.name)}</h2>${closeButton()}</header>
-    ${postScreen(rules, pi, moves, movesAll || options.length <= 4, hires, { home: hireGold(false), foreign: hireGold(true) }, s.nationTreasury[me]!, titlesOf(me))}
+    ${postScreen(rules, pi, moves, movesAll || options.length <= 4, hires, { home: hireGold(false), foreign: hireGold(true) }, s.nationTreasury[me]!, titlesOf(me), s.posts.fit[pi] ?? null)}
     <button class="back" data-back>${icon("scroll", 2)}Back to the officials</button>`;
   bindClose();
   showPanel(true);
@@ -5775,7 +5809,7 @@ function renderRealm(r: number): void {
     : realmTab === "lords" ? realmLords(r)
     : realmTab === "provinces" ? provincesTab(r)
     : realmTab === "learning" && s?.research ? learningTab(rules, s.research, s.nationTreasury[r]!, learningUi)
-    : realmTab === "officials" ? officialsTab(rules, own.filter((i) => s!.provinceLord[i]! < 0).map((i) => ({ province: i, official: officialOf(s!, i, r) })), r, own.filter((i) => s!.provinceLord[i]! >= 0).length, r === s!.playerNation ? s!.newLands : [], titlesOf(r))
+    : realmTab === "officials" ? officialsTab(rules, own.filter((i) => s!.provinceLord[i]! < 0).map((i) => ({ province: i, official: officialOf(s!, i, r) })), r, own.filter((i) => s!.provinceLord[i]! >= 0).length, r === s!.playerNation ? s!.newLands : [], titlesOf(r), r === s!.playerNation ? s!.posts : null)
     : general;
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(n.name)}</h2>${closeButton()}</header>

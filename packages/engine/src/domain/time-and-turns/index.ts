@@ -348,6 +348,12 @@ export function orderShape(order: Order): string {
       return "hire an official";
     case "settleLand":
       return "keep new land as royal land";
+    case "dismissOfficial":
+      return "dismiss an official";
+    case "autoFillPosts":
+      return "turn auto-fill of posts on or off";
+    case "fillPosts":
+      return "fill every empty post";
     case "answerRevolution":
       return "answer the revolution";
     case "setStudy":
