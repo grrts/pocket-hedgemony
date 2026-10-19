@@ -338,6 +338,8 @@ export function orderShape(order: Order): string {
       return "repay a loan";
     case "gift":
       return "give a lord gold";
+    case "callLords":
+      return "call the lords to war";
     case "grantFief":
       return "grant a fief";
     case "seizeFief":
@@ -450,6 +452,8 @@ export function orderShape(order: Order): string {
       return "act in the Shogunate";
     case "tribes":
       return "act on a hunting ground";
+    case "quarantine":
+      return "close or open province against plague";
     case "keepPlaying":
       return "keep playing after a win";
     case "playOn":

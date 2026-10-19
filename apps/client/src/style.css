@@ -3916,6 +3916,26 @@ button.paper.over {
   margin-top: 0;
   color: var(--cloth);
 }
+/* The plague card on a province's Overview (PROV-361): the step in words, the dead, and a full-width Quarantine button. */
+.plague-card {
+  padding: 6px 8px;
+  margin: 6px 0 8px;
+  border-left: 4px dashed var(--cloth);
+}
+.plague-card .sub {
+  margin-top: 0;
+}
+.plague-card p {
+  margin: 0 0 6px;
+}
+.plague-card .plague-toggle {
+  width: 100%;
+  flex-wrap: wrap;
+  gap: 2px 8px;
+}
+.plague-card .plague-toggle small {
+  color: var(--ink-soft);
+}
 .rising dl.facts dd small {
   display: block;
   color: var(--ink-soft);
@@ -6582,6 +6602,19 @@ details.pow-line > .hint {
 }
 .league-members button.realm-link {
   min-height: 44px;
+}
+
+/* Lords' men in the Army tab (WAR-259 to WAR-262): one full-width call, rows with 44-point buttons. */
+button[data-call-lords] {
+  width: 100%;
+  margin: 4px 0;
+}
+.retinue-sum {
+  margin: 4px 0;
+}
+.retinue-row .army-buttons button.small {
+  min-height: 44px;
+  min-width: 44px;
 }
 
 /* ---- Your realm's six sections (SHELL-165..167, ui-review): one row of icons with names under the title, and the

@@ -18,6 +18,8 @@ export interface OverviewInput {
   newLands: number;
   risings: number;
   verdicts: number;
+  /** Provinces with plague (PROV-362). */
+  sick?: number;
   /** Settlers or asks waiting on a tribal realm's Hunting grounds (TRIBE-027). */
   huntWaits: number;
   armies: number;
@@ -64,12 +66,14 @@ function tile(section: string, v: OverviewInput): OverviewTile {
           ? `${plural(v.verdicts, "beaten rising")} to judge`
           : v.risings
             ? `${plural(v.risings, "uprising")}`
-            : v.huntWaits
+            : v.sick
+              ? `Plague in ${plural(v.sick, "province")}`
+              : v.huntWaits
               ? "Settlers wait on your grounds"
               : null;
       return {
         section,
-        page: v.newLands ? "Officials" : v.verdicts || v.risings ? "Provinces" : v.huntWaits ? "Hunting grounds" : "Provinces",
+        page: v.newLands ? "Officials" : v.verdicts || v.risings || v.sick ? "Provinces" : v.huntWaits ? "Hunting grounds" : "Provinces",
         line: plural(v.provinces, "province"),
         note: `${num(v.people)} people`,
         needs,

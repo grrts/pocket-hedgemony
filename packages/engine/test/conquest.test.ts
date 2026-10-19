@@ -22,6 +22,8 @@ const wrong = (w: World, holder: string, other: string, key: string) => dip.ledg
 function setStrength(w: World, n: number, men: number): void {
   for (let i = 0; i < w.armies.count; i++) if (w.armies.owner[i] === n) w.armies.alive[i] = 0;
   w.nationLevies[n] = men;
+  // Its lords bring nothing: the levies are all of its strength (WAR-252).
+  w.nationLordsMen[n] = 0;
   w.nationTroopCap[n] = 1e9;
   w.nationCapUsed[n] = 0;
 }

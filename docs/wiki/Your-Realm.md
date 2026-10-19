@@ -162,7 +162,7 @@ The lord card is the same in every society; only the label changes: nobles, merc
 
 **Where you find them.** Open a province and the first thing on it is who governs it: its lord, with his loyalty and buttons to open him or seize the land, or *Royal land* with a **Grant as fief** button that lists your lords, neighbours first. Its official sits under him; a lord's official serves the lord, so you can't make him a commander. The country card's **Lords** tab is the overview: how much of the realm is royal land, and a row per lord with his portrait, house, lands and loyalty. Tap a lord to open his screen: his lands as a list, a gift while he is not loyal, royal provinces you can grant him (nearest first), and **Show his lands on the map**, which fades the rest of the map and frames his provinces. On the map a lord's land always carries a fine pattern of crosses and a dashed border, and the **Lords** map mode colours each of your lords' lands in his own colour.
 
-**Lords versus officials.** A lord costs no gold, but keeps half the taxes of his provinces and keeps their recruits as his retinue. He obeys according to his loyalty, and can be removed only by force, a trial or his line dying out.
+**Lords versus officials.** A lord costs no gold, but keeps half the taxes of his provinces and keeps their recruits as his retinue. He obeys according to his loyalty, and can be removed only by force, a trial or his line dying out. At war you call his retinue from the Army tab or his screen, and he leads it himself (see [Warfare](Warfare)); each row of the Lords tab shows his men's state beside his loyalty.
 
 **How you gain lords:**
 
@@ -252,7 +252,7 @@ The details live in [Recruiting](Recruiting), [Warfare](Warfare) and [Naval](Nav
 | Your heir | General tab, beside the ruler | Your ruler has no heir until a child is born; die then, and the lords dispute the throne. Abroad, a ruler who dies without a son may give married houses a claim |
 | A lord | His row on the Lords tab; his age and heir on his screen | His heir takes his lands, loyalty and want; with no heir, a kinsman of his house half the time. Otherwise his line dies out and his lands come back to you as royal land, with their posts empty |
 | An official | His card on the province and the Officials tab | His post stands empty: fill it from the province card. AI realms and lords fill theirs at once |
-| A commander or admiral | With his skills on the Military tab and the army card | He leaves your service and his army or fleet has no commander until you name another. Past 60 his Might falls, past 65 his Cunning |
+| A commander or admiral | With his skills on the Military tab and the army card | He leaves your service and his army or fleet has no commander until you name another. Past 60 his Might falls, past 65 his Cunning. A lord leading his own retinue is the lord himself: if he falls, his heir leads the men on, and with no heir they go home |
 | A colonial governor | The Exploration tab | His colony is lost if he was founding one |
 
 Each death in your realm reaches your dispatches in one line saying what follows.
