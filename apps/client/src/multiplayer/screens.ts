@@ -11,31 +11,42 @@ const esc = (s: string) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
 
 /**
  * The Multiplayer dialog over the start screen: Pass and play on this device,
- * or an online game to host, join or come back to.
+ * or an online game to host, join by its code, or come back to. No list of
+ * every game: there may be thousands, and a friend's game is found by its code.
  */
-export function menuHtml(look: RealmLook, games: OnlineGame[] | null, reach: "online" | "this browser" | null, device: { lastCode: string | null }): string {
-  const open = (games ?? []).filter((g) => !g.started);
-  const started = (games ?? []).filter((g) => g.started);
-  const row = (g: OnlineGame) =>
-    g.started
-      ? `<div class="mp-game"><span class="mp-code">${esc(g.code)}</span><span class="mp-realms">${g.humans.map((r) => look.pennant(r)).join("")}</span><span class="mp-rejoin">${g.humans
-          .map((r) => `<button class="paper" data-mp-rejoin="${esc(g.code)}" data-realm="${esc(r)}" title="Come back to game ${esc(g.code)} as ${esc(look.name(r))}">${look.pennant(r)}${esc(look.name(r))}</button>`)
-          .join("")}</span></div>`
-      : `<button class="paper mp-game" data-mp-join="${esc(g.code)}"><span class="mp-code">${esc(g.code)}</span>${look.pennant(g.host)}<span>${esc(look.name(g.host))}'s game<small>tap to choose your realm</small></span></button>`;
+export function menuHtml(
+  look: RealmLook,
+  o: { reach: "online" | "this browser" | null; canWrite: boolean | null; mine: { code: string; realm: string }[]; message: string | null; busy: boolean },
+): string {
+  const online =
+    o.reach === null
+      ? `<p class="mp-note">Looking for the shared table…</p>`
+      : o.canWrite === false
+        ? `<p class="mp-note mp-bad">You can open this page but not write to it, so you cannot sit at an online game. The page's owner can invite you by email as an Editor (the page must not also be shared by a public link).</p>`
+        : `<p class="mp-note">${o.reach === "online" ? "Host a game and share its code, or type a friend's code." : "No shared table here: games reach only other tabs of this browser. Open the published game to play across devices."}</p>
+    <button class="paper" data-mp="host" ${o.busy ? "disabled" : ""}>${icon("castle", 2)}<span><b>Host a game</b><small>choose your realm, then share the code</small></span></button>
+    <form class="mp-join" data-mp-join-form>
+      <label for="mp-code-input">Join a game</label>
+      <input id="mp-code-input" name="code" class="paper" placeholder="CODE" maxlength="5" autocomplete="off" autocapitalize="characters" spellcheck="false" enterkeyhint="go" required ${o.busy ? "disabled" : ""}>
+      <button class="wax" type="submit" ${o.busy ? "disabled" : ""}>Join</button>
+    </form>
+    ${o.message ? `<p class="mp-note mp-bad" role="alert">${esc(o.message)}</p>` : ""}
+    ${
+      o.mine.length
+        ? `<h3>Your games</h3><div class="mp-games">${o.mine
+            .map(
+              (g) =>
+                `<button class="paper mp-game" data-mp-rejoin="${esc(g.code)}" data-realm="${esc(g.realm)}" ${o.busy ? "disabled" : ""}><span class="mp-code">${esc(g.code)}</span>${look.pennant(g.realm)}<span>${esc(look.name(g.realm))}<small>tap to continue</small></span></button>`,
+            )
+            .join("")}</div>`
+        : ""
+    }`;
   return `<div class="start-more mp-menu framed" role="dialog" aria-label="Multiplayer">
     <header><h2 class="ribbon">Multiplayer</h2><span class="panel-buttons"><button class="close" data-mp="close" aria-label="Close">${icon("close", 2)}</button></span></header>
     <p class="mp-note">Everyone plans the same week at once; when all are ready, the orders are carried out together and the week plays.</p>
     <button class="wax" data-mp="hotseat">${icon("crown", 2)}<span><b>Pass and play</b><small>2 to 4 realms on this device</small></span></button>
     <h3>Online</h3>
-    ${
-      reach === null
-        ? `<p class="mp-note">Looking for the shared table…</p>`
-        : `<p class="mp-note">${reach === "online" ? "Games are shared with everyone who can open this page." : "No shared table here: games reach only other tabs of this browser. Open the published game to play across devices."}</p>
-    <button class="paper" data-mp="host">${icon("castle", 2)}<span><b>Host a game</b><small>choose your realm, then share the code</small></span></button>
-    ${open.length ? `<div class="mp-games" aria-label="Games to join">${open.map(row).join("")}</div>` : `<p class="mp-note">No open games yet.</p>`}
-    ${started.length ? `<h3>Games under way</h3><div class="mp-games">${started.map(row).join("")}</div>` : ""}
-    ${device.lastCode ? `<p class="mp-note">Last game on this device: ${esc(device.lastCode)}.</p>` : ""}`
-    }
+    ${online}
   </div>`;
 }
 
@@ -43,7 +54,7 @@ export function menuHtml(look: RealmLook, games: OnlineGame[] | null, reach: "on
 export function lobbyHtml(look: RealmLook, game: OnlineGame, seats: Seat[], me: string, closeButtons: string): string {
   const host = game.host === me;
   return `<header><h2 class="ribbon">Game ${esc(game.code)}</h2>${closeButtons}</header>
-    <p class="mp-note">Share the code <b>${esc(game.code)}</b>: others open Multiplayer, tap this game and choose a realm.</p>
+    <p class="mp-note">Share the code <b class="mp-code">${esc(game.code)}</b>: others open Multiplayer, type it under Join a game and choose a realm.</p>
     <ul class="mp-players">${seats
       .map((s) => `<li>${look.pennant(s.realm)}<b>${esc(look.name(s.realm))}</b><small>${s.realm === me ? "you" : s.realm === game.host ? "host" : "ready to start"}</small></li>`)
       .join("")}</ul>

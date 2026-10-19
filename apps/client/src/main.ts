@@ -97,7 +97,7 @@ import { provinceLevy } from "@ph/engine/domain/recruiting";
 import { musicFacts, newFactMemory, playerPalette, playerWars, remember, type FactMemory } from "./audio/facts.ts";
 import { COMMISSION_GOLD, hireGold, OFFICIALS, resolutionOrder, Rng, type PlayerOrders } from "@ph/engine";
 import { mpStore, type MpStore } from "./multiplayer/store.ts";
-import { deviceId, hostGame, remember as rememberGame, remembered, sendTurn, startOnline, takeSeat, watchGame, watchGames, watchSeats, watchTurns, type OnlineGame, type Seat, type TurnDoc } from "./multiplayer/lobby.ts";
+import { cleanCode, deviceId, findGame, forget as forgetGame, hostGame, remember as rememberGame, rememberedGames, seatOf, sendTurn, startOnline, takeSeat, watchGame, watchSeats, watchTurns, type OnlineGame, type Seat, type TurnDoc } from "./multiplayer/lobby.ts";
 import { hotseatPickHtml, lobbyHtml, menuHtml, playersHtml, type PlayerRow, type RealmLook } from "./multiplayer/screens.ts";
 import { SHELL as SHELL_RULES, endTurnInAuto, endTurnLabel, newAutoTurns, startColumn, startIcons, stopAuto, switchAuto, weekPlayed, type AutoStop, type Platform as ShellPlatform } from "@ph/engine/domain/game-shell";
 import { autosaveDue, continueTarget, longDate, newCampaign, newManualSave, savesConfig, type Campaign, type Platform as SavePlatform } from "@ph/engine/domain/saves";
@@ -378,11 +378,12 @@ let mpPicking: { kind: "hotseat"; chosen: string[] } | { kind: "host" } | { kind
 let mpLobby: { store: MpStore; game: OnlineGame; seats: Seat[]; realm: string; stop: () => void } | null = null;
 /** The Players card is open. */
 let mpView = false;
-/** The Multiplayer dialog over the start screen, and the games it lists. */
+/** The Multiplayer dialog over the start screen: the table it reaches, and what it last has to say. */
 let startMp = false;
-let mpGames: OnlineGame[] | null = null;
 let mpReach: MpStore["reach"] | null = null;
-let stopGames: (() => void) | null = null;
+let mpCanWrite: boolean | null = null;
+let mpMessage: string | null = null;
+let mpMenuBusy = false;
 /** Resolving or catching up a week: nothing else starts meanwhile. */
 let mpBusy = false;
 armyButton.addEventListener("click", () => {
@@ -5861,7 +5862,7 @@ function showStart(): void {
         .join("")}</div>
     </div>
     ${startMore ? startMoreHtml() : ""}
-    ${startMp ? menuHtml(mpLook, mpGames, mpReach, { lastCode: remembered()?.code ?? null }) : ""}
+    ${startMp ? menuHtml(mpLook, { reach: mpReach, canWrite: mpCanWrite, mine: rememberedGames(), message: mpMessage, busy: mpMenuBusy }) : ""}
     <span class="start-version">v${GAME_VERSION}</span>`;
   startEl.hidden = false;
   document.body.classList.add("starting");
@@ -6506,30 +6507,75 @@ const mpLook: RealmLook = {
 };
 const idOf = (n: number) => nations[n]!.id;
 
-/** The Multiplayer dialog over the start screen, with the online games kept up to date. */
-function openMpMenu(): void {
+/** The Multiplayer dialog over the start screen. */
+function openMpMenu(message: string | null = null): void {
   startMp = true;
   startMore = false;
+  mpMessage = message;
+  mpMenuBusy = false;
   showStart();
-  if (stopGames) return;
+  if (mpReach) return;
   void mpStore().then((store) => {
     mpReach = store.reach;
-    stopGames = watchGames(store, (games) => {
-      mpGames = games;
-      if (startMp && !startEl.hidden) showStart();
-    });
-    if (startMp) showStart();
+    mpCanWrite = store.canWrite;
+    if (startMp && !startEl.hidden) showStart();
   });
 }
 
 function closeMpMenu(): void {
   startMp = false;
-  stopGames?.();
-  stopGames = null;
+  mpMessage = null;
 }
 
+/** A failed write to the table, in the player's words. */
+function mpFailure(e: unknown): string {
+  const code = (e as { code?: string })?.code;
+  if (code === "invalid_argument" || code === "not_granted" || code === "revoked")
+    return "This page did not let you write to the table: you can open it but not play online. The page's owner can invite you by email as an Editor.";
+  if (code === "quota_exceeded") return "The table is full: no new games fit on this page.";
+  return `The table did not answer (${e instanceof Error ? e.message : (code ?? String(e))}). Try again.`;
+}
+
+/** Looks up a game by its code, then sits down in it, comes back to it, or says why not. */
+async function mpOpenCode(code: string, realm: string | null): Promise<void> {
+  mpMenuBusy = true;
+  mpMessage = null;
+  showStart();
+  try {
+    const store = await mpStore();
+    const game = await findGame(store, code);
+    if (!game) return openMpMenu(`No game ${code} on this table. Check the code with its host.`);
+    if (game.started) {
+      const mine = realm && game.humans.includes(realm) ? realm : rememberedGames().find((g) => g.code === code && game.humans.includes(g.realm))?.realm;
+      if (!mine) return openMpMenu(`Game ${code} has already started without you.`);
+      closeMpMenu();
+      hideStart();
+      await joinOnline(store, game, mine);
+      return;
+    }
+    closeMpMenu();
+    hideStart();
+    if (realm && (await seatOf(store, code, realm))?.device === deviceId()) return enterLobby(store, game, realm);
+    mpPicking = { kind: "join", code };
+    selectedProvince = -1;
+    renderPanel();
+  } catch (e) {
+    openMpMenu(mpFailure(e));
+  }
+}
+
+startEl.addEventListener("submit", (e) => {
+  const form = (e.target as HTMLElement).closest<HTMLFormElement>("[data-mp-join-form]");
+  if (!form) return;
+  e.preventDefault();
+  const typed = new FormData(form).get("code")?.toString() ?? "";
+  const code = cleanCode(typed);
+  if (!code) return openMpMenu(`"${typed}" is not a game code: codes are four or five letters.`);
+  void mpOpenCode(code, null);
+});
+
 startEl.addEventListener("click", (e) => {
-  const b = (e.target as HTMLElement).closest<HTMLElement>("[data-mp], [data-mp-join], [data-mp-rejoin]");
+  const b = (e.target as HTMLElement).closest<HTMLElement>("[data-mp], [data-mp-rejoin]");
   if (!b) return;
   if (b.dataset.mp === "close") {
     closeMpMenu();
@@ -6537,14 +6583,10 @@ startEl.addEventListener("click", (e) => {
     return;
   }
   if (b.dataset.mpRejoin) {
-    const code = b.dataset.mpRejoin;
-    const game = mpGames?.find((g) => g.code === code);
-    closeMpMenu();
-    hideStart();
-    if (game) void mpStore().then((store) => joinOnline(store, game, b.dataset.realm!));
+    void mpOpenCode(b.dataset.mpRejoin, b.dataset.realm!);
     return;
   }
-  mpPicking = b.dataset.mpJoin ? { kind: "join", code: b.dataset.mpJoin } : b.dataset.mp === "host" ? { kind: "host" } : { kind: "hotseat", chosen: [] };
+  mpPicking = b.dataset.mp === "host" ? { kind: "host" } : { kind: "hotseat", chosen: [] };
   closeMpMenu();
   hideStart();
   selectedProvince = -1;
@@ -6586,28 +6628,35 @@ async function mpSit(id: string): Promise<void> {
   const store = await mpStore();
   const pick = mpPicking;
   if (!pick || pick.kind === "hotseat") return;
-  if (pick.kind === "host") {
-    enterLobby(store, await hostGame(store, id), id);
-    return;
+  try {
+    if (pick.kind === "host") {
+      enterLobby(store, await hostGame(store, id), id);
+      return;
+    }
+    const seat = await seatOf(store, pick.code, id);
+    if (seat && seat.device !== deviceId()) {
+      alertPlayer(`${nationNameOf(id)} is taken in game ${pick.code}: choose another realm.`, "crown");
+      return;
+    }
+    const game = await findGame(store, pick.code);
+    if (!game || game.started) {
+      alertPlayer(game ? `Game ${pick.code} started without you.` : `Game ${pick.code} is gone.`, "crown");
+      return;
+    }
+    await takeSeat(store, pick.code, id);
+    enterLobby(store, game, id);
+  } catch (e) {
+    // Say why, where the player is looking: a write the table refused used to fail silently.
+    mpPicking = null;
+    renderPanel();
+    openMpMenu(mpFailure(e));
   }
-  const seat = (await store.get(`mp/${pick.code}/seats/${id}`)) as Seat | null;
-  if (seat && seat.device !== deviceId()) {
-    alertPlayer(`${nationNameOf(id)} is taken in game ${pick.code}: choose another realm.`, "crown");
-    return;
-  }
-  const game = (await store.get(`mp/${pick.code}`)) as OnlineGame | null;
-  if (!game) {
-    alertPlayer(`Game ${pick.code} is gone.`, "crown");
-    return;
-  }
-  await takeSeat(store, pick.code, id);
-  enterLobby(store, game, id);
 }
 
 function enterLobby(store: MpStore, game: OnlineGame, realm: string): void {
   mpPicking = null;
   selectedProvince = -1;
-  rememberGame({ code: game.code, realm });
+  rememberGame(game.code, realm);
   const stops: (() => void)[] = [];
   mpLobby = { store, game, seats: [], realm, stop: () => stops.forEach((f) => f()) };
   stops.push(
@@ -6642,8 +6691,12 @@ function renderMpLobby(): void {
     renderPanel();
   });
   panel.querySelector<HTMLButtonElement>("[data-mp-start]")?.addEventListener("click", (e) => {
-    (e.currentTarget as HTMLButtonElement).disabled = true;
-    void startOnline(l.store, l.game, l.seats);
+    const button = e.currentTarget as HTMLButtonElement;
+    button.disabled = true;
+    startOnline(l.store, l.game, l.seats).catch((err: unknown) => {
+      button.disabled = false;
+      alertPlayer(mpFailure(err), "crown");
+    });
   });
   showPanel(true, "crown");
 }
@@ -6682,7 +6735,7 @@ async function startMpGame(seed: number, humanIds: string[], me: string, mode: M
 
 /** Opens an online game that has started, as one of its realms: the weeks already played are played again here. */
 async function joinOnline(store: MpStore, game: OnlineGame, realm: string): Promise<void> {
-  rememberGame({ code: game.code, realm });
+  rememberGame(game.code, realm);
   await startMpGame(game.seed, game.humans, realm, "online", { store, game });
 }
 
@@ -6876,7 +6929,7 @@ function renderMpPlayers(): void {
   bindClose();
   panel.querySelector("[data-mp-leave]")!.addEventListener("click", () => {
     m.online?.stop();
-    rememberGame(null);
+    if (m.online) forgetGame(m.online.game.code);
     location.reload();
   });
   showPanel(true);

@@ -63,10 +63,16 @@ async function online() {
   await a.click("[data-mp=host]");
   await a.click("[data-nation=castile]");
   await a.waitForSelector("[data-mp-start]");
+  const code = (await a.textContent(".mp-code")).trim();
   await b.click("[data-start=multiplayer]");
-  await b.waitForSelector("[data-mp-join]");
-  await b.screenshot({ path: `${out}/online-1-join-list.png` });
-  await b.click("[data-mp-join]");
+  await b.waitForSelector("[data-mp-join-form] input:not([disabled])");
+  await b.fill("#mp-code-input", "zzzzz");
+  await b.click("[data-mp-join-form] button");
+  await b.waitForSelector(".mp-menu [role=alert]");
+  await b.evaluate(() => (document.querySelector(".mp-menu").scrollTop = 1e4));
+  await b.screenshot({ path: `${out}/online-1-wrong-code.png` });
+  await b.fill("#mp-code-input", code.toLowerCase());
+  await b.click("[data-mp-join-form] button");
   await b.click("[data-nation=france]");
   await a.waitForSelector("[data-mp-start]:not([disabled])");
   await a.screenshot({ path: `${out}/online-2-lobby.png` });
@@ -85,13 +91,15 @@ async function online() {
     check(sa.hash === sb.hash && !sa.outOfStep && !sb.outOfStep, `online week ${week}: both devices agree (${sa.hash} / ${sb.hash})`);
   }
   await a.screenshot({ path: `${out}/online-4-after.png` });
-  // Coming back: a third tab rejoins as France and plays the weeks again to the same world.
+  // Coming back: a third tab comes back from Your games and plays the weeks again to the same world.
   const c = await context.newPage();
   await c.goto(base);
   await ready(c);
   await c.click("[data-start=multiplayer]");
-  await c.waitForSelector("[data-mp-rejoin][data-realm=france]");
-  await c.click("[data-mp-rejoin][data-realm=france]");
+  await c.waitForSelector("[data-mp-rejoin]");
+  await c.evaluate(() => (document.querySelector(".mp-menu").scrollTop = 1e4));
+  await c.screenshot({ path: `${out}/online-5-your-games.png` });
+  await c.click("[data-mp-rejoin]");
   await c.waitForFunction(() => globalThis.__phMp()?.turn === 3, null, { timeout: 120000 });
   check((await mpState(c)).hash === (await mpState(a)).hash, "online: a device coming back catches up to the same world");
   await context.close();

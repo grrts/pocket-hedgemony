@@ -6097,27 +6097,40 @@ details.pow-line > .hint {
   gap: 6px;
 }
 
-div.mp-game {
-  flex-wrap: wrap;
-  padding: 4px 0;
-  border-top: 2px dashed var(--ink-soft);
-}
-
 .mp-code {
   font: 600 22px/1 var(--body);
   letter-spacing: 2px;
   color: var(--cloth);
 }
 
-.mp-rejoin {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  width: 100%;
+/* Join a game: the code and its button on one row. */
+.mp-join {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 8px;
+  align-items: end;
 }
 
-.mp-rejoin button {
+.mp-join label {
+  grid-column: 1 / -1;
+  font: 600 20px/1 var(--body);
+}
+
+.mp-join input {
+  min-width: 0;
   min-height: 44px;
+  padding: 0 8px;
+  border: 3px solid var(--outline);
+  background: var(--paper-light);
+  font: 600 24px/1 var(--body);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.mp-join button {
+  min-height: 44px;
+  min-width: 88px;
 }
 
 .mp-note {

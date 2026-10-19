@@ -2,9 +2,12 @@ import type { PlayerOrders } from "@ph/engine";
 import type { MpStore } from "./store.ts";
 
 /**
- * An online game in the shared store: `mp/<code>` holds the game, its seats
- * are `mp/<code>/seats/<realm>`, and each player's orders for a week are
- * `mp/<code>/turns/<week>-<realm>`, written once when they press Ready.
+ * An online game in the shared store. Nothing lists every game: a player
+ * reaches one by its code, so the table holds any number of them.
+ *   mp/<code>                  the game (host, seed, realms once started)
+ *   mp/<code>/players/<realm>  one realm's seat and every week's orders
+ * A game is 1 + up to 4 documents, whatever its length: the store's cap is in
+ * documents, so the orders are packed into the player's one document.
  */
 export interface OnlineGame {
   code: string;
@@ -23,6 +26,11 @@ export interface Seat {
   at: number;
 }
 
+/** A realm's document: its seat and its orders, week by week. */
+interface PlayerDoc extends Seat {
+  weeks: Record<string, { orders: PlayerOrders; hash: string }>;
+}
+
 export interface TurnDoc {
   turn: number;
   realm: string;
@@ -39,27 +47,45 @@ export function deviceId(): string {
     if (!id) sessionStorage.setItem("ph-mp-device", (id = Math.random().toString(36).slice(2, 10)));
     return id;
   } catch {
-    return (deviceId.fallback ??= Math.random().toString(36).slice(2, 10));
+    return (deviceId.fallback ||= Math.random().toString(36).slice(2, 10));
   }
 }
 deviceId.fallback = "" as string;
 
-/** A game's four-letter code, without letters that read alike (I, O). */
+/** Letters for codes, without those that read alike (I, O). */
+const LETTERS = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+
+/** A game's code: five letters, about eight million of them. */
 function newCode(): string {
-  const letters = "ABCDEFGHJKLMNPQRSTUVWXYZ";
-  return Array.from({ length: 4 }, () => letters[Math.floor(Math.random() * letters.length)]).join("");
+  return Array.from({ length: 5 }, () => LETTERS[Math.floor(Math.random() * LETTERS.length)]).join("");
+}
+
+/** What a player typed, as a code: letters only, upper case; null when it cannot be one. */
+export function cleanCode(typed: string): string | null {
+  const c = typed.toUpperCase().replace(/[^A-Z]/g, "");
+  return c.length >= 4 && c.length <= 5 && [...c].every((x) => LETTERS.includes(x)) ? c : null;
 }
 
 export async function hostGame(store: MpStore, realm: string): Promise<OnlineGame> {
-  const game: OnlineGame = { code: newCode(), seed: Math.floor(Math.random() * 2 ** 31), host: realm, created: Date.now(), humans: [], started: false };
+  let code = newCode();
+  for (let tries = 0; tries < 5 && (await store.get(`mp/${code}`)); tries++) code = newCode();
+  const game: OnlineGame = { code, seed: Math.floor(Math.random() * 2 ** 31), host: realm, created: Date.now(), humans: [], started: false };
   await store.set(`mp/${game.code}`, { ...game });
   await takeSeat(store, game.code, realm);
   return game;
 }
 
+export async function findGame(store: MpStore, code: string): Promise<OnlineGame | null> {
+  return (await store.get(`mp/${code}`)) as OnlineGame | null;
+}
+
+export async function seatOf(store: MpStore, code: string, realm: string): Promise<Seat | null> {
+  return (await store.get(`mp/${code}/players/${realm}`)) as Seat | null;
+}
+
 export async function takeSeat(store: MpStore, code: string, realm: string): Promise<void> {
-  const seat: Seat = { realm, device: deviceId(), at: Date.now() };
-  await store.set(`mp/${code}/seats/${realm}`, { ...seat });
+  const doc: PlayerDoc = { realm, device: deviceId(), at: Date.now(), weeks: {} };
+  await store.set(`mp/${code}/players/${realm}`, { ...doc });
 }
 
 /** The host starts the game with the realms seated now. */
@@ -67,54 +93,69 @@ export async function startOnline(store: MpStore, game: OnlineGame, seats: Seat[
   await store.set(`mp/${game.code}`, { ...game, humans: seats.map((s) => s.realm).sort(), started: true });
 }
 
+/** Adds a week's orders to the realm's document (only that realm's device writes it). */
 export async function sendTurn(store: MpStore, code: string, doc: TurnDoc): Promise<void> {
-  await store.set(`mp/${code}/turns/${doc.turn}-${doc.realm}`, { ...doc } as unknown as Record<string, unknown>);
+  const path = `mp/${code}/players/${doc.realm}`;
+  const was = ((await store.get(path)) as PlayerDoc | null) ?? { realm: doc.realm, device: doc.device, at: Date.now(), weeks: {} };
+  await store.set(path, { ...was, device: doc.device, weeks: { ...was.weeks, [doc.turn]: { orders: doc.orders, hash: doc.hash } } });
 }
 
-/** Games open to join, newest first; games older than two days are left out. */
-export function watchGames(store: MpStore, cb: (games: OnlineGame[]) => void): () => void {
-  return store.watch("mp", (docs) =>
+export function watchGame(store: MpStore, code: string, cb: (game: OnlineGame | null) => void): () => void {
+  return store.watchDoc(`mp/${code}`, (d) => cb(d as OnlineGame | null));
+}
+
+export function watchSeats(store: MpStore, code: string, cb: (seats: Seat[]) => void): () => void {
+  return store.watch(`mp/${code}/players`, (docs) =>
     cb(
       docs
-        .map((d) => d.data as unknown as OnlineGame)
-        .filter((g) => typeof g.code === "string" && Date.now() - g.created < 2 * 86400_000)
-        .sort((a, b) => b.created - a.created),
+        .map((d) => d.data as unknown as PlayerDoc)
+        .map(({ realm, device, at }) => ({ realm, device, at }))
+        .sort((a, b) => a.at - b.at),
     ),
   );
 }
 
-export function watchGame(store: MpStore, code: string, cb: (game: OnlineGame | null) => void): () => void {
-  return store.watch("mp", (docs) => cb((docs.find((d) => d.id === code)?.data as unknown as OnlineGame) ?? null));
-}
-
-export function watchSeats(store: MpStore, code: string, cb: (seats: Seat[]) => void): () => void {
-  return store.watch(`mp/${code}/seats`, (docs) => cb(docs.map((d) => d.data as unknown as Seat).sort((a, b) => a.at - b.at)));
-}
-
 export function watchTurns(store: MpStore, code: string, cb: (turns: TurnDoc[]) => void): () => void {
-  return store.watch(`mp/${code}/turns`, (docs) => cb(docs.map((d) => d.data as unknown as TurnDoc)));
+  return store.watch(`mp/${code}/players`, (docs) =>
+    cb(
+      docs.flatMap((d) => {
+        const p = d.data as unknown as PlayerDoc;
+        return Object.entries(p.weeks ?? {}).map(([turn, w]) => ({ turn: Number(turn), realm: p.realm, orders: w.orders, hash: w.hash, device: p.device }));
+      }),
+    ),
+  );
 }
 
-/** The online game this browser last sat down in, to come back to after a reload. */
+/** The online games this browser sat down in, newest first, to come back to. */
 export interface Remembered {
   code: string;
   realm: string;
+  at: number;
 }
 
-export function remember(r: Remembered | null): void {
+const KEY = "ph-mp-games";
+
+export function rememberedGames(): Remembered[] {
   try {
-    if (r) localStorage.setItem("ph-mp-last", JSON.stringify(r));
-    else localStorage.removeItem("ph-mp-last");
+    const v = JSON.parse(localStorage.getItem(KEY) ?? "[]") as Remembered[];
+    return Array.isArray(v) ? v : [];
+  } catch {
+    return [];
+  }
+}
+
+function keep(list: Remembered[]): void {
+  try {
+    localStorage.setItem(KEY, JSON.stringify(list.slice(0, 8)));
   } catch {
     /* private mode: nothing kept */
   }
 }
 
-export function remembered(): Remembered | null {
-  try {
-    const v = localStorage.getItem("ph-mp-last");
-    return v ? (JSON.parse(v) as Remembered) : null;
-  } catch {
-    return null;
-  }
+export function remember(code: string, realm: string): void {
+  keep([{ code, realm, at: Date.now() }, ...rememberedGames().filter((g) => g.code !== code)]);
+}
+
+export function forget(code: string): void {
+  keep(rememberedGames().filter((g) => g.code !== code));
 }
