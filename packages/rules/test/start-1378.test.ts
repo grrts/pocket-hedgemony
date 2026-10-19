@@ -18,7 +18,7 @@ describe("the 1378 start behind the dev switch (X-25)", () => {
     const awake = r.nations.filter((n) => !n.asleep);
     expect(awake.length).toBeGreaterThan(300);
     for (const n of awake) expect(owner.get(n.capital), n.id).toBe(n.id);
-    expect(r.map.provinceImage).toBe("map/1378/provinces.png");
+    expect(r.map?.provinceImage).toBe("map/1378/provinces.png");
   });
 
   it("names a ruler for every realm on the map", () => {
