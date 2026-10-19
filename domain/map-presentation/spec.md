@@ -271,13 +271,24 @@ How the player uses it
 - VIEW-130 (Ubiquitous): The overlay shall animate at most `maxAnimated` (60) figures at about 10 frames a second, the nearest the screen's centre first, from sprite caches keyed by piece, colour and whole `u` with least-recently-used eviction; towns cost the tiled tiers one extra texture read, and the budgets do not change (VIEW-054). [living-map-design §1.5, §6]
 - VIEW-131 (Ubiquitous): Town buildings shall take their culture group's style (`townStyles`: roof and wall colours from the 32-colour palette and a house variant set), with one generic set until a group has its own, and a hand-made landmark (`landmarks`, per province) replaces the generic keep or worship cell where one exists. [living-map-design §3.4]
 - VIEW-132 (Ubiquitous): The snapshot shall carry the busy trade paths the player may see for the living map: traders sharing a loop and a way of going (land, river or sea) are one path, with its loop province by province, its trader count, the realm of its first trader for the colours and one of the player's traders on it; a path is kept where its loop enters a province whose trade the player sees (D-TRADE-13), busiest first, at most `livingMap.traders.maxPaths` (200). A tap on a mover of a path the player has a trader on opens that trader's card in the Trade tab; others give way to the province beneath, as there is no card for another realm's trader. [living-map-design §4.3, §7]
-- VIEW-133 (Ubiquitous): In the living band, the figures, hulls, traders and tents, and the town tiles with their keeps, walls, markets and houses of worship, shall be drawn at twice the ground's art density (two by two of their pixels to each art pixel of the ground, 16 × 16 to a map pixel for town tiles), so castles, towns, boats and commanders show their detail at the size VIEW-102 sets; roads stay in the ground's own art pixels so they meet it, and the coarser sprites remain the icons further out (feedback 126, Leroy).
+- VIEW-134 (Ubiquitous): In the living band, the figures, hulls, traders and tents, and the town tiles with their keeps, walls, markets and houses of worship, shall be drawn at twice the ground's art density (two by two of their pixels to each art pixel of the ground, 16 × 16 to a map pixel for town tiles), so castles, towns, boats and commanders show their detail at the size VIEW-102 sets; roads stay in the ground's own art pixels so they meet it, and the coarser sprites remain the icons further out (feedback 126, Leroy).
 
 #### How the player uses it: the living map
 1. Where: the player pinches past the Local icons and nothing else is new. A tap on a town cell opens its province card, a tap on a formation or fleet its own card, a tap on a moving caravan the trade path's card; taps go to the piece first, then the province.
 2. Grouping: this is a way of drawing, not a new screen; each piece keeps its existing card, and the one new control, **Markers**, sits with the map mode buttons in the map controls.
 3. Overview: army sizes, sieges, battles and building works keep their overviews (the army list, the battle bar, the Works and Garrison tabs); in the band each has a picture (town states, figures lost, breaches) so the map alone still tells the story, and the numbers stay in the cards.
-4. Phone: every formation, fleet and caravan has a tap box of at least 44 points even when its figures are smaller; Markers brings back the plates for players who want the numbers, and the selected piece always shows its plate and route; nothing needs hover; plates and tap boxes stay inside the safe areas in the Wide and Tall layouts; pinching across 14 to 16 cross-fades with no pop. The detailed figures and town tiles (VIEW-133) draw at the screen's own pixels, so on a phone their half art pixels stay sharp and a figure keeps the size of the coarse one it replaced. At zoom 16 a phone held sideways shows about 53 × 22 map pixels, at 40 about 21 × 9 and at 96 about 9 × 4, one city.
+4. Phone: every formation, fleet and caravan has a tap box of at least 44 points even when its figures are smaller; Markers brings back the plates for players who want the numbers, and the selected piece always shows its plate and route; nothing needs hover; plates and tap boxes stay inside the safe areas in the Wide and Tall layouts; pinching across 14 to 16 cross-fades with no pop. The detailed figures and town tiles (VIEW-134) draw at the screen's own pixels, so on a phone their half art pixels stay sharp and a figure keeps the size of the coarse one it replaced. At zoom 16 a phone held sideways shows about 53 × 22 map pixels, at 40 about 21 × 9 and at 96 about 9 × 4, one city.
+
+### Realm names that never overlap (18 October 2026)
+Leroy's playtest: zoomed out, Portugal's name lay over Castile's and the Livonian Order's over Pskov's.
+
+- VIEW-133 (Ubiquitous): Zoomed out, no two realm names shall overlap. The player's realm is named first, then the others largest first; a name that would cover one already placed moves to another of its realm's provinces nearest its middle (`LABEL_ANCHORS`, 6), then shrinks a step at a time (`LABEL_SHRINK`, 0.85) down to the smallest realm name (9 pixels), and a name with no room left waits for a closer zoom. [feedback, Leroy 18 October 2026]
+
+#### How the player uses it: realm names
+1. Where: on the map itself, zoomed out to World and Region; nothing new to tap. Pinching in brings back the names that had no room, larger.
+2. Grouping: a realm's name sits on its own land, on its middle province or one near it, never on a neighbour's name.
+3. Overview: the zoomed-out map is the overview of who holds what; every name on it can be read whole, and the player's own realm is always named.
+4. Phone: the same rule in the Wide and Tall layouts and at every zoom; names stay at least 9 pixels tall; nothing needs hover.
 
 ## 6. Commands
 
@@ -529,4 +540,5 @@ None. AI nations run in the same worker turn, which the turn budgets cover (VIEW
 | VIEW-130 | living-map.feature | At most 60 figures move at once |
 | VIEW-131 | — | presentation only: culture styles and landmarks are art |
 | VIEW-132 | living-map.feature | The snapshot feeds the busy trade paths |
-| VIEW-133 | — | presentation only: detailed figures and town tiles are art |
+| VIEW-133 | zoom-content.feature | Realm names never overlap |
+| VIEW-134 | — | presentation only: detailed figures and town tiles are art |

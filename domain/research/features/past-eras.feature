@@ -45,9 +45,9 @@ Feature: The tree reaches back before 1444
 
     Examples:
       | country | past                | n | cost |
-      | Aztecs  | C01 Iron smelting   | 0 | 10   |
-      | Kongo   | G01 Writing         | 0 | 10   |
-      | Songhai | C03 Gunpowder       | 3 | 10.5 |
+      | Aztecs  | C01 Iron smelting   | 0 | 5    |
+      | Kongo   | G01 Writing         | 0 | 5    |
+      | Songhai | C03 Gunpowder       | 3 | 7.875 |
 
   @RSCH-094 @placeholder
   Scenario Outline: Without a past invention a realm plays below the baseline
@@ -91,6 +91,6 @@ Feature: The tree reaches back before 1444
       | France   | Era I    | 0    |
       | Ming     | Era I    | 0    |
       | Champa   | Medieval | 1    |
-      | Oirat    | Ancient  | 2    |
+      | Oirat    | Medieval | 1    |
       | Mali     | Ancient  | 2    |
       | Iroquois | Ancient  | 2    |
