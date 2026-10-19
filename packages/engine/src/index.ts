@@ -29,8 +29,8 @@ export { CHANGES, type ChangeName, type ChangeRow } from "./conversion.ts";
 export { castleCap, FOOD_SETTINGS, foodView, mapNetwork, reachOf, setFood, setFoodPreset, shareFood, SURPLUS_RULES, type CastleView, type FoodView } from "./castleFood.ts";
 export { capsOf, formOf, governmentView, realmTitles, startFormOf, type GovernmentView, type NextFormView } from "./government.ts";
 export { titlesFor, type Titles } from "./domain/realm/index.ts";
-export { TRADER_KINDS, traderKindName, type FoundOption, type GameTraderKind, type KindRow, type RouteEstimate, type TradePath, type TradeView, type TraderView } from "./trade.ts";
-export { tradePaths, tradeSeen } from "./trade.ts";
+export { TRADER_KINDS, traderKindName, type FoundOption, type GameTraderKind, type KindRow, type RouteEstimate, type RouteSuggestion, type TradeFeedItem, type TradeView, type TraderView, type TraderWalk } from "./trade.ts";
+export { tradeSeen, traderWalks } from "./trade.ts";
 export { FAITH_FAMILY, FAITH_IDS, FAITH_POLICIES, faithLine, faithName, NO_FAITH, NO_TONGUE, peoplesDataOf, peoplesView, SLOTS, TONGUE_FAMILY, TONGUE_IDS, TONGUE_POLICIES, tongueLine, tongueName, type FaithRow, type PeoplesSnapshot, type PeoplesView, type TongueLine, type TongueRow } from "./peoples.ts";
 export { censurePreview, faithBadge, faithHeadsView, headCard, type FaithHeadsView, type HeadCard } from "./faithHeads.ts";
 export { ENVOY_ACTIONS, type EnvoyAction, type FearView, type StatecraftView } from "./statecraft.ts";
@@ -55,7 +55,7 @@ export { battleDeath, lordAge, officialAge, onPersonDeath, personDies, yearlyPeo
 export { deathChance as personDeathChance, type PersonKind } from "./mortality.ts";
 export { risingChanceIn, spark } from "./rebels.ts";
 export { PILLAR_TAB, pillarLine, RATE_LABELS, rateButtons, STABILITY_NOTE, stabilityPlaque, stabilitySection, taxLine, TOP_BAR_PLAQUE, topBar, treasuryView, type LedgerRow, type Opens, type PillarRow, type RateButton, type RealmTab, type StabilitySectionView, type TaxLineView, type TopBarInput, type TopBarItem, type TreasuryInput, type TreasuryView } from "./realmScreens.ts";
-export { reportFailedHarvests } from "./food.ts";
+export { FOOD_BALANCE, reportFailedHarvests } from "./food.ts";
 export { grabbedLand, joinsLeague, leagueView, monthlyConquest, nameAbroadView, notorietyWord, type LeagueView, type NameAbroadView, type NotorietyWord } from "./conquest.ts";
 export { aiRecruits, fearOfRealm, monthlyFear, standingTargetOf, strengths, warRaise } from "./arms.ts";
 export { aiWarPay, heedsNoNotoriety, maxCededProvinces, priceContext, priceOfWar, warPay, whyAiWontDeclare, wouldSayPeaceAtDeclaration, type PriceContext, type PriceOfWar, type PriceOfWarCall } from "./priceOfWar.ts";
@@ -70,3 +70,9 @@ export { ungoverned } from "./recruit.ts";
 export { restoreSleeping, saveSleeping, spareSleepers, wakeRealm, type Waking, type WokenRealm } from "./sleeping.ts";
 export { createGoals, goalPulls, monthlyGoals, nearestLand, pullOf, timeFactor, type Goal, type GoalState } from "./goals.ts";
 export { chronicleView, goalViews, TURNING_POINTS, treeEventOf, type ChronicleRow, type ChronicleState, type ChronicleView, type GoalView, type TurningPoint } from "./chronicle.ts";
+
+// Men and ships whose commander dies go home (leaderless.ts); hung on the one death hook once every module has loaded.
+import { onPersonDeath as hangOnDeath } from "./people.ts";
+import { leaderless } from "./leaderless.ts";
+hangOnDeath(leaderless);
+export { armyHome, crownHeld, fleetHome } from "./leaderless.ts";

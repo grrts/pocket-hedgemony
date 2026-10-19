@@ -242,14 +242,28 @@ const WINDOW = 32768;
 const HASH_BITS = 15;
 const MAX_CHAIN = 48;
 
+/** Matches and literals per block: each block gets codes fitted to its own bytes. */
+const BLOCK_TOKENS = 16384;
+
 /**
- * Raw deflate with LZ77 matching and the fixed Huffman codes: one final block.
+ * Raw deflate with LZ77 matching and, block by block, Huffman codes built for
+ * that block's symbols (or the fixed codes where they come out shorter).
  * Deterministic: the same input gives the same bytes everywhere.
  */
 export function deflateRaw(input: Uint8Array): Uint8Array {
-  const b: BitWriter = { out: writer(Math.max(64, input.length >>> 1)), bits: 0, count: 0 };
-  putBits(b, 1, 1); // BFINAL
-  putBits(b, 1, 2); // BTYPE = 01, fixed codes
+  const tokens = lz77(input);
+  const b: BitWriter = { out: writer(Math.max(64, input.length >>> 2)), bits: 0, count: 0 };
+  for (let start = 0; start === 0 || start < tokens.length; start += BLOCK_TOKENS) {
+    const end = Math.min(tokens.length, start + BLOCK_TOKENS);
+    putBlock(b, tokens, start, end, end === tokens.length);
+  }
+  if (b.count > 0) putU8(b.out, b.bits & 0xff);
+  return bytesOf(b.out);
+}
+
+/** The input as tokens: a literal byte (< 65536), or a match as length << 16 | distance. */
+function lz77(input: Uint8Array): number[] {
+  const tokens: number[] = [];
   const head = new Int32Array(1 << HASH_BITS).fill(-1);
   const prev = new Int32Array(WINDOW).fill(-1);
   const n = input.length;
@@ -284,23 +298,216 @@ export function deflateRaw(input: Uint8Array): Uint8Array {
       }
     }
     if (bestLen >= 3) {
-      const lc = lengthCode(bestLen);
-      putLitLen(b, 257 + lc);
-      if (LEN_EXTRA[lc]) putBits(b, bestLen - LEN_BASE[lc]!, LEN_EXTRA[lc]!);
-      const dc = distCode(bestDist);
-      putBits(b, DIST_REV[dc]!, 5);
-      if (DIST_EXTRA[dc]) putBits(b, bestDist - DIST_BASE[dc]!, DIST_EXTRA[dc]!);
+      tokens.push((bestLen << 16) | bestDist);
       for (let k = 0; k < bestLen; k++) insert(i + k);
       i += bestLen;
     } else {
-      putLitLen(b, input[i]!);
+      tokens.push(input[i]!);
       insert(i);
       i++;
     }
   }
-  putLitLen(b, 256);
-  if (b.count > 0) putU8(b.out, b.bits & 0xff);
-  return bytesOf(b.out);
+  return tokens;
+}
+
+/** Writes tokens [start, end) as one block, with dynamic codes unless the fixed ones are shorter. */
+function putBlock(b: BitWriter, tokens: readonly number[], start: number, end: number, final: boolean): void {
+  const litFreq = new Uint32Array(286);
+  const distFreq = new Uint32Array(30);
+  let extraBits = 0;
+  for (let t = start; t < end; t++) {
+    const tok = tokens[t]!;
+    if (tok < 65536) {
+      litFreq[tok]!++;
+      continue;
+    }
+    const lc = lengthCode(tok >>> 16);
+    const dc = distCode(tok & 0xffff);
+    litFreq[257 + lc]!++;
+    distFreq[dc]!++;
+    extraBits += LEN_EXTRA[lc]! + DIST_EXTRA[dc]!;
+  }
+  litFreq[256] = 1;
+  let fixedBits = 3 + extraBits;
+  for (let s = 0; s < 286; s++) fixedBits += litFreq[s]! * LIT_BITS[s]!;
+  for (let s = 0; s < 30; s++) fixedBits += distFreq[s]! * 5;
+
+  const litLen = codeLengths(atLeastTwo(litFreq), 15);
+  const distLen = codeLengths(atLeastTwo(distFreq), 15);
+  let hlit = 286;
+  while (hlit > 257 && litLen[hlit - 1] === 0) hlit--;
+  let hdist = 30;
+  while (hdist > 1 && distLen[hdist - 1] === 0) hdist--;
+  const all = new Uint8Array(hlit + hdist);
+  all.set(litLen.subarray(0, hlit));
+  all.set(distLen.subarray(0, hdist), hlit);
+  const runs = lengthRuns(all);
+  const clFreq = new Uint32Array(19);
+  for (const r of runs) clFreq[r.sym]!++;
+  const clLen = codeLengths(atLeastTwo(clFreq), 7);
+  let hclen = 19;
+  while (hclen > 4 && clLen[CL_ORDER[hclen - 1]!] === 0) hclen--;
+  let dynBits = 3 + 14 + hclen * 3 + extraBits;
+  for (const r of runs) dynBits += clLen[r.sym]! + RUN_EXTRA[r.sym]!;
+  for (let s = 0; s < 286; s++) dynBits += litFreq[s]! * litLen[s]!;
+  for (let s = 0; s < 30; s++) dynBits += distFreq[s]! * distLen[s]!;
+
+  putBits(b, final ? 1 : 0, 1);
+  let litCode: Uint16Array;
+  let litBits: Uint8Array;
+  let distC: Uint16Array;
+  let distBits: Uint8Array;
+  if (fixedBits <= dynBits) {
+    putBits(b, 1, 2); // BTYPE = 01, fixed codes
+    [litCode, litBits, distC, distBits] = [LIT_CODE, LIT_BITS, DIST_REV_16, FIVE_BITS];
+  } else {
+    putBits(b, 2, 2); // BTYPE = 10, dynamic codes
+    putBits(b, hlit - 257, 5);
+    putBits(b, hdist - 1, 5);
+    putBits(b, hclen - 4, 4);
+    for (let k = 0; k < hclen; k++) putBits(b, clLen[CL_ORDER[k]!]!, 3);
+    const clCode = canonical(clLen);
+    for (const r of runs) {
+      putBits(b, clCode[r.sym]!, clLen[r.sym]!);
+      if (RUN_EXTRA[r.sym]) putBits(b, r.extra, RUN_EXTRA[r.sym]!);
+    }
+    [litCode, litBits, distC, distBits] = [canonical(litLen), litLen, canonical(distLen), distLen];
+  }
+  for (let t = start; t < end; t++) {
+    const tok = tokens[t]!;
+    if (tok < 65536) {
+      putBits(b, litCode[tok]!, litBits[tok]!);
+      continue;
+    }
+    const len = tok >>> 16;
+    const dist = tok & 0xffff;
+    const lc = lengthCode(len);
+    putBits(b, litCode[257 + lc]!, litBits[257 + lc]!);
+    if (LEN_EXTRA[lc]) putBits(b, len - LEN_BASE[lc]!, LEN_EXTRA[lc]!);
+    const dc = distCode(dist);
+    putBits(b, distC[dc]!, distBits[dc]!);
+    if (DIST_EXTRA[dc]) putBits(b, dist - DIST_BASE[dc]!, DIST_EXTRA[dc]!);
+  }
+  putBits(b, litCode[256]!, litBits[256]!);
+}
+
+const DIST_REV_16 = Uint16Array.from(DIST_REV);
+const FIVE_BITS = new Uint8Array(30).fill(5);
+/** Extra bits after each code-length symbol: 16 repeats the last 3–6 times, 17 and 18 give 3–10 and 11–138 zeros. */
+const RUN_EXTRA = Uint8Array.from({ length: 19 }, (_, s) => (s === 16 ? 2 : s === 17 ? 3 : s === 18 ? 7 : 0));
+
+/** Gives at least two symbols a count, so no code is a lone one-bit code some inflaters refuse. */
+function atLeastTwo(freq: Uint32Array): Uint32Array {
+  let used = 0;
+  for (const f of freq) if (f) used++;
+  if (used >= 2) return freq;
+  const out = freq.slice();
+  for (let s = 0; s < out.length && used < 2; s++) {
+    if (!out[s]) {
+      out[s] = 1;
+      used++;
+    }
+  }
+  return out;
+}
+
+/**
+ * Huffman code lengths of at most `limit` bits. Ties go by symbol, so the
+ * lengths are the same everywhere; counts are halved until the code fits.
+ */
+function codeLengths(freq: Uint32Array, limit: number): Uint8Array {
+  const n = freq.length;
+  let f = Array.from(freq);
+  for (;;) {
+    const lens = huffmanLengths(f);
+    let max = 0;
+    for (let s = 0; s < n; s++) if (lens[s]! > max) max = lens[s]!;
+    if (max <= limit) return lens;
+    f = f.map((v) => (v ? (v + 1) >>> 1 : 0));
+  }
+}
+
+/** Plain Huffman lengths by the two-queue method over leaves sorted by (count, symbol). */
+function huffmanLengths(freq: readonly number[]): Uint8Array {
+  const n = freq.length;
+  const lens = new Uint8Array(n);
+  const leaves: number[] = [];
+  for (let s = 0; s < n; s++) if (freq[s]) leaves.push(s);
+  leaves.sort((a, c) => freq[a]! - freq[c]! || a - c);
+  if (leaves.length === 1) {
+    lens[leaves[0]!] = 1;
+    return lens;
+  }
+  // Nodes 0..L-1 are the leaves in order; merged nodes follow, already in weight order.
+  const L = leaves.length;
+  const weight: number[] = leaves.map((s) => freq[s]!);
+  const parent: number[] = new Array(2 * L - 1).fill(-1);
+  let li = 0;
+  let ni = L;
+  const take = (): number => {
+    if (li < L && (ni >= weight.length || weight[li]! <= weight[ni]!)) return li++;
+    return ni++;
+  };
+  while (weight.length < 2 * L - 1) {
+    const a = take();
+    const c = take();
+    const id = weight.length;
+    weight.push(weight[a]! + weight[c]!);
+    parent[a] = id;
+    parent[c] = id;
+  }
+  const depth = new Uint8Array(2 * L - 1);
+  for (let k = 2 * L - 3; k >= 0; k--) depth[k] = depth[parent[k]!]! + 1;
+  for (let k = 0; k < L; k++) lens[leaves[k]!] = depth[k]!;
+  return lens;
+}
+
+/** Canonical codes for the lengths (RFC 1951 §3.2.2), bit-reversed for writing low bit first. */
+function canonical(lens: Uint8Array): Uint16Array {
+  const count = new Uint16Array(16);
+  for (const l of lens) count[l]!++;
+  count[0] = 0;
+  const next = new Uint16Array(16);
+  for (let bits = 1, code = 0; bits < 16; bits++) {
+    code = (code + count[bits - 1]!) << 1;
+    next[bits] = code;
+  }
+  const codes = new Uint16Array(lens.length);
+  for (let s = 0; s < lens.length; s++) if (lens[s]) codes[s] = reverse(next[lens[s]!]!++, lens[s]!);
+  return codes;
+}
+
+/** The code lengths as code-length symbols, with runs of zeros and repeats folded (RFC 1951 §3.2.7). */
+function lengthRuns(lens: Uint8Array): { sym: number; extra: number }[] {
+  const out: { sym: number; extra: number }[] = [];
+  let i = 0;
+  while (i < lens.length) {
+    const v = lens[i]!;
+    let run = 1;
+    while (i + run < lens.length && lens[i + run] === v) run++;
+    i += run;
+    if (v === 0) {
+      while (run >= 11) {
+        const k = Math.min(run, 138);
+        out.push({ sym: 18, extra: k - 11 });
+        run -= k;
+      }
+      if (run >= 3) {
+        out.push({ sym: 17, extra: run - 3 });
+        run = 0;
+      }
+    } else {
+      out.push({ sym: v, extra: 0 });
+      run--;
+      while (run >= 3) {
+        const k = Math.min(run, 6);
+        out.push({ sym: 16, extra: k - 3 });
+        run -= k;
+      }
+    }
+    for (; run > 0; run--) out.push({ sym: v, extra: 0 });
+  }
+  return out;
 }
 
 interface Huff {

@@ -68,6 +68,9 @@ export function yearlyFood(world: World, p: number, roll: HarvestRoll = "normal"
   return food;
 }
 
+/** Where a normal year's food is short (the province grows less than it eats) and where it is tight (a poor harvest brings famine; D-PROV-36). */
+export const FOOD_BALANCE: { short: number; tight: number } = provinceConfig.food.balance;
+
 /** A province's longitude, from its place on the map (0 without a map). */
 function lonOf(world: World, p: number): number {
   const map = world.rules.map;

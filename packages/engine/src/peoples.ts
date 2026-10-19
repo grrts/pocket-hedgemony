@@ -691,20 +691,25 @@ export interface SavedPeoples {
   tongues: string[];
   faiths: string[];
   arrays: Record<string, number[]>;
-  nations: string[];
-  provinces: string[];
+  /** Only in saves from before the `ids` chunk was used for them: the same lists, written twice. */
+  nations?: string[];
+  provinces?: string[];
 }
 
-/** The peoples arrays for a save, with tongue and faith ids so a later build with other tables still reads them. */
+/**
+ * The peoples arrays for a save, with tongue and faith ids so a later build with other tables still reads them.
+ * They go in the save's province and realm order, whose ids the `ids` chunk already holds.
+ */
 export function savePeoples(world: World): SavedPeoples {
   const arrays: Record<string, number[]> = {};
   for (const [k, v] of Object.entries(pick(world))) if (k !== "provinceBelief" && k !== "provinceFaithTax") arrays[k] = Array.from(v as ArrayLike<number>);
-  return { tongues: [...TONGUE_IDS], faiths: [...FAITH_IDS], arrays, nations: [...world.nationIds], provinces: [...world.provinceIds] };
+  return { tongues: [...TONGUE_IDS], faiths: [...FAITH_IDS], arrays };
 }
 
-/** Restores the peoples arrays; a save from before them keeps the 1444 start. */
-export function restorePeoples(world: World, s: SavedPeoples | undefined): void {
-  if (s) {
+/** Restores the peoples arrays, indexed by the save's ids; a save from before them keeps the 1444 start. */
+export function restorePeoples(world: World, saved: SavedPeoples | undefined, ids: { provinces: readonly string[]; nations: readonly string[] }): void {
+  if (saved) {
+    const s = { ...saved, provinces: saved.provinces ?? ids.provinces, nations: saved.nations ?? ids.nations };
     const t = (k: number) => (k === NO_TONGUE ? NO_TONGUE : (TONGUE_INDEX.get(s.tongues[k]!) ?? NO_TONGUE));
     const f = (k: number) => (k === NO_FAITH ? NO_FAITH : (FAITH_INDEX.get(s.faiths[k]!) ?? NO_FAITH));
     const pIdx = s.provinces.map((id) => world.provinceIndex.get(id) ?? -1);

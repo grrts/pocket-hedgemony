@@ -2,7 +2,7 @@ import type { World } from "./world.ts";
 import type { News } from "./war.ts";
 import { houseMemberName, personName } from "./names.ts";
 import { loyaltyCause, realmConfig, startingLords, type Lord, type Loyalty } from "./domain/realm/index.ts";
-import { startLords, type HistoricalLordDef } from "@ph/rules";
+import { startLords, type HistoricalLordDef, type LaterLordDef } from "@ph/rules";
 
 /**
  * Lords (milestone 3): each realm starts with lords who hold some of its
@@ -196,6 +196,59 @@ export function asHistorical(world: World, l: RealmLord, h: HistoricalLordDef): 
   l.note = h.note;
   if (h.loyalty) l.loyalty = h.loyalty;
 }
+
+/**
+ * A historical figure comes to a realm by an event (REALM-295, REALM-296).
+ * Where a generated lord holds his seat, or his data says he takes over and
+ * any lord holds it, he takes that lord's place: the lands, loyalty and men
+ * are now his. Otherwise he joins as a new loyal lord. Either way he also
+ * takes the rest of his lands that are royal or a generated lord's (who keeps
+ * at least one province), never another historical lord's and never the
+ * capital. Nothing happens if he is already a lord or the realm holds none of
+ * his lands. Returns his index, or -1.
+ */
+export function historicalLordComes(world: World, n: number, h: LaterLordDef, news: News[] = []): number {
+  if (world.lords.some((l) => l.historical === h.id && !l.gone)) return -1;
+  const capital = world.provinceIndex.get(world.rules.nations[n]!.capital);
+  const land = h.provinces.map((id) => world.provinceIndex.get(id)).filter((p): p is number => p !== undefined && p !== capital && world.provinceOwner[p] === n);
+  if (!land.length) return -1;
+  const holder = world.provinceLord[land[0]!]!;
+  let k: number;
+  let line: string;
+  if (holder >= 0 && (h.takes_over || !world.lords[holder]!.historical)) {
+    k = holder;
+    const l = world.lords[k]!;
+    const was = l.name;
+    asHistorical(world, l, h);
+    l.upCredit = 0;
+    delete l.want;
+    // His men follow their new lord (WAR-252).
+    const c = l.commander;
+    if (c !== undefined && world.commanders[c]) Object.assign(world.commanders[c]!, { name: l.name, ...(l.age === undefined ? {} : { age: l.age }) });
+    line = `${h.name} takes the lands of ${was}: he is ${h.title} now.`;
+  } else {
+    k = world.lords.length;
+    const l: RealmLord = { name: h.name, house: h.house, nation: n, loyalty: "Loyal", upCredit: 0 };
+    asHistorical(world, l, h);
+    world.lords.push(l);
+    line = `${h.name} joins your realm as ${h.title}.`;
+  }
+  for (const p of land) {
+    const was = world.provinceLord[p]!;
+    if (was === k) continue;
+    if (was < 0 || (!world.lords[was]!.historical && lordLands(world, was).length > 1)) world.provinceLord[p] = k;
+  }
+  // A new lord who got none of his lands (all held by others) has no place after all.
+  if (!lordLands(world, k).length) {
+    world.lords.pop();
+    return -1;
+  }
+  if (n === world.player) news.push({ kind: "ruler", text: line, nations: [n], province: land[0]! });
+  return k;
+}
+
+/** The historical figure an event names, by id (REALM-295). */
+export const laterLord = (id: string): LaterLordDef | undefined => startLords.later[id];
 
 /** Someone new holds a lord's lands (an heir, a kinsman, a confirmed son): the title stays with the lands, the history was the man's. */
 export function newHolder(l: RealmLord): void {

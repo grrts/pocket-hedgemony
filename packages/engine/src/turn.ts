@@ -21,7 +21,7 @@ import { answerEveryday, monthlyEveryday } from "./everyday.ts";
 import { monthlyGoals } from "./goals.ts";
 import { heritageChoice, monthlyHeritage, payCounsel } from "./heritage.ts";
 import { monthlyGovernment, reform } from "./government.ts";
-import { dismissTrader, draftTradeRoute, foundTrader, monthlyTrade, setTradeRoute, type GameTraderKind } from "./trade.ts";
+import { dismissTrader, draftTradeRoute, foundTrader, monthlyTrade, setTradeRoute, tradeDay, type GameTraderKind } from "./trade.ts";
 import { monthlyNavy, navyOrder, stepNavy, type NavyOrder } from "./navy.ts";
 import { hiredFleetOrder, monthlyHiredFleets, type HireOrder } from "./hiredFleets.ts";
 import { dailyExploration, exploreOrder, monthlyColonies, stepVoyages, type ExploreOrder } from "./colonies.ts";
@@ -345,6 +345,8 @@ function endDay(world: World, news: News[]): void {
   feedArmies(world);
   dailyExploration(world);
   runOccupation(world, world.date.day === 1, news);
+  // Traders walk a day on, as the armies march (TRADE-132).
+  tradeDay(world);
   dailyRebels(world, news);
   world.date = addDays(world.date, 1);
   world.day++;

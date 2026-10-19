@@ -1182,8 +1182,8 @@
   ]
  },
  "later": {
-  "nuno_alvares_pereira_1385": {
-   "id": "nuno_alvares_pereira_1385",
+  "nuno_alvares_pereira": {
+   "id": "nuno_alvares_pereira",
    "name": "Nuno Álvares Pereira",
    "house": "Pereira",
    "title": "Constable, Count of Ourém",
@@ -1207,8 +1207,8 @@
    "realm": "portugal",
    "year": 1385
   },
-  "john_hunyadi_1439": {
-   "id": "john_hunyadi_1439",
+  "john_hunyadi": {
+   "id": "john_hunyadi",
    "name": "John Hunyadi",
    "house": "Hunyadi",
    "title": "Ban of Severin, later Voivode of Transylvania",
@@ -1233,8 +1233,8 @@
    "realm": "hungary",
    "year": 1439
   },
-  "skirgaila_1382": {
-   "id": "skirgaila_1382",
+  "skirgaila": {
+   "id": "skirgaila",
    "name": "Skirgaila",
    "house": "Gediminid",
    "title": "Duke of Trakai",
@@ -1257,10 +1257,11 @@
     "https://en.wikipedia.org/wiki/Lithuanian_Civil_War_(1381%E2%80%931384)"
    ],
    "realm": "lithuania",
-   "year": 1382
+   "year": 1382,
+   "takes_over": true
   },
-  "jan_zizka_1421": {
-   "id": "jan_zizka_1421",
+  "jan_zizka": {
+   "id": "jan_zizka",
    "name": "Jan Žižka",
    "house": "Žižka of Trocnov",
    "title": "Lord of Kalich, Hussite captain",
@@ -1283,8 +1284,8 @@
    "realm": "bohemia",
    "year": 1421
   },
-  "manuel_ii_palaiologos_1382": {
-   "id": "manuel_ii_palaiologos_1382",
+  "manuel_ii_palaiologos": {
+   "id": "manuel_ii_palaiologos",
    "name": "Manuel II Palaiologos",
    "house": "Palaiologos",
    "title": "Despot ruling Thessalonica",
@@ -1309,8 +1310,8 @@
    "realm": "byzantium",
    "year": 1382
   },
-  "aleksandras_olelka_1443": {
-   "id": "aleksandras_olelka_1443",
+  "aleksandras_olelka": {
+   "id": "aleksandras_olelka",
    "name": "Aleksandras Olelka",
    "house": "Gediminid (Olelkovich)",
    "title": "Prince of Kiev",
@@ -1330,10 +1331,11 @@
     "https://en.wikipedia.org/wiki/Aleksandras_Olelka"
    ],
    "realm": "lithuania",
-   "year": 1443
+   "year": 1443,
+   "takes_over": true
   },
-  "zhu_di_1380": {
-   "id": "zhu_di_1380",
+  "zhu_di": {
+   "id": "zhu_di",
    "name": "Zhu Di",
    "house": "Zhu",
    "title": "Prince of Yan",
@@ -1356,9 +1358,9 @@
    "realm": "ming",
    "year": 1380
   },
-  "zafar_khan_muzaffar_shah_i_1391": {
-   "id": "zafar_khan_muzaffar_shah_i_1391",
-   "name": "Zafar Khan (Muzaffar Shah I)",
+  "zafar_khan": {
+   "id": "zafar_khan",
+   "name": "Zafar Khan",
    "house": "Muzaffarid",
    "title": "Governor of Gujarat",
    "born": 1342,
@@ -1380,8 +1382,8 @@
    "realm": "delhi",
    "year": 1391
   },
-  "dilawar_khan_ghuri_1392": {
-   "id": "dilawar_khan_ghuri_1392",
+  "dilawar_khan_ghuri": {
+   "id": "dilawar_khan_ghuri",
    "name": "Dilawar Khan Ghuri",
    "house": "Ghurid of Malwa",
    "title": "Governor of Malwa (seat Dhar)",

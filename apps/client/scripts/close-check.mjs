@@ -15,7 +15,9 @@ let failed = false;
 
 /** A finger's tap: down, held as long as a real one, then up. */
 async function press(selector) {
-  const box = await page.locator(selector).boundingBox();
+  // While the week plays the panel is redrawn each day, so the button can be between two drawings: take the next one.
+  let box = null;
+  for (let k = 0; k < 10 && !box; k++) box = await page.locator(selector).boundingBox({ timeout: 1000 }).catch(() => null);
   const touchPoints = [{ x: box.x + box.width / 2, y: box.y + box.height / 2 }];
   await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints });
   await page.waitForTimeout(150);
