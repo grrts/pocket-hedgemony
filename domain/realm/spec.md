@@ -413,6 +413,17 @@ Lords and officials are called what their own culture called them, so a Mongol r
 #### How the player uses it: titles
 - REALM-243: The player reads the titles wherever lords and officials show, with no screen of their own: the country card's tabs (Lords and Officials become, for example, Daimyo and Daikan), the two Stability pillars on the General tab, the Lords map mode, the Lords tab and a lord's screen, the Officials tab and an official's screen, and the "Governed by" card of a province. Another realm's card uses that realm's words, so the player sees whose court it is. The post types (Warden, Tax collector, Judge and the rest) stay the same everywhere. On a phone in landscape the words take the place of the old labels in the Wide and Tall layouts; the longest plural tab label (Myothugyis, Tocricocs) is no longer than Mercenaries, and nothing needs hover. [X-19]
 
+### 5.26 Historical lords (Leroy, 19 October)
+Some lords of a start were real people whom history remembers: John of Gaunt, Henry Percy, Kęstutis, Yi Seong-gye. Generated lords alone made every lord feel the same. A start now seats a small, curated set of them, each with his own title, traits, age, heir and a line on who he was; every other lord stays generated. Only people the sources document as holding that land on the start day are seated (high or medium confidence, sources kept with each entry); the rest of the research and what was left out is in `/mnt/project-files/lords/historical-lords-design.md`. Data `scenarios/1378/lords.json` (hand-curated; the 1444 checkpoint has none).
+
+- REALM-280: When a campaign starts, each realm shall seat the historical lords its start's data names for it, each on the provinces of his historical lands that the realm holds, never its capital nor land another lord holds; one whose lands the realm does not hold is left out. Each takes his name, house, title, two traits and his age from his birth year (at least 16), the son who followed him as heir where the sources name him, and the loyalty history gives him on the start day (Loyal unless the data says otherwise). Where the sources give no birth year, the game draws his age and heir as for any lord (REALM-273). History's year of his death is not forced: he ages and dies by REALM-270 like anyone. [Leroy 19 October; REALM-070, REALM-081]
+- REALM-281: Every other lord shall stay generated: a realm with historical lords gets the generated lords REALM-166 would give it less one per historical lord seated (never fewer than none), on the land its historical lords and royal land leave; no generated lord of the start takes the house or family name of a historical lord of that realm, seated or brought in later (1378 Hungary has no generated Hunyadi). [Leroy 19 October; REALM-166]
+- REALM-282: Where the realm data seats great houses on named land (Japan, D-INST-1), the historical head of a house shall be that house's lord. A realm with historical lords at a start shall not take the catalogue's great-houses list, which is written for 1444: in 1378 Anjou, Berry, Bourbon, Foix and Armagnac are realms of their own. [REALM-166, D-INST-1]
+- REALM-283: A lord's title shall stay with his lands when his heir, a kinsman or a confirmed son takes them; the history line and the history mark are the man's and go with him. [REALM-273, EVT-116]
+
+#### How the player uses it: historical lords
+- REALM-284: Nothing new is tapped. On the Lords tab a historical lord's row shows a small *History* tag after his name and his title in place of his house; his screen shows the tag, his title, his house, a short *In history* line on who he was, and his two traits with his age and heir. The tag is a word, not a colour, and needs no hover. Grouping and overview: lords stay on the Lords tab and their own screens, and the Stability plaque's Lords pillar counts them like any lord. On a phone in landscape the tag sits inline after the name and wraps with it in the Wide and Tall layouts; the history line is one short paragraph. [X-19; REALM-243]
+
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
@@ -793,3 +804,8 @@ Every requirement has at least one scenario. REALM-005 and REALM-156 are also pr
 | REALM-241 | — | Presentation only: checked on phone screenshots in landscape (apps/client/scripts/ruler-shots.mjs) |
 | REALM-242 | lords.feature | Lords and officials take their culture's titles |
 | REALM-243 | — | Presentation only: the labels that read the titles (packages/engine/test/titles.test.ts and phone screenshots) |
+| REALM-280 | — | Covered by engine test (packages/engine/test/historicalLords.test.ts: seated on land the realm holds, name, title, traits, age and heir) |
+| REALM-281 | — | Covered by engine test (packages/engine/test/historicalLords.test.ts: the rest stay generated; no generated Hunyadi) |
+| REALM-282 | — | Covered by engine test (packages/engine/test/historicalLords.test.ts: the head of a seated house; no 1444 houses in 1378 France) |
+| REALM-283 | — | Covered by engine test (packages/engine/test/historicalLords.test.ts: his heir keeps the title, not the history) |
+| REALM-284 | — | Presentation only: the Lords tab and a lord's screen (apps/client/src/ui/lords.ts) |

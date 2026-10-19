@@ -358,6 +358,8 @@ export interface HistoricalLordDef {
   note: string;
   confidence: "high" | "medium";
   sources: string[];
+  /** How he stands with the crown on the start day where history says he was at odds with it; unset is Loyal. */
+  loyalty?: "Loyal" | "Wavering" | "Disloyal";
 }
 
 /** A historical lord who joins later by an event (REALM-284). */

@@ -1,1 +1,1409 @@
-{"realms":{},"later":{}}
+{
+ "$comment": "Historical lords of the 1378 start (realm spec §5.26, REALM-280 to REALM-286; Leroy, 19 October 2026). Hand-curated, not generated: each entry was checked against the sources it lists (/mnt/project-files/lords/historical-lords-design.md). `realms` are seated on the start day on the provinces of their lands that their realm holds (the first is the seat); `later` are brought in by events (`historical_lord`). born null: the sources give no birth year, so the game draws his age as for any lord. died is history's; in play the game's own ageing decides. Only high and medium confidence; a person the sources could not pin down is left out, and his land keeps a generated lord.",
+ "realms": {
+  "england": [
+   {
+    "id": "henry_percy",
+    "name": "Henry Percy",
+    "house": "Percy",
+    "title": "Earl of Northumberland",
+    "born": 1341,
+    "died": 1408,
+    "provinces": [
+     "p567",
+     "p799"
+    ],
+    "traits": [
+     "Warlike",
+     "Greedy"
+    ],
+    "heir": {
+     "name": "Henry 'Hotspur' Percy",
+     "born": 1364
+    },
+    "note": "Created Earl of Northumberland in 1377; veteran Warden of the Scottish Marches.",
+    "confidence": "high",
+    "sources": [
+     "https://en.wikipedia.org/wiki/Henry_Percy,_1st_Earl_of_Northumberland",
+     "https://www.britannica.com/print/article/420002"
+    ]
+   },
+   {
+    "id": "edmund_mortimer",
+    "name": "Edmund Mortimer",
+    "house": "Mortimer",
+    "title": "Earl of March and Ulster",
+    "born": 1352,
+    "died": 1381,
+    "provinces": [
+     "p791",
+     "p786"
+    ],
+    "traits": [
+     "Pious",
+     "Builder"
+    ],
+    "heir": {
+     "name": "Roger Mortimer",
+     "born": 1374
+    },
+    "note": "Marcher earl of Wigmore, married to a royal granddaughter; Lieutenant of Ireland from 1379.",
+    "confidence": "high",
+    "sources": [
+     "https://en.wikipedia.org/wiki/Edmund_Mortimer,_3rd_Earl_of_March",
+     "https://mortimerhistorysociety.org.uk/the-mortimers/about-the-mortimers/the-3rd-earl/"
+    ]
+   },
+   {
+    "id": "thomas_beauchamp",
+    "name": "Thomas Beauchamp",
+    "house": "Beauchamp",
+    "title": "Earl of Warwick",
+    "born": 1338,
+    "died": 1401,
+    "provinces": [
+     "p798"
+    ],
+    "traits": [
+     "Builder",
+     "Pious"
+    ],
+    "heir": {
+     "name": "Richard Beauchamp",
+     "born": 1382
+    },
+    "note": "Earl of Warwick who built Guy's Tower and rebuilt St Mary's, Warwick.",
+    "confidence": "high",
+    "sources": [
+     "https://en.wikipedia.org/wiki/Thomas_Beauchamp,_12th_Earl_of_Warwick",
+     "https://en.wikipedia.org/wiki/List_of_owners_of_Warwick_Castle"
+    ]
+   },
+   {
+    "id": "richard_fitzalan",
+    "name": "Richard FitzAlan",
+    "house": "FitzAlan",
+    "title": "Earl of Arundel and Surrey",
+    "born": 1346,
+    "died": 1397,
+    "provinces": [
+     "p792"
+    ],
+    "traits": [
+     "Warlike",
+     "Greedy"
+    ],
+    "heir": {
+     "name": "Thomas FitzAlan",
+     "born": 1381
+    },
+    "note": "Rich Marcher earl and admiral who beat a Franco-Castilian fleet at Margate in 1387.",
+    "confidence": "high",
+    "sources": [
+     "https://www.executedtoday.com/?p=29510",
+     "https://www.english-heritage.org.uk/visit/places/clun-castle/history/"
+    ]
+   },
+   {
+    "id": "john_of_gaunt",
+    "name": "John of Gaunt",
+    "house": "Lancaster",
+    "title": "Duke of Lancaster",
+    "born": 1340,
+    "died": 1399,
+    "provinces": [
+     "p794",
+     "p801",
+     "p797"
+    ],
+    "traits": [
+     "Builder",
+     "Warlike"
+    ],
+    "heir": {
+     "name": "Henry of Bolingbroke",
+     "born": 1367
+    },
+    "note": "The king's uncle and England's richest lord; rebuilt Kenilworth and led armies in France.",
+    "confidence": "high",
+    "sources": [
+     "https://en.wikipedia.org/wiki/John_of_Gaunt",
+     "https://en.wikipedia.org/wiki/Savoy_Palace",
+     "https://aspectsofhistory.com/?p=13817"
+    ]
+   },
+   {
+    "id": "thomas_of_woodstock",
+    "name": "Thomas of Woodstock",
+    "house": "Plantagenet",
+    "title": "Earl of Buckingham",
+    "born": 1355,
+    "died": 1397,
+    "provinces": [
+     "p804"
+    ],
+    "traits": [
+     "Warlike",
+     "Pious"
+    ],
+    "heir": null,
+    "note": "King's youngest uncle; Constable of England, lord of Pleshey; led the 1380 march across France.",
+    "confidence": "high",
+    "sources": [
+     "https://unofficialroyalty.com/thomas-of-woodstock-1st-duke-of-gloucester",
+     "https://historicalbritainblog.com/who-was-thomas-of-woodstock-the-duke-of-gloucester/"
+    ]
+   },
+   {
+    "id": "edmund_of_langley",
+    "name": "Edmund of Langley",
+    "house": "Plantagenet",
+    "title": "Earl of Cambridge",
+    "born": 1341,
+    "died": 1402,
+    "provinces": [
+     "p800"
+    ],
+    "traits": [
+     "Warlike"
+    ],
+    "heir": {
+     "name": "Edward of Norwich",
+     "born": 1373
+    },
+    "note": "King's uncle and Earl of Cambridge, seated at Fotheringhay; led the 1381 expedition to Portugal.",
+    "confidence": "high",
+    "sources": [
+     "https://en.wikipedia.org/wiki/Edmund_of_Langley,_1st_Duke_of_York",
+     "https://www.nashfordpublishing.co.uk/royalty/edmund_langley.html"
+    ]
+   },
+   {
+    "id": "hugh_stafford",
+    "name": "Hugh Stafford",
+    "house": "Stafford",
+    "title": "Earl of Stafford",
+    "born": 1342,
+    "died": 1386,
+    "provinces": [
+     "p795",
+     "p803"
+    ],
+    "traits": [
+     "Warlike",
+     "Pious"
+    ],
+    "heir": {
+     "name": "Thomas Stafford",
+     "born": 1368
+    },
+    "note": "Earl of Stafford, a Black Prince veteran who died on pilgrimage at Rhodes.",
+    "confidence": "high",
+    "sources": [
+     "https://en.wikipedia.org/wiki/Hugh_Stafford,_2nd_Earl_of_Stafford",
+     "https://www.gdcooke.org/ss/org2-o/p5266.htm"
+    ]
+   },
+   {
+    "id": "john_neville",
+    "name": "John Neville",
+    "house": "Neville",
+    "title": "Baron Neville of Raby",
+    "born": 1337,
+    "died": 1388,
+    "provinces": [
+     "p568"
+    ],
+    "traits": [
+     "Warlike",
+     "Builder"
+    ],
+    "heir": {
+     "name": "Ralph Neville",
+     "born": 1364
+    },
+    "note": "Northern baron of Raby and Middleham; fought at Neville's Cross, later Seneschal of Gascony.",
+    "confidence": "high",
+    "sources": [
+     "https://en.wikipedia.org/wiki/John_Neville,_3rd_Baron_Neville",
+     "https://www.wikitree.com/wiki/Neville-59"
+    ]
+   }
+  ],
+  "scotland": [
+   {
+    "id": "william_douglas",
+    "name": "William Douglas",
+    "house": "Douglas",
+    "title": "Earl of Douglas and Mar",
+    "born": 1327,
+    "died": 1384,
+    "provinces": [
+     "p560",
+     "p565"
+    ],
+    "traits": [
+     "Warlike",
+     "Greedy"
+    ],
+    "heir": {
+     "name": "James Douglas",
+     "born": 1358
+    },
+    "note": "First Earl of Douglas, lord of Douglasdale and Mar; fought at Poitiers.",
+    "confidence": "high",
+    "sources": [
+     "https://en.wikipedia.org/wiki/William_Douglas,_1st_Earl_of_Douglas",
+     "https://www.britannica.com/print/article/170200"
+    ]
+   },
+   {
+    "id": "archibald_the_grim",
+    "name": "Archibald the Grim",
+    "house": "Douglas",
+    "title": "Lord of Galloway",
+    "born": 1328,
+    "died": 1400,
+    "provinces": [
+     "p561"
+    ],
+    "traits": [
+     "Warlike",
+     "Builder"
+    ],
+    "heir": {
+     "name": "Archibald Douglas",
+     "born": 1369
+    },
+    "note": "Lord of Galloway who built Threave; becomes Earl of Douglas in 1388.",
+    "confidence": "high",
+    "sources": [
+     "https://en.wikipedia.org/wiki/Archibald_Douglas,_3rd_Earl_of_Douglas",
+     "https://blog.historicenvironment.scot/2019/11/the-black-douglases/",
+     "https://en.wikipedia.org/wiki/Threave_Castle"
+    ]
+   },
+   {
+    "id": "robert_stewart",
+    "name": "Robert Stewart",
+    "house": "Stewart",
+    "title": "Earl of Fife and Menteith",
+    "born": 1340,
+    "died": 1420,
+    "provinces": [
+     "p562"
+    ],
+    "traits": [
+     "Builder",
+     "Greedy"
+    ],
+    "heir": {
+     "name": "Murdoch Stewart",
+     "born": 1362
+    },
+    "note": "King's son, builder of Doune Castle; later Duke of Albany and Scotland's ruler.",
+    "confidence": "high",
+    "sources": [
+     "https://blog.historicenvironment.scot/2025/03/robert-stewart-doune-castle/",
+     "https://mail.undiscoveredscotland.co.uk/usbiography/s/robertstewartalbany.html"
+    ]
+   },
+   {
+    "id": "alexander_stewart",
+    "name": "Alexander Stewart",
+    "house": "Stewart",
+    "title": "Lord of Badenoch",
+    "born": 1343,
+    "died": 1405,
+    "provinces": [
+     "p555"
+    ],
+    "traits": [
+     "Warlike",
+     "Greedy"
+    ],
+    "heir": null,
+    "note": "The 'Wolf of Badenoch', the king's son who burned Elgin Cathedral in 1390.",
+    "confidence": "high",
+    "sources": [
+     "https://www.undiscoveredscotland.co.uk/usbiography/s/alexanderstewartbuchan.html",
+     "https://dundonaldcastle.org.uk/was-the-wolf-of-badenoch-a-fair-title-for-alexander-stewart/"
+    ]
+   },
+   {
+    "id": "george_dunbar",
+    "name": "George Dunbar",
+    "house": "Dunbar",
+    "title": "Earl of March",
+    "born": 1338,
+    "died": 1420,
+    "provinces": [
+     "p566"
+    ],
+    "traits": [
+     "Warlike"
+    ],
+    "heir": null,
+    "note": "Earl of March of Dunbar and the Merse; fought at Otterburn, later changed sides to England.",
+    "confidence": "medium",
+    "sources": [
+     "https://en.wikipedia.org/wiki/George_Dunbar,_10th_Earl_of_March",
+     "https://poms.ac.uk/record/factoid/102412"
+    ]
+   },
+   {
+    "id": "john_of_islay",
+    "name": "John of Islay",
+    "house": "MacDonald",
+    "title": "Lord of the Isles",
+    "born": 1320,
+    "died": 1386,
+    "provinces": [
+     "p554",
+     "p548"
+    ],
+    "traits": [
+     "Pious"
+    ],
+    "heir": null,
+    "note": "'Good John of Islay', Lord of the Isles ruling from Finlaggan; the king's son-in-law.",
+    "confidence": "medium",
+    "sources": [
+     "https://en.wikipedia.org/wiki/John_of_Islay,_Lord_of_the_Isles",
+     "https://www.finlaggan.org/people-and-events/"
+    ]
+   }
+  ],
+  "france": [
+   {
+    "id": "enguerrand_de_coucy",
+    "name": "Enguerrand de Coucy",
+    "house": "Coucy",
+    "title": "Lord of Coucy, Count of Soissons",
+    "born": 1340,
+    "died": 1397,
+    "provinces": [
+     "p1070"
+    ],
+    "traits": [
+     "Warlike",
+     "Pious"
+    ],
+    "heir": null,
+    "note": "Great lord of Coucy and Soissons, captain of Charles V; died after the Nicopolis crusade.",
+    "confidence": "high",
+    "sources": [
+     "https://en.wikipedia.org/wiki/Enguerrand_VII_de_Coucy",
+     "https://en.wikipedia.org/wiki/Lords_of_Coucy"
+    ]
+   },
+   {
+    "id": "peter_of_alencon",
+    "name": "Peter of Alençon",
+    "house": "Valois-Alençon",
+    "title": "Count of Alençon and Perche",
+    "born": 1340,
+    "died": 1404,
+    "provinces": [
+     "p1051",
+     "p1057"
+    ],
+    "traits": [
+     "Warlike"
+    ],
+    "heir": {
+     "name": "John of Alençon",
+     "born": 1385
+    },
+    "note": "Count of Alençon and Perche; a hostage in England after Poitiers, then fought in Aquitaine.",
+    "confidence": "high",
+    "sources": [
+     "https://en.wikipedia.org/wiki/Peter_II,_Count_of_Alen%C3%A7on",
+     "https://en.wikipedia.org/wiki/Lords,_counts_and_dukes_of_Perche"
+    ]
+   },
+   {
+    "id": "bertrand_du_guesclin",
+    "name": "Bertrand du Guesclin",
+    "house": "du Guesclin",
+    "title": "Count of Longueville, Constable",
+    "born": 1320,
+    "died": 1380,
+    "provinces": [
+     "p1056",
+     "p1045"
+    ],
+    "traits": [
+     "Warlike"
+    ],
+    "heir": null,
+    "note": "Constable of France and its most famous captain; Count of Longueville in Normandy.",
+    "confidence": "high",
+    "sources": [
+     "https://en.wikipedia.org/wiki/Bertrand_du_Guesclin",
+     "https://en.wikisource.org/wiki/1911_Encyclop%C3%A6dia_Britannica/Du_Guesclin,_Bertrand"
+    ]
+   }
+  ],
+  "castile": [
+   {
+    "id": "alfonso_of_aragon",
+    "name": "Alfonso of Aragon",
+    "house": "Aragon",
+    "title": "Marquis of Villena",
+    "born": 1332,
+    "died": 1412,
+    "provinces": [
+     "p1612",
+     "p1611"
+    ],
+    "traits": [
+     "Warlike",
+     "Greedy"
+    ],
+    "heir": null,
+    "note": "Aragonese prince made Marquis of Villena by Henry II; Constable of Castile from 1382.",
+    "confidence": "high",
+    "sources": [
+     "https://en.wikipedia.org/wiki/Alfonso_I,_Duke_of_Gandia",
+     "https://dbe.rah.es/biografias/9085/alfonso"
+    ]
+   },
+   {
+    "id": "fadrique_of_castile",
+    "name": "Fadrique of Castile",
+    "house": "Trastámara",
+    "title": "Duke of Benavente",
+    "born": 1360,
+    "died": 1394,
+    "provinces": [
+     "p1600"
+    ],
+    "traits": [
+     "Greedy"
+    ],
+    "heir": null,
+    "note": "Bastard son of Henry II, made Duke of Benavente; plotted against his nephew and died in prison.",
+    "confidence": "medium",
+    "sources": [
+     "https://fernaolopes.fcsh.unl.pt/people/fadrique-duke-benavente",
+     "https://gedbas.genealogy.net/person/show/1134017092"
+    ]
+   },
+   {
+    "id": "alfonso_enriquez",
+    "name": "Alfonso Enríquez",
+    "house": "Trastámara",
+    "title": "Count of Noreña and Gijón",
+    "born": 1355,
+    "died": 1400,
+    "provinces": [
+     "p1329"
+    ],
+    "traits": [
+     "Greedy",
+     "Warlike"
+    ],
+    "heir": null,
+    "note": "Henry II's eldest bastard, Count of Gijón; rebelled three times to rule Asturias himself.",
+    "confidence": "high",
+    "sources": [
+     "https://en.wikipedia.org/wiki/Alfonso_Enr%C3%ADquez,_Count_of_Gij%C3%B3n_and_Nore%C3%B1a",
+     "https://dbe.rah.es/biografias/15606/alfonso-enriquez"
+    ]
+   },
+   {
+    "id": "pedro_gonzalez_de_mendoza",
+    "name": "Pedro González de Mendoza",
+    "house": "Mendoza",
+    "title": "Lord of Hita and Buitrago",
+    "born": 1340,
+    "died": 1385,
+    "provinces": [
+     "p1609",
+     "p1607"
+    ],
+    "traits": [
+     "Warlike",
+     "Builder"
+    ],
+    "heir": {
+     "name": "Diego Hurtado de Mendoza",
+     "born": 1367
+    },
+    "note": "Lord of Hita and Buitrago and royal steward; died at Aljubarrota.",
+    "confidence": "high",
+    "sources": [
+     "https://en.wikipedia.org/wiki/Diego_Hurtado_de_Mendoza_(Admiral_of_Castile)",
+     "https://www.somosprimos.com/inclan/pedrogonzalold.htm"
+    ]
+   },
+   {
+    "id": "juan_alonso_de_guzman",
+    "name": "Juan Alonso de Guzmán",
+    "house": "Guzmán",
+    "title": "Count of Niebla",
+    "born": 1342,
+    "died": 1396,
+    "provinces": [
+     "p1880",
+     "p1882"
+    ],
+    "traits": [
+     "Warlike"
+    ],
+    "heir": null,
+    "note": "First Count of Niebla, Andalusian magnate and Henry II's son-in-law; ancestor of Medina Sidonia.",
+    "confidence": "high",
+    "sources": [
+     "https://en.wikipedia.org/wiki/Juan_Alonso_de_Guzm%C3%A1n,_1st_Count_of_Niebla",
+     "https://en.wikipedia.org/wiki/Duke_of_Medina_Sidonia"
+    ]
+   }
+  ],
+  "portugal": [
+   {
+    "id": "john_of_aviz",
+    "name": "John of Aviz",
+    "house": "Aviz",
+    "title": "Master of the Order of Aviz",
+    "born": 1357,
+    "died": 1433,
+    "provinces": [
+     "p1593"
+    ],
+    "traits": [
+     "Warlike",
+     "Pious"
+    ],
+    "heir": null,
+    "note": "Bastard half-brother of King Ferdinand; Master of the Order of Aviz, king from 1385.",
+    "confidence": "high",
+    "sources": [
+     "https://en.wikipedia.org/wiki/John_I_of_Portugal",
+     "https://en.wikipedia.org/wiki/Military_Order_of_Aviz"
+    ]
+   }
+  ],
+  "aragon": [
+   {
+    "id": "peter_of_urgell",
+    "name": "Peter of Urgell",
+    "house": "Barcelona",
+    "title": "Count of Urgell",
+    "born": 1340,
+    "died": 1408,
+    "provinces": [
+     "p1345"
+    ],
+    "traits": [
+     "Builder"
+    ],
+    "heir": {
+     "name": "James of Urgell",
+     "born": 1380
+    },
+    "note": "Count of Urgell at Balaguer, the king's nephew; father of the 1412 claimant.",
+    "confidence": "high",
+    "sources": [
+     "https://en.wikipedia.org/wiki/Peter_II,_Count_of_Urgell",
+     "https://www.enciclopedia.cat/gran-enciclopedia-catalana/pere-ii-durgell"
+    ]
+   }
+  ],
+  "hungary": [
+   {
+    "id": "nicholas_i_garai",
+    "name": "Nicholas I Garai",
+    "house": "Garai",
+    "title": "Palatine of Hungary",
+    "born": 1325,
+    "died": 1386,
+    "provinces": [
+     "p1405"
+    ],
+    "traits": [
+     "Warlike",
+     "Greedy"
+    ],
+    "heir": {
+     "name": "Nicholas II Garai",
+     "born": 1367
+    },
+    "note": "Palatine of Hungary since 1375; former Ban of Macsó, seated at Gara near Đakovo.",
+    "confidence": "high",
+    "sources": [
+     "https://en.wikipedia.org/wiki/Nicholas_I_Garai",
+     "https://en.wikipedia.org/wiki/Garai_family",
+     "https://en.wikipedia.org/wiki/Nicholas_II_Garai"
+    ]
+   },
+   {
+    "id": "stephen_lackfi",
+    "name": "Stephen Lackfi",
+    "house": "Lackfi",
+    "title": "Lord of Csáktornya (Međimurje) and Keszthely",
+    "born": null,
+    "died": 1397,
+    "provinces": [
+     "p1125",
+     "p1122"
+    ],
+    "traits": [
+     "Warlike",
+     "Pious"
+    ],
+    "heir": null,
+    "note": "Former Voivode of Transylvania; lord of Međimurje, later palatine, murdered at Križevci in 1397.",
+    "confidence": "medium",
+    "sources": [
+     "https://en.wikipedia.org/wiki/Stephen_II_Lackfi",
+     "https://en.wikipedia.org/wiki/Lackfi_family",
+     "https://digihung.univie.ac.at/foswikineu/bin/view.cgi/DigiHung/PersonLackfiIstvánPalatinVon1387Bis1392"
+    ]
+   },
+   {
+    "id": "ladislaus_of_opole",
+    "name": "Ladislaus of Opole",
+    "house": "Piast (Opole)",
+    "title": "Duke of Opole, Governor of Ruthenia",
+    "born": 1332,
+    "died": 1401,
+    "provinces": [
+     "p1151",
+     "p862"
+    ],
+    "traits": [
+     "Pious",
+     "Builder"
+    ],
+    "heir": null,
+    "note": "Silesian duke ruling Red Ruthenia for King Louis; later founded the Jasna Góra monastery.",
+    "confidence": "medium",
+    "sources": [
+     "https://en.wikipedia.org/wiki/Vladislaus_II_of_Opole",
+     "https://rep.up.krakow.pl/xmlui/handle/11716/13366",
+     "https://en.wikipedia.org/wiki/Jasna_Gora"
+    ]
+   }
+  ],
+  "lithuania": [
+   {
+    "id": "kestutis",
+    "name": "Kęstutis",
+    "house": "Gediminid",
+    "title": "Duke of Trakai",
+    "born": 1297,
+    "died": 1382,
+    "provinces": [
+     "p596",
+     "p590",
+     "p597"
+    ],
+    "traits": [
+     "Warlike",
+     "Builder"
+    ],
+    "heir": {
+     "name": "Vytautas",
+     "born": 1350
+    },
+    "note": "Duke of Trakai and Samogitia; co-ruled Lithuania with Algirdas and fought the Teutonic Order for decades.",
+    "confidence": "high",
+    "sources": [
+     "https://en.wikipedia.org/wiki/Duchy_of_Trakai",
+     "https://wikipedia.classicistranieri.com/en/articles/k/%C4%99/s/K%C4%99stutis.html",
+     "https://en.wikipedia.org/wiki/Vytautas_the_Great"
+    ]
+   },
+   {
+    "id": "vytautas",
+    "name": "Vytautas",
+    "house": "Gediminid",
+    "title": "Prince of Grodno",
+    "born": 1350,
+    "died": 1430,
+    "provinces": [
+     "p603",
+     "p863"
+    ],
+    "traits": [
+     "Warlike",
+     "Builder"
+    ],
+    "heir": null,
+    "note": "Kęstutis's son, Prince of Grodno; later Grand Duke Vytautas the Great.",
+    "confidence": "high",
+    "sources": [
+     "https://en.wikipedia.org/wiki/Vytautas_the_Great",
+     "https://en.wikipedia.org/wiki/Duchy_of_Trakai"
+    ]
+   },
+   {
+    "id": "vladimir_olgerdovich",
+    "name": "Vladimir Olgerdovich",
+    "house": "Gediminid",
+    "title": "Prince of Kiev",
+    "born": null,
+    "died": 1398,
+    "provinces": [
+     "p879",
+     "p1177"
+    ],
+    "traits": [
+     "Builder"
+    ],
+    "heir": null,
+    "note": "Algirdas's son, Prince of Kiev since 1362; Vytautas moved him to Kapyl in 1394.",
+    "confidence": "high",
+    "sources": [
+     "https://en.wikipedia.org/wiki/Vladimir_Olgerdovich",
+     "https://en.wikipedia.org/wiki/History_of_Kyiv_(1362%E2%80%931657)"
+    ]
+   },
+   {
+    "id": "dmitry_of_bryansk",
+    "name": "Dmitry of Bryansk",
+    "house": "Gediminid",
+    "title": "Duke of Bryansk",
+    "born": null,
+    "died": 1399,
+    "provinces": [
+     "p884",
+     "p886"
+    ],
+    "traits": [
+     "Warlike"
+    ],
+    "heir": null,
+    "note": "Algirdas's son and Duke of Bryansk; went over to Moscow in 1379, fought at Kulikovo, died at the Vorskla.",
+    "confidence": "high",
+    "sources": [
+     "https://en.wikipedia.org/wiki/Dmitry_of_Bryansk",
+     "https://en.wikipedia.org/wiki/Battle_of_Kulikovo"
+    ]
+   }
+  ],
+  "muscovy": [
+   {
+    "id": "vladimir_the_bold",
+    "name": "Vladimir the Bold",
+    "house": "Rurikid (Moscow)",
+    "title": "Prince of Serpukhov and Borovsk",
+    "born": 1353,
+    "died": 1410,
+    "provinces": [
+     "p629",
+     "p630"
+    ],
+    "traits": [
+     "Warlike",
+     "Builder"
+    ],
+    "heir": null,
+    "note": "Dmitry Donskoy's cousin; built Serpukhov's oak kremlin and led the ambush regiment at Kulikovo.",
+    "confidence": "high",
+    "sources": [
+     "https://en.wikipedia.org/wiki/Vladimir_the_Bold",
+     "https://rusmania.com/central/moscow-region/serpukhov/sights/around-the-centre/prince-vladimir-the-brave-of-serpukhov-monument"
+    ]
+   }
+  ],
+  "ottomans": [
+   {
+    "id": "gazi_evrenos",
+    "name": "Gazi Evrenos",
+    "house": "Evrenosoğulları",
+    "title": "March lord (uç beyi) of Komotini",
+    "born": null,
+    "died": 1417,
+    "provinces": [
+     "p1655"
+    ],
+    "traits": [
+     "Warlike",
+     "Builder"
+    ],
+    "heir": null,
+    "note": "Ottoman march lord based at Komotini; later took Serres and founded Giannitsa.",
+    "confidence": "high",
+    "sources": [
+     "https://en.wikipedia.org/wiki/Evrenos",
+     "https://en.wikipedia.org/wiki/Komotini",
+     "https://kureansiklopedi.com/en/detay/gumulcine-2"
+    ]
+   },
+   {
+    "id": "lala_sahin_pasha",
+    "name": "Lala Şahin Pasha",
+    "house": "Pasha",
+    "title": "Beylerbey of Rumelia",
+    "born": null,
+    "died": 1388,
+    "provinces": [
+     "p1430",
+     "p1436"
+    ],
+    "traits": [
+     "Warlike",
+     "Builder"
+    ],
+    "heir": null,
+    "note": "First Beylerbey of Rumelia and Murad I's tutor; conqueror of Plovdiv.",
+    "confidence": "medium",
+    "sources": [
+     "https://en.wikipedia.org/wiki/Lala_Shahin_Pasha",
+     "https://en.wikipedia.org/wiki/Beylerbey",
+     "https://islamansiklopedisi.org.tr/lala-sahin-pasa-kulliyesi"
+    ]
+   }
+  ],
+  "bohemia": [
+   {
+    "id": "oldrich_i_of_rosenberg",
+    "name": "Oldřich I of Rosenberg",
+    "house": "Rosenberg (Rožmberk)",
+    "title": "Head of the House of Rosenberg",
+    "born": null,
+    "died": 1390,
+    "provinces": [
+     "p1114"
+    ],
+    "traits": [
+     "Pious"
+    ],
+    "heir": {
+     "name": "Henry III of Rosenberg",
+     "born": 1361
+    },
+    "note": "Head of the Rosenbergs, the greatest family of South Bohemia, from Český Krumlov.",
+    "confidence": "high",
+    "sources": [
+     "https://en.wikipedia.org/wiki/Old%C5%99ich_I_of_Rosenberg",
+     "https://en.wikipedia.org/wiki/Rosenberg_family",
+     "https://en.wikipedia.org/wiki/Henry_III_of_Rosenberg"
+    ]
+   }
+  ],
+  "japan": [
+   {
+    "id": "hosokawa_yoriyuki",
+    "name": "Hosokawa Yoriyuki",
+    "house": "Hosokawa",
+    "title": "Kanrei; shugo of Awa, Sanuki, Tosa and Iyo",
+    "born": 1329,
+    "died": 1392,
+    "provinces": [
+     "p2441",
+     "p2442"
+    ],
+    "traits": [
+     "Builder",
+     "Warlike"
+    ],
+    "heir": null,
+    "note": "First kanrei and guardian of the young shogun Yoshimitsu; master of Shikoku.",
+    "confidence": "high",
+    "sources": [
+     "https://en.wikipedia.org/wiki/Hosokawa_clan",
+     "https://samurai-archives.com/wiki/Hosokawa_Yoriyuki",
+     "https://kotobank.jp/word/細川頼之"
+    ]
+   },
+   {
+    "id": "shiba_yoshimasa",
+    "name": "Shiba Yoshimasa",
+    "house": "Shiba",
+    "title": "Shugo of Echizen and Etchu (kanrei 1379-1397)",
+    "born": 1350,
+    "died": 1410,
+    "provinces": [
+     "p2113",
+     "p2115"
+    ],
+    "traits": [
+     "Builder",
+     "Greedy"
+    ],
+    "heir": null,
+    "note": "Head of the Shiba; leads the lords who will topple Hosokawa Yoriyuki in 1379.",
+    "confidence": "high",
+    "sources": [
+     "https://en.wikipedia.org/wiki/Shiba_Yoshiyuki",
+     "https://kotobank.jp/word/斯波義将"
+    ]
+   },
+   {
+    "id": "toki_yoriyasu",
+    "name": "Toki Yoriyasu",
+    "house": "Toki",
+    "title": "Shugo of Mino, Owari and Ise",
+    "born": 1318,
+    "died": 1388,
+    "provinces": [
+     "p2116",
+     "p2114"
+    ],
+    "traits": [
+     "Warlike",
+     "Builder"
+    ],
+    "heir": null,
+    "note": "Veteran of Takauji's wars, governor of three provinces; built Kawate castle in Mino.",
+    "confidence": "high",
+    "sources": [
+     "https://kotobank.jp/word/%E5%9C%9F%E5%B2%90%E9%A0%BC%E5%BA%B7-104621",
+     "https://kotobank.jp/word/%E5%9C%9F%E5%B2%90%E6%B0%8F-104587",
+     "https://www.kankou-gifu.jp/spot/detail_6647.html"
+    ]
+   },
+   {
+    "id": "ouchi_hiroyo",
+    "name": "Ōuchi Hiroyo",
+    "house": "Ōuchi",
+    "title": "Shugo of Suo and Nagato (also Iwami)",
+    "born": null,
+    "died": 1380,
+    "provinces": [
+     "p2108"
+    ],
+    "traits": [
+     "Builder",
+     "Warlike"
+    ],
+    "heir": {
+     "name": "Ōuchi Yoshihiro",
+     "born": 1356
+    },
+    "note": "Built the Ouchi seat at Yamaguchi, the 'little Kyoto' of the west.",
+    "confidence": "medium",
+    "sources": [
+     "https://tabi-mag.jp/ya0390/",
+     "https://kotobank.jp/word/大内義弘",
+     "https://en.wikipedia.org/wiki/%C5%8Cuchi_Yoshihiro"
+    ]
+   },
+   {
+    "id": "yamana_tokiyoshi",
+    "name": "Yamana Tokiyoshi",
+    "house": "Yamana",
+    "title": "Head of the Yamana; shugo of Tajima (and Bingo from 1379)",
+    "born": 1346,
+    "died": 1389,
+    "provinces": [
+     "p2109"
+    ],
+    "traits": [
+     "Warlike",
+     "Greedy"
+    ],
+    "heir": {
+     "name": "Yamana Tokihiro",
+     "born": 1367
+    },
+    "note": "Head of the Yamana, whose kin hold a sixth of Japan's provinces.",
+    "confidence": "medium",
+    "sources": [
+     "https://kotobank.jp/word/%E5%B1%B1%E5%90%8D%E6%B0%8F-144239",
+     "https://kotobank.jp/word/%E5%B1%B1%E5%90%8D%E6%99%82%E7%85%95-144258",
+     "https://en.wikipedia.org/wiki/Yamana_S%C5%8Dzen"
+    ]
+   },
+   {
+    "id": "shimazu_ujihisa",
+    "name": "Shimazu Ujihisa",
+    "house": "Shimazu",
+    "title": "Shugo of Osumi (stripped 1376, in revolt)",
+    "born": 1328,
+    "died": 1387,
+    "provinces": [
+     "p2439",
+     "p2438"
+    ],
+    "traits": [
+     "Warlike",
+     "Greedy"
+    ],
+    "heir": null,
+    "note": "Defied the Kyushu deputy after the Mizushima murder of 1375; a restless southern lord.",
+    "confidence": "medium",
+    "sources": [
+     "https://samurai-archives.com/wiki/Shimazu_Ujihisa",
+     "https://www.pref.kagoshima.jp/ab23/pr/gaiyou/rekishi/tyuusei/sansyu.html",
+     "https://pedia.3rd-in.co.jp/wiki/%E7%9B%B8%E8%89%AF%E5%89%8D%E9%A0%BC"
+    ],
+    "loyalty": "Disloyal"
+   }
+  ],
+  "ming": [
+   {
+    "id": "zhu_shuang",
+    "name": "Zhu Shuang",
+    "house": "Zhu",
+    "title": "Prince of Qin",
+    "born": 1356,
+    "died": 1395,
+    "provinces": [
+     "p2069"
+    ],
+    "traits": [
+     "Warlike"
+    ],
+    "heir": null,
+    "note": "Hongwu's second son, newly installed at Xi'an to guard the northwest.",
+    "confidence": "high",
+    "sources": [
+     "https://en.wikipedia.org/wiki/Zhu_Shuang",
+     "https://en.wikipedia.org/wiki/Prince_of_Qin_(Ming_dynasty)"
+    ]
+   },
+   {
+    "id": "zhu_gang",
+    "name": "Zhu Gang",
+    "house": "Zhu",
+    "title": "Prince of Jin",
+    "born": 1358,
+    "died": 1398,
+    "provinces": [
+     "p1801",
+     "p2078"
+    ],
+    "traits": [
+     "Warlike",
+     "Pious"
+    ],
+    "heir": null,
+    "note": "Hongwu's third son, installed at Taiyuan in 1378; founded the Chongshan temple.",
+    "confidence": "high",
+    "sources": [
+     "https://en.wikipedia.org/wiki/Zhu_Gang",
+     "https://www.mdpi.com/2077-1444/13/9/785"
+    ]
+   }
+  ],
+  "korea": [
+   {
+    "id": "yi_seong_gye",
+    "name": "Yi Seong-gye",
+    "house": "Jeonju Yi",
+    "title": "General; hereditary commander of the northeast (Hamhung region)",
+    "born": 1335,
+    "died": 1408,
+    "provinces": [
+     "p1828"
+    ],
+    "traits": [
+     "Warlike",
+     "Builder"
+    ],
+    "heir": {
+     "name": "Yi Bang-gwa",
+     "born": 1357
+    },
+    "note": "Frontier general from Hamhung with a private army; will found Joseon in 1392.",
+    "confidence": "high",
+    "sources": [
+     "https://en.wikipedia.org/wiki/Taejo_of_Joseon",
+     "https://hasp.ub.uni-heidelberg.de/catalog/view/1158/2108/103708"
+    ]
+   }
+  ],
+  "delhi": [
+   {
+    "id": "malik_raja_faruqi",
+    "name": "Malik Raja Faruqi",
+    "house": "Faruqi",
+    "title": "Iqta holder of Thalner and Karanda",
+    "born": 1340,
+    "died": 1399,
+    "provinces": [
+     "p2974"
+    ],
+    "traits": [
+     "Warlike"
+    ],
+    "heir": null,
+    "note": "Granted Thalner by Firuz Shah in 1370; founder of the Faruqi line of Khandesh.",
+    "confidence": "high",
+    "sources": [
+     "https://en.wikipedia.org/wiki/Farooqui_dynasty",
+     "https://en.wikipedia.org/wiki/Thalner",
+     "https://dhule.gov.in/history/"
+    ]
+   }
+  ],
+  "mamluks": [
+   {
+    "id": "barquq",
+    "name": "Barquq",
+    "house": "Burji (Circassian)",
+    "title": "Atabak al-asakir (commander in chief), co-regent",
+    "born": 1336,
+    "died": 1399,
+    "provinces": [
+     "p2236"
+    ],
+    "traits": [
+     "Warlike",
+     "Builder"
+    ],
+    "heir": null,
+    "note": "Circassian emir ruling for the boy sultan; seizes the throne himself in 1382.",
+    "confidence": "high",
+    "sources": [
+     "https://en.wikipedia.org/wiki/Barquq",
+     "https://en.wikipedia.org/wiki/Al-Mansur_Ali_II,_Sultan_of_Egypt"
+    ]
+   }
+  ],
+  "timurids": [
+   {
+    "id": "umar_shaikh_mirza",
+    "name": "Umar Shaikh Mirza",
+    "house": "Timurid",
+    "title": "Governor of Fergana (Andijan)",
+    "born": 1356,
+    "died": 1394,
+    "provinces": [
+     "p1760",
+     "p1757"
+    ],
+    "traits": [
+     "Warlike"
+    ],
+    "heir": null,
+    "note": "Timur's eldest surviving son, given Fergana in 1376.",
+    "confidence": "high",
+    "sources": [
+     "https://en.wikipedia.org/wiki/Umar_Shaikh_Mirza_I",
+     "https://www.iranicaonline.org/articles/andejn/"
+    ]
+   }
+  ]
+ },
+ "later": {
+  "nuno_alvares_pereira_1385": {
+   "id": "nuno_alvares_pereira_1385",
+   "name": "Nuno Álvares Pereira",
+   "house": "Pereira",
+   "title": "Constable, Count of Ourém",
+   "born": 1360,
+   "died": 1431,
+   "provinces": [
+    "p1589",
+    "p1592"
+   ],
+   "traits": [
+    "Warlike",
+    "Pious"
+   ],
+   "heir": null,
+   "note": "Portugal's great Constable, victor of Aljubarrota; ended his life as a Carmelite friar.",
+   "confidence": "high",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Nuno_%C3%81lvares_Pereira",
+    "https://pacodosduques.gov.pt/monumentos/paco-dos-duques/historia-paco/nuno-alvares-pereira/?lang=en"
+   ],
+   "realm": "portugal",
+   "year": 1385
+  },
+  "john_hunyadi_1439": {
+   "id": "john_hunyadi_1439",
+   "name": "John Hunyadi",
+   "house": "Hunyadi",
+   "title": "Ban of Severin, later Voivode of Transylvania",
+   "born": 1406,
+   "died": 1456,
+   "provinces": [
+    "p1422",
+    "p1419"
+   ],
+   "traits": [
+    "Warlike",
+    "Builder"
+   ],
+   "heir": null,
+   "note": "The White Knight of Wallachia; Hungary's great captain against the Ottomans.",
+   "confidence": "high",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Hunyadi_family",
+    "https://www.britannica.com/biography/Janos-Hunyadi",
+    "https://www.newadvent.org/cathen/07564b.htm"
+   ],
+   "realm": "hungary",
+   "year": 1439
+  },
+  "skirgaila_1382": {
+   "id": "skirgaila_1382",
+   "name": "Skirgaila",
+   "house": "Gediminid",
+   "title": "Duke of Trakai",
+   "born": 1354,
+   "died": 1397,
+   "provinces": [
+    "p596",
+    "p597"
+   ],
+   "traits": [
+    "Warlike",
+    "Greedy"
+   ],
+   "heir": null,
+   "note": "Jogaila's trusted brother; given Trakai after Kęstutis died in prison.",
+   "confidence": "medium",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Skirgaila",
+    "https://en.wikipedia.org/wiki/Duchy_of_Trakai",
+    "https://en.wikipedia.org/wiki/Lithuanian_Civil_War_(1381%E2%80%931384)"
+   ],
+   "realm": "lithuania",
+   "year": 1382
+  },
+  "jan_zizka_1421": {
+   "id": "jan_zizka_1421",
+   "name": "Jan Žižka",
+   "house": "Žižka of Trocnov",
+   "title": "Lord of Kalich, Hussite captain",
+   "born": 1360,
+   "died": 1424,
+   "provinces": [
+    "p834"
+   ],
+   "traits": [
+    "Warlike",
+    "Pious"
+   ],
+   "heir": null,
+   "note": "One-eyed Hussite general who never lost a battle; lord of Kalich castle.",
+   "confidence": "medium",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Jan_%C5%BDi%C5%BEka",
+    "https://www.kudyznudy.cz/aktivity/kalich"
+   ],
+   "realm": "bohemia",
+   "year": 1421
+  },
+  "manuel_ii_palaiologos_1382": {
+   "id": "manuel_ii_palaiologos_1382",
+   "name": "Manuel II Palaiologos",
+   "house": "Palaiologos",
+   "title": "Despot ruling Thessalonica",
+   "born": 1350,
+   "died": 1425,
+   "provinces": [
+    "p1648",
+    "p1651"
+   ],
+   "traits": [
+    "Pious",
+    "Warlike"
+   ],
+   "heir": null,
+   "note": "Imprisoned prince who seizes Thessalonica in 1382; the future emperor.",
+   "confidence": "high",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Manuel_II_Palaiologos",
+    "https://en.wikipedia.org/wiki/Siege_of_Thessalonica_(1383%E2%80%931387)",
+    "https://snl.no/Manuel_2._Palaiologos"
+   ],
+   "realm": "byzantium",
+   "year": 1382
+  },
+  "aleksandras_olelka_1443": {
+   "id": "aleksandras_olelka_1443",
+   "name": "Aleksandras Olelka",
+   "house": "Gediminid (Olelkovich)",
+   "title": "Prince of Kiev",
+   "born": null,
+   "died": 1454,
+   "provinces": [
+    "p879",
+    "p1177"
+   ],
+   "traits": [
+    "Builder"
+   ],
+   "heir": null,
+   "note": "Son of Vladimir Olgerdovich; restores his family's rule in Kiev in 1443.",
+   "confidence": "medium",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Aleksandras_Olelka"
+   ],
+   "realm": "lithuania",
+   "year": 1443
+  },
+  "zhu_di_1380": {
+   "id": "zhu_di_1380",
+   "name": "Zhu Di",
+   "house": "Zhu",
+   "title": "Prince of Yan",
+   "born": 1360,
+   "died": 1424,
+   "provinces": [
+    "p1809"
+   ],
+   "traits": [
+    "Warlike",
+    "Builder"
+   ],
+   "heir": null,
+   "note": "Fourth son of the emperor, given Beiping; the future Yongle Emperor.",
+   "confidence": "high",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Yongle_Emperor",
+    "https://www.cambridge.org/core/product/66519489DE8F7EE6B3D798C3D5D48F0A/core-reader"
+   ],
+   "realm": "ming",
+   "year": 1380
+  },
+  "zafar_khan_muzaffar_shah_i_1391": {
+   "id": "zafar_khan_muzaffar_shah_i_1391",
+   "name": "Zafar Khan (Muzaffar Shah I)",
+   "house": "Muzaffarid",
+   "title": "Governor of Gujarat",
+   "born": 1342,
+   "died": 1411,
+   "provinces": [
+    "p2763",
+    "p2764"
+   ],
+   "traits": [
+    "Warlike"
+   ],
+   "heir": null,
+   "note": "Governor of Gujarat from 1391, later its first sultan.",
+   "confidence": "high",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Muzaffar_Shah_I",
+    "https://en.wikipedia.org/wiki/Gujarat_Sultanate"
+   ],
+   "realm": "delhi",
+   "year": 1391
+  },
+  "dilawar_khan_ghuri_1392": {
+   "id": "dilawar_khan_ghuri_1392",
+   "name": "Dilawar Khan Ghuri",
+   "house": "Ghurid of Malwa",
+   "title": "Governor of Malwa (seat Dhar)",
+   "born": null,
+   "died": 1406,
+   "provinces": [
+    "p2772"
+   ],
+   "traits": [
+    "Builder",
+    "Warlike"
+   ],
+   "heir": null,
+   "note": "Governor of Malwa from Dhar, founder of the Malwa sultanate.",
+   "confidence": "medium",
+   "sources": [
+    "https://en.wikipedia.org/wiki/Dilawar_Khan",
+    "https://en.wikipedia.org/wiki/Malwa_Sultanate",
+    "https://en.wikipedia.org/wiki/Hoshang_Shah"
+   ],
+   "realm": "delhi",
+   "year": 1392
+  }
+ }
+}

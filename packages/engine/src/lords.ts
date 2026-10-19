@@ -95,6 +95,7 @@ export function seedLords(world: World): void {
       continue;
     }
     const historical = seatHistorical(world, n, capital, history);
+    const reserved = reservedNames(def.id);
     const land = byDistance(world, n, capital);
     // The historical lords stand for the realm's great houses: the catalogue's list is for a later start (REALM-282).
     const start = startingLords(land.length, history.length ? [] : (great[def.id] ?? []));
@@ -108,7 +109,7 @@ export function seedLords(world: World): void {
     seats.forEach((seat, k) => {
       const place = world.rules.provinces[seat]!.name;
       const house = start.names[k] ? capitalize(start.names[k]!) : place;
-      world.lords.push({ name: personName(world.rules, n, seat * 7 + k, house), house, nation: n, loyalty: "Loyal", upCredit: 0 });
+      world.lords.push({ name: generatedName(world, n, seat * 7 + k, house, reserved), house, nation: n, loyalty: "Loyal", upCredit: 0 });
       world.provinceLord[seat] = first + k;
     });
     // Each lord's lands grow outward from his seat over the land no one else holds.
@@ -152,6 +153,34 @@ function seatHistorical(world: World, n: number, capital: number, history: reado
   return seated;
 }
 
+/** Words of rank, not family: a historical "Lala Şahin Pasha" leaves other pashas their name. */
+const RANKS = new Set(["pasha", "bey", "beg", "khan", "mirza", "shah", "malik", "ağa", "the", "grim", "bold"]);
+
+/**
+ * The houses and family names of a realm's historical lords, now and later:
+ * no generated lord of the start takes them (REALM-281), so 1378 Hungary has
+ * no generated Hunyadi beside the one an event brings in.
+ */
+function reservedNames(realm: string): RegExp | null {
+  const people = [...(startLords.realms[realm] ?? []), ...Object.values(startLords.later).filter((h) => h.realm === realm)];
+  const words = new Set<string>();
+  for (const h of people) {
+    for (const part of h.house.split(/[(),]/)) if (part.trim()) words.add(part.trim());
+    const last = h.name.split(/\s+/).at(-1)!;
+    if (h.name.includes(" ") && !RANKS.has(last.toLowerCase())) words.add(last);
+  }
+  // A long family name also catches its forms (Rožmberk, z Rožmberka); a short one must stand alone.
+  const word = (w: string) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + (w.length >= 5 ? "" : "(?=$|[\\s'-])");
+  return words.size ? new RegExp(`(^|[\\s'-])(${[...words].map(word).join("|")})`, "iu") : null;
+}
+
+/** A generated lord's name, drawn again (a few times at most) while it is a historical lord's house or name. */
+function generatedName(world: World, n: number, seed: number, place: string, reserved: RegExp | null): string {
+  let name = personName(world.rules, n, seed, place);
+  for (let i = 1; reserved && reserved.test(name) && i <= 8; i++) name = personName(world.rules, n, seed + i * 7919, place);
+  return name;
+}
+
 /** Makes a lord the historical person: his name, house, title, traits, age and heir by the start year (where the sources give his birth; else the game draws them), and the line on who he was. */
 export function asHistorical(world: World, l: RealmLord, h: HistoricalLordDef): void {
   const year = world.date.year;
@@ -165,6 +194,7 @@ export function asHistorical(world: World, l: RealmLord, h: HistoricalLordDef): 
   }
   l.historical = h.id;
   l.note = h.note;
+  if (h.loyalty) l.loyalty = h.loyalty;
 }
 
 /** Someone new holds a lord's lands (an heir, a kinsman, a confirmed son): the title stays with the lands, the history was the man's. */
