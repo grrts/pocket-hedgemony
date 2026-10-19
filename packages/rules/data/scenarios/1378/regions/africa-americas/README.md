@@ -8,10 +8,10 @@ Built by `python3 tools/domain-data/start-1378-africa-americas.py /mnt/project-f
 
 - **Maghreb.** Two Marinid sultans: Fez (`morocco`) and the new `marinid_marrakesh`. Tlemcen is sovereign and holds Algiers (low confidence). Tunis is smaller, and Tripoli has its local lords.
 - **West Africa.** Mali is at its 14th-century extent (Timbuktu, Walata, Gao), with its capital at Niani. Songhai is Mali's tributary downstream of Gao. Kanem's capital is Njimi, at war with the Bulala.
-- **The Horn and the coast.** The new `ifat` takes the 1444 Adal land and the escarpment east of Shewa, at war with Ethiopia. `mogadishu` and `great_zimbabwe` become map nations (decision 3).
+- **The Horn and the coast.** The new `ifat` takes the 1444 Adal land and the escarpment east of Shewa, at war with Ethiopia. `mogadishu` and `great_zimbabwe` become map nations (decision 3). Mogadishu takes the city from `ajuran`, which keeps the southern Somali interior from the middle Shabelle (low confidence).
 - **Mesoamerica.** The new `tepanecs` hold the Basin of Mexico. The Mexica (`aztecs`) hold only Tenochtitlan as their tributary. The new `huexotzinco` leads the Puebla valley. Pátzcuaro is the Purépecha seat, and Mayapan is the League's.
 - **Andes.** Cusco is one lordship of its basin. The new `chanka` hold Andahuaylas and Ayacucho, and Chimor holds Lambayeque (decision 7). The Muisca seat is Bacatá (decision 4).
-- **Asleep until they form** (`sleeping-realms.json`, 22 realms): Adal, Kongo, Mutapa, Torwa, Ajuran, Kaffa, Aïr, the Niger-bend Tuareg, Masina, the Canarian lordship, Bougie, Debdou, the Hintata, Loango, the four Great Lakes kingdoms after Kitara, Mandara, Coosa, Cherokee and Creek (decision 6). Mississippian chiefdoms grow into the Cherokee and Creek land.
+- **Asleep until they form** (`sleeping-realms.json`, 27 realms): Adal, Kongo, Mutapa (its capital moved north to Zvongombe), Torwa, Kaffa, Aïr, the Niger-bend Tuareg, Masina, the Canarian lordship, Bougie, Debdou, the Hintata, Loango, the four Great Lakes kingdoms after Kitara, Mandara, Coosa, Cherokee and Creek (decision 6), and the six Yucatec kuchkabalob (Maní, Sotuta, Cupul, Ecab, Chetumal and Ah Canul), which wake when Mayapan falls c.1441 (decision 2). The map has five provinces on the peninsula, so some kuchkabalob share one until the map is finer. Mississippian chiefdoms grow into the Cherokee and Creek land.
 
 ## Fields the merge step resolves
 

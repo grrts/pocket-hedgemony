@@ -1,0 +1,17 @@
+{# The ways to play: the browser game once PLAY_URL is set ("Coming soon" until then), and a
+   button per store whose STORE_*_URL is set. Pass wiki: true to add a link into the wiki. #}
+<div class="cta">
+    {% if play_url %}
+        <a class="btn wax play" href="{{ play_url }}"><img class="px" src="/site/art/icon-crown.png" width="20" height="16" alt="">Play free in your browser</a>
+    {% else %}
+        <span class="soon"><img class="px" src="/site/art/icon-hourglass.png" width="16" height="22" alt="">Coming soon</span>
+    {% endif %}
+    {% if store_app_store_url or store_google_play_url or store_steam_url %}
+    <div class="stores">
+        {% if store_app_store_url %}<a class="btn store" href="{{ store_app_store_url }}" rel="noopener" data-store="app-store"><small>Download on the</small>App Store</a>{% endif %}
+        {% if store_google_play_url %}<a class="btn store" href="{{ store_google_play_url }}" rel="noopener" data-store="google-play"><small>Get it on</small>Google Play</a>{% endif %}
+        {% if store_steam_url %}<a class="btn store" href="{{ store_steam_url }}" rel="noopener" data-store="steam"><small>Find it on</small>Steam</a>{% endif %}
+    </div>
+    {% endif %}
+    {% if wiki ?? false %}<a class="btn paper" href="{{ path('wiki') }}"><img class="px" src="/site/art/icon-scroll.png" width="20" height="22" alt="">Read the wiki</a>{% endif %}
+</div>

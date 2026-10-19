@@ -12,7 +12,8 @@
     "smoke": "node scripts/smoke.mjs",
     "close-check": "node scripts/close-check.mjs",
     "perf": "node scripts/perf.mjs",
-    "site-art": "node scripts/site-art.mjs"
+    "site-art": "node scripts/site-art.mjs",
+    "site-shots": "node scripts/site-shots.mjs"
   },
   "dependencies": {
     "@fontsource/jacquard-12": "5.3.0",
