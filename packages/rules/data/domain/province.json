@@ -240,6 +240,7 @@
   },
   "plague": {
     "steps": ["none", "rumour", "outbreak", "burning out"],
+    "care_death_cut": 0.5,
     "outbreak_seasons": [1, 2],
     "links": ["road", "river", "sea route", "army", "refugees"],
     "$comment": "PROV-342 to PROV-353 (18 October 2026): the game's plague. Every number below is provisional. Weeks are plague weeks, the days of decided.plague_week_days (four a month). A province's crowding is its townsfolk share over crowd_town_share, kept between crowd_min and crowd_max.",
@@ -374,5 +375,5 @@
     "settlement_stages": { "trading post": "Outpost", "settlement": "Settled", "colony": "Self-governing" },
     "officials_per_province": { "G1": 1, "G9": 2, "G16": 3, "extra_from": ["B2", "G11", "T14"] }
   },
-  "_provisional": ["decided.tax_travel_loss_per_day", "decided.town_size_floors", "decided.town_tiles_at", "decided.recruit_share_per_class", "decided.homeless_drift_share", "decided.refugee_settle_years", "decided.sickness_monthly", "decided.official_learn_years", "plague.start_chance_year", "plague.crowd_town_share", "plague.crowd_min", "plague.crowd_max", "plague.rumour_weeks", "plague.weeks_per_season", "plague.burning_out_weeks", "plague.spread_week", "plague.river_factor", "plague.sea_spread_week", "plague.into_quarantine_factor", "plague.army_carry_weeks", "plague.army_spread_week", "plague.spared_years", "plague.town_week_share_max", "plague.quarantine_tax_factor"]
+  "_provisional": ["decided.tax_travel_loss_per_day", "decided.town_size_floors", "decided.town_tiles_at", "decided.recruit_share_per_class", "decided.homeless_drift_share", "decided.refugee_settle_years", "decided.sickness_monthly", "decided.official_learn_years", "plague.start_chance_year", "plague.crowd_town_share", "plague.crowd_min", "plague.crowd_max", "plague.rumour_weeks", "plague.weeks_per_season", "plague.burning_out_weeks", "plague.spread_week", "plague.river_factor", "plague.sea_spread_week", "plague.into_quarantine_factor", "plague.army_carry_weeks", "plague.army_spread_week", "plague.spared_years", "plague.town_week_share_max", "plague.quarantine_tax_factor", "plague.care_death_cut"]
 }

@@ -1,3 +1,4 @@
+import { plagueReached } from "./everyday.ts";
 import type { World } from "./world.ts";
 import type { News } from "./war.ts";
 import { Rng } from "./rng.ts";
@@ -50,6 +51,8 @@ export interface PlagueState {
   provinceQuarantine: Uint8Array;
   /** People this plague has killed in each province, in thousands (kept after it burns out until the next). */
   provincePlagueDead: Float32Array;
+  /** 1 while the owner pays physicians against this plague (an everyday event's choice, EVT-130): fewer die and it is over sooner. */
+  provincePlagueCare: Uint8Array;
   /** world.day the last plague in each province burned out; the province is spared for plague.spared_years after. */
   provincePlagueEnded: Int32Array;
   /** The sick provinces (step above none), in province order. */
@@ -66,6 +69,7 @@ export function createPlagueState(P: number, seed: number): PlagueState {
     provincePlagueWeeks: new Uint8Array(P),
     provinceQuarantine: new Uint8Array(P),
     provincePlagueDead: new Float32Array(P),
+    provincePlagueCare: new Uint8Array(P),
     provincePlagueEnded: new Int32Array(P).fill(-1e6),
     plagueSick: [],
     plagueCarriers: new Map(),
@@ -138,7 +142,8 @@ function catchPlague(world: World, p: number, news: News[], from: number, how: "
   const owner = world.provinceOwner[p]!;
   if (owner >= 0 && owner === world.player) {
     const way = how === "here" ? "has broken out in its crowded streets" : how === "army" ? "has come with an army" : how === "sea" ? `has come by ship from ${nameOf(world, from)}` : `has come ${how === "river" ? "down the river" : "along the road"} from ${nameOf(world, from)}`;
-    news.push({ kind: "plague", text: `Plague in ${nameOf(world, p)}: the sickness ${way}. Its townsfolk die first. You can close the province to slow it, at a cost to its trade and tax.`, nations: [owner], province: p });
+    news.push({ kind: "plague", text: `Plague in ${nameOf(world, p)}: the sickness ${way}. Its townsfolk die first. You can close the province to slow it, at a cost to its trade and tax.`, nations: [owner], province: p });    // A card asks what to do about it (EVT-130).
+    plagueReached(world, p);
   }
 }
 
@@ -196,7 +201,7 @@ export function plagueDeathRate(world: World, p: number): number {
  */
 export function plagueDeaths(world: World, p: number): number {
   const people = world.provincePopulation[p]!;
-  const dead = (people * plagueDeathRate(world, p)) / WEEKS_A_YEAR;
+  const dead = ((people * plagueDeathRate(world, p)) / WEEKS_A_YEAR) * (world.provincePlagueCare[p] ? 1 - C.care_death_cut : 1);
   if (!(dead > 0)) return 0;
   const cls = world.provinceClasses;
   let left = dead;
@@ -244,7 +249,8 @@ function weekOf(world: World, p: number, news: News[]): boolean {
     // It lasts a season or two (PROV-241).
     const [lo, hi] = C.outbreak_seasons as [number, number];
     world.provincePlague[p] = OUTBREAK;
-    world.provincePlagueWeeks[p] = (lo + world.plagueRng.int(hi - lo + 1)) * C.weeks_per_season;
+    // Physicians cut it to the shortest (EVT-130).
+    world.provincePlagueWeeks[p] = (world.provincePlagueCare[p] ? lo : lo + world.plagueRng.int(hi - lo + 1)) * C.weeks_per_season;
     aiQuarantine(world, p, true);
     return true;
   }
@@ -255,6 +261,7 @@ function weekOf(world: World, p: number, news: News[]): boolean {
   }
   world.provincePlague[p] = NONE;
   world.provincePlagueWeeks[p] = 0;
+  world.provincePlagueCare[p] = 0;
   world.provincePlagueEnded[p] = world.day;
   aiQuarantine(world, p, false);
   const owner = world.provinceOwner[p]!;
@@ -365,6 +372,8 @@ export interface SavedPlague {
   carriers: [number, number][];
   /** Dead of a plague that burned out, shown until the next one: province, thousands. */
   dead: [number, number][];
+  /** Sick provinces with physicians paid (EVT-130). */
+  care?: number[];
 }
 
 export function savePlague(world: World): SavedPlague {
@@ -383,6 +392,7 @@ export function savePlague(world: World): SavedPlague {
     ended,
     carriers: [...world.plagueCarriers],
     dead,
+    care: world.plagueSick.filter((p) => world.provincePlagueCare[p]),
   };
 }
 
@@ -409,6 +419,10 @@ export function restorePlague(world: World, s: SavedPlague | undefined, mapP: (o
     const p = mapP(old);
     if (p >= 0 && !world.provincePlague[p]) world.provincePlagueDead[p] = dead;
   }
+  for (const old of s.care ?? []) {
+    const p = mapP(old);
+    if (p >= 0 && world.provincePlague[p]) world.provincePlagueCare[p] = 1;
+  }
   world.plagueSick = [];
   for (let p = 0; p < world.provinceCount; p++) if (world.provincePlague[p]) world.plagueSick.push(p);
   world.plagueCarriers = new Map(s.carriers.filter(([slot]) => slot < world.armies.count && world.armies.alive[slot]));
@@ -416,5 +430,5 @@ export function restorePlague(world: World, s: SavedPlague | undefined, mapP: (o
 
 /** Numbers for the world's hash. */
 export function plagueHashData(world: World): ArrayBufferView[] {
-  return [world.provincePlague, world.provincePlagueWeeks, world.provinceQuarantine, world.provincePlagueDead, world.provincePlagueEnded, world.plagueRng.state, Int32Array.from([...world.plagueCarriers].flat())];
+  return [world.provincePlague, world.provincePlagueWeeks, world.provinceQuarantine, world.provincePlagueCare, world.provincePlagueDead, world.provincePlagueEnded, world.plagueRng.state, Int32Array.from([...world.plagueCarriers].flat())];
 }

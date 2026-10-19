@@ -748,6 +748,11 @@
      "level": 3
     },
     {
+     "id": "everyday-events",
+     "text": "Everyday events",
+     "level": 3
+    },
+    {
      "id": "when-an-event-can-happen",
      "text": "When an event can happen",
      "level": 3
@@ -1527,6 +1532,11 @@
     {
      "id": "in-the-game-now-the-land",
      "text": "In the game now: the land",
+     "level": 2
+    },
+    {
+     "id": "plague-in-the-game",
+     "text": "Plague in the game",
      "level": 2
     },
     {
