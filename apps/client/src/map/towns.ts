@@ -1,8 +1,8 @@
 import type { Ruleset } from "@ph/rules";
 import { FAITH_FAMILY, LandGridScan, SLOTS, WORKS, type LandGrid, type Snapshot } from "@ph/engine";
 import {
-  hamletCount, hamletSpots, LIVING_MAP, roadLines, settlementByte, townCellKinds, townCells, townFootprint, townGrowthOrder, townPeopleThousands, townPlan,
-  worksSpot, roadLinks, roadPath, berthSpots, type CellKind, type RoadLine, type TownPlan,
+  hamletCount, hamletSpots, keepsRoad, LIVING_MAP, roadLines, settlementByte, townCellKinds, townCells, townFootprint, townGrowthOrder, townPeopleThousands, townPlan,
+  worksSpot, neighbours4, roadPath, berthSpots, type CellKind, type RoadLine, type TownPlan,
 } from "@ph/engine/domain/map-presentation";
 import type { MapImage } from "./loadMap.ts";
 
@@ -11,8 +11,10 @@ import type { MapImage } from "./loadMap.ts";
  * settlement byte of every map pixel the renderer keeps in the alpha of the
  * province id texture. Worked out only for the provinces near the camera, the
  * first time the living band comes close, and again for a province when its
- * town's cell count or works change in a new game month (VIEW-108). Roads only
- * depend on the map, so each is laid once. All of it is done in small steps
+ * town's cell count or works change in a new game month (VIEW-108). Land no
+ * realm holds is unsettled: it has no town, hamlets or roads. Roads depend on
+ * the map and on which towns stand, so a road is laid once and taken up again
+ * only when land round it is settled or left. All of it is done in small steps
  * up to a deadline (the map scan a few rows at a time, then town by town and
  * road by road), so the client can run it in idle time between frames,
  * starting before the living band.
@@ -58,6 +60,13 @@ export class TownLayer {
   readonly bytes: Uint8Array;
   private readonly kinds: Uint8Array;
   private readonly links: Uint8Array;
+  /** How many laid roads leave each road tile by each side (N, E, S, W), so one can be taken up without the others. */
+  private readonly linkCounts = new Map<number, [number, number, number, number]>();
+  /** Laid roads between towns by neighbour pair, and each province's hamlet tracks. */
+  private readonly laid = new Map<number, RoadLine>();
+  private readonly tracks = new Map<number, RoadLine[]>();
+  /** Per province: 1 settled (held by a realm), 0 unsettled, 255 not yet known. */
+  private readonly settled: Uint8Array;
   private readonly orders = new Map<number, number[]>();
   private readonly towns = new Map<number, ProvinceTown>();
   private readonly roadsDone = new Set<number>();
@@ -77,6 +86,7 @@ export class TownLayer {
     this.bytes = new Uint8Array(map.width * map.height);
     this.kinds = new Uint8Array(map.width * map.height);
     this.links = new Uint8Array(map.width * map.height);
+    this.settled = new Uint8Array(rules.provinces.length).fill(255);
   }
 
   get grid(): LandGrid {
@@ -117,6 +127,13 @@ export class TownLayer {
     if (month !== this.month) {
       this.month = month;
       this.recheck = [...this.towns.keys()];
+      // Land settled or left this month takes up the roads round it.
+      for (let p = 0; p < this.settled.length; p++) {
+        const settled = s.provinceOwner[p]! >= 0 ? 1 : 0;
+        if (this.settled[p] === settled) continue;
+        if (this.settled[p] !== 255) this.unsettleRoads(p);
+        this.settled[p] = settled;
+      }
     }
     // A town already laid changes only in a new month (VIEW-108); one coming into view is laid as soon as there is time.
     while (this.recheck.length) {
@@ -149,8 +166,12 @@ export class TownLayer {
     return out;
   }
 
-  /** A province's town and hamlets, from its people and works this month. */
+  /** A province's town and hamlets, from its people and works this month; unsettled land has neither. */
   private settle(s: Snapshot, p: number): void {
+    if (this.settled[p] !== 1) {
+      this.place(p, { key: "unsettled", tiles: new Map(), hamlets: [] });
+      return;
+    }
     const n = s.classNames.length;
     const classes: Record<string, number> = {};
     let total = 0;
@@ -185,41 +206,115 @@ export class TownLayer {
       const t = worksSpot(this.grid, p, w, taken);
       if (t !== null) (taken.add(t), tiles.set(t, "works"));
     }
+    this.place(p, { key, tiles, hamlets: spots });
+  }
+
+  private place(p: number, town: ProvinceTown): void {
+    const old = this.towns.get(p);
+    if (old?.key === town.key) return;
     if (old) {
       for (const t of old.tiles.keys()) this.setKind(t, 0);
       for (const t of old.hamlets) this.setKind(t, 0);
     }
-    for (const t of spots) this.setKind(t, 1);
-    for (const [t, k] of tiles) this.setKind(t, settlementByte(k) & 15);
-    this.towns.set(p, { key, tiles, hamlets: spots });
+    for (const t of town.hamlets) this.setKind(t, 1);
+    for (const [t, k] of town.tiles) this.setKind(t, settlementByte(k) & 15);
+    this.towns.set(p, town);
+    // The hamlets' tracks follow the hamlets.
+    if (this.roadsDone.has(p) && old?.hamlets.join() !== town.hamlets.join()) this.layTracks(p);
+  }
+
+  private neighbours(p: number): number[] {
+    return this.rules.provinces[p]!.neighbors.map((id) => this.provinceIndex.get(id)).filter((q): q is number => q !== undefined && this.grid.centre[q]! >= 0);
+  }
+
+  private seat(p: number) {
+    return { province: p, seed: this.grid.centre[p]!, roadStep: 0 };
   }
 
   /**
-   * The roads from a province's town to its neighbours' towns and from its
-   * hamlets (VIEW-113), one road at a time until the deadline; each pair of
-   * neighbours is laid once. True once all of the province's roads are laid.
+   * Land round a province was settled or left: take up its roads and the
+   * roads between its neighbours (whether those keep a road of their own
+   * depends on the towns between them), to be laid again as they come into view.
+   */
+  private unsettleRoads(p: number): void {
+    const near = this.neighbours(p);
+    const P = this.rules.provinces.length;
+    const around = new Set([p, ...near]);
+    for (const [pair, road] of this.laid) {
+      const a = Math.floor(pair / P), b = pair % P;
+      if (a === p || b === p || (around.has(a) && around.has(b))) {
+        this.unlink([road]);
+        this.laid.delete(pair);
+        this.pairs.delete(pair);
+      }
+    }
+    for (const q of around) this.roadsDone.delete(q);
+  }
+
+  /**
+   * The roads from a province's town to its neighbours' towns where they keep
+   * one (keepsRoad), and from its hamlets (VIEW-113), one road at a time until
+   * the deadline; each pair of neighbours is looked at once. Unsettled land
+   * lays none and gets none. True once all of the province's roads are laid.
    */
   private lay(p: number, deadline: number): boolean {
-    const near = this.rules.provinces[p]!.neighbors.map((id) => this.provinceIndex.get(id)).filter((q): q is number => q !== undefined && this.grid.centre[q]! >= 0);
     const P = this.rules.provinces.length;
+    const standing = (q: number): boolean => this.settled[q] === 1;
+    const near = standing(p) ? this.neighbours(p).filter(standing) : [];
     const from = this.grid.centre[p]!;
     for (const q of near) {
       const pair = Math.min(p, q) * P + Math.max(p, q);
       if (this.pairs.has(pair)) continue;
       if (performance.now() >= deadline) return false;
       this.pairs.add(pair);
-      const path = roadPath(this.grid, from, this.grid.centre[q]!);
-      if (path) this.link([{ from, to: this.grid.centre[q]!, grade: "track", path, bridges: [] }]);
+      const around = new Set(this.neighbours(q));
+      const shared = near.filter((r) => around.has(r)).map((r) => this.seat(r));
+      if (!keepsRoad(this.grid, this.seat(p), this.seat(q), shared)) continue;
+      const to = this.grid.centre[q]!;
+      const path = roadPath(this.grid, from, to);
+      if (!path) continue;
+      const road: RoadLine = { from, to, grade: "track", path, bridges: [] };
+      this.laid.set(pair, road);
+      this.link([road]);
     }
     if (performance.now() >= deadline) return false;
     this.roadsDone.add(p);
-    const hamlets = this.towns.get(p)?.hamlets ?? [];
-    if (hamlets.length) this.link(roadLines(this.grid, [{ province: p, seed: from, roadStep: 0 }], () => [], hamlets));
+    this.layTracks(p);
     return true;
   }
 
-  private link(roads: RoadLine[]): void {
-    for (const [t, l] of roadLinks(this.grid, roads)) this.setLinks(t, this.links[t]! | l);
+  /** A province's hamlet tracks, laid again from its hamlets as they are now. */
+  private layTracks(p: number): void {
+    this.unlink(this.tracks.get(p) ?? []);
+    const hamlets = this.towns.get(p)?.hamlets ?? [];
+    const tracks = hamlets.length ? roadLines(this.grid, [this.seat(p)], () => [], hamlets) : [];
+    this.tracks.set(p, tracks);
+    this.link(tracks);
+  }
+
+  private link(roads: RoadLine[], by = 1): void {
+    for (const r of roads) {
+      for (let i = 1; i < r.path.length; i++) {
+        const a = r.path[i - 1]!, b = r.path[i]!;
+        const side = neighbours4(this.grid, a).indexOf(b);
+        if (side < 0) continue;
+        this.count(a, side, by);
+        this.count(b, (side + 2) % 4, by);
+      }
+    }
+  }
+
+  private unlink(roads: RoadLine[]): void {
+    this.link(roads, -1);
+  }
+
+  private count(t: number, side: number, by: number): void {
+    let c = this.linkCounts.get(t);
+    if (!c) this.linkCounts.set(t, (c = [0, 0, 0, 0]));
+    c[side] = Math.max(0, c[side]! + by);
+    const links = c.reduce((m, n, i) => (n > 0 ? m | (1 << i) : m), 0);
+    if (!links) this.linkCounts.delete(t);
+    this.setLinks(t, links);
   }
 
   private setKind(t: number, kind: number): void {

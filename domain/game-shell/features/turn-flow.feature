@@ -146,7 +146,7 @@ Feature: The turn on screen
     Examples:
       | place              |
       | the turn report    |
-      | the tab "Chronicle" |
+      | the News           |
 
   @SHELL-079
   Scenario Outline: Interrupted at a battle

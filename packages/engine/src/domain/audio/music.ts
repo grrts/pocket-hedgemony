@@ -249,7 +249,7 @@ export function stateHolds(state: MusicState, f: MusicFacts, states = S): boolea
     case "unrest":
       return (f.unrestProvinceShare ?? 0) >= states.unrest.plotting_or_risen_share;
     case "diplomacy":
-      return f.screen === "realm_book" && f.realmBookTab === "Abroad";
+      return f.screen === "realm_book" && f.realmBookTab === "Diplomacy";
     case "prosperity":
       return !war && lordsSteady(f.lords ?? [], states.prosperity.loyal_lords_share_at_least) && f.treasuryTrend === states.prosperity.treasury_trend && (f.yearsAtPeace ?? 0) >= states.prosperity.years_at_peace;
     case "exploration":
@@ -273,7 +273,7 @@ export function stackLevel(state: MusicState): number {
 export function evaluateState(f: MusicFacts, current: MusicState = "peace"): { state: MusicState; reason: string } {
   if (f.screen) {
     const rule = screenMusic(f.screen);
-    // The realm book keeps the state, except its Abroad tab, which is a screen mood (stack level 5).
+    // The realm book keeps the state, except its Diplomacy section, which is a screen mood (stack level 5).
     const mood = f.screen === "realm_book" && stateHolds("diplomacy", f);
     if (rule === "unchanged" && !mood) return { state: current, reason: `screen ${f.screen} keeps the state` };
     if (rule === "none") return { state: "none", reason: `screen ${f.screen} has no music` };

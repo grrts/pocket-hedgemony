@@ -19,6 +19,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   await page.waitForSelector(".hud [data-news]", { timeout: 60000 });
   await page.waitForTimeout(500);
   await page.click(".hud button.realm");
+  await page.click("#panel [data-realm-section=Lands]").catch(() => {});
   await page.click("[data-realm-tab=officials]");
   await page.waitForTimeout(300);
   await shot("officials");

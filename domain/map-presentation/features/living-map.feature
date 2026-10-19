@@ -175,6 +175,17 @@ Feature: The living map close in
     Then every road runs over land from town to town in steps north, east, south or west
 
   @VIEW-113
+  Scenario: A town between two others carries their road
+    Given towns at "Toledo", "Madrid" and a town between them
+    Then "Toledo" and "Madrid" keep no road of their own
+    But with no town between them they keep one
+
+  @VIEW-113
+  Scenario: Roads keep near the straight line
+    When a road is laid from "Toledo" to "Valencia"
+    Then the road strays no more than 4 pixels from the straight line between the towns
+
+  @VIEW-113
   Scenario: No road reaches an island
     When a road is laid from "Valencia" to "East Baleares"
     Then no road is found
