@@ -24,6 +24,8 @@ for f in glob.glob(f"{root}/countries/*/*.json"):
 TITLES = ["Emperor", "Empress", "King", "Queen", "Sultan", "Khan", "khan", "Duke", "Duchess", "duke", "duchess", "Doge", "Pope", "Despot", "Voivode", "voivode", "Grand Master", "Master", "master",
           "Prince", "prince", "grand prince", "Count", "Margrave", "Elector", "elector", "landgrave", "archbishop", "Rana", "Oba", "Mansa", "Mai", "Sarki", "Shah", "Bey", "Sapa Inka", "taishi", "Swargadeo", "Imam", "Jam"]
 NO_ONE = re.compile(r"^(No |Council|Contested|Disputed|Unknown|Uncertain|Veche|Diet|Rector|Garen|Archbishop Evfimy|A Sunni|Buurba|Mahdali|Mansa of Mali|Mai of Bornu)")
+# Group records and unnamed rulers (a title alone, chiefs in the plural, "identity unknown").
+NO_NAME = re.compile(r"\b(unknown|unnamed|uncertain)\b|^(Collective|Various|Many|Several|None|Clan|Village|Local|Family|House|Band|Hereditary|Town|Drum-group|Tribal|Ksar|Councils|Chwezi|Weroances|Paramount chief|Abba gadaa|Kings of|Governor|Guanartemes|Canton|Nine|Banu Jallab|Kaabu Mansaba)")
 
 # Birth years of rulers the catalogue's notes don't date (general knowledge).
 BORN = {
@@ -50,6 +52,8 @@ OVERRIDE = {
     "provence": {"title": "Count"}, "karaman": {"name": "İbrahim II"}, "candar": {"name": "İsmail"}, "dulkadir": {"name": "Süleyman"},
     "uzbek_khanate": {"name": "Abu'l-Khayr"}, "muscovy": {"title": "Grand Prince", "name": "Vasily II"}, "tver": {"title": "Grand Prince"},
     "ryazan": {"title": "Grand Prince"}, "byzantium": {"name": "John VIII"}, "teutonic_order": {"title": "Grand Master"},
+    "hadiya": {"title": "Garad", "name": "Mahiko"}, "katsina": {"title": "Sarki", "name": "Sanau"}, "timbuktu_tuareg": {"title": "Chief"},
+    "canarian_lordship": {"title": "Lord", "name": "Guillén de las Casas"},
 }
 HEIRS = {"france": ["Louis", 1423], "burgundy": ["Charles", 1433], "castile": ["Enrique", 1425], "muscovy": ["Ivan", 1440], "ayutthaya": ["Ramesuan", 1431]}
 
@@ -77,7 +81,7 @@ out = {}
 for n in nations:
     i = cid(n["id"])
     lead = cat.get(i, {}).get("historical", {}).get("identity", {}).get("leadership_1444") if i else None
-    if not lead or not lead.get("leader") or NO_ONE.match(lead["leader"]):
+    if not lead or not lead.get("leader") or NO_ONE.match(lead["leader"]) or (NO_NAME.search(lead["leader"]) and n["id"] not in OVERRIDE):
         out[n["id"]] = None
         continue
     title, name = short(lead["leader"])

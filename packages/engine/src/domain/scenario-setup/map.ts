@@ -20,7 +20,7 @@ export interface NationSource {
 
 /** A map nation's source row (SETUP-040). */
 export function nationSource(id: string): NationSource {
-  const n = (mapData.nations as NationSource[]).find((x) => x.id === id);
+  const n = (mapData.nations as unknown as NationSource[]).find((x) => x.id === id);
   if (!n) throw new Error(`no map nation ${id}`);
   return n;
 }
@@ -150,12 +150,22 @@ export interface CastleInput {
   ground: string;
   /** A value in [0, 1) per province (mapgen hashes the id) for the old ring forts. */
   roll: number;
+  /** The province lies in sub-Saharan Africa (SETUP-067). */
+  subSaharan?: boolean;
+  /** A geography anchor names a stone castle here (SETUP-067). */
+  stoneAnchor?: boolean;
 }
 
 /** The stand-in castle rule until real castles are researched (SETUP-046). */
 export function startCastle(i: CastleInput): "castle" | "fort" | null {
   const c = M.castle;
   if (!i.owned) return null;
+  // Sub-Saharan Africa built earthworks: a capital's ring fort, a few old ones, stone only where an anchor names it (SETUP-067).
+  if (i.subSaharan) {
+    const a = config.africa.sub_saharan_castles;
+    if (i.stoneAnchor) return "castle";
+    return i.capital ? (a.capital as "fort") : i.roll < a.old_fort_share ? "fort" : null;
+  }
   if (i.capital || i.population >= c.capitalOrPopulation) return "castle";
   if (i.frontier) return (c.highGrounds.includes(i.ground) && i.population >= c.frontierHighPopulation) || i.population >= c.frontierPopulation ? "castle" : "fort";
   return i.roll < c.oldFortShare ? "fort" : null;
