@@ -225,6 +225,8 @@ Heritage is checked once a turn (a week), right after historical events, and cou
 
 ## Numbers
 
+Every value the game uses, made from its config so it always matches the game: [National strengths data](Data-National-Strengths). How they combine: [Formulas](Formulas).
+
 From `heritage-rules.json` and `levers.json`. All are provisional placeholders except where noted.
 
 | Key | Value |

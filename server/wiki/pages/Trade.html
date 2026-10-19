@@ -270,6 +270,7 @@ new ratio = ratio + gain − decay   (kept between 0 and 100)
 <li><a href="/wiki/Time-and-Turns">Time and Turns</a>: day loop, month end, year.</li>
 </ul>
 <h2 id="numbers"><a class="anchor" href="#numbers" aria-label="Link to this section">#</a>Numbers</h2>
+<p>Every value the game uses, made from its config so it always matches the game: <a href="/wiki/Data-Trade">Trade data</a>. How they combine: <a href="/wiki/Formulas">Formulas</a>.</p>
 <p>Every trade number is a placeholder, all in the trade config file.</p>
 <div class="table-scroll"><table>
 <thead><tr><th>Value</th><th>Config key</th><th>Design value</th></tr></thead>
@@ -298,7 +299,7 @@ new ratio = ratio + gain − decay   (kept between 0 and 100)
 <tr><td>Tax from ratio</td><td><code>effects.tax_per_ratio_points</code></td><td>+1 % per 4 points</td></tr>
 <tr><td>Crafts floor</td><td><code>effects.crafts_appear_min_ratio</code></td><td>30 %</td></tr>
 <tr><td>Missing input</td><td><code>effects.missing_input_output</code></td><td>half</td></tr>
-<tr><td>Unpaid upkeep before a trader is lost</td><td>not yet in config</td><td>6 months</td></tr>
+<tr><td>Unpaid upkeep before a trader is lost</td><td><code>upkeep.unpaid_months_to_lose</code></td><td>6 months</td></tr>
 <tr><td>Starting traders</td><td><code>start.traders_by_trade_access</code></td><td>6, 4, 2, 1, 0, 0</td></tr>
 <tr><td>Warm-up</td><td><code>start.warmup_months</code></td><td>24</td></tr>
 <tr><td>AI reach</td><td><code>ai.caravan_reach_provinces</code>, <code>ai.ship_reach_sea_zones</code></td><td>12 / 40</td></tr>

@@ -229,6 +229,8 @@ A turn is one week; these steps run once a month, at the end of the turn in whic
 
 ## Numbers
 
+Every value the game uses, made from its config so it always matches the game: [Subjects data](Data-Subjects). How they combine: [Formulas](Formulas).
+
 All values are **placeholders** in `subjects/config/subject-rules.json`, except where marked.
 
 | Key | Value |

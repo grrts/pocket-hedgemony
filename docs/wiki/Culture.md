@@ -262,6 +262,8 @@ Not in yet: per-province homelands, officials' and lords' own languages, schools
 
 ## Numbers
 
+Every value the game uses, made from its config so it always matches the game: [Culture data](Data-Culture). How they combine: [Formulas](Formulas).
+
 All numbers are **provisional** and still being balanced, except the four added families, the chancery-tradition list and the learned languages, which are decided.
 
 | Key | Value |
