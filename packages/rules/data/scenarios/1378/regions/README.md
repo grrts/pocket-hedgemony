@@ -23,5 +23,5 @@ Only the holder writes a catch-all owner rule for a country; others narrow their
 
 | Region | Countries (ISO3) |
 |---|---|
-| `east` | ALB, ARM, AZE, BGR, BIH, BLR, CYN, CYP, ESB, EST, GEO, GRC, HRV, HUN, IRN, IRQ, KAZ, KGZ, KOS, LTU, LVA, MDA, MKD, MNE, POL, ROU, RUS, SRB, SVK, TJK, TKM, TUR, UKR, UZB, WSB, AFG |
+| `east` | ALB, ARM, AZE, BGR, BIH, BLR, CYN, CYP, ESB, EST, GEO, GRC, HRV, HUN, IRN, IRQ, KAZ, KGZ, KOS, LTU, LVA, MDA, MKD, MNE, POL, ROU, RUS, SRB, SVK, TJK, TKM, TUR, UKR, UZB, WSB, AFG, and the Mamluk lands EGY, ISR, JOR, LBN, PSX, SYR |
 | `europe-west`, `asia`, `africa-americas` | every other country, by the region their 1444 realms belong to |
