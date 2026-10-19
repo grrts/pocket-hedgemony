@@ -2,8 +2,18 @@
 framework:
     secret: '%env(APP_SECRET)%'
 
-    # Note that the session will be started ONLY if you read or write from it.
-    session: true
+    # The website's sign-in (the community) keeps a session. It only starts once a page
+    # writes to it, so guests reading the wiki or the forum, and the JSON API, get none.
+    session:
+        handler_id: session.handler.native_file
+        save_path: '%kernel.project_dir%/var/sessions/%kernel.environment%'
+        name: ph_session
+        cookie_secure: auto
+        cookie_samesite: lax
+        cookie_httponly: true
+
+    # Every form on the website carries a CSRF token (csrf_token() in Twig).
+    csrf_protection: true
 
     #esi: true
     #fragments: true
@@ -13,3 +23,6 @@ when@test:
         test: true
         session:
             storage_factory_id: session.storage.factory.mock_file
+        # Steam's ticket check answers from tests/SteamMock.php, never the real Steam.
+        http_client:
+            mock_response_factory: App\Tests\SteamMock

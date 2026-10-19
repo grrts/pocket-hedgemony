@@ -947,7 +947,10 @@ function noBuildData(s: Scenario, what: string): void {
     "province shapes": /shape|"x"|"y"|polygon/i,
   };
   const loose: Record<string, RegExp> = { water: /water/i, rivers: /river/i };
-  expect(s.chunkText).not.toMatch(re[what]!);
+  // Realm ids are not build data, though one names a river (the Cross River societies).
+  const realmIds = new Set(loadDefaultRuleset().nations.map((n) => n.id));
+  const text = (s.chunkText as string).replace(/"([a-z_]+)"(\s*:)/g, (m, id: string, colon: string) => (realmIds.has(id) ? `"realm"${colon}` : m));
+  expect(text).not.toMatch(re[what]!);
   for (const a of s.chunkArrays as string[]) expect(a).not.toMatch(loose[what] ?? re[what]!);
 }
 
@@ -2291,7 +2294,7 @@ Then("the account and every save are deleted", (s) => {
 });
 Given("the game is at launch", () => {});
 When("the sign-in options are listed on {string}", (s, platform: string) => {
-  s.options = S.signInOptions(PLATFORMS[platform] ?? platform.toLowerCase(), s.later ?? []);
+  s.options = S.signInOptions(platform === "Steam" ? "steam" : (PLATFORMS[platform] ?? platform.toLowerCase()), s.later ?? []);
 });
 Then("{string} are offered", (s, opts: string) => {
   expect(s.options.join(", ")).toBe(opts);

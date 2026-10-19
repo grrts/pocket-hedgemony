@@ -140,7 +140,12 @@
         "after_save"
       ],
       "wifi_only_default": false,
-      "ironman_head_check": true
+      "ironman_head_check": true,
+      "access_token_minutes": 15,
+      "sign_in_throttle": {
+        "max_attempts": 5,
+        "interval_minutes": 15
+      }
     },
     "store_backups": {
       "steam": {
@@ -232,15 +237,30 @@
     "desktop": "safeStorage"
   },
   "sign_in": {
-    "at_launch": [
-      "email and password"
-    ],
-    "later": [
-      "Sign in with Apple",
-      "Google",
-      "Steam session ticket"
-    ],
-    "google_on_ios_needs": "Sign in with Apple"
+    "at_launch": {
+      "steam": [
+        "Steam",
+        "email and password"
+      ],
+      "ios": [
+        "Sign in with Apple",
+        "Steam",
+        "email and password"
+      ],
+      "android": [
+        "Google",
+        "Steam",
+        "email and password"
+      ],
+      "web": [
+        "Steam",
+        "Google",
+        "Sign in with Apple",
+        "email and password"
+      ]
+    },
+    "ios_needs": "Sign in with Apple",
+    "steam_ticket_identity": "pockethegemony"
   },
   "export": {
     "android": "share sheet",

@@ -7,7 +7,7 @@
  */
 import type { TraderWalk } from "@ph/engine";
 import { traderFigure, traderOnLeg } from "@ph/engine/domain/map-presentation";
-import type { SpriteName } from "../art/sprites.ts";
+import type { FigureName } from "../art/sprites.ts";
 
 export interface PlacedTrader {
   /** Map position, and the way it heads, one map pixel long (the sprites face left). */
@@ -15,10 +15,10 @@ export interface PlacedTrader {
   y: number;
   ux: number;
   uy: number;
-  sprite: SpriteName;
+  sprite: FigureName;
 }
 
-const SPRITE: Record<string, SpriteName> = { caravan: "caravanTrain", barge: "barge", "trading ship": "cog" };
+const SPRITE: Record<string, FigureName> = { caravan: "caravanTrain", barge: "barge", "trading ship": "cog" };
 
 type XY = readonly [number, number];
 

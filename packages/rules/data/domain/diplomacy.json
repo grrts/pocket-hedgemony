@@ -1339,14 +1339,15 @@
   ]
  },
  "answers": {
-  "$comment": "No preview: the asker learns yes or no, with the full reasons list, a month after the answer is given.",
+  "$comment": "No preview of the count: the asker learns yes or no, with the full reasons list, a month after the answer is given. Before sending, an ask the reasons decide shows one word (DIPL-229): Likely when the count as it stands now is at least `hint.likely_from`, Unlikely when it is at most `hint.unlikely_to`, else Unsure. Placeholders for balance.",
   "delay_months": 1,
-  "preview_before_sending": false
+  "preview_before_sending": false,
+  "hint": { "likely_from": 15, "unlikely_to": -15 }
  },
  "eras_by_year": [
   {
    "era": "I",
-   "from": 1444
+   "from": 1378
   },
   {
    "era": "II",

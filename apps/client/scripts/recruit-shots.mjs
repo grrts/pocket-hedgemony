@@ -56,6 +56,7 @@ await shot("5-commander");
 // The realm's Military tab, then its Mercenaries tab: hire the first company for hire.
 await page.click(".hud .realm");
 await page.waitForTimeout(300);
+await page.click("#panel [data-realm-section=Military]").catch(() => {});
 await page.click("[data-realm-tab=military]");
 await page.waitForTimeout(200);
 await shot("6-military");
@@ -66,6 +67,7 @@ await page.click("[data-hire]:not([disabled])");
 await page.waitForTimeout(300);
 await page.click(".hud .realm").catch(() => {});
 await page.waitForTimeout(300);
+await page.click("#panel [data-realm-section=Military]").catch(() => {});
 await page.click("[data-realm-tab=military]").catch(() => {});
 await page.click("[data-realm-open-tab=mercenaries]").catch(() => {});
 await page.waitForTimeout(200);

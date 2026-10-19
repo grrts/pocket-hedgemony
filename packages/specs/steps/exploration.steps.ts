@@ -120,7 +120,7 @@ Given("the age {string} has begun in the region of the country {string}", (s, ag
   const region = E.polityRegion(countryId(country));
   expect(region).not.toBeNull();
   s.region = region;
-  s.gate = E.gateAtStart(s.year ?? 1444);
+  s.gate = E.gateAtStart(s.year ?? 1444, true);
   expect(s.gate.begunIn.has(region)).toBe(true);
 });
 
@@ -131,7 +131,7 @@ Given("the age {string} has begun in the region {string}", (s, age: string, regi
 });
 
 Given("the age {string} began in the region {string} in {int}", (s, age: string, region: string, year: number) => {
-  s.gate = E.gateAtStart(year);
+  s.gate = E.gateAtStart(year, true);
   expect(s.gate.age).toBe(age);
   expect(s.gate.begunIn.has(region)).toBe(true);
 });
@@ -184,7 +184,7 @@ Then(/^the country "([^"]+)" (has|lacks) the exploration unlock$/, (s, country: 
   }
   // As a given: set up a country that has, or lacks, the unlock.
   s.region = E.polityRegion(countryId(country)) ?? "europe";
-  s.gate = E.gateAtStart(1444);
+  s.gate = E.gateAtStart(1444, true);
   if (has === "has") knows(s).add("S4");
   else s.gate = E.newAgeGate();
   expect(E.hasExplorationUnlock({ knows: knows(s), region: s.region }, s.gate)).toBe(has === "has");
@@ -1126,7 +1126,7 @@ Then("nothing else about its peoples is shown", (s) => {
 });
 
 Given("the country {string} has the exploration unlock and knows S5", (s, country: string) => {
-  s.gate = E.gateAtStart(1493);
+  s.gate = E.gateAtStart(1493, true);
   s.region = E.polityRegion(countryId(country));
   knows(s).add("S4").add("S5").add("S1");
   expect(E.hasExplorationUnlock({ knows: knows(s), region: s.region }, s.gate)).toBe(true);
@@ -1182,18 +1182,18 @@ Then("they come home", (s) => {
 Given("the region {string} is not in the region list of the age {string}", (s, region: string, age: string) => {
   expect(E.ageRegions(age)).not.toContain(region);
   s.region = region;
-  s.gate ??= E.gateAtStart(1444);
+  s.gate ??= E.gateAtStart(1444, true);
 });
 
 Given("the country {string} of the region {string} knows S4 {string}", (s, country: string, region: string, _name: string) => {
   s.country = country;
   s.region = region;
   knows(s).add("S4");
-  s.gate ??= E.gateAtStart(1444);
+  s.gate ??= E.gateAtStart(1444, true);
 });
 
 Given("the age {string} begins in its region", (s, age: string) => {
-  s.gate ??= E.gateAtStart(1444);
+  s.gate ??= E.gateAtStart(1444, true);
   E.anyAgeBegins(s.gate, age, [s.region]);
 });
 
@@ -1210,7 +1210,7 @@ Then("it is {string}", (s, age: string) => {
 });
 
 Then("it lacks the exploration unlock until the age {string} begins in its region", (s, age: string) => {
-  s.gate ??= E.gateAtStart(1444);
+  s.gate ??= E.gateAtStart(1444, true);
   expect(E.hasExplorationUnlock({ knows: knows(s), region: s.region }, s.gate)).toBe(false);
   expect(E.mayBuyShip({ knows: knows(s), region: s.region }, s.gate, "voyaging_canoe").ok).toBe(false);
   E.anyAgeBegins(s.gate, age, [s.region]);

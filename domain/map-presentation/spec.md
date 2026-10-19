@@ -34,6 +34,7 @@ rule of the system that owns the stat.
 
 Newest decision first.
 
+1. `visuals/particles-and-animations-design.md` v1 (19 Oct): moments, living world, cost.
 1. `settings/settings-design.md` v2 (16 Oct) §3.1, §4.3 (parchment toggle), §5.1 (Graphics), §5.5
    (Accessibility), §7 (performance knobs), §8.
 2. `screen-flow/screen-flow-design.md` v1 §1, §4.2, §4.3, §4.6 (G5), §7 (layout by window shape), §8.2.
@@ -153,8 +154,8 @@ Newest decision first.
 ### 5.6 Layout by window shape
 
 - VIEW-039 (Ubiquitous): Screens shall be laid out by the shape of the window, not by the device. [screen-flow §1.5, §7.1]
-- VIEW-040 (State-driven): While the window is Short wide (phones in landscape, height under 500 CSS px), the map shall come first, cards are side sheets on the left (45 % of the screen), the Realm book's tabs a left icon rail, and the top bar one thin row. [screen-flow §7.1, §4.3]
-- VIEW-041 (State-driven): While the window is Tall (tablets in portrait, desktop windows taller than wide), cards shall be bottom sheets (55 % height, draggable), the Realm book's tabs a bottom icon row, and the tool column on the right edge above End turn. [screen-flow §7.1, §4.3]
+- VIEW-040 (State-driven): While the window is Short wide (phones in landscape, height under 500 CSS px), the map shall come first, cards are side sheets on the left (45 % of the screen), the Realm book's sections one row of icons with names (SHELL-167), and the top bar one thin row. [screen-flow §7.1, §4.3]
+- VIEW-041 (State-driven): While the window is Tall (tablets in portrait, desktop windows taller than wide), cards shall be bottom sheets (55 % height, draggable), the Realm book's sections one row of icons with names (SHELL-167), and the tool column on the right edge above End turn. [screen-flow §7.1, §4.3]
 - VIEW-042 (State-driven): While the window is Large (tablets in landscape, desktop, Steam Deck 1280 × 800), side sheets shall have a fixed width (380 px at UI scale 1), menus are centred with a maximum width, and nothing stretches edge to edge. [screen-flow §7.1, §4.3]
 - VIEW-043 (State-driven): While the window is Far (TV and Steam Machine), the Large layout shall be used with UI scale raised so body text is about 1/30 of screen height, thicker focus frames, and nothing in the outer 5 % of the screen. [screen-flow §7.1; settings §3.1]
 - VIEW-044 (Ubiquitous): Phones shall play in landscape only, in every screen; a phone held upright shows "Turn your phone sideways". [screen-flow §7.2, decided 16 Oct; settings §11.1]
@@ -234,12 +235,12 @@ Leroy asked for towns, boats and commanders to match the detail of the world map
 Zoom bands
 - VIEW-100 (State-driven): While at Local zoom, the map shall be in one of three bands by camera zoom (CSS pixels per map pixel): icons from 4 to under 16 (`livingFrom`), as Local zoom draws today; living from 16 to under 40 (`streetFrom`), with town footprints, hamlets, roads, figure armies, hull fleets and traders and the icons hidden; street from 40 to 96 (`streetTo`), the same at double art density. The three zoom levels World, Region and Local do not change. [living-map-design §2]
 - VIEW-101 (State-driven): While the camera zoom is between `livingFrom - livingFade` (14) and `livingFrom` (16), the icons shall fade out as the living pieces fade in, so pinching across never pops. [living-map-design §2, §5.4]
-- VIEW-102 (Ubiquitous): In the living band, every piece (towns, figures, ships, roads) shall be drawn in the ground's own art pixels, at `u = max(2, zoom / 8)` CSS pixels per art pixel, and at street level at `u = zoom / 16`, so at zoom 16 a piece is as big as today's tokens and nothing looks pasted on. [living-map-design §1.1, §2, §4]
+- VIEW-102 (Ubiquitous): In the living band, every piece (towns, figures, ships, roads) shall be drawn in the ground's own art pixels, at `u = max(2, zoom / 8)` CSS pixels per art pixel, and at street level at `u = zoom / 16`, so at zoom 16 a piece is as big as today's tokens and nothing looks pasted on; town buildings are the exception, painted at 16 × 16 art pixels per map pixel in both bands (twice the living ground's density, the street ground's own) so houses, keeps and docks show their detail, while roads keep the ground's art pixels (feedback 126). [living-map-design §1.1, §2, §4]
 - VIEW-103 (State-driven): While at street level, the terrain shall be drawn at 16 × 16 art pixels per map pixel, handing over from 8 × 8 at zoom 40 as 4 × 4 hands over to 8 × 8, and the tiles refined by seeded detail (stones, tufts, single trees, furrows) so they don't look blocky. [living-map-design §2, §3.5]
 - VIEW-104 (Optional): Where Map detail is Low, the map shall draw icons at every zoom with the closest zoom 40; where Medium, the living band and no street level (closest zoom 40), with reduced life; where High, both bands (closest zoom 96) and full life (SET-041). [living-map-design §6]
 
 Towns
-- VIEW-105 (Ubiquitous): A town shall cover `clamp(1, maxCells, round(sqrt(town people in thousands) × cellsPerRootK))` map pixels (`cellsPerRootK` 1.0, `maxCells` 30), its town people being the province's craftsmen, market folk, clergy, clerks and scholars, the town classes the province overview counts. [living-map-design §3.1]
+- VIEW-105 (Ubiquitous): A town shall cover `clamp(1, maxCells, round(sqrt(town people in thousands) × cellsPerRootK))` map pixels (`cellsPerRootK` 1.5, `maxCells` 30), its town people being the province's craftsmen, market folk, clergy, clerks and scholars, the town classes the province overview counts. [living-map-design §3.1]
 - VIEW-106 (Ubiquitous): A town shall grow from its seed, the province's own land pixel nearest its centre point (which can be in the sea), in a fixed order over the province's land within `growRadius` (8) pixels: each next pixel is the cheapest on the town's edge, its cost the distance to the seed plus a small seeded jitter, less a bonus by rivers and coasts, plus a penalty on mountains and marsh; lakes and sea are never used, so a growing town only adds pixels at its edge and a shrinking one only loses them. [living-map-design §3.1]
 - VIEW-107 (Ubiquitous): The first `coreShare` (60 %) of a town's pixels shall be its core (packed houses on cobbles) and the rest its outskirts (scattered houses among strip fields). [living-map-design §3.1]
 - VIEW-108 (Event-driven): When a turn is applied in a new game month, the map shall work out again the footprints of the provinces whose cell count changed, and no others, so towns never flicker. [living-map-design §3.1]
@@ -247,7 +248,8 @@ Towns
 - VIEW-110 (State-driven): While a province has a fort, its core shall be ringed by a palisade along its outer edges, and while it has a castle, by a stone wall with towers, worked out from neighbouring core cells as coasts are. [living-map-design §3.2, §3.5]
 - VIEW-111 (Ubiquitous): The countryside shall make `clamp(0, 6, round(rural thousands / 40))` hamlets of 1 or 2 houses on strip fields, each on a seeded land pixel at least 4 pixels from the town and from each other. [living-map-design §3.3]
 - VIEW-112 (Ubiquitous): A mine, quarry or lumber camp shall mark one seeded pixel of the province on matching ground (mountains or hills, hills, forest), and farms add field strips round the outskirts. [living-map-design §3.2]
-- VIEW-113 (Ubiquitous): A road line shall run over land from each town to the town of each neighbouring province, round the water and across rivers on a bridge pixel, drawn as a track, or as a road or paved road where both ends' road step is that high; each hamlet gets a track to its nearest town or hamlet within 8 pixels. [living-map-design §3.3]
+- VIEW-113 (Ubiquitous): A road line shall run over land from each town to the town of each neighbouring province, unless a third town neighbouring both is nearer to each of them than they are to each other (the way then runs through that town), round the water and across rivers on a bridge pixel, keeping near the straight line between the towns (each step costs `roads.straightness` (0.4) more per pixel it strays from it) so it winds only for the ground; it is drawn as a worn footpath (track), a cart road with ruts or a paved road with a kerb where both ends' road step is that high, cutting the corner where it only turns, so a road going north-east is one slanting line and not stairs; each hamlet gets a track to its nearest town or hamlet within 8 pixels. [living-map-design §3.3]
+- VIEW-133 (Ubiquitous): Land no realm holds shall be unsettled in the living band: it has no town, hamlets, works or roads, and no road from a neighbour ends there; when a realm takes or settles it, its town and roads appear in the next game month, and the roads round it are laid again. [living-map-design §3.1, §3.3]
 - VIEW-114 (State-driven): While an army marches or a caravan travels in the living band, it shall be drawn along the road line where the road runs its way; the movement rules do not change. [living-map-design §3.3]
 - VIEW-115 (Ubiquitous): The map shall carry towns as one settlement byte per map pixel in the free alpha channel of the province id texture: bits 0-3 the cell kind (0 none, 1 hamlet, 2 outskirts, 3 core, 4 keep, 5 market, 6 worship, 7 docks, 8 drill yard, 9 mine, quarry or camp, 10 ash, 11 building site, 12 landmark) and bits 4-7 the road links north, east, south and west; a change rewrites only the alpha of the chunks it touches, and below the living band the byte is ignored. [living-map-design §3.5]
 
@@ -258,7 +260,7 @@ Moving pieces
 - VIEW-119 (State-driven): While a battle runs, the two sides' figures shall face each other on the battle tile with their front ranks clashing, and each round take away figures as the side's men fall (VIEW-077). [living-map-design §4.1]
 - VIEW-120 (State-driven): While an army besieges a town, its figures shall stand in a ring round the walls among tents; rebels are the same figures in the rebel colour with no banner; and in the living band the commander's token is replaced by the banner-bearer, whose name shows on selection, or always at street level. [living-map-design §4.1]
 - VIEW-121 (State-driven): While a fleet is at sea in the living band, it shall be drawn as one hull per `shipsPerHull` ships (5 living, 1 street), at most 8 or 24 hulls, sailing in a loose formation round the fleet's point with wakes while it moves, in the ship types of the naval design once they exist and a generic sailing ship until then. [living-map-design §4.2]
-- VIEW-122 (State-driven): While a fleet is in port, its hulls shall lie at the docks' berths, as many as the harbour has berths (`harbourMarks`); a naval battle shows the hulls facing off on the zone with smoke. [living-map-design §4.2]
+- VIEW-122 (State-driven): While a fleet is in port, its hulls shall lie at the docks' berths, one berth for every `berthSpacing` (2) water pixels along the town's waterfront, from the docks out, with the rest waiting off the docks; a naval battle shows the hulls facing off on the zone with smoke. [living-map-design §4.2]
 - VIEW-123 (State-driven): While a trader walks, the living band shall draw it where the daily walk has it (TRADE-132): a caravan of a mule and cart on land, a barge on a navigable river, a trading ship at sea, on the leg from the province it stands in to the next of its loop at the share of the way walked; over land it steps along the leg's tiles from one province's centre to the next as an army walks, at sea it sails from zone to zone, and over each played day it walks on smoothly from where the day before left it, so it never jumps between frames or turns (F-129). [living-map-design §4.3]
 - VIEW-124 (Ubiquitous): In the living band, envoys shall ride in the band's art pixels, explorers sail as a single ship along the voyage path, colonists' carts head for the colony site, and life (people in town streets and at the market at street level, chimney smoke, flags on keeps) shall be decoration only. [living-map-design §4.4]
 
@@ -271,12 +273,50 @@ How the player uses it
 - VIEW-130 (Ubiquitous): The overlay shall animate at most `maxAnimated` (60) figures at about 10 frames a second, the nearest the screen's centre first, from sprite caches keyed by piece, colour and whole `u` with least-recently-used eviction; towns cost the tiled tiers one extra texture read, and the budgets do not change (VIEW-054). [living-map-design §1.5, §6]
 - VIEW-131 (Ubiquitous): Town buildings shall take their culture group's style (`townStyles`: roof and wall colours from the 32-colour palette and a house variant set), with one generic set until a group has its own, and a hand-made landmark (`landmarks`, per province) replaces the generic keep or worship cell where one exists. [living-map-design §3.4]
 - VIEW-132 (Ubiquitous): The snapshot shall carry every trader the player may see for the living map: its realm, how it goes (land, river or sea), the province it stands in and the next of its loop, the share of the way walked, the leg's tiles over land and whether it is the player's; a trader is kept while its leg enters a province whose trade the player sees (D-TRADE-13), the player's own first, at most `livingMap.traders.maxTraders` (300). A tap on one of the player's opens its card in the Trade tab; another realm's gives way to the province beneath, as there is no card for another realm's trader. [living-map-design §4.3, §7]
+- VIEW-134 (Ubiquitous): In the living band, the figures, hulls, traders and tents, and the town tiles with their keeps, walls, markets and houses of worship, shall be drawn at twice the ground's art density (two by two of their pixels to each art pixel of the ground, 16 × 16 to a map pixel for town tiles), so castles, towns, boats and commanders show their detail at the size VIEW-102 sets; roads stay in the ground's own art pixels so they meet it, and the coarser sprites remain the icons further out (feedback 126, Leroy).
 
 #### How the player uses it: the living map
 1. Where: the player pinches past the Local icons and nothing else is new. A tap on a town cell opens its province card, a tap on a formation or fleet its own card, a tap on a moving caravan the trade path's card; taps go to the piece first, then the province.
 2. Grouping: this is a way of drawing, not a new screen; each piece keeps its existing card, and the one new control, **Markers**, sits with the map mode buttons in the map controls.
 3. Overview: army sizes, sieges, battles and building works keep their overviews (the army list, the battle bar, the Works and Garrison tabs); in the band each has a picture (town states, figures lost, breaches) so the map alone still tells the story, and the numbers stay in the cards.
-4. Phone: every formation, fleet and caravan has a tap box of at least 44 points even when its figures are smaller; Markers brings back the plates for players who want the numbers, and the selected piece always shows its plate and route; nothing needs hover; plates and tap boxes stay inside the safe areas in the Wide and Tall layouts; pinching across 14 to 16 cross-fades with no pop. At zoom 16 a phone held sideways shows about 53 × 22 map pixels, at 40 about 21 × 9 and at 96 about 9 × 4, one city.
+4. Phone: every formation, fleet and caravan has a tap box of at least 44 points even when its figures are smaller; Markers brings back the plates for players who want the numbers, and the selected piece always shows its plate and route; nothing needs hover; plates and tap boxes stay inside the safe areas in the Wide and Tall layouts; pinching across 14 to 16 cross-fades with no pop. The detailed figures and town tiles (VIEW-134) draw at the screen's own pixels, so on a phone their half art pixels stay sharp and a figure keeps the size of the coarse one it replaced. At zoom 16 a phone held sideways shows about 53 × 22 map pixels, at 40 about 21 × 9 and at 96 about 9 × 4, one city.
+
+### Realm names that never overlap (18 October 2026)
+Leroy's playtest: zoomed out, Portugal's name lay over Castile's and the Livonian Order's over Pskov's.
+
+- VIEW-133 (Ubiquitous): Zoomed out, no two realm names shall overlap. The player's realm is named first, then the others largest first; a name that would cover one already placed moves to another of its realm's provinces nearest its middle (`LABEL_ANCHORS`, 6), then shrinks a step at a time (`LABEL_SHRINK`, 0.85) down to the smallest realm name (9 pixels), and a name with no room left waits for a closer zoom. [feedback, Leroy 18 October 2026]
+
+#### How the player uses it: realm names
+1. Where: on the map itself, zoomed out to World and Region; nothing new to tap. Pinching in brings back the names that had no room, larger.
+2. Grouping: a realm's name sits on its own land, on its middle province or one near it, never on a neighbour's name.
+3. Overview: the zoomed-out map is the overview of who holds what; every name on it can be read whole, and the player's own realm is always named.
+4. Phone: the same rule in the Wide and Tall layouts and at every zoom; names stay at least 9 pixels tall; nothing needs hover.
+
+### Particles and animations (19 October 2026)
+Leroy found the game's effects and animations underwhelming (19 Oct). The map now reacts when something happens and the land moves between turns, in the pieces' own art pixels and the 32-colour palette. Battles and sieges keep their own design (`battles/battle-visuals-design.md`). Every number is a starting value in `effects` in `map-presentation.json`. [particles-and-animations-design.md]
+
+Moments
+- VIEW-140 (Event-driven): When a played day leaves a province held by another realm than before (its occupier while occupied, else its owner), and the province is on screen at Region zoom (2) or closer, the map shall throw a burst of pixel confetti in the new holder's colour from the province's centre, falling, with a ring of dust on the ground (`moments.flip`, 24 particles, 1.8 s). [particles-and-animations-design §3]
+- VIEW-141 (Event-driven): When a work of the player's is finished on screen, the map shall raise dust puffs at its town and then gold sparkles rising from it (`moments.built`, 20 particles, 2 s). [particles-and-animations-design §3]
+- VIEW-142 (Event-driven): When a rising begins on screen, the map shall send up dark smoke and red embers from the province (`moments.rising`, 24 particles, 3 s). [particles-and-animations-design §3]
+- VIEW-143 (Event-driven): When the player's realm has a new ruler, reform, invention or heritage (`gloryNews`) and its capital is on screen, the map shall drop one gold shower over the capital (`moments.glory`, 20 particles, 2 s), however many such news the day brings. [particles-and-animations-design §3]
+- VIEW-144 (Event-driven): When plague breaks out in a province on screen (its step rises to outbreak), the map shall let pale motes drift up from it (`moments.plague`, 14 particles, 3 s). [particles-and-animations-design §3]
+- VIEW-145 (Optional): Where Animations is Full, moments shall play in full and the looping effects run; where Reduced, moments play with half their particles (`reducedShare`) and no looping effects; where Off, nothing plays; Battery saver stops the looping effects only. A moment off screen, at World zoom, or on the first snapshot of a session plays nothing. [particles-and-animations-design §3, §6]
+
+Living world
+- VIEW-146 (State-driven): While a town is on screen in the living band, grey smoke shall rise and drift from its core, one chimney per `coreCellsPerChimney` (5) core cells, at most `maxPerTown` (3) (extends VIEW-124). [particles-and-animations-design §4]
+- VIEW-147 (State-driven): While a province on screen at Region zoom or closer is below `snow.belowCelsius` (0 °C), white flakes shall drift down over it, at most `snow.maxFlakes` (80) on screen. [particles-and-animations-design §4]
+- VIEW-148 (State-driven): While the map is at Region zoom or closer, a flock of `flockMin` to `flockMax` (3 to 5) birds shall now and then fly across the land on screen, gulls along the coast, at most `flocksOnScreen` (1) at a time. [particles-and-animations-design §4]
+- VIEW-149 (State-driven): While a rising stands in a province on screen, a thicker dark smoke column shall rise over it (extends VIEW-128). [particles-and-animations-design §4]
+
+Cost
+- VIEW-150 (Ubiquitous): Every particle shall be a square of whole art pixels in one pooled field of at most `maxParticles` (240), the oldest giving its slot to the newest, fading in no more than four steps; the field asks for frames at `frameRate` (20) a second only while particles live, so a still map stays idle, and the overlay budget (VIEW-054) does not change. [particles-and-animations-design §7]
+
+#### How the player uses it: particles and animations
+1. Where: nothing to tap. Moments play on the map where the player is already looking while the week plays out; the looping effects are part of the land.
+2. Grouping: each effect belongs to the thing it shows, the province that changed hands, the town that finished a work, the rising; no new screen or control beyond Settings → Animations.
+3. Overview: the dispatches log and alerts stay the record of every moment (VIEW-127); a moment only draws the eye to it.
+4. Phone: effects are drawn in the pieces' art pixels, so they read at arm's length in the Wide and Tall layouts; nothing needs hover; they are drawn on the map canvas under the top bar and the safe areas; Settings → Animations and Battery saver turn them down or off.
 
 ## 6. Commands
 
@@ -341,11 +381,11 @@ re-renders only open panels.
 | Map detail | Low / Medium / High | phone Medium | No | settings |
 | Animations | Full / Reduced / Off | Full | No | settings |
 | `livingMap.livingFrom`, `livingFade`, `streetFrom`, `streetTo` | Living and street band zooms | 16, 2, 40, 96 | Yes | `map-presentation.json` |
-| `livingMap.cellsPerRootK`, `maxCells`, `coreShare` | Town footprint | 1.0, 30, 60 % | Yes | `map-presentation.json` |
+| `livingMap.cellsPerRootK`, `maxCells`, `coreShare` | Town footprint | 1.5, 30, 60 % | Yes | `map-presentation.json` |
 | `livingMap.growRadius`, `growth` | Town growth order | 8 pixels; jitter and river, coast, mountain and marsh weights | Yes | `map-presentation.json` |
 | `livingMap.hamlets` | Hamlets and tracks | 40 thousand rural per hamlet, at most 6, 4 apart, tracks within 8 | Yes | `map-presentation.json` |
 | `livingMap.figures` | Figures | 1,000 / 250 men a figure, 12 / 40 at most, 60 animated at 10 fps | Yes | `map-presentation.json` |
-| `livingMap.hulls` | Hulls | 5 / 1 ships a hull, 8 / 24 at most | Yes | `map-presentation.json` |
+| `livingMap.hulls` | Hulls | 5 / 1 ships a hull, 8 / 24 at most, a berth every 2 water pixels along the waterfront | Yes | `map-presentation.json` |
 | `livingMap.traders.maxTraders` | Traders in the snapshot feed | 300 | Yes | `map-presentation.json` |
 | `livingMap.byDetail` | Bands and life by Map detail | Low off, Medium living, High living and street | Yes | `map-presentation.json` |
 | `livingMap.townStyles`, `landmarks` | Culture styles and landmarks | generic set; Toledo, Constantinople, Rome, Paris, Venice, Cairo, Beijing, Cuzco | Yes | `map-presentation.json` |
@@ -392,7 +432,7 @@ None. AI nations run in the same worker turn, which the turn budgets cover (VIEW
 - **D-VIEW-10** (was OQ-VIEW-10) Map detail Low: Low keeps 4 × 4 art at every zoom, Local included, and that is a valid close-in view. It only lowers detail and changes nothing else.
 
 - **OQ-VIEW-11** (default chosen) Band thresholds: living from zoom 16 and street level up to 96. Leroy can overrule. [living-map-design §9 OQ-LIVE-1]
-- **OQ-VIEW-12** (default chosen) Footprint scale: `sqrt(town thousands) × 1.0`, capped at 30 cells, to be tuned so big cities read clearly without swallowing small provinces. [OQ-LIVE-2]
+- **OQ-VIEW-12** (default chosen) Footprint scale: `sqrt(town thousands) × 1.5`, capped at 30 cells, so Toledo's 119 thousand town people in 1444 make the design's 15 to 20 cells (at 1.0 it was 11); to be tuned so big cities read clearly without swallowing small provinces. [OQ-LIVE-2]
 - **OQ-VIEW-13** (default chosen) Street level on the phone default: Medium has no street level, to spare the battery; High only. [OQ-LIVE-3]
 - **OQ-VIEW-14** (default chosen) First landmarks: Toledo, Constantinople (Hagia Sophia), Rome, Paris, Venice, Cairo, Beijing (the Forbidden City) and Cuzco. [OQ-LIVE-4]
 
@@ -507,7 +547,8 @@ None. AI nations run in the same worker turn, which the turn budgets cover (VIEW
 | VIEW-110 | living-map.feature | Walls by castle step |
 | VIEW-111 | living-map.feature | The countryside makes hamlets; Hamlets stand apart from the town and each other |
 | VIEW-112 | living-map.feature | A mine marks one pixel of the province |
-| VIEW-113 | living-map.feature | Roads are graded by both ends; Roads join neighbouring towns over land; No road reaches an island |
+| VIEW-113 | living-map.feature | Roads are graded by both ends; Roads join neighbouring towns over land; No road reaches an island; A town between two others carries their road; Roads keep near the straight line |
+| VIEW-133 | — | presentation only: the client lays no town or road on land no realm holds |
 | VIEW-114 | — | presentation only: drawing marches and caravans along the road line |
 | VIEW-115 | living-map.feature | The settlement byte packs kind and road links |
 | VIEW-116 | living-map.feature | One figure per thousand men; Figures are split by arm |
@@ -527,3 +568,16 @@ None. AI nations run in the same worker turn, which the turn budgets cover (VIEW
 | VIEW-130 | living-map.feature | At most 60 figures move at once |
 | VIEW-131 | — | presentation only: culture styles and landmarks are art |
 | VIEW-132 | living-map.feature | The snapshot carries each trader where it walks |
+| VIEW-133 | zoom-content.feature | Realm names never overlap |
+| VIEW-134 | — | presentation only: detailed figures and town tiles are art |
+| VIEW-140 | effects.feature | A province changing hands throws confetti in the new holder's colour |
+| VIEW-141 | effects.feature | A finished work raises dust and sparkles |
+| VIEW-142 | effects.feature | A rising sends up smoke and embers |
+| VIEW-143 | effects.feature | One gold shower over the capital for the realm's news |
+| VIEW-144 | effects.feature | Plague breaking out lets motes drift up |
+| VIEW-145 | effects.feature | Animations decides how much plays |
+| VIEW-146 | effects.feature | Bigger towns smoke from more chimneys |
+| VIEW-147 | effects.feature | Snow falls below freezing |
+| VIEW-148 | — | presentation only: birds are decoration |
+| VIEW-149 | — | presentation only: riot smoke is decoration |
+| VIEW-150 | — | presentation only: checked by the client's particle tests and the perf overlay budget |

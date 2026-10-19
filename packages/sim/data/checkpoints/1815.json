@@ -1,0 +1,3240 @@
+{
+  "date": "1815-06-09",
+  "label": "Final Act of the Congress of Vienna",
+  "why": "The Final Act settles Europe after Napoleon, nine days before Waterloo, while Spanish America fights for independence and Britain rules India.",
+  "realms": [
+    {
+      "id": "england",
+      "name": "United Kingdom of Great Britain and Ireland",
+      "rank": "great_power",
+      "capital": {
+        "name": "London",
+        "at": [
+          -0.12,
+          51.5
+        ]
+      },
+      "overlord": null,
+      "ruler": "George III (George, Prince Regent, governs)",
+      "catalogue_id": "england",
+      "note": "Map id england; Great Britain from 1707; Union with Ireland 1 Jan 1801. Rules India through the East India Company and holds Java, Malacca, the Cape, Ceylon and Malta."
+    },
+    {
+      "id": "france",
+      "name": "French Empire (Hundred Days)",
+      "rank": "great_power",
+      "capital": {
+        "name": "Paris",
+        "at": [
+          2.35,
+          48.86
+        ]
+      },
+      "overlord": null,
+      "ruler": "Napoleon I (returned 20 Mar 1815)",
+      "catalogue_id": "france",
+      "note": "Napoleon rules again from 20 March to 22 June 1815; the Bourbon Louis XVIII waits in Ghent. Waterloo follows on 18 June."
+    },
+    {
+      "id": "austria",
+      "name": "Austrian Empire",
+      "rank": "great_power",
+      "capital": {
+        "name": "Vienna",
+        "at": [
+          16.37,
+          48.21
+        ]
+      },
+      "overlord": null,
+      "ruler": "Francis I",
+      "catalogue_id": "austria",
+      "note": "Includes Hungary, Bohemia, Galicia and, from 7 Apr 1815, the Kingdom of Lombardy-Venetia."
+    },
+    {
+      "id": "brandenburg",
+      "name": "Kingdom of Prussia",
+      "rank": "great_power",
+      "capital": {
+        "name": "Berlin",
+        "at": [
+          13.4,
+          52.52
+        ]
+      },
+      "overlord": null,
+      "ruler": "Frederick William III",
+      "catalogue_id": "brandenburg",
+      "note": "Map id brandenburg; gains the Rhineland, Westphalia and northern Saxony at Vienna."
+    },
+    {
+      "id": "muscovy",
+      "name": "Russian Empire",
+      "rank": "great_power",
+      "capital": {
+        "name": "Saint Petersburg",
+        "at": [
+          30.32,
+          59.94
+        ]
+      },
+      "overlord": null,
+      "ruler": "Alexander I",
+      "catalogue_id": "muscovy",
+      "note": "Map id muscovy; holds Finland (1809), Bessarabia (1812), Georgia and the Duchy of Warsaw under provisional rule."
+    },
+    {
+      "id": "castile",
+      "name": "Kingdom of Spain",
+      "rank": "major",
+      "capital": {
+        "name": "Madrid",
+        "at": [
+          -3.7,
+          40.42
+        ]
+      },
+      "overlord": null,
+      "ruler": "Ferdinand VII",
+      "catalogue_id": "castile",
+      "note": "Map id castile; restored absolutism 1814; its American empire is at war with independence movements."
+    },
+    {
+      "id": "portugal",
+      "name": "Kingdom of Portugal",
+      "rank": "major",
+      "capital": {
+        "name": "Rio de Janeiro",
+        "at": [
+          -43.18,
+          -22.91
+        ]
+      },
+      "overlord": null,
+      "ruler": "Maria I (Prince Regent John governs)",
+      "catalogue_id": "portugal",
+      "note": "The court sits in Rio de Janeiro since 1808; Lisbon is run by a regency council. The United Kingdom with Brazil is proclaimed in Dec 1815."
+    },
+    {
+      "id": "netherlands",
+      "name": "United Kingdom of the Netherlands",
+      "rank": "major",
+      "capital": {
+        "name": "The Hague",
+        "at": [
+          4.3,
+          52.08
+        ]
+      },
+      "overlord": null,
+      "ruler": "William I (king from 16 Mar 1815)",
+      "catalogue_id": null,
+      "note": "Joins the former Dutch Republic and the Austrian Netherlands; confirmed by the Final Act."
+    },
+    {
+      "id": "luxembourg",
+      "name": "Grand Duchy of Luxembourg",
+      "rank": "minor",
+      "capital": {
+        "name": "Luxembourg",
+        "at": [
+          6.13,
+          49.61
+        ]
+      },
+      "overlord": "netherlands",
+      "ruler": "William I",
+      "catalogue_id": "luxembourg",
+      "note": "Created by the Final Act in personal union with the Netherlands; member of the German Confederation."
+    },
+    {
+      "id": "sweden",
+      "name": "Kingdom of Sweden",
+      "rank": "major",
+      "capital": {
+        "name": "Stockholm",
+        "at": [
+          18.07,
+          59.33
+        ]
+      },
+      "overlord": null,
+      "ruler": "Charles XIII (Crown Prince Charles John governs)",
+      "catalogue_id": "sweden",
+      "note": "Lost Finland 1809; gained Norway in union 1814."
+    },
+    {
+      "id": "norway",
+      "name": "Kingdom of Norway",
+      "rank": "minor",
+      "capital": {
+        "name": "Christiania",
+        "at": [
+          10.75,
+          59.91
+        ]
+      },
+      "overlord": "sweden",
+      "ruler": "Charles XIII",
+      "catalogue_id": "norway",
+      "note": "Personal union with Sweden from 4 Nov 1814 under its own constitution."
+    },
+    {
+      "id": "denmark",
+      "name": "Kingdom of Denmark",
+      "rank": "minor",
+      "capital": {
+        "name": "Copenhagen",
+        "at": [
+          12.57,
+          55.68
+        ]
+      },
+      "overlord": null,
+      "ruler": "Frederick VI",
+      "catalogue_id": "denmark",
+      "note": "Lost Norway by the Treaty of Kiel (Jan 1814); keeps Iceland, the Faroes, Greenland, Schleswig and Holstein."
+    },
+    {
+      "id": "ottomans",
+      "name": "Ottoman Empire",
+      "rank": "major",
+      "capital": {
+        "name": "Constantinople",
+        "at": [
+          28.98,
+          41.01
+        ]
+      },
+      "overlord": null,
+      "ruler": "Mahmud II",
+      "catalogue_id": "ottoman"
+    },
+    {
+      "id": "savoy",
+      "name": "Kingdom of Sardinia",
+      "rank": "minor",
+      "capital": {
+        "name": "Turin",
+        "at": [
+          7.69,
+          45.07
+        ]
+      },
+      "overlord": null,
+      "ruler": "Victor Emmanuel I",
+      "catalogue_id": "savoy",
+      "note": "House of Savoy (map id savoy); gains the former Republic of Genoa (1815)."
+    },
+    {
+      "id": "naples",
+      "name": "Kingdom of Naples and Sicily",
+      "rank": "minor",
+      "capital": {
+        "name": "Naples",
+        "at": [
+          14.27,
+          40.85
+        ]
+      },
+      "overlord": null,
+      "ruler": "Ferdinand IV of Naples / III of Sicily",
+      "catalogue_id": "naples",
+      "note": "Two crowns in personal union until merged as the Two Sicilies in Dec 1816. Murat fell in May 1815; Austrian troops took Naples for Ferdinand on 23 May."
+    },
+    {
+      "id": "papal_states",
+      "name": "Papal States",
+      "rank": "minor",
+      "capital": {
+        "name": "Rome",
+        "at": [
+          12.5,
+          41.9
+        ]
+      },
+      "overlord": null,
+      "ruler": "Pius VII",
+      "catalogue_id": "papal_states",
+      "note": "Pius VII came back to Rome on 7 June 1815 after fleeing Murat's advance."
+    },
+    {
+      "id": "florence",
+      "name": "Grand Duchy of Tuscany",
+      "rank": "minor",
+      "capital": {
+        "name": "Florence",
+        "at": [
+          11.26,
+          43.77
+        ]
+      },
+      "overlord": null,
+      "ruler": "Ferdinand III",
+      "catalogue_id": "florence",
+      "note": "Successor of the Republic of Florence (map id florence); Habsburg-Lorraine restored 1814."
+    },
+    {
+      "id": "modena",
+      "name": "Duchy of Modena",
+      "rank": "minor",
+      "capital": {
+        "name": "Modena",
+        "at": [
+          10.93,
+          44.65
+        ]
+      },
+      "overlord": null,
+      "ruler": "Francis IV",
+      "catalogue_id": "ferrara",
+      "note": "Este duchy; catalogue record is the 1444 Este state (Ferrara-Modena)."
+    },
+    {
+      "id": "parma",
+      "name": "Duchy of Parma",
+      "rank": "minor",
+      "capital": {
+        "name": "Parma",
+        "at": [
+          10.33,
+          44.8
+        ]
+      },
+      "overlord": null,
+      "ruler": "Marie Louise",
+      "catalogue_id": null,
+      "note": "Assigned to Napoleon's wife by the Final Act; she stays in Vienna for now."
+    },
+    {
+      "id": "switzerland",
+      "name": "Swiss Confederation",
+      "rank": "minor",
+      "capital": {
+        "name": "Zürich (Vorort)",
+        "at": [
+          8.54,
+          47.37
+        ]
+      },
+      "overlord": null,
+      "ruler": "Federal Diet (Landammann Hans von Reinhard of Zürich)",
+      "catalogue_id": "swiss_confederation",
+      "note": "22 cantons; neutrality recognised at Vienna; Federal Treaty signed Aug 1815."
+    },
+    {
+      "id": "bavaria",
+      "name": "Kingdom of Bavaria",
+      "rank": "minor",
+      "capital": {
+        "name": "Munich",
+        "at": [
+          11.58,
+          48.14
+        ]
+      },
+      "overlord": null,
+      "ruler": "Maximilian I Joseph",
+      "catalogue_id": "bavaria_munich"
+    },
+    {
+      "id": "wurttemberg",
+      "name": "Kingdom of Württemberg",
+      "rank": "minor",
+      "capital": {
+        "name": "Stuttgart",
+        "at": [
+          9.18,
+          48.78
+        ]
+      },
+      "overlord": null,
+      "ruler": "Frederick I",
+      "catalogue_id": "wurttemberg_stuttgart"
+    },
+    {
+      "id": "saxony",
+      "name": "Kingdom of Saxony",
+      "rank": "minor",
+      "capital": {
+        "name": "Dresden",
+        "at": [
+          13.74,
+          51.05
+        ]
+      },
+      "overlord": null,
+      "ruler": "Frederick Augustus I",
+      "catalogue_id": "saxony",
+      "note": "King back in Dresden on 7 June 1815 after Prussian-Russian occupation; lost about half its land to Prussia."
+    },
+    {
+      "id": "luneburg",
+      "name": "Kingdom of Hanover",
+      "rank": "minor",
+      "capital": {
+        "name": "Hanover",
+        "at": [
+          9.73,
+          52.37
+        ]
+      },
+      "overlord": "england",
+      "ruler": "George III",
+      "catalogue_id": "luneburg",
+      "note": "Brunswick-Lüneburg raised to a kingdom in Oct 1814; personal union with Britain."
+    },
+    {
+      "id": "baden",
+      "name": "Grand Duchy of Baden",
+      "rank": "minor",
+      "capital": {
+        "name": "Karlsruhe",
+        "at": [
+          8.4,
+          49.01
+        ]
+      },
+      "overlord": null,
+      "ruler": "Charles",
+      "catalogue_id": "baden"
+    },
+    {
+      "id": "hesse",
+      "name": "Electorate of Hesse (Hesse-Kassel)",
+      "rank": "minor",
+      "capital": {
+        "name": "Kassel",
+        "at": [
+          9.48,
+          51.31
+        ]
+      },
+      "overlord": null,
+      "ruler": "William I",
+      "catalogue_id": "hesse"
+    },
+    {
+      "id": "hesse_darmstadt",
+      "name": "Grand Duchy of Hesse",
+      "rank": "minor",
+      "capital": {
+        "name": "Darmstadt",
+        "at": [
+          8.65,
+          49.87
+        ]
+      },
+      "overlord": null,
+      "ruler": "Louis I",
+      "catalogue_id": null
+    },
+    {
+      "id": "brunswick",
+      "name": "Duchy of Brunswick",
+      "rank": "minor",
+      "capital": {
+        "name": "Brunswick",
+        "at": [
+          10.52,
+          52.27
+        ]
+      },
+      "overlord": null,
+      "ruler": "Frederick William (the Black Duke)",
+      "catalogue_id": "brunswick_wolfenbuttel"
+    },
+    {
+      "id": "oldenburg",
+      "name": "Duchy of Oldenburg",
+      "rank": "minor",
+      "capital": {
+        "name": "Oldenburg",
+        "at": [
+          8.21,
+          53.14
+        ]
+      },
+      "overlord": null,
+      "ruler": "Peter Frederick Louis (regent for William)",
+      "catalogue_id": "oldenburg"
+    },
+    {
+      "id": "mecklenburg",
+      "name": "Mecklenburg-Schwerin",
+      "rank": "minor",
+      "capital": {
+        "name": "Schwerin",
+        "at": [
+          11.41,
+          53.63
+        ]
+      },
+      "overlord": null,
+      "ruler": "Frederick Francis I",
+      "catalogue_id": "mecklenburg",
+      "note": "Raised to a grand duchy by the Final Act."
+    },
+    {
+      "id": "hamburg",
+      "name": "Free City of Hamburg",
+      "rank": "minor",
+      "capital": {
+        "name": "Hamburg",
+        "at": [
+          9.99,
+          53.55
+        ]
+      },
+      "overlord": null,
+      "ruler": "Senate",
+      "catalogue_id": "hamburg"
+    },
+    {
+      "id": "lubeck",
+      "name": "Free City of Lübeck",
+      "rank": "minor",
+      "capital": {
+        "name": "Lübeck",
+        "at": [
+          10.69,
+          53.87
+        ]
+      },
+      "overlord": null,
+      "ruler": "Senate",
+      "catalogue_id": "lubeck"
+    },
+    {
+      "id": "frankfurt",
+      "name": "Free City of Frankfurt",
+      "rank": "minor",
+      "capital": {
+        "name": "Frankfurt",
+        "at": [
+          8.68,
+          50.11
+        ]
+      },
+      "overlord": null,
+      "ruler": "Senate",
+      "catalogue_id": "frankfurt"
+    },
+    {
+      "id": "krakow",
+      "name": "Free City of Kraków",
+      "rank": "minor",
+      "capital": {
+        "name": "Kraków",
+        "at": [
+          19.94,
+          50.06
+        ]
+      },
+      "overlord": null,
+      "ruler": "Organising committee under the three partitioning powers",
+      "catalogue_id": null,
+      "note": "Created by the treaties of 3 May 1815 and the Final Act; its institutions were set up later in 1815."
+    },
+    {
+      "id": "wallachia",
+      "name": "Principality of Wallachia",
+      "rank": "minor",
+      "capital": {
+        "name": "Bucharest",
+        "at": [
+          26.1,
+          44.43
+        ]
+      },
+      "overlord": "ottomans",
+      "ruler": "Ioan Caradja",
+      "catalogue_id": "wallachia"
+    },
+    {
+      "id": "moldavia",
+      "name": "Principality of Moldavia",
+      "rank": "minor",
+      "capital": {
+        "name": "Iași",
+        "at": [
+          27.59,
+          47.16
+        ]
+      },
+      "overlord": "ottomans",
+      "ruler": "Scarlat Callimachi",
+      "catalogue_id": "moldavia"
+    },
+    {
+      "id": "montenegro",
+      "name": "Prince-Bishopric of Montenegro",
+      "rank": "minor",
+      "capital": {
+        "name": "Cetinje",
+        "at": [
+          18.92,
+          42.39
+        ]
+      },
+      "overlord": null,
+      "ruler": "Petar I Petrović-Njegoš",
+      "catalogue_id": "zeta",
+      "note": "De facto independent; Ottomans claim it."
+    },
+    {
+      "id": "ioannina_pashalik",
+      "name": "Pashalik of Yanina",
+      "rank": "minor",
+      "capital": {
+        "name": "Ioannina",
+        "at": [
+          20.85,
+          39.67
+        ]
+      },
+      "overlord": "ottomans",
+      "ruler": "Ali Pasha",
+      "catalogue_id": null,
+      "note": "Ali Pasha rules Epirus and much of Greece as an autonomous Ottoman governor."
+    },
+    {
+      "id": "shirvan",
+      "name": "Shirvan Khanate",
+      "rank": "minor",
+      "capital": {
+        "name": "Shamakhi",
+        "at": [
+          48.64,
+          40.63
+        ]
+      },
+      "overlord": "muscovy",
+      "ruler": "Mustafa Khan",
+      "catalogue_id": "shirvan",
+      "note": "Under Russian suzerainty since 1805; Gulistan 1813."
+    },
+    {
+      "id": "morocco",
+      "name": "Sultanate of Morocco",
+      "rank": "minor",
+      "capital": {
+        "name": "Fez",
+        "at": [
+          -5.0,
+          34.03
+        ]
+      },
+      "overlord": null,
+      "ruler": "Sulayman (Moulay Slimane)",
+      "catalogue_id": "morocco"
+    },
+    {
+      "id": "algiers",
+      "name": "Regency of Algiers",
+      "rank": "minor",
+      "capital": {
+        "name": "Algiers",
+        "at": [
+          3.06,
+          36.75
+        ]
+      },
+      "overlord": "ottomans",
+      "ruler": "Omar Agha (Dey)",
+      "catalogue_id": null,
+      "note": "Nominal Ottoman suzerainty; at war with the United States (Second Barbary War) since Mar 1815."
+    },
+    {
+      "id": "tunis",
+      "name": "Beylik of Tunis",
+      "rank": "minor",
+      "capital": {
+        "name": "Tunis",
+        "at": [
+          10.18,
+          36.8
+        ]
+      },
+      "overlord": "ottomans",
+      "ruler": "Mahmud Bey",
+      "catalogue_id": "hafsid",
+      "note": "Husainid beys; nominal Ottoman suzerainty."
+    },
+    {
+      "id": "tripoli",
+      "name": "Regency of Tripoli",
+      "rank": "minor",
+      "capital": {
+        "name": "Tripoli",
+        "at": [
+          13.19,
+          32.89
+        ]
+      },
+      "overlord": "ottomans",
+      "ruler": "Yusuf Karamanli",
+      "catalogue_id": "tripoli_regency"
+    },
+    {
+      "id": "egypt",
+      "name": "Eyalet of Egypt (Muhammad Ali)",
+      "rank": "major",
+      "capital": {
+        "name": "Cairo",
+        "at": [
+          31.24,
+          30.04
+        ]
+      },
+      "overlord": "ottomans",
+      "ruler": "Muhammad Ali Pasha",
+      "catalogue_id": null,
+      "note": "Governor since 1805; massacred the Mamluks 1811; occupies the Hejaz for the Sultan against the Saudis."
+    },
+    {
+      "id": "baghdad_pashalik",
+      "name": "Mamluk Pashalik of Baghdad",
+      "rank": "minor",
+      "capital": {
+        "name": "Baghdad",
+        "at": [
+          44.36,
+          33.31
+        ]
+      },
+      "overlord": "ottomans",
+      "ruler": "Sa'id Pasha",
+      "catalogue_id": null,
+      "note": "Georgian Mamluk governors, largely autonomous."
+    },
+    {
+      "id": "diriyah",
+      "name": "Emirate of Diriyah (First Saudi State)",
+      "rank": "minor",
+      "capital": {
+        "name": "Diriyah",
+        "at": [
+          46.57,
+          24.73
+        ]
+      },
+      "overlord": null,
+      "ruler": "Abdullah bin Saud",
+      "catalogue_id": null,
+      "note": "Lost the Hejaz to Egypt 1812-13; destroyed 1818."
+    },
+    {
+      "id": "oman",
+      "name": "Sultanate of Muscat and Oman",
+      "rank": "minor",
+      "capital": {
+        "name": "Muscat",
+        "at": [
+          58.59,
+          23.61
+        ]
+      },
+      "overlord": null,
+      "ruler": "Sa'id bin Sultan",
+      "catalogue_id": "oman_nabhani",
+      "note": "Holds Zanzibar and the Swahili coast and leases Bandar Abbas and Hormuz from Persia."
+    },
+    {
+      "id": "yemen",
+      "name": "Zaydi Imamate of Yemen",
+      "rank": "minor",
+      "capital": {
+        "name": "Sana'a",
+        "at": [
+          44.21,
+          15.35
+        ]
+      },
+      "overlord": null,
+      "ruler": "al-Mutawakkil Ahmad",
+      "catalogue_id": "zaydi_imamate"
+    },
+    {
+      "id": "lahej",
+      "name": "Sultanate of Lahej",
+      "rank": "minor",
+      "capital": {
+        "name": "Lahej",
+        "at": [
+          44.88,
+          13.06
+        ]
+      },
+      "overlord": null,
+      "ruler": "Ahmad bin Abd al-Karim",
+      "catalogue_id": null,
+      "note": "Abdali sultans, independent of the imam since 1728; hold Aden."
+    },
+    {
+      "id": "persia",
+      "name": "Qajar Iran",
+      "rank": "major",
+      "capital": {
+        "name": "Tehran",
+        "at": [
+          51.39,
+          35.69
+        ]
+      },
+      "overlord": null,
+      "ruler": "Fath-Ali Shah",
+      "catalogue_id": null,
+      "note": "Lost Georgia and the northern khanates to Russia (Gulistan 1813)."
+    },
+    {
+      "id": "afghanistan",
+      "name": "Durrani Empire",
+      "rank": "minor",
+      "capital": {
+        "name": "Kabul",
+        "at": [
+          69.17,
+          34.53
+        ]
+      },
+      "overlord": null,
+      "ruler": "Mahmud Shah (vizier Fateh Khan Barakzai)",
+      "catalogue_id": null,
+      "note": "Fragmenting; Herat under Mahmud's brother Firuz al-Din, Kashmir under Azim Khan."
+    },
+    {
+      "id": "uzbek_khanate",
+      "name": "Emirate of Bukhara",
+      "rank": "minor",
+      "capital": {
+        "name": "Bukhara",
+        "at": [
+          64.42,
+          39.77
+        ]
+      },
+      "overlord": null,
+      "ruler": "Haydar bin Shahmurad",
+      "catalogue_id": "uzbek_khanate"
+    },
+    {
+      "id": "khiva",
+      "name": "Khanate of Khiva",
+      "rank": "minor",
+      "capital": {
+        "name": "Khiva",
+        "at": [
+          60.36,
+          41.38
+        ]
+      },
+      "overlord": null,
+      "ruler": "Muhammad Rahim Khan I",
+      "catalogue_id": null
+    },
+    {
+      "id": "kokand",
+      "name": "Khanate of Kokand",
+      "rank": "minor",
+      "capital": {
+        "name": "Kokand",
+        "at": [
+          70.94,
+          40.53
+        ]
+      },
+      "overlord": null,
+      "ruler": "Umar Khan",
+      "catalogue_id": null
+    },
+    {
+      "id": "sikh_empire",
+      "name": "Sikh Empire",
+      "rank": "major",
+      "capital": {
+        "name": "Lahore",
+        "at": [
+          74.35,
+          31.55
+        ]
+      },
+      "overlord": null,
+      "ruler": "Ranjit Singh",
+      "catalogue_id": null
+    },
+    {
+      "id": "sindh",
+      "name": "Talpur Sindh",
+      "rank": "minor",
+      "capital": {
+        "name": "Hyderabad (Sindh)",
+        "at": [
+          68.37,
+          25.39
+        ]
+      },
+      "overlord": null,
+      "ruler": "Mir Karam Ali Talpur (with his brothers)",
+      "catalogue_id": "sindh"
+    },
+    {
+      "id": "kalat",
+      "name": "Khanate of Kalat",
+      "rank": "minor",
+      "capital": {
+        "name": "Kalat",
+        "at": [
+          66.59,
+          29.03
+        ]
+      },
+      "overlord": null,
+      "ruler": "Mahmud Khan I",
+      "catalogue_id": "baluch"
+    },
+    {
+      "id": "mughals",
+      "name": "Mughal Empire",
+      "rank": "minor",
+      "capital": {
+        "name": "Delhi",
+        "at": [
+          77.24,
+          28.66
+        ]
+      },
+      "overlord": "england",
+      "ruler": "Akbar II",
+      "catalogue_id": null,
+      "note": "A pensioner of the East India Company since 1803; rules little beyond the Red Fort."
+    },
+    {
+      "id": "maratha",
+      "name": "Maratha Peshwa (Pune)",
+      "rank": "minor",
+      "capital": {
+        "name": "Pune",
+        "at": [
+          73.86,
+          18.52
+        ]
+      },
+      "overlord": "england",
+      "ruler": "Baji Rao II",
+      "catalogue_id": null,
+      "note": "Bound by the subsidiary Treaty of Bassein (1802); the confederacy is ending."
+    },
+    {
+      "id": "gwalior",
+      "name": "Scindia of Gwalior",
+      "rank": "minor",
+      "capital": {
+        "name": "Gwalior",
+        "at": [
+          78.18,
+          26.22
+        ]
+      },
+      "overlord": null,
+      "ruler": "Daulat Rao Scindia",
+      "catalogue_id": "gwalior"
+    },
+    {
+      "id": "indore",
+      "name": "Holkar of Indore",
+      "rank": "minor",
+      "capital": {
+        "name": "Indore",
+        "at": [
+          75.86,
+          22.72
+        ]
+      },
+      "overlord": null,
+      "ruler": "Malhar Rao Holkar III (regent Tulsi Bai)",
+      "catalogue_id": null
+    },
+    {
+      "id": "nagpur",
+      "name": "Bhonsle of Nagpur",
+      "rank": "minor",
+      "capital": {
+        "name": "Nagpur",
+        "at": [
+          79.09,
+          21.15
+        ]
+      },
+      "overlord": null,
+      "ruler": "Raghuji II Bhonsle",
+      "catalogue_id": null
+    },
+    {
+      "id": "baroda",
+      "name": "Gaekwad of Baroda",
+      "rank": "minor",
+      "capital": {
+        "name": "Baroda",
+        "at": [
+          73.18,
+          22.31
+        ]
+      },
+      "overlord": "england",
+      "ruler": "Anand Rao Gaekwad (Fatesingh Rao regent)",
+      "catalogue_id": null
+    },
+    {
+      "id": "dhar",
+      "name": "Puar of Dhar",
+      "rank": "minor",
+      "capital": {
+        "name": "Dhar",
+        "at": [
+          75.3,
+          22.6
+        ]
+      },
+      "overlord": null,
+      "ruler": "Ramchandra Rao Puar",
+      "catalogue_id": null,
+      "note": "Small Maratha state wasted by Pindaris and Scindia."
+    },
+    {
+      "id": "hyderabad",
+      "name": "Hyderabad State (Nizam)",
+      "rank": "minor",
+      "capital": {
+        "name": "Hyderabad",
+        "at": [
+          78.47,
+          17.36
+        ]
+      },
+      "overlord": "england",
+      "ruler": "Sikandar Jah",
+      "catalogue_id": null
+    },
+    {
+      "id": "mysore",
+      "name": "Kingdom of Mysore",
+      "rank": "minor",
+      "capital": {
+        "name": "Mysore",
+        "at": [
+          76.64,
+          12.3
+        ]
+      },
+      "overlord": "england",
+      "ruler": "Krishnaraja Wodeyar III",
+      "catalogue_id": null
+    },
+    {
+      "id": "awadh",
+      "name": "Awadh",
+      "rank": "minor",
+      "capital": {
+        "name": "Lucknow",
+        "at": [
+          80.95,
+          26.85
+        ]
+      },
+      "overlord": "england",
+      "ruler": "Ghazi-ud-Din Haidar",
+      "catalogue_id": null
+    },
+    {
+      "id": "nepal",
+      "name": "Kingdom of Nepal",
+      "rank": "minor",
+      "capital": {
+        "name": "Kathmandu",
+        "at": [
+          85.32,
+          27.72
+        ]
+      },
+      "overlord": null,
+      "ruler": "Girvan Yuddha Bikram Shah (Bhimsen Thapa governs)",
+      "catalogue_id": null,
+      "note": "At war with the East India Company since Nov 1814."
+    },
+    {
+      "id": "ahom",
+      "name": "Ahom Kingdom",
+      "rank": "minor",
+      "capital": {
+        "name": "Jorhat",
+        "at": [
+          94.21,
+          26.75
+        ]
+      },
+      "overlord": null,
+      "ruler": "Chandrakanta Singha",
+      "catalogue_id": "ahom",
+      "note": "Weak; Burmese invasions begin 1817."
+    },
+    {
+      "id": "tibet",
+      "name": "Tibet (Ganden Phodrang)",
+      "rank": "minor",
+      "capital": {
+        "name": "Lhasa",
+        "at": [
+          91.11,
+          29.65
+        ]
+      },
+      "overlord": "jurchens",
+      "ruler": "Regent Demo Tulku (9th Dalai Lama died Mar 1815)",
+      "catalogue_id": null
+    },
+    {
+      "id": "jurchens",
+      "name": "Qing Empire",
+      "rank": "great_power",
+      "capital": {
+        "name": "Beijing",
+        "at": [
+          116.4,
+          39.9
+        ]
+      },
+      "overlord": null,
+      "ruler": "Jiaqing Emperor",
+      "catalogue_id": null
+    },
+    {
+      "id": "korea",
+      "name": "Joseon",
+      "rank": "minor",
+      "capital": {
+        "name": "Hanseong",
+        "at": [
+          126.98,
+          37.57
+        ]
+      },
+      "overlord": null,
+      "ruler": "Sunjo",
+      "catalogue_id": "joseon",
+      "note": "Tributary of the Qing."
+    },
+    {
+      "id": "japan",
+      "name": "Tokugawa Shogunate",
+      "rank": "major",
+      "capital": {
+        "name": "Edo",
+        "at": [
+          139.69,
+          35.69
+        ]
+      },
+      "overlord": null,
+      "ruler": "Shogun Tokugawa Ienari (Emperor Kōkaku in Kyoto)",
+      "catalogue_id": "japan_imperial_court"
+    },
+    {
+      "id": "ryukyu",
+      "name": "Ryukyu Kingdom",
+      "rank": "minor",
+      "capital": {
+        "name": "Shuri",
+        "at": [
+          127.72,
+          26.22
+        ]
+      },
+      "overlord": "japan",
+      "ruler": "Shō Kō",
+      "catalogue_id": "ryukyu",
+      "note": "Under Satsuma since 1609 and a Qing tributary."
+    },
+    {
+      "id": "dai_viet",
+      "name": "Việt Nam (Nguyễn dynasty)",
+      "rank": "major",
+      "capital": {
+        "name": "Huế",
+        "at": [
+          107.58,
+          16.46
+        ]
+      },
+      "overlord": null,
+      "ruler": "Gia Long",
+      "catalogue_id": "dai_viet"
+    },
+    {
+      "id": "ayutthaya",
+      "name": "Kingdom of Siam (Rattanakosin)",
+      "rank": "major",
+      "capital": {
+        "name": "Bangkok",
+        "at": [
+          100.5,
+          13.75
+        ]
+      },
+      "overlord": null,
+      "ruler": "Rama II",
+      "catalogue_id": "ayutthaya",
+      "note": "Successor of Ayutthaya (map id ayutthaya)."
+    },
+    {
+      "id": "ava",
+      "name": "Burma (Konbaung dynasty)",
+      "rank": "major",
+      "capital": {
+        "name": "Amarapura",
+        "at": [
+          96.05,
+          21.9
+        ]
+      },
+      "overlord": null,
+      "ruler": "Bodawpaya",
+      "catalogue_id": "ava"
+    },
+    {
+      "id": "khmer",
+      "name": "Kingdom of Cambodia",
+      "rank": "minor",
+      "capital": {
+        "name": "Phnom Penh",
+        "at": [
+          104.92,
+          11.56
+        ]
+      },
+      "overlord": "dai_viet",
+      "ruler": "Ang Chan II",
+      "catalogue_id": "cambodia",
+      "note": "Under Vietnamese protection since 1813; Siam holds the northwest."
+    },
+    {
+      "id": "vientiane",
+      "name": "Kingdom of Vientiane (Lan Xang successor)",
+      "rank": "minor",
+      "capital": {
+        "name": "Vientiane",
+        "at": [
+          102.6,
+          17.97
+        ]
+      },
+      "overlord": "ayutthaya",
+      "ruler": "Anouvong",
+      "catalogue_id": "lan_xang"
+    },
+    {
+      "id": "johor",
+      "name": "Sultanate of Johor-Riau",
+      "rank": "minor",
+      "capital": {
+        "name": "Lingga",
+        "at": [
+          104.58,
+          -0.2
+        ]
+      },
+      "overlord": null,
+      "ruler": "Abdul Rahman Muazzam Shah (disputed)",
+      "catalogue_id": null,
+      "note": "Succession disputed since 1812; the Temenggong holds Singapore island."
+    },
+    {
+      "id": "ternate",
+      "name": "Sultanate of Ternate",
+      "rank": "minor",
+      "capital": {
+        "name": "Ternate",
+        "at": [
+          127.38,
+          0.79
+        ]
+      },
+      "overlord": "england",
+      "ruler": "Sultan (name uncertain)",
+      "catalogue_id": "ternate",
+      "note": "British occupation of the Moluccas 1810-1817 in place of the Dutch."
+    },
+    {
+      "id": "hawaii",
+      "name": "Kingdom of Hawaii",
+      "rank": "minor",
+      "capital": {
+        "name": "Kailua-Kona",
+        "at": [
+          -155.99,
+          19.64
+        ]
+      },
+      "overlord": null,
+      "ruler": "Kamehameha I",
+      "catalogue_id": null
+    },
+    {
+      "id": "sokoto",
+      "name": "Sokoto Caliphate",
+      "rank": "major",
+      "capital": {
+        "name": "Sokoto",
+        "at": [
+          5.24,
+          13.06
+        ]
+      },
+      "overlord": null,
+      "ruler": "Usman dan Fodio (Muhammad Bello governs the east)",
+      "catalogue_id": null
+    },
+    {
+      "id": "kano",
+      "name": "Kano Emirate",
+      "rank": "minor",
+      "capital": {
+        "name": "Kano",
+        "at": [
+          8.52,
+          12.0
+        ]
+      },
+      "overlord": "sokoto",
+      "ruler": "Sulaimanu",
+      "catalogue_id": "kano"
+    },
+    {
+      "id": "kanem_bornu",
+      "name": "Bornu",
+      "rank": "minor",
+      "capital": {
+        "name": "Kukawa",
+        "at": [
+          13.56,
+          12.93
+        ]
+      },
+      "overlord": null,
+      "ruler": "Mai Dunama IX (Shehu Muhammad al-Amin al-Kanemi holds power)",
+      "catalogue_id": "bornu"
+    },
+    {
+      "id": "darfur",
+      "name": "Sultanate of Darfur",
+      "rank": "minor",
+      "capital": {
+        "name": "El Fasher",
+        "at": [
+          25.35,
+          13.63
+        ]
+      },
+      "overlord": null,
+      "ruler": "Muhammad al-Fadl",
+      "catalogue_id": "darfur_tunjur"
+    },
+    {
+      "id": "wadai",
+      "name": "Sultanate of Wadai",
+      "rank": "minor",
+      "capital": {
+        "name": "Wara",
+        "at": [
+          20.97,
+          13.95
+        ]
+      },
+      "overlord": null,
+      "ruler": "Sabun",
+      "catalogue_id": null
+    },
+    {
+      "id": "funj",
+      "name": "Funj Sultanate of Sennar",
+      "rank": "minor",
+      "capital": {
+        "name": "Sennar",
+        "at": [
+          33.6,
+          13.55
+        ]
+      },
+      "overlord": null,
+      "ruler": "Badi VII (Hamaj regents hold power)",
+      "catalogue_id": null
+    },
+    {
+      "id": "segou",
+      "name": "Bambara Empire of Ségou",
+      "rank": "minor",
+      "capital": {
+        "name": "Ségou",
+        "at": [
+          -6.27,
+          13.43
+        ]
+      },
+      "overlord": null,
+      "ruler": "Da Monzon Diarra",
+      "catalogue_id": null
+    },
+    {
+      "id": "timbuktu_tuareg",
+      "name": "Tuareg overlordship of Timbuktu",
+      "rank": "minor",
+      "capital": {
+        "name": "Timbuktu",
+        "at": [
+          -3.0,
+          16.77
+        ]
+      },
+      "overlord": null,
+      "ruler": "Tuareg chiefs over the Arma pashas (names uncertain)",
+      "catalogue_id": "timbuktu_tuareg",
+      "note": "Arma pashalik reduced to a tributary of the Tuareg; Massina takes the city c.1826."
+    },
+    {
+      "id": "oyo",
+      "name": "Oyo Empire",
+      "rank": "minor",
+      "capital": {
+        "name": "Oyo-Ile",
+        "at": [
+          4.2,
+          8.95
+        ]
+      },
+      "overlord": null,
+      "ruler": "Alaafin (name uncertain)",
+      "catalogue_id": "oyo",
+      "note": "In decline before the Ilorin revolt of 1817."
+    },
+    {
+      "id": "dahomey",
+      "name": "Kingdom of Dahomey",
+      "rank": "minor",
+      "capital": {
+        "name": "Abomey",
+        "at": [
+          1.99,
+          7.18
+        ]
+      },
+      "overlord": null,
+      "ruler": "Adandozan",
+      "catalogue_id": null
+    },
+    {
+      "id": "asante",
+      "name": "Asante Empire",
+      "rank": "major",
+      "capital": {
+        "name": "Kumasi",
+        "at": [
+          -1.62,
+          6.69
+        ]
+      },
+      "overlord": null,
+      "ruler": "Osei Bonsu",
+      "catalogue_id": null
+    },
+    {
+      "id": "benin",
+      "name": "Kingdom of Benin",
+      "rank": "minor",
+      "capital": {
+        "name": "Benin City",
+        "at": [
+          5.62,
+          6.34
+        ]
+      },
+      "overlord": null,
+      "ruler": "Succession contested (Osemwende, crowned 1816)",
+      "catalogue_id": "benin"
+    },
+    {
+      "id": "kongo",
+      "name": "Kingdom of Kongo",
+      "rank": "minor",
+      "capital": {
+        "name": "São Salvador",
+        "at": [
+          14.25,
+          -6.27
+        ]
+      },
+      "overlord": null,
+      "ruler": "Garcia V",
+      "catalogue_id": "kongo"
+    },
+    {
+      "id": "ethiopia",
+      "name": "Ethiopian Empire",
+      "rank": "minor",
+      "capital": {
+        "name": "Gondar",
+        "at": [
+          37.47,
+          12.6
+        ]
+      },
+      "overlord": null,
+      "ruler": "Egwale Seyon (Ras Gugsa of Yejju holds power)",
+      "catalogue_id": "ethiopia",
+      "note": "Zemene Mesafint: the emperor is a figurehead."
+    },
+    {
+      "id": "buganda",
+      "name": "Kingdom of Buganda",
+      "rank": "minor",
+      "capital": {
+        "name": "Rubaga",
+        "at": [
+          32.55,
+          0.3
+        ]
+      },
+      "overlord": null,
+      "ruler": "Kamanya",
+      "catalogue_id": "buganda"
+    },
+    {
+      "id": "rozvi",
+      "name": "Rozvi State",
+      "rank": "minor",
+      "capital": {
+        "name": "Danangombe",
+        "at": [
+          29.36,
+          -19.75
+        ]
+      },
+      "overlord": null,
+      "ruler": "Changamire (name uncertain)",
+      "catalogue_id": null,
+      "note": "In decline before the Nguni invasions of the 1830s."
+    },
+    {
+      "id": "merina",
+      "name": "Kingdom of Imerina",
+      "rank": "minor",
+      "capital": {
+        "name": "Antananarivo",
+        "at": [
+          47.52,
+          -18.91
+        ]
+      },
+      "overlord": null,
+      "ruler": "Radama I",
+      "catalogue_id": "madagascar_highlands"
+    },
+    {
+      "id": "united_states",
+      "name": "United States",
+      "rank": "major",
+      "capital": {
+        "name": "Washington",
+        "at": [
+          -77.04,
+          38.9
+        ]
+      },
+      "overlord": null,
+      "ruler": "James Madison",
+      "catalogue_id": null,
+      "note": "The War of 1812 ended with the Treaty of Ghent (ratified Feb 1815)."
+    },
+    {
+      "id": "kingdom_of_haiti",
+      "name": "Kingdom of Haiti",
+      "rank": "minor",
+      "capital": {
+        "name": "Cap-Henri",
+        "at": [
+          -72.2,
+          19.76
+        ]
+      },
+      "overlord": null,
+      "ruler": "Henri I",
+      "catalogue_id": null
+    },
+    {
+      "id": "haiti",
+      "name": "Republic of Haiti",
+      "rank": "minor",
+      "capital": {
+        "name": "Port-au-Prince",
+        "at": [
+          -72.34,
+          18.54
+        ]
+      },
+      "overlord": null,
+      "ruler": "Alexandre Pétion",
+      "catalogue_id": null
+    },
+    {
+      "id": "argentina",
+      "name": "United Provinces of the Río de la Plata",
+      "rank": "minor",
+      "capital": {
+        "name": "Buenos Aires",
+        "at": [
+          -58.38,
+          -34.6
+        ]
+      },
+      "overlord": null,
+      "ruler": "Ignacio Álvarez Thomas (acting Supreme Director)",
+      "catalogue_id": null,
+      "note": "Independence declared only in July 1816."
+    },
+    {
+      "id": "liga_federal",
+      "name": "Federal League (Artigas)",
+      "rank": "minor",
+      "capital": {
+        "name": "Purificación",
+        "at": [
+          -57.96,
+          -31.86
+        ]
+      },
+      "overlord": null,
+      "ruler": "José Gervasio Artigas",
+      "catalogue_id": null,
+      "note": "Holds the Banda Oriental (Montevideo since Feb 1815) and the Littoral provinces against Buenos Aires."
+    },
+    {
+      "id": "paraguay",
+      "name": "Paraguay",
+      "rank": "minor",
+      "capital": {
+        "name": "Asunción",
+        "at": [
+          -57.58,
+          -25.28
+        ]
+      },
+      "overlord": null,
+      "ruler": "José Gaspar Rodríguez de Francia (Supreme Dictator)",
+      "catalogue_id": null
+    },
+    {
+      "id": "united_provinces_of_new_granada",
+      "name": "United Provinces of New Granada",
+      "rank": "minor",
+      "capital": {
+        "name": "Bogotá",
+        "at": [
+          -74.07,
+          4.71
+        ]
+      },
+      "overlord": null,
+      "ruler": "Executive triumvirate of the Congress (members uncertain)",
+      "catalogue_id": null,
+      "note": "Spanish reconquest under Morillo lands Apr 1815; Bogotá falls in May 1816."
+    },
+    {
+      "id": "mexican_insurgent_government",
+      "name": "Supreme Mexican Government (insurgents)",
+      "rank": "minor",
+      "capital": {
+        "name": "Ario",
+        "at": [
+          -101.71,
+          19.2
+        ]
+      },
+      "overlord": null,
+      "ruler": "José María Morelos and the insurgent Congress",
+      "catalogue_id": null,
+      "note": "Constitution of Apatzingán (Oct 1814); a moving seat in Michoacán; Morelos is captured in Nov 1815."
+    },
+    {
+      "id": "aceh",
+      "name": "Sultanate of Aceh",
+      "rank": "minor",
+      "capital": {
+        "name": "Banda Aceh",
+        "at": [
+          95.32,
+          5.55
+        ]
+      },
+      "overlord": null,
+      "ruler": "Jauhar al-Alam Syah (contested by Saiful Alam)",
+      "catalogue_id": null,
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    },
+    {
+      "id": "amber",
+      "name": "Jaipur State (Amber)",
+      "rank": "minor",
+      "capital": {
+        "name": "Jaipur",
+        "at": [
+          75.82,
+          26.92
+        ]
+      },
+      "overlord": null,
+      "ruler": "Jagat Singh II",
+      "catalogue_id": "amber",
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    },
+    {
+      "id": "arma_pashalik",
+      "name": "Pashalik of Timbuktu (Arma)",
+      "rank": "minor",
+      "capital": {
+        "name": "Timbuktu",
+        "at": [
+          -3.0,
+          16.77
+        ]
+      },
+      "overlord": "timbuktu_tuareg",
+      "ruler": "Arma pasha (name uncertain)",
+      "catalogue_id": "timbuktu",
+      "note": "Still standing; carried forward when realm ids were harmonised. Nominal; Tuareg dominate Timbuktu. Ended by Massina 1826–1833."
+    },
+    {
+      "id": "bhutan",
+      "name": "Bhutan (Drukpa state)",
+      "rank": "minor",
+      "capital": {
+        "name": "Punakha",
+        "at": [
+          89.86,
+          27.58
+        ]
+      },
+      "overlord": null,
+      "ruler": "Druk Desi (name uncertain)",
+      "catalogue_id": null,
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    },
+    {
+      "id": "brunei",
+      "name": "Sultanate of Brunei",
+      "rank": "minor",
+      "capital": {
+        "name": "Brunei",
+        "at": [
+          114.94,
+          4.89
+        ]
+      },
+      "overlord": null,
+      "ruler": "Muhammad Kanzul Alam",
+      "catalogue_id": "brunei",
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    },
+    {
+      "id": "champa",
+      "name": "Thuận Thành (Champa remnant)",
+      "rank": "minor",
+      "capital": {
+        "name": "Phan Rí",
+        "at": [
+          108.52,
+          11.17
+        ]
+      },
+      "overlord": "dai_viet",
+      "ruler": "Po Saong Nyung Ceng",
+      "catalogue_id": "champa",
+      "note": "Still standing; carried forward when realm ids were harmonised. Abolished 1832."
+    },
+    {
+      "id": "champasak",
+      "name": "Kingdom of Champasak",
+      "rank": "minor",
+      "capital": {
+        "name": "Champasak",
+        "at": [
+          105.87,
+          14.89
+        ]
+      },
+      "overlord": "ayutthaya",
+      "ruler": "Chao Manoi",
+      "catalogue_id": null,
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    },
+    {
+      "id": "gowa",
+      "name": "Sultanate of Gowa (Makassar)",
+      "rank": "minor",
+      "capital": {
+        "name": "Somba Opu",
+        "at": [
+          119.42,
+          -5.18
+        ]
+      },
+      "overlord": "england",
+      "ruler": "Sultan (name uncertain)",
+      "catalogue_id": "gowa",
+      "note": "Still standing; carried forward when realm ids were harmonised. Dutch suzerainty, under the British interregnum 1811–1816."
+    },
+    {
+      "id": "hejaz",
+      "name": "Sharifate of Mecca",
+      "rank": "minor",
+      "capital": {
+        "name": "Mecca",
+        "at": [
+          39.83,
+          21.42
+        ]
+      },
+      "overlord": "egypt",
+      "ruler": "Sharif Yahya ibn Surur",
+      "catalogue_id": "mecca",
+      "note": "Still standing; carried forward when realm ids were harmonised. Under Muhammad Ali's Egypt since 1813."
+    },
+    {
+      "id": "hungary",
+      "name": "Kingdom of Hungary",
+      "rank": "minor",
+      "capital": {
+        "name": "Buda",
+        "at": [
+          19.04,
+          47.5
+        ]
+      },
+      "overlord": "austria",
+      "ruler": "Francis I (as king)",
+      "catalogue_id": null,
+      "note": "Still standing; carried forward when realm ids were harmonised. Own diet and laws within the Austrian Empire."
+    },
+    {
+      "id": "bohemia",
+      "name": "Kingdom of Bohemia",
+      "rank": "minor",
+      "capital": {
+        "name": "Prague",
+        "at": [
+          14.42,
+          50.09
+        ]
+      },
+      "overlord": "austria",
+      "ruler": "Francis I (as king)",
+      "catalogue_id": "bohemia",
+      "note": "Still standing; carried forward when realm ids were harmonised. Crown land of the Austrian Empire."
+    },
+    {
+      "id": "kazakh_khanate",
+      "name": "Kazakh Khanate",
+      "rank": "minor",
+      "capital": {
+        "name": "Turkestan",
+        "at": [
+          68.27,
+          43.3
+        ]
+      },
+      "overlord": null,
+      "ruler": "Wali Khan (Middle Juz), Shirgazi (Junior Juz)",
+      "catalogue_id": null,
+      "note": "Still standing; carried forward when realm ids were harmonised. Fragmented into the three juz under Russian pressure; khans abolished 1822–1824."
+    },
+    {
+      "id": "khalkha",
+      "name": "Khalkha Mongols",
+      "rank": "minor",
+      "capital": {
+        "name": "Urga",
+        "at": [
+          106.92,
+          47.92
+        ]
+      },
+      "overlord": "jurchens",
+      "ruler": "Tüsheet, Zasagt, Setsen and Sain Noyon khans",
+      "catalogue_id": null,
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    },
+    {
+      "id": "kilwa",
+      "name": "Kilwa Sultanate",
+      "rank": "minor",
+      "capital": {
+        "name": "Kilwa Kisiwani",
+        "at": [
+          39.51,
+          -8.96
+        ]
+      },
+      "overlord": "oman",
+      "ruler": "Sultan (name uncertain)",
+      "catalogue_id": "kilwa",
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    },
+    {
+      "id": "koch_bihar",
+      "name": "Koch Bihar",
+      "rank": "minor",
+      "capital": {
+        "name": "Koch Bihar",
+        "at": [
+          89.45,
+          26.32
+        ]
+      },
+      "overlord": "england",
+      "ruler": "Harendra Narayan",
+      "catalogue_id": null,
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    },
+    {
+      "id": "kolhapur",
+      "name": "Maratha Kingdom of Kolhapur",
+      "rank": "minor",
+      "capital": {
+        "name": "Kolhapur",
+        "at": [
+          74.24,
+          16.7
+        ]
+      },
+      "overlord": "england",
+      "ruler": "Shambhu (Aba Saheb)",
+      "catalogue_id": null,
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    },
+    {
+      "id": "ladakh",
+      "name": "Kingdom of Ladakh",
+      "rank": "minor",
+      "capital": {
+        "name": "Leh",
+        "at": [
+          77.58,
+          34.16
+        ]
+      },
+      "overlord": null,
+      "ruler": "Tsepal Namgyal",
+      "catalogue_id": "ladakh",
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    },
+    {
+      "id": "lan_xang",
+      "name": "Kingdom of Luang Prabang",
+      "rank": "minor",
+      "capital": {
+        "name": "Luang Prabang",
+        "at": [
+          102.14,
+          19.89
+        ]
+      },
+      "overlord": "ayutthaya",
+      "ruler": "Anurutha",
+      "catalogue_id": null,
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    },
+    {
+      "id": "manipur",
+      "name": "Kingdom of Manipur",
+      "rank": "minor",
+      "capital": {
+        "name": "Imphal",
+        "at": [
+          93.94,
+          24.81
+        ]
+      },
+      "overlord": null,
+      "ruler": "Marjit Singh",
+      "catalogue_id": "manipur",
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    },
+    {
+      "id": "mapuche",
+      "name": "Mapuche (Araucanía)",
+      "rank": "minor",
+      "capital": {
+        "name": "No fixed capital (Araucanía)",
+        "at": [
+          -72.6,
+          -38.7
+        ]
+      },
+      "overlord": null,
+      "ruler": "Lonkos of Araucanía (no single ruler)",
+      "catalogue_id": "mapuche",
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    },
+    {
+      "id": "marwar",
+      "name": "Marwar",
+      "rank": "minor",
+      "capital": {
+        "name": "Jodhpur",
+        "at": [
+          73.02,
+          26.29
+        ]
+      },
+      "overlord": null,
+      "ruler": "Man Singh",
+      "catalogue_id": "marwar",
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    },
+    {
+      "id": "matamba",
+      "name": "Kingdom of Matamba (Ndongo-Matamba)",
+      "rank": "minor",
+      "capital": {
+        "name": "Kabasa",
+        "at": [
+          16.2,
+          -9.3
+        ]
+      },
+      "overlord": null,
+      "ruler": "Ruler of Matamba (name uncertain)",
+      "catalogue_id": null,
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    },
+    {
+      "id": "mewar",
+      "name": "Mewar",
+      "rank": "minor",
+      "capital": {
+        "name": "Udaipur",
+        "at": [
+          73.71,
+          24.58
+        ]
+      },
+      "overlord": null,
+      "ruler": "Bhim Singh",
+      "catalogue_id": "mewar",
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    },
+    {
+      "id": "mutapa",
+      "name": "Mutapa",
+      "rank": "minor",
+      "capital": {
+        "name": "Lower Zambezi court (location uncertain)",
+        "at": [
+          31.5,
+          -16.3
+        ]
+      },
+      "overlord": null,
+      "ruler": "Mwenemutapa (name uncertain)",
+      "catalogue_id": "mutapa",
+      "note": "Still standing; carried forward when realm ids were harmonised. Rump kingdom in the Zambezi valley."
+    },
+    {
+      "id": "sicily",
+      "name": "Kingdom of Sicily",
+      "rank": "minor",
+      "capital": {
+        "name": "Palermo",
+        "at": [
+          13.36,
+          38.12
+        ]
+      },
+      "overlord": null,
+      "ruler": "Ferdinand III (also Ferdinand IV of Naples)",
+      "catalogue_id": null,
+      "note": "Still standing; carried forward when realm ids were harmonised. Separate kingdom until merged with Naples as the Two Sicilies in December 1816."
+    },
+    {
+      "id": "sulu",
+      "name": "Sultanate of Sulu",
+      "rank": "minor",
+      "capital": {
+        "name": "Jolo",
+        "at": [
+          121.0,
+          6.05
+        ]
+      },
+      "overlord": null,
+      "ruler": "Azim ud-Din II",
+      "catalogue_id": "sulu",
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    },
+    {
+      "id": "thanjavur",
+      "name": "Thanjavur Maratha kingdom",
+      "rank": "minor",
+      "capital": {
+        "name": "Thanjavur",
+        "at": [
+          79.14,
+          10.79
+        ]
+      },
+      "overlord": "england",
+      "ruler": "Serfoji II",
+      "catalogue_id": null,
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    },
+    {
+      "id": "tidore",
+      "name": "Sultanate of Tidore",
+      "rank": "minor",
+      "capital": {
+        "name": "Tidore",
+        "at": [
+          127.4,
+          0.68
+        ]
+      },
+      "overlord": "england",
+      "ruler": "Sultan (name uncertain)",
+      "catalogue_id": "tidore",
+      "note": "Still standing; carried forward when realm ids were harmonised. Moluccas under British occupation 1810–1817."
+    },
+    {
+      "id": "venad",
+      "name": "Kingdom of Travancore",
+      "rank": "minor",
+      "capital": {
+        "name": "Thiruvananthapuram",
+        "at": [
+          76.95,
+          8.49
+        ]
+      },
+      "overlord": "england",
+      "ruler": "Gowri Parvati Bayi (regent)",
+      "catalogue_id": "venad",
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    },
+    {
+      "id": "mossi",
+      "name": "Mossi kingdoms",
+      "rank": "minor",
+      "capital": {
+        "name": "Ouagadougou",
+        "at": [
+          -1.52,
+          12.37
+        ]
+      },
+      "overlord": null,
+      "ruler": "Mogho Naba (name uncertain)",
+      "catalogue_id": null,
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    }
+  ],
+  "great_powers": [
+    "england",
+    "muscovy",
+    "austria",
+    "brandenburg",
+    "france",
+    "jurchens"
+  ],
+  "key_places": {
+    "london": {
+      "holder": "england",
+      "confidence": "high"
+    },
+    "calais": {
+      "holder": "france",
+      "confidence": "high",
+      "note": "Under Napoleon in the Hundred Days."
+    },
+    "bordeaux": {
+      "holder": "france",
+      "confidence": "high",
+      "note": "Under Napoleon in the Hundred Days. The Duchess of Angoulême's royalist stand ended in early April."
+    },
+    "paris": {
+      "holder": "france",
+      "confidence": "high",
+      "note": "Under Napoleon in the Hundred Days."
+    },
+    "rouen": {
+      "holder": "france",
+      "confidence": "high",
+      "note": "Under Napoleon in the Hundred Days."
+    },
+    "nantes": {
+      "holder": "france",
+      "confidence": "medium",
+      "note": "Imperial garrison; the Vendée rose for the king in May-June 1815."
+    },
+    "dijon": {
+      "holder": "france",
+      "confidence": "high",
+      "note": "Under Napoleon in the Hundred Days."
+    },
+    "marseille": {
+      "holder": "france",
+      "confidence": "medium",
+      "note": "Royalist city held for Napoleon by Marshal Brune; it rises on 25 June."
+    },
+    "edinburgh": {
+      "holder": "england",
+      "confidence": "high"
+    },
+    "dublin": {
+      "holder": "england",
+      "confidence": "high"
+    },
+    "bruges": {
+      "holder": "netherlands",
+      "confidence": "high"
+    },
+    "amsterdam": {
+      "holder": "netherlands",
+      "confidence": "high"
+    },
+    "brussels": {
+      "holder": "netherlands",
+      "confidence": "high",
+      "note": "Wellington's army is gathered around it."
+    },
+    "lisbon": {
+      "holder": "portugal",
+      "confidence": "high",
+      "note": "Governed by a regency while the court is in Rio de Janeiro."
+    },
+    "toledo": {
+      "holder": "castile",
+      "confidence": "high"
+    },
+    "barcelona": {
+      "holder": "castile",
+      "confidence": "high"
+    },
+    "granada": {
+      "holder": "castile",
+      "confidence": "high"
+    },
+    "ceuta": {
+      "holder": "castile",
+      "confidence": "high"
+    },
+    "fez": {
+      "holder": "morocco",
+      "confidence": "high"
+    },
+    "tunis": {
+      "holder": "tunis",
+      "confidence": "high"
+    },
+    "algiers": {
+      "holder": "algiers",
+      "confidence": "high"
+    },
+    "milan": {
+      "holder": "austria",
+      "confidence": "high",
+      "note": "Kingdom of Lombardy-Venetia, proclaimed 7 Apr 1815."
+    },
+    "venice": {
+      "holder": "austria",
+      "confidence": "high",
+      "note": "Kingdom of Lombardy-Venetia."
+    },
+    "genoa": {
+      "holder": "savoy",
+      "confidence": "high",
+      "note": "Former Republic of Genoa given to Sardinia; Sardinian rule from Jan 1815."
+    },
+    "florence": {
+      "holder": "florence",
+      "confidence": "high"
+    },
+    "pisa": {
+      "holder": "florence",
+      "confidence": "high"
+    },
+    "rome": {
+      "holder": "papal_states",
+      "confidence": "high",
+      "note": "Pius VII returned on 7 June 1815."
+    },
+    "naples": {
+      "holder": "naples",
+      "confidence": "medium",
+      "note": "Murat fled in May; Austrian troops entered for Ferdinand IV on 23 May and the king returns in June."
+    },
+    "palermo": {
+      "holder": "naples",
+      "confidence": "high",
+      "note": "Kingdom of Sicily, same king; the court sat here 1806-1815."
+    },
+    "vienna": {
+      "holder": "austria",
+      "confidence": "high"
+    },
+    "prague": {
+      "holder": "austria",
+      "confidence": "high"
+    },
+    "munich": {
+      "holder": "bavaria",
+      "confidence": "high"
+    },
+    "berlin": {
+      "holder": "brandenburg",
+      "confidence": "high"
+    },
+    "dresden": {
+      "holder": "saxony",
+      "confidence": "medium",
+      "note": "Prussian-Russian occupation ended; the king returned on 7 June 1815."
+    },
+    "cologne": {
+      "holder": "brandenburg",
+      "confidence": "high",
+      "note": "Rhine lands taken over by Prussia in April 1815."
+    },
+    "lubeck": {
+      "holder": "lubeck",
+      "confidence": "high"
+    },
+    "bern": {
+      "holder": "switzerland",
+      "confidence": "high"
+    },
+    "copenhagen": {
+      "holder": "denmark",
+      "confidence": "high"
+    },
+    "stockholm": {
+      "holder": "sweden",
+      "confidence": "high"
+    },
+    "oslo": {
+      "holder": "norway",
+      "confidence": "high",
+      "note": "Christiania; Norway in union with Sweden."
+    },
+    "visby": {
+      "holder": "sweden",
+      "confidence": "high"
+    },
+    "konigsberg": {
+      "holder": "brandenburg",
+      "confidence": "high"
+    },
+    "riga": {
+      "holder": "muscovy",
+      "confidence": "high"
+    },
+    "krakow": {
+      "holder": "krakow",
+      "confidence": "low",
+      "note": "Free City created by the treaties of 3 May and the Final Act; Russian troops still held it on the day, and its government was set up later in 1815."
+    },
+    "vilnius": {
+      "holder": "muscovy",
+      "confidence": "high"
+    },
+    "kyiv": {
+      "holder": "muscovy",
+      "confidence": "high"
+    },
+    "novgorod": {
+      "holder": "muscovy",
+      "confidence": "high"
+    },
+    "moscow": {
+      "holder": "muscovy",
+      "confidence": "high"
+    },
+    "kazan": {
+      "holder": "muscovy",
+      "confidence": "high"
+    },
+    "astrakhan": {
+      "holder": "muscovy",
+      "confidence": "high"
+    },
+    "sarai": {
+      "holder": "muscovy",
+      "confidence": "high"
+    },
+    "caffa": {
+      "holder": "muscovy",
+      "confidence": "high",
+      "note": "Feodosia, Taurida Governorate."
+    },
+    "buda": {
+      "holder": "austria",
+      "confidence": "high",
+      "note": "Kingdom of Hungary within the Austrian Empire."
+    },
+    "belgrade": {
+      "holder": "ottomans",
+      "confidence": "medium",
+      "note": "Ottoman fortress; the Second Serbian Uprising under Miloš Obrenović began in April 1815."
+    },
+    "sofia": {
+      "holder": "ottomans",
+      "confidence": "high"
+    },
+    "tarnovo": {
+      "holder": "ottomans",
+      "confidence": "high"
+    },
+    "bucharest": {
+      "holder": "wallachia",
+      "confidence": "high"
+    },
+    "suceava": {
+      "holder": "austria",
+      "confidence": "high",
+      "note": "Bukovina, Austrian since 1775."
+    },
+    "athens": {
+      "holder": "ottomans",
+      "confidence": "high"
+    },
+    "thessaloniki": {
+      "holder": "ottomans",
+      "confidence": "high"
+    },
+    "edirne": {
+      "holder": "ottomans",
+      "confidence": "high"
+    },
+    "constantinople": {
+      "holder": "ottomans",
+      "confidence": "high"
+    },
+    "bursa": {
+      "holder": "ottomans",
+      "confidence": "high"
+    },
+    "konya": {
+      "holder": "ottomans",
+      "confidence": "high"
+    },
+    "trebizond": {
+      "holder": "ottomans",
+      "confidence": "high"
+    },
+    "rhodes": {
+      "holder": "ottomans",
+      "confidence": "high"
+    },
+    "nicosia": {
+      "holder": "ottomans",
+      "confidence": "high"
+    },
+    "tbilisi": {
+      "holder": "muscovy",
+      "confidence": "high",
+      "note": "Annexed 1801."
+    },
+    "tabriz": {
+      "holder": "persia",
+      "confidence": "high",
+      "note": "Seat of Crown Prince Abbas Mirza."
+    },
+    "baghdad": {
+      "holder": "baghdad_pashalik",
+      "confidence": "medium",
+      "note": "Mamluk pasha under nominal Ottoman rule."
+    },
+    "damascus": {
+      "holder": "ottomans",
+      "confidence": "high"
+    },
+    "jerusalem": {
+      "holder": "ottomans",
+      "confidence": "high"
+    },
+    "cairo": {
+      "holder": "egypt",
+      "confidence": "high"
+    },
+    "mecca": {
+      "holder": "egypt",
+      "confidence": "medium",
+      "note": "Egyptian occupation since 1813; Sharif Yahya ibn Surur installed by Muhammad Ali."
+    },
+    "aden": {
+      "holder": "lahej",
+      "confidence": "medium"
+    },
+    "hormuz": {
+      "holder": "oman",
+      "confidence": "medium",
+      "note": "Leased with Bandar Abbas from Persia by the Muscat sultans."
+    },
+    "shiraz": {
+      "holder": "persia",
+      "confidence": "high"
+    },
+    "isfahan": {
+      "holder": "persia",
+      "confidence": "high"
+    },
+    "herat": {
+      "holder": "afghanistan",
+      "confidence": "medium",
+      "note": "Held by the Sadozai prince Firuz al-Din, nearly independent and paying tribute to Persia at times."
+    },
+    "samarkand": {
+      "holder": "uzbek_khanate",
+      "confidence": "high"
+    },
+    "urgench": {
+      "holder": "khiva",
+      "confidence": "high"
+    },
+    "kabul": {
+      "holder": "afghanistan",
+      "confidence": "high"
+    },
+    "kashgar": {
+      "holder": "jurchens",
+      "confidence": "high"
+    },
+    "lahore": {
+      "holder": "sikh_empire",
+      "confidence": "high"
+    },
+    "delhi": {
+      "holder": "england",
+      "confidence": "medium",
+      "note": "Delhi Territory run by the Company's Resident; the Mughal Akbar II reigns only in the Red Fort."
+    },
+    "jaunpur": {
+      "holder": "england",
+      "confidence": "high",
+      "note": "East India Company (Bengal Presidency)."
+    },
+    "gaur": {
+      "holder": "england",
+      "confidence": "high",
+      "note": "East India Company (Bengal Presidency)."
+    },
+    "ahmedabad": {
+      "holder": "maratha",
+      "confidence": "low",
+      "note": "City shared by the Peshwa and the Gaekwad; the Peshwa's lease of his half to Baroda lapsed in 1814. Could be scored as baroda."
+    },
+    "mandu": {
+      "holder": "dhar",
+      "confidence": "low",
+      "note": "Part of Dhar, a small Maratha state; Malwa overrun by Scindia, Holkar and the Pindaris."
+    },
+    "gulbarga": {
+      "holder": "hyderabad",
+      "confidence": "high"
+    },
+    "vijayanagara": {
+      "holder": "england",
+      "confidence": "high",
+      "note": "Bellary district, ceded to the Company in 1800."
+    },
+    "calicut": {
+      "holder": "england",
+      "confidence": "high",
+      "note": "Malabar, Madras Presidency."
+    },
+    "colombo": {
+      "holder": "england",
+      "confidence": "high",
+      "note": "Crown colony; Kandy annexed in Mar 1815."
+    },
+    "kathmandu": {
+      "holder": "nepal",
+      "confidence": "high"
+    },
+    "lhasa": {
+      "holder": "tibet",
+      "confidence": "high"
+    },
+    "karakorum": {
+      "holder": "jurchens",
+      "confidence": "high",
+      "note": "Khalkha Mongolia under Qing banner rule."
+    },
+    "beijing": {
+      "holder": "jurchens",
+      "confidence": "high"
+    },
+    "nanjing": {
+      "holder": "jurchens",
+      "confidence": "high"
+    },
+    "guangzhou": {
+      "holder": "jurchens",
+      "confidence": "high"
+    },
+    "kunming": {
+      "holder": "jurchens",
+      "confidence": "high"
+    },
+    "shenyang": {
+      "holder": "jurchens",
+      "confidence": "high"
+    },
+    "seoul": {
+      "holder": "korea",
+      "confidence": "high"
+    },
+    "kyoto": {
+      "holder": "japan",
+      "confidence": "high"
+    },
+    "kamakura": {
+      "holder": "japan",
+      "confidence": "high"
+    },
+    "hakata": {
+      "holder": "japan",
+      "confidence": "high",
+      "note": "Fukuoka domain of the Kuroda under the shogunate."
+    },
+    "shuri": {
+      "holder": "ryukyu",
+      "confidence": "high"
+    },
+    "hanoi": {
+      "holder": "dai_viet",
+      "confidence": "high"
+    },
+    "vijaya": {
+      "holder": "dai_viet",
+      "confidence": "high",
+      "note": "Bình Định province."
+    },
+    "angkor": {
+      "holder": "ayutthaya",
+      "confidence": "high",
+      "note": "Siem Reap, held by Siam since 1795."
+    },
+    "ayutthaya": {
+      "holder": "ayutthaya",
+      "confidence": "high",
+      "note": "Ruined old capital within Siam."
+    },
+    "pegu": {
+      "holder": "ava",
+      "confidence": "high"
+    },
+    "ava": {
+      "holder": "ava",
+      "confidence": "high"
+    },
+    "malacca": {
+      "holder": "england",
+      "confidence": "high",
+      "note": "British occupation 1795-1818; returned to the Dutch in 1818."
+    },
+    "trowulan": {
+      "holder": "england",
+      "confidence": "high",
+      "note": "British Java under Raffles, 1811-1816."
+    },
+    "manila": {
+      "holder": "castile",
+      "confidence": "high"
+    },
+    "ternate": {
+      "holder": "ternate",
+      "confidence": "medium",
+      "note": "Sultan under British occupation in place of the Dutch."
+    },
+    "timbuktu": {
+      "holder": "timbuktu_tuareg",
+      "confidence": "low",
+      "note": "Arma pashas under Tuareg tribute; no strong state."
+    },
+    "gao": {
+      "holder": null,
+      "confidence": "low",
+      "note": "Iwellemmeden Tuareg and Songhay remnants; no state."
+    },
+    "niani": {
+      "holder": null,
+      "confidence": "low",
+      "note": "Small Maninka kafus of the upper Niger; no state."
+    },
+    "kano": {
+      "holder": "kano",
+      "confidence": "high"
+    },
+    "kanem": {
+      "holder": "kanem_bornu",
+      "confidence": "low",
+      "note": "Kanem contested between Bornu and Wadai."
+    },
+    "benin_city": {
+      "holder": "benin",
+      "confidence": "medium",
+      "note": "Succession contested after 1804."
+    },
+    "mbanza_kongo": {
+      "holder": "kongo",
+      "confidence": "high"
+    },
+    "great_zimbabwe": {
+      "holder": "rozvi",
+      "confidence": "low",
+      "note": "Rozvi influence; local Karanga chiefs."
+    },
+    "kilwa": {
+      "holder": "oman",
+      "confidence": "medium",
+      "note": "Omani governor over the local sultan."
+    },
+    "mogadishu": {
+      "holder": null,
+      "confidence": "low",
+      "note": "Somali clan elders; Geledi sultanate influence; Omani claims only."
+    },
+    "zeila": {
+      "holder": "yemen",
+      "confidence": "low",
+      "note": "Dependency of Mocha under the Zaydi imam, as usually reported."
+    },
+    "gondar": {
+      "holder": "ethiopia",
+      "confidence": "medium",
+      "note": "Figurehead emperor; Ras Gugsa of Yejju rules."
+    },
+    "cape": {
+      "holder": "england",
+      "confidence": "high",
+      "note": "Cape Colony; ceded by the Dutch in 1814."
+    },
+    "tenochtitlan": {
+      "holder": "castile",
+      "confidence": "high",
+      "note": "New Spain."
+    },
+    "azcapotzalco": {
+      "holder": "castile",
+      "confidence": "high",
+      "note": "New Spain."
+    },
+    "mayapan": {
+      "holder": "castile",
+      "confidence": "high",
+      "note": "Yucatán, New Spain."
+    },
+    "tzintzuntzan": {
+      "holder": "castile",
+      "confidence": "medium",
+      "note": "Michoacán, where Morelos's insurgent government moves about."
+    },
+    "havana": {
+      "holder": "castile",
+      "confidence": "high"
+    },
+    "santo_domingo": {
+      "holder": "castile",
+      "confidence": "high",
+      "note": "Spanish rule restored 1809 (España Boba)."
+    },
+    "cusco": {
+      "holder": "castile",
+      "confidence": "medium",
+      "note": "Royalists retook it after Pumacahua's rising (Mar 1815)."
+    },
+    "chan_chan": {
+      "holder": "castile",
+      "confidence": "high",
+      "note": "Trujillo, Viceroyalty of Peru."
+    },
+    "quito": {
+      "holder": "castile",
+      "confidence": "high"
+    },
+    "bogota": {
+      "holder": "united_provinces_of_new_granada",
+      "confidence": "high",
+      "note": "Morillo's expedition is landing in Venezuela; Bogotá falls in May 1816."
+    },
+    "salvador": {
+      "holder": "portugal",
+      "confidence": "high",
+      "note": "Brazil."
+    },
+    "buenos_aires": {
+      "holder": "argentina",
+      "confidence": "high"
+    },
+    "boston": {
+      "holder": "united_states",
+      "confidence": "high"
+    },
+    "new_orleans": {
+      "holder": "united_states",
+      "confidence": "high"
+    },
+    "quebec": {
+      "holder": "england",
+      "confidence": "high",
+      "note": "Lower Canada."
+    },
+    "sydney": {
+      "holder": "england",
+      "confidence": "high",
+      "note": "New South Wales, Governor Macquarie."
+    },
+    "singapore": {
+      "holder": "johor",
+      "confidence": "medium",
+      "note": "Temenggong Abdul Rahman of Johor settled there in 1811; British founding in 1819."
+    }
+  },
+  "since_previous": {
+    "formed": [
+      "luxembourg",
+      "norway",
+      "oldenburg",
+      "krakow",
+      "ioannina_pashalik",
+      "shirvan",
+      "egypt",
+      "diriyah",
+      "lahej",
+      "afghanistan",
+      "sikh_empire",
+      "sindh",
+      "gwalior",
+      "indore",
+      "nagpur",
+      "baroda",
+      "dhar",
+      "hyderabad",
+      "awadh",
+      "nepal",
+      "tibet",
+      "hawaii",
+      "sokoto",
+      "timbuktu_tuareg",
+      "united_states",
+      "kingdom_of_haiti",
+      "haiti",
+      "argentina",
+      "liga_federal",
+      "paraguay",
+      "united_provinces_of_new_granada",
+      "mexican_insurgent_government"
+    ],
+    "ended": [
+      "ireland",
+      "lorraine",
+      "palatinate",
+      "cologne",
+      "cologne_city",
+      "mainz",
+      "trier",
+      "holstein_gottorp",
+      "hre",
+      "milan",
+      "burgundy",
+      "salzburg",
+      "venice",
+      "genoa",
+      "lucca",
+      "knights_of_rhodes",
+      "poland",
+      "lithuania",
+      "courland",
+      "cossack_hetmanate",
+      "kalmyk_khanate",
+      "crimea",
+      "ragusa",
+      "kartli",
+      "kakheti",
+      "imereti",
+      "hotaki",
+      "oirat",
+      "khoshut_khanate",
+      "madurai",
+      "calicut",
+      "kandy",
+      "nepal_malla",
+      "mrauk_u",
+      "nguyen_lords",
+      "mataram",
+      "banten",
+      "mogadishu",
+      "iroquois",
+      "adal"
+    ],
+    "first_listed": [
+      "baden",
+      "hesse_darmstadt",
+      "frankfurt",
+      "baghdad_pashalik",
+      "kokand",
+      "kalat",
+      "darfur",
+      "wadai",
+      "buganda",
+      "merina"
+    ],
+    "events": [
+      {
+        "key": "treaty_of_nystad",
+        "name": "Treaty of Nystad ends the Great Northern War",
+        "date": "1721-09-10",
+        "event_tree_id": "treaty_of_nystad"
+      },
+      {
+        "key": "fall_of_isfahan",
+        "name": "Afghans take Isfahan, end of Safavid power",
+        "date": "1722-10-23",
+        "event_tree_id": "fall_of_isfahan"
+      },
+      {
+        "key": "nader_shah_sacks_delhi",
+        "name": "Nader Shah sacks Delhi",
+        "date": "1739-03-20",
+        "event_tree_id": "nader_shah_sacks_delhi"
+      },
+      {
+        "key": "war_of_the_austrian_succession",
+        "name": "War of the Austrian Succession",
+        "date": "1740-12-16",
+        "event_tree_id": "war_of_the_austrian_succession"
+      },
+      {
+        "key": "first_saudi_state",
+        "name": "Pact of Diriyah, the First Saudi State",
+        "date": "1744-01-01",
+        "event_tree_id": "first_saudi_state"
+      },
+      {
+        "key": "durrani_empire_founded",
+        "name": "Ahmad Shah founds the Durrani Empire",
+        "date": "1747-10-01",
+        "event_tree_id": "durrani_empire_founded"
+      },
+      {
+        "key": "dzungar_genocide",
+        "name": "Qing destroy the Dzungar Khanate",
+        "date": "1755-01-01",
+        "event_tree_id": "dzungar_genocide"
+      },
+      {
+        "key": "seven_years_war",
+        "name": "Seven Years' War",
+        "date": "1756-05-17",
+        "event_tree_id": "seven_years_war"
+      },
+      {
+        "key": "battle_of_plassey",
+        "name": "Battle of Plassey",
+        "date": "1757-06-23",
+        "event_tree_id": "battle_of_plassey"
+      },
+      {
+        "key": "canton_system",
+        "name": "Canton System",
+        "date": "1757-01-01",
+        "event_tree_id": "canton_system"
+      },
+      {
+        "key": "third_battle_of_panipat",
+        "name": "Third Battle of Panipat",
+        "date": "1761-01-14",
+        "event_tree_id": "third_battle_of_panipat"
+      },
+      {
+        "key": "burmese_sack_of_ayutthaya",
+        "name": "Burmese sack of Ayutthaya",
+        "date": "1767-04-07",
+        "event_tree_id": "burmese_sack_of_ayutthaya"
+      },
+      {
+        "key": "cook_voyages",
+        "name": "Cook's Pacific voyages",
+        "date": "1768-08-26",
+        "event_tree_id": "cook_voyages"
+      },
+      {
+        "key": "partitions_of_poland",
+        "name": "Partitions of Poland (1772, 1793, 1795)",
+        "date": "1772-08-05",
+        "event_tree_id": "partitions_of_poland"
+      },
+      {
+        "key": "treaty_of_kucuk_kaynarca",
+        "name": "Treaty of Küçük Kaynarca",
+        "date": "1774-07-21",
+        "event_tree_id": "treaty_of_kucuk_kaynarca"
+      },
+      {
+        "key": "american_revolution",
+        "name": "American Revolution and independence",
+        "date": "1776-07-04",
+        "event_tree_id": "american_revolution"
+      },
+      {
+        "key": "tupac_amaru_rebellion",
+        "name": "Rebellion of Túpac Amaru II",
+        "date": "1780-11-04",
+        "event_tree_id": "tupac_amaru_rebellion"
+      },
+      {
+        "key": "crimea_annexed",
+        "name": "Russia annexes the Crimean Khanate",
+        "date": "1783-04-19",
+        "event_tree_id": null
+      },
+      {
+        "key": "first_fleet",
+        "name": "First Fleet reaches Sydney",
+        "date": "1788-01-26",
+        "event_tree_id": "first_fleet"
+      },
+      {
+        "key": "qajar_dynasty_founded",
+        "name": "Agha Mohammad Khan founds the Qajar dynasty",
+        "date": "1789-01-01",
+        "event_tree_id": "qajar_dynasty_founded"
+      },
+      {
+        "key": "french_revolution",
+        "name": "French Revolution",
+        "date": "1789-07-14",
+        "event_tree_id": "french_revolution"
+      },
+      {
+        "key": "haitian_revolution",
+        "name": "Haitian Revolution",
+        "date": "1791-08-22",
+        "event_tree_id": "haitian_revolution"
+      },
+      {
+        "key": "french_revolutionary_wars",
+        "name": "French Revolutionary Wars",
+        "date": "1792-04-20",
+        "event_tree_id": "french_revolutionary_wars"
+      },
+      {
+        "key": "macartney_mission",
+        "name": "Macartney Mission to Qianlong",
+        "date": "1793-09-14",
+        "event_tree_id": "macartney_mission"
+      },
+      {
+        "key": "white_lotus_rebellion",
+        "name": "White Lotus Rebellion",
+        "date": "1794-01-01",
+        "event_tree_id": "white_lotus_rebellion"
+      },
+      {
+        "key": "french_invasion_of_egypt",
+        "name": "French invasion of Egypt",
+        "date": "1798-07-01",
+        "event_tree_id": "french_invasion_of_egypt"
+      },
+      {
+        "key": "anglo_mysore_wars",
+        "name": "Fall of Seringapatam ends the Anglo-Mysore Wars",
+        "date": "1799-05-04",
+        "event_tree_id": "anglo_mysore_wars"
+      },
+      {
+        "key": "voc_dissolved",
+        "name": "Dutch East India Company dissolved",
+        "date": "1799-12-31",
+        "event_tree_id": "voc_dissolved"
+      },
+      {
+        "key": "sikh_empire_founded",
+        "name": "Ranjit Singh takes Lahore",
+        "date": "1799-07-07",
+        "event_tree_id": "sikh_empire_founded"
+      },
+      {
+        "key": "union_with_ireland",
+        "name": "Union of Great Britain and Ireland",
+        "date": "1801-01-01",
+        "event_tree_id": null
+      },
+      {
+        "key": "louisiana_purchase",
+        "name": "Louisiana Purchase",
+        "date": "1803-04-30",
+        "event_tree_id": "louisiana_purchase"
+      },
+      {
+        "key": "sokoto_jihad",
+        "name": "Usman dan Fodio's jihad founds Sokoto",
+        "date": "1804-02-21",
+        "event_tree_id": "sokoto_jihad"
+      },
+      {
+        "key": "muhammad_ali_takes_egypt",
+        "name": "Muhammad Ali takes Egypt",
+        "date": "1805-07-09",
+        "event_tree_id": "muhammad_ali_takes_egypt"
+      },
+      {
+        "key": "end_of_holy_roman_empire",
+        "name": "Dissolution of the Holy Roman Empire",
+        "date": "1806-08-06",
+        "event_tree_id": null
+      },
+      {
+        "key": "british_abolition_of_slave_trade",
+        "name": "Britain abolishes the slave trade",
+        "date": "1807-03-25",
+        "event_tree_id": "british_abolition_of_slave_trade"
+      },
+      {
+        "key": "napoleon_invades_iberia",
+        "name": "Napoleon invades Iberia; Portuguese court to Brazil",
+        "date": "1807-11-19",
+        "event_tree_id": "napoleon_invades_iberia"
+      },
+      {
+        "key": "latin_american_independence",
+        "name": "Spanish American wars of independence begin",
+        "date": "1810-05-25",
+        "event_tree_id": "latin_american_independence"
+      },
+      {
+        "key": "hawaii_unification",
+        "name": "Kauai submits; Hawaii unified",
+        "date": "1810-04-01",
+        "event_tree_id": "hawaii_unification"
+      },
+      {
+        "key": "french_invasion_of_russia",
+        "name": "Napoleon's invasion of Russia",
+        "date": "1812-06-24",
+        "event_tree_id": null
+      },
+      {
+        "key": "war_of_1812",
+        "name": "War of 1812",
+        "date": "1812-06-18",
+        "event_tree_id": null
+      },
+      {
+        "key": "battle_of_leipzig",
+        "name": "Battle of Leipzig",
+        "date": "1813-10-19",
+        "event_tree_id": null
+      },
+      {
+        "key": "treaty_of_gulistan",
+        "name": "Treaty of Gulistan",
+        "date": "1813-10-24",
+        "event_tree_id": null
+      },
+      {
+        "key": "treaty_of_kiel",
+        "name": "Treaty of Kiel: Norway to Sweden",
+        "date": "1814-01-14",
+        "event_tree_id": null
+      },
+      {
+        "key": "first_abdication",
+        "name": "First abdication of Napoleon and the Treaty of Paris",
+        "date": "1814-04-06",
+        "event_tree_id": null
+      },
+      {
+        "key": "anglo_nepalese_war",
+        "name": "Anglo-Nepalese War begins",
+        "date": "1814-11-01",
+        "event_tree_id": null
+      },
+      {
+        "key": "kandyan_convention",
+        "name": "Kandyan Convention: Britain annexes Kandy",
+        "date": "1815-03-02",
+        "event_tree_id": null
+      },
+      {
+        "key": "hundred_days",
+        "name": "Napoleon returns: the Hundred Days",
+        "date": "1815-03-20",
+        "event_tree_id": null
+      },
+      {
+        "key": "tambora_eruption",
+        "name": "Eruption of Mount Tambora",
+        "date": "1815-04-10",
+        "event_tree_id": "tambora_eruption"
+      },
+      {
+        "key": "second_serbian_uprising",
+        "name": "Second Serbian Uprising",
+        "date": "1815-04-23",
+        "event_tree_id": null
+      },
+      {
+        "key": "battle_of_tolentino",
+        "name": "Battle of Tolentino: Murat defeated",
+        "date": "1815-05-03",
+        "event_tree_id": null
+      },
+      {
+        "key": "german_confederation",
+        "name": "German Federal Act",
+        "date": "1815-06-08",
+        "event_tree_id": null
+      },
+      {
+        "key": "congress_of_vienna",
+        "name": "Final Act of the Congress of Vienna",
+        "date": "1815-06-09",
+        "event_tree_id": "congress_of_vienna"
+      }
+    ]
+  },
+  "tolerance": {
+    "key_places_match_share": 0.35
+  },
+  "sources": [
+    "C. Webster, The Congress of Vienna 1814-1815 (1919) and the Final Act text",
+    "P. Schroeder, The Transformation of European Politics 1763-1848 (1994)",
+    "C. A. Bayly, Indian Society and the Making of the British Empire (1988)",
+    "J. Lynch, The Spanish American Revolutions 1808-1826 (1986)",
+    "Cambridge History of China vol. 10 and Cambridge History of Iran vol. 7",
+    "Cambridge History of Africa vol. 5 (c.1790-c.1870)",
+    "General reference: Encyclopaedia Britannica entries on the states listed"
+  ],
+  "open_questions": [
+    "Realm ids follow the sibling checkpoints (1600, 1914): successor states keep the map id of their core (england for the United Kingdom, muscovy for Russia, castile for Spain, brandenburg for Prussia, savoy for Sardinia, florence for Tuscany, luneburg for Hanover, ayutthaya for Siam, ava for Burma, dai_viet for Nguyễn Vietnam, khmer for Cambodia, vientiane for Vientiane (lan_xang is Luang Prabang), persia for Qajar Iran, haiti for Pétion's republic). The formed and ended lists were recomputed against 1715.json in the id harmonisation (dutch_republic is netherlands).",
+    "Kraków: the Free City is created on paper by the 3 May treaties and the Final Act, but Russian troops held it on 9 June and its government came later; russia is a fair alternative holder.",
+    "Congress Poland is created by the Final Act but proclaimed only on 20 June 1815, so it is not listed; the Duchy of Warsaw is under Russian provisional rule.",
+    "Naples: Austrian troops held the city for Ferdinand IV from 23 May; the date of Ferdinand's own return in June is uncertain. Naples and Sicily are counted as one realm (merged Dec 1816).",
+    "Ahmedabad was split between the Peshwa and the Gaekwad; the status of the Peshwa's half after the 1814 lease lapsed is uncertain.",
+    "Delhi and other Company lands are scored as united_kingdom (colonial power), not as a separate East India Company realm; the Mughal emperor and the subsidiary-alliance princes are given the United Kingdom as overlord.",
+    "West Africa: Timbuktu, Gao and Niani have no clear state; the Oyo Alaafin, the Rozvi Changamire, the Ternate sultan and the New Granada triumvirate are not named with confidence.",
+    "Mogadishu and Zeila: local rule is poorly documented; Zeila's dependence on Mocha (Yemen) is the usual account.",
+    "Kanem: contested between Bornu and Wadai around 1815.",
+    "France on this date is Napoleon's Hundred Days regime; the Bourbon kingdom is restored on 8 July 1815. The same id france is used for both.",
+    "Id harmonisation: the Kingdom of Vientiane uses vientiane (lan_xang is Luang Prabang, added here); the UK uses england, Hanover luneburg, the Maratha Peshwa maratha, Russia muscovy, Qing jurchens, Qajar Iran persia, the Durrani state afghanistan, the United Provinces of the Río de la Plata argentina, the Emirate of Bukhara uzbek_khanate and Sennar funj.",
+    "Thirty realms standing in June 1815 were added from the 1715 list (among them Hungary and Bohemia as Habsburg crown kingdoms, Sicily until the union of December 1816, Jaipur, Mewar, Marwar, Travancore, Bhutan, Brunei, Aceh, Sulu, Mossi, Mapuche, Khalkha under the Qing). Tibet (Ganden Phodrang) reuses the map id tibet and is counted as formed; Phagmodrupa ended before 1715.",
+    "Lucca is counted as ended (republic gone 1799/1805; the Bourbon duchy only takes over in 1817), the Iroquois as ended as a sovereign confederacy after the American Revolution."
+  ]
+}

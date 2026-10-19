@@ -1,6 +1,6 @@
 import type { World } from "./world.ts";
 import { birthRate, deathModifiers, deathRate } from "./domain/province/people.ts";
-import { CLASSES, type ClassName } from "./domain/province/model.ts";
+import { CLASSES, provinceConfig, type ClassName } from "./domain/province/model.ts";
 import type { News } from "./war.ts";
 import { heritageFactor } from "./heritage.ts";
 
@@ -93,6 +93,8 @@ export function takePeople(world: World, p: number, men: number): number {
 /** Yearly birth and death rates per class (province context PROV-100, PROV-103; clergy don't marry). */
 const BIRTHS = CLASS_NAMES.map((c) => birthRate(c));
 const DEATHS = CLASS_NAMES.map((c) => deathRate(c));
+/** Births plague takes off the yearly rate, as a share (decided.birth_points.plague, in percentage points). */
+const PLAGUE_BIRTHS = -provinceConfig.decided.birth_points.plague / 100;
 
 /** A province is at war while an enemy holds it, besieges it or fights in it (province: war deaths, PROV-102). */
 function atWar(world: World, p: number, fighting: Uint8Array): boolean {
@@ -111,7 +113,8 @@ export function monthlyPeople(world: World, _news: News[]): void {
   const war = deathModifiers({ war: true });
   for (let p = 0; p < world.provinceCount; p++) {
     if (world.provinceWater[p]) continue;
-    const extra = atWar(world, p, fighting) ? war.everyone : 0;
+    // Plague lowers births while it is here (PROV-101); its deaths come each plague week (plague.ts).
+    const extra = (atWar(world, p, fighting) ? war.everyone : 0) + (world.provincePlague[p] ? PLAGUE_BIRTHS : 0);
     // Heritage speeds or slows growth (growth_pct), never a decline.
     const growth = heritageFactor(world, world.provinceOwner[p]!, "growth_pct");
     let total = 0;

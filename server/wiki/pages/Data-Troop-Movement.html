@@ -1,0 +1,117 @@
+<h1>Troop movement data</h1>
+<p>Every value in the game&#39;s troop movement config, exactly as the game reads it. This page is made from <code>packages/rules/data/domain/troop-movement.json</code> each time the config changes, so it always matches the game. How these values are used is explained on <a href="/wiki/Troop-Movement">Troop Movement</a>.</p>
+<p>Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and values marked (provisional) are placeholders that may still change in balancing. Inventions are shown by id and name; see <a href="/wiki/Data-Research#inventions">Research data</a>.</p>
+<blockquote>
+<p>Troop movement (domain/troop-movement/spec.md, troop-movement design v1, decisions D-MOVE-1..20). The march block of defines.json keeps daysPerMonth, daysPerCrossing, daysToCross, horseSpeedBonus and bigArmyExtraCrossings; this file holds the keys of the design&#39;s section 13 and the decided ones. Provisional keys are listed in _provisional.</p>
+<p><code>turnDays</code>: X-18: a turn is one week; the weekly steps run at the end of every turn.</p>
+<p><code>fordMonths</code>: D-MOVE-10: summer and autumn by the province&#39;s hemisphere (X-4).</p>
+<p><code>moverKindOrder</code>: X-2: each day armies move, then fleets, then traders (by land and by sea), each kind in ascending id.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>battleStepChoices</code></td><td>change standing orders, retreat, switch battle</td></tr>
+<tr><td><code>turnDays</code></td><td>7</td></tr>
+<tr><td><code>passRoad</code></td><td>road</td></tr>
+<tr><td><code>gunsFactor</code></td><td>1.25</td></tr>
+<tr><td><code>gunsGrounds</code></td><td>hills, mountains, forest, jungle, marsh</td></tr>
+<tr><td><code>cunningSpeed</code> (provisional)</td><td>0.05</td></tr>
+<tr><td><code>riverDaysPer10kMen</code> (provisional)</td><td>1</td></tr>
+<tr><td><code>greatRiverDaysPer10kMen</code> (provisional)</td><td>2</td></tr>
+<tr><td><code>ferryDaysPer10kMen</code> (provisional)</td><td>2</td></tr>
+<tr><td><code>retreatMaxProvinces</code> (provisional)</td><td>3</td></tr>
+<tr><td><code>splitDays</code> (provisional)</td><td>2</td></tr>
+<tr><td><code>joinDays</code> (provisional)</td><td>1</td></tr>
+<tr><td><code>refillDaysPer10Pct</code> (provisional)</td><td>1</td></tr>
+<tr><td><code>replaySecondsPer10Days</code> (provisional)</td><td>1</td></tr>
+<tr><td><code>menPerBoardingDay</code> (provisional)</td><td>5000</td></tr>
+<tr><td><code>landingNoPortFactor</code> (provisional)</td><td>2</td></tr>
+<tr><td><code>escapeCunning</code> (provisional)</td><td>4</td></tr>
+<tr><td><code>foodYellowUnder</code> (provisional)</td><td>0.5</td></tr>
+<tr><td><code>passes</code> (provisional)</td><td>Great St Bernard, Khyber, Brenner, Roncesvalles</td></tr>
+<tr><td><code>fords</code> (provisional)</td><td>Ebro at Tortosa, Danube at Vidin</td></tr>
+<tr><td><code>straitCrossings</code> (provisional)</td><td>Bosporus, Øresund, Messina, Kerch, Gibraltar</td></tr>
+<tr><td><code>floodMonths</code> (provisional)</td><td>3</td></tr>
+<tr><td><code>greatRiverScaleRanks</code> (provisional)</td><td>0, 1</td></tr>
+<tr><td><code>dunesDaysToCross</code> (provisional)</td><td>3</td></tr>
+<tr><td><code>raidDaysPerProvince</code> (provisional)</td><td>7</td></tr>
+<tr><td><code>moverKindOrder</code></td><td>army, fleet, trader, trade ship</td></tr>
+<tr><td><code>frontStretch</code></td><td>even</td></tr>
+</tbody></table></div>
+<h2 id="frozen-rivers-provisional"><a class="anchor" href="#frozen-rivers-provisional" aria-label="Link to this section">#</a>Frozen rivers (provisional)</h2>
+<blockquote>
+<p><code>rule</code>: X-17: rivers at latitude 55 or more freeze December to March and are crossed like a bridge.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>minLatitude</code></td><td>55</td></tr>
+<tr><td><code>months</code></td><td>12, 1, 2, 3</td></tr>
+</tbody></table></div>
+<h2 id="battle-steps"><a class="anchor" href="#battle-steps" aria-label="Link to this section">#</a>Battle steps</h2>
+<blockquote>
+<p><code>rule</code>: X-1: while a player battle runs the day is six 4-hour steps; a battle with no round rule lasts 6 rounds (provisional).</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>perDay</code></td><td>6</td></tr>
+<tr><td><code>hours</code></td><td>4</td></tr>
+<tr><td><code>defaultRounds</code> (provisional)</td><td>6</td></tr>
+</tbody></table></div>
+<h2 id="road-factor-provisional"><a class="anchor" href="#road-factor-provisional" aria-label="Link to this section">#</a>Road factor (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>track</code></td><td>1</td></tr>
+<tr><td><code>road</code></td><td>0.75</td></tr>
+<tr><td><code>paved road</code></td><td>0.5</td></tr>
+<tr><td><code>turnpike</code></td><td>0.4</td></tr>
+<tr><td><code>railway</code></td><td>0.1</td></tr>
+</tbody></table></div>
+<h2 id="season-factor-provisional"><a class="anchor" href="#season-factor-provisional" aria-label="Link to this section">#</a>Season factor (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>factor</th><th>grounds</th></tr></thead>
+<tbody>
+<tr><td>winter</td><td>2</td><td>tundra, mountains, forest</td></tr>
+<tr><td>wet</td><td>1.25</td><td>paddies, marsh, jungle</td></tr>
+</tbody></table></div>
+<h2 id="order-factor-provisional"><a class="anchor" href="#order-factor-provisional" aria-label="Link to this section">#</a>Order factor (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>Normal</code></td><td>1</td></tr>
+<tr><td><code>Forced</code></td><td>0.67</td></tr>
+<tr><td><code>Careful</code></td><td>1.33</td></tr>
+<tr><td><code>Raid</code></td><td>0.67</td></tr>
+</tbody></table></div>
+<h2 id="winter-months-provisional"><a class="anchor" href="#winter-months-provisional" aria-label="Link to this section">#</a>Winter months (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>north</code></td><td>12, 1, 2</td></tr>
+<tr><td><code>south</code></td><td>6, 7, 8</td></tr>
+</tbody></table></div>
+<h2 id="snow-closed-months-provisional"><a class="anchor" href="#snow-closed-months-provisional" aria-label="Link to this section">#</a>Snow closed months (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>north</code></td><td>12, 1, 2, 3</td></tr>
+<tr><td><code>south</code></td><td>6, 7, 8, 9</td></tr>
+</tbody></table></div>
+<h2 id="wet-season-months-provisional"><a class="anchor" href="#wet-season-months-provisional" aria-label="Link to this section">#</a>Wet season months (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>monsoon Asia</code></td><td>6, 7, 8, 9</td></tr>
+<tr><td><code>Sahel</code></td><td>7, 8, 9</td></tr>
+<tr><td><code>savanna</code></td><td>7, 8, 9</td></tr>
+<tr><td><code>Amazon</code></td><td>12, 1, 2, 3, 4, 5</td></tr>
+</tbody></table></div>
+<h2 id="ford-months-provisional"><a class="anchor" href="#ford-months-provisional" aria-label="Link to this section">#</a>Ford months (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>north</code></td><td>6, 7, 8, 9, 10, 11</td></tr>
+<tr><td><code>south</code></td><td>12, 1, 2, 3, 4, 5</td></tr>
+</tbody></table></div>

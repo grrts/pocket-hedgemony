@@ -6,7 +6,7 @@ Historical events are the game's history layer: the turning points of five centu
 
 ### The campaign span
 
-Events run from the 1444 start to the campaign's end date, which is 31 August 1939 by default (it is one setting). When a campaign loads, every event that history places after that date is dropped and never fires. That covers the Second World War events, the Holocaust, the 1943 Bengal famine, the atomic bombings and everything in the Cold War and decolonization chains: 59 events in the current data. The ages Age of Decolonization, Cold War and Age of Globalization never start, and any age still running on the last day is cut there. An age that would end on a dropped event (the World Wars age ends on the Second World War) simply runs until its other end condition or the end date.
+Events run from the campaign's start to the campaign's end date, which is 31 August 1939 by default (it is one setting). When a campaign loads, every event that history places after that date is dropped and never fires. That covers the Second World War events, the Holocaust, the 1943 Bengal famine, the atomic bombings and everything in the Cold War and decolonization chains: 59 events in the current data. The ages Age of Decolonization, Cold War and Age of Globalization never start, and any age still running on the last day is cut there. An age that would end on a dropped event (the World Wars age ends on the Second World War) simply runs until its other end condition or the end date.
 
 The interwar years stay in: the Wilsonian moment, the 1918 armistice, the 1918 influenza, Versailles, the May Fourth movement, the founding of the Soviet Union, Lausanne, the Great Depression, the Italian invasion of Ethiopia and the Second Sino-Japanese War.
 
@@ -27,8 +27,9 @@ An age is a broad frame over the world with a window, start and end conditions a
 
 | Age | Window | Forced start | Forced end |
 |---|---|---|---|
-| Gunpowder Empires | 1444 to 1760 | 1444 | 1760 |
-| Exploration | 1444 to 1680 | 1444 | 1680 |
+| Schism and Conquerors | 1378 to 1460 | 1378 | 1460 |
+| Gunpowder Empires | 1420 to 1760 | 1453 | 1760 |
+| Exploration | 1415 to 1680 | 1445 | 1680 |
 | Reformations | 1480 to 1700 | 1530 | 1700 |
 | Atlantic Empires | 1480 to 1880 | 1520 | 1880 |
 | Crisis and Absolutism | 1590 to 1790 | 1640 | 1790 |
@@ -37,11 +38,46 @@ An age is a broad frame over the world with a window, start and end conditions a
 | Imperialism | 1800 to 1945 | 1860 | 1945 |
 | World Wars | 1890 to 1960 | 1925 | 1960 |
 
-Each age also lists its regions, so systems that care whether "the age has begun in your region" (exploration, national strengths, music) can read it. There are 12 ages in the data and these 9 are inside the campaign.
+Each age also lists its regions, so systems that care whether "the age has begun in your region" (exploration, national strengths, music) can read it. There are 13 ages in the data and these 10 are inside the campaign.
+
+The campaign starts on 20 September 1378, the day the Western Schism begins. The **Age of Schism and Conquerors** covers the years from then to the fall of Constantinople: two popes, Timur's campaigns, the early Ming fleets. It is under way from the first day in every region and ends once the Schism and the Council of Basel are over and Constantinople has fallen. **Gunpowder Empires** starts when three of the eight great powers (the realms with the most provinces) know Bombards, or when Constantinople falls. **Exploration** starts when Portugal or Castile has the ocean ships (Carrack and caravel) or holds the Atlantic islands. A fast world starts them early and a slow one waits for 1453 and 1445. The 1444 checkpoint world, opened with `?start=1444`, has all three under way from the start.
 
 ### Periods
 
-A period is a regional or thematic situation inside one or more ages, such as a dynastic crisis or a regional war. There are 93. A period becomes active when its start condition holds inside its window (a period marked `initial` is already running at the 1444 start) and ends when its end condition holds, so it can start early, late or never. Events can also start and end periods directly, and conditions can ask whether a period or an age is active. Which events belong to a period or an age is declared once, on the event itself.
+A period is a regional or thematic situation inside one or more ages, such as a dynastic crisis or a regional war. There are 101. A period becomes active when its start condition holds inside its window (a period marked `initial` is already running at the start, if the start lies inside its window) and ends when its end condition holds, so it can start early, late or never. Events can also start and end periods directly, and conditions can ask whether a period or an age is active. Which events belong to a period or an age is declared once, on the event itself.
+
+From the 1378 start the Western Schism, Timur's conquests, the Caroline phase of the Hundred Years' War, Ottoman expansion, Muscovite consolidation and the Southeast Asian states are under way. Others follow from what happens: the Timurid fragmentation once Timur's conquests are over, the Lancastrian phase when England and France go to war again, the Ottoman Interregnum only if Timur breaks the Ottomans, the Hussite wars with the Defenestration of Prague or when religious rebels rise in Bohemia, the Ming treasure voyages while the Ming are steady, Majapahit's decline, and Late Ming once the voyages are over. Portuguese oceanic expansion waits for the Age of Exploration, and Aztec and Inca expansion for the Triple Alliance and the Inca.
+
+### From 1378 to 1444: the bridge events of the West
+
+Between the 1378 start and 1444, the West meets its history as 54 events. Like every event they wait for their conditions and are only likeliest near their history year, so each can come early, late or not at all.
+
+- **The Church.** France declares for the Avignon pope first. Then every Catholic realm of Europe gets one card: obey Rome, obey Avignon, or stay neutral. France's friends lean to Avignon, England's to Rome. Urban deposes Joanna of Naples, Wyclif's Lollards are condemned or tolerated, and the councils of Pisa, Constance and Basel follow. Constance ends the Schism; Hus's burning and the Defenestration of Prague start the Hussite wars.
+- **The Empire.** Wenceslaus follows Charles IV, Austria is split at Neuberg, and the Swiss win at Sempach and Näfels. Wenceslaus can be deposed if his realm is weak and he has ruled ten years or more. Then come Sigismund, Brandenburg to the Hohenzollerns (a union under Brandenburg), Saxony to the Wettins (Saxony takes Saxe-Wittenberg), the Hussite crusades, and Albert of Austria's three crowns (Hungary and Bohemia become unions under Austria).
+- **France and England.** The uncles' regency when a child is king of France, the Peasants' Revolt while England pays for the war, Richard II's deposition when his throne is weak, the madness of Charles VI and the princes' feud that follows. If the princes fight, Agincourt can come, and then Normandy passes to England two years later if the war is still on. At Troyes, France may give Paris to England. Joan of Arc and the Congress of Arras can turn it back.
+- **Iberia.** Portugal's crisis when its king dies, Aljubarrota, Lancaster's claim to Castile and the Compromise of Caspe. Ceuta, Madeira and the Azores, and Cape Bojador turn Portugal to the sea. Settling the islands can start the Age of Exploration. Alfonso V can take Naples as a union under Aragon.
+- **Italy.** The War of Chioggia and the Peace of Turin. Durazzo takes Naples, which gives the French a claim on it. Gian Galeazzo's coup unites Pavia and Milan, Milan is made a duchy and breaks up when he dies, and Florence takes Pisa. Ladislaus marches on Rome, the Lombard wars can give Brescia to Venice, and Sforza's marriage gives the French a claim on Milan. Both claims are what the later Italian Wars need.
+
+Deaths, child kings and the Emperor come from the game itself: an event that needs "the king has died" waits until the realm's ruler really changes. A campaign that starts in 1444 counts these events as history already, with their historical choice, so it plays as before. Some 1444 events now need them: the end of the Hundred Years' War needs Agincourt or Troyes first, the Wars of the Roses need Richard II's fall, and the union of Castile and Aragon needs Caspe.
+
+### Everyday events
+
+Between the great events, your own realm asks for small choices. About every three to six months (two or three times a year) something happens to your officials, lords, family or stores, and an event card asks what you will do. No new one comes while another card waits for your answer, so they never pile up.
+
+| What happens | Your choices |
+|---|---|
+| An official dies in a royal province | Raise his deputy (free, starts at half the post's effect), send for a seasoned man (25 gold, keeps the full effect), or give the post to a lord's kinsman (starts at half, that lord grows more loyal) |
+| A lord dies | Confirm his son (as loyal as his father), ask a fee for the lands (gold, the son less loyal), or take the lands for the crown (they become royal land, your other lords grow less loyal) |
+| A lord feels slighted at court | Send him a gift (gold), give him an office (another lord grows jealous), or let him sulk (he grows less loyal) |
+| A lord speaks well of you | Reward him (gold, he grows more loyal) or thank him |
+| Two lords quarrel over a mill | Judge for one (he grows more loyal, the other less), or fine them both (gold, both less loyal) |
+| A lord is hurt hunting | Send your physician (gold, he grows more loyal) or your prayers |
+| A child is born to your ruler | Hold a feast (gold, your two least loyal lords grow more loyal), promise the child to a lord's house (that lord grows more loyal), or give thanks quietly. With no heir, the child becomes your heir |
+| Your young heir falls ill | Pay the best physicians (gold) or trust in prayer (3 in 10 that the heir dies) |
+| Grain rots, burns or is eaten by rats in a store | The grain is lost whatever you choose; buy grain (gold) or take it from a lord's barns (he grows less loyal) to make half of it good, or bear the loss |
+| Plague reaches one of your provinces | Close the province (its trade stops and its tax halves while closed), send physicians (gold: half as many die and it is over sooner), or keep the roads open. Only one plague card waits at a time; the News tells of the rest |
+
+An option you can't pay for isn't offered, and at least one choice always costs nothing. Other realms get the same events and answer them at once, so their lords die, quarrel and change their minds too. *Look at the map* on a card about a province opens that province.
 
 ### When an event can happen
 
@@ -154,6 +190,17 @@ The event data is checked offline before it ships. The build splits it into runt
 
 The build checks that every id exists, every condition and effect type is declared, every event has its roles, two to four options with one historical, that narrative-only events pay no perpetrator, that there are no mandatory prerequisite cycles, impossible triggers or jointly required exclusive pairs, that entities exist at the event's date, that flags read are set or declared, and that ages and periods have start and end conditions. It also reports coverage: any region with fewer than 2 events in an age that lists it, and an agency share (initiator, beneficiary and resister slots over all slots in a region) below 0.35. An error fails the build; warnings do not. The current result is 0 errors and 21 warnings; the anachronism warnings are corrected when a historian checks the sources before release.
 
+### Realms' historical goals
+
+History is a guide, not a script. Realms follow its normal course because each one pursues the goals it really had, for the reasons it had them: the Ottomans want the Balkans for their frontier lords, Florence wants Pisa because it needs a port. Each goal has a window of years, a weight (weak, normal or strong) and an aim the game can read: **take** some places, **hold** some places, make a realm a **subject**, **ally** with a realm, **fight** a realm, or **free** itself from an overlord. Goals about faith, trade or a succession are shown but not weighed.
+
+- **A goal ends with its reason.** A take goal ends once its realm holds every place it names, a hold goal once one of them is lost, an ally goal once the two are allied, and any goal once its target or its realm is gone. A goal pulls from five years before its window and fades over ten years after it.
+- **The AI weighs goals like any other wish.** A goal makes its realm look for a war more often, pick the realm holding its places as the target, and ask for those places first; an ally or subject goal sends envoys toward its target. A goal never lets a war past its price: a weak realm does not march however much it wants to.
+- **Every campaign differs.** At the start the seed shakes every goal: its weight varies by half either way, and a share of goals goes another way (10 % on Historical, 25 % on Plausible, 50 % on Free), taking the plausible alternative where there is one and dropping out where there is none. Historical also weighs goals ×1.5 and Free ×0.5.
+- **You are never steered.** Your realm's goals weigh nothing you do.
+
+The 1378 scenario holds about 760 goals, written region by region from the start-date research. The 1444 start has none.
+
 ### Hooks for other systems
 
 An event can carry a music tag (good event, bad event, major event, crisis, revolution) that moves the soundtrack. Events marked tutorial only never fire in a real campaign.
@@ -163,7 +210,8 @@ An event can carry a music tag (good event, bad event, major event, crisis, revo
 - **The event card.** A fired event opens as a modal card with its options. Events open one at a time, queued in date order.
 - **End turn waits for you.** Unanswered events block End turn until you choose.
 - **The "Events" choice** (Historical, Plausible or Free) is offered among the new game options.
-- **The chronicle** records events that were invalidated.
+- **The Chronicle.** The News has a **History** tab. Its first line counts the turning points ahead: on course, bent or gone. Under it, *Ahead* lists the turning points of history due within 25 years, soonest first, each with its history year. Tap one to see who is heading there: each realm with its goal and why it wants it. *Happened* lists those that happened, with the year and whether it was as in history (within ten years), early or late. A turning point is **bent** when it is more than ten years overdue, or when every realm heading there went another way; it is **gone** when it can no longer happen. At the foot, the closed fold *History's plan for your realm* holds your own realm's goals as hints, if you want them.
+- **Aims on a realm's card.** Another realm's General tab has an **Aims** fold with its live goals, each with its reason and its years.
 - **The end of the campaign** shows the final scores; there is no separate wrap-up event.
 
 ## How it connects
@@ -181,7 +229,7 @@ An event can carry a music tag (good event, bad event, major event, crisis, revo
 - [Screens and navigation](Screens-and-Navigation): the event card, the queue and blocking End turn.
 - [Music and sound](Music-and-Sound): music tags on events.
 - [Achievements](Achievements): your roles and historical or non-historical choices.
-- [Tutorial and help](Tutorial-and-Help): tutorial-only scripted events such as the Varna crusade.
+- [Tutorial and help](Tutorial-and-Help): tutorial-only scripted events.
 - [How a turn works](Time-and-Turns): events run after every other system's monthly, seasonal and yearly steps, just before achievements and the autosave.
 
 ### Each month
@@ -189,6 +237,8 @@ An event can carry a music tag (good event, bad event, major event, crisis, revo
 Turns are a week long, so this runs in the turn in which a new month begins. Each year, in the turn in which 1 January falls, the game checks age and period conditions and applies forced dates. Each month it lets computer decisions older than 10 years lapse, then checks eligibility and binds roles, fires immediate events, rolls pool events under the pacing cap, offers decisions, queues fired events for you in date order (computer choosers answer at once), applies effects, schedules delayed ones, ticks running events and modifiers, fades follow-up boosts and works out derived values again.
 
 ## Numbers
+
+Every value the game uses, made from its config so it always matches the game: [Events data](Data-Events) and [Everyday events data](Data-Events-Everyday). How they combine: [Formulas](Formulas).
 
 All of these are provisional values still being balanced, unless noted.
 

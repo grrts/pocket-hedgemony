@@ -8,6 +8,8 @@ import { formOf } from "./government.ts";
 import { relationState } from "./war.ts";
 import { mix, personName } from "./names.ts";
 import { OFFICIALS } from "./officials.ts";
+import { aiWaitsToFound, colonyStarts } from "./tribes.ts";
+import { noteMoment } from "./achievements.ts";
 import {
   chartAround,
   chartArmies,
@@ -20,7 +22,7 @@ import {
   type ColonialGovernor,
   type ColonyFounding,
 } from "./exploration.ts";
-import { allExplorers, buyShip, callable, dockRight, fleetById, isPort, mayEnterZone, muster, planVoyage, reachOf, resupply, shipGold, whyNotShip, type NavyFleet } from "./navy.ts";
+import { allExplorers, buyShip, callable, dockRight, fleetById, isPort, mayEnterZone, muster, planVoyage, reachOf, resupply, setCourse, shipGold, whyNotShip, type NavyFleet } from "./navy.ts";
 
 /**
  * Voyages into the fog, colonial governors and colonies being founded, as the
@@ -103,8 +105,7 @@ export function giveVoyage(world: World, n: number, id: number, path: readonly n
   }
   if (f.ships.some((s) => s.crew < nv.shipRow(s.type).crew * NC.minCrewToSail)) return "a ship has less than a quarter of its crew";
   resupply(world, f);
-  f.route = path.slice();
-  f.progress = 0;
+  setCourse(f, path.slice());
   f.landAt = -1;
   f.fleeing = false;
   const e = world.explore;
@@ -159,7 +160,7 @@ export function stepVoyages(world: World, news: News[]): void {
     if (home >= 0 && left <= home) {
       const plan = planVoyage(world, f, (p) => !world.provinceWater[p] && dockRight(world, f.owner, p) !== null);
       if (plan) {
-        f.route = plan.path;
+        setCourse(f, plan.path);
         v.turnedBack = true;
       }
     }
@@ -303,11 +304,14 @@ function foundColony(world: World, n: number, id: number, p: number, news: News[
   const o = colonialOffice(world, n);
   const why = whyNotColony(world, n, p, rangeZones(world, n, o.range));
   if (why) return why;
-  const aggression = ex.rollAggression(world.rng, peopleAround(world, p));
+  // On a tribe's hunting ground the locals are fiercer and the tribe angry; on land it gave up, Peaceful (TRIBE-021 to TRIBE-024).
+  const { aggression, consent } = colonyStarts(world, n, p, ex.rollAggression(world.rng, peopleAround(world, p)), news);
   g.fleet = -1;
   g.colony = p;
   g.homeward = false;
-  world.explore.colonies.push({ province: p, owner: n, governor: g.id, progress: CFG.progress_start, aggression, food: 0, lastChange: 0 });
+  // A colony a viceroy's fleet founds starts ahead (NAVY-154).
+  const ahead = f.admiral >= 0 ? (nv.postRow(f.post).colonyStart ?? 0) : 0;
+  world.explore.colonies.push({ province: p, owner: n, governor: g.id, progress: CFG.progress_start + ahead, aggression, food: 0, lastChange: 0, ...(consent ? { consent } : {}) });
   if (isHuman(world, n)) news.push({ kind: "colony", text: `${g.name} goes ashore at ${name(world, p)} and starts a colony. The locals are ${aggression.toLowerCase()}.`, nations: [n], province: p });
   return null;
 }
@@ -343,9 +347,12 @@ function founded(world: World, c: ColonyFounding, news: News[]): void {
   world.provinceOfficialSeed[p] = p;
   world.provinceOfficialSince[p] = world.day;
   world.provinceOfficialFrom[p] = -1;
+  world.provinceOfficialAge[p] = 0;
   e.founded[p] = n;
   chartAround(world, n, p);
   addBorders(world, n);
+  // Treaty on the Shore: founded with the consent of the local people (ACH colony_by_treaty).
+  noteMoment(world, n, "colony_founded", { founded_with_consent_of_local_people: !!c.consent }, p);
   news.push({ kind: "colony", text: `The colony at ${name(world, p)} is founded: it is ${world.rules.nations[n]!.name}'s now${g ? `, and ${g.name} hands it to its first warden` : ""}.`, nations: [n], province: p });
 }
 
@@ -382,7 +389,7 @@ export function dailyExploration(world: World): void {
   });
 }
 
-/** The month (EXPL-041 … EXPL-048): each colony being founded gains, loses to the locals and eats; governors age in January. */
+/** The month (EXPL-041 … EXPL-048): each colony being founded gains, loses to the locals and eats (governors age with everyone, people.ts). */
 export function monthlyColonies(world: World, news: News[]): void {
   const e = world.explore;
   e.colonies = e.colonies.filter((c) => {
@@ -397,7 +404,6 @@ export function monthlyColonies(world: World, news: News[]): void {
     if (end === "lost") return lost(world, c, hungry ? "its people starved" : "the locals drove the settlers off", news), false;
     return true;
   });
-  if (world.date.month === 1) for (const g of e.governors) g.age++;
   aiExploration(world, news);
 }
 
@@ -470,7 +476,8 @@ function aiExploration(world: World, news: News[]): void {
       const stores = f.ships.reduce((t, s) => t + (s.stores ?? 0), 0);
       if (world.provinceWater[f.at]) {
         // Beside an empty coast with a governor aboard: found, and put the stores ashore.
-        const site = gov && zones ? neighbours(world, f.at).find((p) => !whyNotColony(world, n, p, zones)) : undefined;
+        // A tribe's hunting ground waits for the answer to an ask for the land (TRIBE-033).
+        const site = gov && zones ? neighbours(world, f.at).find((p) => !whyNotColony(world, n, p, zones) && !aiWaitsToFound(world, n, p, news)) : undefined;
         if (site !== undefined && !foundColony(world, n, f.id, site, news)) unloadStores(world, n, f.id, news);
         else if (stores && e.colonies.some((c) => c.owner === n && besides(world, f.at, c.province))) unloadStores(world, n, f.id, news);
         aiHome(world, f);
@@ -481,14 +488,16 @@ function aiExploration(world: World, news: News[]): void {
         continue;
       }
       const hungry = e.colonies.find((c) => c.owner === n && c.food < aiFoodNeed(c));
-      const target = zones && office.used < office.slots ? aiColonySite(world, n, zones) : -1;
+      const site = zones && office.used < office.slots ? aiColonySite(world, n, zones) : -1;
+      // Before sailing for a tribe's hunting ground the AI asks for the land, and sails once answered (TRIBE-033).
+      const target = site >= 0 && aiWaitsToFound(world, n, site, news) ? -1 : site;
       if (hungry || target >= 0) {
         if (!gov && !hungry && hireGovernor(world, n, f.id, news)) continue;
         loadStores(world, n, f.id);
         const to = hungry ? hungry.province : target;
         resupply(world, f);
         const plan = planVoyage(world, f, (p) => !!world.provinceWater[p] && besides(world, p, to));
-        if (plan) f.route = plan.path;
+        if (plan) setCourse(f, plan.path);
         continue;
       }
       const course = courseIntoFog(world, f, AI.most_zones_out);
@@ -500,7 +509,7 @@ function aiExploration(world: World, news: News[]): void {
 /** Sails an explorer home to a port of its own realm. */
 function aiHome(world: World, f: NavyFleet): void {
   const home = planVoyage(world, f, (p) => !world.provinceWater[p] && world.provinceOwner[p] === f.owner && isPort(world, p));
-  if (home) f.route = home.path;
+  if (home) setCourse(f, home.path);
 }
 
 /** Food a colony still needs, with the AI's margin: its level's months to go × 20 rations × 1.25 (EXPL-062). */

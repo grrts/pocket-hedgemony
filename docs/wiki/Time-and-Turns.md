@@ -1,14 +1,14 @@
 # Time and Turns
 
-Pocket Hegemony is played one week at a time, from 11 November 1444 to 31 August 1939. You give your orders, press End turn, and the game plays out the 7 days of that week for every army, fleet and trader in the world at once. This page explains the clock: how a turn runs, how battles slow it, what happens daily, weekly, monthly, seasonally and yearly, and how the campaign is won and ends.
+Pocket Hegemony is played one week at a time, from 20 September 1378 to 31 August 1939. You give your orders, press End turn, and the game plays out the 7 days of that week for every army, fleet and trader in the world at once. This page explains the clock: how a turn runs, how battles slow it, what happens daily, weekly, monthly, seasonally and yearly, and how the campaign is won and ends.
 
 ## How it works
 
 ### One week per turn
 
-Every turn is one week: 7 days on the real calendar. The very last turn ends on 31 August 1939 and may be shorter. Months have their real number of days, 28 to 31, with leap years in February (every fourth year, except years ending in 00 that can't be divided by 400; the game uses these rules for every year, before 1582 too). Things counted per day, like marching, sailing, traders and battles, use the real number of days. Things counted per month, like tax, wages, upkeep and growth, still come once a month, in full: they are paid at the end of the turn in which the 1st of a new month falls, whatever the month's length. Seasonal and yearly things work the same way. No rule counts turns: anything that lasts or waits is measured in days, weeks, months or years on the calendar. Only orders, End turn and the turn report are once per turn. When a turn is processed, the date moves on by 7 days and the turn counter goes up by one; a campaign is about 25,800 turns.
+Every turn is one week: 7 days on the real calendar. The very last turn ends on 31 August 1939 and may be shorter. Months have their real number of days, 28 to 31, with leap years in February (every fourth year, except years ending in 00 that can't be divided by 400; the game uses these rules for every year, before 1582 too). Things counted per day, like marching, sailing, traders and battles, use the real number of days. Things counted per month, like tax, wages, upkeep and growth, still come once a month, in full: they are paid at the end of the turn in which the 1st of a new month falls, whatever the month's length. Seasonal and yearly things work the same way. No rule counts turns: anything that lasts or waits is measured in days, weeks, months or years on the calendar. Only orders, End turn and the turn report are once per turn. When a turn is processed, the date moves on by 7 days and the turn counter goes up by one; a campaign is about 29,250 turns.
 
-Every campaign starts on **11 November 1444**, the day after the battle of Varna, the day the realms and their relations are drawn from. The tutorial, "The Year of Varna", starts on the same day. The turn counter starts at 0, and loading screens call the start "Autumn 1444".
+Every campaign starts on **20 September 1378**, the day the cardinals at Fondi elect Clement VII against Urban VI and the Western Schism begins, the day the realms and their relations are drawn from. The tutorial, "Murad's Frontier", starts on the same day. The turn counter starts at 0, and loading screens call the start "Autumn 1378". The world of 11 November 1444, the day after the battle of Varna, stays as the main history checkpoint; testers can open it with `?start=1444` in the address (see [The 1378 start](The-1378-Start)).
 
 Before the first turn, the game sets up the world and lets the traders warm up their routes. All of that uses the campaign's one random seed and does not move the date.
 
@@ -16,7 +16,7 @@ Before the first turn, the game sets up the world and lets the traders warm up t
 
 There are two ways to win.
 
-- **World domination.** If your realm owns, or holds as subjects, half of the world's settled land provinces, you win. This is checked in the turn in which 1 January falls, and the win counts at once. You may keep playing to the end date afterwards.
+- **World domination.** If your realm owns, or holds as subjects, every settled land province of the world, you win. This is checked in the turn in which 1 January falls, and the win counts at once. You may keep playing to the end date afterwards.
 - **Best at the end.** The campaign ends on **31 August 1939**. On that day the realm leading the Economy score, the realm leading the Power score and the realm leading the Technology score each win in that score. No margin is needed, and realms that tie share the win. The scores are worked out each January for the realm book, but the winner is only judged at the end.
 
 A campaign that reaches the end without a win shows the final scores and your rank. The end date is chosen when you start a campaign and saved with it. When it is reached, the campaign ends with the final wrap-up events, a closing sequence and the final result. There is no playing on past it.
@@ -27,7 +27,7 @@ Nothing after 1939 is in the game: no Era VIII, no Second World War events, and 
 
 Every command that changes the world is an **order**, for example "move this army to that province". The player and the AI send exactly the same kinds of order through exactly the same pipeline. There are no player-only shortcuts.
 
-- Orders you give during your turn are **queued, not applied**. If you tell Jean de Dunois's army in Paris to march to Dijon, it still stands in Paris until you press End turn.
+- Orders you give during your turn are **queued, not applied**. If you tell Bertrand du Guesclin's army in Paris to march to Dijon, it still stands in Paris until you press End turn.
 - When you press End turn, your orders are applied first, then each AI realm's, realm by realm in a fixed order.
 - If an order can't be applied, it is **rejected** with a plain-language reason, listed in the turn report, and the rest of the turn still runs.
 - An army can take only one move order per turn. A second one is rejected with "army already moved this turn".
@@ -148,13 +148,13 @@ Which hemisphere a province is in comes from its latitude. Wet seasons follow th
 
 ### Ages and eras
 
-**Ages** are history's big situations, owned by [Historical Events](Historical-Events). Each starts and ends by its own conditions inside a window of years, and each has forced dates so a stalled game still moves on. Ages may overlap. The ages in the game are Gunpowder Empires, Exploration, Reformations, Atlantic Empires, Crisis and Absolutism, Revolutions, Industrialization, Imperialism and World Wars. An age whose window runs past 1939, like World Wars, simply runs to the end date; an age that would start on an event after 1939 never starts.
+**Ages** are history's big situations, owned by [Historical Events](Historical-Events). Each starts and ends by its own conditions inside a window of years, and each has forced dates so a stalled game still moves on. Ages may overlap. The ages in the game are Schism and Conquerors, Gunpowder Empires, Exploration, Reformations, Atlantic Empires, Crisis and Absolutism, Revolutions, Industrialization, Imperialism and World Wars. An age whose window runs past 1939, like World Wars, simply runs to the end date; an age that would start on an event after 1939 never starts.
 
 **Eras** follow the calendar:
 
 | Era | Years |
 |---|---|
-| I | 1444 to 1500 |
+| I | the start (1378) to 1500 |
 | II | 1500 to 1600 |
 | III | 1600 to 1700 |
 | IV | 1700 to 1800 |
@@ -174,9 +174,11 @@ Which hemisphere a province is in comes from its latitude. Wet seasons follow th
 
 ## Numbers
 
+Every value the game uses, made from its config so it always matches the game: [Time and turns data](Data-Time-and-Turns). How they combine: [Formulas](Formulas).
+
 | Value | Design value | Provisional? |
 |---|---|---|
-| Start date | 11 November 1444 | No |
+| Start date | 20 September 1378 | No |
 | Days in a month | 28 to 31, the real calendar with leap years | No |
 | Steps in a day while your battle runs | 6 of 4 hours | No |
 | Playback of one 4-hour step | about half a second | Yes |
@@ -184,7 +186,7 @@ Which hemisphere a province is in comes from its latitude. Wet seasons follow th
 | Seasonal turns | the turns in which 1 March, 1 June, 1 September or 1 December falls | No |
 | Harvest | September north, March south; paddies both | No |
 | Yearly turn | the turn in which 1 January falls | No |
-| World domination | half the settled land provinces, checked each January | No |
+| World domination | the whole world's settled land provinces, checked each January | No |
 | Campaign end date | 31 August 1939 (default) | No |
 | Wet seasons | as listed above | Yes |
 | How often pool events roll | every month | Yes |

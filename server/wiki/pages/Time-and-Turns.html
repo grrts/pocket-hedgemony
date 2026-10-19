@@ -1,0 +1,162 @@
+<h1>Time and Turns</h1>
+<p>Pocket Hegemony is played one week at a time, from 20 September 1378 to 31 August 1939. You give your orders, press End turn, and the game plays out the 7 days of that week for every army, fleet and trader in the world at once. This page explains the clock: how a turn runs, how battles slow it, what happens daily, weekly, monthly, seasonally and yearly, and how the campaign is won and ends.</p>
+<h2 id="how-it-works"><a class="anchor" href="#how-it-works" aria-label="Link to this section">#</a>How it works</h2>
+<h3 id="one-week-per-turn"><a class="anchor" href="#one-week-per-turn" aria-label="Link to this section">#</a>One week per turn</h3>
+<p>Every turn is one week: 7 days on the real calendar. The very last turn ends on 31 August 1939 and may be shorter. Months have their real number of days, 28 to 31, with leap years in February (every fourth year, except years ending in 00 that can&#39;t be divided by 400; the game uses these rules for every year, before 1582 too). Things counted per day, like marching, sailing, traders and battles, use the real number of days. Things counted per month, like tax, wages, upkeep and growth, still come once a month, in full: they are paid at the end of the turn in which the 1st of a new month falls, whatever the month&#39;s length. Seasonal and yearly things work the same way. No rule counts turns: anything that lasts or waits is measured in days, weeks, months or years on the calendar. Only orders, End turn and the turn report are once per turn. When a turn is processed, the date moves on by 7 days and the turn counter goes up by one; a campaign is about 29,250 turns.</p>
+<p>Every campaign starts on <strong>20 September 1378</strong>, the day the cardinals at Fondi elect Clement VII against Urban VI and the Western Schism begins, the day the realms and their relations are drawn from. The tutorial, &quot;Murad&#39;s Frontier&quot;, starts on the same day. The turn counter starts at 0, and loading screens call the start &quot;Autumn 1378&quot;. The world of 11 November 1444, the day after the battle of Varna, stays as the main history checkpoint; testers can open it with <code>?start=1444</code> in the address (see <a href="/wiki/The-1378-Start">The 1378 start</a>).</p>
+<p>Before the first turn, the game sets up the world and lets the traders warm up their routes. All of that uses the campaign&#39;s one random seed and does not move the date.</p>
+<h3 id="how-a-campaign-is-won-and-ends"><a class="anchor" href="#how-a-campaign-is-won-and-ends" aria-label="Link to this section">#</a>How a campaign is won and ends</h3>
+<p>There are two ways to win.</p>
+<ul>
+<li><strong>World domination.</strong> If your realm owns, or holds as subjects, every settled land province of the world, you win. This is checked in the turn in which 1 January falls, and the win counts at once. You may keep playing to the end date afterwards.</li>
+<li><strong>Best at the end.</strong> The campaign ends on <strong>31 August 1939</strong>. On that day the realm leading the Economy score, the realm leading the Power score and the realm leading the Technology score each win in that score. No margin is needed, and realms that tie share the win. The scores are worked out each January for the realm book, but the winner is only judged at the end.</li>
+</ul>
+<p>A campaign that reaches the end without a win shows the final scores and your rank. The end date is chosen when you start a campaign and saved with it. When it is reached, the campaign ends with the final wrap-up events, a closing sequence and the final result. There is no playing on past it.</p>
+<p>Nothing after 1939 is in the game: no Era VIII, no Second World War events, and no Decolonization, Cold War or Globalization ages.</p>
+<h3 id="orders-and-end-turn"><a class="anchor" href="#orders-and-end-turn" aria-label="Link to this section">#</a>Orders and End turn</h3>
+<p>Every command that changes the world is an <strong>order</strong>, for example &quot;move this army to that province&quot;. The player and the AI send exactly the same kinds of order through exactly the same pipeline. There are no player-only shortcuts.</p>
+<ul>
+<li>Orders you give during your turn are <strong>queued, not applied</strong>. If you tell Bertrand du Guesclin&#39;s army in Paris to march to Dijon, it still stands in Paris until you press End turn.</li>
+<li>When you press End turn, your orders are applied first, then each AI realm&#39;s, realm by realm in a fixed order.</li>
+<li>If an order can&#39;t be applied, it is <strong>rejected</strong> with a plain-language reason, listed in the turn report, and the rest of the turn still runs.</li>
+<li>An army can take only one move order per turn. A second one is rejected with &quot;army already moved this turn&quot;.</li>
+<li>While the turn is being processed, orders are frozen. You can still pan and zoom the map.</li>
+</ul>
+<p><strong>Unanswered events block End turn.</strong> If any event is still waiting for your answer, End turn opens the first unanswered event instead. Nothing ever answers an event for you.</p>
+<p><strong>Warnings never block.</strong> If the End turn confirmation setting is on, the game asks first and tells you how many warnings are open, for example &quot;3 warnings wait for you&quot;. You can look, or end the turn anyway.</p>
+<h3 id="auto-turns"><a class="anchor" href="#auto-turns" aria-label="Link to this section">#</a>Auto turns</h3>
+<p>In a single-player campaign you can let the weeks play one after another. Tap <strong>Auto</strong>, just above End turn, and the next week starts by itself as soon as one has played and been saved, at your Turn playback speed. Auto turns change only when End turn is pressed, never what happens in a week.</p>
+<p><strong>Pausing finishes the week.</strong> While Auto turns run, a tap on End turn or on Auto (or Space) doesn&#39;t stop the clock mid-week: the week plays to its end, then the game stops and you can give orders. Until then both buttons say &quot;Stops at the end of this week&quot;; tap Auto again to keep going. On a keyboard, Shift+Space switches Auto turns.</p>
+<p><strong>Auto turns stop by themselves</strong> at the end of a week in which something needs you, and the alert over the map says what: an event, one of your battles or sieges, a war of your realm, a call to arms, a peace offer or an envoy waiting, beaten rebels waiting for your verdict, scholars with nothing to study, or one of your armies reaching the end of its march. An event, a revolution or one of your battles still makes the week wait at once, as it always does. Auto turns are off every time you load a campaign.</p>
+<h3 id="the-order-of-a-turn"><a class="anchor" href="#the-order-of-a-turn" aria-label="Link to this section">#</a>The order of a turn</h3>
+<p>Every turn runs the same steps in the same order:</p>
+<ol>
+<li><strong>Orders</strong>: yours first, then each AI realm&#39;s.</li>
+<li><strong>The 7 days of the turn</strong> (the day loop, below), then the weekly steps.</li>
+<li><strong>Monthly steps</strong>, only in the turn in which a new month begins: sieges first, then armies and fleets settle their month (sickness, pay, ship states, colonies), then provinces (people, food and tax), buildings, recruiting, the realm (treasury and lords), research, trade upkeep, subjects, government, diplomacy, culture, religion, rebellions and revolutions.</li>
+<li><strong>Seasonal steps</strong>, in the turn in which a season begins.</li>
+<li><strong>Yearly steps</strong>, in the turn in which 1 January falls.</li>
+<li><strong>Events</strong>, then the national strengths tick.</li>
+<li><strong>Achievements</strong>, always last.</li>
+<li><strong>Autosave</strong>.</li>
+<li>The date moves on 7 days.</li>
+</ol>
+<p>Because provinces run before buildings, a building finished this month takes in homeless people from next month on.</p>
+<h3 id="what-a-turn-looks-like"><a class="anchor" href="#what-a-turn-looks-like" aria-label="Link to this section">#</a>What a turn looks like</h3>
+<p>Inside one turn you see, in this order:</p>
+<ol>
+<li>The week playing out on the map, at about one second per ten days, slowing down while one of your battles runs.</li>
+<li>Each of your battles, followed while it runs.</li>
+<li>The events that fired, one at a time in date order.</li>
+<li>The turn report.</li>
+</ol>
+<p>Events and the report are skipped when there is nothing in them.</p>
+<h3 id="watching-time-pass"><a class="anchor" href="#watching-time-pass" aria-label="Link to this section">#</a>Watching time pass</h3>
+<p>When you end a turn, the date doesn&#39;t jump a week. It ticks day by day while the week plays on the map, armies walking their routes, battles fighting and sieges going on as the days pass. While one of your battles runs, the clock slows to 4-hour steps and shows the hour.</p>
+<h3 id="the-day-loop-the-days-inside-a-turn"><a class="anchor" href="#the-day-loop-the-days-inside-a-turn" aria-label="Link to this section">#</a>The day loop: the days inside a turn</h3>
+<p>The turn is played out day by day, all 7 of them, for every mover at once: armies, fleets, traders and trade ships, and exploration ships. They all share one clock, so a trader and an army can meet on the same day, and a fleet that closes a strait on day 12 matters to an army trying to cross on day 13.</p>
+<p>Each day runs these steps, always in this order:</p>
+<ol>
+<li><strong>Move</strong>: armies first, then fleets, then traders, then exploration ships, each kind in a fixed order. So an army crossing a strait on the very day an enemy fleet arrives there gets across.</li>
+<li><strong>Stop checks</strong>: movers that arrived somewhere check what stops them.</li>
+<li><strong>Contact</strong>: hostile armies in the same place meet, and a battle may begin.</li>
+<li><strong>Battles</strong>: every running battle fights its rounds. Armies in a battle don&#39;t move while it lasts.</li>
+<li><strong>Standing orders</strong>: for example armies set to attack look at visible enemies next door.</li>
+</ol>
+<p>At the end of every turn armies eat (from home or from their reserve), hunger bites, plunder and raids burn a tile, forced marches lose men, and plague spreads while an outbreak runs. Sieges are worked out once a month, at the start of the monthly steps.</p>
+<p>Days already walked toward the next place are called <strong>progress</strong> and carry over into the next turn. At the end of every day, every mover stands in exactly one place, never between two.</p>
+<h3 id="battles-inside-the-turn"><a class="anchor" href="#battles-inside-the-turn" aria-label="Link to this section">#</a>Battles inside the turn</h3>
+<p>A battle begins on the day two hostile armies meet, and it is fought over time, round by round, until one side is beaten or retreats.</p>
+<p>While a battle your army or fleet is in is running, <strong>time keeps passing but slows down</strong>: each day is played in six steps of 4 hours. Each step fights one round of every running battle and moves every other army, fleet and trader a sixth of a day, so your armies (and anyone else&#39;s) can march in and join the battle while it lasts. When no battle of yours is left, the days go back to whole days.</p>
+<p>At any step you can change a battle&#39;s standing orders or order a retreat. There is no skip: you watch each of your battles to the end. If several of your battles run at once, you can switch between them to follow each one and decide when to retreat.</p>
+<p>Battles between other realms never slow the game. They fight their six rounds a day all at once, so they last just as long as yours, and other armies can still join them at the start of a day. Any battle, yours or not, can be replayed afterwards from its notice.</p>
+<p>If the app is killed while a battle runs, the turn is played again from the save taken before it, with the same orders, and the battle comes out the same.</p>
+<h3 id="determinism-same-world-same-orders-same-result"><a class="anchor" href="#determinism-same-world-same-orders-same-result" aria-label="Link to this section">#</a>Determinism: same world, same orders, same result</h3>
+<ul>
+<li>All randomness comes from one seeded random generator, never from the device. The same seed gives the same sequence on every phone, PC and server.</li>
+<li>The turn always runs its steps in the same order, and ties on the same day are broken by a fixed rule.</li>
+<li>The same world plus the same orders always gives the same result, which tests and a later server can check.</li>
+<li>The random generator&#39;s state is saved with the world, so a loaded campaign continues the same sequence.</li>
+<li>Nothing outside the simulation changes it: not the music, not the interface, not any setting. Anything that changes rules, balance or the AI is a campaign rule chosen at new game.</li>
+</ul>
+<h3 id="turn-boundaries-and-saves"><a class="anchor" href="#turn-boundaries-and-saves" aria-label="Link to this section">#</a>Turn boundaries and saves</h3>
+<p>A save always holds the world <strong>between two turns</strong>. If your phone puts the app in the background while a turn runs, the turn pauses and carries on when you come back. If the app is killed, the turn is played again from the last save with the same orders and gives the same result. If a balance change is loaded with a campaign, the new rules apply from the next turn on. See <a href="/wiki/Saving">Saving</a>.</p>
+<h3 id="cadences-what-runs-when"><a class="anchor" href="#cadences-what-runs-when" aria-label="Link to this section">#</a>Cadences: what runs when</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Cadence</th><th>What runs</th><th>System</th></tr></thead>
+<tbody>
+<tr><td>Daily (7 times a turn)</td><td>Move, stop checks, contact, battle rounds (six a day), standing orders</td><td><a href="/wiki/Troop-Movement">Troop Movement</a>, <a href="/wiki/Warfare">Warfare</a></td></tr>
+<tr><td>Daily</td><td>Fleets sail; traders walk and collect in every province they enter</td><td><a href="/wiki/Naval">Naval</a>, <a href="/wiki/Trade">Trade</a></td></tr>
+<tr><td>Weekly (end of every turn)</td><td>Armies eat; hunger (5 % desert, 2 % die, 1 horse in 10 eaten); plunder and raids burn a tile; forced march loses 2 % of levies</td><td><a href="/wiki/Warfare">Warfare</a></td></tr>
+<tr><td>Weekly</td><td>Plague, while an outbreak runs</td><td><a href="/wiki/Provinces">Provinces</a></td></tr>
+<tr><td>Monthly (the turn in which the 1st falls)</td><td>Sieges first, then sickness, pay and drill; storms at sea; sailors and ship states; colony progress</td><td><a href="/wiki/Warfare">Warfare</a>, <a href="/wiki/Naval">Naval</a>, <a href="/wiki/Exploration-and-Colonies">Exploration and Colonies</a></td></tr>
+<tr><td>Monthly</td><td>Births, deaths and overflow; building upkeep and sites; recruit pool; treasury and lords; trade ratio and trader upkeep; subject tribute; funding rebels; AI envoys; rising chances</td><td>several</td></tr>
+<tr><td>Monthly</td><td>Pool events roll against how often they happen on average</td><td><a href="/wiki/Historical-Events">Historical Events</a></td></tr>
+<tr><td>Seasonal (March, June, September, December)</td><td>Famine check and stores rot; farms, groves and fisheries make food; subject loyalty; resident envoys and courting; lords lose loyalty to an army taking their grain; pirate fleets grow</td><td>several</td></tr>
+<tr><td>Harvest (September in the north, March in the south)</td><td>The harvest is rolled; rice paddies harvest in both months</td><td><a href="/wiki/Your-Realm">Your Realm</a>, <a href="/wiki/Provinces">Provinces</a></td></tr>
+<tr><td>Yearly (January)</td><td>World domination check; wares, neglect years and building advice; culture drift, then the faith mix; diplomacy fades and league checks</td><td>several</td></tr>
+<tr><td>Every 5 years (January of 1445, 1450 …)</td><td>Culture&#39;s own checks</td><td><a href="/wiki/Culture">Culture</a></td></tr>
+</tbody></table></div>
+<p>A diplomatic answer arrives the turn after the proposal is sent, a week later.</p>
+<h3 id="seasons-and-the-hemispheres"><a class="anchor" href="#seasons-and-the-hemispheres" aria-label="Link to this section">#</a>Seasons and the hemispheres</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Season</th><th>North</th><th>South</th></tr></thead>
+<tbody>
+<tr><td>Spring</td><td>March to May</td><td>September to November</td></tr>
+<tr><td>Summer</td><td>June to August</td><td>December to February</td></tr>
+<tr><td>Autumn</td><td>September to November</td><td>March to May</td></tr>
+<tr><td>Winter</td><td>December to February</td><td>June to August</td></tr>
+<tr><td>Snow peaks with no pass and no road are closed</td><td>December to March</td><td>June to September</td></tr>
+</tbody></table></div>
+<p>Which hemisphere a province is in comes from its latitude. Wet seasons follow the climate: monsoon Asia June to September, the Sahel and savanna July to September, the Amazon December to May. If you set the autosave to &quot;every 12 months&quot;, it falls in each January turn. The rotating autosave goes by the calendar, at most once a month, so it doesn&#39;t write every week.</p>
+<h3 id="ages-and-eras"><a class="anchor" href="#ages-and-eras" aria-label="Link to this section">#</a>Ages and eras</h3>
+<p><strong>Ages</strong> are history&#39;s big situations, owned by <a href="/wiki/Historical-Events">Historical Events</a>. Each starts and ends by its own conditions inside a window of years, and each has forced dates so a stalled game still moves on. Ages may overlap. The ages in the game are Schism and Conquerors, Gunpowder Empires, Exploration, Reformations, Atlantic Empires, Crisis and Absolutism, Revolutions, Industrialization, Imperialism and World Wars. An age whose window runs past 1939, like World Wars, simply runs to the end date; an age that would start on an event after 1939 never starts.</p>
+<p><strong>Eras</strong> follow the calendar:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Era</th><th>Years</th></tr></thead>
+<tbody>
+<tr><td>I</td><td>the start (1378) to 1500</td></tr>
+<tr><td>II</td><td>1500 to 1600</td></tr>
+<tr><td>III</td><td>1600 to 1700</td></tr>
+<tr><td>IV</td><td>1700 to 1800</td></tr>
+<tr><td>V</td><td>1800 to 1870</td></tr>
+<tr><td>VI</td><td>1870 to 1914</td></tr>
+<tr><td>VII</td><td>1914 to the end date</td></tr>
+</tbody></table></div>
+<h2 id="what-you-see"><a class="anchor" href="#what-you-see" aria-label="Link to this section">#</a>What you see</h2>
+<ul>
+<li><strong>End turn</strong> sends your orders. With the confirmation setting on, it asks first and names the number of open warnings.</li>
+<li><strong>Auto</strong>, above End turn: lit while Auto turns run, blinking while they stop at the end of the week.</li>
+<li><strong>Turn in progress</strong>: the week plays out on the map, slowing to 4-hour steps while one of your battles runs. Orders are frozen, but you can pan and zoom.</li>
+<li><strong>Battle view</strong>: follow a running battle, change its standing orders, retreat, or switch to another of your running battles.</li>
+<li><strong>Events</strong>: shown one at a time in date order.</li>
+<li><strong>Turn report</strong>: shown last, including rejected orders with their reasons; battle notices can be replayed.</li>
+<li><strong>End of campaign</strong>: the wrap-up events, a closing sequence and the final result with the winners and your rank.</li>
+</ul>
+<h2 id="numbers"><a class="anchor" href="#numbers" aria-label="Link to this section">#</a>Numbers</h2>
+<p>Every value the game uses, made from its config so it always matches the game: <a href="/wiki/Data-Time-and-Turns">Time and turns data</a>. How they combine: <a href="/wiki/Formulas">Formulas</a>.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Value</th><th>Design value</th><th>Provisional?</th></tr></thead>
+<tbody>
+<tr><td>Start date</td><td>20 September 1378</td><td>No</td></tr>
+<tr><td>Days in a month</td><td>28 to 31, the real calendar with leap years</td><td>No</td></tr>
+<tr><td>Steps in a day while your battle runs</td><td>6 of 4 hours</td><td>No</td></tr>
+<tr><td>Playback of one 4-hour step</td><td>about half a second</td><td>Yes</td></tr>
+<tr><td>Days in a turn</td><td>7 (the last turn may be shorter)</td><td>No</td></tr>
+<tr><td>Seasonal turns</td><td>the turns in which 1 March, 1 June, 1 September or 1 December falls</td><td>No</td></tr>
+<tr><td>Harvest</td><td>September north, March south; paddies both</td><td>No</td></tr>
+<tr><td>Yearly turn</td><td>the turn in which 1 January falls</td><td>No</td></tr>
+<tr><td>World domination</td><td>the whole world&#39;s settled land provinces, checked each January</td><td>No</td></tr>
+<tr><td>Campaign end date</td><td>31 August 1939 (default)</td><td>No</td></tr>
+<tr><td>Wet seasons</td><td>as listed above</td><td>Yes</td></tr>
+<tr><td>How often pool events roll</td><td>every month</td><td>Yes</td></tr>
+<tr><td>Playback speed</td><td>about 1 second per 10 days</td><td>Yes</td></tr>
+<tr><td>Autosave interval</td><td>every month, every 6 months, every 12 months (each January) or off; default 12 months</td><td>No</td></tr>
+</tbody></table></div>
+<h2 id="still-open"><a class="anchor" href="#still-open" aria-label="Link to this section">#</a>Still open</h2>
+<p>Nothing about the clock is left open.</p>
+<h2 id="for-developers"><a class="anchor" href="#for-developers" aria-label="Link to this section">#</a>For developers</h2>
+<ul>
+<li>Spec: <a href="https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/time-and-turns/spec.md" rel="noopener"><code>domain/time-and-turns/spec.md</code></a>; features in <code>domain/time-and-turns/features/</code>.</li>
+<li>Code: <code>packages/engine/src/domain/time-and-turns/</code> (turn order, day loop, seasons, victory timing), on top of <code>packages/engine/src/turn.ts</code>, <code>rng.ts</code> and <code>hash.ts</code>. Numbers are in <code>packages/rules/data/domain/time-and-turns.json</code>.</li>
+</ul>

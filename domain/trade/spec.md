@@ -197,7 +197,7 @@ its ratio in about seven months.
 - TRADE-039 While a province has homeless over 5 %, the trade context shall lower its ratio gain by 5 % for every 5 % of homeless. [trade §4.3]
 - TRADE-040 While a province is under plague quarantine, the trade context shall set its ratio to 0 and let no trader enter. [trade §4.3]
 - TRADE-041 While an enemy army or a siege is in a province, the trade context shall give it no ratio gain that month. [trade §4.3]
-- TRADE-042 While a port is blockaded, the trade context shall let no ship enter it and stop its sea-lane gain. [trade §4.3, §8.2]
+- TRADE-042 While a port is blockaded, the trade context shall let no ship enter it and stop its sea-lane gain. [trade §4.3, §8.2] *When a port is blockaded, which trade ships may pass and the prize money are now set by NAVY-155 to NAVY-158 (playtest feedback).*
 
 ### 5.5 Collecting
 - TRADE-043 When a trader enters a province, the trade context shall on that day collect trade value × trade ratio × hold × visit share (0.2) × crowding into its purse. [trade §4.4]
@@ -330,6 +330,79 @@ Trade now runs in the game's month (D-TRADE-20): every province has goods and a 
 - TRADE-143 Map: the **Trade** lens colours provinces by trade ratio, the provinces the player doesn't see in parchment; zoomed in to regional it draws each of the player's traders' ways there and back as a dotted line with the trader where it stands and its purse, and a coin on each trade stop. The province card has a Trade line: its value a month, its ratio, traders passing last month and its top goods, or "not seen" for a province the player doesn't see. [X-19, TRADE-093, TRADE-094, TRADE-121]
 - TRADE-144 Grouping and overview: everything about traders is in the Trade tab; the General tab carries one line, "Trade: N traders · +x gold a month", that opens it, and the Treasury's Trade line is the same number. A trader given up for want of pay reaches the News. [X-19, TRADE-099]
 - TRADE-145 Phone: the tab fits the side panel in the Wide and Tall layouts, trader cards and found buttons wrap to one column on a narrow panel, the route bar stays inside the safe areas above the map's bottom edge and wraps its buttons, every button is at least 44 points high, nothing needs hover and the panel never scrolls sideways. [X-19, SHELL-108, SHELL-109, SHELL-114]
+
+### 5.16 Following and steering a trader (trade rework, 19 October)
+Leroy's feedback (F-158 to F-161, `trade/trade-rework.md`): a trader can be followed and steered from its own card, the
+realm sees what trade earns and where it comes from, and the map shows gold being banked.
+
+- TRADE-146 The game shall show for each of the player's traders where it walks to (the stop it heads for and the days
+  left, the next province and its days) and where its gold came from on its last whole trip there and back, or on this
+  trip until one is done: each province's gold kept, best first, and the market fees paid. A new route starts the count
+  afresh. Only the player's traders keep these counts, so saves stay small. [F-158, TRADE-100]
+- TRADE-147 The game shall estimate a loop's gold a month as it is walked (TRADE-055): from its start, collecting in each
+  province entered at this month's ratios, crowded by last month's visits (the trader's own old loop's taken off and the
+  new loop's added, each visit's average share as TRADE-048 gives it), less market fees, while the purse has room, and
+  depositing in each own city; the second time round is the loop, divided by its months. The AI's keep and reroute look
+  uses the same estimate. (D-TRADE-22) [F-160, TRADE-054, TRADE-055]
+- TRADE-148 The game shall offer each of the player's traders up to `trade.game.suggest.count` better routes: from where
+  its route starts and from its home to each likely city within reach, each worth at least `suggest.min_gain_share` more
+  than its route now and `suggest.min_gain` gold a month more, best first, with days there and back and the gain; any
+  paying route when it has none or its way is shut. Looking never changes the game. [F-160]
+- TRADE-149 While a route is chosen with where it starts set, the game shall give up to `suggest.draft_options` cities it
+  could go to from there, each with its estimate a month and days there and back, best first. [F-160, TRADE-054]
+- TRADE-150 The game shall sum the realm's trade: gold deposited and market fees taken this month so far, gold carried in
+  its traders' purses, and where its gold comes from (each province's gold a month over its traders' last trips, or
+  this trip so far for a trader on its first, best first, with the market fees paid). [F-159]
+- TRADE-151 Last month's visits per province shall be kept in the save for the estimate's crowding. [SAVE, TRADE-147]
+- TRADE-152 The game shall tell the map each collection and deposit of the player's traders since it last looked (which
+  trader, where, how much), at most `trade.game.feed_max`, never saved. [F-161]
+
+#### How the player uses it
+- TRADE-153 Where: tapping one of the player's traders on the map (close in), or a trader row in the Trade tab, opens its
+  **trader card** in the panel, as a commander's opens. From the top: name, kind and home; **Now** ("Walking to Lyon, 3
+  days", "Waiting in Paris") with its purse bar; **Route** (From and To, days there and back, about how much a month
+  after upkeep); **Better routes** (each with days, gold a month and "+x more", and **Use**), or "This is its best
+  route"; **Where its gold comes from** (provinces of its last trip, a bar each, foreign ones marked, fees); **Last month**
+  deposited, where it last deposited; what is wrong in red; then **Change destination**, **New route**, **Find** and
+  **Dismiss** (asks again). [F-158, F-160, X-19]
+- TRADE-154 Map: while a trader's card is open, its whole way there and back is drawn under any map mode, the leg it walks
+  brighter, its start and end marked, the provinces it collected in on its last trip marked with a coin, and a ring under
+  the trader; the map does not move unless **Find** is tapped. [F-158]
+- TRADE-155 Route: **Change destination** opens the route bar with where it starts already set, waiting for where it goes;
+  **New route** with neither. While where it starts is set, each city of TRADE-149 on screen shows its gold a month over
+  its coin, the best three starred; the bar also offers the best three as buttons. [F-160, TRADE-142]
+- TRADE-156 Overview: the Trade tab opens with **This month**: banked so far, on the road in purses, market fees, upkeep,
+  and last month's Trade line; then **Where the gold comes from** (TRADE-150's provinces, a bar each, foreign marked, and
+  the share from abroad and fees); then **Traders**, one compact row each (kind, From → To, purse bar, gold a month, a red
+  mark for a problem, a gold star for a better route) opening its card, under "N traders could earn more" with **Use
+  all better routes**; then Found a trader and Busiest cities as before. The General tab's Trade line carries the gold
+  star when a trader could earn more. [F-159, TRADE-141, TRADE-144]
+- TRADE-157 Banking on the map: from regional zoom in, under any map mode, when one of the player's traders deposits, a
+  coin bag drops into the city with its gold rising over it ("+2.4") and a quiet coin sound (at most once a day per city),
+  and the treasury figure lifts; each collection glints a small coin over the trader. Under the Trade map mode the
+  player's trade cities with a ratio over 50 % twinkle now and then. All of it follows the Animations setting (still
+  where it is Off). [F-161]
+- TRADE-158 Phone: the trader card is a panel card fitting the Wide and Tall layouts and folding to keep the map in view;
+  rows, Use and the card's buttons are at least 44 points high and wrap; the route bar stays inside the safe areas; gold
+  labels are drawn only for cities on screen and never under the route bar; nothing needs hover. [X-19, SHELL-108,
+  SHELL-109, SHELL-114]
+
+### 5.17 Home slots (trade rework, 19 October)
+Leroy chose A on the balance card (F-162, `trade/trade-rework.md` §2.5): founding traders without end paid, since
+upkeep was a twentieth of what a poor route brought. A city now homes a few traders, and they cost enough that a poor
+route loses money.
+
+- TRADE-159 A city shall be home to at most `trade.game.homes.by_market_step` traders by its market step (none without a
+  market, 1 for a weekly market, 2 for a yearly fair, 4 for a trading house) and `homes.port` more with a harbour;
+  founding there is refused while that many are at home ("home to 2 already; a bigger market homes more"). Traders over
+  that from the 1444 start stay, but none more is founded there until one is gone. (D-TRADE-23) [F-162, TRADE-135]
+- TRADE-160 A trader's upkeep and founding gold shall be the kind's (TRADE-134, TRADE-135) times
+  `homes.upkeep_factor` and `homes.found_factor`; the AI keeps a route bringing at least `ai_keep_route_over_upkeep` times
+  its upkeep, and founds from its first city with a slot free. (D-TRADE-23) [F-162, TRADE-134, TRADE-135]
+- TRADE-161 How the player uses it: the Trade tab's Found a trader shows each city's "home to x of y", red when full,
+  and says how many traders each market step homes; a full city's kinds are greyed out with the reason. The trader
+  card's Route line already gives what it brings after upkeep, so a losing route reads in red there and in the Traders
+  rows. [F-162, X-19, TRADE-153, TRADE-156]
 
 ## 6. Commands
 
@@ -501,6 +574,9 @@ Changes the design asks of other files (§14), recorded here; not edited:
 - **D-TRADE-20** First game slice (milestone 8, provisional): goods are what the game already makes (works' wares, food surplus as grain) plus crafts by craftsmen until the craft buildings make wares; trade value is scaled into the treasury's gold (`trade.game.value_scale`, so the world's trade income in 1444 is about the old flat Trade line) and so are purses; trader gold and upkeep use the works' gold scale. Trade runs once a month on its first day. Kinds in the slice: pack and camel caravans, river barges and the cog. The AI reroutes a twelfth of its traders each month, and only realms with starting traders found more, at most twice as many. Tolls, pacts, embargoes, risks, lords' traders and the other ships wait on their contexts. The smallest slice that replaces the flat line with traders the player steers.
 - **D-TRADE-21** Routes are a start and an end (Leroy, 18 October): the player sets only where a trader starts and where it goes, never the way or stops between; the planner finds the way there and back, drawn toward the most populated land (each land province's days divided by 1 + `route.busy_weight` × its people over the world's average, at most `route.busy_cap` times), since busy land is where trade is. The loop mode goes, there and back is the default, once stays. The 1444 routes are each a start and an end (the old multi-stop ones split into pairs). Supersedes TRADE-050's 2 to 8 stops.
 
+- **D-TRADE-22** Honest estimates (trade rework, 19 October): the playtest found the screens' "about x a month" 30 % to 300 % above what traders brought, since it ignored crowding and let the purse overfill on long loops. The estimate now walks the loop with its purse and last month's crowding (TRADE-147), and better routes are offered only on that estimate (TRADE-148). Without an honest number, suggestions and the AI's reroute mislead.
+- **D-TRADE-23** Home slots (trade rework, 19 October, Leroy chose A of three): the playtest saw France found 121 caravans for +114 gold a month, as upkeep (0.1) was a twentieth of a poor route. Rather than stronger crowding (B, spam still pays) or leaving the numbers (C), each city homes 1 trader per market step (a fair 2, a trading house 4) and a port 1 more, upkeep is four times and founding three times what it was. A poor long route then loses money, so better routes and Dismiss matter. The AI's keep bar went from 4 to 1 times upkeep so the same routes are kept.
+
 ## 14. Traceability
 
 | Requirement | Feature file | Scenario |
@@ -530,3 +606,6 @@ Changes the design asks of other files (§14), recorded here; not edited:
 | TRADE-128 | deposits.feature, start-ai-performance.feature | A heritage lever on deposits; The heritage lever trader_count |
 | TRADE-129 … TRADE-140 | — | Engine: packages/engine/test/trade.test.ts (goods, value, stops, the month, ratios, the Trade line, founding, routes, dismissing, the start, the AI, saves) |
 | TRADE-141 … TRADE-145 | — | Presentation: apps/client/src/ui/trade.ts, the Trade tab, route bar and lens; screenshots from apps/client/scripts/trade-shots.mjs |
+| TRADE-146 … TRADE-152 | — | Engine: packages/engine/test/trade.test.ts (following and steering a trader: where it walks and its sources, the honest estimate, better routes, options while choosing, the realm's sums, the map feed, saves) |
+| TRADE-153 … TRADE-158 | — | Presentation: apps/client/src/ui/trade.ts, the trader card, its way on the map, the Trade tab overview, banking on the map |
+| TRADE-159 … TRADE-161 | — | Engine: packages/engine/test/trade.test.ts (founding: home slots, upkeep and founding gold); presentation: apps/client/src/ui/trade.ts, Found a trader |

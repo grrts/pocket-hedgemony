@@ -19,6 +19,16 @@ const check = (ok, what) => {
 };
 const ready = (page) => page.waitForFunction(() => globalThis.__phDiagnostics?.engineRoundTripMs != null, null, { timeout: 30000 });
 const mpState = (page) => page.evaluate(() => globalThis.__phMp());
+// Answers whatever the week asks first (an event, a revolution): Ready waits for it, as End turn does.
+const ready_ = async (page) => {
+  for (let k = 0; k < 6; k++) {
+    const opt = page.locator("#event-card:not([hidden]) [data-event-option]");
+    if (!(await opt.count())) break;
+    await opt.first().click().catch(() => {});
+    await page.waitForTimeout(300);
+  }
+  await page.click(".end-turn");
+};
 
 async function hotseat(device, name) {
   const context = await browser.newContext({ ...devices[device] });
@@ -81,11 +91,18 @@ async function online() {
   await b.waitForFunction(() => globalThis.__phMp()?.turn === 0, null, { timeout: 60000 });
   check((await mpState(a)).hash === (await mpState(b)).hash, "online: both devices start from the same world");
   for (let week = 1; week <= 3; week++) {
-    await a.click(".end-turn");
+    await ready_(a);
     await a.waitForFunction(() => globalThis.__phMp()?.waiting === true);
     if (week === 1) await a.screenshot({ path: `${out}/online-3-waiting.png` });
-    await b.click(".end-turn");
-    await a.waitForFunction((w) => globalThis.__phMp()?.turn === w && !globalThis.__phMp()?.waiting, week, { timeout: 90000 });
+    await ready_(b);
+    await a.waitForFunction((w) => globalThis.__phMp()?.turn === w && !globalThis.__phMp()?.waiting, week, { timeout: 90000 }).catch(async (e) => {
+      // What each device shows when the week does not come: the cards, the states.
+      for (const [n, p] of [["a", a], ["b", b]]) {
+        await p.screenshot({ path: `${out}/stuck-${n}.png` });
+        console.log(n, JSON.stringify(await mpState(p)));
+      }
+      throw e;
+    });
     await b.waitForFunction((w) => globalThis.__phMp()?.turn === w && !globalThis.__phMp()?.waiting, week, { timeout: 90000 });
     const [sa, sb] = [await mpState(a), await mpState(b)];
     check(sa.hash === sb.hash && !sa.outOfStep && !sb.outOfStep, `online week ${week}: both devices agree (${sa.hash} / ${sb.hash})`);
@@ -101,7 +118,12 @@ async function online() {
   await c.screenshot({ path: `${out}/online-5-your-games.png` });
   await c.click("[data-mp-rejoin]");
   await c.waitForFunction(() => globalThis.__phMp()?.turn === 3, null, { timeout: 120000 });
-  check((await mpState(c)).hash === (await mpState(a)).hash, "online: a device coming back catches up to the same world");
+  await c.waitForTimeout(1500);
+  // The table as it stands, to replay in the engine when a device comes back out of step.
+  const table = await a.evaluate(() => Object.fromEntries(Object.keys(localStorage).filter((k) => k.startsWith("ph-mp:")).map((k) => [k, JSON.parse(localStorage.getItem(k))])));
+  (await import("node:fs")).writeFileSync(`${out}/table.json`, JSON.stringify(table));
+  const [sc, sa] = [await mpState(c), await mpState(a)];
+  check(sc.hash === sa.hash, `online: a device coming back catches up to the same world (${sc.hash} / ${sa.hash}; ${JSON.stringify(sc.hashes)} vs ${JSON.stringify(sa.hashes)}; ${sc.outOfStep})`);
   await context.close();
 }
 

@@ -15,7 +15,9 @@ let failed = false;
 
 /** A finger's tap: down, held as long as a real one, then up. */
 async function press(selector) {
-  const box = await page.locator(selector).boundingBox();
+  // While the week plays the panel is redrawn each day, so the button can be between two drawings: take the next one.
+  let box = null;
+  for (let k = 0; k < 10 && !box; k++) box = await page.locator(selector).boundingBox({ timeout: 1000 }).catch(() => null);
   const touchPoints = [{ x: box.x + box.width / 2, y: box.y + box.height / 2 }];
   await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints });
   await page.waitForTimeout(150);
@@ -46,10 +48,14 @@ async function check(name, open) {
   console.log(`${ok ? "PASS" : "FAIL"} ${name}`);
 }
 
+const SECTION = { general: "Realm", government: "Realm", heritage: "Realm", score: "Realm", treasury: "Economy", trade: "Economy", food: "Economy", provinces: "Lands", officials: "Lands", lords: "Lands", colonies: "Lands", military: "Military", navy: "Military", diplomacy: "Diplomacy", learning: "Research", peoples: "Research" };
 const realm = (tab) => async () => {
   await page.tap(".hud .realm");
   await page.waitForTimeout(300);
-  if (tab) await page.tap(`[data-realm-tab=${tab}]`);
+  // Your realm's pages sit inside its six sections (SHELL-165): open the section first.
+  if (tab) await page.evaluate((t) => document.querySelector(`#panel [data-realm-section=${t.section}]`)?.click(), { section: SECTION[tab] });
+  if (tab) await page.waitForTimeout(200);
+  if (tab && (await page.$(`[data-realm-tab=${tab}]`))) await page.tap(`[data-realm-tab=${tab}]`);
 };
 const then = (...steps) => async () => {
   for (const step of steps) {

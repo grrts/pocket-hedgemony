@@ -1,14 +1,16 @@
 import { describe, expect, it } from "vitest";
 import { loadDefaultRuleset } from "@ph/rules";
-import { loadMapTiles } from "../src/node/mapTiles.ts";
+import { fileURLToPath } from "node:url";
+import { decodeRgb, loadMapTiles } from "../src/node/mapTiles.ts";
+import { groundOfCell, landGrid, LandGridScan, WATER } from "../src/tiles.ts";
 import {
-  animatedFigures, bandFade, detailBands, figureArms, figureCount, figuresLeft, formation, hamletCount, hamletSpots, hullCount, hullsInPort,
+  animatedFigures, bandFade, detailBands, figureArms, figureCount, figuresLeft, formation, hamletCount, hamletSpots, hullCount, hullsInPort, berthSpots,
   kindOfByte, linksOfByte, livingBand, neighbours4, pieceLabels, pieceUnit, roadGrade, roadLines, roadPath, settlementBytes, tapBox, tapTarget,
   tileDistance, townCells, townFootprint, townGrowthOrder, townPeopleThousands, townPlan, townsToRefresh, traderFigure, traderOnLeg, wallEdges, worksSpot, changedBox,
 } from "../src/domain/map-presentation/index.ts";
 
 const rules = loadDefaultRuleset();
-const grid = loadMapTiles(rules);
+const grid = landGrid(loadMapTiles(rules));
 const idx = (id: string): number => {
   const i = rules.provinces.findIndex((p) => p.name === id);
   if (i < 0) throw new Error(`no province ${id}`);
@@ -46,8 +48,8 @@ describe("living map: towns", () => {
   it("counts the town classes and sizes a town by the root of its people", () => {
     expect(townPeopleThousands({ craftsmen: 10, "market folk": 4, clergy: 1, clerks: 1, scholars: 0.5, farmers: 90 })).toBe(16.5);
     expect(townCells(0.2)).toBe(1);
-    expect(townCells(16)).toBe(4);
-    expect(townCells(300)).toBe(17);
+    expect(townCells(16)).toBe(6);
+    expect(townCells(300)).toBe(26);
     expect(townCells(5000)).toBe(30);
   });
 
@@ -57,7 +59,7 @@ describe("living map: towns", () => {
     expect(order[0]).toBe(grid.centre[toledo]);
     expect(new Set(order).size).toBe(order.length);
     for (const t of order) {
-      expect(grid.province[t]).toBe(toledo + 1);
+      expect(grid.provinceAt(t)).toBe(toledo + 1);
       expect(tileDistance(grid, order[0]!, t)).toBeLessThanOrEqual(8);
     }
     const set = new Set<number>([order[0]!]);
@@ -79,7 +81,7 @@ describe("living map: towns", () => {
   it("seeds a town on land when the centre point is in the sea", () => {
     const genova = idx("Genova");
     const seed = grid.centre[genova]!;
-    expect(grid.province[seed]).toBe(genova + 1);
+    expect(grid.provinceAt(seed)).toBe(genova + 1);
   });
 
   it("refreshes footprints once a game month, only where the cell count changed", () => {
@@ -115,7 +117,7 @@ describe("living map: hamlets, works and roads", () => {
     const spots = hamletSpots(grid, p, 3, fp.tiles);
     expect(spots.length).toBeGreaterThan(0);
     for (const h of spots) {
-      expect(grid.province[h]).toBe(p + 1);
+      expect(grid.provinceAt(h)).toBe(p + 1);
       for (const t of [...fp.tiles, ...spots.filter((s) => s !== h)]) expect(tileDistance(grid, h, t)).toBeGreaterThanOrEqual(4);
     }
     expect(hamletSpots(grid, p, 3, fp.tiles)).toEqual(spots);
@@ -125,7 +127,7 @@ describe("living map: hamlets, works and roads", () => {
     const p = idx("Toledo");
     const t = worksSpot(grid, p, "mine", new Set());
     expect(t).not.toBeNull();
-    expect(grid.province[t!]).toBe(p + 1);
+    expect(grid.provinceAt(t!)).toBe(p + 1);
   });
 
   it("grades a road by the lower road step of its two ends", () => {
@@ -142,7 +144,7 @@ describe("living map: hamlets, works and roads", () => {
     for (const r of roads) {
       expect(r.path[0]).toBe(r.from);
       expect(r.path.at(-1)).toBe(r.to);
-      for (const t of r.path) expect(grid.province[t]).toBeGreaterThan(0);
+      for (const t of r.path) expect(grid.provinceAt(t)).toBeGreaterThan(0);
       for (let i = 1; i < r.path.length; i++) expect(neighbours4(grid, r.path[i - 1]!)).toContain(r.path[i]);
     }
   });
@@ -212,6 +214,15 @@ describe("living map: figures, hulls and movers", () => {
     expect(hullCount(80, "living")).toBe(8);
     expect(hullCount(12, "street")).toBe(12);
     expect(hullsInPort(5, 3)).toEqual({ atBerth: 3, waiting: 2 });
+    // Genova's waterfront: berths on water next to the town, a berth every other water pixel, the docks' first.
+    const fp = townFootprint(grid, idx("Genova"), 12);
+    const plan = townPlan(grid, fp, { coastal: true, harbour: true });
+    const docks = [...plan.special].find(([, k]) => k === "docks")?.[0];
+    const town = docks === undefined ? fp.tiles : [docks, ...fp.tiles.filter((t) => t !== docks)];
+    const berths = berthSpots(grid, town);
+    expect(berths.length).toBeGreaterThan(0);
+    for (const b of berths) expect(groundOfCell(grid.cellAt(b))).toBe(WATER);
+    if (plan.piers.length) expect(plan.piers).toContain(berths[0]);
   });
 
   it("stands a trader on its leg's tiles by the share of the way walked, as an army steps", () => {
@@ -250,5 +261,23 @@ describe("living map: plates, taps and budget", () => {
     const pieces = [{ distance: 5, n: 40 }, { distance: 1, n: 30 }, { distance: 9, n: 20 }];
     const moving = animatedFigures(pieces, (p) => p.n);
     expect([...moving].map((p) => p.distance).sort()).toEqual([1, 9]);
+  });
+});
+
+describe("LandGridScan", () => {
+  it("scanned a few rows at a time, finds the same centres and bounds as the whole tile grid", () => {
+    const rules = loadDefaultRuleset();
+    const tiles = loadMapTiles(rules);
+    const terrain = decodeRgb(fileURLToPath(new URL("../../../apps/client/public/map/terrain.png", import.meta.url))).rgb;
+    const ids = decodeRgb(fileURLToPath(new URL("../../../apps/client/public/map/provinces.png", import.meta.url))).rgb;
+    const scan = new LandGridScan(rules, tiles.width, tiles.height, (t) => (ids[t * 3]! << 16) | (ids[t * 3 + 1]! << 8) | ids[t * 3 + 2]!, terrain);
+    let passes = 0;
+    while (!scan.scan(97)) passes++;
+    expect(passes).toBeGreaterThan(1);
+    const g = scan.grid();
+    expect(Array.from(g.centre)).toEqual([...tiles.centre]);
+    expect(Array.from(g.bounds)).toEqual([...tiles.bounds]);
+    const t = tiles.centre[0]!;
+    expect([g.provinceAt(t), g.cellAt(t)]).toEqual([tiles.province[t], tiles.cell[t]]);
   });
 });

@@ -1,12 +1,13 @@
 import { effectInPlay, IN_PLAY, LEVEL_RANK, RISK_DIMENSIONS, type HeritageLine, type HeritageView, type RealmAssessment, type RealmStrengths } from "@ph/engine";
 import { icon, type IconName } from "../art/ui.ts";
+import { START_YEAR } from "@ph/rules/start";
 
 /**
  * A realm's national strengths on its card (national-strengths HER-080..085):
  * one Heritage line on the General tab, and the Heritage tab with what is in
  * play: the birthright (or dormant), each golden age's state and its years toward
- * a mark, the weakness, the player's three ambitions (hidden or hinted, with
- * warmth) and the legacies earned; each row opens on a tap to its full text,
+ * a mark, the weakness, the player's three ambitions (each goal with its
+ * progress, the reward only named, X-27) and the legacies earned; each row opens on a tap to its full text,
  * its history note and what the game applies. Under them the catalogue's
  * assessments as five-step bars.
  */
@@ -57,7 +58,7 @@ const SETS: Record<string, string> = {
 
 const LEVEL_WORD: Record<string, string> = { very_low: "very low", low: "low", moderate: "moderate", high: "high", very_high: "very high", unknown: "unknown" };
 
-/** The General tab's one line, the overview at a glance (HER-070, HER-081): birthright, golden ages active, the three hidden ambitions and the weakness, opening the Heritage tab. */
+/** The General tab's one line, the overview at a glance (HER-070, HER-081, HER-086): birthright, golden ages active, the progress of each open ambition and the weakness, opening the Heritage tab. */
 export function heritageLine(s: RealmStrengths, v: HeritageView | null = null): string {
   const h = s.heritage;
   if (!h) return `<dt>Heritage</dt><dd><button class="paper" data-realm-open-tab="heritage">${s.assessments.length ? "Assessment only" : "Not recorded"}</button></dd>`;
@@ -65,7 +66,7 @@ export function heritageLine(s: RealmStrengths, v: HeritageView | null = null): 
   const bits = [
     v?.ask ? "<b>a choice waits</b>" : "",
     awake ? `${awake} golden age${awake === 1 ? "" : "s"} active` : "",
-    !v?.sealed ? "" : v.ambitions ? `${v.ambitions.filter((a) => a.state === "stirred").length} of ${v.sealed} ambitions hinted` : `${v.sealed} ambitions hidden`,
+    !v?.open ? "" : v.ambitions ? `ambitions ${v.ambitions.filter((a) => a.state === "open" && a.progress).map((a) => `${a.progress!.have}/${a.progress!.need}`).join(" · ")}` : `${v.open} ambition${v.open === 1 ? "" : "s"}`,
     v?.legacies.length ? `${v.legacies.length} legac${v.legacies.length === 1 ? "y" : "ies"}` : "",
     h.burden && v?.burden?.state !== "shed" ? `weakness: ${esc(h.burden.name)}` : "",
   ].filter(Boolean);
@@ -127,37 +128,36 @@ const THEME: Record<string, [IconName, string]> = {
   wealth: ["coin", "wealth"],
 };
 
-const WARMTH: Record<string, number> = { cold: 1, warm: 2, hot: 3 };
-
-/** The player's ambitions: three of them, hidden or hinted, and those fulfilled or lost (HER-016..024). */
+/** The player's ambitions (HER-016..024, X-27): each goal in plain words with its progress, the reward only by its legacy's name; under them those fulfilled or lost. */
 function ambitionsSection(v: HeritageView, gold: number): string {
   const all = v.ambitions ?? [];
-  const open = all.filter((a) => a.state === "sealed" || a.state === "stirred");
+  const open = all.filter((a) => a.state === "open");
   const past = all.filter((a) => a.state === "done" || a.state === "lost");
   const counsel = v.counsel!;
-  const seal = (a: (typeof all)[number]) => {
+  const aim = (a: (typeof all)[number]) => {
     const [ic, theme] = THEME[a.theme] ?? ["scroll", a.theme];
-    const warmth = a.state === "stirred" && a.warmth && a.warmth !== "done"
-      ? `<span class="warm-box"><span class="warmth ${a.warmth}" role="img" aria-label="${a.warmth}">${[1, 2, 3].map((k) => `<i class="${WARMTH[a.warmth!]! >= k ? "on" : ""}"></i>`).join("")}</span> <small>${a.warmth}</small></span>`
-      : "";
-    const ask = a.state === "sealed"
-      ? counsel.nextYear === null
-        ? `<button class="paper counsel" data-heritage-counsel="${esc(a.id)}" title="Pay to reveal this ambition: it shows its warmth and the legacy it promises"${gold < counsel.gold ? " disabled" : ""}>${icon("coin", 1)}Ask court · ${counsel.gold}</button>`
-        : `<small class="later">court again in ${counsel.nextYear}</small>`
-      : "";
-    return `<li class="seal ${a.state}">
+    const p = a.progress ?? { have: 0, need: 1 };
+    const pct = Math.round((Math.min(p.have, p.need) / p.need) * 100);
+    const notes = [`promises <b>${esc(a.legacy)}</b>${a.great ? " (a great legacy)" : ""}`, a.deadline ? `by ${a.deadline}` : "", a.near ? "<b>within reach</b>" : ""].filter(Boolean);
+    const ask =
+      counsel.nextYear === null
+        ? `<button class="paper counsel" data-heritage-counsel="${esc(a.id)}" title="Set this ambition aside: the court draws another in its place"${gold < counsel.gold ? " disabled" : ""}>${icon("coin", 1)}New aim · ${counsel.gold}</button>`
+        : "";
+    return `<li class="aim${a.near ? " near" : ""}">
       <span class="theme" title="${theme}">${icon(ic, 2, theme)}</span>
-      <span class="what"><i>“${esc(a.hint)}”</i>
-        ${a.state === "stirred" ? `<small>Hinted · promises <b>${esc(a.legacy ?? "")}</b>${a.deadline ? ` · by ${a.deadline}` : ""}</small>` : `<small>Hidden</small>`}
+      <span class="what"><b>${esc(a.name)}</b>
+        <span class="goal">${esc(a.goal)}</span>
+        <span class="progress"><span class="meter" role="img" aria-label="${p.have} of ${p.need}"><i style="width:${pct}%"></i></span> <b>${p.have}/${p.need}</b></span>
+        <small>${notes.join(" · ")}</small>
       </span>
-      ${warmth}${ask}
+      ${ask}
     </li>`;
   };
   return `<h3 class="sub">Ambitions</h3>
-    <p class="hint">Hidden goals: only a riddle shows. An ambition is revealed when the world moves toward it, or when you pay the court to reveal it; warmth shows how near you are.</p>
-    <ul class="seals">${open.map(seal).join("") || `<li class="hint">No ambitions left to draw.</li>`}</ul>
+    <p class="hint">Three goals at a time. Each promises a legacy by name; what it gives stays secret until you fulfil it.${counsel.nextYear === null ? " For gold, the court sets one aside and finds you another." : ` The court can find you a new aim again in ${counsel.nextYear}.`}</p>
+    <ul class="aims">${open.map(aim).join("") || `<li class="hint">No ambitions left to draw.</li>`}</ul>
     ${past.length ? `<details class="heritage-part past"><summary><span class="kind">Past</span><b>${past.length} ambition${past.length === 1 ? "" : "s"} settled</b></summary><ul class="past-list">${past
-      .map((a) => `<li>${a.state === "done" ? "Fulfilled" : "Lost"}: ${esc(a.plainGoal ?? "")}</li>`)
+      .map((a) => (a.state === "done" ? `<li>Fulfilled: ${esc(a.name)}. <b>${esc(a.legacy)}</b>: ${esc(a.reward ?? "")}</li>` : `<li>Lost: ${esc(a.name)}. ${esc(a.goal)}</li>`))
       .join("")}</ul></details>` : ""}`;
 }
 
@@ -200,7 +200,7 @@ export function heritageTab(s: RealmStrengths, v: HeritageView | null = null, go
        }).join("")}
        ${h.burden ? part("Weakness", h.burden, burdenShed ? `<span class="chip">overcome</span> now ${esc(v!.burden!.turned.name)}` : v ? `<span class="chip">held</span> until overcome` : "until overcome", burdenShed ? "off" : "") : ""}`
     : `<p class="hint">No heritage is recorded for this realm yet.</p>`;
-  const ambitions = !v || !h ? "" : v.ambitions ? ambitionsSection(v, gold) : `<h3 class="sub">Ambitions</h3><p class="hint">${v.sealed ? `${v.sealed} ambitions, hidden: their court keeps them secret.` : "No ambitions left."}</p>`;
+  const ambitions = !v || !h ? "" : v.ambitions ? ambitionsSection(v, gold) : `<h3 class="sub">Ambitions</h3><p class="hint">${v.open ? `${v.open} ambition${v.open === 1 ? "" : "s"}: their court keeps them to itself.` : "No ambitions left."}</p>`;
   const legacies = !v || !h ? "" : `<h3 class="sub">Legacies <small>${v.legacies.length} of 5</small></h3>${
     v.legacies.length
       ? v.legacies.map((l) => part(l.great ? "Great legacy" : "Legacy", l)).join("")
@@ -213,12 +213,12 @@ export function heritageTab(s: RealmStrengths, v: HeritageView | null = null, go
           .map(([dim, label]) => bar(byDim.get(dim)!, label))
           .join("")}</ul></section>`,
       ).join("")
-    : `<p class="hint">The chronicles say little of this realm in 1444.</p>`;
+    : `<p class="hint">The chronicles say little of this realm in ${START_YEAR}.</p>`;
   return `<h3 class="sub">Heritage</h3>
     <div class="heritage">${parts}</div>
     ${ambitions}
     ${legacies}
-    <h3 class="sub">In 1444</h3>
+    <h3 class="sub">In ${START_YEAR}</h3>
     <p class="hint">How the chronicles judge the realm at the start, and what each sets it off with; a question mark where they are unsure, and there the start varies more between campaigns.</p>
     <div class="assessment-groups">${standing}</div>`;
 }

@@ -21,6 +21,6 @@ export const AGGRESSION = raw.aggression as AggressionRow[];
 export const regionData = regions as {
   macro_regions: string[];
   parents: Record<string, string | null>;
-  ages: Record<string, { regions: string[]; force_start: number | null; force_end: number | null }>;
+  ages: Record<string, { regions: string[]; earliest_start: number | null; force_start: number | null; force_end: number | null }>;
   polities_1444: Record<string, string>;
 };

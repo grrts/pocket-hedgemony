@@ -1,0 +1,339 @@
+<h1>Trade</h1>
+<p>Trade in Pocket Hegemony is carried by units you own and steer: caravans, barges, wagon trains and rail freight on land, and trade ships at sea. You give each trader a route between cities; every province it walks through gets busier, it collects value into its purse in every province it enters, and it empties that purse into your treasury when it reaches a city of your own. You can watch the gold travel home.</p>
+<h2 id="how-it-works"><a class="anchor" href="#how-it-works" aria-label="Link to this section">#</a>How it works</h2>
+<h3 id="the-idea-in-one-card"><a class="anchor" href="#the-idea-in-one-card" aria-label="Link to this section">#</a>The idea in one card</h3>
+<pre><code> CARAVAN OF TROYES                         France · pack caravan · 50 market folk
+ Route   Troyes ▸ Geneva and back                       38 days · repeats
+ Now     Langres, day 12 of 19 to Geneva
+ Purse   ██████░░░░  6.1 / 10 gold                         deposits at Troyes
+ Last    collected 0.6 in Langres · 0.5 at Geneva (after a 0.05 market fee) · toll 0.2 at the Jura pass
+ Danger  low (no war on the road; bandits near Dijon: 1 in 20 a month)
+ Upkeep  0.5 gold a month
+</code></pre>
+<ol>
+<li><strong>Found a trader</strong> in one of your cities with a market.</li>
+<li><strong>Set its route</strong> by tapping where it starts and where it goes. The way between them is found for you, through the most populated land.</li>
+<li>Every province the trader passes <strong>gets busier</strong>: its trade ratio rises, more with more traders, yours and everyone else&#39;s.</li>
+<li>In <strong>every province it enters</strong>, it <strong>collects</strong> a share of that province&#39;s trade value, times its trade ratio, into its purse.</li>
+<li>When it reaches <strong>a city of your own country</strong>, it <strong>deposits</strong> the purse into your treasury.</li>
+</ol>
+<h3 id="traders-and-trade-ships"><a class="anchor" href="#traders-and-trade-ships" aria-label="Link to this section">#</a>Traders and trade ships</h3>
+<p>Each trader is one unit on the map with a kind, a home city, a crew, a route, a purse, a hold, a position and progress toward the next province. Without a route it goes to its home city.</p>
+<p><strong>Gaining traders:</strong></p>
+<ul>
+<li><strong>Found</strong> a land trader in one of your cities with a market, or in a trading post once you know T8. You pay its founding gold up front, and its crew leaves the home province&#39;s job slots like a levy.</li>
+<li><strong>Ships</strong>: buy a ship in a port with enough sailors (see <a href="/wiki/Naval">Naval</a>) and set it to Trade, or turn a cog, junk, dhow, carrack or galleon to trade. Caravels cannot trade.</li>
+<li>Capture in war (an army taking a caravan may keep it), a lord&#39;s gift, or an event.</li>
+</ul>
+<p><strong>Losing traders:</strong> dismissing one removes it and its crew overflow into the emptiest slots of its home. If a trader&#39;s or trade ship&#39;s upkeep is unpaid for 6 months, it is lost and its crew leave. A trade ship pressed into war stops trading and keeps its purse until it next reaches one of your ports.</p>
+<p>Upkeep is charged every month, even with an empty purse and no route. <strong>Each city homes a few traders</strong>: 1 with a weekly market, 2 with a yearly fair, 4 with a trading house, and 1 more with a harbour. To run more, found them in more cities or build up the market.</p>
+<p><strong>Lords</strong> run their own traders from their own cities with their own wealth. They deposit into the lord&#39;s wealth, and you can see them but not steer them.</p>
+<h3 id="kinds-of-land-trader"><a class="anchor" href="#kinds-of-land-trader" aria-label="Link to this section">#</a>Kinds of land trader</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Kind</th><th>Era</th><th>Moves on</th><th>Step days (× army)</th><th>Hold</th><th>Purse</th><th>Crew</th><th>Found</th><th>Upkeep a month</th><th>Needs</th></tr></thead>
+<tbody>
+<tr><td>Pack caravan</td><td>I</td><td>Land</td><td>×0.75</td><td>×1</td><td>10</td><td>50 market folk</td><td>15</td><td>0.5</td><td>A market (yearly fair)</td></tr>
+<tr><td>Camel caravan</td><td>I</td><td>Land; desert and drylands at half step days</td><td>×0.75, desert ×0.5</td><td>×1.5</td><td>15</td><td>50 market folk</td><td>20</td><td>0.6</td><td>T1, or a desert or drylands home (at start in the Middle East, Central Asia and the Sahel)</td></tr>
+<tr><td>River barge</td><td>I</td><td>Along its navigable river only</td><td>×0.4</td><td>×1.5</td><td>15</td><td>50 market folk</td><td>15</td><td>0.4</td><td>A river shore tile at home</td></tr>
+<tr><td>Wagon train</td><td>IV</td><td>Land with at least a road</td><td>×0.6</td><td>×2</td><td>25</td><td>80 market folk</td><td>30</td><td>0.8</td><td>B9 <em>Turnpike roads</em> and a paved road or better at home</td></tr>
+<tr><td>Rail freight</td><td>V</td><td>Along the railway</td><td>rail days</td><td>×6</td><td>80</td><td>120 craftsmen</td><td>80</td><td>2</td><td>A rail station at both ends of each leg</td></tr>
+</tbody></table></div>
+<p>Land traders move by the same step-day rules as armies on <a href="/wiki/Troop-Movement">Troop Movement</a> (ground, road, river, season, passes), times their kind&#39;s factor, with no guns, no column penalty and no march orders.</p>
+<h3 id="trade-ships"><a class="anchor" href="#trade-ships" aria-label="Link to this section">#</a>Trade ships</h3>
+<p><a href="/wiki/Naval">Naval</a> owns which ships exist, what they cost and their crews; trade gives each trading type its hold, purse and upkeep:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Ship type</th><th>Hold</th><th>Purse</th><th>Upkeep while trading a month</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>Cog, junk, dhow</td><td>×2</td><td>30</td><td>1</td><td>The trade ship everywhere at the start</td></tr>
+<tr><td>Merchant galley</td><td>×2</td><td>25</td><td>2</td><td>Enclosed seas only</td></tr>
+<tr><td>Caravel</td><td>×1</td><td>20</td><td>1</td><td>Small and fast; more explorer than trader</td></tr>
+<tr><td>Carrack</td><td>×3</td><td>50</td><td>1.5</td><td>Ocean-going</td></tr>
+<tr><td>Galleon</td><td>×3</td><td>60</td><td>2</td><td>Can defend itself</td></tr>
+<tr><td>Fluyt, merchantman</td><td>×4</td><td>70</td><td>1.5</td><td>Cheap crew, can&#39;t fight (if naval adds it)</td></tr>
+<tr><td>Steamer (S13)</td><td>×6</td><td>150</td><td>3</td><td>Ignores wind; needs a port with coal on the route</td></tr>
+</tbody></table></div>
+<p>Ships move by the sea-zone step days, enter <strong>port provinces only</strong>, and collect only on entering a port, never in sea zones. A Venetian galley sailing through the Adriatic to Corfu collects nothing at sea and collects on entering Corfu.</p>
+<h3 id="trade-value"><a class="anchor" href="#trade-value" aria-label="Link to this section">#</a>Trade value</h3>
+<p>Every province has three numbers: <strong>trade value</strong>, <strong>trade ratio</strong> and <strong>traders passing</strong> (sea zones keep the last two).</p>
+<pre><code>trade value (gold a month) = goods value × (1 + building weights) / 12
+goods value                = wares made in the province this year (loads) × price per load
+</code></pre>
+<p>Only wares actually made count: burned and fallow tiles make nothing, and of food only the surplus counts.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Price tier</th><th>Gold a load</th><th>Wares</th></tr></thead>
+<tbody>
+<tr><td>Staples</td><td>1</td><td>Grain, rice, fish, salt, timber, hides, clay goods</td></tr>
+<tr><td>Raw</td><td>2</td><td>Wool, flax, cotton, iron, copper, tin, horses, saltpetre, dyes</td></tr>
+<tr><td>Finished</td><td>5</td><td>Cloth, linen, leather, tools, arms, pottery, beer and wine, paper, powder</td></tr>
+<tr><td>Luxuries</td><td>10</td><td>Silk, silk cloth, spices, pepper, sugar, tea, coffee, cocoa, tobacco, incense, ivory, porcelain, furs, gems, books</td></tr>
+<tr><td>Precious</td><td>12</td><td>Silver, gold (silver falls after the event tree&#39;s silver flood)</td></tr>
+</tbody></table></div>
+<div class="table-scroll"><table>
+<thead><tr><th>Building</th><th>Weight</th><th>Served visits a month</th></tr></thead>
+<tbody>
+<tr><td>No market</td><td></td><td>2</td></tr>
+<tr><td>Weekly market</td><td>+25 %</td><td>4</td></tr>
+<tr><td>Yearly fair</td><td>+50 %</td><td>8</td></tr>
+<tr><td>Trading house</td><td>+100 %</td><td>16</td></tr>
+<tr><td>Caravanserai</td><td>+25 % for land traders (and stops bandits)</td><td></td></tr>
+<tr><td>Warehouse</td><td>+25 %</td><td></td></tr>
+<tr><td>Harbour</td><td>+25 % for ships (needed to dock)</td><td></td></tr>
+<tr><td>Counting house</td><td>+10 % (foreign deposits)</td><td></td></tr>
+<tr><td>Bank</td><td>+25 % (foreign deposits)</td><td></td></tr>
+<tr><td>Each working craft building (loom house, forge, kiln, tannery, press, brewery)</td><td>+5 %</td><td></td></tr>
+</tbody></table></div>
+<p><strong>Troyes</strong>, making 30 cloth and 40 wool a year, with a yearly fair and 3 working loom houses: goods value 30 × 5 + 40 × 2 = 230 gold a year; building weights 0.50 + 3 × 0.05 = 0.65; trade value 230 × 1.65 / 12 ≈ <strong>31.6 gold a month</strong>.</p>
+<p>A province with no market (a village like Langres) still has a trade value, gets busier and pays traders who walk through it; it just can&#39;t be a route stop.</p>
+<h3 id="trade-ratio-how-busy-a-province-is"><a class="anchor" href="#trade-ratio-how-busy-a-province-is" aria-label="Link to this section">#</a>Trade ratio: how busy a province is</h3>
+<p>When the month&#39;s day loop ends, every province&#39;s ratio (0 to 100 %) updates:</p>
+<pre><code>gain  = 3 × traders passing × (1 − ratio / 100)
+decay = 10 % of the current ratio
+new ratio = ratio + gain − decay   (kept between 0 and 100)
+</code></pre>
+<ul>
+<li><strong>Every trader of every country</strong> counts in traders passing, once in every province it stood in during the month, whether it stopped or walked through.</li>
+<li>A trade ship sailing through a sea zone counts as <strong>half a trader</strong> in every port province on that zone&#39;s coast (a sea lane).</li>
+</ul>
+<p>Steady ratios: 1 trader a month gives about 23 %; 2 about 37 %; 5 about 60 %; 10 about 75 %; 20 about 86 %. A road nobody uses loses half its ratio in about seven months.</p>
+<p><strong>Ratio gain modifiers:</strong></p>
+<div class="table-scroll"><table>
+<thead><tr><th>Condition</th><th>Gain</th></tr></thead>
+<tbody>
+<tr><td>A customs officer in the province</td><td>+15 %</td></tr>
+<tr><td>Road one step better than every neighbour&#39;s</td><td>+10 %</td></tr>
+<tr><td>10 years of peace</td><td>+10 %</td></tr>
+<tr><td>Riots</td><td>−50 %</td></tr>
+<tr><td>Homeless over 5 %</td><td>−5 % for every 5 % homeless</td></tr>
+<tr><td>Enemy army or siege in the province</td><td>no gain that month</td></tr>
+<tr><td>Plague quarantine</td><td>ratio 0, and no trader enters</td></tr>
+<tr><td>Blockaded port</td><td>no ship enters, no sea-lane gain</td></tr>
+</tbody></table></div>
+<p>The modifiers add together (riots count as −50 %), and the total never drops below no gain.</p>
+<h3 id="collecting"><a class="anchor" href="#collecting" aria-label="Link to this section">#</a>Collecting</h3>
+<p>When a trader <strong>enters</strong> a province, it collects that day:</p>
+<pre><code>collected = trade value × trade ratio × hold × visit share (0.2) × crowding
+</code></pre>
+<ul>
+<li>It doesn&#39;t collect in the province it sets out from, or while it waits somewhere, until it enters another.</li>
+<li>A full purse collects nothing more until it deposits.</li>
+<li><strong>Market fee</strong>: collecting in another country&#39;s province pays that country 10 % of the collection, except with a trade pact. A French caravan collecting 0.55 gold abroad pays a 0.055 fee.</li>
+<li><strong>Crowding</strong>: each province serves a number of visits a month at full value (2 with no market, 4 weekly market, 8 fair, 16 trading house). After that, each further visit&#39;s collection is multiplied by served ÷ visits so far. Geneva, with a fair, serves 8; the twelfth trader that month collects 8/12 of the full amount.</li>
+</ul>
+<h3 id="routes"><a class="anchor" href="#routes" aria-label="Link to this section">#</a>Routes</h3>
+<ul>
+<li>A <strong>stop</strong> must be a <strong>city</strong>: a settlement of city or great-city size, or one with a market or trading post. Troyes with its weekly market can be a stop; Langres, a village with no market, can&#39;t; Elmina, a hamlet with a trading post, can.</li>
+<li>A route is <strong>a start and an end</strong>, two different cities. You never draw the way or add stops between them. It runs <strong>there and back</strong> (the default) or <strong>once</strong> (wait at the end for orders).</li>
+<li>The way comes from the shared route planner: fewest days by the trader&#39;s step days and where it may enter, <strong>drawn toward the most populated land</strong> (a province&#39;s days count for less the more people live there, up to three times the average), avoiding forbidden provinces, and preferring lower tolls when two paths are close (a toll counts as 2 days). Busy land is where the trade is, so a caravan goes through the towns, not around them.</li>
+<li>Every province walked through gets the ratio gain and a collection. A route from Lübeck to Bruges busies the whole coast road in between.</li>
+</ul>
+<p><strong>Route preview</strong>, before you confirm:</p>
+<pre><code> Troyes ▸ Geneva and back                           38 days
+ Collects in  14 provinces there and back · best: Geneva, Dijon, Troyes
+ Expect       about 2.4 gold a month after fees and tolls
+ Tolls        Jura pass (Burgundy, low): 0.2 a pass
+ Danger       low · bandits near Dijon
+ Crowding     Geneva: 6 of 8 visits taken this month
+</code></pre>
+<p><strong>Expect</strong> is the planned collections over one trip there and back at this month&#39;s ratios, minus fees and tolls, divided by the trip&#39;s months. Provinces you cannot see count as nothing. Red marks show embargoes, quarantines, enemy armies and passes shut by snow.</p>
+<p><strong>When a route breaks</strong> (war, a closed border, quarantine, a snowed pass, a blockade), the route is checked again. A closed way is replaced by a dashed detour if one exists, otherwise the end is skipped. A closed end (war with its owner, an embargo, a quarantine) is skipped, shows red, and the turn report says so once. If both ends are closed, the trader goes to the nearest of your cities, deposits and waits for orders.</p>
+<h3 id="deposits-and-trade-income"><a class="anchor" href="#deposits-and-trade-income" aria-label="Link to this section">#</a>Deposits and trade income</h3>
+<ul>
+<li>When a trader enters <strong>any city of your own country</strong>, stop or not, it deposits its <strong>whole purse</strong> into the treasury that day: &quot;Caravan of Troyes brought 6.1 gold to Troyes.&quot;</li>
+<li>Depositing in a <strong>lord&#39;s city</strong> pays the whole purse to the treasury, with no fee to the lord.</li>
+<li>No deposits in a city of a subject (unless the subjects design says otherwise for a kind of subject), or in one of your cities an enemy occupies.</li>
+<li>With T3 <em>Bills of exchange</em>, your traders may deposit in a foreign city with a counting house or bank that you are at peace with, paying 10 % to its owner.</li>
+</ul>
+<p><strong>Trade income</strong> = your traders&#39; deposits + market fees paid to you + tolls at your toll points. It replaces the old trade balance and merchants&#39; earnings on <a href="/wiki/Your-Realm">Your Realm</a>.</p>
+<h3 id="who-may-go-where"><a class="anchor" href="#who-may-go-where" aria-label="Link to this section">#</a>Who may go where</h3>
+<ul>
+<li>Land traders may enter your own, your lords&#39; and your subjects&#39; provinces, and those of countries at peace with you unless closed or embargoed. Trade ships the same, ports only.</li>
+<li>No trader enters a country at war with its owner, its occupied land, or a quarantined province.</li>
+<li>Land traders can cross unclaimed land but collect nothing there unless it has a trading post. They never enter sea zones.</li>
+<li>Trade ships enter only sea zones their country knows.</li>
+<li>Borders at peace need no passage.</li>
+<li><strong>Tolls</strong>: passing a toll point (bridge, ford, pass, river mouth, strait), a trader pays the owner&#39;s rate (none, low or high) from its purse. Rates are set on <a href="/wiki/Provinces">Provinces</a>.</li>
+<li><strong>Trade pact</strong>: no market fees and no tolls between the two countries, both ways.</li>
+<li><strong>Embargo</strong>: the embargoed country&#39;s traders can neither enter nor stop in the other&#39;s provinces or ports.</li>
+<li><strong>War</strong> sends traders inside enemy land at once to the nearest own or neutral city, where they may be caught.</li>
+<li>The peace term <strong>Open the roads</strong> (10 years) lets the winner&#39;s traders pass the loser&#39;s tolls free.</li>
+<li>A tributary&#39;s traders pay no tolls in its overlord&#39;s cities; a subject&#39;s traders deposit into the subject&#39;s own treasury.</li>
+</ul>
+<h3 id="risks"><a class="anchor" href="#risks" aria-label="Link to this section">#</a>Risks</h3>
+<ul>
+<li><strong>Enemy army</strong>: a trader that meets an army at war with its owner loses its purse to the army&#39;s owner and is captured (the army&#39;s owner may keep it), unless it can step back the way it came that day. By default a trader that sees an enemy army ahead waits a day and goes round.</li>
+<li><strong>Raids</strong>: an army on Raid takes the purse; the trader escapes half the time.</li>
+<li><strong>Bandits</strong>: in a province with riots, rebels or homeless over 20 %, each land trader has a 1-in-20 chance a month of its purse being stolen; halved with T1, none where there is a caravanserai or a garrisoned castle.</li>
+<li><strong>Rebels</strong> holding a province count as an enemy army.</li>
+<li><strong>Plague</strong>: a trader passing through an outbreak carries it onward.</li>
+<li><strong>At sea</strong>: a hunting fleet captures trade ships in its zone with their purses, and routes avoid zones where an enemy hunts when they can. Your warships escorting a zone protect your trade ships until the escort is beaten. A ship lost in a storm loses its purse; with T11 <em>Marine insurance</em> half is refunded. If naval adds pirates, they act as a hunting fleet with no country.</li>
+</ul>
+<h3 id="what-trade-does-elsewhere"><a class="anchor" href="#what-trade-does-elsewhere" aria-label="Link to this section">#</a>What trade does elsewhere</h3>
+<ul>
+<li><strong>Tax</strong>: tax owed in a province rises 1 % for every 4 points of its trade ratio.</li>
+<li><strong>Crafts appearing</strong>: craft buildings appear by themselves only where the trade ratio is 30 % or more.</li>
+<li><strong>Inputs</strong>: a building&#39;s input ware is supplied if it is made in the province, within reach (one ring, more with roads and rivers), or anywhere on a trader&#39;s route that passes through; otherwise the building works at half.</li>
+<li><strong>Research</strong>: when your traders deposit or collect in another country&#39;s cities, that country counts as your trade partner for invention spread (see <a href="/wiki/Research">Research</a>).</li>
+<li><strong>Food is never carried</strong> by traders; hungry cities are fed by castles (see <a href="/wiki/Your-Realm">Your Realm</a>).</li>
+</ul>
+<h3 id="inventions"><a class="anchor" href="#inventions" aria-label="Link to this section">#</a>Inventions</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Invention</th><th>Trade effect</th></tr></thead>
+<tbody>
+<tr><td>T1 Caravanserai networks</td><td>Camel caravans; bandit losses halved</td></tr>
+<tr><td>T2 Double-entry bookkeeping</td><td>Collections +10 %</td></tr>
+<tr><td>T3 Bills of exchange</td><td>Deposit abroad</td></tr>
+<tr><td>T5 Monsoon sailing calendars</td><td>Trade ships&#39; Indian Ocean storm losses halved</td></tr>
+<tr><td>T6 Merchant fairs and exchanges</td><td>The yearly fair can be built; every market serves +2 visits a month</td></tr>
+<tr><td>T8 Licensed trading companies</td><td>Overseas trading posts count as cities and can found traders</td></tr>
+<tr><td>T9 Joint-stock finance</td><td>Trade ships cost 25 % less</td></tr>
+<tr><td>T11 Marine insurance</td><td>Half a lost ship&#39;s purse refunded</td></tr>
+<tr><td>T13 Commodity exchanges</td><td>Every known province&#39;s trade value and ratio visible</td></tr>
+<tr><td>S2 Lateen and junk rigging</td><td>Trade ships&#39; hold +0.5</td></tr>
+<tr><td>S13 Steamships</td><td>Steamer trade ships</td></tr>
+<tr><td>B2, turnpikes, railways</td><td>Faster land traders</td></tr>
+</tbody></table></div>
+<p>T17 <em>Container shipping</em> is Era VIII and out of the game.</p>
+<h3 id="events"><a class="anchor" href="#events" aria-label="Link to this section">#</a>Events</h3>
+<ul>
+<li><code>trade_power</code> of a country changes its traders&#39; collections by the same share for the duration.</li>
+<li><code>trade_access</code> of a province changes its ratio gain by that share (−0.2 means −20 %).</li>
+<li><code>world_trade_index</code> changes every province&#39;s trade value by that share.</li>
+<li><code>trade_index</code> reads a country&#39;s trade income over the last 12 months as an index against 100 gold a year.</li>
+<li><code>trade_presence(who, hub, value)</code> reads a country&#39;s share of all collections in a hub&#39;s provinces over the last 12 months.</li>
+<li><code>trade_route(from_hub, to_hub, open)</code> makes a sea passage&#39;s zones known to a country for routes, or marks the link closed.</li>
+<li><code>trade_good</code> reads wares made. <strong>Hubs</strong> (Alexandria, Amsterdam, the Malacca Strait and 20 more) are named sets of provinces and sea zones used only by event triggers, never as route targets.</li>
+</ul>
+<h3 id="the-start-and-the-warm-up"><a class="anchor" href="#the-start-and-the-warm-up" aria-label="Link to this section">#</a>The start and the warm-up</h3>
+<p>Each country starts with traders by its catalogue trade access: very high 6, high 4, moderate 2, low 1, very low or unknown 0. Coastal countries with ports get trade ships, inland ones caravans or barges, in the proportion the catalogue&#39;s trade routes suggest. Starting routes are seeded from a hand-made list (Venice, Genoa, Lübeck, Florence, Mali and Timbuktu, Kilwa, Calicut and Gujarat, Malacca, Ryukyu). Before the first turn, the starting traders run for <strong>24 months</strong> so busy roads start busy. See <a href="/wiki/The-1378-Start">The 1378 Start</a>.</p>
+<h3 id="the-ai"><a class="anchor" href="#the-ai" aria-label="Link to this section">#</a>The AI</h3>
+<ul>
+<li>Scores possible routes from a trader&#39;s home to its own cities and enterable foreign cities within reach (about 12 provinces for caravans, 40 sea zones for ships) by expected gold a month after fees, tolls and crowding, minus upkeep, weighted down by danger.</li>
+<li>Founds a trader when the best unused route beats upkeep by a margin set by its personality (merchant republics found more); dismisses one whose route has lost money for a year.</li>
+<li>Reroutes once a year, and at once when a route breaks.</li>
+<li>At war, pulls traders off roads near the front and uses trade ships as transports if short of carriers.</li>
+</ul>
+<h3 id="each-turn-each-month-and-keeping-it-fast"><a class="anchor" href="#each-turn-each-month-and-keeping-it-fast" aria-label="Link to this section">#</a>Each turn, each month, and keeping it fast</h3>
+<ol>
+<li><strong>During the day loop</strong> (the 7 days of each weekly turn): traders move; on entering a province they count as passing, collect (with crowding), pay fees and tolls, meet risks, and deposit in your cities.</li>
+<li><strong>After the day loop, in the turn a new month begins</strong>: every touched province&#39;s and sea zone&#39;s ratio updates.</li>
+<li>Trader upkeep is charged and unpaid months counted.</li>
+<li>Every turn, the turn report gets one deposits line for the week and lines for problems.</li>
+</ol>
+<p>Yearly: trade value is worked out again with the year&#39;s wares (and also on events or burned tiles); the AI reroutes and dismisses.</p>
+<p>On a phone, each province and sea zone stores only its ratio and traders passing; each trader about 12 small numbers. Paths are cached per city pair and cleared only when something on them changes, and ratios on quiet roads decay lazily (×0.9 for each untouched month).</p>
+<h2 id="what-you-see"><a class="anchor" href="#what-you-see" aria-label="Link to this section">#</a>What you see</h2>
+<ul>
+<li><strong>The trader card</strong> (above): kind, crew, route and its days there and back, position, purse bar, last collections, fees and tolls, danger and upkeep.</li>
+<li><strong>Found a trader</strong>: Trade, Found a trader, choose a kind, from a city with a market. Ships are bought on the port screen and switched to Trade.</li>
+<li><strong>Setting a route</strong>: tap where it starts, then where it goes (another tap moves where it goes), and tap the end again to finish; the preview updates with each tap; then Confirm. You can copy another trader&#39;s route.</li>
+<li><strong>The Trade screen</strong>: every trader and trade ship with kind, route, purse, last deposit, expected gold a month and problems, sortable by gold a month.</li>
+<li><strong>Turn report</strong>: deposits summed into one line (&quot;Traders brought 23 gold this week&quot;); only problems (robbed, route broken, ship taken) get their own line.</li>
+<li><strong>On the map</strong>: at world zoom the Trade map mode coloured by trade ratio and the busiest roads and sea lanes; at region zoom thicker roads with more traders, trader icons (caravan, barge, ship) with a purse bar, and a coin on market cities; at local zoom caravans, barges and ships moving. Map modes: <strong>Trade ratio</strong>, <strong>Trade value</strong> and <strong>Traders</strong> (your traders and routes). See <a href="/wiki/Map-and-Lenses">Map and Map Modes</a>.</li>
+</ul>
+<h3 id="in-the-game-now"><a class="anchor" href="#in-the-game-now" aria-label="Link to this section">#</a>In the game now</h3>
+<p>Trade runs in the game as a first slice: traders you own walk there and back between two cities, and what they bring home is your <strong>Trade</strong> line in the treasury. The old flat trade sum from a province&#39;s wealth is gone.</p>
+<ul>
+<li><strong>Goods.</strong> Each January every province counts what it makes: the wares of its works (timber and furs, stone, ore, salt, wool and hides), the food it does not eat (as grain), and crafts made by its craftsmen (finished goods, until the loom houses and forges make their own). Priced by tier, with a market&#39;s weight added, that is its <strong>trade value</strong> in gold a month. A harbour adds its weight for ships.</li>
+<li><strong>Trade stops.</strong> A city, or any town with a market, is a stop for caravans and barges; a port with a harbour is a stop for ships.</li>
+<li><strong>Traders.</strong> Pack caravans, camel caravans (from desert or drylands, or with Caravanserai networks), river barges (on rivers only) and the cog. Each walks its way there and back a month at a time: every province it stands in gets busier, it collects as it enters (10 % to the owner of a foreign province, nothing on unclaimed land) and it empties its purse in every city of yours it reaches. Its upkeep is paid each month; six months unpaid and it is given up.</li>
+<li><strong>Trade ratio.</strong> Each month a province&#39;s ratio rises with the traders passing (a customs officer helps, riots hurt, an enemy or a siege stops it) and loses a tenth. Every 4 points of ratio raise the tax the province owes by 1 %.</li>
+<li><strong>Your Trade line</strong> is last month&#39;s deposits plus market fees paid to you, less your traders&#39; upkeep.</li>
+<li><strong>Home slots.</strong> A city is home to 1 trader with a weekly market, 2 with a yearly fair, 4 with a trading house, and 1 more with a harbour; Found a trader shows &quot;home to x of y&quot; for each city. Founding costs three times the table&#39;s gold and upkeep is four times its figure, so a poor long route loses money: check its card&#39;s Route line and its better routes, or dismiss it. Traders from the 1444 start stay even where a city has more than its slots.</li>
+<li><strong>At the start</strong> every realm gets its traders by its trade access (Venice six, France four), on hand-made routes where their cities are on the map and otherwise on the best route from each of its best cities, and two years of their walking set the starting ratios.</li>
+<li><strong>The AI</strong> looks at each trader once a year and finds it a better route when its own pays little or is broken, and founds one more a year where a route pays well, up to twice its starting traders.</li>
+</ul>
+<p>Where you find it:</p>
+<ul>
+<li><strong>The Trade tab</strong> of your realm card, next to Treasury, is the overview of all your trade. <strong>This month</strong>: gold banked so far, gold on the road in your traders&#39; purses, market fees taken, and last month&#39;s Trade line after upkeep. <strong>Where the gold comes from</strong>: the provinces your traders collected in, each with its gold a month and a bar, those abroad marked, with the share from abroad and the fees you paid. <strong>Traders</strong>: one row each with its route, purse bar and gold a month after upkeep, a red ! when something is wrong and a gold ★ when it has a better route; a row opens the trader&#39;s card. When some could earn more, <strong>Use all better routes</strong> moves each to its best route at once. Then two folds: <strong>Found a trader</strong> and <strong>Busiest cities</strong>.</li>
+<li><strong>A trader&#39;s card</strong>: tap one of your caravans, barges or cogs on the map (close in), or its row in the Trade tab. <strong>Now</strong> says what it is doing (&quot;Walking to Lyon, 3 days&quot;) with its purse; <strong>Route</strong> gives From → To, days there and back and about how much it brings a month after upkeep; <strong>Better routes</strong> lists up to three routes from its start or its home that bring at least a fifth more, each with <strong>Use</strong>; <strong>Where its gold comes from</strong> shows the provinces of its last trip there and back; <strong>Last month</strong> what it banked and where. While the card is open its whole way is drawn on the map under any map mode, the way ahead as a trail, the trader in gold brackets and a coin where its gold came from. <strong>Find</strong> centres the map on it.</li>
+<li><strong>Changing a route</strong>: <strong>Change destination</strong> keeps where it starts; the bar along the bottom of the map offers the three best cities as buttons, and every likely city on the map shows its gold a month over it (the best three starred). Tap a city or a button, check the preview, then <strong>Confirm</strong>. <strong>New route</strong> starts from scratch: tap where it starts, then where it goes. You never draw the way: it is found through the most populated land and drawn on the map, with the preview (days there and back, provinces collected in, about how much a month, the best provinces). <strong>Undo</strong> and <strong>Cancel</strong> are there too.</li>
+<li><strong>Gold being banked</strong>: from regional zoom in, whatever the map mode, when one of your traders banks its purse in a city a coin drops into the city and its gold rises over it (&quot;+2.4&quot;), a coin clinks and your treasury lifts; a trader collecting glints a little coin. Under the Trade map mode your busiest trade cities twinkle. All of it follows the Animations setting.</li>
+<li><strong>About how much a month</strong> is worked out as the trader walks: it fills its purse province by province, can&#39;t carry more than its purse between your cities, and gets less where many traders already call. It lands close to what traders really bank.</li>
+<li><strong>The Trade map mode</strong>: provinces coloured by trade ratio, what you don&#39;t see in parchment; zoomed in, your traders&#39; ways there and back as dotted lines with each trader and its purse, and a coin on every trade stop.</li>
+<li><strong>The province card</strong> has a Trade line: value a month, ratio, traders passing and its top goods.</li>
+<li><strong>The Overview</strong> of your Realm book has an Economy tile with your gold and gold a month; the Trade page sits beside Treasury and Food in the Economy section.</li>
+</ul>
+<p>Not yet: tolls, trade pacts and embargoes, bandits and capture on the road, lords&#39; traders, ships other than the cog, copying a route and the &quot;once&quot; mode.</p>
+<h2 id="how-it-connects"><a class="anchor" href="#how-it-connects" aria-label="Link to this section">#</a>How it connects</h2>
+<ul>
+<li><a href="/wiki/Troop-Movement">Troop Movement</a>: the shared mover model, day loop, graph, route planner and step days; trade supplies where traders may enter and stop.</li>
+<li><a href="/wiki/Buildings">Buildings</a>: markets, caravanserais, warehouses, counting houses, banks, harbours, trading posts, craft buildings, rail stations and roads; trade gives back weights, served visits and the 30 % floor for crafts.</li>
+<li><a href="/wiki/Provinces">Provinces</a>: wares made, food surplus, toll points and rates, customs officers, riots, rebels, homeless, quarantine, plague; trade gives back the ratio (and its tax), traders passing and trade value.</li>
+<li><a href="/wiki/Your-Realm">Your Realm</a>: deposits, fees and tolls as trade income; founding gold and upkeep; traders replace merchants.</li>
+<li><a href="/wiki/Naval">Naval</a>: ship types, sailors, ports and the port list, sea step days, pirates.</li>
+<li><a href="/wiki/Warfare">Warfare</a>: war, armies, raids, sieges, hunting, escorts, blockades, storms, Open the roads, capture.</li>
+<li><a href="/wiki/Diplomacy">Diplomacy</a>: trade pacts, embargoes, war and peace.</li>
+<li><a href="/wiki/Subjects">Subjects</a>: tributary toll waivers, colony cities as deposit points (proposed).</li>
+<li><a href="/wiki/Research">Research</a>: T and S inventions; trade partners for spread.</li>
+<li><a href="/wiki/Historical-Events">Historical Events</a>: trade stats, hubs and the silver flood.</li>
+<li><a href="/wiki/The-1378-Start">The 1378 Start</a>: starting traders and routes; the warm-up.</li>
+<li><a href="/wiki/National-Strengths">National Strengths</a>: trader and toll levers; trade presence conditions.</li>
+<li><a href="/wiki/Rebellions">Rebellions</a>: rebels holding provinces act as enemy armies.</li>
+<li><a href="/wiki/Map-and-Lenses">Map and Map Modes</a>: Trade map modes, trader icons, road thickness.</li>
+<li><a href="/wiki/Screens-and-Navigation">Screens and Navigation</a>: Trade screen, trader card, route preview, turn report lines.</li>
+<li><a href="/wiki/Time-and-Turns">Time and Turns</a>: day loop, month end, year.</li>
+</ul>
+<h2 id="numbers"><a class="anchor" href="#numbers" aria-label="Link to this section">#</a>Numbers</h2>
+<p>Every value the game uses, made from its config so it always matches the game: <a href="/wiki/Data-Trade">Trade data</a>. How they combine: <a href="/wiki/Formulas">Formulas</a>.</p>
+<p>Every trade number is a placeholder, all in the trade config file.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Value</th><th>Config key</th><th>Design value</th></tr></thead>
+<tbody>
+<tr><td>Ratio gain per trader</td><td><code>ratio.gain_per_trader</code></td><td>3 points</td></tr>
+<tr><td>Monthly decay</td><td><code>ratio.decay_share</code></td><td>10 %</td></tr>
+<tr><td>Ratio cap</td><td><code>ratio.max</code></td><td>100</td></tr>
+<tr><td>Ship in a sea lane counts as</td><td><code>ratio.sea_lane_trader_weight</code></td><td>0.5</td></tr>
+<tr><td>Ratio modifiers</td><td><code>ratio.modifiers.*</code></td><td>as in the table above</td></tr>
+<tr><td>Price tiers</td><td><code>value.price_per_load.*</code></td><td>1, 2, 5, 10, 12</td></tr>
+<tr><td>Food counted</td><td><code>value.traded_food</code></td><td>surplus only</td></tr>
+<tr><td>Building weights and served visits</td><td><code>value.building_weights.*</code></td><td>as above</td></tr>
+<tr><td>Visits without a market</td><td><code>value.serves_without_market</code></td><td>2</td></tr>
+<tr><td>Visit share</td><td><code>collect.visit_share</code></td><td>0.2</td></tr>
+<tr><td>Market fee; with a pact</td><td><code>collect.foreign_market_fee</code>, <code>collect.trade_pact_fee</code></td><td>10 %; 0</td></tr>
+<tr><td>Bills of exchange fee</td><td><code>deposit.bills_of_exchange_fee</code></td><td>10 %</td></tr>
+<tr><td>Lord&#39;s city to treasury</td><td><code>deposit.lord_city.to_treasury</code></td><td>100 % (decided)</td></tr>
+<tr><td>Stops: a start and an end</td><td><code>route.min_stops</code>, <code>route.max_stops</code></td><td>2 / 2</td></tr>
+<tr><td>Default mode</td><td><code>route.default_mode</code></td><td>there and back</td></tr>
+<tr><td>Pull of populous land on the planner; its cap</td><td><code>route.busy_weight</code>, <code>route.busy_cap</code></td><td>1; 3 × the average</td></tr>
+<tr><td>Toll counts as</td><td><code>route.toll_counts_as_days</code></td><td>2 days</td></tr>
+<tr><td>Bandits</td><td><code>danger.bandit_chance_per_month</code>, <code>danger.bandit_when.homeless_share_over</code></td><td>5 %; homeless over 20 %</td></tr>
+<tr><td>Escape a raid</td><td><code>danger.raid_trader_escapes</code></td><td>50 %</td></tr>
+<tr><td>T1 bandits; T11 refund</td><td><code>danger.t1_bandit_chance_factor</code>, <code>danger.t11_lost_purse_refund</code></td><td>×0.5; 50 %</td></tr>
+<tr><td>Land kinds; ship numbers; S2</td><td><code>land_traders.*</code>, <code>sea_traders.*</code>, <code>s2_hold_bonus</code></td><td>tables above; +0.5</td></tr>
+<tr><td>Tax from ratio</td><td><code>effects.tax_per_ratio_points</code></td><td>+1 % per 4 points</td></tr>
+<tr><td>Crafts floor</td><td><code>effects.crafts_appear_min_ratio</code></td><td>30 %</td></tr>
+<tr><td>Missing input</td><td><code>effects.missing_input_output</code></td><td>half</td></tr>
+<tr><td>Unpaid upkeep before a trader is lost</td><td><code>upkeep.unpaid_months_to_lose</code></td><td>6 months</td></tr>
+<tr><td>Starting traders</td><td><code>start.traders_by_trade_access</code></td><td>6, 4, 2, 1, 0, 0</td></tr>
+<tr><td>Warm-up</td><td><code>start.warmup_months</code></td><td>24</td></tr>
+<tr><td>AI reach</td><td><code>ai.caravan_reach_provinces</code>, <code>ai.ship_reach_sea_zones</code></td><td>12 / 40</td></tr>
+<tr><td>AI found margin</td><td><code>ai.found_margin</code></td><td>1.25 (config only)</td></tr>
+<tr><td>AI reroute and dismiss</td><td><code>ai.reroute_every_months</code>, <code>ai.dismiss_after_losing_months</code></td><td>12 / 12</td></tr>
+<tr><td>Event mapping and hubs</td><td><code>event_mapping.*</code>, <code>hubs.*</code></td><td>10 hubs, reference 100 gold a year</td></tr>
+</tbody></table></div>
+<h2 id="how-the-open-points-were-settled"><a class="anchor" href="#how-the-open-points-were-settled" aria-label="Link to this section">#</a>How the open points were settled</h2>
+<ul>
+<li><strong>Founding</strong>: you found a land trader in one of your cities with any market (a weekly market is enough), or in a trading post once you know T8. Its crew comes from the home province&#39;s job slots of its class; if there are too few people, founding is refused.</li>
+<li><strong>Yearly fairs</strong>: you need T6 to build a new yearly fair. Fairs that stand at the start stay, so everyone can found traders from the start.</li>
+<li><strong>Ships</strong>: the caravel explores and cannot trade. Cogs, junks, dhows, galleys, carracks, galleons, fluyts and steamers can, and a trade ship pays its normal naval upkeep. A trade ship whose upkeep goes unpaid for 6 months is lost, like a caravan.</li>
+<li><strong>Ratio modifiers add up</strong>: customs officer +15 %, a road better than every neighbour&#39;s +10 %, 10 years of peace +10 %, riots −50 %, −5 % for each full 5 % of homeless over 5 %, event and heritage bonuses on top. The total never goes below no gain, and an enemy army or siege still stops gain that month.</li>
+<li><strong>Buildings and heritage that add &quot;traders passing&quot;</strong> (Djenné +20 %, Taj Mahal +30 %, heritage bonuses) add that percentage to ratio gain. A pilgrimage shrine counts as one more trader passing each month.</li>
+<li><strong>Only an embargo shuts traders out</strong>; there are no closed borders. A customs officer only adds ratio gain; without one you lose nothing.</li>
+<li><strong>What you can see</strong>: the trade value and ratio of your own provinces and of every province your traders have entered. T13 shows all of them. The route preview counts provinces you cannot see as earning nothing.</li>
+<li><strong>Lords&#39; traders</strong> pay no fees or tolls in your realm and deposit in any of your cities, into the lord&#39;s wealth.</li>
+<li><strong>Sea zones</strong> have no trade ratio. The world map shows the busiest sea lanes by the ships that sailed through last month.</li>
+<li><strong>Materials</strong> for buildings cost 25 % more in a province no trade route touches (not a route stop, and no trader passed in the last 12 months).</li>
+<li><strong>Food surplus</strong> in trade value is the food made this year minus what the people eat, never below zero.</li>
+<li><strong>Silver</strong> falls from 12 to 6 gold a load after the silver flood.</li>
+<li><strong>Heritage</strong>: some realms get a bonus on each deposit, on ratio gain, or extra traders at the start.</li>
+<li><strong>Events</strong> read trade_index as your trade income over the last 12 months against 100 gold a year, and 10 named hubs (Alexandria, Amsterdam, the Malacca Strait, Venice, Genoa, Seville, Bruges and Antwerp, Tabriz, Aleppo and the Volga).</li>
+<li>Many of these numbers (ratio points, decay, visit share, the material markup, hubs, the trade index reference) are first guesses and will be tuned.</li>
+</ul>
+<h2 id="still-open"><a class="anchor" href="#still-open" aria-label="Link to this section">#</a>Still open</h2>
+<p>Nothing in the rules. Balancing is a tuning pass on the numbers above.</p>
+<h2 id="for-developers"><a class="anchor" href="#for-developers" aria-label="Link to this section">#</a>For developers</h2>
+<ul>
+<li>Spec: <a href="https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/trade/spec.md" rel="noopener"><code>domain/trade/spec.md</code></a>, requirement code <strong>TRADE</strong> (TRADE-001 to TRADE-128).</li>
+<li>Features: <code>domain/trade/features/</code> (traders, trader-kinds, trade-value, trade-ratio, collecting, routes, deposits, access-tolls-diplomacy, risks, trade-effects, trade-screens, trade-research, event-mapping, start-ai-performance).</li>
+<li>Code: rules code for this context goes in <code>packages/engine/src/domain/trade/</code>, balance numbers in <code>packages/rules/data/domain/trade.json</code>. The design&#39;s config shape is <code>trade/trade-config.example.yaml</code>.</li>
+</ul>

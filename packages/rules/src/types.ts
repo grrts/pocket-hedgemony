@@ -192,6 +192,14 @@ export interface NationDef {
   commanders: CommanderDef[];
   /** Men under arms at the start (1444), a rough historical estimate; realms without one start with a quarter of their troop cap. */
   army?: number;
+  /** A sleeping realm (SETUP-080): listed from the start, holding nothing until it wakes. */
+  asleep?: true;
+  /** A spare sleeper with no name of its own, named and coloured when it wakes (SETUP-081). */
+  spare?: true;
+  /** The event tree's ids for this realm, besides its own id (SETUP-080). */
+  tree?: string[];
+  /** A sleeping realm's home land: the provinces it wakes on when nothing else names its land (SETUP-084). */
+  home?: string[];
 }
 
 export type Terrain =
@@ -260,8 +268,8 @@ export interface CultureNames {
   ranks?: Partial<Record<Rank, string>>;
 }
 
-/** What a commander is doing: leading an army, leading a fleet, or captaining a hired company. */
-export type Rank = "general" | "admiral" | "captain";
+/** What a commander is doing: leading an army, leading a fleet in one of its three posts (NAVY-152), or captaining a hired company. */
+export type Rank = "general" | "admiral" | "commodore" | "viceroy" | "captain";
 
 /** Names for officials and commanders by culture, and each realm's culture (feedback 33). */
 export interface NameBook {
@@ -314,4 +322,73 @@ export interface LivingDefines {
   reliefAboveMonths: number;
   /** Treasury gold a gift to a lord costs (realm: gift_of_gold raises his loyalty a step). */
   lordGiftGold: number;
+}
+
+/** A place a goal names: a point bound to the nearest land province (EVT-100). */
+export interface GoalPlace {
+  name: string;
+  at: [number, number];
+}
+
+/** What the game reads from a historical goal (EVT-100); none when the map can't express it. */
+export type GoalAim =
+  | { kind: "take"; places: GoalPlace[]; target?: string }
+  | { kind: "hold"; places: GoalPlace[]; target?: string }
+  | { kind: "subject" | "ally" | "fight" | "free"; target: string };
+
+/** A real person of the start's history who is, or may become, a lord of a realm (REALM-290 to REALM-295). */
+export interface HistoricalLordDef {
+  /** Stable id, used by events that bring him in (`historical_lord`). */
+  id: string;
+  name: string;
+  house: string;
+  /** What he was called by his lands: "Earl of Northumberland". */
+  title: string;
+  /** His birth year, null where the sources give none (the game then draws his age as for any lord). */
+  born: number | null;
+  /** The year he died in history; the game's own ageing decides when he dies in play. */
+  died: number | null;
+  /** Map provinces of his historical lands; the first is his seat. */
+  provinces: string[];
+  /** Two of the ruler traits the sources support. */
+  traits: string[];
+  /** The son who followed him, if the sources name one. */
+  heir: { name: string; born: number } | null;
+  /** One line for the player: who he was. */
+  note: string;
+  confidence: "high" | "medium";
+  sources: string[];
+  /** How he stands with the crown on the start day where history says he was at odds with it; unset is Loyal. */
+  loyalty?: "Loyal" | "Wavering" | "Disloyal";
+}
+
+/** A historical lord who joins later by an event (REALM-295). */
+export interface LaterLordDef extends HistoricalLordDef {
+  realm: string;
+  /** His history year. */
+  year: number;
+  /** He takes over the lord who holds his seat, lands and all (REALM-296), instead of joining as a new lord. */
+  takes_over?: boolean;
+}
+
+/** The start's historical lords: seated on the start day by realm, and those events bring in later by id. */
+export interface HistoricalLords {
+  realms: Record<string, HistoricalLordDef[]>;
+  later: Record<string, LaterLordDef>;
+}
+
+/** A realm's historical goal with its reason (EVT-100, plan-1378 §2). */
+export interface GoalDef {
+  realm: string;
+  goal: string;
+  reason: string;
+  ends_when: string;
+  /** First and last year; a window with no last year stays open. */
+  window: [number, number | null];
+  weight: "weak" | "normal" | "strong";
+  deviation: string;
+  aim: GoalAim | null;
+  alternative?: GoalAim | null;
+  /** Keys of the history checkpoints' turning points it leads toward. */
+  toward?: string[];
 }

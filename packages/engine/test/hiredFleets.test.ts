@@ -3,7 +3,7 @@ import { loadDefaultRuleset } from "@ph/rules";
 import { loadMapTiles } from "../src/node/mapTiles.ts";
 import { applyNow, createWorld, processTurn, type World } from "../src/index.ts";
 import { restoreWorld, worldChunks } from "../src/domain/saves/world-chunks.ts";
-import { navyCosts, navyView, type NavyFleet } from "../src/navy.ts";
+import { monthlyNavy, navyCosts, navyView, type NavyFleet } from "../src/navy.ts";
 import { fleetOffers, fleetPay, monthlyHiredFleets } from "../src/hiredFleets.ts";
 import { navalConfig } from "../src/domain/naval/index.ts";
 
@@ -15,6 +15,19 @@ const fleetsOf = (w: World, who: number): NavyFleet[] => w.navy.fleets.filter((f
 const H = navalConfig.hiredFleets;
 
 describe("starting fleets (F-115)", () => {
+  it("gives an AI fleet that needs an admiral one commissioned from an official, never a general (RECR-128, RECR-130)", () => {
+    const w = createWorld(rules, 1, tiles);
+    const venice = n(w, "venice");
+    const f = fleetsOf(w, venice)[0]!;
+    w.nationTreasury[venice] = 1000;
+    const generals = w.commanderIds.filter((_, k) => w.commanderOwner[k] === venice).length;
+    expect(generals).toBeGreaterThan(0);
+    monthlyNavy(w, []);
+    expect(f.admiral).toBeGreaterThanOrEqual(0);
+    expect(w.commanderSea[f.admiral]).toBe(1);
+    expect(w.commanderHome[f.admiral]).toBeGreaterThanOrEqual(0);
+  });
+
   it("gives the 1444 sea powers their ships, crewed and in their best port, and none to realms without a port", () => {
     const w = createWorld(rules, 1, tiles);
     const venice = fleetsOf(w, n(w, "venice"));

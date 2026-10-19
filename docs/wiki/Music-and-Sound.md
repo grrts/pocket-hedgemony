@@ -24,6 +24,8 @@ Chords are faked with arpeggios, never played on one voice. Each track stores a 
 
 **In the game now: the music's soft voices.** The first playtests found the strict chip harsh, "noise mostly" (Leroy, 17 Oct). So the music keeps the voices' roles, its tunes and the motif but plays them soft: the pulses and bass are rounded (their buzzing upper harmonics rolled off), volumes glide instead of stepping, a pad holds each bar's chord under the tune, the drums are tuned skins and a woodblock with only a breath of noise for the snare and cymbal, and a small hall gives the music some room. The effects below keep the chip's sound, which playtesters liked as it is.
 
+**The tunes, rewritten.** The tunes are written chord first: each bar has a chord, the tune lands on one of its notes on the beat, the bass walks the chord's root and fifth, and the regional instrument breaks the chord gently under it. Peace tunes use only chords that sound right in every region's tuning, so a nation's music changes colour, not into clashes. The early peace tune is a pastoral air followed by a dance, the late one a march, and every track still carries the Hegemony motif.
+
 **Effect voices** are a separate bank of three, so an effect never takes a music voice:
 
 | Voice | What it is |
@@ -44,7 +46,7 @@ The era is taken from the game year (the calendar). A technology basis (the aver
 
 | Era | Years | Ages that open in it | Style |
 |---|---|---|---|
-| I | 1444 to 1519 | Gunpowder Empires, Exploration | Drones, modal melody with a second voice, frame drums, 60 to 90 bpm |
+| I | the start (1378) to 1519 | Schism and Conquerors, Gunpowder Empires, Exploration | Drones, modal melody with a second voice, frame drums, 60 to 90 bpm |
 | II | 1520 to 1649 | Reformations, Atlantic Empires | Two-part counterpoint, dance rhythms in 3, plucked-string wavetables |
 | III | 1650 to 1789 | Crisis and Absolutism | Walking bass, ornamented leads, harpsichord-like arpeggios, formal marches |
 | IV | 1790 to 1869 | Revolutions, Industrialization | Bigger dynamics, dotted marches, folk-song melodies, first syncopation |
@@ -82,7 +84,7 @@ Loops last 60 to 150 seconds with 2 to 8 second intros, and play once or twice b
 | Interface and frame (6) | `title` (title and main menu; the full motif, era-neutral, all five voices); `nation_select` (new campaign; calm; its lead timbre follows the highlighted realm's palette with the same notes); `load_resume` (loading and coming back to the app; a 6 second intro, then the normal pick); `game_over` (slow, unresolved, ending on motif degree 4); `campaign_end` (the title theme in late era V style, then the motif in your palette); `credits` (a medley of motif quotes from every palette) |
 | Peace by palette (24) | `peace_<palette>_early` (written for eras I to III) and `peace_<palette>_late` (eras IV and V). Each is stored once with era arrangements: melody and harmony stay, tempo, percussion and wavetables follow the era, giving 60 palette and era combinations |
 | Era themes (5) | `era_1` to `era_5`, shared by all nations |
-| Situations and moods (7) | `diplomacy` (Realm book on Abroad; one quiet layer); `prosperity` (a brighter take on your palette); `unrest` (base and drone, plus a second layer while rebels are in the field); `crisis` (disaster, plague, famine or succession crisis; low pulses, irregular noise, no melody until resolved); `revolution` (a revolution period touching you, era IV on; fast march ending on the motif inverted); `exploration` (explorers or colonists active and the camera on open ocean); `world_war` (most great powers at war, era V on; replaces `war_campaign`, heavier, with W2 brass) |
+| Situations and moods (7) | `diplomacy` (Realm book on Diplomacy; one quiet layer); `prosperity` (a brighter take on your palette); `unrest` (base and drone, plus a second layer while rebels are in the field); `crisis` (disaster, plague, famine or succession crisis; low pulses, irregular noise, no melody until resolved); `revolution` (a revolution period touching you, era IV on; fast march ending on the motif inverted); `exploration` (explorers or colonists active and the camera on open ocean); `world_war` (most great powers at war, era V on; replaces `war_campaign`, heavier, with W2 brass) |
 | War, layered (5) | `war_mobilize` (drum ostinato, then bass); `war_campaign` (main theme; a counter-melody when your army is within 2 provinces of an enemy; full percussion when a battle is fought this turn); `war_siege` (slow pulse, plus tension as the siege nears its end); `war_naval` (wave-like arpeggio, lead, percussion); `war_losing` (a minor-key `war_campaign`, plus drone). Layers fade at bar lines. War percussion follows the era (frame drum, field drum, snare and bass drum, then mechanized and noise-heavy); the lead follows your palette |
 | Stingers (21) | nine `age_<id>` (one per age up to the World Wars, ending on the motif); `war_declared` (in the attacker's palette when a rival declares on you); `battle_won`, `battle_lost`; `war_won`, `war_lost`; `discovery`; `innovation`; `ruler_new`; `alliance`; `event_good`, `event_bad`, `event_major` |
 
@@ -96,7 +98,7 @@ It holds one state at a time, chosen by the highest rule that holds:
 2. **Losing a war:** `war_losing`.
 3. **At war:** `world_war`, then `war_naval`, `war_siege`, `war_campaign`, `war_mobilize`.
 4. **Crisis:** `revolution`, then `crisis`, then `unrest`.
-5. **Screen moods:** `diplomacy` on the Realm book's Abroad tab.
+5. **Screen moods:** `diplomacy` on the Realm book's Diplomacy section.
 6. **Good times:** `prosperity`, `exploration`.
 7. **Peace rotation.**
 
@@ -242,7 +244,7 @@ Audio has its own visuals only where they partner a sound: captions at the scree
 - [How a turn works](Time-and-Turns): turn end, turn ready, the game year and January.
 - [Map and Map Modes](Map-and-Lenses): camera position, region and zoom, what is on screen, terrain under the camera.
 - [Culture](Culture): your primary culture group, its changes and culture mix.
-- [The 1444 start](The-1444-Start): capital longitude for the turkic split, colonial founding dates.
+- [The 1378 start](The-1378-Start): capital longitude for the turkic split, colonial founding dates.
 - [Warfare](Warfare): war declared, war trend, occupied capital, battles, bells, routs, sieges, army eras and troop types.
 - [Naval](Naval): sea battles, broadsides, sinkings, blockades, landings, fleet orders.
 - [Troop movement](Troop-Movement): march orders, arrivals, winter quarters.
@@ -272,7 +274,7 @@ From `music.yaml` and `sfx.yaml`. Almost all are provisional placeholders; the e
 | Key | Value |
 |---|---|
 | `eras.basis` | calendar (decided) |
-| `eras.bands` | I 1444, II 1520, III 1650, IV 1790, V 1870 |
+| `eras.bands` | I 1378, II 1520, III 1650, IV 1790, V 1870 |
 | `eras.campaign_end` | 1939-08-31 (fixed) |
 | `palettes.split.turkic` | west of longitude 55 → Middle East, else steppe |
 | `states.war_losing` | more than half your peace voices would accept the enemy's terms, or capital occupied |

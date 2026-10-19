@@ -1,0 +1,241 @@
+<h1>Rebellions data</h1>
+<p>Every value in the game&#39;s rebellions config, exactly as the game reads it. This page is made from <code>packages/rules/data/domain/rebellions.json</code> each time the config changes, so it always matches the game. How these values are used is explained on <a href="/wiki/Rebellions">Rebellions</a>.</p>
+<p>Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and values marked (provisional) are placeholders that may still change in balancing. Inventions are shown by id and name; see <a href="/wiki/Data-Research#inventions">Research data</a>.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>judge_raises_bars_by</code></td><td>1</td></tr>
+<tr><td><code>riots_factor</code></td><td>0.5</td></tr>
+<tr><td><code>sparks_needing_hungry</code></td><td>an army requisitions food, the harvest roll comes up failed</td></tr>
+<tr><td><code>faith_or_tongue_causes</code></td><td>Faith, Homeland</td></tr>
+<tr><td><code>clergy_scholars_causes</code></td><td>Faith, New ideas</td></tr>
+<tr><td><code>clergy_scholars</code></td><td>clergy, scholars</td></tr>
+<tr><td><code>preacher_faith_spread</code></td><td>2</td></tr>
+<tr><td><code>veteran_arms_steps</code></td><td>1</td></tr>
+<tr><td><code>battle_kind</code></td><td>Rebel band</td></tr>
+<tr><td><code>locals_bonus_name</code></td><td>Locals know the land</td></tr>
+<tr><td><code>starving_loss</code></td><td>0.1</td></tr>
+<tr><td><code>loot_first</code></td><td>market</td></tr>
+<tr><td><code>bribe_costs_more</code></td><td>the lord himself, the pretender</td></tr>
+<tr><td><code>punish_lock_years</code></td><td>10</td></tr>
+<tr><td><code>massacre_lock_years</code></td><td>20</td></tr>
+<tr><td><code>bloodshed_years</code></td><td>20</td></tr>
+<tr><td><code>win_hold_months</code></td><td>12</td></tr>
+<tr><td><code>tax_win_years</code></td><td>10</td></tr>
+<tr><td><code>tax_win_rate</code></td><td>light</td></tr>
+<tr><td><code>unrest_grievances_per_effect</code></td><td>1</td></tr>
+<tr><td><code>great_revolt_near_capital</code></td><td>yes</td></tr>
+</tbody></table></div>
+<h2 id="steps"><a class="anchor" href="#steps" aria-label="Link to this section">#</a>Steps</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>grumbling</code></td><td>2</td></tr>
+<tr><td><code>riots</code></td><td>3</td></tr>
+<tr><td><code>plotting</code></td><td>4</td></tr>
+</tbody></table></div>
+<h2 id="rising-chance"><a class="anchor" href="#rising-chance" aria-label="Link to this section">#</a>Rising chance</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>grievances</th><th>percent</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>4</td><td>5</td></tr>
+<tr><td>2</td><td>5</td><td>15</td></tr>
+<tr><td>3</td><td>6</td><td>30</td></tr>
+</tbody></table></div>
+<h2 id="step-effects"><a class="anchor" href="#step-effects" aria-label="Link to this section">#</a>Step effects</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>calm</code></td><td>none</td></tr>
+<tr><td><code>grumbling</code></td><td>growth slows, scholars and craftsmen start to leave</td></tr>
+<tr><td><code>riots</code></td><td>tax halved, recruits halved, traders avoid it, the lord wavers</td></tr>
+<tr><td><code>plotting</code></td><td>tax halved, recruits halved, traders avoid it, the lord wavers, may rise</td></tr>
+</tbody></table></div>
+<h2 id="sparks"><a class="anchor" href="#sparks" aria-label="Link to this section">#</a>Sparks</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>new burden</code></td><td>the tax rate of the province is raised, a levy is called at harvest time, an army is quartered for the winter, an army requisitions food</td></tr>
+<tr><td><code>failed harvest</code></td><td>the harvest roll comes up failed</td></tr>
+<tr><td><code>insult to faith</code></td><td>a house of worship of the majority faith is demolished, a faith tolerance charter is revoked</td></tr>
+<tr><td><code>death or execution</code></td><td>the province&#39;s lord is executed, the province&#39;s lord dies without an accepted heir, a popular official is dismissed</td></tr>
+<tr><td><code>defeat</code></td><td>the owner&#39;s army loses a battle in or next to the province, the capital falls</td></tr>
+<tr><td><code>outsider</code></td><td>a pretender lands with men, a rival&#39;s envoy arrives with gold, a preacher of a new faith arrives</td></tr>
+<tr><td><code>the ruler</code></td><td>the ruler dies with a child heir, the ruler dies with no heir</td></tr>
+</tbody></table></div>
+<h2 id="causes"><a class="anchor" href="#causes" aria-label="Link to this section">#</a>Causes</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>grievances</th><th>demand</th><th>joiners</th><th>classes</th><th>leader</th></tr></thead>
+<tbody>
+<tr><td>Hunger</td><td>Hungry</td><td>the castle granary opened to them</td><td>farmers, homeless</td><td>farmers, homeless</td><td>local</td></tr>
+<tr><td>Tax</td><td>Heavy taxes, Conscription</td><td>the tax rate back down; the levy ended</td><td>farmers, craftsmen, market folk</td><td>farmers, craftsmen, market folk</td><td>local</td></tr>
+<tr><td>Faith</td><td>Wrong faith, Broken charter (faith)</td><td>a faith tolerance charter, or a ruler of their faith</td><td>everyone of that faith</td><td>none</td><td>preacher</td></tr>
+<tr><td>Homeland</td><td>Foreign rule, Far from the throne</td><td>self-rule, then independence</td><td>everyone of the homeland&#39;s language</td><td>none</td><td>local</td></tr>
+<tr><td>Town</td><td>Homeless, Broken charter, Soldiers quartered</td><td>a town law charter; work; the soldiers gone</td><td>homeless, craftsmen, market folk</td><td>homeless, craftsmen, market folk</td><td>local</td></tr>
+<tr><td>Lord</td><td>Harsh lord</td><td>the lord&#39;s want</td><td>the lord&#39;s retinue and officials, and his people of his faith and language</td><td>none</td><td>the lord himself</td></tr>
+<tr><td>Pretender</td><td>none</td><td>the pretender on the throne, or the province handed to them</td><td>lords who back the pretender, and anyone with a grievance</td><td>none</td><td>the pretender</td></tr>
+<tr><td>New ideas</td><td>none</td><td>a new kind of government</td><td>townsfolk and scholars</td><td>craftsmen, market folk, clergy, clerks, scholars</td><td>local</td></tr>
+</tbody></table></div>
+<h2 id="other-grievance-causes"><a class="anchor" href="#other-grievance-causes" aria-label="Link to this section">#</a>Other grievance causes</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>Burned homes</code></td><td>Hunger</td></tr>
+<tr><td><code>Plague</code></td><td>Hunger</td></tr>
+<tr><td><code>Requisitioned</code></td><td>Hunger</td></tr>
+<tr><td><code>Bloodshed</code></td><td>Hunger</td></tr>
+<tr><td><code>Persecuted</code></td><td>Hunger</td></tr>
+<tr><td><code>Ungoverned</code></td><td>Tax</td></tr>
+<tr><td><code>Grasping officials</code></td><td>Tax</td></tr>
+<tr><td><code>Banned language</code></td><td>Homeland</td></tr>
+<tr><td><code>Newly taken</code></td><td>Homeland</td></tr>
+</tbody></table></div>
+<h2 id="join-share"><a class="anchor" href="#join-share" aria-label="Link to this section">#</a>Join share</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>homeless</code></td><td>0.3</td></tr>
+<tr><td><code>cause_class</code></td><td>0.1</td></tr>
+<tr><td><code>faith_or_tongue</code></td><td>0.08</td></tr>
+<tr><td><code>other</code></td><td>0.02</td></tr>
+</tbody></table></div>
+<h2 id="leaders"><a class="anchor" href="#leaders" aria-label="Link to this section">#</a>Leaders</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>roles</th><th>brings</th></tr></thead>
+<tbody>
+<tr><td>local</td><td>dyer, miller, village elder</td><td>Cunning, little Might</td></tr>
+<tr><td>preacher</td><td></td><td>faith spreads to neighbours twice as fast</td></tr>
+<tr><td>veteran</td><td></td><td>Might</td></tr>
+<tr><td>the lord himself</td><td></td><td>his retinue, his wealth and his officials</td></tr>
+<tr><td>the pretender</td><td></td><td>the lords who back them; foreign help</td></tr>
+</tbody></table></div>
+<h2 id="arms"><a class="anchor" href="#arms" aria-label="Link to this section">#</a>Arms</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>steps</code></td><td>Tools, Old weapons, Armed, Soldiers</td></tr>
+</tbody></table></div>
+<h3 id="multiplier"><a class="anchor" href="#multiplier" aria-label="Link to this section">#</a>Multiplier</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>Tools</code></td><td>0.4</td></tr>
+<tr><td><code>Old weapons</code></td><td>0.6</td></tr>
+<tr><td><code>Armed</code></td><td>0.8</td></tr>
+<tr><td><code>Soldiers</code></td><td>1</td></tr>
+</tbody></table></div>
+<h3 id="sources"><a class="anchor" href="#sources" aria-label="Link to this section">#</a>Sources</h3>
+<h4 id="old-weapons"><a class="anchor" href="#old-weapons" aria-label="Link to this section">#</a>Old weapons</h4>
+<ul>
+<li>forge</li>
+<li>veteran leader</li>
+</ul>
+<h4 id="armed"><a class="anchor" href="#armed" aria-label="Link to this section">#</a>Armed</h4>
+<ul>
+<li>forge, market</li>
+<li>captured castle store</li>
+<li>foreign gold</li>
+</ul>
+<h4 id="soldiers"><a class="anchor" href="#soldiers" aria-label="Link to this section">#</a>Soldiers</h4>
+<ul>
+<li>lord&#39;s retinue</li>
+<li>deserters</li>
+<li>rival&#39;s troops</li>
+<li>pretender&#39;s army</li>
+</ul>
+<h2 id="severity"><a class="anchor" href="#severity" aria-label="Link to this section">#</a>Severity</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>rebellion_min</code></td><td>2</td></tr>
+<tr><td><code>rebellion_max</code></td><td>5</td></tr>
+</tbody></table></div>
+<h2 id="spread"><a class="anchor" href="#spread" aria-label="Link to this section">#</a>Spread</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>higher</code></td><td>same grievance, shares faith or language, roads, rivers and traders, many homeless, owner&#39;s army away at war, owner massacred last rising, rival pays the rebels</td></tr>
+<tr><td><code>lower</code></td><td>no shared grievance, garrisoned castle on the road, judge, owner&#39;s army in the region, owner pardoned last rising, almshouse</td></tr>
+</tbody></table></div>
+<h2 id="talk"><a class="anchor" href="#talk" aria-label="Link to this section">#</a>Talk</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>share</code></td><td>0.5</td></tr>
+<tr><td><code>usually_works</code></td><td>Hunger, Tax, Town</td></tr>
+<tr><td><code>rarely_works</code></td><td>Faith, Homeland</td></tr>
+</tbody></table></div>
+<h2 id="scatter"><a class="anchor" href="#scatter" aria-label="Link to this section">#</a>Scatter</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>die</code></td><td>0.333333</td></tr>
+<tr><td><code>flee</code></td><td>0.333333</td></tr>
+<tr><td><code>homeless</code></td><td>0.333333</td></tr>
+</tbody></table></div>
+<h2 id="outcomes"><a class="anchor" href="#outcomes" aria-label="Link to this section">#</a>Outcomes</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>Hunger</code></td><td>the castle&#39;s food is handed out, Hungry ends, the lord turns disloyal</td></tr>
+<tr><td><code>Tax</code></td><td>tax fixed at light</td></tr>
+<tr><td><code>Faith</code></td><td>faith tolerance charter in every held province</td></tr>
+<tr><td><code>Faith great revolt</code></td><td>a ruler of their faith</td></tr>
+<tr><td><code>Homeland</code></td><td>their provinces break away as a new country</td></tr>
+<tr><td><code>Town</code></td><td>town law charter, the quartered army leaves</td></tr>
+<tr><td><code>Lord</code></td><td>the lord gets his want, he leaves the realm with his land as his own country or under a neighbour</td></tr>
+<tr><td><code>Pretender</code></td><td>the pretender takes the throne in a great revolt, the province passes to the pretender</td></tr>
+<tr><td><code>New ideas</code></td><td>the government changes through the event tree&#39;s revolution events</td></tr>
+</tbody></table></div>
+<h2 id="card"><a class="anchor" href="#card" aria-label="Link to this section">#</a>Card</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>answers</code></td><td>Grant demand, Talk, Bribe leader, Wait, Attack</td></tr>
+</tbody></table></div>
+<h3 id="demand"><a class="anchor" href="#demand" aria-label="Link to this section">#</a>Demand</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>Tax</code></td><td>tax back to normal</td></tr>
+</tbody></table></div>
+<h3 id="arms-1"><a class="anchor" href="#arms-1" aria-label="Link to this section">#</a>Arms</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>Tools</code></td><td>tools</td></tr>
+<tr><td><code>Old weapons</code></td><td>tools and old weapons</td></tr>
+<tr><td><code>Armed</code></td><td>armed</td></tr>
+<tr><td><code>Soldiers</code></td><td>soldiers</td></tr>
+</tbody></table></div>
+<h2 id="new-ideas"><a class="anchor" href="#new-ideas" aria-label="Link to this section">#</a>New ideas</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>ideologies</code></td><td>liberalism, socialism, communism, nationalism</td></tr>
+<tr><td><code>min_support</code> (provisional)</td><td>0.3</td></tr>
+<tr><td><code>from_age</code></td><td>revolutions</td></tr>
+</tbody></table></div>
+<h2 id="provisional"><a class="anchor" href="#provisional" aria-label="Link to this section">#</a>Provisional</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>spread_chance_per_month</code> (provisional)</td><td>0.1</td></tr>
+<tr><td><code>talk_gold_per_province</code> (provisional)</td><td>10</td></tr>
+<tr><td><code>bribe_gold_per_100_rebels</code> (provisional)</td><td>1</td></tr>
+<tr><td><code>grant_points</code> (provisional)</td><td>5</td></tr>
+<tr><td><code>grant_months</code> (provisional)</td><td>12</td></tr>
+<tr><td><code>pardon_calm_factor</code> (provisional)</td><td>2</td></tr>
+<tr><td><code>new_preacher_after_months</code> (provisional)</td><td>12</td></tr>
+<tr><td><code>disloyal_lord_revolt_chance</code> (provisional)</td><td>0.05</td></tr>
+<tr><td><code>leader_cunning</code> (provisional)</td><td>3</td></tr>
+<tr><td><code>leader_might</code> (provisional)</td><td>1</td></tr>
+<tr><td><code>talk_usually_chance</code> (provisional)</td><td>0.75</td></tr>
+<tr><td><code>talk_rarely_chance</code> (provisional)</td><td>0.15</td></tr>
+<tr><td><code>talk_other_chance</code> (provisional)</td><td>0.3</td></tr>
+<tr><td><code>bribe_melt_chance</code> (provisional)</td><td>0.5</td></tr>
+<tr><td><code>melts_below_men</code> (provisional)</td><td>200</td></tr>
+<tr><td><code>march_days_per_province</code> (provisional)</td><td>7</td></tr>
+<tr><td><code>grant_food_months</code> (provisional)</td><td>4</td></tr>
+<tr><td><code>light_tax_years_granted</code> (provisional)</td><td>10</td></tr>
+</tbody></table></div>

@@ -127,8 +127,12 @@ describe("ports and fleets", () => {
     expect(f.ships).toHaveLength(2);
     // An army in the port boards: it needs an admiral first.
     const post = w.provinceOfficial.findIndex((o, q) => o >= 0 && w.provinceOwner[q] === me && q !== port && w.provinceLord[q]! < 0);
-    expect(act(w, { type: "commission", province: post }, me)).toEqual([]);
+    // A general can't lead a fleet: the official is commissioned as admiral (RECR-128).
+    expect(act(w, { type: "commission", province: post, sea: true }, me)).toEqual([]);
     const c = w.commanderIds.length - 1;
+    expect(w.commanderSea[c]).toBe(1);
+    const general = w.commanderIds.findIndex((_, k) => w.commanderOwner[k] === me && !w.commanderSea[k]);
+    expect(act(w, { type: "navy", do: "admiral", fleet: f.id, commander: general }, me)[0]).toMatch(/general leads armies/);
     let slot = -1;
     for (let i = 0; i < w.armies.count; i++) if (w.armies.alive[i] && w.armies.owner[i] === me && w.armies.commander[i]! >= 0) slot = i;
     w.armies.location[slot] = port;
@@ -142,6 +146,9 @@ describe("ports and fleets", () => {
     expect(act(w, { type: "navy", do: "admiral", fleet: f.id, commander: c }, me)).toEqual([]);
     expect(act(w, { type: "navy", do: "sail", fleet: f.id, to: target }, me)[0]).toMatch(/right to land/);
     expect(act(w, { type: "declareWar", target: n(w, "brittany") }, me)).toEqual([]);
+    // No enemy fleet on the way and no Breton levy mustering on the shore: this is about the crossing and the landing.
+    w.navy.fleets = w.navy.fleets.filter((x) => x.owner === me);
+    w.musters = w.musters.filter((m) => m.province !== target);
     expect(act(w, { type: "navy", do: "sail", fleet: f.id, to: target }, me)).toEqual([]);
     expect(f.landAt).toBe(target);
     // At sea the army stands in the fleet's zone, out of reach on land.
@@ -158,7 +165,7 @@ describe("ports and fleets", () => {
     const w = createWorld(rules, 3, tiles);
     const me = n(w, "england");
     const port = bestPort(w, me);
-    const fleet: NavyFleet = { id: 999, owner: me, at: port, route: [], progress: 0, admiral: -1, ships: [{ id: 1, type: "galley", crew: 180, hull: 0, supply: 6, damage: 0, wear: 0, age: 0, home: port }], army: -1, landAt: -1, landing: 0, battle: -1, fleeing: false };
+    const fleet: NavyFleet = { id: 999, owner: me, at: port, tile: -1, path: [], pathAt: 0, legHours: 0, goal: -1, post: "admiral", blockading: false, route: [], progress: 0, admiral: -1, ships: [{ id: 1, type: "galley", crew: 180, hull: 0, supply: 6, damage: 0, wear: 0, age: 0, home: port }], army: -1, landAt: -1, landing: 0, battle: -1, fleeing: false };
     const far = w.rules.provinces.findIndex((x, q) => x.terrain === "ocean" && w.navy.coastDist[q]! > 5);
     expect(planVoyage(w, fleet, (q) => q === far)).toBeNull();
   });
@@ -187,6 +194,7 @@ describe("ports and fleets", () => {
     const zone = w.adjList.subarray(w.adjStart[pb]!, w.adjStart[pb + 1]!).find((q) => !!w.provinceWater[q])!;
     for (const f of [fa, fb]) {
       f.at = zone;
+      f.tile = w.tiles.centre[zone]!;
       f.route = [];
       f.admiral = -1;
     }

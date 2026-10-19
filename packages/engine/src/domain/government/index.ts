@@ -35,6 +35,8 @@ export interface ReformRule {
   lordsSlip: number;
   /** A condition row: the change happens by itself when the need holds and cannot be ordered (D-GOV-3). */
   automatic: boolean;
+  /** Inventions that help the realm once in its new form, named on the reform's card (GOV-078). */
+  helpedBy: string[];
 }
 
 interface RawForm {
@@ -354,7 +356,16 @@ export const REFORMS: ReformRule[] = config.reforms.map((r) => ({
   gold: r.gold,
   lordsSlip: r.lords_slip,
   automatic: r.automatic === true,
+  helpedBy: (r as { helped_by?: string[] }).helped_by ?? [],
 }));
+
+/**
+ * The riders line of a horde: strong in the field until its enemies field the
+ * listed inventions (GOV-077); null for a form the config does not list.
+ */
+export function ridersLine(f: FormId): { invention: string; label: string }[] | null {
+  return config.riders_line.forms.includes(f) ? config.riders_line.fades_against : null;
+}
 
 /** The reform from one form to another, if config lists one and `to` is a next form (GOV-027). */
 export function findReform(from: FormId, to: FormId): ReformRule | undefined {

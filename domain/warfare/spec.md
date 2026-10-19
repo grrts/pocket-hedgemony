@@ -128,9 +128,13 @@ Newest decision first.
 | Occupation | Holding an enemy province by taking its castle or holding it a season | — |
 | Raid (army) | A horse-only army that burns and loots instead of besieging or occupying | Raid (war aim) |
 | Peace voices | The people who count in a realm, each saying peace or war | War score (not used) |
+| Demand cost | A province's price at the peace table, from its people, wealth, walls, coast, river, capital and nearness (WAR-240) | Province value in trade |
+| Settlement capacity | What the war lets one side ask of the other, in demand-cost points, from what it won (WAR-241) | War score (not used) |
+| Peace table | The war card section where terms are combined within the capacity (WAR-248) | Peace offer |
+| Surrender | A beaten AI side's unconditional peace: the victor asks anything the rules allow (WAR-245) | Siege surrender (WAR-170) |
 | Victories / Defeats | Battles won and lost (country: last 20 years; commander: lifetime record) | Scars |
 | Fallen | All killed, counted on the country (country 6) | — |
-| Era | Research era I 1444–1500, II 1500–1600, III 1600–1700, IV 1700–1800, V 1800–1870, VI 1870–1914, VII 1914–1939 (cut) | — |
+| Era | Research era I from the start (1378) to 1500, II 1500–1600, III 1600–1700, IV 1700–1800, V 1800–1870, VI 1870–1914, VII 1914–1939 (cut) | — |
 
 ## 4. Domain model
 
@@ -679,16 +683,129 @@ rules are the latest decision and replace what they name; the balance model (BAL
 - WAR-228 The AI shall declare war only when all of these hold: its side's strength, with the allies that would answer its calls, beats the target's side, with the target's allies, pledgers and every league member against the AI, by `warfare.ai.declare_strength_ratio`; its treasury covers `warfare.ai.war_chest_months` (6, provisional) of the pay its armies would draw at war; its own peace voices would not say peace on the day it declares; and its notoriety is under `diplomacy.ai.notoriety_restraint` (50, provisional) unless its personality is Warlike or a hegemon seeker. [X-21; WAR-196; DIPL-174]
 
 #### How the player uses it: the price of war
-- WAR-229 Where: Declare war on another realm's Diplomacy tab opens the declare sheet, which shows a *Price of war* block above Confirm: who will be called against you (allies, pledgers, league members, each with soldiers), the neighbours who will hold *Threatened us* and how many, your lords who will waver, a truce you would break, the monthly pay of your armies at war, and the most land one peace can take ("at most 4 of their 11 provinces"). Lines that hurt are marked in red with an icon, and each opens its reason on tap. [X-21; X-19]
+- WAR-229 Where: Declare war on another realm's Diplomacy tab opens the declare sheet, which shows a *Price of war* block above Confirm: who will be called against you (allies, pledgers, league members, each with soldiers), the neighbours who will hold *Threatened us* and how many, your lords who will waver, a truce you would break, the monthly pay of your armies at war, and the most land one peace can take ("at most 4 of their 11 provinces"). Lines that hurt are marked in red with an icon, and each opens its reason on tap. Beside the price, the sheet's terms name the aim the war will be declared with, in the player's words with the province it names and why it is held ("Take land: Champagne", held within 50 years): the best fitting aim the declarer holds against the target (Take land first), the same aim Confirm declares with. Only when no fitting aim is held (or a regency may not use it, DIPL-153) does it read *No aim*, marked red, and only then does the block list the neighbours alarmed and the lords who will waver. [X-21; X-19; DIPL-148; DIPL-189]
 - WAR-230 Grouping: everything about a running war sits on its war card in the Diplomacy tab, reached also from the war plaque: the aim, both sides' peace voices as a bar with the half mark, months at war and the long-war mark, provinces occupied each way, and the most one peace can take now. No war fact is spread over other tabs. [X-21; X-19; F-11]
 - WAR-231 Overview: the war plaque in the top bar (REALM-205) shows each war's peace voices for your side as a small bar that turns amber past a third and red past half, when a peace becomes obliged; tapping it opens the war card. [X-21; X-19]
 - WAR-232 Phone: in landscape the declare sheet is two columns in the Wide layout (price on the left, terms on the right) and one scrolling column in the Tall layout, with Confirm pinned inside the safe area; every line and button is at least 44 points tall, bars carry their number as text so colour is never the only sign, and nothing needs hover. [X-21; X-19]
+
+### 5.25 Peace settlement scoring (X-23, Leroy 18 Oct)
+Leroy, 18 October: how much a country can demand from a beaten enemy is scored from how the war went; every province
+has a configurable demand cost; demands are combined within the capacity; the AI answers by the same counts (accept,
+counter or refuse); a decisively beaten AI may surrender unconditionally. The capacity is this game's own: it is
+drawn from what was won (land held, the capital, battles) and weighed by armies and the peace voices (WAR-180), not
+from a war score. WAR-184's preconditions and WAR-227's peace limit still hold. All numbers are
+`warfare.settlement.*` and provisional.
+
+- WAR-240 The warfare system shall give each province a demand cost: `province_cost.base`, plus
+  `per_sqrt_thousand_people` times the square root of its people in thousands, plus `per_wealth` times its wealth,
+  plus `castle` when it has walls, `coastal` on the coast and `river` on a river; times `capital_multiplier` for a
+  realm's capital and `not_bordering_multiplier` when it does not touch the asking side's land; rounded, at least 1.
+  [X-23]
+- WAR-241 The warfare system shall give the asking side a settlement capacity against the giving side: the giving
+  side's realm value (the demand cost of all its land) times what was won, the sum of `capacity_weights.land_held`
+  times the share of that value the asking side holds, `capital_held` when it holds the giving leader's capital, and
+  `battles` times the giving side's men lost in this war's battles beyond the asking side's, against those men plus
+  its strength now; raised by the factor 1 + `armies` times the asking side's edge in strength (1 − theirs ÷ ours,
+  at least 0) + `will_to_fight` times the giving side's share of peace voices; rounded down, never above the realm
+  value. Nothing won gives no capacity. It is recomputed from the war's state, never stored (INV-WAR-19). [X-23]
+- WAR-242 The warfare system shall let the asking side combine demands: provinces of the giving side it holds
+  (WAR-184), at most WAR-227's share of each giving realm's provinces and its capital only with its last, and gold up
+  to the giving realm's treasury; a demand costs its provinces' costs plus one point for each `gold_per_point` gold,
+  rounded up. [X-23; WAR-184; WAR-227]
+- WAR-243 When a demand is put to an AI realm, the warfare system shall have it sign when the demand costs no more
+  than the capacity; otherwise offer back the dearest of the asked provinces that fit, within the limits, and as
+  much of the asked gold as the rest buys; and refuse when nothing fits. [X-23; WAR-183]
+- WAR-244 When an AI realm asks for peace terms, the warfare system shall have it spend the capacity the same way:
+  the dearest provinces it holds that still fit, within the limits, and gold up to their treasury with the rest; the
+  AI offers the player this when it is losing and its voices want peace, and asks it of the player when the player's
+  voices want peace and it holds the player's land. Between AI realms these terms end the war when the loser's
+  voices want peace (WAR-183). [X-23; DIPL-195]
+- WAR-245 The warfare system shall count an AI side as beaten when at least `surrender.peace_share` of its voices
+  say peace, its strength is at most `surrender.army_ratio` of the enemy's, and the enemy holds its leader's capital
+  or at least `surrender.land_share` of its realm value; a beaten AI surrenders unconditionally, and the news says
+  so. The player never surrenders by the game's choice. [X-23]
+- WAR-246 While a side has surrendered, its capacity shall be its whole realm value, and it signs any demand the
+  rules allow (WAR-242); an AI victor signs its fullest terms at once; a player victor is sent a surrender offer with
+  the fullest terms, and may instead ask anything else at the peace table. [X-23; WAR-185]
+- WAR-247 When an AI realm counters the player's demand, the warfare system shall send the player its counter as a
+  peace offer that names the provinces and gold, standing until the month is out like any peace offer. [X-23;
+  DIPL-195]
+
+#### How the player uses it: the peace table
+- WAR-248 Where: an enemy's card, Diplomacy tab, under *At war*: the *Peace table*. It says whether the peace ends
+  the whole war, what the war lets you ask and what all their land is worth, a bar of what you ask against what is
+  allowed with both numbers as text and whether they will sign, and *Where the N comes from* (a tap opens the five
+  parts with their points). Under it *Their land you hold*: one 44-point toggle for each province, with its price and
+  why it can't be asked (their capital, the peace limit); then gold with − and + buttons a step at a time. The draft
+  starts as the most the war allows. *Offer these terms*, *Ask the most the war allows*, *White peace* and *Give up*
+  close it. A counter or a surrender arrives as a peace offer in the dispatches and on their card, naming what it
+  gives, with *Make peace* and *Fight on*. [X-23; X-19; DIPL-196]
+- WAR-249 Grouping and overview: the peace table is the only place terms are made, on the war card next to the
+  war's other facts (WAR-230); the war plaque (WAR-231) and the dispatches, which count peace offers, are the
+  overview; a surrender is also told in the news. [X-23; X-19]
+- WAR-250 Phone: in the Wide and Tall layouts the province toggles sit two or three side by side when the card is
+  wide and one to a row when it is narrow; every toggle and button is at least 44 points high, the bar carries its
+  numbers as text so colour is never the only sign, the parts open on a tap and nothing needs hover; checked with
+  `apps/client/scripts/peace-table-shots.mjs` on a small and a large phone held sideways and a desktop. [X-23; X-19]
+- WAR-251 The warfare system shall score settlements the same for player and AI, from the same config, with no
+  randomness: the same war state always gives the same costs, capacity, answer and terms. [X-23; WAR-183; X-15]
+
+### 5.26 Lords lead their retinues (X-26, Leroy 18 Oct)
+Leroy, 18 October: "shouldn't some armies be commanded by lords?" WAR-033, WAR-038 to WAR-040 and RECR-111 already
+say they are; the game gave lords no retinue and offered no call, so the men of a lord's lands never fought. These
+rules bring the lords' summons into the game. All new numbers are `warfare.lords.*` and provisional.
+
+- WAR-252 The warfare system shall make the recruits of a lord's provinces his retinue: they refill at the full rate,
+  the realm's levies, recruit ceiling and troop cap count only its royal provinces, and a lord's retinue can be at most
+  his own cap (WAR-033) less any of his men already called out. This replaces the game's stand-in of half a lord's
+  recruits refilling for the crown. How strong a realm looks to others (allies, calls, the AI's declarations) counts
+  the men its lords would bring by their loyalty beside its levies and armies. [X-26; WAR-033; PROV-141; D-RECR-23]
+- WAR-253 While its realm is at war, the warfare system shall let the ruler call the lords, all at once or one lord;
+  each answers by WAR-038 and WAR-039 with the men at home on his held lands; a lord already gathering or in the field
+  is not called again, and one with fewer than `warfare.lords.min_men` (100) men has none to send. Called men leave
+  his lands' recruits. [X-26; WAR-038; WAR-039]
+- WAR-254 When a called retinue's days are up, the warfare system shall stand it at the lord's seat (his held province
+  with the most people) as an army of the retinue kind, led by the lord himself as a commander of the origin *a lord*
+  with Might, Cunning and Logistics of 1 to 3, trained, with `warfare.lords.retinue_horse_share` (a fifth) of its men
+  on horse as `warfare.lords.retinue_horse_arm` (knights and lancers). If the enemy holds all his land or peace has
+  come by then, the men go back to his lands. [X-26; WAR-061; RECR-111]
+- WAR-255 The warfare system shall keep a retinue whole under its lord: it marches, fights and goes home, but cannot
+  be split, merged, trained, handed to another commander or left as a garrison, and its lord leads no other army; the
+  crown does not pay it (WAR-015) and it does not count toward the troop cap (WAR-033). [X-26; RECR-111; X-7]
+- WAR-256 The warfare system shall send a retinue home to its lord's lands, its men back to their recruits: when its
+  realm is at peace; when its lord turns disloyal or rises; when its lord is wavering and it has served
+  `warfare.lords.wavering_stay_months` (6) unless the war's aim is his Want (WAR-038, WAR-039); and when the ruler
+  sends it home. A beaten retinue that scatters sends half its men home to his lands. [X-26; WAR-018; WAR-038]
+- WAR-257 When a battle is won, the warfare system shall raise a step of loyalty for each lord whose retinue fought on
+  the winning side (REALM-088 *he takes part in a victory*). [X-26; REALM-088]
+- WAR-258 The AI shall call every lord who will come each month it is at war, and march retinues like its other
+  armies. [X-26; WAR-038]
+
+Not yet in the game: a lord sent home to defend his occupied lands (WAR-040), a disloyal lord made angrier by a
+second call, and a retinue's losses in the peace voices (WAR-180).
+
+#### How the player uses it: lords' retinues
+- WAR-259 Where: the Army tab of the player's country card has a *Lords' men* section with one **Call the lords**
+  button, and each lord's own screen (Lords tab) has a *Retinue* block with **Call him**, **Command** while he is in the
+  field, and **Send him home**. A button that can't be pressed is greyed and says why below it in words (only at war,
+  on his way, disloyal, no men). A lord's army on the map opens his commander screen like any army. [X-26; X-19]
+- WAR-260 Grouping: everything about the lords' retinues sits in the *Lords' men* section: a row per lord with his
+  portrait, loyalty and state (*ready, 2,400 men*; *gathering, at Dijon in 3 weeks*; *in the field at Reims* with
+  Command; *refuses*). A lord's commander screen shows *his retinue*, *paid by him*, his loyalty and when a wavering
+  lord will leave, and offers only Move, Halt and Send him home; lords stay out of the Commanders list, which is for the crown's own
+  commanders. [X-26; X-19]
+- WAR-261 Overview: the *Lords' men* section opens with one line that sums the lords' men: ready, gathering, in the
+  field and refusing, with the men of each, so the player sees at a glance what the lords can still add; the Lords tab
+  row of each lord shows his retinue's state beside his loyalty. [X-26; X-19]
+- WAR-262 Phone: in the Wide and Tall layouts the rows are one column across the panel, Call the lords is a full-width
+  button, every row button is at least 44 × 44 points, states are words and not colour alone, and nothing needs hover.
+  [X-26; X-19]
 
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
 |---|---|---|---|---|
-| CallLords(lords?) | player / AI | At war or preparing | Lords answer by loyalty (WAR-038) | LordAnswered |
+| CallLords(lords?) | player / AI | At war (WAR-253) | Lords answer by loyalty (WAR-038) | LordAnswered |
 | HireCompany(company, months) | player / AI | Mercenary company offered in reach; under troop cap; gold | Company joins; gold paid | CompanyHired |
 | PayArrears(army) | player / AI | Gold | Pay owed cleared | — |
 | DisbandCompany(company) | player / AI | — | Men to recruits, arms to store | CompanyDisbanded |
@@ -710,6 +827,7 @@ rules are the latest decision and replace what they name; the balance model (BAL
 | SetAcademyStyle(academy, style) | player / AI | Academy; teacher who knows the style | Adoption path | StyleAdopted (later) |
 | CommissionWargames(commander) | player / AI | Era VI+; peace | +1 Cunning after a year, once per era | — |
 | AcceptPeace(terms) / RefusePeace | player / AI | Offer received (diplomacy) | War ends / loyalty penalties | WarEnded |
+| OfferTerms(enemy, provinces, gold) | player / AI | At war; WAR-242 | Signed, countered or refused by WAR-243 | WarEnded / TermsCountered / TermsRefused |
 
 Re-arming a company (WAR-151) is ordered through recruiting's retraining. March, Raid speed, Besiege as a march
 order, Board, Land and Split/Join are troop-movement commands.
@@ -732,6 +850,8 @@ order, Board, Land and Split/Join are troop-movement commands.
 | LootTaken | Raid or sack | gold, herds, horses | realm, recruiting (a tenth home on disband) |
 | PeaceVoicesChanged / PeaceVoicesPassedHalf / PassedThreeQuarters | Recomputed | war, side, shares | diplomacy, game-shell |
 | WarEnded | Peace or other ending | war, ending kind | diplomacy (truce), realm |
+| TermsCountered / TermsRefused | WAR-243 | war, asker, what fits | game-shell (peace offer card) |
+| Surrendered | WAR-245 | war, beaten side, victor | diplomacy, game-shell news |
 | LevyDeserted / CompanyDeserted | Desertion | company, men | recruiting (men home), province |
 | FieldsBurned | Burn the fields | province | province |
 | StyleAdopted / StyleLearned | Adoption or learning | country / commander, style | map-presentation |
@@ -879,6 +999,10 @@ file `packages/rules/data/domain/warfare.json` (D-WAR-17).
 | warfare.peace.long_war_years | Years before lords who aren't Warlike say peace (WAR-223) | 2 | yes | warfare |
 | warfare.occupation.tax_share | Share of an occupied province's tax the occupier gets (WAR-224) | half | yes | warfare |
 | warfare.peace.max_ceded_share | Most of the loser's provinces one peace cedes (WAR-227) | a third, rounded up | yes | warfare |
+| warfare.settlement.province_cost.* | Demand cost of a province (WAR-240) | base 2; 0.5 per √thousand people; 1 per wealth; castle 2; coast 1; river 0.5; capital ×1.5; not bordering ×1.25 | yes | warfare |
+| warfare.settlement.capacity_weights.* | Capacity parts (WAR-241) | land held 0.5; capital 0.15; battles 0.15; armies 0.1; will to fight 0.25 | yes | warfare |
+| warfare.settlement.gold_per_point | Gold one point buys (WAR-242) | 25 | yes | warfare |
+| warfare.settlement.surrender.* | When an AI side is beaten (WAR-245) | 75 % peace voices; strength at most a quarter; capital or half the land held | yes | warfare |
 | warfare.ai.war_chest_months | Months of war pay the AI must hold to declare (WAR-228) | 6 | yes | warfare |
 | warfare.ai.declare_strength_ratio | How much stronger the AI's side must be to declare (WAR-228; the engine's `war.aiDeclareStrengthRatio`) | 2 | yes | warfare |
 
@@ -940,7 +1064,7 @@ file `packages/rules/data/domain/warfare.json` (D-WAR-17).
   hits and stays afloat loses one hull step, and hits equal to its strength sink or take it;
   higher-Cunning admiral slips away at night; repairs in harbour (shipyard ×2); soldiers aboard a lost ship
   drown or are captured. [warfare §11.2]
-- Fleet orders Blockade, Carry (landing a day per 5,000 men), Hunt, Escort; storms follow naval's rule (D-NAVY-7):
+- Fleet orders Blockade, Carry (landing a day per 5,000 men), Hunt, Escort (blockades are now set by naval's NAVY-155 to NAVY-159: no order, a fleet at war lying still; prize money and peace weight; F-123); storms follow naval's rule (D-NAVY-7):
   1 in 20 ships a month at sea in storm season, a struck ship losing one hull step and a wrecked one sinking. [warfare §11.3]
 - Naval adds crew share, boarding (on Close order or ram, land bell rules on one sector), prizes, sunk crews,
   pirates and ports at war. [naval §8]
@@ -1220,4 +1344,6 @@ Decided on 17 October 2026 (domain/DECISIONS.md). None of warfare's questions is
 | WAR-213 | features/raising-and-keeping.feature | Mercenary companies of the age, each its own size and mix |
 | WAR-214 to 217 | features/raising-and-keeping.feature | The mercenary companies page |
 | WAR-221 … WAR-228 | features/price-of-war.feature | Peace voices in the game; Refusing an obliged peace costs the ruler; A war with no fitting aim in the game; Lords tire of a long war; Occupation does not pay for the war; Levies at war are paid at once; The dead are missed at home; One peace cannot swallow a realm; The AI counts the price before declaring |
-| WAR-229 … WAR-232 | features/price-of-war.feature | The declare sheet shows the price of war; The war card |
+| WAR-229 … WAR-232 | features/price-of-war.feature | The declare sheet shows the price of war; The declare sheet names the aim the war is declared with; The war card |
+| WAR-240 … WAR-251 | features/peace-settlement.feature | What a province costs to demand; Capacity comes from what was won; Combining demands within the rules; The AI answers a demand; The AI asks by the same counts; A beaten AI surrenders; The peace table |
+| WAR-252 … WAR-262 | features/lords-retinues.feature | A lord's lands fill his retinue; Calling the lords; A lord leads his own retinue; A retinue goes home; A victory wins a lord's loyalty; The AI calls its lords; The Lords' men section |

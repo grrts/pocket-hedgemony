@@ -22,6 +22,8 @@ const wrong = (w: World, holder: string, other: string, key: string) => dip.ledg
 function setStrength(w: World, n: number, men: number): void {
   for (let i = 0; i < w.armies.count; i++) if (w.armies.owner[i] === n) w.armies.alive[i] = 0;
   w.nationLevies[n] = men;
+  // Its lords bring nothing: the levies are all of its strength (WAR-252).
+  w.nationLordsMen[n] = 0;
   w.nationTroopCap[n] = 1e9;
   w.nationCapUsed[n] = 0;
 }
@@ -271,5 +273,28 @@ describe("the price of war (WAR-228, WAR-229)", () => {
     expect(price.monthlyPay).toBeGreaterThanOrEqual(0);
     for (const c of price.against) expect(c.soldiers).toBeGreaterThanOrEqual(0);
     expect(JSON.stringify(price)).toBe(JSON.stringify(priceOfWar(w, england, france)));
+  });
+
+  it("prices a war with the fitting aim the declarer holds, and the war is declared with that aim (WAR-229)", () => {
+    const w = createWorld(rules, 1, tiles);
+    const england = nation(w, "england");
+    const france = nation(w, "france");
+    w.player = england;
+    // England and France start under a truce; lift it so the war can be declared.
+    w.diplomacy.graph.relations = w.diplomacy.graph.relations.filter((r) => !(r.type === "truce" && [r.source, r.target].includes("england") && [r.source, r.target].includes("france")));
+    expect(priceOfWar(w, england, france).noAim).toBe(true);
+    const p = provincesOf(w, france)[0]!;
+    dip.grantAim(w.diplomacy, { holder: "england", target: "france", aim: "take_land", province: w.provinceIds[p]!, source: "a lord's Want" });
+    const price = statecraftView(w, england)!.realms[france]!.price!;
+    expect(price.noAim).toBe(false);
+    expect(price.aim).toEqual({ aim: "take_land", province: p, source: "a lord's Want" });
+    // A regency may not declare with it: the war would be declared with no aim.
+    dip.country(w.diplomacy, "england").regency = true;
+    expect(priceOfWar(w, england, france).noAim).toBe(true);
+    dip.country(w.diplomacy, "england").regency = false;
+    expect(declareWar(w, england, france, [])).toBeNull();
+    const war = w.diplomacy.wars.find((x) => x.declarer === "england" && x.target === "france")!;
+    expect(war.aim).toBe("take_land");
+    expect((war as { aimProvince?: string }).aimProvince).toBe(w.provinceIds[p]);
   });
 });

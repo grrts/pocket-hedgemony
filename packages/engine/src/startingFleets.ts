@@ -55,6 +55,6 @@ export function seedStartingFleets(world: World): void {
       v.away[port] = v.away[port]! + crew;
       return { ...newShip(world, t, crew, port), age: rng.int(T.maxAgeYears + 1) };
     });
-    v.fleets.push({ id: ++v.seq, owner: n, at: port, route: [], progress: 0, admiral: -1, ships, army: -1, landAt: -1, landing: 0, battle: -1, fleeing: false });
+    v.fleets.push({ id: ++v.seq, owner: n, at: port, route: [], progress: 0, admiral: -1, tile: -1, path: [], pathAt: 0, legHours: 0, goal: -1, post: "admiral", blockading: false, ships, army: -1, landAt: -1, landing: 0, battle: -1, fleeing: false });
   }
 }

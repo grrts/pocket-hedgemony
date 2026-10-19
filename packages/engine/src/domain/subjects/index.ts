@@ -6,7 +6,7 @@
  * Time is counted in months (any absolute month index; a year is 12).
  */
 import config from "../../../../rules/data/domain/subjects.json" with { type: "json" };
-import data1444 from "../../../../rules/data/domain/subjects-1444.json" with { type: "json" };
+import { startSubjects as data1444 } from "../../../../rules/src/start.ts";
 
 export type Kind = "vassal" | "tributary" | "union" | "march" | "colony" | "protectorate";
 export type Step = "loyal" | "wavering" | "disloyal" | "in_revolt";
@@ -144,6 +144,8 @@ export interface SubjectBond {
   hostageHarmed?: boolean;
   refusedCalls?: number;
   backer?: string;
+  /** The subject has stopped paying its tribute (SUBJ-102, SUBJ-132). */
+  withholding?: boolean;
   tighten?: { monthsLeft: number };
   foldIn?: { monthsLeft: number };
 }
@@ -202,6 +204,7 @@ const REASON_LABELS: Record<string, string> = {
   lent_official: "Lent official",
   left_other_subject_alone: "You left another subject alone",
   quarrel_forbidden: "Quarrel forbidden",
+  withholds_tribute: "Withholds tribute",
   drift: "Drift",
 };
 
@@ -285,7 +288,7 @@ export function payTribute(
   treasury: number,
   overlordCastles: readonly { id: string; distance: number }[] = [],
 ): TributePaid {
-  const due = Math.min(tributeOwed(b, income) * loyaltyPays(b.loyalty), Math.max(0, treasury));
+  const due = b.withholding ? 0 : Math.min(tributeOwed(b, income) * loyaltyPays(b.loyalty), Math.max(0, treasury));
   if (b.tributeForm === "grain") {
     const castle = [...overlordCastles].sort((x, y) => x.distance - y.distance)[0];
     return { gold: 0, grain: due, ...(castle ? { castle: castle.id } : {}) };
@@ -498,6 +501,7 @@ export function reasonsOf(b: SubjectBond, now: number, sit: SubjectSituation = {
     out.push(r("outgrown", R.outgrown.arrow));
   }
   if (sit.ownSubjects) out.push(r("master_of_others", R.master_of_others.arrow));
+  if (b.withholding) out.push(r("withholds_tribute", R.withholds_tribute.arrow));
   if (sit.stance === "hostile") out.push(r("hostile_stance", R.hostile_stance.arrow));
   if (sit.stance === "rival") out.push(r("rival_stance", R.rival_stance.arrow));
   const drift = kindDrift(b.kind);
@@ -553,7 +557,8 @@ export function moveLoyalty(b: SubjectBond, dir: 1 | -1, now: number): void {
 export function seasonCount(b: SubjectBond, total: number, now: number): Step {
   if (b.loyalty === "in_revolt") return b.loyalty;
   const L = config.loyalty;
-  const dir: 0 | 1 | -1 = total >= L.step_up_at ? 1 : total <= L.step_down_at ? -1 : 0;
+  // A subject that withholds its tribute steps toward Disloyal whatever its arrows (SUBJ-132).
+  const dir: 0 | 1 | -1 = b.withholding ? -1 : total >= L.step_up_at ? 1 : total <= L.step_down_at ? -1 : 0;
   if (dir === 0) return b.loyalty;
   if (b.lastStep && b.lastStep.dir === dir && now - b.lastStep.month < L.min_months_between_same_direction_steps) return b.loyalty;
   const i = STEPS.indexOf(b.loyalty) - dir;
@@ -1301,3 +1306,6 @@ export function cardButtons(viewer: string, b: SubjectBond, now: number, ctx: Fo
     { action: "Fold in", locked: foldInMissing(b, now, ctx) },
   ];
 }
+export * from "./playing.ts";
+export * from "./worldZoom.ts";
+export * from "./eventKeys.ts";

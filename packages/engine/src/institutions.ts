@@ -7,6 +7,7 @@ import { ensureRoute } from "./statecraft.ts";
 import { FAITH_IDS } from "./peoples.ts";
 import * as dip from "./domain/diplomacy/index.ts";
 import * as inst from "./domain/institutions/index.ts";
+import { monthlyShogunate, seedShogunate, shogunateHashData, shogunateLens, shogunOf, vacantMembers } from "./shogunate.ts";
 
 /**
  * The Empire in the game (institutions slice 1, INST-001 to INST-034,
@@ -23,9 +24,11 @@ const rel = dip.relations;
 export interface InstitutionsState {
   /** The Empire, null in a world without its members (a test map). */
   empire: inst.Empire | null;
+  /** The Shogunate, null in a world without Japan (a test map). */
+  shogunate: inst.Shogunate | null;
 }
 
-export const createInstitutionsState = (): InstitutionsState => ({ empire: null });
+export const createInstitutionsState = (): InstitutionsState => ({ empire: null, shogunate: null });
 
 const name = (world: World, n: number) => world.rules.nations[n]!.name;
 const nameOf = (world: World, id: string) => world.rules.nations[world.nationIndex.get(id) ?? -1]?.name ?? id;
@@ -67,6 +70,7 @@ export function seedInstitutions(world: World): void {
     const o = world.provinceOwner[p]!;
     if (o >= 0 && !world.provinceWater[p]) land.set(o, [...(land.get(o) ?? []), world.provinceIds[p]!]);
   }
+  seedShogunate(world);
   const holder = idx(world, E.holder_1444);
   if (holder < 0) return;
   world.empire = inst.withReforms(inst.startEmpire({ date: date(world), onMap: (id) => idx(world, id) >= 0, landOf: (id) => land.get(idx(world, id)) ?? [], rulerOf: rulerOf(world) }));
@@ -81,6 +85,7 @@ export function seedInstitutions(world: World): void {
  * January the year's hold count. The dues come in with the ledger.
  */
 export function monthlyInstitutions(world: World, news: News[]): void {
+  monthlyShogunate(world, news);
   const e = world.empire;
   if (!e) return;
   const r = inst.withReforms(e);
@@ -762,33 +767,44 @@ function reformsView(world: World, e: inst.ReformedEmpire, player: number): Refo
   };
 }
 
-/** The Institutions map mode (INST-084): per realm 0 none, 1 member, 2 elector, 3 Emperor; per province 1 when imperial land is held by an outsider. */
-export function institutionsLens(world: World): { realm: Uint8Array; outsiderLand: Uint8Array } {
+/**
+ * The Institutions map mode (INST-084): per realm 0 none, 1 member, 2 elector,
+ * 3 Emperor or Shogun; per province 1 when imperial land is held by an
+ * outsider, and Japan's great house (lord index + 1) while it is whole.
+ */
+export function institutionsLens(world: World): { realm: Uint8Array; outsiderLand: Uint8Array; house: Int16Array } {
   const realm = new Uint8Array(world.nationCount);
   const outsiderLand = new Uint8Array(world.provinceCount);
+  const house = shogunateLens(world);
+  const shogun = shogunOf(world);
+  if (shogun >= 0) realm[shogun] = 3;
+  for (const m of vacantMembers(world)) realm[m] = 1;
   const e = world.empire;
-  if (!e || e.ended) return { realm, outsiderLand };
+  if (!e || e.ended) return { realm, outsiderLand, house };
   for (const m of e.members) {
     const n = idx(world, m);
     if (n >= 0) realm[n] = m === e.holder ? 3 : inst.seatOf(e, m) ? 2 : 1;
   }
   for (const [, ps] of outsidersOf(world, e)) for (const p of ps) outsiderLand[world.provinceIndex.get(p)!] = 1;
-  return { realm, outsiderLand };
+  return { realm, outsiderLand, house };
 }
 
 // ---------------------------------------------------------------- saves and the hash
 
-export function saveInstitutions(world: World): { empire: inst.Empire | null } {
-  return { empire: world.empire ? structuredClone(world.empire) : null };
+export function saveInstitutions(world: World): { empire: inst.Empire | null; shogunate?: inst.Shogunate | null } {
+  return { empire: world.empire ? structuredClone(world.empire) : null, shogunate: world.shogunate ? structuredClone(world.shogunate) : null };
 }
 
-export function restoreInstitutions(world: World, saved: { empire: inst.Empire | null } | undefined): void {
-  if (saved) world.empire = saved.empire ? inst.withReforms(structuredClone(saved.empire)) : null;
+/** A save from before the Shogunate keeps the 1444 Shogunate the new world was seeded with. */
+export function restoreInstitutions(world: World, saved: { empire: inst.Empire | null; shogunate?: inst.Shogunate | null } | undefined): void {
+  if (!saved) return;
+  world.empire = saved.empire ? inst.withReforms(structuredClone(saved.empire)) : null;
+  if (saved.shogunate !== undefined) world.shogunate = saved.shogunate ? structuredClone(saved.shogunate) : null;
 }
 
 export function institutionsHashData(world: World): Float64Array {
   const e = world.empire;
-  if (!e) return new Float64Array(0);
+  if (!e) return new Float64Array(shogunateHashData(world));
   const r = inst.withReforms(e);
-  return new Float64Array([e.hold, e.members.length, e.seats.filter((s) => s.realm).length, e.election ? 1 : 0, e.defence.length, e.holder ? idx(world, e.holder) : -1, e.left, e.year.length, r.reforms.length, r.diet ? 1 : 0, r.breakers.length, r.rulings.length, r.contingents.length, r.zeroYears]);
+  return new Float64Array([e.hold, e.members.length, e.seats.filter((s) => s.realm).length, e.election ? 1 : 0, e.defence.length, e.holder ? idx(world, e.holder) : -1, e.left, e.year.length, r.reforms.length, r.diet ? 1 : 0, r.breakers.length, r.rulings.length, r.contingents.length, r.zeroYears, ...shogunateHashData(world)]);
 }

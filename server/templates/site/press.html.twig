@@ -1,0 +1,66 @@
+{% extends 'site/layout.html.twig' %}
+
+{% block title %}Press kit · Pocket Hegemony{% endblock %}
+{% block description %}Pocket Hegemony press kit: an 8-bit grand strategy game for phones, desktop and the web, from 1378 to 1939. Fact sheet, descriptions, screenshots and logo.{% endblock %}
+{% block stylesheets %}<link rel="stylesheet" href="/site/home.css">{% endblock %}
+
+{% macro size(bytes) %}{{ bytes >= 1048576 ? (bytes / 1048576)|round(1) ~ ' MB' : (bytes / 1024)|round ~ ' KB' }}{% endmacro %}
+
+{% block content %}
+{% import _self as m %}
+<article class="framed sheet">
+<div class="prose">
+    <span class="kicker">Press kit</span>
+    <h1>Pocket Hegemony</h1>
+    <p class="press-intro">An 8-bit grand strategy game for phones, desktop and the web. Lead one of hundreds of realms from 1378 to 1939, one week per turn.</p>
+
+    <h2 id="facts">Fact sheet</h2>
+    <div class="table-scroll">
+    <table class="facts">
+        <tr><th scope="row">Name</th><td>Pocket Hegemony</td></tr>
+        <tr><th scope="row">Genre</th><td>Turn-based grand strategy, in 8-bit pixel art</td></tr>
+        <tr><th scope="row">Platforms</th><td>iPhone, iPad and Android; Steam; the web</td></tr>
+        <tr><th scope="row">Campaign</th><td>20 September 1378 to 31 August 1939, one week per turn</td></tr>
+        <tr><th scope="row">World</th><td>The whole world on one pixel-art map, with about 315 realms at the start, every one playable</td></tr>
+        <tr><th scope="row">Price</th><td>Free to start: the free download and the Steam demo play the Ottomans and France. One purchase, the full game, unlocks every realm. No ads.</td></tr>
+        <tr><th scope="row">Release</th><td>Not announced yet</td></tr>
+        <tr><th scope="row">Wiki</th><td><a href="{{ path('wiki') }}">Every system, explained</a></td></tr>
+        {% if support_email %}<tr><th scope="row">Contact</th><td><a href="mailto:{{ support_email }}">{{ support_email }}</a></td></tr>{% endif %}
+    </table>
+    </div>
+
+    <h2 id="short">Short description</h2>
+    <p>Lead one of hundreds of realms from 1378 to 1939, one week per turn, on a pixel-art map of the whole world.</p>
+
+    <h2 id="long">Long description</h2>
+    <p><b>Pocket Hegemony</b> is a turn-based grand strategy game in 8-bit pixel art, for phones, desktop and the web. Every campaign starts on 20 September 1378, the day the Western Schism begins, with about 315 realms on the map, and runs to 31 August 1939.</p>
+    <p>Each turn is one week. You give your orders, press End turn, and the seven days play out on the map for every army, fleet and trader at once. The map runs from the whole world down to a single town, and every card opens over it.</p>
+    <p>Provinces are rows of tiles with real people working real buildings. Armies march on routes you draw, and battles are decided by commanders, troops, inventions and the ground, with no dice. Envoys bring every answer with its full list of reasons. History arrives as event cards with choices, and can come early, late, differently or not at all.</p>
+    <p>Win by holding half the world's settled land, or by leading in Economy, Power or Technology when the campaign ends.</p>
+
+    <h2 id="screenshots">Screenshots</h2>
+    <p>Real play, with no added text. Free to use in coverage of the game.</p>
+    <ul class="downloads">
+        {% for f in shots %}
+        <li><a href="{{ f.url }}" download>
+            <img src="{{ f.url }}" width="{{ f.width }}" height="{{ f.height }}" alt="{{ f.caption }}" loading="lazy" decoding="async">
+            <span class="dl-name">{{ f.name }}</span>
+            <span class="dl-meta">{{ f.caption }}. {{ f.width }} × {{ f.height }}, WebP, {{ m.size(f.size) }}</span>
+        </a></li>
+        {% endfor %}
+    </ul>
+
+    <h2 id="logo">Logo and art</h2>
+    <p>The name is set in Jacquard 12 and the game's text in Jersey 10, both under the SIL Open Font License. The crown is the game's own pixel art.</p>
+    <ul class="downloads">
+        {% for f in art %}
+        <li class="art"><a href="{{ f.url }}" download>
+            <img src="{{ f.url }}" width="{{ f.width }}" height="{{ f.height }}" alt="{{ f.caption }}" loading="lazy" decoding="async">
+            <span class="dl-name">{{ f.name }}</span>
+            <span class="dl-meta">{{ f.caption }}. {{ f.width }} × {{ f.height }}, PNG, {{ m.size(f.size) }}</span>
+        </a></li>
+        {% endfor %}
+    </ul>
+</div>
+</article>
+{% endblock %}

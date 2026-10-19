@@ -6,9 +6,9 @@ Feature: Heritage on the phone
 
   @HER-070
   Scenario: The Heritage row
-    Given the country "Venice" has a birthright, an active golden age, 3 hidden ambitions and a weakness
+    Given the country "Venice" has a birthright, an active golden age, 3 open ambitions and a weakness
     When the player opens the country card
-    Then one Heritage row shows the birthright icon, the golden age icon, three hidden ambitions and the weakness icon
+    Then one Heritage row shows the birthright icon, the golden age icon, the progress of the three ambitions and the weakness icon
     And tapping it opens the Heritage sheet
 
   @HER-071
@@ -20,12 +20,12 @@ Feature: Heritage on the phone
 
     Examples:
       | change                         |
-      | it is revealed                 |
-      | its warmth rises to hot        |
+      | a new ambition comes up        |
+      | it comes within reach          |
 
   @HER-072
-  Scenario: The map shimmers over a hot ambition
-    Given the country "Venice" has a hot ambition naming "Bergamo", "Brescia" and "Crema"
+  Scenario: The map shimmers over an ambition within reach
+    Given the country "Venice" has an ambition within reach naming "Bergamo", "Brescia" and "Crema"
     When the player looks at the map
     Then the region faintly shimmers
     And the target is neither outlined nor named
@@ -34,7 +34,7 @@ Feature: Heritage on the phone
   Scenario: The nation picker
     Given the player is choosing a country
     When the player looks at "Portugal"
-    Then the picker shows its birthright and weakness, a count of its hidden ambitions and its golden ages as ages
+    Then the picker shows its birthright and weakness, a count of its ambitions and its golden ages as ages
 
   @HER-074
   Scenario: Free tier

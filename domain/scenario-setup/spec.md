@@ -3,7 +3,7 @@
 ## 1. Purpose and scope
 
 This context owns the 1444 start: which political entities exist (the country catalogue's 963 records),
-what kind of actor each is in the game (its representation), how the catalogue is put onto the map (137
+what kind of actor each is in the game (its representation), how the catalogue is put onto the map (237
 map nations today), each country's start form of government, the qualitative starting assessments and how
 they become starting counts, each province's starting values and where they come from, the campaign rules
 chosen at new game, and which realms can be played (the free tier). It turns research data into a starting
@@ -55,7 +55,7 @@ Newest decision first.
     19 facts).
 12. `screen-flow/screen-flow-design.md` S5 (new campaign); `settings/settings-design.md` §4.3 (campaign
     rules); `save-system/README.md` §4.2, §6.1, §9 (`newGame`); `tutorial/tutorial-design.md` §3.
-13. Repository: `README.md` (the world map, 137 nations); `tools/mapgen/nations-1444.json`,
+13. Repository: `README.md` (the world map, 237 nations); `tools/mapgen/nations-1444.json`,
     `owners-1444.json`, `owners.ts`, `config.json` (`settlement`, `palette`);
     `packages/rules/data/defines.json` (`economy.startingTreasury`, `levies`, `march.startingHorseShare`).
 
@@ -63,7 +63,7 @@ Newest decision first.
 
 | Term | Meaning | Not to be confused with |
 |---|---|---|
-| Catalogue | The 963 researched records of 1444 political entities, with no numeric game statistics | The map's 137 nations |
+| Catalogue | The 963 researched records of 1444 political entities, with no numeric game statistics | The map's 237 nations |
 | Record | One catalogue entry, with a stable snake_case `id` | A map nation |
 | Reference day | 11 November 1444, the day the catalogue and relations describe | The campaign start date |
 | Representation | How a record appears in the game: playable country, playable subject, decentralised polity, collective institution, non-state actor, internal estate, background only | Sovereignty (a historical classification) |
@@ -77,7 +77,7 @@ Newest decision first.
 | Detail tier | A (major powers), B (significant secondary), C (minor); sets prose depth only | — |
 | Assessment | A qualitative starting level per dimension: very low, low, moderate, high, very high, unknown, with justification and confidence | A number |
 | Start form | The government form a record starts with in 1444 | A reform |
-| Map nation | One of the 137 nations in `nations-1444.json` that own provinces on today's map | A record |
+| Map nation | One of the 237 nations in `nations-1444.json` that own provinces on today's map | A record |
 | Owner rule | A rule in `owners-1444.json` handing provinces to a map nation; first match wins | — |
 | Stand-in rule | A placeholder rule (castles, wealth) used until the province data is researched | — |
 | Campaign rules | Options chosen at new game and saved with the campaign: difficulty, AI temper, fog, events, ironman, end date | Settings |
@@ -206,7 +206,7 @@ Newest decision first.
 
 ### 5.5 The 1444 map setup (today's build)
 
-- SETUP-040 (Ubiquitous): The map's 1444 setup shall list 137 nations, each with a capital (longitude and latitude), a colour and commanders (name, might, cunning, logistics). [README; nations-1444.json]
+- SETUP-040 (Ubiquitous): The map's 1444 setup shall list 237 nations (137 placed by hand, 100 added from the catalogue by SETUP-060, SETUP-061 and TRIBE-002), each with a capital (longitude and latitude), a colour and commanders (name, might, cunning, logistics). [README; nations-1444.json]
 - SETUP-041 (Ubiquitous): Provinces shall be handed to nations by owner rules checked in order, the first match winning, by modern country, region name, or a longitude and latitude box; borders are an approximation of 1444, not an atlas. [README; owners-1444.json]
 - SETUP-042 (Unwanted): If a nation ends up with no province, then it shall not be in the built nation list. [owners.ts]
 - SETUP-043 (Ubiquitous): Each nation's colour shall be a palette colour (32 colours) not taken by a neighbouring nation. [owners.ts; config.json `palette`]
@@ -254,12 +254,17 @@ too much in terms of gameplay").
   for events, as do group records whose land another realm owns. [X-20; SETUP-005; D-SETUP-9]
 - SETUP-062 (Ubiquitous): A record that becomes a map nation shall keep its catalogue id (so no rename is needed), its
   assessments, its faith and its relations: a playable subject starts under the overlord the relations file names
-  (Kayor, Baol and Waalo under Jolof; Sofala and Mafia under Kilwa), or independent where the relations file names
-  none (D-SETUP-10). [X-20; SETUP-022]
+  (Sine under Jolof; Sofala under Kilwa; Hadiya under Ethiopia; the Canarian lordship under Castile), or
+  independent where the relations file names none (D-SETUP-10). Kayor, Baol and Waalo have their capitals in Jolof's
+  one province and Mafia in Kilwa's, so they stay reference data (SETUP-064). [X-20; SETUP-022]
 - SETUP-063 (Ubiquitous): A new African nation shall take only land no realm owns: first the provinces its owner rule
   names, if it has one, then, from all new capitals at once, one unowned neighbouring province per nation per round
-  in ascending nation index, until each has its size from its `manpower_potential` (very low 1, low 2, moderate 3,
-  high 5, very high 8, unknown 2 provinces). [X-20] @placeholder `scenario_setup.africa.size_by_manpower`
+  in ascending nation index (the one with the most people, the lowest id on a tie), until each has its size from its
+  `manpower_potential` (very low 1, low 2, moderate 3, high 5, very high 8, unknown 2 provinces) or no unowned
+  neighbour is left. A new nation's own owner rules come before every other rule, so it can take back land a broad
+  modern-country rule gave a neighbour (the Hausa towns from Kano, Timbuktu from Songhai, the Guanche islands from
+  Castile); they decide owners only, never how provinces are cut, so every province keeps its id. [X-20]
+  @placeholder `scenario_setup.africa.size_by_manpower`
 - SETUP-064 (Unwanted): If a new nation's capital lies in a province another realm owns and no owner rule gives it
   land, then it shall stay reference data, and the map build's report shall list it. [X-20; SETUP-042]
 - SETUP-065 (Ubiquitous): African land still unowned after SETUP-063 (most of the deep Sahara and parts of the
@@ -307,11 +312,91 @@ too much in terms of gameplay").
 - SETUP-074 Grouping and overview: nothing new is added to play. An African realm is played with the same country
   card (General, Diplomacy, Trade, Army), the Subjects lens and tab for its tributaries, and the Diplomacy tab for
   its neighbours; the new nations are ordinary realms, so every existing overview shows them. The suggested realms
-  in the picker gain one African start per part of Africa (Mali, Benin, Kongo, Ethiopia, Kilwa). [X-19; X-20]
+  in the picker gain one African start per part of Africa (Mali, Benin, Kongo, Ethiopia, Kilwa in 1444; in 1378, where
+  Kongo is not yet founded, Mali, Benin, Tio, Ethiopia and Kilwa); each start lists its own in `scenario.json`
+  (`suggested`). [X-19; X-20; X-25]
 - SETUP-075 The map and the phone: new nations are drawn and named like every realm (realm names stay at every zoom,
   F-22); free land keeps the unowned colour. On a phone, held sideways or upright, the region list, the realm card
   and the Ways to grow line fit the Wide and Tall layouts inside the safe areas, every row and button is at least 44
   points high, and nothing needs hover. [X-19; X-20]
+
+### 5.9 Sleeping realms (Leroy, 18 October; X-24)
+
+Realms that history founds after 1444 (Spain, the Dutch Republic, the Mughals, Qing …) and realms nobody can name
+ahead (a homeland that breaks away, a house of a broken Shogunate) are in every campaign from the start, asleep.
+
+- SETUP-080 (Ubiquitous): The game shall hold, besides the map nations, a list of **sleeping realms**, each with an
+  id, a name, a colour, a flag, its event-tree ids, a capital province and its home land (a list of provinces), in
+  the scenario-setup data. [X-24]
+- SETUP-081 (Ubiquitous): The game shall also hold spare sleeping realms with no name of their own (`spare_count`),
+  for realms that wake where no listed sleeper fits. [X-24] @placeholder `sleeping_realms.spare_count`
+- SETUP-082 (State-driven): While a realm sleeps, it shall hold no land, armies, fleets, lords, treasury,
+  relations or subjects, shall not be drawn, named or listed anywhere (map, realm picker, play on, Diplomacy,
+  dispatches), shall take no turn and shall not count as gone. [X-24]
+- SETUP-083 (Event-driven): When a sleeping realm wakes, the game shall give it land, a capital, a ruler, a start
+  form of government, peoples' faith and tongue from its land, starting gold, the levies its land can call and
+  standing at neutral with every realm, and from then on it is an ordinary realm. [X-24]
+- SETUP-084 (Event-driven): When a realm wakes, its land shall be, in this order: the land of the realms it is
+  formed from, when it is formed from realms (a union); else the provinces the waking names; else its home land.
+  Only land a realm that is not the waking one's overlord holds is taken; a province taken leaves its old owner's
+  lord and siege as a province handed over without a war does. [X-24; DIPL-113]
+- SETUP-085 (Event-driven): When a realm is formed from other realms (a union), every one of them shall end in it:
+  their land passes to it, their subjects and allies become its own, and they are gone. If the player's realm is
+  one of them, the player plays on as the formed realm and is told so. [X-24; SHELL-095]
+- SETUP-086 (Event-driven): When a realm breaks away from another (a release, a revolt, a split), the realm it
+  broke from keeps every province not taken, and the two hold a truce. [X-24]
+- SETUP-087 (Event-driven): When a realm wakes as a subject of another (`subject_of`), the other shall be its
+  overlord with the kind the waking names, else a vassal. [X-24; SUBJ-022]
+- SETUP-088 (Event-driven): When no listed sleeper fits the waking (a homeland that breaks away, a house of a broken
+  Shogunate), the game shall wake the first spare sleeper, named for its people or house and coloured apart from
+  its neighbours. When none is left the waking shall fall back to what the waking context decides without one.
+  [X-24]
+- SETUP-089 (Event-driven): A gone map realm shall wake again the same way when an event founds it anew (Poland in
+  1918). [X-24]
+- SETUP-090 (Unwanted): If a sleeping realm's land has no province to give it, then it shall stay asleep and the
+  waking shall change nothing on the map. [X-24]
+- SETUP-091 (Ubiquitous): Saves shall keep which realms sleep and what each woken realm is called and coloured. [X-24]
+
+#### How the player uses it
+
+- SETUP-092 Where: the player sees a realm wake on the map and in the dispatches, never in a menu. A founding is a
+  major dispatch card with the new realm's flag and name and one line of what it was made from ("Spain is founded
+  from Castile and Aragon"); a tap on the card centres the map on the new realm, whose land takes its colour at
+  once. Sleeping realms are never shown or listed. [X-19; X-24]
+- SETUP-093 Grouping and overview: a woken realm has the same country card (General, Diplomacy, Trade, Army) as
+  every realm, and the Realms list and Diplomacy map mode show it like the others. When the player's own realm is
+  formed into another, a dispatch says "Your realm is now Spain" and the top bar shows the new flag and name. No new
+  screen. [X-19; X-24]
+- SETUP-094 Phone: the founding card is a dispatch card with the usual 44-point buttons (Show on the map, Close) in
+  the Wide and Tall layouts inside the safe areas; nothing needs hover. [X-19; X-24]
+
+### 5.10 The 1378 start (X-25; milestone 10, steps 5 and 7)
+
+The regions' 1378 data (`scenarios/1378/regions/`) is joined into one playable start (step 5), and new campaigns start
+from it (step 7, the switch-over). 1444 stays as the main history checkpoint and the world the tests read.
+
+**How the player uses it.** The player sees nothing new to learn: Play or New campaign opens the realm picker over the
+1378 map, titled "Autumn 1378", with the start's suggested realms (Murad's Ottomans, Byzantium, Venice, Hungary, the
+Horde, Timur, Delhi, Ming and the rest, SETUP-074), and the realm's card before Begin names its ruler on the start day
+and the day the campaign begins, 20 September 1378 (SHELL-034). The loading screen is titled "Autumn 1378" and its tips
+include the world on the start day. A campaign begun in 1444 before the switch keeps playing in its own world: opening
+its save reopens the game in 1444 and loads it (SAVE-111), and leaving it for the start screen returns to 1378. No new
+screen, card or control is added, so the phone layouts (Wide and Tall, safe areas, 44-point targets, nothing that needs
+hover) are the existing ones; the map simply carries about 315 realms instead of 237. A tester opens the 1444 checkpoint
+with `?start=1444` in the address (or `#start=1444`).
+
+- SETUP-095 (Ubiquitous): The game shall start new campaigns from the 1378 scenario: its day (20 September 1378), its
+  map nations, owners, rulers, tongues and faiths, relations, subjects, ports, sleeping realms and suggested realms;
+  where the address asks for `start=1444` (`PH_START=1444` for headless runs and the test configs), it shall start from
+  the 1444 checkpoint instead. [X-25; plan-1378 §6 steps 5 and 7]
+- SETUP-096 (Ubiquitous): The 1378 scenario's files shall be generated by joining its region folders in the order the
+  scenario lists them, the first owner rule matching winning across regions, and its map built from them by the map
+  generator; region data is fixed in the region and the join re-run. [X-25; tools/domain-data/build-1378.py]
+- SETUP-097 (Ubiquitous): Sleeping realms and port towns of a generated start shall be given by longitude and latitude or
+  owner-rule selector and placed on the generated map's provinces; a port is placed only in a coastal province its
+  holder owns on the start day, and waits unplaced otherwise (NAVY-013). [X-24; X-25]
+- SETUP-098 (Ubiquitous): Until each rule is moved to the 1378 map's own data, rules that name 1444 provinces shall read,
+  in the 1378 start, the province of the 1378 map under each 1444 province's centre. [X-25] @placeholder `world/from-1444.json`
 
 ## 6. Commands
 
@@ -330,6 +415,7 @@ too much in terms of gameplay").
 | `StartFormsAssigned` | Start-form tool run | form per record | government |
 | `MapSetupBuilt` | Map setup written | owners, population, wealth, castles, nations | province, warfare, buildings |
 | `StartingWorldBuilt` | New game, before the first turn | countries, provinces, relations, seeds of each system | realm, province, diplomacy, subjects, trade, naval, religion, culture, exploration, research, government, buildings |
+| `RealmWoke` | A sleeping realm wakes | realm, how (founded, formed, broke away, revived), from realms, provinces | realm, diplomacy, events, game-shell, map-presentation |
 | `CampaignStarted` | Starting world built | campaign id, seed, player nation, rules | time-and-turns, saves, game-shell, achievements |
 
 ## 8. Policies (reactions to other contexts)
@@ -421,7 +507,9 @@ Nothing after the start. Before the first turn: build the starting world, then t
 - **D-SETUP-15** (was OQ-SETUP-15) Province names: modern region names stay. D-MAP-6 settles it.
 - **D-SETUP-16** (was OQ-SETUP-16) Coverage and certainty: a disputed, partial or stub record enters play only if it owns map provinces, and low confidence only widens its start range (D-SETUP-6). X-13 settles it.
 - **D-SETUP-17** (was OQ-SETUP-17) Population scale: the map's figure is the province's people in thousands (Aube 305 thousand); the Troyes card's 72,000 is a town-sized illustration, not data. The map is the only complete set.
+- **D-SETUP-19** Sleeping realms (Leroy, 18 Oct; X-24): realms founded after 1444 are listed from the start and asleep until they wake (SETUP-080 to SETUP-094). D-SETUP-2's "only a representation that owns map provinces is a realm" now reads "is a realm on the map in 1444"; a record that owns no province may be a sleeping realm.
 - **D-SETUP-18** African starts (Leroy, 18 Oct; X-20): in the four African regions, D-SETUP-2's "only a representation that owns map provinces is a realm" now applies after the catalogue's playable countries, subjects and peoples are given the unowned land around their capitals (SETUP-060 to SETUP-065); elsewhere D-SETUP-2 stands. Leroy asked for more of the historical states and tribes, even very small ones, and as little change to the rules of play as possible.
+- **D-SETUP-19** Added realms and the province grid (18 Oct; X-20, D-TRIBE-3): realms added from the catalogue (`grows` in the map nations data) take provinces as the map already cuts them, and never keep a piece of land apart the way the hand-placed capitals do, so every province keeps its id and every file that names provinces (ports, event places, anchors) stays valid. Sub-Saharan provinces are large (about 50,000 km² each), so where two capitals fall in one province the first in nation order keeps it and the other stays reference data (Kayor, Baol and Waalo in Jolof's province; Lamu and Pate in Mombasa's). The build lists them in `scenario-setup-report.json`. A finer African grid is a map change of its own. The start-date plan (1378) extends the same rows: a realm's capital, its own owner rules and `grows`.
 
 ## 14. Traceability
 
@@ -504,6 +592,7 @@ Nothing after the start. Before the first turn: build the starting world, then t
 | SETUP-061 | african-starts.feature | Migrations, raiders and background records stay reference data |
 | SETUP-062 | african-starts.feature | A playable subject starts under the overlord the relations file names |
 | SETUP-063 | african-starts.feature | New nations take unowned land around their capitals by size |
+| SETUP-063 | african-starts.feature | A new nation's own owner rule comes before a broad rule |
 | SETUP-064 | african-starts.feature | A capital inside another realm leaves the record as reference data |
 | SETUP-065 | african-starts.feature | Land left over stays free and colonisable |
 | SETUP-066 | african-starts.feature | A new nation gets a colour and a commander |
@@ -516,3 +605,7 @@ Nothing after the start. Before the first turn: build the starting world, then t
 | SETUP-073 | african-starts.feature | The realm card shows how the realm can grow |
 | SETUP-074 | african-starts.feature | African starts join the suggested realms |
 | SETUP-075 | — | Presentation and phone layout (checked by screenshots) |
+| SETUP-095 | — | rules unit tests `start-default.test.ts` (new campaigns start in 1378) and `start-1378.test.ts` (a valid 1378 ruleset) |
+| SETUP-096 | — | rules unit test `scenario-1378.test.ts` (the regions checked together) |
+| SETUP-097 | — | rules unit test `start-1378.test.ts` (sleeping realms and ports on 1378 provinces) |
+| SETUP-098 | — | start.ts (no scenario yet) |

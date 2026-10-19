@@ -9,7 +9,7 @@ import { addCommander } from "./recruit.ts";
 import { personName, mix } from "./names.ts";
 import { Rng } from "./rng.ts";
 import { realmStrengths } from "./realmStrengths.ts";
-import { allExplorers, blockaded, carriesOf, dockRight, fightsOf, fleetStrength, isPort, newShip, planVoyage, type FreeFleet, type NavyFleet } from "./navy.ts";
+import { allExplorers, blockaded, carriesOf, dockRight, fightsOf, fleetStrength, isPort, newShip, planVoyage, setCourse, type FreeFleet, type NavyFleet } from "./navy.ts";
 
 /**
  * Fleets for hire (F-115, naval spec "Hired fleets"): free fleets of the
@@ -117,7 +117,7 @@ export function refreshFreeFleets(world: World): void {
 /** A fleet of these ships for realm n lying at `at`, to plan a voyage with. */
 function probe(n: number, at: number, ships: readonly string[]): NavyFleet {
   return {
-    id: -1, owner: n, at, route: [], progress: 0, admiral: -1, army: -1, landAt: -1, landing: 0, battle: -1, fleeing: false,
+    id: -1, owner: n, at, route: [], progress: 0, admiral: -1, tile: -1, path: [], pathAt: 0, legHours: 0, goal: -1, post: "admiral", blockading: false, army: -1, landAt: -1, landing: 0, battle: -1, fleeing: false,
     ships: ships.map((type) => ({ id: 0, type, crew: nv.shipRow(type).crew, hull: 0, supply: nv.fullSupply(type), damage: 0, wear: 0, age: 0, home: -1 })),
   };
 }
@@ -223,12 +223,12 @@ export function hireFleet(world: World, n: number, o: { free?: number; lent?: nu
   if (why) return why;
   const v = world.navy;
   world.nationTreasury[n] = world.nationTreasury[n]! - x.pay;
-  const captain = addCommander(world, n, wf.newCommander(x.captain, { ...x.skills, origin: "a hired captain" }));
+  const captain = addCommander(world, n, wf.newCommander(x.captain, { ...x.skills, origin: "a hired captain" }), undefined, true);
   let f: NavyFleet;
   if (x.free >= 0) {
     v.forHire = v.forHire.filter((y) => y.id !== x.free);
     const rng = new Rng(mix(world.weatherSeed ^ 0x0a6e, x.free));
-    f = { id: ++v.seq, owner: n, at: x.at, route: [], progress: 0, admiral: -1, ships: x.ships.map((t) => ({ ...newShip(world, t, nv.shipRow(t).crew, -1), age: rng.int(16) })), army: -1, landAt: -1, landing: 0, battle: -1, fleeing: false };
+    f = { id: ++v.seq, owner: n, at: x.at, route: [], progress: 0, admiral: -1, tile: -1, path: [], pathAt: 0, legHours: 0, goal: -1, post: "admiral", blockading: false, ships: x.ships.map((t) => ({ ...newShip(world, t, nv.shipRow(t).crew, -1), age: rng.int(16) })), army: -1, landAt: -1, landing: 0, battle: -1, fleeing: false };
     v.fleets.push(f);
   } else {
     f = v.fleets.find((y) => y.id === x.lent)!;
@@ -268,14 +268,13 @@ function release(world: World, f: NavyFleet, news: News[], why: "dismissed" | "u
   f.admiral = -1;
   f.landAt = -1;
   f.fleeing = false;
-  f.progress = 0;
-  f.route = [];
+  setCourse(f, []);
   if (lender < 0) {
     v.fleets.splice(v.fleets.indexOf(f), 1);
   } else {
     f.owner = lender;
     const plan = planVoyage(world, f, (p) => dockRight(world, lender, p) === "food", { knownWaters: true });
-    if (plan) f.route = plan.path;
+    if (plan) setCourse(f, plan.path);
     else {
       // No way home by sea: it is back in the lender's best port at once.
       let port = -1;

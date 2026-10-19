@@ -10,6 +10,7 @@ Tap the three-line button at the top left of the map (or press `Esc`) to open th
 - **Load** lists every save on this device, newest first, with its map crop, banner, date and when it was saved. Each campaign's first line is "Where you left off". Tap a line to Load or Delete it; Delete asks first. Going back to an earlier save of the campaign you are playing asks "Leave … unsaved?" when weeks have passed since your last save.
 - **Where you left off** is kept after every week and when you leave, so Exit to main menu and Continue on the start screen bring you straight back.
 - **Autosaves** are set in Settings → Gameplay.
+- **Account and cloud saves** in Settings is where you sign in with your email or make an account; "Sign in to keep your saves on every device" at the bottom of the Load card opens it too. Once you are signed in, the card shows a status line ("Up to date", "3 saves waiting to upload", "Offline, will sync when connected", "Storage full"), how much of your storage you use, and your devices, each with Sign out. The saves you made on other devices show in Load marked "from Steam Deck" and the like, and come down when you open one. Deleting a save in Load deletes it in the cloud too. You can play without an account. Steam, Apple and Google sign-in come later.
 
 On the web, saves are kept in your browser's storage on this device.
 
@@ -189,7 +190,7 @@ Send a report, on the failure screen, attaches the Resume save and the orders jo
 - [Settings](Settings): the autosave values, the Cloud saves row, Wi-Fi only and sign-in; personal settings ride the same account.
 - [Achievements](Achievements): reads the ironman flag and the modified mark, and asks for more flags.
 - [Tutorial and help](Tutorial-and-Help): tutorial progress and Needs attention mutes live in your player profile, apart from saves.
-- [The 1444 start](The-1444-Start): campaign options, ironman and the player's nation at a new game.
+- [The 1378 start](The-1378-Start): campaign options, ironman and the player's nation at a new game.
 - [Map and Map Modes](Map-and-Lenses): the map hash, province ids and the rename table.
 - [Historical events](Historical-Events): the events chunk.
 - Every system ([Provinces](Provinces), [Your realm](Your-Realm), [Warfare](Warfare), [Diplomacy](Diplomacy) …) owns its own chunk with its own version and migrations.

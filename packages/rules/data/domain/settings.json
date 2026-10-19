@@ -431,7 +431,7 @@
       {
         "id": "audio.ambience",
         "type": "toggle",
-        "default": false,
+        "default": true,
         "section": "audio"
       },
       {

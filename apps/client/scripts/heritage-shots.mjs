@@ -32,6 +32,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   await page.waitForTimeout(300);
   await page.locator(".heritage-line").scrollIntoViewIfNeeded();
   await shot("picker-general");
+  await page.click("#panel [data-realm-section=Realm]").catch(() => {});
   await page.click("[data-realm-tab=heritage]");
   await page.waitForTimeout(300);
   await shot("picker-heritage");
@@ -63,6 +64,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   }
   await page.click(".hud .realm[data-realm]");
   await page.waitForTimeout(300);
+  await page.click("#panel [data-realm-section=Realm]").catch(() => {});
   await page.click("[data-realm-tab=heritage]");
   await page.waitForTimeout(300);
   await shot("heritage-later");

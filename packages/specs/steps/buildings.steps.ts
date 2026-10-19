@@ -2,7 +2,7 @@ import { expect } from "vitest";
 import { Rng } from "@ph/engine";
 import * as B from "@ph/engine/domain/buildings";
 import { steps, type Scenario } from "../src/registry.ts";
-import ports1444 from "../../rules/data/domain/naval-ports-1444.json" with { type: "json" };
+import { startPorts as ports1444 } from "@ph/rules/start";
 
 const TIER_STEP: Record<string, number> = { small: 1, port: 2, great: 3 };
 /** Harbour step per province from the naval ports-1444 list (D-BLD-8): the best tier there; landings have none. */
@@ -2494,7 +2494,7 @@ Then("it costs 30 gold and takes 3 months", (s) => {
   expect(s.mowCost.months).toBe(3);
 });
 Then(/^(\d+) provinces from the naval ports-1444 list have a harbour with its step$/, (_s, n: string) => {
-  expect(B.startingPortsFile()).toBe("naval-ports-1444");
+  expect(B.startingPortsFile()).toBe("scenarios/1444/ports.json");
   expect(PORTS.size).toBe(Number(n));
 });
 Then(/^the (\d+) provinces with a great port of the time have harbour step 3$/, (_s, n: string) => {

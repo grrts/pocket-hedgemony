@@ -1,0 +1,360 @@
+<h1>Recruiting data</h1>
+<p>Every value in the game&#39;s recruiting config, exactly as the game reads it. This page is made from <code>packages/rules/data/domain/recruiting.json</code> each time the config changes, so it always matches the game. How these values are used is explained on <a href="/wiki/Recruiting">Recruiting</a>.</p>
+<p>Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and values marked (provisional) are placeholders that may still change in balancing. Inventions are shown by id and name; see <a href="/wiki/Data-Research#inventions">Research data</a>.</p>
+<blockquote>
+<p>Recruiting (domain/recruiting/spec.md, recruiting design v3, decisions D-RECR-1..24). This file is the recruiting config (D-RECR-19). Every number is a design value or a provisional one for balancing; the provisional keys are listed in _provisional.</p>
+<p><code>levyUnit</code>: RECR-105, F-18: a levy is called in whole thousands (recruiting.levy_unit, provisional).</p>
+<p><code>aiCommissionMinMen</code>: RECR-115, F-28: the AI commissions an official only for at least this many men without a commander (recruiting.ai_commission_min_men, provisional).</p>
+<p><code>payGroupOfArm</code>: D-RECR-9: foot are arms without shot, gunners are foot with firearms, horse are other mounted arms, knights are the heavy mounted arms.</p>
+<p><code>chaplain</code>: The design gives the chaplain only its trait rule (Beloved when most of the army shares the ruler&#39;s faith); its skills are not in the scenarios.</p>
+<p><code>logisticsFoodCutPerPoint</code>: Recruiting design §8 worked example: &#39;The army eats 20 % less (5 % per Logistics point)&#39;.</p>
+<p><code>students</code>: D-RECR-13: students are called like a class at the clerks&#39; share (provisional).</p>
+<p><code>seasonMonthsByClimate</code>: D-RECR-14: months 1-12. North and south follow X-4 (harvest in September, March); the harvest season is the harvest month and the month before. Rice lands have two crops a year.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>fightingAgeShare</code> (provisional)</td><td>0.25</td></tr>
+<tr><td><code>standingRegimentsInvention</code></td><td><a href="/wiki/Data-Research#inventions">W12 Standing regiments</a></td></tr>
+<tr><td><code>railwayMobilizationInvention</code></td><td><a href="/wiki/Data-Research#inventions">W18 Railway mobilization</a></td></tr>
+<tr><td><code>fallenFadePerYear</code> (provisional)</td><td>0.1</td></tr>
+<tr><td><code>fallenYears</code></td><td>10</td></tr>
+<tr><td><code>veteransFadePerYear</code> (provisional)</td><td>0.1</td></tr>
+<tr><td><code>birthsCutPerFallenPercent</code> (provisional)</td><td>0.2</td></tr>
+<tr><td><code>birthsCutYears</code></td><td>10</td></tr>
+<tr><td><code>levyUnit</code> (provisional)</td><td>1000</td></tr>
+<tr><td><code>aiCommissionMinMen</code> (provisional)</td><td>1000</td></tr>
+<tr><td><code>levyMoneyPer1000</code> (provisional)</td><td>20</td></tr>
+<tr><td><code>freeMonths</code></td><td>3</td></tr>
+<tr><td><code>levyPay</code> (provisional)</td><td>0.15</td></tr>
+<tr><td><code>standingPayMultiplier</code> (provisional)</td><td>1.5</td></tr>
+<tr><td><code>castles</code></td><td>earthwork ring fort, stone castle, bastion fort, star fort</td></tr>
+<tr><td><code>veteranTimeFactor</code> (provisional)</td><td>0.5</td></tr>
+<tr><td><code>paySpentAtHome</code> (provisional)</td><td>0.2</td></tr>
+<tr><td><code>commissionCost</code> (provisional)</td><td>50</td></tr>
+<tr><td><code>releaseYearsFactor</code></td><td>0.5</td></tr>
+<tr><td><code>logisticsFoodCutPerPoint</code> (provisional)</td><td>0.05</td></tr>
+<tr><td><code>freeMonthsStart</code></td><td>gathered</td></tr>
+<tr><td><code>riotCallableShare</code> (provisional)</td><td>0.5</td></tr>
+<tr><td><code>yearlyMonth</code></td><td>1</td></tr>
+<tr><td><code>landRequestVictories</code> (provisional)</td><td>6</td></tr>
+<tr><td><code>lootHomeSplit</code></td><td>by men taken</td></tr>
+</tbody></table></div>
+<h2 id="call-shares-provisional"><a class="anchor" href="#call-shares-provisional" aria-label="Link to this section">#</a>Call shares (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>homeless</code></td><td>0.24</td></tr>
+<tr><td><code>herders</code></td><td>0.16</td></tr>
+<tr><td><code>farmers</code></td><td>0.12</td></tr>
+<tr><td><code>woodsmen</code></td><td>0.12</td></tr>
+<tr><td><code>miners</code></td><td>0.08</td></tr>
+<tr><td><code>seafolk</code></td><td>0.08</td></tr>
+<tr><td><code>craftsmen</code></td><td>0.08</td></tr>
+<tr><td><code>market folk</code></td><td>0.06</td></tr>
+<tr><td><code>clerks</code></td><td>0.04</td></tr>
+<tr><td><code>clergy</code></td><td>0</td></tr>
+<tr><td><code>scholars</code></td><td>0</td></tr>
+<tr><td><code>students</code></td><td>0.04</td></tr>
+</tbody></table></div>
+<h2 id="mass-conscription"><a class="anchor" href="#mass-conscription" aria-label="Link to this section">#</a>Mass conscription</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>invention</code></td><td><a href="/wiki/Data-Research#inventions">W15 Mass conscription</a></td></tr>
+<tr><td><code>callShareMultiplier</code> (provisional)</td><td>1.5</td></tr>
+</tbody></table></div>
+<h2 id="refill-per-year-provisional"><a class="anchor" href="#refill-per-year-provisional" aria-label="Link to this section">#</a>Refill per year (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>base</code></td><td>0.25</td></tr>
+<tr><td><code>musterMaster</code></td><td>0.333333</td></tr>
+</tbody></table></div>
+<h2 id="conscription-provisional"><a class="anchor" href="#conscription-provisional" aria-label="Link to this section">#</a>Conscription (provisional)</h2>
+<blockquote>
+<p><code>rule</code>: D-RECR-10: measured on Recruits here after the levy against the ceiling; with W15 the tenth applies even with fallen.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>base</code></td><td>0.25</td></tr>
+<tr><td><code>withFallen</code></td><td>0.333333</td></tr>
+<tr><td><code>massConscription</code></td><td>0.1</td></tr>
+</tbody></table></div>
+<h2 id="gathering"><a class="anchor" href="#gathering" aria-label="Link to this section">#</a>Gathering</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>days</code></td><td>14</td></tr>
+<tr><td><code>months</code></td><td>0.5</td></tr>
+<tr><td><code>railwayDays</code> (provisional)</td><td>3</td></tr>
+</tbody></table></div>
+<h2 id="pay-by-group-provisional"><a class="anchor" href="#pay-by-group-provisional" aria-label="Link to this section">#</a>Pay by group (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>foot</code></td><td>0.2</td></tr>
+<tr><td><code>gunners</code></td><td>0.25</td></tr>
+<tr><td><code>horse</code></td><td>0.4</td></tr>
+<tr><td><code>knights</code></td><td>0.6</td></tr>
+</tbody></table></div>
+<h2 id="gun-crew-provisional"><a class="anchor" href="#gun-crew-provisional" aria-label="Link to this section">#</a>Gun crew (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>men</code></td><td>15</td></tr>
+<tr><td><code>payPerCrew</code></td><td>1</td></tr>
+</tbody></table></div>
+<h2 id="pay-group-of-arm-provisional"><a class="anchor" href="#pay-group-of-arm-provisional" aria-label="Link to this section">#</a>Pay group of arm (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>levy foot</code></td><td>levy</td></tr>
+<tr><td><code>pikes</code></td><td>foot</td></tr>
+<tr><td><code>armoured foot</code></td><td>foot</td></tr>
+<tr><td><code>archers</code></td><td>foot</td></tr>
+<tr><td><code>hand gunners</code></td><td>gunners</td></tr>
+<tr><td><code>pike and shot</code></td><td>gunners</td></tr>
+<tr><td><code>musketeers</code></td><td>gunners</td></tr>
+<tr><td><code>line infantry</code></td><td>gunners</td></tr>
+<tr><td><code>riflemen</code></td><td>gunners</td></tr>
+<tr><td><code>light horse</code></td><td>horse</td></tr>
+<tr><td><code>camel riders</code></td><td>horse</td></tr>
+<tr><td><code>horse archers</code></td><td>horse</td></tr>
+<tr><td><code>knights and lancers</code></td><td>knights</td></tr>
+<tr><td><code>war elephants</code></td><td>knights</td></tr>
+<tr><td><code>gun crews</code></td><td>gun crews</td></tr>
+</tbody></table></div>
+<h2 id="rations-provisional"><a class="anchor" href="#rations-provisional" aria-label="Link to this section">#</a>Rations (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>gathering</code></td><td>1</td></tr>
+<tr><td><code>home</code></td><td>1</td></tr>
+<tr><td><code>camp</code></td><td>1.5</td></tr>
+<tr><td><code>campaign</code></td><td>2</td></tr>
+<tr><td><code>horse</code></td><td>3</td></tr>
+</tbody></table></div>
+<h2 id="harvest-loss-provisional"><a class="anchor" href="#harvest-loss-provisional" aria-label="Link to this section">#</a>Harvest loss (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>farmerShareMultiplier</code></td><td>2</td></tr>
+<tr><td><code>harvestMultiplier</code></td><td>1.5</td></tr>
+</tbody></table></div>
+<h2 id="season-months-by-climate-provisional"><a class="anchor" href="#season-months-by-climate-provisional" aria-label="Link to this section">#</a>Season months by climate (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>sowing</th><th>harvest</th></tr></thead>
+<tbody>
+<tr><td>north</td><td>3, 4</td><td>8, 9</td></tr>
+<tr><td>south</td><td>9, 10</td><td>2, 3</td></tr>
+<tr><td>rice</td><td>5, 6, 11, 12</td><td>2, 3, 8, 9</td></tr>
+</tbody></table></div>
+<h2 id="training-room-provisional"><a class="anchor" href="#training-room-provisional" aria-label="Link to this section">#</a>Training room (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>earthwork ring fort</code></td><td>1000</td></tr>
+<tr><td><code>stone castle</code></td><td>3000</td></tr>
+<tr><td><code>bastion fort</code></td><td>5000</td></tr>
+<tr><td><code>star fort</code></td><td>8000</td></tr>
+<tr><td><code>drill yard</code></td><td>1500</td></tr>
+<tr><td><code>barracks</code></td><td>4000</td></tr>
+</tbody></table></div>
+<h2 id="arms-provisional"><a class="anchor" href="#arms-provisional" aria-label="Link to this section">#</a>Arms (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>months</th><th>gold</th><th>needs</th><th>also</th></tr></thead>
+<tbody>
+<tr><td>levy foot</td><td>0</td><td>0</td><td>none</td><td></td></tr>
+<tr><td>armoured foot</td><td>2</td><td>80</td><td>arms: 10</td><td></td></tr>
+<tr><td>pikes</td><td>3</td><td>60</td><td>arms: 10</td><td></td></tr>
+<tr><td>archers</td><td>4</td><td>60</td><td>arms: 10</td><td></td></tr>
+<tr><td>hand gunners</td><td>3</td><td>120</td><td>arms: 10; powder: 10</td><td></td></tr>
+<tr><td>pike and shot</td><td>4</td><td>150</td><td>arms: 20; powder: 10</td><td></td></tr>
+<tr><td>musketeers</td><td>5</td><td>180</td><td>arms: 20; powder: 20</td><td></td></tr>
+<tr><td>line infantry</td><td>6</td><td>220</td><td>arms: 20; powder: 20</td><td></td></tr>
+<tr><td>riflemen</td><td>6</td><td>300</td><td>arms: 30; powder: 30</td><td></td></tr>
+<tr><td>light horse</td><td>3</td><td>100</td><td>horses: 1000</td><td></td></tr>
+<tr><td>camel riders</td><td>3</td><td>100</td><td>camels: 1000</td><td></td></tr>
+<tr><td>horse archers</td><td>6</td><td>150</td><td>horses: 1000; arms: 10</td><td></td></tr>
+<tr><td>knights and lancers</td><td>9</td><td>300</td><td>horses: 1500; arms: 20</td><td></td></tr>
+<tr><td>war elephants</td><td>6</td><td>400</td><td>elephants: 125</td><td></td></tr>
+<tr><td>gun crews</td><td>4</td><td>200</td><td>powder: 20</td><td>the guns, horses or oxen for them</td></tr>
+</tbody></table></div>
+<h2 id="retrain-provisional"><a class="anchor" href="#retrain-provisional" aria-label="Link to this section">#</a>Retrain (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>months</code></td><td>0.5</td></tr>
+<tr><td><code>gold</code></td><td>0.5</td></tr>
+</tbody></table></div>
+<h2 id="marshal-provisional"><a class="anchor" href="#marshal-provisional" aria-label="Link to this section">#</a>Marshal (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>trainingSpeedUp</code></td><td>0.25</td></tr>
+<tr><td><code>drill</code></td><td>4</td></tr>
+<tr><td><code>hireMultiplier</code></td><td>3</td></tr>
+<tr><td><code>wageMultiplier</code></td><td>2</td></tr>
+<tr><td><code>idleYears</code></td><td>10</td></tr>
+<tr><td><code>idleSkillLoss</code></td><td>1</td></tr>
+<tr><td><code>wonBattlesForOffer</code></td><td>3</td></tr>
+</tbody></table></div>
+<h2 id="trained-provisional"><a class="anchor" href="#trained-provisional" aria-label="Link to this section">#</a>Trained (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>drill</code></td><td>3</td></tr>
+<tr><td><code>breakPoint</code></td><td>0.3</td></tr>
+</tbody></table></div>
+<h2 id="untrained-provisional"><a class="anchor" href="#untrained-provisional" aria-label="Link to this section">#</a>Untrained (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>drill</code></td><td>0</td></tr>
+<tr><td><code>breakPoint</code></td><td>0.25</td></tr>
+</tbody></table></div>
+<h2 id="goes-home-provisional"><a class="anchor" href="#goes-home-provisional" aria-label="Link to this section">#</a>Goes home (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>afterMonths</code></td><td>6</td></tr>
+<tr><td><code>sharePerMonth</code></td><td>0.05</td></tr>
+</tbody></table></div>
+<h2 id="settlers-provisional"><a class="anchor" href="#settlers-provisional" aria-label="Link to this section">#</a>Settlers (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>clearingFactor</code></td><td>2</td></tr>
+<tr><td><code>extraRiotGrievances</code></td><td>1</td></tr>
+<tr><td><code>years</code></td><td>10</td></tr>
+<tr><td><code>becomes</code></td><td>farmers</td></tr>
+</tbody></table></div>
+<h2 id="loot-home-provisional"><a class="anchor" href="#loot-home-provisional" aria-label="Link to this section">#</a>Loot home (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>share</code></td><td>0.1</td></tr>
+<tr><td><code>years</code></td><td>1</td></tr>
+</tbody></table></div>
+<h2 id="sickness-home-provisional"><a class="anchor" href="#sickness-home-provisional" aria-label="Link to this section">#</a>Sickness home (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>withinMonths</code></td><td>3</td></tr>
+<tr><td><code>oneIn</code></td><td>4</td></tr>
+</tbody></table></div>
+<h2 id="official-to-commander-provisional"><a class="anchor" href="#official-to-commander-provisional" aria-label="Link to this section">#</a>Official to commander (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>might</th><th>cunning</th><th>logistics</th><th>traits</th><th>faithful army only</th></tr></thead>
+<tbody>
+<tr><td>Warden</td><td>2</td><td>1</td><td>1</td><td>Steady, Siege master</td><td></td></tr>
+<tr><td>Steward</td><td>0</td><td>1</td><td>3</td><td>Careful</td><td></td></tr>
+<tr><td>Muster master</td><td>1</td><td>1</td><td>2</td><td>Beloved, Old soldier</td><td></td></tr>
+<tr><td>Master of works</td><td>0</td><td>1</td><td>2</td><td>Siege master</td><td></td></tr>
+<tr><td>Tax collector</td><td>0</td><td>2</td><td>2</td><td>Greedy</td><td></td></tr>
+<tr><td>Customs officer</td><td>0</td><td>3</td><td>1</td><td>Careful</td><td></td></tr>
+<tr><td>Judge</td><td>1</td><td>2</td><td>1</td><td>Steady, Cruel</td><td></td></tr>
+<tr><td>Schoolmaster</td><td>0</td><td>2</td><td>1</td><td>Old soldier</td><td></td></tr>
+<tr><td>Marshal</td><td>2</td><td>2</td><td>2</td><td>Any</td><td></td></tr>
+<tr><td>Chaplain</td><td></td><td></td><td></td><td>Beloved</td><td>yes</td></tr>
+</tbody></table></div>
+<h2 id="years-served-bonus-provisional"><a class="anchor" href="#years-served-bonus-provisional" aria-label="Link to this section">#</a>Years served bonus (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>atYears</code></td><td>5, 10</td></tr>
+<tr><td><code>max</code></td><td>5</td></tr>
+</tbody></table></div>
+<h2 id="field-wage-multiplier-provisional"><a class="anchor" href="#field-wage-multiplier-provisional" aria-label="Link to this section">#</a>Field wage multiplier (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>commander</code></td><td>3</td></tr>
+<tr><td><code>captain</code></td><td>2</td></tr>
+</tbody></table></div>
+<h2 id="staff-provisional"><a class="anchor" href="#staff-provisional" aria-label="Link to this section">#</a>Staff (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>commander</code></td><td>100</td></tr>
+<tr><td><code>captain</code></td><td>50</td></tr>
+<tr><td><code>rations</code></td><td>2</td></tr>
+<tr><td><code>commanderHorses</code></td><td>30</td></tr>
+<tr><td><code>horseRations</code></td><td>3</td></tr>
+<tr><td><code>captainHorses</code></td><td>15</td></tr>
+</tbody></table></div>
+<h2 id="deputy-provisional"><a class="anchor" href="#deputy-provisional" aria-label="Link to this section">#</a>Deputy (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>clerksNeeded</code></td><td>20</td></tr>
+<tr><td><code>goldPerMonth</code></td><td>1</td></tr>
+</tbody></table></div>
+<h2 id="empty-province"><a class="anchor" href="#empty-province" aria-label="Link to this section">#</a>Empty province</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>tax</th><th>recruits</th><th>state</th><th>moved effect</th><th>type effect</th><th>recruits to retinue</th><th>tax to lord</th><th>loyalty steps</th></tr></thead>
+<tbody>
+<tr><td>Leave it</td><td>0.5</td><td>0.5</td><td>Ungoverned</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Move another official in</td><td></td><td></td><td></td><td>0.5</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Name a deputy</td><td>1</td><td>1</td><td></td><td></td><td>0</td><td></td><td></td><td></td></tr>
+<tr><td>Ask the lord next door</td><td></td><td></td><td></td><td></td><td></td><td>1</td><td>0.5</td><td>1</td></tr>
+</tbody></table></div>
+<h2 id="return-bonus-provisional"><a class="anchor" href="#return-bonus-provisional" aria-label="Link to this section">#</a>Return bonus (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>victories</code></td><td>3</td></tr>
+<tr><td><code>factor</code></td><td>1.5</td></tr>
+</tbody></table></div>
+<h2 id="lord-training"><a class="anchor" href="#lord-training" aria-label="Link to this section">#</a>Lord training</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>Warlike</code></td><td>knights and lancers, armoured foot</td></tr>
+<tr><td><code>Greedy</code></td><td>none</td></tr>
+</tbody></table></div>
+<h2 id="ai"><a class="anchor" href="#ai" aria-label="Link to this section">#</a>Ai</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>commissionFirst</code></td><td>Steward, Warden</td></tr>
+<tr><td><code>keepInSeat</code></td><td>Tax collector</td></tr>
+<tr><td><code>harvestMonthsAvoided</code></td><td>harvest</td></tr>
+</tbody></table></div>
+<h3 id="personalities"><a class="anchor" href="#personalities" aria-label="Link to this section">#</a>Personalities</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>levy</th><th>trains</th><th>hires</th></tr></thead>
+<tbody>
+<tr><td>militarist</td><td>deep</td><td>expensive arms</td><td></td></tr>
+<tr><td>merchant republic</td><td>little</td><td>nothing</td><td>yes</td></tr>
+<tr><td>steppe realm</td><td>normal</td><td>horse archers</td><td></td></tr>
+</tbody></table></div>
+<h2 id="pastoral-provisional"><a class="anchor" href="#pastoral-provisional" aria-label="Link to this section">#</a>Pastoral (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>herdShareMultiplier</code></td><td>2</td></tr>
+</tbody></table></div>
+<h3 id="spring-move"><a class="anchor" href="#spring-move" aria-label="Link to this section">#</a>Spring move</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>north</code></td><td>3, 4, 5</td></tr>
+<tr><td><code>south</code></td><td>9, 10, 11</td></tr>
+</tbody></table></div>
+<h2 id="official-victory-provisional"><a class="anchor" href="#official-victory-provisional" aria-label="Link to this section">#</a>Official victory (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>lordLoyaltySteps</code></td><td>1</td></tr>
+<tr><td><code>rulerVictories</code></td><td>1</td></tr>
+</tbody></table></div>
+<h2 id="their-man-provisional"><a class="anchor" href="#their-man-provisional" aria-label="Link to this section">#</a>Their man (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>victories</code></td><td>8</td></tr>
+<tr><td><code>years</code></td><td>5</td></tr>
+</tbody></table></div>

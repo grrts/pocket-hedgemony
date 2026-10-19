@@ -1,6 +1,6 @@
 {
  "$comment": "Warfare (domain/warfare/spec.md). One warfare config file (WAR-199). Every value is a placeholder from warfare-design v5, warfare-eras and warfare-styles (spec §10); key names follow spec §10. Era VIII and the part of era VII after 31 August 1939 are out of scope.",
- "_provisional": ["hits_per_bell", "kinds", "flee", "troop_cap", "drill_max", "sectors.Shore.attack_across", "ai.standing_orders", "ai.raids_at", "ai.war_chest_months", "amounts", "later_arms", "levels_by_era", "era_scale", "occupation.tax_share"],
+ "_provisional": ["hits_per_bell", "kinds", "flee", "troop_cap", "drill_max", "sectors.Shore.attack_across", "ai.standing_orders", "ai.raids_at", "ai.war_chest_months", "amounts", "later_arms", "levels_by_era", "era_scale", "occupation.tax_share", "lords.min_men", "lords.retinue_horse_share", "lords.retinue_horse_arm"],
  "$decisions": "D-WAR-1..21 (spec §13). Standing regiments break at 30 % (D-WAR-15), the Shore sector costs -20 % across a river (D-WAR-5), drill runs to 24 (D-WAR-9).",
  "skill_growth": {
   "$comment": "WAR-158, D-WAR-13: the staff college is the academy of eras VI-VII.",
@@ -81,7 +81,7 @@
  "troop_cap": { "with_official": 0.02, "muster_master": 0.03, "without": 0.01, "w12": 0.005, "w15": 2, "w18": 0.01 },
  "over_cap": { "pay": 2, "desertion": 0.05 },
  "levy_gather_days": 14,
- "lords": { "loyal_days": 21, "wavering_days": 42, "wavering_stay_months": 6, "wavering_share": 0.5 },
+ "lords": { "loyal_days": 21, "wavering_days": 42, "wavering_stay_months": 6, "wavering_share": 0.5, "min_men": 100, "retinue_horse_share": 0.2, "retinue_horse_arm": "knights and lancers" },
  "free_companies": [
   { "group": "Swiss and German foot", "people": "Swiss Confederacy", "regions": ["Swiss Confederacy", "the Empire"] },
   { "group": "Italian condottieri", "people": "Italian states", "regions": ["Italy"] },
@@ -277,6 +277,13 @@
   "long_war_years": 2,
   "max_ceded_share": 0.3333333333333333,
   "_provisional": ["long_war_years", "max_ceded_share"]
+ },
+ "settlement": {
+  "$comment": "Peace settlement scoring (WAR-240..WAR-251, Leroy X-23). Each province has a demand cost; the war's outcome gives the winner a capacity in the same points; demands that fit are signed, the AI counters or refuses the rest. All values provisional.",
+  "province_cost": { "base": 2, "per_sqrt_thousand_people": 0.5, "per_wealth": 1, "castle": 2, "coastal": 1, "river": 0.5, "capital_multiplier": 1.5, "not_bordering_multiplier": 1.25 },
+  "capacity_weights": { "land_held": 0.5, "capital_held": 0.15, "battles": 0.15, "armies": 0.1, "will_to_fight": 0.25 },
+  "gold_per_point": 25,
+  "surrender": { "peace_share": 0.75, "army_ratio": 0.25, "land_share": 0.5 }
  },
  "raid_war_months": 12,
  "notifications": {

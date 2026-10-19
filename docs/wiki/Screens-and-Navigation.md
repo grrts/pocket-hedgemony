@@ -20,7 +20,7 @@ This page covers every screen of Pocket Hegemony, from the boot logo to the fina
 
 **First run.** The first time the game runs, it asks its first-run questions before the start screen, each as one card with one choice, and never again. If your device language is one the game has, it is used silently (you can change it in [Settings](Settings)); otherwise a card asks. Where something needs consent (crash reports, and counting how far players get in the tutorial), one consent card asks for both, with both off until you turn them on; where nothing on a store needs consent, it does not appear. There are only these two first-run questions. The game never asks you to sign in before play, and it plays offline.
 
-**Start screen.** The game opens on the start screen with its menu already showing; there is no "Tap to start". Behind it the real map pans slowly at region zoom, close enough to see provinces, towns and castles. With a campaign in progress it pans over your realm in its current borders and season, read from the latest save's summary; otherwise it picks one of a handful of 1444 regions. The map behind takes no input and runs no simulation, and with Battery saver on it keeps moving at the lower frame rate. The title music starts on your first touch, click, key or button.
+**Start screen.** The game opens on the start screen with its menu already showing; there is no "Tap to start". Behind it the real map pans slowly at region zoom, close enough to see provinces, towns and castles. With a campaign in progress it pans over your realm in its current borders and season, read from the latest save's summary; otherwise it picks one of a handful of regions of the 1378 world. The map behind takes no input and runs no simulation, and with Battery saver on it keeps moving at the lower frame rate. The title music starts on your first touch, click, key or button.
 
 The menu has two groups:
 
@@ -48,7 +48,7 @@ On a phone in landscape the logo sits top left, the column and icon row fill the
 
 One screen in three steps, with a strip at the top ("Realm · Options · Begin"). Back moves one step back, and from step 1 returns to the start screen without asking. The nation select music plays, its lead voice changing with the highlighted realm.
 
-1. **Realm.** Choose a realm on the map at world zoom, with filters (region, difficulty, free or locked) and a short list of suggested realms. Tapping a realm shows its card with its strengths at a glance. A locked realm shows a padlock and a button to Unlock; coming back from a purchase returns you to step 1 with that realm still chosen. Quick start skips straight to Begin with the last options used and the realm you last tapped (or the first suggested one).
+1. **Realm.** Choose a realm on the map at world zoom, with filters (region, difficulty, free or locked) and a short list of suggested realms. Choosing a region frames it on the map and lists every realm there by name, one row each. Tapping a realm shows its card with its strengths at a glance and one line, Ways to grow ([The 1378 start](The-1378-Start)). A locked realm shows a padlock and a button to Unlock; coming back from a purchase returns you to step 1 with that realm still chosen. Quick start skips straight to Begin with the last options used and the realm you last tapped (or the first suggested one).
 2. **Options.** Difficulty, AI aggression, fog, historical or free events, ironman, and the end date, with presets that fill the whole step. The end date is 31 August of any year from 1494 to 1939; 31 August 1939 is the default.
 3. **Begin.** A summary card (banner, ruler, capital, start date, options) and one big Begin button.
 
@@ -72,7 +72,7 @@ A modal accepts no input to the screens below until it is answered or put off.
 ### The map
 
 - **Top bar:** realm name and banner (opens the country card), the date, gold with its monthly change, and levies. On a phone it holds at most five plaques; the rest move into the country card.
-- **Tool column** on the right edge: map mode, go to capital, and Realm book.
+- **Tool column** on the right edge: map mode, go to capital, your commanders and sound, two buttons wide on a phone held sideways. Achievements and Settings are in the game menu, whose button carries a dot while an achievement waits to be looked at.
 - **End turn** (the hourglass, lower right) carries a badge counting the items on the Attention screen. Tapping the badge, or the controller's "next" button, opens the Attention screen.
 - **Auto** (just above End turn) lets the weeks play one after another in a single-player campaign; a tap stops it at the end of the current week. See [Time and Turns](Time-and-Turns#auto-turns).
 - **Attention bell** next to the date lights while the Attention screen holds a warning, and opens it. It is the only place the game warns you; there is no advisor.
@@ -95,18 +95,20 @@ A **country card** has the tabs General, Diplomacy, Trade and Army, and opens on
 
 ### The Realm book
 
-One full screen with up to six tabs. It opens on the tab you last used. A new system adds a section inside a tab, never a seventh tab.
+Your own realm's card is the Realm book. Tap your banner or a plaque in the top bar and it opens beside the map, on the page that holds what you tapped (the gold plaque opens Economy, Treasury). Its pages are grouped into six sections, each answering one question, so you never scan a long row of tabs. A new system adds a page inside a section, never a seventh section.
 
-| Tab | What it holds |
-|---|---|
-| Realm | Country card in full, ruler and family, lords, government |
-| Treasury | Treasury, Tax screen, Food policy screen, trade |
-| Army | All armies and fleets, commanders, levy, commission, troop cap |
-| Abroad | Diplomacy, relations, subjects, wars and peace voices |
-| Learning | Schools, research tree, religion and culture |
-| Chronicle | Past turn reports, event log, battle reports, ledger |
+| Section | Pages | The question it answers |
+|---|---|---|
+| Realm | Overview, Government, Heritage, Score | How is my realm doing? |
+| Economy | Treasury, Trade, Food | Where do my money and food come from? |
+| Lands | Provinces, Officials, Lords, Colonies, Hunting grounds (tribal realms) | Who runs which land? |
+| Military | Army, Navy | What can fight? |
+| Diplomacy | Diplomacy | Who are my friends and foes? |
+| Research | Research, Peoples | What do we study and believe? |
 
-The tabs are a narrow left rail of icons in Short wide, a row of icons along the bottom in Tall, and icon and name on a left rail in Large. Show on map (on a screen that points at an army or province) closes the book, moves the camera and opens that card; Back returns to the book on the same tab and scroll position. A book screen opened from a card (Levy from a province card) stacks on the card, and Back returns to the card.
+**The Overview** (Realm's first page) is the whole realm on one screen: your capital, then one tile for each other section with its key line (gold and gold a month, provinces and people, armies and men, war or peace, what you study), then your ruler and heir, the score and Stability's four pillars. A tile with a red edge says what waits on you ("2 provinces hungry", "1 new land to fill", "An answer waits", "Choose what to study"), and tapping it opens the page that holds it. What the old General tab repeated from other pages (government form, faiths and languages, lands by ground, heritage, the fallen, neighbours) now lives only on its own page.
+
+The six sections are one row of icons with their names under the card's title, in every shape; a section with several pages shows them in a second, lower row. Tapping a section opens the page you last looked at there. A red seal on Diplomacy means an offer or an envoy waits for your answer. Turn reports and battle replays live in the News (the scroll button in the top bar), which took the place of the old Chronicle. Another realm's card keeps its own tabs: General, Diplomacy, Trade, Army and Heritage. Show on map (on a screen that points at an army or province) closes the book, moves the camera and opens that card; Back returns to the book on the same tab and scroll position. A book screen opened from a card (Levy from a province card) stacks on the card, and Back returns to the card.
 
 ### The game menu
 
@@ -116,7 +118,7 @@ The game menu opens from its button, from Back on an empty map, from Esc, or fro
 
 1. **Orders.** The map is live. End turn ends the turn with one tap, with a confirmation only if Settings turns it on. While any event is unanswered, End turn shows the event's scroll icon with the count instead of the hourglass, and tapping it opens the first unanswered event instead of ending the turn.
 2. **Turn in progress.** Your orders for the turn are written down before it runs, so together with the last save the world before the turn is kept and killing the app mid-turn loses nothing. The map stays visible and can be panned and zoomed, orders are frozen, the hourglass turns, armies march along their routes and borders change as results arrive. If a turn takes longer than 1.5 seconds, a small parchment strip says what is being worked out ("The courts of Europe deliberate…").
-3. **Battles.** Each turn is one week: End turn plays 7 days, and the top bar shows the date with its day, such as "18 November 1444". The week plays out day by day. When one of your armies or fleets meets an enemy, the map flies there and the battle view opens: both sides, their commanders, the ground, how far the battle has got, and its standing orders. While any of your battles runs, time slows to steps of 4 hours, six a day, and you watch it round by round. At any step you can change the standing orders for that battle or press Retreat. You cannot skip to the result. If several of your battles run at once, a battle switcher lists them with each one's progress, and you can jump between them. When all of them have ended, a result card (who won, men lost, the one-line reason) with Carry on sends time back to whole days until your next battle or the end of the week. Battles between other realms never slow the game; they appear on the map and, if they matter to you, in the turn report. Every battle can be watched again from the turn report and the Chronicle.
+3. **Battles.** Each turn is one week: End turn plays 7 days, and the top bar shows the date with its day, such as "27 September 1378". The week plays out day by day. When one of your armies or fleets meets an enemy, the map flies there and the battle view opens: both sides, their commanders, the ground, how far the battle has got, and its standing orders. While any of your battles runs, time slows to steps of 4 hours, six a day, and you watch it round by round. At any step you can change the standing orders for that battle or press Retreat. You cannot skip to the result. If several of your battles run at once, a battle switcher lists them with each one's progress, and you can jump between them. When all of them have ended, a result card (who won, men lost, the one-line reason) with Carry on sends time back to whole days until your next battle or the end of the week. Battles between other realms never slow the game; they appear on the map and, if they matter to you, in the turn report. Every battle can be watched again from the turn report and the Chronicle.
 4. **Events** open one at a time as modal cards (picture, text, two or three options, each showing its effects on tap or focus), in date order. Look at the map shrinks the event into the badge on End turn so you can check something first. Nothing ever answers an event for you. See [Historical events](Historical-Events).
 5. **News.** What happened goes in the News log, which never opens by itself. Tap the scroll button in the top bar to read it: calls to arms and peace offers to answer come first, then every news item of past weeks, newest first under a heading per day, with a switch between everything and only your realm. Each line with a place has a map button that takes you there. The button counts what came about your realm since you last looked, and blinks while a call or offer waits. When one of your battles or sieges begins, or a call to arms or peace offer arrives, a short alert drops in under the top bar with Go there (or Answer); it goes away on its own, and the log keeps what it said. A battle of yours also makes the week wait: tap Watch on its alert and the map goes there, the week plays on slowly enough to follow, and a strip along the bottom shows each side's men left against what they started with and the round; when the battle ends the strip says how. Tap End turn instead to play on without watching.
 6. The Attention list and badge refresh, and the next orders phase begins.
@@ -138,22 +140,26 @@ Lines are listed most urgent first. Each has an icon, one sentence and a Show bu
 
 - **Battle view:** while your battles run, Back takes you to the map and the battles keep running; the switcher brings you back. In a replay, Back returns to where the replay was opened. With a controller: A is pause and play, then Carry on; B goes back to the map (or leaves a replay); X is Retreat; Y shows the commander's line; the bumpers switch battle; Menu does nothing.
 - **Siege view:** a full screen opened from a besieged castle at local zoom or from its card; Back returns to the map at the castle.
-- **Peace table:** a modal opened from the Abroad tab, an enemy's country card or an incoming offer, returning where it was opened. An incoming offer cannot be dismissed, only answered or put off one turn.
+- **Peace table:** a modal opened from the Diplomacy section, an enemy's country card or an incoming offer, returning where it was opened. An incoming offer cannot be dismissed, only answered or put off one turn.
 - **Map mode picker:** a small pop-over from the tool column.
 - **Confirmation:** a small modal for destructive actions only, returning to the screen below unchanged.
 
 ### How a campaign ends
 
-**Game over.** When your realm no longer exists (annexed, or every province lost), the map zooms out over the old borders while the game over music plays, and a card says how it ended in one line with the date ("Burgundy was divided between France and the Empire · 1477") and your realm's highs: largest size, years lasted, battles won. It offers Look back (the Chronicle, read only), Play on as another realm (any realm on the current map) and Main menu. Play on is allowed in every campaign, ironman included, but it ends achievements for that campaign, says so on the button before you press it ("Achievements end for this campaign"), and cannot be undone.
+**Game over.** When your realm no longer exists (annexed, or every province lost), the map zooms out over the old borders while the game over music plays, and a card says how it ended in one line with the date ("Burgundy was divided between France and the Empire · 1477") and your realm's highs: largest size, years lasted, battles won. It offers Look back (the News, read only), Play on as another realm (any realm on the current map) and Main menu. Play on is allowed in every campaign, ironman included, but it ends achievements for that campaign, says so on the button before you press it ("Achievements end for this campaign"), and cannot be undone.
 
 **Winning.** There are two ways to win.
 
-- **World domination:** you own, or hold as subjects, at least half of the world's settled land provinces. It is checked every January, and reaching it wins at once: the campaign end sequence plays straight away, and the final result offers Keep playing, which takes you back to the map until the end date.
-- **Best at the end:** when the end date comes, the realm that leads the Economy, Power or Technology score wins in that score. No margin is needed, and a tie shares the win. The scores are worked out every January for the Realm book; see [Your realm](Your-Realm).
+- **World domination:** you own, or hold as subjects, every settled land province of the world. It is checked every January, and reaching it wins at once: the campaign end sequence plays straight away, and the final result offers Keep playing, which takes you back to the map until the end date.
+- **Best at the end:** when the end date comes, the realm that has grown most in the Economy, Power or Technology score wins in that score: each score's 25-year average against the realm's own start. No margin is needed, and a tie shares the win. The scores are worked out every January for the Realm book; see [Your realm](Your-Realm).
+
+**Chapters.** Every 100 years (January 1544, 1644, 1744 and 1844) a chapter closes and the chapter card opens by itself in the panel: the hundred years it covers, one line on how your realm did ("France led Power"), your growth and place in each score beside who led it, and the leading realms. **Play on** closes it and the next chapter begins; **Score** opens the Score tab, where every closed chapter stays listed and opens its card again. Auto turns stop at the end of that week. The last chapter closes with the campaign, on the end card.
 
 **Campaign end.** When the end date is reached (31 August 1939 by default, or the date chosen at the start) or you win by world domination, the final wrap-up events appear as normal event cards, then a closing sequence steps through your borders era by era at world zoom with the campaign end music, then the final result. There is no playing on past the end date.
 
 **Final result.** The scores of your realm and the five leading realms, the outcome (your wins, or with none your place in each score, such as "No victory · Economy 2nd · Power 3rd · Technology 2nd"), the achievements earned in this campaign, and Main menu or Credits. Achievements are earned only in ironman campaigns, so outside ironman the screen says so instead of showing an empty list.
+
+**In the game today.** The ending is one card over the map, the end card. It opens by itself when the end date comes, when your realm holds no land any more, or when the January turn finds your world domination, and the clock stops. It says how the campaign ended with the date ("France was divided between England and Burgundy · 1420", "The campaign ends · 31 August 1939", "World domination · 1700"), the outcome line, your score breakdown, the leading realms and your highs. After the end date it offers **Look at the map** (the End turn button becomes a crown that opens the card again) and **New game**; after game over **Play on as another realm** (tap a realm, then Rule it; achievements end) and **New game**; after world domination **Keep playing** and **New game**. The wrap-up events, the closing sequence, Look back and Credits come later.
 
 ### Interruptions
 
@@ -168,8 +174,8 @@ Lines are listed most urgent first. Each has an icon, one sentence and a Show bu
 
 | Shape | When | Layout |
 |---|---|---|
-| Short wide | A window under 500 css px tall, such as a phone in landscape | Map first, cards as side sheets on the left, Realm book tabs as a left icon rail, top bar one thin row |
-| Tall | A tablet in portrait, or a desktop window taller than wide (never a phone) | Cards as bottom sheets, Realm book tabs as a bottom row, tool column on the right above End turn |
+| Short wide | A window under 500 css px tall, such as a phone in landscape | Map first, cards as side sheets on the left, the Realm book's six sections as one row of icons with names, top bar one thin row |
+| Tall | A tablet in portrait, or a desktop window taller than wide (never a phone) | Cards as bottom sheets, the same one row of sections, tool column on the right above End turn |
 | Large | A tablet in landscape, a desktop window, a Steam Deck (1280 × 800) | Side sheets with a fixed width, menus centred with a maximum width, nothing stretched edge to edge |
 | Far | A TV or Steam Machine (chosen in Settings or detected) | Large with UI scale raised so body text is about 1/30 of screen height, thicker focus frames, nothing in the outer 5 % |
 
@@ -211,7 +217,7 @@ The screen list is the single catalogue that code, music and sound key on:
 | credits | Full | Back | main menu or final result | credits |
 | map | Home | your capital or last army | opens the game menu | game music |
 | card | Sheet | first line | previous card or map | unchanged |
-| realm_book | Full | last tab's first item | map | unchanged; diplomacy mood on Abroad |
+| realm_book | Full | last tab's first item | map | unchanged; diplomacy mood on Diplomacy |
 | game_menu | Modal | Return to the map | map | unchanged |
 | turn | Overlay | none | none | unchanged |
 | battle | Full | Retreat while it runs, Carry on after | Back to the map while battles run (they keep running); where opened for a replay | war tracks |
@@ -236,7 +242,7 @@ The screen list is the single catalogue that code, music and sound key on:
 - [Tutorial and help](Tutorial-and-Help): tips, the Almanac, the tutorial and its chapter list, and what goes on the Needs attention list.
 - [Achievements](Achievements): play on ends achievements; the final result shows them.
 - [Music and sound](Music-and-Sound): screen ids and Realm book tabs drive music; sound suspends and resumes.
-- [The 1444 start](The-1444-Start): realms, suggested realms, filters, campaign options and presets.
+- [The 1378 start](The-1378-Start): realms, suggested realms, filters, campaign options and presets.
 - [Your realm](Your-Realm), [Provinces](Provinces), [Recruiting](Recruiting), [Diplomacy](Diplomacy), [Research](Research): the cards and Realm book screens they fill.
 
 The computer players never use these screens.
@@ -264,7 +270,7 @@ All are provisional values, unless marked, kept in the game shell's and the map'
 | `shell.tap_target_gap` | 8 points |
 | `shell.controller_end_turn_hold` | 0.5 s (Menu on a controller, Enter on a keyboard) |
 | `shell.end_date_earliest_year` | 1494 |
-| `shell.domination_share` | half of the world's settled land provinces (decided) |
+| `shell.domination_share` | every settled land province of the world (decided) |
 | `shell.ledger_leaders` | 5 realms beside yours on the final result |
 | `shell.campaign_end_date_default` | 31 August 1939 (decided) |
 | `attention.*` | one table of warnings and thresholds |

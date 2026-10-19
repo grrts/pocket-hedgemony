@@ -274,26 +274,6 @@ export const SPRITES = {
     ".bbbbbbbbb.",
     "..bbbbbbb..",
   ],
-  /** Close in, a caravan on its trade path: a pack mule leading a covered cart in the realm's colour, walking left (VIEW-123). */
-  caravanTrain: [
-    "....NNNN....NNNNNN.",
-    "...NLLLNn..NLLLLLNn",
-    "ab.bNNNnbb.NNNNNNNn",
-    "abbbbbbbbbbbbbbbbbb",
-    "..bbbbbbb.b.tbt.tbt",
-    "..t.t..t.t..bmb.bmb",
-    "..t.t..t.t..tbt.tbt",
-  ],
-  /** Close in, a barge on a river trade path: bales in the realm's colour and a boatman poling at the stern (VIEW-123). */
-  barge: [
-    "..........f...t",
-    "..........Nn.t.",
-    "..NNN.NNN.Nnt..",
-    "..NLN.NLN.bbt..",
-    "bbbbbbbbbbbbbbb",
-    ".bbbbbbbbbbbbb.",
-    "..ttttttttttt..",
-  ],
   /** Move order arrow head. */
   flag: [
     "kk....",
@@ -357,35 +337,313 @@ export function spriteUrl(name: SpriteName, nationColor: string, scale: number):
   return url;
 }
 
+
 /**
- * The living map's figures (VIEW-116..VIEW-120), drawn in the ground's own art
- * pixels: a few pixels each, so a dozen make a block on one map pixel. Facing
- * east with their feet on the last row (the ink outline adds one below). Two
- * frames each where they walk.
+ * The living map's detailed pieces (feedback 126): the same figures, ships and
+ * traders drawn at twice the art density, so each art pixel of the ground holds
+ * two by two of theirs and they stand as tall as before with far more in them.
+ * Facing east with their feet (or keel) on the last row; the ink outline is a
+ * half art pixel too. The coarse art above stays for the icons further out.
  */
 export const FIGURES = {
-  foot0: ["...s", ".s.s", ".f.s", "NNNs", "NLNs", ".n.s", "k.k."],
-  foot1: ["...s", ".s.s", ".f.s", "NNNs", "NLNs", ".n.s", ".kk."],
-  horse0: ["...s...", "...f...", "..NNn..", "bbbNbaa", ".bbbbb.", ".H...H."],
-  horse1: ["...s...", "...f...", "..NNn..", "bbbNbaa", ".bbbbb.", "..H.H.."],
-  guns0: ["..f....", ".NNsssk", "tttNt..", "k.k...."],
-  guns1: ["..f....", ".NNsssk", "tttNt..", ".k.k..."],
-  wagons0: [".wwww.", "wwwwww", "tNNNNt", ".k..k."],
-  wagons1: [".wwww.", "wwwwww", "tNNNNt", ".k..k."],
-  banner0: ["tNNN", "tLNn", "tNN.", "t.s.", "t.f.", "tNNN", "tNLN", "t.n.", ".k.k"],
-  banner1: ["tNN.", "tNLN", "tNNn", "t.s.", "t.f.", "tNNN", "tNLN", "t.n.", "..kk"],
-  /** A besieger's tent, its stripe in the realm's colour. */
-  tent: ["..k..", ".wwe.", "wwNee", "wNNNe", "wwkee"],
+  /** A spearman in a kettle hat, his tunic in the realm's colour. */
+  foot0: [
+    "........w.",
+    ".......gsd",
+    "........t.",
+    "...gsd..t.",
+    "..gsssd.t.",
+    ".dsssssdt.",
+    "...hfff.t.",
+    "...hfzF.t.",
+    "....fF..t.",
+    "..LLNNnfF.",
+    ".LNNyNn.t.",
+    ".LNNNNn.t.",
+    "..bbybb.t.",
+    "..Nn.Nn.t.",
+    "..dd..d.t.",
+    ".tt...tt..",
+  ],
+  foot1: [
+    "........w.",
+    ".......gsd",
+    "........t.",
+    "...gsd..t.",
+    "..gsssd.t.",
+    ".dsssssdt.",
+    "...hfff.t.",
+    "...hfzF.t.",
+    "....fF..t.",
+    "..LLNNnfF.",
+    ".LNNyNn.t.",
+    ".LNNNNn.t.",
+    "..bbybb.t.",
+    "..NnNn..t.",
+    "...dd...t.",
+    "...ttt....",
+  ],
+  /** A horseman in a sallet on a bay horse under a saddle cloth in the realm's colour. */
+  horse0: [
+    "......gs........",
+    ".....gssd.......",
+    "......fz........",
+    ".....LNNn.....a.",
+    "....LNNNnf...abH",
+    ".....NyNn.f.abzb",
+    ".....NNNn..abbbH",
+    ".a..bLNNnbbbb.HH",
+    "aabbbNNNNnbbb...",
+    "a.bbbnnnnnbbb...",
+    "..bbbbbbbbbbH...",
+    "..bH.bH..bH.bH..",
+    "..b..b...b...b..",
+    "..H..H...H...H..",
+  ],
+  horse1: [
+    "......gs........",
+    ".....gssd.......",
+    "......fz........",
+    ".....LNNn.....a.",
+    "....LNNNnf...abH",
+    ".....NyNn.f.abzb",
+    ".....NNNn..abbbH",
+    ".a..bLNNnbbbb.HH",
+    "aabbbNNNNnbbb...",
+    "a.bbbnnnnnbbb...",
+    "..bbbbbbbbbbH...",
+    "...bHbH...bHbH..",
+    "...b..b...b..b..",
+    "..H....H.H....H.",
+  ],
+  /** A bronze gun on its carriage, its gunner behind it with the rammer. */
+  guns0: [
+    ".gs.............",
+    "gssd............",
+    ".fz.............",
+    "LNNn...ddssssd..",
+    "NNNnf.dsggssssdk",
+    "NyNn..ddssssssd.",
+    "NNNn..tbtt......",
+    ".dd..tbybt......",
+    ".dd.ttbtbtt.....",
+    ".tt...tbt.......",
+  ],
+  guns1: [
+    ".gs.............",
+    "gssd............",
+    ".fz.............",
+    "LNNn...ddssssd..",
+    "NNNnf.dsggssssdk",
+    "NyNn..ddssssssd.",
+    "NNNn..tbtt......",
+    ".dd..tbybt......",
+    ".d.dttbtbtt.....",
+    "t...t.tbt.......",
+  ],
+  /** A covered supply wagon, a band of the realm's colour on its canvas. */
+  wagons0: [
+    "..wwwwwwww....",
+    ".wwwwwwwwwww..",
+    "wwgwwwwwwgwww.",
+    "wNNNNNNNNNNNw.",
+    "wwgwwwwwwgwww.",
+    "tbbbbbbbbbbbbt",
+    ".bbbbbbbbbbbb.",
+    ".tbt....tbt.tt",
+    ".bmb....bmb...",
+    ".tbt....tbt...",
+  ],
+  wagons1: [
+    "..wwwwwwww....",
+    ".wwwwwwwwwww..",
+    "wwgwwwwwwgwww.",
+    "wNNNNNNNNNNNw.",
+    "wwgwwwwwwgwww.",
+    "tbbbbbbbbbbbbt",
+    ".bbbbbbbbbbbb.",
+    ".tbt....tbt.tt",
+    ".mbb....mbb...",
+    ".tbt....tbt...",
+  ],
+  /** The commander: a knight under his great banner, gold at his crest, riding at the head. */
+  banner0: [
+    ".y..............",
+    ".tNNNNNNL.......",
+    ".tNLLyNNn.......",
+    ".tNLyyyNn.......",
+    ".tNNLyNnn.......",
+    ".tNNNNNnn.......",
+    ".tNn.Nn.n.......",
+    ".t....yy........",
+    ".t...gssd.......",
+    ".t...wssd.......",
+    ".t....fz........",
+    ".tf..LNNn.....a.",
+    ".tfLLNNNnf...abH",
+    ".t...NyNn.f.abzb",
+    ".t...NNNn..abbbH",
+    ".ta.bLNNnbbbb.HH",
+    "aabbbNNNNnbbb...",
+    "a.bbbnynynbbb...",
+    "..bbbbbbbbbbH...",
+    "..bH.bH..bH.bH..",
+    "..b..b...b...b..",
+    "..H..H...H...H..",
+  ],
+  banner1: [
+    ".y..............",
+    ".tNNNNNL........",
+    ".tNLLyNNnn......",
+    ".tNLyyyNNn......",
+    ".tNNLyNNnn......",
+    ".tNNNNNNn.......",
+    ".tNn.NNn........",
+    ".t....yy........",
+    ".t...gssd.......",
+    ".t...wssd.......",
+    ".t....fz........",
+    ".tf..LNNn.....a.",
+    ".tfLLNNNnf...abH",
+    ".t...NyNn.f.abzb",
+    ".t...NNNn..abbbH",
+    ".ta.bLNNnbbbb.HH",
+    "aabbbNNNNnbbb...",
+    "a.bbbnynynbbb...",
+    "..bbbbbbbbbbH...",
+    "...bHbH...bHbH..",
+    "...b..b...b..b..",
+    "..H....H.H....H.",
+  ],
+  /** A besieger's tent, striped in the realm's colour, its flap open. */
+  tent: [
+    ".....tN.....",
+    ".....t......",
+    "....wwe.....",
+    "...wwNee....",
+    "..wwNNNee...",
+    ".wwwNNNeee..",
+    "wwwwNmNeeee.",
+    "wwwNmmmNeee.",
+    "wwwNmmmNeeee",
+    "EEEEEEEEEEEE",
+  ],
+  /** Close in, a trading ship on a sea trade path: a cog under a striped sail in the realm's colour (VIEW-123). */
+  cog: [
+    "..........y...........",
+    "..........tNN.........",
+    "..........tLNn........",
+    "......wwwwtwwww.......",
+    "......wNwNtNwNw.......",
+    "......wNwNtNwNw.......",
+    "......wNwNtNwNw.......",
+    "......wNwNtNwNw.......",
+    ".......wwwtwww........",
+    ".ao.......t........ao.",
+    ".bbb......t.......bbb.",
+    "bbbbbbbbbbbbbbbbbbbbbb",
+    "bobbbbbbbbbbbbbbbbbbob",
+    ".bbbbbbbbbbbbbbbbbbbb.",
+    "..HbbbbbbbbbbbbbbbbH..",
+    "...HHHHHHHHHHHHHHHH...",
+  ],
+  /** Close in, one hull of a fleet: a carrack under a mainsail in the realm's colour, bow to the right (VIEW-121). */
+  hull0: [
+    "..........y.................",
+    "..........tNNN..............",
+    "..........tLNn.......y......",
+    "..........t..........tNn....",
+    "......wwwwtwwww......t......",
+    ".....wLNNNtNNNNw...wwtww....",
+    ".....wNNNytyNNNw..wwwtwww...",
+    "..t..wNNyytyyNNw..wgwtwgw...",
+    "..tw.wNNNytyNNNw..wwwtwww...",
+    "..tww.wNNNtNNNww...wwtww...t",
+    "..twww.wwwtwww......wtw...t.",
+    "..t......t.t........t....t..",
+    "aaoaao...t.t........t..aaoa.",
+    "bbbbbb...t.t........t..bbbt.",
+    "bobbbbbbbbbbbbbbbbbbbbbbbbb.",
+    "bbbbbbbbbbbbbbbbbbbbbbbbbbb.",
+    ".byybbbbbbbbbbbbbbbbbbbbbb..",
+    ".bbmbbmbbmbbmbbmbbmbbmbbbb..",
+    "..bbbbbbbbbbbbbbbbbbbbbbb...",
+    "...HbbbbbbbbbbbbbbbbbbbH....",
+    "....HHHHHHHHHHHHHHHHHHH.....",
+  ],
+  hull1: [
+    "..........y.................",
+    "..........tNN...............",
+    "..........tLNNn......y......",
+    "..........t..........tN.....",
+    "......wwwwtwwww......t......",
+    ".....wLNNNtNNNNw...wwtww....",
+    ".....wNNNytyNNNw..wwwtwww...",
+    "..t..wNNyytyyNNw..wgwtwgw...",
+    "..tw.wNNNytyNNNw..wwwtwww...",
+    "..tww.wNNNtNNNww...wwtww...t",
+    "..twww.wwwtwww......wtw...t.",
+    "..t......t.t........t....t..",
+    "aaoaao...t.t........t..aaoa.",
+    "bbbbbb...t.t........t..bbbt.",
+    "bobbbbbbbbbbbbbbbbbbbbbbbbb.",
+    "bbbbbbbbbbbbbbbbbbbbbbbbbbb.",
+    ".byybbbbbbbbbbbbbbbbbbbbbb..",
+    ".bbmbbmbbmbbmbbmbbmbbmbbbb..",
+    "..bbbbbbbbbbbbbbbbbbbbbbb...",
+    "...HbbbbbbbbbbbbbbbbbbbH....",
+    "....HHHHHHHHHHHHHHHHHHH.....",
+  ],
+  /** Close in, a caravan on its trade path: a pack mule leading a covered cart in the realm's colour, walking left (VIEW-123). */
+  caravanTrain: [
+    ".a.................wwwwwwwwwww...",
+    "aab.....wwww......wLLNNNNNNNNnw..",
+    "abzb...wLNNnw....wLNNNNNNNNNNNnw.",
+    "Hbbb...wNyNnw....wNNNNNNNNNNNNnw.",
+    "..bbb..wNNNnw....wNNNNNNNNNNNNnw.",
+    "...bbbbbbbbbbbbbttbbbbbbbbbbbbbbt",
+    "....bbbbbbbbbbbb..bbbbbbbbbbbbbb.",
+    "....bbbbbbbbbbb....tbbt....tbbt..",
+    "....bH.bH.bH.bH....bmyb....bmyb..",
+    "....b..b..b...b....tbbt....tbbt..",
+    "....H..H..H...H.....tt......tt...",
+  ],
+  /** Close in, a barge on a river trade path: bales in the realm's colour and a boatman poling at the stern (VIEW-123). */
+  barge: [
+    "........................f...t.",
+    "......................hfF..t..",
+    "......................LNn.t...",
+    "...wwww..wwww.........NNnt....",
+    "..wNNNnw.wNNNnw......fNNn.....",
+    "..wNyNnw.wNyNnw..wwwwbdd......",
+    "..wNNNnw.wNNNnw.wNNNnw.d......",
+    "bbbbbbbbbbbbbbbbbbbbbbbbbbbbb.",
+    ".boooooooooooooooooooooooooob.",
+    "..bbbbbbbbbbbbbbbbbbbbbbbbbb..",
+    "...tttttttttttttttttttttttt...",
+  ],
 } as const;
 
 export type FigureName = keyof typeof FIGURES;
 
+
 /** Least-recently-used cache of figure art, keyed by figure, colour, whole art pixel and facing (VIEW-130). */
-const figureCache = new Map<string, HTMLCanvasElement>();
+const figureCache = new Map<string, FigureArt>();
 const FIGURE_CACHE_MAX = 400;
 
-/** A figure at a whole number of CSS pixels per art pixel, tinted with its realm's colour, facing east (1) or west (-1). */
-export function figureSprite(name: FigureName, color: string, u: number, dir: 1 | -1): HTMLCanvasElement {
+/** A figure's picture and the size to draw it at, in CSS pixels. */
+export interface FigureArt {
+  img: HTMLCanvasElement;
+  w: number;
+  h: number;
+}
+
+/**
+ * A figure at `u` CSS pixels per art pixel of the ground, so half that per pixel of
+ * its own art, tinted with its realm's colour, facing east (1) or west (-1). The
+ * picture is painted at the screen's own pixels so the half art pixels stay sharp.
+ */
+export function figureSprite(name: FigureName, color: string, u: number, dir: 1 | -1): FigureArt {
   const key = `${name}|${color}|${u}|${dir}`;
   const hit = figureCache.get(key);
   if (hit) {
@@ -395,19 +653,21 @@ export function figureSprite(name: FigureName, color: string, u: number, dir: 1 
   }
   // Outlined in ink like every sprite, so each figure in a block reads on any ground.
   const rows = outlined(FIGURES[name].map((r) => (dir === 1 ? r : [...r].reverse().join(""))));
+  const k = Math.max(1, Math.round((u * Math.min(window.devicePixelRatio || 1, 2)) / 2));
   const canvas = document.createElement("canvas");
-  canvas.width = rows[0]!.length * u;
-  canvas.height = rows.length * u;
+  canvas.width = rows[0]!.length * k;
+  canvas.height = rows.length * k;
   const ctx = canvas.getContext("2d")!;
   rows.forEach((row, y) => {
     for (let x = 0; x < row.length; x++) {
       const ch = row[x]!;
       if (ch === ".") continue;
       ctx.fillStyle = ch === "N" ? color : ch === "n" || ch === "L" ? shade(color, ch) : KEY[ch]!;
-      ctx.fillRect(x * u, y * u, u, u);
+      ctx.fillRect(x * k, y * k, k, k);
     }
   });
-  figureCache.set(key, canvas);
+  const art = { img: canvas, w: (rows[0]!.length * u) / 2, h: (rows.length * u) / 2 };
+  figureCache.set(key, art);
   if (figureCache.size > FIGURE_CACHE_MAX) figureCache.delete(figureCache.keys().next().value!);
-  return canvas;
+  return art;
 }

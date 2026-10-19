@@ -12,5 +12,7 @@ export * from "./turn.ts";
 export * from "./front.ts";
 export * from "./ending.ts";
 export * from "./input.ts";
+export * from "./desk.ts";
 export { classifyShape, layoutFor, mapHud, checkTouchRules, cornerOf, oppositeCorners, portraitNotice, type Shape, type Window } from "../map-presentation/index.ts";
 export * from "./autoTurns.ts";
+export * from "./overview.ts";

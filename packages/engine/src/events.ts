@@ -1,15 +1,26 @@
 import { isHuman } from "./humans.ts";
 import campaign from "../../rules/data/domain/events-campaign.json" with { type: "json" };
 import bridge from "../../rules/data/domain/events-places.json" with { type: "json" };
+import rules from "../../rules/data/domain/events.json" with { type: "json" };
+import geography from "../../rules/data/domain/exploration-regions.json" with { type: "json" };
+import west from "../../rules/data/domain/events-bridge-west.json" with { type: "json" };
+import lordEvents from "../../rules/data/domain/events-bridge-lords.json" with { type: "json" };
+import sequels from "../../rules/data/domain/events-ambitions.json" with { type: "json" };
 import * as evt from "./domain/events/index.ts";
 import * as dip from "./domain/diplomacy/index.ts";
+import * as subj from "./domain/subjects/index.ts";
+import { bondOf, bondsChanged, makeSubject, monthNow, subjectTies } from "./subjects.ts";
 import { Rng } from "./rng.ts";
 import { stabilityOf } from "./stability.ts";
 import { cedeProvince, controller, type News } from "./war.ts";
+import { spareSleepers, wakeRealm, type Waking } from "./sleeping.ts";
 import type { World } from "./world.ts";
 import { noteChoice } from "./achievements.ts";
 import { traitLean } from "./rulers.ts";
-import { headEventChosen, isHeadPatron, setHeadPatron } from "./faithHeads.ts";
+import { faithOf, headEventChosen, isHeadPatron, setHeadPatron } from "./faithHeads.ts";
+import { spark } from "./rebels.ts";
+import { historicalLordComes, laterLord } from "./lords.ts";
+import { heritageStates } from "./domain/national-strengths/index.ts";
 
 /**
  * Milestone 6, history (first slice): the 1444 event tree fires in the game.
@@ -23,11 +34,33 @@ import { headEventChosen, isHeadPatron, setHeadPatron } from "./faithHeads.ts";
  */
 
 type Campaign = Pick<evt.Tree, "ages" | "periods" | "events" | "modifiers" | "localization"> & { entities: Record<string, string> };
-const data = campaign as unknown as Campaign;
+/** A region's bridge events of 1378 to 1444, with the places, names and words they bring (EVT-085). */
+type Bridge = { events: Record<string, evt.EventDef>; places: Record<string, string[]>; entities: Record<string, string>; localization: Record<string, string> };
+const BRIDGES = [west, lordEvents] as unknown as Bridge[];
+/** Events that follow a realm's fulfilled ambition (HER-093). */
+const SEQUELS = sequels as unknown as Pick<Bridge, "events" | "localization">;
+const base = campaign as unknown as Campaign;
+const data: Campaign = {
+  ...base,
+  events: Object.assign({}, base.events, ...BRIDGES.map((b) => b.events), SEQUELS.events),
+  entities: Object.assign({}, base.entities, ...BRIDGES.map((b) => b.entities)),
+  localization: Object.assign({}, base.localization, ...BRIDGES.map((b) => b.localization), SEQUELS.localization),
+};
+/** The bridge events' ids, which a later start counts as history (EVT-087). */
+const BRIDGE_EVENTS = new Set(BRIDGES.flatMap((b) => Object.keys(b.events)).filter((id) => !(id in base.events)));
+/** A later figure who came before the start is not history the tree reads (REALM-295), so a later start keeps no record of him. */
+const PAST_EVENTS = [...BRIDGE_EVENTS].filter((id) => !(id in lordEvents.events));
+const PLACES: Record<string, string[]> = Object.assign({}, bridge.places, ...BRIDGES.map((b) => b.places));
+/** The last year a later figure's seat matters: a start after his window keeps no place for it (REALM-295). */
+const SEAT_UNTIL = new Map(Object.values(lordEvents.events).map((e) => [`area:seat_${e.id.slice("lord_".length)}`, e.availability.latest]));
 
 /** Statistics the game reads live; an event's change to one is kept as an adjustment on top. */
 const ADJUSTED = new Set(["legitimacy", "stability", "tech_state", "tech_economy", "tech_military"]);
 const TECH = ["tech_state", "tech_economy", "tech_military"] as const;
+/** Derived statistics the tree still holds at its own start value until a realm context gives them (D-EVT-17). */
+const HELD = new Set(Object.keys(bridge.start.country).filter((k) => evt.isDerived(k)));
+/** Tree innovations and the research inventions that bring them (D-EVT-19). */
+const INNOVATIONS = Object.entries(rules.innovations_from_research).filter(([k]) => k !== "$comment") as [string, string][];
 
 export interface GameEvents {
   state: evt.EventState;
@@ -46,6 +79,41 @@ export interface GameEvents {
   stability: Map<number, number>;
   /** Inventions each realm knew in 1444: the tech tracks rise by one for each learned since. */
   knownAtStart: number[];
+  /** Each map realm's region for `where` limits (D-EVT-17): the tree's own, else its nearest neighbour's. */
+  regions: (string | undefined)[];
+}
+
+/**
+ * Regions of the map's realms: the tree's polity regions where it knows the
+ * realm, else the region of the nearest capital it knows (a stand-in until
+ * every map realm has one, D-EVT-17).
+ */
+function realmRegions(world: World, treeId: string[]): (string | undefined)[] {
+  const polities = geography.polities_1444 as Record<string, string>;
+  const at = (n: number) => world.rules.provinces[world.provinceIndex.get(world.rules.nations[n]!.capital) ?? -1];
+  const known = treeId.map((id, n) => (world.rules.nations[n]!.asleep ? undefined : polities[id]));
+  return known.map((r, n) => {
+    if (r || world.rules.nations[n]!.asleep) return r;
+    const me = at(n);
+    if (!me) return undefined;
+    let best: string | undefined;
+    let dist = Infinity;
+    known.forEach((k, m) => {
+      const p = at(m);
+      if (!k || !p) return;
+      const d = Math.hypot((p.x ?? 0) - (me.x ?? 0), (p.y ?? 0) - (me.y ?? 0));
+      if (d < dist) [dist, best] = [d, k];
+    });
+    return best;
+  });
+}
+
+/** A realm's region now: its own, or for a woken realm that of whoever held its capital in 1444. */
+function regionOf(world: World, g: GameEvents, n: number): string | undefined {
+  if (!world.rules.nations[n]!.asleep) return g.regions[n];
+  const cap = world.rules.provinces[world.provinceIndex.get(world.rules.nations[n]!.capital) ?? -1];
+  const was = cap?.owner ? world.nationIndex.get(cap.owner) : undefined;
+  return was === undefined ? undefined : g.regions[was];
 }
 
 const provinceKey = (p: string) => `g:${p}`;
@@ -54,9 +122,11 @@ const provinceKey = (p: string) => `g:${p}`;
 export function createGameEvents(world: World): GameEvents {
   const tree = evt.emptyWorld(world.date.year, world.date.month);
   const aliases = bridge.aliases as Record<string, string>;
-  const treeId = world.nationIds.map((id) => aliases[id] ?? id);
+  // A sleeping realm is known to the tree by its own id; a woken spare by the one it took (SETUP-088).
+  const treeId = world.nationIds.map((id, n) => world.rules.nations[n]!.tree?.[0] ?? aliases[id] ?? id);
   const nationOf = new Map(treeId.map((id, n) => [id, n]));
-  const places = Object.entries(bridge.places as Record<string, string[]>)
+  const places = Object.entries(PLACES)
+    .filter(([key]) => (SEAT_UNTIL.get(key) ?? Infinity) >= world.date.year)
     .map(([key, ids]): [string, number[]] => [key, ids.map((id) => world.provinceIndex.get(id) ?? -1).filter((p) => p >= 0)])
     .filter(([, ps]) => ps.length > 0);
   for (const key of bridge.start.places) Object.assign(evt.place(tree, key).stats, bridge.start.place);
@@ -66,12 +136,16 @@ export function createGameEvents(world: World): GameEvents {
     pl.provinces = ps.map((p) => provinceKey(world.provinceIds[p]!));
   }
   for (const id of treeId) evt.country(tree, id).stats = { ...bridge.start.country };
+  // A sleeping realm is not yet in the world (SETUP-082).
+  treeId.forEach((id, n) => world.nationAsleep[n] && (evt.country(tree, id).exists = false));
   const state = evt.newState(tree, { events: evt.campaignEvents(data.events), ages: data.ages, periods: data.periods });
+  pastBridgeEvents(state, world.date.year, world.date.month);
   state.conditions = {};
+  state.effects = { stat: treeStat };
   leanByTraits(world, state, nationOf);
   evt.startCampaign(state, world.date.year);
   const knownAtStart = world.nationIds.map((_, n) => world.research[n]?.known.size ?? 0);
-  const g: GameEvents = { state, rng: new Rng(world.weatherSeed ^ 0x5eed), treeId, nationOf, places, eventRelations: [], adjust: {}, stability: new Map(), knownAtStart };
+  const g: GameEvents = { state, rng: new Rng(world.weatherSeed ^ 0x5eed), treeId, nationOf, places, eventRelations: [], adjust: {}, stability: new Map(), knownAtStart, regions: realmRegions(world, treeId) };
   bindConditions(world, g);
   sync(world, g);
   evt.yearlyAgeCheck(state, world.date.year);
@@ -84,19 +158,96 @@ export function createGameEvents(world: World): GameEvents {
 }
 
 /**
- * The tree's conditions and the AI's lean read the game's world through
- * closures; a copy of the world (cloneWorld, multiplayer) binds them anew.
+ * The tree's conditions and effects and the AI's lean read the game's world
+ * through closures; a copy of the world (cloneWorld, multiplayer) binds them anew.
  */
 export function bindConditions(world: World, g: GameEvents): void {
   const state = g.state;
   state.conditions = {};
+  state.effects = { stat: treeStat };
   leanByTraits(world, state, g.nationOf);
   state.conditions.stat = (p, w, ctx) => evt.resolve(p.who, ctx).some((id) => evt.compare(statOf(world, g, id, String(p.stat)), String(p.op), p.value as number | string));
   // Opinion is the standing one court holds of another (D-EVT-4, diplomacy's ledger), read only when asked.
   state.conditions.opinion = (p, _w, ctx) =>
     evt.resolve(p.who, ctx).some((a) => evt.resolve(p.other, ctx).some((b) => evt.compare(opinionOf(world, g, a, b), String(p.op), Number(p.value))));
+  subjectConditions(world, g);
   // Whether a realm is a head's patron (RELG-154).
   state.conditions.faith_head_patron = (p, _w, ctx) => evt.resolve(p.who, ctx).some((id) => isHeadPatron(world, String(p.head), g.nationOf.get(id) ?? -1));
+  // A historical figure comes to a realm as its lord (REALM-295): the tree reports it, the game seats him.
+  state.effects.historical_lord = (p, _w, ctx, out) => evt.resolve(p.on, ctx).forEach((on) => out.push({ type: "historical_lord", target: on, values: { id: p.id } }));
+  // A realm's heritage item in a state, such as an ambition done (HER-093); heritage is made after events, so it is read when asked.
+  state.conditions.heritage = (p, _w, ctx) =>
+    evt.resolve(p.who, ctx).some((id) => {
+      const h = world.heritage?.realms[g.nationOf.get(id) ?? -1];
+      return !!h && heritageStates(h, String(p.id)).includes(String(p.state));
+    });
+}
+
+/**
+ * A campaign that starts after a bridge event's history date has that history
+ * already (EVT-087): the event counts as having happened, with its historical
+ * option and holders, so the later events that need it can follow. Its effects
+ * are not applied again: the start's own data already shows them.
+ */
+function pastBridgeEvents(state: evt.EventState, year: number, month: number): void {
+  const start = evt.monthIndex(year, month);
+  for (const id of PAST_EVENTS) {
+    const ev = state.events[id];
+    if (!ev?.history) continue;
+    const d = ev.history.date;
+    const [y, m] = String(Array.isArray(d) ? d[0] : d).split("-").map(Number);
+    // A date of a year alone is under way all that year.
+    if (!Number.isFinite(y) || (m ? evt.monthIndex(y!, m) : evt.monthIndex(y! + 1, 1)) > start) continue;
+    const option = ev.options.find((o) => o.historical)?.id;
+    const roles = Object.fromEntries(Object.entries(ev.roles).map(([r, d]) => [r, [...d.historical]]));
+    state.world.history.push({ event: id, year: y!, month: m || 1, roles, ...(option ? { option } : {}) });
+  }
+}
+
+/** The game's own bond of the realm `subject` under `overlord` (tree ids), if both are realms and the tie stands. */
+function realBond(world: World, g: GameEvents, overlord: string, subject: string): subj.SubjectBond | undefined {
+  const s = g.nationOf.get(subject);
+  const o = g.nationOf.get(overlord);
+  if (s === undefined || o === undefined) return undefined;
+  const b = bondOf(world, s);
+  return b && b.overlord === world.nationIds[o] ? b : undefined;
+}
+
+/**
+ * The subject keys read the game's own bonds (SUBJ-097): `subject_loyalty`
+ * tests the bond's loyalty, `subject_count by_reach` weighs the realm's
+ * subjects by kind, and `relation … kind` reads the bond's kind. Ids that are
+ * not realms of the game keep the tree's own reading.
+ */
+function subjectConditions(world: World, g: GameEvents): void {
+  const c = g.state.conditions!;
+  const tree = evt.CONDITIONS;
+  c.subject_loyalty = (p, w, ctx) =>
+    evt.resolve(p.who, ctx).some((who) =>
+      evt.resolve(p.target, ctx).some((t) =>
+        g.nationOf.has(who) && g.nationOf.has(t) ? subj.subjectLoyaltyHolds(realBond(world, g, who, t), String(p.op), String(p.step)) : tree.subject_loyalty!({ ...p, who, target: t }, w, ctx),
+      ),
+    );
+  c.subject_count = (p, w, ctx) => {
+    if (p.by_reach !== true) return tree.subject_count!(p, w, ctx);
+    return evt.resolve(p.who, ctx).some((id) => {
+      const n = g.nationOf.get(id);
+      if (n === undefined) return tree.subject_count!({ ...p, who: id }, w, ctx);
+      const bonds = subjectTies(world).map((t) => t.bond);
+      return evt.compare(subj.subjectCountByEvent(bonds, world.nationIds[n]!, true), String(p.op), Number(p.value));
+    });
+  };
+  c.relation = (p, w, ctx) => {
+    if (p.kind === undefined) return tree.relation!(p, w, ctx);
+    const type = String(p.type);
+    return evt.resolve(p.who, ctx).some((a) =>
+      evt.resolve(p.other, ctx).some((b) => {
+        if (!g.nationOf.has(a) || !g.nationOf.has(b)) return tree.relation!({ ...p, who: a, other: b }, w, ctx);
+        const bond = type === "subject" ? realBond(world, g, b, a) : type === "overlord" ? realBond(world, g, a, b) : type === "personal_union" ? [realBond(world, g, b, a), realBond(world, g, a, b)].find((x) => x?.kind === "union") : undefined;
+        return bond?.kind === p.kind;
+      }),
+    );
+  };
 }
 
 /** The chooser's ruler's traits lean the AI's pick (REALM-104). */
@@ -106,6 +257,34 @@ function leanByTraits(world: World, state: evt.EventState, nationOf: Map<string,
     return n === undefined ? 1 : traitLean(world, n, o.effects);
   };
 }
+
+/**
+ * A stat change as the tree lands it in the game (EVT-054, EVT-073): a derived
+ * statistic the tree still holds at its start value (naval reach, navy,
+ * military quality) takes the change on that reading, where later events read
+ * it; any other derived one is the game's own reading, so the change is told
+ * but not written. Everything else goes to the tree's own `stat` effect.
+ */
+const treeStat: evt.EffectEval = (p, w, ctx, out) => {
+  for (const [stat, change] of Object.entries(p.changes as Record<string, number | string>)) {
+    if (evt.routedTo(stat) || !evt.isDerived(stat)) {
+      evt.EFFECTS.stat!({ ...p, changes: { [stat]: change } }, w, ctx, out);
+      continue;
+    }
+    for (const t of evt.resolve(p.on, ctx)) {
+      const stats = HELD.has(stat) ? w.countries[t]?.stats : undefined;
+      if (!stats) {
+        out.push({ type: "stat", target: t, values: { stat, change, derived: true } });
+        continue;
+      }
+      const before = Number(stats[stat] ?? 0);
+      const range = evt.statRange(stat);
+      const after = evt.changeStat(before, change);
+      stats[stat] = range ? Math.min(range[1], Math.max(range[0], after)) : after;
+      out.push({ type: "stat", target: t, values: { stat, change, before, after: stats[stat] } });
+    }
+  }
+};
 
 /** A tree statistic, with legitimacy and stability read from the realm (D-EVT-4, D-EVT-17). */
 function statOf(world: World, g: GameEvents, id: string, stat: string): number | string | undefined {
@@ -136,6 +315,8 @@ function sync(world: World, g: GameEvents): void {
   const d = world.diplomacy;
   w.year = world.date.year;
   w.month = world.date.month;
+  // the game's subject bonds are the truth: the tree's own copies live only for the month's effects
+  delete w.subjects;
   g.stability.clear();
   const soldiers = new Float64Array(world.nationCount);
   const a = world.armies;
@@ -144,7 +325,7 @@ function sync(world: World, g: GameEvents): void {
   const lords = new Float64Array(world.nationCount);
   const loyal = new Float64Array(world.nationCount);
   for (const l of world.lords) {
-    if (l.nation < 0) continue;
+    if (l.nation < 0 || l.gone) continue;
     lords[l.nation]!++;
     if (l.loyalty === "Loyal") loyal[l.nation]!++;
   }
@@ -156,10 +337,19 @@ function sync(world: World, g: GameEvents): void {
     held[o]!++;
     if (world.provinceGrievances[p]) aggrieved[o]!++;
   }
+  // A sleeping realm has no ties to show (SETUP-082).
+  const tree = (id: string) => {
+    const n = world.nationIndex.get(id) ?? -1;
+    return world.nationAsleep[n] ? undefined : g.treeId[n];
+  };
   for (let n = 0; n < world.nationCount; n++) {
+    // A sleeping realm is the tree's own until it wakes (SETUP-082).
+    if (world.nationAsleep[n]) continue;
     const id = g.treeId[n]!;
     const c = evt.country(w, id);
     c.exists = !world.nationGone[n];
+    const region = regionOf(world, g, n);
+    if (region) c.region = region;
     c.human = isHuman(world, n);
     c.enemies = [];
     c.relations = g.eventRelations.filter((r) => r.who === id).map((r) => ({ other: r.other, type: r.type }));
@@ -171,8 +361,31 @@ function sync(world: World, g: GameEvents): void {
     c.stats.integration_strain = held[n] ? (100 * aggrieved[n]!) / held[n]! : 0;
     const learned = Math.max(0, (world.research[n]?.known.size ?? 0) - (g.knownAtStart[n] ?? 0));
     for (const t of TECH) c.stats[t] = bridge.start.country[t] + learned + (g.adjust[id]?.[t] ?? 0);
+    // The innovations it has adopted include the inventions it knows (D-EVT-19).
+    const known = world.research[n]?.known;
+    if (known) for (const [inn, inv] of INNOVATIONS) if (known.has(inv) && !(c.innovations ??= []).includes(inn)) c.innovations.push(inn);
+    // The great powers are the realms with the most provinces (D-AUD-2), so the score is the count (D-EVT-19).
+    c.stats.great_power_score = held[n]!;
+    // Its state faith as the tree first meets it; an event's change to it is the tree's own after (EVT-086).
+    if (c.religion === undefined && faithOf(world, n)) c.religion = faithOf(world, n);
+    // Its ruler: age, years on the throne (0 in a new ruler's first year), and a regent ruling for a child (EVT-086).
+    const ruler = world.rulers[n];
+    if (ruler) {
+      c.stats.ruler_age = ruler.age;
+      c.stats.ruler_years = ruler.years;
+    }
+    c.flags = ruler?.regent ? ["regency"] : [];
   }
-  const tree = (id: string) => g.treeId[world.nationIndex.get(id) ?? -1];
+  // The Emperor and the members of the Empire (EVT-086).
+  const e = world.empire;
+  if (e && !e.ended) {
+    for (const m of e.members) {
+      const id = tree(m);
+      if (id) (evt.country(w, id).flags ??= []).push("empire_member");
+    }
+    const holder = e.holder ? tree(e.holder) : undefined;
+    if (holder) (evt.country(w, holder).flags ??= []).push("emperor");
+  }
   for (const r of d.graph.relations) {
     const x = tree(r.source);
     const y = tree(r.target);
@@ -238,6 +451,35 @@ export function answerEvent(world: World, nation: number, event: string, option:
   return null;
 }
 
+/** Fires an event of the tree now, with its first binding of roles, if it has not fired (INST-065: `onin_war` at the break). */
+export function fireEventNow(world: World, id: string, news: News[]): void {
+  const g = (world.events ??= createGameEvents(world));
+  sync(world, g);
+  const s = g.state;
+  const ev = s.events[id];
+  if (!ev || s.world.history.some((h) => h.event === id)) return;
+  const roles = evt.bindings(s, ev)[0] ?? {};
+  const from = s.log.length;
+  evt.fire(s, ev, roles, g.rng);
+  land(world, g, s.log.slice(from), news);
+}
+
+/** Applies effects as an event's chosen option would, and lands them on the game (scripted history, tests). */
+export function applyEventEffects(world: World, effects: evt.Effect[], news: News[], roles: Record<string, string[]> = {}): void {
+  const g = (world.events ??= createGameEvents(world));
+  sync(world, g);
+  const s = g.state;
+  const applied = evt.applyEffects(effects, s.world, { roles, ...(s.conditions ? { conditions: s.conditions } : {}), ...(s.effects ? { effects: s.effects } : {}) });
+  land(world, g, applied.map((a) => ({ type: "EffectApplied", effect: a.type, target: a.target, values: a.values })), news);
+}
+
+/** Whether a condition holds for the game as it stands (scripted history, tests). */
+export function eventConditionHolds(world: World, condition: evt.Condition, roles: Record<string, string[]> = {}): boolean {
+  const g = (world.events ??= createGameEvents(world));
+  sync(world, g);
+  return evt.holds(condition, g.state.world, { roles, ...(g.state.conditions ? { conditions: g.state.conditions } : {}) });
+}
+
 const label = (key: string, fallback: string): string => data.localization[key] ?? fallback;
 const humanize = (id: string): string => id.replace(/^(province|area|region):/, "").replace(/_/g, " ");
 export const eventTitle = (id: string): string => label(`event.${id}.name`, humanize(id));
@@ -281,6 +523,65 @@ function land(world: World, g: GameEvents, log: evt.DomainEvent[], news: News[])
       news.push({ kind: "event", text: `${eventTitle(ev.id)}: ${who} chooses “${optionName(ev.id, String(e.option))}”.`, nations, ...(ev.importance === "major" ? { major: true as const } : {}) });
     } else if (e.type === "EffectApplied") landEffect(world, g, e, news);
   }
+  delete s.world.subjects;
+}
+
+/** Envoys the overlord keeps at a subject's court, recalled when the tie ends or the kind changes (as subjects.ts does on release). */
+function recallSubjectEnvoys(world: World, b: subj.SubjectBond, actions: readonly string[]): void {
+  const d = world.diplomacy;
+  d.envoys = d.envoys.filter((e) => !(e.country === b.overlord && e.target === b.subject && actions.includes(e.action) && e.status === "resident"));
+}
+
+/** The rebellions spark an event's rising stands for, by the tree's rebel type (EVT-088). */
+const REBEL_SPARKS: Record<string, string> = { peasant: "the tax rate of the province is raised", religious: "a preacher of a new faith arrives", noble: "a pretender lands with men" };
+
+const KIND_WORDS: Record<subj.Kind, string> = { vassal: "a vassal", tributary: "a tributary", union: "a union", march: "a march", colony: "a colony", protectorate: "a protectorate" };
+
+/**
+ * An event founds a realm (SETUP-083 to SETUP-090): its sleeping realm wakes,
+ * or a gone map realm wakes again, or the first spare takes the name for one
+ * the list does not hold. With no `where`, the realms it is made from form it
+ * (a union); with one, it takes that place's land, only from those realms when
+ * it names them. A place the map does not know falls back to its home land;
+ * with no land at all it stays asleep.
+ */
+/** A `create_country` effect as the tree hands it to the game, for the specs (EVT-077). */
+export function foundByEvent(world: World, id: string, values: Record<string, unknown>, news: News[]): void {
+  foundRealm(world, world.events!, id, values, news);
+}
+
+/** What the tree reads of a realm: its tree id and its region (EVT-078, EVT-079). */
+export function treeView(world: World, n: number): { id: string; region: string | undefined } {
+  return { id: world.events!.treeId[n]!, region: regionOf(world, world.events!, n) };
+}
+
+function foundRealm(world: World, g: GameEvents, id: string, v: Record<string, unknown>, news: News[]): void {
+  let n = g.nationOf.get(id);
+  if (n !== undefined && !world.nationGone[n]) return;
+  const from = ((v.from as string[] | undefined) ?? []).flatMap((x) => {
+    const f = g.nationOf.get(x);
+    return f !== undefined && f !== n && !world.nationGone[f] ? [f] : [];
+  });
+  const over = v.subject_of === undefined ? undefined : g.nationOf.get(String(v.subject_of));
+  const where = v.where === undefined ? undefined : g.places.find(([k]) => k === String(v.where))?.[1];
+  const waking: Waking = {};
+  if (v.where === undefined && from.length) waking.from = from;
+  else if (where) {
+    waking.provinces = from.length ? where.filter((p) => from.includes(world.provinceOwner[p]!)) : where;
+    const held = from.map((f) => waking.provinces!.filter((p) => world.provinceOwner[p] === f).length);
+    if (from.length) waking.breakFrom = from[held.indexOf(Math.max(...held))]!;
+  } else if (n === undefined) return;
+  if (over !== undefined && !world.nationGone[over]) waking.subjectOf = over;
+  if (n === undefined) {
+    // A realm the list does not hold takes the first spare, named for it (SETUP-088); with none left, nothing wakes.
+    n = spareSleepers(world)[0];
+    if (n === undefined) return;
+    waking.name = nameOf(world, g, id).replace(/\b\w/g, (c) => c.toUpperCase());
+    waking.tree = id;
+  }
+  if (!wakeRealm(world, n, waking, news)) return;
+  g.treeId[n] = id;
+  g.nationOf.set(id, n);
 }
 
 function landEffect(world: World, g: GameEvents, e: evt.DomainEvent, news: News[]): void {
@@ -288,6 +589,9 @@ function landEffect(world: World, g: GameEvents, e: evt.DomainEvent, news: News[
   const target = e.target as string | undefined;
   const n = target === undefined ? undefined : g.nationOf.get(target);
   switch (e.effect) {
+    case "create_country":
+      foundRealm(world, g, target!, v, news);
+      return;
     case "faith_head_patron": {
       const who = g.nationOf.get(String(v.who ?? target));
       if (who !== undefined) setHeadPatron(world, String(v.head), who);
@@ -308,7 +612,7 @@ function landEffect(world: World, g: GameEvents, e: evt.DomainEvent, news: News[
       return;
     }
     case "stat": {
-      if (n === undefined || v.routed) return;
+      if (n === undefined || v.routed || v.derived) return;
       const stat = String(v.stat);
       const delta = Number(v.after) - Number(v.before);
       const gold = typeof v.change === "number" ? v.change * world.rules.defines.works.goldScale : delta;
@@ -320,10 +624,81 @@ function landEffect(world: World, g: GameEvents, e: evt.DomainEvent, news: News[
       }
       return;
     }
-    case "relation":
     case "vassalize": {
-      const other = String(v.other ?? v.who);
-      const type = e.effect === "vassalize" ? "subject" : String(v.type);
+      // an event makes a subject of the mapped kind (SUBJ-015, SUBJ-097); the game keeps the tie and its bond
+      const o = g.nationOf.get(String(v.who));
+      if (n !== undefined && o !== undefined) {
+        if (world.nationGone[n] || world.nationGone[o]) return;
+        const kind = (v.subjectKind as subj.Kind | undefined) ?? subj.kindFromEventType(String(v.kind ?? "vassal")).kind;
+        const cur = bondOf(world, n);
+        if (cur) return; // a subject has one overlord: the event cannot take it from another
+        try {
+          makeSubject(world, n, o, kind);
+        } catch {
+          return; // a tie the diplomacy rules refuse (a cycle of overlords)
+        }
+        const b = bondOf(world, n);
+        if (b && v.stage) b.stage = v.stage as subj.ColonyStage;
+        bondsChanged(world);
+        news.push({ kind: "event", text: `${world.rules.nations[n]!.name} becomes ${KIND_WORDS[kind]} of ${world.rules.nations[o]!.name}.`, nations: [n, o] });
+        return;
+      }
+      const other = String(v.who);
+      g.eventRelations = g.eventRelations.filter((r) => !(r.who === target && r.other === other && r.type === "subject"));
+      g.eventRelations.push({ who: target!, other, type: "subject" });
+      return;
+    }
+    case "release": {
+      const who = String(v.who);
+      g.eventRelations = g.eventRelations.filter((r) => !(r.who === target && r.other === who && r.type === "subject") && !(r.who === who && r.other === target && r.type === "overlord"));
+      const b = realBond(world, g, who, target!);
+      if (!b) return;
+      recallSubjectEnvoys(world, b, ["subject_resident", "subject_tighten", "subject_fold_in"]);
+      dip.relations.releaseSubject(world.diplomacy.graph, b.subject);
+      bondsChanged(world);
+      const o = g.nationOf.get(who)!;
+      news.push({ kind: "event", text: `${world.rules.nations[n!]!.name} is released by ${world.rules.nations[o]!.name} and goes free as a friend.`, nations: [n!, o] });
+      return;
+    }
+    case "change_subject_kind": {
+      const b = realBond(world, g, String(v.who), target!);
+      if (!b) return;
+      const r = subj.changeSubjectKindByEvent(b, String(v.kind), monthNow(world));
+      if (!r.ok) return;
+      recallSubjectEnvoys(world, b, ["subject_tighten", "subject_fold_in"]);
+      const rec = world.diplomacy.graph.relations.find((x) => x.type === "subject" && x.source === b.subject);
+      if (rec) rec.subject_kind = b.kind;
+      bondsChanged(world);
+      const o = g.nationOf.get(String(v.who))!;
+      news.push({ kind: "event", text: `${world.rules.nations[n!]!.name} is now ${KIND_WORDS[b.kind]} of ${world.rules.nations[o]!.name}.`, nations: [n!, o] });
+      return;
+    }
+    case "add_subject_reason":
+    case "remove_subject_reason": {
+      // a reason on the subject's loyalty, by id, for the months given (SUBJ-035, SUBJ-097)
+      if (n === undefined) return;
+      const b = bondOf(world, n);
+      if (!b) return;
+      if (e.effect === "add_subject_reason") subj.addSubjectReasonByEvent(b, String(v.reason), v.months === undefined ? undefined : Number(v.months), monthNow(world));
+      else subj.removeSubjectReasonByEvent(b, String(v.reason));
+      bondsChanged(world);
+      return;
+    }
+    case "historical_lord": {
+      const h = laterLord(String(v.id));
+      if (n !== undefined && h) historicalLordComes(world, n, h, news);
+      return;
+    }
+    case "rebels": {
+      // The event is a spark (EVT-048, EVT-088): every aggrieved province of the realm or the place may rise.
+      const what = REBEL_SPARKS[String(v.type)] ?? REBEL_SPARKS.noble!;
+      const ps = n !== undefined ? [...Array(world.provinceCount).keys()].filter((p) => world.provinceOwner[p] === n) : (g.places.find(([k]) => k === target)?.[1] ?? []);
+      for (const p of ps) if (world.provinceGrievances[p]) spark(world, p, what);
+      return;
+    }
+    case "relation": {
+      const other = String(v.other);
+      const type = String(v.type);
       g.eventRelations = g.eventRelations.filter((r) => !(r.who === target && r.other === other && r.type === type));
       if (v.set !== false) g.eventRelations.push({ who: target!, other, type });
       return;
@@ -346,6 +721,10 @@ export interface EventCard {
   /** What happens whatever is chosen. */
   always: string[];
   options: { id: string; name: string; historical: boolean; effects: string[] }[];
+  /** An everyday event of the realm's own people (EVT-121): no year in history. */
+  everyday?: boolean;
+  /** The province it is about, for Look at the map. */
+  province?: number;
 }
 
 /** The events waiting for a realm's answer, oldest first (EVT-044). */
@@ -418,6 +797,15 @@ function describe(world: World, g: GameEvents, e: evt.Effect, roles: Record<stri
     case "release":
       text = `${cap(who(p.target))} ${who(p.target) === "you" ? "are" : "is"} released by ${who(p.who)}`;
       break;
+    case "change_subject_kind":
+      text = `${cap(who(p.target))}: the tie to ${who(p.who)} is ${p.kind === "tighten" ? "tightened" : p.kind === "loosen" ? "loosened" : `now ${humanize(String(p.kind))}`}`;
+      break;
+    case "add_subject_reason":
+    case "remove_subject_reason": {
+      const label = subj.reasonLabel(String(p.reason));
+      text = type === "remove_subject_reason" ? `${cap(who(p.target))}: “${label}” no longer weighs on loyalty` : `${cap(who(p.target))}: loyalty reason “${label}”${p.months === undefined ? "" : ` for ${Number(p.months)} months`}`;
+      break;
+    }
     case "create_country":
       text = `${nameOf(world, g, String(p.entity))} is founded`;
       break;
@@ -433,6 +821,11 @@ function describe(world: World, g: GameEvents, e: evt.Effect, roles: Record<stri
     case "relation":
       text = `${cap(who(p.who))} and ${who(p.other)}: ${humanize(String(p.type))}${p.set === false ? " ends" : ""}`;
       break;
+    case "historical_lord": {
+      const h = laterLord(String(p.id));
+      if (h) text = h.takes_over ? `${h.name} takes the lands of their lord as ${h.title}` : `${h.name} becomes ${who(p.on) === "you" ? "your" : `${who(p.on)}'s`} lord as ${h.title}`;
+      break;
+    }
     case "rebels":
       text = `Rebels rise in ${place(String(p.on).startsWith("$") ? who(p.on) : p.on)}`;
       break;

@@ -1,5 +1,5 @@
 import raw from "../../../../rules/data/domain/diplomacy.json" with { type: "json" };
-import dataset from "../../../../rules/data/domain/diplomacy-relations-1444.json" with { type: "json" };
+import { startRelations as dataset } from "../../../../rules/src/start.ts";
 
 /** A relation type as the relations rules describe it. */
 export interface TypeRule {
@@ -172,7 +172,7 @@ export interface DiplomacyConfig {
     relation: Record<string, string>;
     new_effects: string[];
   };
-  answers: { delay_months: number; preview_before_sending: boolean };
+  answers: { delay_months: number; preview_before_sending: boolean; hint: { likely_from: number; unlikely_to: number } };
   eras_by_year: { era: string; from: number }[];
   oaths_broken_years: number;
   lands_taken_years: number;

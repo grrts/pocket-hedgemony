@@ -1,0 +1,1953 @@
+{
+ "$comment": "The turning points of the history checkpoints (packages/sim/data/checkpoints, since_previous.events), for the Chronicle (EVT-109). `event` is the tree event when its id is not the key. Regenerate from the checkpoints: packages/sim/test/history.test.ts checks they agree.",
+ "turning_points": [
+  {
+   "key": "peace_of_almazan",
+   "name": "Peace of Almazán (Castile and Aragon)",
+   "date": "1375-04-12"
+  },
+  {
+   "key": "truce_of_bruges",
+   "name": "Truce of Bruges (England and France)",
+   "date": "1375-06-27"
+  },
+  {
+   "key": "war_of_the_eight_saints",
+   "name": "War of the Eight Saints begins (Florence against the Pope)",
+   "date": "1375-07-01"
+  },
+  {
+   "key": "death_of_valdemar_iv",
+   "name": "Death of Valdemar IV; Olaf II chosen under Margaret",
+   "date": "1375-10-24"
+  },
+  {
+   "key": "death_of_the_black_prince",
+   "name": "Death of Edward the Black Prince",
+   "date": "1376-06-08"
+  },
+  {
+   "key": "wenceslaus_king_of_the_romans",
+   "name": "Wenceslaus elected King of the Romans",
+   "date": "1376-06-10"
+  },
+  {
+   "key": "andronikos_iv_seizes_constantinople",
+   "name": "Andronikos IV seizes Constantinople with Ottoman help",
+   "date": "1376-08-12"
+  },
+  {
+   "key": "gregory_xi_returns_to_rome",
+   "name": "Gregory XI returns the Papacy to Rome",
+   "date": "1377-01-17"
+  },
+  {
+   "key": "death_of_tran_due_tong",
+   "name": "Champa kills Trần Duệ Tông at Vijaya",
+   "date": "1377-02-01"
+  },
+  {
+   "key": "battle_of_reutlingen",
+   "name": "Battle of Reutlingen (Swabian City League beats Württemberg)",
+   "date": "1377-05-14"
+  },
+  {
+   "key": "death_of_algirdas",
+   "name": "Death of Algirdas; Jogaila grand duke of Lithuania",
+   "date": "1377-05-24"
+  },
+  {
+   "key": "death_of_edward_iii",
+   "name": "Death of Edward III; Richard II king",
+   "date": "1377-06-21"
+  },
+  {
+   "key": "battle_of_the_pyana",
+   "name": "Battle of the Pyana (Arab Shah beats the Rus)",
+   "date": "1377-08-02"
+  },
+  {
+   "key": "tvrtko_crowned",
+   "name": "Tvrtko I crowned King of Bosnia",
+   "date": "1377-10-26"
+  },
+  {
+   "key": "sukhothai_submits",
+   "name": "Sukhothai submits to Ayutthaya",
+   "date": "1378-01-01"
+  },
+  {
+   "key": "tokhtamysh_takes_white_horde",
+   "name": "Tokhtamysh, backed by Timur, wins the White Horde",
+   "date": "1378-01-01"
+  },
+  {
+   "key": "charles_iv_in_paris",
+   "name": "Charles IV visits Charles V in Paris",
+   "date": "1378-01-04"
+  },
+  {
+   "key": "death_of_gregory_xi",
+   "name": "Death of Gregory XI",
+   "date": "1378-03-27"
+  },
+  {
+   "key": "navarrese_normandy_seized",
+   "name": "Charles V seizes Charles the Bad's Norman lands",
+   "date": "1378-04-01"
+  },
+  {
+   "key": "election_of_urban_vi",
+   "name": "Election of Urban VI",
+   "date": "1378-04-08"
+  },
+  {
+   "key": "murder_of_mujahid_shah",
+   "name": "Bahmani Mujahid Shah murdered",
+   "date": "1378-04-16"
+  },
+  {
+   "key": "death_of_ayushiridara",
+   "name": "Death of Biligtü Khan; Tögüs Temür Northern Yuan khan",
+   "date": "1378-05-01"
+  },
+  {
+   "key": "battle_of_antium",
+   "name": "Battle of Antium (Venice beats Genoa; War of Chioggia begins)",
+   "date": "1378-05-30"
+  },
+  {
+   "key": "ciompi_revolt",
+   "name": "Revolt of the Ciompi in Florence",
+   "date": "1378-07-20"
+  },
+  {
+   "key": "peace_of_tivoli",
+   "name": "Peace of Tivoli ends the War of the Eight Saints",
+   "date": "1378-07-28"
+  },
+  {
+   "key": "death_of_galeazzo_ii",
+   "name": "Death of Galeazzo II Visconti",
+   "date": "1378-08-04"
+  },
+  {
+   "key": "battle_of_the_vozha",
+   "name": "Battle of the Vozha (Moscow beats Mamai's army)",
+   "date": "1378-08-11"
+  },
+  {
+   "key": "election_of_clement_vii",
+   "name": "Election of Clement VII at Fondi: the Western Schism begins",
+   "date": "1378-09-20"
+  },
+  {
+   "key": "western_schism",
+   "name": "Western Schism begins (Clement VII elected)",
+   "date": "1378-09-20"
+  },
+  {
+   "key": "death_of_charles_iv",
+   "name": "Death of Emperor Charles IV",
+   "date": "1378-11-29"
+  },
+  {
+   "key": "battle_of_kulikovo",
+   "name": "Battle of Kulikovo",
+   "date": "1380-09-08"
+  },
+  {
+   "key": "death_of_charles_v",
+   "name": "Death of Charles V of France",
+   "date": "1380-09-16"
+  },
+  {
+   "key": "peasants_revolt",
+   "name": "Peasants' Revolt in England",
+   "date": "1381-06-14"
+  },
+  {
+   "key": "durazzo_takes_naples",
+   "name": "Charles of Durazzo takes Naples",
+   "date": "1381-07-16"
+  },
+  {
+   "key": "peace_of_turin",
+   "name": "Peace of Turin ends the War of Chioggia",
+   "date": "1381-08-08"
+  },
+  {
+   "key": "ming_takes_yunnan",
+   "name": "Ming conquers Yunnan",
+   "date": "1382-01-06"
+  },
+  {
+   "key": "moscow_burned",
+   "name": "Tokhtamysh burns Moscow",
+   "date": "1382-08-26"
+  },
+  {
+   "key": "death_of_louis_the_great",
+   "name": "Death of Louis the Great",
+   "date": "1382-09-10"
+  },
+  {
+   "key": "barquq_coup",
+   "name": "Barquq takes the Mamluk throne",
+   "date": "1382-11-26"
+  },
+  {
+   "key": "portuguese_crisis",
+   "name": "Portuguese interregnum begins",
+   "date": "1383-10-22"
+  },
+  {
+   "key": "jadwiga_crowned",
+   "name": "Jadwiga crowned King of Poland",
+   "date": "1384-10-16"
+  },
+  {
+   "key": "gian_galeazzo_coup",
+   "name": "Gian Galeazzo Visconti seizes Bernabò",
+   "date": "1385-05-06"
+  },
+  {
+   "key": "battle_of_aljubarrota",
+   "name": "Battle of Aljubarrota",
+   "date": "1385-08-14"
+  },
+  {
+   "key": "union_of_krewo",
+   "name": "Union of Krewo",
+   "date": "1385-08-14"
+  },
+  {
+   "key": "battle_of_sempach",
+   "name": "Battle of Sempach",
+   "date": "1386-07-09"
+  },
+  {
+   "key": "sigismund_king_of_hungary",
+   "name": "Sigismund crowned King of Hungary",
+   "date": "1387-03-31"
+  },
+  {
+   "key": "battle_of_buir_lake",
+   "name": "Battle of Buir Lake",
+   "date": "1388-05-18"
+  },
+  {
+   "key": "battle_of_kosovo",
+   "name": "Battle of Kosovo",
+   "date": "1389-06-15"
+  },
+  {
+   "key": "battle_of_kondurcha",
+   "name": "Timur defeats Tokhtamysh on the Kondurcha",
+   "date": "1391-06-18"
+  },
+  {
+   "key": "joseon_founded",
+   "name": "Yi Seong-gye founds Joseon",
+   "date": "1392-08-05"
+  },
+  {
+   "key": "courts_of_japan_reunited",
+   "name": "Northern and Southern Courts reunited",
+   "date": "1392-11-19"
+  },
+  {
+   "key": "fall_of_tarnovo",
+   "name": "Ottomans take Tarnovo",
+   "date": "1393-07-17"
+  },
+  {
+   "key": "battle_of_the_terek",
+   "name": "Battle of the Terek",
+   "date": "1395-04-15"
+  },
+  {
+   "key": "milan_made_duchy",
+   "name": "Milan made a duchy",
+   "date": "1395-05-11"
+  },
+  {
+   "key": "battle_of_nicopolis",
+   "name": "Battle of Nicopolis",
+   "date": "1396-09-25"
+  },
+  {
+   "key": "kalmar_union",
+   "name": "Union of Kalmar",
+   "date": "1397-06-17"
+  },
+  {
+   "key": "sack_of_delhi",
+   "name": "Timur sacks Delhi",
+   "date": "1398-12-18"
+  },
+  {
+   "key": "battle_of_vorskla",
+   "name": "Battle of the Vorskla",
+   "date": "1399-08-12"
+  },
+  {
+   "key": "richard_ii_deposed",
+   "name": "Richard II deposed; Henry IV king",
+   "date": "1399-09-30"
+  },
+  {
+   "key": "ho_dynasty",
+   "name": "Hồ Quý Ly usurps the Trần throne",
+   "date": "1400-03-23"
+  },
+  {
+   "key": "wenceslaus_deposed",
+   "name": "Wenceslaus deposed as King of the Romans",
+   "date": "1400-08-20"
+  },
+  {
+   "key": "glyndwr_rising",
+   "name": "Owain Glyndŵr's rising",
+   "date": "1400-09-16"
+  },
+  {
+   "key": "sack_of_damascus",
+   "name": "Timur takes Damascus",
+   "date": "1401-03-19"
+  },
+  {
+   "key": "sack_of_baghdad",
+   "name": "Timur sacks Baghdad",
+   "date": "1401-07-10"
+  },
+  {
+   "key": "jingnan_campaign_ends",
+   "name": "Yongle Emperor enthroned after the Jingnan campaign",
+   "date": "1402-07-17",
+   "event": "jingnan_war"
+  },
+  {
+   "key": "battle_of_ankara",
+   "name": "Battle of Ankara",
+   "date": "1402-07-20"
+  },
+  {
+   "key": "death_of_gian_galeazzo",
+   "name": "Death of Gian Galeazzo Visconti",
+   "date": "1402-09-03"
+  },
+  {
+   "key": "treaty_of_gallipoli",
+   "name": "Treaty of Gallipoli",
+   "date": "1403-02-20"
+  },
+  {
+   "key": "death_of_timur",
+   "name": "Death of Timur at Otrar",
+   "date": "1405-02-18"
+  },
+  {
+   "key": "zheng_he_first_voyage",
+   "name": "Zheng He's first voyage sets out",
+   "date": "1405-07-11",
+   "event": "treasure_voyages"
+  },
+  {
+   "key": "venice_takes_padua",
+   "name": "Venice takes Padua; end of the Carraresi",
+   "date": "1405-11-17"
+  },
+  {
+   "key": "capture_of_james_i",
+   "name": "James of Scotland captured at sea; Robert III dies",
+   "date": "1406-04-04"
+  },
+  {
+   "key": "florence_takes_pisa",
+   "name": "Florence takes Pisa",
+   "date": "1406-10-09"
+  },
+  {
+   "key": "ming_conquest_of_dai_viet",
+   "name": "Ming conquest of Dai Ngu (Ho dynasty)",
+   "date": "1407-06-16"
+  },
+  {
+   "key": "murder_of_orleans",
+   "name": "Murder of Louis of Orléans",
+   "date": "1407-11-23"
+  },
+  {
+   "key": "battle_of_sardrud",
+   "name": "Qara Yusuf defeats and kills Miran Shah at Sardrud",
+   "date": "1408-04-20"
+  },
+  {
+   "key": "shah_rukh_takes_samarkand",
+   "name": "Shah Rukh takes Samarkand and reunites the Timurid core",
+   "date": "1409-05-13"
+  },
+  {
+   "key": "council_of_pisa",
+   "name": "Council of Pisa elects a third pope",
+   "date": "1409-06-26"
+  },
+  {
+   "key": "death_of_martin_of_aragon",
+   "name": "Martin of Aragon dies; Aragonese interregnum",
+   "date": "1410-05-31"
+  },
+  {
+   "key": "battle_of_grunwald",
+   "name": "Battle of Grunwald (Tannenberg)",
+   "date": "1410-07-15"
+  },
+  {
+   "key": "compromise_of_caspe",
+   "name": "Compromise of Caspe: Ferdinand of Antequera king of Aragon",
+   "date": "1412-06-28"
+  },
+  {
+   "key": "accession_of_henry_v",
+   "name": "Henry IV dies; Henry V king",
+   "date": "1413-03-20"
+  },
+  {
+   "key": "battle_of_camurlu",
+   "name": "Battle of Çamurlu: Mehmed I ends the Ottoman Interregnum",
+   "date": "1413-07-05"
+  },
+  {
+   "key": "sayyid_delhi",
+   "name": "Khizr Khan takes Delhi; Sayyid dynasty",
+   "date": "1414-05-28"
+  },
+  {
+   "key": "council_of_constance",
+   "name": "Council of Constance opens",
+   "date": "1414-11-05"
+  },
+  {
+   "key": "burning_of_hus",
+   "name": "Jan Hus burned at Constance",
+   "date": "1415-07-06"
+  },
+  {
+   "key": "conquest_of_ceuta",
+   "name": "Portugal takes Ceuta",
+   "date": "1415-08-21"
+  },
+  {
+   "key": "battle_of_agincourt",
+   "name": "Battle of Agincourt",
+   "date": "1415-10-25"
+  },
+  {
+   "key": "battle_of_gallipoli_1416",
+   "name": "Venice defeats the Ottoman fleet off Gallipoli",
+   "date": "1416-05-29"
+  },
+  {
+   "key": "henry_v_invades_normandy",
+   "name": "Henry V lands in Normandy",
+   "date": "1417-08-01"
+  },
+  {
+   "key": "election_of_martin_v",
+   "name": "Election of Martin V ends the Western Schism",
+   "date": "1417-11-11"
+  },
+  {
+   "key": "burgundians_take_paris",
+   "name": "Burgundians take Paris",
+   "date": "1418-05-29"
+  },
+  {
+   "key": "fall_of_rouen",
+   "name": "Rouen surrenders to Henry V",
+   "date": "1419-01-19"
+  },
+  {
+   "key": "oei_invasion",
+   "name": "Joseon expedition against Tsushima (Ōei invasion)",
+   "date": "1419-06-19"
+  },
+  {
+   "key": "first_defenestration_of_prague",
+   "name": "First Defenestration of Prague",
+   "date": "1419-07-30"
+  },
+  {
+   "key": "death_of_wenceslaus_iv",
+   "name": "Wenceslaus IV dies; Bohemian interregnum",
+   "date": "1419-08-16"
+  },
+  {
+   "key": "murder_at_montereau",
+   "name": "John the Fearless murdered at Montereau",
+   "date": "1419-09-10"
+  },
+  {
+   "key": "anti_hussite_crusade",
+   "name": "Martin V proclaims the crusade against the Hussites",
+   "date": "1420-03-01"
+  },
+  {
+   "key": "battle_of_sudomer",
+   "name": "Battle of Sudoměř",
+   "date": "1420-03-25"
+  },
+  {
+   "key": "treaty_of_troyes",
+   "name": "Treaty of Troyes",
+   "date": "1420-05-21"
+  },
+  {
+   "key": "ming_capital_beijing",
+   "name": "Ming court formally moves to Beijing",
+   "date": "1421-02-02"
+  },
+  {
+   "key": "siege_of_constantinople_1422",
+   "name": "Murad II besieges Constantinople",
+   "date": "1422-06-20"
+  },
+  {
+   "key": "death_of_henry_v",
+   "name": "Death of Henry V; Henry VI king of England and (in Lancastrian claim) France",
+   "date": "1422-08-31"
+  },
+  {
+   "key": "tepanec_war",
+   "name": "Triple Alliance overthrows Azcapotzalco",
+   "date": "1428"
+  },
+  {
+   "key": "treaty_of_delft",
+   "name": "Treaty of Delft: Jacqueline of Hainaut cedes rule of Holland to Philip the Good",
+   "date": "1428-07-03"
+  },
+  {
+   "key": "relief_of_orleans",
+   "name": "Joan of Arc relieves Orléans",
+   "date": "1429-05-08"
+  },
+  {
+   "key": "coronation_at_reims",
+   "name": "Charles VII crowned at Reims",
+   "date": "1429-07-17",
+   "event": "relief_of_orleans"
+  },
+  {
+   "key": "fall_of_thessaloniki",
+   "name": "Ottomans take Thessaloniki from Venice",
+   "date": "1430-03-29"
+  },
+  {
+   "key": "death_of_vytautas",
+   "name": "Death of Vytautas; Lithuanian succession war",
+   "date": "1430-10-27"
+  },
+  {
+   "key": "ayutthaya_sacks_angkor",
+   "name": "Ayutthaya takes Angkor; Khmer court moves south",
+   "date": "1431"
+  },
+  {
+   "key": "council_of_basel",
+   "name": "Council of Basel opens",
+   "date": "1431-07-23"
+  },
+  {
+   "key": "last_zheng_he_voyage",
+   "name": "Zheng He's seventh and last voyage",
+   "date": "1431-1433"
+  },
+  {
+   "key": "tuareg_take_timbuktu",
+   "name": "Tuareg under Akil take Timbuktu from Mali",
+   "date": "1433"
+  },
+  {
+   "key": "cape_bojador",
+   "name": "Gil Eanes rounds Cape Bojador",
+   "date": "1434"
+  },
+  {
+   "key": "battle_of_lipany",
+   "name": "Battle of Lipany ends radical Hussite power",
+   "date": "1434-05-30"
+  },
+  {
+   "key": "congress_of_arras",
+   "name": "Treaty of Arras: Burgundy reconciles with Charles VII",
+   "date": "1435-09-21"
+  },
+  {
+   "key": "france_retakes_paris",
+   "name": "Charles VII's forces retake Paris",
+   "date": "1436-04-13",
+   "event": "congress_of_arras"
+  },
+  {
+   "key": "council_of_florence_union",
+   "name": "Union of the Churches proclaimed at Florence",
+   "date": "1439-07-06"
+  },
+  {
+   "key": "deposition_of_eric_of_pomerania",
+   "name": "Eric of Pomerania deposed in Denmark and Sweden; Christopher of Bavaria king",
+   "date": "1439-1440"
+  },
+  {
+   "key": "crimean_khanate_founded",
+   "name": "Hacı Giray establishes the Crimean Khanate",
+   "date": "1441"
+  },
+  {
+   "key": "alfonso_takes_naples",
+   "name": "Alfonso V of Aragon takes Naples",
+   "date": "1442-06-02"
+  },
+  {
+   "key": "long_campaign",
+   "name": "Hunyadi's Long Campaign in the Balkans",
+   "date": "1443-1444"
+  },
+  {
+   "key": "league_of_lezhe",
+   "name": "Skanderbeg forms the League of Lezhë",
+   "date": "1444-03-02"
+  },
+  {
+   "key": "truce_of_tours",
+   "name": "Truce of Tours between England and France",
+   "date": "1444-05-28"
+  },
+  {
+   "key": "peace_of_szeged",
+   "name": "Peace of Edirne-Szeged; Serbian Despotate restored",
+   "date": "1444-08"
+  },
+  {
+   "key": "battle_of_st_jakob",
+   "name": "Battle of St. Jakob an der Birs",
+   "date": "1444-08-26"
+  },
+  {
+   "key": "battle_of_varna",
+   "name": "Battle of Varna: Murad II defeats the crusade; Władysław III killed",
+   "date": "1444-11-10"
+  },
+  {
+   "key": "tumu_crisis",
+   "name": "Tumu Crisis",
+   "date": "1449-09-01",
+   "event": "tumu_crisis"
+  },
+  {
+   "key": "fall_of_constantinople",
+   "name": "Fall of Constantinople",
+   "date": "1453-05-29",
+   "event": "fall_of_constantinople"
+  },
+  {
+   "key": "battle_of_castillon",
+   "name": "Battle of Castillon: end of the Hundred Years' War",
+   "date": "1453-07-17",
+   "event": "end_of_hundred_years_war"
+  },
+  {
+   "key": "peace_of_lodi",
+   "name": "Peace of Lodi",
+   "date": "1454-04-09"
+  },
+  {
+   "key": "wars_of_the_roses",
+   "name": "Wars of the Roses begin (First St Albans)",
+   "date": "1455-05-22",
+   "event": "wars_of_the_roses"
+  },
+  {
+   "key": "fall_of_trebizond",
+   "name": "Ottoman conquest of Trebizond",
+   "date": "1461-08-15"
+  },
+  {
+   "key": "ottoman_conquest_of_bosnia",
+   "name": "Ottoman conquest of Bosnia",
+   "date": "1463-06"
+  },
+  {
+   "key": "kazakh_khanate_founded",
+   "name": "Founding of the Kazakh Khanate",
+   "date": "1465",
+   "event": "kazakh_khanate_founded"
+  },
+  {
+   "key": "second_peace_of_thorn",
+   "name": "Second Peace of Thorn",
+   "date": "1466-10-19"
+  },
+  {
+   "key": "onin_war",
+   "name": "Ōnin War",
+   "date": "1467-05",
+   "event": "onin_war"
+  },
+  {
+   "key": "sonni_ali_takes_timbuktu",
+   "name": "Sonni Ali takes Timbuktu",
+   "date": "1468-01",
+   "event": "songhai_expansion"
+  },
+  {
+   "key": "marriage_of_ferdinand_and_isabella",
+   "name": "Marriage of Ferdinand and Isabella",
+   "date": "1469-10-19",
+   "event": "union_of_castile_and_aragon"
+  },
+  {
+   "key": "inca_conquest_of_chimor",
+   "name": "Inca conquest of Chimor",
+   "date": "1470",
+   "event": "inca_expansion"
+  },
+  {
+   "key": "dai_viet_conquest_of_vijaya",
+   "name": "Đại Việt takes Vijaya",
+   "date": "1471-03"
+  },
+  {
+   "key": "battle_of_otlukbeli",
+   "name": "Battle of Otlukbeli",
+   "date": "1473-08-11"
+  },
+  {
+   "key": "fall_of_caffa",
+   "name": "Ottoman capture of Caffa",
+   "date": "1475-06-06"
+  },
+  {
+   "key": "battle_of_nancy",
+   "name": "Battle of Nancy: death of Charles the Bold",
+   "date": "1477-01-05"
+  },
+  {
+   "key": "demak_rises",
+   "name": "Demak supplants Majapahit on the north coast",
+   "date": "1478",
+   "event": "majapahit_collapse"
+  },
+  {
+   "key": "fall_of_novgorod",
+   "name": "Muscovy annexes Novgorod",
+   "date": "1478-01-15"
+  },
+  {
+   "key": "siege_of_otranto",
+   "name": "Ottoman capture of Otranto",
+   "date": "1480-08-11"
+  },
+  {
+   "key": "great_stand_on_the_ugra",
+   "name": "Great Stand on the Ugra",
+   "date": "1480-11"
+  },
+  {
+   "key": "portuguese_elmina",
+   "name": "Portuguese fort of São Jorge da Mina",
+   "date": "1482",
+   "event": "portuguese_elmina"
+  },
+  {
+   "key": "battle_of_bosworth",
+   "name": "Battle of Bosworth Field",
+   "date": "1485-08-22"
+  },
+  {
+   "key": "aztec_ahuitzotl",
+   "name": "Ahuitzotl becomes tlatoani of Tenochtitlan",
+   "date": "1486",
+   "event": "aztec_imperial_height"
+  },
+  {
+   "key": "dias_rounds_the_cape",
+   "name": "Dias rounds the Cape of Good Hope",
+   "date": "1488-02"
+  },
+  {
+   "key": "venice_takes_cyprus",
+   "name": "Venice annexes Cyprus",
+   "date": "1489-02-26"
+  },
+  {
+   "key": "bahmani_breakup",
+   "name": "Bahmani governors declare independence",
+   "date": "1490"
+  },
+  {
+   "key": "death_of_matthias_corvinus",
+   "name": "Death of Matthias Corvinus",
+   "date": "1490-04-06"
+  },
+  {
+   "key": "kongo_baptism",
+   "name": "Baptism of Nzinga a Nkuwu",
+   "date": "1491-05-03",
+   "event": "kongo_christianization"
+  },
+  {
+   "key": "fall_of_granada",
+   "name": "Conquest of Granada",
+   "date": "1492-01-02",
+   "event": "fall_of_granada"
+  },
+  {
+   "key": "alhambra_decree",
+   "name": "Expulsion of the Jews from Spain",
+   "date": "1492-03-31",
+   "event": "alhambra_decree"
+  },
+  {
+   "key": "columbus_first_voyage",
+   "name": "Columbus reaches the Caribbean",
+   "date": "1492-10-12",
+   "event": "columbus_first_voyage"
+  },
+  {
+   "key": "askia_muhammad_seizes_songhai",
+   "name": "Askia Muhammad seizes Songhai",
+   "date": "1493-04"
+  },
+  {
+   "key": "treaty_of_tordesillas",
+   "name": "Treaty of Tordesillas",
+   "date": "1494-06-07",
+   "event": "treaty_of_tordesillas"
+  },
+  {
+   "key": "italian_wars",
+   "name": "Charles VIII invades Italy",
+   "date": "1494-09",
+   "event": "italian_wars"
+  },
+  {
+   "key": "da_gama_reaches_calicut",
+   "name": "Vasco da Gama reaches Calicut",
+   "date": "1498-05-20",
+   "event": "portuguese_cape_route"
+  },
+  {
+   "key": "ottoman_venetian_war",
+   "name": "Ottoman-Venetian war; fall of Lepanto",
+   "date": "1499-08-29"
+  },
+  {
+   "key": "swabian_war",
+   "name": "Swabian War ends (Peace of Basel)",
+   "date": "1499-09-22"
+  },
+  {
+   "key": "french_conquest_of_milan",
+   "name": "Louis XII takes Milan",
+   "date": "1499-10-06"
+  },
+  {
+   "key": "safavid_rise",
+   "name": "Ismail I founds the Safavid state",
+   "date": "1501",
+   "event": "safavid_rise"
+  },
+  {
+   "key": "portuguese_goa",
+   "name": "Portuguese take Goa",
+   "date": "1510-11-25",
+   "event": "portuguese_goa"
+  },
+  {
+   "key": "portuguese_capture_of_malacca",
+   "name": "Portuguese capture Malacca",
+   "date": "1511-08-24",
+   "event": "portuguese_capture_of_malacca"
+  },
+  {
+   "key": "battle_of_chaldiran",
+   "name": "Battle of Chaldiran",
+   "date": "1514-08-23",
+   "event": "battle_of_chaldiran"
+  },
+  {
+   "key": "ottoman_conquest_of_mamluks",
+   "name": "Ottoman conquest of the Mamluk Sultanate",
+   "date": "1516-08-24/1517-04",
+   "event": "ottoman_conquest_of_mamluks"
+  },
+  {
+   "key": "protestant_reformation",
+   "name": "Luther's theses",
+   "date": "1517-10-31",
+   "event": "protestant_reformation"
+  },
+  {
+   "key": "spanish_conquest_of_the_aztecs",
+   "name": "Spanish conquest of the Aztecs",
+   "date": "1519-04/1521-08-13",
+   "event": "spanish_conquest_of_the_aztecs"
+  },
+  {
+   "key": "siege_of_rhodes",
+   "name": "Ottomans take Rhodes",
+   "date": "1522-12-20"
+  },
+  {
+   "key": "german_peasants_war",
+   "name": "German Peasants' War",
+   "date": "1524/1525",
+   "event": "german_peasants_war"
+  },
+  {
+   "key": "first_battle_of_panipat",
+   "name": "First Battle of Panipat: Babur founds the Mughal Empire",
+   "date": "1526-04-21",
+   "event": "first_battle_of_panipat"
+  },
+  {
+   "key": "battle_of_mohacs",
+   "name": "Battle of Mohács",
+   "date": "1526-08-29",
+   "event": "battle_of_mohacs"
+  },
+  {
+   "key": "siege_of_vienna_1529",
+   "name": "First siege of Vienna",
+   "date": "1529-09-27",
+   "event": "siege_of_vienna_1529"
+  },
+  {
+   "key": "spanish_conquest_of_the_inca",
+   "name": "Spanish conquest of the Inca",
+   "date": "1532-11-16/1536",
+   "event": "spanish_conquest_of_the_inca"
+  },
+  {
+   "key": "english_reformation",
+   "name": "English Reformation (Act of Supremacy)",
+   "date": "1534-11",
+   "event": "english_reformation"
+  },
+  {
+   "key": "battle_of_wayna_daga",
+   "name": "Battle of Wayna Daga ends Adal's conquest of Ethiopia",
+   "date": "1543-02-21",
+   "event": "battle_of_wayna_daga"
+  },
+  {
+   "key": "conquest_of_kazan",
+   "name": "Muscovy conquers Kazan (and Astrakhan 1556)",
+   "date": "1552-10-13",
+   "event": "conquest_of_kazan"
+  },
+  {
+   "key": "peace_of_amasya",
+   "name": "Peace of Amasya",
+   "date": "1555-05-29",
+   "event": "peace_of_amasya"
+  },
+  {
+   "key": "peace_of_augsburg",
+   "name": "Peace of Augsburg",
+   "date": "1555-09-25",
+   "event": "peace_of_augsburg"
+  },
+  {
+   "key": "akbar_consolidation",
+   "name": "Akbar's accession and expansion",
+   "date": "1556",
+   "event": "akbar_consolidation"
+  },
+  {
+   "key": "peace_of_cateau_cambresis",
+   "name": "Peace of Cateau-Cambrésis ends the Italian Wars",
+   "date": "1559-04-03",
+   "event": "peace_of_cateau_cambresis"
+  },
+  {
+   "key": "battle_of_talikota",
+   "name": "Battle of Talikota",
+   "date": "1565-01-23",
+   "event": "battle_of_talikota"
+  },
+  {
+   "key": "dutch_revolt",
+   "name": "Dutch Revolt begins",
+   "date": "1568",
+   "event": "dutch_revolt"
+  },
+  {
+   "key": "union_of_lublin",
+   "name": "Union of Lublin",
+   "date": "1569-07-01",
+   "event": "union_of_lublin"
+  },
+  {
+   "key": "spanish_philippines",
+   "name": "Spanish found Manila",
+   "date": "1571-06-24",
+   "event": "spanish_philippines"
+  },
+  {
+   "key": "battle_of_lepanto",
+   "name": "Battle of Lepanto",
+   "date": "1571-10-07",
+   "event": "battle_of_lepanto"
+  },
+  {
+   "key": "fall_of_vilcabamba",
+   "name": "Fall of Vilcabamba, last Inca state",
+   "date": "1572-06-24",
+   "event": "fall_of_vilcabamba"
+  },
+  {
+   "key": "ottoman_conquest_of_tunis",
+   "name": "Ottomans take Tunis; Hafsids end",
+   "date": "1574-09-13"
+  },
+  {
+   "key": "battle_of_alcacer_quibir",
+   "name": "Battle of Alcácer Quibir",
+   "date": "1578-08-04",
+   "event": "battle_of_alcacer_quibir"
+  },
+  {
+   "key": "iberian_union",
+   "name": "Iberian Union",
+   "date": "1580",
+   "event": "iberian_union"
+  },
+  {
+   "key": "yermak_conquest_of_sibir",
+   "name": "Yermak's conquest of Sibir",
+   "date": "1581/1585",
+   "event": "yermak_conquest_of_sibir"
+  },
+  {
+   "key": "spanish_armada",
+   "name": "Spanish Armada",
+   "date": "1588-07",
+   "event": "spanish_armada"
+  },
+  {
+   "key": "treaty_of_constantinople_1590",
+   "name": "Ottoman-Safavid peace of Constantinople",
+   "date": "1590-03-21"
+  },
+  {
+   "key": "siege_of_odawara",
+   "name": "Hideyoshi completes unification of Japan at Odawara",
+   "date": "1590-08-04"
+  },
+  {
+   "key": "battle_of_tondibi",
+   "name": "Battle of Tondibi: Morocco defeats Songhay",
+   "date": "1591-03-13",
+   "event": "battle_of_tondibi"
+  },
+  {
+   "key": "imjin_war",
+   "name": "Japanese invasions of Korea",
+   "date": "1592-05-23/1598-12-16",
+   "event": "imjin_war"
+  },
+  {
+   "key": "nine_years_war_ireland",
+   "name": "Nine Years' War in Ireland",
+   "date": "1593"
+  },
+  {
+   "key": "long_turkish_war",
+   "name": "Long Turkish War begins",
+   "date": "1593-07-29"
+  },
+  {
+   "key": "time_of_troubles",
+   "name": "Rurikids end; Boris Godunov tsar (Time of Troubles era)",
+   "date": "1598-01-17",
+   "event": "time_of_troubles"
+  },
+  {
+   "key": "edict_of_nantes",
+   "name": "Edict of Nantes ends the French Wars of Religion",
+   "date": "1598-04-13",
+   "event": "french_wars_of_religion"
+  },
+  {
+   "key": "peace_of_vervins",
+   "name": "Peace of Vervins",
+   "date": "1598-05-02"
+  },
+  {
+   "key": "death_of_hideyoshi",
+   "name": "Death of Toyotomi Hideyoshi",
+   "date": "1598-09-18"
+  },
+  {
+   "key": "battle_of_curalaba",
+   "name": "Battle of Curalaba: Mapuche rising",
+   "date": "1598-12-23"
+  },
+  {
+   "key": "deposition_of_sigismund",
+   "name": "Swedish Riksdag deposes Sigismund",
+   "date": "1599-07-24"
+  },
+  {
+   "key": "battle_of_selimbar",
+   "name": "Michael the Brave takes Transylvania at Șelimbăr",
+   "date": "1599-10-28"
+  },
+  {
+   "key": "sack_of_pegu",
+   "name": "Toungoo and Arakan sack Pegu; Nanda Bayin's fall",
+   "date": "1599-12"
+  },
+  {
+   "key": "ricci_in_beijing",
+   "name": "Matteo Ricci admitted to Beijing",
+   "date": "1601-01-24",
+   "event": "jesuits_at_the_ming_court"
+  },
+  {
+   "key": "voc_founded",
+   "name": "Dutch East India Company founded",
+   "date": "1602-03-20",
+   "event": "voc_founded"
+  },
+  {
+   "key": "tokugawa_shogunate",
+   "name": "Tokugawa Ieyasu made shogun",
+   "date": "1603-03-24",
+   "event": "tokugawa_shogunate_established"
+  },
+  {
+   "key": "jamestown",
+   "name": "Jamestown founded",
+   "date": "1607-05-14",
+   "event": "jamestown_founded"
+  },
+  {
+   "key": "quebec_founded",
+   "name": "Quebec founded",
+   "date": "1608-07-03",
+   "event": "quebec_founded"
+  },
+  {
+   "key": "romanov_election",
+   "name": "Michael Romanov elected tsar, ending the Time of Troubles",
+   "date": "1613-02-21",
+   "event": "time_of_troubles"
+  },
+  {
+   "key": "siege_of_osaka",
+   "name": "Fall of Osaka Castle",
+   "date": "1615-06-04",
+   "event": "siege_of_osaka"
+  },
+  {
+   "key": "nurhaci_seven_grievances",
+   "name": "Nurhaci's Seven Grievances against the Ming",
+   "date": "1618-05-07",
+   "event": "ming_qing_transition_begins"
+  },
+  {
+   "key": "defenestration_of_prague",
+   "name": "Defenestration of Prague begins the Thirty Years' War",
+   "date": "1618-05-23",
+   "event": "thirty_years_war"
+  },
+  {
+   "key": "banda_conquest",
+   "name": "VOC conquest of the Banda Islands",
+   "date": "1621-04-01",
+   "event": "banda_conquest"
+  },
+  {
+   "key": "capture_of_hormuz",
+   "name": "Safavid and English capture of Hormuz",
+   "date": "1622-05-03"
+  },
+  {
+   "key": "manchu_invasion_korea",
+   "name": "Joseon submits to the Qing at Samjeondo",
+   "date": "1637-02-24",
+   "event": "manchu_invasions_of_korea"
+  },
+  {
+   "key": "treaty_of_zuhab",
+   "name": "Treaty of Zuhab fixes the Ottoman-Safavid border",
+   "date": "1639-05-17"
+  },
+  {
+   "key": "sakoku_1639",
+   "name": "Portuguese expelled from Japan (last sakoku edict)",
+   "date": "1639-07-05",
+   "event": "sakoku_edicts"
+  },
+  {
+   "key": "portuguese_restoration",
+   "name": "Portuguese Restoration",
+   "date": "1640-12-01",
+   "event": "portuguese_restoration"
+  },
+  {
+   "key": "english_civil_war",
+   "name": "English Civil War begins",
+   "date": "1642-08-22",
+   "event": "wars_of_the_three_kingdoms"
+  },
+  {
+   "key": "fall_of_beijing",
+   "name": "Fall of Beijing; Qing enter the capital",
+   "date": "1644-06-06",
+   "event": "fall_of_beijing_1644"
+  },
+  {
+   "key": "peace_of_westphalia",
+   "name": "Peace of Westphalia",
+   "date": "1648-10-24",
+   "event": "peace_of_westphalia"
+  },
+  {
+   "key": "muscat_taken",
+   "name": "Omanis take Muscat from the Portuguese",
+   "date": "1650-01-26",
+   "event": "oman_expels_portuguese_from_muscat"
+  },
+  {
+   "key": "pereiaslav",
+   "name": "Pereiaslav Council: the Hetmanate under the Tsar",
+   "date": "1654-01-18"
+  },
+  {
+   "key": "peace_of_pyrenees",
+   "name": "Peace of the Pyrenees",
+   "date": "1659-11-07"
+  },
+  {
+   "key": "restoration_charles_ii",
+   "name": "Restoration of Charles II",
+   "date": "1660-05-29",
+   "event": "restoration_of_charles_ii"
+  },
+  {
+   "key": "battle_of_mbwila",
+   "name": "Battle of Mbwila; Kongo's king killed",
+   "date": "1665-10-29",
+   "event": "battle_of_mbwila"
+  },
+  {
+   "key": "fall_of_candia",
+   "name": "Ottomans take Candia (Crete)",
+   "date": "1669-09-27"
+  },
+  {
+   "key": "shivaji_coronation",
+   "name": "Coronation of Shivaji",
+   "date": "1674-06-06",
+   "event": "shivaji_coronation"
+  },
+  {
+   "key": "dzungar_conquest_tarim",
+   "name": "Galdan's Dzungars conquer the Yarkent Khanate",
+   "date": "1680-01-01",
+   "event": "afaqi_khojas_and_the_yarkent_khanate"
+  },
+  {
+   "key": "siege_of_vienna_1683",
+   "name": "Ottoman siege of Vienna broken",
+   "date": "1683-09-12",
+   "event": "siege_of_vienna_1683"
+  },
+  {
+   "key": "qing_taiwan",
+   "name": "Qing conquest of Zheng Taiwan",
+   "date": "1683-10-01",
+   "event": "qing_conquest_of_taiwan"
+  },
+  {
+   "key": "fall_of_golconda",
+   "name": "Mughal conquest of Golconda (Bijapur fell 1686)",
+   "date": "1687-09-22"
+  },
+  {
+   "key": "glorious_revolution",
+   "name": "William of Orange lands at Torbay",
+   "date": "1688-11-05",
+   "event": "glorious_revolution"
+  },
+  {
+   "key": "treaty_of_nerchinsk",
+   "name": "Treaty of Nerchinsk",
+   "date": "1689-08-27",
+   "event": "treaty_of_nerchinsk"
+  },
+  {
+   "key": "treaty_of_karlowitz",
+   "name": "Treaty of Karlowitz",
+   "date": "1699-01-26",
+   "event": "treaty_of_karlowitz"
+  },
+  {
+   "key": "khalsa_founded",
+   "name": "Khalsa founded by Guru Gobind Singh",
+   "date": "1699-04-13",
+   "event": "khalsa_founded"
+  },
+  {
+   "key": "great_northern_war",
+   "name": "Great Northern War begins",
+   "date": "1700-02-22",
+   "event": "great_northern_war"
+  },
+  {
+   "key": "asante_feyiase",
+   "name": "Asante victory over Denkyira at Feyiase",
+   "date": "1701-01-01",
+   "event": "rise_of_asante"
+  },
+  {
+   "key": "spanish_succession_war",
+   "name": "War of the Spanish Succession begins",
+   "date": "1701-09-07",
+   "event": "war_of_the_spanish_succession"
+  },
+  {
+   "key": "saint_petersburg_founded",
+   "name": "Saint Petersburg founded",
+   "date": "1703-05-27",
+   "event": "petrine_reforms"
+  },
+  {
+   "key": "lan_xang_split",
+   "name": "Lan Xang splits into Luang Prabang and Vientiane",
+   "date": "1707-01-01"
+  },
+  {
+   "key": "death_of_aurangzeb",
+   "name": "Death of Aurangzeb",
+   "date": "1707-03-03",
+   "event": "death_of_aurangzeb"
+  },
+  {
+   "key": "acts_of_union",
+   "name": "Acts of Union create Great Britain",
+   "date": "1707-05-01"
+  },
+  {
+   "key": "hotaki_revolt",
+   "name": "Mir Wais Hotak takes Kandahar from the Safavids",
+   "date": "1709-04-21"
+  },
+  {
+   "key": "poltava",
+   "name": "Battle of Poltava",
+   "date": "1709-07-08"
+  },
+  {
+   "key": "pruth_campaign",
+   "name": "Treaty of the Pruth; Azov returned to the Ottomans",
+   "date": "1711-07-23"
+  },
+  {
+   "key": "treaty_of_utrecht",
+   "name": "Treaties of Utrecht",
+   "date": "1713-04-11",
+   "event": "war_of_the_spanish_succession"
+  },
+  {
+   "key": "treaty_of_rastatt",
+   "name": "Treaty of Rastatt between France and the Emperor",
+   "date": "1714-03-07",
+   "event": "war_of_the_spanish_succession"
+  },
+  {
+   "key": "george_i_accession",
+   "name": "George I succeeds Queen Anne",
+   "date": "1714-08-01"
+  },
+  {
+   "key": "treaty_of_baden",
+   "name": "Treaty of Baden with the Empire",
+   "date": "1714-09-07",
+   "event": "war_of_the_spanish_succession"
+  },
+  {
+   "key": "fall_of_barcelona",
+   "name": "Barcelona falls to Philip V",
+   "date": "1714-09-11"
+  },
+  {
+   "key": "treaty_of_nystad",
+   "name": "Treaty of Nystad ends the Great Northern War",
+   "date": "1721-09-10",
+   "event": "treaty_of_nystad"
+  },
+  {
+   "key": "fall_of_isfahan",
+   "name": "Afghans take Isfahan, end of Safavid power",
+   "date": "1722-10-23",
+   "event": "fall_of_isfahan"
+  },
+  {
+   "key": "nader_shah_sacks_delhi",
+   "name": "Nader Shah sacks Delhi",
+   "date": "1739-03-20",
+   "event": "nader_shah_sacks_delhi"
+  },
+  {
+   "key": "war_of_the_austrian_succession",
+   "name": "War of the Austrian Succession",
+   "date": "1740-12-16",
+   "event": "war_of_the_austrian_succession"
+  },
+  {
+   "key": "first_saudi_state",
+   "name": "Pact of Diriyah, the First Saudi State",
+   "date": "1744-01-01",
+   "event": "first_saudi_state"
+  },
+  {
+   "key": "durrani_empire_founded",
+   "name": "Ahmad Shah founds the Durrani Empire",
+   "date": "1747-10-01",
+   "event": "durrani_empire_founded"
+  },
+  {
+   "key": "dzungar_genocide",
+   "name": "Qing destroy the Dzungar Khanate",
+   "date": "1755-01-01",
+   "event": "dzungar_genocide"
+  },
+  {
+   "key": "seven_years_war",
+   "name": "Seven Years' War",
+   "date": "1756-05-17",
+   "event": "seven_years_war"
+  },
+  {
+   "key": "canton_system",
+   "name": "Canton System",
+   "date": "1757-01-01",
+   "event": "canton_system"
+  },
+  {
+   "key": "battle_of_plassey",
+   "name": "Battle of Plassey",
+   "date": "1757-06-23",
+   "event": "battle_of_plassey"
+  },
+  {
+   "key": "third_battle_of_panipat",
+   "name": "Third Battle of Panipat",
+   "date": "1761-01-14",
+   "event": "third_battle_of_panipat"
+  },
+  {
+   "key": "burmese_sack_of_ayutthaya",
+   "name": "Burmese sack of Ayutthaya",
+   "date": "1767-04-07",
+   "event": "burmese_sack_of_ayutthaya"
+  },
+  {
+   "key": "cook_voyages",
+   "name": "Cook's Pacific voyages",
+   "date": "1768-08-26",
+   "event": "cook_voyages"
+  },
+  {
+   "key": "partitions_of_poland",
+   "name": "Partitions of Poland (1772, 1793, 1795)",
+   "date": "1772-08-05",
+   "event": "partitions_of_poland"
+  },
+  {
+   "key": "treaty_of_kucuk_kaynarca",
+   "name": "Treaty of Küçük Kaynarca",
+   "date": "1774-07-21",
+   "event": "treaty_of_kucuk_kaynarca"
+  },
+  {
+   "key": "american_revolution",
+   "name": "American Revolution and independence",
+   "date": "1776-07-04",
+   "event": "american_revolution"
+  },
+  {
+   "key": "tupac_amaru_rebellion",
+   "name": "Rebellion of Túpac Amaru II",
+   "date": "1780-11-04",
+   "event": "tupac_amaru_rebellion"
+  },
+  {
+   "key": "crimea_annexed",
+   "name": "Russia annexes the Crimean Khanate",
+   "date": "1783-04-19"
+  },
+  {
+   "key": "first_fleet",
+   "name": "First Fleet reaches Sydney",
+   "date": "1788-01-26",
+   "event": "first_fleet"
+  },
+  {
+   "key": "qajar_dynasty_founded",
+   "name": "Agha Mohammad Khan founds the Qajar dynasty",
+   "date": "1789-01-01",
+   "event": "qajar_dynasty_founded"
+  },
+  {
+   "key": "french_revolution",
+   "name": "French Revolution",
+   "date": "1789-07-14",
+   "event": "french_revolution"
+  },
+  {
+   "key": "haitian_revolution",
+   "name": "Haitian Revolution",
+   "date": "1791-08-22",
+   "event": "haitian_revolution"
+  },
+  {
+   "key": "french_revolutionary_wars",
+   "name": "French Revolutionary Wars",
+   "date": "1792-04-20",
+   "event": "french_revolutionary_wars"
+  },
+  {
+   "key": "macartney_mission",
+   "name": "Macartney Mission to Qianlong",
+   "date": "1793-09-14",
+   "event": "macartney_mission"
+  },
+  {
+   "key": "white_lotus_rebellion",
+   "name": "White Lotus Rebellion",
+   "date": "1794-01-01",
+   "event": "white_lotus_rebellion"
+  },
+  {
+   "key": "french_invasion_of_egypt",
+   "name": "French invasion of Egypt",
+   "date": "1798-07-01",
+   "event": "french_invasion_of_egypt"
+  },
+  {
+   "key": "anglo_mysore_wars",
+   "name": "Fall of Seringapatam ends the Anglo-Mysore Wars",
+   "date": "1799-05-04",
+   "event": "anglo_mysore_wars"
+  },
+  {
+   "key": "sikh_empire_founded",
+   "name": "Ranjit Singh takes Lahore",
+   "date": "1799-07-07",
+   "event": "sikh_empire_founded"
+  },
+  {
+   "key": "voc_dissolved",
+   "name": "Dutch East India Company dissolved",
+   "date": "1799-12-31",
+   "event": "voc_dissolved"
+  },
+  {
+   "key": "union_with_ireland",
+   "name": "Union of Great Britain and Ireland",
+   "date": "1801-01-01"
+  },
+  {
+   "key": "louisiana_purchase",
+   "name": "Louisiana Purchase",
+   "date": "1803-04-30",
+   "event": "louisiana_purchase"
+  },
+  {
+   "key": "sokoto_jihad",
+   "name": "Usman dan Fodio's jihad founds Sokoto",
+   "date": "1804-02-21",
+   "event": "sokoto_jihad"
+  },
+  {
+   "key": "muhammad_ali_takes_egypt",
+   "name": "Muhammad Ali takes Egypt",
+   "date": "1805-07-09",
+   "event": "muhammad_ali_takes_egypt"
+  },
+  {
+   "key": "end_of_holy_roman_empire",
+   "name": "Dissolution of the Holy Roman Empire",
+   "date": "1806-08-06"
+  },
+  {
+   "key": "british_abolition_of_slave_trade",
+   "name": "Britain abolishes the slave trade",
+   "date": "1807-03-25",
+   "event": "british_abolition_of_slave_trade"
+  },
+  {
+   "key": "napoleon_invades_iberia",
+   "name": "Napoleon invades Iberia; Portuguese court to Brazil",
+   "date": "1807-11-19",
+   "event": "napoleon_invades_iberia"
+  },
+  {
+   "key": "hawaii_unification",
+   "name": "Kauai submits; Hawaii unified",
+   "date": "1810-04-01",
+   "event": "hawaii_unification"
+  },
+  {
+   "key": "latin_american_independence",
+   "name": "Spanish American wars of independence begin",
+   "date": "1810-05-25",
+   "event": "latin_american_independence"
+  },
+  {
+   "key": "war_of_1812",
+   "name": "War of 1812",
+   "date": "1812-06-18"
+  },
+  {
+   "key": "french_invasion_of_russia",
+   "name": "Napoleon's invasion of Russia",
+   "date": "1812-06-24"
+  },
+  {
+   "key": "battle_of_leipzig",
+   "name": "Battle of Leipzig",
+   "date": "1813-10-19"
+  },
+  {
+   "key": "treaty_of_gulistan",
+   "name": "Treaty of Gulistan",
+   "date": "1813-10-24"
+  },
+  {
+   "key": "treaty_of_kiel",
+   "name": "Treaty of Kiel: Norway to Sweden",
+   "date": "1814-01-14"
+  },
+  {
+   "key": "first_abdication",
+   "name": "First abdication of Napoleon and the Treaty of Paris",
+   "date": "1814-04-06"
+  },
+  {
+   "key": "anglo_nepalese_war",
+   "name": "Anglo-Nepalese War begins",
+   "date": "1814-11-01"
+  },
+  {
+   "key": "kandyan_convention",
+   "name": "Kandyan Convention: Britain annexes Kandy",
+   "date": "1815-03-02"
+  },
+  {
+   "key": "hundred_days",
+   "name": "Napoleon returns: the Hundred Days",
+   "date": "1815-03-20"
+  },
+  {
+   "key": "tambora_eruption",
+   "name": "Eruption of Mount Tambora",
+   "date": "1815-04-10",
+   "event": "tambora_eruption"
+  },
+  {
+   "key": "second_serbian_uprising",
+   "name": "Second Serbian Uprising",
+   "date": "1815-04-23"
+  },
+  {
+   "key": "battle_of_tolentino",
+   "name": "Battle of Tolentino: Murat defeated",
+   "date": "1815-05-03"
+  },
+  {
+   "key": "german_confederation",
+   "name": "German Federal Act",
+   "date": "1815-06-08"
+  },
+  {
+   "key": "congress_of_vienna",
+   "name": "Final Act of the Congress of Vienna",
+   "date": "1815-06-09",
+   "event": "congress_of_vienna"
+  },
+  {
+   "key": "waterloo",
+   "name": "Battle of Waterloo",
+   "date": "1815-06-18",
+   "event": "congress_of_vienna"
+  },
+  {
+   "key": "mexican_independence",
+   "name": "Army of the Three Guarantees enters Mexico City",
+   "date": "1821-09-27",
+   "event": "latin_american_independence"
+  },
+  {
+   "key": "brazilian_independence",
+   "name": "Brazilian independence",
+   "date": "1822-09-07",
+   "event": "brazilian_independence"
+  },
+  {
+   "key": "greek_independence",
+   "name": "London Protocol recognises Greece",
+   "date": "1830-02-03",
+   "event": "greek_war_of_independence"
+  },
+  {
+   "key": "french_algeria",
+   "name": "French capture of Algiers",
+   "date": "1830-07-05",
+   "event": "french_conquest_of_algeria"
+  },
+  {
+   "key": "belgian_revolution",
+   "name": "Belgian Revolution",
+   "date": "1830-08-25"
+  },
+  {
+   "key": "treaty_of_nanking",
+   "name": "Treaty of Nanking ends the First Opium War",
+   "date": "1842-08-29",
+   "event": "first_opium_war"
+  },
+  {
+   "key": "treaty_of_guadalupe_hidalgo",
+   "name": "Treaty of Guadalupe Hidalgo",
+   "date": "1848-02-02",
+   "event": "mexican_american_war"
+  },
+  {
+   "key": "revolutions_of_1848",
+   "name": "Revolutions of 1848 (February Revolution in Paris)",
+   "date": "1848-02-22",
+   "event": "revolutions_of_1848"
+  },
+  {
+   "key": "taiping_rebellion",
+   "name": "Taiping Rebellion proclaimed at Jintian",
+   "date": "1851-01-11",
+   "event": "taiping_rebellion"
+  },
+  {
+   "key": "treaty_of_paris_1856",
+   "name": "Treaty of Paris ends the Crimean War",
+   "date": "1856-03-30",
+   "event": "crimean_war"
+  },
+  {
+   "key": "indian_rebellion",
+   "name": "Indian Rebellion breaks out at Meerut",
+   "date": "1857-05-10",
+   "event": "indian_rebellion_of_1857"
+  },
+  {
+   "key": "kingdom_of_italy",
+   "name": "Proclamation of the Kingdom of Italy",
+   "date": "1861-03-17",
+   "event": "italian_unification"
+  },
+  {
+   "key": "us_civil_war",
+   "name": "American Civil War (Fort Sumter to Appomattox)",
+   "date": "1861-04-12",
+   "event": "us_civil_war"
+  },
+  {
+   "key": "austro_hungarian_compromise",
+   "name": "Austro-Hungarian Compromise",
+   "date": "1867-03-15"
+  },
+  {
+   "key": "canadian_confederation",
+   "name": "Canadian Confederation",
+   "date": "1867-07-01"
+  },
+  {
+   "key": "meiji_restoration",
+   "name": "Meiji Restoration",
+   "date": "1868-01-03",
+   "event": "meiji_restoration"
+  },
+  {
+   "key": "suez_canal",
+   "name": "Opening of the Suez Canal",
+   "date": "1869-11-17",
+   "event": "suez_canal"
+  },
+  {
+   "key": "capture_of_rome",
+   "name": "Capture of Rome",
+   "date": "1870-09-20",
+   "event": "italian_unification"
+  },
+  {
+   "key": "german_empire",
+   "name": "Proclamation of the German Empire at Versailles",
+   "date": "1871-01-18",
+   "event": "german_unification"
+  },
+  {
+   "key": "congress_of_berlin",
+   "name": "Treaty of Berlin",
+   "date": "1878-07-13"
+  },
+  {
+   "key": "british_occupation_of_egypt",
+   "name": "Battle of Tel el-Kebir; British occupation of Egypt",
+   "date": "1882-09-13",
+   "event": "british_occupation_of_egypt"
+  },
+  {
+   "key": "berlin_conference",
+   "name": "Berlin Conference General Act",
+   "date": "1885-02-26",
+   "event": "berlin_conference"
+  },
+  {
+   "key": "treaty_of_shimonoseki",
+   "name": "Treaty of Shimonoseki",
+   "date": "1895-04-17",
+   "event": "first_sino_japanese_war"
+  },
+  {
+   "key": "battle_of_adwa",
+   "name": "Battle of Adwa",
+   "date": "1896-03-01",
+   "event": "battle_of_adwa"
+  },
+  {
+   "key": "treaty_of_paris_1898",
+   "name": "Treaty of Paris ends the Spanish–American War",
+   "date": "1898-12-10",
+   "event": "spanish_american_war"
+  },
+  {
+   "key": "australian_federation",
+   "name": "Federation of Australia",
+   "date": "1901-01-01",
+   "event": "australian_federation"
+  },
+  {
+   "key": "treaty_of_vereeniging",
+   "name": "Treaty of Vereeniging ends the Second Boer War",
+   "date": "1902-05-31",
+   "event": "south_african_war"
+  },
+  {
+   "key": "panama_independence",
+   "name": "Panama separates from Colombia",
+   "date": "1903-11-03",
+   "event": "panama_canal"
+  },
+  {
+   "key": "norwegian_independence",
+   "name": "Dissolution of the union of Norway and Sweden",
+   "date": "1905-06-07"
+  },
+  {
+   "key": "treaty_of_portsmouth",
+   "name": "Treaty of Portsmouth ends the Russo-Japanese War",
+   "date": "1905-09-05",
+   "event": "russo_japanese_war"
+  },
+  {
+   "key": "anglo_russian_convention",
+   "name": "Anglo-Russian Convention",
+   "date": "1907-08-31",
+   "event": "anglo_russian_convention"
+  },
+  {
+   "key": "young_turk_revolution",
+   "name": "Young Turk Revolution",
+   "date": "1908-07-24",
+   "event": "young_turk_revolution"
+  },
+  {
+   "key": "bosnian_annexation",
+   "name": "Austria-Hungary annexes Bosnia and Herzegovina",
+   "date": "1908-10-06"
+  },
+  {
+   "key": "union_of_south_africa",
+   "name": "Union of South Africa",
+   "date": "1910-05-31"
+  },
+  {
+   "key": "korea_annexed",
+   "name": "Japan annexes Korea",
+   "date": "1910-08-29",
+   "event": "japanese_annexation_of_korea"
+  },
+  {
+   "key": "portuguese_republic",
+   "name": "Portuguese republic proclaimed",
+   "date": "1910-10-05"
+  },
+  {
+   "key": "mexican_revolution",
+   "name": "Mexican Revolution begins",
+   "date": "1910-11-20",
+   "event": "mexican_revolution"
+  },
+  {
+   "key": "xinhai_revolution",
+   "name": "Wuchang Uprising (Xinhai Revolution)",
+   "date": "1911-10-10",
+   "event": "xinhai_revolution"
+  },
+  {
+   "key": "qing_abdication",
+   "name": "Abdication of the Qing emperor",
+   "date": "1912-02-12",
+   "event": "xinhai_revolution"
+  },
+  {
+   "key": "treaty_of_fez",
+   "name": "Treaty of Fez: French protectorate over Morocco",
+   "date": "1912-03-30"
+  },
+  {
+   "key": "treaty_of_ouchy",
+   "name": "Treaty of Ouchy ends the Italo-Turkish War",
+   "date": "1912-10-18",
+   "event": "italian_invasion_of_libya"
+  },
+  {
+   "key": "treaty_of_bucharest_1913",
+   "name": "Treaty of Bucharest ends the Second Balkan War",
+   "date": "1913-08-10",
+   "event": "balkan_wars"
+  },
+  {
+   "key": "sarajevo_assassination",
+   "name": "Assassination of Archduke Franz Ferdinand in Sarajevo",
+   "date": "1914-06-28",
+   "event": "world_war_i"
+  },
+  {
+   "key": "chanka_war",
+   "name": "Pachacuti defeats the Chanka and takes power in Cusco",
+   "date": "c. 1438"
+  },
+  {
+   "key": "fall_of_mayapan",
+   "name": "Fall of Mayapan; Yucatán fragments",
+   "date": "c. 1441"
+  }
+ ]
+}

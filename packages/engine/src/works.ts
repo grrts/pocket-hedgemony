@@ -2,9 +2,10 @@ import { isHuman } from "./humans.ts";
 import type { World } from "./world.ts";
 import type { News } from "./war.ts";
 import { controller } from "./war.ts";
+import { START_YEAR } from "../../rules/src/start.ts";
 import { inAnyWar } from "./lords.ts";
 import { LEDGER, LEDGER_LINES } from "./treasury.ts";
-import { buildingType, siteKind, townAtLeast, type TownSize } from "./domain/buildings/index.ts";
+import { buildingType, buildingsConfig, siteKind, townAtLeast, type TownSize } from "./domain/buildings/index.ts";
 import { invention, startingKnowledgeFor } from "./domain/research/index.ts";
 import { CHANGES, changeRows, changeTitle, changeUses, changing, type ChangeRow } from "./conversion.ts";
 import { classFood, FOOD_CLASSES, jobSlots, precious, roughWaste, saltCoast, seamWare, tileCount, tilesOf, tileWares, USES, wearYearsOf, wornFields, type FoodClass, type UseName } from "./land.ts";
@@ -16,6 +17,8 @@ import { heritageFactor } from "./heritage.ts";
 
 const provinceMines = provinceConfig.mines;
 const MINE_ANCHORS = new Set(Object.keys(provinceMines.anchors));
+/** The trade towns the geography anchors name keep their market in 1444, however poor the province (SETUP-068). */
+const MARKET_ANCHORS = new Set(buildingsConfig.anchors.filter((a) => a.building === "market" && a.from_year <= START_YEAR).map((a) => a.province));
 
 /**
  * Works (milestone 4, first slice of the buildings context): the crown builds
@@ -468,7 +471,7 @@ export const hasGranary = (world: World, p: number): boolean => worksAt(world, p
  */
 export function seedWorks(world: World): void {
   const set = (p: number, w: WorkName, step: number) => (world.provinceWorks[p * WORK_COUNT + W[w]] = step);
-  const capitals = new Set(world.rules.nations.map((n) => world.provinceIndex.get(n.capital)));
+  const capitals = new Set(world.rules.nations.filter((n) => !n.asleep).map((n) => world.provinceIndex.get(n.capital)));
   for (let p = 0; p < world.provinceCount; p++) {
     if (world.provinceWater[p]) continue;
     const def = world.rules.provinces[p]!;
@@ -491,7 +494,7 @@ export function seedWorks(world: World): void {
     put("ranch", 1, wealth >= 3 && placeFits(world, p, "ranch"));
     put("fishery", 1, wealth >= 2 && placeFits(world, p, "fishery"));
     put("hunting lodge", 1, wealth >= 3 && tilesOf(world, p, "woods") >= 3);
-    put("market", wealth >= 8 ? 2 : 1, wealth >= 4);
+    put("market", wealth >= 8 ? 2 : 1, wealth >= 4 || MARKET_ANCHORS.has(def.name));
     put("harbour", 1, wealth >= 5 && !!def.coastal);
     put("road", 1, wealth >= 6);
     put("lumber camp", 1, wealth >= 5 && placeFits(world, p, "lumber camp"));

@@ -1,6 +1,6 @@
 import { isHuman } from "./humans.ts";
 import type { World } from "./world.ts";
-import { defaultAim, relationState, strength } from "./war.ts";
+import { declaringAim, relationState, strength } from "./war.ts";
 import { censureOf } from "./faithHeads.ts";
 import { maxCeded, peaceShare } from "./peace.ts";
 import * as dip from "./domain/diplomacy/index.ts";
@@ -38,7 +38,13 @@ export interface PriceOfWar {
   threatened: number[];
   /** The declarer's lords who will waver when it takes land in a war with no fitting aim (WAR-222). */
   waveringLords: number;
-  /** The game declares every war with no aim for now. */
+  /**
+   * The aim the declaration will be made with (declaringAim: the best fitting
+   * aim the declarer holds against the target, else "no_aim"), as diplomacy
+   * names it, with the province a Take land aim names and why it is held.
+   */
+  aim: { aim: string; province?: number; source?: string };
+  /** The declarer holds no fitting aim against the target: the war is declared with no aim. */
   noAim: boolean;
   /** A truce the declaration breaks, and the month it would have lasted to. */
   truce: { until: string | null } | null;
@@ -220,6 +226,9 @@ export function priceOfWar(world: World, a: number, b: number, ctx: PriceContext
     if (strengthOf(world, ctx, n) * 2 >= target) add(friends, id, "alliance");
   }
   const st = relationState(world, a, b);
+  const held = declaringAim(world, a, b);
+  const aimProvince = held.province === undefined ? undefined : world.provinceIndex.get(held.province);
+  const aim: PriceOfWar["aim"] = { aim: held.aim, ...(aimProvince !== undefined ? { province: aimProvince } : {}), ...(held.source && held.aim !== "no_aim" ? { source: held.source } : {}) };
   const ourSide = strengthOf(world, ctx, a) + friends.reduce((t, c) => t + c.soldiers, 0);
   let theirSide = target + against.reduce((t, c) => t + c.soldiers, 0);
   // A league against a may join any later war: the AI counts every member (WAR-228).
@@ -233,7 +242,8 @@ export function priceOfWar(world: World, a: number, b: number, ctx: PriceContext
     friends,
     threatened: ctx.threatened.filter((n) => n !== b),
     waveringLords: ctx.waveringLords,
-    noAim: true,
+    aim,
+    noAim: aim.aim === "no_aim",
     truce: st.state === "truce" ? { until: st.until ?? null } : null,
     monthlyPay: ctx.monthlyPay,
     maxCeded: maxCededProvinces(world, b, ctx.counts),
@@ -259,6 +269,6 @@ export function whyAiWontDeclare(world: World, n: number, t: number, price: Pric
   if (wouldSayPeaceAtDeclaration(world, n)) return "its people want peace";
   if (!heedsNoNotoriety(world, n) && dip.notoriety(world.diplomacy, world.nationIds[n]!) >= dip.config.ai.notoriety_restraint) return "too notorious";
   // A war its faith's head would censure costs a wrong with every fellow believer and a Punish aim for all (RELG-156).
-  if (!heedsNoNotoriety(world, n) && censureOf(world, n, t, defaultAim(world, n, t)?.aim ?? "no_aim")) return "the faith would censure it";
+  if (!heedsNoNotoriety(world, n) && censureOf(world, n, t, price.aim.aim)) return "the faith would censure it";
   return null;
 }

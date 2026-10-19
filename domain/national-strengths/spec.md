@@ -3,7 +3,8 @@
 ## 1. Purpose and scope
 
 Every playable country gets a **heritage**: what it is good at because of where and what it is (birthright), what it
-becomes good at when its moment in history arrives (golden ages), what it secretly wants (ambitions), what it achieved
+becomes good at when its moment in history arrives (golden ages), what it wants (ambitions: the goal in plain sight, the
+reward kept secret until earned), what it achieved
 (legacies) and what holds it back (weakness). Heritage is small on purpose: at most five rows on a card, each line
 changing something countable in another context. This context decides the parts, their life cycles, the levers they may
 pull, the conditions they use, the budgets that keep them fair, who gets which heritage, and what happens to heritage
@@ -11,14 +12,14 @@ when countries change hands. It is Pocket Hegemony's own system (1444 to 31 Augu
 
 **In scope**
 - The heritage card and its five parts; birthright needs and dormancy; golden ages becoming active, inactive or ended, and marks;
-  hidden ambitions (draw, hidden, hinted, warmth, done, lost, counsel, envoy reading, age ambitions, settings); legacies
-  and their cap; weaknesses and overcoming them.
+  ambitions (draw, requirements, goal and progress, the reward named but hidden, within reach, done, lost, counsel for a
+  new aim, envoy reading, age ambitions, settings); legacies and their cap; weaknesses and overcoming them.
 - The lever catalogue (`config/levers.json`): units, groups, costs, scope costs, provisional levers.
 - The heritage condition types and how heritage reads the event tree's condition language.
 - Budgets, size bonus, tolerance and the build-time validation.
 - Who gets hand-written, generated or no heritage; archetype generation.
 - Inheritance on annexation, subjects, releases and formed countries.
-- The four event effects and one condition heritage proposes to the event tree.
+- The event effects and the condition heritage proposes to the event tree.
 - Heritage on the phone (card row, sheet, reveal moments, map shimmer, nation picker).
 
 **Not in scope (owned by …)**
@@ -32,6 +33,9 @@ when countries change hands. It is Pocket Hegemony's own system (1444 to 31 Augu
 ## 2. Sources
 
 Newest decision first.
+0. `domain/DECISIONS.md` X-27 (Leroy, 19 Oct): ambitions show their goal plainly with progress and keep only their
+   reward secret, more ambitions are written, and ambitions can require one another and open events. It replaces §13's
+   "hidden with a hint" below and D-HER-13's warmth bands.
 1. `national-strengths/national-strengths-design.md` §13 "Decided (16 October)": ambitions hidden with a hint and never
    fully revealed while open (Leroy); a country keeps 5 legacies; weaknesses can't be bought off, overcome only by their
    condition or a reform event.
@@ -53,14 +57,15 @@ Newest decision first.
 | Golden age (was Heyday) | A strength tied to one event-tree age, active while the age is active and its start condition (`wakes`) holds | Age |
 | Active / inactive (was awake / asleep) | A golden age's state within its age: active while its start condition holds, inactive while it fails | Ended |
 | Mark | The permanent legacy a golden age leaves if it was active 25 years in total, worth a third of it | Legacy from an ambition |
-| Ambition | A hidden goal drawn from the country's pool | Mission |
-| Pool | 4 to 7 ambitions per country, plus age ambitions that join when their age begins | Active ambitions (3) |
-| Hidden (was Sealed) | An ambition showing only a theme icon and a riddle hint | Hinted |
-| Hinted (was Stirred) | An ambition whose hint condition (`stir`) held, so it is revealed: shows warmth, promised legacy name, deadline; words stay a hint | Done |
-| Hint | The one-line riddle shown for an open ambition | Plain goal |
-| Plain goal | The ambition's real goal text, shown only once done or lost | Hint |
-| Warmth | Share of the goal's leaf conditions that hold, shown as cold, warm or hot | Progress bar |
-| Counsel | Paying gold (by era), once every 10 years, to reveal one ambition at once (it becomes hinted) | Envoy reading |
+| Ambition | A goal drawn from the country's pool, shown plainly with its progress; its reward stays secret until earned (X-27) | Mission |
+| Pool | The country's ambitions not drawn yet: its own (4 to 7 from the heritage build, plus those of the ambitions file) and age ambitions once their age begins | Active ambitions (3) |
+| Open | An ambition drawn and not yet done or lost: its name, plain goal, progress, promised legacy's name and deadline show | Done |
+| Plain goal | The ambition's goal in words (`text`), shown while it is open and after | Hint (retired) |
+| Progress | How much of the goal is met, as have of need ("3 of 8") | Warmth (retired) |
+| Within reach | An open ambition with two thirds of its goal met | — |
+| Promised legacy | The name of the legacy an ambition grants, all of its reward shown while open | The legacy's effects |
+| Requirement | A condition (`requires`) that must hold before an ambition can be drawn: an earlier ambition done, an event, a coast | Goal |
+| Counsel | Paying gold (by era), once every 10 years, to set one open ambition aside and draw another at once (X-27) | Envoy reading |
 | Legacy | A permanent strength: an ambition's reward, a golden age's mark, or a turned weakness | Birthright |
 | Great legacy | A legacy with a bigger budget, for the hardest goals | — |
 | Weakness (was Burden) | A historical weakness with negative points and a condition to overcome it (`shed`) | Grievance |
@@ -79,12 +84,12 @@ Newest decision first.
 
 **Heritage** (identity: country id)
 - Holds: birthrights (1, up to 2 with an inherited one) with dormant flag; golden ages (up to 3) with state (waiting,
-  active, inactive, ended) and years active; pool of ambitions with state (in pool, hidden, hinted, done, lost) and
-  warmth; up to 5 legacies; 0 or 1 weakness with state (held, overcome); dormant claims with years held.
+  active, inactive, ended) and years active; pool of ambitions with state (in pool, open, done, lost) and
+  the share of the goal met; up to 5 legacies; 0 or 1 weakness with state (held, overcome); dormant claims with years held.
 - INV-HER-1: At most 5 rows on the card: birthright, golden age, ambitions, weakness, legacies.
 - INV-HER-2: At most 2 golden ages active at once.
-- INV-HER-3: Exactly 3 ambitions active (hidden or hinted) while the pool allows; at least one of the first three drawn is tagged historical.
-- INV-HER-4: An open ambition's plain goal is never shown.
+- INV-HER-3: Exactly 3 ambitions open while the pool allows; at least one of the first three drawn is tagged historical.
+- INV-HER-4: An open ambition's reward is never shown beyond its legacy's name (X-27).
 - INV-HER-5: At most 5 legacies held.
 - INV-HER-6: At most 1 weakness; at most 2 birthrights.
 - INV-HER-7: Every effect is a lever from levers.json.
@@ -93,8 +98,9 @@ Newest decision first.
 ### Entities and value objects
 - **Birthright**: id, name, text, why (history note), needs (condition), effects (levers).
 - **Golden age**: id, name, age, text, why, wakes (start condition), ends (condition, optional), effects, mark (name, text, effects; optional).
-- **Ambition**: id, name, theme (land, sea, trade, faith, crown, learning, survival, wealth), hint, text (plain goal),
-  historical (flag), window (years, optional deadline), stir (hint condition), goal, fail (optional), age (optional), legacy.
+- **Ambition**: id, name, theme (land, sea, trade, faith, crown, learning, survival, wealth), text (plain goal),
+  historical (flag), window (years, optional deadline), requires (optional), goal, fail (optional), age (optional),
+  legacy. The build's `hint` and `stir` are kept in the data but no longer used (X-27).
 - **Legacy**: id, name, great (flag), text, effects.
 - **Weakness**: id, name, text, effects (negative points), shed (condition to overcome it), turned (legacy).
 - **Effect**: lever key, value, lever params (`where`, `ware`, `arm`, `type`, `style`, `building`, `event`, `route_kind` …).
@@ -153,12 +159,13 @@ below → +2.0. Size class = mean of `economic_strength`, `manpower_potential`, 
 | Tier B and C playable countries and subjects | 434 | Generated by archetype |
 | Decentralised polities | 214 | Generated with decentralised archetypes |
 | Background, non-state actors, internal estates, collective institutions | 257 | None (not played) |
+The ambitions file (`packages/rules/data/domain/ambitions/*.json`, X-27) adds 47 common ambitions every realm with heritage may draw, each with a requirement that makes it fit, and 520 more for the 110 map realms with heritage (3 to 11 each); 192 of them follow on from an earlier ambition. They use only conditions the game reads (HER-089), and `packages/engine/test/ambitions-data.test.ts` checks their ids, references and budgets.
 Build report: 706 countries with heritage (58 hand-written, 648 generated), 3,551 ambitions, 945 golden ages, 706 weaknesses,
 0 errors, 0 warnings, 273 place names to bind, every lever in use.
 
 ### Domain services
-- **HeritageEvaluator**: evaluates the needs, start (`wakes`), ends, hint (`stir`), goal, fail, overcome (`shed`) and claim conditions; warmth.
-- **AmbitionDrawer**: draws 3 with one historical; redraws on done or lost; refuses goals true on day one; age entries.
+- **HeritageEvaluator**: evaluates the needs, start (`wakes`), ends, goal, fail, overcome (`shed`) and claim conditions; progress.
+- **AmbitionDrawer**: draws 3 with one historical; redraws on done or lost; refuses goals true on day one; skips ambitions whose requirement fails; age entries.
 - **HeritageGenerator** (`tools/build_heritage.py`, `tools/make_archetypes.py`, `tools/extract_vocab.py`): archetype
   scoring, template filling, merge of authored over generated, budget and id validation, report.
 
@@ -184,21 +191,27 @@ Build report: 706 countries with heritage (58 hand-written, 648 generated), 3,55
 - HER-013 If a third golden age would begin while 2 are active, then the heritage context shall ask the player which one becomes inactive. [ns §2.2; rules max_active]
 
 ### 5.4 Ambitions
-- HER-014 The heritage context shall give each country a pool of 4 to 7 ambitions (at least 5 hand-written, at least 4 generated, at most 7 either way); age ambitions join on top and do not count. [ns §2; rules pool_min_*, pool_max; D-HER-10]
-- HER-015 When a campaign starts, the heritage context shall draw 3 active ambitions from the pool, at least one tagged historical. [ns §2.3; rules active, guaranteed_historical]
-- HER-016 While an ambition is open, the heritage context shall never show its plain goal. [ns §2.3, §13; rules never_revealed]
-- HER-017 While an ambition is hidden, the game shall show only its theme icon (land, sea, trade, faith, crown, learning, survival, wealth) and its one-line riddle hint. [ns §2.3]
-- HER-018 When an ambition's hint condition (`stir`) holds, the heritage context shall reveal it as hinted: the hint stays the only words shown, and its warmth, the name of its promised legacy and its deadline (if any) are shown. [ns §2.3]
-- HER-019 When an ambition's goal holds, the heritage context shall mark it done, grant its legacy, show its plain goal for the first time and draw a new ambition from the pool. [ns §2.3; rules redraw_on_complete_or_fail]
-- HER-020 When an ambition's deadline passes or its fail condition holds, the heritage context shall mark it lost without penalty, show its plain goal as what might have been and draw a new one. [ns §2.3]
-- HER-021 The heritage context shall compute warmth as the share of the goal's leaf conditions that hold, with a count leaf counting as partly met by how far it has come, and show it as cold (under a third), warm (from a third to under two thirds) or hot (two thirds or more). [ns §2.3; rules warmth_bands; D-HER-13]
-- HER-022 If an ambition's goal is a single yes-or-no condition, then its warmth shall go from cold straight to done. [ns §2.3]
+- HER-014 The heritage context shall give each country a pool of its own ambitions: 4 to 7 from the heritage build (at least 5 hand-written, at least 4 generated, at most 7 either way), and on top of them those of the ambitions file (X-27); age ambitions join on top too, and none of these count toward the build's limits. [ns §2; rules pool_min_*, pool_max; D-HER-10; X-27]
+- HER-015 When a campaign starts, the heritage context shall draw 3 open ambitions from the pool, at least one tagged historical. [ns §2.3; rules active, guaranteed_historical]
+- HER-016 While an ambition is open, the game shall show its own realm the ambition's name, its plain goal and its progress. (Changed by X-27: the goal was hidden behind a riddle.) [X-27]
+- HER-017 While an ambition is open, the game shall show of its reward only the promised legacy's name (and that it is a great legacy, where it is); the legacy's text and effects stay secret. [X-27; rules reward_hidden_until_done]
+- HER-018 The heritage context shall measure an open ambition's progress as have of need: for a count, the count now against its target; for a goal of several parts that must all hold, the parts met of the parts; for a goal met in one of several ways, the way nearest done; for a yes-or-no goal, 0 or 1 of 1. (Changed by X-27: was the hinted state.) [X-27]
+- HER-019 When an ambition's goal holds, the heritage context shall mark it done, grant its legacy, show what the legacy gives for the first time and draw a new ambition from the pool. [ns §2.3; rules redraw_on_complete_or_fail; X-27]
+- HER-020 When an ambition's deadline passes or its fail condition holds, the heritage context shall mark it lost without penalty and draw a new one; its reward stays secret. [ns §2.3; X-27]
+- HER-021 The heritage context shall count an open ambition within reach once two thirds of its goal is met: the share of the goal's leaf conditions that hold, a count leaf counting as partly met by how far it has come. (Changed by X-27: replaces the warmth bands of D-HER-13.) [ns §2.3; rules within_reach; X-27]
+- HER-022 If an ambition's goal is a single yes-or-no condition, then its progress shall go from 0 of 1 straight to done, never within reach. [ns §2.3; X-27]
 - HER-023 If a drawn ambition's goal already holds on the first day of the campaign, or when it is drawn later, then the heritage context shall put it back and draw another; so too one that could only be lost, its deadline gone or its fail condition holding. [ns §2.3; D-HER-20]
-- HER-024 When a country pays counsel (gold by era: 30, 50, 80, 120, 180, 260, 380 for eras I–VII), at most once every 10 years, the heritage context shall reveal one ambition at once as hinted and show its warmth, keeping its words a hint. [ns §2.3; rules counsel]
-- HER-025 When a country has kept a resident envoy (diplomacy) at a foreign court for 2 years, the heritage context shall show it the hint and warmth of one of that country's active ambitions, never its plain goal; the AI may do the same against the player. [ns §2.3; rules envoy_reveal_years; diplomacy residents; D-HER-11]
+- HER-024 When a country pays counsel (gold by era: 30, 50, 80, 120, 180, 260, 380 for eras I–VII), at most once every 10 years, the heritage context shall set the chosen open ambition back in the pool and draw another in its place at once; counsel is refused when nothing else can be drawn. (Changed by X-27: counsel revealed a hidden ambition.) [ns §2.3; rules counsel; X-27]
+- HER-025 When a country has kept a resident envoy (diplomacy) at a foreign court for 2 years, the heritage context shall show it the name, plain goal and progress of one of that country's open ambitions, never its reward; the AI may do the same against the player. [ns §2.3; rules envoy_reveal_years; diplomacy residents; D-HER-11; X-27]
 - HER-026 When an age begins, the heritage context shall add the pool entries that name that age to the pool. [ns §2.3; rules age_ambitions_join_pool_when_age_starts]
-- HER-027 Where the setting "History mode" is "Historical only", the heritage context shall draw only ambitions tagged historical; the default is "Drawn"; no setting reveals ambitions. [ns §2.3; rules history_mode_setting]
-- HER-028 The tutorial shall teach ambitions with one ambition whose hint is plain. [ns §2.3]
+- HER-027 Where the setting "History mode" is "Historical only", the heritage context shall draw only ambitions tagged historical; the default is "Drawn"; no setting reveals rewards. [ns §2.3; rules history_mode_setting; X-27]
+- HER-028 The tutorial shall teach ambitions with one ambition, its goal and progress shown like any other and its reward named but secret. [ns §2.3; X-27]
+- HER-090 Where an ambition names a requirement (`requires`), the heritage context shall draw it only while the requirement holds; until then it stays in the pool. A requirement may name an earlier ambition done (`heritage {who: this, id, state: done}`), so ambitions follow on from one another, or an event that has happened. [X-27]
+- HER-093 Certain history events shall follow a fulfilled ambition: their trigger holds `heritage {who: <realm>, id: <ambition>, state: done}`, which the game answers from that realm's heritage, so an event such as the Casa da Índia comes only after Portugal has gone beyond the Cape. They are written in `events-ambitions.json` beside the campaign events, one-time and weighed like any other, and reach the player as an ordinary event card; nothing on the Heritage tab says which events an ambition opens, in keeping with the hidden reward. [X-27; HER-068]
+
+#### How the player uses it (ambitions, X-19, X-27)
+- HER-091 The player's ambitions shall live on the realm card's Heritage tab, under Ambitions: one 44-point row each with its theme icon, its name, its plain goal, a progress meter with "have/need", the promised legacy's name, its deadline if any and "within reach" once it is, highlighted; and, when counsel can be asked, a 44-point "New aim" button priced in gold, placed under the words so it fits the Tall layout. Settled ambitions sit under "Past": a fulfilled one with its legacy and what it gives, a lost one with its goal. [X-19; X-27]
+- HER-092 The General tab's Heritage line, the overview at a glance, shall show each open ambition's progress ("ambitions 3/8 · 0/1 · 5/12") for the player's own realm and only a count for another realm, and opening it goes to the Heritage tab. A new ambition, one within reach, one fulfilled (with what its legacy gives) and one lost each send one news line that opens the Heritage tab. [X-19; X-27]
 
 ### 5.5 Legacies and weaknesses
 - HER-029 The heritage context shall grant legacies three ways: an ambition's reward, a golden age's mark, or a turned weakness; legacies are permanent. [ns §2.4]
@@ -250,7 +263,7 @@ Build report: 706 countries with heritage (58 hand-written, 648 generated), 3,55
 ### 5.11 Events
 - HER-064 When an event applies `grant_legacy {on, id}`, the heritage context shall grant that legacy. [ns §8]
 - HER-065 When an event applies `wake_heyday {on, id, years}`, the heritage context shall make that golden age active for those years even if its condition fails. [ns §8]
-- HER-066 When an event applies `stir_ambition {on, id}`, the heritage context shall reveal that ambition as hinted, keeping its words a hint. [ns §8]
+- HER-066 *(Retired by X-27.)* `stir_ambition {on, id}` revealed a hidden ambition; with goals in plain sight there is nothing to reveal, and the effect does nothing. [ns §8; X-27]
 - HER-067 When an event applies `shed_burden {on}`, the heritage context shall overcome the country's weakness. [ns §8]
 - HER-068 The heritage context shall answer the `heritage` condition for events, and let the `event_weight` and `event_option` levers raise an event's weight or open an option for the country. [ns §8]
 
@@ -259,10 +272,10 @@ Build report: 706 countries with heritage (58 hand-written, 648 generated), 3,55
 - HER-079 When a third golden age would begin or a sixth legacy is earned for an AI country, the heritage context shall make inactive the golden age, or let go the legacy, with the fewest lever points; on a tie, the one held longest. [D-HER-12]
 
 ### 5.13 On the phone
-- HER-070 The game shall add one Heritage row to the country card (birthright icon, active golden age icon, three hidden ambition icons, weakness icon) that opens the Heritage sheet. [ns §9]
-- HER-071 When a hidden ambition is revealed, or warmth rises from warm to hot, the game shall show a small quiet animation and one line in the monthly digest. [ns §9]
-- HER-072 While an ambition that names places or areas is hot, the map shall shimmer faintly over the region it concerns, without outlining or naming the target. [ns §9]
-- HER-073 The nation picker shall show each country's birthright and weakness, a count of hidden ambitions, and its golden ages as the ages they belong to. [ns §9]
+- HER-070 The game shall add one Heritage row to the country card (birthright icon, active golden age icon, the open ambitions with their progress, weakness icon) that opens the Heritage sheet. [ns §9; X-27]
+- HER-071 When a new ambition is drawn or an ambition comes within reach, the game shall show a small quiet animation and one line in the monthly digest. [ns §9; X-27]
+- HER-072 While an ambition that names places or areas is within reach, the map shall shimmer faintly over the region it concerns, without outlining or naming the target. [ns §9; X-27]
+- HER-073 The nation picker shall show each country's birthright and weakness, a count of its ambitions, and its golden ages as the ages they belong to. [ns §9]
 - HER-074 The heritage context shall give every country the same system in every tier; the free tier only limits which countries can be picked. [ns §9]
 
 ### How the player uses it
@@ -270,9 +283,9 @@ Build report: 706 countries with heritage (58 hand-written, 648 generated), 3,55
 - HER-081 The realm card's General tab shall carry one Heritage line, the overview at a glance, naming the realm's birthright and its weakness; tapping it opens the realm card's Heritage tab. The Heritage tab is offered for every realm, the player's own and others, before and during a campaign, so the realm picker shows it too (HER-073). [X-19; HER-070]
 - HER-082 The Heritage tab shall hold everything about the realm's strengths in one place: the birthright, each golden age with its age, and the weakness, each a row that opens on a tap to its full text and history note (HER-002); under them the realm's 1444 assessments from the catalogue in three groups (Strength, Government, Dangers) as five-step bars with the level in words, marked uncertain where the catalogue's confidence is low. [X-19; scenario-setup SETUP-009]
 - HER-083 The Heritage tab shall work on a phone in landscape: 44-point rows in one column in the Tall layout, the assessment groups side by side where the panel is wide enough, inside the safe areas, and nothing that needs hover. [X-19]
-- HER-085 While a campaign runs, the Heritage tab shall show heritage in play: the birthright in force or dormant (greyed); each golden age waiting for its age, active or inactive with a meter of its months toward a mark, or ended; the weakness held or overcome with the legacy it turned into; the legacies earned (of 5); and, for the player's own realm only, the three ambitions with their theme icon and hint, a hinted one with its warmth (three pips: cold, warm, hot), promised legacy and deadline, a hidden one with a 44-point "Ask the court" button priced in gold by era (HER-024), and the ambitions settled under "Past" with their plain goal. Another realm's tab counts its hidden ambitions and shows none of them (HER-016). Each row, opened, says which of its levers the game applies now ("In the game now: …") and that the rest comes as the game grows. [X-19; Leroy 18 Oct]
-- HER-086 When heritage waits on a choice (a third golden age beginning, HER-013; a sixth legacy, HER-030), the Heritage tab shall open with it: the question and one 44-point button for each golden age or legacy; the General tab's Heritage line says that a choice waits. The Heritage line, the overview at a glance, also counts golden ages active, ambitions hinted (hidden for another realm), legacies and the weakness while held, and strikes through a dormant birthright. [X-19; HER-070]
-- HER-087 When a hidden ambition is revealed, warmth turns hot, an ambition is fulfilled or lost, a golden age begins or becomes inactive, a mark is granted, the weakness is overcome, the birthright goes dormant or wakes, or a choice waits, the player shall get one news line that opens the Heritage tab (HER-071). [X-19]
+- HER-085 While a campaign runs, the Heritage tab shall show heritage in play: the birthright in force or dormant (greyed); each golden age waiting for its age, active or inactive with a meter of its months toward a mark, or ended; the weakness held or overcome with the legacy it turned into; the legacies earned (of 5); and, for the player's own realm only, the three ambitions as HER-091 lays them out. Another realm's tab counts its open ambitions and shows none of them. Each row, opened, says which of its levers the game applies now ("In the game now: …") and that the rest comes as the game grows. [X-19; Leroy 18 Oct]
+- HER-086 When heritage waits on a choice (a third golden age beginning, HER-013; a sixth legacy, HER-030), the Heritage tab shall open with it: the question and one 44-point button for each golden age or legacy; the General tab's Heritage line says that a choice waits. The Heritage line, the overview at a glance, also counts golden ages active, shows the ambitions' progress (HER-092), legacies and the weakness while held, and strikes through a dormant birthright. [X-19; HER-070]
+- HER-087 When a new ambition is drawn, an ambition comes within reach, an ambition is fulfilled or lost, a golden age begins or becomes inactive, a mark is granted, the weakness is overcome, the birthright goes dormant or wakes, or a choice waits, the player shall get one news line that opens the Heritage tab (HER-071). [X-19]
 
 ### 5.14 Build and data
 - HER-075 The build shall refresh ids from other designs (`extract_vocab.py`), rebuild archetypes (`make_archetypes.py`), and generate, merge, validate and write `build/` (`build_heritage.py`, with `--check FILE` for one authored file). [ns §12; README]
@@ -290,10 +303,10 @@ Build report: 706 countries with heritage (58 hand-written, 648 generated), 3,55
 | Command | Who | Preconditions | Result | Events |
 |---|---|---|---|---|
 | ChooseSleepingHeyday(country, heyday) | player | A third golden age would begin | Chosen golden age becomes inactive | HeydaySlept |
-| PayCounsel(country, ambition) | player / AI | 10 years since last; gold for the era | Ambition revealed as hinted, warmth shown | AmbitionStirred |
+| PayCounsel(country, ambition) | player / AI | 10 years since last; gold for the era; another ambition can be drawn | Ambition back in the pool, another drawn in its place | AmbitionSetAside, AmbitionDrawn |
 | LetGoLegacy(country, legacy) | player / AI | A sixth legacy earned | Chosen legacy removed | LegacyReleased |
 | SetHistoryMode(drawn / historical_only) | player (campaign setting) | Before the campaign starts | Ambition draws limited | — |
-| KeepEnvoyAtCourt(country, target) | player / AI (diplomacy) | A resident envoy at that court (diplomacy) | After 2 years: hint and warmth of one target ambition | AmbitionRead |
+| KeepEnvoyAtCourt(country, target) | player / AI (diplomacy) | A resident envoy at that court (diplomacy) | After 2 years: name, goal and progress of one target ambition | AmbitionRead |
 
 ## 7. Domain events
 
@@ -302,26 +315,26 @@ Build report: 706 countries with heritage (58 hand-written, 648 generated), 3,55
 | BirthrightDormant / BirthrightWoke | Needs fail / hold | country, birthright | game-shell, map-presentation |
 | HeydayWoke / HeydaySlept / HeydayEnded | Golden age state changes | country, golden age, age, years | game-shell, events (heritage condition) |
 | MarkGranted | Golden age ended after 25 years | country, mark | events, achievements |
-| AmbitionDrawn | Start, done, lost, age begins | country, ambition (hidden) | game-shell |
-| AmbitionStirred | Hint condition holds, counsel, event | country, ambition, warmth | game-shell (reveal moment, digest), map-presentation |
-| WarmthChanged | Warmth band changes | country, ambition, band | game-shell, map-presentation (shimmer when hot) |
-| AmbitionDone / AmbitionLost | Goal holds / deadline or fail | country, ambition, plain goal | game-shell, achievements, events |
+| AmbitionDrawn | Start, done, lost, counsel, age begins | country, ambition | game-shell |
+| AmbitionNear | Two thirds of the goal met | country, ambition, progress | game-shell (digest), map-presentation (shimmer) |
+| AmbitionSetAside | Counsel | country, ambition | game-shell |
+| AmbitionDone / AmbitionLost | Goal holds / deadline or fail | country, ambition | game-shell, achievements, events (`heritage` condition, state done) |
 | LegacyGranted / LegacyReleased | Earned / let go | country, legacy | all lever-owning contexts |
 | BurdenShed | Condition to overcome holds, or event | country, weakness, turned legacy | events, game-shell |
 | DormantClaimCreated / DormantClaimWoke | Annexation / 30 years held | country, claim | game-shell |
-| AmbitionRead | Envoy 2 years | reader, target, hint, warmth | diplomacy, game-shell |
+| AmbitionRead | Envoy 2 years | reader, target, name, goal, progress | diplomacy, game-shell |
 
 ## 8. Policies
 
 - When **events** report an age beginning, then golden ages of that age may begin and age ambitions join pools (HER-009, HER-026).
 - When **events** report an age ending, then its golden ages end (and marks are granted) (HER-011, HER-012).
-- When **events** apply grant_legacy, wake_heyday, stir_ambition or shed_burden, then HER-064..067.
+- When **events** apply grant_legacy, wake_heyday or shed_burden, then HER-064, HER-065, HER-067 (stir_ambition is retired, X-27).
 - When **diplomacy** or **warfare** reports an annexation, release or formed country, then HER-059..063.
 - When **subjects** reports a new subject, then it keeps its heritage and the overlord's legacies do not apply (HER-061).
 - When **diplomacy** reports an envoy kept 2 years at a court, then HER-025.
 - When **diplomacy** or **warfare** reports how long an annexer has held an annexed capital and homeland, then a dormant claim may wake after 30 years (HER-060).
 - When **government** or **revolutions** apply a reform event, then a weakness may be overcome or a legacy granted (HER-034, HER-067).
-- When any owning context changes state named in a condition, then the needs, start (`wakes`), hint (`stir`), goal, fail and overcome (`shed`) conditions are re-evaluated.
+- When any owning context changes state named in a condition, then the needs, start (`wakes`), requirement (`requires`), goal, fail and overcome (`shed`) conditions are re-evaluated.
 
 ## 9. Each turn
 
@@ -330,7 +343,7 @@ new age is seen the same month; its levers apply from then until the next month.
 1. Evaluate dormant claims (wake after 30 years held) and birthright needs (dormant or awake).
 2. Evaluate golden ages: age active, start, ends; in the turn in which a new month begins, add a month to each active golden age; grant marks on end; resolve a third
    beginning (the AI by HER-079).
-3. Evaluate ambitions: hint, warmth, goal, fail, deadline; draw replacements; digest lines for reveal and warmth moments.
+3. Evaluate ambitions: goal, fail, deadline, progress; draw replacements whose requirement holds; digest lines for new ambitions and those within reach.
 4. Evaluate whether the weakness is overcome; grant turned legacy; resolve a sixth legacy (the AI by HER-079).
 5. Publish active levers to their owning contexts for the next monthly steps.
 Reads first: ages (events), the condition inputs from every context, catalogue data (start only).
@@ -349,11 +362,12 @@ Reads first: ages (events), the condition inputs from every context, catalogue d
 | `heydays.mark_after_years` / `mark_share` | Mark | 25 / one third | 25 yes | national-strengths.json rules |
 | `ambitions.active` / `guaranteed_historical` | Active, historical | 3 / 1 | yes | heritage-rules.json |
 | `ambitions.pool_min_authored` / `pool_min_generated` / `pool_max` | Pool size | 5 / 4 / 7 | yes (pool_max provisional) | national-strengths.json rules |
-| `ambitions.counsel.cooldown_years` / `gold_by_era` | Counsel | 10 / 30, 50, 80, 120, 180, 260, 380 | yes | heritage-rules.json |
-| `ambitions.envoy_reveal_years` | Envoy reading (a resident envoy) | 2 | yes | heritage-rules.json |
+| `ambitions.counsel.cooldown_years` / `gold_by_era` | Counsel for a new aim (X-27) | 10 / 30, 50, 80, 120, 180, 260, 380 | yes | heritage-rules.json |
+| `ambitions.envoy_reveal_years` | Envoy reading (a resident envoy): goal and progress | 2 | yes | heritage-rules.json |
+| `ambitions.reward_hidden_until_done` | Only the legacy's name shows while open (X-27) | true | decided | national-strengths.json rules |
+| `ambitions.within_reach` | Share of the goal met for "within reach" (X-27) | two thirds | yes | national-strengths.json rules |
 | `ambitions.history_mode_setting` | Setting | drawn (default), historical_only | — | heritage-rules.json |
 | `ambitions.max_legacies` | Legacy cap | 5 | decided | heritage-rules.json |
-| `ambitions.warmth_bands` | Warmth bands | cold 0, warm one third, hot two thirds | no (design) | national-strengths.json rules |
 | `burden.per_country_max` / `turned_legacy` | Weakness | 1 / true | — | heritage-rules.json |
 | `inheritance.*`, `inheritance.claim_years` | Claims, releases, formed, subjects; 30 years; max 2 birthrights | as §5.10 | claim_years provisional | national-strengths.json rules |
 | `ai.ambition_goal_weight` | AI weight | 1.5 | yes | heritage-rules.json |
@@ -369,7 +383,7 @@ Reads first: ages (events), the condition inputs from every context, catalogue d
 | Other context | Direction | Pattern | What crosses |
 |---|---|---|---|
 | events | upstream | Conformist | Ages (`ages.yaml`) and their start/end, the condition language, event ids for event_weight/event_option; the `stat` lever lands through the events mapping (D-EVT-4, D-HER-6); heritage runs right after the event tree each turn |
-| events | downstream | Published Language | Four effects (grant_legacy, wake_heyday, stir_ambition, shed_burden) and the `heritage` condition (adopted, D-EVT-11) |
+| events | downstream | Published Language | Effects grant_legacy, wake_heyday and shed_burden (stir_ambition retired, X-27) and the `heritage` condition (adopted, D-EVT-11), which lets an event require an ambition done |
 | scenario-setup | upstream | Anti-Corruption Layer | Catalogue fields read by archetypes; tiers; size-class assessments; ai_personality; places |
 | realm | downstream | Published Language | Levers on treasury, officials, lords, loyalty, recruits, horses, envoys, Lands taken (country-stats) |
 | province | downstream | Published Language | Levers on tax reach, harvests, growth, class slots, official types, grievances, Foreign rule, days to capital |
@@ -391,9 +405,9 @@ Reads first: ages (events), the condition inputs from every context, catalogue d
 | revolutions | upstream | Customer–Supplier | Reforms and revolutions overcoming weaknesses or granting legacies through event effects |
 | achievements | downstream | Published Language | Suggested achievements: every ambition of a country, 5 legacies |
 | game-shell | downstream | Published Language | Heritage row and sheet, nation picker, digest lines |
-| map-presentation | downstream | Published Language | Shimmer over hot ambition regions |
+| map-presentation | downstream | Published Language | Shimmer over the regions of ambitions within reach |
 | settings | upstream | Customer–Supplier | History mode setting (Drawn / Historical only) |
-| onboarding | downstream | Customer–Supplier | Tutorial ambition with a plain hint |
+| onboarding | downstream | Customer–Supplier | Tutorial ambition, its goal and progress shown |
 | world-map | upstream | Customer–Supplier | Province ids for place names, bound to the nearest land province (D-HER-16); areas, seas |
 | time-and-turns | upstream | Conformist | Dates, eras (counsel gold); heritage runs in the events step, time in months (X-2, HER-078) |
 
@@ -443,10 +457,10 @@ Requests to other designs (`requests-to-other-designs.md`), worked around, nothi
 - **D-HER-10** (was OQ-HER-10) Pool maximum: 7 is a cap for every pool, generated or authored; age ambitions join on top
   and do not count. The design's "4 to 7" is the rule.
 - **D-HER-11** (was OQ-HER-11) Envoy reading: diplomacy's resident envoy (an envoy who stays at one court) is the envoy
-  kept at a court; after 2 years it reads one ambition's hint and warmth. Diplomacy already has residents.
+  kept at a court; after 2 years it reads one ambition's goal and progress (X-27). Diplomacy already has residents.
 - **D-HER-12** (was OQ-HER-12) AI choices: the AI makes inactive the golden age, and lets go the legacy, with the fewest lever
   points; on a tie the one held longest (HER-079, provisional). Points already measure worth.
-- **D-HER-13** (was OQ-HER-13) Warmth band edges: cold under a third, warm from a third to under two thirds, hot from two
+- **D-HER-13** *(replaced by X-27: warmth is no longer shown; within reach starts at two thirds, HER-021)* (was OQ-HER-13) Warmth band edges: cold under a third, warm from a third to under two thirds, hot from two
   thirds, so exactly 1/3 is warm and exactly 2/3 is hot. The design's words govern over the rounded config.
 - **D-HER-14** (was OQ-HER-14) Mark share: exactly a third; a mark is a legacy and counts toward the cap of 5. A mark is
   granted as a legacy already.
@@ -478,6 +492,17 @@ Requests to other designs (`requests-to-other-designs.md`), worked around, nothi
 - **D-HER-22** (18 Oct) Levers in play: the nine of HER-088, the ones whose rule the game already has. A lever narrowed
   to one arm, ware, building, ship or class waits for that rule, and so does a scoped lever but tax. The Heritage tab
   says which lines are in play, so no effect claims more than the game does.
+- **D-HER-23** (19 Oct, X-27, Leroy) Ambitions in plain sight: an open ambition shows its name, plain goal and progress,
+  and only its legacy's name; the legacy's text and effects show once it is done. Warmth, the hidden and hinted states,
+  the hint condition and `stir_ambition` are retired, since there is nothing left to reveal. Counsel now sets an
+  ambition aside for another (default chosen, so the gold and the ten years keep a use the player can feel); an envoy
+  reads another realm's goal and progress, since other realms' ambitions stay private. Saves before it load their
+  hidden and hinted ambitions as open. An ambition may name a requirement (HER-090), which is how ambitions chain and
+  how history opens them.
+- **D-HER-24** (19 Oct, X-27) The written ambitions live in three files by region beside the heritage build, keyed by map
+  realm id, and join the pool after the build's own; a save keeps only the drawn and age-waiting ambitions, and the pool
+  is the rest, so ambitions written later reach old campaigns too. The common ones share their ids and legacies across
+  realms. Writing them in the build would mean regenerating 706 countries for 110 that are played.
 - **D-HER-17** (was OQ-HER-17) Formed countries beyond the caps: the formed country keeps the forming country's own
   birthright and adds its own; any other birthright of the forming country becomes a dormant claim again. Legacies
   cannot exceed 5, since a formed heritage brings none, and a weakness stays at most one (the formed country's, or else
@@ -490,14 +515,16 @@ Requests to other designs (`requests-to-other-designs.md`), worked around, nothi
 | HER-001..004 | heritage-card.feature | all scenarios |
 | HER-005..007 | birthright.feature | all scenarios |
 | HER-008..013 | heydays.feature | all scenarios |
-| HER-014..028 | ambitions.feature | all scenarios |
+| HER-014..028, HER-090 | ambitions.feature | all scenarios |
+| HER-093 | ambitions.feature | Events that follow an ambition; checked by packages/engine/test/ambitionEvents.test.ts |
+| HER-091, HER-092 | heritage-in-play.feature | The Heritage tab shows heritage in play; client screens checked by apps/client/src/ui/heritage.test.ts |
 | HER-029..034 | legacies-and-burdens.feature | all scenarios |
 | HER-035..039 | levers.feature | all scenarios |
 | HER-040..044 | conditions.feature | all scenarios |
 | HER-045..050 | budgets.feature | all scenarios |
 | HER-051..058 | heritage-generation.feature | all scenarios |
 | HER-059..063 | changing-hands.feature | all scenarios |
-| HER-064..068 | heritage-events.feature | all scenarios |
+| HER-064..068 | heritage-events.feature | all scenarios (HER-066 retired: no scenario) |
 | HER-069 | ambitions.feature | The AI knows its own ambitions |
 | HER-078 | ambitions.feature, heritage-in-play.feature | Heritage counts time month by month; Heritage is evaluated each month in the game |
 | HER-084 | heritage-in-play.feature | Nothing is settled on the first day |

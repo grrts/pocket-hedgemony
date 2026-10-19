@@ -1065,7 +1065,8 @@ Then("the country {string} may study {string}", (s, _country: string, name: stri
 });
 
 When("the country {string} is set up from its start group", (s, country: string) => {
-  s.p = R.startingProgramme(nationId(country));
+  // A campaign start given in the scenario applies its start block and Era I pace (RSCH-113, RSCH-114).
+  s.p = R.startingProgramme(nationId(country), R.tree(), s.start);
 });
 
 Then("its standing is {string}", (s, standing: string) => {
@@ -1091,7 +1092,7 @@ Given("the research data with start groups", (s) => {
 });
 
 When("every map nation is looked up", (s) => {
-  s.nations = loadDefaultRuleset().nations.map((n) => n.id);
+  s.nations = loadDefaultRuleset().nations.filter((n) => !n.asleep).map((n) => n.id);
   s.memberships = s.nations.map((id: string) => Object.values(s.groups as Record<string, { realms: string[] }>).filter((g) => g.realms.includes(id)).length);
 });
 
@@ -1112,6 +1113,88 @@ Then("every invention in it has its parent or an alternative and everything it a
 
 Then(/^it (starts knowing|does not start knowing) "([^"]+)"$/, (s, knows: string, name: string) => {
   expect(s.p.known.has(idOf(name))).toBe(knows === "starts knowing");
+});
+
+// ------------------------------------------------------------ Era I from the start, and a 1378 start (RSCH-113 to RSCH-115)
+
+Given("the campaign starts in {int}", (s, year: number) => {
+  s.start = { year };
+  s.date = { year };
+});
+
+Given(/^the campaign starts on (\d+) (January|February|March|April|May|June|July|August|September|October|November|December) (\d+)$/, (s, d: string, m: string, y: string) => {
+  s.start = { year: Number(y), month: MONTHS.indexOf(m) + 1, day: Number(d) };
+  s.date = { ...s.start };
+});
+
+Then("the era {string} runs from {int} to {int}", (s, name: string, from: number, to: number) => {
+  const era = R.TREE_ERAS.find((e) => R.eraName(e) === name)!;
+  const dates = R.researchConfig.era_dates as Record<string, number>;
+  expect(dates[era]).toBe(from);
+  expect(dates[R.TREE_ERAS[R.TREE_ERAS.indexOf(era) + 1]!]! - 1).toBe(to);
+  // A dated era is the era of every day from its first year to its last.
+  if ((R.ERAS as readonly string[]).includes(era)) {
+    expect(R.eraOf({ year: from, month: 1, day: 1 })).toBe(era);
+    expect(R.eraOf({ year: to, month: 12, day: 31 })).toBe(era);
+  }
+});
+
+Then("Era I's cost is multiplied by {float}", (s, pace: number) => {
+  expect(R.eraPace("I", s.start.year)).toBeCloseTo(pace, 2);
+});
+
+Then("an invention of era {word} costs {float} scholar-years before discounts", (s, era: string, cost: number) => {
+  expect(R.costBeforeDiscounts(era as R.TreeEra, date(s), s.start?.year)).toBeCloseTo(cost, 1);
+});
+
+Then("the study costs {float} scholar-years", (s, cost: number) => {
+  expect(s.result).toEqual({ ok: true });
+  expect(s.cost).toBeCloseTo(cost, 1);
+});
+
+When("every map nation is set up for that start", (s) => {
+  s.nations = loadDefaultRuleset().nations.map((n) => n.id);
+});
+
+Then("each knows what the 1444 start groups give it", (s) => {
+  expect(R.startBlockFor(s.start)).toBeUndefined();
+  expect(R.eraPace("I", s.start.year)).toBe(1);
+  for (const id of s.nations as string[]) {
+    const p = R.startingProgramme(id, R.tree(), s.start);
+    expect([...p.known].sort()).toEqual([...R.startingKnowledgeFor(id)].sort());
+    expect(p.group).toBe(R.startGroupOf(id));
+  }
+});
+
+/** Every realm a start block names: its joins, additions and removals. */
+const namedIn = (block: R.StartBlock): string[] => [...new Set([...Object.keys(block.join), ...Object.keys(block.add), ...Object.keys(block.remove)])];
+
+When("the 1378 block is checked against the map", (s) => {
+  s.block = R.startBlockFor({ year: 1378 });
+  expect(s.block).toBeDefined();
+  s.mapIds = new Set(loadDefaultRuleset().nations.map((n) => n.id));
+});
+
+Then("every realm it names joins a start group that exists", (s) => {
+  const groups = R.startGroupTable();
+  for (const [id, g] of Object.entries(s.block.join as Record<string, string>)) expect(groups[g], id).toBeDefined();
+  for (const id of namedIn(s.block)) expect(R.startGroupOf(id, s.block.date), id).toBeDefined();
+});
+
+Then("the realms it names that are not yet map nations are only checked once the map has them", (s) => {
+  const named = namedIn(s.block);
+  // The block names realms of 1378 the map does not have yet; the map's own check (RSCH-098) is untouched by them.
+  expect(named.filter((id) => !s.mapIds.has(id)).length).toBeGreaterThan(0);
+  const nations = loadDefaultRuleset().nations.filter((n) => !n.asleep).map((n) => n.id);
+  for (const id of nations) expect(Object.values(R.startGroupTable()).filter((g) => g.realms.includes(id)).length, id).toBe(1);
+  // A map nation the block names belongs to one group at that start.
+  for (const id of named) if (s.mapIds.has(id)) expect(R.startGroupOf(id, s.block.date), id).toBeDefined();
+});
+
+When("every 1378 realm's start set is built", (s) => {
+  const block = R.startBlockFor(s.start)!;
+  const ids = new Set([...loadDefaultRuleset().nations.map((n) => n.id), ...namedIn(block)]);
+  s.gaps = [...ids].flatMap((id) => R.startSetGaps(R.startingKnowledgeFor(id, R.tree(), s.start)).map((g) => ({ nation: id, ...g })));
 });
 
 // ------------------------------------------------------------ the study queue (RSCH-108, RSCH-109)

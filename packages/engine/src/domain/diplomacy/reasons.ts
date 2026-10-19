@@ -118,10 +118,10 @@ function traits(d: Diplomacy, ask: Ask): Reason[] {
 export type DaysFn = (from: string, to: string) => number | undefined;
 
 /** Reasons in every count (DIPL-084 … DIPL-092). */
-function common(d: Diplomacy, ask: Ask, days?: DaysFn): Reason[] {
+function common(d: Diplomacy, ask: Ask, days?: DaysFn, known?: number): Reason[] {
   const out: Reason[] = [];
   const { asker, asked } = ask;
-  out.push({ name: "Standing / 4", number: quarter(standing(d, asked, asker), R.standing_divisor) });
+  out.push({ name: "Standing / 4", number: quarter(known ?? standing(d, asked, asker), R.standing_divisor) });
   if (R.relies_on_word.includes(ask.action)) {
     const per = country(d, asked).posture === "opportunist" ? Number(config.ai.posture.opportunist!.own_view_per_oath_broken) : R.per_oath_broken;
     const n = oathsBroken(d, asker);
@@ -268,16 +268,19 @@ function callReasons(d: Diplomacy, ask: Ask): Reason[] {
   return out;
 }
 
-/** Makes the count of an ask; yes only when the total is over zero (DIPL-081). */
-export function countAsk(d: Diplomacy, ask: Ask, days?: DaysFn): Count {
+/**
+ * Makes the count of an ask; yes only when the total is over zero (DIPL-081).
+ * `known` is the asked's standing toward the asker, when the caller has just read it.
+ */
+export function countAsk(d: Diplomacy, ask: Ask, days?: DaysFn, known?: number): Count {
   const label = ask.action === "propose_alliance" ? "alliance" : ask.action.replace(/_/g, " ");
   const reasons: Reason[] = [{ name: `Base (${label})`, number: baseOf(ask), own: true, kind: "base" }];
   if (ask.action === "call_to_arms") {
     reasons.push(...callReasons(d, ask));
-    reasons.push({ name: "Standing / 4", number: quarter(standing(d, ask.asked, ask.asker), R.standing_divisor) });
+    reasons.push({ name: "Standing / 4", number: quarter(known ?? standing(d, ask.asked, ask.asker), R.standing_divisor) });
     reasons.push(...personality(d, ask), ...negotiation(d, ask));
   } else {
-    reasons.push(...common(d, ask, days), ...ownReasons(d, ask));
+    reasons.push(...common(d, ask, days, known), ...ownReasons(d, ask));
   }
   const total = reasons.reduce((s, r) => s + r.number, 0);
   return { ask, reasons, total, yes: total > 0 };
@@ -322,3 +325,11 @@ export function ownTotal(c: Count): number {
 }
 
 export { overlord };
+
+/** The one word shown before an ask is sent (DIPL-229): how the count stands now, with no numbers. */
+export type AskHint = "Likely" | "Unsure" | "Unlikely";
+
+export function askHint(total: number): AskHint {
+  const h = config.answers.hint;
+  return total >= h.likely_from ? "Likely" : total <= h.unlikely_to ? "Unlikely" : "Unsure";
+}

@@ -1,6 +1,6 @@
 # Research
 
-Research is how your country learns. You build schools, fill their seats with young men from the same recruit pool your army draws on, and after five years they graduate as scholars whose work, counted in scholar-years, unlocks new inventions. Every country climbs one shared invention tree that reaches back before 1444, through the Ancient and Medieval eras, and on to the radios and tanks of the 1930s. Not every country starts at the same place on it: some begin the game still missing the plough, the horse or iron, and have to catch up. And every seat you fill is a soldier you didn't raise.
+Research is how your country learns. You build schools, fill their seats with young men from the same recruit pool your army draws on, and after five years they graduate as scholars whose work, counted in scholar-years, unlocks new inventions. Every country climbs one shared invention tree that reaches back before the start, through the Ancient and Medieval eras, and on to the radios and tanks of the 1930s. Not every country starts at the same place on it: some begin the game still missing the plough, the horse or iron, and have to catch up. And every seat you fill is a soldier you didn't raise.
 
 ## How it works
 
@@ -52,8 +52,8 @@ Each invention costs scholar-years by its era:
 | Era | Years | Cost in scholar-years |
 |---|---|---|
 | Ancient | before 600 | 10 |
-| Medieval | 600 to 1443 | 15 |
-| I | 1444 to 1500 | 20 |
+| Medieval | 600 to 1377 | 15 |
+| I | the start (1378) to 1500 | 20, raised for the long Era I of the 1378 start (see below) |
 | II | 1500 to 1600 | 40 |
 | III | 1600 to 1700 | 80 |
 | IV | 1700 to 1800 | 150 |
@@ -83,13 +83,13 @@ There is **one tree**, from the root **Settled life**, which everyone knows. It 
 - **R3 Counting and records**
 - **R4 Boats**
 
-The tree reaches back before 1444 with two **past eras**, **Ancient** (before 600) and **Medieval** (600 to 1443), and then runs through Eras I to VII. Inventions grow era by era, and many need an invention from another branch. The letter in an invention's id only says what it is about (F food, C crafts and industry, T trade, S sea, W war, B building, G government, L learning); it is not a separate tree. Each invention is one config row (`id`, `parent`, `also_needs`, `era`, `unlocks`, `start_regions`), so new inventions such as Andean terrace farming, Ethiopian church schools or Javanese irrigation can be hung anywhere on the tree without code.
+The tree reaches back before the start with two **past eras**, **Ancient** (before 600) and **Medieval** (600 to 1377), and then runs through Eras I to VII. Era I runs from the start to 1500: a campaign from 1378 plays all 122 years of it (the 1444 checkpoint only its last 56), so an Era I invention costs about 2.2 times as much as it would from 1444 and a realm still reaches Era II around 1500 (the number is a first guess for balancing). Inventions grow era by era, and many need an invention from another branch. The letter in an invention's id only says what it is about (F food, C crafts and industry, T trade, S sea, W war, B building, G government, L learning); it is not a separate tree. Each invention is one config row (`id`, `parent`, `also_needs`, `era`, `unlocks`, `start_regions`), so new inventions such as Andean terrace farming, Ethiopian church schools or Javanese irrigation can be hung anywhere on the tree without code.
 
-The tree holds **187 inventions**: 13 past inventions and 174 from 1444 on. Twenty of them keep ids the event tree uses (marked "event id" below) so events keep working; the event tree's technology and innovation stats read them from the tree. Where another system gives an invention's effect in numbers ([Warfare](Warfare), [Trade](Trade), [Exploration and Colonies](Exploration-and-Colonies)), that system owns the numbers. Nuclear physics and Rocketry are never studied, and the other Era VII inventions stay in play until August 1939 with what they did by then.
+The tree holds **187 inventions**: 13 past inventions and 174 from Era I on. Twenty of them keep ids the event tree uses (marked "event id" below) so events keep working; the event tree's technology and innovation stats read them from the tree. Where another system gives an invention's effect in numbers ([Warfare](Warfare), [Trade](Trade), [Exploration and Colonies](Exploration-and-Colonies)), that system owns the numbers. Nuclear physics and Rocketry are never studied, and the other Era VII inventions stay in play until August 1939 with what they did by then.
 
-#### Before 1444: the past inventions
+#### Before the start: the past inventions
 
-These 13 are what a country of 1444 may or may not already know. Most countries know them all; the ones that don't start the game behind (see [What each country knows in 1444](#what-each-country-knows-in-1444)). Several Era I inventions now grow from them, as the branch tables below show.
+These 13 are what a country at the start may or may not already know. Most countries know them all; the ones that don't start the game behind (see [What each country knows at the start](#what-each-country-knows-at-the-start)). Several Era I inventions now grow from them, as the branch tables below show.
 
 | Id | Invention | Era | Branch | Grows from | Opens | Without it |
 |---|---|---|---|---|---|---|
@@ -109,7 +109,7 @@ These 13 are what a country of 1444 may or may not already know. Most countries 
 
 #### Without it
 
-Four past inventions hold a country below the 1444 baseline while it lacks them. Countries that know them play exactly as before; only the laggards change. All four numbers are placeholders for balancing.
+Four past inventions hold a country below the baseline at the start while it lacks them. Countries that know them play exactly as before; only the laggards change. All four numbers are placeholders for balancing.
 
 - **Without F01 Ox plough**, your farmland harvests one step worse.
 - **Without F03 Riding and pack animals**, you raise no horse regiments (light cavalry, horse archers, knights and lancers, camel riders) and send no camel caravans. For a country of the Americas, F03 can't even be studied until first contact with a country from across the ocean; in the game that happens when such a country comes to own land bordering yours.
@@ -118,7 +118,7 @@ Four past inventions hold a country below the 1444 baseline while it lacks them.
 
 The other nine past inventions only open later ones.
 
-The "Known in 1444 by" column in the tables below is a history note on who knew each invention at the time. What your country actually starts with is set by its start group (see [What each country knows in 1444](#what-each-country-knows-in-1444)).
+The "Known in 1444 by" column in the tables below is a history note on who knew each invention at the time. What your country actually starts with is set by its start group (see [What each country knows at the start](#what-each-country-knows-at-the-start)).
 
 #### Tilling and building (R1)
 
@@ -307,9 +307,9 @@ The "Known in 1444 by" column in the tables below is a history note on who knew 
 
 These 12 Era VIII inventions are in the tree's data but never studied: L25 Computing, C24 Automation, B17 Prefab housing, G20 Digital government, S21 Satellite navigation, T18 Electronic banking, T19 Internet, W24 Guided missiles, F23 Green revolution agriculture, F24 Drip irrigation, S20 Nuclear propulsion, T17 Container shipping.
 
-### What each country knows in 1444
+### What each country knows at the start
 
-Every one of the 137 nations on the map belongs to exactly one of **20 start groups**. A country starts knowing the root, the four branches, its group's past inventions and its group's Era I and II inventions, plus a few additions or minus a few removals of its own. Nothing else is known, and no study is under way on the first turn.
+Every nation on the map belongs to exactly one of **20 start groups**. A country starts knowing the root, the four branches, its group's past inventions and its group's Era I and II inventions, plus a few additions or minus a few removals of its own. Nothing else is known, and no study is under way on the first turn.
 
 | Start group | For example | Past inventions known (of 13) | Era I and II inventions known | Standing in 1444 |
 |---|---|---|---|---|
@@ -336,13 +336,15 @@ Every one of the 137 nations on the map belongs to exactly one of **20 start gro
 
 On top of its group, a country may know a few more inventions or a few fewer. For example, Venice also knows Double-entry bookkeeping, Bills of exchange, Glass and lenses, Tax registers and Lateen and junk rigging; Portugal and Castile have the Carrack and caravel; the Ottomans also know roads, tax registers, the compass and rigging, bombards, gunpowder infantry, glass and variolation; the Inca also know stone castles, roads, raised fields and temple schools; Scotland and Switzerland know Pike squares; Muisca lack Dressed stone and Sail, and the Purépecha lack Writing, Written law codes and Temple and monastery schools.
 
+**At the 1378 start.** The start groups were drawn up for 1444, so the examples above include realms that are not born yet in 1378 (Kazan, the Crimea, Malacca, Kongo and others, which form later). New campaigns start on 20 September 1378, and the same groups apply with a few changes for that year: the Ottomans don't yet know bombards, gunpowder infantry or tax registers; Bohemia and Hungary have no wagon fort; Portugal and Castile have no carrack and caravel (Genoa and Venice do); Ming has no tax registers yet (the Yellow Registers come by event in 1381); Timur's realm stands with the settled khanates and has no observatory, while the Jalayirids keep the Maragha tradition. The realms of 1378 that the 1444 map lacks, such as the Jalayirids, the Anatolian beyliks, the White Horde or the Tepanecs, start in the group of their neighbours. Goryeo, in the Korea group, keeps metal movable type (Jikji, 1377).
+
 A start set is always **complete**: every invention in it has its parent (or one of its alternatives) and everything it also needs in the same set, and the game's data check refuses a set that isn't.
 
-So in 1444 the Latin, Orthodox, Islamic, South Asian and East Asian countries stand in Era I with 23 to 38 inventions, maritime Southeast Asia in Era I with 21, and mainland Southeast Asia is split between Medieval and Era I. The khanates, hordes, Tibet, Ethiopia, the Swahili coast and the Sahel stand in Ancient with 7 to 15. Forest Africa stands in Ancient with 3 or 4 (iron but no horses), and Mesoamerica, the Andes and North America in Ancient with 2 to 10, without iron or horses. No African country south of the Sahara starts with B1 *Stone castles*: they defend with B4 earthworks until they learn dressed stone.
+So with the 1444 sets the Latin, Orthodox, Islamic, South Asian and East Asian countries stand in Era I with 23 to 38 inventions, maritime Southeast Asia in Era I with 21, and mainland Southeast Asia is split between Medieval and Era I. The khanates, hordes, Tibet, Ethiopia, the Swahili coast and the Sahel stand in Ancient with 7 to 15. Forest Africa stands in Ancient with 3 or 4 (iron but no horses), and Mesoamerica, the Andes and North America in Ancient with 2 to 10, without iron or horses. No African country south of the Sahara starts with B1 *Stone castles*: they defend with B4 earthworks until they learn dressed stone.
 
-**Standing.** Your standing is the latest era, from Ancient on, of which you know at least a quarter of the inventions, and a quarter of every earlier era's too. Ancient is the floor: no country stands lower. If your standing is earlier than the era of today's date, you are **behind the times** by the eras in between: a country standing in Ancient in 1444 is behind the times by 2 eras. Standing changes nothing by itself; it tells you, and the AI, how far behind a country is.
+**Standing.** Your standing is the latest era, from Ancient on, of which you know at least a quarter of the inventions, and a quarter of every earlier era's too. Ancient is the floor: no country stands lower. If your standing is earlier than the era of today's date, you are **behind the times** by the eras in between: a country standing in Ancient at the start, in Era I, is behind the times by 2 eras. Standing changes nothing by itself; it tells you, and the AI, how far behind a country is.
 
-See [The 1444 Start](The-1444-Start).
+See [The 1378 Start](The-1378-Start).
 
 ### Research elsewhere
 
@@ -386,7 +388,7 @@ Everything about research and schools is in one place: the **Research** tab of y
 
 Elsewhere:
 
-- The **General** tab of your country card has a **Research** line, "Studying Three-field rotation · 40 % · scholars 6", that opens the tab.
+- The **Overview** of your Realm book has a **Research** tile, "Three-field rotation · 40 %", that opens the tab; it turns red with "Choose what to study" when nothing is studied.
 - Another country's card shows its standing, how many inventions it knows and what it studies, and how many inventions it knows that you don't: those are the ones it makes cheaper for you as a neighbour or trade partner.
 - The nation picker at the start of a campaign shows each country's standing next to its name ("Starts in Ancient", "Starts in Era I"), so you know a country starts behind before you choose it.
 - When you learn an invention and your queue is empty, an alert says "Learned X. Choose the next study." with **Open**. While nothing is studied, one alert asks you to choose. With something queued, the next study simply starts.
@@ -413,17 +415,19 @@ Research plays one study at a time, with a queue of up to 5 behind it. Every cou
 - [Religion](Religion): a change of faith closes the other faith's schools.
 - [National Strengths](National-Strengths): levers on invention cost and inventions known.
 - [Historical Events](Historical-Events): event ids for technology and innovation, literacy, contact events.
-- [The 1444 Start](The-1444-Start): start inventions per country.
+- [The 1378 Start](The-1378-Start): start inventions per country.
 - [Time and Turns](Time-and-Turns): the date for eras and studying ahead; the campaign end.
 
 ## Numbers
+
+Every value the game uses, made from its config so it always matches the game: [Research data](Data-Research). How they combine: [Formulas](Formulas).
 
 All research numbers except the era dates are placeholders. The design names no config file, so key names other than the invention row fields are the spec's proposals.
 
 | Value | Config key | Design value | Provisional? |
 |---|---|---|---|
 | Cost by era | `research.era_cost` | Ancient 10, Medieval 15, I 20, II 40, III 80, IV 150, V 250, VI 400, VII 650 (VIII 1000) | Yes |
-| Era dates | `research.era_dates` | Ancient before 600, Medieval 600, 1444, 1500, 1600, 1700, 1800, 1870, 1914 (cut 31 August 1939) | No |
+| Era dates | `research.era_dates` | Ancient before 600, Medieval 600, I 1378, 1500, 1600, 1700, 1800, 1870, 1914 (cut 31 August 1939) | No |
 | Studying ahead | `research.ahead_multiplier` | ×2 per era | Yes |
 | Spread per neighbour or partner | `research.spread_per_partner` | 10 % | Yes |
 | Spread cap | `research.spread_cap` | 60 % | Yes |
@@ -432,7 +436,7 @@ All research numbers except the era dates are placeholders. The design names no 
 | Years to graduate | `research.graduation_years` | 5 | Yes |
 | Studies with an academy | `research.studies_with_academy` | 2 | Yes |
 | Seats per school | `research.school_seats` | 20 / 30 / 60 / 100 | Yes |
-| The tree | `inventions[]` | 187 rows (13 past, 174 from 1444) | Era costs are placeholders |
+| The tree | `inventions[]` | 187 rows (13 past, 174 from Era I on) | Era costs are placeholders |
 | Study queue | `research.queue_length` | 5 inventions after the current study | Yes |
 | Standing share | `research.standing_share` | 25 % of an era's inventions (and of every earlier era's) | Yes |
 | Without a past invention | `research.without` | F01 −1 harvest step; F03 no horse regiments and no camel caravans; B01 half the food carried; C01 regiments −20 % strength | Yes |
@@ -452,7 +456,7 @@ All research numbers except the era dates are placeholders. The design names no 
 - The AI studies the cheapest invention open to it, fills its seats in peace and empties them only at war with no recruits left.
 - Guano's harvest bonus lasts 30 years, then ends.
 - With the Examination system, any working scholar can be made an official of any kind.
-- **One tree reaching back before 1444** (18 October): the tree is drawn as one picture with the branches as bands and a Whole tree zoom, never one branch at a time. Two eras before 1444, Ancient and Medieval, add 13 past inventions that Era I inventions now need. A country that lacks one plays below the 1444 baseline, so countries that know them play exactly as before and only the laggards change.
+- **One tree reaching back before the start** (18 October): the tree is drawn as one picture with the branches as bands and a Whole tree zoom, never one branch at a time. Two eras before the start, Ancient and Medieval, add 13 past inventions that Era I inventions now need. A country that lacks one plays below the start groups' baseline, so countries that know them play exactly as before and only the laggards change.
 - **Start groups** (18 October): starting by region labels gave thin, uneven sets (France knew 12 inventions, Kongo knew stone castles), so every nation now belongs to one of 20 start groups with complete sets, plus its own additions and removals, and its standing names how far behind it starts. Penalties, costs and the standing share are placeholders; the Hordes, African start and tribal designs may tune their groups.
 - **A study queue on one screen** (18 October): the tab split the tree from the action, and each invention ended in an alert and a fresh choice. Now one screen holds the queue strip, the tree and the picked invention's sheet; a queue of 5 carries on by itself, and Queue the path gets every step to a far invention in one tap. The AI still chooses one study at a time.
 

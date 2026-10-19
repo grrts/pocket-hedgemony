@@ -297,14 +297,34 @@ Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision
 
 #### Names and ranks in the realm's language (feedback 125)
 - RECR-121 The recruiting system shall name every commander, admiral and hired captain in the language of the realm's culture (`names.json`), in that language's order: family name first where the language puts it first (Chinese, Japanese, Korean, Vietnamese, Hungarian). The 1444 start's historical commanders keep their own names in their own language ("Hunyadi János", "Gjergj Kastrioti", "Konstantinos Palaiologos"), and a realm the map data gives only a stand-in general gets one named in its culture. [F-125; F-33]
-- RECR-122 The recruiting system shall give each commander the rank of his post in the realm's language, from the culture's `ranks`: `general` while he leads an army or waits at court, `admiral` while he leads a fleet; the rank goes where the language puts it ("Almirante Fernão Coutinho", "Hosokawa Katsumoto Taishō"), and a culture with no word for the post shows the name alone. The rank follows the post: an admiral sent back to court is a general again. [F-125]
+- RECR-122 The recruiting system shall give each commander the rank of his post in the realm's language, from the culture's `ranks`: `general` while he leads an army or waits at court, `admiral` for one commissioned as admiral (RECR-128); the rank goes where the language puts it ("Almirante Fernão Coutinho", "Hosokawa Katsumoto Taishō"), and a culture with no word for the post shows the name alone. The rank follows the commission: an admiral sent back to court stays an admiral. [F-125; Leroy 19 Oct]
 - RECR-123 The recruiting system shall name a mercenary company's captain in the culture of the realm the company gathers in, keeping the company's own given name for him, with that culture's `captain` rank ("Hauptmann Ulrich von Hallwyl", "Condottiero Niccolò Piccinino"); he keeps that name in any realm's service. [F-125; WAR-213]
 
 #### How the player uses it: names and ranks
 - RECR-124 Where: the ranked name is the commander's name everywhere the player meets him: the army row on a province card, the commander screen's title, the Military tab's Commanders list, a fleet's name ("Kapudan Mehmed Pasha's fleet") on the Navy tab and port, the army picker, and the Mercenaries tab; short buttons ("Lead: …", "Join …") keep the bare name. Dispatches keep the bare name. [F-125; X-19]
-- RECR-125 Grouping: under the ranked name, the same small line that shows his skills begins with the post in plain English, "commander", "admiral" or "hired captain", so a rank the player does not know is never the only clue. [F-125; X-19]
+- RECR-125 Grouping: under the ranked name, the same small line that shows his skills begins with the post in plain English, "general", "admiral" or "hired captain", so a rank the player does not know is never the only clue. [F-125; X-19]
 - RECR-126 Overview: the Military tab's Commanders list shows every commander of the realm with his rank and post, and the Navy tab every fleet under its admiral's ranked name. [F-125; X-19]
 - RECR-127 Phone: a ranked name wraps inside its card instead of widening the panel, keeps the portrait and buttons at 44 points, and needs no hover to read the post. [F-125; X-19]
+
+#### Generals and admirals (Leroy, 19 Oct)
+- RECR-128 When an official is commissioned, the player shall choose whether he serves as a general or as an admiral; a general leads only armies and an admiral only fleets, and he keeps that post at court until he is released. The 1444 commanders and a mercenary company's captain are generals; a hired fleet's captain is an admiral. [Leroy 19 Oct; NAVY-067]
+- RECR-129 When an official is commissioned as admiral, the recruiting system shall start him with the sea skills of his type (NAVY-073), his years served in a port province counting double; as general, with the skills of his type (RECR-070). Both cost the same commission (RECR-114) and leave the post the same way (RECR-083). [Leroy 19 Oct; NAVY-073]
+- RECR-130 When an AI fleet that needs an admiral (NAVY-065) has none and no admiral waits at court, the recruiting system shall commission one if the AI keeps its reserve after the commission: the official of the fleet's own port if it has one, else a customs officer, else any official of a royal province. [Leroy 19 Oct; naval §11]
+
+- RECR-135 When a general dies (REALM-276), the recruiting system shall leave his army as the garrison of the province it stands in if that is crown land of the realm that the realm holds; otherwise (a lord's land, an enemy's land, or its own land held by an enemy) it shall march the army to the nearest such crown province, where it stands as that province's garrison. An army fighting a battle leaves it by the battle's rules instead (WAR-062). [Leroy 19 Oct]
+- RECR-136 While an army whose general died walks home, the recruiting system shall let it take no orders and not be caught, as an army falling back. [Leroy 19 Oct]
+- RECR-137 When an admiral dies, the recruiting system shall sail his fleet, if it is not in battle and not already in a port of the realm, to the nearest port the realm owns and holds, taking no orders and not caught on the way. [Leroy 19 Oct]
+
+#### How the player uses it: general or admiral
+- RECR-131 Where: the official's screen (from his province card or the Officials tab) ends with a Command section of two buttons, "Commission as general" and "Commission as admiral", each with the cost and, under it, what he leads and the might, cunning and logistics he would start with; in a port it adds that his years there count double at sea. A general then shows in the Military tab's Commanders list, an admiral on the Navy tab. Army pickers ("Lead: …", split off under a commander) offer only generals, a fleet's Admiral block only admirals; a fleet with no admiral at court says so and opens the Officials tab. [Leroy 19 Oct; X-19]
+- RECR-132 Grouping: both choices sit side by side in the one Command section, with the skills to compare, so the choice is made once, where the official is. [Leroy 19 Oct; X-19]
+- RECR-133 Overview: the Military tab's Commanders list shows every general and admiral with his post in plain English and what he does now ("leads 8,000 men at Paris", "leads a fleet", "waits at court"). [Leroy 19 Oct; X-19]
+- RECR-134 Phone: in landscape the two buttons are full width in the Wide and Tall layouts, at least 44 points high with the skills line inside, and nothing needs hover. [Leroy 19 Oct; X-19]
+
+#### How the player uses it: when a commander dies
+- RECR-138 Where: a dispatch says the commander died and where his men march or his ships sail. On the map, zoomed out, the army's commander banner and the fleet's token are gone; close in, the men are drawn walking and the hulls sailing home, with no name and nothing to tap until they arrive. [Leroy 19 Oct; X-19]
+- RECR-139 Grouping and overview: once home, the men are on that province's Garrison tab under "Troops without a commander", where a general can pick them up (RECR-122), and the ships are a fleet without an admiral in the port, on the Navy tab. [Leroy 19 Oct; X-19]
+- RECR-140 Phone: nothing new to tap on the way; the dispatch's province opens with a 44-point button as every dispatch's does. [Leroy 19 Oct; X-19]
 
 ## 6. Commands
 
@@ -516,3 +536,8 @@ Decided on 17 October 2026 (domain/DECISIONS.md). None of recruiting's questions
 | RECR-114, 115 | commissioning-officials.feature; ai-recruiting.feature | A commission costs 50 gold; The AI commissions only for troops it has |
 | RECR-121–123 | commander-names.feature | Names in the realm's language; The rank follows the post; A mercenary company's captain |
 | RECR-124–127 | — | Presentation only (client UI) |
+| RECR-128, 129 | commissioning-officials.feature | A general for the armies, an admiral for the fleets |
+| RECR-130 | — | Engine test: hiredFleets.test.ts (an AI fleet commissions its admiral) |
+| RECR-131–134 | — | Presentation only (client UI) |
+| RECR-135–137 | — | Engine test: leaderless.test.ts (a dead general's army stays or walks to crown land; a dead admiral's fleet sails home) |
+| RECR-138–140 | — | Presentation only (client UI) |

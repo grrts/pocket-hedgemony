@@ -129,3 +129,7 @@ players only as tuned numbers in the rules data (BAL-030).
    are in balance.
 4. **On a phone.** The report is plain Markdown that the project's file preview shows on a phone; every table
    keeps to five short columns so it reads in portrait and landscape without scrolling sideways.
+
+## The history check (BAL-031 to BAL-034)
+
+`pnpm --filter @ph/sim history --seeds 1,2,3 --years 70` plays AI-only campaigns from the bundled start and compares the world with each history checkpoint it reaches (1405, 1420, 1444, 1500, 1600, 1715, 1815, 1914; the data is in `packages/sim/data/checkpoints/`). At each one it counts the key places whose holder matches, the listed realms that exist, the great powers among the 8 largest realms and the turning points that happened, and marks the checkpoint *within history* when the key-place share reaches the checkpoint's tolerance (0.8 in 1405 down to 0.3 in 1914). It never fails: realms are meant to go their own way, and the game never pulls them back. `history.md` has one row per checkpoint in five short columns, then the places that differ most often; `history.json` has every number. As with the balance runs, it starts only when Leroy asks. For scale: the 1444 start compared with its own checkpoint matches 82 % of the key places, since some realms are too small for the map.

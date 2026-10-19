@@ -2,17 +2,16 @@ import { isHuman } from "./humans.ts";
 import type { World } from "./world.ts";
 import type { News } from "./war.ts";
 import * as dip from "./domain/diplomacy/index.ts";
-import { bondOf, foldInRealm, makeSubject, mergeCrownsRealm, monthNow } from "./subjects.ts";
-import { newRuler, yearlyRulers } from "./rulers.ts";
+import { bondOf, endTie, foldInRealm, makeSubject, mergeCrownsRealm, monthNow } from "./subjects.ts";
+import { dynastic, newRuler, throneLaw } from "./rulers.ts";
 import { loyaltyStep } from "./lords.ts";
 import { rulerDied } from "./faithHeads.ts";
 import config from "../../rules/data/domain/subjects.json" with { type: "json" };
 
 /**
  * Personal unions in the game (milestone 5, SUBJ-126 to SUBJ-129, D-SUBJ-30):
- * each January a roll stands for a ruler dying without a direct heir, beside
- * the deaths of old age that rulers.ts rolls (REALM-234); both change the
- * ruler here (succeed). His marriages may give the other houses a claim and
+ * a ruler who dies (people.ts rolls it, REALM-270) without a direct heir
+ * changes the ruler here (rulerDies, succeed). His marriages may give the other houses a claim and
  * a pretender (DIPL-107); with no heir at all his crown passes to the house
  * married most often into his (DIPL-110) as a Union, or a Loyal subject's
  * overlord takes it at once (SUBJ-071).
@@ -52,11 +51,9 @@ export function succeed(world: World, n: number, news: News[], kinsman = false, 
   newRuler(world, n, news, (lord, cause) => loyaltyStep(world, lord, cause, news), kinsman);
 }
 
-/** The January roll for every ruler but the player's, and claims that lapse (SUBJ-126 to SUBJ-128). */
+/** Each January the claims that lapse (SUBJ-126); rulers age and die with everyone else (people.ts, REALM-270). */
 export function yearlyCrowns(world: World, news: News[]): void {
   if (world.date.month !== 1) return;
-  // Rulers age, and old ones die (REALM-234); the roll below is the union rules' own.
-  yearlyRulers(world, news, (n) => succeed(world, n, news));
   const d = world.diplomacy;
   const now = monthNow(world);
   const name = (n: number) => world.rules.nations[n]!.name;
@@ -72,25 +69,35 @@ export function yearlyCrowns(world: World, news: News[]): void {
     if (!keep && isHuman(world, court) && !gone(p.throne)) news.push({ kind: "crown", text: `Your house's claim to the throne of ${name(world.nationIndex.get(p.throne)!)} lapses.`, nations: [court!] });
     return keep;
   });
-  for (let n = 0; n < world.nationCount; n++) {
-    if (world.nationGone[n] || isHuman(world, n)) continue;
-    if (dip.draw(d) >= C.heirless_per_year) continue;
-    const id = world.nationIds[n]!;
-    const before = d.pretenders.length;
-    dip.rulerDiesWithoutDirectHeir(d, id);
-    for (const p of d.pretenders.slice(before) as Claim[]) {
-      p.until = now + C.claim_years * 12;
-      if (world.nationIndex.get(p.court) === world.player) news.push({ kind: "crown", text: `${name(n)}'s ruler dies without a son: your house gains a claim to its throne until ${Math.floor(p.until / 12)}.`, nations: [world.player, n] });
-    }
-    if (dip.draw(d) >= C.no_heir_share) {
-      succeed(world, n, news, true);
-      continue;
-    }
-    const overlord = bondOf(world, n)?.overlord;
-    inheritCrown(world, n, news);
-    const bond = bondOf(world, n);
-    succeed(world, n, news, true, bond?.kind === "union" && bond.overlord !== overlord ? (world.nationIndex.get(bond.overlord) ?? -1) : -1);
+}
+
+/**
+ * Ruler n dies, of old age, in battle or by an event (REALM-100 to REALM-103,
+ * SUBJ-126 to SUBJ-128, REALM-272). With an heir, or under a law where the
+ * lords choose, the throne passes as the law says. Dying without a direct
+ * heir, his marriages may give the other houses a claim and a pretender
+ * (DIPL-107); one such death in 4 leaves no heir at all, and his crown passes
+ * to the house married most often into his or to a Loyal subject's overlord.
+ * The player's own line never ends that way: a kinsman takes the throne.
+ */
+export function rulerDies(world: World, n: number, news: News[]): void {
+  if (world.nationGone[n]) return;
+  const law = throneLaw(world, n);
+  if (world.rulers[n]!.heir || !(dynastic(law) || law === "eldest of the house")) return succeed(world, n, news);
+  const d = world.diplomacy;
+  const now = monthNow(world);
+  const name = (k: number) => world.rules.nations[k]!.name;
+  const before = d.pretenders.length;
+  dip.rulerDiesWithoutDirectHeir(d, world.nationIds[n]!);
+  for (const p of d.pretenders.slice(before) as Claim[]) {
+    p.until = now + C.claim_years * 12;
+    if (isHuman(world, world.nationIndex.get(p.court))) news.push({ kind: "crown", text: `${name(n)}'s ruler dies without a son: your house gains a claim to its throne until ${Math.floor(p.until / 12)}.`, nations: [world.player, n] });
   }
+  if (isHuman(world, n) || dip.draw(d) >= C.no_heir_share) return succeed(world, n, news);
+  const overlord = bondOf(world, n)?.overlord;
+  inheritCrown(world, n, news);
+  const bond = bondOf(world, n);
+  succeed(world, n, news, true, bond?.kind === "union" && bond.overlord !== overlord ? (world.nationIndex.get(bond.overlord) ?? -1) : -1);
 }
 
 /** Ruler n dies with no heir at all (SUBJ-127, SUBJ-128): who takes his crown, if anyone. */
@@ -112,7 +119,10 @@ export function inheritCrown(world: World, n: number, news: News[]): void {
   for (const house of marriedHouses(d, id)) {
     const h = world.nationIndex.get(house);
     if (h === undefined || world.nationGone[h]) continue;
-    if (rel.overlord(d.graph, house) || dip.warOf(d, house)) return;
+    // A union runs either way (SUBJ-136): the dead ruler's own subject inherits him, and the tie between them ends.
+    const ownSubject = rel.overlord(d.graph, house) === id;
+    if ((rel.overlord(d.graph, house) && !ownSubject) || dip.warOf(d, house)) return;
+    if (ownSubject) endTie(world, h);
     try {
       makeSubject(world, n, h, "union");
     } catch {

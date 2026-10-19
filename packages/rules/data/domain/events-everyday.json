@@ -1,0 +1,139 @@
+{
+  "$comment": "Everyday events (domain/events/spec.md §5.22, EVT-115 to EVT-128; feedback 152). Small choices about the realm's own people and stores, drawn from what the game already holds: its officials, lords, ruler and heir, and food stores, and plague reaching a province of the player's (EVT-130: not drawn; plague fires it). Each realm draws one every `months_between` months (a range), never while the player has an event waiting. `weight` is how often an event is drawn among the ones that can happen; `needs` names what it is about. Options list their effects in the engine's small vocabulary (gold, loyalty, official, lands, heir, heir_risk, food_back, new_lord, quarantine, care); `ai` weights the AI's pick; `needs` on an option hides it when the realm lacks what it asks. `{words}` in braces are filled with the names of who and where. Every number is a placeholder for balance.",
+  "months_between": [3, 6],
+  "first_within_months": 4,
+  "food": { "min_store_months": 3, "min_store": 2 },
+  "events": {
+    "official_dies": {
+      "weight": 2,
+      "needs": "official",
+      "title": "Death of {official}",
+      "text": "{official}, your {type} at {province}, has died after {years} years in the post. His clerks wait to hear who will take his seat.",
+      "options": [
+        { "id": "deputy", "name": "Raise his deputy", "ai": 3, "effects": [{ "official": "new" }] },
+        { "id": "seasoned", "name": "Send for a seasoned man", "ai": 1, "effects": [{ "gold": -25 }, { "official": "seasoned" }] },
+        { "id": "kin", "name": "Give the post to {lord2}'s kinsman", "needs": "lord2", "ai": 2, "effects": [{ "official": "new" }, { "loyalty": "office_at_court", "who": "lord2" }] }
+      ]
+    },
+    "lord_dies": {
+      "weight": 2,
+      "needs": "lord",
+      "title": "Death of {lord}",
+      "text": "{lord} of the house of {house} has died. His son {son} asks you to confirm him in his father's lands ({lands}).",
+      "options": [
+        { "id": "confirm", "name": "Confirm {son}", "ai": 4, "effects": [{ "new_lord": true }] },
+        { "id": "relief", "name": "Ask a fee for his lands", "ai": 2, "effects": [{ "new_lord": true }, { "gold": 20 }, { "loyalty": "heavy_taxes", "who": "lord" }] },
+        { "id": "take", "name": "Take his lands for the crown", "ai": 1, "effects": [{ "lands": "crown" }, { "loyalty": "land_seized_from_another", "who": "other_lords" }] }
+      ]
+    },
+    "lord_slighted": {
+      "weight": 2,
+      "needs": "lord_not_disloyal",
+      "title": "{lord} feels slighted",
+      "text": "{lord} of the house of {house} was seated below a lesser man at your table, and talks against you in his hall.",
+      "options": [
+        { "id": "gift", "name": "Send him a gift", "ai": 2, "effects": [{ "gold": -10 }] },
+        { "id": "office", "name": "Give him an office at court", "needs": "lord2", "ai": 2, "effects": [{ "loyalty": "land_seized_from_another", "who": "lord2" }] },
+        { "id": "ignore", "name": "Let him sulk", "ai": 1, "effects": [{ "loyalty": "slighted_at_court", "who": "lord" }] }
+      ]
+    },
+    "lord_praises": {
+      "weight": 2,
+      "needs": "lord_not_loyal",
+      "title": "{lord} speaks well of you",
+      "text": "{lord} of the house of {house} has been heard praising your rule in his hall. A word from you now could win him over.",
+      "options": [
+        { "id": "reward", "name": "Reward him with gold", "ai": 3, "effects": [{ "gold": -10 }, { "loyalty": "gift_of_gold", "who": "lord" }] },
+        { "id": "thank", "name": "Thank him", "ai": 1, "effects": [] }
+      ]
+    },
+    "lords_quarrel": {
+      "weight": 2,
+      "needs": "two_lords",
+      "title": "{lord} and {lord2} quarrel",
+      "text": "{lord} and {lord2} both claim a mill and its meadows on the edge of their lands, and each asks you to judge for him.",
+      "options": [
+        { "id": "first", "name": "Judge for {lord}", "ai": 2, "effects": [{ "loyalty": "want_granted", "who": "lord" }, { "loyalty": "land_seized_from_him", "who": "lord2" }] },
+        { "id": "second", "name": "Judge for {lord2}", "ai": 2, "effects": [{ "loyalty": "want_granted", "who": "lord2" }, { "loyalty": "land_seized_from_him", "who": "lord" }] },
+        { "id": "fine", "name": "Fine them both and keep the mill", "ai": 1, "effects": [{ "gold": 15 }, { "loyalty": "heavy_taxes", "who": "lord" }, { "loyalty": "heavy_taxes", "who": "lord2" }] }
+      ]
+    },
+    "lord_hurt": {
+      "weight": 1,
+      "needs": "lord",
+      "title": "{lord} is hurt",
+      "text": "{lord} of the house of {house} fell from his horse while hunting and lies in his hall with a broken leg.",
+      "options": [
+        { "id": "physician", "name": "Send your own physician", "ai": 2, "effects": [{ "gold": -10 }, { "loyalty": "gift_of_gold", "who": "lord" }] },
+        { "id": "prayers", "name": "Send your prayers", "ai": 2, "effects": [] }
+      ]
+    },
+    "child_born": {
+      "weight": 2,
+      "needs": "ruler_fertile",
+      "title": "A child is born",
+      "text": "A {child} is born to {ruler}, and named {childName}. The bells ring in every town of the realm.",
+      "options": [
+        { "id": "feast", "name": "Hold a great feast", "ai": 2, "effects": [{ "heir": "child" }, { "gold": -15 }, { "loyalty": "gift_of_gold", "who": "least_loyal_lords", "count": 2 }] },
+        { "id": "match", "name": "Promise the child to {lord2}'s house", "needs": "lord2", "ai": 2, "effects": [{ "heir": "child" }, { "loyalty": "marriage_into_ruling_house", "who": "lord2" }] },
+        { "id": "quiet", "name": "Give thanks quietly", "ai": 1, "effects": [{ "heir": "child" }] }
+      ]
+    },
+    "heir_ill": {
+      "weight": 1,
+      "needs": "young_heir",
+      "title": "{heir} falls ill",
+      "text": "Your heir {heir}, aged {heirAge}, is burning with fever. The court physicians shake their heads.",
+      "options": [
+        { "id": "doctors", "name": "Pay the best physicians", "ai": 3, "effects": [{ "gold": -20 }] },
+        { "id": "pray", "name": "Trust in prayer", "ai": 1, "effects": [{ "heir_risk": 0.3 }] }
+      ]
+    },
+    "grain_rots": {
+      "weight": 2,
+      "needs": "store",
+      "loss": 0.4,
+      "title": "Grain rots at {province}",
+      "text": "Damp has got into the granaries at {province}. The keepers have thrown out {loss} months of grain.",
+      "options": [
+        { "id": "buy", "name": "Buy grain from merchants", "ai": 2, "effects": [{ "gold": -15 }, { "food_back": 0.5 }] },
+        { "id": "requisition", "name": "Take grain from {lord2}'s barns", "needs": "lord2", "ai": 1, "effects": [{ "food_back": 0.5 }, { "loyalty": "grain_requisitioned", "who": "lord2" }] },
+        { "id": "bear", "name": "Bear the loss", "ai": 2, "effects": [] }
+      ]
+    },
+    "granary_fire": {
+      "weight": 1,
+      "needs": "store",
+      "loss": 0.5,
+      "title": "Fire in the granary at {province}",
+      "text": "A fire in the night has burned half of {province}'s granary: {loss} months of grain are lost.",
+      "options": [
+        { "id": "buy", "name": "Buy grain from merchants", "ai": 2, "effects": [{ "gold": -20 }, { "food_back": 0.5 }] },
+        { "id": "requisition", "name": "Take grain from {lord2}'s barns", "needs": "lord2", "ai": 1, "effects": [{ "food_back": 0.5 }, { "loyalty": "grain_requisitioned", "who": "lord2" }] },
+        { "id": "bear", "name": "Bear the loss", "ai": 2, "effects": [] }
+      ]
+    },
+    "plague_reaches": {
+      "weight": 0,
+      "needs": "plague",
+      "title": "Plague at {province}",
+      "text": "Men are falling sick at {province}: fever, black swellings, death in three days. The townsfolk die first. What will you do?",
+      "options": [
+        { "id": "close", "name": "Close the province", "ai": 1, "effects": [{ "quarantine": true }] },
+        { "id": "physicians", "name": "Send physicians and burn the sick houses", "ai": 1, "effects": [{ "gold": -20 }, { "care": true }] },
+        { "id": "open", "name": "Keep the roads open", "ai": 1, "effects": [] }
+      ]
+    },
+    "rats": {
+      "weight": 1,
+      "needs": "store",
+      "loss": 0.3,
+      "title": "Rats in the stores at {province}",
+      "text": "Rats have overrun the stores at {province} and spoiled {loss} months of grain.",
+      "options": [
+        { "id": "buy", "name": "Buy grain from merchants", "ai": 2, "effects": [{ "gold": -10 }, { "food_back": 0.5 }] },
+        { "id": "bear", "name": "Bear the loss", "ai": 2, "effects": [] }
+      ]
+    }
+  }
+}

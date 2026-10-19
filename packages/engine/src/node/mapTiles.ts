@@ -9,14 +9,15 @@ import { tileGridFromImages, type TileGrid } from "../tiles.ts";
  * generated province and terrain images the client draws from. Node only, so
  * the browser build never pulls it in.
  */
-const MAP_DIR = new URL("../../../../apps/client/public/map/", import.meta.url);
+const PUBLIC_DIR = new URL("../../../../apps/client/public/", import.meta.url);
 
 let cached: { rules: Ruleset; grid: TileGrid } | null = null;
 
 export function loadMapTiles(rules: Ruleset): TileGrid {
   if (cached?.rules === rules) return cached.grid;
-  const ids = decodeRgb(fileURLToPath(new URL("provinces.png", MAP_DIR)));
-  const terrain = decodeRgb(fileURLToPath(new URL("terrain.png", MAP_DIR)));
+  // The start's own images (rules.map names them, as the client loads them).
+  const ids = decodeRgb(fileURLToPath(new URL(rules.map?.provinceImage ?? "map/provinces.png", PUBLIC_DIR)));
+  const terrain = decodeRgb(fileURLToPath(new URL(rules.map?.terrainImage ?? "map/terrain.png", PUBLIC_DIR)));
   const n = ids.width * ids.height;
   const province = new Uint16Array(n);
   for (let p = 0, i = 0; p < n; p++, i += 3) province[p] = (ids.rgb[i]! << 16) | (ids.rgb[i + 1]! << 8) | ids.rgb[i + 2]!;

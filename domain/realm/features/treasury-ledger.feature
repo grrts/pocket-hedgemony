@@ -48,7 +48,7 @@ Feature: Tax rates and the treasury ledger
   @REALM-179
   Scenario: The month's ledger
     Given the game starts with the country "France"
-    Then the ledger of "France" has the lines "tax", "trade", "army pay", "officials", "interest", "works", "schools", "grain", "tribute" and "navy"
+    Then the ledger of "France" has the lines "tax", "trade", "army pay", "officials", "interest", "works", "schools", "grain", "tribute", "navy", "furs" and "new land"
     And the monthly income of "France" is the sum of its ledger
     When a new month begins
     Then the month's income is paid into the treasury of "France"
@@ -129,3 +129,13 @@ Feature: Tax rates and the treasury ledger
     Given the player rules "France"
     When the player taps the gold plaque
     Then the Treasury tab of the country card opens
+
+  @REALM-300 @REALM-301 @placeholder
+  Scenario: Broke and heading for a default
+    # config: realm.debt.default
+    Given Castile's gold is below zero and lenders will lend it no more
+    When three monthly steps pass with nothing changed
+    Then the player is warned at the first two that the crown will default
+    And at the third Castile defaults: its debt is gone and its gold is nothing
+    And each of its lords falls two steps of loyalty, none below Disloyal
+    And lenders refuse Castile for five years

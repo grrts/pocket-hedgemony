@@ -11,3 +11,4 @@ export * from "./model.ts";
 export * from "./reasons.ts";
 export * from "./actions.ts";
 export * from "./ai.ts";
+export * from "./peace.ts";

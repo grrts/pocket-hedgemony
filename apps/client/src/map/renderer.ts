@@ -1,8 +1,13 @@
 import { DEPTH_COLORS, hexToRgb, PALETTE, TERRAINS } from "../art/palette.ts";
 import { ATLAS_ROWS, BIG_ROWS, buildMiniAtlas, buildTileAtlas, rowColors, SEA_ROW, SHALLOW_ROW, TILE, VARIANTS, WATER_BASE } from "../art/tiles.ts";
+import { TOWN_FLAG, TOWN_ROWS, TOWN_TILE, TOWN_VARIANTS, buildTownAtlas } from "../art/townTiles.ts";
 import { UI_COLORS } from "../art/ui.ts";
 import { ICE } from "@ph/engine/domain/map-presentation";
 import type { MapImage } from "./loadMap.ts";
+import { worldZoomHatchPx } from "@ph/engine/domain/subjects";
+
+/** Width of a subject's hatch at world zoom, in map pixels (SUBJ-093, rules subjects.map.world_zoom_hatch_px). */
+const SUBJECT_HATCH_PX = worldZoomHatchPx();
 
 /** A number as a GLSL float literal. */
 const glf = (n: number): string => (Number.isInteger(n) ? n.toFixed(1) : String(n));
@@ -67,6 +72,9 @@ uniform ivec2 uTileSize;     // texels in this tile's texture (includes 1px over
 uniform sampler2D uInfo;     // per-province: rgb = fill colour, a = flags
 uniform sampler2D uOwner;    // per-province: rg = owner index + 1, b = 255 for sea zones (else +64 faded, +16 closed to the moving armies), a = lord tag (0 = royal land)
 uniform sampler2D uSeason;   // per-province season, see seasonal()
+uniform sampler2D uSubject;  // per-province, for subjects (SUBJ-093): rgb = direct overlord's colour, a = 255 when a subject
+uniform sampler2D uSubjectOf; // per-province: rg = direct overlord's owner index + 1 (0 = nobody's subject)
+uniform sampler2D uHunt;     // per-province, for hunting grounds (TRIBE-028): rgb = the tribe's colour, a = 255 a ground, 110 a claim under way, 0 none
 uniform int uInfoWidth;
 uniform float uZoom;
 uniform float uTime;
@@ -77,6 +85,11 @@ uniform vec3 uDepth[${DEPTH_COLORS.length}];     // ocean colour by depth band
 uniform vec3 uFoam, uInk, uHighlight, uSand, uForbid;
 uniform sampler2D uAtlas;    // terrain tiles: ${VARIANTS} variants across, one row per terrain
 uniform sampler2D uMini;     // the same at half size
+uniform sampler2D uTown;     // per-province town (VIEW-110, VIEW-113): r walls (0 none, 1 palisade, 2 stone), g road grade (0 track, 1 road, 2 paved), b worship variant, a style
+uniform sampler2D uTownAtlas; // town tiles: ${TOWN_VARIANTS} variants across, one row per cell kind (row = kind - 1)
+uniform float uLiving;       // 0..1: how far the living map has faded in (VIEW-101)
+uniform bool uFiefs;         // a data lens that draws fief borders and patterns too (the Institutions lens's great houses, INST-084)
+uniform vec3 uRoad[3];       // track, road, paved road
 out vec4 outColor;
 
 const vec3 SEA_BASE = ${glsl(WATER_BASE.sea)};
@@ -104,6 +117,12 @@ int riverAt(ivec2 p) {
   return g >= 64 ? g - 64 : 0;
 }
 vec4 info(int id) { return texelFetch(uInfo, ivec2(id % uInfoWidth, id / uInfoWidth), 0); }
+vec4 subjectInfo(int id) { return texelFetch(uSubject, ivec2(id % uInfoWidth, id / uInfoWidth), 0); }
+// The direct overlord of a province's owner, or -1 when the owner is nobody's subject.
+int overlordOf(int id) {
+  vec2 o = texelFetch(uSubjectOf, ivec2(id % uInfoWidth, id / uInfoWidth), 0).rg * 255.0 + 0.5;
+  return int(o.r) * 256 + int(o.g) - 1;
+}
 int ownerOf(int id) {
   vec2 o = texelFetch(uOwner, ivec2(id % uInfoWidth, id / uInfoWidth), 0).rg * 255.0 + 0.5;
   return int(o.r) * 256 + int(o.g) - 1;
@@ -112,9 +131,11 @@ int ownerOf(int id) {
 int lordTag(int id) { return int(texelFetch(uOwner, ivec2(id % uInfoWidth, id / uInfoWidth), 0).a * 255.0 + 0.5); }
 // Land faded back while other provinces are picked out (owner b = 64), e.g. while a lord's lands are lit.
 vec3 faded(vec3 c, int id) {
-  float b = texelFetch(uOwner, ivec2(id % uInfoWidth, id / uInfoWidth), 0).b;
-  return b > 0.2 && b < 0.4 ? mix(vec3(dot(c, vec3(0.3, 0.55, 0.15))), uParchmentDark, 0.25) * 0.75 : c;
+  int b = int(texelFetch(uOwner, ivec2(id % uInfoWidth, id / uInfoWidth), 0).b * 255.0 + 0.5);
+  return b < 128 && (b & 64) != 0 ? mix(vec3(dot(c, vec3(0.3, 0.55, 0.15))), uParchmentDark, 0.25) * 0.75 : c;
 }
+// Unowned land a data lens colours all the same (owner b bit 32), such as the Charts lens's empty coasts (EXPL-073, TRIBE-028).
+bool lensWashed(int id) { return uMode == 2 && (int(texelFetch(uOwner, ivec2(id % uInfoWidth, id / uInfoWidth), 0).b * 255.0 + 0.5) & 32) != 0; }
 // Land province (not a lake, not a sea zone).
 bool land(int id) {
   return id >= 0 && texelFetch(uOwner, ivec2(id % uInfoWidth, id / uInfoWidth), 0).b < 0.5;
@@ -169,6 +190,21 @@ float flags(int id) { return float(int(info(id).a * 255.0 + 0.5) >> 4); }
 vec3 hatch(vec3 c, int id, ivec2 q, int width) {
   if (uMode == 1 || (int(flags(id)) & 8) == 0) return c;
   return ((q.x + q.y) / width) % 2 == 0 ? mix(c, uInk, 0.35) : c;
+}
+// A hunting ground (TRIBE-028): a light diagonal hatch in the tribe's colour,
+// running the other way from the occupation hatch, one line in three; a dark
+// edge on each line keeps the pattern readable when the colours are close
+// (colour-vision modes). A claim under way shows the same lines fainter.
+vec3 hunt(vec3 c, int id, ivec2 q, int width) {
+  if (uMode == 1) return c;
+  vec4 h = texelFetch(uHunt, ivec2(id % uInfoWidth, id / uInfoWidth), 0);
+  if (h.a < 0.1) return c;
+  int d = (q.x + 4194304 - q.y) / width;
+  int k = d % 3;
+  bool ground = h.a > 0.7;
+  if (k == 0) return mix(c, h.rgb, ground ? 0.62 : 0.32);
+  if (k == 1 && ground) return mix(c, uInk, 0.18);
+  return c;
 }
 vec3 highlight(vec3 c, int id, float strength) {
   int f = int(flags(id));
@@ -293,6 +329,119 @@ int effId(vec2 m) {
   return dx + dy < 0.5 ? h : id;
 }
 
+
+// The living map (VIEW-105..VIEW-115): the alpha of the id texture holds each
+// map pixel's settlement byte, the cell kind in bits 0-3 and road links
+// N/E/S/W in bits 4-7. Roads are drawn in the ground's own art pixels so they
+// meet the terrain art; buildings and walls at the town atlas's finer density
+// (TOWN_TILE per map pixel, twice the ground's), the walls worked out from
+// neighbouring core cells.
+int settlementAt(ivec2 p) {
+  ivec2 local = clamp(p - uTileOrigin, ivec2(0), uTileSize - 1);
+  return int(texelFetch(uIds, local, 0).a * 255.0 + 0.5);
+}
+// Cells inside the walls: core, keep, market, worship, docks, drill yard and landmark.
+bool walled(int b) { int k = b & 15; return (k >= 3 && k <= 8) || k == 12; }
+vec4 townInfo(int id) { return floor(texelFetch(uTown, ivec2(id % uInfoWidth, id / uInfoWidth), 0) * 255.0 + 0.5); }
+const vec3 FLAG = ${glsl(TOWN_FLAG)};
+// A road through a map pixel (VIEW-113): from the middle to each linked side,
+// or, where it only turns a corner, straight across from one side to the
+// other, so a road stepping north-east runs as one slanting line. A track is a
+// worn footpath, broken where the grass grows over it; a road a cart way with
+// ruts and a soft verge; a paved road laid stones with a kerb.
+float segment(vec2 f, vec2 s0, vec2 s1) {
+  vec2 d = s1 - s0;
+  return length(f - s0 - d * clamp(dot(f - s0, d) / dot(d, d), 0.0, 1.0));
+}
+vec3 livingRoad(vec3 c, ivec2 a, ivec2 q, int links, int grade) {
+  const float H = ${TOWN_TILE / 2}.0;
+  vec2 f = vec2(q) + 0.5;
+  vec2 side[4] = vec2[4](vec2(H, 0.0), vec2(2.0 * H, H), vec2(H, 2.0 * H), vec2(0.0, H));
+  float d = 1e3;
+  bool corner = links == 3 || links == 6 || links == 12 || links == 9;
+  if (corner) {
+    int s0 = links == 9 ? 3 : (links == 3 ? 0 : links == 6 ? 1 : 2);
+    d = segment(f, side[s0], side[(s0 + 1) & 3]);
+  } else {
+    for (int i = 0; i < 4; i++) if ((links & (1 << i)) != 0) d = min(d, segment(f, vec2(H), side[i]));
+  }
+  float n = hash(a + 3);
+  if (grade == 0) {
+    // A footpath one art pixel wide, the ground showing through here and there.
+    if (d < 0.75 && n < 0.93) c = mix(c, uRoad[0], 0.85);
+    return c;
+  }
+  if (grade == 1) {
+    if (d < 1.0) c = uRoad[1] * (n > 0.72 ? 0.84 : 1.0);
+    else if (d < 1.8) c = mix(c, uRoad[1], 0.25);
+    return c;
+  }
+  if (d < 1.1) c = uRoad[2] * (((a.x + a.y) & 1) == 0 ? 1.0 : 0.9) * (n > 0.85 ? 0.85 : 1.0);
+  else if (d < 1.9) c = mix(c, uInk, 0.22);
+  return c;
+}
+vec3 livingTown(vec3 c, ivec2 p, ivec2 a, int id, int terrain, vec3 realm) {
+  int b = settlementAt(p);
+  if (b == 0) return c;
+  int kind = b & 15;
+  int links = b >> 4;
+  ivec2 q = a & 7; // the ground's art pixel within the map pixel, for the roads
+  ivec2 fine = ivec2(floor(vMap * ${TOWN_TILE}.0)); // the town atlas's finer art pixel
+  ivec2 fq = fine & ${TOWN_TILE - 1};
+  vec4 ti = townInfo(id);
+  if (links != 0) c = livingRoad(c, a, q, links, clamp(int(ti.g), 0, 2));
+  if (kind == 0) return c;
+  bool woods = terrain == ${T.forest} || terrain == ${T.broadleaf} || terrain == ${T.jungle} || terrain == ${T.highlands};
+  int variant = kind == 6 ? int(ti.b) : kind == 9 ? (woods ? 2 : terrain == ${T.hills} ? 1 : terrain == ${T.mountains} || terrain == ${T.badlands} ? 0 : 3) : int(hash(p + ivec2(13, 7)) * ${TOWN_VARIANTS}.0);
+  ivec2 tq = fq;
+  if (kind == 7) {
+    // Docks are painted with the quay to the north and the water to the south: turn them to face the water.
+    const int L = ${TOWN_TILE - 1};
+    if (!land(idAt(p + ivec2(0, -1)))) tq = ivec2(fq.x, L - fq.y);
+    else if (!land(idAt(p + ivec2(1, 0)))) tq = ivec2(fq.y, fq.x);
+    else if (!land(idAt(p + ivec2(-1, 0)))) tq = ivec2(fq.y, L - fq.x);
+  }
+  vec4 t = texelFetch(uTownAtlas, ivec2((variant & ${TOWN_VARIANTS - 1}) * ${TOWN_TILE} + tq.x, (kind - 1) * ${TOWN_TILE} + tq.y), 0);
+  if (t.a > 0.5) {
+    c = distance(t.rgb, FLAG) < 0.02 ? realm : t.rgb;
+    // Snow on the roofs in winter (VIEW-128, VIEW-072).
+    c = mix(c, vec3(0.94, 0.96, 1.0), 0.6 * snowAt(id, terrain, hash(fine)));
+  }
+  int walls = int(ti.r);
+  if (walls > 0 && walled(b)) {
+    bool n = !walled(settlementAt(p + ivec2(0, -1)));
+    bool s = !walled(settlementAt(p + ivec2(0, 1)));
+    bool w = !walled(settlementAt(p + ivec2(-1, 0)));
+    bool e = !walled(settlementAt(p + ivec2(1, 0)));
+    // Two fine pixels thick: the outer one crenellated (stone) or the stake tips
+    // (palisade), the inner one the wall walk or the stakes' shaded side.
+    const int L2 = ${TOWN_TILE - 1};
+    int outer = -1; // distance from the outside edge, 0 or 1, on a wall pixel
+    int along = 0;  // position along the wall, for the pattern
+    if (n && fq.y <= 1) { outer = fq.y; along = fine.x; }
+    if (s && fq.y >= L2 - 1) { outer = L2 - fq.y; along = fine.x; }
+    if (w && fq.x <= 1) { outer = fq.x; along = fine.y; }
+    if (e && fq.x >= L2 - 1) { outer = L2 - fq.x; along = fine.y; }
+    // Inside corners: close the gap where the wall turns round a cell outside it.
+    if (outer < 0 && (fq.x <= 1 || fq.x >= L2 - 1) && (fq.y <= 1 || fq.y >= L2 - 1)) {
+      ivec2 d = ivec2(fq.x <= 1 ? -1 : 1, fq.y <= 1 ? -1 : 1);
+      if (!walled(settlementAt(p + d))) { outer = 1; along = fine.x; }
+    }
+    // Stone corner towers, 4 × 4 fine pixels, with a crenellated rim.
+    bool cornerX = (w && fq.x <= 3) || (e && fq.x >= L2 - 3);
+    bool cornerY = (n && fq.y <= 3) || (s && fq.y >= L2 - 3);
+    if (walls == 2 && cornerX && cornerY) {
+      ivec2 t = ivec2(w && fq.x <= 3 ? fq.x : L2 - fq.x, n && fq.y <= 3 ? fq.y : L2 - fq.y);
+      bool rim = t.x == 0 || t.y == 0 || t.x == 3 || t.y == 3;
+      c = rim ? (((fine.x + fine.y) & 1) == 0 ? ${glsl("#b5aebb")} : ${glsl("#4a4552")}) : (t.x + t.y <= 3 ? ${glsl("#d8d0b0")} : ${glsl("#9a94a0")});
+    } else if (outer >= 0) {
+      if (walls == 1) c = outer == 0 ? ((along & 1) == 0 ? ${glsl("#c06a44")} : ${glsl("#5a3a1a")}) : ((along & 1) == 0 ? ${glsl("#8a5a2a")} : ${glsl("#5a3a1a")});
+      else c = outer == 0 ? (((along >> 1) & 1) == 0 ? ${glsl("#b5aebb")} : ${glsl("#4a4552")}) : ${glsl("#9a94a0")};
+    }
+  }
+  return c;
+}
+
 // Tiled map: each map pixel is ART × ART art pixels; tiles cover 2 × 2 map pixels.
 vec3 tiled(bool mini) {
   int size = mini ? ${TILE / 2} : ${TILE};
@@ -345,7 +494,7 @@ vec3 tiled(bool mini) {
   }
   vec3 c = seasonal(tileAt(mini, terrain, variant, local), terrain, id, hash(a));
   int owner = ownerOf(id);
-  bool political = uMode != 1 && owner >= 0;
+  bool political = uMode != 1 && (owner >= 0 || lensWashed(id));
   if (political) {
     c = snowOver(realmWash(c, inf.rgb), id, terrain, hash(a));
     // A wider band of the owner's colour along its borders.
@@ -356,7 +505,7 @@ vec3 tiled(bool mini) {
     }
     if (edge) c = mix(c, inf.rgb, 0.35);
     // A lord's land (feedback 68): a sparse diaper of small dark crosses, like a fief's mantle.
-    if (lordTag(id) > 0 && uMode == 0) {
+    if (lordTag(id) > 0 && (uMode == 0 || uFiefs)) {
       ivec2 d = ivec2(a.x + ((a.y >> 3) & 1) * 4, a.y) & 7;
       if ((d.x == 2 && d.y >= 1 && d.y <= 3) || (d.y == 2 && d.x >= 1 && d.x <= 3)) c = mix(c, uInk, 0.28);
     }
@@ -373,6 +522,8 @@ vec3 tiled(bool mini) {
       c = mix(c, uInk, 0.45);
     }
   }
+
+  if (!mini && uLiving > 0.0) c = mix(c, livingTown(c, p, a, id, terrain, inf.rgb), uLiving);
 
   bool other1 = (land(iR) && ownerOf(iR) != owner) || (land(iL) && ownerOf(iL) != owner) || (land(iD) && ownerOf(iD) != owner) || (land(iU) && ownerOf(iU) != owner);
   if (!land(iR) || !land(iL) || !land(iD) || !land(iU)) {
@@ -391,18 +542,25 @@ vec3 tiled(bool mini) {
       c = mix(c, min(inf.rgb * 1.15 + 0.06, 1.0), 0.8);
     } else if (other2) {
       c = mix(c, uInk, 0.35);
-    } else if (political && uMode == 0 && ((iR != id && lordTag(iR) != lordTag(id)) || (iL != id && lordTag(iL) != lordTag(id)) || (iD != id && lordTag(iD) != lordTag(id)) || (iU != id && lordTag(iU) != lordTag(id)))) {
+    } else if (political && (uMode == 0 || uFiefs) && ((iR != id && lordTag(iR) != lordTag(id)) || (iL != id && lordTag(iL) != lordTag(id)) || (iD != id && lordTag(iD) != lordTag(id)) || (iU != id && lordTag(iU) != lordTag(id)))) {
       if (((a.x + a.y) >> 1 & 1) == 0) c = mix(c, uInk, 0.7); // dashed border between fiefs and royal land
     } else if ((iR != id || iL != id || iD != id || iU != id) && ((a.x + a.y) & 1) == 0) {
       c = mix(c, uInk, 0.5); // dotted province border
     }
   }
-  return highlight(hatch(faded(c, id), id, a, max(2, size / 2)), id, 0.18);
+  return highlight(hunt(hatch(faded(c, id), id, a, max(2, size / 2)), id, a, max(2, size / 4)), id, 0.18);
 }
 
 // Rough height of a terrain, for hill shading on the far map.
 float height(int t) {
   return t == ${T.mountains} || t == ${T.badlands} || t == ${T.snowpeaks} ? 2.0 : t == ${T.highlands} ? 1.6 : t == ${T.hills} ? 0.8 : 0.0;
+}
+
+// Two provinces held by a subject and its direct overlord (either way round).
+bool tied(int a, int b) {
+  int oa = ownerOf(a);
+  int ob = ownerOf(b);
+  return oa != ob && ((oa >= 0 && overlordOf(a) == ob) || (ob >= 0 && overlordOf(b) == oa));
 }
 
 vec3 far() {
@@ -449,8 +607,13 @@ vec3 far() {
   if ((t == ${T.mountains}) && height(terrainAt(p - ivec2(1, 1))) > 1.0 && h > 0.7) c = mix(c, vec3(0.95), 0.6);
 
   int owner = ownerOf(id);
-  bool political = uMode != 1 && owner >= 0;
-  if (political) c = snowOver(realmWash(c, inf.rgb), id, t, bayer(p));
+  bool political = uMode != 1 && (owner >= 0 || lensWashed(id));
+  // A subject (SUBJ-093) is washed in its direct overlord's colour with a thin
+  // diagonal hatch in its own colour; a chain never stacks a second hatch.
+  vec4 sub = subjectInfo(id);
+  bool subject = political && uMode == 0 && sub.a > 0.5;
+  vec3 realm = subject && ((p.x + p.y) % ${SUBJECT_HATCH_PX * 3}) >= ${SUBJECT_HATCH_PX} ? sub.rgb : inf.rgb;
+  if (political) c = snowOver(realmWash(c, realm), id, t, bayer(p));
   // Great rivers always, the rest once zoomed in a little.
   int rs = riverAt(p);
   if (rs == 2 && uZoom > 0.9 || rs == 1 && uZoom > 2.2) c = mix(c, riverFrozen(id, t, bayer(p)) ? iceColor(vec2(p)) : uDepth[0], 0.8);
@@ -461,18 +624,23 @@ vec3 far() {
   int d = idAt(p + ivec2(0, 1));
   bool nationEdge = (land(r) && ownerOf(r) != owner) || (land(d) && ownerOf(d) != owner);
   bool provinceEdge = (land(r) && r != id) || (land(d) && d != id);
-  if (nationEdge) {
+  // The border between a subject and its direct overlord is dotted (SUBJ-093).
+  bool dotted = nationEdge && uMode == 0 && !(land(r) && ownerOf(r) != owner && !tied(id, r)) && !(land(d) && ownerOf(d) != owner && !tied(id, d));
+  if (dotted) {
+    if (((p.x + p.y) & 1) == 0) c = mix(c, uInk, uZoom > 2.0 ? 0.85 : 0.65);
+  } else if (nationEdge) {
     c = mix(c, uInk, uZoom > 2.0 ? 0.85 : 0.65);
   } else if (political && uZoom > 2.0) {
     int l = idAt(p - ivec2(1, 0));
     int u = idAt(p - ivec2(0, 1));
     if ((land(l) && ownerOf(l) != owner) || (land(u) && ownerOf(u) != owner)) c = mix(c, inf.rgb, 0.7);
     else if (provinceEdge) c *= (land(r) && lordTag(r) != lordTag(id)) || (land(d) && lordTag(d) != lordTag(id)) ? 0.5 : 0.72;
-    else if (uMode == 0 && lordTag(id) > 0 && uZoom > 3.0 && (p.x & 3) == 1 && (p.y & 3) == 1) c *= 0.8;
+    else if ((uMode == 0 || uFiefs) && lordTag(id) > 0 && uZoom > 3.0 && (p.x & 3) == 1 && (p.y & 3) == 1) c *= 0.8;
   } else if (provinceEdge && uZoom > 1.2) {
     c *= 0.72;
   }
-  return highlight(hatch(faded(c, id), id, p, 2), id, 0.3);
+  // The hunting hatch keeps about the same width on screen at every zoom.
+  return highlight(hunt(hatch(faded(c, id), id, p, 2), id, p, max(1, int(3.0 / uZoom))), id, 0.3);
 }
 
 // Undiscovered land and sea: old parchment with stains and a ruled grid.
@@ -559,14 +727,27 @@ export class MapRenderer {
   private ownerTex: WebGLTexture;
   private seasonTex: WebGLTexture;
   private seasonData: Uint8Array;
+  private subjectTex: WebGLTexture;
+  private subjectData: Uint8Array;
+  private subjectOfTex: WebGLTexture;
+  private subjectOfData: Uint8Array;
+  private subjectDirty = true;
+  private huntTex: WebGLTexture;
+  private huntData: Uint8Array;
+  private huntDirty = true;
   private atlasTex: WebGLTexture;
   private miniTex: WebGLTexture;
   private terrainColors: number[];
   private infoWidth = 256;
   private infoData: Uint8Array;
   private ownerData: Uint8Array;
+  private townData: Uint8Array;
+  private townTex: WebGLTexture;
+  private townAtlasTex: WebGLTexture;
   private u: Record<string, WebGLUniformLocation | null> = {};
   mode: MapMode = "political";
+  /** Under a data lens, draw the fief borders and pattern of the lords passed to setProvinceStyle (the Institutions lens's great houses). */
+  fiefs = false;
   readonly canvas: HTMLCanvasElement;
   readonly map: MapImage;
 
@@ -577,7 +758,7 @@ export class MapRenderer {
     if (!gl) throw new Error("WebGL2 is not available");
     this.gl = gl;
     this.program = link(gl, VERT, FRAG);
-    for (const name of ["uCenter", "uZoom", "uView", "uIds", "uTileOrigin", "uTileSize", "uInfo", "uOwner", "uInfoWidth", "uTime", "uMode", "uParchment", "uParchmentDark", "uTerrain", "uDepth", "uFoam", "uInk", "uHighlight", "uSand", "uForbid", "uAtlas", "uMini", "uLand", "uSeason"]) {
+    for (const name of ["uCenter", "uZoom", "uView", "uIds", "uTileOrigin", "uTileSize", "uInfo", "uOwner", "uInfoWidth", "uTime", "uMode", "uParchment", "uParchmentDark", "uTerrain", "uDepth", "uFoam", "uInk", "uHighlight", "uSand", "uForbid", "uAtlas", "uMini", "uLand", "uSeason", "uTown", "uTownAtlas", "uLiving", "uFiefs", "uRoad", "uSubject", "uSubjectOf", "uHunt"]) {
       this.u[name] = gl.getUniformLocation(this.program, name);
     }
 
@@ -601,11 +782,23 @@ export class MapRenderer {
     this.ownerTex = makeDataTexture(gl, this.infoWidth, rows);
     this.seasonData = new Uint8Array(this.infoWidth * rows * 4);
     this.seasonTex = makeDataTexture(gl, this.infoWidth, rows);
+    this.subjectData = new Uint8Array(this.infoWidth * rows * 4);
+    this.subjectTex = makeDataTexture(gl, this.infoWidth, rows);
+    this.subjectOfData = new Uint8Array(this.infoWidth * rows * 4);
+    this.subjectOfTex = makeDataTexture(gl, this.infoWidth, rows);
+    this.huntData = new Uint8Array(this.infoWidth * rows * 4);
+    this.huntTex = makeDataTexture(gl, this.infoWidth, rows);
 
     const atlas = buildTileAtlas();
     this.atlasTex = makeDataTexture(gl, atlas.width, atlas.height);
     gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, atlas.width, atlas.height, gl.RGBA, gl.UNSIGNED_BYTE, atlas.rgba);
     if (atlas.height !== ATLAS_ROWS * TILE) throw new Error("tile atlas has the wrong size");
+    this.townData = new Uint8Array(this.infoWidth * rows * 4);
+    this.townTex = makeDataTexture(gl, this.infoWidth, rows);
+    const town = buildTownAtlas();
+    if (town.width !== TOWN_VARIANTS * TOWN_TILE || town.height !== TOWN_ROWS * TOWN_TILE) throw new Error("town atlas has the wrong size");
+    this.townAtlasTex = makeDataTexture(gl, town.width, town.height);
+    gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, town.width, town.height, gl.RGBA, gl.UNSIGNED_BYTE, town.rgba);
     const mini = buildMiniAtlas();
     this.miniTex = makeDataTexture(gl, mini.width, mini.height);
     gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, mini.width, mini.height, gl.RGBA, gl.UNSIGNED_BYTE, mini.rgba);
@@ -619,6 +812,8 @@ export class MapRenderer {
       const start = ((y + row) * this.map.width + x) * 4;
       pixels.set(this.map.rgba.subarray(start, start + texW * 4), row * texW * 4);
     }
+    // The alpha holds the settlement byte (VIEW-115), none until the living map lays its towns.
+    for (let i = 3; i < pixels.length; i += 4) pixels[i] = 0;
     const texture = gl.createTexture()!;
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
@@ -653,8 +848,9 @@ export class MapRenderer {
    * lord: the lord holding it, -1 for royal land (drawn as a fief border and a pattern).
    * fade: land drawn faded to grey, so the provinces that are not stand out.
    * closed: land the armies being moved may not enter, drawn with red borders.
+   * wash: unowned land a data lens still washes in rgb (the Charts lens's empty coasts).
    */
-  setProvinceStyle(i: number, rgb: readonly number[], owner: number, terrain: number, flags: number, water = false, lord = -1, fade = false, closed = false): void {
+  setProvinceStyle(i: number, rgb: readonly number[], owner: number, terrain: number, flags: number, water = false, lord = -1, fade = false, closed = false, wash = false): void {
     const o = i * 4;
     this.infoData[o] = rgb[0]!;
     this.infoData[o + 1] = rgb[1]!;
@@ -663,8 +859,94 @@ export class MapRenderer {
     const ow = owner + 1;
     this.ownerData[o] = (ow >> 8) & 255;
     this.ownerData[o + 1] = ow & 255;
-    this.ownerData[o + 2] = water ? 255 : (fade ? 64 : 0) | (closed ? 16 : 0);
+    this.ownerData[o + 2] = water ? 255 : (fade ? 64 : 0) | (closed ? 16 : 0) | (wash ? 32 : 0);
     this.ownerData[o + 3] = lord >= 0 ? (lord % 255) + 1 : 0;
+  }
+
+  /** A province's town for the living map: walls (0 none, 1 palisade, 2 stone), road grade (0 track, 1 road, 2 paved), worship variant and style. */
+  setTownInfo(i: number, walls: number, roadGrade: number, worship: number, style: number): void {
+    const o = i * 4;
+    this.townData[o] = walls;
+    this.townData[o + 1] = roadGrade;
+    this.townData[o + 2] = worship;
+    this.townData[o + 3] = style;
+    this.townDirty = true;
+  }
+  private townDirty = false;
+
+  /** How far the living map has faded in, 0..1 (VIEW-101). */
+  living = 0;
+
+  /**
+   * Writes the settlement bytes of a box of map pixels into the alpha of the
+   * id textures it touches, leaving the rest of the GPU's copy alone (VIEW-115).
+   */
+  setSettlement(bytes: Uint8Array, box: { x0: number; y0: number; x1: number; y1: number }): void {
+    const gl = this.gl;
+    const W = this.map.width;
+    gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
+    for (const t of this.tiles) {
+      const x0 = Math.max(box.x0, t.x), y0 = Math.max(box.y0, t.y);
+      const x1 = Math.min(box.x1, t.x + t.texW - 1), y1 = Math.min(box.y1, t.y + t.texH - 1);
+      if (x1 < x0 || y1 < y0) continue;
+      const w = x1 - x0 + 1, h = y1 - y0 + 1;
+      const buf = new Uint8Array(w * h * 4);
+      for (let y = 0; y < h; y++) {
+        const row = (y0 + y) * W + x0;
+        buf.set(this.map.rgba.subarray(row * 4, (row + w) * 4), y * w * 4);
+        for (let x = 0; x < w; x++) buf[(y * w + x) * 4 + 3] = bytes[row + x]!;
+      }
+      gl.bindTexture(gl.TEXTURE_2D, t.texture);
+      gl.texSubImage2D(gl.TEXTURE_2D, 0, x0 - t.x, y0 - t.y, w, h, gl.RGBA, gl.UNSIGNED_BYTE, buf);
+    }
+  }
+
+  /**
+   * Marks a province's owner as a subject for the world-zoom map (SUBJ-093):
+   * overlordRgb is its direct overlord's colour (the wash), overlord that
+   * overlord's index (for the dotted border); overlord -1 clears it. The
+   * texture is sent with the next upload only when something changed.
+   */
+  setProvinceSubject(i: number, overlord: number, overlordRgb: readonly number[] | null): void {
+    const o = i * 4;
+    const on = overlord >= 0 && overlordRgb !== null;
+    const ow = on ? overlord + 1 : 0;
+    const s = this.subjectData;
+    const f = this.subjectOfData;
+    const r = on ? overlordRgb[0]! : 0;
+    const g = on ? overlordRgb[1]! : 0;
+    const b = on ? overlordRgb[2]! : 0;
+    const a = on ? 255 : 0;
+    const hi = (ow >> 8) & 255;
+    const lo = ow & 255;
+    if (s[o] === r && s[o + 1] === g && s[o + 2] === b && s[o + 3] === a && f[o] === hi && f[o + 1] === lo) return;
+    s[o] = r;
+    s[o + 1] = g;
+    s[o + 2] = b;
+    s[o + 3] = a;
+    f[o] = hi;
+    f[o + 1] = lo;
+    this.subjectDirty = true;
+  }
+
+  /**
+   * Marks a province as a tribe's hunting ground (TRIBE-028): rgb is the
+   * tribe's colour, null clears it; claim draws the hatch fainter, for a claim
+   * under way. Sent with the next upload only when something changed.
+   */
+  setProvinceHunt(i: number, rgb: readonly number[] | null, claim: boolean): void {
+    const o = i * 4;
+    const h = this.huntData;
+    const r = rgb ? rgb[0]! : 0;
+    const g = rgb ? rgb[1]! : 0;
+    const b = rgb ? rgb[2]! : 0;
+    const a = rgb ? (claim ? 110 : 255) : 0;
+    if (h[o] === r && h[o + 1] === g && h[o + 2] === b && h[o + 3] === a) return;
+    h[o] = r;
+    h[o + 1] = g;
+    h[o + 2] = b;
+    h[o + 3] = a;
+    this.huntDirty = true;
   }
 
   /** Every province's season for this turn, four bytes each, as seasonBytes() packs them. */
@@ -681,6 +963,23 @@ export class MapRenderer {
     gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, this.infoWidth, rows, gl.RGBA, gl.UNSIGNED_BYTE, this.infoData);
     gl.bindTexture(gl.TEXTURE_2D, this.ownerTex);
     gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, this.infoWidth, rows, gl.RGBA, gl.UNSIGNED_BYTE, this.ownerData);
+    if (this.townDirty) {
+      gl.bindTexture(gl.TEXTURE_2D, this.townTex);
+      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, this.infoWidth, rows, gl.RGBA, gl.UNSIGNED_BYTE, this.townData);
+      this.townDirty = false;
+    }
+    if (this.subjectDirty) {
+      gl.bindTexture(gl.TEXTURE_2D, this.subjectTex);
+      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, this.infoWidth, rows, gl.RGBA, gl.UNSIGNED_BYTE, this.subjectData);
+      gl.bindTexture(gl.TEXTURE_2D, this.subjectOfTex);
+      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, this.infoWidth, rows, gl.RGBA, gl.UNSIGNED_BYTE, this.subjectOfData);
+      this.subjectDirty = false;
+    }
+    if (this.huntDirty) {
+      gl.bindTexture(gl.TEXTURE_2D, this.huntTex);
+      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, this.infoWidth, rows, gl.RGBA, gl.UNSIGNED_BYTE, this.huntData);
+      this.huntDirty = false;
+    }
     if (this.seasonDirty) {
       gl.bindTexture(gl.TEXTURE_2D, this.seasonTex);
       gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, this.infoWidth, rows, gl.RGBA, gl.UNSIGNED_BYTE, this.seasonData);
@@ -728,6 +1027,24 @@ export class MapRenderer {
     gl.activeTexture(gl.TEXTURE6);
     gl.bindTexture(gl.TEXTURE_2D, this.seasonTex);
     gl.uniform1i(this.u.uSeason!, 6);
+    gl.activeTexture(gl.TEXTURE7);
+    gl.bindTexture(gl.TEXTURE_2D, this.townTex);
+    gl.uniform1i(this.u.uTown!, 7);
+    gl.activeTexture(gl.TEXTURE8);
+    gl.bindTexture(gl.TEXTURE_2D, this.townAtlasTex);
+    gl.uniform1i(this.u.uTownAtlas!, 8);
+    gl.uniform1f(this.u.uLiving!, this.living);
+    gl.uniform1i(this.u.uFiefs!, this.fiefs ? 1 : 0);
+    gl.uniform3fv(this.u.uRoad!, ["#8a6a44", PALETTE.clay, "#9a94a0"].flatMap((c) => hexToRgb(c).map((v) => v / 255)));
+    gl.activeTexture(gl.TEXTURE9);
+    gl.bindTexture(gl.TEXTURE_2D, this.subjectTex);
+    gl.uniform1i(this.u.uSubject!, 9);
+    gl.activeTexture(gl.TEXTURE10);
+    gl.bindTexture(gl.TEXTURE_2D, this.subjectOfTex);
+    gl.uniform1i(this.u.uSubjectOf!, 10);
+    gl.activeTexture(gl.TEXTURE11);
+    gl.bindTexture(gl.TEXTURE_2D, this.huntTex);
+    gl.uniform1i(this.u.uHunt!, 11);
     gl.activeTexture(gl.TEXTURE0);
     gl.uniform1i(this.u.uIds!, 0);
 

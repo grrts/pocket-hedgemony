@@ -1,0 +1,68 @@
+{
+ "$comment": "Tribes (domain/tribes/spec.md, TRIBE): tribal realms of North America and their hunting grounds. Values from the tribes design of 18 October 2026; every number is a placeholder balancing knob (DECISIONS rule 4). region_bounds draws each region of tribes.regions as a box of longitude and latitude, read against a realm's capital on the map, since map realms carry no catalogue region. new_tribe_regions, new_tribe_representations, new_tribe_provinces and new_tribes_left_out say which catalogue records the 1444 map adds as new tribes (TRIBE-002 to TRIBE-005); their home points are in packages/rules/data/scenarios/1444/map-nations.json (grows).",
+ "regions": [
+  "am_north"
+ ],
+ "region_bounds": {
+  "am_north": {
+   "west": -170,
+   "east": -50,
+   "south": 24.5,
+   "north": 84
+  }
+ },
+ "tribal_forms": [
+  "clan_council",
+  "chiefdom",
+  "confederation"
+ ],
+ "new_tribe_regions": [
+  "am_north"
+ ],
+ "new_tribe_representations": [
+  "decentralized_polity"
+ ],
+ "new_tribe_provinces": {
+  "B": 2,
+  "C": 1
+ },
+ "new_tribes_left_out": {
+  "$comment": "D-TRIBE-2: decentralised polities of am_north that did not exist on 11 November 1444, or are already map realms under another id.",
+  "susquehannock": "a people that formed c. 1450",
+  "paquime": "background only; abandoned c. 1450",
+  "haudenosaunee": "the map's iroquois",
+  "wendat": "the map's huron",
+  "pueblo_rio_grande": "the map's pueblo"
+ },
+ "range_size": {
+  "clan_council": 2,
+  "chiefdom": 3,
+  "confederation": 4
+ },
+ "claim_months": 3,
+ "reclaim_years": 5,
+ "furs_gold": 0.5,
+ "take_in_years": 10,
+ "settlers_wrong": {
+  "weight": -30,
+  "fade_years": 20
+ },
+ "settlers_punish_years": 10,
+ "land_price": 10,
+ "given_reclaim_years": 10,
+ "ask": {
+  "base": -5,
+  "per_gold": 1,
+  "gold_max": 40,
+  "standing_divisor": 4,
+  "settlers_held": -25,
+  "hostile": -30,
+  "one_ground_left": -10,
+  "last_ground": -100,
+  "answer_months": 1
+ },
+ "ai": {
+  "ask_when_gold_times": 2,
+  "answered_years": 10
+ }
+}

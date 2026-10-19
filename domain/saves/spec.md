@@ -35,16 +35,18 @@ Not in scope (owned by …):
 
 Newest decision first.
 
-1. `save-system/README.md`, second draft 2026-10-16, §8 Decisions (settled by Leroy on 16 Oct: Export and
+1. `accounts/accounts-design.md`, draft 1, 19 October 2026 (agreed by Leroy on 19 Oct: one account with several
+   sign-ins, store sign-ins at launch, purchases per store), §4 and §5.
+2. `save-system/README.md`, second draft 2026-10-16, §8 Decisions (settled by Leroy on 16 Oct: Export and
    Import yes; cloud saves on our Symfony server with optional accounts; default autosave every 12 months plus
    the Resume save every turn; cross-store cloud saves at launch, purchases stay per store), and all of §1–§7, §9.
-2. `save-system/save-config.example.yaml` (the configuration the rules describe).
-3. `planning/gap-lists.md` "Decisions already made" (campaign to 31 August 1939; business model: paid full
+3. `save-system/save-config.example.yaml` (the configuration the rules describe).
+4. `planning/gap-lists.md` "Decisions already made" (campaign to 31 August 1939; business model: paid full
    game, Steam demo, free mobile download with in-app purchases), List 2 item 3, List 3 items 2, 3, 7, 9, 13, 14.
-4. Read for seams only: `achievements/achievements-design.md` v1.1 (16 Oct: every achievement is ironman-only;
+5. Read for seams only: `achievements/achievements-design.md` v1.1 (16 Oct: every achievement is ironman-only;
    flags `ironman_unbroken`, `cheat_marked`, `switched_country`), `settings/settings-design.md` v2 §4, §5.3,
    §5.7, `screen-flow/screen-flow-design.md` §3 S4, S6, §4.5, §4.6, §6, `tutorial/tutorial-design.md` §9, §12.
-5. Today's code: `packages/engine/src/protocol.ts` (`newGame` with seed and player nation only; `endTurn`
+6. Today's code: `packages/engine/src/protocol.ts` (`newGame` with seed and player nation only; `endTurn`
    with `Order[]`), `hashWorld`, `createEngineHost`; the server can only register accounts (`POST /api/accounts`).
 
 ## 3. Ubiquitous language
@@ -214,6 +216,10 @@ Newest decision first.
 - SAVE-049: If a save's `formatVersion` is newer than the build's, then the save system shall not open it and shall say "This save is from a newer version of Pocket Hegemony. Update the game to open it." [save-system §4.4, §2.5]
 - SAVE-050: Each release shall add at least two saves from that build (one early game, one late game) to `packages/engine/test/saves/`; every test run shall load every save from every earlier release and run one turn; a release shall not ship if any old save fails; the changelog shall say when a release changes the format. [save-system §4.4]
 - SAVE-051: When a save is loaded into a build with changed rules, the rule changes shall apply from the next turn on, with the saved `Rng` state, so a balance patch changes outcomes from then on but never corrupts the save. [save-system §4.4]
+- SAVE-111: A save shall record the start its campaign began from (`start` in the header; a save without one began in
+  1444, before campaigns moved to 1378). When the player opens a save from another start, the game shall reopen in that
+  start's world and load the save there, without asking; the save system shall never open a save in another start's
+  world. Exit to main menu shall return to the default start, so new campaigns begin in 1378. [X-25; SETUP-095]
 
 ### 5.8 Cloud saves
 
@@ -224,7 +230,7 @@ Newest decision first.
 - SAVE-056: When the player deletes a campaign, the save system shall delete it from the cloud too. [save-system §5.1]
 - SAVE-057: When the player signs in with email and password (`POST /api/sessions`), the server shall return a short-lived access token and a long-lived device token, kept in the platform's secure storage (Keychain on iOS, Keystore on Android, `safeStorage` in Electron); each device shall show in the account's device list and can be signed out from any other. [save-system §5.2]
 - SAVE-058: The server shall offer password reset by email, and account deletion that also deletes every save. [save-system §5.2]
-- SAVE-059: The save system shall launch with email and password sign-in only; Sign in with Apple, Google and a Steam session ticket come later, and if Google sign-in is offered on iOS, Sign in with Apple shall be offered too. [save-system §5.2, §8.7]
+- SAVE-059: The save system shall launch with these sign-ins, the ones that need no typing first: on Steam, Steam and email; on iOS and iPadOS, Sign in with Apple, Steam and email; on Android, Google, Steam and email; on the web, Steam, Google, Sign in with Apple and email; wherever another third-party sign-in is offered on iOS, Sign in with Apple shall be offered too. [accounts-design §4; D-SAVE-18]
 - SAVE-060: The save system shall offer sign-in from a Cloud saves row in Settings and a "Sign in to sync" prompt on the Load screen, never as a wall before playing. [save-system §5.2]
 - SAVE-061: The server shall keep a `Save` table of the header fields the Load screen needs (account, campaign, save id, kind, name, saved at, device, platform, game version, format version, turn, date, nation, ironman, size, deleted at) and put the file bytes in S3-compatible object storage under `<accountId>/<campaignId>/<saveId>.phsave`, not in the database. [save-system §5.2]
 - SAVE-062: When a save is removed, the server shall mark it deleted with a tombstone so other devices learn of it, and purge the bytes after 30 days. [save-system §5.2; config `cloud.server.tombstone_purge_days`]
@@ -238,6 +244,16 @@ Newest decision first.
 - SAVE-070: The server shall apply a rate limit per account and per device. [save-system §5.2]
 - SAVE-071: Where the server later needs to trust a save (for example before it counts toward a leaderboard), it may load it with the engine (`createEngineHost`) and check `worldHash`. [save-system §5.2]
 - SAVE-072: The server shall sync saves, not purchases: a campaign synced from one store opens on another device only if its nation is unlocked there. [save-system §5.2, §8.4]
+
+#### Sign-ins and devices
+
+- SAVE-112: One account shall hold one or more sign-ins (Steam, Sign in with Apple, Google, email and password), and each Steam account, Apple id, Google id or email address shall belong to at most one account. [accounts-design §4, §5]
+- SAVE-113: When the player signs in with Steam, the game shall send a Steam Web API ticket for the identity `pockethegemony`; the server shall check it with Steam (`ISteamUserAuth/AuthenticateUserTicket`), open the account that holds that SteamID, or make one with the player's Steam name as display name when none does. [accounts-design §4]
+- SAVE-114: The server shall return the same pair for every way of signing in: an access token that lasts 15 minutes and a device token that lasts until the device is signed out, and shall store both only as hashes. [accounts-design §4; config `cloud.server.access_token_minutes`; placeholder]
+- SAVE-115: When a device refreshes its access token with its device token, the server shall give it a new device token and refuse the old one from then on. [accounts-design §4]
+- SAVE-116: When a device is signed out, from itself or from another device of the account, the server shall refuse its device token and its access token at once. [save-system §5.2; accounts-design §3]
+- SAVE-117: If email sign-in fails 5 times within 15 minutes for one address from one place, then the server shall refuse further tries until the 15 minutes have passed, as the website's sign-in does. [save-system §5.2 rate limits; config `cloud.server.sign_in_throttle`]
+- SAVE-118: Where the server has no Steam key configured, Steam sign-in shall answer "Steam sign-in is not available" and email sign-in shall keep working. [accounts-design §10]
 
 ### 5.9 Store backups, Export and Import
 
@@ -294,6 +310,11 @@ Newest decision first.
 - SAVE-108: The autosave choices shall live in Settings → Gameplay (Autosave, Autosaves kept), and a toast "Saved." shall show over the map whenever the player saves, never a dialog; autosaves and the Resume save are written quietly after End turn. [X-19; SAVE-022, SET-061, SET-062]
 - SAVE-109: Exit to main menu shall keep the campaign's Resume save current and return to the start screen, where Continue opens it again. [X-19; SAVE-007]
 - SAVE-110: On a phone in landscape the Save and Load cards shall be one scrolling column inside the safe areas, with every button and save line at least 44 points high and nothing that needs hover; on the web the saves shall live in the browser's IndexedDB, one transaction per save written. [X-19; SAVE-032, SAVE-077]
+- SAVE-119: The player shall find everything about the account and cloud saves in one card, Settings → Account and cloud saves, and a "Sign in to keep your saves on every device" line at the bottom of the Load card shall open it while signed out; there shall be no other way in and never a wall before playing. Where the build names no cloud server, neither the section nor the line shall show. [X-19; accounts-design §3; SAVE-060; D-SET-22]
+- SAVE-120: While signed out, the card shall hold the email sign-in (email, password, Sign in) and "Make an account" (email, display name, password), which signs the new account in on this device; a failed try shall say why in the card ("Wrong email or password.", "Too many tries. Wait 15 minutes and try again.") and keep the email typed. The store sign-ins (Steam, Sign in with Apple, Google; SAVE-059) shall join the card above the email form when they are built. [accounts-design §3, §4; SAVE-057, SAVE-117]
+- SAVE-121: While signed in, the card shall show the display name and email, the cloud's status line as the overview of cloud state ("Up to date", "3 saves waiting to upload", "Offline, will sync when connected", "Storage full"), Storage (saves and megabytes used against the quota), Devices (name, platform, last seen, and Sign out on each, which asks first) and Sign out of this device; signing in sends up the synced set the device already holds. "Sync on Wi-Fi only" (SAVE-067), Sign-ins and Delete account shall join the card when they are built. [accounts-design §3; SAVE-055, SAVE-069, SAVE-116]
+- SAVE-122: The Load card shall list the saves other devices put in the cloud with this device's own, each line from another device marked "from <device>", and download a save's bytes only when it is opened ("Connect to open this save from the cloud." while offline); Continue shall name the device of a save from another device (SAVE-014), and a campaign played on two devices shall show where each left off. Deleting a save on the Load card shall delete it in the cloud too. [accounts-design §3; SAVE-053, SAVE-054, SAVE-062, SAVE-064]
+- SAVE-123: On a phone in landscape the Account and cloud saves card shall be one scrolling column inside the safe areas in both the Wide and Tall layouts, with full-width fields and buttons at least 44 points high (Sign in and Sign out 48), and nothing that needs hover. [X-19; accounts-design §3]
 
 ## 6. Commands
 
@@ -456,6 +477,7 @@ None. AI countries' state is saved like any other (later an `ai` chunk); no AI d
 - **D-SAVE-15** (was OQ-SAVE-15) Importing an ironman save needs a connection: offline, the import is refused with "Connect to import an ironman save", so the head check always runs. It closes the split with no new state.
 - **D-SAVE-16** (was OQ-SAVE-16) Every way out of an ironman campaign is an exit: "Save and quit", "Exit to main menu" and the app being closed write the ironman save; a kill mid-turn resumes from the Resume save and journal like any campaign. One rule for all exits.
 - **D-SAVE-17** The Load card lists each campaign's Resume save as its first line, "Where you left off", although SAVE-013 keeps Resume saves out of Load: with several campaigns and no manual saves, Continue alone reaches only the newest, and the player would have no way back to the others. One line per campaign, so the list stays short (X-19).
+- **D-SAVE-18** (Leroy, 19 Oct) Store sign-ins at launch, replacing "email and password only" in SAVE-059: on a Steam Deck or a phone a password is the step most players skip, and Steam sign-in on the phone links a Steam account to the phone with no email. One account gathers several sign-ins (SAVE-112), and purchases stay per store (SAVE-072, decided again on 19 Oct). Source: `accounts/accounts-design.md`.
 
 ## 14. Traceability
 
@@ -586,3 +608,7 @@ None. AI countries' state is saved like any other (later an `ai` chunk); no AI d
 | SAVE-103 | resume-and-orders-journal.feature | A choice at a before-the-battle stop goes into the journal |
 | SAVE-104 | cloud-sync.feature | Personal settings ride the account sync |
 | SAVE-105 … SAVE-110 | — | Client screens; checked by apps/client/scripts/saves-shots.mjs |
+| SAVE-111 | — | engine unit test `saves-start.test.ts` (the header names the start; a save from another start is refused); the client reopens in the save's start (main.ts `loadSave`) |
+| SAVE-112 … SAVE-118 | sign-in.feature | Server sign-in; checked by `server/tests/Controller/SessionTest.php` |
+| SAVE-061 … SAVE-070 | cloud-sync.feature | The server's side as well: `server/tests/Controller/SavesTest.php` (`App\Controller\SavesController`) |
+| SAVE-119 … SAVE-123 | — | Client screens; checked by `apps/client/src/cloud/sync.test.ts` (the card) and `api.test.ts` (sign-in messages) |

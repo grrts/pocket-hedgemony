@@ -148,7 +148,7 @@ Config split: turkic → `mena` if the nation's capital is west of longitude 55,
 - Peace regional (24): `peace_<palette>_<early|late>`; early written for Eras I–III, late for IV–V; era
   arrangement variants give 60 palette × era combinations.
 - Peace era themes (5): `era_1` … `era_5`, shared by all nations, between palettes; play once in full after an era change.
-- Situations and moods (7): `diplomacy` (realm book open on Abroad; single quiet layer; regional W lead);
+- Situations and moods (7): `diplomacy` (realm book open on its Diplomacy section; single quiet layer; regional W lead);
   `prosperity` (brighter variant of the palette's track key); `unrest` (base + drone; second layer when rebels
   are in the field); `crisis` (disaster, plague, famine or succession crisis chain active; low pulses,
   irregular noise, no melody until resolved); `revolution` (revolution period touching the player, Era IV on;
@@ -172,7 +172,7 @@ Config split: turkic → `mena` if the nation's capital is west of longitude 55,
 2. Losing war: `war_losing`.
 3. Active war: `world_war` > `war_naval` > `war_siege` > `war_campaign` > `war_mobilize`.
 4. Crisis: `revolution` > `crisis` > `unrest`.
-5. Screen moods: `diplomacy` (realm book on its Abroad tab).
+5. Screen moods: `diplomacy` (realm book on its Diplomacy section).
 6. Good times: `prosperity`, `exploration`.
 7. Peace rotation.
 
@@ -335,14 +335,14 @@ Group counts: ui 21, frame 6, turn 5, map 8, army/fleet 15, battle 18, siege 10,
 ### Originality and sound character (both)
 - AUD-001 The audio context shall use only original music, with no melody, track name or soundtrack structure from Europa Universalis or any other commercial game, no national anthems and no modern copyrighted songs; public-domain folk tunes may inspire an idiom only, with every melody newly written. [music intro]
 - AUD-002 The audio context shall make every effect original and synthesized, with no samples, no sound from another game and no recorded real-world audio. [sfx intro]
-- AUD-003 The audio context shall synthesize all music and effects at runtime on the PH-5 chip from note data, shipping no audio files. [music §2, §7.1; sfx §3]
+- AUD-003 The audio context shall synthesize every effect at runtime on the PH-5 chip, and play the music's own written tunes from note data on the sampled period instruments of D-AUD-16; the only audio files it ships are those instrument packs (one pack of single notes per instrument), never a recorded piece of music. [music §2, §7.1; sfx §3; D-AUD-16]
 
 ### PH-5 music voices
 - AUD-004 The audio context shall play music on five voices at most: P1 and P2 (pulse, duty 12.5/25/50/75 %, 16-step volume envelope, vibrato, pitch slide), T (4-bit stepped triangle, on/off only), W (32-sample 4-bit wavetable, swappable per pattern) and N (noise, long and short LFSR, envelope). [music §2]
 - AUD-005 While the music era is V, the audio context shall allow one optional sixth music voice, a second wavetable W2 for brass and string sections. [music §2; config eras.bands V extra_voice]
 - AUD-006 The audio context shall fake chords with arpeggios and never play chords on one voice. [music §2]
 - AUD-007 The audio context shall store a tuning table (cents per scale degree) per track. [music §2]
-- AUD-008 The audio context shall allow pitch slides, vibrato, duty sweeps, volume envelopes, one short echo (one tap, 60–250 ms, used sparingly) and per-voice pan up to 30 % off centre, and shall not allow samples, reverb tails or more voices. [music §2]
+- AUD-008 The audio context shall allow pitch slides, vibrato, duty sweeps, volume envelopes, one short echo (one tap, 60–250 ms, used sparingly) and per-voice pan up to 30 % off centre, and shall not allow samples other than the instrument packs (D-AUD-16), reverb tails or more voices. [music §2; D-AUD-16]
 - AUD-009 The audio context shall place bass lines an octave higher than a console would and keep the triangle's stepped shape, so bass is heard on phone speakers that can't reproduce much below about 200 Hz. [music §2]
 - AUD-010 The audio context shall apply a gentle low-pass around 9 kHz to the master mix. [music §2; config mix.master_lowpass_hz]
 
@@ -352,7 +352,7 @@ Group counts: ui 21, frame 6, turn 5, map 8, army/fleet 15, battle 18, siege 10,
 - AUD-013 The `turn_end` effect shall play motif notes 1 – 5 and the `turn_ready` effect shall answer with notes 4 – 5 – 1↑. [sfx §1, §5.3]
 
 ### Music eras
-- AUD-014 The audio context shall pick the music era from the game year using the bands I 1444–1519, II 1520–1649, III 1650–1789, IV 1790–1869, V 1870–31 August 1939. [music §3.2; config eras]
+- AUD-014 The audio context shall pick the music era from the game year using the bands I from the start (1378)–1519, II 1520–1649, III 1650–1789, IV 1790–1869, V 1870–31 August 1939. [music §3.2; config eras; plan-1378 §3.1]
 - AUD-015 The audio context shall take era boundaries from configuration. [music §3.2]
 - AUD-016 The audio context shall use the calendar as the only era basis in play, keeping the technology basis in config, turned off and not offered as a campaign rule (D-AUD-4). [music §3.2, §10.2; config eras.basis]
 - AUD-017 The audio context shall play no music for ages that fall after the campaign end (Decolonization, Cold War, Globalization) and have no era after V; music stops at the campaign end. [music §3.2; config eras.campaign_end]
@@ -436,9 +436,9 @@ Group counts: ui 21, frame 6, turn 5, map 8, army/fleet 15, battle 18, siege 10,
 
 ### Ambience
 - AUD-079 Where ambience is on, the audio context shall play the bed chosen by what is under the camera at regional or local zoom, one of the ten `amb_` beds, each a 4–12 s loop of noise and occasional wavetable notes. [sfx §5.12]
-- AUD-080 The audio context shall keep ambience off by default. [sfx §5.12, §15.2; music §10.3]
+- AUD-080 The audio context shall have ambience on by default. [sfx §5.12, §15.2; music §10.3; D-AUD-17]
 - AUD-081 The audio context shall not simulate weather beds; in winter months the plain and forest beds are windier. [sfx §5.12]
-- AUD-082 Where ambience is on, it may fill the silences between peace tracks. [music §5.4; sfx §5.12]
+- AUD-082 Where ambience is on, it shall play under the map at its full level in the silences between tracks and about 10 dB lower under a playing track. [music §5.4; sfx §5.12; D-AUD-17]
 
 ### Many things at once
 - AUD-083 When a new turn is shown, the turn results player shall play at most 5 effect sounds, 150 ms apart: first things that happened to the player's armies, castles or ruler (highest priority first), then things in view; everything else is shown without sound. [sfx §6.1; config turn_results]
@@ -453,7 +453,7 @@ Group counts: ui 21, frame 6, turn 5, map 8, army/fleet 15, battle 18, siege 10,
 - AUD-090 When the music has a stinger for a moment, the audio context shall not mark the same moment with an effect, except that effects may lead in to a stinger, never playing over its tune. [sfx §7.1]
 - AUD-091 While a stinger plays, the audio context shall drop effects of priority 3 to 5 and duck effects of priority 1 and 2 by 4 dB. [sfx §7.2; config ducking]
 - AUD-092 The audio context shall let effects duck music only for the six listed sounds (`battle_start`, `siege_breach`, `siege_storm`, `realm_rising`, `realm_ruler_dies`, `sea_battle_start`), by 4 dB for their length; no other sound ducks music, whatever its length (D-AUD-8). [sfx §7.2; config ducking.effects_duck_music]
-- AUD-093 The audio context shall duck the ambience bed by 6 dB under any effect of priority 1 or 2 and fade it out over 2 s when a music track starts. [sfx §7.2]
+- AUD-093 The audio context shall duck the ambience bed by 6 dB under any effect of priority 1 or 2 and dip it under the track (AUD-082) over 2 s when a music track starts, bringing it back when the track ends. [sfx §7.2; D-AUD-17]
 - AUD-094 While the game menu is open, the audio context shall leave the music unchanged (no duck; `pause_music_db` is dropped, D-AUD-8). [sfx §5.2, §14]
 - AUD-095 The audio context shall mix a `ui_tap` about 6 dB below the music's average and let a priority 1 sound peak about 3 dB above it, with the whole mix at −16 LUFS. [sfx §7.3; config mix.target_loudness_lufs]
 - AUD-096 When several achievements unlock in one turn, `ui_achievement` shall play once. [sfx §14]
@@ -518,6 +518,11 @@ Group counts: ui 21, frame 6, turn 5, map 8, army/fleet 15, battle 18, siege 10,
 - AUD-141 Until the MML track build (AUD-097) and the AudioWorklet synth (AUD-104) exist, the client shall synthesize the chip's tracks and effects in the page into sample buffers, a track at a time between frames, and stand a written track in for any track id of the list not yet written (palette peace tracks share one tune per half of the eras, played in each palette's tuning, key and wavetable). [D-AUD-13]
 - AUD-142 Sound settings shall be kept on the device (Device group, SET-023), never in a save. [SET-023]
 - AUD-143 The client shall play the music, not the effects, on softened voices: the pulse, bass and wavetable voices band-limited with their upper harmonics rolled off and smooth (not 16-step) envelopes, a pad voice that holds each bar's chord, tuned drums (falling-pitch skins, a woodblock, brushed and breathy noise) in place of raw noise bursts, a low-pass at 6 kHz and a small hall; a loop's hall tail wraps into its start so it repeats without a seam. The effects stay on the chip voices of AUD-057. [D-AUD-14; playtest 17 Oct, feedback 79]
+- AUD-145 The client shall play every music voice on its palette's band of sampled instruments (D-AUD-16): the lead (P1) on the band's lead, or its war lead on war tracks and battle stingers; the answer (P2), the regional voice (W), the bass (T) and the held chords (S) on theirs; a part that asks for its own timbre (a horn, an organ) on the instrument standing for it; the kick, boom and wood drums on sampled taiko, timpani and woodblock, with the snare and crash staying synthesized. A note takes the nearest sample and is retuned to its pitch, so each palette's tuning table plays true; bowed, blown and sung notes held past their sample loop its middle. [D-AUD-16]
+- AUD-146 The client shall fetch a palette's instrument packs before the first track of that palette and keep them for the visit; a pack that can't be fetched or decoded plays its parts on the soft chip voices of AUD-143, so the music never stops for a missing file. [D-AUD-16; AUD-111]
+- AUD-147 The More card of the start screen shall credit the instruments: "Music played on the Fluid R3 GM soundfont by Frank Wen (CC BY 3.0)." [D-AUD-16]
+- AUD-148 The client shall synthesize each ambience bed as a 12-second stereo loop, in a worker where the browser allows one: wind as moving bands of noise with gusts, surf in swells, birds as quick gliding whistles, cicadas, frogs, a town's murmur with a bell and a smith's hammer, and far thumps and clangs at a war front, under a gentle low-pass so nothing hisses. It shall pick the bed each second from the province in the middle of the map, with regional zoom from 2 and local zoom from 8, and a big settlement being a capital or a province of at least 100,000 people; a new bed crosses over the old one in 2 s. The Sound card shall carry an Ambience row (volume and On/Off) beside Effects, and Settings → Audio its two rows. [D-AUD-17; AUD-138]
+- AUD-144 The written tunes shall be harmony first: every bar has a chord, the lead lands on a note of it on the beat, the bass walks the chord roots and fifths, and peace tunes use chords on degrees 1, 3, 4 and 5 only, so they stay consonant in every palette. A held chord drops any note within a semitone or a tritone of a lower one in the palette's tuning. [D-AUD-15; feedback 79]
 
 ## 6. Commands
 
@@ -576,7 +581,7 @@ Audio runs on the client main thread and never feeds back into the engine.
 | Key | Meaning | Value in the design | Placeholder? | Config file |
 |---|---|---|---|---|
 | `eras.basis` | calendar or technology | calendar | no (decided) | music.yaml |
-| `eras.bands` | Era start years | I 1444, II 1520, III 1650, IV 1790, V 1870 (W2) | yes ("design values for a first pass") | music.yaml |
+| `eras.bands` | Era start years | I 1378 (the start), II 1520, III 1650, IV 1790, V 1870 (W2) | yes ("design values for a first pass") | music.yaml |
 | `eras.campaign_end` | Music stops | 1939-08-31 | no | music.yaml |
 | `palettes.*` | Culture group → palette | as palette table | yes | music.yaml |
 | `palettes.split.turkic` | Longitude split | west of 55 → mena, else steppe | yes | music.yaml |
@@ -692,6 +697,9 @@ None. Audio reacts to the player's view and nation only; computer players hear n
 - **D-AUD-12** (was OQ-AUD-12) Catalogue defaults: `ui_tooltip` is never played (no setting turns it on); all five haptic moments are "light" (§15.3 is later); the `final_result` screen plays `campaign_end`. The later decision and the screen list win.
 - **D-AUD-13** (17 Oct, Leroy: pull music and sound forward for playtesting) The music and effects are built ahead of their milestones in a first cut: the director, 16 written tracks (title, two peace tunes per half of the eras, prosperity, diplomacy, the five war and situation tracks with layers, six stingers) and 30 effects, synthesized in the page (AUD-141). The worklet, the MML build, ambience, captions, haptics and the full catalogue follow in their milestones; the palette tunings are drafts awaiting review (OQ-AUD-13).
 - **D-AUD-14** (17 Oct, Leroy: "its not really nice to listen to, it sounds like noise mostly"; the effects are fine) The music leaves the strict PH-5 chip rules of AUD-004 that made it harsh: square and narrow pulses buzzed, the 16-step envelopes and stepped triangle crackled, and the noise voice ticked on most beats. The music keeps the voice roles (P1, P2, T, W, N), the tunes, the motif and the palettes, and plays them soft (AUD-143), with a pad voice holding chords and a small hall where AUD-004 and §2 forbid reverb tails. Measured on the first tracks, spectral flatness (how much of the sound is noise) falls from about 0.36 to under 0.08 and the brightness centre from about 3 kHz to about 1 kHz. The effects keep the chip sound unchanged. The worklet synth (AUD-104) follows this decision when it is built.
+- **D-AUD-15** (18 Oct, feedback 79, second pass) The soft voices fixed the sound but not the writing: tunes ignored their chords (in the early peace tune about a fifth of the time two voices rubbed a semitone or tritone apart, up to 46 % in major palettes, where a chord on degree 7 is diminished), the bass's "fifth" was a tritone on some roots, narrow 12.5 % pulses buzzed, and `b6` and `b7` in minor tunes sounded the wrong notes. The tunes are rewritten harmony first (AUD-144) with the motif kept: the title gets eight bars, the early peace tune a pastoral and a dance, the late one a march, and the war, siege and crisis tracks follow their chords. Clashes fall to about 5 % of the time (passing notes) in every palette, and the lead sits on its chord more than 95 % of the time.
+- **D-AUD-16** (19 Oct, Leroy chose "Real instruments" after the play-hook review, `research/play-hook.md`) The music, reworked twice on chip voices (D-AUD-14, D-AUD-15), still sounded like noise, and EU4's hold comes partly from a score on real instruments. Our own tunes, the motif and the music director stay, but every music voice plays on sampled period instruments (AUD-145), one band per palette: Western Europe recorder, flute and lute (nylon guitar), Eastern Europe fiddle and dulcimer, the Middle East oboe and qanun (koto) with the shawm in war, the Steppe fiddle and dombra (shamisen), South Asia flute and sitar, East Asia shakuhachi and koto, Southeast Asia flute and gambang (marimba), West Africa kora (harp) and balafon (marimba), East and Southern Africa flute and mbira (kalimba), the Americas pan flute and ocarina, Oceania flute and marimba, the Atlantic fiddle and banjo; cello and a string section under all of them, a choir under the title, trumpets, horns or shawms leading in war. The notes come from the Fluid R3 GM soundfont (Frank Wen, CC BY 3.0, credited by AUD-147), cut by `tools/music-samples` into 27 packs of 2 to 15 notes (3.6 MB in all, about 1 MB a palette). It overturns "no samples, no audio files" for the music only (AUD-003, AUD-008); the effects keep the chip (AUD-002).
+- **D-AUD-17** (19 Oct, Leroy chose "Real instruments", which put the map ambience on by default with it) EU4's map is never silent. The ambience bed goes on by default (AUD-080) and plays under the music, about 10 dB down, and at full level in the silences between tracks (AUD-082, AUD-093), where before it was off and heard only in the silences. The beds stay synthesized (AUD-148). A device that saved the old default gets ambience on once.
 - **OQ-AUD-13** Palette reviewers and listening approval (release task): each palette needs a paid reviewer of its tradition, and every track needs Leroy's listening approval, before release.
 
 ## 14. Traceability
@@ -721,4 +729,6 @@ None. Audio reacts to the player's view and nation only; computer players hear n
 | AUD-135 | music-and-effects-together.feature | Tutorial and Needs attention sounds |
 | AUD-136 | busy-turns-and-mixing.feature | Only the battle on screen is heard |
 | AUD-137 | effects-era-and-region.feature | Weekly turns and the new year chime |
-| AUD-138 … AUD-143 | — | Client screens and synth; checked by apps/client/scripts/sound-shots.mjs and src/audio/audio.test.ts |
+| AUD-138 … AUD-144 | — | Client screens and synth; checked by apps/client/scripts/sound-shots.mjs and src/audio/audio.test.ts |
+| AUD-145 … AUD-147 | — | Sampled instruments; checked by apps/client/src/audio/samples.test.ts |
+| AUD-148 | — | Ambience beds in the client; checked by apps/client/src/audio/ambience.test.ts |

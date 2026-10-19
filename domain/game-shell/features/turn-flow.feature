@@ -146,7 +146,7 @@ Feature: The turn on screen
     Examples:
       | place              |
       | the turn report    |
-      | the tab "Chronicle" |
+      | the News           |
 
   @SHELL-079
   Scenario Outline: Interrupted at a battle
@@ -176,15 +176,16 @@ Feature: The turn on screen
     And the map can be used
     And the event is still unanswered
 
-  @SHELL-082
+  @SHELL-082 @SHELL-147
   Scenario Outline: Turn report
+    # SHELL-147 (feedback 72) replaces the report sliding in: it goes into the Dispatches, which never open by themselves.
     Given the turn <happened>
     When the turn ends
     Then <result>
 
     Examples:
       | happened                              | result                                                                                 |
-      | had something worth reporting         | the turn report slides in from the edge as a card, each line jumping to its place      |
+      | had something worth reporting         | the report goes into the Dispatches without opening, each line jumping to its place    |
       | had nothing worth reporting           | no turn report opens and only the date in the top bar changes                          |
 
   @SHELL-082

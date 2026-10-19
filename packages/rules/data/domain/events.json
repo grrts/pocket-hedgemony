@@ -1,7 +1,6 @@
 {
  "$comment": "Event tree rules (domain/events/spec.md). balance = event-tree/data/balance.yaml; vocabulary, enums and statistics are the event tree's closed lists. All balance values are placeholders.",
  "campaign": {
-  "start_year": 1444,
   "end_date": "1939-08-31",
   "out_of_scope_ages": [
    "age_of_decolonization",
@@ -144,7 +143,8 @@
    "relation": [
     "who",
     "other",
-    "type"
+    "type",
+    "kind"
    ],
    "opinion": [
     "who",
@@ -219,7 +219,14 @@
    "subject_count": [
     "who",
     "op",
-    "value"
+    "value",
+    "by_reach"
+   ],
+   "subject_loyalty": [
+    "who",
+    "target",
+    "op",
+    "step"
    ],
    "event": [
     "id",
@@ -288,6 +295,20 @@
    "release": [
     "who",
     "target"
+   ],
+   "change_subject_kind": [
+    "who",
+    "target",
+    "kind"
+   ],
+   "add_subject_reason": [
+    "target",
+    "reason",
+    "months"
+   ],
+   "remove_subject_reason": [
+    "target",
+    "reason"
    ],
    "war": [
     "id",
@@ -455,6 +476,7 @@
   ],
   "innovations": [
    "printing",
+   "bombards",
    "humanist_learning",
    "bastion_fortification",
    "gunpowder_infantry",
@@ -586,6 +608,8 @@
   "regency",
   "female_succession",
   "ruler_led_campaign",
+  "emperor",
+  "empire_member",
   "atlantic_island_bases",
   "potato_blight",
   "commercial_crisis",
@@ -1177,5 +1201,43 @@
   "derived_formulas.good_base_yield",
   "derived_formulas.tech_economy_bonus",
   "derived_formulas.terrain_supply_mult"
- ]
+ ],
+ "innovations_from_research": {
+  "$comment": "D-EVT-19: the tree's innovations a realm has adopted include the research inventions it knows, by this table (tree innovation -> research invention).",
+  "bombards": "W3",
+  "gunpowder_infantry": "W5",
+  "ocean_navigation": "S4",
+  "printing": "L5",
+  "humanist_learning": "L6"
+ },
+ "goals": {
+  "$comment": "Realms' historical goals (EVT-100 to EVT-108). Provisional (plan-1378 §2).",
+  "weights": {
+   "weak": 0.5,
+   "normal": 1,
+   "strong": 2
+  },
+  "shake_low": 0.5,
+  "shake_high": 1.5,
+  "deviate_share": {
+   "historical": 0.1,
+   "plausible": 0.25,
+   "divergent": 0.5
+  },
+  "preset_mult": {
+   "historical": 1.5,
+   "plausible": 1,
+   "divergent": 0.5
+  },
+  "lead_years": 5,
+  "lapse_years": 10,
+  "war_chance_per_pull": 1,
+  "target_weight_per_pull": 4,
+  "envoy_points_per_pull": 10
+ },
+ "chronicle": {
+  "$comment": "The Chronicle card (EVT-109 to EVT-111). Provisional.",
+  "on_course_years": 10,
+  "horizon_years": 25
+ }
 }

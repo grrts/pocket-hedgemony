@@ -10,15 +10,15 @@ Feature: Layout by window shape
     When a card is opened during a campaign
     Then the shape is "<shape>"
     And the card is <card>
-    And the Realm book's tabs are <tabs>
+    And the Realm book's sections are one row of icons with names
 
     Examples:
-      | window                               | shape      | card                                   | tabs                    |
-      | a phone in landscape, 390 px high    | Short wide | a side sheet on the left 45 %          | a left icon rail        |
-      | a tablet in portrait                 | Tall       | a bottom sheet at 55 % height          | a bottom icon row       |
-      | a desktop window wider than tall     | Large      | a side sheet 380 px wide               | icons with names on a left rail |
-      | a Steam Deck at 1280 × 800           | Large      | a side sheet 380 px wide               | icons with names on a left rail |
-      | a TV                                 | Far        | a side sheet at raised scale           | icons with names on a left rail |
+      | window                               | shape      | card                                   |
+      | a phone in landscape, 390 px high    | Short wide | a side sheet on the left 45 %          |
+      | a tablet in portrait                 | Tall       | a bottom sheet at 55 % height          |
+      | a desktop window wider than tall     | Large      | a side sheet 380 px wide               |
+      | a Steam Deck at 1280 × 800           | Large      | a side sheet 380 px wide               |
+      | a TV                                 | Far        | a side sheet at raised scale           |
 
   @VIEW-043
   Scenario: The Far layout keeps clear of the overscan band

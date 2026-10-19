@@ -1,0 +1,2629 @@
+{
+ "$comment": "Historical goals with their reasons for South, Southeast and East Asia (plan-1378 §2), from start-date/research/asia.md. Weighed by the AI (EVT-100 to EVT-106); never forced.",
+ "goals": [
+  {
+   "realm": "delhi",
+   "goal": "Keep the provinces loyal through grants and hereditary offices",
+   "reason": "Firuz rules by conciliation after the revolts under Muhammad bin Tughlaq",
+   "ends_when": "Firuz dies (1388)",
+   "window": [
+    1378,
+    1388
+   ],
+   "weight": "strong",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "delhi",
+   "goal": "Punish Katehar and hold the Doab",
+   "reason": "Kharku of Katehar kills the governor of Badaun",
+   "ends_when": "Katehar submits",
+   "window": [
+    1379,
+    1382
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Badaun",
+      "at": [
+       79.12,
+       28.03
+      ]
+     },
+     {
+      "name": "Kannauj",
+      "at": [
+       79.92,
+       27.05
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "delhi",
+   "goal": "Settle the succession",
+   "reason": "Heir Fath Khan died in 1376 and the sultan is old",
+   "ends_when": "A successor holds the throne unopposed",
+   "window": [
+    1387,
+    1394
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "delhi",
+   "goal": "Keep Sindh paying tribute",
+   "reason": "Tribute and the lower Indus route won in 1367",
+   "ends_when": "Delhi loses Multan and the Punjab",
+   "window": [
+    1378,
+    1388
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "subject",
+    "target": "sindh"
+   }
+  },
+  {
+   "realm": "bengal",
+   "goal": "Keep independence from Delhi",
+   "reason": "Firuz invaded in 1353-54 and 1359",
+   "ends_when": "Delhi can no longer invade (after 1398)",
+   "window": [
+    1378,
+    1398
+   ],
+   "weight": "strong",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Pandua",
+      "at": [
+       88.16,
+       25.14
+      ]
+     },
+     {
+      "name": "Sonargaon",
+      "at": [
+       90.6,
+       23.65
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "bengal",
+   "goal": "Push into Kamata and Kamarupa",
+   "reason": "Weak neighbours and Brahmaputra trade",
+   "ends_when": "Kamata is conquered (1498)",
+   "window": [
+    1390,
+    1498
+   ],
+   "weight": "normal",
+   "deviation": "Tripura and Arakan",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Kamatapur",
+      "at": [
+       89.4,
+       26.29
+      ]
+     },
+     {
+      "name": "Hajo",
+      "at": [
+       91.53,
+       26.25
+      ]
+     }
+    ],
+    "target": "kamata"
+   },
+   "alternative": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Udaipur (Tripura)",
+      "at": [
+       91.48,
+       23.53
+      ]
+     }
+    ],
+    "target": "tripura"
+   }
+  },
+  {
+   "realm": "bengal",
+   "goal": "Seek recognition abroad",
+   "reason": "Legitimacy and trade, later help against Jaunpur",
+   "ends_when": "Recognition no longer needed",
+   "window": [
+    1405,
+    1439
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": {
+    "kind": "ally",
+    "target": "ming"
+   }
+  },
+  {
+   "realm": "bengal",
+   "goal": "Resist Jaunpur",
+   "reason": "Ibrahim Sharqi's invasion",
+   "ends_when": "Jaunpur no longer threatens",
+   "window": [
+    1410,
+    1420
+   ],
+   "weight": "normal",
+   "deviation": "Bihar if Jaunpur collapses",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Pandua",
+      "at": [
+       88.16,
+       25.14
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Bihar Sharif",
+      "at": [
+       85.52,
+       25.2
+      ]
+     }
+    ],
+    "target": "jaunpur"
+   }
+  },
+  {
+   "realm": "bahmanis",
+   "goal": "Secure the throne after the 1378 murders",
+   "reason": "Two sultans killed in two months",
+   "ends_when": "The court accepts Muhammad Shah II",
+   "window": [
+    1378,
+    1380
+   ],
+   "weight": "strong",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "bahmanis",
+   "goal": "Win the Raichur doab",
+   "reason": "Rich land and the Mudgal and Raichur forts",
+   "ends_when": "Both forts are held securely",
+   "window": [
+    1395,
+    1444
+   ],
+   "weight": "strong",
+   "deviation": "Absorb the Velama forts",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Raichur",
+      "at": [
+       77.36,
+       16.2
+      ]
+     },
+     {
+      "name": "Mudgal",
+      "at": [
+       76.44,
+       16.01
+      ]
+     }
+    ],
+    "target": "vijayanagar"
+   },
+   "alternative": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Rachakonda",
+      "at": [
+       78.82,
+       17.13
+      ]
+     },
+     {
+      "name": "Devarakonda",
+      "at": [
+       78.92,
+       16.69
+      ]
+     }
+    ],
+    "target": "rachakonda"
+   }
+  },
+  {
+   "realm": "bahmanis",
+   "goal": "Hold the Konkan ports",
+   "reason": "Arab horses come through Goa, Chaul and Dabhol",
+   "ends_when": "The ports are held",
+   "window": [
+    1378,
+    1439
+   ],
+   "weight": "normal",
+   "deviation": "Extend Konkan control",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Goa",
+      "at": [
+       73.91,
+       15.5
+      ]
+     },
+     {
+      "name": "Chaul",
+      "at": [
+       72.93,
+       18.55
+      ]
+     },
+     {
+      "name": "Dabhol",
+      "at": [
+       73.19,
+       17.59
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "bahmanis",
+   "goal": "Subdue Telangana",
+   "reason": "The Velama and Warangal lands border the realm",
+   "ends_when": "Velama forts are taken",
+   "window": [
+    1420,
+    1435
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Rachakonda",
+      "at": [
+       78.82,
+       17.13
+      ]
+     },
+     {
+      "name": "Devarakonda",
+      "at": [
+       78.92,
+       16.69
+      ]
+     }
+    ],
+    "target": "rachakonda"
+   }
+  },
+  {
+   "realm": "vijayanagar",
+   "goal": "Consolidate the Tamil country",
+   "reason": "Madurai has just been conquered",
+   "ends_when": "Southern chiefs pay tribute",
+   "window": [
+    1378,
+    1399
+   ],
+   "weight": "strong",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Madurai",
+      "at": [
+       78.12,
+       9.93
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "vijayanagar",
+   "goal": "Take Goa and the west coast ports",
+   "reason": "Horse imports and trade",
+   "ends_when": "Goa is held",
+   "window": [
+    1378,
+    1385
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Goa",
+      "at": [
+       73.91,
+       15.5
+      ]
+     }
+    ],
+    "target": "bahmanis"
+   }
+  },
+  {
+   "realm": "vijayanagar",
+   "goal": "Hold the Raichur doab",
+   "reason": "The Bahmanis contest it",
+   "ends_when": "The Bahmanis no longer threaten",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "strong",
+   "deviation": "Exploit Bahmani strife",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Raichur",
+      "at": [
+       77.36,
+       16.2
+      ]
+     },
+     {
+      "name": "Mudgal",
+      "at": [
+       76.44,
+       16.01
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "fight",
+    "target": "bahmanis"
+   }
+  },
+  {
+   "realm": "vijayanagar",
+   "goal": "Take coastal Andhra from the Reddis",
+   "reason": "Rich delta and temple country",
+   "ends_when": "Kondavidu is annexed",
+   "window": [
+    1380,
+    1424
+   ],
+   "weight": "normal",
+   "deviation": "Tribute from Kerala and Ceylon",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Kondavidu",
+      "at": [
+       80.27,
+       16.26
+      ]
+     },
+     {
+      "name": "Rajahmundry",
+      "at": [
+       81.8,
+       17.0
+      ]
+     }
+    ],
+    "target": "kondavidu_reddi"
+   }
+  },
+  {
+   "realm": "orissa",
+   "goal": "Defend Odisha against sultanate raids",
+   "reason": "Firuz's raid of 1360; Bengal on the border",
+   "ends_when": "No sultanate threatens",
+   "window": [
+    1378,
+    1439
+   ],
+   "weight": "strong",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Cuttack",
+      "at": [
+       85.88,
+       20.46
+      ]
+     },
+     {
+      "name": "Puri",
+      "at": [
+       85.83,
+       19.81
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "orissa",
+   "goal": "Hold the southern coast against the Reddis",
+   "reason": "Reddi campaigns into Kalinga",
+   "ends_when": "The Reddis are gone",
+   "window": [
+    1380,
+    1429
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Simhachalam",
+      "at": [
+       83.25,
+       17.77
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "kotte",
+   "goal": "Stop Jaffna's advance in the southwest",
+   "reason": "Jaffna collects dues and invades",
+   "ends_when": "Jaffna no longer threatens",
+   "window": [
+    1378,
+    1389
+   ],
+   "weight": "strong",
+   "deviation": "",
+   "aim": {
+    "kind": "fight",
+    "target": "jaffna"
+   }
+  },
+  {
+   "realm": "kotte",
+   "goal": "Unify the island",
+   "reason": "The ideal of one Sinhala kingship",
+   "ends_when": "The island is united",
+   "window": [
+    1412,
+    1450
+   ],
+   "weight": "normal",
+   "deviation": "Control the Vanni",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Jaffna",
+      "at": [
+       80.01,
+       9.66
+      ]
+     }
+    ],
+    "target": "jaffna"
+   },
+   "alternative": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Vavuniya",
+      "at": [
+       80.5,
+       8.75
+      ]
+     }
+    ],
+    "target": "vanni"
+   }
+  },
+  {
+   "realm": "jaffna",
+   "goal": "Collect tribute from the Sinhala lowlands",
+   "reason": "Pearl and trade revenue",
+   "ends_when": "Defeated by Alagakkonara",
+   "window": [
+    1378,
+    1389
+   ],
+   "weight": "strong",
+   "deviation": "South Indian help",
+   "aim": {
+    "kind": "subject",
+    "target": "kotte"
+   }
+  },
+  {
+   "realm": "jaffna",
+   "goal": "Hold the pearl banks",
+   "reason": "The main royal revenue",
+   "ends_when": "Jaffna is conquered",
+   "window": [
+    1378,
+    1499
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Mannar",
+      "at": [
+       79.9,
+       8.98
+      ]
+     },
+     {
+      "name": "Jaffna",
+      "at": [
+       80.01,
+       9.66
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "kashmir",
+   "goal": "Extend influence over Ladakh, Baltistan and the hills",
+   "reason": "Tribute and trade routes",
+   "ends_when": "Neighbours are tributary",
+   "window": [
+    1378,
+    1449
+   ],
+   "weight": "normal",
+   "deviation": "Influence in Punjab",
+   "aim": {
+    "kind": "subject",
+    "target": "ladakh"
+   }
+  },
+  {
+   "realm": "kashmir",
+   "goal": "Patronise Islam and Sayyid scholars",
+   "reason": "Hamadani's mission and immigrant scholars",
+   "ends_when": "A tolerant ruler takes over (1420)",
+   "window": [
+    1379,
+    1413
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "mewar",
+   "goal": "Expand around Chittor",
+   "reason": "Recovering lands after Hammir's restoration",
+   "ends_when": "The core forts are held",
+   "window": [
+    1378,
+    1382
+   ],
+   "weight": "strong",
+   "deviation": "",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Mandalgarh",
+      "at": [
+       75.07,
+       25.2
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "mewar",
+   "goal": "Lead Rajputana",
+   "reason": "Prestige of the Guhila house",
+   "ends_when": "Rival powers block it",
+   "window": [
+    1382,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "Exploit Delhi's weakness",
+   "aim": null
+  },
+  {
+   "realm": "mewar",
+   "goal": "Resist Malwa",
+   "reason": "Malwa's sultans attack after 1401",
+   "ends_when": "Malwa is weakened",
+   "window": [
+    1437,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Chittor",
+      "at": [
+       74.65,
+       24.89
+      ]
+     },
+     {
+      "name": "Mandalgarh",
+      "at": [
+       75.07,
+       25.2
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "sindh",
+   "goal": "Throw off Delhi's tribute",
+   "reason": "Forced submission in 1367",
+   "ends_when": "Delhi cannot enforce it (1388)",
+   "window": [
+    1388,
+    1399
+   ],
+   "weight": "strong",
+   "deviation": "",
+   "aim": {
+    "kind": "free",
+    "target": "delhi"
+   }
+  },
+  {
+   "realm": "sindh",
+   "goal": "Take upper Sindh",
+   "reason": "Delhi's garrisons at Bhakkar and Sehwan",
+   "ends_when": "Upper Sindh is held",
+   "window": [
+    1400,
+    1499
+   ],
+   "weight": "weak",
+   "deviation": "Weak Multan",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Bukkur",
+      "at": [
+       68.88,
+       27.7
+      ]
+     },
+     {
+      "name": "Sehwan",
+      "at": [
+       67.87,
+       26.42
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Multan",
+      "at": [
+       71.47,
+       30.2
+      ]
+     }
+    ],
+    "target": "multan"
+   }
+  },
+  {
+   "realm": "nepal_malla",
+   "goal": "Unify the valley under Jayasthiti",
+   "reason": "Rival nobles of Patan and Bhaktapur",
+   "ends_when": "Jayasthiti is king (1382)",
+   "window": [
+    1378,
+    1382
+   ],
+   "weight": "strong",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "nepal_malla",
+   "goal": "Control the Tibet trade routes",
+   "reason": "Revenue from Kuti and Kerung",
+   "ends_when": "Routes are lost",
+   "window": [
+    1378,
+    1499
+   ],
+   "weight": "normal",
+   "deviation": "Hill expansion",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Kuti (Nyalam)",
+      "at": [
+       85.98,
+       28.16
+      ]
+     },
+     {
+      "name": "Kerung (Kyirong)",
+      "at": [
+       85.3,
+       28.4
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "calicut",
+   "goal": "Dominate the pepper trade and Cochin",
+   "reason": "Trade revenue",
+   "ends_when": "Cochin submits",
+   "window": [
+    1400,
+    1500
+   ],
+   "weight": "strong",
+   "deviation": "Attract more trade",
+   "aim": {
+    "kind": "subject",
+    "target": "cochin"
+   }
+  },
+  {
+   "realm": "rachakonda",
+   "goal": "Hold Telangana as the Kakatiya heirs",
+   "reason": "Won Warangal in 1368",
+   "ends_when": "Bahmanis take the forts (c.1435)",
+   "window": [
+    1378,
+    1435
+   ],
+   "weight": "strong",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Warangal",
+      "at": [
+       79.59,
+       17.97
+      ]
+     },
+     {
+      "name": "Rachakonda",
+      "at": [
+       78.82,
+       17.13
+      ]
+     },
+     {
+      "name": "Devarakonda",
+      "at": [
+       78.92,
+       16.69
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "rachakonda",
+   "goal": "Push into coastal Andhra against the Reddis",
+   "reason": "Rivalry over the delta",
+   "ends_when": "The Reddis fall",
+   "window": [
+    1380,
+    1429
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "fight",
+    "target": "kondavidu_reddi"
+   }
+  },
+  {
+   "realm": "kondavidu_reddi",
+   "goal": "Hold the Godavari delta and push into Kalinga",
+   "reason": "Rich land and ports",
+   "ends_when": "Defeated",
+   "window": [
+    1378,
+    1395
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Simhachalam",
+      "at": [
+       83.25,
+       17.77
+      ]
+     }
+    ],
+    "target": "orissa"
+   }
+  },
+  {
+   "realm": "kondavidu_reddi",
+   "goal": "Survive Vijayanagara and the Velamas",
+   "reason": "Two stronger neighbours",
+   "ends_when": "Annexed (1424)",
+   "window": [
+    1380,
+    1424
+   ],
+   "weight": "strong",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Kondavidu",
+      "at": [
+       80.27,
+       16.26
+      ]
+     },
+     {
+      "name": "Rajahmundry",
+      "at": [
+       81.8,
+       17.0
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "ahom",
+   "goal": "End the interregnum with a new king",
+   "reason": "No king since 1376",
+   "ends_when": "A king is chosen (1380)",
+   "window": [
+    1378,
+    1380
+   ],
+   "weight": "strong",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "ahom",
+   "goal": "Fight the Chutias",
+   "reason": "The murder of Sutuphaa and land",
+   "ends_when": "The Chutias are conquered (1523)",
+   "window": [
+    1378,
+    1523
+   ],
+   "weight": "normal",
+   "deviation": "Kachari lands",
+   "aim": {
+    "kind": "fight",
+    "target": "chutia"
+   },
+   "alternative": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Dimapur",
+      "at": [
+       93.73,
+       25.91
+      ]
+     }
+    ],
+    "target": "kachari"
+   }
+  },
+  {
+   "realm": "kamata",
+   "goal": "Hold its land against Bengal",
+   "reason": "Bengal frontier pressure",
+   "ends_when": "Bengal no longer threatens",
+   "window": [
+    1390,
+    1498
+   ],
+   "weight": "strong",
+   "deviation": "Bhuyan lands",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Kamatapur",
+      "at": [
+       89.4,
+       26.29
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "manipur",
+   "goal": "Hold the valley",
+   "reason": "Border pressure",
+   "ends_when": "Uncertain",
+   "window": [
+    1400,
+    1499
+   ],
+   "weight": "weak",
+   "deviation": "Kabaw",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Imphal",
+      "at": [
+       93.94,
+       24.81
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Tamu (Kabaw)",
+      "at": [
+       94.31,
+       24.22
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "ladakh",
+   "goal": "Reunify the kingdom",
+   "reason": "Divided branches",
+   "ends_when": "One king holds both",
+   "window": [
+    1400,
+    1440
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "cochin",
+   "goal": "Resist Calicut",
+   "reason": "Calicut seeks overlordship",
+   "ends_when": "Calicut no longer threatens",
+   "window": [
+    1400,
+    1499
+   ],
+   "weight": "normal",
+   "deviation": "Outside allies",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Kochi",
+      "at": [
+       76.26,
+       9.97
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "venad",
+   "goal": "Hold Kollam and the Tirunelveli claims",
+   "reason": "Old claims across the Ghats",
+   "ends_when": "Lost to stronger neighbours",
+   "window": [
+    1378,
+    1499
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Kollam",
+      "at": [
+       76.6,
+       8.89
+      ]
+     },
+     {
+      "name": "Tirunelveli",
+      "at": [
+       77.7,
+       8.73
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "champa",
+   "goal": "Retake the Ô and Lý lands",
+   "reason": "Lost to Đại Việt in 1306; the Trần court is weak",
+   "ends_when": "Chế Bồng Nga dies or Đại Việt is strong again",
+   "window": [
+    1378,
+    1390
+   ],
+   "weight": "strong",
+   "deviation": "Hold Panduranga and the highlands if Vijaya falls",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Thuận Hóa (Huế)",
+      "at": [
+       107.59,
+       16.46
+      ]
+     },
+     {
+      "name": "Quảng Trị",
+      "at": [
+       107.19,
+       16.75
+      ]
+     }
+    ],
+    "target": "dai_viet"
+   },
+   "alternative": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Panduranga (Phan Rang)",
+      "at": [
+       108.99,
+       11.57
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "champa",
+   "goal": "Raid Thăng Long for plunder and prestige",
+   "reason": "Repeated victories since 1371",
+   "ends_when": "Chế Bồng Nga dies (1390)",
+   "window": [
+    1378,
+    1390
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "fight",
+    "target": "dai_viet"
+   }
+  },
+  {
+   "realm": "champa",
+   "goal": "Recover the northern lands while the Viets are occupied",
+   "reason": "Ming occupation of Đại Việt",
+   "ends_when": "Đại Việt restored (1428)",
+   "window": [
+    1407,
+    1428
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Amaravati (Trà Kiệu)",
+      "at": [
+       108.23,
+       15.83
+      ]
+     }
+    ],
+    "target": "dai_viet"
+   }
+  },
+  {
+   "realm": "dai_viet",
+   "goal": "Stop Champa's raids and punish it",
+   "reason": "Emperor killed in 1377, capital sacked",
+   "ends_when": "Champa's threat ends (Chế Bồng Nga dead)",
+   "window": [
+    1378,
+    1390
+   ],
+   "weight": "strong",
+   "deviation": "Consolidate and turn to the uplands",
+   "aim": {
+    "kind": "fight",
+    "target": "champa"
+   }
+  },
+  {
+   "realm": "dai_viet",
+   "goal": "Hồ Quý Ly takes over the state",
+   "reason": "The Trần court is weak and needs reform",
+   "ends_when": "He is on the throne, or he is dead",
+   "window": [
+    1388,
+    1400
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": null,
+   "toward": [
+    "ho_dynasty"
+   ]
+  },
+  {
+   "realm": "dai_viet",
+   "goal": "Push south into Amaravati",
+   "reason": "Champa weakened after 1390",
+   "ends_when": "Land taken, or the Ming invade",
+   "window": [
+    1400,
+    1406
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Amaravati (Trà Kiệu)",
+      "at": [
+       108.23,
+       15.83
+      ]
+     }
+    ],
+    "target": "champa"
+   }
+  },
+  {
+   "realm": "ayutthaya",
+   "goal": "Keep Sukhothai subject",
+   "reason": "Paramountcy over the Tai heartland and its rice",
+   "ends_when": "Sukhothai absorbed (1438)",
+   "window": [
+    1378,
+    1438
+   ],
+   "weight": "strong",
+   "deviation": "",
+   "aim": {
+    "kind": "subject",
+    "target": "sukhothai"
+   },
+   "toward": [
+    "sukhothai_submits"
+   ]
+  },
+  {
+   "realm": "ayutthaya",
+   "goal": "Bring Lan Na to heel",
+   "reason": "Lan Na backs Sukhothai's nobles",
+   "ends_when": "Lan Na submits, or is too strong",
+   "window": [
+    1385,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "Turn to the peninsula and Cambodia if Lan Na is stable",
+   "aim": {
+    "kind": "subject",
+    "target": "lan_na"
+   },
+   "alternative": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Angkor",
+      "at": [
+       103.87,
+       13.41
+      ]
+     }
+    ],
+    "target": "khmer"
+   }
+  },
+  {
+   "realm": "ayutthaya",
+   "goal": "Take Angkor",
+   "reason": "Khmer rival for the eastern lands and prestige",
+   "ends_when": "Angkor taken (c.1431)",
+   "window": [
+    1390,
+    1435
+   ],
+   "weight": "strong",
+   "deviation": "Exploit Cambodian court weakness",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Angkor",
+      "at": [
+       103.87,
+       13.41
+      ]
+     }
+    ],
+    "target": "khmer"
+   },
+   "alternative": {
+    "kind": "subject",
+    "target": "khmer"
+   },
+   "toward": [
+    "ayutthaya_sacks_angkor"
+   ]
+  },
+  {
+   "realm": "ayutthaya",
+   "goal": "Claim the peninsula ports",
+   "reason": "Tribute and trade of the Strait",
+   "ends_when": "Ports submit, or a Ming-backed Malacca resists",
+   "window": [
+    1390,
+    1449
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Temasek",
+      "at": [
+       103.85,
+       1.29
+      ]
+     },
+     {
+      "name": "Malacca",
+      "at": [
+       102.25,
+       2.2
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "khmer",
+   "goal": "Hold Angkor against Ayutthaya",
+   "reason": "Repeated Siamese attacks",
+   "ends_when": "Angkor lost (c.1431)",
+   "window": [
+    1378,
+    1431
+   ],
+   "weight": "strong",
+   "deviation": "Accept tributary status",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Angkor",
+      "at": [
+       103.87,
+       13.41
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "khmer",
+   "goal": "Keep Ming recognition",
+   "reason": "Prestige and trade against Siam",
+   "ends_when": "Missions lapse",
+   "window": [
+    1378,
+    1419
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": {
+    "kind": "ally",
+    "target": "ming"
+   }
+  },
+  {
+   "realm": "ava",
+   "goal": "Win the Mon ports",
+   "reason": "Landlocked; heir of Pagan's claims",
+   "ends_when": "Truce with Pegu, or Pegu taken",
+   "window": [
+    1385,
+    1424
+   ],
+   "weight": "strong",
+   "deviation": "Press the Shan states if Pegu is too strong",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Pegu",
+      "at": [
+       96.48,
+       17.34
+      ]
+     },
+     {
+      "name": "Dagon",
+      "at": [
+       96.15,
+       16.8
+      ]
+     },
+     {
+      "name": "Bassein",
+      "at": [
+       94.73,
+       16.78
+      ]
+     }
+    ],
+    "target": "pegu"
+   },
+   "alternative": {
+    "kind": "fight",
+    "target": "mohnyin"
+   }
+  },
+  {
+   "realm": "ava",
+   "goal": "Control Arakan",
+   "reason": "Client king installed 1374; Pegu contests it",
+   "ends_when": "Arakan secure or lost",
+   "window": [
+    1378,
+    1406
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "subject",
+    "target": "mrauk_u"
+   }
+  },
+  {
+   "realm": "ava",
+   "goal": "Hold the Shan frontier",
+   "reason": "Möng Mao and Mohnyin raids",
+   "ends_when": "Shan threat ends",
+   "window": [
+    1378,
+    1442
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Ava",
+      "at": [
+       95.98,
+       21.86
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "pegu",
+   "goal": "Reunite the Mon lands",
+   "reason": "Martaban and the delta held by rebel lords",
+   "ends_when": "Byattaba and Laukpya gone (c.1390)",
+   "window": [
+    1384,
+    1390
+   ],
+   "weight": "strong",
+   "deviation": "",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Martaban",
+      "at": [
+       97.6,
+       16.53
+      ]
+     },
+     {
+      "name": "Myaungmya",
+      "at": [
+       95.17,
+       16.6
+      ]
+     }
+    ],
+    "target": "martaban"
+   }
+  },
+  {
+   "realm": "pegu",
+   "goal": "Resist Ava",
+   "reason": "Ava wants the ports",
+   "ends_when": "Truce (1424/1431)",
+   "window": [
+    1385,
+    1424
+   ],
+   "weight": "strong",
+   "deviation": "Attack if Ava collapses",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Pegu",
+      "at": [
+       96.48,
+       17.34
+      ]
+     },
+     {
+      "name": "Dagon",
+      "at": [
+       96.15,
+       16.8
+      ]
+     },
+     {
+      "name": "Bassein",
+      "at": [
+       94.73,
+       16.78
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "fight",
+    "target": "ava"
+   }
+  },
+  {
+   "realm": "pegu",
+   "goal": "Win influence in Arakan",
+   "reason": "Deny Ava the coast",
+   "ends_when": "Arakan settled",
+   "window": [
+    1406,
+    1429
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "subject",
+    "target": "mrauk_u"
+   }
+  },
+  {
+   "realm": "lan_na",
+   "goal": "Keep Ayutthaya out of the north",
+   "reason": "Ayutthaya's advance into Sukhothai",
+   "ends_when": "Ayutthaya stops pressing",
+   "window": [
+    1386,
+    1474
+   ],
+   "weight": "strong",
+   "deviation": "Turn north and east",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Chiang Mai",
+      "at": [
+       98.98,
+       18.79
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "lan_na",
+   "goal": "Pull Sukhothai's lords into its orbit",
+   "reason": "Sukhothai nobles' ties to Chiang Mai",
+   "ends_when": "Sukhothai absorbed by Ayutthaya",
+   "window": [
+    1410,
+    1449
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "subject",
+    "target": "sukhothai"
+   }
+  },
+  {
+   "realm": "lan_xang",
+   "goal": "Secure the young kingdom by peace and marriages",
+   "reason": "Nobles exiled Fa Ngum for his harsh wars",
+   "ends_when": "Samsenthai dies (1416)",
+   "window": [
+    1378,
+    1416
+   ],
+   "weight": "strong",
+   "deviation": "",
+   "aim": {
+    "kind": "ally",
+    "target": "ayutthaya"
+   }
+  },
+  {
+   "realm": "lan_xang",
+   "goal": "Hold Phuan and the middle Mekong",
+   "reason": "Upland tribute and the Viet frontier",
+   "ends_when": "Lost to Đại Việt",
+   "window": [
+    1378,
+    1499
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Xieng Khouang",
+      "at": [
+       103.36,
+       19.33
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "majapahit",
+   "goal": "Keep the archipelago's tribute",
+   "reason": "Trade and the prestige of the 1365 order",
+   "ends_when": "Court divided (1404-06) or Ming fleets arrive (1405)",
+   "window": [
+    1378,
+    1405
+   ],
+   "weight": "strong",
+   "deviation": "Reunite the royal lines and reassert authority",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Palembang",
+      "at": [
+       104.76,
+       -2.99
+      ]
+     }
+    ]
+   },
+   "toward": [
+    "zheng_he_first_voyage"
+   ]
+  },
+  {
+   "realm": "majapahit",
+   "goal": "Stop vassals seeking Ming investiture",
+   "reason": "Investiture undermines Javanese overlordship",
+   "ends_when": "Ming power in the Strait accepted",
+   "window": [
+    1378,
+    1399
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "majapahit",
+   "goal": "Settle Hayam Wuruk's succession",
+   "reason": "Rival heirs: Wikramawardhana and Bhre Wirabhumi",
+   "ends_when": "One line wins (1406)",
+   "window": [
+    1389,
+    1406
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "sunda",
+   "goal": "Stay free of Majapahit",
+   "reason": "Bubat (1357)",
+   "ends_when": "Majapahit no longer a threat",
+   "window": [
+    1378,
+    1449
+   ],
+   "weight": "strong",
+   "deviation": "Fortify the interior",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Kawali",
+      "at": [
+       108.36,
+       -7.19
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "samudra_pasai",
+   "goal": "Stay independent and keep the pepper trade",
+   "reason": "Majapahit's mid-century attack",
+   "ends_when": "Malacca overshadows it",
+   "window": [
+    1378,
+    1439
+   ],
+   "weight": "strong",
+   "deviation": "Seek protection from a strong neighbour",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Samudra Pasai",
+      "at": [
+       97.25,
+       5.13
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "ming"
+   }
+  },
+  {
+   "realm": "brunei",
+   "goal": "Escape Sulu raids and Javanese claims through Ming ties",
+   "reason": "Sulu sack c.1369, Majapahit's overlordship",
+   "ends_when": "Ming ties lapse",
+   "window": [
+    1378,
+    1408
+   ],
+   "weight": "normal",
+   "deviation": "Become the Borneo-Philippine trade hub",
+   "aim": {
+    "kind": "ally",
+    "target": "ming"
+   }
+  },
+  {
+   "realm": "ternate",
+   "goal": "Lead north Maluku against Tidore",
+   "reason": "Clove rivalry",
+   "ends_when": "Rival submits",
+   "window": [
+    1378,
+    1499
+   ],
+   "weight": "normal",
+   "deviation": "Convert and align with Muslim traders",
+   "aim": {
+    "kind": "subject",
+    "target": "tidore"
+   }
+  },
+  {
+   "realm": "bali",
+   "goal": "Make the Kepakisan dynasty secure",
+   "reason": "Imposed by conquest in 1343",
+   "ends_when": "Court accepted on the island",
+   "window": [
+    1378,
+    1399
+   ],
+   "weight": "normal",
+   "deviation": "Act alone if Majapahit falls",
+   "aim": null
+  },
+  {
+   "realm": "luwu",
+   "goal": "Dominate the Cenrana trade",
+   "reason": "Iron and forest-product exports to Java",
+   "ends_when": "Bone or Gowa outgrow it",
+   "window": [
+    1378,
+    1499
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Cenrana",
+      "at": [
+       120.2,
+       -4.4
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "singapura",
+   "goal": "Keep the port free of Siamese control",
+   "reason": "Siamese attacks and claims",
+   "ends_when": "Port lost (c.1398)",
+   "window": [
+    1378,
+    1398
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Temasek",
+      "at": [
+       103.85,
+       1.29
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "sukhothai",
+   "goal": "Win back independence",
+   "reason": "Forced submission in 1378",
+   "ends_when": "Absorbed (1438)",
+   "window": [
+    1395,
+    1419
+   ],
+   "weight": "normal",
+   "deviation": "Seek Lan Na's help",
+   "aim": {
+    "kind": "free",
+    "target": "ayutthaya"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "lan_na"
+   }
+  },
+  {
+   "realm": "palembang",
+   "goal": "Escape Javanese rule through China",
+   "reason": "1377 punishment",
+   "ends_when": "Ming office set up (1407)",
+   "window": [
+    1390,
+    1407
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": {
+    "kind": "free",
+    "target": "majapahit"
+   }
+  },
+  {
+   "realm": "ming",
+   "goal": "Break the Northern Yuan",
+   "reason": "The Yuan court is a rival claim to the Mandate and raids the frontier",
+   "ends_when": "No Kublaid khan reigns (or the steppe submits)",
+   "window": [
+    1378,
+    1424
+   ],
+   "weight": "strong",
+   "deviation": "Hold the line and exploit Mongol divisions",
+   "aim": {
+    "kind": "fight",
+    "target": "mongols"
+   },
+   "toward": [
+    "battle_of_buir_lake"
+   ]
+  },
+  {
+   "realm": "ming",
+   "goal": "Take Yunnan",
+   "reason": "Last Yuan province inside China; its prince killed Ming envoys",
+   "ends_when": "Kunming and Dali are Ming",
+   "window": [
+    1380,
+    1383
+   ],
+   "weight": "strong",
+   "deviation": "",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Kunming",
+      "at": [
+       102.71,
+       25.04
+      ]
+     },
+     {
+      "name": "Dali",
+      "at": [
+       100.23,
+       25.61
+      ]
+     }
+    ],
+    "target": "yunnan_yuan"
+   },
+   "toward": [
+    "ming_takes_yunnan"
+   ]
+  },
+  {
+   "realm": "ming",
+   "goal": "End Naghachu and secure Liaodong",
+   "reason": "His army threatens Liaodong and the road to Korea",
+   "ends_when": "Naghachu surrenders or dies",
+   "window": [
+    1385,
+    1388
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "fight",
+    "target": "naghachu"
+   }
+  },
+  {
+   "realm": "ming",
+   "goal": "Register land and people",
+   "reason": "Hongwu's tax base and village order after the wars",
+   "ends_when": "Registers compiled",
+   "window": [
+    1380,
+    1388
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "ming",
+   "goal": "Yongle: capital north, voyages, Đại Việt",
+   "reason": "A usurper needs prestige; his base is Beiping; the Hồ usurped the Ming-invested Trần",
+   "ends_when": "Beijing is capital; no usurper on the throne; Trần restored or Ming withdraws",
+   "window": [
+    1402,
+    1433
+   ],
+   "weight": "strong",
+   "deviation": "Reopen sea trade instead of voyages",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Thăng Long",
+      "at": [
+       105.85,
+       21.03
+      ]
+     }
+    ],
+    "target": "dai_viet"
+   },
+   "toward": [
+    "jingnan_campaign_ends",
+    "ming_capital_beijing",
+    "zheng_he_first_voyage",
+    "ming_conquest_of_dai_viet",
+    "last_zheng_he_voyage"
+   ]
+  },
+  {
+   "realm": "mongols",
+   "goal": "Restore the Yuan in China",
+   "reason": "Kublaid legitimacy; the court lost Dadu in 1368",
+   "ends_when": "The Kublaid line ends (1388)",
+   "window": [
+    1378,
+    1388
+   ],
+   "weight": "strong",
+   "deviation": "",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Dadu (Beijing)",
+      "at": [
+       116.4,
+       39.9
+      ]
+     }
+    ],
+    "target": "ming"
+   },
+   "toward": [
+    "battle_of_buir_lake"
+   ]
+  },
+  {
+   "realm": "mongols",
+   "goal": "Keep the loyal outposts",
+   "reason": "Yunnan and Manchuria are its armies and claim in China",
+   "ends_when": "Both lost (1382, 1387)",
+   "window": [
+    1378,
+    1387
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "ally",
+    "target": "yunnan_yuan"
+   }
+  },
+  {
+   "realm": "yunnan_yuan",
+   "goal": "Hold Yunnan for the Yuan",
+   "reason": "Loyal Kublaid prince; no road back to the khan",
+   "ends_when": "Kunming falls or the khan submits",
+   "window": [
+    1378,
+    1382
+   ],
+   "weight": "strong",
+   "deviation": "Submit to Ming for a title",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Kunming",
+      "at": [
+       102.71,
+       25.04
+      ]
+     },
+     {
+      "name": "Qujing",
+      "at": [
+       103.8,
+       25.49
+      ]
+     }
+    ]
+   },
+   "toward": [
+    "ming_takes_yunnan"
+   ]
+  },
+  {
+   "realm": "yunnan_yuan",
+   "goal": "Subdue Dali",
+   "reason": "The Duan stay apart in the west of his land",
+   "ends_when": "Dali taken",
+   "window": [
+    1378,
+    1381
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Dali",
+      "at": [
+       100.23,
+       25.61
+      ]
+     }
+    ],
+    "target": "dali_duan"
+   }
+  },
+  {
+   "realm": "naghachu",
+   "goal": "Hold Manchuria and press Liaodong",
+   "reason": "His own domain and loyalty to the khan",
+   "ends_when": "Isolated after the khan's defeats",
+   "window": [
+    1378,
+    1387
+   ],
+   "weight": "strong",
+   "deviation": "Surrender for a Ming title (what he did)",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Liaoyang",
+      "at": [
+       123.17,
+       41.27
+      ]
+     }
+    ],
+    "target": "ming"
+   }
+  },
+  {
+   "realm": "korea",
+   "goal": "Suppress the wokou",
+   "reason": "Raids ruin the coasts and the grain transport",
+   "ends_when": "Raids fade (after the 1389 Tsushima raid, 1419)",
+   "window": [
+    1378,
+    1419
+   ],
+   "weight": "strong",
+   "deviation": "",
+   "aim": {
+    "kind": "fight",
+    "target": "wokou"
+   },
+   "toward": [
+    "oei_invasion"
+   ]
+  },
+  {
+   "realm": "korea",
+   "goal": "Recover Liaodong",
+   "reason": "Old claim; Ming's Cheolryeong claim (1388) threatens the north",
+   "ends_when": "The army turns back (Wihwado) or Liaodong is held",
+   "window": [
+    1387,
+    1389
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Liaoyang",
+      "at": [
+       123.17,
+       41.27
+      ]
+     }
+    ],
+    "target": "ming"
+   },
+   "toward": [
+    "joseon_founded"
+   ]
+  },
+  {
+   "realm": "korea",
+   "goal": "Balance Ming and the Northern Yuan",
+   "reason": "Pro-Yuan nobles against Ming-leaning reformers",
+   "ends_when": "One side is gone (Yuan collapse 1388)",
+   "window": [
+    1378,
+    1388
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "korea",
+   "goal": "Land reform and a new dynasty (Yi Seong-gye faction)",
+   "reason": "Reformers and generals want the great estates broken",
+   "ends_when": "Joseon founded and the land law passed",
+   "window": [
+    1388,
+    1392
+   ],
+   "weight": "strong",
+   "deviation": "Goryeo survives under a strong regent",
+   "aim": null,
+   "toward": [
+    "joseon_founded"
+   ]
+  },
+  {
+   "realm": "japan",
+   "goal": "Absorb the Southern Court",
+   "reason": "One line is needed for full legitimacy",
+   "ends_when": "The courts are reunited",
+   "window": [
+    1378,
+    1392
+   ],
+   "weight": "strong",
+   "deviation": "",
+   "aim": {
+    "kind": "subject",
+    "target": "japan_southern_court"
+   },
+   "toward": [
+    "courts_of_japan_reunited"
+   ]
+  },
+  {
+   "realm": "japan",
+   "goal": "Cut down the over-mighty shugo",
+   "reason": "Houses with many provinces can unseat the shogun",
+   "ends_when": "No house holds a large bloc",
+   "window": [
+    1379,
+    1399
+   ],
+   "weight": "strong",
+   "deviation": "",
+   "aim": {
+    "kind": "fight",
+    "target": "yamana"
+   }
+  },
+  {
+   "realm": "japan",
+   "goal": "Win Ming recognition and trade",
+   "reason": "Revenue and a title above the shugo",
+   "ends_when": "Investiture won (1402), or a later shogun refuses it (1411)",
+   "window": [
+    1378,
+    1411
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "ally",
+    "target": "ming"
+   }
+  },
+  {
+   "realm": "japan",
+   "goal": "Hold Kyushu through the tandai",
+   "reason": "The South's last base is there",
+   "ends_when": "Kikuchi submit; tandai recalled (1395)",
+   "window": [
+    1378,
+    1395
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Dazaifu",
+      "at": [
+       130.52,
+       33.51
+      ]
+     },
+     {
+      "name": "Hakata",
+      "at": [
+       130.4,
+       33.59
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "japan_southern_court",
+   "goal": "Keep the line and the regalia",
+   "reason": "It holds itself the true line",
+   "ends_when": "A settlement promising alternation (1392)",
+   "window": [
+    1378,
+    1392
+   ],
+   "weight": "strong",
+   "deviation": "Fight on in the mountains",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Yoshino",
+      "at": [
+       135.86,
+       34.37
+      ]
+     }
+    ]
+   },
+   "toward": [
+    "courts_of_japan_reunited"
+   ]
+  },
+  {
+   "realm": "kamakura_kubo",
+   "goal": "Rule the Kantō on its own terms",
+   "reason": "Ashikaga kin with a claim to equality with Kyoto",
+   "ends_when": "The kubo line is destroyed (1439)",
+   "window": [
+    1378,
+    1439
+   ],
+   "weight": "strong",
+   "deviation": "",
+   "aim": {
+    "kind": "free",
+    "target": "japan"
+   }
+  },
+  {
+   "realm": "kamakura_kubo",
+   "goal": "Subdue the Kantō and Tōhoku houses",
+   "reason": "Rival houses resist the kubo",
+   "ends_when": "Revolts crushed",
+   "window": [
+    1380,
+    1420
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Oyama",
+      "at": [
+       139.8,
+       36.31
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "hosokawa",
+   "goal": "Keep the kanrei office",
+   "reason": "Yoriyuki governs for the shogun; the Shiba want it",
+   "ends_when": "Office lost (1379) or regained (1391)",
+   "window": [
+    1378,
+    1391
+   ],
+   "weight": "strong",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "shiba",
+   "goal": "Oust Hosokawa Yoriyuki",
+   "reason": "Rivalry over the kanrei post",
+   "ends_when": "Yoriyuki falls",
+   "window": [
+    1378,
+    1379
+   ],
+   "weight": "strong",
+   "deviation": "",
+   "aim": {
+    "kind": "fight",
+    "target": "hosokawa"
+   }
+  },
+  {
+   "realm": "yamana",
+   "goal": "Gather provinces",
+   "reason": "Family strength is the road to power",
+   "ends_when": "Shogun breaks the house (1391)",
+   "window": [
+    1378,
+    1391
+   ],
+   "weight": "strong",
+   "deviation": "",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Sakai (Izumi)",
+      "at": [
+       135.48,
+       34.57
+      ]
+     },
+     {
+      "name": "Wakayama (Kii)",
+      "at": [
+       135.17,
+       34.23
+      ]
+     }
+    ],
+    "target": "japan_southern_court"
+   }
+  },
+  {
+   "realm": "ouchi",
+   "goal": "Rule the western straits and the Korea trade",
+   "reason": "Hakata and Korea bring wealth",
+   "ends_when": "Yoshihiro killed (1399)",
+   "window": [
+    1380,
+    1399
+   ],
+   "weight": "strong",
+   "deviation": "Stay the shogun's loyal agent",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Yamaguchi",
+      "at": [
+       131.47,
+       34.18
+      ]
+     },
+     {
+      "name": "Shimonoseki",
+      "at": [
+       130.94,
+       33.96
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "japan"
+   }
+  },
+  {
+   "realm": "imagawa",
+   "goal": "Pacify Kyushu as tandai",
+   "reason": "Ryōshun's commission from the shogun",
+   "ends_when": "Kyushu subdued or Ryōshun recalled (1395)",
+   "window": [
+    1378,
+    1395
+   ],
+   "weight": "strong",
+   "deviation": "",
+   "aim": {
+    "kind": "fight",
+    "target": "kikuchi"
+   }
+  },
+  {
+   "realm": "tibet",
+   "goal": "Keep Ü-Tsang under the gongma",
+   "reason": "Changchub Gyaltsen's realm against Sakya and myriarchs",
+   "ends_when": "Rival lords dominate (Rinpungpa, 1430s-80s)",
+   "window": [
+    1378,
+    1432
+   ],
+   "weight": "strong",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Nêdong",
+      "at": [
+       91.77,
+       29.23
+      ]
+     },
+     {
+      "name": "Lhasa",
+      "at": [
+       91.13,
+       29.65
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "tibet",
+   "goal": "Patronise the new schools",
+   "reason": "Prestige and support of the great monks",
+   "ends_when": "Patronage ends",
+   "window": [
+    1400,
+    1419
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "ryukyu",
+   "goal": "Ming tribute trade",
+   "reason": "Wealth and legitimacy from the tribute ships",
+   "ends_when": "Tribute privileges cut",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "strong",
+   "deviation": "",
+   "aim": {
+    "kind": "ally",
+    "target": "ming"
+   }
+  },
+  {
+   "realm": "ryukyu",
+   "goal": "Unite Okinawa",
+   "reason": "Rivals compete for the same Ming trade",
+   "ends_when": "Hokuzan and Nanzan gone",
+   "window": [
+    1406,
+    1429
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Nakijin",
+      "at": [
+       127.93,
+       26.69
+      ]
+     },
+     {
+      "name": "Ōzato (Nanzan)",
+      "at": [
+       127.73,
+       26.17
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "hokuzan",
+   "goal": "Win its own Ming tribute",
+   "reason": "Equal standing with Chūzan",
+   "ends_when": "Conquered",
+   "window": [
+    1378,
+    1416
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": {
+    "kind": "ally",
+    "target": "ming"
+   }
+  },
+  {
+   "realm": "nanzan",
+   "goal": "Win its own Ming tribute",
+   "reason": "Equal standing with Chūzan",
+   "ends_when": "Conquered",
+   "window": [
+    1378,
+    1429
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": {
+    "kind": "ally",
+    "target": "ming"
+   }
+  },
+  {
+   "realm": "luchuan",
+   "goal": "Expand Möng Mao power",
+   "reason": "A strong Tai realm between Yunnan and Burma",
+   "ends_when": "Defeated by Ming (1388) or split (1398)",
+   "window": [
+    1378,
+    1398
+   ],
+   "weight": "strong",
+   "deviation": "Accept Ming titles quietly",
+   "aim": {
+    "kind": "fight",
+    "target": "ming"
+   }
+  },
+  {
+   "realm": "wokou",
+   "goal": "Plunder the coasts",
+   "reason": "Japan's civil war leaves the straits unpoliced",
+   "ends_when": "Japan reunited and Korea strikes the bases",
+   "window": [
+    1378,
+    1419
+   ],
+   "weight": "strong",
+   "deviation": "",
+   "aim": {
+    "kind": "fight",
+    "target": "korea"
+   },
+   "toward": [
+    "oei_invasion"
+   ]
+  }
+ ]
+}

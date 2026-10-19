@@ -4,8 +4,11 @@ import { cedeProvince, relationState, type News } from "./war.ts";
 import { grabbedLand, nameAbroadView, type NameAbroadView } from "./conquest.ts";
 import { priceContext, priceOfWar, type PriceOfWar } from "./priceOfWar.ts";
 import * as dip from "./domain/diplomacy/index.ts";
+import { goalAsks } from "./goals.ts";
+import goalsConfig from "../../rules/data/domain/events.json" with { type: "json" };
 import { LEDGER, LEDGER_LINES } from "./treasury.ts";
 import { houseView, yearlyCrowns, type HouseView } from "./crowns.ts";
+import { yearlyPeople } from "./people.ts";
 import { aiCourting, courtingView, monthlyCourting, type CourtingView } from "./courting.ts";
 import { bondOf, aiMayTakeSubject, aiOverlordEnvoys, aiOverlords, aiRisings, monthlySubjectEnvoys, makeSubject, seasonalSubjects, subjectByAgreement, subjectsView, type SubjectsView } from "./subjects.ts";
 
@@ -93,14 +96,25 @@ const envoyTo = (world: World, n: number, t: number) => world.diplomacy.envoys.f
 /** Why realm n can't send this envoy to t now, or null. */
 export function whyNotEnvoy(world: World, n: number, t: number, action: string): string | null {
   if (!(ENVOY_ACTIONS as readonly string[]).includes(action)) return "no such mission";
+  return whyNotCourt(world, n, t) ?? whyNotMission(world, n, t, action);
+}
+
+/** Why realm n can't send any envoy to t now, or null. */
+function whyNotCourt(world: World, n: number, t: number): string | null {
   if (n < 0 || t < 0 || n >= world.nationCount || t >= world.nationCount || n === t) return "no such realm";
   if (world.nationGone[t]) return "that realm is gone";
+  const a = world.nationIds[n]!;
+  if (rel.has(world.diplomacy.graph, "at_war", a, world.nationIds[t]!)) return "you are at war";
+  if (envoyTo(world, n, t)) return "an envoy is already on the way";
+  if (dip.freeSeats(world.diplomacy, a) <= 0) return "no free envoy: every seat is taken";
+  return null;
+}
+
+/** Why realm n can't send this mission to t, once an envoy can ride there. */
+function whyNotMission(world: World, n: number, t: number, action: string): string | null {
   const g = world.diplomacy.graph;
   const a = world.nationIds[n]!;
   const b = world.nationIds[t]!;
-  if (rel.has(g, "at_war", a, b)) return "you are at war";
-  if (envoyTo(world, n, t)) return "an envoy is already on the way";
-  if (dip.freeSeats(world.diplomacy, a) <= 0) return "no free envoy: every seat is taken";
   if (action === "propose_alliance") {
     if (rel.has(g, "alliance", a, b)) return "already allies";
     if (rel.overlord(g, a) === b || rel.overlord(g, b) === a) return "a subject is bound already";
@@ -118,6 +132,38 @@ export function whyNotEnvoy(world: World, n: number, t: number, action: string):
   if (action === "arrange_marriage" && dip.marriagesBetween(world.diplomacy, a, b) > 0) return "your houses are married already";
   if (action === "send_gift" && world.nationTreasury[n]! < giftGold(world)) return `needs ${giftGold(world)} gold`;
   return null;
+}
+
+/** The missions the reasons decide, which show a hint before sending (DIPL-229); a visit and a gift always land. */
+const COUNTED: readonly string[] = ["propose_alliance", "arrange_marriage", "offer_overlordship", "ask_protection"];
+
+/** How the count of n's ask of t stands now (DIPL-229). */
+function countNow(world: World, n: number, t: number, action: string, days: (a: string, b: string) => number, demandKind?: string): number {
+  const ask: dip.Ask = { action, asker: world.nationIds[n]!, asked: world.nationIds[t]!, ...(demandKind ? { demandKind } : {}) };
+  return dip.countAsk(world.diplomacy, ask, days).total;
+}
+
+/**
+ * How each ask of the player's would count with a realm now: the missions the
+ * reasons decide, tribute, and a province demand before It's our heartland.
+ * The view reads them for every realm, and a count reads the whole realm, so
+ * they are counted once a month, as the world stands then; the word is rough
+ * enough that a gift arriving mid-month waits for the next (DIPL-229).
+ */
+const hintCache = new WeakMap<World, { month: string; player: number; by: Map<number, Record<string, number>> }>();
+
+function countsNow(world: World, player: number, n: number, days: (a: string, b: string) => number): Record<string, number> {
+  const month = dip.monthOf(world.diplomacy.date);
+  let c = hintCache.get(world);
+  if (!c || c.month !== month || c.player !== player) hintCache.set(world, (c = { month, player, by: new Map() }));
+  let out = c.by.get(n);
+  if (!out) {
+    out = {};
+    for (const a of COUNTED) out[a] = countNow(world, player, n, a, days);
+    for (const k of DEMAND_KINDS) out[k] = countNow(world, player, n, "demand", days, k);
+    c.by.set(n, out);
+  }
+  return out;
 }
 
 /** Sends an envoy (an order of the player's or the AI's). */
@@ -283,6 +329,8 @@ export function monthlyStatecraft(world: World, news: News[]): void {
   aiRisings(world, news);
   aiOverlords(world, news);
   aiOverlordEnvoys(world, news);
+  // Everyone ages and may die each January, then claims lapse (REALM-270, SUBJ-126).
+  yearlyPeople(world, news);
   yearlyCrowns(world, news);
   monthlyCourting(world, news);
   aiCourting(world, (s) => bondOf(world, s)?.loyalty ?? null);
@@ -409,21 +457,37 @@ function aiEnvoys(world: World): void {
     for (const x of near[n]!) {
       if (world.nationGone[x]) continue;
       const w = dip.standing(d, world.nationIds[x]!, id);
-      if (w > warmest) [t, warmest] = [x, w];
+      if (w > warmest) {
+        t = x;
+        warmest = w;
+      }
     }
-    if (t < 0) continue;
+    // Besides the warmest neighbour, the realms its ally and subject goals name (EVT-106).
+    const asks = goalAsks(world, n);
+    if (t < 0 && !asks.length) continue;
     const days = countDays(world);
     let best: { t: number; action: string; total: number } | null = null;
-    for (const action of ["propose_alliance", "arrange_marriage", "offer_overlordship"] as const) {
-      if (whyNotEnvoy(world, n, t, action)) continue;
+    // Nothing changes while the asks are weighed: each court's envoy check and the reach are read once.
+    const court = new Map<number, string | null>();
+    let mayTake: boolean | undefined;
+    const warm = t;
+    const weigh = (t: number, action: string, extra: number) => {
+      if (!(ENVOY_ACTIONS as readonly string[]).includes(action)) return;
+      let why = court.get(t);
+      if (why === undefined) court.set(t, (why = whyNotCourt(world, n, t)));
+      if (why !== null || whyNotMission(world, n, t, action)) return;
       // An AI overlord takes no subject that would put it more than 1 over its reach (SUBJ-098).
-      if (action === "offer_overlordship" && !aiMayTakeSubject(world, n)) continue;
-      const count = dip.countAsk(d, { action, asker: id, asked: world.nationIds[t]! }, days);
+      if (action === "offer_overlordship" && !(mayTake ??= aiMayTakeSubject(world, n))) return;
+      // The warmest neighbour's standing toward us is known already.
+      const count = dip.countAsk(d, { action, asker: id, asked: world.nationIds[t]! }, days, t === warm ? warmest : undefined);
       // The AI counts the other court's notoriety against binding itself to it (DIPL-223).
-      const total = count.total - (dip.NOTORIETY_ASKS.includes(action) ? dip.notorietyPoints(d, world.nationIds[t]!) : 0);
+      const total = count.total - (dip.NOTORIETY_ASKS.includes(action) ? dip.notorietyPoints(d, world.nationIds[t]!) : 0) + extra;
       if (!best || total > best.total) best = { t, action, total };
-    }
+    };
+    if (t >= 0) for (const action of ["propose_alliance", "arrange_marriage", "offer_overlordship"] as const) weigh(t, action, 0);
+    for (const a of asks) for (const action of a.actions) weigh(a.target, action, goalsConfig.goals.envoy_points_per_pull * a.pull);
     if (!best) continue;
+    best = best as { t: number; action: string; total: number };
     const choice = dip.aiChoose(best.total);
     if (choice === "send") sendEnvoy(world, n, best.t, best.action);
     else if (choice === "gift_first" && dip.country(d, id).goldToSpare) sendEnvoy(world, n, best.t, "send_gift");
@@ -443,9 +507,11 @@ export function standingOf(world: World, holder: number, other: number): { stand
   const d = world.diplomacy;
   const a = world.nationIds[holder]!;
   const b = world.nationIds[other]!;
-  const n = dip.standing(d, a, b);
-  const lines: StandingLine[] = dip.ledgerOf(d, a, b).map((e) => ({ name: e.name, weight: Math.round(e.weight) }));
+  // The ledger and relation line are read once, for the standing and its lines alike.
+  const ledger = dip.ledgerOf(d, a, b);
   const line = dip.relationLine(d, a, b);
+  const n = dip.standing(d, a, b, ledger, line);
+  const lines: StandingLine[] = ledger.map((e) => ({ name: e.name, weight: Math.round(e.weight) }));
   if (line.weight) lines.unshift({ name: RELATION_NAME[line.relation] ?? line.relation.replace(/_/g, " "), weight: line.weight });
   return { standing: Math.round(n), word: dip.standingWord(n), lines };
 }
@@ -460,8 +526,11 @@ export interface StatecraftView {
   envoys: { target: number; action: string; status: string; arrival: string; home?: string }[];
   /** Answers received in the last two years, newest first, with the reasons each court counted. */
   letters: { from: number; action: string; answer: "yes" | "no" | "done"; text: string; reasons: { name: string; number: number }[]; total?: number; month: string }[];
-  /** For every other realm: what it thinks of the player, the ledger behind it, and why each mission can't be sent now (null when it can), in ENVOY_ACTIONS order. */
-  realms: Record<number, { standing: number; word: string; lines: StandingLine[]; why: (string | null)[]; married: boolean; demands: DemandView; notoriety: number; price: PriceOfWar | null }>;
+  /**
+   * For every other realm: what it thinks of the player, the ledger behind it, why each mission can't be sent now
+   * (null when it can) and, for one the reasons decide that can be sent, how likely a yes is (DIPL-229), in ENVOY_ACTIONS order.
+   */
+  realms: Record<number, { standing: number; word: string; lines: StandingLine[]; why: (string | null)[]; hints: (dip.AskHint | null)[]; married: boolean; demands: DemandView; notoriety: number; price: PriceOfWar | null }>;
   /** The player's own name abroad: notoriety, Lands taken against the league threshold and the leagues against them (DIPL-225). */
   nameAbroad: NameAbroadView;
   /** The player's subjects and its own overlord (SUBJ-091, SUBJ-102). */
@@ -488,7 +557,9 @@ export interface AskView {
 export interface DemandView {
   why: string | null;
   tribute: string | null;
-  provinces: { province: number; name: string; capital: boolean }[];
+  /** How likely they are to give in to each demand that can be made (DIPL-229). */
+  tributeHint: dip.AskHint | null;
+  provinces: { province: number; name: string; capital: boolean; hint: dip.AskHint }[];
 }
 
 export function statecraftView(world: World, player: number): StatecraftView | null {
@@ -507,16 +578,24 @@ export function statecraftView(world: World, player: number): StatecraftView | n
   const realms: StatecraftView["realms"] = {};
   // The declare sheet's Price of war (WAR-229) for every realm the player could declare on, sharing the player's own reads.
   const ctx = priceContext(world, player);
+  const days = countDays(world);
   for (let n = 0; n < world.nationCount; n++) {
     if (n === player || world.nationGone[n]) continue;
     const s = standingOf(world, n, player);
     const why = whyNotDemandAtAll(world, player, n);
     const near = why ? [] : demandableProvinces(world, player, n);
     const capital = world.provinceIndex.get(world.rules.nations[n]!.capital);
-    const demands: DemandView = { why, tribute: why ? why : whyNotDemand(world, player, n, "pay_tribute"), provinces: near.map((p) => ({ province: p, name: world.rules.provinces[p]!.name, capital: p === capital })) };
+    const tribute = why ? why : whyNotDemand(world, player, n, "pay_tribute");
+    const whys = ENVOY_ACTIONS.map((a) => whyNotEnvoy(world, player, n, a));
+    const counts = countsNow(world, player, n, days);
+    // A province demand is counted like any other, with It's our heartland for their capital (DIPL-204).
+    const heart = dip.config.actions.demand.heartland_province;
+    const provinces = near.map((p) => ({ province: p, name: world.rules.provinces[p]!.name, capital: p === capital, hint: dip.askHint(counts.hand_over_province! + (p === capital ? heart : 0)) }));
+    const demands: DemandView = { why, tribute, tributeHint: tribute === null ? dip.askHint(counts.pay_tribute!) : null, provinces };
     realms[n] = {
       ...s,
-      why: ENVOY_ACTIONS.map((a) => whyNotEnvoy(world, player, n, a)),
+      why: whys,
+      hints: ENVOY_ACTIONS.map((a, k) => (whys[k] === null && a in counts ? dip.askHint(counts[a]!) : null)),
       married: dip.marriagesBetween(d, me, world.nationIds[n]!) > 0,
       demands,
       notoriety: dip.notoriety(d, world.nationIds[n]!),

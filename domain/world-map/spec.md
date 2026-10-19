@@ -41,7 +41,7 @@ Newest decision first.
 2. `terrain/terrain.md` (= repo `docs/terrain.md`, identical): 22 tile types, categories, shares, sources,
    province ground rule, rivers, differences from the province design.
 3. Repository `README.md` "The world map"; `tools/mapgen/config.json`; `tools/mapgen/mapgen.ts`;
-   `packages/rules/data/world/provinces.json` and `map.json` (the built data).
+   `packages/rules/data/scenarios/1444/world/provinces.json` and `map.json` (the built data).
 4. `province-stats/province-stats-design.md` v3 §2.1 (tiles by size, shore tiles), §3 (11 grounds),
    §9 (road, river, days to capital, as geography), §16 (map as a starting source), §17.
 5. `naval/naval-design.md` §1.3, §7.1–7.3, §13 ("Map (game build)").

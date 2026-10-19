@@ -8,7 +8,7 @@
   "controllerEndTurnHoldSeconds": 0.5,
   "campaignEndDateDefault": "1939-08-31",
   "endDateEarliestYear": 1494,
-  "dominationShare": 0.5,
+  "dominationShare": 1,
   "dominationCheckMonth": 1,
   "ledgerLeaders": 5,
   "scores": [
@@ -124,7 +124,7 @@
       "kind": "Full",
       "firstFocus": "last tab's first item",
       "back": "map",
-      "music": "unchanged; diplomacy mood on Abroad"
+      "music": "unchanged; diplomacy mood on Diplomacy"
     },
     "game_menu": {
       "name": "Game menu",
@@ -239,7 +239,7 @@
     "leaveUnsaved": "Leave {date} unsaved? · Save first · Leave · Cancel",
     "tapToStart": "Tap to start",
     "noAchievementsOutsideIronman": "Achievements are earned only in ironman campaigns",
-    "achievementsOff": "Achievements (off for this campaign)",
+    "playedOn": "Achievements (off for this campaign)",
     "attentionTitle": "Needs attention",
     "firstLaunch": "New to Pocket Hegemony?"
   },
@@ -276,7 +276,7 @@
     "Credits"
   ],
   "start": {
-    "$comment": "The start screen (SHELL-149..158): shell.start_zoom, shell.start_pan_speed (map pixels per second at that zoom), shell.start_regions (the 1444 realms whose land the map pans over when no campaign is in progress, one per start), shell.wiki_url (placeholder until the wiki is published).",
+    "$comment": "The start screen (SHELL-149..158): shell.start_zoom, shell.start_pan_speed (map pixels per second at that zoom), shell.start_regions (realms on the start map whose land the map pans over when no campaign is in progress, one per start), shell.wiki_url (placeholder until the wiki is published).",
     "zoom": "Region",
     "zoomLevel": 3,
     "panSpeed": 6,
@@ -320,44 +320,47 @@
   "toolColumn": [
     "map mode",
     "go to capital",
-    "Realm book"
+    "commanders",
+    "sound"
   ],
   "realmBook": {
     "Realm": [
-      "country card in full",
-      "ruler and family",
-      "lords",
-      "government"
+      "Overview",
+      "Government",
+      "Heritage",
+      "Score"
     ],
-    "Treasury": [
-      "treasury",
-      "Tax screen",
-      "Food policy screen",
-      "trade"
+    "Economy": [
+      "Treasury",
+      "Trade",
+      "Food"
     ],
-    "Army": [
-      "all armies and fleets",
-      "commanders",
-      "levy",
-      "commission",
-      "troop cap"
+    "Lands": [
+      "Provinces",
+      "Officials",
+      "Lords",
+      "Colonies",
+      "Hunting grounds"
     ],
-    "Abroad": [
-      "diplomacy",
-      "relations",
-      "subjects",
-      "wars and peace voices"
+    "Military": [
+      "Army",
+      "Navy"
     ],
-    "Learning": [
-      "schools",
-      "research tree",
-      "religion and culture"
+    "Diplomacy": [
+      "Diplomacy"
     ],
-    "Chronicle": [
-      "past turn reports",
-      "event log",
-      "battle reports",
-      "ledger"
+    "Research": [
+      "Research",
+      "Peoples"
+    ]
+  },
+  "realmOverview": {
+    "tiles": [
+      "Economy",
+      "Lands",
+      "Military",
+      "Diplomacy",
+      "Research"
     ]
   },
   "attention": {
@@ -586,7 +589,9 @@
     "turnStripAfterSeconds",
     "controllerEndTurnHoldSeconds",
     "endDateEarliestYear",
-    "ledgerLeaders"
+    "ledgerLeaders",
+    "desk.watchStepMs",
+    "desk.alertSeconds"
   ],
   "battleSteps": {
     "hoursPerStep": 4,
@@ -599,5 +604,111 @@
   "turn": {
     "days": 7,
     "dateFormat": "{day} {month} {year}"
+  },
+  "desk": {
+    "$comment": "Dispatches log, alerts over the map, the week waiting at a battle, AI peace offers and the country card (SHELL-138 to SHELL-148).",
+    "dispatchesKept": 400,
+    "alertsShown": 3,
+    "alertSeconds": 12,
+    "watchStepMs": 1200,
+    "battleStepMs": 500,
+    "countryCardTabs": [
+      "General",
+      "Diplomacy",
+      "Trade",
+      "Army"
+    ],
+    "tabHolds": {
+      "General": [
+        "ruler",
+        "gold",
+        "food",
+        "people",
+        "castles",
+        "officials",
+        "lords",
+        "schools",
+        "faith",
+        "tongue",
+        "in revolt",
+        "fallen"
+      ],
+      "Diplomacy": [
+        "standing",
+        "envoys",
+        "allies",
+        "enemies",
+        "oaths broken",
+        "declare war",
+        "offer peace",
+        "ask for peace",
+        "the peace table",
+        "peace offers"
+      ],
+      "Trade": [
+        "wealth",
+        "trade income",
+        "trade pacts",
+        "embargoes"
+      ],
+      "Army": [
+        "soldiers",
+        "recruits",
+        "horses",
+        "commanders",
+        "ships"
+      ]
+    },
+    "subjects": {
+      "diplomacy": "Diplomacy",
+      "trade": "Trade",
+      "army": "Army"
+    },
+    "overviews": {
+      "armies": {
+        "overview": "Army list",
+        "shows": [
+          "commander",
+          "men",
+          "where"
+        ],
+        "opens": "the army"
+      },
+      "garrison troops": {
+        "overview": "Garrison tab",
+        "shows": [
+          "troops without a commander",
+          "levies gathering",
+          "commanders present"
+        ],
+        "opens": "the troops"
+      },
+      "warnings": {
+        "overview": "Needs attention",
+        "shows": [
+          "what is wrong",
+          "where"
+        ],
+        "opens": "Show"
+      },
+      "waiting for an answer": {
+        "overview": "Dispatches",
+        "shows": [
+          "calls to arms",
+          "peace offers",
+          "events"
+        ],
+        "opens": "Answer"
+      }
+    },
+    "phoneSafeArea": {
+      "top": 0,
+      "right": 47,
+      "bottom": 21,
+      "left": 47
+    },
+    "keys": {
+      "Space": "End turn"
+    }
   }
 }

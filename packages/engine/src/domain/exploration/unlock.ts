@@ -63,9 +63,10 @@ export function ageEnds(_gate: AgeGate): void {}
  */
 export function gateAgeFor(region: string, gating: string = cfg.unlock_age): string | null {
   if (ageRegions(gating).includes(region)) return gating;
+  // An age that starts later: its window opens only after the gating age is forced on (D-EXPL-3).
   const from = regionData.ages[gating]?.force_start ?? 0;
   const later = Object.entries(regionData.ages)
-    .filter(([id, a]) => id !== gating && (a.force_start ?? Infinity) > from && a.regions.includes(region))
+    .filter(([id, a]) => id !== gating && (a.earliest_start ?? a.force_start ?? Infinity) > from && a.regions.includes(region))
     .sort((a, b) => (a[1].force_start ?? Infinity) - (b[1].force_start ?? Infinity));
   return later[0]?.[0] ?? null;
 }
@@ -75,11 +76,15 @@ export function anyAgeBegins(gate: AgeGate, age: string, regions: readonly strin
   for (const r of regions) if (gateAgeFor(r, gate.age) === age) gate.begunIn.add(r);
 }
 
-/** The 1444 start: the Age of Exploration starts in 1444 (its force_start) in all its regions. */
-export function gateAtStart(year: number): AgeGate {
+/**
+ * The gate at the start: the Age of Exploration has begun in all its regions when its
+ * start condition held at the start (`begun`, inside its window) or its forced year has come (EXPL-076).
+ */
+export function gateAtStart(year: number, begun = false): AgeGate {
   const gate = newAgeGate();
-  const start = regionData.ages[gate.age]?.force_start;
-  if (start !== null && start !== undefined && year >= start) ageBegins(gate);
+  const a = regionData.ages[gate.age];
+  const inWindow = year >= (a?.earliest_start ?? -Infinity);
+  if ((begun && inWindow) || (a?.force_start != null && year >= a.force_start)) ageBegins(gate);
   return gate;
 }
 

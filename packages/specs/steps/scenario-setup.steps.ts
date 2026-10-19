@@ -773,7 +773,8 @@ Then("it is the record {string}", (s, record: string) => {
 });
 
 Given("the map's {int} nations", (s, n: number) => {
-  s.nations = loadDefaultRuleset().nations;
+  // The sleeping realms come after the map's nations and are not on the 1444 map (SETUP-080).
+  s.nations = loadDefaultRuleset().nations.filter((x) => !x.asleep);
   expect(s.nations).toHaveLength(n);
 });
 
@@ -857,14 +858,15 @@ When("a new campaign starts", (s) => {
 
 Then("every nation with no catalogue assessment has {int} gold", (s, gold: number) => {
   const w = s.world;
-  for (const n of loadDefaultRuleset().nations) if (S.catalogueIdOf(n.id) === null) expect(w.nationTreasury[w.nationIndex.get(n.id)]).toBe(gold);
+  for (const n of loadDefaultRuleset().nations) if (!n.asleep && S.catalogueIdOf(n.id) === null) expect(w.nationTreasury[w.nationIndex.get(n.id)]).toBe(gold);
 });
 
 Then("its levies are {int} men per thousand people", (s, per: number) => {
   const w = s.world;
-  const total = Array.from(w.nationMaxLevies as Float64Array).reduce((a, b) => a + b, 0);
+  // Each province's recruit ceiling, royal land and lords' land alike (a lord's fills his retinue, WAR-252).
+  let total = 0;
   let people = 0;
-  for (let p = 0; p < w.provinceCount; p++) if (w.provinceOwner[p] >= 0) people += w.provincePopulation[p];
+  for (let p = 0; p < w.provinceCount; p++) if (w.provinceOwner[p] >= 0) (total += w.provinceRecruitCeiling[p], (people += w.provincePopulation[p]));
   expect(total).toBeCloseTo(people * per);
 });
 

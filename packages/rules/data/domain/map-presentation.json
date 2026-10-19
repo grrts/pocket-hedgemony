@@ -493,7 +493,7 @@
       "clerks",
       "scholars"
     ],
-    "cellsPerRootK": 1.0,
+    "cellsPerRootK": 1.5,
     "maxCells": 30,
     "coreShare": 0.6,
     "growRadius": 8,
@@ -513,6 +513,7 @@
     },
     "roads": {
       "searchMargin": 4,
+      "straightness": 0.4,
       "cost": {
         "default": 1,
         "forest": 2,
@@ -576,7 +577,8 @@
         "living": 8,
         "street": 24
       },
-      "spread": 6
+      "spread": 6,
+      "berthSpacing": 2
     },
     "traders": {
       "maxTraders": 300,
@@ -587,11 +589,76 @@
       }
     },
     "tapBoxPoints": 44,
+    "worshipVariant": {
+      "christian": 0,
+      "jewish": 0,
+      "islamic": 1,
+      "buddhist": 2,
+      "east_asian": 2,
+      "traditional": 2,
+      "indic": 3,
+      "none": 0
+    },
     "townStyles": {
       "generic": {
         "cultureGroups": []
       }
     },
     "landmarks": {}
+  },
+  "effects": {
+    "$comment": "Particles and animations (VIEW-140..VIEW-150, visuals/particles-and-animations-design.md). Decoration only: every moment has its news line too (VIEW-127). Starting values, to be tuned in play.",
+    "fromZoom": 2,
+    "maxParticles": 240,
+    "frameRate": 20,
+    "loopFrameRate": 10,
+    "emitMs": 250,
+    "reducedShare": 0.5,
+    "moments": {
+      "flip": {
+        "seconds": 1.8,
+        "particles": 24
+      },
+      "built": {
+        "seconds": 2.0,
+        "particles": 20
+      },
+      "rising": {
+        "seconds": 3.0,
+        "particles": 24
+      },
+      "glory": {
+        "seconds": 2.0,
+        "particles": 20
+      },
+      "plague": {
+        "seconds": 3.0,
+        "particles": 14
+      }
+    },
+    "gloryNews": [
+      "invention",
+      "ruler",
+      "reform",
+      "heritage"
+    ],
+    "chimneys": {
+      "fromZoom": 16,
+      "coreCellsPerChimney": 5,
+      "maxPerTown": 3,
+      "maxPuffs": 120,
+      "puffChance": 0.6
+    },
+    "snow": {
+      "belowCelsius": 0,
+      "maxFlakes": 80,
+      "perEmit": 10
+    },
+    "birds": {
+      "flockMin": 3,
+      "flockMax": 5,
+      "flocksOnScreen": 1,
+      "chance": 0.04
+    }
   }
 }

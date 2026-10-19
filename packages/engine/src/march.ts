@@ -103,14 +103,20 @@ export function planRoute(d: MarchDefines, map: MarchMap, from: number, to: numb
   const n = map.ground.length;
   // stepDays(p, q) = (half[p] + enter[q]) * pace + river[q], split per province.
   const pace = d.daysPerCrossing / (1 + d.horseSpeedBonus * (a.men > 0 ? Math.min(1, a.horse / a.men) : 0));
-  const half = new Float64Array(n);
-  const enter = new Float64Array(n).fill(Infinity);
-  for (let p = 0; p < n; p++) {
+  // Each province's costs are worked out when the search first reaches it: most searches stop long before the far side of the map.
+  const half = new Float64Array(n).fill(NaN);
+  const enter = new Float64Array(n);
+  const reach = (p: number) => {
+    if (half[p] === half[p]) return;
     const g = map.ground[p];
-    if (!g) continue;
+    if (!g) {
+      half[p] = 0;
+      enter[p] = Infinity;
+      return;
+    }
     half[p] = (d.daysToCross[g] / 2) * pace;
     enter[p] = half[p]! + (a.men > forageLimit(d, map, p) ? d.bigArmyExtraCrossings * pace : 0) + (map.river[p] ? d.riverCrossingDays : 0);
-  }
+  };
   const dist = new Float64Array(n).fill(Infinity);
   const prev = new Int32Array(n).fill(-1);
   // Binary heap of (cost, province); a province may sit in it more than once.
@@ -165,10 +171,12 @@ export function planRoute(d: MarchDefines, map: MarchMap, from: number, to: numb
     if (done[p]) continue;
     done[p] = 1;
     if (p === to) break;
+    reach(p);
     const base = dist[p]! + half[p]!;
     for (let k = map.adjStart[p]!, end = map.adjStart[p + 1]!; k < end; k++) {
       const q = map.adjList[k]!;
       if (barred?.(p, q)) continue;
+      reach(q);
       const c = base + enter[q]!;
       if (c < dist[q]!) {
         dist[q] = c;
@@ -336,6 +344,89 @@ export function planTilePath(m: TileMarch, from: number, to: number, allowed: Ui
     for (let t = to; t !== from; t = s.prev[local(t)]!) tiles.push(t);
     tiles.reverse();
     result = { tiles: Int32Array.from(tiles), hours: Float32Array.from(tiles, (t) => s.g[local(t)]!) };
+  }
+  s.g.fill(Infinity, 0, bw * bh);
+  s.closed.fill(0, 0, bw * bh);
+  return result;
+}
+
+/**
+ * Shortest sail over water tiles from one tile to another (A* on distance,
+ * eight ways round), only through tiles of the sea zones marked in `zones`;
+ * null when there is none. Fleets sail a zone at a time, so the search spans
+ * two zones (feedback 122). With `landCost`, it may cross land at that many
+ * times the cost of water: a strait too narrow for the map's tiles.
+ */
+export function planSeaPath(grid: TileGrid, rowWidth: Float32Array, from: number, to: number, zones: Uint8Array, landCost = 0): Int32Array | null {
+  const W = grid.width;
+  if (from === to || grid.cell[to] !== WATER) return null;
+  let x0 = W;
+  let y0 = grid.height;
+  let x1 = -1;
+  let y1 = -1;
+  const widen = (t: number) => {
+    const x = t % W;
+    const y = (t - x) / W;
+    ((x0 = Math.min(x0, x)), (y0 = Math.min(y0, y)), (x1 = Math.max(x1, x)), (y1 = Math.max(y1, y)));
+  };
+  for (let p = 0; p < zones.length; p++) {
+    if (!zones[p] || grid.bounds[p * 4 + 2]! < 0) continue;
+    widen(grid.bounds[p * 4 + 1]! * W + grid.bounds[p * 4]!);
+    widen(grid.bounds[p * 4 + 3]! * W + grid.bounds[p * 4 + 2]!);
+  }
+  widen(from);
+  widen(to);
+  const bw = x1 - x0 + 1;
+  const bh = y1 - y0 + 1;
+  const s = scratch(bw * bh);
+  const local = (t: number) => (Math.floor(t / W) - y0) * bw + (t % W) - x0;
+  const tx = to % W;
+  const ty = Math.floor(to / W);
+  const estimate = (x: number, y: number) => Math.max(Math.abs(x - tx) * rowWidth[y]!, Math.abs(y - ty));
+  const heap = s.heap;
+  heap.size = 0;
+  s.g[local(from)] = 0;
+  heapPush(heap, estimate(from % W, Math.floor(from / W)), from);
+  let found = false;
+  while (heap.size) {
+    const t = heapPop(heap);
+    const lt = local(t);
+    if (s.closed[lt]) continue;
+    s.closed[lt] = 1;
+    if (t === to) {
+      found = true;
+      break;
+    }
+    const x = t % W;
+    const y = (t - x) / W;
+    const base = s.g[lt]!;
+    for (let dy = -1; dy <= 1; dy++) {
+      const ny = y + dy;
+      if (ny < y0 || ny > y1) continue;
+      for (let dx = -1; dx <= 1; dx++) {
+        if (!dx && !dy) continue;
+        const nx = x + dx;
+        if (nx < x0 || nx > x1) continue;
+        const n = ny * W + nx;
+        const ln = (ny - y0) * bw + nx - x0;
+        if (s.closed[ln]) continue;
+        const wet = grid.cell[n] === WATER;
+        if (!wet && !landCost) continue;
+        const z = grid.province[n]! - 1;
+        if (wet && n !== to && (z < 0 || !zones[z])) continue;
+        const c = base + (dx === 0 ? 1 : dy === 0 ? rowWidth[ny]! : Math.hypot(1, rowWidth[ny]!)) * (wet ? 1 : landCost);
+        if (c >= s.g[ln]!) continue;
+        s.g[ln] = c;
+        s.prev[ln] = t;
+        heapPush(heap, c + estimate(nx, ny), n);
+      }
+    }
+  }
+  let result: Int32Array | null = null;
+  if (found) {
+    const tiles: number[] = [];
+    for (let t = to; t !== from; t = s.prev[local(t)]!) tiles.push(t);
+    result = Int32Array.from(tiles.reverse());
   }
   s.g.fill(Infinity, 0, bw * bh);
   s.closed.fill(0, 0, bw * bh);

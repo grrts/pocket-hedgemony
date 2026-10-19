@@ -12,6 +12,17 @@ Feature: The tree reaches back before 1444
     And it holds 8 past inventions of era Ancient and 5 of era Medieval
     And it holds 187 inventions in all
 
+  @RSCH-032 @RSCH-091
+  Scenario Outline: Era I runs from the start
+    Given the invention tree config with the past eras
+    Then the era "<era>" runs from <from> to <to>
+
+    Examples:
+      | era      | from | to   |
+      | Medieval | 600  | 1377 |
+      | Era I    | 1378 | 1499 |
+      | Era II   | 1500 | 1599 |
+
   @RSCH-093
   Scenario Outline: Past inventions open the Era I rows
     Given the invention tree config with the past eras
@@ -45,9 +56,9 @@ Feature: The tree reaches back before 1444
 
     Examples:
       | country | past                | n | cost |
-      | Aztecs  | C01 Iron smelting   | 0 | 10   |
-      | Kongo   | G01 Writing         | 0 | 10   |
-      | Songhai | C03 Gunpowder       | 3 | 10.5 |
+      | Aztecs  | C01 Iron smelting   | 0 | 5    |
+      | Kongo   | G01 Writing         | 0 | 5    |
+      | Songhai | C03 Gunpowder       | 3 | 7.875 |
 
   @RSCH-094 @placeholder
   Scenario Outline: Without a past invention a realm plays below the baseline
@@ -91,6 +102,6 @@ Feature: The tree reaches back before 1444
       | France   | Era I    | 0    |
       | Ming     | Era I    | 0    |
       | Champa   | Medieval | 1    |
-      | Oirat    | Ancient  | 2    |
+      | Oirat    | Medieval | 1    |
       | Mali     | Ancient  | 2    |
       | Iroquois | Ancient  | 2    |

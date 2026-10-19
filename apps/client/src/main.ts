@@ -34,36 +34,49 @@ import {
   topBar,
   treasuryView,
   type Opens,
+  shareAtDays,
+  STABILITY,
+  STABILITY_EFFECTS,
+  DEFAULT_RULE,
+  takenUntil,
+  THRONE,
 } from "@ph/engine";
 import type { GameDate } from "@ph/rules";
-import { askCard, courtLordHtml, myHouse, mySubjects, myStatecraft, realmStatecraft, subjectCard } from "./ui/statecraft.ts";
-import { rebelsUi, risingCard, risingsLine, risingsOverview, verdictCard, type Attacker } from "./ui/rebels.ts";
+import { askCard, courtLordHtml, myHouse, mySubjects, myStatecraft, overlordCard, realmStatecraft, subjectCard } from "./ui/statecraft.ts";
+import { rebelsUi, risingCard, risingsOverview, verdictCard, type Attacker } from "./ui/rebels.ts";
 import { heritageLine, heritageTab } from "./ui/heritage.ts";
+import { fitDraft, offerLine, peaceTable, startDraft, stepGold, togglePick, type PeaceDraft } from "./ui/peace.ts";
 import { fallenLine, rulerLines } from "./ui/ruler.ts";
-import { loadDefaultRuleset } from "@ph/rules";
+import { DEFAULT_START, loadDefaultRuleset, SESSION_START_KEY, START_ID, START_SCENARIO, startRulers } from "@ph/rules";
 import { hexToRgb, PALETTE, TERRAINS } from "./art/palette.ts";
-import { sprite, spriteUrl } from "./art/sprites.ts";
-import { icon, iconUrl, installUiArt, flagCanvas, flagUrl, UI_COLORS, type FlagOf } from "./art/ui.ts";
+import { figureSprite, sprite, spriteUrl } from "./art/sprites.ts";
+import { icon, iconUrl, installUiArt, flagCanvas, flagUrl, UI_COLORS, type FlagOf, type IconName } from "./art/ui.ts";
 import { apparentAge, eraOfYear } from "./art/commanders.ts";
 import { lookOfCulture, setPortraitYear } from "./art/portraits.ts";
 import { EngineClient } from "./engineClient.ts";
-import { hideLoading, loadingStage, painted, showLoading } from "./loading.ts";
+import { hideLoading, loadingStage, painted, setLoadingStart, showLoading } from "./loading.ts";
 import { stabilityPlaque, stabilitySection } from "./ui/stability.ts";
 import { cap, DEFAULT_TITLES } from "./ui/titles.ts";
+import { chapterCard, endCard, scoreLine, scoreTab } from "./ui/score.ts";
 import { lockRevolutionButtons, revolutionCardHtml, revolutionSection } from "./ui/revolution.ts";
-import { governmentLine, governmentTab, governmentUi } from "./ui/government.ts";
-import { isShipKind, provinceTradeLine, routeBar, stopBit, tradeLine, tradeTab, tradeUi, type Routing } from "./ui/trade.ts";
+import { governmentTab, governmentUi } from "./ui/government.ts";
+import { isShipKind, provinceTradeLine, routeBar, stopBit, tradeTab, traderCardHtml, tradeUi, type Routing } from "./ui/trade.ts";
 import { beliefData, beliefFacts, beliefLines, beliefUi, peoplesTab } from "./ui/belief.ts";
 import { censureWarningHtml, faithBadgeHtml, headCardHtml, seatKeyHtml } from "./ui/faithHeads.ts";
 import { declareSheetHtml, nameAbroadHtml, warCardHtml, warPlaqueBars } from "./ui/priceOfWar.ts";
-import { closeUpPoint, firstShown, jumpTarget, learningLine, learningTab, newLearningUi, nodeAt, realmLearningLine, startStanding } from "./ui/learning.ts";
+import { closeUpPoint, firstShown, jumpTarget, learningTab, newLearningUi, nodeAt, realmLearningLine, startStanding, studyNow } from "./ui/learning.ts";
 import { provinceWorks } from "./ui/works.ts";
 import { provinceLand } from "./ui/land.ts";
-import { castleFoodLine, castleFoodSettings, foodLine, foodTab } from "./ui/food.ts";
+import { castleFoodLine, castleFoodSettings, foodCounts, foodTab, landShare as landShareOf } from "./ui/food.ts";
+import { bindFolds } from "./ui/fold.ts";
+import { aimsFoldHtml, chronicleHtml, type ChronicleUi } from "./ui/chronicle.ts";
+import { startGoals, type GoalDef } from "@ph/rules";
 import { commanderPortrait, officialCard, officialOf, officialScreen, officialsTab, paintSiege, postScreen, siegeView, type SiegeInfo } from "./ui/people.ts";
-import { governanceCard, LOYALTY_ORDER, lordScreen, lordsTab, type LordLands, type LordView, type ProvinceRow } from "./ui/lords.ts";
+import { governanceCard, LOYALTY_ORDER, loyaltyBadge, lordScreen, lordsMenSection, lordsTab, retinueBlock, type LordLands, type LordView, type ProvinceRow, type RetinueRow } from "./ui/lords.ts";
 import { loadMapImage, type MapImage } from "./map/loadMap.ts";
 import { provinceThumb } from "./map/provinceThumb.ts";
+import { drawPlagueMark, plagueCard } from "./ui/plague.ts";
+import { stepTroop, type Pt, type Troop } from "./map/troops.ts";
 import { armyFigureUnit, armyNameShown, brackets, drawBattle, drawClash, drawFormation, drawPlate, drawRoute, drawSiegeMark, drawTents, drawToken, menShort, pruneBattles, weekEnds } from "./map/marchArt.ts";
 import { MapView, type OverlayContext } from "./map/mapView.ts";
 import { placeTrader } from "./map/traders.ts";
@@ -71,39 +84,57 @@ import { seasonBytes } from "./map/renderer.ts";
 import { detectRuntime, type Diagnostics } from "./platform.ts";
 import { sound } from "./audio/sound.ts";
 import { eventCardHtml, waitingEventsHtml } from "./ui/events.ts";
-import { dietAnswerCard, electionAnswerCard, empireAsks, empireBadgeHtml, empireCard, empireUi, institutionsKey, institutionsRows, rulingAnswerCards, type InstitutionsUi } from "./ui/institutions.ts";
-import { fleetButton, fleetCard, hireFleetsTab, navyTab, portTab } from "./ui/navy.ts";
+import { dietAnswerCard, electionAnswerCard, empireAsks, empireBadgeHtml, empireCard, empireUi, institutionsKey, institutionsRows, oathAnswerCard, rulingAnswerCards, shogunateAsks, shogunateCard, shogunateUi, shogunBadgeHtml, type InstitutionsUi } from "./ui/institutions.ts";
+import { fleetButton, fleetCard, fleetTitle, hireFleetsTab, navyTab, portTab } from "./ui/navy.ts";
 import { colonyCard, coloniesTab, colonySection, exploreSection, voyageBar } from "./ui/explore.ts";
+import { askRows, bindTribes, colonyGround, groundHead, groundSection, groundsCountLine, huntKeyHtml, huntTab, type TribesUi } from "./ui/tribes.ts";
+import { HUNT_TAB, chartsCoast, settlersAlert } from "@ph/engine/domain/tribes";
 import { achievementName, achievementsCard, loadProfile, saveProfile, takeAchievements, tileKey, toastHtml, unseen, type Filter as AchFilter } from "./ui/achievements.ts";
-import { Hints, type HintTarget } from "./ui/hints.ts";
+import { Hints, mapSpot, type HintTarget } from "./ui/hints.ts";
 import type { Hint } from "@ph/engine/domain/onboarding";
 import {
   animatedFigures,
+  bandArtPixels,
   bandFade,
   figuresAnimate,
   figuresLeft,
   formation,
+  hullCount,
+  hullsAtSea,
+  hullsInPort,
   LIVING_MAP,
   nameOnMap,
   pieceLabels,
   pieceUnit,
   playbackAdvance,
   playbackHour,
+  placeLabels,
+  provinceMarks,
   tapBox,
   type Figure,
+  type LabelAsk,
   type FormationState,
 } from "@ph/engine/domain/map-presentation";
 import { provinceLevy } from "@ph/engine/domain/recruiting";
-import { musicFacts, newFactMemory, playerPalette, playerWars, remember, type FactMemory } from "./audio/facts.ts";
-import { COMMISSION_GOLD, hireGold, OFFICIALS, resolutionOrder, Rng, type PlayerOrders } from "@ph/engine";
+import { chimneysShown, detailBands, EFFECTS, holderOf, loopingEffects, momentParticles, moments, momentSeconds, momentsShown, snowing, type MomentKind } from "@ph/engine/domain/map-presentation";
+import { ParticleField, Shape } from "./map/particles.ts";
+import { TownLayer, townInfo } from "./map/towns.ts";
+import { bedUnderCamera, musicFacts, newFactMemory, playerPalette, playerWars, remember, type FactMemory } from "./audio/facts.ts";
+import { COMMISSION_GOLD, commissionSkills, FOOD_BALANCE, hireGold, OFFICIALS, resolutionOrder, Rng, startFormOf, type PlayerOrders } from "@ph/engine";
+import { formName } from "@ph/engine/domain/government";
+import { PICKER_REGIONS, pickerRegions, startTrade, waysToGrow } from "@ph/engine/domain/scenario-setup";
+import { pickerCardHtml, regionListHtml, regionSelectHtml, strongIn, strongInWords, waysToGrowHtml } from "./ui/realmPicker.ts";
+import { BATTLE_STEP_MS, bannerAt, COUNTRY_CARD_TABS, endTurnInAuto, endTurnLabel, keyEndsTurn, newAutoTurns, realmOverview, REALM_BOOK_TABS, sectionOf, SHELL as SHELL_RULES, startColumn, startIcons, stopAuto, switchAuto, tabHolds, WATCH_STEP_MS, weekPlayed, type AutoStop, type OverviewTile, type Platform as ShellPlatform } from "@ph/engine/domain/game-shell";
+import { autosaveDue, continueTarget, longDate, newCampaign, newManualSave, saveStart, savesConfig, type Campaign, type Platform as SavePlatform } from "@ph/engine/domain/saves";
 import { mpStore, type MpStore } from "./multiplayer/store.ts";
 import { cleanCode, deviceId, findGame, forget as forgetGame, hostGame, remember as rememberGame, rememberedGames, seatOf, sendTurn, startOnline, takeSeat, watchGame, watchSeats, watchTurns, type OnlineGame, type Seat, type TurnDoc } from "./multiplayer/lobby.ts";
 import { hotseatPickHtml, lobbyHtml, menuHtml, playersHtml, type PlayerRow, type RealmLook } from "./multiplayer/screens.ts";
-import { SHELL as SHELL_RULES, endTurnInAuto, endTurnLabel, newAutoTurns, startColumn, startIcons, stopAuto, switchAuto, weekPlayed, type AutoStop, type Platform as ShellPlatform } from "@ph/engine/domain/game-shell";
-import { autosaveDue, continueTarget, longDate, newCampaign, newManualSave, savesConfig, type Campaign, type Platform as SavePlatform } from "@ph/engine/domain/saves";
 import { SaveStore, type StoredSave } from "./saves/store.ts";
-import { animationsPref, autosaveEvery, autosavesKept, battleStepMs, dayMs, livingPrefs, mapDetail, mapPower, onPrefs, setPref, textZoom } from "./settings/prefs.ts";
-import { openSettingsAt, renderSettings, setHintsRows } from "./ui/settingsScreen.ts";
+import { animationsPref, autosaveEvery, autosavesKept, battleStepMs, batteryOn, dayMs, livingPrefs, longPressMs, mapDetail, mapPower, onPrefs, setPref, textZoom } from "./settings/prefs.ts";
+import { openSettingsAt, renderSettings, setHintsRows, setOwnSection } from "./ui/settingsScreen.ts";
+import { CloudApi, CloudError, cloudBase, webKeyValue, webTokenStore } from "./cloud/api.ts";
+import { CLOUD_PATH, CloudSync } from "./cloud/sync.ts";
+import { accountHtml, accountView, bindAccount, loadCard } from "./cloud/accountCard.ts";
 
 const rules = loadDefaultRuleset();
 // ?engine=main-thread forces the fallback path, for testing it.
@@ -125,18 +156,50 @@ const diagnostics: Diagnostics = {
 // Read by the wrapper smoke tests.
 (globalThis as { __phDiagnostics?: Diagnostics }).__phDiagnostics = diagnostics;
 
-const FEATURED = ["france", "england", "castile", "portugal", "ottomans", "byzantium", "austria", "muscovy", "ming", "aztecs", "inca", "mali"];
+// The suggested realms: the great powers of each part of the world, and one start per part of Africa, as the start lists them (SETUP-074); sleeping realms are never among them (SETUP-082).
+// ?feature=great_horde adds realms to the list, for the screenshot scripts.
+const FEATURED = [...START_SCENARIO.suggested, ...(new URLSearchParams(location.search).get("feature")?.split(",") ?? [])];
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-/** "11 November 1444", or "11 Nov 1444" short. */
 /** The hour beside the date in the top bar, while the player's battle runs (VIEW-076). */
 const clockText = (hour: string | null) => (hour ? ` <small>${hour}</small>` : "");
+/** "20 September 1378", or "20 Sep 1378" short. */
 const dateText = (d: GameDate, short = false) => `${d.day ?? 1} ${short ? MONTHS[d.month - 1]!.slice(0, 3) : MONTHS[d.month - 1]} ${d.year}`;
 
+setLoadingStart(START_SCENARIO.name);
 const provinces = rules.provinces;
 const nations = rules.nations;
 const provinceIndex = new Map(provinces.map((p, i) => [p.id, i]));
 const nationIndex = new Map(nations.map((n, i) => [n.id, i]));
 const nationRgb = nations.map((n) => hexToRgb(n.color));
+/** Each realm as the rules list it, before any waking renamed or recoloured it. */
+const baseNations = nations.slice();
+/** The woken list last applied, so a snapshot with the same one costs nothing. */
+let wokenKey = "[]";
+/**
+ * A woken realm's name, colour and capital (SETUP-083, SETUP-088): a spare
+ * takes a name and colour when it wakes, a listed sleeper may take a new
+ * capital. They go into the client's own copy of the realms, so the map,
+ * flags and every card show them; each entry is replaced, never changed, as
+ * the rules' objects are shared.
+ */
+function applyWoken(s: Snapshot): void {
+  const key = JSON.stringify(s.woken);
+  if (key === wokenKey) return;
+  wokenKey = key;
+  baseNations.forEach((d, i) => {
+    if (nations[i] === d) return;
+    nations[i] = d;
+    nationRgb[i] = hexToRgb(d.color);
+  });
+  for (const w of s.woken) {
+    const i = nationIndex.get(w.id);
+    if (i === undefined) continue;
+    nations[i] = { ...baseNations[i]!, name: w.name, color: w.color, capital: w.capital };
+    nationRgb[i] = hexToRgb(w.color);
+  }
+}
+/** A realm still asleep (SETUP-082): never drawn, named or listed. Before a game, every sleeper is. */
+const asleep = (n: number) => (snapshot ? snapshot.nationAsleep[n] === 1 : !!nations[n]?.asleep);
 const unownedRgb = hexToRgb(PALETTE.unowned);
 /** Rebels' colour: land they hold is hatched in it, their bands carry it (REBL-066). */
 const REBEL_COLOR = "#2b1d1a";
@@ -144,15 +207,18 @@ const rebelRgb = hexToRgb(REBEL_COLOR);
 /** A commander by index, as the engine last reported him. */
 const cmdOf = (c: number) => snapshot!.commanders[c]!;
 type Commander = Snapshot["commanders"][number];
+/** The post a fleet's leader holds (NAVY-152): admiral, commodore or viceroy. */
+const postOf = (x: Commander) => snapshot?.navy.fleets.find((f) => f.id === x.fleet)?.post ?? "admiral";
 /**
  * A commander's name with his rank in his realm's language (feedback 125):
- * admiral at the head of a fleet, general otherwise. A hired captain's rank
- * came with his name, in his company's language.
+ * his post at the head of a fleet (admiral, commodore or viceroy), admiral at court for one
+ * commissioned to lead fleets, general otherwise (RECR-128). A hired captain's rank came with his
+ * name, in his company's language.
  */
-const titledOf = (x: Commander) => (x.origin === "a hired captain" || x.owner < 0 ? x.name : rankedName(rules, x.owner, x.name, x.fleet >= 0 ? "admiral" : "general"));
+const titledOf = (x: Commander) => (x.origin === "a hired captain" || x.owner < 0 || x.lord >= 0 ? x.name : rankedName(rules, x.owner, x.name, x.fleet >= 0 ? postOf(x) : x.sea ? "admiral" : "general"));
 const titled = (c: number) => titledOf(cmdOf(c));
 /** The same post in plain English, shown beside the ranked name. */
-const roleOf = (x: Commander) => (x.origin === "a hired captain" ? "hired captain" : x.fleet >= 0 ? "admiral" : "commander");
+const roleOf = (x: Commander) => (x.origin === "a hired captain" ? "hired captain" : x.lord >= 0 ? titlesOf(x.owner).lord : x.fleet >= 0 ? postOf(x) : x.sea ? "admiral" : "general");
 const neighborIdx = provinces.map((p) => p.neighbors.map((id) => provinceIndex.get(id)!));
 // The same, flat, for walks over the whole map each turn.
 const neighborStart = new Int32Array(provinces.length + 1);
@@ -160,6 +226,15 @@ neighborIdx.forEach((n, i) => (neighborStart[i + 1] = neighborStart[i]! + n.leng
 const neighborList = Int32Array.from(neighborIdx.flat());
 const terrainIdx = Int8Array.from(provinces, (p) => TERRAINS.indexOf(p.terrain as (typeof TERRAINS)[number]));
 const isWater = provinces.map((p) => p.terrain === "sea" || p.terrain === "ocean");
+// The realm picker's region of each realm and the start's trade, for its Region select and Ways to grow (SETUP-072, SETUP-073).
+// A sleeping realm may have no capital on the map yet (SETUP-082); it falls in no region.
+const realmRegion = pickerRegions(nations.map((n) => {
+  const c = n.asleep ? undefined : provinces[provinceIndex.get(n.capital) ?? -1];
+  return { id: n.id, x: c?.x ?? Number.NaN, y: c?.y ?? Number.NaN };
+}));
+const START_TRADE = startTrade(provinces);
+/** The region the picker shows, "" for the suggested realms. */
+let pickRegion = "";
 const march = rules.defines.march;
 const marchGraph: MarchMap = (() => {
   const adjStart = new Int32Array(provinces.length + 1);
@@ -195,12 +270,29 @@ const DISPATCHES_KEPT = 400;
 let unread = 0;
 /** The log shows only what concerns the player's realm. */
 let dispatchesMine = false;
+/** The News shows the Chronicle (EVT-112). */
+let newsHistory = false;
+/** Peace offers the player put off until next week (Later). */
+const putOffOffers = new Set<number>();
+/** Peace offers waiting for an answer and not put off. */
 /** Calls to arms and peace offers the player was already alerted to. */
 const alerted = new Set<string>();
 /** The dispatches are open in the panel. */
 let newsView = false;
 /** The Empire card is open (INST-081). */
 let empireOpen = false;
+/** The Shogunate card is open (INST-082). */
+let shogunateOpen = false;
+/** The end card is open (SHELL-164); `endShown` is the ending it last opened for, so it opens by itself once. */
+let endView = false;
+let endShown = "";
+/** The chapter card open, by its place in the chapters closed (SHELL-183), or -1; `chaptersShown` is how many have opened by themselves. */
+let chapterView = -1;
+let chaptersShown = -1;
+/** What the panel showed beneath when the chapter card opened: once the player opens something else, the card gives way. */
+let chapterOver: string | null = null;
+/** After game over, the player is picking a realm to play on as (SHELL-095). */
+let pickingPlayOn = false;
 let selectedProvince = -1;
 /** Armies chosen to march (army ids): a tap on the land sends them all (feedback 21). */
 const selected = new Set<number>();
@@ -212,14 +304,16 @@ let stepMs = 0;
 let walkedBefore = new Map<number, TraderWalk>();
 /** Where each army was drawn when the latest snapshot arrived, by army id, for walking on from there. */
 let drawnAt = new Map<number, [number, number]>();
+/** Where each fleet was drawn when the latest snapshot arrived, by fleet id, and the tiles it had ahead, for gliding on over them. */
+let fleetFrom = new Map<number, { at: [number, number]; path: number[] }>();
+/** The spot of the sea the player tapped for each fleet's voyage, so its course is drawn to it (NAVY-149). */
+const sailGoal = new Map<number, { zone: number; tile: number }>();
 /**
  * End turn plays the week a day at a time (TIME-076), and a 4-hour step at a
  * time while the player fights, at the speeds set in Settings → Gameplay
  * (SET-131, SET-065). A 4-hour step takes 500 ms at 1×, and 1200 ms while the
  * player watches the battle, so its rounds can be followed (feedback 73).
  */
-const BATTLE_STEP_MS = 500;
-const WATCH_STEP_MS = 1200;
 let playing = false;
 let paused = false;
 /** Auto turns (SHELL-159..161): weeks start by themselves until the player or something that needs them stops them; off after every load. */
@@ -241,7 +335,7 @@ let armyView = -1;
 /** The head of the faith whose card is open from the Faiths map mode's seats (RELG-138), or null. */
 let headView: string | null = null;
 /** Which tab of a country's overview is open (feedback 12). */
-type RealmTab = "general" | "government" | "peoples" | "heritage" | "treasury" | "trade" | "food" | "diplomacy" | "military" | "mercenaries" | "officials" | "lords" | "provinces" | "learning" | "navy" | "hireFleets" | "colonies";
+type RealmTab = "general" | "government" | "peoples" | "heritage" | "treasury" | "trade" | "food" | "diplomacy" | "military" | "mercenaries" | "officials" | "lords" | "provinces" | "learning" | "navy" | "hireFleets" | "colonies" | "hunting" | "score";
 let realmTab: RealmTab = "general";
 /** The realm whose declare sheet is open (WAR-229), -1 for none. */
 let declareFor = -1;
@@ -259,21 +353,27 @@ let litLord = -1;
 let grantOpen = false;
 /** The lord's screen lists every royal province to grant, not just the nearest. */
 let grantAll = false;
+/** The lord whose assassin confirm card is open on his screen, -1 = none (REALM-284). */
+let assassinAsk = -1;
 /** Which tab of the province overview is open. */
 type ProvinceTab = "overview" | "people" | "garrison" | "land" | "build" | "port";
 let provinceTab: ProvinceTab = "overview";
 /** The player's fleet whose card is open (its id), and the fleet waiting for a tap on where to sail (-1 = none). */
 let fleetView = -1;
 let sailing = -1;
+/** The player's trader whose card is open (its id), or -1 (TRADE-153). */
+let traderView = -1;
 /** A course being drawn for a fleet of explorers (EXPL-069): its zones, where each leg ends (for Undo), and the low-supply choice. */
 let exploring: { fleet: number; path: number[]; legs: number[]; carryOn: boolean } | null = null;
 /** The tile tapped on the Land tab, or -1. */
 let landTile = -1;
 /** Map lens: how provinces are coloured. */
-type Lens = "realms" | "terrain" | "people" | "wealth" | "walls" | "food" | "lords" | "diplomacy" | "subjects" | "tongues" | "faiths" | "charts" | "trade" | "institutions";
+type Lens = "realms" | "terrain" | "people" | "wealth" | "walls" | "food" | "lords" | "diplomacy" | "subjects" | "tongues" | "faiths" | "charts" | "trade" | "institutions" | "throne";
 let lens: Lens = "realms";
 /** The trader route being drawn on the map, or null when the map is not in route mode (TRADE-142). */
 let routing: Routing | null = null;
+/** Whether the route being drawn was started from the trader's own card, which it returns to. */
+let routeFromCard = false;
 /** Parchment over lands the player's realm doesn't know yet (a toggle while it's judged). */
 let fogOn = true;
 /** Provinces the player has charted (bit p of byte p >> 3, EXPL-010), or null before a realm is chosen. */
@@ -290,8 +390,6 @@ app.innerHTML = `
     <button class="icon-only" id="home" title="Go to your capital">${icon("castle", 3, "Capital")}</button>
     <button class="icon-only" id="armies" title="Your commanders" aria-expanded="false" hidden>${icon("swords", 3, "Commanders")}</button>
     <button class="icon-only" id="sound" title="Sound and music" aria-expanded="false">${icon("speaker", 3, "Sound")}</button>
-    <button class="icon-only" id="trophy" title="Achievements">${icon("trophy", 3, "Achievements")}<span class="dot" hidden></span></button>
-    <button class="icon-only" id="settings" title="Settings">${icon("cog", 3, "Settings")}</button>
   </div>
   <button class="ach-toast framed" id="ach-toast" hidden></button>
   <div class="lens-menu sound-menu framed" id="sound-menu" hidden></div>
@@ -330,7 +428,6 @@ const eventsSeen = new Set<string>();
 /** The battle the player is watching (its province), and how it ended once it has. */
 let watching: { province: number; result?: string } | null = null;
 const soundButton = document.querySelector<HTMLButtonElement>("#sound")!;
-const trophyButton = document.querySelector<HTMLButtonElement>("#trophy")!;
 const achToast = document.querySelector<HTMLButtonElement>("#ach-toast")!;
 /** Achievements (domain/achievements "How the player uses it"): the profile on the device, and the card's state. */
 const achProfile = loadProfile();
@@ -342,7 +439,6 @@ let achNew = new Set<string>();
 /** Unlocks waiting for their toast. */
 const achToasts: { id: string; date: string; province?: number }[] = [];
 const soundMenu = document.querySelector<HTMLElement>("#sound-menu")!;
-const settingsButton = document.querySelector<HTMLButtonElement>("#settings")!;
 /** First-campaign hints (onboarding TUT-121 … TUT-130). */
 const hints = new Hints();
 /** The commander list is put away. */
@@ -367,6 +463,8 @@ interface MpState {
   /** The world's hash at this week's start: every device's must agree. */
   weekHash: string;
   outOfStep: string | null;
+  /** The hash at each week's start, kept for the scripts that check devices agree. */
+  hashes?: string[];
   /** Pass and play: the realm the device is being passed to (-1: none). */
   cover: number;
   online: { store: MpStore; game: OnlineGame; turns: Map<string, TurnDoc>; stop: () => void } | null;
@@ -397,7 +495,7 @@ fab.addEventListener("click", () => void endTurn());
 autoButton.addEventListener("click", () => switchAutoTurns());
 // Space ends the turn, and pauses or resumes it while it plays (feedback 27); Shift+Space switches Auto turns (SHELL-159).
 document.addEventListener("keydown", (e) => {
-  if (e.code !== "Space" || (e.target as HTMLElement).closest("input, textarea, select")) return;
+  if (!keyEndsTurn(e.code, !!(e.target as HTMLElement).closest("input, textarea, select"))) return;
   e.preventDefault();
   if (e.repeat) return;
   if (e.shiftKey) switchAutoTurns();
@@ -456,14 +554,23 @@ document.addEventListener("click", (e) => {
   const b = (e.target as HTMLElement).closest<HTMLButtonElement>("[data-commission]");
   if (!b || b.disabled) return;
   const province = Number(b.dataset.commission);
-  void act({ type: "commission", province }).then(() => {
+  const sea = b.dataset.commissionSea !== undefined;
+  void act({ type: "commission", province, sea }).then(() => {
     if (!snapshot || snapshot.rejectedOrders.length) return;
     officialView = -1;
     newsView = false;
     realmView = snapshot.playerNation;
-    realmTab = "military";
+    // A general waits in the Military tab's Commanders list, an admiral on the Navy tab.
+    realmTab = sea ? "navy" : "military";
     renderPanel();
   });
+});
+// Auto-fill posts on or off, and Fill all, on the Officials tab (PROV-348).
+document.addEventListener("click", (e) => {
+  const t = e.target as HTMLElement;
+  const auto = t.closest<HTMLButtonElement>("[data-auto-fill]");
+  if (auto) void act({ type: "autoFillPosts", on: auto.dataset.autoFill === "1" }).then(() => renderPanel());
+  if (t.closest("[data-fill-posts]")) void act({ type: "fillPosts" }).then(() => renderPanel());
 });
 // New land kept as royal land with its post empty (PROV-340).
 document.addEventListener("click", (e) => {
@@ -489,11 +596,11 @@ document.addEventListener("click", (e) => {
   restyleProvinces();
   renderPanel();
 });
-trophyButton.addEventListener("click", () => openAchievements());
 // The Empire card opens from the Institutions row, a member's badge, a News card or the map mode (INST-080).
 document.addEventListener("click", (e) => {
   if (!(e.target as HTMLElement).closest("[data-empire-open]") || !snapshot?.empire) return;
   empireOpen = true;
+  shogunateOpen = false;
   achView = false;
   newsView = false;
   realmView = -1;
@@ -504,14 +611,31 @@ document.addEventListener("click", (e) => {
   panelCollapsed = false;
   renderPanel();
 });
+// The Shogunate card opens from the Institutions row, the shogun's badge, the oath's News card or the map mode (INST-080).
+document.addEventListener("click", (e) => {
+  if (!(e.target as HTMLElement).closest("[data-shogunate-open]") || !snapshot?.shogunate) return;
+  shogunateOpen = true;
+  empireOpen = false;
+  achView = false;
+  newsView = false;
+  realmView = -1;
+  officialView = -1;
+  lordView = -1;
+  armyView = -1;
+  fleetView = -1;
+  traderView = -1;
+  panelCollapsed = false;
+  renderPanel();
+});
 // Opening anything else in the panel puts the Achievements card away.
 document.addEventListener(
   "click",
   (e) => {
-    if ((e.target as HTMLElement).closest("[data-realm], [data-news], [data-official], [data-show-province], [data-go-province], .go-there")) {
+    if ((e.target as HTMLElement).closest("[data-realm], [data-news], [data-official], [data-show-province], [data-go-province], [data-lord-open], .go-there")) {
       achView = false;
       empireOpen = false;
       mpView = false;
+      shogunateOpen = false;
     }
   },
   { capture: true },
@@ -549,6 +673,7 @@ function openAchievements(at: string | null = null): void {
   lordView = -1;
   armyView = -1;
   fleetView = -1;
+  traderView = -1;
   newsView = false;
   realmView = -1;
   panelCollapsed = false;
@@ -561,8 +686,11 @@ function openAchievements(at: string | null = null): void {
 /** The trophy button carries a dot while an unlock has not been looked at (ACH-078). */
 function renderTrophy(): void {
   const n = unseen(achProfile);
-  trophyButton.querySelector<HTMLElement>(".dot")!.hidden = n === 0;
-  trophyButton.title = n ? `Achievements: ${n} new` : "Achievements";
+  const menu = hud.querySelector<HTMLElement>(".game-menu");
+  if (menu) {
+    menu.querySelector<HTMLElement>(".dot")!.hidden = n === 0;
+    menu.title = n ? `Game menu: ${n} new achievement${n === 1 ? "" : "s"}` : "Game menu";
+  }
 }
 
 function renderAchievements(): void {
@@ -667,14 +795,14 @@ function renderSoundButton(): void {
 }
 
 /** The Sound card's controls are the Audio rows of Settings (SET-132). */
-const SOUND_PREF: Record<string, string> = { master: "audio.master", music: "audio.music_volume", effects: "audio.effects_volume", musicOn: "audio.music", uiSounds: "audio.interface_sounds" };
+const SOUND_PREF: Record<string, string> = { master: "audio.master", music: "audio.music_volume", effects: "audio.effects_volume", musicOn: "audio.music", uiSounds: "audio.interface_sounds", ambience: "audio.ambience_volume", ambienceOn: "audio.ambience" };
 
 /** The Sound menu (domain/audio "How the player uses it"): what plays and why, and the volumes, in one card. */
 function renderSoundMenu(): void {
   if (soundMenu.hidden) return;
   const st = sound.settings;
   const pct = (v: number) => Math.round(v * 100);
-  const toggle = (key: "musicOn" | "uiSounds") =>
+  const toggle = (key: "musicOn" | "uiSounds" | "ambienceOn") =>
     `<button class="paper toggle${st[key] ? " on" : ""}" data-toggle="${key}" data-sfx="none" aria-pressed="${st[key]}">${st[key] ? "On" : "Off"}</button>`;
   const slider = (key: "master" | "music" | "effects", label: string, off = false, after = `<output>${pct(st[key])}%</output>`) =>
     `<label class="sound-row${off ? " off" : ""}"><span>${label}</span><input type="range" min="0" max="100" step="5" value="${pct(st[key])}" data-vol="${key}" aria-label="${label} volume"${off ? " disabled" : ""}>${after}</label>`;
@@ -684,8 +812,9 @@ function renderSoundMenu(): void {
     ${slider("master", "Volume")}
     <div class="sound-row${st.musicOn ? "" : " off"}"><span>Music</span><input type="range" min="0" max="100" step="5" value="${pct(st.music)}" data-vol="music" aria-label="Music volume"${st.musicOn ? "" : " disabled"}>${toggle("musicOn")}</div>
     ${slider("effects", "Effects")}
-    <div class="sound-row"><span>Buttons</span><small>A click on every tap</small>${toggle("uiSounds")}</div>
-    <button class="paper all-sound" data-shell="settings" data-settings-section="audio">${icon("cog", 1)} All sound settings</button>`;
+    <div class="sound-row${st.ambienceOn ? "" : " off"}"><span>Ambience</span><input type="range" min="0" max="100" step="5" value="${pct(st.ambience)}" data-vol="ambience" aria-label="Ambience volume"${st.ambienceOn ? "" : " disabled"}>${toggle("ambienceOn")}</div>
+    <div class="sound-foot"><div class="sound-row"><span>Buttons</span><small>A click on every tap</small>${toggle("uiSounds")}</div>
+    <button class="paper all-sound" data-shell="settings" data-settings-section="audio">${icon("cog", 1)} <span class="all-word">All sound settings</span><span class="short-word">Sound settings</span></button></div>`;
   renderNowPlaying();
   soundMenu.querySelectorAll<HTMLInputElement>("[data-vol]").forEach((input) =>
     input.addEventListener("input", () => {
@@ -697,7 +826,7 @@ function renderSoundMenu(): void {
   soundMenu.querySelectorAll<HTMLInputElement>("[data-vol]").forEach((input) => input.addEventListener("change", () => sound.sfx(input.dataset.vol === "music" ? "ui_tap_soft" : "ui_tap")));
   soundMenu.querySelectorAll<HTMLButtonElement>("[data-toggle]").forEach((b) =>
     b.addEventListener("click", () => {
-      const key = b.dataset.toggle as "musicOn" | "uiSounds";
+      const key = b.dataset.toggle as "musicOn" | "uiSounds" | "ambienceOn";
       const on = !sound.settings[key];
       setPref(SOUND_PREF[key]!, on);
       sound.sfx(on ? "ui_toggle_on" : "ui_toggle_off");
@@ -719,9 +848,15 @@ function renderNowPlaying(): void {
 renderSoundButton();
 renderTrophy();
 
+// The ambience follows the ground under the middle of the map, checked each second (AUD-079).
+setInterval(() => {
+  if (!view || !snapshot) return sound.ambience(null);
+  const p = view.provinceAtCentre();
+  const capital = p >= 0 && nations.some((n) => n.capital === provinces[p]!.id);
+  sound.ambience(bedUnderCamera(snapshot, p, provinces[p]?.terrain, view.camera.zoom, capital));
+}, 1000);
+
 // ---- settings ----
-// The cog opens the Settings screen straight from the map; Back returns to the map (SET-132).
-settingsButton.addEventListener("click", () => openShell("settings", true));
 hints.onChange = () => {
   if (shell.view === "settings") renderShell();
 };
@@ -752,7 +887,7 @@ async function boot(): Promise<void> {
   const image = (mapImage = await loadMapImage(rules.map!, provinces.length));
   loadingStage("Raising the realms…", 0.75);
   await painted();
-  view = new MapView(document.querySelector("#map")!, image, provinces.length, { onTap, drawOverlay });
+  view = new MapView(document.querySelector("#map")!, image, provinces.length, { onTap, drawOverlay, onLongPress, longPressMs });
   view.setPower(mapPower());
   // Read by the performance checks (scripts/perf.mjs).
   (globalThis as { __phMap?: MapView }).__phMap = view;
@@ -781,8 +916,8 @@ async function boot(): Promise<void> {
   renderPanel();
   hideLoading();
   sound.title();
-  // The first-campaign hints wait while a multiplayer game is chosen or played: they teach a game of one.
-  hints.mount({ target: hintTarget, moment: () => ({ eventOpen: !eventCard.hidden || !overlay.hidden || !revolutionCard.hidden || !!mp || !!mpPicking || !!mpLobby, turnPlaying: playing }), sfx: (id) => sound.sfx(id) });
+  // A hint waits while a card is up: an event, a revolution, a realm founded, the loading screen (TUT-126, SETUP-094), and while a multiplayer game is chosen or played: hints teach a game of one.
+  hints.mount({ target: hintTarget, moment: () => ({ eventOpen: !eventCard.hidden || !overlay.hidden || !revolutionCard.hidden || !!alerts.querySelector(".founding") || loadingShown() || !!mp || !!mpPicking || !!mpLobby, turnPlaying: playing }), sfx: (id) => sound.sfx(id) });
 }
 
 // ---- map styling ----
@@ -797,12 +932,13 @@ const LENSES: { id: Lens; name: string; note: string }[] = [
   { id: "walls", name: "Walls", note: "castles and forts" },
   { id: "food", name: "Food", note: "men on campaign the store can feed" },
   { id: "lords", name: "Lords", note: "who holds your land" },
+  { id: "throne", name: "Days to capital", note: "royal land far from the throne sends less" },
   { id: "diplomacy", name: "Diplomacy", note: "friend or foe, envoys on the road" },
   { id: "subjects", name: "Subjects", note: "your subjects by loyalty, and your overlord" },
   { id: "tongues", name: "Languages", note: "the family of the language most speak" },
   { id: "faiths", name: "Faiths", note: "the faith most hold; hatched where mixed" },
   { id: "trade", name: "Trade", note: "trade ratio, your traders' loops" },
-  { id: "institutions", name: "Institutions", note: "the Empire: Emperor, electors, members" },
+  { id: "institutions", name: "Institutions", note: "the Empire and the Shogunate: holders, members, houses" },
   { id: "charts", name: "Exploration", note: "what you have charted, and empty coasts to settle" },
 ];
 /** The trade lens's ramp by trade ratio, quiet to busy (TRADE-143); provinces the player doesn't see are parchment. */
@@ -840,6 +976,19 @@ const LOYALTY_RGB = Object.fromEntries(Object.entries(LOYALTY_HEX).map(([k, v]) 
 const OVERLORD_HEX = "#7a4fa0";
 const OVERLORD_RGB = hexToRgb(OVERLORD_HEX);
 const loyaltyKey = (l: string): keyof typeof LOYALTY_HEX => (/disloyal/i.test(l) ? "disloyal" : /waver/i.test(l) ? "wavering" : "loyal");
+/** The Days to capital lens (X-29): near, far (amber to red as the cut grows) and lords' land. */
+const THRONE_HEX = { near: "#3f8f46", lord: "#9a8f7a" } as const;
+const THRONE_RGB = { near: hexToRgb(THRONE_HEX.near), lord: hexToRgb(THRONE_HEX.lord) };
+const THRONE_RAMP = [hexToRgb("#d8a03a"), hexToRgb("#b8323a")];
+function throneKey(): string {
+  const sw = (c: string) => `<i class="swatch" style="background:${c}"></i>`;
+  return `<div class="lens-key">
+    <span>${sw(THRONE_HEX.near)}Within ${THRONE.days} days: full tax and recruits</span>
+    <span>${sw("#d8a03a")}Far from the throne: sends less</span>
+    <span>${sw("#b8323a")}${THRONE.farCap} days or cut off: half</span>
+    <span>${sw(THRONE_HEX.lord)}A lord's land: run from his seat</span>
+  </div>`;
+}
 /** The key under the lens buttons: what each colour means. */
 const RELATION_KEY: [LensRelation, string][] = [
   ["own", "You and your subjects"],
@@ -858,8 +1007,8 @@ const relationTo = (n: number): LensRelation | null => {
   return r === undefined || r < 0 ? null : LENS_RELATIONS[r]!;
 };
 const ROYAL_RGB = hexToRgb("#e9c35a");
-/** The Institutions map mode's colours (INST-084): the Emperor gold, members light gold, outsiders on imperial land red and hatched. */
-const INSTITUTION_HEX = { gold: "#d0a248", "light gold": "#f1dc98", red: "#b8323a" } as Record<string, string>;
+/** The Institutions map mode's colours (INST-084): the holder gold, members light gold, outsiders on imperial land red and hatched; Japan's great houses each a gold of their own. */
+const INSTITUTION_HEX = { gold: "#d0a248", "light gold": "#f1dc98", red: "#b8323a", "the house's own": "linear-gradient(90deg, #c98a4a 50%, #a8a457 50%)" } as Record<string, string>;
 const INSTITUTION_RGB = { emperor: hexToRgb("#d0a248"), member: hexToRgb("#f1dc98"), outsider: hexToRgb("#b8323a") };
 /** A colour per lord for the Lords lens: hues spread by the golden angle, kept clear of the crown's gold. */
 function lordRgb(k: number): number[] {
@@ -885,7 +1034,9 @@ const lensMenu = document.querySelector<HTMLElement>("#lenses")!;
 /** Turns a lens on: the renderer's mode, the provinces' colours and the menu. */
 function setLens(l: Lens): void {
   lens = l;
+  if (l !== "realms") hints.did("lens");
   view.renderer.mode = lens === "realms" ? "political" : lens === "terrain" ? "terrain" : "lens";
+  view.renderer.fiefs = lens === "institutions";
   restyleProvinces();
   renderLensMenu();
 }
@@ -894,7 +1045,7 @@ function renderLensMenu(): void {
   lensMenu.innerHTML = `
     <h3 class="sub">Map mode</h3>
     ${LENSES.map((l) => `<button class="paper lens${l.id === lens ? " on" : ""}" data-lens="${l.id}"><b>${l.id === "lords" && snapshot ? cap(titlesOf(snapshot.playerNation).lords) : l.name}</b><small>${l.note}</small></button>`).join("")}
-    ${lens === "institutions" ? institutionsKey(INSTITUTION_HEX) : lens === "diplomacy" ? diplomacyKey() : lens === "subjects" ? subjectsKey() : lens === "tongues" || lens === "faiths" ? beliefKey() : lens === "charts" ? chartsKey() : lens === "trade" ? tradeKey() : ""}
+    ${lens === "institutions" ? institutionsKey(INSTITUTION_HEX) : lens === "diplomacy" ? diplomacyKey() : lens === "subjects" ? subjectsKey() : lens === "tongues" || lens === "faiths" ? beliefKey() : lens === "charts" ? chartsKey() : lens === "trade" ? tradeKey() : lens === "throne" ? throneKey() : ""}
     <label class="fog-toggle"><input type="checkbox" id="fog" ${fogOn ? "checked" : ""}> Hide unexplored lands</label>
     <label class="fog-toggle"><input type="checkbox" id="markers" ${markersOn ? "checked" : ""}> Markers: men and names over every army close in</label>`;
   lensMenu.querySelectorAll<HTMLButtonElement>("[data-lens]").forEach((b) =>
@@ -938,12 +1089,15 @@ function chartsKey(): string {
     <span>${sw(SITE_RGB[1]!)}Empty coast inside your colonial range${ex?.colonial ? ` (${ex.range} zones)` : ""}</span>
     <span>${sw(SITE_RGB[2]!)}Empty land beyond it, or inland</span>
     <span>${sw(SITE_RGB[3]!)}A colony being founded</span>
+    ${huntKeyHtml(`rgb(${HUNT_AMBER_RGB.join(",")})`)}
     <span><i class="swatch parchment"></i>Not charted yet: send explorers</span>
     ${ex && !ex.colonial ? "<p>Colonies open with ocean navigation.</p>" : "<p>Tap an empty coast for what it takes to settle it.</p>"}
   </div>`;
 }
 /** Colours of empty land under the Charts lens: in range, beyond it, being settled. */
 const SITE_RGB = [[0, 0, 0], hexToRgb("#5fd35a"), hexToRgb("#b7d9a2"), hexToRgb("#f2c14e")];
+/** An empty coast in range that is a tribe's hunting ground: amber, not green (TRIBE-028). */
+const HUNT_AMBER_RGB = hexToRgb("#e08a2c");
 
 /** The diplomacy lens's key: a swatch for each relation, and what a tap does. */
 function subjectsKey(): string {
@@ -1013,6 +1167,13 @@ function lensColor(i: number): number[] {
       return WALL_RGB[wallsAt(i) ?? "none"];
     case "food":
       return ramp(FOOD_RAMP, Math.log10(Math.max(1, landFeeds(i))) / 5);
+    case "throne": {
+      // The player's royal land by its days to the capital: near in green, far from amber to red; lords' land is run from their seats.
+      if (!snapshot || o !== snapshot.playerNation) return o >= 0 ? nationRgb[o]!.map((v) => Math.round(v * 0.35 + 150)) : unownedRgb;
+      if (snapshot.provinceLord[i]! >= 0) return THRONE_RGB.lord;
+      const days = snapshot.provinceDaysToCapital[i]!;
+      return days <= THRONE.days ? THRONE_RGB.near : ramp(THRONE_RAMP, (days - THRONE.days) / (THRONE.farCap - THRONE.days));
+    }
     case "lords": {
       // The player's realm: royal land in gold, each lord's land in his own colour; other realms faded.
       if (!snapshot || o !== snapshot.playerNation) return o >= 0 ? nationRgb[o]!.map((v) => Math.round(v * 0.35 + 150)) : unownedRgb;
@@ -1038,6 +1199,7 @@ function lensColor(i: number): number[] {
     case "charts": {
       // Held land faded in its holder's colour; empty land by whether it can be settled (EXPL-073).
       const site = snapshot?.exploration.sites[i] ?? 0;
+      if (o < 0 && site === 1 && chartsCoast((snapshot?.tribes.ground[i] ?? -1) >= 0) === "amber") return HUNT_AMBER_RGB;
       if (o < 0) return site ? SITE_RGB[site]! : unownedRgb;
       return nationRgb[o]!.map((v) => Math.round(v * 0.45 + 130));
     }
@@ -1050,6 +1212,9 @@ function lensColor(i: number): number[] {
     case "institutions": {
       const il = snapshot?.institutionsLens;
       if (il?.outsiderLand[i]) return INSTITUTION_RGB.outsider;
+      // A great house of Japan in its own colour, warmed toward the shogun's gold so the whole reads as one realm.
+      const house = il?.house[i] ?? 0;
+      if (house) return lordRgb(house - 1).map((c, k) => Math.round(c * 0.55 + INSTITUTION_RGB.emperor[k]! * 0.45));
       const r = o >= 0 ? (il?.realm[o] ?? 0) : 0;
       return r === 3 ? INSTITUTION_RGB.emperor : r ? INSTITUTION_RGB.member : o >= 0 ? RELATION_RGB.neutral : unownedRgb;
     }
@@ -1095,7 +1260,8 @@ function restyleProvinces(): void {
     // Occupied land is hatched in the occupier's colour; borders stay the owner's.
     const rebels = !!snapshot?.provinceRebels[i];
     const hatched = ((occ >= 0 || rebels) && lens === "realms") || (lens === "diplomacy" && o >= 0 && relationTo(o) === "war") || (lens === "faiths" && (snapshot?.peoples.provinceFaithShare[i * SLOTS + 1] ?? 0) >= 0.3) || (lens === "institutions" && !!snapshot?.institutionsLens.outsiderLand[i]);
-    const lord = snapshot ? snapshot.provinceLord[i]! : -1;
+    // Under the Institutions map mode only Japan's great houses carry a fief border and pattern (INST-084).
+    const lord = !snapshot ? -1 : lens === "institutions" ? snapshot.institutionsLens.house[i]! - 1 : snapshot.provinceLord[i]!;
     const lit = litLord >= 0 && lord === litLord;
     // Under the trade lens, land whose trade the player doesn't see is parchment too (TRADE-143).
     const unseen = !isKnown(i) || (lens === "trade" && !!snapshot && !isWater[i] && !snapshot.provinceTradeSeen[i]);
@@ -1104,15 +1270,29 @@ function restyleProvinces(): void {
     // Under the diplomacy lens, a league against the player gets the same red border (DIPL-183).
     const closed = (selected.size > 0 && !!snapshot?.provinceClosed[i]) || (lens === "diplomacy" && o >= 0 && snapshot?.diplomacyLens?.league[o] === 1);
     // While a lord's lands are lit, the rest of the land fades to grey so they stand out.
-    view.renderer.setProvinceStyle(i, isWater[i] ? unownedRgb : hatched && lens === "realms" ? (rebels ? rebelRgb : nationRgb[occ]!) : lensColor(i), o, terrainIdx[i]!, flags, isWater[i], lord, litLord >= 0 && !lit, closed);
+    if (snapshot && !isWater[i]) {
+      const t = townInfo(rules, snapshot, i);
+      view.renderer.setTownInfo(i, t.walls, t.roadGrade, t.worship, t.style);
+    }
+    view.renderer.setProvinceStyle(i, isWater[i] ? unownedRgb : hatched && lens === "realms" ? (rebels ? rebelRgb : nationRgb[occ]!) : lensColor(i), o, terrainIdx[i]!, flags, isWater[i], lord, litLord >= 0 && !lit, closed, lens === "charts" && o < 0 && !isWater[i] && (snapshot?.exploration.sites[i] ?? 0) > 0);
+    // At world zoom a subject is washed in its direct overlord's colour with a hatch in its own,
+    // and its border with that overlord is dotted (SUBJ-093). Occupied land keeps its occupation hatch.
+    const overlord = lens === "realms" && !hatched && o >= 0 && !isWater[i] ? (snapshot?.nationOverlord[o] ?? -1) : -1;
+    view.renderer.setProvinceSubject(i, overlord, overlord >= 0 ? nationRgb[overlord]! : null);
+    // Hunting grounds: a light diagonal hatch in the tribe's colour under the political and Charts lenses; a claim under way fainter (TRIBE-028).
+    const tv = snapshot?.tribes;
+    const g = tv && o < 0 && !isWater[i] && (lens === "realms" || lens === "charts") ? tv.ground[i]! : -1;
+    const cl = tv && g < 0 && o < 0 && !isWater[i] && (lens === "realms" || lens === "charts") ? tv.claiming[i]! : -1;
+    view.renderer.setProvinceHunt(i, g >= 0 ? nationRgb[g]! : cl >= 0 ? nationRgb[cl]! : null, g < 0 && cl >= 0);
   }
   // Seasons move on a week a turn, so they are only worked out when a week starts.
-  const date = previewMonth ? { year: 1444, month: previewMonth, day: previewDay } : (weekStart ?? rules.defines.startDate);
+  const date = previewMonth ? { year: rules.defines.startDate.year, month: previewMonth, day: previewDay } : (weekStart ?? rules.defines.startDate);
   const key = dateKey(date);
   if (key !== seasonKey) {
     seasonKey = key;
     const s = nextSeason?.key === key ? nextSeason.data : seasonsFor(date);
     view.renderer.setProvinceSeasons(s);
+    seasonNow = s;
     if (!previewMonth) {
       const next = addDays(date, DAYS_PER_TURN);
       setTimeout(() => (nextSeason = { key: dateKey(next), data: seasonsFor(next) }), 50);
@@ -1124,6 +1304,11 @@ function restyleProvinces(): void {
 
 // ---- overlay: nation names, cities, armies ----
 let nationLabels = computeNationLabels();
+
+/** How many of a realm's provinces, nearest its middle, its name may sit on. */
+const LABEL_ANCHORS = 6;
+/** The smallest realm name drawn, in pixels. */
+const LABEL_MIN_PX = 9;
 
 function computeNationLabels() {
   const acc = nations.map(() => ({ x: 0, y: 0, n: 0, ref: -1, owned: [] as number[] }));
@@ -1145,20 +1330,78 @@ function computeNationLabels() {
     if (!a.n) return null;
     const cx = a.x / a.n;
     const cy = a.y / a.n;
-    // Snap to the nearest owned province so the label sits on the nation itself.
-    let best = -1;
-    let bestD = Infinity;
-    for (const j of a.owned) {
-      const p = provinces[j]!;
-      const d = (p.x! - cx) ** 2 + (p.y! - cy) ** 2;
-      if (d < bestD) ((bestD = d), (best = j));
-    }
-    return { x: provinces[best]!.x!, y: provinces[best]!.y!, size: Math.sqrt(a.n) };
+    // Snap to the nearest owned province so the label sits on the nation itself;
+    // the next nearest are where it may move to make room for a neighbour's (VIEW-133).
+    const near = a.owned
+      .map((j) => ({ j, d: (provinces[j]!.x! - cx) ** 2 + (provinces[j]!.y! - cy) ** 2 }))
+      .sort((p, q) => p.d - q.d)
+      .slice(0, LABEL_ANCHORS)
+      .map(({ j }): [number, number] => [provinces[j]!.x!, provinces[j]!.y!]);
+    return { x: near[0]![0], y: near[0]![1], size: Math.sqrt(a.n), anchors: near };
   });
+}
+
+/** The living map's towns, hamlets and roads, laid the first time the camera comes close (VIEW-105..VIEW-115). */
+let townLayer: TownLayer | null = null;
+
+/** Below the living band, how close the camera comes before the towns near it are laid ahead of time. */
+const TOWNS_AHEAD_ZOOM = 10;
+/** The most milliseconds one idle slice may spend laying towns; without idle callbacks (Safari) a timer slice gets the least of these. */
+const TOWNS_SLICE_MS = 8;
+const TOWNS_TIMER_SLICE_MS = 4;
+/** What the towns are being laid for: the latest turn and the map rectangles round the view. */
+let townsWanted: { s: Snapshot; rects: { x0: number; y0: number; x1: number; y1: number }[] } | null = null;
+let townsQueued = false;
+
+/**
+ * Lays towns in idle time between frames, a slice at a time, so laying them
+ * never lengthens a frame; uploads what changed and asks for a redraw.
+ */
+function queueTowns(): void {
+  if (townsQueued) return;
+  townsQueued = true;
+  const run = (deadline: number) => {
+    townsQueued = false;
+    if (!townsWanted || !mapImage) return;
+    townLayer ??= new TownLayer(rules, mapImage);
+    const more = townLayer.update(townsWanted.s, townsWanted.rects, deadline);
+    const dirty = townLayer.takeDirty();
+    if (dirty) (view.renderer.setSettlement(townLayer.bytes, dirty), view.invalidate());
+    if (more) queueTowns();
+  };
+  if (typeof requestIdleCallback === "function") requestIdleCallback((d) => run(performance.now() + Math.min(TOWNS_SLICE_MS, Math.max(1, d.timeRemaining()))), { timeout: 200 });
+  else setTimeout(() => run(performance.now() + TOWNS_TIMER_SLICE_MS), 0);
+}
+
+/**
+ * The living map close in: fades the towns in over 14 to 16 (VIEW-101) and,
+ * from zoom 10 on, has the towns near the camera laid in idle time, a margin
+ * round the view so a pan finds them ready. Returns how strongly the icons
+ * are drawn.
+ */
+function livingMap(o: OverlayContext): number {
+  const fade = bandFade(o.zoom, mapDetail());
+  if (view.renderer.living !== fade.living) {
+    view.renderer.living = fade.living;
+    view.invalidate();
+  }
+  if (!detailBands(mapDetail()).living || o.zoom < TOWNS_AHEAD_ZOOM || !snapshot || !mapImage) return fade.icons;
+  const c = view.camera;
+  const margin = 12;
+  const hw = o.width / 2 / o.zoom + margin, hh = o.height / 2 / o.zoom + margin;
+  const W = mapImage.width;
+  const y0 = Math.max(0, Math.floor(c.y - hh)), y1 = Math.min(mapImage.height - 1, Math.ceil(c.y + hh));
+  const x0 = Math.floor(c.x - hw), x1 = Math.ceil(c.x + hw);
+  // The map wraps east-west: a view across the edge lays both sides.
+  const spans = x0 < 0 ? [[x0 + W, W - 1], [0, x1]] : x1 >= W ? [[x0, W - 1], [0, x1 - W]] : [[x0, x1]];
+  townsWanted = { s: snapshot, rects: spans.map(([a, b]) => ({ x0: a!, y0, x1: b!, y1 })) };
+  queueTowns();
+  return fade.icons;
 }
 
 function drawOverlay(o: OverlayContext): void {
   const { ctx, zoom } = o;
+  const icons = livingMap(o);
   const onScreen = (sx: number, sy: number, pad = 40) => sx > -pad && sy > -pad && sx < o.width + pad && sy < o.height + pad;
   const spriteScale = zoom >= 8 ? 4 : zoom >= 4 ? 3 : zoom >= 2 ? 2 : 1;
   // Close in, armies become figures; between zoom 14 and 16 the tokens fade out as they fade in (VIEW-101).
@@ -1166,7 +1409,8 @@ function drawOverlay(o: OverlayContext): void {
 
   // One settlement per province, sized by its people, with its walls:
   // a stone tower for a castle, a palisade for a fort. Capitals come after.
-  if (zoom >= 3) {
+  if (zoom >= 3 && icons > 0) {
+    ctx.globalAlpha = icons;
     const sc = Math.max(1, spriteScale - 2);
     provinces.forEach((p, i) => {
       const own = owners[i]!;
@@ -1174,7 +1418,7 @@ function drawOverlay(o: OverlayContext): void {
       const [sx, sy] = o.toScreen(p.x!, p.y!);
       if (!onScreen(sx, sy)) return;
       const color = nations[own]!.color;
-      const img = sprite(settlementOf(p.population), color, sc);
+      const img = sprite(settlementOf(peopleNow(i)), color, sc);
       const x = Math.round(sx - img.width / 2);
       const y = Math.round(sy - img.height / 2);
       const walls = wallsAt(i);
@@ -1189,9 +1433,12 @@ function drawOverlay(o: OverlayContext): void {
         ctx.drawImage(f, 0, 0, w, f.height, x - sc, y + img.height - f.height + 2 * sc, w, f.height);
       }
     });
+    ctx.globalAlpha = 1;
   }
-  if (zoom >= 1.1) {
+  if (zoom >= 1.1 && icons > 0) {
+    ctx.globalAlpha = icons;
     nations.forEach((n, i) => {
+      if (asleep(i) || !provinceIndex.has(n.capital)) return;
       const p = provinces[provinceIndex.get(n.capital)!]!;
       if (owners[provinceIndex.get(n.capital)!] !== i || !isKnown(provinceIndex.get(n.capital)!)) return;
       const [sx, sy] = o.toScreen(p.x!, p.y!);
@@ -1199,20 +1446,31 @@ function drawOverlay(o: OverlayContext): void {
       const img = sprite("capital", n.color, Math.max(1, spriteScale - 1));
       ctx.drawImage(img, Math.round(sx - img.width / 2), Math.round(sy - img.height / 2));
     });
+    ctx.globalAlpha = 1;
   }
 
   // Nation names when zoomed out.
   if (zoom < 3.5) {
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
+    // The player's realm first, then the largest; a smaller name moves or shrinks to make room, or waits for a closer zoom (VIEW-133).
+    const asks: (LabelAsk & { big: number })[] = [];
     nationLabels.forEach((l, i) => {
       if (!l || !isKnown(provinceIndex.get(nations[i]!.capital)!)) return;
       const px = Math.round(Math.min(28, l.size * zoom * 4.5));
-      if (px < 9) return;
+      if (px < LABEL_MIN_PX) return;
       const [sx, sy] = o.toScreen(l.x, l.y);
-      if (!onScreen(sx, sy, 200)) return;
-      pixelText(ctx, nations[i]!.name.toUpperCase(), sx, sy - (zoom >= 1.1 ? px : 0), px);
+      if (!onScreen(sx, sy, 300)) return;
+      const lift = zoom >= 1.1 ? px : 0;
+      const b = labelBitmap(nations[i]!.name.toUpperCase(), px, false);
+      // The letters and their outline, without the bitmap's spare room.
+      asks.push({
+        id: i, size: px, minSize: LABEL_MIN_PX, w: b.w - 2 * b.pad + 2, h: b.h - 2 * b.pad, big: snapshot && i === snapshot.playerNation ? Infinity : l.size,
+        anchors: l.anchors.map(([x, y]) => { const [ax, ay] = o.toScreen(x, y); return [ax, ay - lift] as [number, number]; }),
+      });
     });
+    asks.sort((a, b) => b.big - a.big || a.id - b.id);
+    for (const spot of placeLabels(asks)) pixelText(ctx, nations[spot.id]!.name.toUpperCase(), spot.x, spot.y, spot.size);
   }
 
   // Close up, only each realm's capital is named, so you can see whose seat it is; other names are in the province's overview (feedback 22).
@@ -1220,7 +1478,9 @@ function drawOverlay(o: OverlayContext): void {
     ctx.textAlign = "center";
     ctx.textBaseline = "top";
     nations.forEach((n, i) => {
-      const c = provinceIndex.get(n.capital)!;
+      const c = provinceIndex.get(n.capital);
+      // A sleeping realm has no seat on the map (a spare has no capital at all until it wakes, SETUP-082).
+      if (c === undefined || asleep(i)) return;
       if (!nameOnMap({ name: provinces[c]!.name, ownersCapital: owners[c] === i }) || !isKnown(c)) return;
       const [sx, sy] = o.toScreen(provinces[c]!.x!, provinces[c]!.y!);
       if (onScreen(sx, sy)) pixelText(ctx, provinces[c]!.name, sx, sy + 7 * spriteScale, 12);
@@ -1269,6 +1529,19 @@ function drawOverlay(o: OverlayContext): void {
     ctx.globalAlpha = 1;
   }
 
+  // Plague (VIEW-011, VIEW-128, PROV-361): a pale door with the plague cross over each sick province at Region zoom, barred while it is closed.
+  if (snapshot && snapshot.plague.length && zoom >= 2 && markAlpha > 0 && provinceMarks("Region", { name: "", owner: "", plague: true }).some((m) => m.draw === "plague")) {
+    ctx.globalAlpha = markAlpha;
+    const u = tokenUnit(zoom);
+    for (const x of snapshot.plague) {
+      if (!isKnown(x.province)) continue;
+      const p = provinces[x.province]!;
+      const [sx, sy] = o.toScreen(p.x!, p.y!);
+      if (onScreen(sx, sy)) drawPlagueMark(ctx, sx + 9 * u, sy - 2 * u, u, x.step, !!snapshot.provinceQuarantine[x.province]);
+    }
+    ctx.globalAlpha = 1;
+  }
+
   // The Institutions map mode: a crown over each elector's realm, so seats read without colour (INST-084).
   const il = lens === "institutions" ? snapshot?.institutionsLens : null;
   if (il && crownImage.complete) {
@@ -1300,8 +1573,11 @@ function drawOverlay(o: OverlayContext): void {
     }
   }
 
+  // The trader whose card is open: its way there and back under any map mode (TRADE-154).
+  const following = drawFollowedTrader(o, onScreen);
+  const banking = drawBankings(o, onScreen);
   // Close in, traders walk their paths; about ten frames a second is enough for them, as for the hammers (VIEW-130).
-  if (drawTraders(o, onScreen) && !traderTick) traderTick = setTimeout(() => ((traderTick = 0), view.invalidate()), 100);
+  if ((drawTraders(o, onScreen) || following || banking) && !traderTick) traderTick = setTimeout(() => ((traderTick = 0), view.invalidate()), 100);
 
   // The Faiths map mode marks each head of the faith's seat; a tap on it opens his card (RELG-138).
   if (lens === "faiths" && snapshot && zoom >= 1.1) {
@@ -1336,6 +1612,19 @@ function drawOverlay(o: OverlayContext): void {
     for (const t of tv.traders) loop(t.path, color);
     const draft = routing && tv.draft?.trader === routing.trader ? tv.draft : null;
     if (draft) loop(draft.path, PALETTE.gold);
+    // While where it starts is set, each city it could go to carries its gold a month, the best three starred (TRADE-155).
+    if (routing && draft && routing.stops.length >= 1) {
+      const upkeep = tv.traders.find((x) => x.id === routing!.trader)?.upkeep ?? 0;
+      const barTop = routeBarEl.hidden ? Infinity : routeBarEl.getBoundingClientRect().top - o.ctx.canvas.getBoundingClientRect().top;
+      draft.options.forEach((opt, k) => {
+        if (routing!.stops[1] === opt.city) return;
+        const [sx, sy] = at(opt.city);
+        if (!onScreen(sx, sy, 16) || sy > barTop - 12 * u) return;
+        const g = opt.expected - upkeep;
+        const text = `${g >= 0 ? "+" : "-"}${Math.abs(g).toFixed(1)}`;
+        drawPlate(ctx, k < 3 ? `★ ${text}` : text, sx, sy - 18 * u, u);
+      });
+    }
     // Close in, the walking traders take over from these icons (VIEW-101).
     const iconAlpha = bandFade(zoom, mapDetail()).icons;
     ctx.save();
@@ -1424,12 +1713,17 @@ function drawOverlay(o: OverlayContext): void {
       }
     }
     pruneBattles(snapshot.battles.map((b) => b.id));
+    const tiled = snapshot.tileWidth === rules.map!.width;
     for (const b of snapshot.navy.battles) {
       if (!isKnown(b.zone)) continue;
-      const [sx, sy] = o.toScreen(provinces[b.zone]!.x!, provinces[b.zone]!.y!);
+      // Fought where the defender stands (NAVY-151).
+      const [sx, sy] = o.toScreen(...(tiled && b.tile >= 0 ? tileXY(b.tile) : ([provinces[b.zone]!.x!, provinces[b.zone]!.y!] as [number, number])));
       if (onScreen(sx, sy)) swords(ctx, sx, sy - 18 * tokenUnit(zoom), 3 * spriteScale);
     }
   }
+
+  // Ports closed by blockades, at every zoom (NAVY-163).
+  if (snapshot) drawBlockades(o, ctx, Math.max(2, spriteScale - 1), onScreen);
 
   // Armies and their commanders, once zoomed in past the realm names (feedback 31).
   // Troops without a commander stay off the map, in their province's garrison (RECR-107).
@@ -1464,7 +1758,9 @@ function drawOverlay(o: OverlayContext): void {
     const besieged = new Map(s.sieges.map((st) => [st.province, st.by]));
     for (let k = 0; k < s.armies.id.length; k++) {
       const cmd = s.armies.commander[k]!;
-      if (cmd < 0 || !isKnown(s.armies.location[k]!) || aboard.has(s.armies.id[k]!)) continue;
+      // Troops without a commander are drawn only while they walk (home, after their general died: RECR-136), close in and with no banner.
+      const walking = cmd < 0 && (s.armies.route[k]!.length > 0 || s.armies.path[k]!.length > 0);
+      if ((cmd < 0 && !walking) || !isKnown(s.armies.location[k]!) || aboard.has(s.armies.id[k]!)) continue;
       const tile = s.armies.tile[k]!;
       // Fighting armies are drawn in their battle.
       if (s.armies.battle[k]! >= 0 && inBattle.has(tile)) continue;
@@ -1478,22 +1774,25 @@ function drawOverlay(o: OverlayContext): void {
       const id = s.armies.id[k]!;
       const moving = performance.now() - stepStart < stepMs && s.armies.trail[k]!.length > 0;
       const realm = nations[s.armies.owner[k]!]!;
-      const name = cmdOf(cmd).name;
+      const name = cmd >= 0 ? cmdOf(cmd).name : "";
       const dir = armyFacing(k);
       if (liv.living > 0) {
         // Besiegers ring the town; the others stand, or march in a column, on their tile.
         const location = s.armies.location[k]!;
         const state: FormationState = besieged.get(location) === s.armies.owner[k] ? "besieging" : moving || s.armies.path[k]!.length ? "marching" : "standing";
-        const at = state === "besieging" ? o.toScreen(provinces[location]!.x!, provinces[location]!.y!) : [cx + nth * 16 * liv.u, cy - nth * 4 * liv.u];
+        // Its point on the map: the town it besieges, or where it stands, stacked armies side by side.
+        const point: [number, number] = state === "besieging" ? [provinces[location]!.x!, provinces[location]!.y!] : [px + (nth * 16 * liv.u) / zoom, py - (nth * 4 * liv.u) / zoom];
+        const at = o.toScreen(...point);
         const horse = s.armies.horse[k]!;
         const men = s.armies.men[k]!;
         const heading = state === "standing" ? ([dir, 0] as const) : armyHeading(k, dir);
         pieces.push({
-          id, x: at[0]!, y: at[1]!, color: realm.color, men, name, state, facing: heading, selected: selected.has(id), seed: location,
+          // Leaderless troops walking home take no orders, so they have nothing to tap.
+          ...(walking ? {} : { id }), key: `a${id}`, point, x: at[0]!, y: at[1]!, color: realm.color, men, name, state, facing: heading, selected: selected.has(id), seed: location,
           figures: formation({ men, foot: men - horse, horse, wagons: s.armies.food[k]! > 0, state, band: "living", facing: heading }),
         });
       }
-      if (liv.icons <= 0 || !onScreen(sx, sy)) continue;
+      if (walking || liv.icons <= 0 || !onScreen(sx, sy)) continue;
       // The commander in their realm's colours, kit of the era and age (feedback 56), at one size at every zoom (feedback 57).
       ctx.globalAlpha = liv.icons;
       const token = drawToken(ctx, {
@@ -1515,14 +1814,18 @@ function drawOverlay(o: OverlayContext): void {
       for (const r of s.rebels.risings) {
         if (!isKnown(r.location)) continue;
         const state: FormationState = r.siege ? "besieging" : r.target >= 0 ? "marching" : "standing";
-        const at = r.siege ? o.toScreen(provinces[r.siege.province]!.x!, provinces[r.siege.province]!.y!) : o.toScreen(...tileXY(r.tile));
+        const point: [number, number] = r.siege ? [provinces[r.siege.province]!.x!, provinces[r.siege.province]!.y!] : tileXY(r.tile);
+        const at = o.toScreen(...point);
         const heading = rebelHeading(r.location, r.target);
         pieces.push({
-          x: at[0]!, y: at[1]!, color: REBEL_COLOR, men: r.men, state, facing: heading, selected: false, seed: r.location,
+          key: `r${r.id}`, point, x: at[0]!, y: at[1]!, color: REBEL_COLOR, men: r.men, state, facing: heading, selected: false, seed: r.location,
           figures: formation({ men: r.men, state, band: "living", facing: heading, rebel: true }),
         });
       }
-    figuresTicking = drawLivingPieces(ctx, pieces, liv, now, o, onScreen) || figuresTicking;
+    const drawn = drawLivingPieces(ctx, pieces, liv, now, o, onScreen);
+    figuresTicking ||= drawn.ticking;
+    // Figures on their way somewhere move every frame, so their walk is smooth.
+    animating ||= drawn.walking;
     drawColonies(o, ctx, u, onScreen);
     animating = drawFleets(o, ctx, u, now, onScreen) || animating;
   }
@@ -1539,6 +1842,8 @@ function drawOverlay(o: OverlayContext): void {
     }
     ctx.globalAlpha = 1;
   }
+  // The map's moments over everything, where the player is looking (VIEW-140).
+  drawParticles(o);
   if (animating) view.invalidate();
   else if (figuresTicking && !figureTick) figureTick = setTimeout(() => ((figureTick = 0), view.invalidate()), 1000 / LIVING_MAP.figures.frameRate);
   if (performance.now() - stepStart < stepMs) view.invalidate();
@@ -1601,6 +1906,9 @@ const ARMY_ZOOM = 3.5;
 /** CSS pixels per art pixel of the army tokens, routes and battles. */
 const tokenUnit = (zoom: number) => (zoom >= 12 ? 3 : 2);
 
+/** Where each troop's figures stood last frame, by piece key. */
+const troops = new Map<string, Troop>();
+
 /** Markers: men and names over every army close in (VIEW-126), remembered on this device. */
 const MARKERS_KEY = "ph.markers";
 let markersOn = (() => {
@@ -1629,6 +1937,10 @@ function livingView(zoom: number): LivingView {
 interface LivingPiece {
   /** The army's id for its tap box; rebels have none and open from their province. */
   id?: number;
+  /** Which troop it is between frames, so its figures walk on from where they stood. */
+  key: string;
+  /** Its point on the map, and on screen. */
+  point: Pt;
   x: number;
   y: number;
   color: string;
@@ -1670,20 +1982,33 @@ function rebelHeading(from: number, to: number): readonly [number, number] {
  * At most `maxAnimated` figures move, the nearest the screen's centre first (VIEW-130).
  * Returns whether any figure moves, so the overlay ticks again.
  */
-function drawLivingPieces(ctx: CanvasRenderingContext2D, pieces: LivingPiece[], liv: LivingView, now: number, o: OverlayContext, onScreen: (x: number, y: number, pad?: number) => boolean): boolean {
+function drawLivingPieces(ctx: CanvasRenderingContext2D, pieces: LivingPiece[], liv: LivingView, now: number, o: OverlayContext, onScreen: (x: number, y: number, pad?: number) => boolean): { ticking: boolean; walking: boolean } {
   const u = liv.u;
   const shown = pieces.filter((p) => onScreen(p.x, p.y, 30 * u)).map((p) => ({ p, distance: Math.hypot(p.x - o.width / 2, p.y - o.height / 2) }));
   const moving = animatedFigures(shown.filter((e) => figuresAnimate(liv.animations, e.p.state)), (e) => e.p.figures.length);
   const step = Math.floor(now / (2000 / LIVING_MAP.figures.frameRate)) % 2;
+  let walking = false;
   ctx.globalAlpha = liv.living;
   for (const { p } of shown.sort((a, b) => a.p.y - b.p.y)) {
     if (p.state === "besieging") drawTents(ctx, p.x, p.y, u, p.color, LIVING_MAP.figures.siegeRing + 4, p.seed);
-    const animated = shown.some((e) => e.p === p && moving.has(e));
-    const box = drawFormation(ctx, { x: p.x, y: p.y, u, color: p.color, figures: p.figures, facing: p.facing, frame: animated ? (step as 0 | 1) : 0 });
+    // The figures walk to their places, the column along the banner-bearer's road, rather than jump (feedback on VIEW-118).
+    const art = bandArtPixels("living");
+    const moved = stepTroop(troops.get(p.key), {
+      point: p.point, offsets: p.figures.map((f): Pt => [f.x / art, f.y / art]), marching: p.state === "marching",
+      facing: [p.facing[0], p.facing[1]], now, still: liv.animations === "Off",
+    });
+    troops.set(p.key, moved.troop);
+    walking ||= moved.walking;
+    const figures = p.figures.map((f, i) => {
+      const [sx, sy] = o.toScreen(...moved.troop.at[i]!);
+      return { ...f, x: (sx - p.x) / u, y: (sy - p.y) / u };
+    });
+    const animated = moved.walking || shown.some((e) => e.p === p && moving.has(e));
+    const box = drawFormation(ctx, { x: p.x, y: p.y, u, color: p.color, figures, facing: p.facing, frame: animated ? (step as 0 | 1) : 0 });
     if (p.selected) brackets(ctx, box.x, box.y, box.w, box.h, u, 1 + (Math.floor(now / 260) % 2), PALETTE.gold);
     const labels = pieceLabels("living", { markers: markersOn, selected: p.selected });
     let bottom = box.y + box.h;
-    if (labels.plate) bottom += drawPlate(ctx, menShort(p.men), box.x + box.w / 2, bottom + 2, 2, p.color) + 2;
+    if (labels.plate) bottom += drawPlate(ctx, menShort(p.men), box.x + box.w / 2, bottom + 2, 2) + 2;
     if (labels.name && p.name) {
       ctx.textAlign = "center";
       ctx.textBaseline = "top";
@@ -1695,7 +2020,9 @@ function drawLivingPieces(ctx: CanvasRenderingContext2D, pieces: LivingPiece[], 
     }
   }
   ctx.globalAlpha = 1;
-  return moving.size > 0;
+  // Forget troops not drawn for a while; they take their places at once when seen again.
+  for (const [key, t] of troops) if (now - t.t > 5000) troops.delete(key);
+  return { ticking: moving.size > 0, walking };
 }
 
 /**
@@ -1777,7 +2104,11 @@ function armyPosition(k: number): [number, number] {
   const trail = s.armies.trail[k]!;
   const t = stepMs ? (performance.now() - stepStart) / stepMs : 1;
   if (!from || !trail.length || t >= 1) return end;
-  const pts = [from, ...trail.map(tileXY)];
+  return alongPoints([from, ...trail.map(tileXY)], t);
+}
+
+/** The point a share t (0 to 1) of the way along a line of map points. */
+function alongPoints(pts: [number, number][], t: number): [number, number] {
   const f = t * (pts.length - 1);
   const i = Math.floor(f);
   const [ax, ay] = pts[i]!;
@@ -1786,6 +2117,23 @@ function armyPosition(k: number): [number, number] {
   if (bx - ax > rules.map!.width / 2) bx -= rules.map!.width;
   if (ax - bx > rules.map!.width / 2) bx += rules.map!.width;
   return [ax + (bx - ax) * (f - i), ay + (by - ay) * (f - i)];
+}
+
+/**
+ * Where to draw a fleet: on its tile, gliding over the tiles it sailed since
+ * the latest snapshot, as armies walk (NAVY-147, NAVY-148); without tiles, in
+ * its zone or off its port.
+ */
+function fleetPosition(f: FleetView): [number, number] {
+  const s = snapshot!;
+  if (f.tile < 0 || s.tileWidth !== rules.map!.width) return fleetXY(f);
+  const end = tileXY(f.tile);
+  const from = fleetFrom.get(f.id);
+  const t = stepMs ? (performance.now() - stepStart) / stepMs : 1;
+  if (!from || t >= 1) return end;
+  // The tiles it had ahead up to where it is now; straight on when it sailed off them (a new leg).
+  const i = from.path.indexOf(f.tile);
+  return alongPoints([from.at, ...(i >= 0 ? from.path.slice(0, i + 1) : [f.tile]).map(tileXY)], t);
 }
 
 /** Two crossed swords, r pixels from the middle to each tip. */
@@ -1847,26 +2195,162 @@ function drawTraders(o: OverlayContext, onScreen: (x: number, y: number, pad?: n
     if (!isKnown(w.from) || !isKnown(w.to)) continue;
     const color = nations[w.owner]?.color ?? PALETTE.clay;
     const m = placeTrader(w, walkedBefore.get(w.id), t, tileXY, centre);
-    // A little to the right of its way, so two meeting pass side by side.
+    // Each keeps to the right of its way, so two meeting pass side by side.
     const [px, py] = o.toScreen(m.x, m.y);
-    const sx = px - m.uy * 2 * u, sy = py + m.ux * 2 * u;
+    const sx = px - m.uy * 5 * u, sy = py + m.ux * 5 * u;
     if (!onScreen(sx, sy)) continue;
-    const img = sprite(m.sprite, color, u);
-    const x = Math.round(sx - img.width / 2);
-    const y = Math.round(sy - img.height + 2 * u);
-    if (m.ux > 0) {
-      ctx.save();
-      ctx.translate(x + img.width, y);
-      ctx.scale(-1, 1);
-      ctx.drawImage(img, 0, 0);
-      ctx.restore();
-    } else ctx.drawImage(img, x, y);
-    const box = tapBox(img.width, img.height, 1);
-    traderHitBoxes.push({ mine: w.mine ? w.id : -1, x: x + img.width / 2 - box.w / 2, y: y + img.height / 2 - box.h / 2, w: box.w, h: box.h });
+    // Caravans and barges are drawn walking left, the ship sailing right.
+    const right = m.ux > 0;
+    const east = m.sprite === "cog" ? right : !right;
+    const { img, w: iw, h: ih } = figureSprite(m.sprite, color, u, east ? 1 : -1);
+    const x = Math.round(sx - iw / 2);
+    const y = Math.round(sy - ih + u);
+    // The trader whose card is open stands in brackets, as a chosen army does (TRADE-154).
+    if (w.id === traderView) brackets(ctx, x - u, y - u, iw + 2 * u, ih + 2 * u, u, Math.floor(performance.now() / 300) % 2, PALETTE.gold);
+    ctx.drawImage(img, x, y, iw, ih);
+    // A coin glints over a trader as it collects (TRADE-157).
+    const glint = glints.get(w.id);
+    if (glint !== undefined) {
+      const age = performance.now() - glint;
+      const coin = coinImages[0]!;
+      if (age > GLINT_MS) glints.delete(w.id);
+      else if (age >= 0 && coin.complete) ctx.drawImage(coin, Math.round(x + iw / 2 - coin.width / 2), Math.round(y - coin.height - (moving ? (age / GLINT_MS) * 4 * u : 0)));
+    }
+    const box = tapBox(iw, ih, 1);
+    traderHitBoxes.push({ mine: w.mine ? w.id : -1, x: x + iw / 2 - box.w / 2, y: y + ih / 2 - box.h / 2, w: box.w, h: box.h });
   }
   ctx.restore();
-  return moving && performance.now() - stepStart < stepMs;
+  return (moving && performance.now() - stepStart < stepMs) || glints.size > 0;
 }
+
+/** Gold the player's traders banked, by city, as it shows on the map; and the traders glinting as they collect (TRADE-157). */
+const bankings: { province: number; gold: number; born: number }[] = [];
+const glints = new Map<number, number>();
+const GLINT_MS = 500;
+const BANK_MS = 1900;
+let lastClink = 0;
+
+/** Takes in what the player's traders collected and banked since the last snapshot, spread over the step it plays in. */
+function hearTradeFeed(next: Snapshot, ms: number): void {
+  const feed = next.tradeFeed ?? [];
+  if (!feed.length) return;
+  const now = performance.now();
+  const banked = new Map<number, number>();
+  feed.forEach((f, i) => {
+    if (f.deposit) banked.set(f.province, (banked.get(f.province) ?? 0) + f.gold);
+    else glints.set(f.trader, now + (i / feed.length) * ms);
+  });
+  let k = 0;
+  for (const [province, gold] of banked) bankings.push({ province, gold, born: now + (k++ / banked.size) * Math.min(ms, 800) });
+  if (bankings.length > 40) bankings.splice(0, bankings.length - 40);
+  if (banked.size) {
+    // A quiet clink, at most once a second, and the treasury figure lifts.
+    if (now - lastClink > 1000) {
+      sound.sfx("econ_income");
+      lastClink = now;
+    }
+    // After the HUD is drawn again for this snapshot.
+    if (animationsPref() !== "Off")
+      requestAnimationFrame(() => {
+        const plaque = document.querySelector<HTMLElement>(".plaque.gold");
+        plaque?.classList.add("banked");
+        setTimeout(() => plaque?.classList.remove("banked"), 700);
+      });
+  }
+  view.invalidate();
+}
+
+/**
+ * Banking on the map (TRADE-157): from regional zoom in, under any map mode, a coin drops into the city where a
+ * trader banked and its gold rises over it and fades; still where Animations is Off. Under the Trade map mode, the
+ * player's busy trade cities (ratio over half) twinkle now and then. Returns true while anything is shown.
+ */
+function drawBankings(o: OverlayContext, onScreen: (x: number, y: number, pad?: number) => boolean): boolean {
+  const now = performance.now();
+  for (let i = bankings.length - 1; i >= 0; i--) if (now - bankings[i]!.born > BANK_MS) bankings.splice(i, 1);
+  const s = snapshot;
+  if (!s || o.zoom < REGIONAL_ZOOM) return bankings.length > 0;
+  const { ctx } = o;
+  const u = tokenUnit(o.zoom);
+  const still = animationsPref() === "Off";
+  const coin = coinImages[u >= 3 ? 1 : 0]!;
+  let twinkling = false;
+  if (lens === "trade" && !still && coin.complete)
+    for (let p = 0; p < provinces.length; p++) {
+      if (owners[p] !== s.playerNation || !s.provinceTradeCity[p] || s.provinceTradeRatio[p]! <= 50) continue;
+      twinkling = true;
+      // Each city twinkles for a fifth of a second every three, at its own moment.
+      if ((now + p * 397) % 3000 > 200) continue;
+      const [sx, sy] = o.toScreen(provinces[p]!.x!, provinces[p]!.y!);
+      if (!onScreen(sx, sy)) continue;
+      ctx.fillStyle = PALETTE.paper;
+      ctx.fillRect(Math.round(sx + 9 * u), Math.round(sy - 9 * u), u, 3 * u);
+      ctx.fillRect(Math.round(sx + 8 * u), Math.round(sy - 8 * u), 3 * u, u);
+    }
+  for (const b of bankings) {
+    const age = now - b.born;
+    if (age < 0 || !isKnown(b.province)) continue;
+    const [sx, sy] = o.toScreen(provinces[b.province]!.x!, provinces[b.province]!.y!);
+    if (!onScreen(sx, sy, 40)) continue;
+    const drop = still ? 1 : Math.min(1, age / 300);
+    const fade = Math.max(0, (age - BANK_MS * 0.65) / (BANK_MS * 0.35));
+    ctx.save();
+    ctx.globalAlpha = 1 - fade;
+    if (coin.complete) ctx.drawImage(coin, Math.round(sx - coin.width / 2), Math.round(sy - coin.height - 2 * u - (1 - drop) * 20 * u));
+    const rise = still ? 0 : Math.min(1, age / 1200) * 12 * u;
+    if (age > 200 || still) drawPlate(ctx, `+${b.gold >= 10 ? Math.round(b.gold) : b.gold.toFixed(1)}`, sx, sy - coin.height - 14 * u - rise, u);
+    ctx.restore();
+  }
+  return bankings.length > 0 || twinkling;
+}
+/**
+ * The trader whose card is open (TRADE-154): its whole loop dotted in the realm's colour, the way ahead to the stop
+ * it heads for as a march trail with the stop's standard, the other stop marked, and a coin on each province its
+ * gold came from on its last trip. Returns true while it is drawn, so the trail flows.
+ */
+function drawFollowedTrader(o: OverlayContext, onScreen: (x: number, y: number, pad?: number) => boolean): boolean {
+  const t = traderView >= 0 && !routing ? snapshot?.trade?.traders.find((x) => x.id === traderView) : undefined;
+  if (!t || t.path.length < 2) return false;
+  const { ctx } = o;
+  const u = tokenUnit(o.zoom);
+  const color = nations[snapshot!.playerNation]!.color;
+  const at = (p: number) => o.toScreen(provinces[p]!.x!, provinces[p]!.y!);
+  const L = t.path.length;
+  for (let k = 0; k < L; k++) dottedLine(ctx, at(t.path[k]!), at(t.path[(k + 1) % L]!), u, color, o.width, o.height);
+  // Where its gold came from: a coin by each province.
+  const coin = coinImages[u >= 3 ? 1 : 0]!;
+  if (coin.complete)
+    for (const x of t.sources) {
+      const [sx, sy] = at(x.province);
+      if (onScreen(sx, sy, 16)) ctx.drawImage(coin, Math.round(sx - coin.width / 2), Math.round(sy - coin.height / 2));
+    }
+  // The way ahead, from where it walks to the stop it heads for.
+  const walk = snapshot!.traderWalks.find((w) => w.id === t.id);
+  const pts: [number, number][] = [];
+  if (walk) {
+    const m = placeTrader(walk, walkedBefore.get(walk.id), 1, tileXY, (p) => [provinces[p]!.x!, provinces[p]!.y!]);
+    pts.push(o.toScreen(m.x, m.y) as [number, number]);
+  } else pts.push(at(t.at) as [number, number]);
+  for (let i = t.pathAt; i !== t.path.indexOf(t.heading) || pts.length === 1; i = (i + 1) % L) {
+    pts.push(at(t.path[(i + 1) % L]!) as [number, number]);
+    if (pts.length > L + 1) break;
+  }
+  drawRoute(ctx, { pts, u, color, weeks: [], t: performance.now(), viewWidth: o.width });
+  // The other stop: a small gold square.
+  const other = t.stops.find((p) => p !== t.heading);
+  if (other !== undefined) {
+    const [sx, sy] = at(other);
+    if (onScreen(sx, sy)) {
+      const r = 5 * u;
+      ctx.fillStyle = PALETTE.ink;
+      ctx.fillRect(Math.round(sx - r / 2 - u), Math.round(sy - r / 2 - u), r + 2 * u, r + 2 * u);
+      ctx.fillStyle = PALETTE.gold;
+      ctx.fillRect(Math.round(sx - r / 2), Math.round(sy - r / 2), r, r);
+    }
+  }
+  return true;
+}
+
 let fleetHitBoxes: { id: number; mine: boolean; x: number; y: number; w: number; h: number }[] = [];
 
 /** Where a fleet is drawn: in its sea zone, or in a port just off the coast toward the sea. */
@@ -1878,37 +2362,241 @@ function fleetXY(f: FleetView): [number, number] {
   return [p.x! + (z.x! - p.x!) * 0.4, p.y! + (z.y! - p.y!) * 0.4];
 }
 
-/** Every known fleet as a ship in its realm's colours with its ship count, and the player's voyages as routes; true while one sails. */
+/**
+ * Every known fleet as a ship in its realm's colours with its ship count, on
+ * its tile; the player's voyages as courses through the water, tile by tile
+ * and then zone by zone (NAVY-149); and the sighting ring of the fleet chosen
+ * to sail (NAVY-163). True while one sails.
+ */
 function drawFleets(o: OverlayContext, ctx: CanvasRenderingContext2D, u: number, now: number, onScreen: (x: number, y: number, pad?: number) => boolean): boolean {
   const s = snapshot!;
+  const tiled = s.tileWidth === rules.map!.width;
   let moving = false;
   for (const f of s.navy.fleets) {
-    if (f.owner !== s.playerNation || !f.route.length) continue;
-    const pts = [o.toScreen(...fleetXY(f)), ...f.route.map((q) => o.toScreen(provinces[q]!.x!, provinces[q]!.y!))];
+    if (f.owner !== s.playerNation) continue;
+    if (!f.route.length) {
+      sailGoal.delete(f.id);
+      continue;
+    }
+    const pts = [o.toScreen(...fleetPosition(f))];
+    const path = tiled && f.tile >= 0 ? f.path : [];
+    for (const t of path) pts.push(o.toScreen(...tileXY(t)));
+    // The whole voyage runs over the water tiles, as a march over the land (NAVY-148); while it sails a leg alone, the zones past it, the last to the spot tapped.
+    const goal = sailGoal.get(f.id);
+    const zones = path.length && f.whole ? [] : path.length ? f.route.slice(1) : f.route;
+    zones.forEach((q, i) => pts.push(o.toScreen(...(tiled && goal && i === zones.length - 1 && goal.zone === q ? tileXY(goal.tile) : ([provinces[q]!.x!, provinces[q]!.y!] as [number, number])))));
     drawRoute(ctx, { pts, u, color: nations[s.playerNation]!.color, weeks: [], t: now, viewWidth: o.width });
+    // The days still to sail over the course's end, as over a march's.
+    if (f.days > 0) {
+      ctx.textAlign = "center";
+      ctx.textBaseline = "bottom";
+      const [bx, by] = pts.at(-1)!;
+      pixelText(ctx, hoursText(f.days * 24), bx, by - 13 * u, 10);
+    }
   }
   // The course being drawn for explorers, in gold over the sea (EXPL-069).
   const draft = exploring && s.navy.fleets.find((f) => f.id === exploring!.fleet);
   if (draft && exploring!.path.length) {
-    const pts = [o.toScreen(...fleetXY(draft)), ...exploring!.path.map((q) => o.toScreen(provinces[q]!.x!, provinces[q]!.y!))];
+    const pts = [o.toScreen(...fleetPosition(draft)), ...exploring!.path.map((q) => o.toScreen(provinces[q]!.x!, provinces[q]!.y!))];
     drawRoute(ctx, { pts, u, color: PALETTE.gold, weeks: [], t: now, viewWidth: o.width });
   }
+  // The fleet chosen to sail sights enemies within this ring in its zone (NAVY-150); 0 is the whole zone, so no ring.
+  const chosen = sailing >= 0 && tiled ? s.navy.fleets.find((f) => f.id === sailing && f.owner === s.playerNation && f.sight > 0 && f.tile >= 0) : undefined;
+  if (chosen) {
+    const [mx, my] = fleetPosition(chosen);
+    const [cx, cy] = o.toScreen(mx, my);
+    const r = Math.abs(o.toScreen(mx + chosen.sight, my)[0] - cx);
+    if (onScreen(cx, cy, r)) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      ctx.globalAlpha = 0.12;
+      ctx.fillStyle = nations[chosen.owner]!.color;
+      ctx.fill();
+      ctx.globalAlpha = 0.55;
+      ctx.setLineDash([3 * u, 3 * u]);
+      ctx.lineWidth = u;
+      ctx.strokeStyle = PALETTE.paper;
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
   fleetHitBoxes = [];
+  // Close in, fleets are hulls on the water; between zoom 14 and 16 the ship tokens fade out as they fade in (VIEW-101).
+  const liv = livingView(o.zoom);
+  const berthsUsed = new Map<number, number>();
   const stack = new Map<number, number>();
   for (const f of s.navy.fleets) {
     if (!f.ships || !isKnown(f.at)) continue;
-    const nth = stack.get(f.at) ?? 0;
-    stack.set(f.at, nth + 1);
-    let [sx, sy] = o.toScreen(...fleetXY(f));
+    const mine = f.owner === s.playerNation;
+    const selected = fleetView === f.id || sailing === f.id;
+    moving ||= f.route.length > 0;
+    if (liv.living > 0) {
+      const box = drawHulls(o, f, liv, now, onScreen, selected, berthsUsed);
+      if (box && liv.living >= 0.5) fleetHitBoxes.push({ id: f.id, mine, ...box });
+    }
+    // Ships whose admiral died sail home with no fleet token: only their hulls show, close in (RECR-137).
+    if (liv.icons <= 0 || (f.admiral < 0 && f.fleeing)) continue;
+    // Fleets on one tile (or in one port) fan out behind the first.
+    const key = tiled && f.tile >= 0 ? f.tile : -1 - f.at;
+    const nth = stack.get(key) ?? 0;
+    stack.set(key, nth + 1);
+    let [sx, sy] = o.toScreen(...fleetPosition(f));
     sx += nth * 8 * u;
     sy -= nth * 3 * u;
     if (!onScreen(sx, sy)) continue;
     const realm = nations[f.owner]!;
-    const box = drawToken(ctx, { x: sx, y: sy, u: 2, color: realm.color, men: f.ships, naval: true, flag: flagCanvas(realm, 1), dir: 1, moving: f.route.length > 0, selected: fleetView === f.id || sailing === f.id, t: now });
-    fleetHitBoxes.push({ id: f.id, mine: f.owner === s.playerNation, ...box.tap });
-    moving ||= f.route.length > 0;
+    ctx.globalAlpha = liv.icons;
+    const box = drawToken(ctx, { x: sx, y: sy, u: 2, color: realm.color, men: f.ships, naval: true, flag: flagCanvas(realm, 1), dir: fleetFacing(f), moving: f.route.length > 0, selected, t: now });
+    ctx.globalAlpha = 1;
+    if (liv.living < 0.5) fleetHitBoxes.push({ id: f.id, mine, ...box.tap });
   }
   return moving;
+}
+
+/**
+ * A fleet close in as hulls (VIEW-121, VIEW-122): one per `shipsPerHull` ships, in a loose
+ * formation round its point at sea with wakes while it sails, or at its port town's berths with
+ * the rest waiting off the waterfront; in a battle they face the enemy through powder smoke.
+ * Brackets round the chosen fleet, and its ship count with Markers (VIEW-126). Returns its tap
+ * box of at least 44 points (VIEW-125), or null when it is off screen.
+ */
+function drawHulls(o: OverlayContext, f: FleetView, liv: LivingView, now: number, onScreen: (x: number, y: number, pad?: number) => boolean, selected: boolean, berthsUsed: Map<number, number>): { x: number; y: number; w: number; h: number } | null {
+  const { ctx } = o;
+  const u = liv.u;
+  const s = snapshot!;
+  const n = hullCount(f.ships, "living");
+  const color = nations[f.owner]!.color;
+  const underway = f.route.length > 0;
+  let dir = fleetFacing(f);
+  if (f.battle) {
+    // Bows toward the nearest enemy fleet in the same waters.
+    const [mx] = fleetPosition(f);
+    const foe = s.navy.fleets.find((g) => g.battle && g.at === f.at && g.owner !== f.owner);
+    if (foe) {
+      let dx = fleetPosition(foe)[0] - mx;
+      if (Math.abs(dx) > rules.map!.width / 2) dx = -dx;
+      if (dx) dir = dx > 0 ? 1 : -1;
+    }
+  }
+  // Where each hull lies, on screen, and which way it faces.
+  const spots: { x: number; y: number; dir: 1 | -1 }[] = [];
+  const port = !isWater[f.at] && townLayer ? townLayer.berths(f.at) : [];
+  if (port.length) {
+    const used = berthsUsed.get(f.at) ?? 0;
+    const { atBerth, waiting } = hullsInPort(n, port.length - used);
+    berthsUsed.set(f.at, used + atBerth);
+    const town = provinces[f.at]!;
+    for (const t of port.slice(used, used + atBerth)) {
+      const [x, y] = tileXY(t);
+      const [sx, sy] = o.toScreen(x, y);
+      spots.push({ x: sx, y: sy, dir: x < town.x! ? -1 : 1 });
+    }
+    if (waiting) {
+      // Off the waterfront: a few map pixels out from the first berth, away from the town.
+      const [bx, by] = tileXY(port[0]!);
+      const dx = bx - town.x!, dy = by - town.y!;
+      const d = Math.hypot(dx, dy) || 1;
+      const [cx, cy] = o.toScreen(bx + (dx / d) * 3, by + (dy / d) * 3);
+      for (const h of hullsAtSea(f.id, waiting * LIVING_MAP.hulls.shipsPerHull.living, "living")) spots.push({ x: cx + h.x * u, y: cy + h.y * u, dir });
+    }
+  } else {
+    const [cx, cy] = o.toScreen(...fleetPosition(f));
+    for (const h of hullsAtSea(f.id, f.ships, "living")) spots.push({ x: cx + h.x * u, y: cy + h.y * u, dir });
+  }
+  if (!spots.some((p) => onScreen(p.x, p.y, 20 * u))) return null;
+  // Hulls rock and leave a broken wake only while they sail; at anchor they lie still.
+  const animate = underway && figuresAnimate(liv.animations, "marching");
+  const frame = animate ? Math.floor(now / (2000 / LIVING_MAP.figures.frameRate)) % 2 : 0;
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  ctx.save();
+  ctx.globalAlpha = liv.living;
+  for (const p of spots.sort((a, b) => a.y - b.y)) {
+    const { img, w, h } = figureSprite(frame ? "hull1" : "hull0", color, u, p.dir);
+    const x = Math.round(p.x - w / 2);
+    const y = Math.round(p.y - h + 3 * u);
+    // A wake astern while it sails, broken on alternate frames.
+    if (underway) {
+      ctx.fillStyle = PALETTE.paper;
+      const stern = p.dir > 0 ? x - u : x + w;
+      for (let i = 0; i < 3; i++) ctx.fillRect(stern - p.dir * (i * 2 + frame) * u, y + h - 2 * u + (i % 2) * u, u, u);
+    }
+    ctx.drawImage(img, x, y, w, h);
+    // Powder smoke drifting off the guns in a battle.
+    if (f.battle) {
+      ctx.fillStyle = PALETTE.mist;
+      for (let i = 0; i < 4; i++) {
+        const k = (Math.floor(now / 250) + i * 3) % 6;
+        ctx.fillRect(Math.round(p.x + p.dir * (6 + k) * u), Math.round(y + h - (4 + i + k / 2) * u), 2 * u, 2 * u);
+      }
+    }
+    // The hull's size on the map, not its art's pixels (sharper on a phone's dense screen), so the brackets and tap box fit it.
+    x0 = Math.min(x0, x);
+    y0 = Math.min(y0, y);
+    x1 = Math.max(x1, x + w);
+    y1 = Math.max(y1, y + h);
+  }
+  if (selected) brackets(ctx, x0, y0, x1 - x0, y1 - y0, u, 1 + (Math.floor(now / 260) % 2), PALETTE.gold);
+  let bottom = y1;
+  if (pieceLabels("living", { markers: markersOn, selected }).plate) bottom += drawPlate(ctx, String(f.ships), (x0 + x1) / 2, y1 + 2, 2) + 2;
+  ctx.restore();
+  const tap = tapBox((x1 - x0) / u, (bottom - y0) / u, u);
+  return { x: (x0 + x1) / 2 - tap.w / 2, y: (y0 + bottom) / 2 - tap.h / 2, w: tap.w, h: tap.h };
+}
+
+/** The way each fleet last faced (by id), so it keeps facing that way when it lies still. */
+const fleetFacingOf = new Map<number, 1 | -1>();
+/** East (1) or west (-1): the way a fleet sails, toward the next tile of its course. */
+function fleetFacing(f: FleetView): 1 | -1 {
+  const w = snapshot!.tileWidth;
+  const next = f.path[0] ?? -1;
+  let dx = f.tile >= 0 && next >= 0 ? (next % w) - (f.tile % w) : 0;
+  if (Math.abs(dx) > w / 2) dx = -dx;
+  const dir = dx > 0 ? 1 : dx < 0 ? -1 : (fleetFacingOf.get(f.id) ?? 1);
+  fleetFacingOf.set(f.id, dir);
+  return dir;
+}
+
+/**
+ * Ports a blockade closes: a small chain in the blockader's colour at the
+ * port, toward the sea it is closed from (NAVY-163), big enough to read from
+ * the whole world out.
+ */
+function drawBlockades(o: OverlayContext, ctx: CanvasRenderingContext2D, u: number, onScreen: (x: number, y: number, pad?: number) => boolean): void {
+  const s = snapshot;
+  if (!s) return;
+  for (const b of s.navy.blockades) {
+    const z = provinces[b.zone]!;
+    for (const p of b.ports) {
+      if (!isKnown(p)) continue;
+      const q = provinces[p]!;
+      // From the port's centre a little way toward the zone, onto its coast.
+      const dx = z.x! - q.x!, dy = z.y! - q.y!;
+      const d = Math.hypot(dx, dy) || 1;
+      const k = Math.min(0.5, 6 / d);
+      const [sx, sy] = o.toScreen(q.x! + dx * k, q.y! + dy * k);
+      if (onScreen(sx, sy)) chainMark(ctx, sx, sy, u, nations[b.owner]!.color);
+    }
+  }
+}
+
+/** Two links of chain, ink round a colour, centred on x, y. */
+function chainMark(ctx: CanvasRenderingContext2D, x: number, y: number, u: number, color: string): void {
+  const left = Math.round(x - 5 * u);
+  const top = Math.round(y - 4 * u);
+  // Each link is a 6 × 4 ring; the second lies over the first, down and to the right.
+  for (const [lx, ly] of [[0, 0], [4, 3]] as const) {
+    const ax = left + lx * u, ay = top + ly * u;
+    ctx.fillStyle = PALETTE.ink;
+    ctx.fillRect(ax - u, ay - u, 8 * u, 6 * u);
+    ctx.fillStyle = color;
+    ctx.fillRect(ax, ay, 6 * u, 4 * u);
+    ctx.fillStyle = PALETTE.ink;
+    ctx.fillRect(ax + u, ay + u, 4 * u, 2 * u);
+  }
+  // The first link passes over the second where they cross.
+  ctx.fillStyle = color;
+  ctx.fillRect(left + 4 * u, top + 3 * u, u, u);
 }
 
 /** Colonies being founded: a small flag of the founder over a ring that fills as the colony grows (EXPL-052, EXPL-073). */
@@ -1938,11 +2626,23 @@ function drawColonies(o: OverlayContext, ctx: CanvasRenderingContext2D, u: numbe
 }
 
 /** Settlement drawn for a province by its people (thousands). */
-function settlementOf(population: number): "village" | "town" | "city" {
-  return population >= 200 ? "city" : population >= 25 ? "town" : "village";
+/** A province's people now, in thousands: the snapshot's, else the 1444 map's. */
+function peopleNow(i: number): number {
+  return snapshot ? snapshot.provincePeople[i]! : provinces[i]!.population;
 }
 
-const SETTLEMENT_NAMES = { village: "Village", town: "Town", city: "City" };
+/** Town-size steps passed by a province's people (defines.works.townPeople): 0 a hamlet up to 5 a great city, as the buildings read it (BLD-149). */
+function townStep(population: number): number {
+  return rules.defines.works.townPeople.filter((at) => population >= at).length;
+}
+
+/** The map's settlement sprite for a province's people: a village up to a village, a town from a market town, a city from a city. */
+function settlementOf(population: number): "village" | "town" | "city" {
+  const step = townStep(population);
+  return step >= 4 ? "city" : step >= 2 ? "town" : "village";
+}
+
+const TOWN_NAMES = ["Hamlet", "Village", "Market town", "Town", "City", "Great city"];
 const WALL_NAMES = { castle: "Stone castle", fort: "Earthwork ring fort" };
 
 /** The hammer's angle at a time, in radians (its head points left, so lifting it back turns it clockwise): lifted over 0.6 s, brought down in 0.15 s past upright onto the work, resting 0.25 s. */
@@ -2041,9 +2741,24 @@ function labelBitmap(text: string, size: number, water: boolean): LabelBitmap {
 }
 
 // ---- input ----
+/** A long-press on a realm's land opens its card at the Diplomacy tab, where a subject's card sits (SUBJ-096, SUBJ-138). */
+function onLongPress(_sx: number, _sy: number, province: number): void {
+  if (!snapshot || province < 0 || isWater[province] || !isKnown(province)) return;
+  const owner = owners[province]!;
+  if (owner < 0) return;
+  realmView = owner;
+  officialView = -1;
+  lordView = -1;
+  realmTab = "diplomacy";
+  newsView = false;
+  panelCollapsed = false;
+  renderPanel();
+}
+
 function onTap(sx: number, sy: number, province: number): void {
   // While a route is drawn, a tap picks its next stop (TRADE-142).
   if (routing) return routeTap(province);
+  traderView = -1;
   officialView = -1;
   achView = false;
   // Drawing a course: each tap on the sea adds a leg; the bar over the map says what it takes (EXPL-069).
@@ -2051,10 +2766,12 @@ function onTap(sx: number, sy: number, province: number): void {
     if (province >= 0 && isWater[province]) addLeg(province);
     return;
   }
-  // Armies sit on top of provinces, so check them first, with some room around each for fingers.
-  const PAD = 8;
-  const hit = armyHitBoxes.find((b) => sx >= b.x - PAD && sx <= b.x + b.w + PAD && sy >= b.y - PAD && sy <= b.y + b.h + PAD);
-  const fleetHit = fleetHitBoxes.find((b) => b.mine && sx >= b.x - PAD && sx <= b.x + b.w + PAD && sy >= b.y - PAD && sy <= b.y + b.h + PAD);
+  // Armies and fleets sit on top of provinces, so check them first. A banner or a ship takes taps in a box of
+  // at least 44 points; where boxes overlap, the nearest one wins, so a fleet in port beside an army is chosen
+  // as readily as the army (feedback 21, VIEW-125).
+  const piece = bannerAt<{ x: number; y: number; w: number; h: number; id: number; fleet?: boolean }>([...armyHitBoxes, ...fleetHitBoxes.filter((b) => b.mine).map((b) => ({ ...b, fleet: true }))], sx, sy);
+  const hit = piece && !piece.fleet ? piece : undefined;
+  const fleetHit = piece?.fleet ? piece : undefined;
   // Close in, one of the player's caravans, barges or ships opens its card in the Trade tab; others fall through to the land (VIEW-125).
   const traderHit = !hit && !fleetHit && !selected.size && sailing < 0 ? traderHitBoxes.find((b) => b.mine >= 0 && sx >= b.x && sx <= b.x + b.w && sy >= b.y && sy <= b.y + b.h) : undefined;
   if (traderHit && snapshot) return openTraderCard(traderHit.mine);
@@ -2064,16 +2781,24 @@ function onTap(sx: number, sy: number, province: number): void {
     else pickFleet(fleetHit.id);
     return;
   }
-  if (sailing >= 0 && snapshot && province >= 0 && (isWater[province] || neighborIdx[province]!.some((q) => isWater[q]))) {
+  // With a fleet chosen, a tap on one of the player's armies chooses the army, as with armies; anything else by the sea is where to sail.
+  const mineHit = !!hit && !!snapshot && snapshot.armies.owner[armySlot(hit.id)] === snapshot.playerNation;
+  if (sailing >= 0 && snapshot && !mineHit && province >= 0 && (isWater[province] || neighborIdx[province]!.some((q) => isWater[q]))) {
     // A sea zone, a port or a shore: the fleet sets sail at once (an army aboard lands on a shore).
     const fleet = sailing;
     sailing = -1;
     sound.sfx("army_order_move");
-    void act({ type: "navy", do: "sail", fleet, to: province });
+    // On the sea, the fleet sails to the very spot tapped (NAVY-149).
+    const [mx, my] = view.toMap(sx, sy);
+    const tile = isWater[province] && snapshot.tileWidth === rules.map!.width ? Math.floor(my) * snapshot.tileWidth + Math.floor(mx) : undefined;
+    if (tile !== undefined) sailGoal.set(fleet, { zone: province, tile });
+    else sailGoal.delete(fleet);
+    void act({ type: "navy", do: "sail", fleet, to: province, ...(tile !== undefined ? { tile } : {}) });
     return;
   }
   sailing = -1;
   fleetView = -1;
+  traderView = -1;
   if (hit && snapshot && snapshot.armies.owner[armySlot(hit.id)] === snapshot.playerNation) {
     // With armies chosen, another one joins them (or leaves, tapped again); else it is the one chosen.
     if (selected.size && !selected.has(hit.id)) selected.add(hit.id);
@@ -2113,9 +2838,13 @@ function onTap(sx: number, sy: number, province: number): void {
   realmView = -1;
   newsView = false;
   empireOpen = false;
-  // Under the Institutions map mode a tap on a member opens the Empire card (INST-084).
+  shogunateOpen = false;
+  // Under the Institutions map mode a tap on a member opens the Empire card, on Japan the Shogunate card (INST-084).
   if (lens === "institutions" && selectedProvince >= 0 && owners[selectedProvince]! >= 0 && snapshot?.institutionsLens.realm[owners[selectedProvince]!]) {
-    empireOpen = true;
+    const o = owners[selectedProvince]!;
+    const sh = snapshot.shogunate;
+    shogunateOpen = !!sh && !sh.ended && (sh.shogun === o || sh.members.some((m) => m.realm === o));
+    empireOpen = !shogunateOpen;
     panelCollapsed = false;
   }
   // Under the Faiths map mode a tap on a seat opens its head's card (RELG-138).
@@ -2247,15 +2976,16 @@ function renderVoyageBar(): void {
   });
 }
 
-/** A fleet's name on a button: its admiral's, else what it is. */
+/** A fleet's name on a button: its leader's with his post, else what it is. */
 function fleetLabel(id: number): string {
   const f = snapshot?.navy.fleets.find((x) => x.id === id);
-  return !f ? "a lost fleet" : f.admiral >= 0 ? `${titled(f.admiral)}'s fleet` : f.explorers ? "the explorers" : "the fleet";
+  return !f ? "a lost fleet" : f.admiral >= 0 ? fleetTitle(f, titled) : f.explorers ? "the explorers" : "the fleet";
 }
 
 /** Opens a fleet's card. */
 function openFleet(id: number): void {
   fleetView = id;
+  traderView = -1;
   sailing = -1;
   armyView = -1;
   realmView = -1;
@@ -2385,11 +3115,59 @@ function armySlot(id: number): number {
 // ---- HUD and panels ----
 const pennant = (nation: FlagOf, scale = 2) => `<img class="px-icon flag" src="${flagUrl(nation, scale)}" alt="">`;
 
+// The top bar's one-shot animations (SHELL-174, SHELL-175, SHELL-177): what each plaque last showed and when its animation began.
+const hudShot = { nation: -1, goldFrom: 0, goldTo: NaN, goldAt: -1e9, day: "", dayAt: -1e9, unread: 0, unreadAt: -1e9 };
+let goldTick = 0;
+const GOLD_MS = 300;
+
+/** Whether the interface plays its small animations: not with Animations Off or the system's reduced motion. */
+const uiMotion = () => animationsPref() !== "Off" && !matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/** The gold the plaque shows now: it counts from the old value to the new in 6 steps. */
+function goldShown(): number {
+  const k = Math.min(6, Math.floor(((performance.now() - hudShot.goldAt) / GOLD_MS) * 6));
+  return k >= 6 ? hudShot.goldTo : hudShot.goldFrom + ((hudShot.goldTo - hudShot.goldFrom) * k) / 6;
+}
+
+/** Writes each counting step into the gold plaque, whichever render drew it, until the count is done. */
+function tickGold(): void {
+  const el = hud.querySelector(".gold-n");
+  if (el) el.textContent = fmt(goldShown());
+  goldTick = goldShown() === hudShot.goldTo ? 0 : window.setTimeout(tickGold, GOLD_MS / 6);
+  // The tint goes once the count is done.
+  if (!goldTick) el?.classList.remove("up", "down");
+}
+
+/** A class attribute that adds `shot` while an animation begun at `at` still runs, delayed so a re-render carries it on rather than restarting it. */
+function shotClass(base: string, shot: string, at: number, ms: number): string {
+  const t = performance.now() - at;
+  return t < ms ? `class="${base} ${shot}" style="animation-delay:-${Math.round(t)}ms"` : `class="${base}"`;
+}
+
+/** Notes what changed on the plaques since the last render and starts their animations. */
+function noteHudChanges(me: number, gold: number, day: string, count: number): void {
+  const now = performance.now();
+  const moving = uiMotion() && hudShot.nation === me;
+  if (gold !== hudShot.goldTo) {
+    // A new value counts on from what the plaque shows, even mid-count.
+    hudShot.goldFrom = moving ? goldShown() : gold;
+    hudShot.goldTo = gold;
+    hudShot.goldAt = moving ? now : -1e9;
+    clearTimeout(goldTick);
+    if (moving) goldTick = window.setTimeout(tickGold, GOLD_MS / 6);
+  }
+  if (day !== hudShot.day && moving) hudShot.dayAt = now;
+  if (count > hudShot.unread && moving) hudShot.unreadAt = now;
+  hudShot.day = day;
+  hudShot.unread = count;
+  hudShot.nation = me;
+}
+
 function renderHud(): void {
   if (!snapshot) {
     hud.innerHTML = `
       <div class="realm title">${icon("crown", 2)}<b>Pocket Hegemony</b></div>
-      <span class="subtitle">Autumn 1444 · choose a realm</span>`;
+      <span class="subtitle">${START_SCENARIO.name} · choose a realm</span>`;
     return;
   }
   const s = snapshot;
@@ -2397,25 +3175,30 @@ function renderHud(): void {
   const n = nations[me]!;
   // The plaques, their order and what each opens come from the engine's top-bar model (REALM-205).
   const open = (o: Opens) => (o && "card" in o && o.tab ? ` data-realm-open="${o.tab}"` : "");
-  hud.innerHTML = `<button class="icon-only game-menu" data-shell="menu" title="Game menu" aria-label="Game menu">${icon("menu", 2)}</button>
-    ` + topBar(s, unread, asksOf(s).length + empireAsks(s.empire))
+  const bar = topBar({ ...s, peaceOffers: s.peaceOffers.filter((o) => !putOffOffers.has(o.id)) }, unread, asksOf(s).length + empireAsks(s.empire) + shogunateAsks(s.shogunate));
+  const goldP = bar.find((p) => p.key === "gold");
+  const newsP = bar.find((p) => p.key === "dispatches");
+  noteHudChanges(me, goldP?.key === "gold" ? goldP.gold : hudShot.goldTo, dateText(s.date, true), newsP?.key === "dispatches" ? newsP.count : 0);
+  hud.innerHTML = `<button class="icon-only game-menu" data-shell="menu" title="Game menu" aria-label="Game menu">${icon("menu", 2)}<span class="dot" hidden></span></button>
+    ` + bar
     .map((p) => {
       switch (p.key) {
         case "realm":
           return `<button class="realm" data-realm="${me}" title="Your realm">${pennant(n, 2)}<b>${esc(n.name)}</b></button>`;
         case "date":
-          return `<span class="plaque turn-label" title="${dateText(s.date)}, ${seasonName(latOf(provinces[provinceIndex.get(n.capital)!]!), s.date.month).toLowerCase()}: one turn is a week">${dateText(s.date, true)}${clockText(playbackHour(s.hour, s.battles.some((b) => b.player)))}</span>`;
+          return `<span class="plaque turn-label" title="${dateText(s.date)}, ${seasonName(latOf(provinces[provinceIndex.get(n.capital)!]!), s.date.month).toLowerCase()}: one turn is a week"><span ${shotClass("day", "flip", hudShot.dayAt, 200)}>${dateText(s.date, true)}</span>${clockText(playbackHour(s.hour, s.battles.some((b) => b.player)))}</span>`;
         case "gold":
-          return `<button class="plaque" data-realm="${me}"${open(p.opens)} title="Treasury: gold, and change per month. Opens the ledger">${icon("coin", 1)}${fmt(p.gold)} <small class="${p.falling ? "down" : ""}">${p.perMonth >= 0 ? "+" : ""}${p.perMonth.toFixed(1)}</small></button>`;
+          return `<button class="plaque gold" data-realm="${me}"${open(p.opens)} title="Treasury: gold, and change per month. Opens the ledger">${icon("coin", 1)}<span class="gold-n${goldShown() === p.gold ? "" : p.gold > hudShot.goldFrom ? " up" : " down"}">${fmt(goldShown())}</span> <small class="${p.falling ? "down" : ""}">${p.perMonth >= 0 ? "+" : ""}${p.perMonth.toFixed(1)}</small><i ${shotClass("gold-pop", p.gold > hudShot.goldFrom ? "up" : "down", hudShot.goldAt, 600)} aria-hidden="true">${icon("coin", 1)}</i></button>`;
         case "stability":
           return stabilityPlaque(s.stability!, me, s.revolution);
         case "war":
           return `<button class="plaque at-war" data-realm="${me}"${open(p.opens)} data-war-focus title="Your wars: your side's peace voices, amber past a third, red past half">${icon("swords", 1)}At war${warPlaqueBars(myWarsRaw(), me)}</button>`;
         case "dispatches":
-          return `<button class="plaque dispatches${p.urgent ? " urgent" : ""}" data-news title="News: everything that happened, newest first">${icon("scroll", 1)}${p.count || ""}</button>`;
+          return `<button ${shotClass(`plaque dispatches${p.urgent ? " urgent" : ""}`, "bounce", hudShot.unreadAt, 300)} data-news title="News: everything that happened, newest first">${icon("scroll", 1)}${p.count || ""}</button>`;
       }
     })
     .join("\n    ") + mpPlaque();
+  renderTrophy();
 }
 
 /** Wars the player fights, with the player's side first. */
@@ -2460,7 +3243,33 @@ const monthText = (iso: string) => {
   const [y, m] = iso.split("-").map(Number);
   return `${m ? MONTHS[m - 1] + " " : ""}${y}`;
 };
+/** What the Chronicle and the Aims fold need from the shell (EVT-112, EVT-113). */
+const chronicleUi = (): ChronicleUi => ({ realm: (n) => realmButton(n), esc, me: snapshot?.playerNation ?? -1 });
 const realmButton = (n: number, tab?: "diplomacy") => `<button class="realm-link" data-realm="${n}"${tab ? ` data-realm-open="${tab}"` : ""}>${pennant(nations[n]!)}<b>${esc(nations[n]!.name)}</b></button>`;
+
+/** What the hunting grounds pieces need of the client (ui/tribes.ts). */
+function tribesUiOf(): TribesUi {
+  const s = snapshot!;
+  return {
+    province: (p) => provinces[p]!.name,
+    realm: (n) => nations[n]!.name,
+    pennant: (n) => pennant(nations[n]!),
+    realmLink: (n) => realmButton(n),
+    me: s.playerNation,
+    now: s.date.year * 12 + s.date.month - 1,
+    colonial: s.exploration.colonial,
+  };
+}
+
+/** Binds the panel's hunting grounds buttons: orders stay on the same screen; a row or Go there opens the province on the map. */
+function bindHunt(): void {
+  bindTribes(panel, {
+    send: (o) => void actHere(o as Order),
+    go: (p) => goThere(p),
+    redraw: () => renderPanel(),
+    price: snapshot!.tribes.landPrice,
+  });
+}
 
 /** Sends an order that acts at once (war, peace, levies), then shows what came of it. */
 async function act(order: Order): Promise<void> {
@@ -2481,6 +3290,9 @@ async function act(order: Order): Promise<void> {
   // What came of it goes in the log; a refusal is also said over the map, where the order was given.
   logNews(snapshot);
   for (const r of snapshot.rejectedOrders) alertPlayer(`Not done: ${r.reason}.`, "scroll");
+  if (!snapshot.campaign.ending) pickingPlayOn = false;
+  watchEnding();
+  watchChapter();
   // An order the game took ticks off its first-campaign hint; a refused one ticks nothing (TUT-122).
   if (!snapshot.rejectedOrders.length) hints.did(order.type);
   restyleProvinces();
@@ -2494,12 +3306,152 @@ function takeSnapshot(next: Snapshot, ms: number): void {
   const at = new Map<number, [number, number]>();
   if (snapshot) for (let k = 0; k < snapshot.armies.id.length; k++) at.set(snapshot.armies.id[k]!, armyPosition(k));
   walkedBefore = new Map((snapshot?.traderWalks ?? []).map((w) => [w.id, w]));
+  hearTradeFeed(next, ms);
+  const ships = new Map<number, { at: [number, number]; path: number[] }>();
+  if (snapshot) for (const f of snapshot.navy.fleets) ships.set(f.id, { at: fleetPosition(f), path: f.path });
+  fleetFrom = ships;
+  applyWoken(next);
+  playMoments(snapshot, next);
   snapshot = next;
+  followPlayerRealm(next);
   setPortraitYear(next.date.year);
   hearAchievements(next);
   drawnAt = at;
   stepStart = performance.now();
   stepMs = ms;
+}
+
+/**
+ * The campaign follows the realm the player plays: after Play on (SHELL-096),
+ * and when the player's realm was formed into another (SETUP-085, SETUP-093),
+ * its saves are of the new realm, under its name. The top bar reads the
+ * snapshot's realm itself.
+ */
+function followPlayerRealm(s: Snapshot): void {
+  if (!campaign) return;
+  const n = nations[s.playerNation]!;
+  if (campaign.playerNation === n.id && campaign.nationName === n.name) return;
+  campaign.playerNation = n.id;
+  campaign.nationName = n.name;
+}
+
+/** The map's particles: one-shot moments, and later the looping smoke, snow and birds (VIEW-140..VIEW-150). */
+const particles = new ParticleField(EFFECTS.maxParticles);
+let particleTick: ReturnType<typeof setTimeout> | 0 = 0;
+/** When the particles last moved (performance.now). */
+let particleClock = 0;
+
+const heldOf = (s: Snapshot) => Array.from(s.provinceOwner, (o, p) => holderOf(o, s.provinceOccupier[p]!));
+const plagueOf = (s: Snapshot) => new Map(s.plague.map((x) => [x.province, x.step]));
+
+/**
+ * What a played day changed, as moments on the map where the player is
+ * looking (VIEW-140..VIEW-145): a province changing hands, a work finished,
+ * a rising, a plague breaking out, a gold shower for the realm's news.
+ * Off screen, or zoomed out to the world, nothing plays; the news log has it all.
+ */
+function playMoments(before: Snapshot | null, next: Snapshot): void {
+  const animations = animationsPref();
+  if (!view || animations === "Off" || !momentsShown(view.camera.zoom)) return;
+  const capital = provinceIndex.get(nations[next.playerNation]!.capital) ?? -1;
+  const list = moments({
+    me: next.playerNation, capital, heldBefore: before ? heldOf(before) : null, heldAfter: heldOf(next), news: next.news,
+    ...(before ? { plagueBefore: plagueOf(before), plagueAfter: plagueOf(next) } : {}), outbreakStep: next.plagueSteps.indexOf("outbreak"),
+  });
+  for (const m of list) {
+    const p = provinces[m.province];
+    if (!p || !isKnown(m.province)) continue;
+    const [sx, sy] = view.toScreen(p.x!, p.y!);
+    if (sx < -40 || sy < -40 || sx > view.width + 40 || sy > view.height + 40) continue;
+    const colour = m.nation >= 0 ? nations[m.nation]!.color : PALETTE.paper;
+    particles.moment(m.kind, p.x!, p.y!, momentParticles(m.kind, animations), momentSeconds(m.kind), colour);
+    momentUntil = Math.max(momentUntil, performance.now() + momentSeconds(m.kind) * 1000);
+  }
+  if (particles.count) view.invalidate();
+}
+
+/** Moves the particles on to now and draws them, asking for the next frame while any live: at the effects' frame rate during a moment, slower for the looping ones. */
+function drawParticles(o: OverlayContext): void {
+  const now = performance.now();
+  // A long gap (the tab hidden, the map idle) is not played out: the particles go on from where they were.
+  particles.step(Math.min(0.1, Math.max(0, (now - (particleClock || now)) / 1000)));
+  particleClock = now;
+  if (now - lastEmit >= EFFECTS.emitMs) {
+    lastEmit = now;
+    if (loopingEffects(animationsPref(), batteryOn()) && momentsShown(o.zoom)) emitLoops(o);
+  }
+  if (!particles.count) {
+    particleClock = 0;
+    return;
+  }
+  // In art pixels a little bigger than the tokens', so a moment reads at arm's length, and the living band's close in (VIEW-102).
+  particles.draw(o.ctx, o.toScreen, Math.max(3, Math.round(o.zoom / 8)), o.width, o.height);
+  const rate = now < momentUntil ? EFFECTS.frameRate : EFFECTS.loopFrameRate;
+  if (!particleTick) particleTick = setTimeout(() => ((particleTick = 0), view.invalidate()), 1000 / rate);
+}
+
+/** The province temperatures this week, °C, from the season bytes the map is drawn with (seasonBytes). */
+let seasonNow: Uint8Array | null = null;
+const celsiusOf = (p: number) => (seasonNow ? (seasonNow[p * 4]! / 255) * 127.5 - 60 : 10);
+/** When the looping emitters last ran, and until when a moment keeps the particles at full frame rate. */
+let lastEmit = 0;
+let momentUntil = 0;
+
+/**
+ * The living world's looping effects (VIEW-146..VIEW-149), a few particles
+ * at a time on what is on screen: smoke from the towns' chimneys close in,
+ * riot smoke over risings, snow over provinces below freezing, and now and
+ * then a flock of birds. Each kind keeps under its own cap.
+ */
+function emitLoops(o: OverlayContext): void {
+  if (!snapshot) return;
+  const r = Math.random;
+  const pad = 40;
+  const on = (x: number, y: number) => {
+    const [sx, sy] = o.toScreen(x, y);
+    return sx > -pad && sy > -pad && sx < o.width + pad && sy < o.height + pad;
+  };
+  const W = view.map.width;
+  // Chimney smoke, close in, from the towns on screen.
+  if (chimneysShown(o.zoom) && townLayer && particles.countOf(Shape.Smoke) < EFFECTS.chimneys.maxPuffs)
+    for (let p = 0; p < provinces.length; p++) {
+      const at = provinces[p]!;
+      if (at.x === undefined || !on(at.x, at.y!) || !isKnown(p)) continue;
+      for (const t of townLayer.chimneys(p)) {
+        if (r() > EFFECTS.chimneys.puffChance) continue;
+        particles.add(Shape.Smoke, (t % W) + 0.5, Math.floor(t / W) + 0.3, 0, -2, r() * 2 - 1, -4 - r() * 3, 2 + r(), r() < 0.5 ? PALETTE.mist : PALETTE.steel);
+      }
+    }
+  // A thicker dark column over each standing rising.
+  for (const rising of snapshot.rebels.risings) {
+    const at = provinces[rising.location]!;
+    if (!isKnown(rising.location) || !on(at.x!, at.y!) || r() > 0.6) continue;
+    particles.add(Shape.Smoke, at.x!, at.y!, r() * 4 - 2, -3, r() * 2 - 1, -7 - r() * 4, 2.5, r() < 0.5 ? PALETTE.slate : PALETTE.ink);
+  }
+  // Snow over the provinces on screen below freezing, falling a short way and gone.
+  if (seasonNow && particles.countOf(Shape.Snow) < EFFECTS.snow.maxFlakes)
+    for (let k = 0; k < EFFECTS.snow.perEmit; k++) {
+      const sx = r() * o.width;
+      const sy = r() * o.height;
+      const p = view.provinceAt(sx, sy);
+      if (p < 0 || isWater[p] || !snowing(celsiusOf(p))) continue;
+      const [mx, my] = view.toMap(sx, sy);
+      particles.add(Shape.Snow, mx, my, 0, -12, 0, 6 + r() * 3, 2 + r(), PALETTE.paper);
+    }
+  // Now and then a flock crosses the land; gulls, white, by the coast.
+  if (particles.countOf(Shape.Bird) === 0 && r() < EFFECTS.birds.chance) {
+    const sx = o.width * (0.2 + r() * 0.6);
+    const sy = o.height * (0.2 + r() * 0.6);
+    const p = view.provinceAt(sx, sy);
+    if (p >= 0 && !isWater[p]) {
+      const [mx, my] = view.toMap(sx, sy);
+      const dir = r() < 0.5 ? -1 : 1;
+      const n = EFFECTS.birds.flockMin + Math.floor(r() * (EFFECTS.birds.flockMax - EFFECTS.birds.flockMin + 1));
+      const colour = provinces[p]!.coastal ? PALETTE.paper : PALETTE.ink;
+      // In a loose V behind the leader.
+      for (let k = 0; k < n; k++) particles.add(Shape.Bird, mx, my, -dir * k * 4 + r() * 2, (k % 2 ? 1 : -1) * Math.ceil(k / 2) * 2, dir * 16, -1 + r() * 2, 7, colour);
+    }
+  }
 }
 
 /** Takes in a fresh snapshot's map state. */
@@ -2513,8 +3465,124 @@ function applySnapshot(): void {
 
 const NEWS_ICON: Record<News["kind"], "swords" | "castle" | "crown" | "scroll"> = {
   war: "swords", joined: "swords", call: "swords", battle: "swords", peace: "crown", siege: "castle", occupied: "castle", freed: "castle", raised: "swords", refused: "scroll", destroyed: "crown", famine: "scroll", unrest: "scroll",
-  invention: "scroll", built: "castle", envoy: "scroll", event: "scroll", reform: "crown", rebels: "swords", heritage: "crown", voyage: "scroll", colony: "crown", crown: "crown", revolution: "crown", trade: "scroll", ruler: "crown",
+  invention: "scroll", built: "castle", envoy: "scroll", event: "scroll", reform: "crown", rebels: "swords", heritage: "crown", voyage: "scroll", colony: "crown", crown: "crown", revolution: "crown", trade: "scroll", ruler: "crown", campaign: "crown", founded: "crown", tribe: "crown", plague: "scroll",
 };
+
+/** The end card (SHELL-164): how the campaign ended, the outcome, the scores and the highs, with its two choices. */
+function renderEnd(): void {
+  const v = snapshot!.campaign;
+  panel.innerHTML = `
+    <header><h2 class="ribbon">${v.ending!.kind === "end date" ? "The end" : v.ending!.kind === "game over" ? "Game over" : "Victory"}</h2>${closeButton()}</header>
+    ${endCard(v, (j) => nations[j]!.name)}`;
+  bindClose();
+  showPanel(true);
+  bindChapterButtons();
+  panel.querySelectorAll<HTMLButtonElement>("[data-realm]").forEach((b) =>
+    b.addEventListener("click", () => {
+      endView = false;
+      realmView = Number(b.dataset.realm);
+      realmTab = "general";
+      renderPanel();
+    }),
+  );
+  panel.querySelectorAll<HTMLButtonElement>("[data-end]").forEach((b) =>
+    b.addEventListener("click", () => {
+      const what = b.dataset.end;
+      if (what === "new") {
+        location.reload();
+        return;
+      }
+      endView = false;
+      if (what === "keep") void act({ type: "keepPlaying" });
+      if (what === "play-on") {
+        pickingPlayOn = true;
+        realmView = -1;
+        selectedProvince = -1;
+        alertPlayer("Tap a realm on the map, then Rule it to play on.", "crown");
+      }
+      renderPanel();
+      renderActions();
+    }),
+  );
+}
+
+/** The chapter card (SHELL-183): the hundred years just closed, with Play on and Score. */
+function renderChapter(): void {
+  const v = snapshot!.campaign;
+  const c = v.chapters[chapterView]!;
+  panel.innerHTML = `
+    <header><h2 class="ribbon">Chapter ${["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"][c.n - 1] ?? c.n}</h2>${closeButton()}</header>
+    ${chapterCard(v, chapterView, (j) => nations[j]!.name)}`;
+  bindClose();
+  showPanel(true);
+  panel.querySelectorAll<HTMLButtonElement>("[data-realm]").forEach((b) =>
+    b.addEventListener("click", () => {
+      chapterView = -1;
+      realmView = Number(b.dataset.realm);
+      realmTab = "general";
+      renderPanel();
+    }),
+  );
+  panel.querySelectorAll<HTMLButtonElement>("[data-chapter-close]").forEach((b) =>
+    b.addEventListener("click", () => {
+      chapterView = -1;
+      if (b.dataset.chapterClose === "score") {
+        realmView = snapshot!.playerNation;
+        realmTab = "score";
+        renderPanel();
+        return;
+      }
+      showPanel(false);
+    }),
+  );
+}
+
+/** A chapter just closed: its card opens by itself, once, and Auto turns stop at the end of the week (SHELL-183). */
+function watchChapter(): void {
+  const closed = snapshot?.campaign.chapters ?? [];
+  const n = closed.filter((c) => !c.last).length;
+  // The first snapshot of a campaign, or a load, opens nothing: those chapters were seen before.
+  if (chaptersShown < 0 || n < chaptersShown) {
+    chaptersShown = n;
+    return;
+  }
+  if (n === chaptersShown) return;
+  chaptersShown = n;
+  if (snapshot!.campaign.ending) return;
+  // The last chapter closes with the campaign, on the end card; any other is the newest.
+  chapterView = closed.length - (closed.at(-1)?.last ? 2 : 1);
+  chapterOver = null;
+  stopAuto(auto, "chapter");
+  panelCollapsed = false;
+  sound.sfx("turn_month_new_year");
+}
+
+/** A closed chapter in the Score tab or on the end card opens its card again (SHELL-184). */
+function bindChapterButtons(): void {
+  panel.querySelectorAll<HTMLButtonElement>("[data-chapter]").forEach((b) =>
+    b.addEventListener("click", () => {
+      endView = false;
+      chapterView = Number(b.dataset.chapter);
+      chapterOver = null;
+      renderPanel();
+    }),
+  );
+}
+
+/** When the campaign has just ended, the clock stops and the end card opens by itself, once (SHELL-164). */
+function watchEnding(): void {
+  const e = snapshot?.campaign.ending;
+  if (!e) return;
+  const key = `${e.kind}/${e.date}/${e.realm}`;
+  if (key === endShown) return;
+  endShown = key;
+  // Alerts over the map would cover the end card; everything they said is in the Dispatches.
+  clearAlerts();
+  endView = true;
+  pickingPlayOn = false;
+  panelCollapsed = false;
+  sound.sfx("turn_month_new_year");
+}
 
 /**
  * Takes a snapshot's news into the dispatches log, newest first, without
@@ -2525,7 +3593,9 @@ function logNews(s: Snapshot): void {
   const me = s.playerNation;
   const news = [...s.rejectedOrders.map((r): News => ({ kind: "refused", text: `Not done: ${r.reason}.`, nations: [me] })), ...s.news];
   dispatches = [...news.reverse().map((n) => ({ date: { ...s.date }, news: n })), ...dispatches].slice(0, DISPATCHES_KEPT);
-  unread += news.filter((x) => x.nations.includes(me) && x.kind !== "raised").length;
+  unread += news.filter((x) => (x.nations.includes(me) || x.major) && x.kind !== "raised").length;
+  // A realm founded: a dispatch card with its flag, every realm hears it (SETUP-092).
+  showFoundings(news.filter((x) => x.kind === "founded"));
   for (const x of news) {
     // A work of the player's finished: said over the map, with Go there.
     if (x.kind === "built" && x.nations.includes(me) && x.province !== undefined) alertPlayer(x.text, "castle", { province: x.province });
@@ -2570,6 +3640,8 @@ function logNews(s: Snapshot): void {
   // A crown inherited, a claim gained or lapsed, crowns merged: one line that opens the Diplomacy tab, where Your house lists them (SUBJ-130).
   for (const x of news) if (x.kind === "crown" && x.nations.includes(me)) alertPlayer(x.text, "crown", { tab: "diplomacy" });
   for (const x of news) if (x.kind === "ruler" && x.nations[0] === me) alertPlayer(x.text, "crown", { tab: "general" });
+  // Settlers on the player's hunting ground, or an ask for it: a short alert with Go there; the dispatches keep it (TRIBE-029).
+  for (const x of news) if (x.kind === "tribe" && x.nations[0] === me) alertPlayer(x.text, "swords", x.province !== undefined && x.text.startsWith(settlersAlert("", "").text.split(":")[0]!) ? { province: x.province } : { tab: "hunting" });
   askForStudy(s, news.some((x) => x.kind === "invention" && /Learned/.test(x.text)));
   for (const c of s.calls) {
     if (alerted.has(`call ${c.id}`)) continue;
@@ -2588,6 +3660,13 @@ function logNews(s: Snapshot): void {
     alerted.add(`verdict ${v.id}`);
     alertPlayer(`The rebels of ${provinces[v.province]!.name} are beaten: choose their fate.`, "crown", { province: v.province });
     stopAuto(auto, "rebels");
+  }
+  // The Court asks the player to swear to a new shogun (INST-083).
+  const oath = s.shogunate?.oath;
+  if (oath && !alerted.has(`oath ${oath.ends}`)) {
+    alerted.add(`oath ${oath.ends}`);
+    alertPlayer(`The Court asks you to swear to ${nations[oath.shogun]!.name}, the new Shogun.`, "crown", { answer: true });
+    stopAuto(auto, "envoy");
   }
   for (const a of asksOf(s)) {
     if (alerted.has(`ask ${a.id}`)) continue;
@@ -2619,9 +3698,12 @@ function logNews(s: Snapshot): void {
 /** The player's revolution's choice card while it waits on a stance (REVO-091): it cannot be folded away. */
 function renderRevolutionCard(): void {
   const v = snapshot?.revolution;
+  const opening = revolutionCard.hidden;
   revolutionCard.hidden = !v?.outbreak;
   if (!v?.outbreak) return;
   revolutionCard.innerHTML = revolutionCardHtml(v, nations[snapshot!.playerNation]!.name);
+  // The card unrolls when it first shows, not on each re-render (SHELL-176).
+  if (opening) revolutionCard.firstElementChild!.classList.add("unroll");
   revolutionCard.querySelectorAll<HTMLButtonElement>("[data-revolution-stance]").forEach((b) =>
     b.addEventListener("click", async () => {
       await act({ type: "answerRevolution", stance: b.dataset.revolutionStance as "lead" | "bend" | "fight" });
@@ -2647,6 +3729,8 @@ function renderEventCard(): void {
     eventFolded = true;
     renderEventCard();
     renderActions();
+    // An everyday event about a province shows it (EVT-121).
+    if (card.province !== undefined) goToProvince(card.province, true);
   });
   eventCard.querySelectorAll<HTMLButtonElement>("[data-event-option]").forEach((b) =>
     b.addEventListener("click", async () => {
@@ -2686,17 +3770,19 @@ const ALERTS_SHOWN = 3;
 const ALERT_MS = 12000;
 
 /** A short alert over the map, with Go there (to a province) or Answer (opens the dispatches). */
-function alertPlayer(text: string, what: "swords" | "castle" | "crown" | "scroll", to: { province?: number; answer?: true; battle?: true; tab?: "learning" | "heritage" | "diplomacy" | "general" } = {}): void {
+function alertPlayer(text: string, what: "swords" | "castle" | "crown" | "scroll", to: { province?: number; answer?: true; battle?: true; tab?: "learning" | "heritage" | "diplomacy" | "general" | "hunting" } = {}): void {
   if ([...alerts.children].some((el) => el.querySelector("span")?.textContent === text)) return;
   const el = document.createElement("div");
   el.className = "alert framed";
   el.setAttribute("role", "status");
   if (to.battle) el.dataset.battle = String(to.province);
   el.innerHTML = `${icon(what, 2)}<span>${esc(text)}</span>${
-    to.battle ? `<button class="wax go-there">${icon("swords", 1)}Watch</button>` : to.tab && snapshot ? `<button class="wax go-there" data-realm="${snapshot.playerNation}" data-realm-open="${to.tab}">Open</button>` : to.province !== undefined ? `<button class="wax go-there">${icon("map", 1)}Go there</button>` : to.answer ? `<button class="wax go-there">Answer</button>` : ""
+    to.battle ? `<button class="wax go-there">${icon("swords", 1)}Watch</button><button class="paper look-there">${icon("map", 1)}Go there</button>` : to.tab && snapshot ? `<button class="wax go-there" data-realm="${snapshot.playerNation}" data-realm-open="${to.tab}">Open</button>` : to.province !== undefined ? `<button class="wax go-there">${icon("map", 1)}Go there</button>` : to.answer ? `<button class="wax go-there">Answer</button>` : ""
   }<button class="paper dismiss" aria-label="Dismiss">${icon("close", 1)}</button>`;
   const remove = () => el.remove();
   el.querySelector(".dismiss")!.addEventListener("click", remove);
+  // A battle's Go there only looks: the alert stays while the week waits on it.
+  el.querySelector(".look-there")?.addEventListener("click", () => goThere(to.province!));
   el.querySelector(".go-there")?.addEventListener("click", () => {
     remove();
     if (to.battle && to.province !== undefined) watchBattle(to.province);
@@ -2718,6 +3804,41 @@ function alertPlayer(text: string, what: "swords" | "castle" | "crown" | "scroll
   while (alerts.children.length > ALERTS_SHOWN) ([...alerts.children].find((x) => !(x as HTMLElement).dataset.battle) ?? alerts.firstElementChild!).remove();
   // A battle's alert stays while the week waits on it.
   if (!to.battle) setTimeout(remove, ALERT_MS);
+}
+
+/**
+ * The founding card (SETUP-092 to SETUP-094): a major dispatch over the map
+ * with the new realm's flag and name and what it was made from, and, when
+ * the player's realm was formed into it, that it is theirs now. Show on the
+ * map centres the map on its capital; Close puts it away. It stays until the
+ * player does either, as the alerts for battles do, and the line is in the
+ * dispatches too. One card per realm founded.
+ */
+function showFoundings(news: News[]): void {
+  const realms = new Map<number, News[]>();
+  for (const x of news) realms.set(x.nations[0]!, [...(realms.get(x.nations[0]!) ?? []), x]);
+  for (const [n, lines] of realms) {
+    const key = `founded ${n} ${lines.map((x) => x.text).join(" ")}`;
+    if (alerted.has(key)) continue;
+    alerted.add(key);
+    const realm = nations[n]!;
+    // "Your realm is now Spain" comes first, then how it was founded.
+    const text = lines.sort((a, b) => Number(b.text.startsWith("Your realm")) - Number(a.text.startsWith("Your realm"))).map((x) => `<p>${esc(x.text)}</p>`).join("");
+    const el = document.createElement("div");
+    el.className = "alert founding framed";
+    el.setAttribute("role", "status");
+    el.dataset.founding = String(n);
+    el.innerHTML = `<div class="founding-head">${pennant(realm, 3)}<div><small>A realm is founded</small><b>${esc(realm.name)}</b>${text}</div></div>
+      <div class="founding-choices">${lines[0]!.province !== undefined ? `<button class="wax go-there">${icon("map", 1)}Show on the map</button>` : ""}<button class="paper close-founding">${icon("close", 1)}Close</button></div>`;
+    el.querySelector(".close-founding")!.addEventListener("click", () => el.remove());
+    el.querySelector(".go-there")?.addEventListener("click", () => {
+      el.remove();
+      // Close enough to see the new realm's land in its colour, with its name over it.
+      goThere(lines[0]!.province!, 2);
+    });
+    alerts.append(el);
+    while (alerts.children.length > ALERTS_SHOWN) ([...alerts.children].find((x) => !(x as HTMLElement).dataset.battle && !(x as HTMLElement).dataset.founding) ?? alerts.firstElementChild!).remove();
+  }
 }
 
 /** Clears the alerts the log now shows, keeping those for a battle the week waits on. */
@@ -2820,11 +3941,52 @@ function bindEmpire(): void {
   panel.querySelectorAll<HTMLButtonElement>("[data-ruling]").forEach((b) => b.addEventListener("click", () => void act({ type: "empire", do: "ruling", id: b.dataset.ruling!, yes: b.dataset.yes === "1" }).then(again)));
 }
 
+/** The Shogunate card (INST-082): header and the folds Houses, The Court and Hold, over the map. */
+function renderShogunate(): void {
+  const v = snapshot!.shogunate!;
+  panel.innerHTML = `
+    <header><h2 class="ribbon">${esc(v.name)}</h2>${closeButton()}</header>
+    <div class="empire-card shogunate-card">${shogunateCard(v, institutionsUi)}</div>`;
+  bindClose();
+  showPanel(true);
+  panel.querySelectorAll<HTMLDetailsElement>("details.inst-fold[data-fold]").forEach((d) =>
+    d.addEventListener("toggle", () => {
+      if (d.open) shogunateUi.open.add(d.dataset.fold!);
+      else shogunateUi.open.delete(d.dataset.fold!);
+    }),
+  );
+  panel.querySelector<HTMLButtonElement>("[data-close-pick]")?.addEventListener("click", () => {
+    shogunateUi.picking = !shogunateUi.picking;
+    renderPanel();
+  });
+  panel.querySelectorAll<HTMLButtonElement>("[data-lord-open]").forEach((b) => b.addEventListener("click", () => openLord(Number(b.dataset.lordOpen))));
+  bindShogunate();
+}
+
+/** The Shogunate's orders, from its card or the oath's News answer card. */
+function bindShogunate(): void {
+  const again = () => renderPanel();
+  const order = (o: Record<string, unknown>) => void act({ type: "shogunate", ...o } as Order).then(again);
+  panel.querySelectorAll<HTMLButtonElement>("[data-house-summon]").forEach((b) => b.addEventListener("click", () => order({ do: "summon", lord: Number(b.dataset.houseSummon) })));
+  panel.querySelectorAll<HTMLButtonElement>("[data-house-release]").forEach((b) => b.addEventListener("click", () => order({ do: "release", lord: Number(b.dataset.houseRelease) })));
+  panel.querySelectorAll<HTMLButtonElement>("[data-house-confirm]").forEach((b) => b.addEventListener("click", () => order({ do: "confirm", lord: Number(b.dataset.houseConfirm) })));
+  panel.querySelectorAll<HTMLButtonElement>("[data-ask-court]").forEach((b) => b.addEventListener("click", () => order({ do: "askCourt" })));
+  panel.querySelectorAll<HTMLButtonElement>("[data-oath]").forEach((b) => b.addEventListener("click", () => order({ do: "oath", yes: b.dataset.oath === "1" })));
+  panel.querySelectorAll<HTMLButtonElement>("[data-close-port]").forEach((b) =>
+    b.addEventListener("click", () => {
+      shogunateUi.picking = false;
+      order({ do: "close", port: Number(b.dataset.closePort) });
+    }),
+  );
+  panel.querySelectorAll<HTMLButtonElement>("[data-open-ports]").forEach((b) => b.addEventListener("click", () => order({ do: "open" })));
+}
+
 /** The dispatches: calls to arms and offers to answer, then the log of everything that happened, newest first. */
 function renderNews(): void {
   const s = snapshot!;
   const me = s.playerNation;
-  const mine = (x: News) => x.nations.includes(me);
+  // Major news is every realm's (a realm founded, SETUP-092).
+  const mine = (x: News) => x.nations.includes(me) || !!x.major;
   const items = dispatchesMine ? dispatches.filter((x) => mine(x.news)) : dispatches;
   // One heading per day, newest day first.
   const days: { date: GameDate; news: News[] }[] = [];
@@ -2835,13 +3997,15 @@ function renderNews(): void {
   }
   panel.innerHTML = `
     <header><h2 class="ribbon">News</h2>${closeButton()}</header>
-    <nav class="tabs"><button class="tab${dispatchesMine ? "" : " on"}" data-news-mine="0">Everything</button><button class="tab${dispatchesMine ? " on" : ""}" data-news-mine="1">Your realm</button></nav>
+    <nav class="tabs"><button class="tab${dispatchesMine || newsHistory ? "" : " on"}" data-news-mine="0">All</button><button class="tab${dispatchesMine && !newsHistory ? " on" : ""}" data-news-mine="1">Your realm</button><button class="tab${newsHistory ? " on" : ""}" data-news-history>History</button></nav>
+    ${newsHistory ? chronicleHtml(s.history.chronicle, s.history.goals, chronicleUi(), goalDefs) : `${s.events.length || asksOf(s).length || s.peaceOffers.length || s.calls.length || shogunateAsks(s.shogunate) ? `<h3 class="sub">Waiting for you</h3>` : ""}
     ${waitingEventsHtml(s.events)}
     ${asksHtml()}
     ${s.peaceOffers.map(offerHtml).join("")}
     ${electionAnswerCard(s.empire, institutionsUi)}
     ${dietAnswerCard(s.empire, institutionsUi)}
     ${rulingAnswerCards(s.empire, institutionsUi)}
+    ${oathAnswerCard(s.shogunate, institutionsUi)}
     ${s.calls
       .map((c) =>
         c.via === "empire"
@@ -2858,12 +4022,17 @@ function renderNews(): void {
     ${days
       .map(
         (d) => `<h3 class="sub news-day">${dateText(d.date)}</h3><ul class="news">${d.news
-          .map((x) => `<li class="${mine(x) ? "mine" : ""}">${icon(NEWS_ICON[x.kind], 1)}<span>${esc(x.text)}</span>${x.province !== undefined ? `<button class="paper go" data-go-province="${x.province}" title="Show on the map" aria-label="Show on the map">${icon("map", 1)}</button>` : ""}</li>`)
+          .map((x) => `<li class="${mine(x) ? "mine" : ""}">${x.kind === "founded" ? pennant(nations[x.nations[0]!]!, 1) : icon(NEWS_ICON[x.kind], 1)}<span>${esc(x.text)}</span>${x.province !== undefined ? `<button class="paper go" data-go-province="${x.province}" title="Show on the map" aria-label="Show on the map">${icon("map", 1)}</button>` : ""}</li>`)
           .join("")}</ul>`,
       )
       .join("")}
-    ${days.length ? "" : `<p class="hint">Nothing of note yet.</p>`}`;
+    ${days.length ? "" : `<p class="hint">Nothing of note yet.</p>`}`}`;
   bindClose();
+  bindFolds(panel);
+  panel.querySelector<HTMLButtonElement>("[data-news-history]")?.addEventListener("click", () => {
+    newsHistory = true;
+    renderNews();
+  });
   showPanel(true);
   bindOffers();
   panel.querySelectorAll<HTMLButtonElement>("[data-event-open]").forEach((b) => b.addEventListener("click", openEventCard));
@@ -2871,10 +4040,12 @@ function renderNews(): void {
     b.addEventListener("click", () => void act({ type: "answerCall", call: b.dataset.call!, yes: b.dataset.yes === "1" })),
   );
   bindEmpire();
+  bindShogunate();
   panel.querySelectorAll<HTMLButtonElement>("[data-go-province]").forEach((b) => b.addEventListener("click", () => goThere(Number(b.dataset.goProvince))));
   panel.querySelectorAll<HTMLButtonElement>("[data-news-mine]").forEach((b) =>
     b.addEventListener("click", () => {
       dispatchesMine = b.dataset.newsMine === "1";
+      newsHistory = false;
       renderNews();
     }),
   );
@@ -2894,19 +4065,23 @@ function renderActions(): void {
   autoButton.title = stopping ? `${stopping}: tap to keep Auto turns on (Shift+Space)` : auto.state === "on" ? "Auto turns on: tap to stop at the end of this week (Shift+Space)" : "Auto turns: play week after week (Shift+Space)";
   fab.classList.toggle("playing", playing);
   fab.classList.toggle("paused", paused);
-  const waiting = snapshot?.events.length ?? 0;
+  const over = !!snapshot?.campaign.ending;
+  const waiting = over ? 0 : (snapshot?.events.length ?? 0);
   const badge = fab.querySelector<HTMLElement>(".badge")!;
   badge.hidden = !waiting;
   badge.textContent = String(waiting);
-  // While events wait, End turn shows their scroll and count (SHELL-070).
-  const want = waiting ? "scroll" : "hourglass";
+  // While events wait, End turn shows their scroll and count (SHELL-070); once the campaign is over, a crown (SHELL-164).
+  const want = over ? "crown" : waiting ? "scroll" : "hourglass";
   if ((fab.dataset.icon ?? "hourglass") !== want) {
-    fab.querySelector("img")!.outerHTML = icon(want, 3, waiting ? "Answer the event" : "End turn");
+    fab.querySelector("img")!.outerHTML = icon(want, 3, over ? "Campaign over" : waiting ? "Answer the event" : "End turn");
     fab.dataset.icon = want;
   }
   fab.classList.toggle("events", waiting > 0);
+  fab.classList.toggle("over", over);
   if (!snapshot) return;
-  fab.title = waiting
+  fab.title = over
+    ? "Campaign over: open the end card"
+    : waiting
     ? `${waiting === 1 ? "An event waits" : `${waiting} events wait`} for your answer (Space opens it)`
     : playing
       ? paused
@@ -2938,7 +4113,7 @@ function showPanel(open: boolean, reopenIcon: "scroll" | "crown" = "scroll"): vo
   // While a course is drawn the voyage bar stands in for the folded card (EXPL-074).
   reopen.hidden = !open || !panelCollapsed || !!exploring;
   const what =
-    reopenIcon === "crown" ? "Choose a realm" : empireOpen ? "The Empire" : newsView ? "News" : fleetView >= 0 ? (sailing >= 0 ? "Fleet: tap where to sail" : "Fleet") : realmView >= 0 ? nations[realmView]!.name : selectedProvince >= 0 ? provinces[selectedProvince]!.name : "";
+    reopenIcon === "crown" ? "Choose a realm" : empireOpen ? "The Empire" : shogunateOpen ? "The Shogunate" : newsView ? "News" : fleetView >= 0 ? (sailing >= 0 ? "Fleet: tap where to sail" : "Fleet") : traderView >= 0 ? "Trader" : realmView >= 0 ? nations[realmView]!.name : selectedProvince >= 0 ? provinces[selectedProvince]!.name : "";
   reopen.innerHTML = `${icon(reopenIcon, 3)}<span>${esc(what)}</span>`;
   reopen.title = `Open the overview: ${what}`;
   panel.querySelector(".fold")?.addEventListener("click", () => {
@@ -2960,6 +4135,7 @@ interface Screen {
   lord: number;
   army: number;
   fleet: number;
+  trader: number;
   province: number;
   provinceTab: ProvinceTab;
 }
@@ -2979,13 +4155,13 @@ let backIgnore = false;
 /** The screen the panel shows now, or null when it is closed. */
 function currentScreen(): Screen | null {
   if (!snapshot) return null;
-  const s: Screen = { ach: achView, news: newsView, realm: realmView, realmTab, official: officialView, lord: lordView, army: armyView, fleet: fleetView, province: selectedProvince, provinceTab };
+  const s: Screen = { ach: achView, news: newsView, realm: realmView, realmTab, official: officialView, lord: lordView, army: armyView, fleet: fleetView, trader: traderView, province: selectedProvince, provinceTab };
   return screenKey(s) ? s : null;
 }
 
 /** What the player sees of a screen, the first view set as renderPanelCard picks it: two screens that look alike are one. */
 function screenKey(s: Screen): string {
-  return s.ach ? "ach" : s.news ? "news" : s.realm >= 0 ? `realm ${s.realm} ${s.realmTab}` : s.official >= 0 ? `official ${s.official}` : s.lord >= 0 ? `lord ${s.lord}` : s.army >= 0 ? `army ${s.army}` : s.fleet >= 0 ? `fleet ${s.fleet}` : s.province >= 0 ? `province ${s.province} ${s.provinceTab}` : "";
+  return s.ach ? "ach" : s.news ? "news" : s.realm >= 0 ? `realm ${s.realm} ${s.realmTab}` : s.official >= 0 ? `official ${s.official}` : s.lord >= 0 ? `lord ${s.lord}` : s.army >= 0 ? `army ${s.army}` : s.fleet >= 0 ? `fleet ${s.fleet}` : s.trader >= 0 ? `trader ${s.trader}` : s.province >= 0 ? `province ${s.province} ${s.provinceTab}` : "";
 }
 
 /** After a redraw: a new screen puts the one before on the history; a closed panel clears it. */
@@ -3022,6 +4198,7 @@ function goBack(): void {
   lordView = s.lord;
   armyView = s.army;
   fleetView = s.fleet;
+  traderView = s.trader;
   sailing = -1;
   grantOpen = false;
   selectedProvince = s.province;
@@ -3061,7 +4238,10 @@ function renderPanel(): void {
   }
   // Whatever the card, the buttons a revolution's regime locks say so (REVO-092).
   lockRevolutionButtons(panel, snapshot?.revolution);
-  if (!panelDepth) noteScreen();
+  if (!panelDepth) {
+    noteScreen();
+    hintViews();
+  }
 }
 
 /** The Head of the faith card's buttons: conclave gold in steps, Claim the caliphate, Raise our own patriarch. */
@@ -3099,13 +4279,77 @@ function renderHead(id: string): void {
   showPanel(true);
 }
 
+/** The realms of a picker region, by index. */
+function regionRealms(region: string): number[] {
+  return nations.flatMap((_, r) => (realmRegion[r] === region && realmSize(r) > 0 ? [r] : []));
+}
+
+function realmProvinces(r: number): number[] {
+  const out: number[] = [];
+  owners.forEach((o, i) => o === r && out.push(i));
+  return out;
+}
+
+function realmSize(r: number): number {
+  let n = 0;
+  for (let i = 0; i < owners.length; i++) if (owners[i] === r) n++;
+  return n;
+}
+
+/** A realm at a glance on its card before a game starts, with Ways to grow (SETUP-073). */
+function pickerCard(r: number): string {
+  const own = realmProvinces(r);
+  return pickerCardHtml({
+    form: formName(startFormOf(nations[r]!.id)),
+    provinces: own.length,
+    people: fmt(own.reduce((t, i) => t + provinces[i]!.population, 0) * 1000),
+    strong: strongIn(nations[r]!.id),
+    ways: waysToGrow({ owners, neighbors: neighborIdx, water: isWater, trade: START_TRADE }, r),
+  });
+}
+
+/**
+ * Frames provinces in the part of the map the card leaves open: right of a
+ * side sheet (Wide), above a bottom sheet (Tall), under the top bar (SETUP-072).
+ */
+function frameProvinces(list: readonly number[], maxZoom = 8): void {
+  if (!view || !list.length) return;
+  const xs = list.map((p) => provinces[p]!.x!);
+  const ys = list.map((p) => provinces[p]!.y!);
+  const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
+  const W = app.clientWidth;
+  const H = app.clientHeight;
+  const top = 44;
+  let left = 0;
+  let bottom = H;
+  if (!panel.hidden) {
+    const r = panel.getBoundingClientRect();
+    if (r.width < W * 0.7) left = r.right;
+    else bottom = r.top;
+  }
+  const w = Math.max(80, W - left);
+  const h = Math.max(80, bottom - top);
+  const zoom = Math.min(maxZoom, w / ((x1 - x0) * 1.1 + 30), h / ((y1 - y0) * 1.1 + 30));
+  view.lookAt((x0 + x1) / 2 - (left + w / 2 - W / 2) / zoom, (y0 + y1) / 2 - (top + h / 2 - H / 2) / zoom, zoom);
+}
+
 function renderPanelCard(): void {
   panel.classList.remove("declaring");
-  const shows = `${achView}/${empireOpen}/${newsView}/${realmView}/${realmTab}/${declareFor}/${officialView}/${lordView}/${armyView}/${fleetView}/${selectedProvince}/${provinceTab}`;
+  const shows = `${achView}/${empireOpen}/${shogunateOpen}/${newsView}/${realmView}/${realmTab}/${declareFor}/${officialView}/${lordView}/${armyView}/${fleetView}/${traderView}/${selectedProvince}/${provinceTab}`;
   if (shows !== panelShows) {
     panelShows = shows;
     panel.scrollTop = 0;
   }
+  if (endView && snapshot?.campaign.ending) {
+    renderEnd();
+    return;
+  }
+  if (chapterView >= 0 && chapterOver === null) chapterOver = shows;
+  if (chapterView >= 0 && chapterOver === shows && snapshot?.campaign.chapters[chapterView]) {
+    renderChapter();
+    return;
+  }
+  chapterView = -1;
   if (achView) {
     renderAchievements();
     return;
@@ -3124,6 +4368,11 @@ function renderPanelCard(): void {
     return;
   }
   empireOpen = false;
+  if (shogunateOpen && snapshot?.shogunate) {
+    renderShogunate();
+    return;
+  }
+  shogunateOpen = false;
   if (newsView && snapshot) {
     renderNews();
     return;
@@ -3157,6 +4406,11 @@ function renderPanelCard(): void {
   }
   fleetView = -1;
   sailing = -1;
+  if (traderView >= 0 && snapshot?.trade?.traders.some((t) => t.id === traderView)) {
+    renderTrader(traderView);
+    return;
+  }
+  traderView = -1;
   if (!snapshot && selectedProvince < 0 && startOn) {
     showStart();
     showPanel(false);
@@ -3164,20 +4418,33 @@ function renderPanelCard(): void {
   }
   if (!snapshot && selectedProvince < 0) {
     const pickTitle = !mpPicking ? "Choose your realm" : mpPicking.kind === "hotseat" ? "Choose 2 to 4 realms" : mpPicking.kind === "host" ? "Host: your realm" : `Game ${mpPicking.code}: your realm`;
+    const regionName = PICKER_REGIONS.find((r) => r.id === pickRegion)?.name ?? "";
+    const featured = `<div class="nations">${FEATURED.filter((id) => nationIndex.has(id) && !nations[nationIndex.get(id)!]!.asleep)
+      .map((id) => {
+        const n = nations[nationIndex.get(id)!]!;
+        // Each realm's standing at the start, so a realm that starts behind says so before it is chosen (RSCH-105).
+        return `<button class="paper nation" data-nation="${n.id}">${pennant(n)}<span class="nation-name">${esc(n.name)}<small class="starts">${esc(startStanding(n.id))}</small></span></button>`;
+      })
+      .join("")}</div>
+      <p class="hint">Or choose a region above, or tap any realm on the map: ${nations.filter((n) => !n.asleep).length} to choose from. <a href="./style.html">Art test page</a></p>`;
     panel.innerHTML = `
       <header><h2 class="ribbon">${esc(pickTitle)}</h2><span class="panel-buttons"><button class="fold" aria-label="Minimise">${icon("collapse", 2)}</button><button class="close" data-start-back aria-label="Back to the start screen">${icon("close", 2)}</button></span></header>
-      <div class="nations">${FEATURED.filter((id) => nationIndex.has(id))
-        .map((id) => {
-          const n = nations[nationIndex.get(id)!]!;
-          // Each realm's standing at the start, so a realm that starts behind says so before it is chosen (RSCH-105).
-          return `<button class="paper nation" data-nation="${n.id}">${pennant(n)}<span class="nation-name">${esc(n.name)}<small class="starts">${esc(startStanding(n.id))}</small></span></button>`;
-        })
-        .join("")}</div>
+      ${regionSelectHtml(PICKER_REGIONS.map((r) => ({ ...r, count: realmRegion.filter((x, i) => x === r.id && !nations[i]!.asleep).length })), pickRegion, nations.filter((n) => !n.asleep).length)}
+      ${pickRegion ? regionListHtml(regionName, regionRealms(pickRegion).map((r) => ({ index: r, name: nations[r]!.name, provinces: realmSize(r), standing: startStanding(nations[r]!.id), pennant: pennant(nations[r]!) }))) : featured}
       ${mpPicking?.kind === "hotseat" ? hotseatPickHtml(mpLook, mpPicking.chosen) : ""}
-      <p class="hint">Or tap any realm on the map: ${nations.length} to choose from. <a href="./style.html">Art test page</a></p>
       <button class="paper ach-open" data-ach-open>${icon("trophy", 2)}Achievements<small>${Object.keys(achProfile.unlocked).length} earned · every campaign can earn them</small></button>
       <p class="diag" id="diag">${diagnosticsLine()}</p>`;
     bindNationButtons();
+    panel.querySelector<HTMLSelectElement>("[data-pick-region]")!.addEventListener("change", (e) => {
+      pickRegion = (e.target as HTMLSelectElement).value;
+      panelShows = "";
+      renderPanel();
+      if (pickRegion) frameProvinces(regionRealms(pickRegion).flatMap((r) => realmProvinces(r)));
+    });
+    // A row opens the realm's card ([data-realm]); the map then frames the realm beside or above the card.
+    panel.querySelectorAll<HTMLButtonElement>("[data-pick-realm]").forEach((b) =>
+      b.addEventListener("click", () => requestAnimationFrame(() => frameProvinces(realmProvinces(Number(b.dataset.pickRealm)), 6))),
+    );
     panel.querySelector("[data-ach-open]")!.addEventListener("click", () => openAchievements());
     panel.querySelector("[data-start-back]")!.addEventListener("click", () => {
       mpPicking = null;
@@ -3238,11 +4505,13 @@ function renderPanelCard(): void {
   panel.innerHTML = `
     <header><h2 class="ribbon">${owner ? pennant(owner, 2) : ""}${esc(p.name)}</h2>${closeButton()}</header>
     ${mineHere ? provinceTabs() : ""}
-    <p class="owner">${owner ? `<button class="realm-link" data-realm="${own}" title="Open ${esc(owner.name)}"><b>${esc(owner.name)}</b></button>` : "<b>Unclaimed land</b>"}</p>
-    <p class="province-kind">${esc(provinceKind(p, !!owner && owner.capital === p.id))}</p>
+    <p class="owner">${owner ? `<button class="realm-link" data-realm="${own}" title="Open ${esc(owner.name)}"><b>${esc(owner.name)}</b></button>` : snapshot && !isWater[selectedProvince] ? groundHead(snapshot.tribes, selectedProvince, tribesUiOf()) : "<b>Unclaimed land</b>"}</p>
+    <p class="province-kind">${esc(provinceKind(p, selectedProvince, !!owner && owner.capital === p.id))}</p>
+    ${snapshot && !owner ? groundSection(snapshot.tribes, selectedProvince, tribesUiOf()) : ""}
     ${snapshot ? settleSection(selectedProvince) : ""}
     ${snapshot ? rebelsHere(selectedProvince) : ""}
     ${siege ? siegeView(rules, siege) : ""}
+    ${snapshot && own >= 0 ? plagueHere(selectedProvince, mineHere) : ""}
     ${snapshot && own >= 0 && official !== undefined ? governanceSection(selectedProvince, own, mineHere, official) : ""}
     <dl class="facts">
       <dt>People</dt><dd>${fmt((snapshot ? snapshot.provincePeople[selectedProvince]! : p.population) * 1000)}</dd>
@@ -3253,6 +4522,8 @@ function renderPanelCard(): void {
       ${snapshot ? beliefFacts(snapshot.peoples, selectedProvince) : ""}
       <dt>Walls</dt><dd>${wallsAt(selectedProvince) ? WALL_NAMES[wallsAt(selectedProvince)!] : "None"}</dd>
       ${occupiers[selectedProvince]! >= 0 ? `<dt>Occupied</dt><dd>by ${esc(nations[occupiers[selectedProvince]!]!.name)}</dd>` : ""}
+      ${mineHere ? throneFact(selectedProvince) : ""}
+      ${mineHere ? newLandFact(selectedProvince) : ""}
       ${mineHere ? taxLine(selectedProvince) : ""}
     </dl>
     ${mineHere ? rateButtons(snapshot!.provinceTax[selectedProvince]!, "province") : ""}
@@ -3267,12 +4538,13 @@ function renderPanelCard(): void {
         const c = cmd >= 0 ? cmdOf(cmd) : null;
         return `<div class="army">
           ${c ? commanderPortrait(rules, c.name, s.armies.owner[k]!) : `<img class="portrait" src="${spriteUrl("soldier", nations[s.armies.owner[k]!]!.color, 3)}" alt="">`}
-          <span class="who">${c ? `<b>${esc(titledOf(c))}</b><br><small>${roleOf(c)} · might ${c.might} · cunning ${c.cunning} · logistics ${c.logistics}</small>` : "<b>Army</b>"}<br>
+          <span class="who">${c ? `<b>${esc(titledOf(c))}</b><br><small>${roleOf(c)} · ${skills(c)}</small>` : "<b>Army</b>"}<br>
           ${fmt(s.armies.men[k]!)} men of ${esc(nations[s.armies.owner[k]!]!.name)}, ${fmt(s.armies.horse[k]!)} on horse${mine ? `<br><small>${supplyLine(k)}${marchLine(k)}</small>` : ""}</span>
           ${mine ? `<span class="army-buttons"><button data-army="${id}">${selected.has(id) ? "Pick a target" : "Move"}</button><button class="paper small" data-command="${id}" title="The commander's screen: troops, food, pay, training">Command</button></span>` : ""}
         </div>`;
       })
       .join("")}
+    ${!snapshot && owner ? `<h3 class="sub">${esc(owner.name)} at a glance</h3>${pickerCard(own)}` : ""}
     ${!snapshot && owner ? `<button class="wax play" data-nation="${owner.id}">${icon("crown", 2)}Rule ${esc(owner.name)}</button>` : ""}`;
   bindClose();
   showPanel(true);
@@ -3304,8 +4576,22 @@ function renderPanelCard(): void {
     b.addEventListener("click", () => void actHere({ type: "setFood", castle: Number(b.dataset.foodCastle), key: b.dataset.foodKey!, value: JSON.parse(b.dataset.foodValue!) as string | number | null })),
   );
   panel.querySelector("[data-colony-abandon]")?.addEventListener("click", () => void actHere({ type: "explore", do: "abandon", province: selectedProvince }));
+  // Quarantine and Lift quarantine (PROV-361): the card stays on the province.
+  panel.querySelector<HTMLButtonElement>("[data-quarantine]")?.addEventListener("click", (e) => void actHere({ type: "quarantine", province: selectedProvince, on: (e.currentTarget as HTMLButtonElement).dataset.quarantine === "on" }));
+  if (snapshot) bindHunt();
   if (siege) animateSiege(siege);
 }
+
+/** The plague card of province p (PROV-361): its step, the dead so far and the Quarantine button; on a healthy province of the player's, only when it is closed or plague is next door. */
+function plagueHere(p: number, mine: boolean): string {
+  const s = snapshot!;
+  const sick = s.plague.find((x) => x.province === p);
+  const nearby = sick || !mine ? 0 : neighborIdx[p]!.filter((q) => s.provincePlague[q] === OUTBREAK_STEP).length;
+  return plagueCard({ name: provinces[p]!.name, step: sick ? s.plagueSteps[sick.step]! : "none", weeks: sick?.weeks ?? 0, dead: sick?.dead ?? 0, closed: !!s.provinceQuarantine[p], mine, taxShare: s.quarantineTax, nearby });
+}
+
+/** The plague step at its height (index into plagueSteps). */
+const OUTBREAK_STEP = 2;
 
 /** The province's Colony section (EXPL-071): a colony being founded here, a colony founded, or what it takes to settle empty land. */
 function settleSection(p: number): string {
@@ -3327,8 +4613,9 @@ function settleSection(p: number): string {
 }
 
 /** What kind of province p is, after the realm that rules it (feedback 78): its seat and land, then river and coast. */
-function provinceKind(p: (typeof provinces)[number], capital: boolean): string {
-  const seat = capital ? "Capital city" : SETTLEMENT_NAMES[settlementOf(p.population)];
+function provinceKind(p: (typeof provinces)[number], i: number, capital: boolean): string {
+  // The town grows and shrinks with its people; capitals keep their title.
+  const seat = capital ? "Capital city" : TOWN_NAMES[townStep(peopleNow(i))]!;
   return [`${seat} in ${p.terrain}`, p.river ? "river" : "", p.coastal ? "coast" : ""].filter(Boolean).join(" · ");
 }
 
@@ -3444,6 +4731,9 @@ function moveFit(post: string, p: number): [number, string] {
   }
 }
 
+/** What an official would start with as a general and as an admiral (RECR-070, NAVY-073). */
+const commandChoice = (post: string, years: number, port: boolean) => ({ general: commissionSkills(post, years, port, false), admiral: commissionSkills(post, years, port, true), port });
+
 /** The official's screen shows every province to move him to, not just the best few. */
 let movesAll = false;
 
@@ -3474,7 +4764,7 @@ function renderOfficial(pi: number): void {
   }));
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(o.name)}</h2>${closeButton()}</header>
-    ${officialScreen(rules, o, me, COMMISSION_GOLD, s.nationTreasury[me]!, moves, movesAll || options.length <= 6, titlesOf(me))}
+    ${officialScreen(rules, o, me, COMMISSION_GOLD, s.nationTreasury[me]!, moves, movesAll || options.length <= 6, titlesOf(me), s.posts.fit[pi] ?? null, commandChoice(o.post, s.provinceOfficialYears[pi]!, s.navy.ports.some((x) => x.province === pi)))}
     <button class="back" data-back>${icon("scroll", 2)}Back to the officials</button>`;
   bindClose();
   showPanel(true);
@@ -3496,6 +4786,33 @@ function renderOfficial(pi: number): void {
       });
     }),
   );
+  // Replace him with the best fit in one step; the screen turns into the new official's own (PROV-345).
+  panel.querySelector<HTMLButtonElement>("[data-replace]")?.addEventListener("click", (e) => {
+    const b = e.currentTarget as HTMLButtonElement;
+    if (b.disabled) return;
+    void act({ type: "dismissOfficial", province: pi, hire: { official: Number(b.dataset.replaceType), foreign: b.dataset.replaceForeign === "1" } }).then(() => {
+      if (!snapshot || snapshot.rejectedOrders.length) return;
+      newsView = false;
+      panel.scrollTop = 0;
+      renderPanel();
+    });
+  });
+  // Dismiss asks once more in place, so a stray tap does not lose him (PROV-351); then the post's screen follows.
+  panel.querySelector<HTMLButtonElement>("[data-dismiss]")?.addEventListener("click", (e) => {
+    const b = e.currentTarget as HTMLButtonElement;
+    if (!b.dataset.confirm) {
+      b.dataset.confirm = "1";
+      b.classList.add("wax");
+      b.textContent = `Dismiss ${o.name}? Yes`;
+      return;
+    }
+    void act({ type: "dismissOfficial", province: pi }).then(() => {
+      if (!snapshot || snapshot.rejectedOrders.length) return;
+      newsView = false;
+      panel.scrollTop = 0;
+      renderPanel();
+    });
+  });
   panel.querySelector("[data-back]")?.addEventListener("click", () => {
     officialView = -1;
     realmView = s.playerNation;
@@ -3529,7 +4846,7 @@ function renderPost(pi: number): void {
   const hires = OFFICIALS.map((t, type) => ({ type, home: home.has(t) }));
   panel.innerHTML = `
     <header><h2 class="ribbon">Post at ${esc(provinces[pi]!.name)}</h2>${closeButton()}</header>
-    ${postScreen(rules, pi, moves, movesAll || options.length <= 4, hires, { home: hireGold(false), foreign: hireGold(true) }, s.nationTreasury[me]!, titlesOf(me))}
+    ${postScreen(rules, pi, moves, movesAll || options.length <= 4, hires, { home: hireGold(false), foreign: hireGold(true) }, s.nationTreasury[me]!, titlesOf(me), s.posts.fit[pi] ?? null)}
     <button class="back" data-back>${icon("scroll", 2)}Back to the officials</button>`;
   bindClose();
   showPanel(true);
@@ -3592,7 +4909,15 @@ function foodFacts(pi: number): string {
     men += s.armies.men[k]!;
   });
   const people = s.provincePeople[pi]! * 1000;
+  // What the land feeds in a normal year (D-PROV-36): people keep having children, so a short province shrinks until the player builds.
+  const share = landShare(pi);
+  const fixable = s.provinceOwner[pi] === s.playerNation && s.provinceLord[pi]! < 0 && share < FOOD_BALANCE.tight;
+  const shortWord = share < FOOD_BALANCE.short ? " · <b>short: it shrinks</b>" : share < FOOD_BALANCE.tight ? " · tight: a poor harvest starves it" : "";
+  const land = fixable
+    ? `<button class="paper" data-tab="land" title="Open the Land tab">${icon("hammer", 1)}${Math.round(share * 100)} % of its people${shortWord} · ${esc(foodFix(pi))}</button>`
+    : `${Math.round(share * 100)} % of its people in a normal year${shortWord}`;
   return `<dt>Food</dt><dd>${months.toFixed(1)} months stored${warn}</dd>
+      <dt>Land feeds</dt><dd>${land}</dd>
       <dt>Harvest</dt><dd>${harvestText(pi)}</dd>
       ${men > 0 && people > 0 ? `<dt>Armies</dt><dd>${fmt(men)} men here eat ${(eaten / people).toFixed(1)} months of this store a month</dd>` : ""}
       ${castleFoodLine(s, pi, (p) => provinces[p]!.name)}
@@ -3608,7 +4933,8 @@ const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "Ju
  */
 function harvestText(pi: number): string {
   const s = snapshot!;
-  const months = s.provinceHarvestMonths[pi]!;
+  const bits = s.provinceHarvestMonths[pi]!;
+  const months = MONTH_NAMES.map((_, m) => m + 1).filter((m) => bits & (1 << (m - 1)));
   if (!months.length) return "none · the tundra grows no crops";
   const h = s.provinceHarvest[pi]!;
   const w = s.provinceWeather[pi]!;
@@ -3619,6 +4945,14 @@ function harvestText(pi: number): string {
 
 /** The snapshot's lords as the panels show them. */
 const lordViews = (): LordView[] => snapshot!.lords.map((l, k) => ({ ...l, k }));
+/** The player's lords' retinues by lord (WAR-252 to WAR-262). */
+const retinueRows = (): Map<number, RetinueRow> => new Map(snapshot!.retinues.map((r) => [r.lord, r]));
+const playerAtWar = (): boolean => snapshot!.wars.some((w) => w.attackers.includes(snapshot!.playerNation) || w.defenders.includes(snapshot!.playerNation));
+/** How the retinue screens read places and armies. */
+const retinueLook = () => {
+  const s = snapshot!;
+  return { atWar: playerAtWar(), place: (p: number) => (p >= 0 ? provinces[p]!.name : "his lands"), armyMen: (k: number) => s.armies.men[k] ?? 0, armyAt: (k: number) => s.armies.location[k] ?? -1, armyId: (k: number) => s.armies.id[k]! };
+};
 
 /** Every lord's lands: provinces, people and the gold that reaches the crown. */
 function lordLands(): Map<number, LordLands> {
@@ -3666,7 +5000,8 @@ function governanceSection(pi: number, own: number, mine: boolean, official: Ret
 function renderLord(k: number): void {
   const s = snapshot!;
   const l = lordViews()[k];
-  if (!l) {
+  // A lord left with no land (seized, or murdered with his lands going to the crown) is no longer on the Lords tab.
+  if (!l || l.lands === 0) {
     lordView = -1;
     renderPanel();
     return;
@@ -3685,15 +5020,32 @@ function renderLord(k: number): void {
   royal.sort((a, b) => (dist.get(a) ?? 999) - (dist.get(b) ?? 999) || a - b);
   const grants = (grantAll ? royal : royal.slice(0, 6)).map((p) => provinceRow(p, `${dist.get(p) === 1 ? "next to his lands" : dist.has(p) ? `${dist.get(p)} provinces away` : "across the sea"} · ${gold2(s.provinceTaxGold[p]!)} gold a month`));
   const holdings = lands.provinces.map((p) => provinceRow(p, `${MOOD_LABEL[s.provinceMood[p]!]} · ${fmt(Math.round(s.provincePeople[p]! * 1000))} people`));
+  // Who an assassin would unsettle: every other lord of the realm with land, and how many of them are his house.
+  const others = lordViews().filter((o) => o.nation === l.nation && o.k !== k && o.lands > 0);
+  const a = s.assassination;
+  const assassin = { open: assassinAsk === k, gold: a.gold, chance: s.lords[k]!.assassinChance, base: a.base, heir: s.lords[k]!.heir?.name ?? null, heirLoyalty: a.heirLoyalty, onFailure: a.onFailure, others: others.length, house: others.filter((o) => o.house === l.house).length };
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(l.name)}</h2>${closeButton()}</header>
-    ${lordScreen(rules, l, lands, { lit: litLord === k, gift: s.giftGold, treasury: s.nationTreasury[s.playerNation]!, mine, holdings, grants, allGrants: grantAll || royal.length <= 6, court: mine ? "" : courtLordHtml(s.statecraft, k, l.nation) }, titlesOf(l.nation))}`;
+    ${lordScreen(rules, l, lands, { lit: litLord === k, gift: s.giftGold, treasury: s.nationTreasury[s.playerNation]!, mine, holdings, grants, allGrants: grantAll || royal.length <= 6, court: mine ? "" : courtLordHtml(s.statecraft, k, l.nation), retinue: mine && retinueRows().has(k) ? retinueBlock(l, retinueRows().get(k)!, retinueLook()) : "", assassin }, titlesOf(l.nation))}`;
   bindClose();
   showPanel(true);
   bindLords();
+  bindCommand();
   panel.querySelector("[data-grant-all]")?.addEventListener("click", () => {
     grantAll = true;
     renderPanel();
+  });
+  panel.querySelector<HTMLButtonElement>("[data-assassin-ask]")?.addEventListener("click", () => {
+    assassinAsk = k;
+    renderPanel();
+  });
+  panel.querySelector<HTMLButtonElement>("[data-assassin-cancel]")?.addEventListener("click", () => {
+    assassinAsk = -1;
+    renderPanel();
+  });
+  panel.querySelector<HTMLButtonElement>("[data-assassinate]")?.addEventListener("click", () => {
+    assassinAsk = -1;
+    void act({ type: "assassinateLord", lord: k });
   });
   panel.querySelector("[data-back-lords]")?.addEventListener("click", () => {
     lordView = -1;
@@ -3749,6 +5101,7 @@ function openLord(k: number): void {
   panel.scrollTop = 0;
   lordView = k;
   grantAll = false;
+  assassinAsk = -1;
   realmView = -1;
   officialView = -1;
   newsView = false;
@@ -3762,11 +5115,11 @@ function realmLords(r: number): string {
   let royal = 0;
   let all = 0;
   for (let p = 0; p < owners.length; p++) if (owners[p] === r) (all++, s.provinceLord[p]! < 0 && royal++);
-  return lordsTab(rules, lordViews().filter((l) => l.nation === r && l.lands > 0), lordLands(), royal, all, titlesOf(r));
+  return lordsTab(rules, lordViews().filter((l) => l.nation === r && l.lands > 0), lordLands(), royal, all, titlesOf(r), r === s.playerNation ? retinueRows() : new Map());
 }
 
 /** Sort orders of the Provinces overview. */
-let provinceSort: "trouble" | "people" | "food" | "tax" | "short" = "trouble";
+let provinceSort: "trouble" | "people" | "food" | "tax" | "short" | "sick" = "trouble";
 
 /**
  * The realm's provinces at a glance (milestone 3 overview, richer for
@@ -3779,13 +5132,15 @@ function provincesTab(r: number): string {
   const s = snapshot!;
   const list: number[] = [];
   for (let p = 0; p < owners.length; p++) if (owners[p] === r) list.push(p);
-  const trouble = (p: number) => (s.provinceRebels[p] ? 100 : 0) + s.provinceMood[p]! * 10 + (s.provinceFoodMonths[p]! < 1 ? 15 : s.provinceFoodMonths[p]! < 3 ? 5 : 0) + (s.provinceGrievances[p]! ? 1 : 0);
+  const trouble = (p: number) => (s.provinceRebels[p] ? 100 : 0) + s.provinceMood[p]! * 10 + (s.provinceFoodMonths[p]! < 1 ? 15 : s.provinceFoodMonths[p]! < 3 ? 5 : 0) + (s.provincePlague[p] ? 12 : 0) + (s.provinceGrievances[p]! ? 1 : 0);
   const by = {
     trouble: (a: number, b: number) => trouble(b) - trouble(a),
     people: (a: number, b: number) => s.provincePeople[b]! - s.provincePeople[a]!,
     food: (a: number, b: number) => s.provinceFoodMonths[a]! - s.provinceFoodMonths[b]!,
     tax: (a: number, b: number) => s.provinceTaxGold[b]! - s.provinceTaxGold[a]!,
     short: (a: number, b: number) => landShare(a) - landShare(b),
+    // The worst plague first: outbreak, then rumour, then burning out.
+    sick: (a: number, b: number) => plagueRank(s.provincePlague[b]!) - plagueRank(s.provincePlague[a]!),
   }[provinceSort];
   list.sort((a, b) => by(a, b) || a - b);
   const people = list.reduce((t, p) => t + s.provincePeople[p]!, 0);
@@ -3794,6 +5149,10 @@ function provincesTab(r: number): string {
   const low = list.filter((p) => s.provinceFoodMonths[p]! >= 1 && s.provinceFoodMonths[p]! < 3).length;
   const restless = list.filter((p) => s.provinceMood[p]! >= 2).length;
   const grumbling = list.filter((p) => s.provinceMood[p]! === 1).length;
+  // Plague at a glance (PROV-362): sick provinces and those closed.
+  const sickList = list.filter((p) => s.provincePlague[p]! > 0);
+  const closedCount = list.filter((p) => s.provinceQuarantine[p]).length;
+  const plagueLine = sickList.length || closedCount ? `<p><b>Plague in ${sickList.length} province${sickList.length === 1 ? "" : "s"}</b>${closedCount ? ` · ${closedCount} closed by quarantine` : ""}. Tap Sick for the list.</p>` : "";
   // The last harvests at a glance (feedback 82).
   const harvested = list.filter((p) => s.provinceHarvest[p]! >= 0);
   const band = (lo: number, hi: number) => harvested.filter((p) => s.provinceHarvest[p]! >= lo && s.provinceHarvest[p]! <= hi).length;
@@ -3801,15 +5160,15 @@ function provincesTab(r: number): string {
   const harvests = harvested.length ? `<p>Last harvests: ${rich ? `${rich} good or bumper, ` : ""}${fair} normal${bad ? `, <b>${bad} poor or failed</b>` : ""}.</p>` : "";
   const color = nations[r]!.color;
   // Short of food (feedback 86): only the provinces whose land feeds under all their people in a normal year; the counts above stay the realm's.
-  const shown = provinceSort === "short" ? list.filter((p) => landShare(p) < 1) : list;
+  const shown = provinceSort === "short" ? list.filter((p) => landShare(p) < 1) : provinceSort === "sick" ? list.filter((p) => s.provincePlague[p]! > 0 || s.provinceQuarantine[p]) : list;
   const rows = shown
     .map((p) => {
       const months = s.provinceFoodMonths[p]!;
       const l = s.provinceLord[p]!;
       const post = s.provinceOfficial[p];
-      const bad = s.provinceMood[p]! >= 2 || months < 1 || s.provinceRebels[p]! > 0;
+      const bad = s.provinceMood[p]! >= 2 || months < 1 || s.provinceRebels[p]! > 0 || s.provincePlague[p] === OUTBREAK_STEP;
       const gov = l >= 0 ? `Lord ${esc(s.lords[l]!.house)}` : post ? `Royal · ${esc(post.toLowerCase())}` : "Royal · <b>no official</b>";
-      const fix = provinceSort === "short" ? `<small>Land feeds ${Math.round(landShare(p) * 100)} % · ${esc(foodFix(p))}</small>` : "";
+      const fix = provinceSort === "short" ? `<small>Land feeds ${Math.round(landShare(p) * 100)} % · ${esc(foodFix(p))}</small>` : plagueRow(p);
       return `<div class="province-row${bad ? " bad" : ""}">
         <button class="place" ${provinceSort === "short" ? `data-open-land="${p}"` : `data-open-province="${p}"`} title="Open ${esc(provinces[p]!.name)}">
           <img class="thumb" src="${mapImage ? provinceThumb(mapImage, provinces.length, p, color) : ""}" alt="" width="48" height="48">
@@ -3822,18 +5181,31 @@ function provincesTab(r: number): string {
     .join("");
   const sortButton = (key: typeof provinceSort, label: string) => `<button class="tab${provinceSort === key ? " on" : ""}" data-province-sort="${key}">${label}</button>`;
   return `<p><b>${fmt(Math.round(people * 1000))}</b> people in ${list.length} provinces paying <b>${gold2(tax)}</b> gold a month. ${hungry ? `<b>${hungry} hungry</b>, ` : ""}${low ? `${low} low on food, ` : ""}${restless ? `<b>${restless} rioting or plotting</b>, ` : ""}${grumbling ? `${grumbling} grumbling.` : hungry || low || restless ? "the rest content." : "All fed and calm."}</p>
+    ${plagueLine}
     ${harvests}
     ${r === s.playerNation ? risingsOverview(s.rebels, r, (q) => provinces[q]!.name) : ""}
-    <nav class="tabs small">${sortButton("trouble", "Trouble first")}${sortButton("people", "Most people")}${sortButton("food", "Least food")}${sortButton("tax", "Most tax")}${sortButton("short", "Short of food")}</nav>
+    <nav class="tabs small">${sortButton("trouble", "Trouble first")}${sortButton("people", "Most people")}${sortButton("food", "Least food")}${sortButton("tax", "Most tax")}${sortButton("short", "Short of food")}${sortButton("sick", sickList.length ? `Sick (${sickList.length})` : "Sick")}</nav>
     ${provinceSort === "short" && !shown.length ? `<p class="hint">Every province's land feeds its people in a normal year.</p>` : ""}
+    ${provinceSort === "sick" && !shown.length ? `<p class="hint">No plague in your land, and no province closed.</p>` : ""}
     <div class="province-list">${rows}</div>`;
+}
+
+/** Order of plague steps by how bad they are: outbreak, rumour, burning out, none. */
+const plagueRank = (step: number) => [0, 2, 3, 1][step] ?? 0;
+
+/** A province row's plague line in the Provinces list (PROV-362), in words: the step, the dead and whether it is closed. */
+function plagueRow(p: number): string {
+  const s = snapshot!;
+  const step = s.provincePlague[p]!;
+  const closed = !!s.provinceQuarantine[p];
+  if (!step) return closed ? `<small>Closed by quarantine</small>` : "";
+  const dead = s.plague.find((x) => x.province === p)?.dead ?? 0;
+  return `<small><b>Plague: ${esc(s.plagueSteps[step]!)}</b>${dead ? ` · ${fmt(dead)} dead` : ""}${closed ? " · closed" : ""}</small>`;
 }
 
 /** The share of its people a province's land feeds in a normal year (its Land tab's first line). */
 function landShare(p: number): number {
-  const tiles = snapshot?.landSheets[p] ?? [];
-  const people = snapshot?.provincePeople[p] ?? 0;
-  return people > 0 ? tiles.reduce((a, t) => a + t.feeds, 0) / people : 1;
+  return snapshot ? landShareOf(snapshot, p) : 1;
 }
 
 /** What would feed a short province, as its Land tab offers it: a farm, a better farm, clearing woods, or bringing food in. */
@@ -3886,6 +5258,10 @@ function bindLords(): void {
     renderPanel();
   });
   panel.querySelectorAll<HTMLButtonElement>("[data-gift]").forEach((b) => b.addEventListener("click", () => void actHere({ type: "gift", lord: Number(b.dataset.gift) })));
+  // Lords' retinues (WAR-259): call them all, call one, send one home.
+  panel.querySelector<HTMLButtonElement>("[data-call-lords]")?.addEventListener("click", () => void actHere({ type: "callLords" }));
+  panel.querySelectorAll<HTMLButtonElement>("[data-call-lord]").forEach((b) => b.addEventListener("click", () => void actHere({ type: "callLords", lord: Number(b.dataset.callLord) })));
+  panel.querySelectorAll<HTMLButtonElement>("[data-send-home]").forEach((b) => b.addEventListener("click", () => void actHere({ type: "disband", army: Number(b.dataset.sendHome) })));
   // Court a foreign lord, or call the envoy home (DIPL-220).
   panel.querySelectorAll<HTMLButtonElement>("[data-court-lord]").forEach((b) =>
     b.addEventListener("click", () => void actHere({ type: "court", target: Number(b.dataset.realm), lord: Number(b.dataset.courtLord), ...(b.dataset.recall ? { recall: true } : {}) })),
@@ -3905,13 +5281,16 @@ const GRIEVANCE_FIX: Record<string, string> = {
   Conscription: "ends when half the recruits are back",
   "Soldiers quartered": "ends when the armies move on",
   Ungoverned: "ends when the official returns to his post",
-  "Foreign rule": "the homeland of a people with a foreign language, taken since 1444; ends with a lord who speaks their language",
+  "Foreign rule": `the homeland of a people with a foreign language, taken since ${START_SCENARIO.date.year}; ends with a lord who speaks their language`,
   "Banned language": "your Language policy is Impose and most here speak a foreign language; ends with Teach or Let be (Peoples tab)",
   "Wrong faith": "a third or more keep a faith without a house, or a Restricted majority; ends when it is served (Peoples tab)",
   Persecuted: "a Persecuted faith lives here; counts as two; ends when it is Tolerated or Restricted again (Peoples tab)",
   Bloodshed: "a battle was fought here; it fades after 20 years",
   "Heavy taxes": "ends when the tax is normal or lighter; crushing counts twice",
   "Grasping officials": "the realm has more officials than its cap; ends when it is back within (Government tab)",
+  Plague: "an outbreak rages here; ends when it burns out",
+  "Far from the throne": "royal land more than a month from the capital; ends when a lord holds it or the capital is nearer",
+  "Newly taken": "taken from another realm in the last 10 years; fades with time",
 };
 
 /** A province's mood and its grievances, with what each needs to end. */
@@ -4070,17 +5449,17 @@ const weeks = (w: number) => `${w} week${w === 1 ? "" : "s"}`;
 /** Days as the queue says them: "in 9 days", "tomorrow" (or bare, "14 days"). */
 const days = (d: number, inWord = true) => (inWord && d <= 1 ? "tomorrow" : `${inWord ? "in " : ""}${Math.max(1, Math.round(d))} day${Math.round(d) === 1 ? "" : "s"}`);
 
-/** Commanders of the player waiting at court, best first. */
-function idleCommanders(): number[] {
+/** Generals of the player waiting at court, or admirals when `sea`, best first (RECR-128). */
+function idleCommanders(sea = false): number[] {
   const s = snapshot!;
   return s.commanders
     .map((c, i) => ({ c, i }))
-    .filter(({ c }) => c.owner === s.playerNation && c.army < 0 && c.fleet < 0)
+    .filter(({ c }) => c.owner === s.playerNation && c.army < 0 && c.fleet < 0 && c.sea === sea)
     .sort((x, y) => y.c.might + y.c.cunning + y.c.logistics - (x.c.might + x.c.cunning + x.c.logistics))
     .map(({ i }) => i);
 }
 
-const skills = (c: Snapshot["commanders"][number]) => `might ${c.might} · cunning ${c.cunning} · logistics ${c.logistics}`;
+const skills = (c: Snapshot["commanders"][number]) => `${c.age ? `aged ${c.age} · ` : ""}might ${c.might} · cunning ${c.cunning} · logistics ${c.logistics}`;
 
 /**
  * A province's Garrison tab (PROV-302, RECR-116..120): men who can be called
@@ -4148,7 +5527,7 @@ function renderGarrison(pi: number): void {
           })
           .join("")
       : `<p class="hint">None. Men you call here wait in the garrison until a commander leads them or picks them up.</p>`}
-    ${g.troops.length ? `<p class="hint">${here.length ? `Commanders here: ${here.map((c) => esc(cmdOf(c.commander).name)).join(", ")}.` : idle.length ? "No commander stands here: one from court can lead them." : "No commander is free: commission an official from the Officials tab."}</p>` : ""}
+    ${g.troops.length ? `<p class="hint">${here.length ? `Commanders here: ${here.map((c) => esc(cmdOf(c.commander).name)).join(", ")}.` : idle.length ? "No commander stands here: one from court can lead them." : "No general is free: commission an official as general from the Officials tab."}</p>` : ""}
     </div>`;
   bindClose();
   bindProvinceTabs();
@@ -4189,6 +5568,7 @@ function bindNavyLinks(): void {
     b.addEventListener("click", () => {
       realmView = -1;
       fleetView = -1;
+      traderView = -1;
       selectedProvince = Number(b.dataset.portOpen);
       provinceTab = "port";
       restyleProvinces();
@@ -4209,10 +5589,11 @@ function bindNavyLinks(): void {
 function renderPort(pi: number): void {
   const s = snapshot!;
   const port = s.navy.ports.find((x) => x.province === pi)!;
+  const by = s.navy.blockades.find((b) => b.ports.includes(pi))?.owner ?? -1;
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(provinces[pi]!.name)}</h2>${closeButton()}</header>
     ${provinceTabs()}
-    ${portTab(port, { gold: s.nationTreasury[s.playerNation]!, musterGoldEach: s.navy.musterGoldEach, queues: s.navy.queues, fleetsHere: s.navy.fleets.filter((f) => f.owner === s.playerNation && f.at === pi), admiralName: titled })}`;
+    ${portTab(port, { gold: s.nationTreasury[s.playerNation]!, musterGoldEach: s.navy.musterGoldEach, queues: s.navy.queues, fleetsHere: s.navy.fleets.filter((f) => f.owner === s.playerNation && f.at === pi), admiralName: titled, blockadedBy: by >= 0 ? nations[by]!.name : undefined })}`;
   bindClose();
   showPanel(true);
   bindProvinceTabs();
@@ -4244,7 +5625,7 @@ function renderFleet(id: number): void {
         .filter((k) => s.armies.owner[k] === me && s.armies.location[k] === f.at && s.armies.commander[k]! >= 0 && s.armies.battle[k]! < 0 && !aboard.has(s.armies.id[k]!))
         .map((k) => ({ id: s.armies.id[k]!, name: cmdOf(s.armies.commander[k]!).name, men: s.armies.men[k]!, room: s.armies.men[k]! + s.armies.horse[k]! * 3 }))
     : [];
-  const name = f.hired ? f.hired.name : f.admiral >= 0 ? `${titled(f.admiral)}'s fleet` : f.explorers ? "Explorers" : "Fleet";
+  const name = fleetTitle(f, titled, "Fleet");
   const ex = s.exploration;
   const pname = (p: number) => provinces[p]!.name;
   let explore = "";
@@ -4276,6 +5657,7 @@ function renderFleet(id: number): void {
         colonyHere,
         waiting: ex.governors.filter((g) => g.port === f.at && g.fleet < 0 && g.colony < 0),
         name: pname,
+        ground: (p) => colonyGround(s.tribes, p, tribesUiOf()),
       });
   }
   panel.innerHTML = `
@@ -4283,13 +5665,17 @@ function renderFleet(id: number): void {
     ${fleetCard(f, mine, {
       name: (p) => provinces[p]!.name,
       admiralName: titled,
-      idle: idleCommanders().map((c) => ({ id: c, name: cmdOf(c).name, skills: skills(cmdOf(c)) })),
+      idle: idleCommanders(true).map((c) => ({ id: c, name: cmdOf(c).name, skills: skills(cmdOf(c)) })),
       armiesHere,
       fleetsHere: v.fleets.filter((x) => x.owner === me && x.at === f.at && x.id !== id && !x.battle),
       choosing: sailing === id,
       inPort,
       me,
       explore,
+      posts: v.posts,
+      realmName: (n) => nations[n]!.name,
+      blockade: v.blockades.find((b) => b.fleet === id),
+      prize: v.prize,
     })}`;
   bindClose();
   showPanel(true);
@@ -4307,6 +5693,7 @@ function renderFleet(id: number): void {
     renderPanel();
   });
   panel.querySelectorAll<HTMLButtonElement>("[data-fleet-admiral]").forEach((b) => b.addEventListener("click", () => order({ do: "admiral", commander: Number(b.dataset.fleetAdmiral) })));
+  panel.querySelectorAll<HTMLButtonElement>("[data-fleet-post]").forEach((b) => b.addEventListener("click", () => order({ do: "post", post: b.dataset.fleetPost })));
   panel.querySelectorAll<HTMLButtonElement>("[data-fleet-board]").forEach((b) => b.addEventListener("click", () => order({ do: "board", army: Number(b.dataset.fleetBoard) })));
   panel.querySelector("[data-fleet-unload]")?.addEventListener("click", () => order({ do: "unload" }));
   // Sailing to where it is stops the fleet there (feedback 128).
@@ -4331,6 +5718,7 @@ function renderFleet(id: number): void {
   panel.querySelector("[data-colony-load]")?.addEventListener("click", () => colony({ do: "load" }));
   panel.querySelector("[data-colony-unload]")?.addEventListener("click", () => colony({ do: "unload" }));
   panel.querySelectorAll<HTMLButtonElement>("[data-colony-found]").forEach((b) => b.addEventListener("click", () => colony({ do: "found", province: Number(b.dataset.colonyFound) })));
+  bindHunt();
 }
 
 /** Thousands of levy foot the commander screen's Train buttons send (RECR-109). */
@@ -4343,6 +5731,10 @@ function renderArmy(id: number): void {
   const c = cmdOf(s.armies.commander[k]!);
   const by = s.armies.byArm[k]!;
   const hired = s.armies.kind[k] === 1;
+  // A lord's retinue only marches, fights and goes home (WAR-255, WAR-260).
+  const retinue = s.armies.kind[k] === 2;
+  const lord = retinue && c.lord >= 0 ? s.lords[c.lord] : undefined;
+  const leavesAfter = retinue ? (s.retinues.find((r) => r.lord === c.lord)?.leavesAfter ?? null) : null;
   const monthsOut = s.armies.monthsOut[k]!;
   const rations = s.armies.rations[k]!;
   const food = s.armies.food[k]!;
@@ -4368,15 +5760,16 @@ function renderArmy(id: number): void {
     <header><h2 class="ribbon">${esc(titledOf(c))}</h2>${closeButton()}</header>
     <div class="army">
       ${commanderPortrait(rules, c.name, me)}
-      <span class="who"><b>${esc(titledOf(c))}</b> <small>(${roleOf(c)}${c.origin && c.origin !== "a hired captain" ? `, ${esc(c.origin.toLowerCase())}` : ""})</small><br><small>${skills(c)}</small><br><small>${c.victories} victor${c.victories === 1 ? "y" : "ies"}, ${c.defeats} defeat${c.defeats === 1 ? "" : "s"}</small></span>
+      <span class="who"><b>${esc(titledOf(c))}</b> <small>(${roleOf(c)}${c.origin && c.origin !== "a hired captain" && c.lord < 0 ? `, ${esc(c.origin.toLowerCase())}` : ""})</small><br><small>${skills(c)}</small><br><small>${c.victories} victor${c.victories === 1 ? "y" : "ies"}, ${c.defeats} defeat${c.defeats === 1 ? "" : "s"}</small></span>
       <span class="army-buttons"><button data-army="${id}">${selected.has(id) ? "Pick a target" : "Move"}</button>${marching(k) ? `<button class="paper" data-halt>Halt</button>` : ""}</span>
     </div>
     <dl class="facts">
       <dt>Where</dt><dd><button class="paper capital" data-go="${here}">${icon("map", 1)}${esc(provinces[here]!.name)}</button>${marchLine(k)}</dd>
-      <dt>Men</dt><dd>${fmt(s.armies.men[k]!)}, ${fmt(s.armies.horse[k]!)} on horse · ${hired ? "a mercenary company" : "levies"}</dd>
+      <dt>Men</dt><dd>${fmt(s.armies.men[k]!)}, ${fmt(s.armies.horse[k]!)} on horse · ${hired ? "a mercenary company" : retinue ? "his own retinue" : "levies"}</dd>
+      ${lord ? `<dt>Loyalty</dt><dd>${loyaltyBadge(lord.loyalty)} <small>${leavesAfter !== null ? `goes home after ${leavesAfter} months in the field (${monthsOut} so far)` : lord.loyalty === "Loyal" || lord.loyalty === "Wavering" ? "serves to the end of the war" : "goes home"}</small></dd>` : ""}
       <dt>Drill</dt><dd>${(s.armies.drill[k]! / 10).toFixed(1)} months trained together</dd>
       <dt>Breaks</dt><dd>after losing ${Math.round(s.armies.breakPoint[k]! * 100)}% of its men</dd>
-      <dt>Pay</dt><dd>${s.armies.pay[k]!.toFixed(2)} gold a month${!hired && monthsOut <= 3 && s.armies.pay[k]! === 0 ? ` (free for ${3 - monthsOut} more month${3 - monthsOut === 1 ? "" : "s"})` : ""}</dd>
+      <dt>Pay</dt><dd>${retinue ? "paid by him, not you" : `${s.armies.pay[k]!.toFixed(2)} gold a month`}${!hired && !retinue && monthsOut <= 3 && s.armies.pay[k]! === 0 ? ` (free for ${3 - monthsOut} more month${3 - monthsOut === 1 ? "" : "s"})` : ""}</dd>
       <dt>Food</dt><dd>${fmt(rations / RATION_MONTH_DAYS)} rations a day, ${fmt(rations)} a month · ${fmt(food)} in the wagons (${rations > 0 ? (food / rations).toFixed(1) : "–"} months)<br><small>${supplyLine(k)}</small></dd>
     </dl>
     <h3 class="sub">Troops</h3>
@@ -4386,14 +5779,15 @@ function renderArmy(id: number): void {
         .filter(([, m]) => m > 0)
         .map(([a, m]) => {
           const n = Math.min(1000, Math.floor(m));
-          return `<tr><th>${ARM_LABEL[a]}</th><td>${fmt(m)}</td><td class="army-buttons">
+          return `<tr><th>${ARM_LABEL[a]}</th><td>${fmt(m)}</td><td class="army-buttons">${retinue ? "" : `
             <button class="paper small" data-split="${a}" data-men="${n}" title="Leave them here as the province's garrison${idle.length ? ", or under a commander at court" : ""}">Split ${fmt(n)}</button>
-            ${hired ? "" : `<button class="paper small" data-dismiss="${a}" data-men="${n}">Send ${fmt(n)} home</button>`}
+            ${hired ? "" : `<button class="paper small" data-dismiss="${a}" data-men="${n}">Send ${fmt(n)} home</button>`}`}
           </td></tr>`;
         })
         .join("")}
     </table>
-    ${hired ? "" : `<h3 class="sub">Train</h3>
+    ${retinue ? `<p class="hint">${esc(cmdOf(s.armies.commander[k]!).name)} leads only his own men: they can't be split, trained, joined to another army or handed over, and they cost you nothing. Win a battle with him and his loyalty rises.</p>` : ""}
+    ${hired || retinue ? "" : `<h3 class="sub">Train</h3>
     ${training
       ? `<p>${icon("hourglass", 1)} ${fmt(training.men)} levy infantry training as ${esc((ARM_LABEL[training.arm] ?? training.arm).toLowerCase())}: ${training.months} month${training.months === 1 ? "" : "s"} left${atHome ? "" : " (held: the army must stand at a castle or drill yard of your own)"}.</p>`
       : trainMen >= 1 && !atHome
@@ -4415,14 +5809,14 @@ function renderArmy(id: number): void {
         ? `<h3 class="sub">Garrison here</h3><div class="choices">${waiting > 1000 ? `<button class="paper" data-pickup="${id}" data-men="1000">Take in ${fmt(1000)}</button>` : ""}<button class="wax" data-pickup="${id}">Take in ${waiting > 1000 ? "all " : ""}${fmt(waiting)} men</button></div>`
         : "";
     })()}
-    ${shipsHere.length ? `<h3 class="sub">Board ships</h3><div class="choices">${shipsHere.map((f) => `<button class="paper" data-board-fleet="${f.id}">${icon("anchor", 1)}Board ${f.admiral >= 0 ? `${esc(titled(f.admiral))}'s fleet` : "the fleet without an admiral"} · room for ${fmt(s.navy.mine.find((m) => m.id === f.id)?.room ?? 0)}</button>`).join("")}</div>` : ""}
-    ${others.length ? `<h3 class="sub">Join another army here</h3><div class="choices">${others.map((j) => `<button class="paper" data-merge="${s.armies.id[j]!}">Into ${esc(titled(s.armies.commander[j]!))}'s army</button>`).join("")}</div>` : ""}
-    ${hired ? "" : `<h3 class="sub">Command</h3>
+    ${shipsHere.length ? `<h3 class="sub">Board ships</h3><div class="choices">${shipsHere.map((f) => `<button class="paper" data-board-fleet="${f.id}">${icon("anchor", 1)}Board ${esc(fleetTitle(f, titled, "the fleet without a leader"))} · room for ${fmt(s.navy.mine.find((m) => m.id === f.id)?.room ?? 0)}</button>`).join("")}</div>` : ""}
+    ${others.length && !retinue ? `<h3 class="sub">Join another army here</h3><div class="choices">${others.map((j) => `<button class="paper" data-merge="${s.armies.id[j]!}">Into ${esc(titled(s.armies.commander[j]!))}'s army</button>`).join("")}</div>` : ""}
+    ${hired || retinue ? "" : `<h3 class="sub">Command</h3>
     <div class="choices">
       ${idle.slice(0, 3).map((x) => `<button class="paper" data-hand="${x}" title="${skills(cmdOf(x))}">Hand over to ${esc(cmdOf(x).name)}</button>`).join("")}
       <button class="paper" data-leave>Leave the men as ${esc(provinces[here]!.name)}'s garrison</button>
     </div>`}
-    <div class="choices"><button class="paper" data-disband="${id}">${hired ? "Pay off the company" : "Send the whole army home"}</button></div>`;
+    <div class="choices"><button class="paper" data-disband="${id}">${hired ? "Pay off the company" : retinue ? "Send him home" : "Send the whole army home"}</button></div>`;
   bindClose();
   showPanel(true);
   panel.querySelectorAll<HTMLButtonElement>("[data-army]").forEach((b) => b.addEventListener("click", () => pickArmy(Number(b.dataset.army))));
@@ -4517,29 +5911,28 @@ function relationsSection(r: number): string {
   const war = myWars().find((w) => w.theirs.includes(r));
   if (war) {
     // Land each side holds of the other's, for the peace terms.
-    const { taken, lost } = occupiedEachWay(war.ours, war.theirs);
+    const { lost } = occupiedEachWay(war.ours, war.theirs);
     const leaders = s.wars.find((w) => w.id === war.id)!;
     const whole = [leaders.attackers[0], leaders.defenders[0]].includes(me) && [leaders.attackers[0], leaders.defenders[0]].includes(r);
+    const table = s.settlements.find((x) => x.target === r);
+    const dissolve = !!s.empire && s.empire.emperor === r && !s.empire.dissolveWhyNot;
     return `<h3 class="sub">At war</h3>
       ${warCard(war.id)}
-      <p class="hint">${whole ? "Peace with them ends the whole war." : "A separate peace: the rest of the war goes on."} Your side holds ${taken} of their provinces; they hold ${lost} of yours.</p>
-      <div class="choices">
-        <button class="wax" data-peace="take" ${taken ? "" : "disabled"}>${icon("crown", 1)}Peace: take ${taken} province${taken === 1 ? "" : "s"}</button>
-        <button class="paper" data-peace="white">White peace</button>
-        ${lost ? `<button class="paper" data-peace="give">Give up ${lost} province${lost === 1 ? "" : "s"}</button>` : ""}
-        ${s.empire && s.empire.emperor === r && !s.empire.dissolveWhyNot ? `<button class="paper" data-peace="dissolve">${icon("crown", 1)}Dissolve the Empire</button>` : ""}
-      </div>
-      ${s.empire && s.empire.emperor === r && !s.empire.dissolveWhyNot ? `<p class="hint">Dissolve the Empire: every member becomes a free realm and every imperial war aim ends; no land changes hands.</p>` : ""}
+      <p class="hint">${whole ? "Peace with them ends the whole war." : "A separate peace: the rest of the war goes on."}</p>
+      ${table ? peaceTable(table, peaceDraftFor(r), { province: (p) => provinces[p]!.name, realm: (n) => nations[n]!.name, lost }) : ""}
+      ${dissolve ? `<div class="choices"><button class="paper" data-peace="dissolve">${icon("crown", 1)}Dissolve the Empire</button></div><p class="hint">Dissolve the Empire: every member becomes a free realm and every imperial war aim ends; no land changes hands.</p>` : ""}
+      ${masterPeace(r, whole)}
       ${realmStatecraft(s.statecraft, r, false, true)}`;
   }
   const line =
     rel?.state === "truce" ? `A truce holds${rel.until ? ` until ${monthText(rel.until)}` : ""}: no war before then.`
     : rel?.state === "alliance" ? "Your ally: they answer your calls to arms."
-    : rel?.state === "subject" ? "Your overlord: see your own Diplomacy tab for what you owe it."
+    : rel?.state === "subject" ? "Your overlord. Your card as they see it, and your choices toward them:"
     : rel?.state === "overlord" ? "Your subject."
     : "No ties between you. Declaring war calls their allies to arms against you, and yours to your side.";
   return `<h3 class="sub">Relations</h3><p>${line}</p>
-    ${rel?.state === "overlord" ? subjectCard(s.statecraft, r, (n) => realmButton(n, "diplomacy")) : ""}
+    ${rel?.state === "overlord" ? subjectCard(s.statecraft, r, (n) => realmButton(n, "diplomacy"), nations[r]!.name) : ""}
+    ${rel?.state === "subject" && s.statecraft?.subjects?.overlord?.overlord === r ? overlordCard(s.statecraft, (n) => realmButton(n, "diplomacy")) : ""}
     ${realmStatecraft(s.statecraft, r, rel?.state === "alliance", false)}
     ${rel && rel.state !== "truce" ? "" : `<h3 class="sub">War</h3><div class="choices"><button class="wax" data-declare="${r}">${icon("swords", 1)}Declare war</button></div><p class="hint">Shows the price of war before you confirm.</p>`}`;
 }
@@ -4559,6 +5952,7 @@ function renderDeclareSheet(r: number): void {
       target: r,
       price,
       name: (n) => nations[n]!.name,
+      provinceName: (p) => provinces[p]!.name,
       titles: titlesOf(me),
       income: s.nationMonthlyIncome[me]!,
       nameAbroad: s.statecraft?.nameAbroad ?? null,
@@ -4581,16 +5975,55 @@ function renderDeclareSheet(r: number): void {
   });
 }
 
+/** In the player's war for independence: make the old overlord its own subject in the peace (SUBJ-135, SUBJ-140). */
+function masterPeace(r: number, whole: boolean): string {
+  const t = snapshot!.statecraft?.subjects?.tables;
+  if (!t || t.overlord !== r || !whole) return "";
+  const kind = t.kind === "vassal" ? "vassal" : "tributary";
+  return t.kind
+    ? `<button class="wax" data-peace="master">${icon("crown", 2)}Make them your subject</button><p class="hint">You have outgrown your old master and over three quarters of their voices want peace: they become your ${kind}, held Loyal from today.</p>`
+    : `<button class="paper" disabled>${icon("crown", 2)}Make them your subject</button><p class="hint">Not yet: ${esc(t.why ?? "")}.</p>`;
+}
+
+/** The player's choice at each enemy's peace table, until it is sent (WAR-248). */
+const peaceDrafts = new Map<number, PeaceDraft>();
+function peaceDraftFor(r: number): PeaceDraft {
+  const v = snapshot!.settlements.find((x) => x.target === r)!;
+  const d = fitDraft(v, peaceDrafts.get(r) ?? startDraft(v));
+  peaceDrafts.set(r, d);
+  return d;
+}
+
+/** The peace table's buttons: a province in or out, gold up or down, back to the most allowed, and the offer. */
+function bindPeaceTable(r: number): void {
+  const v = snapshot?.settlements.find((x) => x.target === r);
+  if (!v) return;
+  const redraw = (d: PeaceDraft) => {
+    peaceDrafts.set(r, d);
+    const keep = panel.scrollTop;
+    renderPanel();
+    panel.scrollTop = keep;
+  };
+  panel.querySelectorAll<HTMLButtonElement>("[data-peace-pick]").forEach((b) => b.addEventListener("click", () => redraw(togglePick(v, peaceDraftFor(r), Number(b.dataset.peacePick)))));
+  panel.querySelectorAll<HTMLButtonElement>("[data-peace-gold]").forEach((b) => b.addEventListener("click", () => redraw(stepGold(v, peaceDraftFor(r), Number(b.dataset.peaceGold)))));
+  panel.querySelector<HTMLButtonElement>("[data-peace-best]")?.addEventListener("click", () => redraw(startDraft(v)));
+  panel.querySelector<HTMLButtonElement>("[data-peace-offer]")?.addEventListener("click", () => {
+    const demand = peaceDraftFor(r);
+    peaceDrafts.delete(r);
+    void act({ type: "offerPeace", target: r, terms: "take", ...demand });
+  });
+}
+
 /** Peace offered to the player, with the choice to take it. */
 function offerHtml(o: Snapshot["peaceOffers"][number]): string {
   const what =
-    o.terms === "give" ? "it gives up the land you hold of theirs"
-    : o.terms === "take" ? "it asks for the land it holds of yours"
-    : o.terms === "dissolve" ? "it dissolves the Empire; no land changes hands"
-    : "a white peace, no land changes hands";
+    o.terms === "dissolve" ? "offers peace: it dissolves the Empire; no land changes hands"
+    : o.terms === "master" ? "offers peace and becomes your subject"
+    : offerLine(o, (p) => provinces[p]!.name);
+  const later = putOffOffers.has(o.id);
   return `<div class="call framed-soft">
-    <p>${icon("crown", 2)} ${realmButton(o.from, "diplomacy")} offers peace: ${what}. The offer stands until the month is out.</p>
-    <div class="choices"><button class="wax" data-offer="${o.id}" data-yes="1">Make peace</button><button class="paper" data-offer="${o.id}" data-yes="0">Fight on</button></div>
+    <p>${icon("crown", 2)} ${realmButton(o.from, "diplomacy")} ${what}. The offer waits for your answer${later ? "; put off until next week" : ""}.</p>
+    <div class="choices"><button class="wax" data-offer="${o.id}" data-yes="1">Make peace</button><button class="paper" data-offer="${o.id}" data-yes="0">Fight on</button>${later ? "" : `<button class="paper" data-offer-later="${o.id}">Later</button>`}</div>
   </div>`;
 }
 
@@ -4610,6 +6043,14 @@ function asksHtml(from?: number): string {
 }
 
 function bindOffers(): void {
+  // Later: the offer still waits here, but marks nothing until next week (SHELL-092, SHELL-141).
+  panel.querySelectorAll<HTMLButtonElement>("[data-offer-later]").forEach((b) =>
+    b.addEventListener("click", () => {
+      putOffOffers.add(Number(b.dataset.offerLater));
+      renderHud();
+      renderPanel();
+    }),
+  );
   panel.querySelectorAll<HTMLButtonElement>("[data-offer]").forEach((b) =>
     b.addEventListener("click", () => void act({ type: "answerPeace", offer: Number(b.dataset.offer), yes: b.dataset.yes === "1" })),
   );
@@ -4625,7 +6066,7 @@ function myDiplomacySection(): string {
   const STATE = { truce: "Truce", alliance: "Ally", subject: "Your overlord", overlord: "Your subject", war: "At war" } as const;
   // Your name abroad opens the tab (DIPL-225), then what waits for an answer, then each war's card (WAR-230).
   return `${s.statecraft ? nameAbroadHtml(s.statecraft.nameAbroad, (n) => nations[n]!.name) : ""}${asksHtml()}${s.peaceOffers.map(offerHtml).join("")}
-    ${institutionsRows(s.empire, institutionsUi)}
+    ${institutionsRows(s.empire, s.shogunate, institutionsUi)}
     <h3 class="sub">Wars</h3>
     ${myWars().length ? myWars().map((w) => warCard(w.id)).join("") : `<p class="hint">At peace with the world.</p>`}
     <p class="hint">Open a realm to send it an envoy, declare war on it or offer it peace.</p>
@@ -4642,24 +6083,27 @@ function warRoomSection(): string {
   const s = snapshot!;
   const me = s.playerNation;
   const gathering = s.musters.reduce((t, m) => t + m.men, 0);
-  const mine = s.commanders.map((c, i) => ({ c, i })).filter(({ c }) => c.owner === me);
+  // Lords in the field show in the Lords' men rows; the rest wait at home, not at court.
+  const mine = s.commanders.map((c, i) => ({ c, i })).filter(({ c }) => c.owner === me && c.lord < 0);
   return `<h3 class="sub">Troops</h3>
     <p>${fmt(s.nationCapUsed[me]!)} men under arms or gathering, of a troop cap of ${fmt(s.nationTroopCap[me]!)}. Pay: ${s.pay.toFixed(1)} gold a month.</p>
+    ${s.fallen ? `<dl class="facts">${fallenLine(s.fallen)}</dl>` : ""}
     <p class="hint">Call men up from a province's Garrison tab, a thousand at a time.${gathering ? ` ${fmt(gathering)} men are gathering now.` : ""} Over the cap, pay doubles and levies desert.</p>
     ${s.musters.length ? `<div class="queue-head"><span>Recruiting</span><span>${fmt(gathering)} men</span></div>
     <ol class="queue">${s.musters
       .map((m) => `<li><button class="paper small" data-garrison="${m.province}">${esc(provinces[m.province]!.name)}</button><span class="what"><small>${Math.ceil(m.men / 1000)} / ${rules.defines.recruit.queueMax} queued</small></span><span class="when">all ${days(m.daysAll)}</span></li>`)
       .join("")}</ol>` : ""}
+    ${lordsMenSection(rules, s.retinues, lordViews(), retinueLook(), titlesOf(me))}
     <h3 class="sub">Commanders</h3>
     ${mine
       .map(({ c, i }) => {
         const k = c.army;
-        const where = k >= 0 ? `leads ${fmt(s.armies.men[k]!)} men at ${esc(provinces[s.armies.location[k]!]!.name)}` : "waits at court";
+        const where = k >= 0 ? `leads ${fmt(s.armies.men[k]!)} men at ${esc(provinces[s.armies.location[k]!]!.name)}` : c.fleet >= 0 ? "leads a fleet" : "waits at court";
         return `<div class="army">${commanderPortrait(rules, c.name, me)}<span class="who"><b>${esc(titledOf(c))}</b><br><small>${roleOf(c)} · ${skills(c)} · ${c.victories} won, ${c.defeats} lost</small><br><small>${where}</small></span>
           <span class="army-buttons">${k >= 0 ? `<button class="paper small" data-command="${s.armies.id[k]!}">Command</button>` : c.home >= 0 ? `<button class="paper small" data-release="${i}" title="Back to his post in ${esc(provinces[c.home]!.name)}">Release</button>` : ""}</span></div>`;
       })
       .join("")}
-    <p class="hint">New commanders are commissioned from a province's official, in its Garrison tab.</p>
+    <p class="hint">New generals and admirals are commissioned from a province's official, on his screen in the Officials tab.</p>
     ${mercenaryLine()}`;
 }
 
@@ -4727,10 +6171,40 @@ function mercenarySection(): string {
 
 const gold2 = (g: number) => (Math.abs(g) < 10 ? g.toFixed(2) : g.toFixed(1));
 
+/** How far the province is from the capital, and what that costs (PROV-173, X-29). */
+function throneFact(p: number): string {
+  const s = snapshot!;
+  if (provinces[p]!.id === nations[s.playerNation]?.capital) return "";
+  const days = s.provinceDaysToCapital[p]!;
+  const say = days >= THRONE.farCap ? `${THRONE.farCap}+ days` : `${days} days`;
+  const note = s.provinceLord[p]! >= 0 ? (days > THRONE.days ? " · its lord runs it from his seat" : "") : days > THRONE.days ? ` · far from the throne: ${cutPct(1 - shareAtDays(days))} tax and recruits` : "";
+  return `<dt>To capital</dt><dd>${say}${note}</dd>`;
+}
+
+/** Land taken from another realm: what holding it costs, and until when (X-29). */
+function newLandFact(p: number): string {
+  const s = snapshot!;
+  const y = s.provinceTakenYear[p]!;
+  if (y < 0 || s.date.year >= takenUntil(y)) return "";
+  return `<dt>Newly taken</dt><dd>in ${y} · until ${takenUntil(y)} it costs garrisons and clerks (Holding new land on the Treasury tab) and holds the Newly taken grievance</dd>`;
+}
+
+/** Why a province sends less than its rate says, each with its share kept back (X-29). */
+function taxCuts(p: number): string {
+  const s = snapshot!;
+  const cuts: string[] = [];
+  const days = s.provinceDaysToCapital[p]!;
+  if (s.provinceLord[p]! < 0 && days > THRONE.days) cuts.push(`${cutPct(1 - shareAtDays(days))}: far from the throne`);
+  const st = s.stability ? STABILITY_EFFECTS[s.stability.step]! : null;
+  if (st && st.tax < 1) cuts.push(`${cutPct(1 - st.tax)}: the realm is ${STABILITY[s.stability!.step]!.toLowerCase()} (General tab)`);
+  return cuts.length ? `<br><small>${cuts.join("<br>")}</small>` : "";
+}
+const cutPct = (x: number) => `−${Math.round(x * 100)} %`;
+
 /** A province's Tax line: its rate, whether it follows the realm default, and the gold it pays a month (the engine's taxLine model, REALM-183). */
 function taxLine(p: number): string {
   const t = taxLineOf(snapshot!, p);
-  return `<dt>Tax</dt><dd>${t.rateLabel} (${t.followsDefault ? "realm default" : "own rate"}) · ${gold2(t.goldPerMonth)} gold a month</dd>`;
+  return `<dt>Tax</dt><dd>${t.rateLabel} (${t.followsDefault ? "realm default" : "own rate"}) · ${gold2(t.goldPerMonth)} gold a month${taxCuts(p)}</dd>`;
 }
 
 /**
@@ -4776,6 +6250,14 @@ async function actInTreasury(order: Order): Promise<void> {
  * loan costs said before the borrow buttons (REALM-184, REALM-198). What it
  * shows comes from the engine's treasuryView model.
  */
+/** The road to default, or what a default left behind (X-29): said on the Treasury tab before it happens. */
+function defaultNote(d: { monthsLeft: number; refuseUntil: number; defaulted: number }): string {
+  if (d.monthsLeft > 0)
+    return `<p class="hint warn"><b>The treasury is empty and lenders give no more.</b> Unless gold comes in, the crown defaults in ${d.monthsLeft === 1 ? "a month" : `${d.monthsLeft} months`}: the debt is gone, but the lords turn away, the realm is troubled for ${DEFAULT_RULE.troubledYears} years and lenders refuse it for ${DEFAULT_RULE.refuseYears}. Raise the tax, send soldiers home or sell grain.</p>`;
+  if (d.refuseUntil >= 0) return `<p class="hint warn">The crown defaulted in ${d.defaulted}: lenders refuse it until ${d.refuseUntil}.</p>`;
+  return "";
+}
+
 function treasurySection(): string {
   const s = snapshot!;
   const t = treasuryView(s);
@@ -4796,6 +6278,7 @@ function treasurySection(): string {
         <div class="purse-note">${lasts}</div>
       </div>
     </div>
+    ${defaultNote(s.debtTrouble)}
     <h3 class="sub">This month</h3>
     <div class="flow" role="img" aria-label="Gold in ${gold2(income)}, gold out ${gold2(spending)} a month">
       <span class="in" style="flex:${income.toFixed(3)}">In ${gold2(income)}</span><span class="out" style="flex:${spending.toFixed(3)}">Out ${gold2(spending)}</span>
@@ -4820,6 +6303,142 @@ function treasurySection(): string {
     </div>` : ""}`;
 }
 
+/** Every country card starts with these tabs, in this order (SHELL-139); the Army tab is the war room on your own card. */
+const COUNTRY_TAB_KEYS: Record<string, "general" | "diplomacy" | "trade" | "military"> = { General: "general", Diplomacy: "diplomacy", Trade: "trade", Army: "military" };
+const COUNTRY_TABS = COUNTRY_CARD_TABS.map((label) => [COUNTRY_TAB_KEYS[label]!, label] as const);
+
+// ---- your realm's six sections (SHELL-165..167) ----
+
+/** Each page of the Realm book (SHELL-165) and the tab of the country card that draws it. */
+const PAGE_KEYS: Record<string, RealmTab> = {
+  Overview: "general",
+  Government: "government",
+  Heritage: "heritage",
+  Score: "score",
+  Treasury: "treasury",
+  Trade: "trade",
+  Food: "food",
+  Provinces: "provinces",
+  Officials: "officials",
+  Lords: "lords",
+  Colonies: "colonies",
+  [HUNT_TAB.label]: HUNT_TAB.id,
+  Army: "military",
+  Navy: "navy",
+  Diplomacy: "diplomacy",
+  Research: "learning",
+  Peoples: "peoples",
+};
+const SECTION_ICONS: Record<string, IconName> = { Realm: "crown", Economy: "coin", Lands: "castle", Military: "swords", Diplomacy: "scroll", Research: "hammer" };
+/** The page each section was last left on, so a section opens where the player was (SHELL-166). */
+const sectionPage = new Map<string, RealmTab>();
+
+/** The page a tab belongs to: pages opened from a page keep it lit (Free companies under Army, Hire a fleet under Navy). */
+const pageOf = (t: RealmTab): string => {
+  const key = t === "mercenaries" ? "military" : t === "hireFleets" ? "navy" : t;
+  return Object.keys(PAGE_KEYS).find((p) => PAGE_KEYS[p] === key) ?? "Overview";
+};
+
+/** The six sections in one row, and the open section's pages in a lower row when it has more than one (SHELL-167). */
+/**
+ * Realm's Overview on the player's own card (SHELL-170, SHELL-171): one line
+ * with the capital, then one tile per section with its key line, a note and
+ * what waits on the player (a tap opens the page that holds it), then ruler
+ * and heir, the score, Stability's pillars and the Revolution block under them. The banner is
+ * already in the top bar.
+ */
+function realmOverviewHtml(r: number, own: number[], people: number, armies: number, men: number, answerWaits: boolean): string {
+  const s = snapshot!;
+  const n = nations[r]!;
+  const capIdx = provinceIndex.get(n.capital)!;
+  const tribe = s.tribes.mine;
+  const tiles = realmOverview({
+    gold: s.nationTreasury[r]!,
+    perMonth: s.nationMonthlyIncome[r]!,
+    ...foodCounts(s, own),
+    provinces: own.length,
+    people,
+    newLands: s.newLands?.length ?? 0,
+    risings: s.rebels.risings.filter((x) => x.owner === r).length,
+    verdicts: s.rebels.verdicts.length,
+    sick: own.filter((p) => s.provincePlague[p]! > 0).length,
+    huntWaits: tribe ? tribe.settlers.length + tribe.asks.length : 0,
+    armies,
+    men,
+    fleets: s.navy.fleets.filter((f) => f.owner === r).length,
+    wars: s.relations.filter((x) => x.state === "war").length,
+    allies: s.relations.filter((x) => x.state === "alliance").length,
+    subjects: s.relations.filter((x) => x.state === "overlord").length,
+    answerWaits,
+    study: s.research ? studyNow(s.research) : null,
+    beliefLow: !!s.beliefLow && (s.beliefLow.faith || s.beliefLow.tongue),
+  });
+  const tile = (t: OverviewTile) =>
+    `<button class="paper tile${t.needs ? " needs" : ""}" data-realm-open-tab="${PAGE_KEYS[t.page]}"${t.needs ? ` aria-label="${t.section}: ${esc(t.needs)}"` : ""}>${icon(SECTION_ICONS[t.section]!, 1)}<b>${t.section}</b><span>${esc(t.line)}</span>${t.needs ? `<em>${esc(t.needs)}</em>` : t.note ? `<small>${esc(t.note)}</small>` : ""}</button>`;
+  return `
+    <p class="overview-head"><b>Your realm</b> · ${own.length} province${own.length === 1 ? "" : "s"} ${empireBadgeHtml(s.empire, r) + shogunBadgeHtml(s.shogunate, r)} · Capital <button class="paper capital" data-go="${capIdx}">${icon("castle", 1)}${esc(provinces[capIdx]!.name)}</button></p>
+    <div class="overview-tiles">${tiles.map(tile).join("")}</div>
+    <dl class="facts">
+      ${s.rulers[r] ? rulerLines(s.rulers[r]!) : ""}
+      ${scoreLine(s.campaign, r, true)}
+    </dl>
+    ${s.stability ? stabilitySection(s.stability, titlesOf(r)) : ""}
+    ${s.revolution ? revolutionSection(s.revolution) : ""}`;
+}
+
+function realmBookNav(r: number, answerWaits: boolean): string {
+  const tribe = snapshot!.tribes.mine;
+  const page = pageOf(realmTab);
+  const open = sectionOf(page) ?? "Realm";
+  sectionPage.set(open, realmTab);
+  const label = (p: string) => (p === "Officials" ? cap(titlesOf(r).officials) : p === "Lords" ? cap(titlesOf(r).lords) : p);
+  const sections = REALM_BOOK_TABS.map((sec) => {
+    const marked = sec === "Diplomacy" && answerWaits;
+    return `<button class="section${sec === open ? " on" : ""}${marked ? " marked" : ""}" data-realm-section="${sec}"${sec === open ? ' aria-current="page"' : ""}${marked ? ` aria-label="${sec}: waits for your answer"` : ""}>${icon(SECTION_ICONS[sec]!, 2)}<span>${sec}</span></button>`;
+  }).join("");
+  // Hunting grounds is a page only for a tribal realm, marked while settlers or asks wait (TRIBE).
+  const pages = tabHolds(open).filter((p) => p !== HUNT_TAB.label || tribe);
+  const waits = (p: string) => p === HUNT_TAB.label && !!tribe && (tribe.settlers.length > 0 || tribe.asks.length > 0);
+  const row = pages.length > 1 ? `<nav class="tabs pages">${pages.map((p) => `<button class="tab${p === page ? " on" : ""}${waits(p) ? " marked" : ""}" data-realm-tab="${PAGE_KEYS[p]}">${label(p)}</button>`).join("")}</nav>` : "";
+  return `<nav class="sections" aria-label="Your realm">${sections}</nav>${row}`;
+}
+
+/** A realm's Trade tab: its wealth, its richest lands, and for your own realm what trade brought this month. */
+function realmTradeTab(r: number, own: number[], wealth: number, mine: boolean): string {
+  const s = snapshot!;
+  const traded = mine ? s.ledger.find((x) => x.line === "trade")?.gold ?? 0 : null;
+  const richest = [...own].sort((a, b) => provinces[b]!.wealth - provinces[a]!.wealth || a - b).slice(0, 5);
+  return `<dl class="facts">
+      <dt>Wealth</dt><dd>${icon("coin", 1)} ${wealth} across its ${own.length} province${own.length === 1 ? "" : "s"}</dd>
+      ${traded === null ? "" : `<dt>Trade</dt><dd>${traded >= 0 ? "+" : ""}${gold2(traded)} gold this month</dd>`}
+    </dl>
+    ${richest.length ? `<h3 class="sub">Richest lands</h3><div class="nations">${richest
+      .map((i) => `<button class="paper" data-show-province="${i}">${icon("coin", 1)}${esc(provinces[i]!.name)} <small>wealth ${provinces[i]!.wealth}</small></button>`)
+      .join("")}</div>` : ""}
+    <button class="paper" data-lens-open="wealth">${icon("map", 1)}Show wealth on the map</button>
+    ${mine ? "" : `<p class="hint">Trade pacts and embargoes with ${esc(nations[r]!.name)} are made by envoy from its Diplomacy tab.</p>`}`;
+}
+
+/** Another realm's Army tab: its armies, the men it can call, and its commanders. */
+function realmArmyTab(r: number, armyCount: number, men: number): string {
+  const s = snapshot!;
+  const list = s.commanders.filter((c) => c.owner === r);
+  return `<dl class="facts">
+      <dt>Armies</dt><dd>${armyCount} in the field, ${fmt(men)} men</dd>
+      <dt>Recruits</dt><dd>${fmt(s.nationLevies[r]!)} men who can be called</dd>
+    </dl>
+    ${list.length ? `<h3 class="sub">Commanders</h3>${list
+      .map((c) => `<div class="army">${commanderPortrait(rules, c.name, r)}<span class="who"><b>${esc(titledOf(c))}</b><br><small>${roleOf(c)} · ${skills(c)}</small></span></div>`)
+      .join("")}` : `<p class="hint">No commanders.</p>`}`;
+}
+
+/** Who rules the realm on the start day, and the day the campaign begins, for the picker's card (SHELL-034). */
+function startRulerLine(id: string): string {
+  const v = (startRulers.rulers as unknown as Record<string, { title?: string; name: string; age?: number | null; heir?: { name: string; age?: number | null } | null } | null>)[id];
+  const ruler = v ? `<dt>Ruler</dt><dd class="ruler">${icon("crown", 1)}<b>${esc(v.title ? `${v.title} ${v.name}` : v.name)}</b>${v.age ? `, ${v.age}` : ""}${v.heir ? ` <small>heir ${esc(v.heir.name)}${v.heir.age != null ? `, ${v.heir.age}` : ""}</small>` : ""}</dd>` : "";
+  return `${ruler}<dt>Starts</dt><dd>${dateText(START_SCENARIO.date)}</dd>`;
+}
+
 function renderRealm(r: number): void {
   const n = nations[r]!;
   const s = snapshot;
@@ -4837,72 +6456,72 @@ function renderRealm(r: number): void {
   const men = armies.reduce((t, k) => t + s!.armies.men[k]!, 0);
   const inc = s ? s.nationMonthlyIncome[r]! : 0;
   const mine = !!s && s.playerNation === r;
-  if ((!s && realmTab !== "heritage") || (s && (realmTab === "government" || realmTab === "peoples" || realmTab === "treasury" || realmTab === "trade" || realmTab === "food" || realmTab === "military" || realmTab === "mercenaries" || realmTab === "officials" || realmTab === "lords" || realmTab === "provinces" || realmTab === "learning" || realmTab === "navy" || realmTab === "hireFleets" || realmTab === "colonies") && !mine)) realmTab = "general";
+  if ((!s && realmTab !== "heritage") || (s && (realmTab === "government" || realmTab === "peoples" || realmTab === "treasury" || realmTab === "food" || realmTab === "mercenaries" || realmTab === "officials" || realmTab === "lords" || realmTab === "provinces" || realmTab === "learning" || realmTab === "navy" || realmTab === "hireFleets" || realmTab === "colonies" || realmTab === "hunting" || realmTab === "score") && !mine)) realmTab = "general";
+  if (realmTab === "hunting" && !s?.tribes.mine) realmTab = "general";
   const strengths = realmStrengths(n.id);
   const peoples = s ? peoplesView(beliefData(s.peoples), r, s.provincePeople) : null;
   // Pages opened from a tab keep that tab lit: free companies under Military (feedback 114), the Hire a fleet screen under Navy (F-115).
-  const tab = (key: typeof realmTab, label: string) => `<button class="tab${realmTab === key || (key === "military" && realmTab === "mercenaries") || (key === "navy" && realmTab === "hireFleets") ? " on" : ""}" data-realm-tab="${key}">${label}</button>`;
-  const general = `
+  const tab = (key: typeof realmTab, label: string, marked = false) => `<button class="tab${realmTab === key || (key === "military" && realmTab === "mercenaries") || (key === "navy" && realmTab === "hireFleets") ? " on" : ""}${marked ? " marked" : ""}" data-realm-tab="${key}"${marked ? ` aria-label="${label}: waits for your answer"` : ""}>${label}</button>`;
+  // A peace offer or an envoy waiting for an answer marks the Diplomacy tab, on that realm's card and on your own (SHELL-141).
+  const answerWaits = !!s && (s.peaceOffers.some((o) => (mine || o.from === r) && !putOffOffers.has(o.id)) || asksOf(s).some((a) => mine || a.from === r));
+  const general = mine ? realmOverviewHtml(r, own, people, armies.length, men, answerWaits) : `
     <div class="realm-card">
       <img class="banner" src="${flagUrl(n, 6)}" alt="">
-      <p>${s && s.playerNation === r ? "<b>Your realm</b>" : "<b>Realm</b>"} · ${own.length} province${own.length === 1 ? "" : "s"} ${s ? empireBadgeHtml(s.empire, r) : ""}${!s ? ` · <b class="starts">${esc(startStanding(n.id))}</b>` : ""}<br>
+      <p>${s && s.playerNation === r ? "<b>Your realm</b>" : "<b>Realm</b>"} · ${own.length} province${own.length === 1 ? "" : "s"} ${s ? empireBadgeHtml(s.empire, r) + shogunBadgeHtml(s.shogunate, r) : ""}${!s ? ` · <b class="starts">${esc(startStanding(n.id))}</b>` : ""}<br>
       Capital <button class="paper capital" data-go="${capIdx}">${icon("castle", 1)}${esc(provinces[capIdx]!.name)}</button></p>
     </div>
-    ${mine && s?.stability ? stabilitySection(s.stability, titlesOf(r)) : ""}
-    ${mine && s?.revolution ? revolutionSection(s.revolution) : ""}
+    ${!s ? waysToGrowHtml(waysToGrow({ owners, neighbors: neighborIdx, water: isWater, trade: START_TRADE }, r)) : ""}
     <dl class="facts">
       ${s?.rulers[r] ? rulerLines(s.rulers[r]!) : ""}
+      ${s ? scoreLine(s.campaign, r, false) : ""}
       <dt>People</dt><dd>${fmt(people)}</dd>
-      <dt>Wealth</dt><dd>${icon("coin", 1)} ${wealth} across its lands</dd>
-      ${s ? `<dt>Treasury</dt><dd>${mine ? `<button class="paper" data-realm-open-tab="treasury" title="Open the ledger">${icon("coin", 1)}${fmt(s.nationTreasury[r]!)} gold <small>${inc >= 0 ? "+" : ""}${inc.toFixed(1)} a month</small></button>` : `${fmt(s.nationTreasury[r]!)} gold <small>${inc >= 0 ? "+" : ""}${inc.toFixed(1)} a month</small>`}</dd>
-      ${mine && s.trade ? tradeLine(s.trade) : ""}
-      ${mine ? risingsLine(s.rebels, r) : ""}
-      ${mine && s.government ? governmentLine(s.government) : `<dt>Government</dt><dd>${esc(s.realmForms[r] ?? "")}</dd>`}
-      ${peoples ? beliefLines(peoples, mine, mine ? s.beliefLow : null, faithBadgeHtml(s.faithHeads?.badges[r] ?? null)) : ""}
-      <dt>Recruits</dt><dd>${fmt(s.nationLevies[r]!)} men who can be called</dd>
-      <dt>Armies</dt><dd>${armies.length} in the field, ${fmt(men)} men</dd>
-      ${mine && s.fallen ? fallenLine(s.fallen) : ""}
-      ${mine && s.research ? learningLine(s.research) : realmLearningLine(s.realmResearch[r])}
-      ${mine ? foodLine(s, own) : ""}` : ""}
+      ${s ? `<dt>Treasury</dt><dd>${fmt(s.nationTreasury[r]!)} gold <small>${inc >= 0 ? "+" : ""}${inc.toFixed(1)} a month</small></dd>
+      <dt>Government</dt><dd>${esc(s.realmForms[r] ?? "")}</dd>
+      ${peoples ? beliefLines(peoples, false, null, faithBadgeHtml(s.faithHeads?.badges[r] ?? null)) : ""}
+      ${realmLearningLine(s.realmResearch[r])}
+      ${groundsCountLine(s.tribes, r)}` : ""}
+      ${!s ? `${startRulerLine(n.id)}<dt>Government</dt><dd>${esc(formName(startFormOf(n.id)))}</dd><dt>Strong in</dt><dd>${esc(strongInWords(n.id))}</dd>` : ""}
       <dt>Lands</dt><dd>${topLands.map(([t, c]) => `${t} ${c}`).join(" · ")}</dd>
       ${heritageLine(strengths, s?.heritage[r] ?? null)}
     </dl>
-    ${mine ? "" : (() => {
-      const list = s ? s.commanders.filter((c) => c.owner === r) : n.commanders;
-      return list.length ? `<h3 class="sub">Commanders</h3>${list
-        .map((c) => `<div class="army">${commanderPortrait(rules, c.name, r)}<span class="who"><b>${esc("owner" in c ? titledOf(c) : rankedName(rules, r, c.name, "general"))}</b><br><small>${"owner" in c ? `${roleOf(c)} · ` : ""}might ${c.might} · cunning ${c.cunning} · logistics ${c.logistics}</small></span></div>`)
-        .join("")}` : "";
-    })()}
+    ${s && !mine ? aimsFoldHtml(r, s.history.goals, chronicleUi(), goalDefs) : ""}
     ${neighbours.size ? `<h3 class="sub">Neighbours</h3><div class="nations">${[...neighbours]
       .map((j) => `<button class="paper nation" data-realm="${j}">${pennant(nations[j]!)}${esc(nations[j]!.name)}</button>`)
       .join("")}</div>` : ""}
-    ${!s ? `<button class="wax play" data-nation="${n.id}">${icon("crown", 2)}Rule ${esc(n.name)}</button>` : ""}`;
+    ${!s ? `<button class="wax play" data-nation="${n.id}">${icon("crown", 2)}Rule ${esc(n.name)}</button>` : ""}
+    ${s && pickingPlayOn && s.campaign.ending?.kind === "game over" && !mine && s.campaign.ranks[r * 3] ? `<button class="wax play" data-play-on="${r}">${icon("crown", 2)}Rule ${esc(n.name)}<small>Achievements end for this campaign</small></button>` : ""}`;
   const content =
-    realmTab === "heritage" ? heritageTab(strengths, s?.heritage[r] ?? null, s ? s.nationTreasury[r]! : 0)
-    : realmTab === "diplomacy" ? `<div class="diplomacy-tab">${mine ? myDiplomacySection() : offersFrom(r) + relationsSection(r)}</div>`
+    realmTab === "score" && s ? scoreTab(s.campaign, r, (j) => nations[j]!.name)
+    : realmTab === "heritage" ? heritageTab(strengths, s?.heritage[r] ?? null, s ? s.nationTreasury[r]! : 0)
+    : realmTab === "diplomacy" ? `<div class="diplomacy-tab">${mine ? myDiplomacySection() : offersFrom(r) + relationsSection(r) + askRows(s!.tribes, r, tribesUiOf())}</div>`
     : realmTab === "government" && s?.government ? governmentTab(s.government, s.revolution)
     : realmTab === "peoples" && peoples ? peoplesTab(peoples) + headCardHtml(s?.faithHeads?.card ?? null, (n) => nations[n]!.name, true)
     : realmTab === "treasury" ? treasurySection()
-    : realmTab === "trade" && s?.trade ? tradeTab(s.trade, s, (p) => provinces[p]!.name)
-    : realmTab === "food" ? foodTab(s!, (p) => provinces[p]!.name, (p) => (mapImage ? provinceThumb(mapImage, provinces.length, p, n.color) : ""), own)
-    : realmTab === "military" ? warRoomSection()
-    : realmTab === "navy" ? navyTab(s!.navy, r, { name: (p) => provinces[p]!.name, admiralName: titled, forHire: s!.fleetsForHire.length })
+    : realmTab === "trade" && mine && s?.trade ? tradeTab(s.trade, s, (p) => provinces[p]!.name)
+    : realmTab === "food" ? foodTab(s!, (p) => provinces[p]!.name, (p) => (mapImage ? provinceThumb(mapImage, provinces.length, p, n.color) : ""), own, foodFix)
+    : realmTab === "trade" ? realmTradeTab(r, own, wealth, mine)
+    : realmTab === "military" ? (mine ? warRoomSection() : realmArmyTab(r, armies.length, men))
+    : realmTab === "navy" ? navyTab(s!.navy, r, { name: (p) => provinces[p]!.name, admiralName: titled, realmName: (n) => nations[n]!.name, forHire: s!.fleetsForHire.length })
     : realmTab === "hireFleets" ? hireFleetsTab(s!.navy, s!.fleetsForHire, r, { name: (p) => provinces[p]!.name, admiralName: titled, realm: (x) => realmButton(x), hasPort: s!.navy.ports.length > 0 })
+    : realmTab === "hunting" && s?.tribes.mine ? huntTab(s.tribes, tribesUiOf())
     : realmTab === "colonies" ? coloniesTab(s!.exploration, { name: (p) => provinces[p]!.name, fleetName: fleetLabel, inRange: s!.exploration.sites.reduce((t, x) => t + (x === 1 ? 1 : 0), 0) })
-    : realmTab === "mercenaries" ? `<button class="paper small" data-realm-open-tab="military">${icon("scroll", 1)}Back to Military</button>${mercenarySection()}`
+    : realmTab === "mercenaries" ? `<button class="paper small" data-realm-open-tab="military">${icon("scroll", 1)}Back to Army</button>${mercenarySection()}`
     : realmTab === "lords" ? realmLords(r)
     : realmTab === "provinces" ? provincesTab(r)
     : realmTab === "learning" && s?.research ? learningTab(rules, s.research, s.nationTreasury[r]!, learningUi)
-    : realmTab === "officials" ? officialsTab(rules, own.filter((i) => s!.provinceLord[i]! < 0).map((i) => ({ province: i, official: officialOf(s!, i, r) })), r, own.filter((i) => s!.provinceLord[i]! >= 0).length, r === s!.playerNation ? s!.newLands : [], titlesOf(r))
+    : realmTab === "officials" ? officialsTab(rules, own.filter((i) => s!.provinceLord[i]! < 0).map((i) => ({ province: i, official: officialOf(s!, i, r) })), r, own.filter((i) => s!.provinceLord[i]! >= 0).length, r === s!.playerNation ? s!.newLands : [], titlesOf(r), r === s!.playerNation ? s!.posts : null)
     : general;
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(n.name)}</h2>${closeButton()}</header>
-    ${s ? `<nav class="tabs">${tab("general", "General")}${mine ? tab("government", "Government") + tab("peoples", "Peoples") : ""}${tab("heritage", "Heritage")}${mine ? tab("treasury", "Treasury") + tab("trade", "Trade") + tab("food", "Food") + tab("provinces", "Provinces") + tab("learning", "Research") : ""}${tab("diplomacy", "Diplomacy")}${mine ? tab("military", "Military") + tab("navy", "Navy") + tab("colonies", "Colonies") + tab("officials", cap(titlesOf(r).officials)) + tab("lords", cap(titlesOf(r).lords)) : ""}</nav>` : `<nav class="tabs">${tab("general", "General")}${tab("heritage", "Heritage")}</nav>`}
+    ${s && mine ? realmBookNav(r, answerWaits) : s ? `<nav class="tabs">${COUNTRY_TABS.map(([key, label]) => tab(key, label, key === "diplomacy" && answerWaits)).join("")}${tab("heritage", "Heritage")}</nav>` : `<nav class="tabs">${tab("general", "General")}${tab("heritage", "Heritage")}</nav>`}
     ${content}`;
   bindClose();
   showPanel(true);
   bindNavyLinks();
+  if (s) bindHunt();
+  bindFolds(panel);
   panel.querySelectorAll("[data-show-charts]").forEach((b) => b.addEventListener("click", () => setLens("charts")));
+  panel.querySelectorAll<HTMLButtonElement>("[data-lens-open]").forEach((b) => b.addEventListener("click", () => setLens(b.dataset.lensOpen as Lens)));
   panel.querySelector("[data-go]")?.addEventListener("click", () => {
     realmView = -1;
     selectedProvince = capIdx;
@@ -4915,6 +6534,7 @@ function renderRealm(r: number): void {
   panel.querySelectorAll<HTMLButtonElement>("[data-peace]").forEach((b) =>
     b.addEventListener("click", () => void act({ type: "offerPeace", target: r, terms: b.dataset.peace as PeaceTerms })),
   );
+  bindPeaceTable(r);
   // Declaring opens the declare sheet with the price of war first (WAR-229).
   panel.querySelector<HTMLButtonElement>("[data-declare]")?.addEventListener("click", () => {
     declareFor = r;
@@ -4922,6 +6542,8 @@ function renderRealm(r: number): void {
   });
   panel.querySelectorAll<HTMLButtonElement>("[data-envoy]").forEach((b) => b.addEventListener("click", () => void act({ type: "sendEnvoy", target: r, action: b.dataset.envoy! })));
   panel.querySelector<HTMLButtonElement>("[data-rise]")?.addEventListener("click", () => void act({ type: "riseUp" }));
+  panel.querySelectorAll<HTMLButtonElement>("[data-subject-choice]").forEach((b) => b.addEventListener("click", () => void act({ type: "subjectChoice", action: b.dataset.subjectChoice as "stop_paying" | "pay" | "ask_loosen" })));
+  panel.querySelector<HTMLButtonElement>("[data-play-on]")?.addEventListener("click", () => void playOnAs(r));
   panel.querySelectorAll<HTMLButtonElement>("[data-court-subject]").forEach((b) => b.addEventListener("click", () => void act({ type: "court", target: Number(b.dataset.courtSubject), ...(b.dataset.recall ? { recall: true } : {}) })));
   panel.querySelectorAll<HTMLButtonElement>("[data-subject-act]").forEach((b) =>
     b.addEventListener("click", () => void act({ type: "subjectAction", subject: r, action: b.dataset.subjectAct as "tribute" | "gift" | "loosen" | "release" | "resident" | "recall" | "hostage" | "send_heir_home" | "tighten" | "fold_in" | "merge", ...(b.dataset.level ? { level: b.dataset.level } : {}) })),
@@ -4961,9 +6583,19 @@ function renderRealm(r: number): void {
   panel.querySelectorAll<HTMLButtonElement>("[data-heritage-choice]").forEach((b) =>
     b.addEventListener("click", () => void actHere({ type: "heritageChoice", id: b.dataset.heritageChoice! })),
   );
+  bindChapterButtons();
   panel.querySelectorAll<HTMLButtonElement>("[data-realm-open-tab]").forEach((b) =>
     b.addEventListener("click", () => {
       realmTab = b.dataset.realmOpenTab as typeof realmTab;
+      // A line naming an invention opens the tree on it (GOV-078).
+      if (b.dataset.learnPick) Object.assign(learningUi, { part: "tree", pick: b.dataset.learnPick, center: b.dataset.learnPick, slide: true });
+      renderPanel();
+    }),
+  );
+  panel.querySelectorAll<HTMLButtonElement>("[data-realm-section]").forEach((b) =>
+    b.addEventListener("click", () => {
+      const section = b.dataset.realmSection!;
+      realmTab = sectionPage.get(section) ?? PAGE_KEYS[tabHolds(section)[0]!]!;
       renderPanel();
     }),
   );
@@ -5027,6 +6659,13 @@ function bindTrade(): void {
   const id = (b: HTMLElement, key: string) => Number(b.dataset[key]);
   panel.querySelectorAll<HTMLButtonElement>("[data-trader-route]").forEach((b) => b.addEventListener("click", () => startRoute(id(b, "traderRoute"))));
   panel.querySelectorAll<HTMLButtonElement>("[data-trader-show]").forEach((b) => b.addEventListener("click", () => showTrader(id(b, "traderShow"))));
+  panel.querySelectorAll<HTMLButtonElement>("[data-trader-open]").forEach((b) => b.addEventListener("click", () => openTraderCard(id(b, "traderOpen"))));
+  // Use all better routes: each trader takes its best one, in turn (TRADE-156).
+  panel.querySelector<HTMLButtonElement>("[data-trader-use-all]")?.addEventListener("click", async (e) => {
+    (e.currentTarget as HTMLButtonElement).disabled = true;
+    for (const t of snapshot?.trade?.traders ?? []) if (t.better[0]) await act({ type: "setTradeRoute", trader: t.id, stops: t.better[0].stops.slice() });
+    renderPanel();
+  });
   panel.querySelectorAll<HTMLButtonElement>("[data-trader-ask]").forEach((b) =>
     b.addEventListener("click", () => {
       tradeUi.dismiss = id(b, "traderAsk");
@@ -5050,7 +6689,7 @@ function bindTrade(): void {
   });
 }
 
-/** A trader tapped on the map: the player's Trade tab opens at its card. */
+/** A trader tapped on the map or a row of the Trade tab: its own card opens, and its way is drawn on the map (TRADE-153, TRADE-154). */
 function openTraderCard(id: number): void {
   sound.sfx("map_select_province");
   selected.clear();
@@ -5061,31 +6700,60 @@ function openTraderCard(id: number): void {
   lordView = -1;
   newsView = false;
   achView = false;
-  realmView = snapshot!.playerNation;
-  realmTab = "trade";
+  realmView = -1;
+  traderView = id;
+  tradeUi.dismiss = -1;
   panelCollapsed = false;
   restyleProvinces();
   renderArmyList();
   renderPanel();
   renderActions();
-  panel.querySelector(`[data-trader-show="${id}"]`)?.closest(".trader")?.scrollIntoView({ block: "nearest" });
+  view.invalidate();
 }
 
-/** Show on a trader card: the map centres on the trader, zoomed in to regional, under the trade lens. */
+/** The trader card in the panel (TRADE-153): its buttons set a better route, change where it goes, find it or dismiss it. */
+function renderTrader(id: number): void {
+  const s = snapshot!;
+  const t = s.trade!.traders.find((x) => x.id === id)!;
+  const name = (p: number) => provinces[p]!.name;
+  panel.innerHTML = `
+    <header><h2 class="ribbon">${esc(t.name)}</h2>${closeButton()}</header>
+    ${traderCardHtml(t, name, (p) => owners[p] !== s.playerNation)}`;
+  bindClose();
+  showPanel(true);
+  bindTrade();
+  const num = (b: HTMLElement, key: string) => Number(b.dataset[key]);
+  panel.querySelectorAll<HTMLButtonElement>("[data-trader-use]").forEach((b) =>
+    b.addEventListener("click", () => {
+      void act({ type: "setTradeRoute", trader: id, stops: [num(b, "useFrom"), num(b, "useTo")] }).then(() => {
+        if (!snapshot?.rejectedOrders.length) sound.sfx("map_select_province");
+      });
+    }),
+  );
+  panel.querySelector<HTMLButtonElement>("[data-trader-dest]")?.addEventListener("click", () => startRoute(id, true));
+  panel.querySelector<HTMLButtonElement>("[data-trader-dismiss]")?.addEventListener("click", () => (traderView = -1));
+}
+
+/** Find on a trader card (Show in the Trade tab): its card opens and the map centres on it, close in where it walks (TRADE-153). */
 function showTrader(id: number): void {
   const t = snapshot?.trade?.traders.find((x) => x.id === id);
   if (!t) return;
+  if (traderView !== id) openTraderCard(id);
   panelCollapsed = foldOnPhone();
-  setLens("trade");
-  view.lookAt(provinces[t.at]!.x!, provinces[t.at]!.y!, Math.max(view.camera.zoom, 3));
+  view.lookAt(provinces[t.at]!.x!, provinces[t.at]!.y!, Math.max(view.camera.zoom, LIVING_MAP.livingFrom));
   renderPanel();
 }
 
-/** Route on a trader card: the card closes, the trade lens comes on and the route bar waits for taps on the map. */
-function startRoute(id: number): void {
+/**
+ * Route on a trader card: the card closes, the trade lens comes on and the route bar waits for taps on the map;
+ * Change destination keeps where it starts and waits only for where it goes (TRADE-155).
+ */
+function startRoute(id: number, keepStart = false): void {
   const t = snapshot?.trade?.traders.find((x) => x.id === id);
   if (!t) return;
-  routing = { trader: id, kind: t.kind, stops: [], note: null };
+  routeFromCard = traderView === id;
+  traderView = -1;
+  routing = { trader: id, kind: t.kind, stops: keepStart && t.stops.length ? [t.stops[0]!] : [], note: null };
   realmView = -1;
   selectedProvince = -1;
   officialView = -1;
@@ -5139,11 +6807,15 @@ async function sendDraft(): Promise<void> {
   renderRouteBar();
 }
 
-/** Leaves route mode; the realm card waits on the Trade tab, folded on a phone so the new route stays in view. */
+/** Leaves route mode; the trader's card or the Trade tab waits where it was opened from, folded on a phone so the new route stays in view. */
 function leaveRoute(): void {
+  const id = routing?.trader ?? -1;
   routing = null;
   renderRouteBar();
-  if (snapshot) {
+  if (snapshot && routeFromCard && snapshot.trade?.traders.some((t) => t.id === id)) {
+    traderView = id;
+    panelCollapsed = foldOnPhone();
+  } else if (snapshot) {
     realmView = snapshot.playerNation;
     realmTab = "trade";
     panelCollapsed = foldOnPhone();
@@ -5179,6 +6851,8 @@ routeBarEl.addEventListener("click", (e) => {
     void act({ type: "draftTradeRoute", trader: r.trader, stops: [] });
     leaveRoute();
   } else if (b.dataset.routeConfirm !== undefined) void confirmRoute();
+  // One of the best cities from where it starts, picked from the bar (TRADE-155).
+  else if (b.dataset.routePick !== undefined) routeTap(Number(b.dataset.routePick));
 });
 
 /**
@@ -5314,13 +6988,17 @@ function bindClose(): void {
     lordView = -1;
     armyView = -1;
     fleetView = -1;
+    traderView = -1;
     sailing = -1;
     grantOpen = false;
     newsView = false;
+    endView = false;
+    chapterView = -1;
     realmView = -1;
     achView = false;
     empireOpen = false;
     mpView = false;
+    shogunateOpen = false;
     headView = null;
     declareFor = -1;
     selectedProvince = -1;
@@ -5334,6 +7012,25 @@ function bindNationButtons(): void {
   panel.querySelectorAll<HTMLButtonElement>("[data-nation]").forEach((b) => b.addEventListener("click", () => chooseRealm(b.dataset.nation!)));
 }
 
+/** ?goals=<JSON list of goals> gives realms goals of the caller's own, to try the Chronicle and the Aims fold (EVT-112, EVT-113). */
+const goalsParam = (): GoalDef[] | undefined => {
+  const raw = new URLSearchParams(location.search).get("goals");
+  try {
+    return raw ? (JSON.parse(raw) as GoalDef[]) : undefined;
+  } catch {
+    return undefined;
+  }
+};
+const goalDefs: readonly GoalDef[] = goalsParam() ?? startGoals;
+
+/** ?end=YYYY-MM-DD brings the end date near, to try the end card (SHELL-164). */
+const endDateParam = (): { endDate?: string; chapterYears?: number } => {
+  const q = new URLSearchParams(location.search);
+  const end = q.get("end");
+  // ?chapter=1 closes a chapter every year, to look at the chapter card (SHELL-183).
+  const chapter = Number(q.get("chapter"));
+  return { ...(end ? { endDate: end } : {}), ...(chapter > 0 ? { chapterYears: chapter } : {}) };
+};
 // ---- first-campaign hints ----
 
 /** Opens one of the player's provinces on a tab, as tapping it and the tab would. */
@@ -5343,6 +7040,7 @@ function openProvinceTab(i: number, tab: typeof provinceTab): void {
   realmView = -1;
   armyView = -1;
   fleetView = -1;
+  traderView = -1;
   newsView = false;
   selected.clear();
   selectedProvince = i;
@@ -5368,56 +7066,150 @@ function nearestNeighbour(): number {
   return [...count].sort((a, b) => b[1] - a[1])[0]?.[0] ?? s.relations.find((r) => r.nation !== s.playerNation)?.nation ?? -1;
 }
 
-/** Where each first-campaign hint points as the screen stands now (TUT-127): the button or card to tap, and Show me when it is not on screen. */
+/** The loading screen is up (a campaign starting or opening): the hints wait for the map. */
+function loadingShown(): boolean {
+  const l = document.querySelector<HTMLElement>("#loader");
+  return !!l && !l.hidden && !l.classList.contains("done");
+}
+
+/** A hint that points at a province on the map: the province when it is in open view, else the fold button of the card in the way. */
+function mapTarget(i: number, line: string, show: () => void): HintTarget {
+  const at = provinceSpot(i);
+  const fold = !mapSpot(at) && !panel.hidden ? panel.querySelector(".panel-buttons .fold") : null;
+  return fold ? { el: fold, line: "Fold this card away to see the map.", show } : { at, line, show };
+}
+
+/** A province's spot on the screen, for a hint that points at the map (TUT-127). */
+function provinceSpot(i: number): [number, number] {
+  const [x, y] = view.toScreen(provinces[i]!.x!, provinces[i]!.y!);
+  const r = view.renderer.canvas.getBoundingClientRect();
+  return [r.left + x, r.top + y];
+}
+
+/** The player's own province card is open (any tab). */
+function ownProvinceOpen(): boolean {
+  const s = snapshot;
+  return !panel.hidden && !!s && realmView < 0 && officialView < 0 && lordView < 0 && armyView < 0 && fleetView < 0 && !newsView && selectedProvince >= 0 && owners[selectedProvince] === s.playerNation;
+}
+
+/** Opens a page of the player's realm book, for a hint's Show me. */
+function openRealmPage(tab: RealmTab): void {
+  realmView = snapshot!.playerNation;
+  realmTab = tab;
+  officialView = -1;
+  lordView = -1;
+  armyView = -1;
+  fleetView = -1;
+  newsView = false;
+  panelCollapsed = false;
+  renderPanel();
+}
+
+/**
+ * The way to a page of the player's realm book, one tap at a time: the banner
+ * in the top bar, then the page's section, then its tab, then the button on it.
+ */
+function realmPageTarget(tab: RealmTab, button: string | null, lines: { banner: string; section: string }): HintTarget {
+  const s = snapshot!;
+  const show = () => openRealmPage(tab);
+  if (panel.hidden || realmView !== s.playerNation) return { el: hud.querySelector(".realm"), line: lines.banner, show };
+  if (realmTab === tab) return button ? { el: panel.querySelector(`${button}:not([disabled])`) ?? panel.querySelector(button), show } : {};
+  const page = panel.querySelector(`[data-realm-tab="${tab}"]`);
+  if (page) return { el: page, line: lines.section, show };
+  return { el: panel.querySelector(`[data-realm-section="${sectionOf(pageOf(tab))}"]`) ?? panel.querySelector(`[data-realm-open-tab="${tab}"]`), line: lines.section, show };
+}
+
+/**
+ * The way to one of the player's province cards: the province's name at the
+ * bottom left once it is chosen, else the province itself on the map.
+ */
+function provinceCardTarget(i: number, then: string, show: () => void): HintTarget {
+  const name = provinces[i]!.name;
+  const chosen = selectedProvince >= 0 && owners[selectedProvince] === snapshot!.playerNation;
+  if (chosen && !reopen.hidden) return { el: reopen, line: `Open ${provinces[selectedProvince]!.name}'s card: tap its name at the bottom left${then}.`, show };
+  return mapTarget(i, `Tap ${name} on the map, then its name at the bottom left${then}.`, show);
+}
+
+/** Where each first-campaign hint points as the screen stands now (TUT-127): the button, card or spot on the map to tap at this step of it, and Show me when it is not on screen. */
 function hintTarget(h: Hint): HintTarget {
   const s = snapshot;
-  const open = !panel.hidden;
   const capital = s ? provinceIndex.get(nations[s.playerNation]!.capital)! : -1;
-  const provinceOpen = open && !!s && realmView < 0 && officialView < 0 && lordView < 0 && armyView < 0 && fleetView < 0 && !newsView && selectedProvince >= 0 && owners[selectedProvince] === s.playerNation;
+  const provinceOpen = ownProvinceOpen();
+  if (h.id !== "realm" && !s) return {};
   switch (h.id) {
-    case "realm":
+    case "realm": {
       if (s) return {};
       if (panelCollapsed) return { el: reopen };
+      const play = panel.querySelector(".play");
       return {
-        el: panel.querySelector(".play") ?? panel.querySelector(".nation"),
+        el: play ?? panel.querySelector('.nation[data-nation="ottomans"]') ?? panel.querySelector(".nation"),
+        ...(play ? { line: `Tap ${play.textContent!.trim()} to begin, or close this card and pick another realm.` } : {}),
         show: () => {
           realmView = -1;
           selectedProvince = -1;
           renderPanel();
         },
       };
+    }
+    case "province":
+      return provinceCardTarget(capital, "", () => openProvinceTab(capital, "overview"));
+    case "realm_book":
+      return { el: hud.querySelector(".realm") };
+    case "lens":
+      if (!lensMenu.hidden) return { el: lensMenu.querySelector('[data-lens="wealth"]'), line: "Pick Wealth: the map colours each province by its riches. Realms brings the borders back." };
+      return { el: document.querySelector("#mode") };
     case "move": {
-      if (!s) return {};
-      if (selected.size) return { line: "Now tap the land to march to: the army sets off at once." };
-      if (!armyList.hidden) return { el: armyList.querySelector("[data-pick]") };
+      if (selected.size) {
+        // A march: the ring sits on land next to the chosen army.
+        const from = s!.armies.location[armySlot([...selected][0]!)]!;
+        const near = neighborIdx[from]?.filter((n) => !isWater[n]).sort((a, b) => Number(owners[b] === s!.playerNation) - Number(owners[a] === s!.playerNation)) ?? [];
+        const to = near.find((n) => mapSpot(provinceSpot(n))) ?? near[0];
+        if (to === undefined) return { line: "Now tap the land to march to: the army sets off at once." };
+        return { at: provinceSpot(to), line: `Now tap ${provinces[to]!.name}, or any land, to march there: the army sets off at once.`, show: () => view.lookAt(provinces[to]!.x!, provinces[to]!.y!, Math.max(view.camera.zoom, 4)) };
+      }
+      if (!armyList.hidden) return { el: armyList.querySelector("[data-pick]"), line: "Pick a commander from the list." };
       const openList = () => {
         panelCollapsed = true;
         renderPanel();
         armyListClosed = false;
         lensMenu.hidden = true;
         soundMenu.hidden = true;
-            armyButton.setAttribute("aria-expanded", "true");
+        armyButton.setAttribute("aria-expanded", "true");
         renderArmyList();
       };
-      return { el: (open && panel.querySelector("[data-army]")) || armyButton, show: openList };
+      return { el: (!panel.hidden && panel.querySelector("[data-army]")) || armyButton, show: openList };
     }
     case "end_turn":
       return { el: fab };
+    case "news":
+      return { el: hud.querySelector("[data-news]") };
+    case "study": {
+      const way = realmPageTarget("learning", "[data-study]", { banner: "Choose what your scholars study: tap your banner in the top bar to open your realm's book.", section: "Now open Research." });
+      if (way.el !== null || realmTab !== "learning") return way;
+      // No invention picked yet: Can study brings one up with its Study now.
+      const pickOne = panel.querySelector("[data-jump=open]");
+      return { ...way, el: pickOne, ...(pickOne ? { line: "Tap Can study: it brings up an invention your scholars can start now." } : {}) };
+    }
     case "recruit":
     case "build": {
-      if (!s || capital < 0) return {};
+      if (capital < 0) return {};
       const tab = h.id === "recruit" ? "garrison" : "build";
       const button = h.id === "recruit" ? "[data-recruit]" : "[data-build]";
       const show = () => openProvinceTab(provinceOpen ? selectedProvince : capital, tab);
       if (provinceOpen && provinceTab === tab) return { el: panel.querySelector(`${button}:not([disabled])`) ?? panel.querySelector(button), show };
       if (provinceOpen) return { el: panel.querySelector(`[data-tab="${tab}"]`), show };
-      return { show };
+      return provinceCardTarget(capital, `, then the ${h.id === "recruit" ? "Garrison" : "Build"} tab`, show);
     }
+    case "lords": {
+      const t = titlesOf(s!.playerNation);
+      return realmPageTarget("lords", null, { banner: `Meet your ${t.lords}, who hold land for you and want things in return: tap your banner in the top bar.`, section: `Now open Lands, then ${cap(t.lords)}.` });
+    }
+    case "treasury":
+      return { el: hud.querySelector(".plaque.gold"), show: () => openRealmPage("treasury") };
     case "envoy": {
-      if (!s) return {};
+      const n = realmView >= 0 && realmView !== s!.playerNation ? realmView : nearestNeighbour();
+      if (n < 0) return {};
       const show = () => {
-        const n = realmView >= 0 && realmView !== s.playerNation ? realmView : nearestNeighbour();
-        if (n < 0) return;
         realmView = n;
         realmTab = "diplomacy";
         officialView = -1;
@@ -5426,11 +7218,41 @@ function hintTarget(h: Hint): HintTarget {
         panelCollapsed = false;
         renderPanel();
       };
-      if (open && realmView >= 0 && realmView !== s.playerNation) return { el: realmTab === "diplomacy" ? panel.querySelector("[data-envoy]") : panel.querySelector('[data-realm-tab="diplomacy"]'), show };
-      return { show };
+      const name = nations[n]!.name;
+      if (!panel.hidden && realmView === n) return { el: realmTab === "diplomacy" ? panel.querySelector("[data-envoy]") : panel.querySelector('[data-realm-tab="diplomacy"]') ?? panel.querySelector('[data-realm-section="Diplomacy"]'), show };
+      // From one of the neighbour's provinces: its card names its realm.
+      const theirs = selectedProvince >= 0 && owners[selectedProvince] === n;
+      if (theirs && !panel.hidden) return { el: panel.querySelector(`[data-realm="${n}"]`), line: `Tap ${name} to open its realm card.`, show };
+      if (theirs && !reopen.hidden) return { el: reopen, line: `Open ${provinces[selectedProvince]!.name}'s card: tap its name at the bottom left.`, show };
+      const border = borderProvince(n);
+      return border >= 0 ? mapTarget(border, `Send an envoy to ${name}: tap their land on the map.`, show) : { show };
     }
   }
   return {};
+}
+
+/** The neighbour's province that touches the player's land, nearest the capital, preferring one in open view on the map. */
+function borderProvince(n: number): number {
+  const s = snapshot!;
+  const cap = provinces[provinceIndex.get(nations[s.playerNation]!.capital)!]!;
+  const border: number[] = [];
+  for (let p = 0; p < owners.length; p++) if (owners[p] === n && neighborIdx[p]!.some((q) => owners[q] === s.playerNation)) border.push(p);
+  border.sort((a, b) => Math.hypot(provinces[a]!.x! - cap.x!, provinces[a]!.y! - cap.y!) - Math.hypot(provinces[b]!.x! - cap.x!, provinces[b]!.y! - cap.y!));
+  return border.find((p) => mapSpot(provinceSpot(p))) ?? border[0] ?? -1;
+}
+
+/** The hints a look ticks off: a card or page opened, or a study already chosen (TUT-122). */
+function hintViews(): void {
+  const s = snapshot;
+  if (!s) return;
+  if (ownProvinceOpen()) hints.did("province opened");
+  if (!panel.hidden && realmView === s.playerNation) {
+    hints.did("realm opened");
+    if (realmTab === "lords") hints.did("lords opened");
+    if (realmTab === "treasury") hints.did("treasury opened");
+  }
+  if (!panel.hidden && newsView) hints.did("news opened");
+  if (s.research?.study) hints.did("setStudy");
 }
 
 async function startGame(nation: string): Promise<void> {
@@ -5438,7 +7260,7 @@ async function startGame(nation: string): Promise<void> {
   showLoading(`Gathering the court of ${name}…`, 0.15);
   await painted();
   loadingStage(`Mustering the armies of ${name}…`, 0.6);
-  const snap = await engine.send({ type: "newGame", seed: Date.now() >>> 0, playerNation: nation, ...(mapImage ? { map: mapTiles(mapImage) } : {}) });
+  const snap = await engine.send({ type: "newGame", seed: Date.now() >>> 0, playerNation: nation, ...(mapImage ? { map: mapTiles(mapImage) } : {}), ...endDateParam(), ...(goalsParam() ? { goals: goalsParam()! } : {}) });
   mapSent = true;
   // One new game is one campaign (SAVE-012).
   campaign = newCampaign(new Rng(Date.now() >>> 0), { playerNation: nation, nationName: name });
@@ -5460,6 +7282,11 @@ function enterGame(snap: Snapshot): void {
   lordView = -1;
   armyView = -1;
   newsView = false;
+  endView = false;
+  endShown = "";
+  chapterView = -1;
+  chaptersShown = -1;
+  pickingPlayOn = false;
   grantOpen = false;
   selected.clear();
   screenHistory.length = 0;
@@ -5488,6 +7315,24 @@ function enterGame(snap: Snapshot): void {
   askedStudy = -1;
   askForStudy(snapshot!);
   hints.did("realm chosen");
+}
+
+/** Plays on as another realm after game over (SHELL-095, SHELL-096): the map turns to its capital. */
+async function playOnAs(r: number): Promise<void> {
+  await act({ type: "playOn", nation: r });
+  if (snapshot?.playerNation !== r) return;
+  // The campaign now plays another realm (D-SAVE-1); its saves follow it (followPlayerRealm).
+  if (campaign) campaign.switchedCountry = true;
+  const cap = provinceIndex.get(nations[r]!.capital)!;
+  realmView = -1;
+  selectedProvince = cap;
+  panelCollapsed = true;
+  heldBefore = provincesHeld();
+  view.lookAt(provinces[cap]!.x!, provinces[cap]!.y!, 4);
+  restyleProvinces();
+  renderHud();
+  renderPanel();
+  renderActions();
 }
 
 /** The map images as the engine takes them, so armies march over the map's own tiles. */
@@ -5552,7 +7397,7 @@ function hearSnapshot(): void {
     } else if (x.kind === "siege" && x.text.includes("lays siege")) effects.add("siege_begin");
     else if (x.kind === "occupied") effects.add("siege_fall");
     else if (x.kind === "freed") effects.add("ui_confirm");
-    else if (x.kind === "famine") effects.add("realm_famine");
+    else if (x.kind === "famine" || (x.kind === "plague" && x.text.startsWith("Plague in"))) effects.add("realm_famine");
     else if (x.kind === "unrest") effects.add("realm_unrest");
     else if (x.kind === "raised") effects.add("army_levy_call");
     else if (x.kind === "built" && x.nations.includes(snapshot!.playerNation)) effects.add("econ_build_done");
@@ -5573,6 +7418,14 @@ async function endTurn(force = false): Promise<void> {
   if (!snapshot) return;
   // Multiplayer: the week plays once every player's orders are in (force), not on this device's say.
   if (force) return playWeek();
+  // Once the campaign has ended the button reads Campaign over and reopens the end card (SHELL-164).
+  if (snapshot.campaign.ending) {
+    endView = true;
+    pickingPlayOn = false;
+    panelCollapsed = false;
+    renderPanel();
+    return;
+  }
   // While an event waits, End turn opens it instead (EVT-044, SHELL-070).
   if (snapshot.events.length) {
     openEventCard();
@@ -5625,12 +7478,14 @@ async function playWeek(): Promise<void> {
   // Saves still waiting for a quiet moment wait for the end of this week instead.
   clearTimeout(afterTurnTimer);
   selected.clear();
+  // Offers put off last week wait to be answered again.
+  putOffOffers.clear();
   sound.sfx("turn_end");
   hints.did("turn ended");
   if (factMem) factMem.battleThisTurn = false;
   renderActions();
   const turn = snapshot.turn;
-  while (snapshot.turn === turn) {
+  while (snapshot.turn === turn && !snapshot.campaign.ending) {
     if (paused) {
       await new Promise<void>((r) => (resume = r));
       continue;
@@ -5651,9 +7506,11 @@ async function playWeek(): Promise<void> {
     if (battle) sound.sfx(shotSound(next.date.year), 0.7);
     logNews(next);
     if (marching) sayArrivals(marching);
+    watchEnding();
+    watchChapter();
     restyleProvinces();
     renderHud();
-    if (!panel.hidden) renderPanel();
+    if (!panel.hidden || endView || chapterView >= 0) renderPanel();
     renderActions();
     // Budgets in docs/performance.md, checked by scripts/perf.mjs: each step's answer, and taking it in.
     performance.measure("turn-wait", "turn-sent", "turn-arrived");
@@ -5803,6 +7660,41 @@ const DEVICE = { ios: "iPhone", android: "Android", desktop: "Desktop", web: "Br
 const GAME_VERSION = "0.1.0";
 const SM = savesConfig.messages;
 
+/**
+ * Cloud saves (SAVE-052 … SAVE-069, SAVE-119 …): only in a build that names
+ * its server in VITE_CLOUD_API; without one nothing of them shows (D-SET-22).
+ */
+const cloudUrl = cloudBase();
+const cloud = cloudUrl ? new CloudSync(new CloudApi(cloudUrl, webTokenStore()), saveStore, webKeyValue(), { device: DEVICE }) : undefined;
+const cloudView = accountView();
+let cardLoading = false;
+if (cloud) {
+  setOwnSection("account", {
+    html: () => {
+      // The devices come fresh each time Settings opens.
+      if (cloud.api.signedIn && !cloudView.card && !cardLoading) {
+        cardLoading = true;
+        void loadCard(cloud, cloudView, () => {
+          cardLoading = false;
+          if (shell.view === "settings") renderShell();
+        });
+      }
+      return accountHtml(cloud, cloudView);
+    },
+    bind: (card, redraw) => bindAccount(card, cloud, cloudView, { name: DEVICE, platform: savePlatform }, redraw),
+  });
+  cloud.onChange = () =>
+    void refreshSaves().then(() => {
+      // A sign-in form being typed in is left alone.
+      if (shell.view === "load" || (shell.view === "settings" && cloud.api.signedIn)) renderShell();
+      else if (!shell.view && startOn && !startEl.hidden) showStart();
+    });
+  addEventListener("online", () => void cloud.run("resume"));
+}
+
+/** The saves the Load card and Continue list: this device's, and those in the cloud from other devices. */
+const listedSaves = (): StoredSave[] => (cloud ? [...savesList, ...cloud.remote(savesList)] : savesList);
+
 type ShellView = "menu" | "save" | "load" | "settings";
 /** What the overlay shows, where it was opened from, and the card's own open line or question. */
 const shell: { view: ShellView | null; fromStart: boolean; open: string; confirm: string; busy: boolean; note: string; name: string } = { view: null, fromStart: false, open: "", confirm: "", busy: false, note: "", name: "" };
@@ -5839,19 +7731,21 @@ const tutorialFinished = () => hints.progress().done >= hints.progress().of;
 
 /** The start screen: Play with the waiting campaign, the ways into a campaign, the icon row, the map panning behind (SHELL-150..156). */
 function showStart(): void {
-  const cont = continueTarget(savesList, DEVICE, nationNameOf);
+  const cont = continueTarget(listedSaves(), DEVICE, nationNameOf);
   const nation = cont ? flagOfId(cont.entry.header.playerNation) : undefined;
   const d = cont?.entry.header.date;
+  // A save from another device says so, as Continue does (SAVE-014).
+  const from = cont && cont.entry.header.device !== DEVICE ? ` (from ${cont.entry.header.device})` : "";
   const column = startColumn({
     campaign: cont && d ? { realm: nationNameOf(cont.entry.header.playerNation), date: { year: d.y, month: d.m }, borders: "" } : null,
-    saves: savesList.length,
+    saves: listedSaves().length,
     tutorialFinished: tutorialFinished(),
     platform: SHELL_PLATFORM,
     edition: "full game",
   });
   const entry = (e: (typeof column)[number]) =>
     e.label === "Play"
-      ? `<button class="wax start-play" data-start="play">${nation ? pennant(nation, 3) : icon("crown", 3)}<span><b>Play</b>${e.detail ? `<small>${esc(e.detail)}</small>` : ""}</span></button>`
+      ? `<button class="wax start-play" data-start="play">${nation ? pennant(nation, 3) : icon("crown", 3)}<span><b>Play</b>${e.detail ? `<small>${esc(e.detail + from)}</small>` : ""}</span></button>`
       : `<button class="paper" data-start="${e.target}">${esc(e.label)}</button>`;
   startEl.innerHTML = `
     <div class="start-band framed"${startMp ? " hidden" : ""}>
@@ -5877,6 +7771,7 @@ function startMoreHtml(): string {
     ${tutorialFinished() ? `<button class="paper" data-start="tutorial">Tutorial</button>` : ""}
     <a class="paper-link" href="./style.html">Art test page</a>
     <p class="start-credits"><b>Pocket Hegemony</b> ${esc(GAME_VERSION)}. Made by Leroy with Claude.</p>
+    <p class="start-credits">Music played on the Fluid R3 GM soundfont by Frank Wen (CC BY 3.0).</p>
   </div>`;
 }
 
@@ -5919,7 +7814,7 @@ startEl.addEventListener("click", (e) => {
   if (!b) return;
   const what = b.dataset.start ?? b.dataset.startIcon!;
   if (what === "play" || what === "loading" || what === "new_campaign") {
-    const cont = continueTarget(savesList, DEVICE, nationNameOf);
+    const cont = continueTarget(listedSaves(), DEVICE, nationNameOf);
     if (what !== "new_campaign" && cont) {
       hideStart();
       void loadSave(cont.entry.path, false, false);
@@ -5970,6 +7865,11 @@ function writeGameSave(kind: "manual" | "autosave" | "resume", opts: { name?: st
     try {
       const entry = await saveStore.commit(r.path, r.bytes, r.removed);
       await refreshSaves();
+      // Its upload is queued, and sent now if the device is online (SAVE-065).
+      if (cloud) {
+        cloud.saved(r.path, r.removed);
+        void cloud.run("after_save");
+      }
       if (kind === "resume") changedSinceResume = false;
       return entry;
     } catch (e) {
@@ -6000,7 +7900,11 @@ async function savesAfterTurn(began: GameDate | null): Promise<void> {
 
 // The Resume save follows the app being put away, when orders were given since (SAVE-007).
 document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "visible") playClock = performance.now();
+  if (document.visibilityState === "visible") {
+    playClock = performance.now();
+    // Back in the app: what other devices saved meanwhile (SAVE-064); going away adds no cloud work (SAVE-066).
+    void cloud?.run("resume");
+  }
   // The time played up to now counts before the app is put away.
   else if (campaign) campaign.playSeconds += Math.round((performance.now() - playClock) / 1000);
   if (document.visibilityState !== "hidden" || !campaign || !snapshot || playing) return;
@@ -6020,6 +7924,7 @@ function sayDone(text: string): void {
 }
 
 function openShell(view: ShellView, fromStart = !snapshot): void {
+  if (view === "settings") cloudView.card = undefined;
   shell.view = view;
   shell.fromStart = fromStart;
   shell.open = "";
@@ -6071,6 +7976,7 @@ function gameMenuHtml(): string {
       <button class="paper" data-shell="save">${icon("scroll", 2)} Save</button>
       <button class="paper" data-shell="load">${icon("scroll", 2)} Load</button>
       <button class="paper" data-shell="settings">${icon("cog", 2)} Settings</button>
+      <button class="paper" data-shell="achievements">${icon("trophy", 2)} Achievements${unseen(achProfile) ? ` <small>${unseen(achProfile)} new</small>` : ""}</button>
       <button class="paper" data-shell="exit">${icon("castle", 2)} Exit to main menu</button>
     </div>
   </div>`;
@@ -6089,8 +7995,8 @@ const savedAgo = (ms: number) => {
 function saveLine(e: StoredSave, mark = ""): string {
   const h = e.header;
   const n = flagOfId(h.playerNation);
-  return `<span class="save-thumb"><img src="data:image/png;base64,${h.thumbnail}" alt=""></span>
-    <span class="save-text"><b>${n ? pennant(n, 1) : ""}${esc(h.name)}</b><small>${mark ? `<em class="mark">${esc(mark)}</em> · ` : ""}${esc(nationNameOf(h.playerNation))} · ${esc(longDate(h.date))} · saved ${esc(savedAgo(h.savedAt))}</small></span>`;
+  return `<span class="save-thumb">${h.thumbnail ? `<img src="data:image/png;base64,${h.thumbnail}" alt="">` : icon("scroll", 2)}</span>
+    <span class="save-text"><b>${n ? pennant(n, 1) : ""}${esc(h.name)}</b><small>${mark ? `<em class="mark">${esc(mark)}</em> · ` : ""}${esc(nationNameOf(h.playerNation))} · ${esc(longDate(h.date))} · saved ${esc(savedAgo(h.savedAt))}${h.device !== DEVICE ? ` · from ${esc(h.device)}` : ""}</small></span>`;
 }
 
 /** The Save card (SAVE-106). */
@@ -6159,16 +8065,21 @@ function bindSaveCard(): void {
   });
 }
 
-/** The Load card's lines: each campaign's Resume save first, then every other save, newest first (SAVE-107, D-SAVE-17). */
+/**
+ * The Load card's lines: each campaign's Resume save first, then every other save, newest first (SAVE-107, D-SAVE-17);
+ * a campaign played on two devices keeps both lines of play, each marked with its device (SAVE-054).
+ */
 function loadLines(): { entry: StoredSave; mark: string }[] {
+  const all = listedSaves().sort((a, b) => b.header.savedAt - a.header.savedAt || b.header.turn - a.header.turn);
   const seen = new Set<string>();
   const resumes: StoredSave[] = [];
-  for (const e of savesList) {
-    if (e.header.kind !== "resume" || seen.has(e.header.campaignId)) continue;
-    seen.add(e.header.campaignId);
+  for (const e of all) {
+    const line = `${e.header.campaignId}|${e.header.device}`;
+    if (e.header.kind !== "resume" || seen.has(line)) continue;
+    seen.add(line);
     resumes.push(e);
   }
-  return [...resumes.map((entry) => ({ entry, mark: "Where you left off" })), ...savesList.filter((e) => e.header.kind === "manual" || e.header.kind === "autosave").map((entry) => ({ entry, mark: entry.header.kind === "autosave" ? "Auto" : "" }))];
+  return [...resumes.map((entry) => ({ entry, mark: "Where you left off" })), ...all.filter((e) => e.header.kind === "manual" || e.header.kind === "autosave").map((entry) => ({ entry, mark: entry.header.kind === "autosave" ? "Auto" : "" }))];
 }
 
 /** The Load card (SAVE-107). */
@@ -6193,6 +8104,7 @@ function loadCardHtml(): string {
         return `<li class="save-row${open ? " open" : ""}"><button class="save-pick" data-pick="${esc(e.path)}" aria-expanded="${open}">${saveLine(e, mark)}</button>${acts}</li>`;
       })
       .join("")}</ul>
+    ${cloud && !cloud.api.signedIn ? `<button class="paper cloud-invite" data-shell="settings" data-settings-section="account">Sign in to keep your saves on every device</button>` : ""}
   </div>`;
 }
 
@@ -6208,7 +8120,10 @@ function bindLoadCard(): void {
     renderShell();
   });
   on("[data-delete]", (path) => {
-    void saveStore.remove(path).then(async () => {
+    // The cloud's copy goes too, so other devices learn of it (SAVE-062).
+    const id = listedSaves().find((x) => x.path === path)?.header.saveId;
+    if (cloud && id) cloud.deleted(id);
+    void (path.startsWith(CLOUD_PATH) ? Promise.resolve() : saveStore.remove(path)).then(async () => {
       await refreshSaves();
       shell.open = "";
       shell.confirm = "";
@@ -6245,7 +8160,43 @@ function bindLoadCard(): void {
  * Opens a save (SHELL-039): the campaign being played keeps where it was left
  * first; the engine checks and opens the file and the map shows it.
  */
+/** The page's key for a save waiting to load once the page has reopened in its start (SAVE-111). */
+const OPEN_SAVE_KEY = "ph-open-save";
+/** Session storage, which a private window or a sandboxed frame may refuse. */
+function sessionGet(key: string): string | null {
+  try {
+    return sessionStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+function sessionSet(key: string, value: string | null): void {
+  try {
+    if (value === null) sessionStorage.removeItem(key);
+    else sessionStorage.setItem(key, value);
+  } catch {
+    // Without session storage the save opens in the default start's world only.
+  }
+}
+
 async function loadSave(path: string, acceptModified = false, keepCurrent = true): Promise<void> {
+  // A save from another device comes down when it is opened (SAVE-064).
+  if (path.startsWith(CLOUD_PATH) && cloud) {
+    shell.busy = true;
+    if (shell.view) renderShell();
+    try {
+      path = (await cloud.download(path.slice(CLOUD_PATH.length))).path;
+      await refreshSaves();
+    } catch (err) {
+      shell.busy = false;
+      // Continue on the start screen has no card open yet: the Load card says why.
+      if (!shell.view) openShell("load");
+      shell.note = err instanceof CloudError && err.offline ? "Connect to open this save from the cloud." : "This save could not be fetched from the cloud.";
+      renderShell();
+      return;
+    }
+    shell.busy = false;
+  }
   const bytes = await saveStore.read(path);
   const e = savesList.find((x) => x.path === path);
   if (!bytes || !e) {
@@ -6254,6 +8205,15 @@ async function loadSave(path: string, acceptModified = false, keepCurrent = true
     return;
   }
   if (keepCurrent && campaign && snapshot && changedSinceResume) await writeGameSave("resume");
+  // A campaign plays on in the world it began in (SAVE-111): the page reopens in that start and loads the save there.
+  const began = saveStart(e.header);
+  if (began !== START_ID) {
+    showLoading(`Opening ${e.header.name}…`, 0.2);
+    sessionSet(SESSION_START_KEY, began === DEFAULT_START ? null : began);
+    sessionSet(OPEN_SAVE_KEY, path);
+    location.reload();
+    return;
+  }
   shell.busy = true;
   showLoading(`Opening ${e.header.name}…`, 0.2);
   await painted();
@@ -6282,6 +8242,8 @@ async function exitToMenu(): Promise<void> {
   showLoading("Keeping your place…", 0.5);
   await painted();
   await writeGameSave("resume");
+  // The menu and new campaigns are back in the default start (SAVE-111).
+  sessionSet(SESSION_START_KEY, null);
   location.reload();
 }
 
@@ -6291,6 +8253,10 @@ document.addEventListener("click", (e) => {
   const v = b.dataset.shell!;
   if (v === "map") closeShell();
   else if (v === "exit") void exitToMenu();
+  else if (v === "achievements") {
+    closeShell();
+    openAchievements();
+  }
   else {
     if (v === "settings" && b.dataset.settingsSection) openSettingsAt(b.dataset.settingsSection);
     openShell(v as ShellView, shell.view === null ? !snapshot : shell.fromStart);
@@ -6317,6 +8283,7 @@ overlay.addEventListener("click", (e) => {
 /** Settings apply at once (SET-003): text size, the map's battery knobs, and the cards that show them. */
 function applyPrefs(): void {
   document.documentElement.style.setProperty("--text-zoom", String(textZoom()));
+  document.documentElement.dataset.animations = animationsPref().toLowerCase();
   view?.setPower(mapPower());
   if (!soundMenu.hidden) renderSoundMenu();
   renderSoundButton();
@@ -6324,15 +8291,40 @@ function applyPrefs(): void {
 onPrefs(applyPrefs);
 applyPrefs();
 void refreshSaves().then(() => {
+  // A save from another start reopened the page in its start: load it now (SAVE-111).
+  const waiting = sessionGet(OPEN_SAVE_KEY);
+  sessionSet(OPEN_SAVE_KEY, null);
+  if (waiting && savesList.some((x) => x.path === waiting)) {
+    hideStart();
+    void loadSave(waiting, false, false);
+    return;
+  }
+  if (waiting && START_ID !== DEFAULT_START) {
+    // The save is gone: back to the default start for the menu and new campaigns.
+    sessionSet(SESSION_START_KEY, null);
+    location.reload();
+    return;
+  }
   if (!snapshot) renderPanel();
+  // What other devices saved since the last launch, then this device's waiting uploads (SAVE-064, SAVE-065).
+  void cloud?.run("launch");
 });
 
 // Hooks for the scripted play-throughs (scripts/war-shots.mjs).
 Object.assign(globalThis, {
   /** Multiplayer, for the shots script: this device's week, its hash at the week's start and whether it is out of step. */
-  __phMp: () => (mp && snapshot ? { turn: snapshot.turn, hash: mp.weekHash, outOfStep: mp.outOfStep, waiting: mp.waiting, cover: mp.cover } : null),
+  __phMp: () => (mp && snapshot ? { turn: snapshot.turn, hash: mp.weekHash, outOfStep: mp.outOfStep, waiting: mp.waiting, cover: mp.cover, hashes: mp.hashes ?? [] } : null),
   __phNation: (id: string) => nationIndex.get(id),
+  /** The most provinces the player holds of any one enemy, from the peace tables (scripts/peace-table-shots.mjs). */
+  __phPeaceTable: () => Math.max(0, ...(snapshot?.settlements ?? []).map((x) => x.provinces.length)),
   __phTurn: () => snapshot?.turn ?? -1,
+  /** A realm's capital province and its point on the map. */
+  __phCapitalOf: (n: number) => {
+    const p = provinceIndex.get(nations[n]!.capital)!;
+    return { province: p, x: provinces[p]!.x!, y: provinces[p]!.y! };
+  },
+  /** The founding card for staged news: a realm founded takes decades of play (scripts/founding-shots.mjs). */
+  __phFoundingCard: (news: News[]) => showFoundings(news),
   /** The player's ports and fleets, and an order for the navy (scripts/navy-shots.mjs). */
   __phNavy: () => snapshot?.navy ?? null,
   __phNavyOrder: (o: Record<string, unknown>) => act({ type: "navy", ...o } as Order).then(() => snapshot?.rejectedOrders.map((r) => r.reason) ?? []),
@@ -6341,6 +8333,46 @@ Object.assign(globalThis, {
   /** The exploration cards' builders, to show states a short play-through can't reach (a governor aboard, a colony growing). */
   __phExploreUi: { colonySection, colonyCard, coloniesTab },
   /** The Empire's view, and a staged one in its place until the next snapshot: a Diet or a ruling takes years of play (scripts/institutions-shots.mjs). */
+  /** The hunting grounds view, its arrays as plain lists (scripts/tribes-shots.mjs). */
+  __phTribes: () => (snapshot ? { ...snapshot.tribes, ground: [...snapshot.tribes.ground], claiming: [...snapshot.tribes.claiming] } : null),
+  /** Sends a hunting grounds order and says what was refused. */
+  __phTribesOrder: (o: Record<string, unknown>) => act({ type: "tribes", ...o } as Order).then(() => snapshot?.rejectedOrders.map((r) => r.reason) ?? []),
+  /** Draws the screens as if the player could found colonies (scripts/tribes-shots.mjs: Ask for the land); the engine still decides. */
+  __phStageColonial: () => {
+    if (!snapshot) return;
+    snapshot.exploration.colonial = true;
+    restyleProvinces();
+    renderPanel();
+  },
+  /** Opens the player's realm card on a tab. */
+  __phRealmTab: (tab: string) => {
+    if (!snapshot) return;
+    realmView = snapshot.playerNation;
+    realmTab = tab as RealmTab;
+    newsView = false;
+    panelCollapsed = false;
+    renderPanel();
+  },
+  /** Stages this temperature, °C, in every province for the snow until the next week: winter takes months of play (scripts/effects-shots.mjs). */
+  __phStageCelsius: (c: number) => {
+    seasonNow = new Uint8Array(provinces.length * 4);
+    for (let i = 0; i < provinces.length; i++) seasonBytes(seasonNow, i, c, 0, 0, 0);
+  },
+  /** Plays a map moment at province p, in a realm's colour: the things that cause one take a war or years of play (scripts/effects-shots.mjs). */
+  __phMoment: (kind: MomentKind, p: number, nation = snapshot?.playerNation ?? 0) => {
+    const at = provinces[p]!;
+    particles.moment(kind, at.x!, at.y!, momentParticles(kind, animationsPref()), momentSeconds(kind), nations[nation]!.color);
+    view.invalidate();
+    return particles.count;
+  },
+  /** Stages an outbreak in province p until the next snapshot and opens its card: plague takes years of play to come (scripts/plague-shots.mjs). */
+  __phStagePlague: (p: number, closed = false) => {
+    if (!snapshot) return;
+    snapshot.provincePlague[p] = OUTBREAK_STEP;
+    snapshot.provinceQuarantine[p] = closed ? 1 : 0;
+    snapshot.plague = [...snapshot.plague.filter((x) => x.province !== p), { province: p, step: OUTBREAK_STEP, weeks: 9, dead: 1400 }];
+    goToProvince(p, false);
+  },
   __phEmpire: () => snapshot?.empire ?? null,
   __phStageEmpire: (v: NonNullable<Snapshot["empire"]>) => {
     if (!snapshot) return;
@@ -6348,6 +8380,16 @@ Object.assign(globalThis, {
     renderHud();
     renderPanel();
   },
+  /** The Shogunate's view, and a staged one in its place until the next snapshot: an oath or a closed country takes years of play (scripts/shogunate-shots.mjs). */
+  __phShogunate: () => snapshot?.shogunate ?? null,
+  __phStageShogunate: (v: NonNullable<Snapshot["shogunate"]>) => {
+    if (!snapshot) return;
+    snapshot.shogunate = v;
+    renderHud();
+    renderPanel();
+  },
+  /** Sends a Shogunate order and says what was refused. */
+  __phShogunateOrder: (o: Record<string, unknown>) => act({ type: "shogunate", ...o } as Order).then(() => snapshot?.rejectedOrders.map((r) => r.reason) ?? []),
   /** A sea zone k zones out from port p that a fleet with this ocean reach may enter, the farthest found first. */
   __phSeaOut: (p: number, k: number, reach = -1) => {
     const ex = snapshot!.exploration;
@@ -6362,22 +8404,64 @@ Object.assign(globalThis, {
     }
     return best;
   },
-  /** Commissions the first official of the player's who serves the crown (not a lord) as a commander. */
-  __phCommission: async () => {
+  /** Commissions the first official of the player's who serves the crown (not a lord) as a general, or as an admiral when `sea`. */
+  __phCommission: async (sea = false) => {
     if (!snapshot) return null;
     const me = snapshot.playerNation;
     const p = provinces.findIndex((_, i) => owners[i] === me && snapshot!.provinceLord[i]! < 0 && officialOf(snapshot!, i, me) && i !== provinceIndex.get(nations[me]!.capital));
     if (p < 0) return null;
-    await act({ type: "commission", province: p });
+    await act({ type: "commission", province: p, sea });
     return snapshot.rejectedOrders.map((r) => r.reason);
   },
-  /** A coastal sea zone two zones out from a port. */
-  __phSeaNear: (p: number) => {
+  /** Takes the commander off the player's first led army, as the army card's leave button does (a fleet's leader when gold is short). */
+  __phFreeCommander: async () => {
+    if (!snapshot) return null;
+    const a = snapshot.armies;
+    const slot = a.id.findIndex((_, i) => a.owner[i] === snapshot!.playerNation && a.commander[i]! >= 0);
+    if (slot < 0) return null;
+    await act({ type: "appoint", army: a.id[slot]!, commander: -1 });
+    return snapshot.rejectedOrders.map((r) => r.reason);
+  },
+  /** The first commander of the player's free to lead (scripts/navy-shots.mjs), or -1. */
+  __phIdleCommander: (sea = false) => idleCommanders(sea)[0] ?? -1,
+  /** Declares war on a realm by id (scripts/navy-shots.mjs: a blockade). */
+  __phWar: (id: string) => act({ type: "declareWar", target: nationIndex.get(id)! }).then(() => snapshot?.rejectedOrders.map((r) => r.reason) ?? []),
+  /** The nearest sea zones (up to eight, nearest first), over the sea from port p, that lie beside a coastal province of a realm by id. */
+  __phSeaBy: (id: string, p: number) => {
+    const n = nationIndex.get(id)!;
+    const start = neighborIdx[p]!.filter((q) => isWater[q]);
+    const seen = new Set(start);
+    const found: number[] = [];
+    for (let i = 0; i < start.length && found.length < 8; i++) {
+      const z = start[i]!;
+      if (neighborIdx[z]!.some((q) => !isWater[q] && owners[q] === n)) found.push(z);
+      for (const q of neighborIdx[z]!) if (isWater[q] && !seen.has(q)) (seen.add(q), start.push(q));
+    }
+    return found;
+  },
+  /** Realms (ids, nearest first) with a coast on the seas around port p, the player's own left out. */
+  __phCoastRealms: (p: number) => {
+    const start = neighborIdx[p]!.filter((q) => isWater[q]);
+    const seen = new Set(start);
+    const found: string[] = [];
+    for (let i = 0; i < start.length && i < 60; i++) {
+      for (const q of neighborIdx[start[i]!]!) {
+        if (isWater[q]) {
+          if (!seen.has(q)) (seen.add(q), start.push(q));
+        } else if (owners[q]! >= 0 && owners[q] !== snapshot?.playerNation && !found.includes(nations[owners[q]!]!.id)) found.push(nations[owners[q]!]!.id);
+      }
+    }
+    return found;
+  },
+  /** A coastal sea zone two zones out from a port, or the one beside it when `out` is 1. */
+  __phSeaNear: (p: number, out = 2) => {
     const first = neighborIdx[p]!.find((q) => isWater[q]);
-    return first === undefined ? -1 : (neighborIdx[first]!.find((q) => isWater[q] && !neighborIdx[q]!.includes(p)) ?? first);
+    if (first === undefined || out < 2) return first ?? -1;
+    return neighborIdx[first]!.find((q) => isWater[q] && !neighborIdx[q]!.includes(p)) ?? first;
   },
   /** Province index by id, and its map point. */
   __phProvince: (id: string) => provinceIndex.get(id),
+  __phProvinceId: (p: number) => provinces[p]!.id,
   __phPoint: (p: number) => [provinces[p]!.x!, provinces[p]!.y!],
   /** Id of the player's capital province. */
   __phCapital: () => (snapshot ? nations[snapshot.playerNation]!.capital : null),
@@ -6429,6 +8513,8 @@ Object.assign(globalThis, {
   __phTraderPath: () => (snapshot?.trade?.traders[0]?.path ?? []).map((p) => provinces[p]!.id),
   /** The traders drawn close in, with their tap boxes in CSS pixels (VIEW-123, VIEW-125). */
   __phTraderBoxes: () => traderHitBoxes.slice(),
+  /** Gold banked on the map now, coins still showing (TRADE-157). */
+  __phBankings: () => bankings.length,
   /** Centres the map on the player's first trader walking over land, at a zoom. */
   __phLookAtTrader: (zoom: number) => {
     const w = snapshot?.traderWalks.find((x) => x.mine && x.medium === "land" && x.from !== x.to) ?? snapshot?.traderWalks[0];
@@ -6449,6 +8535,7 @@ Object.assign(globalThis, {
     realmView = -1;
     newsView = false;
     empireOpen = false;
+    shogunateOpen = false;
     panelCollapsed = false;
     renderPanel();
   },
@@ -6476,6 +8563,17 @@ Object.assign(globalThis, {
     selected.add(snapshot.armies.id[k]!);
     view.lookAt(...armyPosition(k), zoom);
   },
+  /** Centres the map on the player's first fleet, at a zoom; false when it has none. */
+  __phLookAtFleet: (zoom = 20) => {
+    const f = snapshot?.navy.fleets.find((g) => g.owner === snapshot!.playerNation);
+    if (!f) return false;
+    // In port its hulls lie at the town's berths.
+    if (isWater[f.at]) view.lookAt(...fleetPosition(f), zoom);
+    else view.lookAt(provinces[f.at]!.x!, provinces[f.at]!.y!, zoom);
+    return true;
+  },
+  /** The tap boxes of the fleets drawn now, on screen (scripts/fleet-path-shots.mjs). */
+  __phFleetBoxes: () => fleetHitBoxes.map((b) => ({ ...b })),
   /** Centres the map on the first battle, if any. */
   __phLookAtBattle: (zoom = 8) => {
     const b = snapshot?.battles[0];
@@ -6490,6 +8588,27 @@ Object.assign(globalThis, {
     view.lookAt(p.x!, p.y!, zoom);
     return p.id;
   },
+  /** Shows a peace offer from a realm as if its AI had sent it, for screenshots (a short play-through rarely reaches one). */
+  __phPretendOffer: (id: string, terms: "take" | "white" | "give" = "white") => {
+    if (!snapshot) return;
+    snapshot.peaceOffers.push({ id: 900000 + snapshot.peaceOffers.length, from: nationIndex.get(id)!, terms });
+    logNews({ ...snapshot, news: [], rejectedOrders: [] });
+    renderHud();
+    renderPanel();
+  },
+  /** A chapter as if it had just closed, from the standings now, to look at the chapter card (SHELL-183). */
+  __phPretendChapter: () => {
+    if (!snapshot) return;
+    const v = snapshot.campaign;
+    const me = snapshot.playerNation;
+    const leaders = [0, 1, 2].map((k) => v.ledger.filter((r) => r.ranks[k] === 1).map((r) => r.nation)) as [number[], number[], number[]];
+    const mine = v.ledger.find((r) => r.nation === me);
+    v.chapters = [...v.chapters, { n: v.chapter.n, from: v.chapter.from, to: v.chapter.to, realm: me, growth: mine?.growth ?? [1, 1, 1], ranks: mine?.ranks ?? [1, 1, 1], realms: v.realms, leaders, leaderGrowth: [0, 1, 2].map((k) => v.ledger.find((r) => r.ranks[k] === 1)?.growth[k] ?? 1) as [number, number, number], ledger: v.ledger.map((r) => ({ nation: r.nation, growth: r.growth, ranks: r.ranks })), last: false }];
+    watchChapter();
+    renderPanel();
+  },
+  /** The camera as x, y and zoom, to check that selecting moves nothing (SHELL-138). */
+  __phCamera: () => ({ ...view.camera }),
   __phLookAtWar: () => {
     const p = snapshot?.sieges[0]?.province ?? occupiers.findIndex((o) => o >= 0);
     if (p >= 0) view.lookAt(provinces[p]!.x!, provinces[p]!.y!, 4);
@@ -6820,7 +8939,8 @@ async function mpResolve(all: PlayerOrders[], quick: boolean): Promise<void> {
   logNews(snapshot!);
   for (const r of snapshot!.rejectedOrders) alertPlayer(`Not done: ${r.reason}.`, "scroll");
   if (!quick) return endTurn(true);
-  while (snapshot!.turn === t) takeSnapshot(await engine.send({ type: "advance", steps: 42 }), 0);
+  // A day at a time, as the playback steps: a week played in one go can end apart from one played by the day.
+  while (snapshot!.turn === t) takeSnapshot(await engine.send({ type: "advance", steps: playbackAdvance(snapshot!.hour, snapshot!.battles.some((b) => b.player)) }), 0);
   applySnapshot();
   logNews(snapshot!);
   restyleProvinces();
@@ -6832,6 +8952,7 @@ function mpWeekEnded(): void {
   const m = mp;
   if (!m || !snapshot) return;
   m.weekHash = snapshot.hash || m.weekHash;
+  (m.hashes ??= [])[snapshot.turn] = m.weekHash;
   m.orders.clear();
   m.waiting = false;
   if (m.mode === "hotseat") mpCover(m.local[0]!);

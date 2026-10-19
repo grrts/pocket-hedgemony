@@ -455,9 +455,14 @@ export function storeBackup(platform: "steam" | "android" | "ios" | "web"): Reco
   return { ...(savesConfig.cloud.store_backups as unknown as Record<string, Record<string, unknown>>)[platform] };
 }
 
-/** Sign-in options (SAVE-059): email and password at launch; Google on iOS brings Sign in with Apple. */
+/**
+ * Sign-in options (SAVE-059): each platform's store sign-ins first, email last; on iOS any
+ * third-party sign-in brings Sign in with Apple.
+ */
 export function signInOptions(platform: string, later: readonly string[] = []): string[] {
-  const opts = [...savesConfig.sign_in.at_launch, ...later];
-  if (platform === "ios" && opts.includes("Google") && !opts.includes(savesConfig.sign_in.google_on_ios_needs)) opts.push(savesConfig.sign_in.google_on_ios_needs);
+  const byPlatform = savesConfig.sign_in.at_launch as Record<string, readonly string[]>;
+  const opts = [...(byPlatform[platform] ?? byPlatform.web ?? []), ...later.filter((o) => !(byPlatform[platform] ?? []).includes(o))];
+  const apple = savesConfig.sign_in.ios_needs;
+  if (platform === "ios" && opts.some((o) => o !== apple && o !== "email and password") && !opts.includes(apple)) opts.unshift(apple);
   return opts;
 }

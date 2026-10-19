@@ -1,4 +1,5 @@
 import type { Rng } from "../../rng.ts";
+import { START_YEAR } from "../../../../rules/src/start.ts";
 import { holds, holdsIfBound, holdsSoFar, leaves, resolve, type Ctx, type LeafEval } from "./conditions.ts";
 import { applyEffects, effectType, type Applied, type EffectCtx, type EffectEval } from "./effects.ts";
 import { expired } from "./modifiers.ts";
@@ -6,6 +7,7 @@ import { deriveAll } from "./mapping.ts";
 import {
   balance,
   eventsConfig,
+  inRegion,
   monthIndex,
   now,
   type AgeDef,
@@ -214,8 +216,8 @@ export function ageBegunIn(s: EventState, age: string, region: string): boolean 
   return !!a && s.world.ages.includes(age) && a.regions.includes(region);
 }
 
-/** Periods with `start: initial` are active at the 1444 start (EVT-015). */
-export function startCampaign(s: EventState, year = eventsConfig.campaign.start_year): void {
+/** Periods with `start: initial` are active at the start (EVT-015). */
+export function startCampaign(s: EventState, year = START_YEAR): void {
   for (const p of s.periods) {
     if (p.start === "initial" && year >= p.window[0] && year <= p.window[1] && !s.world.periods.includes(p.id)) {
       s.world.periods.push(p.id);
@@ -272,7 +274,7 @@ export function roleCandidates(s: EventState, ev: EventDef, role: string): strin
   const out: string[] = [];
   for (const id in s.world.countries) {
     const c = s.world.countries[id]!;
-    if (c.exists === false || (sel.where !== undefined && `region:${c.region}` !== sel.where)) continue;
+    if (c.exists === false || (sel.where !== undefined && !inRegion(c.region, sel.where))) continue;
     ctx.this = id;
     if (holdsIfBound(sel.condition, s.world, ctx) === true) out.push(id);
   }

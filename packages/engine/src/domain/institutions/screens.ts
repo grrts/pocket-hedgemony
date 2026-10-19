@@ -29,12 +29,19 @@ export function empireBadge(role: "Emperor" | "Elector" | "Member" | null): stri
 /** INST-081: the Empire card's folds, in order. */
 export const EMPIRE_FOLDS = ["Election", "Reforms", "Members", "Hold"] as const;
 
+/** INST-082: the Shogunate card's folds, in order. */
+export const SHOGUNATE_FOLDS = ["Houses", "The Court", "Hold"] as const;
+
+/** INST-082: the warning line while hold is Weak or lower. */
+export const BREAK_WARNING = "At hold 0 the houses break away";
+
 /** INST-084: the Institutions map mode's key: each colour with its pattern, so it reads without colour too. */
 export const INSTITUTIONS_KEY = [
-  { what: "The Emperor's land", colour: "gold", pattern: "solid" },
+  { what: "The Emperor's or the Shogun's land", colour: "gold", pattern: "solid" },
   { what: "Members' land", colour: "light gold", pattern: "solid" },
   { what: "An elector's seat", colour: "light gold", pattern: "seat mark" },
   { what: "Imperial land held by an outsider", colour: "red", pattern: "hatched" },
+  { what: "A great house of Japan", colour: "the house's own", pattern: "house border" },
 ] as const;
 
 /** INST-083: what silence on an answer card counts as. */

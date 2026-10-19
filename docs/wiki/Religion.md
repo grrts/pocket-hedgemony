@@ -160,25 +160,25 @@ You can't adopt by decision again within 30 years; events aren't limited. After 
 
 ### Holy places
 
-Holy places are a fixed list of named provinces, each with its faiths and its 1444 holder:
+Holy places are a fixed list of named provinces, each with its faiths and its holder on 20 September 1378:
 
-| Holy place | Faiths | Held in 1444 by |
+| Holy place | Faiths | Held at the start by |
 |---|---|---|
 | Rome | catholic | Papal States |
 | Jerusalem | catholic, orthodox, oriental_christian, jewish, sunni, shia | Mamluk Sultanate |
 | Mecca and Medina | sunni, shia, ibadi | Hejaz (the Sharifs, not their Mamluk overlord) |
-| Karbala and Najaf | shia | Qara Qoyunlu |
+| Karbala and Najaf | shia | Jalayirids |
 | Constantinople | orthodox | Byzantium |
-| Echmiadzin | oriental_christian | Qara Qoyunlu |
+| Echmiadzin | oriental_christian | Jalayirids |
 | Aksum | oriental_christian | Ethiopia |
-| Varanasi | hindu | Jaunpur |
+| Varanasi | hindu | Delhi (Jaunpur is not yet born) |
 | Lhasa | vajrayana | Tibet |
-| Temple of the Tooth | theravada | Kotte, then Kandy from 1592 |
+| Temple of the Tooth | theravada | Gampola, then Kandy from 1592 |
 | Mount Wutai | mahayana | Ming |
 | Qufu | confucian_ritual | Ming |
 | Ise | shinto | Japan |
 | Santiago de Compostela | catholic | Castile |
-| Bodh Gaya | theravada, mahayana, vajrayana | Jaunpur |
+| Bodh Gaya | theravada, mahayana, vajrayana | Delhi |
 
 Amritsar appears as a holy place only once the founding of the Sikh Panth has happened, not before 1577. A holy place is always held by whoever owns its province.
 
@@ -205,7 +205,7 @@ Anglican and Protestant churches are headed by their own crowns, and every other
 - **Censure.** Declaring war on a ruler of your own faith, to take land, for tribute, to raid or with no aim, brings the head's censure: *Censured by the Pope* (−25) with every realm of the faith while the war lasts and fading over 10 years after, your lords of the faith waver once, and every fellow believer holds the *Punish* aim against you. A peace that gives back everything you took ends it at once. Crown-headed churches are never censured.
 - **Raise our own patriarch**, once, for an Orthodox realm with a great Orthodox house in its capital while Constantinople is held by another faith, for 40 gold: its church becomes crown-headed and it gets 1 more preacher.
 
-In 1444 the Pope has no patron, Byzantium is the Ecumenical Patriarch's patron, the Qara Qoyunlu the Catholicos's, and the Mamluks hold the Caliph's claim as overlord of the Hejaz.
+**The Schism.** On the start day there are two Popes: Urban VI in Rome, and Clement VII, elected at Fondi that day, who goes to Avignon. Each Catholic realm holds an **obedience** to one of them, and its Pope is the one whose censure, patronage and calls count for it. On 20 September 1378, 150 realms and lords follow Rome (the Empire, England, Hungary and Poland, Scandinavia, most of Italy), 30 follow Avignon (France and its great fiefs, Scotland, Naples, Savoy, Cyprus) and 22 have not chosen, among them Castile, Aragon, Portugal and Navarre. The Council of Pisa (1409) can add a third Pope and the Council of Constance (1414 to 1418) can end the Schism; both are events. At the start Byzantium is the Ecumenical Patriarch's patron, the Jalayirids the Catholicos's, and the Mamluks hold the Caliph's claim as overlord of the Hejaz.
 
 ### What each faith does differently
 
@@ -247,20 +247,21 @@ Religion adds ten new events: the princes adopting the Reformation (1525 to 1563
 
 For event writers, religion provides the conditions `faith_policy`, `holds_holy_place` and `faith_wave_active`, and the effects `faith_wave`, `faith_policy` (Tolerated, Restricted or Persecuted; Established is set only by `religion`) and `preachers` (extra preachers for some years, or for good with 0). The `religion` and `religion_share` conditions read the mix and the state faith directly, and `spread` still shifts a share at once.
 
-### The start in 1444
+### The start
 
-Each country gets its ruler's faith from the catalogue, and each province the mix of the record that owns it, adjusted by region overrides. Where the people's majority differs from the ruler's faith, the ruler's faith starts at 15 % (court, garrison and town), as for sunni Delhi over a hindu people, catholic Lithuania over orthodox people, or sunni Mali over african_traditional people. A community not otherwise sized starts at 5 %.
+Each country gets its ruler's faith from the catalogue, and each province the mix of the record that owns it, adjusted by region overrides. Where the people's majority differs from the ruler's faith, the ruler's faith starts at 15 % (court, garrison and town), as for sunni Delhi over a hindu people, pagan Lithuania over orthodox people, or sunni Mali over african_traditional people. A community not otherwise sized starts at 5 %.
 
 | Region override | Starting mix |
 |---|---|
 | The Balkans under the Ottomans | orthodox 85 %, sunni 15 % |
-| Bohemia | hussite 70 %, catholic 27 %, jewish 3 % |
 | Granada | sunni 95 %, jewish 3 %, catholic 2 % |
 | The north Java coast | hindu 55 %, sunni 25 %, asian_traditional 20 % |
 | Punjab | hindu 55 %, sunni 45 % |
 | Persia | sunni 80 %, shia 20 % |
 | Egypt | sunni 88 %, oriental_christian 10 %, jewish 2 % |
 | Polish towns | 5 % more jewish |
+
+There are no Hussites at the start: Bohemia is Catholic until Hus is burned (1415) and the Defenestration of Prague (1419), and only then does the Hussite mix (hussite 70 %, catholic 27 %, jewish 3 %) come in by event. Lithuania and Samogitia keep their own **Baltic traditional** faith until their baptisms (Jogaila's in 1386 and 1387, Samogitia's in 1413), which are events.
 
 ### What religion gives other systems
 
@@ -290,7 +291,7 @@ Once a year, alongside traders and the trade balance: pulls, hold and the 3 % mo
 
 ### In the game now
 
-Every province starts in 1444 with up to three faiths from its realm's start mix, with area overrides (Hussite Bohemia, Orthodox Balkans under the Ottomans). Communities of a tenth or more start with a house of worship where their faith has one.
+Every province starts with up to three faiths from its realm's start mix, with area overrides (such as the Orthodox Balkans under the Ottomans). Communities of a tenth or more start with a house of worship where their faith has one.
 
 - **Province card, Faith line**: each faith's share with ↑ or ↓. Tap it for this year's pulls per faith and their sources (houses, your capital, your policy), each community's state, any grievance, and how many points a year the mix moves toward which faith.
 - **Your realm card, Peoples tab**: the state faith, Faith %, and a card per faith in your realm with its share, people and provinces. The state faith is Established; every other faith has three buttons, **Tolerated**, **Restricted** and **Persecuted**, which are your tolerance for that faith. A change is shown as pending and takes effect at New Year; tap the current policy to cancel it.
@@ -321,11 +322,13 @@ Not in yet: building or paying for houses, preachers, expulsion and the Inquisit
 - [Recruiting](Recruiting): a Chaplain commander's "Beloved" trait reads the army's faith share.
 - [Subjects](Subjects): preachers enter subjects without permission.
 - [Revolutions](Revolutions): faith revolutions use waves; regimes may lead to the church events.
-- [The-1444-Start](The-1444-Start): the ruler's faith and each province's starting mix.
+- [The 1378 Start](The-1378-Start): the ruler's faith and each province's starting mix.
 - [Map and Map Modes](Map-and-Lenses): the Faith map mode, house sprites, preachers and wave tint.
 - [Time-and-Turns](Time-and-Turns): the yearly slot and New Year policy changes.
 
 ## Numbers
+
+Every value the game uses, made from its config so it always matches the game: [Religion data](Data-Religion). How they combine: [Formulas](Formulas).
 
 All numbers are **first-pass placeholders** in `religion.yaml`. Four defaults were kept on 16 October (still config values): communities at 10 %, *Wrong faith* at a third, the 25 % faith tax and the 3 % yearly move. The three-faith limit is a storage limit, not a balance number.
 

@@ -297,7 +297,7 @@ const LOYALTY_RANK = ["Loyal", "Wavering", "Disloyal", "In revolt"];
 /** Runs a warfare rule over realm n's lords as the rule library sees them, and keeps the loyalty it gives them. */
 function withLords(world: World, n: number, rule: (lords: (Lord & { warlike?: boolean })[]) => void, why: string, news: News[]): number {
   const ks: number[] = [];
-  world.lords.forEach((l, k) => l.nation === n && ks.push(k));
+  world.lords.forEach((l, k) => l.nation === n && !l.gone && ks.push(k));
   const views = ks.map((k) => {
     const l = world.lords[k]!;
     return { name: l.name, house: l.house, provinces: [], retinue: 0, wealth: 0, traits: lordTraits(world, k), loyalty: l.loyalty, sons: [] } as Lord & { warlike?: boolean };

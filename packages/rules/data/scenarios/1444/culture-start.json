@@ -1,0 +1,4884 @@
+{
+  "$comment": "The 1444 tongues of each map realm (CULT-009, CULT-086), mapped once from the catalogue's culture strings; shares are provisional. tongues: tongues not already in culture.json. realms: map nation id -> court tongue and up to three tongues with shares of the people.",
+  "_provisional": [
+    "realms.*.mix"
+  ],
+  "tongues": {
+    "great_russian": {
+      "name": "Great Russian",
+      "family": "slavic",
+      "way_of_life": "settled"
+    },
+    "ruthenian": {
+      "name": "Ruthenian",
+      "family": "slavic",
+      "way_of_life": "settled"
+    },
+    "andalusi_arabic": {
+      "name": "Andalusi Arabic",
+      "family": "arab",
+      "way_of_life": "settled"
+    },
+    "basque": {
+      "name": "Basque",
+      "family": "caucasian",
+      "way_of_life": "settled"
+    },
+    "galician": {
+      "name": "Galician",
+      "family": "latin",
+      "way_of_life": "settled"
+    },
+    "cherokee": {
+      "name": "Cherokee",
+      "family": "iroquoian",
+      "way_of_life": "forest"
+    },
+    "welsh": {
+      "name": "Welsh",
+      "family": "celtic",
+      "way_of_life": "settled"
+    },
+    "lowland_scots": {
+      "name": "Lowland Scots",
+      "family": "germanic",
+      "way_of_life": "settled"
+    },
+    "gaelic_scottish": {
+      "name": "Scottish Gaelic",
+      "family": "celtic",
+      "way_of_life": "herding"
+    },
+    "franco_provencal": {
+      "name": "Franco-Provençal",
+      "family": "latin",
+      "way_of_life": "settled"
+    },
+    "piedmontese": {
+      "name": "Piedmontese",
+      "family": "latin",
+      "way_of_life": "settled"
+    },
+    "aragonese": {
+      "name": "Aragonese",
+      "family": "latin",
+      "way_of_life": "settled"
+    },
+    "emilian": {
+      "name": "Emilian-Romagnol",
+      "family": "latin",
+      "way_of_life": "settled"
+    },
+    "venetian": {
+      "name": "Venetian",
+      "family": "latin",
+      "way_of_life": "seafaring"
+    },
+    "friulian": {
+      "name": "Friulian",
+      "family": "latin",
+      "way_of_life": "settled"
+    },
+    "ligurian": {
+      "name": "Ligurian",
+      "family": "latin",
+      "way_of_life": "seafaring"
+    },
+    "slovene": {
+      "name": "Slovene",
+      "family": "slavic",
+      "way_of_life": "settled"
+    },
+    "czech": {
+      "name": "Czech",
+      "family": "slavic",
+      "way_of_life": "settled"
+    },
+    "sorbian": {
+      "name": "Sorbian",
+      "family": "slavic",
+      "way_of_life": "settled"
+    },
+    "polish": {
+      "name": "Polish",
+      "family": "slavic",
+      "way_of_life": "settled"
+    },
+    "old_prussian": {
+      "name": "Old Prussian",
+      "family": "baltic",
+      "way_of_life": "forest"
+    },
+    "estonian": {
+      "name": "Estonian",
+      "family": "uralic",
+      "way_of_life": "settled"
+    },
+    "danish": {
+      "name": "Danish",
+      "family": "germanic",
+      "way_of_life": "seafaring"
+    },
+    "norwegian": {
+      "name": "Norwegian",
+      "family": "germanic",
+      "way_of_life": "seafaring"
+    },
+    "finnish": {
+      "name": "Finnish",
+      "family": "uralic",
+      "way_of_life": "forest"
+    },
+    "sami": {
+      "name": "Sámi",
+      "family": "uralic",
+      "way_of_life": "herding"
+    },
+    "hungarian": {
+      "name": "Hungarian",
+      "family": "uralic",
+      "way_of_life": "settled"
+    },
+    "croatian": {
+      "name": "Croatian",
+      "family": "slavic",
+      "way_of_life": "settled"
+    },
+    "slovak": {
+      "name": "Slovak",
+      "family": "slavic",
+      "way_of_life": "settled"
+    },
+    "romanian": {
+      "name": "Romanian",
+      "family": "latin",
+      "way_of_life": "settled"
+    },
+    "bulgarian": {
+      "name": "Bulgarian",
+      "family": "slavic",
+      "way_of_life": "settled"
+    },
+    "serbian": {
+      "name": "Serbian",
+      "family": "slavic",
+      "way_of_life": "settled"
+    },
+    "aromanian": {
+      "name": "Vlach (Aromanian)",
+      "family": "latin",
+      "way_of_life": "herding"
+    },
+    "albanian": {
+      "name": "Albanian",
+      "family": "hellenic",
+      "way_of_life": "herding"
+    },
+    "dalmatian": {
+      "name": "Dalmatian",
+      "family": "latin",
+      "way_of_life": "seafaring"
+    },
+    "greek": {
+      "name": "Greek",
+      "family": "hellenic",
+      "way_of_life": "seafaring"
+    },
+    "turkish": {
+      "name": "Turkish",
+      "family": "turkic",
+      "way_of_life": "settled"
+    },
+    "turkmen": {
+      "name": "Turkmen",
+      "family": "turkic",
+      "way_of_life": "herding"
+    },
+    "laz": {
+      "name": "Laz",
+      "family": "caucasian",
+      "way_of_life": "seafaring"
+    },
+    "kurdish": {
+      "name": "Kurdish",
+      "family": "iranian",
+      "way_of_life": "herding"
+    },
+    "persian": {
+      "name": "Persian",
+      "family": "iranian",
+      "way_of_life": "settled"
+    },
+    "ossetian": {
+      "name": "Ossetian",
+      "family": "iranian",
+      "way_of_life": "herding"
+    },
+    "azerbaijani": {
+      "name": "Azerbaijani",
+      "family": "turkic",
+      "way_of_life": "settled"
+    },
+    "lezgin": {
+      "name": "Lezgin",
+      "family": "caucasian",
+      "way_of_life": "herding"
+    },
+    "komi": {
+      "name": "Komi",
+      "family": "uralic",
+      "way_of_life": "forest"
+    },
+    "karelian": {
+      "name": "Karelian",
+      "family": "uralic",
+      "way_of_life": "forest"
+    },
+    "mordvin": {
+      "name": "Mordvin",
+      "family": "uralic",
+      "way_of_life": "forest"
+    },
+    "kazan_tatar": {
+      "name": "Kazan Tatar",
+      "family": "turkic",
+      "way_of_life": "settled"
+    },
+    "chuvash": {
+      "name": "Chuvash",
+      "family": "turkic",
+      "way_of_life": "settled"
+    },
+    "mari": {
+      "name": "Mari",
+      "family": "uralic",
+      "way_of_life": "forest"
+    },
+    "tatar": {
+      "name": "Tatar (Kipchak steppe)",
+      "family": "turkic",
+      "way_of_life": "herding"
+    },
+    "crimean_tatar": {
+      "name": "Crimean Tatar",
+      "family": "turkic",
+      "way_of_life": "herding"
+    },
+    "nogai": {
+      "name": "Nogai",
+      "family": "turkic",
+      "way_of_life": "herding"
+    },
+    "uzbek": {
+      "name": "Uzbek",
+      "family": "turkic",
+      "way_of_life": "herding"
+    },
+    "ob_ugrian": {
+      "name": "Ob-Ugrian (Khanty and Mansi)",
+      "family": "uralic",
+      "way_of_life": "forest"
+    },
+    "circassian": {
+      "name": "Circassian",
+      "family": "caucasian",
+      "way_of_life": "herding"
+    },
+    "egyptian_arabic": {
+      "name": "Egyptian Arabic",
+      "family": "arab",
+      "way_of_life": "settled"
+    },
+    "levantine_arabic": {
+      "name": "Levantine Arabic",
+      "family": "arab",
+      "way_of_life": "settled"
+    },
+    "bedouin_arabic": {
+      "name": "Bedouin Arabic",
+      "family": "arab",
+      "way_of_life": "herding"
+    },
+    "hejazi_arabic": {
+      "name": "Hejazi Arabic",
+      "family": "arab",
+      "way_of_life": "trading"
+    },
+    "yemeni_arabic": {
+      "name": "Yemeni Arabic",
+      "family": "arab",
+      "way_of_life": "settled"
+    },
+    "omani_arabic": {
+      "name": "Omani Arabic",
+      "family": "arab",
+      "way_of_life": "seafaring"
+    },
+    "chagatai": {
+      "name": "Chagatai Turkic",
+      "family": "turkic",
+      "way_of_life": "herding"
+    },
+    "moghul": {
+      "name": "Moghul",
+      "family": "turkic",
+      "way_of_life": "herding"
+    },
+    "uyghur": {
+      "name": "Uyghur (Tarim oasis Turks)",
+      "family": "turkic",
+      "way_of_life": "settled"
+    },
+    "kyrgyz": {
+      "name": "Kyrgyz",
+      "family": "turkic",
+      "way_of_life": "herding"
+    },
+    "oirat": {
+      "name": "Oirat",
+      "family": "mongolic",
+      "way_of_life": "herding"
+    },
+    "mongol": {
+      "name": "Mongol",
+      "family": "mongolic",
+      "way_of_life": "herding"
+    },
+    "tibetan": {
+      "name": "Tibetan",
+      "family": "tibeto_burman",
+      "way_of_life": "settled"
+    },
+    "korean": {
+      "name": "Korean",
+      "family": "koreanic",
+      "way_of_life": "settled"
+    },
+    "japanese": {
+      "name": "Japanese",
+      "family": "japonic",
+      "way_of_life": "settled"
+    },
+    "vietnamese": {
+      "name": "Vietnamese",
+      "family": "austroasiatic",
+      "way_of_life": "settled"
+    },
+    "muong": {
+      "name": "Mường",
+      "family": "austroasiatic",
+      "way_of_life": "settled"
+    },
+    "tay": {
+      "name": "Tày (upland Tai)",
+      "family": "tai",
+      "way_of_life": "forest"
+    },
+    "cham": {
+      "name": "Cham",
+      "family": "austronesian",
+      "way_of_life": "seafaring"
+    },
+    "jarai": {
+      "name": "Highland Chamic (Jarai, Rade)",
+      "family": "austronesian",
+      "way_of_life": "forest"
+    },
+    "lao": {
+      "name": "Lao",
+      "family": "tai",
+      "way_of_life": "settled"
+    },
+    "khmu": {
+      "name": "Khmu",
+      "family": "austroasiatic",
+      "way_of_life": "forest"
+    },
+    "tai_yuan": {
+      "name": "Tai Yuan",
+      "family": "tai",
+      "way_of_life": "settled"
+    },
+    "lawa": {
+      "name": "Lawa",
+      "family": "austroasiatic",
+      "way_of_life": "forest"
+    },
+    "tai_lue": {
+      "name": "Tai Lue and Khün",
+      "family": "tai",
+      "way_of_life": "settled"
+    },
+    "thai": {
+      "name": "Siamese",
+      "family": "tai",
+      "way_of_life": "settled"
+    },
+    "khmer": {
+      "name": "Khmer",
+      "family": "austroasiatic",
+      "way_of_life": "settled"
+    },
+    "mon": {
+      "name": "Mon",
+      "family": "austroasiatic",
+      "way_of_life": "settled"
+    },
+    "burmese": {
+      "name": "Burmese",
+      "family": "tibeto_burman",
+      "way_of_life": "settled"
+    },
+    "shan": {
+      "name": "Shan",
+      "family": "tai",
+      "way_of_life": "settled"
+    },
+    "kadu": {
+      "name": "Kadu",
+      "family": "tibeto_burman",
+      "way_of_life": "forest"
+    },
+    "karen": {
+      "name": "Karen",
+      "family": "tibeto_burman",
+      "way_of_life": "forest"
+    },
+    "javanese": {
+      "name": "Javanese",
+      "family": "austronesian",
+      "way_of_life": "settled"
+    },
+    "madurese": {
+      "name": "Madurese",
+      "family": "austronesian",
+      "way_of_life": "seafaring"
+    },
+    "malay": {
+      "name": "Malay",
+      "family": "austronesian",
+      "way_of_life": "trading"
+    },
+    "orang_laut": {
+      "name": "Orang Laut",
+      "family": "austronesian",
+      "way_of_life": "seafaring"
+    },
+    "kedayan": {
+      "name": "Kedayan",
+      "family": "austronesian",
+      "way_of_life": "settled"
+    },
+    "dayak": {
+      "name": "Dayak (interior Borneo)",
+      "family": "austronesian",
+      "way_of_life": "forest"
+    },
+    "hindustani": {
+      "name": "Hindustani",
+      "family": "indo_aryan",
+      "way_of_life": "settled"
+    },
+    "awadhi": {
+      "name": "Awadhi",
+      "family": "indo_aryan",
+      "way_of_life": "settled"
+    },
+    "bhojpuri": {
+      "name": "Bhojpuri",
+      "family": "indo_aryan",
+      "way_of_life": "settled"
+    },
+    "bengali": {
+      "name": "Bengali",
+      "family": "indo_aryan",
+      "way_of_life": "settled"
+    },
+    "deccani": {
+      "name": "Deccani",
+      "family": "indo_aryan",
+      "way_of_life": "settled"
+    },
+    "marathi": {
+      "name": "Marathi",
+      "family": "indo_aryan",
+      "way_of_life": "settled"
+    },
+    "telugu": {
+      "name": "Telugu",
+      "family": "dravidian",
+      "way_of_life": "settled"
+    },
+    "kannada": {
+      "name": "Kannada",
+      "family": "dravidian",
+      "way_of_life": "settled"
+    },
+    "tamil": {
+      "name": "Tamil",
+      "family": "dravidian",
+      "way_of_life": "seafaring"
+    },
+    "gujarati": {
+      "name": "Gujarati",
+      "family": "indo_aryan",
+      "way_of_life": "trading"
+    },
+    "bhil": {
+      "name": "Bhil",
+      "family": "indo_aryan",
+      "way_of_life": "forest"
+    },
+    "malvi": {
+      "name": "Malvi",
+      "family": "indo_aryan",
+      "way_of_life": "settled"
+    },
+    "gond": {
+      "name": "Gond",
+      "family": "dravidian",
+      "way_of_life": "forest"
+    },
+    "rajasthani": {
+      "name": "Rajasthani",
+      "family": "indo_aryan",
+      "way_of_life": "settled"
+    },
+    "odia": {
+      "name": "Odia",
+      "family": "indo_aryan",
+      "way_of_life": "settled"
+    },
+    "khond": {
+      "name": "Khond",
+      "family": "dravidian",
+      "way_of_life": "forest"
+    },
+    "kashmiri": {
+      "name": "Kashmiri",
+      "family": "indo_aryan",
+      "way_of_life": "settled"
+    },
+    "dard": {
+      "name": "Dard",
+      "family": "indo_aryan",
+      "way_of_life": "herding"
+    },
+    "punjabi": {
+      "name": "Punjabi",
+      "family": "indo_aryan",
+      "way_of_life": "settled"
+    },
+    "baluch": {
+      "name": "Baluch",
+      "family": "iranian",
+      "way_of_life": "herding"
+    },
+    "sindhi": {
+      "name": "Sindhi",
+      "family": "indo_aryan",
+      "way_of_life": "settled"
+    },
+    "ahom": {
+      "name": "Ahom",
+      "family": "tai",
+      "way_of_life": "settled"
+    },
+    "assamese": {
+      "name": "Assamese",
+      "family": "indo_aryan",
+      "way_of_life": "settled"
+    },
+    "moran": {
+      "name": "Moran",
+      "family": "tibeto_burman",
+      "way_of_life": "forest"
+    },
+    "zenata": {
+      "name": "Zenata Berber",
+      "family": "berber",
+      "way_of_life": "herding"
+    },
+    "masmuda": {
+      "name": "Masmuda Berber",
+      "family": "berber",
+      "way_of_life": "settled"
+    },
+    "maghrebi_arabic": {
+      "name": "Maghrebi Arabic",
+      "family": "arab",
+      "way_of_life": "settled"
+    },
+    "soninke": {
+      "name": "Soninke",
+      "family": "mande",
+      "way_of_life": "trading"
+    },
+    "songhai": {
+      "name": "Songhai",
+      "family": "nilotic",
+      "way_of_life": "settled"
+    },
+    "wolof": {
+      "name": "Wolof",
+      "family": "hausa_fulani",
+      "way_of_life": "settled"
+    },
+    "serer": {
+      "name": "Serer",
+      "family": "hausa_fulani",
+      "way_of_life": "settled"
+    },
+    "mossi": {
+      "name": "Mossi",
+      "family": "akan",
+      "way_of_life": "settled"
+    },
+    "hausa": {
+      "name": "Hausa",
+      "family": "hausa_fulani",
+      "way_of_life": "settled"
+    },
+    "kanuri": {
+      "name": "Kanuri",
+      "family": "nilotic",
+      "way_of_life": "settled"
+    },
+    "kotoko": {
+      "name": "Kotoko (Sao)",
+      "family": "hausa_fulani",
+      "way_of_life": "settled"
+    },
+    "tubu": {
+      "name": "Tubu",
+      "family": "nilotic",
+      "way_of_life": "herding"
+    },
+    "edo": {
+      "name": "Edo",
+      "family": "yoruba_edo",
+      "way_of_life": "settled"
+    },
+    "yoruba": {
+      "name": "Yoruba",
+      "family": "yoruba_edo",
+      "way_of_life": "settled"
+    },
+    "amhara": {
+      "name": "Amhara",
+      "family": "semitic_ethiopian",
+      "way_of_life": "settled"
+    },
+    "tigrinya": {
+      "name": "Tigrinya",
+      "family": "semitic_ethiopian",
+      "way_of_life": "settled"
+    },
+    "agaw": {
+      "name": "Agaw",
+      "family": "cushitic",
+      "way_of_life": "settled"
+    },
+    "harla": {
+      "name": "Harla",
+      "family": "semitic_ethiopian",
+      "way_of_life": "settled"
+    },
+    "somali": {
+      "name": "Somali",
+      "family": "cushitic",
+      "way_of_life": "herding"
+    },
+    "afar": {
+      "name": "Afar",
+      "family": "cushitic",
+      "way_of_life": "herding"
+    },
+    "shona": {
+      "name": "Shona",
+      "family": "bantu",
+      "way_of_life": "settled"
+    },
+    "kongo": {
+      "name": "Kongo",
+      "family": "bantu",
+      "way_of_life": "settled"
+    },
+    "mbundu": {
+      "name": "Mbundu",
+      "family": "bantu",
+      "way_of_life": "settled"
+    },
+    "otomi": {
+      "name": "Otomi",
+      "family": "nahua",
+      "way_of_life": "settled"
+    },
+    "purepecha": {
+      "name": "Purépecha",
+      "family": "nahua",
+      "way_of_life": "settled"
+    },
+    "zapotec": {
+      "name": "Zapotec",
+      "family": "nahua",
+      "way_of_life": "settled"
+    },
+    "mixtec": {
+      "name": "Mixtec",
+      "family": "nahua",
+      "way_of_life": "settled"
+    },
+    "maya_yucatec": {
+      "name": "Yucatec Maya",
+      "family": "maya",
+      "way_of_life": "settled"
+    },
+    "quechua": {
+      "name": "Quechua",
+      "family": "andean",
+      "way_of_life": "settled"
+    },
+    "aymara": {
+      "name": "Aymara",
+      "family": "andean",
+      "way_of_life": "herding"
+    },
+    "chimu": {
+      "name": "Chimú (Quingnam)",
+      "family": "andean",
+      "way_of_life": "seafaring"
+    },
+    "mochica": {
+      "name": "Mochica",
+      "family": "andean",
+      "way_of_life": "settled"
+    },
+    "muisca": {
+      "name": "Muisca",
+      "family": "andean",
+      "way_of_life": "settled"
+    },
+    "haudenosaunee": {
+      "name": "Haudenosaunee (Iroquois)",
+      "family": "iroquoian",
+      "way_of_life": "forest"
+    },
+    "wendat": {
+      "name": "Wendat (Huron)",
+      "family": "iroquoian",
+      "way_of_life": "forest"
+    },
+    "muscogee": {
+      "name": "Muscogee (Creek)",
+      "family": "iroquoian",
+      "way_of_life": "forest"
+    },
+    "pueblo": {
+      "name": "Pueblo",
+      "family": "nahua",
+      "way_of_life": "settled"
+    },
+    "tamasheq": {
+      "name": "Tamasheq (Tuareg)",
+      "family": "berber",
+      "way_of_life": "herding"
+    },
+    "mozabite": {
+      "name": "Mozabite (Tumzabt)",
+      "family": "berber",
+      "way_of_life": "settled"
+    },
+    "zenaga": {
+      "name": "Zenaga",
+      "family": "berber",
+      "way_of_life": "herding"
+    },
+    "guanche": {
+      "name": "Canarian (Guanche)",
+      "family": "berber",
+      "way_of_life": "herding"
+    },
+    "beja": {
+      "name": "Beja (Bedawi)",
+      "family": "cushitic",
+      "way_of_life": "herding"
+    },
+    "hadiya": {
+      "name": "Hadiyya",
+      "family": "cushitic",
+      "way_of_life": "settled"
+    },
+    "kafa": {
+      "name": "Kafa",
+      "family": "cushitic",
+      "way_of_life": "settled"
+    },
+    "fur": {
+      "name": "Fur",
+      "family": "nilotic",
+      "way_of_life": "settled"
+    },
+    "zaghawa": {
+      "name": "Zaghawa",
+      "family": "nilotic",
+      "way_of_life": "herding"
+    },
+    "bulala": {
+      "name": "Bulala",
+      "family": "nilotic",
+      "way_of_life": "settled"
+    },
+    "kalenjin": {
+      "name": "Kalenjin",
+      "family": "nilotic",
+      "way_of_life": "herding"
+    },
+    "maa": {
+      "name": "Maa",
+      "family": "nilotic",
+      "way_of_life": "herding"
+    },
+    "akan": {
+      "name": "Akan (Twi, Fante)",
+      "family": "akan",
+      "way_of_life": "settled"
+    },
+    "gbe": {
+      "name": "Gbe (Aja, Ewe)",
+      "family": "akan",
+      "way_of_life": "settled"
+    },
+    "dagbani": {
+      "name": "Dagbani",
+      "family": "akan",
+      "way_of_life": "settled"
+    },
+    "bariba": {
+      "name": "Bariba (Baatonum)",
+      "family": "akan",
+      "way_of_life": "settled"
+    },
+    "voltaic": {
+      "name": "Voltaic peoples (Dogon, Gurunsi, Lobi, Dagara)",
+      "family": "akan",
+      "way_of_life": "settled"
+    },
+    "kru": {
+      "name": "Kru",
+      "family": "akan",
+      "way_of_life": "seafaring"
+    },
+    "susu": {
+      "name": "Susu-Jalonke",
+      "family": "mande",
+      "way_of_life": "settled"
+    },
+    "vai": {
+      "name": "Vai",
+      "family": "mande",
+      "way_of_life": "trading"
+    },
+    "balanta": {
+      "name": "Bak peoples (Balanta, Papel, Biafada)",
+      "family": "hausa_fulani",
+      "way_of_life": "settled"
+    },
+    "temne": {
+      "name": "Temne and other Mel peoples",
+      "family": "hausa_fulani",
+      "way_of_life": "settled"
+    },
+    "igala": {
+      "name": "Igala",
+      "family": "yoruba_edo",
+      "way_of_life": "settled"
+    },
+    "igbo": {
+      "name": "Igbo",
+      "family": "yoruba_edo",
+      "way_of_life": "settled"
+    },
+    "ijaw": {
+      "name": "Ijaw",
+      "family": "yoruba_edo",
+      "way_of_life": "seafaring"
+    },
+    "ibibio": {
+      "name": "Ibibio-Efik",
+      "family": "yoruba_edo",
+      "way_of_life": "settled"
+    },
+    "jukun": {
+      "name": "Jukun",
+      "family": "yoruba_edo",
+      "way_of_life": "settled"
+    },
+    "middle_belt": {
+      "name": "Middle Belt peoples (Gbagyi, Tiv, Idoma)",
+      "family": "yoruba_edo",
+      "way_of_life": "settled"
+    },
+    "ganda": {
+      "name": "Ganda",
+      "family": "bantu",
+      "way_of_life": "settled"
+    },
+    "kinyarwanda": {
+      "name": "Kinyarwanda",
+      "family": "bantu",
+      "way_of_life": "settled"
+    },
+    "rutara": {
+      "name": "Rutara (Nyoro, Nkore, Haya)",
+      "family": "bantu",
+      "way_of_life": "settled"
+    },
+    "kikuyu": {
+      "name": "Kikuyu",
+      "family": "bantu",
+      "way_of_life": "settled"
+    },
+    "comorian": {
+      "name": "Comorian",
+      "family": "bantu",
+      "way_of_life": "seafaring"
+    },
+    "venda": {
+      "name": "Venda",
+      "family": "bantu",
+      "way_of_life": "settled"
+    },
+    "tonga": {
+      "name": "Tonga (Zambezi)",
+      "family": "bantu",
+      "way_of_life": "settled"
+    },
+    "chewa": {
+      "name": "Chewa (Maravi)",
+      "family": "bantu",
+      "way_of_life": "settled"
+    },
+    "makua": {
+      "name": "Makua-Lomwe",
+      "family": "bantu",
+      "way_of_life": "settled"
+    },
+    "tsonga": {
+      "name": "Tsonga-Chopi",
+      "family": "bantu",
+      "way_of_life": "settled"
+    },
+    "nguni": {
+      "name": "Nguni",
+      "family": "bantu",
+      "way_of_life": "herding"
+    },
+    "sotho_tswana": {
+      "name": "Sotho-Tswana",
+      "family": "bantu",
+      "way_of_life": "herding"
+    },
+    "ovambo": {
+      "name": "Owambo and Nyaneka-Nkhumbi",
+      "family": "bantu",
+      "way_of_life": "herding"
+    },
+    "umbundu": {
+      "name": "Umbundu",
+      "family": "bantu",
+      "way_of_life": "settled"
+    },
+    "kasai": {
+      "name": "Kwango-Kasai peoples (Yaka, Pende, Kuba, Lele, Ruund)",
+      "family": "bantu",
+      "way_of_life": "settled"
+    },
+    "luba": {
+      "name": "Luba",
+      "family": "bantu",
+      "way_of_life": "settled"
+    },
+    "mongo": {
+      "name": "Mongo and equatorial forest peoples",
+      "family": "bantu",
+      "way_of_life": "forest"
+    },
+    "teke": {
+      "name": "Teke",
+      "family": "bantu",
+      "way_of_life": "settled"
+    },
+    "khoekhoe": {
+      "name": "Khoekhoe",
+      "family": "khoisan",
+      "way_of_life": "herding"
+    },
+    "san": {
+      "name": "San",
+      "family": "khoisan",
+      "way_of_life": "herding"
+    },
+    "malagasy": {
+      "name": "Malagasy",
+      "family": "austronesian",
+      "way_of_life": "settled"
+    },
+    "anishinaabe": {
+      "name": "Anishinaabemowin (Ojibwe, Odawa, Potawatomi)",
+      "family": "algonquian",
+      "way_of_life": "forest"
+    },
+    "lenape": {
+      "name": "Lenape (Unami, Munsee)",
+      "family": "algonquian",
+      "way_of_life": "forest"
+    },
+    "powhatan": {
+      "name": "Tidewater Algonquian (Powhatan, Carolina Algonquian)",
+      "family": "algonquian",
+      "way_of_life": "forest"
+    },
+    "massachusett": {
+      "name": "Southern New England Algonquian",
+      "family": "algonquian",
+      "way_of_life": "forest"
+    },
+    "shawnee": {
+      "name": "Fort Ancient (Shawnee)",
+      "family": "algonquian",
+      "way_of_life": "forest"
+    },
+    "salish": {
+      "name": "Coast Salish",
+      "family": "algonquian",
+      "way_of_life": "seafaring"
+    },
+    "wakashan": {
+      "name": "Wakashan (Kwak'wala, Nuu-chah-nulth)",
+      "family": "algonquian",
+      "way_of_life": "seafaring"
+    },
+    "tsimshian": {
+      "name": "Tsimshianic",
+      "family": "algonquian",
+      "way_of_life": "seafaring"
+    },
+    "tlingit": {
+      "name": "Tlingit",
+      "family": "algonquian",
+      "way_of_life": "seafaring"
+    },
+    "haida": {
+      "name": "Haida",
+      "family": "algonquian",
+      "way_of_life": "seafaring"
+    },
+    "neutral_erie": {
+      "name": "Neutral and Erie",
+      "family": "iroquoian",
+      "way_of_life": "forest"
+    },
+    "laurentian": {
+      "name": "Laurentian (St. Lawrence Iroquoian)",
+      "family": "iroquoian",
+      "way_of_life": "forest"
+    },
+    "caddo": {
+      "name": "Caddo",
+      "family": "iroquoian",
+      "way_of_life": "settled"
+    },
+    "pawnee": {
+      "name": "Central Plains Caddoan (Pawnee)",
+      "family": "iroquoian",
+      "way_of_life": "settled"
+    },
+    "mandan": {
+      "name": "Mandan",
+      "family": "iroquoian",
+      "way_of_life": "settled"
+    },
+    "ho_chunk": {
+      "name": "Chiwere and Ho-Chunk",
+      "family": "iroquoian",
+      "way_of_life": "forest"
+    },
+    "dakota": {
+      "name": "Dakota",
+      "family": "iroquoian",
+      "way_of_life": "forest"
+    },
+    "natchez": {
+      "name": "Natchez",
+      "family": "iroquoian",
+      "way_of_life": "settled"
+    },
+    "tunica": {
+      "name": "Tunica",
+      "family": "iroquoian",
+      "way_of_life": "settled"
+    },
+    "timucua": {
+      "name": "Timucua",
+      "family": "iroquoian",
+      "way_of_life": "forest"
+    },
+    "calusa": {
+      "name": "Calusa",
+      "family": "iroquoian",
+      "way_of_life": "seafaring"
+    },
+    "oodham": {
+      "name": "O'odham",
+      "family": "nahua",
+      "way_of_life": "settled"
+    },
+    "chumash": {
+      "name": "Chumash",
+      "family": "nahua",
+      "way_of_life": "seafaring"
+    }
+  },
+  "realms": {
+    "england": {
+      "court": "english",
+      "mix": [
+        [
+          "english",
+          0.93
+        ],
+        [
+          "welsh",
+          0.07
+        ]
+      ],
+      "local": {
+        "english": "English",
+        "welsh": "Welsh"
+      }
+    },
+    "scotland": {
+      "court": "lowland_scots",
+      "mix": [
+        [
+          "lowland_scots",
+          0.6
+        ],
+        [
+          "gaelic_scottish",
+          0.4
+        ]
+      ],
+      "local": {
+        "lowland_scots": "Lowland Scots",
+        "gaelic_scottish": "Gaelic Highland and Island society"
+      }
+    },
+    "ireland": {
+      "court": "gaelic_irish",
+      "mix": [
+        [
+          "gaelic_irish",
+          0.85
+        ],
+        [
+          "english",
+          0.15
+        ]
+      ],
+      "local": {},
+      "faith": "catholic"
+    },
+    "france": {
+      "court": "french",
+      "mix": [
+        [
+          "french",
+          0.78
+        ],
+        [
+          "occitan",
+          0.18
+        ],
+        [
+          "franco_provencal",
+          0.04
+        ]
+      ],
+      "local": {
+        "french": "French (langue d'oïl)",
+        "occitan": "Occitan",
+        "franco_provencal": "Franco-Provençal"
+      }
+    },
+    "burgundy": {
+      "court": "french",
+      "mix": [
+        [
+          "flemish",
+          0.42
+        ],
+        [
+          "french",
+          0.38
+        ],
+        [
+          "dutch",
+          0.2
+        ]
+      ],
+      "local": {
+        "flemish": "Flemings and Brabanters (Dutch-speaking)",
+        "french": "Burgundians of the duchy and county (French-speaking)",
+        "dutch": "Hollanders, Zeelanders and West Frisians"
+      }
+    },
+    "brittany": {
+      "court": "breton",
+      "mix": [
+        [
+          "breton",
+          0.55
+        ],
+        [
+          "french",
+          0.45
+        ]
+      ],
+      "local": {
+        "breton": "Breton",
+        "french": "Gallo/French"
+      }
+    },
+    "provence": {
+      "court": "occitan",
+      "mix": [
+        [
+          "occitan",
+          0.97
+        ],
+        [
+          "jewish",
+          0.03
+        ]
+      ],
+      "local": {
+        "occitan": "Provençal",
+        "jewish": "Jewish communities"
+      }
+    },
+    "savoy": {
+      "court": "franco_provencal",
+      "mix": [
+        [
+          "franco_provencal",
+          0.55
+        ],
+        [
+          "piedmontese",
+          0.4
+        ],
+        [
+          "occitan",
+          0.05
+        ]
+      ],
+      "local": {
+        "franco_provencal": "Savoyard (Franco-Provençal)",
+        "piedmontese": "Piedmontese",
+        "occitan": "Occitan (Nice)"
+      }
+    },
+    "lorraine": {
+      "court": "french",
+      "mix": [
+        [
+          "french",
+          0.7
+        ],
+        [
+          "high_german",
+          0.3
+        ]
+      ],
+      "local": {
+        "french": "Lorrainers (Romance)",
+        "high_german": "German Lorrainers"
+      }
+    },
+    "navarre": {
+      "court": "basque",
+      "mix": [
+        [
+          "basque",
+          0.6
+        ],
+        [
+          "castilian",
+          0.36
+        ],
+        [
+          "jewish",
+          0.04
+        ]
+      ],
+      "local": {
+        "basque": "Navarrese",
+        "castilian": "Romance-speaking southern Navarrese",
+        "jewish": "Jewish"
+      }
+    },
+    "castile": {
+      "court": "castilian",
+      "mix": [
+        [
+          "castilian",
+          0.85
+        ],
+        [
+          "galician",
+          0.1
+        ],
+        [
+          "basque",
+          0.05
+        ]
+      ],
+      "local": {
+        "castilian": "Castilian",
+        "galician": "Galician",
+        "basque": "Basque"
+      }
+    },
+    "aragon": {
+      "court": "catalan",
+      "mix": [
+        [
+          "catalan",
+          0.68
+        ],
+        [
+          "aragonese",
+          0.18
+        ],
+        [
+          "andalusi_arabic",
+          0.14
+        ]
+      ],
+      "local": {
+        "catalan": "Catalan",
+        "aragonese": "Aragonese",
+        "andalusi_arabic": "Mudéjar (Muslim) communities, large in Valencia and Aragon"
+      }
+    },
+    "portugal": {
+      "court": "portuguese",
+      "mix": [
+        [
+          "portuguese",
+          0.97
+        ],
+        [
+          "jewish",
+          0.03
+        ]
+      ],
+      "local": {
+        "portuguese": "Portuguese",
+        "jewish": "Jewish communities"
+      }
+    },
+    "granada": {
+      "court": "andalusi_arabic",
+      "mix": [
+        [
+          "andalusi_arabic",
+          1
+        ]
+      ],
+      "local": {
+        "andalusi_arabic": "Andalusi Arab-Berber Muslims"
+      }
+    },
+    "milan": {
+      "court": "lombard",
+      "mix": [
+        [
+          "lombard",
+          0.85
+        ],
+        [
+          "emilian",
+          0.1
+        ],
+        [
+          "piedmontese",
+          0.05
+        ]
+      ],
+      "local": {
+        "lombard": "Lombard",
+        "emilian": "Emilian (Parma, Piacenza)",
+        "piedmontese": "Piedmontese (Novara, Alessandria)"
+      }
+    },
+    "venice": {
+      "court": "venetian",
+      "mix": [
+        [
+          "venetian",
+          0.7
+        ],
+        [
+          "lombard",
+          0.2
+        ],
+        [
+          "friulian",
+          0.1
+        ]
+      ],
+      "local": {
+        "venetian": "Venetian",
+        "lombard": "Lombard (Bergamo, Brescia)",
+        "friulian": "Friulian"
+      }
+    },
+    "genoa": {
+      "court": "ligurian",
+      "mix": [
+        [
+          "ligurian",
+          1
+        ]
+      ],
+      "local": {
+        "ligurian": "Ligurian"
+      }
+    },
+    "florence": {
+      "court": "tuscan",
+      "mix": [
+        [
+          "tuscan",
+          1
+        ]
+      ],
+      "local": {
+        "tuscan": "Tuscan"
+      }
+    },
+    "modena": {
+      "court": "emilian",
+      "mix": [
+        [
+          "emilian",
+          1
+        ]
+      ],
+      "local": {},
+      "faith": "catholic"
+    },
+    "papal_states": {
+      "court": "italian",
+      "mix": [
+        [
+          "italian",
+          0.85
+        ],
+        [
+          "emilian",
+          0.15
+        ]
+      ],
+      "local": {
+        "italian": "Central Italian (Roman, Umbrian, Marchigian, Romagnol) populations",
+        "emilian": "Central Italian (Roman, Umbrian, Marchigian, Romagnol) populations"
+      }
+    },
+    "naples": {
+      "court": "catalan",
+      "mix": [
+        [
+          "neapolitan",
+          0.95
+        ],
+        [
+          "greek",
+          0.05
+        ]
+      ],
+      "local": {
+        "neapolitan": "Neapolitan and southern Italian",
+        "greek": "Greek communities in Calabria and Salento",
+        "catalan": "Catalan-Aragonese elite"
+      }
+    },
+    "austria": {
+      "court": "high_german",
+      "mix": [
+        [
+          "high_german",
+          0.87
+        ],
+        [
+          "slovene",
+          0.13
+        ]
+      ],
+      "local": {
+        "high_german": "German-speaking Austrians and Styrians",
+        "slovene": "Slovene-speaking population in Carniola, Lower Styria and southern Carinthia"
+      }
+    },
+    "bohemia": {
+      "court": "czech",
+      "mix": [
+        [
+          "czech",
+          0.7
+        ],
+        [
+          "high_german",
+          0.3
+        ]
+      ],
+      "local": {
+        "czech": "Czechs (majority)",
+        "high_german": "Germans (towns, borderlands, Egerland)"
+      }
+    },
+    "bavaria": {
+      "court": "high_german",
+      "mix": [
+        [
+          "high_german",
+          1
+        ]
+      ],
+      "local": {},
+      "faith": "catholic"
+    },
+    "wurttemberg": {
+      "court": "high_german",
+      "mix": [
+        [
+          "high_german",
+          1
+        ]
+      ],
+      "local": {},
+      "faith": "catholic"
+    },
+    "palatinate": {
+      "court": "high_german",
+      "mix": [
+        [
+          "high_german",
+          1
+        ]
+      ],
+      "local": {
+        "high_german": "Rhine Franconians"
+      }
+    },
+    "cologne": {
+      "court": "high_german",
+      "mix": [
+        [
+          "high_german",
+          0.6
+        ],
+        [
+          "low_german",
+          0.4
+        ]
+      ],
+      "local": {
+        "high_german": "Rhinelanders",
+        "low_german": "Westphalians"
+      }
+    },
+    "hesse": {
+      "court": "high_german",
+      "mix": [
+        [
+          "high_german",
+          1
+        ]
+      ],
+      "local": {
+        "high_german": "Hessians"
+      }
+    },
+    "saxony": {
+      "court": "high_german",
+      "mix": [
+        [
+          "high_german",
+          0.96
+        ],
+        [
+          "sorbian",
+          0.04
+        ]
+      ],
+      "local": {
+        "high_german": "German (Upper Saxon and Thuringian dialects)",
+        "sorbian": "Sorbian (Wendish) minorities in the east"
+      }
+    },
+    "brandenburg": {
+      "court": "low_german",
+      "mix": [
+        [
+          "low_german",
+          0.96
+        ],
+        [
+          "sorbian",
+          0.04
+        ]
+      ],
+      "local": {
+        "low_german": "German (Low German speaking)",
+        "sorbian": "Wendish/Sorbian remnants (Spreewald, Lusatian borders)"
+      }
+    },
+    "luneburg": {
+      "court": "low_german",
+      "mix": [
+        [
+          "low_german",
+          1
+        ]
+      ],
+      "local": {
+        "low_german": "German (Eastphalian Low Saxon)"
+      }
+    },
+    "hamburg": {
+      "court": "low_german",
+      "mix": [
+        [
+          "low_german",
+          1
+        ]
+      ],
+      "local": {
+        "low_german": "German (Low German)"
+      }
+    },
+    "mecklenburg": {
+      "court": "low_german",
+      "mix": [
+        [
+          "low_german",
+          1
+        ]
+      ],
+      "local": {
+        "low_german": "German (Mecklenburg Low German)"
+      }
+    },
+    "pomerania": {
+      "court": "low_german",
+      "mix": [
+        [
+          "low_german",
+          0.93
+        ],
+        [
+          "polish",
+          0.07
+        ]
+      ],
+      "local": {},
+      "faith": "catholic"
+    },
+    "switzerland": {
+      "court": "high_german",
+      "mix": [
+        [
+          "high_german",
+          1
+        ]
+      ],
+      "local": {
+        "high_german": "Alemannic Swiss Germans"
+      }
+    },
+    "teutonic_order": {
+      "court": "low_german",
+      "mix": [
+        [
+          "low_german",
+          0.52
+        ],
+        [
+          "polish",
+          0.3
+        ],
+        [
+          "old_prussian",
+          0.18
+        ]
+      ],
+      "local": {
+        "low_german": "German settlers and burghers",
+        "polish": "Polish (Kashubian in Pomerelia; Masurian settlers)",
+        "old_prussian": "Old Prussian (Baltic) population"
+      }
+    },
+    "livonian_order": {
+      "court": "low_german",
+      "mix": [
+        [
+          "latvian",
+          0.5
+        ],
+        [
+          "estonian",
+          0.42
+        ],
+        [
+          "low_german",
+          0.08
+        ]
+      ],
+      "local": {
+        "latvian": "Latvian peasantry (Latgalian, Semigallian, Curonian descendants)",
+        "estonian": "Estonian peasantry",
+        "low_german": "German elite and burghers"
+      }
+    },
+    "denmark": {
+      "court": "danish",
+      "mix": [
+        [
+          "danish",
+          0.95
+        ],
+        [
+          "low_german",
+          0.05
+        ]
+      ],
+      "local": {
+        "danish": "Danish",
+        "low_german": "German burghers"
+      }
+    },
+    "sweden": {
+      "court": "swedish",
+      "mix": [
+        [
+          "swedish",
+          0.75
+        ],
+        [
+          "finnish",
+          0.25
+        ]
+      ],
+      "local": {
+        "swedish": "Swedish",
+        "finnish": "Finnish"
+      }
+    },
+    "norway": {
+      "court": "norwegian",
+      "mix": [
+        [
+          "norwegian",
+          0.97
+        ],
+        [
+          "sami",
+          0.03
+        ]
+      ],
+      "local": {
+        "norwegian": "Norwegian",
+        "sami": "Sámi"
+      }
+    },
+    "poland": {
+      "court": "polish",
+      "mix": [
+        [
+          "polish",
+          0.8
+        ],
+        [
+          "ruthenian",
+          0.14
+        ],
+        [
+          "high_german",
+          0.06
+        ]
+      ],
+      "local": {
+        "polish": "Polish",
+        "ruthenian": "Ruthenian (Red Ruthenia, Podolia)",
+        "high_german": "German burghers and settlers in towns"
+      }
+    },
+    "lithuania": {
+      "court": "lithuanian",
+      "mix": [
+        [
+          "ruthenian",
+          0.68
+        ],
+        [
+          "lithuanian",
+          0.32
+        ]
+      ],
+      "local": {
+        "ruthenian": "Ruthenian (ancestors of Belarusians and Ukrainians)",
+        "lithuanian": "Lithuanian"
+      }
+    },
+    "hungary": {
+      "court": "hungarian",
+      "mix": [
+        [
+          "hungarian",
+          0.73
+        ],
+        [
+          "croatian",
+          0.15
+        ],
+        [
+          "slovak",
+          0.12
+        ]
+      ],
+      "local": {
+        "hungarian": "Hungarian (Magyar)",
+        "croatian": "Croatian",
+        "slovak": "Slovak and other Slavic"
+      }
+    },
+    "moldavia": {
+      "court": "romanian",
+      "mix": [
+        [
+          "romanian",
+          0.85
+        ],
+        [
+          "ruthenian",
+          0.15
+        ]
+      ],
+      "local": {
+        "romanian": "Romanian (Moldavian)",
+        "ruthenian": "Ruthenian (north)"
+      }
+    },
+    "wallachia": {
+      "court": "romanian",
+      "mix": [
+        [
+          "romanian",
+          0.92
+        ],
+        [
+          "bulgarian",
+          0.08
+        ]
+      ],
+      "local": {
+        "romanian": "Romanian (Vlach)",
+        "bulgarian": "Bulgarian and Slav minorities"
+      }
+    },
+    "serbia": {
+      "court": "serbian",
+      "mix": [
+        [
+          "serbian",
+          0.85
+        ],
+        [
+          "aromanian",
+          0.15
+        ]
+      ],
+      "local": {
+        "serbian": "Serb",
+        "aromanian": "Vlach"
+      }
+    },
+    "bosnia": {
+      "court": "bosnian",
+      "mix": [
+        [
+          "bosnian",
+          0.85
+        ],
+        [
+          "aromanian",
+          0.15
+        ]
+      ],
+      "local": {
+        "bosnian": "Bosnian Slavs",
+        "aromanian": "Vlachs"
+      }
+    },
+    "albania": {
+      "court": "albanian",
+      "mix": [
+        [
+          "albanian",
+          1
+        ]
+      ],
+      "local": {},
+      "faith": "catholic"
+    },
+    "ragusa": {
+      "court": "croatian",
+      "mix": [
+        [
+          "croatian",
+          0.93
+        ],
+        [
+          "dalmatian",
+          0.07
+        ]
+      ],
+      "local": {
+        "croatian": "Croatian/Slavic",
+        "dalmatian": "Dalmatian Romance (declining)"
+      }
+    },
+    "byzantium": {
+      "court": "greek",
+      "mix": [
+        [
+          "greek",
+          1
+        ]
+      ],
+      "local": {
+        "greek": "Greek (Romaioi)"
+      }
+    },
+    "ottomans": {
+      "court": "turkish",
+      "mix": [
+        [
+          "turkish",
+          0.5
+        ],
+        [
+          "bulgarian",
+          0.26
+        ],
+        [
+          "greek",
+          0.24
+        ]
+      ],
+      "local": {
+        "turkish": "Turkish (Anatolian Turkish and Turkmen)",
+        "bulgarian": "Bulgarian and other South Slavs",
+        "greek": "Greek"
+      }
+    },
+    "karaman": {
+      "court": "turkmen",
+      "mix": [
+        [
+          "turkmen",
+          0.45
+        ],
+        [
+          "turkish",
+          0.4
+        ],
+        [
+          "greek",
+          0.15
+        ]
+      ],
+      "local": {
+        "turkmen": "Turkmen",
+        "turkish": "Urban Turkish-speaking Muslims",
+        "greek": "Greek and Armenian Christians (Cappadocia, towns)"
+      }
+    },
+    "candar": {
+      "court": "turkish",
+      "mix": [
+        [
+          "turkish",
+          0.85
+        ],
+        [
+          "greek",
+          0.15
+        ]
+      ],
+      "local": {
+        "turkish": "Turks",
+        "greek": "Greeks"
+      }
+    },
+    "trebizond": {
+      "court": "greek",
+      "mix": [
+        [
+          "greek",
+          0.7
+        ],
+        [
+          "laz",
+          0.2
+        ],
+        [
+          "armenian",
+          0.1
+        ]
+      ],
+      "local": {
+        "greek": "Pontic Greeks",
+        "laz": "Laz",
+        "armenian": "Armenians"
+      }
+    },
+    "dulkadir": {
+      "court": "turkmen",
+      "mix": [
+        [
+          "turkmen",
+          0.6
+        ],
+        [
+          "kurdish",
+          0.25
+        ],
+        [
+          "armenian",
+          0.15
+        ]
+      ],
+      "local": {
+        "turkmen": "Turkmen",
+        "kurdish": "Kurds",
+        "armenian": "Armenians"
+      }
+    },
+    "aq_qoyunlu": {
+      "court": "turkmen",
+      "mix": [
+        [
+          "kurdish",
+          0.4
+        ],
+        [
+          "turkmen",
+          0.32
+        ],
+        [
+          "armenian",
+          0.28
+        ]
+      ],
+      "local": {
+        "kurdish": "Kurds",
+        "turkmen": "Turkmen tribes",
+        "armenian": "Armenians"
+      }
+    },
+    "qara_qoyunlu": {
+      "court": "turkmen",
+      "mix": [
+        [
+          "persian",
+          0.55
+        ],
+        [
+          "turkmen",
+          0.25
+        ],
+        [
+          "kurdish",
+          0.2
+        ]
+      ],
+      "local": {
+        "persian": "Persian (Tajik) urban and rural population",
+        "turkmen": "Oghuz Turkmen tribes",
+        "kurdish": "Kurds"
+      }
+    },
+    "cyprus": {
+      "court": "french",
+      "mix": [
+        [
+          "greek",
+          0.88
+        ],
+        [
+          "levantine_arabic",
+          0.07
+        ],
+        [
+          "armenian",
+          0.05
+        ]
+      ],
+      "local": {
+        "greek": "Greek Cypriot",
+        "levantine_arabic": "Maronites",
+        "armenian": "Armenians",
+        "french": "Frankish (Latin) nobility"
+      }
+    },
+    "knights_of_rhodes": {
+      "court": "french",
+      "mix": [
+        [
+          "greek",
+          1
+        ]
+      ],
+      "local": {
+        "greek": "Greek islanders",
+        "french": "Latin knights (French, Italian, Spanish, English, German)"
+      }
+    },
+    "georgia": {
+      "court": "georgian",
+      "mix": [
+        [
+          "georgian",
+          0.82
+        ],
+        [
+          "armenian",
+          0.1
+        ],
+        [
+          "ossetian",
+          0.08
+        ]
+      ],
+      "local": {
+        "georgian": "Georgians (Kartvelians)",
+        "armenian": "Armenians",
+        "ossetian": "Ossetians"
+      }
+    },
+    "shirvan": {
+      "court": "persian",
+      "mix": [
+        [
+          "persian",
+          0.45
+        ],
+        [
+          "azerbaijani",
+          0.35
+        ],
+        [
+          "lezgin",
+          0.2
+        ]
+      ],
+      "local": {
+        "persian": "Persian-speaking Tats",
+        "azerbaijani": "Turkic population",
+        "lezgin": "Lezgins"
+      }
+    },
+    "muscovy": {
+      "court": "great_russian",
+      "mix": [
+        [
+          "great_russian",
+          0.95
+        ],
+        [
+          "komi",
+          0.05
+        ]
+      ],
+      "local": {
+        "great_russian": "Great Russian (East Slavic)",
+        "komi": "Finnic groups (Merya descendants, Mordvins, Komi) in the east and north"
+      }
+    },
+    "novgorod": {
+      "court": "great_russian",
+      "mix": [
+        [
+          "great_russian",
+          0.8
+        ],
+        [
+          "karelian",
+          0.12
+        ],
+        [
+          "komi",
+          0.08
+        ]
+      ],
+      "local": {
+        "great_russian": "Great Russian (Novgorodian Slavs)",
+        "karelian": "Karelians",
+        "komi": "Komi"
+      }
+    },
+    "pskov": {
+      "court": "great_russian",
+      "mix": [
+        [
+          "great_russian",
+          0.95
+        ],
+        [
+          "estonian",
+          0.05
+        ]
+      ],
+      "local": {
+        "great_russian": "Great Russian (Pskovian)",
+        "estonian": "Setos and Estonians on the border"
+      }
+    },
+    "tver": {
+      "court": "great_russian",
+      "mix": [
+        [
+          "great_russian",
+          1
+        ]
+      ],
+      "local": {
+        "great_russian": "Great Russian"
+      }
+    },
+    "ryazan": {
+      "court": "great_russian",
+      "mix": [
+        [
+          "great_russian",
+          0.85
+        ],
+        [
+          "mordvin",
+          0.15
+        ]
+      ],
+      "local": {
+        "great_russian": "Great Russian",
+        "mordvin": "Mordvins"
+      }
+    },
+    "kazan": {
+      "court": "kazan_tatar",
+      "mix": [
+        [
+          "kazan_tatar",
+          0.55
+        ],
+        [
+          "chuvash",
+          0.25
+        ],
+        [
+          "mari",
+          0.2
+        ]
+      ],
+      "local": {
+        "kazan_tatar": "Kazan Tatars (settled Muslim population of Bulgar heritage with Kipchak elements)",
+        "chuvash": "Chuvash",
+        "mari": "Mari (Cheremis)"
+      }
+    },
+    "great_horde": {
+      "court": "tatar",
+      "mix": [
+        [
+          "tatar",
+          1
+        ]
+      ],
+      "local": {
+        "tatar": "Kipchak-Turkic 'Tatars' of many clans"
+      }
+    },
+    "crimea": {
+      "court": "crimean_tatar",
+      "mix": [
+        [
+          "crimean_tatar",
+          0.7
+        ],
+        [
+          "greek",
+          0.2
+        ],
+        [
+          "armenian",
+          0.1
+        ]
+      ],
+      "local": {
+        "crimean_tatar": "Crimean Tatars of the leading clans (Kipchak-speaking)",
+        "greek": "Greeks",
+        "armenian": "Armenians (Solkhat, Caffa)"
+      }
+    },
+    "nogai": {
+      "court": "nogai",
+      "mix": [
+        [
+          "nogai",
+          1
+        ]
+      ],
+      "local": {
+        "nogai": "Mangits and allied tribes"
+      }
+    },
+    "uzbek_khanate": {
+      "court": "uzbek",
+      "mix": [
+        [
+          "uzbek",
+          0.92
+        ],
+        [
+          "ob_ugrian",
+          0.08
+        ]
+      ],
+      "local": {
+        "uzbek": "Uzbek tribes (Qiyat, Qongirat, Mangit, Durman, Ushun, Naiman and others)",
+        "ob_ugrian": "Ugrian and Siberian forest peoples on the northern margins"
+      }
+    },
+    "mamluks": {
+      "court": "circassian",
+      "mix": [
+        [
+          "egyptian_arabic",
+          0.6
+        ],
+        [
+          "levantine_arabic",
+          0.3
+        ],
+        [
+          "bedouin_arabic",
+          0.1
+        ]
+      ],
+      "local": {
+        "egyptian_arabic": "Egyptian Arabic-speaking Muslims",
+        "levantine_arabic": "Syrian Arabs",
+        "bedouin_arabic": "Bedouin",
+        "circassian": "Circassian, Turkic and other mamluk elite"
+      }
+    },
+    "hejaz": {
+      "court": "hejazi_arabic",
+      "mix": [
+        [
+          "hejazi_arabic",
+          0.6
+        ],
+        [
+          "bedouin_arabic",
+          0.4
+        ]
+      ],
+      "local": {},
+      "faith": "sunni"
+    },
+    "yemen": {
+      "court": "yemeni_arabic",
+      "mix": [
+        [
+          "yemeni_arabic",
+          1
+        ]
+      ],
+      "local": {},
+      "faith": "shia"
+    },
+    "oman": {
+      "court": "omani_arabic",
+      "mix": [
+        [
+          "omani_arabic",
+          1
+        ]
+      ],
+      "local": {},
+      "faith": "ibadi"
+    },
+    "timurids": {
+      "court": "chagatai",
+      "mix": [
+        [
+          "persian",
+          0.75
+        ],
+        [
+          "chagatai",
+          0.25
+        ]
+      ],
+      "local": {
+        "persian": "Persian (Tajik) sedentary population of cities and oases",
+        "chagatai": "Turkic (Chaghatay-speaking) military and nomadic elites"
+      }
+    },
+    "moghulistan": {
+      "court": "moghul",
+      "mix": [
+        [
+          "moghul",
+          0.5
+        ],
+        [
+          "uyghur",
+          0.35
+        ],
+        [
+          "kyrgyz",
+          0.15
+        ]
+      ],
+      "local": {
+        "moghul": "Turkicised Mongol (Moghul) tribes",
+        "uyghur": "Oasis Turks of the Tarim",
+        "kyrgyz": "Kyrgyz groups"
+      }
+    },
+    "oirat": {
+      "court": "oirat",
+      "mix": [
+        [
+          "oirat",
+          0.72
+        ],
+        [
+          "mongol",
+          0.28
+        ]
+      ],
+      "local": {
+        "oirat": "Oirat Mongol",
+        "mongol": "Eastern Mongol subjects"
+      }
+    },
+    "mongols": {
+      "court": "mongol",
+      "mix": [
+        [
+          "mongol",
+          1
+        ]
+      ],
+      "local": {},
+      "faith": "siberian_steppe_traditional"
+    },
+    "tibet": {
+      "court": "tibetan",
+      "mix": [
+        [
+          "tibetan",
+          1
+        ]
+      ],
+      "local": {},
+      "faith": "vajrayana"
+    },
+    "ming": {
+      "court": "han",
+      "mix": [
+        [
+          "han",
+          1
+        ]
+      ],
+      "local": {
+        "han": "Han Chinese (with strong regional variation)"
+      }
+    },
+    "jurchens": {
+      "court": "manchu",
+      "mix": [
+        [
+          "manchu",
+          1
+        ]
+      ],
+      "local": {},
+      "faith": "siberian_steppe_traditional"
+    },
+    "korea": {
+      "court": "korean",
+      "mix": [
+        [
+          "korean",
+          1
+        ]
+      ],
+      "local": {
+        "korean": "Korean"
+      }
+    },
+    "japan": {
+      "court": "japanese",
+      "mix": [
+        [
+          "japanese",
+          1
+        ]
+      ],
+      "local": {},
+      "faith": "shinto"
+    },
+    "dai_viet": {
+      "court": "vietnamese",
+      "mix": [
+        [
+          "vietnamese",
+          0.84
+        ],
+        [
+          "muong",
+          0.1
+        ],
+        [
+          "tay",
+          0.06
+        ]
+      ],
+      "local": {
+        "vietnamese": "Kinh (Viet) majority in the lowlands",
+        "muong": "Mường in the piedmont",
+        "tay": "Tai (Tai Dam, Tai Don), Tày and Nùng in the uplands"
+      }
+    },
+    "champa": {
+      "court": "cham",
+      "mix": [
+        [
+          "cham",
+          0.75
+        ],
+        [
+          "jarai",
+          0.25
+        ]
+      ],
+      "local": {
+        "cham": "Cham",
+        "jarai": "Highland Chamic (Jarai, Rhade) and Mon-Khmer peoples"
+      }
+    },
+    "lan_xang": {
+      "court": "lao",
+      "mix": [
+        [
+          "lao",
+          0.8
+        ],
+        [
+          "khmu",
+          0.2
+        ]
+      ],
+      "local": {
+        "lao": "Lao",
+        "khmu": "Khmu and other Mon-Khmer uplanders"
+      }
+    },
+    "lan_na": {
+      "court": "tai_yuan",
+      "mix": [
+        [
+          "tai_yuan",
+          0.8
+        ],
+        [
+          "lawa",
+          0.1
+        ],
+        [
+          "tai_lue",
+          0.1
+        ]
+      ],
+      "local": {
+        "tai_yuan": "Tai Yuan",
+        "lawa": "Lawa",
+        "tai_lue": "Tai Khün and Tai Lue"
+      }
+    },
+    "ayutthaya": {
+      "court": "thai",
+      "mix": [
+        [
+          "thai",
+          0.78
+        ],
+        [
+          "khmer",
+          0.11
+        ],
+        [
+          "mon",
+          0.11
+        ]
+      ],
+      "local": {
+        "thai": "Siamese (central Thai)",
+        "khmer": "Khmer",
+        "mon": "Mon"
+      }
+    },
+    "khmer": {
+      "court": "khmer",
+      "mix": [
+        [
+          "khmer",
+          1
+        ]
+      ],
+      "local": {},
+      "faith": "theravada"
+    },
+    "ava": {
+      "court": "burmese",
+      "mix": [
+        [
+          "burmese",
+          0.75
+        ],
+        [
+          "shan",
+          0.2
+        ],
+        [
+          "kadu",
+          0.05
+        ]
+      ],
+      "local": {
+        "burmese": "Burman (Bamar)",
+        "shan": "Shan (Tai)",
+        "kadu": "Kadu"
+      }
+    },
+    "pegu": {
+      "court": "mon",
+      "mix": [
+        [
+          "mon",
+          0.85
+        ],
+        [
+          "karen",
+          0.15
+        ]
+      ],
+      "local": {},
+      "faith": "theravada"
+    },
+    "majapahit": {
+      "court": "javanese",
+      "mix": [
+        [
+          "javanese",
+          0.85
+        ],
+        [
+          "madurese",
+          0.15
+        ]
+      ],
+      "local": {
+        "javanese": "Javanese",
+        "madurese": "Madurese"
+      }
+    },
+    "malacca": {
+      "court": "malay",
+      "mix": [
+        [
+          "malay",
+          0.88
+        ],
+        [
+          "orang_laut",
+          0.12
+        ]
+      ],
+      "local": {
+        "malay": "Malay",
+        "orang_laut": "Orang Laut (sea peoples)"
+      }
+    },
+    "brunei": {
+      "court": "malay",
+      "mix": [
+        [
+          "malay",
+          0.6
+        ],
+        [
+          "kedayan",
+          0.2
+        ],
+        [
+          "dayak",
+          0.2
+        ]
+      ],
+      "local": {
+        "malay": "Brunei Malay",
+        "kedayan": "Kedayan",
+        "dayak": "Interior Bornean peoples"
+      }
+    },
+    "delhi": {
+      "court": "hindustani",
+      "mix": [
+        [
+          "hindustani",
+          1
+        ]
+      ],
+      "local": {
+        "hindustani": "Hindustani urban society"
+      }
+    },
+    "jaunpur": {
+      "court": "hindustani",
+      "mix": [
+        [
+          "awadhi",
+          0.55
+        ],
+        [
+          "bhojpuri",
+          0.3
+        ],
+        [
+          "hindustani",
+          0.15
+        ]
+      ],
+      "local": {
+        "awadhi": "Awadhi and Bhojpuri peasantry",
+        "bhojpuri": "Awadhi and Bhojpuri peasantry",
+        "hindustani": "Hindustani Muslims"
+      }
+    },
+    "bengal": {
+      "court": "bengali",
+      "mix": [
+        [
+          "bengali",
+          1
+        ]
+      ],
+      "local": {
+        "bengali": "Bengali"
+      }
+    },
+    "bahmanis": {
+      "court": "deccani",
+      "mix": [
+        [
+          "marathi",
+          0.48
+        ],
+        [
+          "telugu",
+          0.27
+        ],
+        [
+          "kannada",
+          0.25
+        ]
+      ],
+      "local": {
+        "marathi": "Marathi-speaking peasantry and gentry",
+        "telugu": "Telugu in the east",
+        "kannada": "Kannada in the south",
+        "deccani": "Deccani Muslims"
+      }
+    },
+    "vijayanagar": {
+      "court": "kannada",
+      "mix": [
+        [
+          "kannada",
+          0.38
+        ],
+        [
+          "telugu",
+          0.32
+        ],
+        [
+          "tamil",
+          0.3
+        ]
+      ],
+      "local": {
+        "kannada": "Kannada",
+        "telugu": "Telugu",
+        "tamil": "Tamil"
+      }
+    },
+    "gujarat": {
+      "court": "gujarati",
+      "mix": [
+        [
+          "gujarati",
+          0.88
+        ],
+        [
+          "bhil",
+          0.12
+        ]
+      ],
+      "local": {
+        "gujarati": "Gujarati",
+        "bhil": "Koli and Bhil communities"
+      }
+    },
+    "malwa": {
+      "court": "malvi",
+      "mix": [
+        [
+          "malvi",
+          0.75
+        ],
+        [
+          "bhil",
+          0.15
+        ],
+        [
+          "gond",
+          0.1
+        ]
+      ],
+      "local": {
+        "malvi": "Malvi-speaking peasantry",
+        "bhil": "Bhil and Gond forest peoples",
+        "gond": "Bhil and Gond forest peoples"
+      }
+    },
+    "mewar": {
+      "court": "rajasthani",
+      "mix": [
+        [
+          "rajasthani",
+          0.85
+        ],
+        [
+          "bhil",
+          0.15
+        ]
+      ],
+      "local": {
+        "rajasthani": "Rajput clans",
+        "bhil": "Bhil tribes"
+      }
+    },
+    "orissa": {
+      "court": "odia",
+      "mix": [
+        [
+          "odia",
+          0.9
+        ],
+        [
+          "khond",
+          0.1
+        ]
+      ],
+      "local": {},
+      "faith": "hindu"
+    },
+    "gondwana": {
+      "court": "gond",
+      "mix": [
+        [
+          "gond",
+          0.65
+        ],
+        [
+          "hindustani",
+          0.35
+        ]
+      ],
+      "local": {
+        "gond": "Gond",
+        "hindustani": "Hindu peasants"
+      }
+    },
+    "kashmir": {
+      "court": "kashmiri",
+      "mix": [
+        [
+          "kashmiri",
+          0.9
+        ],
+        [
+          "dard",
+          0.1
+        ]
+      ],
+      "local": {
+        "kashmiri": "Kashmiri",
+        "dard": "Dardic and Tibetan border peoples"
+      }
+    },
+    "multan": {
+      "court": "punjabi",
+      "mix": [
+        [
+          "punjabi",
+          0.8
+        ],
+        [
+          "baluch",
+          0.2
+        ]
+      ],
+      "local": {
+        "punjabi": "Punjabi (Saraiki)",
+        "baluch": "Baluch"
+      }
+    },
+    "sindh": {
+      "court": "sindhi",
+      "mix": [
+        [
+          "sindhi",
+          0.8
+        ],
+        [
+          "baluch",
+          0.2
+        ]
+      ],
+      "local": {
+        "sindhi": "Sindhi",
+        "baluch": "Baluch"
+      }
+    },
+    "ahom": {
+      "court": "ahom",
+      "mix": [
+        [
+          "assamese",
+          0.55
+        ],
+        [
+          "ahom",
+          0.3
+        ],
+        [
+          "moran",
+          0.15
+        ]
+      ],
+      "local": {
+        "assamese": "Assamese-speaking peoples",
+        "ahom": "Tai Ahom",
+        "moran": "Moran and Barahi"
+      }
+    },
+    "morocco": {
+      "court": "zenata",
+      "mix": [
+        [
+          "maghrebi_arabic",
+          0.4
+        ],
+        [
+          "masmuda",
+          0.35
+        ],
+        [
+          "zenata",
+          0.25
+        ]
+      ],
+      "local": {
+        "maghrebi_arabic": "Arabic-speaking urban population of Fez and the ports, including Andalusi émigrés",
+        "masmuda": "Zenata, Masmuda and Sanhaja Berber groups",
+        "zenata": "Zenata, Masmuda and Sanhaja Berber groups"
+      }
+    },
+    "tlemcen": {
+      "court": "zenata",
+      "mix": [
+        [
+          "maghrebi_arabic",
+          0.55
+        ],
+        [
+          "zenata",
+          0.45
+        ]
+      ],
+      "local": {
+        "maghrebi_arabic": "Arabic-speaking townspeople",
+        "zenata": "Zenata Berbers"
+      }
+    },
+    "tunis": {
+      "court": "maghrebi_arabic",
+      "mix": [
+        [
+          "maghrebi_arabic",
+          0.88
+        ],
+        [
+          "zenata",
+          0.12
+        ]
+      ],
+      "local": {},
+      "faith": "sunni"
+    },
+    "mali": {
+      "court": "mandinka",
+      "mix": [
+        [
+          "mandinka",
+          0.5
+        ],
+        [
+          "bamana",
+          0.25
+        ],
+        [
+          "soninke",
+          0.25
+        ]
+      ],
+      "local": {
+        "mandinka": "Mandinka (Maninka)",
+        "bamana": "Bamana",
+        "soninke": "Soninke"
+      }
+    },
+    "songhai": {
+      "court": "songhai",
+      "mix": [
+        [
+          "songhai",
+          1
+        ]
+      ],
+      "local": {
+        "songhai": "Songhai"
+      }
+    },
+    "jolof": {
+      "court": "wolof",
+      "mix": [
+        [
+          "wolof",
+          0.65
+        ],
+        [
+          "serer",
+          0.2
+        ],
+        [
+          "fulbe",
+          0.15
+        ]
+      ],
+      "local": {
+        "wolof": "Wolof",
+        "serer": "Serer",
+        "fulbe": "Fulbe"
+      }
+    },
+    "mossi": {
+      "court": "mossi",
+      "mix": [
+        [
+          "mossi",
+          1
+        ]
+      ],
+      "local": {},
+      "faith": "african_traditional"
+    },
+    "kano": {
+      "court": "hausa",
+      "mix": [
+        [
+          "hausa",
+          1
+        ]
+      ],
+      "local": {
+        "hausa": "Hausa"
+      }
+    },
+    "kanem_bornu": {
+      "court": "kanuri",
+      "mix": [
+        [
+          "kanuri",
+          0.75
+        ],
+        [
+          "kotoko",
+          0.15
+        ],
+        [
+          "tubu",
+          0.1
+        ]
+      ],
+      "local": {
+        "kanuri": "Kanuri",
+        "kotoko": "Sao-descended populations",
+        "tubu": "Tubu"
+      }
+    },
+    "benin": {
+      "court": "edo",
+      "mix": [
+        [
+          "edo",
+          0.88
+        ],
+        [
+          "yoruba",
+          0.12
+        ]
+      ],
+      "local": {
+        "edo": "Edo (Bini)",
+        "yoruba": "Yoruba and Igbo margins"
+      }
+    },
+    "ethiopia": {
+      "court": "amhara",
+      "mix": [
+        [
+          "amhara",
+          0.55
+        ],
+        [
+          "tigrinya",
+          0.25
+        ],
+        [
+          "agaw",
+          0.2
+        ]
+      ],
+      "local": {
+        "amhara": "Amhara",
+        "tigrinya": "Tigrinya-speakers",
+        "agaw": "Agaw"
+      }
+    },
+    "adal": {
+      "court": "harla",
+      "mix": [
+        [
+          "somali",
+          0.35
+        ],
+        [
+          "afar",
+          0.35
+        ],
+        [
+          "harla",
+          0.3
+        ]
+      ],
+      "local": {
+        "somali": "Somali",
+        "afar": "Afar",
+        "harla": "Harla"
+      }
+    },
+    "ajuran": {
+      "court": "somali",
+      "mix": [
+        [
+          "somali",
+          1
+        ]
+      ],
+      "local": {
+        "somali": "Somali (Ajuran and allied clans)"
+      }
+    },
+    "kilwa": {
+      "court": "swahili",
+      "mix": [
+        [
+          "swahili",
+          1
+        ]
+      ],
+      "local": {
+        "swahili": "Swahili"
+      }
+    },
+    "mutapa": {
+      "court": "shona",
+      "mix": [
+        [
+          "shona",
+          1
+        ]
+      ],
+      "local": {
+        "shona": "Shona (Karanga, Korekore)"
+      }
+    },
+    "kongo": {
+      "court": "kongo",
+      "mix": [
+        [
+          "kongo",
+          0.9
+        ],
+        [
+          "mbundu",
+          0.1
+        ]
+      ],
+      "local": {
+        "kongo": "Kongo (Kikongo-speaking) peoples",
+        "mbundu": "Mbundu borderers in the south"
+      }
+    },
+    "aztecs": {
+      "court": "nahua",
+      "mix": [
+        [
+          "nahua",
+          0.8
+        ],
+        [
+          "otomi",
+          0.2
+        ]
+      ],
+      "local": {
+        "nahua": "Mexica, Acolhua, Tepanec and other Nahua",
+        "otomi": "Otomi and Mazahua in the north and west"
+      }
+    },
+    "purepecha": {
+      "court": "purepecha",
+      "mix": [
+        [
+          "purepecha",
+          0.86
+        ],
+        [
+          "otomi",
+          0.07
+        ],
+        [
+          "nahua",
+          0.07
+        ]
+      ],
+      "local": {
+        "purepecha": "Purépecha",
+        "otomi": "Nahua, Otomi and Matlatzinca minorities",
+        "nahua": "Nahua, Otomi and Matlatzinca minorities"
+      }
+    },
+    "zapotec": {
+      "court": "zapotec",
+      "mix": [
+        [
+          "zapotec",
+          0.85
+        ],
+        [
+          "mixtec",
+          0.15
+        ]
+      ],
+      "local": {},
+      "faith": "indigenous_american"
+    },
+    "maya": {
+      "court": "maya_yucatec",
+      "mix": [
+        [
+          "maya_yucatec",
+          1
+        ]
+      ],
+      "local": {},
+      "faith": "indigenous_american"
+    },
+    "inca": {
+      "court": "quechua",
+      "mix": [
+        [
+          "quechua",
+          0.8
+        ],
+        [
+          "aymara",
+          0.2
+        ]
+      ],
+      "local": {
+        "quechua": "Inca and Cusco-region Quechua",
+        "aymara": "Conquered and allied Andean peoples (Chanka and others)"
+      }
+    },
+    "chimu": {
+      "court": "chimu",
+      "mix": [
+        [
+          "chimu",
+          0.6
+        ],
+        [
+          "mochica",
+          0.4
+        ]
+      ],
+      "local": {
+        "chimu": "Chimú (Moche valley)",
+        "mochica": "Lambayeque (Sicán) heritage peoples"
+      }
+    },
+    "muisca": {
+      "court": "muisca",
+      "mix": [
+        [
+          "muisca",
+          1
+        ]
+      ],
+      "local": {},
+      "faith": "indigenous_american"
+    },
+    "iroquois": {
+      "court": "haudenosaunee",
+      "mix": [
+        [
+          "haudenosaunee",
+          1
+        ]
+      ],
+      "local": {
+        "haudenosaunee": "Mohawk"
+      }
+    },
+    "huron": {
+      "court": "wendat",
+      "mix": [
+        [
+          "wendat",
+          1
+        ]
+      ],
+      "local": {},
+      "faith": "indigenous_american"
+    },
+    "cherokee": {
+      "court": "cherokee",
+      "mix": [
+        [
+          "cherokee",
+          1
+        ]
+      ],
+      "local": {},
+      "faith": "indigenous_american"
+    },
+    "creek": {
+      "court": "muscogee",
+      "mix": [
+        [
+          "muscogee",
+          1
+        ]
+      ],
+      "local": {},
+      "faith": "indigenous_american"
+    },
+    "pueblo": {
+      "court": "pueblo",
+      "mix": [
+        [
+          "pueblo",
+          1
+        ]
+      ],
+      "local": {},
+      "faith": "indigenous_american"
+    },
+    "afar_dankali": {
+      "court": "afar",
+      "mix": [
+        [
+          "afar",
+          1
+        ]
+      ],
+      "local": {
+        "afar": "Afar"
+      }
+    },
+    "air_agadez": {
+      "court": "tamasheq",
+      "mix": [
+        [
+          "tamasheq",
+          0.65
+        ],
+        [
+          "hausa",
+          0.2
+        ],
+        [
+          "songhai",
+          0.15
+        ]
+      ],
+      "local": {
+        "tamasheq": "Tuareg (Kel Owey and others)",
+        "hausa": "Hausa traders",
+        "songhai": "Tasawaq-speaking Agadez townspeople"
+      }
+    },
+    "akan_forest": {
+      "court": "akan",
+      "mix": [
+        [
+          "akan",
+          1
+        ]
+      ],
+      "local": {
+        "akan": "Akan, Guan and Ga-Adangbe"
+      }
+    },
+    "allada_tado": {
+      "court": "gbe",
+      "mix": [
+        [
+          "gbe",
+          1
+        ]
+      ],
+      "local": {
+        "gbe": "Aja and Ewe"
+      }
+    },
+    "ankole": {
+      "court": "rutara",
+      "mix": [
+        [
+          "rutara",
+          1
+        ]
+      ],
+      "local": {
+        "rutara": "Runyankore (Bahima herders and Bairu farmers)"
+      }
+    },
+    "apalachee": {
+      "court": "muscogee",
+      "mix": [
+        [
+          "muscogee",
+          1
+        ]
+      ],
+      "local": {
+        "muscogee": "Apalachee"
+      }
+    },
+    "beja": {
+      "court": "beja",
+      "mix": [
+        [
+          "beja",
+          0.8
+        ],
+        [
+          "bedouin_arabic",
+          0.2
+        ]
+      ],
+      "local": {
+        "beja": "Beja",
+        "bedouin_arabic": "Arabised Hadariba"
+      }
+    },
+    "biram": {
+      "court": "hausa",
+      "mix": [
+        [
+          "hausa",
+          0.88
+        ],
+        [
+          "fulbe",
+          0.08
+        ],
+        [
+          "kanuri",
+          0.04
+        ]
+      ],
+      "local": {
+        "hausa": "Hausa",
+        "fulbe": "Fulbe (arriving)",
+        "kanuri": "Kanuri traders"
+      }
+    },
+    "bono": {
+      "court": "akan",
+      "mix": [
+        [
+          "akan",
+          1
+        ]
+      ],
+      "local": {
+        "akan": "Akan (Bono)"
+      }
+    },
+    "borgu": {
+      "court": "bariba",
+      "mix": [
+        [
+          "bariba",
+          0.8
+        ],
+        [
+          "fulbe",
+          0.2
+        ]
+      ],
+      "local": {
+        "bariba": "Bariba and Busa",
+        "fulbe": "Fulbe"
+      }
+    },
+    "buganda": {
+      "court": "ganda",
+      "mix": [
+        [
+          "ganda",
+          1
+        ]
+      ],
+      "local": {
+        "ganda": "Ganda"
+      }
+    },
+    "bulala": {
+      "court": "bulala",
+      "mix": [
+        [
+          "bulala",
+          0.6
+        ],
+        [
+          "kanuri",
+          0.3
+        ],
+        [
+          "bedouin_arabic",
+          0.1
+        ]
+      ],
+      "local": {
+        "bulala": "Bulala",
+        "kanuri": "Kanembu",
+        "bedouin_arabic": "Arab herders"
+      }
+    },
+    "caddo": {
+      "court": "caddo",
+      "mix": [
+        [
+          "caddo",
+          1
+        ]
+      ],
+      "local": {
+        "caddo": "Caddo"
+      }
+    },
+    "calusa": {
+      "court": "calusa",
+      "mix": [
+        [
+          "calusa",
+          1
+        ]
+      ],
+      "local": {
+        "calusa": "Calusa"
+      }
+    },
+    "canarian_lordship": {
+      "court": "castilian",
+      "mix": [
+        [
+          "castilian",
+          0.55
+        ],
+        [
+          "guanche",
+          0.35
+        ],
+        [
+          "norman",
+          0.1
+        ]
+      ],
+      "local": {
+        "castilian": "Castilian and Andalusian settlers",
+        "guanche": "Majos, Bimbaches and Gomeros",
+        "norman": "Norman settlers"
+      }
+    },
+    "casqui_pacaha": {
+      "court": "tunica",
+      "mix": [
+        [
+          "tunica",
+          1
+        ]
+      ],
+      "local": {
+        "tunica": "Late Mississippian (Tunican?)"
+      }
+    },
+    "chumash": {
+      "court": "chumash",
+      "mix": [
+        [
+          "chumash",
+          1
+        ]
+      ],
+      "local": {
+        "chumash": "Chumash"
+      }
+    },
+    "coast_salish": {
+      "court": "salish",
+      "mix": [
+        [
+          "salish",
+          1
+        ]
+      ],
+      "local": {
+        "salish": "Coast Salish"
+      }
+    },
+    "cofitachequi": {
+      "court": "muscogee",
+      "mix": [
+        [
+          "muscogee",
+          1
+        ]
+      ],
+      "local": {
+        "muscogee": "South Appalachian Mississippian"
+      }
+    },
+    "comoros": {
+      "court": "comorian",
+      "mix": [
+        [
+          "comorian",
+          0.85
+        ],
+        [
+          "malagasy",
+          0.15
+        ]
+      ],
+      "local": {
+        "comorian": "Comorian",
+        "malagasy": "Malagasy-speaking villages"
+      }
+    },
+    "cross_river_societies": {
+      "court": "ibibio",
+      "mix": [
+        [
+          "ibibio",
+          1
+        ]
+      ],
+      "local": {
+        "ibibio": "Ibibio, Annang and Ejagham"
+      }
+    },
+    "dagbon": {
+      "court": "dagbani",
+      "mix": [
+        [
+          "dagbani",
+          1
+        ]
+      ],
+      "local": {
+        "dagbani": "Mole-Dagbani"
+      }
+    },
+    "darfur_tunjur": {
+      "court": "fur",
+      "mix": [
+        [
+          "fur",
+          0.75
+        ],
+        [
+          "zaghawa",
+          0.25
+        ]
+      ],
+      "local": {
+        "fur": "Fur, Daju and the Tunjur ruling house",
+        "zaghawa": "Zaghawa"
+      }
+    },
+    "delagoa_lowland_chiefdoms": {
+      "court": "tsonga",
+      "mix": [
+        [
+          "tsonga",
+          1
+        ]
+      ],
+      "local": {
+        "tsonga": "Tsonga, Chopi and Tonga precursors"
+      }
+    },
+    "equatorial_forest_societies": {
+      "court": "mongo",
+      "mix": [
+        [
+          "mongo",
+          1
+        ]
+      ],
+      "local": {
+        "mongo": "Mongo-related peoples, riverine traders and forest foragers"
+      }
+    },
+    "fezzan": {
+      "court": "maghrebi_arabic",
+      "mix": [
+        [
+          "maghrebi_arabic",
+          0.55
+        ],
+        [
+          "tamasheq",
+          0.25
+        ],
+        [
+          "tubu",
+          0.2
+        ]
+      ],
+      "local": {
+        "maghrebi_arabic": "Fezzani oasis people and Arab tribes",
+        "tamasheq": "Tuareg",
+        "tubu": "Teda (Tubu)"
+      }
+    },
+    "fort_ancient": {
+      "court": "shawnee",
+      "mix": [
+        [
+          "shawnee",
+          1
+        ]
+      ],
+      "local": {
+        "shawnee": "Fort Ancient"
+      }
+    },
+    "gobir": {
+      "court": "hausa",
+      "mix": [
+        [
+          "hausa",
+          0.88
+        ],
+        [
+          "fulbe",
+          0.08
+        ],
+        [
+          "kanuri",
+          0.04
+        ]
+      ],
+      "local": {
+        "hausa": "Hausa",
+        "fulbe": "Fulbe (arriving)",
+        "kanuri": "Kanuri traders"
+      }
+    },
+    "gran_canaria": {
+      "court": "guanche",
+      "mix": [
+        [
+          "guanche",
+          1
+        ]
+      ],
+      "local": {
+        "guanche": "Canarios (indigenous Gran Canarians)"
+      }
+    },
+    "hadiya": {
+      "court": "hadiya",
+      "mix": [
+        [
+          "hadiya",
+          1
+        ]
+      ],
+      "local": {
+        "hadiya": "Hadiya and related Highland East Cushitic peoples"
+      }
+    },
+    "hopi": {
+      "court": "pueblo",
+      "mix": [
+        [
+          "pueblo",
+          1
+        ]
+      ],
+      "local": {
+        "pueblo": "Hopi"
+      }
+    },
+    "igala": {
+      "court": "igala",
+      "mix": [
+        [
+          "igala",
+          1
+        ]
+      ],
+      "local": {
+        "igala": "Igala"
+      }
+    },
+    "igbo_societies": {
+      "court": "igbo",
+      "mix": [
+        [
+          "igbo",
+          1
+        ]
+      ],
+      "local": {
+        "igbo": "Igbo"
+      }
+    },
+    "ijaw_delta": {
+      "court": "ijaw",
+      "mix": [
+        [
+          "ijaw",
+          1
+        ]
+      ],
+      "local": {
+        "ijaw": "Ijaw, Ibani, Kalabari and Nembe"
+      }
+    },
+    "ijebu": {
+      "court": "yoruba",
+      "mix": [
+        [
+          "yoruba",
+          1
+        ]
+      ],
+      "local": {
+        "yoruba": "Yoruba (Ijebu)"
+      }
+    },
+    "kaabu": {
+      "court": "mandinka",
+      "mix": [
+        [
+          "mandinka",
+          0.55
+        ],
+        [
+          "balanta",
+          0.3
+        ],
+        [
+          "fulbe",
+          0.15
+        ]
+      ],
+      "local": {
+        "mandinka": "Mandinka",
+        "balanta": "Biafada, Papel and Balanta",
+        "fulbe": "Fulbe"
+      }
+    },
+    "kaffa": {
+      "court": "kafa",
+      "mix": [
+        [
+          "kafa",
+          1
+        ]
+      ],
+      "local": {
+        "kafa": "Kafa"
+      }
+    },
+    "karagwe": {
+      "court": "rutara",
+      "mix": [
+        [
+          "rutara",
+          1
+        ]
+      ],
+      "local": {
+        "rutara": "Nyambo (Haya)"
+      }
+    },
+    "katsina": {
+      "court": "hausa",
+      "mix": [
+        [
+          "hausa",
+          0.88
+        ],
+        [
+          "fulbe",
+          0.08
+        ],
+        [
+          "kanuri",
+          0.04
+        ]
+      ],
+      "local": {
+        "hausa": "Hausa",
+        "fulbe": "Fulbe (arriving)",
+        "kanuri": "Kanuri traders"
+      }
+    },
+    "khoikhoi": {
+      "court": "khoekhoe",
+      "mix": [
+        [
+          "khoekhoe",
+          1
+        ]
+      ],
+      "local": {
+        "khoekhoe": "Khoekhoe groups"
+      }
+    },
+    "kitara": {
+      "court": "rutara",
+      "mix": [
+        [
+          "rutara",
+          1
+        ]
+      ],
+      "local": {
+        "rutara": "Great Lakes pastoral and farming communities (Proto-Rutara)"
+      }
+    },
+    "kunene_peoples": {
+      "court": "ovambo",
+      "mix": [
+        [
+          "ovambo",
+          0.85
+        ],
+        [
+          "san",
+          0.15
+        ]
+      ],
+      "local": {
+        "ovambo": "Bantu-speaking agropastoralists",
+        "san": "San and Khoe contacts"
+      }
+    },
+    "kwango_kasai_societies": {
+      "court": "kasai",
+      "mix": [
+        [
+          "kasai",
+          1
+        ]
+      ],
+      "local": {
+        "kasai": "Proto-Yaka, Pende, Kuba, Lele and Ruund groups"
+      }
+    },
+    "kwararafa": {
+      "court": "jukun",
+      "mix": [
+        [
+          "jukun",
+          1
+        ]
+      ],
+      "local": {
+        "jukun": "Jukun and Benue peoples"
+      }
+    },
+    "la_palma": {
+      "court": "guanche",
+      "mix": [
+        [
+          "guanche",
+          1
+        ]
+      ],
+      "local": {
+        "guanche": "Benahoaritas"
+      }
+    },
+    "lake_malawi_peoples": {
+      "court": "chewa",
+      "mix": [
+        [
+          "chewa",
+          1
+        ]
+      ],
+      "local": {
+        "chewa": "Chewa, Tumbuka and Nsenga"
+      }
+    },
+    "lenape": {
+      "court": "lenape",
+      "mix": [
+        [
+          "lenape",
+          1
+        ]
+      ],
+      "local": {
+        "lenape": "Lenape and Munsee"
+      }
+    },
+    "loango": {
+      "court": "kongo",
+      "mix": [
+        [
+          "kongo",
+          1
+        ]
+      ],
+      "local": {
+        "kongo": "Vili and Yombe (Kikongo cluster)"
+      }
+    },
+    "luba": {
+      "court": "luba",
+      "mix": [
+        [
+          "luba",
+          1
+        ]
+      ],
+      "local": {
+        "luba": "Proto-Luba"
+      }
+    },
+    "maasai_kenya_highlands": {
+      "court": "kalenjin",
+      "mix": [
+        [
+          "kalenjin",
+          0.4
+        ],
+        [
+          "maa",
+          0.3
+        ],
+        [
+          "kikuyu",
+          0.3
+        ]
+      ],
+      "local": {
+        "kalenjin": "Kalenjin ancestors and Southern Cushites",
+        "maa": "Maa-speakers",
+        "kikuyu": "Bantu highland farmers"
+      }
+    },
+    "madagascar_coast": {
+      "court": "malagasy",
+      "mix": [
+        [
+          "malagasy",
+          1
+        ]
+      ],
+      "local": {
+        "malagasy": "Coastal Malagasy"
+      }
+    },
+    "madagascar_highlands": {
+      "court": "malagasy",
+      "mix": [
+        [
+          "malagasy",
+          1
+        ]
+      ],
+      "local": {
+        "malagasy": "Highland Malagasy"
+      }
+    },
+    "madagascar_north_trading_towns": {
+      "court": "swahili",
+      "mix": [
+        [
+          "malagasy",
+          0.65
+        ],
+        [
+          "swahili",
+          0.35
+        ]
+      ],
+      "local": {
+        "malagasy": "Malagasy",
+        "swahili": "Antalaotra"
+      }
+    },
+    "mafia": {
+      "court": "swahili",
+      "mix": [
+        [
+          "swahili",
+          1
+        ]
+      ],
+      "local": {
+        "swahili": "Swahili"
+      }
+    },
+    "makua_lomwe": {
+      "court": "makua",
+      "mix": [
+        [
+          "makua",
+          1
+        ]
+      ],
+      "local": {
+        "makua": "Makua and Lomwe"
+      }
+    },
+    "mandan_hidatsa": {
+      "court": "mandan",
+      "mix": [
+        [
+          "mandan",
+          1
+        ]
+      ],
+      "local": {
+        "mandan": "Mandan ancestors"
+      }
+    },
+    "mande_kafus": {
+      "court": "mandinka",
+      "mix": [
+        [
+          "mandinka",
+          0.6
+        ],
+        [
+          "bamana",
+          0.25
+        ],
+        [
+          "susu",
+          0.15
+        ]
+      ],
+      "local": {
+        "mandinka": "Maninka",
+        "bamana": "Bamana",
+        "susu": "Jalonke"
+      }
+    },
+    "mbundu_chiefdoms": {
+      "court": "mbundu",
+      "mix": [
+        [
+          "mbundu",
+          1
+        ]
+      ],
+      "local": {
+        "mbundu": "Mbundu, Libolo and Kisama"
+      }
+    },
+    "middle_belt_societies": {
+      "court": "middle_belt",
+      "mix": [
+        [
+          "middle_belt",
+          1
+        ]
+      ],
+      "local": {
+        "middle_belt": "Gbagyi, Plateau peoples, Idoma and Tiv"
+      }
+    },
+    "mombasa": {
+      "court": "swahili",
+      "mix": [
+        [
+          "swahili",
+          1
+        ]
+      ],
+      "local": {
+        "swahili": "Swahili"
+      }
+    },
+    "mzab": {
+      "court": "mozabite",
+      "mix": [
+        [
+          "mozabite",
+          0.85
+        ],
+        [
+          "bedouin_arabic",
+          0.15
+        ]
+      ],
+      "local": {
+        "mozabite": "Mozabite Berbers",
+        "bedouin_arabic": "Allied Arab nomads"
+      }
+    },
+    "natchez_plaquemine": {
+      "court": "natchez",
+      "mix": [
+        [
+          "natchez",
+          0.7
+        ],
+        [
+          "tunica",
+          0.3
+        ]
+      ],
+      "local": {
+        "natchez": "Plaquemine (Natchez)",
+        "tunica": "Tunican-speakers"
+      }
+    },
+    "neutral_erie": {
+      "court": "neutral_erie",
+      "mix": [
+        [
+          "neutral_erie",
+          1
+        ]
+      ],
+      "local": {
+        "neutral_erie": "Western Ontario and Lake Erie Iroquoians"
+      }
+    },
+    "nguni": {
+      "court": "nguni",
+      "mix": [
+        [
+          "nguni",
+          1
+        ]
+      ],
+      "local": {
+        "nguni": "Nguni"
+      }
+    },
+    "ojibwe_anishinaabe": {
+      "court": "anishinaabe",
+      "mix": [
+        [
+          "anishinaabe",
+          1
+        ]
+      ],
+      "local": {
+        "anishinaabe": "Ojibwe, Odawa, Potawatomi, Algonquin and Nipissing"
+      }
+    },
+    "oneota": {
+      "court": "ho_chunk",
+      "mix": [
+        [
+          "ho_chunk",
+          0.6
+        ],
+        [
+          "dakota",
+          0.4
+        ]
+      ],
+      "local": {
+        "ho_chunk": "Oneota (ancestral Chiwere-Siouan, Ho-Chunk)",
+        "dakota": "Psinomani (ancestral Dakota)"
+      }
+    },
+    "oodham": {
+      "court": "oodham",
+      "mix": [
+        [
+          "oodham",
+          1
+        ]
+      ],
+      "local": {
+        "oodham": "Hohokam, Salado and O'odham"
+      }
+    },
+    "oromo": {
+      "court": "oromo",
+      "mix": [
+        [
+          "oromo",
+          1
+        ]
+      ],
+      "local": {
+        "oromo": "Oromo"
+      }
+    },
+    "ovimbundu_central_angola": {
+      "court": "umbundu",
+      "mix": [
+        [
+          "umbundu",
+          1
+        ]
+      ],
+      "local": {
+        "umbundu": "Highland Bantu-speaking communities (Proto-Umbundu)"
+      }
+    },
+    "oyo": {
+      "court": "yoruba",
+      "mix": [
+        [
+          "yoruba",
+          1
+        ]
+      ],
+      "local": {
+        "yoruba": "Yoruba (Oyo)"
+      }
+    },
+    "pacific_northwest": {
+      "court": "tsimshian",
+      "mix": [
+        [
+          "tsimshian",
+          0.6
+        ],
+        [
+          "salish",
+          0.4
+        ]
+      ],
+      "local": {
+        "tsimshian": "Tsimshianic peoples",
+        "salish": "Nuxalk and Chinookan peoples"
+      }
+    },
+    "pawnee_plains_villagers": {
+      "court": "pawnee",
+      "mix": [
+        [
+          "pawnee",
+          1
+        ]
+      ],
+      "local": {
+        "pawnee": "Coalescent, Great Bend and Washita River villagers"
+      }
+    },
+    "powhatan_precursors": {
+      "court": "powhatan",
+      "mix": [
+        [
+          "powhatan",
+          1
+        ]
+      ],
+      "local": {
+        "powhatan": "Virginia and Carolina Algonquians, Nanticoke and Piscataway"
+      }
+    },
+    "rwanda": {
+      "court": "kinyarwanda",
+      "mix": [
+        [
+          "kinyarwanda",
+          1
+        ]
+      ],
+      "local": {
+        "kinyarwanda": "Ancestors of Rwandans"
+      }
+    },
+    "san": {
+      "court": "san",
+      "mix": [
+        [
+          "san",
+          1
+        ]
+      ],
+      "local": {
+        "san": "San groups"
+      }
+    },
+    "sanhaja_zenaga": {
+      "court": "zenaga",
+      "mix": [
+        [
+          "zenaga",
+          0.75
+        ],
+        [
+          "bedouin_arabic",
+          0.25
+        ]
+      ],
+      "local": {
+        "zenaga": "Zenaga Berbers and zawaya lineages",
+        "bedouin_arabic": "Arabic-speaking Hassan newcomers"
+      }
+    },
+    "sine": {
+      "court": "serer",
+      "mix": [
+        [
+          "serer",
+          1
+        ]
+      ],
+      "local": {
+        "serer": "Serer"
+      }
+    },
+    "sofala": {
+      "court": "swahili",
+      "mix": [
+        [
+          "swahili",
+          1
+        ]
+      ],
+      "local": {
+        "swahili": "Swahili"
+      }
+    },
+    "sotho_tswana": {
+      "court": "sotho_tswana",
+      "mix": [
+        [
+          "sotho_tswana",
+          1
+        ]
+      ],
+      "local": {
+        "sotho_tswana": "Sotho-Tswana"
+      }
+    },
+    "southern_new_england_algonquians": {
+      "court": "massachusett",
+      "mix": [
+        [
+          "massachusett",
+          1
+        ]
+      ],
+      "local": {
+        "massachusett": "Wampanoag, Narragansett, Pequot-Mohegan, Massachusett, Nipmuc and Mahican"
+      }
+    },
+    "st_lawrence_iroquoians": {
+      "court": "laurentian",
+      "mix": [
+        [
+          "laurentian",
+          1
+        ]
+      ],
+      "local": {
+        "laurentian": "St. Lawrence Iroquoians"
+      }
+    },
+    "takrur_futa_toro": {
+      "court": "fulbe",
+      "mix": [
+        [
+          "fulbe",
+          0.9
+        ],
+        [
+          "serer",
+          0.1
+        ]
+      ],
+      "local": {
+        "fulbe": "Haalpulaar (Tukulor) and Fulbe",
+        "serer": "Serer remnants"
+      }
+    },
+    "tenerife_menceyatos": {
+      "court": "guanche",
+      "mix": [
+        [
+          "guanche",
+          1
+        ]
+      ],
+      "local": {
+        "guanche": "Guanche"
+      }
+    },
+    "thulamela": {
+      "court": "venda",
+      "mix": [
+        [
+          "venda",
+          0.7
+        ],
+        [
+          "shona",
+          0.3
+        ]
+      ],
+      "local": {
+        "venda": "Venda precursors",
+        "shona": "Shona-related groups"
+      }
+    },
+    "timbuktu_tuareg": {
+      "court": "tamasheq",
+      "mix": [
+        [
+          "tamasheq",
+          1
+        ]
+      ],
+      "local": {
+        "tamasheq": "Kel Tamasheq and dependent Bella"
+      }
+    },
+    "timucua": {
+      "court": "timucua",
+      "mix": [
+        [
+          "timucua",
+          1
+        ]
+      ],
+      "local": {
+        "timucua": "Timucua"
+      }
+    },
+    "tio": {
+      "court": "teke",
+      "mix": [
+        [
+          "teke",
+          1
+        ]
+      ],
+      "local": {
+        "teke": "Tio (Teke)"
+      }
+    },
+    "tlingit_haida": {
+      "court": "tlingit",
+      "mix": [
+        [
+          "tlingit",
+          0.6
+        ],
+        [
+          "haida",
+          0.4
+        ]
+      ],
+      "local": {
+        "tlingit": "Tlingit",
+        "haida": "Haida"
+      }
+    },
+    "tonga_zambezi": {
+      "court": "tonga",
+      "mix": [
+        [
+          "tonga",
+          0.8
+        ],
+        [
+          "shona",
+          0.2
+        ]
+      ],
+      "local": {
+        "tonga": "Valley and plateau Tonga precursors",
+        "shona": "Tavara"
+      }
+    },
+    "touggourt_ouargla": {
+      "court": "zenata",
+      "mix": [
+        [
+          "zenata",
+          0.55
+        ],
+        [
+          "maghrebi_arabic",
+          0.25
+        ],
+        [
+          "bedouin_arabic",
+          0.2
+        ]
+      ],
+      "local": {
+        "zenata": "Zenata Berbers",
+        "maghrebi_arabic": "Haratin cultivators and oasis townspeople",
+        "bedouin_arabic": "Arab nomads"
+      }
+    },
+    "tuareg_kel_ajjer": {
+      "court": "tamasheq",
+      "mix": [
+        [
+          "tamasheq",
+          1
+        ]
+      ],
+      "local": {
+        "tamasheq": "Tamahaq (Kel Ajjer, Kel Ahaggar)"
+      }
+    },
+    "tuat": {
+      "court": "zenata",
+      "mix": [
+        [
+          "zenata",
+          0.6
+        ],
+        [
+          "maghrebi_arabic",
+          0.4
+        ]
+      ],
+      "local": {
+        "zenata": "Zenata Berbers and Haratin cultivators",
+        "maghrebi_arabic": "Arab, Sharifian and murabit lineages"
+      }
+    },
+    "tubu_teda": {
+      "court": "tubu",
+      "mix": [
+        [
+          "tubu",
+          0.85
+        ],
+        [
+          "kanuri",
+          0.15
+        ]
+      ],
+      "local": {
+        "tubu": "Teda",
+        "kanuri": "Kanuri traders in Kawar"
+      }
+    },
+    "upper_guinea_coast": {
+      "court": "temne",
+      "mix": [
+        [
+          "temne",
+          1
+        ]
+      ],
+      "local": {
+        "temne": "Baga, Landuma, Nalu, Temne, Bullom, Kissi and Limba"
+      }
+    },
+    "voltaic_stateless_societies": {
+      "court": "voltaic",
+      "mix": [
+        [
+          "voltaic",
+          1
+        ]
+      ],
+      "local": {
+        "voltaic": "Dogon, Kurumba, Bwa, Gurunsi, Lobi, Dagara and Konkomba"
+      }
+    },
+    "wakashan": {
+      "court": "wakashan",
+      "mix": [
+        [
+          "wakashan",
+          1
+        ]
+      ],
+      "local": {
+        "wakashan": "Kwakwaka'wakw, Nuu-chah-nulth, Makah, Heiltsuk and Haisla"
+      }
+    },
+    "warsangali": {
+      "court": "somali",
+      "mix": [
+        [
+          "somali",
+          1
+        ]
+      ],
+      "local": {
+        "somali": "Somali (Warsangali and other northern clans)"
+      }
+    },
+    "windward_coast_peoples": {
+      "court": "kru",
+      "mix": [
+        [
+          "kru",
+          0.8
+        ],
+        [
+          "vai",
+          0.2
+        ]
+      ],
+      "local": {
+        "kru": "Kru, Grebo, Dei and lagoon peoples",
+        "vai": "Vai"
+      }
+    },
+    "zamfara": {
+      "court": "hausa",
+      "mix": [
+        [
+          "hausa",
+          0.88
+        ],
+        [
+          "fulbe",
+          0.08
+        ],
+        [
+          "kanuri",
+          0.04
+        ]
+      ],
+      "local": {
+        "hausa": "Hausa",
+        "fulbe": "Fulbe (arriving)",
+        "kanuri": "Kanuri traders"
+      }
+    },
+    "zanzibar": {
+      "court": "swahili",
+      "mix": [
+        [
+          "swahili",
+          1
+        ]
+      ],
+      "local": {
+        "swahili": "Swahili"
+      }
+    },
+    "zazzau": {
+      "court": "hausa",
+      "mix": [
+        [
+          "hausa",
+          0.88
+        ],
+        [
+          "fulbe",
+          0.08
+        ],
+        [
+          "kanuri",
+          0.04
+        ]
+      ],
+      "local": {
+        "hausa": "Hausa",
+        "fulbe": "Fulbe (arriving)",
+        "kanuri": "Kanuri traders"
+      }
+    }
+  }
+}
