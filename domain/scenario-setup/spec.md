@@ -318,6 +318,56 @@ too much in terms of gameplay").
   and the Ways to grow line fit the Wide and Tall layouts inside the safe areas, every row and button is at least 44
   points high, and nothing needs hover. [X-19; X-20]
 
+### 5.9 Sleeping realms (Leroy, 18 October; X-24)
+
+Realms that history founds after 1444 (Spain, the Dutch Republic, the Mughals, Qing …) and realms nobody can name
+ahead (a homeland that breaks away, a house of a broken Shogunate) are in every campaign from the start, asleep.
+
+- SETUP-080 (Ubiquitous): The game shall hold, besides the map nations, a list of **sleeping realms**, each with an
+  id, a name, a colour, a flag, its event-tree ids, a capital province and its home land (a list of provinces), in
+  the scenario-setup data. [X-24]
+- SETUP-081 (Ubiquitous): The game shall also hold spare sleeping realms with no name of their own (`spare_count`),
+  for realms that wake where no listed sleeper fits. [X-24] @placeholder `sleeping_realms.spare_count`
+- SETUP-082 (State-driven): While a realm sleeps, it shall hold no land, armies, fleets, lords, treasury,
+  relations or subjects, shall not be drawn, named or listed anywhere (map, realm picker, play on, Diplomacy,
+  dispatches), shall take no turn and shall not count as gone. [X-24]
+- SETUP-083 (Event-driven): When a sleeping realm wakes, the game shall give it land, a capital, a ruler, a start
+  form of government, peoples' faith and tongue from its land, starting gold, the levies its land can call and
+  standing at neutral with every realm, and from then on it is an ordinary realm. [X-24]
+- SETUP-084 (Event-driven): When a realm wakes, its land shall be, in this order: the land of the realms it is
+  formed from, when it is formed from realms (a union); else the provinces the waking names; else its home land.
+  Only land a realm that is not the waking one's overlord holds is taken; a province taken leaves its old owner's
+  lord and siege as a province handed over without a war does. [X-24; DIPL-113]
+- SETUP-085 (Event-driven): When a realm is formed from other realms (a union), every one of them shall end in it:
+  their land passes to it, their subjects and allies become its own, and they are gone. If the player's realm is
+  one of them, the player plays on as the formed realm and is told so. [X-24; SHELL-095]
+- SETUP-086 (Event-driven): When a realm breaks away from another (a release, a revolt, a split), the realm it
+  broke from keeps every province not taken, and the two hold a truce. [X-24]
+- SETUP-087 (Event-driven): When a realm wakes as a subject of another (`subject_of`), the other shall be its
+  overlord with the kind the waking names, else a vassal. [X-24; SUBJ-022]
+- SETUP-088 (Event-driven): When no listed sleeper fits the waking (a homeland that breaks away, a house of a broken
+  Shogunate), the game shall wake the first spare sleeper, named for its people or house and coloured apart from
+  its neighbours. When none is left the waking shall fall back to what the waking context decides without one.
+  [X-24]
+- SETUP-089 (Event-driven): A gone map realm shall wake again the same way when an event founds it anew (Poland in
+  1918). [X-24]
+- SETUP-090 (Unwanted): If a sleeping realm's land has no province to give it, then it shall stay asleep and the
+  waking shall change nothing on the map. [X-24]
+- SETUP-091 (Ubiquitous): Saves shall keep which realms sleep and what each woken realm is called and coloured. [X-24]
+
+#### How the player uses it
+
+- SETUP-092 Where: the player sees a realm wake on the map and in the dispatches, never in a menu. A founding is a
+  major dispatch card with the new realm's flag and name and one line of what it was made from ("Spain is founded
+  from Castile and Aragon"); a tap on the card centres the map on the new realm, whose land takes its colour at
+  once. Sleeping realms are never shown or listed. [X-19; X-24]
+- SETUP-093 Grouping and overview: a woken realm has the same country card (General, Diplomacy, Trade, Army) as
+  every realm, and the Realms list and Diplomacy map mode show it like the others. When the player's own realm is
+  formed into another, a dispatch says "Your realm is now Spain" and the top bar shows the new flag and name. No new
+  screen. [X-19; X-24]
+- SETUP-094 Phone: the founding card is a dispatch card with the usual 44-point buttons (Show on the map, Close) in
+  the Wide and Tall layouts inside the safe areas; nothing needs hover. [X-19; X-24]
+
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
@@ -335,6 +385,7 @@ too much in terms of gameplay").
 | `StartFormsAssigned` | Start-form tool run | form per record | government |
 | `MapSetupBuilt` | Map setup written | owners, population, wealth, castles, nations | province, warfare, buildings |
 | `StartingWorldBuilt` | New game, before the first turn | countries, provinces, relations, seeds of each system | realm, province, diplomacy, subjects, trade, naval, religion, culture, exploration, research, government, buildings |
+| `RealmWoke` | A sleeping realm wakes | realm, how (founded, formed, broke away, revived), from realms, provinces | realm, diplomacy, events, game-shell, map-presentation |
 | `CampaignStarted` | Starting world built | campaign id, seed, player nation, rules | time-and-turns, saves, game-shell, achievements |
 
 ## 8. Policies (reactions to other contexts)
@@ -426,6 +477,7 @@ Nothing after the start. Before the first turn: build the starting world, then t
 - **D-SETUP-15** (was OQ-SETUP-15) Province names: modern region names stay. D-MAP-6 settles it.
 - **D-SETUP-16** (was OQ-SETUP-16) Coverage and certainty: a disputed, partial or stub record enters play only if it owns map provinces, and low confidence only widens its start range (D-SETUP-6). X-13 settles it.
 - **D-SETUP-17** (was OQ-SETUP-17) Population scale: the map's figure is the province's people in thousands (Aube 305 thousand); the Troyes card's 72,000 is a town-sized illustration, not data. The map is the only complete set.
+- **D-SETUP-19** Sleeping realms (Leroy, 18 Oct; X-24): realms founded after 1444 are listed from the start and asleep until they wake (SETUP-080 to SETUP-094). D-SETUP-2's "only a representation that owns map provinces is a realm" now reads "is a realm on the map in 1444"; a record that owns no province may be a sleeping realm.
 - **D-SETUP-18** African starts (Leroy, 18 Oct; X-20): in the four African regions, D-SETUP-2's "only a representation that owns map provinces is a realm" now applies after the catalogue's playable countries, subjects and peoples are given the unowned land around their capitals (SETUP-060 to SETUP-065); elsewhere D-SETUP-2 stands. Leroy asked for more of the historical states and tribes, even very small ones, and as little change to the rules of play as possible.
 - **D-SETUP-19** Added realms and the province grid (18 Oct; X-20, D-TRIBE-3): realms added from the catalogue (`grows` in the map nations data) take provinces as the map already cuts them, and never keep a piece of land apart the way the hand-placed capitals do, so every province keeps its id and every file that names provinces (ports, event places, anchors) stays valid. Sub-Saharan provinces are large (about 50,000 km² each), so where two capitals fall in one province the first in nation order keeps it and the other stays reference data (Kayor, Baol and Waalo in Jolof's province; Lamu and Pate in Mombasa's). The build lists them in `scenario-setup-report.json`. A finer African grid is a map change of its own. The start-date plan (1378) extends the same rows: a realm's capital, its own owner rules and `grows`.
 

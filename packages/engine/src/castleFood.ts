@@ -287,7 +287,7 @@ export function shareFood(world: World): void {
     const c = castleOf[p]!;
     disposeSurplus(world, n, c >= 0 ? policyAt(world, c).surplus : world.foodPolicy[n]!.realm.surplus, over, p);
   }
-  const capitals = new Set(world.rules.nations.map((x) => world.provinceIndex.get(x.capital)));
+  const capitals = new Set(world.rules.nations.map((x, n) => (world.nationAsleep[n] ? undefined : world.provinceIndex.get(x.capital))));
   const castles = [...rings.keys()].sort((a, b) => Number(capitals.has(a)) - Number(capitals.has(b)));
   for (const c of castles) {
     const over = cs[c]! - castleCap(world, c);

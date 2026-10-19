@@ -67,6 +67,8 @@ export function createGameEvents(world: World): GameEvents {
     pl.provinces = ps.map((p) => provinceKey(world.provinceIds[p]!));
   }
   for (const id of treeId) evt.country(tree, id).stats = { ...bridge.start.country };
+  // A sleeping realm is not yet in the world (SETUP-082).
+  treeId.forEach((id, n) => world.nationAsleep[n] && (evt.country(tree, id).exists = false));
   const state = evt.newState(tree, { events: evt.campaignEvents(data.events), ages: data.ages, periods: data.periods });
   state.conditions = {};
   leanByTraits(world, state, nationOf);
@@ -196,6 +198,8 @@ function sync(world: World, g: GameEvents): void {
     if (world.provinceGrievances[p]) aggrieved[o]!++;
   }
   for (let n = 0; n < world.nationCount; n++) {
+    // A sleeping realm is the tree's own until it wakes (SETUP-082).
+    if (world.nationAsleep[n]) continue;
     const id = g.treeId[n]!;
     const c = evt.country(w, id);
     c.exists = !world.nationGone[n];
@@ -211,7 +215,11 @@ function sync(world: World, g: GameEvents): void {
     const learned = Math.max(0, (world.research[n]?.known.size ?? 0) - (g.knownAtStart[n] ?? 0));
     for (const t of TECH) c.stats[t] = bridge.start.country[t] + learned + (g.adjust[id]?.[t] ?? 0);
   }
-  const tree = (id: string) => g.treeId[world.nationIndex.get(id) ?? -1];
+  // A sleeping realm has no ties to show (SETUP-082).
+  const tree = (id: string) => {
+    const n = world.nationIndex.get(id) ?? -1;
+    return world.nationAsleep[n] ? undefined : g.treeId[n];
+  };
   for (const r of d.graph.relations) {
     const x = tree(r.source);
     const y = tree(r.target);

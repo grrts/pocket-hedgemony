@@ -1,0 +1,15 @@
+{
+  "_doc": "Sleeping realms (SETUP-080, SETUP-081, X-24): realms history founds after 1444, listed from the start and asleep until they wake. Spares have no name of their own; they are named and coloured when they wake.",
+  "spare_count": 12,
+  "realms": [
+    { "id": "spain", "name": "Spain", "color": "#d4a017", "capital": "p1601", "tree": ["spain"], "home": [] },
+    { "id": "dutch_republic", "name": "Dutch Republic", "color": "#e8772e", "capital": "p811", "tree": ["dutch_republic"], "home": ["p811"] },
+    { "id": "babur_kabul", "name": "Kabul", "color": "#7a9a3a", "capital": "p2005", "tree": ["babur_kabul"], "home": ["p2005"] },
+    { "id": "mughals", "name": "Mughal Empire", "color": "#3c8d5a", "capital": "p2574", "tree": ["mughals"], "home": ["p2574", "p2575", "p2576", "p2577", "p2578", "p2579", "p2580"] },
+    { "id": "sikh_empire", "name": "Sikh Empire", "color": "#d9822b", "capital": "p2318", "tree": ["sikh_empire"], "home": ["p2313", "p2315", "p2316", "p2317", "p2318", "p2319", "p2320", "p2321"] },
+    { "id": "transylvania", "name": "Transylvania", "color": "#8e5a9b", "capital": "p1150", "tree": ["transylvania"], "home": ["p1150", "p1151", "p1153", "p1155", "p1156", "p1418", "p1425", "p1431"] },
+    { "id": "czechoslovakia", "name": "Czechoslovakia", "color": "#3b6fb6", "capital": "p839", "tree": ["czechoslovakia"], "home": ["p836", "p839", "p840", "p843", "p1109", "p1113", "p1117"] },
+    { "id": "poland_lithuania", "name": "Poland-Lithuania", "color": "#c0392b", "capital": "p1136", "tree": ["poland_lithuania"], "home": [] },
+    { "id": "russia", "name": "Russia", "color": "#2e7d4f", "capital": "p633", "tree": ["russia"], "home": [] }
+  ]
+}

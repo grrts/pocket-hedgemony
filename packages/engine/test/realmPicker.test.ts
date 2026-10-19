@@ -2,8 +2,10 @@ import { describe, expect, it } from "vitest";
 import { loadDefaultRuleset } from "@ph/rules";
 import { PICKER_REGIONS, pickerRegions, recordRegion, startTrade, waysToGrow, waysToGrowLine, type GrowthMap } from "../src/domain/scenario-setup/index.ts";
 
-const rules = loadDefaultRuleset();
-const at = new Map(rules.provinces.map((p) => [p.id, p]));
+const loaded = loadDefaultRuleset();
+// The realms on the map at the start; sleeping realms wake later and are never in the picker (SETUP-082).
+const rules = { ...loaded, nations: loaded.nations.filter((n) => !n.asleep) };
+const at = new Map(loaded.provinces.map((p) => [p.id, p]));
 const realms = rules.nations.map((n) => ({ id: n.id, x: at.get(n.capital)!.x!, y: at.get(n.capital)!.y! }));
 const regions = pickerRegions(realms);
 const regionOf = (id: string) => regions[rules.nations.findIndex((n) => n.id === id)];

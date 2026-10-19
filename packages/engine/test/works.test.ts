@@ -40,6 +40,7 @@ describe("works (milestone 4)", () => {
   it("stands the map's castles and a stone castle in every capital in 1444", () => {
     const w = createWorld(rules, 1, tiles);
     for (const n of rules.nations) {
+      if (n.asleep) continue;
       const cap = w.provinceIndex.get(n.capital)!;
       expect(worksAt(w, cap, work("castle"))).toBe(2);
     }

@@ -35,7 +35,6 @@ export const NOT_YET: ReadonlySet<string> = new Set([
   "style_adopted",
   "ocean_crossed",
   "first_contact",
-  "colony_by_treaty",
   "around_the_world",
   "demand_granted",
   "great_revolt_beaten",

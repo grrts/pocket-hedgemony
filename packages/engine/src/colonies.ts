@@ -7,6 +7,8 @@ import { formOf } from "./government.ts";
 import { relationState } from "./war.ts";
 import { mix, personName } from "./names.ts";
 import { OFFICIALS } from "./officials.ts";
+import { aiWaitsToFound, colonyStarts } from "./tribes.ts";
+import { noteMoment } from "./achievements.ts";
 import {
   chartAround,
   chartArmies,
@@ -301,13 +303,14 @@ function foundColony(world: World, n: number, id: number, p: number, news: News[
   const o = colonialOffice(world, n);
   const why = whyNotColony(world, n, p, rangeZones(world, n, o.range));
   if (why) return why;
-  const aggression = ex.rollAggression(world.rng, peopleAround(world, p));
+  // On a tribe's hunting ground the locals are fiercer and the tribe angry; on land it gave up, Peaceful (TRIBE-021 to TRIBE-024).
+  const { aggression, consent } = colonyStarts(world, n, p, ex.rollAggression(world.rng, peopleAround(world, p)), news);
   g.fleet = -1;
   g.colony = p;
   g.homeward = false;
   // A colony a viceroy's fleet founds starts ahead (NAVY-154).
   const ahead = f.admiral >= 0 ? (nv.postRow(f.post).colonyStart ?? 0) : 0;
-  world.explore.colonies.push({ province: p, owner: n, governor: g.id, progress: CFG.progress_start + ahead, aggression, food: 0, lastChange: 0 });
+  world.explore.colonies.push({ province: p, owner: n, governor: g.id, progress: CFG.progress_start + ahead, aggression, food: 0, lastChange: 0, ...(consent ? { consent } : {}) });
   if (n === world.player) news.push({ kind: "colony", text: `${g.name} goes ashore at ${name(world, p)} and starts a colony. The locals are ${aggression.toLowerCase()}.`, nations: [n], province: p });
   return null;
 }
@@ -346,6 +349,8 @@ function founded(world: World, c: ColonyFounding, news: News[]): void {
   e.founded[p] = n;
   chartAround(world, n, p);
   addBorders(world, n);
+  // Treaty on the Shore: founded with the consent of the local people (ACH colony_by_treaty).
+  noteMoment(world, n, "colony_founded", { founded_with_consent_of_local_people: !!c.consent }, p);
   news.push({ kind: "colony", text: `The colony at ${name(world, p)} is founded: it is ${world.rules.nations[n]!.name}'s now${g ? `, and ${g.name} hands it to its first warden` : ""}.`, nations: [n], province: p });
 }
 
@@ -470,7 +475,8 @@ function aiExploration(world: World, news: News[]): void {
       const stores = f.ships.reduce((t, s) => t + (s.stores ?? 0), 0);
       if (world.provinceWater[f.at]) {
         // Beside an empty coast with a governor aboard: found, and put the stores ashore.
-        const site = gov && zones ? neighbours(world, f.at).find((p) => !whyNotColony(world, n, p, zones)) : undefined;
+        // A tribe's hunting ground waits for the answer to an ask for the land (TRIBE-033).
+        const site = gov && zones ? neighbours(world, f.at).find((p) => !whyNotColony(world, n, p, zones) && !aiWaitsToFound(world, n, p, news)) : undefined;
         if (site !== undefined && !foundColony(world, n, f.id, site, news)) unloadStores(world, n, f.id, news);
         else if (stores && e.colonies.some((c) => c.owner === n && besides(world, f.at, c.province))) unloadStores(world, n, f.id, news);
         aiHome(world, f);
@@ -481,7 +487,9 @@ function aiExploration(world: World, news: News[]): void {
         continue;
       }
       const hungry = e.colonies.find((c) => c.owner === n && c.food < aiFoodNeed(c));
-      const target = zones && office.used < office.slots ? aiColonySite(world, n, zones) : -1;
+      const site = zones && office.used < office.slots ? aiColonySite(world, n, zones) : -1;
+      // Before sailing for a tribe's hunting ground the AI asks for the land, and sails once answered (TRIBE-033).
+      const target = site >= 0 && aiWaitsToFound(world, n, site, news) ? -1 : site;
       if (hungry || target >= 0) {
         if (!gov && !hungry && hireGovernor(world, n, f.id, news)) continue;
         loadStores(world, n, f.id);

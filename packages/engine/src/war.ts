@@ -36,7 +36,7 @@ const rel = dip.relations;
 
 /** Something that happened this turn that a player may want to read. */
 export interface News {
-  kind: "war" | "joined" | "call" | "peace" | "battle" | "siege" | "occupied" | "freed" | "raised" | "refused" | "destroyed" | "famine" | "unrest" | "invention" | "built" | "envoy" | "reform" | "rebels" | "event" | "heritage" | "voyage" | "colony" | "crown" | "revolution" | "trade" | "ruler" | "campaign";
+  kind: "war" | "joined" | "call" | "peace" | "battle" | "siege" | "occupied" | "freed" | "raised" | "refused" | "destroyed" | "famine" | "unrest" | "invention" | "built" | "envoy" | "reform" | "rebels" | "event" | "heritage" | "voyage" | "colony" | "crown" | "revolution" | "trade" | "ruler" | "campaign" | "founded" | "tribe";
   text: string;
   /** Nations it is about, by index. */
   nations: number[];
@@ -80,7 +80,8 @@ export function maxGarrison(world: World, p: number): number {
 /** The 1444 relations between the map's realms (the dataset also lists realms the map folds into others). */
 export function createWarState(world: World): dip.Diplomacy {
   const d = dip.createFromDataset(isoDate(world));
-  const onMap = (id: string) => world.nationIndex.has(id);
+  // A sleeping realm has no ties in 1444 (SETUP-082).
+  const onMap = (id: string) => world.nationIndex.has(id) && !world.nationAsleep[world.nationIndex.get(id)!];
   d.graph.relations = d.graph.relations.filter((r) => onMap(r.source) && onMap(r.target));
   d.graph.facts = d.graph.facts.filter((f) => onMap(f.source) && onMap(f.target));
   // Wars already under way in November 1444 become wars the game can end.
@@ -1000,9 +1001,11 @@ export function checkDestroyed(world: World, news: News[]): void {
     const a = world.armies;
     for (let i = 0; i < a.count; i++) if (a.alive[i] && a.owner[i] === n) a.alive[i] = 0;
     rel.countryDestroyed(world.diplomacy.graph, id);
-    for (const w of world.diplomacy.wars) {
+    for (const w of [...world.diplomacy.wars]) {
       w.attackers = w.attackers.filter((x) => x !== id);
       w.defenders = w.defenders.filter((x) => x !== id);
+      // A war it led has no one left to make the peace: it ends.
+      if (w.declarer === id || w.target === id) dip.endWar(world.diplomacy, w);
     }
     world.diplomacy.wars = world.diplomacy.wars.filter((w) => w.attackers.length && w.defenders.length);
     for (let p = 0; p < world.provinceCount; p++) if (world.provinceOccupier[p] === n) world.provinceOccupier[p] = -1;

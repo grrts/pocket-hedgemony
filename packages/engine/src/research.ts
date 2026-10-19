@@ -135,6 +135,27 @@ export function seedResearch(world: World): void {
   for (let n = 0; n < world.nationCount; n++) refreshHarvest(world, n);
 }
 
+/**
+ * A woken realm's learning (SETUP-083): what the realm it takes after knows,
+ * its contacts and start group, with no school or study of its own yet.
+ */
+export function wakeResearch(world: World, n: number, donor: number): void {
+  const id = world.nationIds[n]!;
+  const p = rs.startingProgramme(donor >= 0 ? world.nationIds[donor]! : id);
+  p.country = id;
+  if (donor >= 0) {
+    const d = world.research[donor]!;
+    p.known = new Set(d.known);
+    p.contacts = new Set(d.contacts);
+    if (d.group !== undefined) p.group = d.group;
+  }
+  p.scholars = START_SCHOLARS.unschooled;
+  world.research[n] = p;
+  world.researchSeats[n] = 0;
+  refreshNeighbours(world);
+  refreshHarvest(world, n);
+}
+
 // ---------------------------------------------------------------- recruits
 
 /** Each realm's provinces, by nation index. */

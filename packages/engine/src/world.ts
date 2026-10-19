@@ -1,4 +1,5 @@
 import type { GameDate, Ground, Ruleset } from "@ph/rules";
+import type { WokenRealm } from "./sleeping.ts";
 import { groundOf, rowWidths, wagonRations, type MarchMap, type TileMarch } from "./march.ts";
 import { placeClimate, provinceTemperature, type PlaceClimate } from "./climate.ts";
 import { pointTileGrid, type TileGrid } from "./tiles.ts";
@@ -41,6 +42,7 @@ import { seedStartingPosts, seedStartingPurse } from "./startingCounts.ts";
 import { createCampaignEndState, seedCampaign, type CampaignEndState } from "./campaignEnd.ts";
 import type { AchievementLog } from "./achievements.ts";
 import { createInstitutionsState, seedInstitutions, type InstitutionsState } from "./institutions.ts";
+import { createTribesState, seedTribes, type TribesState } from "./tribes.ts";
 
 /**
  * Simulation state stored as parallel typed arrays (one array per field,
@@ -48,7 +50,7 @@ import { createInstitutionsState, seedInstitutions, type InstitutionsState } fro
  * cache-friendly to iterate every turn and lets whole arrays be copied or
  * transferred to the UI thread without serialising objects.
  */
-export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState, RebelState, RevolutionState, PeoplesState, TradeState, RulerState, FallenState, BeliefState, InstitutionsState {
+export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState, RebelState, RevolutionState, PeoplesState, TradeState, RulerState, FallenState, BeliefState, InstitutionsState, TribesState {
   /** Heads of the faith: patrons, the Caliph, the conclave, censures (faithHeads.ts). */
   faithHeads: FaithHeadsState;
   /** Faiths a realm serves as the patron of their head while of another faith (RELG-145). */
@@ -124,8 +126,12 @@ export interface World extends LivingState, TreasuryState, FoodState, MoodState,
   battleSeq: number;
   /** Peace the AI offers the player, waiting for an answer until the next month. */
   peaceOffers: PeaceOffer[];
-  /** 1 once a nation has lost all its land. */
+  /** 1 once a nation has lost all its land; a sleeping realm is gone too, so every system passes it by (SETUP-082). */
   nationGone: Uint8Array;
+  /** 1 for a sleeping realm that has not woken (SETUP-082). */
+  nationAsleep: Uint8Array;
+  /** Woken realms' names, colours and capitals, for saves and the client (SETUP-091). */
+  woken: WokenRealm[];
 
   /** Men who can be called in each province now (recruiting: Recruits here), and the most there can be. */
   provinceRecruits: Float32Array;
@@ -427,7 +433,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     nationCount: N,
     nationIds,
     nationIndex,
-    nationTreasury: new Float64Array(N).fill(rules.defines.economy.startingTreasury),
+    nationTreasury: Float64Array.from(rules.nations, (n) => (n.asleep ? 0 : rules.defines.economy.startingTreasury)),
     nationLevies: new Float64Array(N),
     nationMaxLevies: new Float64Array(N),
     nationMonthlyIncome: new Float64Array(N),
@@ -447,7 +453,10 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     battles: [],
     battleSeq: 0,
     peaceOffers: [],
-    nationGone: new Uint8Array(N),
+    // Sleeping realms are gone and asleep from the start: no turn, no land, nothing listed (SETUP-082).
+    nationGone: Uint8Array.from(rules.nations, (n) => (n.asleep ? 1 : 0)),
+    nationAsleep: Uint8Array.from(rules.nations, (n) => (n.asleep ? 1 : 0)),
+    woken: [],
     campaign: createCampaignEndState(N, rules.defines.startDate),
     ...createRecruitState(P, N),
     ...createLivingState(P),
@@ -472,6 +481,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     ...createBeliefState(N),
     ...createFaithHeadsState(N),
     ...createInstitutionsState(),
+    ...createTribesState(P),
   };
   world.diplomacy = createWarState(world);
   seedClasses(world);
@@ -503,12 +513,15 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   seedFaithHeads(world);
   // The Empire of 1444 reads the members' land and the Emperor's ruler (INST-010).
   seedInstitutions(world);
+  // Tribal realms walk their first hunting grounds; the form and the tongues are known by now (TRIBE-007).
+  seedTribes(world);
   readBeliefShares(world);
   recount(world);
 
   // Every nation starts with the men it had under arms in 1444 (a quarter of its troop cap where
   // the data has no figure), within its cap, spread over its land (REALM-196, REALM-197).
   rules.nations.forEach((n, i) => {
+    if (n.asleep) return;
     const cap = world.nationTroopCap[i]!;
     const total = Math.max(1000, Math.min(Math.floor(cap / 1000) * 1000, n.army ?? Math.round(cap / 4000) * 1000));
     const capital = provinceIndex.get(n.capital)!;

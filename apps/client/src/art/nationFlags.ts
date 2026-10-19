@@ -248,4 +248,14 @@ export const NATION_FLAGS: Record<string, Layer[]> = {
   wakashan: [["v", "K", "R"], ["emblem", "dragon", "W"]],
   pacific_northwest: [["h", "K"], ["emblem", "feather", "R"]],
   tlingit_haida: [["h", "R"], ["border", "K"], ["emblem", "eagle", "K"]],
+  // Sleeping realms (SETUP-080): flown from the day they wake. A spare has none of its own and flies a cloth in the colour it woke with.
+  spain: [["h", "R", "Y", "Y", "R"], ["emblem", "crown", "R", "hoist", "Y"]],
+  dutch_republic: [["h", "O", "W", "B"]],
+  babur_kabul: [["h", "K"], ["border", "G"], ["emblem", "sun", "Y"]],
+  mughals: [["h", "G"], ["emblem", "sun", "Y"]],
+  sikh_empire: [["h", "O"], ["emblem", "sword", "b"]],
+  transylvania: [["h", "B", "R", "Y"]],
+  czechoslovakia: [["h", "W", "R"], ["hoist", "B"]],
+  poland_lithuania: [["h", "R"], ["border", "W"], ["emblem", "eagle", "W"]],
+  russia: [["h", "W", "B", "R"], ["emblem", "doubleEagle", "Y", "middle", "K"]],
 };

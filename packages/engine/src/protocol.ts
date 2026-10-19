@@ -1,4 +1,5 @@
 import { realmConfig } from "./domain/realm/index.ts";
+import type { WokenRealm } from "./sleeping.ts";
 import { rulerViews, type RulerView } from "./rulers.ts";
 import { fallenEffect, type FallenEffect } from "./fallen.ts";
 import { lowFaith, lowTongue } from "./belief.ts";
@@ -16,6 +17,7 @@ import { LIVING_MAP } from "./domain/map-presentation/livingMap.ts";
 import { rebelsView, type RebelsView } from "./rebels.ts";
 import { revolutionView, type RevolutionView } from "./revolutions.ts";
 import { empireView, institutionsLens, type EmpireView } from "./institutions.ts";
+import { tribesView, type TribesView } from "./tribes.ts";
 import { peoplesSnapshot, type PeoplesSnapshot } from "./peoples.ts";
 import { faithHeadsView, type FaithHeadsView } from "./faithHeads.ts";
 import { campaignView, setPlayer, type CampaignView } from "./campaignEnd.ts";
@@ -120,6 +122,10 @@ export interface Snapshot {
   /** Hour of the day (0, 4, 8 … 20). */
   hour: number;
   playerNation: number;
+  /** 1 for a sleeping realm, never drawn, named or listed (SETUP-082). */
+  nationAsleep: Uint8Array;
+  /** Woken realms' names, colours and capitals, where the data's differ or a spare took its own (SETUP-091). */
+  woken: WokenRealm[];
   /** worldHash at the end of a whole turn or a new game; empty for a day or step played (hashing the world costs more than the day). */
   hash: string;
   computeMs: number;
@@ -238,6 +244,8 @@ export interface Snapshot {
   /** The Empire card (INST-081): Emperor, hold, seats and votes, members, the hold record; null without an Empire. */
   empire: EmpireView | null;
   /** The Institutions map mode (INST-084): per realm 0 none, 1 member, 2 elector, 3 Emperor; imperial provinces held by outsiders. */
+  /** Hunting grounds (TRIBE-026 to TRIBE-029): every ground and claim for the map, the player's range for the Hunting grounds tab, and what the player may ask for. */
+  tribes: TribesView;
   institutionsLens: { realm: Uint8Array; outsiderLand: Uint8Array };
   /** The player's Government tab: form, both caps, the form's laws and the next forms (GOV-064); null before a realm is chosen. */
   government: GovernmentView | null;
@@ -422,6 +430,8 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       date: { ...w.date },
       hour: w.step * HOURS_PER_STEP,
       playerNation: player,
+      nationAsleep: w.nationAsleep.slice(),
+      woken: w.woken.map((x) => ({ ...x })),
       hash: withHash ? hashWorld(w) : "",
       computeMs: now() - started,
       rejectedOrders,
@@ -522,6 +532,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       revolution: player >= 0 ? revolutionView(w, player) : null,
       empire: empireView(w, player),
       institutionsLens: institutionsLens(w),
+      tribes: tribesView(w, player),
       government: player >= 0 ? governmentView(w, player) : null,
       rebels: rebelsView(w),
       provinceRebels: w.provinceRebels.slice(),
@@ -674,11 +685,14 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         case "endTurn": {
           if (!world) throw new Error("no game in progress");
           const report = processTurn(world, req.orders, player);
+          // A union can fold the player's realm into a new one (SETUP-085).
+          player = world.player;
           return snapshot(req.id, started, report.rejectedOrders, report.news);
         }
         case "advance": {
           if (!world) throw new Error("no game in progress");
           const news = advance(world, Math.max(1, Math.min(req.steps, 42)));
+          player = world.player;
           return snapshot(req.id, started, [], news, false);
         }
         case "act": {
