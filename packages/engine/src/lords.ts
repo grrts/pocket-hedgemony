@@ -28,6 +28,12 @@ export interface RealmLord {
   want?: string;
   /** His wealth as a share of what he had, in percent; unset is 100 (a summoned house's falls, INST-063). */
   wealth?: number;
+  /** His age (REALM-273); unset, people.ts draws it from his index the first time it is needed. */
+  age?: number;
+  /** The son who takes his lands when he dies, null for none (REALM-070, REALM-079). */
+  heir?: { name: string; age: number } | null;
+  /** His line died out: his lands went back to the crown (REALM-082). */
+  gone?: boolean;
 }
 
 export interface LordState {
@@ -180,6 +186,7 @@ export function giveGift(world: World, n: number, lord: number): string | null {
 export function grantFief(world: World, n: number, province: number, lord: number): string | null {
   const l = world.lords[lord];
   if (!l || l.nation !== n) return "not your lord";
+  if (l.gone) return "his line has died out";
   if (world.provinceOwner[province] !== n) return "not your province";
   if (world.provinceLord[province]! >= 0) return "a lord holds it already";
   if (world.rules.nations[n]!.capital === world.provinceIds[province]) return "the capital stays royal";

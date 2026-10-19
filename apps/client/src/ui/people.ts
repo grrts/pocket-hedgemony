@@ -47,6 +47,8 @@ export interface Official {
   years: number;
   /** Realm a foreign specialist came from, -1 = one of the realm's own. */
   from: number;
+  /** His age (REALM-275); 0 when the snapshot has none. */
+  age: number;
 }
 
 /** The official in province p's post as the snapshot gives it, or null when the post stands empty. */
@@ -54,7 +56,7 @@ export function officialOf(s: Snapshot, p: number, owner: number): Official | nu
   const post = s.provinceOfficial[p];
   const name = s.provinceOfficialName[p];
   if (!post || !name || owner < 0) return null;
-  return { province: p, name, post, years: s.provinceOfficialYears[p] ?? 0, from: s.provinceOfficialFrom?.[p] ?? -1 };
+  return { province: p, name, post, years: s.provinceOfficialYears[p] ?? 0, from: s.provinceOfficialFrom?.[p] ?? -1, age: s.provinceOfficialAge?.[p] ?? 0 };
 }
 
 export function officialPortrait(rules: Ruleset, o: Official, nation: number, scale = 3): string {
@@ -84,7 +86,7 @@ export function officialCard(rules: Ruleset, o: Official | null, nation: number,
       ${mine && !servesLord && fill >= 0 ? `<span class="army-buttons"><button class="paper small" data-official="${fill}">Fill the post</button></span>` : ""}</div>`;
   const e = officialEffect(o.post, o.years);
   return `<div class="army person">${officialPortrait(rules, o, nation)}
-    <span class="who"><b>${esc(o.name)}</b><br><small>${esc(o.post)} of ${esc(place)}${o.from >= 0 ? `, from ${esc(rules.nations[o.from]!.name)}` : ""}${servesLord ? `. He serves the ${esc(t.lord)}.` : ""}</small><br>
+    <span class="who"><b>${esc(o.name)}</b><br><small>${esc(o.post)} of ${esc(place)}${o.age ? `, ${o.age}` : ""}${o.from >= 0 ? `, from ${esc(rules.nations[o.from]!.name)}` : ""}${servesLord ? `. He serves the ${esc(t.lord)}.` : ""}</small><br>
     <small class="effect">${esc(effectText(o))}</small> ${servicePips(o.years, e.share)}</span>
     ${mine ? `<span class="army-buttons"><button class="paper small" data-official="${o.province}">${esc(cap(t.official))}</button></span>` : ""}</div>`;
 }

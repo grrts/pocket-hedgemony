@@ -2757,3 +2757,80 @@ Then("he gets small bonuses from those traits", (s) => {
   if (s.traits.includes("Builder")) expect(G.heritageFactor(w, n, "building_cost_pct")).toBeLessThan(1);
   if (s.traits.includes("Pious")) expect(G.beliefRevoltFactor(w, n, "Faith")).toBeLessThan(1);
 });
+
+// people age and die (REALM-270 to REALM-276)
+const FR = (s: S) => (s.game as GW).nationIndex.get("france")!;
+const royalPost = (w: GW, n: number) => [...w.provinceOwner.keys()].find((p) => w.provinceOwner[p] === n && w.provinceLord[p]! < 0 && w.provinceOfficial[p]! >= 0)!;
+const lordWithLand = (w: GW, n: number) => w.lords.findIndex((l, k) => l.nation === n && !l.gone && w.provinceLord.includes(k));
+Then("a person of 75 is likelier to die this year than one of 45", () => {
+  expect(G.personDeathChance(75, "official")).toBeGreaterThan(G.personDeathChance(45, "official"));
+});
+Then("a lord and a ruler of 55 are as likely to die", () => {
+  expect(G.personDeathChance(55, "lord")).toBe(G.personDeathChance(55, "ruler"));
+});
+Given("a new game", (s) => void freshGame(s));
+Given("nobody dies this year", (s) => {
+  (s.game as GW).rulerRng.next = () => 0.999;
+});
+When("a January passes", (s) => {
+  const w = s.game as GW;
+  const n = FR(s);
+  s.before = { lords: w.lords.map((_, k) => G.lordAge(w, k).age), officials: [...w.provinceOwner.keys()].filter((p) => w.provinceOwner[p] === n && w.provinceOfficial[p]! >= 0).map((p) => [p, G.officialAge(w, p)]) };
+  w.date.year++;
+  w.date.month = 1;
+  G.yearlyPeople(w, []);
+});
+Then(/^every lord and official of "([^"]+)" is a year older$/, (s, realm: string) => {
+  const w = s.game as GW;
+  const n = realmOf(s, realm);
+  w.lords.forEach((l, k) => l.nation === n && expect(G.lordAge(w, k).age).toBe(s.before.lords[k] + 1));
+  for (const [p, age] of s.before.officials) expect(G.officialAge(w, p)).toBe(age + 1);
+});
+Given(/^a lord of "([^"]+)" with (an|no) heir$/, (s, realm: string, has: string) => {
+  const w = freshGame(s);
+  const k = lordWithLand(w, realmOf(s, realm));
+  G.lordAge(w, k);
+  w.lords[k]!.heir = has === "an" ? { name: "Jean", age: 20 } : null;
+  s.lord = k;
+  s.lands = [...w.provinceLord.keys()].filter((p) => w.provinceLord[p] === k);
+});
+When("the lord dies", (s) => G.personDies(s.game as GW, { kind: "lord", lord: s.lord }, "old age", []));
+Then("his heir holds his lands under his own name", (s) => {
+  const w = s.game as GW;
+  expect(w.lords[s.lord]!.name).toBe("Jean");
+  for (const p of s.lands) expect(w.provinceLord[p]).toBe(s.lord);
+});
+Then("his lands return to the crown with their posts empty", (s) => {
+  const w = s.game as GW;
+  expect(w.lords[s.lord]!.gone).toBe(true);
+  for (const p of s.lands) {
+    expect(w.provinceLord[p]).toBe(-1);
+    expect(w.provinceOfficial[p]).toBe(-1);
+  }
+});
+When(/^the official of a royal province of "([^"]+)" dies$/, (s, realm: string) => {
+  const w = s.game as GW;
+  s.post = royalPost(w, realmOf(s, realm));
+  G.personDies(w, { kind: "official", p: s.post }, "old age", []);
+});
+Then("that post stands empty", (s) => expect((s.game as GW).provinceOfficial[s.post]).toBe(-1));
+Given(/^an army of "([^"]+)" with a commander$/, (s, realm: string) => {
+  const w = freshGame(s);
+  const n = realmOf(s, realm);
+  s.slot = [...w.armies.owner.keys()].find((i) => w.armies.alive[i] && w.armies.owner[i] === n && w.armies.commander[i]! >= 0);
+});
+When("its commander dies", (s) => {
+  const w = s.game as GW;
+  G.personDies(w, { kind: "commander", c: w.armies.commander[s.slot]! }, "battle", []);
+});
+Then("the army has no commander", (s) => expect((s.game as GW).armies.commander[s.slot]).toBe(-1));
+Given("a ruler with an heir", (s) => {
+  const w = freshGame(s);
+  s.n = w.rulers.findIndex((r, k) => r.heir && !w.nationGone[k]);
+});
+When("the heir dies", (s) => G.personDies(s.game as GW, { kind: "heir", n: s.n }, "illness", []));
+Then("the ruler has no heir", (s) => expect((s.game as GW).rulers[s.n]!.heir).toBeNull());
+Given(/^the player plays "([^"]+)"$/, (s, realm: string) => {
+  const w = freshGame(s);
+  w.player = realmOf(s, realm);
+});

@@ -29,6 +29,7 @@ import { createGovernmentState, seedGovernment, type GovernmentState } from "./g
 import { createTradeState, seedTrade, type TradeState } from "./trade.ts";
 import { createPeoplesState, seedPeoples, type PeoplesState } from "./peoples.ts";
 import { createRulerState, seedRulers, type RulerState } from "./rulers.ts";
+import { seedPeople } from "./people.ts";
 import { createFallenState, type FallenState } from "./fallen.ts";
 import { createBeliefState, readBeliefShares, type BeliefState } from "./belief.ts";
 import { createFaithHeadsState, seedFaithHeads, type FaithHeadsState } from "./faithHeads.ts";
@@ -156,6 +157,8 @@ export interface World extends LivingState, TreasuryState, FoodState, MoodState,
   provinceOfficialSince: Int32Array;
   /** Realm a foreign specialist at each post came from, -1 = one of the realm's own (PROV-334). */
   provinceOfficialFrom: Int16Array;
+  /** Age of the official at each post, 0 = not drawn yet (people.ts officialAge, REALM-275). */
+  provinceOfficialAge: Uint8Array;
   /** 1 while a province the player has just taken waits for him to fill its post, grant it or keep it royal (PROV-340). */
   provinceNewLand: Uint8Array;
   /** Province each commander was commissioned from, -1 = none. */
@@ -563,6 +566,8 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   world.heritage = createGameHeritage(world);
   // Worked out again with heritage's tax in force, so lenders and the treasury card know the income the realm will have.
   runLedger(world, false);
+  // Lords, officials and commanders of 1444 get their ages (REALM-274).
+  seedPeople(world);
   // The scores stand from the first day, for the country card (SHELL-162).
   seedCampaign(world);
   return world;
