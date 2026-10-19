@@ -2828,3 +2828,39 @@ Then("the copy is not ironman", (s) => {
 Then("its flag ironman_unbroken is off", (s) => {
   expect(s.copy.header.flags.ironman_unbroken).toBe(false);
 });
+
+// ================================================================ steam-desktop (SAVE-145)
+
+interface PartnerSite {
+  root: string;
+  subdirectory: string;
+  pattern: string;
+  os: string;
+  recursive: boolean;
+  overrides: { os: string; root: string; path: string; replace_path?: boolean }[];
+}
+const steamBackup = () => S.storeBackup("steam") as { partner_site: PartnerSite; product_name: string; folder: string };
+const override = (os: string) => steamBackup().partner_site.overrides.find((o) => o.os === os);
+
+Then("the Auto-Cloud root is {string} with the subdirectory {string}", (_s, root: string, sub: string) => {
+  const site = steamBackup().partner_site;
+  expect(site.root).toBe(root);
+  expect(site.subdirectory).toBe(sub);
+});
+Then(/^the Auto-Cloud pattern is "([^"]+)", recursive, for every OS$/, (_s, pattern: string) => {
+  const site = steamBackup().partner_site;
+  expect(site.pattern).toBe(pattern);
+  expect(`x${C.format.extension}`.endsWith(pattern.replace("*", ""))).toBe(true);
+  expect(site.recursive).toBe(true);
+  expect(site.os).toBe("all");
+});
+Then("on macOS the root is overridden to {string} with the same path", (_s, root: string) => {
+  expect(override("macos")).toEqual({ os: "macos", root, path: steamBackup().partner_site.subdirectory });
+});
+Then("on Linux the root is overridden to {string} with the path {string}", (_s, root: string, path: string) => {
+  expect(override("linux")).toEqual({ os: "linux", root, path, replace_path: true });
+});
+Then("the desktop app's product name is {string}", (_s, name: string) => {
+  expect(steamBackup().product_name).toBe(name);
+  expect(steamBackup().partner_site.subdirectory.startsWith(`${name}/`)).toBe(true);
+});
