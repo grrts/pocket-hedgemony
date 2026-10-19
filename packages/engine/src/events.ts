@@ -1,5 +1,6 @@
 import campaign from "../../rules/data/domain/events-campaign.json" with { type: "json" };
 import bridge from "../../rules/data/domain/events-places.json" with { type: "json" };
+import geography from "../../rules/data/domain/exploration-regions.json" with { type: "json" };
 import * as evt from "./domain/events/index.ts";
 import * as dip from "./domain/diplomacy/index.ts";
 import * as subj from "./domain/subjects/index.ts";
@@ -7,6 +8,7 @@ import { bondOf, bondsChanged, makeSubject, monthNow, subjectTies } from "./subj
 import { Rng } from "./rng.ts";
 import { stabilityOf } from "./stability.ts";
 import { cedeProvince, controller, type News } from "./war.ts";
+import { spareSleepers, wakeRealm, type Waking } from "./sleeping.ts";
 import type { World } from "./world.ts";
 import { noteChoice } from "./achievements.ts";
 import { traitLean } from "./rulers.ts";
@@ -47,6 +49,41 @@ export interface GameEvents {
   stability: Map<number, number>;
   /** Inventions each realm knew in 1444: the tech tracks rise by one for each learned since. */
   knownAtStart: number[];
+  /** Each map realm's region for `where` limits (D-EVT-17): the tree's own, else its nearest neighbour's. */
+  regions: (string | undefined)[];
+}
+
+/**
+ * Regions of the map's realms: the tree's polity regions where it knows the
+ * realm, else the region of the nearest capital it knows (a stand-in until
+ * every map realm has one, D-EVT-17).
+ */
+function realmRegions(world: World, treeId: string[]): (string | undefined)[] {
+  const polities = geography.polities_1444 as Record<string, string>;
+  const at = (n: number) => world.rules.provinces[world.provinceIndex.get(world.rules.nations[n]!.capital) ?? -1];
+  const known = treeId.map((id, n) => (world.rules.nations[n]!.asleep ? undefined : polities[id]));
+  return known.map((r, n) => {
+    if (r || world.rules.nations[n]!.asleep) return r;
+    const me = at(n);
+    if (!me) return undefined;
+    let best: string | undefined;
+    let dist = Infinity;
+    known.forEach((k, m) => {
+      const p = at(m);
+      if (!k || !p) return;
+      const d = Math.hypot((p.x ?? 0) - (me.x ?? 0), (p.y ?? 0) - (me.y ?? 0));
+      if (d < dist) [dist, best] = [d, k];
+    });
+    return best;
+  });
+}
+
+/** A realm's region now: its own, or for a woken realm that of whoever held its capital in 1444. */
+function regionOf(world: World, g: GameEvents, n: number): string | undefined {
+  if (!world.rules.nations[n]!.asleep) return g.regions[n];
+  const cap = world.rules.provinces[world.provinceIndex.get(world.rules.nations[n]!.capital) ?? -1];
+  const was = cap?.owner ? world.nationIndex.get(cap.owner) : undefined;
+  return was === undefined ? undefined : g.regions[was];
 }
 
 const provinceKey = (p: string) => `g:${p}`;
@@ -55,7 +92,8 @@ const provinceKey = (p: string) => `g:${p}`;
 export function createGameEvents(world: World): GameEvents {
   const tree = evt.emptyWorld(world.date.year, world.date.month);
   const aliases = bridge.aliases as Record<string, string>;
-  const treeId = world.nationIds.map((id) => aliases[id] ?? id);
+  // A sleeping realm is known to the tree by its own id; a woken spare by the one it took (SETUP-088).
+  const treeId = world.nationIds.map((id, n) => world.rules.nations[n]!.tree?.[0] ?? aliases[id] ?? id);
   const nationOf = new Map(treeId.map((id, n) => [id, n]));
   const places = Object.entries(bridge.places as Record<string, string[]>)
     .map(([key, ids]): [string, number[]] => [key, ids.map((id) => world.provinceIndex.get(id) ?? -1).filter((p) => p >= 0)])
@@ -74,7 +112,7 @@ export function createGameEvents(world: World): GameEvents {
   leanByTraits(world, state, nationOf);
   evt.startCampaign(state, world.date.year);
   const knownAtStart = world.nationIds.map((_, n) => world.research[n]?.known.size ?? 0);
-  const g: GameEvents = { state, rng: new Rng(world.weatherSeed ^ 0x5eed), treeId, nationOf, places, eventRelations: [], adjust: {}, stability: new Map(), knownAtStart };
+  const g: GameEvents = { state, rng: new Rng(world.weatherSeed ^ 0x5eed), treeId, nationOf, places, eventRelations: [], adjust: {}, stability: new Map(), knownAtStart, regions: realmRegions(world, treeId) };
   state.conditions.stat = (p, w, ctx) => evt.resolve(p.who, ctx).some((id) => evt.compare(statOf(world, g, id, String(p.stat)), String(p.op), p.value as number | string));
   // Opinion is the standing one court holds of another (D-EVT-4, diplomacy's ledger), read only when asked.
   state.conditions.opinion = (p, _w, ctx) =>
@@ -203,6 +241,8 @@ function sync(world: World, g: GameEvents): void {
     const id = g.treeId[n]!;
     const c = evt.country(w, id);
     c.exists = !world.nationGone[n];
+    const region = regionOf(world, g, n);
+    if (region) c.region = region;
     c.human = n === world.player;
     c.enemies = [];
     c.relations = g.eventRelations.filter((r) => r.who === id).map((r) => ({ other: r.other, type: r.type }));
@@ -355,11 +395,61 @@ function recallSubjectEnvoys(world: World, b: subj.SubjectBond, actions: readonl
 
 const KIND_WORDS: Record<subj.Kind, string> = { vassal: "a vassal", tributary: "a tributary", union: "a union", march: "a march", colony: "a colony", protectorate: "a protectorate" };
 
+/**
+ * An event founds a realm (SETUP-083 to SETUP-090): its sleeping realm wakes,
+ * or a gone map realm wakes again, or the first spare takes the name for one
+ * the list does not hold. With no `where`, the realms it is made from form it
+ * (a union); with one, it takes that place's land, only from those realms when
+ * it names them. A place the map does not know falls back to its home land;
+ * with no land at all it stays asleep.
+ */
+/** A `create_country` effect as the tree hands it to the game, for the specs (EVT-077). */
+export function foundByEvent(world: World, id: string, values: Record<string, unknown>, news: News[]): void {
+  foundRealm(world, world.events!, id, values, news);
+}
+
+/** What the tree reads of a realm: its tree id and its region (EVT-078, EVT-079). */
+export function treeView(world: World, n: number): { id: string; region: string | undefined } {
+  return { id: world.events!.treeId[n]!, region: regionOf(world, world.events!, n) };
+}
+
+function foundRealm(world: World, g: GameEvents, id: string, v: Record<string, unknown>, news: News[]): void {
+  let n = g.nationOf.get(id);
+  if (n !== undefined && !world.nationGone[n]) return;
+  const from = ((v.from as string[] | undefined) ?? []).flatMap((x) => {
+    const f = g.nationOf.get(x);
+    return f !== undefined && f !== n && !world.nationGone[f] ? [f] : [];
+  });
+  const over = v.subject_of === undefined ? undefined : g.nationOf.get(String(v.subject_of));
+  const where = v.where === undefined ? undefined : g.places.find(([k]) => k === String(v.where))?.[1];
+  const waking: Waking = {};
+  if (v.where === undefined && from.length) waking.from = from;
+  else if (where) {
+    waking.provinces = from.length ? where.filter((p) => from.includes(world.provinceOwner[p]!)) : where;
+    const held = from.map((f) => waking.provinces!.filter((p) => world.provinceOwner[p] === f).length);
+    if (from.length) waking.breakFrom = from[held.indexOf(Math.max(...held))]!;
+  } else if (n === undefined) return;
+  if (over !== undefined && !world.nationGone[over]) waking.subjectOf = over;
+  if (n === undefined) {
+    // A realm the list does not hold takes the first spare, named for it (SETUP-088); with none left, nothing wakes.
+    n = spareSleepers(world)[0];
+    if (n === undefined) return;
+    waking.name = nameOf(world, g, id).replace(/\b\w/g, (c) => c.toUpperCase());
+    waking.tree = id;
+  }
+  if (!wakeRealm(world, n, waking, news)) return;
+  g.treeId[n] = id;
+  g.nationOf.set(id, n);
+}
+
 function landEffect(world: World, g: GameEvents, e: evt.DomainEvent, news: News[]): void {
   const v = e.values as Record<string, unknown>;
   const target = e.target as string | undefined;
   const n = target === undefined ? undefined : g.nationOf.get(target);
   switch (e.effect) {
+    case "create_country":
+      foundRealm(world, g, target!, v, news);
+      return;
     case "faith_head_patron": {
       const who = g.nationOf.get(String(v.who ?? target));
       if (who !== undefined) setHeadPatron(world, String(v.head), who);

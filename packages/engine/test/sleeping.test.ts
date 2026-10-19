@@ -5,6 +5,7 @@ import { setPlayer } from "../src/campaignEnd.ts";
 import { hashWorld } from "../src/hash.ts";
 import { restoreWorld, worldChunks } from "../src/domain/saves/world-chunks.ts";
 import { spareSleepers, wakeRealm } from "../src/sleeping.ts";
+import { foundByEvent, treeView } from "../src/events.ts";
 
 const rules = loadDefaultRuleset();
 const N = (w: ReturnType<typeof createWorld>, id: string) => w.nationIndex.get(id)!;
@@ -40,5 +41,16 @@ describe("sleeping realms (SETUP-080 to SETUP-091)", () => {
     expect(back.nationAsleep[N(back, "russia")]).toBe(1);
     expect(back.nationGone[N(back, "russia")]).toBe(1);
     expect(hashWorld(back)).toBe(hashWorld(restoreWorld(new Map(worldChunks(back, { playerNation: "spain", options: {} as never }).map((c) => [c.id, c])), rules, {}).world));
+  });
+
+  it("keeps a spare founded by an event under its tree id through a save (EVT-078)", () => {
+    const w = createWorld(rules, 3);
+    foundByEvent(w, "kazakh_khanate", { entity: "kazakh_khanate", where: "area:kabul" }, []);
+    const n = w.rules.nations.findIndex((d) => d.name === "Kazakh Khanate");
+    expect(treeView(w, n).id).toBe("kazakh_khanate");
+    advance(w, STEPS_PER_TURN * 5);
+    const back = restoreWorld(new Map(worldChunks(w, { playerNation: "castile", options: {} as never }).map((c) => [c.id, c])), rules, {}).world;
+    expect(treeView(back, n).id).toBe("kazakh_khanate");
+    expect(back.rules.nations[n]!.name).toBe("Kazakh Khanate");
   });
 });
