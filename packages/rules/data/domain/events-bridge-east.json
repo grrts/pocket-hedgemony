@@ -86,7 +86,7 @@
         "stat": {
          "prestige": 20,
          "legitimacy": 5,
-         "army_strength": "-25%"
+         "manpower": "-25%"
         }
        },
        {
@@ -94,7 +94,7 @@
         "stat": {
          "prestige": -20,
          "stability": -1,
-         "army_strength": "-30%"
+         "manpower": "-30%"
         }
        }
       ]
@@ -1250,7 +1250,7 @@
        {
         "on": "$grand_duke",
         "stat": {
-         "army_strength": "-40%",
+         "manpower": "-40%",
          "prestige": -15
         }
        }
@@ -1389,7 +1389,7 @@
        {
         "on": "teutonic_order",
         "stat": {
-         "army_strength": "-50%",
+         "manpower": "-50%",
          "prestige": -25,
          "stability": -2
         }
@@ -1414,7 +1414,7 @@
        {
         "on": "teutonic_order",
         "stat": {
-         "army_strength": "-40%",
+         "manpower": "-40%",
          "prestige": -20
         }
        },
@@ -2540,7 +2540,7 @@
        {
         "on": "serbia",
         "stat": {
-         "army_strength": "-60%"
+         "manpower": "-60%"
         }
        },
        {
@@ -2553,7 +2553,7 @@
        {
         "on": "$sultan",
         "stat": {
-         "army_strength": "-25%",
+         "manpower": "-25%",
          "prestige": 10
         }
        }
@@ -3005,7 +3005,7 @@
        {
         "on": "$crusader",
         "stat": {
-         "army_strength": "-50%",
+         "manpower": "-50%",
          "prestige": -20
         }
        },
@@ -3384,7 +3384,7 @@
        {
         "on": "ottoman",
         "stat": {
-         "army_strength": "-50%",
+         "manpower": "-50%",
          "stability": -3,
          "prestige": -30
         }
@@ -3727,7 +3727,7 @@
        {
         "on": "$sultan",
         "stat": {
-         "army_strength": "-20%"
+         "manpower": "-20%"
         }
        },
        {
@@ -4204,7 +4204,7 @@
        {
         "on": "$crusader",
         "stat": {
-         "army_strength": "-50%",
+         "manpower": "-50%",
          "prestige": -20
         }
        },
@@ -5061,7 +5061,7 @@
        {
         "on": "golden_horde",
         "stat": {
-         "army_strength": "-60%",
+         "manpower": "-60%",
          "stability": -3,
          "prestige": -30,
          "treasury": "-50%"
@@ -5106,7 +5106,7 @@
        {
         "on": "golden_horde",
         "stat": {
-         "army_strength": "-40%",
+         "manpower": "-40%",
          "stability": -2
         }
        },
@@ -5395,7 +5395,7 @@
         "on": "timurid_empire",
         "stat": {
          "stability": -1,
-         "army_strength": "-20%"
+         "manpower": "-20%"
         }
        },
        {
@@ -5650,7 +5650,7 @@
         "on": "golden_horde",
         "stat": {
          "legitimacy": -15,
-         "army_strength": "+20%"
+         "manpower": "+20%"
         }
        },
        {
@@ -5849,7 +5849,7 @@
        {
         "on": "golden_horde",
         "stat": {
-         "army_strength": "-15%"
+         "manpower": "-15%"
         }
        }
       ],
@@ -6778,7 +6778,7 @@
        {
         "on": "ethiopia",
         "stat": {
-         "army_strength": "-10%",
+         "manpower": "-10%",
          "treasury": "-10%"
         }
        }
