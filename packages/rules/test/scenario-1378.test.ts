@@ -21,7 +21,7 @@ type Lonlat = [number, number];
 type Selector = { countries: string[]; admin1?: string[]; regions?: string[]; bbox?: number[] };
 type Region = {
   key: string;
-  nations: { id: string; name: string; capital: Lonlat; color?: string }[];
+  nations: { id: string; name: string; capital: Lonlat; color?: string; grows?: boolean }[];
   owners: { nation: string | null; countries: string[]; admin1?: string[]; regions?: string[]; bbox?: number[] }[];
   rulers: Record<string, unknown>;
   relations: { relations: { id: string; source: string; target: string }[]; facts?: { id: string; source: string; target: string }[]; entities?: { id: string; name: string }[] };
@@ -93,7 +93,8 @@ describe("the 1378 scenario (X-25)", () => {
           if (o.bbox) expect(o.bbox[0]! < o.bbox[2]! && o.bbox[1]! < o.bbox[3]!, `${o.nation} bbox`).toBe(true);
         }
         const landed = new Set(regions.flatMap((x) => x.owners.map((o) => o.nation)));
-        for (const n of r.nations) expect(landed.has(n.id), `${n.id} has no owner rule`).toBe(true);
+        // A nation that grows takes only unowned land at map build, so it has no owner rule (as in 1444).
+        for (const n of r.nations) if (!n.grows) expect(landed.has(n.id), `${n.id} has no owner rule`).toBe(true);
       });
 
       it("names a ruler, tongues and a faith for its own realms only", () => {
