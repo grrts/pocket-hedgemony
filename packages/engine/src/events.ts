@@ -1,4 +1,5 @@
 import campaign from "../../rules/data/domain/events-campaign.json" with { type: "json" };
+import bridgeSouth from "../../rules/data/domain/events-bridge-south.json" with { type: "json" };
 import bridge from "../../rules/data/domain/events-places.json" with { type: "json" };
 import rules from "../../rules/data/domain/events.json" with { type: "json" };
 import geography from "../../rules/data/domain/exploration-regions.json" with { type: "json" };
@@ -27,7 +28,49 @@ import { headEventChosen, isHeadPatron, setHeadPatron } from "./faithHeads.ts";
  */
 
 type Campaign = Pick<evt.Tree, "ages" | "periods" | "events" | "modifiers" | "localization"> & { entities: Record<string, string> };
-const data = campaign as unknown as Campaign;
+/** A region's bridge events of 1378 to 1444, with their names, new realms and places (D-EVT-22). */
+type Bridge = Pick<Campaign, "events" | "localization" | "entities"> & {
+  places?: Record<string, unknown>;
+  /** A 1444 event's new window and conditions, laid over it (EVT-096). */
+  redate?: Record<string, Partial<Pick<evt.EventDef, "availability" | "requires" | "trigger">>>;
+};
+/** One entry per region file (EVT-095). */
+const BRIDGES = [bridgeSouth] as unknown as Bridge[];
+const data: Campaign = {
+  ...(campaign as unknown as Campaign),
+  localization: Object.assign({}, campaign.localization, ...BRIDGES.map((b) => b.localization)),
+  entities: Object.assign({}, campaign.entities, ...BRIDGES.map((b) => b.entities ?? {})),
+};
+/** The campaign's events with the bridge events joined, a re-dated event replacing its 1444 form (EVT-095, EVT-096). */
+function startEvents(): Record<string, evt.EventDef> {
+  const events: Record<string, evt.EventDef> = Object.assign({}, data.events, ...BRIDGES.map((b) => b.events));
+  for (const b of BRIDGES)
+    for (const [id, r] of Object.entries(b.redate ?? {}))
+      if (events[id]) events[id] = { ...events[id]!, ...(r.availability ? { availability: r.availability } : {}), ...(r.requires ? { requires: r.requires } : {}), ...(r.trigger ? { trigger: r.trigger } : {}) };
+  return events;
+}
+/**
+ * From a later start, each bridge event whose history began before the start
+ * has already happened, as history had it: its historical option, with its
+ * historical realms, and no effects, since the start's map already shows them (EVT-095).
+ */
+function settleBridgeHistory(state: evt.EventState): void {
+  const today = evt.isoOf(state.world);
+  for (const b of BRIDGES)
+    for (const ev of Object.values(b.events)) {
+      if (!ev.history || evt.historyStart(ev.history.date) >= today || state.world.history.some((h) => h.event === ev.id)) continue;
+      const [y, m] = evt.historyStart(ev.history.date).split("-").map(Number);
+      const option = ev.options.find((o) => o.historical)?.id;
+      const roles = Object.fromEntries(Object.entries(ev.roles).map(([k, r]) => [k, [...r.historical]]));
+      state.world.history.push({ event: ev.id, year: y!, month: m ?? 1, roles, ...(option ? { option } : {}) });
+    }
+}
+/** The places the tree knows: the 1444 bridge's and those the region files add, as lists of map provinces. */
+const PLACES: Record<string, string[]> = Object.assign(
+  {},
+  bridge.places,
+  ...BRIDGES.map((b) => Object.fromEntries(Object.entries(b.places ?? {}).filter((e): e is [string, string[]] => Array.isArray(e[1])))),
+);
 
 /** Statistics the game reads live; an event's change to one is kept as an adjustment on top. */
 const ADJUSTED = new Set(["legitimacy", "stability", "tech_state", "tech_economy", "tech_military"]);
@@ -98,7 +141,7 @@ export function createGameEvents(world: World): GameEvents {
   // A sleeping realm is known to the tree by its own id; a woken spare by the one it took (SETUP-088).
   const treeId = world.nationIds.map((id, n) => world.rules.nations[n]!.tree?.[0] ?? aliases[id] ?? id);
   const nationOf = new Map(treeId.map((id, n) => [id, n]));
-  const places = Object.entries(bridge.places as Record<string, string[]>)
+  const places = Object.entries(PLACES)
     .map(([key, ids]): [string, number[]] => [key, ids.map((id) => world.provinceIndex.get(id) ?? -1).filter((p) => p >= 0)])
     .filter(([, ps]) => ps.length > 0);
   for (const key of bridge.start.places) Object.assign(evt.place(tree, key).stats, bridge.start.place);
@@ -110,8 +153,9 @@ export function createGameEvents(world: World): GameEvents {
   for (const id of treeId) evt.country(tree, id).stats = { ...bridge.start.country };
   // A sleeping realm is not yet in the world (SETUP-082).
   treeId.forEach((id, n) => world.nationAsleep[n] && (evt.country(tree, id).exists = false));
-  const state = evt.newState(tree, { events: evt.campaignEvents(data.events), ages: data.ages, periods: data.periods });
+  const state = evt.newState(tree, { events: evt.campaignEvents(startEvents()), ages: data.ages, periods: data.periods });
   state.conditions = {};
+  settleBridgeHistory(state);
   leanByTraits(world, state, nationOf);
   evt.startCampaign(state, world.date.year);
   const knownAtStart = world.nationIds.map((_, n) => world.research[n]?.known.size ?? 0);

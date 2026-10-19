@@ -48,6 +48,10 @@ A period is a regional or thematic situation inside one or more ages, such as a 
 
 From the 1378 start the Western Schism, Timur's conquests, the Caroline phase of the Hundred Years' War, Ottoman expansion, Muscovite consolidation and the Southeast Asian states are under way. Others follow from what happens: the Timurid fragmentation once Timur's conquests are over, the Lancastrian phase when England and France go to war again, the Ottoman Interregnum only if Timur breaks the Ottomans, the Hussite wars when religious rebels rise in Bohemia, the Ming treasure voyages while the Ming are steady, Majapahit's decline, and Late Ming once the voyages are over. Portuguese oceanic expansion waits for the Age of Exploration, and Aztec and Inca expansion for the Triple Alliance and the Inca.
 
+### From 1378 to 1444: Asia, Africa and the Americas
+
+Between the 1378 start and 1444 about a hundred events carry the south's history: Timur's sack of Delhi and the breakup of the Delhi sultanate, the Ming taking Yunnan and beating the Mongols at Buir Lake, Joseon's founding, Japan's two courts reunited, the treasure voyages, the Ming conquest of Đại Việt and the Lam Sơn uprising, Malacca founded after Singapura falls, Ayutthaya sacking Angkor, Songhai breaking from Mali, Kongo and Mutapa founded, the Tuareg taking Timbuktu, the Tepanec war that makes the Triple Alliance, the fall of Mayapan and the Inca's Chanka war. None of them waits for its year. Each happens when the reason it had in history holds: Delhi falls apart once Firuz Shah is dead and his heirs fight, the Inca expand once they have beaten the Chanka, and the Triple Alliance rises once Maxtla turns on the Mexica. If the reason never comes, neither does the event. A campaign that starts in 1444 finds them fought as history had them.
+
 ### When an event can happen
 
 An event has to pass several gates before it can fire.
