@@ -36,7 +36,7 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 | faith | missionaries\_and\_clergy, schools, migrants, conversion\_event | conquest, reformation, foreign\_missionaries |
 | tongue | assimilation, settlers, schools | conquest, migration, separatists |
 | in\_revolt | heavy\_taxes, famine, foreign\_faith\_or\_tongue, disloyal\_lords, lost\_war | rebels\_defeated, demands\_given, taxes\_lowered, food |
-| lords | fief\_granted, local\_ruler\_kept, title\_sold, marriage, land\_split, defector | line\_dies\_out, land\_seized, trial, revolt\_defeated, defected, merged |
+| lords | fief\_granted, local\_ruler\_kept, title\_sold, marriage, land\_split, defector | line\_dies\_out, land\_seized, trial, revolt\_defeated, defected, merged, assassinated |
 | soldiers | raised, paid\_company, retinue | battle, disease\_and\_hunger, desertion, disbanded |
 | recruits | yearly\_refill, students\_leave\_school | soldiers\_raised, sent\_to\_school, famine, plague |
 | horses | breeding, bought, herds, captured | battle, fodder\_shortage, disease |
@@ -59,7 +59,7 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 |---|---|
 | `steps` | Loyal, Wavering, Disloyal, In revolt |
 | `up` | want\_granted, gift\_of\_gold, office\_at\_court, marriage\_into\_ruling\_house, victory\_taken\_part, long\_secure\_reign, fed\_in\_famine, shared\_faith\_and\_tongue, war\_against\_rival |
-| `down` | heavy\_taxes, land\_seized\_from\_him, land\_seized\_from\_another, war\_lost, battle\_lost, child\_ruler, disputed\_heir, new\_ruler, grain\_requisitioned, foreign\_bribes, crown\_borrowed, massacre, faith\_not\_shared, censured\_by\_head, slighted\_at\_court |
+| `down` | heavy\_taxes, land\_seized\_from\_him, land\_seized\_from\_another, war\_lost, battle\_lost, child\_ruler, disputed\_heir, new\_ruler, grain\_requisitioned, foreign\_bribes, crown\_borrowed, massacre, faith\_not\_shared, censured\_by\_head, slighted\_at\_court, lord\_assassinated, assassin\_caught |
 
 ## Food
 
@@ -132,6 +132,22 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 | `theocracy` | bishop or abbot |
 | `steppe realm` | clan chief |
 | `chiefdom or stateless society` | elder or lineage head |
+
+### Assassination (provisional)
+
+> Sending an assassin after one of your lords (REALM-280 to REALM-285). gold: what it costs, paid whether or not it works. chance: the base chance it works; less by great\_lord\_penalty for each Great lord reason (REALM-162), never below min\_chance. He dies through the shared death rules (people, REALM-273): his heir or a kinsman takes his lands at heir\_loyalty, or with no one left they go back to the crown. On success every other lord of the realm falls others\_steps steps and the rest of his house turns Disloyal when house\_turns\_disloyal; on failure he turns target\_on\_failure and every other lord falls others\_steps\_on\_failure steps.
+
+| Key | Value |
+|---|---|
+| `gold` | 25 |
+| `chance` | 0.6 |
+| `great_lord_penalty` | 0.15 |
+| `min_chance` | 0.2 |
+| `heir_loyalty` | Wavering |
+| `house_turns_disloyal` | yes |
+| `others_steps` | 1 |
+| `others_steps_on_failure` | 1 |
+| `target_on_failure` | Disloyal |
 
 ## Windows
 

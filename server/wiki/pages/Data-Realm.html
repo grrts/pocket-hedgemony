@@ -35,7 +35,7 @@
 <tr><td>faith</td><td>missionaries_and_clergy, schools, migrants, conversion_event</td><td>conquest, reformation, foreign_missionaries</td></tr>
 <tr><td>tongue</td><td>assimilation, settlers, schools</td><td>conquest, migration, separatists</td></tr>
 <tr><td>in_revolt</td><td>heavy_taxes, famine, foreign_faith_or_tongue, disloyal_lords, lost_war</td><td>rebels_defeated, demands_given, taxes_lowered, food</td></tr>
-<tr><td>lords</td><td>fief_granted, local_ruler_kept, title_sold, marriage, land_split, defector</td><td>line_dies_out, land_seized, trial, revolt_defeated, defected, merged</td></tr>
+<tr><td>lords</td><td>fief_granted, local_ruler_kept, title_sold, marriage, land_split, defector</td><td>line_dies_out, land_seized, trial, revolt_defeated, defected, merged, assassinated</td></tr>
 <tr><td>soldiers</td><td>raised, paid_company, retinue</td><td>battle, disease_and_hunger, desertion, disbanded</td></tr>
 <tr><td>recruits</td><td>yearly_refill, students_leave_school</td><td>soldiers_raised, sent_to_school, famine, plague</td></tr>
 <tr><td>horses</td><td>breeding, bought, herds, captured</td><td>battle, fodder_shortage, disease</td></tr>
@@ -58,7 +58,7 @@
 <tbody>
 <tr><td><code>steps</code></td><td>Loyal, Wavering, Disloyal, In revolt</td></tr>
 <tr><td><code>up</code></td><td>want_granted, gift_of_gold, office_at_court, marriage_into_ruling_house, victory_taken_part, long_secure_reign, fed_in_famine, shared_faith_and_tongue, war_against_rival</td></tr>
-<tr><td><code>down</code></td><td>heavy_taxes, land_seized_from_him, land_seized_from_another, war_lost, battle_lost, child_ruler, disputed_heir, new_ruler, grain_requisitioned, foreign_bribes, crown_borrowed, massacre, faith_not_shared, censured_by_head, slighted_at_court</td></tr>
+<tr><td><code>down</code></td><td>heavy_taxes, land_seized_from_him, land_seized_from_another, war_lost, battle_lost, child_ruler, disputed_heir, new_ruler, grain_requisitioned, foreign_bribes, crown_borrowed, massacre, faith_not_shared, censured_by_head, slighted_at_court, lord_assassinated, assassin_caught</td></tr>
 </tbody></table></div>
 <h2 id="food"><a class="anchor" href="#food" aria-label="Link to this section">#</a>Food</h2>
 <div class="table-scroll"><table>
@@ -131,6 +131,23 @@
 <tr><td><code>theocracy</code></td><td>bishop or abbot</td></tr>
 <tr><td><code>steppe realm</code></td><td>clan chief</td></tr>
 <tr><td><code>chiefdom or stateless society</code></td><td>elder or lineage head</td></tr>
+</tbody></table></div>
+<h3 id="assassination-provisional"><a class="anchor" href="#assassination-provisional" aria-label="Link to this section">#</a>Assassination (provisional)</h3>
+<blockquote>
+<p>Sending an assassin after one of your lords (REALM-280 to REALM-285). gold: what it costs, paid whether or not it works. chance: the base chance it works; less by great_lord_penalty for each Great lord reason (REALM-162), never below min_chance. He dies through the shared death rules (people, REALM-273): his heir or a kinsman takes his lands at heir_loyalty, or with no one left they go back to the crown. On success every other lord of the realm falls others_steps steps and the rest of his house turns Disloyal when house_turns_disloyal; on failure he turns target_on_failure and every other lord falls others_steps_on_failure steps.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>gold</code></td><td>25</td></tr>
+<tr><td><code>chance</code></td><td>0.6</td></tr>
+<tr><td><code>great_lord_penalty</code></td><td>0.15</td></tr>
+<tr><td><code>min_chance</code></td><td>0.2</td></tr>
+<tr><td><code>heir_loyalty</code></td><td>Wavering</td></tr>
+<tr><td><code>house_turns_disloyal</code></td><td>yes</td></tr>
+<tr><td><code>others_steps</code></td><td>1</td></tr>
+<tr><td><code>others_steps_on_failure</code></td><td>1</td></tr>
+<tr><td><code>target_on_failure</code></td><td>Disloyal</td></tr>
 </tbody></table></div>
 <h2 id="windows"><a class="anchor" href="#windows" aria-label="Link to this section">#</a>Windows</h2>
 <div class="table-scroll"><table>
