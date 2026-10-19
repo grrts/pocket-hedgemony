@@ -12,7 +12,7 @@ Every file is optional and has the shape of its 1444 counterpart in `scenarios/1
 | `culture-start.json` | `{ tongues: { <new tongue>: { name, family, way_of_life } }, realms: { <nation>: { court, mix, local, faith? } } }`; tongues already in the 1444 file need not be repeated |
 | `relations.json` | `{ relations: [...], facts: [...], entities?: [{ id, name }] }` in the 1444 shape; `entities` names 1378 realms that are neither on the map nor in the catalogue |
 | `subjects.json` | `{ subjects: [[subject, overlord, kind, autonomy, start]], stances: [[a, b, stance]] }` |
-| `sleeping-realms.json` | `{ realms: [{ id, name, color?, capital, home, tree? }] }`: realms not yet born on the start day; places are 1444 province ids or `[lon, lat]` |
+| `sleeping-realms.json` | `{ realms: [{ id, name, color?, capital, home, tree? }] }`: realms not yet born on the start day; places are 1444 province ids or `[lon, lat]`; `home` entries may also be owner-rule selectors `{ countries, admin1?, regions?, bbox? }`, which survive a new map |
 | `README.md` | what the region covers, its sources and its confidence |
 
 `packages/rules/test/scenario-1378.test.ts` reads every folder here and checks them together: ids unique across regions, every owner rule, ruler and tongue tied to a known realm, and relations and subjects naming known realms (map nations, sleeping realms, catalogue records or declared entities).
