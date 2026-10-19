@@ -735,6 +735,12 @@ and do not count toward its pool (EVT-033). Every number is a placeholder for ba
 - EVT-128 The everyday events' state (each realm's next draw, the player's waiting events, the count and the dice)
   shall be kept in the save; a save from before them starts the draws afresh. [EVT-075]
 
+- EVT-130 When plague reaches a province of the player's (PROV-359), an everyday event shall ask what to do, unless
+  one about plague already waits: *Close the province* (quarantine, PROV-357), *Send physicians and burn the sick
+  houses* (gold; `plague.care_death_cut` (0.5) fewer die there and its outbreak lasts the shortest time, one season),
+  or *Keep the roads open*. Plague fires it; it is never drawn and does not wait for EVT-117. @placeholder
+  [feedback 152; PROV-240 to PROV-242]
+
 #### How the player uses it: everyday events
 - EVT-129 Where: nothing new to find. An everyday event opens the same event card over the map and pauses the week
   (EVT-076): its title names who or where ("Death of Gilles de Chabannes", "Grain rots at Creuse"), *In your
@@ -1038,3 +1044,4 @@ before achievements and the autosave. The age and period checks run in the event
 | EVT-112 – 114 | — | Presentation: apps/client/src/ui/chronicle.ts, the History tab and the Aims fold; apps/client/scripts/chronicle-shots.mjs |
 | EVT-115 – 128 | everyday.feature | A choice every few months; none while one waits; an official's death; an option the realm cannot pay; spoiled grain; a lord's death; a child born heirless. Engine: packages/engine/test/everyday.test.ts |
 | EVT-129 | — | Presentation: apps/client/src/ui/events.ts, the event card |
+| EVT-130 | — | Engine: packages/engine/test/everyday.test.ts (plague reaching the player's land opens one card) |

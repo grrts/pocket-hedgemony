@@ -338,6 +338,8 @@ export function orderShape(order: Order): string {
       return "repay a loan";
     case "gift":
       return "give a lord gold";
+    case "callLords":
+      return "call the lords to war";
     case "grantFief":
       return "grant a fief";
     case "seizeFief":
@@ -350,6 +352,12 @@ export function orderShape(order: Order): string {
       return "hire an official";
     case "settleLand":
       return "keep new land as royal land";
+    case "dismissOfficial":
+      return "dismiss an official";
+    case "autoFillPosts":
+      return "turn auto-fill of posts on or off";
+    case "fillPosts":
+      return "fill every empty post";
     case "answerRevolution":
       return "answer the revolution";
     case "setStudy":
@@ -446,6 +454,8 @@ export function orderShape(order: Order): string {
       return "act in the Shogunate";
     case "tribes":
       return "act on a hunting ground";
+    case "quarantine":
+      return "close or open province against plague";
     case "keepPlaying":
       return "keep playing after a win";
     case "playOn":

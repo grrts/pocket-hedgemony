@@ -180,7 +180,7 @@ Newest decision first.
 - SET-050: Audio shall offer Music variety (My palette only, All palettes; default My palette only) and Zoom mix (On, Off; default On; the mix follows the zoom level). [settings §5.2]
 - SET-051: Audio shall offer Effects volume (0–100 %; default 80 %). [settings §5.2]
 - SET-052: Audio shall offer Interface sounds (On, Off; default On); Off silences taps and panel sounds but keeps world effects. [settings §5.2]
-- SET-053: Audio shall offer Ambience (On, Off; default Off) and Ambience volume (0–100 %; default 50 %), the volume greyed out while Ambience is off. [settings §5.2, §11.5]
+- SET-053: Audio shall offer Ambience (On, Off; default On) and Ambience volume (0–100 %; default 50 %), the volume greyed out while Ambience is off. [settings §5.2, §11.5; D-AUD-17]
 - SET-054: Where the game runs on mobile, Audio shall offer Haptics (On, Off; default On on phones) for light vibrations on the five moments in sound effects 8, never on desktop; the same switch shall also appear under Controls → Touch. [settings §5.2, §5.4]
 - SET-055: Where the game runs on desktop or web, Audio shall offer Play sound in the background (On, Off; default Off); on mobile the game always goes silent in the background. [settings §5.2]
 - SET-056: Where the game runs on mobile, Audio shall offer Let other apps' audio play (On, Off; default On; applies on restart): when On and other audio is playing at launch, game music starts muted and effects play over it, respecting the iPhone silent switch. [settings §5.2, §6.4]
@@ -502,7 +502,7 @@ The settings design said "No open questions remain"; these were found against it
 | SET-051 | audio.feature | Volume defaults |
 | SET-052 | audio.feature | Interface sounds off keeps world effects |
 | SET-053 | audio.feature | Volume defaults |
-| SET-053 | audio.feature | Ambience off by default, its volume greyed while off |
+| SET-053 | audio.feature | Ambience on by default, its volume greyed while off |
 | SET-054 | audio.feature | Haptics on phones only, one switch in two places |
 | SET-055 | audio.feature | Sound in the background |
 | SET-056 | audio.feature | Other apps' audio |

@@ -7,6 +7,7 @@ import { regentOf, rulerLabel, yearlyRulers } from "./rulers.ts";
 import { rulerDies } from "./crowns.ts";
 import { hireGold, officialAt, OFFICIALS } from "./officials.ts";
 import { realmTitles } from "./government.ts";
+import { lordOfCommander } from "./lords.ts";
 
 /**
  * People in play (REALM-270 to REALM-279): every person the game names, the
@@ -179,6 +180,19 @@ function lordDies(world: World, k: number, d: Omit<PersonDeath, "who">, news: Ne
     if (n !== world.player) for (const p of lands) refillPost(world, p);
     if (n === world.player) news.push({ kind: "ruler", text: `${d.name}, ${title} of the house of ${l.house}, ${how(d.cause, d.age)}, the last of his line. ${lands.length ? `${lands.map((p) => placeName(world, p)).join(", ")} return${lands.length === 1 ? "s" : ""} to the crown as royal land, with ${lands.length === 1 ? "its post" : "their posts"} empty.` : "He held no land."}`, nations: [n], ...(lands.length ? { province: lands[0]! } : {}) });
   }
+  // His command (WAR-252): his heir leads his men on; with his line gone, the men have no lord and go home.
+  const c = l.commander;
+  if (c !== undefined && world.commanderOwner[c]! >= 0) {
+    const cmd = world.commanders[c]!;
+    if (heir) {
+      cmd.name = heir.name;
+      cmd.age = heir.age;
+    } else {
+      world.commanderOwner[c] = -1;
+      for (let i = 0; i < world.armies.count; i++) if (world.armies.commander[i] === c) world.armies.commander[i] = -1;
+      delete l.commander;
+    }
+  }
   const r = world.rulers[n];
   if (r?.regent === d.name) r.regent = regentOf(world, n);
 }
@@ -239,6 +253,9 @@ function governorDies(world: World, id: number, d: Omit<PersonDeath, "who">, new
  * no one holds the reference any more.
  */
 export function personDies(world: World, who: PersonRef, cause: DeathCause, news: News[]): void {
+  // A lord leading his own retinue is one man: his death as a commander is the lord's death (WAR-252).
+  const lord = who.kind === "commander" ? lordOfCommander(world, who.c) : -1;
+  if (lord >= 0) return personDies(world, { kind: "lord", lord }, cause, news);
   const d = describe(world, who);
   if (!d) return;
   const death: PersonDeath = { who, cause, ...d };
@@ -310,10 +327,13 @@ export function yearlyPeople(world: World, news: News[]): void {
   for (let c = 0; c < world.commanders.length; c++) {
     if (world.commanderOwner[c]! < 0) continue;
     const cmd = world.commanders[c]!;
+    // A lord's own command is the lord himself: his age, and his roll above (WAR-252).
+    const lord = lordOfCommander(world, c);
+    if (lord >= 0) cmd.age = world.lords[lord]!.age! - 1;
     // Past 60 Might and past 65 Cunning fall a step every 5 years (WAR-051, WAR-053).
     wf.birthday(cmd);
     world.commanderLogistics[c] = cmd.logistics;
-    if (rolls(world, cmd.age, "commander")) personDies(world, { kind: "commander", c }, "old age", news);
+    if (lord < 0 && rolls(world, cmd.age, "commander")) personDies(world, { kind: "commander", c }, "old age", news);
   }
   for (const g of [...world.explore.governors]) {
     g.age++;

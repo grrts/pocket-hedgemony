@@ -6,6 +6,7 @@ import { restoreWorld, worldChunks } from "../src/domain/saves/world-chunks.ts";
 import { battleDeath, lordAge, officialAge, onPersonDeath, personDies, yearlyPeople, type PersonDeath } from "../src/people.ts";
 import { deathChance } from "../src/mortality.ts";
 import { swapOfficials } from "../src/officials.ts";
+import { grantFief } from "../src/lords.ts";
 import { addCommander } from "../src/recruit.ts";
 import * as wf from "../src/domain/warfare/index.ts";
 
@@ -71,6 +72,8 @@ describe("people age and die (REALM-270 to REALM-279)", () => {
       expect(w.provinceOfficial[p]).toBe(-1);
     }
     expect(news.some((n) => /last of his line/.test(n.text))).toBe(true);
+    // A line that died out is no lord of the realm: no fief, no gift, no say.
+    expect(grantFief(w, fr, lands[0]!, k)).toBe("his line has died out");
   });
 
   it("leaves a dead official's post empty for the player and refills it for the AI (PROV-194, REALM-275)", () => {
@@ -117,6 +120,34 @@ describe("people age and die (REALM-270 to REALM-279)", () => {
     expect(w.commanderOwner[c]).toBe(-1);
     expect(heard).toHaveLength(1);
     expect(heard[0]).toMatchObject({ who: { kind: "commander", c }, nation: fr, cause: "battle" });
+  });
+
+  it("treats a lord leading his retinue as one man: his fall is the lord's death, and his heir leads on (WAR-252)", () => {
+    const w = createWorld(rules, 1, tiles);
+    const fr = nation(w, "france");
+    const k = lordOf(w, fr);
+    const l = w.lords[k]!;
+    l.heir = { name: "Jean", age: 24 };
+    const c = addCommander(w, fr, wf.newCommander(l.name, { age: lordAge(w, k).age, origin: "a lord" }));
+    l.commander = c;
+    const heard: PersonDeath[] = [];
+    const off = onPersonDeath((_, d) => heard.push(d));
+    try {
+      w.rulerRng.next = () => 0;
+      battleDeath(w, c, []);
+    } finally {
+      off();
+    }
+    expect(heard).toHaveLength(1);
+    expect(heard[0]).toMatchObject({ who: { kind: "lord", lord: k }, cause: "battle" });
+    expect(l.name).toBe("Jean");
+    expect(w.commanders[c]).toMatchObject({ name: "Jean", age: 24 });
+    expect(w.commanderOwner[c]).toBe(fr);
+    // He ages with the lord and rolls only as the lord.
+    w.rulerRng.next = () => 0.999;
+    january(w);
+    yearlyPeople(w, []);
+    expect(w.commanders[c]!.age).toBe(l.age);
   });
 
   it("lowers an old commander's Might as he ages (WAR-051)", () => {

@@ -2375,11 +2375,35 @@ table.provinces td:first-child {
   padding-right: 24px;
 }
 
-/* A phone held sideways: the rows fit without scrolling. */
+/* A phone held sideways: the rows fit without scrolling, the Buttons toggle
+   beside the way to all sound settings. */
 @media (max-height: 500px) {
   .sound-menu .sub,
+  .sound-menu .now-playing small,
   .sound-row small {
     display: none;
+  }
+  .sound-foot {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 8px;
+  }
+  .sound-foot .sound-row {
+    grid-template-columns: auto 64px;
+  }
+  .sound-menu .sound-foot .all-sound {
+    margin-top: 0;
+    padding: 0 6px;
+    min-width: 0;
+    white-space: nowrap;
+    font-size: 15px;
+  }
+  .sound-menu .all-word {
+    display: none;
+  }
+  .sound-menu .all-sound .short-word {
+    display: inline;
   }
 }
 
@@ -2554,6 +2578,50 @@ button.place:active:not(:disabled) {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
+}
+/* An empty post's button names the type auto-fill or Fill all would hire there (PROV-348). */
+.post-buttons button.small:has(small) {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+}
+.post-buttons button.small small {
+  display: block;
+  color: var(--ink-soft);
+  font-size: 16px;
+  line-height: 1;
+}
+/* The Auto-fill posts switch at the top of the Officials tab, and the best fit above a post's other choices (PROV-348). */
+.auto-fill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0 8px;
+  border-bottom: 2px solid rgba(107, 74, 44, 0.25);
+}
+.auto-fill > span {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+  line-height: 1.1;
+}
+.auto-fill small {
+  color: var(--ink-soft);
+  font-size: 18px;
+}
+.auto-fill .toggle {
+  flex: none;
+  width: 64px;
+  min-height: 44px;
+  padding: 0;
+}
+.auto-fill .toggle.on {
+  outline: 3px solid var(--brass, #d0a248);
+}
+.hire-row.best-fit {
+  border-bottom: none;
 }
 img.thumb {
   flex: none;
@@ -3848,6 +3916,26 @@ button.paper.over {
   margin-top: 0;
   color: var(--cloth);
 }
+/* The plague card on a province's Overview (PROV-361): the step in words, the dead, and a full-width Quarantine button. */
+.plague-card {
+  padding: 6px 8px;
+  margin: 6px 0 8px;
+  border-left: 4px dashed var(--cloth);
+}
+.plague-card .sub {
+  margin-top: 0;
+}
+.plague-card p {
+  margin: 0 0 6px;
+}
+.plague-card .plague-toggle {
+  width: 100%;
+  flex-wrap: wrap;
+  gap: 2px 8px;
+}
+.plague-card .plague-toggle small {
+  color: var(--ink-soft);
+}
 .rising dl.facts dd small {
   display: block;
   color: var(--ink-soft);
@@ -4631,6 +4719,10 @@ button.paper.over {
 .sound-menu .all-sound {
   width: 100%;
   margin-top: 4px;
+}
+
+.sound-menu .short-word {
+  display: none;
 }
 
 /* "Saved." over the map, never a dialog (SAVE-022). */
@@ -6512,6 +6604,19 @@ details.pow-line > .hint {
   min-height: 44px;
 }
 
+/* Lords' men in the Army tab (WAR-259 to WAR-262): one full-width call, rows with 44-point buttons. */
+button[data-call-lords] {
+  width: 100%;
+  margin: 4px 0;
+}
+.retinue-sum {
+  margin: 4px 0;
+}
+.retinue-row .army-buttons button.small {
+  min-height: 44px;
+  min-width: 44px;
+}
+
 /* ---- Your realm's six sections (SHELL-165..167, ui-review): one row of icons with names under the title, and the
    open section's pages in a lower row. Neither row wraps or scrolls (F-111); six fit the 45 % sheet of a phone held
    sideways, each a 44-point target or more. ---- */
@@ -6817,7 +6922,7 @@ div.chron-row {
   color: var(--ink-soft);
 }
 
-/* Sending an assassin after a lord (REALM-283): the confirm card on his screen, two 44-point buttons side by side. */
+/* Sending an assassin after a lord (REALM-284): the confirm card on his screen, two 44-point buttons side by side. */
 .assassin-ask {
   padding: 6px 8px;
   margin: 6px 0 8px;

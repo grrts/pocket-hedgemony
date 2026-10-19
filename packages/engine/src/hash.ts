@@ -6,6 +6,7 @@ import { rebelsHashData } from "./rebels.ts";
 import { revolutionsHashData } from "./revolutions.ts";
 import { institutionsHashData } from "./institutions.ts";
 import { tribesHashData } from "./tribes.ts";
+import { plagueHashData } from "./plague.ts";
 import type { World } from "./world.ts";
 
 /**
@@ -97,6 +98,7 @@ export function hashWorld(world: World): string {
   feed(revolutionsHashData(world));
   feed(institutionsHashData(world));
   feed(tribesHashData(world));
+  for (const v of plagueHashData(world)) feed(v);
   feed(world.provinceLightTax);
   feed(world.provinceSelfRule);
   feed(world.provinceTongue);
@@ -113,6 +115,7 @@ export function hashWorld(world: World): string {
   feed(world.provinceOfficialFrom);
   feed(world.provinceOfficialAge);
   feed(world.provinceNewLand);
+  feed(world.nationManualPosts);
   feed(live(a.trainArm));
   feed(live(a.trainMen));
   feed(live(a.trainLeft));

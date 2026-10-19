@@ -209,7 +209,7 @@ export function newRuler(world: World, n: number, news: News[], step: (lord: num
   const child = ruler.age < R.child_under;
   if (child) ruler.regent = regentOf(world, n);
   world.lords.forEach((l, k) => {
-    if (l.nation !== n) return;
+    if (l.nation !== n || l.gone) return;
     step(k, "new_ruler");
     if (disputed) step(k, "disputed_heir");
     if (child) step(k, "child_ruler");

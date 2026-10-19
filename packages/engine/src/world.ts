@@ -14,7 +14,7 @@ import { byDistance, createLordState, seedLords, type LordState } from "./lords.
 import { mix, personName } from "./names.ts";
 import { realmConfig } from "./domain/realm/index.ts";
 import { createLivingState, seedClasses, type LivingState } from "./living.ts";
-import { addCommander, ARMS, armIndex, createRecruitState, recount, FOOT_ARMS, HORSE_ARMS, KIND, OFFICIALS, type FreeCompany, type Mercenary, type Muster, refreshFreeCompanies } from "./recruit.ts";
+import { addCommander, ARMS, armIndex, createRecruitState, recount, recountLordsMen, FOOT_ARMS, HORSE_ARMS, KIND, OFFICIALS, type FreeCompany, type Mercenary, type Muster, refreshFreeCompanies } from "./recruit.ts";
 import { seedOfficials } from "./officials.ts";
 import { createResearchState, seedResearch, withoutOf, type ResearchState } from "./research.ts";
 import { createWorksState, seedWorks, type WorksState } from "./works.ts";
@@ -46,6 +46,7 @@ import { createCampaignEndState, seedCampaign, type CampaignEndState } from "./c
 import type { AchievementLog } from "./achievements.ts";
 import { createInstitutionsState, seedInstitutions, type InstitutionsState } from "./institutions.ts";
 import { createTribesState, seedTribes, type TribesState } from "./tribes.ts";
+import { createPlagueState, type PlagueState } from "./plague.ts";
 
 /**
  * Simulation state stored as parallel typed arrays (one array per field,
@@ -53,7 +54,7 @@ import { createTribesState, seedTribes, type TribesState } from "./tribes.ts";
  * cache-friendly to iterate every turn and lets whole arrays be copied or
  * transferred to the UI thread without serialising objects.
  */
-export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState, RebelState, RevolutionState, PeoplesState, TradeState, RulerState, FallenState, BeliefState, InstitutionsState, TribesState {
+export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState, RebelState, RevolutionState, PeoplesState, TradeState, RulerState, FallenState, BeliefState, InstitutionsState, TribesState, PlagueState {
   /** Heads of the faith: patrons, the Caliph, the conclave, censures (faithHeads.ts). */
   faithHeads: FaithHeadsState;
   /** Faiths a realm serves as the patron of their head while of another faith (RELG-145). */
@@ -99,6 +100,8 @@ export interface World extends LivingState, TreasuryState, FoodState, MoodState,
   nationTreasury: Float64Array;
   nationLevies: Float64Array;
   nationMaxLevies: Float64Array;
+  /** Men each realm's lords would bring if called now, by loyalty (WAR-252): part of how strong it looks. */
+  nationLordsMen: Float64Array;
   nationMonthlyIncome: Float64Array;
   /** Each realm's administrative capacity from the catalogue, 1 (very low) to 5 (very high), 0 unknown: how far its rule reaches (realmStrengths.ts). */
   nationAdminCapacity: Int8Array;
@@ -162,6 +165,8 @@ export interface World extends LivingState, TreasuryState, FoodState, MoodState,
   provinceOfficialAge: Uint8Array;
   /** 1 while a province the player has just taken waits for him to fill its post, grant it or keep it royal (PROV-340). */
   provinceNewLand: Uint8Array;
+  /** 1 where the player has turned Auto-fill posts off, so his realm's empty posts wait for him (PROV-342). */
+  nationManualPosts: Uint8Array;
   /** Province each commander was commissioned from, -1 = none. */
   commanderHome: number[];
   /** Name seed of each commander commissioned from an official, -1 = none. */
@@ -213,7 +218,7 @@ export interface ArmyPool {
   battle: Int32Array;
   /** The province the army last marched in from (-1 = none): the way back past an enemy castle. */
   cameFrom: Int32Array;
-  /** Company kind: levy or hired (see KIND). */
+  /** Company kind: levy, hired or a lord's retinue (see KIND). */
   kind: Uint8Array;
   /** Province the men were levied from (-1 = none, as for a hired company): its people lose the army's dead (WAR-226). */
   home: Int32Array;
@@ -445,6 +450,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     nationTreasury: Float64Array.from(rules.nations, (n) => (n.asleep ? 0 : rules.defines.economy.startingTreasury)),
     nationLevies: new Float64Array(N),
     nationMaxLevies: new Float64Array(N),
+    nationLordsMen: new Float64Array(N),
     nationMonthlyIncome: new Float64Array(N),
     nationAdminCapacity: Int8Array.from(nationIds, adminCapacityRank),
     commanderIds,
@@ -491,6 +497,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     ...createFaithHeadsState(N),
     ...createInstitutionsState(),
     ...createTribesState(P),
+    ...createPlagueState(P, seed),
   };
   world.diplomacy = createWarState(world);
   seedClasses(world);
@@ -552,6 +559,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   seedRegions(world);
   seedCharts(world);
   recount(world);
+  recountLordsMen(world);
   refreshFreeCompanies(world);
   // The ledger is worked out from the start, so lenders and the treasury card know the realm's income.
   runLedger(world, false);

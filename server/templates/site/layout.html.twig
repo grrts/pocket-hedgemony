@@ -6,6 +6,9 @@
     <a class="brand" href="/"><img class="px" src="/site/art/icon-crown.png" width="30" height="24" alt="">Pocket Hegemony</a>
     <nav class="bar-nav" aria-label="Site">
         <a href="{{ path('wiki') }}"{% if here starts with 'wiki' %} aria-current="page"{% endif %}>Wiki</a>
+        <a href="{{ path('community') }}"{% if here starts with 'community' and here not in ['community_you', 'community_signin', 'community_join'] %} aria-current="page"{% endif %}>Community</a>
+        {% if app.user %}<a class="bar-you" href="{{ path('community_you') }}"{% if here == 'community_you' %} aria-current="page"{% endif %}>{{ app.user.displayName }}</a>
+        {% else %}<a href="{{ path('community_signin') }}"{% if here in ['community_signin', 'community_join'] %} aria-current="page"{% endif %}>Sign in</a>{% endif %}
         {% if play_url %}<a class="btn wax" href="{{ play_url }}">Play</a>{% endif %}
     </nav>
 </div></header>
@@ -15,6 +18,7 @@
 <footer class="foot"><div class="wrap foot-row">
     <span class="brand-small">Pocket Hegemony</span>
     <a href="{{ path('wiki') }}">Wiki</a>
+    <a href="{{ path('community') }}">Community</a>
     <a href="{{ path('press') }}">Press</a>
     <a href="{{ path('privacy') }}">Privacy</a>
 </div></footer>

@@ -122,7 +122,7 @@ function castlesOf(world: World, n: number): number {
   return k;
 }
 
-const lordsOf = (world: World, n: number) => world.lords.filter((l) => l.nation === n);
+const lordsOf = (world: World, n: number) => world.lords.filter((l) => l.nation === n && !l.gone);
 
 function startKindOf(world: World, n: number): string {
   try {

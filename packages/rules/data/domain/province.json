@@ -218,7 +218,8 @@
       "colonial governor": {}
     },
     "school_trains": { "madrasa": ["judge", "chaplain"], "university": ["judge", "steward"], "academy": ["master of works", "warden"] },
-    "hire": { "gold": 25, "foreign_multiplier": 2, "provisional": true }
+    "hire": { "gold": 25, "foreign_multiplier": 2, "provisional": true },
+    "auto_fill": { "$comment": "PROV-342, PROV-343: gold auto-fill keeps back, and months of food under which a steward fits best.", "reserve_gold": 20, "hungry_months": 1, "traders_passing": 3, "provisional": true }
   },
   "loyalty": ["In revolt", "Disloyal", "Wavering", "Loyal"],
   "homeland": { "years": 100 },
@@ -238,7 +239,29 @@
     "bloodshed_years": 20,
     "harsh_lord_traits": ["Cruel", "Greedy"]
   },
-  "plague": { "steps": ["none", "rumour", "outbreak", "burning out"], "outbreak_seasons": [1, 2], "links": ["road", "river", "sea route", "army", "refugees"] },
+  "plague": {
+    "steps": ["none", "rumour", "outbreak", "burning out"],
+    "care_death_cut": 0.5,
+    "outbreak_seasons": [1, 2],
+    "links": ["road", "river", "sea route", "army", "refugees"],
+    "$comment": "PROV-352 to PROV-363 (18 October 2026): the game's plague. Every number below is provisional. Weeks are plague weeks, the days of decided.plague_week_days (four a month). A province's crowding is its townsfolk share over crowd_town_share, kept between crowd_min and crowd_max.",
+    "start_chance_year": 0.003,
+    "crowd_town_share": 0.1,
+    "crowd_min": 0.5,
+    "crowd_max": 3,
+    "rumour_weeks": 4,
+    "weeks_per_season": 12,
+    "burning_out_weeks": 4,
+    "spread_week": 0.04,
+    "river_factor": 1.5,
+    "sea_spread_week": 0.0015,
+    "into_quarantine_factor": 0.25,
+    "army_carry_weeks": 4,
+    "army_spread_week": 0.15,
+    "spared_years": 12,
+    "town_week_share_max": 0.02,
+    "quarantine_tax_factor": 0.5
+  },
   "fever_land": {
     "$comment": "D-PROV-32: steps from the ground, one more in the tropics and one more for every two marsh tiles, one less for each of quinine and sanitation known. People born elsewhere die at the extra yearly rate of the step; locals at local_share of it.",
     "steps": ["none", "mild", "harsh", "deadly"],
@@ -353,5 +376,5 @@
     "settlement_stages": { "trading post": "Outpost", "settlement": "Settled", "colony": "Self-governing" },
     "officials_per_province": { "G1": 1, "G9": 2, "G16": 3, "extra_from": ["B2", "G11", "T14"] }
   },
-  "_provisional": ["decided.tax_travel_loss_per_day", "decided.town_size_floors", "decided.town_tiles_at", "decided.recruit_share_per_class", "decided.homeless_drift_share", "decided.refugee_settle_years", "decided.sickness_monthly", "decided.official_learn_years"]
+  "_provisional": ["decided.tax_travel_loss_per_day", "decided.town_size_floors", "decided.town_tiles_at", "decided.recruit_share_per_class", "decided.homeless_drift_share", "decided.refugee_settle_years", "decided.sickness_monthly", "decided.official_learn_years", "plague.start_chance_year", "plague.crowd_town_share", "plague.crowd_min", "plague.crowd_max", "plague.rumour_weeks", "plague.weeks_per_season", "plague.burning_out_weeks", "plague.spread_week", "plague.river_factor", "plague.sea_spread_week", "plague.into_quarantine_factor", "plague.army_carry_weeks", "plague.army_spread_week", "plague.spared_years", "plague.town_week_share_max", "plague.quarantine_tax_factor", "plague.care_death_cut"]
 }
