@@ -1,0 +1,32 @@
+# The community forum at /community (see docs/website.md). The boards are fixed here,
+# in the order the overview lists them; the slug is the board's address and the icon
+# one of public/site/art/icon-*.png.
+parameters:
+    community.boards:
+        - { slug: general, name: General, icon: castle, description: 'Anything about Pocket Hegemony that fits nowhere else.' }
+        - { slug: strategy, name: Strategy and campaign stories, icon: swords, description: 'How you play, what worked, and the tales of your campaigns.' }
+        - { slug: ideas, name: Ideas and feedback, icon: scroll, description: 'What you would add to the game, change or take out.' }
+        - { slug: bugs, name: Bug reports, icon: hammer, description: 'Something broke? Say what you did, what you expected and what happened.' }
+
+framework:
+    rate_limiter:
+        # Web sign-ups, per IP address.
+        community_join:
+            policy: sliding_window
+            limit: 3
+            interval: '1 hour'
+        # New topics, per account.
+        community_topic:
+            policy: sliding_window
+            limit: 5
+            interval: '1 hour'
+        # Replies, per account.
+        community_post:
+            policy: sliding_window
+            limit: 10
+            interval: '10 minutes'
+        # Reported posts, per account.
+        community_report:
+            policy: sliding_window
+            limit: 10
+            interval: '1 hour'

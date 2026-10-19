@@ -1,0 +1,37 @@
+{% extends 'community/layout.html.twig' %}
+{% import 'community/_parts.html.twig' as parts %}
+
+{% block title %}Report a post · Pocket Hegemony community{% endblock %}
+{% block meta %}<meta name="robots" content="noindex">{% endblock %}
+
+{% block community %}
+<section class="framed sheet narrow">
+    <p class="crumbs"><a href="{{ path('community') }}">Community</a> › <a href="{{ path('community_board', {board: board.slug}) }}">{{ board.name }}</a> › <a href="{{ path('community_post', {id: post.id}) }}">{{ topic.title }}</a></p>
+    <h1>Report a post</h1>
+    <blockquote class="quote">
+        <p class="quote-who">{{ parts.seal(post.author) }} <strong>{{ post.author.displayName }}</strong> <span class="muted">{{ parts.when(post.createdAt) }}</span></p>
+        <div class="post-body">{{ post.body|plain_text }}</div>
+    </blockquote>
+    {% if own %}
+        <p>This is your own post. You can <a href="{{ path('community_post', {id: post.id}) }}">go back to it</a>.</p>
+    {% elseif already %}
+        <p>You have reported this post already. A moderator will look at it.</p>
+        <p><a class="btn paper" href="{{ path('community_post', {id: post.id}) }}">Back to the topic</a></p>
+    {% else %}
+        <p>Tell the moderators if this post is rude, spam, or breaks the rules. Only moderators see reports.</p>
+        <form method="post" action="{{ path('community_report', {id: post.id}) }}" class="c-form">
+            <input type="hidden" name="_token" value="{{ csrf_token('community-post') }}">
+            <label class="field-label" for="report-reason">What is wrong with it? <span class="muted">(optional)</span></label>
+            <textarea id="report-reason" name="reason" rows="3" maxlength="{{ constant('App\\Entity\\PostReport::REASON_MAX') }}"{% if errors.reason is defined %} aria-invalid="true" aria-describedby="reason-error"{% endif %}>{{ reason }}</textarea>
+            {{ parts.error(errors, 'reason') }}
+            <div class="form-row">
+                <span></span>
+                <span class="form-buttons">
+                    <a class="btn paper" href="{{ path('community_post', {id: post.id}) }}">Cancel</a>
+                    <button class="btn wax" type="submit">Report post</button>
+                </span>
+            </div>
+        </form>
+    {% endif %}
+</section>
+{% endblock %}

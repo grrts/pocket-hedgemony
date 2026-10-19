@@ -1,5 +1,5 @@
 import type { Snapshot } from "@ph/engine";
-import { musicEra, paletteOf, type MusicFacts, type Palette } from "@ph/engine/domain/audio";
+import { ambienceBed, musicEra, paletteOf, type MusicFacts, type Palette, type Zoom } from "@ph/engine/domain/audio";
 
 /**
  * What the music director needs to know (AUD-037), read from a snapshot and
@@ -135,4 +135,36 @@ const CULTURE_GROUP: Record<string, string> = {
 /** The player's music palette from their culture and capital (AUD-018, AUD-019); Western Europe when unknown. */
 export function playerPalette(culture: string | undefined, capitalLongitude: number): Palette {
   return paletteOf(CULTURE_GROUP[culture ?? ""] ?? "latin", capitalLongitude) ?? ("europe_west" as Palette);
+}
+
+// ---------------------------------------------------------------- ambience (AUD-079, D-AUD-17)
+
+/** Camera zoom where the regional and local bands begin: the diplomacy lens's regional zoom, and close enough to see a town's streets coming. */
+const ZOOM_BANDS = { regional: 2, local: 8 };
+/** People (thousands) that make a big settlement for the town bed. */
+const BIG_SETTLEMENT = 100;
+
+/** The ground words of the ambience table for each map terrain. */
+const GROUND: Record<string, string> = {
+  sea: "coastal sea", ocean: "open ocean",
+  grassland: "plains", farmland: "plains", savanna: "plains", mediterranean: "plains", paddies: "plains", tundra: "plains",
+  steppe: "steppe", drylands: "drylands", badlands: "drylands", colddesert: "drylands",
+  forest: "forest", broadleaf: "forest", jungle: "jungle",
+  desert: "desert", dunes: "desert",
+  hills: "hills", highlands: "hills", mountains: "mountains", snowpeaks: "mountains", glacier: "mountains",
+  marsh: "marsh", swamp: "marsh",
+};
+
+export const zoomBand = (zoom: number): Zoom => (zoom >= ZOOM_BANDS.local ? "local" : zoom >= ZOOM_BANDS.regional ? "regional" : "world");
+
+/** The bed under the camera: the ground of the province in the middle of the view, a big town or a war close in. */
+export function bedUnderCamera(s: Snapshot, province: number, terrain: string | undefined, zoom: number, capital: boolean): { bed: string; windier: boolean } | null {
+  if (province < 0) return null;
+  const ground = GROUND[terrain ?? ""];
+  return ambienceBed(true, {
+    zoom: zoomBand(zoom),
+    ...(ground ? { ground } : {}),
+    bigSettlement: capital || (s.provincePeople[province] ?? 0) >= BIG_SETTLEMENT,
+    warFront: s.sieges.some((x) => x.province === province) || s.battles.some((b) => b.province === province),
+  }, s.date.month);
 }
