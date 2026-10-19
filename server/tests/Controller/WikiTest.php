@@ -30,6 +30,22 @@ final class WikiTest extends WebTestCase
         self::assertGreaterThan(0, $crawler->filter('.prose a[href^="/wiki/"]')->count());
     }
 
+    public function testShowsTheGamesConfigAsDataPages(): void
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/wiki/Data-Warfare');
+
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('.prose h1', 'Warfare data');
+        self::assertSelectorExists('.prose h2#arms');
+        self::assertStringContainsString('levy foot', $crawler->filter('.prose')->text());
+        self::assertSelectorExists('.prose a[href="/wiki/Data-Research#inventions"]');
+
+        $crawler = $client->request('GET', '/wiki/Game-Data');
+        self::assertResponseIsSuccessful();
+        self::assertGreaterThan(20, $crawler->filter('.prose a[href^="/wiki/Data-"]')->count());
+    }
+
     public function testSendsOtherSpellingsToThePage(): void
     {
         $client = static::createClient();

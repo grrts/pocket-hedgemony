@@ -310,6 +310,8 @@ Not yet: tolls, trade pacts and embargoes, bandits and capture on the road, lord
 
 ## Numbers
 
+Every value the game uses, made from its config so it always matches the game: [Trade data](Data-Trade). How they combine: [Formulas](Formulas).
+
 Every trade number is a placeholder, all in the trade config file.
 
 | Value | Config key | Design value |

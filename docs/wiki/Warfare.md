@@ -417,6 +417,8 @@ During the turn, inside the day loop: contacts, the withdraw check and battles; 
 
 ## Numbers
 
+Every value the game uses, made from its config so it always matches the game: [Warfare data](Data-Warfare). How they combine: [Formulas](Formulas).
+
 All warfare values live in `packages/rules/data/domain/warfare.json`; most are provisional and tuned in balancing. Amounts the designs left out are set as: a wagon costs 10 gold, a hired company costs twice standing pay, a season is 3 months, a ransom is 100 gold for a commander and 25 for a captain, and fever land doubles sickness. Key values:
 
 | Key | Value |

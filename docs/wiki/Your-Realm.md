@@ -349,6 +349,8 @@ Things you can do: set food policy, override a castle, apply a food preset; take
 
 ## Numbers
 
+Every value the game uses, made from its config so it always matches the game: [Realm data](Data-Realm). How they combine: [Formulas](Formulas).
+
 All realm numbers are placeholders, kept in one realm data file.
 
 | Value | Config key | Design value | Provisional? |

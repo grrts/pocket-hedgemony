@@ -63,6 +63,37 @@
    ]
   },
   {
+   "title": "Game data",
+   "pages": [
+    "Game-Data",
+    "Data-Defines",
+    "Data-Time-and-Turns",
+    "Data-Realm",
+    "Data-Province",
+    "Data-Buildings",
+    "Data-Trade",
+    "Data-Research",
+    "Data-Institutions",
+    "Data-Warfare",
+    "Data-Recruiting",
+    "Data-Troop-Movement",
+    "Data-Naval",
+    "Data-Exploration",
+    "Data-Tribes",
+    "Data-Government",
+    "Data-Subjects",
+    "Data-Diplomacy",
+    "Data-Religion",
+    "Data-Culture",
+    "Data-Rebellions",
+    "Data-Revolutions",
+    "Data-National-Strengths",
+    "Data-Events",
+    "Data-Achievements",
+    "Data-Events-Everyday"
+   ]
+  },
+  {
    "title": "For developers",
    "pages": [
     "Design-Principles"
@@ -414,6 +445,6146 @@
     }
    ]
   },
+  "Data-Achievements": {
+   "title": "Achievements data",
+   "summary": "Every value in the game's achievements config, exactly as the game reads it. This page is made from packages/rules/data/domain/achievements.json each time the config changes, so it always matches the game. How these…",
+   "headings": [
+    {
+     "id": "limits",
+     "text": "Limits",
+     "level": 2
+    },
+    {
+     "id": "progress",
+     "text": "Progress",
+     "level": 2
+    },
+    {
+     "id": "google-step-size",
+     "text": "Google step size",
+     "level": 3
+    },
+    {
+     "id": "tiers",
+     "text": "Tiers",
+     "level": 2
+    },
+    {
+     "id": "achievements",
+     "text": "Achievements",
+     "level": 2
+    }
+   ]
+  },
+  "Data-Buildings": {
+   "title": "Buildings data",
+   "summary": "Every value in the game's buildings config, exactly as the game reads it. This page is made from packages/rules/data/domain/buildings.json each time the config changes, so it always matches the game. How these values…",
+   "headings": [
+    {
+     "id": "materials",
+     "text": "Materials",
+     "level": 2
+    },
+    {
+     "id": "ground-multiplier",
+     "text": "Ground multiplier",
+     "level": 2
+    },
+    {
+     "id": "town-slots",
+     "text": "Town slots",
+     "level": 2
+    },
+    {
+     "id": "sites",
+     "text": "Sites",
+     "level": 2
+    },
+    {
+     "id": "per-province",
+     "text": "Per province",
+     "level": 3
+    },
+    {
+     "id": "master-of-works",
+     "text": "Master of works",
+     "level": 3
+    },
+    {
+     "id": "stop-months-by-climate",
+     "text": "Stop months by climate",
+     "level": 3
+    },
+    {
+     "id": "condition",
+     "text": "Condition",
+     "level": 2
+    },
+    {
+     "id": "damage",
+     "text": "Damage",
+     "level": 2
+    },
+    {
+     "id": "town-fire-provisional",
+     "text": "Town fire (provisional)",
+     "level": 3
+    },
+    {
+     "id": "village-works",
+     "text": "Village works",
+     "level": 2
+    },
+    {
+     "id": "needs",
+     "text": "Needs",
+     "level": 3
+    },
+    {
+     "id": "builds",
+     "text": "Builds",
+     "level": 3
+    },
+    {
+     "id": "crafts-appearing",
+     "text": "Crafts appearing",
+     "level": 2
+    },
+    {
+     "id": "raw",
+     "text": "Raw",
+     "level": 3
+    },
+    {
+     "id": "upkeep-groups",
+     "text": "Upkeep groups",
+     "level": 2
+    },
+    {
+     "id": "arsenal",
+     "text": "Arsenal",
+     "level": 2
+    },
+    {
+     "id": "ai",
+     "text": "Ai",
+     "level": 2
+    },
+    {
+     "id": "advice",
+     "text": "Advice",
+     "level": 2
+    },
+    {
+     "id": "owners-may-build",
+     "text": "Owners may build",
+     "level": 2
+    },
+    {
+     "id": "lord-traits",
+     "text": "Lord traits",
+     "level": 2
+    },
+    {
+     "id": "ai-personality",
+     "text": "Ai personality",
+     "level": 2
+    },
+    {
+     "id": "map-wealth",
+     "text": "Map wealth",
+     "level": 2
+    },
+    {
+     "id": "templates",
+     "text": "Templates",
+     "level": 2
+    },
+    {
+     "id": "european-market-town",
+     "text": "European market town",
+     "level": 3
+    },
+    {
+     "id": "sahel-trade-town",
+     "text": "Sahel trade town",
+     "level": 3
+    },
+    {
+     "id": "variants",
+     "text": "Variants",
+     "level": 2
+    },
+    {
+     "id": "landmarks",
+     "text": "Landmarks",
+     "level": 2
+    },
+    {
+     "id": "anchors",
+     "text": "Anchors",
+     "level": 2
+    },
+    {
+     "id": "inventions",
+     "text": "Inventions",
+     "level": 2
+    },
+    {
+     "id": "buildings",
+     "text": "Buildings",
+     "level": 2
+    },
+    {
+     "id": "burned-rebuild-provisional",
+     "text": "Burned rebuild (provisional)",
+     "level": 2
+    },
+    {
+     "id": "troyes-1444",
+     "text": "Troyes 1444",
+     "level": 2
+    },
+    {
+     "id": "unique-variants",
+     "text": "Unique variants",
+     "level": 2
+    }
+   ]
+  },
+  "Data-Culture": {
+   "title": "Culture data",
+   "summary": "Every value in the game's culture config, exactly as the game reads it. This page is made from packages/rules/data/domain/culture.json each time the config changes, so it always matches the game. How these values are…",
+   "headings": [
+    {
+     "id": "relation-provisional",
+     "text": "Relation (provisional)",
+     "level": 2
+    },
+    {
+     "id": "drift",
+     "text": "Drift",
+     "level": 2
+    },
+    {
+     "id": "multipliers-provisional",
+     "text": "Multipliers (provisional)",
+     "level": 3
+    },
+    {
+     "id": "inventions",
+     "text": "Inventions",
+     "level": 4
+    },
+    {
+     "id": "way-of-life-lands-provisional",
+     "text": "Way of life lands (provisional)",
+     "level": 3
+    },
+    {
+     "id": "policy-provisional",
+     "text": "Policy (provisional)",
+     "level": 2
+    },
+    {
+     "id": "officials",
+     "text": "Officials",
+     "level": 2
+    },
+    {
+     "id": "years-to-full-effect-provisional",
+     "text": "Years to full effect (provisional)",
+     "level": 3
+    },
+    {
+     "id": "effects-provisional",
+     "text": "Effects (provisional)",
+     "level": 2
+    },
+    {
+     "id": "trading-people",
+     "text": "Trading people",
+     "level": 3
+    },
+    {
+     "id": "national-levy",
+     "text": "National levy",
+     "level": 3
+    },
+    {
+     "id": "nationalism-provisional",
+     "text": "Nationalism (provisional)",
+     "level": 2
+    },
+    {
+     "id": "engine-events-provisional",
+     "text": "Engine events (provisional)",
+     "level": 2
+    },
+    {
+     "id": "court-goes-native",
+     "text": "Court goes native",
+     "level": 3
+    },
+    {
+     "id": "new-tongue-abroad",
+     "text": "New tongue abroad",
+     "level": 3
+    },
+    {
+     "id": "merge-without-event",
+     "text": "Merge without event",
+     "level": 3
+    },
+    {
+     "id": "family-default-by-region-provisional",
+     "text": "Family default by region (provisional)",
+     "level": 2
+    },
+    {
+     "id": "tongues",
+     "text": "Tongues",
+     "level": 2
+    },
+    {
+     "id": "tongues-added",
+     "text": "Tongues added",
+     "level": 2
+    },
+    {
+     "id": "merge-events",
+     "text": "Merge events",
+     "level": 2
+    },
+    {
+     "id": "age-of-revolutions",
+     "text": "Age of revolutions",
+     "level": 2
+    },
+    {
+     "id": "dots",
+     "text": "Dots",
+     "level": 2
+    },
+    {
+     "id": "lens",
+     "text": "Lens",
+     "level": 2
+    },
+    {
+     "id": "ai",
+     "text": "Ai",
+     "level": 2
+    },
+    {
+     "id": "risings",
+     "text": "Risings",
+     "level": 2
+    },
+    {
+     "id": "refugees",
+     "text": "Refugees",
+     "level": 2
+    },
+    {
+     "id": "schools",
+     "text": "Schools",
+     "level": 2
+    }
+   ]
+  },
+  "Data-Defines": {
+   "title": "Core values data",
+   "summary": "Every value in the game's core values config, exactly as the game reads it. This page is made from packages/rules/data/defines.json each time the config changes, so it always matches the game.",
+   "headings": [
+    {
+     "id": "economy",
+     "text": "Economy",
+     "level": 2
+    },
+    {
+     "id": "works",
+     "text": "Works",
+     "level": 2
+    },
+    {
+     "id": "levies",
+     "text": "Levies",
+     "level": 2
+    },
+    {
+     "id": "military",
+     "text": "Military",
+     "level": 2
+    },
+    {
+     "id": "march",
+     "text": "March",
+     "level": 2
+    },
+    {
+     "id": "days-to-cross",
+     "text": "Days to cross",
+     "level": 3
+    },
+    {
+     "id": "foraging",
+     "text": "Foraging",
+     "level": 3
+    },
+    {
+     "id": "war",
+     "text": "War",
+     "level": 2
+    },
+    {
+     "id": "garrison",
+     "text": "Garrison",
+     "level": 3
+    },
+    {
+     "id": "recruit",
+     "text": "Recruit",
+     "level": 2
+    },
+    {
+     "id": "free-company-men",
+     "text": "Free company men",
+     "level": 3
+    },
+    {
+     "id": "free-companies",
+     "text": "Free companies",
+     "level": 3
+    },
+    {
+     "id": "living",
+     "text": "Living",
+     "level": 2
+    },
+    {
+     "id": "town-mix",
+     "text": "Town mix",
+     "level": 3
+    },
+    {
+     "id": "country-mix",
+     "text": "Country mix",
+     "level": 3
+    },
+    {
+     "id": "castle-food",
+     "text": "Castle food",
+     "level": 2
+    }
+   ]
+  },
+  "Data-Diplomacy": {
+   "title": "Diplomacy data",
+   "summary": "Every value in the game's diplomacy config, exactly as the game reads it. This page is made from packages/rules/data/domain/diplomacy.json each time the config changes, so it always matches the game. How these values…",
+   "headings": [
+    {
+     "id": "relations",
+     "text": "Relations",
+     "level": 2
+    },
+    {
+     "id": "layers",
+     "text": "Layers",
+     "level": 3
+    },
+    {
+     "id": "implied-stance",
+     "text": "Implied stance",
+     "level": 3
+    },
+    {
+     "id": "types",
+     "text": "Types",
+     "level": 3
+    },
+    {
+     "id": "subject-kinds",
+     "text": "Subject kinds",
+     "level": 3
+    },
+    {
+     "id": "compatibility",
+     "text": "Compatibility",
+     "level": 3
+    },
+    {
+     "id": "rules",
+     "text": "Rules",
+     "level": 4
+    },
+    {
+     "id": "precedence",
+     "text": "Precedence",
+     "level": 3
+    },
+    {
+     "id": "actions",
+     "text": "Actions",
+     "level": 3
+    },
+    {
+     "id": "fact-types",
+     "text": "Fact types",
+     "level": 3
+    },
+    {
+     "id": "confidence-levels",
+     "text": "Confidence levels",
+     "level": 3
+    },
+    {
+     "id": "origin-values",
+     "text": "Origin values",
+     "level": 3
+    },
+    {
+     "id": "modifiers",
+     "text": "Modifiers",
+     "level": 3
+    },
+    {
+     "id": "proposed-fact-types",
+     "text": "Proposed fact types",
+     "level": 3
+    },
+    {
+     "id": "protection-pledge",
+     "text": "Protection pledge",
+     "level": 4
+    },
+    {
+     "id": "envoys",
+     "text": "Envoys",
+     "level": 2
+    },
+    {
+     "id": "seats",
+     "text": "Seats",
+     "level": 3
+    },
+    {
+     "id": "extra-if-provinces-over",
+     "text": "Extra if provinces over",
+     "level": 4
+    },
+    {
+     "id": "inventions",
+     "text": "Inventions",
+     "level": 4
+    },
+    {
+     "id": "official-type-bonus",
+     "text": "Official type bonus",
+     "level": 3
+    },
+    {
+     "id": "years-served-bonus",
+     "text": "Years served bonus",
+     "level": 3
+    },
+    {
+     "id": "resident-years-bonus",
+     "text": "Resident years bonus",
+     "level": 3
+    },
+    {
+     "id": "resident",
+     "text": "Resident",
+     "level": 3
+    },
+    {
+     "id": "held",
+     "text": "Held",
+     "level": 3
+    },
+    {
+     "id": "ledger",
+     "text": "Ledger",
+     "level": 2
+    },
+    {
+     "id": "stance-lines",
+     "text": "Stance lines",
+     "level": 3
+    },
+    {
+     "id": "ties",
+     "text": "Ties",
+     "level": 3
+    },
+    {
+     "id": "wrongs",
+     "text": "Wrongs",
+     "level": 3
+    },
+    {
+     "id": "standing-words",
+     "text": "Standing words",
+     "level": 3
+    },
+    {
+     "id": "reasons",
+     "text": "Reasons",
+     "level": 2
+    },
+    {
+     "id": "strength",
+     "text": "Strength",
+     "level": 3
+    },
+    {
+     "id": "distance",
+     "text": "Distance",
+     "level": 3
+    },
+    {
+     "id": "envoy-days-over",
+     "text": "Envoy days over",
+     "level": 4
+    },
+    {
+     "id": "allies-beyond-free",
+     "text": "Allies beyond free",
+     "level": 3
+    },
+    {
+     "id": "ruler-traits",
+     "text": "Ruler traits",
+     "level": 3
+    },
+    {
+     "id": "actions-1",
+     "text": "Actions",
+     "level": 2
+    },
+    {
+     "id": "propose-alliance",
+     "text": "Propose alliance",
+     "level": 3
+    },
+    {
+     "id": "call-to-arms",
+     "text": "Call to arms",
+     "level": 3
+    },
+    {
+     "id": "defensive",
+     "text": "Defensive",
+     "level": 4
+    },
+    {
+     "id": "offensive",
+     "text": "Offensive",
+     "level": 4
+    },
+    {
+     "id": "break-alliance",
+     "text": "Break alliance",
+     "level": 3
+    },
+    {
+     "id": "arrange-marriage",
+     "text": "Arrange marriage",
+     "level": 3
+    },
+    {
+     "id": "demand",
+     "text": "Demand",
+     "level": 3
+    },
+    {
+     "id": "kinds",
+     "text": "Kinds",
+     "level": 4
+    },
+    {
+     "id": "on-refusal",
+     "text": "On refusal",
+     "level": 4
+    },
+    {
+     "id": "ask-passage",
+     "text": "Ask passage",
+     "level": 3
+    },
+    {
+     "id": "entering-without",
+     "text": "Entering without",
+     "level": 4
+    },
+    {
+     "id": "trade-pact",
+     "text": "Trade pact",
+     "level": 3
+    },
+    {
+     "id": "embargo",
+     "text": "Embargo",
+     "level": 3
+    },
+    {
+     "id": "pledge-protection",
+     "text": "Pledge protection",
+     "level": 3
+    },
+    {
+     "id": "swear-peace",
+     "text": "Swear peace",
+     "level": 3
+    },
+    {
+     "id": "offer-overlordship",
+     "text": "Offer overlordship",
+     "level": 3
+    },
+    {
+     "id": "ask-protection",
+     "text": "Ask protection",
+     "level": 3
+    },
+    {
+     "id": "court-lord",
+     "text": "Court lord",
+     "level": 3
+    },
+    {
+     "id": "send-gift",
+     "text": "Send gift",
+     "level": 3
+    },
+    {
+     "id": "courtesy-visit",
+     "text": "Courtesy visit",
+     "level": 3
+    },
+    {
+     "id": "make-resident",
+     "text": "Make resident",
+     "level": 3
+    },
+    {
+     "id": "insult",
+     "text": "Insult",
+     "level": 3
+    },
+    {
+     "id": "declare-rival",
+     "text": "Declare rival",
+     "level": 3
+    },
+    {
+     "id": "fund-rebels",
+     "text": "Fund rebels",
+     "level": 3
+    },
+    {
+     "id": "on-caught",
+     "text": "On caught",
+     "level": 4
+    },
+    {
+     "id": "if-revolution-wins",
+     "text": "If revolution wins",
+     "level": 4
+    },
+    {
+     "id": "war-aims",
+     "text": "War aims",
+     "level": 2
+    },
+    {
+     "id": "truce",
+     "text": "Truce",
+     "level": 2
+    },
+    {
+     "id": "leagues",
+     "text": "Leagues",
+     "level": 2
+    },
+    {
+     "id": "threshold-by-era",
+     "text": "Threshold by era",
+     "level": 3
+    },
+    {
+     "id": "could-crush-us-per-multiple",
+     "text": "Could crush us per multiple",
+     "level": 3
+    },
+    {
+     "id": "eras",
+     "text": "Eras",
+     "level": 2
+    },
+    {
+     "id": "ai",
+     "text": "Ai",
+     "level": 2
+    },
+    {
+     "id": "posture",
+     "text": "Posture",
+     "level": 3
+    },
+    {
+     "id": "negotiation",
+     "text": "Negotiation",
+     "level": 3
+    },
+    {
+     "id": "event-tree-mapping",
+     "text": "Event tree mapping",
+     "level": 2
+    },
+    {
+     "id": "opinion",
+     "text": "Opinion",
+     "level": 3
+    },
+    {
+     "id": "trust",
+     "text": "Trust",
+     "level": 3
+    },
+    {
+     "id": "notoriety",
+     "text": "Notoriety",
+     "level": 3
+    },
+    {
+     "id": "relation",
+     "text": "Relation",
+     "level": 3
+    },
+    {
+     "id": "answers",
+     "text": "Answers",
+     "level": 2
+    },
+    {
+     "id": "eras-by-year",
+     "text": "Eras by year",
+     "level": 2
+    }
+   ]
+  },
+  "Data-Events-Everyday": {
+   "title": "Everyday events data",
+   "summary": "Every value in the game's everyday events config, exactly as the game reads it. This page is made from packages/rules/data/domain/events-everyday.json each time the config changes, so it always matches the game. How…",
+   "headings": [
+    {
+     "id": "food",
+     "text": "Food",
+     "level": 2
+    },
+    {
+     "id": "events",
+     "text": "Events",
+     "level": 2
+    },
+    {
+     "id": "official-dies",
+     "text": "Official dies",
+     "level": 3
+    },
+    {
+     "id": "options",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "lord-dies",
+     "text": "Lord dies",
+     "level": 3
+    },
+    {
+     "id": "options-1",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "lord-slighted",
+     "text": "Lord slighted",
+     "level": 3
+    },
+    {
+     "id": "options-2",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "lord-praises",
+     "text": "Lord praises",
+     "level": 3
+    },
+    {
+     "id": "options-3",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "lords-quarrel",
+     "text": "Lords quarrel",
+     "level": 3
+    },
+    {
+     "id": "options-4",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "lord-hurt",
+     "text": "Lord hurt",
+     "level": 3
+    },
+    {
+     "id": "options-5",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "child-born",
+     "text": "Child born",
+     "level": 3
+    },
+    {
+     "id": "options-6",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "heir-ill",
+     "text": "Heir ill",
+     "level": 3
+    },
+    {
+     "id": "options-7",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "grain-rots",
+     "text": "Grain rots",
+     "level": 3
+    },
+    {
+     "id": "options-8",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "granary-fire",
+     "text": "Granary fire",
+     "level": 3
+    },
+    {
+     "id": "options-9",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "plague-reaches",
+     "text": "Plague reaches",
+     "level": 3
+    },
+    {
+     "id": "options-10",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "rats",
+     "text": "Rats",
+     "level": 3
+    },
+    {
+     "id": "options-11",
+     "text": "Options",
+     "level": 4
+    }
+   ]
+  },
+  "Data-Events": {
+   "title": "Events data",
+   "summary": "Every value in the game's events config, exactly as the game reads it. This page is made from packages/rules/data/domain/events.json each time the config changes, so it always matches the game. How these values are…",
+   "headings": [
+    {
+     "id": "campaign",
+     "text": "Campaign",
+     "level": 2
+    },
+    {
+     "id": "events-choice",
+     "text": "Events choice",
+     "level": 3
+    },
+    {
+     "id": "values",
+     "text": "Values",
+     "level": 4
+    },
+    {
+     "id": "balance",
+     "text": "Balance",
+     "level": 2
+    },
+    {
+     "id": "selection",
+     "text": "Selection",
+     "level": 3
+    },
+    {
+     "id": "alternate-history-mode",
+     "text": "Alternate history mode",
+     "level": 4
+    },
+    {
+     "id": "follow-ups",
+     "text": "Follow ups",
+     "level": 3
+    },
+    {
+     "id": "ai-factors",
+     "text": "Ai factors",
+     "level": 3
+    },
+    {
+     "id": "rebel-sizes-provisional",
+     "text": "Rebel sizes (provisional)",
+     "level": 3
+    },
+    {
+     "id": "modifier-rules",
+     "text": "Modifier rules",
+     "level": 3
+    },
+    {
+     "id": "coverage",
+     "text": "Coverage",
+     "level": 3
+    },
+    {
+     "id": "date-binding",
+     "text": "Date binding",
+     "level": 3
+    },
+    {
+     "id": "options",
+     "text": "Options",
+     "level": 3
+    },
+    {
+     "id": "enums",
+     "text": "Enums",
+     "level": 2
+    },
+    {
+     "id": "statistics",
+     "text": "Statistics",
+     "level": 2
+    },
+    {
+     "id": "province",
+     "text": "Province",
+     "level": 3
+    },
+    {
+     "id": "country",
+     "text": "Country",
+     "level": 3
+    },
+    {
+     "id": "global",
+     "text": "Global",
+     "level": 3
+    },
+    {
+     "id": "relationships",
+     "text": "Relationships",
+     "level": 3
+    },
+    {
+     "id": "ai-factor-rules",
+     "text": "Ai factor rules",
+     "level": 2
+    },
+    {
+     "id": "modifier-changes",
+     "text": "Modifier changes",
+     "level": 2
+    },
+    {
+     "id": "rise-is-cost",
+     "text": "Rise is cost",
+     "level": 2
+    },
+    {
+     "id": "system-flag-owners",
+     "text": "System flag owners",
+     "level": 2
+    },
+    {
+     "id": "stat-mapping",
+     "text": "Stat mapping",
+     "level": 2
+    },
+    {
+     "id": "derived-formulas",
+     "text": "Derived formulas",
+     "level": 2
+    },
+    {
+     "id": "innovations-from-research",
+     "text": "Innovations from research",
+     "level": 2
+    },
+    {
+     "id": "goals",
+     "text": "Goals",
+     "level": 2
+    },
+    {
+     "id": "weights",
+     "text": "Weights",
+     "level": 3
+    },
+    {
+     "id": "deviate-share",
+     "text": "Deviate share",
+     "level": 3
+    },
+    {
+     "id": "preset-mult",
+     "text": "Preset mult",
+     "level": 3
+    },
+    {
+     "id": "chronicle",
+     "text": "Chronicle",
+     "level": 2
+    }
+   ]
+  },
+  "Data-Exploration": {
+   "title": "Exploration data",
+   "summary": "Every value in the game's exploration config, exactly as the game reads it. This page is made from packages/rules/data/domain/exploration.json each time the config changes, so it always matches the game. How these…",
+   "headings": [
+    {
+     "id": "governor-slots-provisional",
+     "text": "Governor slots (provisional)",
+     "level": 2
+    },
+    {
+     "id": "aggression-provisional",
+     "text": "Aggression (provisional)",
+     "level": 2
+    },
+    {
+     "id": "colony-stores-provisional",
+     "text": "Colony stores (provisional)",
+     "level": 2
+    },
+    {
+     "id": "ai",
+     "text": "Ai",
+     "level": 2
+    },
+    {
+     "id": "naval",
+     "text": "Naval",
+     "level": 2
+    },
+    {
+     "id": "exploration-ships",
+     "text": "Exploration ships",
+     "level": 3
+    },
+    {
+     "id": "other-ships",
+     "text": "Other ships",
+     "level": 3
+    },
+    {
+     "id": "reach",
+     "text": "Reach",
+     "level": 3
+    },
+    {
+     "id": "docking",
+     "text": "Docking",
+     "level": 3
+    },
+    {
+     "id": "game",
+     "text": "Game",
+     "level": 2
+    },
+    {
+     "id": "catalogue-regions",
+     "text": "Catalogue regions",
+     "level": 3
+    },
+    {
+     "id": "ai-provisional",
+     "text": "Ai (provisional)",
+     "level": 3
+    }
+   ]
+  },
+  "Data-Government": {
+   "title": "Government data",
+   "summary": "Every value in the game's government config, exactly as the game reads it. This page is made from packages/rules/data/domain/government.json each time the config changes, so it always matches the game. How these…",
+   "headings": [
+    {
+     "id": "over-cap",
+     "text": "Over cap",
+     "level": 2
+    },
+    {
+     "id": "great-lord",
+     "text": "Great lord",
+     "level": 2
+    },
+    {
+     "id": "subject-reach-start",
+     "text": "Subject reach start",
+     "level": 2
+    },
+    {
+     "id": "start",
+     "text": "Start",
+     "level": 2
+    },
+    {
+     "id": "buildings",
+     "text": "Buildings",
+     "level": 2
+    },
+    {
+     "id": "forms",
+     "text": "Forms",
+     "level": 2
+    },
+    {
+     "id": "reforms",
+     "text": "Reforms",
+     "level": 2
+    },
+    {
+     "id": "event-tree-map",
+     "text": "Event tree map",
+     "level": 2
+    },
+    {
+     "id": "start-forms",
+     "text": "Start forms",
+     "level": 2
+    },
+    {
+     "id": "kingdom-by-region",
+     "text": "Kingdom by region",
+     "level": 3
+    },
+    {
+     "id": "as-se-asia",
+     "text": "As se asia",
+     "level": 4
+    },
+    {
+     "id": "entity-type",
+     "text": "Entity type",
+     "level": 3
+    },
+    {
+     "id": "text-rules",
+     "text": "Text rules",
+     "level": 3
+    },
+    {
+     "id": "overrides",
+     "text": "Overrides",
+     "level": 3
+    },
+    {
+     "id": "succession-names",
+     "text": "Succession names",
+     "level": 2
+    },
+    {
+     "id": "ai",
+     "text": "Ai",
+     "level": 2
+    },
+    {
+     "id": "riders-line",
+     "text": "Riders line",
+     "level": 2
+    },
+    {
+     "id": "fades-against",
+     "text": "Fades against",
+     "level": 3
+    }
+   ]
+  },
+  "Data-Institutions": {
+   "title": "Institutions data",
+   "summary": "Every value in the game's institutions config, exactly as the game reads it. This page is made from packages/rules/data/domain/institutions.json each time the config changes, so it always matches the game. How these…",
+   "headings": [
+    {
+     "id": "hold",
+     "text": "Hold",
+     "level": 2
+    },
+    {
+     "id": "words",
+     "text": "Words",
+     "level": 3
+    },
+    {
+     "id": "empire",
+     "text": "Empire",
+     "level": 2
+    },
+    {
+     "id": "seats-1444",
+     "text": "Seats 1444",
+     "level": 3
+    },
+    {
+     "id": "seek-vote",
+     "text": "Seek vote",
+     "level": 3
+    },
+    {
+     "id": "vote",
+     "text": "Vote",
+     "level": 3
+    },
+    {
+     "id": "defence",
+     "text": "Defence",
+     "level": 3
+    },
+    {
+     "id": "hold-year",
+     "text": "Hold year",
+     "level": 3
+    },
+    {
+     "id": "admit",
+     "text": "Admit",
+     "level": 3
+    },
+    {
+     "id": "diet",
+     "text": "Diet",
+     "level": 3
+    },
+    {
+     "id": "reasons",
+     "text": "Reasons",
+     "level": 4
+    },
+    {
+     "id": "reforms",
+     "text": "Reforms",
+     "level": 3
+    },
+    {
+     "id": "breaker",
+     "text": "Breaker",
+     "level": 3
+    },
+    {
+     "id": "court",
+     "text": "Court",
+     "level": 3
+    },
+    {
+     "id": "circles",
+     "text": "Circles",
+     "level": 3
+    },
+    {
+     "id": "shogunate",
+     "text": "Shogunate",
+     "level": 2
+    },
+    {
+     "id": "hold-year-1",
+     "text": "Hold year",
+     "level": 3
+    },
+    {
+     "id": "closed-country",
+     "text": "Closed country",
+     "level": 3
+    },
+    {
+     "id": "oath",
+     "text": "Oath",
+     "level": 3
+    }
+   ]
+  },
+  "Data-National-Strengths": {
+   "title": "National strengths data",
+   "summary": "Every value in the game's national strengths config, exactly as the game reads it. This page is made from packages/rules/data/domain/national-strengths.json each time the config changes, so it always matches the…",
+   "headings": [
+    {
+     "id": "rules",
+     "text": "Rules",
+     "level": 2
+    },
+    {
+     "id": "budget",
+     "text": "Budget",
+     "level": 3
+    },
+    {
+     "id": "size-bonus",
+     "text": "Size bonus",
+     "level": 4
+    },
+    {
+     "id": "stat-points",
+     "text": "Stat points",
+     "level": 3
+    },
+    {
+     "id": "birthright",
+     "text": "Birthright",
+     "level": 3
+    },
+    {
+     "id": "heydays",
+     "text": "Heydays",
+     "level": 3
+    },
+    {
+     "id": "ambitions",
+     "text": "Ambitions",
+     "level": 3
+    },
+    {
+     "id": "counsel",
+     "text": "Counsel",
+     "level": 4
+    },
+    {
+     "id": "history-mode-setting",
+     "text": "History mode setting",
+     "level": 4
+    },
+    {
+     "id": "warmth-bands",
+     "text": "Warmth bands",
+     "level": 4
+    },
+    {
+     "id": "burden",
+     "text": "Burden",
+     "level": 3
+    },
+    {
+     "id": "inheritance",
+     "text": "Inheritance",
+     "level": 3
+    },
+    {
+     "id": "ai",
+     "text": "Ai",
+     "level": 3
+    },
+    {
+     "id": "timing",
+     "text": "Timing",
+     "level": 3
+    },
+    {
+     "id": "units",
+     "text": "Units",
+     "level": 2
+    },
+    {
+     "id": "levers",
+     "text": "Levers",
+     "level": 2
+    },
+    {
+     "id": "scope-cost",
+     "text": "Scope cost",
+     "level": 2
+    },
+    {
+     "id": "where",
+     "text": "Where",
+     "level": 3
+    },
+    {
+     "id": "levels",
+     "text": "Levels",
+     "level": 2
+    },
+    {
+     "id": "groups",
+     "text": "Groups",
+     "level": 2
+    },
+    {
+     "id": "ages",
+     "text": "Ages",
+     "level": 2
+    },
+    {
+     "id": "macro-regions",
+     "text": "Macro regions",
+     "level": 2
+    },
+    {
+     "id": "path-theme",
+     "text": "Path theme",
+     "level": 2
+    },
+    {
+     "id": "path-hint",
+     "text": "Path hint",
+     "level": 2
+    },
+    {
+     "id": "archetypes",
+     "text": "Archetypes",
+     "level": 2
+    },
+    {
+     "id": "archetypes-1",
+     "text": "Archetypes",
+     "level": 3
+    },
+    {
+     "id": "theme-ambitions",
+     "text": "Theme ambitions",
+     "level": 3
+    },
+    {
+     "id": "legacies",
+     "text": "Legacies",
+     "level": 3
+    },
+    {
+     "id": "land",
+     "text": "Land",
+     "level": 4
+    },
+    {
+     "id": "sea",
+     "text": "Sea",
+     "level": 4
+    },
+    {
+     "id": "trade",
+     "text": "Trade",
+     "level": 4
+    },
+    {
+     "id": "faith",
+     "text": "Faith",
+     "level": 4
+    },
+    {
+     "id": "crown",
+     "text": "Crown",
+     "level": 4
+    },
+    {
+     "id": "learning",
+     "text": "Learning",
+     "level": 4
+    },
+    {
+     "id": "survival",
+     "text": "Survival",
+     "level": 4
+    },
+    {
+     "id": "wealth",
+     "text": "Wealth",
+     "level": 4
+    }
+   ]
+  },
+  "Data-Naval": {
+   "title": "Naval data",
+   "summary": "Every value in the game's naval config, exactly as the game reads it. This page is made from packages/rules/data/domain/naval.json each time the config changes, so it always matches the game. How these values are…",
+   "headings": [
+    {
+     "id": "berths-by-harbour-step-provisional",
+     "text": "Berths by harbour step (provisional)",
+     "level": 2
+    },
+    {
+     "id": "slipways-by-shipyard-step-provisional",
+     "text": "Slipways by shipyard step (provisional)",
+     "level": 2
+    },
+    {
+     "id": "harbour-allows",
+     "text": "Harbour allows",
+     "level": 2
+    },
+    {
+     "id": "tier-rank",
+     "text": "Tier rank",
+     "level": 2
+    },
+    {
+     "id": "start-harbour-by-tier",
+     "text": "Start harbour by tier",
+     "level": 2
+    },
+    {
+     "id": "start-shipyard",
+     "text": "Start shipyard",
+     "level": 2
+    },
+    {
+     "id": "muster-share-provisional",
+     "text": "Muster share (provisional)",
+     "level": 2
+    },
+    {
+     "id": "drift-home",
+     "text": "Drift home",
+     "level": 2
+    },
+    {
+     "id": "pressing",
+     "text": "Pressing",
+     "level": 2
+    },
+    {
+     "id": "skilled-service",
+     "text": "Skilled service",
+     "level": 2
+    },
+    {
+     "id": "widows",
+     "text": "Widows",
+     "level": 2
+    },
+    {
+     "id": "ships",
+     "text": "Ships",
+     "level": 2
+    },
+    {
+     "id": "trade-ship-by-sea",
+     "text": "Trade ship by sea",
+     "level": 2
+    },
+    {
+     "id": "supply-by-family",
+     "text": "Supply by family",
+     "level": 2
+    },
+    {
+     "id": "refit-months",
+     "text": "Refit months",
+     "level": 2
+    },
+    {
+     "id": "rot-months",
+     "text": "Rot months",
+     "level": 2
+    },
+    {
+     "id": "out-of-supply",
+     "text": "Out of supply",
+     "level": 2
+    },
+    {
+     "id": "wind-multiplier",
+     "text": "Wind multiplier",
+     "level": 2
+    },
+    {
+     "id": "sea-inventions",
+     "text": "Sea inventions",
+     "level": 2
+    },
+    {
+     "id": "admiral",
+     "text": "Admiral",
+     "level": 2
+    },
+    {
+     "id": "admirals-by-official",
+     "text": "Admirals by official",
+     "level": 2
+    },
+    {
+     "id": "pirate-coasts",
+     "text": "Pirate coasts",
+     "level": 2
+    },
+    {
+     "id": "small-craft",
+     "text": "Small craft",
+     "level": 2
+    },
+    {
+     "id": "room",
+     "text": "Room",
+     "level": 2
+    },
+    {
+     "id": "ai",
+     "text": "Ai",
+     "level": 2
+    },
+    {
+     "id": "muster",
+     "text": "Muster",
+     "level": 2
+    },
+    {
+     "id": "admiral-commission",
+     "text": "Admiral commission",
+     "level": 2
+    },
+    {
+     "id": "storm",
+     "text": "Storm",
+     "level": 2
+    },
+    {
+     "id": "canoe-landing-provisional",
+     "text": "Canoe landing (provisional)",
+     "level": 2
+    },
+    {
+     "id": "monsoon",
+     "text": "Monsoon",
+     "level": 2
+    },
+    {
+     "id": "pirates-provisional",
+     "text": "Pirates (provisional)",
+     "level": 2
+    },
+    {
+     "id": "bases",
+     "text": "Bases",
+     "level": 3
+    },
+    {
+     "id": "later-ships-provisional",
+     "text": "Later ships (provisional)",
+     "level": 2
+    },
+    {
+     "id": "frozen-seas-provisional",
+     "text": "Frozen seas (provisional)",
+     "level": 2
+    },
+    {
+     "id": "sea-engage-provisional",
+     "text": "Sea engage (provisional)",
+     "level": 2
+    },
+    {
+     "id": "admiral-posts-provisional",
+     "text": "Admiral posts (provisional)",
+     "level": 2
+    },
+    {
+     "id": "blockade-provisional",
+     "text": "Blockade (provisional)",
+     "level": 2
+    },
+    {
+     "id": "starting-fleets-provisional",
+     "text": "Starting fleets (provisional)",
+     "level": 2
+    },
+    {
+     "id": "hired-fleets-provisional",
+     "text": "Hired fleets (provisional)",
+     "level": 2
+    },
+    {
+     "id": "groups",
+     "text": "Groups",
+     "level": 3
+    },
+    {
+     "id": "game-provisional",
+     "text": "Game (provisional)",
+     "level": 2
+    },
+    {
+     "id": "ai-1",
+     "text": "Ai",
+     "level": 3
+    },
+    {
+     "id": "queues",
+     "text": "Queues",
+     "level": 3
+    },
+    {
+     "id": "upgrades-provisional",
+     "text": "Upgrades (provisional)",
+     "level": 2
+    }
+   ]
+  },
+  "Data-Province": {
+   "title": "Province data",
+   "summary": "Every value in the game's province config, exactly as the game reads it. This page is made from packages/rules/data/domain/province.json each time the config changes, so it always matches the game. How these values…",
+   "headings": [
+    {
+     "id": "tiles",
+     "text": "Tiles",
+     "level": 2
+    },
+    {
+     "id": "shore-tiles",
+     "text": "Shore tiles",
+     "level": 2
+    },
+    {
+     "id": "clear-woods",
+     "text": "Clear woods",
+     "level": 2
+    },
+    {
+     "id": "fields-to-woods",
+     "text": "Fields to woods",
+     "level": 2
+    },
+    {
+     "id": "fields-to-pasture",
+     "text": "Fields to pasture",
+     "level": 2
+    },
+    {
+     "id": "woods",
+     "text": "Woods",
+     "level": 2
+    },
+    {
+     "id": "tile-changes",
+     "text": "Tile changes",
+     "level": 2
+    },
+    {
+     "id": "castle-ruin",
+     "text": "Castle ruin",
+     "level": 2
+    },
+    {
+     "id": "town",
+     "text": "Town",
+     "level": 2
+    },
+    {
+     "id": "building-slots",
+     "text": "Building slots",
+     "level": 3
+    },
+    {
+     "id": "worn",
+     "text": "Worn",
+     "level": 2
+    },
+    {
+     "id": "burned",
+     "text": "Burned",
+     "level": 2
+    },
+    {
+     "id": "ground",
+     "text": "Ground",
+     "level": 2
+    },
+    {
+     "id": "woods-ambush",
+     "text": "Woods ambush",
+     "level": 2
+    },
+    {
+     "id": "locals-rough-bonus",
+     "text": "Locals rough bonus",
+     "level": 2
+    },
+    {
+     "id": "bare-tile",
+     "text": "Bare tile",
+     "level": 2
+    },
+    {
+     "id": "by-use",
+     "text": "By use",
+     "level": 3
+    },
+    {
+     "id": "buildings",
+     "text": "Buildings",
+     "level": 2
+    },
+    {
+     "id": "land",
+     "text": "Land",
+     "level": 3
+    },
+    {
+     "id": "town-1",
+     "text": "Town",
+     "level": 3
+    },
+    {
+     "id": "mill",
+     "text": "Mill",
+     "level": 3
+    },
+    {
+     "id": "castle-steps",
+     "text": "Castle steps",
+     "level": 3
+    },
+    {
+     "id": "lord-traits",
+     "text": "Lord traits",
+     "level": 3
+    },
+    {
+     "id": "almshouse",
+     "text": "Almshouse",
+     "level": 2
+    },
+    {
+     "id": "food",
+     "text": "Food",
+     "level": 2
+    },
+    {
+     "id": "harvest",
+     "text": "Harvest",
+     "level": 3
+    },
+    {
+     "id": "new-crops",
+     "text": "New crops",
+     "level": 3
+    },
+    {
+     "id": "hunting",
+     "text": "Hunting",
+     "level": 3
+    },
+    {
+     "id": "game-yield",
+     "text": "Game yield",
+     "level": 4
+    },
+    {
+     "id": "hard-winter",
+     "text": "Hard winter",
+     "level": 4
+    },
+    {
+     "id": "wares",
+     "text": "Wares",
+     "level": 2
+    },
+    {
+     "id": "crafts",
+     "text": "Crafts",
+     "level": 3
+    },
+    {
+     "id": "classes",
+     "text": "Classes",
+     "level": 2
+    },
+    {
+     "id": "births",
+     "text": "Births",
+     "level": 2
+    },
+    {
+     "id": "deaths",
+     "text": "Deaths",
+     "level": 2
+    },
+    {
+     "id": "death-modifiers",
+     "text": "Death modifiers",
+     "level": 2
+    },
+    {
+     "id": "plague",
+     "text": "Plague",
+     "level": 3
+    },
+    {
+     "id": "famine",
+     "text": "Famine",
+     "level": 2
+    },
+    {
+     "id": "mines",
+     "text": "Mines",
+     "level": 2
+    },
+    {
+     "id": "ware-weights",
+     "text": "Ware weights",
+     "level": 3
+    },
+    {
+     "id": "anchors",
+     "text": "Anchors",
+     "level": 3
+    },
+    {
+     "id": "trade",
+     "text": "Trade",
+     "level": 3
+    },
+    {
+     "id": "homeless",
+     "text": "Homeless",
+     "level": 2
+    },
+    {
+     "id": "refugees",
+     "text": "Refugees",
+     "level": 2
+    },
+    {
+     "id": "recruits",
+     "text": "Recruits",
+     "level": 2
+    },
+    {
+     "id": "tax",
+     "text": "Tax",
+     "level": 2
+    },
+    {
+     "id": "heavy-weight",
+     "text": "Heavy weight",
+     "level": 3
+    },
+    {
+     "id": "owed",
+     "text": "Owed",
+     "level": 3
+    },
+    {
+     "id": "rate-factor",
+     "text": "Rate factor",
+     "level": 4
+    },
+    {
+     "id": "presets",
+     "text": "Presets",
+     "level": 3
+    },
+    {
+     "id": "tolls",
+     "text": "Tolls",
+     "level": 2
+    },
+    {
+     "id": "roads",
+     "text": "Roads",
+     "level": 2
+    },
+    {
+     "id": "travel",
+     "text": "Travel",
+     "level": 3
+    },
+    {
+     "id": "far-from-throne",
+     "text": "Far from throne",
+     "level": 2
+    },
+    {
+     "id": "officials",
+     "text": "Officials",
+     "level": 2
+    },
+    {
+     "id": "effects",
+     "text": "Effects",
+     "level": 3
+    },
+    {
+     "id": "school-trains",
+     "text": "School trains",
+     "level": 3
+    },
+    {
+     "id": "hire",
+     "text": "Hire",
+     "level": 3
+    },
+    {
+     "id": "auto-fill",
+     "text": "Auto fill",
+     "level": 3
+    },
+    {
+     "id": "homeland",
+     "text": "Homeland",
+     "level": 2
+    },
+    {
+     "id": "pretender",
+     "text": "Pretender",
+     "level": 2
+    },
+    {
+     "id": "charters",
+     "text": "Charters",
+     "level": 2
+    },
+    {
+     "id": "castle",
+     "text": "Castle",
+     "level": 2
+    },
+    {
+     "id": "walls",
+     "text": "Walls",
+     "level": 2
+    },
+    {
+     "id": "grievances",
+     "text": "Grievances",
+     "level": 2
+    },
+    {
+     "id": "levels",
+     "text": "Levels",
+     "level": 3
+    },
+    {
+     "id": "hungry",
+     "text": "Hungry",
+     "level": 3
+    },
+    {
+     "id": "plague-1",
+     "text": "Plague",
+     "level": 2
+    },
+    {
+     "id": "fever-land",
+     "text": "Fever land",
+     "level": 2
+    },
+    {
+     "id": "by-ground",
+     "text": "By ground",
+     "level": 3
+    },
+    {
+     "id": "deaths-born-elsewhere",
+     "text": "Deaths born elsewhere",
+     "level": 3
+    },
+    {
+     "id": "smoke",
+     "text": "Smoke",
+     "level": 2
+    },
+    {
+     "id": "settlement",
+     "text": "Settlement",
+     "level": 2
+    },
+    {
+     "id": "event-map",
+     "text": "Event map",
+     "level": 2
+    },
+    {
+     "id": "card",
+     "text": "Card",
+     "level": 2
+    },
+    {
+     "id": "gain-lose",
+     "text": "Gain lose",
+     "level": 3
+    },
+    {
+     "id": "decided",
+     "text": "Decided",
+     "level": 2
+    },
+    {
+     "id": "event-effects",
+     "text": "Event effects",
+     "level": 3
+    },
+    {
+     "id": "country-sums",
+     "text": "Country sums",
+     "level": 3
+    },
+    {
+     "id": "birth-points",
+     "text": "Birth points",
+     "level": 3
+    },
+    {
+     "id": "town-size-floors-provisional",
+     "text": "Town size floors (provisional)",
+     "level": 3
+    },
+    {
+     "id": "rise-chance",
+     "text": "Rise chance",
+     "level": 3
+    },
+    {
+     "id": "official-learn-years-provisional",
+     "text": "Official learn years (provisional)",
+     "level": 3
+    },
+    {
+     "id": "sickness-monthly-provisional",
+     "text": "Sickness monthly (provisional)",
+     "level": 3
+    },
+    {
+     "id": "settlement-stages",
+     "text": "Settlement stages",
+     "level": 3
+    },
+    {
+     "id": "officials-per-province",
+     "text": "Officials per province",
+     "level": 3
+    }
+   ]
+  },
+  "Data-Realm": {
+   "title": "Realm data",
+   "summary": "Every value in the game's realm config, exactly as the game reads it. This page is made from packages/rules/data/domain/realm.json each time the config changes, so it always matches the game. How these values are…",
+   "headings": [
+    {
+     "id": "stats",
+     "text": "Stats",
+     "level": 2
+    },
+    {
+     "id": "loyalty",
+     "text": "Loyalty",
+     "level": 2
+    },
+    {
+     "id": "food",
+     "text": "Food",
+     "level": 2
+    },
+    {
+     "id": "spread-patterns",
+     "text": "Spread patterns",
+     "level": 3
+    },
+    {
+     "id": "famine-rule-options",
+     "text": "Famine rule options",
+     "level": 3
+    },
+    {
+     "id": "lords-castles",
+     "text": "Lords castles",
+     "level": 3
+    },
+    {
+     "id": "presets",
+     "text": "Presets",
+     "level": 3
+    },
+    {
+     "id": "officials",
+     "text": "Officials",
+     "level": 2
+    },
+    {
+     "id": "lords",
+     "text": "Lords",
+     "level": 2
+    },
+    {
+     "id": "labels",
+     "text": "Labels",
+     "level": 3
+    },
+    {
+     "id": "windows",
+     "text": "Windows",
+     "level": 2
+    },
+    {
+     "id": "inheritance",
+     "text": "Inheritance",
+     "level": 2
+    },
+    {
+     "id": "win",
+     "text": "Win",
+     "level": 2
+    },
+    {
+     "id": "army-weights-provisional",
+     "text": "Army weights (provisional)",
+     "level": 3
+    },
+    {
+     "id": "campaign-end",
+     "text": "Campaign end",
+     "level": 2
+    },
+    {
+     "id": "succession-by-form",
+     "text": "Succession by form",
+     "level": 2
+    },
+    {
+     "id": "great-lord-provisional",
+     "text": "Great lord (provisional)",
+     "level": 2
+    },
+    {
+     "id": "event-stat-map",
+     "text": "Event stat map",
+     "level": 2
+    },
+    {
+     "id": "women-in-roles-provisional",
+     "text": "Women in roles (provisional)",
+     "level": 2
+    },
+    {
+     "id": "age-multipliers-provisional",
+     "text": "Age multipliers (provisional)",
+     "level": 2
+    },
+    {
+     "id": "starting-provisional",
+     "text": "Starting (provisional)",
+     "level": 2
+    },
+    {
+     "id": "per-thousand-people",
+     "text": "Per thousand people",
+     "level": 3
+    },
+    {
+     "id": "spread-by-confidence",
+     "text": "Spread by confidence",
+     "level": 3
+    },
+    {
+     "id": "starting-armies-provisional",
+     "text": "Starting armies (provisional)",
+     "level": 2
+    },
+    {
+     "id": "starting-lords-provisional",
+     "text": "Starting lords (provisional)",
+     "level": 2
+    },
+    {
+     "id": "great-houses",
+     "text": "Great houses",
+     "level": 3
+    },
+    {
+     "id": "house-lands",
+     "text": "House lands",
+     "level": 3
+    },
+    {
+     "id": "japan",
+     "text": "Japan",
+     "level": 4
+    },
+    {
+     "id": "food-year-provisional",
+     "text": "Food year (provisional)",
+     "level": 2
+    },
+    {
+     "id": "harvest-month",
+     "text": "Harvest month",
+     "level": 3
+    },
+    {
+     "id": "weather",
+     "text": "Weather",
+     "level": 3
+    },
+    {
+     "id": "climate-weather",
+     "text": "Climate weather",
+     "level": 3
+    },
+    {
+     "id": "rice-lands",
+     "text": "Rice lands",
+     "level": 3
+    },
+    {
+     "id": "base-harvest",
+     "text": "Base harvest",
+     "level": 3
+    },
+    {
+     "id": "reach-by-road",
+     "text": "Reach by road",
+     "level": 3
+    },
+    {
+     "id": "debt-provisional",
+     "text": "Debt (provisional)",
+     "level": 2
+    },
+    {
+     "id": "officials-per-province",
+     "text": "Officials per province",
+     "level": 2
+    },
+    {
+     "id": "steps",
+     "text": "Steps",
+     "level": 3
+    },
+    {
+     "id": "ai-provisional",
+     "text": "Ai (provisional)",
+     "level": 2
+    },
+    {
+     "id": "stability",
+     "text": "Stability",
+     "level": 2
+    },
+    {
+     "id": "empty-posts-share-provisional",
+     "text": "Empty posts share (provisional)",
+     "level": 3
+    },
+    {
+     "id": "restless-share-provisional",
+     "text": "Restless share (provisional)",
+     "level": 3
+    },
+    {
+     "id": "titles-provisional",
+     "text": "Titles (provisional)",
+     "level": 2
+    },
+    {
+     "id": "ruler-provisional",
+     "text": "Ruler (provisional)",
+     "level": 2
+    },
+    {
+     "id": "start-age",
+     "text": "Start age",
+     "level": 3
+    },
+    {
+     "id": "traits",
+     "text": "Traits",
+     "level": 3
+    },
+    {
+     "id": "people-provisional",
+     "text": "People (provisional)",
+     "level": 2
+    },
+    {
+     "id": "death-per-year",
+     "text": "Death per year",
+     "level": 3
+    },
+    {
+     "id": "kinds",
+     "text": "Kinds",
+     "level": 3
+    },
+    {
+     "id": "battle-death",
+     "text": "Battle death",
+     "level": 3
+    },
+    {
+     "id": "fallen-provisional",
+     "text": "Fallen (provisional)",
+     "level": 2
+    },
+    {
+     "id": "belief-provisional",
+     "text": "Belief (provisional)",
+     "level": 2
+    }
+   ]
+  },
+  "Data-Rebellions": {
+   "title": "Rebellions data",
+   "summary": "Every value in the game's rebellions config, exactly as the game reads it. This page is made from packages/rules/data/domain/rebellions.json each time the config changes, so it always matches the game. How these…",
+   "headings": [
+    {
+     "id": "steps",
+     "text": "Steps",
+     "level": 2
+    },
+    {
+     "id": "rising-chance",
+     "text": "Rising chance",
+     "level": 2
+    },
+    {
+     "id": "step-effects",
+     "text": "Step effects",
+     "level": 2
+    },
+    {
+     "id": "sparks",
+     "text": "Sparks",
+     "level": 2
+    },
+    {
+     "id": "causes",
+     "text": "Causes",
+     "level": 2
+    },
+    {
+     "id": "other-grievance-causes",
+     "text": "Other grievance causes",
+     "level": 2
+    },
+    {
+     "id": "join-share",
+     "text": "Join share",
+     "level": 2
+    },
+    {
+     "id": "leaders",
+     "text": "Leaders",
+     "level": 2
+    },
+    {
+     "id": "arms",
+     "text": "Arms",
+     "level": 2
+    },
+    {
+     "id": "multiplier",
+     "text": "Multiplier",
+     "level": 3
+    },
+    {
+     "id": "sources",
+     "text": "Sources",
+     "level": 3
+    },
+    {
+     "id": "old-weapons",
+     "text": "Old weapons",
+     "level": 4
+    },
+    {
+     "id": "armed",
+     "text": "Armed",
+     "level": 4
+    },
+    {
+     "id": "soldiers",
+     "text": "Soldiers",
+     "level": 4
+    },
+    {
+     "id": "severity",
+     "text": "Severity",
+     "level": 2
+    },
+    {
+     "id": "spread",
+     "text": "Spread",
+     "level": 2
+    },
+    {
+     "id": "talk",
+     "text": "Talk",
+     "level": 2
+    },
+    {
+     "id": "scatter",
+     "text": "Scatter",
+     "level": 2
+    },
+    {
+     "id": "outcomes",
+     "text": "Outcomes",
+     "level": 2
+    },
+    {
+     "id": "card",
+     "text": "Card",
+     "level": 2
+    },
+    {
+     "id": "demand",
+     "text": "Demand",
+     "level": 3
+    },
+    {
+     "id": "arms-1",
+     "text": "Arms",
+     "level": 3
+    },
+    {
+     "id": "new-ideas",
+     "text": "New ideas",
+     "level": 2
+    },
+    {
+     "id": "provisional",
+     "text": "Provisional",
+     "level": 2
+    }
+   ]
+  },
+  "Data-Recruiting": {
+   "title": "Recruiting data",
+   "summary": "Every value in the game's recruiting config, exactly as the game reads it. This page is made from packages/rules/data/domain/recruiting.json each time the config changes, so it always matches the game. How these…",
+   "headings": [
+    {
+     "id": "call-shares-provisional",
+     "text": "Call shares (provisional)",
+     "level": 2
+    },
+    {
+     "id": "mass-conscription",
+     "text": "Mass conscription",
+     "level": 2
+    },
+    {
+     "id": "refill-per-year-provisional",
+     "text": "Refill per year (provisional)",
+     "level": 2
+    },
+    {
+     "id": "conscription-provisional",
+     "text": "Conscription (provisional)",
+     "level": 2
+    },
+    {
+     "id": "gathering",
+     "text": "Gathering",
+     "level": 2
+    },
+    {
+     "id": "pay-by-group-provisional",
+     "text": "Pay by group (provisional)",
+     "level": 2
+    },
+    {
+     "id": "gun-crew-provisional",
+     "text": "Gun crew (provisional)",
+     "level": 2
+    },
+    {
+     "id": "pay-group-of-arm-provisional",
+     "text": "Pay group of arm (provisional)",
+     "level": 2
+    },
+    {
+     "id": "rations-provisional",
+     "text": "Rations (provisional)",
+     "level": 2
+    },
+    {
+     "id": "harvest-loss-provisional",
+     "text": "Harvest loss (provisional)",
+     "level": 2
+    },
+    {
+     "id": "season-months-by-climate-provisional",
+     "text": "Season months by climate (provisional)",
+     "level": 2
+    },
+    {
+     "id": "training-room-provisional",
+     "text": "Training room (provisional)",
+     "level": 2
+    },
+    {
+     "id": "arms-provisional",
+     "text": "Arms (provisional)",
+     "level": 2
+    },
+    {
+     "id": "retrain-provisional",
+     "text": "Retrain (provisional)",
+     "level": 2
+    },
+    {
+     "id": "marshal-provisional",
+     "text": "Marshal (provisional)",
+     "level": 2
+    },
+    {
+     "id": "trained-provisional",
+     "text": "Trained (provisional)",
+     "level": 2
+    },
+    {
+     "id": "untrained-provisional",
+     "text": "Untrained (provisional)",
+     "level": 2
+    },
+    {
+     "id": "goes-home-provisional",
+     "text": "Goes home (provisional)",
+     "level": 2
+    },
+    {
+     "id": "settlers-provisional",
+     "text": "Settlers (provisional)",
+     "level": 2
+    },
+    {
+     "id": "loot-home-provisional",
+     "text": "Loot home (provisional)",
+     "level": 2
+    },
+    {
+     "id": "sickness-home-provisional",
+     "text": "Sickness home (provisional)",
+     "level": 2
+    },
+    {
+     "id": "official-to-commander-provisional",
+     "text": "Official to commander (provisional)",
+     "level": 2
+    },
+    {
+     "id": "years-served-bonus-provisional",
+     "text": "Years served bonus (provisional)",
+     "level": 2
+    },
+    {
+     "id": "field-wage-multiplier-provisional",
+     "text": "Field wage multiplier (provisional)",
+     "level": 2
+    },
+    {
+     "id": "staff-provisional",
+     "text": "Staff (provisional)",
+     "level": 2
+    },
+    {
+     "id": "deputy-provisional",
+     "text": "Deputy (provisional)",
+     "level": 2
+    },
+    {
+     "id": "empty-province",
+     "text": "Empty province",
+     "level": 2
+    },
+    {
+     "id": "return-bonus-provisional",
+     "text": "Return bonus (provisional)",
+     "level": 2
+    },
+    {
+     "id": "lord-training",
+     "text": "Lord training",
+     "level": 2
+    },
+    {
+     "id": "ai",
+     "text": "Ai",
+     "level": 2
+    },
+    {
+     "id": "personalities",
+     "text": "Personalities",
+     "level": 3
+    },
+    {
+     "id": "pastoral-provisional",
+     "text": "Pastoral (provisional)",
+     "level": 2
+    },
+    {
+     "id": "spring-move",
+     "text": "Spring move",
+     "level": 3
+    },
+    {
+     "id": "official-victory-provisional",
+     "text": "Official victory (provisional)",
+     "level": 2
+    },
+    {
+     "id": "their-man-provisional",
+     "text": "Their man (provisional)",
+     "level": 2
+    }
+   ]
+  },
+  "Data-Religion": {
+   "title": "Religion data",
+   "summary": "Every value in the game's religion config, exactly as the game reads it. This page is made from packages/rules/data/domain/religion.json each time the config changes, so it always matches the game. How these values…",
+   "headings": [
+    {
+     "id": "added-faiths",
+     "text": "Added faiths",
+     "level": 2
+    },
+    {
+     "id": "faiths",
+     "text": "Faiths",
+     "level": 2
+    },
+    {
+     "id": "relations",
+     "text": "Relations",
+     "level": 2
+    },
+    {
+     "id": "mix-provisional",
+     "text": "Mix (provisional)",
+     "level": 2
+    },
+    {
+     "id": "pull-provisional",
+     "text": "Pull (provisional)",
+     "level": 2
+    },
+    {
+     "id": "landmark-house",
+     "text": "Landmark house",
+     "level": 3
+    },
+    {
+     "id": "houses-provisional",
+     "text": "Houses (provisional)",
+     "level": 2
+    },
+    {
+     "id": "take-over-gold",
+     "text": "Take over gold",
+     "level": 3
+    },
+    {
+     "id": "communities-provisional",
+     "text": "Communities (provisional)",
+     "level": 2
+    },
+    {
+     "id": "policies-provisional",
+     "text": "Policies (provisional)",
+     "level": 2
+    },
+    {
+     "id": "tolerated",
+     "text": "Tolerated",
+     "level": 3
+    },
+    {
+     "id": "restricted",
+     "text": "Restricted",
+     "level": 3
+    },
+    {
+     "id": "persecuted",
+     "text": "Persecuted",
+     "level": 3
+    },
+    {
+     "id": "expulsion-provisional",
+     "text": "Expulsion (provisional)",
+     "level": 2
+    },
+    {
+     "id": "inquisition",
+     "text": "Inquisition",
+     "level": 2
+    },
+    {
+     "id": "allowed-for",
+     "text": "Allowed for",
+     "level": 3
+    },
+    {
+     "id": "preachers",
+     "text": "Preachers",
+     "level": 2
+    },
+    {
+     "id": "state-faith-change",
+     "text": "State faith change",
+     "level": 2
+    },
+    {
+     "id": "lords-provisional",
+     "text": "Lords (provisional)",
+     "level": 2
+    },
+    {
+     "id": "faith-rules-provisional",
+     "text": "Faith rules (provisional)",
+     "level": 2
+    },
+    {
+     "id": "holy-places",
+     "text": "Holy places",
+     "level": 2
+    },
+    {
+     "id": "holy-place-effects-provisional",
+     "text": "Holy place effects (provisional)",
+     "level": 2
+    },
+    {
+     "id": "waves",
+     "text": "Waves",
+     "level": 2
+    },
+    {
+     "id": "ai-provisional",
+     "text": "Ai (provisional)",
+     "level": 2
+    },
+    {
+     "id": "start-provisional",
+     "text": "Start (provisional)",
+     "level": 2
+    },
+    {
+     "id": "overrides",
+     "text": "Overrides",
+     "level": 3
+    },
+    {
+     "id": "record-faith-overrides",
+     "text": "Record faith overrides",
+     "level": 3
+    },
+    {
+     "id": "patches",
+     "text": "Patches",
+     "level": 2
+    },
+    {
+     "id": "event-options",
+     "text": "Event options",
+     "level": 2
+    },
+    {
+     "id": "princes-adopt-the-reformation",
+     "text": "Princes adopt the reformation",
+     "level": 3
+    },
+    {
+     "id": "adopt-and-take-church-lands",
+     "text": "Adopt and take church lands",
+     "level": 4
+    },
+    {
+     "id": "adopt-and-keep-church-lands",
+     "text": "Adopt and keep church lands",
+     "level": 4
+    },
+    {
+     "id": "stay-with-rome",
+     "text": "Stay with rome",
+     "level": 4
+    },
+    {
+     "id": "expulsion-of-the-moriscos",
+     "text": "Expulsion of the moriscos",
+     "level": 3
+    },
+    {
+     "id": "expel",
+     "text": "Expel",
+     "level": 4
+    },
+    {
+     "id": "leave-them-be",
+     "text": "Leave them be",
+     "level": 4
+    },
+    {
+     "id": "altan-khan-and-the-dalai-lama",
+     "text": "Altan khan and the dalai lama",
+     "level": 3
+    },
+    {
+     "id": "patron-of-the-gelug",
+     "text": "Patron of the gelug",
+     "level": 4
+    },
+    {
+     "id": "keep-the-old-rites",
+     "text": "Keep the old rites",
+     "level": 4
+    },
+    {
+     "id": "jizya-reimposed",
+     "text": "Jizya reimposed",
+     "level": 3
+    },
+    {
+     "id": "reimpose-the-tax",
+     "text": "Reimpose the tax",
+     "level": 4
+    },
+    {
+     "id": "keep-akbars-settlement",
+     "text": "Keep akbars settlement",
+     "level": 4
+    },
+    {
+     "id": "raskol-old-believers",
+     "text": "Raskol old believers",
+     "level": 3
+    },
+    {
+     "id": "enforce-the-new-rites",
+     "text": "Enforce the new rites",
+     "level": 4
+    },
+    {
+     "id": "allow-both-rites",
+     "text": "Allow both rites",
+     "level": 4
+    },
+    {
+     "id": "revolution-and-the-church",
+     "text": "Revolution and the church",
+     "level": 3
+    },
+    {
+     "id": "concordat",
+     "text": "Concordat",
+     "level": 4
+    },
+    {
+     "id": "civic-religion",
+     "text": "Civic religion",
+     "level": 4
+    },
+    {
+     "id": "separation-of-church-and-state",
+     "text": "Separation of church and state",
+     "level": 3
+    },
+    {
+     "id": "separate",
+     "text": "Separate",
+     "level": 4
+    },
+    {
+     "id": "keep-the-established-church",
+     "text": "Keep the established church",
+     "level": 4
+    },
+    {
+     "id": "missionary-societies",
+     "text": "Missionary societies",
+     "level": 3
+    },
+    {
+     "id": "found-societies",
+     "text": "Found societies",
+     "level": 4
+    },
+    {
+     "id": "no-state-support",
+     "text": "No state support",
+     "level": 4
+    },
+    {
+     "id": "court-conversion-islam",
+     "text": "Court conversion islam",
+     "level": 3
+    },
+    {
+     "id": "embrace-islam",
+     "text": "Embrace islam",
+     "level": 4
+    },
+    {
+     "id": "keep-the-old-faith",
+     "text": "Keep the old faith",
+     "level": 4
+    },
+    {
+     "id": "court-conversion-christian",
+     "text": "Court conversion christian",
+     "level": 3
+    },
+    {
+     "id": "embrace-christianity",
+     "text": "Embrace christianity",
+     "level": 4
+    },
+    {
+     "id": "expel-the-missionaries",
+     "text": "Expel the missionaries",
+     "level": 4
+    },
+    {
+     "id": "event-dates",
+     "text": "Event dates",
+     "level": 2
+    },
+    {
+     "id": "holy-place-names",
+     "text": "Holy place names",
+     "level": 2
+    },
+    {
+     "id": "holder-names",
+     "text": "Holder names",
+     "level": 2
+    },
+    {
+     "id": "lens",
+     "text": "Lens",
+     "level": 2
+    },
+    {
+     "id": "event-triggers-provisional",
+     "text": "Event triggers (provisional)",
+     "level": 2
+    },
+    {
+     "id": "church-heads",
+     "text": "Church heads",
+     "level": 2
+    },
+    {
+     "id": "faith-heads",
+     "text": "Faith heads",
+     "level": 2
+    },
+    {
+     "id": "heads",
+     "text": "Heads",
+     "level": 3
+    },
+    {
+     "id": "no-head-reasons",
+     "text": "No head reasons",
+     "level": 3
+    },
+    {
+     "id": "seat-provinces",
+     "text": "Seat provinces",
+     "level": 3
+    },
+    {
+     "id": "holy-place-provinces",
+     "text": "Holy place provinces",
+     "level": 3
+    },
+    {
+     "id": "start-1444",
+     "text": "Start 1444",
+     "level": 3
+    },
+    {
+     "id": "conclave",
+     "text": "Conclave",
+     "level": 3
+    },
+    {
+     "id": "patron",
+     "text": "Patron",
+     "level": 3
+    },
+    {
+     "id": "betrayed",
+     "text": "Betrayed",
+     "level": 3
+    },
+    {
+     "id": "seized",
+     "text": "Seized",
+     "level": 3
+    },
+    {
+     "id": "freed",
+     "text": "Freed",
+     "level": 3
+    },
+    {
+     "id": "censure",
+     "text": "Censure",
+     "level": 3
+    },
+    {
+     "id": "own-patriarch",
+     "text": "Own patriarch",
+     "level": 3
+    }
+   ]
+  },
+  "Data-Research": {
+   "title": "Research data",
+   "summary": "Every value in the game's research config, exactly as the game reads it. This page is made from packages/rules/data/domain/research.json each time the config changes, so it always matches the game. How these values…",
+   "headings": [
+    {
+     "id": "inventions",
+     "text": "Inventions",
+     "level": 2
+    },
+    {
+     "id": "era-cost-provisional",
+     "text": "Era cost (provisional)",
+     "level": 2
+    },
+    {
+     "id": "era-dates",
+     "text": "Era dates",
+     "level": 2
+    },
+    {
+     "id": "root",
+     "text": "Root",
+     "level": 2
+    },
+    {
+     "id": "boughs",
+     "text": "Boughs",
+     "level": 2
+    },
+    {
+     "id": "era-pace-provisional",
+     "text": "Era pace (provisional)",
+     "level": 2
+    },
+    {
+     "id": "campaign-end",
+     "text": "Campaign end",
+     "level": 2
+    },
+    {
+     "id": "school-seats-provisional",
+     "text": "School seats (provisional)",
+     "level": 2
+    },
+    {
+     "id": "school-invention",
+     "text": "School invention",
+     "level": 2
+    },
+    {
+     "id": "graduate-official-types",
+     "text": "Graduate official types",
+     "level": 2
+    },
+    {
+     "id": "school-lost-by",
+     "text": "School lost by",
+     "level": 2
+    },
+    {
+     "id": "students",
+     "text": "Students",
+     "level": 2
+    },
+    {
+     "id": "scholars",
+     "text": "Scholars",
+     "level": 2
+    },
+    {
+     "id": "school-upkeep-provisional",
+     "text": "School upkeep (provisional)",
+     "level": 2
+    },
+    {
+     "id": "ai",
+     "text": "Ai",
+     "level": 2
+    },
+    {
+     "id": "era-names",
+     "text": "Era names",
+     "level": 2
+    },
+    {
+     "id": "regional-contacts",
+     "text": "Regional contacts",
+     "level": 2
+    },
+    {
+     "id": "without-provisional",
+     "text": "Without (provisional)",
+     "level": 2
+    },
+    {
+     "id": "start-groups-provisional",
+     "text": "Start groups (provisional)",
+     "level": 2
+    },
+    {
+     "id": "start-add-provisional",
+     "text": "Start add (provisional)",
+     "level": 2
+    },
+    {
+     "id": "start-remove-provisional",
+     "text": "Start remove (provisional)",
+     "level": 2
+    },
+    {
+     "id": "starts-provisional",
+     "text": "Starts (provisional)",
+     "level": 2
+    },
+    {
+     "id": "1378",
+     "text": "1378",
+     "level": 3
+    }
+   ]
+  },
+  "Data-Revolutions": {
+   "title": "Revolutions data",
+   "summary": "Every value in the game's revolutions config, exactly as the game reads it. This page is made from packages/rules/data/domain/revolutions.json each time the config changes, so it always matches the game. How these…",
+   "headings": [
+    {
+     "id": "reference",
+     "text": "Reference",
+     "level": 2
+    },
+    {
+     "id": "lord-measures",
+     "text": "Lord measures",
+     "level": 3
+    },
+    {
+     "id": "stances",
+     "text": "Stances",
+     "level": 3
+    },
+    {
+     "id": "actions",
+     "text": "Actions",
+     "level": 3
+    },
+    {
+     "id": "foreign-backing",
+     "text": "Foreign backing",
+     "level": 3
+    },
+    {
+     "id": "rearm",
+     "text": "Rearm",
+     "level": 3
+    },
+    {
+     "id": "foreign-backing-1",
+     "text": "Foreign backing",
+     "level": 2
+    },
+    {
+     "id": "counter-revolution",
+     "text": "Counter revolution",
+     "level": 2
+    },
+    {
+     "id": "reaction",
+     "text": "Reaction",
+     "level": 2
+    },
+    {
+     "id": "ai",
+     "text": "Ai",
+     "level": 2
+    },
+    {
+     "id": "generals-switch-to",
+     "text": "Generals switch to",
+     "level": 2
+    },
+    {
+     "id": "camp-rules",
+     "text": "Camp rules",
+     "level": 2
+    },
+    {
+     "id": "regime-on-apply",
+     "text": "Regime on apply",
+     "level": 2
+    },
+    {
+     "id": "emancipation",
+     "text": "Emancipation",
+     "level": 3
+    },
+    {
+     "id": "families",
+     "text": "Families",
+     "level": 2
+    },
+    {
+     "id": "faith",
+     "text": "Faith",
+     "level": 3
+    },
+    {
+     "id": "camps",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "stance-labels",
+     "text": "Stance labels",
+     "level": 4
+    },
+    {
+     "id": "wave",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "estates",
+     "text": "Estates",
+     "level": 3
+    },
+    {
+     "id": "camps-1",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "stance-labels-1",
+     "text": "Stance labels",
+     "level": 4
+    },
+    {
+     "id": "wave-1",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "liberal-national",
+     "text": "Liberal national",
+     "level": 3
+    },
+    {
+     "id": "camps-2",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "stance-labels-2",
+     "text": "Stance labels",
+     "level": 4
+    },
+    {
+     "id": "wave-2",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "freedom",
+     "text": "Freedom",
+     "level": 3
+    },
+    {
+     "id": "camps-3",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "stance-labels-3",
+     "text": "Stance labels",
+     "level": 4
+    },
+    {
+     "id": "wave-3",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "agrarian",
+     "text": "Agrarian",
+     "level": 3
+    },
+    {
+     "id": "camps-4",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "stance-labels-4",
+     "text": "Stance labels",
+     "level": 4
+    },
+    {
+     "id": "wave-4",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "from-above",
+     "text": "From above",
+     "level": 3
+    },
+    {
+     "id": "camps-5",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "stance-labels-5",
+     "text": "Stance labels",
+     "level": 4
+    },
+    {
+     "id": "wave-5",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "homeland",
+     "text": "Homeland",
+     "level": 3
+    },
+    {
+     "id": "camps-6",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "stance-labels-6",
+     "text": "Stance labels",
+     "level": 4
+    },
+    {
+     "id": "wave-6",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "socialist-defeat",
+     "text": "Socialist defeat",
+     "level": 3
+    },
+    {
+     "id": "camps-7",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "stance-labels-7",
+     "text": "Stance labels",
+     "level": 4
+    },
+    {
+     "id": "wave-7",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "restoration",
+     "text": "Restoration",
+     "level": 3
+    },
+    {
+     "id": "camps-8",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "stance-labels-8",
+     "text": "Stance labels",
+     "level": 4
+    },
+    {
+     "id": "wave-8",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "regimes",
+     "text": "Regimes",
+     "level": 2
+    },
+    {
+     "id": "decrees",
+     "text": "Decrees",
+     "level": 2
+    },
+    {
+     "id": "revolutions",
+     "text": "Revolutions",
+     "level": 2
+    },
+    {
+     "id": "kaga-ikko-ikki",
+     "text": "Kaga ikko ikki",
+     "level": 3
+    },
+    {
+     "id": "requirements",
+     "text": "Requirements",
+     "level": 4
+    },
+    {
+     "id": "signs",
+     "text": "Signs",
+     "level": 4
+    },
+    {
+     "id": "list",
+     "text": "List",
+     "level": 5
+    },
+    {
+     "id": "sparks",
+     "text": "Sparks",
+     "level": 4
+    },
+    {
+     "id": "stances-1",
+     "text": "Stances",
+     "level": 4
+    },
+    {
+     "id": "camps-9",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "wave-9",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "rearm-1",
+     "text": "Rearm",
+     "level": 4
+    },
+    {
+     "id": "safavid-rise",
+     "text": "Safavid rise",
+     "level": 3
+    },
+    {
+     "id": "requirements-1",
+     "text": "Requirements",
+     "level": 4
+    },
+    {
+     "id": "signs-1",
+     "text": "Signs",
+     "level": 4
+    },
+    {
+     "id": "list-1",
+     "text": "List",
+     "level": 5
+    },
+    {
+     "id": "sparks-1",
+     "text": "Sparks",
+     "level": 4
+    },
+    {
+     "id": "stances-2",
+     "text": "Stances",
+     "level": 4
+    },
+    {
+     "id": "camps-10",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "wave-10",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "rearm-2",
+     "text": "Rearm",
+     "level": 4
+    },
+    {
+     "id": "khalsa-founded",
+     "text": "Khalsa founded",
+     "level": 3
+    },
+    {
+     "id": "requirements-2",
+     "text": "Requirements",
+     "level": 4
+    },
+    {
+     "id": "signs-2",
+     "text": "Signs",
+     "level": 4
+    },
+    {
+     "id": "list-2",
+     "text": "List",
+     "level": 5
+    },
+    {
+     "id": "sparks-2",
+     "text": "Sparks",
+     "level": 4
+    },
+    {
+     "id": "stances-3",
+     "text": "Stances",
+     "level": 4
+    },
+    {
+     "id": "camps-11",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "wave-11",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "rearm-3",
+     "text": "Rearm",
+     "level": 4
+    },
+    {
+     "id": "futa-jallon-jihad",
+     "text": "Futa jallon jihad",
+     "level": 3
+    },
+    {
+     "id": "requirements-3",
+     "text": "Requirements",
+     "level": 4
+    },
+    {
+     "id": "signs-3",
+     "text": "Signs",
+     "level": 4
+    },
+    {
+     "id": "list-3",
+     "text": "List",
+     "level": 5
+    },
+    {
+     "id": "sparks-3",
+     "text": "Sparks",
+     "level": 4
+    },
+    {
+     "id": "stances-4",
+     "text": "Stances",
+     "level": 4
+    },
+    {
+     "id": "camps-12",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "wave-12",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "rearm-4",
+     "text": "Rearm",
+     "level": 4
+    },
+    {
+     "id": "sokoto-jihad",
+     "text": "Sokoto jihad",
+     "level": 3
+    },
+    {
+     "id": "requirements-4",
+     "text": "Requirements",
+     "level": 4
+    },
+    {
+     "id": "signs-4",
+     "text": "Signs",
+     "level": 4
+    },
+    {
+     "id": "list-4",
+     "text": "List",
+     "level": 5
+    },
+    {
+     "id": "sparks-4",
+     "text": "Sparks",
+     "level": 4
+    },
+    {
+     "id": "stances-5",
+     "text": "Stances",
+     "level": 4
+    },
+    {
+     "id": "camps-13",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "wave-13",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "rearm-5",
+     "text": "Rearm",
+     "level": 4
+    },
+    {
+     "id": "taiping-rebellion",
+     "text": "Taiping rebellion",
+     "level": 3
+    },
+    {
+     "id": "requirements-5",
+     "text": "Requirements",
+     "level": 4
+    },
+    {
+     "id": "signs-5",
+     "text": "Signs",
+     "level": 4
+    },
+    {
+     "id": "list-5",
+     "text": "List",
+     "level": 5
+    },
+    {
+     "id": "sparks-5",
+     "text": "Sparks",
+     "level": 4
+    },
+    {
+     "id": "stances-6",
+     "text": "Stances",
+     "level": 4
+    },
+    {
+     "id": "camps-14",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "wave-14",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "rearm-6",
+     "text": "Rearm",
+     "level": 4
+    },
+    {
+     "id": "mahdist-state",
+     "text": "Mahdist state",
+     "level": 3
+    },
+    {
+     "id": "requirements-6",
+     "text": "Requirements",
+     "level": 4
+    },
+    {
+     "id": "signs-6",
+     "text": "Signs",
+     "level": 4
+    },
+    {
+     "id": "list-6",
+     "text": "List",
+     "level": 5
+    },
+    {
+     "id": "sparks-6",
+     "text": "Sparks",
+     "level": 4
+    },
+    {
+     "id": "stances-7",
+     "text": "Stances",
+     "level": 4
+    },
+    {
+     "id": "camps-15",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "wave-15",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "rearm-7",
+     "text": "Rearm",
+     "level": 4
+    },
+    {
+     "id": "comuneros-revolt",
+     "text": "Comuneros revolt",
+     "level": 3
+    },
+    {
+     "id": "requirements-7",
+     "text": "Requirements",
+     "level": 4
+    },
+    {
+     "id": "signs-7",
+     "text": "Signs",
+     "level": 4
+    },
+    {
+     "id": "list-7",
+     "text": "List",
+     "level": 5
+    },
+    {
+     "id": "sparks-7",
+     "text": "Sparks",
+     "level": 4
+    },
+    {
+     "id": "stances-8",
+     "text": "Stances",
+     "level": 4
+    },
+    {
+     "id": "camps-16",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "wave-16",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "rearm-8",
+     "text": "Rearm",
+     "level": 4
+    },
+    {
+     "id": "dutch-revolt",
+     "text": "Dutch revolt",
+     "level": 3
+    },
+    {
+     "id": "requirements-8",
+     "text": "Requirements",
+     "level": 4
+    },
+    {
+     "id": "signs-8",
+     "text": "Signs",
+     "level": 4
+    },
+    {
+     "id": "list-8",
+     "text": "List",
+     "level": 5
+    },
+    {
+     "id": "sparks-8",
+     "text": "Sparks",
+     "level": 4
+    },
+    {
+     "id": "stances-9",
+     "text": "Stances",
+     "level": 4
+    },
+    {
+     "id": "camps-17",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "wave-17",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "rearm-9",
+     "text": "Rearm",
+     "level": 4
+    },
+    {
+     "id": "wars-of-the-three-kingdoms",
+     "text": "Wars of the three kingdoms",
+     "level": 3
+    },
+    {
+     "id": "requirements-9",
+     "text": "Requirements",
+     "level": 4
+    },
+    {
+     "id": "signs-9",
+     "text": "Signs",
+     "level": 4
+    },
+    {
+     "id": "list-9",
+     "text": "List",
+     "level": 5
+    },
+    {
+     "id": "sparks-9",
+     "text": "Sparks",
+     "level": 4
+    },
+    {
+     "id": "stances-10",
+     "text": "Stances",
+     "level": 4
+    },
+    {
+     "id": "camps-18",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "wave-18",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "rearm-10",
+     "text": "Rearm",
+     "level": 4
+    },
+    {
+     "id": "fronde",
+     "text": "Fronde",
+     "level": 3
+    },
+    {
+     "id": "requirements-10",
+     "text": "Requirements",
+     "level": 4
+    },
+    {
+     "id": "signs-10",
+     "text": "Signs",
+     "level": 4
+    },
+    {
+     "id": "list-10",
+     "text": "List",
+     "level": 5
+    },
+    {
+     "id": "sparks-10",
+     "text": "Sparks",
+     "level": 4
+    },
+    {
+     "id": "stances-11",
+     "text": "Stances",
+     "level": 4
+    },
+    {
+     "id": "camps-19",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "wave-19",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "rearm-11",
+     "text": "Rearm",
+     "level": 4
+    },
+    {
+     "id": "glorious-revolution",
+     "text": "Glorious revolution",
+     "level": 3
+    },
+    {
+     "id": "requirements-11",
+     "text": "Requirements",
+     "level": 4
+    },
+    {
+     "id": "signs-11",
+     "text": "Signs",
+     "level": 4
+    },
+    {
+     "id": "list-11",
+     "text": "List",
+     "level": 5
+    },
+    {
+     "id": "sparks-11",
+     "text": "Sparks",
+     "level": 4
+    },
+    {
+     "id": "stances-12",
+     "text": "Stances",
+     "level": 4
+    },
+    {
+     "id": "camps-20",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "wave-20",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "rearm-12",
+     "text": "Rearm",
+     "level": 4
+    },
+    {
+     "id": "restoration-of-charles-ii",
+     "text": "Restoration of charles ii",
+     "level": 3
+    },
+    {
+     "id": "requirements-12",
+     "text": "Requirements",
+     "level": 4
+    },
+    {
+     "id": "signs-12",
+     "text": "Signs",
+     "level": 4
+    },
+    {
+     "id": "list-12",
+     "text": "List",
+     "level": 5
+    },
+    {
+     "id": "sparks-12",
+     "text": "Sparks",
+     "level": 4
+    },
+    {
+     "id": "stances-13",
+     "text": "Stances",
+     "level": 4
+    },
+    {
+     "id": "camps-21",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "wave-21",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "rearm-13",
+     "text": "Rearm",
+     "level": 4
+    },
+    {
+     "id": "american-revolution",
+     "text": "American revolution",
+     "level": 3
+    },
+    {
+     "id": "requirements-13",
+     "text": "Requirements",
+     "level": 4
+    },
+    {
+     "id": "signs-13",
+     "text": "Signs",
+     "level": 4
+    },
+    {
+     "id": "list-13",
+     "text": "List",
+     "level": 5
+    },
+    {
+     "id": "sparks-13",
+     "text": "Sparks",
+     "level": 4
+    },
+    {
+     "id": "stances-14",
+     "text": "Stances",
+     "level": 4
+    },
+    {
+     "id": "camps-22",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "wave-22",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "rearm-14",
+     "text": "Rearm",
+     "level": 4
+    },
+    {
+     "id": "french-revolution",
+     "text": "French revolution",
+     "level": 3
+    },
+    {
+     "id": "requirements-14",
+     "text": "Requirements",
+     "level": 4
+    },
+    {
+     "id": "signs-14",
+     "text": "Signs",
+     "level": 4
+    },
+    {
+     "id": "list-14",
+     "text": "List",
+     "level": 5
+    },
+    {
+     "id": "sparks-14",
+     "text": "Sparks",
+     "level": 4
+    },
+    {
+     "id": "stances-15",
+     "text": "Stances",
+     "level": 4
+    },
+    {
+     "id": "camps-23",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "wave-23",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "rearm-15",
+     "text": "Rearm",
+     "level": 4
+    },
+    {
+     "id": "latin-american-independence",
+     "text": "Latin american independence",
+     "level": 3
+    },
+    {
+     "id": "requirements-15",
+     "text": "Requirements",
+     "level": 4
+    },
+    {
+     "id": "signs-15",
+     "text": "Signs",
+     "level": 4
+    },
+    {
+     "id": "list-15",
+     "text": "List",
+     "level": 5
+    },
+    {
+     "id": "sparks-15",
+     "text": "Sparks",
+     "level": 4
+    },
+    {
+     "id": "stances-16",
+     "text": "Stances",
+     "level": 4
+    },
+    {
+     "id": "camps-24",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "wave-24",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "rearm-16",
+     "text": "Rearm",
+     "level": 4
+    },
+    {
+     "id": "revolutions-of-1848",
+     "text": "Revolutions of 1848",
+     "level": 3
+    },
+    {
+     "id": "requirements-16",
+     "text": "Requirements",
+     "level": 4
+    },
+    {
+     "id": "signs-16",
+     "text": "Signs",
+     "level": 4
+    },
+    {
+     "id": "list-16",
+     "text": "List",
+     "level": 5
+    },
+    {
+     "id": "sparks-16",
+     "text": "Sparks",
+     "level": 4
+    },
+    {
+     "id": "stances-17",
+     "text": "Stances",
+     "level": 4
+    },
+    {
+     "id": "camps-25",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "wave-25",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "rearm-17",
+     "text": "Rearm",
+     "level": 4
+    },
+    {
+     "id": "iranian-constitutional-revolution",
+     "text": "Iranian constitutional revolution",
+     "level": 3
+    },
+    {
+     "id": "requirements-17",
+     "text": "Requirements",
+     "level": 4
+    },
+    {
+     "id": "signs-17",
+     "text": "Signs",
+     "level": 4
+    },
+    {
+     "id": "list-17",
+     "text": "List",
+     "level": 5
+    },
+    {
+     "id": "sparks-17",
+     "text": "Sparks",
+     "level": 4
+    },
+    {
+     "id": "stances-18",
+     "text": "Stances",
+     "level": 4
+    },
+    {
+     "id": "camps-26",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "wave-26",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "rearm-18",
+     "text": "Rearm",
+     "level": 4
+    },
+    {
+     "id": "young-turk-revolution",
+     "text": "Young turk revolution",
+     "level": 3
+    },
+    {
+     "id": "requirements-18",
+     "text": "Requirements",
+     "level": 4
+    },
+    {
+     "id": "signs-18",
+     "text": "Signs",
+     "level": 4
+    },
+    {
+     "id": "list-18",
+     "text": "List",
+     "level": 5
+    },
+    {
+     "id": "sparks-18",
+     "text": "Sparks",
+     "level": 4
+    },
+    {
+     "id": "stances-19",
+     "text": "Stances",
+     "level": 4
+    },
+    {
+     "id": "camps-27",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "wave-27",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "rearm-19",
+     "text": "Rearm",
+     "level": 4
+    },
+    {
+     "id": "xinhai-revolution",
+     "text": "Xinhai revolution",
+     "level": 3
+    },
+    {
+     "id": "requirements-19",
+     "text": "Requirements",
+     "level": 4
+    },
+    {
+     "id": "signs-19",
+     "text": "Signs",
+     "level": 4
+    },
+    {
+     "id": "list-19",
+     "text": "List",
+     "level": 5
+    },
+    {
+     "id": "sparks-19",
+     "text": "Sparks",
+     "level": 4
+    },
+    {
+     "id": "stances-20",
+     "text": "Stances",
+     "level": 4
+    },
+    {
+     "id": "camps-28",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "wave-28",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "rearm-20",
+     "text": "Rearm",
+     "level": 4
+    },
+    {
+     "id": "egyptian-revolution-1919",
+     "text": "Egyptian revolution 1919",
+     "level": 3
+    },
+    {
+     "id": "requirements-20",
+     "text": "Requirements",
+     "level": 4
+    },
+    {
+     "id": "signs-20",
+     "text": "Signs",
+     "level": 4
+    },
+    {
+     "id": "list-20",
+     "text": "List",
+     "level": 5
+    },
+    {
+     "id": "sparks-20",
+     "text": "Sparks",
+     "level": 4
+    },
+    {
+     "id": "stances-21",
+     "text": "Stances",
+     "level": 4
+    },
+    {
+     "id": "camps-29",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "wave-29",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "rearm-21",
+     "text": "Rearm",
+     "level": 4
+    },
+    {
+     "id": "haitian-revolution",
+     "text": "Haitian revolution",
+     "level": 3
+    },
+    {
+     "id": "requirements-21",
+     "text": "Requirements",
+     "level": 4
+    },
+    {
+     "id": "signs-21",
+     "text": "Signs",
+     "level": 4
+    },
+    {
+     "id": "list-21",
+     "text": "List",
+     "level": 5
+    },
+    {
+     "id": "sparks-21",
+     "text": "Sparks",
+     "level": 4
+    },
+    {
+     "id": "stances-22",
+     "text": "Stances",
+     "level": 4
+    },
+    {
+     "id": "camps-30",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "wave-30",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "rearm-22",
+     "text": "Rearm",
+     "level": 4
+    },
+    {
+     "id": "shivaji-coronation",
+     "text": "Shivaji coronation",
+     "level": 3
+    },
+    {
+     "id": "requirements-22",
+     "text": "Requirements",
+     "level": 4
+    },
+    {
+     "id": "signs-22",
+     "text": "Signs",
+     "level": 4
+    },
+    {
+     "id": "list-22",
+     "text": "List",
+     "level": 5
+    },
+    {
+     "id": "sparks-22",
+     "text": "Sparks",
+     "level": 4
+    },
+    {
+     "id": "stances-23",
+     "text": "Stances",
+     "level": 4
+    },
+    {
+     "id": "camps-31",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "wave-31",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "rearm-23",
+     "text": "Rearm",
+     "level": 4
+    },
+    {
+     "id": "sikh-empire-founded",
+     "text": "Sikh empire founded",
+     "level": 3
+    },
+    {
+     "id": "requirements-23",
+     "text": "Requirements",
+     "level": 4
+    },
+    {
+     "id": "signs-23",
+     "text": "Signs",
+     "level": 4
+    },
+    {
+     "id": "list-23",
+     "text": "List",
+     "level": 5
+    },
+    {
+     "id": "sparks-23",
+     "text": "Sparks",
+     "level": 4
+    },
+    {
+     "id": "stances-24",
+     "text": "Stances",
+     "level": 4
+    },
+    {
+     "id": "camps-32",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "wave-32",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "rearm-24",
+     "text": "Rearm",
+     "level": 4
+    },
+    {
+     "id": "fall-of-beijing-1644",
+     "text": "Fall of beijing 1644",
+     "level": 3
+    },
+    {
+     "id": "requirements-24",
+     "text": "Requirements",
+     "level": 4
+    },
+    {
+     "id": "signs-24",
+     "text": "Signs",
+     "level": 4
+    },
+    {
+     "id": "list-24",
+     "text": "List",
+     "level": 5
+    },
+    {
+     "id": "sparks-24",
+     "text": "Sparks",
+     "level": 4
+    },
+    {
+     "id": "stances-25",
+     "text": "Stances",
+     "level": 4
+    },
+    {
+     "id": "camps-33",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "wave-33",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "rearm-25",
+     "text": "Rearm",
+     "level": 4
+    },
+    {
+     "id": "tay-son-uprising",
+     "text": "Tay son uprising",
+     "level": 3
+    },
+    {
+     "id": "requirements-25",
+     "text": "Requirements",
+     "level": 4
+    },
+    {
+     "id": "signs-25",
+     "text": "Signs",
+     "level": 4
+    },
+    {
+     "id": "list-25",
+     "text": "List",
+     "level": 5
+    },
+    {
+     "id": "sparks-25",
+     "text": "Sparks",
+     "level": 4
+    },
+    {
+     "id": "stances-26",
+     "text": "Stances",
+     "level": 4
+    },
+    {
+     "id": "camps-34",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "wave-34",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "rearm-26",
+     "text": "Rearm",
+     "level": 4
+    },
+    {
+     "id": "donghak-revolution",
+     "text": "Donghak revolution",
+     "level": 3
+    },
+    {
+     "id": "requirements-26",
+     "text": "Requirements",
+     "level": 4
+    },
+    {
+     "id": "signs-26",
+     "text": "Signs",
+     "level": 4
+    },
+    {
+     "id": "list-26",
+     "text": "List",
+     "level": 5
+    },
+    {
+     "id": "sparks-26",
+     "text": "Sparks",
+     "level": 4
+    },
+    {
+     "id": "stances-27",
+     "text": "Stances",
+     "level": 4
+    },
+    {
+     "id": "camps-35",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "wave-35",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "rearm-27",
+     "text": "Rearm",
+     "level": 4
+    },
+    {
+     "id": "mexican-revolution",
+     "text": "Mexican revolution",
+     "level": 3
+    },
+    {
+     "id": "requirements-27",
+     "text": "Requirements",
+     "level": 4
+    },
+    {
+     "id": "signs-27",
+     "text": "Signs",
+     "level": 4
+    },
+    {
+     "id": "list-27",
+     "text": "List",
+     "level": 5
+    },
+    {
+     "id": "sparks-27",
+     "text": "Sparks",
+     "level": 4
+    },
+    {
+     "id": "stances-28",
+     "text": "Stances",
+     "level": 4
+    },
+    {
+     "id": "camps-36",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "wave-36",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "rearm-28",
+     "text": "Rearm",
+     "level": 4
+    },
+    {
+     "id": "petrine-reforms",
+     "text": "Petrine reforms",
+     "level": 3
+    },
+    {
+     "id": "requirements-28",
+     "text": "Requirements",
+     "level": 4
+    },
+    {
+     "id": "signs-28",
+     "text": "Signs",
+     "level": 4
+    },
+    {
+     "id": "list-28",
+     "text": "List",
+     "level": 5
+    },
+    {
+     "id": "sparks-28",
+     "text": "Sparks",
+     "level": 4
+    },
+    {
+     "id": "stances-29",
+     "text": "Stances",
+     "level": 4
+    },
+    {
+     "id": "camps-37",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "wave-37",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "rearm-29",
+     "text": "Rearm",
+     "level": 4
+    },
+    {
+     "id": "rise-of-the-zulu-kingdom",
+     "text": "Rise of the zulu kingdom",
+     "level": 3
+    },
+    {
+     "id": "requirements-29",
+     "text": "Requirements",
+     "level": 4
+    },
+    {
+     "id": "signs-29",
+     "text": "Signs",
+     "level": 4
+    },
+    {
+     "id": "list-29",
+     "text": "List",
+     "level": 5
+    },
+    {
+     "id": "sparks-29",
+     "text": "Sparks",
+     "level": 4
+    },
+    {
+     "id": "stances-30",
+     "text": "Stances",
+     "level": 4
+    },
+    {
+     "id": "camps-38",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "wave-38",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "rearm-30",
+     "text": "Rearm",
+     "level": 4
+    },
+    {
+     "id": "meiji-restoration",
+     "text": "Meiji restoration",
+     "level": 3
+    },
+    {
+     "id": "requirements-30",
+     "text": "Requirements",
+     "level": 4
+    },
+    {
+     "id": "signs-30",
+     "text": "Signs",
+     "level": 4
+    },
+    {
+     "id": "list-30",
+     "text": "List",
+     "level": 5
+    },
+    {
+     "id": "sparks-30",
+     "text": "Sparks",
+     "level": 4
+    },
+    {
+     "id": "stances-31",
+     "text": "Stances",
+     "level": 4
+    },
+    {
+     "id": "camps-39",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "wave-39",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "rearm-31",
+     "text": "Rearm",
+     "level": 4
+    },
+    {
+     "id": "kemalist-reforms",
+     "text": "Kemalist reforms",
+     "level": 3
+    },
+    {
+     "id": "requirements-31",
+     "text": "Requirements",
+     "level": 4
+    },
+    {
+     "id": "signs-31",
+     "text": "Signs",
+     "level": 4
+    },
+    {
+     "id": "list-31",
+     "text": "List",
+     "level": 5
+    },
+    {
+     "id": "sparks-31",
+     "text": "Sparks",
+     "level": 4
+    },
+    {
+     "id": "stances-32",
+     "text": "Stances",
+     "level": 4
+    },
+    {
+     "id": "camps-40",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "wave-40",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "rearm-32",
+     "text": "Rearm",
+     "level": 4
+    },
+    {
+     "id": "russian-revolution-1905",
+     "text": "Russian revolution 1905",
+     "level": 3
+    },
+    {
+     "id": "requirements-32",
+     "text": "Requirements",
+     "level": 4
+    },
+    {
+     "id": "signs-32",
+     "text": "Signs",
+     "level": 4
+    },
+    {
+     "id": "list-32",
+     "text": "List",
+     "level": 5
+    },
+    {
+     "id": "sparks-32",
+     "text": "Sparks",
+     "level": 4
+    },
+    {
+     "id": "stances-33",
+     "text": "Stances",
+     "level": 4
+    },
+    {
+     "id": "camps-41",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "wave-41",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "rearm-33",
+     "text": "Rearm",
+     "level": 4
+    },
+    {
+     "id": "russian-revolution",
+     "text": "Russian revolution",
+     "level": 3
+    },
+    {
+     "id": "requirements-33",
+     "text": "Requirements",
+     "level": 4
+    },
+    {
+     "id": "signs-33",
+     "text": "Signs",
+     "level": 4
+    },
+    {
+     "id": "list-33",
+     "text": "List",
+     "level": 5
+    },
+    {
+     "id": "sparks-33",
+     "text": "Sparks",
+     "level": 4
+    },
+    {
+     "id": "stances-34",
+     "text": "Stances",
+     "level": 4
+    },
+    {
+     "id": "camps-42",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "wave-42",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "rearm-34",
+     "text": "Rearm",
+     "level": 4
+    },
+    {
+     "id": "armistice-1918",
+     "text": "Armistice 1918",
+     "level": 3
+    },
+    {
+     "id": "sparks-34",
+     "text": "Sparks",
+     "level": 4
+    },
+    {
+     "id": "stances-35",
+     "text": "Stances",
+     "level": 4
+    },
+    {
+     "id": "camps-43",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "wave-43",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "rearm-35",
+     "text": "Rearm",
+     "level": 4
+    },
+    {
+     "id": "restoration-of-the-old-order",
+     "text": "Restoration of the old order",
+     "level": 3
+    },
+    {
+     "id": "requirements-34",
+     "text": "Requirements",
+     "level": 4
+    },
+    {
+     "id": "signs-34",
+     "text": "Signs",
+     "level": 4
+    },
+    {
+     "id": "list-34",
+     "text": "List",
+     "level": 5
+    },
+    {
+     "id": "sparks-35",
+     "text": "Sparks",
+     "level": 4
+    },
+    {
+     "id": "stances-36",
+     "text": "Stances",
+     "level": 4
+    },
+    {
+     "id": "camps-44",
+     "text": "Camps",
+     "level": 4
+    },
+    {
+     "id": "wave-44",
+     "text": "Wave",
+     "level": 4
+    },
+    {
+     "id": "rearm-36",
+     "text": "Rearm",
+     "level": 4
+    },
+    {
+     "id": "wave-grievances",
+     "text": "Wave grievances",
+     "level": 2
+    },
+    {
+     "id": "decree-effects",
+     "text": "Decree effects",
+     "level": 2
+    },
+    {
+     "id": "game",
+     "text": "Game",
+     "level": 2
+    },
+    {
+     "id": "signs-provisional",
+     "text": "Signs (provisional)",
+     "level": 3
+    },
+    {
+     "id": "ai-weights-provisional",
+     "text": "Ai weights (provisional)",
+     "level": 3
+    },
+    {
+     "id": "families-1",
+     "text": "Families",
+     "level": 3
+    }
+   ]
+  },
+  "Data-Subjects": {
+   "title": "Subjects data",
+   "summary": "Every value in the game's subjects config, exactly as the game reads it. This page is made from packages/rules/data/domain/subjects.json each time the config changes, so it always matches the game. How these values…",
+   "headings": [
+    {
+     "id": "gift",
+     "text": "Gift",
+     "level": 2
+    },
+    {
+     "id": "loyalty",
+     "text": "Loyalty",
+     "level": 2
+    },
+    {
+     "id": "effects",
+     "text": "Effects",
+     "level": 3
+    },
+    {
+     "id": "start-1444-by-autonomy",
+     "text": "Start 1444 by autonomy",
+     "level": 3
+    },
+    {
+     "id": "tint-by-step",
+     "text": "Tint by step",
+     "level": 3
+    },
+    {
+     "id": "kinds",
+     "text": "Kinds",
+     "level": 2
+    },
+    {
+     "id": "vassal",
+     "text": "Vassal",
+     "level": 3
+    },
+    {
+     "id": "tributary",
+     "text": "Tributary",
+     "level": 3
+    },
+    {
+     "id": "union",
+     "text": "Union",
+     "level": 3
+    },
+    {
+     "id": "march",
+     "text": "March",
+     "level": 3
+    },
+    {
+     "id": "colony",
+     "text": "Colony",
+     "level": 3
+    },
+    {
+     "id": "stages",
+     "text": "Stages",
+     "level": 4
+    },
+    {
+     "id": "protectorate",
+     "text": "Protectorate",
+     "level": 3
+    },
+    {
+     "id": "ties",
+     "text": "Ties",
+     "level": 2
+    },
+    {
+     "id": "reasons",
+     "text": "Reasons",
+     "level": 2
+    },
+    {
+     "id": "tribute-levels",
+     "text": "Tribute levels",
+     "level": 2
+    },
+    {
+     "id": "reach-by-administrative-capacity",
+     "text": "Reach by administrative capacity",
+     "level": 2
+    },
+    {
+     "id": "raise-lord",
+     "text": "Raise lord",
+     "level": 2
+    },
+    {
+     "id": "fold-in",
+     "text": "Fold in",
+     "level": 2
+    },
+    {
+     "id": "tighten",
+     "text": "Tighten",
+     "level": 2
+    },
+    {
+     "id": "loosen",
+     "text": "Loosen",
+     "level": 2
+    },
+    {
+     "id": "order",
+     "text": "Order",
+     "level": 3
+    },
+    {
+     "id": "rising",
+     "text": "Rising",
+     "level": 2
+    },
+    {
+     "id": "mapping-1444",
+     "text": "Mapping 1444",
+     "level": 2
+    },
+    {
+     "id": "subjects-with-subjects",
+     "text": "Subjects with subjects",
+     "level": 2
+    },
+    {
+     "id": "crowns",
+     "text": "Crowns",
+     "level": 2
+    },
+    {
+     "id": "playing-as-subject",
+     "text": "Playing as subject",
+     "level": 2
+    },
+    {
+     "id": "map",
+     "text": "Map",
+     "level": 2
+    }
+   ]
+  },
+  "Data-Time-and-Turns": {
+   "title": "Time and turns data",
+   "summary": "Every value in the game's time and turns config, exactly as the game reads it. This page is made from packages/rules/data/domain/time-and-turns.json each time the config changes, so it always matches the game. How…",
+   "headings": [
+    {
+     "id": "mover-kind-order",
+     "text": "Mover kind order",
+     "level": 2
+    },
+    {
+     "id": "battle-days",
+     "text": "Battle days",
+     "level": 2
+    },
+    {
+     "id": "cadences",
+     "text": "Cadences",
+     "level": 2
+    },
+    {
+     "id": "seasons",
+     "text": "Seasons",
+     "level": 2
+    },
+    {
+     "id": "winter",
+     "text": "Winter",
+     "level": 3
+    },
+    {
+     "id": "snow-pass-closed",
+     "text": "Snow pass closed",
+     "level": 3
+    },
+    {
+     "id": "wet-season-provisional",
+     "text": "Wet season (provisional)",
+     "level": 3
+    },
+    {
+     "id": "names",
+     "text": "Names",
+     "level": 3
+    },
+    {
+     "id": "harvest-month",
+     "text": "Harvest month",
+     "level": 3
+    },
+    {
+     "id": "autosave",
+     "text": "Autosave",
+     "level": 2
+    },
+    {
+     "id": "out-of-scope",
+     "text": "Out of scope",
+     "level": 2
+    },
+    {
+     "id": "ages",
+     "text": "Ages",
+     "level": 2
+    },
+    {
+     "id": "eras",
+     "text": "Eras",
+     "level": 2
+    },
+    {
+     "id": "victory",
+     "text": "Victory",
+     "level": 2
+    },
+    {
+     "id": "engine-phases",
+     "text": "Engine phases",
+     "level": 2
+    }
+   ]
+  },
+  "Data-Trade": {
+   "title": "Trade data",
+   "summary": "Every value in the game's trade config, exactly as the game reads it. This page is made from packages/rules/data/domain/trade.json each time the config changes, so it always matches the game. How these values are…",
+   "headings": [
+    {
+     "id": "ratio",
+     "text": "Ratio",
+     "level": 2
+    },
+    {
+     "id": "modifiers-provisional",
+     "text": "Modifiers (provisional)",
+     "level": 3
+    },
+    {
+     "id": "quarantine",
+     "text": "Quarantine",
+     "level": 4
+    },
+    {
+     "id": "value",
+     "text": "Value",
+     "level": 2
+    },
+    {
+     "id": "price-per-load-provisional",
+     "text": "Price per load (provisional)",
+     "level": 3
+    },
+    {
+     "id": "building-weights-provisional",
+     "text": "Building weights (provisional)",
+     "level": 3
+    },
+    {
+     "id": "collect",
+     "text": "Collect",
+     "level": 2
+    },
+    {
+     "id": "deposit",
+     "text": "Deposit",
+     "level": 2
+    },
+    {
+     "id": "lord-city",
+     "text": "Lord city",
+     "level": 3
+    },
+    {
+     "id": "route",
+     "text": "Route",
+     "level": 2
+    },
+    {
+     "id": "tolls",
+     "text": "Tolls",
+     "level": 2
+    },
+    {
+     "id": "danger-provisional",
+     "text": "Danger (provisional)",
+     "level": 2
+    },
+    {
+     "id": "bandit-when",
+     "text": "Bandit when",
+     "level": 3
+    },
+    {
+     "id": "upkeep",
+     "text": "Upkeep",
+     "level": 2
+    },
+    {
+     "id": "land-traders-provisional",
+     "text": "Land traders (provisional)",
+     "level": 2
+    },
+    {
+     "id": "sea-traders-provisional",
+     "text": "Sea traders (provisional)",
+     "level": 2
+    },
+    {
+     "id": "research-provisional",
+     "text": "Research (provisional)",
+     "level": 2
+    },
+    {
+     "id": "peace-terms",
+     "text": "Peace terms",
+     "level": 2
+    },
+    {
+     "id": "effects-provisional",
+     "text": "Effects (provisional)",
+     "level": 2
+    },
+    {
+     "id": "tax-per-ratio-points",
+     "text": "Tax per ratio points",
+     "level": 3
+    },
+    {
+     "id": "start",
+     "text": "Start",
+     "level": 2
+    },
+    {
+     "id": "traders-by-trade-access-provisional",
+     "text": "Traders by trade access (provisional)",
+     "level": 3
+    },
+    {
+     "id": "routes",
+     "text": "Routes",
+     "level": 3
+    },
+    {
+     "id": "ai-provisional",
+     "text": "Ai (provisional)",
+     "level": 2
+    },
+    {
+     "id": "found",
+     "text": "Found",
+     "level": 2
+    },
+    {
+     "id": "visibility",
+     "text": "Visibility",
+     "level": 2
+    },
+    {
+     "id": "hubs-provisional",
+     "text": "Hubs (provisional)",
+     "level": 2
+    },
+    {
+     "id": "event-mapping",
+     "text": "Event mapping",
+     "level": 2
+    },
+    {
+     "id": "heritage-levers",
+     "text": "Heritage levers",
+     "level": 2
+    },
+    {
+     "id": "materials",
+     "text": "Materials",
+     "level": 2
+    },
+    {
+     "id": "game-provisional",
+     "text": "Game (provisional)",
+     "level": 2
+    }
+   ]
+  },
+  "Data-Tribes": {
+   "title": "Tribes data",
+   "summary": "Every value in the game's tribes config, exactly as the game reads it. This page is made from packages/rules/data/domain/tribes.json each time the config changes, so it always matches the game. How these values are…",
+   "headings": [
+    {
+     "id": "region-bounds",
+     "text": "Region bounds",
+     "level": 2
+    },
+    {
+     "id": "am-north",
+     "text": "Am north",
+     "level": 3
+    },
+    {
+     "id": "new-tribe-provinces",
+     "text": "New tribe provinces",
+     "level": 2
+    },
+    {
+     "id": "new-tribes-left-out",
+     "text": "New tribes left out",
+     "level": 2
+    },
+    {
+     "id": "range-size",
+     "text": "Range size",
+     "level": 2
+    },
+    {
+     "id": "settlers-wrong",
+     "text": "Settlers wrong",
+     "level": 2
+    },
+    {
+     "id": "ask",
+     "text": "Ask",
+     "level": 2
+    },
+    {
+     "id": "ai",
+     "text": "Ai",
+     "level": 2
+    }
+   ]
+  },
+  "Data-Troop-Movement": {
+   "title": "Troop movement data",
+   "summary": "Every value in the game's troop movement config, exactly as the game reads it. This page is made from packages/rules/data/domain/troop-movement.json each time the config changes, so it always matches the game. How…",
+   "headings": [
+    {
+     "id": "frozen-rivers-provisional",
+     "text": "Frozen rivers (provisional)",
+     "level": 2
+    },
+    {
+     "id": "battle-steps",
+     "text": "Battle steps",
+     "level": 2
+    },
+    {
+     "id": "road-factor-provisional",
+     "text": "Road factor (provisional)",
+     "level": 2
+    },
+    {
+     "id": "season-factor-provisional",
+     "text": "Season factor (provisional)",
+     "level": 2
+    },
+    {
+     "id": "order-factor-provisional",
+     "text": "Order factor (provisional)",
+     "level": 2
+    },
+    {
+     "id": "winter-months-provisional",
+     "text": "Winter months (provisional)",
+     "level": 2
+    },
+    {
+     "id": "snow-closed-months-provisional",
+     "text": "Snow closed months (provisional)",
+     "level": 2
+    },
+    {
+     "id": "wet-season-months-provisional",
+     "text": "Wet season months (provisional)",
+     "level": 2
+    },
+    {
+     "id": "ford-months-provisional",
+     "text": "Ford months (provisional)",
+     "level": 2
+    }
+   ]
+  },
+  "Data-Warfare": {
+   "title": "Warfare data",
+   "summary": "Every value in the game's warfare config, exactly as the game reads it. This page is made from packages/rules/data/domain/warfare.json each time the config changes, so it always matches the game. How these values are…",
+   "headings": [
+    {
+     "id": "arms",
+     "text": "Arms",
+     "level": 2
+    },
+    {
+     "id": "later-arms-provisional",
+     "text": "Later arms (provisional)",
+     "level": 2
+    },
+    {
+     "id": "kinds-provisional",
+     "text": "Kinds (provisional)",
+     "level": 2
+    },
+    {
+     "id": "battle",
+     "text": "Battle",
+     "level": 2
+    },
+    {
+     "id": "hits-per-bell-provisional",
+     "text": "Hits per bell (provisional)",
+     "level": 2
+    },
+    {
+     "id": "by-invention",
+     "text": "By invention",
+     "level": 3
+    },
+    {
+     "id": "skill-growth",
+     "text": "Skill growth",
+     "level": 2
+    },
+    {
+     "id": "origins",
+     "text": "Origins",
+     "level": 2
+    },
+    {
+     "id": "amounts-provisional",
+     "text": "Amounts (provisional)",
+     "level": 2
+    },
+    {
+     "id": "ransom",
+     "text": "Ransom",
+     "level": 3
+    },
+    {
+     "id": "company-size",
+     "text": "Company size",
+     "level": 2
+    },
+    {
+     "id": "obsolete",
+     "text": "Obsolete",
+     "level": 2
+    },
+    {
+     "id": "break",
+     "text": "Break",
+     "level": 2
+    },
+    {
+     "id": "levy",
+     "text": "Levy",
+     "level": 2
+    },
+    {
+     "id": "hired",
+     "text": "Hired",
+     "level": 2
+    },
+    {
+     "id": "troop-cap-provisional",
+     "text": "Troop cap (provisional)",
+     "level": 2
+    },
+    {
+     "id": "over-cap",
+     "text": "Over cap",
+     "level": 2
+    },
+    {
+     "id": "lords",
+     "text": "Lords",
+     "level": 2
+    },
+    {
+     "id": "free-companies",
+     "text": "Free companies",
+     "level": 2
+    },
+    {
+     "id": "rations",
+     "text": "Rations",
+     "level": 2
+    },
+    {
+     "id": "logistics",
+     "text": "Logistics",
+     "level": 2
+    },
+    {
+     "id": "reserve",
+     "text": "Reserve",
+     "level": 2
+    },
+    {
+     "id": "wagon",
+     "text": "Wagon",
+     "level": 2
+    },
+    {
+     "id": "foraging-rating",
+     "text": "Foraging rating",
+     "level": 2
+    },
+    {
+     "id": "hunger",
+     "text": "Hunger",
+     "level": 2
+    },
+    {
+     "id": "sickness",
+     "text": "Sickness",
+     "level": 2
+    },
+    {
+     "id": "forced-march",
+     "text": "Forced march",
+     "level": 2
+    },
+    {
+     "id": "requisition",
+     "text": "Requisition",
+     "level": 2
+    },
+    {
+     "id": "scouting",
+     "text": "Scouting",
+     "level": 2
+    },
+    {
+     "id": "era-scale-provisional",
+     "text": "Era scale (provisional)",
+     "level": 2
+    },
+    {
+     "id": "sectors",
+     "text": "Sectors",
+     "level": 2
+    },
+    {
+     "id": "roles",
+     "text": "Roles",
+     "level": 2
+    },
+    {
+     "id": "level-scars",
+     "text": "Level scars",
+     "level": 2
+    },
+    {
+     "id": "levels-by-era-provisional",
+     "text": "Levels by era (provisional)",
+     "level": 2
+    },
+    {
+     "id": "level-abilities",
+     "text": "Level abilities",
+     "level": 2
+    },
+    {
+     "id": "era-notes",
+     "text": "Era notes",
+     "level": 2
+    },
+    {
+     "id": "might-by-era",
+     "text": "Might by era",
+     "level": 2
+    },
+    {
+     "id": "cunning-by-era",
+     "text": "Cunning by era",
+     "level": 2
+    },
+    {
+     "id": "order-inventions",
+     "text": "Order inventions",
+     "level": 2
+    },
+    {
+     "id": "logistics-by-era",
+     "text": "Logistics by era",
+     "level": 2
+    },
+    {
+     "id": "role-changing-inventions",
+     "text": "Role changing inventions",
+     "level": 2
+    },
+    {
+     "id": "w11",
+     "text": "W11",
+     "level": 3
+    },
+    {
+     "id": "tired",
+     "text": "Tired",
+     "level": 2
+    },
+    {
+     "id": "dug-in",
+     "text": "Dug in",
+     "level": 2
+    },
+    {
+     "id": "orders",
+     "text": "Orders",
+     "level": 2
+    },
+    {
+     "id": "approaches",
+     "text": "Approaches",
+     "level": 2
+    },
+    {
+     "id": "flee-provisional",
+     "text": "Flee (provisional)",
+     "level": 2
+    },
+    {
+     "id": "traits",
+     "text": "Traits",
+     "level": 2
+    },
+    {
+     "id": "wound-chance",
+     "text": "Wound chance",
+     "level": 2
+    },
+    {
+     "id": "death-chance",
+     "text": "Death chance",
+     "level": 2
+    },
+    {
+     "id": "age",
+     "text": "Age",
+     "level": 2
+    },
+    {
+     "id": "their-man",
+     "text": "Their man",
+     "level": 2
+    },
+    {
+     "id": "named-commanders",
+     "text": "Named commanders",
+     "level": 2
+    },
+    {
+     "id": "jean-de-dunois",
+     "text": "Jean de Dunois",
+     "level": 3
+    },
+    {
+     "id": "after",
+     "text": "After",
+     "level": 2
+    },
+    {
+     "id": "capture-warfare",
+     "text": "Capture warfare",
+     "level": 2
+    },
+    {
+     "id": "castles",
+     "text": "Castles",
+     "level": 2
+    },
+    {
+     "id": "castle-ground",
+     "text": "Castle ground",
+     "level": 2
+    },
+    {
+     "id": "siege",
+     "text": "Siege",
+     "level": 2
+    },
+    {
+     "id": "storm",
+     "text": "Storm",
+     "level": 2
+    },
+    {
+     "id": "sack",
+     "text": "Sack",
+     "level": 2
+    },
+    {
+     "id": "ai-honours",
+     "text": "Ai honours",
+     "level": 2
+    },
+    {
+     "id": "bribe",
+     "text": "Bribe",
+     "level": 2
+    },
+    {
+     "id": "raid",
+     "text": "Raid",
+     "level": 2
+    },
+    {
+     "id": "occupation",
+     "text": "Occupation",
+     "level": 2
+    },
+    {
+     "id": "peace",
+     "text": "Peace",
+     "level": 2
+    },
+    {
+     "id": "settlement",
+     "text": "Settlement",
+     "level": 2
+    },
+    {
+     "id": "province-cost",
+     "text": "Province cost",
+     "level": 3
+    },
+    {
+     "id": "capacity-weights",
+     "text": "Capacity weights",
+     "level": 3
+    },
+    {
+     "id": "surrender",
+     "text": "Surrender",
+     "level": 3
+    },
+    {
+     "id": "notifications",
+     "text": "Notifications",
+     "level": 2
+    },
+    {
+     "id": "war-aims",
+     "text": "War aims",
+     "level": 2
+    },
+    {
+     "id": "inventions-outside-battle",
+     "text": "Inventions outside battle",
+     "level": 2
+    },
+    {
+     "id": "ai",
+     "text": "Ai",
+     "level": 2
+    },
+    {
+     "id": "kinds-raised",
+     "text": "Kinds raised",
+     "level": 3
+    },
+    {
+     "id": "peace-at",
+     "text": "Peace at",
+     "level": 3
+    },
+    {
+     "id": "standing-orders-provisional",
+     "text": "Standing orders (provisional)",
+     "level": 3
+    },
+    {
+     "id": "style-region-fallback",
+     "text": "Style region fallback",
+     "level": 2
+    },
+    {
+     "id": "adoption",
+     "text": "Adoption",
+     "level": 2
+    },
+    {
+     "id": "styles",
+     "text": "Styles",
+     "level": 2
+    },
+    {
+     "id": "ships",
+     "text": "Ships",
+     "level": 2
+    }
+   ]
+  },
   "Design-Principles": {
    "title": "Design principles",
    "summary": "These are the rules every feature of Pocket Hegemony is designed by. They come from Leroy's direction for the game (decision X-19 in domain/DECISIONS.md ) and from the screen rules already in the specs. Every new or…",
@@ -621,6 +6792,11 @@
      "level": 2
     }
    ]
+  },
+  "Game-Data": {
+   "title": "Game data",
+   "summary": "Every number the game plays by, straight from its config: unit strengths, building sizes, invention costs, break points, prices, chances and timings. These pages are made from the game's rules files in…",
+   "headings": []
   },
   "Government": {
    "title": "Government",
@@ -869,6 +7045,11 @@
      "level": 2
     },
     {
+     "id": "game-data",
+     "text": "Game data",
+     "level": 2
+    },
+    {
      "id": "how-the-systems-fit-together",
      "text": "How the systems fit together",
      "level": 2
@@ -947,6 +7128,11 @@
     {
      "id": "where-you-find-it",
      "text": "Where you find it",
+     "level": 2
+    },
+    {
+     "id": "numbers",
+     "text": "Numbers",
      "level": 2
     }
    ]
@@ -3000,6 +9186,11 @@
     {
      "id": "the-computers-tribes",
      "text": "The computer's tribes",
+     "level": 2
+    },
+    {
+     "id": "numbers",
+     "text": "Numbers",
      "level": 2
     }
    ]

@@ -254,6 +254,8 @@ The first slice plays risings on the eight grievances the game tracks, so the ri
 
 ## Numbers
 
+Every value the game uses, made from its config so it always matches the game: [Rebellions data](Data-Rebellions). How they combine: [Formulas](Formulas).
+
 All numbers are **placeholders** in the province config. The key names are the spec's own labels, since the design names only the groups.
 
 | Key | Value |
