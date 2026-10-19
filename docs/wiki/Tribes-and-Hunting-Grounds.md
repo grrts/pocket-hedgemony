@@ -4,7 +4,7 @@ The peoples of North America cannot colonise, so a tribe starts with two or thre
 
 ## Which realms are tribes
 
-A realm is a **tribal realm** while its form is a clan council, a chiefdom or a confederation and its capital lies in North America. In 1444 that is the Iroquois, the Huron, the Cherokee and the Creek. The Pueblo are a city commune: their towns grew by farming, so they walk no grounds unless a reform makes them a tribal form. A realm that reforms out of a tribal form loses its grounds at once.
+A realm is a **tribal realm** while its form is a clan council, a chiefdom or a confederation and its capital lies in North America. At the 1378 start that includes the Iroquois and the Huron; the Cherokee and the Creek are not born yet and form later (see [The 1378 start](The-1378-Start)). The Pueblo are a city commune: their towns grew by farming, so they walk no grounds unless a reform makes them a tribal form. A realm that reforms out of a tribal form loses its grounds at once.
 
 ## The range
 
@@ -54,7 +54,7 @@ A yes pays the tribe, gives up the ground (the tribe may not claim it again for 
 
 ## The Hunting grounds tab
 
-A tribal realm's card has a **Hunting grounds** tab in the Lands group, beside Colonies: settlers on your grounds at the top in red with Go there, asks for your land, "Hunting grounds n of m" with a bar, the claim under way and its end date, then one row per ground with its people, years held and furs, a ground ready to take in first. The General tab carries one line, "Hunting grounds n of m · furs x gold a month", that opens it.
+A tribal realm's card has a **Hunting grounds** tab in the Lands group, beside Colonies: settlers on your grounds at the top in red with Go there, asks for your land, "Hunting grounds n of m" with a bar, the claim under way and its end date, then one row per ground with its people, years held and furs, a ground ready to take in first. When settlers or asks wait, the Lands tile on your Realm book's Overview turns red and opens it.
 
 On the map, grounds are a light diagonal hatch in the tribe's colour at every zoom, in the political and Charts lenses. In the Charts lens an empty coast that is someone's hunting ground is amber, not green, so you see before sailing that settling there angers a tribe.
 

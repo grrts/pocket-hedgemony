@@ -6,7 +6,7 @@
  * Time is counted in months (any absolute month index; a year is 12).
  */
 import config from "../../../../rules/data/domain/subjects.json" with { type: "json" };
-import data1444 from "../../../../rules/data/domain/subjects-1444.json" with { type: "json" };
+import { startSubjects as data1444 } from "../../../../rules/src/start.ts";
 
 export type Kind = "vassal" | "tributary" | "union" | "march" | "colony" | "protectorate";
 export type Step = "loyal" | "wavering" | "disloyal" | "in_revolt";

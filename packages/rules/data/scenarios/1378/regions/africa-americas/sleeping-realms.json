@@ -1,0 +1,610 @@
+{
+ "_doc": "Realms of Africa and the Americas born between 1379 and 1444, or later, that the 1444 map shows: listed from the start and asleep until they form (SETUP-080, X-25). capital is a [lon, lat] point and home a list of owner-rule selectors, which the merge step resolves to provinces of the 1378 map. From start-date/research/africa-americas.md and research/decisions.md; built by tools/domain-data/start-1378-africa-americas.py from the 1444 files.",
+ "realms": [
+  {
+   "id": "adal",
+   "name": "Adal Sultanate",
+   "color": "#a05a2c",
+   "capital": [
+    43.48,
+    11.35
+   ],
+   "home": [
+    {
+     "countries": [
+      "DJI",
+      "SOL",
+      "ETH"
+     ],
+     "bbox": [
+      41,
+      8,
+      46,
+      12.5
+     ]
+    }
+   ],
+   "tree": [
+    "adal"
+   ],
+   "forms_about": 1415,
+   "why": "The Walashma heirs refound Ifat's state in the east after Sa'ad ad-Din II falls at Zeila."
+  },
+  {
+   "id": "kongo",
+   "name": "Kingdom of Kongo",
+   "color": "#6b8e23",
+   "capital": [
+    14.24,
+    -6.27
+   ],
+   "home": [
+    {
+     "countries": [
+      "AGO",
+      "COD",
+      "COG"
+     ],
+     "bbox": [
+      12,
+      -8.5,
+      16,
+      -4
+     ]
+    }
+   ],
+   "tree": [
+    "kongo"
+   ],
+   "forms_about": 1390,
+   "why": "Lukeni lua Nimi takes the Mbanza Kongo area with Mbata's alliance (traditional date)."
+  },
+  {
+   "id": "mutapa",
+   "name": "Mutapa",
+   "color": "#8b4513",
+   "capital": [
+    31.0,
+    -16.5
+   ],
+   "home": [
+    {
+     "countries": [
+      "ZWE"
+     ],
+     "bbox": [
+      29,
+      -18.5,
+      33,
+      -15.5
+     ]
+    }
+   ],
+   "tree": [
+    "mutapa"
+   ],
+   "forms_about": 1430,
+   "why": "Mutota moves north from Great Zimbabwe and conquers the Dande (traditional)."
+  },
+  {
+   "id": "torwa",
+   "name": "Torwa",
+   "color": "#b8860b",
+   "capital": [
+    28.38,
+    -20.16
+   ],
+   "home": [
+    {
+     "countries": [
+      "ZWE"
+     ],
+     "bbox": [
+      26,
+      -22.5,
+      29.8,
+      -18
+     ]
+    }
+   ],
+   "tree": [
+    "torwa"
+   ],
+   "forms_about": 1420,
+   "why": "Khami rises in the south-west as Great Zimbabwe fades (c.1400-1450, disputed)."
+  },
+  {
+   "id": "ajuran",
+   "name": "Ajuran",
+   "color": "#2e8b57",
+   "capital": [
+    45.34,
+    2.04
+   ],
+   "home": [
+    {
+     "countries": [
+      "SOM"
+     ],
+     "bbox": [
+      41,
+      -1.7,
+      44.5,
+      6
+     ]
+    }
+   ],
+   "tree": [
+    "ajuran"
+   ],
+   "forms_about": 1420,
+   "why": "An inland Shabelle power; it holds Mogadishu's hinterland only in the 15th century (low confidence)."
+  },
+  {
+   "id": "kaffa",
+   "name": "Kaffa",
+   "color": "#9a6b3c",
+   "capital": [
+    36.24,
+    7.27
+   ],
+   "home": [
+    {
+     "countries": [
+      "ETH"
+     ],
+     "bbox": [
+      35.5,
+      5.7,
+      36.5,
+      6.7
+     ]
+    }
+   ],
+   "tree": [
+    "kaffa"
+   ],
+   "forms_about": 1390,
+   "why": "The Minjo dynasty founds Kaffa among the Gonga chiefdoms (traditional)."
+  },
+  {
+   "id": "air_agadez",
+   "name": "Aïr Sultanate",
+   "color": "#c2b280",
+   "capital": [
+    7.99,
+    16.97
+   ],
+   "home": [
+    {
+     "countries": [
+      "NER"
+     ],
+     "bbox": [
+      5.5,
+      16.5,
+      9.5,
+      21
+     ]
+    }
+   ],
+   "tree": [
+    "air_agadez"
+   ],
+   "forms_about": 1405,
+   "why": "The Aïr confederations found a sultanate; its seat moves to Agadez c.1430."
+  },
+  {
+   "id": "timbuktu_tuareg",
+   "name": "Tuareg of the Niger bend",
+   "color": "#5f7f9f",
+   "capital": [
+    -2.0,
+    18.8
+   ],
+   "home": [
+    {
+     "countries": [
+      "MLI"
+     ],
+     "bbox": [
+      -2.5,
+      16.7,
+      -1.5,
+      17.7
+     ]
+    }
+   ],
+   "tree": [
+    "timbuktu_tuareg"
+   ],
+   "forms_about": 1433,
+   "why": "Akil's Tuareg take Timbuktu from a weakened Mali."
+  },
+  {
+   "id": "massina_fulbe",
+   "name": "Fulbe of Masina",
+   "color": "#7c5c8c",
+   "capital": [
+    -4.95,
+    14.5
+   ],
+   "home": [
+    {
+     "countries": [
+      "MLI"
+     ],
+     "bbox": [
+      -5.5,
+      13.8,
+      -3,
+      15.2
+     ]
+    }
+   ],
+   "tree": [
+    "massina_fulbe"
+   ],
+   "forms_about": 1400,
+   "why": "Fulbe ardos settle Masina in the inland delta."
+  },
+  {
+   "id": "canarian_lordship",
+   "name": "Lordship of the Canary Islands",
+   "color": "#a0522d",
+   "capital": [
+    -13.56,
+    29.06
+   ],
+   "home": [
+    {
+     "countries": [
+      "ESP"
+     ],
+     "bbox": [
+      -14.5,
+      27.9,
+      -13.2,
+      29.5
+     ]
+    }
+   ],
+   "tree": [
+    "canarian_lordship"
+   ],
+   "forms_about": 1402,
+   "why": "Béthencourt and Gadifer conquer Lanzarote and Fuerteventura for Castile (1402-05)."
+  },
+  {
+   "id": "bougie",
+   "name": "Bougie",
+   "color": "#4f7942",
+   "capital": [
+    5.08,
+    36.75
+   ],
+   "home": [
+    {
+     "countries": [
+      "DZA"
+     ],
+     "bbox": [
+      4.5,
+      36,
+      6.5,
+      37
+     ]
+    }
+   ],
+   "tree": [
+    "bougie"
+   ],
+   "forms_about": 1435,
+   "why": "A Hafsid prince holds Bougie against Tunis after Abu Faris dies (could be an event instead)."
+  },
+  {
+   "id": "debdou",
+   "name": "Debdou",
+   "color": "#8f6f3f",
+   "capital": [
+    -3.05,
+    34.0
+   ],
+   "home": [
+    {
+     "countries": [
+      "MAR"
+     ],
+     "bbox": [
+      -3.5,
+      33.5,
+      -2,
+      34.6
+     ]
+    }
+   ],
+   "tree": [
+    "debdou"
+   ],
+   "forms_about": 1430,
+   "why": "The Banu Urtajjen make Debdou a lordship of their own (could be an event instead)."
+  },
+  {
+   "id": "hintata_marrakesh",
+   "name": "Hintata of Marrakesh",
+   "color": "#6a5acd",
+   "capital": [
+    -7.99,
+    31.63
+   ],
+   "home": [
+    {
+     "countries": [
+      "MAR"
+     ],
+     "bbox": [
+      -8.5,
+      31,
+      -7,
+      32.3
+     ]
+    }
+   ],
+   "tree": [
+    "hintata_marrakesh"
+   ],
+   "forms_about": 1420,
+   "why": "The Hintata take Marrakesh as Marinid rule in the south collapses (no firm date)."
+  },
+  {
+   "id": "loango",
+   "name": "Loango",
+   "color": "#b07c4f",
+   "capital": [
+    11.82,
+    -4.65
+   ],
+   "home": [
+    {
+     "countries": [
+      "COG"
+     ],
+     "bbox": [
+      11,
+      -4.6,
+      13,
+      -2.5
+     ]
+    }
+   ],
+   "tree": [
+    "loango"
+   ],
+   "forms_about": 1420,
+   "why": "The Maloango unite the Vili polities of the coast (late 14th-15th c., disputed)."
+  },
+  {
+   "id": "buganda",
+   "name": "Buganda",
+   "color": "#3f6f6f",
+   "capital": [
+    32.5,
+    0.3
+   ],
+   "home": [
+    {
+     "countries": [
+      "UGA"
+     ],
+     "bbox": [
+      31.5,
+      -0.5,
+      33.5,
+      1.5
+     ]
+    }
+   ],
+   "tree": [
+    "buganda"
+   ],
+   "forms_about": 1450,
+   "why": "Great Lakes kingdom of tradition; dating is oral, the research leans to later than 1378."
+  },
+  {
+   "id": "ankole",
+   "name": "Ankole",
+   "color": "#9c7a3c",
+   "capital": [
+    30.8,
+    -0.8
+   ],
+   "home": [
+    {
+     "countries": [
+      "UGA"
+     ],
+     "bbox": [
+      30,
+      -1.2,
+      31.5,
+      0
+     ]
+    }
+   ],
+   "tree": [
+    "ankole"
+   ],
+   "forms_about": 1500,
+   "why": "Hinda dynasty, usually placed after the Chwezi."
+  },
+  {
+   "id": "karagwe",
+   "name": "Karagwe",
+   "color": "#7f8f5f",
+   "capital": [
+    31.1,
+    -1.6
+   ],
+   "home": [
+    {
+     "countries": [
+      "TZA"
+     ],
+     "bbox": [
+      30.5,
+      -2.8,
+      32,
+      -1
+     ]
+    }
+   ],
+   "tree": [
+    "karagwe"
+   ],
+   "forms_about": 1500,
+   "why": "Hinda dynasty, usually placed after the Chwezi."
+  },
+  {
+   "id": "rwanda",
+   "name": "Rwanda",
+   "color": "#a76f5f",
+   "capital": [
+    29.9,
+    -2.0
+   ],
+   "home": [
+    {
+     "countries": [
+      "RWA",
+      "COD"
+     ],
+     "bbox": [
+      28,
+      -3.5,
+      31,
+      -1
+     ]
+    }
+   ],
+   "tree": [
+    "rwanda"
+   ],
+   "forms_about": 1450,
+   "why": "Nyiginya dating is disputed (15th-17th c.)."
+  },
+  {
+   "id": "mandara",
+   "name": "Mandara",
+   "color": "#5c7c4c",
+   "capital": [
+    13.9,
+    10.9
+   ],
+   "home": [
+    {
+     "countries": [
+      "CMR",
+      "NGA"
+     ],
+     "bbox": [
+      13.4,
+      10.4,
+      14.4,
+      11.4
+     ]
+    }
+   ],
+   "tree": [
+    "mandara"
+   ],
+   "forms_about": 1450,
+   "why": "Probably not yet a kingdom; Fra Mauro names it c.1450."
+  },
+  {
+   "id": "coosa",
+   "name": "Coosa",
+   "color": "#8a7a5a",
+   "capital": [
+    -84.75,
+    34.6
+   ],
+   "home": [
+    {
+     "countries": [
+      "USA"
+     ],
+     "admin1": [
+      "Georgia"
+     ],
+     "bbox": [
+      -85.6,
+      33.5,
+      -83.5,
+      35
+     ]
+    }
+   ],
+   "tree": [
+    "coosa"
+   ],
+   "forms_about": 1400,
+   "why": "The Coosa paramountcy at Little Egypt forms after Etowah's fall (c.1400-1500, disputed)."
+  },
+  {
+   "id": "cherokee",
+   "name": "Cherokee",
+   "color": "#c47a3a",
+   "capital": [
+    -84.2,
+    35.5
+   ],
+   "home": [
+    {
+     "countries": [
+      "USA"
+     ],
+     "admin1": [
+      "Tennessee",
+      "North Carolina"
+     ],
+     "bbox": [
+      -86,
+      34.5,
+      -82,
+      36.7
+     ]
+    }
+   ],
+   "tree": [
+    "cherokee"
+   ],
+   "forms_about": 1600,
+   "why": "The Cherokee coalesce as a nation long after 1444; Mississippian chiefdoms hold the land (decision 6)."
+  },
+  {
+   "id": "creek",
+   "name": "Creek",
+   "color": "#6f8faf",
+   "capital": [
+    -85.5,
+    32.4
+   ],
+   "home": [
+    {
+     "countries": [
+      "USA"
+     ],
+     "admin1": [
+      "Alabama",
+      "Georgia"
+     ]
+    }
+   ],
+   "tree": [
+    "creek"
+   ],
+   "forms_about": 1600,
+   "why": "The Creek Confederacy coalesces long after 1444; Mississippian chiefdoms hold the land (decision 6)."
+  }
+ ]
+}

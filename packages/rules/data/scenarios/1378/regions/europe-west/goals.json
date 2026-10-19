@@ -1,0 +1,6344 @@
+{
+ "$comment": "Historical goals with their reasons for western Europe, the Empire, Italy and the Nordic realms (plan-1378 §2), from start-date/research/europe-west.md. Weighed by the AI (EVT-100 to EVT-106); never forced.",
+ "goals": [
+  {
+   "realm": "england",
+   "goal": "Hold Calais, Gascony, Brest and Cherbourg and win back Aquitaine",
+   "reason": "The French reconquest of 1369 to 1375 took most of the 1360 lands; the crown's claim and the lords' honour rest on them",
+   "ends_when": "All French lands lost, or a lasting peace with territory",
+   "window": [
+    1378,
+    1453
+   ],
+   "weight": "strong",
+   "deviation": "A long truce and a French marriage, as Richard did in 1396",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Bordeaux",
+      "at": [
+       -0.58,
+       44.84
+      ]
+     },
+     {
+      "name": "Calais",
+      "at": [
+       1.86,
+       50.95
+      ]
+     },
+     {
+      "name": "Poitiers",
+      "at": [
+       0.34,
+       46.58
+      ]
+     },
+     {
+      "name": "Limoges",
+      "at": [
+       1.26,
+       45.83
+      ]
+     }
+    ],
+    "target": "france"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "france"
+   },
+   "toward": [
+    "battle_of_agincourt",
+    "treaty_of_troyes",
+    "battle_of_castillon"
+   ]
+  },
+  {
+   "realm": "england",
+   "goal": "Press the claim to the French crown",
+   "reason": "The dynasty's main source of prestige; after 1399 a source of legitimacy for Lancaster",
+   "ends_when": "Claim given up by treaty",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "Use the claim only as a bargaining chip for Aquitaine",
+   "aim": {
+    "kind": "fight",
+    "target": "france"
+   },
+   "alternative": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Bordeaux",
+      "at": [
+       -0.58,
+       44.84
+      ]
+     },
+     {
+      "name": "Poitiers",
+      "at": [
+       0.34,
+       46.58
+      ]
+     }
+    ],
+    "target": "france"
+   },
+   "toward": [
+    "henry_v_invades_normandy",
+    "treaty_of_troyes"
+   ]
+  },
+  {
+   "realm": "england",
+   "goal": "Put John of Gaunt on the throne of Castile",
+   "reason": "Gaunt's claim through his wife Constance; it would break France's naval ally",
+   "ends_when": "Gaunt dies, or a marriage settles it (Bayonne 1388)",
+   "window": [
+    1381,
+    1388
+   ],
+   "weight": "normal",
+   "deviation": "Settle for a marriage of Gaunt's daughter into the Trastámara house and a pension",
+   "aim": {
+    "kind": "fight",
+    "target": "castile"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "castile"
+   }
+  },
+  {
+   "realm": "england",
+   "goal": "Keep the Portuguese alliance",
+   "reason": "Portuguese ports and fleet against Castile",
+   "ends_when": "Portugal joins Castile",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "Back a Portuguese candidate in a succession crisis (Avis 1385)",
+   "aim": {
+    "kind": "ally",
+    "target": "portugal"
+   },
+   "toward": [
+    "battle_of_aljubarrota"
+   ]
+  },
+  {
+   "realm": "england",
+   "goal": "Contain Scotland and keep the border lordships",
+   "reason": "The Scots are France's ally and raid the March",
+   "ends_when": "Scotland is subject, or a stable peace",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "A truce and a marriage, as in 1424",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Berwick",
+      "at": [
+       -2.0,
+       55.77
+      ]
+     },
+     {
+      "name": "Roxburgh",
+      "at": [
+       -2.47,
+       55.6
+      ]
+     },
+     {
+      "name": "Lochmaben",
+      "at": [
+       -3.44,
+       55.13
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "scotland"
+   }
+  },
+  {
+   "realm": "england",
+   "goal": "Pay for the war without a revolt",
+   "reason": "The poll taxes of 1377 to 1381 break the countryside's patience",
+   "ends_when": "A settled revenue, or peace",
+   "window": [
+    1378,
+    1381
+   ],
+   "weight": "normal",
+   "deviation": "Cut back the war to avoid taxation",
+   "aim": null,
+   "toward": [
+    "peasants_revolt"
+   ]
+  },
+  {
+   "realm": "england",
+   "goal": "Restore royal lordship in Ireland",
+   "reason": "Black rent and the Gaelic recovery shrink the colony",
+   "ends_when": "The Pale is secure, or England is too busy",
+   "window": [
+    1379,
+    1399
+   ],
+   "weight": "normal",
+   "deviation": "Leave Ireland to the strongest earl",
+   "aim": {
+    "kind": "subject",
+    "target": "ireland"
+   }
+  },
+  {
+   "realm": "scotland",
+   "goal": "Recover Berwick, Roxburgh, Annandale and the border castles",
+   "reason": "Lost in the wars of independence; national honour and the border lords' lands",
+   "ends_when": "Places taken, or a lasting peace",
+   "window": [
+    1378,
+    1460
+   ],
+   "weight": "strong",
+   "deviation": "Live with truces and raid only",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Berwick",
+      "at": [
+       -2.0,
+       55.77
+      ]
+     },
+     {
+      "name": "Roxburgh",
+      "at": [
+       -2.47,
+       55.6
+      ]
+     },
+     {
+      "name": "Lochmaben",
+      "at": [
+       -3.44,
+       55.13
+      ]
+     },
+     {
+      "name": "Jedburgh",
+      "at": [
+       -2.55,
+       55.48
+      ]
+     }
+    ],
+    "target": "england"
+   },
+   "alternative": {
+    "kind": "fight",
+    "target": "england"
+   }
+  },
+  {
+   "realm": "scotland",
+   "goal": "Keep the French alliance",
+   "reason": "It pays and protects Scotland against England",
+   "ends_when": "France makes a separate peace or collapses",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "Neutrality when France is weak",
+   "aim": {
+    "kind": "ally",
+    "target": "france"
+   }
+  },
+  {
+   "realm": "scotland",
+   "goal": "Settle Stewart power through the king's sons",
+   "reason": "Robert II rules by giving the great earldoms to his family",
+   "ends_when": "A strong king curbs them (James I from 1424)",
+   "window": [
+    1378,
+    1424
+   ],
+   "weight": "normal",
+   "deviation": "A magnate (Douglas) takes the lead instead",
+   "aim": null
+  },
+  {
+   "realm": "lordship_of_the_isles",
+   "goal": "Gain the earldom of Ross",
+   "reason": "A claim through the Leslie heiress from 1402; Ross gives a mainland power base",
+   "ends_when": "Ross held, or the claim lost",
+   "window": [
+    1402,
+    1437
+   ],
+   "weight": "normal",
+   "deviation": "Expand into Lochaber and the Ulster Glens instead",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Dingwall",
+      "at": [
+       -4.43,
+       57.6
+      ]
+     },
+     {
+      "name": "Inverness",
+      "at": [
+       -4.22,
+       57.48
+      ]
+     }
+    ],
+    "target": "scotland"
+   },
+   "alternative": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Glenarm",
+      "at": [
+       -5.96,
+       54.97
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "lordship_of_the_isles",
+   "goal": "Keep autonomy from the Stewart crown",
+   "reason": "A semi-royal Gaelic lordship with its own council",
+   "ends_when": "The crown destroys the lordship",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "Seek an English alliance (as in 1462)",
+   "aim": {
+    "kind": "free",
+    "target": "scotland"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "england"
+   }
+  },
+  {
+   "realm": "lordship_of_the_isles",
+   "goal": "Win land in Ulster",
+   "reason": "Galloglass trade and marriage links",
+   "ends_when": "Holdings in Antrim secured (c.1399)",
+   "window": [
+    1390,
+    1399
+   ],
+   "weight": "weak",
+   "deviation": "Supply soldiers only",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Glenarm",
+      "at": [
+       -5.96,
+       54.97
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "lordship_of_ireland",
+   "goal": "Defend the Pale and stop the black rent",
+   "reason": "Gaelic lords tax the colony",
+   "ends_when": "A strong governor with English money",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "Let the resident earls govern",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Dublin",
+      "at": [
+       -6.26,
+       53.35
+      ]
+     },
+     {
+      "name": "Drogheda",
+      "at": [
+       -6.35,
+       53.72
+      ]
+     },
+     {
+      "name": "Trim",
+      "at": [
+       -6.79,
+       53.55
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "lordship_of_ireland",
+   "goal": "Recover the earldom of Ulster for Mortimer",
+   "reason": "The Mortimer heir holds the Ulster and Connacht claims",
+   "ends_when": "The Mortimer line fails or Ulster is lost",
+   "window": [
+    1379,
+    1398
+   ],
+   "weight": "normal",
+   "deviation": "Make terms with O'Neill",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Carrickfergus",
+      "at": [
+       -5.81,
+       54.72
+      ]
+     },
+     {
+      "name": "Coleraine",
+      "at": [
+       -6.67,
+       55.13
+      ]
+     }
+    ],
+    "target": "tyrone"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "tyrone"
+   }
+  },
+  {
+   "realm": "tyrone",
+   "goal": "Overlordship of Ulster",
+   "reason": "O'Neill claims the high kingship of the north and the old earldom's land",
+   "ends_when": "O'Neill weakened, or a strong English deputy",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "strong",
+   "deviation": "Submit to the king for recognition (as in 1395)",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Carrickfergus",
+      "at": [
+       -5.81,
+       54.72
+      ]
+     },
+     {
+      "name": "Coleraine",
+      "at": [
+       -6.67,
+       55.13
+      ]
+     }
+    ],
+    "target": "lordship_of_ireland"
+   }
+  },
+  {
+   "realm": "leinster_kavanagh",
+   "goal": "Win the kingship of Leinster and the colony's fees",
+   "reason": "Art Mór claims the Norfolk lands in Leinster through his wife, and black rent",
+   "ends_when": "Crushed, or the fee is paid",
+   "window": [
+    1378,
+    1416
+   ],
+   "weight": "strong",
+   "deviation": "Submit for a fee and a title, as in 1395",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Carlow",
+      "at": [
+       -6.93,
+       52.84
+      ]
+     },
+     {
+      "name": "New Ross",
+      "at": [
+       -6.94,
+       52.4
+      ]
+     }
+    ],
+    "target": "lordship_of_ireland"
+   }
+  },
+  {
+   "realm": "desmond",
+   "goal": "Hold the governorship or act as a regional king",
+   "reason": "Office brings revenue and patronage; a weak crown leaves a vacuum",
+   "ends_when": "A strong crown governs directly",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "Gaelicise and rule as a Gaelic lord",
+   "aim": null
+  },
+  {
+   "realm": "ormond",
+   "goal": "Hold the governorship or act as a regional king",
+   "reason": "Office brings revenue and patronage; a weak crown leaves a vacuum",
+   "ends_when": "A strong crown governs directly",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "kildare",
+   "goal": "Hold the governorship or act as a regional king",
+   "reason": "Office brings revenue and patronage; a weak crown leaves a vacuum",
+   "ends_when": "A strong crown governs directly",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "castile",
+   "goal": "Secure the Trastámara crown against Lancaster",
+   "reason": "A usurping dynasty, and John of Gaunt claims the throne",
+   "ends_when": "Gaunt dead or bought off (Bayonne 1388)",
+   "window": [
+    1378,
+    1388
+   ],
+   "weight": "strong",
+   "deviation": "Defeat Gaunt in the field and keep France's backing",
+   "aim": {
+    "kind": "fight",
+    "target": "england"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "france"
+   }
+  },
+  {
+   "realm": "castile",
+   "goal": "Keep the French alliance and the war at sea against England",
+   "reason": "France made the dynasty; galleys win prestige and plunder",
+   "ends_when": "France makes peace with England",
+   "window": [
+    1378,
+    1389
+   ],
+   "weight": "normal",
+   "deviation": "Neutrality if France fails to pay",
+   "aim": {
+    "kind": "ally",
+    "target": "france"
+   }
+  },
+  {
+   "realm": "castile",
+   "goal": "Win Portugal by marriage or war",
+   "reason": "Ferdinand's only heir is Beatriz; union would remove a rival allied to England",
+   "ends_when": "Avis secure (Aljubarrota 1385) or union achieved",
+   "window": [
+    1382,
+    1385
+   ],
+   "weight": "strong",
+   "deviation": "Settle for border gains and peace (as in 1411)",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Lisbon",
+      "at": [
+       -9.14,
+       38.72
+      ]
+     }
+    ],
+    "target": "portugal"
+   },
+   "toward": [
+    "portuguese_crisis",
+    "battle_of_aljubarrota"
+   ]
+  },
+  {
+   "realm": "castile",
+   "goal": "Bend Navarre",
+   "reason": "Navarre is England's door into Iberia",
+   "ends_when": "Navarre friendly (Briones 1379)",
+   "window": [
+    1378,
+    1379
+   ],
+   "weight": "normal",
+   "deviation": "Marriage ties only",
+   "aim": {
+    "kind": "subject",
+    "target": "navarre"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "navarre"
+   }
+  },
+  {
+   "realm": "castile",
+   "goal": "Buy the great nobles with grants",
+   "reason": "Henry's victory rests on them",
+   "ends_when": "The crown is strong enough to reclaim grants",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "Rule through favourites (later Álvaro de Luna)",
+   "aim": null
+  },
+  {
+   "realm": "castile",
+   "goal": "Push the Granada frontier",
+   "reason": "Crusading tradition and tribute (parias)",
+   "ends_when": "Granada gone",
+   "window": [
+    1407,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "Keep the truce and the tribute",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Antequera",
+      "at": [
+       -4.56,
+       37.02
+      ]
+     }
+    ],
+    "target": "granada"
+   },
+   "toward": [
+    "fall_of_granada"
+   ]
+  },
+  {
+   "realm": "aragon",
+   "goal": "Conquer Sardinia from Arborea",
+   "reason": "The papal grant of 1297; trade, grain and Catalan honour",
+   "ends_when": "Arborea gone (1409 to 1420)",
+   "window": [
+    1378,
+    1420
+   ],
+   "weight": "strong",
+   "deviation": "Make peace with Arborea and hold the towns only",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Oristano",
+      "at": [
+       8.59,
+       39.9
+      ]
+     }
+    ],
+    "target": "oristano"
+   },
+   "alternative": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Cagliari",
+      "at": [
+       9.11,
+       39.22
+      ]
+     },
+     {
+      "name": "Alghero",
+      "at": [
+       8.32,
+       40.56
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "aragon",
+   "goal": "Gain Sicily for the House of Barcelona",
+   "reason": "Family right after Frederick III's death; Catalan trade",
+   "ends_when": "Sicily joined (1392 to 1409)",
+   "window": [
+    1378,
+    1409
+   ],
+   "weight": "normal",
+   "deviation": "Rule Sicily through a cadet (Martin the Younger)",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Palermo",
+      "at": [
+       13.36,
+       38.12
+      ]
+     },
+     {
+      "name": "Messina",
+      "at": [
+       15.55,
+       38.19
+      ]
+     }
+    ],
+    "target": "sicily"
+   },
+   "alternative": {
+    "kind": "subject",
+    "target": "sicily"
+   }
+  },
+  {
+   "realm": "aragon",
+   "goal": "Hold the Catalan duchies in Greece",
+   "reason": "Catalan honour and trade",
+   "ends_when": "Lost to the Acciaioli (1388)",
+   "window": [
+    1379,
+    1390
+   ],
+   "weight": "weak",
+   "deviation": "Let them go",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Athens",
+      "at": [
+       23.73,
+       37.98
+      ]
+     },
+     {
+      "name": "Thebes",
+      "at": [
+       23.32,
+       38.32
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "aragon",
+   "goal": "Keep Majorca against Anjou's claim",
+   "reason": "The Majorcan claim passed to Louis of Anjou",
+   "ends_when": "The claim lapses",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Palma",
+      "at": [
+       2.65,
+       39.57
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "aragon",
+   "goal": "Stay out of the Schism and the Anglo-French war",
+   "reason": "Peter weighs both sides for gain",
+   "ends_when": "A king picks a side (1387)",
+   "window": [
+    1378,
+    1387
+   ],
+   "weight": "normal",
+   "deviation": "Declare early for Avignon for French favour",
+   "aim": null,
+   "alternative": {
+    "kind": "ally",
+    "target": "france"
+   }
+  },
+  {
+   "realm": "aragon",
+   "goal": "Keep the peace with Castile",
+   "reason": "Almazán ended a ruinous war",
+   "ends_when": "A Castilian succession opens (Caspe 1412)",
+   "window": [
+    1378,
+    1412
+   ],
+   "weight": "normal",
+   "deviation": "Revive the claims on Murcia",
+   "aim": {
+    "kind": "ally",
+    "target": "castile"
+   },
+   "alternative": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Murcia",
+      "at": [
+       -1.13,
+       37.99
+      ]
+     }
+    ],
+    "target": "castile"
+   },
+   "toward": [
+    "compromise_of_caspe"
+   ]
+  },
+  {
+   "realm": "portugal",
+   "goal": "Claim the Castilian crown",
+   "reason": "Ferdinand's descent from Sancho IV and the Trastámara illegitimacy",
+   "ends_when": "Peace of Elvas (1382)",
+   "window": [
+    1378,
+    1382
+   ],
+   "weight": "normal",
+   "deviation": "Marry Beatriz into Castile instead (Salvaterra 1383)",
+   "aim": {
+    "kind": "fight",
+    "target": "castile"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "castile"
+   }
+  },
+  {
+   "realm": "portugal",
+   "goal": "Keep the English alliance",
+   "reason": "A counterweight to Castile",
+   "ends_when": "Castile is no threat",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "Neutral peace with Castile",
+   "aim": {
+    "kind": "ally",
+    "target": "england"
+   }
+  },
+  {
+   "realm": "portugal",
+   "goal": "Defend independence in the succession crisis",
+   "reason": "Ferdinand's heir is a girl promised to Castile",
+   "ends_when": "Avis secure, or union",
+   "window": [
+    1383,
+    1385
+   ],
+   "weight": "strong",
+   "deviation": "Accept a Castilian king consort",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Lisbon",
+      "at": [
+       -9.14,
+       38.72
+      ]
+     }
+    ]
+   },
+   "toward": [
+    "portuguese_crisis",
+    "battle_of_aljubarrota"
+   ]
+  },
+  {
+   "realm": "portugal",
+   "goal": "Turn to Morocco and the Atlantic",
+   "reason": "The nobility and the orders need land; trade",
+   "ends_when": "Ceuta held",
+   "window": [
+    1410,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "Stay in the Iberian wars",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Ceuta",
+      "at": [
+       -5.32,
+       35.89
+      ]
+     }
+    ],
+    "target": "morocco"
+   },
+   "toward": [
+    "conquest_of_ceuta",
+    "cape_bojador"
+   ]
+  },
+  {
+   "realm": "navarre",
+   "goal": "Recover the Norman lands and Montpellier",
+   "reason": "Charles II's inheritance was seized in 1378",
+   "ends_when": "Lands returned (exchanged for Nemours in 1404)",
+   "window": [
+    1378,
+    1404
+   ],
+   "weight": "normal",
+   "deviation": "Trade them for a French duchy",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Évreux",
+      "at": [
+       1.15,
+       49.02
+      ]
+     },
+     {
+      "name": "Pont-Audemer",
+      "at": [
+       0.51,
+       49.36
+      ]
+     },
+     {
+      "name": "Montpellier",
+      "at": [
+       3.88,
+       43.61
+      ]
+     }
+    ],
+    "target": "france"
+   }
+  },
+  {
+   "realm": "navarre",
+   "goal": "Survive between France, Castile and England",
+   "reason": "A small kingdom open on all sides",
+   "ends_when": "A stable peace with Castile",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "Lean fully on Castile after Briones",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Pamplona",
+      "at": [
+       -1.64,
+       42.81
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "castile"
+   }
+  },
+  {
+   "realm": "granada",
+   "goal": "Control the Strait and the Marinid court",
+   "reason": "Gibraltar and Ceuta guard Granada; a friendly Fez protects it",
+   "ends_when": "Marinid power independent, or the Strait lost",
+   "window": [
+    1378,
+    1399
+   ],
+   "weight": "normal",
+   "deviation": "Hold Gibraltar only",
+   "aim": {
+    "kind": "subject",
+    "target": "morocco"
+   },
+   "alternative": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Gibraltar",
+      "at": [
+       -5.35,
+       36.14
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "granada",
+   "goal": "Keep the peace with Castile without tribute",
+   "reason": "Castile is far stronger",
+   "ends_when": "Castile turns to war",
+   "window": [
+    1378,
+    1406
+   ],
+   "weight": "normal",
+   "deviation": "Raid when Castile is divided",
+   "aim": null,
+   "alternative": {
+    "kind": "fight",
+    "target": "castile"
+   }
+  },
+  {
+   "realm": "france",
+   "goal": "Drive the English out of Gascony, Calais, Brest and Cherbourg",
+   "reason": "The reconquest of 1369 to 1375 left a few footholds that keep the English claim alive",
+   "ends_when": "France holds Bordeaux, Bayonne and Calais, or a lasting peace",
+   "window": [
+    1378,
+    1453
+   ],
+   "weight": "strong",
+   "deviation": "Accept a long truce and turn to Flanders and Italy (Leulinghem 1389)",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Bordeaux",
+      "at": [
+       -0.58,
+       44.84
+      ]
+     },
+     {
+      "name": "Bayonne",
+      "at": [
+       -1.47,
+       43.49
+      ]
+     },
+     {
+      "name": "Calais",
+      "at": [
+       1.86,
+       50.95
+      ]
+     },
+     {
+      "name": "Brest",
+      "at": [
+       -4.49,
+       48.39
+      ]
+     }
+    ],
+    "target": "england"
+   },
+   "toward": [
+    "relief_of_orleans",
+    "battle_of_castillon"
+   ]
+  },
+  {
+   "realm": "france",
+   "goal": "Annex or tame Brittany",
+   "reason": "John IV sided with England; the crown wants Brittany's coast closed to English fleets",
+   "ends_when": "Brittany is royal, or a duke does homage and cuts off England",
+   "window": [
+    1378,
+    1381
+   ],
+   "weight": "normal",
+   "deviation": "Back a Penthièvre duke as a client instead",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Nantes",
+      "at": [
+       -1.55,
+       47.22
+      ]
+     },
+     {
+      "name": "Vannes",
+      "at": [
+       -2.76,
+       47.66
+      ]
+     },
+     {
+      "name": "Rennes",
+      "at": [
+       -1.68,
+       48.11
+      ]
+     }
+    ],
+    "target": "brittany"
+   },
+   "alternative": {
+    "kind": "subject",
+    "target": "brittany"
+   }
+  },
+  {
+   "realm": "france",
+   "goal": "Destroy Charles the Bad's power in France",
+   "reason": "Navarrese plots and Norman ports opened France to England",
+   "ends_when": "Navarre holds no fiefs in France, or takes compensation",
+   "window": [
+    1378,
+    1404
+   ],
+   "weight": "normal",
+   "deviation": "A settlement with Charles III (lands exchanged for Nemours, 1404)",
+   "aim": {
+    "kind": "fight",
+    "target": "navarre"
+   }
+  },
+  {
+   "realm": "france",
+   "goal": "Bring the Church to the French pope",
+   "reason": "A French pope at Avignon is a political asset and a source of revenue",
+   "ends_when": "The Schism is closed",
+   "window": [
+    1378,
+    1417
+   ],
+   "weight": "normal",
+   "deviation": "Neutrality and the way of cession (subtraction, 1398)",
+   "aim": null,
+   "toward": [
+    "western_schism",
+    "council_of_constance"
+   ]
+  },
+  {
+   "realm": "france",
+   "goal": "Clear the routiers from the centre",
+   "reason": "Free Companies ruin the tax base of Auvergne and the Limousin",
+   "ends_when": "The companies are bought out or crushed",
+   "window": [
+    1378,
+    1392
+   ],
+   "weight": "normal",
+   "deviation": "Lead them abroad (Castile, Italy) instead of buying them out",
+   "aim": {
+    "kind": "fight",
+    "target": "free_companies"
+   }
+  },
+  {
+   "realm": "burgundy",
+   "goal": "Secure the Flemish inheritance",
+   "reason": "His wife is heiress of Flanders, Artois, Nevers, Rethel and the Franche-Comté",
+   "ends_when": "He holds them (1384)",
+   "window": [
+    1378,
+    1385
+   ],
+   "weight": "strong",
+   "deviation": "Barter parts of it for royal favour or money",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Bruges",
+      "at": [
+       3.22,
+       51.21
+      ]
+     },
+     {
+      "name": "Arras",
+      "at": [
+       2.78,
+       50.29
+      ]
+     },
+     {
+      "name": "Nevers",
+      "at": [
+       3.16,
+       46.99
+      ]
+     },
+     {
+      "name": "Besançon",
+      "at": [
+       6.02,
+       47.24
+      ]
+     }
+    ],
+    "target": "flanders"
+   }
+  },
+  {
+   "realm": "burgundy",
+   "goal": "Dominate the royal council",
+   "reason": "A prince of the blood gains pensions, offices and royal armies (Roosebeke 1382)",
+   "ends_when": "A rival party controls the king (Orléans from 1392, Armagnac from 1410)",
+   "window": [
+    1380,
+    1404
+   ],
+   "weight": "normal",
+   "deviation": "Turn to the Low Countries and the Empire alone",
+   "aim": null,
+   "toward": [
+    "murder_of_orleans",
+    "burgundians_take_paris"
+   ]
+  },
+  {
+   "realm": "burgundy",
+   "goal": "Keep Flanders' wool trade with England",
+   "reason": "Flemish towns need English wool, and Ghent revolts (1379 to 1385)",
+   "ends_when": "The towns are reconciled (Tournai 1385)",
+   "window": [
+    1379,
+    1385
+   ],
+   "weight": "normal",
+   "deviation": "A trade truce with England separate from France",
+   "aim": null
+  },
+  {
+   "realm": "brittany",
+   "goal": "Restore the duke and ducal autonomy",
+   "reason": "John IV is exiled and the king seeks to annex the duchy",
+   "ends_when": "The duke rules from Vannes and Nantes with his privileges (Guérande 1381)",
+   "window": [
+    1378,
+    1381
+   ],
+   "weight": "strong",
+   "deviation": "Accept a Penthièvre duke if John IV dies",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Vannes",
+      "at": [
+       -2.76,
+       47.66
+      ]
+     },
+     {
+      "name": "Nantes",
+      "at": [
+       -1.55,
+       47.22
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "brittany",
+   "goal": "Recover Brest from England",
+   "reason": "The lease was the price of English help, and Bretons resent the garrison",
+   "ends_when": "Brest is returned (1397)",
+   "window": [
+    1381,
+    1397
+   ],
+   "weight": "normal",
+   "deviation": "Keep the English alliance as a check on France",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Brest",
+      "at": [
+       -4.49,
+       48.39
+      ]
+     }
+    ],
+    "target": "england"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "england"
+   }
+  },
+  {
+   "realm": "brittany",
+   "goal": "Keep the Penthièvre down",
+   "reason": "The Blois claim survives Auray and Guérande",
+   "ends_when": "The Penthièvre are crushed or reconciled",
+   "window": [
+    1378,
+    1420
+   ],
+   "weight": "normal",
+   "deviation": "Marry into them for peace (the 1380s attempts)",
+   "aim": null
+  },
+  {
+   "realm": "provence",
+   "goal": "Stay tied to whichever Angevin wins Naples",
+   "reason": "The barons and towns split on Joanna's succession (Union of Aix 1382 to 1387)",
+   "ends_when": "One heir is recognised by the estates (1387)",
+   "window": [
+    1380,
+    1388
+   ],
+   "weight": "normal",
+   "deviation": "Towns such as Nice seek another protector (Savoy, 1388)",
+   "aim": {
+    "kind": "ally",
+    "target": "anjou"
+   }
+  },
+  {
+   "realm": "provence",
+   "goal": "Hold the Durance and the Rhône against neighbours",
+   "reason": "Routiers, Savoy and the Dauphiné press on its borders",
+   "ends_when": "A strong count rules again",
+   "window": [
+    1378,
+    1400
+   ],
+   "weight": "normal",
+   "deviation": "Lean on France",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Sisteron",
+      "at": [
+       5.94,
+       44.2
+      ]
+     },
+     {
+      "name": "Tarascon",
+      "at": [
+       4.66,
+       43.81
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "france"
+   }
+  },
+  {
+   "realm": "anjou",
+   "goal": "Win the crown of Naples",
+   "reason": "Joanna adopts him (1380) and Clement VII backs him; a kingdom outranks an apanage",
+   "ends_when": "He holds Naples, or the Angevin claim is extinct",
+   "window": [
+    1380,
+    1442
+   ],
+   "weight": "strong",
+   "deviation": "Settle for Provence and influence in France",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Naples",
+      "at": [
+       14.25,
+       40.85
+      ]
+     }
+    ],
+    "target": "naples"
+   },
+   "alternative": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Aix",
+      "at": [
+       5.45,
+       43.53
+      ]
+     },
+     {
+      "name": "Marseille",
+      "at": [
+       5.37,
+       43.3
+      ]
+     }
+    ],
+    "target": "provence"
+   },
+   "toward": [
+    "durazzo_takes_naples",
+    "alfonso_takes_naples"
+   ]
+  },
+  {
+   "realm": "anjou",
+   "goal": "Hold the regency and the purse",
+   "reason": "The eldest uncle on the king's death needs money for Italy",
+   "ends_when": "Charles VI rules himself (1388)",
+   "window": [
+    1380,
+    1382
+   ],
+   "weight": "normal",
+   "deviation": "Stay as lieutenant in Languedoc",
+   "aim": null
+  },
+  {
+   "realm": "berry",
+   "goal": "Control Languedoc and its taxes",
+   "reason": "The richest royal lieutenancy funds his court",
+   "ends_when": "He loses it (1389)",
+   "window": [
+    1380,
+    1389
+   ],
+   "weight": "normal",
+   "deviation": "Patronage and building alone",
+   "aim": null
+  },
+  {
+   "realm": "berry",
+   "goal": "Keep a share of power between Burgundy and Orléans",
+   "reason": "As the elder uncle he wants a peace among princes that keeps his place",
+   "ends_when": "He dies (1416)",
+   "window": [
+    1392,
+    1416
+   ],
+   "weight": "normal",
+   "deviation": "Join the Orléans and Armagnac side (League of Gien, 1410)",
+   "aim": null,
+   "alternative": {
+    "kind": "ally",
+    "target": "armagnac"
+   }
+  },
+  {
+   "realm": "bourbon",
+   "goal": "Serve and guard the boy king",
+   "reason": "He is the king's uncle on the mother's side and a crusading knight",
+   "ends_when": "Charles VI rules himself (1388)",
+   "window": [
+    1380,
+    1388
+   ],
+   "weight": "normal",
+   "deviation": "A crusade abroad (Mahdia, 1390)",
+   "aim": null
+  },
+  {
+   "realm": "bourbon",
+   "goal": "Clear the routiers from the Bourbonnais and Auvergne",
+   "reason": "His lands border the routier country",
+   "ends_when": "The companies are gone",
+   "window": [
+    1378,
+    1392
+   ],
+   "weight": "normal",
+   "deviation": "Pay them off",
+   "aim": {
+    "kind": "fight",
+    "target": "free_companies"
+   }
+  },
+  {
+   "realm": "foix",
+   "goal": "Keep Béarn sovereign and neutral",
+   "reason": "Fébus holds Béarn of God alone and plays England against France",
+   "ends_when": "Béarn is subdued, or his line ends (1391)",
+   "window": [
+    1378,
+    1391
+   ],
+   "weight": "strong",
+   "deviation": "Seek the Languedoc lieutenancy (1380) against Berry",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Orthez",
+      "at": [
+       -0.77,
+       43.49
+      ]
+     },
+     {
+      "name": "Pau",
+      "at": [
+       -0.37,
+       43.3
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "foix",
+   "goal": "Keep Bigorre and the Pyrenean passes",
+   "reason": "They tie Foix to Béarn",
+   "ends_when": "They are held",
+   "window": [
+    1378,
+    1400
+   ],
+   "weight": "normal",
+   "deviation": "Trade them for peace with Armagnac",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Tarbes",
+      "at": [
+       0.08,
+       43.23
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "armagnac"
+   }
+  },
+  {
+   "realm": "armagnac",
+   "goal": "Build a great southern principality (Comminges, Bigorre)",
+   "reason": "Armagnac rivals Foix and leads the southern lords",
+   "ends_when": "It holds them, or is crushed (1443 to 1444)",
+   "window": [
+    1378,
+    1418
+   ],
+   "weight": "strong",
+   "deviation": "Buy the routiers and lead them to Italy (John III, 1391)",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Saint-Gaudens",
+      "at": [
+       0.72,
+       43.11
+      ]
+     },
+     {
+      "name": "Tarbes",
+      "at": [
+       0.08,
+       43.23
+      ]
+     },
+     {
+      "name": "Lourdes",
+      "at": [
+       -0.05,
+       43.1
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "armagnac",
+   "goal": "Serve the crown against England",
+   "reason": "French since 1368, with lands bordering Gascony",
+   "ends_when": "The English are gone from the south",
+   "window": [
+    1378,
+    1418
+   ],
+   "weight": "normal",
+   "deviation": "Change sides when the crown weakens (the 1440s English approach)",
+   "aim": {
+    "kind": "fight",
+    "target": "england"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "england"
+   }
+  },
+  {
+   "realm": "english_france",
+   "goal": "Hold the coastal footholds",
+   "reason": "Calais and Bordeaux carry the wool and wine trades; Brest and Cherbourg guard against invasion",
+   "ends_when": "They are lost or traded in a peace",
+   "window": [
+    1378,
+    1453
+   ],
+   "weight": "strong",
+   "deviation": "Trade Brest and Cherbourg for a truce (done 1394 to 1397)",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Calais",
+      "at": [
+       1.86,
+       50.95
+      ]
+     },
+     {
+      "name": "Bordeaux",
+      "at": [
+       -0.58,
+       44.84
+      ]
+     },
+     {
+      "name": "Brest",
+      "at": [
+       -4.49,
+       48.39
+      ]
+     },
+     {
+      "name": "Cherbourg",
+      "at": [
+       -1.62,
+       49.64
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Calais",
+      "at": [
+       1.86,
+       50.95
+      ]
+     },
+     {
+      "name": "Bordeaux",
+      "at": [
+       -0.58,
+       44.84
+      ]
+     }
+    ]
+   },
+   "toward": [
+    "battle_of_castillon"
+   ]
+  },
+  {
+   "realm": "free_companies",
+   "goal": "Live by ransoms from their castles",
+   "reason": "Unpaid soldiers with fortresses and an English excuse",
+   "ends_when": "They are bought out or beaten",
+   "window": [
+    1378,
+    1392
+   ],
+   "weight": "normal",
+   "deviation": "Sell their castles and take service in Italy or Castile",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Ventadour",
+      "at": [
+       2.1,
+       45.45
+      ]
+     },
+     {
+      "name": "Carlat",
+      "at": [
+       2.57,
+       44.89
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "orleans",
+   "goal": "Win power at court against Burgundy",
+   "reason": "The king's brother needs the treasury and the regency during the madness",
+   "ends_when": "Louis is murdered (1407), or Burgundy is broken",
+   "window": [
+    1392,
+    1435
+   ],
+   "weight": "strong",
+   "deviation": "Make peace with Burgundy through a marriage",
+   "aim": {
+    "kind": "fight",
+    "target": "burgundy"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "burgundy"
+   },
+   "toward": [
+    "murder_of_orleans",
+    "congress_of_arras"
+   ]
+  },
+  {
+   "realm": "orleans",
+   "goal": "Press the Visconti claim to Asti and Milan",
+   "reason": "Valentina Visconti's dowry (Asti) and her rights to Milan",
+   "ends_when": "The Visconti line holds, or Orléans holds Milan",
+   "window": [
+    1389,
+    1459
+   ],
+   "weight": "normal",
+   "deviation": "A Genoa venture (the 1394 to 1396 bid)",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Asti",
+      "at": [
+       8.21,
+       44.9
+      ]
+     },
+     {
+      "name": "Milan",
+      "at": [
+       9.19,
+       45.46
+      ]
+     }
+    ],
+    "target": "milan"
+   },
+   "alternative": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Genoa",
+      "at": [
+       8.93,
+       44.41
+      ]
+     }
+    ],
+    "target": "genoa"
+   },
+   "toward": [
+    "french_conquest_of_milan"
+   ]
+  },
+  {
+   "realm": "flanders",
+   "goal": "Bring Ghent to heel",
+   "reason": "Ghent's privileges and its veto on the Bruges canal block the count's revenue and control",
+   "ends_when": "Ghent is subdued, or the count dies",
+   "window": [
+    1379,
+    1385
+   ],
+   "weight": "strong",
+   "deviation": "Buy peace with charters (the count needs money)",
+   "aim": {
+    "kind": "subject",
+    "target": "ghent"
+   }
+  },
+  {
+   "realm": "flanders",
+   "goal": "Keep the wool trade with England open while staying a French vassal",
+   "reason": "Flemish cloth needs English wool; the count owes homage to France",
+   "ends_when": "The Burgundian succession fixes the line",
+   "window": [
+    1378,
+    1384
+   ],
+   "weight": "normal",
+   "deviation": "Lean to England if France presses",
+   "aim": null,
+   "alternative": {
+    "kind": "ally",
+    "target": "england"
+   }
+  },
+  {
+   "realm": "flanders",
+   "goal": "Secure Margaret's inheritance for Burgundy",
+   "reason": "She is the only heir; Philip the Bold protects the count against the towns",
+   "ends_when": "Inheritance done (1384)",
+   "window": [
+    1379,
+    1384
+   ],
+   "weight": "normal",
+   "deviation": "Seek another match only if Philip dies",
+   "aim": {
+    "kind": "ally",
+    "target": "burgundy"
+   }
+  },
+  {
+   "realm": "ghent",
+   "goal": "Defend its staple and privileges against the count and Bruges",
+   "reason": "The Bruges canal and new taxes threaten Ghent's grain and cloth",
+   "ends_when": "Peace on good terms, or crushed",
+   "window": [
+    1379,
+    1385
+   ],
+   "weight": "strong",
+   "deviation": "Submit early after a defeat",
+   "aim": {
+    "kind": "free",
+    "target": "flanders"
+   }
+  },
+  {
+   "realm": "ghent",
+   "goal": "Ally with England",
+   "reason": "England is Urbanist and the wool supplier; the Artevelde precedent",
+   "ends_when": "Peace with the count",
+   "window": [
+    1381,
+    1385
+   ],
+   "weight": "normal",
+   "deviation": "Seek imperial or Brabant mediation",
+   "aim": {
+    "kind": "ally",
+    "target": "england"
+   }
+  },
+  {
+   "realm": "brabant",
+   "goal": "Avenge Baesweiler and hold Grave and the Meuse",
+   "reason": "The 1371 defeat; border towns lost or pawned to Guelders and Jülich",
+   "ends_when": "Peace with Guelders",
+   "window": [
+    1378,
+    1399
+   ],
+   "weight": "normal",
+   "deviation": "Seek a Guelders marriage",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Grave",
+      "at": [
+       5.74,
+       51.76
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "guelders"
+   }
+  },
+  {
+   "realm": "brabant",
+   "goal": "Recover Antwerp and Mechelen",
+   "reason": "Lost to Flanders in 1357",
+   "ends_when": "Back under Brabant (1406, by succession)",
+   "window": [
+    1378,
+    1406
+   ],
+   "weight": "normal",
+   "deviation": "Accept a Burgundian Antwerp if a Burgundian heir is named",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Antwerp",
+      "at": [
+       4.4,
+       51.22
+      ]
+     },
+     {
+      "name": "Mechelen",
+      "at": [
+       4.48,
+       51.03
+      ]
+     }
+    ],
+    "target": "flanders"
+   }
+  },
+  {
+   "realm": "brabant",
+   "goal": "Settle the succession",
+   "reason": "Joanna is childless, and the estates are bound by the Joyous Entry",
+   "ends_when": "An heir is chosen (Burgundian, 1390s to 1406)",
+   "window": [
+    1383,
+    1406
+   ],
+   "weight": "normal",
+   "deviation": "A Luxembourg or Wittelsbach heir",
+   "aim": null
+  },
+  {
+   "realm": "luxembourg",
+   "goal": "Keep the duchy solvent and the lords at peace",
+   "reason": "Wenceslaus I is in debt from the Baesweiler ransom and his landfrieden",
+   "ends_when": "His death (1383)",
+   "window": [
+    1378,
+    1383
+   ],
+   "weight": "weak",
+   "deviation": "Pawn lands (as the next rulers did)",
+   "aim": null
+  },
+  {
+   "realm": "holland",
+   "goal": "Hold the Hook and Cod parties in balance",
+   "reason": "The parties tore the county in the 1350s; Albert rules as regent",
+   "ends_when": "Factions reconciled, or one crushed",
+   "window": [
+    1378,
+    1429
+   ],
+   "weight": "normal",
+   "deviation": "Side with one faction (the 1392 swing)",
+   "aim": null,
+   "toward": [
+    "treaty_of_delft"
+   ]
+  },
+  {
+   "realm": "holland",
+   "goal": "Win Frisia",
+   "reason": "An old comital claim; Frisian feuds give openings",
+   "ends_when": "Frisia taken, or the claim given up",
+   "window": [
+    1396,
+    1401
+   ],
+   "weight": "normal",
+   "deviation": "Settle for tribute or alliances with chieftains (tom Brok)",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Stavoren",
+      "at": [
+       5.36,
+       52.88
+      ]
+     },
+     {
+      "name": "Leeuwarden",
+      "at": [
+       5.8,
+       53.2
+      ]
+     }
+    ],
+    "target": "friesland"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "east_frisia"
+   }
+  },
+  {
+   "realm": "holland",
+   "goal": "Marry the house into the Burgundian circle",
+   "reason": "Security against France and Brabant (the 1385 double wedding at Cambrai)",
+   "ends_when": "Marriages made",
+   "window": [
+    1384,
+    1385
+   ],
+   "weight": "normal",
+   "deviation": "Marry into England or the Empire",
+   "aim": {
+    "kind": "ally",
+    "target": "burgundy"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "england"
+   }
+  },
+  {
+   "realm": "holland",
+   "goal": "Subdue Arkel and the river lords",
+   "reason": "They control the Merwede and the Linge",
+   "ends_when": "Arkel taken (1412)",
+   "window": [
+    1401,
+    1412
+   ],
+   "weight": "normal",
+   "deviation": "Leave Arkel as a vassal",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Gorinchem",
+      "at": [
+       4.97,
+       51.83
+      ]
+     },
+     {
+      "name": "Leerdam",
+      "at": [
+       5.09,
+       51.89
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "guelders",
+   "goal": "Win the succession war",
+   "reason": "Mathilda's party holds towns; the investiture alone is not enough",
+   "ends_when": "Mathilda renounces (24 Mar 1379)",
+   "window": [
+    1378,
+    1379
+   ],
+   "weight": "strong",
+   "deviation": "A compromise partition",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Nijmegen",
+      "at": [
+       5.86,
+       51.84
+      ]
+     },
+     {
+      "name": "Arnhem",
+      "at": [
+       5.9,
+       51.98
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "guelders",
+   "goal": "Take Grave and the Meuse from Brabant",
+   "reason": "Strategic river towns; Brabant hostile since Baesweiler",
+   "ends_when": "Peace with Brabant",
+   "window": [
+    1385,
+    1399
+   ],
+   "weight": "normal",
+   "deviation": "A marriage settlement",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Grave",
+      "at": [
+       5.74,
+       51.76
+      ]
+     }
+    ],
+    "target": "brabant"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "brabant"
+   }
+  },
+  {
+   "realm": "guelders",
+   "goal": "Ally with England against France and Burgundy",
+   "reason": "Brabant is French-backed; English money",
+   "ends_when": "The French or Burgundian threat is gone",
+   "window": [
+    1386,
+    1399
+   ],
+   "weight": "normal",
+   "deviation": "Make peace with France after the 1388 invasion",
+   "aim": {
+    "kind": "ally",
+    "target": "england"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "france"
+   }
+  },
+  {
+   "realm": "julich",
+   "goal": "Put his son on the Guelders throne",
+   "reason": "A family claim through Mary of Guelders",
+   "ends_when": "Done (1379)",
+   "window": [
+    1378,
+    1379
+   ],
+   "weight": "strong",
+   "deviation": "Partition with Mathilda",
+   "aim": {
+    "kind": "ally",
+    "target": "guelders"
+   }
+  },
+  {
+   "realm": "julich",
+   "goal": "Keep Aachen and the Lower Rhine landfrieden in his favour",
+   "reason": "The advocacy of Aachen; toll and robber-knight disputes",
+   "ends_when": "Lost to a rival",
+   "window": [
+    1378,
+    1393
+   ],
+   "weight": "normal",
+   "deviation": "Ally with Brabant for peace",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Aachen",
+      "at": [
+       6.08,
+       50.78
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "brabant"
+   }
+  },
+  {
+   "realm": "berg",
+   "goal": "Win ducal rank and grow on the right bank",
+   "reason": "Berg is rising against Cologne and Mark",
+   "ends_when": "Duchy granted (1380)",
+   "window": [
+    1378,
+    1380
+   ],
+   "weight": "normal",
+   "deviation": "Buy pledges from Cologne",
+   "aim": null
+  },
+  {
+   "realm": "berg",
+   "goal": "Inherit Jülich",
+   "reason": "The same house; the Jülich-Guelders line may die out",
+   "ends_when": "Inheritance (1423), or a new Jülich heir",
+   "window": [
+    1393,
+    1423
+   ],
+   "weight": "normal",
+   "deviation": "A marriage with Cleves",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Jülich",
+      "at": [
+       6.36,
+       50.92
+      ]
+     }
+    ],
+    "target": "julich"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "cleves"
+   }
+  },
+  {
+   "realm": "cleves",
+   "goal": "Unite Cleves and the Mark",
+   "reason": "The brothers' lands; Engelbert III has no male heir",
+   "ends_when": "Union (1391 to 1398)",
+   "window": [
+    1391,
+    1398
+   ],
+   "weight": "normal",
+   "deviation": "Partition among sons",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Hamm",
+      "at": [
+       7.82,
+       51.68
+      ]
+     }
+    ],
+    "target": "mark"
+   }
+  },
+  {
+   "realm": "cleves",
+   "goal": "Keep Jülich out of Guelders",
+   "reason": "A Jülich-Guelders block would surround Cleves",
+   "ends_when": "Jülich wins (1379)",
+   "window": [
+    1378,
+    1379
+   ],
+   "weight": "weak",
+   "deviation": "Make peace and seek Burgundian ties",
+   "aim": {
+    "kind": "fight",
+    "target": "julich"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "burgundy"
+   }
+  },
+  {
+   "realm": "cleves",
+   "goal": "Hold its own against Cologne",
+   "reason": "Rhine tolls and the Westphalian borders",
+   "ends_when": "Cologne weakened",
+   "window": [
+    1390,
+    1449
+   ],
+   "weight": "normal",
+   "deviation": "Ally with Cologne against Berg",
+   "aim": {
+    "kind": "fight",
+    "target": "cologne"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "cologne"
+   }
+  },
+  {
+   "realm": "mark",
+   "goal": "Win Dortmund's lordship or its money",
+   "reason": "A rich imperial city in the middle of the Mark",
+   "ends_when": "The Dortmund Feud fails (1389)",
+   "window": [
+    1388,
+    1389
+   ],
+   "weight": "normal",
+   "deviation": "Toll and protection deals",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Dortmund",
+      "at": [
+       7.47,
+       51.51
+      ]
+     }
+    ],
+    "target": "dortmund"
+   }
+  },
+  {
+   "realm": "liege",
+   "goal": "Govern with the estates under the Peace of the XXII",
+   "reason": "The towns enforce the 1316 and 1373 settlements",
+   "ends_when": "A bishop breaks them (John of Bavaria, 1390s to 1408)",
+   "window": [
+    1378,
+    1408
+   ],
+   "weight": "normal",
+   "deviation": "The bishop seeks outside help to rule alone",
+   "aim": null
+  },
+  {
+   "realm": "liege",
+   "goal": "Keep the see Urbanist",
+   "reason": "Urban VI made Arnold bishop; Clement names a rival",
+   "ends_when": "The Schism ends",
+   "window": [
+    1378,
+    1417
+   ],
+   "weight": "normal",
+   "deviation": "Accept Clement if Brabant and France press",
+   "aim": null
+  },
+  {
+   "realm": "utrecht",
+   "goal": "Hold the Oversticht towns and Drenthe together",
+   "reason": "They are cut off by the Veluwe, and the IJssel towns act alone",
+   "ends_when": "The towns are loyal",
+   "window": [
+    1378,
+    1449
+   ],
+   "weight": "normal",
+   "deviation": "Let the towns go their own way",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Deventer",
+      "at": [
+       6.16,
+       52.25
+      ]
+     },
+     {
+      "name": "Zwolle",
+      "at": [
+       6.09,
+       52.51
+      ]
+     },
+     {
+      "name": "Coevorden",
+      "at": [
+       6.74,
+       52.66
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "utrecht",
+   "goal": "Keep Holland and Guelders out",
+   "reason": "Both press on the Sticht",
+   "ends_when": "Peace with both",
+   "window": [
+    1378,
+    1449
+   ],
+   "weight": "normal",
+   "deviation": "Ally with one against the other",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Utrecht",
+      "at": [
+       5.12,
+       52.09
+      ]
+     },
+     {
+      "name": "Amersfoort",
+      "at": [
+       5.39,
+       52.16
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "guelders"
+   }
+  },
+  {
+   "realm": "cologne",
+   "goal": "Pay off debts and hold the Rhine tolls",
+   "reason": "Debts from earlier archbishops; tolls are the main revenue",
+   "ends_when": "Finances restored",
+   "window": [
+    1378,
+    1414
+   ],
+   "weight": "normal",
+   "deviation": "Pawn lands to the nobles",
+   "aim": null
+  },
+  {
+   "realm": "cologne",
+   "goal": "Master the city of Cologne",
+   "reason": "The city fought the archbishop until 1377",
+   "ends_when": "City subdued (it never was)",
+   "window": [
+    1378,
+    1414
+   ],
+   "weight": "weak",
+   "deviation": "Live with the city",
+   "aim": {
+    "kind": "subject",
+    "target": "cologne_city"
+   }
+  },
+  {
+   "realm": "cologne",
+   "goal": "Hold Westphalia against Mark and Dortmund",
+   "reason": "Westphalia was bought in 1368, and Mark encroaches",
+   "ends_when": "Westphalia secure",
+   "window": [
+    1378,
+    1399
+   ],
+   "weight": "normal",
+   "deviation": "Ally with Mark against Dortmund (as in 1388)",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Soest",
+      "at": [
+       8.11,
+       51.57
+      ]
+     },
+     {
+      "name": "Arnsberg",
+      "at": [
+       8.06,
+       51.4
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "mark"
+   }
+  },
+  {
+   "realm": "cologne_city",
+   "goal": "Keep its freedom from the archbishop",
+   "reason": "Worringen (1288) and the war of 1375 to 1377",
+   "ends_when": "Freedom recognised (1475)",
+   "window": [
+    1378,
+    1475
+   ],
+   "weight": "strong",
+   "deviation": "Seek imperial privileges",
+   "aim": {
+    "kind": "free",
+    "target": "cologne"
+   }
+  },
+  {
+   "realm": "cologne_city",
+   "goal": "Settle its own government",
+   "reason": "Patrician feuds; the guilds want a share",
+   "ends_when": "A new constitution (1396)",
+   "window": [
+    1390,
+    1399
+   ],
+   "weight": "normal",
+   "deviation": "Patrician rule continues",
+   "aim": null
+  },
+  {
+   "realm": "mainz",
+   "goal": "Win the see against Louis of Meissen",
+   "reason": "The chapter's choice against Charles IV's",
+   "ends_when": "Recognised (1381)",
+   "window": [
+    1378,
+    1381
+   ],
+   "weight": "strong",
+   "deviation": "Accept a compensation see",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Mainz",
+      "at": [
+       8.27,
+       50.0
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "mainz",
+   "goal": "Use the Schism to get confirmation",
+   "reason": "Clement VII offers what Urban and Charles refused",
+   "ends_when": "Rome recognises him (1381)",
+   "window": [
+    1378,
+    1381
+   ],
+   "weight": "normal",
+   "deviation": "Wait for Urban",
+   "aim": null
+  },
+  {
+   "realm": "mainz",
+   "goal": "Contain Hesse and keep the Hessian enclaves",
+   "reason": "Fritzlar and Amöneburg sit inside Hesse",
+   "ends_when": "Peace, or defeat",
+   "window": [
+    1380,
+    1427
+   ],
+   "weight": "normal",
+   "deviation": "An alliance with Hesse",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Fritzlar",
+      "at": [
+       9.27,
+       51.13
+      ]
+     },
+     {
+      "name": "Amöneburg",
+      "at": [
+       8.92,
+       50.8
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "hesse"
+   }
+  },
+  {
+   "realm": "trier",
+   "goal": "Build up the territory and its finances",
+   "reason": "Kuno inherited debts; Koblenz and the Moselle lands",
+   "ends_when": "Kuno dies (1388)",
+   "window": [
+    1378,
+    1388
+   ],
+   "weight": "normal",
+   "deviation": "Pledge lands",
+   "aim": null
+  },
+  {
+   "realm": "trier",
+   "goal": "Back the Roman pope and Wenceslaus",
+   "reason": "Kuno is a Luxembourg ally",
+   "ends_when": "Wenceslaus deposed (1400)",
+   "window": [
+    1378,
+    1400
+   ],
+   "weight": "normal",
+   "deviation": "Join the electors against him",
+   "aim": {
+    "kind": "ally",
+    "target": "bohemia"
+   },
+   "toward": [
+    "wenceslaus_deposed"
+   ]
+  },
+  {
+   "realm": "palatinate",
+   "goal": "Lead the Rhine princes against the city leagues",
+   "reason": "The leagues threaten princely tolls and lordship",
+   "ends_when": "The cities are beaten (1388 to 1389)",
+   "window": [
+    1381,
+    1389
+   ],
+   "weight": "normal",
+   "deviation": "Make a landfriede with the cities",
+   "aim": null
+  },
+  {
+   "realm": "palatinate",
+   "goal": "Recover the Upper Palatinate and the family's rank",
+   "reason": "Charles IV took parts of it as New Bohemia",
+   "ends_when": "Recovered, or the Luxembourg crown falls",
+   "window": [
+    1378,
+    1400
+   ],
+   "weight": "normal",
+   "deviation": "Marriage alliances",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Sulzbach",
+      "at": [
+       11.75,
+       49.5
+      ]
+     },
+     {
+      "name": "Amberg",
+      "at": [
+       11.86,
+       49.44
+      ]
+     }
+    ],
+    "target": "bohemia"
+   }
+  },
+  {
+   "realm": "palatinate",
+   "goal": "Put a Palatine on the German throne",
+   "reason": "Wenceslaus is weak and Rupert III is able",
+   "ends_when": "Rupert elected (1400)",
+   "window": [
+    1395,
+    1400
+   ],
+   "weight": "normal",
+   "deviation": "Back another candidate",
+   "aim": null,
+   "toward": [
+    "wenceslaus_deposed"
+   ]
+  },
+  {
+   "realm": "hesse",
+   "goal": "Survive the Mainz, Brunswick and Thuringia coalition",
+   "reason": "Neighbours eye the Hessian fiefs; Kassel besieged in 1385",
+   "ends_when": "Peace (1388)",
+   "window": [
+    1378,
+    1388
+   ],
+   "weight": "strong",
+   "deviation": "Accept Mainz's overlordship over parts",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Kassel",
+      "at": [
+       9.48,
+       51.32
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "hesse",
+   "goal": "Absorb Ziegenhain, Waldeck and Katzenelnbogen",
+   "reason": "Inheritance pacts and pledges",
+   "ends_when": "Absorbed",
+   "window": [
+    1390,
+    1479
+   ],
+   "weight": "normal",
+   "deviation": "Growth by marriage",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Ziegenhain",
+      "at": [
+       9.25,
+       50.91
+      ]
+     },
+     {
+      "name": "Waldeck",
+      "at": [
+       9.06,
+       51.21
+      ]
+     },
+     {
+      "name": "Katzenelnbogen",
+      "at": [
+       7.97,
+       50.27
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "lorraine",
+   "goal": "Win over Metz",
+   "reason": "A rich free city inside the duchy",
+   "ends_when": "Metz falls (never in the period)",
+   "window": [
+    1378,
+    1449
+   ],
+   "weight": "normal",
+   "deviation": "Protection deals with Metz",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Metz",
+      "at": [
+       6.18,
+       49.12
+      ]
+     }
+    ],
+    "target": "metz"
+   }
+  },
+  {
+   "realm": "lorraine",
+   "goal": "Serve and lean on France",
+   "reason": "John I is in French service",
+   "ends_when": "French collapse (1410s)",
+   "window": [
+    1378,
+    1410
+   ],
+   "weight": "normal",
+   "deviation": "Turn to Burgundy (as Charles II did)",
+   "aim": {
+    "kind": "ally",
+    "target": "france"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "burgundy"
+   }
+  },
+  {
+   "realm": "friesland",
+   "goal": "Keep the Frisian freedom",
+   "reason": "Holland's claim and the chieftains' ambitions",
+   "ends_when": "Freedom lost",
+   "window": [
+    1378,
+    1498
+   ],
+   "weight": "normal",
+   "deviation": "One party calls in Holland or Groningen",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Leeuwarden",
+      "at": [
+       5.8,
+       53.2
+      ]
+     },
+     {
+      "name": "Sneek",
+      "at": [
+       5.66,
+       53.03
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "east_frisia",
+   "goal": "Unite East Frisia under the tom Brok",
+   "reason": "Ocko I and his heirs build a lordship over the chieftains",
+   "ends_when": "The tom Brok fall (1427)",
+   "window": [
+    1379,
+    1427
+   ],
+   "weight": "normal",
+   "deviation": "Ally with Holland or the Hanse",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Aurich",
+      "at": [
+       7.48,
+       53.47
+      ]
+     },
+     {
+      "name": "Emden",
+      "at": [
+       7.21,
+       53.37
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "holland"
+   }
+  },
+  {
+   "realm": "munster",
+   "goal": "Hold the Emsland and the Lippe border",
+   "reason": "Tecklenburg and Mark press on them",
+   "ends_when": "Peace",
+   "window": [
+    1378,
+    1409
+   ],
+   "weight": "normal",
+   "deviation": "Pledge castles",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Meppen",
+      "at": [
+       7.29,
+       52.69
+      ]
+     },
+     {
+      "name": "Beckum",
+      "at": [
+       8.04,
+       51.76
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "hre",
+   "goal": "Secure Wenceslaus's succession",
+   "reason": "Charles IV bought the electors' votes so the crown stays Luxembourg",
+   "ends_when": "Wenceslaus reigns unopposed",
+   "window": [
+    1378,
+    1379
+   ],
+   "weight": "strong",
+   "deviation": "A weak succession invites a rival king early",
+   "aim": null,
+   "toward": [
+    "death_of_charles_iv"
+   ]
+  },
+  {
+   "realm": "hre",
+   "goal": "Back Urban VI and end the Schism",
+   "reason": "The Empire protects the Church, and Urban crowns emperors in Rome",
+   "ends_when": "One Pope again (Constance 1417)",
+   "window": [
+    1378,
+    1417
+   ],
+   "weight": "normal",
+   "deviation": "Neutrality, as the electors chose in 1438",
+   "aim": null,
+   "toward": [
+    "western_schism",
+    "council_of_pisa",
+    "council_of_constance",
+    "election_of_martin_v"
+   ]
+  },
+  {
+   "realm": "hre",
+   "goal": "Keep the public peace between princes and city leagues",
+   "reason": "The Swabian and Rhenish city leagues fight the princes",
+   "ends_when": "Leagues dissolved (Eger 1389)",
+   "window": [
+    1378,
+    1389
+   ],
+   "weight": "normal",
+   "deviation": "Side openly with the princes or the towns",
+   "aim": null
+  },
+  {
+   "realm": "hre",
+   "goal": "Depose a negligent king",
+   "reason": "The electors resent Wenceslaus's absence and his sale of Milan's ducal title",
+   "ends_when": "A new king elected",
+   "window": [
+    1395,
+    1400
+   ],
+   "weight": "normal",
+   "deviation": "Wenceslaus stays if he governs the Empire",
+   "aim": null,
+   "toward": [
+    "wenceslaus_deposed"
+   ]
+  },
+  {
+   "realm": "brandenburg",
+   "goal": "Keep the Mark and its vote in Luxembourg hands",
+   "reason": "Two of seven votes make the house kingmaker",
+   "ends_when": "The Luxembourgs lose the Mark",
+   "window": [
+    1378,
+    1415
+   ],
+   "weight": "strong",
+   "deviation": "Pledge it for cash, as Jobst got it in 1388",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Tangermünde",
+      "at": [
+       11.97,
+       52.54
+      ]
+     },
+     {
+      "name": "Berlin",
+      "at": [
+       13.4,
+       52.52
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "brandenburg",
+   "goal": "Raise money from the Mark",
+   "reason": "Sigismund needs funds for his Hungarian marriage and crown",
+   "ends_when": "Sigismund has Hungary's revenues",
+   "window": [
+    1379,
+    1388
+   ],
+   "weight": "normal",
+   "deviation": "Sell the Neumark (done 1402)",
+   "aim": null,
+   "toward": [
+    "sigismund_king_of_hungary"
+   ]
+  },
+  {
+   "realm": "brandenburg",
+   "goal": "Restrain the robber nobility (the Quitzows)",
+   "reason": "Absent lords leave the Mark lawless",
+   "ends_when": "A resident margrave rules",
+   "window": [
+    1388,
+    1415
+   ],
+   "weight": "weak",
+   "deviation": "Leave it to the towns' leagues",
+   "aim": null
+  },
+  {
+   "realm": "saxe_wittenberg",
+   "goal": "Win Lüneburg for the Ascanians",
+   "reason": "Charles IV's grant of 1370 and the 1373 settlement",
+   "ends_when": "Wenceslaus of Saxony dies or Winsen is lost (1388)",
+   "window": [
+    1378,
+    1388
+   ],
+   "weight": "strong",
+   "deviation": "Settle for the alternation and marriages",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Lüneburg",
+      "at": [
+       10.41,
+       53.25
+      ]
+     },
+     {
+      "name": "Winsen",
+      "at": [
+       10.21,
+       53.36
+      ]
+     }
+    ],
+    "target": "luneburg"
+   }
+  },
+  {
+   "realm": "saxe_wittenberg",
+   "goal": "Hold the electoral vote against Lauenburg",
+   "reason": "The Golden Bull gave the vote to Wittenberg",
+   "ends_when": "The line dies out (1422)",
+   "window": [
+    1378,
+    1422
+   ],
+   "weight": "normal",
+   "deviation": "Union with Lauenburg by marriage",
+   "aim": null,
+   "alternative": {
+    "kind": "ally",
+    "target": "saxe_lauenburg"
+   }
+  },
+  {
+   "realm": "saxony",
+   "goal": "Divide the inheritance among the brothers",
+   "reason": "Three adult brothers, each with heirs",
+   "ends_when": "A division is made (Chemnitz 1382)",
+   "window": [
+    1379,
+    1382
+   ],
+   "weight": "normal",
+   "deviation": "Keep joint rule longer",
+   "aim": null
+  },
+  {
+   "realm": "saxony",
+   "goal": "Win the Saxon electorate",
+   "reason": "A vote and a duke's rank; Wittenberg's line is thin",
+   "ends_when": "Granted (1423) or the Ascanians survive",
+   "window": [
+    1400,
+    1423
+   ],
+   "weight": "strong",
+   "deviation": "Seek Brandenburg or Bohemian land instead",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Wittenberg",
+      "at": [
+       12.65,
+       51.87
+      ]
+     }
+    ],
+    "target": "saxe_wittenberg"
+   }
+  },
+  {
+   "realm": "saxony",
+   "goal": "Place Ludwig in a great see",
+   "reason": "Church provision for a younger son",
+   "ends_when": "Ludwig dies (1382)",
+   "window": [
+    1378,
+    1382
+   ],
+   "weight": "weak",
+   "deviation": "Another Wettin bishop (Meissen, Naumburg)",
+   "aim": null
+  },
+  {
+   "realm": "saxony",
+   "goal": "Hold the Bohemian border",
+   "reason": "Luxembourg power next door, later the Hussites",
+   "ends_when": "Bohemia is quiet or Wettin-friendly",
+   "window": [
+    1378,
+    1436
+   ],
+   "weight": "normal",
+   "deviation": "Expand into Lusatia",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Meissen",
+      "at": [
+       13.47,
+       51.16
+      ]
+     },
+     {
+      "name": "Dresden",
+      "at": [
+       13.74,
+       51.05
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Bautzen",
+      "at": [
+       14.42,
+       51.18
+      ]
+     }
+    ],
+    "target": "bohemia"
+   },
+   "toward": [
+    "anti_hussite_crusade"
+   ]
+  },
+  {
+   "realm": "luneburg",
+   "goal": "Recover Lüneburg from the Ascanians",
+   "reason": "Welf house law makes them the heirs",
+   "ends_when": "Won (1388)",
+   "window": [
+    1378,
+    1388
+   ],
+   "weight": "strong",
+   "deviation": "Accept the alternation treaty",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Lüneburg",
+      "at": [
+       10.41,
+       53.25
+      ]
+     },
+     {
+      "name": "Winsen",
+      "at": [
+       10.21,
+       53.36
+      ]
+     }
+    ],
+    "target": "saxe_wittenberg"
+   }
+  },
+  {
+   "realm": "luneburg",
+   "goal": "Subdue Lüneburg town",
+   "reason": "The town expelled the dukes and backs the Ascanians",
+   "ends_when": "The town settles (Sate of 1392)",
+   "window": [
+    1378,
+    1392
+   ],
+   "weight": "normal",
+   "deviation": "Leave the town free for its salt money",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Lüneburg",
+      "at": [
+       10.41,
+       53.25
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "brunswick_wolfenbuttel",
+   "goal": "Throw off Otto the Evil's regency",
+   "reason": "Frederick is of age and Otto treats the lands as his own",
+   "ends_when": "Otto is out (1381/84)",
+   "window": [
+    1378,
+    1384
+   ],
+   "weight": "strong",
+   "deviation": "Share the lands with Otto",
+   "aim": {
+    "kind": "free",
+    "target": "brunswick_gottingen"
+   }
+  },
+  {
+   "realm": "brunswick_wolfenbuttel",
+   "goal": "Bring Brunswick city to heel",
+   "reason": "The city holds ducal pledges and resists",
+   "ends_when": "The city submits (not before 1671)",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "Borrow from the city instead",
+   "aim": {
+    "kind": "subject",
+    "target": "brunswick_city"
+   }
+  },
+  {
+   "realm": "brunswick_wolfenbuttel",
+   "goal": "Seek a crown through Frederick's candidacy",
+   "reason": "Frederick is a leading prince of the reform party",
+   "ends_when": "Frederick murdered at Fritzlar (1400)",
+   "window": [
+    1390,
+    1400
+   ],
+   "weight": "weak",
+   "deviation": "Stay a regional prince",
+   "aim": null,
+   "toward": [
+    "wenceslaus_deposed"
+   ]
+  },
+  {
+   "realm": "brunswick_gottingen",
+   "goal": "Rule the Brunswick lands",
+   "reason": "The 1370 succession pact with Magnus II",
+   "ends_when": "Driven out (1381/84)",
+   "window": [
+    1378,
+    1384
+   ],
+   "weight": "strong",
+   "deviation": "Bargain for a share",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Brunswick",
+      "at": [
+       10.52,
+       52.27
+      ]
+     },
+     {
+      "name": "Wolfenbüttel",
+      "at": [
+       10.54,
+       52.16
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "brunswick_gottingen",
+   "goal": "Feud with Hesse and the towns",
+   "reason": "Otto's way of rule, and the Sterner knights' cause",
+   "ends_when": "Otto dies (1394)",
+   "window": [
+    1378,
+    1394
+   ],
+   "weight": "normal",
+   "deviation": "Peace with Hesse",
+   "aim": {
+    "kind": "fight",
+    "target": "hesse"
+   }
+  },
+  {
+   "realm": "mecklenburg",
+   "goal": "Put Albert IV on the Danish throne",
+   "reason": "Ingeborg's line is senior to Margaret's",
+   "ends_when": "Albert IV dies (1388) or Margaret rules unopposed",
+   "window": [
+    1378,
+    1388
+   ],
+   "weight": "strong",
+   "deviation": "Make terms with Margaret",
+   "aim": {
+    "kind": "fight",
+    "target": "denmark"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "denmark"
+   }
+  },
+  {
+   "realm": "mecklenburg",
+   "goal": "Keep Albert king in Sweden",
+   "reason": "Family prestige, and Swedish castles and revenues",
+   "ends_when": "Albert loses at Åsle (1389) and is freed (1395)",
+   "window": [
+    1378,
+    1395
+   ],
+   "weight": "strong",
+   "deviation": "Let the Swedish magnates rule",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Stockholm",
+      "at": [
+       18.07,
+       59.33
+      ]
+     },
+     {
+      "name": "Kalmar",
+      "at": [
+       16.36,
+       56.66
+      ]
+     }
+    ]
+   },
+   "toward": [
+    "kalmar_union"
+   ]
+  },
+  {
+   "realm": "mecklenburg",
+   "goal": "Wage privateer war on Denmark",
+   "reason": "To relieve Stockholm through the Victual Brothers",
+   "ends_when": "Stockholm handed over (1398)",
+   "window": [
+    1389,
+    1398
+   ],
+   "weight": "normal",
+   "deviation": "Hanseatic mediation",
+   "aim": {
+    "kind": "fight",
+    "target": "denmark"
+   }
+  },
+  {
+   "realm": "holstein",
+   "goal": "Win Schleswig as a hereditary fief",
+   "reason": "They hold most of it by pledge and want the title",
+   "ends_when": "Enfeoffed (1386; hereditary 1440)",
+   "window": [
+    1378,
+    1440
+   ],
+   "weight": "strong",
+   "deviation": "Hold the pledges only",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Schleswig",
+      "at": [
+       9.57,
+       54.52
+      ]
+     },
+     {
+      "name": "Flensburg",
+      "at": [
+       9.44,
+       54.78
+      ]
+     }
+    ],
+    "target": "denmark"
+   }
+  },
+  {
+   "realm": "holstein",
+   "goal": "Subdue Dithmarschen",
+   "reason": "The free peasants block the west coast",
+   "ends_when": "Conquered (1559) or a crushing defeat",
+   "window": [
+    1378,
+    1404
+   ],
+   "weight": "normal",
+   "deviation": "Accept a truce",
+   "aim": {
+    "kind": "subject",
+    "target": "dithmarschen"
+   }
+  },
+  {
+   "realm": "holstein",
+   "goal": "Reunite the Schauenburg lines",
+   "reason": "The Kiel and Plön line has no heir",
+   "ends_when": "Adolf VII dies (1390)",
+   "window": [
+    1378,
+    1390
+   ],
+   "weight": "weak",
+   "deviation": "Leave it to cousins",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Kiel",
+      "at": [
+       10.13,
+       54.32
+      ]
+     },
+     {
+      "name": "Plön",
+      "at": [
+       10.42,
+       54.16
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "hanseatic_league",
+   "goal": "Keep the Stralsund settlement",
+   "reason": "It gave the towns the Sound trade and the Scanian castles",
+   "ends_when": "Castles returned (1385) or Denmark breaks the terms",
+   "window": [
+    1378,
+    1385
+   ],
+   "weight": "strong",
+   "deviation": "Renew the castle pledge",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Skanör",
+      "at": [
+       12.84,
+       55.42
+      ]
+     },
+     {
+      "name": "Falsterbo",
+      "at": [
+       12.83,
+       55.4
+      ]
+     },
+     {
+      "name": "Malmö",
+      "at": [
+       12.99,
+       55.61
+      ]
+     },
+     {
+      "name": "Helsingborg",
+      "at": [
+       12.69,
+       56.05
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "hanseatic_league",
+   "goal": "Keep the Baltic safe from pirates",
+   "reason": "Trade loses ships and goods",
+   "ends_when": "The Victual Brothers are crushed (1401)",
+   "window": [
+    1389,
+    1401
+   ],
+   "weight": "normal",
+   "deviation": "Hire the pirates as allies",
+   "aim": null
+  },
+  {
+   "realm": "hanseatic_league",
+   "goal": "Defend the Kontore",
+   "reason": "Bruges, London, Bergen and Novgorod carry its trade",
+   "ends_when": "Privileges lost",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "strong",
+   "deviation": "Blockade the offender (Flanders 1388)",
+   "aim": null
+  },
+  {
+   "realm": "hanseatic_league",
+   "goal": "Keep member towns governed by their councils",
+   "reason": "Guild risings like Brunswick's in 1374 threaten the order",
+   "ends_when": "No rising for a generation",
+   "window": [
+    1378,
+    1418
+   ],
+   "weight": "normal",
+   "deviation": "Accept the new regime",
+   "aim": null
+  },
+  {
+   "realm": "lubeck",
+   "goal": "Lead the Hanse",
+   "reason": "Directing town since Stralsund",
+   "ends_when": "The league breaks up",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "strong",
+   "deviation": "Lead only the Wendish towns",
+   "aim": null
+  },
+  {
+   "realm": "lubeck",
+   "goal": "Gain land along the road to Hamburg",
+   "reason": "The overland route and the Mölln pledge",
+   "ends_when": "Bergedorf won (1420)",
+   "window": [
+    1378,
+    1420
+   ],
+   "weight": "normal",
+   "deviation": "Buy more pledges",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Mölln",
+      "at": [
+       10.69,
+       53.63
+      ]
+     },
+     {
+      "name": "Bergedorf",
+      "at": [
+       10.21,
+       53.49
+      ]
+     }
+    ],
+    "target": "saxe_lauenburg"
+   }
+  },
+  {
+   "realm": "hamburg",
+   "goal": "Hold the lower Elbe",
+   "reason": "Its trade needs the river mouth",
+   "ends_when": "Ritzebüttel taken (1394)",
+   "window": [
+    1378,
+    1420
+   ],
+   "weight": "normal",
+   "deviation": "Treaties with the counts",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Ritzebüttel",
+      "at": [
+       8.7,
+       53.87
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "hamburg",
+   "goal": "Loosen Schauenburg lordship",
+   "reason": "Self-government",
+   "ends_when": "Imperial status (1510)",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "Stay a privileged lordship town",
+   "aim": {
+    "kind": "free",
+    "target": "holstein"
+   }
+  },
+  {
+   "realm": "brunswick_city",
+   "goal": "Get back into the Hanse",
+   "reason": "Exclusion cuts its trade",
+   "ends_when": "Readmitted (1380)",
+   "window": [
+    1378,
+    1380
+   ],
+   "weight": "strong",
+   "deviation": "Trade through other towns",
+   "aim": {
+    "kind": "ally",
+    "target": "hanseatic_league"
+   }
+  },
+  {
+   "realm": "brunswick_city",
+   "goal": "Settle the council",
+   "reason": "The Great Schicht split the city",
+   "ends_when": "New constitution (1386)",
+   "window": [
+    1378,
+    1386
+   ],
+   "weight": "normal",
+   "deviation": "Old families return",
+   "aim": null
+  },
+  {
+   "realm": "bremen",
+   "goal": "Help the Welf kin in Lüneburg",
+   "reason": "Archbishop Albert is a Welf",
+   "ends_when": "The war ends (1388)",
+   "window": [
+    1378,
+    1388
+   ],
+   "weight": "normal",
+   "deviation": "Stay neutral and pay off debts",
+   "aim": {
+    "kind": "ally",
+    "target": "luneburg"
+   }
+  },
+  {
+   "realm": "bremen",
+   "goal": "Assert lordship over the city and the marshes",
+   "reason": "Revenue and rights",
+   "ends_when": "The city wins imperial-style freedom",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "Concentrate on Stade",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Bremen",
+      "at": [
+       8.81,
+       53.08
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Stade",
+      "at": [
+       9.48,
+       53.6
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "magdeburg",
+   "goal": "Serve Luxembourg policy",
+   "reason": "Archbishop Peter was placed by Charles IV",
+   "ends_when": "Peter leaves (1381)",
+   "window": [
+    1378,
+    1381
+   ],
+   "weight": "normal",
+   "deviation": "Lean to the Wettins, who take the see in 1381",
+   "aim": {
+    "kind": "ally",
+    "target": "bohemia"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "saxony"
+   }
+  },
+  {
+   "realm": "magdeburg",
+   "goal": "Control the towns of Magdeburg and Halle",
+   "reason": "Revenue and authority",
+   "ends_when": "Never fully",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "Pledge rights to the towns",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Magdeburg",
+      "at": [
+       11.63,
+       52.13
+      ]
+     },
+     {
+      "name": "Halle",
+      "at": [
+       11.97,
+       51.48
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "hildesheim",
+   "goal": "Keep the Welfs out",
+   "reason": "Dinklar (1367) and the ducal threat",
+   "ends_when": "The Welfs unite against the see",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "Ally with one Welf line",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Hildesheim",
+      "at": [
+       9.95,
+       52.15
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "brunswick_wolfenbuttel"
+   }
+  },
+  {
+   "realm": "pomerania",
+   "goal": "Keep the Luxembourg friendship",
+   "reason": "Sigismund is a Griffin grandson, which shields them from Brandenburg",
+   "ends_when": "The Luxembourgs lose the Mark (1415)",
+   "window": [
+    1378,
+    1415
+   ],
+   "weight": "normal",
+   "deviation": "Lean to Poland",
+   "aim": {
+    "kind": "ally",
+    "target": "bohemia"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "poland"
+   }
+  },
+  {
+   "realm": "pomerania",
+   "goal": "Take the Uckermark",
+   "reason": "Brandenburg is weak under absent lords",
+   "ends_when": "Hohenzollern recovery (1420s)",
+   "window": [
+    1388,
+    1420
+   ],
+   "weight": "normal",
+   "deviation": "Buy pledges",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Prenzlau",
+      "at": [
+       13.86,
+       53.32
+      ]
+     }
+    ],
+    "target": "brandenburg"
+   }
+  },
+  {
+   "realm": "pomerania",
+   "goal": "Win a crown for the Stolp line",
+   "reason": "Wartislaw VII's son Eric is Margaret's grandnephew",
+   "ends_when": "Eric adopted (1389) or the line fails",
+   "window": [
+    1385,
+    1389
+   ],
+   "weight": "weak",
+   "deviation": "Keep to Pomerania",
+   "aim": {
+    "kind": "ally",
+    "target": "denmark"
+   },
+   "toward": [
+    "kalmar_union"
+   ]
+  },
+  {
+   "realm": "saxe_lauenburg",
+   "goal": "Claim the Saxon vote",
+   "reason": "Lauenburg sees itself as the senior Ascanian line",
+   "ends_when": "The vote passes to the Wettins (1423)",
+   "window": [
+    1378,
+    1423
+   ],
+   "weight": "weak",
+   "deviation": "Accept Wittenberg and seek marriage",
+   "aim": null,
+   "alternative": {
+    "kind": "ally",
+    "target": "saxe_wittenberg"
+   }
+  },
+  {
+   "realm": "saxe_lauenburg",
+   "goal": "Redeem Mölln and Bergedorf",
+   "reason": "Pledged to Lübeck",
+   "ends_when": "Lost (1401 and 1420)",
+   "window": [
+    1378,
+    1420
+   ],
+   "weight": "normal",
+   "deviation": "Sell the reversion",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Mölln",
+      "at": [
+       10.69,
+       53.63
+      ]
+     },
+     {
+      "name": "Bergedorf",
+      "at": [
+       10.21,
+       53.49
+      ]
+     }
+    ],
+    "target": "lubeck"
+   }
+  },
+  {
+   "realm": "dithmarschen",
+   "goal": "Stay free of Holstein",
+   "reason": "Kin groups and parishes rule themselves",
+   "ends_when": "Conquered (1559)",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "strong",
+   "deviation": "Seek Lübeck's protection",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Heide",
+      "at": [
+       9.1,
+       54.2
+      ]
+     },
+     {
+      "name": "Meldorf",
+      "at": [
+       9.08,
+       54.09
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "lubeck"
+   }
+  },
+  {
+   "realm": "bohemia",
+   "goal": "Win Hungary and Poland for Sigismund",
+   "reason": "Louis I has only daughters; Sigismund is betrothed to Mary",
+   "ends_when": "Sigismund crowned in Hungary, or Mary marries elsewhere",
+   "window": [
+    1382,
+    1387
+   ],
+   "weight": "strong",
+   "deviation": "Push Sigismund for Poland alone",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Buda",
+      "at": [
+       19.04,
+       47.5
+      ]
+     }
+    ],
+    "target": "hungary"
+   },
+   "alternative": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Kraków",
+      "at": [
+       19.94,
+       50.06
+      ]
+     }
+    ],
+    "target": "poland"
+   },
+   "toward": [
+    "death_of_louis_the_great",
+    "sigismund_king_of_hungary"
+   ]
+  },
+  {
+   "realm": "bohemia",
+   "goal": "Keep both Luxembourg votes and the imperial crown",
+   "reason": "The Bohemian and Brandenburg votes secure the succession",
+   "ends_when": "Brandenburg pledged away (1388) or Wenceslaus deposed",
+   "window": [
+    1378,
+    1400
+   ],
+   "weight": "strong",
+   "deviation": "Trade Brandenburg for money, as Sigismund did",
+   "aim": null,
+   "toward": [
+    "wenceslaus_deposed"
+   ]
+  },
+  {
+   "realm": "bohemia",
+   "goal": "End the Schism for Rome and be crowned emperor there",
+   "reason": "Charles IV's policy and the Urbanist league",
+   "ends_when": "The Schism ended",
+   "window": [
+    1379,
+    1409
+   ],
+   "weight": "normal",
+   "deviation": "Deal with France on a joint solution (Reims 1398)",
+   "aim": {
+    "kind": "ally",
+    "target": "papal_states"
+   },
+   "toward": [
+    "western_schism",
+    "council_of_pisa"
+   ]
+  },
+  {
+   "realm": "bohemia",
+   "goal": "Rule through lesser men against the great lords",
+   "reason": "Royal domain and favourites against the barons",
+   "ends_when": "A settlement with the lords (1405)",
+   "window": [
+    1384,
+    1405
+   ],
+   "weight": "normal",
+   "deviation": "Rule with the barons and the Rosenbergs",
+   "aim": null
+  },
+  {
+   "realm": "bohemia",
+   "goal": "An English marriage for Anne",
+   "reason": "Urbanist alliance against France",
+   "ends_when": "Done (1382)",
+   "window": [
+    1380,
+    1382
+   ],
+   "weight": "normal",
+   "deviation": "A French or Polish match",
+   "aim": {
+    "kind": "ally",
+    "target": "england"
+   }
+  },
+  {
+   "realm": "moravia",
+   "goal": "Gather land and pledges (Brandenburg, Luxembourg)",
+   "reason": "Jobst is rich and lends to his cousins",
+   "ends_when": "Jobst dies (1411)",
+   "window": [
+    1383,
+    1411
+   ],
+   "weight": "strong",
+   "deviation": "Stay a loyal margrave",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Tangermünde",
+      "at": [
+       11.97,
+       52.54
+      ]
+     },
+     {
+      "name": "Luxembourg",
+      "at": [
+       6.13,
+       49.61
+      ]
+     }
+    ],
+    "target": "brandenburg"
+   }
+  },
+  {
+   "realm": "moravia",
+   "goal": "Hold down Prokop",
+   "reason": "The brothers fight over shares",
+   "ends_when": "One brother wins (Prokop dies 1405)",
+   "window": [
+    1381,
+    1405
+   ],
+   "weight": "normal",
+   "deviation": "Brothers combine against Wenceslaus",
+   "aim": null
+  },
+  {
+   "realm": "moravia",
+   "goal": "Win the Roman crown",
+   "reason": "Seniority in the house after Wenceslaus's deposition",
+   "ends_when": "Jobst dies",
+   "window": [
+    1400,
+    1411
+   ],
+   "weight": "weak",
+   "deviation": "Back Sigismund",
+   "aim": null
+  },
+  {
+   "realm": "austria",
+   "goal": "Partition the lands between the brothers",
+   "reason": "Two adult dukes with heirs; Leopold wants his own rule",
+   "ends_when": "Lands divided",
+   "window": [
+    1379,
+    1379
+   ],
+   "weight": "normal",
+   "deviation": "Joint rule continues under Albert",
+   "aim": null
+  },
+  {
+   "realm": "austria",
+   "goal": "Link Tyrol to the Vorlande and reach the Adriatic",
+   "reason": "Leopold wants to join scattered western lands and the trade over the Alps",
+   "ends_when": "Leopold dies (Sempach 1386) or the Swiss cut the link",
+   "window": [
+    1379,
+    1386
+   ],
+   "weight": "strong",
+   "deviation": "Turn on Italy through the Visconti in-laws",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Feldkirch",
+      "at": [
+       9.6,
+       47.24
+      ]
+     },
+     {
+      "name": "Trieste",
+      "at": [
+       13.77,
+       45.65
+      ]
+     },
+     {
+      "name": "Treviso",
+      "at": [
+       12.24,
+       45.67
+      ]
+     },
+     {
+      "name": "Rottenburg (Hohenberg)",
+      "at": [
+       8.93,
+       48.48
+      ]
+     }
+    ]
+   },
+   "toward": [
+    "battle_of_sempach"
+   ]
+  },
+  {
+   "realm": "austria",
+   "goal": "Restore Habsburg lordship over the Swiss",
+   "reason": "Old family rights; the truce runs out in 1387",
+   "ends_when": "Renounced (1394 peace) or regained",
+   "window": [
+    1385,
+    1388
+   ],
+   "weight": "strong",
+   "deviation": "Accept the loss and buy lands elsewhere",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Lucerne",
+      "at": [
+       8.31,
+       47.05
+      ]
+     },
+     {
+      "name": "Sempach",
+      "at": [
+       8.19,
+       47.14
+      ]
+     },
+     {
+      "name": "Zug",
+      "at": [
+       8.52,
+       47.17
+      ]
+     }
+    ],
+    "target": "switzerland"
+   },
+   "toward": [
+    "battle_of_sempach"
+   ]
+  },
+  {
+   "realm": "austria",
+   "goal": "Win a crown for William through Hedwig",
+   "reason": "Louis I has no son; William was betrothed to Hedwig in 1378",
+   "ends_when": "Hedwig marries Jogaila (1386)",
+   "window": [
+    1382,
+    1386
+   ],
+   "weight": "normal",
+   "deviation": "Albertine claim on Hungary through later marriages",
+   "aim": {
+    "kind": "ally",
+    "target": "poland"
+   },
+   "toward": [
+    "jadwiga_crowned",
+    "union_of_krewo"
+   ]
+  },
+  {
+   "realm": "bavaria",
+   "goal": "Hold the Swabian Landvogtei and break the cities",
+   "reason": "Income and rule over the imperial cities",
+   "ends_when": "Eger landfriede (1389)",
+   "window": [
+    1378,
+    1389
+   ],
+   "weight": "normal",
+   "deviation": "Stand aside and let Württemberg fight",
+   "aim": {
+    "kind": "fight",
+    "target": "swabian_league_cities"
+   }
+  },
+  {
+   "realm": "bavaria",
+   "goal": "Divide the duchy among three brothers",
+   "reason": "Each has heirs",
+   "ends_when": "Divided",
+   "window": [
+    1392,
+    1392
+   ],
+   "weight": "normal",
+   "deviation": "Keep it joint",
+   "aim": null
+  },
+  {
+   "realm": "bavaria",
+   "goal": "Force Salzburg",
+   "reason": "Salt rivalry, and Archbishop Pilgrim's league with the cities",
+   "ends_when": "Peace with Salzburg",
+   "window": [
+    1387,
+    1389
+   ],
+   "weight": "normal",
+   "deviation": "Alliance with Salzburg",
+   "aim": {
+    "kind": "fight",
+    "target": "salzburg"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "salzburg"
+   }
+  },
+  {
+   "realm": "bavaria",
+   "goal": "Reach into Italy and France through the Visconti and Isabeau",
+   "reason": "Stephen III's ties",
+   "ends_when": "Stephen dies (1413)",
+   "window": [
+    1381,
+    1413
+   ],
+   "weight": "weak",
+   "deviation": "Stay in German affairs",
+   "aim": {
+    "kind": "ally",
+    "target": "france"
+   }
+  },
+  {
+   "realm": "wurttemberg",
+   "goal": "Defeat the Swabian City League",
+   "reason": "The cities block his growth; revenge for Reutlingen",
+   "ends_when": "League beaten or banned",
+   "window": [
+    1378,
+    1389
+   ],
+   "weight": "strong",
+   "deviation": "Wait for the king to curb them",
+   "aim": {
+    "kind": "fight",
+    "target": "swabian_league_cities"
+   }
+  },
+  {
+   "realm": "wurttemberg",
+   "goal": "Grow by purchase and marriage (Montbéliard)",
+   "reason": "No room for conquest among the cities",
+   "ends_when": "Montbéliard won (1397/1407)",
+   "window": [
+    1390,
+    1410
+   ],
+   "weight": "normal",
+   "deviation": "Expand into Baden or the Black Forest",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Montbéliard",
+      "at": [
+       6.8,
+       47.51
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "swabian_league_cities",
+   "goal": "Stay under the Empire, never pledged",
+   "reason": "They fear being pawned to princes for Wenceslaus's election debts",
+   "ends_when": "Royal guarantee holds or league banned (1389)",
+   "window": [
+    1378,
+    1389
+   ],
+   "weight": "strong",
+   "deviation": "Seek the king's protection alone",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Ulm",
+      "at": [
+       9.99,
+       48.4
+      ]
+     },
+     {
+      "name": "Reutlingen",
+      "at": [
+       9.2,
+       48.49
+      ]
+     },
+     {
+      "name": "Esslingen",
+      "at": [
+       9.31,
+       48.74
+      ]
+     },
+     {
+      "name": "Augsburg",
+      "at": [
+       10.9,
+       48.37
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "swabian_league_cities",
+   "goal": "Join with the Rhenish cities and the Swiss",
+   "reason": "The princes are stronger",
+   "ends_when": "Alliances made (1381, 1385)",
+   "window": [
+    1381,
+    1388
+   ],
+   "weight": "normal",
+   "deviation": "Join the Swiss outright",
+   "aim": {
+    "kind": "ally",
+    "target": "rhenish_imperial_cities"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "switzerland"
+   }
+  },
+  {
+   "realm": "switzerland",
+   "goal": "Keep Habsburg out and take its towns (Sempach, Weesen, Aargau)",
+   "reason": "Habsburg claims; the truce ends in 1387",
+   "ends_when": "Habsburg renounces (1394)",
+   "window": [
+    1385,
+    1415
+   ],
+   "weight": "strong",
+   "deviation": "Renew the truce",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Sempach",
+      "at": [
+       8.19,
+       47.14
+      ]
+     },
+     {
+      "name": "Weesen",
+      "at": [
+       9.1,
+       47.13
+      ]
+     },
+     {
+      "name": "Baden (Aargau)",
+      "at": [
+       8.31,
+       47.47
+      ]
+     }
+    ],
+    "target": "austria"
+   },
+   "toward": [
+    "battle_of_sempach"
+   ]
+  },
+  {
+   "realm": "switzerland",
+   "goal": "Bern: buy and take Kyburg and Oberland lands (Burgdorf, Thun)",
+   "reason": "Bern's own territory",
+   "ends_when": "Done (1384 onward)",
+   "window": [
+    1382,
+    1400
+   ],
+   "weight": "normal",
+   "deviation": "Ally with Savoy instead",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Burgdorf",
+      "at": [
+       7.63,
+       47.06
+      ]
+     },
+     {
+      "name": "Thun",
+      "at": [
+       7.63,
+       46.76
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "savoy"
+   }
+  },
+  {
+   "realm": "switzerland",
+   "goal": "Glarus: throw off the Habsburg bailiff",
+   "reason": "Valley freedom",
+   "ends_when": "Free (1387-88)",
+   "window": [
+    1386,
+    1388
+   ],
+   "weight": "normal",
+   "deviation": "Stay under Habsburg",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Glarus",
+      "at": [
+       9.07,
+       47.04
+      ]
+     }
+    ],
+    "target": "austria"
+   }
+  },
+  {
+   "realm": "switzerland",
+   "goal": "Schwyz: hold Zug",
+   "reason": "Control of the route to Zurich",
+   "ends_when": "Others force a balance (1404)",
+   "window": [
+    1378,
+    1404
+   ],
+   "weight": "weak",
+   "deviation": "Share Zug",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Zug",
+      "at": [
+       8.52,
+       47.17
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "burgraviate_of_nuremberg",
+   "goal": "Serve the Luxembourgs for reward",
+   "reason": "Patron family of the Empire, later rewarded with Brandenburg (1415)",
+   "ends_when": "Reward gained",
+   "window": [
+    1378,
+    1415
+   ],
+   "weight": "normal",
+   "deviation": "Lean to the Habsburgs (the 1375 marriage)",
+   "aim": {
+    "kind": "ally",
+    "target": "bohemia"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "austria"
+   }
+  },
+  {
+   "realm": "burgraviate_of_nuremberg",
+   "goal": "Build a Franconian territory by purchase",
+   "reason": "Scattered lands",
+   "ends_when": "Partition (1398)",
+   "window": [
+    1378,
+    1398
+   ],
+   "weight": "normal",
+   "deviation": "Fight Nuremberg city for its rights",
+   "aim": null,
+   "alternative": {
+    "kind": "fight",
+    "target": "nuremberg"
+   }
+  },
+  {
+   "realm": "nuremberg",
+   "goal": "Buy out the burgrave's rights",
+   "reason": "The burgraves sit inside the city",
+   "ends_when": "Bought (1427)",
+   "window": [
+    1378,
+    1427
+   ],
+   "weight": "normal",
+   "deviation": "Join the Swabian league against the burgraves",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Nuremberg",
+      "at": [
+       11.08,
+       49.45
+      ]
+     }
+    ],
+    "target": "burgraviate_of_nuremberg"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "swabian_league_cities"
+   }
+  },
+  {
+   "realm": "salzburg",
+   "goal": "Keep its salt and independence from Bavaria",
+   "reason": "Bavarian dukes covet Salzburg's salt and lands",
+   "ends_when": "Peace with Bavaria",
+   "window": [
+    1378,
+    1396
+   ],
+   "weight": "strong",
+   "deviation": "Lean on Austria",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Salzburg",
+      "at": [
+       13.04,
+       47.8
+      ]
+     },
+     {
+      "name": "Hallein",
+      "at": [
+       13.1,
+       47.68
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "austria"
+   }
+  },
+  {
+   "realm": "cilli",
+   "goal": "Rise through Hungarian and Polish marriages",
+   "reason": "Bosnian and Polish royal ties; William marries Anne of Poland in 1380",
+   "ends_when": "Princely rank won (1436)",
+   "window": [
+    1380,
+    1436
+   ],
+   "weight": "normal",
+   "deviation": "Serve the Habsburgs only",
+   "aim": {
+    "kind": "ally",
+    "target": "hungary"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "austria"
+   }
+  },
+  {
+   "realm": "milan",
+   "goal": "Win the Scaliger inheritance (Verona, Vicenza)",
+   "reason": "His wife Regina della Scala's claim; Verona is weak under two bastard brothers",
+   "ends_when": "Verona held by another, or Regina dead (1384)",
+   "window": [
+    1378,
+    1379
+   ],
+   "weight": "strong",
+   "deviation": "Settle for a payment and a truce (as in 1379)",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Verona",
+      "at": [
+       10.99,
+       45.44
+      ]
+     },
+     {
+      "name": "Vicenza",
+      "at": [
+       11.55,
+       45.55
+      ]
+     }
+    ],
+    "target": "verona"
+   }
+  },
+  {
+   "realm": "milan",
+   "goal": "Defeat Genoa as Venice's ally",
+   "reason": "Rivalry over the Riviera and support of Genoese exiles",
+   "ends_when": "Peace of Turin, or Genoa under Visconti control",
+   "window": [
+    1378,
+    1381
+   ],
+   "weight": "normal",
+   "deviation": "Turn on the Riviera alone for his own gain",
+   "aim": {
+    "kind": "fight",
+    "target": "genoa"
+   },
+   "alternative": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Savona",
+      "at": [
+       8.48,
+       44.31
+      ]
+     }
+    ],
+    "target": "genoa"
+   },
+   "toward": [
+    "peace_of_turin"
+   ]
+  },
+  {
+   "realm": "milan",
+   "goal": "Keep the Visconti state for his own sons",
+   "reason": "Many sons, and an older-line nephew in Pavia",
+   "ends_when": "Bernabò removed (1385) or the nephew dead",
+   "window": [
+    1378,
+    1385
+   ],
+   "weight": "strong",
+   "deviation": "Reconcile with Gian Galeazzo by marriage (Caterina, 1380)",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Pavia",
+      "at": [
+       9.16,
+       45.19
+      ]
+     }
+    ],
+    "target": "visconti_pavia"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "visconti_pavia"
+   },
+   "toward": [
+    "gian_galeazzo_coup"
+   ]
+  },
+  {
+   "realm": "visconti_pavia",
+   "goal": "Reunite the Visconti state",
+   "reason": "Bernabò and his sons threaten his half and his life",
+   "ends_when": "He holds Milan, or he is dead",
+   "window": [
+    1380,
+    1385
+   ],
+   "weight": "strong",
+   "deviation": "Accept the split and build ties with France (Vertus)",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Milan",
+      "at": [
+       9.19,
+       45.46
+      ]
+     }
+    ],
+    "target": "milan"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "france"
+   },
+   "toward": [
+    "gian_galeazzo_coup"
+   ]
+  },
+  {
+   "realm": "visconti_pavia",
+   "goal": "Take Verona and Padua",
+   "reason": "Rich, weak neighbours on the route east to the Adriatic",
+   "ends_when": "Both held, or Venice holds them",
+   "window": [
+    1386,
+    1390
+   ],
+   "weight": "strong",
+   "deviation": "Partition the Veneto with Venice or with Carrara",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Verona",
+      "at": [
+       10.99,
+       45.44
+      ]
+     },
+     {
+      "name": "Padua",
+      "at": [
+       11.88,
+       45.41
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "venice"
+   }
+  },
+  {
+   "realm": "visconti_pavia",
+   "goal": "Become duke and lord of north and central Italy",
+   "reason": "Legitimacy for a new state; Florence and Bologna block him",
+   "ends_when": "Ducal title held and Florence humbled, or his death",
+   "window": [
+    1390,
+    1402
+   ],
+   "weight": "strong",
+   "deviation": "Seek a royal crown through the Empire",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Bologna",
+      "at": [
+       11.34,
+       44.49
+      ]
+     },
+     {
+      "name": "Florence",
+      "at": [
+       11.26,
+       43.77
+      ]
+     }
+    ]
+   },
+   "toward": [
+    "milan_made_duchy",
+    "death_of_gian_galeazzo"
+   ]
+  },
+  {
+   "realm": "venice",
+   "goal": "Beat Genoa and keep Tenedos and the straits trade",
+   "reason": "Levant trade and Black Sea access",
+   "ends_when": "Peace with Genoa",
+   "window": [
+    1378,
+    1381
+   ],
+   "weight": "strong",
+   "deviation": "A quick peace giving up Tenedos (the outcome at Turin)",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Tenedos",
+      "at": [
+       26.07,
+       39.83
+      ]
+     },
+     {
+      "name": "Chioggia",
+      "at": [
+       12.28,
+       45.22
+      ]
+     }
+    ]
+   },
+   "toward": [
+    "peace_of_turin"
+   ]
+  },
+  {
+   "realm": "venice",
+   "goal": "Break the Carrara",
+   "reason": "Padua's hostility and its blockade of the mainland routes",
+   "ends_when": "Padua held by Venice or a friendly power",
+   "window": [
+    1385,
+    1405
+   ],
+   "weight": "strong",
+   "deviation": "Back the Visconti against the Carrara (as in 1388)",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Padua",
+      "at": [
+       11.88,
+       45.41
+      ]
+     }
+    ],
+    "target": "padua"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "visconti_pavia"
+   },
+   "toward": [
+    "venice_takes_padua"
+   ]
+  },
+  {
+   "realm": "venice",
+   "goal": "Recover Dalmatia",
+   "reason": "Lost to Hungary in 1358; Adriatic security",
+   "ends_when": "The Dalmatian coast is Venetian",
+   "window": [
+    1409,
+    1420
+   ],
+   "weight": "normal",
+   "deviation": "Buy it from a weak Hungarian claimant (as in 1409)",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Zadar",
+      "at": [
+       15.23,
+       44.12
+      ]
+     },
+     {
+      "name": "Split",
+      "at": [
+       16.44,
+       43.51
+      ]
+     }
+    ],
+    "target": "hungary"
+   }
+  },
+  {
+   "realm": "venice",
+   "goal": "Take Friuli",
+   "reason": "Aquileia joined its enemies; the route north-east",
+   "ends_when": "Friuli is Venetian",
+   "window": [
+    1411,
+    1420
+   ],
+   "weight": "normal",
+   "deviation": "Keep the patriarch as a client",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Udine",
+      "at": [
+       13.24,
+       46.06
+      ]
+     },
+     {
+      "name": "Cividale",
+      "at": [
+       13.43,
+       46.09
+      ]
+     }
+    ],
+    "target": "aquileia"
+   },
+   "alternative": {
+    "kind": "subject",
+    "target": "aquileia"
+   }
+  },
+  {
+   "realm": "genoa",
+   "goal": "Defeat Venice and gain Tenedos",
+   "reason": "Control of the straits and the Black Sea trade (Caffa, Pera)",
+   "ends_when": "Peace with Venice",
+   "window": [
+    1378,
+    1381
+   ],
+   "weight": "strong",
+   "deviation": "Accept a compromise (Tenedos neutralised)",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Tenedos",
+      "at": [
+       26.07,
+       39.83
+      ]
+     }
+    ],
+    "target": "venice"
+   },
+   "toward": [
+    "peace_of_turin"
+   ]
+  },
+  {
+   "realm": "genoa",
+   "goal": "Hold Famagusta and the Cyprus trade",
+   "reason": "Taken in 1374; Cypriot hostility",
+   "ends_when": "Famagusta lost",
+   "window": [
+    1378,
+    1464
+   ],
+   "weight": "normal",
+   "deviation": "Push Cyprus into tribute (as in 1383)",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Famagusta",
+      "at": [
+       33.94,
+       35.12
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "subject",
+    "target": "cyprus"
+   }
+  },
+  {
+   "realm": "genoa",
+   "goal": "End factional strife under a protector",
+   "reason": "Doges fall often; the Adorno-Fregoso feud",
+   "ends_when": "A stable dogeship",
+   "window": [
+    1390,
+    1399
+   ],
+   "weight": "weak",
+   "deviation": "Accept French lordship (1396) or Milan's (1421)",
+   "aim": null
+  },
+  {
+   "realm": "florence",
+   "goal": "Restore order after the Ciompi",
+   "reason": "Fear of the popolo minuto and of exiles",
+   "ends_when": "A stable regime (oligarchy from 1382)",
+   "window": [
+    1378,
+    1382
+   ],
+   "weight": "strong",
+   "deviation": "Keep the guild regime longer",
+   "aim": null
+  },
+  {
+   "realm": "florence",
+   "goal": "Win a port: Pisa, later Livorno",
+   "reason": "Its trade depends on Pisa's goodwill",
+   "ends_when": "Pisa and Livorno Florentine",
+   "window": [
+    1390,
+    1421
+   ],
+   "weight": "strong",
+   "deviation": "Buy Pisa from a weak lord (as in 1405)",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Pisa",
+      "at": [
+       10.4,
+       43.72
+      ]
+     },
+     {
+      "name": "Livorno",
+      "at": [
+       10.31,
+       43.55
+      ]
+     }
+    ],
+    "target": "pisa"
+   },
+   "toward": [
+    "florence_takes_pisa"
+   ]
+  },
+  {
+   "realm": "florence",
+   "goal": "Gain Arezzo and the Casentino",
+   "reason": "Security and roads to the Valdichiana",
+   "ends_when": "Held",
+   "window": [
+    1384,
+    1384
+   ],
+   "weight": "normal",
+   "deviation": "Buy it from French captains (as happened)",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Arezzo",
+      "at": [
+       11.88,
+       43.46
+      ]
+     },
+     {
+      "name": "Poppi (Casentino)",
+      "at": [
+       11.77,
+       43.72
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "florence",
+   "goal": "Contain the Visconti",
+   "reason": "A Visconti hegemon would swallow Tuscany",
+   "ends_when": "Visconti power broken",
+   "window": [
+    1385,
+    1402
+   ],
+   "weight": "strong",
+   "deviation": "Ally with Bologna and France against Milan",
+   "aim": {
+    "kind": "fight",
+    "target": "visconti_pavia"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "bologna"
+   },
+   "toward": [
+    "death_of_gian_galeazzo"
+   ]
+  },
+  {
+   "realm": "papal_states",
+   "goal": "Defeat Clement and win obediences",
+   "reason": "The Schism",
+   "ends_when": "The Schism ended",
+   "window": [
+    1378,
+    1417
+   ],
+   "weight": "strong",
+   "deviation": "Seek a council or compromise early",
+   "aim": null,
+   "toward": [
+    "western_schism",
+    "council_of_pisa",
+    "council_of_constance",
+    "election_of_martin_v"
+   ]
+  },
+  {
+   "realm": "papal_states",
+   "goal": "Unseat Joanna in Naples",
+   "reason": "She backs Clement and shelters him",
+   "ends_when": "Naples is Urbanist",
+   "window": [
+    1379,
+    1381
+   ],
+   "weight": "strong",
+   "deviation": "Make terms with Joanna if she returns to Rome",
+   "aim": {
+    "kind": "fight",
+    "target": "naples"
+   },
+   "toward": [
+    "durazzo_takes_naples"
+   ]
+  },
+  {
+   "realm": "papal_states",
+   "goal": "Recover the Romagna, Marche and Umbria",
+   "reason": "Lost to revolts in 1375-76",
+   "ends_when": "Vicars and communes submit",
+   "window": [
+    1378,
+    1430
+   ],
+   "weight": "normal",
+   "deviation": "Sell vicariates for revenue (as happened)",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Forlì",
+      "at": [
+       12.04,
+       44.22
+      ]
+     },
+     {
+      "name": "Ancona",
+      "at": [
+       13.52,
+       43.62
+      ]
+     },
+     {
+      "name": "Perugia",
+      "at": [
+       12.39,
+       43.11
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "papal_states",
+   "goal": "Hold Rome against Clementist garrisons",
+   "reason": "Castel Sant'Angelo and the Bretons",
+   "ends_when": "The castle taken",
+   "window": [
+    1378,
+    1379
+   ],
+   "weight": "strong",
+   "deviation": "Hire Italian companies (Marino, 1379)",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Rome",
+      "at": [
+       12.48,
+       41.9
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "naples",
+   "goal": "Secure an heir",
+   "reason": "Childless queen; Durazzo and Hungary claims",
+   "ends_when": "An heir adopted",
+   "window": [
+    1378,
+    1380
+   ],
+   "weight": "strong",
+   "deviation": "Recognise Charles of Durazzo instead of Louis of Anjou",
+   "aim": {
+    "kind": "ally",
+    "target": "anjou"
+   },
+   "toward": [
+    "durazzo_takes_naples"
+   ]
+  },
+  {
+   "realm": "naples",
+   "goal": "Back Clement VII",
+   "reason": "The Fondi conclave met on her land; French ties",
+   "ends_when": "She falls (1381-82), or the Schism ends",
+   "window": [
+    1378,
+    1381
+   ],
+   "weight": "normal",
+   "deviation": "Return to Urban to save her throne",
+   "aim": null,
+   "toward": [
+    "western_schism"
+   ]
+  },
+  {
+   "realm": "naples",
+   "goal": "Keep Provence and Achaea",
+   "reason": "Dynastic lands",
+   "ends_when": "Lost",
+   "window": [
+    1378,
+    1382
+   ],
+   "weight": "normal",
+   "deviation": "Lease or sell Achaea",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Aix-en-Provence",
+      "at": [
+       5.45,
+       43.53
+      ]
+     },
+     {
+      "name": "Glarentza",
+      "at": [
+       21.27,
+       37.93
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "savoy",
+   "goal": "Expand in Piedmont (Cuneo, Biella, Saluzzo homage)",
+   "reason": "Weak Montferrat and Saluzzo; the Visconti divided",
+   "ends_when": "Lands held",
+   "window": [
+    1378,
+    1418
+   ],
+   "weight": "strong",
+   "deviation": "Turn to the sea through Nice (as in 1388)",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Cuneo",
+      "at": [
+       7.55,
+       44.38
+      ]
+     },
+     {
+      "name": "Biella",
+      "at": [
+       8.05,
+       45.57
+      ]
+     },
+     {
+      "name": "Saluzzo",
+      "at": [
+       7.49,
+       44.65
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Nice",
+      "at": [
+       7.27,
+       43.7
+      ]
+     }
+    ],
+    "target": "naples"
+   }
+  },
+  {
+   "realm": "savoy",
+   "goal": "Act as arbiter of Italy",
+   "reason": "Prestige and gains through mediation",
+   "ends_when": "Peace made",
+   "window": [
+    1381,
+    1381
+   ],
+   "weight": "normal",
+   "deviation": "Join one side in the Chioggia war",
+   "aim": null,
+   "toward": [
+    "peace_of_turin"
+   ]
+  },
+  {
+   "realm": "savoy",
+   "goal": "Support Clement and Louis of Anjou in Naples",
+   "reason": "Kinship with Clement; the French alliance",
+   "ends_when": "Anjou fails or Amadeus dies",
+   "window": [
+    1382,
+    1383
+   ],
+   "weight": "normal",
+   "deviation": "Stay home and consolidate",
+   "aim": {
+    "kind": "ally",
+    "target": "anjou"
+   }
+  },
+  {
+   "realm": "montferrat",
+   "goal": "Recover Asti and resist the Visconti",
+   "reason": "Asti taken; Secondotto's death blamed on them",
+   "ends_when": "Asti held, or a firm peace",
+   "window": [
+    1378,
+    1387
+   ],
+   "weight": "strong",
+   "deviation": "Lean on Savoy or France",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Asti",
+      "at": [
+       8.21,
+       44.9
+      ]
+     }
+    ],
+    "target": "visconti_pavia"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "savoy"
+   }
+  },
+  {
+   "realm": "montferrat",
+   "goal": "Keep the regency stable",
+   "reason": "Child marquises (John III, Theodore II)",
+   "ends_when": "Theodore II comes of age",
+   "window": [
+    1378,
+    1399
+   ],
+   "weight": "normal",
+   "deviation": "Accept Visconti protection",
+   "aim": null
+  },
+  {
+   "realm": "mantua",
+   "goal": "Survive between the Visconti and Venice",
+   "reason": "A small state on the Po",
+   "ends_when": "Mantua falls to a neighbour",
+   "window": [
+    1378,
+    1440
+   ],
+   "weight": "strong",
+   "deviation": "Side with Gian Galeazzo, then switch (as in 1397)",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Mantua",
+      "at": [
+       10.79,
+       45.16
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "modena",
+   "goal": "Keep Ferrara and Modena, regain Reggio",
+   "reason": "Reggio lost to Bernabò in 1371",
+   "ends_when": "Reggio held",
+   "window": [
+    1378,
+    1409
+   ],
+   "weight": "normal",
+   "deviation": "Pledge the Polesine to Venice for money (as in 1395)",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Reggio",
+      "at": [
+       10.63,
+       44.7
+      ]
+     }
+    ],
+    "target": "milan"
+   }
+  },
+  {
+   "realm": "bologna",
+   "goal": "Keep self-government",
+   "reason": "Free since 1376; papal and Visconti threats",
+   "ends_when": "Lost to a signore or the Pope",
+   "window": [
+    1378,
+    1401
+   ],
+   "weight": "strong",
+   "deviation": "Accept a native signore (Bentivoglio)",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Bologna",
+      "at": [
+       11.34,
+       44.49
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "siena",
+   "goal": "Resist Florence",
+   "reason": "Tuscan rivalry and the Montepulciano dispute",
+   "ends_when": "Florence humbled or Siena protected",
+   "window": [
+    1378,
+    1404
+   ],
+   "weight": "normal",
+   "deviation": "Accept a Visconti lordship (as in 1399)",
+   "aim": {
+    "kind": "fight",
+    "target": "florence"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "visconti_pavia"
+   }
+  },
+  {
+   "realm": "urbino",
+   "goal": "Take Gubbio and Cagli",
+   "reason": "Montefeltro lands lost to the Church",
+   "ends_when": "Held",
+   "window": [
+    1384,
+    1384
+   ],
+   "weight": "normal",
+   "deviation": "Serve as condottieri for pay",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Gubbio",
+      "at": [
+       12.58,
+       43.35
+      ]
+     },
+     {
+      "name": "Cagli",
+      "at": [
+       12.65,
+       43.55
+      ]
+     }
+    ],
+    "target": "papal_states"
+   }
+  },
+  {
+   "realm": "rimini",
+   "goal": "Hold the Malatesta vicariates and Cesena",
+   "reason": "Papal weakness after 1376",
+   "ends_when": "Partition (1385) or papal recovery",
+   "window": [
+    1378,
+    1430
+   ],
+   "weight": "normal",
+   "deviation": "Sell towns to stronger neighbours",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Rimini",
+      "at": [
+       12.57,
+       44.06
+      ]
+     },
+     {
+      "name": "Cesena",
+      "at": [
+       12.24,
+       44.14
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "sicily",
+   "goal": "Keep the queen and the island free of Aragon",
+   "reason": "The vicars' power depends on there being no king",
+   "ends_when": "The Martins land (1392)",
+   "window": [
+    1378,
+    1392
+   ],
+   "weight": "strong",
+   "deviation": "A vicar seizes the queen and marries her into his own house",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Palermo",
+      "at": [
+       13.36,
+       38.12
+      ]
+     },
+     {
+      "name": "Catania",
+      "at": [
+       15.09,
+       37.5
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "sardinia",
+   "goal": "Conquer Arborea",
+   "reason": "The island is claimed under the 1297 grant",
+   "ends_when": "Arborea ended",
+   "window": [
+    1378,
+    1420
+   ],
+   "weight": "strong",
+   "deviation": "Accept a peace leaving Arborea autonomous (as in 1388)",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Oristano",
+      "at": [
+       8.59,
+       39.9
+      ]
+     }
+    ],
+    "target": "oristano"
+   }
+  },
+  {
+   "realm": "oristano",
+   "goal": "Drive Aragon from Sardinia",
+   "reason": "The judges claim the whole island",
+   "ends_when": "Aragon expelled, or Arborea defeated (Sanluri 1409)",
+   "window": [
+    1378,
+    1409
+   ],
+   "weight": "strong",
+   "deviation": "A negotiated peace (Eleanor, 1388)",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Cagliari",
+      "at": [
+       9.11,
+       39.22
+      ]
+     },
+     {
+      "name": "Sassari",
+      "at": [
+       8.56,
+       40.73
+      ]
+     }
+    ],
+    "target": "sardinia"
+   }
+  },
+  {
+   "realm": "padua",
+   "goal": "Win Treviso, Feltre and Belluno",
+   "reason": "Control of the routes to Austria and Friuli, with Venice weakened",
+   "ends_when": "Held (1384) or lost",
+   "window": [
+    1378,
+    1388
+   ],
+   "weight": "strong",
+   "deviation": "Ally with the Visconti against Verona (as in 1387)",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Treviso",
+      "at": [
+       12.24,
+       45.67
+      ]
+     },
+     {
+      "name": "Feltre",
+      "at": [
+       11.91,
+       46.02
+      ]
+     },
+     {
+      "name": "Belluno",
+      "at": [
+       12.22,
+       46.14
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "visconti_pavia"
+   }
+  },
+  {
+   "realm": "verona",
+   "goal": "Survive Bernabò's claim and keep Vicenza",
+   "reason": "A weak, disputed succession",
+   "ends_when": "Verona lost (1387)",
+   "window": [
+    1378,
+    1387
+   ],
+   "weight": "strong",
+   "deviation": "Seek Venice's backing against Padua (as in 1386-87)",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Verona",
+      "at": [
+       10.99,
+       45.44
+      ]
+     },
+     {
+      "name": "Vicenza",
+      "at": [
+       11.55,
+       45.55
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "venice"
+   }
+  },
+  {
+   "realm": "pisa",
+   "goal": "Stay neutral and trade",
+   "reason": "Gambacorta's pact with Florence",
+   "ends_when": "Gambacorta killed (1392)",
+   "window": [
+    1378,
+    1392
+   ],
+   "weight": "normal",
+   "deviation": "Turn to the Visconti (Appiano)",
+   "aim": {
+    "kind": "ally",
+    "target": "florence"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "visconti_pavia"
+   }
+  },
+  {
+   "realm": "aquileia",
+   "goal": "Win Trieste and Istrian towns from Venice",
+   "reason": "Old claims, with Venice at war",
+   "ends_when": "Peace of Turin, or Friuli lost",
+   "window": [
+    1378,
+    1381
+   ],
+   "weight": "normal",
+   "deviation": "Seek Hungarian or Austrian protection",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Trieste",
+      "at": [
+       13.77,
+       45.65
+      ]
+     },
+     {
+      "name": "Capodistria",
+      "at": [
+       13.73,
+       45.55
+      ]
+     }
+    ],
+    "target": "venice"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "hungary"
+   },
+   "toward": [
+    "peace_of_turin"
+   ]
+  },
+  {
+   "realm": "denmark",
+   "goal": "Win Norway for Olaf",
+   "reason": "Olaf is Haakon VI's only son and heir",
+   "ends_when": "Olaf takes Norway (1380) or its council chooses another",
+   "window": [
+    1378,
+    1380
+   ],
+   "weight": "strong",
+   "deviation": "Keep Norway as a close ally under a regent",
+   "aim": null,
+   "alternative": {
+    "kind": "ally",
+    "target": "norway"
+   },
+   "toward": [
+    "kalmar_union"
+   ]
+  },
+  {
+   "realm": "denmark",
+   "goal": "Keep the throne against Mecklenburg",
+   "reason": "Albert IV's claim through Ingeborg is senior to Olaf's",
+   "ends_when": "Albert IV dies (1388) or Mecklenburg renounces",
+   "window": [
+    1378,
+    1388
+   ],
+   "weight": "strong",
+   "deviation": "Buy off the claim with a marriage or land",
+   "aim": {
+    "kind": "fight",
+    "target": "mecklenburg"
+   }
+  },
+  {
+   "realm": "denmark",
+   "goal": "Take back the Scanian castles",
+   "reason": "The Hanse holds them only until 1385",
+   "ends_when": "Castles returned (1385)",
+   "window": [
+    1383,
+    1385
+   ],
+   "weight": "strong",
+   "deviation": "Renew the pledge for money and Hanseatic support",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Skanör",
+      "at": [
+       12.84,
+       55.42
+      ]
+     },
+     {
+      "name": "Falsterbo",
+      "at": [
+       12.83,
+       55.4
+      ]
+     },
+     {
+      "name": "Malmö",
+      "at": [
+       12.99,
+       55.61
+      ]
+     },
+     {
+      "name": "Helsingborg",
+      "at": [
+       12.69,
+       56.05
+      ]
+     }
+    ],
+    "target": "hanseatic_league"
+   }
+  },
+  {
+   "realm": "denmark",
+   "goal": "Redeem pledged crown castles and lands",
+   "reason": "Valdemar pledged much of the crown; revenue and control depend on it",
+   "ends_when": "Most pledges redeemed (Margaret's reign)",
+   "window": [
+    1378,
+    1412
+   ],
+   "weight": "normal",
+   "deviation": "Tax the nobility instead (riskier)",
+   "aim": null
+  },
+  {
+   "realm": "denmark",
+   "goal": "Recover Schleswig",
+   "reason": "A royal fief alienated by pledges since 1375",
+   "ends_when": "Holstein enfeoffed for peace (1386), or the duchy retaken",
+   "window": [
+    1378,
+    1435
+   ],
+   "weight": "normal",
+   "deviation": "Enfeoff Holstein to secure the south (the historical choice)",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Schleswig",
+      "at": [
+       9.57,
+       54.52
+      ]
+     },
+     {
+      "name": "Flensburg",
+      "at": [
+       9.44,
+       54.78
+      ]
+     }
+    ],
+    "target": "holstein"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "holstein"
+   }
+  },
+  {
+   "realm": "denmark",
+   "goal": "Win Sweden from Albert",
+   "reason": "Olaf is heir of the Folkung claim, and the Swedish magnates tire of Albert",
+   "ends_when": "Albert deposed (1389) or he makes peace",
+   "window": [
+    1385,
+    1389
+   ],
+   "weight": "strong",
+   "deviation": "Wait for the magnates to call her in, as in 1388",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Stockholm",
+      "at": [
+       18.07,
+       59.33
+      ]
+     },
+     {
+      "name": "Kalmar",
+      "at": [
+       16.36,
+       56.66
+      ]
+     },
+     {
+      "name": "Nyköping",
+      "at": [
+       17.01,
+       58.75
+      ]
+     }
+    ],
+    "target": "sweden"
+   },
+   "toward": [
+    "kalmar_union"
+   ]
+  },
+  {
+   "realm": "denmark",
+   "goal": "Join the three crowns and secure an heir",
+   "reason": "After Olaf dies (1387) Margaret needs one successor for all three realms",
+   "ends_when": "Eric crowned at Kalmar (1397)",
+   "window": [
+    1387,
+    1397
+   ],
+   "weight": "strong",
+   "deviation": "Rule as regent for life without a union act",
+   "aim": null,
+   "toward": [
+    "kalmar_union"
+   ]
+  },
+  {
+   "realm": "denmark",
+   "goal": "Recover Gotland",
+   "reason": "Lost to Mecklenburg privateers and the Teutonic Order",
+   "ends_when": "Bought back (1408)",
+   "window": [
+    1394,
+    1408
+   ],
+   "weight": "normal",
+   "deviation": "Leave it to the Order for a price",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Visby",
+      "at": [
+       18.29,
+       57.64
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "norway",
+   "goal": "Pass both crowns to Olaf",
+   "reason": "Haakon's only son; union with Denmark gives plague-hit Norway a protector",
+   "ends_when": "Olaf king of Norway (1380)",
+   "window": [
+    1378,
+    1380
+   ],
+   "weight": "strong",
+   "deviation": "The council elects a native noble",
+   "aim": {
+    "kind": "ally",
+    "target": "denmark"
+   },
+   "toward": [
+    "kalmar_union"
+   ]
+  },
+  {
+   "realm": "norway",
+   "goal": "Press the claim to Sweden",
+   "reason": "Haakon was deposed in 1364; the Folkungs see Sweden as theirs",
+   "ends_when": "The claim won (1389) or given up",
+   "window": [
+    1378,
+    1389
+   ],
+   "weight": "normal",
+   "deviation": "A lasting peace with Albert",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Stockholm",
+      "at": [
+       18.07,
+       59.33
+      ]
+     }
+    ],
+    "target": "sweden"
+   },
+   "toward": [
+    "kalmar_union"
+   ]
+  },
+  {
+   "realm": "norway",
+   "goal": "Settle the Orkney earldom",
+   "reason": "The earldom is vacant and the islands need a loyal earl",
+   "ends_when": "Henry Sinclair invested (1379)",
+   "window": [
+    1378,
+    1379
+   ],
+   "weight": "normal",
+   "deviation": "Give it to Malise Sperra or keep a royal captain",
+   "aim": {
+    "kind": "subject",
+    "target": "orkney"
+   }
+  },
+  {
+   "realm": "norway",
+   "goal": "Limit the Hanse at Bergen",
+   "reason": "The Kontor controls the stockfish trade and grain supply",
+   "ends_when": "The Hanse's hold breaks (after 1444)",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "Accept the Hanse for grain and credit",
+   "aim": null
+  },
+  {
+   "realm": "sweden",
+   "goal": "Win back royal castles from the magnates",
+   "reason": "The 1371 terms and Grip's fiefs leave the king poor and weak",
+   "ends_when": "Albert claims Grip's fiefs (1386); the council calls in Margaret (1388)",
+   "window": [
+    1378,
+    1389
+   ],
+   "weight": "strong",
+   "deviation": "Rule with the council and keep the peace",
+   "aim": null
+  },
+  {
+   "realm": "sweden",
+   "goal": "Put Mecklenburg men in Swedish castles",
+   "reason": "They are the only men Albert can trust",
+   "ends_when": "Albert loses Sweden (1389)",
+   "window": [
+    1378,
+    1389
+   ],
+   "weight": "normal",
+   "deviation": "Rely on Swedish nobles",
+   "aim": null
+  },
+  {
+   "realm": "sweden",
+   "goal": "Help his nephew to the Danish throne",
+   "reason": "Mecklenburg house interest through Ingeborg",
+   "ends_when": "Albert IV dies (1388)",
+   "window": [
+    1378,
+    1388
+   ],
+   "weight": "normal",
+   "deviation": "Peace with Margaret",
+   "aim": {
+    "kind": "ally",
+    "target": "mecklenburg"
+   }
+  },
+  {
+   "realm": "sweden",
+   "goal": "Hold Gotland for Sweden",
+   "reason": "The island was Swedish before 1361, and Visby's trade matters",
+   "ends_when": "Gotland settled on Denmark (1408)",
+   "window": [
+    1378,
+    1408
+   ],
+   "weight": "weak",
+   "deviation": "Sell or pledge the claim",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Visby",
+      "at": [
+       18.29,
+       57.64
+      ]
+     }
+    ],
+    "target": "denmark"
+   }
+  },
+  {
+   "realm": "sweden",
+   "goal": "Keep Stockholm after defeat",
+   "reason": "The last fortress, held with German burghers and the Victual Brothers",
+   "ends_when": "Stockholm handed over (1398)",
+   "window": [
+    1389,
+    1398
+   ],
+   "weight": "strong",
+   "deviation": "Settle at once for Albert's release",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Stockholm",
+      "at": [
+       18.07,
+       59.33
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "sweden",
+   "goal": "Guard the Karelian frontier",
+   "reason": "Novgorod raids Finland",
+   "ends_when": "Peace on the border",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "Push east for furs",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Vyborg",
+      "at": [
+       28.75,
+       60.71
+      ]
+     },
+     {
+      "name": "Turku",
+      "at": [
+       22.27,
+       60.45
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "fight",
+    "target": "novgorod"
+   }
+  },
+  {
+   "realm": "kalmar_union",
+   "goal": "Keep three crowns on one head",
+   "reason": "Margaret's achievement and the house's prestige",
+   "ends_when": "A council elects a separate king (1448)",
+   "window": [
+    1397,
+    1444
+   ],
+   "weight": "strong",
+   "deviation": "Let Sweden go and keep Denmark-Norway",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Copenhagen",
+      "at": [
+       12.57,
+       55.68
+      ]
+     },
+     {
+      "name": "Stockholm",
+      "at": [
+       18.07,
+       59.33
+      ]
+     },
+     {
+      "name": "Bergen",
+      "at": [
+       5.32,
+       60.39
+      ]
+     }
+    ]
+   },
+   "toward": [
+    "deposition_of_eric_of_pomerania"
+   ]
+  },
+  {
+   "realm": "kalmar_union",
+   "goal": "Win Schleswig back from Holstein",
+   "reason": "Eric sees the duchy as a lapsed royal fief",
+   "ends_when": "Vordingborg (1435) leaves it to Holstein",
+   "window": [
+    1404,
+    1435
+   ],
+   "weight": "strong",
+   "deviation": "Peace with Holstein for the union's sake",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Schleswig",
+      "at": [
+       9.57,
+       54.52
+      ]
+     },
+     {
+      "name": "Flensburg",
+      "at": [
+       9.44,
+       54.78
+      ]
+     }
+    ],
+    "target": "holstein"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "holstein"
+   }
+  },
+  {
+   "realm": "kalmar_union",
+   "goal": "Make the Hanse pay at the Sound",
+   "reason": "Royal revenue without the councils' consent",
+   "ends_when": "The toll holds (from 1429)",
+   "window": [
+    1420,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "Trade privileges for Hanseatic loans",
+   "aim": {
+    "kind": "fight",
+    "target": "hanseatic_league"
+   }
+  }
+ ]
+}

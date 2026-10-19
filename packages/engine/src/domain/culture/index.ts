@@ -1,5 +1,6 @@
 import config from "../../../../rules/data/domain/culture.json" with { type: "json" };
-import start from "../../../../rules/data/domain/culture-start-1444.json" with { type: "json" };
+import { startCulture as start } from "../../../../rules/src/start.ts";
+import { START_YEAR } from "../../../../rules/src/start.ts";
 import { localsBonus } from "../province/index.ts";
 import { REGIONS, type Ground } from "../world-map/index.ts";
 
@@ -731,9 +732,9 @@ export function answerCourtGoesNative(cc: CountryCulture, checks: CultureChecks,
   return { changed, wavering: lords.filter((l) => mustTongue(l.tongue).id === old).map((l) => l.name) };
 }
 
-/** Is this a year the 5-yearly culture checks run (CULT-068): every 5 years counted from 1444. */
+/** Is this a year the 5-yearly culture checks run (CULT-068): every 5 years counted from the start. */
 export function cultureCheckYear(year: number): boolean {
-  return (year - 1444) % config.engine_events.check_every_years === 0;
+  return (year - START_YEAR) % config.engine_events.check_every_years === 0;
 }
 
 /** The continent a map region lies in: its top-level region (D-CULT-10). */

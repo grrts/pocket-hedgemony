@@ -33,15 +33,17 @@ Feature: Ages and eras on the calendar
     Then the era is "<era>"
 
     Examples:
-      | date          | era |
-      | November 1444 | I   |
-      | January 1500  | II  |
-      | January 1650  | III |
-      | January 1750  | IV  |
-      | January 1850  | V   |
-      | January 1900  | VI  |
-      | January 1939  | VII |
-      | August 1939   | VII |
+      | date           | era |
+      | September 1378 | I   |
+      | November 1444  | I   |
+      | December 1499  | I   |
+      | January 1500   | II  |
+      | January 1650   | III |
+      | January 1750   | IV  |
+      | January 1850   | V   |
+      | January 1900   | VI  |
+      | January 1939   | VII |
+      | August 1939    | VII |
 
   @TIME-072
   Scenario: An age is cut at the campaign end

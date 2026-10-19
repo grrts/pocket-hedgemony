@@ -1,0 +1,1085 @@
+{
+ "source": "scenarios/1444/ports.json with each western town's 1378 holder; province ids are 1444's and are re-matched when the 1378 map is generated",
+ "towns": [
+  {
+   "name": "London",
+   "holder": "england",
+   "tier": "great",
+   "shipyard": true,
+   "source": "cat",
+   "province": "p803",
+   "province_name": "Cambridgeshire"
+  },
+  {
+   "name": "Southampton",
+   "holder": "england",
+   "tier": "port",
+   "shipyard": true,
+   "source": "cat",
+   "province": "p797",
+   "province_name": "Hampshire"
+  },
+  {
+   "name": "Bristol",
+   "holder": "england",
+   "tier": "port",
+   "shipyard": true,
+   "source": "cat",
+   "province": "p794",
+   "province_name": "Somerset"
+  },
+  {
+   "name": "King's Lynn",
+   "holder": "england",
+   "tier": "port",
+   "shipyard": false,
+   "source": "add",
+   "province": "p806",
+   "province_name": "Norfolk"
+  },
+  {
+   "name": "Hull",
+   "holder": "england",
+   "tier": "port",
+   "shipyard": false,
+   "source": "add",
+   "province": "p800",
+   "province_name": "East Riding of Yorkshire"
+  },
+  {
+   "name": "Newcastle",
+   "holder": "england",
+   "tier": "small",
+   "shipyard": false,
+   "source": "add",
+   "province": "p566",
+   "province_name": "Northumberland"
+  },
+  {
+   "name": "Sandwich",
+   "holder": "england",
+   "tier": "small",
+   "shipyard": false,
+   "source": "add",
+   "province": "p804",
+   "province_name": "Kent"
+  },
+  {
+   "name": "Dartmouth",
+   "holder": "england",
+   "tier": "small",
+   "shipyard": false,
+   "source": "add",
+   "province": "p792",
+   "province_name": "Herefordshire"
+  },
+  {
+   "name": "Plymouth",
+   "holder": "england",
+   "tier": "small",
+   "shipyard": false,
+   "source": "add",
+   "province": "p790",
+   "province_name": "Devon"
+  },
+  {
+   "name": "Calais",
+   "holder": "england",
+   "tier": "port",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p807",
+   "province_name": "Pas-de-Calais"
+  },
+  {
+   "name": "Harfleur",
+   "holder": "france",
+   "tier": "port",
+   "shipyard": false,
+   "source": "add",
+   "province": "p1058",
+   "province_name": "Seine-Maritime"
+  },
+  {
+   "name": "Honfleur",
+   "holder": "france",
+   "tier": "small",
+   "shipyard": false,
+   "source": "add",
+   "province": "p1051",
+   "province_name": "Calvados"
+  },
+  {
+   "name": "Rouen",
+   "holder": "france",
+   "tier": "port",
+   "shipyard": true,
+   "source": "add",
+   "province": "p1058",
+   "province_name": "Seine-Maritime"
+  },
+  {
+   "name": "Cherbourg",
+   "holder": "england",
+   "tier": "small",
+   "shipyard": false,
+   "source": "add",
+   "province": "p1047",
+   "province_name": "Manche"
+  },
+  {
+   "name": "Bordeaux",
+   "holder": "england",
+   "tier": "great",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p1338",
+   "province_name": "Gironde"
+  },
+  {
+   "name": "Bayonne",
+   "holder": "england",
+   "tier": "port",
+   "shipyard": true,
+   "source": "cat",
+   "province": "p1336",
+   "province_name": "Pyrénées-Atlantiques"
+  },
+  {
+   "name": "Leith",
+   "holder": "scotland",
+   "tier": "port",
+   "shipyard": false,
+   "source": "add",
+   "province": "p562",
+   "province_name": "Angus"
+  },
+  {
+   "name": "Aberdeen",
+   "holder": "scotland",
+   "tier": "small",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p564",
+   "province_name": "Aberdeenshire"
+  },
+  {
+   "name": "Dundee",
+   "holder": "scotland",
+   "tier": "small",
+   "shipyard": false,
+   "source": "add",
+   "province": "p562",
+   "province_name": "Angus"
+  },
+  {
+   "name": "Kirkwall",
+   "holder": "norway",
+   "tier": "small",
+   "shipyard": false,
+   "source": "add",
+   "province": "p388",
+   "province_name": "Orkney"
+  },
+  {
+   "name": "Castletown",
+   "holder": "england",
+   "tier": "small",
+   "shipyard": false,
+   "source": "add",
+   "province": "p558",
+   "province_name": "Isle of Man"
+  },
+  {
+   "name": "Dublin",
+   "holder": "england",
+   "tier": "port",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p786",
+   "province_name": "Westmeath"
+  },
+  {
+   "name": "Drogheda",
+   "holder": "england",
+   "tier": "small",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p553",
+   "province_name": "Newry and Mourne"
+  },
+  {
+   "name": "Waterford",
+   "holder": "england",
+   "tier": "port",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p785",
+   "province_name": "Kilkenny"
+  },
+  {
+   "name": "Cork",
+   "holder": "england",
+   "tier": "small",
+   "shipyard": false,
+   "source": "add",
+   "province": "p783",
+   "province_name": "Cork"
+  },
+  {
+   "name": "Galway",
+   "holder": "england",
+   "tier": "small",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p781",
+   "province_name": "Galway"
+  },
+  {
+   "name": "Youghal",
+   "holder": "ireland",
+   "tier": "small",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p785",
+   "province_name": "Kilkenny"
+  },
+  {
+   "name": "Baltimore",
+   "holder": "ireland",
+   "tier": "small",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p783",
+   "province_name": "Cork"
+  },
+  {
+   "name": "La Rochelle",
+   "holder": "france",
+   "tier": "port",
+   "shipyard": true,
+   "source": "add",
+   "province": "p1337",
+   "province_name": "Charente-Maritime"
+  },
+  {
+   "name": "Dieppe",
+   "holder": "france",
+   "tier": "port",
+   "shipyard": false,
+   "source": "add",
+   "province": "p1058",
+   "province_name": "Seine-Maritime"
+  },
+  {
+   "name": "Aigues-Mortes",
+   "holder": "france",
+   "tier": "small",
+   "shipyard": false,
+   "source": "add",
+   "province": "p1357",
+   "province_name": "Gard"
+  },
+  {
+   "name": "Montpellier",
+   "holder": "france",
+   "tier": "small",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p1355",
+   "province_name": "Hérault"
+  },
+  {
+   "name": "Nantes",
+   "holder": "brittany",
+   "tier": "port",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p1045",
+   "province_name": "Loire-Atlantique"
+  },
+  {
+   "name": "Saint-Malo",
+   "holder": "brittany",
+   "tier": "port",
+   "shipyard": true,
+   "source": "cat",
+   "province": "p1046",
+   "province_name": "Ille-et-Vilaine"
+  },
+  {
+   "name": "Brest",
+   "holder": "england",
+   "tier": "small",
+   "shipyard": false,
+   "source": "add",
+   "province": "p1042",
+   "province_name": "Finistère"
+  },
+  {
+   "name": "Marseille",
+   "holder": "naples",
+   "tier": "port",
+   "shipyard": true,
+   "source": "cat",
+   "province": "p1360",
+   "province_name": "Bouches-du-Rhône"
+  },
+  {
+   "name": "Toulon",
+   "holder": "naples",
+   "tier": "small",
+   "shipyard": false,
+   "source": "add",
+   "province": "p1364",
+   "province_name": "Var"
+  },
+  {
+   "name": "Nice",
+   "holder": "naples",
+   "tier": "small",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p1368",
+   "province_name": "Cuneo"
+  },
+  {
+   "name": "Collioure",
+   "holder": "aragon",
+   "tier": "small",
+   "shipyard": false,
+   "source": "add",
+   "province": "p1351",
+   "province_name": "Gerona"
+  },
+  {
+   "name": "Monaco",
+   "holder": "genoa",
+   "tier": "small",
+   "shipyard": false,
+   "source": "add",
+   "province": "p1368",
+   "province_name": "Cuneo"
+  },
+  {
+   "name": "Genoa",
+   "holder": "genoa",
+   "tier": "great",
+   "shipyard": true,
+   "source": "cat",
+   "province": "p1371",
+   "province_name": "Genova"
+  },
+  {
+   "name": "Savona",
+   "holder": "genoa",
+   "tier": "port",
+   "shipyard": true,
+   "source": "cat",
+   "province": "p1371",
+   "province_name": "Genova"
+  },
+  {
+   "name": "La Spezia",
+   "holder": "genoa",
+   "tier": "small",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p1371",
+   "province_name": "Genova"
+  },
+  {
+   "name": "Finale",
+   "holder": "genoa",
+   "tier": "small",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p1371",
+   "province_name": "Genova"
+  },
+  {
+   "name": "Bastia",
+   "holder": "genoa",
+   "tier": "small",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p1372",
+   "province_name": "Haute-Corse"
+  },
+  {
+   "name": "Pisa",
+   "holder": "pisa",
+   "tier": "port",
+   "shipyard": true,
+   "source": "cat",
+   "province": "p1376",
+   "province_name": "Pisa"
+  },
+  {
+   "name": "Livorno",
+   "holder": "pisa",
+   "tier": "small",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p1376",
+   "province_name": "Pisa"
+  },
+  {
+   "name": "Piombino",
+   "holder": "pisa",
+   "tier": "small",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p1376",
+   "province_name": "Pisa"
+  },
+  {
+   "name": "Talamone",
+   "holder": "siena",
+   "tier": "small",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p1379",
+   "province_name": "Grosseto"
+  },
+  {
+   "name": "Civitavecchia",
+   "holder": "papal_states",
+   "tier": "small",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p1624",
+   "province_name": "Roma"
+  },
+  {
+   "name": "Gaeta",
+   "holder": "naples",
+   "tier": "port",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p1625",
+   "province_name": "Frosinone"
+  },
+  {
+   "name": "Naples",
+   "holder": "naples",
+   "tier": "great",
+   "shipyard": true,
+   "source": "add",
+   "province": "p1626",
+   "province_name": "Campobasso"
+  },
+  {
+   "name": "Bari",
+   "holder": "naples",
+   "tier": "small",
+   "shipyard": false,
+   "source": "add",
+   "province": "p1632",
+   "province_name": "Central Bari"
+  },
+  {
+   "name": "Brindisi",
+   "holder": "naples",
+   "tier": "small",
+   "shipyard": false,
+   "source": "add",
+   "province": "p1633",
+   "province_name": "Lecce"
+  },
+  {
+   "name": "Taranto",
+   "holder": "naples",
+   "tier": "port",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p1633",
+   "province_name": "Lecce"
+  },
+  {
+   "name": "Messina",
+   "holder": "sicily",
+   "tier": "port",
+   "shipyard": true,
+   "source": "cat",
+   "province": "p1920",
+   "province_name": "Catania"
+  },
+  {
+   "name": "Palermo",
+   "holder": "sicily",
+   "tier": "port",
+   "shipyard": true,
+   "source": "add",
+   "province": "p1916",
+   "province_name": "Palermo"
+  },
+  {
+   "name": "Syracuse",
+   "holder": "sicily",
+   "tier": "small",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p1919",
+   "province_name": "Siracusa"
+  },
+  {
+   "name": "Trapani",
+   "holder": "sicily",
+   "tier": "small",
+   "shipyard": false,
+   "source": "add",
+   "province": "p1916",
+   "province_name": "Palermo"
+  },
+  {
+   "name": "Cagliari",
+   "holder": "aragon",
+   "tier": "port",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p1623",
+   "province_name": "Cagliari"
+  },
+  {
+   "name": "Alghero",
+   "holder": "aragon",
+   "tier": "small",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p1622",
+   "province_name": "Sassari"
+  },
+  {
+   "name": "Ancona",
+   "holder": "papal_states",
+   "tier": "port",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p1384",
+   "province_name": "Pesaro e Urbino"
+  },
+  {
+   "name": "Pesaro",
+   "holder": "papal_states",
+   "tier": "small",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p1384",
+   "province_name": "Pesaro e Urbino"
+  },
+  {
+   "name": "Fano",
+   "holder": "papal_states",
+   "tier": "small",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p1384",
+   "province_name": "Pesaro e Urbino"
+  },
+  {
+   "name": "Rimini",
+   "holder": "papal_states",
+   "tier": "small",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p1384",
+   "province_name": "Pesaro e Urbino"
+  },
+  {
+   "name": "Venice",
+   "holder": "venice",
+   "tier": "great",
+   "shipyard": true,
+   "source": "cat",
+   "province": "p1381",
+   "province_name": "Treviso"
+  },
+  {
+   "name": "Trieste",
+   "holder": "venice",
+   "tier": "small",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p1112",
+   "province_name": "Tolmin"
+  },
+  {
+   "name": "Tana",
+   "holder": "venice",
+   "tier": "small",
+   "shipyard": false,
+   "source": "add",
+   "province": "p1189",
+   "province_name": "West Rostov"
+  },
+  {
+   "name": "Ceuta",
+   "holder": "morocco",
+   "tier": "port",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p1882",
+   "province_name": "Tanger - Tétouan"
+  },
+  {
+   "name": "Funchal",
+   "holder": null,
+   "tier": "small",
+   "shipyard": false,
+   "source": "add",
+   "province": "p2154",
+   "province_name": "Madeira"
+  },
+  {
+   "name": "Lisbon",
+   "holder": "portugal",
+   "tier": "great",
+   "shipyard": true,
+   "source": "cat",
+   "province": "p1585",
+   "province_name": "Setúbal"
+  },
+  {
+   "name": "Porto",
+   "holder": "portugal",
+   "tier": "port",
+   "shipyard": true,
+   "source": "cat",
+   "province": "p1587",
+   "province_name": "Coimbra"
+  },
+  {
+   "name": "Lagos",
+   "holder": "portugal",
+   "tier": "port",
+   "shipyard": true,
+   "source": "cat",
+   "province": "p1877",
+   "province_name": "Beja"
+  },
+  {
+   "name": "Setúbal",
+   "holder": "portugal",
+   "tier": "small",
+   "shipyard": false,
+   "source": "add",
+   "province": "p1585",
+   "province_name": "Setúbal"
+  },
+  {
+   "name": "Seville",
+   "holder": "castile",
+   "tier": "great",
+   "shipyard": true,
+   "source": "cat",
+   "province": "p1881",
+   "province_name": "Sevilla"
+  },
+  {
+   "name": "Cádiz",
+   "holder": "castile",
+   "tier": "port",
+   "shipyard": false,
+   "source": "add",
+   "province": "p1880",
+   "province_name": "Cádiz"
+  },
+  {
+   "name": "Sanlúcar",
+   "holder": "castile",
+   "tier": "small",
+   "shipyard": false,
+   "source": "add",
+   "province": "p1880",
+   "province_name": "Cádiz"
+  },
+  {
+   "name": "Cartagena",
+   "holder": "castile",
+   "tier": "small",
+   "shipyard": false,
+   "source": "add",
+   "province": "p1610",
+   "province_name": "Murcia"
+  },
+  {
+   "name": "A Coruña",
+   "holder": "castile",
+   "tier": "port",
+   "shipyard": false,
+   "source": "add",
+   "province": "p1325",
+   "province_name": "La Coruña"
+  },
+  {
+   "name": "Santander",
+   "holder": "castile",
+   "tier": "small",
+   "shipyard": true,
+   "source": "add",
+   "province": "p1331",
+   "province_name": "Cantabria"
+  },
+  {
+   "name": "Bilbao",
+   "holder": "castile",
+   "tier": "port",
+   "shipyard": true,
+   "source": "cat",
+   "province": "p1333",
+   "province_name": "Central La Rioja"
+  },
+  {
+   "name": "San Sebastián",
+   "holder": "castile",
+   "tier": "small",
+   "shipyard": false,
+   "source": "add",
+   "province": "p1333",
+   "province_name": "Central La Rioja"
+  },
+  {
+   "name": "Málaga",
+   "holder": "granada",
+   "tier": "port",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p1883",
+   "province_name": "Málaga"
+  },
+  {
+   "name": "Almería",
+   "holder": "granada",
+   "tier": "port",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p1887",
+   "province_name": "Almería"
+  },
+  {
+   "name": "Barcelona",
+   "holder": "aragon",
+   "tier": "great",
+   "shipyard": true,
+   "source": "cat",
+   "province": "p1618",
+   "province_name": "Barcelona"
+  },
+  {
+   "name": "Valencia",
+   "holder": "aragon",
+   "tier": "port",
+   "shipyard": true,
+   "source": "cat",
+   "province": "p1613",
+   "province_name": "Valencia"
+  },
+  {
+   "name": "Tortosa",
+   "holder": "aragon",
+   "tier": "small",
+   "shipyard": false,
+   "source": "add",
+   "province": "p1616",
+   "province_name": "Tarragona"
+  },
+  {
+   "name": "Alicante",
+   "holder": "aragon",
+   "tier": "small",
+   "shipyard": false,
+   "source": "add",
+   "province": "p1614",
+   "province_name": "Alicante"
+  },
+  {
+   "name": "Palma",
+   "holder": "aragon",
+   "tier": "port",
+   "shipyard": true,
+   "source": "cat",
+   "province": "p1619",
+   "province_name": "Northeast Baleares"
+  },
+  {
+   "name": "Sluis",
+   "holder": "flanders",
+   "tier": "great",
+   "shipyard": true,
+   "source": "cat",
+   "province": "p809",
+   "province_name": "Hainaut"
+  },
+  {
+   "name": "Antwerp",
+   "holder": "flanders",
+   "tier": "port",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p810",
+   "province_name": "Antwerp"
+  },
+  {
+   "name": "Middelburg",
+   "holder": "holland",
+   "tier": "port",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p809",
+   "province_name": "Hainaut"
+  },
+  {
+   "name": "Dordrecht",
+   "holder": "holland",
+   "tier": "small",
+   "shipyard": false,
+   "source": "add",
+   "province": "p811",
+   "province_name": "Zuid-Holland"
+  },
+  {
+   "name": "Amsterdam",
+   "holder": "holland",
+   "tier": "port",
+   "shipyard": true,
+   "source": "cat",
+   "province": "p811",
+   "province_name": "Zuid-Holland"
+  },
+  {
+   "name": "Enkhuizen",
+   "holder": "holland",
+   "tier": "small",
+   "shipyard": false,
+   "source": "add",
+   "province": "p811",
+   "province_name": "Zuid-Holland"
+  },
+  {
+   "name": "Kampen",
+   "holder": "utrecht",
+   "tier": "small",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p816",
+   "province_name": "Friesland"
+  },
+  {
+   "name": "Stavoren",
+   "holder": "friesland",
+   "tier": "small",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p816",
+   "province_name": "Friesland"
+  },
+  {
+   "name": "Emden",
+   "holder": "friesland",
+   "tier": "small",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p821",
+   "province_name": "West Niedersachsen"
+  },
+  {
+   "name": "Bremen",
+   "holder": "bremen",
+   "tier": "port",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p823",
+   "province_name": "Northwest Niedersachsen"
+  },
+  {
+   "name": "Stade",
+   "holder": "bremen",
+   "tier": "small",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p823",
+   "province_name": "Northwest Niedersachsen"
+  },
+  {
+   "name": "Hamburg",
+   "holder": "hamburg",
+   "tier": "great",
+   "shipyard": true,
+   "source": "cat",
+   "province": "p571",
+   "province_name": "Schleswig-Holstein"
+  },
+  {
+   "name": "Kiel",
+   "holder": "holstein",
+   "tier": "small",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p571",
+   "province_name": "Schleswig-Holstein"
+  },
+  {
+   "name": "Flensburg",
+   "holder": "holstein",
+   "tier": "small",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p571",
+   "province_name": "Schleswig-Holstein"
+  },
+  {
+   "name": "Lübeck",
+   "holder": "holstein",
+   "tier": "great",
+   "shipyard": true,
+   "source": "cat",
+   "province": "p571",
+   "province_name": "Schleswig-Holstein"
+  },
+  {
+   "name": "Wismar",
+   "holder": "mecklenburg",
+   "tier": "port",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p831",
+   "province_name": "West Mecklenburg-Vorpommern"
+  },
+  {
+   "name": "Rostock",
+   "holder": "mecklenburg",
+   "tier": "port",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p831",
+   "province_name": "West Mecklenburg-Vorpommern"
+  },
+  {
+   "name": "Stralsund",
+   "holder": "pomerania",
+   "tier": "port",
+   "shipyard": true,
+   "source": "cat",
+   "province": "p834",
+   "province_name": "East Mecklenburg-Vorpommern"
+  },
+  {
+   "name": "Stettin",
+   "holder": "pomerania",
+   "tier": "port",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p841",
+   "province_name": "West West Pomeranian"
+  },
+  {
+   "name": "Tórshavn",
+   "holder": "norway",
+   "tier": "small",
+   "shipyard": false,
+   "source": "add",
+   "province": "p285",
+   "province_name": "Eysturoyar"
+  },
+  {
+   "name": "Hafnarfjörður",
+   "holder": "norway",
+   "tier": "small",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p283",
+   "province_name": "Suðurland"
+  },
+  {
+   "name": "Herjolfsnes",
+   "holder": "norway",
+   "tier": "landing",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p385",
+   "province_name": "Kommune Kujalleq"
+  },
+  {
+   "name": "Visby",
+   "holder": "denmark",
+   "tier": "small",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p586",
+   "province_name": "Gotland"
+  },
+  {
+   "name": "Kalmar",
+   "holder": "sweden",
+   "tier": "small",
+   "shipyard": false,
+   "source": "add",
+   "province": "p582",
+   "province_name": "West Kalmar"
+  },
+  {
+   "name": "Stockholm",
+   "holder": "sweden",
+   "tier": "port",
+   "shipyard": false,
+   "source": "add",
+   "province": "p405",
+   "province_name": "Uppsala"
+  },
+  {
+   "name": "Åbo",
+   "holder": "sweden",
+   "tier": "small",
+   "shipyard": false,
+   "source": "add",
+   "province": "p291",
+   "province_name": "Finland Proper"
+  },
+  {
+   "name": "Copenhagen",
+   "holder": "denmark",
+   "tier": "port",
+   "shipyard": true,
+   "source": "add",
+   "province": "p575",
+   "province_name": "West Hovedstaden"
+  },
+  {
+   "name": "Malmö",
+   "holder": "denmark",
+   "tier": "small",
+   "shipyard": false,
+   "source": "add",
+   "province": "p578",
+   "province_name": "Skåne"
+  },
+  {
+   "name": "Bergen",
+   "holder": "norway",
+   "tier": "great",
+   "shipyard": false,
+   "source": "cat",
+   "province": "p391",
+   "province_name": "Hordaland"
+  },
+  {
+   "name": "Oslo",
+   "holder": "norway",
+   "tier": "small",
+   "shipyard": false,
+   "source": "add",
+   "province": "p395",
+   "province_name": "Sogn og Fjordane"
+  },
+  {
+   "name": "Trondheim",
+   "holder": "norway",
+   "tier": "small",
+   "shipyard": false,
+   "source": "add",
+   "province": "p287",
+   "province_name": "Nord-Trøndelag"
+  }
+ ]
+}

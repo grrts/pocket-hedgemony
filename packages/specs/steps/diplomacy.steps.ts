@@ -10,7 +10,7 @@ const { Given, When, Then } = steps("diplomacy");
 
 // ---------------------------------------------------------------- helpers
 
-const DATASET_PATH = new URL("../../rules/data/domain/diplomacy-relations-1444.json", import.meta.url);
+const DATASET_PATH = new URL("../../rules/data/scenarios/1444/relations.json", import.meta.url);
 const datasetHash = () => createHash("sha256").update(readFileSync(DATASET_PATH)).digest("hex");
 
 /** The scenario's diplomacy state; a test route of 10 crossing units stands in for the map. */

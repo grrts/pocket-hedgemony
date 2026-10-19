@@ -8,7 +8,7 @@ import * as G from "@ph/engine";
 import * as DIP from "@ph/engine/domain/diplomacy";
 import * as EVT from "@ph/engine/domain/events";
 import diplomacyConfig from "../../rules/data/domain/diplomacy.json" with { type: "json" };
-import relations1444 from "../../rules/data/domain/diplomacy-relations-1444.json" with { type: "json" };
+import { startRelations as relations1444 } from "@ph/rules/start";
 
 const { Given, When, Then } = steps("realm");
 

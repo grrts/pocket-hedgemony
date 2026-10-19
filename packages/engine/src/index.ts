@@ -39,6 +39,7 @@ export { admit, answerRuling, callTheDiet, courtAims, passReform, defenceCalls, 
 export { askTheCourt, breakShogunate, closeCountry, closedTo, confirmHouse, endShogunate, housesOf, japanHeld, mayJoinRising, missionariesBarred, oathCount, openPorts, restorationOpen, shogunateOrder, shogunateView, shogunOf, summonHouse, swearOrRefuse, vacantMembers, whyNotAskCourt, type HouseView, type ShogunateOrder, type ShogunateView } from "./shogunate.ts";
 export type { EventCard } from "./events.ts";
 export { foundByEvent, treeView } from "./events.ts";
+export { answerEvent, applyEventEffects, createGameEvents, eventCards, eventConditionHolds, monthlyEvents } from "./events.ts";
 export { adminCapacityRank, ASSESSMENT_DIMENSIONS, LEVEL_RANK, realmAssessment, realmStrengths, RISK_DIMENSIONS, type AssessmentConfidence, type AssessmentLevel, type HeritageLine, type RealmAssessment, type RealmHeritage, type RealmHeyday, type RealmStrengths } from "./realmStrengths.ts";
 export { effectInPlay, heritageChoice, heritageFactor, heritageTaxReach, heritageView, IN_PLAY, monthlyHeritage, type HeritageView } from "./heritage.ts";
 export { realmStartingCounts } from "./startingCounts.ts";
@@ -60,3 +61,5 @@ export { setForm } from "./government.ts";
 export { inAnyWar } from "./lords.ts";
 export { ungoverned } from "./recruit.ts";
 export { restoreSleeping, saveSleeping, spareSleepers, wakeRealm, type Waking, type WokenRealm } from "./sleeping.ts";
+export { createGoals, goalPulls, monthlyGoals, nearestLand, pullOf, timeFactor, type Goal, type GoalState } from "./goals.ts";
+export { chronicleView, goalViews, TURNING_POINTS, treeEventOf, type ChronicleRow, type ChronicleState, type ChronicleView, type GoalView, type TurningPoint } from "./chronicle.ts";

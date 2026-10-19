@@ -159,8 +159,8 @@ export function pickTip(tips: Tip[], opened: string[], seed = 0): Tip {
   return pool[seed % pool.length]!;
 }
 
-/** The devshirme entry: sourced, with no invented numbers (TUT-053). */
-export const devshirmeEntry = () => config.almanac.devshirme_entry;
+/** The pençik entry (the first Janissaries): sourced, with no invented numbers (TUT-053). */
+export const pencikEntry = () => config.almanac.pencik_entry;
 
 // ---------------------------------------------------------------- measuring (TUT-114, TUT-115)
 

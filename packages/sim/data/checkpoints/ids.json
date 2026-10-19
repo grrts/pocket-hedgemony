@@ -1,0 +1,4029 @@
+{
+  "$comment": "Canonical realm ids across the history checkpoints. Each continuing state has one id: the map nation id (tools/mapgen/nations-1444.json) when the state or its continuation is on the map, else the catalogue id, else a new id. aliases are the ids merged into it; years are the checkpoints that list it. Checked by check_ids.py.",
+  "realms": [
+    {
+      "id": "england",
+      "name": "England / Great Britain / United Kingdom",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": [
+        "great_britain"
+      ]
+    },
+    {
+      "id": "france",
+      "name": "Kingdom of France",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "scotland",
+      "name": "Kingdom of Scotland",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600
+      ],
+      "aliases": []
+    },
+    {
+      "id": "brittany",
+      "name": "Duchy of Brittany",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "burgundy",
+      "name": "Burgundian State / Habsburg Netherlands",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715
+      ],
+      "aliases": [
+        "spanish_netherlands"
+      ],
+      "note": "Map id; the Burgundian Netherlands continue as the Habsburg/Spanish and Austrian Netherlands until 1795."
+    },
+    {
+      "id": "flanders",
+      "name": "County of Flanders",
+      "years": [
+        1378
+      ],
+      "aliases": []
+    },
+    {
+      "id": "navarre",
+      "name": "Kingdom of Navarre",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600
+      ],
+      "aliases": []
+    },
+    {
+      "id": "castile",
+      "name": "Castile / Spain",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "aragon",
+      "name": "Crown of Aragon",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600
+      ],
+      "aliases": []
+    },
+    {
+      "id": "portugal",
+      "name": "Kingdom of Portugal",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "granada",
+      "name": "Emirate of Granada",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444
+      ],
+      "aliases": []
+    },
+    {
+      "id": "morocco",
+      "name": "Marinid Sultanate",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "tlemcen",
+      "name": "Zayyanid Sultanate of Tlemcen",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "tunis",
+      "name": "Hafsid Tunis / Regency of Tunis",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": [
+        "hafsid"
+      ],
+      "note": "Map id; the Hafsid state continued as the Ottoman regency and beylik."
+    },
+    {
+      "id": "bohemia",
+      "name": "Kingdom of Bohemia (Luxembourg lands)",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "brandenburg",
+      "name": "Brandenburg / Prussia",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "brabant",
+      "name": "Duchy of Brabant",
+      "years": [
+        1378,
+        1405,
+        1420
+      ],
+      "aliases": []
+    },
+    {
+      "id": "holland",
+      "name": "County of Holland",
+      "years": [
+        1378,
+        1405,
+        1420
+      ],
+      "aliases": [
+        "holland_hainaut"
+      ]
+    },
+    {
+      "id": "cologne",
+      "name": "Electorate of Cologne",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715
+      ],
+      "aliases": []
+    },
+    {
+      "id": "cologne_city",
+      "name": "City of Cologne",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715
+      ],
+      "aliases": []
+    },
+    {
+      "id": "palatinate",
+      "name": "Electoral Palatinate",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715
+      ],
+      "aliases": []
+    },
+    {
+      "id": "saxe_wittenberg",
+      "name": "Electorate of Saxe-Wittenberg",
+      "years": [
+        1378,
+        1405,
+        1420
+      ],
+      "aliases": []
+    },
+    {
+      "id": "saxony",
+      "name": "Margraviate of Meissen and Landgraviate of Thuringia (Wettin)",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "bavaria",
+      "name": "Duchy of Bavaria (Upper and Lower Bavaria-Landshut)",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "austria",
+      "name": "Duchies of Austria (Habsburg)",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "lubeck",
+      "name": "Free City of Lübeck",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "switzerland",
+      "name": "Old Swiss Confederacy (eight cantons)",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "teutonic_order",
+      "name": "State of the Teutonic Order",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "livonian_order",
+      "name": "Livonian Order",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "riga",
+      "name": "Archbishopric of Riga",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "denmark",
+      "name": "Kingdom of Denmark",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "sweden",
+      "name": "Kingdom of Sweden",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "norway",
+      "name": "Kingdom of Norway",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "hungary",
+      "name": "Kingdom of Hungary",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "poland",
+      "name": "Kingdom of Poland",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715
+      ],
+      "aliases": []
+    },
+    {
+      "id": "lithuania",
+      "name": "Grand Duchy of Lithuania",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715
+      ],
+      "aliases": []
+    },
+    {
+      "id": "wallachia",
+      "name": "Principality of Wallachia",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "moldavia",
+      "name": "Principality of Moldavia",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "bosnia",
+      "name": "Kingdom of Bosnia",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444
+      ],
+      "aliases": []
+    },
+    {
+      "id": "ragusa",
+      "name": "Republic of Ragusa",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715
+      ],
+      "aliases": []
+    },
+    {
+      "id": "serbia",
+      "name": "Moravian Serbia (Lazar)",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "brankovic",
+      "name": "Lands of Vuk Branković",
+      "years": [
+        1378
+      ],
+      "aliases": []
+    },
+    {
+      "id": "zeta",
+      "name": "Zeta (Balšić)",
+      "years": [
+        1378,
+        1405,
+        1420
+      ],
+      "aliases": []
+    },
+    {
+      "id": "albania",
+      "name": "Albania (Thopia 1378; League of Lezhë 1444; principality 1914)",
+      "years": [
+        1378,
+        1444,
+        1914
+      ],
+      "aliases": [],
+      "note": "The id is reused for three separate states, each with its own formed/ended break."
+    },
+    {
+      "id": "bulgaria_tarnovo",
+      "name": "Tsardom of Bulgaria (Tarnovo)",
+      "years": [
+        1378
+      ],
+      "aliases": []
+    },
+    {
+      "id": "bulgaria_vidin",
+      "name": "Tsardom of Vidin",
+      "years": [
+        1378
+      ],
+      "aliases": []
+    },
+    {
+      "id": "dobruja",
+      "name": "Despotate of Dobruja",
+      "years": [
+        1378
+      ],
+      "aliases": []
+    },
+    {
+      "id": "byzantium",
+      "name": "Byzantine Empire",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444
+      ],
+      "aliases": []
+    },
+    {
+      "id": "morea",
+      "name": "Despotate of the Morea",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444
+      ],
+      "aliases": []
+    },
+    {
+      "id": "achaea",
+      "name": "Principality of Achaea",
+      "years": [
+        1378,
+        1405,
+        1420
+      ],
+      "aliases": []
+    },
+    {
+      "id": "athens",
+      "name": "Duchy of Athens",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444
+      ],
+      "aliases": [
+        "catalan_athens"
+      ]
+    },
+    {
+      "id": "venice",
+      "name": "Republic of Venice",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715
+      ],
+      "aliases": []
+    },
+    {
+      "id": "genoa",
+      "name": "Republic of Genoa",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715
+      ],
+      "aliases": []
+    },
+    {
+      "id": "ottomans",
+      "name": "Ottoman Beylik",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "karaman",
+      "name": "Beylik of Karaman",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444
+      ],
+      "aliases": []
+    },
+    {
+      "id": "germiyan",
+      "name": "Beylik of Germiyan",
+      "years": [
+        1378,
+        1405,
+        1420
+      ],
+      "aliases": []
+    },
+    {
+      "id": "aydin",
+      "name": "Beylik of Aydın",
+      "years": [
+        1378,
+        1405,
+        1420
+      ],
+      "aliases": []
+    },
+    {
+      "id": "mentese",
+      "name": "Beylik of Menteşe",
+      "years": [
+        1378,
+        1405,
+        1420
+      ],
+      "aliases": [
+        "menteshe"
+      ]
+    },
+    {
+      "id": "saruhan",
+      "name": "Beylik of Saruhan",
+      "years": [
+        1378,
+        1405
+      ],
+      "aliases": []
+    },
+    {
+      "id": "hamid",
+      "name": "Beylik of Hamid",
+      "years": [
+        1378
+      ],
+      "aliases": []
+    },
+    {
+      "id": "candar",
+      "name": "Beylik of Candar",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444
+      ],
+      "aliases": []
+    },
+    {
+      "id": "eretnids",
+      "name": "Eretnid Sultanate",
+      "years": [
+        1378
+      ],
+      "aliases": []
+    },
+    {
+      "id": "dulkadir",
+      "name": "Beylik of Dulkadir",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "trebizond",
+      "name": "Empire of Trebizond",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444
+      ],
+      "aliases": []
+    },
+    {
+      "id": "cyprus",
+      "name": "Kingdom of Cyprus",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444
+      ],
+      "aliases": []
+    },
+    {
+      "id": "knights_of_rhodes",
+      "name": "Knights Hospitaller (Rhodes)",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715
+      ],
+      "aliases": []
+    },
+    {
+      "id": "milan",
+      "name": "Visconti Milan (Bernabò)",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715
+      ],
+      "aliases": []
+    },
+    {
+      "id": "visconti_pavia",
+      "name": "Visconti Pavia (Gian Galeazzo)",
+      "years": [
+        1378
+      ],
+      "aliases": []
+    },
+    {
+      "id": "savoy",
+      "name": "Savoy / Sardinia / Italy",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": [
+        "italy"
+      ],
+      "note": "Map id; the Kingdom of Sardinia became the Kingdom of Italy in 1861 (legal continuation)."
+    },
+    {
+      "id": "verona",
+      "name": "Verona (della Scala)",
+      "years": [
+        1378
+      ],
+      "aliases": []
+    },
+    {
+      "id": "padua",
+      "name": "Carrara Padua",
+      "years": [
+        1378,
+        1405
+      ],
+      "aliases": [
+        "carrara_padua"
+      ]
+    },
+    {
+      "id": "modena",
+      "name": "Este Ferrara and Modena",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815
+      ],
+      "aliases": [
+        "ferrara"
+      ]
+    },
+    {
+      "id": "florence",
+      "name": "Republic of Florence",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "pisa",
+      "name": "Republic of Pisa",
+      "years": [
+        1378,
+        1405,
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "papal_states",
+      "name": "Papal States",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "avignon_papacy",
+      "name": "Comtat Venaissin / Avignon obedience",
+      "years": [
+        1378,
+        1405
+      ],
+      "aliases": [
+        "comtat_venaissin"
+      ],
+      "note": "The papal enclave at Avignon; seat of the Avignon obedience, counted as ended by 1420."
+    },
+    {
+      "id": "naples",
+      "name": "Kingdom of Naples",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "sicily",
+      "name": "Kingdom of Sicily",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "oristano",
+      "name": "Judicate of Arborea",
+      "years": [
+        1378,
+        1405,
+        1420
+      ],
+      "aliases": []
+    },
+    {
+      "id": "muscovy",
+      "name": "Muscovy / Russia",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "tver",
+      "name": "Grand Principality of Tver",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444
+      ],
+      "aliases": []
+    },
+    {
+      "id": "ryazan",
+      "name": "Grand Principality of Ryazan",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "suzdal_nizhny",
+      "name": "Nizhny Novgorod-Suzdal",
+      "years": [
+        1378
+      ],
+      "aliases": [
+        "nizhny_novgorod"
+      ]
+    },
+    {
+      "id": "novgorod",
+      "name": "Novgorod Republic",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444
+      ],
+      "aliases": []
+    },
+    {
+      "id": "great_horde",
+      "name": "Golden Horde / Great Horde",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500
+      ],
+      "aliases": [
+        "golden_horde"
+      ],
+      "note": "One id for the Golden Horde and its central rump; the 1438–1466 splits are recorded as Kazan, Crimea, Nogai, the Uzbeks and Astrakhan forming. Ends 1502."
+    },
+    {
+      "id": "white_horde",
+      "name": "White Horde",
+      "years": [
+        1378
+      ],
+      "aliases": []
+    },
+    {
+      "id": "mamluks",
+      "name": "Mamluk Sultanate",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "hejaz",
+      "name": "Sharifate of Mecca",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "yemen",
+      "name": "Yemen (Rasulid, Tahirid, Zaydi imamate)",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": [
+        "zaydi_imamate"
+      ],
+      "note": "Map id; the highland Zaydi imamate is treated as the continuing Yemeni state."
+    },
+    {
+      "id": "hormuz",
+      "name": "Kingdom of Hormuz",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600
+      ],
+      "aliases": []
+    },
+    {
+      "id": "georgia",
+      "name": "Kingdom of Georgia",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444
+      ],
+      "aliases": []
+    },
+    {
+      "id": "qara_qoyunlu",
+      "name": "Qara Qoyunlu",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444
+      ],
+      "aliases": []
+    },
+    {
+      "id": "jalayirids",
+      "name": "Jalayirid Sultanate",
+      "years": [
+        1378,
+        1405,
+        1420
+      ],
+      "aliases": []
+    },
+    {
+      "id": "muzaffarids",
+      "name": "Muzaffarid Sultanate",
+      "years": [
+        1378
+      ],
+      "aliases": []
+    },
+    {
+      "id": "kartids",
+      "name": "Kartid Maliks of Herat",
+      "years": [
+        1378
+      ],
+      "aliases": []
+    },
+    {
+      "id": "sarbadars",
+      "name": "Sarbadars of Sabzevar",
+      "years": [
+        1378
+      ],
+      "aliases": []
+    },
+    {
+      "id": "sufids",
+      "name": "Sufid Khwarazm",
+      "years": [
+        1378
+      ],
+      "aliases": []
+    },
+    {
+      "id": "timurids",
+      "name": "Chagatai Ulus of Timur",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "moghulistan",
+      "name": "Moghulistan",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600
+      ],
+      "aliases": []
+    },
+    {
+      "id": "delhi",
+      "name": "Tughlaq Sultanate of Delhi",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "bengal",
+      "name": "Sultanate of Bengal",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "bahmanis",
+      "name": "Bahmani Sultanate",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "vijayanagar",
+      "name": "Vijayanagara Empire",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600
+      ],
+      "aliases": []
+    },
+    {
+      "id": "calicut",
+      "name": "Calicut (Zamorin)",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715
+      ],
+      "aliases": []
+    },
+    {
+      "id": "kotte",
+      "name": "Gampola / Kotte",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500
+      ],
+      "aliases": [
+        "gampola"
+      ]
+    },
+    {
+      "id": "nepal_malla",
+      "name": "Nepal (Malla)",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715
+      ],
+      "aliases": []
+    },
+    {
+      "id": "tibet",
+      "name": "Tibet (Phagmodrupa; Ganden Phodrang from 1815)",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1815,
+        1914
+      ],
+      "aliases": [
+        "phagmodrupa"
+      ],
+      "note": "Phagmodrupa to c.1618 (ended by 1715); the id is reused for the Ganden Phodrang, formed again in 1815."
+    },
+    {
+      "id": "ming",
+      "name": "Ming Empire",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600
+      ],
+      "aliases": []
+    },
+    {
+      "id": "mongols",
+      "name": "Northern Yuan",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "yunnan_yuan",
+      "name": "Yuan Prince of Liang (Yunnan)",
+      "years": [
+        1378
+      ],
+      "aliases": []
+    },
+    {
+      "id": "naghachu",
+      "name": "Naghachu's Manchuria",
+      "years": [
+        1378
+      ],
+      "aliases": []
+    },
+    {
+      "id": "korea",
+      "name": "Goryeo",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "japan",
+      "name": "Ashikaga Shogunate (Northern Court)",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "japan_southern_court",
+      "name": "Southern Court of Japan",
+      "years": [
+        1378
+      ],
+      "aliases": []
+    },
+    {
+      "id": "kamakura_kubo",
+      "name": "Kamakura kubo (Kantō)",
+      "years": [
+        1378,
+        1405,
+        1420
+      ],
+      "aliases": []
+    },
+    {
+      "id": "ryukyu",
+      "name": "Chūzan / Ryukyu",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815
+      ],
+      "aliases": [
+        "chuzan"
+      ]
+    },
+    {
+      "id": "hokuzan",
+      "name": "Hokuzan",
+      "years": [
+        1378,
+        1405
+      ],
+      "aliases": []
+    },
+    {
+      "id": "nanzan",
+      "name": "Nanzan",
+      "years": [
+        1378,
+        1405,
+        1420
+      ],
+      "aliases": []
+    },
+    {
+      "id": "dai_viet",
+      "name": "Đại Việt (Trần)",
+      "years": [
+        1378,
+        1405,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "champa",
+      "name": "Champa",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "khmer",
+      "name": "Khmer Kingdom",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "ayutthaya",
+      "name": "Ayutthaya / Siam",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "sukhothai",
+      "name": "Sukhothai",
+      "years": [
+        1378,
+        1405,
+        1420
+      ],
+      "aliases": []
+    },
+    {
+      "id": "lan_xang",
+      "name": "Lan Xang / Luang Prabang",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": [
+        "luang_prabang"
+      ],
+      "note": "Luang Prabang keeps the Lan Xang id as the royal line that becomes the Kingdom of Laos; Vientiane and Champasak form at the 1707–1713 split."
+    },
+    {
+      "id": "ava",
+      "name": "Kingdom of Ava",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "pegu",
+      "name": "Hanthawaddy",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "majapahit",
+      "name": "Majapahit",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "singapura",
+      "name": "Singapura (Temasek)",
+      "years": [
+        1378
+      ],
+      "aliases": []
+    },
+    {
+      "id": "tondo",
+      "name": "Tondo",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "ternate",
+      "name": "Ternate",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "mali",
+      "name": "Mali Empire",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600
+      ],
+      "aliases": []
+    },
+    {
+      "id": "kano",
+      "name": "Kano",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "kanem_bornu",
+      "name": "Kanem (Sayfawa)",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "bulala",
+      "name": "Bulala",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "benin",
+      "name": "Kingdom of Benin",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "ethiopia",
+      "name": "Ethiopian Empire",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "ifat",
+      "name": "Sultanate of Ifat",
+      "years": [
+        1378,
+        1405
+      ],
+      "aliases": []
+    },
+    {
+      "id": "kilwa",
+      "name": "Kilwa Sultanate",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "mogadishu",
+      "name": "Sultanate of Mogadishu",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715
+      ],
+      "aliases": []
+    },
+    {
+      "id": "great_zimbabwe",
+      "name": "Great Zimbabwe",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444
+      ],
+      "aliases": []
+    },
+    {
+      "id": "tepanecs",
+      "name": "Tepanec Azcapotzalco",
+      "years": [
+        1378,
+        1405,
+        1420
+      ],
+      "aliases": [
+        "azcapotzalco",
+        "tepanec_azcapotzalco"
+      ]
+    },
+    {
+      "id": "aztecs",
+      "name": "Mexica Tenochtitlan",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "purepecha",
+      "name": "Purépecha (Tarascan) lordships",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "maya",
+      "name": "Mayapan league / Maní (Xiu)",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500
+      ],
+      "aliases": [
+        "mayapan_league",
+        "maya_mani_xiu"
+      ],
+      "note": "Map id; the League of Mayapan (to c.1441) and its successor Maní (Xiu) are treated as one line. Ends with the Spanish conquest (1542)."
+    },
+    {
+      "id": "inca",
+      "name": "Kingdom of Cusco",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "chimu",
+      "name": "Chimor",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444
+      ],
+      "aliases": []
+    },
+    {
+      "id": "muisca",
+      "name": "Muisca zipazgo of Bacatá",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444,
+        1500
+      ],
+      "aliases": [
+        "muisca_bacata"
+      ]
+    },
+    {
+      "id": "quitu_cara",
+      "name": "Quitu-Cara lordships",
+      "years": [
+        1378,
+        1405,
+        1420,
+        1444
+      ],
+      "aliases": []
+    },
+    {
+      "id": "wales_glyndwr",
+      "name": "Principality of Wales (Owain Glyndŵr)",
+      "years": [
+        1405
+      ],
+      "aliases": []
+    },
+    {
+      "id": "provence",
+      "name": "County of Provence",
+      "years": [
+        1405,
+        1420,
+        1444
+      ],
+      "aliases": []
+    },
+    {
+      "id": "lucca",
+      "name": "Lordship of Lucca",
+      "years": [
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715
+      ],
+      "aliases": []
+    },
+    {
+      "id": "siena",
+      "name": "Republic of Siena",
+      "years": [
+        1405,
+        1420,
+        1444,
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "montferrat",
+      "name": "Marquisate of Montferrat",
+      "years": [
+        1405,
+        1420,
+        1444,
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "mantua",
+      "name": "Lordship of Mantua",
+      "years": [
+        1405,
+        1420,
+        1444,
+        1500,
+        1600
+      ],
+      "aliases": []
+    },
+    {
+      "id": "pskov",
+      "name": "Pskov Republic",
+      "years": [
+        1405,
+        1420,
+        1444,
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "epirus",
+      "name": "Tocco Despotate (Cephalonia and Epirus)",
+      "years": [
+        1405,
+        1420,
+        1444
+      ],
+      "aliases": []
+    },
+    {
+      "id": "ottoman_mehmed",
+      "name": "Ottoman Anatolia (Mehmed Çelebi)",
+      "years": [
+        1405
+      ],
+      "aliases": []
+    },
+    {
+      "id": "shirvan",
+      "name": "Shirvanshahs",
+      "years": [
+        1405,
+        1420,
+        1444,
+        1500,
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "aq_qoyunlu",
+      "name": "Aq Qoyunlu",
+      "years": [
+        1405,
+        1420,
+        1444,
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "multan",
+      "name": "Multan (Khizr Khan 1405; Langah sultanate 1444–1500)",
+      "years": [
+        1405,
+        1444,
+        1500
+      ],
+      "aliases": [],
+      "note": "The id is reused for two separate states, each with its own formed/ended break."
+    },
+    {
+      "id": "jaunpur",
+      "name": "Sharqi Sultanate of Jaunpur",
+      "years": [
+        1405,
+        1420,
+        1444
+      ],
+      "aliases": []
+    },
+    {
+      "id": "gujarat",
+      "name": "Gujarat (Zafar Khan)",
+      "years": [
+        1405,
+        1420,
+        1444,
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "malwa",
+      "name": "Malwa Sultanate",
+      "years": [
+        1405,
+        1420,
+        1444,
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "khandesh",
+      "name": "Faruqi Khandesh",
+      "years": [
+        1405,
+        1420,
+        1444,
+        1500,
+        1600
+      ],
+      "aliases": []
+    },
+    {
+      "id": "orissa",
+      "name": "Eastern Ganga Odisha",
+      "years": [
+        1405,
+        1420,
+        1444,
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "jaffna",
+      "name": "Jaffna Kingdom",
+      "years": [
+        1405,
+        1420,
+        1444,
+        1500,
+        1600
+      ],
+      "aliases": []
+    },
+    {
+      "id": "kashmir",
+      "name": "Shah Miri Kashmir",
+      "years": [
+        1405,
+        1420,
+        1444,
+        1500,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "mewar",
+      "name": "Mewar",
+      "years": [
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "oirat",
+      "name": "Oirat",
+      "years": [
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715
+      ],
+      "aliases": []
+    },
+    {
+      "id": "lan_na",
+      "name": "Lan Na",
+      "years": [
+        1405,
+        1420,
+        1444,
+        1500,
+        1600
+      ],
+      "aliases": []
+    },
+    {
+      "id": "malacca",
+      "name": "Malacca Sultanate",
+      "years": [
+        1405,
+        1420,
+        1444,
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "samudra_pasai",
+      "name": "Samudra Pasai",
+      "years": [
+        1405,
+        1420,
+        1444,
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "maynila",
+      "name": "Maynila",
+      "years": [
+        1405,
+        1420,
+        1444,
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "songhai",
+      "name": "Songhai (Gao)",
+      "years": [
+        1405,
+        1420,
+        1444,
+        1500,
+        1600
+      ],
+      "aliases": []
+    },
+    {
+      "id": "jolof",
+      "name": "Jolof Empire",
+      "years": [
+        1405,
+        1420,
+        1444,
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "kongo",
+      "name": "Kingdom of Kongo",
+      "years": [
+        1405,
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "texcoco",
+      "name": "Texcoco",
+      "years": [
+        1405
+      ],
+      "aliases": []
+    },
+    {
+      "id": "dauphinist_france",
+      "name": "Dauphinist France (Kingdom of Bourges)",
+      "years": [
+        1420
+      ],
+      "aliases": []
+    },
+    {
+      "id": "lorraine",
+      "name": "Duchy of Lorraine",
+      "years": [
+        1420,
+        1444,
+        1500,
+        1600,
+        1715
+      ],
+      "aliases": []
+    },
+    {
+      "id": "bar",
+      "name": "Duchy of Bar",
+      "years": [
+        1420
+      ],
+      "aliases": []
+    },
+    {
+      "id": "aquileia",
+      "name": "Patriarchate of Aquileia (Friuli)",
+      "years": [
+        1420
+      ],
+      "aliases": []
+    },
+    {
+      "id": "tabor",
+      "name": "Tábor (Hussite radicals)",
+      "years": [
+        1420
+      ],
+      "aliases": []
+    },
+    {
+      "id": "tyrol",
+      "name": "County of Tyrol",
+      "years": [
+        1420,
+        1444
+      ],
+      "aliases": []
+    },
+    {
+      "id": "pomerania",
+      "name": "Duchies of Pomerania",
+      "years": [
+        1420,
+        1444,
+        1500,
+        1600
+      ],
+      "aliases": []
+    },
+    {
+      "id": "mecklenburg",
+      "name": "Duchy of Mecklenburg",
+      "years": [
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "sindh",
+      "name": "Sindh (Samma)",
+      "years": [
+        1420,
+        1444,
+        1500,
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "brunei",
+      "name": "Brunei",
+      "years": [
+        1420,
+        1444,
+        1500,
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "adal",
+      "name": "Adal (Walashma)",
+      "years": [
+        1420,
+        1444,
+        1500,
+        1600,
+        1715
+      ],
+      "aliases": []
+    },
+    {
+      "id": "zapotec",
+      "name": "Zaachila (Zapotec)",
+      "years": [
+        1420,
+        1444,
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "kiche",
+      "name": "K'iche'",
+      "years": [
+        1420,
+        1444,
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "ireland",
+      "name": "Ireland (Gaelic lordships; Kingdom of Ireland 1542–1800)",
+      "years": [
+        1444,
+        1500,
+        1600,
+        1715
+      ],
+      "aliases": [],
+      "note": "The id follows the island's polity; ended with the 1801 Union."
+    },
+    {
+      "id": "wurttemberg",
+      "name": "County of Württemberg",
+      "years": [
+        1444,
+        1500,
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "hesse",
+      "name": "Hesse / Hesse-Kassel",
+      "years": [
+        1444,
+        1500,
+        1600,
+        1715,
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "luneburg",
+      "name": "Brunswick-Lüneburg / Hanover",
+      "years": [
+        1444,
+        1500,
+        1600,
+        1715,
+        1815
+      ],
+      "aliases": [
+        "hanover"
+      ]
+    },
+    {
+      "id": "hamburg",
+      "name": "Free City of Hamburg",
+      "years": [
+        1444,
+        1500,
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "gotland",
+      "name": "Gotland under Eric of Pomerania",
+      "years": [
+        1444
+      ],
+      "aliases": []
+    },
+    {
+      "id": "kazan",
+      "name": "Khanate of Kazan",
+      "years": [
+        1444,
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "crimea",
+      "name": "Crimean Khanate",
+      "years": [
+        1444,
+        1500,
+        1600,
+        1715
+      ],
+      "aliases": []
+    },
+    {
+      "id": "nogai",
+      "name": "Nogai Horde",
+      "years": [
+        1444,
+        1500,
+        1600
+      ],
+      "aliases": []
+    },
+    {
+      "id": "uzbek_khanate",
+      "name": "Uzbek Khanate / Bukhara",
+      "years": [
+        1444,
+        1500,
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": [
+        "bukhara"
+      ],
+      "note": "Abu'l-Khayr's khanate, the Shaybanids and the Khanate/Emirate of Bukhara treated as one continuing state."
+    },
+    {
+      "id": "oman",
+      "name": "Oman (Nabhani kings and Ibadi imams)",
+      "years": [
+        1444,
+        1500,
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "jurchens",
+      "name": "Jianzhou Jurchens / Later Jin / Qing",
+      "years": [
+        1444,
+        1500,
+        1600,
+        1715,
+        1815
+      ],
+      "aliases": [
+        "qing"
+      ],
+      "note": "Map id; Nurhaci's Jianzhou state continued as Later Jin (1616) and Qing (1636). The Republic of China (1912) is a separate id."
+    },
+    {
+      "id": "sirhind_lodi",
+      "name": "Lodi Punjab",
+      "years": [
+        1444
+      ],
+      "aliases": []
+    },
+    {
+      "id": "ahom",
+      "name": "Ahom Kingdom",
+      "years": [
+        1444,
+        1500,
+        1600,
+        1715,
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "timbuktu_tuareg",
+      "name": "Tuareg of the Niger bend (Akil)",
+      "years": [
+        1444,
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "mossi",
+      "name": "Mossi kingdoms",
+      "years": [
+        1444,
+        1500,
+        1600,
+        1715,
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "ajuran",
+      "name": "Ajuran",
+      "years": [
+        1444,
+        1500,
+        1600
+      ],
+      "aliases": []
+    },
+    {
+      "id": "mutapa",
+      "name": "Mutapa",
+      "years": [
+        1444,
+        1500,
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "iroquois",
+      "name": "Haudenosaunee",
+      "years": [
+        1444,
+        1500,
+        1600,
+        1715
+      ],
+      "aliases": []
+    },
+    {
+      "id": "bavaria_landshut",
+      "name": "Duchy of Bavaria-Landshut",
+      "years": [
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "albertine_saxony",
+      "name": "Duchy of Saxony (Albertine)",
+      "years": [
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "astrakhan",
+      "name": "Khanate of Astrakhan",
+      "years": [
+        1500
+      ],
+      "aliases": [
+        "astrakhan_khanate"
+      ]
+    },
+    {
+      "id": "kazakh_khanate",
+      "name": "Kazakh Khanate",
+      "years": [
+        1500,
+        1600,
+        1715,
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "dughlat_kashgar",
+      "name": "Dughlat realm of Kashgar and Yarkand",
+      "years": [
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "timurid_samarkand",
+      "name": "Timurid principality of Samarkand",
+      "years": [
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "timurid_kabul",
+      "name": "Timurid principality of Kabul",
+      "years": [
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "fergana",
+      "name": "Timurid principality of Fergana",
+      "years": [
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "persia",
+      "name": "Safavid, Afsharid, Zand and Qajar Iran",
+      "years": [
+        1500,
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": [
+        "safaviyya"
+      ],
+      "note": "Safavid order (1500) and Iran to 1914 under one id."
+    },
+    {
+      "id": "kartli",
+      "name": "Kingdom of Kartli",
+      "years": [
+        1500,
+        1600,
+        1715
+      ],
+      "aliases": []
+    },
+    {
+      "id": "kakheti",
+      "name": "Kingdom of Kakheti",
+      "years": [
+        1500,
+        1600,
+        1715
+      ],
+      "aliases": []
+    },
+    {
+      "id": "imereti",
+      "name": "Kingdom of Imereti",
+      "years": [
+        1500,
+        1600,
+        1715
+      ],
+      "aliases": []
+    },
+    {
+      "id": "marwar",
+      "name": "Kingdom of Marwar",
+      "years": [
+        1500,
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "bijapur",
+      "name": "Adil Shahi Sultanate of Bijapur",
+      "years": [
+        1500,
+        1600
+      ],
+      "aliases": []
+    },
+    {
+      "id": "ahmadnagar",
+      "name": "Nizam Shahi Sultanate of Ahmadnagar",
+      "years": [
+        1500,
+        1600
+      ],
+      "aliases": []
+    },
+    {
+      "id": "berar",
+      "name": "Imad Shahi Sultanate of Berar",
+      "years": [
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "rinpungpa",
+      "name": "Rinpungpa",
+      "years": [
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "ouchi",
+      "name": "Ōuchi clan",
+      "years": [
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "uesugi",
+      "name": "Ōgigayatsu Uesugi",
+      "years": [
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "later_hojo",
+      "name": "Ise (later Hōjō)",
+      "years": [
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "toungoo",
+      "name": "Toungoo",
+      "years": [
+        1500,
+        1600
+      ],
+      "aliases": []
+    },
+    {
+      "id": "mrauk_u",
+      "name": "Mrauk U (Arakan)",
+      "years": [
+        1500,
+        1600,
+        1715
+      ],
+      "aliases": []
+    },
+    {
+      "id": "demak",
+      "name": "Sultanate of Demak",
+      "years": [
+        1500
+      ],
+      "aliases": []
+    },
+    {
+      "id": "torwa",
+      "name": "Torwa (Butua)",
+      "years": [
+        1500,
+        1600
+      ],
+      "aliases": []
+    },
+    {
+      "id": "netherlands",
+      "name": "United Provinces / Kingdom of the Netherlands",
+      "years": [
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": [
+        "dutch_republic"
+      ],
+      "note": "Dutch Republic and the post-1813 kingdom treated as one state."
+    },
+    {
+      "id": "tyrone",
+      "name": "O'Neill lordship of Tyrone",
+      "years": [
+        1600
+      ],
+      "aliases": []
+    },
+    {
+      "id": "parma",
+      "name": "Duchy of Parma and Piacenza",
+      "years": [
+        1600,
+        1715,
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "urbino",
+      "name": "Duchy of Urbino",
+      "years": [
+        1600
+      ],
+      "aliases": []
+    },
+    {
+      "id": "hre",
+      "name": "Holy Roman Empire",
+      "years": [
+        1600,
+        1715
+      ],
+      "aliases": []
+    },
+    {
+      "id": "transylvania",
+      "name": "Principality of Transylvania",
+      "years": [
+        1600
+      ],
+      "aliases": []
+    },
+    {
+      "id": "mainz",
+      "name": "Electorate of Mainz",
+      "years": [
+        1600,
+        1715
+      ],
+      "aliases": []
+    },
+    {
+      "id": "salzburg",
+      "name": "Prince-Archbishopric of Salzburg",
+      "years": [
+        1600,
+        1715
+      ],
+      "aliases": []
+    },
+    {
+      "id": "brunswick",
+      "name": "Brunswick-Wolfenbüttel / Duchy of Brunswick",
+      "years": [
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": [
+        "brunswick_wolfenbuttel"
+      ]
+    },
+    {
+      "id": "ducal_prussia",
+      "name": "Duchy of Prussia",
+      "years": [
+        1600
+      ],
+      "aliases": []
+    },
+    {
+      "id": "courland",
+      "name": "Duchy of Courland and Semigallia",
+      "years": [
+        1600,
+        1715
+      ],
+      "aliases": []
+    },
+    {
+      "id": "algiers",
+      "name": "Regency of Algiers",
+      "years": [
+        1600,
+        1715,
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "tripoli",
+      "name": "Regency of Tripoli",
+      "years": [
+        1600,
+        1715,
+        1815
+      ],
+      "aliases": [
+        "tripoli_regency"
+      ]
+    },
+    {
+      "id": "khiva",
+      "name": "Khanate of Khwarazm (Khiva)",
+      "years": [
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "mughals",
+      "name": "Mughal Empire",
+      "years": [
+        1600,
+        1715,
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "golconda",
+      "name": "Golconda Sultanate",
+      "years": [
+        1600
+      ],
+      "aliases": []
+    },
+    {
+      "id": "madurai",
+      "name": "Madurai Nayaks",
+      "years": [
+        1600,
+        1715
+      ],
+      "aliases": []
+    },
+    {
+      "id": "mysore",
+      "name": "Kingdom of Mysore",
+      "years": [
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "kandy",
+      "name": "Kingdom of Kandy",
+      "years": [
+        1600,
+        1715
+      ],
+      "aliases": []
+    },
+    {
+      "id": "koch_bihar",
+      "name": "Koch Bihar",
+      "years": [
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "tsangpa",
+      "name": "Tsangpa dynasty",
+      "years": [
+        1600
+      ],
+      "aliases": []
+    },
+    {
+      "id": "khalkha",
+      "name": "Khalkha Mongols",
+      "years": [
+        1600,
+        1715,
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "tokugawa",
+      "name": "Tokugawa domain",
+      "years": [
+        1600
+      ],
+      "aliases": []
+    },
+    {
+      "id": "mac",
+      "name": "Mạc remnant (Cao Bằng)",
+      "years": [
+        1600
+      ],
+      "aliases": []
+    },
+    {
+      "id": "aceh",
+      "name": "Aceh Sultanate",
+      "years": [
+        1600,
+        1715,
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "johor",
+      "name": "Johor Sultanate",
+      "years": [
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "banten",
+      "name": "Banten Sultanate",
+      "years": [
+        1600,
+        1715
+      ],
+      "aliases": []
+    },
+    {
+      "id": "mataram",
+      "name": "Mataram Sultanate",
+      "years": [
+        1600,
+        1715
+      ],
+      "aliases": []
+    },
+    {
+      "id": "surabaya",
+      "name": "Surabaya",
+      "years": [
+        1600
+      ],
+      "aliases": []
+    },
+    {
+      "id": "gowa",
+      "name": "Gowa (Makassar)",
+      "years": [
+        1600,
+        1715,
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "tidore",
+      "name": "Tidore Sultanate",
+      "years": [
+        1600,
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "oyo",
+      "name": "Oyo",
+      "years": [
+        1600,
+        1715,
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "ndongo",
+      "name": "Kingdom of Ndongo",
+      "years": [
+        1600
+      ],
+      "aliases": []
+    },
+    {
+      "id": "funj",
+      "name": "Funj Sultanate of Sennar",
+      "years": [
+        1600,
+        1715,
+        1815
+      ],
+      "aliases": [
+        "sennar"
+      ]
+    },
+    {
+      "id": "mapuche",
+      "name": "Mapuche (Araucanía)",
+      "years": [
+        1600,
+        1715,
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "itza",
+      "name": "Itza kingdom",
+      "years": [
+        1600
+      ],
+      "aliases": []
+    },
+    {
+      "id": "powhatan",
+      "name": "Powhatan Paramount Chiefdom",
+      "years": [
+        1600
+      ],
+      "aliases": []
+    },
+    {
+      "id": "huron",
+      "name": "Wendat Confederacy",
+      "years": [
+        1600
+      ],
+      "aliases": []
+    },
+    {
+      "id": "trier",
+      "name": "Electorate of Trier",
+      "years": [
+        1715
+      ],
+      "aliases": []
+    },
+    {
+      "id": "holstein_gottorp",
+      "name": "Duchy of Holstein-Gottorp",
+      "years": [
+        1715
+      ],
+      "aliases": []
+    },
+    {
+      "id": "cossack_hetmanate",
+      "name": "Cossack Hetmanate",
+      "years": [
+        1715
+      ],
+      "aliases": []
+    },
+    {
+      "id": "kalmyk_khanate",
+      "name": "Kalmyk Khanate",
+      "years": [
+        1715
+      ],
+      "aliases": []
+    },
+    {
+      "id": "montenegro",
+      "name": "Prince-Bishopric of Montenegro",
+      "years": [
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "hotaki",
+      "name": "Hotaki Kandahar",
+      "years": [
+        1715
+      ],
+      "aliases": []
+    },
+    {
+      "id": "khoshut_khanate",
+      "name": "Khoshut Khanate (Tibet)",
+      "years": [
+        1715
+      ],
+      "aliases": []
+    },
+    {
+      "id": "ladakh",
+      "name": "Kingdom of Ladakh",
+      "years": [
+        1715,
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "maratha",
+      "name": "Maratha state",
+      "years": [
+        1715,
+        1815
+      ],
+      "aliases": [
+        "marathas",
+        "maratha_confederacy"
+      ]
+    },
+    {
+      "id": "kolhapur",
+      "name": "Maratha Kingdom of Kolhapur",
+      "years": [
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "amber",
+      "name": "Amber (Jaipur)",
+      "years": [
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "thanjavur",
+      "name": "Thanjavur Maratha kingdom",
+      "years": [
+        1715,
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "venad",
+      "name": "Venad (Travancore)",
+      "years": [
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "manipur",
+      "name": "Kingdom of Manipur",
+      "years": [
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "bhutan",
+      "name": "Bhutan (Drukpa state)",
+      "years": [
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "nguyen_lords",
+      "name": "Đàng Trong (Nguyễn lords)",
+      "years": [
+        1715
+      ],
+      "aliases": []
+    },
+    {
+      "id": "vientiane",
+      "name": "Kingdom of Vientiane",
+      "years": [
+        1715,
+        1815
+      ],
+      "aliases": [
+        "lan_xang (in 1815 only)"
+      ],
+      "note": "In 1815 this file used lan_xang for Vientiane; renamed for that year only."
+    },
+    {
+      "id": "champasak",
+      "name": "Kingdom of Champasak",
+      "years": [
+        1715,
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "sulu",
+      "name": "Sultanate of Sulu",
+      "years": [
+        1715,
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "rozvi",
+      "name": "Rozvi Empire (Changamire)",
+      "years": [
+        1715,
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "arma_pashalik",
+      "name": "Pashalik of Timbuktu (Arma)",
+      "years": [
+        1715,
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "segou",
+      "name": "Bamana Empire of Ségou",
+      "years": [
+        1715,
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "dahomey",
+      "name": "Kingdom of Dahomey",
+      "years": [
+        1715,
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "asante",
+      "name": "Asante",
+      "years": [
+        1715,
+        1815
+      ],
+      "aliases": [
+        "ashanti"
+      ]
+    },
+    {
+      "id": "matamba",
+      "name": "Kingdom of Matamba (Ndongo-Matamba)",
+      "years": [
+        1715,
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "luxembourg",
+      "name": "Grand Duchy of Luxembourg",
+      "years": [
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "baden",
+      "name": "Grand Duchy of Baden",
+      "years": [
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "hesse_darmstadt",
+      "name": "Hesse-Darmstadt / Grand Duchy of Hesse",
+      "years": [
+        1815,
+        1914
+      ],
+      "aliases": [
+        "hesse (in 1914 only)"
+      ],
+      "note": "In 1914 this file used hesse for the Grand Duchy of Hesse; renamed for that year only."
+    },
+    {
+      "id": "oldenburg",
+      "name": "Duchy of Oldenburg",
+      "years": [
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "frankfurt",
+      "name": "Free City of Frankfurt",
+      "years": [
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "krakow",
+      "name": "Free City of Kraków",
+      "years": [
+        1815
+      ],
+      "aliases": [
+        "free_city_of_krakow"
+      ]
+    },
+    {
+      "id": "ioannina_pashalik",
+      "name": "Pashalik of Yanina",
+      "years": [
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "egypt",
+      "name": "Eyalet of Egypt (Muhammad Ali)",
+      "years": [
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "baghdad_pashalik",
+      "name": "Mamluk Pashalik of Baghdad",
+      "years": [
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "diriyah",
+      "name": "Emirate of Diriyah (First Saudi State)",
+      "years": [
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "lahej",
+      "name": "Sultanate of Lahej",
+      "years": [
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "afghanistan",
+      "name": "Durrani Empire / Afghanistan",
+      "years": [
+        1815,
+        1914
+      ],
+      "aliases": [
+        "durrani_empire"
+      ]
+    },
+    {
+      "id": "kokand",
+      "name": "Khanate of Kokand",
+      "years": [
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "sikh_empire",
+      "name": "Sikh Empire",
+      "years": [
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "kalat",
+      "name": "Khanate of Kalat",
+      "years": [
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "gwalior",
+      "name": "Scindia of Gwalior",
+      "years": [
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "indore",
+      "name": "Holkar of Indore",
+      "years": [
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "nagpur",
+      "name": "Bhonsle of Nagpur",
+      "years": [
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "baroda",
+      "name": "Gaekwad of Baroda",
+      "years": [
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "dhar",
+      "name": "Puar of Dhar",
+      "years": [
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "hyderabad",
+      "name": "Hyderabad State (Nizam)",
+      "years": [
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "awadh",
+      "name": "Awadh",
+      "years": [
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "nepal",
+      "name": "Kingdom of Nepal",
+      "years": [
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "hawaii",
+      "name": "Kingdom of Hawaii",
+      "years": [
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "sokoto",
+      "name": "Sokoto Caliphate",
+      "years": [
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "darfur",
+      "name": "Sultanate of Darfur",
+      "years": [
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "wadai",
+      "name": "Sultanate of Wadai",
+      "years": [
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "buganda",
+      "name": "Kingdom of Buganda",
+      "years": [
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "merina",
+      "name": "Kingdom of Imerina",
+      "years": [
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "united_states",
+      "name": "United States",
+      "years": [
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "kingdom_of_haiti",
+      "name": "Kingdom of Haiti",
+      "years": [
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "haiti",
+      "name": "Republic of Haiti",
+      "years": [
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "argentina",
+      "name": "United Provinces of the Río de la Plata / Argentina",
+      "years": [
+        1815,
+        1914
+      ],
+      "aliases": [
+        "united_provinces_rio_de_la_plata"
+      ]
+    },
+    {
+      "id": "liga_federal",
+      "name": "Federal League (Artigas)",
+      "years": [
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "paraguay",
+      "name": "Paraguay",
+      "years": [
+        1815,
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "united_provinces_of_new_granada",
+      "name": "United Provinces of New Granada",
+      "years": [
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "mexican_insurgent_government",
+      "name": "Supreme Mexican Government (insurgents)",
+      "years": [
+        1815
+      ],
+      "aliases": []
+    },
+    {
+      "id": "germany",
+      "name": "German Empire",
+      "years": [
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "china",
+      "name": "Republic of China",
+      "years": [
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "canada",
+      "name": "Dominion of Canada",
+      "years": [
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "australia",
+      "name": "Commonwealth of Australia",
+      "years": [
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "south_africa",
+      "name": "Union of South Africa",
+      "years": [
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "brazil",
+      "name": "Republic of the United States of Brazil",
+      "years": [
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "belgium",
+      "name": "Kingdom of Belgium",
+      "years": [
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "finland",
+      "name": "Grand Duchy of Finland",
+      "years": [
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "bulgaria",
+      "name": "Tsardom of Bulgaria",
+      "years": [
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "romania",
+      "name": "Kingdom of Romania",
+      "years": [
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "greece",
+      "name": "Kingdom of Greece",
+      "years": [
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "monaco",
+      "name": "Principality of Monaco",
+      "years": [
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "san_marino",
+      "name": "Republic of San Marino",
+      "years": [
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "liechtenstein",
+      "name": "Principality of Liechtenstein",
+      "years": [
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "andorra",
+      "name": "Principality of Andorra",
+      "years": [
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "nejd",
+      "name": "Emirate of Nejd and Hasa",
+      "years": [
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "kuwait",
+      "name": "Sheikhdom of Kuwait",
+      "years": [
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "sarawak",
+      "name": "Raj of Sarawak",
+      "years": [
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "liberia",
+      "name": "Republic of Liberia",
+      "years": [
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "zanzibar",
+      "name": "Sultanate of Zanzibar",
+      "years": [
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "newfoundland",
+      "name": "Dominion of Newfoundland",
+      "years": [
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "new_zealand",
+      "name": "Dominion of New Zealand",
+      "years": [
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "tonga",
+      "name": "Kingdom of Tonga",
+      "years": [
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "mexico",
+      "name": "United Mexican States",
+      "years": [
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "guatemala",
+      "name": "Republic of Guatemala",
+      "years": [
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "honduras",
+      "name": "Republic of Honduras",
+      "years": [
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "el_salvador",
+      "name": "Republic of El Salvador",
+      "years": [
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "nicaragua",
+      "name": "Republic of Nicaragua",
+      "years": [
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "costa_rica",
+      "name": "Republic of Costa Rica",
+      "years": [
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "panama",
+      "name": "Republic of Panama",
+      "years": [
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "cuba",
+      "name": "Republic of Cuba",
+      "years": [
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "dominican_republic",
+      "name": "Dominican Republic",
+      "years": [
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "colombia",
+      "name": "Republic of Colombia",
+      "years": [
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "venezuela",
+      "name": "United States of Venezuela",
+      "years": [
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "ecuador",
+      "name": "Republic of Ecuador",
+      "years": [
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "peru",
+      "name": "Republic of Peru",
+      "years": [
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "bolivia",
+      "name": "Republic of Bolivia",
+      "years": [
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "chile",
+      "name": "Republic of Chile",
+      "years": [
+        1914
+      ],
+      "aliases": []
+    },
+    {
+      "id": "uruguay",
+      "name": "Oriental Republic of Uruguay",
+      "years": [
+        1914
+      ],
+      "aliases": []
+    }
+  ]
+}

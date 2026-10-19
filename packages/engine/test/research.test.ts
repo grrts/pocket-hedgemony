@@ -192,3 +192,95 @@ describe("research", () => {
     expect(s.realmResearch).toHaveLength(rules.nations.length);
   });
 });
+
+describe("Era I from the start, and a 1378 start (RSCH-113 to RSCH-115)", () => {
+  const start1378 = { year: 1378, month: 9, day: 20 };
+
+  it("dates Era I from 1378 to 1500 and Medieval to 1377, with nothing renumbered", () => {
+    expect(rs.researchConfig.era_dates.M).toBe(600);
+    expect(rs.researchConfig.era_dates.I).toBe(1378);
+    expect(rs.eraOf(start1378)).toBe("I");
+    expect(rs.eraOf({ year: 1444, month: 11, day: 11 })).toBe("I");
+    expect(rs.eraOf({ year: 1500 })).toBe("II");
+    expect(rs.TREE_ERAS).toEqual(["A", "M", "I", "II", "III", "IV", "V", "VI", "VII", "VIII"]);
+    // A Medieval invention is one era behind at either start.
+    expect(rs.behindDiscountPct("M", start1378)).toBe(rs.behindDiscountPct("M", { year: 1444 }));
+  });
+
+  it("paces Era I to the start: x1 from 1444, about x2.18 from 1378, other eras unchanged", () => {
+    expect(rs.eraPace("I", 1444)).toBe(1);
+    expect(rs.eraPace("I")).toBe(1);
+    expect(rs.eraPace("I", 1378)).toBeCloseTo(122 / 56);
+    expect(rs.eraPace("II", 1378)).toBe(1);
+    expect(rs.eraPace("M", 1378)).toBe(1);
+    const p1444 = rs.startingProgramme("france", rs.tree(), { year: 1444, month: 11, day: 11 });
+    const p1378 = rs.startingProgramme("france", rs.tree(), start1378);
+    expect(rs.studyCostFor(p1444, "L5", { year: 1450 })).toBe(20);
+    expect(rs.studyCostFor(rs.startingProgramme("france"), "L5", { year: 1450 })).toBe(20);
+    expect(rs.studyCostFor(p1378, "L5", { year: 1400 })).toBeCloseTo((20 * 122) / 56);
+    expect(rs.studyCostFor(p1378, "B5", { year: 1400 })).toBe(80);
+    expect(rs.studyCostFor(p1378, "F02", { year: 1400 })).toBe(rs.studyCostFor(p1444, "F02", { year: 1450 }));
+  });
+
+  it("leaves a 1444 start exactly as the start groups give it", () => {
+    const start = { year: 1444, month: 11, day: 11 };
+    expect(rs.startBlockFor(start)).toBeUndefined();
+    for (const n of rules.nations) {
+      const p = rs.startingProgramme(n.id, rs.tree(), start);
+      expect([...p.known].sort(), n.id).toEqual([...rs.startingKnowledgeFor(n.id)].sort());
+      expect(p.group).toBe(rs.startGroupOf(n.id));
+    }
+    const { w, me, p } = setup();
+    expect(p.startYear).toBe(1444);
+    expect(rs.studyCostFor(p, "L5", w.date)).toBe(20);
+    expect(knows(w, w.nationIndex.get("ottomans")!, "W3")).toBe(true);
+    expect(knows(w, me, "L1")).toBe(true);
+  });
+
+  it("gives the 1378 sets: removals, additions and the realms of 1378 in their groups", () => {
+    const k = (id: string) => rs.startingKnowledgeFor(id, rs.tree(), start1378);
+    expect(k("ottomans").has("W3")).toBe(false);
+    expect(k("ottomans").has("W5")).toBe(false);
+    expect(k("ottomans").has("G3")).toBe(false);
+    expect(k("france").has("W3")).toBe(true);
+    expect(k("ming").has("W5")).toBe(true);
+    expect(k("ming").has("G3")).toBe(false);
+    expect(k("venice").has("G3")).toBe(true);
+    expect(k("bohemia").has("W4")).toBe(false);
+    expect(k("portugal").has("S4")).toBe(false);
+    expect(k("genoa").has("S4")).toBe(true);
+    expect(k("timurids").has("L3")).toBe(false);
+    expect(k("jalayirids").has("L3")).toBe(true);
+    expect(k("korea").has("L4")).toBe(true);
+    expect(rs.startGroupOf("timurids", start1378)).toBe("khanates");
+    expect(rs.startGroupOf("timurids")).toBe("islamic");
+    expect(rs.startGroupOf("white_horde", start1378)).toBe("hordes");
+    expect(rs.startGroupOf("white_horde")).toBeUndefined();
+    expect(rs.startGroupOf("great_horde", start1378)).toBe("hordes");
+    expect(rs.startGroupOf("lithuania", start1378)).toBe("latin");
+    expect(rs.startGroupOf("tepanecs", start1378)).toBe("mesoamerica");
+    // Every set the block gives is complete (RSCH-099), the realms not yet on the map included.
+    const block = rs.startBlockFor(start1378)!;
+    const ids = new Set([...rules.nations.map((n) => n.id), ...Object.keys(block.join), ...Object.keys(block.add), ...Object.keys(block.remove)]);
+    for (const id of ids) expect(rs.startSetGaps(k(id)), id).toEqual([]);
+    // Standing (RSCH-097): as in 1444, but Timur's realm stands with the khanates.
+    expect(rs.eraName(rs.standing(k("ottomans")))).toBe("Era I");
+    expect(rs.eraName(rs.standing(k("timurids")))).toBe("Medieval");
+    expect(rs.eraName(rs.standing(k("jalayirids")))).toBe("Era I");
+  });
+
+  it("seeds a world that starts in 1378 with the 1378 sets and the Era I pace", () => {
+    const early = { ...rules, defines: { ...rules.defines, startDate: { ...rules.defines.startDate, ...start1378 } } };
+    const w = createWorld(early, 1);
+    const france = w.nationIndex.get("france")!;
+    const ottomans = w.nationIndex.get("ottomans")!;
+    expect(w.research[france]!.startYear).toBe(1378);
+    expect(knows(w, ottomans, "W3")).toBe(false);
+    expect(knows(w, france, "W3")).toBe(true);
+    expect(rs.studyCostFor(w.research[france]!, "L5", w.date)).toBeCloseTo((20 * 122) / 56);
+    // The pace survives a save.
+    const chunks = worldChunks(w, { playerNation: "france", options: {} as never });
+    const back = restoreWorld(new Map(chunks.map((c) => [c.id, c])), early).world;
+    expect(back.research[france]!.startYear).toBe(1378);
+  });
+});

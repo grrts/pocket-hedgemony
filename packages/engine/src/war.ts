@@ -23,6 +23,8 @@ import { lostBattle } from "./rebels.ts";
 import { bestTerms, markSurrender, noteWarBattle, settlementTable } from "./settlement.ts";
 import { priceContext, priceOfWar, whyAiWontDeclare } from "./priceOfWar.ts";
 import { grabbedLand } from "./conquest.ts";
+import { goalPlacesHeldBy, goalPulls } from "./goals.ts";
+import goalsConfig from "../../rules/data/domain/events.json" with { type: "json" };
 import { cededProvinces, fittingAim, landTakenWithoutAim, monthlyRefusals, noteWarVictory, peaceVoices, refusedPeace, truceBroken, type GameWar } from "./peace.ts";
 import { aiAnswersDefence, defenceCalls, dissolveEmpire, whyNotDissolveTerm } from "./institutions.ts";
 
@@ -1153,19 +1155,33 @@ export function monthlyDiplomacy(world: World, news: News[]): void {
 export function aiDeclarations(world: World, news: News[]): void {
   const d = world.diplomacy;
   const chance = world.rules.defines.war.aiDeclareChancePerMonth;
+  const G = goalsConfig.goals;
   for (let n = 0; n < world.nationCount; n++) {
     if (n === world.player || world.nationGone[n] || dip.warOf(d, world.nationIds[n]!)) continue;
-    if (world.rng.next() >= chance) continue;
+    // A realm's goals make it look for a war more often (EVT-105).
+    const pulls = goalPulls(world, n);
+    const neighbours = () => dip.neighbours(d, world.nationIds[n]!).map((id) => world.nationIndex.get(id)!);
+    let near = pulls?.size ? neighbours() : null;
+    const most = near ? Math.max(0, ...near.map((t) => pulls!.get(t) ?? 0)) : 0;
+    if (world.rng.next() >= chance * (1 + G.war_chance_per_pull * most)) continue;
+    near ??= neighbours();
     const ctx = priceContext(world, n);
-    const targets = dip
-      .neighbours(d, world.nationIds[n]!)
-      .map((id) => world.nationIndex.get(id)!)
-      .filter((t) => t !== undefined && !world.nationGone[t] && relationState(world, n, t).state === null && !whyAiWontDeclare(world, n, t, priceOfWar(world, n, t, ctx)));
+    const targets = near.filter((t) => t !== undefined && !world.nationGone[t] && relationState(world, n, t).state === null && !whyAiWontDeclare(world, n, t, priceOfWar(world, n, t, ctx)));
     if (!targets.length) continue;
-    const t = targets[world.rng.int(targets.length)]!;
+    const t = most > 0 ? weightedPick(world, targets, (x) => 1 + G.target_weight_per_pull * (pulls!.get(x) ?? 0)) : targets[world.rng.int(targets.length)]!;
     if (demandFirst(world, n, t)) continue;
-    declareWar(world, n, t, news);
+    // A Take land aim on a place one of its goals names is the war's aim (EVT-105).
+    const place = goalPlacesHeldBy(world, n, t).map((p) => world.provinceIds[p]!).find((p) => dip.warAimsOf(d, world.nationIds[n]!, world.nationIds[t]!).some((h) => h.aim === "take_land" && h.province === p));
+    declareWar(world, n, t, news, place ? { aim: "take_land", province: place } : {});
   }
+}
+
+/** One of the items, each as likely as its weight. */
+function weightedPick(world: World, items: number[], weight: (x: number) => number): number {
+  const total = items.reduce((s, x) => s + weight(x), 0);
+  let r = world.rng.next() * total;
+  for (const x of items) if ((r -= weight(x)) < 0) return x;
+  return items.at(-1)!;
 }
 
 /**
@@ -1181,7 +1197,9 @@ function demandFirst(world: World, n: number, t: number): boolean {
   if (d.refusedDemands.some((x) => x.asker === a && x.asked === b)) return false;
   if (!whyNotDemand(world, n, t, "pay_tribute")) return !makeDemand(world, n, t, "pay_tribute");
   const capital = world.provinceIndex.get(world.rules.nations[t]!.capital);
-  const p = demandableProvinces(world, n, t).find((x) => x !== capital);
+  // A place one of its goals names is asked for first (EVT-105).
+  const can = demandableProvinces(world, n, t).filter((x) => x !== capital);
+  const p = goalPlacesHeldBy(world, n, t).find((x) => can.includes(x)) ?? can[0];
   if (p !== undefined && !whyNotDemand(world, n, t, "hand_over_province", p)) return !makeDemand(world, n, t, "hand_over_province", p);
   return false;
 }

@@ -1,0 +1,8468 @@
+{
+ "$comment": "Bridge events of the West, 1378 to 1444 (plan-1378 §5 rows Church, Empire, France and England, Iberia, Italy; milestone 10 step 6; EVT-085 to EVT-089, D-EVT-20). Same shape as events-campaign.json's events; the engine joins every events-bridge-<region>.json to the campaign. places: event-tree place -> map provinces, as events-places.json. It also carries six 1444 events re-dated for the 1378 start (same id, replacing the campaign's). Every event is conditional; dates are history, not a script (EVT-004, EVT-019).",
+ "events": {
+  "schism_vincennes": {
+   "id": "schism_vincennes",
+   "name": "France declares for Clement",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [
+    "p_western_schism"
+   ],
+   "regions": [
+    "europe"
+   ],
+   "importance": "major",
+   "roles": {
+    "crown": {
+     "historical": [
+      "france"
+     ],
+     "select": "fixed",
+     "as": [
+      "initiator"
+     ]
+    },
+    "pope": {
+     "historical": [
+      "papal_states"
+     ],
+     "select": "fixed",
+     "as": [
+      "affected"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1378,
+    "latest": 1385,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "france"
+     },
+     {
+      "exists": "papal_states"
+     },
+     {
+      "period_active": {
+       "id": "p_western_schism"
+      }
+     },
+     {
+      "not": {
+       "flag": {
+        "who": "france",
+        "id": "obedience_rome"
+       }
+      }
+     },
+     {
+      "not": {
+       "flag": {
+        "who": "france",
+        "id": "obedience_avignon"
+       }
+      }
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 0.25
+   },
+   "options": [
+    {
+     "id": "declare_for_clement",
+     "chooser": "$crown",
+     "historical": true,
+     "ai": {
+      "base": 80
+     },
+     "effects": {
+      "immediate": [
+       {
+        "set_flag": {
+         "on": "france",
+         "id": "obedience_avignon",
+         "years": 0
+        }
+       },
+       {
+        "on": "france",
+        "stat": {
+         "prestige": 5
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "stay_with_urban",
+     "chooser": "$crown",
+     "ai": {
+      "base": 12
+     },
+     "effects": {
+      "immediate": [
+       {
+        "set_flag": {
+         "on": "france",
+         "id": "obedience_rome",
+         "years": 0
+        }
+       },
+       {
+        "on": "france",
+        "stat": {
+         "prestige": -5
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "wait_on_a_council",
+     "chooser": "$crown",
+     "ai": {
+      "base": 8
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "france",
+        "stat": {
+         "prestige": -2
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {
+    "immediate": [
+     {
+      "set_flag": {
+       "on": "papal_states",
+       "id": "obedience_rome",
+       "years": 0
+      }
+     }
+    ]
+   },
+   "history": {
+    "date": "1378-11-16",
+    "confidence": "high"
+   }
+  },
+  "schism_obedience": {
+   "id": "schism_obedience",
+   "name": "A realm chooses its Pope",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [
+    "p_western_schism"
+   ],
+   "regions": [
+    "europe"
+   ],
+   "importance": "major",
+   "roles": {
+    "realm": {
+     "historical": [
+      "england",
+      "scotland",
+      "castile",
+      "aragon",
+      "portugal",
+      "naples"
+     ],
+     "select": {
+      "where": "region:europe",
+      "condition": {
+       "all": [
+        {
+         "religion": {
+          "who": "this",
+          "is": "catholic"
+         }
+        },
+        {
+         "not": {
+          "flag": {
+           "who": "this",
+           "id": "obedience_rome"
+          }
+         }
+        },
+        {
+         "not": {
+          "flag": {
+           "who": "this",
+           "id": "obedience_avignon"
+          }
+         }
+        }
+       ]
+      }
+     },
+     "as": [
+      "initiator"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1378,
+    "latest": 1418,
+    "mode": "approximate",
+    "repeat": "process"
+   },
+   "requires": {
+    "event": {
+     "id": "schism_vincennes"
+    }
+   },
+   "trigger": {
+    "all": [
+     {
+      "period_active": {
+       "id": "p_western_schism"
+      }
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 2
+   },
+   "options": [
+    {
+     "id": "obey_rome",
+     "chooser": "$realm",
+     "historical": true,
+     "ai": {
+      "base": 50,
+      "factors": [
+       {
+        "if": {
+         "relation": {
+          "who": "$realm",
+          "other": "england",
+          "type": "alliance"
+         }
+        },
+        "factor": 3
+       },
+       {
+        "if": {
+         "at_war": {
+          "who": "$realm",
+          "other": "france"
+         }
+        },
+        "factor": 3
+       },
+       {
+        "if": {
+         "relation": {
+          "who": "$realm",
+          "other": "france",
+          "type": "rivalry"
+         }
+        },
+        "factor": 2
+       },
+       {
+        "if": {
+         "flag": {
+          "who": "$realm",
+          "id": "empire_member"
+         }
+        },
+        "factor": 2
+       }
+      ]
+     },
+     "effects": {
+      "immediate": [
+       {
+        "set_flag": {
+         "on": "$realm",
+         "id": "obedience_rome",
+         "years": 0
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "obey_avignon",
+     "chooser": "$realm",
+     "ai": {
+      "base": 35,
+      "factors": [
+       {
+        "if": {
+         "relation": {
+          "who": "$realm",
+          "other": "france",
+          "type": "alliance"
+         }
+        },
+        "factor": 4
+       },
+       {
+        "if": {
+         "relation": {
+          "who": "$realm",
+          "other": "france",
+          "type": "subject"
+         }
+        },
+        "factor": 6
+       },
+       {
+        "if": {
+         "at_war": {
+          "who": "$realm",
+          "other": "england"
+         }
+        },
+        "factor": 3
+       }
+      ]
+     },
+     "effects": {
+      "immediate": [
+       {
+        "set_flag": {
+         "on": "$realm",
+         "id": "obedience_avignon",
+         "years": 0
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "stay_neutral",
+     "chooser": "$realm",
+     "ai": {
+      "base": 15
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "$realm",
+        "stat": {
+         "prestige": -3
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "history": {
+    "date": [
+     "1378-11",
+     1387
+    ],
+    "confidence": "high"
+   }
+  },
+  "urban_deposes_joanna": {
+   "id": "urban_deposes_joanna",
+   "name": "Urban deposes Queen Joanna",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [
+    "p_western_schism"
+   ],
+   "regions": [
+    "europe"
+   ],
+   "importance": "regional",
+   "roles": {
+    "pope": {
+     "historical": [
+      "papal_states"
+     ],
+     "select": "fixed",
+     "as": [
+      "initiator"
+     ]
+    },
+    "queen": {
+     "historical": [
+      "naples"
+     ],
+     "select": "fixed",
+     "as": [
+      "victim"
+     ]
+    },
+    "claimant": {
+     "historical": [
+      "hungary"
+     ],
+     "select": "fixed",
+     "as": [
+      "beneficiary"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1379,
+    "latest": 1395,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "papal_states"
+     },
+     {
+      "exists": "naples"
+     },
+     {
+      "flag": {
+       "who": "naples",
+       "id": "obedience_avignon"
+      }
+     },
+     {
+      "flag": {
+       "who": "papal_states",
+       "id": "obedience_rome"
+      }
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 1.5
+   },
+   "options": [
+    {
+     "id": "depose_the_queen",
+     "chooser": "$pope",
+     "historical": true,
+     "ai": {
+      "base": 75
+     },
+     "effects": {
+      "immediate": [
+       {
+        "casus_belli": {
+         "who": "hungary",
+         "against": "naples",
+         "type": "claim",
+         "years": 15
+        }
+       },
+       {
+        "set_flag": {
+         "on": "naples",
+         "id": "queen_deposed",
+         "years": 15
+        }
+       },
+       {
+        "on": "naples",
+        "stat": {
+         "legitimacy": -15
+        }
+       },
+       {
+        "relation": {
+         "who": "papal_states",
+         "other": "naples",
+         "type": "rivalry",
+         "set": true
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "seek_terms",
+     "chooser": "$pope",
+     "ai": {
+      "base": 25
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "papal_states",
+        "stat": {
+         "prestige": -5
+        }
+       },
+       {
+        "on": "naples",
+        "stat": {
+         "legitimacy": 5
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "follow_ups": [
+    {
+     "event": "durazzo_takes_naples",
+     "delay": [
+      0,
+      3
+     ],
+     "boost": 3.0
+    }
+   ],
+   "history": {
+    "date": "1380-04-21",
+    "confidence": "high"
+   }
+  },
+  "wyclif_and_the_lollards": {
+   "id": "wyclif_and_the_lollards",
+   "name": "Wyclif and the Lollards",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [
+    "p_western_schism"
+   ],
+   "regions": [
+    "europe"
+   ],
+   "importance": "regional",
+   "roles": {
+    "realm": {
+     "historical": [
+      "england"
+     ],
+     "select": "fixed",
+     "as": [
+      "affected"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1378,
+    "latest": 1400,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "england"
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 3
+   },
+   "options": [
+    {
+     "id": "condemn_at_blackfriars",
+     "chooser": "$realm",
+     "historical": true,
+     "ai": {
+      "base": 70
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "england",
+        "stat": {
+         "legitimacy": 5
+        }
+       },
+       {
+        "spread": {
+         "kind": "ideology",
+         "id": "devotional_reform",
+         "where": "england",
+         "amount": 0.05
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "tolerate_the_preachers",
+     "chooser": "$realm",
+     "ai": {
+      "base": 30
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "england",
+        "stat": {
+         "legitimacy": -5
+        }
+       },
+       {
+        "spread": {
+         "kind": "ideology",
+         "id": "devotional_reform",
+         "where": "england",
+         "amount": 0.2
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {
+    "immediate": [
+     {
+      "spread": {
+       "kind": "ideology",
+       "id": "devotional_reform",
+       "where": "region:europe",
+       "amount": 0.02
+      }
+     }
+    ]
+   },
+   "follow_ups": [
+    {
+     "event": "burning_of_hus",
+     "delay": [
+      10,
+      40
+     ],
+     "boost": 1.5
+    }
+   ],
+   "history": {
+    "date": "1382-05-21",
+    "confidence": "high"
+   }
+  },
+  "council_of_pisa": {
+   "id": "council_of_pisa",
+   "name": "The Council of Pisa",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [
+    "p_western_schism"
+   ],
+   "regions": [
+    "europe"
+   ],
+   "importance": "regional",
+   "roles": {
+    "church": {
+     "historical": [
+      "papal_states"
+     ],
+     "select": "fixed",
+     "as": [
+      "affected"
+     ]
+    },
+    "council": {
+     "historical": [
+      "france"
+     ],
+     "select": "fixed",
+     "as": [
+      "participant"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1395,
+    "latest": 1415,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "period_active": {
+       "id": "p_western_schism"
+      }
+     },
+     {
+      "count_countries": {
+       "where": "region:europe",
+       "condition": {
+        "flag": {
+         "who": "this",
+         "id": "obedience_avignon"
+        }
+       },
+       "op": ">=",
+       "value": 2
+      }
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 4
+   },
+   "options": [
+    {
+     "id": "elect_a_third_pope",
+     "chooser": null,
+     "historical": true,
+     "ai": {
+      "base": 60
+     },
+     "effects": {
+      "immediate": [
+       {
+        "set_flag": {
+         "on": "global",
+         "id": "three_popes",
+         "years": 0
+        }
+       },
+       {
+        "on": "papal_states",
+        "stat": {
+         "prestige": -10
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "heal_the_schism",
+     "chooser": null,
+     "ai": {
+      "base": 25
+     },
+     "effects": {
+      "immediate": [
+       {
+        "end_period": {
+         "id": "p_western_schism"
+        }
+       },
+       {
+        "on": "papal_states",
+        "stat": {
+         "prestige": 10
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "council_fails",
+     "chooser": null,
+     "ai": {
+      "base": 15
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "papal_states",
+        "stat": {
+         "prestige": -5
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "follow_ups": [
+    {
+     "event": "council_of_constance",
+     "delay": [
+      3,
+      10
+     ],
+     "boost": 2.0
+    }
+   ],
+   "history": {
+    "date": [
+     "1409-03-25",
+     "1409-08-07"
+    ],
+    "confidence": "high"
+   }
+  },
+  "council_of_constance": {
+   "id": "council_of_constance",
+   "name": "The Council of Constance",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [
+    "p_western_schism"
+   ],
+   "regions": [
+    "europe"
+   ],
+   "importance": "major",
+   "roles": {
+    "convener": {
+     "historical": [
+      "hungary"
+     ],
+     "select": {
+      "where": "region:europe",
+      "condition": {
+       "flag": {
+        "who": "this",
+        "id": "emperor"
+       }
+      }
+     },
+     "as": [
+      "initiator"
+     ]
+    },
+    "church": {
+     "historical": [
+      "papal_states"
+     ],
+     "select": "fixed",
+     "as": [
+      "beneficiary"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1400,
+    "latest": 1430,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "optional": [
+    {
+     "event": "council_of_pisa",
+     "weight": 2.0
+    }
+   ],
+   "trigger": {
+    "all": [
+     {
+      "period_active": {
+       "id": "p_western_schism"
+      }
+     },
+     {
+      "exists": "papal_states"
+     },
+     {
+      "date": {
+       "min": 1405
+      }
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 3
+   },
+   "options": [
+    {
+     "id": "end_the_schism",
+     "chooser": "$convener",
+     "historical": true,
+     "ai": {
+      "base": 80
+     },
+     "effects": {
+      "immediate": [
+       {
+        "end_period": {
+         "id": "p_western_schism"
+        }
+       },
+       {
+        "set_flag": {
+         "on": "global",
+         "id": "schism_healed",
+         "years": 0
+        }
+       },
+       {
+        "on": "$convener",
+        "stat": {
+         "prestige": 15
+        }
+       },
+       {
+        "on": "papal_states",
+        "stat": {
+         "prestige": 15
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "let_the_popes_quarrel",
+     "chooser": "$convener",
+     "ai": {
+      "base": 20
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "$convener",
+        "stat": {
+         "prestige": -5
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "follow_ups": [
+    {
+     "event": "burning_of_hus",
+     "delay": [
+      0,
+      2
+     ],
+     "boost": 3.0
+    }
+   ],
+   "history": {
+    "date": [
+     "1414-11-05",
+     "1418-04-22"
+    ],
+    "confidence": "high"
+   }
+  },
+  "burning_of_hus": {
+   "id": "burning_of_hus",
+   "name": "Jan Hus burned at Constance",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [
+    "p_western_schism"
+   ],
+   "regions": [
+    "europe"
+   ],
+   "importance": "regional",
+   "roles": {
+    "realm": {
+     "historical": [
+      "bohemia"
+     ],
+     "select": "fixed",
+     "as": [
+      "victim"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1405,
+    "latest": 1430,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "bohemia"
+     },
+     {
+      "event": {
+       "id": "council_of_constance",
+       "within_years": 4
+      }
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 0.5
+   },
+   "options": [
+    {
+     "id": "burn_hus",
+     "chooser": null,
+     "historical": true,
+     "ai": {
+      "base": 75
+     },
+     "effects": {
+      "immediate": [
+       {
+        "spread": {
+         "kind": "ideology",
+         "id": "devotional_reform",
+         "where": "bohemia",
+         "amount": 0.3
+        }
+       },
+       {
+        "on": "bohemia",
+        "stat": {
+         "stability": -1
+        }
+       },
+       {
+        "set_flag": {
+         "on": "bohemia",
+         "id": "hussite_movement",
+         "years": 0
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "spare_hus",
+     "chooser": null,
+     "ai": {
+      "base": 25
+     },
+     "effects": {
+      "immediate": [
+       {
+        "spread": {
+         "kind": "ideology",
+         "id": "devotional_reform",
+         "where": "bohemia",
+         "amount": 0.1
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "follow_ups": [
+    {
+     "event": "first_defenestration_of_prague",
+     "delay": [
+      1,
+      6
+     ],
+     "boost": 3.0
+    }
+   ],
+   "history": {
+    "date": "1415-07-06",
+    "confidence": "high"
+   }
+  },
+  "first_defenestration_of_prague": {
+   "id": "first_defenestration_of_prague",
+   "name": "The Defenestration of Prague",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [
+    "p_hussite_wars"
+   ],
+   "regions": [
+    "europe"
+   ],
+   "importance": "major",
+   "roles": {
+    "realm": {
+     "historical": [
+      "bohemia"
+     ],
+     "select": "fixed",
+     "as": [
+      "affected",
+      "resister"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1410,
+    "latest": 1440,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "bohemia"
+     },
+     {
+      "any": [
+       {
+        "flag": {
+         "who": "bohemia",
+         "id": "hussite_movement"
+        }
+       },
+       {
+        "ideology": {
+         "who": "bohemia",
+         "id": "devotional_reform",
+         "op": ">=",
+         "value": 0.3
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 2
+   },
+   "options": [
+    {
+     "id": "the_hussites_rise",
+     "chooser": "$realm",
+     "historical": true,
+     "ai": {
+      "base": 70
+     },
+     "effects": {
+      "immediate": [
+       {
+        "start_period": {
+         "id": "p_hussite_wars"
+        }
+       },
+       {
+        "rebels": {
+         "on": "$realm",
+         "type": "religious",
+         "size": "large"
+        }
+       },
+       {
+        "on": "$realm",
+        "stat": {
+         "stability": -2
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "grant_the_chalice",
+     "chooser": "$realm",
+     "ai": {
+      "base": 30
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "$realm",
+        "stat": {
+         "legitimacy": -10
+        }
+       },
+       {
+        "set_flag": {
+         "on": "$realm",
+         "id": "utraquist_compact",
+         "years": 0
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "follow_ups": [
+    {
+     "event": "anti_hussite_crusade",
+     "delay": [
+      0,
+      3
+     ],
+     "boost": 3.0
+    }
+   ],
+   "history": {
+    "date": "1419-07-30",
+    "confidence": "high"
+   }
+  },
+  "council_of_basel": {
+   "id": "council_of_basel",
+   "name": "The Council of Basel",
+   "ages": [
+    "age_of_schism_and_conquerors",
+    "age_of_gunpowder_empires"
+   ],
+   "periods": [],
+   "regions": [
+    "europe"
+   ],
+   "importance": "regional",
+   "roles": {
+    "church": {
+     "historical": [
+      "papal_states"
+     ],
+     "select": "fixed",
+     "as": [
+      "affected"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1420,
+    "latest": 1449,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "papal_states"
+     },
+     {
+      "not": {
+       "period_active": {
+        "id": "p_western_schism"
+       }
+      }
+     },
+     {
+      "date": {
+       "min": 1425
+      }
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 3
+   },
+   "execution": {
+    "duration_years": 18
+   },
+   "options": [
+    {
+     "id": "council_over_pope",
+     "chooser": null,
+     "historical": true,
+     "ai": {
+      "base": 55
+     },
+     "effects": {
+      "immediate": [
+       {
+        "set_flag": {
+         "on": "global",
+         "id": "basel_schism",
+         "years": 18
+        }
+       },
+       {
+        "on": "papal_states",
+        "stat": {
+         "prestige": -10
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "pope_masters_the_council",
+     "chooser": null,
+     "ai": {
+      "base": 45
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "papal_states",
+        "stat": {
+         "prestige": 5
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {
+    "immediate": [
+     {
+      "end_period": {
+       "id": "p_hussite_wars"
+      },
+      "if": {
+       "period_active": {
+        "id": "p_hussite_wars"
+       }
+      }
+     }
+    ]
+   },
+   "history": {
+    "date": [
+     "1431-07-23",
+     "1449-04-25"
+    ],
+    "confidence": "high"
+   }
+  },
+  "council_of_florence_union": {
+   "id": "council_of_florence_union",
+   "name": "The Union of Florence",
+   "ages": [
+    "age_of_schism_and_conquerors",
+    "age_of_gunpowder_empires"
+   ],
+   "periods": [],
+   "regions": [
+    "europe",
+    "middle_east"
+   ],
+   "importance": "regional",
+   "roles": {
+    "church": {
+     "historical": [
+      "papal_states"
+     ],
+     "select": "fixed",
+     "as": [
+      "beneficiary"
+     ]
+    },
+    "east": {
+     "historical": [
+      "byzantium"
+     ],
+     "select": "fixed",
+     "as": [
+      "initiator"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1420,
+    "latest": 1453,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "byzantium"
+     },
+     {
+      "exists": "papal_states"
+     },
+     {
+      "not": {
+       "period_active": {
+        "id": "p_western_schism"
+       }
+      }
+     },
+     {
+      "any": [
+       {
+        "at_war": {
+         "who": "byzantium",
+         "other": "ottoman"
+        }
+       },
+       {
+        "relation": {
+         "who": "byzantium",
+         "other": "ottoman",
+         "type": "subject"
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 3
+   },
+   "options": [
+    {
+     "id": "sign_the_union",
+     "chooser": "$east",
+     "historical": true,
+     "ai": {
+      "base": 60
+     },
+     "effects": {
+      "immediate": [
+       {
+        "set_flag": {
+         "on": "byzantium",
+         "id": "council_of_florence_union",
+         "years": 0
+        }
+       },
+       {
+        "on": "byzantium",
+        "stat": {
+         "legitimacy": -10
+        }
+       },
+       {
+        "on": "papal_states",
+        "stat": {
+         "prestige": 10
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "refuse_the_union",
+     "chooser": "$east",
+     "ai": {
+      "base": 40
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "byzantium",
+        "stat": {
+         "legitimacy": 5
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "follow_ups": [
+    {
+     "event": "crusade_of_varna",
+     "delay": [
+      2,
+      8
+     ],
+     "boost": 2.0
+    }
+   ],
+   "history": {
+    "date": "1439-07-06",
+    "confidence": "high"
+   }
+  },
+  "wenceslaus_succeeds": {
+   "id": "wenceslaus_succeeds",
+   "name": "Wenceslaus succeeds Charles IV",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [],
+   "regions": [
+    "europe"
+   ],
+   "importance": "major",
+   "roles": {
+    "realm": {
+     "historical": [
+      "bohemia"
+     ],
+     "select": "fixed",
+     "as": [
+      "affected"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1378,
+    "latest": 1395,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "bohemia"
+     },
+     {
+      "flag": {
+       "who": "bohemia",
+       "id": "emperor"
+      }
+     },
+     {
+      "stat": {
+       "who": "bohemia",
+       "stat": "ruler_years",
+       "op": "<=",
+       "value": 0
+      }
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 0.25
+   },
+   "options": [
+    {
+     "id": "share_the_lands",
+     "chooser": "$realm",
+     "historical": true,
+     "ai": {
+      "base": 70
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "bohemia",
+        "stat": {
+         "legitimacy": -5
+        }
+       },
+       {
+        "set_flag": {
+         "on": "bohemia",
+         "id": "luxembourg_brothers",
+         "years": 20
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "hold_the_inheritance",
+     "chooser": "$realm",
+     "ai": {
+      "base": 30
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "bohemia",
+        "stat": {
+         "legitimacy": 5,
+         "prestige": 5
+        }
+       },
+       {
+        "vassalize": {
+         "who": "bohemia",
+         "target": "brandenburg",
+         "type": "personal_union"
+        },
+        "if": {
+         "exists": "brandenburg"
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "history": {
+    "date": "1378-11-29",
+    "confidence": "high"
+   }
+  },
+  "neuberg_partition": {
+   "id": "neuberg_partition",
+   "name": "The partition of Neuberg",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [],
+   "regions": [
+    "europe"
+   ],
+   "importance": "regional",
+   "roles": {
+    "realm": {
+     "historical": [
+      "austria"
+     ],
+     "select": "fixed",
+     "as": [
+      "affected"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1378,
+    "latest": 1395,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "austria"
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 1
+   },
+   "options": [
+    {
+     "id": "divide_at_neuberg",
+     "chooser": "$realm",
+     "historical": true,
+     "ai": {
+      "base": 70
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "austria",
+        "stat": {
+         "legitimacy": -10
+        }
+       },
+       {
+        "set_flag": {
+         "on": "austria",
+         "id": "habsburg_partition",
+         "years": 60
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "keep_joint_rule",
+     "chooser": "$realm",
+     "ai": {
+      "base": 30
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "austria",
+        "stat": {
+         "legitimacy": 5,
+         "stability": -1
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "history": {
+    "date": "1379-09-25",
+    "confidence": "high"
+   }
+  },
+  "swabian_city_war": {
+   "id": "swabian_city_war",
+   "name": "The Swabian City War",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [],
+   "regions": [
+    "europe"
+   ],
+   "importance": "regional",
+   "roles": {
+    "princes": {
+     "historical": [
+      "wurttemberg"
+     ],
+     "select": "fixed",
+     "as": [
+      "initiator"
+     ]
+    },
+    "ally": {
+     "historical": [
+      "bavaria"
+     ],
+     "select": "fixed",
+     "as": [
+      "participant"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1378,
+    "latest": 1400,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "wurttemberg"
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 5
+   },
+   "options": [
+    {
+     "id": "crush_the_league",
+     "chooser": "$princes",
+     "historical": true,
+     "ai": {
+      "base": 65
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "wurttemberg",
+        "stat": {
+         "prestige": 10,
+         "legitimacy": 5
+        }
+       },
+       {
+        "set_flag": {
+         "on": "global",
+         "id": "swabian_league_broken",
+         "years": 0
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "make_terms_with_the_towns",
+     "chooser": "$princes",
+     "ai": {
+      "base": 35
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "wurttemberg",
+        "stat": {
+         "treasury": "-10%",
+         "prestige": -5
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "history": {
+    "date": [
+     "1388-08-23",
+     "1389-05-05"
+    ],
+    "confidence": "high"
+   }
+  },
+  "battle_of_sempach": {
+   "id": "battle_of_sempach",
+   "name": "The Battle of Sempach",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [],
+   "regions": [
+    "europe"
+   ],
+   "importance": "regional",
+   "roles": {
+    "duke": {
+     "historical": [
+      "austria"
+     ],
+     "select": "fixed",
+     "as": [
+      "cost_bearer"
+     ]
+    },
+    "confederates": {
+     "historical": [
+      "swiss_confederation"
+     ],
+     "select": "fixed",
+     "as": [
+      "resister"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1380,
+    "latest": 1400,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "austria"
+     },
+     {
+      "exists": "swiss_confederation"
+     },
+     {
+      "any": [
+       {
+        "at_war": {
+         "who": "austria",
+         "other": "swiss_confederation"
+        }
+       },
+       {
+        "opinion": {
+         "who": "austria",
+         "other": "swiss_confederation",
+         "op": "<=",
+         "value": -25
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 3
+   },
+   "options": [
+    {
+     "id": "swiss_victory",
+     "chooser": null,
+     "historical": true,
+     "ai": {
+      "base": 65
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "austria",
+        "stat": {
+         "prestige": -15,
+         "legitimacy": -10
+        }
+       },
+       {
+        "on": "swiss_confederation",
+        "stat": {
+         "prestige": 15
+        }
+       },
+       {
+        "set_flag": {
+         "on": "swiss_confederation",
+         "id": "sempach_won",
+         "years": 10
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "austrian_victory",
+     "chooser": null,
+     "ai": {
+      "base": 35
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "austria",
+        "stat": {
+         "prestige": 10
+        }
+       },
+       {
+        "on": "swiss_confederation",
+        "stat": {
+         "stability": -1
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "follow_ups": [
+    {
+     "event": "battle_of_naefels",
+     "delay": [
+      1,
+      4
+     ],
+     "boost": 2.0
+    }
+   ],
+   "history": {
+    "date": "1386-07-09",
+    "confidence": "high"
+   }
+  },
+  "battle_of_naefels": {
+   "id": "battle_of_naefels",
+   "name": "The Battle of Näfels",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [],
+   "regions": [
+    "europe"
+   ],
+   "importance": "regional",
+   "roles": {
+    "duke": {
+     "historical": [
+      "austria"
+     ],
+     "select": "fixed",
+     "as": [
+      "cost_bearer"
+     ]
+    },
+    "confederates": {
+     "historical": [
+      "swiss_confederation"
+     ],
+     "select": "fixed",
+     "as": [
+      "resister",
+      "beneficiary"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1380,
+    "latest": 1405,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "optional": [
+    {
+     "event": "battle_of_sempach",
+     "weight": 2.0
+    }
+   ],
+   "trigger": {
+    "all": [
+     {
+      "exists": "austria"
+     },
+     {
+      "exists": "swiss_confederation"
+     },
+     {
+      "any": [
+       {
+        "at_war": {
+         "who": "austria",
+         "other": "swiss_confederation"
+        }
+       },
+       {
+        "opinion": {
+         "who": "austria",
+         "other": "swiss_confederation",
+         "op": "<=",
+         "value": -25
+        }
+       },
+       {
+        "flag": {
+         "who": "swiss_confederation",
+         "id": "sempach_won"
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 3
+   },
+   "options": [
+    {
+     "id": "glarus_free",
+     "chooser": null,
+     "historical": true,
+     "ai": {
+      "base": 65
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "austria",
+        "stat": {
+         "prestige": -10
+        }
+       },
+       {
+        "on": "swiss_confederation",
+        "stat": {
+         "prestige": 10,
+         "legitimacy": 10
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "habsburg_holds_glarus",
+     "chooser": null,
+     "ai": {
+      "base": 35
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "austria",
+        "stat": {
+         "prestige": 5
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "history": {
+    "date": "1388-04-09",
+    "confidence": "high"
+   }
+  },
+  "wenceslaus_deposed": {
+   "id": "wenceslaus_deposed",
+   "name": "The deposition of Wenceslaus",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [],
+   "regions": [
+    "europe"
+   ],
+   "importance": "major",
+   "roles": {
+    "king": {
+     "historical": [
+      "bohemia"
+     ],
+     "select": {
+      "where": "region:europe",
+      "condition": {
+       "flag": {
+        "who": "this",
+        "id": "emperor"
+       }
+      }
+     },
+     "as": [
+      "victim"
+     ]
+    },
+    "rival": {
+     "historical": [
+      "palatinate"
+     ],
+     "select": "fixed",
+     "as": [
+      "beneficiary"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1390,
+    "latest": 1415,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "palatinate"
+     },
+     {
+      "stat": {
+       "who": "$king",
+       "stat": "ruler_years",
+       "op": ">=",
+       "value": 10
+      }
+     },
+     {
+      "any": [
+       {
+        "stat": {
+         "who": "$king",
+         "stat": "legitimacy",
+         "op": "<",
+         "value": 60
+        }
+       },
+       {
+        "stat": {
+         "who": "$king",
+         "stat": "stability",
+         "op": "<=",
+         "value": -1
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 4
+   },
+   "options": [
+    {
+     "id": "deposed_at_lahnstein",
+     "chooser": "$king",
+     "historical": true,
+     "ai": {
+      "base": 60
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "$king",
+        "stat": {
+         "prestige": -20,
+         "legitimacy": -10
+        }
+       },
+       {
+        "set_flag": {
+         "on": "palatinate",
+         "id": "rupert_king",
+         "years": 10
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "buy_the_electors",
+     "chooser": "$king",
+     "ai": {
+      "base": 40
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "$king",
+        "stat": {
+         "treasury": "-20%",
+         "legitimacy": -5
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "follow_ups": [
+    {
+     "event": "ruperts_italian_venture",
+     "delay": [
+      0,
+      3
+     ],
+     "boost": 2.0
+    }
+   ],
+   "history": {
+    "date": "1400-08-20",
+    "confidence": "high"
+   }
+  },
+  "ruperts_italian_venture": {
+   "id": "ruperts_italian_venture",
+   "name": "Rupert's Italian venture",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [],
+   "regions": [
+    "europe"
+   ],
+   "importance": "regional",
+   "roles": {
+    "king": {
+     "historical": [
+      "palatinate"
+     ],
+     "select": "fixed",
+     "as": [
+      "initiator",
+      "cost_bearer"
+     ]
+    },
+    "duke": {
+     "historical": [
+      "milan"
+     ],
+     "select": {
+      "condition": {
+       "owns": {
+        "who": "this",
+        "where": "area:milan",
+        "min_share": 1
+       }
+      }
+     },
+     "as": [
+      "resister"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1395,
+    "latest": 1412,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "flag": {
+       "who": "palatinate",
+       "id": "rupert_king"
+      }
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 1.5
+   },
+   "options": [
+    {
+     "id": "march_on_milan",
+     "chooser": "$king",
+     "historical": true,
+     "ai": {
+      "base": 60
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "palatinate",
+        "stat": {
+         "prestige": -15,
+         "treasury": "-30%"
+        }
+       },
+       {
+        "on": "$duke",
+        "stat": {
+         "prestige": 10
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "stay_in_germany",
+     "chooser": "$king",
+     "ai": {
+      "base": 40
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "palatinate",
+        "stat": {
+         "prestige": -5
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "history": {
+    "date": [
+     "1401-10",
+     "1402-04"
+    ],
+    "confidence": "high"
+   }
+  },
+  "sigismund_elected": {
+   "id": "sigismund_elected",
+   "name": "Sigismund King of the Romans",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [],
+   "regions": [
+    "europe"
+   ],
+   "importance": "regional",
+   "roles": {
+    "king": {
+     "historical": [
+      "hungary"
+     ],
+     "select": "fixed",
+     "as": [
+      "beneficiary"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1400,
+    "latest": 1425,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "requires": {
+    "event": {
+     "id": "wenceslaus_deposed"
+    }
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "hungary"
+     },
+     {
+      "any": [
+       {
+        "stat": {
+         "who": "palatinate",
+         "stat": "ruler_years",
+         "op": "<=",
+         "value": 0
+        }
+       },
+       {
+        "not": {
+         "flag": {
+          "who": "palatinate",
+          "id": "rupert_king"
+         }
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 3
+   },
+   "options": [
+    {
+     "id": "take_the_crown",
+     "chooser": "$king",
+     "historical": true,
+     "ai": {
+      "base": 80
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "hungary",
+        "stat": {
+         "prestige": 15
+        }
+       },
+       {
+        "set_flag": {
+         "on": "hungary",
+         "id": "king_of_the_romans",
+         "years": 0
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "decline_the_crown",
+     "chooser": "$king",
+     "ai": {
+      "base": 20
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "hungary",
+        "stat": {
+         "prestige": -5
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "history": {
+    "date": [
+     "1410-09-20",
+     "1411-07-21"
+    ],
+    "confidence": "high"
+   }
+  },
+  "brandenburg_to_hohenzollern": {
+   "id": "brandenburg_to_hohenzollern",
+   "name": "Brandenburg to the Hohenzollerns",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [],
+   "regions": [
+    "europe"
+   ],
+   "importance": "regional",
+   "roles": {
+    "margraviate": {
+     "historical": [
+      "brandenburg"
+     ],
+     "select": "fixed",
+     "as": [
+      "affected"
+     ]
+    },
+    "burgrave": {
+     "historical": [
+      "burgraviate_of_nuremberg"
+     ],
+     "select": "fixed",
+     "as": [
+      "initiator",
+      "beneficiary"
+     ]
+    },
+    "king": {
+     "historical": [
+      "hungary"
+     ],
+     "select": "fixed",
+     "as": [
+      "participant"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1405,
+    "latest": 1430,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "brandenburg"
+     },
+     {
+      "exists": "burgraviate_of_nuremberg"
+     },
+     {
+      "any": [
+       {
+        "flag": {
+         "who": "hungary",
+         "id": "king_of_the_romans"
+        }
+       },
+       {
+        "event": {
+         "id": "sigismund_elected"
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 3
+   },
+   "options": [
+    {
+     "id": "buy_the_march",
+     "chooser": "$burgrave",
+     "historical": true,
+     "ai": {
+      "base": 80
+     },
+     "effects": {
+      "immediate": [
+       {
+        "vassalize": {
+         "who": "brandenburg",
+         "target": "burgraviate_of_nuremberg",
+         "type": "personal_union"
+        }
+       },
+       {
+        "on": "burgraviate_of_nuremberg",
+        "stat": {
+         "treasury": "-20%",
+         "prestige": 10
+        }
+       },
+       {
+        "on": "brandenburg",
+        "stat": {
+         "legitimacy": 10
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "decline_the_march",
+     "chooser": "$burgrave",
+     "ai": {
+      "base": 20
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "burgraviate_of_nuremberg",
+        "stat": {
+         "prestige": -5
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "history": {
+    "date": "1415-04-30",
+    "confidence": "high"
+   }
+  },
+  "saxony_to_the_wettins": {
+   "id": "saxony_to_the_wettins",
+   "name": "Saxony to the Wettins",
+   "ages": [
+    "age_of_schism_and_conquerors",
+    "age_of_gunpowder_empires"
+   ],
+   "periods": [],
+   "regions": [
+    "europe"
+   ],
+   "importance": "regional",
+   "roles": {
+    "elector": {
+     "historical": [
+      "saxe_wittenberg"
+     ],
+     "select": "fixed",
+     "as": [
+      "affected"
+     ]
+    },
+    "heir": {
+     "historical": [
+      "saxony"
+     ],
+     "select": "fixed",
+     "as": [
+      "beneficiary"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1405,
+    "latest": 1440,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "saxe_wittenberg"
+     },
+     {
+      "exists": "saxony"
+     },
+     {
+      "not": {
+       "at_war": {
+        "who": "saxony",
+        "other": "saxe_wittenberg"
+       }
+      }
+     },
+     {
+      "any": [
+       {
+        "stat": {
+         "who": "saxe_wittenberg",
+         "stat": "ruler_years",
+         "op": "<=",
+         "value": 0
+        }
+       },
+       {
+        "event": {
+         "id": "sigismund_elected",
+         "within_years": 15
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 8
+   },
+   "options": [
+    {
+     "id": "take_the_electorate",
+     "chooser": "$heir",
+     "historical": true,
+     "ai": {
+      "base": 80
+     },
+     "effects": {
+      "immediate": [
+       {
+        "annex": {
+         "who": "saxony",
+         "target": "saxe_wittenberg"
+        }
+       },
+       {
+        "on": "saxony",
+        "stat": {
+         "prestige": 15
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "let_lauenburg_inherit",
+     "chooser": "$heir",
+     "ai": {
+      "base": 20
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "saxony",
+        "stat": {
+         "prestige": -5
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "history": {
+    "date": "1423-01-06",
+    "confidence": "high"
+   }
+  },
+  "anti_hussite_crusade": {
+   "id": "anti_hussite_crusade",
+   "name": "The Hussite crusades",
+   "ages": [
+    "age_of_schism_and_conquerors",
+    "age_of_gunpowder_empires"
+   ],
+   "periods": [
+    "p_hussite_wars"
+   ],
+   "regions": [
+    "europe"
+   ],
+   "importance": "major",
+   "roles": {
+    "realm": {
+     "historical": [
+      "bohemia"
+     ],
+     "select": "fixed",
+     "as": [
+      "resister"
+     ]
+    },
+    "crusader": {
+     "historical": [
+      "hungary"
+     ],
+     "select": {
+      "where": "region:europe",
+      "condition": {
+       "flag": {
+        "who": "this",
+        "id": "emperor"
+       }
+      }
+     },
+     "as": [
+      "initiator",
+      "cost_bearer"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1415,
+    "latest": 1440,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "requires": {
+    "event": {
+     "id": "first_defenestration_of_prague"
+    }
+   },
+   "trigger": {
+    "all": [
+     {
+      "period_active": {
+       "id": "p_hussite_wars"
+      }
+     },
+     {
+      "exists": "bohemia"
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 1.5
+   },
+   "options": [
+    {
+     "id": "launch_the_crusades",
+     "chooser": "$crusader",
+     "historical": true,
+     "ai": {
+      "base": 75
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "$crusader",
+        "stat": {
+         "prestige": -20,
+         "treasury": "-25%"
+        }
+       },
+       {
+        "on": "bohemia",
+        "modifier": "religious_civil_war"
+       }
+      ],
+      "delayed": [
+       {
+        "end_period": {
+         "id": "p_hussite_wars"
+        },
+        "after_years": 16
+       }
+      ]
+     }
+    },
+    {
+     "id": "treat_with_the_hussites",
+     "chooser": "$crusader",
+     "ai": {
+      "base": 25
+     },
+     "effects": {
+      "immediate": [
+       {
+        "end_period": {
+         "id": "p_hussite_wars"
+        }
+       },
+       {
+        "on": "$crusader",
+        "stat": {
+         "prestige": -5
+        }
+       },
+       {
+        "set_flag": {
+         "on": "bohemia",
+         "id": "utraquist_compact",
+         "years": 0
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "history": {
+    "date": [
+     "1420-03-01",
+     "1431-08-14"
+    ],
+    "confidence": "high"
+   }
+  },
+  "albert_ii_king": {
+   "id": "albert_ii_king",
+   "name": "Albert of Austria takes three crowns",
+   "ages": [
+    "age_of_schism_and_conquerors",
+    "age_of_gunpowder_empires"
+   ],
+   "periods": [],
+   "regions": [
+    "europe"
+   ],
+   "importance": "regional",
+   "roles": {
+    "heir": {
+     "historical": [
+      "austria"
+     ],
+     "select": "fixed",
+     "as": [
+      "beneficiary"
+     ]
+    },
+    "kingdom": {
+     "historical": [
+      "hungary"
+     ],
+     "select": "fixed",
+     "as": [
+      "affected"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1425,
+    "latest": 1445,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "austria"
+     },
+     {
+      "exists": "hungary"
+     },
+     {
+      "flag": {
+       "who": "hungary",
+       "id": "king_of_the_romans"
+      }
+     },
+     {
+      "stat": {
+       "who": "hungary",
+       "stat": "ruler_years",
+       "op": "<=",
+       "value": 0
+      }
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 0.5
+   },
+   "options": [
+    {
+     "id": "take_three_crowns",
+     "chooser": "$heir",
+     "historical": true,
+     "ai": {
+      "base": 75
+     },
+     "effects": {
+      "immediate": [
+       {
+        "vassalize": {
+         "who": "austria",
+         "target": "hungary",
+         "type": "personal_union"
+        }
+       },
+       {
+        "vassalize": {
+         "who": "austria",
+         "target": "bohemia",
+         "type": "personal_union"
+        },
+        "if": {
+         "exists": "bohemia"
+        }
+       },
+       {
+        "on": "austria",
+        "stat": {
+         "prestige": 20
+        }
+       },
+       {
+        "set_flag": {
+         "on": "austria",
+         "id": "king_of_the_romans",
+         "years": 0
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "take_the_german_crown_alone",
+     "chooser": "$heir",
+     "ai": {
+      "base": 25
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "austria",
+        "stat": {
+         "prestige": 5
+        }
+       },
+       {
+        "set_flag": {
+         "on": "austria",
+         "id": "king_of_the_romans",
+         "years": 0
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "history": {
+    "date": "1438-03-18",
+    "confidence": "high"
+   }
+  },
+  "frederick_iii_king": {
+   "id": "frederick_iii_king",
+   "name": "Frederick III King of the Romans",
+   "ages": [
+    "age_of_schism_and_conquerors",
+    "age_of_gunpowder_empires"
+   ],
+   "periods": [],
+   "regions": [
+    "europe"
+   ],
+   "importance": "regional",
+   "roles": {
+    "heir": {
+     "historical": [
+      "austria"
+     ],
+     "select": "fixed",
+     "as": [
+      "beneficiary"
+     ]
+    },
+    "kingdom": {
+     "historical": [
+      "hungary"
+     ],
+     "select": "fixed",
+     "as": [
+      "affected"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1430,
+    "latest": 1450,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "requires": {
+    "event": {
+     "id": "albert_ii_king"
+    }
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "austria"
+     },
+     {
+      "flag": {
+       "who": "austria",
+       "id": "king_of_the_romans"
+      }
+     },
+     {
+      "stat": {
+       "who": "austria",
+       "stat": "ruler_years",
+       "op": "<=",
+       "value": 0
+      }
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 0.5
+   },
+   "options": [
+    {
+     "id": "crown_frederick",
+     "chooser": "$heir",
+     "historical": true,
+     "ai": {
+      "base": 70
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "austria",
+        "stat": {
+         "legitimacy": 5
+        }
+       },
+       {
+        "release": {
+         "who": "austria",
+         "target": "hungary"
+        },
+        "if": {
+         "relation": {
+          "who": "hungary",
+          "other": "austria",
+          "type": "subject"
+         }
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "hold_the_unions",
+     "chooser": "$heir",
+     "ai": {
+      "base": 30
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "austria",
+        "stat": {
+         "legitimacy": -10,
+         "stability": -1
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "history": {
+    "date": "1440-02-02",
+    "confidence": "high"
+   }
+  },
+  "brittany_confiscated": {
+   "id": "brittany_confiscated",
+   "name": "Brittany confiscated",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [
+    "p_hundred_years_war_caroline"
+   ],
+   "regions": [
+    "europe"
+   ],
+   "importance": "regional",
+   "roles": {
+    "crown": {
+     "historical": [
+      "france"
+     ],
+     "select": "fixed",
+     "as": [
+      "initiator"
+     ]
+    },
+    "duchy": {
+     "historical": [
+      "brittany"
+     ],
+     "select": "fixed",
+     "as": [
+      "victim",
+      "resister"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1378,
+    "latest": 1388,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "france"
+     },
+     {
+      "exists": "brittany"
+     },
+     {
+      "any": [
+       {
+        "relation": {
+         "who": "brittany",
+         "other": "england",
+         "type": "alliance"
+        }
+       },
+       {
+        "at_war": {
+         "who": "france",
+         "other": "brittany"
+        }
+       },
+       {
+        "opinion": {
+         "who": "france",
+         "other": "brittany",
+         "op": "<=",
+         "value": -25
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 0.5
+   },
+   "options": [
+    {
+     "id": "confiscate_the_duchy",
+     "chooser": "$crown",
+     "historical": true,
+     "ai": {
+      "base": 70
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "france",
+        "stat": {
+         "prestige": 5
+        }
+       },
+       {
+        "on": "brittany",
+        "stat": {
+         "legitimacy": 20
+        }
+       },
+       {
+        "set_flag": {
+         "on": "brittany",
+         "id": "breton_league",
+         "years": 3
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "forgive_the_duke",
+     "chooser": "$crown",
+     "ai": {
+      "base": 30
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "france",
+        "stat": {
+         "prestige": -5
+        }
+       },
+       {
+        "on": "brittany",
+        "stat": {
+         "legitimacy": -5
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "history": {
+    "date": "1378-12-18",
+    "confidence": "high"
+   }
+  },
+  "death_of_charles_v": {
+   "id": "death_of_charles_v",
+   "name": "The uncles' regency",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [
+    "p_hundred_years_war_caroline"
+   ],
+   "regions": [
+    "europe"
+   ],
+   "importance": "regional",
+   "roles": {
+    "crown": {
+     "historical": [
+      "france"
+     ],
+     "select": "fixed",
+     "as": [
+      "affected"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1378,
+    "latest": 1395,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "france"
+     },
+     {
+      "any": [
+       {
+        "flag": {
+         "who": "france",
+         "id": "regency"
+        }
+       },
+       {
+        "stat": {
+         "who": "france",
+         "stat": "ruler_years",
+         "op": "<=",
+         "value": 0
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 0.5
+   },
+   "options": [
+    {
+     "id": "rule_by_the_uncles",
+     "chooser": "$crown",
+     "historical": true,
+     "ai": {
+      "base": 70
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "france",
+        "stat": {
+         "treasury": "-20%",
+         "legitimacy": -10
+        }
+       },
+       {
+        "set_flag": {
+         "on": "france",
+         "id": "uncles_regency",
+         "years": 8
+        }
+       },
+       {
+        "rebels": {
+         "on": "$crown",
+         "type": "peasant",
+         "size": "small"
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "keep_the_hearth_tax",
+     "chooser": "$crown",
+     "ai": {
+      "base": 30
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "france",
+        "stat": {
+         "stability": -1
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "history": {
+    "date": "1380-09-16",
+    "confidence": "high"
+   }
+  },
+  "peasants_revolt": {
+   "id": "peasants_revolt",
+   "name": "The Peasants' Revolt",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [
+    "p_hundred_years_war_caroline"
+   ],
+   "regions": [
+    "europe"
+   ],
+   "importance": "major",
+   "roles": {
+    "realm": {
+     "historical": [
+      "england"
+     ],
+     "select": "fixed",
+     "as": [
+      "affected",
+      "cost_bearer"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1378,
+    "latest": 1400,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "england"
+     },
+     {
+      "at_war": {
+       "who": "england",
+       "other": "france"
+      }
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 3
+   },
+   "options": [
+    {
+     "id": "promise_and_take_back",
+     "chooser": "$realm",
+     "historical": true,
+     "ai": {
+      "base": 65
+     },
+     "effects": {
+      "immediate": [
+       {
+        "rebels": {
+         "on": "$realm",
+         "type": "peasant",
+         "size": "medium"
+        }
+       },
+       {
+        "on": "england",
+        "stat": {
+         "legitimacy": 5
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "end_villeinage",
+     "chooser": "$realm",
+     "ai": {
+      "base": 20
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "england",
+        "stat": {
+         "legitimacy": -10,
+         "treasury": "-10%"
+        }
+       },
+       {
+        "set_flag": {
+         "on": "england",
+         "id": "villeinage_ended",
+         "years": 0
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "ride_them_down",
+     "chooser": "$realm",
+     "ai": {
+      "base": 15
+     },
+     "effects": {
+      "immediate": [
+       {
+        "rebels": {
+         "on": "$realm",
+         "type": "peasant",
+         "size": "large"
+        }
+       },
+       {
+        "on": "england",
+        "stat": {
+         "stability": -1
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "history": {
+    "date": [
+     "1381-05-30",
+     "1381-06-15"
+    ],
+    "confidence": "high"
+   }
+  },
+  "richard_ii_deposed": {
+   "id": "richard_ii_deposed",
+   "name": "Richard II deposed",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [],
+   "regions": [
+    "europe"
+   ],
+   "importance": "major",
+   "roles": {
+    "realm": {
+     "historical": [
+      "england"
+     ],
+     "select": "fixed",
+     "as": [
+      "affected"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1385,
+    "latest": 1415,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "england"
+     },
+     {
+      "stat": {
+       "who": "england",
+       "stat": "ruler_years",
+       "op": ">=",
+       "value": 10
+      }
+     },
+     {
+      "any": [
+       {
+        "stat": {
+         "who": "england",
+         "stat": "legitimacy",
+         "op": "<",
+         "value": 50
+        }
+       },
+       {
+        "stat": {
+         "who": "england",
+         "stat": "stability",
+         "op": "<=",
+         "value": -1
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 4
+   },
+   "options": [
+    {
+     "id": "lancaster_takes_the_crown",
+     "chooser": "$realm",
+     "historical": true,
+     "ai": {
+      "base": 65
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "england",
+        "stat": {
+         "legitimacy": -15
+        }
+       },
+       {
+        "on": "england",
+        "modifier": "new_dynasty_consolidation"
+       },
+       {
+        "set_flag": {
+         "on": "england",
+         "id": "lancastrian_dynasty",
+         "years": 0
+        }
+       },
+       {
+        "rebels": {
+         "on": "$realm",
+         "type": "noble",
+         "size": "small"
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "the_king_holds",
+     "chooser": "$realm",
+     "ai": {
+      "base": 35
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "england",
+        "stat": {
+         "stability": -1,
+         "legitimacy": 5
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "history": {
+    "date": "1399-09-30",
+    "confidence": "high"
+   }
+  },
+  "madness_of_charles_vi": {
+   "id": "madness_of_charles_vi",
+   "name": "The madness of Charles VI",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [],
+   "regions": [
+    "europe"
+   ],
+   "importance": "regional",
+   "roles": {
+    "crown": {
+     "historical": [
+      "france"
+     ],
+     "select": "fixed",
+     "as": [
+      "affected"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1385,
+    "latest": 1410,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "france"
+     },
+     {
+      "not": {
+       "flag": {
+        "who": "france",
+        "id": "regency"
+       }
+      }
+     },
+     {
+      "stat": {
+       "who": "france",
+       "stat": "ruler_age",
+       "op": ">=",
+       "value": 20
+      }
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 6
+   },
+   "options": [
+    {
+     "id": "the_king_goes_mad",
+     "chooser": null,
+     "historical": true,
+     "ai": {
+      "base": 70
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "france",
+        "stat": {
+         "stability": -1,
+         "legitimacy": -10
+        }
+       },
+       {
+        "set_flag": {
+         "on": "france",
+         "id": "royal_madness",
+         "years": 30
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "the_king_recovers",
+     "chooser": null,
+     "ai": {
+      "base": 30
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "france",
+        "stat": {
+         "legitimacy": -2
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "history": {
+    "date": "1392-08-05",
+    "confidence": "high"
+   }
+  },
+  "murder_of_orleans": {
+   "id": "murder_of_orleans",
+   "name": "The murder of Louis of Orléans",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [],
+   "regions": [
+    "europe"
+   ],
+   "importance": "regional",
+   "roles": {
+    "crown": {
+     "historical": [
+      "france"
+     ],
+     "select": "fixed",
+     "as": [
+      "affected"
+     ]
+    },
+    "rival": {
+     "historical": [
+      "burgundy"
+     ],
+     "select": "fixed",
+     "as": [
+      "initiator"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1395,
+    "latest": 1420,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "france"
+     },
+     {
+      "exists": "burgundy"
+     },
+     {
+      "flag": {
+       "who": "france",
+       "id": "royal_madness"
+      }
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 4
+   },
+   "options": [
+    {
+     "id": "strike_at_orleans",
+     "chooser": "$rival",
+     "historical": true,
+     "ai": {
+      "base": 65
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "france",
+        "stat": {
+         "stability": -1
+        }
+       },
+       {
+        "on": "burgundy",
+        "stat": {
+         "prestige": -5
+        }
+       },
+       {
+        "set_flag": {
+         "on": "france",
+         "id": "princes_feud",
+         "years": 30
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "reconcile_at_court",
+     "chooser": "$rival",
+     "ai": {
+      "base": 35
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "burgundy",
+        "stat": {
+         "prestige": 5
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "follow_ups": [
+    {
+     "event": "armagnac_burgundian_war",
+     "delay": [
+      1,
+      5
+     ],
+     "boost": 2.5
+    }
+   ],
+   "history": {
+    "date": "1407-11-23",
+    "confidence": "high"
+   }
+  },
+  "armagnac_burgundian_war": {
+   "id": "armagnac_burgundian_war",
+   "name": "The Armagnac–Burgundian war",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [],
+   "regions": [
+    "europe"
+   ],
+   "importance": "regional",
+   "roles": {
+    "crown": {
+     "historical": [
+      "france"
+     ],
+     "select": "fixed",
+     "as": [
+      "affected"
+     ]
+    },
+    "rival": {
+     "historical": [
+      "burgundy"
+     ],
+     "select": "fixed",
+     "as": [
+      "initiator"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1400,
+    "latest": 1430,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "france"
+     },
+     {
+      "exists": "burgundy"
+     },
+     {
+      "flag": {
+       "who": "france",
+       "id": "princes_feud"
+      }
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 2
+   },
+   "options": [
+    {
+     "id": "civil_war",
+     "chooser": "$rival",
+     "historical": true,
+     "ai": {
+      "base": 70
+     },
+     "effects": {
+      "immediate": [
+       {
+        "rebels": {
+         "on": "$crown",
+         "type": "noble",
+         "size": "medium"
+        }
+       },
+       {
+        "on": "france",
+        "stat": {
+         "stability": -1
+        }
+       },
+       {
+        "relation": {
+         "who": "burgundy",
+         "other": "france",
+         "type": "rivalry",
+         "set": true
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "peace_of_the_princes",
+     "chooser": "$rival",
+     "ai": {
+      "base": 30
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "burgundy",
+        "stat": {
+         "prestige": 5
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "follow_ups": [
+    {
+     "event": "cabochien_revolt",
+     "delay": [
+      0,
+      4
+     ],
+     "boost": 2.0
+    },
+    {
+     "event": "battle_of_agincourt",
+     "delay": [
+      0,
+      6
+     ],
+     "boost": 1.5
+    }
+   ],
+   "history": {
+    "date": [
+     "1411",
+     "1435"
+    ],
+    "confidence": "high"
+   }
+  },
+  "cabochien_revolt": {
+   "id": "cabochien_revolt",
+   "name": "The Cabochien revolt",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [],
+   "regions": [
+    "europe"
+   ],
+   "importance": "regional",
+   "roles": {
+    "realm": {
+     "historical": [
+      "france"
+     ],
+     "select": "fixed",
+     "as": [
+      "affected"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1405,
+    "latest": 1425,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "requires": {
+    "event": {
+     "id": "armagnac_burgundian_war"
+    }
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "france"
+     },
+     {
+      "flag": {
+       "who": "france",
+       "id": "princes_feud"
+      }
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 2
+   },
+   "options": [
+    {
+     "id": "revoke_the_ordinance",
+     "chooser": "$realm",
+     "historical": true,
+     "ai": {
+      "base": 60
+     },
+     "effects": {
+      "immediate": [
+       {
+        "rebels": {
+         "on": "area:ile_de_france",
+         "type": "peasant",
+         "size": "small"
+        }
+       },
+       {
+        "on": "france",
+        "stat": {
+         "stability": -1
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "keep_the_ordinance",
+     "chooser": "$realm",
+     "ai": {
+      "base": 40
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "france",
+        "stat": {
+         "legitimacy": 5,
+         "treasury": "-10%"
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "history": {
+    "date": "1413-04-28",
+    "confidence": "high"
+   }
+  },
+  "battle_of_agincourt": {
+   "id": "battle_of_agincourt",
+   "name": "The Battle of Agincourt",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [
+    "p_hundred_years_war_lancastrian"
+   ],
+   "regions": [
+    "europe"
+   ],
+   "importance": "major",
+   "roles": {
+    "invader": {
+     "historical": [
+      "england"
+     ],
+     "select": "fixed",
+     "as": [
+      "initiator",
+      "beneficiary"
+     ]
+    },
+    "defender": {
+     "historical": [
+      "france"
+     ],
+     "select": "fixed",
+     "as": [
+      "cost_bearer"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1400,
+    "latest": 1435,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "at_war": {
+       "who": "england",
+       "other": "france"
+      }
+     },
+     {
+      "any": [
+       {
+        "stat": {
+         "who": "france",
+         "stat": "stability",
+         "op": "<=",
+         "value": 0
+        }
+       },
+       {
+        "flag": {
+         "who": "france",
+         "id": "princes_feud"
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 3
+   },
+   "options": [
+    {
+     "id": "english_victory",
+     "chooser": null,
+     "historical": true,
+     "ai": {
+      "base": 60
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "france",
+        "stat": {
+         "prestige": -20,
+         "legitimacy": -10
+        }
+       },
+       {
+        "on": "england",
+        "stat": {
+         "prestige": 20
+        }
+       }
+      ],
+      "delayed": [
+       {
+        "transfer": {
+         "where": "area:normandy",
+         "from": "france",
+         "to": "england"
+        },
+        "after_years": 2,
+        "if": {
+         "at_war": {
+          "who": "england",
+          "other": "france"
+         }
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "french_victory",
+     "chooser": null,
+     "ai": {
+      "base": 40
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "england",
+        "stat": {
+         "prestige": -15
+        }
+       },
+       {
+        "on": "france",
+        "stat": {
+         "prestige": 10
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "follow_ups": [
+    {
+     "event": "treaty_of_troyes",
+     "delay": [
+      2,
+      8
+     ],
+     "boost": 2.0
+    }
+   ],
+   "history": {
+    "date": "1415-10-25",
+    "confidence": "high"
+   }
+  },
+  "treaty_of_troyes": {
+   "id": "treaty_of_troyes",
+   "name": "The Treaty of Troyes",
+   "ages": [
+    "age_of_schism_and_conquerors",
+    "age_of_gunpowder_empires"
+   ],
+   "periods": [
+    "p_hundred_years_war_lancastrian"
+   ],
+   "regions": [
+    "europe"
+   ],
+   "importance": "major",
+   "roles": {
+    "victor": {
+     "historical": [
+      "england"
+     ],
+     "select": "fixed",
+     "as": [
+      "beneficiary"
+     ]
+    },
+    "crown": {
+     "historical": [
+      "france"
+     ],
+     "select": "fixed",
+     "as": [
+      "cost_bearer"
+     ]
+    },
+    "ally": {
+     "historical": [
+      "burgundy"
+     ],
+     "select": "fixed",
+     "as": [
+      "participant"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1410,
+    "latest": 1440,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "at_war": {
+       "who": "england",
+       "other": "france"
+      }
+     },
+     {
+      "controls": {
+       "who": "england",
+       "where": "area:normandy",
+       "min_share": 0.6
+      }
+     },
+     {
+      "any": [
+       {
+        "relation": {
+         "who": "england",
+         "other": "burgundy",
+         "type": "alliance"
+        }
+       },
+       {
+        "flag": {
+         "who": "france",
+         "id": "princes_feud"
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 2
+   },
+   "options": [
+    {
+     "id": "accept_troyes",
+     "chooser": "$crown",
+     "historical": true,
+     "ai": {
+      "base": 60,
+      "factors": [
+       {
+        "if": {
+         "stat": {
+          "who": "france",
+          "stat": "stability",
+          "op": "<=",
+          "value": -1
+         }
+        },
+        "factor": 2
+       }
+      ]
+     },
+     "effects": {
+      "immediate": [
+       {
+        "transfer": {
+         "where": "area:ile_de_france",
+         "from": "france",
+         "to": "england"
+        }
+       },
+       {
+        "on": "france",
+        "stat": {
+         "legitimacy": -20
+        }
+       },
+       {
+        "set_flag": {
+         "on": "england",
+         "id": "heir_of_france",
+         "years": 0
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "refuse_troyes",
+     "chooser": "$crown",
+     "ai": {
+      "base": 40
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "france",
+        "stat": {
+         "legitimacy": 10,
+         "stability": -1
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "follow_ups": [
+    {
+     "event": "relief_of_orleans",
+     "delay": [
+      5,
+      12
+     ],
+     "boost": 2.0
+    }
+   ],
+   "history": {
+    "date": "1420-05-21",
+    "confidence": "high"
+   }
+  },
+  "relief_of_orleans": {
+   "id": "relief_of_orleans",
+   "name": "Joan of Arc",
+   "ages": [
+    "age_of_schism_and_conquerors",
+    "age_of_gunpowder_empires"
+   ],
+   "periods": [
+    "p_hundred_years_war_lancastrian"
+   ],
+   "regions": [
+    "europe"
+   ],
+   "importance": "major",
+   "roles": {
+    "crown": {
+     "historical": [
+      "france"
+     ],
+     "select": "fixed",
+     "as": [
+      "initiator",
+      "beneficiary"
+     ]
+    },
+    "invader": {
+     "historical": [
+      "england"
+     ],
+     "select": "fixed",
+     "as": [
+      "cost_bearer"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1420,
+    "latest": 1445,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "france"
+     },
+     {
+      "at_war": {
+       "who": "england",
+       "other": "france"
+      }
+     },
+     {
+      "any": [
+       {
+        "flag": {
+         "who": "england",
+         "id": "heir_of_france"
+        }
+       },
+       {
+        "controls": {
+         "who": "england",
+         "where": "area:normandy",
+         "min_share": 0.5
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 3
+   },
+   "options": [
+    {
+     "id": "trust_the_maid",
+     "chooser": "$crown",
+     "historical": true,
+     "ai": {
+      "base": 75
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "france",
+        "stat": {
+         "legitimacy": 25,
+         "prestige": 15,
+         "stability": 1
+        }
+       },
+       {
+        "on": "england",
+        "stat": {
+         "prestige": -10
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "send_her_home",
+     "chooser": "$crown",
+     "ai": {
+      "base": 25
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "france",
+        "stat": {
+         "legitimacy": -2
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "follow_ups": [
+    {
+     "event": "congress_of_arras",
+     "delay": [
+      1,
+      8
+     ],
+     "boost": 2.0
+    }
+   ],
+   "history": {
+    "date": [
+     "1429-05-08",
+     "1431-05-30"
+    ],
+    "confidence": "high"
+   }
+  },
+  "congress_of_arras": {
+   "id": "congress_of_arras",
+   "name": "The Congress of Arras",
+   "ages": [
+    "age_of_schism_and_conquerors",
+    "age_of_gunpowder_empires"
+   ],
+   "periods": [],
+   "regions": [
+    "europe"
+   ],
+   "importance": "major",
+   "roles": {
+    "crown": {
+     "historical": [
+      "france"
+     ],
+     "select": "fixed",
+     "as": [
+      "beneficiary"
+     ]
+    },
+    "duke": {
+     "historical": [
+      "burgundy"
+     ],
+     "select": "fixed",
+     "as": [
+      "initiator"
+     ]
+    },
+    "england": {
+     "historical": [
+      "england"
+     ],
+     "select": "fixed",
+     "as": [
+      "cost_bearer"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1425,
+    "latest": 1450,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "france"
+     },
+     {
+      "exists": "burgundy"
+     },
+     {
+      "any": [
+       {
+        "relation": {
+         "who": "burgundy",
+         "other": "england",
+         "type": "alliance"
+        }
+       },
+       {
+        "flag": {
+         "who": "france",
+         "id": "princes_feud"
+        }
+       }
+      ]
+     },
+     {
+      "any": [
+       {
+        "event": {
+         "id": "relief_of_orleans"
+        }
+       },
+       {
+        "stat": {
+         "who": "france",
+         "stat": "legitimacy",
+         "op": ">=",
+         "value": 60
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 3
+   },
+   "options": [
+    {
+     "id": "make_peace_with_france",
+     "chooser": "$duke",
+     "historical": true,
+     "ai": {
+      "base": 65
+     },
+     "effects": {
+      "immediate": [
+       {
+        "relation": {
+         "who": "burgundy",
+         "other": "england",
+         "type": "alliance",
+         "set": false
+        }
+       },
+       {
+        "relation": {
+         "who": "burgundy",
+         "other": "france",
+         "type": "rivalry",
+         "set": false
+        }
+       },
+       {
+        "on": "burgundy",
+        "stat": {
+         "prestige": 10
+        }
+       },
+       {
+        "set_flag": {
+         "on": "burgundy",
+         "id": "treaty_of_arras",
+         "years": 0
+        }
+       }
+      ],
+      "delayed": [
+       {
+        "transfer": {
+         "where": "area:ile_de_france",
+         "from": "england",
+         "to": "france"
+        },
+        "after_years": 1
+       }
+      ]
+     }
+    },
+    {
+     "id": "keep_the_english_alliance",
+     "chooser": "$duke",
+     "ai": {
+      "base": 35
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "burgundy",
+        "stat": {
+         "prestige": -5
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "history": {
+    "date": "1435-09-21",
+    "confidence": "high"
+   }
+  },
+  "ecorcheurs": {
+   "id": "ecorcheurs",
+   "name": "The Écorcheurs",
+   "ages": [
+    "age_of_schism_and_conquerors",
+    "age_of_gunpowder_empires"
+   ],
+   "periods": [],
+   "regions": [
+    "europe"
+   ],
+   "importance": "regional",
+   "roles": {
+    "realm": {
+     "historical": [
+      "france"
+     ],
+     "select": "fixed",
+     "as": [
+      "affected"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1425,
+    "latest": 1450,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "france"
+     },
+     {
+      "any": [
+       {
+        "event": {
+         "id": "congress_of_arras"
+        }
+       },
+       {
+        "not": {
+         "at_war": {
+          "who": "england",
+          "other": "france"
+         }
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 3
+   },
+   "options": [
+    {
+     "id": "ordinance_companies",
+     "chooser": "$realm",
+     "historical": true,
+     "ai": {
+      "base": 60
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "france",
+        "modifier": "standing_army_reform"
+       },
+       {
+        "on": "france",
+        "stat": {
+         "treasury": "-10%"
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "send_them_abroad",
+     "chooser": "$realm",
+     "ai": {
+      "base": 40
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "france",
+        "stat": {
+         "prestige": -5
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {
+    "immediate": [
+     {
+      "rebels": {
+       "on": "$realm",
+       "type": "noble",
+       "size": "small"
+      }
+     }
+    ]
+   },
+   "history": {
+    "date": [
+     "1435",
+     "1445-05-26"
+    ],
+    "confidence": "high"
+   }
+  },
+  "portuguese_crisis": {
+   "id": "portuguese_crisis",
+   "name": "The Portuguese crisis of 1383–85",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [],
+   "regions": [
+    "europe"
+   ],
+   "importance": "major",
+   "roles": {
+    "realm": {
+     "historical": [
+      "portugal"
+     ],
+     "select": "fixed",
+     "as": [
+      "affected",
+      "resister"
+     ]
+    },
+    "claimant": {
+     "historical": [
+      "castile"
+     ],
+     "select": "fixed",
+     "as": [
+      "initiator"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1378,
+    "latest": 1400,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "portugal"
+     },
+     {
+      "exists": "castile"
+     },
+     {
+      "any": [
+       {
+        "stat": {
+         "who": "portugal",
+         "stat": "ruler_years",
+         "op": "<=",
+         "value": 0
+        }
+       },
+       {
+        "flag": {
+         "who": "portugal",
+         "id": "regency"
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 0.5
+   },
+   "options": [
+    {
+     "id": "avis_takes_the_crown",
+     "chooser": "$realm",
+     "historical": true,
+     "ai": {
+      "base": 60
+     },
+     "effects": {
+      "immediate": [
+       {
+        "set_flag": {
+         "on": "portugal",
+         "id": "avis_dynasty",
+         "years": 0
+        }
+       },
+       {
+        "on": "portugal",
+        "stat": {
+         "legitimacy": -5
+        }
+       },
+       {
+        "casus_belli": {
+         "who": "castile",
+         "against": "portugal",
+         "type": "claim",
+         "years": 10
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "accept_castile",
+     "chooser": "$realm",
+     "ai": {
+      "base": 40
+     },
+     "effects": {
+      "immediate": [
+       {
+        "vassalize": {
+         "who": "castile",
+         "target": "portugal",
+         "type": "personal_union"
+        }
+       },
+       {
+        "on": "portugal",
+        "stat": {
+         "legitimacy": -20
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "follow_ups": [
+    {
+     "event": "battle_of_aljubarrota",
+     "delay": [
+      0,
+      3
+     ],
+     "boost": 3.0
+    }
+   ],
+   "history": {
+    "date": [
+     "1383-10-22",
+     "1385-04-06"
+    ],
+    "confidence": "high"
+   }
+  },
+  "battle_of_aljubarrota": {
+   "id": "battle_of_aljubarrota",
+   "name": "The Battle of Aljubarrota",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [],
+   "regions": [
+    "europe"
+   ],
+   "importance": "major",
+   "roles": {
+    "realm": {
+     "historical": [
+      "portugal"
+     ],
+     "select": "fixed",
+     "as": [
+      "resister",
+      "beneficiary"
+     ]
+    },
+    "invader": {
+     "historical": [
+      "castile"
+     ],
+     "select": "fixed",
+     "as": [
+      "cost_bearer"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1383,
+    "latest": 1400,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "optional": [
+    {
+     "event": "portuguese_crisis",
+     "weight": 2.0
+    }
+   ],
+   "trigger": {
+    "all": [
+     {
+      "flag": {
+       "who": "portugal",
+       "id": "avis_dynasty"
+      }
+     },
+     {
+      "exists": "castile"
+     },
+     {
+      "not": {
+       "relation": {
+        "who": "portugal",
+        "other": "castile",
+        "type": "subject"
+       }
+      }
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 1
+   },
+   "options": [
+    {
+     "id": "portuguese_victory",
+     "chooser": null,
+     "historical": true,
+     "ai": {
+      "base": 65
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "portugal",
+        "stat": {
+         "prestige": 20,
+         "legitimacy": 20
+        }
+       },
+       {
+        "on": "castile",
+        "stat": {
+         "prestige": -15
+        }
+       },
+       {
+        "relation": {
+         "who": "portugal",
+         "other": "england",
+         "type": "alliance",
+         "set": true
+        },
+        "if": {
+         "exists": "england"
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "castilian_victory",
+     "chooser": null,
+     "ai": {
+      "base": 35
+     },
+     "effects": {
+      "immediate": [
+       {
+        "vassalize": {
+         "who": "castile",
+         "target": "portugal",
+         "type": "personal_union"
+        }
+       },
+       {
+        "on": "portugal",
+        "stat": {
+         "legitimacy": -20
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "follow_ups": [
+    {
+     "event": "lancaster_claim_in_castile",
+     "delay": [
+      0,
+      3
+     ],
+     "boost": 2.0
+    }
+   ],
+   "history": {
+    "date": "1385-08-14",
+    "confidence": "high"
+   }
+  },
+  "lancaster_claim_in_castile": {
+   "id": "lancaster_claim_in_castile",
+   "name": "Lancaster's claim to Castile",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [],
+   "regions": [
+    "europe"
+   ],
+   "importance": "regional",
+   "roles": {
+    "claimant": {
+     "historical": [
+      "england"
+     ],
+     "select": "fixed",
+     "as": [
+      "initiator"
+     ]
+    },
+    "crown": {
+     "historical": [
+      "castile"
+     ],
+     "select": "fixed",
+     "as": [
+      "resister"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1380,
+    "latest": 1395,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "england"
+     },
+     {
+      "exists": "castile"
+     },
+     {
+      "any": [
+       {
+        "relation": {
+         "who": "england",
+         "other": "portugal",
+         "type": "alliance"
+        }
+       },
+       {
+        "at_war": {
+         "who": "england",
+         "other": "castile"
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 3
+   },
+   "options": [
+    {
+     "id": "invade_and_bargain",
+     "chooser": "$claimant",
+     "historical": true,
+     "ai": {
+      "base": 55
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "england",
+        "stat": {
+         "treasury": "-15%"
+        }
+       }
+      ],
+      "delayed": [
+       {
+        "on": "castile",
+        "stat": {
+         "legitimacy": 10
+        },
+        "after_years": 2
+       },
+       {
+        "on": "england",
+        "stat": {
+         "treasury": "+10%"
+        },
+        "after_years": 2
+       }
+      ]
+     }
+    },
+    {
+     "id": "give_up_the_claim",
+     "chooser": "$claimant",
+     "ai": {
+      "base": 45
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "england",
+        "stat": {
+         "prestige": -5
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "history": {
+    "date": [
+     "1386-07-25",
+     "1388-07-08"
+    ],
+    "confidence": "high"
+   }
+  },
+  "compromise_of_caspe": {
+   "id": "compromise_of_caspe",
+   "name": "The Compromise of Caspe",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [],
+   "regions": [
+    "europe"
+   ],
+   "importance": "regional",
+   "roles": {
+    "crown": {
+     "historical": [
+      "aragon"
+     ],
+     "select": "fixed",
+     "as": [
+      "affected"
+     ]
+    },
+    "candidate": {
+     "historical": [
+      "castile"
+     ],
+     "select": "fixed",
+     "as": [
+      "beneficiary"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1395,
+    "latest": 1430,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "aragon"
+     },
+     {
+      "exists": "castile"
+     },
+     {
+      "stat": {
+       "who": "aragon",
+       "stat": "ruler_years",
+       "op": "<=",
+       "value": 0
+      }
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 1
+   },
+   "options": [
+    {
+     "id": "trastamara_king",
+     "chooser": "$crown",
+     "historical": true,
+     "ai": {
+      "base": 60
+     },
+     "effects": {
+      "immediate": [
+       {
+        "set_flag": {
+         "on": "aragon",
+         "id": "trastamara_dynasty",
+         "years": 0
+        }
+       },
+       {
+        "on": "aragon",
+        "stat": {
+         "legitimacy": 5
+        }
+       },
+       {
+        "relation": {
+         "who": "aragon",
+         "other": "castile",
+         "type": "alliance",
+         "set": true
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "count_of_urgell",
+     "chooser": "$crown",
+     "ai": {
+      "base": 40
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "aragon",
+        "stat": {
+         "stability": -1
+        }
+       },
+       {
+        "rebels": {
+         "on": "$crown",
+         "type": "noble",
+         "size": "small"
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "history": {
+    "date": "1412-06-28",
+    "confidence": "high"
+   }
+  },
+  "conquest_of_ceuta": {
+   "id": "conquest_of_ceuta",
+   "name": "The conquest of Ceuta",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [],
+   "regions": [
+    "europe",
+    "north_africa"
+   ],
+   "importance": "major",
+   "roles": {
+    "conqueror": {
+     "historical": [
+      "portugal"
+     ],
+     "select": "fixed",
+     "as": [
+      "initiator",
+      "beneficiary"
+     ]
+    },
+    "defender": {
+     "historical": [
+      "morocco"
+     ],
+     "select": "fixed",
+     "as": [
+      "victim"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1400,
+    "latest": 1440,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "optional": [
+    {
+     "event": "battle_of_aljubarrota",
+     "weight": 1.5
+    }
+   ],
+   "trigger": {
+    "all": [
+     {
+      "exists": "portugal"
+     },
+     {
+      "not": {
+       "at_war": {
+        "who": "portugal",
+        "other": "castile"
+       }
+      }
+     },
+     {
+      "stat": {
+       "who": "portugal",
+       "stat": "stability",
+       "op": ">=",
+       "value": 0
+      }
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 4
+   },
+   "options": [
+    {
+     "id": "storm_ceuta",
+     "chooser": "$conqueror",
+     "historical": true,
+     "ai": {
+      "base": 70
+     },
+     "effects": {
+      "immediate": [
+       {
+        "set_flag": {
+         "on": "portugal",
+         "id": "ceuta_held",
+         "years": 0
+        }
+       },
+       {
+        "on": "portugal",
+        "stat": {
+         "prestige": 15,
+         "treasury": "-15%"
+        }
+       },
+       {
+        "on": "morocco",
+        "stat": {
+         "prestige": -10
+        },
+        "if": {
+         "exists": "morocco"
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "stay_in_iberia",
+     "chooser": "$conqueror",
+     "ai": {
+      "base": 30
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "portugal",
+        "stat": {
+         "prestige": -2
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "follow_ups": [
+    {
+     "event": "madeira_and_azores",
+     "delay": [
+      2,
+      15
+     ],
+     "boost": 2.0
+    }
+   ],
+   "history": {
+    "date": "1415-08-21",
+    "confidence": "high"
+   }
+  },
+  "madeira_and_azores": {
+   "id": "madeira_and_azores",
+   "name": "Madeira and the Azores",
+   "ages": [
+    "age_of_schism_and_conquerors",
+    "age_of_gunpowder_empires"
+   ],
+   "periods": [],
+   "regions": [
+    "europe",
+    "sub_saharan_africa"
+   ],
+   "importance": "regional",
+   "roles": {
+    "navigator": {
+     "historical": [
+      "portugal"
+     ],
+     "select": "fixed",
+     "as": [
+      "initiator",
+      "beneficiary"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1405,
+    "latest": 1450,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "portugal"
+     },
+     {
+      "any": [
+       {
+        "event": {
+         "id": "conquest_of_ceuta"
+        }
+       },
+       {
+        "innovation": {
+         "who": "portugal",
+         "id": "ocean_navigation"
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 4
+   },
+   "options": [
+    {
+     "id": "settle_the_islands",
+     "chooser": "$navigator",
+     "historical": true,
+     "ai": {
+      "base": 75
+     },
+     "effects": {
+      "immediate": [
+       {
+        "set_flag": {
+         "on": "portugal",
+         "id": "atlantic_island_bases",
+         "years": 0
+        }
+       },
+       {
+        "on": "portugal",
+        "stat": {
+         "prestige": 10,
+         "naval_reach": 3
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "leave_them_empty",
+     "chooser": "$navigator",
+     "ai": {
+      "base": 25
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "portugal",
+        "stat": {
+         "prestige": -2
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "follow_ups": [
+    {
+     "event": "cape_bojador",
+     "delay": [
+      2,
+      15
+     ],
+     "boost": 2.0
+    }
+   ],
+   "history": {
+    "date": [
+     "1420",
+     "1432"
+    ],
+    "confidence": "high"
+   }
+  },
+  "cape_bojador": {
+   "id": "cape_bojador",
+   "name": "Past Cape Bojador",
+   "ages": [
+    "age_of_schism_and_conquerors",
+    "age_of_gunpowder_empires"
+   ],
+   "periods": [],
+   "regions": [
+    "europe",
+    "sub_saharan_africa"
+   ],
+   "importance": "regional",
+   "roles": {
+    "navigator": {
+     "historical": [
+      "portugal"
+     ],
+     "select": "fixed",
+     "as": [
+      "initiator",
+      "beneficiary"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1420,
+    "latest": 1460,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "portugal"
+     },
+     {
+      "flag": {
+       "who": "portugal",
+       "id": "atlantic_island_bases"
+      }
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 4
+   },
+   "options": [
+    {
+     "id": "round_the_cape",
+     "chooser": "$navigator",
+     "historical": true,
+     "ai": {
+      "base": 70
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "portugal",
+        "stat": {
+         "prestige": 10,
+         "naval_reach": 5
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "turn_back",
+     "chooser": "$navigator",
+     "ai": {
+      "base": 30
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "portugal",
+        "stat": {
+         "prestige": -2
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "history": {
+    "date": "1434",
+    "confidence": "high"
+   }
+  },
+  "alfonso_takes_naples": {
+   "id": "alfonso_takes_naples",
+   "name": "Alfonso V takes Naples",
+   "ages": [
+    "age_of_schism_and_conquerors",
+    "age_of_gunpowder_empires"
+   ],
+   "periods": [],
+   "regions": [
+    "europe"
+   ],
+   "importance": "regional",
+   "roles": {
+    "conqueror": {
+     "historical": [
+      "aragon"
+     ],
+     "select": "fixed",
+     "as": [
+      "initiator",
+      "beneficiary"
+     ]
+    },
+    "kingdom": {
+     "historical": [
+      "naples"
+     ],
+     "select": "fixed",
+     "as": [
+      "affected"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1420,
+    "latest": 1450,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "aragon"
+     },
+     {
+      "exists": "naples"
+     },
+     {
+      "any": [
+       {
+        "at_war": {
+         "who": "aragon",
+         "other": "naples"
+        }
+       },
+       {
+        "stat": {
+         "who": "naples",
+         "stat": "ruler_years",
+         "op": "<=",
+         "value": 0
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 3
+   },
+   "options": [
+    {
+     "id": "conquer_naples",
+     "chooser": "$conqueror",
+     "historical": true,
+     "ai": {
+      "base": 65
+     },
+     "effects": {
+      "immediate": [
+       {
+        "vassalize": {
+         "who": "aragon",
+         "target": "naples",
+         "type": "personal_union"
+        }
+       },
+       {
+        "on": "aragon",
+        "stat": {
+         "prestige": 15
+        }
+       },
+       {
+        "set_flag": {
+         "on": "france",
+         "id": "claim_on_naples",
+         "years": 0
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "leave_naples_to_anjou",
+     "chooser": "$conqueror",
+     "ai": {
+      "base": 35
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "aragon",
+        "stat": {
+         "prestige": -5
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "history": {
+    "date": [
+     "1435-02-02",
+     "1442-06-02"
+    ],
+    "confidence": "high"
+   }
+  },
+  "war_of_chioggia": {
+   "id": "war_of_chioggia",
+   "name": "The War of Chioggia",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [],
+   "regions": [
+    "europe",
+    "middle_east"
+   ],
+   "importance": "major",
+   "roles": {
+    "venice": {
+     "historical": [
+      "venice"
+     ],
+     "select": "fixed",
+     "as": [
+      "resister"
+     ]
+    },
+    "genoa": {
+     "historical": [
+      "genoa"
+     ],
+     "select": "fixed",
+     "as": [
+      "initiator"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1378,
+    "latest": 1390,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "venice"
+     },
+     {
+      "exists": "genoa"
+     },
+     {
+      "any": [
+       {
+        "at_war": {
+         "who": "venice",
+         "other": "genoa"
+        }
+       },
+       {
+        "opinion": {
+         "who": "venice",
+         "other": "genoa",
+         "op": "<=",
+         "value": -25
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 0.5
+   },
+   "options": [
+    {
+     "id": "venice_recovers",
+     "chooser": null,
+     "historical": true,
+     "ai": {
+      "base": 60
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "genoa",
+        "stat": {
+         "prestige": -20,
+         "treasury": "-25%"
+        }
+       },
+       {
+        "on": "venice",
+        "stat": {
+         "treasury": "-25%"
+        }
+       },
+       {
+        "set_flag": {
+         "on": "genoa",
+         "id": "chioggia_lost",
+         "years": 30
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "genoa_triumphs",
+     "chooser": null,
+     "ai": {
+      "base": 40
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "venice",
+        "stat": {
+         "prestige": -20,
+         "treasury": "-30%"
+        }
+       },
+       {
+        "on": "genoa",
+        "stat": {
+         "prestige": 15
+        }
+       },
+       {
+        "set_flag": {
+         "on": "venice",
+         "id": "chioggia_lost",
+         "years": 30
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "follow_ups": [
+    {
+     "event": "peace_of_turin",
+     "delay": [
+      0,
+      2
+     ],
+     "boost": 3.0
+    }
+   ],
+   "history": {
+    "date": [
+     "1378",
+     "1380-06-24"
+    ],
+    "confidence": "high"
+   }
+  },
+  "peace_of_turin": {
+   "id": "peace_of_turin",
+   "name": "The Peace of Turin",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [],
+   "regions": [
+    "europe"
+   ],
+   "importance": "regional",
+   "roles": {
+    "mediator": {
+     "historical": [
+      "savoy"
+     ],
+     "select": "fixed",
+     "as": [
+      "initiator"
+     ]
+    },
+    "venice": {
+     "historical": [
+      "venice"
+     ],
+     "select": "fixed",
+     "as": [
+      "participant"
+     ]
+    },
+    "genoa": {
+     "historical": [
+      "genoa"
+     ],
+     "select": "fixed",
+     "as": [
+      "participant"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1379,
+    "latest": 1395,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "requires": {
+    "event": {
+     "id": "war_of_chioggia"
+    }
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "savoy"
+     },
+     {
+      "exists": "venice"
+     },
+     {
+      "exists": "genoa"
+     },
+     {
+      "not": {
+       "at_war": {
+        "who": "venice",
+        "other": "genoa"
+       }
+      }
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 1
+   },
+   "options": [
+    {
+     "id": "neutralise_tenedos",
+     "chooser": "$mediator",
+     "historical": true,
+     "ai": {
+      "base": 70
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "savoy",
+        "stat": {
+         "prestige": 10
+        }
+       },
+       {
+        "on": "venice",
+        "stat": {
+         "prestige": -5
+        }
+       },
+       {
+        "on": "genoa",
+        "stat": {
+         "prestige": -5
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "let_them_settle_it",
+     "chooser": "$mediator",
+     "ai": {
+      "base": 30
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "savoy",
+        "stat": {
+         "prestige": -5
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "history": {
+    "date": "1381-08-08",
+    "confidence": "high"
+   }
+  },
+  "durazzo_takes_naples": {
+   "id": "durazzo_takes_naples",
+   "name": "Charles of Durazzo takes Naples",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [],
+   "regions": [
+    "europe"
+   ],
+   "importance": "regional",
+   "roles": {
+    "claimant": {
+     "historical": [
+      "hungary"
+     ],
+     "select": "fixed",
+     "as": [
+      "initiator"
+     ]
+    },
+    "kingdom": {
+     "historical": [
+      "naples"
+     ],
+     "select": "fixed",
+     "as": [
+      "victim"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1379,
+    "latest": 1395,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "hungary"
+     },
+     {
+      "exists": "naples"
+     },
+     {
+      "flag": {
+       "who": "naples",
+       "id": "queen_deposed"
+      }
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 1.5
+   },
+   "options": [
+    {
+     "id": "seize_naples",
+     "chooser": "$claimant",
+     "historical": true,
+     "ai": {
+      "base": 70
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "naples",
+        "stat": {
+         "legitimacy": -20
+        }
+       },
+       {
+        "set_flag": {
+         "on": "naples",
+         "id": "durazzo_line",
+         "years": 0
+        }
+       },
+       {
+        "set_flag": {
+         "on": "anjou",
+         "id": "claim_on_naples",
+         "years": 0
+        }
+       },
+       {
+        "set_flag": {
+         "on": "france",
+         "id": "claim_on_naples",
+         "years": 0
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "stay_out_of_naples",
+     "chooser": "$claimant",
+     "ai": {
+      "base": 30
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "hungary",
+        "stat": {
+         "prestige": -5
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "history": {
+    "date": "1381-07-16",
+    "confidence": "high"
+   }
+  },
+  "gian_galeazzo_coup": {
+   "id": "gian_galeazzo_coup",
+   "name": "Gian Galeazzo seizes Milan",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [],
+   "regions": [
+    "europe"
+   ],
+   "importance": "major",
+   "roles": {
+    "nephew": {
+     "historical": [
+      "visconti_pavia"
+     ],
+     "select": "fixed",
+     "as": [
+      "initiator",
+      "beneficiary"
+     ]
+    },
+    "uncle": {
+     "historical": [
+      "milan"
+     ],
+     "select": "fixed",
+     "as": [
+      "victim"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1378,
+    "latest": 1395,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "visconti_pavia"
+     },
+     {
+      "exists": "milan"
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 3
+   },
+   "options": [
+    {
+     "id": "seize_bernabo",
+     "chooser": "$nephew",
+     "historical": true,
+     "ai": {
+      "base": 70
+     },
+     "effects": {
+      "immediate": [
+       {
+        "annex": {
+         "who": "visconti_pavia",
+         "target": "milan"
+        }
+       },
+       {
+        "on": "visconti_pavia",
+        "stat": {
+         "prestige": 15
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "share_the_state",
+     "chooser": "$nephew",
+     "ai": {
+      "base": 30
+     },
+     "effects": {
+      "immediate": [
+       {
+        "relation": {
+         "who": "visconti_pavia",
+         "other": "milan",
+         "type": "alliance",
+         "set": true
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "follow_ups": [
+    {
+     "event": "milan_made_duchy",
+     "delay": [
+      3,
+      12
+     ],
+     "boost": 2.0
+    }
+   ],
+   "history": {
+    "date": "1385-05-06",
+    "confidence": "high"
+   }
+  },
+  "milan_made_duchy": {
+   "id": "milan_made_duchy",
+   "name": "Milan made a duchy",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [],
+   "regions": [
+    "europe"
+   ],
+   "importance": "regional",
+   "roles": {
+    "duke": {
+     "historical": [
+      "visconti_pavia",
+      "milan"
+     ],
+     "select": {
+      "condition": {
+       "owns": {
+        "who": "this",
+        "where": "area:milan",
+        "min_share": 1
+       }
+      }
+     },
+     "as": [
+      "initiator",
+      "beneficiary"
+     ]
+    },
+    "king": {
+     "historical": [
+      "bohemia"
+     ],
+     "select": {
+      "where": "region:europe",
+      "condition": {
+       "flag": {
+        "who": "this",
+        "id": "emperor"
+       }
+      }
+     },
+     "as": [
+      "participant"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1385,
+    "latest": 1410,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "event": {
+       "id": "gian_galeazzo_coup"
+      }
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 3
+   },
+   "options": [
+    {
+     "id": "buy_the_title",
+     "chooser": "$duke",
+     "historical": true,
+     "ai": {
+      "base": 75
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "$duke",
+        "stat": {
+         "treasury": "-20%",
+         "legitimacy": 20,
+         "prestige": 15
+        }
+       },
+       {
+        "on": "$king",
+        "stat": {
+         "treasury": "+5%",
+         "prestige": -5
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "remain_an_imperial_vicar",
+     "chooser": "$duke",
+     "ai": {
+      "base": 25
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "$duke",
+        "stat": {
+         "prestige": -2
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "history": {
+    "date": "1395-09-05",
+    "confidence": "high"
+   }
+  },
+  "death_of_gian_galeazzo": {
+   "id": "death_of_gian_galeazzo",
+   "name": "Death of Gian Galeazzo",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [],
+   "regions": [
+    "europe"
+   ],
+   "importance": "regional",
+   "roles": {
+    "duke": {
+     "historical": [
+      "visconti_pavia",
+      "milan"
+     ],
+     "select": {
+      "condition": {
+       "owns": {
+        "who": "this",
+        "where": "area:milan",
+        "min_share": 1
+       }
+      }
+     },
+     "as": [
+      "affected"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1395,
+    "latest": 1415,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "event": {
+       "id": "milan_made_duchy"
+      }
+     },
+     {
+      "stat": {
+       "who": "$duke",
+       "stat": "ruler_years",
+       "op": "<=",
+       "value": 0
+      }
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 0.5
+   },
+   "options": [
+    {
+     "id": "the_state_breaks_up",
+     "chooser": null,
+     "historical": true,
+     "ai": {
+      "base": 65
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "$duke",
+        "stat": {
+         "legitimacy": -20,
+         "stability": -2
+        }
+       },
+       {
+        "rebels": {
+         "on": "$duke",
+         "type": "noble",
+         "size": "medium"
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "the_regency_holds",
+     "chooser": null,
+     "ai": {
+      "base": 35
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "$duke",
+        "stat": {
+         "legitimacy": -5
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "follow_ups": [
+    {
+     "event": "florence_takes_pisa",
+     "delay": [
+      1,
+      6
+     ],
+     "boost": 2.0
+    }
+   ],
+   "history": {
+    "date": "1402-09-03",
+    "confidence": "high"
+   }
+  },
+  "florence_takes_pisa": {
+   "id": "florence_takes_pisa",
+   "name": "Florence takes Pisa",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [],
+   "regions": [
+    "europe"
+   ],
+   "importance": "regional",
+   "roles": {
+    "buyer": {
+     "historical": [
+      "florence"
+     ],
+     "select": "fixed",
+     "as": [
+      "initiator",
+      "beneficiary"
+     ]
+    },
+    "seller": {
+     "historical": [
+      "pisa"
+     ],
+     "select": "fixed",
+     "as": [
+      "victim"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1390,
+    "latest": 1425,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "florence"
+     },
+     {
+      "exists": "pisa"
+     },
+     {
+      "any": [
+       {
+        "at_war": {
+         "who": "florence",
+         "other": "pisa"
+        }
+       },
+       {
+        "stat": {
+         "who": "pisa",
+         "stat": "stability",
+         "op": "<=",
+         "value": -1
+        }
+       },
+       {
+        "event": {
+         "id": "death_of_gian_galeazzo"
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 4
+   },
+   "options": [
+    {
+     "id": "take_pisa",
+     "chooser": "$buyer",
+     "historical": true,
+     "ai": {
+      "base": 70
+     },
+     "effects": {
+      "immediate": [
+       {
+        "annex": {
+         "who": "florence",
+         "target": "pisa"
+        }
+       },
+       {
+        "on": "florence",
+        "stat": {
+         "treasury": "-20%",
+         "prestige": 10
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "leave_pisa_free",
+     "chooser": "$buyer",
+     "ai": {
+      "base": 30
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "florence",
+        "stat": {
+         "prestige": -5
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "history": {
+    "date": "1406-10-09",
+    "confidence": "high"
+   }
+  },
+  "ladislaus_of_naples": {
+   "id": "ladislaus_of_naples",
+   "name": "Ladislaus of Naples marches on Rome",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [
+    "p_western_schism"
+   ],
+   "regions": [
+    "europe"
+   ],
+   "importance": "regional",
+   "roles": {
+    "king": {
+     "historical": [
+      "naples"
+     ],
+     "select": "fixed",
+     "as": [
+      "initiator"
+     ]
+    },
+    "pope": {
+     "historical": [
+      "papal_states"
+     ],
+     "select": "fixed",
+     "as": [
+      "victim"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1395,
+    "latest": 1420,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "naples"
+     },
+     {
+      "exists": "papal_states"
+     },
+     {
+      "period_active": {
+       "id": "p_western_schism"
+      }
+     },
+     {
+      "stat": {
+       "who": "naples",
+       "stat": "stability",
+       "op": ">=",
+       "value": 0
+      }
+     },
+     {
+      "flag": {
+       "who": "naples",
+       "id": "durazzo_line"
+      }
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 4
+   },
+   "options": [
+    {
+     "id": "march_on_rome",
+     "chooser": "$king",
+     "historical": true,
+     "ai": {
+      "base": 60
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "papal_states",
+        "stat": {
+         "prestige": -15
+        }
+       },
+       {
+        "on": "naples",
+        "stat": {
+         "prestige": 15
+        }
+       },
+       {
+        "casus_belli": {
+         "who": "florence",
+         "against": "naples",
+         "type": "containment",
+         "years": 10
+        },
+        "if": {
+         "exists": "florence"
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "stay_in_the_south",
+     "chooser": "$king",
+     "ai": {
+      "base": 40
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "naples",
+        "stat": {
+         "prestige": -2
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "history": {
+    "date": [
+     "1408-04-25",
+     "1414-08-06"
+    ],
+    "confidence": "high"
+   }
+  },
+  "lombard_wars": {
+   "id": "lombard_wars",
+   "name": "The Lombard wars",
+   "ages": [
+    "age_of_schism_and_conquerors",
+    "age_of_gunpowder_empires"
+   ],
+   "periods": [],
+   "regions": [
+    "europe"
+   ],
+   "importance": "regional",
+   "roles": {
+    "venice": {
+     "historical": [
+      "venice"
+     ],
+     "select": "fixed",
+     "as": [
+      "initiator",
+      "beneficiary"
+     ]
+    },
+    "duke": {
+     "historical": [
+      "visconti_pavia",
+      "milan"
+     ],
+     "select": {
+      "condition": {
+       "owns": {
+        "who": "this",
+        "where": "area:milan",
+        "min_share": 1
+       }
+      }
+     },
+     "as": [
+      "cost_bearer"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1415,
+    "latest": 1454,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "venice"
+     },
+     {
+      "any": [
+       {
+        "at_war": {
+         "who": "venice",
+         "other": "$duke"
+        }
+       },
+       {
+        "opinion": {
+         "who": "venice",
+         "other": "$duke",
+         "op": "<=",
+         "value": -25
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 4
+   },
+   "options": [
+    {
+     "id": "venice_wins_brescia",
+     "chooser": null,
+     "historical": true,
+     "ai": {
+      "base": 60
+     },
+     "effects": {
+      "immediate": [
+       {
+        "transfer": {
+         "where": "area:brescia",
+         "from": "$duke",
+         "to": "venice"
+        }
+       },
+       {
+        "on": "venice",
+        "stat": {
+         "prestige": 10
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "milan_holds",
+     "chooser": null,
+     "ai": {
+      "base": 40
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "$duke",
+        "stat": {
+         "prestige": 10
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "follow_ups": [
+    {
+     "event": "sforza_rise",
+     "delay": [
+      5,
+      20
+     ],
+     "boost": 1.5
+    }
+   ],
+   "history": {
+    "date": [
+     "1425-12-04",
+     "1454-04-09"
+    ],
+    "confidence": "high"
+   }
+  },
+  "sforza_rise": {
+   "id": "sforza_rise",
+   "name": "Francesco Sforza weds the duke's daughter",
+   "ages": [
+    "age_of_schism_and_conquerors",
+    "age_of_gunpowder_empires"
+   ],
+   "periods": [],
+   "regions": [
+    "europe"
+   ],
+   "importance": "regional",
+   "roles": {
+    "duke": {
+     "historical": [
+      "visconti_pavia",
+      "milan"
+     ],
+     "select": {
+      "condition": {
+       "owns": {
+        "who": "this",
+        "where": "area:milan",
+        "min_share": 1
+       }
+      }
+     },
+     "as": [
+      "affected"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1430,
+    "latest": 1450,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "optional": [
+    {
+     "event": "lombard_wars",
+     "weight": 2.0
+    }
+   ],
+   "trigger": {
+    "all": [
+     {
+      "stat": {
+       "who": "$duke",
+       "stat": "ruler_age",
+       "op": ">=",
+       "value": 45
+      }
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 4
+   },
+   "options": [
+    {
+     "id": "marry_bianca_to_sforza",
+     "chooser": "$duke",
+     "historical": true,
+     "ai": {
+      "base": 60
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "$duke",
+        "stat": {
+         "legitimacy": 10
+        }
+       },
+       {
+        "set_flag": {
+         "on": "$duke",
+         "id": "sforza_heir",
+         "years": 0
+        }
+       },
+       {
+        "set_flag": {
+         "on": "france",
+         "id": "claim_on_milan",
+         "years": 0
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "keep_the_condottieri_out",
+     "chooser": "$duke",
+     "ai": {
+      "base": 40
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "$duke",
+        "stat": {
+         "stability": -1
+        }
+       },
+       {
+        "set_flag": {
+         "on": "france",
+         "id": "claim_on_milan",
+         "years": 0
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "history": {
+    "date": "1441-10-25",
+    "confidence": "high"
+   }
+  },
+  "end_of_hundred_years_war": {
+   "id": "end_of_hundred_years_war",
+   "name": "End of the Hundred Years' War",
+   "ages": [
+    "age_of_schism_and_conquerors",
+    "age_of_gunpowder_empires"
+   ],
+   "periods": [
+    "p_hundred_years_war_lancastrian"
+   ],
+   "regions": [
+    "europe"
+   ],
+   "importance": "regional",
+   "roles": {
+    "victor": {
+     "historical": [
+      "france"
+     ],
+     "select": "fixed",
+     "as": [
+      "initiator",
+      "beneficiary"
+     ]
+    },
+    "loser": {
+     "historical": [
+      "england"
+     ],
+     "select": "fixed",
+     "as": [
+      "cost_bearer"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1420,
+    "latest": 1520,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "france"
+     },
+     {
+      "exists": "england"
+     },
+     {
+      "controls": {
+       "who": "france",
+       "where": "area:guyenne",
+       "min_share": 0.8
+      }
+     },
+     {
+      "not": {
+       "at_war": {
+        "who": "france",
+        "other": "england"
+       }
+      }
+     }
+    ]
+   },
+   "invalidated_if": {
+    "any": [
+     {
+      "not": {
+       "exists": "france"
+      }
+     },
+     {
+      "not": {
+       "exists": "england"
+      }
+     }
+    ]
+   },
+   "selection": {
+    "mode": "immediate"
+   },
+   "options": [
+    {
+     "id": "accept_losses",
+     "chooser": "$loser",
+     "historical": true,
+     "ai": {
+      "base": 70
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "$loser",
+        "stat": {
+         "war_weariness": -3
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "plan_revanche",
+     "chooser": "$loser",
+     "ai": {
+      "base": 30,
+      "factors": [
+       {
+        "if": {
+         "stat": {
+          "who": "$loser",
+          "stat": "stability",
+          "op": ">=",
+          "value": 1
+         }
+        },
+        "factor": 2
+       }
+      ]
+     },
+     "effects": {
+      "immediate": [
+       {
+        "casus_belli": {
+         "who": "$loser",
+         "against": "$victor",
+         "type": "reconquest",
+         "years": 25
+        }
+       },
+       {
+        "on": "$loser",
+        "stat": {
+         "stability": -1
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {
+    "immediate": [
+     {
+      "on": "$victor",
+      "modifier": "standing_army_reform"
+     },
+     {
+      "on": "$loser",
+      "stat": {
+       "prestige": -15,
+       "legitimacy": -10
+      }
+     }
+    ]
+   },
+   "follow_ups": [
+    {
+     "event": "wars_of_the_roses",
+     "delay": [
+      0,
+      10
+     ],
+     "boost": 2.0
+    }
+   ],
+   "history": {
+    "date": "1453-07-17"
+   },
+   "requires": {
+    "any": [
+     {
+      "event": {
+       "id": "battle_of_agincourt"
+      }
+     },
+     {
+      "event": {
+       "id": "treaty_of_troyes"
+      }
+     }
+    ]
+   }
+  },
+  "wars_of_the_roses": {
+   "id": "wars_of_the_roses",
+   "name": "Wars of the Roses",
+   "ages": [
+    "age_of_gunpowder_empires"
+   ],
+   "periods": [],
+   "regions": [
+    "europe"
+   ],
+   "importance": "regional",
+   "roles": {
+    "realm": {
+     "historical": [
+      "england"
+     ],
+     "select": {
+      "condition": {
+       "all": [
+        {
+         "government": {
+          "who": "this",
+          "is": "monarchy"
+         }
+        },
+        {
+         "stat": {
+          "who": "this",
+          "stat": "legitimacy",
+          "op": "<",
+          "value": 40
+         }
+        }
+       ]
+      }
+     },
+     "as": [
+      "affected",
+      "cost_bearer"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1430,
+    "latest": 1520,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "$realm"
+     },
+     {
+      "stat": {
+       "who": "$realm",
+       "stat": "legitimacy",
+       "op": "<",
+       "value": 40
+      }
+     },
+     {
+      "any": [
+       {
+        "event": "end_of_hundred_years_war"
+       },
+       {
+        "stat": {
+         "who": "$realm",
+         "stat": "prestige",
+         "op": "<",
+         "value": -10
+        }
+       },
+       {
+        "stat": {
+         "who": "$realm",
+         "stat": "stability",
+         "op": "<=",
+         "value": -1
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "invalidated_if": {
+    "not": {
+     "exists": "england"
+    }
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 4
+   },
+   "execution": {
+    "duration_years": 30,
+    "maintain": {
+     "stat": {
+      "who": "$realm",
+      "stat": "legitimacy",
+      "op": "<",
+      "value": 70
+     }
+    },
+    "cancel_if": {
+     "stat": {
+      "who": "$realm",
+      "stat": "legitimacy",
+      "op": ">=",
+      "value": 70
+     }
+    }
+   },
+   "options": [
+    {
+     "id": "tudor_victory",
+     "chooser": "$realm",
+     "historical": true,
+     "ai": {
+      "base": 60
+     },
+     "effects": {
+      "long_term": [
+       {
+        "on": "$realm",
+        "modifier": "new_dynasty_consolidation"
+       }
+      ]
+     }
+    },
+    {
+     "id": "york_victory",
+     "chooser": "$realm",
+     "ai": {
+      "base": 40
+     },
+     "effects": {
+      "long_term": [
+       {
+        "on": "$realm",
+        "stat": {
+         "legitimacy": 20
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {
+    "immediate": [
+     {
+      "rebels": {
+       "on": "$realm",
+       "type": "noble",
+       "size": "medium"
+      }
+     }
+    ],
+    "ongoing": [
+     {
+      "on": "$realm",
+      "modifier": "dynastic_civil_war"
+     }
+    ]
+   },
+   "history": {
+    "date": [
+     1455,
+     1487
+    ]
+   },
+   "requires": {
+    "event": {
+     "id": "richard_ii_deposed"
+    }
+   }
+  },
+  "union_of_castile_and_aragon": {
+   "id": "union_of_castile_and_aragon",
+   "name": "Union of the crowns of Castile and Aragon",
+   "ages": [
+    "age_of_schism_and_conquerors",
+    "age_of_gunpowder_empires"
+   ],
+   "periods": [],
+   "regions": [
+    "europe"
+   ],
+   "importance": "major",
+   "roles": {
+    "senior": {
+     "historical": [
+      "castile"
+     ],
+     "select": "fixed",
+     "as": [
+      "initiator",
+      "beneficiary"
+     ]
+    },
+    "junior": {
+     "historical": [
+      "aragon"
+     ],
+     "select": "fixed",
+     "as": [
+      "participant"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1415,
+    "latest": 1530,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "castile"
+     },
+     {
+      "exists": "aragon"
+     },
+     {
+      "opinion": {
+       "who": "castile",
+       "other": "aragon",
+       "op": ">=",
+       "value": 50
+      }
+     },
+     {
+      "not": {
+       "at_war": {
+        "who": "castile",
+        "other": "aragon"
+       }
+      }
+     },
+     {
+      "not": {
+       "relation": {
+        "who": "castile",
+        "other": "portugal",
+        "type": "personal_union"
+       }
+      }
+     }
+    ]
+   },
+   "invalidated_if": {
+    "any": [
+     {
+      "not": {
+       "exists": "castile"
+      }
+     },
+     {
+      "not": {
+       "exists": "aragon"
+      }
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 8,
+    "modifiers": [
+     {
+      "if": {
+       "relation": {
+        "who": "castile",
+        "other": "portugal",
+        "type": "alliance"
+       }
+      },
+      "factor": 0.5
+     }
+    ]
+   },
+   "exclusive_with": [
+    "castile_portugal_union"
+   ],
+   "options": [
+    {
+     "id": "personal_union",
+     "chooser": "$senior",
+     "historical": true,
+     "ai": {
+      "base": 90
+     },
+     "effects": {
+      "immediate": [
+       {
+        "relation": {
+         "who": "castile",
+         "other": "aragon",
+         "type": "personal_union",
+         "set": true
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "decline_match",
+     "chooser": "$senior",
+     "ai": {
+      "base": 10
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "castile",
+        "stat": {
+         "prestige": -5
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {
+    "delayed": [
+     {
+      "after_years": 40,
+      "create_country": {
+       "entity": "spain",
+       "from": [
+        "castile",
+        "aragon"
+       ]
+      },
+      "if": {
+       "relation": {
+        "who": "castile",
+        "other": "aragon",
+        "type": "personal_union"
+       }
+      }
+     }
+    ]
+   },
+   "follow_ups": [
+    {
+     "event": "fall_of_granada",
+     "delay": [
+      5,
+      40
+     ],
+     "boost": 2.0
+    }
+   ],
+   "history": {
+    "date": [
+     "1469-10-19",
+     "1479-01-20"
+    ]
+   },
+   "requires": {
+    "event": {
+     "id": "compromise_of_caspe"
+    }
+   }
+  },
+  "fall_of_granada": {
+   "id": "fall_of_granada",
+   "name": "Conquest of Granada",
+   "ages": [
+    "age_of_schism_and_conquerors",
+    "age_of_gunpowder_empires"
+   ],
+   "periods": [],
+   "regions": [
+    "europe",
+    "north_africa"
+   ],
+   "importance": "major",
+   "roles": {
+    "conqueror": {
+     "historical": [
+      "castile",
+      "spain"
+     ],
+     "select": {
+      "condition": {
+       "all": [
+        {
+         "borders": {
+          "who": "this",
+          "other": "granada"
+         }
+        },
+        {
+         "religion": {
+          "who": "this",
+          "is": "catholic"
+         }
+        }
+       ]
+      }
+     },
+     "as": [
+      "initiator",
+      "beneficiary"
+     ]
+    },
+    "emirate": {
+     "historical": [
+      "granada"
+     ],
+     "select": "fixed",
+     "as": [
+      "cost_bearer"
+     ]
+    },
+    "muslims_of_iberia": {
+     "historical": [
+      "mudejar_morisco_population"
+     ],
+     "select": "fixed",
+     "as": [
+      "victim"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1400,
+    "latest": null,
+    "mode": "reference",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "granada"
+     },
+     {
+      "at_war": {
+       "who": "$conqueror",
+       "other": "granada"
+      }
+     },
+     {
+      "controls": {
+       "who": "$conqueror",
+       "where": "area:granada",
+       "min_share": 1
+      }
+     }
+    ]
+   },
+   "invalidated_if": {
+    "not": {
+     "exists": "granada"
+    }
+   },
+   "selection": {
+    "mode": "immediate"
+   },
+   "options": [
+    {
+     "id": "capitulation_terms",
+     "chooser": "$conqueror",
+     "historical": true,
+     "ai": {
+      "base": 70
+     },
+     "effects": {
+      "delayed": [
+       {
+        "after_years": 8,
+        "on": "area:granada",
+        "modifier": "forced_conversion"
+       }
+      ]
+     }
+    },
+    {
+     "id": "honour_treaty_of_granada",
+     "chooser": "$conqueror",
+     "ai": {
+      "base": 30,
+      "factors": [
+       {
+        "if": {
+         "ideology": {
+          "who": "$conqueror",
+          "id": "religious_tolerance",
+          "op": ">=",
+          "value": 0.3
+         }
+        },
+        "factor": 3
+       }
+      ]
+     },
+     "effects": {
+      "long_term": [
+       {
+        "on": "area:granada",
+        "stat": {
+         "unrest": -10
+        }
+       },
+       {
+        "on": "$conqueror",
+        "stat": {
+         "prestige": -5
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {
+    "immediate": [
+     {
+      "annex": {
+       "who": "$conqueror",
+       "target": "granada"
+      }
+     },
+     {
+      "on": "$conqueror",
+      "stat": {
+       "prestige": 20
+      }
+     },
+     {
+      "on": "$conqueror",
+      "modifier": "crusading_zeal"
+     }
+    ]
+   },
+   "follow_ups": [
+    {
+     "event": "alhambra_decree",
+     "delay": [
+      0,
+      2
+     ],
+     "boost": 3.0
+    },
+    {
+     "event": "columbus_first_voyage",
+     "delay": [
+      0,
+      10
+     ],
+     "boost": 1.5
+    }
+   ],
+   "history": {
+    "date": [
+     1482,
+     "1492-01-02"
+    ]
+   }
+  },
+  "alhambra_decree": {
+   "id": "alhambra_decree",
+   "name": "Expulsion of the Jews from Spain",
+   "ages": [
+    "age_of_gunpowder_empires",
+    "age_of_reformations"
+   ],
+   "periods": [],
+   "regions": [
+    "europe",
+    "north_africa",
+    "middle_east"
+   ],
+   "importance": "regional",
+   "roles": {
+    "persecutor": {
+     "historical": [
+      "spain",
+      "castile"
+     ],
+     "select": {
+      "condition": {
+       "all": [
+        {
+         "religion": {
+          "who": "this",
+          "is": "catholic"
+         }
+        },
+        {
+         "ideology": {
+          "who": "this",
+          "id": "religious_zeal",
+          "op": ">=",
+          "value": 0.5
+         }
+        }
+       ]
+      }
+     },
+     "as": [
+      "initiator"
+     ]
+    },
+    "expelled": {
+     "historical": [
+      "sephardic_jews"
+     ],
+     "select": "fixed",
+     "as": [
+      "victim"
+     ]
+    },
+    "host": {
+     "historical": [
+      "ottoman"
+     ],
+     "select": {
+      "condition": {
+       "ideology": {
+        "who": "this",
+        "id": "religious_tolerance",
+        "op": ">=",
+        "value": 0.3
+       }
+      }
+     },
+     "as": [
+      "beneficiary"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1400,
+    "latest": 1700,
+    "mode": "reference",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "religion": {
+       "who": "$persecutor",
+       "is": "catholic"
+      }
+     },
+     {
+      "ideology": {
+       "who": "$persecutor",
+       "id": "religious_zeal",
+       "op": ">=",
+       "value": 0.5
+      }
+     },
+     {
+      "any": [
+       {
+        "event": "fall_of_granada"
+       },
+       {
+        "flag": {
+         "who": "$persecutor",
+         "id": "inquisition_established"
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "invalidated_if": {
+    "ideology": {
+     "who": "$persecutor",
+     "id": "religious_tolerance",
+     "op": ">=",
+     "value": 0.5
+    }
+   },
+   "selection": {
+    "mode": "decision",
+    "mean_years": 5
+   },
+   "options": [
+    {
+     "id": "expel",
+     "chooser": "$persecutor",
+     "historical": true,
+     "ai": {
+      "base": 60
+     },
+     "effects": {
+      "immediate": [
+       {
+        "move_population": {
+         "group": "sephardic_jews",
+         "from": "$persecutor",
+         "to": "$host",
+         "amount": "70%"
+        }
+       },
+       {
+        "on": "$persecutor",
+        "stat": {
+         "prestige": 5
+        }
+       },
+       {
+        "on": "$persecutor",
+        "modifier": "loss_of_skilled_minority"
+       },
+       {
+        "on": "$host",
+        "modifier": "skilled_refugees"
+       }
+      ]
+     }
+    },
+    {
+     "id": "tolerate",
+     "chooser": "$persecutor",
+     "ai": {
+      "base": 40
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "$persecutor",
+        "stat": {
+         "stability": -1
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "history": {
+    "date": "1492-03-31"
+   }
+  },
+  "printing_press_spreads": {
+   "id": "printing_press_spreads",
+   "name": "Spread of movable-type printing",
+   "ages": [
+    "age_of_gunpowder_empires",
+    "age_of_reformations"
+   ],
+   "periods": [
+    "p_protestant_reformation"
+   ],
+   "regions": [
+    "europe"
+   ],
+   "importance": "major",
+   "roles": {
+    "adopters": {
+     "historical": [
+      "hre",
+      "venice",
+      "france"
+     ],
+     "select": {
+      "condition": {
+       "innovation": {
+        "who": "this",
+        "id": "humanist_learning",
+        "op": ">=",
+        "value": 0.3
+       }
+      }
+     },
+     "as": [
+      "initiator",
+      "beneficiary"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1440,
+    "latest": null,
+    "mode": "reference",
+    "repeat": "process"
+   },
+   "trigger": {
+    "all": [
+     {
+      "stat": {
+       "who": "region:europe",
+       "stat": "literacy",
+       "op": ">=",
+       "value": 5
+      }
+     },
+     {
+      "any": [
+       {
+        "innovation": {
+         "who": "region:europe",
+         "id": "humanist_learning",
+         "op": ">=",
+         "value": 0.1
+        }
+       },
+       {
+        "tech": {
+         "who": "$adopters",
+         "track": "economy",
+         "op": ">=",
+         "value": 5
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 6
+   },
+   "execution": {
+    "duration_years": 50,
+    "maintain": null
+   },
+   "options": [
+    {
+     "id": "spread",
+     "chooser": null,
+     "historical": true,
+     "ai": {
+      "base": 100
+     },
+     "effects": {}
+    }
+   ],
+   "effects": {
+    "immediate": [
+     {
+      "unlock": {
+       "on": "region:europe",
+       "id": "innovation_printing"
+      }
+     }
+    ],
+    "ongoing": [
+     {
+      "spread": {
+       "kind": "innovation",
+       "id": "printing",
+       "where": "region:europe",
+       "amount": 0.02
+      }
+     }
+    ],
+    "long_term": [
+     {
+      "on": "$adopters",
+      "stat": {
+       "literacy": 5
+      }
+     }
+    ]
+   },
+   "follow_ups": [
+    {
+     "event": "protestant_reformation",
+     "delay": [
+      20,
+      120
+     ],
+     "boost": 1.5
+    }
+   ],
+   "history": {
+    "date": [
+     1450,
+     1500
+    ]
+   }
+  }
+ },
+ "places": {
+  "area:normandy": [
+   "p1058",
+   "p1051",
+   "p1047",
+   "p1057",
+   "p1053"
+  ],
+  "area:ile_de_france": [
+   "p1063",
+   "p1068",
+   "p1066"
+  ],
+  "area:milan": [
+   "p1373"
+  ],
+  "area:brescia": [
+   "p1375"
+  ]
+ },
+ "entities": {
+  "visconti_pavia": "Visconti of Pavia",
+  "saxe_wittenberg": "Saxe-Wittenberg",
+  "burgraviate_of_nuremberg": "Burgraviate of Nuremberg",
+  "padua": "Padua",
+  "verona": "Verona",
+  "pisa": "Pisa",
+  "aquileia": "Patriarchate of Aquileia",
+  "anjou": "Duchy of Anjou",
+  "berry": "Duchy of Berry",
+  "bourbon": "Duchy of Bourbon",
+  "foix": "County of Foix",
+  "armagnac": "County of Armagnac",
+  "franche_comte": "County of Burgundy",
+  "perugia": "Perugia",
+  "wurttemberg": "Württemberg",
+  "palatinate": "Palatinate"
+ },
+ "localization": {
+  "event.schism_vincennes.name": "France declares for Clement",
+  "event.schism_vincennes.desc": "At Vincennes in November 1378 Charles V and his council recognise Clement VII, the pope the cardinals elected at Fondi, against Urban VI in Rome. France's choice gives the Avignon pope a kingdom behind him.",
+  "event.schism_vincennes.option.declare_for_clement": "Declare for Clement",
+  "event.schism_vincennes.option.stay_with_urban": "Stay with Urban",
+  "event.schism_vincennes.option.wait_on_a_council": "Wait for a council",
+  "event.schism_obedience.name": "A realm chooses its Pope",
+  "event.schism_obedience.desc": "Rome and Avignon each claim the Church. Every Catholic court must say which pope it obeys, and its friends and enemies weigh on the choice: France's allies lean to Avignon, England's to Rome.",
+  "event.schism_obedience.option.obey_rome": "Obey Rome",
+  "event.schism_obedience.option.obey_avignon": "Obey Avignon",
+  "event.schism_obedience.option.stay_neutral": "Stay neutral",
+  "event.urban_deposes_joanna.name": "Urban deposes Queen Joanna",
+  "event.urban_deposes_joanna.desc": "Joanna of Naples sheltered the cardinals of Fondi and backs Clement. In 1380 Urban VI declares her deposed and hands her kingdom to her kinsman Charles of Durazzo, a prince of the Hungarian court.",
+  "event.urban_deposes_joanna.option.depose_the_queen": "Depose the queen",
+  "event.urban_deposes_joanna.option.seek_terms": "Seek terms with her",
+  "event.wyclif_and_the_lollards.name": "Wyclif and the Lollards",
+  "event.wyclif_and_the_lollards.desc": "John Wyclif attacks the wealth of the Church and the pope's power, and his followers carry an English Bible to the towns. In 1382 a council at Blackfriars condemns his teaching, but the Lollards live on.",
+  "event.wyclif_and_the_lollards.option.condemn_at_blackfriars": "Condemn the teaching",
+  "event.wyclif_and_the_lollards.option.tolerate_the_preachers": "Tolerate the preachers",
+  "event.council_of_pisa.name": "The Council of Pisa",
+  "event.council_of_pisa.desc": "Cardinals of both obediences meet at Pisa in 1409, depose both popes and elect Alexander V. Neither pope gives way, so the Church has three.",
+  "event.council_of_pisa.option.elect_a_third_pope": "Elect a third pope",
+  "event.council_of_pisa.option.heal_the_schism": "Both popes resign",
+  "event.council_of_pisa.option.council_fails": "The council breaks up",
+  "event.council_of_constance.name": "The Council of Constance",
+  "event.council_of_constance.desc": "The King of the Romans calls the Church to Constance. The council deposes the Pisan pope and Benedict XIII, accepts Gregory XII's resignation and elects Martin V in 1417. The Western Schism is over.",
+  "event.council_of_constance.option.end_the_schism": "End the Schism",
+  "event.council_of_constance.option.let_the_popes_quarrel": "Let the popes quarrel",
+  "event.burning_of_hus.name": "Jan Hus burned at Constance",
+  "event.burning_of_hus.desc": "Jan Hus preaches Wyclif's reform in Prague. Summoned to the council under a safe-conduct, he is condemned and burned on 6 July 1415, and Bohemia takes his death as an insult to the kingdom.",
+  "event.burning_of_hus.option.burn_hus": "Hus is burned",
+  "event.burning_of_hus.option.spare_hus": "Hus is spared",
+  "event.first_defenestration_of_prague.name": "The Defenestration of Prague",
+  "event.first_defenestration_of_prague.desc": "In July 1419 Hussites storm Prague's New Town Hall and throw the councillors from the windows. Weeks later King Wenceslaus dies, and Bohemia rises against his heir Sigismund.",
+  "event.first_defenestration_of_prague.option.the_hussites_rise": "The Hussites rise",
+  "event.first_defenestration_of_prague.option.grant_the_chalice": "Grant the chalice",
+  "event.council_of_basel.name": "The Council of Basel",
+  "event.council_of_basel.desc": "The council that meets at Basel in 1431 claims to stand above the pope. It makes peace with the Hussites, deposes Eugenius IV and elects its own antipope, Felix V, before it dissolves in 1449.",
+  "event.council_of_basel.option.council_over_pope": "The council defies the pope",
+  "event.council_of_basel.option.pope_masters_the_council": "The pope masters it",
+  "event.council_of_florence_union.name": "The Union of Florence",
+  "event.council_of_florence_union.desc": "Hard pressed by the Ottomans, the Byzantine emperor comes to Florence in 1439 and signs a union of the Greek and Latin Churches in return for help. At home the union is hated.",
+  "event.council_of_florence_union.option.sign_the_union": "Sign the union",
+  "event.council_of_florence_union.option.refuse_the_union": "Refuse the union",
+  "event.wenceslaus_succeeds.name": "Wenceslaus succeeds Charles IV",
+  "event.wenceslaus_succeeds.desc": "Emperor Charles IV dies at Prague on 29 November 1378. His son Wenceslaus, already King of the Romans, follows him without an election, and the Luxembourg lands are shared among the brothers: Sigismund keeps Brandenburg, Jobst Moravia.",
+  "event.wenceslaus_succeeds.option.share_the_lands": "Share the lands",
+  "event.wenceslaus_succeeds.option.hold_the_inheritance": "Hold the inheritance together",
+  "event.neuberg_partition.name": "The partition of Neuberg",
+  "event.neuberg_partition.desc": "On 25 September 1379 the Habsburg brothers divide their lands at Neuberg: Albert III keeps Austria, Leopold III takes Styria, Carinthia, Tyrol and the western lands. The house is weaker for a century.",
+  "event.neuberg_partition.option.divide_at_neuberg": "Divide the lands",
+  "event.neuberg_partition.option.keep_joint_rule": "Keep joint rule",
+  "event.swabian_city_war.name": "The Swabian City War",
+  "event.swabian_city_war.desc": "The towns of the Swabian League fight the princes. Count Eberhard of Württemberg breaks their army at Döffingen in 1388, and the Peace of Eger in 1389 forbids the leagues.",
+  "event.swabian_city_war.option.crush_the_league": "Crush the league",
+  "event.swabian_city_war.option.make_terms_with_the_towns": "Make terms with the towns",
+  "event.battle_of_sempach.name": "The Battle of Sempach",
+  "event.battle_of_sempach.desc": "Duke Leopold III marches against Lucerne and its confederates. On 9 July 1386 his knights are cut down at Sempach and the duke is killed.",
+  "event.battle_of_sempach.option.swiss_victory": "The confederates win",
+  "event.battle_of_sempach.option.austrian_victory": "The duke wins",
+  "event.battle_of_naefels.name": "The Battle of Näfels",
+  "event.battle_of_naefels.desc": "In April 1388 the men of Glarus and Schwyz rout a Habsburg army at Näfels. Glarus is free of its Habsburg bailiff and joins the confederates in full.",
+  "event.battle_of_naefels.option.glarus_free": "Glarus is free",
+  "event.battle_of_naefels.option.habsburg_holds_glarus": "The Habsburgs hold Glarus",
+  "event.wenceslaus_deposed.name": "The deposition of Wenceslaus",
+  "event.wenceslaus_deposed.desc": "The Rhenish electors meet at Lahnstein in August 1400 and depose King Wenceslaus as idle and useless to the Empire. They elect Rupert of the Palatinate in his place.",
+  "event.wenceslaus_deposed.option.deposed_at_lahnstein": "Accept the deposition",
+  "event.wenceslaus_deposed.option.buy_the_electors": "Buy the electors",
+  "event.ruperts_italian_venture.name": "Rupert's Italian venture",
+  "event.ruperts_italian_venture.desc": "Rupert crosses the Alps in 1401 to be crowned in Rome and to humble Gian Galeazzo Visconti. Beaten before Brescia and out of money, he goes home with nothing.",
+  "event.ruperts_italian_venture.option.march_on_milan": "March on Milan",
+  "event.ruperts_italian_venture.option.stay_in_germany": "Stay in Germany",
+  "event.sigismund_elected.name": "Sigismund King of the Romans",
+  "event.sigismund_elected.desc": "After Rupert dies in 1410, the electors choose Sigismund, King of Hungary and Wenceslaus's brother. He is the strongest prince of the Empire and means to end the Schism.",
+  "event.sigismund_elected.option.take_the_crown": "Take the crown",
+  "event.sigismund_elected.option.decline_the_crown": "Decline it",
+  "event.brandenburg_to_hohenzollern.name": "Brandenburg to the Hohenzollerns",
+  "event.brandenburg_to_hohenzollern.desc": "Sigismund, short of money, pledges and then grants Brandenburg to Frederick, Burgrave of Nuremberg. At Constance in 1415 Frederick is made margrave and elector.",
+  "event.brandenburg_to_hohenzollern.option.buy_the_march": "Buy the march",
+  "event.brandenburg_to_hohenzollern.option.decline_the_march": "Decline it",
+  "event.saxony_to_the_wettins.name": "Saxony to the Wettins",
+  "event.saxony_to_the_wettins.desc": "The Ascanian electors of Saxe-Wittenberg die out in 1422. Sigismund grants the electorate to Frederick the Warlike of Meissen, and the Wettin lands take the name of Saxony.",
+  "event.saxony_to_the_wettins.option.take_the_electorate": "Take the electorate",
+  "event.saxony_to_the_wettins.option.let_lauenburg_inherit": "Let Lauenburg inherit",
+  "event.anti_hussite_crusade.name": "The Hussite crusades",
+  "event.anti_hussite_crusade.desc": "Sigismund leads five crusades into Bohemia between 1420 and 1431. Žižka's wagon forts beat every one, and the war ends only with the Compacts of Basel in 1436.",
+  "event.anti_hussite_crusade.option.launch_the_crusades": "Launch the crusades",
+  "event.anti_hussite_crusade.option.treat_with_the_hussites": "Treat with the Hussites",
+  "event.albert_ii_king.name": "Albert of Austria takes three crowns",
+  "event.albert_ii_king.desc": "Sigismund dies in December 1437 without a son. His son-in-law Albert of Austria is chosen King of Hungary and of Bohemia and King of the Romans, the first Habsburg on the throne since 1308.",
+  "event.albert_ii_king.option.take_three_crowns": "Take the three crowns",
+  "event.albert_ii_king.option.take_the_german_crown_alone": "Take the German crown alone",
+  "event.frederick_iii_king.name": "Frederick III King of the Romans",
+  "event.frederick_iii_king.desc": "Albert II dies in 1439 on campaign against the Ottomans. The electors pick his cousin Frederick of Styria, and Hungary chooses Władysław of Poland over Albert's newborn son.",
+  "event.frederick_iii_king.option.crown_frederick": "Crown Frederick",
+  "event.frederick_iii_king.option.hold_the_unions": "Hold the unions",
+  "event.brittany_confiscated.name": "Brittany confiscated",
+  "event.brittany_confiscated.desc": "Duke John IV sided with England and fled there. In December 1378 the Parlement declares Brittany forfeit to the crown, and the Breton lords, who wanted no king's rule, call their duke home.",
+  "event.brittany_confiscated.option.confiscate_the_duchy": "Confiscate the duchy",
+  "event.brittany_confiscated.option.forgive_the_duke": "Forgive the duke",
+  "event.death_of_charles_v.name": "The uncles' regency",
+  "event.death_of_charles_v.desc": "Charles V dies on 16 September 1380, leaving an eleven-year-old son. His brothers of Anjou, Berry and Burgundy govern for the boy, empty the treasury, and the hearth tax he abolished on his deathbed brings riots to Paris and Rouen.",
+  "event.death_of_charles_v.option.rule_by_the_uncles": "Rule by the uncles",
+  "event.death_of_charles_v.option.keep_the_hearth_tax": "Keep the hearth tax",
+  "event.peasants_revolt.name": "The Peasants' Revolt",
+  "event.peasants_revolt.desc": "The third poll tax to pay for the French war sets Essex and Kent alight in May 1381. Wat Tyler's men take London and kill the chancellor. The boy king Richard meets them at Smithfield, promises freedom, and his council takes it back.",
+  "event.peasants_revolt.option.promise_and_take_back": "Promise, then take it back",
+  "event.peasants_revolt.option.end_villeinage": "End villeinage",
+  "event.peasants_revolt.option.ride_them_down": "Ride them down",
+  "event.richard_ii_deposed.name": "Richard II deposed",
+  "event.richard_ii_deposed.desc": "Richard II exiles and then disinherits his cousin Henry Bolingbroke. Henry lands in 1399 while the king is in Ireland, the lords desert Richard, and Parliament accepts Henry IV. The House of Lancaster needs the French war to prove its right.",
+  "event.richard_ii_deposed.option.lancaster_takes_the_crown": "Lancaster takes the crown",
+  "event.richard_ii_deposed.option.the_king_holds": "The king holds",
+  "event.madness_of_charles_vi.name": "The madness of Charles VI",
+  "event.madness_of_charles_vi.desc": "Riding through the forest of Le Mans in August 1392, Charles VI goes mad and kills four of his own men. For thirty years his fits come and go, and the princes fight over who governs in his name.",
+  "event.madness_of_charles_vi.option.the_king_goes_mad": "The king goes mad",
+  "event.madness_of_charles_vi.option.the_king_recovers": "The king recovers",
+  "event.murder_of_orleans.name": "The murder of Louis of Orléans",
+  "event.murder_of_orleans.desc": "The king's brother Louis of Orléans and his cousin John the Fearless of Burgundy fight for the council of a mad king. On 23 November 1407 John's men cut Louis down in a Paris street.",
+  "event.murder_of_orleans.option.strike_at_orleans": "Strike at Orléans",
+  "event.murder_of_orleans.option.reconcile_at_court": "Reconcile at court",
+  "event.armagnac_burgundian_war.name": "The Armagnac–Burgundian war",
+  "event.armagnac_burgundian_war.desc": "Orléans's son and his father-in-law Bernard of Armagnac raise the princes against Burgundy. From 1411 France has a civil war inside the English war, and both sides court the English.",
+  "event.armagnac_burgundian_war.option.civil_war": "Civil war",
+  "event.armagnac_burgundian_war.option.peace_of_the_princes": "A peace among the princes",
+  "event.cabochien_revolt.name": "The Cabochien revolt",
+  "event.cabochien_revolt.desc": "In April 1413 the butchers of Paris, led by Simon Caboche and backed by Burgundy, take the city and force a reform ordinance on the court. The Armagnacs retake Paris in August and tear the ordinance up.",
+  "event.cabochien_revolt.option.revoke_the_ordinance": "Revoke the ordinance",
+  "event.cabochien_revolt.option.keep_the_ordinance": "Keep the ordinance",
+  "event.battle_of_agincourt.name": "The Battle of Agincourt",
+  "event.battle_of_agincourt.desc": "Henry V renews his claim, takes Harfleur and marches for Calais. On 25 October 1415 his archers destroy the French nobility in the mud at Agincourt. Two years later he begins the conquest of Normandy.",
+  "event.battle_of_agincourt.option.english_victory": "The English win",
+  "event.battle_of_agincourt.option.french_victory": "The French win",
+  "event.treaty_of_troyes.name": "The Treaty of Troyes",
+  "event.treaty_of_troyes.desc": "After John the Fearless is murdered at Montereau, Burgundy joins England. At Troyes on 21 May 1420 the mad Charles VI disinherits his son, makes Henry V his heir and gives him his daughter. English and Burgundian garrisons hold Paris.",
+  "event.treaty_of_troyes.option.accept_troyes": "Accept the treaty",
+  "event.treaty_of_troyes.option.refuse_troyes": "Refuse the treaty",
+  "event.relief_of_orleans.name": "Joan of Arc",
+  "event.relief_of_orleans.desc": "In 1429 a peasant girl from Domrémy convinces the Dauphin that God has sent her. She breaks the siege of Orléans in May and brings him to Reims to be crowned. The English burn her at Rouen in 1431, but the tide has turned.",
+  "event.relief_of_orleans.option.trust_the_maid": "Trust the Maid",
+  "event.relief_of_orleans.option.send_her_home": "Send her home",
+  "event.congress_of_arras.name": "The Congress of Arras",
+  "event.congress_of_arras.desc": "In September 1435 Philip the Good makes peace with Charles VII at Arras, avenged for his father's murder and freed from homage. The English walk out, and Paris opens its gates to the French king in 1436.",
+  "event.congress_of_arras.option.make_peace_with_france": "Make peace with France",
+  "event.congress_of_arras.option.keep_the_english_alliance": "Keep the English alliance",
+  "event.ecorcheurs.name": "The Écorcheurs",
+  "event.ecorcheurs.desc": "With the truces, unpaid companies called the Flayers roam Champagne, Burgundy and Alsace. Charles VII's ordinance of 1439 makes the raising of soldiers the king's alone, and in 1445 the best companies become a standing royal army.",
+  "event.ecorcheurs.option.ordinance_companies": "Make them the king's companies",
+  "event.ecorcheurs.option.send_them_abroad": "Send them abroad",
+  "event.portuguese_crisis.name": "The Portuguese crisis of 1383–85",
+  "event.portuguese_crisis.desc": "Ferdinand I dies in 1383 and his only child Beatriz is married to John I of Castile. Lisbon rises, the Master of Avis kills the queen's favourite, and the Cortes of Coimbra make him king in 1385.",
+  "event.portuguese_crisis.option.avis_takes_the_crown": "The Master of Avis is king",
+  "event.portuguese_crisis.option.accept_castile": "Accept Beatriz and Castile",
+  "event.battle_of_aljubarrota.name": "The Battle of Aljubarrota",
+  "event.battle_of_aljubarrota.desc": "John I of Castile invades to take his wife's crown. On 14 August 1385 King John of Avis and Nuno Álvares Pereira, with English archers, destroy his army at Aljubarrota. The Treaty of Windsor binds England and Portugal the next year.",
+  "event.battle_of_aljubarrota.option.portuguese_victory": "Portugal wins",
+  "event.battle_of_aljubarrota.option.castilian_victory": "Castile wins",
+  "event.lancaster_claim_in_castile.name": "Lancaster's claim to Castile",
+  "event.lancaster_claim_in_castile.desc": "John of Gaunt claims Castile through his wife Constance, daughter of Peter the Cruel. He lands in Galicia in 1386 with Portugal's help, but his army melts away, and at Bayonne in 1388 he sells the claim: his daughter marries the Castilian heir.",
+  "event.lancaster_claim_in_castile.option.invade_and_bargain": "Invade, then bargain",
+  "event.lancaster_claim_in_castile.option.give_up_the_claim": "Give up the claim",
+  "event.compromise_of_caspe.name": "The Compromise of Caspe",
+  "event.compromise_of_caspe.desc": "Martin I of Aragon dies in 1410 without an heir. Nine judges meet at Caspe and in June 1412 choose Ferdinand of Antequera, a Castilian Trastámara, over the Count of Urgell. Castile and Aragon now share a dynasty.",
+  "event.compromise_of_caspe.option.trastamara_king": "Choose the Trastámara",
+  "event.compromise_of_caspe.option.count_of_urgell": "Choose the Count of Urgell",
+  "event.conquest_of_ceuta.name": "The conquest of Ceuta",
+  "event.conquest_of_ceuta.desc": "On 21 August 1415 John I of Portugal and his sons storm Ceuta across the strait. The first European foothold in Africa gives the princes their knighthood and starts Portugal's turn to the sea.",
+  "event.conquest_of_ceuta.option.storm_ceuta": "Storm Ceuta",
+  "event.conquest_of_ceuta.option.stay_in_iberia": "Stay in Iberia",
+  "event.madeira_and_azores.name": "Madeira and the Azores",
+  "event.madeira_and_azores.desc": "Prince Henry's captains settle Madeira from 1420 and find the Azores in 1427. Sugar and wheat from the islands pay for longer voyages south.",
+  "event.madeira_and_azores.option.settle_the_islands": "Settle the islands",
+  "event.madeira_and_azores.option.leave_them_empty": "Leave them empty",
+  "event.cape_bojador.name": "Past Cape Bojador",
+  "event.cape_bojador.desc": "Sailors feared the shoals and currents of Cape Bojador as the end of the world. In 1434 Gil Eanes sails past it and comes home, and the West African coast opens to Portuguese ships.",
+  "event.cape_bojador.option.round_the_cape": "Round the cape",
+  "event.cape_bojador.option.turn_back": "Turn back",
+  "event.alfonso_takes_naples.name": "Alfonso V takes Naples",
+  "event.alfonso_takes_naples.desc": "Joanna II of Naples adopts and then disowns Alfonso V of Aragon. After she dies in 1435 he fights René of Anjou for the kingdom and enters Naples in June 1442, where he keeps his court.",
+  "event.alfonso_takes_naples.option.conquer_naples": "Conquer Naples",
+  "event.alfonso_takes_naples.option.leave_naples_to_anjou": "Leave Naples to Anjou",
+  "event.war_of_chioggia.name": "The War of Chioggia",
+  "event.war_of_chioggia.desc": "Venice and Genoa fight over Tenedos and the straits. In 1379 the Genoese take Chioggia at the mouth of the lagoon, then are themselves trapped there and surrender in June 1380.",
+  "event.war_of_chioggia.option.venice_recovers": "Venice recovers",
+  "event.war_of_chioggia.option.genoa_triumphs": "Genoa triumphs",
+  "event.peace_of_turin.name": "The Peace of Turin",
+  "event.peace_of_turin.desc": "Amadeus VI of Savoy brokers peace in August 1381. Tenedos is emptied of people and its fort pulled down, and Venice gives up Dalmatia to Hungary.",
+  "event.peace_of_turin.option.neutralise_tenedos": "Empty Tenedos",
+  "event.peace_of_turin.option.let_them_settle_it": "Let them settle it",
+  "event.durazzo_takes_naples.name": "Charles of Durazzo takes Naples",
+  "event.durazzo_takes_naples.desc": "With Hungarian troops and Urban's blessing, Charles of Durazzo takes Naples in July 1381 and has Queen Joanna smothered. Joanna had adopted Louis of Anjou, so the Angevins of France now claim the kingdom.",
+  "event.durazzo_takes_naples.option.seize_naples": "Seize Naples",
+  "event.durazzo_takes_naples.option.stay_out_of_naples": "Stay out of Naples",
+  "event.gian_galeazzo_coup.name": "Gian Galeazzo seizes Milan",
+  "event.gian_galeazzo_coup.desc": "On 6 May 1385 Gian Galeazzo Visconti, lord of Pavia, rides out to greet his uncle Bernabò outside Milan and arrests him. Bernabò dies in prison, and the Visconti state is one again.",
+  "event.gian_galeazzo_coup.option.seize_bernabo": "Seize Bernabò",
+  "event.gian_galeazzo_coup.option.share_the_state": "Share the state",
+  "event.milan_made_duchy.name": "Milan made a duchy",
+  "event.milan_made_duchy.desc": "For 100,000 florins Wenceslaus makes Gian Galeazzo Duke of Milan in 1395, the first duke in Italy by imperial grant. Gian Galeazzo goes on to take Pisa, Siena, Perugia and Bologna.",
+  "event.milan_made_duchy.option.buy_the_title": "Buy the title",
+  "event.milan_made_duchy.option.remain_an_imperial_vicar": "Remain a vicar",
+  "event.death_of_gian_galeazzo.name": "Death of Gian Galeazzo",
+  "event.death_of_gian_galeazzo.desc": "Gian Galeazzo dies of plague in September 1402 with Florence almost at his mercy. His sons are boys, the condottieri carve up his state, and the threat to Tuscany is gone.",
+  "event.death_of_gian_galeazzo.option.the_state_breaks_up": "The state breaks up",
+  "event.death_of_gian_galeazzo.option.the_regency_holds": "The regency holds",
+  "event.florence_takes_pisa.name": "Florence takes Pisa",
+  "event.florence_takes_pisa.desc": "Gian Galeazzo's bastard sells Pisa to Florence in 1405, but the Pisans refuse the sale. Florence besieges the city for a year, and it falls by starvation on 9 October 1406. Florence has its port.",
+  "event.florence_takes_pisa.option.take_pisa": "Take Pisa",
+  "event.florence_takes_pisa.option.leave_pisa_free": "Leave Pisa free",
+  "event.ladislaus_of_naples.name": "Ladislaus of Naples marches on Rome",
+  "event.ladislaus_of_naples.desc": "Charles of Durazzo's son Ladislaus uses the Schism to make himself master of the south and takes Rome itself in 1408 and 1413. Florence and the Pisan popes fight him until he dies in 1414.",
+  "event.ladislaus_of_naples.option.march_on_rome": "March on Rome",
+  "event.ladislaus_of_naples.option.stay_in_the_south": "Stay in the south",
+  "event.lombard_wars.name": "The Lombard wars",
+  "event.lombard_wars.desc": "Filippo Maria Visconti rebuilds his father's state, and Venice and Florence join against him in 1425. Carmagnola wins Brescia for Venice in 1426 and Bergamo in 1428, and the wars run on for thirty years.",
+  "event.lombard_wars.option.venice_wins_brescia": "Venice wins Brescia",
+  "event.lombard_wars.option.milan_holds": "Milan holds",
+  "event.sforza_rise.name": "Francesco Sforza weds the duke's daughter",
+  "event.sforza_rise.desc": "Filippo Maria has no son. In 1441 he gives his daughter Bianca Maria to his best condottiere, Francesco Sforza, who will take Milan for himself in 1450. The French house of Orléans keeps its own claim through Valentina Visconti.",
+  "event.sforza_rise.option.marry_bianca_to_sforza": "Marry Bianca to Sforza",
+  "event.sforza_rise.option.keep_the_condottieri_out": "Keep the condottieri out"
+ }
+}

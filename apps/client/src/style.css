@@ -6716,3 +6716,113 @@ button.realm-link.hunt-line {
   margin: 0;
   text-align: left;
 }
+
+/* Realm's Overview (SHELL-170, SHELL-171): one tile per section, two or more to a row; a tile that waits on the player has a red edge and says why. */
+.overview-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 4px;
+  margin: 4px 0 10px;
+}
+.overview-tiles .tile {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  column-gap: 6px;
+  row-gap: 1px;
+  min-height: 64px;
+  padding: 6px 8px;
+  justify-content: stretch;
+  text-align: left;
+  font-size: 16px;
+  line-height: 1.15;
+}
+.overview-tiles .tile > b {
+  font-size: 17px;
+}
+.overview-tiles .tile > span,
+.overview-tiles .tile > small,
+.overview-tiles .tile > em {
+  grid-column: 1 / -1;
+  font-weight: 400;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.overview-tiles .tile > small {
+  color: var(--ink-soft);
+}
+.overview-tiles .tile > em {
+  font-style: normal;
+  color: var(--cloth);
+}
+.overview-tiles .tile.needs {
+  box-shadow: inset 4px 0 0 var(--cloth);
+}
+.overview-head {
+  margin: 2px 0 4px;
+}
+.overview-head .capital {
+  min-height: 44px;
+  margin-left: 4px;
+}
+
+/* The Chronicle (EVT-112): turning points ahead and happened, and realms' aims (EVT-113). */
+.chron-counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin: 6px 0 2px;
+  font-weight: 600;
+}
+.chron-row {
+  margin: 6px 0;
+  border: 2px solid var(--outline);
+  background: var(--paper-light);
+}
+div.chron-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 8px;
+  min-height: 44px;
+  padding: 2px 8px;
+}
+.chron-row small {
+  color: var(--ink-soft);
+}
+.chron-mark {
+  display: inline-block;
+  width: 1.2em;
+  color: var(--ink);
+}
+.chron-row.bent .chron-mark {
+  color: var(--wood);
+}
+.chron-row.gone {
+  background: var(--paper);
+}
+.chron-row.gone .chron-mark,
+.chron-row.gone b {
+  color: var(--ink-soft);
+}
+.chron-heading,
+.aims {
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.chron-heading li,
+.aims li {
+  min-height: 44px;
+  padding: 4px 0;
+  border-top: 1px solid var(--outline);
+}
+.chron-heading .why,
+.aims .why {
+  display: block;
+  color: var(--ink-soft);
+}
+.aims li small {
+  display: block;
+  color: var(--ink-soft);
+}

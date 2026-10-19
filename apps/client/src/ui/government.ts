@@ -1,6 +1,7 @@
 import type { GovernmentView, NextFormView, RevolutionView } from "@ph/engine";
 import { icon } from "../art/ui.ts";
 import { regimeCard } from "./revolution.ts";
+import { START_YEAR } from "@ph/rules/start";
 
 /**
  * Government on the realm card (GOV-064 to GOV-066): the Government tab of
@@ -26,7 +27,7 @@ const FAMILY: Record<string, string> = {
 /** The reform waiting for a second tap, by form id; the player's choice, kept between renders. */
 export const governmentUi = { confirm: null as string | null };
 
-const PART: Record<string, string> = { form: "Form", custom: "Custom since 1444" };
+const PART: Record<string, string> = { form: "Form", custom: `Custom since ${START_YEAR}` };
 
 /** One cap: "x of y", a bar, its parts, and what going over it does. */
 function capBlock(label: string, used: number, cap: GovernmentView["officials"]["cap"], over: string, tab: string): string {
@@ -102,8 +103,3 @@ export function governmentTab(v: GovernmentView, revo?: RevolutionView | null): 
     ${v.next.length ? `<p class="hint">A reform changes the form for good: it costs gold, and some lords dislike it.</p><div class="next-forms">${v.next.map((x) => nextCard(v, x)).join("")}</div>` : `<p class="hint">This form has no next form.</p>`}`;
 }
 
-/** The General tab's line: form and both caps, opening the Government tab. */
-export function governmentLine(v: GovernmentView): string {
-  const over = v.officials.used > v.officials.cap.total || v.lords.used > v.lords.cap.total;
-  return `<dt>Government</dt><dd><button class="paper${over ? " over" : ""}" data-realm-open-tab="government" title="Open the Government tab">${icon("crown", 1)}${esc(v.form)} <small>officials ${v.officials.used}/${v.officials.cap.total} · lords ${v.lords.used}/${v.lords.cap.total}</small></button></dd>`;
-}

@@ -5,6 +5,8 @@ import { fallenEffect, type FallenEffect } from "./fallen.ts";
 import { lowFaith, lowTongue } from "./belief.ts";
 import { heritageViews, type HeritageView } from "./heritage.ts";
 import { statecraftView, type StatecraftView } from "./statecraft.ts";
+import { chronicleView, goalViews, type ChronicleView, type GoalView } from "./chronicle.ts";
+import { createGoals, monthlyGoals } from "./goals.ts";
 import { achievementsView, startAchievements } from "./achievements.ts";
 import { eventCards, type EventCard } from "./events.ts";
 import { diplomacyLensView, type DiplomacyLensView } from "./diplomacyLens.ts";
@@ -32,7 +34,7 @@ import { badWeatherName } from "./domain/realm/index.ts";
 import { foodView, mapNetwork, type FoodView } from "./castleFood.ts";
 import { buildSheets, landSheets, slotsOf, slotsUsed, townSize, workCost, WORKS, workStepName, workEffect, type LandTileRow, type WorkRow } from "./works.ts";
 import { buildingType } from "./domain/buildings/index.ts";
-import type { GameDate, Ruleset } from "@ph/rules";
+import type { GameDate, GoalDef, Ruleset } from "@ph/rules";
 import { hashWorld } from "./hash.ts";
 import { advance, applyNow, campaigning, HOURS_PER_STEP, mayMarchInto, processTurn, refillHere, type Order } from "./turn.ts";
 import { createWorld, tileMarch, type World } from "./world.ts";
@@ -73,7 +75,7 @@ const companyView = (c: FreeCompany): CompanyView => ({
 /** Messages the UI thread sends to the engine worker. */
 export type EngineRequest =
   /** `map` is the map's images as the UI decoded them, so armies march over its tiles; without it they stand still. */
-  | { id: number; type: "newGame"; seed: number; playerNation: string; map?: MapTiles; endDate?: string }
+  | { id: number; type: "newGame"; seed: number; playerNation: string; map?: MapTiles; endDate?: string; goals?: GoalDef[] }
   /** Plays a whole week at once (the start-up probe and the benchmarks). */
   | { id: number; type: "endTurn"; orders: Order[] }
   /** Plays the clock on by some 4-hour steps (six a day). */
@@ -282,6 +284,8 @@ export interface Snapshot {
   peoples: PeoplesSnapshot;
   /** Win scores, ranks, the player's breakdown and ledger, and how the campaign ended. */
   campaign: CampaignView;
+  /** The Chronicle and every realm's live historical goals (EVT-109 to EVT-113). */
+  history: { chronicle: ChronicleView; goals: GoalView[] };
   /** Heads of the faith: seats, each realm's Faith-line badge, the player's Head of the faith card and the censure a war would bring (RELG-135 to RELG-138). */
   faithHeads: FaithHeadsView;
   /** The player's men gathering in provinces: men still to come, days to the next thousand and to the last. */
@@ -559,6 +563,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       })(),
       peoples: peoplesSnapshot(w),
       campaign: campaignView(w),
+      history: { chronicle: chronicleView(w), goals: goalViews(w) },
       faithHeads: faithHeadsView(w, player),
       musters: w.musters.filter((m) => m.nation === player).map((m) => ({ province: m.province, men: m.men, daysLeft: m.daysLeft, daysAll: daysToGather(w, m) })),
       gatherDays: player >= 0 ? gatherDays(w, player) : 14,
@@ -695,6 +700,11 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
           setPlayer(world, idx);
           // A nearer end date (YYYY-MM-DD), for trying the end card (SHELL-164).
           if (req.endDate && /^\d{4}-\d\d-\d\d$/.test(req.endDate)) world.campaign.endDate = req.endDate;
+          // Goals of the caller's own, for trying the Chronicle and the Aims fold (EVT-112, EVT-113).
+          if (req.goals) {
+            world.goals = createGoals(world, req.goals);
+            monthlyGoals(world, false);
+          }
           startAchievements(world);
           return snapshot(req.id, started, []);
         }

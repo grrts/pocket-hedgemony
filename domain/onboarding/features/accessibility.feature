@@ -21,7 +21,7 @@ Feature: Tutorial accessibility and language
     Given reduced motion is on
     Then the pointing hand doesn't bob
     And the spotlight doesn't pulse
-    And the border clash in chapter 5 can be skipped to the result
+    And the clash before Pera in chapter 5 can be skipped to the result
 
   @TUT-112
   Scenario: Reading time
@@ -33,6 +33,6 @@ Feature: Tutorial accessibility and language
 
   @TUT-113
   Scenario: Translation keeps tokens and length
-    Given the step text key "tut.ch3.open_food_policy" translated into another language
+    Given the step text key "tut.ch6.open_food_policy" translated into another language
     Then the {ui:food_policy} token stays in the string where the translator put it
     And the step length lint checks the translation against 140 characters

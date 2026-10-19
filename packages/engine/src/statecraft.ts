@@ -3,6 +3,8 @@ import { cedeProvince, relationState, type News } from "./war.ts";
 import { grabbedLand, nameAbroadView, type NameAbroadView } from "./conquest.ts";
 import { priceContext, priceOfWar, type PriceOfWar } from "./priceOfWar.ts";
 import * as dip from "./domain/diplomacy/index.ts";
+import { goalAsks } from "./goals.ts";
+import goalsConfig from "../../rules/data/domain/events.json" with { type: "json" };
 import { LEDGER, LEDGER_LINES } from "./treasury.ts";
 import { houseView, yearlyCrowns, type HouseView } from "./crowns.ts";
 import { aiCourting, courtingView, monthlyCourting, type CourtingView } from "./courting.ts";
@@ -410,19 +412,24 @@ function aiEnvoys(world: World): void {
       const w = dip.standing(d, world.nationIds[x]!, id);
       if (w > warmest) [t, warmest] = [x, w];
     }
-    if (t < 0) continue;
+    // Besides the warmest neighbour, the realms its ally and subject goals name (EVT-106).
+    const asks = goalAsks(world, n);
+    if (t < 0 && !asks.length) continue;
     const days = countDays(world);
     let best: { t: number; action: string; total: number } | null = null;
-    for (const action of ["propose_alliance", "arrange_marriage", "offer_overlordship"] as const) {
-      if (whyNotEnvoy(world, n, t, action)) continue;
+    const weigh = (t: number, action: string, extra: number) => {
+      if (whyNotEnvoy(world, n, t, action)) return;
       // An AI overlord takes no subject that would put it more than 1 over its reach (SUBJ-098).
-      if (action === "offer_overlordship" && !aiMayTakeSubject(world, n)) continue;
+      if (action === "offer_overlordship" && !aiMayTakeSubject(world, n)) return;
       const count = dip.countAsk(d, { action, asker: id, asked: world.nationIds[t]! }, days);
       // The AI counts the other court's notoriety against binding itself to it (DIPL-223).
-      const total = count.total - (dip.NOTORIETY_ASKS.includes(action) ? dip.notorietyPoints(d, world.nationIds[t]!) : 0);
+      const total = count.total - (dip.NOTORIETY_ASKS.includes(action) ? dip.notorietyPoints(d, world.nationIds[t]!) : 0) + extra;
       if (!best || total > best.total) best = { t, action, total };
-    }
+    };
+    if (t >= 0) for (const action of ["propose_alliance", "arrange_marriage", "offer_overlordship"] as const) weigh(t, action, 0);
+    for (const a of asks) for (const action of a.actions) weigh(a.target, action, goalsConfig.goals.envoy_points_per_pull * a.pull);
     if (!best) continue;
+    best = best as { t: number; action: string; total: number };
     const choice = dip.aiChoose(best.total);
     if (choice === "send") sendEnvoy(world, n, best.t, best.action);
     else if (choice === "gift_first" && dip.country(d, id).goldToSpare) sendEnvoy(world, n, best.t, "send_gift");

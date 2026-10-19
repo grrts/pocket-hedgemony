@@ -4,8 +4,9 @@ import { conditionalEntries, type Diplomacy, type LedgerEntry } from "../diploma
 import { ferryDays, ferryOpen, straitBetween, type Army, type MoveWorld } from "../troop-movement/index.ts";
 
 /**
- * The tutorial campaign "The Year of Varna" (onboarding spec §4–§5, TUT-001 …
- * TUT-064, TUT-098 … TUT-113): chapters, the step script and the pure step
+ * The tutorial campaign "Murad's Frontier" (the Ottomans under Murad I from
+ * 20 September 1378; onboarding spec §4–§5, TUT-001 … TUT-064, TUT-098 …
+ * TUT-113): chapters, the step script and the pure step
  * machine that runs it, tutorial progress, text tokens and prompts, the
  * pacing tools and the scenario file's world rules. State is plain data the
  * caller owns; nothing here touches the screen.
@@ -296,7 +297,7 @@ export const guideFace = (inTutorial: boolean): string | null => (inTutorial ? c
 /** The label on the note's face (TUT-119, D-TUT-2). */
 export const guideFaceLabel = (): string => config.guide_face.label;
 
-/** Any battle, the chapter 5 border clash included, can be skipped to the result; under reduced motion the hand and spotlight stay still (TUT-111). */
+/** Any battle, the chapter 5 clash before Pera included, can be skipped to the result; under reduced motion the hand and spotlight stay still (TUT-111). */
 export const battleSkippable = (): boolean => true;
 
 // ---------------------------------------------------------------- tokens and prompts (TUT-006, TUT-059, TUT-098, TUT-099, TUT-113)
@@ -387,7 +388,7 @@ export function warHeldBack(war: { attacker: string; target?: string; region?: s
   return !!region && q.regions.includes(region);
 }
 
-/** The chapter 5 border clash at Giurgiu always opens the battle screen at one bell every 3 seconds (TUT-023). */
+/** The chapter 5 clash before Pera always opens the battle screen at one bell every 3 seconds (TUT-023). */
 export function battleView(battle: string, tutorialRunning: boolean): { battleScreen: boolean; secondsPerBell: number | null } {
   const w = SC.watch_speed;
   if (tutorialRunning && battle === w.battle) return { battleScreen: w.opens_battle_screen, secondsPerBell: w.seconds_per_bell };
@@ -409,6 +410,13 @@ export interface ScriptedEvent {
 
 export const SCRIPTED_EVENTS: ScriptedEvent[] = config.scripted_events as ScriptedEvent[];
 
+/** A scripted event by id. */
+export function scriptedEvent(id: string): ScriptedEvent {
+  const e = SCRIPTED_EVENTS.find((x) => x.id === id);
+  if (!e) throw new Error(`no scripted event ${id}`);
+  return e;
+}
+
 /** Events that may fire: `tutorial_only` events never fire in a real campaign (TUT-026). */
 export function mayFire(e: { tutorial_only?: boolean }, campaign: "tutorial" | "real"): boolean {
   return !e.tutorial_only || campaign === "tutorial";
@@ -418,18 +426,28 @@ export const historicalDate = (what: keyof typeof config.historical_dates): stri
 
 export const scenarioOverrides = () => SC.overrides;
 
-/** The forced AI of chapters 5 and 8 (TUT-027, TUT-031). */
-export function forcedAi(country: string): (typeof SC.forced_ai)[keyof typeof SC.forced_ai] | undefined {
-  return (SC.forced_ai as Record<string, (typeof SC.forced_ai)[keyof typeof SC.forced_ai]>)[country];
+export interface ForcedAi {
+  chapter: number;
+  realm: string;
+  holds: string;
+  with?: string;
+  commander?: string;
+  offers_terms_after_failing_castle_months?: number;
+  accepts_terms_when?: string;
 }
 
-/** Hungary offers terms after failing to take one castle in two months, when the border clash was lost (TUT-031). */
-export function hungaryOffersTerms(monthsFailingOneCastle: number): boolean {
-  return monthsFailingOneCastle >= SC.forced_ai.Hungary.offers_terms_after_failing_castle_months;
+/** The forced AI of chapters 5 and 8, by the leader it steers (TUT-027, TUT-031). */
+export function forcedAi(leader: string): ForcedAi | undefined {
+  return (SC.forced_ai as Record<string, ForcedAi>)[leader];
 }
 
-/** The Morea accepts terms once the wall has fallen (TUT-027). */
-export const moreaAcceptsTerms = (wallFallen: boolean): boolean => wallFallen && SC.forced_ai["the Morea"].accepts_terms_when === "wall fallen";
+/** Andronikos IV's side offers terms after failing to take one castle in two months, when the clash before Pera was lost (TUT-031). */
+export function andronikosOffersTerms(monthsFailingOneCastle: number): boolean {
+  return monthsFailingOneCastle >= SC.forced_ai["Andronikos IV"].offers_terms_after_failing_castle_months;
+}
+
+/** Manuel II accepts terms once Serres has fallen (TUT-027). */
+export const manuelAcceptsTerms = (serresFallen: boolean): boolean => serresFallen && SC.forced_ai["Manuel II"].accepts_terms_when === "Serres fallen";
 
 /** A chapter that needs more gold than the player has starts with a scripted loan, shown as a real debt line (TUT-034). */
 export function chapterStartLoan(minimum: number, gold: number, house: number): { lender: string; amount: number; debtLine: true } | null {
@@ -438,12 +456,12 @@ export function chapterStartLoan(minimum: number, gold: number, house: number): 
   return { lender: `a ${houses[house % houses.length]} banking house`, amount: minimum - gold, debtLine: true };
 }
 
-/** The chapter 8 siege after a failed storm: month by month until breached or terms (TUT-035). */
-export function siegeMonth(s: { breached: boolean; moreaOffersTerms: boolean }): "carries on" | "chapter ends" {
-  return s.breached || s.moreaOffersTerms ? "chapter ends" : "carries on";
+/** The chapter 8 siege of Serres after a failed storm: month by month until breached or terms (TUT-035). */
+export function siegeMonth(s: { breached: boolean; enemyOffersTerms: boolean }): "carries on" | "chapter ends" {
+  return s.breached || s.enemyOffersTerms ? "chapter ends" : "carries on";
 }
 
-/** After a lost border clash the step text changes (TUT-031). */
+/** After a lost clash before Pera the step text changes (TUT-031). */
 export function clashStepText(won: boolean, lang = "en"): string | null {
   return won ? null : (config.strings as Record<string, Record<string, string>>)[lang]!["tut.ch5.lost_clash"]!;
 }
@@ -459,43 +477,59 @@ export function playableChapters(edition: string): number[] {
   return config.free_tier.includes(config.tutorial_nation) ? CHAPTERS.map((c) => c.n) : [];
 }
 
-// ---------------------------------------------------------------- the crusade after Varna (TUT-036 … TUT-049)
+// ---------------------------------------------------------------- the Byzantine civil war (TUT-036 … TUT-049)
 
-export function crusadeLeague(): { against: string; members: string[]; fleets: string[]; regardlessOfThreshold: boolean; line: string; warAim: string; aimGrantedBy: string } {
-  const l = SC.league;
-  return {
-    against: l.against,
-    members: [...l.members],
-    fleets: [...l.fleets],
-    regardlessOfThreshold: l.regardless_of_threshold,
-    line: `League against the ${l.against}: ${l.members.length} members, ${l.soldiers.toLocaleString("en-GB")} soldiers`,
-    warAim: l.war_aim,
-    aimGrantedBy: l.aim_granted_by,
-  };
-}
+export type EmperorChoice = keyof typeof SC.civil_war.sides;
 
-/** The news that ends chapter 3: the crusaders' fleet on the Danube (TUT-037, D-TUT-9). */
-export function danubeNewsLine(): string {
-  return SCRIPTED_EVENTS.find((x) => x.id === "tut_danube_fleet")!.line!;
-}
-
-/** The tutorial's start state (X-5, D-TUT-9): 11 November 1444, Mehmed II on the throne, the crusade war still open with its aim held. */
-export function tutorialStart(): { date: string; ruler: string; rulerAge: number; retired: string; retiredAt: string; crusadeWarOpen: boolean; leagueAim: string; aimGrantedBy: string } {
-  const c = SC.catalogue_court;
-  return { date: config.start_date, ruler: c.ruler, rulerAge: c.ruler_age, retired: c.retired, retiredAt: c.retired_at, crusadeWarOpen: SC.overrides.crusade_war_open, leagueAim: SC.league.war_aim, aimGrantedBy: SC.league.aim_granted_by };
+export interface CivilWarSide {
+  emperor: string;
+  partner: string;
+  partner_brings: string;
+  war_aim: string | null;
+  aim_granted_by: string | null;
+  enemy: string;
+  enemy_partner: string;
+  closed_strait: string;
+  historical: boolean;
 }
 
 /**
- * Off script inside one chapter (TUT-030, TUT-032, D-TUT-3): asking Murad to
- * stay keeps him at Edirne as a commander until chapter 1 ends; ignoring the
+ * The start state's civil war (TUT-037): Andronikos IV on the throne since
+ * 12 August 1376, John V and Manuel II in his prison, Venice and Genoa at war
+ * over Tenedos; the country card's line once John V has escaped.
+ */
+export function civilWar(): { emperor: string; since: string; prisoners: string[]; partnersAtWar: { a: string; b: string; over: string; since: string }; cardLine: string; choices: EmperorChoice[] } {
+  const w = SC.civil_war;
+  return { emperor: w.emperor, since: w.since, prisoners: [...w.prisoners], partnersAtWar: { ...w.partners_at_war }, cardLine: w.card_line, choices: Object.keys(w.sides) as EmperorChoice[] };
+}
+
+/** What backing one emperor brings: the Italian partner, the war aim, the enemy and the strait his partner's galleys close (TUT-038, TUT-040). */
+export function emperorChoice(choice: EmperorChoice): CivilWarSide {
+  return (SC.civil_war.sides as Record<EmperorChoice, CivilWarSide>)[choice];
+}
+
+/** The news that ends chapter 3: John V and Manuel have escaped to Murad (TUT-037). */
+export function escapeNewsLine(): string {
+  return scriptedEvent("tut_john_escapes").line!;
+}
+
+/** The tutorial's start state (X-25, D-TUT-9): 20 September 1378, Murad I with Bayezid his heir, Edirne the capital and Bursa the second seat, Andronikos IV on the Byzantine throne. */
+export function tutorialStart(): { date: string; ruler: string; rulerAge: number; heir: string; heirAge: number; capital: string; secondSeat: string; emperor: string; prisoners: string[] } {
+  const c = SC.catalogue_court;
+  return { date: config.start_date, ruler: c.ruler, rulerAge: c.ruler_age, heir: c.heir, heirAge: c.heir_age, capital: c.capital, secondSeat: c.second_seat, emperor: SC.civil_war.emperor, prisoners: [...SC.civil_war.prisoners] };
+}
+
+/**
+ * Off script inside one chapter (TUT-030, TUT-032, D-TUT-3): asking after
+ * John V sends Andronikos's envoy away cold until chapter 1 ends; ignoring the
  * wavering lord drops him one step within chapter 2. The next chapter's save
  * carries nothing over.
  */
-export function offScript(choice: "Ask him to stay this winter" | "Let him go" | "ignored lord", chapterN: number): { chapter: number; murad?: string; until?: string; loyaltyStepsDown?: number; carriesOver: false } {
+export function offScript(choice: "Take the tribute" | "Ask after John V" | "ignored lord", chapterN: number): { chapter: number; effect?: string; until?: string; loyaltyStepsDown?: number; carriesOver: false } {
   const o = SC.off_script;
   if (choice === "ignored lord") return { chapter: chapterN, loyaltyStepsDown: chapterN === o.ignored_lord.chapter ? o.ignored_lord.loyalty_steps_down : 0, carriesOver: false };
-  if (choice === "Let him go") return { chapter: chapterN, murad: "Manisa", carriesOver: false };
-  return { chapter: chapterN, murad: o.murad_stays.murad, until: o.murad_stays.until, carriesOver: false };
+  if (choice === "Take the tribute") return { chapter: chapterN, carriesOver: false };
+  return { chapter: chapterN, effect: o.asked_after_john.effect, until: o.asked_after_john.until, carriesOver: false };
 }
 
 /** The Ottoman worked-example numbers for the recruiting, battle and siege lessons (TUT-018, D-TUT-11; provisional). */
@@ -538,12 +572,13 @@ export function lensStep(): { lens: string; marks: string[] } {
   return { lens: step.lens!, marks: (SC.lenses as Record<string, { marks: string[] }>)[step.lens!]!.marks };
 }
 
-/** The turn report after the border clash: the result with the faith choice, both sides' dead counted the same way (TUT-047, TUT-049). */
-export function clashReport(r: { won: boolean; choice: FaithChoice; sipahis: Lord; dead: Record<string, number> }): {
+/** The turn report after the clash before Pera: the result with the faith choice and the partner's help, both sides' dead counted the same way (TUT-047, TUT-049). */
+export function clashReport(r: { won: boolean; choice: FaithChoice; emperor: EmperorChoice; sipahis: Lord; dead: Record<string, number> }): {
   result: string;
   faithChoice: FaithChoice;
   sipahisRode: number;
   stayedHomeBecause: Loyalty | null;
+  partnerBrought: string;
   dead: { side: string; dead: number }[];
   reward: null;
 } {
@@ -553,26 +588,27 @@ export function clashReport(r: { won: boolean; choice: FaithChoice; sipahis: Lor
     faithChoice: r.choice,
     sipahisRode: rode,
     stayedHomeBecause: rode ? null : r.sipahis.loyalty,
+    partnerBrought: emperorChoice(r.emperor).partner_brings,
     dead: Object.entries(r.dead).map(([side, dead]) => ({ side, dead })),
     reward: null,
   };
 }
 
-/** Peace with Hungary ends the league's war, and the league with it (TUT-047). */
-export function afterClashPeace(): { leagueWarEnds: true; leagueEnds: true } {
-  return { leagueWarEnds: true, leagueEnds: true };
+/** Peace with Andronikos IV's side ends the war for the throne, and his Genoese partner's part in it (TUT-047). */
+export function afterClashPeace(): { warEnds: true; partnerLeaves: true } {
+  return { warEnds: true, partnerLeaves: true };
 }
 
-/** Chapter 6's Faith line and the madrasa's faith (TUT-048). */
-export const chapter6Faith = () => SC.chapter6_faith_line;
+/** Chapter 3's Faith line and the madrasa's faith (TUT-048). */
+export const chapter3Faith = () => SC.chapter3_faith_line;
 
-/** The Janissary lesson (TUT-050 … TUT-053). */
-export const devshirme = () => SC.devshirme;
+/** The Janissary lesson: the pençik and the first yeniçeri (TUT-050 … TUT-053). */
+export const pencik = () => SC.pencik;
 
-/** The vignette's cost on the map: the Orthodox lords sit one step lower (TUT-052). */
-export function devshirmeCost(orthodoxLords: Lord[]): { peopleLine: string; grievance: string } {
-  for (const l of orthodoxLords) for (let i = 0; i < SC.devshirme.province_card.orthodox_lords_step_down; i++) l.loyalty = stepDown(l.loyalty);
-  return { peopleLine: SC.devshirme.province_card.people_line, grievance: SC.devshirme.province_card.grievance };
+/** The vignette's cost on the map: the Orthodox lords there sit one step lower (TUT-052). */
+export function pencikCost(orthodoxLords: Lord[]): { peopleLine: string; grievance: string } {
+  for (const l of orthodoxLords) for (let i = 0; i < SC.pencik.province_card.orthodox_lords_step_down; i++) l.loyalty = stepDown(l.loyalty);
+  return { peopleLine: SC.pencik.province_card.people_line, grievance: SC.pencik.province_card.grievance };
 }
 
 // ---------------------------------------------------------------- keep ruling (TUT-107, TUT-108)
@@ -618,17 +654,17 @@ export function advanceTo<R>(now: () => { year: number; month: number }, target:
   return { turns: reports.length, reports, combinedReports: 1 };
 }
 
-// ---------------------------------------------------------------- crusade lessons on other contexts' rules (TUT-038 … TUT-040, TUT-046)
+// ---------------------------------------------------------------- civil-war lessons on other contexts' rules (TUT-038 … TUT-040, TUT-046)
 
-/** The war screen of the crusade: the aim, its cause, and a linked line on why not Take land (TUT-038). */
-export function crusadeWarScreen(): { aim: string; cause: string; whyNotTakeLand: { linked: true; almanac: string } } {
-  const l = SC.league;
-  return { aim: l.war_aim, cause: l.aim_granted_by, whyNotTakeLand: { linked: true, almanac: "war aims" } };
+/** The war screen of the war for John V's throne: the aim, its cause, and a linked line on why not Take land (TUT-038). */
+export function warScreen(choice: EmperorChoice = "Back John V"): { aim: string | null; cause: string | null; whyNotTakeLand: { linked: true; almanac: string } } {
+  const side = emperorChoice(choice);
+  return { aim: side.war_aim, cause: side.aim_granted_by, whyNotTakeLand: { linked: true, almanac: "war aims" } };
 }
 
-/** A league member's reasons, on the same screen as the player's own alliances (diplomacy's ledger) (TUT-039). */
-export function memberReasons(d: Diplomacy, member: string, other: string): { screen: "alliance reasons"; entries: LedgerEntry[] } {
-  return { screen: "alliance reasons", entries: conditionalEntries(d, member, other) };
+/** A partner's reasons, on the same screen as the player's own alliances (diplomacy's ledger) (TUT-039). */
+export function partnerReasons(d: Diplomacy, partner: string, other: string): { screen: "alliance reasons"; entries: LedgerEntry[] } {
+  return { screen: "alliance reasons", entries: conditionalEntries(d, partner, other) };
 }
 
 /** A strait crossing as the map shows it: closed under an enemy fleet, with that fleet's banner (TUT-040, TUT-046). */

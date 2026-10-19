@@ -9,12 +9,12 @@ import { grownAtBuild, leftOutAtBuild } from "@ph/engine/domain/tribes";
 import { subjectTies } from "../../engine/src/subjects.ts";
 import { formOf } from "../../engine/src/government.ts";
 import { assignOwners, type NationSource } from "../../../tools/mapgen/owners.ts";
-import sources from "../../../tools/mapgen/nations-1444.json" with { type: "json" };
+import sources from "../../rules/data/scenarios/1444/map-nations.json" with { type: "json" };
 import setupConfig from "../../rules/data/domain/scenario-setup.json" with { type: "json" };
 import provinceConfig from "../../rules/data/domain/province.json" with { type: "json" };
 import buildingsConfig from "../../rules/data/domain/buildings.json" with { type: "json" };
 import worldMap from "../../rules/data/domain/world-map.json" with { type: "json" };
-import ports from "../../rules/data/domain/naval-ports-1444.json" with { type: "json" };
+import { startPorts as ports } from "@ph/rules/start";
 import names from "../../rules/data/names.json" with { type: "json" };
 import { steps } from "../src/registry.ts";
 

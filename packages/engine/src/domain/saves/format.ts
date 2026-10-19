@@ -81,6 +81,8 @@ export interface SaveHeader {
   modified: boolean;
   /** The ironman save this one follows (INV-SAVE-10). */
   parent?: string;
+  /** The start the campaign began from (X-25, SAVE-111); a save without one began in 1444. */
+  start?: string;
 }
 
 /** One chunk before compression. */
@@ -105,7 +107,7 @@ export const CONTAINER_VERSION = config.format.container_version;
 export const FORMAT_VERSION = config.format.format_version;
 
 /** Why a file could not be read. */
-export type SaveProblem = "wrong-magic" | "damaged" | "newer-version";
+export type SaveProblem = "wrong-magic" | "damaged" | "newer-version" | "other-start";
 
 export class SaveError extends Error {
   readonly problem: SaveProblem;

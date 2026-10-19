@@ -1,0 +1,18 @@
+{
+ "$comment": "Each map realm's ruler on 20 September 1378 (REALM-233). Stand-in until the Arabia research pass; see README.md.",
+ "rulers": {
+  "hejaz": {
+   "title": "Sharif of Mecca",
+   "name": "Ahmad ibn Ajlan",
+   "since": 1375,
+   "age": null
+  },
+  "yemen": {
+   "title": "Imam",
+   "name": "al-Nasir Muhammad Salah al-Din",
+   "since": 1372,
+   "age": null
+  },
+  "oman": null
+ }
+}

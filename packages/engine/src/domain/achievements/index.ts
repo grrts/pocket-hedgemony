@@ -192,6 +192,8 @@ export interface CampaignAchievements {
   difficulty?: string;
   events?: "historical" | "free";
   realm?: string;
+  /** The campaign's start day (yyyy-mm-dd); a `date` row on or before it is never earned (ACH-088). */
+  start?: string;
   /** Campaign counters for progress rows; reset with each new game (ACH-048). */
   counters: Record<string, number>;
   /** Achievements earned in this campaign, with the date. */
@@ -202,7 +204,7 @@ export interface CampaignAchievements {
   warned: string[];
 }
 
-export function newCampaign(o: { ironman: boolean; tutorial?: boolean; realm?: string; difficulty?: string; events?: "historical" | "free" }): CampaignAchievements {
+export function newCampaign(o: { ironman: boolean; tutorial?: boolean; realm?: string; difficulty?: string; events?: "historical" | "free"; start?: string }): CampaignAchievements {
   const tutorial = o.tutorial ?? false;
   return {
     // The tutorial is never ironman (onboarding), so it earns nothing (ACH-039).
@@ -211,6 +213,7 @@ export function newCampaign(o: { ironman: boolean; tutorial?: boolean; realm?: s
     ...(o.difficulty === undefined ? {} : { difficulty: o.difficulty }),
     ...(o.events === undefined ? {} : { events: o.events }),
     ...(o.realm === undefined ? {} : { realm: o.realm }),
+    ...(o.start === undefined ? {} : { start: o.start }),
     counters: {},
     earned: {},
     datesChecked: [],
@@ -398,7 +401,7 @@ export function lifetimeFacts(p: Pick<Profile, "lifetime" | "totals">): Facts {
 /**
  * A moment occurred: runs only the rows whose `moment` names it (ACH-031), `date`
  * rows only on their day and once (ACH-032), and only in an eligible
- * campaign (ACH-014). Campaign rows read this campaign's facts alone
+ * campaign (ACH-014), never on or before the campaign's start day (ACH-088). Campaign rows read this campaign's facts alone
  * (ACH-027); lifetime rows read the profile's counters (ACH-028).
  */
 export function evaluate(cat: Catalogue, c: CampaignAchievements, p: Profile, moment: string, facts: Facts, date: string, place?: string): Evaluation {
@@ -409,6 +412,8 @@ export function evaluate(cat: Catalogue, c: CampaignAchievements, p: Profile, mo
     if (moment === "date") {
       if (d.test.date !== date || c.datesChecked.includes(d.id)) continue;
       c.datesChecked.push(d.id);
+      // A day the campaign started on or after is not reached in play, such as 1444 from the 1444 checkpoint (ACH-088).
+      if (c.start !== undefined && date <= c.start) continue;
     }
     out.ran.push(d.id);
     if (d.id in c.earned || (d.scope === "lifetime" && d.id in p.unlocked)) continue;

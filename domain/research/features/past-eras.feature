@@ -12,6 +12,17 @@ Feature: The tree reaches back before 1444
     And it holds 8 past inventions of era Ancient and 5 of era Medieval
     And it holds 187 inventions in all
 
+  @RSCH-032 @RSCH-091
+  Scenario Outline: Era I runs from the start
+    Given the invention tree config with the past eras
+    Then the era "<era>" runs from <from> to <to>
+
+    Examples:
+      | era      | from | to   |
+      | Medieval | 600  | 1377 |
+      | Era I    | 1378 | 1499 |
+      | Era II   | 1500 | 1599 |
+
   @RSCH-093
   Scenario Outline: Past inventions open the Era I rows
     Given the invention tree config with the past eras

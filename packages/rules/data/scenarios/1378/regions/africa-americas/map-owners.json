@@ -1,0 +1,385 @@
+[
+ {
+  "nation": "tunis",
+  "countries": [
+   "TUN"
+  ]
+ },
+ {
+  "nation": "tunis",
+  "countries": [
+   "DZA"
+  ],
+  "bbox": [
+   3.5,
+   33,
+   9,
+   37.5
+  ]
+ },
+ {
+  "nation": "tlemcen",
+  "countries": [
+   "DZA"
+  ],
+  "bbox": [
+   -2.2,
+   33,
+   3.5,
+   37
+  ]
+ },
+ {
+  "nation": "marinid_marrakesh",
+  "countries": [
+   "MAR"
+  ],
+  "bbox": [
+   -10,
+   29,
+   -5.6,
+   32.3
+  ]
+ },
+ {
+  "nation": "morocco",
+  "countries": [
+   "MAR"
+  ],
+  "bbox": [
+   -10,
+   29,
+   -1,
+   36
+  ]
+ },
+ {
+  "nation": "songhai",
+  "countries": [
+   "NER"
+  ],
+  "bbox": [
+   0,
+   13,
+   4,
+   15.6
+  ]
+ },
+ {
+  "nation": "mali",
+  "countries": [
+   "MLI"
+  ],
+  "bbox": [
+   -12.5,
+   10,
+   4.5,
+   18.5
+  ]
+ },
+ {
+  "nation": "mali",
+  "countries": [
+   "MRT"
+  ],
+  "bbox": [
+   -11,
+   15.5,
+   -5,
+   18.5
+  ]
+ },
+ {
+  "nation": "mali",
+  "countries": [
+   "GIN",
+   "SEN",
+   "GMB"
+  ],
+  "bbox": [
+   -12.5,
+   10,
+   -5,
+   15.5
+  ]
+ },
+ {
+  "nation": "jolof",
+  "countries": [
+   "SEN"
+  ],
+  "bbox": [
+   -17.5,
+   14.3,
+   -14,
+   16.7
+  ]
+ },
+ {
+  "nation": "mossi",
+  "countries": [
+   "BFA"
+  ],
+  "bbox": [
+   -3,
+   11,
+   1,
+   14
+  ]
+ },
+ {
+  "nation": "kano",
+  "countries": [
+   "NGA"
+  ],
+  "bbox": [
+   7,
+   10.5,
+   10,
+   13.5
+  ]
+ },
+ {
+  "nation": "kanem_bornu",
+  "countries": [
+   "NGA",
+   "NER",
+   "TCD",
+   "CMR"
+  ],
+  "bbox": [
+   11,
+   10,
+   16,
+   15
+  ]
+ },
+ {
+  "nation": "benin",
+  "countries": [
+   "NGA"
+  ],
+  "bbox": [
+   4.5,
+   5.5,
+   7,
+   7.5
+  ]
+ },
+ {
+  "nation": "ifat",
+  "countries": [
+   "DJI",
+   "SOL",
+   "ETH"
+  ],
+  "bbox": [
+   41,
+   8,
+   46,
+   12.5
+  ]
+ },
+ {
+  "nation": "ifat",
+  "countries": [
+   "ETH"
+  ],
+  "bbox": [
+   39.6,
+   9.4,
+   41,
+   11
+  ]
+ },
+ {
+  "nation": "ethiopia",
+  "countries": [
+   "ETH",
+   "ERI"
+  ],
+  "bbox": [
+   35,
+   6,
+   41,
+   16
+  ]
+ },
+ {
+  "nation": "mogadishu",
+  "countries": [
+   "SOM"
+  ],
+  "bbox": [
+   44.6,
+   1.6,
+   46.2,
+   3.2
+  ]
+ },
+ {
+  "nation": "kilwa",
+  "countries": [
+   "TZA",
+   "KEN"
+  ],
+  "bbox": [
+   38.5,
+   -10.5,
+   41,
+   -4
+  ]
+ },
+ {
+  "nation": "great_zimbabwe",
+  "countries": [
+   "ZWE"
+  ]
+ },
+ {
+  "nation": "aztecs",
+  "countries": [
+   "MEX"
+  ],
+  "admin1": [
+   "Distrito Federal"
+  ]
+ },
+ {
+  "nation": "tepanecs",
+  "countries": [
+   "MEX"
+  ],
+  "admin1": [
+   "México"
+  ]
+ },
+ {
+  "nation": "huexotzinco",
+  "countries": [
+   "MEX"
+  ],
+  "admin1": [
+   "Puebla",
+   "Tlaxcala"
+  ]
+ },
+ {
+  "nation": "purepecha",
+  "countries": [
+   "MEX"
+  ],
+  "admin1": [
+   "Michoacán"
+  ],
+  "bbox": [
+   -102,
+   19,
+   -100,
+   20.5
+  ]
+ },
+ {
+  "nation": "zapotec",
+  "countries": [
+   "MEX"
+  ],
+  "admin1": [
+   "Oaxaca"
+  ]
+ },
+ {
+  "nation": "maya",
+  "countries": [
+   "MEX"
+  ],
+  "admin1": [
+   "Yucatán",
+   "Campeche",
+   "Quintana Roo"
+  ]
+ },
+ {
+  "nation": "inca",
+  "countries": [
+   "PER"
+  ],
+  "admin1": [
+   "Cusco"
+  ],
+  "bbox": [
+   -72.5,
+   -15,
+   -70,
+   -13.2
+  ]
+ },
+ {
+  "nation": "chanka",
+  "countries": [
+   "PER"
+  ],
+  "admin1": [
+   "Apurímac",
+   "Ayacucho"
+  ]
+ },
+ {
+  "nation": "chimu",
+  "countries": [
+   "PER"
+  ],
+  "admin1": [
+   "La Libertad",
+   "Lambayeque"
+  ]
+ },
+ {
+  "nation": "muisca",
+  "countries": [
+   "COL"
+  ],
+  "admin1": [
+   "Cundinamarca"
+  ]
+ },
+ {
+  "nation": "iroquois",
+  "countries": [
+   "USA"
+  ],
+  "admin1": [
+   "New York"
+  ]
+ },
+ {
+  "nation": "huron",
+  "countries": [
+   "CAN"
+  ],
+  "admin1": [
+   "Ontario"
+  ],
+  "bbox": [
+   -82,
+   42,
+   -78,
+   46
+  ]
+ },
+ {
+  "nation": "pueblo",
+  "countries": [
+   "USA"
+  ],
+  "admin1": [
+   "New Mexico"
+  ],
+  "bbox": [
+   -109,
+   33,
+   -105,
+   37
+  ]
+ }
+]

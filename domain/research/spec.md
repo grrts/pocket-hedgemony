@@ -5,7 +5,7 @@
 Research decides how a country learns: schools with student seats, students taken from the recruit pool, scholars
 who graduate from them, scholar-years of progress, and the one invention tree that every country climbs from a single
 root. It also decides what may be studied, what it costs, how knowledge spreads from neighbours and trade partners,
-what each country knows in 1444, and which inventions are in scope for a campaign that ends on 31 August 1939.
+what each country knows at the start, and which inventions are in scope for a campaign that ends on 31 August 1939.
 
 **In scope**
 - Schools, students, scholars and research as stats (country stats §7.1).
@@ -13,7 +13,8 @@ what each country knows in 1444, and which inventions are in scope for a campaig
 - How research works (§7.3) and the research tree rules (research-tree "Rules").
 - The full tree: every invention, its parent, extra needs, era, unlocks and start regions (research-tree "The tree").
 - Scope cut: Era VIII out; Era VII cut at 1939 (gap-lists items 22 and decisions).
-- The two eras before 1444 (Ancient and Medieval), each realm's start group and its standing (Leroy, 18 Oct; D-RSCH-21).
+- The two eras before the start (Ancient and Medieval), each realm's start group and its standing (Leroy, 18 Oct; D-RSCH-21).
+- Era I from the start (1378 at the earliest) to 1500, its pacing, and the start sets of a 1378 start (Leroy, 18 Oct; D-RSCH-23).
 
 **Not in scope (owned by …)**
 - What each invention does in another system where that system gives the numbers: warfare §12 (W, B, S), trade §11
@@ -26,6 +27,7 @@ what each country knows in 1444, and which inventions are in scope for a campaig
 ## 2. Sources
 
 Newest decision first.
+0. Leroy, 18 Oct 2026 (start date): campaign start 20 September 1378; stretch Era I back to the start (1378–1500) and keep the tree as it is (`start-date/plan-1378.md` §3.2, D-RSCH-23).
 0. Leroy, 18 Oct 2026 (project chat): one single tree, reaching further into the past so some countries start behind; design each kingdom's starting technologies (D-RSCH-21).
 1. `planning/gap-lists.md` (16 Oct 2026): decisions (campaign to 31 August 1939; research Era VIII and the 1939–1960 part
    of Era VII out of scope; multiplayer-friendly) and item 22 (drop Era VIII, cut Era VII at 1939, scholar-year costs
@@ -53,14 +55,16 @@ Newest decision first.
 | Parent | The invention a node grows from; must be known to study it | Also needs |
 | Also needs | Extra inventions, possibly from another branch, that must also be known | Parent |
 | "or" | Either listed invention is enough | |
-| Era | Ancient (before 600) and Medieval (600–1443) before the start, then I 1444–1500, II 1500–1600, III 1600–1700, IV 1700–1800, V 1800–1870, VI 1870–1914, VII 1914–1960 (cut at 1939), VIII 1960 on (out of scope) | Age (event tree) |
+| Era | Ancient (before 600) and Medieval (600–1377) before the start, then I from the start (1378 at the earliest) to 1500, II 1500–1600, III 1600–1700, IV 1700–1800, V 1800–1870, VI 1870–1914, VII 1914–1960 (cut at 1939), VIII 1960 on (out of scope) | Age (event tree) |
 | Studying ahead | Studying an invention of an era later than the current date | |
 | Spread | Discount from neighbours and trade partners who already know an invention | |
 | Trade partner | A country whose traders deposit in, or collect in, your cities or yours in theirs (trade §9) | Ally |
 | Contact invention (⇄) | An invention that opens only after a contact event | |
 | Event-tree invention (★) | One of the 20 inventions whose ids the event tree already uses | |
-| Past invention | An invention of the Ancient or Medieval era: part of the 1444 baseline that some realms lack | Era I invention |
-| Without it | What lacking a past invention costs a realm, below the 1444 baseline (RSCH-094) | Unlock |
+| Past invention | An invention of the Ancient or Medieval era, known before the start: part of the baseline at the start that some realms lack | Era I invention |
+| Without it | What lacking a past invention costs a realm, below the baseline at the start (RSCH-094) | Unlock |
+| Start block | What differs for a campaign that starts on another date than 11 November 1444: the groups realms join and each realm's additions and removals (RSCH-114) | Start group |
+| Era I pacing | Era I's cost per invention scaled to the share of Era I the campaign plays (RSCH-113) | Studying ahead |
 | Start group | The set of realms that start with the same knowledge (§5.11) | Culture group, start label |
 | Standing | The latest era of which a realm knows a quarter of the inventions, every earlier era too (RSCH-097) | Technology score |
 | Behind the times | Standing earlier than the era of the current date | |
@@ -126,7 +130,7 @@ Holds: one row per invention with `id`, `parent`, `also_needs`, `era`, `unlocks`
 ### 5.4 Cost, eligibility and spread
 - RSCH-030: Each invention shall cost scholar-years by era: I 20, II 40, III 80, IV 150, V 250, VI 400, VII 650 (VIII 1000, out of scope). [research-tree Rules]
 - RSCH-031: Studying an invention from an era later than the current date shall cost double for each era ahead. [research-tree Rules]
-- RSCH-032: Eras shall be dated I 1444–1500, II 1500–1600, III 1600–1700, IV 1700–1800, V 1800–1870, VI 1870–1914, VII 1914 to the campaign's end (31 August 1939). [research-tree Rules, gap-lists]
+- RSCH-032: Eras shall be dated I from the start to 1500 (1378–1500; a campaign that starts in 1444 plays 1444–1500 of it), II 1500–1600, III 1600–1700, IV 1700–1800, V 1800–1870, VI 1870–1914, VII 1914 to the campaign's end (31 August 1939). [research-tree Rules, gap-lists, D-RSCH-23]
 - RSCH-033: A country shall be able to study any invention whose parent it knows plus everything listed under "also needs"; where "or" is given, either one is enough. [research-tree Rules]
 - RSCH-034: Each neighbour or trade partner that already knows an invention shall make it 10 % cheaper, up to 60 % off. A neighbour is a country owning a province that borders one of yours by land. [research-tree Rules, §7.3, D-RSCH-8]
 - RSCH-035: Contact inventions (⇄) shall open only after a contact event, for example the Atlantic crossing for maize and potatoes. [research-tree Rules]
@@ -366,14 +370,14 @@ they did by then; L23 and L24 are dropped (D-RSCH-1).
 - RSCH-089: *(With a queue, only when the queue is empty: RSCH-108.)* When the player's realm learns an invention, an alert shall say "Learned X. Choose the next study." with an Open button to the Research tab; while nothing is studied, one alert shall ask the player to choose (at the start and after each invention), the same way. [X-19]
 - RSCH-090: The Research tab shall work on a phone in landscape and in the Tall layout: inside the safe areas, every button, tree node and fold at least 44 points tall, nothing that needs hover, and the page never scrolling sideways; the tree scrolls by dragging inside its own frame, and where the tab is at least 500 points wide the invention's sheet stands beside the tree, otherwise above it. [X-19, SHELL-108, SHELL-109, SHELL-114, D-RSCH-20]
 
-### 5.10 One tree that reaches back before 1444 (18 October 2026, Leroy)
+### 5.10 One tree that reaches back before the start (18 October 2026, Leroy)
 
 Leroy: the game must have one single tree, not a tree split in four, and the tree must reach further into the past
 so that some countries start on the back foot. These rules replace the bough-by-bough drawing of RSCH-084 and the
 start sets of RSCH-051 and RSCH-076 (D-RSCH-21). Nothing already in the tree changes id, and the 20 ★ ids stay.
 
-**Two eras before 1444**
-- RSCH-091: The tree shall have two eras before Era I: **Ancient** (`A`, before 600) and **Medieval** (`M`, 600 to 1443). Their inventions are the **past inventions**: what a realm of 1444 may or may not already know. [Leroy 18 Oct, D-RSCH-21]
+**Two eras before the start**
+- RSCH-091: The tree shall have two eras before Era I: **Ancient** (`A`, before 600) and **Medieval** (`M`, 600 to 1377). Their inventions are the **past inventions**, known before the start: what a realm at the start may or may not already know. Era I begins at the start (1378 at the earliest), so nothing is renumbered when the campaign starts in 1378. [Leroy 18 Oct, D-RSCH-21, D-RSCH-23]
 - RSCH-092: The tree shall hold these 13 past inventions, one config row each like any other (RSCH-044), bringing it to 187 rows:
 
 | Id | Name | Era | Bough | Parent | Also needs | What it opens | Without it (RSCH-094) |
@@ -393,7 +397,7 @@ start sets of RSCH-051 and RSCH-076 (D-RSCH-21). Nothing already in the tree cha
 | S02 | Sternpost rudder | M | R4 | S01 | — | S4 Carrack and caravel | — |
 
 - RSCH-093: These Era I and II rows shall take new needs from the past inventions, everything else in their rows unchanged: B1 parent B02; F1 parent F02; F5 also needs B01; F11 parent F03; C1 also needs G01; C2 parent C01; W1 also needs F03; W2 parent C02 and also needs F03; W3 also needs C03; W4 also needs B01; W6 also needs C01; G1 parent G01; L1 parent G01 or G6 *Quipu and knot records*; L2 parent G01; T1 also needs F03; T2 parent T01 and also needs L01; T4 also needs T01; T5 also needs S01; S1 and S2 parent S01; S4 also needs S02. [D-RSCH-21]
-- RSCH-094: A past invention a realm lacks shall hold it below the 1444 baseline, so realms that know it play exactly as now: without F01 its farmland harvests one step worse (province owns the step); without F03 it raises no horse regiments and sends no camel caravans (recruiting, warfare and trade own these); without B01 its armies carry half the food (troop-movement owns the carrying); without C01 its regiments fight 20 % weaker (warfare owns the strength). The other past inventions only open later ones. @placeholder [D-RSCH-21]
+- RSCH-094: A past invention a realm lacks shall hold it below the baseline at the start, so realms that know it play exactly as now: without F01 its farmland harvests one step worse (province owns the step); without F03 it raises no horse regiments and sends no camel caravans (recruiting, warfare and trade own these); without B01 its armies carry half the food (troop-movement owns the carrying); without C01 its regiments fight 20 % weaker (warfare owns the strength). The other past inventions only open later ones. @placeholder [D-RSCH-21]
 - RSCH-095: A past invention shall cost Ancient 10 and Medieval 15 scholar-years before discounts, is never studied ahead, is cheaper for lying behind the times (RSCH-112), and takes the spread discount from neighbours and trade partners like any invention (RSCH-034), so a realm next to realms that know it catches up fastest. @placeholder [D-RSCH-21]
 - RSCH-096: For a realm of the Americas, F03 *Riding and pack animals* shall be a contact invention: it opens when exploration reports that realm's first contact with a realm from across the ocean, as F9 opens with the Atlantic crossing (RSCH-077). [D-RSCH-21]
 
@@ -418,7 +422,7 @@ The start of every one of the 237 map nations (the African and tribal realms add
 Past inventions by id (RSCH-092); Era I and II by the ids of §5.8. The Hordes, African start and tribal designs
 may move realms between groups or change a group's set; this table is the data they change.
 
-| Group | Realms | Past inventions known (of 13) | Era I and II inventions known | Standing in 1444 |
+| Group | Realms | Past inventions known (of 13) | Era I and II inventions known | Standing at the 1444 start |
 |---|---|---|---|---|
 | Latin Christendom (`latin`) | england, scotland, ireland, france, burgundy, brittany, provence, savoy, lorraine, navarre, castile, aragon, portugal, milan, venice, genoa, florence, modena, papal_states, naples, austria, bohemia, bavaria, wurttemberg, palatinate, cologne, hesse, saxony, brandenburg, luneburg, hamburg, mecklenburg, pomerania, switzerland, teutonic_order, livonian_order, denmark, sweden, norway, poland, lithuania, hungary, ragusa, cyprus, knights_of_rhodes, canarian_lordship | all 13 | B1, F1, F4, F5, C1, C2, W2, W3, G1, G2, G5, L1, S1 | Era I |
 | Orthodox Europe (`orthodox`) | byzantium, moldavia, wallachia, serbia, bosnia, albania, georgia, trebizond, muscovy, novgorod, pskov, tver, ryazan | all but L01 | B1, F1, F4, F5, C1, C2, W2, G1, G2, G5, L1 | Era I |
@@ -519,9 +523,74 @@ the Swahili coast and the Sahel stand in Ancient with 7 to 15; Forest Africa sta
 horses), and Mesoamerica, the Andes and North America in Ancient with 2 to 10, without iron or horses. No African realm south of the Sahara starts with B1 *Stone
 castles*: they defend with B4 earthworks until they learn dressed stone.
 
+**The 1378 start (RSCH-114, RSCH-115).** A campaign that starts on 20 September 1378 uses the groups and sets
+above with the 1378 block of `research.starts`. The realms of 1378 that are not yet map nations join the group of
+their neighbours (ids from `start-date/checkpoints/1378.json`); a realm already in a group keeps it unless a join
+moves it. Lithuania keeps `latin` inventions (its pagan faith is religion's work). The Golden Horde
+(`great_horde`) stays in `hordes`, Goryeo stays `korea` and Mayapan (`maya`) stays `mesoamerica`.
+
+| Group | Realms that join it in 1378 | Standing at the 1378 start |
+|---|---|---|
+| `latin` | achaea, athens, padua, verona, pisa, visconti_pavia, oristano, sicily, flanders, brabant, holland, saxe_wittenberg, lubeck, riga, cologne_city, avignon_papacy | Era I (26 to 29 inventions) |
+| `orthodox` | bulgaria_tarnovo, bulgaria_vidin, dobruja, brankovic, zeta, morea, suzdal_nizhny | Era I (23 to 26) |
+| `islamic` | jalayirids, muzaffarids, kartids, sarbadars, hormuz, germiyan, aydin, mentese, saruhan, hamid, eretnids | Era I (26 to 30) |
+| `khanates` | timurids (moves from `islamic`: Timur's Chagatai ulus), sufids (Khwarazm) | Medieval (16) |
+| `hordes` | white_horde, naghachu (Naghachu's Manchuria, by its Mongol neighbours) | Medieval (11) |
+| `china` | yunnan_yuan (the Yuan prince of Yunnan, by its Chinese neighbours) | Era I (37) |
+| `japan` | japan_southern_court, kamakura_kubo, ryukyu, hokuzan, nanzan (the Ryukyu kingdoms by their nearest settled neighbour) | Era I (25) |
+| `south_asia` | calicut, kotte, nepal_malla | Era I (25 to 28) |
+| `se_mainland` | sukhothai | Medieval (19) |
+| `se_maritime` | singapura, tondo, ternate | Medieval (20) |
+| `swahili_somali` | ifat, mogadishu | Ancient (13) |
+| `forest_africa` | great_zimbabwe | Ancient (4) |
+| `mesoamerica` | tepanecs | Ancient (6) |
+| `andes` | quitu_cara | Ancient (6) |
+
+| Realm (1378) | Also knows | Does not know | Why |
+|---|---|---|---|
+| ottomans | — | W3, W5, G3 | No bombards or handguns yet; the registers come later |
+| bohemia, hungary | — | W4 | The wagon fort is Hussite, from the 1420s |
+| portugal, castile | — | S4 | The ocean caravel is learned in the 1430s; Genoa keeps its carrack |
+| timurids | — | L3, W3 | Ulugh Beg's observatory comes in the 1420s; W3 also needs C2 and C03, which the khanates lack, so it goes too |
+| ming, yunnan_yuan | — | G3 | The Yellow Registers become a Hongwu event (1381) |
+| jalayirids | L3 | — | The Maragha tradition |
+| hormuz | T5, S1, S2, F11 | — | As Oman |
+| calicut | S1, S2, T5 | — | As Vijayanagar |
+| morea | L01, S1, S2 | — | As Byzantium |
+| flanders | T2, T3, F8 | — | As Burgundy |
+| brabant, cologne_city, lubeck, visconti_pavia | T2, T3 | — | As Cologne, Hamburg and Milan |
+| pisa | T2, T3, S2 | — | As Genoa |
+| holland | F8 | — | Polders |
+| padua, avignon_papacy | T2 | — | As Modena and the Papal States |
+| sicily | S2 | — | As Naples |
+| great_zimbabwe | B02 | — | As Mutapa: dressed stone |
+
+Every 1378 set is complete (RSCH-099): the removals take nothing that another invention in the same set needs,
+since no realm's set holds what grows from W3, W4, W5, S4, L3 or G3. Florence does **not** start knowing L6
+*Humanist learning*: L6 grows from L5 *printing* or L2 *Madrasa networks*, and Florence knows neither in 1378, so
+the set would not be complete. Its head start (Salutati is chancellor) waits for a bridge event or a call by
+Leroy (OQ-RSCH-23). Europe has no W5 in 1444 either, so "Europe doesn't know it" changes no set. By RSCH-097 the
+1378 sets stand as in 1444 for every realm on both maps, except Timur's realm, which stands in Medieval with the
+khanates instead of Era I. The horse line (government GOV-068) and the horde Technology share (GOV-069) are for
+government to measure again.
+
 ### 5.12 Behind the times (18 October 2026, D-GOV-19)
 
 - RSCH-112: Every realm shall pay less for an invention of an era earlier than the current date: 25 % less for each era it lies behind, at most 50 % off (`research.behind_discount_pct_per_era` 25, `research.behind_discount_cap_pct` 50), applied after the cost by era and before the spread from neighbours and trade partners (RSCH-034); an invention never costs less than a fifth of its era cost (`research.cost_floor_share` 0.2). The past eras count like any other: in 1450 an Ancient invention is two eras behind and a Medieval one, one. What the world already knows is cheap to learn and what is new still costs full price, so a realm that starts behind (hordes, African and American starts) catches up. The research AI's rule (RSCH-078) then studies these first. @placeholder [Leroy 18 Oct; government GOV-070; D-GOV-19]
+
+### 5.13 Era I from the start, and a start in 1378 (18 October 2026, Leroy, D-RSCH-23)
+
+Leroy chose to start the campaign on 20 September 1378 and to stretch Era I back to the start, keeping the tree as
+it is. Medieval now ends in 1377, past inventions stay known before the start, and no id changes. A campaign that
+starts on 11 November 1444 plays exactly as before: its Era I pace is ×1 and no start block applies.
+
+- RSCH-113: Era I's cost per invention shall be multiplied by the share of Era I the campaign plays: the years from the campaign's start year to 1500, over the 56 of a 1444 start, never below 1 (`research.era_pace`: era I, `reference_years` 56). A 1444 start pays ×1, a 1378 start about ×2.18 (43.6 scholar-years for an Era I invention before discounts), so a typical realm still reaches Era II around 1500. The pace scales the era cost everywhere it is used for that campaign (studying ahead, behind the times, the cost floor and stealing in war); other eras and the Technology score's weights do not change. The balance model tunes the rule. @placeholder [plan-1378 §3.2, D-RSCH-23]
+- RSCH-114: A campaign that starts on another date than 11 November 1444 shall apply that date's **start block** from the research data (`research.starts`, keyed by the start year) on top of the start groups: the groups its realms join (a join wins over the 1444 group), then each realm's additions and removals after its 1444 ones. A start without a block is the 1444 start. A block may name realms that are not yet map nations; each is checked as a map nation only once the map has it. Every set it gives shall be complete (RSCH-099). [plan-1378 §3.2, D-RSCH-23]
+- RSCH-115: The 1378 block shall give the sets of the 1378 table in §5.11: the Ottomans know neither W3 *Bombards* nor W5 *Gunpowder infantry* nor G3 *Tax registers*; Europe keeps W3 and has no W5, and Ming keeps W3, W5 and W4; Bohemia and Hungary do not know W4 *Wagon fort*; Portugal and Castile do not know S4 *Carrack and caravel*, which Genoa keeps (Venice has no S4 in the 1444 sets either, so nothing changes for it); Timur's realm does not know L3 *Observatories* and the Jalayirids do (the Maragha tradition); Ming does not know G3 (the Yellow Registers come as a Hongwu event in 1381, later); Goryeo (`korea`) keeps L4 *Metal movable type*. [plan-1378 §3.2, D-RSCH-23]
+
+**How the player uses it.** Nothing in the screens changes except the era dates they show: the Learning tab's era
+headings and "Now" mark, and the standing lines, read Era I from the start (1378–1500 in a 1378 campaign). The
+higher Era I cost shows in each invention's cost and time, as any cost does (RSCH-084, RSCH-100).
 
 ### How the player uses the one tree
 - RSCH-100: The Tree part of the Learning tab shall draw the whole tree as one picture, never one bough at a time: the root *Settled life* at the left, then a column per era (Ancient, Medieval, I to VII), and the four boughs as four horizontal bands of the same picture, each with its name pinned at the left edge while the tree scrolls. The era headings stay pinned along the top, the era of the current date marked "Now". Parent lines are always drawn, across bands too; an "also needs" line, in any band, is drawn only for the picked invention, highlighted, and its sheet lists them. This replaces the bough tabs of RSCH-084. [Leroy 18 Oct, X-19]
@@ -583,7 +652,7 @@ On era boundaries (by date): costs of studying ahead change.
 | Key | Meaning | Value in the design | Placeholder? | Config file |
 |---|---|---|---|---|
 | research.era_cost | Scholar-years by era | A 10, M 15, I 20, II 40, III 80, IV 150, V 250, VI 400, VII 650, VIII 1000 | yes | research config |
-| research.era_dates | Era start years | A before 600, M 600, I 1444, II 1500, III 1600, IV 1700, V 1800, VI 1870, VII 1914 (cut 31 Aug 1939), VIII 1960 | no | research config |
+| research.era_dates | Era start years | A before 600, M 600, I 1378 (the start; a 1444 start begins in it), II 1500, III 1600, IV 1700, V 1800, VI 1870, VII 1914 (cut 31 Aug 1939), VIII 1960 | no | research config |
 | research.ahead_multiplier | Cost per era ahead | ×2 | yes | research config |
 | research.spread_per_partner | Discount per neighbour or trade partner | 10 % | yes | research config |
 | research.spread_cap | Maximum discount | 60 % | yes | research config |
@@ -609,7 +678,9 @@ On era boundaries (by date): costs of studying ahead change.
 | standing_share | Share of an era's inventions that gives standing in it | 0.25 | yes | research.json |
 | behind_discount_pct_per_era / behind_discount_cap_pct / cost_floor_share | Cheaper for an era behind the date (RSCH-112) | 25 % per era / 50 % / a fifth of the era cost | yes | research.json |
 | regional_contacts | Inventions that open only on a contact for the realms of some start groups | F03 on first contact across the ocean for mesoamerica, andes and north_america (RSCH-096); F9's contact stays on its row (RSCH-077) | no | research.json |
-| past_eras, era_names | The eras before 1444 and their names | A Ancient, M Medieval | no | research.json |
+| past_eras, era_names | The eras before the start and their names | A Ancient, M Medieval | no | research.json |
+| era_pace | Era I pacing: the era it paces and the years of a 1444 start's Era I (RSCH-113) | era I, `reference_years` 56 | yes | research.json |
+| starts | Start blocks by start year: date, `join`, `add`, `remove` (RSCH-114, the 1378 table of §5.11) | 1378 | yes | research.json |
 
 The file is `packages/rules/data/domain/research.json`; its `_provisional` list names the provisional values.
 
@@ -669,6 +740,8 @@ The file is `packages/rules/data/domain/research.json`; its `_provisional` list 
 - **D-RSCH-20** (17 Oct, Leroy's feedback 88) The Research tab shows the tree: the first tab listed the inventions open to study by era, which hid the tree and read as if any invention could be picked, among too many controls. Now the tab is an overview plus two parts, Tree (drawn branch by branch; Study only on an invention whose needs are known, a locked one saying what to learn first) and Schools (seats, students to arms, schools, founding). The rules of what may be studied are unchanged (RSCH-031, RSCH-033).
 - **D-RSCH-21** (18 Oct, Leroy) One tree reaching back before 1444, and start groups: Leroy asked for one single tree, not the four branch tabs, reaching further into the past so some countries start behind, and for each kingdom's starting technologies. The tree is now drawn as one picture with the branches as bands and a whole-tree zoom (RSCH-100 to RSCH-106); two eras before 1444 add 13 past inventions that Era I rows now need (RSCH-091 to RSCH-096); a realm that lacks one plays below the 1444 baseline, so realms that know them play exactly as today and only the laggards change. Start labels gave thin, uneven sets (France knew 12 inventions, Kongo knew stone castles), so every map nation now belongs to one of 20 start groups with complete sets (RSCH-098, RSCH-099, §5.11), and a realm's standing names how far behind it starts (RSCH-097). Penalties, costs and the standing share are provisional for the balancing model; the Hordes, African start and tribal designs tune their groups.
 - **D-RSCH-22** (18 Oct, Leroy's feedback 113) Tree, queue and selection on one screen: the Research tab still split the tree from the action, and a realm could only hold one study, so each invention ended in an alert and a fresh choice. Now one screen holds the queue strip, the tree and the selected invention's sheet (RSCH-107, RSCH-111); a queue of 5 carries on by itself (RSCH-108); Queue the path lets the player tap a far invention and get every step to it (RSCH-109); the tree shows queue places (RSCH-110). The AI keeps choosing one study at a time (RSCH-078). The queue length is provisional.
+- **D-RSCH-23** (18 Oct, Leroy; plan-1378 §3.2) Era I from the start, and the 1378 sets: the campaign will start on 20 September 1378, and Leroy chose to stretch Era I back to the start (1378–1500) and keep the tree as it is, over a new playable era from 1378 to 1444. Medieval now runs 600–1377, past inventions stay known before the start, and nothing is renumbered (RSCH-032, RSCH-091). Era I gets 122 years instead of 56, so its cost per invention scales by the share of Era I the campaign plays, ×1 from 1444 and about ×2.18 from 1378 (RSCH-113): the simplest rule that leaves a 1444 start unchanged, provisional for the balance model. A 1378 start adds a start block on top of the 1444 groups (RSCH-114, RSCH-115, the 1378 table of §5.11); the game still starts on 11 November 1444 until the scenario moves it, and the scenario will then name the start the block is read from.
+- **OQ-RSCH-23** Florence's head start in humanist learning (plan-1378 §3.2): L6 needs L5 or L2, which Florence lacks in 1378, so knowing it would break RSCH-099. A bridge event (Salutati) or a tree change is for Leroy to choose.
 
 ## 14. Traceability
 
@@ -744,5 +817,10 @@ Every requirement has at least one scenario. The invention list (§5.8) is check
 | RSCH-097 | past-eras.feature | Standing |
 | RSCH-098, RSCH-099 | start-groups.feature | Every realm starts from its group; Start sets are complete; Who starts behind |
 | RSCH-100 … RSCH-106 | — | Client screens; checked by apps/client/scripts/research-shots.mjs and apps/client/src/ui/learning.test.ts (one picture, zoom, tap targets, no sideways scroll) |
+| RSCH-032, RSCH-091 | past-eras.feature | Era I runs from the start |
+| RSCH-113 | start-1378.feature | Era I is paced to the start |
+| RSCH-114 | start-1378.feature | The realms of 1378 join start groups; A 1444 start has no block; 1378 start sets are complete |
+| RSCH-115 | start-1378.feature | What a realm knows in 1378 |
+| RSCH-097 | start-1378.feature | Standing in 1378 |
 | RSCH-108, RSCH-109 | study-queue.feature | The next queued study starts by itself; Queue the path; A full queue takes no path |
 | RSCH-107, RSCH-110, RSCH-111 | — | Client screens; checked by apps/client/scripts/research-shots.mjs |

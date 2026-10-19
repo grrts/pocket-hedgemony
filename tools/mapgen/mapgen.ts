@@ -1,16 +1,20 @@
 // Builds the playable world map from Natural Earth (public domain) data.
 //
-//   node --experimental-strip-types tools/mapgen/mapgen.ts
+//   node --experimental-strip-types tools/mapgen/mapgen.ts [scenario]
+//
+// scenario is a folder in packages/rules/data/scenarios (default 1444, the bundled start).
+// Another scenario (1378) writes its province image to apps/client/public/map/<scenario>/,
+// its build report beside its world files, and shares terrain.png when its land is the same.
 //
 // Outputs:
 //   apps/client/public/map/provinces.png   province id per pixel (RGB = id + 1, black = water)
 //   apps/client/public/map/terrain.png     terrain per pixel for the close-zoom art (R = terrain index,
 //                                          G = ocean depth band)
-//   packages/rules/data/world/*.json       provinces, nations, map metadata
+//   packages/rules/data/scenarios/1444/world/*.json   provinces, nations, map metadata
 //
 // Regions come from modern first-level admin borders (states, provinces,
 // departments), merged or split to even sizes, then handed to 1444 nations by
-// the rules in owners-1444.json. The result is an approximation of 1444, not
+// the rules in the start scenario's map-owners.json. The result is an approximation of 1444, not
 // a historical atlas.
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -27,6 +31,10 @@ const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "../..");
 const cacheDir = join(here, ".cache");
 const config = JSON.parse(readFileSync(join(here, "config.json"), "utf8"));
+// The start scenario (X-25): its map nations and owner rules go in, its world comes out.
+const scenarioId = process.argv[2] ?? "1444";
+const isDefault = scenarioId === "1444";
+const scenarioDir = join(root, "packages/rules/data/scenarios", scenarioId);
 
 const NE_BASE = "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/";
 
@@ -112,7 +120,7 @@ const stats = () => {
 
 // Merges stay inside one 1444 owner (or one modern country for unowned land),
 // so a small region never drags its neighbour across a 1444 border.
-const ownerRules: OwnerRule[] = JSON.parse(readFileSync(join(here, "owners-1444.json"), "utf8"));
+const ownerRules: OwnerRule[] = JSON.parse(readFileSync(join(scenarioDir, "map-owners.json"), "utf8"));
 const groupKeys = new Map<string, number>();
 const featureGroup = features.map((f: any) => {
   const p = f.properties;
@@ -126,7 +134,7 @@ const groupOf = (feature: number) => featureGroup[feature] as number;
 // 3. Merge pieces that are too small.
 // Pixels under each nation's capital: those pieces never merge away, so
 // city-states like Hamburg or Ragusa keep their own province.
-const nationSourcesEarly: NationSource[] = JSON.parse(readFileSync(join(here, "nations-1444.json"), "utf8"));
+const nationSourcesEarly: NationSource[] = JSON.parse(readFileSync(join(scenarioDir, "map-nations.json"), "utf8"));
 // Realms added from the catalogue (grows) take the provinces as they are cut, so they keep no pieces apart.
 const capitalPixels = nationSourcesEarly.filter((n) => !n.grows).map((n) => Math.floor((grid.latTop - n.capital[1]) * grid.pxPerDeg) * W + Math.floor((n.capital[0] + 180) * grid.pxPerDeg));
 
@@ -286,7 +294,7 @@ const provinces = order.map((old) => {
 });
 
 // 6. Nations and owners.
-const nationSources: NationSource[] = JSON.parse(readFileSync(join(here, "nations-1444.json"), "utf8"));
+const nationSources: NationSource[] = JSON.parse(readFileSync(join(scenarioDir, "map-nations.json"), "utf8"));
 const provinceAt = (lon: number, lat: number) => {
   const x = Math.floor((lon + 180) * grid.pxPerDeg);
   const y = Math.floor((grid.latTop - lat) * grid.pxPerDeg);
@@ -417,6 +425,55 @@ const seaProvinces = sea.zones.map((z, i) => ({
   neighbors: [...seaNeighbors[i]!].sort(),
 }));
 
+// 7b. A scenario built from regions (1378) gives its sleeping realms and port towns by
+// [lon, lat] or owner-rule selector, since its province ids exist only now; place them.
+// It also maps every 1444 province to the province under its centre, for rules that name 1444 provinces.
+const placed: { sleeping?: unknown; ports?: unknown; from1444?: Record<string, string> } = {};
+if (!isDefault) {
+  type Place = [number, number] | { countries: string[]; admin1?: string[]; regions?: string[]; bbox?: [number, number, number, number] };
+  const ownerOf = new Map(world.provinces.map((p) => [p.id, (p as { owner: string | null }).owner]));
+  const placeOf = (c: Place): string[] => {
+    if (Array.isArray(c)) {
+      const at = provinceAt(c[0], c[1]);
+      return at ? [at] : [];
+    }
+    const rule = { ...c, nation: "x" } as OwnerRule;
+    return provinces.filter((p) => matchOwner([rule], p) === "x").map((p) => p.id);
+  };
+  const sleepingSrc = JSON.parse(readFileSync(join(scenarioDir, "sleeping-realms.json"), "utf8"));
+  placed.sleeping = {
+    _doc: "Generated by tools/mapgen from ../sleeping-realms.json: the sleeping realms with their places as this map's province ids (SETUP-080, SETUP-081, X-24). Do not edit by hand.",
+    spare_count: sleepingSrc.spare_count,
+    realms: sleepingSrc.realms.map((r: { id: string; name: string; color?: string; capital: Place; home: Place[]; tree?: string[] }) => {
+      const capital = placeOf(r.capital)[0];
+      if (!capital) throw new Error(`sleeping realm ${r.id}: capital in the sea`);
+      return { id: r.id, name: r.name, ...(r.color ? { color: r.color } : {}), capital, tree: r.tree ?? [r.id], home: [...new Set(r.home.flatMap(placeOf))] };
+    }),
+  };
+  const portsSrc = JSON.parse(readFileSync(join(scenarioDir, "ports.json"), "utf8"));
+  const towns: object[] = [];
+  const notPlaced: object[] = [];
+  const nationIdSet = new Set(world.nations.map((n) => n.id));
+  for (const t of portsSrc.towns as { name: string; lat: number; lon: number; holder: string | null; tier: string; shipyard: boolean; source: string }[]) {
+    const at = provinceAt(t.lon, t.lat);
+    const owner = at ? (ownerOf.get(at) ?? null) : null;
+    const holder = t.holder ?? owner;
+    const row = { name: t.name, holder, tier: t.tier, shipyard: t.shipyard, source: t.source };
+    // A port is placed in a coastal province its holder owns on the start day (NAVY-013); else it waits unplaced.
+    const coastalAt = at && landById.get(at)?.neighbors.some((n) => n.startsWith("sea"));
+    if (at && holder && holder === owner && coastalAt) towns.push({ ...row, province: at, province_name: landById.get(at)!.name });
+    else if (holder && nationIdSet.has(holder)) notPlaced.push(row);
+  }
+  placed.ports = { source: "Generated by tools/mapgen from ../ports.json: each town in the province under its lat and lon when its holder owns that coastal province on the start day, else unplaced. Do not edit by hand.", towns, not_placed: notPlaced };
+  const old = JSON.parse(readFileSync(join(root, "packages/rules/data/scenarios/1444/world/provinces.json"), "utf8")) as { id: string; x: number; y: number }[];
+  placed.from1444 = {};
+  for (const p of old) {
+    if (!p.id.startsWith("p")) continue;
+    const at = provinceAt((p.x + 0.5) / grid.pxPerDeg - 180, grid.latTop - (p.y + 0.5) / grid.pxPerDeg);
+    if (at) placed.from1444[p.id] = at;
+  }
+}
+
 // 8. Write outputs.
 const rgb = new Uint8Array(W * H * 3);
 for (let p = 0; p < label.length; p++) {
@@ -427,24 +484,34 @@ for (let p = 0; p < label.length; p++) {
   rgb[p * 3 + 1] = (v >> 8) & 255;
   rgb[p * 3 + 2] = v & 255;
 }
-const mapDir = join(root, "apps/client/public/map");
-const dataDir = join(root, "packages/rules/data/world");
+const publicMapDir = join(root, "apps/client/public/map");
+const mapDir = isDefault ? publicMapDir : join(publicMapDir, scenarioId);
+const imageBase = isDefault ? "map" : `map/${scenarioId}`;
+const dataDir = join(scenarioDir, "world");
 mkdirSync(mapDir, { recursive: true });
 mkdirSync(dataDir, { recursive: true });
 writeFileSync(join(mapDir, "provinces.png"), encodePngRgb(W, H, rgb));
-writeFileSync(join(mapDir, "terrain.png"), encodePngRgb(W, H, detailTerrain()));
+// The ground does not depend on who owns it, so another scenario shares the bundled terrain image when it matches.
+const terrainPng = encodePngRgb(W, H, detailTerrain());
+const sharedTerrain = !isDefault && existsSync(join(publicMapDir, "terrain.png")) && readFileSync(join(publicMapDir, "terrain.png")).equals(terrainPng);
+if (!sharedTerrain) writeFileSync(join(mapDir, "terrain.png"), terrainPng);
 writeFileSync(
   join(dataDir, "map.json"),
-  JSON.stringify({ width: W, height: H, pxPerDeg: grid.pxPerDeg, latTop: grid.latTop, provinceImage: "map/provinces.png", terrainImage: "map/terrain.png" }, null, 2) + "\n",
+  JSON.stringify({ width: W, height: H, pxPerDeg: grid.pxPerDeg, latTop: grid.latTop, provinceImage: `${imageBase}/provinces.png`, terrainImage: sharedTerrain ? "map/terrain.png" : `${imageBase}/terrain.png` }, null, 2) + "\n",
 );
 writeFileSync(join(dataDir, "provinces.json"), "[\n" + [...world.provinces, ...seaProvinces].map((p) => JSON.stringify(p)).join(",\n") + "\n]\n");
 writeFileSync(join(dataDir, "nations.json"), JSON.stringify(world.nations, null, 2) + "\n");
+if (!isDefault) {
+  writeFileSync(join(dataDir, "sleeping-realms.json"), JSON.stringify(placed.sleeping, null, 1) + "\n");
+  writeFileSync(join(dataDir, "ports.json"), JSON.stringify(placed.ports, null, 1) + "\n");
+  writeFileSync(join(dataDir, "from-1444.json"), JSON.stringify({ $comment: "Generated by tools/mapgen: each 1444 province id and the province of this map under its centre, for rules that still name 1444 provinces. Do not edit by hand.", provinces: placed.from1444 }) + "\n");
+}
 // The build's report of the realms added from the catalogue (SETUP-064, TRIBE-004).
 writeFileSync(
-  join(domainDir, "scenario-setup-report.json"),
+  isDefault ? join(domainDir, "scenario-setup-report.json") : join(dataDir, "setup-report.json"),
   JSON.stringify(
     {
-      $comment: "Generated by tools/mapgen: realms added from the catalogue (nations-1444.json grows) that were left as reference data because their capital lies in another realm's land, and the size each added realm wanted and got. Do not edit by hand.",
+      $comment: "Generated by tools/mapgen: realms added from the catalogue (map-nations.json grows) that were left as reference data because their capital lies in another realm's land, and the size each added realm wanted and got. Do not edit by hand.",
       left_out: world.leftOut,
       grown: world.grown,
     },

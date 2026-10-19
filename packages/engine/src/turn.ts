@@ -16,6 +16,7 @@ import { monthlyMoods } from "./moods.ts";
 import { answerRebels, dailyRebels, monthlyRebels, verdictOrder } from "./rebels.ts";
 import { answerRevolution, lockedOrder, monthlyRevolutions } from "./revolutions.ts";
 import { answerEvent, monthlyEvents } from "./events.ts";
+import { monthlyGoals } from "./goals.ts";
 import { heritageChoice, monthlyHeritage, payCounsel } from "./heritage.ts";
 import { monthlyGovernment, reform } from "./government.ts";
 import { dismissTrader, draftTradeRoute, foundTrader, monthlyTrade, setTradeRoute, type GameTraderKind } from "./trade.ts";
@@ -301,6 +302,8 @@ function startDay(world: World, news: News[]): void {
     monthlyConquest(world, news);
     // Institutions read standing and forms and add war aims, so they come after diplomacy and before the wars (INST §9).
     monthlyInstitutions(world, news);
+    // Goals end with their reasons and pull their realms before the AI looks for wars (EVT-103 to EVT-105).
+    monthlyGoals(world);
     aiDeclarations(world, news);
     // A war just declared may be censured, or call a patron to a holy place (RELG-147, RELG-149).
     faithHeadsWars(world, news);

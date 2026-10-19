@@ -4,7 +4,7 @@ Feature: Lords lead their retinues
   I want my lords to bring their own men to my wars and lead them
   So that a loyal nobility is an army I don't pay for, and a wavering one is a risk
 
-  # Leroy, 18 Oct (X-25). Config keys: warfare.lords.loyal_days, warfare.lords.wavering_days,
+  # Leroy, 18 Oct (X-26). Config keys: warfare.lords.loyal_days, warfare.lords.wavering_days,
   # warfare.lords.wavering_share, warfare.lords.wavering_stay_months, warfare.lords.min_men,
   # warfare.lords.retinue_horse_share, warfare.lords.retinue_horse_arm
 

@@ -103,7 +103,8 @@ export function schoolsOf(world: World, n: number): { province: number; type: rs
 // ---------------------------------------------------------------- the start
 
 /**
- * What each realm knows in 1444 (RSCH-076), and its first school: one in its
+ * What each realm knows at the start (RSCH-098; the start date's block and
+ * Era I pacing, RSCH-113, RSCH-114), and its first school: one in its
  * capital, a madrasa where it knows L2, else a temple or monastery school
  * (founded by the clergy where the realm knows neither, RSCH-001), half its
  * seats filled from recruits in cohorts of the last five years, and a few
@@ -113,7 +114,7 @@ export function seedResearch(world: World): void {
   const year = world.date.year;
   const land = landOf(world);
   world.research = world.rules.nations.map((def, n) => {
-    const p = rs.startingProgramme(def.id);
+    const p = rs.startingProgramme(def.id, rs.tree(), world.date);
     p.country = world.nationIds[n]!;
     const capital = world.provinceIndex.get(def.capital);
     const type = schoolTypeFor(p);
@@ -141,7 +142,7 @@ export function seedResearch(world: World): void {
  */
 export function wakeResearch(world: World, n: number, donor: number): void {
   const id = world.nationIds[n]!;
-  const p = rs.startingProgramme(donor >= 0 ? world.nationIds[donor]! : id);
+  const p = rs.startingProgramme(donor >= 0 ? world.nationIds[donor]! : id, rs.tree(), { year: world.campaign.startYear });
   p.country = id;
   if (donor >= 0) {
     const d = world.research[donor]!;
@@ -647,6 +648,8 @@ interface SavedProgramme {
   seats: number;
   /** The study queue (RSCH-108); older saves have none. */
   queue?: string[];
+  /** The campaign's start year for Era I pacing (RSCH-113); older saves have none and keep the world's own. */
+  startYear?: number;
 }
 
 export interface SavedResearch {
@@ -657,7 +660,7 @@ export interface SavedResearch {
 
 export function saveResearch(world: World): SavedResearch {
   return {
-    realms: world.research.map((p, n) => ({ known: [...p.known], contacts: [...p.contacts], studies: p.studies, schools: p.schools, scholars: p.scholars, stopped: p.stopped, seats: world.researchSeats[n]!, queue: [...p.queue] })),
+    realms: world.research.map((p, n) => ({ known: [...p.known], contacts: [...p.contacts], studies: p.studies, schools: p.schools, scholars: p.scholars, stopped: p.stopped, seats: world.researchSeats[n]!, queue: [...p.queue], ...(p.startYear !== undefined ? { startYear: p.startYear } : {}) })),
     founding: world.researchFounding,
   };
 }
@@ -675,6 +678,7 @@ export function restoreResearch(world: World, saved: SavedResearch, mapNation: (
     p.scholars = s.scholars;
     p.stopped = s.stopped;
     p.queue = (s.queue ?? []).filter((id) => rs.tree().inventions.has(id));
+    if (s.startYear !== undefined) p.startYear = s.startYear;
     world.researchSeats[n] = s.seats;
   });
   world.researchFounding = saved.founding.map((f) => ({ ...f, nation: mapNation(f.nation), province: mapProvince(f.province) })).filter((f) => f.nation >= 0 && f.province >= 0);
