@@ -715,11 +715,11 @@ Given("the country {string} has had {int} pool events this year", (s, who: strin
   st(s).poolFired[`${who}:1600`] = n;
   c(s, who).government = "monarchy";
 });
-Given("a third pool event for {string} wins its roll", (s, who: string) => {
+Given("another pool event for {string} wins its roll", (s, who: string) => {
   add(s, fixture("third_pool_event", { selection: { mode: "pool", mean_years: 1 / 120 }, roles: { realm: { historical: [who], select: { condition: { government: { who: "this", is: "monarchy" } } }, as: ["affected"] } } }));
   expect(E.poolChance(st(s), ev(s), { realm: [who] }).chance).toBe(1);
 });
-Then("the third event does not fire for {string} this year", (s, who: string) => {
+Then("that event does not fire for {string} this year", (s, who: string) => {
   expect(w(s).history.some((h) => h.event === s.event)).toBe(false);
   expect(E.underPacingCap(st(s), who)).toBe(false);
   st(s).poolFired[`${who}:1600`] = 1;
