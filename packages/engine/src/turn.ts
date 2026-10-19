@@ -27,6 +27,7 @@ import { dailyExploration, exploreOrder, monthlyColonies, stepVoyages, type Expl
 import { monthlyPeoples, setFaithPolicy, setTonguePolicy } from "./peoples.ts";
 import { claimCaliphate, faithHeadsWars, monthlyFaithHeads, raiseOwnPatriarch, sendConclaveGold } from "./faithHeads.ts";
 import { dismissOfficial, fillAllPosts, hireOfficial, monthlyPosts, setAutoFill, settleLand, swapOfficials } from "./officials.ts";
+import { assassinate } from "./assassination.ts";
 import { giveGift, grantFief, inAnyWar, lordGetsBuilding, monthlyLords, seizeFief } from "./lords.ts";
 import { callLord, callLords, monthlyRetinues, weeklyRetinues } from "./retinues.ts";
 import { clockStopped, dailyEndCheck, keepPlaying, playOn, weeklyEndCheck, yearlyScores } from "./campaignEnd.ts";
@@ -127,6 +128,8 @@ export type Order =
   | { type: "callLords"; lord?: number }
   | { type: "grantFief"; province: number; lord: number }
   | { type: "seizeFief"; province: number }
+  /** Send an assassin after one of the realm's lords (REALM-280). */
+  | { type: "assassinateLord"; lord: number }
   /** Move officials between two royal provinces: they swap posts, or one takes the other's empty post (AssignOfficial). */
   | { type: "swapOfficials"; a: number; b: number }
   /** Hire an official of a type (an OFFICIALS index) into an empty royal post; a foreign specialist costs more (HireOfficial). */
@@ -428,6 +431,8 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
       return grantFief(world, actingNation, order.province, order.lord);
     case "seizeFief":
       return seizeFief(world, actingNation, order.province, news);
+    case "assassinateLord":
+      return assassinate(world, actingNation, order.lord, news);
     case "swapOfficials": {
       const reason = swapOfficials(world, actingNation, order.a, order.b, news);
       // The ledger shows the new sums at once.
