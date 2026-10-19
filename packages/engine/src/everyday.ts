@@ -4,7 +4,7 @@ import type { News } from "./war.ts";
 import type { EventCard } from "./events.ts";
 import { Rng } from "./rng.ts";
 import { houseMemberName } from "./names.ts";
-import { LOYALTY, loyaltyStep } from "./lords.ts";
+import { LOYALTY, loyaltyStep, newHolder } from "./lords.ts";
 import { OFFICIALS, officialAt, yearsServed } from "./officials.ts";
 import { storeMonths } from "./food.ts";
 import { child, dynastic, rulerLabel, throneLaw } from "./rulers.ts";
@@ -325,6 +325,7 @@ function choose(world: World, s: EverydayState, ev: EverydayEvent, o: OptionDef,
       l.upCredit = 0;
       delete l.traits;
       delete l.want;
+      newHolder(l);
     }
     if (e.lands === "crown" && ev.lord !== undefined) {
       for (let p = 0; p < world.provinceCount; p++) if (world.provinceLord[p] === ev.lord) world.provinceLord[p] = -1;

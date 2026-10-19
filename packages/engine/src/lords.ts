@@ -2,6 +2,7 @@ import type { World } from "./world.ts";
 import type { News } from "./war.ts";
 import { houseMemberName, personName } from "./names.ts";
 import { loyaltyCause, realmConfig, startingLords, type Lord, type Loyalty } from "./domain/realm/index.ts";
+import { startLords, type HistoricalLordDef } from "@ph/rules";
 
 /**
  * Lords (milestone 3): each realm starts with lords who hold some of its
@@ -38,6 +39,11 @@ export interface RealmLord {
   heir?: { name: string; age: number } | null;
   /** His line died out: his lands went back to the crown (REALM-082). */
   gone?: boolean;
+  /** What his lands make him: "Earl of Northumberland" (REALM-281); passes to whoever holds them after him. */
+  title?: string;
+  /** A real person of history: his id in the start's historical lords, and one line on who he was (REALM-280). His heir is not. */
+  historical?: string;
+  note?: string;
 }
 
 export interface LordState {
@@ -81,16 +87,21 @@ export function seedLords(world: World): void {
     const def = world.rules.nations[n]!;
     const capital = world.provinceIndex.get(def.capital);
     if (capital === undefined) continue;
+    const history = startLords.realms[def.id] ?? [];
     if (seated[def.id]) {
       seatHouses(world, n, seated[def.id]!);
+      // The head of a seated house in history is that house's lord (REALM-282); the others are seated on their own land.
+      seatHistorical(world, n, capital, history.filter((h) => !world.lords.some((l) => l.nation === n && l.house === h.house && (asHistorical(world, l, h), true))));
       continue;
     }
+    const historical = seatHistorical(world, n, capital, history);
     const land = byDistance(world, n, capital);
-    const start = startingLords(land.length, great[def.id] ?? []);
-    const count = start.names.length || start.generated;
+    // The historical lords stand for the realm's great houses: the catalogue's list is for a later start (REALM-282).
+    const start = startingLords(land.length, history.length ? [] : (great[def.id] ?? []));
+    const count = Math.max(0, (start.names.length || start.generated) - historical);
     if (count === 0) continue;
     const royal = Math.max(1, Math.ceil(land.length * royalShare));
-    const rest = land.slice(royal);
+    const rest = land.slice(royal).filter((p) => world.provinceLord[p]! < 0);
     if (rest.length === 0) continue;
     const seats = Array.from({ length: Math.min(count, rest.length) }, (_, k) => rest[Math.floor((k * rest.length) / Math.min(count, rest.length))]!);
     const first = world.lords.length;
@@ -119,6 +130,45 @@ export function seedLords(world: World): void {
     // What no lord reached by land goes to the nearest seat's lord in the list.
     for (const p of left) world.provinceLord[p] = first;
   }
+}
+
+/**
+ * Seats a realm's historical lords on the land history gave them, where the
+ * realm holds it at the start: never its capital, never land another lord
+ * already holds (REALM-280). Returns how many were seated.
+ */
+function seatHistorical(world: World, n: number, capital: number, history: readonly HistoricalLordDef[]): number {
+  let seated = 0;
+  for (const h of history) {
+    const land = h.provinces.map((id) => world.provinceIndex.get(id)).filter((p): p is number => p !== undefined && p !== capital && world.provinceOwner[p] === n && world.provinceLord[p]! < 0);
+    if (!land.length) continue;
+    const k = world.lords.length;
+    const l: RealmLord = { name: h.name, house: h.house, nation: n, loyalty: "Loyal", upCredit: 0 };
+    asHistorical(world, l, h);
+    world.lords.push(l);
+    for (const p of land) world.provinceLord[p] = k;
+    seated++;
+  }
+  return seated;
+}
+
+/** Makes a lord the historical person: his name, house, title, traits, age and heir by the start year, and the line on who he was. */
+export function asHistorical(world: World, l: RealmLord, h: HistoricalLordDef): void {
+  const year = world.date.year;
+  l.name = h.name;
+  l.house = h.house;
+  l.title = h.title;
+  l.traits = [...h.traits];
+  l.age = Math.max(16, year - h.born);
+  l.heir = h.heir && year >= h.heir.born ? { name: h.heir.name, age: year - h.heir.born } : null;
+  l.historical = h.id;
+  l.note = h.note;
+}
+
+/** Someone new holds a lord's lands (an heir, a kinsman, a confirmed son): the title stays with the lands, the history was the man's. */
+export function newHolder(l: RealmLord): void {
+  delete l.historical;
+  delete l.note;
 }
 
 /** Great houses the realm data seats on named land (D-INST-1): each holds its listed provinces that the realm owns; the rest is royal. */

@@ -336,6 +336,42 @@ export type GoalAim =
   | { kind: "hold"; places: GoalPlace[]; target?: string }
   | { kind: "subject" | "ally" | "fight" | "free"; target: string };
 
+/** A real person of the start's history who is, or may become, a lord of a realm (REALM-280 to REALM-285). */
+export interface HistoricalLordDef {
+  /** Stable id, used by events that bring him in (`historical_lord`). */
+  id: string;
+  name: string;
+  house: string;
+  /** What he was called by his lands: "Earl of Northumberland". */
+  title: string;
+  born: number;
+  /** The year he died in history; the game's own ageing decides when he dies in play. */
+  died: number;
+  /** Map provinces of his historical lands; the first is his seat. */
+  provinces: string[];
+  /** Two of the ruler traits the sources support. */
+  traits: string[];
+  /** The son who followed him, if the sources name one. */
+  heir: { name: string; born: number } | null;
+  /** One line for the player: who he was. */
+  note: string;
+  confidence: "high" | "medium";
+  sources: string[];
+}
+
+/** A historical lord who joins later by an event (REALM-284). */
+export interface LaterLordDef extends HistoricalLordDef {
+  realm: string;
+  /** His history year. */
+  year: number;
+}
+
+/** The start's historical lords: seated on the start day by realm, and those events bring in later by id. */
+export interface HistoricalLords {
+  realms: Record<string, HistoricalLordDef[]>;
+  later: Record<string, LaterLordDef>;
+}
+
 /** A realm's historical goal with its reason (EVT-100, plan-1378 §2). */
 export interface GoalDef {
   realm: string;
