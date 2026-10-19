@@ -428,6 +428,13 @@ The General tab had grown into a wall of 4.5 phone screens that repeated a line 
 
   How the player uses it: the player opens the Realm book on Realm and reads the whole realm in one screen on a phone held sideways: the ruler, Stability's four pillars and five tiles, two to a row, each at least 44 points tall. A red edge and one line say what waits ("2 provinces hungry", "An answer waits"); tapping the tile goes straight to it. What used to be repeated here (government form, faiths and languages, lands by ground, heritage, the fallen, neighbours) stays on its own page in its section, one tap away, so nothing is explained twice. Nothing needs hover.
 
+### Less to read on each page (Leroy, 18 October 2026)
+The Economy pages were the longest in the book: Food 8.9 phone screens, with a paragraph under each of its settings, and Trade 6.9 (ui-review). Settings and long lists the player opens now and then move behind a tap.
+
+- SHELL-172: A Realm book page shall keep what the player acts on most at the top and put settings and long lists they open now and then in folds, each fold's line saying what it holds at a glance; a fold stays as the player left it while the book is open, so a choice made inside it keeps it open. Food keeps how many provinces are hungry or running low and the presets, with the five settings in a Customise fold whose line reads the current choices and the castles in a Castles fold that opens by itself while a castle is besieged or cut off; a siege reserve the castles without a granary can't hold stays outside as a warning. Trade keeps last month and the traders, with Found a trader (open while the player has no trader) and Busiest cities in folds. [Leroy 18 Oct; ui-review]
+
+  How the player uses it: on a phone held sideways the Food page is now under two screens: the counts, the four presets and two folds. Tapping Customise shows each setting with its one-line explanation; picking a choice keeps the fold open. A fold's line ("40 % · Even · 3 mo · Below 1 month · Keep") tells the player what is set without opening it. Each fold's summary is a 44-point tap target, and nothing needs hover.
+
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
@@ -841,5 +848,6 @@ Decided on 17 October 2026 under `domain/DECISIONS.md`. No question stays open.
 | SHELL-168 | map-and-cards.feature | Tool column |
 | SHELL-170 | realm-book.feature | The overview has a tile per section |
 | SHELL-171 | realm-book.feature | A tile names what waits and opens it |
+| SHELL-172 | — | Presentation only: the client's folds (`apps/client/src/ui/fold.ts`), checked on screenshots |
 | SHELL-164 | campaign-end.feature | The end card when the end date comes; The end card at game over; The end card after world domination |
 | SHELL-144–146 | layout-by-shape.feature | Each subject has one home; Important things have an overview; Every screen fits a phone in landscape |
