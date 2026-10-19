@@ -24,6 +24,9 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
+      # The website's wiki is made from docs/wiki: re-export it and fail if it changed.
+      - name: Website wiki matches docs/wiki (run `pnpm wiki` and commit if this fails)
+        run: pnpm wiki && git diff --exit-code -- server/wiki
       - run: pnpm test
       - run: pnpm --filter @ph/client build
       - name: Engine worker in a mobile Chromium browser
