@@ -2848,6 +2848,54 @@ function armySlot(id: number): number {
 // ---- HUD and panels ----
 const pennant = (nation: FlagOf, scale = 2) => `<img class="px-icon flag" src="${flagUrl(nation, scale)}" alt="">`;
 
+// The top bar's one-shot animations (SHELL-174, SHELL-175, SHELL-177): what each plaque last showed and when its animation began.
+const hudShot = { nation: -1, goldFrom: 0, goldTo: NaN, goldAt: -1e9, day: "", dayAt: -1e9, unread: 0, unreadAt: -1e9 };
+let goldTick = 0;
+const GOLD_MS = 300;
+
+/** Whether the interface plays its small animations: not with Animations Off or the system's reduced motion. */
+const uiMotion = () => animationsPref() !== "Off" && !matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/** The gold the plaque shows now: it counts from the old value to the new in 6 steps. */
+function goldShown(): number {
+  const k = Math.min(6, Math.floor(((performance.now() - hudShot.goldAt) / GOLD_MS) * 6));
+  return k >= 6 ? hudShot.goldTo : hudShot.goldFrom + ((hudShot.goldTo - hudShot.goldFrom) * k) / 6;
+}
+
+/** Writes each counting step into the gold plaque, whichever render drew it, until the count is done. */
+function tickGold(): void {
+  const el = hud.querySelector(".gold-n");
+  if (el) el.textContent = fmt(goldShown());
+  goldTick = goldShown() === hudShot.goldTo ? 0 : window.setTimeout(tickGold, GOLD_MS / 6);
+  // The tint goes once the count is done.
+  if (!goldTick) el?.classList.remove("up", "down");
+}
+
+/** A class attribute that adds `shot` while an animation begun at `at` still runs, delayed so a re-render carries it on rather than restarting it. */
+function shotClass(base: string, shot: string, at: number, ms: number): string {
+  const t = performance.now() - at;
+  return t < ms ? `class="${base} ${shot}" style="animation-delay:-${Math.round(t)}ms"` : `class="${base}"`;
+}
+
+/** Notes what changed on the plaques since the last render and starts their animations. */
+function noteHudChanges(me: number, gold: number, day: string, count: number): void {
+  const now = performance.now();
+  const moving = uiMotion() && hudShot.nation === me;
+  if (gold !== hudShot.goldTo) {
+    // A new value counts on from what the plaque shows, even mid-count.
+    hudShot.goldFrom = moving ? goldShown() : gold;
+    hudShot.goldTo = gold;
+    hudShot.goldAt = moving ? now : -1e9;
+    clearTimeout(goldTick);
+    if (moving) goldTick = window.setTimeout(tickGold, GOLD_MS / 6);
+  }
+  if (day !== hudShot.day && moving) hudShot.dayAt = now;
+  if (count > hudShot.unread && moving) hudShot.unreadAt = now;
+  hudShot.day = day;
+  hudShot.unread = count;
+  hudShot.nation = me;
+}
+
 function renderHud(): void {
   if (!snapshot) {
     hud.innerHTML = `
@@ -2860,22 +2908,26 @@ function renderHud(): void {
   const n = nations[me]!;
   // The plaques, their order and what each opens come from the engine's top-bar model (REALM-205).
   const open = (o: Opens) => (o && "card" in o && o.tab ? ` data-realm-open="${o.tab}"` : "");
+  const bar = topBar({ ...s, peaceOffers: s.peaceOffers.filter((o) => !putOffOffers.has(o.id)) }, unread, asksOf(s).length + empireAsks(s.empire) + shogunateAsks(s.shogunate));
+  const goldP = bar.find((p) => p.key === "gold");
+  const newsP = bar.find((p) => p.key === "dispatches");
+  noteHudChanges(me, goldP?.key === "gold" ? goldP.gold : hudShot.goldTo, dateText(s.date, true), newsP?.key === "dispatches" ? newsP.count : 0);
   hud.innerHTML = `<button class="icon-only game-menu" data-shell="menu" title="Game menu" aria-label="Game menu">${icon("menu", 2)}<span class="dot" hidden></span></button>
-    ` + topBar({ ...s, peaceOffers: s.peaceOffers.filter((o) => !putOffOffers.has(o.id)) }, unread, asksOf(s).length + empireAsks(s.empire) + shogunateAsks(s.shogunate))
+    ` + bar
     .map((p) => {
       switch (p.key) {
         case "realm":
           return `<button class="realm" data-realm="${me}" title="Your realm">${pennant(n, 2)}<b>${esc(n.name)}</b></button>`;
         case "date":
-          return `<span class="plaque turn-label" title="${dateText(s.date)}, ${seasonName(latOf(provinces[provinceIndex.get(n.capital)!]!), s.date.month).toLowerCase()}: one turn is a week">${dateText(s.date, true)}${clockText(playbackHour(s.hour, s.battles.some((b) => b.player)))}</span>`;
+          return `<span class="plaque turn-label" title="${dateText(s.date)}, ${seasonName(latOf(provinces[provinceIndex.get(n.capital)!]!), s.date.month).toLowerCase()}: one turn is a week"><span ${shotClass("day", "flip", hudShot.dayAt, 200)}>${dateText(s.date, true)}</span>${clockText(playbackHour(s.hour, s.battles.some((b) => b.player)))}</span>`;
         case "gold":
-          return `<button class="plaque gold" data-realm="${me}"${open(p.opens)} title="Treasury: gold, and change per month. Opens the ledger">${icon("coin", 1)}${fmt(p.gold)} <small class="${p.falling ? "down" : ""}">${p.perMonth >= 0 ? "+" : ""}${p.perMonth.toFixed(1)}</small></button>`;
+          return `<button class="plaque gold" data-realm="${me}"${open(p.opens)} title="Treasury: gold, and change per month. Opens the ledger">${icon("coin", 1)}<span class="gold-n${goldShown() === p.gold ? "" : p.gold > hudShot.goldFrom ? " up" : " down"}">${fmt(goldShown())}</span> <small class="${p.falling ? "down" : ""}">${p.perMonth >= 0 ? "+" : ""}${p.perMonth.toFixed(1)}</small><i ${shotClass("gold-pop", p.gold > hudShot.goldFrom ? "up" : "down", hudShot.goldAt, 600)} aria-hidden="true">${icon("coin", 1)}</i></button>`;
         case "stability":
           return stabilityPlaque(s.stability!, me, s.revolution);
         case "war":
           return `<button class="plaque at-war" data-realm="${me}"${open(p.opens)} data-war-focus title="Your wars: your side's peace voices, amber past a third, red past half">${icon("swords", 1)}At war${warPlaqueBars(myWarsRaw(), me)}</button>`;
         case "dispatches":
-          return `<button class="plaque dispatches${p.urgent ? " urgent" : ""}" data-news title="News: everything that happened, newest first">${icon("scroll", 1)}${p.count || ""}</button>`;
+          return `<button ${shotClass(`plaque dispatches${p.urgent ? " urgent" : ""}`, "bounce", hudShot.unreadAt, 300)} data-news title="News: everything that happened, newest first">${icon("scroll", 1)}${p.count || ""}</button>`;
       }
     })
     .join("\n    ");
@@ -3308,9 +3360,12 @@ function logNews(s: Snapshot): void {
 /** The player's revolution's choice card while it waits on a stance (REVO-091): it cannot be folded away. */
 function renderRevolutionCard(): void {
   const v = snapshot?.revolution;
+  const opening = revolutionCard.hidden;
   revolutionCard.hidden = !v?.outbreak;
   if (!v?.outbreak) return;
   revolutionCard.innerHTML = revolutionCardHtml(v, nations[snapshot!.playerNation]!.name);
+  // The card unrolls when it first shows, not on each re-render (SHELL-176).
+  if (opening) revolutionCard.firstElementChild!.classList.add("unroll");
   revolutionCard.querySelectorAll<HTMLButtonElement>("[data-revolution-stance]").forEach((b) =>
     b.addEventListener("click", async () => {
       await act({ type: "answerRevolution", stance: b.dataset.revolutionStance as "lead" | "bend" | "fight" });
@@ -7643,6 +7698,7 @@ overlay.addEventListener("click", (e) => {
 /** Settings apply at once (SET-003): text size, the map's battery knobs, and the cards that show them. */
 function applyPrefs(): void {
   document.documentElement.style.setProperty("--text-zoom", String(textZoom()));
+  document.documentElement.dataset.animations = animationsPref().toLowerCase();
   view?.setPower(mapPower());
   if (!soundMenu.hidden) renderSoundMenu();
   renderSoundButton();
