@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import catalogue from "../data/domain/scenario-setup-catalogue.json" with { type: "json" };
 import cultureDomain from "../data/domain/culture.json" with { type: "json" };
+import nations1444 from "../data/scenarios/1444/map-nations.json" with { type: "json" };
 import culture1444 from "../data/scenarios/1444/culture-start.json" with { type: "json" };
 import provinces1444 from "../data/scenarios/1444/world/provinces.json" with { type: "json" };
 
@@ -47,8 +48,13 @@ const regions: Region[] = present.map((key) => ({
 const nationIds = new Set(regions.flatMap((r) => r.nations.map((n) => n.id)));
 const sleepingIds = new Set(regions.flatMap((r) => r.sleeping.realms.map((s) => s.id)));
 const entityIds = new Set(regions.flatMap((r) => (r.relations.entities ?? []).map((e) => e.id)));
+// While regions are still being built, an owner rule may name a realm another
+// region will add (a 1444 map nation or a catalogue record); once all regions
+// are in, every owner must be a 1378 map nation.
+const complete = scenario.regions.every((k: string) => present.includes(k));
+const ownerKnown = (id: string) => nationIds.has(id) || (!complete && (nations1444.some((n) => n.id === id) || id in catalogue.records));
 const known = (id: string) => nationIds.has(id) || sleepingIds.has(id) || entityIds.has(id) || id in catalogue.records;
-const tongues = new Set([...cultureDomain.tongues.map((t) => t.id), ...Object.keys(culture1444.tongues), ...regions.flatMap((r) => Object.keys(r.culture.tongues ?? {}))]);
+const tongues = new Set([...[...cultureDomain.tongues, ...(cultureDomain.tongues_added ?? [])].map((t) => t.id), ...Object.keys(culture1444.tongues), ...regions.flatMap((r) => Object.keys(r.culture.tongues ?? {}))]);
 const provinceIds = new Set((provinces1444 as { id: string }[]).map((p) => p.id));
 const isLonlat = (c: unknown) => Array.isArray(c) && c.length === 2 && Math.abs(c[0]) <= 180 && Math.abs(c[1]) <= 90;
 const place = (c: string | Lonlat | Selector) =>
@@ -82,7 +88,7 @@ describe("the 1378 scenario (X-25)", () => {
           expect(isLonlat(n.capital), `${n.id} capital`).toBe(true);
         }
         for (const o of r.owners) {
-          if (o.nation !== null) expect(nationIds.has(o.nation), `owner rule for unknown nation ${o.nation}`).toBe(true);
+          if (o.nation !== null) expect(ownerKnown(o.nation), `owner rule for unknown nation ${o.nation}`).toBe(true);
           expect(o.countries.length, `${o.nation} rule names no country`).toBeGreaterThan(0);
           if (o.bbox) expect(o.bbox[0]! < o.bbox[2]! && o.bbox[1]! < o.bbox[3]!, `${o.nation} bbox`).toBe(true);
         }
