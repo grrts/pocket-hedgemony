@@ -11,6 +11,8 @@ rmSync(out, { recursive: true, force: true });
 mkdirSync(out, { recursive: true });
 cpSync(join(dist, "assets"), join(out, "assets"), { recursive: true });
 cpSync(join(dist, "map"), join(out, "map"), { recursive: true });
+// The music's instrument packs (D-AUD-16), fetched by the page beside it.
+cpSync(join(dist, "music"), join(out, "music"), { recursive: true });
 
 // Fonts referenced by the CSS become data: URIs, since the inlined CSS no longer
 // sits next to them and the host may not serve font files.
