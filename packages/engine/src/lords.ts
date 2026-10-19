@@ -7,8 +7,8 @@ import { loyaltyCause, realmConfig, startingLords, type Lord, type Loyalty } fro
  * Lords (milestone 3): each realm starts with lords who hold some of its
  * provinces (realm REALM-166: the great houses where the data names them,
  * else one lord per 4 provinces). A lord's province gives the crown half its
- * tax and recruits while he is loyal or wavering, and nothing once he is
- * disloyal. Loyalty moves a step at a time with the realm context's causes:
+ * tax while he is loyal or wavering, and nothing once he is disloyal; its
+ * recruits are his retinue (retinues.ts). Loyalty moves a step at a time with the realm context's causes:
  * gifts, fiefs and quiet years raise it; lost wars and seized land lower it.
  */
 
@@ -26,6 +26,10 @@ export interface RealmLord {
   traits?: string[];
   /** His Want, a province id (REALM-070); unset, it is worked out from his lands' borders (lordWant). */
   want?: string;
+  /** Himself as a commander (index into the commanders), once he has first led his retinue out (WAR-254). */
+  commander?: number;
+  /** His retinue on its way to his seat after a call: men and days until it stands there (WAR-253). */
+  call?: { men: number; daysLeft: number };
 }
 
 export interface LordState {
@@ -111,12 +115,29 @@ export function lordLands(world: World, lord: number): number[] {
   return out;
 }
 
-/** Share of a province's tax and recruits that reaches the crown: all of royal land, half of a lord's, none of a disloyal lord's. */
+/** Share of a province's tax that reaches the crown: all of royal land, half of a lord's, none of a disloyal lord's. */
 export function crownShare(world: World, p: number): number {
   const l = world.provinceLord[p]!;
   if (l < 0) return 1;
   const loyalty = world.lords[l]!.loyalty;
   return loyalty === "Loyal" || loyalty === "Wavering" ? 1 - realmConfig.lords.tax_share : 0;
+}
+
+/** The lord a commander is, or -1: a lord leads only his own retinue (RECR-111, WAR-255). */
+export function lordOfCommander(world: World, c: number): number {
+  // Only a lord's own command has his origin: the common case answers without a search.
+  if (c < 0 || world.commanders[c]?.origin !== "a lord") return -1;
+  return world.lords.findIndex((l) => l.commander === c);
+}
+
+/** Men coming home to a lord's lands fill their recruit pools, by each one's gap (WAR-256). */
+export function lordSendHome(world: World, lord: number, men: number): void {
+  if (men <= 0 || lord < 0) return;
+  const lands = lordLands(world, lord);
+  const gap = lands.reduce((t, p) => t + Math.max(0, world.provinceRecruitCeiling[p]! - world.provinceRecruits[p]!), 0);
+  if (gap <= 0) return;
+  const share = Math.min(1, men / gap);
+  for (const p of lands) world.provinceRecruits[p] = world.provinceRecruits[p]! + Math.max(0, world.provinceRecruitCeiling[p]! - world.provinceRecruits[p]!) * share;
 }
 
 /** Moves a lord one step by a realm-context cause (REALM-088, REALM-089, great lords REALM-162). */

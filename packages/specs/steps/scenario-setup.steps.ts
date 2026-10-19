@@ -862,9 +862,10 @@ Then("every nation with no catalogue assessment has {int} gold", (s, gold: numbe
 
 Then("its levies are {int} men per thousand people", (s, per: number) => {
   const w = s.world;
-  const total = Array.from(w.nationMaxLevies as Float64Array).reduce((a, b) => a + b, 0);
+  // Each province's recruit ceiling, royal land and lords' land alike (a lord's fills his retinue, WAR-252).
+  let total = 0;
   let people = 0;
-  for (let p = 0; p < w.provinceCount; p++) if (w.provinceOwner[p] >= 0) people += w.provincePopulation[p];
+  for (let p = 0; p < w.provinceCount; p++) if (w.provinceOwner[p] >= 0) (total += w.provinceRecruitCeiling[p], (people += w.provincePopulation[p]));
   expect(total).toBeCloseTo(people * per);
 });
 

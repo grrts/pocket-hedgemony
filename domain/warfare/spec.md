@@ -750,11 +750,62 @@ from a war score. WAR-184's preconditions and WAR-227's peace limit still hold. 
 - WAR-251 The warfare system shall score settlements the same for player and AI, from the same config, with no
   randomness: the same war state always gives the same costs, capacity, answer and terms. [X-23; WAR-183; X-15]
 
+### 5.26 Lords lead their retinues (X-24, Leroy 18 Oct)
+Leroy, 18 October: "shouldn't some armies be commanded by lords?" WAR-033, WAR-038 to WAR-040 and RECR-111 already
+say they are; the game gave lords no retinue and offered no call, so the men of a lord's lands never fought. These
+rules bring the lords' summons into the game. All new numbers are `warfare.lords.*` and provisional.
+
+- WAR-252 The warfare system shall make the recruits of a lord's provinces his retinue: they refill at the full rate,
+  the realm's levies, recruit ceiling and troop cap count only its royal provinces, and a lord's retinue can be at most
+  his own cap (WAR-033) less any of his men already called out. This replaces the game's stand-in of half a lord's
+  recruits refilling for the crown. How strong a realm looks to others (allies, calls, the AI's declarations) counts
+  the men its lords would bring by their loyalty beside its levies and armies. [X-24; WAR-033; PROV-141; D-RECR-23]
+- WAR-253 While its realm is at war, the warfare system shall let the ruler call the lords, all at once or one lord;
+  each answers by WAR-038 and WAR-039 with the men at home on his held lands; a lord already gathering or in the field
+  is not called again, and one with fewer than `warfare.lords.min_men` (100) men has none to send. Called men leave
+  his lands' recruits. [X-24; WAR-038; WAR-039]
+- WAR-254 When a called retinue's days are up, the warfare system shall stand it at the lord's seat (his held province
+  with the most people) as an army of the retinue kind, led by the lord himself as a commander of the origin *a lord*
+  with Might, Cunning and Logistics of 1 to 3, trained, with `warfare.lords.retinue_horse_share` (a fifth) of its men
+  on horse as `warfare.lords.retinue_horse_arm` (knights and lancers). If the enemy holds all his land or peace has
+  come by then, the men go back to his lands. [X-24; WAR-061; RECR-111]
+- WAR-255 The warfare system shall keep a retinue whole under its lord: it marches, fights and goes home, but cannot
+  be split, merged, trained, handed to another commander or left as a garrison, and its lord leads no other army; the
+  crown does not pay it (WAR-015) and it does not count toward the troop cap (WAR-033). [X-24; RECR-111; X-7]
+- WAR-256 The warfare system shall send a retinue home to its lord's lands, its men back to their recruits: when its
+  realm is at peace; when its lord turns disloyal or rises; when its lord is wavering and it has served
+  `warfare.lords.wavering_stay_months` (6) unless the war's aim is his Want (WAR-038, WAR-039); and when the ruler
+  sends it home. A beaten retinue that scatters sends half its men home to his lands. [X-24; WAR-018; WAR-038]
+- WAR-257 When a battle is won, the warfare system shall raise a step of loyalty for each lord whose retinue fought on
+  the winning side (REALM-088 *he takes part in a victory*). [X-24; REALM-088]
+- WAR-258 The AI shall call every lord who will come each month it is at war, and march retinues like its other
+  armies. [X-24; WAR-038]
+
+Not yet in the game: a lord sent home to defend his occupied lands (WAR-040), a disloyal lord made angrier by a
+second call, and a retinue's losses in the peace voices (WAR-180).
+
+#### How the player uses it: lords' retinues
+- WAR-259 Where: the Army tab of the player's country card has a *Lords' men* section with one **Call the lords**
+  button, and each lord's own screen (Lords tab) has a *Retinue* block with **Call him**, **Command** while he is in the
+  field, and **Send him home**. A button that can't be pressed is greyed and says why below it in words (only at war,
+  on his way, disloyal, no men). A lord's army on the map opens his commander screen like any army. [X-24; X-19]
+- WAR-260 Grouping: everything about the lords' retinues sits in the *Lords' men* section: a row per lord with his
+  portrait, loyalty and state (*ready, 2,400 men*; *gathering, at Dijon in 3 weeks*; *in the field at Reims* with
+  Command; *refuses*). A lord's commander screen shows *his retinue*, *paid by him*, his loyalty and when a wavering
+  lord will leave, and offers only Move, Halt and Send him home; lords stay out of the Commanders list, which is for the crown's own
+  commanders. [X-24; X-19]
+- WAR-261 Overview: the *Lords' men* section opens with one line that sums the lords' men: ready, gathering, in the
+  field and refusing, with the men of each, so the player sees at a glance what the lords can still add; the Lords tab
+  row of each lord shows his retinue's state beside his loyalty. [X-24; X-19]
+- WAR-262 Phone: in the Wide and Tall layouts the rows are one column across the panel, Call the lords is a full-width
+  button, every row button is at least 44 × 44 points, states are words and not colour alone, and nothing needs hover.
+  [X-24; X-19]
+
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
 |---|---|---|---|---|
-| CallLords(lords?) | player / AI | At war or preparing | Lords answer by loyalty (WAR-038) | LordAnswered |
+| CallLords(lords?) | player / AI | At war (WAR-253) | Lords answer by loyalty (WAR-038) | LordAnswered |
 | HireCompany(company, months) | player / AI | Mercenary company offered in reach; under troop cap; gold | Company joins; gold paid | CompanyHired |
 | PayArrears(army) | player / AI | Gold | Pay owed cleared | — |
 | DisbandCompany(company) | player / AI | — | Men to recruits, arms to store | CompanyDisbanded |
@@ -1295,3 +1346,4 @@ Decided on 17 October 2026 (domain/DECISIONS.md). None of warfare's questions is
 | WAR-221 … WAR-228 | features/price-of-war.feature | Peace voices in the game; Refusing an obliged peace costs the ruler; A war with no fitting aim in the game; Lords tire of a long war; Occupation does not pay for the war; Levies at war are paid at once; The dead are missed at home; One peace cannot swallow a realm; The AI counts the price before declaring |
 | WAR-229 … WAR-232 | features/price-of-war.feature | The declare sheet shows the price of war; The war card |
 | WAR-240 … WAR-251 | features/peace-settlement.feature | What a province costs to demand; Capacity comes from what was won; Combining demands within the rules; The AI answers a demand; The AI asks by the same counts; A beaten AI surrenders; The peace table |
+| WAR-252 … WAR-262 | features/lords-retinues.feature | A lord's lands fill his retinue; Calling the lords; A lord leads his own retinue; A retinue goes home; A victory wins a lord's loyalty; The AI calls its lords; The Lords' men section |

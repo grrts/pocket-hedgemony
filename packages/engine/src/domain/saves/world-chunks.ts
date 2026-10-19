@@ -106,6 +106,7 @@ export function worldChunks(world: World, game: SavedGame): RawChunk[] {
         treasury: world.nationTreasury,
         levies: world.nationLevies,
         maxLevies: world.nationMaxLevies,
+        lordsMen: world.nationLordsMen,
         monthlyIncome: world.nationMonthlyIncome,
         taxDefault: world.nationTaxDefault,
         debt: world.nationDebt,
@@ -322,6 +323,7 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
     if (nat.treasury) world.nationTreasury[n] = nat.treasury[old]!;
     if (nat.levies) world.nationLevies[n] = nat.levies[old]!;
     if (nat.maxLevies) world.nationMaxLevies[n] = nat.maxLevies[old]!;
+    if (nat.lordsMen) world.nationLordsMen[n] = nat.lordsMen[old]!;
     if (nat.monthlyIncome) world.nationMonthlyIncome[n] = nat.monthlyIncome[old]!;
     if (nat.taxDefault) world.nationTaxDefault[n] = nat.taxDefault[old]!;
     if (nat.debt) world.nationDebt[n] = nat.debt[old]!;

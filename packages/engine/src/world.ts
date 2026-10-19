@@ -94,6 +94,8 @@ export interface World extends LivingState, TreasuryState, FoodState, MoodState,
   nationTreasury: Float64Array;
   nationLevies: Float64Array;
   nationMaxLevies: Float64Array;
+  /** Men each realm's lords would bring if called now, by loyalty (WAR-252): part of how strong it looks. */
+  nationLordsMen: Float64Array;
   nationMonthlyIncome: Float64Array;
   /** Each realm's administrative capacity from the catalogue, 1 (very low) to 5 (very high), 0 unknown: how far its rule reaches (realmStrengths.ts). */
   nationAdminCapacity: Int8Array;
@@ -198,7 +200,7 @@ export interface ArmyPool {
   battle: Int32Array;
   /** The province the army last marched in from (-1 = none): the way back past an enemy castle. */
   cameFrom: Int32Array;
-  /** Company kind: levy or hired (see KIND). */
+  /** Company kind: levy, hired or a lord's retinue (see KIND). */
   kind: Uint8Array;
   /** Province the men were levied from (-1 = none, as for a hired company): its people lose the army's dead (WAR-226). */
   home: Int32Array;
@@ -430,6 +432,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     nationTreasury: new Float64Array(N).fill(rules.defines.economy.startingTreasury),
     nationLevies: new Float64Array(N),
     nationMaxLevies: new Float64Array(N),
+    nationLordsMen: new Float64Array(N),
     nationMonthlyIncome: new Float64Array(N),
     nationAdminCapacity: Int8Array.from(nationIds, adminCapacityRank),
     commanderIds,

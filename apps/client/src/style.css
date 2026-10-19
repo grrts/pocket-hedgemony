@@ -6323,3 +6323,16 @@ details.pow-line > .hint {
 .league-members button.realm-link {
   min-height: 44px;
 }
+
+/* Lords' men in the Army tab (WAR-259 to WAR-262): one full-width call, rows with 44-point buttons. */
+button[data-call-lords] {
+  width: 100%;
+  margin: 4px 0;
+}
+.retinue-sum {
+  margin: 4px 0;
+}
+.retinue-row .army-buttons button.small {
+  min-height: 44px;
+  min-width: 44px;
+}

@@ -62,7 +62,7 @@ import { provinceWorks } from "./ui/works.ts";
 import { provinceLand } from "./ui/land.ts";
 import { castleFoodLine, castleFoodSettings, foodLine, foodTab } from "./ui/food.ts";
 import { commanderPortrait, officialCard, officialOf, officialScreen, officialsTab, paintSiege, postScreen, siegeView, type SiegeInfo } from "./ui/people.ts";
-import { governanceCard, LOYALTY_ORDER, lordScreen, lordsTab, type LordLands, type LordView, type ProvinceRow } from "./ui/lords.ts";
+import { governanceCard, LOYALTY_ORDER, loyaltyBadge, lordScreen, lordsMenSection, lordsTab, retinueBlock, type LordLands, type LordView, type ProvinceRow, type RetinueRow } from "./ui/lords.ts";
 import { loadMapImage, type MapImage } from "./map/loadMap.ts";
 import { provinceThumb } from "./map/provinceThumb.ts";
 import { armyFigureUnit, armyNameShown, brackets, drawBattle, drawClash, drawFormation, drawPlate, drawRoute, drawSiegeMark, drawTents, drawToken, menShort, pruneBattles, weekEnds } from "./map/marchArt.ts";
@@ -154,10 +154,10 @@ const postOf = (x: Commander) => snapshot?.navy.fleets.find((f) => f.id === x.fl
  * his post at the head of a fleet (admiral, commodore or viceroy), general
  * otherwise. A hired captain's rank came with his name, in his company's language.
  */
-const titledOf = (x: Commander) => (x.origin === "a hired captain" || x.owner < 0 ? x.name : rankedName(rules, x.owner, x.name, x.fleet >= 0 ? postOf(x) : "general"));
+const titledOf = (x: Commander) => (x.origin === "a hired captain" || x.owner < 0 || x.lord >= 0 ? x.name : rankedName(rules, x.owner, x.name, x.fleet >= 0 ? postOf(x) : "general"));
 const titled = (c: number) => titledOf(cmdOf(c));
 /** The same post in plain English, shown beside the ranked name. */
-const roleOf = (x: Commander) => (x.origin === "a hired captain" ? "hired captain" : x.fleet >= 0 ? postOf(x) : "commander");
+const roleOf = (x: Commander) => (x.origin === "a hired captain" ? "hired captain" : x.lord >= 0 ? titlesOf(x.owner).lord : x.fleet >= 0 ? postOf(x) : "commander");
 const neighborIdx = provinces.map((p) => p.neighbors.map((id) => provinceIndex.get(id)!));
 // The same, flat, for walks over the whole map each turn.
 const neighborStart = new Int32Array(provinces.length + 1);
@@ -3955,6 +3955,14 @@ function harvestText(pi: number): string {
 
 /** The snapshot's lords as the panels show them. */
 const lordViews = (): LordView[] => snapshot!.lords.map((l, k) => ({ ...l, k }));
+/** The player's lords' retinues by lord (WAR-252 to WAR-262). */
+const retinueRows = (): Map<number, RetinueRow> => new Map(snapshot!.retinues.map((r) => [r.lord, r]));
+const playerAtWar = (): boolean => snapshot!.wars.some((w) => w.attackers.includes(snapshot!.playerNation) || w.defenders.includes(snapshot!.playerNation));
+/** How the retinue screens read places and armies. */
+const retinueLook = () => {
+  const s = snapshot!;
+  return { atWar: playerAtWar(), place: (p: number) => (p >= 0 ? provinces[p]!.name : "his lands"), armyMen: (k: number) => s.armies.men[k] ?? 0, armyAt: (k: number) => s.armies.location[k] ?? -1, armyId: (k: number) => s.armies.id[k]! };
+};
 
 /** Every lord's lands: provinces, people and the gold that reaches the crown. */
 function lordLands(): Map<number, LordLands> {
@@ -4023,10 +4031,11 @@ function renderLord(k: number): void {
   const holdings = lands.provinces.map((p) => provinceRow(p, `${MOOD_LABEL[s.provinceMood[p]!]} · ${fmt(Math.round(s.provincePeople[p]! * 1000))} people`));
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(l.name)}</h2>${closeButton()}</header>
-    ${lordScreen(rules, l, lands, { lit: litLord === k, gift: s.giftGold, treasury: s.nationTreasury[s.playerNation]!, mine, holdings, grants, allGrants: grantAll || royal.length <= 6, court: mine ? "" : courtLordHtml(s.statecraft, k, l.nation) }, titlesOf(l.nation))}`;
+    ${lordScreen(rules, l, lands, { lit: litLord === k, gift: s.giftGold, treasury: s.nationTreasury[s.playerNation]!, mine, holdings, grants, allGrants: grantAll || royal.length <= 6, court: mine ? "" : courtLordHtml(s.statecraft, k, l.nation), retinue: mine && retinueRows().has(k) ? retinueBlock(l, retinueRows().get(k)!, retinueLook()) : "" }, titlesOf(l.nation))}`;
   bindClose();
   showPanel(true);
   bindLords();
+  bindCommand();
   panel.querySelector("[data-grant-all]")?.addEventListener("click", () => {
     grantAll = true;
     renderPanel();
@@ -4098,7 +4107,7 @@ function realmLords(r: number): string {
   let royal = 0;
   let all = 0;
   for (let p = 0; p < owners.length; p++) if (owners[p] === r) (all++, s.provinceLord[p]! < 0 && royal++);
-  return lordsTab(rules, lordViews().filter((l) => l.nation === r && l.lands > 0), lordLands(), royal, all, titlesOf(r));
+  return lordsTab(rules, lordViews().filter((l) => l.nation === r && l.lands > 0), lordLands(), royal, all, titlesOf(r), r === s.playerNation ? retinueRows() : new Map());
 }
 
 /** Sort orders of the Provinces overview. */
@@ -4222,6 +4231,10 @@ function bindLords(): void {
     renderPanel();
   });
   panel.querySelectorAll<HTMLButtonElement>("[data-gift]").forEach((b) => b.addEventListener("click", () => void actHere({ type: "gift", lord: Number(b.dataset.gift) })));
+  // Lords' retinues (WAR-259): call them all, call one, send one home.
+  panel.querySelector<HTMLButtonElement>("[data-call-lords]")?.addEventListener("click", () => void actHere({ type: "callLords" }));
+  panel.querySelectorAll<HTMLButtonElement>("[data-call-lord]").forEach((b) => b.addEventListener("click", () => void actHere({ type: "callLords", lord: Number(b.dataset.callLord) })));
+  panel.querySelectorAll<HTMLButtonElement>("[data-send-home]").forEach((b) => b.addEventListener("click", () => void actHere({ type: "disband", army: Number(b.dataset.sendHome) })));
   // Court a foreign lord, or call the envoy home (DIPL-220).
   panel.querySelectorAll<HTMLButtonElement>("[data-court-lord]").forEach((b) =>
     b.addEventListener("click", () => void actHere({ type: "court", target: Number(b.dataset.realm), lord: Number(b.dataset.courtLord), ...(b.dataset.recall ? { recall: true } : {}) })),
@@ -4685,6 +4698,10 @@ function renderArmy(id: number): void {
   const c = cmdOf(s.armies.commander[k]!);
   const by = s.armies.byArm[k]!;
   const hired = s.armies.kind[k] === 1;
+  // A lord's retinue only marches, fights and goes home (WAR-255, WAR-260).
+  const retinue = s.armies.kind[k] === 2;
+  const lord = retinue && c.lord >= 0 ? s.lords[c.lord] : undefined;
+  const leavesAfter = retinue ? (s.retinues.find((r) => r.lord === c.lord)?.leavesAfter ?? null) : null;
   const monthsOut = s.armies.monthsOut[k]!;
   const rations = s.armies.rations[k]!;
   const food = s.armies.food[k]!;
@@ -4710,15 +4727,16 @@ function renderArmy(id: number): void {
     <header><h2 class="ribbon">${esc(titledOf(c))}</h2>${closeButton()}</header>
     <div class="army">
       ${commanderPortrait(rules, c.name, me)}
-      <span class="who"><b>${esc(titledOf(c))}</b> <small>(${roleOf(c)}${c.origin && c.origin !== "a hired captain" ? `, ${esc(c.origin.toLowerCase())}` : ""})</small><br><small>${skills(c)}</small><br><small>${c.victories} victor${c.victories === 1 ? "y" : "ies"}, ${c.defeats} defeat${c.defeats === 1 ? "" : "s"}</small></span>
+      <span class="who"><b>${esc(titledOf(c))}</b> <small>(${roleOf(c)}${c.origin && c.origin !== "a hired captain" && c.lord < 0 ? `, ${esc(c.origin.toLowerCase())}` : ""})</small><br><small>${skills(c)}</small><br><small>${c.victories} victor${c.victories === 1 ? "y" : "ies"}, ${c.defeats} defeat${c.defeats === 1 ? "" : "s"}</small></span>
       <span class="army-buttons"><button data-army="${id}">${selected.has(id) ? "Pick a target" : "Move"}</button>${marching(k) ? `<button class="paper" data-halt>Halt</button>` : ""}</span>
     </div>
     <dl class="facts">
       <dt>Where</dt><dd><button class="paper capital" data-go="${here}">${icon("map", 1)}${esc(provinces[here]!.name)}</button>${marchLine(k)}</dd>
-      <dt>Men</dt><dd>${fmt(s.armies.men[k]!)}, ${fmt(s.armies.horse[k]!)} on horse · ${hired ? "a mercenary company" : "levies"}</dd>
+      <dt>Men</dt><dd>${fmt(s.armies.men[k]!)}, ${fmt(s.armies.horse[k]!)} on horse · ${hired ? "a mercenary company" : retinue ? "his own retinue" : "levies"}</dd>
+      ${lord ? `<dt>Loyalty</dt><dd>${loyaltyBadge(lord.loyalty)} <small>${leavesAfter !== null ? `goes home after ${leavesAfter} months in the field (${monthsOut} so far)` : lord.loyalty === "Loyal" || lord.loyalty === "Wavering" ? "serves to the end of the war" : "goes home"}</small></dd>` : ""}
       <dt>Drill</dt><dd>${(s.armies.drill[k]! / 10).toFixed(1)} months trained together</dd>
       <dt>Breaks</dt><dd>after losing ${Math.round(s.armies.breakPoint[k]! * 100)}% of its men</dd>
-      <dt>Pay</dt><dd>${s.armies.pay[k]!.toFixed(2)} gold a month${!hired && monthsOut <= 3 && s.armies.pay[k]! === 0 ? ` (free for ${3 - monthsOut} more month${3 - monthsOut === 1 ? "" : "s"})` : ""}</dd>
+      <dt>Pay</dt><dd>${retinue ? "paid by him, not you" : `${s.armies.pay[k]!.toFixed(2)} gold a month`}${!hired && !retinue && monthsOut <= 3 && s.armies.pay[k]! === 0 ? ` (free for ${3 - monthsOut} more month${3 - monthsOut === 1 ? "" : "s"})` : ""}</dd>
       <dt>Food</dt><dd>${fmt(rations / RATION_MONTH_DAYS)} rations a day, ${fmt(rations)} a month · ${fmt(food)} in the wagons (${rations > 0 ? (food / rations).toFixed(1) : "–"} months)<br><small>${supplyLine(k)}</small></dd>
     </dl>
     <h3 class="sub">Troops</h3>
@@ -4728,14 +4746,15 @@ function renderArmy(id: number): void {
         .filter(([, m]) => m > 0)
         .map(([a, m]) => {
           const n = Math.min(1000, Math.floor(m));
-          return `<tr><th>${ARM_LABEL[a]}</th><td>${fmt(m)}</td><td class="army-buttons">
+          return `<tr><th>${ARM_LABEL[a]}</th><td>${fmt(m)}</td><td class="army-buttons">${retinue ? "" : `
             <button class="paper small" data-split="${a}" data-men="${n}" title="Leave them here as the province's garrison${idle.length ? ", or under a commander at court" : ""}">Split ${fmt(n)}</button>
-            ${hired ? "" : `<button class="paper small" data-dismiss="${a}" data-men="${n}">Send ${fmt(n)} home</button>`}
+            ${hired ? "" : `<button class="paper small" data-dismiss="${a}" data-men="${n}">Send ${fmt(n)} home</button>`}`}
           </td></tr>`;
         })
         .join("")}
     </table>
-    ${hired ? "" : `<h3 class="sub">Train</h3>
+    ${retinue ? `<p class="hint">${esc(cmdOf(s.armies.commander[k]!).name)} leads only his own men: they can't be split, trained, joined to another army or handed over, and they cost you nothing. Win a battle with him and his loyalty rises.</p>` : ""}
+    ${hired || retinue ? "" : `<h3 class="sub">Train</h3>
     ${training
       ? `<p>${icon("hourglass", 1)} ${fmt(training.men)} levy infantry training as ${esc((ARM_LABEL[training.arm] ?? training.arm).toLowerCase())}: ${training.months} month${training.months === 1 ? "" : "s"} left${atHome ? "" : " (held: the army must stand at a castle or drill yard of your own)"}.</p>`
       : trainMen >= 1 && !atHome
@@ -4758,13 +4777,13 @@ function renderArmy(id: number): void {
         : "";
     })()}
     ${shipsHere.length ? `<h3 class="sub">Board ships</h3><div class="choices">${shipsHere.map((f) => `<button class="paper" data-board-fleet="${f.id}">${icon("anchor", 1)}Board ${esc(fleetTitle(f, titled, "the fleet without a leader"))} · room for ${fmt(s.navy.mine.find((m) => m.id === f.id)?.room ?? 0)}</button>`).join("")}</div>` : ""}
-    ${others.length ? `<h3 class="sub">Join another army here</h3><div class="choices">${others.map((j) => `<button class="paper" data-merge="${s.armies.id[j]!}">Into ${esc(titled(s.armies.commander[j]!))}'s army</button>`).join("")}</div>` : ""}
-    ${hired ? "" : `<h3 class="sub">Command</h3>
+    ${others.length && !retinue ? `<h3 class="sub">Join another army here</h3><div class="choices">${others.map((j) => `<button class="paper" data-merge="${s.armies.id[j]!}">Into ${esc(titled(s.armies.commander[j]!))}'s army</button>`).join("")}</div>` : ""}
+    ${hired || retinue ? "" : `<h3 class="sub">Command</h3>
     <div class="choices">
       ${idle.slice(0, 3).map((x) => `<button class="paper" data-hand="${x}" title="${skills(cmdOf(x))}">Hand over to ${esc(cmdOf(x).name)}</button>`).join("")}
       <button class="paper" data-leave>Leave the men as ${esc(provinces[here]!.name)}'s garrison</button>
     </div>`}
-    <div class="choices"><button class="paper" data-disband="${id}">${hired ? "Pay off the company" : "Send the whole army home"}</button></div>`;
+    <div class="choices"><button class="paper" data-disband="${id}">${hired ? "Pay off the company" : retinue ? "Send him home" : "Send the whole army home"}</button></div>`;
   bindClose();
   showPanel(true);
   panel.querySelectorAll<HTMLButtonElement>("[data-army]").forEach((b) => b.addEventListener("click", () => pickArmy(Number(b.dataset.army))));
@@ -5030,7 +5049,8 @@ function warRoomSection(): string {
   const s = snapshot!;
   const me = s.playerNation;
   const gathering = s.musters.reduce((t, m) => t + m.men, 0);
-  const mine = s.commanders.map((c, i) => ({ c, i })).filter(({ c }) => c.owner === me);
+  // Lords in the field show in the Lords' men rows; the rest wait at home, not at court.
+  const mine = s.commanders.map((c, i) => ({ c, i })).filter(({ c }) => c.owner === me && c.lord < 0);
   return `<h3 class="sub">Troops</h3>
     <p>${fmt(s.nationCapUsed[me]!)} men under arms or gathering, of a troop cap of ${fmt(s.nationTroopCap[me]!)}. Pay: ${s.pay.toFixed(1)} gold a month.</p>
     <p class="hint">Call men up from a province's Garrison tab, a thousand at a time.${gathering ? ` ${fmt(gathering)} men are gathering now.` : ""} Over the cap, pay doubles and levies desert.</p>
@@ -5038,6 +5058,7 @@ function warRoomSection(): string {
     <ol class="queue">${s.musters
       .map((m) => `<li><button class="paper small" data-garrison="${m.province}">${esc(provinces[m.province]!.name)}</button><span class="what"><small>${Math.ceil(m.men / 1000)} / ${rules.defines.recruit.queueMax} queued</small></span><span class="when">all ${days(m.daysAll)}</span></li>`)
       .join("")}</ol>` : ""}
+    ${lordsMenSection(rules, s.retinues, lordViews(), retinueLook(), titlesOf(me))}
     <h3 class="sub">Commanders</h3>
     ${mine
       .map(({ c, i }) => {
