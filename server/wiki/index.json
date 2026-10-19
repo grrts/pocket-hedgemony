@@ -6525,6 +6525,11 @@
      "level": 2
     },
     {
+     "id": "castle-supply",
+     "text": "Castle supply",
+     "level": 2
+    },
+    {
      "id": "storm",
      "text": "Storm",
      "level": 2
@@ -9792,6 +9797,11 @@
      "id": "sieges",
      "text": "Sieges",
      "level": 3
+    },
+    {
+     "id": "castles-starve-besiegers",
+     "text": "Castles starve besiegers",
+     "level": 4
     },
     {
      "id": "occupation-and-raids",
