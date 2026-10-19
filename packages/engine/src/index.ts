@@ -69,3 +69,9 @@ export { ungoverned } from "./recruit.ts";
 export { restoreSleeping, saveSleeping, spareSleepers, wakeRealm, type Waking, type WokenRealm } from "./sleeping.ts";
 export { createGoals, goalPulls, monthlyGoals, nearestLand, pullOf, timeFactor, type Goal, type GoalState } from "./goals.ts";
 export { chronicleView, goalViews, TURNING_POINTS, treeEventOf, type ChronicleRow, type ChronicleState, type ChronicleView, type GoalView, type TurningPoint } from "./chronicle.ts";
+
+// Men and ships whose commander dies go home (leaderless.ts); hung on the one death hook once every module has loaded.
+import { onPersonDeath as hangOnDeath } from "./people.ts";
+import { leaderless } from "./leaderless.ts";
+hangOnDeath(leaderless);
+export { armyHome, crownHeld, fleetHome } from "./leaderless.ts";

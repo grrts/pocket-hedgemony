@@ -1646,7 +1646,9 @@ function drawOverlay(o: OverlayContext): void {
     const besieged = new Map(s.sieges.map((st) => [st.province, st.by]));
     for (let k = 0; k < s.armies.id.length; k++) {
       const cmd = s.armies.commander[k]!;
-      if (cmd < 0 || !isKnown(s.armies.location[k]!) || aboard.has(s.armies.id[k]!)) continue;
+      // Troops without a commander are drawn only while they walk (home, after their general died: RECR-136), close in and with no banner.
+      const walking = cmd < 0 && (s.armies.route[k]!.length > 0 || s.armies.path[k]!.length > 0);
+      if ((cmd < 0 && !walking) || !isKnown(s.armies.location[k]!) || aboard.has(s.armies.id[k]!)) continue;
       const tile = s.armies.tile[k]!;
       // Fighting armies are drawn in their battle.
       if (s.armies.battle[k]! >= 0 && inBattle.has(tile)) continue;
@@ -1660,7 +1662,7 @@ function drawOverlay(o: OverlayContext): void {
       const id = s.armies.id[k]!;
       const moving = performance.now() - stepStart < stepMs && s.armies.trail[k]!.length > 0;
       const realm = nations[s.armies.owner[k]!]!;
-      const name = cmdOf(cmd).name;
+      const name = cmd >= 0 ? cmdOf(cmd).name : "";
       const dir = armyFacing(k);
       if (liv.living > 0) {
         // Besiegers ring the town; the others stand, or march in a column, on their tile.
@@ -1673,11 +1675,12 @@ function drawOverlay(o: OverlayContext): void {
         const men = s.armies.men[k]!;
         const heading = state === "standing" ? ([dir, 0] as const) : armyHeading(k, dir);
         pieces.push({
-          id, key: `a${id}`, point, x: at[0]!, y: at[1]!, color: realm.color, men, name, state, facing: heading, selected: selected.has(id), seed: location,
+          // Leaderless troops walking home take no orders, so they have nothing to tap.
+          ...(walking ? {} : { id }), key: `a${id}`, point, x: at[0]!, y: at[1]!, color: realm.color, men, name, state, facing: heading, selected: selected.has(id), seed: location,
           figures: formation({ men, foot: men - horse, horse, wagons: s.armies.food[k]! > 0, state, band: "living", facing: heading }),
         });
       }
-      if (liv.icons <= 0 || !onScreen(sx, sy)) continue;
+      if (walking || liv.icons <= 0 || !onScreen(sx, sy)) continue;
       // The commander in their realm's colours, kit of the era and age (feedback 56), at one size at every zoom (feedback 57).
       ctx.globalAlpha = liv.icons;
       const token = drawToken(ctx, {
@@ -2189,7 +2192,8 @@ function drawFleets(o: OverlayContext, ctx: CanvasRenderingContext2D, u: number,
       const box = drawHulls(o, f, liv, now, onScreen, selected, berthsUsed);
       if (box && liv.living >= 0.5) fleetHitBoxes.push({ id: f.id, mine, ...box });
     }
-    if (liv.icons <= 0) continue;
+    // Ships whose admiral died sail home with no fleet token: only their hulls show, close in (RECR-137).
+    if (liv.icons <= 0 || (f.admiral < 0 && f.fleeing)) continue;
     // Fleets on one tile (or in one port) fan out behind the first.
     const key = tiled && f.tile >= 0 ? f.tile : -1 - f.at;
     const nth = stack.get(key) ?? 0;
