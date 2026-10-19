@@ -43,7 +43,7 @@ import { fallenLine, rulerLines } from "./ui/ruler.ts";
 import { loadDefaultRuleset, START_SCENARIO } from "@ph/rules";
 import { hexToRgb, PALETTE, TERRAINS } from "./art/palette.ts";
 import { figureSprite, sprite, spriteUrl } from "./art/sprites.ts";
-import { icon, iconUrl, installUiArt, flagCanvas, flagUrl, UI_COLORS, type FlagOf } from "./art/ui.ts";
+import { icon, iconUrl, installUiArt, flagCanvas, flagUrl, UI_COLORS, type FlagOf, type IconName } from "./art/ui.ts";
 import { apparentAge, eraOfYear } from "./art/commanders.ts";
 import { lookOfCulture, setPortraitYear } from "./art/portraits.ts";
 import { EngineClient } from "./engineClient.ts";
@@ -111,7 +111,7 @@ import { COMMISSION_GOLD, hireGold, OFFICIALS, Rng, startFormOf } from "@ph/engi
 import { formName } from "@ph/engine/domain/government";
 import { PICKER_REGIONS, pickerRegions, startTrade, waysToGrow } from "@ph/engine/domain/scenario-setup";
 import { pickerCardHtml, regionListHtml, regionSelectHtml, strongIn, strongInWords, waysToGrowHtml } from "./ui/realmPicker.ts";
-import { BATTLE_STEP_MS, bannerAt, COUNTRY_CARD_TABS, endTurnInAuto, endTurnLabel, keyEndsTurn, newAutoTurns, SHELL as SHELL_RULES, startColumn, startIcons, stopAuto, switchAuto, WATCH_STEP_MS, weekPlayed, type AutoStop, type Platform as ShellPlatform } from "@ph/engine/domain/game-shell";
+import { BATTLE_STEP_MS, bannerAt, COUNTRY_CARD_TABS, endTurnInAuto, endTurnLabel, keyEndsTurn, newAutoTurns, REALM_BOOK_TABS, sectionOf, SHELL as SHELL_RULES, startColumn, startIcons, stopAuto, switchAuto, tabHolds, WATCH_STEP_MS, weekPlayed, type AutoStop, type Platform as ShellPlatform } from "@ph/engine/domain/game-shell";
 import { autosaveDue, continueTarget, longDate, newCampaign, newManualSave, savesConfig, type Campaign, type Platform as SavePlatform } from "@ph/engine/domain/saves";
 import { SaveStore, type StoredSave } from "./saves/store.ts";
 import { animationsPref, autosaveEvery, autosavesKept, battleStepMs, dayMs, livingPrefs, longPressMs, mapDetail, mapPower, onPrefs, setPref, textZoom } from "./settings/prefs.ts";
@@ -356,8 +356,6 @@ app.innerHTML = `
     <button class="icon-only" id="home" title="Go to your capital">${icon("castle", 3, "Capital")}</button>
     <button class="icon-only" id="armies" title="Your commanders" aria-expanded="false" hidden>${icon("swords", 3, "Commanders")}</button>
     <button class="icon-only" id="sound" title="Sound and music" aria-expanded="false">${icon("speaker", 3, "Sound")}</button>
-    <button class="icon-only" id="trophy" title="Achievements">${icon("trophy", 3, "Achievements")}<span class="dot" hidden></span></button>
-    <button class="icon-only" id="settings" title="Settings">${icon("cog", 3, "Settings")}</button>
   </div>
   <button class="ach-toast framed" id="ach-toast" hidden></button>
   <div class="lens-menu sound-menu framed" id="sound-menu" hidden></div>
@@ -396,7 +394,6 @@ const eventsSeen = new Set<string>();
 /** The battle the player is watching (its province), and how it ended once it has. */
 let watching: { province: number; result?: string } | null = null;
 const soundButton = document.querySelector<HTMLButtonElement>("#sound")!;
-const trophyButton = document.querySelector<HTMLButtonElement>("#trophy")!;
 const achToast = document.querySelector<HTMLButtonElement>("#ach-toast")!;
 /** Achievements (domain/achievements "How the player uses it"): the profile on the device, and the card's state. */
 const achProfile = loadProfile();
@@ -408,7 +405,6 @@ let achNew = new Set<string>();
 /** Unlocks waiting for their toast. */
 const achToasts: { id: string; date: string; province?: number }[] = [];
 const soundMenu = document.querySelector<HTMLElement>("#sound-menu")!;
-const settingsButton = document.querySelector<HTMLButtonElement>("#settings")!;
 /** First-campaign hints (onboarding TUT-121 … TUT-130). */
 const hints = new Hints();
 /** The commander list is put away. */
@@ -516,7 +512,6 @@ document.addEventListener("click", (e) => {
   restyleProvinces();
   renderPanel();
 });
-trophyButton.addEventListener("click", () => openAchievements());
 // The Empire card opens from the Institutions row, a member's badge, a News card or the map mode (INST-080).
 document.addEventListener("click", (e) => {
   if (!(e.target as HTMLElement).closest("[data-empire-open]") || !snapshot?.empire) return;
@@ -595,8 +590,11 @@ function openAchievements(at: string | null = null): void {
 /** The trophy button carries a dot while an unlock has not been looked at (ACH-078). */
 function renderTrophy(): void {
   const n = unseen(achProfile);
-  trophyButton.querySelector<HTMLElement>(".dot")!.hidden = n === 0;
-  trophyButton.title = n ? `Achievements: ${n} new` : "Achievements";
+  const menu = hud.querySelector<HTMLElement>(".game-menu");
+  if (menu) {
+    menu.querySelector<HTMLElement>(".dot")!.hidden = n === 0;
+    menu.title = n ? `Game menu: ${n} new achievement${n === 1 ? "" : "s"}` : "Game menu";
+  }
 }
 
 function renderAchievements(): void {
@@ -754,8 +752,6 @@ renderSoundButton();
 renderTrophy();
 
 // ---- settings ----
-// The cog opens the Settings screen straight from the map; Back returns to the map (SET-132).
-settingsButton.addEventListener("click", () => openShell("settings", true));
 hints.onChange = () => {
   if (shell.view === "settings") renderShell();
 };
@@ -2811,7 +2807,7 @@ function renderHud(): void {
   const n = nations[me]!;
   // The plaques, their order and what each opens come from the engine's top-bar model (REALM-205).
   const open = (o: Opens) => (o && "card" in o && o.tab ? ` data-realm-open="${o.tab}"` : "");
-  hud.innerHTML = `<button class="icon-only game-menu" data-shell="menu" title="Game menu" aria-label="Game menu">${icon("menu", 2)}</button>
+  hud.innerHTML = `<button class="icon-only game-menu" data-shell="menu" title="Game menu" aria-label="Game menu">${icon("menu", 2)}<span class="dot" hidden></span></button>
     ` + topBar({ ...s, peaceOffers: s.peaceOffers.filter((o) => !putOffOffers.has(o.id)) }, unread, asksOf(s).length + empireAsks(s.empire) + shogunateAsks(s.shogunate))
     .map((p) => {
       switch (p.key) {
@@ -2830,6 +2826,7 @@ function renderHud(): void {
       }
     })
     .join("\n    ");
+  renderTrophy();
 }
 
 /** Wars the player fights, with the player's side first. */
@@ -5540,6 +5537,56 @@ function treasurySection(): string {
 const COUNTRY_TAB_KEYS: Record<string, "general" | "diplomacy" | "trade" | "military"> = { General: "general", Diplomacy: "diplomacy", Trade: "trade", Army: "military" };
 const COUNTRY_TABS = COUNTRY_CARD_TABS.map((label) => [COUNTRY_TAB_KEYS[label]!, label] as const);
 
+// ---- your realm's six sections (SHELL-165..167) ----
+
+/** Each page of the Realm book (SHELL-165) and the tab of the country card that draws it. */
+const PAGE_KEYS: Record<string, RealmTab> = {
+  Overview: "general",
+  Government: "government",
+  Heritage: "heritage",
+  Score: "score",
+  Treasury: "treasury",
+  Trade: "trade",
+  Food: "food",
+  Provinces: "provinces",
+  Officials: "officials",
+  Lords: "lords",
+  Colonies: "colonies",
+  [HUNT_TAB.label]: HUNT_TAB.id,
+  Army: "military",
+  Navy: "navy",
+  Diplomacy: "diplomacy",
+  Research: "learning",
+  Peoples: "peoples",
+};
+const SECTION_ICONS: Record<string, IconName> = { Realm: "crown", Economy: "coin", Lands: "castle", Military: "swords", Diplomacy: "scroll", Research: "hammer" };
+/** The page each section was last left on, so a section opens where the player was (SHELL-166). */
+const sectionPage = new Map<string, RealmTab>();
+
+/** The page a tab belongs to: pages opened from a page keep it lit (Free companies under Army, Hire a fleet under Navy). */
+const pageOf = (t: RealmTab): string => {
+  const key = t === "mercenaries" ? "military" : t === "hireFleets" ? "navy" : t;
+  return Object.keys(PAGE_KEYS).find((p) => PAGE_KEYS[p] === key) ?? "Overview";
+};
+
+/** The six sections in one row, and the open section's pages in a lower row when it has more than one (SHELL-167). */
+function realmBookNav(r: number, answerWaits: boolean): string {
+  const tribe = snapshot!.tribes.mine;
+  const page = pageOf(realmTab);
+  const open = sectionOf(page) ?? "Realm";
+  sectionPage.set(open, realmTab);
+  const label = (p: string) => (p === "Officials" ? cap(titlesOf(r).officials) : p === "Lords" ? cap(titlesOf(r).lords) : p);
+  const sections = REALM_BOOK_TABS.map((sec) => {
+    const marked = sec === "Diplomacy" && answerWaits;
+    return `<button class="section${sec === open ? " on" : ""}${marked ? " marked" : ""}" data-realm-section="${sec}"${sec === open ? ' aria-current="page"' : ""}${marked ? ` aria-label="${sec}: waits for your answer"` : ""}>${icon(SECTION_ICONS[sec]!, 2)}<span>${sec}</span></button>`;
+  }).join("");
+  // Hunting grounds is a page only for a tribal realm, marked while settlers or asks wait (TRIBE).
+  const pages = tabHolds(open).filter((p) => p !== HUNT_TAB.label || tribe);
+  const waits = (p: string) => p === HUNT_TAB.label && !!tribe && (tribe.settlers.length > 0 || tribe.asks.length > 0);
+  const row = pages.length > 1 ? `<nav class="tabs pages">${pages.map((p) => `<button class="tab${p === page ? " on" : ""}${waits(p) ? " marked" : ""}" data-realm-tab="${PAGE_KEYS[p]}">${label(p)}</button>`).join("")}</nav>` : "";
+  return `<nav class="sections" aria-label="Your realm">${sections}</nav>${row}`;
+}
+
 /** A realm's Trade tab: its wealth, its richest lands, and for your own realm what trade brought this month. */
 function realmTradeTab(r: number, own: number[], wealth: number, mine: boolean): string {
   const s = snapshot!;
@@ -5648,7 +5695,7 @@ function renderRealm(r: number): void {
     : general;
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(n.name)}</h2>${closeButton()}</header>
-    ${s ? `<nav class="tabs">${COUNTRY_TABS.map(([key, label]) => tab(key, label, key === "diplomacy" && answerWaits)).join("")}${mine ? tab("government", "Government") + tab("peoples", "Peoples") + tab("score", "Score") + tab("treasury", "Treasury") + tab("food", "Food") + tab("provinces", "Provinces") + tab("learning", "Research") + tab("navy", "Navy") + tab("colonies", "Colonies") + (s.tribes.mine ? tab(HUNT_TAB.id, HUNT_TAB.label, s.tribes.mine.settlers.length > 0 || s.tribes.mine.asks.length > 0) : "") + tab("officials", cap(titlesOf(r).officials)) + tab("lords", cap(titlesOf(r).lords)) : ""}${tab("heritage", "Heritage")}</nav>` : `<nav class="tabs">${tab("general", "General")}${tab("heritage", "Heritage")}</nav>`}
+    ${s && mine ? realmBookNav(r, answerWaits) : s ? `<nav class="tabs">${COUNTRY_TABS.map(([key, label]) => tab(key, label, key === "diplomacy" && answerWaits)).join("")}${tab("heritage", "Heritage")}</nav>` : `<nav class="tabs">${tab("general", "General")}${tab("heritage", "Heritage")}</nav>`}
     ${content}`;
   bindClose();
   showPanel(true);
@@ -5722,6 +5769,13 @@ function renderRealm(r: number): void {
       realmTab = b.dataset.realmOpenTab as typeof realmTab;
       // A line naming an invention opens the tree on it (GOV-078).
       if (b.dataset.learnPick) Object.assign(learningUi, { part: "tree", pick: b.dataset.learnPick, center: b.dataset.learnPick, slide: true });
+      renderPanel();
+    }),
+  );
+  panel.querySelectorAll<HTMLButtonElement>("[data-realm-section]").forEach((b) =>
+    b.addEventListener("click", () => {
+      const section = b.dataset.realmSection!;
+      realmTab = sectionPage.get(section) ?? PAGE_KEYS[tabHolds(section)[0]!]!;
       renderPanel();
     }),
   );
@@ -6852,6 +6906,7 @@ function gameMenuHtml(): string {
       <button class="paper" data-shell="save">${icon("scroll", 2)} Save</button>
       <button class="paper" data-shell="load">${icon("scroll", 2)} Load</button>
       <button class="paper" data-shell="settings">${icon("cog", 2)} Settings</button>
+      <button class="paper" data-shell="achievements">${icon("trophy", 2)} Achievements${unseen(achProfile) ? ` <small>${unseen(achProfile)} new</small>` : ""}</button>
       <button class="paper" data-shell="exit">${icon("castle", 2)} Exit to main menu</button>
     </div>
   </div>`;
@@ -7072,6 +7127,10 @@ document.addEventListener("click", (e) => {
   const v = b.dataset.shell!;
   if (v === "map") closeShell();
   else if (v === "exit") void exitToMenu();
+  else if (v === "achievements") {
+    closeShell();
+    openAchievements();
+  }
   else {
     if (v === "settings" && b.dataset.settingsSection) openSettingsAt(b.dataset.settingsSection);
     openShell(v as ShellView, shell.view === null ? !snapshot : shell.fromStart);

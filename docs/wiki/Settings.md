@@ -4,7 +4,7 @@ Settings let you shape how Pocket Hegemony looks, sounds and handles on your dev
 
 ## Where you find it
 
-Open Settings from the cog in the side tools, from the game menu (the three-line button at the top left of the map, or `Esc`) or from the start screen. Sections are on the left and their rows on the right; in a tall window the sections come first. Each row says what it does under its name, a red dot marks a value you changed, and a long press on the name (or a right-click) puts it back. Reset this section is at the end of each section.
+Open Settings from the game menu (the three-line button at the top left of the map, or `Esc`) or from the start screen. Sections are on the left and their rows on the right; in a tall window the sections come first. Each row says what it does under its name, a red dot marks a value you changed, and a long press on the name (or a right-click) puts it back. Reset this section is at the end of each section.
 
 What the game has built so far:
 

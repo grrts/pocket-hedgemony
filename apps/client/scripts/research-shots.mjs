@@ -71,6 +71,7 @@ for (const [size, device, realms] of sizes) {
     else {
       // The alert may have given way to others: the realm button in the top bar opens the card.
       await page.click(".hud [data-realm]");
+      await page.click("#panel [data-realm-section=Research]").catch(() => {});
       await page.click("[data-realm-tab=learning]");
     }
     await page.waitForSelector(".learn-screen");
@@ -155,6 +156,7 @@ for (const [size, device, realms] of sizes) {
     await checkTargets("in Schools");
     await press(page.locator("[data-learn-part=tree]"));
     // The General tab's line, then another realm's card (RSCH-088, RSCH-104).
+    await page.click("#panel [data-realm-section=Realm]").catch(() => {});
     await page.click("[data-realm-tab=general]");
     await page.waitForTimeout(200);
     await page.locator(".learning-line").scrollIntoViewIfNeeded();

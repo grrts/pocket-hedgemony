@@ -63,7 +63,7 @@ Feature: The track list
 
     Examples:
       | condition | track |
-      | the realm book is open on its Abroad tab in peace | diplomacy |
+      | the realm book is open on its Diplomacy section in peace | diplomacy |
       | a plague event chain is active | crisis |
       | the player has explorers active and the camera is over open ocean | exploration |
       | a revolution period touches the player in Era IV | revolution |

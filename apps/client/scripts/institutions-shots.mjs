@@ -35,7 +35,7 @@ for (const [name, device] of [
   await page.evaluate(() => document.querySelector("[data-hint=stop]")?.click());
   await page.evaluate(() => document.querySelectorAll(".alert .dismiss").forEach((b) => b.click()));
   await tap(".hud button.realm");
-  await tap("[data-realm-tab=diplomacy]");
+  await tap("#panel [data-realm-section=Diplomacy]");
   await page.waitForTimeout(300);
   await shot("diplomacy-row");
   await tap("[data-empire-open]");

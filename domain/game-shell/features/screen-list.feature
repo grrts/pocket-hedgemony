@@ -29,7 +29,7 @@ Feature: Screen list
       | credits       | Full        | Back                                | main_menu or final_result                 | credits                       |
       | map           | Home        | your capital or last army           | opens game_menu                           | game music                    |
       | card          | Sheet       | first line                          | previous card or map                      | unchanged                     |
-      | realm_book    | Full        | last tab's first item               | map                                       | unchanged; diplomacy mood on Abroad |
+      | realm_book    | Full        | last tab's first item               | map                                       | unchanged; diplomacy mood on Diplomacy |
       | game_menu     | Modal       | Return to the map                   | map                                       | unchanged                     |
       | turn          | Overlay     | none                                | none                                      | unchanged                     |
       | battle        | Full        | Retreat while it runs, Carry on after | back to the map while battles run (they keep running); where opened for a replay | war tracks      |

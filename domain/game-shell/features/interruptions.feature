@@ -23,9 +23,9 @@ Feature: Interruptions
 
   @SHELL-102
   Scenario Outline: Coming back while in memory
-    Given the player was on the tab "Army" of the Realm book scrolled halfway
+    Given the player was on the tab "Military" of the Realm book scrolled halfway
     When <event>
-    Then the tab "Army" of the Realm book is shown at the same scroll and camera
+    Then the tab "Military" of the Realm book is shown at the same scroll and camera
     And the screen "title" is not shown
     And the track "load_resume" plays
 

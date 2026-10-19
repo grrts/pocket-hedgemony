@@ -513,6 +513,7 @@
     },
     "roads": {
       "searchMargin": 4,
+      "straightness": 0.4,
       "cost": {
         "default": 1,
         "forest": 2,

@@ -100,6 +100,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   // Its card from the Navy tab.
   await page.click(".hud button.realm");
   await page.waitForTimeout(300);
+  await page.click("#panel [data-realm-section=Military]").catch(() => {});
   await page.click("[data-realm-tab=navy]");
   await page.waitForTimeout(300);
   await shot("4-navy-tab");
@@ -185,6 +186,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   }
   await page.click(".hud button.realm");
   await page.waitForTimeout(300);
+  await page.click("#panel [data-realm-section=Military]").catch(() => {});
   await page.click("[data-realm-tab=navy]");
   await page.waitForTimeout(300);
   await page.locator(".panel h3.sub", { hasText: "Blockades" }).scrollIntoViewIfNeeded().catch(() => {});
