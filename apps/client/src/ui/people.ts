@@ -1,4 +1,5 @@
 import { officialEffect, OFFICIALS, type Snapshot, type Titles } from "@ph/engine";
+import { fold } from "./fold.ts";
 import { DEFAULT_TITLES, an, cap } from "./titles.ts";
 import type { Ruleset } from "@ph/rules";
 import { siegeHeld } from "@ph/engine/domain/map-presentation";
@@ -115,9 +116,8 @@ export function officialsTab(rules: Ruleset, list: { province: number; official:
   const older = empty.filter((x) => !newLands.includes(x.province));
   return `${fresh}<p><b>${filled.length}</b> ${esc(filled.length === 1 ? t.official : t.officials)} run your royal provinces: ${[...types].sort((a, b) => b[1] - a[1]).map(([k, c]) => `${c} ${esc(c === 1 ? k.toLowerCase() : plural(k.toLowerCase()))}`).join(", ")}.${lordPosts ? ` Your ${esc(t.lords)}' own ${esc(t.officials)} run their ${lordPosts} provinces.` : ""}</p>
     ${missing.length ? `<p class="hint">No royal post has ${missing.map((k) => `a ${esc(k.toLowerCase())}`).join(", ")}: those come only as foreign specialists.</p>` : ""}
-    <p class="hint">Each type helps the province it runs, at half in his first year and in full after 5 years there. Open ${esc(an(t.official))} to move him where his type helps most.</p>
     ${older.length ? `<h3 class="sub">Empty posts · ${older.length}</h3><p class="hint">Half tax and recruits until ${esc(an(t.official))} is moved in or hired. Tap one to fill it.</p><p class="post-buttons">${older.map((x) => `<button class="paper small" data-official="${x.province}">${esc(rules.provinces[x.province]!.name)}</button>`).join(" ")}</p>` : ""}
-    <h3 class="sub">In post · ${filled.length}</h3>
+    ${fold("officials-in-post", `In post · ${filled.length}`, `Tap ${esc(an(t.official))} to move him`, `<p class="hint">Each type helps the province it runs, at half in his first year and in full after 5 years there. Open ${esc(an(t.official))} to move him where his type helps most.</p>
     <div class="lord-list">${filled
       .map((o) => {
         const e = officialEffect(o.post, o.years);
@@ -126,7 +126,7 @@ export function officialsTab(rules: Ruleset, list: { province: number; official:
           <span class="lord-state">${servicePips(o.years, e.share)}<small>${yearsText(o.years)}</small></span>
         </button>`;
       })
-      .join("")}</div>`;
+      .join("")}</div>`)}`;
 }
 
 /** A province the official could move to: who holds that post now, and how well his type suits it. */
