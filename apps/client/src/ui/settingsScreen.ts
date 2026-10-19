@@ -52,8 +52,22 @@ export function setHintsRows(rows: HintsRows): void {
   hintsRows = rows;
 }
 
+/**
+ * Account and cloud saves draws its own card (accounts-design §3) and shows
+ * only when the build has a server to sync with (D-SET-22).
+ */
+export interface OwnSection {
+  html(): string;
+  /** `redraw` draws the screen again while it is still shown, keeping the scroll. */
+  bind(card: HTMLElement, redraw: () => void): void;
+}
+const ownSections = new Map<string, OwnSection>();
+export function setOwnSection(section: string, own: OwnSection): void {
+  ownSections.set(section, own);
+}
+
 const rowsOf = (section: string) => sectionRows(prefs, section, env).filter((id) => BUILT.has(id));
-const sections = () => prefs.cat.sections.filter((s) => rowsOf(s).length);
+const sections = () => prefs.cat.sections.filter((s) => ownSections.has(s) || rowsOf(s).length);
 const nameOf = (id: string) => STRINGS[`settings.${id}.name`] ?? id;
 const descOf = (id: string) => STRINGS[`settings.${id}.desc`] ?? "";
 
@@ -73,7 +87,11 @@ export function openSettingsAt(section: string): void {
  */
 export function renderSettings(root: HTMLElement, close: () => void): void {
   if (!sections().includes(ui.section)) ui.section = sections()[0]!;
+  const redraw = () => {
+    if (root.querySelector(".settings")) keepScroll(root, () => renderSettings(root, close));
+  };
   const rows = rowsOf(ui.section);
+  const own = ownSections.get(ui.section);
   root.innerHTML = `
     <div class="shell-card settings framed" data-open="${ui.open}" role="dialog" aria-label="Settings">
       <header><h2 class="ribbon">Settings</h2><span class="panel-buttons"><button class="close" aria-label="Close">${icon("close", 2)}</button></span></header>
@@ -84,8 +102,8 @@ export function renderSettings(root: HTMLElement, close: () => void): void {
         <div class="settings-rows">
           <button class="paper settings-back" data-back>${icon("collapse", 1)} Sections</button>
           <h3 class="sub">${esc(STRINGS[`settings.section.${ui.section}`] ?? ui.section)}</h3>
-          ${rows.map(rowHtml).join("")}
-          <button class="paper reset-section" data-reset-section>Reset this section</button>
+          ${own ? own.html() : `${rows.map(rowHtml).join("")}
+          <button class="paper reset-section" data-reset-section>Reset this section</button>`}
         </div>
       </div>
     </div>`;
@@ -103,7 +121,8 @@ export function renderSettings(root: HTMLElement, close: () => void): void {
     ui.open = false;
     renderSettings(root, close);
   });
-  card.querySelector("[data-reset-section]")!.addEventListener("click", () => {
+  if (own) own.bind(card, redraw);
+  card.querySelector("[data-reset-section]")?.addEventListener("click", () => {
     resetPrefSection(ui.section);
     if (ui.section === "gameplay") {
       hintsRows?.setOn(true);
