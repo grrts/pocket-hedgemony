@@ -1,22 +1,32 @@
 {
-  "$comment": "The 1378 start scenario (X-25), being built (milestone 10, step 5). Not bundled yet: the game still starts from scenarios/1444 until the switch-over (step 7). Each region's data lives in regions/<key>/ with the same file names and shapes as the 1444 folder; packages/rules/test/scenario-1378.test.ts reads and checks them together. The world/ folder (the generated map) comes when the regions are joined and tools/mapgen is run for this scenario.",
+  "$comment": "The 1378 start scenario (X-25), milestone 10. The regions' data lives in regions/<key>/; tools/domain-data/build-1378.py joins them into the files beside this one, and tools/mapgen/mapgen.ts 1378 builds world/ from those. New campaigns still start in 1444 until the switch-over (step 7); this start runs behind the dev switch ?start=1378 (PH_START=1378 in Node), read through packages/rules/src/start.ts.",
   "id": "1378",
   "name": "Autumn 1378",
-  "date": { "year": 1378, "month": 9, "day": 20 },
+  "date": {
+    "year": 1378,
+    "month": 9,
+    "day": 20
+  },
   "eras": {
     "$comment": "Era I is stretched back to the start (X-25), so the start falls in Era I as in 1444.",
     "start": "I",
-    "before_start": ["A", "M"]
+    "before_start": [
+      "A",
+      "M"
+    ]
   },
-  "regions": ["europe-west", "east", "asia", "africa-americas"],
+  "regions": [
+    "europe-west",
+    "east",
+    "asia",
+    "africa-americas",
+    "arabia"
+  ],
   "files": {
-    "regions/<key>/map-nations.json": "the region's map nations with their capitals (SETUP-040)",
-    "regions/<key>/map-owners.json": "owner rules handing the region's provinces to map nations, first match wins (SETUP-041); regions are joined in the order listed in regions, so a rule in another region's country is narrowed by admin1 or bbox",
-    "regions/<key>/rulers.json": "each map realm's ruler on the start day (REALM-233)",
-    "regions/<key>/culture-start.json": "court tongues, province tongues and faiths on the start day (CULT-094)",
-    "regions/<key>/relations.json": "relations and facts between realms on the start day (DIPL-020, SETUP-022)",
-    "regions/<key>/subjects.json": "subject records and stances on the start day (SUBJ)",
-    "regions/<key>/sleeping-realms.json": "realms not yet born on the start day, asleep until they form (X-24, X-25)",
-    "regions/<key>/README.md": "what the region covers, its sources and confidence"
+    "regions/<key>/": "each region's part, in the shapes of the 1444 folder (see regions/README.md); the source of every joined file",
+    "map-nations.json, map-owners.json, rulers.json, culture-start.json, relations.json, subjects.json, subjects-rulers.json": "the regions joined in the order of regions (generated; fix the region and re-run build-1378.py)",
+    "map-to-catalogue.json": "map nations whose 1378 catalogue record has another id, over scenario-setup.json's map_to_catalogue (generated)",
+    "sleeping-realms.json, ports.json": "sleeping realms and port towns by [lon, lat] or owner-rule selector (generated); mapgen places them in world/",
+    "world/": "the generated map (map, nations, provinces, sleeping realms, ports, the build report, and from-1444.json mapping each 1444 province to this map's) built by tools/mapgen"
   }
 }

@@ -34,9 +34,9 @@ export function newWorld(kind: MapKind, seed: number, rules: Ruleset = rulesFor(
 function realScenario(): { rules: Ruleset; map: MapTiles } {
   if (real) return real;
   const rules = loadDefaultRuleset();
-  const dir = new URL("../../../apps/client/public/map/", import.meta.url);
-  const ids = decodeRgb(new URL("provinces.png", dir).pathname);
-  const terrain = decodeRgb(new URL("terrain.png", dir).pathname);
+  const dir = new URL("../../../apps/client/public/", import.meta.url);
+  const ids = decodeRgb(new URL(rules.map.provinceImage, dir).pathname);
+  const terrain = decodeRgb(new URL(rules.map.terrainImage, dir).pathname);
   const province = new Uint16Array(ids.width * ids.height);
   for (let p = 0, i = 0; p < province.length; p++, i += 3) province[p] = (ids.rgb[i]! << 16) | (ids.rgb[i + 1]! << 8) | ids.rgb[i + 2]!;
   real = { rules, map: { width: ids.width, height: ids.height, province, terrain: terrain.rgb } };

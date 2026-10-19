@@ -1,6 +1,6 @@
 # The 1378 scenario, by region
 
-Each folder here is one region's part of the 1378 start (X-25, milestone 10 step 5): `europe-west`, `east`, `asia` and `africa-americas`. A region writes only its own folder, so the four can be built side by side.
+Each folder here is one region's part of the 1378 start (X-25, milestone 10 step 5): `europe-west`, `east`, `asia`, `africa-americas` and `arabia` (a stand-in from the 1444 data). A region writes only its own folder, so the four can be built side by side.
 
 Every file is optional and has the shape of its 1444 counterpart in `scenarios/1444/`:
 
@@ -24,4 +24,5 @@ Only the holder writes a catch-all owner rule for a country; others narrow their
 | Region | Countries (ISO3) |
 |---|---|
 | `east` | ALB, ARM, AZE, BGR, BIH, BLR, CYN, CYP, ESB, EST, GEO, GRC, HRV, HUN, IRN, IRQ, KAZ, KGZ, KOS, LTU, LVA, MDA, MKD, MNE, POL, ROU, RUS, SRB, SVK, TJK, TKM, TUR, UKR, UZB, WSB, AFG, and the Mamluk lands EGY, ISR, JOR, LBN, PSX, SYR |
+| `arabia` | SAU, YEM, OMN, and eastern LBY for the Mamluks (a stand-in from the 1444 data; see its README) |
 | `europe-west`, `asia`, `africa-americas` | every other country, by the region their 1444 realms belong to |
