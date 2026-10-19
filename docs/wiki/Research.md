@@ -420,6 +420,8 @@ Research plays one study at a time, with a queue of up to 5 behind it. Every cou
 
 ## Numbers
 
+Every value the game uses, made from its config so it always matches the game: [Research data](Data-Research). How they combine: [Formulas](Formulas).
+
 All research numbers except the era dates are placeholders. The design names no config file, so key names other than the invention row fields are the spec's proposals.
 
 | Value | Config key | Design value | Provisional? |

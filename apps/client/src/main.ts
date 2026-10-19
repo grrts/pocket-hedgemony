@@ -110,17 +110,18 @@ import {
   type FormationState,
 } from "@ph/engine/domain/map-presentation";
 import { provinceLevy } from "@ph/engine/domain/recruiting";
-import { detailBands } from "@ph/engine/domain/map-presentation";
+import { detailBands, EFFECTS, holderOf, momentParticles, moments, momentSeconds, momentsShown, type MomentKind } from "@ph/engine/domain/map-presentation";
+import { ParticleField } from "./map/particles.ts";
 import { TownLayer, townInfo } from "./map/towns.ts";
 import { bedUnderCamera, musicFacts, newFactMemory, playerPalette, playerWars, remember, type FactMemory } from "./audio/facts.ts";
-import { COMMISSION_GOLD, hireGold, OFFICIALS, Rng, startFormOf } from "@ph/engine";
+import { COMMISSION_GOLD, commissionSkills, hireGold, OFFICIALS, Rng, startFormOf } from "@ph/engine";
 import { formName } from "@ph/engine/domain/government";
 import { PICKER_REGIONS, pickerRegions, startTrade, waysToGrow } from "@ph/engine/domain/scenario-setup";
 import { pickerCardHtml, regionListHtml, regionSelectHtml, strongIn, strongInWords, waysToGrowHtml } from "./ui/realmPicker.ts";
 import { BATTLE_STEP_MS, bannerAt, COUNTRY_CARD_TABS, endTurnInAuto, endTurnLabel, keyEndsTurn, newAutoTurns, realmOverview, REALM_BOOK_TABS, sectionOf, SHELL as SHELL_RULES, startColumn, startIcons, stopAuto, switchAuto, tabHolds, WATCH_STEP_MS, weekPlayed, type AutoStop, type OverviewTile, type Platform as ShellPlatform } from "@ph/engine/domain/game-shell";
 import { autosaveDue, continueTarget, longDate, newCampaign, newManualSave, saveStart, savesConfig, type Campaign, type Platform as SavePlatform } from "@ph/engine/domain/saves";
 import { SaveStore, type StoredSave } from "./saves/store.ts";
-import { animationsPref, autosaveEvery, autosavesKept, battleStepMs, dayMs, livingPrefs, longPressMs, mapDetail, mapPower, onPrefs, setPref, textZoom } from "./settings/prefs.ts";
+import { animationsPref, autosaveEvery, autosavesKept, battleStepMs, batteryOn, dayMs, livingPrefs, longPressMs, mapDetail, mapPower, onPrefs, setPref, textZoom } from "./settings/prefs.ts";
 import { openSettingsAt, renderSettings, setHintsRows } from "./ui/settingsScreen.ts";
 
 const rules = loadDefaultRuleset();
@@ -198,13 +199,14 @@ type Commander = Snapshot["commanders"][number];
 const postOf = (x: Commander) => snapshot?.navy.fleets.find((f) => f.id === x.fleet)?.post ?? "admiral";
 /**
  * A commander's name with his rank in his realm's language (feedback 125):
- * his post at the head of a fleet (admiral, commodore or viceroy), general
- * otherwise. A hired captain's rank came with his name, in his company's language.
+ * his post at the head of a fleet (admiral, commodore or viceroy), admiral at court for one
+ * commissioned to lead fleets, general otherwise (RECR-128). A hired captain's rank came with his
+ * name, in his company's language.
  */
-const titledOf = (x: Commander) => (x.origin === "a hired captain" || x.owner < 0 || x.lord >= 0 ? x.name : rankedName(rules, x.owner, x.name, x.fleet >= 0 ? postOf(x) : "general"));
+const titledOf = (x: Commander) => (x.origin === "a hired captain" || x.owner < 0 || x.lord >= 0 ? x.name : rankedName(rules, x.owner, x.name, x.fleet >= 0 ? postOf(x) : x.sea ? "admiral" : "general"));
 const titled = (c: number) => titledOf(cmdOf(c));
 /** The same post in plain English, shown beside the ranked name. */
-const roleOf = (x: Commander) => (x.origin === "a hired captain" ? "hired captain" : x.lord >= 0 ? titlesOf(x.owner).lord : x.fleet >= 0 ? postOf(x) : "commander");
+const roleOf = (x: Commander) => (x.origin === "a hired captain" ? "hired captain" : x.lord >= 0 ? titlesOf(x.owner).lord : x.fleet >= 0 ? postOf(x) : x.sea ? "admiral" : "general");
 const neighborIdx = provinces.map((p) => p.neighbors.map((id) => provinceIndex.get(id)!));
 // The same, flat, for walks over the whole map each turn.
 const neighborStart = new Int32Array(provinces.length + 1);
@@ -334,6 +336,8 @@ let litLord = -1;
 let grantOpen = false;
 /** The lord's screen lists every royal province to grant, not just the nearest. */
 let grantAll = false;
+/** The lord whose assassin confirm card is open on his screen, -1 = none (REALM-284). */
+let assassinAsk = -1;
 /** Which tab of the province overview is open. */
 type ProvinceTab = "overview" | "people" | "garrison" | "land" | "build" | "port";
 let provinceTab: ProvinceTab = "overview";
@@ -492,12 +496,14 @@ document.addEventListener("click", (e) => {
   const b = (e.target as HTMLElement).closest<HTMLButtonElement>("[data-commission]");
   if (!b || b.disabled) return;
   const province = Number(b.dataset.commission);
-  void act({ type: "commission", province }).then(() => {
+  const sea = b.dataset.commissionSea !== undefined;
+  void act({ type: "commission", province, sea }).then(() => {
     if (!snapshot || snapshot.rejectedOrders.length) return;
     officialView = -1;
     newsView = false;
     realmView = snapshot.playerNation;
-    realmTab = "military";
+    // A general waits in the Military tab's Commanders list, an admiral on the Navy tab.
+    realmTab = sea ? "navy" : "military";
     renderPanel();
   });
 });
@@ -1322,7 +1328,7 @@ function drawOverlay(o: OverlayContext): void {
       const [sx, sy] = o.toScreen(p.x!, p.y!);
       if (!onScreen(sx, sy)) return;
       const color = nations[own]!.color;
-      const img = sprite(settlementOf(p.population), color, sc);
+      const img = sprite(settlementOf(peopleNow(i)), color, sc);
       const x = Math.round(sx - img.width / 2);
       const y = Math.round(sy - img.height / 2);
       const walls = wallsAt(i);
@@ -1743,6 +1749,8 @@ function drawOverlay(o: OverlayContext): void {
     }
     ctx.globalAlpha = 1;
   }
+  // The map's moments over everything, where the player is looking (VIEW-140).
+  drawParticles(o);
   if (animating) view.invalidate();
   else if (figuresTicking && !figureTick) figureTick = setTimeout(() => ((figureTick = 0), view.invalidate()), 1000 / LIVING_MAP.figures.frameRate);
   if (performance.now() - stepStart < stepMs) view.invalidate();
@@ -2524,11 +2532,23 @@ function drawColonies(o: OverlayContext, ctx: CanvasRenderingContext2D, u: numbe
 }
 
 /** Settlement drawn for a province by its people (thousands). */
-function settlementOf(population: number): "village" | "town" | "city" {
-  return population >= 200 ? "city" : population >= 25 ? "town" : "village";
+/** A province's people now, in thousands: the snapshot's, else the 1444 map's. */
+function peopleNow(i: number): number {
+  return snapshot ? snapshot.provincePeople[i]! : provinces[i]!.population;
 }
 
-const SETTLEMENT_NAMES = { village: "Village", town: "Town", city: "City" };
+/** Town-size steps passed by a province's people (defines.works.townPeople): 0 a hamlet up to 5 a great city, as the buildings read it (BLD-149). */
+function townStep(population: number): number {
+  return rules.defines.works.townPeople.filter((at) => population >= at).length;
+}
+
+/** The map's settlement sprite for a province's people: a village up to a village, a town from a market town, a city from a city. */
+function settlementOf(population: number): "village" | "town" | "city" {
+  const step = townStep(population);
+  return step >= 4 ? "city" : step >= 2 ? "town" : "village";
+}
+
+const TOWN_NAMES = ["Hamlet", "Village", "Market town", "Town", "City", "Great city"];
 const WALL_NAMES = { castle: "Stone castle", fort: "Earthwork ring fort" };
 
 /** The hammer's angle at a time, in radians (its head points left, so lifting it back turns it clockwise): lifted over 0.6 s, brought down in 0.15 s past upright onto the work, resting 0.25 s. */
@@ -3139,6 +3159,7 @@ function takeSnapshot(next: Snapshot, ms: number): void {
   if (snapshot) for (const f of snapshot.navy.fleets) ships.set(f.id, { at: fleetPosition(f), path: f.path });
   fleetFrom = ships;
   applyWoken(next);
+  playMoments(snapshot, next);
   snapshot = next;
   followPlayerRealm(next);
   setPortraitYear(next.date.year);
@@ -3160,6 +3181,55 @@ function followPlayerRealm(s: Snapshot): void {
   if (campaign.playerNation === n.id && campaign.nationName === n.name) return;
   campaign.playerNation = n.id;
   campaign.nationName = n.name;
+}
+
+/** The map's particles: one-shot moments, and later the looping smoke, snow and birds (VIEW-140..VIEW-150). */
+const particles = new ParticleField(EFFECTS.maxParticles);
+let particleTick: ReturnType<typeof setTimeout> | 0 = 0;
+/** When the particles last moved (performance.now). */
+let particleClock = 0;
+
+const heldOf = (s: Snapshot) => Array.from(s.provinceOwner, (o, p) => holderOf(o, s.provinceOccupier[p]!));
+const plagueOf = (s: Snapshot) => new Map(s.plague.map((x) => [x.province, x.step]));
+
+/**
+ * What a played day changed, as moments on the map where the player is
+ * looking (VIEW-140..VIEW-145): a province changing hands, a work finished,
+ * a rising, a plague breaking out, a gold shower for the realm's news.
+ * Off screen, or zoomed out to the world, nothing plays; the news log has it all.
+ */
+function playMoments(before: Snapshot | null, next: Snapshot): void {
+  const animations = animationsPref();
+  if (!view || animations === "Off" || !momentsShown(view.camera.zoom)) return;
+  const capital = provinceIndex.get(nations[next.playerNation]!.capital) ?? -1;
+  const list = moments({
+    me: next.playerNation, capital, heldBefore: before ? heldOf(before) : null, heldAfter: heldOf(next), news: next.news,
+    ...(before ? { plagueBefore: plagueOf(before), plagueAfter: plagueOf(next) } : {}), outbreakStep: next.plagueSteps.indexOf("outbreak"),
+  });
+  for (const m of list) {
+    const p = provinces[m.province];
+    if (!p || !isKnown(m.province)) continue;
+    const [sx, sy] = view.toScreen(p.x!, p.y!);
+    if (sx < -40 || sy < -40 || sx > view.width + 40 || sy > view.height + 40) continue;
+    const colour = m.nation >= 0 ? nations[m.nation]!.color : PALETTE.paper;
+    particles.moment(m.kind, p.x!, p.y!, momentParticles(m.kind, animations), momentSeconds(m.kind), colour);
+  }
+  if (particles.count) view.invalidate();
+}
+
+/** Moves the particles on to now and draws them, asking for the next frame at the effects' frame rate while any live. */
+function drawParticles(o: OverlayContext): void {
+  const now = performance.now();
+  // A long gap (the tab hidden, the map idle) is not played out: the particles go on from where they were.
+  particles.step(Math.min(0.1, Math.max(0, (now - (particleClock || now)) / 1000)));
+  particleClock = now;
+  if (!particles.count) {
+    particleClock = 0;
+    return;
+  }
+  // In art pixels a little bigger than the tokens', so a moment reads at arm's length, and the living band's close in (VIEW-102).
+  particles.draw(o.ctx, o.toScreen, Math.max(3, Math.round(o.zoom / 8)), o.width, o.height);
+  if (!particleTick) particleTick = setTimeout(() => ((particleTick = 0), view.invalidate()), 1000 / EFFECTS.frameRate);
 }
 
 /** Takes in a fresh snapshot's map state. */
@@ -4122,7 +4192,7 @@ function renderPanelCard(): void {
     <header><h2 class="ribbon">${owner ? pennant(owner, 2) : ""}${esc(p.name)}</h2>${closeButton()}</header>
     ${mineHere ? provinceTabs() : ""}
     <p class="owner">${owner ? `<button class="realm-link" data-realm="${own}" title="Open ${esc(owner.name)}"><b>${esc(owner.name)}</b></button>` : snapshot && !isWater[selectedProvince] ? groundHead(snapshot.tribes, selectedProvince, tribesUiOf()) : "<b>Unclaimed land</b>"}</p>
-    <p class="province-kind">${esc(provinceKind(p, !!owner && owner.capital === p.id))}</p>
+    <p class="province-kind">${esc(provinceKind(p, selectedProvince, !!owner && owner.capital === p.id))}</p>
     ${snapshot && !owner ? groundSection(snapshot.tribes, selectedProvince, tribesUiOf()) : ""}
     ${snapshot ? settleSection(selectedProvince) : ""}
     ${snapshot ? rebelsHere(selectedProvince) : ""}
@@ -4227,8 +4297,9 @@ function settleSection(p: number): string {
 }
 
 /** What kind of province p is, after the realm that rules it (feedback 78): its seat and land, then river and coast. */
-function provinceKind(p: (typeof provinces)[number], capital: boolean): string {
-  const seat = capital ? "Capital city" : SETTLEMENT_NAMES[settlementOf(p.population)];
+function provinceKind(p: (typeof provinces)[number], i: number, capital: boolean): string {
+  // The town grows and shrinks with its people; capitals keep their title.
+  const seat = capital ? "Capital city" : TOWN_NAMES[townStep(peopleNow(i))]!;
   return [`${seat} in ${p.terrain}`, p.river ? "river" : "", p.coastal ? "coast" : ""].filter(Boolean).join(" · ");
 }
 
@@ -4344,6 +4415,9 @@ function moveFit(post: string, p: number): [number, string] {
   }
 }
 
+/** What an official would start with as a general and as an admiral (RECR-070, NAVY-073). */
+const commandChoice = (post: string, years: number, port: boolean) => ({ general: commissionSkills(post, years, port, false), admiral: commissionSkills(post, years, port, true), port });
+
 /** The official's screen shows every province to move him to, not just the best few. */
 let movesAll = false;
 
@@ -4374,7 +4448,7 @@ function renderOfficial(pi: number): void {
   }));
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(o.name)}</h2>${closeButton()}</header>
-    ${officialScreen(rules, o, me, COMMISSION_GOLD, s.nationTreasury[me]!, moves, movesAll || options.length <= 6, titlesOf(me), s.posts.fit[pi] ?? null)}
+    ${officialScreen(rules, o, me, COMMISSION_GOLD, s.nationTreasury[me]!, moves, movesAll || options.length <= 6, titlesOf(me), s.posts.fit[pi] ?? null, commandChoice(o.post, s.provinceOfficialYears[pi]!, s.navy.ports.some((x) => x.province === pi)))}
     <button class="back" data-back>${icon("scroll", 2)}Back to the officials</button>`;
   bindClose();
   showPanel(true);
@@ -4602,7 +4676,8 @@ function governanceSection(pi: number, own: number, mine: boolean, official: Ret
 function renderLord(k: number): void {
   const s = snapshot!;
   const l = lordViews()[k];
-  if (!l) {
+  // A lord left with no land (seized, or murdered with his lands going to the crown) is no longer on the Lords tab.
+  if (!l || l.lands === 0) {
     lordView = -1;
     renderPanel();
     return;
@@ -4621,9 +4696,13 @@ function renderLord(k: number): void {
   royal.sort((a, b) => (dist.get(a) ?? 999) - (dist.get(b) ?? 999) || a - b);
   const grants = (grantAll ? royal : royal.slice(0, 6)).map((p) => provinceRow(p, `${dist.get(p) === 1 ? "next to his lands" : dist.has(p) ? `${dist.get(p)} provinces away` : "across the sea"} · ${gold2(s.provinceTaxGold[p]!)} gold a month`));
   const holdings = lands.provinces.map((p) => provinceRow(p, `${MOOD_LABEL[s.provinceMood[p]!]} · ${fmt(Math.round(s.provincePeople[p]! * 1000))} people`));
+  // Who an assassin would unsettle: every other lord of the realm with land, and how many of them are his house.
+  const others = lordViews().filter((o) => o.nation === l.nation && o.k !== k && o.lands > 0);
+  const a = s.assassination;
+  const assassin = { open: assassinAsk === k, gold: a.gold, chance: s.lords[k]!.assassinChance, base: a.base, heir: s.lords[k]!.heir?.name ?? null, heirLoyalty: a.heirLoyalty, onFailure: a.onFailure, others: others.length, house: others.filter((o) => o.house === l.house).length };
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(l.name)}</h2>${closeButton()}</header>
-    ${lordScreen(rules, l, lands, { lit: litLord === k, gift: s.giftGold, treasury: s.nationTreasury[s.playerNation]!, mine, holdings, grants, allGrants: grantAll || royal.length <= 6, court: mine ? "" : courtLordHtml(s.statecraft, k, l.nation), retinue: mine && retinueRows().has(k) ? retinueBlock(l, retinueRows().get(k)!, retinueLook()) : "" }, titlesOf(l.nation))}`;
+    ${lordScreen(rules, l, lands, { lit: litLord === k, gift: s.giftGold, treasury: s.nationTreasury[s.playerNation]!, mine, holdings, grants, allGrants: grantAll || royal.length <= 6, court: mine ? "" : courtLordHtml(s.statecraft, k, l.nation), retinue: mine && retinueRows().has(k) ? retinueBlock(l, retinueRows().get(k)!, retinueLook()) : "", assassin }, titlesOf(l.nation))}`;
   bindClose();
   showPanel(true);
   bindLords();
@@ -4631,6 +4710,18 @@ function renderLord(k: number): void {
   panel.querySelector("[data-grant-all]")?.addEventListener("click", () => {
     grantAll = true;
     renderPanel();
+  });
+  panel.querySelector<HTMLButtonElement>("[data-assassin-ask]")?.addEventListener("click", () => {
+    assassinAsk = k;
+    renderPanel();
+  });
+  panel.querySelector<HTMLButtonElement>("[data-assassin-cancel]")?.addEventListener("click", () => {
+    assassinAsk = -1;
+    renderPanel();
+  });
+  panel.querySelector<HTMLButtonElement>("[data-assassinate]")?.addEventListener("click", () => {
+    assassinAsk = -1;
+    void act({ type: "assassinateLord", lord: k });
   });
   panel.querySelector("[data-back-lords]")?.addEventListener("click", () => {
     lordView = -1;
@@ -4686,6 +4777,7 @@ function openLord(k: number): void {
   panel.scrollTop = 0;
   lordView = k;
   grantAll = false;
+  assassinAsk = -1;
   realmView = -1;
   officialView = -1;
   newsView = false;
@@ -5033,12 +5125,12 @@ const weeks = (w: number) => `${w} week${w === 1 ? "" : "s"}`;
 /** Days as the queue says them: "in 9 days", "tomorrow" (or bare, "14 days"). */
 const days = (d: number, inWord = true) => (inWord && d <= 1 ? "tomorrow" : `${inWord ? "in " : ""}${Math.max(1, Math.round(d))} day${Math.round(d) === 1 ? "" : "s"}`);
 
-/** Commanders of the player waiting at court, best first. */
-function idleCommanders(): number[] {
+/** Generals of the player waiting at court, or admirals when `sea`, best first (RECR-128). */
+function idleCommanders(sea = false): number[] {
   const s = snapshot!;
   return s.commanders
     .map((c, i) => ({ c, i }))
-    .filter(({ c }) => c.owner === s.playerNation && c.army < 0 && c.fleet < 0)
+    .filter(({ c }) => c.owner === s.playerNation && c.army < 0 && c.fleet < 0 && c.sea === sea)
     .sort((x, y) => y.c.might + y.c.cunning + y.c.logistics - (x.c.might + x.c.cunning + x.c.logistics))
     .map(({ i }) => i);
 }
@@ -5111,7 +5203,7 @@ function renderGarrison(pi: number): void {
           })
           .join("")
       : `<p class="hint">None. Men you call here wait in the garrison until a commander leads them or picks them up.</p>`}
-    ${g.troops.length ? `<p class="hint">${here.length ? `Commanders here: ${here.map((c) => esc(cmdOf(c.commander).name)).join(", ")}.` : idle.length ? "No commander stands here: one from court can lead them." : "No commander is free: commission an official from the Officials tab."}</p>` : ""}
+    ${g.troops.length ? `<p class="hint">${here.length ? `Commanders here: ${here.map((c) => esc(cmdOf(c.commander).name)).join(", ")}.` : idle.length ? "No commander stands here: one from court can lead them." : "No general is free: commission an official as general from the Officials tab."}</p>` : ""}
     </div>`;
   bindClose();
   bindProvinceTabs();
@@ -5249,7 +5341,7 @@ function renderFleet(id: number): void {
     ${fleetCard(f, mine, {
       name: (p) => provinces[p]!.name,
       admiralName: titled,
-      idle: idleCommanders().map((c) => ({ id: c, name: cmdOf(c).name, skills: skills(cmdOf(c)) })),
+      idle: idleCommanders(true).map((c) => ({ id: c, name: cmdOf(c).name, skills: skills(cmdOf(c)) })),
       armiesHere,
       fleetsHere: v.fleets.filter((x) => x.owner === me && x.at === f.at && x.id !== id && !x.battle),
       choosing: sailing === id,
@@ -5681,12 +5773,12 @@ function warRoomSection(): string {
     ${mine
       .map(({ c, i }) => {
         const k = c.army;
-        const where = k >= 0 ? `leads ${fmt(s.armies.men[k]!)} men at ${esc(provinces[s.armies.location[k]!]!.name)}` : "waits at court";
+        const where = k >= 0 ? `leads ${fmt(s.armies.men[k]!)} men at ${esc(provinces[s.armies.location[k]!]!.name)}` : c.fleet >= 0 ? "leads a fleet" : "waits at court";
         return `<div class="army">${commanderPortrait(rules, c.name, me)}<span class="who"><b>${esc(titledOf(c))}</b><br><small>${roleOf(c)} · ${skills(c)} · ${c.victories} won, ${c.defeats} lost</small><br><small>${where}</small></span>
           <span class="army-buttons">${k >= 0 ? `<button class="paper small" data-command="${s.armies.id[k]!}">Command</button>` : c.home >= 0 ? `<button class="paper small" data-release="${i}" title="Back to his post in ${esc(provinces[c.home]!.name)}">Release</button>` : ""}</span></div>`;
       })
       .join("")}
-    <p class="hint">New commanders are commissioned from a province's official, in its Garrison tab.</p>
+    <p class="hint">New generals and admirals are commissioned from a province's official, on his screen in the Officials tab.</p>
     ${mercenaryLine()}`;
 }
 
@@ -7760,6 +7852,11 @@ Object.assign(globalThis, {
   /** The most provinces the player holds of any one enemy, from the peace tables (scripts/peace-table-shots.mjs). */
   __phPeaceTable: () => Math.max(0, ...(snapshot?.settlements ?? []).map((x) => x.provinces.length)),
   __phTurn: () => snapshot?.turn ?? -1,
+  /** A realm's capital province and its point on the map. */
+  __phCapitalOf: (n: number) => {
+    const p = provinceIndex.get(nations[n]!.capital)!;
+    return { province: p, x: provinces[p]!.x!, y: provinces[p]!.y! };
+  },
   /** The founding card for staged news: a realm founded takes decades of play (scripts/founding-shots.mjs). */
   __phFoundingCard: (news: News[]) => showFoundings(news),
   /** The player's ports and fleets, and an order for the navy (scripts/navy-shots.mjs). */
@@ -7789,6 +7886,13 @@ Object.assign(globalThis, {
     newsView = false;
     panelCollapsed = false;
     renderPanel();
+  },
+  /** Plays a map moment at province p, in a realm's colour: the things that cause one take a war or years of play (scripts/effects-shots.mjs). */
+  __phMoment: (kind: MomentKind, p: number, nation = snapshot?.playerNation ?? 0) => {
+    const at = provinces[p]!;
+    particles.moment(kind, at.x!, at.y!, momentParticles(kind, animationsPref()), momentSeconds(kind), nations[nation]!.color);
+    view.invalidate();
+    return particles.count;
   },
   /** Stages an outbreak in province p until the next snapshot and opens its card: plague takes years of play to come (scripts/plague-shots.mjs). */
   __phStagePlague: (p: number, closed = false) => {
@@ -7829,13 +7933,13 @@ Object.assign(globalThis, {
     }
     return best;
   },
-  /** Commissions the first official of the player's who serves the crown (not a lord) as a commander. */
-  __phCommission: async () => {
+  /** Commissions the first official of the player's who serves the crown (not a lord) as a general, or as an admiral when `sea`. */
+  __phCommission: async (sea = false) => {
     if (!snapshot) return null;
     const me = snapshot.playerNation;
     const p = provinces.findIndex((_, i) => owners[i] === me && snapshot!.provinceLord[i]! < 0 && officialOf(snapshot!, i, me) && i !== provinceIndex.get(nations[me]!.capital));
     if (p < 0) return null;
-    await act({ type: "commission", province: p });
+    await act({ type: "commission", province: p, sea });
     return snapshot.rejectedOrders.map((r) => r.reason);
   },
   /** Takes the commander off the player's first led army, as the army card's leave button does (a fleet's leader when gold is short). */
@@ -7848,7 +7952,7 @@ Object.assign(globalThis, {
     return snapshot.rejectedOrders.map((r) => r.reason);
   },
   /** The first commander of the player's free to lead (scripts/navy-shots.mjs), or -1. */
-  __phIdleCommander: () => idleCommanders()[0] ?? -1,
+  __phIdleCommander: (sea = false) => idleCommanders(sea)[0] ?? -1,
   /** Declares war on a realm by id (scripts/navy-shots.mjs: a blockade). */
   __phWar: (id: string) => act({ type: "declareWar", target: nationIndex.get(id)! }).then(() => snapshot?.rejectedOrders.map((r) => r.reason) ?? []),
   /** The nearest sea zones (up to eight, nearest first), over the sea from port p, that lie beside a coastal province of a realm by id. */

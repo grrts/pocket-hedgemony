@@ -319,6 +319,8 @@ The game evaluates requirements and signs for every revolution and country and s
 
 ## Numbers
 
+Every value the game uses, made from its config so it always matches the game: [Revolutions data](Data-Revolutions). How they combine: [Formulas](Formulas).
+
 Every balance value here is a provisional placeholder.
 
 | Key | Value |

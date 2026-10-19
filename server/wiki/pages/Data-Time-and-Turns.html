@@ -1,0 +1,200 @@
+<h1>Time and turns data</h1>
+<p>Every value in the game&#39;s time and turns config, exactly as the game reads it. This page is made from <code>packages/rules/data/domain/time-and-turns.json</code> each time the config changes, so it always matches the game. How these values are used is explained on <a href="/wiki/Time-and-Turns">Time and Turns</a>.</p>
+<p>Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and values marked (provisional) are placeholders that may still change in balancing. Inventions are shown by id and name; see <a href="/wiki/Data-Research#inventions">Research data</a>.</p>
+<blockquote>
+<p>Time and turns (domain/time-and-turns/spec.md). Turn order from DECISIONS X-2, weeks X-3, seasons X-4, start date X-25 (the start scenario&#39;s day, packages/rules/data/scenarios), victory timing X-12, the 1939 cut X-14. Wet seasons are placeholders; ages from event-tree/data/ages.yaml.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>endDate</code></td><td>1939-08-31</td></tr>
+<tr><td><code>campaignRules</code></td><td>difficulty, aiAggression, fogOfWar, events, ironman, endDate, musicEras</td></tr>
+<tr><td><code>dayPhases</code></td><td>move, stopChecks, contact, battles, standingOrders</td></tr>
+<tr><td><code>turnStages</code></td><td>apply orders, day loop, monthly steps, seasonal steps, yearly steps, events, checks, achievements, autosave, advance the date</td></tr>
+<tr><td><code>monthlyContextOrder</code></td><td>warfare, naval, exploration, province, buildings, recruiting, realm, research, trade, subjects, government, diplomacy, culture, religion, rebellions, revolutions</td></tr>
+<tr><td><code>afterTurnChecks</code></td><td>attention and tutorial checks</td></tr>
+<tr><td><code>lastOfTurn</code></td><td>achievement tests</td></tr>
+<tr><td><code>yearlyMonth</code></td><td>1</td></tr>
+<tr><td><code>fiveYearlyEvery</code></td><td>5</td></tr>
+<tr><td><code>ageStartsOnPostEndEvent</code></td><td>age_of_decolonization</td></tr>
+<tr><td><code>battleStepsPerDay</code></td><td>6</td></tr>
+<tr><td><code>turnDays</code></td><td>7</td></tr>
+</tbody></table></div>
+<h2 id="mover-kind-order"><a class="anchor" href="#mover-kind-order" aria-label="Link to this section">#</a>Mover kind order</h2>
+<ul>
+<li>army</li>
+<li>fleet</li>
+<li>trader, trade ship</li>
+<li>exploration ship</li>
+</ul>
+<h2 id="battle-days"><a class="anchor" href="#battle-days" aria-label="Link to this section">#</a>Battle days</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>min</code></td><td>1</td></tr>
+<tr><td><code>max</code></td><td>3</td></tr>
+</tbody></table></div>
+<h2 id="cadences"><a class="anchor" href="#cadences" aria-label="Link to this section">#</a>Cadences</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>step</th><th>context</th><th>cadence</th><th>phase</th><th>kind</th><th>aka</th><th>after day loop</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>where movers stand</td><td>troop-movement</td><td>daily</td><td>move</td><td></td><td></td><td></td></tr>
+<tr><td>2</td><td>armies marching</td><td>troop-movement</td><td>daily</td><td>move</td><td>army</td><td></td><td></td></tr>
+<tr><td>3</td><td>fleets sailing</td><td>naval</td><td>daily</td><td>move</td><td>fleet</td><td></td><td></td></tr>
+<tr><td>4</td><td>traders travelling</td><td>trade</td><td>daily</td><td>move</td><td>trader</td><td></td><td></td></tr>
+<tr><td>5</td><td>who meets whom</td><td>troop-movement</td><td>daily</td><td>contact</td><td></td><td></td><td></td></tr>
+<tr><td>6</td><td>armies set to attack looking at visible enemies</td><td>troop-movement</td><td>daily</td><td>standingOrders</td><td></td><td></td><td></td></tr>
+<tr><td>7</td><td>an army abroad eats from its reserve</td><td>warfare</td><td>weekly</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>8</td><td>an army at home takes its week&#39;s meals</td><td>warfare</td><td>weekly</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>9</td><td>hunger in an army with no food</td><td>warfare</td><td>weekly</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>10</td><td>plunder burning one tile</td><td>warfare</td><td>weekly</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>11</td><td>a raid burning one tile and moving on</td><td>warfare</td><td>weekly</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>12</td><td>forced-march desertion of 2 % of levies</td><td>warfare</td><td>weekly</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>13</td><td>plague while an outbreak runs</td><td>province</td><td>weekly</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>14</td><td>births, deaths and overflow</td><td>province</td><td>monthly</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>15</td><td>building upkeep and construction sites</td><td>buildings</td><td>monthly</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>16</td><td>AI looks at one province per country for building</td><td>buildings</td><td>monthly</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>17</td><td>siege month</td><td>warfare</td><td>monthly</td><td></td><td></td><td>sieges</td><td></td></tr>
+<tr><td>18</td><td>sickness on campaign</td><td>warfare</td><td>monthly</td><td></td><td></td><td>sickness</td><td></td></tr>
+<tr><td>19</td><td>pay owed, months out, drill</td><td>warfare</td><td>monthly</td><td></td><td></td><td>pay</td><td></td></tr>
+<tr><td>20</td><td>reserve rot</td><td>warfare</td><td>monthly</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>21</td><td>storms at sea in storm season</td><td>naval</td><td>monthly</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>22</td><td>trade ratio gain and decay</td><td>trade</td><td>monthly</td><td></td><td></td><td></td><td>yes</td></tr>
+<tr><td>23</td><td>trader upkeep</td><td>trade</td><td>monthly</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>24</td><td>colony progress and colony food</td><td>exploration</td><td>monthly</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>25</td><td>recruit pool refill</td><td>recruiting</td><td>monthly</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>26</td><td>realm treasury and lords</td><td>realm</td><td>monthly</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>27</td><td>research progress</td><td>research</td><td>monthly</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>28</td><td>government monthly step</td><td>government</td><td>monthly</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>29</td><td>culture monthly step</td><td>culture</td><td>monthly</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>30</td><td>religion monthly step</td><td>religion</td><td>monthly</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>31</td><td>rising chance in plotting provinces</td><td>rebellions</td><td>monthly</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>32</td><td>subject tribute</td><td>subjects</td><td>monthly</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>33</td><td>fund rebels caught roll</td><td>diplomacy</td><td>monthly</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>34</td><td>fund a revolution caught roll</td><td>revolutions</td><td>monthly</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>35</td><td>AI diplomatic actions</td><td>diplomacy</td><td>monthly</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>36</td><td>sailors in port and ship states</td><td>naval</td><td>monthly</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>37</td><td>pool events roll</td><td>events</td><td>monthly</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>38</td><td>famine check in every province</td><td>province</td><td>seasonal</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>39</td><td>farms, groves and fisheries make food</td><td>buildings</td><td>seasonal</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>40</td><td>subject loyalty worked out</td><td>subjects</td><td>seasonal</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>41</td><td>resident envoy tie +5</td><td>diplomacy</td><td>seasonal</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>42</td><td>pirate fleets grow by one ship</td><td>naval</td><td>seasonal</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>43</td><td>lords lose loyalty while an army takes their grain</td><td>warfare</td><td>seasonal</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>44</td><td>world domination check</td><td>realm</td><td>yearly</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>45</td><td>harvest</td><td>realm</td><td>harvest</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>46</td><td>wares made</td><td>buildings</td><td>yearly</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>47</td><td>building neglect years counted</td><td>buildings</td><td>yearly</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>48</td><td>building advice</td><td>buildings</td><td>yearly</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>49</td><td>culture drift</td><td>culture</td><td>yearly</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>50</td><td>faith mix</td><td>religion</td><td>yearly</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>51</td><td>diplomacy fades</td><td>diplomacy</td><td>yearly</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>52</td><td>league checks</td><td>diplomacy</td><td>yearly</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>53</td><td>culture checks for the court going native, new languages abroad and merges</td><td>culture</td><td>five-yearly</td><td></td><td></td><td></td><td></td></tr>
+</tbody></table></div>
+<h2 id="seasons"><a class="anchor" href="#seasons" aria-label="Link to this section">#</a>Seasons</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>startMonths</code></td><td>3, 6, 9, 12</td></tr>
+<tr><td><code>paddyHarvestMonths</code></td><td>3, 9</td></tr>
+</tbody></table></div>
+<h3 id="winter"><a class="anchor" href="#winter" aria-label="Link to this section">#</a>Winter</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>northern</code></td><td>12, 1, 2</td></tr>
+<tr><td><code>southern</code></td><td>6, 7, 8</td></tr>
+</tbody></table></div>
+<h3 id="snow-pass-closed"><a class="anchor" href="#snow-pass-closed" aria-label="Link to this section">#</a>Snow pass closed</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>northern</code></td><td>12, 1, 2, 3</td></tr>
+<tr><td><code>southern</code></td><td>6, 7, 8, 9</td></tr>
+</tbody></table></div>
+<h3 id="wet-season-provisional"><a class="anchor" href="#wet-season-provisional" aria-label="Link to this section">#</a>Wet season (provisional)</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>monsoon_asia</code></td><td>6, 7, 8, 9</td></tr>
+<tr><td><code>sahel_and_savanna</code></td><td>7, 8, 9</td></tr>
+<tr><td><code>amazon</code></td><td>12, 1, 2, 3, 4, 5</td></tr>
+</tbody></table></div>
+<h3 id="names"><a class="anchor" href="#names" aria-label="Link to this section">#</a>Names</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>3</th><th>6</th><th>9</th><th>12</th></tr></thead>
+<tbody>
+<tr><td>northern</td><td>spring</td><td>summer</td><td>autumn</td><td>winter</td></tr>
+<tr><td>southern</td><td>autumn</td><td>winter</td><td>spring</td><td>summer</td></tr>
+</tbody></table></div>
+<h3 id="harvest-month"><a class="anchor" href="#harvest-month" aria-label="Link to this section">#</a>Harvest month</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>northern</code></td><td>9</td></tr>
+<tr><td><code>southern</code></td><td>3</td></tr>
+</tbody></table></div>
+<h2 id="autosave"><a class="anchor" href="#autosave" aria-label="Link to this section">#</a>Autosave</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>every month</th><th>month</th><th>never</th></tr></thead>
+<tbody>
+<tr><td>every month</td><td>yes</td><td></td><td></td></tr>
+<tr><td>every 12 months</td><td></td><td>1</td><td></td></tr>
+<tr><td>off</td><td></td><td></td><td>yes</td></tr>
+</tbody></table></div>
+<h2 id="out-of-scope"><a class="anchor" href="#out-of-scope" aria-label="Link to this section">#</a>Out of scope</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>ages</code></td><td>age_of_decolonization, cold_war, age_of_globalization</td></tr>
+<tr><td><code>events</code></td><td>second_world_war</td></tr>
+</tbody></table></div>
+<h2 id="ages"><a class="anchor" href="#ages" aria-label="Link to this section">#</a>Ages</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>id</th><th>name</th><th>window</th><th>force start</th><th>force end</th></tr></thead>
+<tbody>
+<tr><td>age_of_gunpowder_empires</td><td>Age of Gunpowder Empires</td><td>1444, 1760</td><td>1444</td><td>1760</td></tr>
+<tr><td>age_of_exploration</td><td>Age of Exploration</td><td>1444, 1680</td><td>1444</td><td>1680</td></tr>
+<tr><td>age_of_reformations</td><td>Age of Reformations</td><td>1480, 1700</td><td>1530</td><td>1700</td></tr>
+<tr><td>age_of_atlantic_empires</td><td>Age of Atlantic Empires</td><td>1480, 1880</td><td>1520</td><td>1880</td></tr>
+<tr><td>age_of_crisis_and_absolutism</td><td>Age of Crisis and Absolutism</td><td>1590, 1790</td><td>1640</td><td>1790</td></tr>
+<tr><td>age_of_revolutions</td><td>Age of Revolutions</td><td>1750, 1880</td><td>1800</td><td>1880</td></tr>
+<tr><td>age_of_industrialization</td><td>Age of Industrialization</td><td>1700, 1950</td><td>1830</td><td>1950</td></tr>
+<tr><td>age_of_imperialism</td><td>Age of Imperialism</td><td>1800, 1945</td><td>1860</td><td>1945</td></tr>
+<tr><td>age_of_world_wars</td><td>Age of World Wars</td><td>1890, 1960</td><td>1925</td><td>1960</td></tr>
+<tr><td>age_of_decolonization</td><td>Age of Decolonization</td><td>1919, 1997</td><td>1955</td><td>1997</td></tr>
+<tr><td>cold_war</td><td>Cold War</td><td>1945, 2000</td><td>1950</td><td>2000</td></tr>
+<tr><td>age_of_globalization</td><td>Age of Globalization</td><td>1978, none</td><td>1995</td><td>none</td></tr>
+</tbody></table></div>
+<h2 id="eras"><a class="anchor" href="#eras" aria-label="Link to this section">#</a>Eras</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>era</th><th>from</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>I</td><td>1378</td></tr>
+<tr><td>2</td><td>II</td><td>1500</td></tr>
+<tr><td>3</td><td>III</td><td>1600</td></tr>
+<tr><td>4</td><td>IV</td><td>1700</td></tr>
+<tr><td>5</td><td>V</td><td>1800</td></tr>
+<tr><td>6</td><td>VI</td><td>1870</td></tr>
+<tr><td>7</td><td>VII</td><td>1914</td></tr>
+</tbody></table></div>
+<h2 id="victory"><a class="anchor" href="#victory" aria-label="Link to this section">#</a>Victory</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>dominationShare</code></td><td>0.5</td></tr>
+<tr><td><code>checkMonth</code></td><td>1</td></tr>
+<tr><td><code>ways</code></td><td>world domination, best at the end</td></tr>
+<tr><td><code>scores</code></td><td>Economy, Power, Technology</td></tr>
+</tbody></table></div>
+<h2 id="engine-phases"><a class="anchor" href="#engine-phases" aria-label="Link to this section">#</a>Engine phases</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>apply orders</code></td><td>apply orders</td></tr>
+<tr><td><code>marches</code></td><td>day loop</td></tr>
+<tr><td><code>economy</code></td><td>monthly steps</td></tr>
+<tr><td><code>levies</code></td><td>monthly steps</td></tr>
+<tr><td><code>advance the date</code></td><td>advance the date</td></tr>
+</tbody></table></div>

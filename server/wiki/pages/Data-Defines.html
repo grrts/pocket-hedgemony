@@ -1,0 +1,238 @@
+<h1>Core values data</h1>
+<p>Every value in the game&#39;s core values config, exactly as the game reads it. This page is made from <code>packages/rules/data/defines.json</code> each time the config changes, so it always matches the game.</p>
+<p>Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and values marked (provisional) are placeholders that may still change in balancing. Inventions are shown by id and name; see <a href="/wiki/Data-Research#inventions">Research data</a>.</p>
+<blockquote>
+<p>Global balance numbers. Every value here can be tuned without touching engine code.</p>
+</blockquote>
+<h2 id="economy"><a class="anchor" href="#economy" aria-label="Link to this section">#</a>Economy</h2>
+<blockquote>
+<p><code>taxRateFactor</code>: Milestone 3: gold a province pays at each tax step (none, light, normal, heavy, crushing) against normal. Provisional: the design names the steps but no amounts.</p>
+<p><code>officialWagePerMonth</code>: Milestone 3: an official&#39;s wage, paid monthly while he runs his province (REALM-063 wages). Provisional: the design gives no amount.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>goldPerThousandPeoplePerMonth</code></td><td>0.004</td></tr>
+<tr><td><code>goldPerWealthPerMonth</code></td><td>0.06</td></tr>
+<tr><td><code>startingTreasury</code></td><td>50</td></tr>
+<tr><td><code>taxRateFactor</code></td><td>0, 0.5, 1, 1.5, 2</td></tr>
+<tr><td><code>officialWagePerMonth</code></td><td>0.1</td></tr>
+</tbody></table></div>
+<h2 id="works"><a class="anchor" href="#works" aria-label="Link to this section">#</a>Works</h2>
+<blockquote>
+<p>Milestone 4, works (first slice of the buildings context). goldScale turns the buildings data&#39;s gold into the treasury&#39;s gold. The effects are stand-ins for the jobs-and-wares model (BLD-002, BLD-005) on numbers the game already simulates; all provisional.</p>
+<p><code>slots</code>: Leroy, 17 Oct: a province&#39;s slots come from its people, one kind of slot for every work. baseSlots plus one for each townPeople step passed (thousands of people), which also sets the town&#39;s size: hamlet, village, market town, town, city, great city.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>goldScale</code></td><td>0.2</td></tr>
+<tr><td><code>defaultUpkeepPerYear</code></td><td>0.25</td></tr>
+<tr><td><code>materialsAtHandSaving</code></td><td>0.2</td></tr>
+<tr><td><code>seedFoodShare</code></td><td>1.1</td></tr>
+<tr><td><code>slotScale</code></td><td>2.5</td></tr>
+<tr><td><code>farmRates</code></td><td>1.1, 1.3, 1.5</td></tr>
+<tr><td><code>maxLandYield</code></td><td>3</td></tr>
+<tr><td><code>marketTrade</code></td><td>0.5</td></tr>
+<tr><td><code>harbourTrade</code></td><td>0.25</td></tr>
+<tr><td><code>roadTrade</code></td><td>0.05</td></tr>
+<tr><td><code>campTrade</code></td><td>0.05</td></tr>
+<tr><td><code>drillYardRecruits</code></td><td>0.15</td></tr>
+<tr><td><code>roadSpeed</code></td><td>0.15</td></tr>
+<tr><td><code>aiReserveGold</code></td><td>10</td></tr>
+<tr><td><code>baseSlots</code></td><td>2</td></tr>
+<tr><td><code>townPeople</code></td><td>10, 30, 100, 300, 1000</td></tr>
+</tbody></table></div>
+<h2 id="levies"><a class="anchor" href="#levies" aria-label="Link to this section">#</a>Levies</h2>
+<blockquote>
+<p>Men who can be called per thousand people: the recruiting context&#39;s fighting-age share (0.25) times the farmers&#39; call share (0.12).</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>menPerThousandPeople</code></td><td>30</td></tr>
+<tr><td><code>monthlyRecoveryFraction</code></td><td>0.0167</td></tr>
+</tbody></table></div>
+<h2 id="military"><a class="anchor" href="#military" aria-label="Link to this section">#</a>Military</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>upkeepPerThousandMenPerMonth</code></td><td>0.2</td></tr>
+</tbody></table></div>
+<h2 id="march"><a class="anchor" href="#march" aria-label="Link to this section">#</a>March</h2>
+<blockquote>
+<p>Marching and feeding armies, after the warfare design (sections 5 and 6) and the province design (section 3.1). One crossing unit in the design&#39;s days-to-cross table is daysPerCrossing real days here, since a province on this map is about 100 km and a 1444 army marched 15-20 km a day.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>daysPerMonth</code></td><td>30</td></tr>
+<tr><td><code>daysPerCrossing</code></td><td>6</td></tr>
+<tr><td><code>horseSpeedBonus</code></td><td>0.5</td></tr>
+<tr><td><code>bigArmyExtraCrossings</code></td><td>1</td></tr>
+<tr><td><code>riverCrossingDays</code></td><td>1</td></tr>
+<tr><td><code>tilesPerCrossing</code></td><td>14</td></tr>
+<tr><td><code>snowSlowdown</code></td><td>1</td></tr>
+<tr><td><code>rationsPerSoldier</code></td><td>1</td></tr>
+<tr><td><code>rationsPerHorse</code></td><td>3</td></tr>
+<tr><td><code>rationsStoredPerPerson</code></td><td>0.5</td></tr>
+<tr><td><code>monthsCarried</code></td><td>2</td></tr>
+<tr><td><code>homeReserveMonths</code></td><td>2</td></tr>
+<tr><td><code>logisticsRationCut</code></td><td>0.05</td></tr>
+<tr><td><code>hungerLossPerMonth</code></td><td>0.28</td></tr>
+<tr><td><code>startingHorseShare</code></td><td>0.2</td></tr>
+</tbody></table></div>
+<h3 id="days-to-cross"><a class="anchor" href="#days-to-cross" aria-label="Link to this section">#</a>Days to cross</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>grassland</code></td><td>1</td></tr>
+<tr><td><code>farmland</code></td><td>1</td></tr>
+<tr><td><code>savanna</code></td><td>1</td></tr>
+<tr><td><code>drylands</code></td><td>1.5</td></tr>
+<tr><td><code>hills</code></td><td>1.5</td></tr>
+<tr><td><code>desert</code></td><td>2</td></tr>
+<tr><td><code>forest</code></td><td>2</td></tr>
+<tr><td><code>tundra</code></td><td>2</td></tr>
+<tr><td><code>mountains</code></td><td>3</td></tr>
+<tr><td><code>jungle</code></td><td>3</td></tr>
+<tr><td><code>marsh</code></td><td>3</td></tr>
+</tbody></table></div>
+<h3 id="foraging"><a class="anchor" href="#foraging" aria-label="Link to this section">#</a>Foraging</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>grassland</code></td><td>0.6</td></tr>
+<tr><td><code>farmland</code></td><td>1</td></tr>
+<tr><td><code>savanna</code></td><td>0.6</td></tr>
+<tr><td><code>drylands</code></td><td>0.3</td></tr>
+<tr><td><code>hills</code></td><td>0.6</td></tr>
+<tr><td><code>desert</code></td><td>0.1</td></tr>
+<tr><td><code>forest</code></td><td>0.6</td></tr>
+<tr><td><code>tundra</code></td><td>0.1</td></tr>
+<tr><td><code>mountains</code></td><td>0.3</td></tr>
+<tr><td><code>jungle</code></td><td>0.3</td></tr>
+<tr><td><code>marsh</code></td><td>0.3</td></tr>
+</tbody></table></div>
+<h2 id="war"><a class="anchor" href="#war" aria-label="Link to this section">#</a>War</h2>
+<blockquote>
+<p>Milestone 1, war and conquest. Battles, sieges and peace use the warfare and diplomacy contexts&#39; own numbers; these only fit them to the weekly turn.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>holdWeeks</code></td><td>4</td></tr>
+<tr><td><code>engageBase</code></td><td>9</td></tr>
+<tr><td><code>engageMin</code></td><td>10</td></tr>
+<tr><td><code>engageMax</code></td><td>15</td></tr>
+<tr><td><code>menPerBattleRound</code></td><td>6000</td></tr>
+<tr><td><code>garrisonRecoveryPerMonth</code></td><td>0.1</td></tr>
+<tr><td><code>castleStoreMonths</code></td><td>6</td></tr>
+<tr><td><code>stormRatio</code></td><td>4</td></tr>
+<tr><td><code>disperseBelow</code></td><td>100</td></tr>
+<tr><td><code>aiDeclareChancePerMonth</code></td><td>0.01</td></tr>
+<tr><td><code>aiDeclareStrengthRatio</code></td><td>2</td></tr>
+</tbody></table></div>
+<h3 id="garrison"><a class="anchor" href="#garrison" aria-label="Link to this section">#</a>Garrison</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>capital</code></td><td>1500</td></tr>
+<tr><td><code>castle</code></td><td>1000</td></tr>
+<tr><td><code>fort</code></td><td>500</td></tr>
+</tbody></table></div>
+<h2 id="recruit"><a class="anchor" href="#recruit" aria-label="Link to this section">#</a>Recruit</h2>
+<blockquote>
+<p>Milestone 2, armies that cost something. Pay, training costs, the levy and the troop cap come from domain/recruiting.json and domain/warfare.json; these fit them to this game&#39;s economy and weekly turn. goldScale turns the domain&#39;s gold into the treasury&#39;s gold (one domain gold is 0.004 here).</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>goldScale</code></td><td>0.004</td></tr>
+<tr><td><code>queueMax</code></td><td>10</td></tr>
+<tr><td><code>armsAtStart</code></td><td>levy foot, armoured foot, pikes, archers, light horse, knights and lancers</td></tr>
+<tr><td><code>freeCompaniesForHire</code></td><td>6</td></tr>
+<tr><td><code>unpaidDesertion</code></td><td>0.05</td></tr>
+<tr><td><code>mercenaryWeeks</code></td><td>4</td></tr>
+<tr><td><code>commanderNames</code></td><td>Juan, Pedro, Rodrigo, Jean, Guillaume, Louis, Henry, Richard, Thomas, Heinrich, Konrad, Albrecht, Giovanni, Niccolò, Mehmed, Ali, Ivan, Dmitri, Jan, Erik, Olaf, Andrzej, János, Duarte</td></tr>
+</tbody></table></div>
+<h3 id="free-company-men"><a class="anchor" href="#free-company-men" aria-label="Link to this section">#</a>Free company men</h3>
+<blockquote>
+<p>A free company&#39;s size in this age: never more than max men, some much smaller (Leroy: no fixed 1,000).</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>min</code></td><td>300</td></tr>
+<tr><td><code>max</code></td><td>3000</td></tr>
+</tbody></table></div>
+<h3 id="free-companies"><a class="anchor" href="#free-companies" aria-label="Link to this section">#</a>Free companies</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>group</th><th>homes</th><th>names</th><th>captains</th><th>mix</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Swiss and German foot</td><td>switzerland, wurttemberg, bavaria</td><td>Reisläufer of Uri, Bernese free company, Company of Schwyz, Swabian foot, Zürich free company</td><td>Hans, Ulrich, Konrad, Rudolf</td><td>pikes: 0.6, 0.85; armoured foot: 0.1, 0.3; archers: 0, 0.1</td></tr>
+<tr><td>2</td><td>Italian condottieri</td><td>milan, florence, papal_states, naples, venice</td><td>The Braccheschi, The Sforzeschi, Company of the Star, Company of Saint George, The Black Company</td><td>Niccolò, Bartolomeo, Jacopo, Francesco</td><td>knights and lancers: 0.35, 0.6; armoured foot: 0.2, 0.4; archers: 0.1, 0.25; light horse: 0, 0.1</td></tr>
+<tr><td>3</td><td>Genoese crossbowmen</td><td>genoa</td><td>Genoese crossbowmen, Ligurian crossbow company</td><td>Ottone, Antonio</td><td>archers: 0.7, 0.9; armoured foot: 0.1, 0.3</td></tr>
+<tr><td>4</td><td>English mercenary companies</td><td>england</td><td>The White Company, Company of the Rose, Gascon archers</td><td>John, Thomas, Robert</td><td>archers: 0.6, 0.75; armoured foot: 0.25, 0.4</td></tr>
+<tr><td>5</td><td>Bohemian field companies</td><td>bohemia</td><td>Brethren of the wagon fort, Tábor field company</td><td>Jan, Prokop</td><td>armoured foot: 0.3, 0.5; archers: 0.3, 0.5; pikes: 0, 0.2; light horse: 0, 0.1</td></tr>
+<tr><td>6</td><td>Scottish and Irish gallowglass</td><td>scotland, ireland</td><td>MacSweeney gallowglass, MacDonald redshanks, Clan Sheehy axes</td><td>Donnchadh, Alasdair, Eoin</td><td>armoured foot: 0.6, 0.9; archers: 0.1, 0.3; light horse: 0, 0.1</td></tr>
+<tr><td>7</td><td>Albanian and Greek stradioti</td><td>albania, byzantium</td><td>Stradioti of Morea, Albanian riders</td><td>Gjon, Theodoros</td><td>light horse: 0.9, 1; armoured foot: 0, 0.1</td></tr>
+<tr><td>8</td><td>Catalan almogavars</td><td>aragon</td><td>Almogavars of the Pyrenees, Catalan company</td><td>Bernat, Ramon</td><td>levy foot: 0.3, 0.5; armoured foot: 0.3, 0.5; light horse: 0, 0.2</td></tr>
+<tr><td>9</td><td>Turkic and Afghan horse</td><td>timurids, uzbek_khanate, delhi</td><td>Lodi horse, Chagatai riders, Turkmen horse</td><td>Bahlul, Timur, Ali</td><td>light horse: 0.7, 1; archers: 0, 0.2; armoured foot: 0, 0.1</td></tr>
+<tr><td>10</td><td>Javanese and Japanese sword bands</td><td>japan, majapahit</td><td>Ronin band, Wako sword band, Javanese keris company</td><td>Saburō, Gajah</td><td>armoured foot: 0.5, 0.8; archers: 0.2, 0.4; pikes: 0, 0.1</td></tr>
+</tbody></table></div>
+<h2 id="living"><a class="anchor" href="#living" aria-label="Link to this section">#</a>Living</h2>
+<blockquote>
+<p>Milestone 3, people by class. Each province&#39;s people are seeded into the province context&#39;s classes from its population, ground, coast and wealth (the context gives the classes and their birth and death rates but no 1444 mix, so these shares are provisional).</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>townShareBase</code></td><td>0.03</td></tr>
+<tr><td><code>townSharePerWealth</code></td><td>0.025</td></tr>
+<tr><td><code>townShareMax</code></td><td>0.35</td></tr>
+<tr><td><code>homelessShare</code></td><td>0.02</td></tr>
+<tr><td><code>coastalSeafolk</code></td><td>0.12</td></tr>
+<tr><td><code>startingStoreMonths</code></td><td>4</td></tr>
+<tr><td><code>reliefAboveMonths</code></td><td>3</td></tr>
+<tr><td><code>lordGiftGold</code></td><td>5</td></tr>
+</tbody></table></div>
+<h3 id="town-mix"><a class="anchor" href="#town-mix" aria-label="Link to this section">#</a>Town mix</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>craftsmen</code></td><td>0.42</td></tr>
+<tr><td><code>market folk</code></td><td>0.3</td></tr>
+<tr><td><code>clergy</code></td><td>0.12</td></tr>
+<tr><td><code>clerks</code></td><td>0.13</td></tr>
+<tr><td><code>scholars</code></td><td>0.03</td></tr>
+</tbody></table></div>
+<h3 id="country-mix"><a class="anchor" href="#country-mix" aria-label="Link to this section">#</a>Country mix</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>farmers</th><th>herders</th><th>woodsmen</th><th>miners</th></tr></thead>
+<tbody>
+<tr><td>grassland</td><td>0.7</td><td>0.2</td><td>0.1</td><td></td></tr>
+<tr><td>farmland</td><td>0.85</td><td>0.1</td><td>0.05</td><td></td></tr>
+<tr><td>hills</td><td>0.55</td><td>0.25</td><td>0.1</td><td>0.1</td></tr>
+<tr><td>mountains</td><td>0.4</td><td>0.4</td><td>0.1</td><td>0.1</td></tr>
+<tr><td>drylands</td><td>0.5</td><td>0.45</td><td></td><td>0.05</td></tr>
+<tr><td>marsh</td><td>0.55</td><td>0.15</td><td>0.3</td><td></td></tr>
+<tr><td>forest</td><td>0.5</td><td>0.1</td><td>0.4</td><td></td></tr>
+<tr><td>desert</td><td>0.3</td><td>0.65</td><td></td><td>0.05</td></tr>
+<tr><td>tundra</td><td>0.05</td><td>0.6</td><td>0.35</td><td></td></tr>
+<tr><td>jungle</td><td>0.55</td><td>0.05</td><td>0.4</td><td></td></tr>
+<tr><td>savanna</td><td>0.5</td><td>0.45</td><td>0.05</td><td></td></tr>
+</tbody></table></div>
+<h2 id="castle-food"><a class="anchor" href="#castle-food" aria-label="Link to this section">#</a>Castle food</h2>
+<blockquote>
+<p>Feedback 84 and 85: castles collect a share of each province&#39;s surplus at the harvest, keep a siege reserve and spread the rest by rings; stores are capped (a province&#39;s own at localStoreCapMonths, a castle&#39;s at castleStoreMonths, granaryStoreMonths with a granary) and the surplus rule decides what happens to the rest. The realm data gives the grain price (0.5 gold a food); grainGoldScale turns it into the treasury&#39;s gold for the engine&#39;s food (a thousand people fed for a month), so a month&#39;s food sells for about what its eaters pay in tax a month. All provisional.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>localStoreCapMonths</code></td><td>18</td></tr>
+<tr><td><code>castleStoreMonths</code></td><td>6</td></tr>
+<tr><td><code>granaryStoreMonths</code></td><td>18</td></tr>
+<tr><td><code>keepMonths</code></td><td>12</td></tr>
+<tr><td><code>grainGoldScale</code></td><td>0.008</td></tr>
+</tbody></table></div>

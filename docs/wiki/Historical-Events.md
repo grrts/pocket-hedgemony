@@ -238,6 +238,8 @@ Turns are a week long, so this runs in the turn in which a new month begins. Eac
 
 ## Numbers
 
+Every value the game uses, made from its config so it always matches the game: [Events data](Data-Events) and [Everyday events data](Data-Events-Everyday). How they combine: [Formulas](Formulas).
+
 All of these are provisional values still being balanced, unless noted.
 
 | Key | Value |

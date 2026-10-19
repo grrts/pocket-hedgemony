@@ -219,6 +219,8 @@ The Government page sits in your Realm book's Realm section, beside the Overview
 
 ## Numbers
 
+Every value the game uses, made from its config so it always matches the game: [Government data](Data-Government). How they combine: [Formulas](Formulas).
+
 All numbers are **placeholders** in `government/config/government.yaml` (and `start-forms.yaml`), except `revolution_ignores_era`, which is decided. Numbers added on 17 October to settle open points are marked provisional.
 
 | Key | Value |

@@ -1,0 +1,869 @@
+<h1>Province data</h1>
+<p>Every value in the game&#39;s province config, exactly as the game reads it. This page is made from <code>packages/rules/data/domain/province.json</code> each time the config changes, so it always matches the game. How these values are used is explained on <a href="/wiki/Provinces">Provinces</a>.</p>
+<p>Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and values marked (provisional) are placeholders that may still change in balancing. Inventions are shown by id and name; see <a href="/wiki/Data-Research#inventions">Research data</a>.</p>
+<blockquote>
+<p>Province config (domain/province/spec.md §10; province-stats design v3). Every value is a placeholder for balancing. Rates are fractions (0.05 = 5 %). Key names are the spec&#39;s proposals (OQ-PROV-20).</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>months_per_season</code></td><td>3</td></tr>
+<tr><td><code>river_crossing_penalty</code></td><td>-0.2</td></tr>
+<tr><td><code>castle_hard_grounds</code></td><td>hills, mountains</td></tr>
+<tr><td><code>loyalty</code></td><td>In revolt, Disloyal, Wavering, Loyal</td></tr>
+</tbody></table></div>
+<h2 id="tiles"><a class="anchor" href="#tiles" aria-label="Link to this section">#</a>Tiles</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>min</code></td><td>4</td></tr>
+<tr><td><code>max</code></td><td>16</td></tr>
+</tbody></table></div>
+<h2 id="shore-tiles"><a class="anchor" href="#shore-tiles" aria-label="Link to this section">#</a>Shore tiles</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>min</code></td><td>1</td></tr>
+<tr><td><code>max</code></td><td>3</td></tr>
+</tbody></table></div>
+<h2 id="clear-woods"><a class="anchor" href="#clear-woods" aria-label="Link to this section">#</a>Clear woods</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>years</code></td><td>3</td></tr>
+<tr><td><code>timber_loads</code></td><td>1</td></tr>
+</tbody></table></div>
+<h2 id="fields-to-woods"><a class="anchor" href="#fields-to-woods" aria-label="Link to this section">#</a>Fields to woods</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>years</code></td><td>10</td></tr>
+</tbody></table></div>
+<h2 id="fields-to-pasture"><a class="anchor" href="#fields-to-pasture" aria-label="Link to this section">#</a>Fields to pasture</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>seasons</code></td><td>1</td></tr>
+</tbody></table></div>
+<h2 id="woods"><a class="anchor" href="#woods" aria-label="Link to this section">#</a>Woods</h2>
+<blockquote>
+<p>D-PROV-30: woods lost to fire or to cutting more timber in a year than they regrow become waste (stumps and ash) and grow back to woods after regrow_years without use.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>regrow_loads_per_tile</code></td><td>1</td></tr>
+<tr><td><code>regrow_years</code></td><td>10</td></tr>
+</tbody></table></div>
+<h2 id="tile-changes"><a class="anchor" href="#tile-changes" aria-label="Link to this section">#</a>Tile changes</h2>
+<blockquote>
+<p>Feedback 86: what the player (or a lord, or the AI) pays to change a tile&#39;s use, in the buildings data&#39;s gold, and the time for the changes clear_woods and fields_to_pasture don&#39;t already set. One change at a time per province.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>gold</th><th>seasons</th><th>years</th><th>needs</th><th>grounds</th></tr></thead>
+<tbody>
+<tr><td>clear woods</td><td>30</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>to pasture</td><td>5</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>plough</td><td>10</td><td>1</td><td></td><td></td><td></td></tr>
+<tr><td>drain</td><td>60</td><td></td><td>3</td><td><a href="/wiki/Data-Research#inventions">F8 Polder drainage</a></td><td></td></tr>
+<tr><td>irrigate</td><td>60</td><td></td><td>2</td><td><a href="/wiki/Data-Research#inventions">F3 Qanat and canal irrigation</a></td><td>drylands, desert, savanna</td></tr>
+</tbody></table></div>
+<h2 id="castle-ruin"><a class="anchor" href="#castle-ruin" aria-label="Link to this section">#</a>Castle ruin</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>waste_years</code></td><td>5</td></tr>
+</tbody></table></div>
+<h2 id="town"><a class="anchor" href="#town" aria-label="Link to this section">#</a>Town</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>second_tile_townsfolk</code></td><td>40000</td></tr>
+<tr><td><code>great_city_tiles</code></td><td>3</td></tr>
+<tr><td><code>sizes</code></td><td>hamlet, village, market town, town, city, great city</td></tr>
+</tbody></table></div>
+<h3 id="building-slots"><a class="anchor" href="#building-slots" aria-label="Link to this section">#</a>Building slots</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>hamlet</code></td><td>1</td></tr>
+<tr><td><code>village</code></td><td>2</td></tr>
+<tr><td><code>market town</code></td><td>4</td></tr>
+<tr><td><code>town</code></td><td>6</td></tr>
+<tr><td><code>city</code></td><td>9</td></tr>
+<tr><td><code>great city</code></td><td>12</td></tr>
+</tbody></table></div>
+<h2 id="worn"><a class="anchor" href="#worn" aria-label="Link to this section">#</a>Worn</h2>
+<blockquote>
+<p>D-PROV-31: a fields tile farmed with more farmers than its slots for overwork_years in a row wears; each rotation invention known stretches that by rotation_stretch.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>recovery_years</code></td><td>5</td></tr>
+<tr><td><code>output</code></td><td>0.5</td></tr>
+<tr><td><code>overwork_years</code></td><td>30</td></tr>
+<tr><td><code>rotation_stretch</code></td><td>1.5</td></tr>
+<tr><td><code>rotation_inventions</code></td><td><a href="/wiki/Data-Research#inventions">F1 Three-field rotation</a>, <a href="/wiki/Data-Research#inventions">F12 Fodder crops (clover, turnips)</a>, <a href="/wiki/Data-Research#inventions">F15 Four-field rotation</a></td></tr>
+</tbody></table></div>
+<h2 id="burned"><a class="anchor" href="#burned" aria-label="Link to this section">#</a>Burned</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>rebuild_per_year</code></td><td>1</td></tr>
+</tbody></table></div>
+<h2 id="ground"><a class="anchor" href="#ground" aria-label="Link to this section">#</a>Ground</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>farmland</th><th>grassland</th><th>savanna</th><th>drylands</th><th>desert</th><th>hills</th><th>mountains</th><th>forest</th><th>jungle</th><th>more</th></tr></thead>
+<tbody>
+<tr><td>start_mix</td><td>fields: 0.8; pasture: 0.1; woods: 0.1</td><td>pasture: 0.55; fields: 0.3; woods: 0.15</td><td>pasture: 0.6; fields: 0.25; waste: 0.15</td><td>pasture: 0.4; waste: 0.35; fields: 0.25</td><td>waste: 0.8; pasture: 0.15; fields: 0.05</td><td>pasture: 0.35; fields: 0.3; woods: 0.15; waste: 0.2</td><td>waste: 0.5; pasture: 0.3; woods: 0.15; fields: 0.05</td><td>woods: 0.6; fields: 0.25; pasture: 0.15</td><td>woods: 0.7; fields: 0.2; marsh: 0.1</td><td>marsh: (marsh: 0.6; fields: 0.25; pasture: 0.15); tundra: (waste: 0.5; woods: 0.35; pasture: 0.15)</td></tr>
+<tr><td>troops</td><td>foot: 0; horse: 0.1; guns: 0; defender: 0; days_to_cross: 1; foraging: Rich; sickness: Low</td><td>foot: 0; horse: 0.25; guns: 0; defender: -0.1; days_to_cross: 1; foraging: Fair; sickness: Low</td><td>foot: 0; horse: 0.15; guns: 0; defender: 0; days_to_cross: 1; foraging: Fair; sickness: Medium</td><td>foot: 0; horse: 0.1; guns: 0; defender: 0; days_to_cross: 1.5; foraging: Poor; sickness: Low</td><td>foot: -0.1; horse: -0.1; camels: 0; guns: -0.1; defender: 0.1; days_to_cross: 2; foraging: Almost none; sickness: Heat</td><td>foot: 0.1; horse: -0.15; guns: -0.1; defender: 0.15; days_to_cross: 1.5; foraging: Fair; sickness: Low</td><td>foot: 0; horse: -0.4; guns: -0.3; defender: 0.3; days_to_cross: 3; foraging: Poor; sickness: Cold</td><td>foot: 0; horse: -0.25; guns: -0.2; defender: 0.15; days_to_cross: 2; foraging: Fair; sickness: Low</td><td>foot: -0.1; horse: -0.4; guns: -0.3; defender: 0.25; days_to_cross: 3; foraging: Poor; sickness: High</td><td>marsh: (foot: -0.1; horse: -0.3; guns: -0.3; defender: 0.2; days_to_cross: 3; foraging: Poor; sickness: High); tundra: (foot: 0; horse: -0.1; guns: -0.1; defender: 0.1; days_to_cross: 2; foraging: Almost none; sickness: Cold)</td></tr>
+<tr><td>economy</td><td>build_cost: 1; building_output: (base: 1.25); people_output: (base: 1)</td><td>build_cost: 1; building_output: (base: 1); people_output: (base: 1; herding: 1.5)</td><td>build_cost: 1; building_output: (base: 1); people_output: (base: 1; herding: 1.25)</td><td>build_cost: 1.25; building_output: (base: 0.75; lifted_by: irrigated); people_output: (base: 1)</td><td>build_cost: 1.5; building_output: (base: 0.5; mine: 1; irrigation works: 1); people_output: (base: 1; herding: 1; caravans: 1)</td><td>build_cost: 1.25; building_output: (base: 1; mine: 1.25); people_output: (base: 1)</td><td>build_cost: 2; building_output: (base: 1; farm: 0.5; mine: 1.5); people_output: (base: 0.75)</td><td>build_cost: 1.5; building_output: (base: 1; lumber camp: 1.5); people_output: (base: 1; hunting and gathering: 1.25)</td><td>build_cost: 2; building_output: (base: 0.75); people_output: (base: 1; gathering: 1.25)</td><td>marsh: (build_cost: 2; building_output: (base: 0.5; lifted_by: drained); people_output: (base: 1; fishing: 1.25)); tundra: (build_cost: 1.5; building_output: (base: 0.5); people_output: (base: 1; herding: 1))</td></tr>
+</tbody></table></div>
+<h2 id="woods-ambush"><a class="anchor" href="#woods-ambush" aria-label="Link to this section">#</a>Woods ambush</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>per_two_woods</code></td><td>0.05</td></tr>
+<tr><td><code>cap</code></td><td>0.15</td></tr>
+</tbody></table></div>
+<h2 id="locals-rough-bonus"><a class="anchor" href="#locals-rough-bonus" aria-label="Link to this section">#</a>Locals rough bonus</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>bonus</code></td><td>0.1</td></tr>
+<tr><td><code>grounds</code></td><td>hills, mountains, forest, jungle, marsh</td></tr>
+</tbody></table></div>
+<h2 id="bare-tile"><a class="anchor" href="#bare-tile" aria-label="Link to this section">#</a>Bare tile</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>slots</code></td><td>3000</td></tr>
+</tbody></table></div>
+<h3 id="by-use"><a class="anchor" href="#by-use" aria-label="Link to this section">#</a>By use</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>class</th><th>activity</th><th>food</th><th>harvest roll</th></tr></thead>
+<tbody>
+<tr><td>Fields</td><td>farmers</td><td>farming</td><td>yes</td><td>yes</td></tr>
+<tr><td>Pasture</td><td>herders</td><td>herding</td><td>yes</td><td>no</td></tr>
+<tr><td>Woods</td><td>woodsmen</td><td>hunting and gathering</td><td>yes</td><td>no</td></tr>
+<tr><td>Shore</td><td>seafolk</td><td>fishing</td><td>no</td><td>no</td></tr>
+</tbody></table></div>
+<h2 id="buildings"><a class="anchor" href="#buildings" aria-label="Link to this section">#</a>Buildings</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>craft</code></td><td>loom house, forge, kiln, tannery, press, brewery or winery, powder mill</td></tr>
+<tr><td><code>fallow_below</code></td><td>0.5</td></tr>
+<tr><td><code>timber_reach_rings</code></td><td>1</td></tr>
+</tbody></table></div>
+<h3 id="land"><a class="anchor" href="#land" aria-label="Link to this section">#</a>Land</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>uses</th><th>slots</th><th>class</th><th>unlock</th><th>food per worker</th><th>harvests</th><th>harvest roll</th><th>hazards</th><th>needs timber</th><th>more</th></tr></thead>
+<tbody>
+<tr><td>farm</td><td>Fields</td><td>12000</td><td>farmers</td><td>none</td><td>1.5</td><td>1</td><td>yes</td><td></td><td></td><td></td></tr>
+<tr><td>rice paddy</td><td>Fields</td><td>18000</td><td>farmers</td><td><a href="/wiki/Data-Research#inventions">F2 Wet-rice terracing</a></td><td>1.5</td><td>2</td><td>yes</td><td></td><td></td><td>needs water: yes</td></tr>
+<tr><td>terrace</td><td>Fields</td><td>12000</td><td>farmers</td><td><a href="/wiki/Data-Research#inventions">F2 Wet-rice terracing</a></td><td>1.5</td><td>1</td><td>yes</td><td></td><td></td><td>grounds: hills, mountains</td></tr>
+<tr><td>raised fields</td><td>Marsh</td><td>12000</td><td>farmers</td><td><a href="/wiki/Data-Research#inventions">F6 Chinampa and raised fields</a></td><td>1.5</td><td>1</td><td>yes</td><td></td><td></td><td></td></tr>
+<tr><td>plantation</td><td>Fields</td><td>12000</td><td>farmers</td><td><a href="/wiki/Data-Research#inventions">F10 Sugar and spice plantations</a></td><td></td><td></td><td></td><td></td><td></td><td>tropical: yes</td></tr>
+<tr><td>ranch</td><td>Pasture</td><td>3000</td><td>herders</td><td>none</td><td>1.33</td><td>1</td><td>no</td><td>drought, hard winter</td><td></td><td></td></tr>
+<tr><td>horse stud</td><td>Pasture</td><td>3000</td><td>herders</td><td><a href="/wiki/Data-Research#inventions">F11 Horse breeding studs</a></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>lumber camp</td><td>Woods</td><td>1500</td><td>woodsmen</td><td>none</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>hunting lodge</td><td>Woods</td><td>1500</td><td>woodsmen</td><td>none</td><td>1</td><td>1</td><td>no</td><td>hard winter</td><td></td><td></td></tr>
+<tr><td>mine</td><td>Waste</td><td>6000</td><td>miners</td><td>none</td><td></td><td></td><td></td><td></td><td>yes</td><td>rough grounds: hills, mountains; needs seam: yes</td></tr>
+<tr><td>irrigation works</td><td>Waste, Fields</td><td>1500</td><td>farmers</td><td><a href="/wiki/Data-Research#inventions">F3 Qanat and canal irrigation</a></td><td></td><td></td><td></td><td></td><td></td><td>fields grounds: drylands</td></tr>
+<tr><td>fishery</td><td>Shore</td><td>3000</td><td>seafolk</td><td>none</td><td>1.33</td><td>1</td><td>no</td><td>storms, blockades</td><td></td><td></td></tr>
+<tr><td>saltworks</td><td>Shore</td><td>1500</td><td>miners</td><td>none</td><td></td><td></td><td></td><td></td><td></td><td>dry or warm coast: yes</td></tr>
+<tr><td>harbour</td><td>Shore</td><td>1500</td><td>seafolk</td><td>none</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>shipyard</td><td>Shore</td><td>3000</td><td>seafolk</td><td>none</td><td></td><td></td><td></td><td></td><td>yes</td><td>needs harbour: yes</td></tr>
+<tr><td>bridge</td><td>Shore</td><td>0</td><td>none</td><td>none</td><td></td><td></td><td></td><td></td><td></td><td>river: yes</td></tr>
+<tr><td>castle</td><td>Castle</td><td>0</td><td>none</td><td>none</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+</tbody></table></div>
+<h3 id="town-1"><a class="anchor" href="#town-1" aria-label="Link to this section">#</a>Town</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>slots</th><th>class</th><th>needs</th><th>min town size</th></tr></thead>
+<tbody>
+<tr><td>loom house</td><td>1500</td><td>craftsmen</td><td>raw ware</td><td></td></tr>
+<tr><td>forge</td><td>1500</td><td>craftsmen</td><td>iron</td><td></td></tr>
+<tr><td>kiln</td><td>1500</td><td>craftsmen</td><td>clay</td><td></td></tr>
+<tr><td>tannery</td><td>1500</td><td>craftsmen</td><td>hides</td><td></td></tr>
+<tr><td>press</td><td>900</td><td>craftsmen</td><td>paper, printing</td><td></td></tr>
+<tr><td>brewery or winery</td><td>900</td><td>craftsmen</td><td>grain or grapes</td><td></td></tr>
+<tr><td>market</td><td>1500</td><td>market folk</td><td>market charter for the fair</td><td></td></tr>
+<tr><td>caravanserai or warehouse</td><td>900</td><td>market folk</td><td>road</td><td></td></tr>
+<tr><td>house of worship</td><td>600</td><td>clergy</td><td>none</td><td></td></tr>
+<tr><td>school</td><td>0</td><td>scholars</td><td>none</td><td>market town</td></tr>
+<tr><td>seat</td><td>300</td><td>clerks</td><td>own official</td><td>town</td></tr>
+<tr><td>almshouse</td><td>600</td><td>clergy</td><td>gold upkeep</td><td></td></tr>
+<tr><td>powder mill</td><td>900</td><td>craftsmen</td><td>saltpetre</td><td></td></tr>
+<tr><td>hospital, wells and drains</td><td>600</td><td>clergy</td><td>later inventions</td><td></td></tr>
+<tr><td>factory</td><td>6000</td><td>craftsmen</td><td>era V inventions, coal or water power</td><td></td></tr>
+<tr><td>rail station</td><td>600</td><td>craftsmen</td><td>railway invention, road</td><td></td></tr>
+</tbody></table></div>
+<h3 id="mill"><a class="anchor" href="#mill" aria-label="Link to this section">#</a>Mill</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>unlock</code></td><td><a href="/wiki/Data-Research#inventions">F5 Water and wind mills</a></td></tr>
+<tr><td><code>gold_bonus</code></td><td>0.25</td></tr>
+</tbody></table></div>
+<h3 id="castle-steps"><a class="anchor" href="#castle-steps" aria-label="Link to this section">#</a>Castle steps</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>none</code></td><td>none</td></tr>
+<tr><td><code>earthwork ring fort</code></td><td><a href="/wiki/Data-Research#inventions">B4 Earthwork ring forts</a></td></tr>
+<tr><td><code>stone castle</code></td><td><a href="/wiki/Data-Research#inventions">B1 Stone castles</a></td></tr>
+<tr><td><code>bastion fort</code></td><td><a href="/wiki/Data-Research#inventions">B5 bastion_fortification</a></td></tr>
+<tr><td><code>star fort</code></td><td><a href="/wiki/Data-Research#inventions">B6 Star forts</a></td></tr>
+</tbody></table></div>
+<h3 id="lord-traits"><a class="anchor" href="#lord-traits" aria-label="Link to this section">#</a>Lord traits</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>Builder</code></td><td>any</td></tr>
+<tr><td><code>Greedy</code></td><td>market, mine</td></tr>
+<tr><td><code>Pious</code></td><td>house of worship</td></tr>
+<tr><td><code>Warlike</code></td><td>castle</td></tr>
+</tbody></table></div>
+<h2 id="almshouse"><a class="anchor" href="#almshouse" aria-label="Link to this section">#</a>Almshouse</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>shelters</code></td><td>3000</td></tr>
+</tbody></table></div>
+<h2 id="food"><a class="anchor" href="#food" aria-label="Link to this section">#</a>Food</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>bare_per_worker</code></td><td>0.67</td></tr>
+<tr><td><code>harvest_order</code></td><td>failed, poor, normal, good, bumper</td></tr>
+</tbody></table></div>
+<h3 id="harvest"><a class="anchor" href="#harvest" aria-label="Link to this section">#</a>Harvest</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>bumper</code></td><td>1.3</td></tr>
+<tr><td><code>good</code></td><td>1.15</td></tr>
+<tr><td><code>normal</code></td><td>1</td></tr>
+<tr><td><code>poor</code></td><td>0.7</td></tr>
+<tr><td><code>failed</code></td><td>0.3</td></tr>
+</tbody></table></div>
+<h3 id="new-crops"><a class="anchor" href="#new-crops" aria-label="Link to this section">#</a>New crops</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>invention</code></td><td><a href="/wiki/Data-Research#inventions">F9 Maize, potato and cassava</a></td></tr>
+<tr><td><code>failed_becomes</code></td><td>poor</td></tr>
+</tbody></table></div>
+<h3 id="hunting"><a class="anchor" href="#hunting" aria-label="Link to this section">#</a>Hunting</h3>
+<blockquote>
+<p>Feedback 81. Woods hold game for the hunters their tiles&#39; slots can take; more hunters than that thin it. Game moves toward what the hunting leaves each year; a hard winter cuts the year&#39;s catch.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>boreal_lat</code></td><td>55</td></tr>
+<tr><td><code>boreal_yield</code></td><td>1.3</td></tr>
+<tr><td><code>beyond_woods</code></td><td>0.5</td></tr>
+<tr><td><code>thinning_per_crowding</code></td><td>0.35</td></tr>
+<tr><td><code>game_floor</code></td><td>0.3</td></tr>
+<tr><td><code>regrow_per_year</code></td><td>0.2</td></tr>
+</tbody></table></div>
+<h4 id="game-yield"><a class="anchor" href="#game-yield" aria-label="Link to this section">#</a>Game yield</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>tundra</code></td><td>1.3</td></tr>
+<tr><td><code>forest</code></td><td>1.1</td></tr>
+<tr><td><code>jungle</code></td><td>1</td></tr>
+<tr><td><code>base</code></td><td>0.9</td></tr>
+</tbody></table></div>
+<h4 id="hard-winter"><a class="anchor" href="#hard-winter" aria-label="Link to this section">#</a>Hard winter</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>north_lat</code></td><td>55</td></tr>
+<tr><td><code>north_one_in</code></td><td>5</td></tr>
+<tr><td><code>mid_lat</code></td><td>45</td></tr>
+<tr><td><code>mid_one_in</code></td><td>8</td></tr>
+<tr><td><code>catch</code></td><td>0.6</td></tr>
+</tbody></table></div>
+<h2 id="wares"><a class="anchor" href="#wares" aria-label="Link to this section">#</a>Wares</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>list</code></td><td>grain, rice, wine, olive oil, wool, cloth, flax, linen, silk, cotton, salt, fish, timber, furs, hides, leather, horses, iron, tools, arms, copper, tin, silver, gold, gems, spices, pepper, sugar, tea, coffee, cocoa, tobacco, incense, ivory, pottery, porcelain, dyes, paper, books, saltpetre, powder</td></tr>
+<tr><td><code>later</code></td><td>coal, rubber, oil</td></tr>
+<tr><td><code>craft_value</code></td><td>3</td></tr>
+</tbody></table></div>
+<h3 id="crafts"><a class="anchor" href="#crafts" aria-label="Link to this section">#</a>Crafts</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>cloth</code></td><td>wool</td></tr>
+<tr><td><code>linen</code></td><td>flax</td></tr>
+<tr><td><code>leather</code></td><td>hides</td></tr>
+<tr><td><code>tools</code></td><td>iron</td></tr>
+<tr><td><code>arms</code></td><td>iron</td></tr>
+</tbody></table></div>
+<h2 id="classes"><a class="anchor" href="#classes" aria-label="Link to this section">#</a>Classes</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>all</code></td><td>farmers, herders, woodsmen, miners, seafolk, craftsmen, market folk, clergy, clerks, scholars, homeless</td></tr>
+<tr><td><code>town</code></td><td>craftsmen, market folk, clergy, clerks, scholars</td></tr>
+<tr><td><code>food</code></td><td>farmers, herders, woodsmen, seafolk</td></tr>
+<tr><td><code>no_overflow</code></td><td>scholars</td></tr>
+</tbody></table></div>
+<h2 id="births"><a class="anchor" href="#births" aria-label="Link to this section">#</a>Births</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>farmers</code></td><td>0.04</td></tr>
+<tr><td><code>herders</code></td><td>0.04</td></tr>
+<tr><td><code>woodsmen</code></td><td>0.04</td></tr>
+<tr><td><code>seafolk</code></td><td>0.04</td></tr>
+<tr><td><code>miners</code></td><td>0.035</td></tr>
+<tr><td><code>craftsmen</code></td><td>0.03</td></tr>
+<tr><td><code>market folk</code></td><td>0.03</td></tr>
+<tr><td><code>clerks</code></td><td>0.03</td></tr>
+<tr><td><code>clergy_celibate</code></td><td>0.005</td></tr>
+<tr><td><code>scholars</code></td><td>0.01</td></tr>
+<tr><td><code>homeless</code></td><td>0.04</td></tr>
+</tbody></table></div>
+<h2 id="deaths"><a class="anchor" href="#deaths" aria-label="Link to this section">#</a>Deaths</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>farmers</code></td><td>0.03</td></tr>
+<tr><td><code>herders</code></td><td>0.03</td></tr>
+<tr><td><code>woodsmen</code></td><td>0.03</td></tr>
+<tr><td><code>seafolk</code></td><td>0.03</td></tr>
+<tr><td><code>miners</code></td><td>0.04</td></tr>
+<tr><td><code>craftsmen</code></td><td>0.035</td></tr>
+<tr><td><code>market folk</code></td><td>0.035</td></tr>
+<tr><td><code>clerks</code></td><td>0.035</td></tr>
+<tr><td><code>clergy</code></td><td>0.03</td></tr>
+<tr><td><code>scholars</code></td><td>0.03</td></tr>
+<tr><td><code>homeless</code></td><td>0.05</td></tr>
+</tbody></table></div>
+<h2 id="death-modifiers"><a class="anchor" href="#death-modifiers" aria-label="Link to this section">#</a>Death modifiers</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>war</code></td><td>0.01</td></tr>
+<tr><td><code>per_burned_tile</code></td><td>0.005</td></tr>
+<tr><td><code>smoke_town</code></td><td>0.01</td></tr>
+<tr><td><code>hospitals_town</code></td><td>-0.005</td></tr>
+<tr><td><code>sanitation</code></td><td>-0.005</td></tr>
+<tr><td><code>vaccination</code></td><td>-0.005</td></tr>
+</tbody></table></div>
+<h3 id="plague"><a class="anchor" href="#plague" aria-label="Link to this section">#</a>Plague</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>rumour</code></td><td>0.05</td></tr>
+<tr><td><code>outbreak</code></td><td>0.15</td></tr>
+<tr><td><code>worst</code></td><td>0.3</td></tr>
+</tbody></table></div>
+<h2 id="famine"><a class="anchor" href="#famine" aria-label="Link to this section">#</a>Famine</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>flee_share</code></td><td>0.25</td></tr>
+<tr><td><code>year_share</code></td><td>0.2</td></tr>
+</tbody></table></div>
+<h2 id="mines"><a class="anchor" href="#mines" aria-label="Link to this section">#</a>Mines</h2>
+<blockquote>
+<p>Feedback 87, PROV-065 to PROV-067. Rough waste (hills, mountains) may hold a seam: a ware and the years of digging it has left. The map&#39;s anchors are the famous mines of 1444; elsewhere a seam is found by a fixed roll per province, so every game has the same geology. A mine digs a year off its seam each January and closes when it runs out.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>seam_chance</code></td><td>0.35</td></tr>
+<tr><td><code>years_min</code></td><td>40</td></tr>
+<tr><td><code>years_max</code></td><td>160</td></tr>
+<tr><td><code>precious</code></td><td>silver, gold</td></tr>
+<tr><td><code>timber_reach</code></td><td>1</td></tr>
+<tr><td><code>salt_grounds</code></td><td>drylands, desert, savanna</td></tr>
+<tr><td><code>salt_lat_below</code></td><td>42</td></tr>
+</tbody></table></div>
+<h3 id="ware-weights"><a class="anchor" href="#ware-weights" aria-label="Link to this section">#</a>Ware weights</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>iron</code></td><td>45</td></tr>
+<tr><td><code>copper</code></td><td>20</td></tr>
+<tr><td><code>tin</code></td><td>8</td></tr>
+<tr><td><code>silver</code></td><td>12</td></tr>
+<tr><td><code>gold</code></td><td>5</td></tr>
+<tr><td><code>salt</code></td><td>10</td></tr>
+</tbody></table></div>
+<h3 id="anchors"><a class="anchor" href="#anchors" aria-label="Link to this section">#</a>Anchors</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>ware</th><th>years</th><th>mine</th></tr></thead>
+<tbody>
+<tr><td>Středočeský</td><td>silver</td><td>120</td><td>Kutná Hora</td></tr>
+<tr><td>Dalarna</td><td>copper</td><td>300</td><td>Falun</td></tr>
+<tr><td>South Kayes</td><td>gold</td><td>300</td><td>Bambuk gold field</td></tr>
+<tr><td>Siguiri</td><td>gold</td><td>300</td><td>Bure gold field</td></tr>
+<tr><td>Ashanti</td><td>gold</td><td>300</td><td>Akan forest gold</td></tr>
+<tr><td>Masvingo</td><td>gold</td><td>200</td><td>Zimbabwe plateau gold</td></tr>
+<tr><td>Manicaland</td><td>gold</td><td>200</td><td>Manyika gold</td></tr>
+</tbody></table></div>
+<h3 id="trade"><a class="anchor" href="#trade" aria-label="Link to this section">#</a>Trade</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>base</code></td><td>1</td></tr>
+<tr><td><code>precious</code></td><td>3</td></tr>
+</tbody></table></div>
+<h2 id="homeless"><a class="anchor" href="#homeless" aria-label="Link to this section">#</a>Homeless</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>theft_from</code></td><td>0.05</td></tr>
+<tr><td><code>theft_step</code></td><td>0.05</td></tr>
+<tr><td><code>grievance_over</code></td><td>0.1</td></tr>
+<tr><td><code>shanty_over</code></td><td>0.2</td></tr>
+<tr><td><code>shanty_town_death_extra</code></td><td>0.01</td></tr>
+<tr><td><code>shanty_plague_spread</code></td><td>2</td></tr>
+</tbody></table></div>
+<h2 id="refugees"><a class="anchor" href="#refugees" aria-label="Link to this section">#</a>Refugees</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>settle_years</code></td><td>2</td></tr>
+</tbody></table></div>
+<h2 id="recruits"><a class="anchor" href="#recruits" aria-label="Link to this section">#</a>Recruits</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>conscription_below</code></td><td>0.25</td></tr>
+<tr><td><code>conscription_ends_at</code></td><td>0.5</td></tr>
+<tr><td><code>no_recruits_from</code></td><td>clergy, scholars</td></tr>
+</tbody></table></div>
+<h2 id="tax"><a class="anchor" href="#tax" aria-label="Link to this section">#</a>Tax</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>rates</code></td><td>none, light, normal, heavy, crushing</td></tr>
+<tr><td><code>no_official_share</code></td><td>0.5</td></tr>
+<tr><td><code>lord_share</code></td><td>0.5</td></tr>
+<tr><td><code>riots_factor</code></td><td>0.5</td></tr>
+<tr><td><code>free_travel_days</code></td><td>5</td></tr>
+<tr><td><code>cap_charter_max</code></td><td>light</td></tr>
+</tbody></table></div>
+<h3 id="heavy-weight"><a class="anchor" href="#heavy-weight" aria-label="Link to this section">#</a>Heavy weight</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>heavy</code></td><td>1</td></tr>
+<tr><td><code>crushing</code></td><td>2</td></tr>
+</tbody></table></div>
+<h3 id="owed"><a class="anchor" href="#owed" aria-label="Link to this section">#</a>Owed</h3>
+<blockquote>
+<p>D-PROV-33: gold a year at the normal rate per 1,000 workers in working land buildings and per 1,000 townsfolk; the rate scales it as the realm&#39;s tax steps. Tolls are trade&#39;s, never here.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>per_1000_building_workers</code></td><td>0.12</td></tr>
+<tr><td><code>per_1000_townsfolk</code></td><td>0.5</td></tr>
+</tbody></table></div>
+<h4 id="rate-factor"><a class="anchor" href="#rate-factor" aria-label="Link to this section">#</a>Rate factor</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>none</code></td><td>0</td></tr>
+<tr><td><code>light</code></td><td>0.5</td></tr>
+<tr><td><code>normal</code></td><td>1</td></tr>
+<tr><td><code>heavy</code></td><td>1.5</td></tr>
+<tr><td><code>crushing</code></td><td>2</td></tr>
+</tbody></table></div>
+<h3 id="presets"><a class="anchor" href="#presets" aria-label="Link to this section">#</a>Presets</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>all</th><th>border</th><th>heartland</th><th>towns</th><th>countryside</th></tr></thead>
+<tbody>
+<tr><td>Even</td><td>normal</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Spare the frontier</td><td></td><td>light</td><td>heavy</td><td></td><td></td></tr>
+<tr><td>Squeeze the towns</td><td></td><td></td><td></td><td>heavy</td><td>light</td></tr>
+<tr><td>War chest</td><td>heavy</td><td></td><td></td><td></td><td></td></tr>
+</tbody></table></div>
+<h2 id="tolls"><a class="anchor" href="#tolls" aria-label="Link to this section">#</a>Tolls</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>rates</code></td><td>none, low, high</td></tr>
+<tr><td><code>points</code></td><td>bridge, ford, pass, river mouth, strait</td></tr>
+</tbody></table></div>
+<h2 id="roads"><a class="anchor" href="#roads" aria-label="Link to this section">#</a>Roads</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>steps</code></td><td>none, track, road, paved road, turnpike, railway</td></tr>
+<tr><td><code>canal_inventions</code></td><td><a href="/wiki/Data-Research#inventions">B3 Grand canals</a>, Canal locks</td></tr>
+</tbody></table></div>
+<h3 id="travel"><a class="anchor" href="#travel" aria-label="Link to this section">#</a>Travel</h3>
+<blockquote>
+<p>D-PROV-34: winter slows roads and rivers; an enemy army on the road or a broken road forces a detour; a sea route closed in war is no route.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>winter</code></td><td>1.5</td></tr>
+<tr><td><code>enemy_army</code></td><td>2</td></tr>
+<tr><td><code>broken_road</code></td><td>2</td></tr>
+</tbody></table></div>
+<h2 id="far-from-throne"><a class="anchor" href="#far-from-throne" aria-label="Link to this section">#</a>Far from throne</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>days</code></td><td>30</td></tr>
+</tbody></table></div>
+<h2 id="officials"><a class="anchor" href="#officials" aria-label="Link to this section">#</a>Officials</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>full_effect_years</code></td><td>5</td></tr>
+<tr><td><code>first_year_share</code></td><td>0.5</td></tr>
+<tr><td><code>types</code></td><td>tax collector, steward, judge, master of works, muster master, customs officer, chaplain, schoolmaster, warden, colonial governor</td></tr>
+</tbody></table></div>
+<h3 id="effects"><a class="anchor" href="#effects" aria-label="Link to this section">#</a>Effects</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>tax reach</th><th>food</th><th>store rot</th><th>riots extra grievances</th><th>broken charter fade</th><th>build cost</th><th>build time</th><th>burned rebuild</th><th>recruit refill</th><th>more</th></tr></thead>
+<tbody>
+<tr><td>tax collector</td><td>0.2</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>steward</td><td></td><td>0.1</td><td>0.5</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>judge</td><td></td><td></td><td></td><td>1</td><td>2</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>master of works</td><td></td><td></td><td></td><td></td><td></td><td>-0.25</td><td>0.5</td><td>2</td><td></td><td></td></tr>
+<tr><td>muster master</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>0.25</td><td></td></tr>
+<tr><td>customs officer</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>trade ratio gain: 0.15</td></tr>
+<tr><td>chaplain</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>faith shift: 2</td></tr>
+<tr><td>schoolmaster</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>tongue shift: 2; graduate sooner years: 1</td></tr>
+<tr><td>warden</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>garrison: 0.25; walls repair: 2; castle store rot: 0.5</td></tr>
+<tr><td>colonial governor</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+</tbody></table></div>
+<h3 id="school-trains"><a class="anchor" href="#school-trains" aria-label="Link to this section">#</a>School trains</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>madrasa</code></td><td>judge, chaplain</td></tr>
+<tr><td><code>university</code></td><td>judge, steward</td></tr>
+<tr><td><code>academy</code></td><td>master of works, warden</td></tr>
+</tbody></table></div>
+<h3 id="hire"><a class="anchor" href="#hire" aria-label="Link to this section">#</a>Hire</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>gold</code></td><td>25</td></tr>
+<tr><td><code>foreign_multiplier</code></td><td>2</td></tr>
+<tr><td><code>provisional</code></td><td>yes</td></tr>
+</tbody></table></div>
+<h3 id="auto-fill"><a class="anchor" href="#auto-fill" aria-label="Link to this section">#</a>Auto fill</h3>
+<blockquote>
+<p>PROV-342, PROV-343: gold auto-fill keeps back, and months of food under which a steward fits best.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>reserve_gold</code></td><td>20</td></tr>
+<tr><td><code>hungry_months</code></td><td>1</td></tr>
+<tr><td><code>traders_passing</code></td><td>3</td></tr>
+<tr><td><code>provisional</code></td><td>yes</td></tr>
+</tbody></table></div>
+<h2 id="homeland"><a class="anchor" href="#homeland" aria-label="Link to this section">#</a>Homeland</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>years</code></td><td>100</td></tr>
+</tbody></table></div>
+<h2 id="pretender"><a class="anchor" href="#pretender" aria-label="Link to this section">#</a>Pretender</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>years</code></td><td>50</td></tr>
+</tbody></table></div>
+<h2 id="charters"><a class="anchor" href="#charters" aria-label="Link to this section">#</a>Charters</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>kinds</code></td><td>market charter, tax cap, town law, no quartering, faith tolerance, free trade, mining right</td></tr>
+<tr><td><code>broken_years</code></td><td>20</td></tr>
+<tr><td><code>mining_right_share</code></td><td>0.5</td></tr>
+</tbody></table></div>
+<h2 id="castle"><a class="anchor" href="#castle" aria-label="Link to this section">#</a>Castle</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>steps</code></td><td>none, earthwork ring fort, stone castle, bastion fort, star fort</td></tr>
+<tr><td><code>neglect_years</code></td><td>10</td></tr>
+</tbody></table></div>
+<h2 id="walls"><a class="anchor" href="#walls" aria-label="Link to this section">#</a>Walls</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>max_breaches</code></td><td>3</td></tr>
+</tbody></table></div>
+<h2 id="grievances"><a class="anchor" href="#grievances" aria-label="Link to this section">#</a>Grievances</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>soldiers_quartered_seasons</code></td><td>1</td></tr>
+<tr><td><code>requisitioned_seasons</code></td><td>1</td></tr>
+<tr><td><code>bloodshed_years</code></td><td>20</td></tr>
+<tr><td><code>harsh_lord_traits</code></td><td>Cruel, Greedy</td></tr>
+</tbody></table></div>
+<h3 id="levels"><a class="anchor" href="#levels" aria-label="Link to this section">#</a>Levels</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>grumbling</code></td><td>2</td></tr>
+<tr><td><code>riots</code></td><td>3</td></tr>
+<tr><td><code>rebels</code></td><td>4</td></tr>
+</tbody></table></div>
+<h3 id="hungry"><a class="anchor" href="#hungry" aria-label="Link to this section">#</a>Hungry</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>starts_below_months</code></td><td>1</td></tr>
+<tr><td><code>ends_above_months</code></td><td>3</td></tr>
+</tbody></table></div>
+<h2 id="plague-1"><a class="anchor" href="#plague-1" aria-label="Link to this section">#</a>Plague</h2>
+<blockquote>
+<p>PROV-352 to PROV-363 (18 October 2026): the game&#39;s plague. Every number below is provisional. Weeks are plague weeks, the days of decided.plague_week_days (four a month). A province&#39;s crowding is its townsfolk share over crowd_town_share, kept between crowd_min and crowd_max.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>steps</code></td><td>none, rumour, outbreak, burning out</td></tr>
+<tr><td><code>care_death_cut</code> (provisional)</td><td>0.5</td></tr>
+<tr><td><code>outbreak_seasons</code></td><td>1, 2</td></tr>
+<tr><td><code>links</code></td><td>road, river, sea route, army, refugees</td></tr>
+<tr><td><code>start_chance_year</code> (provisional)</td><td>0.003</td></tr>
+<tr><td><code>crowd_town_share</code> (provisional)</td><td>0.1</td></tr>
+<tr><td><code>crowd_min</code> (provisional)</td><td>0.5</td></tr>
+<tr><td><code>crowd_max</code> (provisional)</td><td>3</td></tr>
+<tr><td><code>rumour_weeks</code> (provisional)</td><td>4</td></tr>
+<tr><td><code>weeks_per_season</code> (provisional)</td><td>12</td></tr>
+<tr><td><code>burning_out_weeks</code> (provisional)</td><td>4</td></tr>
+<tr><td><code>spread_week</code> (provisional)</td><td>0.04</td></tr>
+<tr><td><code>river_factor</code> (provisional)</td><td>1.5</td></tr>
+<tr><td><code>sea_spread_week</code> (provisional)</td><td>0.0015</td></tr>
+<tr><td><code>into_quarantine_factor</code> (provisional)</td><td>0.25</td></tr>
+<tr><td><code>army_carry_weeks</code> (provisional)</td><td>4</td></tr>
+<tr><td><code>army_spread_week</code> (provisional)</td><td>0.15</td></tr>
+<tr><td><code>spared_years</code> (provisional)</td><td>12</td></tr>
+<tr><td><code>town_week_share_max</code> (provisional)</td><td>0.02</td></tr>
+<tr><td><code>quarantine_tax_factor</code> (provisional)</td><td>0.5</td></tr>
+</tbody></table></div>
+<h2 id="fever-land"><a class="anchor" href="#fever-land" aria-label="Link to this section">#</a>Fever land</h2>
+<blockquote>
+<p>D-PROV-32: steps from the ground, one more in the tropics and one more for every two marsh tiles, one less for each of quinine and sanitation known. People born elsewhere die at the extra yearly rate of the step; locals at local_share of it.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>steps</code></td><td>none, mild, harsh, deadly</td></tr>
+<tr><td><code>tropics_lat</code></td><td>23.5</td></tr>
+<tr><td><code>tropics_steps</code></td><td>1</td></tr>
+<tr><td><code>marsh_tiles_per_step</code></td><td>2</td></tr>
+<tr><td><code>lowered_by</code></td><td>quinine, sanitation</td></tr>
+<tr><td><code>local_share</code></td><td>0.1</td></tr>
+</tbody></table></div>
+<h3 id="by-ground"><a class="anchor" href="#by-ground" aria-label="Link to this section">#</a>By ground</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>jungle</code></td><td>2</td></tr>
+<tr><td><code>marsh</code></td><td>1</td></tr>
+<tr><td><code>savanna</code></td><td>1</td></tr>
+</tbody></table></div>
+<h3 id="deaths-born-elsewhere"><a class="anchor" href="#deaths-born-elsewhere" aria-label="Link to this section">#</a>Deaths born elsewhere</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>none</code></td><td>0</td></tr>
+<tr><td><code>mild</code></td><td>0.05</td></tr>
+<tr><td><code>harsh</code></td><td>0.15</td></tr>
+<tr><td><code>deadly</code></td><td>0.3</td></tr>
+</tbody></table></div>
+<h2 id="smoke"><a class="anchor" href="#smoke" aria-label="Link to this section">#</a>Smoke</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>from_era</code></td><td>V</td></tr>
+<tr><td><code>sources</code></td><td>factory, coal mine</td></tr>
+</tbody></table></div>
+<h2 id="settlement"><a class="anchor" href="#settlement" aria-label="Link to this section">#</a>Settlement</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>steps</code></td><td>none, trading post, settlement, colony</td></tr>
+</tbody></table></div>
+<h2 id="event-map"><a class="anchor" href="#event-map" aria-label="Link to this section">#</a>Event map</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>population</code></td><td>People</td></tr>
+<tr><td><code>prosperity</code></td><td>buildings and their workers</td></tr>
+<tr><td><code>devastation</code></td><td>burned tiles</td></tr>
+<tr><td><code>unrest</code></td><td>grievances and rebels</td></tr>
+<tr><td><code>control</code></td><td>governed by, days to capital and reaches you</td></tr>
+<tr><td><code>fort_level</code></td><td>castle and walls</td></tr>
+<tr><td><code>infrastructure</code></td><td>road, harbour and bridge</td></tr>
+<tr><td><code>industry</code></td><td>factories</td></tr>
+<tr><td><code>trade_good</code></td><td>wares made</td></tr>
+<tr><td><code>trade_access</code></td><td>trade ratio gain</td></tr>
+<tr><td><code>local_supply</code></td><td>food from tiles, local store and castle store</td></tr>
+<tr><td><code>food_security</code></td><td>food from tiles, local store and castle store</td></tr>
+<tr><td><code>urbanization</code></td><td>townsfolk share</td></tr>
+<tr><td><code>manpower_yield</code></td><td>recruits here</td></tr>
+<tr><td><code>disease_burden</code></td><td>plague and fever land</td></tr>
+<tr><td><code>environmental_degradation</code></td><td>worn tiles and smoke</td></tr>
+<tr><td><code>culture_share</code></td><td>language mix</td></tr>
+<tr><td><code>religion_share</code></td><td>faith mix</td></tr>
+<tr><td><code>colonial_status</code></td><td>settlement and governed by</td></tr>
+<tr><td><code>terrain</code></td><td>ground and tile mix</td></tr>
+<tr><td><code>innovation_presence</code></td><td>schools and scholars here</td></tr>
+</tbody></table></div>
+<h2 id="card"><a class="anchor" href="#card" aria-label="Link to this section">#</a>Card</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>lines</code></td><td>owner, governance, official, pretender, ground, tile row, people, classes, food, town, trade, tax, recruits, castle, faith, language, grievances, rebels</td></tr>
+</tbody></table></div>
+<h3 id="gain-lose"><a class="anchor" href="#gain-lose" aria-label="Link to this section">#</a>Gain lose</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>gain</th><th>lose</th></tr></thead>
+<tbody>
+<tr><td>tax</td><td>the value of what its buildings make, townsfolk, an official in a royal province, few days to the capital or a seat, roads</td><td>burned and fallow tiles, homeless people, riots (half), no official (half), a lord (he keeps half), every day of travel beyond 5, enemy armies on the road, occupation (nothing)</td></tr>
+<tr><td>people</td><td>births, refugees settling, migrants coming for work</td><td>deaths, famine, war, leaving for work or safety, soldiers who die on campaign</td></tr>
+<tr><td>recruits</td><td>a share of every class except clergy and scholars each year, more from homeless men</td><td>raising soldiers, enrolling students, famine and plague, losing the province</td></tr>
+<tr><td>castle</td><td>building or upgrading, conquering one</td><td>destroyed in a siege, demolished in a peace, 10 years without upkeep drops it a step</td></tr>
+</tbody></table></div>
+<h2 id="decided"><a class="anchor" href="#decided" aria-label="Link to this section">#</a>Decided</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>tax_months_per_year</code></td><td>12</td></tr>
+<tr><td><code>neglected_output</code></td><td>0.5</td></tr>
+<tr><td><code>tax_travel_loss_per_day</code> (provisional)</td><td>0.05</td></tr>
+<tr><td><code>tax_collector_bonus</code></td><td>0.2</td></tr>
+<tr><td><code>town_tiles_at</code> (provisional)</td><td>0, 40000, 100000</td></tr>
+<tr><td><code>recruit_share_per_class</code> (provisional)</td><td>0.01</td></tr>
+<tr><td><code>homeless_drift_share</code> (provisional)</td><td>0.02</td></tr>
+<tr><td><code>refugee_settle_years</code> (provisional)</td><td>2</td></tr>
+<tr><td><code>plotting_at</code></td><td>4</td></tr>
+<tr><td><code>spark_at</code></td><td>3</td></tr>
+<tr><td><code>judge_riots_extra</code></td><td>1</td></tr>
+<tr><td><code>lord_ungoverned_share</code></td><td>0.5</td></tr>
+<tr><td><code>sickness_local_share</code></td><td>0.5</td></tr>
+<tr><td><code>plague_week_days</code></td><td>7, 14, 21, 28</td></tr>
+<tr><td><code>homeless_trade_cut_per_5pct</code></td><td>0.05</td></tr>
+</tbody></table></div>
+<h3 id="event-effects"><a class="anchor" href="#event-effects" aria-label="Link to this section">#</a>Event effects</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>population</code></td><td>people −10 %, townsfolk first in plague events</td></tr>
+<tr><td><code>prosperity</code></td><td>two new buildings the owner picks</td></tr>
+<tr><td><code>devastation</code></td><td>30 % of its tiles burned</td></tr>
+<tr><td><code>unrest</code></td><td>one named grievance from the event</td></tr>
+<tr><td><code>control</code></td><td>its official fleeing, or its road a step down</td></tr>
+<tr><td><code>fort_level</code></td><td>its castle one step up</td></tr>
+<tr><td><code>infrastructure</code></td><td>its road one step up</td></tr>
+<tr><td><code>industry</code></td><td>one factory</td></tr>
+<tr><td><code>trade_access</code></td><td>trade ratio gain −20 % for the event&#39;s duration</td></tr>
+<tr><td><code>food_security</code></td><td>a harvest two steps worse</td></tr>
+<tr><td><code>disease_burden</code></td><td>a plague outbreak</td></tr>
+<tr><td><code>trade_good</code></td><td>a new main ware</td></tr>
+<tr><td><code>urbanization</code></td><td>5 % of its people moving to town</td></tr>
+<tr><td><code>manpower_yield</code></td><td>its recruit share up by a fifth</td></tr>
+<tr><td><code>environmental_degradation</code></td><td>one tile worn</td></tr>
+<tr><td><code>colonial_status</code></td><td>its settlement one step up</td></tr>
+</tbody></table></div>
+<h3 id="country-sums"><a class="anchor" href="#country-sums" aria-label="Link to this section">#</a>Country sums</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>Gold income</code></td><td>tax reaching you plus trade income over all provinces</td></tr>
+<tr><td><code>People</code></td><td>people plus refugees</td></tr>
+<tr><td><code>Recruits</code></td><td>recruits here in royal provinces only</td></tr>
+<tr><td><code>Food</code></td><td>local stores and castle stores</td></tr>
+<tr><td><code>Hungry</code></td><td>provinces with the &quot;Hungry&quot; grievance</td></tr>
+<tr><td><code>Horses</code></td><td>horse studs and ranches</td></tr>
+<tr><td><code>Ships</code></td><td>ships built at shipyards and based at harbours</td></tr>
+<tr><td><code>Castles</code></td><td>castle buildings</td></tr>
+<tr><td><code>Faith</code></td><td>the people-weighted faith mix</td></tr>
+<tr><td><code>Language</code></td><td>the people-weighted language mix</td></tr>
+<tr><td><code>In revolt</code></td><td>provinces with riots or rebels</td></tr>
+<tr><td><code>Schools, Students, Scholars</code></td><td>school buildings, students here and scholars here</td></tr>
+<tr><td><code>Officials</code></td><td>your officials in royal provinces and seats</td></tr>
+</tbody></table></div>
+<h3 id="birth-points"><a class="anchor" href="#birth-points" aria-label="Link to this section">#</a>Birth points</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>food over 6 months</code></td><td>0.5</td></tr>
+<tr><td><code>10 years of peace</code></td><td>0.5</td></tr>
+<tr><td><code>food under 3 months</code></td><td>-1</td></tr>
+<tr><td><code>Hungry</code></td><td>-2</td></tr>
+<tr><td><code>war</code></td><td>-1</td></tr>
+<tr><td><code>plague</code></td><td>-1</td></tr>
+</tbody></table></div>
+<h3 id="town-size-floors-provisional"><a class="anchor" href="#town-size-floors-provisional" aria-label="Link to this section">#</a>Town size floors (provisional)</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>hamlet</code></td><td>0</td></tr>
+<tr><td><code>village</code></td><td>1000</td></tr>
+<tr><td><code>market town</code></td><td>3000</td></tr>
+<tr><td><code>town</code></td><td>8000</td></tr>
+<tr><td><code>city</code></td><td>20000</td></tr>
+<tr><td><code>great city</code></td><td>40000</td></tr>
+</tbody></table></div>
+<h3 id="rise-chance"><a class="anchor" href="#rise-chance" aria-label="Link to this section">#</a>Rise chance</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>4</code></td><td>0.05</td></tr>
+<tr><td><code>5</code></td><td>0.15</td></tr>
+<tr><td><code>6</code></td><td>0.3</td></tr>
+</tbody></table></div>
+<h3 id="official-learn-years-provisional"><a class="anchor" href="#official-learn-years-provisional" aria-label="Link to this section">#</a>Official learn years (provisional)</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>own</code></td><td>5</td></tr>
+<tr><td><code>cousin</code></td><td>7</td></tr>
+<tr><td><code>stranger</code></td><td>10</td></tr>
+</tbody></table></div>
+<h3 id="sickness-monthly-provisional"><a class="anchor" href="#sickness-monthly-provisional" aria-label="Link to this section">#</a>Sickness monthly (provisional)</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>Low</code></td><td>0</td></tr>
+<tr><td><code>Medium</code></td><td>0.01</td></tr>
+<tr><td><code>High</code></td><td>0.02</td></tr>
+<tr><td><code>Heat</code></td><td>0.02</td></tr>
+<tr><td><code>Cold</code></td><td>0.02</td></tr>
+</tbody></table></div>
+<h3 id="settlement-stages"><a class="anchor" href="#settlement-stages" aria-label="Link to this section">#</a>Settlement stages</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>trading post</code></td><td>Outpost</td></tr>
+<tr><td><code>settlement</code></td><td>Settled</td></tr>
+<tr><td><code>colony</code></td><td>Self-governing</td></tr>
+</tbody></table></div>
+<h3 id="officials-per-province"><a class="anchor" href="#officials-per-province" aria-label="Link to this section">#</a>Officials per province</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>G1</code></td><td>1</td></tr>
+<tr><td><code>G9</code></td><td>2</td></tr>
+<tr><td><code>G16</code></td><td>3</td></tr>
+<tr><td><code>extra_from</code></td><td><a href="/wiki/Data-Research#inventions">B2 Roads and post stations</a>, <a href="/wiki/Data-Research#inventions">G11 Postal service</a>, <a href="/wiki/Data-Research#inventions">T14 telegraphy</a></td></tr>
+</tbody></table></div>

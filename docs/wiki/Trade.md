@@ -313,6 +313,8 @@ Not yet: tolls, trade pacts and embargoes, bandits and capture on the road, lord
 
 ## Numbers
 
+Every value the game uses, made from its config so it always matches the game: [Trade data](Data-Trade). How they combine: [Formulas](Formulas).
+
 Every trade number is a placeholder, all in the trade config file.
 
 | Value | Config key | Design value |
@@ -341,7 +343,7 @@ Every trade number is a placeholder, all in the trade config file.
 | Tax from ratio | `effects.tax_per_ratio_points` | +1 % per 4 points |
 | Crafts floor | `effects.crafts_appear_min_ratio` | 30 % |
 | Missing input | `effects.missing_input_output` | half |
-| Unpaid upkeep before a trader is lost | not yet in config | 6 months |
+| Unpaid upkeep before a trader is lost | `upkeep.unpaid_months_to_lose` | 6 months |
 | Starting traders | `start.traders_by_trade_access` | 6, 4, 2, 1, 0, 0 |
 | Warm-up | `start.warmup_months` | 24 |
 | AI reach | `ai.caravan_reach_provinces`, `ai.ship_reach_sea_zones` | 12 / 40 |

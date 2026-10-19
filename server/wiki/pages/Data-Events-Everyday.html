@@ -1,0 +1,223 @@
+<h1>Everyday events data</h1>
+<p>Every value in the game&#39;s everyday events config, exactly as the game reads it. This page is made from <code>packages/rules/data/domain/events-everyday.json</code> each time the config changes, so it always matches the game. How these values are used is explained on <a href="/wiki/Historical-Events">Historical Events</a>.</p>
+<p>Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and values marked (provisional) are placeholders that may still change in balancing. Inventions are shown by id and name; see <a href="/wiki/Data-Research#inventions">Research data</a>.</p>
+<blockquote>
+<p>Everyday events (domain/events/spec.md §5.22, EVT-115 to EVT-128; feedback 152). Small choices about the realm&#39;s own people and stores, drawn from what the game already holds: its officials, lords, ruler and heir, and food stores, and plague reaching a province of the player&#39;s (EVT-130: not drawn; plague fires it). Each realm draws one every `months_between` months (a range), never while the player has an event waiting. `weight` is how often an event is drawn among the ones that can happen; `needs` names what it is about. Options list their effects in the engine&#39;s small vocabulary (gold, loyalty, official, lands, heir, heir_risk, food_back, new_lord, quarantine, care); `ai` weights the AI&#39;s pick; `needs` on an option hides it when the realm lacks what it asks. `{words}` in braces are filled with the names of who and where. Every number is a placeholder for balance.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>months_between</code></td><td>3, 6</td></tr>
+<tr><td><code>first_within_months</code></td><td>4</td></tr>
+</tbody></table></div>
+<h2 id="food"><a class="anchor" href="#food" aria-label="Link to this section">#</a>Food</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>min_store_months</code></td><td>3</td></tr>
+<tr><td><code>min_store</code></td><td>2</td></tr>
+</tbody></table></div>
+<h2 id="events"><a class="anchor" href="#events" aria-label="Link to this section">#</a>Events</h2>
+<h3 id="official-dies"><a class="anchor" href="#official-dies" aria-label="Link to this section">#</a>Official dies</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>weight</code></td><td>2</td></tr>
+<tr><td><code>needs</code></td><td>official</td></tr>
+<tr><td><code>title</code></td><td>Death of {official}</td></tr>
+<tr><td><code>text</code></td><td>{official}, your {type} at {province}, has died after {years} years in the post. His clerks wait to hear who will take his seat.</td></tr>
+</tbody></table></div>
+<h4 id="options"><a class="anchor" href="#options" aria-label="Link to this section">#</a>Options</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th><th>needs</th></tr></thead>
+<tbody>
+<tr><td>deputy</td><td>Raise his deputy</td><td>3</td><td>(official: new)</td><td></td></tr>
+<tr><td>seasoned</td><td>Send for a seasoned man</td><td>1</td><td>(gold: -25), (official: seasoned)</td><td></td></tr>
+<tr><td>kin</td><td>Give the post to {lord2}&#39;s kinsman</td><td>2</td><td>(official: new), (loyalty: office_at_court; who: lord2)</td><td>lord2</td></tr>
+</tbody></table></div>
+<h3 id="lord-dies"><a class="anchor" href="#lord-dies" aria-label="Link to this section">#</a>Lord dies</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>weight</code></td><td>2</td></tr>
+<tr><td><code>needs</code></td><td>lord</td></tr>
+<tr><td><code>title</code></td><td>Death of {lord}</td></tr>
+<tr><td><code>text</code></td><td>{lord} of the house of {house} has died. His son {son} asks you to confirm him in his father&#39;s lands ({lands}).</td></tr>
+</tbody></table></div>
+<h4 id="options-1"><a class="anchor" href="#options-1" aria-label="Link to this section">#</a>Options</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
+<tbody>
+<tr><td>confirm</td><td>Confirm {son}</td><td>4</td><td>(new_lord: yes)</td></tr>
+<tr><td>relief</td><td>Ask a fee for his lands</td><td>2</td><td>(new_lord: yes), (gold: 20), (loyalty: heavy_taxes; who: lord)</td></tr>
+<tr><td>take</td><td>Take his lands for the crown</td><td>1</td><td>(lands: crown), (loyalty: land_seized_from_another; who: other_lords)</td></tr>
+</tbody></table></div>
+<h3 id="lord-slighted"><a class="anchor" href="#lord-slighted" aria-label="Link to this section">#</a>Lord slighted</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>weight</code></td><td>2</td></tr>
+<tr><td><code>needs</code></td><td>lord_not_disloyal</td></tr>
+<tr><td><code>title</code></td><td>{lord} feels slighted</td></tr>
+<tr><td><code>text</code></td><td>{lord} of the house of {house} was seated below a lesser man at your table, and talks against you in his hall.</td></tr>
+</tbody></table></div>
+<h4 id="options-2"><a class="anchor" href="#options-2" aria-label="Link to this section">#</a>Options</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th><th>needs</th></tr></thead>
+<tbody>
+<tr><td>gift</td><td>Send him a gift</td><td>2</td><td>(gold: -10)</td><td></td></tr>
+<tr><td>office</td><td>Give him an office at court</td><td>2</td><td>(loyalty: land_seized_from_another; who: lord2)</td><td>lord2</td></tr>
+<tr><td>ignore</td><td>Let him sulk</td><td>1</td><td>(loyalty: slighted_at_court; who: lord)</td><td></td></tr>
+</tbody></table></div>
+<h3 id="lord-praises"><a class="anchor" href="#lord-praises" aria-label="Link to this section">#</a>Lord praises</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>weight</code></td><td>2</td></tr>
+<tr><td><code>needs</code></td><td>lord_not_loyal</td></tr>
+<tr><td><code>title</code></td><td>{lord} speaks well of you</td></tr>
+<tr><td><code>text</code></td><td>{lord} of the house of {house} has been heard praising your rule in his hall. A word from you now could win him over.</td></tr>
+</tbody></table></div>
+<h4 id="options-3"><a class="anchor" href="#options-3" aria-label="Link to this section">#</a>Options</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
+<tbody>
+<tr><td>reward</td><td>Reward him with gold</td><td>3</td><td>(gold: -10), (loyalty: gift_of_gold; who: lord)</td></tr>
+<tr><td>thank</td><td>Thank him</td><td>1</td><td>none</td></tr>
+</tbody></table></div>
+<h3 id="lords-quarrel"><a class="anchor" href="#lords-quarrel" aria-label="Link to this section">#</a>Lords quarrel</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>weight</code></td><td>2</td></tr>
+<tr><td><code>needs</code></td><td>two_lords</td></tr>
+<tr><td><code>title</code></td><td>{lord} and {lord2} quarrel</td></tr>
+<tr><td><code>text</code></td><td>{lord} and {lord2} both claim a mill and its meadows on the edge of their lands, and each asks you to judge for him.</td></tr>
+</tbody></table></div>
+<h4 id="options-4"><a class="anchor" href="#options-4" aria-label="Link to this section">#</a>Options</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
+<tbody>
+<tr><td>first</td><td>Judge for {lord}</td><td>2</td><td>(loyalty: want_granted; who: lord), (loyalty: land_seized_from_him; who: lord2)</td></tr>
+<tr><td>second</td><td>Judge for {lord2}</td><td>2</td><td>(loyalty: want_granted; who: lord2), (loyalty: land_seized_from_him; who: lord)</td></tr>
+<tr><td>fine</td><td>Fine them both and keep the mill</td><td>1</td><td>(gold: 15), (loyalty: heavy_taxes; who: lord), (loyalty: heavy_taxes; who: lord2)</td></tr>
+</tbody></table></div>
+<h3 id="lord-hurt"><a class="anchor" href="#lord-hurt" aria-label="Link to this section">#</a>Lord hurt</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>weight</code></td><td>1</td></tr>
+<tr><td><code>needs</code></td><td>lord</td></tr>
+<tr><td><code>title</code></td><td>{lord} is hurt</td></tr>
+<tr><td><code>text</code></td><td>{lord} of the house of {house} fell from his horse while hunting and lies in his hall with a broken leg.</td></tr>
+</tbody></table></div>
+<h4 id="options-5"><a class="anchor" href="#options-5" aria-label="Link to this section">#</a>Options</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
+<tbody>
+<tr><td>physician</td><td>Send your own physician</td><td>2</td><td>(gold: -10), (loyalty: gift_of_gold; who: lord)</td></tr>
+<tr><td>prayers</td><td>Send your prayers</td><td>2</td><td>none</td></tr>
+</tbody></table></div>
+<h3 id="child-born"><a class="anchor" href="#child-born" aria-label="Link to this section">#</a>Child born</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>weight</code></td><td>2</td></tr>
+<tr><td><code>needs</code></td><td>ruler_fertile</td></tr>
+<tr><td><code>title</code></td><td>A child is born</td></tr>
+<tr><td><code>text</code></td><td>A {child} is born to {ruler}, and named {childName}. The bells ring in every town of the realm.</td></tr>
+</tbody></table></div>
+<h4 id="options-6"><a class="anchor" href="#options-6" aria-label="Link to this section">#</a>Options</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th><th>needs</th></tr></thead>
+<tbody>
+<tr><td>feast</td><td>Hold a great feast</td><td>2</td><td>(heir: child), (gold: -15), (loyalty: gift_of_gold; who: least_loyal_lords; count: 2)</td><td></td></tr>
+<tr><td>match</td><td>Promise the child to {lord2}&#39;s house</td><td>2</td><td>(heir: child), (loyalty: marriage_into_ruling_house; who: lord2)</td><td>lord2</td></tr>
+<tr><td>quiet</td><td>Give thanks quietly</td><td>1</td><td>(heir: child)</td><td></td></tr>
+</tbody></table></div>
+<h3 id="heir-ill"><a class="anchor" href="#heir-ill" aria-label="Link to this section">#</a>Heir ill</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>weight</code></td><td>1</td></tr>
+<tr><td><code>needs</code></td><td>young_heir</td></tr>
+<tr><td><code>title</code></td><td>{heir} falls ill</td></tr>
+<tr><td><code>text</code></td><td>Your heir {heir}, aged {heirAge}, is burning with fever. The court physicians shake their heads.</td></tr>
+</tbody></table></div>
+<h4 id="options-7"><a class="anchor" href="#options-7" aria-label="Link to this section">#</a>Options</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
+<tbody>
+<tr><td>doctors</td><td>Pay the best physicians</td><td>3</td><td>(gold: -20)</td></tr>
+<tr><td>pray</td><td>Trust in prayer</td><td>1</td><td>(heir_risk: 0.3)</td></tr>
+</tbody></table></div>
+<h3 id="grain-rots"><a class="anchor" href="#grain-rots" aria-label="Link to this section">#</a>Grain rots</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>weight</code></td><td>2</td></tr>
+<tr><td><code>needs</code></td><td>store</td></tr>
+<tr><td><code>loss</code></td><td>0.4</td></tr>
+<tr><td><code>title</code></td><td>Grain rots at {province}</td></tr>
+<tr><td><code>text</code></td><td>Damp has got into the granaries at {province}. The keepers have thrown out {loss} months of grain.</td></tr>
+</tbody></table></div>
+<h4 id="options-8"><a class="anchor" href="#options-8" aria-label="Link to this section">#</a>Options</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th><th>needs</th></tr></thead>
+<tbody>
+<tr><td>buy</td><td>Buy grain from merchants</td><td>2</td><td>(gold: -15), (food_back: 0.5)</td><td></td></tr>
+<tr><td>requisition</td><td>Take grain from {lord2}&#39;s barns</td><td>1</td><td>(food_back: 0.5), (loyalty: grain_requisitioned; who: lord2)</td><td>lord2</td></tr>
+<tr><td>bear</td><td>Bear the loss</td><td>2</td><td>none</td><td></td></tr>
+</tbody></table></div>
+<h3 id="granary-fire"><a class="anchor" href="#granary-fire" aria-label="Link to this section">#</a>Granary fire</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>weight</code></td><td>1</td></tr>
+<tr><td><code>needs</code></td><td>store</td></tr>
+<tr><td><code>loss</code></td><td>0.5</td></tr>
+<tr><td><code>title</code></td><td>Fire in the granary at {province}</td></tr>
+<tr><td><code>text</code></td><td>A fire in the night has burned half of {province}&#39;s granary: {loss} months of grain are lost.</td></tr>
+</tbody></table></div>
+<h4 id="options-9"><a class="anchor" href="#options-9" aria-label="Link to this section">#</a>Options</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th><th>needs</th></tr></thead>
+<tbody>
+<tr><td>buy</td><td>Buy grain from merchants</td><td>2</td><td>(gold: -20), (food_back: 0.5)</td><td></td></tr>
+<tr><td>requisition</td><td>Take grain from {lord2}&#39;s barns</td><td>1</td><td>(food_back: 0.5), (loyalty: grain_requisitioned; who: lord2)</td><td>lord2</td></tr>
+<tr><td>bear</td><td>Bear the loss</td><td>2</td><td>none</td><td></td></tr>
+</tbody></table></div>
+<h3 id="plague-reaches"><a class="anchor" href="#plague-reaches" aria-label="Link to this section">#</a>Plague reaches</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>weight</code></td><td>0</td></tr>
+<tr><td><code>needs</code></td><td>plague</td></tr>
+<tr><td><code>title</code></td><td>Plague at {province}</td></tr>
+<tr><td><code>text</code></td><td>Men are falling sick at {province}: fever, black swellings, death in three days. The townsfolk die first. What will you do?</td></tr>
+</tbody></table></div>
+<h4 id="options-10"><a class="anchor" href="#options-10" aria-label="Link to this section">#</a>Options</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
+<tbody>
+<tr><td>close</td><td>Close the province</td><td>1</td><td>(quarantine: yes)</td></tr>
+<tr><td>physicians</td><td>Send physicians and burn the sick houses</td><td>1</td><td>(gold: -20), (care: yes)</td></tr>
+<tr><td>open</td><td>Keep the roads open</td><td>1</td><td>none</td></tr>
+</tbody></table></div>
+<h3 id="rats"><a class="anchor" href="#rats" aria-label="Link to this section">#</a>Rats</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>weight</code></td><td>1</td></tr>
+<tr><td><code>needs</code></td><td>store</td></tr>
+<tr><td><code>loss</code></td><td>0.3</td></tr>
+<tr><td><code>title</code></td><td>Rats in the stores at {province}</td></tr>
+<tr><td><code>text</code></td><td>Rats have overrun the stores at {province} and spoiled {loss} months of grain.</td></tr>
+</tbody></table></div>
+<h4 id="options-11"><a class="anchor" href="#options-11" aria-label="Link to this section">#</a>Options</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
+<tbody>
+<tr><td>buy</td><td>Buy grain from merchants</td><td>2</td><td>(gold: -10), (food_back: 0.5)</td></tr>
+<tr><td>bear</td><td>Bear the loss</td><td>2</td><td>none</td></tr>
+</tbody></table></div>

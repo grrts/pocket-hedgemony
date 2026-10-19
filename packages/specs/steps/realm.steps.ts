@@ -2837,3 +2837,83 @@ Given(/^the player plays "([^"]+)"$/, (s, realm: string) => {
   const w = freshGame(s);
   w.player = realmOf(s, realm);
 });
+
+
+// ------------------------------------------------------------ sending an assassin after a lord (REALM-280 to REALM-283)
+// These run against the game: a fresh world, the realm's own lords, and the order the player gives.
+
+const landed = (s: S, realm: string): number[] => lordsOf(s, realm).filter((k) => G.lordLands(s.game, k).length > 0);
+/** Sends the assassin after lord k: he succeeds or is caught as the scenario says, else the seeded draw decides. */
+function sendAssassin(s: S, realm: string, k: number, outcome?: string): void {
+  s.target = k;
+  s.targetLands = G.lordLands(s.game, k);
+  s.targetName = (s.game as GW).lords[k]!.name;
+  s.targetHouse = (s.game as GW).lords[k]!.house;
+  if (outcome === undefined) return void (s.refused = G.applyNow(s.game, { type: "assassinateLord", lord: k }, realmOf(s, realm)).rejectedOrders[0]?.reason ?? null);
+  s.refused = G.assassinate(s.game, realmOf(s, realm), k, [], outcome === "he succeeds" ? 0 : 0.999999);
+}
+
+Given("the treasury of {string} holds {int} gold", (s, realm: string, gold: number) => {
+  s.game.nationTreasury[realmOf(s, realm)] = gold;
+});
+Then("the treasury of {string} is down to {int} gold", (s, realm: string, gold: number) => {
+  expect(s.game.nationTreasury[realmOf(s, realm)]).toBeCloseTo(gold, 6);
+});
+When(/^"([^"]+)" sends an assassin after one of its lords(?: and (he succeeds|he is caught))?$/, (s, realm: string, outcome?: string) => {
+  const lords = landed(s, realm);
+  expect(lords.length).toBeGreaterThan(1);
+  sendAssassin(s, realm, lords[0]!, outcome);
+});
+When(/^"([^"]+)" sends an assassin after one of them and (he succeeds|he is caught)$/, (s, realm: string, outcome: string) => {
+  sendAssassin(s, realm, s.pair[0], outcome);
+});
+Given("one of its lords has an heir", (s) => {
+  const w = s.game as GW;
+  s.heirOf = landed(s, "France")[0]!;
+  G.lordAge(w, s.heirOf);
+  w.lords[s.heirOf]!.heir = { name: "Bernard", age: 20 };
+});
+When(/^"([^"]+)" sends an assassin after him and (he succeeds|he is caught)$/, (s, realm: string, outcome: string) => {
+  sendAssassin(s, realm, s.heirOf, outcome);
+});
+When("{string} sends an assassin after a lord of another realm", (s, realm: string) => {
+  const n = realmOf(s, realm);
+  const other = (s.game as GW).lords.findIndex((l, k) => l.nation !== n && G.lordLands(s.game, k).length > 0);
+  expect(other).toBeGreaterThanOrEqual(0);
+  sendAssassin(s, realm, other);
+});
+Then("the order is refused as {string}", (s, reason: string) => {
+  expect(s.refused).toBe(reason);
+});
+Given("a lord holds {int} provinces", (s, n: number) => {
+  s.chance = M.assassinationChance({ provinces: Array.from({ length: n }, (_, i) => `p${i}`) });
+});
+Then("an assassin sent after him succeeds {int} % of the time", (s, pct: number) => {
+  expect(s.chance * 100).toBeCloseTo(pct, 6);
+});
+Given("two lords of {string} are of one house", (s, realm: string) => {
+  const [a, b] = landed(s, realm);
+  (s.game as GW).lords[b!]!.house = (s.game as GW).lords[a!]!.house;
+  s.pair = [a, b];
+});
+Then("that lord is dead and his heir holds his lands, {string}", (s, loyalty: string) => {
+  expect(s.refused).toBe(null);
+  const l = (s.game as GW).lords[s.target]!;
+  expect(l.name).toBe("Bernard");
+  expect(l.house).toBe(s.targetHouse);
+  expect(l.loyalty).toBe(loyalty);
+  expect(G.lordLands(s.game, s.target)).toEqual(s.targetLands);
+});
+Then("every other lord of {string} is {string}", (s, realm: string, loyalty: string) => {
+  const others = landed(s, realm).filter((k) => k !== s.target && (s.game as GW).lords[k]!.house !== s.targetHouse);
+  expect(others.length).toBeGreaterThan(0);
+  for (const k of others) expect((s.game as GW).lords[k]!.loyalty).toBe(loyalty);
+});
+Then("the other lord of his house is {string}", (s, loyalty: string) => {
+  expect((s.game as GW).lords[s.pair[1]]!.loyalty).toBe(loyalty);
+});
+Then("that lord is {string}", (s, loyalty: string) => {
+  expect(s.refused).toBe(null);
+  expect((s.game as GW).lords[s.target]!.loyalty).toBe(loyalty);
+  expect((s.game as GW).lords[s.target]!.name).toBe(s.targetName);
+});

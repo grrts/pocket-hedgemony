@@ -259,6 +259,8 @@ Computer players have no part here; achievements are only for your realm.
 
 ## Numbers
 
+Every value the game uses, made from its config so it always matches the game: [Achievements data](Data-Achievements). How they combine: [Formulas](Formulas).
+
 | Key | Value | Status |
 |---|---|---|
 | `tiers.copper` / `silver` / `gold` / `crown` | 5 / 10 / 20 / 40 | fixed (store rule) |

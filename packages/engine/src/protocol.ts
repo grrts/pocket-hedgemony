@@ -1,4 +1,4 @@
-import { realmConfig } from "./domain/realm/index.ts";
+import { assassinationChance, realmConfig } from "./domain/realm/index.ts";
 import type { WokenRealm } from "./sleeping.ts";
 import { rulerViews, type RulerView } from "./rulers.ts";
 import { fallenEffect, type FallenEffect } from "./fallen.ts";
@@ -13,6 +13,7 @@ import { everydayCards } from "./everyday.ts";
 import { diplomacyLensView, type DiplomacyLensView } from "./diplomacyLens.ts";
 import { giftGold, lordOfCommander } from "./lords.ts";
 import { retinueView, type RetinueState } from "./retinues.ts";
+import { assassinationGold } from "./assassination.ts";
 import { stabilityOf, type Stability } from "./stability.ts";
 import { governmentView, realmForms, realmTitles, type GovernmentView } from "./government.ts";
 import type { Titles } from "./domain/realm/index.ts";
@@ -248,13 +249,15 @@ export interface Snapshot {
   moods: readonly string[];
   /** Every lord (index = provinceLord's value): name, house, realm, loyalty and provinces held; the gold a gift costs. */
   /** Lords by index; age, heir and gone for REALM-273 (a gone lord's line died out and he is listed nowhere). */
-  lords: { name: string; house: string; nation: number; loyalty: string; lands: number; age: number; heir: { name: string; age: number } | null; gone: boolean }[];
+  lords: { name: string; house: string; nation: number; loyalty: string; lands: number; age: number; heir: { name: string; age: number } | null; gone: boolean; /** The chance an assassin sent after him succeeds (REALM-281). */ assassinChance: number }[];
   provinceLord: Int16Array;
   /** The player's lords' retinues (WAR-252 to WAR-262): what each would bring, gathering or in the field (army = index in armies, -1), and why he can't be called. */
   retinues: { lord: number; state: RetinueState; wouldBring: number; atHome: number; cap: number; gathering?: { men: number; days: number }; army: number; seat: number; refusal: string | null; leavesAfter: number | null }[];
   /** Each realm's direct overlord by nation index, -1 when it is nobody's subject (SUBJ-093: the world-zoom map washes a subject in it). */
   nationOverlord: Int16Array;
   giftGold: number;
+  /** Gold an assassin costs, and how his heir and he take it (REALM-280, REALM-282). */
+  assassination: { gold: number; base: number; heirLoyalty: string; onFailure: string };
   /** The player's stability: the weakest of its lords, subjects, officials and provinces (REALM-199); null before a realm is chosen. */
   stability: Stability | null;
   /** The player's revolution card, its regime and ruler (REVO-090 to REVO-092); null before a realm is chosen. */
@@ -329,7 +332,7 @@ export interface Snapshot {
   /** The player's posts (PROV-342 to PROV-348): whether Auto-fill posts is on, the gold it keeps back, what filling every empty post costs now, and the best fit for each royal post of the player's, by province. */
   posts: { autoFill: boolean; reserve: number; fillAll: { posts: number; gold: number }; fit: Record<number, { type: number; why: string; foreign: boolean; gold: number }> };
   /** Every commander: who they serve (-1 = none), their skills and record, the army they lead (index in armies, -1 = at court) and the province they left as an official (-1 = none). */
-  commanders: { name: string; owner: number; age: number; might: number; cunning: number; logistics: number; victories: number; defeats: number; army: number; home: number; origin: string; fleet: number; lord: number }[];
+  commanders: { name: string; owner: number; age: number; might: number; cunning: number; logistics: number; victories: number; defeats: number; army: number; home: number; origin: string; fleet: number; lord: number; /** An admiral (fleets only) rather than a general (armies only), RECR-128. */ sea: boolean }[];
   /** Ports, sailors and fleets: every fleet for the map, the player's ports and fleets in full (navy.ts). */
   navy: NavyView;
   /** Fleets the player can hire now, free fleets first (hiredFleets.ts, F-115). */
@@ -552,7 +555,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       lords: (() => {
         const lands = new Int32Array(w.lords.length);
         for (let p = 0; p < w.provinceCount; p++) if (w.provinceLord[p]! >= 0) lands[w.provinceLord[p]!]!++;
-        return w.lords.map((l, k) => ({ name: l.name, house: l.house, nation: l.nation, loyalty: l.loyalty, lands: lands[k]!, ...lordAge(w, k), gone: !!l.gone }));
+        return w.lords.map((l, k) => ({ name: l.name, house: l.house, nation: l.nation, loyalty: l.loyalty, lands: lands[k]!, ...lordAge(w, k), gone: !!l.gone, assassinChance: assassinationChance({ provinces: new Array<string>(lands[k]!) }) }));
       })(),
       provinceLord: w.provinceLord.slice(),
       nationOverlord: (() => {
@@ -561,6 +564,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         return out;
       })(),
       giftGold: giftGold(w),
+      assassination: { gold: assassinationGold(), base: realmConfig.lords.assassination.chance, heirLoyalty: realmConfig.lords.assassination.heir_loyalty, onFailure: realmConfig.lords.assassination.target_on_failure },
       stability: player >= 0 ? stabilityOf(w, player) : null,
       revolution: player >= 0 ? revolutionView(w, player) : null,
       empire: empireView(w, player),
@@ -617,6 +621,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         origin: c.origin ?? "",
         fleet: w.navy.fleets.find((f) => f.admiral === k)?.id ?? -1,
         lord: lordOfCommander(w, k),
+        sea: w.commanderSea[k] === 1,
       })),
       retinues:
         player >= 0

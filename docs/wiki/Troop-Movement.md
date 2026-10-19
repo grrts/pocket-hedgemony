@@ -151,6 +151,8 @@ The Bastard of Burgundy (Cunning 2) leads 8,000 men, seen by France only as a ru
 
 ## Numbers
 
+Every value the game uses, made from its config so it always matches the game: [Troop movement data](Data-Troop-Movement). How they combine: [Formulas](Formulas).
+
 Values live in `packages/rules/data/domain/troop-movement.json`. Values marked provisional may change in balancing.
 
 | What | Value | Status |

@@ -1,0 +1,87 @@
+<h1>Tribes data</h1>
+<p>Every value in the game&#39;s tribes config, exactly as the game reads it. This page is made from <code>packages/rules/data/domain/tribes.json</code> each time the config changes, so it always matches the game. How these values are used is explained on <a href="/wiki/Tribes-and-Hunting-Grounds">Tribes and Hunting Grounds</a>.</p>
+<p>Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and values marked (provisional) are placeholders that may still change in balancing. Inventions are shown by id and name; see <a href="/wiki/Data-Research#inventions">Research data</a>.</p>
+<blockquote>
+<p>Tribes (domain/tribes/spec.md, TRIBE): tribal realms of North America and their hunting grounds. Values from the tribes design of 18 October 2026; every number is a placeholder balancing knob (DECISIONS rule 4). region_bounds draws each region of tribes.regions as a box of longitude and latitude, read against a realm&#39;s capital on the map, since map realms carry no catalogue region. new_tribe_regions, new_tribe_representations, new_tribe_provinces and new_tribes_left_out say which catalogue records the 1444 map adds as new tribes (TRIBE-002 to TRIBE-005); their home points are in packages/rules/data/scenarios/1444/map-nations.json (grows).</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>regions</code></td><td>am_north</td></tr>
+<tr><td><code>tribal_forms</code></td><td>clan_council, chiefdom, confederation</td></tr>
+<tr><td><code>new_tribe_regions</code></td><td>am_north</td></tr>
+<tr><td><code>new_tribe_representations</code></td><td>decentralized_polity</td></tr>
+<tr><td><code>claim_months</code></td><td>3</td></tr>
+<tr><td><code>reclaim_years</code></td><td>5</td></tr>
+<tr><td><code>furs_gold</code></td><td>0.5</td></tr>
+<tr><td><code>take_in_years</code></td><td>10</td></tr>
+<tr><td><code>settlers_punish_years</code></td><td>10</td></tr>
+<tr><td><code>land_price</code></td><td>10</td></tr>
+<tr><td><code>given_reclaim_years</code></td><td>10</td></tr>
+</tbody></table></div>
+<h2 id="region-bounds"><a class="anchor" href="#region-bounds" aria-label="Link to this section">#</a>Region bounds</h2>
+<h3 id="am-north"><a class="anchor" href="#am-north" aria-label="Link to this section">#</a>Am north</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>west</code></td><td>-170</td></tr>
+<tr><td><code>east</code></td><td>-50</td></tr>
+<tr><td><code>south</code></td><td>24.5</td></tr>
+<tr><td><code>north</code></td><td>84</td></tr>
+</tbody></table></div>
+<h2 id="new-tribe-provinces"><a class="anchor" href="#new-tribe-provinces" aria-label="Link to this section">#</a>New tribe provinces</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>B</code></td><td>2</td></tr>
+<tr><td><code>C</code></td><td>1</td></tr>
+</tbody></table></div>
+<h2 id="new-tribes-left-out"><a class="anchor" href="#new-tribes-left-out" aria-label="Link to this section">#</a>New tribes left out</h2>
+<blockquote>
+<p>D-TRIBE-2: decentralised polities of am_north that did not exist on 11 November 1444, or are already map realms under another id.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>susquehannock</code></td><td>a people that formed c. 1450</td></tr>
+<tr><td><code>paquime</code></td><td>background only; abandoned c. 1450</td></tr>
+<tr><td><code>haudenosaunee</code></td><td>the map&#39;s iroquois</td></tr>
+<tr><td><code>wendat</code></td><td>the map&#39;s huron</td></tr>
+<tr><td><code>pueblo_rio_grande</code></td><td>the map&#39;s pueblo</td></tr>
+</tbody></table></div>
+<h2 id="range-size"><a class="anchor" href="#range-size" aria-label="Link to this section">#</a>Range size</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>clan_council</code></td><td>2</td></tr>
+<tr><td><code>chiefdom</code></td><td>3</td></tr>
+<tr><td><code>confederation</code></td><td>4</td></tr>
+</tbody></table></div>
+<h2 id="settlers-wrong"><a class="anchor" href="#settlers-wrong" aria-label="Link to this section">#</a>Settlers wrong</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>weight</code></td><td>-30</td></tr>
+<tr><td><code>fade_years</code></td><td>20</td></tr>
+</tbody></table></div>
+<h2 id="ask"><a class="anchor" href="#ask" aria-label="Link to this section">#</a>Ask</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>base</code></td><td>-5</td></tr>
+<tr><td><code>per_gold</code></td><td>1</td></tr>
+<tr><td><code>gold_max</code></td><td>40</td></tr>
+<tr><td><code>standing_divisor</code></td><td>4</td></tr>
+<tr><td><code>settlers_held</code></td><td>-25</td></tr>
+<tr><td><code>hostile</code></td><td>-30</td></tr>
+<tr><td><code>one_ground_left</code></td><td>-10</td></tr>
+<tr><td><code>last_ground</code></td><td>-100</td></tr>
+<tr><td><code>answer_months</code></td><td>1</td></tr>
+</tbody></table></div>
+<h2 id="ai"><a class="anchor" href="#ai" aria-label="Link to this section">#</a>Ai</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>ask_when_gold_times</code></td><td>2</td></tr>
+<tr><td><code>answered_years</code></td><td>10</td></tr>
+</tbody></table></div>

@@ -34,6 +34,7 @@ rule of the system that owns the stat.
 
 Newest decision first.
 
+1. `visuals/particles-and-animations-design.md` v1 (19 Oct): moments, living world, cost.
 1. `settings/settings-design.md` v2 (16 Oct) §3.1, §4.3 (parchment toggle), §5.1 (Graphics), §5.5
    (Accessibility), §7 (performance knobs), §8.
 2. `screen-flow/screen-flow-design.md` v1 §1, §4.2, §4.3, §4.6 (G5), §7 (layout by window shape), §8.2.
@@ -291,6 +292,32 @@ Leroy's playtest: zoomed out, Portugal's name lay over Castile's and the Livonia
 3. Overview: the zoomed-out map is the overview of who holds what; every name on it can be read whole, and the player's own realm is always named.
 4. Phone: the same rule in the Wide and Tall layouts and at every zoom; names stay at least 9 pixels tall; nothing needs hover.
 
+### Particles and animations (19 October 2026)
+Leroy found the game's effects and animations underwhelming (19 Oct). The map now reacts when something happens and the land moves between turns, in the pieces' own art pixels and the 32-colour palette. Battles and sieges keep their own design (`battles/battle-visuals-design.md`). Every number is a starting value in `effects` in `map-presentation.json`. [particles-and-animations-design.md]
+
+Moments
+- VIEW-140 (Event-driven): When a played day leaves a province held by another realm than before (its occupier while occupied, else its owner), and the province is on screen at Region zoom (2) or closer, the map shall throw a burst of pixel confetti in the new holder's colour from the province's centre, falling, with a ring of dust on the ground (`moments.flip`, 24 particles, 1.8 s). [particles-and-animations-design §3]
+- VIEW-141 (Event-driven): When a work of the player's is finished on screen, the map shall raise dust puffs at its town and then gold sparkles rising from it (`moments.built`, 20 particles, 2 s). [particles-and-animations-design §3]
+- VIEW-142 (Event-driven): When a rising begins on screen, the map shall send up dark smoke and red embers from the province (`moments.rising`, 24 particles, 3 s). [particles-and-animations-design §3]
+- VIEW-143 (Event-driven): When the player's realm has a new ruler, reform, invention or heritage (`gloryNews`) and its capital is on screen, the map shall drop one gold shower over the capital (`moments.glory`, 20 particles, 2 s), however many such news the day brings. [particles-and-animations-design §3]
+- VIEW-144 (Event-driven): When plague breaks out in a province on screen (its step rises to outbreak), the map shall let pale motes drift up from it (`moments.plague`, 14 particles, 3 s). [particles-and-animations-design §3]
+- VIEW-145 (Optional): Where Animations is Full, moments shall play in full and the looping effects run; where Reduced, moments play with half their particles (`reducedShare`) and no looping effects; where Off, nothing plays; Battery saver stops the looping effects only. A moment off screen, at World zoom, or on the first snapshot of a session plays nothing. [particles-and-animations-design §3, §6]
+
+Living world
+- VIEW-146 (State-driven): While a town is on screen in the living band, grey smoke shall rise and drift from its core, one chimney per `coreCellsPerChimney` (5) core cells, at most `maxPerTown` (3) (extends VIEW-124). [particles-and-animations-design §4]
+- VIEW-147 (State-driven): While a province on screen at Region zoom or closer is below `snow.belowCelsius` (0 °C), white flakes shall drift down over it, at most `snow.maxFlakes` (80) on screen. [particles-and-animations-design §4]
+- VIEW-148 (State-driven): While the map is at Region zoom or closer, a flock of `flockMin` to `flockMax` (3 to 5) birds shall now and then fly across the land on screen, gulls along the coast, at most `flocksOnScreen` (1) at a time. [particles-and-animations-design §4]
+- VIEW-149 (State-driven): While a rising stands in a province on screen, a thicker dark smoke column shall rise over it (extends VIEW-128). [particles-and-animations-design §4]
+
+Cost
+- VIEW-150 (Ubiquitous): Every particle shall be a square of whole art pixels in one pooled field of at most `maxParticles` (240), the oldest giving its slot to the newest, fading in no more than four steps; the field asks for frames at `frameRate` (20) a second only while particles live, so a still map stays idle, and the overlay budget (VIEW-054) does not change. [particles-and-animations-design §7]
+
+#### How the player uses it: particles and animations
+1. Where: nothing to tap. Moments play on the map where the player is already looking while the week plays out; the looping effects are part of the land.
+2. Grouping: each effect belongs to the thing it shows, the province that changed hands, the town that finished a work, the rising; no new screen or control beyond Settings → Animations.
+3. Overview: the dispatches log and alerts stay the record of every moment (VIEW-127); a moment only draws the eye to it.
+4. Phone: effects are drawn in the pieces' art pixels, so they read at arm's length in the Wide and Tall layouts; nothing needs hover; they are drawn on the map canvas under the top bar and the safe areas; Settings → Animations and Battery saver turn them down or off.
+
 ## 6. Commands
 
 Presentation commands, issued by the player; none reach the engine.
@@ -543,3 +570,14 @@ None. AI nations run in the same worker turn, which the turn budgets cover (VIEW
 | VIEW-132 | living-map.feature | The snapshot carries each trader where it walks |
 | VIEW-133 | zoom-content.feature | Realm names never overlap |
 | VIEW-134 | — | presentation only: detailed figures and town tiles are art |
+| VIEW-140 | effects.feature | A province changing hands throws confetti in the new holder's colour |
+| VIEW-141 | effects.feature | A finished work raises dust and sparkles |
+| VIEW-142 | effects.feature | A rising sends up smoke and embers |
+| VIEW-143 | effects.feature | One gold shower over the capital for the realm's news |
+| VIEW-144 | effects.feature | Plague breaking out lets motes drift up |
+| VIEW-145 | effects.feature | Animations decides how much plays |
+| VIEW-146 | effects.feature | Bigger towns smoke from more chimneys |
+| VIEW-147 | effects.feature | Snow falls below freezing |
+| VIEW-148 | — | presentation only: birds are decoration |
+| VIEW-149 | — | presentation only: riot smoke is decoration |
+| VIEW-150 | — | presentation only: checked by the client's particle tests and the perf overlay budget |
