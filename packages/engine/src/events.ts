@@ -325,6 +325,19 @@ export function answerEvent(world: World, nation: number, event: string, option:
   return null;
 }
 
+/** Fires an event of the tree now, with its first binding of roles, if it has not fired (INST-065: `onin_war` at the break). */
+export function fireEventNow(world: World, id: string, news: News[]): void {
+  const g = (world.events ??= createGameEvents(world));
+  sync(world, g);
+  const s = g.state;
+  const ev = s.events[id];
+  if (!ev || s.world.history.some((h) => h.event === id)) return;
+  const roles = evt.bindings(s, ev)[0] ?? {};
+  const from = s.log.length;
+  evt.fire(s, ev, roles, g.rng);
+  land(world, g, s.log.slice(from), news);
+}
+
 /** Applies effects as an event's chosen option would, and lands them on the game (scripted history, tests). */
 export function applyEventEffects(world: World, effects: evt.Effect[], news: News[], roles: Record<string, string[]> = {}): void {
   const g = (world.events ??= createGameEvents(world));

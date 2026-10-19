@@ -17,6 +17,7 @@ import { LIVING_MAP } from "./domain/map-presentation/livingMap.ts";
 import { rebelsView, type RebelsView } from "./rebels.ts";
 import { revolutionView, type RevolutionView } from "./revolutions.ts";
 import { empireView, institutionsLens, type EmpireView } from "./institutions.ts";
+import { shogunateView, type ShogunateView } from "./shogunate.ts";
 import { tribesView, type TribesView } from "./tribes.ts";
 import { peoplesSnapshot, type PeoplesSnapshot } from "./peoples.ts";
 import { faithHeadsView, type FaithHeadsView } from "./faithHeads.ts";
@@ -243,10 +244,12 @@ export interface Snapshot {
   revolution: RevolutionView | null;
   /** The Empire card (INST-081): Emperor, hold, seats and votes, members, the hold record; null without an Empire. */
   empire: EmpireView | null;
+  /** The Shogunate card (INST-082). */
+  shogunate: ShogunateView | null;
   /** The Institutions map mode (INST-084): per realm 0 none, 1 member, 2 elector, 3 Emperor; imperial provinces held by outsiders. */
   /** Hunting grounds (TRIBE-026 to TRIBE-029): every ground and claim for the map, the player's range for the Hunting grounds tab, and what the player may ask for. */
   tribes: TribesView;
-  institutionsLens: { realm: Uint8Array; outsiderLand: Uint8Array };
+  institutionsLens: { realm: Uint8Array; outsiderLand: Uint8Array; house: Int16Array };
   /** The player's Government tab: form, both caps, the form's laws and the next forms (GOV-064); null before a realm is chosen. */
   government: GovernmentView | null;
   /** Risings in every realm (the player's with their card and answers), the player's beaten risings waiting for a verdict, and each plotting province's monthly chance to rise (REBL-063). */
@@ -531,6 +534,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       stability: player >= 0 ? stabilityOf(w, player) : null,
       revolution: player >= 0 ? revolutionView(w, player) : null,
       empire: empireView(w, player),
+      shogunate: shogunateView(w, player),
       institutionsLens: institutionsLens(w),
       tribes: tribesView(w, player),
       government: player >= 0 ? governmentView(w, player) : null,

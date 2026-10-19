@@ -88,6 +88,7 @@ uniform sampler2D uMini;     // the same at half size
 uniform sampler2D uTown;     // per-province town (VIEW-110, VIEW-113): r walls (0 none, 1 palisade, 2 stone), g road grade (0 track, 1 road, 2 paved), b worship variant, a style
 uniform sampler2D uTownAtlas; // town tiles: ${TOWN_VARIANTS} variants across, one row per cell kind (row = kind - 1)
 uniform float uLiving;       // 0..1: how far the living map has faded in (VIEW-101)
+uniform bool uFiefs;         // a data lens that draws fief borders and patterns too (the Institutions lens's great houses, INST-084)
 uniform vec3 uRoad[3];       // track, road, paved road
 out vec4 outColor;
 
@@ -480,7 +481,7 @@ vec3 tiled(bool mini) {
     }
     if (edge) c = mix(c, inf.rgb, 0.35);
     // A lord's land (feedback 68): a sparse diaper of small dark crosses, like a fief's mantle.
-    if (lordTag(id) > 0 && uMode == 0) {
+    if (lordTag(id) > 0 && (uMode == 0 || uFiefs)) {
       ivec2 d = ivec2(a.x + ((a.y >> 3) & 1) * 4, a.y) & 7;
       if ((d.x == 2 && d.y >= 1 && d.y <= 3) || (d.y == 2 && d.x >= 1 && d.x <= 3)) c = mix(c, uInk, 0.28);
     }
@@ -517,7 +518,7 @@ vec3 tiled(bool mini) {
       c = mix(c, min(inf.rgb * 1.15 + 0.06, 1.0), 0.8);
     } else if (other2) {
       c = mix(c, uInk, 0.35);
-    } else if (political && uMode == 0 && ((iR != id && lordTag(iR) != lordTag(id)) || (iL != id && lordTag(iL) != lordTag(id)) || (iD != id && lordTag(iD) != lordTag(id)) || (iU != id && lordTag(iU) != lordTag(id)))) {
+    } else if (political && (uMode == 0 || uFiefs) && ((iR != id && lordTag(iR) != lordTag(id)) || (iL != id && lordTag(iL) != lordTag(id)) || (iD != id && lordTag(iD) != lordTag(id)) || (iU != id && lordTag(iU) != lordTag(id)))) {
       if (((a.x + a.y) >> 1 & 1) == 0) c = mix(c, uInk, 0.7); // dashed border between fiefs and royal land
     } else if ((iR != id || iL != id || iD != id || iU != id) && ((a.x + a.y) & 1) == 0) {
       c = mix(c, uInk, 0.5); // dotted province border
@@ -610,7 +611,7 @@ vec3 far() {
     int u = idAt(p - ivec2(0, 1));
     if ((land(l) && ownerOf(l) != owner) || (land(u) && ownerOf(u) != owner)) c = mix(c, inf.rgb, 0.7);
     else if (provinceEdge) c *= (land(r) && lordTag(r) != lordTag(id)) || (land(d) && lordTag(d) != lordTag(id)) ? 0.5 : 0.72;
-    else if (uMode == 0 && lordTag(id) > 0 && uZoom > 3.0 && (p.x & 3) == 1 && (p.y & 3) == 1) c *= 0.8;
+    else if ((uMode == 0 || uFiefs) && lordTag(id) > 0 && uZoom > 3.0 && (p.x & 3) == 1 && (p.y & 3) == 1) c *= 0.8;
   } else if (provinceEdge && uZoom > 1.2) {
     c *= 0.72;
   }
@@ -721,6 +722,8 @@ export class MapRenderer {
   private townAtlasTex: WebGLTexture;
   private u: Record<string, WebGLUniformLocation | null> = {};
   mode: MapMode = "political";
+  /** Under a data lens, draw the fief borders and pattern of the lords passed to setProvinceStyle (the Institutions lens's great houses). */
+  fiefs = false;
   readonly canvas: HTMLCanvasElement;
   readonly map: MapImage;
 
@@ -731,7 +734,7 @@ export class MapRenderer {
     if (!gl) throw new Error("WebGL2 is not available");
     this.gl = gl;
     this.program = link(gl, VERT, FRAG);
-    for (const name of ["uCenter", "uZoom", "uView", "uIds", "uTileOrigin", "uTileSize", "uInfo", "uOwner", "uInfoWidth", "uTime", "uMode", "uParchment", "uParchmentDark", "uTerrain", "uDepth", "uFoam", "uInk", "uHighlight", "uSand", "uForbid", "uAtlas", "uMini", "uLand", "uSeason", "uTown", "uTownAtlas", "uLiving", "uRoad", "uSubject", "uSubjectOf", "uHunt"]) {
+    for (const name of ["uCenter", "uZoom", "uView", "uIds", "uTileOrigin", "uTileSize", "uInfo", "uOwner", "uInfoWidth", "uTime", "uMode", "uParchment", "uParchmentDark", "uTerrain", "uDepth", "uFoam", "uInk", "uHighlight", "uSand", "uForbid", "uAtlas", "uMini", "uLand", "uSeason", "uTown", "uTownAtlas", "uLiving", "uFiefs", "uRoad", "uSubject", "uSubjectOf", "uHunt"]) {
       this.u[name] = gl.getUniformLocation(this.program, name);
     }
 
@@ -1007,6 +1010,7 @@ export class MapRenderer {
     gl.bindTexture(gl.TEXTURE_2D, this.townAtlasTex);
     gl.uniform1i(this.u.uTownAtlas!, 8);
     gl.uniform1f(this.u.uLiving!, this.living);
+    gl.uniform1i(this.u.uFiefs!, this.fiefs ? 1 : 0);
     gl.uniform3fv(this.u.uRoad!, ["#8a6a44", PALETTE.clay, "#9a94a0"].flatMap((c) => hexToRgb(c).map((v) => v / 255)));
     gl.activeTexture(gl.TEXTURE9);
     gl.bindTexture(gl.TEXTURE_2D, this.subjectTex);

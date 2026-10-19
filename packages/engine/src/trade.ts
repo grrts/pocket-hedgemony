@@ -1,4 +1,5 @@
 import type { World } from "./world.ts";
+import { closedTo } from "./shogunate.ts";
 import { atWar, type News } from "./war.ts";
 import { tradeConfig as config } from "./domain/trade/index.ts";
 import navalConfig from "../../rules/data/domain/naval.json" with { type: "json" };
@@ -284,6 +285,8 @@ function stepDays(world: World, kind: GameTraderKind, q: number): number {
 
 /** Whether realm n's traders may enter q: not the land of a realm at war with it, nor land its enemies hold (TRADE-066, TRADE-067). */
 export function traderMayEnter(world: World, n: number, q: number): boolean {
+  // The closed country: foreign traders stop only at the shogun's one port (INST-068).
+  if (closedTo(world, n, q)) return false;
   // An enemy blockade shuts the sea to a realm's trade ships, unless its commodore escorts them (NAVY-157).
   if (world.provinceWater[q]) return tradeShipMayPass(world, n, q);
   const o = world.provinceOwner[q]!;

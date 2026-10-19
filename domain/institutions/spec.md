@@ -159,7 +159,8 @@ Not in scope (owned by …):
 
 ### 5.7 The Shogunate
 - INST-060 At the start, the Shogunate's holder shall be Japan, its members Japan's great houses, and its hold 30.
-  [institutions §4]
+  The great houses are the shogun's lords who hold land; the Court's province is the province holding Kyoto, and
+  Japan's land is the shogun's provinces of 1444. [institutions §4; D-INST-1]
 - INST-061 The yearly hold count shall add +3 when no house is In revolt, −5 for each house In revolt, −10 while the
   realm has no adult heir, −3 while the shogun is at war and over half his houses are Wavering or worse, and +1 for
   each summoned house. [institutions §4]
@@ -171,7 +172,8 @@ Not in scope (owned by …):
   [institutions §4]
 - INST-065 At a season's end with hold 0, or when the shogun loses the Court's province (GOV-038), the Shogunate shall
   break: each great house becomes a warlord domain with its land, the shogun keeps his royal provinces as a warlord
-  domain, and the event `onin_war` fires if it has not. [institutions §4; GOV-038]
+  domain, and the event `onin_war` fires if it has not. A house wakes as its own sleeping realm (SETUP-080), ruled by
+  its lord; a house that swore to a later shogun wakes as the realm it was. [institutions §4; GOV-038; D-INST-1]
 - INST-066 While the office is vacant, every warlord domain whose capital is in Japan shall be a member; a member that
   holds the Court's province and owns or holds as subjects over half of Japan's land provinces may ask the Court, and
   then takes the warlord domain → shogunate reform at no gold, with hold 40. [institutions §4]
@@ -282,6 +284,10 @@ because they read standing and forms and add war aims.
 | `shogunate.summon_wealth_loss` | Per year | 10 % | yes | institutions.json |
 | `shogunate.confirm_cost` | Hold | 5 | yes | institutions.json |
 | `shogunate.closed_country` | Min era, hold per year | III, +2 | yes | institutions.json |
+| `shogunate.court_province` | The Court's province (Mie, holding Kyoto) | p2110 | no | institutions.json |
+| `shogunate.oath` | Base, standing divisor, per multiple of soldiers, most, hold divisor, months to answer | −10, 4, +10, +30, 5, 1 | yes | institutions.json |
+| `shogunate.restoration_min_era` | The restoration opens from | V | yes | institutions.json |
+| `starting_lords.house_lands` | Japan's great houses and their land (D-INST-1) | 14 houses | yes | realm.json |
 
 ## 11. Seams
 
@@ -310,13 +316,32 @@ because they read standing and forms and add war aims.
 - An AI defendant hands a province over on a ruling unless it has more soldiers than the Emperor and the plaintiff together; the player's ruling waits a month on an answer card and silence hands it over (built in slice 2).
 - The imperial contingent is raised as a fresh army at the Emperor's capital, sized from each member's soldiers as others see them; the members' own levies are not drawn down (slice 2 default).
 - An AI realm accepts *Dissolve the Empire* on the white-peace rule: when over half its voices want peace.
-- An AI shogun summons the least loyal houses first while hold allows, and confirms Wavering houses.
+- An AI shogun summons the least loyal houses first while hold allows, and confirms Wavering houses while hold stays
+  Firm after the cost (built in slice 3).
+- An AI warlord domain of Japan asks the Court as soon as it qualifies (built in slice 3).
 
 ## 13. Open questions and contradictions
 
 - OQ-INST-1: The X-13 match of catalogue imperial estates to map realms (Bavaria, Württemberg, Hamburg, Pomerania, Switzerland, Modena are split or renamed in the catalogue): the data list decides; it needs one pass of review.
 - OQ-INST-2: The ten circles on a 137-realm map: which map realms sit in which circle (data). Slice 2 default: the historical circles matched to the map members (Austrian, Bavarian, Swabian, Upper Rhenish, Electoral Rhenish, Lower Saxon, Upper Saxon); Bohemia, Switzerland and the Italian members sit in none.
-- OQ-INST-3: Which great houses Japan starts with as lords depends on the realm data's great-house list (D-REALM-10); the shogunate needs at least the 22 shugo houses of the catalogue.
+- **D-INST-1** (was OQ-INST-3) Japan's great houses: the realm data seats fourteen of the catalogue's shugo and
+  Tōhoku houses on the map provinces nearest their 1444 seats (`starting_lords.house_lands`): Hosokawa, Hatakeyama,
+  Shiba, Yamana, Ōuchi, Uesugi, Imagawa, Toki, Kyōgoku, Ōtomo, Shimazu, Takeda, Date and Nanbu. The rest of Japan is
+  royal: Mie, which holds Kyoto and so is the Court's province, the three Nagasaki provinces and Ehime. Fourteen is
+  the shogunate form's lords cap, so no house slips for being one too many; the catalogue's Rokkaku, Isshiki and
+  Togashi held land the map draws inside other provinces. Each house is listed as a sleeping realm with that land
+  as its home, so the break wakes the houses by name and the event tree knows them (Takeda among its Sengoku
+  entities). A reasonable default to review with the catalogue.
+- **D-INST-2** Slice 3 defaults where the design is silent or a neighbour is not built yet: a lord's wealth is kept
+  as a share of what he had (lords hold no gold of their own yet), so a summons shows it falling 10 % a year; lords
+  do not join risings yet, so *cannot join a rising* is a rule the rebellions context reads (`mayJoinRising`). The
+  oath's reasons count is Base −10, Standing / 4, *The shogun is stronger* +10 per multiple of soldiers (at most
+  +30) and *The shogun's hold* (hold − 50) / 5; an AI member answers at once and the player's oath waits a month on
+  an answer card. *Bring to heel* is a war aim (a cause for war) with no peace term of its own. The closed country
+  keeps foreign traders out of the shogun's land except at the one port; foreign preachers are not built yet, so
+  the ban on missionaries is a rule the religion context reads (`missionariesBarred`). A shogun whose realm is
+  destroyed leaves the office vacant. The restoration's opening (INST-069) is a rule the revolutions context reads
+  (`restorationOpen`); the restoration itself is that context's.
 - OQ-INST-4: The heads of faith design may give the Papacy powers over the Emperor (crowning); the church seats then read that design.
 
 ## 14. Traceability

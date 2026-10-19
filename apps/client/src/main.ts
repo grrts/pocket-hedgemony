@@ -73,7 +73,7 @@ import { seasonBytes } from "./map/renderer.ts";
 import { detectRuntime, type Diagnostics } from "./platform.ts";
 import { sound } from "./audio/sound.ts";
 import { eventCardHtml, waitingEventsHtml } from "./ui/events.ts";
-import { dietAnswerCard, electionAnswerCard, empireAsks, empireBadgeHtml, empireCard, empireUi, institutionsKey, institutionsRows, rulingAnswerCards, type InstitutionsUi } from "./ui/institutions.ts";
+import { dietAnswerCard, electionAnswerCard, empireAsks, empireBadgeHtml, empireCard, empireUi, institutionsKey, institutionsRows, oathAnswerCard, rulingAnswerCards, shogunateAsks, shogunateCard, shogunateUi, shogunBadgeHtml, type InstitutionsUi } from "./ui/institutions.ts";
 import { fleetButton, fleetCard, fleetTitle, hireFleetsTab, navyTab, portTab } from "./ui/navy.ts";
 import { colonyCard, coloniesTab, colonySection, exploreSection, voyageBar } from "./ui/explore.ts";
 import { askRows, bindTribes, colonyGround, groundHead, groundSection, groundsCountLine, huntGeneralLine, huntKeyHtml, huntTab, type TribesUi } from "./ui/tribes.ts";
@@ -258,6 +258,8 @@ const alerted = new Set<string>();
 let newsView = false;
 /** The Empire card is open (INST-081). */
 let empireOpen = false;
+/** The Shogunate card is open (INST-082). */
+let shogunateOpen = false;
 /** The end card is open (SHELL-164); `endShown` is the ending it last opened for, so it opens by itself once. */
 let endView = false;
 let endShown = "";
@@ -519,6 +521,22 @@ trophyButton.addEventListener("click", () => openAchievements());
 document.addEventListener("click", (e) => {
   if (!(e.target as HTMLElement).closest("[data-empire-open]") || !snapshot?.empire) return;
   empireOpen = true;
+  shogunateOpen = false;
+  achView = false;
+  newsView = false;
+  realmView = -1;
+  officialView = -1;
+  lordView = -1;
+  armyView = -1;
+  fleetView = -1;
+  panelCollapsed = false;
+  renderPanel();
+});
+// The Shogunate card opens from the Institutions row, the shogun's badge, the oath's News card or the map mode (INST-080).
+document.addEventListener("click", (e) => {
+  if (!(e.target as HTMLElement).closest("[data-shogunate-open]") || !snapshot?.shogunate) return;
+  shogunateOpen = true;
+  empireOpen = false;
   achView = false;
   newsView = false;
   realmView = -1;
@@ -533,9 +551,10 @@ document.addEventListener("click", (e) => {
 document.addEventListener(
   "click",
   (e) => {
-    if ((e.target as HTMLElement).closest("[data-realm], [data-news], [data-official], [data-show-province], [data-go-province], .go-there")) {
+    if ((e.target as HTMLElement).closest("[data-realm], [data-news], [data-official], [data-show-province], [data-go-province], [data-lord-open], .go-there")) {
       achView = false;
       empireOpen = false;
+      shogunateOpen = false;
     }
   },
   { capture: true },
@@ -817,7 +836,7 @@ const LENSES: { id: Lens; name: string; note: string }[] = [
   { id: "tongues", name: "Languages", note: "the family of the language most speak" },
   { id: "faiths", name: "Faiths", note: "the faith most hold; hatched where mixed" },
   { id: "trade", name: "Trade", note: "trade ratio, your traders' loops" },
-  { id: "institutions", name: "Institutions", note: "the Empire: Emperor, electors, members" },
+  { id: "institutions", name: "Institutions", note: "the Empire and the Shogunate: holders, members, houses" },
   { id: "charts", name: "Exploration", note: "what you have charted, and empty coasts to settle" },
 ];
 /** The trade lens's ramp by trade ratio, quiet to busy (TRADE-143); provinces the player doesn't see are parchment. */
@@ -873,8 +892,8 @@ const relationTo = (n: number): LensRelation | null => {
   return r === undefined || r < 0 ? null : LENS_RELATIONS[r]!;
 };
 const ROYAL_RGB = hexToRgb("#e9c35a");
-/** The Institutions map mode's colours (INST-084): the Emperor gold, members light gold, outsiders on imperial land red and hatched. */
-const INSTITUTION_HEX = { gold: "#d0a248", "light gold": "#f1dc98", red: "#b8323a" } as Record<string, string>;
+/** The Institutions map mode's colours (INST-084): the holder gold, members light gold, outsiders on imperial land red and hatched; Japan's great houses each a gold of their own. */
+const INSTITUTION_HEX = { gold: "#d0a248", "light gold": "#f1dc98", red: "#b8323a", "the house's own": "linear-gradient(90deg, #c98a4a 50%, #a8a457 50%)" } as Record<string, string>;
 const INSTITUTION_RGB = { emperor: hexToRgb("#d0a248"), member: hexToRgb("#f1dc98"), outsider: hexToRgb("#b8323a") };
 /** A colour per lord for the Lords lens: hues spread by the golden angle, kept clear of the crown's gold. */
 function lordRgb(k: number): number[] {
@@ -901,6 +920,7 @@ const lensMenu = document.querySelector<HTMLElement>("#lenses")!;
 function setLens(l: Lens): void {
   lens = l;
   view.renderer.mode = lens === "realms" ? "political" : lens === "terrain" ? "terrain" : "lens";
+  view.renderer.fiefs = lens === "institutions";
   restyleProvinces();
   renderLensMenu();
 }
@@ -1069,6 +1089,9 @@ function lensColor(i: number): number[] {
     case "institutions": {
       const il = snapshot?.institutionsLens;
       if (il?.outsiderLand[i]) return INSTITUTION_RGB.outsider;
+      // A great house of Japan in its own colour, warmed toward the shogun's gold so the whole reads as one realm.
+      const house = il?.house[i] ?? 0;
+      if (house) return lordRgb(house - 1).map((c, k) => Math.round(c * 0.55 + INSTITUTION_RGB.emperor[k]! * 0.45));
       const r = o >= 0 ? (il?.realm[o] ?? 0) : 0;
       return r === 3 ? INSTITUTION_RGB.emperor : r ? INSTITUTION_RGB.member : o >= 0 ? RELATION_RGB.neutral : unownedRgb;
     }
@@ -1114,7 +1137,8 @@ function restyleProvinces(): void {
     // Occupied land is hatched in the occupier's colour; borders stay the owner's.
     const rebels = !!snapshot?.provinceRebels[i];
     const hatched = ((occ >= 0 || rebels) && lens === "realms") || (lens === "diplomacy" && o >= 0 && relationTo(o) === "war") || (lens === "faiths" && (snapshot?.peoples.provinceFaithShare[i * SLOTS + 1] ?? 0) >= 0.3) || (lens === "institutions" && !!snapshot?.institutionsLens.outsiderLand[i]);
-    const lord = snapshot ? snapshot.provinceLord[i]! : -1;
+    // Under the Institutions map mode only Japan's great houses carry a fief border and pattern (INST-084).
+    const lord = !snapshot ? -1 : lens === "institutions" ? snapshot.institutionsLens.house[i]! - 1 : snapshot.provinceLord[i]!;
     const lit = litLord >= 0 && lord === litLord;
     // Under the trade lens, land whose trade the player doesn't see is parchment too (TRADE-143).
     const unseen = !isKnown(i) || (lens === "trade" && !!snapshot && !isWater[i] && !snapshot.provinceTradeSeen[i]);
@@ -2499,9 +2523,13 @@ function onTap(sx: number, sy: number, province: number): void {
   realmView = -1;
   newsView = false;
   empireOpen = false;
-  // Under the Institutions map mode a tap on a member opens the Empire card (INST-084).
+  shogunateOpen = false;
+  // Under the Institutions map mode a tap on a member opens the Empire card, on Japan the Shogunate card (INST-084).
   if (lens === "institutions" && selectedProvince >= 0 && owners[selectedProvince]! >= 0 && snapshot?.institutionsLens.realm[owners[selectedProvince]!]) {
-    empireOpen = true;
+    const o = owners[selectedProvince]!;
+    const sh = snapshot.shogunate;
+    shogunateOpen = !!sh && !sh.ended && (sh.shogun === o || sh.members.some((m) => m.realm === o));
+    empireOpen = !shogunateOpen;
     panelCollapsed = false;
   }
   // Under the Faiths map mode a tap on a seat opens its head's card (RELG-138).
@@ -2784,7 +2812,7 @@ function renderHud(): void {
   // The plaques, their order and what each opens come from the engine's top-bar model (REALM-205).
   const open = (o: Opens) => (o && "card" in o && o.tab ? ` data-realm-open="${o.tab}"` : "");
   hud.innerHTML = `<button class="icon-only game-menu" data-shell="menu" title="Game menu" aria-label="Game menu">${icon("menu", 2)}</button>
-    ` + topBar({ ...s, peaceOffers: s.peaceOffers.filter((o) => !putOffOffers.has(o.id)) }, unread, asksOf(s).length + empireAsks(s.empire))
+    ` + topBar({ ...s, peaceOffers: s.peaceOffers.filter((o) => !putOffOffers.has(o.id)) }, unread, asksOf(s).length + empireAsks(s.empire) + shogunateAsks(s.shogunate))
     .map((p) => {
       switch (p.key) {
         case "realm":
@@ -3071,6 +3099,13 @@ function logNews(s: Snapshot): void {
     alertPlayer(`The rebels of ${provinces[v.province]!.name} are beaten: choose their fate.`, "crown", { province: v.province });
     stopAuto(auto, "rebels");
   }
+  // The Court asks the player to swear to a new shogun (INST-083).
+  const oath = s.shogunate?.oath;
+  if (oath && !alerted.has(`oath ${oath.ends}`)) {
+    alerted.add(`oath ${oath.ends}`);
+    alertPlayer(`The Court asks you to swear to ${nations[oath.shogun]!.name}, the new Shogun.`, "crown", { answer: true });
+    stopAuto(auto, "envoy");
+  }
   for (const a of asksOf(s)) {
     if (alerted.has(`ask ${a.id}`)) continue;
     alerted.add(`ask ${a.id}`);
@@ -3339,6 +3374,46 @@ function bindEmpire(): void {
   panel.querySelectorAll<HTMLButtonElement>("[data-ruling]").forEach((b) => b.addEventListener("click", () => void act({ type: "empire", do: "ruling", id: b.dataset.ruling!, yes: b.dataset.yes === "1" }).then(again)));
 }
 
+/** The Shogunate card (INST-082): header and the folds Houses, The Court and Hold, over the map. */
+function renderShogunate(): void {
+  const v = snapshot!.shogunate!;
+  panel.innerHTML = `
+    <header><h2 class="ribbon">${esc(v.name)}</h2>${closeButton()}</header>
+    <div class="empire-card shogunate-card">${shogunateCard(v, institutionsUi)}</div>`;
+  bindClose();
+  showPanel(true);
+  panel.querySelectorAll<HTMLDetailsElement>("details.inst-fold[data-fold]").forEach((d) =>
+    d.addEventListener("toggle", () => {
+      if (d.open) shogunateUi.open.add(d.dataset.fold!);
+      else shogunateUi.open.delete(d.dataset.fold!);
+    }),
+  );
+  panel.querySelector<HTMLButtonElement>("[data-close-pick]")?.addEventListener("click", () => {
+    shogunateUi.picking = !shogunateUi.picking;
+    renderPanel();
+  });
+  panel.querySelectorAll<HTMLButtonElement>("[data-lord-open]").forEach((b) => b.addEventListener("click", () => openLord(Number(b.dataset.lordOpen))));
+  bindShogunate();
+}
+
+/** The Shogunate's orders, from its card or the oath's News answer card. */
+function bindShogunate(): void {
+  const again = () => renderPanel();
+  const order = (o: Record<string, unknown>) => void act({ type: "shogunate", ...o } as Order).then(again);
+  panel.querySelectorAll<HTMLButtonElement>("[data-house-summon]").forEach((b) => b.addEventListener("click", () => order({ do: "summon", lord: Number(b.dataset.houseSummon) })));
+  panel.querySelectorAll<HTMLButtonElement>("[data-house-release]").forEach((b) => b.addEventListener("click", () => order({ do: "release", lord: Number(b.dataset.houseRelease) })));
+  panel.querySelectorAll<HTMLButtonElement>("[data-house-confirm]").forEach((b) => b.addEventListener("click", () => order({ do: "confirm", lord: Number(b.dataset.houseConfirm) })));
+  panel.querySelectorAll<HTMLButtonElement>("[data-ask-court]").forEach((b) => b.addEventListener("click", () => order({ do: "askCourt" })));
+  panel.querySelectorAll<HTMLButtonElement>("[data-oath]").forEach((b) => b.addEventListener("click", () => order({ do: "oath", yes: b.dataset.oath === "1" })));
+  panel.querySelectorAll<HTMLButtonElement>("[data-close-port]").forEach((b) =>
+    b.addEventListener("click", () => {
+      shogunateUi.picking = false;
+      order({ do: "close", port: Number(b.dataset.closePort) });
+    }),
+  );
+  panel.querySelectorAll<HTMLButtonElement>("[data-open-ports]").forEach((b) => b.addEventListener("click", () => order({ do: "open" })));
+}
+
 /** The dispatches: calls to arms and offers to answer, then the log of everything that happened, newest first. */
 function renderNews(): void {
   const s = snapshot!;
@@ -3356,13 +3431,14 @@ function renderNews(): void {
   panel.innerHTML = `
     <header><h2 class="ribbon">News</h2>${closeButton()}</header>
     <nav class="tabs"><button class="tab${dispatchesMine ? "" : " on"}" data-news-mine="0">Everything</button><button class="tab${dispatchesMine ? " on" : ""}" data-news-mine="1">Your realm</button></nav>
-    ${s.events.length || asksOf(s).length || s.peaceOffers.length || s.calls.length ? `<h3 class="sub">Waiting for you</h3>` : ""}
+    ${s.events.length || asksOf(s).length || s.peaceOffers.length || s.calls.length || shogunateAsks(s.shogunate) ? `<h3 class="sub">Waiting for you</h3>` : ""}
     ${waitingEventsHtml(s.events)}
     ${asksHtml()}
     ${s.peaceOffers.map(offerHtml).join("")}
     ${electionAnswerCard(s.empire, institutionsUi)}
     ${dietAnswerCard(s.empire, institutionsUi)}
     ${rulingAnswerCards(s.empire, institutionsUi)}
+    ${oathAnswerCard(s.shogunate, institutionsUi)}
     ${s.calls
       .map((c) =>
         c.via === "empire"
@@ -3392,6 +3468,7 @@ function renderNews(): void {
     b.addEventListener("click", () => void act({ type: "answerCall", call: b.dataset.call!, yes: b.dataset.yes === "1" })),
   );
   bindEmpire();
+  bindShogunate();
   panel.querySelectorAll<HTMLButtonElement>("[data-go-province]").forEach((b) => b.addEventListener("click", () => goThere(Number(b.dataset.goProvince))));
   panel.querySelectorAll<HTMLButtonElement>("[data-news-mine]").forEach((b) =>
     b.addEventListener("click", () => {
@@ -3457,7 +3534,7 @@ function showPanel(open: boolean, reopenIcon: "scroll" | "crown" = "scroll"): vo
   // While a course is drawn the voyage bar stands in for the folded card (EXPL-074).
   reopen.hidden = !open || !panelCollapsed || !!exploring;
   const what =
-    reopenIcon === "crown" ? "Choose a realm" : empireOpen ? "The Empire" : newsView ? "News" : fleetView >= 0 ? (sailing >= 0 ? "Fleet: tap where to sail" : "Fleet") : realmView >= 0 ? nations[realmView]!.name : selectedProvince >= 0 ? provinces[selectedProvince]!.name : "";
+    reopenIcon === "crown" ? "Choose a realm" : empireOpen ? "The Empire" : shogunateOpen ? "The Shogunate" : newsView ? "News" : fleetView >= 0 ? (sailing >= 0 ? "Fleet: tap where to sail" : "Fleet") : realmView >= 0 ? nations[realmView]!.name : selectedProvince >= 0 ? provinces[selectedProvince]!.name : "";
   reopen.innerHTML = `${icon(reopenIcon, 3)}<span>${esc(what)}</span>`;
   reopen.title = `Open the overview: ${what}`;
   panel.querySelector(".fold")?.addEventListener("click", () => {
@@ -3674,7 +3751,7 @@ function frameProvinces(list: readonly number[], maxZoom = 8): void {
 
 function renderPanelCard(): void {
   panel.classList.remove("declaring");
-  const shows = `${achView}/${empireOpen}/${newsView}/${realmView}/${realmTab}/${declareFor}/${officialView}/${lordView}/${armyView}/${fleetView}/${selectedProvince}/${provinceTab}`;
+  const shows = `${achView}/${empireOpen}/${shogunateOpen}/${newsView}/${realmView}/${realmTab}/${declareFor}/${officialView}/${lordView}/${armyView}/${fleetView}/${selectedProvince}/${provinceTab}`;
   if (shows !== panelShows) {
     panelShows = shows;
     panel.scrollTop = 0;
@@ -3692,6 +3769,11 @@ function renderPanelCard(): void {
     return;
   }
   empireOpen = false;
+  if (shogunateOpen && snapshot?.shogunate) {
+    renderShogunate();
+    return;
+  }
+  shogunateOpen = false;
   if (newsView && snapshot) {
     renderNews();
     return;
@@ -5259,7 +5341,7 @@ function myDiplomacySection(): string {
   const STATE = { truce: "Truce", alliance: "Ally", subject: "Your overlord", overlord: "Your subject", war: "At war" } as const;
   // Your name abroad opens the tab (DIPL-225), then what waits for an answer, then each war's card (WAR-230).
   return `${s.statecraft ? nameAbroadHtml(s.statecraft.nameAbroad, (n) => nations[n]!.name) : ""}${asksHtml()}${s.peaceOffers.map(offerHtml).join("")}
-    ${institutionsRows(s.empire, institutionsUi)}
+    ${institutionsRows(s.empire, s.shogunate, institutionsUi)}
     <h3 class="sub">Wars</h3>
     ${myWars().length ? myWars().map((w) => warCard(w.id)).join("") : `<p class="hint">At peace with the world.</p>`}
     <p class="hint">Open a realm to send it an envoy, declare war on it or offer it peace.</p>
@@ -5515,7 +5597,7 @@ function renderRealm(r: number): void {
   const general = `
     <div class="realm-card">
       <img class="banner" src="${flagUrl(n, 6)}" alt="">
-      <p>${s && s.playerNation === r ? "<b>Your realm</b>" : "<b>Realm</b>"} · ${own.length} province${own.length === 1 ? "" : "s"} ${s ? empireBadgeHtml(s.empire, r) : ""}${!s ? ` · <b class="starts">${esc(startStanding(n.id))}</b>` : ""}<br>
+      <p>${s && s.playerNation === r ? "<b>Your realm</b>" : "<b>Realm</b>"} · ${own.length} province${own.length === 1 ? "" : "s"} ${s ? empireBadgeHtml(s.empire, r) + shogunBadgeHtml(s.shogunate, r) : ""}${!s ? ` · <b class="starts">${esc(startStanding(n.id))}</b>` : ""}<br>
       Capital <button class="paper capital" data-go="${capIdx}">${icon("castle", 1)}${esc(provinces[capIdx]!.name)}</button></p>
     </div>
     ${!s ? waysToGrowHtml(waysToGrow({ owners, neighbors: neighborIdx, water: isWater, trade: START_TRADE }, r)) : ""}
@@ -5997,6 +6079,7 @@ function bindClose(): void {
     realmView = -1;
     achView = false;
     empireOpen = false;
+    shogunateOpen = false;
     headView = null;
     declareFor = -1;
     selectedProvince = -1;
@@ -7068,6 +7151,16 @@ Object.assign(globalThis, {
     renderHud();
     renderPanel();
   },
+  /** The Shogunate's view, and a staged one in its place until the next snapshot: an oath or a closed country takes years of play (scripts/shogunate-shots.mjs). */
+  __phShogunate: () => snapshot?.shogunate ?? null,
+  __phStageShogunate: (v: NonNullable<Snapshot["shogunate"]>) => {
+    if (!snapshot) return;
+    snapshot.shogunate = v;
+    renderHud();
+    renderPanel();
+  },
+  /** Sends a Shogunate order and says what was refused. */
+  __phShogunateOrder: (o: Record<string, unknown>) => act({ type: "shogunate", ...o } as Order).then(() => snapshot?.rejectedOrders.map((r) => r.reason) ?? []),
   /** A sea zone k zones out from port p that a fleet with this ocean reach may enter, the farthest found first. */
   __phSeaOut: (p: number, k: number, reach = -1) => {
     const ex = snapshot!.exploration;
@@ -7211,6 +7304,7 @@ Object.assign(globalThis, {
     realmView = -1;
     newsView = false;
     empireOpen = false;
+    shogunateOpen = false;
     panelCollapsed = false;
     renderPanel();
   },

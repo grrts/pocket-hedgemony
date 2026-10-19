@@ -36,6 +36,7 @@ export { ENVOY_ACTIONS, type EnvoyAction, type StatecraftView } from "./statecra
 export { type RebelsView, type RisingView } from "./rebels.ts";
 export { type RegimeView, type RevolutionView, type Sign as RevolutionSign, type StanceView } from "./revolutions.ts";
 export { admit, answerRuling, callTheDiet, courtAims, passReform, defenceCalls, dietForecast, dissolveEmpire, empireDues, empireOrder, empireTax, empireView, headOfFaith, institutionsLens, monthlyInstitutions, realmsOf, seekVote, takeToCourt, whyNotDissolveTerm, type EmpireOrder, type EmpireView, type MemberView, type ReformsView, type SeatView } from "./institutions.ts";
+export { askTheCourt, breakShogunate, closeCountry, closedTo, confirmHouse, endShogunate, housesOf, japanHeld, mayJoinRising, missionariesBarred, oathCount, openPorts, restorationOpen, shogunateOrder, shogunateView, shogunOf, summonHouse, swearOrRefuse, vacantMembers, whyNotAskCourt, type HouseView, type ShogunateOrder, type ShogunateView } from "./shogunate.ts";
 export type { EventCard } from "./events.ts";
 export { foundByEvent, treeView } from "./events.ts";
 export { adminCapacityRank, ASSESSMENT_DIMENSIONS, LEVEL_RANK, realmAssessment, realmStrengths, RISK_DIMENSIONS, type AssessmentConfidence, type AssessmentLevel, type HeritageLine, type RealmAssessment, type RealmHeritage, type RealmHeyday, type RealmStrengths } from "./realmStrengths.ts";
