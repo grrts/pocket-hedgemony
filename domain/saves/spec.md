@@ -605,3 +605,4 @@ None. AI countries' state is saved like any other (later an `ai` chunk); no AI d
 | SAVE-105 … SAVE-110 | — | Client screens; checked by apps/client/scripts/saves-shots.mjs |
 | SAVE-111 | — | engine unit test `saves-start.test.ts` (the header names the start; a save from another start is refused); the client reopens in the save's start (main.ts `loadSave`) |
 | SAVE-112 … SAVE-118 | sign-in.feature | Server sign-in; checked by `server/tests/Controller/SessionTest.php` |
+| SAVE-061 … SAVE-070 | cloud-sync.feature | The server's side as well: `server/tests/Controller/SavesTest.php` (`App\Controller\SavesController`) |
