@@ -48,12 +48,12 @@ const regions: Region[] = present.map((key) => ({
 const nationIds = new Set(regions.flatMap((r) => r.nations.map((n) => n.id)));
 const sleepingIds = new Set(regions.flatMap((r) => r.sleeping.realms.map((s) => s.id)));
 const entityIds = new Set(regions.flatMap((r) => (r.relations.entities ?? []).map((e) => e.id)));
-// While regions are still being built, an owner rule may name a realm another
-// region will add (a 1444 map nation or a catalogue record); once all regions
+// While regions are still being built, an owner rule or relation may name a
+// realm another region will add (a 1444 map nation or a catalogue record); once all regions
 // are in, every owner must be a 1378 map nation.
 const complete = scenario.regions.every((k: string) => present.includes(k));
 const ownerKnown = (id: string) => nationIds.has(id) || (!complete && (nations1444.some((n) => n.id === id) || id in catalogue.records));
-const known = (id: string) => nationIds.has(id) || sleepingIds.has(id) || entityIds.has(id) || id in catalogue.records;
+const known = (id: string) => ownerKnown(id) || sleepingIds.has(id) || entityIds.has(id) || id in catalogue.records;
 const tongues = new Set([...[...cultureDomain.tongues, ...(cultureDomain.tongues_added ?? [])].map((t) => t.id), ...Object.keys(culture1444.tongues), ...regions.flatMap((r) => Object.keys(r.culture.tongues ?? {}))]);
 const provinceIds = new Set((provinces1444 as { id: string }[]).map((p) => p.id));
 const isLonlat = (c: unknown) => Array.isArray(c) && c.length === 2 && Math.abs(c[0]) <= 180 && Math.abs(c[1]) <= 90;
