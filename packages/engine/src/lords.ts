@@ -163,7 +163,7 @@ export function inAnyWar(world: World, n: number): boolean {
 
 /** A realm lost a war: its lords think less of the crown. */
 export function lordsLoseWar(world: World, n: number, news: News[]): void {
-  world.lords.forEach((l, k) => l.nation === n && loyaltyStep(world, k, "war_lost", news));
+  world.lords.forEach((l, k) => l.nation === n && !l.gone && loyaltyStep(world, k, "war_lost", news));
 }
 
 /** Gold a gift to a lord costs. */
@@ -185,8 +185,8 @@ export function giveGift(world: World, n: number, lord: number): string | null {
 /** Grants a royal province to a lord as a fief: the want granted raises his loyalty. */
 export function grantFief(world: World, n: number, province: number, lord: number): string | null {
   const l = world.lords[lord];
+  if (l?.gone) return "his line has died out";
   if (!l || l.nation !== n) return "not your lord";
-  if (l.gone) return "his line has died out";
   if (world.provinceOwner[province] !== n) return "not your province";
   if (world.provinceLord[province]! >= 0) return "a lord holds it already";
   if (world.rules.nations[n]!.capital === world.provinceIds[province]) return "the capital stays royal";
@@ -201,7 +201,7 @@ export function seizeFief(world: World, n: number, province: number, news: News[
   if (world.provinceOwner[province] !== n || lord < 0) return "no lord of yours holds it";
   world.provinceLord[province] = -1;
   loyaltyStep(world, lord, "land_seized_from_him", news);
-  world.lords.forEach((l, k) => k !== lord && l.nation === n && loyaltyStep(world, k, "land_seized_from_another", news));
+  world.lords.forEach((l, k) => k !== lord && l.nation === n && !l.gone && loyaltyStep(world, k, "land_seized_from_another", news));
   return null;
 }
 
@@ -215,9 +215,9 @@ export function monthlyLords(world: World, atPeace: (n: number) => boolean, news
     const l = world.provinceLord[p]!;
     if (l >= 0 && world.lords[l]!.nation !== world.provinceOwner[p]) world.provinceLord[p] = -1;
   }
-  if (world.date.month === 1) world.lords.forEach((l, k) => l.loyalty !== "Loyal" && atPeace(l.nation) && loyaltyStep(world, k, "long_secure_reign", news));
+  if (world.date.month === 1) world.lords.forEach((l, k) => !l.gone && l.loyalty !== "Loyal" && atPeace(l.nation) && loyaltyStep(world, k, "long_secure_reign", news));
   world.lords.forEach((l, k) => {
-    if (l.nation === world.player || (l.loyalty !== "Disloyal" && l.loyalty !== "Wavering")) return;
+    if (l.gone || l.nation === world.player || (l.loyalty !== "Disloyal" && l.loyalty !== "Wavering")) return;
     // REALM-171 gives when it has 20 domain gold; here, when the treasury holds two gifts.
     if (world.nationTreasury[l.nation]! >= giftGold(world) * 2) giveGift(world, l.nation, k);
   });

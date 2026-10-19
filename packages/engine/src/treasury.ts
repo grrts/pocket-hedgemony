@@ -204,7 +204,7 @@ export function canBorrow(world: World, n: number): number {
 /** Whether a loan now would unsettle the realm's lords: at most once in `debt.lords_waver_once_per_months` (REALM-189). */
 export function loanUnsettlesLords(world: World, n: number): boolean {
   const month = world.date.year * 12 + world.date.month;
-  return month - world.nationLoanMonth[n]! >= realmConfig.debt.lords_waver_once_per_months && world.lords.some((l) => l.nation === n);
+  return month - world.nationLoanMonth[n]! >= realmConfig.debt.lords_waver_once_per_months && world.lords.some((l) => l.nation === n && !l.gone);
 }
 
 /** Sets a province's rate (-1 = back to the default), or the realm's default when province is -1. */
@@ -253,7 +253,7 @@ export function takeLoan(world: World, n: number, gold: number, news: News[] = [
   if (gold > canBorrow(world, n) + 1e-9) return `lenders give at most ${canBorrow(world, n).toFixed(1)} gold more`;
   if (loanUnsettlesLords(world, n)) {
     world.nationLoanMonth[n] = world.date.year * 12 + world.date.month;
-    world.lords.forEach((l, k) => l.nation === n && loyaltyStep(world, k, "crown_borrowed", news));
+    world.lords.forEach((l, k) => l.nation === n && !l.gone && loyaltyStep(world, k, "crown_borrowed", news));
   }
   world.nationDebt[n] = world.nationDebt[n]! + loanDebt(gold);
   world.nationTreasury[n] = world.nationTreasury[n]! + gold;

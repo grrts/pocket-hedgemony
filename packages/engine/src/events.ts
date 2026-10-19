@@ -262,7 +262,7 @@ function sync(world: World, g: GameEvents): void {
   const lords = new Float64Array(world.nationCount);
   const loyal = new Float64Array(world.nationCount);
   for (const l of world.lords) {
-    if (l.nation < 0) continue;
+    if (l.nation < 0 || l.gone) continue;
     lords[l.nation]!++;
     if (l.loyalty === "Loyal") loyal[l.nation]!++;
   }

@@ -6,6 +6,7 @@ import { restoreWorld, worldChunks } from "../src/domain/saves/world-chunks.ts";
 import { battleDeath, lordAge, officialAge, onPersonDeath, personDies, yearlyPeople, type PersonDeath } from "../src/people.ts";
 import { deathChance } from "../src/mortality.ts";
 import { swapOfficials } from "../src/officials.ts";
+import { grantFief } from "../src/lords.ts";
 import { addCommander } from "../src/recruit.ts";
 import * as wf from "../src/domain/warfare/index.ts";
 
@@ -71,6 +72,8 @@ describe("people age and die (REALM-270 to REALM-279)", () => {
       expect(w.provinceOfficial[p]).toBe(-1);
     }
     expect(news.some((n) => /last of his line/.test(n.text))).toBe(true);
+    // A line that died out is no lord of the realm: no fief, no gift, no say.
+    expect(grantFief(w, fr, lands[0]!, k)).toBe("his line has died out");
   });
 
   it("leaves a dead official's post empty for the player and refills it for the AI (PROV-194, REALM-275)", () => {

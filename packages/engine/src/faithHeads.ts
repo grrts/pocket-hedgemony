@@ -404,7 +404,7 @@ export function censureOf(world: World, a: number, b: number, aim: string): relg
 export function censurePreview(world: World, a: number, b: number, aim = "no_aim"): { head: string; wrong: string; weight: number; realms: number; lords: number; fadeYears: number } | null {
   const h = censureOf(world, a, b, aim);
   if (!h) return null;
-  return { head: h.name, wrong: H.censureName(h), weight: FH.censure.weight, realms: realmsOf(world, h.faith, a).length, lords: world.lords.filter((l) => l.nation === a).length, fadeYears: FH.censure.fade_years };
+  return { head: h.name, wrong: H.censureName(h), weight: FH.censure.weight, realms: realmsOf(world, h.faith, a).length, lords: world.lords.filter((l) => l.nation === a && !l.gone).length, fadeYears: FH.censure.fade_years };
 }
 
 function censure(world: World, a: number, b: number, war: dip.War, h: relg.heads.Head, news: News[]): void {
@@ -418,7 +418,7 @@ function censure(world: World, a: number, b: number, war: dip.War, h: relg.heads
     dip.addEntry(d, world.nationIds[r]!, world.nationIds[a]!, { key: `censured_${h.id}`, name: wrong, weight: FH.censure.weight });
     d.aims.push({ holder: world.nationIds[r]!, target: world.nationIds[a]!, aim: "punish", source: wrong });
   }
-  world.lords.forEach((l, k) => l.nation === a && loyaltyStep(world, k, FH.censure.lord_cause, news));
+  world.lords.forEach((l, k) => l.nation === a && !l.gone && loyaltyStep(world, k, FH.censure.lord_cause, news));
   news.push({ kind: "event", text: `${cap(h.name)} censures ${name(world, a)} for its war on ${name(world, b)}: every ${relgName(h.faith)} realm holds ${wrong} and may punish it.`, nations: [a, b, ...realmsOf(world, h.faith)] });
 }
 
