@@ -477,6 +477,7 @@
   ],
   "innovations": [
    "printing",
+   "bombards",
    "humanist_learning",
    "bastion_fortification",
    "gunpowder_infantry",
@@ -1199,5 +1200,13 @@
   "derived_formulas.good_base_yield",
   "derived_formulas.tech_economy_bonus",
   "derived_formulas.terrain_supply_mult"
- ]
+ ],
+ "innovations_from_research": {
+  "$comment": "D-EVT-19: the tree's innovations a realm has adopted include the research inventions it knows, by this table (tree innovation -> research invention).",
+  "bombards": "W3",
+  "gunpowder_infantry": "W5",
+  "ocean_navigation": "S4",
+  "printing": "L5",
+  "humanist_learning": "L6"
+ }
 }

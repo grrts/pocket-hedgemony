@@ -150,7 +150,7 @@ Then("the event {string} can still fire in a campaign", (s, id: string) => {
 Given("the start condition of the age {string} has never held", (s, age: string) => {
   s.age = age;
   s.holds = (() => false) as E.Holds;
-  s.checked = E.eventsConfig.campaign.start_year - 1;
+  s.checked = Math.min(E.eventsConfig.campaign.start_year, E.ageDef(age).window.earliest_start) - 1;
 });
 function runYearsTo(s: Scenario, year: number): void {
   for (let y = (s.checked ?? year - 1) + 1; y <= year; y++) {
@@ -183,6 +183,60 @@ Given("the event {string} has somehow happened", (s, id: string) => {
 When("the yearly age check runs", (s) => {
   E.yearlyAgeCheck(st(s), w(s).year, s.holds);
   act(s);
+});
+Then("the age {string} is not active", (s, age: string) => {
+  expect(w(s).ages).not.toContain(age);
+});
+/** Realm "gp1" … "gp<n>": n of the 8 realms with the most provinces know bombards (EVT-082). */
+Given("{int} of the 8 realms with the most provinces know bombards", (s, n: number) => {
+  for (let i = 1; i <= 8; i++) {
+    const r = c(s, `gp${i}`);
+    r.stats.great_power_score = 100 - i;
+    r.innovations = i <= n ? ["bombards"] : [];
+  }
+});
+Given("a small realm knows bombards too", (s) => {
+  const r = c(s, "small");
+  r.stats.great_power_score = 1;
+  r.innovations = ["bombards"];
+});
+Given("{string} knows the ocean ships", (s, id: string) => {
+  c(s, id).innovations = ["ocean_navigation"];
+});
+Given("the campaign started in {int}", (s, year: number) => {
+  setYear(s, year);
+  // the realms its periods name stand at the start
+  for (const id of ["ottoman", "timurid_empire", "england", "france", "ming", "byzantium", "muscovy"]) c(s, id);
+  E.startCampaign(st(s), year);
+  E.yearlyAgeCheck(st(s), year);
+  E.periodCheck(st(s), year);
+  act(s);
+});
+/** Each year's age and period check, as the game runs them every January (EVT-011, EVT-015). */
+When("the years pass to {int}", (s, year: number) => {
+  for (let y = w(s).year + 1; y <= year; y++) {
+    setYear(s, y);
+    E.yearlyAgeCheck(st(s), y);
+    E.periodCheck(st(s), y);
+  }
+});
+Then("the period {string} has ended", (s, id: string) => {
+  expect(w(s).periods).not.toContain(id);
+  expect(st(s).periodsEnded).toContain(id);
+});
+Then("the period {string} is not active", (s, id: string) => {
+  expect(w(s).periods).not.toContain(id);
+});
+Given("{string} and {string} are at war", (s, a: string, b: string) => {
+  c(s, a).enemies = [b];
+  c(s, b).enemies = [a];
+});
+Given("{string} and {string} are not at war", (s, a: string, b: string) => {
+  c(s, a).enemies = [];
+  c(s, b).enemies = [];
+});
+Given("{string} is a subject of {string}", (s, sub: string, over: string) => {
+  c(s, sub).relations = [{ other: over, type: "subject" }];
 });
 Then("the age {string} is not active, because its window opens in {int}", (s, age: string, year: number) => {
   expect(w(s).ages).not.toContain(age);

@@ -164,17 +164,24 @@ export function seedRegions(world: World): void {
   });
 }
 
-/** Whether the age that opens exploration in a region has begun by this year (EXPL-002, EXPL-004). */
-export function ageGateOpen(region: string, year: number): boolean {
+/**
+ * Whether the age that opens exploration in a region has begun (EXPL-002, EXPL-004):
+ * the event tree's own age when it runs, which starts by its conditions (EXPL-076),
+ * else the age's forced start year.
+ */
+export function ageGateOpen(region: string, year: number, world?: World): boolean {
   const age = ex.gateAgeFor(region);
-  const start = age ? ex.regionData.ages[age]?.force_start : null;
+  if (!age) return false;
+  const s = world?.events?.state;
+  if (s) return s.world.ages.includes(age) || s.agesEnded.includes(age);
+  const start = ex.regionData.ages[age]?.force_start;
   return start !== null && start !== undefined && year >= start;
 }
 
 /** Outrigger voyaging or Carrack and caravel known, and the age begun in the realm's region (EXPL-001, D-EXPL-4). */
 export function explorationUnlocked(world: World, n: number): boolean {
   if (n < 0) return false;
-  return CFG.unlock_inventions.some((i) => knows(world, n, i)) && ageGateOpen(world.explore.region[n] ?? CFG.game.fallback_region, world.date.year);
+  return CFG.unlock_inventions.some((i) => knows(world, n, i)) && ageGateOpen(world.explore.region[n] ?? CFG.game.fallback_region, world.date.year, world);
 }
 
 /** Why realm n may not have exploration ships yet, or null. */

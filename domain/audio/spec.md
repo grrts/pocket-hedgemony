@@ -352,7 +352,7 @@ Group counts: ui 21, frame 6, turn 5, map 8, army/fleet 15, battle 18, siege 10,
 - AUD-013 The `turn_end` effect shall play motif notes 1 – 5 and the `turn_ready` effect shall answer with notes 4 – 5 – 1↑. [sfx §1, §5.3]
 
 ### Music eras
-- AUD-014 The audio context shall pick the music era from the game year using the bands I 1444–1519, II 1520–1649, III 1650–1789, IV 1790–1869, V 1870–31 August 1939. [music §3.2; config eras]
+- AUD-014 The audio context shall pick the music era from the game year using the bands I from the start (1378)–1519, II 1520–1649, III 1650–1789, IV 1790–1869, V 1870–31 August 1939. [music §3.2; config eras; plan-1378 §3.1]
 - AUD-015 The audio context shall take era boundaries from configuration. [music §3.2]
 - AUD-016 The audio context shall use the calendar as the only era basis in play, keeping the technology basis in config, turned off and not offered as a campaign rule (D-AUD-4). [music §3.2, §10.2; config eras.basis]
 - AUD-017 The audio context shall play no music for ages that fall after the campaign end (Decolonization, Cold War, Globalization) and have no era after V; music stops at the campaign end. [music §3.2; config eras.campaign_end]

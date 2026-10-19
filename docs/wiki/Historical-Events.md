@@ -6,7 +6,7 @@ Historical events are the game's history layer: the turning points of five centu
 
 ### The campaign span
 
-Events run from the 1444 start to the campaign's end date, which is 31 August 1939 by default (it is one setting). When a campaign loads, every event that history places after that date is dropped and never fires. That covers the Second World War events, the Holocaust, the 1943 Bengal famine, the atomic bombings and everything in the Cold War and decolonization chains: 59 events in the current data. The ages Age of Decolonization, Cold War and Age of Globalization never start, and any age still running on the last day is cut there. An age that would end on a dropped event (the World Wars age ends on the Second World War) simply runs until its other end condition or the end date.
+Events run from the campaign's start to the campaign's end date, which is 31 August 1939 by default (it is one setting). When a campaign loads, every event that history places after that date is dropped and never fires. That covers the Second World War events, the Holocaust, the 1943 Bengal famine, the atomic bombings and everything in the Cold War and decolonization chains: 59 events in the current data. The ages Age of Decolonization, Cold War and Age of Globalization never start, and any age still running on the last day is cut there. An age that would end on a dropped event (the World Wars age ends on the Second World War) simply runs until its other end condition or the end date.
 
 The interwar years stay in: the Wilsonian moment, the 1918 armistice, the 1918 influenza, Versailles, the May Fourth movement, the founding of the Soviet Union, Lausanne, the Great Depression, the Italian invasion of Ethiopia and the Second Sino-Japanese War.
 
@@ -27,8 +27,9 @@ An age is a broad frame over the world with a window, start and end conditions a
 
 | Age | Window | Forced start | Forced end |
 |---|---|---|---|
-| Gunpowder Empires | 1444 to 1760 | 1444 | 1760 |
-| Exploration | 1444 to 1680 | 1444 | 1680 |
+| Schism and Conquerors | 1378 to 1460 | 1378 | 1460 |
+| Gunpowder Empires | 1420 to 1760 | 1453 | 1760 |
+| Exploration | 1415 to 1680 | 1445 | 1680 |
 | Reformations | 1480 to 1700 | 1530 | 1700 |
 | Atlantic Empires | 1480 to 1880 | 1520 | 1880 |
 | Crisis and Absolutism | 1590 to 1790 | 1640 | 1790 |
@@ -37,11 +38,15 @@ An age is a broad frame over the world with a window, start and end conditions a
 | Imperialism | 1800 to 1945 | 1860 | 1945 |
 | World Wars | 1890 to 1960 | 1925 | 1960 |
 
-Each age also lists its regions, so systems that care whether "the age has begun in your region" (exploration, national strengths, music) can read it. There are 12 ages in the data and these 9 are inside the campaign.
+Each age also lists its regions, so systems that care whether "the age has begun in your region" (exploration, national strengths, music) can read it. There are 13 ages in the data and these 10 are inside the campaign.
+
+The campaign is moving to a start on 20 September 1378, the day the Western Schism begins. The **Age of Schism and Conquerors** covers the years from then to the fall of Constantinople: two popes, Timur's campaigns, the early Ming fleets. It is under way from the first day in every region and ends once the Schism and the Council of Basel are over and Constantinople has fallen. **Gunpowder Empires** starts when three of the eight great powers (the realms with the most provinces) know Bombards, or when Constantinople falls. **Exploration** starts when Portugal or Castile has the ocean ships (Carrack and caravel) or holds the Atlantic islands. A fast world starts them early and a slow one waits for 1453 and 1445. A campaign that starts in 1444 has all three under way from the start, as before.
 
 ### Periods
 
-A period is a regional or thematic situation inside one or more ages, such as a dynastic crisis or a regional war. There are 93. A period becomes active when its start condition holds inside its window (a period marked `initial` is already running at the 1444 start) and ends when its end condition holds, so it can start early, late or never. Events can also start and end periods directly, and conditions can ask whether a period or an age is active. Which events belong to a period or an age is declared once, on the event itself.
+A period is a regional or thematic situation inside one or more ages, such as a dynastic crisis or a regional war. There are 101. A period becomes active when its start condition holds inside its window (a period marked `initial` is already running at the start, if the start lies inside its window) and ends when its end condition holds, so it can start early, late or never. Events can also start and end periods directly, and conditions can ask whether a period or an age is active. Which events belong to a period or an age is declared once, on the event itself.
+
+From the 1378 start the Western Schism, Timur's conquests, the Caroline phase of the Hundred Years' War, Ottoman expansion, Muscovite consolidation and the Southeast Asian states are under way. Others follow from what happens: the Timurid fragmentation once Timur's conquests are over, the Lancastrian phase when England and France go to war again, the Ottoman Interregnum only if Timur breaks the Ottomans, the Hussite wars when religious rebels rise in Bohemia, the Ming treasure voyages while the Ming are steady, Majapahit's decline, and Late Ming once the voyages are over. Portuguese oceanic expansion waits for the Age of Exploration, and Aztec and Inca expansion for the Triple Alliance and the Inca.
 
 ### When an event can happen
 

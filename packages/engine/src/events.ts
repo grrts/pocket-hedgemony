@@ -1,5 +1,6 @@
 import campaign from "../../rules/data/domain/events-campaign.json" with { type: "json" };
 import bridge from "../../rules/data/domain/events-places.json" with { type: "json" };
+import rules from "../../rules/data/domain/events.json" with { type: "json" };
 import geography from "../../rules/data/domain/exploration-regions.json" with { type: "json" };
 import * as evt from "./domain/events/index.ts";
 import * as dip from "./domain/diplomacy/index.ts";
@@ -31,6 +32,8 @@ const data = campaign as unknown as Campaign;
 /** Statistics the game reads live; an event's change to one is kept as an adjustment on top. */
 const ADJUSTED = new Set(["legitimacy", "stability", "tech_state", "tech_economy", "tech_military"]);
 const TECH = ["tech_state", "tech_economy", "tech_military"] as const;
+/** Tree innovations and the research inventions that bring them (D-EVT-19). */
+const INNOVATIONS = Object.entries(rules.innovations_from_research).filter(([k]) => k !== "$comment") as [string, string][];
 
 export interface GameEvents {
   state: evt.EventState;
@@ -254,6 +257,11 @@ function sync(world: World, g: GameEvents): void {
     c.stats.integration_strain = held[n] ? (100 * aggrieved[n]!) / held[n]! : 0;
     const learned = Math.max(0, (world.research[n]?.known.size ?? 0) - (g.knownAtStart[n] ?? 0));
     for (const t of TECH) c.stats[t] = bridge.start.country[t] + learned + (g.adjust[id]?.[t] ?? 0);
+    // The innovations it has adopted include the inventions it knows (D-EVT-19).
+    const known = world.research[n]?.known;
+    if (known) for (const [inn, inv] of INNOVATIONS) if (known.has(inv) && !(c.innovations ??= []).includes(inn)) c.innovations.push(inn);
+    // The great powers are the realms with the most provinces (D-AUD-2), so the score is the count (D-EVT-19).
+    c.stats.great_power_score = held[n]!;
   }
   // A sleeping realm has no ties to show (SETUP-082).
   const tree = (id: string) => {
