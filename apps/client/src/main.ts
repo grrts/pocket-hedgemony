@@ -95,8 +95,10 @@ import {
   pieceUnit,
   playbackAdvance,
   playbackHour,
+  placeLabels,
   tapBox,
   type Figure,
+  type LabelAsk,
   type FormationState,
 } from "@ph/engine/domain/map-presentation";
 import { provinceLevy } from "@ph/engine/domain/recruiting";
@@ -130,8 +132,8 @@ const diagnostics: Diagnostics = {
 // Read by the wrapper smoke tests.
 (globalThis as { __phDiagnostics?: Diagnostics }).__phDiagnostics = diagnostics;
 
-/** The realms the picker offers first; sleeping realms are never among them (SETUP-082). */
-const FEATURED = ["france", "england", "castile", "portugal", "ottomans", "byzantium", "austria", "muscovy", "ming", "aztecs", "inca", "mali"];
+/** The realms the picker offers first; sleeping realms are never among them (SETUP-082). ?feature=great_horde adds realms to the list, for the screenshot scripts. */
+const FEATURED = ["france", "england", "castile", "portugal", "ottomans", "byzantium", "austria", "muscovy", "ming", "aztecs", "inca", "mali", ...(new URLSearchParams(location.search).get("feature")?.split(",") ?? [])];
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 /** "11 November 1444", or "11 Nov 1444" short. */
 /** The hour beside the date in the top bar, while the player's battle runs (VIEW-076). */
@@ -1131,6 +1133,11 @@ function restyleProvinces(): void {
 // ---- overlay: nation names, cities, armies ----
 let nationLabels = computeNationLabels();
 
+/** How many of a realm's provinces, nearest its middle, its name may sit on. */
+const LABEL_ANCHORS = 6;
+/** The smallest realm name drawn, in pixels. */
+const LABEL_MIN_PX = 9;
+
 function computeNationLabels() {
   const acc = nations.map(() => ({ x: 0, y: 0, n: 0, ref: -1, owned: [] as number[] }));
   provinces.forEach((p, i) => {
@@ -1151,15 +1158,14 @@ function computeNationLabels() {
     if (!a.n) return null;
     const cx = a.x / a.n;
     const cy = a.y / a.n;
-    // Snap to the nearest owned province so the label sits on the nation itself.
-    let best = -1;
-    let bestD = Infinity;
-    for (const j of a.owned) {
-      const p = provinces[j]!;
-      const d = (p.x! - cx) ** 2 + (p.y! - cy) ** 2;
-      if (d < bestD) ((bestD = d), (best = j));
-    }
-    return { x: provinces[best]!.x!, y: provinces[best]!.y!, size: Math.sqrt(a.n) };
+    // Snap to the nearest owned province so the label sits on the nation itself;
+    // the next nearest are where it may move to make room for a neighbour's (VIEW-133).
+    const near = a.owned
+      .map((j) => ({ j, d: (provinces[j]!.x! - cx) ** 2 + (provinces[j]!.y! - cy) ** 2 }))
+      .sort((p, q) => p.d - q.d)
+      .slice(0, LABEL_ANCHORS)
+      .map(({ j }): [number, number] => [provinces[j]!.x!, provinces[j]!.y!]);
+    return { x: near[0]![0], y: near[0]![1], size: Math.sqrt(a.n), anchors: near };
   });
 }
 
@@ -1275,14 +1281,24 @@ function drawOverlay(o: OverlayContext): void {
   if (zoom < 3.5) {
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
+    // The player's realm first, then the largest; a smaller name moves or shrinks to make room, or waits for a closer zoom (VIEW-133).
+    const asks: (LabelAsk & { big: number })[] = [];
     nationLabels.forEach((l, i) => {
       if (!l || !isKnown(provinceIndex.get(nations[i]!.capital)!)) return;
       const px = Math.round(Math.min(28, l.size * zoom * 4.5));
-      if (px < 9) return;
+      if (px < LABEL_MIN_PX) return;
       const [sx, sy] = o.toScreen(l.x, l.y);
-      if (!onScreen(sx, sy, 200)) return;
-      pixelText(ctx, nations[i]!.name.toUpperCase(), sx, sy - (zoom >= 1.1 ? px : 0), px);
+      if (!onScreen(sx, sy, 300)) return;
+      const lift = zoom >= 1.1 ? px : 0;
+      const b = labelBitmap(nations[i]!.name.toUpperCase(), px, false);
+      // The letters and their outline, without the bitmap's spare room.
+      asks.push({
+        id: i, size: px, minSize: LABEL_MIN_PX, w: b.w - 2 * b.pad + 2, h: b.h - 2 * b.pad, big: snapshot && i === snapshot.playerNation ? Infinity : l.size,
+        anchors: l.anchors.map(([x, y]) => { const [ax, ay] = o.toScreen(x, y); return [ax, ay - lift] as [number, number]; }),
+      });
     });
+    asks.sort((a, b) => b.big - a.big || a.id - b.id);
+    for (const spot of placeLabels(asks)) pixelText(ctx, nations[spot.id]!.name.toUpperCase(), spot.x, spot.y, spot.size);
   }
 
   // Close up, only each realm's capital is named, so you can see whose seat it is; other names are in the province's overview (feedback 22).
@@ -5504,6 +5520,8 @@ function renderRealm(r: number): void {
   panel.querySelectorAll<HTMLButtonElement>("[data-realm-open-tab]").forEach((b) =>
     b.addEventListener("click", () => {
       realmTab = b.dataset.realmOpenTab as typeof realmTab;
+      // A line naming an invention opens the tree on it (GOV-078).
+      if (b.dataset.learnPick) Object.assign(learningUi, { part: "tree", pick: b.dataset.learnPick, center: b.dataset.learnPick, slide: true });
       renderPanel();
     }),
   );

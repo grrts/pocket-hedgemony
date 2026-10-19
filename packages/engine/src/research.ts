@@ -221,6 +221,15 @@ export function partnersKnowing(world: World, n: number, id: string): number {
   return k;
 }
 
+/** Inventions in play that a neighbour of realm n knows and n does not (GOV-077). */
+export function behindNeighbours(world: World, n: number): string[] {
+  const mine = knownSet(world, n);
+  const out = new Set<string>();
+  const t = rs.tree();
+  for (const m of world.researchNeighbours[n] ?? []) for (const id of world.research[m]?.known ?? EMPTY) if (!mine.has(id) && t.inventions.has(id) && !rs.outOfScope(t.inventions.get(id)!)) out.add(id);
+  return [...out].sort();
+}
+
 function partnersFor(world: World, n: number): Record<string, number> {
   const out: Record<string, number> = {};
   for (const s of world.research[n]!.studies) out[s.id] = partnersKnowing(world, n, s.id);
@@ -484,6 +493,8 @@ export interface StudyOption extends InventionView {
   ahead: boolean;
   /** Neighbours who know it (each makes it cheaper). */
   partners: number;
+  /** "Behind the times": percent off for an era before today's (RSCH-112, GOV-077). */
+  behindPct: number;
 }
 
 export interface ResearchView {
@@ -523,6 +534,8 @@ export interface ResearchView {
   standing: string;
   behind: number;
   pastMissing: string[];
+  /** "Behind your neighbours": inventions a neighbour knows that the realm does not, by id (GOV-077). */
+  behindNeighbours: string[];
   harvestSteps: number;
   /** Arms the realm may train now. */
   arms: string[];
@@ -548,7 +561,7 @@ export function researchView(world: World, n: number, arms: readonly string[]): 
     const cost = rs.studyCostFor(p, inv.id, date, partners);
     const pace = paceFor(p, inv.id);
     const progress = p.studies.find((s) => s.id === inv.id)?.progress ?? 0;
-    return { ...view(inv), cost, months: pace > 0 ? Math.max(1, Math.ceil(((cost - progress) / pace) * 12)) : null, ahead: rs.eraIndex(inv.era) > rs.eraIndex(era), partners };
+    return { ...view(inv), cost, months: pace > 0 ? Math.max(1, Math.ceil(((cost - progress) / pace) * 12)) : null, ahead: rs.eraIndex(inv.era) > rs.eraIndex(era), partners, behindPct: rs.behindDiscountPct(inv.era, date) };
   };
   const t = rs.tree();
   const options: StudyOption[] = [];
@@ -594,20 +607,24 @@ export function researchView(world: World, n: number, arms: readonly string[]): 
     standing: rs.standing(p.known),
     behind: rs.behindBy(p.known, date),
     pastMissing: rs.missingPast(p.known),
+    behindNeighbours: behindNeighbours(world, n),
     harvestSteps: world.researchHarvest[n]!,
     arms: arms.filter((a) => armUnlocked(world, n, a)),
   };
 }
 
 /** Every realm's research at a glance, for its country card: inventions known, its study and how far along. */
-export function realmResearch(world: World): { known: number; study: string | null; pct: number; standing: string; behind: number; ahead: number }[] {
+export function realmResearch(world: World): { known: number; study: string | null; pct: number; standing: string; behind: number; ahead: number; behindYou: number }[] {
   const mine = world.research[world.player]?.known ?? EMPTY;
   const date = dateOf(world);
   return world.research.map((p) => {
-    // The inventions this realm knows that the player's does not: each it makes cheaper as a neighbour (RSCH-104).
+    // The inventions this realm knows that the player's does not: each it makes cheaper as a neighbour (RSCH-104);
+    // and those the player's knows that it does not (GOV-078).
     let ahead = 0;
     for (const id of p.known) if (!mine.has(id)) ahead++;
-    const base = { known: p.known.size, standing: rs.standing(p.known), behind: rs.behindBy(p.known, date), ahead };
+    let behindYou = 0;
+    for (const id of mine) if (!p.known.has(id)) behindYou++;
+    const base = { known: p.known.size, standing: rs.standing(p.known), behind: rs.behindBy(p.known, date), ahead, behindYou };
     const s = p.studies[0];
     if (!s) return { ...base, study: null, pct: 0 };
     const cost = rs.studyCostFor(p, s.id, date);

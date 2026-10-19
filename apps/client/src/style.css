@@ -2560,6 +2560,14 @@ button.learning-line {
   padding: 2px 6px;
   white-space: normal;
 }
+button.law-line {
+  justify-content: flex-start;
+  text-align: left;
+  line-height: 1.1;
+  padding: 2px 6px;
+  white-space: normal;
+  min-height: 44px;
+}
 button.learning-line.idle {
   color: var(--cloth);
 }
