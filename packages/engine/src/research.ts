@@ -1,6 +1,7 @@
 import warfareData from "../../rules/data/domain/warfare.json" with { type: "json" };
 import buildingsData from "../../rules/data/domain/buildings.json" with { type: "json" };
 import * as rs from "./domain/research/index.ts";
+import * as dip from "./domain/diplomacy/index.ts";
 import type { World } from "./world.ts";
 import type { News } from "./war.ts";
 import { controller } from "./war.ts";
@@ -335,9 +336,14 @@ function aiResearch(world: World, n: number, date: rs.Day): void {
   aiChoose(world, n, date);
 }
 
+/** The inventions that unlock a castle step (buildings data): the fortification inventions a realm in fear studies sooner (DIPL-241). */
+export const FORTIFICATION = new Set((buildingsData.buildings as { id: string; steps: { unlocked_by?: string }[] }[]).find((b) => b.id === "castle")!.steps.flatMap((s) => (s.unlocked_by && s.unlocked_by !== "start" ? [s.unlocked_by] : [])));
+
 function aiChoose(world: World, n: number, date: rs.Day): void {
   const p = world.research[n]!;
   if (p.studies.length > 0) return;
+  // A realm in fear weighs warfare and fortification studies lighter (DIPL-241).
+  const fear = dip.fearLevel(dip.country(world.diplomacy, world.nationIds[n]!).fears);
   // rs.aiChooseStudy's rule (cheapest now, ties by id) in one pass over the ids sorted once.
   let pick: string | null = null;
   let best = Infinity;
@@ -347,7 +353,7 @@ function aiChoose(world: World, n: number, date: rs.Day): void {
   for (const k of p.known) for (const c of children.get(k) ?? []) if (!p.known.has(c)) tried.add(c);
   for (const id of [...tried].sort()) {
     if (!rs.eligibility(p, id, date).ok) continue;
-    const cost = rs.studyCostFor(p, id, date, partnersKnowing(world, n, id));
+    const cost = rs.studyCostFor(p, id, date, partnersKnowing(world, n, id)) * (fear === "calm" ? 1 : dip.studyCostWeight(id, fear, FORTIFICATION));
     if (cost < best) [pick, best] = [id, cost];
   }
   if (pick) rs.setStudy(p, pick, date);

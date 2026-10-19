@@ -777,3 +777,7 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 | standing (provisional) |  |  |  | 0.25 | 0.5 | calm: 1; wary: 1.5; threatened: 2 | calm: 0.5; wary: 0.7; threatened: 0.9 | calm: 0.4; wary: 0.5; threatened: 0.65 | 3 | slack: 1000 |
 | war (provisional) |  |  |  | 0.25 |  |  |  | 0.75 |  | per province: 3 |
 | borrow (provisional) |  |  |  |  |  |  |  |  |  | months of pay: 3 |
+| allies (provisional) |  |  |  |  |  |  |  |  |  | same fear: (calm: 0; wary: 15; threatened: 30); envoy every months: 3; partners: 3 |
+| defences (provisional) |  |  |  |  |  |  |  |  |  | castle step: (calm: 0; wary: 1; threatened: 2); reserve share: (calm: 1; wary: 1; threatened: 0.5) |
+| technology (provisional) |  |  |  |  |  |  |  |  |  | warfare prefix: W; cost weight: (calm: 1; wary: 0.8; threatened: 0.6) |
+| opportunity (provisional) |  |  |  |  |  |  |  |  |  | at war ratio factor: 0.75; at war chance factor: 2; at war target weight: 3; gamble chance: 0.1; gamble ratio factor: 0.8; min ratio: 1.2 |

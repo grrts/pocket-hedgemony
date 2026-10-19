@@ -14,7 +14,11 @@
   "arms_and_fear.fear",
   "arms_and_fear.standing",
   "arms_and_fear.war",
-  "arms_and_fear.borrow"
+  "arms_and_fear.borrow",
+  "arms_and_fear.allies",
+  "arms_and_fear.defences",
+  "arms_and_fear.technology",
+  "arms_and_fear.opportunity"
  ],
  "relations": {
   "layers": {
@@ -1420,6 +1424,47 @@
   "borrow": {
    "$comment": "At war, or Threatened, an AI realm whose gold is under months_of_pay of its army's pay borrows up to it, within its loan limit.",
    "months_of_pay": 3
+  },
+  "allies": {
+   "$comment": "F-166 (DIPL-238, DIPL-239): two realms that fear the same realm count We fear the same realm in an alliance count, at the asked realm's own fear of it (the larger when it is Threatened). A Threatened AI realm weighs its envoys every envoy_every_months months instead of once a year, and besides its warmest neighbour weighs an alliance with up to partners realms that border the realm it is Threatened of and fear it too, the strongest first.",
+   "same_fear": {
+    "calm": 0,
+    "wary": 15,
+    "threatened": 30
+   },
+   "envoy_every_months": 3,
+   "partners": 3
+  },
+  "defences": {
+   "$comment": "F-166 (DIPL-240): an AI realm at peace that is Wary or Threatened orders walls first, in its province bordering the realm it fears most whose castle stands lowest, until those castles reach castle_step for its fear (0: none). For those walls it keeps reserve_share of its usual gold reserve.",
+   "castle_step": {
+    "calm": 0,
+    "wary": 1,
+    "threatened": 2
+   },
+   "reserve_share": {
+    "calm": 1,
+    "wary": 1,
+    "threatened": 0.5
+   }
+  },
+  "technology": {
+   "$comment": "F-166 (DIPL-241): an AI realm that is Wary or Threatened weighs the study cost of warfare inventions (ids beginning with warfare_prefix) and of the inventions that unlock a castle step (buildings data) by cost_weight for its fear when it chooses its next study; it still studies the one that costs it least after the weight.",
+   "warfare_prefix": "W",
+   "cost_weight": {
+    "calm": 1,
+    "wary": 0.8,
+    "threatened": 0.6
+   }
+  },
+  "opportunity": {
+   "$comment": "F-166 (DIPL-242, DIPL-243): an AI realm takes its chances. Against a target already at war with another realm its side needs at_war_ratio_factor of the usual strength ratio (warfare ai declare ratio), it looks for a war at at_war_chance_factor times its monthly chance when such a neighbour is there, and such a target weighs at_war_target_weight more in its pick. Each month it looks for a war, a gamble_chance roll of the world's dice lets it accept gamble_ratio_factor of the ratio. The ratio is never under min_ratio.",
+   "at_war_ratio_factor": 0.75,
+   "at_war_chance_factor": 2,
+   "at_war_target_weight": 3,
+   "gamble_chance": 0.1,
+   "gamble_ratio_factor": 0.8,
+   "min_ratio": 1.2
   }
  }
 }

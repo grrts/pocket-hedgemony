@@ -189,6 +189,14 @@ export interface ArmsAndFearRule {
   standing: { share_of_cap: number; match_neighbour: number; multiplier: ByFear; max_share_of_cap: ByFear; pay_share_of_income: ByFear; raise_per_month: number; slack: number };
   war: { share_of_cap: number; per_province: number; pay_share_of_income: number };
   borrow: { months_of_pay: number };
+  /** F-166: allies against a common fear (DIPL-238, DIPL-239). */
+  allies: { same_fear: ByFear; envoy_every_months: number; partners: number };
+  /** F-166: walls on the border with the feared realm (DIPL-240). */
+  defences: { castle_step: ByFear; reserve_share: ByFear };
+  /** F-166: warfare and fortification studies weigh less when afraid (DIPL-241). */
+  technology: { warfare_prefix: string; cost_weight: ByFear };
+  /** F-166: opportunities and gambles before a declaration (DIPL-242, DIPL-243). */
+  opportunity: { at_war_ratio_factor: number; at_war_chance_factor: number; at_war_target_weight: number; gamble_chance: number; gamble_ratio_factor: number; min_ratio: number };
 }
 
 export const config = raw as unknown as DiplomacyConfig;

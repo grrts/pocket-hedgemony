@@ -1206,26 +1206,37 @@ export function monthlyDiplomacy(world: World, news: News[]): void {
  * truce, alliance or subject tie with (rare, set in defines), only when it has
  * counted the price (WAR-228): its side beats the target's with everyone
  * called against it, it holds a war chest, its people don't want peace and it
- * isn't too notorious.
+ * isn't too notorious. It takes its chances (DIPL-242, DIPL-243): a neighbour
+ * already at war elsewhere makes it look more often, needs a smaller edge and
+ * is likelier picked, and now and then it gambles on a smaller edge.
  */
 export function aiDeclarations(world: World, news: News[]): void {
   const d = world.diplomacy;
   // The campaign's difficulty scales how readily the AI looks for a war (SETUP-101).
   const chance = world.rules.defines.war.aiDeclareChancePerMonth * aiWarChanceFactor(world);
   const G = goalsConfig.goals;
+  const O = dip.AF.opportunity;
+  // Realms at war this month: a neighbour already fighting another is an opportunity (DIPL-242).
+  const fighting = new Set<string>();
+  for (const w of d.wars) for (const id of [...w.attackers, ...w.defenders]) fighting.add(id);
   for (let n = 0; n < world.nationCount; n++) {
-    if (n === world.player || world.nationGone[n] || dip.warOf(d, world.nationIds[n]!)) continue;
+    if (n === world.player || world.nationGone[n] || fighting.has(world.nationIds[n]!)) continue;
     // A realm's goals make it look for a war more often (EVT-105).
     const pulls = goalPulls(world, n);
-    const neighbours = () => dip.neighbours(d, world.nationIds[n]!).map((id) => world.nationIndex.get(id)!);
-    let near = pulls?.size ? neighbours() : null;
-    const most = near ? Math.max(0, ...near.map((t) => pulls!.get(t) ?? 0)) : 0;
-    if (world.rng.next() >= chance * (1 + G.war_chance_per_pull * most)) continue;
-    near ??= neighbours();
+    const near = dip.neighbours(d, world.nationIds[n]!).map((id) => world.nationIndex.get(id)!);
+    const busy = (t: number) => t !== undefined && fighting.has(world.nationIds[t]!);
+    const most = pulls?.size ? Math.max(0, ...near.map((t) => pulls.get(t) ?? 0)) : 0;
+    // A neighbour at war elsewhere makes it look for a war more often (DIPL-242).
+    const opening = near.some(busy) ? O.at_war_chance_factor : 1;
+    if (world.rng.next() >= chance * opening * (1 + G.war_chance_per_pull * most)) continue;
+    // Now and then a realm gambles on a little less than its usual edge (DIPL-243); a hash of the day and the realm decides,
+    // so it stays deterministic without drawing on the world's dice.
+    const gamble = gambleRoll(world.day, n) < O.gamble_chance;
     const ctx = priceContext(world, n);
-    const targets = near.filter((t) => t !== undefined && !world.nationGone[t] && relationState(world, n, t).state === null && !whyAiWontDeclare(world, n, t, priceOfWar(world, n, t, ctx)));
+    const targets = near.filter((t) => t !== undefined && !world.nationGone[t] && relationState(world, n, t).state === null && !whyAiWontDeclare(world, n, t, priceOfWar(world, n, t, ctx), gamble));
     if (!targets.length) continue;
-    const t = most > 0 ? weightedPick(world, targets, (x) => 1 + G.target_weight_per_pull * (pulls!.get(x) ?? 0)) : targets[world.rng.int(targets.length)]!;
+    const weight = (x: number) => (1 + G.target_weight_per_pull * (pulls?.get(x) ?? 0)) * (busy(x) ? O.at_war_target_weight : 1);
+    const t = most > 0 || targets.some(busy) ? weightedPick(world, targets, weight) : targets[world.rng.int(targets.length)]!;
     if (demandFirst(world, n, t)) continue;
     // A Take land aim on a place one of its goals names is the war's aim (EVT-105).
     const place = goalPlacesHeldBy(world, n, t).map((p) => world.provinceIds[p]!).find((p) => dip.warAimsOf(d, world.nationIds[n]!, world.nationIds[t]!).some((h) => h.aim === "take_land" && h.province === p));
@@ -1315,4 +1326,11 @@ export function aiMarches(world: World): void {
       a.pathAt[i] = 0;
     }
   }
+}
+
+/** A deterministic roll in [0,1) from the day and the realm, which leaves the world's dice untouched. */
+function gambleRoll(day: number, n: number): number {
+  let h = Math.imul(day ^ 0x9e3779b9, 0x85ebca6b) ^ Math.imul(n + 1, 0xc2b2ae35);
+  h ^= h >>> 16; h = Math.imul(h, 0x7feb352d); h ^= h >>> 15; h = Math.imul(h, 0x846ca68b); h ^= h >>> 16;
+  return (h >>> 0) / 4294967296;
 }
