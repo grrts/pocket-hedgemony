@@ -170,6 +170,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-EVT-15**: (was OQ-EVT-15) When ages and periods are checked: in the turn in which 1 January falls, in the events step
 - **D-EVT-16**: (was OQ-EVT-16) The religion flags: religious_persecution_active, missionary_persecution and
 - **D-EVT-17**: First game slice of events (milestone 6, provisional): the bridge maps 13 realm ids of the map to
+- **D-EVT-18**: Founding events (Leroy, 18 Oct; X-24): a `create_country` founds the realm on the map through
 
 ### Exploration (exploration)
 
