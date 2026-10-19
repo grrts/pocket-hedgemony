@@ -1026,6 +1026,15 @@ export function greatLordReasons(lord: Pick<Lord, "provinces">): number {
   return n >= config.great_lord.two_reasons_from ? 2 : n >= config.great_lord.one_reason_from ? 1 : 0;
 }
 
+/** The assassination numbers and reactions, all in the realm data (REALM-280 to REALM-285). */
+export const assassinationConfig = config.lords.assassination;
+
+/** The chance an assassin sent after a lord does his work: the base, less for each Great lord reason, never below the floor (REALM-281). */
+export function assassinationChance(lord: Pick<Lord, "provinces">): number {
+  const a = config.lords.assassination;
+  return Math.max(a.min_chance, a.chance - a.great_lord_penalty * greatLordReasons(lord));
+}
+
 /**
  * The throne law a government form gives (REALM-161); a reform or revolution
  * that changes the form changes it. Where the country's history lets a

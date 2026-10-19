@@ -331,6 +331,8 @@ let litLord = -1;
 let grantOpen = false;
 /** The lord's screen lists every royal province to grant, not just the nearest. */
 let grantAll = false;
+/** The lord whose assassin confirm card is open on his screen, -1 = none (REALM-283). */
+let assassinAsk = -1;
 /** Which tab of the province overview is open. */
 type ProvinceTab = "overview" | "people" | "garrison" | "land" | "build" | "port";
 let provinceTab: ProvinceTab = "overview";
@@ -4350,7 +4352,8 @@ function governanceSection(pi: number, own: number, mine: boolean, official: Ret
 function renderLord(k: number): void {
   const s = snapshot!;
   const l = lordViews()[k];
-  if (!l) {
+  // A lord left with no land (seized, or murdered with his lands going to the crown) is no longer on the Lords tab.
+  if (!l || l.lands === 0) {
     lordView = -1;
     renderPanel();
     return;
@@ -4369,15 +4372,31 @@ function renderLord(k: number): void {
   royal.sort((a, b) => (dist.get(a) ?? 999) - (dist.get(b) ?? 999) || a - b);
   const grants = (grantAll ? royal : royal.slice(0, 6)).map((p) => provinceRow(p, `${dist.get(p) === 1 ? "next to his lands" : dist.has(p) ? `${dist.get(p)} provinces away` : "across the sea"} · ${gold2(s.provinceTaxGold[p]!)} gold a month`));
   const holdings = lands.provinces.map((p) => provinceRow(p, `${MOOD_LABEL[s.provinceMood[p]!]} · ${fmt(Math.round(s.provincePeople[p]! * 1000))} people`));
+  // Who an assassin would unsettle: every other lord of the realm with land, and how many of them are his house.
+  const others = lordViews().filter((o) => o.nation === l.nation && o.k !== k && o.lands > 0);
+  const a = s.assassination;
+  const assassin = { open: assassinAsk === k, gold: a.gold, chance: s.lords[k]!.assassinChance, base: a.base, landGoesTo: a.landGoesTo, heirLoyalty: a.heirLoyalty, onFailure: a.onFailure, others: others.length, house: others.filter((o) => o.house === l.house).length };
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(l.name)}</h2>${closeButton()}</header>
-    ${lordScreen(rules, l, lands, { lit: litLord === k, gift: s.giftGold, treasury: s.nationTreasury[s.playerNation]!, mine, holdings, grants, allGrants: grantAll || royal.length <= 6, court: mine ? "" : courtLordHtml(s.statecraft, k, l.nation) }, titlesOf(l.nation))}`;
+    ${lordScreen(rules, l, lands, { lit: litLord === k, gift: s.giftGold, treasury: s.nationTreasury[s.playerNation]!, mine, holdings, grants, allGrants: grantAll || royal.length <= 6, court: mine ? "" : courtLordHtml(s.statecraft, k, l.nation), assassin }, titlesOf(l.nation))}`;
   bindClose();
   showPanel(true);
   bindLords();
   panel.querySelector("[data-grant-all]")?.addEventListener("click", () => {
     grantAll = true;
     renderPanel();
+  });
+  panel.querySelector<HTMLButtonElement>("[data-assassin-ask]")?.addEventListener("click", () => {
+    assassinAsk = k;
+    renderPanel();
+  });
+  panel.querySelector<HTMLButtonElement>("[data-assassin-cancel]")?.addEventListener("click", () => {
+    assassinAsk = -1;
+    renderPanel();
+  });
+  panel.querySelector<HTMLButtonElement>("[data-assassinate]")?.addEventListener("click", () => {
+    assassinAsk = -1;
+    void act({ type: "assassinateLord", lord: k });
   });
   panel.querySelector("[data-back-lords]")?.addEventListener("click", () => {
     lordView = -1;
@@ -4433,6 +4452,7 @@ function openLord(k: number): void {
   panel.scrollTop = 0;
   lordView = k;
   grantAll = false;
+  assassinAsk = -1;
   realmView = -1;
   officialView = -1;
   newsView = false;

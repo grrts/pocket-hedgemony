@@ -59,6 +59,7 @@ export { aiWaitsToFound, answerLandAsk, askForLand, claimGround, colonyStarts, f
 export { refillHere } from "./turn.ts";
 export { setForm } from "./government.ts";
 export { inAnyWar } from "./lords.ts";
+export { assassinate, assassinChance, assassinationGold, lordLands, whyNotAssassinate } from "./lords.ts";
 export { ungoverned } from "./recruit.ts";
 export { restoreSleeping, saveSleeping, spareSleepers, wakeRealm, type Waking, type WokenRealm } from "./sleeping.ts";
 export { createGoals, goalPulls, monthlyGoals, nearestLand, pullOf, timeFactor, type Goal, type GoalState } from "./goals.ts";

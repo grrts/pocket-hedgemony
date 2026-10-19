@@ -71,7 +71,7 @@
     },
     "lords": {
       "gain": ["fief_granted", "local_ruler_kept", "title_sold", "marriage", "land_split", "defector"],
-      "lose": ["line_dies_out", "land_seized", "trial", "revolt_defeated", "defected", "merged"]
+      "lose": ["line_dies_out", "land_seized", "trial", "revolt_defeated", "defected", "merged", "assassinated"]
     },
     "soldiers": {
       "gain": ["raised", "paid_company", "retinue"],
@@ -137,7 +137,7 @@
   "loyalty": {
     "steps": ["Loyal", "Wavering", "Disloyal", "In revolt"],
     "up": ["want_granted", "gift_of_gold", "office_at_court", "marriage_into_ruling_house", "victory_taken_part", "long_secure_reign", "fed_in_famine", "shared_faith_and_tongue", "war_against_rival"],
-    "down": ["heavy_taxes", "land_seized_from_him", "land_seized_from_another", "war_lost", "battle_lost", "child_ruler", "disputed_heir", "new_ruler", "grain_requisitioned", "foreign_bribes", "crown_borrowed", "massacre", "faith_not_shared", "censured_by_head"]
+    "down": ["heavy_taxes", "land_seized_from_him", "land_seized_from_another", "war_lost", "battle_lost", "child_ruler", "disputed_heir", "new_ruler", "grain_requisitioned", "foreign_bribes", "crown_borrowed", "massacre", "faith_not_shared", "censured_by_head", "lord_assassinated", "assassin_caught"]
   },
   "harvest_steps": ["failed", "poor", "normal", "good", "bumper"],
   "tax_rates": ["none", "light", "normal", "heavy", "crushing"],
@@ -172,6 +172,19 @@
       "theocracy": "bishop or abbot",
       "steppe realm": "clan chief",
       "chiefdom or stateless society": "elder or lineage head"
+    },
+    "assassination": {
+      "$comment": "Sending an assassin after one of your lords (REALM-280 to REALM-285). gold: what it costs, paid whether or not it works. chance: the base chance it works; less by great_lord_penalty for each Great lord reason (REALM-162), never below min_chance. land_goes_to: 'heir' (a new lord of his house takes his lands at heir_loyalty) or 'crown' (his lands become royal land). On success every other lord of the realm falls others_steps steps and the rest of his house turns Disloyal when house_turns_disloyal; on failure he turns target_on_failure and every other lord falls others_steps_on_failure steps.",
+      "gold": 25,
+      "chance": 0.6,
+      "great_lord_penalty": 0.15,
+      "min_chance": 0.2,
+      "land_goes_to": "heir",
+      "heir_loyalty": "Wavering",
+      "house_turns_disloyal": true,
+      "others_steps": 1,
+      "others_steps_on_failure": 1,
+      "target_on_failure": "Disloyal"
     }
   },
   "windows": { "fallen": 10, "oaths_broken": 30, "lands_taken": 20 },
@@ -281,5 +294,5 @@
     "revolt_factor": 1.5,
     "official_slow": 0.5
   },
-  "_provisional": ["grain_price_gold_per_food", "daughters_inherit_crown", "great_lord", "women_in_roles", "age_multipliers", "women_reform_multiplier", "starting", "starting_armies", "starting_lords", "food_year", "debt", "win.army_weights", "win.warship_men", "win.commander_men", "win.army_power_per_men", "ai", "stability.empty_posts_share", "stability.restless_share", "ruler", "fallen", "belief", "titles"]
+  "_provisional": ["grain_price_gold_per_food", "daughters_inherit_crown", "great_lord", "women_in_roles", "age_multipliers", "women_reform_multiplier", "starting", "starting_armies", "starting_lords", "food_year", "debt", "win.army_weights", "win.warship_men", "win.commander_men", "win.army_power_per_men", "ai", "stability.empty_posts_share", "stability.restless_share", "ruler", "fallen", "belief", "titles", "lords.assassination"]
 }

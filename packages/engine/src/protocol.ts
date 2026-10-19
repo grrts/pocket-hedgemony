@@ -1,4 +1,4 @@
-import { realmConfig } from "./domain/realm/index.ts";
+import { assassinationChance, realmConfig } from "./domain/realm/index.ts";
 import type { WokenRealm } from "./sleeping.ts";
 import { rulerViews, type RulerView } from "./rulers.ts";
 import { fallenEffect, type FallenEffect } from "./fallen.ts";
@@ -10,7 +10,7 @@ import { createGoals, monthlyGoals } from "./goals.ts";
 import { achievementsView, startAchievements } from "./achievements.ts";
 import { eventCards, type EventCard } from "./events.ts";
 import { diplomacyLensView, type DiplomacyLensView } from "./diplomacyLens.ts";
-import { giftGold } from "./lords.ts";
+import { assassinationGold, giftGold } from "./lords.ts";
 import { stabilityOf, type Stability } from "./stability.ts";
 import { governmentView, realmForms, realmTitles, type GovernmentView } from "./government.ts";
 import type { Titles } from "./domain/realm/index.ts";
@@ -235,11 +235,13 @@ export interface Snapshot {
   grievanceNames: readonly string[];
   moods: readonly string[];
   /** Every lord (index = provinceLord's value): name, house, realm, loyalty and provinces held; the gold a gift costs. */
-  lords: { name: string; house: string; nation: number; loyalty: string; lands: number }[];
+  lords: { name: string; house: string; nation: number; loyalty: string; lands: number; /** The chance an assassin sent after him succeeds (REALM-281). */ assassinChance: number }[];
   provinceLord: Int16Array;
   /** Each realm's direct overlord by nation index, -1 when it is nobody's subject (SUBJ-093: the world-zoom map washes a subject in it). */
   nationOverlord: Int16Array;
   giftGold: number;
+  /** Gold an assassin costs, and where his lands go if he succeeds (REALM-280, REALM-282). */
+  assassination: { gold: number; base: number; landGoesTo: string; heirLoyalty: string; onFailure: string };
   /** The player's stability: the weakest of its lords, subjects, officials and provinces (REALM-199); null before a realm is chosen. */
   stability: Stability | null;
   /** The player's revolution card, its regime and ruler (REVO-090 to REVO-092); null before a realm is chosen. */
@@ -526,7 +528,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       lords: (() => {
         const lands = new Int32Array(w.lords.length);
         for (let p = 0; p < w.provinceCount; p++) if (w.provinceLord[p]! >= 0) lands[w.provinceLord[p]!]!++;
-        return w.lords.map((l, k) => ({ name: l.name, house: l.house, nation: l.nation, loyalty: l.loyalty, lands: lands[k]! }));
+        return w.lords.map((l, k) => ({ name: l.name, house: l.house, nation: l.nation, loyalty: l.loyalty, lands: lands[k]!, assassinChance: assassinationChance({ provinces: new Array<string>(lands[k]!) }) }));
       })(),
       provinceLord: w.provinceLord.slice(),
       nationOverlord: (() => {
@@ -535,6 +537,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         return out;
       })(),
       giftGold: giftGold(w),
+      assassination: { gold: assassinationGold(), base: realmConfig.lords.assassination.chance, landGoesTo: realmConfig.lords.assassination.land_goes_to, heirLoyalty: realmConfig.lords.assassination.heir_loyalty, onFailure: realmConfig.lords.assassination.target_on_failure },
       stability: player >= 0 ? stabilityOf(w, player) : null,
       revolution: player >= 0 ? revolutionView(w, player) : null,
       empire: empireView(w, player),
