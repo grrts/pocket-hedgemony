@@ -3,6 +3,7 @@ import type { News } from "./war.ts";
 import * as gov from "./domain/government/index.ts";
 import * as dip from "./domain/diplomacy/index.ts";
 import { knownSet } from "./research.ts";
+import * as rs from "./domain/research/index.ts";
 import { LOYALTY } from "./lords.ts";
 import { GRIEVANCES } from "./moods.ts";
 import { NO_TONGUE, TONGUE_FAMILY } from "./peoples.ts";
@@ -265,6 +266,10 @@ export interface NextFormView {
   lordsSlip: number;
   /** Why the Reform button is off, or null when it can be ordered now. */
   whyNot: string | null;
+  /** The new form's change to subject reach; null where it holds no subjects. */
+  subjectReach: number | null;
+  /** Inventions that help once in the new form, by id and name (GOV-078). */
+  helpedBy: { id: string; name: string }[];
 }
 
 export interface GovernmentView {
@@ -275,6 +280,8 @@ export interface GovernmentView {
   /** Provinces holding *Grasping officials* now. */
   grasping: number;
   laws: { succession: string; colonialRange: number; subjectReach: number | null };
+  /** A horde's edge and its end: the inventions its riders fade against, null for other forms (GOV-077). */
+  riders: { id: string; label: string }[] | null;
   next: NextFormView[];
 }
 
@@ -293,10 +300,12 @@ export function governmentView(world: World, n: number): GovernmentView {
     lords: { used: k.lords[n]!.length, cap: caps.lords },
     grasping,
     laws: { succession: gov.successionName(f.id), colonialRange: f.colonialRange, subjectReach: f.subjectReach },
+    riders: gov.ridersLine(f.id)?.map((x) => ({ id: x.invention, label: x.label })) ?? null,
     next: f.next.map((to): NextFormView => {
       const t = gov.form(to);
       const rule = gov.findReform(f.id, to);
-      const base = { id: to, name: gov.formName(to), family: t.family, officials: t.officials, lords: t.lords };
+      const helpedBy = (rule?.helpedBy ?? []).map((id) => ({ id, name: rs.invention(id).name }));
+      const base = { id: to, name: gov.formName(to), family: t.family, officials: t.officials, lords: t.lords, subjectReach: t.subjectReach, helpedBy };
       if (!rule) return { ...base, way: "revolution", needs: [], gold: 0, lordsSlip: 0, whyNot: WHY.no_reform! };
       const needs = rule.needs.map((need) => ({ label: needText(need), met: gov.needMet(need, c) }));
       if (rule.automatic) return { ...base, way: "condition", needs, gold: 0, lordsSlip: rule.lordsSlip, whyNot: WHY.automatic! };

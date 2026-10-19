@@ -19,7 +19,7 @@ Feature: Each realm starts from its start group
       | Venice   | latin         | 31    |
       | Ottomans | islamic       | 34    |
       | Ming     | china         | 38    |
-      | Oirat    | hordes        | 7     |
+      | Oirat    | hordes        | 11    |
       | Mali     | sahel         | 12    |
       | Kongo    | forest_africa | 3     |
       | Inca     | andes         | 10    |
