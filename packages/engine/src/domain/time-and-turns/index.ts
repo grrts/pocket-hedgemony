@@ -1,5 +1,6 @@
 import type { GameDate, Ruleset } from "@ph/rules";
 import config from "../../../../rules/data/domain/time-and-turns.json" with { type: "json" };
+import { START_DATE as SCENARIO_START } from "../../../../rules/src/start.ts";
 import { hashWorld } from "../../hash.ts";
 import { Rng } from "../../rng.ts";
 import { processTurn, type Order, type TurnReport } from "../../turn.ts";
@@ -118,11 +119,11 @@ export interface Campaign {
 
 export const FINALE = ["final wrap-up events", "closing sequence", "final result"] as const;
 
-/** The first day of every campaign, the tutorial included: 11 November 1444 (X-5, D-TIME-1). */
-export const START_DATE: GameDate = { year: config.startDate.year, month: config.startDate.month };
-export const START_DAY: number = config.startDate.day;
+/** The first day of every campaign, the tutorial included: the start scenario's day (X-25, D-TIME-1). */
+export const START_DATE: GameDate = { year: SCENARIO_START.year, month: SCENARIO_START.month };
+export const START_DAY: number = SCENARIO_START.day;
 
-/** NewGame: the clock on 11 November 1444, turn 0, the Rng seeded (TIME-005, TIME-006). */
+/** NewGame: the clock on the start day, turn 0, the Rng seeded (TIME-005, TIME-006). */
 export function newCampaign(rules: Ruleset, seed: number, options: Partial<CampaignRules> = {}): Campaign {
   const world = createWorld(rules, seed);
   world.date = worldDateOf(START_CALENDAR_DAY);
@@ -600,8 +601,8 @@ export interface CalendarDay {
 /** Days in a turn: one week (X-18). */
 export const TURN_DAYS: number = config.turnDays;
 
-/** The first day of every campaign: 11 November 1444 (X-5). */
-export const START_CALENDAR_DAY: CalendarDay = { ...config.startDate };
+/** The first day of every campaign: the start scenario's day (X-25). */
+export const START_CALENDAR_DAY: CalendarDay = { ...SCENARIO_START };
 
 export function addDays(d: CalendarDay, n: number): CalendarDay {
   let { year, month, day } = d;

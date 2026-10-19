@@ -11,6 +11,7 @@ import { LOYALTY } from "./lords.ts";
 import { grievanceCount, GRIEVANCES, moodIndex } from "./moods.ts";
 import { formOf } from "./government.ts";
 import { lightTax, openGranary, startRevolutionRising, type Band } from "./rebels.ts";
+import { START_YEAR } from "../../rules/src/start.ts";
 
 /**
  * Revolutions in the game (first slice, REVO-082 to REVO-093, D-REVO-17):
@@ -534,7 +535,7 @@ function rulerLine(world: World, r: RealmRevolution): string {
   if (r.rulerRule === "replaced") return `${r.ruler}, risen from the revolution${r.emigre ? "; the old house lives abroad as pretenders" : ""}`;
   if (r.rulerRule === "elected") return `Elected${r.emigre ? "; the old house lives abroad as pretenders" : ""}`;
   void world;
-  return "The house that ruled in 1444";
+  return `The house that ruled in ${START_YEAR}`;
 }
 
 /** The player's revolution card, regime and ruler (REVO-090 to REVO-092). */

@@ -168,7 +168,7 @@
     }
   },
   "africa": {
-    "$comment": "African starts (SETUP-060 to SETUP-067, X-20): the catalogue's playable countries and subjects, decentralised polities and peoples with a homeland in these regions are map realms (tools/mapgen/nations-1444.json, grows). Each takes only land no realm owns and grows from its capital to its size by manpower potential (provisional). Migrations, raiders and background records stay reference data.",
+    "$comment": "African starts (SETUP-060 to SETUP-067, X-20): the catalogue's playable countries and subjects, decentralised polities and peoples with a homeland in these regions are map realms (packages/rules/data/scenarios/1444/map-nations.json, grows). Each takes only land no realm owns and grows from its capital to its size by manpower potential (provisional). Migrations, raiders and background records stay reference data.",
     "regions": [
       "af_west",
       "af_central_south",

@@ -40,7 +40,7 @@ import { rebelsUi, risingCard, risingsLine, risingsOverview, verdictCard, type A
 import { heritageLine, heritageTab } from "./ui/heritage.ts";
 import { fitDraft, offerLine, peaceTable, startDraft, stepGold, togglePick, type PeaceDraft } from "./ui/peace.ts";
 import { fallenLine, rulerLines } from "./ui/ruler.ts";
-import { loadDefaultRuleset } from "@ph/rules";
+import { loadDefaultRuleset, START_SCENARIO } from "@ph/rules";
 import { hexToRgb, PALETTE, TERRAINS } from "./art/palette.ts";
 import { figureSprite, sprite, spriteUrl } from "./art/sprites.ts";
 import { icon, iconUrl, installUiArt, flagCanvas, flagUrl, UI_COLORS, type FlagOf, type IconName } from "./art/ui.ts";
@@ -1159,7 +1159,7 @@ function restyleProvinces(): void {
     view.renderer.setProvinceHunt(i, g >= 0 ? nationRgb[g]! : cl >= 0 ? nationRgb[cl]! : null, g < 0 && cl >= 0);
   }
   // Seasons move on a week a turn, so they are only worked out when a week starts.
-  const date = previewMonth ? { year: 1444, month: previewMonth, day: previewDay } : (weekStart ?? rules.defines.startDate);
+  const date = previewMonth ? { year: rules.defines.startDate.year, month: previewMonth, day: previewDay } : (weekStart ?? rules.defines.startDate);
   const key = dateKey(date);
   if (key !== seasonKey) {
     seasonKey = key;
@@ -2799,7 +2799,7 @@ function renderHud(): void {
   if (!snapshot) {
     hud.innerHTML = `
       <div class="realm title">${icon("crown", 2)}<b>Pocket Hegemony</b></div>
-      <span class="subtitle">Autumn 1444 · choose a realm</span>`;
+      <span class="subtitle">${START_SCENARIO.name} · choose a realm</span>`;
     return;
   }
   const s = snapshot;
@@ -4564,7 +4564,7 @@ const GRIEVANCE_FIX: Record<string, string> = {
   Conscription: "ends when half the recruits are back",
   "Soldiers quartered": "ends when the armies move on",
   Ungoverned: "ends when the official returns to his post",
-  "Foreign rule": "the homeland of a people with a foreign language, taken since 1444; ends with a lord who speaks their language",
+  "Foreign rule": `the homeland of a people with a foreign language, taken since ${START_SCENARIO.date.year}; ends with a lord who speaks their language`,
   "Banned language": "your Language policy is Impose and most here speak a foreign language; ends with Teach or Let be (Peoples tab)",
   "Wrong faith": "a third or more keep a faith without a house, or a Restricted majority; ends when it is served (Peoples tab)",
   Persecuted: "a Persecuted faith lives here; counts as two; ends when it is Tolerated or Restricted again (Peoples tab)",

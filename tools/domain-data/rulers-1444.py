@@ -1,4 +1,4 @@
-"""Builds packages/rules/data/domain/rulers-1444.json: each map realm's ruler in November 1444.
+"""Builds packages/rules/data/scenarios/1444/rulers.json: each map realm's ruler in November 1444.
 
 Names and the year each reign began come from the country catalogue's
 historical.identity.leadership_1444 (leader, reign); a ruler's age comes from
@@ -15,7 +15,7 @@ import glob, json, re, sys
 root = sys.argv[1] if len(sys.argv) > 1 else "/mnt/project-files/country-catalogue"
 here = "packages/rules/data"
 cfg = json.load(open(f"{here}/domain/scenario-setup.json"))["map_to_catalogue"]
-nations = json.load(open(f"{here}/world/nations.json"))
+nations = json.load(open(f"{here}/scenarios/1444/world/nations.json"))
 cat = {}
 for f in glob.glob(f"{root}/countries/*/*.json"):
     d = json.load(open(f))
@@ -112,5 +112,5 @@ doc = {
     "$comment": "Each map realm's ruler in November 1444, from the country catalogue's leadership_1444 (name, reign) and its notes; ages of well-known rulers from their birth years. null: the record names no single ruler, and the game names one. Built by tools/domain-data/rulers-1444.py.",
     "rulers": out,
 }
-json.dump(doc, open(f"{here}/domain/rulers-1444.json", "w"), indent=1, ensure_ascii=False)
+json.dump(doc, open(f"{here}/scenarios/1444/rulers.json", "w"), indent=1, ensure_ascii=False)
 print(sum(1 for v in out.values() if v), "named of", len(out))

@@ -4,7 +4,7 @@
 Reads the heritage build (national-strengths/build/heritage-all.json), the
 event tree's age names (packages/rules/data/domain/national-strengths.json),
 the compact catalogue rows (scenario-setup-catalogue.json), the map's nations
-(packages/rules/data/world/nations.json) and the map-to-catalogue rename table
+(packages/rules/data/scenarios/1444/world/nations.json) and the map-to-catalogue rename table
 (scenario-setup.json), and writes packages/rules/data/domain/
 national-strengths-realms.json: for every map nation, its catalogue record id,
 its 14 assessments with their confidence, and its heritage: birthright,
@@ -36,7 +36,7 @@ def main():
     ages = {a["id"]: a["name"] for a in load(DOMAIN / "national-strengths.json")["ages"]}
     catalogue = load(DOMAIN / "scenario-setup-catalogue.json")
     rename = {k: v for k, v in load(DOMAIN / "scenario-setup.json")["map_to_catalogue"].items() if k != "$comment"}
-    nations = load(ROOT / "packages/rules/data/world/nations.json")
+    nations = load(ROOT / "packages/rules/data/scenarios/1444/world/nations.json")
     n = len(catalogue["dimensions"])
 
     realms = {}

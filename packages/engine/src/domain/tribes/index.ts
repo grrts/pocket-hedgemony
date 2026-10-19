@@ -219,7 +219,7 @@ export const aiMayAsk = (gold: number): boolean => gold >= C.land_price * C.ai.a
 export * from "./screens.ts";
 
 // ---------------------------------------------------------------- new tribes on the 1444 map (TRIBE-002 to TRIBE-005)
-// The map build places them (tools/mapgen, nations-1444.json `grows`); these read the same config and the build's report.
+// The map build places them (tools/mapgen, the start scenario's map-nations.json `grows`); these read the same config and the build's report.
 
 /** TRIBE-001 by catalogue region: a tribal form whose record lies in a tribal region. */
 export const isTribalRealmIn = (form: string, region: string): boolean => isTribalForm(form) && C.regions.includes(region);
