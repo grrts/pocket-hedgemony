@@ -67,6 +67,9 @@ one worker answer and one apply.
 Rules:
 
 - The worker sends typed arrays and transfers them; no JSON of the world.
+  The snapshot is copied to the main thread every day, in one task, so a
+  per-province field is a typed array (bits for a small set, such as the
+  harvest months), never an array of numbers or arrays.
 - Applying a day updates textures and redraws once; panels re-render only
   what is open. Seasons change once a week, worked out ahead while the
   player looks at the map.

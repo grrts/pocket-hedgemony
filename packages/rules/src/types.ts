@@ -336,7 +336,7 @@ export type GoalAim =
   | { kind: "hold"; places: GoalPlace[]; target?: string }
   | { kind: "subject" | "ally" | "fight" | "free"; target: string };
 
-/** A real person of the start's history who is, or may become, a lord of a realm (REALM-280 to REALM-285). */
+/** A real person of the start's history who is, or may become, a lord of a realm (REALM-290 to REALM-295). */
 export interface HistoricalLordDef {
   /** Stable id, used by events that bring him in (`historical_lord`). */
   id: string;
@@ -362,7 +362,7 @@ export interface HistoricalLordDef {
   loyalty?: "Loyal" | "Wavering" | "Disloyal";
 }
 
-/** A historical lord who joins later by an event (REALM-284). */
+/** A historical lord who joins later by an event (REALM-295). */
 export interface LaterLordDef extends HistoricalLordDef {
   realm: string;
   /** His history year. */

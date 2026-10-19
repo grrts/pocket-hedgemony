@@ -39,9 +39,9 @@ export interface RealmLord {
   heir?: { name: string; age: number } | null;
   /** His line died out: his lands went back to the crown (REALM-082). */
   gone?: boolean;
-  /** What his lands make him: "Earl of Northumberland" (REALM-281); passes to whoever holds them after him. */
+  /** What his lands make him: "Earl of Northumberland" (REALM-291); passes to whoever holds them after him. */
   title?: string;
-  /** A real person of history: his id in the start's historical lords, and one line on who he was (REALM-280). His heir is not. */
+  /** A real person of history: his id in the start's historical lords, and one line on who he was (REALM-290). His heir is not. */
   historical?: string;
   note?: string;
 }
@@ -90,14 +90,14 @@ export function seedLords(world: World): void {
     const history = startLords.realms[def.id] ?? [];
     if (seated[def.id]) {
       seatHouses(world, n, seated[def.id]!);
-      // The head of a seated house in history is that house's lord (REALM-282); the others are seated on their own land.
+      // The head of a seated house in history is that house's lord (REALM-292); the others are seated on their own land.
       seatHistorical(world, n, capital, history.filter((h) => !world.lords.some((l) => l.nation === n && l.house === h.house && (asHistorical(world, l, h), true))));
       continue;
     }
     const historical = seatHistorical(world, n, capital, history);
     const reserved = reservedNames(def.id);
     const land = byDistance(world, n, capital);
-    // The historical lords stand for the realm's great houses: the catalogue's list is for a later start (REALM-282).
+    // The historical lords stand for the realm's great houses: the catalogue's list is for a later start (REALM-292).
     const start = startingLords(land.length, history.length ? [] : (great[def.id] ?? []));
     const count = Math.max(0, (start.names.length || start.generated) - historical);
     if (count === 0) continue;
@@ -136,7 +136,7 @@ export function seedLords(world: World): void {
 /**
  * Seats a realm's historical lords on the land history gave them, where the
  * realm holds it at the start: never its capital, never land another lord
- * already holds (REALM-280). Returns how many were seated.
+ * already holds (REALM-290). Returns how many were seated.
  */
 function seatHistorical(world: World, n: number, capital: number, history: readonly HistoricalLordDef[]): number {
   let seated = 0;
@@ -158,7 +158,7 @@ const RANKS = new Set(["pasha", "bey", "beg", "khan", "mirza", "shah", "malik", 
 
 /**
  * The houses and family names of a realm's historical lords, now and later:
- * no generated lord of the start takes them (REALM-281), so 1378 Hungary has
+ * no generated lord of the start takes them (REALM-291), so 1378 Hungary has
  * no generated Hunyadi beside the one an event brings in.
  */
 function reservedNames(realm: string): RegExp | null {

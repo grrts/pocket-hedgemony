@@ -1,4 +1,4 @@
-import { realmConfig } from "./domain/realm/index.ts";
+import { assassinationChance, realmConfig } from "./domain/realm/index.ts";
 import type { WokenRealm } from "./sleeping.ts";
 import { rulerViews, type RulerView } from "./rulers.ts";
 import { fallenEffect, type FallenEffect } from "./fallen.ts";
@@ -13,6 +13,7 @@ import { everydayCards } from "./everyday.ts";
 import { diplomacyLensView, type DiplomacyLensView } from "./diplomacyLens.ts";
 import { giftGold, lordOfCommander } from "./lords.ts";
 import { retinueView, type RetinueState } from "./retinues.ts";
+import { assassinationGold } from "./assassination.ts";
 import { stabilityOf, type Stability } from "./stability.ts";
 import { governmentView, realmForms, realmTitles, type GovernmentView } from "./government.ts";
 import type { Titles } from "./domain/realm/index.ts";
@@ -218,10 +219,10 @@ export interface Snapshot {
   provinceHarvest: Int8Array;
   provinceStarved: Float32Array;
   harvests: readonly string[];
-  /** The weather of each province's last harvest (-1 bad, 0 normal, 1 good), its harvest climate (index into climates) and the months it harvests. */
+  /** The weather of each province's last harvest (-1 bad, 0 normal, 1 good), its harvest climate (index into climates) and the months it harvests (bit m-1 set for month m: one number a province, not an array, as the snapshot is copied every day). */
   provinceWeather: Int8Array;
   provinceClimate: Int8Array;
-  provinceHarvestMonths: number[][];
+  provinceHarvestMonths: Uint16Array;
   /** Each province's fever land (index into feverSteps: none, mild, harsh, deadly), PROV-243. */
   provinceFever: Int8Array;
   feverSteps: readonly string[];
@@ -248,13 +249,15 @@ export interface Snapshot {
   moods: readonly string[];
   /** Every lord (index = provinceLord's value): name, house, realm, loyalty and provinces held; the gold a gift costs. */
   /** Lords by index; age, heir and gone for REALM-273 (a gone lord's line died out and he is listed nowhere). */
-  lords: { name: string; house: string; nation: number; loyalty: string; lands: number; age: number; heir: { name: string; age: number } | null; gone: boolean; traits: string[]; title?: string; note?: string; historical?: boolean }[];
+  lords: { name: string; house: string; nation: number; loyalty: string; lands: number; age: number; heir: { name: string; age: number } | null; gone: boolean; /** The chance an assassin sent after him succeeds (REALM-281). */ assassinChance: number; traits: string[]; title?: string; note?: string; historical?: boolean }[];
   provinceLord: Int16Array;
   /** The player's lords' retinues (WAR-252 to WAR-262): what each would bring, gathering or in the field (army = index in armies, -1), and why he can't be called. */
   retinues: { lord: number; state: RetinueState; wouldBring: number; atHome: number; cap: number; gathering?: { men: number; days: number }; army: number; seat: number; refusal: string | null; leavesAfter: number | null }[];
   /** Each realm's direct overlord by nation index, -1 when it is nobody's subject (SUBJ-093: the world-zoom map washes a subject in it). */
   nationOverlord: Int16Array;
   giftGold: number;
+  /** Gold an assassin costs, and how his heir and he take it (REALM-280, REALM-282). */
+  assassination: { gold: number; base: number; heirLoyalty: string; onFailure: string };
   /** The player's stability: the weakest of its lords, subjects, officials and provinces (REALM-199); null before a realm is chosen. */
   stability: Stability | null;
   /** The player's revolution card, its regime and ruler (REVO-090 to REVO-092); null before a realm is chosen. */
@@ -317,11 +320,11 @@ export interface Snapshot {
   /** Name of the official at each province's post, or null when it stands empty (or no realm owns it). */
   provinceOfficialName: (string | null)[];
   /** Years the official at each post has served there, to one decimal (0 when empty); his effect grows to full at 5 (see officialEffect). */
-  provinceOfficialYears: number[];
+  provinceOfficialYears: Float64Array;
   /** Realm a foreign specialist at each post came from (nation index), -1 = one of the realm's own (PROV-334). */
-  provinceOfficialFrom: number[];
+  provinceOfficialFrom: Int16Array;
   /** Age of each post's official, 0 for an empty post (REALM-275). */
-  provinceOfficialAge: number[];
+  provinceOfficialAge: Uint8Array;
   /** The player's provinces just taken that wait for a decision before the turn ends: fill the post, grant it, or keep it royal (PROV-340). */
   newLands: number[];
   /** The player's posts (PROV-342 to PROV-348): whether Auto-fill posts is on, the gold it keeps back, what filling every empty post costs now, and the best fit for each royal post of the player's, by province. */
@@ -538,7 +541,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       plagueSteps: PLAGUE_STEPS,
       plague: w.plagueSick.map((p) => ({ province: p, step: w.provincePlague[p]!, weeks: w.provincePlagueWeeks[p]!, dead: Math.round(w.provincePlagueDead[p]! * 1000) })),
       quarantineTax: quarantineTaxShare(),
-      provinceHarvestMonths: Array.from({ length: w.provinceCount }, (_, p) => (w.provinceWater[p] ? [] : harvestMonthsOf(w, p))),
+      provinceHarvestMonths: Uint16Array.from({ length: w.provinceCount }, (_, p) => (w.provinceWater[p] ? 0 : harvestMonthsOf(w, p).reduce((bits, m) => bits | (1 << (m - 1)), 0))),
       climates: CLIMATES,
       badWeather: CLIMATES.map(badWeatherName),
       ...(mapNetwork(w), { provinceCastle: w.provinceCastle.slice(), provinceRing: w.provinceRing.slice() }),
@@ -550,7 +553,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       lords: (() => {
         const lands = new Int32Array(w.lords.length);
         for (let p = 0; p < w.provinceCount; p++) if (w.provinceLord[p]! >= 0) lands[w.provinceLord[p]!]!++;
-        return w.lords.map((l, k) => ({ name: l.name, house: l.house, nation: l.nation, loyalty: l.loyalty, lands: lands[k]!, ...lordAge(w, k), gone: !!l.gone, traits: lordTraits(w, k), ...(l.title ? { title: l.title } : {}), ...(l.historical ? { note: l.note ?? "", historical: true } : {}) }));
+        return w.lords.map((l, k) => ({ name: l.name, house: l.house, nation: l.nation, loyalty: l.loyalty, lands: lands[k]!, ...lordAge(w, k), gone: !!l.gone, assassinChance: assassinationChance({ provinces: new Array<string>(lands[k]!) }), traits: lordTraits(w, k), ...(l.title ? { title: l.title } : {}), ...(l.historical ? { note: l.note ?? "", historical: true } : {}) }));
       })(),
       provinceLord: w.provinceLord.slice(),
       nationOverlord: (() => {
@@ -559,6 +562,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         return out;
       })(),
       giftGold: giftGold(w),
+      assassination: { gold: assassinationGold(), base: realmConfig.lords.assassination.chance, heirLoyalty: realmConfig.lords.assassination.heir_loyalty, onFailure: realmConfig.lords.assassination.target_on_failure },
       stability: player >= 0 ? stabilityOf(w, player) : null,
       revolution: player >= 0 ? revolutionView(w, player) : null,
       empire: empireView(w, player),
@@ -594,9 +598,9 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       freeCompanies: player >= 0 ? freeCompaniesFor(w, player).map((c) => ({ ...companyView(c), id: c.id, pay: companyPay(w, c, player), weeks: companyWeeks(w, c, player) })) : [],
       provinceOfficial: Array.from(w.provinceOfficial, (o) => (o >= 0 ? OFFICIALS[o]! : null)),
       provinceOfficialName: Array.from({ length: w.provinceCount }, (_, p) => officialAt(w, p)),
-      provinceOfficialYears: Array.from({ length: w.provinceCount }, (_, p) => Math.floor(yearsServed(w, p) * 10) / 10),
-      provinceOfficialFrom: Array.from(w.provinceOfficialFrom),
-      provinceOfficialAge: Array.from({ length: w.provinceCount }, (_, p) => (w.provinceOfficial[p]! >= 0 ? officialAge(w, p) : 0)),
+      provinceOfficialYears: Float64Array.from({ length: w.provinceCount }, (_, p) => Math.floor(yearsServed(w, p) * 10) / 10),
+      provinceOfficialFrom: w.provinceOfficialFrom.slice(),
+      provinceOfficialAge: Uint8Array.from({ length: w.provinceCount }, (_, p) => (w.provinceOfficial[p]! >= 0 ? officialAge(w, p) : 0)),
       newLands: player >= 0 ? newLands(w, player) : [],
       posts: player >= 0 ? postsView(w, player) : { autoFill: false, reserve: autoFillReserve(), fillAll: { posts: 0, gold: 0 }, fit: {} },
       commanders: w.commanders.map((c, k) => ({

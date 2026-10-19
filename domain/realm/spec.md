@@ -413,16 +413,28 @@ Lords and officials are called what their own culture called them, so a Mongol r
 #### How the player uses it: titles
 - REALM-243: The player reads the titles wherever lords and officials show, with no screen of their own: the country card's tabs (Lords and Officials become, for example, Daimyo and Daikan), the two Stability pillars on the General tab, the Lords map mode, the Lords tab and a lord's screen, the Officials tab and an official's screen, and the "Governed by" card of a province. Another realm's card uses that realm's words, so the player sees whose court it is. The post types (Warden, Tax collector, Judge and the rest) stay the same everywhere. On a phone in landscape the words take the place of the old labels in the Wide and Tall layouts; the longest plural tab label (Myothugyis, Tocricocs) is no longer than Mercenaries, and nothing needs hover. [X-19]
 
-### 5.26 Historical lords (Leroy, 19 October)
+### 5.26 Sending an assassin after a lord (Leroy, 19 October)
+A lord who grows too troublesome can be killed, but murder at court is never secret for long: every other lord of the realm trusts the crown less, whether the assassin succeeds or is caught. It is a harsher, quicker tool than a trial (REALM-084), which needs a disloyal lord and only turns his own house. The numbers and reactions are in `lords.assassination` in the realm data.
+
+- REALM-280: A realm shall be able to send an assassin after any lord of its own who holds land, whatever his loyalty; it costs `lords.assassination.gold` (25 gold), spent whether or not he succeeds, and is refused without the gold or for another realm's lord. [Leroy 19 October; provisional]
+- REALM-281: The assassin shall succeed with the base chance (60 %), 15 points less for each Great lord reason (REALM-162), never below 20 %; the dice are the campaign's seeded draw. [Leroy 19 October; provisional]
+- REALM-282: When the assassin succeeds, the lord shall die by the shared death rules (cause *assassinated*, REALM-273): his heir, or else perhaps a kinsman, takes his lands as a Wavering lord, and with no one left they return to the crown; every other lord of his house shall become Disloyal; and every other lord of the realm shall fall one step (the cause *A lord assassinated*). [Leroy 19 October; provisional]
+- REALM-283: When the assassin is caught, the lord shall become Disloyal, and every other lord of the realm shall fall one step (the cause *An assassin caught*). [Leroy 19 October; provisional]
+- REALM-285: The computer players shall not send assassins (a default until a design gives them a reason to). [Leroy 19 October]
+
+#### How the player uses it: assassination
+- REALM-284: The player finds it on the lord's own screen (Lords tab, or the lord's button on a province's "Governed by" card), where an **Assassinate…** button sits beside Gift. Tapping it opens a confirm card on the same screen, in the lord's own subject: the cost, the chance he succeeds (and that a great lord is well guarded), what follows if it works (he dies, his heir by name takes his lands or, with none, a kinsman or the crown, his house turns disloyal, how many other lords fall a step) and if the assassin is caught, with **Send the assassin** and **Cancel**. The outcome goes to the news log, and the Lords tab, the overview, shows every lord's new loyalty and the Lords pillar of stability. On a phone in landscape the card fits the side panel in the Wide and Tall layouts: its two buttons sit side by side at 44 points high, the text wraps, and nothing needs hover (each button names what it does). [X-19]
+
+### 5.27 Historical lords (Leroy, 19 October)
 Some lords of a start were real people whom history remembers: John of Gaunt, Henry Percy, Kęstutis, Yi Seong-gye. Generated lords alone made every lord feel the same. A start now seats a small, curated set of them, each with his own title, traits, age, heir and a line on who he was; every other lord stays generated. Only people the sources document as holding that land on the start day are seated (high or medium confidence, sources kept with each entry); the rest of the research and what was left out is in `/mnt/project-files/lords/historical-lords-design.md`. Data `scenarios/1378/lords.json` (hand-curated; the 1444 checkpoint has none).
 
-- REALM-280: When a campaign starts, each realm shall seat the historical lords its start's data names for it, each on the provinces of his historical lands that the realm holds, never its capital nor land another lord holds; one whose lands the realm does not hold is left out. Each takes his name, house, title, two traits and his age from his birth year (at least 16), the son who followed him as heir where the sources name him, and the loyalty history gives him on the start day (Loyal unless the data says otherwise). Where the sources give no birth year, the game draws his age and heir as for any lord (REALM-273). History's year of his death is not forced: he ages and dies by REALM-270 like anyone. [Leroy 19 October; REALM-070, REALM-081]
-- REALM-281: Every other lord shall stay generated: a realm with historical lords gets the generated lords REALM-166 would give it less one per historical lord seated (never fewer than none), on the land its historical lords and royal land leave; no generated lord of the start takes the house or family name of a historical lord of that realm, seated or brought in later (1378 Hungary has no generated Hunyadi). [Leroy 19 October; REALM-166]
-- REALM-282: Where the realm data seats great houses on named land (Japan, D-INST-1), the historical head of a house shall be that house's lord. A realm with historical lords at a start shall not take the catalogue's great-houses list, which is written for 1444: in 1378 Anjou, Berry, Bourbon, Foix and Armagnac are realms of their own. [REALM-166, D-INST-1]
-- REALM-283: A lord's title shall stay with his lands when his heir, a kinsman or a confirmed son takes them; the history line and the history mark are the man's and go with him. [REALM-273, EVT-116]
+- REALM-290: When a campaign starts, each realm shall seat the historical lords its start's data names for it, each on the provinces of his historical lands that the realm holds, never its capital nor land another lord holds; one whose lands the realm does not hold is left out. Each takes his name, house, title, two traits and his age from his birth year (at least 16), the son who followed him as heir where the sources name him, and the loyalty history gives him on the start day (Loyal unless the data says otherwise). Where the sources give no birth year, the game draws his age and heir as for any lord (REALM-273). History's year of his death is not forced: he ages and dies by REALM-270 like anyone. [Leroy 19 October; REALM-070, REALM-081]
+- REALM-291: Every other lord shall stay generated: a realm with historical lords gets the generated lords REALM-166 would give it less one per historical lord seated (never fewer than none), on the land its historical lords and royal land leave; no generated lord of the start takes the house or family name of a historical lord of that realm, seated or brought in later (1378 Hungary has no generated Hunyadi). [Leroy 19 October; REALM-166]
+- REALM-292: Where the realm data seats great houses on named land (Japan, D-INST-1), the historical head of a house shall be that house's lord. A realm with historical lords at a start shall not take the catalogue's great-houses list, which is written for 1444: in 1378 Anjou, Berry, Bourbon, Foix and Armagnac are realms of their own. [REALM-166, D-INST-1]
+- REALM-293: A lord's title shall stay with his lands when his heir, a kinsman or a confirmed son takes them; the history line and the history mark are the man's and go with him. [REALM-273, EVT-116]
 
 #### How the player uses it: historical lords
-- REALM-284: Nothing new is tapped. On the Lords tab a historical lord's row shows a small *History* tag after his name and his title in place of his house; his screen shows the tag, his title, his house, a short *In history* line on who he was, and his two traits with his age and heir. The tag is a word, not a colour, and needs no hover. Grouping and overview: lords stay on the Lords tab and their own screens, and the Stability plaque's Lords pillar counts them like any lord. On a phone in landscape the tag sits inline after the name and wraps with it in the Wide and Tall layouts; the history line is one short paragraph. [X-19; REALM-243]
+- REALM-294: Nothing new is tapped. On the Lords tab a historical lord's row shows a small *History* tag after his name and his title in place of his house; his screen shows the tag, his title, his house, a short *In history* line on who he was, and his two traits with his age and heir. The tag is a word, not a colour, and needs no hover. Grouping and overview: lords stay on the Lords tab and their own screens, and the Stability plaque's Lords pillar counts them like any lord. On a phone in landscape the tag sits inline after the name and wraps with it in the Wide and Tall layouts; the history line is one short paragraph. [X-19; REALM-243]
 
 ## 6. Commands
 
@@ -441,6 +453,7 @@ Some lords of a start were real people whom history remembers: John of Gaunt, He
 | SellTitle(province) | player / AI | Royal province; a buyer | Gold; weak loyal lord | LordCreated, GoldChanged |
 | SeizeLordLand(lord, provinces) | player / AI | — | Land royal; lords waver | LordLandSeized, LordLoyaltyChanged |
 | PutLordOnTrial(lord) | player / AI | Lord disloyal | Lord removed; his house disloyal | LordExecuted |
+| AssassinateLord(lord) | player | Own lord with land; the gold | Gold spent; he dies (personDies) and his heir, a kinsman or the crown takes his lands, or he turns disloyal; every other lord falls a step (REALM-280 to REALM-283) | LordAssassinated / AssassinCaught, LordLoyaltyChanged |
 | GiftToLord(lord, gold / office / marriage) | player / AI | Gold or an office or a marriage candidate | Loyalty up | LordLoyaltyChanged |
 | GrantLordWant(lord) | player / AI | Want is grantable | Loyalty up | LordLoyaltyChanged |
 | CallRetinue(lord) | player / AI | Lord loyal | Retinue joins | RetinueCalled |
@@ -542,6 +555,7 @@ All numbers are placeholders ("Numbers are placeholders for config"). The file i
 | great_lord | Great lord reasons | 4 to 7 provinces one, 8+ two | no | realm.json |
 | succession_by_form | Throne law per government succession | table | no | realm.json |
 | ai | Realm AI | presets, tax, loan, gift, fiefs | yes | realm.json |
+| lords.assassination | Assassin's gold, chance, Great lord penalty and floor, the heir's loyalty, the house and the other lords' reactions | 25 gold; 60 %, −15 per reason, 20 % floor; the heir Wavering; house Disloyal; others one step either way; the target Disloyal if caught | yes | realm.json |
 
 ## 11. Seams
 
@@ -804,8 +818,14 @@ Every requirement has at least one scenario. REALM-005 and REALM-156 are also pr
 | REALM-241 | — | Presentation only: checked on phone screenshots in landscape (apps/client/scripts/ruler-shots.mjs) |
 | REALM-242 | lords.feature | Lords and officials take their culture's titles |
 | REALM-243 | — | Presentation only: the labels that read the titles (packages/engine/test/titles.test.ts and phone screenshots) |
-| REALM-280 | — | Covered by engine test (packages/engine/test/historicalLords.test.ts: seated on land the realm holds, name, title, traits, age and heir) |
-| REALM-281 | — | Covered by engine test (packages/engine/test/historicalLords.test.ts: the rest stay generated; no generated Hunyadi) |
-| REALM-282 | — | Covered by engine test (packages/engine/test/historicalLords.test.ts: the head of a seated house; no 1444 houses in 1378 France) |
-| REALM-283 | — | Covered by engine test (packages/engine/test/historicalLords.test.ts: his heir keeps the title, not the history) |
-| REALM-284 | — | Presentation only: checked on phone screenshots in landscape (apps/client/scripts/historical-lords-shots.mjs) |
+| REALM-280 | assassination.feature | The assassin is paid whether or not he succeeds; Only the realm's own lords; Not without the gold |
+| REALM-281 | assassination.feature | Great lords are better guarded |
+| REALM-282 | assassination.feature | The assassin succeeds; His house turns on the crown |
+| REALM-283 | assassination.feature | The assassin is caught |
+| REALM-284 | — | Presentation only: the confirm card (apps/client/src/ui/lords.test.ts) and phone screenshots in landscape |
+| REALM-285 | — | No AI code issues the AssassinateLord order |
+| REALM-290 | — | Covered by engine test (packages/engine/test/historicalLords.test.ts: seated on land the realm holds, name, title, traits, age and heir) |
+| REALM-291 | — | Covered by engine test (packages/engine/test/historicalLords.test.ts: the rest stay generated; no generated Hunyadi) |
+| REALM-292 | — | Covered by engine test (packages/engine/test/historicalLords.test.ts: the head of a seated house; no 1444 houses in 1378 France) |
+| REALM-293 | — | Covered by engine test (packages/engine/test/historicalLords.test.ts: his heir keeps the title, not the history) |
+| REALM-294 | — | Presentation only: checked on phone screenshots in landscape (apps/client/scripts/historical-lords-shots.mjs) |

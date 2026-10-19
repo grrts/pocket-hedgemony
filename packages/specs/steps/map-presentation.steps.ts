@@ -1251,6 +1251,11 @@ Given("a synthetic world of {int} provinces and {int} nations", (s, provinces: n
 
 When("the bench processes a turn", (s) => {
   const w = s.world;
+  // The game's worker plays turn after turn, so the budget is for warm code: a
+  // spare world of the same size plays a season first, so the timed turns do
+  // not pay for compiling the monthly and yearly steps the first time they run.
+  const spare = createWorld(generateSyntheticRuleset(loadDefaultRuleset(), s.size), 1);
+  for (let i = 0; i < 16; i++) processTurn(spare, [], 0);
   processTurn(w, [], 0); // warm up
   s.treasuryBefore = w.nationTreasury.slice();
   s.turnBefore = w.turn;

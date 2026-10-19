@@ -1,4 +1,4 @@
-// Historical lords (REALM-284) as England in 1378: the Lords tab with each lord's History tag and title, and a
+// Historical lords (REALM-294) as England in 1378: the Lords tab with each lord's History tag and title, and a
 // lord's screen with his title, the In history line and his traits; on a small and a large phone held sideways, a
 // tall window and a desktop.
 // Usage: pnpm build && node scripts/historical-lords-shots.mjs <outDir> [devices]

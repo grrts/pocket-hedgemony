@@ -28,13 +28,13 @@ export interface LordView {
   heir?: { name: string; age: number } | null;
   /** His two traits (REALM-070); unset in an older snapshot. */
   traits?: string[];
-  /** What his lands make him ("Earl of Northumberland"), and for a real person of history one line on who he was (REALM-280, REALM-283). */
+  /** What his lands make him ("Earl of Northumberland"), and for a real person of history one line on who he was (REALM-290, REALM-294). */
   title?: string;
   note?: string;
   historical?: boolean;
 }
 
-/** The mark after a real person's name: he lived, and his card says who he was (REALM-283). */
+/** The mark after a real person's name: he lived, and his card says who he was (REALM-294). */
 const HISTORY_MARK = ` <span class="history-mark" title="A real person of history">History</span>`;
 
 /** What each loyalty step means for the crown. */
@@ -88,7 +88,50 @@ export function lordsTab(rules: Ruleset, lords: LordView[], lands: Map<number, L
     </div>
     <p><b>${royal}</b> of ${all} provinces are royal land and give you all their tax. ${lords.length ? `<b>${lords.length}</b> ${esc(lords.length === 1 ? `${t.lord} holds` : `${t.lords} hold`)} the other ${all - royal}: ${counts.map(([l, c]) => `${c} ${l.toLowerCase()}`).join(", ")}.` : ""}</p>
     ${lords.length ? `<div class="lord-list">${rows}</div>` : `<p class="hint">No ${esc(t.lords)}: every province is royal land.</p>`}
-    <p class="hint">Open ${esc(an(t.lord))} to see his lands on the map, send a gift, seize land or grant him a province. Gifts, fiefs and quiet years raise loyalty; lost wars and seized land lower it.</p>`;
+    <p class="hint">Open ${esc(an(t.lord))} to see his lands on the map, send a gift, seize land, grant him a province or send an assassin. Gifts, fiefs and quiet years raise loyalty; lost wars, seized land and murdered ${esc(t.lords)} lower it.</p>`;
+}
+
+/** What the player needs to weigh an assassin (REALM-280 to REALM-284). */
+export interface AssassinAsk {
+  /** The confirm card is open. */
+  open: boolean;
+  gold: number;
+  /** 0 to 1, and the base chance against an ordinary lord. */
+  chance: number;
+  base: number;
+  /** His heir's name, or null: then a kinsman may take his lands, or the crown. */
+  heir: string | null;
+  heirLoyalty: string;
+  onFailure: string;
+  /** Other lords of the realm who will think less of the crown, and how many of them are his own house. */
+  others: number;
+  house: number;
+}
+
+const pct = (x: number) => `${Math.round(x * 100)} %`;
+
+/**
+ * The confirm card for an assassin, opened from the lord's screen: what it
+ * costs, the odds, and what follows either way, with Send and Cancel.
+ */
+export function assassinCard(l: LordView, a: AssassinAsk, treasury: number, t: Titles = DEFAULT_TITLES): string {
+  const others = a.others ? `every other ${esc(t.lord)} of yours (${a.others}) falls a step of loyalty` : "";
+  const heir = a.heir ? `his heir ${esc(a.heir)} takes his lands, ${esc(a.heirLoyalty.toLowerCase())}` : `with no heir, a kinsman may take his lands, ${esc(a.heirLoyalty.toLowerCase())}, or they return to the crown`;
+  const house = a.house ? `the other ${a.house} of House ${esc(l.house)} turn${a.house === 1 ? "s" : ""} disloyal` : "";
+  const success = [`${esc(l.name)} dies`, heir, house, others].filter(Boolean).join("; ");
+  const failure = [`he turns ${esc(a.onFailure.toLowerCase())}`, a.others ? `every other ${esc(t.lord)} still falls a step` : ""].filter(Boolean).join(", and ");
+  const short = treasury < a.gold;
+  return `<section class="assassin-ask" aria-label="Send an assassin">
+      <h3 class="sub">Send an assassin after ${esc(l.name)}?</h3>
+      <p><b>${a.gold} gold</b>, spent either way · <b>${pct(a.chance)}</b> he succeeds${a.chance < a.base ? " (a great lord is well guarded)" : ""}</p>
+      <p><b>If it works:</b> ${success}.</p>
+      <p><b>If he is caught:</b> ${failure}.</p>
+      <p class="hint">Whatever happens, your ${esc(t.lords)} know whose knife it was.</p>
+      <div class="confirm-row">
+        <button class="wax" data-assassinate="${l.k}" ${short ? "disabled" : ""}>${short ? `Needs ${a.gold} gold` : "Send the assassin"}</button>
+        <button class="paper" data-assassin-cancel>Cancel</button>
+      </div>
+    </section>`;
 }
 
 export interface ProvinceRow {
@@ -101,14 +144,15 @@ export interface ProvinceRow {
 
 /**
  * A lord's own screen: who he is and how loyal, what his lands give, a
- * button that lights them up on the map, a gift, his lands (each opens its
- * province, with Seize), and royal provinces to grant him, nearest first.
+ * button that lights them up on the map, a gift, Assassinate (with its
+ * confirm card), his lands (each opens its province, with Seize), and royal
+ * provinces to grant him, nearest first.
  */
 export function lordScreen(
   rules: Ruleset,
   l: LordView,
   ll: LordLands,
-  o: { lit: boolean; gift: number; treasury: number; mine: boolean; holdings: ProvinceRow[]; grants: ProvinceRow[]; allGrants: boolean; court?: string; retinue?: string },
+  o: { lit: boolean; gift: number; treasury: number; mine: boolean; holdings: ProvinceRow[]; grants: ProvinceRow[]; allGrants: boolean; court?: string; retinue?: string; assassin?: AssassinAsk },
   t: Titles = DEFAULT_TITLES,
 ): string {
   const row = (r: ProvinceRow, button: string) => `<div class="place-row">
@@ -122,7 +166,9 @@ export function lordScreen(
     <div class="choices">
       <button class="wax" data-lord-light="${l.k}" aria-pressed="${o.lit}">${o.lit ? "Stop showing his lands" : "Show his lands on the map"}</button>
       ${o.mine && l.loyalty !== "Loyal" ? `<button class="paper" data-gift="${l.k}" ${o.treasury < o.gift ? "disabled" : ""} title="A gift of gold raises his loyalty a step">Gift · ${o.gift} gold</button>` : ""}
+      ${o.mine && o.assassin && !o.assassin.open ? `<button class="paper" data-assassin-ask="${l.k}" title="Have him killed: every other ${esc(t.lord)} will think less of you">Assassinate…</button>` : ""}
     </div>
+    ${o.mine && o.assassin?.open ? assassinCard(l, o.assassin, o.treasury, t) : ""}
     ${o.court ?? ""}
     ${o.retinue ?? ""}
     <dl class="facts">

@@ -12,7 +12,7 @@ const rules = loadDefaultRuleset();
 const w = createWorld(rules, 1);
 const lordOf = (id: string) => w.lords.findIndex((l) => l.historical === id);
 
-describe("historical lords of 1378 (REALM-280 to REALM-283)", () => {
+describe("historical lords of 1378 (REALM-290 to REALM-293)", () => {
   it("every historical lord is seated in his realm on land it holds, never its capital", () => {
     const missing: string[] = [];
     for (const [realm, list] of Object.entries(startLords.realms)) {
@@ -67,7 +67,7 @@ describe("historical lords of 1378 (REALM-280 to REALM-283)", () => {
     expect(w.lords[lordOf("shimazu_ujihisa")]!.loyalty).toBe("Disloyal");
   });
 
-  it("his heir keeps the title, not the history (REALM-283)", () => {
+  it("his heir keeps the title, not the history (REALM-293)", () => {
     const k = lordOf("john_of_gaunt");
     personDies(w, { kind: "lord", lord: k }, "old age", []);
     const l = w.lords[k]!;
