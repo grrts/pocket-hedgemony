@@ -1,0 +1,217 @@
+{
+ "$comment": "Rulers on 20 September 1378 of the western subject and catalogue records the subjects context names. Display text.",
+ "rulers": {
+  "lordship_of_ireland": {
+   "ruler": "Lord Richard II (justiciar James Butler, Earl of Ormond)",
+   "house": "House of Plantagenet",
+   "born": 1367
+  },
+  "isle_of_man": {
+   "ruler": "William Montagu, 2nd Earl of Salisbury, Lord of Mann",
+   "house": "House of Montagu",
+   "born": 1328
+  },
+  "english_france": {
+   "ruler": "The Seneschal of Gascony and the Captain of Calais for Richard II",
+   "house": "House of Plantagenet"
+  },
+  "ormond": {
+   "ruler": "James Butler, 2nd Earl of Ormond",
+   "house": "House of Butler",
+   "born": 1331
+  },
+  "desmond": {
+   "ruler": "Gerald FitzGerald, 3rd Earl of Desmond (Gearóid Iarla)",
+   "house": "FitzGerald of Desmond"
+  },
+  "kildare": {
+   "ruler": "Maurice FitzGerald, 4th Earl of Kildare",
+   "house": "FitzGerald of Kildare",
+   "born": 1318
+  },
+  "gaelic_munster_minor": {
+   "ruler": "Several lesser Munster lords",
+   "house": "Gaelic lordships of Munster"
+  },
+  "lordship_of_the_isles": {
+   "ruler": "John of Islay, Lord of the Isles",
+   "house": "Clan Donald"
+  },
+  "douglas_earldom": {
+   "ruler": "William Douglas, 1st Earl of Douglas",
+   "house": "House of Douglas"
+  },
+  "orkney": {
+   "ruler": "No earl (royal captain for Haakon VI)",
+   "house": "Norwegian crown"
+  },
+  "alencon": {
+   "ruler": "Count Peter II 'the Noble'",
+   "house": "House Valois-Alençon",
+   "born": 1340
+  },
+  "albret": {
+   "ruler": "Lord Arnaud-Amanieu VIII",
+   "house": "House Albret",
+   "born": 1338
+  },
+  "dauphine": {
+   "ruler": "Dauphin Charles",
+   "house": "House Valois",
+   "born": 1368
+  },
+  "french_minor_lordships": {
+   "ruler": "Various lords",
+   "house": "Lesser fiefs of the French crown"
+  },
+  "comtat_venaissin": {
+   "ruler": "Papal rector and the cardinals at Avignon",
+   "house": "Holy See"
+  },
+  "castilian_magnates": {
+   "ruler": "Heads of the new Trastámara lineages",
+   "house": "Enríquez, Villena, Guzmán, Manrique, Mendoza, Velasco"
+  },
+  "castilian_military_orders": {
+   "ruler": "Masters Fernando Osórez (Santiago) and Pedro Muñiz de Godoy (Calatrava)",
+   "house": "Military orders"
+  },
+  "aragon_kingdom": {
+   "ruler": "King Peter IV, with the Justicia of Aragon",
+   "house": "House of Barcelona"
+  },
+  "catalonia": {
+   "ruler": "Peter IV, Count of Barcelona",
+   "house": "House of Barcelona"
+  },
+  "valencia": {
+   "ruler": "King Peter IV",
+   "house": "House of Barcelona"
+  },
+  "sardinia": {
+   "ruler": "King Peter IV, through a governor at Cagliari",
+   "house": "House of Barcelona"
+  },
+  "andorra": {
+   "ruler": "Co-princes Gaston III Fébus of Foix and Bishop Berenguer d'Erill of Urgell"
+  },
+  "ferrara": {
+   "ruler": "Marquis Niccolò II 'lo Zoppo', with his brother Alberto",
+   "house": "House of Este",
+   "born": 1338
+  },
+  "rimini": {
+   "ruler": "Galeotto I Malatesta",
+   "house": "House Malatesta"
+  },
+  "camerino": {
+   "ruler": "Rodolfo II da Varano",
+   "house": "House da Varano"
+  },
+  "romagna_minor_signorie": {
+   "ruler": "Guido III da Polenta (Ravenna), the Alidosi (Imola) and others",
+   "house": "Romagna vicars"
+  },
+  "ancona": {
+   "ruler": "Anziani under a papal rector",
+   "house": "Commune of Ancona"
+  },
+  "roman_baronial_houses": {
+   "ruler": "Heads of the Colonna, Orsini, Savelli, Caetani and Prefetti di Vico",
+   "house": "Roman baronial houses"
+  },
+  "saluzzo": {
+   "ruler": "Marquis Frederick II",
+   "house": "Del Vasto"
+  },
+  "ghent": null,
+  "hainaut": {
+   "ruler": "Count William V (insane; Albert of Bavaria regent)",
+   "house": "House Wittelsbach (Bavaria-Straubing)",
+   "born": 1330
+  },
+  "arkel": {
+   "ruler": "Lord Otto of Arkel",
+   "house": "House Arkel"
+  },
+  "bar": {
+   "ruler": "Duke Robert I",
+   "house": "House Montbéliard (Bar)",
+   "born": 1344
+  },
+  "vaudemont": {
+   "ruler": "Countess Margaret of Joinville with Peter of Geneva",
+   "house": "House Joinville"
+  },
+  "soest": null,
+  "schwarzburg": {
+   "ruler": "Counts of Schwarzburg",
+   "house": "House Schwarzburg"
+  },
+  "harz_thuringian_counties": {
+   "ruler": "Separate counts and Vögte",
+   "house": "Various"
+  },
+  "silesia": {
+   "ruler": "Various Silesian dukes",
+   "house": "Silesian Piasts and Opava Přemyslids"
+  },
+  "breslau": {
+   "ruler": "City council of Breslau for the king"
+  },
+  "upper_lusatia": {
+   "ruler": "Royal Landvogt and the Six Towns"
+  },
+  "lower_lusatia": {
+   "ruler": "Royal Landvogt",
+   "house": "House Luxembourg"
+  },
+  "gorlitz_duchy": {
+   "ruler": "Duke John of Görlitz",
+   "house": "House Luxembourg",
+   "born": 1370
+  },
+  "rosenberg": {
+   "ruler": "Jan I and Oldřich I of Rosenberg",
+   "house": "House Rosenberg"
+  },
+  "cilli": {
+   "ruler": "Count Hermann I (with his nephew William)",
+   "house": "House Cilli"
+  },
+  "fribourg": {
+   "ruler": "Schultheiss and council under Habsburg lordship"
+  },
+  "schaffhausen": {
+   "ruler": "Town council under Habsburg pledge"
+  },
+  "glarus": {
+   "ruler": "Habsburg bailiff and valley assembly"
+  },
+  "brixen": {
+   "ruler": "Bishop Friedrich von Erdingen",
+   "house": "Cathedral chapter of Brixen"
+  },
+  "trent": {
+   "ruler": "Bishop Albert of Ortenburg",
+   "house": "House Ortenburg"
+  },
+  "zug": {
+   "ruler": "Ammann named by Schwyz"
+  },
+  "schwyz": {
+   "ruler": "Landammann and Landsgemeinde"
+  },
+  "iceland": {
+   "ruler": "Royal governor (hirðstjóri) for Haakon VI",
+   "house": "House of Sverre"
+  },
+  "faroes": {
+   "ruler": "Lawman and royal officials for Haakon VI",
+   "house": "House of Sverre"
+  },
+  "norse_greenland": {
+   "ruler": "Farmers' assembly under the Norwegian crown"
+  }
+ }
+}

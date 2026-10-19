@@ -1,4 +1,5 @@
 import type { World } from "./world.ts";
+import { closedTo } from "./shogunate.ts";
 import { atWar, type News } from "./war.ts";
 import { tradeConfig as config } from "./domain/trade/index.ts";
 import navalConfig from "../../rules/data/domain/naval.json" with { type: "json" };
@@ -119,6 +120,25 @@ export function createTradeState(P: number, N: number): TradeState {
     tradeDraft: null,
     tradeFeed: [],
   };
+}
+
+/** A commodore lying off a port of his realm speeds its trade (NAVY-154). */
+const COMMODORE_GAIN = navalConfig.admiralPosts.commodore.tradeGain;
+
+/** Whether a trade ship of realm n may pass sea zone z: not while an enemy blockades it, unless a commodore of n's lies there (NAVY-157; the navy works the blockades out). */
+function tradeShipMayPass(world: World, n: number, z: number): boolean {
+  const b = world.navy.blockade[z]!;
+  return !b || !atWar(world, n, b - 1) || (world.navy.escorts.get(z)?.includes(n) ?? false);
+}
+
+/** A trade ship stopped by a blockade in zone z: its purse is the blockading realm's prize (NAVY-157). */
+function seizePurse(world: World, z: number, purse: number): void {
+  const b = world.navy.blockade[z]!;
+  const v = world.navy;
+  if (!b || purse <= 0) return;
+  world.nationTreasury[b - 1] = world.nationTreasury[b - 1]! + purse;
+  if (v.seized.length !== world.nationCount) v.seized = new Float64Array(world.nationCount);
+  v.seized[b - 1] = v.seized[b - 1]! + purse;
 }
 
 // ---------------------------------------------------------------- goods and value
@@ -289,7 +309,10 @@ function stepDays(world: World, kind: GameTraderKind, q: number): number {
 
 /** Whether realm n's traders may enter q: not the land of a realm at war with it, nor land its enemies hold (TRADE-066, TRADE-067). */
 export function traderMayEnter(world: World, n: number, q: number): boolean {
-  if (world.provinceWater[q]) return true;
+  // The closed country: foreign traders stop only at the shogun's one port (INST-068).
+  if (closedTo(world, n, q)) return false;
+  // An enemy blockade shuts the sea to a realm's trade ships, unless its commodore escorts them (NAVY-157).
+  if (world.provinceWater[q]) return tradeShipMayPass(world, n, q);
   const o = world.provinceOwner[q]!;
   if (o >= 0 && o !== n && atWar(world, n, o)) return false;
   const occ = world.provinceOccupier[q]!;
@@ -402,7 +425,7 @@ function plan(world: World, n: number, kind: GameTraderKind, from: number, maxDa
 
 /** traderMayEnter, with each realm's war with n looked up once a search (ownerAt: 2×stamp at peace, 2×stamp+1 at war). */
 function mayEnterIn(world: World, n: number, q: number, stamp: number): boolean {
-  if (world.provinceWater[q]) return true;
+  if (world.provinceWater[q]) return tradeShipMayPass(world, n, q);
   const hostile = (o: number) => {
     if (o < 0 || o === n) return false;
     if (ownerAt[o] !== 2 * stamp && ownerAt[o] !== 2 * stamp + 1) ownerAt[o] = 2 * stamp + (atWar(world, n, o) ? 1 : 0);
@@ -512,6 +535,11 @@ function walk(world: World, t: GameTrader, collect: boolean, days: number): void
     const q = path[next]!;
     const cost = stepDays(world, t.kind, q);
     if (cost === Infinity || !traderMayEnter(world, t.owner, q)) {
+      // A ship a blockade stops loses its purse to the blockading realm (NAVY-157).
+      if (ship && world.provinceWater[q] && cost !== Infinity) {
+        if (collect) seizePurse(world, q, t.purse);
+        t.purse = 0;
+      }
       // The way is shut: plan the loop again next month.
       t.path = [];
       t.blocked = q;
@@ -544,14 +572,15 @@ function walk(world: World, t: GameTrader, collect: boolean, days: number): void
       else if (owner !== t.owner) {
         const fee = gold * config.collect.foreign_market_fee;
         world.nationTradeNow[owner * 2 + 1] = world.nationTradeNow[owner * 2 + 1]! + fee;
-        t.fees += fee;
+        if (t.owner === world.player) t.fees += fee;
         gold -= fee;
       }
       const took = Math.min(row.purse - t.purse, gold);
       t.purse += took;
-      if (took > 0) {
+      // Only the player's traders keep where their gold came from: no screen shows another realm's, and saves stay small.
+      if (took > 0 && t.owner === world.player) {
         addSource(t.src, q, took);
-        if (t.owner === world.player) feed(world, { trader: t.id, province: q, gold: took, deposit: false });
+        feed(world, { trader: t.id, province: q, gold: took, deposit: false });
       }
     }
     if (depositsAt(world, t, q) && t.purse > 0) {
@@ -593,12 +622,13 @@ function updateRatios(world: World): void {
     const ratio = r[p]!;
     let gain = 0;
     if (passing > 0) {
-      const enemy = world.provinceOccupier[p]! >= 0 || world.sieges.has(p);
-      // A customs officer +15 %, riots −50 % (TRADE-035, TRADE-038); an enemy or a siege stops the gain (TRADE-041).
-      const share = enemy ? 0 : Math.max(0, officialBonus(world, p, "Customs officer", "trade_ratio_gain") + (moodIndex(world, p) >= 2 ? config.ratio.modifiers.riots : 0));
+      const enemy = world.provinceOccupier[p]! >= 0 || world.sieges.has(p) || world.navy.blockade[p]! > 0;
+      // A customs officer +15 %, riots −50 %, a commodore lying off the port +25 % (TRADE-035, TRADE-038, NAVY-154); an enemy, a siege or a blockade stops the gain (TRADE-041, TRADE-042).
+      const share = enemy ? 0 : Math.max(0, officialBonus(world, p, "Customs officer", "trade_ratio_gain") + (moodIndex(world, p) >= 2 ? config.ratio.modifiers.riots : 0) + (world.navy.guarded[p] ? COMMODORE_GAIN : 0));
       gain = config.ratio.gain_per_trader * passing * (1 - ratio / config.ratio.max) * share;
     }
-    r[p] = Math.max(0, Math.min(config.ratio.max, ratio + gain - ratio * config.ratio.decay_share));
+    // A province closed against plague trades nothing while the quarantine lasts (TRADE-040, PROV-357).
+    r[p] = world.provinceQuarantine[p] ? config.ratio.modifiers.quarantine.set_ratio : Math.max(0, Math.min(config.ratio.max, ratio + gain - ratio * config.ratio.decay_share));
     world.provincePassed[p] = passing;
     world.provinceVisitsLast[p] = world.provinceVisits[p]!;
   }
@@ -1316,7 +1346,7 @@ export interface SavedTrade {
 
 /** By province: trade ratio, goods value a year, weight and trade stop as counted last January, and this month's traders passing and visits so far. */
 export function tradeProvinceArrays(world: World): Record<string, Float32Array | Uint8Array | Int32Array> {
-  return { tradeRatio: world.provinceTradeRatio, tradeGoods: world.provinceGoodsValue, tradeWeight: world.provinceWeight, tradeCity: world.provinceTradeCity, tradePassing: world.provincePassing, tradeVisits: Int32Array.from(world.provinceVisits), tradeVisitsLast: Int32Array.from(world.provinceVisitsLast) };
+  return { tradeRatio: world.provinceTradeRatio, tradeGoods: world.provinceGoodsValue, tradeWeight: world.provinceWeight, tradeCity: world.provinceTradeCity, tradePassing: world.provincePassing, tradeVisits: Int32Array.from(world.provinceVisits), tradeVisitsLast: Uint8Array.from(world.provinceVisitsLast, (v) => Math.min(255, v)) };
 }
 
 export function saveTrade(world: World): SavedTrade {

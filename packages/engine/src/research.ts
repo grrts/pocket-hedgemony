@@ -103,7 +103,8 @@ export function schoolsOf(world: World, n: number): { province: number; type: rs
 // ---------------------------------------------------------------- the start
 
 /**
- * What each realm knows in 1444 (RSCH-076), and its first school: one in its
+ * What each realm knows at the start (RSCH-098; the start date's block and
+ * Era I pacing, RSCH-113, RSCH-114), and its first school: one in its
  * capital, a madrasa where it knows L2, else a temple or monastery school
  * (founded by the clergy where the realm knows neither, RSCH-001), half its
  * seats filled from recruits in cohorts of the last five years, and a few
@@ -113,7 +114,7 @@ export function seedResearch(world: World): void {
   const year = world.date.year;
   const land = landOf(world);
   world.research = world.rules.nations.map((def, n) => {
-    const p = rs.startingProgramme(def.id);
+    const p = rs.startingProgramme(def.id, rs.tree(), world.date);
     p.country = world.nationIds[n]!;
     const capital = world.provinceIndex.get(def.capital);
     const type = schoolTypeFor(p);
@@ -135,6 +136,27 @@ export function seedResearch(world: World): void {
   for (let n = 0; n < world.nationCount; n++) refreshHarvest(world, n);
 }
 
+/**
+ * A woken realm's learning (SETUP-083): what the realm it takes after knows,
+ * its contacts and start group, with no school or study of its own yet.
+ */
+export function wakeResearch(world: World, n: number, donor: number): void {
+  const id = world.nationIds[n]!;
+  const p = rs.startingProgramme(donor >= 0 ? world.nationIds[donor]! : id, rs.tree(), { year: world.campaign.startYear });
+  p.country = id;
+  if (donor >= 0) {
+    const d = world.research[donor]!;
+    p.known = new Set(d.known);
+    p.contacts = new Set(d.contacts);
+    if (d.group !== undefined) p.group = d.group;
+  }
+  p.scholars = START_SCHOLARS.unschooled;
+  world.research[n] = p;
+  world.researchSeats[n] = 0;
+  refreshNeighbours(world);
+  refreshHarvest(world, n);
+}
+
 // ---------------------------------------------------------------- recruits
 
 /** Each realm's provinces, by nation index. */
@@ -145,13 +167,14 @@ function landOf(world: World): number[][] {
 }
 
 /**
- * Takes up to `men` recruits from realm n's held provinces, each giving the
+ * Takes up to `men` recruits from realm n's held royal provinces, each giving the
  * same share of its pool; returns how many. `land` lists the realm's
  * provinces when the caller has it.
  */
 function takeRecruits(world: World, n: number, men: number, land?: readonly number[]): number {
   if (men <= 0) return 0;
-  const held = (land ?? landOf(world)[n]!).filter((p) => world.provinceOwner[p] === n && controller(world, p) === n);
+  // The crown's recruits: a lord's land fills his own retinue (WAR-252).
+  const held = (land ?? landOf(world)[n]!).filter((p) => world.provinceOwner[p] === n && world.provinceLord[p]! < 0 && controller(world, p) === n);
   let pool = 0;
   for (const p of held) pool += world.provinceRecruits[p]!;
   const take = Math.min(men, Math.floor(pool));
@@ -198,6 +221,15 @@ export function partnersKnowing(world: World, n: number, id: string): number {
   let k = 0;
   for (const m of world.researchNeighbours[n] ?? []) if (world.research[m]?.known.has(id)) k++;
   return k;
+}
+
+/** Inventions in play that a neighbour of realm n knows and n does not (GOV-077). */
+export function behindNeighbours(world: World, n: number): string[] {
+  const mine = knownSet(world, n);
+  const out = new Set<string>();
+  const t = rs.tree();
+  for (const m of world.researchNeighbours[n] ?? []) for (const id of world.research[m]?.known ?? EMPTY) if (!mine.has(id) && t.inventions.has(id) && !rs.outOfScope(t.inventions.get(id)!)) out.add(id);
+  return [...out].sort();
 }
 
 function partnersFor(world: World, n: number): Record<string, number> {
@@ -463,6 +495,8 @@ export interface StudyOption extends InventionView {
   ahead: boolean;
   /** Neighbours who know it (each makes it cheaper). */
   partners: number;
+  /** "Behind the times": percent off for an era before today's (RSCH-112, GOV-077). */
+  behindPct: number;
 }
 
 export interface ResearchView {
@@ -502,6 +536,8 @@ export interface ResearchView {
   standing: string;
   behind: number;
   pastMissing: string[];
+  /** "Behind your neighbours": inventions a neighbour knows that the realm does not, by id (GOV-077). */
+  behindNeighbours: string[];
   harvestSteps: number;
   /** Arms the realm may train now. */
   arms: string[];
@@ -527,9 +563,10 @@ export function researchView(world: World, n: number, arms: readonly string[]): 
     const cost = rs.studyCostFor(p, inv.id, date, partners);
     const pace = paceFor(p, inv.id);
     const progress = p.studies.find((s) => s.id === inv.id)?.progress ?? 0;
-    return { ...view(inv), cost, months: pace > 0 ? Math.max(1, Math.ceil(((cost - progress) / pace) * 12)) : null, ahead: rs.eraIndex(inv.era) > rs.eraIndex(era), partners };
+    return { ...view(inv), cost, months: pace > 0 ? Math.max(1, Math.ceil(((cost - progress) / pace) * 12)) : null, ahead: rs.eraIndex(inv.era) > rs.eraIndex(era), partners, behindPct: rs.behindDiscountPct(inv.era, date) };
   };
   const t = rs.tree();
+  const standing = rs.standing(p.known, t);
   const options: StudyOption[] = [];
   const known: InventionView[] = [];
   for (const inv of t.inventions.values()) {
@@ -570,23 +607,28 @@ export function researchView(world: World, n: number, arms: readonly string[]): 
     pace: paceFor(p, null),
     contacts: [...p.contacts],
     group: p.group ?? null,
-    standing: rs.standing(p.known),
-    behind: rs.behindBy(p.known, date),
+    standing,
+    behind: rs.eraBehind(standing, date),
     pastMissing: rs.missingPast(p.known),
+    behindNeighbours: behindNeighbours(world, n),
     harvestSteps: world.researchHarvest[n]!,
     arms: arms.filter((a) => armUnlocked(world, n, a)),
   };
 }
 
 /** Every realm's research at a glance, for its country card: inventions known, its study and how far along. */
-export function realmResearch(world: World): { known: number; study: string | null; pct: number; standing: string; behind: number; ahead: number }[] {
+export function realmResearch(world: World): { known: number; study: string | null; pct: number; standing: string; behind: number; ahead: number; behindYou: number }[] {
   const mine = world.research[world.player]?.known ?? EMPTY;
   const date = dateOf(world);
   return world.research.map((p) => {
-    // The inventions this realm knows that the player's does not: each it makes cheaper as a neighbour (RSCH-104).
+    // The inventions this realm knows that the player's does not: each it makes cheaper as a neighbour (RSCH-104);
+    // and those the player's knows that it does not (GOV-078).
     let ahead = 0;
     for (const id of p.known) if (!mine.has(id)) ahead++;
-    const base = { known: p.known.size, standing: rs.standing(p.known), behind: rs.behindBy(p.known, date), ahead };
+    let behindYou = 0;
+    for (const id of mine) if (!p.known.has(id)) behindYou++;
+    const standing = rs.standing(p.known);
+    const base = { known: p.known.size, standing, behind: rs.eraBehind(standing, date), ahead, behindYou };
     const s = p.studies[0];
     if (!s) return { ...base, study: null, pct: 0 };
     const cost = rs.studyCostFor(p, s.id, date);
@@ -606,6 +648,8 @@ interface SavedProgramme {
   seats: number;
   /** The study queue (RSCH-108); older saves have none. */
   queue?: string[];
+  /** The campaign's start year for Era I pacing (RSCH-113); older saves have none and keep the world's own. */
+  startYear?: number;
 }
 
 export interface SavedResearch {
@@ -616,7 +660,7 @@ export interface SavedResearch {
 
 export function saveResearch(world: World): SavedResearch {
   return {
-    realms: world.research.map((p, n) => ({ known: [...p.known], contacts: [...p.contacts], studies: p.studies, schools: p.schools, scholars: p.scholars, stopped: p.stopped, seats: world.researchSeats[n]!, queue: [...p.queue] })),
+    realms: world.research.map((p, n) => ({ known: [...p.known], contacts: [...p.contacts], studies: p.studies, schools: p.schools, scholars: p.scholars, stopped: p.stopped, seats: world.researchSeats[n]!, queue: [...p.queue], ...(p.startYear !== undefined ? { startYear: p.startYear } : {}) })),
     founding: world.researchFounding,
   };
 }
@@ -634,6 +678,7 @@ export function restoreResearch(world: World, saved: SavedResearch, mapNation: (
     p.scholars = s.scholars;
     p.stopped = s.stopped;
     p.queue = (s.queue ?? []).filter((id) => rs.tree().inventions.has(id));
+    if (s.startYear !== undefined) p.startYear = s.startYear;
     world.researchSeats[n] = s.seats;
   });
   world.researchFounding = saved.founding.map((f) => ({ ...f, nation: mapNation(f.nation), province: mapProvince(f.province) })).filter((f) => f.nation >= 0 && f.province >= 0);

@@ -1,0 +1,3609 @@
+[
+  {
+    "id": "england",
+    "name": "England",
+    "color": "#b13e53",
+    "capital": "p803",
+    "army": 12000,
+    "commanders": [
+      {
+        "id": "england_1",
+        "name": "John Talbot",
+        "might": 4,
+        "cunning": 2,
+        "logistics": 2
+      }
+    ]
+  },
+  {
+    "id": "scotland",
+    "name": "Scotland",
+    "color": "#257179",
+    "capital": "p562",
+    "army": 6000,
+    "commanders": [
+      {
+        "id": "scotland_1",
+        "name": "General of Scotland",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "ireland",
+    "name": "Ireland",
+    "color": "#45283c",
+    "capital": "p785",
+    "commanders": [
+      {
+        "id": "ireland_1",
+        "name": "General of Ireland",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "france",
+    "name": "France",
+    "color": "#3b5dc9",
+    "capital": "p1063",
+    "army": 25000,
+    "commanders": [
+      {
+        "id": "france_1",
+        "name": "Jean de Dunois",
+        "might": 3,
+        "cunning": 3,
+        "logistics": 2
+      }
+    ]
+  },
+  {
+    "id": "burgundy",
+    "name": "Burgundy",
+    "color": "#c97d3b",
+    "capital": "p1077",
+    "army": 15000,
+    "commanders": [
+      {
+        "id": "burgundy_1",
+        "name": "Charles le Téméraire",
+        "might": 4,
+        "cunning": 2,
+        "logistics": 2
+      }
+    ]
+  },
+  {
+    "id": "brittany",
+    "name": "Brittany",
+    "color": "#d9a066",
+    "capital": "p1046",
+    "commanders": [
+      {
+        "id": "brittany_1",
+        "name": "General of Brittany",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "provence",
+    "name": "Provence",
+    "color": "#306082",
+    "capital": "p1360",
+    "commanders": [
+      {
+        "id": "provence_1",
+        "name": "General of Provence",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "savoy",
+    "name": "Savoy",
+    "color": "#9badb7",
+    "capital": "p1366",
+    "commanders": [
+      {
+        "id": "savoy_1",
+        "name": "General of Savoy",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "lorraine",
+    "name": "Lorraine",
+    "color": "#e8a0bf",
+    "capital": "p1083",
+    "commanders": [
+      {
+        "id": "lorraine_1",
+        "name": "General of Lorraine",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "navarre",
+    "name": "Navarre",
+    "color": "#cbdbfc",
+    "capital": "p1334",
+    "commanders": [
+      {
+        "id": "navarre_1",
+        "name": "General of Navarre",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "castile",
+    "name": "Castile",
+    "color": "#ffcd75",
+    "capital": "p1601",
+    "army": 15000,
+    "commanders": [
+      {
+        "id": "castile_1",
+        "name": "Álvaro de Luna",
+        "might": 3,
+        "cunning": 3,
+        "logistics": 3
+      }
+    ]
+  },
+  {
+    "id": "aragon",
+    "name": "Aragon",
+    "color": "#ef7d57",
+    "capital": "p1611",
+    "army": 8000,
+    "commanders": [
+      {
+        "id": "aragon_1",
+        "name": "General of Aragon",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "portugal",
+    "name": "Portugal",
+    "color": "#38b764",
+    "capital": "p1585",
+    "army": 6000,
+    "commanders": [
+      {
+        "id": "portugal_1",
+        "name": "General of Portugal",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "granada",
+    "name": "Granada",
+    "color": "#257179",
+    "capital": "p1885",
+    "army": 4000,
+    "commanders": [
+      {
+        "id": "granada_1",
+        "name": "General of Granada",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "milan",
+    "name": "Milan",
+    "color": "#639bff",
+    "capital": "p1373",
+    "army": 8000,
+    "commanders": [
+      {
+        "id": "milan_1",
+        "name": "General of Milan",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "venice",
+    "name": "Venice",
+    "color": "#41a6f6",
+    "capital": "p1381",
+    "army": 15000,
+    "commanders": [
+      {
+        "id": "venice_1",
+        "name": "General of Venice",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "genoa",
+    "name": "Genoa",
+    "color": "#d95763",
+    "capital": "p1371",
+    "commanders": [
+      {
+        "id": "genoa_1",
+        "name": "General of Genoa",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "florence",
+    "name": "Florence",
+    "color": "#847e87",
+    "capital": "p1380",
+    "army": 6000,
+    "commanders": [
+      {
+        "id": "florence_1",
+        "name": "General of Florence",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "modena",
+    "name": "Modena",
+    "color": "#ffcd75",
+    "capital": "p1378",
+    "commanders": [
+      {
+        "id": "modena_1",
+        "name": "General of Modena",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "papal_states",
+    "name": "Papal States",
+    "color": "#eec39a",
+    "capital": "p1624",
+    "army": 6000,
+    "commanders": [
+      {
+        "id": "papal_states_1",
+        "name": "General of Papal States",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "naples",
+    "name": "Naples",
+    "color": "#e8a0bf",
+    "capital": "p1626",
+    "army": 10000,
+    "commanders": [
+      {
+        "id": "naples_1",
+        "name": "General of Naples",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "austria",
+    "name": "Austria",
+    "color": "#cbdbfc",
+    "capital": "p1120",
+    "army": 6000,
+    "commanders": [
+      {
+        "id": "austria_1",
+        "name": "Ulrich von Cilli",
+        "might": 2,
+        "cunning": 2,
+        "logistics": 3
+      }
+    ]
+  },
+  {
+    "id": "bohemia",
+    "name": "Bohemia",
+    "color": "#45283c",
+    "capital": "p839",
+    "army": 15000,
+    "commanders": [
+      {
+        "id": "bohemia_1",
+        "name": "General of Bohemia",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "bavaria",
+    "name": "Bavaria",
+    "color": "#38b764",
+    "capital": "p1105",
+    "army": 6000,
+    "commanders": [
+      {
+        "id": "bavaria_1",
+        "name": "General of Bavaria",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "wurttemberg",
+    "name": "Württemberg",
+    "color": "#d95763",
+    "capital": "p1095",
+    "commanders": [
+      {
+        "id": "wurttemberg_1",
+        "name": "General of Württemberg",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "palatinate",
+    "name": "Palatinate",
+    "color": "#b13e53",
+    "capital": "p1089",
+    "commanders": [
+      {
+        "id": "palatinate_1",
+        "name": "General of Palatinate",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "cologne",
+    "name": "Cologne",
+    "color": "#847e87",
+    "capital": "p818",
+    "commanders": [
+      {
+        "id": "cologne_1",
+        "name": "General of Cologne",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "hesse",
+    "name": "Hesse",
+    "color": "#8f4fa8",
+    "capital": "p825",
+    "commanders": [
+      {
+        "id": "hesse_1",
+        "name": "General of Hesse",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "saxony",
+    "name": "Saxony",
+    "color": "#ef7d57",
+    "capital": "p835",
+    "army": 8000,
+    "commanders": [
+      {
+        "id": "saxony_1",
+        "name": "General of Saxony",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "brandenburg",
+    "name": "Brandenburg",
+    "color": "#eec39a",
+    "capital": "p837",
+    "army": 4000,
+    "commanders": [
+      {
+        "id": "brandenburg_1",
+        "name": "General of Brandenburg",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "luneburg",
+    "name": "Lüneburg",
+    "color": "#306082",
+    "capital": "p828",
+    "commanders": [
+      {
+        "id": "luneburg_1",
+        "name": "General of Lüneburg",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "hamburg",
+    "name": "Hamburg",
+    "color": "#639bff",
+    "capital": "p827",
+    "commanders": [
+      {
+        "id": "hamburg_1",
+        "name": "General of Hamburg",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "mecklenburg",
+    "name": "Mecklenburg",
+    "color": "#38b764",
+    "capital": "p831",
+    "commanders": [
+      {
+        "id": "mecklenburg_1",
+        "name": "General of Mecklenburg",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "pomerania",
+    "name": "Pomerania",
+    "color": "#d9a066",
+    "capital": "p841",
+    "commanders": [
+      {
+        "id": "pomerania_1",
+        "name": "General of Pomerania",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "switzerland",
+    "name": "Switzerland",
+    "color": "#e8a0bf",
+    "capital": "p1090",
+    "army": 7000,
+    "commanders": [
+      {
+        "id": "switzerland_1",
+        "name": "General of Switzerland",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "teutonic_order",
+    "name": "Teutonic Order",
+    "color": "#9badb7",
+    "capital": "p585",
+    "army": 8000,
+    "commanders": [
+      {
+        "id": "teutonic_order_1",
+        "name": "General of Teutonic Order",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "livonian_order",
+    "name": "Livonian Order",
+    "color": "#257179",
+    "capital": "p591",
+    "commanders": [
+      {
+        "id": "livonian_order_1",
+        "name": "General of Livonian Order",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "denmark",
+    "name": "Denmark",
+    "color": "#ac3232",
+    "capital": "p575",
+    "army": 6000,
+    "commanders": [
+      {
+        "id": "denmark_1",
+        "name": "General of Denmark",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "sweden",
+    "name": "Sweden",
+    "color": "#306082",
+    "capital": "p405",
+    "army": 6000,
+    "commanders": [
+      {
+        "id": "sweden_1",
+        "name": "General of Sweden",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "norway",
+    "name": "Norway",
+    "color": "#6abe30",
+    "capital": "p395",
+    "commanders": [
+      {
+        "id": "norway_1",
+        "name": "General of Norway",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "poland",
+    "name": "Poland",
+    "color": "#d95763",
+    "capital": "p1136",
+    "army": 8000,
+    "commanders": [
+      {
+        "id": "poland_1",
+        "name": "Jan Tarnowski",
+        "might": 3,
+        "cunning": 2,
+        "logistics": 2
+      }
+    ]
+  },
+  {
+    "id": "lithuania",
+    "name": "Lithuania",
+    "color": "#a7f070",
+    "capital": "p600",
+    "army": 15000,
+    "commanders": [
+      {
+        "id": "lithuania_1",
+        "name": "General of Lithuania",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "hungary",
+    "name": "Hungary",
+    "color": "#99e550",
+    "capital": "p1128",
+    "army": 20000,
+    "commanders": [
+      {
+        "id": "hungary_1",
+        "name": "Hunyadi János",
+        "might": 4,
+        "cunning": 4,
+        "logistics": 3
+      }
+    ]
+  },
+  {
+    "id": "moldavia",
+    "name": "Moldavia",
+    "color": "#5b6ee1",
+    "capital": "p1158",
+    "commanders": [
+      {
+        "id": "moldavia_1",
+        "name": "General of Moldavia",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "wallachia",
+    "name": "Wallachia",
+    "color": "#3b5dc9",
+    "capital": "p1433",
+    "army": 4000,
+    "commanders": [
+      {
+        "id": "wallachia_1",
+        "name": "General of Wallachia",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "serbia",
+    "name": "Serbia",
+    "color": "#306082",
+    "capital": "p1409",
+    "army": 6000,
+    "commanders": [
+      {
+        "id": "serbia_1",
+        "name": "General of Serbia",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "bosnia",
+    "name": "Bosnia",
+    "color": "#d9a066",
+    "capital": "p1394",
+    "commanders": [
+      {
+        "id": "bosnia_1",
+        "name": "General of Bosnia",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "albania",
+    "name": "Albania",
+    "color": "#99e550",
+    "capital": "p1634",
+    "army": 8000,
+    "commanders": [
+      {
+        "id": "albania_1",
+        "name": "Gjergj Kastrioti",
+        "might": 5,
+        "cunning": 4,
+        "logistics": 2
+      }
+    ]
+  },
+  {
+    "id": "ragusa",
+    "name": "Ragusa",
+    "color": "#639bff",
+    "capital": "p1397",
+    "commanders": [
+      {
+        "id": "ragusa_1",
+        "name": "General of Ragusa",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "byzantium",
+    "name": "Byzantium",
+    "color": "#73eff7",
+    "capital": "p1662",
+    "army": 2000,
+    "commanders": [
+      {
+        "id": "byzantium_1",
+        "name": "Konstantinos Palaiologos",
+        "might": 3,
+        "cunning": 2,
+        "logistics": 3
+      }
+    ]
+  },
+  {
+    "id": "ottomans",
+    "name": "Ottomans",
+    "color": "#6abe30",
+    "capital": "p1655",
+    "army": 40000,
+    "commanders": [
+      {
+        "id": "ottomans_1",
+        "name": "Murad II",
+        "might": 3,
+        "cunning": 3,
+        "logistics": 3
+      }
+    ]
+  },
+  {
+    "id": "karaman",
+    "name": "Karaman",
+    "color": "#38b764",
+    "capital": "p1933",
+    "commanders": [
+      {
+        "id": "karaman_1",
+        "name": "General of Karaman",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "candar",
+    "name": "Candar",
+    "color": "#306082",
+    "capital": "p1674",
+    "commanders": [
+      {
+        "id": "candar_1",
+        "name": "General of Candar",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "trebizond",
+    "name": "Trebizond",
+    "color": "#45283c",
+    "capital": "p1693",
+    "commanders": [
+      {
+        "id": "trebizond_1",
+        "name": "General of Trebizond",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "dulkadir",
+    "name": "Dulkadir",
+    "color": "#257179",
+    "capital": "p1939",
+    "commanders": [
+      {
+        "id": "dulkadir_1",
+        "name": "General of Dulkadir",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "aq_qoyunlu",
+    "name": "Aq Qoyunlu",
+    "color": "#99e550",
+    "capital": "p1694",
+    "army": 7000,
+    "commanders": [
+      {
+        "id": "aq_qoyunlu_1",
+        "name": "General of Aq Qoyunlu",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "qara_qoyunlu",
+    "name": "Qara Qoyunlu",
+    "color": "#38b764",
+    "capital": "p1962",
+    "army": 20000,
+    "commanders": [
+      {
+        "id": "qara_qoyunlu_1",
+        "name": "General of Qara Qoyunlu",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "cyprus",
+    "name": "Cyprus",
+    "color": "#73eff7",
+    "capital": "p1934",
+    "commanders": [
+      {
+        "id": "cyprus_1",
+        "name": "General of Cyprus",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "knights_of_rhodes",
+    "name": "Knights of Rhodes",
+    "color": "#76428a",
+    "capital": "p1926",
+    "commanders": [
+      {
+        "id": "knights_of_rhodes_1",
+        "name": "General of Knights of Rhodes",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "georgia",
+    "name": "Georgia",
+    "color": "#eec39a",
+    "capital": "p1461",
+    "commanders": [
+      {
+        "id": "georgia_1",
+        "name": "General of Georgia",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "shirvan",
+    "name": "Shirvan",
+    "color": "#6abe30",
+    "capital": "p1721",
+    "commanders": [
+      {
+        "id": "shirvan_1",
+        "name": "General of Shirvan",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "muscovy",
+    "name": "Muscovy",
+    "color": "#8f4fa8",
+    "capital": "p633",
+    "army": 15000,
+    "commanders": [
+      {
+        "id": "muscovy_1",
+        "name": "Vasily Vasilyevich",
+        "might": 2,
+        "cunning": 2,
+        "logistics": 2
+      }
+    ]
+  },
+  {
+    "id": "novgorod",
+    "name": "Novgorod",
+    "color": "#d9a066",
+    "capital": "p420",
+    "commanders": [
+      {
+        "id": "novgorod_1",
+        "name": "General of Novgorod",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "pskov",
+    "name": "Pskov",
+    "color": "#5d275d",
+    "capital": "p611",
+    "commanders": [
+      {
+        "id": "pskov_1",
+        "name": "General of Pskov",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "tver",
+    "name": "Tver",
+    "color": "#38b764",
+    "capital": "p628",
+    "commanders": [
+      {
+        "id": "tver_1",
+        "name": "General of Tver",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "ryazan",
+    "name": "Ryazan",
+    "color": "#99e550",
+    "capital": "p638",
+    "commanders": [
+      {
+        "id": "ryazan_1",
+        "name": "General of Ryazan",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "kazan",
+    "name": "Kazan",
+    "color": "#bd8d5a",
+    "capital": "p658",
+    "commanders": [
+      {
+        "id": "kazan_1",
+        "name": "General of Kazan",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "great_horde",
+    "name": "Great Horde",
+    "color": "#ef7d57",
+    "capital": "p1199",
+    "army": 30000,
+    "commanders": [
+      {
+        "id": "great_horde_1",
+        "name": "General of Great Horde",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "crimea",
+    "name": "Crimea",
+    "color": "#8f974a",
+    "capital": "p1445",
+    "army": 4000,
+    "commanders": [
+      {
+        "id": "crimea_1",
+        "name": "General of Crimea",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "nogai",
+    "name": "Nogai",
+    "color": "#639bff",
+    "capital": "p1211",
+    "army": 20000,
+    "commanders": [
+      {
+        "id": "nogai_1",
+        "name": "General of Nogai",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "uzbek_khanate",
+    "name": "Uzbek Khanate",
+    "color": "#9badb7",
+    "capital": "p1489",
+    "commanders": [
+      {
+        "id": "uzbek_khanate_1",
+        "name": "General of Uzbek Khanate",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "mamluks",
+    "name": "Mamluks",
+    "color": "#d9a066",
+    "capital": "p2493",
+    "army": 30000,
+    "commanders": [
+      {
+        "id": "mamluks_1",
+        "name": "Jaqmaq al-Zahiri",
+        "might": 3,
+        "cunning": 2,
+        "logistics": 3
+      }
+    ]
+  },
+  {
+    "id": "hejaz",
+    "name": "Hejaz",
+    "color": "#5d275d",
+    "capital": "p2932",
+    "commanders": [
+      {
+        "id": "hejaz_1",
+        "name": "General of Hejaz",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "yemen",
+    "name": "Yemen",
+    "color": "#5d275d",
+    "capital": "p3109",
+    "commanders": [
+      {
+        "id": "yemen_1",
+        "name": "General of Yemen",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "oman",
+    "name": "Oman",
+    "color": "#9badb7",
+    "capital": "p2747",
+    "commanders": [
+      {
+        "id": "oman_1",
+        "name": "General of Oman",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "timurids",
+    "name": "Timurids",
+    "color": "#5b6ee1",
+    "capital": "p1989",
+    "army": 40000,
+    "commanders": [
+      {
+        "id": "timurids_1",
+        "name": "Shahrukh Mirza",
+        "might": 2,
+        "cunning": 3,
+        "logistics": 3
+      }
+    ]
+  },
+  {
+    "id": "moghulistan",
+    "name": "Moghulistan",
+    "color": "#ef7d57",
+    "capital": "p1498",
+    "commanders": [
+      {
+        "id": "moghulistan_1",
+        "name": "General of Moghulistan",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "oirat",
+    "name": "Oirat",
+    "color": "#e8a0bf",
+    "capital": "p1248",
+    "commanders": [
+      {
+        "id": "oirat_1",
+        "name": "General of Oirat",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "mongols",
+    "name": "Mongols",
+    "color": "#3b5dc9",
+    "capital": "p1258",
+    "commanders": [
+      {
+        "id": "mongols_1",
+        "name": "General of Mongols",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "tibet",
+    "name": "Tibet",
+    "color": "#a7f070",
+    "capital": "p2614",
+    "commanders": [
+      {
+        "id": "tibet_1",
+        "name": "General of Tibet",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "ming",
+    "name": "Ming",
+    "color": "#fbf236",
+    "capital": "p1807",
+    "army": 200000,
+    "commanders": [
+      {
+        "id": "ming_1",
+        "name": "Wang Zhen",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 3
+      }
+    ]
+  },
+  {
+    "id": "jurchens",
+    "name": "Jurchens",
+    "color": "#306082",
+    "capital": "p1528",
+    "commanders": [
+      {
+        "id": "jurchens_1",
+        "name": "General of Jurchens",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "korea",
+    "name": "Korea",
+    "color": "#9badb7",
+    "capital": "p2095",
+    "army": 30000,
+    "commanders": [
+      {
+        "id": "korea_1",
+        "name": "General of Korea",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "japan",
+    "name": "Japan",
+    "color": "#e8a0bf",
+    "capital": "p2110",
+    "army": 20000,
+    "commanders": [
+      {
+        "id": "japan_1",
+        "name": "General of Japan",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "dai_viet",
+    "name": "Dai Viet",
+    "color": "#5d275d",
+    "capital": "p3025",
+    "army": 30000,
+    "commanders": [
+      {
+        "id": "dai_viet_1",
+        "name": "General of Dai Viet",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "champa",
+    "name": "Champa",
+    "color": "#ffcd75",
+    "capital": "p3167",
+    "commanders": [
+      {
+        "id": "champa_1",
+        "name": "General of Champa",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "lan_xang",
+    "name": "Lan Xang",
+    "color": "#6abe30",
+    "capital": "p3016",
+    "commanders": [
+      {
+        "id": "lan_xang_1",
+        "name": "General of Lan Xang",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "lan_na",
+    "name": "Lan Na",
+    "color": "#306082",
+    "capital": "p3004",
+    "commanders": [
+      {
+        "id": "lan_na_1",
+        "name": "General of Lan Na",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "ayutthaya",
+    "name": "Ayutthaya",
+    "color": "#df7126",
+    "capital": "p3148",
+    "commanders": [
+      {
+        "id": "ayutthaya_1",
+        "name": "General of Ayutthaya",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "khmer",
+    "name": "Khmer",
+    "color": "#73eff7",
+    "capital": "p3300",
+    "commanders": [
+      {
+        "id": "khmer_1",
+        "name": "General of Khmer",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "ava",
+    "name": "Ava",
+    "color": "#ef7d57",
+    "capital": "p2997",
+    "commanders": [
+      {
+        "id": "ava_1",
+        "name": "General of Ava",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "pegu",
+    "name": "Pegu",
+    "color": "#ac3232",
+    "capital": "p2998",
+    "commanders": [
+      {
+        "id": "pegu_1",
+        "name": "General of Pegu",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "majapahit",
+    "name": "Majapahit",
+    "color": "#fbf236",
+    "capital": "p3876",
+    "commanders": [
+      {
+        "id": "majapahit_1",
+        "name": "General of Majapahit",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "malacca",
+    "name": "Malacca",
+    "color": "#38b764",
+    "capital": "p3537",
+    "commanders": [
+      {
+        "id": "malacca_1",
+        "name": "General of Malacca",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "brunei",
+    "name": "Brunei",
+    "color": "#73eff7",
+    "capital": "p3545",
+    "commanders": [
+      {
+        "id": "brunei_1",
+        "name": "General of Brunei",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "delhi",
+    "name": "Delhi",
+    "color": "#c97d3b",
+    "capital": "p2574",
+    "army": 15000,
+    "commanders": [
+      {
+        "id": "delhi_1",
+        "name": "General of Delhi",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "jaunpur",
+    "name": "Jaunpur",
+    "color": "#d95763",
+    "capital": "p2786",
+    "army": 30000,
+    "commanders": [
+      {
+        "id": "jaunpur_1",
+        "name": "General of Jaunpur",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "bengal",
+    "name": "Bengal",
+    "color": "#4b692f",
+    "capital": "p2800",
+    "army": 30000,
+    "commanders": [
+      {
+        "id": "bengal_1",
+        "name": "General of Bengal",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "bahmanis",
+    "name": "Bahmanis",
+    "color": "#76428a",
+    "capital": "p3130",
+    "army": 40000,
+    "commanders": [
+      {
+        "id": "bahmanis_1",
+        "name": "General of Bahmanis",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "vijayanagar",
+    "name": "Vijayanagar",
+    "color": "#df7126",
+    "capital": "p3128",
+    "army": 60000,
+    "commanders": [
+      {
+        "id": "vijayanagar_1",
+        "name": "General of Vijayanagar",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "gujarat",
+    "name": "Gujarat",
+    "color": "#b13e53",
+    "capital": "p2761",
+    "commanders": [
+      {
+        "id": "gujarat_1",
+        "name": "General of Gujarat",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "malwa",
+    "name": "Malwa",
+    "color": "#ac3232",
+    "capital": "p2970",
+    "commanders": [
+      {
+        "id": "malwa_1",
+        "name": "General of Malwa",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "mewar",
+    "name": "Mewar",
+    "color": "#5b6ee1",
+    "capital": "p2766",
+    "commanders": [
+      {
+        "id": "mewar_1",
+        "name": "General of Mewar",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "orissa",
+    "name": "Orissa",
+    "color": "#8f974a",
+    "capital": "p2993",
+    "commanders": [
+      {
+        "id": "orissa_1",
+        "name": "General of Orissa",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "gondwana",
+    "name": "Gondwana",
+    "color": "#b13e53",
+    "capital": "p2778",
+    "commanders": [
+      {
+        "id": "gondwana_1",
+        "name": "General of Gondwana",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "kashmir",
+    "name": "Kashmir",
+    "color": "#639bff",
+    "capital": "p2016",
+    "commanders": [
+      {
+        "id": "kashmir_1",
+        "name": "General of Kashmir",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "multan",
+    "name": "Multan",
+    "color": "#76428a",
+    "capital": "p2559",
+    "commanders": [
+      {
+        "id": "multan_1",
+        "name": "General of Multan",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "sindh",
+    "name": "Sindh",
+    "color": "#8f974a",
+    "capital": "p2750",
+    "commanders": [
+      {
+        "id": "sindh_1",
+        "name": "General of Sindh",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "ahom",
+    "name": "Ahom",
+    "color": "#fbf236",
+    "capital": "p2618",
+    "commanders": [
+      {
+        "id": "ahom_1",
+        "name": "General of Ahom",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "morocco",
+    "name": "Morocco",
+    "color": "#bd8d5a",
+    "capital": "p2168",
+    "army": 4000,
+    "commanders": [
+      {
+        "id": "morocco_1",
+        "name": "General of Morocco",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "tlemcen",
+    "name": "Tlemcen",
+    "color": "#45283c",
+    "capital": "p1888",
+    "commanders": [
+      {
+        "id": "tlemcen_1",
+        "name": "General of Tlemcen",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "tunis",
+    "name": "Tunis",
+    "color": "#3b5dc9",
+    "capital": "p1914",
+    "commanders": [
+      {
+        "id": "tunis_1",
+        "name": "General of Tunis",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "mali",
+    "name": "Mali",
+    "color": "#eec39a",
+    "capital": "p3206",
+    "army": 10000,
+    "commanders": [
+      {
+        "id": "mali_1",
+        "name": "General of Mali",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "songhai",
+    "name": "Songhai",
+    "color": "#73eff7",
+    "capital": "p3072",
+    "commanders": [
+      {
+        "id": "songhai_1",
+        "name": "General of Songhai",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "jolof",
+    "name": "Jolof",
+    "color": "#99e550",
+    "capital": "p3061",
+    "commanders": [
+      {
+        "id": "jolof_1",
+        "name": "General of Jolof",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "mossi",
+    "name": "Mossi",
+    "color": "#45283c",
+    "capital": "p3217",
+    "commanders": [
+      {
+        "id": "mossi_1",
+        "name": "General of Mossi",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "kano",
+    "name": "Kano",
+    "color": "#ef7d57",
+    "capital": "p3229",
+    "commanders": [
+      {
+        "id": "kano_1",
+        "name": "General of Kano",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "kanem_bornu",
+    "name": "Kanem-Bornu",
+    "color": "#eec39a",
+    "capital": "p3233",
+    "commanders": [
+      {
+        "id": "kanem_bornu_1",
+        "name": "General of Kanem-Bornu",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "benin",
+    "name": "Benin",
+    "color": "#d95763",
+    "capital": "p3384",
+    "commanders": [
+      {
+        "id": "benin_1",
+        "name": "General of Benin",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "ethiopia",
+    "name": "Ethiopia",
+    "color": "#8f974a",
+    "capital": "p3418",
+    "army": 10000,
+    "commanders": [
+      {
+        "id": "ethiopia_1",
+        "name": "General of Ethiopia",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "adal",
+    "name": "Adal",
+    "color": "#c97d3b",
+    "capital": "p3266",
+    "commanders": [
+      {
+        "id": "adal_1",
+        "name": "General of Adal",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "ajuran",
+    "name": "Ajuran",
+    "color": "#e8a0bf",
+    "capital": "p3529",
+    "commanders": [
+      {
+        "id": "ajuran_1",
+        "name": "General of Ajuran",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "kilwa",
+    "name": "Kilwa",
+    "color": "#b13e53",
+    "capital": "p3870",
+    "commanders": [
+      {
+        "id": "kilwa_1",
+        "name": "General of Kilwa",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "mutapa",
+    "name": "Mutapa",
+    "color": "#bd8d5a",
+    "capital": "p4128",
+    "commanders": [
+      {
+        "id": "mutapa_1",
+        "name": "General of Mutapa",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "kongo",
+    "name": "Kongo",
+    "color": "#3b5dc9",
+    "capital": "p3847",
+    "commanders": [
+      {
+        "id": "kongo_1",
+        "name": "General of Kongo",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "aztecs",
+    "name": "Aztecs",
+    "color": "#6abe30",
+    "capital": "p2877",
+    "army": 15000,
+    "commanders": [
+      {
+        "id": "aztecs_1",
+        "name": "Motecuhzoma Ilhuicamina",
+        "might": 4,
+        "cunning": 2,
+        "logistics": 2
+      }
+    ]
+  },
+  {
+    "id": "purepecha",
+    "name": "Purépecha",
+    "color": "#8f4fa8",
+    "capital": "p2872",
+    "commanders": [
+      {
+        "id": "purepecha_1",
+        "name": "General of Purépecha",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "zapotec",
+    "name": "Zapotec",
+    "color": "#9badb7",
+    "capital": "p3032",
+    "commanders": [
+      {
+        "id": "zapotec_1",
+        "name": "General of Zapotec",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "maya",
+    "name": "Maya",
+    "color": "#ac3232",
+    "capital": "p2884",
+    "commanders": [
+      {
+        "id": "maya_1",
+        "name": "General of Maya",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "inca",
+    "name": "Inca",
+    "color": "#fbf236",
+    "capital": "p3925",
+    "army": 15000,
+    "commanders": [
+      {
+        "id": "inca_1",
+        "name": "Pachakutiq Inka Yupanki",
+        "might": 4,
+        "cunning": 4,
+        "logistics": 3
+      }
+    ]
+  },
+  {
+    "id": "chimu",
+    "name": "Chimú",
+    "color": "#9badb7",
+    "capital": "p3802",
+    "commanders": [
+      {
+        "id": "chimu_1",
+        "name": "General of Chimú",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "muisca",
+    "name": "Muisca",
+    "color": "#eec39a",
+    "capital": "p3461",
+    "commanders": [
+      {
+        "id": "muisca_1",
+        "name": "General of Muisca",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "iroquois",
+    "name": "Iroquois",
+    "color": "#d9a066",
+    "capital": "p1316",
+    "commanders": [
+      {
+        "id": "iroquois_1",
+        "name": "General of Iroquois",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "huron",
+    "name": "Huron",
+    "color": "#ef7d57",
+    "capital": "p1315",
+    "commanders": [
+      {
+        "id": "huron_1",
+        "name": "General of Huron",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "cherokee",
+    "name": "Cherokee",
+    "color": "#3b5dc9",
+    "capital": "p1869",
+    "commanders": [
+      {
+        "id": "cherokee_1",
+        "name": "General of Cherokee",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "creek",
+    "name": "Creek",
+    "color": "#306082",
+    "capital": "p2148",
+    "commanders": [
+      {
+        "id": "creek_1",
+        "name": "General of Creek",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "pueblo",
+    "name": "Pueblo",
+    "color": "#fbf236",
+    "capital": "p1849",
+    "commanders": [
+      {
+        "id": "pueblo_1",
+        "name": "General of Pueblo",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "air_agadez",
+    "name": "Aïr Sultanate (Agadez)",
+    "color": "#257179",
+    "capital": "p3076",
+    "commanders": [
+      {
+        "id": "air_agadez_1",
+        "name": "General of Aïr Sultanate (Agadez)",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "bulala",
+    "name": "Bulala (Kanem)",
+    "color": "#cbdbfc",
+    "capital": "p3237",
+    "commanders": [
+      {
+        "id": "bulala_1",
+        "name": "General of Bulala (Kanem)",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "katsina",
+    "name": "Katsina",
+    "color": "#c97d3b",
+    "capital": "p3227",
+    "commanders": [
+      {
+        "id": "katsina_1",
+        "name": "General of Katsina",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "loango",
+    "name": "Loango",
+    "color": "#847e87",
+    "capital": "p3727",
+    "commanders": [
+      {
+        "id": "loango_1",
+        "name": "General of Loango",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "mombasa",
+    "name": "Mombasa",
+    "color": "#d9a066",
+    "capital": "p3754",
+    "commanders": [
+      {
+        "id": "mombasa_1",
+        "name": "General of Mombasa",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "oyo",
+    "name": "Oyo",
+    "color": "#847e87",
+    "capital": "p3381",
+    "commanders": [
+      {
+        "id": "oyo_1",
+        "name": "General of Oyo",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "timbuktu_tuareg",
+    "name": "Tuareg of the Niger bend (Akil)",
+    "color": "#a7f070",
+    "capital": "p3070",
+    "commanders": [
+      {
+        "id": "timbuktu_tuareg_1",
+        "name": "General of Tuareg of the Niger bend (Akil)",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "tio",
+    "name": "Tio Kingdom",
+    "color": "#4b692f",
+    "capital": "p3729",
+    "commanders": [
+      {
+        "id": "tio_1",
+        "name": "General of Tio Kingdom",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "allada_tado",
+    "name": "Tado (Aja)",
+    "color": "#99e550",
+    "capital": "p3378",
+    "commanders": [
+      {
+        "id": "allada_tado_1",
+        "name": "General of Tado (Aja)",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "ankole",
+    "name": "Ankole (Nkore)",
+    "color": "#fbf236",
+    "capital": "p3627",
+    "commanders": [
+      {
+        "id": "ankole_1",
+        "name": "General of Ankole (Nkore)",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "biram",
+    "name": "Biram",
+    "color": "#73eff7",
+    "capital": "p3230",
+    "commanders": [
+      {
+        "id": "biram_1",
+        "name": "General of Biram",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "bono",
+    "name": "Bono-Manso",
+    "color": "#639bff",
+    "capital": "p3372",
+    "commanders": [
+      {
+        "id": "bono_1",
+        "name": "General of Bono-Manso",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "borgu",
+    "name": "Borgu",
+    "color": "#639bff",
+    "capital": "p3383",
+    "commanders": [
+      {
+        "id": "borgu_1",
+        "name": "General of Borgu",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "buganda",
+    "name": "Buganda",
+    "color": "#d95763",
+    "capital": "p3629",
+    "commanders": [
+      {
+        "id": "buganda_1",
+        "name": "General of Buganda",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "dagbon",
+    "name": "Dagbon",
+    "color": "#73eff7",
+    "capital": "p3374",
+    "commanders": [
+      {
+        "id": "dagbon_1",
+        "name": "General of Dagbon",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "darfur_tunjur",
+    "name": "Darfur (Tunjur)",
+    "color": "#257179",
+    "capital": "p3242",
+    "commanders": [
+      {
+        "id": "darfur_tunjur_1",
+        "name": "General of Darfur (Tunjur)",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "gobir",
+    "name": "Gobir",
+    "color": "#bd8d5a",
+    "capital": "p3077",
+    "commanders": [
+      {
+        "id": "gobir_1",
+        "name": "General of Gobir",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "igala",
+    "name": "Igala",
+    "color": "#41a6f6",
+    "capital": "p3385",
+    "commanders": [
+      {
+        "id": "igala_1",
+        "name": "General of Igala",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "ijebu",
+    "name": "Ijebu",
+    "color": "#ef7d57",
+    "capital": "p3380",
+    "commanders": [
+      {
+        "id": "ijebu_1",
+        "name": "General of Ijebu",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "kaffa",
+    "name": "Kaffa",
+    "color": "#bd8d5a",
+    "capital": "p3415",
+    "commanders": [
+      {
+        "id": "kaffa_1",
+        "name": "General of Kaffa",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "karagwe",
+    "name": "Karagwe",
+    "color": "#6abe30",
+    "capital": "p3745",
+    "commanders": [
+      {
+        "id": "karagwe_1",
+        "name": "General of Karagwe",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "kitara",
+    "name": "Kitara (Chwezi)",
+    "color": "#5d275d",
+    "capital": "p3628",
+    "commanders": [
+      {
+        "id": "kitara_1",
+        "name": "General of Kitara (Chwezi)",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "kwararafa",
+    "name": "Kwararafa (Jukun)",
+    "color": "#bd8d5a",
+    "capital": "p3390",
+    "commanders": [
+      {
+        "id": "kwararafa_1",
+        "name": "General of Kwararafa (Jukun)",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "rwanda",
+    "name": "Rwanda",
+    "color": "#99e550",
+    "capital": "p3626",
+    "commanders": [
+      {
+        "id": "rwanda_1",
+        "name": "General of Rwanda",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "takrur_futa_toro",
+    "name": "Futa Toro (Takrur)",
+    "color": "#257179",
+    "capital": "p3063",
+    "commanders": [
+      {
+        "id": "takrur_futa_toro_1",
+        "name": "General of Futa Toro (Takrur)",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "zamfara",
+    "name": "Zamfara",
+    "color": "#3b5dc9",
+    "capital": "p3226",
+    "commanders": [
+      {
+        "id": "zamfara_1",
+        "name": "General of Zamfara",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "zanzibar",
+    "name": "Zanzibar and Pemba",
+    "color": "#eec39a",
+    "capital": "p3872",
+    "commanders": [
+      {
+        "id": "zanzibar_1",
+        "name": "General of Zanzibar and Pemba",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "zazzau",
+    "name": "Zazzau",
+    "color": "#ac3232",
+    "capital": "p3228",
+    "commanders": [
+      {
+        "id": "zazzau_1",
+        "name": "General of Zazzau",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "kaabu",
+    "name": "Kaabu",
+    "color": "#9badb7",
+    "capital": "p3197",
+    "commanders": [
+      {
+        "id": "kaabu_1",
+        "name": "General of Kaabu",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "canarian_lordship",
+    "name": "Lordship of the Canary Islands",
+    "color": "#9badb7",
+    "capital": "p2460",
+    "commanders": [
+      {
+        "id": "canarian_lordship_1",
+        "name": "General of Lordship of the Canary Islands",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "hadiya",
+    "name": "Hadiya",
+    "color": "#d9a066",
+    "capital": "p3416",
+    "commanders": [
+      {
+        "id": "hadiya_1",
+        "name": "General of Hadiya",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "sine",
+    "name": "Sine",
+    "color": "#ffcd75",
+    "capital": "p3196",
+    "commanders": [
+      {
+        "id": "sine_1",
+        "name": "General of Sine",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "sofala",
+    "name": "Sofala",
+    "color": "#99e550",
+    "capital": "p4131",
+    "commanders": [
+      {
+        "id": "sofala_1",
+        "name": "General of Sofala",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "afar_dankali",
+    "name": "Afar sultanates (Dankali)",
+    "color": "#bd8d5a",
+    "capital": "p3263",
+    "commanders": [
+      {
+        "id": "afar_dankali_1",
+        "name": "General of Afar sultanates (Dankali)",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "akan_forest",
+    "name": "Akan forest chiefdoms",
+    "color": "#a7f070",
+    "capital": "p3373",
+    "commanders": [
+      {
+        "id": "akan_forest_1",
+        "name": "General of Akan forest chiefdoms",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "beja",
+    "name": "Beja",
+    "color": "#cbdbfc",
+    "capital": "p2930",
+    "commanders": [
+      {
+        "id": "beja_1",
+        "name": "General of Beja",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "comoros",
+    "name": "Comoros towns and fani chiefdoms",
+    "color": "#ac3232",
+    "capital": "p3986",
+    "commanders": [
+      {
+        "id": "comoros_1",
+        "name": "General of Comoros towns and fani chiefdoms",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "cross_river_societies",
+    "name": "Cross River peoples",
+    "color": "#ef7d57",
+    "capital": "p3492",
+    "commanders": [
+      {
+        "id": "cross_river_societies_1",
+        "name": "General of Cross River peoples",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "delagoa_lowland_chiefdoms",
+    "name": "Southern Mozambique lowland chiefdoms",
+    "color": "#fbf236",
+    "capital": "p4196",
+    "commanders": [
+      {
+        "id": "delagoa_lowland_chiefdoms_1",
+        "name": "General of Southern Mozambique lowland chiefdoms",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "fezzan",
+    "name": "Fezzan oases",
+    "color": "#ef7d57",
+    "capital": "p2711",
+    "commanders": [
+      {
+        "id": "fezzan_1",
+        "name": "General of Fezzan oases",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "gran_canaria",
+    "name": "Gran Canaria (guanartematos of Gáldar and Telde)",
+    "color": "#6abe30",
+    "capital": "p2458",
+    "commanders": [
+      {
+        "id": "gran_canaria_1",
+        "name": "General of Gran Canaria (guanartematos of Gáldar and Telde)",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "igbo_societies",
+    "name": "Igbo village-group societies",
+    "color": "#4b692f",
+    "capital": "p3491",
+    "commanders": [
+      {
+        "id": "igbo_societies_1",
+        "name": "General of Igbo village-group societies",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "ijaw_delta",
+    "name": "Niger Delta communities",
+    "color": "#306082",
+    "capital": "p3489",
+    "commanders": [
+      {
+        "id": "ijaw_delta_1",
+        "name": "General of Niger Delta communities",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "khoikhoi",
+    "name": "Khoikhoi herders",
+    "color": "#b13e53",
+    "capital": "p4295",
+    "commanders": [
+      {
+        "id": "khoikhoi_1",
+        "name": "General of Khoikhoi herders",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "kwango_kasai_societies",
+    "name": "Kwango-Kasai societies",
+    "color": "#ac3232",
+    "capital": "p3735",
+    "commanders": [
+      {
+        "id": "kwango_kasai_societies_1",
+        "name": "General of Kwango-Kasai societies",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "la_palma",
+    "name": "La Palma (Benahoarite cantons)",
+    "color": "#d95763",
+    "capital": "p2456",
+    "commanders": [
+      {
+        "id": "la_palma_1",
+        "name": "General of La Palma (Benahoarite cantons)",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "lake_malawi_peoples",
+    "name": "Lake Malawi and Luangwa peoples",
+    "color": "#5d275d",
+    "capital": "p3980",
+    "commanders": [
+      {
+        "id": "lake_malawi_peoples_1",
+        "name": "General of Lake Malawi and Luangwa peoples",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "luba",
+    "name": "Upemba chiefdoms (Luba precursors)",
+    "color": "#eec39a",
+    "capital": "p3861",
+    "commanders": [
+      {
+        "id": "luba_1",
+        "name": "General of Upemba chiefdoms (Luba precursors)",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "madagascar_coast",
+    "name": "Madagascar coastal and southern chiefdoms",
+    "color": "#c97d3b",
+    "capital": "p4202",
+    "commanders": [
+      {
+        "id": "madagascar_coast_1",
+        "name": "General of Madagascar coastal and southern chiefdoms",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "madagascar_highlands",
+    "name": "Central highland chiefdoms (pre-Merina)",
+    "color": "#5b6ee1",
+    "capital": "p4135",
+    "commanders": [
+      {
+        "id": "madagascar_highlands_1",
+        "name": "General of Central highland chiefdoms (pre-Merina)",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "madagascar_north_trading_towns",
+    "name": "North Madagascar Islamic trading towns",
+    "color": "#9badb7",
+    "capital": "p3988",
+    "commanders": [
+      {
+        "id": "madagascar_north_trading_towns_1",
+        "name": "General of North Madagascar Islamic trading towns",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "mande_kafus",
+    "name": "Mande kafus (local chiefdoms)",
+    "color": "#ef7d57",
+    "capital": "p3362",
+    "commanders": [
+      {
+        "id": "mande_kafus_1",
+        "name": "General of Mande kafus (local chiefdoms)",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "mbundu_chiefdoms",
+    "name": "Mbundu chiefdoms",
+    "color": "#38b764",
+    "capital": "p3849",
+    "commanders": [
+      {
+        "id": "mbundu_chiefdoms_1",
+        "name": "General of Mbundu chiefdoms",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "middle_belt_societies",
+    "name": "Middle Belt decentralized societies",
+    "color": "#73eff7",
+    "capital": "p3388",
+    "commanders": [
+      {
+        "id": "middle_belt_societies_1",
+        "name": "General of Middle Belt decentralized societies",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "mzab",
+    "name": "Mzab (Ibadi confederation)",
+    "color": "#b13e53",
+    "capital": "p2185",
+    "commanders": [
+      {
+        "id": "mzab_1",
+        "name": "General of Mzab (Ibadi confederation)",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "nguni",
+    "name": "Nguni chiefdoms",
+    "color": "#fbf236",
+    "capital": "p4254",
+    "commanders": [
+      {
+        "id": "nguni_1",
+        "name": "General of Nguni chiefdoms",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "oromo",
+    "name": "Oromo (Gadaa)",
+    "color": "#ef7d57",
+    "capital": "p3521",
+    "commanders": [
+      {
+        "id": "oromo_1",
+        "name": "General of Oromo (Gadaa)",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "ovimbundu_central_angola",
+    "name": "Central Angolan highland chiefdoms",
+    "color": "#eec39a",
+    "capital": "p3963",
+    "commanders": [
+      {
+        "id": "ovimbundu_central_angola_1",
+        "name": "General of Central Angolan highland chiefdoms",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "sanhaja_zenaga",
+    "name": "Sanhaja (Zenaga) Berbers of the western Sahara",
+    "color": "#ac3232",
+    "capital": "p2903",
+    "commanders": [
+      {
+        "id": "sanhaja_zenaga_1",
+        "name": "General of Sanhaja (Zenaga) Berbers of the western Sahara",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "sotho_tswana",
+    "name": "Sotho-Tswana chiefdoms",
+    "color": "#257179",
+    "capital": "p4191",
+    "commanders": [
+      {
+        "id": "sotho_tswana_1",
+        "name": "General of Sotho-Tswana chiefdoms",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "tenerife_menceyatos",
+    "name": "Tenerife menceyatos",
+    "color": "#306082",
+    "capital": "p2457",
+    "commanders": [
+      {
+        "id": "tenerife_menceyatos_1",
+        "name": "General of Tenerife menceyatos",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "thulamela",
+    "name": "Thulamela and Limpopo Zimbabwe-culture centres",
+    "color": "#5d275d",
+    "capital": "p4194",
+    "commanders": [
+      {
+        "id": "thulamela_1",
+        "name": "General of Thulamela and Limpopo Zimbabwe-culture centres",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "tonga_zambezi",
+    "name": "Middle Zambezi peoples",
+    "color": "#4b692f",
+    "capital": "p4047",
+    "commanders": [
+      {
+        "id": "tonga_zambezi_1",
+        "name": "General of Middle Zambezi peoples",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "touggourt_ouargla",
+    "name": "Touggourt and Ouargla oases",
+    "color": "#5b6ee1",
+    "capital": "p2188",
+    "commanders": [
+      {
+        "id": "touggourt_ouargla_1",
+        "name": "General of Touggourt and Ouargla oases",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "tuareg_kel_ajjer",
+    "name": "Northern Tuareg (Kel Ajjer and Kel Ahaggar)",
+    "color": "#41a6f6",
+    "capital": "p2708",
+    "commanders": [
+      {
+        "id": "tuareg_kel_ajjer_1",
+        "name": "General of Northern Tuareg (Kel Ajjer and Kel Ahaggar)",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "tuat",
+    "name": "Tuat, Gourara and Tidikelt oases",
+    "color": "#76428a",
+    "capital": "p2468",
+    "commanders": [
+      {
+        "id": "tuat_1",
+        "name": "General of Tuat, Gourara and Tidikelt oases",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "tubu_teda",
+    "name": "Tubu (Teda) of Tibesti and Kawar",
+    "color": "#ffcd75",
+    "capital": "p2917",
+    "commanders": [
+      {
+        "id": "tubu_teda_1",
+        "name": "General of Tubu (Teda) of Tibesti and Kawar",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "upper_guinea_coast",
+    "name": "Sapes of the Upper Guinea coast",
+    "color": "#73eff7",
+    "capital": "p3358",
+    "commanders": [
+      {
+        "id": "upper_guinea_coast_1",
+        "name": "General of Sapes of the Upper Guinea coast",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "voltaic_stateless_societies",
+    "name": "Voltaic decentralized societies",
+    "color": "#ef7d57",
+    "capital": "p3212",
+    "commanders": [
+      {
+        "id": "voltaic_stateless_societies_1",
+        "name": "General of Voltaic decentralized societies",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "warsangali",
+    "name": "Northern Somali clans (Warsangali and others)",
+    "color": "#8f974a",
+    "capital": "p3425",
+    "commanders": [
+      {
+        "id": "warsangali_1",
+        "name": "General of Northern Somali clans (Warsangali and others)",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "windward_coast_peoples",
+    "name": "Peoples of the Windward and Ivory coasts",
+    "color": "#a7f070",
+    "capital": "p3485",
+    "commanders": [
+      {
+        "id": "windward_coast_peoples_1",
+        "name": "General of Peoples of the Windward and Ivory coasts",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "equatorial_forest_societies",
+    "name": "Equatorial forest societies",
+    "color": "#8f974a",
+    "capital": "p3615",
+    "commanders": [
+      {
+        "id": "equatorial_forest_societies_1",
+        "name": "General of Equatorial forest societies",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "kunene_peoples",
+    "name": "Kunene-Cubango agropastoralists",
+    "color": "#3b5dc9",
+    "capital": "p4114",
+    "commanders": [
+      {
+        "id": "kunene_peoples_1",
+        "name": "General of Kunene-Cubango agropastoralists",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "maasai_kenya_highlands",
+    "name": "Kenya highland societies",
+    "color": "#73eff7",
+    "capital": "p3633",
+    "commanders": [
+      {
+        "id": "maasai_kenya_highlands_1",
+        "name": "General of Kenya highland societies",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "makua_lomwe",
+    "name": "Makua-Lomwe chiefdoms",
+    "color": "#df7126",
+    "capital": "p4058",
+    "commanders": [
+      {
+        "id": "makua_lomwe_1",
+        "name": "General of Makua-Lomwe chiefdoms",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "san",
+    "name": "San hunter-gatherers",
+    "color": "#639bff",
+    "capital": "p4185",
+    "commanders": [
+      {
+        "id": "san_1",
+        "name": "General of San hunter-gatherers",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "apalachee",
+    "name": "Apalachee (Fort Walton)",
+    "color": "#5d275d",
+    "capital": "p2149",
+    "commanders": [
+      {
+        "id": "apalachee_1",
+        "name": "General of Apalachee (Fort Walton)",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "calusa",
+    "name": "Calusa",
+    "color": "#8f974a",
+    "capital": "p2452",
+    "commanders": [
+      {
+        "id": "calusa_1",
+        "name": "General of Calusa",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "caddo",
+    "name": "Caddo chiefdoms",
+    "color": "#df7126",
+    "capital": "p2140",
+    "commanders": [
+      {
+        "id": "caddo_1",
+        "name": "General of Caddo chiefdoms",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "casqui_pacaha",
+    "name": "Central Mississippi valley chiefdoms (Casqui, Pacaha)",
+    "color": "#41a6f6",
+    "capital": "p1862",
+    "commanders": [
+      {
+        "id": "casqui_pacaha_1",
+        "name": "General of Central Mississippi valley chiefdoms (Casqui, Pacaha)",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "chumash",
+    "name": "Chumash",
+    "color": "#6abe30",
+    "capital": "p1836",
+    "commanders": [
+      {
+        "id": "chumash_1",
+        "name": "General of Chumash",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "coast_salish",
+    "name": "Coast Salish",
+    "color": "#3b5dc9",
+    "capital": "p995",
+    "commanders": [
+      {
+        "id": "coast_salish_1",
+        "name": "General of Coast Salish",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "cofitachequi",
+    "name": "Cofitachequi",
+    "color": "#bd8d5a",
+    "capital": "p2153",
+    "commanders": [
+      {
+        "id": "cofitachequi_1",
+        "name": "General of Cofitachequi",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "fort_ancient",
+    "name": "Fort Ancient",
+    "color": "#76428a",
+    "capital": "p1575",
+    "commanders": [
+      {
+        "id": "fort_ancient_1",
+        "name": "General of Fort Ancient",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "hopi",
+    "name": "Hopi",
+    "color": "#847e87",
+    "capital": "p1844",
+    "commanders": [
+      {
+        "id": "hopi_1",
+        "name": "General of Hopi",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "lenape",
+    "name": "Lenape (Delaware) and Munsee",
+    "color": "#41a6f6",
+    "capital": "p1581",
+    "commanders": [
+      {
+        "id": "lenape_1",
+        "name": "General of Lenape (Delaware) and Munsee",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "mandan_hidatsa",
+    "name": "Middle Missouri villagers",
+    "color": "#d9a066",
+    "capital": "p1012",
+    "commanders": [
+      {
+        "id": "mandan_hidatsa_1",
+        "name": "General of Middle Missouri villagers",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "natchez_plaquemine",
+    "name": "Natchez / Plaquemine Mississippian",
+    "color": "#6abe30",
+    "capital": "p2144",
+    "commanders": [
+      {
+        "id": "natchez_plaquemine_1",
+        "name": "General of Natchez / Plaquemine Mississippian",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "neutral_erie",
+    "name": "Ancestral Neutral and Erie",
+    "color": "#639bff",
+    "capital": "p1578",
+    "commanders": [
+      {
+        "id": "neutral_erie_1",
+        "name": "General of Ancestral Neutral and Erie",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "ojibwe_anishinaabe",
+    "name": "Anishinaabe peoples",
+    "color": "#5b6ee1",
+    "capital": "p1025",
+    "commanders": [
+      {
+        "id": "ojibwe_anishinaabe_1",
+        "name": "General of Anishinaabe peoples",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "oneota",
+    "name": "Oneota and related Upper Mississippian peoples",
+    "color": "#d9a066",
+    "capital": "p1307",
+    "commanders": [
+      {
+        "id": "oneota_1",
+        "name": "General of Oneota and related Upper Mississippian peoples",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "oodham",
+    "name": "O'odham and post-Classic Hohokam",
+    "color": "#76428a",
+    "capital": "p2124",
+    "commanders": [
+      {
+        "id": "oodham_1",
+        "name": "General of O'odham and post-Classic Hohokam",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "pacific_northwest",
+    "name": "Other Northwest Coast peoples",
+    "color": "#4b692f",
+    "capital": "p517",
+    "commanders": [
+      {
+        "id": "pacific_northwest_1",
+        "name": "General of Other Northwest Coast peoples",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "pawnee_plains_villagers",
+    "name": "Central Plains villagers",
+    "color": "#fbf236",
+    "capital": "p1560",
+    "commanders": [
+      {
+        "id": "pawnee_plains_villagers_1",
+        "name": "General of Central Plains villagers",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "powhatan_precursors",
+    "name": "Tidewater and Carolina Sound Algonquians",
+    "color": "#3b5dc9",
+    "capital": "p1874",
+    "commanders": [
+      {
+        "id": "powhatan_precursors_1",
+        "name": "General of Tidewater and Carolina Sound Algonquians",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "southern_new_england_algonquians",
+    "name": "Southern New England and Hudson valley Algonquians",
+    "color": "#c97d3b",
+    "capital": "p1321",
+    "commanders": [
+      {
+        "id": "southern_new_england_algonquians_1",
+        "name": "General of Southern New England and Hudson valley Algonquians",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "st_lawrence_iroquoians",
+    "name": "St. Lawrence Iroquoians",
+    "color": "#fbf236",
+    "capital": "p1030",
+    "commanders": [
+      {
+        "id": "st_lawrence_iroquoians_1",
+        "name": "General of St. Lawrence Iroquoians",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "timucua",
+    "name": "Timucua chiefdoms",
+    "color": "#b13e53",
+    "capital": "p2451",
+    "commanders": [
+      {
+        "id": "timucua_1",
+        "name": "General of Timucua chiefdoms",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "tlingit_haida",
+    "name": "Tlingit and Haida",
+    "color": "#847e87",
+    "capital": "p509",
+    "commanders": [
+      {
+        "id": "tlingit_haida_1",
+        "name": "General of Tlingit and Haida",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
+    "id": "wakashan",
+    "name": "Wakashan peoples (Kwakwaka'wakw, Nuu-chah-nulth, Makah, Heiltsuk)",
+    "color": "#5d275d",
+    "capital": "p741",
+    "commanders": [
+      {
+        "id": "wakashan_1",
+        "name": "General of Wakashan peoples (Kwakwaka'wakw, Nuu-chah-nulth, Makah, Heiltsuk)",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  }
+]

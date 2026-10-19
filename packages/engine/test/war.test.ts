@@ -27,11 +27,13 @@ describe("war and conquest", () => {
     const r = applyNow(w, { type: "declareWar", target: foe }, me);
     expect(r.rejectedOrders).toEqual([]);
     expect(relationState(w, me, foe).state).toBe("war");
-    // A big army walks to Granada's capital and sits there.
+    // A big army walks to a Portuguese province on the border (one peace takes a capital only with the last province, WAR-227) and sits there.
     const army = armyOf(w, me);
     w.armies.men[army] = 40000;
     w.armies.horse[army] = 8000;
-    const target = w.provinceIndex.get(rules.nations[foe]!.capital)!;
+    const capital = w.provinceIndex.get(rules.nations[foe]!.capital)!;
+    const borders = (p: number) => Array.from(w.adjList.subarray(w.adjStart[p]!, w.adjStart[p + 1]!)).some((q) => w.provinceOwner[q] === me);
+    const target = Array.from({ length: w.provinceCount }, (_, p) => p).find((p) => w.provinceOwner[p] === foe && p !== capital && borders(p))!;
     const news = [];
     let peace = false;
     for (let t = 0; t < 120 && !peace; t++) {
@@ -46,8 +48,8 @@ describe("war and conquest", () => {
     const kinds = new Set(news.map((x) => x.kind));
     expect(kinds.has("siege") || kinds.has("battle")).toBe(true);
     expect(peace).toBe(true);
-    // One peace never takes a capital that is not the loser's last province (WAR-227).
-    expect(w.provinceOwner[target]).toBe(foe);
+    // The province the war lets Castile ask for changes hands (WAR-244).
+    expect(w.provinceOwner[target]).toBe(me);
     expect(relationState(w, me, foe).state).toBe("truce");
   }, 60000);
 
@@ -66,13 +68,32 @@ describe("war and conquest", () => {
     }
     expect(offer?.terms).toBe("give");
     const portugal = w.provinceOwner.filter((o) => o === foe).length;
-    const mine = w.provinceOwner.filter((o) => o === me).length;
+    expect(offer!.provinces!.length).toBeGreaterThan(0);
     expect(applyNow(w, { type: "answerPeace", offer: offer!.id, yes: true }, me).rejectedOrders).toEqual([]);
-    expect(w.nationGone[foe] || relationState(w, me, foe).state === "truce").toBeTruthy();
-    // It gives up at most a third of its land, and keeps its capital (WAR-227).
+    expect(relationState(w, me, foe).state).toBe("truce");
+    // It gives what the peace table allows: at most a third of its land, never its capital while it has more (WAR-227).
+    for (const p of offer!.provinces!) expect(w.provinceOwner[p]).toBe(me);
+    expect(offer!.provinces!.length).toBeLessThanOrEqual(Math.ceil(portugal / 3));
     expect(w.provinceOwner[w.provinceIndex.get(rules.nations[foe]!.capital)!]).toBe(foe);
-    expect(w.provinceOwner.filter((o) => o === me).length - mine).toBe(Math.ceil(portugal / 3));
     expect(w.peaceOffers).toEqual([]);
+  }, 60000);
+
+  it("keeps an AI peace offer waiting until the player answers, one per realm (SHELL-141)", () => {
+    const w = createWorld(rules, 7, tiles);
+    const me = n(w, "castile");
+    w.player = me;
+    const foe = n(w, "portugal");
+    applyNow(w, { type: "declareWar", target: foe }, me);
+    for (let p = 0; p < w.provinceCount; p++) if (w.provinceOwner[p] === foe) w.provinceOccupier[p] = me;
+    let offer;
+    for (let t = 0; t < 8 && !offer; t++) {
+      processTurn(w, [], me);
+      offer = w.peaceOffers.find((o) => o.from === foe);
+    }
+    expect(offer).toBeDefined();
+    // Two more months pass unanswered: the same offer still waits, and only one.
+    for (let t = 0; t < 9; t++) processTurn(w, [], me);
+    expect(w.peaceOffers.filter((o) => o.from === foe)).toEqual([offer]);
   }, 60000);
 
   it("sends a province's garrison troops into a battle fought in it (RECR-107)", () => {

@@ -104,6 +104,21 @@ export function provinceTemperature(place: PlaceClimate, date: GameDate): number
   return place.mean + place.swing * Math.cos((2 * Math.PI * (day - 201 - place.lag)) / 365);
 }
 
+/** Every land province's temperature on a date, into `out` (provinceTemperature's sum, its cosine worked out once for each hemisphere and lag). */
+export function landTemperatures(places: readonly PlaceClimate[], water: Uint8Array, date: GameDate, out: Float32Array): void {
+  const doy = dayOfYear(date);
+  const cosines = new Map<number, number>();
+  for (let p = 0; p < places.length; p++) {
+    if (water[p]) continue;
+    const place = places[p]!;
+    const day = (doy + (place.lat < 0 ? 182 : 0)) % 365;
+    const key = day * 1000 + place.lag;
+    let c = cosines.get(key);
+    if (c === undefined) cosines.set(key, (c = Math.cos((2 * Math.PI * (day - 201 - place.lag)) / 365)));
+    out[p] = place.mean + place.swing * c;
+  }
+}
+
 export function provinceClimate(place: PlaceClimate, date: GameDate): ProvinceClimate {
   const { lat } = place;
   const south = lat < 0;

@@ -177,21 +177,31 @@ export function aiCourting(world: World, loyaltyOf: (s: number) => string | null
     pairs.push(r);
     if (r.direction === "mutual") pairs.push({ source: r.target, target: r.source });
   }
+  // A rival overlord with more Disloyal subjects is courted first, as it is the one to break (SUBJ-100, SUBJ-139).
+  // Each overlord's subjects, a Wavering one first: a Disloyal one is already lost to its overlord.
+  const disloyal = new Map<string, number>();
+  const subjectsOf = new Map<string, { id: string; si: number; loyalty: string | null }[]>();
+  for (const s of d.graph.relations) {
+    const si = s.type === "subject" ? world.nationIndex.get(s.source) : undefined;
+    if (si === undefined) continue;
+    const loyalty = loyaltyOf(si);
+    if (loyalty === "disloyal") disloyal.set(s.target, (disloyal.get(s.target) ?? 0) + 1);
+    subjectsOf.set(s.target, [...(subjectsOf.get(s.target) ?? []), { id: s.source, si, loyalty }]);
+  }
+  for (const list of subjectsOf.values()) list.sort((x, y) => Number(y.loyalty === "wavering") - Number(x.loyalty === "wavering"));
+  pairs.sort((x, y) => (disloyal.get(y.target) ?? 0) - (disloyal.get(x.target) ?? 0));
   for (const r of pairs) {
     const n = world.nationIndex.get(r.source);
     const t = world.nationIndex.get(r.target);
     if (n === undefined || t === undefined || n === world.player || busy.has(r.source) || world.nationGone[n] || world.nationGone[t]) continue;
     if (!dip.borders(d, r.source, r.target)) continue;
-    const k = world.lords.findIndex((l, i) => l.nation === t && (l.loyalty === "Wavering" || l.loyalty === "Disloyal") && lordBorders(world, i, n));
+    const k = world.lords.findIndex((l, i) => l.nation === t && !l.gone && (l.loyalty === "Wavering" || l.loyalty === "Disloyal") && lordBorders(world, i, n));
     if (k >= 0 && !court(world, n, t, k)) {
       busy.add(r.source);
       continue;
     }
-    for (const s of d.graph.relations) {
-      if (s.type !== "subject" || s.target !== r.target) continue;
-      const si = world.nationIndex.get(s.source);
-      if (si === undefined || world.nationGone[si] || !dip.borders(d, r.source, s.source)) continue;
-      const l = loyaltyOf(si);
+    for (const { id, si, loyalty: l } of subjectsOf.get(r.target) ?? []) {
+      if (world.nationGone[si] || !dip.borders(d, r.source, id)) continue;
       if (l !== "wavering" && l !== "disloyal") continue;
       if (!court(world, n, si)) {
         busy.add(r.source);
@@ -220,7 +230,7 @@ export function courtingView(world: World, player: number): CourtingView | null 
     .map((c) => ({ target: world.nationIndex.get(c.target)!, lord: c.lord ?? null, lordName: c.lord === undefined ? null : (world.lords[c.lord]?.name ?? null), since: yearMonth(c.since) }));
   const lords: CourtingView["lords"] = {};
   world.lords.forEach((l, k) => {
-    if (l.nation !== player && l.nation >= 0 && !world.nationGone[l.nation]) lords[k] = whyNotCourt(world, player, l.nation, k);
+    if (!l.gone && l.nation !== player && l.nation >= 0 && !world.nationGone[l.nation]) lords[k] = whyNotCourt(world, player, l.nation, k);
   });
   const subjects: CourtingView["subjects"] = {};
   for (const r of world.diplomacy.graph.relations) {

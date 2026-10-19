@@ -1,4 +1,5 @@
 import type { World } from "./world.ts";
+import { quarantineTaxFactor } from "./plague.ts";
 import { controller, type News } from "./war.ts";
 import { allNationPay, ungoverned } from "./recruit.ts";
 import { emptyProvinceEffect } from "./domain/recruiting/index.ts";
@@ -16,6 +17,7 @@ import { navyCosts } from "./navy.ts";
 import { governorWages } from "./colonies.ts";
 import { W as WARFARE } from "./domain/warfare/index.ts";
 import { empireDues, empireTax } from "./institutions.ts";
+import { fursOf } from "./tribes.ts";
 
 /**
  * Tax rates and the treasury ledger (milestone 3): each province pays at its
@@ -30,7 +32,7 @@ export const NORMAL_TAX = 2;
 const HEAVY_TAX = 3;
 
 /** Lines of the ledger, in the order the snapshot sends them. */
-export const LEDGER = ["tax", "trade", "army pay", "officials", "interest", "works", "schools", "grain", "tribute", "navy"] as const;
+export const LEDGER = ["tax", "trade", "army pay", "officials", "interest", "works", "schools", "grain", "tribute", "navy", "furs"] as const;
 export const LEDGER_LINES = LEDGER.length;
 const TAX = 0;
 const TRADE = 1;
@@ -42,6 +44,7 @@ const SCHOOLS = 6;
 const GRAIN = 7;
 const TRIBUTE = 8;
 const NAVY = 9;
+const FURS = 10;
 
 /** Nothing invented yet: interest and loan caps are the realm context's for a realm without banks. */
 const KNOWN: ReadonlySet<string> = new Set();
@@ -95,8 +98,8 @@ export function provinceTax(world: World, p: number, holder: number, share = cro
   // A tax collector brings more of it in (province officials table: +20 % reaching you).
   const collector = officialBonus(world, p, "Tax collector", "tax_reach");
   // Restricted faiths pay a quarter more on their share, Persecuted ones nothing (RELG-050, RELG-052); heritage may raise or lower what reaches the holder (tax_reach_pct, HER-078).
-  // A busy province owes more: 1 % for every 4 points of its trade ratio (TRADE-088).
-  return world.provincePopulation[p]! * economy.goldPerThousandPeoplePerMonth * taxFactor(world, taxRateOf(world, p, holder)) * share * collector * world.provinceFaithTax[p]! * heritageTaxReach(world, p) * tradeTaxFactor(world, p);
+  // A busy province owes more: 1 % for every 4 points of its trade ratio (TRADE-088); a closed one pays half while its quarantine lasts (PROV-357).
+  return world.provincePopulation[p]! * economy.goldPerThousandPeoplePerMonth * taxFactor(world, taxRateOf(world, p, holder)) * share * collector * world.provinceFaithTax[p]! * heritageTaxReach(world, p) * tradeTaxFactor(world, p) * quarantineTaxFactor(world, p);
 }
 
 /**
@@ -160,6 +163,7 @@ export function runLedger(world: World, pay: boolean, only = -1): void {
   const armyPay = allNationPay(world);
   const navy = navyCosts(world);
   const governors = governorWages(world);
+  const furs = fursOf(world);
   for (let n = only >= 0 ? only : 0; n < (only >= 0 ? only + 1 : world.nationCount); n++) {
     L[n * LEDGER_LINES + PAY] = -armyPay[n]!;
     L[n * LEDGER_LINES + SCHOOLS] = -schoolUpkeepMonthly(world, n);
@@ -170,6 +174,8 @@ export function runLedger(world: World, pay: boolean, only = -1): void {
     L[n * LEDGER_LINES + GRAIN] = world.nationGrainGold[n]!;
     // The Emperor's dues from the members come in with the tribute (INST-032).
     L[n * LEDGER_LINES + TRIBUTE] = L[n * LEDGER_LINES + TRIBUTE]! + empireDues(world, n);
+    // Furs and hides from the hunting grounds (TRIBE-014).
+    L[n * LEDGER_LINES + FURS] = furs[n]!;
     sumLedger(world, n);
   }
   if (!pay) return;
@@ -199,7 +205,7 @@ export function canBorrow(world: World, n: number): number {
 /** Whether a loan now would unsettle the realm's lords: at most once in `debt.lords_waver_once_per_months` (REALM-189). */
 export function loanUnsettlesLords(world: World, n: number): boolean {
   const month = world.date.year * 12 + world.date.month;
-  return month - world.nationLoanMonth[n]! >= realmConfig.debt.lords_waver_once_per_months && world.lords.some((l) => l.nation === n);
+  return month - world.nationLoanMonth[n]! >= realmConfig.debt.lords_waver_once_per_months && world.lords.some((l) => l.nation === n && !l.gone);
 }
 
 /** Sets a province's rate (-1 = back to the default), or the realm's default when province is -1. */
@@ -248,7 +254,7 @@ export function takeLoan(world: World, n: number, gold: number, news: News[] = [
   if (gold > canBorrow(world, n) + 1e-9) return `lenders give at most ${canBorrow(world, n).toFixed(1)} gold more`;
   if (loanUnsettlesLords(world, n)) {
     world.nationLoanMonth[n] = world.date.year * 12 + world.date.month;
-    world.lords.forEach((l, k) => l.nation === n && loyaltyStep(world, k, "crown_borrowed", news));
+    world.lords.forEach((l, k) => l.nation === n && !l.gone && loyaltyStep(world, k, "crown_borrowed", news));
   }
   world.nationDebt[n] = world.nationDebt[n]! + loanDebt(gold);
   world.nationTreasury[n] = world.nationTreasury[n]! + gold;

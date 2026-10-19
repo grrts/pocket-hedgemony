@@ -180,7 +180,7 @@ Newest decision first.
 - SET-050: Audio shall offer Music variety (My palette only, All palettes; default My palette only) and Zoom mix (On, Off; default On; the mix follows the zoom level). [settings §5.2]
 - SET-051: Audio shall offer Effects volume (0–100 %; default 80 %). [settings §5.2]
 - SET-052: Audio shall offer Interface sounds (On, Off; default On); Off silences taps and panel sounds but keeps world effects. [settings §5.2]
-- SET-053: Audio shall offer Ambience (On, Off; default Off) and Ambience volume (0–100 %; default 50 %), the volume greyed out while Ambience is off. [settings §5.2, §11.5]
+- SET-053: Audio shall offer Ambience (On, Off; default On) and Ambience volume (0–100 %; default 50 %), the volume greyed out while Ambience is off. [settings §5.2, §11.5; D-AUD-17]
 - SET-054: Where the game runs on mobile, Audio shall offer Haptics (On, Off; default On on phones) for light vibrations on the five moments in sound effects 8, never on desktop; the same switch shall also appear under Controls → Touch. [settings §5.2, §5.4]
 - SET-055: Where the game runs on desktop or web, Audio shall offer Play sound in the background (On, Off; default Off); on mobile the game always goes silent in the background. [settings §5.2]
 - SET-056: Where the game runs on mobile, Audio shall offer Let other apps' audio play (On, Off; default On; applies on restart): when On and other audio is playing at launch, game music starts muted and effects play over it, respecting the iPhone silent switch. [settings §5.2, §6.4]
@@ -289,7 +289,7 @@ Newest decision first.
 ### 5.17 How the player uses it
 
 - SET-131: Gameplay shall offer Turn playback speed (1×, 2×, 4×; default 1×), one day of the week playing back on the map after End turn in 0.3 s at 1×, 0.15 s at 2× and 0.075 s at 4×; it changes only how fast the week is shown, never what happens in it. [X-19; D-SET-20; design `day_seconds_at_1x`]
-- SET-132: Settings shall open from the game menu (the three-line button at the top left of the map's top bar, or Esc), from the cog in the side tools and from the start screen's Settings button, as one full screen over the dimmed map, and close back to where the player was with nothing lost; the Sound card stays the quick way to the volumes while playing (AUD-138), and both change the same settings. [X-19; SET-005, SET-007, SET-008]
+- SET-132: Settings shall open from the game menu (the three-line button at the top left of the map's top bar, or Esc) and from the start screen's Settings button, as one full screen over the dimmed map, and close back to where the player was with nothing lost; the Sound card stays the quick way to the volumes while playing (AUD-138), and both change the same settings. *The cog left the side tools (SHELL-168, Leroy 18 Oct).* [X-19; SET-005, SET-007, SET-008]
 - SET-133: Each section shall be one subject: Gameplay holds Tutorial hints with "Reset tutorial and hints" and Achievement toasts, saving (Autosave, Autosaves kept) and playback speed (Turn playback speed, Battle playback speed); Graphics holds Battery saver with the knobs it drives (Frame rate cap, Sharpness, Animations); Audio holds the volumes and switches; Accessibility holds Text size. Until a row's effect is built in the client, the client shall leave that row out rather than show a setting that does nothing, and a section with no built rows shall not be listed. [X-19; D-SET-22]
 - SET-134: A row shall show its name, its changed dot, its control and one line saying what it does, under the name, so nothing needs hover; a choice of up to four values shall be a row of buttons, a slider shall take a tap at a position and step by 5, a toggle shall be one On/Off button, and every control shall be at least 44 points high; a long press on a row's name, or the section's Reset this section button, shall put it back to its default. [X-19; SET-004, SET-014, SET-015]
 - SET-135: A row driven by Battery saver shall say "Set by Battery saver" under its name, so the state of the battery saving shows on the rows it changes. [X-19; SET-124]
@@ -502,7 +502,7 @@ The settings design said "No open questions remain"; these were found against it
 | SET-051 | audio.feature | Volume defaults |
 | SET-052 | audio.feature | Interface sounds off keeps world effects |
 | SET-053 | audio.feature | Volume defaults |
-| SET-053 | audio.feature | Ambience off by default, its volume greyed while off |
+| SET-053 | audio.feature | Ambience on by default, its volume greyed while off |
 | SET-054 | audio.feature | Haptics on phones only, one switch in two places |
 | SET-055 | audio.feature | Sound in the background |
 | SET-056 | audio.feature | Other apps' audio |

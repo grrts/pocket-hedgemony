@@ -197,7 +197,7 @@ its ratio in about seven months.
 - TRADE-039 While a province has homeless over 5 %, the trade context shall lower its ratio gain by 5 % for every 5 % of homeless. [trade §4.3]
 - TRADE-040 While a province is under plague quarantine, the trade context shall set its ratio to 0 and let no trader enter. [trade §4.3]
 - TRADE-041 While an enemy army or a siege is in a province, the trade context shall give it no ratio gain that month. [trade §4.3]
-- TRADE-042 While a port is blockaded, the trade context shall let no ship enter it and stop its sea-lane gain. [trade §4.3, §8.2]
+- TRADE-042 While a port is blockaded, the trade context shall let no ship enter it and stop its sea-lane gain. [trade §4.3, §8.2] *When a port is blockaded, which trade ships may pass and the prize money are now set by NAVY-155 to NAVY-158 (playtest feedback).*
 
 ### 5.5 Collecting
 - TRADE-043 When a trader enters a province, the trade context shall on that day collect trade value × trade ratio × hold × visit share (0.2) × crowding into its purse. [trade §4.4]
@@ -338,7 +338,7 @@ realm sees what trade earns and where it comes from, and the map shows gold bein
 - TRADE-146 The game shall show for each of the player's traders where it walks to (the stop it heads for and the days
   left, the next province and its days) and where its gold came from on its last whole trip there and back, or on this
   trip until one is done: each province's gold kept, best first, and the market fees paid. A new route starts the count
-  afresh. [F-158, TRADE-100]
+  afresh. Only the player's traders keep these counts, so saves stay small. [F-158, TRADE-100]
 - TRADE-147 The game shall estimate a loop's gold a month as it is walked (TRADE-055): from its start, collecting in each
   province entered at this month's ratios, crowded by last month's visits (the trader's own old loop's taken off and the
   new loop's added, each visit's average share as TRADE-048 gives it), less market fees, while the purse has room, and
@@ -370,7 +370,7 @@ realm sees what trade earns and where it comes from, and the map shows gold bein
   the trader; the map does not move unless **Find** is tapped. [F-158]
 - TRADE-155 Route: **Change destination** opens the route bar with where it starts already set, waiting for where it goes;
   **New route** with neither. While where it starts is set, each city of TRADE-149 on screen shows its gold a month over
-  its coin, the best three in gold. [F-160, TRADE-142]
+  its coin, the best three starred; the bar also offers the best three as buttons. [F-160, TRADE-142]
 - TRADE-156 Overview: the Trade tab opens with **This month**: banked so far, on the road in purses, market fees, upkeep,
   and last month's Trade line; then **Where the gold comes from** (TRADE-150's provinces, a bar each, foreign marked, and
   the share from abroad and fees); then **Traders**, one compact row each (kind, From → To, purse bar, gold a month, a red

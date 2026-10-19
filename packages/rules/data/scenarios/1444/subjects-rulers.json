@@ -1,0 +1,1426 @@
+{
+ "$comment": "Rulers in 1444 from the country catalogue's leadership_1444 (title, name, house), with a birth year only where known (SUBJ-137, D-SUBJ-31). Generated; display text.",
+ "rulers": {
+  "abenaki_wabanaki": {
+   "ruler": "Sagamores"
+  },
+  "ahom": {
+   "ruler": "Swargadeo Susenphaa",
+   "house": "Ahom dynasty"
+  },
+  "ainu": {
+   "ruler": "Local headmen",
+   "house": "Kin-based communities"
+  },
+  "akamatsu": {
+   "ruler": "No recognized head",
+   "house": "Akamatsu kin and former retainers"
+  },
+  "albret": {
+   "ruler": "Lord Charles II",
+   "house": "House Albret"
+  },
+  "alencon": {
+   "ruler": "Duke John II",
+   "house": "House Valois-Alençon"
+  },
+  "amber": {
+   "ruler": "Kachwaha raja",
+   "house": "Kachwaha dynasty"
+  },
+  "ambon_hitu": {
+   "ruler": "Four perdana",
+   "house": "Hitu federation"
+  },
+  "ando": {
+   "ruler": "Andō Morisue",
+   "house": "House Andō"
+  },
+  "anjou": {
+   "ruler": "René of Anjou",
+   "house": "House Valois-Anjou"
+  },
+  "ansbach": {
+   "ruler": "Margrave Albert III Achilles",
+   "house": "House Hohenzollern"
+  },
+  "aotearoa_north": {
+   "ruler": "No overall leader",
+   "house": "Descent groups tracing to waka ancestors"
+  },
+  "aragon": {
+   "ruler": "King Alfonso V 'the Magnanimous'",
+   "house": "House Trastámara"
+  },
+  "aragon_kingdom": {
+   "ruler": "Royal lieutenant",
+   "house": "Crown lieutenancy"
+  },
+  "arianiti": {
+   "ruler": "Gjergj Arianiti",
+   "house": "House Arianiti"
+  },
+  "armagnac": {
+   "ruler": "Count Jean IV",
+   "house": "House Armagnac"
+  },
+  "ashikaga": {
+   "ruler": "No shogun in office",
+   "house": "Ashikaga house"
+  },
+  "ashina": {
+   "ruler": "Ashina Morihisa",
+   "house": "Ashina house"
+  },
+  "asti": {
+   "ruler": "Duke Charles",
+   "house": "House Valois-Orléans"
+  },
+  "atacameno": {
+   "ruler": "Local lords"
+  },
+  "athens": {
+   "ruler": "Duke Nerio II Acciaioli",
+   "house": "House Acciaioli"
+  },
+  "augsburg_bishopric": {
+   "ruler": "Bishop Peter von Schaumberg",
+   "house": "Cathedral chapter of Augsburg"
+  },
+  "austria": {
+   "ruler": "Duke Frederick V",
+   "house": "House Habsburg"
+  },
+  "ava": {
+   "ruler": "King Narapati I",
+   "house": "Mohnyin dynasty of Ava"
+  },
+  "ayutthaya": {
+   "ruler": "King Borommaracha II",
+   "house": "Suphannaphum dynasty"
+  },
+  "baden": {
+   "ruler": "Margrave Jacob I",
+   "house": "House Zähringen"
+  },
+  "bahmani": {
+   "ruler": "Sultan Ala al-Din Ahmad Shah II",
+   "house": "Bahmani dynasty"
+  },
+  "bali": {
+   "ruler": "Dalem Ketut or successor",
+   "house": "Kepakisan dynasty"
+  },
+  "bamberg": {
+   "ruler": "Bishop Anton von Rotenhan",
+   "house": "Cathedral chapter of Bamberg"
+  },
+  "banda": {
+   "ruler": "Councils of orang kaya",
+   "house": "Village federations"
+  },
+  "bar": {
+   "ruler": "Duke René of Anjou",
+   "house": "House Valois-Anjou"
+  },
+  "bashkir": {
+   "ruler": "Tribal biys"
+  },
+  "bavaria_ingolstadt": {
+   "ruler": "Duke Louis VIII the Hunchback",
+   "house": "House Wittelsbach"
+  },
+  "bavaria_landshut": {
+   "ruler": "Duke Henry XVI the Rich",
+   "house": "House Wittelsbach"
+  },
+  "bavaria_munich": {
+   "ruler": "Duke Albert III the Pious",
+   "house": "House Wittelsbach"
+  },
+  "bengal": {
+   "ruler": "Sultan Nasiruddin Abu'l-Muzaffar Mahmud Shah I",
+   "house": "Ilyas Shahi dynasty"
+  },
+  "benin": {
+   "ruler": "Oba Ewuare",
+   "house": "Oba dynasty of Benin"
+  },
+  "bologna": {
+   "ruler": "Annibale I Bentivoglio",
+   "house": "House Bentivoglio"
+  },
+  "bosnia": {
+   "ruler": "King Stjepan Tomaš",
+   "house": "House Kotromanić"
+  },
+  "bourbon": {
+   "ruler": "Duke Charles I",
+   "house": "House Bourbon"
+  },
+  "brabant": {
+   "ruler": "Duke Philip the Good",
+   "house": "House Valois-Burgundy"
+  },
+  "brandenburg": {
+   "ruler": "Margrave Frederick II 'Irontooth'",
+   "house": "House Hohenzollern"
+  },
+  "bremen": {
+   "ruler": "Archbishop Gerhard III",
+   "house": "Cathedral chapter"
+  },
+  "brittany": {
+   "ruler": "Duke Francis I",
+   "house": "House Montfort",
+   "born": 1414
+  },
+  "brunei": {
+   "ruler": "Sultan Sulaiman",
+   "house": "Brunei royal house"
+  },
+  "brunswick_gottingen": {
+   "ruler": "Otto II 'Cocles'",
+   "house": "House Welf"
+  },
+  "brunswick_wolfenbuttel": {
+   "ruler": "Duke Henry 'the Peaceable'",
+   "house": "House Welf"
+  },
+  "burgundy": {
+   "ruler": "Duke Philip III 'the Good'",
+   "house": "House Valois-Burgundy"
+  },
+  "byzantium": {
+   "ruler": "Emperor John VIII Palaiologos",
+   "house": "Palaiologos dynasty"
+  },
+  "calenberg": {
+   "ruler": "Duke William I 'the Victorious'",
+   "house": "House Welf"
+  },
+  "calicut": {
+   "ruler": "The Samutiri of Calicut",
+   "house": "Nediyiruppu Swarupam"
+  },
+  "california_peoples": {
+   "ruler": "Tribelet headmen",
+   "house": "House Tribelets"
+  },
+  "calusa": {
+   "ruler": "Paramount chief",
+   "house": "Calusa chiefly lineage"
+  },
+  "cambodia": {
+   "ruler": "King Ponhea Yat",
+   "house": "Khmer royal line of Angkor"
+  },
+  "cambrai": {
+   "ruler": "Bishop John of Burgundy",
+   "house": "Cathedral chapter"
+  },
+  "candar": {
+   "ruler": "İsmail Bey",
+   "house": "Candar / İsfendiyarid dynasty"
+  },
+  "castile": {
+   "ruler": "King Juan II",
+   "house": "House Trastámara"
+  },
+  "catalonia": {
+   "ruler": "Queen Maria"
+  },
+  "central_coast_lordships": {
+   "ruler": "Many valley lords"
+  },
+  "central_highland_chiefdoms": {
+   "ruler": "Many local lords"
+  },
+  "champa": {
+   "ruler": "King Maha Vijaya",
+   "house": "Vijaya royal line"
+  },
+  "champaner": {
+   "ruler": "Raja",
+   "house": "Khichi Chauhans of Pavagadh"
+  },
+  "chiba": {
+   "ruler": "Chiba Tanenao",
+   "house": "Chiba house"
+  },
+  "cilli": {
+   "ruler": "Prince Frederick II",
+   "house": "House Cilli"
+  },
+  "cleves": {
+   "ruler": "Duke Adolf I",
+   "house": "House La Marck"
+  },
+  "coast_salish": {
+   "ruler": "Family heads",
+   "house": "House Households"
+  },
+  "cologne": {
+   "ruler": "Archbishop Dietrich II of Moers",
+   "house": "Cathedral chapter"
+  },
+  "connacht_burkes": {
+   "ruler": "Ulick Ruadh Burke"
+  },
+  "coosa": {
+   "ruler": "Paramount chief",
+   "house": "Chiefly lineage at Little Egypt"
+  },
+  "crimea": {
+   "ruler": "Khan Hacı I Giray",
+   "house": "House Giray"
+  },
+  "cyprus": {
+   "ruler": "King John II",
+   "house": "House Lusignan"
+  },
+  "dai_viet": {
+   "ruler": "Emperor Lê Nhân Tông",
+   "house": "Lê dynasty"
+  },
+  "date": {
+   "ruler": "Date Mochimune",
+   "house": "Date house"
+  },
+  "debdou": {
+   "ruler": "Musa ibn Hammu",
+   "house": "Banu Urtajjen"
+  },
+  "decapolis": {
+   "ruler": "League assembly",
+   "house": "League of member cities"
+  },
+  "delhi": {
+   "ruler": "Sultan Muhammad Shah ibn Farid",
+   "house": "Sayyid dynasty"
+  },
+  "denmark": {
+   "ruler": "King Christopher of Bavaria",
+   "house": "House Wittelsbach"
+  },
+  "dorpat": {
+   "ruler": "Bishop Bartholomäus Savijerv",
+   "house": "Bishop, chapter and vassals"
+  },
+  "dughlat_kashgar": {
+   "ruler": "Amir Sayyid Ali Dughlat",
+   "house": "House Dughlat"
+  },
+  "dulkadir": {
+   "ruler": "Süleyman Bey",
+   "house": "Dulkadir dynasty"
+  },
+  "dushmani": {
+   "ruler": "Lekë Dushmani",
+   "house": "House Dushmani"
+  },
+  "east_frisia": {
+   "ruler": "Chieftain Ulrich Cirksena",
+   "house": "Cirksena family"
+  },
+  "eastern_highland_maya": {
+   "ruler": "Many local lords",
+   "house": "House Local"
+  },
+  "eastern_lesser_sunda_societies": {
+   "ruler": "Clan and domain heads"
+  },
+  "eichstatt": {
+   "ruler": "Bishop Albert II von Hohenrechberg",
+   "house": "Cathedral chapter of Eichstätt"
+  },
+  "england": {
+   "ruler": "King Henry VI",
+   "house": "House Lancaster"
+  },
+  "english_france": {
+   "ruler": "Henry VI",
+   "house": "House Lancaster"
+  },
+  "epirus": {
+   "ruler": "Despot Carlo II Tocco",
+   "house": "House Tocco"
+  },
+  "equatorial_forest_societies": {
+   "ruler": "None",
+   "house": "Houses, villages and districts"
+  },
+  "ermland": {
+   "ruler": "Bishop Franz Kuhschmalz"
+  },
+  "ethiopia": {
+   "ruler": "Zara Yaqob",
+   "house": "Solomonic dynasty"
+  },
+  "ferrara": {
+   "ruler": "Marquis Leonello d'Este",
+   "house": "House Este"
+  },
+  "flanders": {
+   "ruler": "Count Philip the Good",
+   "house": "House Valois-Burgundy"
+  },
+  "florence": {
+   "ruler": "Cosimo de' Medici"
+  },
+  "foix": {
+   "ruler": "Count Gaston IV",
+   "house": "House Foix-Grailly"
+  },
+  "forli": {
+   "ruler": "Antonio I Ordelaffi",
+   "house": "House Ordelaffi"
+  },
+  "france": {
+   "ruler": "King Charles VII",
+   "house": "House Valois",
+   "born": 1403
+  },
+  "gajapati": {
+   "ruler": "Gajapati Kapilendra Deva",
+   "house": "Suryavamsi Gajapati dynasty"
+  },
+  "galich_shemyaka": {
+   "ruler": "Prince Dmitry Yurievich Shemyaka",
+   "house": "Rurikid, Moscow branch"
+  },
+  "gazaria": {
+   "ruler": "Consul of Caffa"
+  },
+  "genoa": {
+   "ruler": "Doge Raffaele Adorno",
+   "house": "Adorno faction"
+  },
+  "georgia": {
+   "ruler": "Vakhtang IV",
+   "house": "House Bagrationi"
+  },
+  "gilan": {
+   "ruler": "Sayyid Nasir Kiya",
+   "house": "Kar-Kiya dynasty"
+  },
+  "gondwana": {
+   "ruler": "Kharji",
+   "house": "Rajgond dynasty of Garha"
+  },
+  "gorizia": {
+   "ruler": "Count Henry VI",
+   "house": "House Gorizia"
+  },
+  "gotland": {
+   "ruler": "Eric of Pomerania",
+   "house": "House Griffin"
+  },
+  "granada": {
+   "ruler": "Sultan Muhammad IX al-Aysar",
+   "house": "Nasrid dynasty"
+  },
+  "great_basin": {
+   "ruler": "None above family groups",
+   "house": "House Families"
+  },
+  "great_horde": {
+   "ruler": "Khan Küchük Muhammad",
+   "house": "Chinggisid (Jochid"
+  },
+  "grisons": {
+   "ruler": "Assemblies of each league",
+   "house": "Three Rhaetian leagues"
+  },
+  "guelders": {
+   "ruler": "Duke Arnold of Egmond",
+   "house": "House Egmond"
+  },
+  "guge": {
+   "ruler": "King Namkha Wangpo Phuntsok De",
+   "house": "Guge royal line"
+  },
+  "gujarat": {
+   "ruler": "Sultan Muhammad Shah II",
+   "house": "Muzaffarid dynasty"
+  },
+  "gwalior": {
+   "ruler": "Raja Dungar Singh",
+   "house": "Tomar dynasty"
+  },
+  "hadiya": {
+   "ruler": "Garad Mahiko",
+   "house": "Hadiya garads"
+  },
+  "hafsid": {
+   "ruler": "Sultan Abu Umar Uthman ibn Muhammad",
+   "house": "Hafsid dynasty"
+  },
+  "hainaut": {
+   "ruler": "Count Philip the Good",
+   "house": "House Valois-Burgundy"
+  },
+  "halberstadt": {
+   "ruler": "Bishop Burchard III",
+   "house": "Cathedral chapter"
+  },
+  "hami": {
+   "ruler": "Hami prince",
+   "house": "Chagatayid-descended Hami house"
+  },
+  "hanseatic_league": {
+   "ruler": "Diet of town envoys"
+  },
+  "hanthawaddy": {
+   "ruler": "King Binnya Ran I",
+   "house": "Wareru dynasty"
+  },
+  "hatakeyama": {
+   "ruler": "Hatakeyama Mochikuni",
+   "house": "Hatakeyama Kinshū house"
+  },
+  "hesse": {
+   "ruler": "Landgrave Louis I the Peaceable",
+   "house": "House Hesse"
+  },
+  "hilali_sulaymi_arabs": {
+   "ruler": "Tribal shaykhs"
+  },
+  "hildesheim": {
+   "ruler": "Bishop Magnus",
+   "house": "Cathedral chapter"
+  },
+  "holland": {
+   "ruler": "Count Philip the Good",
+   "house": "House Valois-Burgundy"
+  },
+  "holstein": {
+   "ruler": "Duke Count Adolf VIII of Holstein",
+   "house": "House Schauenburg"
+  },
+  "hoya": {
+   "ruler": "Counts of Hoya",
+   "house": "House Hoya"
+  },
+  "hre": {
+   "ruler": "King Frederick III",
+   "house": "Habsburg king"
+  },
+  "huastec": {
+   "ruler": "Many local lords",
+   "house": "House Teenek"
+  },
+  "huexotzinco": {
+   "ruler": "Tlatoani",
+   "house": "Huexotzinca ruling house"
+  },
+  "idar": {
+   "ruler": "Rao Bhan",
+   "house": "Rathore rajas of Idar"
+  },
+  "idrisid_sharifs_fez": {
+   "ruler": "Naqib al-ashraf of Fez"
+  },
+  "imagawa": {
+   "ruler": "Imagawa Noritada",
+   "house": "Imagawa house"
+  },
+  "isle_of_man": {
+   "ruler": "King Thomas Stanley",
+   "house": "Stanley family"
+  },
+  "isshiki": {
+   "ruler": "Isshiki Noritomo",
+   "house": "Isshiki house"
+  },
+  "jabrids": {
+   "ruler": "Zamil ibn Jabr",
+   "house": "Banu Jabr"
+  },
+  "jaffna": {
+   "ruler": "Kanakasuriya Cinkaiariyan",
+   "house": "Aryacakravarti dynasty"
+  },
+  "jaisalmer": {
+   "ruler": "A Bhati Rawal",
+   "house": "Bhati dynasty"
+  },
+  "japan_imperial_court": {
+   "ruler": "Emperor Go-Hanazono",
+   "house": "Imperial house"
+  },
+  "jaunpur": {
+   "ruler": "Sultan Mahmud Shah Sharqi",
+   "house": "Sharqi dynasty"
+  },
+  "jianzhou": {
+   "ruler": "Li Manzhu"
+  },
+  "joseon": {
+   "ruler": "King Sejong, fourth king",
+   "house": "Jeonju Yi royal house"
+  },
+  "juhayna_arabs": {
+   "ruler": "Tribal sheikhs"
+  },
+  "julich_berg": {
+   "ruler": "Duke Gerhard",
+   "house": "House Jülich-Heimbach"
+  },
+  "junagadh": {
+   "ruler": "Ra Mahipala",
+   "house": "Chudasama dynasty"
+  },
+  "kalmar_union": {
+   "ruler": "King Christopher of Bavaria",
+   "house": "House Wittelsbach"
+  },
+  "kamakura_kubo": {
+   "ruler": "Vacant",
+   "house": "House Kamakura-fu"
+  },
+  "kamata": {
+   "ruler": "Niladhwaj",
+   "house": "Khen dynasty"
+  },
+  "kano": {
+   "ruler": "Sarki Abdullahi Burja",
+   "house": "Hausa royal lineage"
+  },
+  "karaman": {
+   "ruler": "İbrahim II Bey",
+   "house": "Karamanid dynasty"
+  },
+  "karmapa": {
+   "ruler": "6th Karmapa Thongwa Donden",
+   "house": "Karmapa incarnation line"
+  },
+  "kashmir": {
+   "ruler": "Sultan Ghiyas-ud-Din Zain-ul-Abidin",
+   "house": "Shah Mir dynasty"
+  },
+  "kastrioti": {
+   "ruler": "George Kastrioti Skanderbeg",
+   "house": "House Kastrioti"
+  },
+  "katsina": {
+   "ruler": "Sanau or Muhammad Korau",
+   "house": "Hausa royal lineage"
+  },
+  "katzenelnbogen": {
+   "ruler": "Philip I",
+   "house": "Counts of Katzenelnbogen"
+  },
+  "kazan": {
+   "ruler": "Khan Ulugh Muhammad",
+   "house": "House Chinggisid"
+  },
+  "khandesh": {
+   "ruler": "Miran Mubarak Khan Faruqi",
+   "house": "Faruqi dynasty"
+  },
+  "kikuchi": {
+   "ruler": "Kikuchi Mochitomo",
+   "house": "Kikuchi house"
+  },
+  "kildare": {
+   "ruler": "Thomas FitzGerald",
+   "house": "FitzGerald of Kildare"
+  },
+  "kilwa": {
+   "ruler": "Mahdali sultan",
+   "house": "Mahdali dynasty"
+  },
+  "kitabatake": {
+   "ruler": "Kitabatake Noritomo",
+   "house": "House Kitabatake"
+  },
+  "kitara": {
+   "ruler": "Chwezi rulers",
+   "house": "House Bacwezi"
+  },
+  "knights_hospitaller": {
+   "ruler": "Grand Master Jean de Lastic",
+   "house": "Order of St John"
+  },
+  "konkan_chiefs": {
+   "ruler": "Shirke chief and others"
+  },
+  "kono": {
+   "ruler": "Kōno Norimichi",
+   "house": "Kōno house"
+  },
+  "kosrae": {
+   "ruler": "Tokosra",
+   "house": "Chiefly clans of Leluh"
+  },
+  "kotte": {
+   "ruler": "Parakramabahu VI",
+   "house": "Sirisanghabodhi line"
+  },
+  "kulmbach": {
+   "ruler": "Margrave John the Alchemist",
+   "house": "House Hohenzollern"
+  },
+  "kumaon": {
+   "ruler": "Bharati Chand",
+   "house": "Chand dynasty"
+  },
+  "kyogoku": {
+   "ruler": "Kyōgoku Mochikiyo",
+   "house": "House Sasaki-Kyōgoku"
+  },
+  "lakshadweep": {
+   "ruler": "Island headmen",
+   "house": "House Local"
+  },
+  "lan_na": {
+   "ruler": "King Tilokaraj",
+   "house": "Mangrai dynasty"
+  },
+  "lan_xang": {
+   "ruler": "King Chakkaphat Phaen Phaeo",
+   "house": "Khun Lo dynasty"
+  },
+  "lenape": {
+   "ruler": "Local sachems",
+   "house": "Lineage and community sachems"
+  },
+  "lesbos": {
+   "ruler": "Dorino I Gattilusio",
+   "house": "House Gattilusio"
+  },
+  "liege": {
+   "ruler": "Prince-bishop John of Heinsberg",
+   "house": "Cathedral chapter of St Lambert"
+  },
+  "lijiang": {
+   "ruler": "Mu clan native prefect",
+   "house": "Mu clan"
+  },
+  "lithuania": {
+   "ruler": "Grand Duke Casimir IV Jagiellon",
+   "house": "Gediminid-Jagiellonian dynasty"
+  },
+  "lordship_of_the_isles": {
+   "ruler": "Lord Alexander of Islay",
+   "house": "Clan Donald"
+  },
+  "lorraine": {
+   "ruler": "Duchess Isabella",
+   "house": "House Valois-Anjou"
+  },
+  "luchuan": {
+   "ruler": "Si Jifa leading resistance",
+   "house": "Si ruling family"
+  },
+  "magdeburg": {
+   "ruler": "Archbishop Günther II",
+   "house": "Cathedral chapter of Magdeburg"
+  },
+  "mainz": {
+   "ruler": "Archbishop Dietrich Schenk von Erbach",
+   "house": "Cathedral chapter"
+  },
+  "majapahit": {
+   "ruler": "Queen Suhita",
+   "house": "Rajasa dynasty of Singhasari-Majapahit"
+  },
+  "malacca": {
+   "ruler": "Sultan Abu Syahid",
+   "house": "Malacca royal house"
+  },
+  "maldives": {
+   "ruler": "Sultan Hassan III",
+   "house": "Hilaali dynasty"
+  },
+  "mali": {
+   "ruler": "Mansa of Mali, probably Musa III",
+   "house": "Keita dynasty"
+  },
+  "maluku_other_societies": {
+   "ruler": "Local heads"
+  },
+  "malwa": {
+   "ruler": "Sultan Mahmud Shah I Khalji",
+   "house": "Khalji dynasty of Malwa"
+  },
+  "manipur": {
+   "ruler": "Ningthou Ningthoukhomba",
+   "house": "Ningthouja dynasty"
+  },
+  "mansfeld": {
+   "ruler": "Counts of Mansfeld (co-ruling",
+   "house": "House Mansfeld"
+  },
+  "mantua": {
+   "ruler": "Marquis Ludovico III Gonzaga",
+   "house": "House Gonzaga"
+  },
+  "mapuche": {
+   "ruler": "Many lonko"
+  },
+  "mark": {
+   "ruler": "Count Gerhard of Cleves",
+   "house": "House La Marck"
+  },
+  "marquesas": {
+   "ruler": "Many valley hakaʻiki",
+   "house": "Tribal chiefly lines"
+  },
+  "marwar": {
+   "ruler": "Rao Jodha",
+   "house": "Rathore clan"
+  },
+  "massina_fulbe": {
+   "ruler": "Ardo of Masina",
+   "house": "Dikko/Diallo ardos"
+  },
+  "maya_cupul": {
+   "ruler": "Cupul batabob",
+   "house": "Cupul lineage"
+  },
+  "mazovia_plock": {
+   "ruler": "Duke Władysław I",
+   "house": "Mazovian Piasts"
+  },
+  "mazovia_warsaw": {
+   "ruler": "Duke Bolesław IV",
+   "house": "Mazovian Piasts"
+  },
+  "mecklenburg": {
+   "ruler": "Duke Henry IV 'the Fat'",
+   "house": "House Mecklenburg"
+  },
+  "mecklenburg_stargard": {
+   "ruler": "Duke Henry 'the Elder'",
+   "house": "House Mecklenburg"
+  },
+  "meissen": {
+   "ruler": "Bishop John IV Hoffmann",
+   "house": "Cathedral chapter"
+  },
+  "metztitlan": {
+   "ruler": "Ruler not known for 1444",
+   "house": "Metztitlan ruling house"
+  },
+  "mewar": {
+   "ruler": "Rana Kumbhakarna",
+   "house": "Sisodia dynasty"
+  },
+  "mikmaq": {
+   "ruler": "Band sagamores"
+  },
+  "milan": {
+   "ruler": "Duke Filippo Maria Visconti",
+   "house": "House Visconti"
+  },
+  "minden": {
+   "ruler": "Bishop Albert",
+   "house": "Cathedral chapter"
+  },
+  "ming": {
+   "ruler": "Zhengtong Emperor",
+   "house": "Zhu house"
+  },
+  "mithila": {
+   "ruler": "Harasimha",
+   "house": "Oiniwar dynasty"
+  },
+  "mixteca_alta": {
+   "ruler": "Many royal couples",
+   "house": "Mixtec dynasties"
+  },
+  "moghulistan": {
+   "ruler": "Khan Esen Buqa II",
+   "house": "Chagatayid dynasty"
+  },
+  "moldavia": {
+   "ruler": "Voivode Stephen II",
+   "house": "Mușat dynasty"
+  },
+  "monaco": {
+   "ruler": "Lord Jean I Grimaldi",
+   "house": "House Grimaldi"
+  },
+  "montferrat": {
+   "ruler": "Marquis Gian Giacomo Palaiologos",
+   "house": "House Palaiologos-Montferrat"
+  },
+  "moravia": {
+   "ruler": "No margrave in residence",
+   "house": "Moravian estates"
+  },
+  "mozhaysk": {
+   "ruler": "Prince Ivan Andreyevich",
+   "house": "Rurikid, Moscow branch"
+  },
+  "mrauk_u": {
+   "ruler": "King Min Khayi",
+   "house": "Mrauk U dynasty"
+  },
+  "multan": {
+   "ruler": "Shaikh Yusuf Qureshi"
+  },
+  "munster": {
+   "ruler": "Prince-bishop Heinrich II of Moers",
+   "house": "Cathedral chapter"
+  },
+  "muscovy": {
+   "ruler": "Grand Prince Vasily II Vasilievich",
+   "house": "Rurikid, Moscow branch"
+  },
+  "mushasha": {
+   "ruler": "Sayyid Muhammad ibn Falah",
+   "house": "Musha'sha' sayyids"
+  },
+  "nagaur": {
+   "ruler": "A Dandani khan",
+   "house": "Dandani khans"
+  },
+  "naples": {
+   "ruler": "King Alfonso I",
+   "house": "House Trastámara"
+  },
+  "navarre": {
+   "ruler": "King Juan",
+   "house": "House Trastámara"
+  },
+  "naxos": {
+   "ruler": "Duke Giacomo II Crispo",
+   "house": "House Crispo"
+  },
+  "nepal_malla": {
+   "ruler": "Yaksha Malla",
+   "house": "Malla dynasty"
+  },
+  "neuchatel": {
+   "ruler": "Count John",
+   "house": "House Freiburg"
+  },
+  "nevers": {
+   "ruler": "Count Charles of Burgundy",
+   "house": "House Valois-Burgundy"
+  },
+  "northern_yuan": {
+   "ruler": "Taisun Khan",
+   "house": "House Borjigin"
+  },
+  "norway": {
+   "ruler": "King Christopher of Bavaria",
+   "house": "House Wittelsbach"
+  },
+  "oaxaca_mountain_peoples": {
+   "ruler": "Many local lords",
+   "house": "House Local"
+  },
+  "ob_ugrian_principalities": {
+   "ruler": "Local princes"
+  },
+  "oirat": {
+   "ruler": "Esen Taishi",
+   "house": "Choros lineage of the Oirat"
+  },
+  "oldenburg": {
+   "ruler": "Count Christian under guardianship",
+   "house": "House Oldenburg"
+  },
+  "orang_asli": {
+   "ruler": "Band and village headmen",
+   "house": "House None"
+  },
+  "orang_laut": {
+   "ruler": "Suku headmen"
+  },
+  "orange": {
+   "ruler": "Prince Louis de Chalon",
+   "house": "House Chalon-Arlay"
+  },
+  "orleans": {
+   "ruler": "Duke Charles",
+   "house": "House Valois-Orléans"
+  },
+  "osel_wiek": {
+   "ruler": "Bishop Johannes Kreul",
+   "house": "Bishop and chapter of Hapsal"
+  },
+  "otomo": {
+   "ruler": "Ōtomo Chikatsuna or Chikashige",
+   "house": "Ōtomo house"
+  },
+  "ouchi": {
+   "ruler": "Ōuchi Norihiro",
+   "house": "Ōuchi house"
+  },
+  "paderborn": {
+   "ruler": "Archbishop Dietrich II of Moers",
+   "house": "House Chapter"
+  },
+  "pahang": {
+   "ruler": "Maharaja Dewa Sura",
+   "house": "Siamese-linked ruling house"
+  },
+  "palatinate": {
+   "ruler": "Elector Louis IV",
+   "house": "House Wittelsbach"
+  },
+  "palatinate_mosbach": {
+   "ruler": "Count Palatine Otto I",
+   "house": "House Wittelsbach"
+  },
+  "palatinate_neumarkt": {
+   "ruler": "Christopher of Bavaria",
+   "house": "House Wittelsbach"
+  },
+  "palatine_cadet_lines": {
+   "ruler": "Stephen of Simmern-Zweibrücken",
+   "house": "House Wittelsbach"
+  },
+  "palau": {
+   "ruler": "Village title-holders",
+   "house": "Clan titles"
+  },
+  "papal_states": {
+   "ruler": "Pope Eugenius IV",
+   "house": "House Papacy"
+  },
+  "passau": {
+   "ruler": "Bishop Leonhard von Laiming",
+   "house": "Cathedral chapter of Passau"
+  },
+  "pesaro": {
+   "ruler": "Galeazzo Malatesta",
+   "house": "Malatesta of Pesaro"
+  },
+  "phagmodrupa": {
+   "ruler": "Gongma Drakpa Jungne",
+   "house": "Lang clan"
+  },
+  "piombino": {
+   "ruler": "Lady Paola Colonna",
+   "house": "House Appiani"
+  },
+  "plateau_peoples": {
+   "ruler": "Village headmen",
+   "house": "House Villages"
+  },
+  "poland": {
+   "ruler": "King Władysław III Jagiellon",
+   "house": "Jagiellonian dynasty"
+  },
+  "pomerania_stettin": {
+   "ruler": "Duke Joachim 'the Younger'",
+   "house": "House Griffins"
+  },
+  "pomerania_stolp": {
+   "ruler": "Duke Bogislaw IX",
+   "house": "House Griffins"
+  },
+  "portugal": {
+   "ruler": "King Afonso V",
+   "house": "House Avis"
+  },
+  "powhatan_precursors": {
+   "ruler": "Weroances"
+  },
+  "provence": {
+   "ruler": "Count René I",
+   "house": "House Valois-Anjou"
+  },
+  "qara_qoyunlu": {
+   "ruler": "Jahan Shah",
+   "house": "Barani house of the Qara Qoyunlu"
+  },
+  "rachakonda": {
+   "ruler": "Peda Anapota Nayaka",
+   "house": "Recherla Velamas"
+  },
+  "rajahmundry_reddi": {
+   "ruler": "Virabhadra Reddi",
+   "house": "Reddi dynasty"
+  },
+  "rasulid_yemen": {
+   "ruler": "al-Muzaffar Yusuf",
+   "house": "Rasulid dynasty"
+  },
+  "ratzeburg": {
+   "ruler": "Bishop Johann Prohl",
+   "house": "Cathedral chapter"
+  },
+  "rhenish_imperial_cities": {
+   "ruler": "Councils of each city",
+   "house": "Urban patriciates and guilds"
+  },
+  "riga": {
+   "ruler": "Archbishop Henning Scharpenberg",
+   "house": "Archbishop and chapter"
+  },
+  "rimini": {
+   "ruler": "Sigismondo Pandolfo Malatesta",
+   "house": "House Malatesta"
+  },
+  "rinpungpa": {
+   "ruler": "Norzang",
+   "house": "Rinpungpa lineage"
+  },
+  "rosenberg": {
+   "ruler": "Oldřich II of Rosenberg",
+   "house": "House Rosenberg"
+  },
+  "rustamdar": {
+   "ruler": "Kayumarth b. Bisutun",
+   "house": "Paduspanid dynasty"
+  },
+  "ryazan": {
+   "ruler": "Grand Prince Ivan Fyodorovich",
+   "house": "Rurikid, Ryazan branch"
+  },
+  "ryukyu": {
+   "ruler": "King Shō Shitatsu",
+   "house": "First Shō dynasty"
+  },
+  "safaviyya": {
+   "ruler": "Shaykh Ibrahim",
+   "house": "Safaviyya order"
+  },
+  "sakya": {
+   "ruler": "Khön family heads",
+   "house": "Khön family"
+  },
+  "saluzzo": {
+   "ruler": "Marquis Ludovico I",
+   "house": "Del Vasto"
+  },
+  "salzburg": {
+   "ruler": "Archbishop Frederick IV Truchsess von Emmerberg",
+   "house": "Cathedral chapter of Salzburg"
+  },
+  "san": {
+   "ruler": "None",
+   "house": "House Bands"
+  },
+  "sapmi": {
+   "ruler": "No central leadership",
+   "house": "House Siida"
+  },
+  "sardinia": {
+   "ruler": "Alfonso V",
+   "house": "House Trastámara"
+  },
+  "satake": {
+   "ruler": "Satake Yoshihito",
+   "house": "Satake house"
+  },
+  "savoy": {
+   "ruler": "Duke Louis I",
+   "house": "House Savoy"
+  },
+  "saxe_lauenburg": {
+   "ruler": "Duke Bernard II",
+   "house": "House Ascania"
+  },
+  "saxon_hanse_towns": {
+   "ruler": "Town councils",
+   "house": "Patriciates and guilds"
+  },
+  "saxony": {
+   "ruler": "Elector Frederick II 'the Gentle'",
+   "house": "House Wettin"
+  },
+  "sayyid_ahmad_horde": {
+   "ruler": "Khan Sayyid Ahmad I",
+   "house": "House Chinggisid"
+  },
+  "schleswig": {
+   "ruler": "Count Adolf VIII",
+   "house": "House Schauenburg"
+  },
+  "scotland": {
+   "ruler": "King James II",
+   "house": "House Stewart"
+  },
+  "serbia": {
+   "ruler": "Despot Đurađ Branković",
+   "house": "House Branković"
+  },
+  "serpukhov_borovsk": {
+   "ruler": "Prince Vasily Yaroslavich",
+   "house": "Rurikid, Moscow branch"
+  },
+  "sforza_marche": {
+   "ruler": "Count Francesco Sforza",
+   "house": "House Sforza"
+  },
+  "shiba": {
+   "ruler": "Shiba Yoshitake",
+   "house": "Shiba Buei house"
+  },
+  "shimazu": {
+   "ruler": "Shimazu Tadakuni",
+   "house": "House Shimazu"
+  },
+  "shirvan": {
+   "ruler": "Khalilullah I",
+   "house": "Derbendid Shirvanshahs"
+  },
+  "shoni": {
+   "ruler": "Shōni Noriyori",
+   "house": "Shōni house"
+  },
+  "shuixi": {
+   "ruler": "An lineage pacification commissioner",
+   "house": "An lineage"
+  },
+  "sicily": {
+   "ruler": "Alfonso V",
+   "house": "House Trastámara"
+  },
+  "sine": {
+   "ruler": "Maad a Sinig",
+   "house": "Guelowar matrilineage"
+  },
+  "sirhind_lodi": {
+   "ruler": "Malik Bahlul Lodi",
+   "house": "Lodi Afghan clan"
+  },
+  "sistan": {
+   "ruler": "Malik Nizam al-Din Yahya",
+   "house": "Mihrabanid dynasty"
+  },
+  "so": {
+   "ruler": "Sō Sadamori",
+   "house": "Sō house"
+  },
+  "songhai": {
+   "ruler": "A Sunni of Gao",
+   "house": "Sunni dynasty"
+  },
+  "southern_court_loyalists": {
+   "ruler": "Southern Court princes",
+   "house": "Southern line partisans"
+  },
+  "southern_new_england_algonquians": {
+   "ruler": "Local sachems",
+   "house": "House Sachemships"
+  },
+  "st_gallen": {
+   "ruler": "Abbot Kaspar von Breitenlandenberg",
+   "house": "Abbey of St. Gallen"
+  },
+  "sukhothai": {
+   "ruler": "Prince Ramesuan, viceroy, a youth"
+  },
+  "sunda": {
+   "ruler": "King Prabu Niskala Wastu Kancana",
+   "house": "Sunda-Galuh royal house"
+  },
+  "sweden": {
+   "ruler": "King Christopher of Bavaria",
+   "house": "House Wittelsbach"
+  },
+  "tahirid": {
+   "ruler": "Tahirid brothers",
+   "house": "Banu Tahir"
+  },
+  "tahiti": {
+   "ruler": "Many ariʻi"
+  },
+  "takeda": {
+   "ruler": "Takeda Nobushige",
+   "house": "Kai Takeda"
+  },
+  "taranto": {
+   "ruler": "Prince Giovanni Antonio Orsini del Balzo",
+   "house": "Orsini del Balzo"
+  },
+  "tenkasi_pandyas": {
+   "ruler": "Jatilavarman Arikesari Parakrama Pandya",
+   "house": "Pandya dynasty"
+  },
+  "ternate": {
+   "ruler": "Kolano Gapi Baguna II",
+   "house": "Ternate royal house"
+  },
+  "teutonic_order": {
+   "ruler": "Grand Master Konrad von Erlichshausen",
+   "house": "Teutonic Order"
+  },
+  "texcoco": {
+   "ruler": "Tlatoani Nezahualcoyotl",
+   "house": "Acolhua royal house"
+  },
+  "thasos_imbros": {
+   "ruler": "Palamede Gattilusio",
+   "house": "House Gattilusio"
+  },
+  "timbuktu_tuareg": {
+   "ruler": "Chief Akil",
+   "house": "Maghsharen Tuareg leadership"
+  },
+  "timurid_empire": {
+   "ruler": "Sultan Shah Rukh",
+   "house": "Timurid dynasty"
+  },
+  "timurid_fars": {
+   "ruler": "Abdullah b. Ibrahim Sultan",
+   "house": "Timurid dynasty"
+  },
+  "tlacopan": {
+   "ruler": "Tlatoani Totoquihuaztli I",
+   "house": "Tepanec ruling house of Tlacopan"
+  },
+  "tlatelolco": {
+   "ruler": "Tlatoani Cuauhtlatoa",
+   "house": "Tlatelolca ruling house"
+  },
+  "toki": {
+   "ruler": "Toki Mochimasu",
+   "house": "Toki house"
+  },
+  "toul_verdun": {
+   "ruler": "City councils and bishops",
+   "house": "House Chapters"
+  },
+  "trebizond": {
+   "ruler": "John IV Megas Komnenos",
+   "house": "Grand Komnenoi"
+  },
+  "trier": {
+   "ruler": "Archbishop Jakob I of Sierck",
+   "house": "Cathedral chapter"
+  },
+  "tripoli_regency": {
+   "ruler": "Hafsid governor",
+   "house": "Hafsid provincial administration"
+  },
+  "tripura": {
+   "ruler": "Dharma Manikya I",
+   "house": "Manikya dynasty"
+  },
+  "tubu_teda": {
+   "ruler": "Clan heads",
+   "house": "Teda clans"
+  },
+  "tuii_tonga": {
+   "ruler": "Tuʻi Tonga",
+   "house": "Tuʻi Tonga line"
+  },
+  "tver": {
+   "ruler": "Grand Prince Boris Alexandrovich",
+   "house": "Rurikid, Tver branch"
+  },
+  "tyrconnell": {
+   "ruler": "King Neachtain Ó Domhnaill",
+   "house": "Ó Domhnaill"
+  },
+  "tyrol": {
+   "ruler": "Count Sigismund",
+   "house": "House Habsburg"
+  },
+  "tyumen_sibir": {
+   "ruler": "Abu'l-Khayr",
+   "house": "House Shibanid"
+  },
+  "tzutujil": {
+   "ruler": "Ahtz'ikinahay",
+   "house": "Tz'utujil lineage"
+  },
+  "urbino": {
+   "ruler": "Count Federico da Montefeltro",
+   "house": "House Montefeltro"
+  },
+  "uriankhai": {
+   "ruler": "Hereditary guard commanders"
+  },
+  "utrecht": {
+   "ruler": "Bishop Rudolf van Diepholt"
+  },
+  "uzbek_khanate": {
+   "ruler": "Abu'l-Khayr Khan",
+   "house": "House Shibanid"
+  },
+  "valais": {
+   "ruler": "Bishop Wilhelm VI von Raron",
+   "house": "Bishop of Sion and the Zenden"
+  },
+  "valluvanad": {
+   "ruler": "Valluvakonathiri",
+   "house": "Valluvanad house"
+  },
+  "vanuatu": {
+   "ruler": "Many title-holders",
+   "house": "Grade and title systems"
+  },
+  "vaudemont": {
+   "ruler": "Count Antoine of Vaudémont",
+   "house": "House Lorraine"
+  },
+  "venice": {
+   "ruler": "Doge Francesco Foscari",
+   "house": "Venetian patriciate"
+  },
+  "verden": {
+   "ruler": "Bishop Johann III von Asel",
+   "house": "Cathedral chapter"
+  },
+  "vereya_beloozero": {
+   "ruler": "Prince Mikhail Andreyevich",
+   "house": "Rurikid, Moscow branch"
+  },
+  "vijayanagara": {
+   "ruler": "Deva Raya II",
+   "house": "Sangama dynasty"
+  },
+  "vlachs_aromanians": {
+   "ruler": "No central leadership",
+   "house": "Katun communities"
+  },
+  "volhynia": {
+   "ruler": "Prince Švitrigaila",
+   "house": "House Gediminid"
+  },
+  "wallachia": {
+   "ruler": "Voivode Vlad II Dracul",
+   "house": "House Basarab"
+  },
+  "wendish_hanse_towns": {
+   "ruler": "Town councils",
+   "house": "Merchant patriciates"
+  },
+  "west_mexico_chiefdoms": {
+   "ruler": "Many local rulers",
+   "house": "House Local"
+  },
+  "wurttemberg_stuttgart": {
+   "ruler": "Count Ulrich V the Much-Beloved",
+   "house": "House Württemberg"
+  },
+  "wurttemberg_urach": {
+   "ruler": "Count Ludwig I",
+   "house": "House Württemberg"
+  },
+  "wurzburg": {
+   "ruler": "Bishop Gottfried IV Schenk von Limpurg",
+   "house": "Cathedral chapter of Würzburg"
+  },
+  "yakut": {
+   "ruler": "Toyons"
+  },
+  "yamana": {
+   "ruler": "Yamana Mochitoyo",
+   "house": "Yamana house"
+  },
+  "zaharia": {
+   "ruler": "Lekë Zaharia",
+   "house": "House Zaharia"
+  },
+  "zaydi_imamate": {
+   "ruler": "al-Mansur al-Nasir",
+   "house": "Zaydi imams"
+  },
+  "zuni": {
+   "ruler": "Priests",
+   "house": "House Priesthoods"
+  }
+ }
+}

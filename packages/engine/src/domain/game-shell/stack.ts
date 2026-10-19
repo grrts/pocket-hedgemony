@@ -106,7 +106,7 @@ export interface Frame {
   returnTo?: Frame;
   /** A modal Back may put off ("decide later"). */
   decideLater?: boolean;
-  /** A battle replayed from the turn report or the Chronicle, not stopped in a turn. */
+  /** A battle replayed from the News, not stopped in a turn. */
   replay?: boolean;
   /** The battle view: running (4-hour steps, X-1) or result. */
   battleCard?: "running" | "result";
@@ -478,7 +478,7 @@ export const dayDate = (date: GameDate, day: number): string => `${day} ${format
 export const cardLayout = (sh: Shell) => layoutFor(sh.shape).card;
 
 // ---------------------------------------------------------------------------
-// The Realm book (SHELL-059..063)
+// The Realm book (SHELL-059..063, SHELL-165..167): your realm's six sections, each holding its pages
 
 export const REALM_BOOK_TABS = Object.keys(config.realmBook);
 
@@ -486,6 +486,11 @@ export function tabHolds(tab: string): string[] {
   const t = (config.realmBook as Record<string, string[]>)[tab];
   if (!t) throw new Error(`No Realm book tab ${tab}`);
   return t;
+}
+
+/** The section that holds a page, such as Economy for Food (SHELL-165). */
+export function sectionOf(page: string): string | null {
+  return REALM_BOOK_TABS.find((t) => tabHolds(t).includes(page)) ?? null;
 }
 
 /** A new system adds a section inside a tab, never a seventh tab (SHELL-060). */
@@ -550,7 +555,7 @@ export function gameMenuEntries(platform: Platform, ironman: boolean, o: GameMen
     .filter((e) => e !== "Quit" || hasQuit(platform))
     .filter((e) => e !== "Load" || !ironman)
     .map((e) => (e === "Save" && ironman ? "Save and quit" : e))
-    .map((e) => (e === "Achievements" && o.canEarnAchievements === false ? config.strings.achievementsOff : e));
+    .map((e) => (e === "Achievements" && o.canEarnAchievements === false ? config.strings.playedOn : e));
   if (o.tutorial) out.splice(1, 0, ...config.tutorialMenuLines);
   return out;
 }

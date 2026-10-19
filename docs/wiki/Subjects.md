@@ -21,7 +21,7 @@ All land sits on one **ladder of rule**: royal land (run by your officials), lor
 | Weight toward the subject limit | 1 | ½ | 1 | ½ | 1 | 1 |
 | Drift | none | −1 | none | −1 | none | −1 |
 | Fold in | yes | no: tighten to Vassal first | yes, as *Merge the crowns* | yes | yes, into royal land | yes |
-| 1444 examples | Brittany under France; shugo houses under the Ashikaga; Romagna lords under the Pope | Joseon, Ryukyu, Dai Viet to the Ming; Serbia, Byzantium to the Ottomans; Granada to Castile | Sweden, Norway under Denmark; Sicily, Sardinia under Aragon | Jurchen and Tusi commanderies on the Ming frontier | Genoese Chios and Gazaria; Portuguese Ceuta | Bukhara under Russia; Indian princely states under the Company (event tree) |
+| Examples at the 1378 start | Brittany under France; Wallachia and Bosnia under Hungary; Naples held of the Pope | Goryeo, Ryukyu, Dai Viet to the Ming; Byzantium to the Ottomans; Tver and Ryazan to Mamai's Horde; Tenochtitlan to the Tepanecs | Sardinia under Aragon; the Lordship of Ireland under England | the Tibetan and Western Guards commanderies on the Ming frontier | Genoese Gazaria; Cypriot Korykos | Bukhara under Russia; Indian princely states under the Company (event tree) |
 
 A subject pays its share from its own treasury each month, so a poor subject pays little. Tribute taken in grain arrives at your nearest castle and counts toward Food. Protectorates exist only from era VI, or from era IV for an overseas trade empire.
 
@@ -45,9 +45,9 @@ A subject pays its share from its own treasury each month, so a poor subject pay
 
 When a Settled or Self-governing colony turns Disloyal, [Revolutions](Revolutions) gets the settler-independence trigger.
 
-### The 1444 subjects
+### The subjects at the start
 
-The relations data has eight subject types, which are mapped onto the six: vassal to Vassal; fief to Vassal with *Held of the Church* or *Held in fief* (Naples from the Pope, Andorra from Foix); appanage to Vassal with *Kin*; tributary to Tributary; personal union to Union; frontier commandery to March; colony to Colony; and estate (Catalonia, Flanders, the Castilian magnates, Moravia and others) to a lord of its crown, never a separate country. Event subjects map the same way, with protectorate and puppet becoming Protectorate and dominion a Colony at Self-governing. The 167 Subject records minus 32 estates give **135 subjects** in 1444: 83 vassals, 31 tributaries, 9 unions, 7 marches and 5 colonies.
+The relations data has eight subject types, which are mapped onto the six: vassal to Vassal; fief to Vassal with *Held of the Church* or *Held in fief* (Naples from the Pope, Andorra from Foix); appanage to Vassal with *Kin*; tributary to Tributary; personal union to Union; frontier commandery to March; colony to Colony; and estate (Catalonia, Flanders, the Castilian magnates, Moravia and others) to a lord of its crown, never a separate country. Event subjects map the same way, with protectorate and puppet becoming Protectorate and dominion a Colony at Self-governing. On 20 September 1378 the 228 subject records minus 24 estates give **204 subjects**: 126 vassals, 68 tributaries, 4 unions, 4 marches and 2 colonies. (The 1444 checkpoint has 135.)
 
 ### Loyalty
 
@@ -88,7 +88,7 @@ A subject has one of the lords' four steps:
 
 Events can add or remove a reason by id, or add a one-off named reason with its own arrow for a stated time.
 
-**Starting loyalty in 1444** comes from the dataset's autonomy: very low, low and moderate start Loyal; high and very high start Wavering; one step lower if the subject is Hostile toward its overlord in the data.
+**Starting loyalty** comes from the dataset's autonomy: very low, low and moderate start Loyal; high and very high start Wavering; one step lower if the subject is Hostile toward its overlord in the data.
 
 ### What an overlord can do
 
@@ -127,7 +127,7 @@ Each action is a button on the subject's card; a locked button names its first m
 
 ### Folding in
 
-Folding in makes a subject's ruler one of your lords and removes its country from the map. It needs: Loyal for the last 10 years, a subject for 20 years or more, a land path or your sea route to it, room for one more lord in lord capacity, and a type other than Tributary or Self-governing colony. In 1444 each subject counts as held since its dataset start date (20 years when unknown), and one Loyal in 1444 counts as Loyal for 10 years.
+Folding in makes a subject's ruler one of your lords and removes its country from the map. It needs: Loyal for the last 10 years, a subject for 20 years or more, a land path or your sea route to it, room for one more lord in lord capacity, and a type other than Tributary or Self-governing colony. At the start each subject counts as held since its dataset start date (20 years when unknown), and one Loyal at the start counts as Loyal for 10 years.
 
 You keep one envoy at its court for 1 month per province; if the subject drops to Wavering, the folding stops and the envoy comes home. When it completes, its ruler becomes one lord holding all its provinces (its own lords merged into his card), with its buildings, its army as his retinue and its treasury as his wealth. Its provinces get *Foreign rule* for 10 years unless it shared your faith and people.
 
@@ -155,7 +155,7 @@ You keep one envoy at its court for 1 month per province; if the subject drops t
 - Chartering a group of your colonial provinces in one distant region makes one Colony.
 - Events (`vassalize`, `create_country … subject_of`, `relation: personal_union`) create the type they name; a created country is a Colony at Self-governing unless named otherwise.
 
-### France, 1444 to 1453
+### France, 1444 to 1453 (on the 1444 checkpoint world)
 
 France has high administrative capacity and a subject limit of 7, with 10 vassals and the appanage of the Dauphiné.
 
@@ -167,7 +167,7 @@ France has high administrative capacity and a subject limit of 7, with 10 vassal
 
 ### Playing as a subject
 
-Every playable subject in the catalogue (218) can be played from the start. You see your own card from below with the same badges, and can pay and be protected, stop paying, find a backer, wait for your overlord's bad war, or marry into its house to inherit its crown (a union can run either way). A Loyal subject that politely asks by envoy for a looser type gets it if the overlord's AI is cautious or over its subject limit. A subject that wins its independence war can make its old overlord its own subject in the same peace if the voices allow.
+Every playable subject at the start (94 on 20 September 1378) can be played. You see your own card from below with the same badges, and can pay and be protected, stop paying, find a backer, wait for your overlord's bad war, or marry into its house to inherit its crown (a union can run either way). A Loyal subject that politely asks by envoy for a looser type gets it if the overlord's AI is cautious or over its subject limit. A subject that wins its independence war can make its old overlord its own subject in the same peace if the voices allow.
 
 ### The computer players
 
@@ -198,9 +198,15 @@ A turn is one week; these steps run once a month, at the end of the turn in whic
 - **Their heir**: *Take a hostage* from a Loyal or Wavering subject: his heir lives at your court (+1 loyalty) until you *Send the heir home* or 20 years pass.
 - **Backers**: a Disloyal subject with a stronger enemy of its overlord next door rises with that realm at its side; the backer declares war on the overlord at once.
 - **The Subjects map mode**: from the map mode menu, your realm in its colour, your subjects green, amber or red by loyalty, your overlord purple. Tap one for its Diplomacy tab.
-- **Personal unions**: a marriage is a path to a crown. Rulers don't grow old in the game yet, so each January a ruler may die without a son (1 in 50): each house married into his then has a 1 in 10 chance of a claim on his throne, held for 20 years. One such death in 4 leaves no heir at all, and the crown passes to the ruler of the house married most often into his, as a *Union*, if neither realm is at war and the inheriting realm answers to no one. Your own ruler is spared for now: you can inherit, but are never inherited. Your Diplomacy tab's *Your house* lists the houses married into yours and your claims; another realm's tab says when your houses are married or you claim its throne.
+- **On the realms map, zoomed out**: every subject is washed in its direct overlord's colour with thin diagonal stripes (2 map pixels wide) of its own colour, and its border with that overlord is dotted instead of a solid line, so Brittany reads as part of France at a glance; a subject of a subject shows only its own overlord's colour, never a second set of stripes. Occupied land keeps its occupation hatch, and zoomed in each realm is drawn in its own colour again.
+- **Personal unions**: a marriage is a path to a crown. When a ruler dies without a son, because his heir died first or none was born, each house married into his has a 1 in 10 chance of a claim on his throne, held for 20 years. One such death in 4 leaves no heir at all, and the crown passes to the ruler of the house married most often into his, as a *Union*, if neither realm is at war and the inheriting realm answers to no one. Your own line is spared that: you can inherit, but are never inherited. Your Diplomacy tab's *Your house* lists the houses married into yours and your claims; another realm's tab says when your houses are married or you claim its throne.
+- **Playing as a subject**: on your own Diplomacy tab, or your overlord's card, *Your overlord* shows your card as they see it, with the same badges, then *Your choices*. *Stop paying* keeps your tribute but makes you Disloyal a step each season (*Withholds tribute* −2); *Pay tribute again* ends it. *Ask to loosen* (Loyal only) makes you a tributary when your overlord is cautious (unrest or outside threats high) or over its reach, and says when they would refuse. *Find a backer* names the rivals of your overlord, at peace, next door and as strong, who would join your rising; the first of them does. *Their wars* show how many of their voices want peace, the moment to rise. *Marry into their house* opens their card: if their line dies out and your house is married most into theirs, you inherit their crown and they become your union.
+- **Turning the tables**: in your war for independence, once you hold more provinces than your old master and over three quarters of its voices want peace, *Make them your subject* ends the war with them as your vassal (or tributary without a land border).
+- **The subject card**: framed like a lord's card, with its kind, its ruler as the start data names him (Duke John IV, age 39 · House Montfort), provinces, army, treasury and its own subjects.
+- **Long-press**: hold a finger on a realm on the map (for the Settings long-press time) to open its card at the Diplomacy tab.
 - **Merge the crowns**: a Union cannot be folded in. Once it has been in union 50 years and is Loyal, *Merge the crowns* on its card joins its provinces to your realm at once, its lords serving you with the loyalty they have. When the ruler of a Loyal Vassal or Union dies with no heir, its overlord takes it at once.
-- **Courting**: on another realm's subject, *Court their loyalty* stations one of your envoys at its court: it counts *Courted* (−1) against its overlord, and a Disloyal subject may rise. Each season there is 1 in 4 they find out (−25 with the overlord, fading over 10 years) and he comes home. Your own subjects' cards show *Courted* when someone courts them, and name who once you have a resident there; the Subjects map mode draws a dotted line from the courting realm. Rival and hostile neighbours court your Wavering and Disloyal subjects too.
+- **Courting**: on another realm's subject, *Court their loyalty* stations one of your envoys at its court: it counts *Courted* (−1) against its overlord, and a Disloyal subject may rise. Each season there is 1 in 4 they find out (−25 with the overlord, fading over 10 years) and he comes home. Your own subjects' cards show *Courted* when someone courts them, and name who once you have a resident there; the Subjects lens draws a dotted line from the courting realm. Rival and hostile neighbours court your Wavering and Disloyal subjects too.
+- **Events**: historical events can make a subject (*becomes a protectorate of …*), loosen or tighten it, add or lift a loyalty reason for some months, and break the tie (*released … goes free as a friend*). What the event will do is written on its card before you choose, and the change lands on the subject's card and the Subjects lens like any other. Events can also ask how loyal a subject is, or how many subjects you hold.
 - **Not yet**: the succession war of an inherited realm's lords, and harming a hostage come later; distance gives no reason yet. Faith and language do: the same state faith or court language pulls a subject closer, a different faith pushes it away, more so where you persecute it.
 
 ## How it connects
@@ -218,7 +224,7 @@ A turn is one week; these steps run once a month, at the end of the turn in whic
 - [Trade](Trade): colony goods flowing home; what an overseas trade empire is.
 - [Exploration-and-Colonies](Exploration-and-Colonies): colonial provinces chartered into a Colony.
 - [Historical-Events](Historical-Events): `vassalize`, `release`, `relation`, `subject_count`, `create_country … subject_of`, `doctrine_of_lapse` and new keys.
-- [The-1444-Start](The-1444-Start): 1444 subject records, autonomy, start dates, playable subjects.
+- [The 1378 Start](The-1378-Start): the 1378 subject records, autonomy, start dates, playable subjects.
 - [Map and Map Modes](Map-and-Lenses), [Screens-and-Navigation](Screens-and-Navigation), [Time-and-Turns](Time-and-Turns): hatches, icons, the list and card, and the month, season and era.
 
 ## Numbers
@@ -258,4 +264,4 @@ Nothing. Every question is decided; numbers marked as placeholders in the data (
 - Spec: `domain/subjects/spec.md` in the game repository, requirement code **SUBJ** (SUBJ-001 to SUBJ-106).
 - Features: `domain/subjects/features/`, 17 files including `ladder-and-kinds.feature`, `loyalty.feature`, `overlord-actions.feature`, `folding-in.feature`, `losing-subjects.feature` and the worked example `france-1444-1453.feature`.
 - Config: `subjects/config/subject-rules.json` in the designs.
-- Code: `packages/engine/src/domain/subjects/`, with numbers in `packages/rules/data/domain/subjects.json` and the 1444 subjects in `packages/rules/data/domain/subjects-1444.json`.
+- Code: `packages/engine/src/domain/subjects/`, with numbers in `packages/rules/data/domain/subjects.json` and the subjects at the start in `packages/rules/data/scenarios/1378/subjects.json` (the 1444 checkpoint's in `scenarios/1444/subjects.json`).

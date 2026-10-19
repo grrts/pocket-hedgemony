@@ -28,7 +28,8 @@
   "religions": [
    "hussite",
    "jain",
-   "asian_traditional"
+   "asian_traditional",
+   "baltic_traditional"
   ]
  },
  "faiths": {
@@ -265,6 +266,15 @@
    "rooted": true
   },
   "asian_traditional": {
+   "family": "traditional",
+   "house": [
+    "shrine",
+    "great shrine"
+   ],
+   "clergy_marry": true,
+   "rooted": true
+  },
+  "baltic_traditional": {
    "family": "traditional",
    "house": [
     "shrine",

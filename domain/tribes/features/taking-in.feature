@@ -24,13 +24,13 @@ Feature: Taking in a hunting ground
 
   @TRIBE-018 @placeholder
   Scenario Outline: Taking in that is not allowed
-    Given "East Kentucky" has been a hunting ground of "Cherokee" for <years> years
+    Given "Southeast Tennessee" has been a hunting ground of "Cherokee" for <years> years
     And <situation>
-    When "Cherokee" tries to take in "East Kentucky"
+    When "Cherokee" tries to take in "Southeast Tennessee"
     Then it is refused because <reason>
 
     Examples:
       | years | situation                                    | reason                   |
       | 6     | "Cherokee" is at peace                       | held 6 of 10 years       |
       | 12    | "Cherokee" is at war                         | not while at war         |
-      | 12    | a colony is being founded in "East Kentucky" | a colony is being founded |
+      | 12    | a colony is being founded in "Southeast Tennessee" | a colony is being founded |

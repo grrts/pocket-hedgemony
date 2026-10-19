@@ -23,8 +23,13 @@ await page.evaluate(() => {
 
 // CI shades the map on a software GPU at about 120 ms a frame, which made the
 // pans below take minutes. The map's shading is not budgeted here (only the
-// overlay's CPU time is), so it is switched off while panning and animating,
-// timed on its own for the report, and back on before the turns are played.
+// overlay's CPU time is), so it is switched off for the whole check and timed
+// on its own for the report. It stays off while the turns play too: on a
+// phone the GPU shades the map, but here the software GPU takes 200 to 300 ms
+// of CPU a frame from the cores the worker and the main thread need, which
+// made a day's apply on the main thread a third slower than the same code
+// with the map dark. Applying a day still uploads the provinces' textures
+// (restyleProvinces), so that part of the GPU's work is still timed.
 const mapFrameMs = await page.evaluate(
   () =>
     new Promise((done) => {
@@ -41,13 +46,7 @@ const mapFrameMs = await page.evaluate(
       requestAnimationFrame(step);
     }),
 );
-const shadeMap = (on) =>
-  page.evaluate((on) => {
-    const r = globalThis.__phMap.renderer;
-    if (!on) ((r.realDraw = r.draw), (r.draw = () => {}));
-    else if (r.realDraw) ((r.draw = r.realDraw), delete r.realDraw);
-  }, on);
-await shadeMap(false);
+await page.evaluate(() => (globalThis.__phMap.renderer.draw = () => {}));
 
 const pan = (zoom) =>
   page.evaluate(
@@ -79,7 +78,7 @@ const TURN_WAIT_MS = 250;
 const TURN_APPLY_MS = 16;
 const LONG_TASK_MS = 50;
 let failed = false;
-for (const zoom of [1.2, 2.5, 4, 6, 10]) {
+for (const zoom of [1.2, 2.5, 4, 6, 10, 20]) {
   const o = stat(await pan(zoom));
   const ok = o.avg <= OVERLAY_AVG_MS && o.p95 <= OVERLAY_P95_MS;
   if (!ok) failed = true;
@@ -106,12 +105,11 @@ const ANIM_SHARE = 0.9;
 if (animFrames < ANIM_SHARE) failed = true;
 console.log(`${animFrames >= ANIM_SHARE ? "PASS" : "FAIL"} animating overlay redrawn on ${(animFrames * 100).toFixed(0)}% of frames (budget ${ANIM_SHARE * 100}%)`);
 
-await shadeMap(true);
 
 // Ending turns: each day (or battle step) of the week as it plays, the engine
 // worker's answer, then taking it in on the main thread. Turns are played
 // first to warm up and are not timed, up to and past the first 1st of a month
-// (3 turns from 11 November 1444), so the monthly steps run once before any
+// (3 turns from the start), so the monthly steps run once before any
 // day is timed: the first run of a code path in the worker is far slower than
 // every later one, and that compile is not the turn the budget is about. CI runners share their CPUs, so a single
 // stalled day can break a budget that every other day meets by far. On CI the
@@ -122,10 +120,26 @@ await shadeMap(true);
 // the 90th percentile): two stalled days pass, while a real regression slows
 // most days and still fails. When an attempt fails, three more turns are
 // played as a fresh attempt, up to three attempts; one must meet every budget.
+// The week stops for an event or a revolution until the player answers (EVT-044,
+// REVO-091), as France's choice of pope does in October 1378: the first
+// option is taken, as a player would, and the week plays on. It also waits at a
+// battle of the player's (feedback 73), as at France's first battle in November
+// 1378 since lords lead their own retinues: End turn plays on, as a player would.
 const playTurns = async (n) => {
   for (let i = 0; i < n; i++) {
     await page.click(".end-turn");
-    await page.waitForFunction(() => !document.querySelector(".end-turn").classList.contains("playing"), null, { timeout: 60000 });
+    await page.waitForFunction(
+      () => {
+        const choice = document.querySelector("[data-event-option], [data-revolution-stance]");
+        if (choice && !choice.closest("[hidden]")) choice.click();
+        // A battle of the player's holds the week too (feedback 73): play on, as the player would.
+        const endTurn = document.querySelector(".end-turn");
+        if (endTurn.classList.contains("paused") && document.querySelector(".alert[data-battle]")) endTurn.click();
+        return !document.querySelector(".end-turn").classList.contains("playing");
+      },
+      null,
+      { timeout: 60000, polling: 250 },
+    );
   }
 };
 await playTurns(3);

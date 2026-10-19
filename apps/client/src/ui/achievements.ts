@@ -1,6 +1,7 @@
 import { ACHIEVEMENTS, LIMITS, ladders, ladderState, lifetimeFacts, pointsOf, ruledOut, shownAs, testHolds, totalPoints, type AchievementDefinition, type Tier } from "@ph/engine/domain/achievements";
 import { ACHIEVEMENTS_NOT_YET, type AchievementUnlock, type Snapshot } from "@ph/engine";
 import { icon, type IconName } from "../art/ui.ts";
+import { START_DATE } from "@ph/rules/start";
 
 /**
  * Achievements on screen (domain/achievements "How the player uses it",
@@ -188,7 +189,7 @@ function ladderDetail(levels: AchievementDefinition[], p: DeviceProfile, s: Snap
 export function achievementsCard(p: DeviceProfile, s: Snapshot | null, filter: Filter, chosen: string | null, closeButtons: string): string {
   const all = ACHIEVEMENTS;
   const earnedList = all.filter((d) => d.id in p.unlocked);
-  const date = s ? isoOf(s.date) : "1444-11-11";
+  const date = s ? isoOf(s.date) : isoOf(START_DATE);
   const show = (d: AchievementDefinition) => (filter === "earned" ? d.id in p.unlocked : filter === "reach" ? !(d.id in p.unlocked) && !ACHIEVEMENTS_NOT_YET.has(d.id) && !ruledOut(d, date) : true);
   // A ladder shows while any level passes the filter: Within reach while a level is left, Earned once one is (ACH-086).
   const showTile = (t: Tile) => t.levels.some(show);

@@ -8,7 +8,8 @@
     "test": "vitest run",
     "campaign": "node --experimental-strip-types src/cli.ts campaign",
     "breaker": "node --experimental-strip-types src/cli.ts breaker",
-    "strategies": "node --experimental-strip-types src/cli.ts strategies"
+    "strategies": "node --experimental-strip-types src/cli.ts strategies",
+    "history": "node --experimental-strip-types src/cli.ts history"
   },
   "dependencies": {
     "@ph/engine": "workspace:*",

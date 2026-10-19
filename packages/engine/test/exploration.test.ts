@@ -4,6 +4,7 @@ import { loadMapTiles } from "../src/node/mapTiles.ts";
 import { advance, applyNow, createWorld, LEDGER, LEDGER_LINES, processTurn, type World } from "../src/index.ts";
 import { isPort, planVoyage, type NavyFleet } from "../src/navy.ts";
 import { chartAround, explorationUnlocked, isCharted } from "../src/exploration.ts";
+import { yearlyAgeCheck } from "../src/domain/events/index.ts";
 import { colonialOffice, explorationView, rangeZones, whyNotColony } from "../src/colonies.ts";
 import { STEPS_PER_DAY } from "../src/turn.ts";
 import { restoreExploration, saveExploration } from "../src/colonies.ts";
@@ -23,6 +24,13 @@ function fleetAt(w: World, owner: number, at: number, type = "caravel", count = 
     id: ++w.navy.seq,
     owner,
     at,
+    tile: -1,
+    path: [],
+    pathAt: 0,
+    legHours: 0,
+    goal: -1,
+    post: "admiral",
+    blockading: false,
     route: [],
     progress: 0,
     admiral: -1,
@@ -93,6 +101,9 @@ describe("exploration ships and voyages", { timeout: 30_000 }, () => {
     w.research[cherokee]!.known.add("S4");
     expect(explorationUnlocked(w, cherokee)).toBe(false);
     w.date = { ...w.date, year: 1520 };
+    expect(explorationUnlocked(w, cherokee)).toBe(false);
+    // The gate follows the tree's own ages: it opens when the Age of Atlantic Empires begins.
+    yearlyAgeCheck(w.events!.state, 1520);
     expect(explorationUnlocked(w, cherokee)).toBe(true);
   });
 

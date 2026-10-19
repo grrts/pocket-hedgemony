@@ -166,6 +166,68 @@ export function mapNames(zoom: Zoom, places: readonly NamedPlace[], selected: Na
 }
 
 // ---------------------------------------------------------------------------
+// Realm names that never overlap (VIEW-133)
+
+/** A realm name the map wants to write, in screen pixels. */
+export interface LabelAsk {
+  id: number;
+  /** Where it may sit, best first: its middle province, then its others nearest the middle. */
+  anchors: readonly (readonly [number, number])[];
+  /** The text's width and height at `size`, in whole pixels like the sizes it shrinks through. */
+  w: number;
+  h: number;
+  size: number;
+  /** The smallest size it may shrink to. */
+  minSize: number;
+}
+
+export interface LabelSpot {
+  id: number;
+  x: number;
+  y: number;
+  size: number;
+}
+
+/** How far a name shrinks at each step while it looks for room. */
+export const LABEL_SHRINK = 0.85;
+
+/**
+ * Places realm names so no two overlap (VIEW-133). Asks come first to last
+ * in priority (the player's realm, then the largest); each takes the first
+ * room it finds, at full size on any of its anchors, then a step smaller,
+ * down to its smallest size; a name with no room is left off.
+ */
+export function placeLabels(asks: readonly LabelAsk[], gap = 2): LabelSpot[] {
+  const CELL = 64;
+  const grid = new Map<number, [number, number, number, number][]>();
+  const key = (cx: number, cy: number) => cx * 65536 + cy;
+  const cells = (x0: number, y0: number, x1: number, y1: number, f: (k: number) => boolean | void): boolean => {
+    for (let cx = Math.floor(x0 / CELL); cx <= Math.floor(x1 / CELL); cx++)
+      for (let cy = Math.floor(y0 / CELL); cy <= Math.floor(y1 / CELL); cy++) if (f(key(cx, cy))) return true;
+    return false;
+  };
+  const free = (x0: number, y0: number, x1: number, y1: number) =>
+    !cells(x0, y0, x1, y1, (k) => grid.get(k)?.some((b) => x0 < b[2] && x1 > b[0] && y0 < b[3] && y1 > b[1]));
+  const out: LabelSpot[] = [];
+  for (const a of asks) {
+    const sizes: number[] = [];
+    for (let s = a.size; s > a.minSize; s = Math.floor(s * LABEL_SHRINK)) sizes.push(s);
+    sizes.push(Math.min(a.size, a.minSize));
+    found: for (const size of sizes) {
+      const hw = (a.w * size) / a.size / 2 + gap / 2, hh = (a.h * size) / a.size / 2 + gap / 2;
+      for (const [x, y] of a.anchors) {
+        const box: [number, number, number, number] = [x - hw, y - hh, x + hw, y + hh];
+        if (!free(...box)) continue;
+        cells(...box, (k) => void (grid.get(k) ?? grid.set(k, []).get(k)!).push(box));
+        out.push({ id: a.id, x, y, size });
+        break found;
+      }
+    }
+  }
+  return out;
+}
+
+// ---------------------------------------------------------------------------
 // Sea ice (VIEW-080..082, X-17)
 
 export type Rgb01 = readonly [number, number, number];

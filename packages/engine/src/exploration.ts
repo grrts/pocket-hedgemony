@@ -1,3 +1,4 @@
+import * as nv from "./domain/naval/index.ts";
 import * as ex from "./domain/exploration/index.ts";
 import { catalogueRecord, hasRecord } from "./domain/scenario-setup/catalogue.ts";
 import type { World } from "./world.ts";
@@ -46,6 +47,8 @@ export interface ColonyFounding {
   food: number;
   /** Progress made last month, for the card's "a month" figure. */
   lastChange: number;
+  /** Founded on land a tribe gave up: with the consent of the local people (TRIBE-024). */
+  consent?: boolean;
 }
 
 export interface ExplorationState {
@@ -129,7 +132,10 @@ export function chartFleets(world: World): void {
   for (const f of world.navy.fleets) {
     if (e.lastAt.get(f.id) === f.at) continue;
     e.lastAt.set(f.id, f.at);
-    const added = chartAround(world, f.owner, f.at);
+    let added = chartAround(world, f.owner, f.at);
+    // A viceroy's fleet charts a ring of zones further (NAVY-154).
+    const rings = f.admiral >= 0 ? (nv.postRow(f.post).chartRings ?? 1) : 1;
+    if (rings > 1) for (let k = world.adjStart[f.at]!; k < world.adjStart[f.at + 1]!; k++) if (world.provinceWater[world.adjList[k]!]) added += chartAround(world, f.owner, world.adjList[k]!);
     if (added) {
       const v = e.voyages.find((x) => x.fleet === f.id);
       if (v) v.charted += added;
@@ -158,17 +164,24 @@ export function seedRegions(world: World): void {
   });
 }
 
-/** Whether the age that opens exploration in a region has begun by this year (EXPL-002, EXPL-004). */
-export function ageGateOpen(region: string, year: number): boolean {
+/**
+ * Whether the age that opens exploration in a region has begun (EXPL-002, EXPL-004):
+ * the event tree's own age when it runs, which starts by its conditions (EXPL-076),
+ * else the age's forced start year.
+ */
+export function ageGateOpen(region: string, year: number, world?: World): boolean {
   const age = ex.gateAgeFor(region);
-  const start = age ? ex.regionData.ages[age]?.force_start : null;
+  if (!age) return false;
+  const s = world?.events?.state;
+  if (s) return s.world.ages.includes(age) || s.agesEnded.includes(age);
+  const start = ex.regionData.ages[age]?.force_start;
   return start !== null && start !== undefined && year >= start;
 }
 
 /** Outrigger voyaging or Carrack and caravel known, and the age begun in the realm's region (EXPL-001, D-EXPL-4). */
 export function explorationUnlocked(world: World, n: number): boolean {
   if (n < 0) return false;
-  return CFG.unlock_inventions.some((i) => knows(world, n, i)) && ageGateOpen(world.explore.region[n] ?? CFG.game.fallback_region, world.date.year);
+  return CFG.unlock_inventions.some((i) => knows(world, n, i)) && ageGateOpen(world.explore.region[n] ?? CFG.game.fallback_region, world.date.year, world);
 }
 
 /** Why realm n may not have exploration ships yet, or null. */

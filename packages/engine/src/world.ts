@@ -1,6 +1,7 @@
 import type { GameDate, Ground, Ruleset } from "@ph/rules";
+import type { WokenRealm } from "./sleeping.ts";
 import { groundOf, rowWidths, wagonRations, type MarchMap, type TileMarch } from "./march.ts";
-import { placeClimate, provinceTemperature, type PlaceClimate } from "./climate.ts";
+import { landTemperatures, placeClimate, type PlaceClimate } from "./climate.ts";
 import { pointTileGrid, type TileGrid } from "./tiles.ts";
 import { Rng } from "./rng.ts";
 import type { Diplomacy } from "./domain/diplomacy/index.ts";
@@ -13,7 +14,7 @@ import { byDistance, createLordState, seedLords, type LordState } from "./lords.
 import { mix, personName } from "./names.ts";
 import { realmConfig } from "./domain/realm/index.ts";
 import { createLivingState, seedClasses, type LivingState } from "./living.ts";
-import { addCommander, ARMS, armIndex, createRecruitState, recount, FOOT_ARMS, HORSE_ARMS, KIND, OFFICIALS, type FreeCompany, type Mercenary, type Muster, refreshFreeCompanies } from "./recruit.ts";
+import { addCommander, ARMS, armIndex, createRecruitState, recount, recountLordsMen, FOOT_ARMS, HORSE_ARMS, KIND, OFFICIALS, type FreeCompany, type Mercenary, type Muster, refreshFreeCompanies } from "./recruit.ts";
 import { seedOfficials } from "./officials.ts";
 import { createResearchState, seedResearch, withoutOf, type ResearchState } from "./research.ts";
 import { createWorksState, seedWorks, type WorksState } from "./works.ts";
@@ -22,11 +23,14 @@ import { createConversionState, type ConversionState } from "./conversion.ts";
 import { syncCountries } from "./statecraft.ts";
 import { createCastleFoodState, seedCastleStores, type CastleFoodState } from "./castleFood.ts";
 import { createGameEvents, type GameEvents } from "./events.ts";
+import type { EverydayState } from "./everyday.ts";
+import { createGoals, monthlyGoals, type GoalState } from "./goals.ts";
 import { createGameHeritage, type GameHeritage } from "./heritage.ts";
 import { createGovernmentState, seedGovernment, type GovernmentState } from "./government.ts";
 import { createTradeState, seedTrade, type TradeState } from "./trade.ts";
 import { createPeoplesState, seedPeoples, type PeoplesState } from "./peoples.ts";
 import { createRulerState, seedRulers, type RulerState } from "./rulers.ts";
+import { seedPeople } from "./people.ts";
 import { createFallenState, type FallenState } from "./fallen.ts";
 import { createBeliefState, readBeliefShares, type BeliefState } from "./belief.ts";
 import { createFaithHeadsState, seedFaithHeads, type FaithHeadsState } from "./faithHeads.ts";
@@ -38,8 +42,11 @@ import { seedStartingFleets } from "./startingFleets.ts";
 import { refreshFreeFleets } from "./hiredFleets.ts";
 import { createExplorationState, seedCharts, seedRegions, type ExplorationState } from "./exploration.ts";
 import { seedStartingPosts, seedStartingPurse } from "./startingCounts.ts";
+import { createCampaignEndState, seedCampaign, type CampaignEndState } from "./campaignEnd.ts";
 import type { AchievementLog } from "./achievements.ts";
 import { createInstitutionsState, seedInstitutions, type InstitutionsState } from "./institutions.ts";
+import { createTribesState, seedTribes, type TribesState } from "./tribes.ts";
+import { createPlagueState, type PlagueState } from "./plague.ts";
 
 /**
  * Simulation state stored as parallel typed arrays (one array per field,
@@ -47,7 +54,7 @@ import { createInstitutionsState, seedInstitutions, type InstitutionsState } fro
  * cache-friendly to iterate every turn and lets whole arrays be copied or
  * transferred to the UI thread without serialising objects.
  */
-export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState, RebelState, RevolutionState, PeoplesState, TradeState, RulerState, FallenState, BeliefState, InstitutionsState {
+export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState, RebelState, RevolutionState, PeoplesState, TradeState, RulerState, FallenState, BeliefState, InstitutionsState, TribesState, PlagueState {
   /** Heads of the faith: patrons, the Caliph, the conclave, censures (faithHeads.ts). */
   faithHeads: FaithHeadsState;
   /** Faiths a realm serves as the patron of their head while of another faith (RELG-145). */
@@ -93,6 +100,8 @@ export interface World extends LivingState, TreasuryState, FoodState, MoodState,
   nationTreasury: Float64Array;
   nationLevies: Float64Array;
   nationMaxLevies: Float64Array;
+  /** Men each realm's lords would bring if called now, by loyalty (WAR-252): part of how strong it looks. */
+  nationLordsMen: Float64Array;
   nationMonthlyIncome: Float64Array;
   /** Each realm's administrative capacity from the catalogue, 1 (very low) to 5 (very high), 0 unknown: how far its rule reaches (realmStrengths.ts). */
   nationAdminCapacity: Int8Array;
@@ -123,8 +132,12 @@ export interface World extends LivingState, TreasuryState, FoodState, MoodState,
   battleSeq: number;
   /** Peace the AI offers the player, waiting for an answer until the next month. */
   peaceOffers: PeaceOffer[];
-  /** 1 once a nation has lost all its land. */
+  /** 1 once a nation has lost all its land; a sleeping realm is gone too, so every system passes it by (SETUP-082). */
   nationGone: Uint8Array;
+  /** 1 for a sleeping realm that has not woken (SETUP-082). */
+  nationAsleep: Uint8Array;
+  /** Woken realms' names, colours and capitals, for saves and the client (SETUP-091). */
+  woken: WokenRealm[];
 
   /** Men who can be called in each province now (recruiting: Recruits here), and the most there can be. */
   provinceRecruits: Float32Array;
@@ -148,8 +161,12 @@ export interface World extends LivingState, TreasuryState, FoodState, MoodState,
   provinceOfficialSince: Int32Array;
   /** Realm a foreign specialist at each post came from, -1 = one of the realm's own (PROV-334). */
   provinceOfficialFrom: Int16Array;
+  /** Age of the official at each post, 0 = not drawn yet (people.ts officialAge, REALM-275). */
+  provinceOfficialAge: Uint8Array;
   /** 1 while a province the player has just taken waits for him to fill its post, grant it or keep it royal (PROV-340). */
   provinceNewLand: Uint8Array;
+  /** 1 where the player has turned Auto-fill posts off, so his realm's empty posts wait for him (PROV-342). */
+  nationManualPosts: Uint8Array;
   /** Province each commander was commissioned from, -1 = none. */
   commanderHome: number[];
   /** Name seed of each commander commissioned from an official, -1 = none. */
@@ -160,6 +177,12 @@ export interface World extends LivingState, TreasuryState, FoodState, MoodState,
   explore: ExplorationState;
   /** The event tree in play (milestone 6). */
   events?: GameEvents;
+  /** Everyday events (EVT-115): made on the first month that draws one. */
+  everyday?: EverydayState;
+  /** Realms' historical goals (EVT-100, goals.ts). */
+  goals?: GoalState;
+  /** Win scores, the end date and how the campaign ended (campaignEnd.ts). */
+  campaign: CampaignEndState;
   /** Every realm's heritage in play: birthright, heydays, ambitions, legacies and burden (HER-078). */
   heritage?: GameHeritage;
   /** The player's campaign as achievements see it (achievements.ts). */
@@ -195,7 +218,7 @@ export interface ArmyPool {
   battle: Int32Array;
   /** The province the army last marched in from (-1 = none): the way back past an enemy castle. */
   cameFrom: Int32Array;
-  /** Company kind: levy or hired (see KIND). */
+  /** Company kind: levy, hired or a lord's retinue (see KIND). */
   kind: Uint8Array;
   /** Province the men were levied from (-1 = none, as for a hired company): its people lose the army's dead (WAR-226). */
   home: Int32Array;
@@ -424,9 +447,10 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     nationCount: N,
     nationIds,
     nationIndex,
-    nationTreasury: new Float64Array(N).fill(rules.defines.economy.startingTreasury),
+    nationTreasury: Float64Array.from(rules.nations, (n) => (n.asleep ? 0 : rules.defines.economy.startingTreasury)),
     nationLevies: new Float64Array(N),
     nationMaxLevies: new Float64Array(N),
+    nationLordsMen: new Float64Array(N),
     nationMonthlyIncome: new Float64Array(N),
     nationAdminCapacity: Int8Array.from(nationIds, adminCapacityRank),
     commanderIds,
@@ -444,7 +468,11 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     battles: [],
     battleSeq: 0,
     peaceOffers: [],
-    nationGone: new Uint8Array(N),
+    // Sleeping realms are gone and asleep from the start: no turn, no land, nothing listed (SETUP-082).
+    nationGone: Uint8Array.from(rules.nations, (n) => (n.asleep ? 1 : 0)),
+    nationAsleep: Uint8Array.from(rules.nations, (n) => (n.asleep ? 1 : 0)),
+    woken: [],
+    campaign: createCampaignEndState(N, rules.defines.startDate),
     ...createRecruitState(P, N),
     ...createLivingState(P),
     ...createTreasuryState(P, N),
@@ -468,6 +496,8 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     ...createBeliefState(N),
     ...createFaithHeadsState(N),
     ...createInstitutionsState(),
+    ...createTribesState(P),
+    ...createPlagueState(P, seed),
   };
   world.diplomacy = createWarState(world);
   seedClasses(world);
@@ -499,12 +529,15 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   seedFaithHeads(world);
   // The Empire of 1444 reads the members' land and the Emperor's ruler (INST-010).
   seedInstitutions(world);
+  // Tribal realms walk their first hunting grounds; the form and the tongues are known by now (TRIBE-007).
+  seedTribes(world);
   readBeliefShares(world);
   recount(world);
 
   // Every nation starts with the men it had under arms in 1444 (a quarter of its troop cap where
   // the data has no figure), within its cap, spread over its land (REALM-196, REALM-197).
   rules.nations.forEach((n, i) => {
+    if (n.asleep) return;
     const cap = world.nationTroopCap[i]!;
     const total = Math.max(1000, Math.min(Math.floor(cap / 1000) * 1000, n.army ?? Math.round(cap / 4000) * 1000));
     const capital = provinceIndex.get(n.capital)!;
@@ -526,6 +559,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   seedRegions(world);
   seedCharts(world);
   recount(world);
+  recountLordsMen(world);
   refreshFreeCompanies(world);
   // The ledger is worked out from the start, so lenders and the treasury card know the realm's income.
   runLedger(world, false);
@@ -536,10 +570,17 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
 
   // The event tree starts with the campaign, so its first month costs no more than any other.
   world.events = createGameEvents(world);
+  // Realms' historical goals, shaken by the seed and the Events preset (EVT-101).
+  world.goals = createGoals(world);
+  monthlyGoals(world, false);
   // Heritage reads the tree's ages, so it starts after it: three ambitions drawn, the birthright in force.
   world.heritage = createGameHeritage(world);
   // Worked out again with heritage's tax in force, so lenders and the treasury card know the income the realm will have.
   runLedger(world, false);
+  // Lords, officials and commanders of 1444 get their ages (REALM-274).
+  seedPeople(world);
+  // The scores stand from the first day, for the country card (SHELL-162).
+  seedCampaign(world);
   return world;
 }
 
@@ -600,7 +641,7 @@ export function marchMap(world: World): MarchMap {
 
 /** Each province's sea-level temperature for today (the snow on its tiles slows marches). */
 export function updateWeather(world: World): void {
-  for (let p = 0; p < world.provinceCount; p++) if (!world.provinceWater[p]) world.provinceTemperature[p] = provinceTemperature(world.provincePlace[p]!, world.date);
+  landTemperatures(world.provincePlace, world.provinceWater, world.date, world.provinceTemperature);
 }
 
 /** The world's tiles as a march over them sees them today. */

@@ -37,6 +37,11 @@ contexts extend, and the data build that validates all of it.
 
 Newest decision first.
 
+0. `start-date/plan-1378.md` §5 and `start-date/research/europe-west.md` (goals with reasons), 19 Oct 2026: the
+   West's bridge events of 1378 to 1444 (EVT-085 to EVT-089, D-EVT-20).
+0. `start-date/plan-1378.md` §3.1 (18 Oct 2026, Leroy's choices of 18 and 19 Oct): the campaign starts on
+   20 September 1378; a new Age of Schism and Conquerors; Gunpowder Empires and Exploration start by their
+   conditions; the periods move and new ones cover 1378 to 1444 (EVT-081 to EVT-084, D-EVT-19).
 1. `planning/gap-lists.md` "Decisions already made" (16 Oct 2026): the game stops 31 August 1939; the event
    tree's Second World War events and its Decolonization, Cold War and Globalization ages are out of scope;
    item 24 (event tree fixes); item 20 (order of a turn).
@@ -86,6 +91,12 @@ Newest decision first.
 | Alternate history mode | Game rule preset: historical, plausible, divergent. | |
 | Agency share | (initiator + beneficiary + resister) / all role slots of a region. | |
 | prosperity, innovations, trade_hubs, notoriety, integration_strain | The tree's own names that replaced genre terms. | |
+| Historical goal | A realm's goal from history with its reason, window, weight and aim; ends when its reason does (EVT-100). | Event, war aim |
+| Aim (of a goal) | What the game reads from a goal: take, hold, subject, ally, fight, free, or none. | War aim (diplomacy) |
+| Pull | How strongly a live goal draws its realm, from its weight, shake, preset and time (EVT-102). | Standing |
+| Shake | The seed's change to a realm's goals at the start: weights vary, some goals deviate or drop (EVT-101). | |
+| Turning point | A historic event of the history checkpoints that the event tree holds (EVT-109). | |
+| Chronicle | The History tab of the News: the turning points and whether each is on course, bent or gone (EVT-112). | The old Chronicle tab of the Realm book (SHELL-169) |
 
 ## 4. Domain model
 
@@ -152,8 +163,8 @@ Newest decision first.
 
 ### 5.1 Campaign span
 
-- EVT-001 The game shall run events from 1444 to the campaign's end date, 31 August 1939 by default (one
-  setting). [gap-lists decisions]
+- EVT-001 The game shall run events from the campaign's start to its end date, 31 August 1939 by default (one
+  setting). [gap-lists decisions; plan-1378 §3.1]
 - EVT-002 When a campaign loads its events, the game shall drop every event whose history starts after
   31 August 1939 (59 in the current data: world_war_ii, holocaust, bengal_famine_1943, atomic_bombings and the
   events of cold_war_to_present, decolonization_1945_1994 and the post-1939 events of coverage_gaps) and shall
@@ -189,18 +200,20 @@ Newest decision first.
   starts at its `force_start` and ends at its `force_end` regardless, so a stalled game still advances.
   [ages.yaml header; README]
 - EVT-012 The game shall allow several ages to be active at once. [ages.yaml header]
-- EVT-013 The game shall run the 9 in-scope ages with these windows and forced dates: Gunpowder Empires (1444–
-  1760; force start 1444, force end 1760); Exploration (1444–1680; 1444, 1680); Reformations (1480–1700; 1530,
+- EVT-013 The game shall run the 10 in-scope ages with these windows and forced dates: Schism and Conquerors
+  (1378–1460; force start 1378, force end 1460); Gunpowder Empires (1420–1760; 1453, 1760); Exploration
+  (1415–1680; 1445, 1680); Reformations (1480–1700; 1530,
   1700); Atlantic Empires (1480–1880; 1520, 1880); Crisis and Absolutism (1590–1790; 1640, 1790); Revolutions
   (1750–1880; 1800, 1880); Industrialization (1700–1950; 1830, 1950); Imperialism (1800–1945; 1860, 1945);
-  World Wars (1890–1960; 1925, 1960), with their start and end conditions as in ages.yaml. [ages.yaml]
+  World Wars (1890–1960; 1925, 1960), with their start and end conditions as in ages.yaml. [ages.yaml;
+  plan-1378 §3.1; D-EVT-19]
 - EVT-014 The game shall list each age's regions, so systems that read "the age has begun in your region"
   (exploration, national strengths, music) can use them. [ages.yaml; exploration §2]
 
 ### 5.4 Periods
 
 - EVT-015 The game shall make a period active when its start condition holds inside its window (`start:
-  initial` = active at the 1444 start) and end it when its end condition holds, so a period can start early,
+  initial` = active at the campaign's start when the start lies inside its window) and end it when its end condition holds, so a period can start early,
   late or never. [periods.yaml header]
 - EVT-016 The game shall derive each period's and each age's event list from the events' own `periods` and
   `ages` fields. [periods.yaml header; ages.yaml header]
@@ -228,7 +241,9 @@ Newest decision first.
   opinion, stat, rank, government, religion, religion_share, culture_group, innovation, ideology, tech,
   colonial_presence, trade_presence, rebels_active, subject_count, event, event_active, period_active,
   age_active, flag, any_country, all_countries, count_countries) with logic all, any, not, at_least.
-  [vocabulary.yaml]
+  [vocabulary.yaml] Subjects adds `subject_loyalty {who, target, op, step}` (the more loyal step is the
+  higher: `>= wavering` is Loyal or Wavering), `subject_count … by_reach: true` (subjects weighed by their
+  reach weights, else a head count) and `relation … kind` (the subject bond's kind) (D-EVT-11, SUBJ-097).
 - EVT-026 The game shall resolve targets as `$role`, an entity id, `province:<id>`, `area:<id>`,
   `region:<id>`, `global`, or `this` inside any_country, all_countries and count_countries. [vocabulary.yaml]
 - EVT-027 The game shall have no condition that reads whether a country is played by a person: `is_human` is
@@ -292,7 +307,9 @@ Newest decision first.
 - EVT-046 The game shall apply only effect types declared in the vocabulary: modifier, stat, transfer,
   create_country, annex, vassalize, release, war, peace, casus_belli, relation, rebels, spread, population,
   move_population, set_flag, start_period, end_period, unlock, government, religion, trade_route, colony.
-  [vocabulary.yaml]
+  [vocabulary.yaml] Subjects adds `change_subject_kind {who, target, kind}` (a kind, or `tighten` /
+  `loosen`), `add_subject_reason {target, reason, months}` (a subjects reason id, its arrow from subjects
+  config) and `remove_subject_reason {target, reason}` (D-EVT-11, SUBJ-097).
 - EVT-047 The game shall apply a `stat` change as a one-off delta, `+n` / `-n` or `+n%` / `-n%`. [vocabulary.yaml]
 - EVT-048 When a `rebels` effect applies, the game shall start a rising in the target province at once (the
   event is a spark), taking its men from the province's recruit pool: small 1/8, medium 1/4, large 1/2, huge
@@ -385,7 +402,7 @@ The event tree now runs in the game's month for every realm (D-EVT-17). The libr
 a bridge shows it the game as the tree's own world, and lands what the game already simulates.
 
 - EVT-069 When a campaign starts, the game shall load the campaign's events (the tree's 247 events whose history
-  starts before the end date, no tutorial-only ones), every age, period and modifier, start the 1444 periods,
+  starts before the end date, no tutorial-only ones), every age, period and modifier, start the start's periods,
   and check the ages and periods of the start year at once. [EVT-002, EVT-011, EVT-015; D-EVT-17]
 - EVT-070 Each month, as the last of the month's work, the game shall show the tree every realm under its tree id
   (aliases where the map's id differs), whether it exists, its wars, alliances, subjects and truces, its land
@@ -408,6 +425,73 @@ a bridge shows it the game as the tree's own world, and lands what the game alre
 - EVT-075 The event tree's state (its world, ages and periods, what fired, events waiting for an answer, boosts
   and its dice) shall be kept in the save. [saves; D-EVT-17]
 
+- EVT-077 When a `create_country` effect fires, the game shall found the realm on the map (SETUP-083 to
+  SETUP-090): the realm's sleeping realm wakes, or a gone map realm wakes again; a realm the list does not hold
+  takes the first spare sleeper under the tree's name for it. With no `where` and realms named in `from`, those
+  realms form it (a union); with a `where`, it takes the map provinces of that place, only those the `from` realms
+  hold when it names them, and holds a truce with the realm it broke from; a place the map does not know yet
+  gives it its home land; `subject_of` makes it that realm's subject. With no land to give, nothing wakes and the
+  effect stays in the tree's world. [EVT-045; X-24; D-EVT-18]
+- EVT-078 The tree shall know a founded realm under the id the event gave it from then on, and a save shall keep
+  it. [EVT-075; SETUP-091; D-EVT-18]
+- EVT-079 The game shall show the tree each realm's region, so a `where: region:<id>` limit binds: the tree's
+  region for the realm where it has one, else that of the nearest realm it has one for; a founded realm takes the
+  region of whoever held its capital in 1444. A region holds the regions inside it (region:europe holds
+  region:germany). [EVT-030; D-EVT-18]
+- EVT-080 The map's Japan, Korea and Khmer shall be the tree's Ashikaga, Joseon and Cambodia, as the catalogue
+  has them, so the events written for them fire (the Ōnin War, the Imjin War). [D-EVT-17; D-EVT-18]
+
+### 5.16 Ages and periods from 1378 (milestone 10, 19 October 2026)
+
+The campaign is to start on 20 September 1378 (Leroy, 18 Oct; plan-1378). The ages and periods now run from that
+start, and a campaign that still starts in 1444 plays them as before: every age and period of 1444 is under way
+at a 1444 start, by its conditions rather than by its date.
+
+- EVT-081 The game shall run these periods from the start (periods.yaml):
+
+| Period | Window | Starts | Ends |
+|---|---|---|---|
+| Western Schism (new) | 1378–1418 | at the start | with its window (the Council of Constance's bridge event, later) |
+| Timur's conquests (new) | 1378–1405 | at the start | when Timur's realm is gone, or with its window (his death, 1405) |
+| Hundred Years' War, Caroline phase (new) | 1378–1396 | at the start | when England and France are no longer at war |
+| Hundred Years' War, Lancastrian phase (new) | 1399–1453 | when England and France are at war again after the Caroline phase | the end of the Hundred Years' War, or peace |
+| Ottoman Interregnum (new) | 1400–1420 | only if the Ottomans fall under Timur's realm, or are at war with it at stability −2 or worse | when they are free of it, at peace with it and at stability 0 or better |
+| Hussite wars (new) | 1415–1440 | when religious rebels rise in Bohemia | in 1436, or when the rebels are gone |
+| Ming treasure voyages (new) | 1403–1435 | when the Ming stand at stability +1 or better | in 1433, when the Ming fall to −1 or worse, or are gone |
+| Majapahit's decline (new) | 1389–1527 | while Majapahit stands (after Hayam Wuruk, 1389) | when Majapahit is gone |
+| Ottoman expansion | 1378–1620 | at the start | as before |
+| Muscovite consolidation | 1378–1620 | at the start | as before |
+| Southeast Asian mainland and maritime states | 1378–1700 | at the start | as before |
+| Timurid fragmentation | 1400–1540 | once Timur's conquests are over | as before |
+| Late Ming | 1424–1650 | after Yongle, once the treasure voyages are over | as before |
+| Songhai and the Sahel | 1378–1640 | when Songhai stands on its own | as before |
+| Aztec and Inca expansion | 1428–1580 | when the Triple Alliance or the Inca stand | as before |
+| Portuguese oceanic expansion | 1415–1640 | when the Age of Exploration is under way and Portugal stands | as before |
+
+  The new periods belong to the Age of Schism and Conquerors; the periods under way from the start belong to it
+  as well as to their later ages. Where a new period's history turns on an event of 1378 to 1444 (Constance,
+  Timur's death, Ankara, the Defenestration, the voyages), that bridge event will start or end it by
+  `start_period` and `end_period` (EVT-017); until those events are written, the period runs by the conditions
+  above. @placeholder [plan-1378 §3.1, §5; D-EVT-19]
+- EVT-082 The game shall start the Age of Schism and Conquerors at the start, in every region, and end it once the
+  Western Schism is over, the Council of Basel is over (1449 until its bridge event is written) and Constantinople
+  has fallen or Byzantium is gone. Gunpowder Empires shall start from 1420 when 3 of the 8 great powers (EVT-083)
+  know bombards, or when Constantinople falls. Exploration shall start from 1415 when Portugal or Castile knows the
+  ocean ships or holds the Atlantic islands (the engine's `atlantic_island_bases` flag); the Ceuta and island
+  bridge events add to this later. A world that moves fast starts them early, a slow one waits for their forced
+  years. @placeholder [plan-1378 §3.1; D-EVT-19]
+- EVT-083 The bridge shall show the tree, each month, the innovations a realm has adopted as including the research
+  inventions it knows, by the table `innovations_from_research` (bombards: W3 Bombards, gunpowder_infantry: W5,
+  ocean_navigation: S4 Carrack and caravel, printing: L5, humanist_learning: L6), and its `great_power_score` as
+  the number of provinces it holds, so the 8 great powers are the 8 realms with the most provinces, as music and
+  diplomacy count them (D-AUD-2). [D-EVT-19; D-EVT-17]
+
+#### How the player uses it
+- EVT-084 Nothing new is tapped: an age or a period that starts shows as before, in the News and in the systems
+  that read it (exploration, national strengths, music). From the 1378 start the Age of Schism and Conquerors is
+  under way on the first day, so it brings no stinger (AUD-033 keeps its nine). The Chronicle card, the overview
+  of history from 1378, comes with the bridge events (plan-1378 §4.6). [X-19; plan-1378 §3.1]
+
 #### How the player uses it: the event card
 - EVT-076 Where: when an event fires for the player, the week pauses and the event card opens over the map,
   one event at a time, oldest first (SHELL-080). The card shows the event's name, the year it happened in
@@ -421,6 +505,254 @@ a bridge shows it the game as the tree's own world, and lands what the game alre
   waiting events sit at the top of the News with an *Answer* button. Phone: the card is a sheet over the
   map in the Wide and Tall layouts, inside the safe areas, its text scrolling while the options stay in reach,
   every button at least 44 points high, nothing that needs hover. [X-19, SHELL-070, SHELL-080, SHELL-081]
+
+### 5.17 Bridge events of the West, 1378 to 1444 (milestone 10, step 6, 19 October 2026)
+
+History from the 1378 start to 1444 reaches the West as events (plan-1378 §5, rows Church, Empire, France and
+England, Iberia and Italy). Like every event they are conditional and mostly `approximate`: likeliest near their
+history year when their conditions hold, never forced by the date (EVT-004, EVT-019, plan-1378 §2).
+
+- EVT-085 The game shall join each region's bridge file (`events-bridge-<region>.json`: its events, the places they
+  name with their map provinces, entity names and words) to the campaign's events when a campaign loads. A bridge
+  event with the id of a campaign event replaces it, which is how a 1444 event is re-dated (EVT-089). [plan-1378 §5;
+  D-EVT-20]
+- EVT-086 The bridge shall show the tree, each month, three more things of each realm: its state faith as the tree
+  first meets it (an event's change of faith is the tree's own after), its ruler's age and years on the throne as
+  the statistics `ruler_age` and `ruler_years` (0 through a new ruler's first year), and these flags: `regency`
+  while a regent rules for a child, `emperor` on the realm whose ruler holds the Empire, `empire_member` on each
+  member. So "the king has died", "a child is king" and "the Emperor" are conditions an event can read.
+  [D-EVT-20; REALM-100; INST-010]
+- EVT-087 When a campaign starts, the game shall count every bridge event whose history date lies before the start
+  as having happened, with its historical option and holders, and shall not apply its effects again (the start's
+  own data shows them). A date of a year alone counts as under way all that year. So a 1444 campaign plays as
+  before, and an event that needs a bridge event (EVT-089) can still follow there; a 1378 campaign has none of them
+  yet. [D-EVT-20]
+- EVT-088 The game shall run the West's 54 bridge events (`events-bridge-west.json`; ★ marks the 18 turning points
+  the history check will watch):
+
+| Region | Events (history year) |
+|---|---|
+| Church | France declares for Clement ★ (1378), A realm chooses its Pope ★ (1378–87, once for each Catholic realm of Europe: Rome, Avignon or neutral, leaning by its ties to France and England), Urban deposes Joanna (1380), Wyclif and the Lollards (1382), Council of Pisa (1409), Council of Constance ★ (1414, ends the Western Schism), Hus burned (1415), Defenestration of Prague ★ (1419, starts the Hussite wars), Council of Basel (1431), Union of Florence (1439) |
+| Empire | Wenceslaus succeeds Charles IV ★ (1378), Neuberg partition (1379), Battle of Sempach (1386), Battle of Näfels (1388), Swabian City War (1388), Deposition of Wenceslaus ★ (1400), Rupert's Italian venture (1401), Sigismund King of the Romans (1410), Brandenburg to the Hohenzollerns (1415, a union under Brandenburg), Saxony to the Wettins (1423, Saxony annexes Saxe-Wittenberg), Hussite crusades ★ (1420–31), Albert of Austria takes three crowns (1438, unions of Hungary and Bohemia), Frederick III (1440) |
+| France and England | Brittany confiscated (1378), The uncles' regency (1380), Peasants' Revolt ★ (1381), Madness of Charles VI (1392), Richard II deposed ★ (1399), Murder of Orléans (1407), Armagnac–Burgundian war (1411), Cabochien revolt (1413), Agincourt ★ (1415, Normandy passes to England two years on if the war goes on), Treaty of Troyes ★ (1420, Paris to England), Joan of Arc ★ (1429), Congress of Arras ★ (1435, Paris back to France a year on), Écorcheurs (1435) |
+| Iberia | Portuguese crisis ★ (1383), Aljubarrota ★ (1385), Lancaster's claim to Castile (1386), Compromise of Caspe (1412), Conquest of Ceuta ★ (1415), Madeira and the Azores (1420, sets `atlantic_island_bases`, so the Age of Exploration can start), Past Cape Bojador (1434), Alfonso V takes Naples (1435, a union under Aragon) |
+| Italy | War of Chioggia ★ (1378), Peace of Turin (1381), Charles of Durazzo takes Naples (1381), Gian Galeazzo seizes Milan ★ (1385, Pavia annexes Milan), Milan made a duchy (1395), Death of Gian Galeazzo (1402), Florence takes Pisa (1406), Ladislaus marches on Rome (1408), Lombard wars (1425, Brescia to Venice), Sforza weds the duke's daughter (1441) |
+
+  The events chain by their conditions and follow-ups: the obedience each realm chooses is a flag Urban's and
+  Pisa's events read, the madness opens the princes' feud that Orléans's murder, the civil war, Agincourt and
+  Troyes follow, Ceuta leads to the islands and the islands to Bojador. Durazzo's and Alfonso's events give the
+  `claim_on_naples` and Sforza's the `claim_on_milan` the Italian Wars read. A `rebels` effect is a spark in each
+  aggrieved province of the realm or place it names (EVT-048, REBL-010). Effects the game does not simulate yet
+  (prestige, casus belli, relations other than subjects) stay in the tree's world, where later events read them
+  (EVT-073). @placeholder [plan-1378 §5; europe-west.md goals; D-EVT-20]
+- EVT-089 The game shall run these 1444 events from the 1378 start, re-dated (the same events otherwise):
+  `end_of_hundred_years_war` from 1420, needing Agincourt or Troyes first; `wars_of_the_roses` from 1430, needing
+  Richard II's deposition; `union_of_castile_and_aragon` from 1415, needing the Compromise of Caspe;
+  `fall_of_granada` and `alhambra_decree` from 1400; `printing_press_spreads` from 1440. The West's other events with
+  `earliest: 1444` keep it, because their history needs what the bridge period builds first: `castile_portugal_union`
+  (the war of 1475 over a Castilian succession), `columbus_first_voyage`, `portuguese_cape_route`,
+  `treaty_of_tordesillas` and `portuguese_elmina` (ocean reach after Bojador). [plan-1378 §5; D-EVT-20]
+
+#### How the player uses it: the bridge events
+- Where: nothing new is built. A bridge event for the player's realm opens the event card over the map like any
+  other (EVT-076): its name, its history year, what happened then, and its options as 44-point buttons with their
+  effects in words, the historical one marked *As in history*. Playing France in 1378, the first card is *France
+  declares for Clement*; playing Castile, *A realm chooses its Pope* asks Rome, Avignon or neutral. Grouping and
+  overview: one card per event; the News keeps a line for each that fired, so the run of history from 1378 reads
+  there, and the Chronicle card (plan-1378 §4.6) will show the turning points on course, bent or gone. Phone: the
+  card's Wide and Tall sheets, safe areas and 44-point buttons, nothing that needs hover (EVT-076). [X-19]
+
+### 5.18 Bridge events of 1378 to 1444: the East (milestone 10, step 6)
+
+The East's bridge events live in `events-bridge-east.json`, written by `tools/domain-data/build_bridge_east.py`:
+North and East (Kulikovo to Grunwald and the Muscovite war of succession), the Ottomans and the Balkans (John V
+restored to the Crusade of Varna), the steppe and Iran (Tokhtamysh to Abu'l-Khayr's Uzbeks) and the Mamluks and
+the Horn of Africa (Barquq to Zara Yaqob). Timur in India is the South file's `sack_of_delhi`.
+
+- EVT-090 The East's bridge events shall all belong to the Age of Schism and Conquerors, none shall be
+  `mandatory`, and most shall be `approximate`, so each is likeliest near its history year while its
+  conditions hold and none is forced by its date. Its turning points (★ in plan-1378 §5) shall be among them:
+  Kulikovo, Tokhtamysh burns Moscow, the Union of Krewo, Grunwald, Kosovo, Nikopolis, Ankara, the Crusade of
+  Varna, Tokhtamysh unites the Horde, Timur's three-year and five-year campaigns, the Terek, the death of Timur,
+  and the Khanates of Kazan and Crimea. [plan-1378 §2, §5; D-EVT-21]
+- EVT-091 Every East bridge event shall pass the tree's build checks (EVT-062) together with the campaign's
+  events, shall name realms by their tree ids (`ottoman`, `mamluk`, `timurid_empire`, `golden_horde`), and shall
+  name only places that its file or `events-places.json` maps to provinces. [EVT-057, EVT-062; D-EVT-17;
+  D-EVT-21]
+- EVT-092 The campaign events of the East that waited only for the year 1444 shall be copied into the East file
+  with an earlier `earliest` and nothing else changed: the fall of Constantinople (1390), Mohács (1400), the
+  Union of Lublin (1386), the Ottoman conquest of the Mamluks (1400), the conquest of Kazan (1438), the Kazakh
+  khanate (1428) and the Shaybanid conquest of Transoxiana (1428); a bridge event replaces the campaign event of
+  the same id. [plan-1378 §5; D-EVT-21]
+- EVT-093 The Crusade of Varna shall be a bridge event like the others: open from 1425 to 1465, likeliest
+  in 1444, it fires when a realm on the Ottoman border is at war with the Ottomans or has just made the Long
+  Campaign, and not once the Ottomans hold Constantinople. [plan-1378 §5; D-EVT-21]
+
+#### How the player uses it
+- EVT-094 Nothing new is tapped: an East bridge event that fires for the player opens the event card
+  (EVT-076) with its name, its history year, its summary and two or three options, one marked *As in
+  history*; every one has its name, summary and option labels in the localization. Grouping and overview: each
+  event is one card, and the News keeps the line; the Chronicle card (plan-1378 §4.6) is the overview of the
+  bridge events and comes with the history check. Phone: as EVT-076. [X-19; EVT-061, EVT-076]
+
+### 5.20 Realms' historical goals (milestone 10, 19 October 2026)
+
+History is a reference, not a script, and realms follow its normal course because each pursues the goals it really
+had, for the reasons it had them (Leroy, 18 Oct; X-25; plan-1378 §2). A goal ends when its reason does. The AI
+weighs goals like any other wish and never above what it can afford.
+
+- EVT-100 The scenario shall give realms historical goals (`scenarios/<id>/regions/<key>/goals.json`), each with its
+  realm, the goal, its reason and when it ends in words, a window of years, a weight (weak, normal or strong), a
+  plausible alternative in words, an **aim** the game can read or none, optionally the alternative as an aim, and
+  the turning points it leads toward (the history checkpoints' event keys). The aims are **take** (hold these
+  places), **hold** (keep these places), **subject** (make that realm a subject), **ally** (an alliance or a
+  marriage with that realm), **fight** (beat that realm in war) and **free** (throw off that realm's overlordship).
+  A place is a point bound to the nearest land province, as heritage binds its places (D-HER-16). A goal with no aim
+  is shown and never weighed. A goal of a realm that is not on the map waits until that realm wakes. [plan-1378 §2,
+  §4.1; X-25]
+- EVT-101 At the start of each campaign the game shall shake every realm's goals with the campaign's seed: each
+  goal's weight is multiplied by a factor drawn between `goals.shake_low` (0.5) and `goals.shake_high` (1.5); a
+  share of the goals deviates by the Events preset (`goals.deviate_share`: Historical 10 %, Plausible 25 %, Free
+  50 %), a goal with an alternative aim taking it and one without being dropped; then every weight is multiplied
+  by the preset's `goals.preset_mult` (×1.5, ×1, ×0.5). Every realm's goals differ from one campaign to the next,
+  while the big picture usually holds. @placeholder [plan-1378 §2; EVT-035, EVT-036]
+- EVT-102 A goal's pull shall be its weight word's number (`goals.weights`: weak 0.5, normal 1, strong 2) times its
+  shake and preset factors, times its time factor: 1 inside its window, rising from 0 over `goals.lead_years` (5)
+  before it, and fading to 0 over `goals.lapse_years` (10) after it, when the goal has lapsed; a window with no last year stays open. @placeholder
+  [plan-1378 §2: "while its reason holds and its time is near"]
+- EVT-103 The game shall end a goal, each month, when its reason ends: a take goal when its realm holds all its
+  places (achieved); a hold goal when its realm has lost one of them (lost); a subject goal when the target is its
+  realm's subject, an ally goal when the two are allied, and a free goal when its realm is no longer the target's
+  subject (achieved); a fight goal when its realm has taken land from the target since the start (achieved); a subject, ally, fight
+  or free goal when its target is gone (gone); and every goal of a realm that is gone. An ended goal never comes
+  back. [plan-1378 §2: "the goal ends if its reason ends"]
+- EVT-104 A realm's pull toward another realm shall be the sum of the pulls of its live goals aimed at it: a take
+  goal at the holder of any of its places, a subject or fight goal at its target. [plan-1378 §2]
+- EVT-105 An AI realm at peace shall multiply its monthly chance of looking for a war (WAR-228) by 1 +
+  `goals.war_chance_per_pull` (1) × its greatest pull toward a neighbour, and pick its target among the neighbours
+  that pass the price of war with weight 1 + `goals.target_weight_per_pull` (4) × its pull toward each. A goal never
+  lets a war past the price of war: a weak realm does not march however strong its goal. When the target holds a
+  place of one of its take goals, its demand before war (DIPL-180) asks for that province first, and a Take land aim
+  it holds on that province is the war's aim. @placeholder [plan-1378 §2; WAR-228; DIPL-180]
+- EVT-106 An AI realm sending an envoy shall weigh, besides its warmest neighbour, the targets of its live ally
+  goals (propose an alliance, arrange a marriage) and subject goals (offer overlordship), adding
+  `goals.envoy_points_per_pull` (10) × the goal's pull to the count of that ask; every other reason of the count
+  still counts (DIPL-223), and the envoy goes only when the total is above 0. @placeholder [plan-1378 §2; DIPL-223]
+- EVT-107 The player's realm is never steered: its goals weigh nothing the player does, and the game never acts on
+  them for the player. [plan-1378 §2; X-25]
+- EVT-108 A save shall keep every goal's state: its shaken weight, whether it deviated or was dropped, and whether
+  and how it ended. [SAVE]
+
+### 5.21 The Chronicle (milestone 10, 19 October 2026)
+
+The Chronicle is the overview of history: the turning points that have happened, those realms' goals are heading
+toward, and whether each is on course, bent or gone (plan-1378 §4.6).
+
+- EVT-109 The Chronicle shall list the historic turning points of the history checkpoints (each checkpoint's events
+  since the previous one, with key, name and date) that the event tree holds, by the checkpoint's `event_tree_id` or
+  an event whose id is the key. [plan-1378 §2, §4.6]
+- EVT-110 The Chronicle shall give each turning point one state:
+  - **Happened** when its event has fired, with the year; *as in history* within `chronicle.on_course_years` (10)
+    of its history year, else *early* or *late*;
+  - **Gone** when it can no longer happen: its event is invalidated, past its latest year, or an event exclusive
+    with it has fired;
+  - **Bent** when it has not happened more than `chronicle.on_course_years` after its history year, or when goals
+    lead toward it and none of them is still live with its own aim (each deviated, was dropped, lapsed, was lost
+    or lost its realm);
+  - **On course** otherwise.
+  @placeholder [plan-1378 §4.6]
+- EVT-111 The Chronicle shall show *Ahead* the turning points not yet happened whose history year is at most
+  `chronicle.horizon_years` (25) away, and those Bent or Gone whose history year passed within the same span, each
+  with the realms whose live goals lead toward it and those goals; and *Happened* the ones that fired, newest
+  first. [plan-1378 §4.6]
+
+#### How the player uses it: the Chronicle and realms' aims
+- EVT-112 Where: the News (SHELL-147) has a third tab, **History**, beside *All* (was *Everything*) and *Your realm*, in one row: the
+  Chronicle card. Its first line counts the turning points ahead by state ("On course 9 · Bent 2 · Gone 1"), so
+  history's course reads at a glance; under it *Ahead*, soonest first, then *Happened*, newest first. Each row is
+  one 44-point line with the turning point's name, its history year, and its state as a word with an icon (never
+  colour alone); a tap opens the row to show who is heading there, each realm as a button that opens its card,
+  with the goal and its reason ("Ottomans: Break Lazar's Serbia, because Lazar's coalition blocks the road
+  north"). Grouping: everything about history's course is on this one card; the event card and the News lines
+  stay as they are (EVT-076). Overview: the Chronicle card is the overview of history. [X-19; plan-1378 §4.6]
+- EVT-113 Another realm's General tab shall hold an **Aims** fold, its line counting the realm's live goals
+  ("Aims · 3"), each goal with its reason, its window and its target as a button; the player's own goals are shown
+  only if the player opens the closed *History's plan for your realm* fold at the foot of the History tab, as hints
+  that nothing enforces. [plan-1378 §2: "Other realms' goals show on their realm card"; X-19]
+- EVT-114 Phone: on a phone held sideways the News is the side panel (Wide) or the lower sheet (Tall); the History
+  tab scrolls down, never sideways; every row, fold line and realm button is at least 44 points tall inside the
+  safe areas; nothing needs hover. Checked with `apps/client/scripts/chronicle-shots.mjs` on a phone held sideways
+  and upright. [X-19; plan-1378 §4.6]
+
+### 5.22 Everyday events (feedback 152, 19 October 2026)
+
+The historical events give a realm a choice about once in three years (research/play-hook.md); everyday events
+add small ones about the realm's own people and stores, so something asks the player to choose every few months.
+Leroy (19 Oct): officials dying, children born, lords dying, things happening to lords and lords changing their
+opinion of you, and stores losing a big part of their grain; and not so many that play turns tedious. They are
+drawn from what the game already holds (officials, lords and their loyalty, the ruler and heir, the food stores),
+from `packages/rules/data/domain/events-everyday.json`, and stand beside the event tree: they are not tree events
+and do not count toward its pool (EVT-033). Every number is a placeholder for balance (D-EVT-22).
+
+- EVT-115 Each realm shall draw one everyday event every `months_between` months (3 to 6, rolled after each
+  draw), its first within `first_within_months` (4) of the start, so realms do not all draw in the same month.
+  @placeholder [feedback 152; D-EVT-22]
+- EVT-116 When a realm draws, the game shall pick by `weight` among the everyday events the realm could have now,
+  each bound to who and where it is about; a realm with nothing to bind draws nothing that month. The AI answers
+  at once by the options' `ai` weights; the player's waits on the event card (EVT-044). [feedback 152]
+- EVT-117 While an event, historical or everyday, waits for the player's answer, no new everyday event shall
+  come to the player; the draw waits a month at a time. A decision the player may take or leave (EVT-031) does not
+  hold one back. [Leroy, 19 Oct: "not too much, so the gameplay doesn't feel too tedious"]
+- EVT-118 Everyday events shall be: an official's death (a royal post with an official), a lord's death, a lord
+  slighted at court (Loyal or Wavering), a lord speaking well of you (Wavering or Disloyal), two lords quarrelling,
+  a lord hurt, a child born to the ruler (a ruler of an age to have children under a law of heirs by blood, with no
+  regent), the heir falling ill (an heir under the age of a child ruler), and grain lost from a province's store
+  (rot, fire, rats) where it holds at least `food.min_store_months` (3) months and `food.min_store` (2) thousand
+  months of food. A lord in revolt or with no land is never drawn. [feedback 152; REALM-088, REALM-089]
+- EVT-119 Every everyday event shall have two or three options, each with its effects shown in words, at least one
+  costing nothing. [EVT-039; feedback 152]
+- EVT-120 If an option costs more gold than the realm holds, or asks for a second lord the realm does not have,
+  then the game shall not offer it. [EVT-041]
+- EVT-121 The player's everyday events shall show on the event card with the realm's own story instead of a year
+  in history, marked *In your realm*. [EVT-076]
+- EVT-122 An official's death shall leave the post to a new man: the deputy, who starts at half the post's effect
+  (PROV-192); a seasoned man sent for, for gold, who keeps the post's years and so its effect; or a lord's kinsman,
+  who starts at half and makes that lord a step more loyal. [PROV-192; REALM-088 office at court]
+- EVT-123 A lord's death shall pass his lands to his son, as loyal as his father; the crown may ask a fee (gold,
+  the son a step less loyal, heavy taxes) or take the lands for the crown, making them royal land and every other
+  lord of the realm a step less loyal (land seized from another). [PROV-200, PROV-201; REALM-089]
+- EVT-124 A child born to a ruler with no heir shall be the heir. A feast costs gold and makes the two least loyal
+  lords a step more loyal; promising the child to a lord's house makes him a step more loyal (marriage into the
+  ruling house). [REALM-100 to REALM-107, REALM-088]
+- EVT-125 A lord's loyalty shall move a step by the realm's causes (REALM-088, REALM-089): a gift of gold, his want
+  granted, an office at court, marriage into the ruling house up; heavy taxes, land seized from him, grain
+  requisitioned, and the new *slighted at court* down. [REALM-088, REALM-089]
+- EVT-126 Grain lost from a store shall be gone when the event fires, whatever is chosen; buying grain (gold) or
+  requisitioning it from the province's lord, else another lord (a step less loyal), makes half of it good.
+  [feedback 152; PROV-104]
+- EVT-127 If the player trusts the sick heir to prayer, then the heir shall die with the chance the option shows
+  (3 in 10). [feedback 152]
+- EVT-128 The everyday events' state (each realm's next draw, the player's waiting events, the count and the dice)
+  shall be kept in the save; a save from before them starts the draws afresh. [EVT-075]
+
+- EVT-130 When plague reaches a province of the player's (PROV-359), an everyday event shall ask what to do, unless
+  one about plague already waits: *Close the province* (quarantine, PROV-357), *Send physicians and burn the sick
+  houses* (gold; `plague.care_death_cut` (0.5) fewer die there and its outbreak lasts the shortest time, one season),
+  or *Keep the roads open*. Plague fires it; it is never drawn and does not wait for EVT-117. @placeholder
+  [feedback 152; PROV-240 to PROV-242]
+
+#### How the player uses it: everyday events
+- EVT-129 Where: nothing new to find. An everyday event opens the same event card over the map and pauses the week
+  (EVT-076): its title names who or where ("Death of Gilles de Chabannes", "Grain rots at Creuse"), *In your
+  realm* in place of the history line, the story in one or two sentences, *Whatever you choose* for grain already
+  lost, and each option as a 44-point button with its cost and effect in words ("You: gold −25", "Charles de
+  Brézé: a step more loyal"). *Look at the map* folds the card into End turn and, for an event about a province,
+  opens that province. Grouping: every event is one card; lords, officials, the heir and stores stay on their own
+  cards, where the result shows (the lord's loyalty, the post's years, the heir on the General tab, the store on the
+  Land tab). Overview: the News keeps a line for each, with what was chosen, and the realm's Lords list and
+  Provinces list stay the overviews of loyalty and food. Phone: the card is the sheet it already is, in the Wide
+  and Tall layouts, inside the safe areas, options in reach, nothing that needs hover. Rate: about two or three a
+  year per realm, never stacking (EVT-117). [X-19; EVT-076]
 
 ## 6. Commands
 
@@ -493,6 +825,7 @@ before achievements and the autosave. The age and period checks run in the event
 | follow_ups.boost_decay_years | Linear fade after the window | 10 | yes | data/balance.yaml |
 | ai_factors | Named AI factors | 7 factors (EVT-042); high_unrest: more than 0.5 of provinces at 4+ grievances | yes | data/balance.yaml; events.json ai_factor_rules |
 | rebel_sizes | Share of the province's recruit pool that rises | small 0.125, medium 0.25, large 0.5, huge 1.0 | yes (provisional) | events.json |
+| innovations_from_research | Tree innovation → research invention the bridge reads it from (EVT-083) | bombards W3, gunpowder_infantry W5, ocean_navigation S4, printing L5, humanist_learning L6 | no | events.json |
 | stat_mapping | Event-tree statistic → concrete change (D-EVT-4) | province §15 table, country §11, trade v2, diplomacy 11 | food_security step size provisional | events.json |
 | derived_formulas | k_supply, good_base_yield, tech_economy_bonus, terrain_supply_mult | 1, 1, 0, 1 | yes (provisional) | events.json |
 | modifier_rules.default_stacking | Default stacking | refresh | yes | data/balance.yaml |
@@ -504,6 +837,16 @@ before achievements and the autosave. The age and period checks run in the event
 | campaign end date | Last day of the campaign | 31 August 1939 | no (a setting) | settings; events.json campaign.end_date |
 | per event `selection.mean_years`, `modifiers`, option `ai.base` | Per-event balance | per event | yes | data/events/*.yaml |
 | per modifier `changes`, `years` | Per-modifier magnitudes | per modifier | yes (design values) | data/modifiers.yaml |
+| goals.weights | A goal's pull by its weight word (EVT-102) | weak 0.5, normal 1, strong 2 | yes | events.json |
+| goals.shake_low, goals.shake_high | The seed's shake of each goal's weight (EVT-101) | 0.5, 1.5 | yes | events.json |
+| goals.deviate_share | Share of goals that deviate, by preset (EVT-101) | historical 0.10, plausible 0.25, divergent 0.50 | yes (plan-1378 §2 "provisional") | events.json |
+| goals.preset_mult | Goal weight by preset (EVT-101) | historical 1.5, plausible 1, divergent 0.5 | yes | events.json |
+| goals.lead_years, goals.lapse_years | How far before its window a goal pulls, and how long after (EVT-102) | 5, 10 | yes | events.json |
+| goals.war_chance_per_pull | Extra chance of looking for a war per pull (EVT-105) | 1 | yes | events.json |
+| goals.target_weight_per_pull | Weight of a neighbour as a war target per pull (EVT-105) | 4 | yes | events.json |
+| goals.envoy_points_per_pull | Count points of an envoy toward a goal's target per pull (EVT-106) | 10 | yes | events.json |
+| chronicle.on_course_years | Years from its history year a turning point is on course (EVT-110) | 10 | yes | events.json |
+| chronicle.horizon_years | Years ahead and behind the Chronicle shows (EVT-111) | 25 | yes | events.json |
 
 ## 11. Seams
 
@@ -533,6 +876,9 @@ before achievements and the autosave. The age and period checks run in the event
 
 ## 12. AI
 
+- Each realm weighs its historical goals (EVT-100 to EVT-106): a goal's pull raises how often it looks for a war,
+  which neighbour it picks and which province it asks for, and the count of an envoy toward an ally or a subject it
+  wants; it never lets a war past the price of war (WAR-228) nor an envoy past its count (DIPL-223).
 - The AI picks among options by base weight times named factors (EVT-042); historical options are multiplied
   by the preset's `historical_option_mult`.
 - A decision the AI leaves unanswered for 10 years lapses into the pool (EVT-032).
@@ -613,6 +959,57 @@ before achievements and the autosave. The age and period checks run in the event
   rest of the turn. Only land, gold, debt, legitimacy and stability land on the game in this slice (EVT-073); war,
   peace, subjects, rebels, buildings and people from events land when their bridges are built. Quick defaults so
   the game can play history now; each is replaced when its context lands.
+- **D-EVT-18** Founding events (Leroy, 18 Oct; X-24): a `create_country` founds the realm on the map through
+  the sleeping realms (EVT-077, EVT-078). The bridge also gives every realm a region, the tree's own or its
+  nearest neighbour's as a stand-in, and reads a region as holding the regions inside it, because before this no
+  `where: region:` limit could bind (EVT-079); and it aliases japan, korea and khmer to the catalogue's ashikaga,
+  joseon and cambodia (EVT-080). The tree's later "japan" and "korea" (Meiji Japan, the Korean Empire) are other
+  entities and are founded when their events say so.
+
+- **D-EVT-19** Ages and periods from 1378 (Leroy, 18 Oct; plan-1378 §3.1; milestone 10, step 4): a new age, the
+  Age of Schism and Conquerors, runs from the start to about 1460; Gunpowder Empires and Exploration start by
+  their conditions inside wider windows, forced on in 1453 and 1445; the eight periods that started `initial` in
+  1444 get a start in 1378 or a start condition, and eight new periods cover 1378 to 1444 (EVT-081, EVT-082).
+  The conditions are written so that a campaign that still starts in 1444 has every one of its ages and periods
+  under way as before: bombards among the great powers and Portugal's ocean ships hold at that start, and the
+  periods whose windows closed before 1444 never start. The tree cannot see research or provinces, so the bridge
+  shows it the inventions a realm knows as innovations (a new innovation, `bombards`, joins the tree's list) and
+  the great powers by provinces held (EVT-083). Exploration's gate reads the tree's own age when the tree runs
+  (EXPL-076). Conditions name only events the tree has; the bridge events of 1378 to 1444 will start and end
+  the new periods when they are written (plan-1378 step 6).
+- **D-EVT-22** Everyday events (feedback 152; integrator's picks under Leroy's rule of quick decisions, 19 Oct):
+  kept apart from the event tree in their own file and engine module, because they act on what the tree cannot
+  see (officials, lords, heirs, stores); they reuse the tree's card, News lines and AnswerEvent order. The rate
+  (one every 3 to 6 months, none while one waits) is set below the 2 to 4 months of the research so play stays
+  light, as Leroy asked; `months_between` tunes it. Effects use only what the game already has; one new loyalty
+  cause, *slighted at court*, joins the down list. Province disease is its own mechanic (province PROV-240 to
+  PROV-242) and comes in the next change. The deaths of officials and lords roll on their own for now; once the
+  shared ageing and death of people lands (the "Death across all people" work), they fire from it instead.
+
+- **D-EVT-21** The East's bridge events (milestone 10, step 6; integrator's picks, 19 Oct): 46 new events and 7
+  re-dated ones (EVT-090 to EVT-093). Realms go by tree ids, places by 1444 province ids in the file's own
+  `places`. The Horde union of east.md is Tokhtamysh's event: the Golden Horde absorbs the White Horde and Arab
+  Shah's Horde and keeps the id `golden_horde` (map `great_horde`). The Livonian and Prussian confederations and
+  Giskra's Upper Hungary come as events, not sleeping realms (decisions.md 5); Kazan, Crimea, the Uzbeks, Adal and
+  Galich wake by `create_country`. Ankara starts the Ottoman Interregnum and Mehmed I ends it; Timur's death ends
+  his conquests and opens the Timurid fragmentation (EVT-081). The Crusade of Varna keeps its id and opens in
+  1425, with the Long Campaign as its forerunner. Mamluk events are written from general scholarship (no
+  research file covers them), with confidence in each event's history block. Kalmar and Engelbrekt are the
+  West's; Timur in India is the South's `sack_of_delhi`.
+
+- **D-EVT-20** Bridge events of the West (plan-1378 §5; milestone 10, step 6; quick calls by the integrator under
+  Leroy's rule of quick decisions): each region keeps its own bridge file, joined to the campaign at load, so the
+  regions are written side by side (EVT-085). A bridge event before the start counts as history rather than being
+  dropped, so re-dated 1444 events can need one and still run from 1444 (EVT-087). The tree is shown the ruler's
+  age and years, the regency and the Emperor, so deaths, regencies and imperial politics are read from the game's
+  own rulers and Empire instead of from dates (EVT-086); a faith is seeded once, as the tree's `religion` effect
+  lands nowhere else yet. Choices: the Schism obedience is a flag on each realm, asked once per Catholic realm,
+  France first; the Visconti state after 1385 is whoever holds Milan's province (the role binds by `owns`), so the
+  realm Gian Galeazzo's coup leaves standing carries the later events; Ceuta (a port below map size) changes no
+  land; Madeira's settlement sets `atlantic_island_bases`, which already starts the Age of Exploration; the age of
+  Schism keeps 1449 as Basel's end. Tests run the events on today's map set back to 1378 until the 1378 map is
+  joined. Provisional. Effects stay small (prestige, legitimacy, a share of the treasury) where the game cannot
+  yet land the real thing.
 
 ## 14. Traceability
 
@@ -634,3 +1031,17 @@ before achievements and the autosave. The age and period checks run in the event
 | EVT-068 | effects.feature | The end of a tagged rising applies its tier |
 | EVT-069 … EVT-075 | — | Engine: packages/engine/test/events.test.ts (ages and periods at the start, the AI's Fall of Constantinople, the player's card and answer, the save) |
 | EVT-076 | — | Presentation: apps/client/src/ui/events.ts, the event card |
+| EVT-077 – 080 | founding.feature | Founding events wake sleeping realms; regions and aliases bind |
+| EVT-081 | ages-and-periods.feature | The periods under way at the 1378 start; Timur's death opens the Timurid fragmentation; the Lancastrian phase; the Ottoman Interregnum; from a 1444 start the periods that closed before it never start |
+| EVT-082 | ages-and-periods.feature | Forced dates; bombards among three great powers; two are not enough; the fall of Constantinople; Portugal's ocean ships; Exploration's window. Engine: packages/engine/test/events.test.ts |
+| EVT-083 | — | Engine: packages/engine/test/events.test.ts (without bombards or ocean ships the two ages wait) |
+| EVT-084 | — | Presentation: nothing new on screen |
+| EVT-085 – 089 | bridge-west.feature | A 1444 campaign already has the West's history; a 1378 campaign has none yet; France declares for Clement, then the realms choose; the tree sees a regent and the Emperor; Troyes gives Paris to England; the end of the Hundred Years' War needs the Lancastrian conquest. Engine: packages/engine/test/bridgeWest.test.ts (build checks, places and modifiers, the uncles' regency on the player's card, rebels as sparks) |
+| EVT-090 – 093 | bridge-east.feature | The East's bridge events and turning points; build checks, tree ids and places; the re-dated campaign events; the Crusade of Varna waits for a war on the Ottoman border |
+| EVT-094 | bridge-east.feature | Every East event reads on the card: name, summary, two or three options, one historical |
+| EVT-100 – 108 | historical-goals.feature | A goal ends with its reason; the seed shakes the goals; a goal's pull fades after its window; a goal draws the AI's war but not past its price; an ally goal sends an envoy; the player is never steered. Engine: packages/engine/test/goals.test.ts; data: packages/rules/test/goals-1378.test.ts |
+| EVT-109 – 111 | chronicle.feature | A turning point happened as in history; late; bent when its goals are gone; gone when invalidated. Engine: packages/engine/test/goals.test.ts |
+| EVT-112 – 114 | — | Presentation: apps/client/src/ui/chronicle.ts, the History tab and the Aims fold; apps/client/scripts/chronicle-shots.mjs |
+| EVT-115 – 128 | everyday.feature | A choice every few months; none while one waits; an official's death; an option the realm cannot pay; spoiled grain; a lord's death; a child born heirless. Engine: packages/engine/test/everyday.test.ts |
+| EVT-129 | — | Presentation: apps/client/src/ui/events.ts, the event card |
+| EVT-130 | — | Engine: packages/engine/test/everyday.test.ts (plague reaching the player's land opens one card) |

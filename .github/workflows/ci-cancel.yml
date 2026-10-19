@@ -1,0 +1,17 @@
+name: Cancel CI on close
+
+# Joins the PR's CI concurrency group (ci.yml) so its running run is
+# cancelled once the PR is merged or closed.
+on:
+  pull_request:
+    types: [closed]
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  cancel:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "PR closed; any CI run still going for it is cancelled."

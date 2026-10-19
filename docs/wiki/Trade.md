@@ -56,7 +56,7 @@ Land traders move by the same step-day rules as armies on [Troop Movement](Troop
 
 | Ship type | Hold | Purse | Upkeep while trading a month | Notes |
 |---|---|---|---|---|
-| Cog, junk, dhow | ×2 | 30 | 1 | The 1444 trade ship everywhere |
+| Cog, junk, dhow | ×2 | 30 | 1 | The trade ship everywhere at the start |
 | Merchant galley | ×2 | 25 | 2 | Enclosed seas only |
 | Caravel | ×1 | 20 | 1 | Small and fast; more explorer than trader |
 | Carrack | ×3 | 50 | 1.5 | Ocean-going |
@@ -236,9 +236,9 @@ T17 *Container shipping* is Era VIII and out of the game.
 - `trade_route(from_hub, to_hub, open)` makes a sea passage's zones known to a country for routes, or marks the link closed.
 - `trade_good` reads wares made. **Hubs** (Alexandria, Amsterdam, the Malacca Strait and 20 more) are named sets of provinces and sea zones used only by event triggers, never as route targets.
 
-### 1444 and the warm-up
+### The start and the warm-up
 
-Each country starts with traders by its catalogue trade access: very high 6, high 4, moderate 2, low 1, very low or unknown 0. Coastal countries with ports get trade ships, inland ones caravans or barges, in the proportion the catalogue's trade routes suggest. Starting routes are seeded from a hand-made list (Venice, Genoa, Lübeck, Florence, Mali and Timbuktu, Kilwa, Calicut and Gujarat, Malacca, Ryukyu). Before the first turn, the starting traders run for **24 months** so busy roads start busy. See [The 1444 Start](The-1444-Start).
+Each country starts with traders by its catalogue trade access: very high 6, high 4, moderate 2, low 1, very low or unknown 0. Coastal countries with ports get trade ships, inland ones caravans or barges, in the proportion the catalogue's trade routes suggest. Starting routes are seeded from a hand-made list (Venice, Genoa, Lübeck, Florence, Mali and Timbuktu, Kilwa, Calicut and Gujarat, Malacca, Ryukyu). Before the first turn, the starting traders run for **24 months** so busy roads start busy. See [The 1378 Start](The-1378-Start).
 
 ### The AI
 
@@ -281,11 +281,11 @@ Trade runs in the game as a first slice: traders you own walk there and back bet
 
 Where you find it:
 
-- **The Trade tab** of your realm card, next to Treasury: last month's deposits, fees and upkeep; your traders, best first, each with its route ("Paris → Lyon and back"), its days there and back, a purse bar, about what it brings a month, what it deposited last month and what is wrong, with **Route**, **Show** and **Dismiss**; **Found a trader** in each of your cities that can, one button per kind with its gold and upkeep (greyed with the reason when it can't); and your **busiest cities**.
+- **The Trade tab** of your realm card, next to Treasury: last month's deposits, fees and upkeep; your traders, best first, each with its route ("Paris → Lyon and back"), its days there and back, a purse bar, about what it brings a month, what it deposited last month and what is wrong, with **Route**, **Show** and **Dismiss**; then two folds you open with a tap: **Found a trader** (its line says how many cities can; it starts open while you have no trader), with one button per kind with its gold and upkeep in each city, greyed with the reason when it can't; and **Busiest cities** (its line names the busiest).
 - **Setting a route**: tap **Route** on a trader. The map switches to the Trade map mode and a bar along the bottom asks you to tap where it starts, then where it goes; a third city moves where it goes. You never draw the way: it is found through the most populated land and drawn on the map, with the preview (days there and back, provinces collected in, about how much a month, the best provinces). Then **Confirm** (or tap the end again), **Undo** or **Cancel**.
 - **The Trade map mode**: provinces coloured by trade ratio, what you don't see in parchment; zoomed in, your traders' ways there and back as dotted lines with each trader and its purse, and a coin on every trade stop.
 - **The province card** has a Trade line: value a month, ratio, traders passing and its top goods.
-- **The General tab** has one line, "Trade: N traders · +x gold a month", that opens the Trade tab.
+- **The Overview** of your Realm book has an Economy tile with your gold and gold a month; the Trade page sits beside Treasury and Food in the Economy section.
 
 Not yet: tolls, trade pacts and embargoes, bandits and capture on the road, lords' traders, ships other than the cog, copying a route and the "once" mode.
 
@@ -295,13 +295,13 @@ Not yet: tolls, trade pacts and embargoes, bandits and capture on the road, lord
 - [Buildings](Buildings): markets, caravanserais, warehouses, counting houses, banks, harbours, trading posts, craft buildings, rail stations and roads; trade gives back weights, served visits and the 30 % floor for crafts.
 - [Provinces](Provinces): wares made, food surplus, toll points and rates, customs officers, riots, rebels, homeless, quarantine, plague; trade gives back the ratio (and its tax), traders passing and trade value.
 - [Your Realm](Your-Realm): deposits, fees and tolls as trade income; founding gold and upkeep; traders replace merchants.
-- [Naval](Naval): ship types, sailors, ports and the 1444 port list, sea step days, pirates.
+- [Naval](Naval): ship types, sailors, ports and the port list, sea step days, pirates.
 - [Warfare](Warfare): war, armies, raids, sieges, hunting, escorts, blockades, storms, Open the roads, capture.
 - [Diplomacy](Diplomacy): trade pacts, embargoes, war and peace.
 - [Subjects](Subjects): tributary toll waivers, colony cities as deposit points (proposed).
 - [Research](Research): T and S inventions; trade partners for spread.
 - [Historical Events](Historical-Events): trade stats, hubs and the silver flood.
-- [The 1444 Start](The-1444-Start): starting traders and routes; the warm-up.
+- [The 1378 Start](The-1378-Start): starting traders and routes; the warm-up.
 - [National Strengths](National-Strengths): trader and toll levers; trade presence conditions.
 - [Rebellions](Rebellions): rebels holding provinces act as enemy armies.
 - [Map and Map Modes](Map-and-Lenses): Trade map modes, trader icons, road thickness.
@@ -349,7 +349,7 @@ Every trade number is a placeholder, all in the trade config file.
 ## How the open points were settled
 
 - **Founding**: you found a land trader in one of your cities with any market (a weekly market is enough), or in a trading post once you know T8. Its crew comes from the home province's job slots of its class; if there are too few people, founding is refused.
-- **Yearly fairs**: you need T6 to build a new yearly fair. Fairs that stand in 1444 stay, so everyone can found traders from the start.
+- **Yearly fairs**: you need T6 to build a new yearly fair. Fairs that stand at the start stay, so everyone can found traders from the start.
 - **Ships**: the caravel explores and cannot trade. Cogs, junks, dhows, galleys, carracks, galleons, fluyts and steamers can, and a trade ship pays its normal naval upkeep. A trade ship whose upkeep goes unpaid for 6 months is lost, like a caravan.
 - **Ratio modifiers add up**: customs officer +15 %, a road better than every neighbour's +10 %, 10 years of peace +10 %, riots −50 %, −5 % for each full 5 % of homeless over 5 %, event and heritage bonuses on top. The total never goes below no gain, and an enemy army or siege still stops gain that month.
 - **Buildings and heritage that add "traders passing"** (Djenné +20 %, Taj Mahal +30 %, heritage bonuses) add that percentage to ratio gain. A pilgrimage shrine counts as one more trader passing each month.

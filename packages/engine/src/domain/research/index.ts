@@ -8,13 +8,13 @@ import type { Rng } from "../../rng.ts";
  * Pure rules: state is plain data the caller owns; nothing here rolls dice.
  */
 
-/** An era a date falls in, from 1444 on. */
+/** An era a date falls in, from the start on (Era I runs from the start, 1378 at the earliest, to 1500). */
 export type Era = "I" | "II" | "III" | "IV" | "V" | "VI" | "VII" | "VIII";
-/** An era of the tree: the two before 1444, Ancient and Medieval (RSCH-091), then the dated eras. */
+/** An era of the tree: the two before the start, Ancient and Medieval (RSCH-091), then the dated eras. */
 export type TreeEra = "A" | "M" | Era;
 /** Every era of the tree, the past ones first. */
 export const TREE_ERAS: readonly TreeEra[] = config.eras as TreeEra[];
-/** The eras a date falls in, Era I (1444) on. */
+/** The eras a date falls in, Era I (from the start) on. */
 export const ERAS: readonly Era[] = TREE_ERAS.filter((e) => !config.past_eras.includes(e)) as Era[];
 
 export type SchoolType = keyof typeof config.school_seats;
@@ -168,10 +168,28 @@ export function eraCost(era: TreeEra): number {
   return config.era_cost[era];
 }
 
-/** Cost before discounts: era cost, doubled for each era ahead of the date (RSCH-031). */
-export function costBeforeDiscounts(era: TreeEra, date: Day): number {
+/**
+ * Era I pacing (RSCH-113): Era I's cost per invention scales by the share of
+ * Era I the campaign plays, the years from its start to Era II over the 56 of
+ * a 1444 start, never below 1. A 1444 start (or no start given) is ×1, a 1378
+ * start about ×2.18. Every other era is ×1.
+ */
+export function eraPace(era: TreeEra, startYear?: number): number {
+  const pace = config.era_pace;
+  if (startYear === undefined || era !== pace.era) return 1;
+  const next = TREE_ERAS[TREE_ERAS.indexOf(era) + 1]!;
+  return Math.max(1, (config.era_dates[next] - startYear) / pace.reference_years);
+}
+
+/** An era's cost for a campaign that started in startYear (RSCH-030, RSCH-113). */
+export function eraCostFor(era: TreeEra, startYear?: number): number {
+  return eraCost(era) * eraPace(era, startYear);
+}
+
+/** Cost before discounts: era cost (paced, RSCH-113), doubled for each era ahead of the date (RSCH-031). */
+export function costBeforeDiscounts(era: TreeEra, date: Day, startYear?: number): number {
   const ahead = Math.max(0, eraIndex(era) - eraIndex(eraOf(date)));
-  return eraCost(era) * config.ahead_multiplier ** ahead;
+  return eraCostFor(era, startYear) * config.ahead_multiplier ** ahead;
 }
 
 /** Spread discount in percent: 10 % per neighbour or trade partner who knows it, capped at 60 % (RSCH-034). */
@@ -179,10 +197,24 @@ export function spreadDiscountPct(partnersKnowing: number): number {
   return Math.min(config.spread_cap_pct, config.spread_per_partner_pct * Math.max(0, partnersKnowing));
 }
 
+/**
+ * Behind the times: an invention of an era before the date's costs 25 % less
+ * for each era it lies behind, at most 50 % off (RSCH-112).
+ */
+export function behindDiscountPct(era: TreeEra, date: Day): number {
+  const behind = Math.max(0, eraIndex(eraOf(date)) - eraIndex(era));
+  return Math.min(config.behind_discount_cap_pct, config.behind_discount_pct_per_era * behind);
+}
+
+/** The cost by era, then behind the times, then the spread; never under a fifth of the era cost (RSCH-112). */
+function discountedCost(era: TreeEra, date: Day, spreadOffPct: number, startYear?: number): number {
+  const behind = (costBeforeDiscounts(era, date, startYear) * (100 - behindDiscountPct(era, date))) / 100;
+  return Math.max(eraCostFor(era, startYear) * config.cost_floor_share, (behind * (100 - spreadOffPct)) / 100);
+}
+
 /** What studying an invention costs in scholar-years now. */
 export function studyCost(id: string, date: Day, partnersKnowing = 0, t: Tree = tree()): number {
-  const base = costBeforeDiscounts(invention(id, t).era, date);
-  return (base * (100 - spreadDiscountPct(partnersKnowing))) / 100;
+  return discountedCost(invention(id, t).era, date, spreadDiscountPct(partnersKnowing));
 }
 
 // ---------------------------------------------------------------- the programme
@@ -219,6 +251,8 @@ export interface Programme {
   queue: string[];
   /** The start group the realm belongs to (RSCH-098); regional contacts read it (RSCH-096). */
   group?: string;
+  /** The year the campaign started, for Era I pacing (RSCH-113); absent reads as a 1444 start. */
+  startYear?: number;
 }
 
 /** The recruit pool research draws on (owned by realm and province). */
@@ -345,9 +379,8 @@ export function spreadPerPartnerPct(p: Programme, t: Tree = tree()): number {
 
 /** What a study costs this country now, with its own spread inventions. */
 export function studyCostFor(p: Programme, id: string, date: Day, partnersKnowing = 0, t: Tree = tree()): number {
-  const base = costBeforeDiscounts(invention(id, t).era, date);
   const off = Math.min(config.spread_cap_pct, spreadPerPartnerPct(p, t) * Math.max(0, partnersKnowing));
-  return (base * (100 - off)) / 100;
+  return discountedCost(invention(id, t).era, date, off, p.startYear);
 }
 
 function addProgress(p: Programme, scholarYears: number, date: Day, partnersKnowing: Record<string, number>, t: Tree): string[] {
@@ -626,7 +659,7 @@ export function stealInWar(p: Programme, enemyKnows: ReadonlySet<string>, date: 
   const helped: string[] = [];
   for (const s of p.studies) {
     if (!enemyKnows.has(s.id)) continue;
-    s.progress += costBeforeDiscounts(invention(s.id, t).era, date) * config.steal_share_of_cost;
+    s.progress += costBeforeDiscounts(invention(s.id, t).era, date, p.startYear) * config.steal_share_of_cost;
     helped.push(s.id);
   }
   return helped;
@@ -663,8 +696,28 @@ interface StartGroup {
 }
 const startGroups = config.start_groups as Record<string, StartGroup>;
 
-/** The start group a map nation belongs to (RSCH-098), or undefined for one in none. */
-export function startGroupOf(nation: string): string | undefined {
+/**
+ * What differs for a campaign that starts on another date than 11 November
+ * 1444 (§5.11, RSCH-114): the groups its realms join, ids not yet on the map
+ * included, and what each realm knows more or less than its 1444 set.
+ */
+export interface StartBlock {
+  date: Day;
+  join: Record<string, string>;
+  add: Record<string, string[]>;
+  remove: Record<string, string[]>;
+}
+const startBlocks = config.starts as unknown as Record<string, StartBlock>;
+
+/** The start block of a campaign's start date, keyed by its year; none for 1444 (RSCH-114). */
+export function startBlockFor(start?: Day): StartBlock | undefined {
+  return start ? startBlocks[String(start.year)] : undefined;
+}
+
+/** The start group a map nation belongs to (RSCH-098), or undefined for one in none; a start block's joins come first (RSCH-114). */
+export function startGroupOf(nation: string, start?: Day): string | undefined {
+  const joined = startBlockFor(start)?.join[nation];
+  if (joined) return joined;
   for (const [g, def] of Object.entries(startGroups)) if (def.realms.includes(nation)) return g;
   return undefined;
 }
@@ -679,11 +732,12 @@ export function startGroupTable(): Record<string, StartGroup> {
  * its group's past inventions and Era I and II inventions, its own additions,
  * minus its own removals; nothing else (RSCH-098).
  */
-export function startingKnowledgeFor(nation: string, t: Tree = tree()): Set<string> {
+export function startingKnowledgeFor(nation: string, t: Tree = tree(), start?: Day): Set<string> {
   const known = startingKnowledge(t);
-  const group = startGroups[startGroupOf(nation) ?? ""];
-  const add = (config.start_add as Record<string, string[]>)[nation] ?? [];
-  const remove = new Set((config.start_remove as Record<string, string[]>)[nation] ?? []);
+  const block = startBlockFor(start);
+  const group = startGroups[startGroupOf(nation, start) ?? ""];
+  const add = [...((config.start_add as Record<string, string[]>)[nation] ?? []), ...(block?.add[nation] ?? [])];
+  const remove = new Set([...((config.start_remove as Record<string, string[]>)[nation] ?? []), ...(block?.remove[nation] ?? [])]);
   for (const id of [...(group?.past ?? []), ...(group?.inventions ?? []), ...add]) if (!remove.has(id) && t.inventions.has(id)) known.add(id);
   return known;
 }
@@ -706,18 +760,24 @@ export function startSetGaps(known: ReadonlySet<string>, t: Tree = tree()): { id
   return out;
 }
 
-/** A programme set up for a map nation at the start: its start group's knowledge and no study (RSCH-098). */
-export function startingProgramme(nation: string, t: Tree = tree()): Programme {
+/**
+ * A programme set up for a map nation at the start: its start group's
+ * knowledge and no study (RSCH-098). Given the campaign's start date, the
+ * start block of that date applies and Era I is paced to it (RSCH-113,
+ * RSCH-114); without one it is the 1444 start.
+ */
+export function startingProgramme(nation: string, t: Tree = tree(), start?: Day): Programme {
   const p = newProgramme(nation, t);
-  p.known = startingKnowledgeFor(nation, t);
-  const group = startGroupOf(nation);
+  p.known = startingKnowledgeFor(nation, t, start);
+  const group = startGroupOf(nation, start);
   if (group) p.group = group;
+  if (start) p.startYear = start.year;
   return p;
 }
 
 // ---------------------------------------------------------------- standing (RSCH-097)
 
-/** True for an invention of the eras before 1444, Ancient and Medieval (RSCH-091). */
+/** True for an invention of the eras before the start, Ancient and Medieval (RSCH-091). */
 export function isPast(inv: Invention): boolean {
   return config.past_eras.includes(inv.era);
 }
@@ -733,12 +793,11 @@ export function eraName(era: TreeEra): string {
  * era's. Ancient is the floor (RSCH-097).
  */
 export function standing(known: ReadonlySet<string>, t: Tree = tree()): TreeEra {
-  const all = new Map<TreeEra, number>();
+  const { all, eras } = eraCounts(t);
   const have = new Map<TreeEra, number>();
-  for (const inv of t.inventions.values()) {
-    if (outOfScope(inv)) continue;
-    all.set(inv.era, (all.get(inv.era) ?? 0) + 1);
-    if (known.has(inv.id)) have.set(inv.era, (have.get(inv.era) ?? 0) + 1);
+  for (const id of known) {
+    const e = eras.get(id);
+    if (e !== undefined) have.set(e, (have.get(e) ?? 0) + 1);
   }
   let found: TreeEra = TREE_ERAS[0]!;
   for (const era of TREE_ERAS) {
@@ -750,9 +809,31 @@ export function standing(known: ReadonlySet<string>, t: Tree = tree()): TreeEra 
   return found;
 }
 
+/** Each era's inventions in scope, and each such invention's era: counted once a tree, as every snapshot asks every realm's standing. */
+const eraCountsOf = new WeakMap<Tree, { size: number; all: Map<TreeEra, number>; eras: Map<string, TreeEra> }>();
+function eraCounts(t: Tree): { all: Map<TreeEra, number>; eras: Map<string, TreeEra> } {
+  const had = eraCountsOf.get(t);
+  if (had && had.size === t.inventions.size) return had;
+  const all = new Map<TreeEra, number>();
+  const eras = new Map<string, TreeEra>();
+  for (const inv of t.inventions.values()) {
+    if (outOfScope(inv)) continue;
+    all.set(inv.era, (all.get(inv.era) ?? 0) + 1);
+    eras.set(inv.id, inv.era);
+  }
+  const counts = { size: t.inventions.size, all, eras };
+  eraCountsOf.set(t, counts);
+  return counts;
+}
+
 /** Eras between a realm's standing and the era of the date: 0 when abreast of the times (RSCH-097). */
 export function behindBy(known: ReadonlySet<string>, date: Day, t: Tree = tree()): number {
-  return Math.max(0, eraIndex(eraOf(date)) - eraIndex(standing(known, t)));
+  return eraBehind(standing(known, t), date);
+}
+
+/** Eras between a standing already worked out and the era of the date. */
+export function eraBehind(standing: TreeEra, date: Day): number {
+  return Math.max(0, eraIndex(eraOf(date)) - eraIndex(standing));
 }
 
 /** Past inventions a realm lacks (to catch up). */

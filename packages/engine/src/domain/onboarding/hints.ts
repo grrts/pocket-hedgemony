@@ -2,13 +2,27 @@ import config from "../../../../rules/data/domain/onboarding.json" with { type: 
 
 /**
  * First-campaign hints (onboarding spec §5 "First-campaign hints", TUT-121 …
- * TUT-130, D-TUT-16): six one-line hints, shown one at a time, that point at
- * the card or button for a first action. Which are done is the player's, kept
+ * TUT-130, TUT-135, D-TUT-16, D-TUT-18): thirteen one-line hints, shown one
+ * at a time, that point at the card or button for a first action and teach
+ * the main systems a new player meets. Which are done is the player's, kept
  * between campaigns; the "Tutorial hints" setting shows or hides them.
  */
 
-/** What ticks a hint off: a realm chosen, the turn ended, or an order the game took (by its type). */
-export type HintAction = "realm chosen" | "turn ended" | "move" | "recruit" | "build" | "sendEnvoy";
+/** What ticks a hint off: a realm chosen, the turn ended, a card or map mode opened, or an order the game took (by its type). */
+export type HintAction =
+  | "realm chosen"
+  | "province opened"
+  | "realm opened"
+  | "lens"
+  | "turn ended"
+  | "news opened"
+  | "lords opened"
+  | "treasury opened"
+  | "move"
+  | "setStudy"
+  | "recruit"
+  | "build"
+  | "sendEnvoy";
 
 export interface Hint {
   id: string;

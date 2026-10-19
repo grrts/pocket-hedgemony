@@ -1,15 +1,17 @@
-import { crownShare, inAnyWar } from "./lords.ts";
+import { inAnyWar, lordOfCommander, lordSendHome } from "./lords.ts";
+import { officialAge } from "./people.ts";
 import { refillPaces } from "./fallen.ts";
 import { moodShare } from "./moods.ts";
 import * as rc from "./domain/recruiting/index.ts";
 import * as wf from "./domain/warfare/index.ts";
 import { mix, officialName, personName, rankedName } from "./names.ts";
-import { OFFICIALS, officialAt, officialBonus } from "./officials.ts";
+import { bestFit, emptyPosts, OFFICIALS, officialAt, officialBonus } from "./officials.ts";
 import { monthlyRations, wagonRations } from "./march.ts";
 import { campaigning, halt, isMarching } from "./turn.ts";
 import { foodCarriedPct, spawnArmy, type World } from "./world.ts";
 import { armyBreak, atWar, controller, wallsOf, type News } from "./war.ts";
 import { armUnlocked, knownSet } from "./research.ts";
+import { selfRun } from "./tribes.ts";
 import { heritageFactor } from "./heritage.ts";
 import { noteRegiment } from "./achievements.ts";
 import { W as WORK, worksAt } from "./works.ts";
@@ -49,8 +51,8 @@ export const armName = (arm: string): string => ARM_NAME[arm] ?? arm;
 export const isHorseArm = (arm: string): boolean => (HORSE_ARMS as readonly string[]).includes(arm);
 
 /** Company kinds an army can be, by the warfare context's names. */
-export const KIND = { levy: 0, hired: 1 } as const;
-export const KIND_NAMES = ["levy", "hired company"] as const;
+export const KIND = { levy: 0, hired: 1, retinue: 2 } as const;
+export const KIND_NAMES = ["levy", "hired company", "retinue"] as const;
 
 /** Men called up in a province, gathering a thousand at a time (RECR-013; Leroy: no instant armies). */
 export interface Muster {
@@ -102,8 +104,12 @@ export function createRecruitState(P: number, N: number) {
     provinceOfficialSince: new Int32Array(P),
     /** Realm a foreign specialist came from, -1 = one of the realm's own (PROV-334). */
     provinceOfficialFrom: new Int16Array(P).fill(-1),
+    /** Age of each post's official, 0 = drawn from his seed (people.ts). */
+    provinceOfficialAge: new Uint8Array(P),
     /** New land waiting for its owner's decision (officials.ts provinceTaken). */
     provinceNewLand: new Uint8Array(P),
+    /** 1 where the realm leaves its empty posts for the player to fill: Auto-fill posts is off (PROV-342). */
+    nationManualPosts: new Uint8Array(N),
     /** Province each commander was commissioned from, -1 = none. */
     commanderHome: [] as number[],
     /** Name seed of each commander commissioned from an official (-1 = none), so he goes back to a post as himself. */
@@ -149,10 +155,13 @@ export function idleCommanders(world: World, n: number): number[] {
   const a = world.armies;
   for (let i = 0; i < a.count; i++) if (a.alive[i]) busy.add(a.commander[i]!);
   const out: number[] = [];
-  for (let c = 0; c < world.commanderIds.length; c++) if (world.commanderOwner[c] === n && !busy.has(c)) out.push(c);
+  for (let c = 0; c < world.commanderIds.length; c++) if (world.commanderOwner[c] === n && !busy.has(c) && lordOfCommander(world, c) < 0) out.push(c);
   const score = (c: number) => world.commanders[c]!.might + world.commanders[c]!.cunning + world.commanders[c]!.logistics;
   return out.sort((x, y) => score(y) - score(x) || x - y);
 }
+
+/** Why a lord's retinue takes no order but march and go home (WAR-255). */
+const RETINUE_OWN = "a lord's retinue stays whole under its lord: it can only march or go home";
 
 /** Gold a commission costs once (RECR-114). */
 export const COMMISSION_GOLD = rc.recruitingConfig.commissionCost;
@@ -174,7 +183,7 @@ export function commissionOfficial(world: World, n: number, p: number, news: New
   const seed = world.provinceOfficialSeed[p]!;
   const name = officialAt(world, p)!;
   world.nationTreasury[n] = world.nationTreasury[n]! - cost;
-  const c = addCommander(world, n, wf.newCommander(name, { ...skills, origin: OFFICIALS[type]! }));
+  const c = addCommander(world, n, wf.newCommander(name, { ...skills, origin: OFFICIALS[type]!, age: officialAge(world, p) }));
   world.commanderHome[c] = p;
   world.commanderSeed[c] = seed;
   world.provinceOfficial[p] = -1;
@@ -186,15 +195,20 @@ export function commissionOfficial(world: World, n: number, p: number, news: New
 export function releaseCommander(world: World, n: number, c: number): string | null {
   if (c < 0 || c >= world.commanderIds.length || world.commanderOwner[c] !== n) return "no such commander of yours";
   if (armyOf(world, c) >= 0) return "he leads an army: give it to another commander or leave it as a garrison first";
-  const home = world.commanderHome[c]!;
-  if (home < 0 || world.provinceOwner[home] !== n) return "he has no post in your lands to go back to";
-  if (world.provinceOfficial[home]! >= 0) return `another official holds his post at ${provinceName(world, home)} now`;
   const type = OFFICIALS.indexOf(world.commanders[c]!.origin as (typeof OFFICIALS)[number]);
+  let home = world.commanderHome[c]!;
+  // His old post filled meanwhile (auto-fill or a hire), he takes the empty royal post that suits his type best (PROV-346).
+  if (home < 0 || world.provinceOwner[home] !== n || world.provinceLord[home]! >= 0 || world.provinceOfficial[home]! >= 0) {
+    const free = emptyPosts(world, n);
+    if (!free.length) return home >= 0 && world.provinceOwner[home] === n ? `another official holds his post at ${provinceName(world, home)} now, and no post stands empty: dismiss an official or wait for a post` : "no post stands empty for him: dismiss an official or wait for a post";
+    home = free.find((p) => bestFit(world, p).type === type) ?? free[0]!;
+  }
   const seed = world.commanderSeed[c]! >= 0 ? world.commanderSeed[c]! : home;
   // Back at his own post he keeps his years there; if someone else held it meanwhile he starts again.
   if (world.provinceOfficialSeed[home] !== seed) (world.provinceOfficialSince[home] = world.day), (world.provinceOfficialFrom[home] = -1);
   world.provinceOfficial[home] = Math.max(0, type);
   world.provinceOfficialSeed[home] = seed;
+  world.provinceOfficialAge[home] = Math.min(255, world.commanders[c]!.age);
   world.commanderOwner[c] = -1;
   return null;
 }
@@ -260,8 +274,9 @@ export function armyPay(world: World, slot: number): number {
 }
 
 /**
- * Troop cap and its use for every nation: a share of the people of each province
- * it owns and holds, against its armies and its recruits (WAR-029, WAR-030).
+ * Troop cap and its use for every nation: a share of the people of each royal
+ * province it owns and holds, against its armies but its lords' retinues and its
+ * recruits (WAR-029, WAR-030, WAR-033).
  */
 export function recomputeCap(world: World): void {
   const cap = world.nationTroopCap;
@@ -272,12 +287,13 @@ export function recomputeCap(world: World): void {
   const share = new Float64Array(world.nationCount).fill(-1);
   for (let p = 0; p < world.provinceCount; p++) {
     const owner = world.provinceOwner[p]!;
-    if (owner < 0 || world.provinceOccupier[p]! >= 0) continue;
+    // A lord's land fills his own retinue, not the crown's cap (WAR-033, WAR-252).
+    if (owner < 0 || world.provinceOccupier[p]! >= 0 || world.provinceLord[p]! >= 0) continue;
     if (share[owner]! < 0) share[owner] = wf.capShare({}, knownSet(world, owner));
     cap[owner] = cap[owner]! + world.provincePopulation[p]! * 1000 * share[owner]!;
   }
   const a = world.armies;
-  for (let i = 0; i < a.count; i++) if (a.alive[i]) used[a.owner[i]!] = used[a.owner[i]!]! + a.men[i]!;
+  for (let i = 0; i < a.count; i++) if (a.alive[i] && a.kind[i] !== KIND.retinue) used[a.owner[i]!] = used[a.owner[i]!]! + a.men[i]!;
   for (const m of world.musters) used[m.nation] = used[m.nation]! + m.men;
   for (const m of world.mercs) used[m.nation] = used[m.nation]! + companyMen(m.company);
 }
@@ -325,15 +341,15 @@ export function armyRations(world: World, slot: number): number {
 
 // ---------------------------------------------------------------- the pools
 
-/** Men going home return to the pools of their realm's provinces, by each one's gap (RECR-020). */
+/** Men going home return to the pools of their realm's royal provinces, by each one's gap (RECR-020); a lord's land fills his retinue. */
 export function sendHome(world: World, n: number, men: number): void {
   if (men <= 0) return;
   let gap = 0;
-  for (let p = 0; p < world.provinceCount; p++) if (world.provinceOwner[p] === n) gap += world.provinceRecruitCeiling[p]! - world.provinceRecruits[p]!;
+  for (let p = 0; p < world.provinceCount; p++) if (world.provinceOwner[p] === n && world.provinceLord[p]! < 0) gap += world.provinceRecruitCeiling[p]! - world.provinceRecruits[p]!;
   if (gap <= 0) return;
   const share = Math.min(1, men / gap);
   for (let p = 0; p < world.provinceCount; p++) {
-    if (world.provinceOwner[p] !== n) continue;
+    if (world.provinceOwner[p] !== n || world.provinceLord[p]! >= 0) continue;
     world.provinceRecruits[p] = world.provinceRecruits[p]! + (world.provinceRecruitCeiling[p]! - world.provinceRecruits[p]!) * share;
   }
 }
@@ -566,6 +582,7 @@ export function pickUp(world: World, n: number, army: number, men?: number): str
   const a = world.armies;
   if (army < 0 || army >= a.count || !a.alive[army] || a.owner[army] !== n) return "no such army of yours";
   if (a.commander[army]! < 0) return "troops without a commander can't take in others";
+  if (a.kind[army] === KIND.retinue) return RETINUE_OWN;
   const troops = garrisonTroops(world, n, a.location[army]!).filter((i) => a.kind[i] === a.kind[army]);
   if (!troops.length) return `no troops wait in ${provinceName(world, a.location[army]!)}`;
   let want = men === undefined ? Infinity : Math.round(men);
@@ -612,6 +629,7 @@ export function trainTroops(world: World, n: number, army: number, arm: string, 
   if (army < 0 || army >= a.count || !a.alive[army] || a.owner[army] !== n) return "no such army of yours";
   // Garrison troops train only once a commander has picked them up (RECR-107).
   if (a.commander[army]! < 0) return "troops without a commander can't train: a commander must pick them up first";
+  if (a.kind[army] === KIND.retinue) return RETINUE_OWN;
   if (a.trainArm[army]! >= 0) return `already training ${armName(ARMS[a.trainArm[army]!]!)}`;
   if (arm === rc.LEVY_ARM || !world.rules.defines.recruit.armsAtStart.includes(arm) || !armUnlocked(world, n, arm)) return `you can't train ${armName(arm)} yet`;
   men = Math.round(Math.min(men, menByArm(world, army)[LEVY]!));
@@ -632,6 +650,7 @@ export function trainTroops(world: World, n: number, army: number, arm: string, 
 export function dismissTroops(world: World, n: number, army: number, arm: string, men: number): string | null {
   const a = world.armies;
   if (army < 0 || army >= a.count || !a.alive[army] || a.owner[army] !== n) return "no such army of yours";
+  if (a.kind[army] === KIND.retinue) return RETINUE_OWN;
   const k = ARMS.indexOf(arm);
   if (k < 0) return `no arm ${arm}`;
   const by = menByArm(world, army);
@@ -650,6 +669,7 @@ export function dismissTroops(world: World, n: number, army: number, arm: string
 export function splitTroops(world: World, n: number, army: number, arm: string, men: number, commander?: number): string | null {
   const a = world.armies;
   if (army < 0 || army >= a.count || !a.alive[army] || a.owner[army] !== n) return "no such army of yours";
+  if (a.kind[army] === KIND.retinue) return RETINUE_OWN;
   const k = ARMS.indexOf(arm);
   if (k < 0) return `no arm ${arm}`;
   const c = commander ?? -1;
@@ -792,6 +812,7 @@ export function mergeArmies(world: World, n: number, from: number, into: number)
   const a = world.armies;
   for (const s of [from, into]) if (s < 0 || s >= a.count || !a.alive[s] || a.owner[s] !== n) return "no such army of yours";
   if (from === into) return "an army can't join itself";
+  if (a.kind[from] === KIND.retinue || a.kind[into] === KIND.retinue) return RETINUE_OWN;
   if (a.location[from] !== a.location[into]) return "armies must stand in the same province to join";
   if (a.kind[from] !== a.kind[into]) return `a ${KIND_NAMES[a.kind[from]!]} can't join a ${KIND_NAMES[a.kind[into]!]}`;
   const byF = menByArm(world, from);
@@ -821,6 +842,8 @@ export function mergeArmies(world: World, n: number, from: number, into: number)
 export function appointCommander(world: World, n: number, army: number, commander: number): string | null {
   const a = world.armies;
   if (army < 0 || army >= a.count || !a.alive[army] || a.owner[army] !== n) return "no such army of yours";
+  if (a.kind[army] === KIND.retinue) return RETINUE_OWN;
+  if (lordOfCommander(world, commander) >= 0) return "a lord leads only his own retinue";
   if (commander < 0) {
     if (a.kind[army] === KIND.hired) return "a mercenary company keeps its own captain";
     a.commander[army] = -1;
@@ -838,7 +861,7 @@ export function appointCommander(world: World, n: number, army: number, commande
   return null;
 }
 
-/** Send an army home: levies go back to the pools, a hired company and its captain leave; the commander returns to court. */
+/** Send an army home: levies go back to the pools, a lord's retinue to his lands, a hired company and its captain leave; the commander returns to court. */
 export function disbandArmy(world: World, n: number, army: number, recountAfter = true): string | null {
   const a = world.armies;
   if (army < 0 || army >= a.count || !a.alive[army]) return "no such army";
@@ -846,14 +869,15 @@ export function disbandArmy(world: World, n: number, army: number, recountAfter 
   if (a.kind[army] === KIND.hired) {
     const c = a.commander[army]!;
     if (c >= 0) world.commanderOwner[c] = -1;
-  } else sendHome(world, n, a.men[army]!);
+  } else if (a.kind[army] === KIND.retinue) lordSendHome(world, lordOfCommander(world, a.commander[army]!), a.men[army]!);
+  else sendHome(world, n, a.men[army]!);
   a.alive[army] = 0;
   halt(world, army);
   if (recountAfter) recount(world);
   return null;
 }
 
-/** The levies of the realm's provinces and its troop cap, after anything that changed them. */
+/** The levies of the realm's royal provinces and its troop cap, after anything that changed them. */
 export function recount(world: World): void {
   recomputeCap(world);
   const now = world.nationLevies;
@@ -862,9 +886,34 @@ export function recount(world: World): void {
   max.fill(0);
   for (let p = 0; p < world.provinceCount; p++) {
     const owner = world.provinceOwner[p]!;
-    if (owner < 0) continue;
+    if (owner < 0 || world.provinceLord[p]! >= 0) continue;
     max[owner] = max[owner]! + world.provinceRecruitCeiling[p]!;
     if (world.provinceOccupier[p]! < 0) now[owner] = now[owner]! + world.provinceRecruits[p]!;
+  }
+}
+
+/**
+ * The men each realm's lords would bring by their loyalty, each province's
+ * recruits held to its share of its lord's cap: they count toward how strong the
+ * realm looks (D-RECR-23, WAR-252). An estimate for the other realms, so it is
+ * worked out at the end of each week and after the lords are called, not on
+ * every recount.
+ */
+export function recountLordsMen(world: World): void {
+  const lords = world.nationLordsMen;
+  lords.fill(0);
+  if (!world.lords.length) return;
+  const loyalty = world.lords.map((l) => (l.loyalty === "Loyal" ? 1 : l.loyalty === "Wavering" ? wf.W.lords.wavering_share : 0));
+  // One share per realm, with and without an official (capShare's rule), worked out once.
+  const share = new Float64Array(world.nationCount * 2).fill(-1);
+  for (let p = 0; p < world.provinceCount; p++) {
+    const k = world.provinceLord[p]!;
+    if (k < 0 || !loyalty[k] || world.provinceOccupier[p]! >= 0) continue;
+    const owner = world.provinceOwner[p]!;
+    if (owner < 0) continue;
+    const at = owner * 2 + (world.provinceOfficial[p]! >= 0 ? 1 : 0);
+    if (share[at]! < 0) share[at] = wf.capShare({ official: at % 2 === 1 }, knownSet(world, owner));
+    lords[owner] = lords[owner]! + Math.min(world.provinceRecruits[p]!, world.provincePopulation[p]! * 1000 * share[at]!) * loyalty[k]!;
   }
 }
 
@@ -923,7 +972,7 @@ export function monthlyRecruits(world: World, news: News[]): void {
     const muster = officialBonus(world, p, "Muster master", "recruit_refill");
     const heritage = heritageFactor(world, world.provinceOwner[p]!, "recruit_refill_pct");
     const owner = world.provinceOwner[p]!;
-    rc.refill(pool as rc.ProvincePool, 1, rate * muster * heritage * (owner >= 0 ? fallen[owner]! : 1) * (ungoverned(world, p) ? empty : 1) * moodShare(world, p) * crownShare(world, p));
+    rc.refill(pool as rc.ProvincePool, 1, rate * muster * heritage * (owner >= 0 ? fallen[owner]! : 1) * (ungoverned(world, p) ? empty : 1) * moodShare(world, p));
     world.provinceRecruits[p] = pool.recruits;
   }
   recomputeCap(world);
@@ -960,7 +1009,8 @@ export function monthlyRecruits(world: World, news: News[]): void {
 
 /** A province of a realm whose official's post stands empty (he was commissioned). */
 export function ungoverned(world: World, p: number): boolean {
-  return world.provinceOwner[p]! >= 0 && world.provinceOfficial[p]! < 0;
+  // A clan council or chiefdom's own people run themselves (GOV-023, TRIBE-019).
+  return world.provinceOwner[p]! >= 0 && world.provinceOfficial[p]! < 0 && !selfRun(world, p);
 }
 
 /** A month of training: on at a castle of its own with no march under way, else held (RECR-050, RECR-100, RECR-109). */
@@ -1044,7 +1094,7 @@ export function aiCollect(world: World, news: News[]): void {
   const idle = new Map<number, number[]>();
   for (let c = 0; c < world.commanderIds.length; c++) {
     const n = world.commanderOwner[c]!;
-    if (n < 0 || busy.has(c)) continue;
+    if (n < 0 || busy.has(c) || lordOfCommander(world, c) >= 0) continue;
     const list = idle.get(n);
     if (list) list.push(c);
     else idle.set(n, [c]);

@@ -1,6 +1,6 @@
 # Warfare
 
-Warfare is everything that happens once your soldiers are under arms: how they are organised into companies and armies, what they cost, how they are fed, who leads them and in what style, how a battle is fought bell by bell, how castles fall, what holding enemy land means, and how a war drifts toward peace. It runs from era I (1444) to the end of the campaign on 31 August 1939, changing as inventions arrive.
+Warfare is everything that happens once your soldiers are under arms: how they are organised into companies and armies, what they cost, how they are fed, who leads them and in what style, how a battle is fought bell by bell, how castles fall, what holding enemy land means, and how a war drifts toward peace. It runs from era I (from the start on 20 September 1378) to the end of the campaign on 31 August 1939, changing as inventions arrive.
 
 ## How it works
 
@@ -68,13 +68,15 @@ The **troop cap** is the most soldiers your realm may keep: 2 % of the people in
 
 Lords' retinues don't count: each lord has his own cap by the same rule on his lands (2 % with one of his officials, 1 % without), and allies count only against their own. Over the cap you can't raise or hire, every soldier over it costs double pay, and levies desert 5 % a month until you are back under. There is no cap on the size of one army; food is its limit.
 
-**France, 1444.** With 4,000,000 people in royal provinces with an official, 1,500,000 without and 31 castles, France's cap is 95,000 plus the garrison room of the 31 castles. The Duke of Burgundy's 6 provinces of about 430,000 people, all with his officials, give him a retinue cap of about 9,000, outside France's cap.
+**France, 1444** (on the 1444 checkpoint world). With 4,000,000 people in royal provinces with an official, 1,500,000 without and 31 castles, France's cap is 95,000 plus the garrison room of the 31 castles. The Duke of Burgundy's 6 provinces of about 430,000 people, all with his officials, give him a retinue cap of about 9,000, outside France's cap.
 
 ### Raising and keeping an army
 
 Levies come from [Recruiting](Recruiting) as levy-kind companies of levy infantry, gathered a thousand at a time in their province, where they wait as its garrison until a commander picks them up. **No army exists without a commander**: soldiers without one are a province's garrison. An army that loses its commander with no captain to step up halts; in your own land it becomes that province's garrison, abroad it waits for a commander to join it.
 
 **Calling the lords.** Each lord answers by his loyalty. A loyal lord brings his whole retinue in 3 weeks and may lead it as a captain. A wavering lord brings half, after 6 weeks, and goes home after 6 months unless the war aim is his Want. A disloyal lord refuses, and calling him again makes him angrier. A lord in revolt's retinue is a rebel army. When the war aim is his Want, a lord comes even when wavering and stays to the end, and a lord whose lands are occupied leaves to defend them.
+
+**Lords' men in play.** A lord's lands' recruits are his retinue, not your levy: your levies and troop cap count only royal provinces, and each lord's retinue can grow to his own cap. At war, open your country card's **Army** tab: the *Lords' men* section sums what your lords have ready, gathering, in the field and refusing, with **Call the lords** to call them all; you can also call one from his own screen (Lords tab), where *Retinue* shows his men and **Call him**. A called retinue gathers at the lord's seat (his most peopled province) and takes the field as its own army, led by the lord himself. You march it like any army, but it is his: it can't be split, trained, joined to another army or handed to another commander, and he leads no other army. It costs you no pay and doesn't count toward your cap. It goes home to his lands when peace comes, when he turns disloyal, when a wavering lord has served 6 months (unless the war is for his Want), or when you tap **Send him home**. Every battle his men help win raises his loyalty a step. AI realms call their lords whenever they are at war. Not yet in play: a lord leaving to defend his occupied lands.
 
 **Mercenary companies.** Named companies with a captain are offered in the regions where they historically gathered (Swiss and German foot, Italian condottieri, Scottish and Irish gallowglass, Turkic and Afghan horse, Javanese and Japanese sword bands and others). Each shows men, troop type, drill, scars and price. A contract brings the company for the agreed months for gold up front plus monthly pay, using no recruits. The company isn't there at once: it marches from where it gathers to your capital, and the hire screen shows how many days that takes. It always comes led by its own captain as its commander, and he leaves with it. It leaves when the contract ends, when pay is owed as above, or when an enemy outbids you.
 
@@ -283,7 +285,7 @@ Each realm fights by the inventions it knows, with no world clock, so armies of 
 
 | Era | Years | A bell | Longest battle | Sector room | Hits per bell |
 |---|---|---|---|---|---|
-| I to IV | 1444 to 1800 | 2 hours | 3 days | as the table | 4 % |
+| I to IV | 1378 to 1800 | 2 hours | 3 days | as the table | 4 % |
 | V | 1800 to 1870 | 2 hours | 3 days | as the table | 5 % with W16, 6 % with W17 |
 | VI | 1870 to 1914 | half a day | 10 days | halved | 6 % (8 % with W19) |
 | VII | 1914 to 1939 | a day | 30 days | a quarter | 8 % |
@@ -408,7 +410,7 @@ During the turn, inside the day loop: contacts, the withdraw check and battles; 
 - [Culture](Culture): homeland language, culture group for style fallback, a captain's language for bribes.
 - [Religion](Religion): persecution for the Defend the faith aim.
 - [Historical-Events](Historical-Events): prestige from victories, war weariness from Fallen and peace voices, throne offers to generals.
-- [The-1444-Start](The-1444-Start): starting styles, capture warfare realms, starting castles and inventions.
+- [The 1378 Start](The-1378-Start): starting styles, capture warfare realms, starting castles and inventions.
 - [Map and Map Modes](Map-and-Lenses) and [Screens-and-Navigation](Screens-and-Navigation): army cards, battle playback, reports and notifications.
 - [Trade](Trade): occupiers take trade; the Open the roads term.
 - [Time-and-Turns](Time-and-Turns): the weekly turn, the day loop and the order battles resolve in.

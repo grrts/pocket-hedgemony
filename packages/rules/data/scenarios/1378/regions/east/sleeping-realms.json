@@ -1,0 +1,314 @@
+{
+ "$comment": "East realms not yet born on 20 September 1378, asleep until they form (X-24, X-25); their 1444 record is the blueprint.",
+ "realms": [
+  {
+   "id": "herzegovina",
+   "name": "Herzegovina",
+   "color": "#6a7fc0",
+   "capital": [
+    18.14,
+    43.27
+   ],
+   "home": [
+    [
+     18.14,
+     43.27
+    ],
+    [
+     17.81,
+     43.34
+    ],
+    [
+     18.34,
+     42.71
+    ],
+    [
+     18.83,
+     42.83
+    ]
+   ],
+   "tree": [
+    "herzegovina"
+   ]
+  },
+  {
+   "id": "kastrioti",
+   "name": "Kastrioti",
+   "color": "#c04a4a",
+   "capital": [
+    19.79,
+    41.51
+   ],
+   "home": [
+    [
+     19.79,
+     41.51
+    ],
+    [
+     20.18,
+     41.61
+    ],
+    [
+     19.95,
+     41.68
+    ]
+   ],
+   "tree": [
+    "kastrioti"
+   ]
+  },
+  {
+   "id": "dukagjini",
+   "name": "Dukagjini",
+   "color": "#9a5a5a",
+   "capital": [
+    19.64,
+    41.78
+   ],
+   "home": [
+    [
+     19.64,
+     41.78
+    ],
+    [
+     19.86,
+     41.95
+    ],
+    [
+     20.19,
+     42.09
+    ]
+   ],
+   "tree": [
+    "dukagjini"
+   ]
+  },
+  {
+   "id": "zaharia",
+   "name": "Zaharia",
+   "color": "#b07a6a",
+   "capital": [
+    19.67,
+    42.04
+   ],
+   "home": [
+    [
+     19.67,
+     42.04
+    ]
+   ],
+   "tree": [
+    "zaharia"
+   ]
+  },
+  {
+   "id": "league_of_lezhe",
+   "name": "League of Lezhë",
+   "color": "#d04040",
+   "capital": [
+    19.64,
+    41.78
+   ],
+   "home": [
+    [
+     19.64,
+     41.78
+    ],
+    [
+     19.79,
+     41.51
+    ],
+    [
+     20.18,
+     41.61
+    ]
+   ],
+   "tree": [
+    "league_of_lezhe"
+   ]
+  },
+  {
+   "id": "mazovia_plock",
+   "name": "Duchy of Płock",
+   "color": "#b07aa1",
+   "capital": [
+    19.71,
+    52.55
+   ],
+   "home": [
+    [
+     19.71,
+     52.55
+    ],
+    [
+     20.25,
+     51.76
+    ]
+   ],
+   "tree": [
+    "mazovia_plock"
+   ]
+  },
+  {
+   "id": "mazovia_warsaw",
+   "name": "Duchy of Warsaw",
+   "color": "#c9a0dc",
+   "capital": [
+    21.01,
+    52.23
+   ],
+   "home": [
+    [
+     21.01,
+     52.23
+    ],
+    [
+     21.23,
+     51.96
+    ]
+   ],
+   "tree": [
+    "mazovia_warsaw"
+   ]
+  },
+  {
+   "id": "galich_shemyaka",
+   "name": "Galich-Mersky",
+   "color": "#6d4c8f",
+   "capital": [
+    42.36,
+    58.38
+   ],
+   "home": [
+    [
+     42.36,
+     58.38
+    ]
+   ],
+   "tree": [
+    "galich_shemyaka"
+   ]
+  },
+  {
+   "id": "mozhaysk",
+   "name": "Mozhaysk",
+   "color": "#9a7cc4",
+   "capital": [
+    36.03,
+    55.5
+   ],
+   "home": [
+    [
+     36.03,
+     55.5
+    ]
+   ],
+   "tree": [
+    "mozhaysk"
+   ]
+  },
+  {
+   "id": "vereya_beloozero",
+   "name": "Vereya-Beloozero",
+   "color": "#7e6b9e",
+   "capital": [
+    36.7,
+    55.34
+   ],
+   "home": [
+    [
+     36.7,
+     55.34
+    ],
+    [
+     37.78,
+     60.03
+    ]
+   ],
+   "tree": [
+    "vereya_beloozero"
+   ]
+  },
+  {
+   "id": "kazan",
+   "name": "Kazan",
+   "color": "#6b8e23",
+   "capital": "p656",
+   "home": [
+    "p652",
+    "p654",
+    "p656",
+    "p658",
+    "p660",
+    "p663",
+    "p664"
+   ],
+   "tree": [
+    "kazan"
+   ]
+  },
+  {
+   "id": "crimea",
+   "name": "Crimea",
+   "color": "#c9a227",
+   "capital": "p1445",
+   "home": [
+    "p1445"
+   ],
+   "tree": [
+    "crimea"
+   ]
+  },
+  {
+   "id": "nogai",
+   "name": "Nogai",
+   "color": "#8b6f47",
+   "capital": "p1211",
+   "home": [
+    "p1208",
+    "p1209",
+    "p1210",
+    "p1211",
+    "p1213",
+    "p1214",
+    "p1215",
+    "p1217"
+   ],
+   "tree": [
+    "nogai"
+   ]
+  },
+  {
+   "id": "uzbek_khanate",
+   "name": "Uzbek Khanate",
+   "color": "#4f9fbf",
+   "capital": "p681",
+   "home": [
+    "p680",
+    "p681",
+    "p682",
+    "p941",
+    "p942",
+    "p943",
+    "p945",
+    "p1231"
+   ],
+   "tree": [
+    "uzbek_khanate"
+   ]
+  },
+  {
+   "id": "mushasha",
+   "name": "Musha'sha'",
+   "color": "#2e8b57",
+   "capital": "p2272",
+   "home": [
+    "p2272",
+    "p2273"
+   ],
+   "tree": [
+    "mushasha"
+   ]
+  }
+ ]
+}

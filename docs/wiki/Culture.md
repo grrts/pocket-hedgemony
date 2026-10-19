@@ -109,7 +109,7 @@ Each country has one realm-wide **Language policy**: Let be, Teach or Impose. Te
 - **Teach** keeps drift at its base and makes schools teaching in the court language cost 10 % more upkeep.
 - **Impose** doubles drift. It gives the grievance *Banned language* in every province where most people speak a foreign language, and in provinces where most speak a related language once nationalism there is 0.3 or more. When you switch to it, lords of the affected languages waver one step, foreign-language lords first. That happens once: keeping Impose costs no more loyalty.
 
-Impose needs the *Printing* invention, unless your country has the **chancery tradition**. In 1444 that is Ming, Joseon, Castile and the Ottomans, who can Impose from the start. Your form of government doesn't matter: a confederation can Impose and an absolute monarchy can Let be.
+Impose needs the *Printing* invention, unless your country has the **chancery tradition**. At the 1378 start that is Ming, Goryeo, Castile and the Ottomans, who can Impose from the start. Your form of government doesn't matter: a confederation can Impose and an absolute monarchy can Let be.
 
 *Worked example.* Castile has the chancery tradition. Granada is mostly Andalusi Arabic (foreign) and Barcelona mostly Catalan (related) with nationalism 0.1. When Castile sets Impose, Granada gets *Banned language* and Barcelona does not, and the Andalusi lord Zegri wavers a step, just this once. If nationalism in Barcelona later reaches 0.3, Barcelona gets *Banned language* too.
 
@@ -227,11 +227,11 @@ For France the screen reads:
 
 ### In the game now
 
-Every province starts in 1444 with up to three languages from its realm's start record: the court language, the realm's main peoples, and and, in some areas, a local language set by the area rather than the realm. The language most people speak in 1444 is the province's homeland.
+Every province starts with up to three languages from its realm's start record: the court language, the realm's main peoples, and and, in some areas, a local language set by the area rather than the realm. The language most people speak at the start is the province's homeland.
 
 - **Province card, Language line**: the three languages with their dots. Tap it to open this year's drift: the language it drifts toward, why (yours where you have held it 20 years and govern it through an official or lord, else the local majority) and each group's rate with its reasons. Tap again to close it.
-- **Your realm card, Peoples tab** (next to Government): the court language, Language % (the same language plus half of the related ones), one fold per family with a row per language (share, people, relation, provinces, where it is the majority, aggrieved provinces) and the **Language policy** buttons: Let be, Teach (the 1444 default) and Impose. Impose needs Printing or a chancery tradition; until then its button is greyed out and says so. The General tab's Language line opens the tab.
-- **Grievances**: *Foreign rule* where most people speak a language foreign to the court in their own homeland, on land taken after 1444 (land you held at the start never has it, or 394 provinces in 13 realms would start aggrieved); *Banned language* where you Impose and most people speak a foreign language.
+- **Your realm card, Peoples tab** (next to Government): the court language, Language % (the same language plus half of the related ones), one fold per family with a row per language (share, people, relation, provinces, where it is the majority, aggrieved provinces) and the **Language policy** buttons: Let be, Teach (the default at the start) and Impose. Impose needs Printing or a chancery tradition; until then its button is greyed out and says so. The General tab's Language line opens the tab.
+- **Grievances**: *Foreign rule* where most people speak a language foreign to the court in their own homeland, on land taken after the start (land you held at the start never has it, or 394 provinces in 13 realms would start aggrieved in 1444); *Banned language* where you Impose and most people speak a foreign language.
 - **The Languages map mode**: each province coloured by the family of the language most speak, with a key of the largest families.
 - Drift runs each New Year, so a share moves by a fraction of a point a year: a generation, not a season. There is no list of accepted cultures: who counts as yours comes from same language, related and foreign.
 
@@ -257,7 +257,7 @@ Not in yet: per-province homelands, officials' and lords' own languages, schools
 - [Naval](Naval): seafaring languages drift slowly on the coast; sailors keep their language.
 - [Music-and-Sound](Music-and-Sound): the music palette follows the court language's family.
 - [Map and Map Modes](Map-and-Lenses): the Language map mode, dots and outlines.
-- [The-1444-Start](The-1444-Start): court languages and each province's starting languages.
+- [The 1378 Start](The-1378-Start): court languages and each province's starting languages.
 - [Time-and-Turns](Time-and-Turns): the yearly drift slot and the 5-yearly checks.
 
 ## Numbers
@@ -305,4 +305,4 @@ Nothing about culture is waiting on a design decision. The numbers above are sti
 
 - Spec: `domain/culture/spec.md` in the game repository; its section 13 lists every decision with its reason.
 - Features: `domain/culture/features/`: `tongues-and-relations.feature` (families, court language, Language % for France), `drift.feature` (Troyes, the language it drifts toward, multipliers, lands, the fourth language), `tongue-policy.feature`, `culture-effects.feature`, `culture-history.feature`, `peoples-screen.feature` and `culture-ai.feature`.
-- Code: `packages/engine/src/domain/culture/`, with its numbers in `packages/rules/data/domain/culture.json` and the 1444 start in `packages/rules/data/domain/culture-start-1444.json`. The game wiring (province arrays, New Year drift, grievances, the snapshot) is `packages/engine/src/peoples.ts`; the panels are `apps/client/src/ui/belief.ts`.
+- Code: `packages/engine/src/domain/culture/`, with its numbers in `packages/rules/data/domain/culture.json` and the start in `packages/rules/data/scenarios/1378/culture-start.json` (the 1444 checkpoint's in `scenarios/1444/culture-start.json`). The game wiring (province arrays, New Year drift, grievances, the snapshot) is `packages/engine/src/peoples.ts`; the panels are `apps/client/src/ui/belief.ts`.

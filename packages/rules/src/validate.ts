@@ -59,10 +59,13 @@ export function validateRuleset(rules: Ruleset): Ruleset {
   }
 
   for (const n of rules.nations) {
+    // A spare sleeper has no capital until it wakes; a listed one names a capital someone else holds now (SETUP-080).
+    if (n.spare) continue;
+    for (const h of n.home ?? []) if (!byId.has(h)) problems.push(`nation ${n.id}: unknown home province "${h}"`);
     const capital = byId.get(n.capital);
     if (!capital) problems.push(`nation ${n.id}: unknown capital "${n.capital}"`);
     else if (capital.terrain === "sea" || capital.terrain === "ocean") problems.push(`nation ${n.id}: capital ${n.capital} is at sea`);
-    else if (capital.owner !== n.id) problems.push(`nation ${n.id}: capital ${n.capital} is owned by ${capital.owner}`);
+    else if (!n.asleep && capital.owner !== n.id) problems.push(`nation ${n.id}: capital ${n.capital} is owned by ${capital.owner}`);
   }
 
   const unitIds = new Set<string>();

@@ -7,7 +7,7 @@ which campaigns may earn achievements, how progress and unlocks reach the three 
 Google Play Games), how achievements look (icons, toast, screen), and how the list may grow later.
 
 **In scope**
-- The achievement list (75 at launch: the YAML's 71 and the harvest ladder's four levels, D-ACH-16), its tiers and points, categories, scope (campaign / lifetime),
+- The achievement list (80 at launch: the YAML's 71, the harvest ladder's four levels, D-ACH-16, and five rows for the 1378 start, D-ACH-17), its tiers and points, categories, scope (campaign / lifetime),
   hidden flag, `full_game` flag, test moment (`moment`), test and progress counter.
 - The store limits adopted, store ids, the build step that writes store upload files, retiring achievements.
 - Eligibility: ironman-only, cheat marking, switching country after game over, tutorial, demo.
@@ -33,10 +33,11 @@ Google Play Games), how achievements look (icons, toast, screen), and how the li
 
 Newest decision first.
 
+0. `DECISIONS.md` X-25 (Leroy, 18 Oct): every campaign starts on 20 September 1378; `start-date/plan-1378.md` §1, §2, §4; the bridge events of 1378 to 1444 (`events-bridge-east.json`, EVT-090 to EVT-094) that the 1378 start's rows read (D-ACH-17).
 1. `achievements/achievements-design.md` v1.1 (16 Oct 2026), §11 Decisions made (ironman, cheats, game over).
 2. `achievements/achievements-design.md` §1–§10, §12 Open questions.
 3. `achievements/achievements.yaml` (config v1): field definitions, tiers, 71 rows.
-4. `planning/gap-lists.md` "Decisions already made" (campaign span 1444 to 31 August 1939; business model;
+4. `planning/gap-lists.md` "Decisions already made" (campaign span to 31 August 1939, its start moved to 20 September 1378 by X-25; business model;
    free tier = Ottomans and France, List 1 item 2).
 5. Cross-checked, not owned: `save-system` §6 (ironman, integrity), `screen-flow` E1/E3 and S4,
    `settings/settings-design.md` (achievement toasts row), `tutorial/tutorial-design.md` §12,
@@ -107,8 +108,8 @@ Newest decision first.
 
 - **AchievementDefinition** (entity, id): `id`, `name`, `text`, `category`, `tier`, `hidden` (default false),
   `scope`, `moment`, `test`, optional `progress {stat, target}`, optional `full_game`, optional `ladder` (the ladder it is a level of), `refs`.
-- **Tier** (value): copper | silver | gold | crown, with points 5 | 10 | 20 | 40. Launch counts: copper 39,
-  silver 22, gold 11, crown 3. Meant for: copper = one action or a goal most players reach in their first
+- **Tier** (value): copper | silver | gold | crown, with points 5 | 10 | 20 | 40. Launch counts: copper 40,
+  silver 25, gold 12, crown 3. Meant for: copper = one action or a goal most players reach in their first
   campaign; silver = a goal you aim for; gold = a whole campaign shaped around it; crown = the hardest.
 - **Moment** (value): `turn_end`, `year_end`, `harvest`, `spring_start`, `date` (checked once on that day),
   `battle_end`, `sea_battle_end`, `siege_end`, `war_end`, `rebellion_end`, `relation_changed`,
@@ -126,18 +127,18 @@ Newest decision first.
 
 | Limit | Steam | Game Center | Google Play Games | Adopted |
 |---|---|---|---|---|
-| Number | 100 until Valve's "confidence" check | 100 | 200 to 400 depending on docs version | 100 at most, ever; 75 at launch, 25 kept |
-| Points | none | max 100 each, 1,000 total | multiples of 5, 5–200 each, 1,000 total (newer docs: 2,000) | multiples of 5, max 40 each, 1,000 total; 755 at launch, 245 kept |
+| Number | 100 until Valve's "confidence" check | 100 | 200 to 400 depending on docs version | 100 at most, ever; 80 at launch, 20 kept |
+| Points | none | max 100 each, 1,000 total | multiples of 5, 5–200 each, 1,000 total (newer docs: 2,000) | multiples of 5, max 40 each, 1,000 total; 810 at launch, 190 kept |
 | Hidden | yes | yes | yes ("hidden" initial state) | yes, spoilers only |
 | Progress | stats shown at set steps | percent complete | incremental, up to 10,000 steps | one game counter, reported each store's way |
 | Icon | 64 × 64, achieved and unachieved | 512 or 1024 square | 512 square | 32 × 32 pixel art, scaled by whole numbers |
 | Free version | demo is a separate app | same app as paid | same app as paid | §5 Free tier |
 
-### The catalogue (all 75 achievements: the 71 of `achievements.yaml` and the harvest ladder, D-ACH-16)
+### The catalogue (all 80 achievements: the 71 of `achievements.yaml`, the harvest ladder, D-ACH-16, and the 1378 start's five, D-ACH-17)
 
 Category totals: first_steps 8 (40 points), realm 12 (130), lords 6 (35), learning 7 (85), war 8 (65),
-sea 6 (55), order 3 (35), abroad 5 (45), history 12 (165), campaign 8 (100). Total 75, 755 points.
-22 rows have a progress bar. One ladder: `harvests` (`first_harvest` and the four `harvests_*` rows). No row is hidden at launch. Two rows are `full_game`.
+sea 6 (55), order 3 (35), abroad 5 (45), history 16 (215), campaign 9 (105). Total 80, 810 points.
+22 rows have a progress bar. One ladder: `harvests` (`first_harvest` and the four `harvests_*` rows). No row is hidden at launch. Ten rows are `full_game` (ACH-055).
 
 | id | Name | Category | Tier | Scope | On | Test | Progress | Full game | Refs |
 |---|---|---|---|---|---|---|---|---|---|
@@ -199,7 +200,11 @@ sea 6 (55), order 3 (35), abroad 5 (45), history 12 (165), campaign 8 (100). Tot
 | `history_kept` | As It Was Written | history | copper | campaign | `event_choice` | `{historical_choices_min: 25}` | historical_choices → 25 |  | event-tree trigger model |
 | `history_rewritten` | Another Ending | history | silver | campaign | `event_choice` | `{nonhistorical_choices_in_major_events_min: 10}` | nonhistorical_major_choices → 10 |  | event-tree importance, event-tree choices |
 | `paths_not_taken` | Paths Not Taken | history | gold | lifetime | `event_choice` | `{distinct_nonhistorical_options_min: 50}` | distinct_nonhistorical_options → 50 |  | event-tree choices |
-| `walls_held_1453` | The Walls Held | history | gold | campaign | `date` | `{date: 1460-12-31, event_role: {event: fall_of_constantinople, role: defender}, owns: city:constantinople}` |  |  | event-tree fall_of_constantinople |
+| `kulikovo_free` | Free of the Khan | history | silver | campaign | `date` | `{date: 1400-01-01, event_role: {event: battle_of_kulikovo, role: prince}, subject_of_anyone: false}` |  | yes | event-tree battle_of_kulikovo, event-tree tokhtamysh_burns_moscow, relation-types Subject |
+| `kosovo_free` | Blackbird Field | history | silver | campaign | `date` | `{date: 1400-01-01, event_role: {event: battle_of_kosovo, role: prince}, subject_of_anyone: false}` |  | yes | event-tree battle_of_kosovo, relation-types Subject |
+| `ankara_weathered` | The Storm Passes | history | silver | campaign | `date` | `{date: 1405-12-31, event_role: {event: battle_of_ankara, role: sultan}, subject_of_anyone: false}` |  |  | event-tree battle_of_ankara, event-tree death_of_timur, relation-types Subject |
+| `walls_held_1453` | The Walls Held | history | gold | campaign | `date` | `{date: 1460-12-31, event_role: {event: fall_of_constantinople, role: defender}, owns: city:constantinople}` |  | yes | event-tree fall_of_constantinople |
+| `timurid_heirs` | The Conqueror's Heirs | history | gold | campaign | `date` | `{date: 1507-12-31, event_role: {event: death_of_timur, role: empire}, owns: city:samarkand}` |  | yes | event-tree death_of_timur, event-tree shaybanid_conquest_of_transoxiana |
 | `four_quarters_hold` | The Four Quarters Hold | history | gold | campaign | `date` | `{date: 1600-12-31, event_role: {event: inca_expansion, role: any}, owns: city:cusco, subject_of_anyone: false}` |  |  | event-tree inca_expansion, event-tree spanish_conquest_of_the_inca |
 | `never_colonised` | Unconquered | history | gold | campaign | `date` | `{date: 1914-01-01, start_macro_region_not: europe, capital_never_occupied_by_other_macro_region: true}` |  |  | event-tree geography, event-tree agency |
 | `printing_early` | The Presses Roll | history | copper | campaign | `invention_done` | `{invention: printing, before: 1470-01-01}` |  |  | event-tree printing_press_spreads, research-tree |
@@ -208,8 +213,9 @@ sea 6 (55), order 3 (35), abroad 5 (45), history 12 (165), campaign 8 (100). Tot
 | `crash_weathered` | Weathered the Crash | history | copper | campaign | `event_end` | `{event: great_depression, affected: true, defaulted_during_event: false}` |  |  | event-tree great_depression, country-stats 2 |
 | `japan_whole_1600` | One Island Realm | history | gold | campaign | `province_gained` | `{owns_all: region:japan, before: 1600-01-01}` |  |  | event-tree p_sengoku_and_unification |
 | `sahel_whole_1600` | Lord of the River Bend | history | gold | campaign | `province_gained` | `{owns_all: area:niger_bend, before: 1600-01-01}` |  |  | event-tree p_songhai_and_sahel |
+| `reach_1444` | The Old Start | campaign | copper | campaign | `date` | `{date: 1444-11-11}` |  |  | decisions X-25 |
 | `reach_1500` | New Century | campaign | copper | campaign | `date` | `{date: 1500-01-01}` |  |  |  |
-| `reach_1700` | Halfway Through Time | campaign | copper | campaign | `date` | `{date: 1700-01-01}` |  |  |  |
+| `reach_1700` | Three Centuries On (was Halfway Through Time) | campaign | copper | campaign | `date` | `{date: 1700-01-01}` |  |  |  |
 | `reach_1900` | The New Machine Age | campaign | silver | campaign | `date` | `{date: 1900-01-01}` |  |  |  |
 | `campaign_complete` | The Long Road | campaign | crown | campaign | `campaign_end` | `{reached_end_date: true}` |  |  | gap-lists decisions campaign span |
 | `from_one_hall` | From One Hall | campaign | gold | campaign | `province_gained` | `{start_provinces_max: 1, provinces_min: 50}` | provinces → 50 |  |  |
@@ -243,7 +249,7 @@ Unlock texts (what the player reads) are the `text` field of each row; see `achi
 - ACH-008 The achievements context shall hold at most 100 achievements, ever. [achievements §2]
 - ACH-009 The achievements context shall give each achievement the points of its tier: copper 5, silver 10, gold 20, crown 40, the same on Game Center and Google Play. [achievements §3; yaml tiers]
 - ACH-010 The achievements context shall keep every achievement's points a multiple of 5 and at most 40, and the total at most 1,000. [achievements §2]
-- ACH-011 The achievements context shall ship 75 achievements worth 755 points at launch, keeping 25 slots and 245 points for updates. [achievements §2, §4]
+- ACH-011 The achievements context shall ship 80 achievements worth 810 points at launch, keeping 20 slots and 190 points for updates. [achievements §2, §4; D-ACH-16, D-ACH-17]
 - ACH-012 When an update adds achievements, the achievements context shall keep at least 10 slots and 100 points in reserve afterwards. [achievements §9]
 - ACH-013 The achievements context shall keep every name at most 24 characters and every text at most 100 characters. [achievements §4.1; yaml fields]
 - ACH-014 Where a score or victory is added to the game, the achievements context shall give it its own achievements from the reserve. [achievements §10]
@@ -258,8 +264,8 @@ Unlock texts (what the player reads) are the `text` field of each row; see `achi
 - ACH-021 The achievements context shall unlock each Sea and the wider world achievement (6 rows) as listed in the catalogue. [yaml sea]
 - ACH-022 The achievements context shall unlock each Order achievement (3 rows) as listed in the catalogue. [yaml order]
 - ACH-023 The achievements context shall unlock each Abroad achievement (5 rows) as listed in the catalogue. [yaml abroad]
-- ACH-024 The achievements context shall unlock each History achievement (12 rows) as listed in the catalogue. [yaml history]
-- ACH-025 The achievements context shall unlock each Campaign achievement (8 rows) as listed in the catalogue. [yaml campaign]
+- ACH-024 The achievements context shall unlock each History achievement (16 rows, four of them for the decades after the 1378 start) as listed in the catalogue. [yaml history; D-ACH-17]
+- ACH-025 The achievements context shall unlock each Campaign achievement (9 rows) as listed in the catalogue. [yaml campaign; D-ACH-17]
 - ACH-026 If an achievement's test is not met when its moment occurs, then the achievements context shall leave it locked. [achievements §5.1]
 
 ### Scope
@@ -303,7 +309,7 @@ Unlock texts (what the player reads) are the `text` field of each row; see `achi
 
 ### Free tier and Steam demo
 - ACH-054 Where the game is the iOS or Android free download, the achievements context shall award achievements as in the full game and keep them when the player buys. [achievements §5.5]
-- ACH-055 Where a row is marked `full_game`, the achievements context shall not let it be earned with the free tier's countries alone (launch: *Our Own Banner*, *The Walls Held*, *The Four Quarters Hold*, *From One Hall*, *Many Tents, One People*, *Many Crowns*, *Crowns of the World*; D-ACH-3). [achievements §5.5; yaml]
+- ACH-055 Where a row is marked `full_game`, the achievements context shall not let it be earned with the free tier's countries alone (launch: *Our Own Banner*, *Free of the Khan*, *Blackbird Field*, *The Walls Held*, *The Conqueror's Heirs*, *The Four Quarters Hold*, *From One Hall*, *Many Tents, One People*, *Many Crowns*, *Crowns of the World*; D-ACH-3). [achievements §5.5; yaml; D-ACH-17]
 - ACH-056 Because neither free country (Ottomans, France) has a single-province start, the achievements context shall mark *From One Hall* `full_game` (D-ACH-3). [achievements §5.5, §10]
 - ACH-057 Where the game is the Steam demo, the achievements context shall award nothing to Steam directly and keep a local list from the demo's ironman games. [achievements §5.2, §5.5]
 - ACH-058 When a demo player buys the full game, the achievements context shall read the demo's profile and award what was earned there. [achievements §5.5]
@@ -334,13 +340,20 @@ Unlock texts (what the player reads) are the `text` field of each row; see `achi
 - ACH-084 Where rows share a `ladder`, the achievements context shall treat each as one level of that ladder: its own row, points and store achievement, earned when its own test holds, so a counter that jumps past two steps earns both levels at once. [Leroy, 18 Oct, D-ACH-16]
 - ACH-085 The harvest ladder shall count province harvests: each province of the player's realm that brings in its harvest adds one at that month's `harvest` moment, and the levels from 10 up add the campaign's count to the lifetime counter `provinces_harvested` in the player profile, for eligible campaigns only (ACH-041), with levels at 1 (*First Harvest*, the campaign's first harvest), 10, 100, 1,000 and 10,000. [Leroy, 18 Oct; country-stats 3.1]
 
+### The 1378 start (X-25)
+- ACH-087 The achievements context shall read the start facts (start province count, start polity kind, started as subject, start macro-region) on the start day of the campaign's scenario, 20 September 1378 for every new campaign, and no test shall count years from a start year. [X-25; D-ACH-17]
+- ACH-088 The achievements context shall keep its date rows on calendar days that read the same from any start: *The Old Start* on 11 November 1444, the day after Varna where campaigns once began, *New Century* on 1 January 1500, *Three Centuries On* on 1 January 1700 (renamed from *Halfway Through Time*, since 1700 is no longer near the middle of 1378 to 1939) and *The New Machine Age* on 1 January 1900. A date row whose day falls on or before the campaign's start day is never earned, so a campaign begun from the 1444 checkpoint does not earn *The Old Start* on its first day. [X-25; D-ACH-17]
+- ACH-089 The achievements context shall give the decades after the 1378 start four History achievements read through the role the player's realm held in a bridge event (*Free of the Khan*, *Blackbird Field*, *The Storm Passes*, *The Conqueror's Heirs*), as listed in the catalogue; each holds on its day only if that bridge event happened with the player's realm in that role. [X-25; events-bridge-east; D-ACH-17]
+- ACH-090 The achievements context shall name in an `event_role` test only events that the event tree or its bridge events define. [ACH-006; D-ACH-17]
+- ACH-091 How the player uses it: the 1378 start's rows are badges like any other on the Achievements card (ACH-076), in the History and Campaign sections where they belong (ACH-077); the card's head and the two section headings count them (ACH-078); their names and texts fit the badge detail and the toast on a phone in landscape (ACH-013, ACH-080). A row whose bridge event the build does not run yet shows "Not in the game yet" (D-ACH-15). Nothing new is designed. [X-19; D-ACH-17]
+
 ### Adding more later
 - ACH-075 Where spare points are given to new achievements, the achievements context should give them mostly to new copper and silver goals. [achievements §9]
 
 ### How the player uses it (first slice in the game)
-- ACH-076 Where: the player taps the **trophy button** in the side tools (beside the map lens, the commanders and the speaker) or the *Achievements* button at the foot of the *Choose your realm* card, and the **Achievements card** opens in the side panel. Until the main menu (S4) is built these two stand in for More → Achievements (D-ACH-13, D-ACH-15). [X-19]
+- ACH-076 Where: the player taps the **trophy button** in the side tools (beside the map lens, the commanders and the speaker) or the *Achievements* button at the foot of the *Choose your realm* card, and the **Achievements card** opens in the side panel. Until the main menu (S4) is built these two stand in for More → Achievements (D-ACH-13, D-ACH-15). [X-19] *In a campaign the trophy button moves into the game menu as Achievements, and its dot onto the game menu button (SHELL-168, Leroy 18 Oct).*
 - ACH-077 Grouping: everything about achievements sits on that one card: the eligibility line ("This campaign can earn achievements"), the filter (*All*, *Within reach* = ACH-073, *Earned*) and one section per category with its badges; the *Achievement toasts* switch (ACH-071) sits in the Settings screen's Gameplay section, beside Tutorial hints. Tapping a badge opens its detail under the grid: name, tier and points, text, this campaign's progress bar with its value (ACH-050), the date earned, or "Not in the game yet" for a row whose system the build does not have. [X-19]
-- ACH-078 Overview: the card's head shows earned of all and points of 755 at a glance, each category heading shows its own earned of all (a ladder's levels counted one by one), and the trophy button carries a dot while an unlock has not been looked at. [X-19]
+- ACH-078 Overview: the card's head shows earned of all and points of the list's total (810 at launch) at a glance, each category heading shows its own earned of all (a ladder's levels counted one by one), and the trophy button carries a dot while an unlock has not been looked at. [X-19]
 - ACH-079 Unlock: the toast (ACH-069) slides in at the top centre under the date bar for 3 seconds with the badge, name and tier, plays the sting and adds a line to the News; tapping it opens the card at that achievement; it waits while an event card or the battle watch is open (ACH-070). [X-19]
 - ACH-080 Phone: the card is one column in the side panel in the Wide and Tall layouts, inside the safe areas; badges, filter chips and the switch are at least 44 points; the detail needs no hover; the toast fits a 375-point-wide screen. Checked by `apps/client/scripts/achievement-shots.mjs` on a small and a large phone held sideways and upright. [X-19]
 - ACH-081 Storage: unlocks with their dates and the lifetime counters are kept on the device in the player profile (local storage), apart from any save, so they survive a new campaign and a reload; the campaign's own counters and earned list travel with the campaign. [ACH-051; saves profile]
@@ -465,7 +478,8 @@ None. Achievements are only for the human player's realm; the designs give compu
 - **D-ACH-12** (was OQ-ACH-12) The tutorial's last card says that achievements start in a real campaign; onboarding adds the line. One line of copy, no rule.
 - **D-ACH-13** (was OQ-ACH-13) The achievements screen opens from the main menu's More, as screen flow places it (the latest design); the game menu does not list it. Latest decision wins.
 - **D-ACH-14** (was OQ-ACH-14) Victory: X-12 decides how a campaign is won; no new achievement is added, and *The Long Road* still needs only reaching 31 August 1939. No new rows beyond the list.
-- **D-ACH-15** First slice in the playable build (X-19, 18 Oct): the build has no main menu, saves or cheats yet, so the trophy button and the *Choose your realm* card open the Achievements card, every campaign counts as ironman, and tests run at each weekly turn end. Rows whose stats the engine does not keep yet (charters, rulers and succession, trade hubs, winter quarters, marshals, styles, buying a castle, voyages, contact and colonies, rebellions, famine relief, castle reach 3, macro-regions, world-war and crash tracking) show "Not in the game yet" and stay locked. Badges are a tier frame around a category glyph until the 71 icons of ACH-065 are drawn. Each of these goes when its system lands.
+- **D-ACH-15** First slice in the playable build (X-19, 18 Oct): the build has no main menu, saves or cheats yet, so the trophy button and the *Choose your realm* card open the Achievements card, every campaign counts as ironman, and tests run at each weekly turn end. Rows whose stats the engine does not keep yet (charters, rulers and succession, trade hubs, winter quarters, marshals, styles, buying a castle, voyages, contact and colonies, rebellions, famine relief, castle reach 3, macro-regions, world-war and crash tracking) show "Not in the game yet" and stay locked. Badges are a tier frame around a category glyph until the icons of ACH-065 are drawn. Each of these goes when its system lands.
+- **D-ACH-17** The 1378 start (X-25, Leroy, 18 Oct; reviewed 19 Oct). Every row was read again for anything that assumed a 1444 start. *Changed:* `reach_1700` keeps its day, because round centuries make a clean date ladder, and is renamed *Three Centuries On*, since 1700 is no longer near the middle of 1378 to 1939; the counts, the reserve and the list of `full_game` rows follow the new rows. *Kept as they are:* *The Walls Held* still reads the defender of `fall_of_constantinople` (which may now come from 1390, its trigger still needing a war and the walls) and Constantinople held through 1460; Byzantium starts as a tributary of the Ottomans in 1378, which does not change the test. *From One Hall*, *Our Own Banner*, *Many Tents, One People* and *Unconquered* read start facts taken on the start day of whichever start is played (ACH-087), so they need no change; *The Presses Roll* (before 1470), *One Island Realm* and *Lord of the River Bend* (before 1600) keep their years, which now leave more time and stay goals to aim for; no test names a realm, so none depends on which realms are born in 1378 (the Inca role of *The Four Quarters Hold* is held by Cusco from the start). *Added* (55 points, mostly silver, ACH-075): *The Old Start* (11 November 1444) and four History rows on the east bridge events, each read through one `event_role` and a date, the only keys the evaluator needs: *Free of the Khan* (the prince at Kulikovo, nobody's subject on 1 January 1400; historically Tokhtamysh burned Moscow in 1382 and it paid again), *Blackbird Field* (the prince at Kosovo, nobody's subject on 1 January 1400), *The Storm Passes* (the sultan at Ankara, nobody's subject at the end of 1405) and *The Conqueror's Heirs* (the empire at Timur's death, Samarkand held through 1507, past the Shaybanid conquest). *Left for later* (their events or places are not in the data yet): the end of the Western Schism, Florence taking Pisa, and the Ottomans holding Edirne and Bursa through Ankara (no place for either city). 80 rows and 810 points leave 20 slots and 190 points, inside ACH-012.
 - **D-ACH-16** Ladders (Leroy, 18 Oct: "steps that get up, up to 10000 harvests"): a ladder is a set of ordinary rows sharing `ladder`, not a new kind of achievement, because no store has levels: Steam, Game Center and Google Play each list every level as its own achievement, and the stores' limits keep applying row by row. The harvest ladder adds four rows (`harvests_10` copper, `harvests_100` silver, `harvests_1000` gold, `harvests_10000` crown, 75 points) to the YAML's 71, leaving 25 slots and 245 points in reserve. It counts province harvests across campaigns, because a realm harvests once a year and no campaign lasts 10,000 years; ten thousand takes several long campaigns as a large realm, which fits a crown. *First Harvest* stays a campaign row and is the ladder's first level. Further ladders (battles won, inventions) can come from the reserve.
 
 ## 14. Traceability
@@ -498,4 +512,9 @@ None. Achievements are only for the human player's realm; the designs give compu
 | ACH-069 … ACH-074 | in-game-presentation.feature | all scenarios |
 | ACH-075 | — | Guidance for content updates, not behaviour |
 | ACH-084, ACH-085 | scope-and-progress.feature | A ladder earns its levels as the count climbs |
+| ACH-087 | list-rules.feature | No test counts years from a start year (the start facts themselves are taken when the live game starts the campaign, `startAchievements` in `packages/engine/src/achievements.ts`) |
+| ACH-088 | test-timing.feature, unlock-catalogue.feature | Date rows are checked once, on that day; A day on or before the campaign's start is never reached; Campaign achievement outline |
+| ACH-089 | unlock-catalogue.feature | History achievement outline; A bridge event row needs the role |
+| ACH-090 | list-rules.feature | Every event a test reads is defined |
+| ACH-091 | — | How the player uses it; the rows show on the existing Achievements card (ACH-076 … ACH-080) |
 | ACH-076 … ACH-083, ACH-086 | — | How the player uses it; checked in the client by `apps/client/scripts/achievement-shots.mjs` and engine tests in `packages/engine/test/achievements.test.ts` |

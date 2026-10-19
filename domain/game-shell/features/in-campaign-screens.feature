@@ -17,7 +17,7 @@ Feature: Other in-campaign screens
       | from                                  | result                                         |
       | by a running player battle            | the map is shown and the battle keeps running  |
       | from the turn report as a replay      | the turn report is shown                       |
-      | from the tab "Chronicle" as a replay  | the tab "Chronicle" is shown                   |
+      | from the News as a replay             | the News is shown                              |
 
   @SHELL-091
   Scenario Outline: Siege view
@@ -40,7 +40,7 @@ Feature: Other in-campaign screens
 
     Examples:
       | from                                 |
-      | the tab "Abroad"                     |
+      | the tab "Diplomacy"                  |
       | the country card of "England"        |
 
   @SHELL-092

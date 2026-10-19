@@ -1,0 +1,3578 @@
+{
+ "nav": [
+  {
+   "title": "Start here",
+   "pages": [
+    "Time-and-Turns",
+    "The-1378-Start",
+    "Your-Realm",
+    "Provinces",
+    "Map-and-Lenses"
+   ]
+  },
+  {
+   "title": "Land and economy",
+   "pages": [
+    "Provinces",
+    "Your-Realm",
+    "Research",
+    "Buildings",
+    "Trade"
+   ]
+  },
+  {
+   "title": "Armies and the seas",
+   "pages": [
+    "Recruiting",
+    "Troop-Movement",
+    "Warfare",
+    "Naval",
+    "Exploration-and-Colonies",
+    "Tribes-and-Hunting-Grounds"
+   ]
+  },
+  {
+   "title": "Statecraft",
+   "pages": [
+    "Diplomacy",
+    "Subjects",
+    "Institutions",
+    "Government",
+    "Culture",
+    "Religion",
+    "Rebellions"
+   ]
+  },
+  {
+   "title": "History and identity",
+   "pages": [
+    "Historical-Events",
+    "Revolutions",
+    "National-Strengths"
+   ]
+  },
+  {
+   "title": "Around the game",
+   "pages": [
+    "Screens-and-Navigation",
+    "Saving",
+    "Settings",
+    "Tutorial-and-Help",
+    "Achievements",
+    "Music-and-Sound"
+   ]
+  },
+  {
+   "title": "For developers",
+   "pages": [
+    "Design-Principles"
+   ]
+  },
+  {
+   "title": "More",
+   "pages": [
+    "World-Map"
+   ]
+  }
+ ],
+ "pages": {
+  "Achievements": {
+   "title": "Achievements",
+   "summary": "Achievements are goals you can earn across your campaigns: a first harvest, a castle taken by terms, a century without a broken oath, Constantinople held past 1460, Moscow free of the khan after Kulikovo. There are…",
+   "headings": [
+    {
+     "id": "how-it-works",
+     "text": "How it works",
+     "level": 2
+    },
+    {
+     "id": "fair-and-our-own",
+     "text": "Fair and our own",
+     "level": 3
+    },
+    {
+     "id": "tiers-and-points",
+     "text": "Tiers and points",
+     "level": 3
+    },
+    {
+     "id": "scope-and-hidden-achievements",
+     "text": "Scope and hidden achievements",
+     "level": 3
+    },
+    {
+     "id": "when-tests-run",
+     "text": "When tests run",
+     "level": 3
+    },
+    {
+     "id": "which-games-count",
+     "text": "Which games count",
+     "level": 3
+    },
+    {
+     "id": "progress-bars",
+     "text": "Progress bars",
+     "level": 3
+    },
+    {
+     "id": "offline-and-failed-calls",
+     "text": "Offline and failed calls",
+     "level": 3
+    },
+    {
+     "id": "free-tier-and-steam-demo",
+     "text": "Free tier and Steam demo",
+     "level": 3
+    },
+    {
+     "id": "store-ids-and-retiring",
+     "text": "Store ids and retiring",
+     "level": 3
+    },
+    {
+     "id": "icons",
+     "text": "Icons",
+     "level": 3
+    },
+    {
+     "id": "the-80-achievements",
+     "text": "The 80 achievements",
+     "level": 3
+    },
+    {
+     "id": "what-you-see",
+     "text": "What you see",
+     "level": 2
+    },
+    {
+     "id": "in-the-playable-build-today",
+     "text": "In the playable build today",
+     "level": 3
+    },
+    {
+     "id": "how-it-connects",
+     "text": "How it connects",
+     "level": 2
+    },
+    {
+     "id": "numbers",
+     "text": "Numbers",
+     "level": 2
+    },
+    {
+     "id": "still-open",
+     "text": "Still open",
+     "level": 2
+    },
+    {
+     "id": "for-developers",
+     "text": "For developers",
+     "level": 2
+    }
+   ]
+  },
+  "Buildings": {
+   "title": "Buildings",
+   "summary": "Buildings are how your provinces put people to work. Every farm, mine, loom house, church, castle and harbour stands on a tile, a town slot or across the whole province, gives job slots to one class of people, makes…",
+   "headings": [
+    {
+     "id": "how-it-works",
+     "text": "How it works",
+     "level": 2
+    },
+    {
+     "id": "what-a-building-is",
+     "text": "What a building is",
+     "level": 3
+    },
+    {
+     "id": "where-buildings-go",
+     "text": "Where buildings go",
+     "level": 3
+    },
+    {
+     "id": "what-a-building-costs",
+     "text": "What a building costs",
+     "level": 3
+    },
+    {
+     "id": "sites",
+     "text": "Sites",
+     "level": 3
+    },
+    {
+     "id": "steps-and-upgrades",
+     "text": "Steps and upgrades",
+     "level": 3
+    },
+    {
+     "id": "upkeep-and-condition",
+     "text": "Upkeep and condition",
+     "level": 3
+    },
+    {
+     "id": "how-buildings-are-lost-or-damaged",
+     "text": "How buildings are lost or damaged",
+     "level": 3
+    },
+    {
+     "id": "converting",
+     "text": "Converting",
+     "level": 3
+    },
+    {
+     "id": "owners",
+     "text": "Owners",
+     "level": 3
+    },
+    {
+     "id": "what-the-people-build-themselves",
+     "text": "What the people build themselves",
+     "level": 3
+    },
+    {
+     "id": "the-catalogue",
+     "text": "The catalogue",
+     "level": 3
+    },
+    {
+     "id": "landmarks",
+     "text": "Landmarks",
+     "level": 3
+    },
+    {
+     "id": "regional-looks-and-unique-variants",
+     "text": "Regional looks and unique variants",
+     "level": 3
+    },
+    {
+     "id": "events",
+     "text": "Events",
+     "level": 3
+    },
+    {
+     "id": "starting-buildings",
+     "text": "Starting buildings",
+     "level": 3
+    },
+    {
+     "id": "the-ai",
+     "text": "The AI",
+     "level": 3
+    },
+    {
+     "id": "each-month",
+     "text": "Each month",
+     "level": 3
+    },
+    {
+     "id": "worked-example-troyes-1444-to-1452-on-the-1444-checkpoint-world",
+     "text": "Worked example: Troyes, 1444 to 1452 (on the 1444 checkpoint world)",
+     "level": 3
+    },
+    {
+     "id": "in-the-game-now-works-the-first-cut",
+     "text": "In the game now: works, the first cut",
+     "level": 2
+    },
+    {
+     "id": "what-you-see",
+     "text": "What you see",
+     "level": 2
+    },
+    {
+     "id": "how-it-connects",
+     "text": "How it connects",
+     "level": 2
+    },
+    {
+     "id": "numbers",
+     "text": "Numbers",
+     "level": 2
+    },
+    {
+     "id": "decided-since-the-first-draft",
+     "text": "Decided since the first draft",
+     "level": 2
+    },
+    {
+     "id": "still-open",
+     "text": "Still open",
+     "level": 2
+    },
+    {
+     "id": "for-developers",
+     "text": "For developers",
+     "level": 2
+    }
+   ]
+  },
+  "Culture": {
+   "title": "Culture",
+   "summary": "Culture in Pocket Hegemony is about language : the people a person belongs to, the speech they share and the land they see as their own. Every person has a language, every country has one court language, and everyone…",
+   "headings": [
+    {
+     "id": "how-it-works",
+     "text": "How it works",
+     "level": 2
+    },
+    {
+     "id": "languages-and-families",
+     "text": "Languages and families",
+     "level": 3
+    },
+    {
+     "id": "the-court-language",
+     "text": "The court language",
+     "level": 3
+    },
+    {
+     "id": "same-language-related-foreign-and-trading-peoples",
+     "text": "Same language, related, foreign and trading peoples",
+     "level": 3
+    },
+    {
+     "id": "drift",
+     "text": "Drift",
+     "level": 3
+    },
+    {
+     "id": "people-on-the-move",
+     "text": "People on the move",
+     "level": 3
+    },
+    {
+     "id": "language-policy",
+     "text": "Language policy",
+     "level": 3
+    },
+    {
+     "id": "the-own-language-charter-and-other-levers",
+     "text": "The Own-language charter and other levers",
+     "level": 3
+    },
+    {
+     "id": "officials-and-lords",
+     "text": "Officials and lords",
+     "level": 3
+    },
+    {
+     "id": "order-and-war",
+     "text": "Order and war",
+     "level": 3
+    },
+    {
+     "id": "trade-research-and-diplomacy",
+     "text": "Trade, research and diplomacy",
+     "level": 3
+    },
+    {
+     "id": "languages-through-history",
+     "text": "Languages through history",
+     "level": 3
+    },
+    {
+     "id": "the-computer-players",
+     "text": "The computer players",
+     "level": 3
+    },
+    {
+     "id": "when-it-happens",
+     "text": "When it happens",
+     "level": 3
+    },
+    {
+     "id": "what-you-see",
+     "text": "What you see",
+     "level": 2
+    },
+    {
+     "id": "in-the-game-now",
+     "text": "In the game now",
+     "level": 3
+    },
+    {
+     "id": "how-it-connects",
+     "text": "How it connects",
+     "level": 2
+    },
+    {
+     "id": "numbers",
+     "text": "Numbers",
+     "level": 2
+    },
+    {
+     "id": "still-open",
+     "text": "Still open",
+     "level": 2
+    },
+    {
+     "id": "for-developers",
+     "text": "For developers",
+     "level": 2
+    }
+   ]
+  },
+  "Design-Principles": {
+   "title": "Design principles",
+   "summary": "These are the rules every feature of Pocket Hegemony is designed by. They come from Leroy's direction for the game (decision X-19 in domain/DECISIONS.md ) and from the screen rules already in the specs. Every new or…",
+   "headings": [
+    {
+     "id": "start-from-how-the-player-uses-it",
+     "text": "Start from how the player uses it",
+     "level": 2
+    },
+    {
+     "id": "group-related-things-together",
+     "text": "Group related things together",
+     "level": 2
+    },
+    {
+     "id": "give-the-important-things-an-overview",
+     "text": "Give the important things an overview",
+     "level": 2
+    },
+    {
+     "id": "check-it-on-a-phone",
+     "text": "Check it on a phone",
+     "level": 2
+    },
+    {
+     "id": "rules-that-already-hold",
+     "text": "Rules that already hold",
+     "level": 2
+    }
+   ]
+  },
+  "Diplomacy": {
+   "title": "Diplomacy",
+   "summary": "Diplomacy is how countries deal with each other short of fighting, and how they get into and out of wars. You send envoys (your own officials) to other courts, and every request is answered by a plain list of reasons…",
+   "headings": [
+    {
+     "id": "how-it-works",
+     "text": "How it works",
+     "level": 2
+    },
+    {
+     "id": "how-two-countries-stand",
+     "text": "How two countries stand",
+     "level": 3
+    },
+    {
+     "id": "envoys",
+     "text": "Envoys",
+     "level": 3
+    },
+    {
+     "id": "the-ledger-and-standing",
+     "text": "The ledger and standing",
+     "level": 3
+    },
+    {
+     "id": "the-reasons-count",
+     "text": "The reasons count",
+     "level": 3
+    },
+    {
+     "id": "the-actions",
+     "text": "The actions",
+     "level": 3
+    },
+    {
+     "id": "war-aims",
+     "text": "War aims",
+     "level": 3
+    },
+    {
+     "id": "declaring-war",
+     "text": "Declaring war",
+     "level": 3
+    },
+    {
+     "id": "peace-and-truces",
+     "text": "Peace and truces",
+     "level": 3
+    },
+    {
+     "id": "leagues-against-a-conqueror",
+     "text": "Leagues against a conqueror",
+     "level": 3
+    },
+    {
+     "id": "eras",
+     "text": "Eras",
+     "level": 3
+    },
+    {
+     "id": "events",
+     "text": "Events",
+     "level": 3
+    },
+    {
+     "id": "the-computer-players",
+     "text": "The computer players",
+     "level": 3
+    },
+    {
+     "id": "each-month",
+     "text": "Each month",
+     "level": 3
+    },
+    {
+     "id": "what-you-see",
+     "text": "What you see",
+     "level": 2
+    },
+    {
+     "id": "envoys-in-the-game-today",
+     "text": "Envoys in the game today",
+     "level": 3
+    },
+    {
+     "id": "demands-in-the-game-today",
+     "text": "Demands in the game today",
+     "level": 3
+    },
+    {
+     "id": "how-it-connects",
+     "text": "How it connects",
+     "level": 2
+    },
+    {
+     "id": "numbers",
+     "text": "Numbers",
+     "level": 2
+    },
+    {
+     "id": "still-open",
+     "text": "Still open",
+     "level": 2
+    },
+    {
+     "id": "for-developers",
+     "text": "For developers",
+     "level": 2
+    }
+   ]
+  },
+  "Exploration-and-Colonies": {
+   "title": "Exploration and Colonies",
+   "summary": "Exploration is how your realm sails into the unknown and plants colonies there. Each country sees only the part of the world it has charted, with a parchment fog over the rest; exploration ships push into that fog,…",
+   "headings": [
+    {
+     "id": "how-it-works",
+     "text": "How it works",
+     "level": 2
+    },
+    {
+     "id": "unlocking-exploration",
+     "text": "Unlocking exploration",
+     "level": 3
+    },
+    {
+     "id": "the-charted-map",
+     "text": "The charted map",
+     "level": 3
+    },
+    {
+     "id": "voyages",
+     "text": "Voyages",
+     "level": 3
+    },
+    {
+     "id": "colonial-governors-and-range",
+     "text": "Colonial governors and range",
+     "level": 3
+    },
+    {
+     "id": "founding-a-colony",
+     "text": "Founding a colony",
+     "level": 3
+    },
+    {
+     "id": "the-computer-players",
+     "text": "The computer players",
+     "level": 3
+    },
+    {
+     "id": "how-you-play-it",
+     "text": "How you play it",
+     "level": 2
+    },
+    {
+     "id": "how-it-connects",
+     "text": "How it connects",
+     "level": 2
+    },
+    {
+     "id": "numbers",
+     "text": "Numbers",
+     "level": 2
+    },
+    {
+     "id": "still-open",
+     "text": "Still open",
+     "level": 2
+    },
+    {
+     "id": "for-developers",
+     "text": "For developers",
+     "level": 2
+    }
+   ]
+  },
+  "Government": {
+   "title": "Government",
+   "summary": "Government decides how your country is ruled and how many people can run it. Your government form (one of 27, from a feudal realm to a party state) sets how many officials and lords you can support, how far your…",
+   "headings": [
+    {
+     "id": "how-it-works",
+     "text": "How it works",
+     "level": 2
+    },
+    {
+     "id": "the-two-caps",
+     "text": "The two caps",
+     "level": 3
+    },
+    {
+     "id": "buildings-that-raise-the-caps",
+     "text": "Buildings that raise the caps",
+     "level": 3
+    },
+    {
+     "id": "the-27-forms",
+     "text": "The 27 forms",
+     "level": 3
+    },
+    {
+     "id": "reforms",
+     "text": "Reforms",
+     "level": 3
+    },
+    {
+     "id": "changes-that-happen-by-themselves",
+     "text": "Changes that happen by themselves",
+     "level": 3
+    },
+    {
+     "id": "changes-without-a-reform",
+     "text": "Changes without a reform",
+     "level": 3
+    },
+    {
+     "id": "hordes-and-technology",
+     "text": "Hordes and technology",
+     "level": 3
+    },
+    {
+     "id": "the-start",
+     "text": "The start",
+     "level": 3
+    },
+    {
+     "id": "the-computer-players",
+     "text": "The computer players",
+     "level": 3
+    },
+    {
+     "id": "each-month",
+     "text": "Each month",
+     "level": 3
+    },
+    {
+     "id": "what-you-see",
+     "text": "What you see",
+     "level": 2
+    },
+    {
+     "id": "in-the-game-now",
+     "text": "In the game now",
+     "level": 3
+    },
+    {
+     "id": "how-it-connects",
+     "text": "How it connects",
+     "level": 2
+    },
+    {
+     "id": "numbers",
+     "text": "Numbers",
+     "level": 2
+    },
+    {
+     "id": "still-open",
+     "text": "Still open",
+     "level": 2
+    },
+    {
+     "id": "for-developers",
+     "text": "For developers",
+     "level": 2
+    }
+   ]
+  },
+  "Historical-Events": {
+   "title": "Historical events",
+   "summary": "Historical events are the game's history layer: the turning points of five centuries, from the fall of Constantinople to the Great Depression, arriving as cards with choices. They follow the state of the world rather…",
+   "headings": [
+    {
+     "id": "how-it-works",
+     "text": "How it works",
+     "level": 2
+    },
+    {
+     "id": "the-campaign-span",
+     "text": "The campaign span",
+     "level": 3
+    },
+    {
+     "id": "principles",
+     "text": "Principles",
+     "level": 3
+    },
+    {
+     "id": "ages",
+     "text": "Ages",
+     "level": 3
+    },
+    {
+     "id": "periods",
+     "text": "Periods",
+     "level": 3
+    },
+    {
+     "id": "from-1378-to-1444-the-bridge-events-of-the-west",
+     "text": "From 1378 to 1444: the bridge events of the West",
+     "level": 3
+    },
+    {
+     "id": "everyday-events",
+     "text": "Everyday events",
+     "level": 3
+    },
+    {
+     "id": "when-an-event-can-happen",
+     "text": "When an event can happen",
+     "level": 3
+    },
+    {
+     "id": "how-an-eligible-event-is-chosen",
+     "text": "How an eligible event is chosen",
+     "level": 3
+    },
+    {
+     "id": "options-and-choices",
+     "text": "Options and choices",
+     "level": 3
+    },
+    {
+     "id": "effects",
+     "text": "Effects",
+     "level": 3
+    },
+    {
+     "id": "modifiers",
+     "text": "Modifiers",
+     "level": 3
+    },
+    {
+     "id": "the-event-trees-statistics",
+     "text": "The event tree's statistics",
+     "level": 3
+    },
+    {
+     "id": "flags-lists-and-entities",
+     "text": "Flags, lists and entities",
+     "level": 3
+    },
+    {
+     "id": "the-data-build",
+     "text": "The data build",
+     "level": 3
+    },
+    {
+     "id": "realms-historical-goals",
+     "text": "Realms' historical goals",
+     "level": 3
+    },
+    {
+     "id": "hooks-for-other-systems",
+     "text": "Hooks for other systems",
+     "level": 3
+    },
+    {
+     "id": "what-you-see",
+     "text": "What you see",
+     "level": 2
+    },
+    {
+     "id": "how-it-connects",
+     "text": "How it connects",
+     "level": 2
+    },
+    {
+     "id": "each-month",
+     "text": "Each month",
+     "level": 3
+    },
+    {
+     "id": "numbers",
+     "text": "Numbers",
+     "level": 2
+    },
+    {
+     "id": "still-open",
+     "text": "Still open",
+     "level": 2
+    },
+    {
+     "id": "for-developers",
+     "text": "For developers",
+     "level": 2
+    }
+   ]
+  },
+  "Home": {
+   "title": "Pocket Hegemony wiki",
+   "summary": "Pocket Hegemony is an 8-bit grand strategy game for phones, desktop and the web. You lead one of hundreds of realms from 20 September 1378 to the end of August 1939, one week per turn, on a pixel-art map of the whole…",
+   "headings": [
+    {
+     "id": "start-here",
+     "text": "Start here",
+     "level": 2
+    },
+    {
+     "id": "land-and-economy",
+     "text": "Land and economy",
+     "level": 2
+    },
+    {
+     "id": "armies-and-the-seas",
+     "text": "Armies and the seas",
+     "level": 2
+    },
+    {
+     "id": "statecraft",
+     "text": "Statecraft",
+     "level": 2
+    },
+    {
+     "id": "history-and-identity",
+     "text": "History and identity",
+     "level": 2
+    },
+    {
+     "id": "around-the-game",
+     "text": "Around the game",
+     "level": 2
+    },
+    {
+     "id": "how-the-systems-fit-together",
+     "text": "How the systems fit together",
+     "level": 2
+    },
+    {
+     "id": "for-developers",
+     "text": "For developers",
+     "level": 2
+    }
+   ]
+  },
+  "Institutions": {
+   "title": "Institutions",
+   "summary": "Some realms belong to something bigger than themselves. At the 1378 start that is the Empire , whose Emperor is elected by seven seats and is only as strong as his hold over its members. The Shogunate in Japan works…",
+   "headings": [
+    {
+     "id": "hold",
+     "text": "Hold",
+     "level": 2
+    },
+    {
+     "id": "the-empire",
+     "text": "The Empire",
+     "level": 2
+    },
+    {
+     "id": "members-and-imperial-land",
+     "text": "Members and imperial land",
+     "level": 3
+    },
+    {
+     "id": "seats-and-the-election",
+     "text": "Seats and the election",
+     "level": 3
+    },
+    {
+     "id": "the-emperor",
+     "text": "The Emperor",
+     "level": 3
+    },
+    {
+     "id": "the-diet-and-the-reforms",
+     "text": "The Diet and the reforms",
+     "level": 3
+    },
+    {
+     "id": "faith-and-the-end",
+     "text": "Faith and the end",
+     "level": 3
+    },
+    {
+     "id": "the-shogunate",
+     "text": "The Shogunate",
+     "level": 2
+    },
+    {
+     "id": "the-houses",
+     "text": "The houses",
+     "level": 3
+    },
+    {
+     "id": "the-shoguns-actions",
+     "text": "The shogun's actions",
+     "level": 3
+    },
+    {
+     "id": "the-break",
+     "text": "The break",
+     "level": 3
+    },
+    {
+     "id": "the-end",
+     "text": "The end",
+     "level": 3
+    },
+    {
+     "id": "where-you-find-it",
+     "text": "Where you find it",
+     "level": 2
+    }
+   ]
+  },
+  "Map-and-Lenses": {
+   "title": "Map and Map Modes",
+   "summary": "The map is home in Pocket Hegemony: you play on it, and cards and screens open over it. This page covers how the map is drawn, what you see at each of the three zoom levels, the map modes that recolour the world by…",
+   "headings": [
+    {
+     "id": "how-it-works",
+     "text": "How it works",
+     "level": 2
+    },
+    {
+     "id": "drawing-the-map",
+     "text": "Drawing the map",
+     "level": 3
+    },
+    {
+     "id": "the-three-zoom-levels",
+     "text": "The three zoom levels",
+     "level": 3
+    },
+    {
+     "id": "close-in-the-living-map",
+     "text": "Close in: the living map",
+     "level": 3
+    },
+    {
+     "id": "map-modes",
+     "text": "Map modes",
+     "level": 3
+    },
+    {
+     "id": "parchment-over-uncharted-lands",
+     "text": "Parchment over uncharted lands",
+     "level": 3
+    },
+    {
+     "id": "watching-the-week",
+     "text": "Watching the week",
+     "level": 3
+    },
+    {
+     "id": "seasons",
+     "text": "Seasons",
+     "level": 3
+    },
+    {
+     "id": "layout-by-window-shape",
+     "text": "Layout by window shape",
+     "level": 3
+    },
+    {
+     "id": "map-accessibility",
+     "text": "Map accessibility",
+     "level": 3
+    },
+    {
+     "id": "staying-smooth-performance-budgets",
+     "text": "Staying smooth: performance budgets",
+     "level": 3
+    },
+    {
+     "id": "what-you-see",
+     "text": "What you see",
+     "level": 2
+    },
+    {
+     "id": "how-it-connects",
+     "text": "How it connects",
+     "level": 2
+    },
+    {
+     "id": "numbers",
+     "text": "Numbers",
+     "level": 2
+    },
+    {
+     "id": "other-display-rules",
+     "text": "Other display rules",
+     "level": 2
+    },
+    {
+     "id": "still-open",
+     "text": "Still open",
+     "level": 2
+    },
+    {
+     "id": "for-developers",
+     "text": "For developers",
+     "level": 2
+    }
+   ]
+  },
+  "Music-and-Sound": {
+   "title": "Music and sound",
+   "summary": "Every sound in Pocket Hegemony, music and effects alike, is synthesized live on PH-5, a small virtual 8-bit sound chip, from note data; the game ships no audio files. The music follows history: it changes with the…",
+   "headings": [
+    {
+     "id": "how-it-works",
+     "text": "How it works",
+     "level": 2
+    },
+    {
+     "id": "original-by-design",
+     "text": "Original by design",
+     "level": 3
+    },
+    {
+     "id": "the-ph-5-chip",
+     "text": "The PH-5 chip",
+     "level": 3
+    },
+    {
+     "id": "the-hegemony-motif",
+     "text": "The Hegemony motif",
+     "level": 3
+    },
+    {
+     "id": "music-eras",
+     "text": "Music eras",
+     "level": 3
+    },
+    {
+     "id": "palettes",
+     "text": "Palettes",
+     "level": 3
+    },
+    {
+     "id": "the-tracks",
+     "text": "The tracks",
+     "level": 3
+    },
+    {
+     "id": "the-music-director",
+     "text": "The music director",
+     "level": 3
+    },
+    {
+     "id": "who-marks-which-moment",
+     "text": "Who marks which moment",
+     "level": 3
+    },
+    {
+     "id": "effects-through-the-centuries",
+     "text": "Effects through the centuries",
+     "level": 3
+    },
+    {
+     "id": "the-effects-catalogue",
+     "text": "The effects catalogue",
+     "level": 3
+    },
+    {
+     "id": "ambience",
+     "text": "Ambience",
+     "level": 3
+    },
+    {
+     "id": "many-things-at-once",
+     "text": "Many things at once",
+     "level": 3
+    },
+    {
+     "id": "mixing-with-the-music",
+     "text": "Mixing with the music",
+     "level": 3
+    },
+    {
+     "id": "platform-behaviour",
+     "text": "Platform behaviour",
+     "level": 3
+    },
+    {
+     "id": "the-sound-card",
+     "text": "The Sound card",
+     "level": 3
+    },
+    {
+     "id": "settings",
+     "text": "Settings",
+     "level": 3
+    },
+    {
+     "id": "accessibility",
+     "text": "Accessibility",
+     "level": 3
+    },
+    {
+     "id": "care",
+     "text": "Care",
+     "level": 3
+    },
+    {
+     "id": "how-it-is-made",
+     "text": "How it is made",
+     "level": 3
+    },
+    {
+     "id": "what-you-see",
+     "text": "What you see",
+     "level": 2
+    },
+    {
+     "id": "how-it-connects",
+     "text": "How it connects",
+     "level": 2
+    },
+    {
+     "id": "each-turn",
+     "text": "Each turn",
+     "level": 3
+    },
+    {
+     "id": "numbers",
+     "text": "Numbers",
+     "level": 2
+    },
+    {
+     "id": "still-open",
+     "text": "Still open",
+     "level": 2
+    },
+    {
+     "id": "for-developers",
+     "text": "For developers",
+     "level": 2
+    }
+   ]
+  },
+  "National-Strengths": {
+   "title": "National strengths",
+   "summary": "Every playable country has a heritage: what it is good at because of where and what it is, what it becomes good at when its moment in history comes, what it secretly wants, what it has achieved, and what holds it…",
+   "headings": [
+    {
+     "id": "how-it-works",
+     "text": "How it works",
+     "level": 2
+    },
+    {
+     "id": "the-five-parts",
+     "text": "The five parts",
+     "level": 3
+    },
+    {
+     "id": "birthright",
+     "text": "Birthright",
+     "level": 3
+    },
+    {
+     "id": "golden-ages",
+     "text": "Golden ages",
+     "level": 3
+    },
+    {
+     "id": "ambitions",
+     "text": "Ambitions",
+     "level": 3
+    },
+    {
+     "id": "legacies",
+     "text": "Legacies",
+     "level": 3
+    },
+    {
+     "id": "weakness",
+     "text": "Weakness",
+     "level": 3
+    },
+    {
+     "id": "levers",
+     "text": "Levers",
+     "level": 3
+    },
+    {
+     "id": "conditions",
+     "text": "Conditions",
+     "level": 3
+    },
+    {
+     "id": "budgets",
+     "text": "Budgets",
+     "level": 3
+    },
+    {
+     "id": "who-gets-what",
+     "text": "Who gets what",
+     "level": 3
+    },
+    {
+     "id": "when-countries-change-hands",
+     "text": "When countries change hands",
+     "level": 3
+    },
+    {
+     "id": "events",
+     "text": "Events",
+     "level": 3
+    },
+    {
+     "id": "the-computer",
+     "text": "The computer",
+     "level": 3
+    },
+    {
+     "id": "what-you-see",
+     "text": "What you see",
+     "level": 2
+    },
+    {
+     "id": "how-it-connects",
+     "text": "How it connects",
+     "level": 2
+    },
+    {
+     "id": "each-turn",
+     "text": "Each turn",
+     "level": 3
+    },
+    {
+     "id": "numbers",
+     "text": "Numbers",
+     "level": 2
+    },
+    {
+     "id": "still-open",
+     "text": "Still open",
+     "level": 2
+    },
+    {
+     "id": "for-developers",
+     "text": "For developers",
+     "level": 2
+    }
+   ]
+  },
+  "Naval": {
+   "title": "Naval",
+   "summary": "Naval is how your realm gets ships to sea and keeps them there. Ships need ports, and ports need sailors: you muster sailors from a port's people at a shipyard, order ships there and they are laid down once their…",
+   "headings": [
+    {
+     "id": "how-it-works",
+     "text": "How it works",
+     "level": 2
+    },
+    {
+     "id": "ports",
+     "text": "Ports",
+     "level": 3
+    },
+    {
+     "id": "sailors",
+     "text": "Sailors",
+     "level": 3
+    },
+    {
+     "id": "buying-ships",
+     "text": "Buying ships",
+     "level": 3
+    },
+    {
+     "id": "fleets-and-ships",
+     "text": "Fleets and ships",
+     "level": 3
+    },
+    {
+     "id": "admirals",
+     "text": "Admirals",
+     "level": 3
+    },
+    {
+     "id": "keeping-ships",
+     "text": "Keeping ships",
+     "level": 3
+    },
+    {
+     "id": "sailing",
+     "text": "Sailing",
+     "level": 3
+    },
+    {
+     "id": "against-an-enemy-at-sea",
+     "text": "Against an enemy at sea",
+     "level": 3
+    },
+    {
+     "id": "the-computer-players",
+     "text": "The computer players",
+     "level": 3
+    },
+    {
+     "id": "each-day-and-each-month",
+     "text": "Each day and each month",
+     "level": 3
+    },
+    {
+     "id": "what-you-see",
+     "text": "What you see",
+     "level": 2
+    },
+    {
+     "id": "in-the-game-now",
+     "text": "In the game now",
+     "level": 3
+    },
+    {
+     "id": "fleets-at-sea",
+     "text": "Fleets at sea",
+     "level": 3
+    },
+    {
+     "id": "how-it-connects",
+     "text": "How it connects",
+     "level": 2
+    },
+    {
+     "id": "numbers",
+     "text": "Numbers",
+     "level": 2
+    },
+    {
+     "id": "how-the-open-points-were-settled",
+     "text": "How the open points were settled",
+     "level": 2
+    },
+    {
+     "id": "still-open",
+     "text": "Still open",
+     "level": 2
+    },
+    {
+     "id": "for-developers",
+     "text": "For developers",
+     "level": 2
+    }
+   ]
+  },
+  "Provinces": {
+   "title": "Provinces",
+   "summary": "The province is where your realm actually lives. Gold is taxed here, food grows here, recruits are raised here, lords and officials govern here, and armies burn it. Each province is a row of 4 to 16 tiles with real…",
+   "headings": [
+    {
+     "id": "how-it-works",
+     "text": "How it works",
+     "level": 2
+    },
+    {
+     "id": "the-principles",
+     "text": "The principles",
+     "level": 3
+    },
+    {
+     "id": "our-running-example-troyes-in-1444-on-the-1444-checkpoint-world",
+     "text": "Our running example: Troyes in 1444 (on the 1444 checkpoint world)",
+     "level": 3
+    },
+    {
+     "id": "tiles",
+     "text": "Tiles",
+     "level": 3
+    },
+    {
+     "id": "ground",
+     "text": "Ground",
+     "level": 3
+    },
+    {
+     "id": "buildings-in-the-province",
+     "text": "Buildings in the province",
+     "level": 3
+    },
+    {
+     "id": "food",
+     "text": "Food",
+     "level": 3
+    },
+    {
+     "id": "wares",
+     "text": "Wares",
+     "level": 3
+    },
+    {
+     "id": "people-births-deaths-and-famine",
+     "text": "People: births, deaths and famine",
+     "level": 3
+    },
+    {
+     "id": "classes-and-job-slots",
+     "text": "Classes and job slots",
+     "level": 3
+    },
+    {
+     "id": "homeless",
+     "text": "Homeless",
+     "level": 3
+    },
+    {
+     "id": "other-people",
+     "text": "Other people",
+     "level": 3
+    },
+    {
+     "id": "recruits-students-and-scholars",
+     "text": "Recruits, students and scholars",
+     "level": 3
+    },
+    {
+     "id": "tolls",
+     "text": "Tolls",
+     "level": 3
+    },
+    {
+     "id": "tax",
+     "text": "Tax",
+     "level": 3
+    },
+    {
+     "id": "roads-rivers-and-days-to-capital",
+     "text": "Roads, rivers and days to capital",
+     "level": 3
+    },
+    {
+     "id": "who-owns-and-governs-it",
+     "text": "Who owns and governs it",
+     "level": 3
+    },
+    {
+     "id": "officials",
+     "text": "Officials",
+     "level": 3
+    },
+    {
+     "id": "lords-in-the-province",
+     "text": "Lords in the province",
+     "level": 3
+    },
+    {
+     "id": "charters",
+     "text": "Charters",
+     "level": 3
+    },
+    {
+     "id": "defence",
+     "text": "Defence",
+     "level": 3
+    },
+    {
+     "id": "grievances-and-rebels",
+     "text": "Grievances and rebels",
+     "level": 3
+    },
+    {
+     "id": "health-and-the-land",
+     "text": "Health and the land",
+     "level": 3
+    },
+    {
+     "id": "colonies-and-the-people-already-there",
+     "text": "Colonies and the people already there",
+     "level": 3
+    },
+    {
+     "id": "adding-up-to-the-country-card",
+     "text": "Adding up to the country card",
+     "level": 3
+    },
+    {
+     "id": "when-events-touch-a-province",
+     "text": "When events touch a province",
+     "level": 3
+    },
+    {
+     "id": "starting-values",
+     "text": "Starting values",
+     "level": 3
+    },
+    {
+     "id": "what-is-stored-and-when-it-updates",
+     "text": "What is stored and when it updates",
+     "level": 3
+    },
+    {
+     "id": "in-the-game-now-the-land",
+     "text": "In the game now: the land",
+     "level": 2
+    },
+    {
+     "id": "plague-in-the-game",
+     "text": "Plague in the game",
+     "level": 2
+    },
+    {
+     "id": "what-you-see",
+     "text": "What you see",
+     "level": 2
+    },
+    {
+     "id": "how-it-connects",
+     "text": "How it connects",
+     "level": 2
+    },
+    {
+     "id": "numbers",
+     "text": "Numbers",
+     "level": 2
+    },
+    {
+     "id": "decided-since-the-first-draft",
+     "text": "Decided since the first draft",
+     "level": 2
+    },
+    {
+     "id": "still-open",
+     "text": "Still open",
+     "level": 2
+    },
+    {
+     "id": "for-developers",
+     "text": "For developers",
+     "level": 2
+    }
+   ]
+  },
+  "Rebellions": {
+   "title": "Rebellions",
+   "summary": "Rebellions turn a province's grievances into a rising. There is no anger meter: a province simply counts its named grievances, and as the count grows it grumbles, riots, plots and finally rises. This page covers how…",
+   "headings": [
+    {
+     "id": "how-it-works",
+     "text": "How it works",
+     "level": 2
+    },
+    {
+     "id": "from-grievances-to-an-uprising",
+     "text": "From grievances to an uprising",
+     "level": 3
+    },
+    {
+     "id": "sparks",
+     "text": "Sparks",
+     "level": 3
+    },
+    {
+     "id": "cause-demand-and-who-joins",
+     "text": "Cause, demand and who joins",
+     "level": 3
+    },
+    {
+     "id": "the-leader",
+     "text": "The leader",
+     "level": 3
+    },
+    {
+     "id": "strength-how-hard-an-uprising-is-to-beat",
+     "text": "Strength: how hard an uprising is to beat",
+     "level": 3
+    },
+    {
+     "id": "severity-how-much-harm-it-does",
+     "text": "Severity: how much harm it does",
+     "level": 3
+    },
+    {
+     "id": "answering-an-uprising",
+     "text": "Answering an uprising",
+     "level": 3
+    },
+    {
+     "id": "preventing-uprisings",
+     "text": "Preventing uprisings",
+     "level": 3
+    },
+    {
+     "id": "if-the-rebels-win",
+     "text": "If the rebels win",
+     "level": 3
+    },
+    {
+     "id": "how-other-systems-use-it",
+     "text": "How other systems use it",
+     "level": 3
+    },
+    {
+     "id": "the-computer-players",
+     "text": "The computer players",
+     "level": 3
+    },
+    {
+     "id": "each-month",
+     "text": "Each month",
+     "level": 3
+    },
+    {
+     "id": "what-you-see",
+     "text": "What you see",
+     "level": 2
+    },
+    {
+     "id": "in-the-game-today",
+     "text": "In the game today",
+     "level": 3
+    },
+    {
+     "id": "how-it-connects",
+     "text": "How it connects",
+     "level": 2
+    },
+    {
+     "id": "numbers",
+     "text": "Numbers",
+     "level": 2
+    },
+    {
+     "id": "settled-details",
+     "text": "Settled details",
+     "level": 2
+    },
+    {
+     "id": "still-open",
+     "text": "Still open",
+     "level": 2
+    },
+    {
+     "id": "for-developers",
+     "text": "For developers",
+     "level": 2
+    }
+   ]
+  },
+  "Recruiting": {
+   "title": "Recruiting",
+   "summary": "Recruiting is how your realm turns the people of its provinces into soldiers. You call men up with one slider (the levy), train them into regiments of one troop type at a castle or drill yard, keep the best as…",
+   "headings": [
+    {
+     "id": "how-it-works",
+     "text": "How it works",
+     "level": 2
+    },
+    {
+     "id": "who-can-be-called",
+     "text": "Who can be called",
+     "level": 3
+    },
+    {
+     "id": "the-levy",
+     "text": "The levy",
+     "level": 3
+    },
+    {
+     "id": "the-recruit-pool",
+     "text": "The recruit pool",
+     "level": 3
+    },
+    {
+     "id": "what-a-levy-costs-at-home",
+     "text": "What a levy costs at home",
+     "level": 3
+    },
+    {
+     "id": "training",
+     "text": "Training",
+     "level": 3
+    },
+    {
+     "id": "standing-regiments-and-retinues",
+     "text": "Standing regiments and retinues",
+     "level": 3
+    },
+    {
+     "id": "what-recruiting-gives-back",
+     "text": "What recruiting gives back",
+     "level": 3
+    },
+    {
+     "id": "what-recruiting-takes",
+     "text": "What recruiting takes",
+     "level": 3
+    },
+    {
+     "id": "commanders-from-officials",
+     "text": "Commanders from officials",
+     "level": 3
+    },
+    {
+     "id": "the-marshal",
+     "text": "The Marshal",
+     "level": 3
+    },
+    {
+     "id": "what-official-commanders-mean",
+     "text": "What official commanders mean",
+     "level": 3
+    },
+    {
+     "id": "names-and-ranks",
+     "text": "Names and ranks",
+     "level": 3
+    },
+    {
+     "id": "the-computer-players",
+     "text": "The computer players",
+     "level": 3
+    },
+    {
+     "id": "each-month",
+     "text": "Each month",
+     "level": 3
+    },
+    {
+     "id": "what-you-see",
+     "text": "What you see",
+     "level": 2
+    },
+    {
+     "id": "how-it-connects",
+     "text": "How it connects",
+     "level": 2
+    },
+    {
+     "id": "numbers",
+     "text": "Numbers",
+     "level": 2
+    },
+    {
+     "id": "still-open",
+     "text": "Still open",
+     "level": 2
+    },
+    {
+     "id": "for-developers",
+     "text": "For developers",
+     "level": 2
+    }
+   ]
+  },
+  "Religion": {
+   "title": "Religion",
+   "summary": "Religion decides which faiths exist, how the faith mix of every province slowly changes, and how you rule a realm where people pray in different ways. Faiths spread through things you can point at on the map: houses…",
+   "headings": [
+    {
+     "id": "how-it-works",
+     "text": "How it works",
+     "level": 2
+    },
+    {
+     "id": "faiths-and-families",
+     "text": "Faiths and families",
+     "level": 3
+    },
+    {
+     "id": "the-faith-mix",
+     "text": "The faith mix",
+     "level": 3
+    },
+    {
+     "id": "faith-buildings",
+     "text": "Faith buildings",
+     "level": 3
+    },
+    {
+     "id": "communities-and-the-faith-policy-screen",
+     "text": "Communities and the Faith policy screen",
+     "level": 3
+    },
+    {
+     "id": "expulsion-and-the-inquisition",
+     "text": "Expulsion and the Inquisition",
+     "level": 3
+    },
+    {
+     "id": "lords-and-faith",
+     "text": "Lords and faith",
+     "level": 3
+    },
+    {
+     "id": "preachers",
+     "text": "Preachers",
+     "level": 3
+    },
+    {
+     "id": "changing-the-state-faith",
+     "text": "Changing the state faith",
+     "level": 3
+    },
+    {
+     "id": "holy-places",
+     "text": "Holy places",
+     "level": 3
+    },
+    {
+     "id": "heads-of-the-faith",
+     "text": "Heads of the faith",
+     "level": 3
+    },
+    {
+     "id": "what-each-faith-does-differently",
+     "text": "What each faith does differently",
+     "level": 3
+    },
+    {
+     "id": "faith-waves-and-events",
+     "text": "Faith waves and events",
+     "level": 3
+    },
+    {
+     "id": "the-start",
+     "text": "The start",
+     "level": 3
+    },
+    {
+     "id": "what-religion-gives-other-systems",
+     "text": "What religion gives other systems",
+     "level": 3
+    },
+    {
+     "id": "the-computer-players",
+     "text": "The computer players",
+     "level": 3
+    },
+    {
+     "id": "when-it-happens",
+     "text": "When it happens",
+     "level": 3
+    },
+    {
+     "id": "what-you-see",
+     "text": "What you see",
+     "level": 2
+    },
+    {
+     "id": "in-the-game-now",
+     "text": "In the game now",
+     "level": 3
+    },
+    {
+     "id": "how-it-connects",
+     "text": "How it connects",
+     "level": 2
+    },
+    {
+     "id": "numbers",
+     "text": "Numbers",
+     "level": 2
+    },
+    {
+     "id": "settled-details",
+     "text": "Settled details",
+     "level": 2
+    },
+    {
+     "id": "still-open",
+     "text": "Still open",
+     "level": 2
+    },
+    {
+     "id": "for-developers",
+     "text": "For developers",
+     "level": 2
+    }
+   ]
+  },
+  "Research": {
+   "title": "Research",
+   "summary": "Research is how your country learns. You build schools, fill their seats with young men from the same recruit pool your army draws on, and after five years they graduate as scholars whose work, counted in…",
+   "headings": [
+    {
+     "id": "how-it-works",
+     "text": "How it works",
+     "level": 2
+    },
+    {
+     "id": "schools-students-and-scholars",
+     "text": "Schools, students and scholars",
+     "level": 3
+    },
+    {
+     "id": "progress",
+     "text": "Progress",
+     "level": 3
+    },
+    {
+     "id": "why-war-and-research-dont-mix",
+     "text": "Why war and research don't mix",
+     "level": 3
+    },
+    {
+     "id": "what-an-invention-costs",
+     "text": "What an invention costs",
+     "level": 3
+    },
+    {
+     "id": "what-you-may-study",
+     "text": "What you may study",
+     "level": 3
+    },
+    {
+     "id": "the-tree",
+     "text": "The tree",
+     "level": 3
+    },
+    {
+     "id": "before-the-start-the-past-inventions",
+     "text": "Before the start: the past inventions",
+     "level": 4
+    },
+    {
+     "id": "without-it",
+     "text": "Without it",
+     "level": 4
+    },
+    {
+     "id": "tilling-and-building-r1",
+     "text": "Tilling and building (R1)",
+     "level": 4
+    },
+    {
+     "id": "fire-and-metal-r2",
+     "text": "Fire and metal (R2)",
+     "level": 4
+    },
+    {
+     "id": "counting-and-records-r3",
+     "text": "Counting and records (R3)",
+     "level": 4
+    },
+    {
+     "id": "boats-r4",
+     "text": "Boats (R4)",
+     "level": 4
+    },
+    {
+     "id": "out-of-the-game-era-viii",
+     "text": "Out of the game: Era VIII",
+     "level": 4
+    },
+    {
+     "id": "what-each-country-knows-at-the-start",
+     "text": "What each country knows at the start",
+     "level": 3
+    },
+    {
+     "id": "research-elsewhere",
+     "text": "Research elsewhere",
+     "level": 3
+    },
+    {
+     "id": "each-month",
+     "text": "Each month",
+     "level": 3
+    },
+    {
+     "id": "the-ai",
+     "text": "The AI",
+     "level": 3
+    },
+    {
+     "id": "what-you-see",
+     "text": "What you see",
+     "level": 2
+    },
+    {
+     "id": "in-the-game-now",
+     "text": "In the game now",
+     "level": 3
+    },
+    {
+     "id": "how-it-connects",
+     "text": "How it connects",
+     "level": 2
+    },
+    {
+     "id": "numbers",
+     "text": "Numbers",
+     "level": 2
+    },
+    {
+     "id": "decided-since-the-first-draft",
+     "text": "Decided since the first draft",
+     "level": 2
+    },
+    {
+     "id": "still-open",
+     "text": "Still open",
+     "level": 2
+    },
+    {
+     "id": "for-developers",
+     "text": "For developers",
+     "level": 2
+    }
+   ]
+  },
+  "Revolutions": {
+   "title": "Revolutions",
+   "summary": "Revolutions are the great upheavals that change how a country plays: the Dutch Revolt, the Glorious Revolution, the French Revolution, the Meiji Restoration and 32 more. You see one coming on a card that lists its…",
+   "headings": [
+    {
+     "id": "how-it-works",
+     "text": "How it works",
+     "level": 2
+    },
+    {
+     "id": "requirements-signs-and-sparks",
+     "text": "Requirements, signs and sparks",
+     "level": 3
+    },
+    {
+     "id": "stages",
+     "text": "Stages",
+     "level": 3
+    },
+    {
+     "id": "stances",
+     "text": "Stances",
+     "level": 3
+    },
+    {
+     "id": "camps",
+     "text": "Camps",
+     "level": 3
+    },
+    {
+     "id": "stopped-not-solved",
+     "text": "Stopped, not solved",
+     "level": 3
+    },
+    {
+     "id": "regimes",
+     "text": "Regimes",
+     "level": 3
+    },
+    {
+     "id": "decrees",
+     "text": "Decrees",
+     "level": 3
+    },
+    {
+     "id": "aftermath",
+     "text": "Aftermath",
+     "level": 3
+    },
+    {
+     "id": "funding-a-revolution-abroad",
+     "text": "Funding a revolution abroad",
+     "level": 3
+    },
+    {
+     "id": "the-36-revolutions",
+     "text": "The 36 revolutions",
+     "level": 3
+    },
+    {
+     "id": "the-computer",
+     "text": "The computer",
+     "level": 3
+    },
+    {
+     "id": "what-you-see",
+     "text": "What you see",
+     "level": 2
+    },
+    {
+     "id": "in-the-game-today",
+     "text": "In the game today",
+     "level": 3
+    },
+    {
+     "id": "how-it-connects",
+     "text": "How it connects",
+     "level": 2
+    },
+    {
+     "id": "each-month",
+     "text": "Each month",
+     "level": 3
+    },
+    {
+     "id": "numbers",
+     "text": "Numbers",
+     "level": 2
+    },
+    {
+     "id": "settled-details",
+     "text": "Settled details",
+     "level": 2
+    },
+    {
+     "id": "still-open",
+     "text": "Still open",
+     "level": 2
+    },
+    {
+     "id": "for-developers",
+     "text": "For developers",
+     "level": 2
+    }
+   ]
+  },
+  "Saving": {
+   "title": "Saving",
+   "summary": "Saving in Pocket Hegemony is built so that you never lose more than the orders you gave since your last End turn, even if your phone kills the app without warning. Saves work the same on every platform, keep loading…",
+   "headings": [
+    {
+     "id": "where-you-find-it",
+     "text": "Where you find it",
+     "level": 2
+    },
+    {
+     "id": "how-it-works",
+     "text": "How it works",
+     "level": 2
+    },
+    {
+     "id": "the-principles",
+     "text": "The principles",
+     "level": 3
+    },
+    {
+     "id": "kinds-of-save",
+     "text": "Kinds of save",
+     "level": 3
+    },
+    {
+     "id": "saving-by-hand",
+     "text": "Saving by hand",
+     "level": 3
+    },
+    {
+     "id": "the-resume-save-and-the-orders-journal",
+     "text": "The Resume save and the orders journal",
+     "level": 3
+    },
+    {
+     "id": "writing-safely",
+     "text": "Writing safely",
+     "level": 3
+    },
+    {
+     "id": "the-save-file",
+     "text": "The save file",
+     "level": 3
+    },
+    {
+     "id": "keeping-saves-working-across-updates",
+     "text": "Keeping saves working across updates",
+     "level": 3
+    },
+    {
+     "id": "cloud-saves",
+     "text": "Cloud saves",
+     "level": 3
+    },
+    {
+     "id": "store-backups-export-and-import",
+     "text": "Store backups, Export and Import",
+     "level": 3
+    },
+    {
+     "id": "free-tier-and-full-game",
+     "text": "Free tier and full game",
+     "level": 3
+    },
+    {
+     "id": "ironman",
+     "text": "Ironman",
+     "level": 3
+    },
+    {
+     "id": "integrity",
+     "text": "Integrity",
+     "level": 3
+    },
+    {
+     "id": "bug-reports-and-tests",
+     "text": "Bug reports and tests",
+     "level": 3
+    },
+    {
+     "id": "what-you-see",
+     "text": "What you see",
+     "level": 2
+    },
+    {
+     "id": "how-it-connects",
+     "text": "How it connects",
+     "level": 2
+    },
+    {
+     "id": "numbers",
+     "text": "Numbers",
+     "level": 2
+    },
+    {
+     "id": "still-open",
+     "text": "Still open",
+     "level": 2
+    },
+    {
+     "id": "for-developers",
+     "text": "For developers",
+     "level": 2
+    }
+   ]
+  },
+  "Screens-and-Navigation": {
+   "title": "Screens and navigation",
+   "summary": "This page covers every screen of Pocket Hegemony, from the boot logo to the final result of a campaign, and how you move between them with touch, mouse, keyboard or controller. The idea is simple: in a campaign the…",
+   "headings": [
+    {
+     "id": "how-it-works",
+     "text": "How it works",
+     "level": 2
+    },
+    {
+     "id": "the-principles",
+     "text": "The principles",
+     "level": 3
+    },
+    {
+     "id": "starting-the-game",
+     "text": "Starting the game",
+     "level": 3
+    },
+    {
+     "id": "new-campaign",
+     "text": "New campaign",
+     "level": 3
+    },
+    {
+     "id": "load-and-loading",
+     "text": "Load and loading",
+     "level": 3
+    },
+    {
+     "id": "the-four-layers-of-a-campaign",
+     "text": "The four layers of a campaign",
+     "level": 3
+    },
+    {
+     "id": "the-map",
+     "text": "The map",
+     "level": 3
+    },
+    {
+     "id": "cards",
+     "text": "Cards",
+     "level": 3
+    },
+    {
+     "id": "the-realm-book",
+     "text": "The Realm book",
+     "level": 3
+    },
+    {
+     "id": "the-game-menu",
+     "text": "The game menu",
+     "level": 3
+    },
+    {
+     "id": "the-turn",
+     "text": "The turn",
+     "level": 3
+    },
+    {
+     "id": "the-needs-attention-screen",
+     "text": "The Needs attention screen",
+     "level": 3
+    },
+    {
+     "id": "other-screens-in-a-campaign",
+     "text": "Other screens in a campaign",
+     "level": 3
+    },
+    {
+     "id": "how-a-campaign-ends",
+     "text": "How a campaign ends",
+     "level": 3
+    },
+    {
+     "id": "interruptions",
+     "text": "Interruptions",
+     "level": 3
+    },
+    {
+     "id": "layout-by-window-shape",
+     "text": "Layout by window shape",
+     "level": 3
+    },
+    {
+     "id": "navigation-by-input",
+     "text": "Navigation by input",
+     "level": 3
+    },
+    {
+     "id": "what-you-see",
+     "text": "What you see",
+     "level": 2
+    },
+    {
+     "id": "how-it-connects",
+     "text": "How it connects",
+     "level": 2
+    },
+    {
+     "id": "numbers",
+     "text": "Numbers",
+     "level": 2
+    },
+    {
+     "id": "still-open",
+     "text": "Still open",
+     "level": 2
+    },
+    {
+     "id": "for-developers",
+     "text": "For developers",
+     "level": 2
+    }
+   ]
+  },
+  "Settings": {
+   "title": "Settings",
+   "summary": "Settings let you shape how Pocket Hegemony looks, sounds and handles on your device, from interface scale and colour vision to controller buttons and battery use. They never change the rules, balance or the computer…",
+   "headings": [
+    {
+     "id": "where-you-find-it",
+     "text": "Where you find it",
+     "level": 2
+    },
+    {
+     "id": "how-it-works",
+     "text": "How it works",
+     "level": 2
+    },
+    {
+     "id": "the-principles",
+     "text": "The principles",
+     "level": 3
+    },
+    {
+     "id": "where-settings-opens",
+     "text": "Where Settings opens",
+     "level": 3
+    },
+    {
+     "id": "the-settings-screen",
+     "text": "The Settings screen",
+     "level": 3
+    },
+    {
+     "id": "device-profiles",
+     "text": "Device profiles",
+     "level": 3
+    },
+    {
+     "id": "storage-and-sync",
+     "text": "Storage and sync",
+     "level": 3
+    },
+    {
+     "id": "campaign-rules",
+     "text": "Campaign rules",
+     "level": 3
+    },
+    {
+     "id": "graphics",
+     "text": "Graphics",
+     "level": 3
+    },
+    {
+     "id": "audio",
+     "text": "Audio",
+     "level": 3
+    },
+    {
+     "id": "gameplay",
+     "text": "Gameplay",
+     "level": 3
+    },
+    {
+     "id": "controls",
+     "text": "Controls",
+     "level": 3
+    },
+    {
+     "id": "accessibility",
+     "text": "Accessibility",
+     "level": 3
+    },
+    {
+     "id": "language",
+     "text": "Language",
+     "level": 3
+    },
+    {
+     "id": "account-privacy-and-about",
+     "text": "Account, privacy and about",
+     "level": 3
+    },
+    {
+     "id": "platform-notes",
+     "text": "Platform notes",
+     "level": 3
+    },
+    {
+     "id": "the-settings-file-format",
+     "text": "The settings file format",
+     "level": 3
+    },
+    {
+     "id": "tests",
+     "text": "Tests",
+     "level": 3
+    },
+    {
+     "id": "what-you-see",
+     "text": "What you see",
+     "level": 2
+    },
+    {
+     "id": "how-it-connects",
+     "text": "How it connects",
+     "level": 2
+    },
+    {
+     "id": "numbers",
+     "text": "Numbers",
+     "level": 2
+    },
+    {
+     "id": "still-open",
+     "text": "Still open",
+     "level": 2
+    },
+    {
+     "id": "for-developers",
+     "text": "For developers",
+     "level": 2
+    }
+   ]
+  },
+  "Subjects": {
+   "title": "Subjects",
+   "summary": "Subjects are countries on the map that answer to another country, their overlord. This system decides what types of subject exist, what each side owes the other, how loyal a subject is and why, and how a subject is…",
+   "headings": [
+    {
+     "id": "how-it-works",
+     "text": "How it works",
+     "level": 2
+    },
+    {
+     "id": "the-ladder-of-rule",
+     "text": "The ladder of rule",
+     "level": 3
+    },
+    {
+     "id": "six-types-of-subject",
+     "text": "Six types of subject",
+     "level": 3
+    },
+    {
+     "id": "the-subjects-at-the-start",
+     "text": "The subjects at the start",
+     "level": 3
+    },
+    {
+     "id": "loyalty",
+     "text": "Loyalty",
+     "level": 3
+    },
+    {
+     "id": "what-an-overlord-can-do",
+     "text": "What an overlord can do",
+     "level": 3
+    },
+    {
+     "id": "obligations-both-ways",
+     "text": "Obligations both ways",
+     "level": 3
+    },
+    {
+     "id": "subject-limit",
+     "text": "Subject limit",
+     "level": 3
+    },
+    {
+     "id": "folding-in",
+     "text": "Folding in",
+     "level": 3
+    },
+    {
+     "id": "losing-subjects",
+     "text": "Losing subjects",
+     "level": 3
+    },
+    {
+     "id": "making-a-subject",
+     "text": "Making a subject",
+     "level": 3
+    },
+    {
+     "id": "france-1444-to-1453-on-the-1444-checkpoint-world",
+     "text": "France, 1444 to 1453 (on the 1444 checkpoint world)",
+     "level": 3
+    },
+    {
+     "id": "playing-as-a-subject",
+     "text": "Playing as a subject",
+     "level": 3
+    },
+    {
+     "id": "the-computer-players",
+     "text": "The computer players",
+     "level": 3
+    },
+    {
+     "id": "each-month",
+     "text": "Each month",
+     "level": 3
+    },
+    {
+     "id": "what-you-see",
+     "text": "What you see",
+     "level": 2
+    },
+    {
+     "id": "subjects-in-the-game-today",
+     "text": "Subjects in the game today",
+     "level": 3
+    },
+    {
+     "id": "how-it-connects",
+     "text": "How it connects",
+     "level": 2
+    },
+    {
+     "id": "numbers",
+     "text": "Numbers",
+     "level": 2
+    },
+    {
+     "id": "still-open",
+     "text": "Still open",
+     "level": 2
+    },
+    {
+     "id": "for-developers",
+     "text": "For developers",
+     "level": 2
+    }
+   ]
+  },
+  "The-1378-Start": {
+   "title": "The 1378 Start",
+   "summary": "Every campaign begins on 20 September 1378 , the day the Western Schism begins. The world is built from research: every realm that existed that autumn, from great kingdoms to stateless societies, put onto the map…",
+   "headings": [
+    {
+     "id": "how-it-works",
+     "text": "How it works",
+     "level": 2
+    },
+    {
+     "id": "the-start-day-20-september-1378",
+     "text": "The start day: 20 September 1378",
+     "level": 3
+    },
+    {
+     "id": "the-world-on-20-september-1378",
+     "text": "The world on 20 September 1378",
+     "level": 3
+    },
+    {
+     "id": "realms-that-come-later",
+     "text": "Realms that come later",
+     "level": 3
+    },
+    {
+     "id": "history-is-a-reference",
+     "text": "History is a reference",
+     "level": 3
+    },
+    {
+     "id": "research-and-the-eras",
+     "text": "Research and the eras",
+     "level": 3
+    },
+    {
+     "id": "the-1444-checkpoint",
+     "text": "The 1444 checkpoint",
+     "level": 3
+    },
+    {
+     "id": "the-country-catalogue",
+     "text": "The country catalogue",
+     "level": 3
+    },
+    {
+     "id": "representations-what-each-record-becomes-in-the-game",
+     "text": "Representations: what each record becomes in the game",
+     "level": 3
+    },
+    {
+     "id": "starting-assessments",
+     "text": "Starting assessments",
+     "level": 3
+    },
+    {
+     "id": "start-forms-of-government",
+     "text": "Start forms of government",
+     "level": 3
+    },
+    {
+     "id": "starting-counts-for-each-country",
+     "text": "Starting counts for each country",
+     "level": 3
+    },
+    {
+     "id": "province-starting-values",
+     "text": "Province starting values",
+     "level": 3
+    },
+    {
+     "id": "the-1378-map-today",
+     "text": "The 1378 map today",
+     "level": 3
+    },
+    {
+     "id": "from-catalogue-to-map",
+     "text": "From catalogue to map",
+     "level": 3
+    },
+    {
+     "id": "good-realms-to-start-with",
+     "text": "Good realms to start with",
+     "level": 3
+    },
+    {
+     "id": "playable-realms-and-the-free-tier",
+     "text": "Playable realms and the free tier",
+     "level": 3
+    },
+    {
+     "id": "campaign-rules",
+     "text": "Campaign rules",
+     "level": 3
+    },
+    {
+     "id": "what-you-see",
+     "text": "What you see",
+     "level": 2
+    },
+    {
+     "id": "how-it-connects",
+     "text": "How it connects",
+     "level": 2
+    },
+    {
+     "id": "numbers",
+     "text": "Numbers",
+     "level": 2
+    },
+    {
+     "id": "how-the-start-is-settled",
+     "text": "How the start is settled",
+     "level": 2
+    },
+    {
+     "id": "still-open",
+     "text": "Still open",
+     "level": 2
+    },
+    {
+     "id": "for-developers",
+     "text": "For developers",
+     "level": 2
+    }
+   ]
+  },
+  "Time-and-Turns": {
+   "title": "Time and Turns",
+   "summary": "Pocket Hegemony is played one week at a time, from 20 September 1378 to 31 August 1939. You give your orders, press End turn, and the game plays out the 7 days of that week for every army, fleet and trader in the…",
+   "headings": [
+    {
+     "id": "how-it-works",
+     "text": "How it works",
+     "level": 2
+    },
+    {
+     "id": "one-week-per-turn",
+     "text": "One week per turn",
+     "level": 3
+    },
+    {
+     "id": "how-a-campaign-is-won-and-ends",
+     "text": "How a campaign is won and ends",
+     "level": 3
+    },
+    {
+     "id": "orders-and-end-turn",
+     "text": "Orders and End turn",
+     "level": 3
+    },
+    {
+     "id": "auto-turns",
+     "text": "Auto turns",
+     "level": 3
+    },
+    {
+     "id": "the-order-of-a-turn",
+     "text": "The order of a turn",
+     "level": 3
+    },
+    {
+     "id": "what-a-turn-looks-like",
+     "text": "What a turn looks like",
+     "level": 3
+    },
+    {
+     "id": "watching-time-pass",
+     "text": "Watching time pass",
+     "level": 3
+    },
+    {
+     "id": "the-day-loop-the-days-inside-a-turn",
+     "text": "The day loop: the days inside a turn",
+     "level": 3
+    },
+    {
+     "id": "battles-inside-the-turn",
+     "text": "Battles inside the turn",
+     "level": 3
+    },
+    {
+     "id": "determinism-same-world-same-orders-same-result",
+     "text": "Determinism: same world, same orders, same result",
+     "level": 3
+    },
+    {
+     "id": "turn-boundaries-and-saves",
+     "text": "Turn boundaries and saves",
+     "level": 3
+    },
+    {
+     "id": "cadences-what-runs-when",
+     "text": "Cadences: what runs when",
+     "level": 3
+    },
+    {
+     "id": "seasons-and-the-hemispheres",
+     "text": "Seasons and the hemispheres",
+     "level": 3
+    },
+    {
+     "id": "ages-and-eras",
+     "text": "Ages and eras",
+     "level": 3
+    },
+    {
+     "id": "what-you-see",
+     "text": "What you see",
+     "level": 2
+    },
+    {
+     "id": "numbers",
+     "text": "Numbers",
+     "level": 2
+    },
+    {
+     "id": "still-open",
+     "text": "Still open",
+     "level": 2
+    },
+    {
+     "id": "for-developers",
+     "text": "For developers",
+     "level": 2
+    }
+   ]
+  },
+  "Trade": {
+   "title": "Trade",
+   "summary": "Trade in Pocket Hegemony is carried by units you own and steer: caravans, barges, wagon trains and rail freight on land, and trade ships at sea. You give each trader a route between cities; every province it walks…",
+   "headings": [
+    {
+     "id": "how-it-works",
+     "text": "How it works",
+     "level": 2
+    },
+    {
+     "id": "the-idea-in-one-card",
+     "text": "The idea in one card",
+     "level": 3
+    },
+    {
+     "id": "traders-and-trade-ships",
+     "text": "Traders and trade ships",
+     "level": 3
+    },
+    {
+     "id": "kinds-of-land-trader",
+     "text": "Kinds of land trader",
+     "level": 3
+    },
+    {
+     "id": "trade-ships",
+     "text": "Trade ships",
+     "level": 3
+    },
+    {
+     "id": "trade-value",
+     "text": "Trade value",
+     "level": 3
+    },
+    {
+     "id": "trade-ratio-how-busy-a-province-is",
+     "text": "Trade ratio: how busy a province is",
+     "level": 3
+    },
+    {
+     "id": "collecting",
+     "text": "Collecting",
+     "level": 3
+    },
+    {
+     "id": "routes",
+     "text": "Routes",
+     "level": 3
+    },
+    {
+     "id": "deposits-and-trade-income",
+     "text": "Deposits and trade income",
+     "level": 3
+    },
+    {
+     "id": "who-may-go-where",
+     "text": "Who may go where",
+     "level": 3
+    },
+    {
+     "id": "risks",
+     "text": "Risks",
+     "level": 3
+    },
+    {
+     "id": "what-trade-does-elsewhere",
+     "text": "What trade does elsewhere",
+     "level": 3
+    },
+    {
+     "id": "inventions",
+     "text": "Inventions",
+     "level": 3
+    },
+    {
+     "id": "events",
+     "text": "Events",
+     "level": 3
+    },
+    {
+     "id": "the-start-and-the-warm-up",
+     "text": "The start and the warm-up",
+     "level": 3
+    },
+    {
+     "id": "the-ai",
+     "text": "The AI",
+     "level": 3
+    },
+    {
+     "id": "each-turn-each-month-and-keeping-it-fast",
+     "text": "Each turn, each month, and keeping it fast",
+     "level": 3
+    },
+    {
+     "id": "what-you-see",
+     "text": "What you see",
+     "level": 2
+    },
+    {
+     "id": "in-the-game-now",
+     "text": "In the game now",
+     "level": 3
+    },
+    {
+     "id": "how-it-connects",
+     "text": "How it connects",
+     "level": 2
+    },
+    {
+     "id": "numbers",
+     "text": "Numbers",
+     "level": 2
+    },
+    {
+     "id": "how-the-open-points-were-settled",
+     "text": "How the open points were settled",
+     "level": 2
+    },
+    {
+     "id": "still-open",
+     "text": "Still open",
+     "level": 2
+    },
+    {
+     "id": "for-developers",
+     "text": "For developers",
+     "level": 2
+    }
+   ]
+  },
+  "Tribes-and-Hunting-Grounds": {
+   "title": "Tribes and hunting grounds",
+   "summary": "The peoples of North America cannot colonise, so a tribe starts with two or three provinces and empty land all round it. Hunting grounds give it room to grow: a tribe walks a few unowned provinces next to its land,…",
+   "headings": [
+    {
+     "id": "which-realms-are-tribes",
+     "text": "Which realms are tribes",
+     "level": 2
+    },
+    {
+     "id": "the-range",
+     "text": "The range",
+     "level": 2
+    },
+    {
+     "id": "claiming-and-leaving",
+     "text": "Claiming and leaving",
+     "level": 2
+    },
+    {
+     "id": "what-a-ground-gives",
+     "text": "What a ground gives",
+     "level": 2
+    },
+    {
+     "id": "taking-them-in",
+     "text": "Taking them in",
+     "level": 2
+    },
+    {
+     "id": "settlers-on-our-land",
+     "text": "Settlers on our land",
+     "level": 2
+    },
+    {
+     "id": "the-hunting-grounds-tab",
+     "text": "The Hunting grounds tab",
+     "level": 2
+    },
+    {
+     "id": "the-computers-tribes",
+     "text": "The computer's tribes",
+     "level": 2
+    }
+   ]
+  },
+  "Troop-Movement": {
+   "title": "Troop Movement",
+   "summary": "Troop movement is where your armies stand on every day of the turn. You draw a route with your finger, see how many days it takes and how much food will be left on arrival, and the week then plays out day by day for…",
+   "headings": [
+    {
+     "id": "how-it-works",
+     "text": "How it works",
+     "level": 2
+    },
+    {
+     "id": "the-day-loop",
+     "text": "The day loop",
+     "level": 3
+    },
+    {
+     "id": "how-long-a-step-takes",
+     "text": "How long a step takes",
+     "level": 3
+    },
+    {
+     "id": "rivers-passes-and-hard-ground",
+     "text": "Rivers, passes and hard ground",
+     "level": 3
+    },
+    {
+     "id": "what-stops-an-army",
+     "text": "What stops an army",
+     "level": 3
+    },
+    {
+     "id": "meeting-the-enemy",
+     "text": "Meeting the enemy",
+     "level": 3
+    },
+    {
+     "id": "food-on-the-road",
+     "text": "Food on the road",
+     "level": 3
+    },
+    {
+     "id": "splitting-and-joining",
+     "text": "Splitting and joining",
+     "level": 3
+    },
+    {
+     "id": "moving-many-armies",
+     "text": "Moving many armies",
+     "level": 3
+    },
+    {
+     "id": "orders",
+     "text": "Orders",
+     "level": 3
+    },
+    {
+     "id": "one-way-of-moving",
+     "text": "One way of moving",
+     "level": 3
+    },
+    {
+     "id": "dunois-marches-to-dijon-march-1450",
+     "text": "Dunois marches to Dijon, March 1450",
+     "level": 3
+    },
+    {
+     "id": "what-you-see",
+     "text": "What you see",
+     "level": 2
+    },
+    {
+     "id": "how-it-connects",
+     "text": "How it connects",
+     "level": 2
+    },
+    {
+     "id": "numbers",
+     "text": "Numbers",
+     "level": 2
+    },
+    {
+     "id": "still-open",
+     "text": "Still open",
+     "level": 2
+    },
+    {
+     "id": "for-developers",
+     "text": "For developers",
+     "level": 2
+    }
+   ]
+  },
+  "Tutorial-and-Help": {
+   "title": "Tutorial and help",
+   "summary": "Pocket Hegemony teaches itself in four layers: a short tutorial campaign, \"Murad's Frontier\", played as the Ottomans under Murad I from 20 September 1378, the day every campaign starts, to late 1383; guided first…",
+   "headings": [
+    {
+     "id": "how-it-works",
+     "text": "How it works",
+     "level": 2
+    },
+    {
+     "id": "the-principles",
+     "text": "The principles",
+     "level": 3
+    },
+    {
+     "id": "murads-frontier",
+     "text": "Murad's Frontier",
+     "level": 3
+    },
+    {
+     "id": "how-you-use-it",
+     "text": "How you use it",
+     "level": 3
+    },
+    {
+     "id": "pacing-tools",
+     "text": "Pacing tools",
+     "level": 3
+    },
+    {
+     "id": "the-tutorial-scenario",
+     "text": "The tutorial scenario",
+     "level": 3
+    },
+    {
+     "id": "going-off-script",
+     "text": "Going off script",
+     "level": 3
+    },
+    {
+     "id": "two-emperors",
+     "text": "Two emperors",
+     "level": 3
+    },
+    {
+     "id": "the-janissaries",
+     "text": "The Janissaries",
+     "level": 3
+    },
+    {
+     "id": "steps-and-how-they-look",
+     "text": "Steps and how they look",
+     "level": 3
+    },
+    {
+     "id": "guided-first-turns",
+     "text": "Guided first turns",
+     "level": 3
+    },
+    {
+     "id": "first-campaign-hints",
+     "text": "First-campaign hints",
+     "level": 3
+    },
+    {
+     "id": "needs-attention",
+     "text": "Needs attention",
+     "level": 3
+    },
+    {
+     "id": "tooltips-why-and-linked-words",
+     "text": "Tooltips, \"Why?\" and linked words",
+     "level": 3
+    },
+    {
+     "id": "the-almanac",
+     "text": "The Almanac",
+     "level": 3
+    },
+    {
+     "id": "inputs",
+     "text": "Inputs",
+     "level": 3
+    },
+    {
+     "id": "starting-skipping-and-returning",
+     "text": "Starting, skipping and returning",
+     "level": 3
+    },
+    {
+     "id": "accessibility-and-language",
+     "text": "Accessibility and language",
+     "level": 3
+    },
+    {
+     "id": "measuring",
+     "text": "Measuring",
+     "level": 3
+    },
+    {
+     "id": "what-you-see",
+     "text": "What you see",
+     "level": 2
+    },
+    {
+     "id": "how-it-connects",
+     "text": "How it connects",
+     "level": 2
+    },
+    {
+     "id": "numbers",
+     "text": "Numbers",
+     "level": 2
+    },
+    {
+     "id": "still-open",
+     "text": "Still open",
+     "level": 2
+    },
+    {
+     "id": "for-developers",
+     "text": "For developers",
+     "level": 2
+    }
+   ]
+  },
+  "Warfare": {
+   "title": "Warfare",
+   "summary": "Warfare is everything that happens once your soldiers are under arms: how they are organised into companies and armies, what they cost, how they are fed, who leads them and in what style, how a battle is fought bell…",
+   "headings": [
+    {
+     "id": "how-it-works",
+     "text": "How it works",
+     "level": 2
+    },
+    {
+     "id": "companies-troop-types-and-kinds",
+     "text": "Companies, troop types and kinds",
+     "level": 3
+    },
+    {
+     "id": "the-realms-soldier-stats",
+     "text": "The realm's soldier stats",
+     "level": 3
+    },
+    {
+     "id": "the-troop-cap",
+     "text": "The troop cap",
+     "level": 3
+    },
+    {
+     "id": "raising-and-keeping-an-army",
+     "text": "Raising and keeping an army",
+     "level": 3
+    },
+    {
+     "id": "commanders-and-captains",
+     "text": "Commanders and captains",
+     "level": 3
+    },
+    {
+     "id": "seeing-the-enemy-and-marching",
+     "text": "Seeing the enemy and marching",
+     "level": 3
+    },
+    {
+     "id": "supply",
+     "text": "Supply",
+     "level": 3
+    },
+    {
+     "id": "battle",
+     "text": "Battle",
+     "level": 3
+    },
+    {
+     "id": "after-the-battle",
+     "text": "After the battle",
+     "level": 3
+    },
+    {
+     "id": "commander-styles",
+     "text": "Commander styles",
+     "level": 3
+    },
+    {
+     "id": "inventions-in-battle",
+     "text": "Inventions in battle",
+     "level": 3
+    },
+    {
+     "id": "warfare-through-the-eras",
+     "text": "Warfare through the eras",
+     "level": 3
+    },
+    {
+     "id": "sieges",
+     "text": "Sieges",
+     "level": 3
+    },
+    {
+     "id": "occupation-and-raids",
+     "text": "Occupation and raids",
+     "level": 3
+    },
+    {
+     "id": "war-and-peace",
+     "text": "War and peace",
+     "level": 3
+    },
+    {
+     "id": "the-price-of-war",
+     "text": "The price of war",
+     "level": 3
+    },
+    {
+     "id": "the-computer-players",
+     "text": "The computer players",
+     "level": 3
+    },
+    {
+     "id": "each-turn-and-each-month",
+     "text": "Each turn and each month",
+     "level": 3
+    },
+    {
+     "id": "what-you-see",
+     "text": "What you see",
+     "level": 2
+    },
+    {
+     "id": "how-it-connects",
+     "text": "How it connects",
+     "level": 2
+    },
+    {
+     "id": "numbers",
+     "text": "Numbers",
+     "level": 2
+    },
+    {
+     "id": "still-open",
+     "text": "Still open",
+     "level": 2
+    },
+    {
+     "id": "for-developers",
+     "text": "For developers",
+     "level": 2
+    }
+   ]
+  },
+  "World-Map": {
+   "title": "World Map",
+   "summary": "The world map is the ground every other system stands on: about 4,400 land provinces and about 4,700 sea zones covering the whole world, each with its terrain, rivers, coasts and neighbours. It is built once from…",
+   "headings": [
+    {
+     "id": "how-it-works",
+     "text": "How it works",
+     "level": 2
+    },
+    {
+     "id": "the-grid",
+     "text": "The grid",
+     "level": 3
+    },
+    {
+     "id": "land-provinces",
+     "text": "Land provinces",
+     "level": 3
+    },
+    {
+     "id": "sea-zones-and-straits",
+     "text": "Sea zones and straits",
+     "level": 3
+    },
+    {
+     "id": "terrain-22-tile-types-11-grounds",
+     "text": "Terrain: 22 tile types, 11 grounds",
+     "level": 3
+    },
+    {
+     "id": "rivers",
+     "text": "Rivers",
+     "level": 3
+    },
+    {
+     "id": "passes-and-roads",
+     "text": "Passes and roads",
+     "level": 3
+    },
+    {
+     "id": "one-graph-for-land-and-sea",
+     "text": "One graph for land and sea",
+     "level": 3
+    },
+    {
+     "id": "regions",
+     "text": "Regions",
+     "level": 3
+    },
+    {
+     "id": "map-versions",
+     "text": "Map versions",
+     "level": 3
+    },
+    {
+     "id": "sources-and-credits",
+     "text": "Sources and credits",
+     "level": 3
+    },
+    {
+     "id": "what-you-see",
+     "text": "What you see",
+     "level": 2
+    },
+    {
+     "id": "how-it-connects",
+     "text": "How it connects",
+     "level": 2
+    },
+    {
+     "id": "numbers",
+     "text": "Numbers",
+     "level": 2
+    },
+    {
+     "id": "frozen-seas",
+     "text": "Frozen seas",
+     "level": 2
+    },
+    {
+     "id": "other-map-facts",
+     "text": "Other map facts",
+     "level": 2
+    },
+    {
+     "id": "still-open",
+     "text": "Still open",
+     "level": 2
+    },
+    {
+     "id": "for-developers",
+     "text": "For developers",
+     "level": 2
+    }
+   ]
+  },
+  "Your-Realm": {
+   "title": "Your Realm",
+   "summary": "Your realm is your country as a whole: the treasury, the food network that runs through your castles, your people and land, your named lords, your army and navy at a glance, your ruler and family, your standing…",
+   "headings": [
+    {
+     "id": "how-it-works",
+     "text": "How it works",
+     "level": 2
+    },
+    {
+     "id": "the-country-card",
+     "text": "The country card",
+     "level": 3
+    },
+    {
+     "id": "treasury",
+     "text": "Treasury",
+     "level": 3
+    },
+    {
+     "id": "tax-and-the-treasury-in-play",
+     "text": "Tax and the treasury in play",
+     "level": 4
+    },
+    {
+     "id": "food-provinces-grow-it-castles-move-it",
+     "text": "Food: provinces grow it, castles move it",
+     "level": 3
+    },
+    {
+     "id": "the-food-policy-screen",
+     "text": "The Food policy screen",
+     "level": 3
+    },
+    {
+     "id": "the-year-of-food",
+     "text": "The year of food",
+     "level": 3
+    },
+    {
+     "id": "harvests-and-army-supply-in-the-game-today",
+     "text": "Harvests and army supply in the game today",
+     "level": 3
+    },
+    {
+     "id": "people-and-land",
+     "text": "People and land",
+     "level": 3
+    },
+    {
+     "id": "lords",
+     "text": "Lords",
+     "level": 3
+    },
+    {
+     "id": "what-your-lords-and-officials-are-called",
+     "text": "What your lords and officials are called",
+     "level": 3
+    },
+    {
+     "id": "stability",
+     "text": "Stability",
+     "level": 3
+    },
+    {
+     "id": "army-and-navy-at-a-glance",
+     "text": "Army and navy at a glance",
+     "level": 3
+    },
+    {
+     "id": "ruler-and-family",
+     "text": "Ruler and family",
+     "level": 3
+    },
+    {
+     "id": "abroad",
+     "text": "Abroad",
+     "level": 3
+    },
+    {
+     "id": "starting-values",
+     "text": "Starting values",
+     "level": 3
+    },
+    {
+     "id": "events-and-the-ai",
+     "text": "Events and the AI",
+     "level": 3
+    },
+    {
+     "id": "how-a-campaign-is-won",
+     "text": "How a campaign is won",
+     "level": 3
+    },
+    {
+     "id": "each-month",
+     "text": "Each month",
+     "level": 3
+    },
+    {
+     "id": "what-you-see",
+     "text": "What you see",
+     "level": 2
+    },
+    {
+     "id": "how-it-connects",
+     "text": "How it connects",
+     "level": 2
+    },
+    {
+     "id": "numbers",
+     "text": "Numbers",
+     "level": 2
+    },
+    {
+     "id": "decided-since-the-first-draft",
+     "text": "Decided since the first draft",
+     "level": 2
+    },
+    {
+     "id": "still-open",
+     "text": "Still open",
+     "level": 2
+    },
+    {
+     "id": "for-developers",
+     "text": "For developers",
+     "level": 2
+    }
+   ]
+  }
+ }
+}

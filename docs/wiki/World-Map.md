@@ -153,7 +153,7 @@ The world map has no screen of its own; [Map and Map Modes](Map-and-Lenses) draw
 - [Trade](Trade): routes over the graph, roads, rivers and sea zones.
 - [Warfare](Warfare): reads ground for battles, roads and rivers.
 - [Exploration and Colonies](Exploration-and-Colonies): graph steps for the charted start; coastal provinces.
-- [The 1444 Start](The-1444-Start): places to own; size, terrain and coast for 1444 population and wealth; asks for rebuilds when provinces must be split.
+- [The 1378 Start](The-1378-Start): places to own; size, terrain and coast for starting population and wealth; asks for rebuilds when provinces must be split.
 - [Historical Events](Historical-Events): shares region ids, areas and anchor provinces.
 - [Map and Map Modes](Map-and-Lenses): draws the id image, terrain, depth and rivers.
 - [Saving](Saving): `mapHash` and the rename table; map data is never saved.
@@ -201,5 +201,5 @@ Nothing about the map is left open. The frozen months and the latitude for froze
 
 - Spec: [`domain/world-map/spec.md`](https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/world-map/spec.md), requirement code **MAP**.
 - Features: `domain/world-map/features/` (grid-and-provinces, sea-zones-and-straits, terrain, rivers-passes-roads, graph-and-regions, map-versions).
-- Map generator: `tools/mapgen/mapgen.ts`, `tools/mapgen/terrain.ts`, settings in `tools/mapgen/config.json`. Built data: `packages/rules/data/world/provinces.json` and `map.json`. Terrain notes: `docs/terrain.md`.
+- Map generator: `tools/mapgen/mapgen.ts`, `tools/mapgen/terrain.ts`, settings in `tools/mapgen/config.json`. Built data: `packages/rules/data/scenarios/1378/world/provinces.json` and `map.json` for the start, and the same files under `scenarios/1444/world/` for the 1444 checkpoint. Terrain notes: `docs/terrain.md`.
 - The engine reads the graph in `packages/engine/src/world.ts` (`adjStart`, `adjList`). Rules code for this context goes in `packages/engine/src/domain/world-map/`.

@@ -9,6 +9,7 @@ import { daysInMonth, nextMonth, playDay, type Battle, type DayLoop } from "../t
 import { turnStrip } from "../map-presentation/index.ts";
 import { badgeCount, openWarnings } from "./attention.ts";
 import { pop, push, SHELL, top, topId, type Frame, type Shell } from "./stack.ts";
+import { logDispatches, newTurnOnDesk, receivePeaceOffer, type PeaceOfferOnScreen } from "./desk.ts";
 
 export type TurnPhase = "orders" | "in progress" | "battle" | "events" | "report";
 
@@ -27,6 +28,8 @@ export interface MonthOnScreen {
   events: PendingEvent[];
   /** Lines worth reporting; none means no turn report. */
   report: string[];
+  /** Peace offered to the player by AI realms at war with them (SHELL-141). */
+  offers?: PeaceOfferOnScreen[];
 }
 
 export interface TurnSession {
@@ -113,6 +116,7 @@ export function answerEndTurnQuestion(sh: Shell, choice: string): void {
 export function startTurn(sh: Shell): void {
   const t = turnOf(sh);
   t.phase = "in progress";
+  newTurnOnDesk(sh);
   push(sh, { id: "turn" });
   // The orders journal is closed with this turn's orders: with the Resume save it is the world before the turn (SHELL-073, D-SHELL-5).
   sh.events.push({ type: "OrdersJournalClosed" });
@@ -299,7 +303,8 @@ function finishMonth(sh: Shell): void {
   for (const b of month.loop.battles) if (!t.fought.includes(b)) t.fought.push(b);
   while (sh.stack.some((f) => f.id === "turn")) pop(sh);
   if (sh.campaign) advanceWeek(sh);
-  t.report = month.report;
+  t.report = [...month.report];
+  for (const o of month.offers ?? []) receivePeaceOffer(sh, o);
   raiseEvents(sh, month.events);
   if (t.events.length) {
     t.phase = "events";
@@ -352,13 +357,16 @@ export function lookAtMap(sh: Shell): void {
   turnOf(sh).phase = "orders";
 }
 
+/** The week's report goes into the Dispatches log, newest first, and never opens by itself (SHELL-147 replaces SHELL-082's slide-in). */
 function showReport(sh: Shell): void {
   const t = turnOf(sh);
   t.phase = "orders";
-  if (t.report.length) push(sh, { id: "turn_report" });
+  const c = sh.campaign;
+  const day = c ? `${c.date.year}-${String(c.date.month).padStart(2, "0")}-${String(c.day ?? 1).padStart(2, "0")}` : "";
+  logDispatches(sh, t.report.map((text) => ({ day, text, mine: true })));
 }
 
-/** A battle from the turn report or the Chronicle replays; Back returns where it was opened (SHELL-078, SHELL-090). */
+/** A battle from the News replays; Back returns where it was opened (SHELL-078, SHELL-090). */
 export function replayBattle(sh: Shell, battle: string, from: string): Frame {
   const t = turnOf(sh);
   const b = t.fought.find((x) => x.place === battle || x.id === battle);

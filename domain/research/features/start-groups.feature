@@ -19,7 +19,7 @@ Feature: Each realm starts from its start group
       | Venice   | latin         | 31    |
       | Ottomans | islamic       | 34    |
       | Ming     | china         | 38    |
-      | Oirat    | hordes        | 7     |
+      | Oirat    | hordes        | 11    |
       | Mali     | sahel         | 12    |
       | Kongo    | forest_africa | 3     |
       | Inca     | andes         | 10    |
@@ -29,7 +29,7 @@ Feature: Each realm starts from its start group
   Scenario: Every map nation has exactly one group
     Given the research data with start groups
     When every map nation is looked up
-    Then each of the 137 map nations belongs to exactly one start group
+    Then each of the 237 map nations belongs to exactly one start group
 
   @RSCH-099
   Scenario: Start sets are complete

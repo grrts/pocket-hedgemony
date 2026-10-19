@@ -1,13 +1,13 @@
 # Pocket Hegemony wiki
 
-Pocket Hegemony is an 8-bit grand strategy game for phones, desktop and the web. You lead one of hundreds of realms from 1444 to the end of August 1939, one week per turn, on a pixel-art map of the whole world that you can zoom from the globe down to a single town.
+Pocket Hegemony is an 8-bit grand strategy game for phones, desktop and the web. You lead one of hundreds of realms from 20 September 1378 to the end of August 1939, one week per turn, on a pixel-art map of the whole world that you can zoom from the globe down to a single town.
 
 This wiki explains every system in the game and how it works. Each page is written from the game's domain specs, the precise rules the code is checked against, so the wiki and the game say the same thing. Numbers marked provisional are still being balanced, and every page ends with what is not decided yet.
 
 ## Start here
 
 - [How a turn works](Time-and-Turns): one week per turn, the days inside it, and when the campaign ends.
-- [The 1444 start](The-1444-Start): which realms exist and which you can play.
+- [The 1378 start](The-1378-Start): which realms exist and which you can play.
 - [Your realm](Your-Realm) and [Provinces](Provinces): the two cards everything else feeds.
 - [Map and Map Modes](Map-and-Lenses): what the map shows at each zoom.
 
@@ -30,6 +30,7 @@ This wiki explains every system in the game and how it works. Each page is writt
 | [Warfare](Warfare) | Battles, sieges, occupation, war through the eras |
 | [Naval](Naval) | Ports, sailors, admirals, fleets and sailing |
 | [Exploration and colonies](Exploration-and-Colonies) | Voyages into the unknown and founding colonies |
+| [Tribes and hunting grounds](Tribes-and-Hunting-Grounds) | Tribal realms, claiming and taking in hunting grounds, asking a tribe for its land |
 
 ## Statecraft
 
@@ -58,13 +59,13 @@ This wiki explains every system in the game and how it works. Each page is writt
 | [Screens and navigation](Screens-and-Navigation) | Every screen from the title to the end of a campaign, on touch, mouse and controller |
 | [Saving](Saving) | Autosave, slots, ironman and cloud saves |
 | [Settings](Settings) | Every setting and what it changes |
-| [Tutorial and help](Tutorial-and-Help) | The Year of Varna tutorial, tooltips and the Almanac |
+| [Tutorial and help](Tutorial-and-Help) | The Murad's Frontier tutorial, tooltips and the Almanac |
 | [Achievements](Achievements) | What can be earned and how |
 | [Music and sound](Music-and-Sound) | The PH-5 sound chip, music that follows history, and sound effects |
 
 ## How the systems fit together
 
-The game is built as 29 systems, each owning its own rules. The [context map](https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/context-map.md) shows how they depend on each other. In short: the clock, the map and the 1444 start sit underneath everything; provinces and the realm make the gold, food and people; armies, fleets and traders spend and move them; diplomacy, government, culture and religion shape who rules and who obeys; events, revolutions and heritage give history its shape; and the screens, saves, sound and achievements sit on top without ever changing the simulation.
+The game is built as 29 systems, each owning its own rules. The [context map](https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/context-map.md) shows how they depend on each other. In short: the clock, the map and the 1378 start sit underneath everything; provinces and the realm make the gold, food and people; armies, fleets and traders spend and move them; diplomacy, government, culture and religion shape who rules and who obeys; events, revolutions and heritage give history its shape; and the screens, saves, sound and achievements sit on top without ever changing the simulation.
 
 ## For developers
 

@@ -2,7 +2,8 @@
   "$comment": "Scenario setup (SETUP) config: the 1444 start. Sources: country-catalogue README and schema; government start-forms.yaml (read through government.json); tools/mapgen owners.ts and config.json (the stand-in map rules); naval 1.3 (port tiers); buildings 15.2 (town templates); gap-lists decisions (free tier, tutorial realm); settings 4.3 and screen-flow S5 (campaign rules). Map numbers are the mapgen placeholders; the generated catalogue and map rows are in scenario-setup-catalogue.json and scenario-setup-map.json.",
   "_provisional": [
     "assessment_factors",
-    "confidence_spread"
+    "confidence_spread",
+    "africa.size_by_manpower"
   ],
   "reference_day": "1444-11-11",
   "catalogue": {
@@ -166,6 +167,39 @@
       "oldFortShare": 0.15
     }
   },
+  "africa": {
+    "$comment": "African starts (SETUP-060 to SETUP-067, X-20): the catalogue's playable countries and subjects, decentralised polities and peoples with a homeland in these regions are map realms (packages/rules/data/scenarios/1444/map-nations.json, grows). Each takes only land no realm owns and grows from its capital to its size by manpower potential (provisional). Migrations, raiders and background records stay reference data.",
+    "regions": [
+      "af_west",
+      "af_central_south",
+      "af_northeast_east",
+      "af_north_sahara"
+    ],
+    "size_by_manpower": {
+      "very_low": 1,
+      "low": 2,
+      "moderate": 3,
+      "high": 5,
+      "very_high": 8,
+      "unknown": 2
+    },
+    "reference_only": [
+      "fulbe_pastoralists",
+      "juhayna_arabs",
+      "nilotic_pastoralists",
+      "banu_kanz",
+      "beta_israel"
+    ],
+    "sub_saharan_castles": {
+      "capital": "fort",
+      "old_fort_share": 0.15,
+      "stone_castles": [
+        "Great Zimbabwe",
+        "Kilwa",
+        "Mombasa"
+      ]
+    }
+  },
   "ports": {
     "$comment": "Naval 1.3: what each 1444 port tier starts with.",
     "great": {
@@ -186,7 +220,8 @@
   },
   "town_templates": {
     "Europe": "European market town",
-    "the Sahel": "Sahel trade town"
+    "the Sahel": "Sahel trade town",
+    "the Swahili coast": "Swahili coast town"
   },
   "free_realms": [
     "ottomans",

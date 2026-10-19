@@ -4,6 +4,7 @@ import {
   batterySaverActive,
   battleStepSeconds,
   daySeconds,
+  longPressSeconds,
   detectProfile,
   readSettings,
   saveSettings,
@@ -58,7 +59,20 @@ if (firstLaunch) {
   prefs.values["audio.effects_volume"] = Math.round(s.effects * 20) * 5;
   prefs.values["audio.music"] = s.musicOn;
   prefs.values["audio.interface_sounds"] = s.uiSounds;
+  prefs.values["audio.ambience"] = s.ambienceOn;
+  prefs.values["audio.ambience_volume"] = Math.round(s.ambience * 20) * 5;
   saveSettings(prefs, store);
+}
+
+// Ambience became on by default (D-AUD-17); a device that saved the old default gets it on once.
+try {
+  if (!firstLaunch && localStorage.getItem("ph-ambience-on") === null) {
+    prefs.values["audio.ambience"] = true;
+    saveSettings(prefs, store);
+  }
+  localStorage.setItem("ph-ambience-on", "1");
+} catch {
+  // Storage refused: the saved setting stands.
 }
 
 type Listener = (ids: string[]) => void;
@@ -98,6 +112,8 @@ function applySound(): void {
     effects: Number(pref("audio.effects_volume")) / 100,
     musicOn: pref("audio.music") === true,
     uiSounds: pref("audio.interface_sounds") === true,
+    ambienceOn: pref("audio.ambience") === true,
+    ambience: Number(pref("audio.ambience_volume")) / 100,
   });
 }
 applySound();
@@ -124,6 +140,8 @@ export const batteryOn = () => batterySaverActive(prefs, battery);
 // ---- what the rows do ----
 /** One day's playback after End turn, ms (SET-131). */
 export const dayMs = () => daySeconds(prefs) * 1000;
+/** How long a long-press takes (SET-080): it opens a realm's card from the map (SUBJ-138). */
+export const longPressMs = () => longPressSeconds(prefs) * 1000;
 /** One 4-hour step of a running battle, ms (SET-065). */
 export const battleStepMs = () => battleStepSeconds(prefs) * 1000;
 export const autosaveEvery = () => autosaveInterval(prefs);

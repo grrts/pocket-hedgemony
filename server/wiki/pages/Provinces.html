@@ -1,0 +1,511 @@
+<h1>Provinces</h1>
+<p>The province is where your realm actually lives. Gold is taxed here, food grows here, recruits are raised here, lords and officials govern here, and armies burn it. Each province is a row of 4 to 16 tiles with real people working real buildings, and every number on its card is something you can count or point at, with a list of how you gain it and how you lose it. Your country card is mostly the sum of your provinces.</p>
+<h2 id="how-it-works"><a class="anchor" href="#how-it-works" aria-label="Link to this section">#</a>How it works</h2>
+<h3 id="the-principles"><a class="anchor" href="#the-principles" aria-label="Link to this section">#</a>The principles</h3>
+<ul>
+<li><strong>Everything is countable.</strong> Tiles, buildings, workers, men, days. There are no abstract levels or meters.</li>
+<li><strong>Every stat explains itself.</strong> Tap any line on the province card and you get its gain and lose list, so you can always see why a number moved.</li>
+<li><strong>One config file.</strong> All rates and limits (jobs per building, food per worker, ground tables, slots per town size, toll effects, grievance thresholds) live in one province config file. Every number on this page is a placeholder until balanced.</li>
+</ul>
+<h3 id="our-running-example-troyes-in-1444-on-the-1444-checkpoint-world"><a class="anchor" href="#our-running-example-troyes-in-1444-on-the-1444-checkpoint-world" aria-label="Link to this section">#</a>Our running example: Troyes in 1444 (on the 1444 checkpoint world)</h3>
+<p>Troyes is a royal province of France, 3 days from Paris, on farmland with 12 tiles: four farms, one burned field, two ranches, a lumber camp, a second woods tile with no building, a fishery, the castle and the town. It has 72,000 people, a tax collector of 6 years, and Duke Philip of Burgundy as a pretender. We will come back to it throughout this page.</p>
+<h3 id="tiles"><a class="anchor" href="#tiles" aria-label="Link to this section">#</a>Tiles</h3>
+<p>A province is a row of <strong>tiles</strong>: 4 for the smallest province on the map, 16 for the largest. Each tile has one <strong>use</strong>, and most uses can hold one building:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Use</th><th>How it changes</th></tr></thead>
+<tbody>
+<tr><td><strong>Fields</strong></td><td>Turned to pasture in one season. Left unworked 10 years, they grow back into woods. Salted or overgrazed, they become waste.</td></tr>
+<tr><td><strong>Pasture</strong></td><td>Ploughed back into fields. Lost to drought and overgrazing (becomes waste). Grassland, savanna and steppe provinces start with many.</td></tr>
+<tr><td><strong>Woods</strong></td><td>Cleared into fields in 3 years for gold, giving one load of timber. Gained by fields growing back and, later, replanting; lost by clearing, cutting timber faster than it regrows, and fire.</td></tr>
+<tr><td><strong>Marsh</strong></td><td>Drained into fields with <em>Polder drainage</em>. Floods and dykes broken in war turn tiles into marsh.</td></tr>
+<tr><td><strong>Waste</strong></td><td>Irrigated into fields with <em>Qanat and canal irrigation</em>.</td></tr>
+<tr><td><strong>Shore</strong></td><td>1 to 3 tiles, only for provinces on a coast, lake or navigable river. Never lost, but a blockade or a silted harbour stops their buildings working.</td></tr>
+<tr><td><strong>Town</strong></td><td>Every settled province has one. At 40,000 townsfolk the town takes a second tile, built over fields, and a great city a third. If the town shrinks below a tile&#39;s limit, that tile goes back to fields.</td></tr>
+<tr><td><strong>Castle</strong></td><td>Placed on any land tile except the Town; that tile stops producing. A destroyed castle leaves waste for 5 years, then fields.</td></tr>
+</tbody></table></div>
+<p><strong>Tile states.</strong> A tile can have at most one state at a time:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>State</th><th>Cause</th><th>Effect</th><th>Ends</th></tr></thead>
+<tbody>
+<tr><td><strong>Burned</strong></td><td>An army forages or loots, you burn your own fields (scorched earth), raiders raid, or rebels act</td><td>Its building is wrecked, it gives nothing, its workers become refugees or die</td><td>With people and peace, one burned tile is rebuilt a year, faster with gold</td></tr>
+<tr><td><strong>Fallow</strong></td><td>A building has fewer than half its workers</td><td>Works not at all</td><td>Enough workers return</td></tr>
+<tr><td><strong>Worn</strong></td><td>Fields farmed for decades with more people than needed and no rotation inventions; overgrazed pasture; later, mines and factories</td><td>Half output</td><td>Five years without use. <em>Three-field rotation</em>, <em>Fodder crops</em> and <em>Four-field rotation</em> make wearing rarer</td></tr>
+</tbody></table></div>
+<p>War damage is shown as burned tiles, never as a meter.</p>
+<h3 id="ground"><a class="anchor" href="#ground" aria-label="Link to this section">#</a>Ground</h3>
+<p>Each province has one <strong>ground</strong>, taken from the <a href="/wiki/World-Map">World Map</a>&#39;s terrain. It sets the starting tile mix and how troops fight, how buildings work and how people work without buildings.</p>
+<p><strong>Ground and troops</strong> (strength changes in %):</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Ground</th><th>Foot</th><th>Horse</th><th>Guns</th><th>Defender</th><th>Days to cross</th><th>Foraging</th><th>Sickness</th></tr></thead>
+<tbody>
+<tr><td>Farmland</td><td>0</td><td>+10</td><td>0</td><td>0</td><td>1</td><td>Rich</td><td>Low</td></tr>
+<tr><td>Grassland</td><td>0</td><td>+25</td><td>0</td><td>−10</td><td>1</td><td>Fair</td><td>Low</td></tr>
+<tr><td>Savanna</td><td>0</td><td>+15</td><td>0</td><td>0</td><td>1</td><td>Fair</td><td>Medium</td></tr>
+<tr><td>Drylands</td><td>0</td><td>+10</td><td>0</td><td>0</td><td>1.5</td><td>Poor</td><td>Low</td></tr>
+<tr><td>Desert</td><td>−10</td><td>−10 (camels 0)</td><td>−10</td><td>+10</td><td>2</td><td>Almost none</td><td>Heat</td></tr>
+<tr><td>Hills</td><td>+10</td><td>−15</td><td>−10</td><td>+15</td><td>1.5</td><td>Fair</td><td>Low</td></tr>
+<tr><td>Mountains</td><td>0</td><td>−40</td><td>−30</td><td>+30</td><td>3</td><td>Poor</td><td>Cold</td></tr>
+<tr><td>Forest</td><td>0</td><td>−25</td><td>−20</td><td>+15</td><td>2</td><td>Fair</td><td>Low</td></tr>
+<tr><td>Jungle</td><td>−10</td><td>−40</td><td>−30</td><td>+25</td><td>3</td><td>Poor</td><td>High</td></tr>
+<tr><td>Marsh</td><td>−10</td><td>−30</td><td>−30</td><td>+20</td><td>3</td><td>Poor</td><td>High</td></tr>
+<tr><td>Tundra</td><td>0</td><td>−10</td><td>−10</td><td>+10</td><td>2</td><td>Almost none</td><td>Cold</td></tr>
+</tbody></table></div>
+<p>On top of that:</p>
+<ul>
+<li>An attacker coming over a river shore tile fights at −20 %, unless the province has a bridge.</li>
+<li>The defender gets +5 % for every two woods tiles, up to +15 %.</li>
+<li>A defending army of the province&#39;s homeland language gets a further +10 % in hills, mountains, forest, jungle and marsh.</li>
+<li>If the province has a castle tile, the defender fights from the walls (see <a href="/wiki/Warfare">Warfare</a>).</li>
+<li><strong>Foraging</strong> is how much an army can take from the tiles before it starts burning them. Burned tiles give nothing to forage.</li>
+<li>An army that stays in a province loses its ground&#39;s <strong>sickness</strong> each month, worst for soldiers not born on that ground.</li>
+</ul>
+<p><strong>Ground and the economy</strong> (build cost, building output, output of people working without a building):</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Ground</th><th>Build cost</th><th>Building output</th><th>People output</th></tr></thead>
+<tbody>
+<tr><td>Farmland</td><td>100 %</td><td>+25 %</td><td>100 %</td></tr>
+<tr><td>Grassland</td><td>100 %</td><td>100 %</td><td>+50 % herding</td></tr>
+<tr><td>Savanna</td><td>100 %</td><td>100 %</td><td>+25 % herding</td></tr>
+<tr><td>Drylands</td><td>125 %</td><td>−25 % until irrigated</td><td>100 %</td></tr>
+<tr><td>Desert</td><td>150 %</td><td>−50 % except mines and irrigation works</td><td>100 % herding and caravans</td></tr>
+<tr><td>Hills</td><td>125 %</td><td>100 % (mines +25 %)</td><td>100 %</td></tr>
+<tr><td>Mountains</td><td>200 %</td><td>farms −50 %, mines +50 %</td><td>−25 %</td></tr>
+<tr><td>Forest</td><td>150 %</td><td>100 % (lumber +50 %)</td><td>+25 % hunting and gathering</td></tr>
+<tr><td>Jungle</td><td>200 %</td><td>−25 %</td><td>+25 % gathering</td></tr>
+<tr><td>Marsh</td><td>200 %</td><td>−50 % until drained</td><td>+25 % fishing</td></tr>
+<tr><td>Tundra</td><td>150 %</td><td>−50 %</td><td>100 % herding</td></tr>
+</tbody></table></div>
+<h3 id="buildings-in-the-province"><a class="anchor" href="#buildings-in-the-province" aria-label="Link to this section">#</a>Buildings in the province</h3>
+<p><a href="/wiki/Buildings">Buildings</a> owns the full building rules; here is how they sit in a province.</p>
+<ul>
+<li>Every building stands on a tile, and the castle is a building too. Each land tile holds at most one building.</li>
+<li>Each building has <strong>job slots</strong> for one class. With all slots filled it works fully, with fewer people in proportion, and below half it is fallow.</li>
+<li>Buildings are gained by building them (cost times the ground&#39;s build cost), by conquest, by events, and some appear by themselves. They are lost when their tile burns, when the town is sacked, when upkeep goes unpaid, when demolished by you or a peace treaty, or when their tile changes use.</li>
+<li>A tile with <strong>no building</strong> still has slots for up to 3,000 people of the matching class, working at the ground&#39;s people output.</li>
+<li><strong>Mines</strong> show the years of digging left in their ore deposit. Ore deposits are gained by prospecting events and mining inventions and lost every year the mine is dug. A mine that runs out closes; its miners overflow into other slots or become homeless, and the town shrinks.</li>
+<li><strong>Shipyards and mines need timber</strong> from a lumber camp in the same province or within reach (one ring, more with roads and rivers). Without timber no ships are built.</li>
+<li>The <strong>Town tile</strong> has building slots by town size:</li>
+</ul>
+<div class="table-scroll"><table>
+<thead><tr><th>Town size</th><th>Hamlet</th><th>Village</th><th>Market town</th><th>Town</th><th>City</th><th>Great city</th></tr></thead>
+<tbody>
+<tr><td>Building slots</td><td>1</td><td>2</td><td>4</td><td>6</td><td>9</td><td>12</td></tr>
+</tbody></table></div>
+<ul>
+<li>An <strong>almshouse</strong> shelters 3,000 homeless, who then stop counting toward theft, the <em>Homeless</em> grievance and shanty camps, at a cost in gold upkeep and clergy.</li>
+<li>While a town has a market, homeless people and the raw ware nearby, <strong>craft buildings</strong> now and then appear by themselves. Craftsmen fleeing persecution abroad may found one too.</li>
+</ul>
+<p>Job slots per building (people, with their families): farm 12,000; rice paddy 18,000; terrace, raised fields and plantation 12,000; ranch and horse stud 3,000; lumber camp 1,500; mine 6,000; irrigation works 1,500; fishery 3,000; saltworks 1,500; harbour 1,500; shipyard 3,000; loom house, forge, kiln and tannery 1,500; press 900; brewery or winery 900; market 1,500; caravanserai or warehouse 900; house of worship 600; seat 300 plus the official; almshouse 600; powder mill 900; hospital, wells and drains 600; factory 6,000; rail station 600.</p>
+<h3 id="food"><a class="anchor" href="#food" aria-label="Link to this section">#</a>Food</h3>
+<p>The province&#39;s <strong>harvest</strong> is the sum of its food tiles. Each gives: people in its slots × food per person × the ground&#39;s output × the harvest roll × inventions.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Food tile</th><th>People fed per worker</th><th>Rolls a harvest?</th></tr></thead>
+<tbody>
+<tr><td>Farm, terrace, raised fields</td><td>1.5</td><td>Yes</td></tr>
+<tr><td>Rice paddy</td><td>1.5, two harvests (rolled twice)</td><td>Yes</td></tr>
+<tr><td>Ranch</td><td>1.33</td><td>No: drought and hard winter events instead</td></tr>
+<tr><td>Fishery</td><td>1.33</td><td>No: storms and blockades instead</td></tr>
+<tr><td>Empty fields, woods, pasture</td><td>0.67 × the ground&#39;s people output</td><td>Fields yes; woods and pasture no</td></tr>
+</tbody></table></div>
+<div class="table-scroll"><table>
+<thead><tr><th>Harvest roll</th><th>Bumper</th><th>Good</th><th>Normal</th><th>Poor</th><th>Failed</th></tr></thead>
+<tbody>
+<tr><td>Food ×</td><td>1.3</td><td>1.15</td><td>1</td><td>0.7</td><td>0.3</td></tr>
+</tbody></table></div>
+<p><em>Three-field rotation</em>, <em>Fodder crops</em>, <em>Seed drill</em> and <em>Four-field rotation</em> each make the harvest one step better. With <em>Maize, potato and cassava</em>, a failed harvest becomes poor.</p>
+<p><strong>Troyes, a normal year:</strong></p>
+<ul>
+<li>4 farms × 12,000 farmers × 1.5 × 1.25 (farmland) = 90,000 fed</li>
+<li>2 ranches × 3,000 herders × 1.33 = 8,000 fed</li>
+<li>1 fishery × 3,000 seafolk × 1.33 = 4,000 fed</li>
+<li>The second woods tile has no building: 3,000 woodsmen hunt and gather, 3,000 × 0.67 = 2,000 fed. The burned field gives nothing.</li>
+<li><strong>Total: about 104,000 fed</strong>, for 72,000 eaters.</li>
+</ul>
+<p>A good year in Troyes feeds the castle; a failed one, with a field burned, leaves Troyes hungry. Burn two more fields and it can&#39;t feed itself.</p>
+<h3 id="wares"><a class="anchor" href="#wares" aria-label="Link to this section">#</a>Wares</h3>
+<p>Every non-food ware is made by the people in a building&#39;s slots × the ground&#39;s building output × inventions. Craft buildings that turn raw wares into finished ones add value: wool into cloth is worth three times as much. Wares made fall with burned and fallow tiles, plague killing workers, missing inputs (a forge without iron stops) and a mine running out.</p>
+<p>The ware list lives in config: grain, rice, wine, olive oil, wool, cloth, flax, linen, silk, cotton, salt, fish, timber, furs, hides, leather, horses, iron, tools, arms, copper, tin, silver, gold, gems, spices, pepper, sugar, tea, coffee, cocoa, tobacco, incense, ivory, pottery, porcelain, dyes, paper, books, saltpetre and powder; later eras add coal, rubber and oil. Enslaved people are never a ware.</p>
+<h3 id="people-births-deaths-and-famine"><a class="anchor" href="#people-births-deaths-and-famine" aria-label="Link to this section">#</a>People: births, deaths and famine</h3>
+<p>Each month every class gains births and loses deaths from yearly base rates:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Class</th><th>Births a year</th><th>Deaths a year</th></tr></thead>
+<tbody>
+<tr><td>Land classes</td><td>4.0 %</td><td>3.0 %</td></tr>
+<tr><td>Miners</td><td>3.5 %</td><td>4.0 %</td></tr>
+<tr><td>Craftsmen, market folk, clerks</td><td>3.0 %</td><td>3.5 %</td></tr>
+<tr><td>Clergy</td><td>0.5 % where clergy don&#39;t marry, otherwise as townsfolk</td><td>3.0 %</td></tr>
+<tr><td>Scholars</td><td>1.0 %</td><td>3.0 %</td></tr>
+<tr><td>Homeless</td><td>4.0 %</td><td>5.0 %</td></tr>
+</tbody></table></div>
+<p><strong>Birth rate</strong> goes up with a food store above 6 months (+0.5) and 10 years of peace in the province (+0.5), and down with a store under 3 months (−1), the <em>Hungry</em> grievance (−2), war in the province (−1), plague (−1) and, in later eras, in towns by era.</p>
+<p><strong>Death rate</strong> goes up with plague (+5 % at rumour, +15 % at outbreak, +30 % at its worst), war in the province (+1 %), each burned tile (+0.5 %), fever land for people born elsewhere, and smoke (+1 % for town classes). It goes down with hospitals, wells and drains (−0.5 % in town) and with sanitation and vaccination (each −0.5 %).</p>
+<p>Troyes, with 72,000 people, well fed and at peace, has about 2,800 births and 2,200 deaths a year, so it grows by about 600 a year until the food runs short.</p>
+<p><strong>Famine.</strong> Each season the province compares the food it has (its share of the harvest, its local store and castle deliveries) with the people who must eat. If there is enough, everyone eats and the rest goes to the store. If not, the people the food can&#39;t feed die that season, spread over the classes by size, except that a quarter of them flee as refugees if a neighbouring province has food. If Troyes has food for 64,000 one season, 8,000 can&#39;t be fed: 2,000 flee to Sens, which has food to spare, and 6,000 die. With no fed neighbour, all 8,000 die. A year&#39;s famine never kills more than a fifth of a province, so even two failed harvests in a row kill at most about a third of its people; past that the unfed go hungry instead.</p>
+<h3 id="classes-and-job-slots"><a class="anchor" href="#classes-and-job-slots" aria-label="Link to this section">#</a>Classes and job slots</h3>
+<p>Every person belongs to one class, and each class works in certain slots:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Class</th><th>Their slots are in</th></tr></thead>
+<tbody>
+<tr><td>Farmers</td><td>Farms, rice paddies, terraces, raised fields, plantations, irrigation works, empty fields</td></tr>
+<tr><td>Herders</td><td>Ranches, horse studs, empty pasture</td></tr>
+<tr><td>Woodsmen</td><td>Lumber camps, empty woods</td></tr>
+<tr><td>Miners</td><td>Mines, saltworks</td></tr>
+<tr><td>Seafolk</td><td>Fisheries, harbours, shipyards, empty shore; fleet crews are raised from them</td></tr>
+<tr><td>Craftsmen</td><td>Loom houses, forges, kilns, tanneries, presses, breweries, factories, rail stations</td></tr>
+<tr><td>Market folk</td><td>Markets, caravanserais, warehouses</td></tr>
+<tr><td>Clergy</td><td>Houses of worship, almshouses, hospitals</td></tr>
+<tr><td>Clerks</td><td>Seats</td></tr>
+<tr><td>Scholars</td><td>Schools</td></tr>
+<tr><td>Homeless</td><td>No slots</td></tr>
+</tbody></table></div>
+<p>How people move:</p>
+<ul>
+<li>Newborns join their parents&#39; class the month they are born.</li>
+<li>When a class has more people than slots, the extra move to the class whose slots are <strong>least filled</strong> (lowest share filled), ties going to food classes first. This is <strong>overflow</strong>.</li>
+<li>Overflow never goes into scholars or soldiers. Scholars only come from graduating students, and soldiers only from raised recruits.</li>
+<li>When every slot in the province is full, overflow becomes <strong>homeless</strong>.</li>
+<li>When a slot opens (a new building, deaths, plague, a levy), homeless people move into it first.</li>
+<li>Each month a share of the homeless moves to the neighbouring province with the least-filled slots, in your own realm first.</li>
+<li>A class with fewer people than slots leaves them empty until overflow arrives.</li>
+</ul>
+<p>In Troyes the farms are full. A new loom house opens 1,500 craftsman slots, now the least filled. The 3,600 homeless move in first: 1,500 become weavers and 2,100 stay homeless. From then on the farmers&#39; extra people overflow into whichever slots are emptiest, or join the homeless.</p>
+<p><strong>Countryfolk and townsfolk</strong> are shown, not stored. Town size comes from townsfolk, and townsfolk grow no food.</p>
+<h3 id="homeless"><a class="anchor" href="#homeless" aria-label="Link to this section">#</a>Homeless</h3>
+<p>Homeless people eat from the local store, make nothing, pay no tax, and die at 5 % a year. They come from overflow with every slot full, burned tiles, buildings closing, and soldiers and refugees returning with no slot free. They leave through new slots, rebuilt tiles, almshouses, levies, settlers sent to a colony or a frontier with free tiles, and drift to neighbours or abroad.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Homeless share</th><th>Effect</th></tr></thead>
+<tbody>
+<tr><td>Over 5 %</td><td>Theft: for every 5 % homeless, 5 % less tax reaches you and 5 % fewer traders pass</td></tr>
+<tr><td>Over 10 %</td><td>The <em>Homeless</em> grievance</td></tr>
+<tr><td>Over 20 % (shanty camps)</td><td><em>Homeless</em> counts as two; plague starts here first and spreads twice as fast; town classes die 1 % faster; each year a town building may burn</td></tr>
+</tbody></table></div>
+<p>Rebels muster from the province&#39;s recruits, like any levy.</p>
+<h3 id="other-people"><a class="anchor" href="#other-people" aria-label="Link to this section">#</a>Other people</h3>
+<ul>
+<li><strong>People</strong> is everyone in the province, summed over classes.</li>
+<li><strong>Refugees</strong> shelter outside the classes, eat without working at first, go home when it is safe, and after 2 years settle and overflow into slots (or become homeless). Fleeing craftsmen and scholars keep their class if a slot is free. If 2,000 refugees from Troyes shelter in Sens, they go home once Troyes is safe.</li>
+<li><strong>Faith and language mix</strong> store the top three of each; the country&#39;s Faith and Language percentages are their people-weighted sums. Persecution makes people flee and take their faith and crafts elsewhere. See <a href="/wiki/Religion">Religion</a> and <a href="/wiki/Culture">Culture</a>.</li>
+</ul>
+<h3 id="recruits-students-and-scholars"><a class="anchor" href="#recruits-students-and-scholars" aria-label="Link to this section">#</a>Recruits, students and scholars</h3>
+<ul>
+<li>Each year the province adds to <strong>recruits here</strong> a share of every class except clergy and scholars, more from homeless men. Recruits of royal provinces go to the ruler; a lord&#39;s go to his retinue. Raised recruits leave their class slots; soldiers who come home rejoin as homeless and overflow.</li>
+<li>While recruits are below a quarter of the pool, the province has the <em>Conscription</em> grievance, ending when refilled to half.</li>
+<li>Local recruits fill local school seats first, then the realm&#39;s. <strong>Students</strong> are lost by graduating, being called to arms, plague and the school being sacked.</li>
+<li><strong>Scholars</strong> are gained by graduation and by foreign scholars settling in towns with schools and peace, and lost by old age, war here, persecution and a richer neighbour hiring them. See <a href="/wiki/Research">Research</a> and <a href="/wiki/Recruiting">Recruiting</a>.</li>
+</ul>
+<h3 id="tolls"><a class="anchor" href="#tolls" aria-label="Link to this section">#</a>Tolls</h3>
+<p>The owner sets a toll rate of none, low or high on each <strong>toll point</strong>: a bridge, ford, pass, river mouth or strait. A free-trade charter sets it to none. Tolls count as trade income; see <a href="/wiki/Trade">Trade</a>.</p>
+<h3 id="tax"><a class="anchor" href="#tax" aria-label="Link to this section">#</a>Tax</h3>
+<p>Each province has its own <strong>tax rate</strong>: none, light, normal, heavy or crushing. It defaults to the realm default set on the Tax screen and can be overridden per province. Presets such as <em>Even</em>, <em>Spare the frontier</em>, <em>Squeeze the towns</em> and <em>War chest</em> fill in every rate at once.</p>
+<ul>
+<li><strong>Tax owed</strong> is the gold the province owes each year at its rate, from the value of what its buildings make and its townsfolk. It falls with burned and fallow tiles, homeless people, and riots (half).</li>
+<li><strong>Reaches you</strong> is the part that arrives: half without an official, half kept by a lord, a share lost for every day of travel beyond 5, less with enemy armies on the road, and nothing while occupied.</li>
+<li>In a lord&#39;s province, the rate is what you demand from the lord. He keeps half of what is collected either way, and a heavy or crushing demand makes him waver.</li>
+<li>Riots or rebels may force the rate down, and a tax cap charter keeps it at light or below.</li>
+<li>A heavy rate gives the <em>Heavy taxes</em> grievance; crushing counts as two.</li>
+</ul>
+<p>Troyes, at normal tax, owes 11 gold a year and all 11 reach you: it is 3 days from Paris and its official is a full-strength tax collector. Tax is paid a twelfth each month. Each day of travel beyond 5 loses 5 % of it, a tax collector makes up to 20 % back, and you never get more than the province owes.</p>
+<h3 id="roads-rivers-and-days-to-capital"><a class="anchor" href="#roads-rivers-and-days-to-capital" aria-label="Link to this section">#</a>Roads, rivers and days to capital</h3>
+<ul>
+<li>Each province has <strong>one road step</strong>: track, road, paved road, turnpike, railway. Each step is unlocked by an invention and built for gold × the ground&#39;s build cost. Roads are lost by neglect without upkeep, fighting and floods.</li>
+<li>A <strong>navigable river</strong> is fixed and shown as shore tiles; canals add one (<em>Grand canals</em>, <em>Canal locks</em>), and a wrecked canal or silting removes it. River provinces count one ring closer for castle food spread.</li>
+<li><strong>Days to capital</strong> is the travel time to the capital or nearest seat by the fastest road, river or sea route, longer in winter, with enemy armies, broken roads or a sea route closed in war. Above a limit (for example 30 days), the province has <em>Far from the throne</em>.</li>
+</ul>
+<h3 id="who-owns-and-governs-it"><a class="anchor" href="#who-owns-and-governs-it" aria-label="Link to this section">#</a>Who owns and governs it</h3>
+<ul>
+<li><strong>Owner</strong>: gained by conquest, inheritance, purchase, a lord joining with his land or a colony; lost by losing a war, a lord defecting, rebels breaking away or ceding it.</li>
+<li><strong>Governed by</strong> one of:</li>
+</ul>
+<div class="table-scroll"><table>
+<thead><tr><th>Governed by</th><th>Effect</th></tr></thead>
+<tbody>
+<tr><td>An official</td><td>Full tax and recruits, plus the effect of his type</td></tr>
+<tr><td>A lord</td><td>Half tax; recruits go to his retinue; run by his own officials</td></tr>
+<tr><td>No one</td><td>Half of everything, and the <em>Ungoverned</em> grievance</td></tr>
+<tr><td>A subject ruler</td><td>See <a href="/wiki/Subjects">Subjects</a></td></tr>
+<tr><td>Occupied</td><td>Tax, recruits, food and trade go to the occupier</td></tr>
+</tbody></table></div>
+<ul>
+<li>When a lord&#39;s line dies out, his province returns to royal and needs an official.</li>
+<li><strong>Officials at work.</strong> Who governs a province is the first thing on its card. Each official&#39;s type helps the province he runs: a tax collector brings in more tax, a steward more food from the harvest, a muster master refills recruits faster, a customs officer adds trade, a warden makes the garrison harder to storm, a judge keeps riots down. He gives half his effect in his first year and all of it after 5 years there, shown as five pips. The country card&#39;s <strong>Officials</strong> tab lists every official with his post, province, effect and years; open one and <strong>Move to another province</strong> lists your royal provinces, the best fit for his type first, to swap him with the official there or move him into an empty post. Whoever moves starts again at half. A lord&#39;s officials serve the lord: you can&#39;t move or commission them.</li>
+<li><strong>Occupied</strong>: while an enemy holds the castle, or holds a province with no castle for a season. Months of occupation are counted.</li>
+<li><strong>Years held</strong> counts years since this owner gained it. The longer it is held, the faster language and faith shift and the faster <em>Foreign rule</em> fades.</li>
+<li><strong>Homeland of</strong>: set at start from the catalogue; a people gains it by making up most of the province for 100 years and loses it after being gone 100 years. A homeland held by a ruler of another language has <em>Foreign rule</em>, and separatist events start there.</li>
+<li><strong>Pretenders</strong> are gained by inheritance and marriage, by losing the province in war (the old ruler keeps a right for 50 years) and by buying a title; lost by death without heirs, renouncing in a peace, marrying into your house, and time.</li>
+</ul>
+<h3 id="officials"><a class="anchor" href="#officials" aria-label="Link to this section">#</a>Officials</h3>
+<p>Every official has a <strong>type</strong> and runs <strong>one province</strong>; a seat needs one of its own. He gives half his effect in his first year in a province, rising to full after 5 years there. Moving him starts him again at half: a tax collector of 6 years moved from Troyes to Rouen is back to half.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Type</th><th>Effect in his province</th></tr></thead>
+<tbody>
+<tr><td>Tax collector</td><td>+20 % of tax owed reaches you</td></tr>
+<tr><td>Steward</td><td>+10 % food from the tiles; local store rots half as fast</td></tr>
+<tr><td>Judge</td><td>Riots need one grievance more; <em>Broken charter</em> fades twice as fast</td></tr>
+<tr><td>Master of works</td><td>Buildings and roads 25 % cheaper and twice as fast; burned tiles rebuilt twice as fast</td></tr>
+<tr><td>Muster master</td><td>Recruits refill 25 % faster</td></tr>
+<tr><td>Customs officer</td><td>+15 % trade gains</td></tr>
+<tr><td>Chaplain</td><td>Faith mix moves twice as fast toward the ruler&#39;s faith</td></tr>
+<tr><td>Schoolmaster</td><td>Language mix moves twice as fast toward the ruler&#39;s language; students graduate a year sooner</td></tr>
+<tr><td>Warden</td><td>Garrison fights 25 % better; walls repair twice as fast; castle store rots half as fast</td></tr>
+<tr><td>Colonial governor</td><td>No effect of his own: founds a colony, then becomes its ordinary official. Needs a colonial governor slot and doesn&#39;t count against the officials cap while holding one</td></tr>
+</tbody></table></div>
+<p>Officials are gained by <strong>hiring</strong> one of a chosen type (gold up front, wages yearly; a foreign specialist costs more), by <strong>school graduates</strong> (a madrasa gives judges and chaplains, a university judges and stewards, an academy masters of works and wardens), and by a lord&#39;s line dying out. They are lost to old age and death, dismissal, unpaid wages, being killed when rebels or an enemy take their province, and a richer neighbour hiring them away. Your country card&#39;s Officials count is the sum of your officials.</p>
+<p><strong>Filling posts without the busywork.</strong> With <strong>Auto-fill posts</strong> on (the switch at the top of the Officials tab, on in a new campaign), the crown fills its empty royal posts at the start of each month, most people first, each with the best fit for the province: a judge where it riots or plots, a steward where the store holds under a month of food, a warden where walls face an enemy at war, a customs officer where at least 3 traders passed last month, and otherwise a tax collector. It hires at home when someone of that type already serves in one of your royal posts, else a foreign specialist, and always keeps 20 gold back and stays under your officials cap. Land you take is filled straight away and doesn&#39;t hold up End turn. All the hires of a month come as one line of news. Every AI realm fills its posts the same way.</p>
+<p>Turn it off and empty posts wait for you, and new land waits for a decision before the turn ends. <strong>Fill all</strong> fills every empty post at once by the same choices. An empty post&#39;s screen puts the best fit first as a single Hire button, above the officials who could move in and the full list of types. An official&#39;s screen offers <strong>Replace</strong> with the best fit (when he isn&#39;t it) and <strong>Dismiss</strong>, which asks once more before he leaves your service. A commissioned official whose post was filled while he was away takes another empty post when released, or waits until one opens.</p>
+<h3 id="lords-in-the-province"><a class="anchor" href="#lords-in-the-province" aria-label="Link to this section">#</a>Lords in the province</h3>
+<ul>
+<li>A lord always holds at least one province; someone with no land is a <strong>courtier</strong>. A lord who loses his last province stays at court as a courtier who can be granted land again, or, if you took it by force, flees abroad and becomes a pretender to it.</li>
+<li>A lord hires and pays his own officials from his wealth. A lord&#39;s province with none of his officials pays him half and has <em>Ungoverned</em>.</li>
+<li>You can <strong>lend a lord</strong> one of your officials: it costs your wage and wins his loyalty, and the official works for him until called back.</li>
+<li>Lords spend their own wealth on buildings by their traits: Builder the most, Greedy markets and mines, Pious houses of worship, Warlike castles.</li>
+<li>If you pay for a building in a lord&#39;s province, it is his, and his loyalty rises one step (unless he is in revolt). When a lord&#39;s land comes back to you, its buildings come with it.</li>
+</ul>
+<p>More on lords in <a href="/wiki/Your-Realm">Your Realm</a>.</p>
+<h3 id="charters"><a class="anchor" href="#charters" aria-label="Link to this section">#</a>Charters</h3>
+<p>The ruler may grant a <strong>charter</strong> to one province or town:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Charter</th><th>Gain</th><th>Cost</th></tr></thead>
+<tbody>
+<tr><td>Market charter</td><td>A market that can grow into a yearly fair</td><td>A little gold</td></tr>
+<tr><td>Tax cap</td><td>Tax rate no higher than light</td><td>Tax from it</td></tr>
+<tr><td>Town law</td><td>Townsfolk run the town; it needs no official</td><td>Nothing may be seized there without breaking it</td></tr>
+<tr><td>No quartering</td><td>No armies winter there</td><td>Winter quarters there</td></tr>
+<tr><td>Faith tolerance</td><td>Its minority faith worships openly</td><td>Clergy lords&#39; loyalty; <em>Wrong faith</em> ends there</td></tr>
+<tr><td>Free trade</td><td>No tolls</td><td>Toll gold</td></tr>
+<tr><td>Mining right</td><td>A merchant house runs the mine, digging faster and finding new ore deposits</td><td>Half the mine&#39;s output</td></tr>
+</tbody></table></div>
+<p>Charters are granted, demanded by lords and towns for loyalty or a loan, or forced by rebels. Revoking one gives <em>Broken charter</em> for 20 years, and every lord notices. A conqueror may keep or revoke the charters of a province he takes.</p>
+<h3 id="defence"><a class="anchor" href="#defence" aria-label="Link to this section">#</a>Defence</h3>
+<ul>
+<li><strong>Castle</strong>: none, earthwork ring fort, stone castle, bastion fort or star fort. Gained by building or upgrading (gold × build cost, and years) or conquest; lost by siege, demolition in a peace, or one step per 10 years without upkeep. An enemy must besiege it to take the province; on hills or mountains it is far harder to take; on a shore tile it can be supplied by sea.</li>
+<li><strong>Walls</strong>: whole or with 1 to 3 breaches. Repaired with gold and months; breached by siege guns, mining and earthquakes. Each breach shortens a siege and allows an assault.</li>
+<li><strong>Garrison</strong>: soldiers inside, counted from the army. A castle with no garrison falls at once.</li>
+<li><strong>The Garrison tab</strong>: the province card lists the troops in the province without a commander (by thousand, troop type and drill), levies still gathering with the days left, and the commanders here who can pick them up. Freshly raised levies wait here and man the castle until a commander takes them.</li>
+</ul>
+<p>See <a href="/wiki/Warfare">Warfare</a> for sieges.</p>
+<h3 id="grievances-and-rebels"><a class="anchor" href="#grievances-and-rebels" aria-label="Link to this section">#</a>Grievances and rebels</h3>
+<p>There is no anger meter. A province has a list of <strong>grievances</strong>, each a named cause you can point at and fix:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Grievance</th><th>Starts when</th><th>Ends when</th></tr></thead>
+<tbody>
+<tr><td>Heavy taxes</td><td>The rate is heavy (crushing counts as two)</td><td>The rate drops; a tax cap charter</td></tr>
+<tr><td>Hungry</td><td>Local food store under 1 month</td><td>Above 3 months for a full season</td></tr>
+<tr><td>Homeless</td><td>Homeless over a tenth of the people (two above a fifth)</td><td>New buildings, an almshouse, people leaving or sent as settlers</td></tr>
+<tr><td>Soldiers quartered</td><td>Any army stays more than a season</td><td>It leaves; a no-quartering charter</td></tr>
+<tr><td>Burned homes</td><td>Any burned tile</td><td>All tiles rebuilt</td></tr>
+<tr><td>Conscription</td><td>Recruits below a quarter of the pool</td><td>Refilled to half</td></tr>
+<tr><td>Foreign rule</td><td>A homeland held by a ruler of another language</td><td>Enough years held; a lord of the local language; the majority changes</td></tr>
+<tr><td>Wrong faith</td><td>Most people don&#39;t share the ruler&#39;s faith</td><td>Conversion; a faith tolerance charter</td></tr>
+<tr><td>Ungoverned</td><td>No official (a royal province without yours, or a lord&#39;s without his)</td><td>An official is assigned</td></tr>
+<tr><td>Harsh lord</td><td>The lord is Cruel or Greedy, or hostile to the people&#39;s faith or language</td><td>The lord changes</td></tr>
+<tr><td>Broken charter</td><td>A charter revoked in the last 20 years</td><td>Time</td></tr>
+<tr><td>Far from the throne</td><td>Days to capital above the limit</td><td>A seat nearby; roads; moving the capital</td></tr>
+<tr><td>Plague</td><td>An outbreak here</td><td>It burns out</td></tr>
+<tr><td>Bloodshed</td><td>A rising of the same faith or language was massacred in the last 20 years</td><td>Time</td></tr>
+<tr><td>Requisitioned</td><td>An army, yours or anyone&#39;s, takes food from the store</td><td>A season after the last taking</td></tr>
+<tr><td>Neighbour in revolt</td><td>A neighbouring province has rebels with a grievance this one shares</td><td>Those rebels are beaten or satisfied</td></tr>
+</tbody></table></div>
+<div class="table-scroll"><table>
+<thead><tr><th>Grievances</th><th>Mood</th></tr></thead>
+<tbody>
+<tr><td>0 or 1</td><td>Calm</td></tr>
+<tr><td>2</td><td>Grumbling: growth slows; scholars and craftsmen start to leave</td></tr>
+<tr><td>3</td><td>Riots: tax and recruits halved; traders avoid it; the lord wavers</td></tr>
+<tr><td>4 or more</td><td>Rebels: a share of the recruits take up arms each month under a named leader, with a demand from their biggest grievance</td></tr>
+</tbody></table></div>
+<p>Under a judge, riots need one grievance more.</p>
+<p><strong>Rebels</strong> are gained from four or more grievances, a disloyal lord raising his retinue, a pretender landing, or foreign gold. They melt away when beaten, when their demand is granted, when grievances are fixed, or when their leader is killed or bribed. Rebel armies fight as the <em>Rebel band</em> kind under the battle rules. A province with riots or rebels counts toward your country&#39;s <strong>In revolt</strong>. At 4 or more grievances a province is <em>Plotting</em>: each month it may rise, with a 5 % chance at 4 grievances, 15 % at 5 and 30 % at 6 or more (an event can spark a rising at 3). The rebels are men from the province&#39;s recruits. More on <a href="/wiki/Rebellions">Rebellions</a>.</p>
+<h3 id="health-and-the-land"><a class="anchor" href="#health-and-the-land" aria-label="Link to this section">#</a>Health and the land</h3>
+<ul>
+<li><strong>Plague</strong>: none, rumour, outbreak, burning out. It spreads with traders along roads, rivers and sea routes, and with armies and refugees; crowded towns catch it first. It burns out after a season or two. Quarantine (you close the province) stops trade; hospitals, wells and drains slow it. It kills townsfolk first, then countryfolk, and buildings go fallow. It runs weekly while an outbreak lasts. How plague works in the game today is under <a href="#plague-in-the-game">Plague in the game</a>.</li>
+<li><strong>Fever land</strong>: none, mild, harsh or deadly, set by ground and climate, with marsh tiles adding to it. Lowered by draining marsh and later inventions (quinine, sanitation). Soldiers and settlers from elsewhere die there; locals mostly don&#39;t.</li>
+<li><strong>Smoke</strong>: from era V, factories and coal mines make smoke. Townsfolk get sick and tiles become worn. Closing them and later inventions reduce it, and smoke feeds the event tree&#39;s climate stats.</li>
+</ul>
+<h3 id="colonies-and-the-people-already-there"><a class="anchor" href="#colonies-and-the-people-already-there" aria-label="Link to this section">#</a>Colonies and the people already there</h3>
+<ul>
+<li>A colony is founded only in a province <strong>no country owns</strong>. Land held by any country, tribal countries included, is gained only by war, treaty, marriage or a lord joining.</li>
+<li>A colony takes only the <strong>free tiles</strong> that nobody works. Tiles the local people work stay theirs, with their buildings and lords; once the province is owned they can be taken only by conquest or treaty, and each tile taken adds grievances and starts resistance events.</li>
+<li><strong>Settlement</strong>: none, trading post, settlement or colony. A trading post is a market that draws traders without taking a tile. Settlement is gained by founding a colony, founding a post (envoy and gold), settlers arriving, or a treaty; lost to the local people driving it out, disease, abandonment, or another power taking it.</li>
+<li><strong>Settlers</strong> are sent from provinces with homeless people, live on the colony&#39;s free tiles, and stop the colony growing when those are full. They are lost to fever land, war with the local people, and leaving.</li>
+</ul>
+<p>See <a href="/wiki/Exploration-and-Colonies">Exploration and Colonies</a>.</p>
+<h3 id="adding-up-to-the-country-card"><a class="anchor" href="#adding-up-to-the-country-card" aria-label="Link to this section">#</a>Adding up to the country card</h3>
+<p>Each province supplies your country card&#39;s sums: gold income, people (people plus refugees), recruits (royal provinces only), food, horses, ships, castles, faith and language, in revolt, schools, students and scholars, and officials. See <a href="/wiki/Your-Realm">Your Realm</a>.</p>
+<h3 id="when-events-touch-a-province"><a class="anchor" href="#when-events-touch-a-province" aria-label="Link to this section">#</a>When events touch a province</h3>
+<p>The event tree speaks in abstract province stats, and each becomes a concrete change:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Event stat</th><th>Example</th><th>Lands as</th></tr></thead>
+<tbody>
+<tr><td>population</td><td>−10 %</td><td>People −10 %, townsfolk first in plague events</td></tr>
+<tr><td>prosperity</td><td>+2</td><td>Two new buildings that fit the province</td></tr>
+<tr><td>devastation</td><td>+30</td><td>30 % of tiles burned</td></tr>
+<tr><td>unrest</td><td>+20</td><td>One named grievance from the event</td></tr>
+<tr><td>control</td><td>−20</td><td>The official flees, or the road breaks</td></tr>
+<tr><td>fort_level</td><td>+1</td><td>Castle one step up</td></tr>
+<tr><td>infrastructure</td><td>+1</td><td>Road one step up</td></tr>
+<tr><td>industry</td><td>+1</td><td>One factory</td></tr>
+<tr><td>food_security</td><td>−0.3</td><td>Harvest two steps worse</td></tr>
+<tr><td>disease_burden</td><td>+40</td><td>Plague outbreak</td></tr>
+</tbody></table></div>
+<h3 id="starting-values"><a class="anchor" href="#starting-values" aria-label="Link to this section">#</a>Starting values</h3>
+<p>At the start each province takes its tile count from its size on the map, its ground from terrain, its tile mix from ground, its shore tiles from coast and rivers, its people from population, and how many buildings start built (and its town size) from wealth. Wealth then stops being a live stat. The rest comes from the catalogue, the research tree, region tables and event anchors; see <a href="/wiki/The-1378-Start">The 1378 Start</a>.</p>
+<h3 id="what-is-stored-and-when-it-updates"><a class="anchor" href="#what-is-stored-and-when-it-updates" aria-label="Link to this section">#</a>What is stored and when it updates</h3>
+<p>A province stores about 95 small numbers and works out food made, wares made, tax owed and reaching you, town size and country sums when needed.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Cadence</th><th>What happens</th></tr></thead>
+<tbody>
+<tr><td>Monthly</td><td>Births and deaths; overflow and homeless drift; rebels take up arms; sickness for armies staying; occupation months; grievances evaluated</td></tr>
+<tr><td>Each season</td><td>Food check and famine; <em>Hungry</em>, <em>Requisitioned</em> and <em>Soldiers quartered</em> timers</td></tr>
+<tr><td>Each autumn (twice for rice)</td><td>Harvest roll</td></tr>
+<tr><td>Yearly</td><td>Recruits refill; tax owed; years held and years served; one burned tile rebuilt; worn tile checks; mine ore deposits fall; woods regrow after 10 unworked years; refugees settle after 2 years</td></tr>
+<tr><td>Weekly, during an outbreak</td><td>Plague</td></tr>
+</tbody></table></div>
+<h2 id="in-the-game-now-the-land"><a class="anchor" href="#in-the-game-now-the-land" aria-label="Link to this section">#</a>In the game now: the land</h2>
+<p>Every province is laid out in <strong>4 to 16 tiles</strong> from the map: bigger provinces have more. One is the <strong>Town</strong>, a coast gives 1 to 3 <strong>Shore</strong> tiles, and the rest are <strong>Fields</strong>, <strong>Pasture</strong>, <strong>Woods</strong>, <strong>Marsh</strong> or <strong>Waste</strong> in the share of the ground under the province (farmland is mostly fields, mountains mostly waste and pasture, forest mostly woods).</p>
+<p><strong>Food comes from the tiles.</strong> A farm in the province works all its fields: each fields tile has work for 30,000 farmers, who feed 1.1 people each at a plain farm, 1.3 at a mill farm and 1.5 at an enclosed farm. Farmers past that, or with no farm at all, work bare land and feed 0.67 each. Ranches do the same for herders on pasture and fisheries for seafolk on the shore (1.33 each). The ground matters too: farmland farms better, mountains and marsh worse.</p>
+<p><strong>At the start</strong> every province about feeds itself: its people&#39;s own ways of working the land (terraces, ditches, herding on the move) make up what its buildings leave short of 110 % of its needs in a normal year. That stays fixed, so as the people grow, a better farm or another ranch is what feeds them. A poor harvest bites.</p>
+<p><strong>Hunting.</strong> Woodsmen hunt in the woods: each woods tile has room for 3,750 hunters, who feed 0.67 each, more in the northern forests and tundra, less in thin woods. Woodsmen past that room scrape by on half. Crowd the woods and the game thins, year by year, down to a third; fewer hunters let it come back. A <strong>hunting lodge</strong> makes the hunters in the woods bring in half as much again, and gives furs in the north. In the north a <strong>hard winter</strong> (about one year in five or eight) cuts the catch to 0.6.</p>
+<p><strong>Changing a tile.</strong> You can clear woods into fields (3 years), turn fields to pasture or plough pasture back (a season each), drain marsh (3 years, needs <em>Polder drainage</em>) and irrigate dry waste (2 years, needs <em>Qanat and canal irrigation</em>). Each costs gold up front, more on hard ground; a province changes one tile at a time, and stopping gives half the gold back. The ground itself never changes. Lords change their own land, and other countries change theirs, by a simple rule: a province that can&#39;t feed itself drains, irrigates or clears woods.</p>
+<p><strong>Mines and salt.</strong> A province in hills or mountains may have an ore deposit under its waste: iron, copper, tin, silver, gold or rock salt, with so many years of digging left. Tap the waste tile on the Land tab to see it. A mine needs the ore deposit and timber from a lumber camp in the province or next door; it gives work for 6,000 miners and adds trade, three times as much for silver or gold. Each January it digs a year off the deposit, and when it runs out the mine closes. Kutná Hora&#39;s silver (in Středočeský) and Falun&#39;s copper (in Dalarna) are already dug at the start. On a dry or warm coast, saltworks on the shore make salt and add trade too.</p>
+<p><strong>Worn fields.</strong> Fields farmed year after year with more farmers than they hold wear out: after 30 years of it one fields tile turns <strong>worn</strong> and gives half, then the next 30 years another. Each rotation invention your realm knows (<em>Three-field rotation</em>, <em>Fodder crops</em>, <em>Four-field rotation</em>) makes that half as long again. Farmers work the sound fields first, so once the sound fields hold them all, the worn tile rests, and after 5 years of rest it is sound again. A better farm, fewer farmers (settlers, recruits, a new town building) or clearing woods for more fields lets it rest. Grassland and savanna start mostly as pasture.</p>
+<p><strong>Fever land.</strong> Every province has a fever land of none, mild, harsh or deadly: jungle is harsh and marsh and savanna mild, a step worse in the tropics and for every two marsh tiles. By the rules, soldiers and settlers born elsewhere die there at 5, 15 or 30 % a year and the people born there at a tenth of that; the game shows it on the Land tab now, and armies and colonies will count it when their sickness is played. Draining the marsh lowers it.</p>
+<p><strong>How you use it.</strong> Tap one of your provinces, then its <strong>Land</strong> tab. The first line says how much of its people the land feeds in a normal year, in red under 100 %; under it, a line names the province&#39;s fever land, if it has any. Below is the grid of tiles; a worn field is striped and marked &quot;worn&quot;, and its sheet says how long it has rested, each coloured by its use and naming the building that works it. Tap a tile to see who works it, what it feeds or gives a year, and the building that would work it better, with its <strong>Build</strong> button or why it can&#39;t be built yet. Under the sheet are the one to three changes that tile allows, each with its gold and time. On the country card, <strong>Provinces → Short of food</strong> lists the provinces whose land doesn&#39;t feed them and what would fix each; tap one to open its Land tab.</p>
+<h2 id="plague-in-the-game"><a class="anchor" href="#plague-in-the-game" aria-label="Link to this section">#</a>Plague in the game</h2>
+<p>Plague is in the game now, as it was in the century after the Black Death: it comes back to a region about once every ten years, not all the time. A large realm sees it somewhere in its land every few years.</p>
+<p><strong>How it starts.</strong> Now and then plague breaks out by itself, most often in <strong>crowded towns</strong> (a province where many of the people are townsfolk) and in shanty camps of the homeless. Land no realm holds has no towns, and plague does not start or spread there.</p>
+<p><strong>How it spreads.</strong> Every week (on the 7th, 14th, 21st and 28th of the month) plague can spread from a province where it rages:</p>
+<ul>
+<li>to the provinces next door, along the roads, and more easily down a river both share;</li>
+<li>by ship to the other coasts of the same sea;</li>
+<li>with an army that stood in a sick province: for about a month after, the army can bring it wherever it goes.</li>
+</ul>
+<p>Crowded towns catch it more easily than the countryside.</p>
+<p><strong>How it runs.</strong> First comes <strong>word of plague</strong> (about a month), then the <strong>outbreak</strong> (a season or two), then it is <strong>burning out</strong> (about a month), and then it is gone. A province that has just had it is spared for about twelve years: its survivors don&#39;t catch it again soon.</p>
+<p><strong>Who dies.</strong> While plague is there, people die faster: a little at first and at the end, more during the outbreak, most of all in shanty camps. The dead are townsfolk first, so towns lose their craftsmen, market folk and clergy faster than the countryside loses its farmers. Fewer children are born while it lasts, and the outbreak is a grievance (<em>Plague</em>) that adds to the province&#39;s mood.</p>
+<p><strong>Quarantine.</strong> You can close any of your provinces, sick or not, and open it again whenever you like. While it is closed:</p>
+<ul>
+<li>its trade stops (its trade ratio falls to 0) and it pays only <strong>half its tax</strong>;</li>
+<li>nothing spreads out of it along roads, rivers or by ship;</li>
+<li>plague gets in only a quarter as easily.</li>
+</ul>
+<p>An army still carries plague in and out. A closed province stays closed until you lift the quarantine, and its trade grows back slowly after. Other realms close their crowded towns when an outbreak starts there, and open them when it is over; they leave their countryside open.</p>
+<p><strong>How you use it.</strong> A sick province has a pale door with a red cross over it on the map when you zoom in to regions; a plank across the door means it is closed. Tap it: its Overview has a plague card with the step in words and about how long it lasts yet, how many have died so far, whether it is closed and what that costs, and a <strong>Quarantine</strong> or <strong>Lift quarantine</strong> button. A healthy province of yours shows the card when plague is next door, so you can close it before plague comes. On your country card, the <strong>Provinces</strong> tab says how many of your provinces have plague and how many are closed, and its <strong>Sick</strong> tab lists them, worst first. The Lands tile of your realm&#39;s Overview says &quot;Plague in N provinces&quot;. You hear once when plague reaches one of your provinces, and how it came, and once when it burns out there, with its dead.</p>
+<p><strong>Not in the game yet:</strong> hospitals, wells and drains that slow plague, refugees that carry it, and buildings going fallow when their workers die.</p>
+<h2 id="what-you-see"><a class="anchor" href="#what-you-see" aria-label="Link to this section">#</a>What you see</h2>
+<p><strong>The province card</strong>, when you tap a province at close zoom:</p>
+<pre><code> TROYES                        France · royal province · 3 days to Paris
+ Official: tax collector, 6 yrs Pretender: Duke Philip of Burgundy
+ Ground: farmland · 12 tiles
+ [Farm][Farm][Farm][Farm][burned][Ranch][Ranch][Lumber][woods][Fishery][Castle][Town]
+ People    72,000                 born 2,800 · died 2,200 a year · growing
+ Classes   farmers 48k · herders 6k · woodsmen 4.5k · seafolk 3k · craftsmen 4.5k · others 2.4k · homeless 3.6k
+ Food      feeds 104,000 a year   72,000 eat · 7 months in store
+ Town      market town            6 slots: market, 3 loom houses, church, school
+ Tax       normal                 11 gold owed · 9 reach you
+ Recruits  1,100                  40 at school
+ Castle    stone · 300 garrison   walls whole · 6 months siege store
+ Faith     Catholic 100 %         Language French 94 % · Flemish 6 %
+ Grievances (2): soldiers quartered, burned homes          Rebels: none
+</code></pre>
+<p>The tile row is the province: tap a tile to see its building, its workers and what it makes. Tap any other line to open its gain and lose list.</p>
+<p><strong>The Tax screen</strong> sets the realm default rate, overrides per province and presets. The province map modes (Food, Tax reaching you, Days to capital, Grievances, Ground, Recruits) and what shows at each zoom are on <a href="/wiki/Map-and-Lenses">Map and Map Modes</a>.</p>
+<p><strong>Things you can do</strong>: set a province&#39;s tax rate, the realm default or a preset; set a toll; change a tile&#39;s use (clear woods, fields to pasture and back, drain marsh, irrigate waste); burn your own fields; pay to rebuild a burned tile faster; assign, dismiss and hire officials; lend an official to a lord and recall him; pay for a building in a lord&#39;s province; grant or revoke a charter; build a road; quarantine a province; assign a garrison; repair walls; send settlers.</p>
+<h2 id="how-it-connects"><a class="anchor" href="#how-it-connects" aria-label="Link to this section">#</a>How it connects</h2>
+<ul>
+<li><a href="/wiki/World-Map">World Map</a>: ground, size (tile count), coast, rivers, neighbours.</li>
+<li><a href="/wiki/The-1378-Start">The 1378 Start</a>: starting values for every province.</li>
+<li><a href="/wiki/Time-and-Turns">Time and Turns</a>: monthly, seasonal, yearly and weekly ticks.</li>
+<li><a href="/wiki/Buildings">Buildings</a>: building list, slots, construction, upkeep and owners; the province supplies tiles, ground and classes.</li>
+<li><a href="/wiki/Research">Research</a>: inventions unlock buildings, tile changes, harvest steps, road and castle steps.</li>
+<li><a href="/wiki/Your-Realm">Your Realm</a>: sums for the country card; food policy, castle deliveries, lords and fiefs.</li>
+<li><a href="/wiki/Trade">Trade</a>: wares, toll points and rates, customs officer, homeless penalty, quarantine.</li>
+<li><a href="/wiki/Warfare">Warfare</a>: ground modifiers, castles, walls, garrison, occupation; burned tiles, sacks, requisition and quartering come back.</li>
+<li><a href="/wiki/Troop-Movement">Troop Movement</a>: days to cross, foraging, roads, rivers, bridges.</li>
+<li><a href="/wiki/Recruiting">Recruiting</a>: recruits here, classes, homeless, muster master.</li>
+<li><a href="/wiki/Rebellions">Rebellions</a>: grievances, homeless share and leaders; owns how risings start.</li>
+<li><a href="/wiki/Revolutions">Revolutions</a>: grievances and class shares read as signs.</li>
+<li><a href="/wiki/Religion">Religion</a>: faith mix, houses of worship, chaplains, <em>Wrong faith</em>.</li>
+<li><a href="/wiki/Culture">Culture</a>: language mix, <em>Foreign rule</em>, officials&#39; language.</li>
+<li><a href="/wiki/Government">Government</a>: caps on officials and lords; seats.</li>
+<li><a href="/wiki/Exploration-and-Colonies">Exploration and Colonies</a>: colonial governors and founding colonies.</li>
+<li><a href="/wiki/Subjects">Subjects</a>: provinces governed by a subject ruler; colony stages.</li>
+<li><a href="/wiki/Diplomacy">Diplomacy</a>: an official sent as envoy leaves his province at half until he returns.</li>
+<li><a href="/wiki/Naval">Naval</a>: seafolk crews, harbours, shipyards, timber.</li>
+<li><a href="/wiki/National-Strengths">National Strengths</a>: levers on tax reach, harvest, officials, grievances and building cost.</li>
+<li><a href="/wiki/Historical-Events">Historical Events</a>: event province stats translated as above.</li>
+<li><a href="/wiki/Map-and-Lenses">Map and Map Modes</a>: card fields, tile row, zoom content and map modes.</li>
+</ul>
+<h2 id="numbers"><a class="anchor" href="#numbers" aria-label="Link to this section">#</a>Numbers</h2>
+<p>All province numbers are placeholders, kept in one province data file.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Value</th><th>Config key</th><th>Design value</th></tr></thead>
+<tbody>
+<tr><td>Tiles per province</td><td><code>province.tiles.min</code> / <code>max</code></td><td>4 / 16</td></tr>
+<tr><td>Shore tiles</td><td><code>province.shore_tiles</code></td><td>1 to 3</td></tr>
+<tr><td>Clearing woods</td><td><code>province.clear_woods.years</code></td><td>3 years</td></tr>
+<tr><td>Fields back to woods</td><td><code>province.fields_to_woods.years</code></td><td>10 years</td></tr>
+<tr><td>Destroyed castle as waste</td><td><code>province.castle_ruin.waste_years</code></td><td>5 years</td></tr>
+<tr><td>Second town tile</td><td><code>province.town.second_tile_townsfolk</code></td><td>40,000 townsfolk</td></tr>
+<tr><td>Worn recovery</td><td><code>province.worn.recovery_years</code></td><td>5 years</td></tr>
+<tr><td>Years of overwork that wear a field</td><td><code>province.worn.overwork_years</code>, <code>rotation_stretch</code></td><td>30, ×1.5 per rotation invention</td></tr>
+<tr><td>Fever land</td><td><code>province.fever_land</code></td><td>jungle harsh, marsh and savanna mild, +1 tropics, +1 per two marsh; 5 / 15 / 30 % a year for people born elsewhere, a tenth for locals</td></tr>
+<tr><td>Tax owed</td><td><code>province.tax.owed</code></td><td>0.12 gold per 1,000 building workers, 0.5 per 1,000 townsfolk, at normal</td></tr>
+<tr><td>Travel</td><td><code>province.roads.travel</code></td><td>winter ×1.5, enemy army or broken road ×2</td></tr>
+<tr><td>Burned tiles rebuilt</td><td><code>province.burned.rebuild_per_year</code></td><td>1 a year</td></tr>
+<tr><td>Ground and troops</td><td><code>province.ground.troops</code></td><td>table above</td></tr>
+<tr><td>River crossing penalty</td><td><code>province.river_crossing_penalty</code></td><td>−20 %</td></tr>
+<tr><td>Woods ambush</td><td><code>province.woods_ambush</code></td><td>+5 % per two woods, cap +15 %</td></tr>
+<tr><td>Locals in rough ground</td><td><code>province.locals_rough_bonus</code></td><td>+10 %</td></tr>
+<tr><td>Ground and economy</td><td><code>province.ground.economy</code></td><td>table above</td></tr>
+<tr><td>Job slots</td><td><code>province.buildings.slots</code></td><td>list above</td></tr>
+<tr><td>Bare tile slots</td><td><code>province.bare_tile.slots</code></td><td>3,000</td></tr>
+<tr><td>Town building slots</td><td><code>province.town.building_slots</code></td><td>1 / 2 / 4 / 6 / 9 / 12</td></tr>
+<tr><td>Mill bonus</td><td><code>province.mill.gold_bonus</code></td><td>+25 % gold from grain</td></tr>
+<tr><td>Almshouse</td><td><code>province.almshouse.shelters</code></td><td>3,000</td></tr>
+<tr><td>Food per worker</td><td><code>province.food.per_worker</code></td><td>1.5 / 1.33 / 0.67</td></tr>
+<tr><td>Harvest roll</td><td><code>province.harvest.multipliers</code></td><td>1.3 / 1.15 / 1 / 0.7 / 0.3</td></tr>
+<tr><td>Craft value</td><td><code>province.wares.craft_value</code></td><td>×3</td></tr>
+<tr><td>Births and deaths</td><td><code>province.births</code> / <code>deaths</code></td><td>table above</td></tr>
+<tr><td>Birth and death modifiers</td><td><code>province.births.modifiers</code>, <code>province.deaths.modifiers</code></td><td>lists above</td></tr>
+<tr><td>Famine flee share</td><td><code>province.famine.flee_share</code></td><td>a quarter</td></tr>
+<tr><td>Homeless drift</td><td><code>province.homeless.drift_share</code></td><td>not given</td></tr>
+<tr><td>Homeless thresholds</td><td><code>province.homeless.thresholds</code></td><td>5 % / 10 % / 20 %</td></tr>
+<tr><td>Homeless deaths</td><td><code>province.homeless.deaths</code></td><td>5 % a year</td></tr>
+<tr><td>Homeless rebel rate</td><td><code>province.homeless.rebel_rate</code></td><td>×2</td></tr>
+<tr><td>Shanty town deaths</td><td><code>province.shanty.town_death_extra</code></td><td>+1 %</td></tr>
+<tr><td>Refugees settle</td><td><code>province.refugees.settle_years</code></td><td>2 years</td></tr>
+<tr><td>Conscription</td><td><code>province.recruits.conscription</code></td><td>below 1/4, ends at 1/2</td></tr>
+<tr><td>Tax without official / lord&#39;s share</td><td><code>province.tax.no_official</code>, <code>province.tax.lord_share</code></td><td>half / half</td></tr>
+<tr><td>Free travel days for tax</td><td><code>province.tax.free_travel_days</code></td><td>5</td></tr>
+<tr><td>Far from the throne</td><td><code>province.far_from_throne.days</code></td><td>30 (example)</td></tr>
+<tr><td>Official full effect</td><td><code>province.officials.full_effect_years</code></td><td>5 years (half in the first)</td></tr>
+<tr><td>Official effects</td><td><code>province.officials.effects</code></td><td>table above</td></tr>
+<tr><td>Homeland</td><td><code>province.homeland.years</code></td><td>100 years</td></tr>
+<tr><td>Pretender&#39;s right</td><td><code>province.pretender.years</code></td><td>50 years</td></tr>
+<tr><td>Broken charter</td><td><code>province.charter.broken_years</code></td><td>20 years</td></tr>
+<tr><td>Castle neglect</td><td><code>province.castle.neglect_years</code></td><td>10 years a step</td></tr>
+<tr><td>Wall breaches</td><td><code>province.walls.max_breaches</code></td><td>3</td></tr>
+<tr><td>Grievance levels</td><td><code>province.grievances.levels</code></td><td>0–1 / 2 / 3 / 4+</td></tr>
+</tbody></table></div>
+<h2 id="decided-since-the-first-draft"><a class="anchor" href="#decided-since-the-first-draft" aria-label="Link to this section">#</a>Decided since the first draft</h2>
+<ul>
+<li>Tax is paid monthly, loses 5 % per day of travel beyond 5, and never exceeds what is owed.</li>
+<li>Provinces have 4 to 16 tiles by their size on the map. A town is a village from 1,000 townsfolk, a market town from 3,000, a town from 8,000, a city from 20,000 and a great city from 40,000. It takes a second tile at 40,000 and a third at 100,000.</li>
+<li>Each class except clergy and scholars gives 1 % of its people a year as recruits. The homeless are not taken first, and rebels come from the recruit pool.</li>
+<li>Birth and death modifiers are percentage points: +0.5 turns a 4 % birth rate into 4.5 %.</li>
+<li>Each harvest step makes the harvest one band better, up to bumper, and steps add up.</li>
+<li>An unpaid month leaves a building neglected at half output; ten neglected years drop it a step.</li>
+<li>Land of peoples with no state of their own counts as unowned, so it can be colonised on its free tiles.</li>
+<li>A customs officer adds 15 % to trade gains; fees and tolls are collected in full with or without him.</li>
+<li>A judge raises the bar for riots by one grievance.</li>
+<li>Armies lose men to sickness each month: none in healthy land, 1 % at medium, 2 % in high, hot, cold or fever land.</li>
+<li>An official learns a province in 5 years among his own people, 7 among a related language and 10 among a foreign one. One official runs more provinces as you learn the right government inventions.</li>
+</ul>
+<h2 id="still-open"><a class="anchor" href="#still-open" aria-label="Link to this section">#</a>Still open</h2>
+<p>Nothing. Every question about provinces has been decided; the numbers marked as placeholders are tuned during balancing.</p>
+<h2 id="for-developers"><a class="anchor" href="#for-developers" aria-label="Link to this section">#</a>For developers</h2>
+<ul>
+<li>Spec: <a href="https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/province/spec.md" rel="noopener"><code>domain/province/spec.md</code></a>, requirement code <strong>PROV</strong> (PROV-001 to PROV-292).</li>
+<li>Features: <code>domain/province/features/</code> (26 files, from tiles, tile-states and ground-troops to grievances, colonies and country-aggregation).</li>
+<li>Code: rules code for this context goes in <code>packages/engine/src/domain/province/</code>, with balance numbers in <code>packages/rules/data/domain/province.json</code>. Today&#39;s engine keeps per-province owner, population and wealth in <code>packages/engine/src/world.ts</code>.</li>
+</ul>

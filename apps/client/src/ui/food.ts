@@ -1,5 +1,6 @@
 import type { FoodView, Snapshot } from "@ph/engine";
 import { icon } from "../art/ui.ts";
+import { fold } from "./fold.ts";
 
 /**
  * The Food tab of the player's country card (feedback 84, 85; realm "How the
@@ -94,6 +95,9 @@ export function foodTab(s: Snapshot, name: (p: number) => string, thumb: (p: num
     })
     .join("");
 
+  // Besieged or cut castles open the fold by themselves, since they need the player.
+  const troubled = f.castles.filter((c) => c.besieged || c.cut).length;
+  const castleSummary = troubled ? `${troubled} besieged or cut off` : `${f.castles.length} castle${f.castles.length === 1 ? "" : "s"}, roads open`;
   const outside = f.outside.length
     ? `<h3 class="sub">Outside every castle's reach</h3>
       <p class="hint">${f.outside.length} province${f.outside.length === 1 ? " lives" : "s live"} on ${f.outside.length === 1 ? "its" : "their"} own harvest. A castle or a road nearby brings ${f.outside.length === 1 ? "it" : "them"} in.</p>
@@ -103,10 +107,8 @@ export function foodTab(s: Snapshot, name: (p: number) => string, thumb: (p: num
         .join("")}${f.outside.length > 12 ? `<span class="hint">and ${f.outside.length - 12} more</span>` : ""}</div>`
     : "";
 
-  return `
-    ${glance}
-    <h3 class="sub">Presets</h3>
-    <div class="choices food-presets">${presets}</div>
+  const current = [`${f.realm.collection} %`, SPREAD_LABEL[f.realm.spread] ?? f.realm.spread, `${f.realm.siegeReserve} mo`, FAMINE_LABEL[f.realm.famineRule] ?? f.realm.famineRule, SURPLUS_LABEL[f.realm.surplus] ?? f.realm.surplus].join(" · ");
+  const settings = `
     <h3 class="sub">Collection</h3>
     <p class="hint">The share of each province's surplus over a year's eating that goes to its castle at the harvest.</p>
     ${choiceRow("collection", collectionChoices(f), f.realm.collection)}
@@ -114,17 +116,24 @@ export function foodTab(s: Snapshot, name: (p: number) => string, thumb: (p: num
     <p class="hint">How a castle hands out what it holds over its reserve, in percent: its own province · the next ring · the ring beyond.${reach < 2 ? " Your castles reach one ring until a road is built at them: the ring beyond's share stays in the castle." : ""}</p>
     ${choiceRow("spread", spreadChoices, f.realm.spread)}
     <h3 class="sub">Siege reserve</h3>
-    <p class="hint">Months of food each castle keeps and never hands out, for a siege.${noGranary.length && f.realm.siegeReserve > smallest ? ` <b>${noGranary.length} castle${noGranary.length === 1 ? "" : "s"} without a granary hold only ${smallest} months.</b>` : ""}</p>
+    <p class="hint">Months of food each castle keeps and never hands out, for a siege.</p>
     ${choiceRow("siegeReserve", reserveChoices(f), f.realm.siegeReserve)}
     <h3 class="sub">Famine relief</h3>
     <p class="hint">A province with less food than this is fed first from its castle's store over the reserve.</p>
     ${choiceRow("famineRule", famineChoices, f.realm.famineRule)}
     <h3 class="sub">Surplus</h3>
     <p class="hint">What happens to food that doesn't fit: a province holds ${monthsText(f.localCapMonths)} at most, a castle ${monthsText(smallest)}, or ${monthsText(f.granaryCapMonths)} with a granary.</p>
-    ${choiceRow("surplus", surplusChoices, f.realm.surplus)}
-    <h3 class="sub">Castles</h3>
-    <p class="hint">Enemy armies on your land cut the roads: food doesn't pass them, and a besieged castle feeds only its own province. Tap a castle to open its province and give it its own collection and siege reserve.</p>
-    <div class="province-list">${castleRows || `<p class="hint">You hold no castle.</p>`}</div>
+    ${choiceRow("surplus", surplusChoices, f.realm.surplus)}`;
+  // A reserve the castles without a granary can't hold is a warning, so it stays outside the fold.
+  const shortReserve = noGranary.length && f.realm.siegeReserve > smallest ? `<p class="hint"><b>${noGranary.length} castle${noGranary.length === 1 ? "" : "s"} without a granary hold only ${smallest} months of the siege reserve.</b></p>` : "";
+
+  return `
+    ${glance}
+    <h3 class="sub">Presets</h3>
+    <div class="choices food-presets">${presets}</div>
+    ${shortReserve}
+    ${fold("food-customise", "Customise", current, settings)}
+    ${fold("food-castles", "Castles", castleSummary, `<p class="hint">Tap a castle for its own collection and siege reserve.</p><div class="province-list">${castleRows || `<p class="hint">You hold no castle.</p>`}</div>`, troubled > 0)}
     ${outside}`;
 }
 
@@ -149,12 +158,12 @@ export function castleFoodSettings(s: Snapshot, p: number): string {
     </section>`;
 }
 
-/** The General tab's Food line: hungry and low counts, opening the Food tab. */
-export function foodLine(s: Snapshot, held: number[]): string {
-  const hungry = held.filter((p) => s.provinceFoodMonths[p]! < 1).length;
-  const low = held.filter((p) => s.provinceFoodMonths[p]! >= 1 && s.provinceFoodMonths[p]! < 3).length;
-  const text = hungry || low ? `${hungry ? `<b>${hungry} hungry</b>` : ""}${hungry && low ? ", " : ""}${low ? `${low} running low` : ""}` : "All provinces fed";
-  return `<dt>Food</dt><dd><button class="paper" data-realm-open-tab="food" title="Open the Food tab">${icon("castle", 1)}${text}</button></dd>`;
+/** Provinces with less than a month of food, and those with less than three. */
+export function foodCounts(s: Snapshot, held: number[]): { hungry: number; low: number } {
+  return {
+    hungry: held.filter((p) => s.provinceFoodMonths[p]! < 1).length,
+    low: held.filter((p) => s.provinceFoodMonths[p]! >= 1 && s.provinceFoodMonths[p]! < 3).length,
+  };
 }
 
 /** The castle line of a province's overview: its castle store, or the castle that feeds it, or none in reach. */

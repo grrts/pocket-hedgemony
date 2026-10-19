@@ -2,10 +2,11 @@ import type { World } from "./world.ts";
 import type { News } from "./war.ts";
 import { Rng } from "./rng.ts";
 import { cultureOf } from "./names.ts";
+import { deathChance as personDeathChance } from "./mortality.ts";
 import { realmConfig, successor, type Person, type ThroneLaw } from "./domain/realm/index.ts";
 import * as gov from "./domain/government/index.ts";
 import { formOf } from "./government.ts";
-import data from "../../rules/data/domain/rulers-1444.json" with { type: "json" };
+import { startRulers as data } from "../../rules/src/start.ts";
 
 /**
  * Rulers in play (realm REALM-233 to REALM-236): every realm has a ruler from
@@ -65,7 +66,7 @@ export function throneLaw(world: World, n: number): ThroneLaw {
   return law === "eldest son" && (realmConfig.daughters_inherit_crown as string[]).includes(world.nationIds[n]!) ? "eldest child" : law;
 }
 
-const dynastic = (law: ThroneLaw) => law === "eldest son" || law === "eldest child";
+export const dynastic = (law: ThroneLaw) => law === "eldest son" || law === "eldest child";
 
 /** A given name of the realm's culture, for a ruler, heir or kinsman the records don't name. */
 function givenName(world: World, n: number): string {
@@ -82,7 +83,7 @@ function drawTraits(rng: Rng): string[] {
 }
 
 /** A child born to the ruler: a daughter only where daughters may inherit the crown (REALM-107). */
-function child(world: World, n: number, age: number): Heir {
+export function child(world: World, n: number, age: number): Heir {
   const daughters = (realmConfig.daughters_inherit_crown as string[]).includes(world.nationIds[n]!);
   const sex = daughters && world.rulerRng.next() < R.daughter_heir ? "f" : "m";
   return { name: givenName(world, n), age, sex, relation: "child" };
@@ -99,7 +100,7 @@ function drawHeir(world: World, n: number, rulerAge: number): Heir | null {
 }
 
 /** The most loyal lord of a realm (then the most provinces, then by name) rules for a child (REALM-170, D-REALM-17). */
-function regentOf(world: World, n: number): string | null {
+export function regentOf(world: World, n: number): string | null {
   const rank = ["Loyal", "Wavering", "Disloyal", "In revolt"];
   const lands = landsByLord(world);
   // The most loyal lord with land, then the one with most provinces, then by name.
@@ -131,6 +132,11 @@ export function seedRulers(world: World): void {
   const rng = world.rulerRng;
   const s = R.start_age;
   for (let n = 0; n < world.nationCount; n++) {
+    // A sleeping realm has its ruler drawn when it wakes (SETUP-083), so the dice of the realms on the map stay as they were.
+    if (world.nationAsleep[n]) {
+      world.rulers[n] = { title: null, name: "", sex: "m", age: 30, years: 0, traits: [], heir: null, regent: null };
+      continue;
+    }
     const rec = RECORDS[world.nationIds[n]!] ?? null;
     const years = rec?.since != null ? Math.max(0, world.date.year - rec.since) : between(rng, s.unknown_since_years);
     const age = rec?.age ?? Math.min(s.oldest, years + between(rng, [s.accession_from, s.accession_to]));
@@ -140,13 +146,23 @@ export function seedRulers(world: World): void {
     world.rulers[n] = r;
   }
   // Regents read the lords, who are seeded first.
-  for (let n = 0; n < world.nationCount; n++) if (world.rulers[n]!.age < R.child_under) world.rulers[n]!.regent = regentOf(world, n);
+  for (let n = 0; n < world.nationCount; n++) if (!world.nationAsleep[n] && world.rulers[n]!.age < R.child_under) world.rulers[n]!.regent = regentOf(world, n);
 }
 
-/** The yearly chance a ruler of this age dies (REALM-100, `ruler.death_per_year`). */
-export function deathChance(age: number): number {
-  return R.death_per_year.find(([under]) => age < under!)?.[1] ?? R.death_per_year[R.death_per_year.length - 1]![1]!;
+/** A woken realm's first ruler (SETUP-083): a man of its own people, the campaign's dice for his age, traits and heir. */
+export function wakeRuler(world: World, n: number): void {
+  const rng = world.rulerRng;
+  const s = R.start_age;
+  const years = between(rng, s.unknown_since_years);
+  const age = Math.min(s.oldest, years + between(rng, [s.accession_from, s.accession_to]));
+  const r: GameRuler = { title: null, name: givenName(world, n), sex: "m", age, years, traits: drawTraits(rng), heir: null, regent: null };
+  r.heir = drawHeir(world, n, age);
+  world.rulers[n] = r;
+  if (r.age < R.child_under) r.regent = regentOf(world, n);
 }
+
+/** The yearly chance a ruler of this age dies (REALM-100, REALM-270): the one table every person shares. */
+export const deathChance = (age: number): number => personDeathChance(age, "ruler");
 
 /** Realms the player borders: they hear of a death there. */
 function bordersPlayer(world: World, n: number): boolean {
@@ -193,7 +209,7 @@ export function newRuler(world: World, n: number, news: News[], step: (lord: num
   const child = ruler.age < R.child_under;
   if (child) ruler.regent = regentOf(world, n);
   world.lords.forEach((l, k) => {
-    if (l.nation !== n) return;
+    if (l.nation !== n || l.gone) return;
     step(k, "new_ruler");
     if (disputed) step(k, "disputed_heir");
     if (child) step(k, "child_ruler");
@@ -217,12 +233,13 @@ const FEMALE_OF: Record<string, string> = { King: "Queen", Duke: "Duchess", Empe
 const MALE_OF: Record<string, string> = Object.fromEntries(Object.entries(FEMALE_OF).map(([m, f]) => [f, m]));
 
 /**
- * Each January (REALM-100 to REALM-102): rulers and heirs grow a year older,
- * rulers reign a year longer, a child ruler who comes of age rules alone, a
- * ruler dies with the chance of his age (crowns.ts names who follows), and
- * an heirless ruler of an age to have children may have one.
+ * Each January (REALM-100 to REALM-102, REALM-271): rulers and heirs grow a
+ * year older, rulers reign a year longer, a child ruler who comes of age
+ * rules alone, an heir and then a ruler die with the chance of their age
+ * (people.ts says what follows), and an heirless ruler of an age to have
+ * children may have one.
  */
-export function yearlyRulers(world: World, news: News[], die: (n: number) => void): void {
+export function yearlyRulers(world: World, news: News[], die: (who: "ruler" | "heir", n: number) => void): void {
   if (world.date.month !== 1) return;
   const rng = world.rulerRng;
   for (let n = 0; n < world.nationCount; n++) {
@@ -235,8 +252,9 @@ export function yearlyRulers(world: World, news: News[], die: (n: number) => voi
       r.regent = null;
       if (n === world.player) news.push({ kind: "ruler", text: `${rulerLabel(r)} comes of age and rules without a regent.`, nations: [n] });
     }
+    if (r.heir && rng.next() < personDeathChance(r.heir.age, "heir")) die("heir", n);
     if (rng.next() < deathChance(r.age)) {
-      die(n);
+      die("ruler", n);
       continue;
     }
     const [from, to] = R.birth_ages;

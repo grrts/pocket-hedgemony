@@ -36,7 +36,7 @@ Feature: The Shogunate
   @INST-063 @placeholder
   Scenario: Summoning a house
     # config: shogunate.summon_wealth_loss
-    Given the Shogunate's hold is 55
+    Given the Shogunate has hold 55
     When the shogun summons the house "Ōuchi"
     Then the lord of "Ōuchi" cannot join a rising
     And his wealth falls by 10 percent a year
@@ -54,11 +54,11 @@ Feature: The Shogunate
 
   @INST-065
   Scenario: The break at hold 0
-    Given the Shogunate's hold is 0
+    Given the Shogunate has hold 0
     When the season ends
     Then each great house is a warlord domain with its land
     And the shogun's realm is a warlord domain with its royal provinces
-    And the event "onin_war" has fired
+    And the event "onin_war" is in the chronicle
 
   @INST-065
   Scenario: The break when the Court's province is lost

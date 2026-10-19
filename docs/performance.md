@@ -1,13 +1,15 @@
 # Performance requirements
 
 Hard budgets for the game on a mid-range phone. They are not goals: a change
-that breaks one fails CI. Two scripts check them:
+that breaks one fails CI on main. Two scripts check them, on pushes to main
+(not on pull requests, where a busy runner made them fail on noise):
 
 - `pnpm bench` (packages/engine/bench/turn.bench.ts) times the engine itself.
 - `pnpm --filter @ph/client perf` (apps/client/scripts/perf.mjs) runs the
-  built game in mobile Chromium, pans the map at five zooms, plays one
-  warm-up turn and then ends three turns (21 days). CI runners share their
-  CPUs with the software GPU, so a day now and then stalls for a CPU: the day
+  built game in mobile Chromium, pans the map at five zooms, plays three
+  warm-up turns and then ends three turns (21 days); when the week stops for
+  an event or a revolution it takes the first answer, as a player would. CI
+  runners share their CPUs with the software GPU, so a day now and then stalls for a CPU: the day
   budgets are judged on the third slowest of the 21 days (about the 90th
   percentile), and when those turns break a budget it plays three more, up to
   three attempts; one attempt must meet every budget. `--report` prints the
@@ -38,8 +40,12 @@ Rules that keep it there:
 
 GPU time is not measured in CI (it runs on a software GPU, about 120 ms a
 frame); the map's frame time is reported only. So perf turns the map's
-shading off while it pans and animates, which keeps the check under a
-minute, and back on before it ends turns.
+shading off for the whole check, which keeps it under a minute. It stays
+off while the turns play: the software GPU's 200 to 300 ms of CPU a frame
+took the cores the worker and the main thread need, which no phone's GPU
+does, and made applying a day a third slower than the same code with the
+map dark. Applying a day still uploads the provinces' textures, so that is
+still timed.
 
 ## Ending a turn
 
@@ -61,6 +67,9 @@ one worker answer and one apply.
 Rules:
 
 - The worker sends typed arrays and transfers them; no JSON of the world.
+  The snapshot is copied to the main thread every day, in one task, so a
+  per-province field is a typed array (bits for a small set, such as the
+  harvest months), never an array of numbers or arrays.
 - Applying a day updates textures and redraws once; panels re-render only
   what is open. Seasons change once a week, worked out ahead while the
   player looks at the map.
@@ -83,8 +92,19 @@ Dragging an army plans a route each time the target changes.
 - Applying a turn: 4 to 6 ms (was 14 to 26 ms, from converting every
   province's season on the main thread; before that 4.3 s, from re-encoding
   sprite images on every panel render).
-- Worker answer: about 50 ms.
+- Worker answer: about 50 ms. The 1378 start's 315 realms took it to about
+  75 ms (most of it the Diplomacy tab's view of every realm, whose lookups
+  scanned every relation in the world); with the relations indexed by realm
+  it is about 55 ms.
 - Engine turn: 0.2 ms at 5,000 provinces, 0.4 ms at 20,000.
+- Engine turn bench (`pnpm bench`, 5,000 provinces and 500 nations): about
+  13.5 ms on this container, was 17 to 19 ms and over budget on CI (25.7 ms of
+  25). The daily occupation pass looked every province up in a map of the
+  armies and tried to lift a siege in each; each 4-hour step with no fleets
+  scanned every province for a blockade, and refreshing blockades cleared
+  and copied the whole map; the yearly technology score threw an exception
+  for the root and the boughs of every realm. Now only marked provinces are
+  touched. At 20,000 provinces: about 80 ms, was about 90.
 - Animation: every frame (was one in five, so marching armies moved at
   5 fps: the redraw request made while drawing was wiped right after).
 - Route: about 4 ms at 5,000 and 20,000 provinces (was about 8 ms).

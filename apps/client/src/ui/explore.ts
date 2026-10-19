@@ -39,7 +39,7 @@ export function exploreSection(f: FleetView, ex: ExplorationView, o: { inPort: b
 export function colonySection(
   f: FleetView,
   ex: ExplorationView,
-  o: { inPort: boolean; portOfMine: boolean; gold: number; stores: number; storesMax: number; coasts: { province: number; why: string | null }[]; colonyHere: Colony | null; waiting: Governor[]; name: (p: number) => string },
+  o: { inPort: boolean; portOfMine: boolean; gold: number; stores: number; storesMax: number; coasts: { province: number; why: string | null }[]; colonyHere: Colony | null; waiting: Governor[]; name: (p: number) => string; ground?: (p: number) => string },
 ): string {
   if (!f.explorers) return "";
   const gov = ex.governors.find((g) => g.fleet === f.id);
@@ -68,7 +68,7 @@ export function colonySection(
   if (gov && !o.inPort && o.coasts.length) {
     parts.push(
       `<div class="choices">${o.coasts
-        .map((c) => `<span class="choice"><button class="wax" data-colony-found="${c.province}" ${c.why ? "disabled" : ""}>Found a colony in ${esc(o.name(c.province))}</button>${c.why ? why(c.why) : ""}</span>`)
+        .map((c) => `<span class="choice"><button class="wax" data-colony-found="${c.province}" ${c.why ? "disabled" : ""}>Found a colony in ${esc(o.name(c.province))}</button>${c.why ? why(c.why) : ""}${o.ground?.(c.province) ?? ""}</span>`)
         .join("")}</div>`,
     );
   } else if (gov && !o.inPort) parts.push(`<p class="hint">Sail beside an empty coast to settle it.</p>`);

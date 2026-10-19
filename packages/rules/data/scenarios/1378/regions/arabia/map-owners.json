@@ -1,0 +1,50 @@
+[
+ {
+  "nation": "mamluks",
+  "countries": [
+   "LBY"
+  ],
+  "bbox": [
+   19,
+   29,
+   26,
+   33.5
+  ]
+ },
+ {
+  "nation": "hejaz",
+  "countries": [
+   "SAU"
+  ],
+  "admin1": [
+   "Makkah",
+   "Al Madinah",
+   "Al Bahah",
+   "Tabuk"
+  ]
+ },
+ {
+  "nation": "yemen",
+  "countries": [
+   "YEM"
+  ],
+  "bbox": [
+   42,
+   12,
+   49,
+   17.5
+  ]
+ },
+ {
+  "nation": "oman",
+  "countries": [
+   "OMN"
+  ],
+  "bbox": [
+   55.5,
+   20,
+   60,
+   26.5
+  ]
+ }
+]

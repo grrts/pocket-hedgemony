@@ -3,18 +3,19 @@
 ## 1. Purpose and scope
 
 This context decides how a new player learns Pocket Hegemony on a phone, with a mouse and keyboard, or with a
-controller. It owns four layers: the tutorial campaign "The Year of Varna" (the Ottomans, 11 November 1444
-to 1447), guided first turns, the content of the Needs attention list, and tooltips, "Why?" and the Almanac
+controller. It owns four layers: the tutorial campaign "Murad's Frontier" (the Ottomans under Murad I,
+20 September 1378 to late 1383, X-25), guided first turns, the content of the Needs attention list, and tooltips, "Why?" and the Almanac
 (the in-game encyclopedia). It also owns the tutorial's pacing tools, its scenario file and step script, the
 lesson actions per input, tutorial progress, and the measuring of tutorial use.
 
 **In scope**
 - Onboarding principles (teach by doing, one idea per step, short sessions, never trap, same lesson on every
-  device, explain why a number moved, teach 1444 first).
+  device, explain why a number moved, teach the start first).
 - The ten tutorial chapters (0–9), their dates, turns, lessons and "Done when" conditions; going off script.
 - Pacing tools: Advance to…, Input focus with Free look, Quiet world, Battle at watch speed.
 - The tutorial scenario file (start state, world rules, scripted `tutorial_only` events, chapter saves, steps).
-- The lesson on the crusade after Varna on the religion, diplomacy, warfare and troop movement rules; the Janissary lesson.
+- The lesson on the Byzantine civil war (which emperor to back) on the diplomacy, religion, warfare and troop movement
+  rules; the Janissary lesson (the pençik and the first yeniçeri).
 - Step script format, step kinds, text tokens, the look of a step (note, spotlight, face, counter), the
   tutorial's pause-menu lines.
 - Guided first turns (goals list).
@@ -33,7 +34,8 @@ lesson actions per input, tutorial progress, and the measuring of tutorial use.
 - Sounds for steps and hints (audio).
 - Final input mapping and glyph sets (input scheme thread, gap list 2, item 9: no context folder yet).
 - Whether Advance to… is a real-game feature; the turn report (game-shell / turn report thread).
-- The devshirme in a real campaign (recruiting; sensitive-history thread). This design only proposes it.
+- The devshirme in a real campaign (recruiting; sensitive-history thread). This design only proposes it; the
+  1378 tutorial no longer shows it (D-TUT-17).
 - The art (pointing hand sprite, vizier portrait, spotlight edge), localisation string tables and glossary
   file (art list, localisation threads).
 - Every system's rules that lessons use (realm, province, recruiting, warfare, troop-movement, religion,
@@ -43,9 +45,15 @@ lesson actions per input, tutorial progress, and the measuring of tutorial use.
 
 Newest decision first.
 
+0. X-25 (Leroy, 18 Oct 2026): every campaign, the tutorial included, starts on 20 September 1378; the tutorial
+   becomes an Ottoman 1378 opening. `start-date/plan-1378.md` §6 step 7 (switch over: the tutorial becomes
+   "Murad's Frontier"); `start-date/research/east.md` "Ottoman 1378 opening ("Murad's Frontier" tutorial)": Murad
+   I's realm on 20 September 1378, the situation the player faces, the near-term sequence 1378–1389 and the
+   choices the tutorial can hand the player. This replaces the start date, court, war and siege of v2–v5 below;
+   v2–v5 still give the lessons, pacing tools, step script, layers and every rule not about the start (D-TUT-17).
 1. `tutorial/tutorial-design.md` v5 (16 Oct 2026): "Changes since version 4" (3.7 Janissaries shown); v4
-   (Varna crusade on religion design, Straits on troop movement); v3 (full religion system, no advisor after
-   the tutorial, Needs attention screen, no achievements); v2 (Ottomans 1444–1447, history's dates).
+   (the war lesson on the religion design, Straits on troop movement); v3 (full religion system, no advisor after
+   the tutorial, Needs attention screen, no achievements); v2 (an Ottoman tutorial on history's dates).
 2. `tutorial/tutorial-design.md` §13 "Settled (16 Oct)" and "Still open".
 3. `tutorial/tutorial-design.md` §1–§12.
 4. `planning/gap-lists.md` "Decisions already made" (span; free tier Ottomans and France, List 1 item 2;
@@ -58,7 +66,7 @@ Newest decision first.
 
 | Term | Meaning | Not to be confused with |
 |---|---|---|
-| Tutorial campaign | "The Year of Varna": ten short chapters as the Ottomans, 11 November 1444 to 1447 | Guided first turns |
+| Tutorial campaign | "Murad's Frontier": ten short chapters as the Ottomans under Murad I, 20 September 1378 to late 1383 | Guided first turns |
 | Chapter | One lesson of about 5 minutes, started from its own fixed chapter save | A turn |
 | Chapter save | A save per chapter made by playing the previous chapter's recommended path in the engine; rebuilt by a tool, never hand-edited; shipped read-only | A campaign save |
 | Step | One entry of the step script: one thing to look at or do, in one or two short lines | A turn |
@@ -69,9 +77,11 @@ Newest decision first.
 | Input focus | During a `do` step, only the controls on the step's `allow` list respond; the rest is dimmed, not hidden | Focus navigation (controller) |
 | Free look | A small button that lifts the input focus for the step | |
 | Advance to… | Tutorial-only ribbon that runs several turns to a named date and shows one combined turn report | End turn |
-| Quiet world | Scenario rule that holds back AI wars against the Ottomans except scripted ones, and AI wars in the Balkans and western Anatolia (Karaman included) | |
-| Battle at watch speed | The chapter 5 border clash at Giurgiu always opens the battle screen, slowed to one bell every 3 seconds | |
-| Guide face | The grand vizier, Çandarlı Halil; appears only in the tutorial | An advisor (there is none after the tutorial) |
+| Quiet world | Scenario rule that holds back AI wars against the Ottomans except scripted ones, and AI wars in the Balkans and western Anatolia (Karaman and Germiyan included) | |
+| Battle at watch speed | The chapter 5 clash before Pera always opens the battle screen, slowed to one bell every 3 seconds | |
+| Guide face | The vizier Çandarlı Kara Halil Hayreddin Pasha, shown as "Çandarlı Kara Halil" and labelled "The Grand Vizier"; appears only in the tutorial | An advisor (there is none after the tutorial) |
+| Two emperors | The Byzantine civil war of the start: Andronikos IV on the throne since 12 August 1376 (Genoa's partner), his father John V and brother Manuel II in his prison (Venice's side); chapter 4 hands the player the choice of which to back | |
+| Italian partner | The sea power that comes with an emperor: Venice with John V, Genoa (from Pera) with Andronikos IV; the two republics are at war over Tenedos (the War of Chioggia, from spring 1378) | Ally |
 | Guided first turns | A goals list under the top bar for the first in-game year of a campaign | Tutorial |
 | Goal | One entry of guided first turns: opens one screen once and ticks off | Achievement |
 | Show me | A goal's button that runs the matching tutorial steps in the current campaign, without scenario overrides | Show (Needs attention) |
@@ -89,28 +99,35 @@ Newest decision first.
 | Tips list | `tips` list linking each loading-screen tip to its Almanac entry | |
 | Button token | `{btn:…}` text token that becomes the prompt for the player's current input | |
 | "Began as the tutorial" | Mark on a tutorial save continued as a campaign; such a save is not ironman | |
-| Devshirme | The historical collection of Christian boys for the Janissary corps; shown in chapter 4 as a `narrative_only` vignette | A recruiting action |
+| Pençik | The bey's fifth of the captives of every raid or war, from which the first Janissaries (yeniçeri) were trained under Murad I (c.1360s–1380s, medium confidence); shown in chapter 4 as a `narrative_only` vignette | Devshirme (the later levy of Christian boys, not shown in a 1378 tutorial), a recruiting action |
 
 ## 4. Domain model
 
 ### Aggregates
 
 **TutorialScenario** (identity: the scenario file)
-- Start state: the normal 11 November 1444 setup (X-5, D-TUT-9), with Mehmed II (12) on the throne and Murad II
-  retired at Manisa as in the catalogue, and overrides only where the tutorial needs them: Çandarlı Halil grand vizier; Evrenos, Mihal and Turahan families as lords, one wavering; one
-  royal province in Anatolia with no official; a fixed seed; the Christian sipahis' lord card (Wavering); the
-  Orthodox row of the Faith policy set to Restricted; the crusade league's war still open, with the league
-  holding the Defend the faith aim from the start. The 1444 map already gives the Ottomans Edirne and
-  Varna and Byzantium the Morea (`owners-1444.json`).
-- World rules: quiet-world regions and dates; forced AI personalities (Hungary crosses the Danube at Giurgiu in
-  chapter 5 with Hunyadi commanding; Hungary offers terms after failing to take one castle in two months if
-  the border clash was lost; the Morea accepts terms after the wall falls).
+- Start state: the normal 20 September 1378 setup (X-25, D-TUT-9; `packages/rules/data/scenarios/1378/`), whose
+  rulers already give Murad I (52) as bey with Bayezid (18) as heir, Andronikos IV as emperor, Ivan Shishman at
+  Tarnovo, Süleyman Şah of Germiyan, Kemaleddin Hüseyin of Hamid and Alaeddin Ali of Karaman; whose map already
+  gives the Ottomans Edirne (the capital), Bursa (the second seat), Gallipoli and the Dardanelles shore, Plovdiv,
+  Komotini (Evrenos's base) and western Thrace to the Mesta, and leaves Serres and Thessaloniki Byzantine, Sofia
+  with Tarnovo and Kütahya with Germiyan; and overrides only where the tutorial needs them: Çandarlı Kara Halil
+  grand vizier; the Evrenos, Mihal and Timurtaş families as lords, Evrenos wavering (his Want: a march on Serres);
+  one royal province in Anatolia with no official; a fixed seed; the Christian sipahis' lord card (Wavering); the
+  Orthodox row of the Faith policy set to Restricted.
+- World rules: quiet-world regions; forced AI personalities (in chapter 5 Andronikos IV holds Pera with the
+  Genoese and leads their sally; if the clash was lost, his side offers terms after failing to take one castle in
+  two months; in chapter 8 Manuel II accepts terms once Serres has fallen).
 - Scripted events (event tree format, `tutorial_only: true`, keeping the event tree's `history` block with
-  sources; they stay in the tutorial scenario file, D-TUT-9): Murad goes back to Manisa (November 1444); the
-  crusaders' fleet on the Danube (summer 1445); the Janissary pay rising and Murad's return (1446).
+  sources; they stay in the tutorial scenario file, D-TUT-9): Tribute from Constantinople (autumn 1378); John V
+  and Manuel reach Murad (June 1379); John V back in Constantinople (1 July 1379); the settlement of 1381 (May
+  1381); A bride for Bayezid (1381); The Hamid towns for sale (1381); Manuel goes to Thessaloniki (1382). Where
+  the research calls a date disputed (the Germiyan marriage, 1378 or 1381; the Hamid sale, 1374/75 or 1381), the
+  tutorial takes the dating the 1378 start itself uses (both still ahead on the start day, so 1381, the Ottoman
+  chronicles' dating) and the event's history block names the other.
 - Chapter saves 0–9, steps (the script).
 - INV-TUT-1: scripted events with `tutorial_only: true` never fire in a real campaign.
-- INV-TUT-2: no event is moved off its historical date.
+- INV-TUT-2: no event is moved off its historical date; a disputed date takes the dating the 1378 start uses.
 - INV-TUT-3: chapter saves are rebuilt by a tool from the recommended path, never edited by hand.
 - INV-TUT-4: the same chapter save and the same orders always give the same result (engine determinism).
 
@@ -143,23 +160,25 @@ Newest decision first.
 
 | # | Chapter | Date | Turns | Teaches | Done when |
 |---|---|---|---|---|---|
-| 0 | The map | November 1444 | 0 | Pan and zoom through world, region and local view; select a province; open its card; switch a lens (Food, then Faith); find the capital, the Straits and Varna | The player has opened Edirne's province card and seen the Food and Faith lenses |
-| 1 | A month at a time | November 1444 – January 1445 | 3 | Country card; gold and food at a glance; End turn; the turn report; the first event (Murad goes back to Manisa; let him go, or ask him to stay this winter) | The Manisa event is answered and the turn report is read |
-| 2 | A boy on the throne | February – April 1445 | 3 | Ruler and heirs; why a child ruler and new reign make lords waver; the lords list (Evrenos, Mihal, Turahan); what a lord wants; royal provinces versus lords' lands; hiring an official for a province with none; tax rates | An official is placed, and one wavering lord has been given his want, given a gift, or left alone (each fine; the turn report shows the result) |
-| 3 | Bread and castles | May – September 1445 | 1 + advance | Food lives in provinces; castles collect and spread it; reach rings; the Food policy screen and presets; the September harvest; ends when news arrives that the crusaders' fleet is on the Danube | A preset is chosen, the harvest turn is played, and the player opens one hungry province's "Why?" |
-| 4 | Men under arms | September 1445 | 3 | The crusade still at war, its league and its Defend the faith aim; the Faith policy choice for the Orthodox; ferrying troops over the Bosporus; the levy screen in Thrace; levies versus trained regiments; the Janissaries as a standing regiment and how they were raised; calling the lords' riders; giving command to an official made Marshal (X-7); standing orders | An army of levies, lords' riders and Janissaries stands with a commander |
-| 5 | The Danube frontier | October – November 1445 | 4–6 | Marching and days to cross; the food reserve; seeing the enemy (the crusade first as a rumour); a small border clash with Hunyadi's crossing at Giurgiu, on the battle screen; after the battle, including what the faith choice changed; terms; peace voices; making peace | Peace is signed (losing the battle is allowed; the chapter adapts) |
-| 6 | Schools and inventions | early 1446 | 2 + advance | Madrasas, students and scholars; schools have a faith; a served, protected community on a province's Faith line; choosing what to study; every student is a recruit the army can't raise | An invention is chosen and the player has seen the recruit pool shrink |
-| 7 | The Janissaries' pay | 1446 | 3–4 | A rising of unpaid soldiers in Edirne; the rebellion card; the five answers (grant, talk, bribe, wait, attack); then an event: Murad takes the throne back, or Mehmed rules on | The rising ends by any means |
-| 8 | The wall at Corinth | November – December 1446 | 4–6 | Declaring a war yourself; marching into the Morea; laying siege to the Hexamilion; the siege month by month; storming with guns; terms | The wall falls or terms are agreed |
-| 9 | Your realm now | 1447 | — | One-screen recap with Almanac links; keep playing these Ottomans or start a new campaign | The player picks one |
+| 0 | The map | September 1378 | 0 | Pan and zoom through world, region and local view; select a province; open its card; switch a lens (Food, then Faith); find the capital Edirne, Bursa the second seat, Gallipoli and the straits, and Constantinople | The player has opened Edirne's province card and seen the Food and Faith lenses |
+| 1 | A week at a time | September – November 1378 | 3 | Country card; gold and food at a glance; End turn; the turn report; the first event (Tribute from Constantinople: take the tribute, or ask after the imprisoned John V) | The tribute event is answered and the turn report is read |
+| 2 | The bey and his lords | December 1378 – February 1379 | 3 | Ruler and heirs (Murad I, Bayezid and Yakub; Savcı's revolt with Andronikos in 1373 as what a restless son can do); why lords waver (frontier lords live by raids and new land); the lords list (Evrenos, Mihal, Timurtaş); what a lord wants (Evrenos: a march on Serres); royal provinces versus lords' lands; hiring an official for a province with none; tax rates | An official is placed, and the wavering lord has been given his want, given a gift, or left alone (each fine; the turn report shows the result) |
+| 3 | Schools and inventions | March – May 1379 | 2 + advance | Madrasas, students and scholars (the madrasa in Bursa); schools have a faith; a served, protected community on a province's Faith line; choosing what to study; every student is a recruit the army can't raise; ends when news arrives that John V and Manuel have escaped | An invention is chosen and the player has seen the recruit pool shrink |
+| 4 | Two emperors | June 1379 | 3 | The event John V and Manuel reach Murad: back John V (as history) or keep Andronikos IV; the Italian partner each brings (Venice or Genoa) and their war over Tenedos; the war aim Seat a pretender; a partner's reasons; the Faith policy choice for the Orthodox; crossing at Gallipoli because the enemy partner's galleys hold the Bosporus; the levy screen in Thrace; levies versus trained regiments; the first Janissaries and how they were raised (the pençik); calling the lords' riders; giving command to an official made Marshal (Lala Şahin Pasha, beylerbeyi of Rumelia, X-7); standing orders | An emperor is chosen, and an army of levies, lords' riders and Janissaries stands with a commander |
+| 5 | The walls of Pera | July 1379 – May 1381 | 4–6 + advance | Marching and days to cross (Edirne to Constantinople); the food reserve; the city opens to John V (1 July 1379); seeing the enemy (Andronikos's sally from Genoese Pera first as a rumour); a small clash before Pera, on the battle screen; after the battle, including what the faith choice and the Venetian galleys changed; terms; peace voices; making peace (the settlement of May 1381) | Peace is signed (losing the battle is allowed; the chapter adapts) |
+| 6 | Bread and castles | June – September 1381 | 1 + advance | Food lives in provinces; castles collect and spread it; reach rings; the Food policy screen and presets; the event A bride for Bayezid (the Germiyan marriage, whose dowry castles of Kütahya, Simav, Eğrigöz and Tavşanlı would join the reach rings, or press Germiyan by war); the September harvest; ends with the offer of the Hamid towns (buy them, knowing Karaman wants them, or leave them) | A preset is chosen, the harvest turn is played, and the player opens one hungry province's "Why?" |
+| 7 | The soldiers' pay | 1382 | 3–4 | A rising of unpaid soldiers in Edirne, their pay owed since the Pera years; the rebellion card; the five answers (grant, talk, bribe, wait, attack); then the news that Manuel II has made Thessaloniki his own base | The rising ends by any means |
+| 8 | The road to Serres | August – September 1383 | 4–6 | Declaring a war yourself (on Manuel's Macedonian towns, Evrenos's Want); marching from Komotini; laying siege to Serres; the siege month by month; storming the breach; terms; Serres falls on 19 September 1383 on the recommended path | Serres falls or terms are agreed |
+| 9 | Your realm now | late 1383 | — | One-screen recap with Almanac links, and what lies ahead (Thessaloniki, Karaman, Sofia and Tarnovo, the road to Kosovo); keep playing these Ottomans or start a new campaign | The player picks one |
 
-Total: about 30 to 40 turns and 45 to 50 minutes, in sessions of about 5 minutes. Under X-18 a turn is one week: the Turns column counts weekly End turn presses, and each chapter uses Advance to… to cover the rest of its date span, so the chapter dates and lengths stay as listed. Durations in months (the goals list's first in-game year, cooldowns) stay in months.
+Total: about 30 to 40 turns and 45 to 50 minutes, in sessions of about 5 minutes. The chapters follow the dates:
+Food comes in chapter 6, at the September 1381 harvest, because the choice of emperor must come before John V's
+return of 1 July 1379 and no harvest falls between the start and that day. Under X-18 a turn is one week: the Turns column counts weekly End turn presses, and each chapter uses Advance to… to cover the rest of its date span, so the chapter dates and lengths stay as listed. Durations in months (the goals list's first in-game year, cooldowns) stay in months.
 
 - **Step** (entity): as in the script format.
 - **Text token** (value): `{btn:confirm}` and other actions → the current input's prompt; `{ui:food_policy}` →
   the screen's name in bold plus icon; `{stat:gold}` → stat icon and name linked to its Almanac entry;
-  `{place:edirne}`, `{lord:turahan}` → the name, linked; tapping moves the camera there.
+  `{place:edirne}`, `{lord:evrenos}` → the name, linked; tapping moves the camera there.
 - **Goal** (value): Look over your realm (Country card; opened); Choose how your castles share food (Food
   policy; a preset or setting chosen); Check your lords (lords list; opened); Put an official in every royal
   province (Officials; no royal province without one, or dismissed); Choose what your scholars study
@@ -171,7 +190,7 @@ Total: about 30 to 40 turns and 45 to 50 minutes, in sessions of about 5 minutes
 |---|---|---|---|
 | Warning | A province's local store will reach zero before the next harvest | "Sofia will run out of bread by March." | Country stats 3 |
 | Warning | An army's food reserve is under 15 days | "Murad's army has twelve days of food left." | Warfare 6 |
-| Warning | A lord turns Wavering or Disloyal | "Turahan Bey grows cold toward you. He wants a war on the Morea." | Country stats 5.5 |
+| Warning | A lord turns Wavering or Disloyal | "Evrenos Bey grows cold toward you. He wants a march on Serres." | Country stats 5.5 |
 | Warning | Pay owed to soldiers | "Your soldiers have not been paid for two months." | Warfare 3.4 |
 | Warning | Gold will run out in under three months at this rate (X-18: measured by the date) | "At this pace the treasury is empty by June." | Country stats 2 |
 | Warning | A harvest is near and many farmers are levied | "Five thousand farmers are under arms with the harvest three weeks away." | Recruiting 2.1 |
@@ -214,7 +233,7 @@ Total: about 30 to 40 turns and 45 to 50 minutes, in sessions of about 5 minutes
 
 ### Proposals to other contexts (not rules here)
 
-- **Devshirme in a campaign** (declined, D-TUT-8: it stays narrative only in the tutorial): runs while a realm holds the
+- **Devshirme in a campaign** (declined, D-TUT-8; the 1378 tutorial shows the earlier pençik instead, D-TUT-17): runs while a realm holds the
   *Kapıkulu household* birthright; no action to take more boys or collect sooner; a collection every 5 years
   (config); boys taken shown on each province's People line; a new grievance *Sons taken* for 10 years in each
   province collected from; Orthodox and Catholic lords there waver one step; a share of families leave as
@@ -239,7 +258,7 @@ Total: about 30 to 40 turns and 45 to 50 minutes, in sessions of about 5 minutes
 - TUT-004 When a player who closed the app mid-chapter returns, the onboarding context shall resume at the same step. [tutorial §1.3]
 - TUT-005 The onboarding context shall let every step and every chapter be skipped and the whole tutorial be left at any time, and shall lock nothing in the game behind it. [tutorial §1.4]
 - TUT-006 The onboarding context shall write each step once, with button tokens that become the right prompt for touch, mouse and keyboard, or controller. [tutorial §1.5]
-- TUT-007 The onboarding context shall teach the 1444 game in the tutorial and teach systems that only matter later through New entries on the Needs attention list and the Almanac, with no tutorial chapters for later eras. [tutorial §1.7, §13 settled]
+- TUT-007 The onboarding context shall teach the game as it starts (20 September 1378, X-25) in the tutorial and teach systems that only matter later through New entries on the Needs attention list and the Almanac, with no tutorial chapters for later eras. [tutorial §1.7, §13 settled]
 - TUT-008 The onboarding context shall use no tutorial text, character name or screen name from Europa Universalis IV or other Paradox games. [tutorial intro]
 
 ### Layers
@@ -247,59 +266,59 @@ Total: about 30 to 40 turns and 45 to 50 minutes, in sessions of about 5 minutes
 - TUT-010 While a player has skipped the tutorial and guided turns, the onboarding context shall still provide the Needs attention list, tooltips, "Why?" and the Almanac. [tutorial §2]
 
 ### Tutorial campaign
-- TUT-011 The onboarding context shall run the tutorial as the Ottomans from 11 November 1444 (X-5) to 1447 in ten chapters (0–9), keeping history's own dates and moving no event to fit the lesson plan. [tutorial §3, §3.2, §13 settled]
+- TUT-011 The onboarding context shall run the tutorial as the Ottomans under Murad I from 20 September 1378 (X-25) to late 1383 in ten chapters (0–9), keeping history's own dates and moving no event to fit the lesson plan; where the research calls a date disputed, the tutorial takes the dating the 1378 start uses and the event's history block names the other. [tutorial §3, §3.2, §13 settled; X-25; research east "Ottoman 1378 opening"]
 - TUT-012 The onboarding context shall start each chapter from its own fixed chapter save, so it can be played or replayed alone. [tutorial §3.2]
 - TUT-013 When a chapter's Done-when condition is met, the onboarding context shall mark the chapter done, for each chapter as listed in §4. [tutorial §3.2]
 - TUT-014 When the player's choices differ from history, the onboarding context shall carry the chapter on from what happened, as a real campaign would. [tutorial §3.2 History]
 - TUT-015 When the next chapter starts, the onboarding context shall put the world back on its historical course through that chapter's save, carrying no off-script choice over (D-TUT-3), and say so in one line on its opening card. [tutorial §3.2 History]
 - TUT-016 The onboarding context shall keep the event tree's `history` block with sources on every scripted event. [tutorial §3.2, §3.4]
 - TUT-017 The onboarding context shall use the Ottomans as the tutorial nation, which are in the free tier, so the whole tutorial works without a purchase on every store and in the Steam demo. [tutorial §3.1, §9; gap-lists List 1 item 2]
-- TUT-018 The onboarding context shall use its own Ottoman set of numbers for the recruiting, battle and siege lessons (`ottoman_examples`, provisional: 1,000 Janissaries, 4,000 levies, 2,000 lords' riders, a crusader army of 16,000, the Hexamilion holding 2 months), made the same way as the French worked examples (D-TUT-11). [tutorial §3.1 Cost]
+- TUT-018 The onboarding context shall use its own Ottoman set of numbers for the recruiting, battle and siege lessons (`ottoman_examples`, provisional: 1,000 Janissaries, 4,000 levies, 2,000 lords' riders, Andronikos's and the Genoese army at Pera of 6,000, Serres holding 2 months), made the same way as the French worked examples (D-TUT-11). [tutorial §3.1 Cost]
 
 ### Pacing tools
 - TUT-019 Where the tutorial offers Advance to…, the onboarding context shall run several weekly turns in a row (X-18) to a named date and show one combined turn report; every chapter whose date span is longer than its turns offers it. [tutorial §3.3]
 - TUT-020 While a `do` step is shown, the onboarding context shall let only the controls on the step's `allow` list respond and dim everything else without hiding it. [tutorial §3.3, §3.8]
 - TUT-021 When the player presses Free look, the onboarding context shall lift the input focus for that step. [tutorial §3.3]
-- TUT-022 While the tutorial runs, the onboarding context shall hold back every AI war against the Ottomans except the scripted ones, and every AI war in the Balkans and western Anatolia (Karaman included). [tutorial §3.3, §3.4]
-- TUT-023 When the chapter 5 border clash at Giurgiu starts, the onboarding context shall always open the battle screen, slowed to one bell every 3 seconds. [tutorial §3.3]
+- TUT-022 While the tutorial runs, the onboarding context shall hold back every AI war against the Ottomans except the scripted ones (the war for John V's throne), and every AI war in the Balkans and western Anatolia (Karaman and Germiyan included). [tutorial §3.3, §3.4]
+- TUT-023 When the chapter 5 clash before Pera starts, the onboarding context shall always open the battle screen, slowed to one bell every 3 seconds. [tutorial §3.3]
 
 ### Scenario file
 - TUT-024 The onboarding context shall hold the tutorial as data in one scenario file: start state, world rules, scripted events, chapter saves and steps. [tutorial §3.4]
-- TUT-025 The onboarding context shall start from the normal 11 November 1444 setup, with Mehmed II as ruler and Murad II retired as in the catalogue, and overrides only where the tutorial needs them (grand vizier, the crusade war left open, the three lord families with one wavering, one Anatolian royal province with no official, a fixed seed, the Christian sipahis' lord card, the Orthodox row set to Restricted). [tutorial §3.4, §3.6]
+- TUT-025 The onboarding context shall start from the normal 20 September 1378 setup, with Murad I as bey, Bayezid as heir, Edirne as capital and Bursa as second seat, and Andronikos IV on the Byzantine throne with John V and Manuel II in his prison, as the 1378 scenario has them, and overrides only where the tutorial needs them (grand vizier, the three lord families with one wavering, one Anatolian royal province with no official, a fixed seed, the Christian sipahis' lord card, the Orthodox row set to Restricted). [tutorial §3.4, §3.6; X-25]
 - TUT-026 The onboarding context shall mark every scripted event `tutorial_only: true` so it never fires in a real campaign. [tutorial §3.4]
-- TUT-027 The onboarding context shall force AI personalities so that Hungary crosses the Danube at Giurgiu in chapter 5 with Hunyadi commanding and the Morea accepts terms after the wall falls. [tutorial §3.4]
+- TUT-027 The onboarding context shall force AI personalities so that in chapter 5 Andronikos IV holds Pera with the Genoese and leads their sally, and in chapter 8 Manuel II accepts terms once Serres has fallen. [tutorial §3.4; research east]
 - TUT-028 When rules change, the onboarding context shall rebuild every chapter save with a tool by playing the previous chapter's recommended path, never editing a save by hand. [tutorial §3.4]
 - TUT-029 The onboarding context shall have a CI test that plays each chapter's recommended path from its chapter save and checks it reaches Done when. [tutorial §3.4]
 
 ### Off script
-- TUT-030 If the player asks Murad to stay in chapter 1, then the onboarding context shall keep Murad at Edirne as a commander for the rest of chapter 1 only; chapter 2 starts from its chapter save with Murad back at Manisa (D-TUT-3). [tutorial §3.5]
-- TUT-031 If the player loses the border clash at Giurgiu, then the onboarding context shall change the step to "Your army broke. Fall back behind the walls of Edirne and call the levy.", and Hungary shall offer terms after failing to take one castle in two months, so the chapter still ends in peace. [tutorial §3.5]
+- TUT-030 If the player asks after John V on the chapter 1 event "Tribute from Constantinople", then Andronikos's envoy shall leave cold for the rest of chapter 1 only; chapter 2 starts from its chapter save with the tribute taken as in history (D-TUT-3). [tutorial §3.5]
+- TUT-031 If the player loses the clash before Pera, then the onboarding context shall change the step to "Your army broke. Fall back behind the walls of Edirne and call the levy.", and Andronikos IV's side shall offer terms after failing to take one castle in two months, so the chapter still ends in peace. [tutorial §3.5]
 - TUT-032 If the player ignored the wavering lord, then the onboarding context shall let his loyalty drop one step within chapter 2 and show it in the turn report; chapter 7 starts from its chapter save, where his riders come as in history (D-TUT-3). [tutorial §3.5]
 - TUT-033 If the player is idle on a `do` step for 8 seconds, then the pointer shall pulse on the target again; after 20 seconds the note shall add "Stuck? {btn:skip_step} to skip this step." [tutorial §3.5]
 - TUT-034 If the player is short of the gold a chapter needs at its start, then the onboarding context shall fill the gap with a scripted loan from a Genoese or Venetian banking house, shown as a real debt line. [tutorial §3.5]
-- TUT-035 If the storm fails in chapter 8, then the siege shall carry on month by month until the wall is breached or the Morea offers terms. [tutorial §3.5]
+- TUT-035 If the storm fails in chapter 8, then the siege of Serres shall carry on month by month until the walls are breached or Manuel II offers terms. [tutorial §3.5]
 
-### The crusade after Varna on the religion system
-- TUT-036 The onboarding context shall build the crusade lesson (the crusade broken at Varna, still at war in 1445) on the full religion system, the event-started leagues, the war aims and strait crossings already designed. [tutorial §3.6]
-- TUT-037 The tutorial's start state shall hold the crusading league against the Ottomans still at war (regardless of the usual threshold), with Hungary, Wallachia and the Papal States as members and Venice and Burgundy sending fleets; when the news of the crusaders' fleet on the Danube arrives (chapter 3's last turn), the country card shall show "League against the Ottomans: 3 members, 24,000 soldiers" (soldiers provisional). [tutorial §3.6]
-- TUT-038 The start state shall give the league the Defend the faith aim from the start (a Restricted policy does not qualify, and no event grants it, D-TUT-9), and the war screen shall show the aim, its cause and one linked line explaining why this aim and not Take land. [tutorial §3.6]
-- TUT-039 When the player taps a league member, the onboarding context shall open that member's reasons (Same faith +10 between Catholic members; "Our ally's war aim is our concern"), the same screen used for the player's own alliances. [tutorial §3.6]
-- TUT-040 While the crusaders' fleet holds the Dardanelles, the crossing shall show as closed with the fleet's banner on it. [tutorial §3.6]
-- TUT-041 In chapter 0, after the Food lens, the onboarding context shall have the player switch to the Faith lens, showing Rumelia as Orthodox under a Sunni realm with hatching where a community is 30 % or more, with the line "Most of your people in Rumelia are Orthodox Christians. You rule them as a Sunni sultan." [tutorial §3.6]
-- TUT-042 In chapter 4, when the league calls on the sultan's Christian subjects to rise, the vizier shall open the Faith policy screen at the Orthodox row set to Restricted and the player shall choose between Keep it Restricted and Tolerate it. [tutorial §3.6]
+### The Byzantine civil war on the diplomacy and religion systems
+- TUT-036 The onboarding context shall build the civil-war lesson (two emperors in 1379, and the Italian sea power each brings) on the diplomacy rules already designed (pretenders and the *Seat a pretender* war aim, DIPL-108; the reasons count), the full religion system, the warfare rules and strait crossings, with no rule of its own. [research east "Ottoman 1378 opening"; tutorial §3.6]
+- TUT-037 The tutorial's start state shall hold the civil war as the 1378 scenario has it: Andronikos IV on the throne since 12 August 1376, John V and Manuel II in his prison, Venice and Genoa at war over Tenedos; when the news that John V and Manuel have escaped arrives (chapter 3's last turn), the country card shall show "Two emperors: Andronikos IV (Genoa) and John V (Venice)". [research east]
+- TUT-038 In chapter 4, the event "John V and Manuel reach Murad" (June 1379) shall be a `choose` step with Back John V (as history) and Keep Andronikos IV: backing John V brings Venice and its galleys as partner, makes Andronikos IV and Genoa the enemy and gives the war aim *Seat a pretender* from John V at the Ottoman court; keeping Andronikos IV brings Genoa's galleys from Pera, makes John V and Venice the enemy and needs no war aim; the war screen shall show the aim, its cause and one linked line explaining why this aim and not Take land. [research east, choice 1; DIPL-108]
+- TUT-039 When the player taps an Italian partner, the onboarding context shall open that partner's reasons, the same screen used for the player's own alliances: Venice shows *Share a rival* (+15) toward John V's Byzantium while both stand against Genoa, and *Same faith* (+10) toward Catholic Genoa but not toward Orthodox Byzantium, so the player sees a shared rival, not faith, bind this war. [diplomacy reasons count]
+- TUT-040 While the enemy partner's galleys hold a strait (the Genoese of Pera on the Bosporus when John V is backed), the crossing shall show as closed with that partner's banner on it; the Dardanelles crossing at Gallipoli, Ottoman again since 1376–77, stays open. [research east; troop-movement]
+- TUT-041 In chapter 0, after the Food lens, the onboarding context shall have the player switch to the Faith lens, showing Rumelia as Orthodox under a Sunni realm with hatching where a community is 30 % or more, with the line "Most of your people in Rumelia are Orthodox Christians. You rule them as a Sunni bey." [tutorial §3.6]
+- TUT-042 In chapter 4, when the Christian sipahis are called to ride for an emperor, the vizier shall open the Faith policy screen at the Orthodox row set to Restricted and the player shall choose between Keep it Restricted and Tolerate it. [tutorial §3.6]
 - TUT-043 When the player keeps the Orthodox Restricted, the faith tax keeps paying for the war and the Christian sipahis stay at Wavering, so they don't bring their retinue when called. [tutorial §3.6]
-- TUT-044 When the player tolerates the Orthodox, the Christian sipahis steady to Loyal and their riders come to the Danube, Pious Sunni lords waver once (Orthodox are more than 10 % of the realm), and the faith tax ends. [tutorial §3.6]
-- TUT-045 While the tutorial runs, the onboarding context shall show Persecute on the Faith policy screen dimmed, with a note that it would give every Orthodox neighbour the Defend the faith aim and grow the crusade. [tutorial §3.6]
-- TUT-046 In chapter 4 the onboarding context shall have the player send the Anatolian troops over the Bosporus ferry (2 days, plus a day per 10,000 men) because the Dardanelles are closed. [tutorial §3.6, §3.4]
-- TUT-047 After the border clash, the turn report shall show the battle's result together with the faith choice (how many Christian sipahis rode at Giurgiu, or why they stayed home); peace with Hungary ends the league's war, and the league ends with it. [tutorial §3.6]
-- TUT-048 In chapter 6 one step shall open a Rumelian province's Faith line, showing the Orthodox community as "served, Restricted, protected: no grievance", with "Why?" linking to the Almanac's religion page; the madrasa in Edirne is Sunni. [tutorial §3.6]
-- TUT-049 The onboarding context shall call the crusade what it was, frame neither side's holy war as the right one, reward no harm, and count the border clash's dead on both sides the same way in the turn report. [tutorial §3.6]
+- TUT-044 When the player tolerates the Orthodox, the Christian sipahis steady to Loyal and their riders come to Constantinople, Pious Sunni lords waver once (Orthodox are more than 10 % of the realm), and the faith tax ends. [tutorial §3.6]
+- TUT-045 While the tutorial runs, the onboarding context shall show Persecute on the Faith policy screen dimmed, with a note that it would give every Orthodox neighbour the Defend the faith aim and turn both emperors against the Ottomans. [tutorial §3.6]
+- TUT-046 In chapter 4 the onboarding context shall have the player send the Anatolian troops over the Dardanelles at Gallipoli (2 days, plus a day per 10,000 men) because the Bosporus is closed. [research east "Gallipoli and the straits"; tutorial §3.4]
+- TUT-047 After the clash before Pera, the turn report shall show the battle's result together with the faith choice (how many Christian sipahis rode at Pera, or why they stayed home) and what the Italian partner brought; peace with Andronikos IV's side (the settlement of May 1381) ends the war for John V's throne, and the Genoese partner leaves it with him. [tutorial §3.6; research east]
+- TUT-048 In chapter 3 one step shall open a Rumelian province's Faith line, showing the Orthodox community as "served, Restricted, protected: no grievance", with "Why?" linking to the Almanac's religion page; the madrasa in Bursa is Sunni. [tutorial §3.6]
+- TUT-049 The onboarding context shall call the civil war what it was, a war between a father and a son for one throne with Ottoman and Italian help, frame neither emperor as the rightful one, reward no harm, and count the dead of the clash before Pera on both sides the same way in the turn report. [tutorial §3.6]
 
 ### The Janissaries
-- TUT-050 In chapter 4, after the Janissaries join the army, a step shall open the Janissary regiment's card and the "Why?" on its men, whose recruits line reads "Boys taken from Christian families in Rumelia (the devshirme), and war captives."; tapping it moves the camera to the Rumelian provinces the corps drew from. [tutorial §3.7]
-- TUT-051 The onboarding context shall then show one illustrated vignette card in the event screen's style, marked `depiction: narrative_only`, with three panels (officials arriving in a village; the boy's years of training; the soldier he becomes, remembered in his village) and only Continue and Read more (Almanac); no option gives the player anything. [tutorial §3.7]
-- TUT-052 The step shall end on a Rumelian province's card whose People line shows the boys taken and whose grievances show *Sons taken*, with the province's Orthodox lords one step lower in loyalty and the vizier's line "The corps is strong. This is what it costs the villages that fill it." [tutorial §3.7]
-- TUT-053 The onboarding context shall source the Almanac's devshirme entry from the catalogue's Ottoman record and standard histories, with no invented numbers. [tutorial §3.7]
+- TUT-050 In chapter 4, after the Janissaries join the army, a step shall open the Janissary regiment's card and the "Why?" on its men, whose recruits line reads "War captives: the bey's fifth of every haul (the pençik), trained as the new troops (yeniçeri)." and dates it to Murad's reign (c.1360s–1380s); tapping it moves the camera to the border lands the raids took captives from. [research east "Men and institutions"; tutorial §3.7]
+- TUT-051 The onboarding context shall then show one illustrated vignette card in the event screen's style, marked `depiction: narrative_only`, with three panels (the captives brought back from a raid; the young man's years of training; the soldier he becomes) and only Continue and Read more (Almanac); no option gives the player anything. [tutorial §3.7]
+- TUT-052 The step shall end on a raided border province's card whose People line shows the captives taken and whose grievances show *Sons taken*, with the province's Orthodox lords one step lower in loyalty and the vizier's line "The corps is strong. This is what it costs the villages that fill it." [tutorial §3.7]
+- TUT-053 The onboarding context shall source the Almanac's pençik entry from the catalogue's Ottoman record and standard histories, with no invented numbers. [tutorial §3.7]
 
 ### Step script and look
 - TUT-054 The onboarding context shall store each step with `id`, `kind`, `text` (string key), `anchor`, `allow`, `done`, `guide_face` and `max_chars`. [tutorial §3.8]
@@ -310,7 +329,7 @@ Total: about 30 to 40 turns and 45 to 50 minutes, in sessions of about 5 minutes
 - TUT-059 The onboarding context shall replace text tokens: `{btn:…}` with the current input's prompt, `{ui:…}` with the screen's name in bold and its icon, `{stat:…}` with the stat's icon and name linked to its Almanac entry, `{place:…}` and `{lord:…}` with the linked name that moves the camera there. [tutorial §3.8]
 - TUT-060 The onboarding context shall show the step note as a parchment strip at the bottom edge, never over the target, moving to the top when the target is low, and at most a third of the screen height. [tutorial §3.9]
 - TUT-061 The onboarding context shall dim the rest of the screen to 50 % (not black) around the spotlight. [tutorial §3.9]
-- TUT-062 The onboarding context shall show the grand vizier Çandarlı Halil as the guide face, only in the tutorial. [tutorial §3.9, §5]
+- TUT-062 The onboarding context shall show the grand vizier Çandarlı Kara Halil (Çandarlı Kara Halil Hayreddin Pasha, Murad I's vizier) as the guide face, only in the tutorial. [tutorial §3.9, §5; research east]
 - TUT-063 The onboarding context shall show a counter of steps in the current chapter (for example "2 / 6"). [tutorial §3.9]
 - TUT-064 While in the tutorial, the pause menu shall gain three lines: Skip this chapter, Chapter list, Leave the tutorial. [tutorial §3.9]
 
@@ -373,7 +392,7 @@ Total: about 30 to 40 turns and 45 to 50 minutes, in sessions of about 5 minutes
 ### Accessibility and language
 - TUT-109 The onboarding context shall size the tutorial note's text with the UI scale setting, letting the note take up to two lines more at the largest size. [tutorial §10]
 - TUT-110 The onboarding context shall teach the chapter 0 lens step with the Food lens, whose hungry provinces also carry the hunger icon, so the lesson works without telling colours apart. [tutorial §10]
-- TUT-111 Where reduced motion is on, the onboarding context shall not bob the hand or pulse the spotlight, and the chapter 5 border clash can be skipped to the result like any battle. [tutorial §3.9, §10]
+- TUT-111 Where reduced motion is on, the onboarding context shall not bob the hand or pulse the spotlight, and the chapter 5 clash before Pera can be skipped to the result like any battle. [tutorial §3.9, §10]
 - TUT-112 The onboarding context shall never auto-advance a `look` step and shall let `watch` steps be paused. [tutorial §10]
 - TUT-113 The onboarding context shall keep all tutorial, Needs attention and Almanac text in string tables with keys, keeping tokens in the string, and run the step length lint per language. [tutorial §3.8, §10]
 
@@ -389,18 +408,25 @@ Total: about 30 to 40 turns and 45 to 50 minutes, in sessions of about 5 minutes
 - TUT-120 When the player picks "Mute this" on an entry, the onboarding context shall stop listing that one item; every mute can be undone in Settings. [D-TUT-1]
 
 ### First-campaign hints (Leroy, 18 October 2026)
-- TUT-121 Where the setting "Tutorial hints" is on, the onboarding context shall show first-campaign hints one at a time, each naming one first action and pointing at the card or button to tap for it, in this order: pick a realm, move an army, end the turn, recruit, build, send an envoy (`first_hints`). [Leroy 18 Oct; D-TUT-16]
+- TUT-121 Where the setting "Tutorial hints" is on, the onboarding context shall show first-campaign hints one at a time, each naming one first action and pointing at the card or button to tap for it, in this order: pick a realm, open a province's card, open the realm's book, change the map mode, move an army, end the turn, read the news, choose a study, recruit, build, look over the lords, look over the treasury, send an envoy (`first_hints`). [Leroy 18 Oct; Leroy 19 Oct; D-TUT-16, D-TUT-18]
 - TUT-122 When the player does a hint's action, in any order and wherever they do it, the onboarding context shall tick that hint off and show the next open one; an order the game refuses ticks nothing. [D-TUT-16]
 - TUT-123 When the player dismisses a hint, the onboarding context shall tick it off without the action and show the next open one. [D-TUT-16]
 - TUT-124 The onboarding context shall keep which hints are done between campaigns and visits: open hints carry over to the next campaign, and once every hint is done none is shown again. [D-TUT-16]
 - TUT-125 When the player turns "Tutorial hints" off, from Settings or from the hint itself, the onboarding context shall hide the hints at once and keep which are done; turned on again, it shows the next open hint, and "Reset tutorial and hints" opens every hint again. [D-TUT-13, D-TUT-16]
-- TUT-126 While an event card, the game menu or one of its screens (Save, Load, Settings) is open, or a turn plays, the onboarding context shall hold the hint back, and show it again when the map is the player's. [D-TUT-16]
+- TUT-126 While an event card, the game menu or one of its screens (Save, Load, Settings) or the loading screen is open, or a turn plays, the onboarding context shall hold the hint back, and show it again when the map is the player's. [D-TUT-16]
+- TUT-135 While a hint is shown, the onboarding context shall ring the one control that moves it on as the screen stands now, one tap at a time (the banner, then the section, then the page, then the button; a spot on the map when the land itself is the thing to tap), and say in the note's line what that tap is; a hint whose action is already done (a study already chosen) ticks off without being shown. [Leroy 19 Oct; D-TUT-18]
+
+#### How the player uses it: the tutorial campaign
+- TUT-131 Where: the player finds the tutorial on the first-launch question ("Play the tutorial"), as Tutorial in the main menu (under More once finished) with its chapter list, and through Practice this on an Almanac How-to-play page. Inside a chapter every lesson is played on the map and on the real cards over it (province card, country card, lords list, Faith policy, levy, war screen, battle screen, siege card, event cards); the step note says in one line what to look at or tap, and the spotlight sits on it. The historical choices (which emperor, the Germiyan marriage, the Hamid towns) are the ordinary event cards with their options, run as `choose` steps. [X-19, D-TUT-17]
+- TUT-132 Grouping: one chapter is one subject (§4), one step is one thing, and one note shows at a time; the tutorial's own controls sit in two places only: the note (Skip step, Free look, the counter) and the pause menu's three lines (Skip this chapter, Chapter list, Leave the tutorial). The chapter list is the one screen for progress, with a tick per chapter. [X-19]
+- TUT-133 Overview: the chapter list's ticks show at a glance how far the player has come through the ten chapters, and the note's counter ("2 / 6") shows how far through the chapter; the turn report's "Needs attention (n)" line and the End turn count show what needs the player, in the tutorial as in a campaign. [X-19, TUT-063, TUT-081]
+- TUT-134 Phone: in landscape, Wide and Tall layouts, the note runs along the bottom inside the safe areas and moves under the top bar when the target is low, never covering the target and never more than a third of the screen's height; Skip step, Free look, the event options and every button a step points at are at least 44 points; the spotlight takes no taps, so the control under it works as ever; a look step ends on a tap anywhere and nothing needs hover (a tooltip is a long-press, a Why? a tap on the number). A phone in portrait shows the game shell's turn-sideways notice over everything, the note included, and the tutorial waits on its step. [X-19, TUT-060, TUT-084, TUT-085, TUT-130]
 
 #### How the player uses it: first-campaign hints
-- TUT-127 Where: a parchment note along the bottom of the screen says in one line what to tap, and a brass ring pulses around that button or card ("Choose a realm" around the realm list; Commanders, then a commander, then the map for a march; End turn; the Garrison tab, then Recruit; the Build tab, then Build; a neighbour's Diplomacy tab, then an envoy's mission). The note follows the player's taps: once the Garrison tab is open the ring moves to Recruit. When the thing to tap is not on screen, the note's Show me opens the card that holds it (the capital's Garrison or Build tab, the nearest neighbour's Diplomacy tab, the Commanders list). Its × dismisses that one hint; Stop hints turns the setting off. [X-19]
+- TUT-127 Where: a parchment note along the bottom of the screen says in one line what to tap, and a brass ring pulses around that button, card or spot on the map: the Ottomans (or the realm card's Rule button) in the realm list; the capital on the map, then its name at the bottom left; the banner in the top bar; Map mode, then Wealth; Commanders, then a commander, then a province next to the army; End turn; the news scroll in the top bar; the banner, the Research section, Can study, then Study now; the capital, its card, the Garrison tab, then Recruit; the Build tab, then Build; the banner, the Lands section, then the lords' page; the gold in the top bar; the nearest neighbour's border province, its card, its realm, the Diplomacy tab, then an envoy's mission. The note follows the player's taps, and its line names the tap the ring is on. When the thing to tap is not on screen, the note's Show me opens the card that holds it or turns the map to it. Its × dismisses that one hint; Stop hints turns the setting off. [X-19, D-TUT-18]
 - TUT-128 Grouping: one note, one hint at a time, never two; the switch and "Reset tutorial and hints" sit together in Settings under Gameplay, the one screen for the game's settings, which the cog in the side tools and the game menu both open. [X-19, SET-071]
-- TUT-129 Overview: the note's counter ("3 / 6") and the Settings row ("3 of 6 done") show at a glance how far the player has come. [X-19]
-- TUT-130 Phone: in landscape (Wide and Tall layouts, inside the safe areas) the note sits along the bottom between the overview button and End turn and moves under the top bar when the ring is low on the screen, so it never covers what it points at; it takes at most a third of the screen's height, its buttons are at least 44 points, the ring takes no taps so the button under it works as ever, the ring stands still where reduced motion is on, and nothing needs hover. In portrait a phone shows the turn-sideways notice over everything, the note included. [X-19, TUT-060, TUT-111]
+- TUT-129 Overview: the note's counter ("3 / 13") and the Settings row ("3 of 13 done") show at a glance how far the player has come. [X-19]
+- TUT-130 Phone: in landscape (Wide and Tall layouts, inside the safe areas) the note sits along the bottom between the overview button and End turn; when that would cover the ring or an open card or menu it moves into the widest free stretch beside the card, else under the top bar, so it never covers what it points at; a button half cut off in a card that scrolls is scrolled into view before it is ringed; it takes at most a third of the screen's height, its buttons are at least 44 points, the ring takes no taps so the button under it works as ever, the ring stands still where reduced motion is on, and nothing needs hover. In portrait a phone shows the turn-sideways notice over everything, the note included. [X-19, TUT-060, TUT-111]
 
 ## 6. Commands
 
@@ -471,20 +497,20 @@ Total: about 30 to 40 turns and 45 to 50 minutes, in sessions of about 5 minutes
 | chapter length | Target minutes per chapter | about 5 | yes | tutorial scenario |
 | tutorial total | Turns / minutes | about 30–40 turns, 45–50 minutes | yes | tutorial scenario |
 | chapter turns | Approximate turns per chapter | see §4 table | yes | tutorial scenario |
-| watch speed | Chapter 5 battle bell pace | one bell every 3 seconds | yes | tutorial scenario |
+| watch speed | Chapter 5 clash before Pera bell pace | one bell every 3 seconds | yes | tutorial scenario |
 | idle pulse | Seconds idle before the pointer pulses | 8 | yes | tutorial scenario |
 | idle skip hint | Seconds idle before "Stuck?" | 20 | yes | tutorial scenario |
 | `max_chars` | Step text limit | 140 | yes | step script |
 | spotlight dim | Dim of the rest of the screen | 50 % | yes | tutorial UI |
 | note height | Max share of screen height | one third | yes | tutorial UI |
 | faith hatching | Community share shown hatched on the Faith lens | 30 % or more | from religion | religion config |
-| Bosporus ferry | Crossing time | 2 days + 1 day per 10,000 men | from troop movement | troop-movement config |
-| league line | League shown on the country card | 3 members, 24,000 soldiers | yes | tutorial scenario |
-| `ottoman_examples` | Ottoman worked-example numbers (D-TUT-11) | Janissaries 1,000; levies 4,000; riders 2,000; crusader army 16,000; Hexamilion 2 months | yes | tutorial scenario |
-| Same faith reason | Reason weight between Catholic members | +10 | from diplomacy | diplomacy config |
-| Hungary terms | Offers terms after failing to take one castle in | two months | yes | tutorial scenario |
+| Dardanelles ferry | Crossing time at Gallipoli | 2 days + 1 day per 10,000 men | from troop movement | troop-movement config |
+| civil war line | Two emperors on the country card | "Two emperors: Andronikos IV (Genoa) and John V (Venice)" | no | tutorial scenario |
+| `ottoman_examples` | Ottoman worked-example numbers (D-TUT-11) | Janissaries 1,000; levies 4,000; riders 2,000; army at Pera 6,000; Serres 2 months | yes | tutorial scenario |
+| Share a rival / Same faith reasons | Reason weights in the partner's reasons | +15 / +10 | from diplomacy | diplomacy config |
+| Andronikos terms | His side offers terms after failing to take one castle in | two months | yes | tutorial scenario |
 | goals period | Guided first turns visible for | first in-game year | yes | onboarding config |
-| `first_hints` | First-campaign hints: id, line, the action that ticks it, in order (D-TUT-16) | six hints: realm, move, end turn, recruit, build, envoy | no | onboarding config |
+| `first_hints` | First-campaign hints: id, line, the action that ticks it, in order (D-TUT-16, D-TUT-18) | thirteen hints: realm, province, realm book, map mode, move, end turn, news, study, recruit, build, lords, treasury, envoy | no | onboarding config |
 | checks | Every Needs attention check, threshold, line, source | §4 table | yes | one checks config file |
 | army food warning | Reserve threshold | under 15 days | yes | checks config |
 | gold warning | Months of gold left (`under_months`) | under three months | yes | checks config |
@@ -504,13 +530,13 @@ Total: about 30 to 40 turns and 45 to 50 minutes, in sessions of about 5 minutes
 | settings | upstream | Conformist | Tooltip delay; Detailed tooltips (Why? in the tooltip) and Tutorial hints (goals list), D-TUT-13; "Reset tutorial and hints"; reduced motion; UI scale |
 | achievements | downstream | Published Language | Tutorial saves are never ironman, so the tutorial earns none |
 | audio | downstream | Customer–Supplier | `ui_hint` on step shown, `ui_confirm` on step completed, `notify_alert` on a new Warning; no ducking (D-TUT-7) |
-| scenario-setup | upstream | Conformist | Normal 1444 setup, `owners-1444.json`, the Ottoman catalogue record (dates, lords, Hunyadi) |
-| events | upstream | Customer–Supplier | Event format, `history` block, `tutorial_only`, `narrative_only`; scripted events stay in the tutorial scenario file and the league's aim comes from the start state (D-TUT-9) |
+| scenario-setup | upstream | Conformist | The normal 20 September 1378 setup (`scenarios/1378/`: rulers, map owners, relations, goals), the Ottoman catalogue record |
+| events | upstream | Customer–Supplier | Event format, `history` block, `tutorial_only`, `narrative_only`; scripted events stay in the tutorial scenario file (D-TUT-9); John V placed at the Ottoman court as a pretender by the event "John V and Manuel reach Murad" |
 | religion | upstream | Conformist | Faith policy screen, Restricted/Tolerated/Persecuted, protected communities, Faith lens, schools' faith, Pious lords |
-| diplomacy | upstream | Conformist | Event-started leagues, reasons count, member reasons screen |
-| warfare | upstream | Conformist | Defend the faith aim, battles, battle screen, sieges, storming, terms, peace voices, army food reserve, pay owed |
-| troop-movement | upstream | Conformist | Strait crossings, Bosporus ferry, closed Dardanelles, days to cross |
-| recruiting | upstream | Conformist | Levy, regiments, Janissaries, recruit pool, Marshal (the devshirme stays tutorial narrative, D-TUT-8) |
+| diplomacy | upstream | Conformist | Pretenders and the Seat a pretender war aim, the event effect `pretender`, reasons count, the alliance reasons screen |
+| warfare | upstream | Conformist | Battles, battle screen, sieges, storming, terms, peace voices, army food reserve, pay owed, lords' Wants as war aims |
+| troop-movement | upstream | Conformist | Strait crossings, the Gallipoli ferry, a strait closed by an enemy fleet, days to cross |
+| recruiting | upstream | Conformist | Levy, regiments, Janissaries, recruit pool, Marshal (the pençik stays tutorial narrative, D-TUT-8, D-TUT-17) |
 | realm | upstream | Conformist | Country card, food policy, lords and loyalty, officials, tax, gold, schools |
 | province | upstream | Conformist | Province card, People line, grievances, local store, hunger |
 | map-presentation | upstream | Conformist | Zoom levels, lenses (Food, Faith), hunger icon, camera |
@@ -523,31 +549,35 @@ Total: about 30 to 40 turns and 45 to 50 minutes, in sessions of about 5 minutes
 
 ## 12. AI
 
-- The tutorial forces AI personalities: Hungary crosses the Danube at Giurgiu in chapter 5 with Hunyadi
-  commanding; if the player lost the border clash, Hungary offers terms after failing to take one castle in two months; the Morea accepts
-  terms after the wall falls.
-- The quiet world holds back AI wars against the Ottomans (except scripted ones) and in the Balkans and
-  western Anatolia (Karaman included).
+- The tutorial forces AI personalities: in chapter 5 Andronikos IV holds Pera with the Genoese and leads their
+  sally; if the player lost the clash, his side offers terms after failing to take one castle in two months; in
+  chapter 8 Manuel II accepts terms once Serres has fallen.
+- The quiet world holds back AI wars against the Ottomans (except the war for John V's throne) and in the
+  Balkans and western Anatolia (Karaman and Germiyan included).
+- The 1378 goals (X-25) stay as the scenario gives them; the player's realm is given none.
 - Proposal (not a rule here): Ottoman AIs keep the devshirme until the event tree's history ends it.
 
 ## 13. Decisions and open questions
 
 - **D-TUT-1** (was OQ-TUT-1) Needs attention screen: the game shell's single screen (D-SHELL-15) is used: titled "Needs attention", two groups, **Warnings** first and **Waiting for you** second (opportunities, then new systems), each line with a **Show** button that opens the place or screen, and mutes "Mute this" (one item) and "Don't list this kind again" (one kind), undone in Settings. Opportunity lines state a fact ("A lord across the border may be won over."), never an order. One screen and one wording across the game is simpler than two.
-- **D-TUT-2** (was OQ-TUT-2) Guide face label: the step note labels the face "The Grand Vizier" (Çandarlı Halil); "The Chancellor" is dropped. The text already says he is the grand vizier.
+- **D-TUT-2** (was OQ-TUT-2) Guide face label: the step note labels the face "The Grand Vizier" (Çandarlı Kara Halil, D-TUT-17); "The Chancellor" is dropped. The text already says he is the grand vizier.
 - **D-TUT-3** (was OQ-TUT-3) Off-script versus chapter saves: the chapter save wins. Each chapter starts from its fixed save, so an off-script choice plays out inside its own chapter only; nothing carries into a later chapter. Fixed saves are the simpler rule and keep every chapter replayable from the list.
 - **D-TUT-4** (was OQ-TUT-4) Turn report and warnings: the turn report shows a "Needs attention (n)" line that opens the list; it never repeats the warnings. There is no "5.4" section to follow, and §5.3 already says so.
 - **D-TUT-5** (was OQ-TUT-5) First launch and naming: the first-launch question "New to Pocket Hegemony?" is shown once, after the first Tap to start (D-SHELL-3, SHELL-131), with "Start the tutorial" and "I know the genre"; the Tutorial main-menu entry stays and moves under More once finished. The reference book is called the **Almanac** everywhere. The shell already adopted both.
 - **D-TUT-6** (was OQ-TUT-6) Saves: X-16 applies. Tutorial progress and Needs attention mutes are stored in the save, chapter saves are read-only, and a campaign kept after the tutorial carries `began_as_tutorial`. Cross-context decision X-16.
 - **D-TUT-7** (was OQ-TUT-7) Sounds: a step appearing plays `ui_hint`, a step finished plays `ui_confirm`, a new warning in Needs attention plays `notify_alert`; the vizier's note has no sound of its own, and none of these duck music (D-AUD-6). Existing catalogue sounds only; no new sound.
-- **D-TUT-8** (was OQ-TUT-8) Devshirme: it stays narrative only in the tutorial (vignette, recruits line, Almanac entry) and is not a campaign mechanic. Adding it would be a new mechanic.
-- **D-TUT-9** (was OQ-TUT-9) Scripted events and the start date: the tutorial's scripted events stay in the tutorial scenario file, not in the event tree. Under X-5 the tutorial starts on **11 November 1444**, the day after Varna, with Mehmed II (12) on the throne and Murad II retired at Manisa; the crusade war is still open from the start and the Defend the faith aim is held from the start, so no event grants it. The peace, abdication and crusade-breaks-the-peace events are dropped; chapter 1 opens with "Murad goes back to Manisa", chapter 4 with "The crusaders' fleet on the Danube" (summer 1445), and chapter 7 keeps the Janissary pay rising and Murad's return (1446). Varna is never re-fought: it lies in the past, and the tutorial teaches its aftermath (the crusade broken, Murad's return, Janissary pay, the Danube frontier). Chapter 5, "The Danube frontier", is a small border clash with the crusaders' crossing at Giurgiu in autumn 1445, where the crusade's Danube campaign really fought; it is never named Varna. Cross-context decision X-5; no new mechanic.
+- **D-TUT-8** (was OQ-TUT-8) Devshirme: it stays narrative only in the tutorial (vignette, recruits line, Almanac entry) and is not a campaign mechanic. Adding it would be a new mechanic. *Under D-TUT-17 the 1378 tutorial shows the pençik and the first yeniçeri in its place, on the same narrative-only terms.*
+- **D-TUT-9** (was OQ-TUT-9) Scripted events and the start date: the tutorial's scripted events stay in the tutorial scenario file, not in the event tree, each keeping its `history` block, and no event grants what the start state already holds. The start date and the events themselves are now set by D-TUT-17 (X-25), which replaced this decision's 1444 start (X-5). No new mechanic.
 - **D-TUT-10** (was OQ-TUT-10) Diplomacy and subjects steps: none are added; the ten chapters stay as they are. Adding steps is outside this pass and the chapters already fit five minutes each.
-- **D-TUT-11** (was OQ-TUT-11) Ottoman example numbers: provisional numbers go in `onboarding.json` under `ottoman_examples` (1,000 Janissaries, 4,000 levies, 2,000 lords' riders; crusader army 16,000; Hexamilion wall 2 months), listed in `_provisional`. Missing numbers get a provisional value.
+- **D-TUT-11** (was OQ-TUT-11) Ottoman example numbers: provisional numbers go in `onboarding.json` under `ottoman_examples` (1,000 Janissaries, 4,000 levies, 2,000 lords' riders; under D-TUT-17 the army at Pera 6,000 and Serres holding 2 months), listed in `_provisional`. Missing numbers get a provisional value.
 - **D-TUT-12** (was OQ-TUT-12) Advance to…, controller column, consent: Advance to… stays a tutorial-only tool. The controller column is the shell's: End turn is Menu held 0.5 s (D-SHELL-7), skip a step is B / Circle held 1 s. Measuring runs only when the player said yes to "tutorial step counts" on the shell's consent card (D-SHELL-22). No new real-game feature; the shell settled the inputs and consent.
 - **D-TUT-13** (was OQ-TUT-13) Detailed tooltips and Tutorial hints: "Detailed tooltips" (off by default) puts the "Why?" list inside the tooltip itself; "Why?" stays one tap away either way. "Tutorial hints" (on by default) shows or hides the guided first-turns goals list. Each switch gets one clear job.
 - **D-TUT-14** (was OQ-TUT-14) Free tier reference: the source is gap list 1, item 2 (Ottomans and France). Only the citation was wrong.
 - **D-TUT-15** (was OQ-TUT-15) Pastoral realms and lens marks: a pastoral realm gets the normal food goal "Choose how your castles share food"; the herds text is dropped. The tutorial's two lenses keep their non-colour marks (Food: hunger icon; Faith: hatching at 30 % or more). No herds rules exist, and both lenses already have marks.
-- **D-TUT-16** First-campaign hints (Leroy, 18 October 2026): before the goals list and the tutorial are built, the first campaign carries six one-line hints that point at the card or button to tap: pick a realm, move an army, end the turn, recruit, build, send an envoy. They are the first slice of guided first turns (§4), not a tutorial chapter: real screens, no scenario, no vizier. "Tutorial hints" switches them with the goals list, so the switch still has one job: the first-campaign guidance. Which hints are done is the player's, not the save's, so a second campaign does not teach them again.
+- **D-TUT-16** First-campaign hints (Leroy, 18 October 2026): before the goals list and the tutorial are built, the first campaign carries six one-line hints that point at the card or button to tap: pick a realm, move an army, end the turn, recruit, build, send an envoy. They are the first slice of guided first turns (§4), not a tutorial chapter: real screens, no scenario, no vizier. "Tutorial hints" switches them with the goals list, so the switch still has one job: the first-campaign guidance. Which hints are done is the player's, not the save's, so a second campaign does not teach them again. (Widened to thirteen hints, each tap ringed, by D-TUT-18.)
+
+- **D-TUT-17** "Murad's Frontier" (X-25, Leroy 18 October 2026; `start-date/plan-1378.md` §6 step 7): the tutorial starts on 20 September 1378 from the normal 1378 setup, as the Ottomans under Murad I, and runs to late 1383. The earlier 1444 tutorial is retired with its court, war and siege. Every lesson stays and the ten chapters keep their kinds of step, pacing tools and length; the lessons are retold through the 1378–1383 Ottoman situation in the research (`start-date/research/east.md`): the tribute of Andronikos IV, the escape of John V and Manuel II (June 1379) and the choice of emperor with Venice or Genoa as partner (replacing the earlier war lesson, on the same diplomacy, religion, warfare and strait rules), the clash before Pera and the settlement of May 1381, the Germiyan marriage and the Hamid towns (1381, the dating the 1378 start uses), Manuel at Thessaloniki (1382) and the fall of Serres (19 September 1383). The Janissary lesson shows the pençik and the first yeniçeri (c.1360s–1380s), not the devshirme, which came later. Because the choice of emperor must come before 1 July 1379 and no harvest falls between the start and that day, the food lesson moves to chapter 6 (the September 1381 harvest) and schools to chapter 3. The rising of chapter 7 is not a scripted history event: the chapter save leaves the soldiers' pay owed after the Pera years and the rebellions rules raise it. No new mechanic: pretenders, the reasons count, strait closure and the Faith policy are the designed rules.
+- **D-TUT-18** Wider hints, each tap ringed (Leroy, 19 October 2026: the hints covered too little, and a hint asked for a tap without ringing what to tap): until the Murad's Frontier chapters are playable, the first-campaign hints are the tutorial the player meets, so they grow from six to thirteen and cover the main systems a new player needs: a province's card, the realm's book, map modes, armies, turns, the news, research, recruiting, building, lords, the treasury and envoys. Every hint rings the next tap at every stage, the map included, and the line says what that tap is; a check on a phone plays every hint by tapping only inside the ring. The realm hint points at the Ottomans, the tutorial's realm, without making them the only choice. Still real screens, no scenario, no vizier.
 
 No onboarding question stays open.
 
@@ -566,7 +596,7 @@ No onboarding question stays open.
 | TUT-019 … TUT-023 | pacing-tools.feature | all scenarios |
 | TUT-024 … TUT-029 | tutorial-chapters.feature | scenario file scenarios |
 | TUT-030 … TUT-035 | off-script.feature | all scenarios |
-| TUT-036 … TUT-049 | varna-crusade.feature | all scenarios |
+| TUT-036 … TUT-049 | byzantine-civil-war.feature | all scenarios |
 | TUT-050 … TUT-053 | janissaries.feature | all scenarios |
 | TUT-054 … TUT-064 | step-script.feature | all scenarios |
 | TUT-065 … TUT-070 | guided-first-turns.feature | all scenarios |
@@ -583,4 +613,6 @@ No onboarding question stays open.
 | TUT-119 | step-script.feature | The guide face is labelled The Grand Vizier |
 | TUT-120 | needs-attention.feature | Mute one item |
 | TUT-121 … TUT-126 | first-campaign-hints.feature | all scenarios |
+| TUT-135 | — | How the player uses it: checked on a phone by `apps/client/scripts/hints-shots.mjs`, which plays every hint tapping only inside the ring |
 | TUT-127 … TUT-130 | first-campaign-hints.feature | How the player uses it (presentation, checked on a phone in landscape) |
+| TUT-131 … TUT-134 | — | How the player uses it: the tutorial campaign (presentation, checked on a phone in landscape and portrait) |

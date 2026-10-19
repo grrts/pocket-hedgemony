@@ -115,8 +115,10 @@ describe("the price of war: peace voices in the game (WAR-221)", () => {
     w.provinceOccupier[one] = me;
     w.day++;
     expect(peaceVoices(w, foe, x).obliged).toBe(false);
-    applyNow(w, { type: "offerPeace", target: foe, terms: "take" }, me);
+    // It will not hand over the province: one province held does not buy it at the peace table (WAR-243).
+    applyNow(w, { type: "offerPeace", target: foe, terms: "take", provinces: [one] }, me);
     expect(relationState(w, me, foe).state).toBe("war");
+    w.peaceOffers = [];
     // All of it held: over half say peace, and it gives up what one peace may take.
     for (const p of land) w.provinceOccupier[p] = me;
     w.day++;

@@ -1,6 +1,6 @@
 import type { World } from "./world.ts";
 import type { News } from "./war.ts";
-import start from "../../rules/data/domain/culture-start-1444.json" with { type: "json" };
+import { START_YEAR, startCulture as start } from "../../rules/src/start.ts";
 import * as cult from "./domain/culture/index.ts";
 import * as relg from "./domain/religion/index.ts";
 import { catalogueIdOf } from "./domain/scenario-setup/index.ts";
@@ -153,6 +153,22 @@ export function seedPeoples(world: World): void {
       for (const [faith, sh] of Object.entries(mix)) if (sh >= relg.religionConfig.communities.min_share && relg.hasHouses(faith) && k < SLOTS) world.provinceHouses[p * SLOTS + k++] = FAITH_INDEX.get(faith)!;
     }
   }
+  refreshBeliefs(world);
+}
+
+/**
+ * A woken realm's court tongue and state faith (SETUP-083): those of the
+ * realm it takes after when that realm's are its capital's own, else the
+ * capital's largest; its faith policy as that realm's.
+ */
+export function wakePeoples(world: World, n: number, capital: number, donor: number): void {
+  const F = FAITH_IDS.length;
+  const tongue = world.provinceTongue[capital * SLOTS]!;
+  const faith = world.provinceFaith[capital * SLOTS]!;
+  world.nationCourt[n] = tongue !== NO_TONGUE ? tongue : donor >= 0 ? world.nationCourt[donor]! : NO_TONGUE;
+  world.nationStateFaith[n] = faith !== NO_FAITH ? faith : donor >= 0 ? world.nationStateFaith[donor]! : NO_FAITH;
+  if (donor >= 0) world.nationFaithPolicy.copyWithin(n * F, donor * F, (donor + 1) * F);
+  else world.nationFaithPolicy.fill(FAITH_POLICIES.indexOf("tolerated"), n * F, (n + 1) * F);
   refreshBeliefs(world);
 }
 
@@ -642,7 +658,7 @@ export function tongueLine(d: PeoplesData, p: number): TongueLine | null {
     rows: Object.entries(pt.people).map(([t, sh]) => ({ tongue: t, name: tongueName(t), share: sh, relation: cult.relationTo(cc.court, t, pt.nationalism), homeland: pt.homelandOf.includes(t) })),
     pull: ex.pull,
     pullName: tongueName(ex.pull),
-    why: ex.pull === cc.court ? (held === HELD_BEFORE_START ? "held from before 1444 and governed for the court" : `held since ${held} and governed for the court`) : held !== HELD_BEFORE_START && d.year - held < cult.cultureConfig.drift.court_pull_needs_years_held ? `the majority language; the court's pulls after ${cult.cultureConfig.drift.court_pull_needs_years_held} years held (since ${held})` : "the majority language; the court's pulls only where an official or a lord governs",
+    why: ex.pull === cc.court ? (held === HELD_BEFORE_START ? `held from before ${START_YEAR} and governed for the court` : `held since ${held} and governed for the court`) : held !== HELD_BEFORE_START && d.year - held < cult.cultureConfig.drift.court_pull_needs_years_held ? `the majority language; the court's pulls after ${cult.cultureConfig.drift.court_pull_needs_years_held} years held (since ${held})` : "the majority language; the court's pulls only where an official or a lord governs",
     groups: ex.groups.map((g) => ({ name: tongueName(g.tongue), rate: g.rate, reasons: g.multipliers })),
     heldSince: held === HELD_BEFORE_START ? null : held,
   };

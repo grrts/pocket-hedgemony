@@ -1,0 +1,236 @@
+<h1>Map and Map Modes</h1>
+<p>The map is home in Pocket Hegemony: you play on it, and cards and screens open over it. This page covers how the map is drawn, what you see at each of the three zoom levels, the map modes that recolour the world by one stat, the parchment over lands you have not charted, how the month plays back after End turn, how screens arrange themselves on phones, tablets, PCs and TVs, and the speed budgets that keep it all smooth on a phone. All of it is presentation only: what a map mode or an icon <em>means</em> is the rule of the system that owns that stat, and nothing the map does ever changes the simulation.</p>
+<h2 id="how-it-works"><a class="anchor" href="#how-it-works" aria-label="Link to this section">#</a>How it works</h2>
+<h3 id="drawing-the-map"><a class="anchor" href="#drawing-the-map" aria-label="Link to this section">#</a>Drawing the map</h3>
+<p>The map is drawn with WebGL2. The province id image (which place each pixel belongs to) is uploaded once, and each province&#39;s colour comes from a small lookup texture, so recolouring the whole world after a turn costs almost nothing.</p>
+<p>How a map pixel looks depends on how far you are zoomed in:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Zoom</th><th>How each map pixel is drawn</th></tr></thead>
+<tbody>
+<tr><td>Zoomed out</td><td>The terrain&#39;s colour with hill shading, and the owner&#39;s colour washed over it. The sea is shaded by depth, with dithered edges between depth bands.</td></tr>
+<tr><td>Middle zoom</td><td>4 × 4 art pixels (half-size tiles) from the terrain tile atlas</td></tr>
+<tr><td>Close in</td><td>8 × 8 art pixels, with rounded coasts, sand and surf</td></tr>
+</tbody></table></div>
+<p>Nation borders are an ink line with a band of the owner&#39;s colour inside. Each tile type&#39;s average colour is its colour on the far map, so an artist who repaints a tile changes the far map too. Rivers are drawn as one clean line along their traced path.</p>
+<p>Labels, towns, armies and routes are painted on a separate overlay at the device&#39;s pixel ratio, from cached bitmaps, so text stays crisp.</p>
+<p>The map never unloads during a campaign, and exactly one map mode is active at a time.</p>
+<h3 id="the-three-zoom-levels"><a class="anchor" href="#the-three-zoom-levels" aria-label="Link to this section">#</a>The three zoom levels</h3>
+<p>There are three zoom levels: <strong>World</strong>, <strong>Region</strong> and <strong>Local</strong> (&quot;Province&quot; zoom in the <a href="/wiki/Naval">Naval</a> and <a href="/wiki/Exploration-and-Colonies">Exploration and Colonies</a> pages means Local). The map is at World zoom when zoomed out furthest, switches to Region at camera zoom 2 and to Local at 4. Local zoom is still the map, not a screen: the province&#39;s tile row is part of it.</p>
+<p><strong>World zoom</strong> shows the big picture:</p>
+<ul>
+<li>Each province&#39;s owner colour, with a small icon if it is hungry, rioting or in revolt, and front lines.</li>
+<li>Armies as a banner with a men count, each standing on its own tile with its commander&#39;s banner and moving tile by tile as the week plays; battles as crossed swords with each side&#39;s men and a bar of men and morale left; besieged castles with a ring. Armies on the move are arrows, thick by men and coloured by owner, with no day counts.</li>
+<li>Ports as anchor dots in the owner&#39;s colour, larger for great ports; fleets as a single ship sprite with a count.</li>
+<li>The parchment, voyage paths as dotted lines, and colonies being founded as a small flag with a progress ring.</li>
+<li>For diplomacy, only the map mode colours.</li>
+</ul>
+<p><strong>Region zoom</strong> shows a province&#39;s life:</p>
+<ul>
+<li>Sieges with their progress: how long the castle has held, its breaches, and the garrison and food left.</li>
+<li>Town size, the castle and its reach rings, roads, rivers and the busiest trade paths (thicker means more traders), armies and sieges, burned provinces hatched, and plague.</li>
+<li>Armies as sprites by troop type (foot, horse, guns) with a food bar on the banner showing days of reserve left; rumours as faded banners; the forage limit while you drag an army; and the full route of a selected army with day counts, month marks, food colour and step icons.</li>
+<li>The harbour tile with an anchor icon showing berths used and free (for example <code>7/20</code>), a slipway icon with hulls being built, and fleets with their admiral&#39;s banner and course line in days.</li>
+<li>Each house of worship as a sprite in the town, preachers as walking figures, and active faith waves as a soft tint spreading from their source.</li>
+<li>Envoys on the road as small riders with a dotted route, and the war-aim icon on countries you hold a war aim against.</li>
+<li>Traders as icons (caravan, barge, ship) with a purse bar, and a coin on cities with a market.</li>
+<li>Colonial range as a faint line on the sea, and colonisable provinces with a pale flag.</li>
+</ul>
+<p><strong>Local zoom</strong> shows the province&#39;s tile row as pixel art:</p>
+<ul>
+<li>Each tile&#39;s building as a sprite, burned tiles in ash, workers moving on busy tiles, ships in the harbour, caravans on the road and barges on the river.</li>
+<li>Marching armies as columns of foot, horse, guns and wagons in proportion.</li>
+<li>A battle is shown on the province&#39;s own tile row, and a siege as the castle tile with breaches drawn in the walls.</li>
+</ul>
+<p><strong>Commanders, flags and portraits.</strong> Each army&#39;s commander stands on the map on foot, dressed in their country&#39;s flag colours, so a French commander wears blue and white and an English one red and white. Their kit follows the era: plate and sword at the start, halberd and morion from 1500, pistol and buff coat from 1600, then tricorne, sabre, revolver, rifle and field glasses. Their hair greys as they age. The figure stays the same size however far you zoom in. Their country&#39;s flag sits in front of their men count, on the same row, and their name shows below. Every country flies its own flag, without a pole: the one you know it by today where it still exists, otherwise its banner of the age. Portraits of commanders, officials and lords stand before their country&#39;s flag and show what they do: armour or uniform for a commander, the dress and tool of an official&#39;s post (a judge&#39;s red robe and gavel, a steward&#39;s keys, a tax collector&#39;s purse), and a fur mantle and coronet for a lord.</p>
+<p>Land provinces have no names on the map at any zoom, except each country&#39;s capital, so you can see whose capital it is. Every province&#39;s name shows on its name tab and card when you select it. Realm names and sea names stay. Realm names never cover each other: your own realm is named first, then the largest; a smaller realm&#39;s name moves to another of its provinces or shrinks to fit, and if there is still no room it shows when you zoom in. Route lines are a light dash over a dark outline, so they read on every colour.</p>
+<p>Every system added after the province and warfare designs has to state what it shows at each zoom, including its map mode.</p>
+<h3 id="close-in-the-living-map"><a class="anchor" href="#close-in-the-living-map" aria-label="Link to this section">#</a>Close in: the living map</h3>
+<p>Pinch in past the Local icons and the map stops showing icons and shows the world itself. There are three bands inside Local zoom:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Camera zoom</th><th>What you see</th></tr></thead>
+<tbody>
+<tr><td>4 to under 16</td><td>The Local icons: settlement sprites, commander tokens, number plates</td></tr>
+<tr><td>16 to under 40</td><td><strong>The living map</strong>: towns, hamlets and roads on the land, armies as small figures, fleets as hulls, traders on their paths</td></tr>
+<tr><td>40 to 96</td><td><strong>Street level</strong>: the same at double detail, with single houses, people and soldiers</td></tr>
+</tbody></table></div>
+<p>Between zoom 14 and 16 the icons fade out as the living pieces fade in, so nothing pops.</p>
+<p><strong>Map scale, not true scale.</strong> One map pixel is about 7 km, so at true scale a city would be smaller than a pixel. Close in, sizes show importance instead: a town covers more pixels the more town people it has (craftsmen, market folk, clergy, clerks and scholars), from 1 pixel for a village to 30 for the greatest cities. It grows from the province&#39;s land nearest its centre and only ever adds or loses pixels at its edge, once a month at most. The first 60 % of a town is its packed core, the rest its outskirts among fields.</p>
+<p><strong>What stands in a town.</strong> A capital has a keep with its realm&#39;s flag; a fort rings the core with a palisade and a castle with stone walls and towers; a market shows its square; every town has its house of worship; a drill yard shows its yard; a coastal town or a harbour has docks with piers and ships at berth. Mines, quarries and lumber camps mark their own pixel, and the countryside has up to 6 hamlets (one per 40,000 country people). Roads join each town to its nearest neighbours&#39; towns, the way the roads of the time ran: a few ways out of each town, with a town between two others carrying the road between them, keeping close to the straight line and winding only round hills, marsh and water. Most are worn footpaths; a cart road with ruts or a paved road appears where both provinces have built their road that far, and hamlets have tracks to the nearest town. Land no realm holds has no towns or roads until someone settles it. Towns take their culture&#39;s building style, and some great cities have their own landmark. Town buildings are drawn at twice the ground&#39;s art detail (16 × 16 art pixels per map pixel), so houses show their roofs, windows, doors and chimneys and a keep its towers, gate and flag.</p>
+<p><strong>Armies, fleets and traders.</strong> An army is one figure per 1,000 men (one per 250 at street level), up to 12 (40), split between foot, horse, guns and wagons. It stands in ranks, marches in a column behind its banner along the roads, clashes front rank to front rank in battle and loses figures as it loses men, and rings a town it besieges. Rebels carry no banner. A fleet is one hull per 5 ships (one per ship at street level), sailing in a loose formation with a wake behind each hull. In port its hulls lie at berths along the town&#39;s waterfront, and any that find no free berth wait just offshore. In a sea battle the hulls turn to face the enemy, with powder smoke drifting off them. Each busy trade path you can see (one through your lands or on your own traders&#39; loops) carries up to three caravans, barges or trading ships in the colours of the realm that sends them. They walk the path there and back with the game clock, keeping to their side of the way, and stand still while the game waits for you. Tap one of yours to open its card in the Trade tab; another realm&#39;s caravan gives way to the province beneath it.</p>
+<p><strong>Reading the numbers.</strong> The living map is for seeing; the cards are for knowing. Every number stays in its card. Tap a town to open its province card, and a formation, fleet or caravan to open its own card; a tap goes to the piece first, then the province, and every piece has a tap box of at least 44 points. The <strong>Markers</strong> switch in the map mode menu brings back the number plates and names over every piece, and the siege marks and battle bars; the selected piece always shows its plate, name and route. The army list, the battle bar and the province&#39;s Garrison tab keep every number either way.</p>
+<p><strong>Map detail.</strong> Low keeps the icons at every zoom (closest zoom 40). Medium, the phone default, has the living map but no street level. High has both. With Animations Off every figure stands still, and Reduced moves only marching and fighting armies.</p>
+<h3 id="map-modes"><a class="anchor" href="#map-modes" aria-label="Link to this section">#</a>Map modes</h3>
+<p>A <strong>map mode</strong> recolours the map by one stat. You pick it from the map mode picker, a small pop-over in the tool column. The map mode list brings together every system&#39;s map mode:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Map mode</th><th>What it colours</th><th>Owner</th></tr></thead>
+<tbody>
+<tr><td>Food</td><td>Food in each province</td><td><a href="/wiki/Provinces">Provinces</a></td></tr>
+<tr><td>Tax reaching you</td><td>Tax that reaches your treasury</td><td><a href="/wiki/Provinces">Provinces</a></td></tr>
+<tr><td>Days to capital</td><td>How far each province is from the capital</td><td><a href="/wiki/Provinces">Provinces</a></td></tr>
+<tr><td>Grievances</td><td>Grievances in each province</td><td><a href="/wiki/Provinces">Provinces</a></td></tr>
+<tr><td>Faith</td><td>Majority faith, hatched where another faith is 30 % or more; holy places carry a small icon</td><td><a href="/wiki/Religion">Religion</a></td></tr>
+<tr><td>Language</td><td>Language family at far zoom, language at region zoom; a toggle to same language, related or foreign colours for your realm; homelands of peoples without a country outlined</td><td><a href="/wiki/Culture">Culture</a></td></tr>
+<tr><td>Ground</td><td>Each province&#39;s ground</td><td><a href="/wiki/Provinces">Provinces</a></td></tr>
+<tr><td>Recruits</td><td>Recruits</td><td><a href="/wiki/Provinces">Provinces</a></td></tr>
+<tr><td>Trade ratio</td><td>Provinces by trade ratio, with the busiest roads and sea lanes as lines</td><td><a href="/wiki/Trade">Trade</a></td></tr>
+<tr><td>Trade value</td><td>Trade value</td><td><a href="/wiki/Trade">Trade</a></td></tr>
+<tr><td>Traders</td><td>Only your traders and their routes</td><td><a href="/wiki/Trade">Trade</a></td></tr>
+<tr><td>Diplomacy</td><td>Every country by your relation to it (see below)</td><td><a href="/wiki/Diplomacy">Diplomacy</a></td></tr>
+<tr><td>Sea</td><td>Ports shaded by sailors who can still be called; fleets at sea; the month&#39;s winds as arrows; zones your ships can enter at current research</td><td><a href="/wiki/Naval">Naval</a></td></tr>
+<tr><td>Works</td><td>Building sites (green), neglected or damaged buildings (amber), ruined ones (red)</td><td><a href="/wiki/Buildings">Buildings</a></td></tr>
+<tr><td>Jobs</td><td>Empty job slots against homeless people</td><td><a href="/wiki/Buildings">Buildings</a></td></tr>
+<tr><td>Subjects</td><td>Your subjects by loyalty, with a line to each courted subject from the courting country&#39;s capital</td><td><a href="/wiki/Subjects">Subjects</a></td></tr>
+<tr><td>Revolution</td><td>Provinces by how many of the revolution&#39;s province-level signs they meet; risen provinces hatched in the revolution&#39;s colour</td><td><a href="/wiki/Revolutions">Revolutions</a></td></tr>
+</tbody></table></div>
+<p>Trade ratio and Trade value replace the older Traders passing and Trade balance map modes. The picker holds 22 map modes: Realms, Terrain, People, Wealth, Walls and Food, plus Tax reaching you, Days to capital, Grievances, Faith, Language, Ground, Recruits, Trade ratio, Trade value, Traders, Diplomacy, Sea, Works, Jobs, Subjects and Revolution. On a phone the picker scrolls. A system with no zoom plan of its own shows its map mode at every zoom and its card only at Local.</p>
+<p><strong>Diplomacy map mode colours:</strong></p>
+<div class="table-scroll"><table>
+<thead><tr><th>Colour</th><th>Means</th></tr></thead>
+<tbody>
+<tr><td>Your own colour</td><td>You and your subjects</td></tr>
+<tr><td>Blue (light blue if pledged)</td><td>Allies</td></tr>
+<tr><td>Green, pale green</td><td>Close, Warm</td></tr>
+<tr><td>Grey</td><td>Cool, or nothing recorded</td></tr>
+<tr><td>Orange</td><td>Cold or Rival</td></tr>
+<tr><td>Red (hatched at war)</td><td>Hostile, Bitter or at war</td></tr>
+<tr><td>Red border</td><td>A league against you</td></tr>
+</tbody></table></div>
+<p><strong>Ambition shimmer.</strong> While one of your national ambitions that names places is hot, the map shimmers faintly over the region it concerns, without outlining or naming the target. See <a href="/wiki/National-Strengths">National Strengths</a>.</p>
+<h3 id="parchment-over-uncharted-lands"><a class="anchor" href="#parchment-over-uncharted-lands" aria-label="Link to this section">#</a>Parchment over uncharted lands</h3>
+<p>Land and sea your country has not charted lie under a drawn <strong>parchment</strong>. The parchment shows your charted map, which only ever grows; it replaces the old rule of showing everything within 6 steps of your lands and armies. Which places you have charted is decided by <a href="/wiki/Exploration-and-Colonies">Exploration and Colonies</a>.</p>
+<p>The <strong>Exploration</strong> map mode shows the same charted map with the parchment always on, empty coasts you could settle in green and colonies being founded in gold (see <a href="/wiki/Exploration-and-Colonies#how-you-play-it">Exploration and Colonies</a>).</p>
+<p>You can turn off &quot;Hide unexplored lands&quot; in the map mode menu to see the whole world. That switch is display only. It only changes what you see: it never lets you enter uncharted waters, and it is not the fog of war campaign rule.</p>
+<h3 id="watching-the-week"><a class="anchor" href="#watching-the-week" aria-label="Link to this section">#</a>Watching the week</h3>
+<p>The date in the top bar ticks one day at a time while the week plays, and shows the hour of each 4-hour step during one of your battles.</p>
+<p>While a turn is being worked out, the map stays visible: you can pan and zoom, armies march along their routes, and borders change as results arrive. If the turn takes longer than 1.5 seconds, a small parchment strip says what is being worked out, such as &quot;The courts of Europe deliberate…&quot;.</p>
+<p>A turn is one week. When you end it, the week <strong>plays back</strong> on the map: armies walk their routes, and castles that stop an army ring red. While one of your battles is being fought, the playback slows to six 4-hour steps a day, about half a second each, and a battle bar shows every battle running. From the bar you can switch between battles, change your standing orders or retreat. The game never stops for a battle, and you cannot skip the playback while one of your battles is running; battles between other realms never slow it. See <a href="/wiki/Time-and-Turns">Time and Turns</a>.</p>
+<h3 id="seasons"><a class="anchor" href="#seasons" aria-label="Link to this section">#</a>Seasons</h3>
+<p>The map shows the season. Lands north of latitude 50 and mountains turn white with snow in winter, wet climates turn green in the rainy months, and northern seas show ice while they are frozen. Sea ice is grey-blue with faint cracks, darker than the white snow on land, so you can tell frozen sea from snowy coast. It grows out from the coasts and the pole as the water cools and melts back in spring, in natural shapes with a soft, textured edge, not as whole sea zones turning white at once. A sea zone closes to fleets once most of it is frozen. The season colours stay readable in every colour vision mode, and there is no switch to turn them off.</p>
+<h3 id="layout-by-window-shape"><a class="anchor" href="#layout-by-window-shape" aria-label="Link to this section">#</a>Layout by window shape</h3>
+<p>Screens are laid out by the <strong>shape of the window</strong>, not by the device:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Window shape</th><th>Typical device</th><th>Layout</th></tr></thead>
+<tbody>
+<tr><td>Short wide</td><td>Phones in landscape (height under 500 CSS px)</td><td>Map first; cards are side sheets on the left (45 % of the screen); the Realm book&#39;s six sections are one row of icons with names; the top bar is one thin row</td></tr>
+<tr><td>Tall</td><td>Tablets in portrait, desktop windows taller than wide</td><td>Cards are bottom sheets (55 % height, draggable); the Realm book&#39;s sections the same one row; the tool column on the right edge above End turn</td></tr>
+<tr><td>Large</td><td>Tablets in landscape, desktop, Steam Deck (1280 × 800)</td><td>Side sheets have a fixed width (380 px at UI scale 1); menus centred with a maximum width; nothing stretches edge to edge</td></tr>
+<tr><td>Far</td><td>TV and Steam Machine</td><td>The Large layout with the UI scaled up so body text is about 1/30 of the screen height, thicker focus frames, and nothing in the outer 5 % of the screen</td></tr>
+</tbody></table></div>
+<p>Phones play <strong>in landscape only</strong>, on every screen; a phone held upright shows &quot;Turn your phone sideways&quot;. When a card is open on a phone in landscape, the map stays live on the right and is recentred so the selected thing isn&#39;t hidden.</p>
+<p>Every tap target is at least 44 × 44 points with 8 points between neighbours (56 with Large touch targets). End turn and the game menu button sit at opposite corners, and system safe areas stay clear of buttons.</p>
+<h3 id="map-accessibility"><a class="anchor" href="#map-accessibility" aria-label="Link to this section">#</a>Map accessibility</h3>
+<ul>
+<li><strong>Colour vision modes</strong> swap nation colours to a second assignment from the same 32-colour palette, chosen so neighbours stay distinguishable, and switch each map mode to a safe ramp (blue to orange instead of red to green). &quot;No colour&quot; uses greys with patterns.</li>
+<li><strong>Patterns on map modes</strong> add hatching, dots and stripes by band so every map mode reads without colour.</li>
+<li><strong>High contrast borders</strong> draw nation borders in black and white ink two art pixels wide.</li>
+<li>Route food colours also carry a pattern (solid, dashed, dotted). Day counts stay at least 10 points tall at region zoom and hide rather than shrink when you zoom too far out.</li>
+<li>Every map mode the tutorial teaches reads without telling colours apart; for example, hungry provinces also carry the hunger icon on the Food map mode.</li>
+</ul>
+<h3 id="staying-smooth-performance-budgets"><a class="anchor" href="#staying-smooth-performance-budgets" aria-label="Link to this section">#</a>Staying smooth: performance budgets</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Budget</th><th>Limit</th></tr></thead>
+<tbody>
+<tr><td>Panning and zooming</td><td>60 fps (16.7 ms a frame)</td></tr>
+<tr><td>Drawing the overlay</td><td>at most 2.5 ms a frame on average, 5 ms at the 95th percentile</td></tr>
+<tr><td>Longest main-thread task while playing</td><td>50 ms</td></tr>
+<tr><td>Frames redrawn while something animates</td><td>at least 90 %</td></tr>
+<tr><td>Engine turn, 5,000 provinces and 500 nations</td><td>25 ms</td></tr>
+<tr><td>Engine turn, 20,000 provinces and 2,000 nations</td><td>100 ms</td></tr>
+<tr><td>Worker&#39;s answer after End turn on the real map</td><td>250 ms</td></tr>
+<tr><td>Applying that answer on the main thread</td><td>16 ms (one frame)</td></tr>
+<tr><td>Slowest route plan, 5,000 / 20,000 provinces</td><td>8 ms / 32 ms</td></tr>
+</tbody></table></div>
+<p>To hold these:</p>
+<ul>
+<li>The map canvas shades 1 pixel per CSS pixel, never device pixels; the overlay uses the device pixel ratio; close-up tile detail switches in by CSS zoom.</li>
+<li>The draw loop never reads layout, takes text and sprites from cached bitmaps, and never plans routes or walks the province graph per frame.</li>
+<li>The turn is simulated in the background (a Web Worker, or a Node worker on desktop); only without worker support does it run on the main thread.</li>
+<li>The worker sends typed arrays and transfers them, never JSON of the world. Applying a turn updates textures and redraws once; panels re-render only what is open.</li>
+<li>Budgets scale with the world, not the player: AI nations run in the same worker turn.</li>
+<li>A change that breaks a budget fails the build (<code>pnpm bench</code>, <code>pnpm --filter @ph/client perf</code>). Targets are measured at the phone defaults and checked once with Battery saver on.</li>
+<li>While nothing moves, the map does not redraw, whatever the frame cap.</li>
+</ul>
+<p><strong>Performance knobs</strong> (in <a href="/wiki/Settings">Settings</a>):</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Knob</th><th>Steps</th></tr></thead>
+<tbody>
+<tr><td>Sharpness</td><td>Native (up to 3×), Balanced (up to 2×), Battery (1×)</td></tr>
+<tr><td>Frame rate cap</td><td>30, 60, 120 or the display&#39;s rate</td></tr>
+<tr><td>Map detail</td><td>Low (no 8 × 8 close-in tiles, no surf, no forest blending), Medium (8 × 8 tiles, still water), High (everything)</td></tr>
+<tr><td>Animations</td><td>Full, Reduced, Off (battle results as still frames); Reduced motion sets Reduced or lower</td></tr>
+<tr><td>Battery saver</td><td>Caps the frame rate at 30, sets Sharpness to Battery, reduces animations, redraws only on change, and runs the AI turn with a smaller worker budget</td></tr>
+</tbody></table></div>
+<h2 id="what-you-see"><a class="anchor" href="#what-you-see" aria-label="Link to this section">#</a>What you see</h2>
+<ul>
+<li>The map itself at World, Region and Local zoom, as described above.</li>
+<li>The <strong>tool column</strong> with the <strong>map mode picker</strong> pop-over, and the map mode menu with the parchment switch and the Language toggle.</li>
+<li><strong>Weekly playback</strong>, slowed to 4-hour steps during your battles, and the parchment strip during long turns.</li>
+<li>Cards as side sheets or bottom sheets depending on the window shape; &quot;Turn your phone sideways&quot; on an upright phone.</li>
+</ul>
+<p>Commands you give here never reach the engine: picking a map mode, zooming and panning, toggling the parchment, and skipping playback. Picking a map mode and crossing a zoom boundary are passed to <a href="/wiki/Music-and-Sound">Music and Sound</a> (the map mode sound and the music&#39;s zoom mix), and the end of playback tells <a href="/wiki/Screens-and-Navigation">Screens and Navigation</a> to show the turn report.</p>
+<h2 id="how-it-connects"><a class="anchor" href="#how-it-connects" aria-label="Link to this section">#</a>How it connects</h2>
+<ul>
+<li><a href="/wiki/World-Map">World Map</a>: supplies the id image, terrain image, depth, rivers and tile colours.</li>
+<li><a href="/wiki/Time-and-Turns">Time and Turns</a>: turn results, playback timing and turn-time budgets.</li>
+<li><a href="/wiki/Provinces">Provinces</a>: province zoom content and the Food, Tax, Days to capital, Grievances, Ground and Recruits map modes.</li>
+<li><a href="/wiki/Warfare">Warfare</a>: army banners, battles, sieges, rumours, front lines.</li>
+<li><a href="/wiki/Troop-Movement">Troop Movement</a>: routes, arrows, columns and playback events.</li>
+<li><a href="/wiki/Naval">Naval</a>: ports, fleets and the Sea map mode.</li>
+<li><a href="/wiki/Trade">Trade</a>: trade map modes, traders, roads and lanes.</li>
+<li><a href="/wiki/Religion">Religion</a>: the Faith map mode, worship sprites, preachers, waves.</li>
+<li><a href="/wiki/Culture">Culture</a>: the Language map mode and its toggle.</li>
+<li><a href="/wiki/Diplomacy">Diplomacy</a>: the Diplomacy map mode, envoys, war-aim icons.</li>
+<li><a href="/wiki/Exploration-and-Colonies">Exploration and Colonies</a>: the charted map under the parchment, voyages, colonies.</li>
+<li><a href="/wiki/Buildings">Buildings</a>: the Works and Jobs map modes.</li>
+<li><a href="/wiki/Subjects">Subjects</a>: the Subjects map mode.</li>
+<li><a href="/wiki/Revolutions">Revolutions</a>: the Revolution map mode.</li>
+<li><a href="/wiki/National-Strengths">National Strengths</a>: the ambition shimmer.</li>
+<li><a href="/wiki/Settings">Settings</a>: performance knobs, colour vision, patterns, borders, reduced motion.</li>
+<li><a href="/wiki/Screens-and-Navigation">Screens and Navigation</a>: layout by window shape, the map as home, cards over the map.</li>
+<li><a href="/wiki/Music-and-Sound">Music and Sound</a>: map mode and zoom events.</li>
+<li><a href="/wiki/Tutorial-and-Help">Tutorial and Help</a>: the map mode and zoom steps the tutorial teaches.</li>
+</ul>
+<h2 id="numbers"><a class="anchor" href="#numbers" aria-label="Link to this section">#</a>Numbers</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Value</th><th>Config key / where</th><th>Design value</th><th>Provisional?</th></tr></thead>
+<tbody>
+<tr><td>Map canvas pixels per CSS pixel</td><td><code>MAP_PIXEL_RATIO</code> (<code>mapView.ts</code>)</td><td>1</td><td>No</td></tr>
+<tr><td>Overlay device pixel ratio cap</td><td><code>main.ts</code></td><td>up to 2 (today&#39;s code)</td><td>Not stated</td></tr>
+<tr><td>Frame budget</td><td>performance.md</td><td>16.7 ms (60 fps)</td><td>No</td></tr>
+<tr><td>Overlay budget</td><td>performance.md</td><td>2.5 ms average, 5 ms p95</td><td>No</td></tr>
+<tr><td>Longest main-thread task</td><td>performance.md</td><td>50 ms</td><td>No</td></tr>
+<tr><td>Frames redrawn while animating</td><td>performance.md</td><td>at least 90 %</td><td>No</td></tr>
+<tr><td>Engine turn</td><td>performance.md</td><td>25 ms (5k/500), 100 ms (20k/2,000)</td><td>No</td></tr>
+<tr><td>Worker answer / applying it</td><td>performance.md</td><td>250 ms / 16 ms</td><td>No</td></tr>
+<tr><td>Route planning</td><td>performance.md</td><td>8 ms (5k), 32 ms (20k)</td><td>No</td></tr>
+<tr><td>Playback speed</td><td><code>replaySecondsPer10Days</code></td><td>about 1 second per 10 days</td><td>Yes</td></tr>
+<tr><td>&quot;What is being worked out&quot; strip</td><td>turn strip delay (interface config)</td><td>after 1.5 s</td><td>Yes</td></tr>
+<tr><td>Battle flash pause</td><td>interface config</td><td>0.5 s</td><td>Yes</td></tr>
+<tr><td>Short wide threshold</td><td>interface config</td><td>height under 500 CSS px</td><td>Yes</td></tr>
+<tr><td>Side sheet width (Large)</td><td>interface config</td><td>380 px at UI scale 1</td><td>Yes</td></tr>
+<tr><td>Card width on phone</td><td>interface config</td><td>45 %</td><td>Yes</td></tr>
+<tr><td>Bottom sheet height (Tall)</td><td>interface config</td><td>55 %</td><td>Yes</td></tr>
+<tr><td>Far body text and margin</td><td>interface config</td><td>about 1/30 of height; 5 % margin</td><td>Yes</td></tr>
+<tr><td>Tap targets</td><td>interface config</td><td>44 × 44 pt with 8 pt gaps; 56 with Large</td><td>Yes</td></tr>
+<tr><td>Faith hatch threshold</td><td>religion config</td><td>30 %</td><td>Yes</td></tr>
+<tr><td>Sharpness default</td><td>settings</td><td>Balanced on phones</td><td>No</td></tr>
+<tr><td>Frame rate cap default</td><td>settings</td><td>60 on phones</td><td>No</td></tr>
+<tr><td>Map detail default</td><td>settings</td><td>Medium on phones</td><td>No</td></tr>
+<tr><td>Animations default</td><td>settings</td><td>Full</td><td>No</td></tr>
+</tbody></table></div>
+<h2 id="other-display-rules"><a class="anchor" href="#other-display-rules" aria-label="Link to this section">#</a>Other display rules</h2>
+<ul>
+<li><strong>Sharpness</strong> sharpens the buttons and text over the map, not the map itself.</li>
+<li><strong>Battery saver</strong> lowers the frame rate, animations and music, and nothing else: the AI thinks the same on every device.</li>
+<li><strong>Map detail Low</strong> draws simpler art at every zoom and is still a full close-up view.</li>
+</ul>
+<h2 id="still-open"><a class="anchor" href="#still-open" aria-label="Link to this section">#</a>Still open</h2>
+<ul>
+<li>Speed and memory targets for a low-end Android phone, an older iPhone, the Steam Deck and the Steam Machine wait on tests on real devices before release.</li>
+</ul>
+<h2 id="for-developers"><a class="anchor" href="#for-developers" aria-label="Link to this section">#</a>For developers</h2>
+<ul>
+<li>Spec: <a href="https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/map-presentation/spec.md" rel="noopener"><code>domain/map-presentation/spec.md</code></a>, requirement code <strong>VIEW</strong>.</li>
+<li>Features: <code>domain/map-presentation/features/</code> (map-rendering, zoom-content, lenses, parchment, month-playback, layout, map-accessibility, performance).</li>
+<li>Code: the map is drawn in the client, <code>apps/client/src/map/mapView.ts</code> (<code>MAP_PIXEL_RATIO</code>) and <code>apps/client/src/main.ts</code> (today&#39;s map modes and fog toggle). Budgets are documented in <code>docs/performance.md</code> and checked by <code>pnpm bench</code> and <code>pnpm --filter @ph/client perf</code>. This context is presentation only and has no engine rules folder.</li>
+</ul>

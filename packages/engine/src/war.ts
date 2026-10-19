@@ -1,15 +1,19 @@
 import { lordsLoseWar } from "./lords.ts";
+import { battleDeath } from "./people.ts";
 import { armyDead, garrisonDead } from "./fallen.ts";
 import { castleStep } from "./works.ts";
 import { markBattle } from "./moods.ts";
 import type { Ground } from "@ph/rules";
-import { independencePeace, subjectAnswersCall } from "./subjects.ts";
+import { independencePeace, subjectAnswersCall, tablesTurned, turnTables } from "./subjects.ts";
 import * as dip from "./domain/diplomacy/index.ts";
 import * as wf from "./domain/warfare/index.ts";
+import navalData from "../../rules/data/domain/naval.json" with { type: "json" };
 import { planRoute } from "./march.ts";
 import { GROUNDS } from "./tiles.ts";
 import { halt, marchTo, routeBars } from "./turn.ts";
 import { marchMap, NO_PATH, type World } from "./world.ts";
+import { battleWon } from "./campaignEnd.ts";
+import { retinueScatters, retinuesWon } from "./retinues.ts";
 import { aiRecruits, ARMS, canCall, commanderBattle, KIND, KIND_NAMES, menByArm, sendHome } from "./recruit.ts";
 import { withoutOf } from "./research.ts";
 import { officialBonus, provinceTaken } from "./officials.ts";
@@ -17,8 +21,11 @@ import { noteBattle, notePeace, noteSiege } from "./achievements.ts";
 import { demandableProvinces, makeDemand, whyNotDemand } from "./statecraft.ts";
 import { heritageFactor } from "./heritage.ts";
 import { lostBattle } from "./rebels.ts";
+import { bestTerms, markSurrender, noteWarBattle, settlementTable } from "./settlement.ts";
 import { priceContext, priceOfWar, whyAiWontDeclare } from "./priceOfWar.ts";
 import { grabbedLand } from "./conquest.ts";
+import { goalPlacesHeldBy, goalPulls } from "./goals.ts";
+import goalsConfig from "../../rules/data/domain/events.json" with { type: "json" };
 import { cededProvinces, fittingAim, landTakenWithoutAim, monthlyRefusals, noteWarVictory, peaceVoices, refusedPeace, truceBroken, type GameWar } from "./peace.ts";
 import { aiAnswersDefence, defenceCalls, dissolveEmpire, whyNotDissolveTerm } from "./institutions.ts";
 
@@ -33,7 +40,7 @@ const rel = dip.relations;
 
 /** Something that happened this turn that a player may want to read. */
 export interface News {
-  kind: "war" | "joined" | "call" | "peace" | "battle" | "siege" | "occupied" | "freed" | "raised" | "refused" | "destroyed" | "famine" | "unrest" | "invention" | "built" | "envoy" | "reform" | "rebels" | "event" | "heritage" | "voyage" | "colony" | "crown" | "revolution" | "trade" | "ruler";
+  kind: "war" | "joined" | "call" | "peace" | "battle" | "siege" | "occupied" | "freed" | "raised" | "refused" | "destroyed" | "famine" | "unrest" | "invention" | "built" | "envoy" | "reform" | "rebels" | "event" | "heritage" | "voyage" | "colony" | "crown" | "revolution" | "trade" | "ruler" | "campaign" | "founded" | "tribe" | "plague";
   text: string;
   /** Nations it is about, by index. */
   nations: number[];
@@ -77,7 +84,8 @@ export function maxGarrison(world: World, p: number): number {
 /** The 1444 relations between the map's realms (the dataset also lists realms the map folds into others). */
 export function createWarState(world: World): dip.Diplomacy {
   const d = dip.createFromDataset(isoDate(world));
-  const onMap = (id: string) => world.nationIndex.has(id);
+  // A sleeping realm has no ties in 1444 (SETUP-082).
+  const onMap = (id: string) => world.nationIndex.has(id) && !world.nationAsleep[world.nationIndex.get(id)!];
   d.graph.relations = d.graph.relations.filter((r) => onMap(r.source) && onMap(r.target));
   d.graph.facts = d.graph.facts.filter((f) => onMap(f.source) && onMap(f.target));
   // Wars already under way in November 1444 become wars the game can end.
@@ -265,9 +273,9 @@ export function answerCall(world: World, call: dip.Call, yes: boolean, news: New
   );
 }
 
-/** Men in the field plus levies at home: how strong a realm looks to others. */
+/** Men in the field plus levies and the lords' men at home: how strong a realm looks to others. */
 export function strength(world: World, n: number): number {
-  let men = canCall(world, n);
+  let men = canCall(world, n) + world.nationLordsMen[n]!;
   const a = world.armies;
   for (let i = 0; i < a.count; i++) if (a.alive[i] && a.owner[i] === n) men += a.men[i]!;
   return men;
@@ -577,9 +585,14 @@ export function fightRound(world: World, news: News[]): void {
     const winStart = b.attackerWins ? b.attStart : b.defStart;
     const loseStart = b.attackerWins ? b.defStart : b.attStart;
     commanderBattle(world, b.attackerWins ? b.attLead : b.defLead, true, winStart < loseStart);
+    battleWon(world, winner);
+    retinuesWon(world, winSlots, news);
     commanderBattle(world, b.attackerWins ? b.defLead : b.attLead, false, false);
+    // The losing commander may fall (WAR-062): people.ts says what follows.
+    battleDeath(world, b.attackerWins ? b.defLead : b.attLead, news);
     endBattle(world, b);
     noteBattle(world, winner, loser, winStart, loseStart, b.province);
+    noteWarBattle(world, winner, loser, b.attackerWins ? b.attDealt : b.defDealt, b.attackerWins ? b.defDealt : b.attDealt);
     noteWarVictory(world, winner, loser);
     for (const s of loseSlots) fallBack(world, s, enemies, news);
     lostBattle(world, loser, b.province);
@@ -643,7 +656,8 @@ function fallBack(world: World, s: number, enemies: Set<number>[], news: News[])
 function disperse(world: World, s: number, text: string, news: News[]): void {
   const a = world.armies;
   // Half the men who survive find their way home to the pools; hired men just leave.
-  if (a.kind[s] !== KIND.hired) sendHome(world, a.owner[s]!, a.men[s]! * 0.5);
+  if (a.kind[s] === KIND.retinue) retinueScatters(world, s, a.men[s]! * 0.5);
+  else if (a.kind[s] !== KIND.hired) sendHome(world, a.owner[s]!, a.men[s]! * 0.5);
   a.alive[s] = 0;
   halt(world, s);
   news.push({ kind: "battle", text, nations: [a.owner[s]!], province: a.location[s]! });
@@ -687,17 +701,33 @@ export function runOccupation(world: World, newMonth: boolean, news: News[]): vo
     present.set(a.location[i]!, list);
   }
   const holdDays = world.rules.defines.war.holdWeeks * 7;
-  for (let p = 0; p < world.provinceCount; p++) {
-    if (world.provinceWater[p] || world.provinceOwner[p]! < 0) continue;
-    const owner = world.provinceOwner[p]!;
-    const slots = present.get(p);
+  // The provinces with an army standing in them, marked so the rest (most of
+  // the map, every day) are passed over without a lookup.
+  const armed = new Uint8Array(world.provinceCount);
+  for (const p of present.keys()) armed[p] = 1;
+  const water = world.provinceWater;
+  const owners = world.provinceOwner;
+  const holds = world.provinceHold;
+  const sieges = world.sieges;
+  // Off the 1st of the month only provinces with an army, a siege or a hold change, so only they are visited, in order.
+  let visit: number[] | null = null;
+  if (!newMonth) {
+    const marked = [...present.keys(), ...sieges.keys()];
+    for (let p = 0; p < world.provinceCount; p++) if (holds[p]) marked.push(p);
+    visit = [...new Set(marked)].sort((x, y) => x - y);
+  }
+  for (let k = 0, end = visit ? visit.length : world.provinceCount; k < end; k++) {
+    const p = visit ? visit[k]! : k;
+    if (water[p] || owners[p]! < 0) continue;
+    const owner = owners[p]!;
     // No army there: nothing is held or besieged, and the walls fill again (most provinces, most days).
-    if (!slots) {
-      world.provinceHold[p] = 0;
-      if (world.sieges.delete(p)) news.push({ kind: "siege", text: `The siege of ${provinceName(world, p)} is lifted.`, nations: [owner], province: p });
-      if (newMonth && world.provinceOccupier[p]! < 0) world.provinceGarrison[p] = Math.min(maxGarrison(world, p), world.provinceGarrison[p]! + maxGarrison(world, p) * world.rules.defines.war.garrisonRecoveryPerMonth);
+    if (!armed[p]) {
+      holds[p] = 0;
+      if (sieges.size && sieges.delete(p)) news.push({ kind: "siege", text: `The siege of ${provinceName(world, p)} is lifted.`, nations: [owner], province: p });
+      if (newMonth && world.provinceOccupier[p]! < 0) refillGarrison(world, p);
       continue;
     }
+    const slots = present.get(p)!;
     const ctl = controller(world, p);
     // The rightful owner (or a partner at war with the occupier) frees occupied land; anyone at war with the holder takes it.
     const hostile = slots.filter((s) => enemies[ctl]!.has(a.owner[s]!));
@@ -705,7 +735,7 @@ export function runOccupation(world: World, newMonth: boolean, news: News[]): vo
     if (!hostile.length || defended) {
       world.provinceHold[p] = 0;
       if (world.sieges.delete(p) && !hostile.length) news.push({ kind: "siege", text: `The siege of ${provinceName(world, p)} is lifted.`, nations: [owner], province: p });
-      if (newMonth && world.provinceOccupier[p]! < 0) world.provinceGarrison[p] = Math.min(maxGarrison(world, p), world.provinceGarrison[p]! + maxGarrison(world, p) * world.rules.defines.war.garrisonRecoveryPerMonth);
+      if (newMonth && world.provinceOccupier[p]! < 0) refillGarrison(world, p);
       continue;
     }
     // The first realm to besiege or hold a province is the one that takes it (Leroy, F-45); the
@@ -769,6 +799,12 @@ export function runOccupation(world: World, newMonth: boolean, news: News[]): vo
   }
 }
 
+/** A month's refill of a held province's garrison, up to what its walls hold. */
+function refillGarrison(world: World, p: number): void {
+  const max = maxGarrison(world, p);
+  world.provinceGarrison[p] = Math.min(max, world.provinceGarrison[p]! + max * world.rules.defines.war.garrisonRecoveryPerMonth);
+}
+
 function occupy(world: World, p: number, by: number, text: string, news: News[]): void {
   world.sieges.delete(p);
   world.provinceHold[p] = 0;
@@ -779,13 +815,16 @@ function occupy(world: World, p: number, by: number, text: string, news: News[])
 
 // ---------------------------------------------------------------- peace
 
-/** "dissolve" is the peace term *Dissolve the Empire* a non-member who beat the Emperor may take from era IV (INST-051). */
-export type PeaceTerms = "take" | "white" | "give" | "dissolve";
+/**
+ * "dissolve" is the peace term *Dissolve the Empire* a non-member who beat the Emperor may take from era IV (INST-051);
+ * "master": a subject that won its independence makes its old overlord its own subject (SUBJ-135).
+ */
+export type PeaceTerms = "take" | "white" | "give" | "dissolve" | "master";
 
 /** A realm's peace voices are counted from its lords, royal provinces and capital (WAR-180, WAR-221): peace.ts. */
 export { peaceShare, peaceVoices } from "./peace.ts";
 
-function sidesOf(world: World, war: dip.War, n: number): { ours: number[]; theirs: number[] } {
+export function sidesOf(world: World, war: dip.War, n: number): { ours: number[]; theirs: number[] } {
   const idx = (ids: string[]) => ids.map((id) => world.nationIndex.get(id)!);
   const att = idx(war.attackers);
   const def = idx(war.defenders);
@@ -801,50 +840,92 @@ export function warBetween(world: World, a: number, b: number): dip.War | undefi
 
 /**
  * a offers b peace. Between the two war leaders the whole war ends; otherwise
- * the two make a separate peace. "take" asks for provinces of b's side that
- * a's side occupies, "give" hands a's occupied provinces to b's side, and
- * "white" gives back all occupied land. One peace cedes at most a third of each
- * loser's provinces, the asker's `picks` first, and a capital only when it is
- * the loser's last province (WAR-227). The AI answers by its peace voices
- * (WAR-183, WAR-221).
+ * the two make a separate peace. "take" asks b for `demand` (by default the
+ * most the war lets a ask, WAR-244), "give" hands b the demanded land and gold
+ * of a's (by default all a peace may cede of what b's side holds), and "white"
+ * gives back all occupied land. The AI answers a demand by the settlement
+ * counts (WAR-243): it signs, counters with what fits, or refuses.
+ * One peace cedes at most a third of each loser's provinces and a capital
+ * only with its last (WAR-227); `picks` and `gold` name the terms chosen at the
+ * peace table, and none means the most the war allows.
  */
-export function offerPeace(world: World, a: number, b: number, terms: PeaceTerms, news: News[], aiAsks = false, picks: readonly number[] = []): string | null {
+export function offerPeace(world: World, a: number, b: number, terms: PeaceTerms, news: News[], aiAsks = false, picks: readonly number[] = [], gold = 0): string | null {
+  const demand: wf.Demand | undefined = picks.length || gold > 0 ? { provinces: [...picks], gold } : undefined;
   const war = warBetween(world, a, b);
   if (!war) return "you are not at war with them";
   const leaders = [war.declarer, war.target].map((id) => world.nationIndex.get(id)!);
   const whole = leaders.includes(a) && leaders.includes(b);
+  if (terms === "master") {
+    // Turning the tables (SUBJ-135): the voices are the rule's own, so the old overlord has no say.
+    const t = tablesTurned(world, war, a, b);
+    if (!whole || !t.kind) return whole ? t.why : "only between the war's leaders";
+    makePeace(world, war, true, a, b, [], news);
+    turnTables(world, a, b, t.kind, news);
+    return null;
+  }
   if (terms === "dissolve") {
     const why = whyNotDissolveTerm(world, a, b);
     if (why) return why;
   }
-  const { ours, theirs } = sidesOf(world, war, a);
-  const sideA = whole ? ours : [a];
-  const sideB = whole ? theirs : [b];
-  const loser = terms === "take" ? sideB : terms === "give" ? sideA : null;
-  const winner = terms === "take" ? sideA : terms === "give" ? sideB : null;
-  const ceded = loser && winner ? loser.flatMap((l) => cededProvinces(world, l, winner, picks)) : [];
-  if (terms !== "give" && !aiAsks && b !== world.player) {
-    const voices = peaceVoices(world, b, war);
-    const share = voices.share;
-    const months = dip.monthsBetween(war.start, dip.monthOf(world.diplomacy.date));
-    const exhausted = rel.aiMustAcceptPeace(months) && occupiedBy(world, sideA, sideB).length === 0;
-    const accepts =
-      terms === "white" || terms === "dissolve"
-        ? voices.obliged || exhausted
-        : ceded.length > 0 && wf.aiAccepts(share, ceded.map((p) => ({ kind: "cede", province: world.provinceIds[p]! })), { occupiedByEnemy: ceded.map((p) => world.provinceIds[p]!), treasury: world.nationTreasury[b]! });
-    if (!accepts) {
-      // An obliged ruler who refuses pays for it, the AI as the player (WAR-221).
-      if (ceded.length > 0 || terms === "white") refusedPeace(world, b, war, news);
-      news.push({ kind: "refused", text: `${name(world, b)} refuses peace${terms === "take" ? ` on those terms (${Math.round(share * 100)} in 100 of its voices want peace; over half must)` : ""}.`, nations: [a, b] });
+  if (terms === "white" || terms === "dissolve") {
+    if (!aiAsks && b !== world.player) {
+      const { ours, theirs } = sidesOf(world, war, a);
+      const voices = peaceVoices(world, b, war);
+      const months = dip.monthsBetween(war.start, dip.monthOf(world.diplomacy.date));
+      const exhausted = rel.aiMustAcceptPeace(months) && occupiedBy(world, whole ? ours : [a], whole ? theirs : [b]).length === 0;
+      if (!(voices.obliged || exhausted)) {
+        // An obliged ruler who refuses pays for it, the AI as the player (WAR-221).
+        if (voices.obliged) refusedPeace(world, b, war, news);
+        news.push({ kind: "refused", text: `${name(world, b)} refuses a white peace.`, nations: [a, b] });
+        return null;
+      }
+    }
+    makePeace(world, war, whole, a, b, [], news);
+    if (terms === "dissolve") dissolveEmpire(world, "peace_term", news);
+    return null;
+  }
+  // The side that takes asks; the other gives (and pays any gold).
+  const taker = terms === "take" ? a : b;
+  const giver = terms === "take" ? b : a;
+  const table = settlementTable(world, taker, giver)!;
+  const asked = demand ?? (terms === "give" ? wf.bestDemand(table.candidates, Infinity, { ...table.limits, maxGold: 0 }) : bestTerms(table));
+  const why = wf.whyNotTerms(asked, table.candidates, table.limits);
+  if (why) return why;
+  if (terms === "take" && !aiAsks && b !== world.player) {
+    const reply = wf.answerDemand(asked, table.candidates, table.capacity, table.limits);
+    const cost = wf.demandCost(asked, table.candidates);
+    // An obliged ruler who will not sign the demand pays for it, the AI as the player (WAR-221).
+    if (reply.answer !== "accept" && peaceVoices(world, b, war).obliged) refusedPeace(world, b, war, news);
+    if (reply.answer === "reject") {
+      news.push({ kind: "refused", text: `${name(world, b)} refuses peace: the war lets you ask ${table.capacity.capacity} and you asked ${cost}.`, nations: [a, b] });
+      return null;
+    }
+    if (reply.answer === "counter") {
+      if (a !== world.player) return settle(world, war, whole, b, a, reply.counter, news);
+      world.peaceOffers.push({ id: world.turn * 100 + world.peaceOffers.length, from: b, terms: "give", ...reply.counter, counter: true });
+      news.push({ kind: "peace", text: `${name(world, b)} will not give all you asked (${cost} of ${table.capacity.capacity}); it offers ${termsText(world, reply.counter)} instead.`, nations: [a, b] });
       return null;
     }
   }
-  makePeace(world, war, whole, a, b, ceded, news);
-  if (terms === "dissolve") dissolveEmpire(world, "peace_term", news);
+  return settle(world, war, whole, giver, taker, asked, news);
+}
+
+/** "Leon and 40 gold", "100 gold". */
+function termsText(world: World, d: wf.Demand): string {
+  const parts = [...d.provinces.map((p) => provinceName(world, p)), ...(d.gold > 0 ? [`${d.gold} gold`] : [])];
+  return parts.length > 1 ? `${parts.slice(0, -1).join(", ")} and ${parts.at(-1)}` : (parts[0] ?? "nothing");
+}
+
+/** The giver hands over the demanded provinces (held by the taker's side) and gold, and the peace is signed. */
+function settle(world: World, war: dip.War, whole: boolean, giver: number, taker: number, d: wf.Demand, news: News[]): null {
+  const gold = Math.min(d.gold, Math.max(0, world.nationTreasury[giver]!));
+  world.nationTreasury[giver]! -= gold;
+  world.nationTreasury[taker]! += gold;
+  makePeace(world, war, whole, taker, giver, d.provinces, news, gold > 0 ? { from: giver, to: taker, amount: gold } : undefined);
   return null;
 }
 
-function occupiedBy(world: World, owners: number[], occupiers: number[]): number[] {
+export function occupiedBy(world: World, owners: number[], occupiers: number[]): number[] {
   const o = new Set(owners);
   const by = new Set(occupiers);
   const out: number[] = [];
@@ -852,7 +933,7 @@ function occupiedBy(world: World, owners: number[], occupiers: number[]): number
   return out;
 }
 
-function makePeace(world: World, war: dip.War, whole: boolean, a: number, b: number, ceded: number[], news: News[]): void {
+function makePeace(world: World, war: dip.War, whole: boolean, a: number, b: number, ceded: number[], news: News[], gold?: { from: number; to: number; amount: number }): void {
   const d = world.diplomacy;
   const truceMonths = dip.truceMonthsAfterPeace({ landOrSubject: ceded.length > 0, white: ceded.length === 0 });
   const involved = whole ? [...war.attackers, ...war.defenders].map((id) => world.nationIndex.get(id)!) : [a, b];
@@ -864,7 +945,7 @@ function makePeace(world: World, war: dip.War, whole: boolean, a: number, b: num
   for (const p of ceded) {
     world.provinceOwner[p] = world.provinceOccupier[p]!;
     world.provinceLord[p] = -1;
-    provinceTaken(world, p);
+    provinceTaken(world, p, news);
   }
   // Every other occupation between the realms making peace ends.
   const set = new Set(involved);
@@ -891,6 +972,7 @@ function makePeace(world: World, war: dip.War, whole: boolean, a: number, b: num
       war.defenders = war.defenders.filter((x) => x !== id);
     }
   }
+  const paid = gold ? `, and ${name(world, gold.from)} pays ${Math.round(gold.amount)} gold` : "";
   if (ceded.length) {
     const gained = new Map<number, string[]>();
     for (const p of ceded) gained.set(world.provinceOwner[p]!, [...(gained.get(world.provinceOwner[p]!) ?? []), provinceName(world, p)]);
@@ -902,7 +984,9 @@ function makePeace(world: World, war: dip.War, whole: boolean, a: number, b: num
     }
     // Neighbours remember land grabbed near them (DIPL-222).
     grabbedLand(world, ceded, cededFrom, true);
-    news.push({ kind: "peace", text: `Peace between ${name(world, a)} and ${name(world, b)}: ${[...gained].map(([n, list]) => `${name(world, n)} takes ${list.join(", ")}`).join("; ")}. Truce for ${truceMonths / 12} years.`, nations: involved, province: ceded[0]! });
+    news.push({ kind: "peace", text: `Peace between ${name(world, a)} and ${name(world, b)}: ${[...gained].map(([n, list]) => `${name(world, n)} takes ${list.join(", ")}`).join("; ")}${paid}. Truce for ${truceMonths / 12} years.`, nations: involved, province: ceded[0]! });
+  } else if (gold) {
+    news.push({ kind: "peace", text: `Peace between ${name(world, a)} and ${name(world, b)}: ${name(world, gold.from)} pays ${name(world, gold.to)} ${Math.round(gold.amount)} gold. Truce for ${truceMonths / 12} years.`, nations: involved });
   } else {
     news.push({ kind: "peace", text: `White peace between ${name(world, a)} and ${name(world, b)}. Truce for ${truceMonths / 12} years.`, nations: involved });
   }
@@ -915,7 +999,7 @@ export function cedeProvince(world: World, p: number, to: number, news: News[]):
   if (from < 0 || from === to) return;
   world.provinceOwner[p] = to;
   world.provinceLord[p] = -1;
-  provinceTaken(world, p);
+  provinceTaken(world, p, news);
   world.provinceOccupier[p] = -1;
   world.provinceHold[p] = 0;
   world.sieges.delete(p);
@@ -947,9 +1031,11 @@ export function checkDestroyed(world: World, news: News[]): void {
     const a = world.armies;
     for (let i = 0; i < a.count; i++) if (a.alive[i] && a.owner[i] === n) a.alive[i] = 0;
     rel.countryDestroyed(world.diplomacy.graph, id);
-    for (const w of world.diplomacy.wars) {
+    for (const w of [...world.diplomacy.wars]) {
       w.attackers = w.attackers.filter((x) => x !== id);
       w.defenders = w.defenders.filter((x) => x !== id);
+      // A war it led has no one left to make the peace: it ends.
+      if (w.declarer === id || w.target === id) dip.endWar(world.diplomacy, w);
     }
     world.diplomacy.wars = world.diplomacy.wars.filter((w) => w.attackers.length && w.defenders.length);
     for (let p = 0; p < world.provinceCount; p++) if (world.provinceOccupier[p] === n) world.provinceOccupier[p] = -1;
@@ -957,33 +1043,69 @@ export function checkDestroyed(world: World, news: News[]): void {
   }
 }
 
-/** Peace an AI war leader offers the player: `terms` as the AI would send them (offerPeace's a = from). */
+/** Peace an AI war leader offers the player: `terms` as the AI would send them (offerPeace's a = from), with the land and gold named. */
 export interface PeaceOffer {
   id: number;
   from: number;
   terms: PeaceTerms;
+  provinces?: number[];
+  gold?: number;
+  /** What the AI will give instead of a demand that asked too much (WAR-243). */
+  counter?: boolean;
+  /** The AI has surrendered: the player may ask anything the rules allow (WAR-246). */
+  surrender?: boolean;
 }
 
 /**
  * Once a month the AI leader of a war against the player may offer peace
- * (feedback 10), by the counts it uses between AI realms: when it is losing,
- * it gives up what the player holds; when the player's people want peace
- * and it holds the player's land, it asks for that; after a long war, or
- * when its own people want peace, a white peace. An offer lasts a month.
+ * (feedback 10), by the counts it uses between AI realms: when it is beaten it
+ * surrenders (WAR-245); when it is losing, it offers what the war lets the
+ * player ask; when the player's people want peace and it holds the player's
+ * land, it asks what the war lets it ask; after a long war, or when its own
+ * people want peace, a white peace. An offer waits until the
+ * player answers it or the war ends (SHELL-141): a later month may change
+ * its terms, never add a second offer from the same realm.
  */
 function aiOffersPeace(world: World, war: dip.War, ai: number, news: News[]): void {
+  const player = world.player;
+  // One offer a realm: a later month brings its terms up to date (SHELL-141).
+  const add = (o: Omit<PeaceOffer, "id" | "from">, text: string) => {
+    const waiting = world.peaceOffers.find((x) => x.from === ai);
+    if (waiting && waiting.terms === o.terms && (waiting.gold ?? 0) === (o.gold ?? 0) && String(waiting.provinces ?? []) === String(o.provinces ?? [])) return;
+    if (waiting) {
+      delete waiting.provinces;
+      delete waiting.gold;
+      delete waiting.counter;
+      delete waiting.surrender;
+      Object.assign(waiting, o);
+    } else world.peaceOffers.push({ id: world.turn * 100 + world.peaceOffers.length, from: ai, ...o });
+    news.push({ kind: "peace", text, nations: [ai, player] });
+  };
+  const theirs = settlementTable(world, player, ai)!;
+  if (!(war.surrendered ?? []).includes(world.nationIds[ai]!) && theirs.beaten) {
+    markSurrender(world, ai, player);
+    news.push({ kind: "peace", text: `${name(world, ai)} can fight no more and surrenders unconditionally: you may ask anything the peace table allows.`, nations: [ai, player] });
+  }
+  if ((war.surrendered ?? []).includes(world.nationIds[ai]!)) {
+    const best = bestTerms(settlementTable(world, player, ai)!);
+    add({ terms: "give", ...best, surrender: true }, `${name(world, ai)} has surrendered and will sign your terms: ${termsText(world, best)}, or whatever else the peace table allows.`);
+    return;
+  }
   const sa = sidesOf(world, war, ai);
   const aiObliged = peaceVoices(world, ai, war).obliged;
   const playerObliged = peaceVoices(world, world.player, war).obliged;
   const months = dip.monthsBetween(war.start, dip.monthOf(world.diplomacy.date));
-  // What one peace would hand over each way, at most a third of each loser's land (WAR-227).
-  const lost = sa.ours.reduce((t, l) => t + cededProvinces(world, l, sa.theirs).length, 0);
-  const won = sa.theirs.reduce((t, l) => t + cededProvinces(world, l, sa.ours).length, 0);
-  const terms: PeaceTerms | null = aiObliged && lost ? "give" : playerObliged && won ? "take" : aiObliged || rel.aiMustAcceptPeace(months) ? "white" : null;
-  if (!terms) return;
-  world.peaceOffers.push({ id: world.turn * 100 + world.peaceOffers.length, from: ai, terms });
-  const what = terms === "give" ? `and gives up the ${lost} province${lost === 1 ? "" : "s"} you hold` : terms === "take" ? `if you give up the ${won} province${won === 1 ? "" : "s"} it holds` : "with no land changing hands";
-  news.push({ kind: "peace", text: `${name(world, ai)} offers peace ${what}.`, nations: [ai, world.player] });
+  const lost = occupiedBy(world, sa.ours, sa.theirs).length;
+  const won = occupiedBy(world, sa.theirs, sa.ours).length;
+  if (aiObliged && lost) {
+    const give = bestTerms(theirs);
+    if (give.provinces.length || give.gold > 0) return add({ terms: "give", ...give }, `${name(world, ai)} offers peace and gives you ${termsText(world, give)}.`);
+  }
+  if (playerObliged && won) {
+    const take = bestTerms(settlementTable(world, ai, player)!);
+    if (take.provinces.length || take.gold > 0) return add({ terms: "take", ...take }, `${name(world, ai)} offers peace if you give it ${termsText(world, take)}.`);
+  }
+  if (aiObliged || rel.aiMustAcceptPeace(months)) add({ terms: "white" }, `${name(world, ai)} offers peace with no land changing hands.`);
 }
 
 /** The player takes or turns down a peace offer. */
@@ -992,24 +1114,25 @@ export function answerPeace(world: World, id: number, yes: boolean, news: News[]
   if (!offer) return "that offer has lapsed";
   world.peaceOffers = world.peaceOffers.filter((o) => o !== offer);
   if (!warBetween(world, offer.from, world.player)) return "you are no longer at war with them";
-  if (yes) return offerPeace(world, offer.from, world.player, offer.terms, news, true);
+  if (yes) return offerPeace(world, offer.from, world.player, offer.terms, news, true, offer.provinces ?? [], offer.gold ?? 0);
   // Turning down a peace the realm's voices oblige it to take costs lords and levies each season (WAR-181).
   refusedPeace(world, world.player, warBetween(world, offer.from, world.player)!, news);
   news.push({ kind: "refused", text: `You turn down ${name(world, offer.from)}'s offer of peace.`, nations: [offer.from, world.player] });
   return null;
 }
 
-/** Wars where a side has lost every war leader's land or army end; truces run out (DIPL-031). */
+/**
+ * AI wars end by the same counts (WAR-183, WAR-243 … WAR-245): a beaten leader
+ * surrenders and signs the victor's fullest terms; a leader whose people want
+ * peace signs what the war lets the other ask; long wars end white. Truces run
+ * out (DIPL-031).
+ */
 export function monthlyDiplomacy(world: World, news: News[]): void {
   const d = world.diplomacy;
   rel.expireTruces(d.graph);
   d.calls = d.calls.filter((c) => d.wars.some((w) => w.id === c.war));
-  // An offer left unanswered for a month is refused (WAR-181).
-  for (const o of world.peaceOffers) {
-    const war = warBetween(world, o.from, world.player);
-    if (war) refusedPeace(world, world.player, war, news);
-  }
-  world.peaceOffers = [];
+  // An offer waits for the player's answer while its war lasts (playtest feedback).
+  world.peaceOffers = world.peaceOffers.filter((o) => warBetween(world, o.from, world.player));
   monthlyRefusals(world, news);
   // AI wars end by the same counts: the losing leader gives up what it has lost, or both tire of it.
   for (const war of [...d.wars]) {
@@ -1020,14 +1143,26 @@ export function monthlyDiplomacy(world: World, news: News[]): void {
       aiOffersPeace(world, war, att === world.player ? def : att, news);
       continue;
     }
+    for (const loser of [def, att]) {
+      const victor = loser === def ? att : def;
+      const gaveUp = (war.surrendered ?? []).includes(world.nationIds[loser]!);
+      if (!gaveUp && !settlementTable(world, victor, loser)!.beaten) continue;
+      if (!gaveUp) {
+        markSurrender(world, loser, victor);
+        news.push({ kind: "peace", text: `${name(world, loser)} can fight no more and surrenders unconditionally to ${name(world, victor)}.`, nations: [loser, victor] });
+      }
+      offerPeace(world, victor, loser, "take", news, true);
+      break;
+    }
+    if (!d.wars.includes(war)) continue;
     // Each leader by its own peace voices (WAR-183, WAR-221): an obliged leader gives up what the enemy occupies.
     const sa = sidesOf(world, war, att);
     const defObliged = peaceVoices(world, def, war).obliged;
     const attObliged = peaceVoices(world, att, war).obliged;
     const months = dip.monthsBetween(war.start, dip.monthOf(d.date));
-    if (defObliged && occupiedBy(world, sa.theirs, sa.ours).length) offerPeace(world, att, def, "take", news, true);
-    else if (attObliged && occupiedBy(world, sa.ours, sa.theirs).length) offerPeace(world, def, att, "take", news, true);
-    else if (rel.aiMustAcceptPeace(months) || (attObliged && defObliged)) offerPeace(world, att, def, "white", news, true);
+    if (defObliged && occupiedBy(world, sa.theirs, sa.ours).length && !offerPeace(world, att, def, "take", news, true)) continue;
+    if (attObliged && occupiedBy(world, sa.ours, sa.theirs).length && !offerPeace(world, def, att, "take", news, true)) continue;
+    if (rel.aiMustAcceptPeace(months) || (attObliged && defObliged)) offerPeace(world, att, def, "white", news, true);
   }
 }
 
@@ -1043,19 +1178,33 @@ export function monthlyDiplomacy(world: World, news: News[]): void {
 export function aiDeclarations(world: World, news: News[]): void {
   const d = world.diplomacy;
   const chance = world.rules.defines.war.aiDeclareChancePerMonth;
+  const G = goalsConfig.goals;
   for (let n = 0; n < world.nationCount; n++) {
     if (n === world.player || world.nationGone[n] || dip.warOf(d, world.nationIds[n]!)) continue;
-    if (world.rng.next() >= chance) continue;
+    // A realm's goals make it look for a war more often (EVT-105).
+    const pulls = goalPulls(world, n);
+    const neighbours = () => dip.neighbours(d, world.nationIds[n]!).map((id) => world.nationIndex.get(id)!);
+    let near = pulls?.size ? neighbours() : null;
+    const most = near ? Math.max(0, ...near.map((t) => pulls!.get(t) ?? 0)) : 0;
+    if (world.rng.next() >= chance * (1 + G.war_chance_per_pull * most)) continue;
+    near ??= neighbours();
     const ctx = priceContext(world, n);
-    const targets = dip
-      .neighbours(d, world.nationIds[n]!)
-      .map((id) => world.nationIndex.get(id)!)
-      .filter((t) => t !== undefined && !world.nationGone[t] && relationState(world, n, t).state === null && !whyAiWontDeclare(world, n, t, priceOfWar(world, n, t, ctx)));
+    const targets = near.filter((t) => t !== undefined && !world.nationGone[t] && relationState(world, n, t).state === null && !whyAiWontDeclare(world, n, t, priceOfWar(world, n, t, ctx)));
     if (!targets.length) continue;
-    const t = targets[world.rng.int(targets.length)]!;
+    const t = most > 0 ? weightedPick(world, targets, (x) => 1 + G.target_weight_per_pull * (pulls!.get(x) ?? 0)) : targets[world.rng.int(targets.length)]!;
     if (demandFirst(world, n, t)) continue;
-    declareWar(world, n, t, news);
+    // A Take land aim on a place one of its goals names is the war's aim (EVT-105).
+    const place = goalPlacesHeldBy(world, n, t).map((p) => world.provinceIds[p]!).find((p) => dip.warAimsOf(d, world.nationIds[n]!, world.nationIds[t]!).some((h) => h.aim === "take_land" && h.province === p));
+    declareWar(world, n, t, news, place ? { aim: "take_land", province: place } : {});
   }
+}
+
+/** One of the items, each as likely as its weight. */
+function weightedPick(world: World, items: number[], weight: (x: number) => number): number {
+  const total = items.reduce((s, x) => s + weight(x), 0);
+  let r = world.rng.next() * total;
+  for (const x of items) if ((r -= weight(x)) < 0) return x;
+  return items.at(-1)!;
 }
 
 /**
@@ -1071,7 +1220,9 @@ function demandFirst(world: World, n: number, t: number): boolean {
   if (d.refusedDemands.some((x) => x.asker === a && x.asked === b)) return false;
   if (!whyNotDemand(world, n, t, "pay_tribute")) return !makeDemand(world, n, t, "pay_tribute");
   const capital = world.provinceIndex.get(world.rules.nations[t]!.capital);
-  const p = demandableProvinces(world, n, t).find((x) => x !== capital);
+  // A place one of its goals names is asked for first (EVT-105).
+  const can = demandableProvinces(world, n, t).filter((x) => x !== capital);
+  const p = goalPlacesHeldBy(world, n, t).find((x) => can.includes(x)) ?? can[0];
   if (p !== undefined && !whyNotDemand(world, n, t, "hand_over_province", p)) return !makeDemand(world, n, t, "hand_over_province", p);
   return false;
 }
@@ -1119,6 +1270,9 @@ export function aiMarches(world: World): void {
       halt(world, i);
       continue;
     }
+    // Already on its way there: the route it walks stands (planning one is most of this step's cost).
+    const walking = a.route[i]!;
+    if (walking.length && walking[walking.length - 1] === target) continue;
     const route = planRoute(world.rules.defines.march, marchMap(world), here, target, { men, horse: a.horse[i]!, logistics: 0 }, routeBars(world, i));
     if (route) {
       // Walked a province at a time: each stretch is planned over the tiles as the army gets there.

@@ -1,0 +1,139 @@
+<h1>Exploration and Colonies</h1>
+<p>Exploration is how your realm sails into the unknown and plants colonies there. Each country sees only the part of the world it has charted, with a parchment fog over the rest; exploration ships push into that fog, and once you can hire colonial governors you can carry one to an unowned coast, keep the colony fed from your ships, and watch it grow until the province becomes yours.</p>
+<h2 id="how-it-works"><a class="anchor" href="#how-it-works" aria-label="Link to this section">#</a>How it works</h2>
+<h3 id="unlocking-exploration"><a class="anchor" href="#unlocking-exploration" aria-label="Link to this section">#</a>Unlocking exploration</h3>
+<p>A country gets the <strong>exploration unlock</strong> when it knows S4 <em>Carrack and caravel</em> (or S3 <em>Outrigger voyaging</em>) and the <strong>Age of Exploration</strong> has begun in its region. Once the age has begun there, the gate stays open for that country even after the age ends. The gating age is one config line, <code>exploration.unlock_age</code>, set to the event tree&#39;s <code>age_of_exploration</code>. Regions outside that age&#39;s list wait for the first later age that covers them: North America opens with the Age of Atlantic Empires (1520), the Middle East and central Asia with the Age of Reformations (1530). So the Mamluks can know S4 early and still not explore until then.</p>
+<p>At the 1378 start nobody can explore. Genoa and Venice know S4, but the Age of Exploration has not begun; it starts when Portugal or Castile has the ocean ships or holds the Atlantic islands (earliest 1415, and by 1445 at the latest), see <a href="/wiki/Historical-Events">Historical Events</a>. Portugal and Castile don&#39;t know S4 yet and must research it first. Ming knows S1 and S2 but not S4.</p>
+<p>Without the unlock you can&#39;t buy exploration ships: no caravel without S4, no voyaging canoe without S3, and the age gate applies to voyaging canoes too. Where an exploration ship may sail is <a href="/wiki/Naval">Naval</a>&#39;s research rule: with S4 and S1 within 3 zones of a coast, with S5 the open ocean. Early voyages creep along the coasts.</p>
+<p><strong>The Pacific and Malay way.</strong> A country that knows S3 builds the <strong>voyaging canoe</strong> (outrigger or double-hulled) as its exploration ship: 60 supply, 100 rations of colony stores, crew 20, 5 gold, 1 timber and 1 month, built on any shore with seafolk. It can cross open ocean from the start. S3 also opens colonies with 1 colonial governor slot and a colonial range of at least 10 zones, whatever the government form; T8 and T9 add a slot each on top.</p>
+<h3 id="the-charted-map"><a class="anchor" href="#the-charted-map" aria-label="Link to this section">#</a>The charted map</h3>
+<p>Every country has its own <strong>charted map</strong> of the land provinces and sea zones it knows, and what it hasn&#39;t charted lies under the <strong>parchment</strong>.</p>
+<ul>
+<li>At the start a country has charted every province within 6 steps of its lands, plus every sea zone touching them.</li>
+<li>When an exploration ship enters a zone, that zone and every zone and coastal province next to it are charted.</li>
+<li>Any army or fleet charts what is next to where it stands.</li>
+<li>Charts are never lost: if Portugal charted the coast of Arguin and later loses every ship and province near it, the coast stays charted.</li>
+<li>Charts are never shared or handed over: not with allies, subjects or overlords, and not when land is conquered or inherited. Each country charts its own world.</li>
+<li>Only exploration ships enter uncharted zones. Trade and military fleets plan routes only through charted zones.</li>
+</ul>
+<h3 id="voyages"><a class="anchor" href="#voyages" aria-label="Link to this section">#</a>Voyages</h3>
+<p>You give a voyage to an exploration ship or a fleet of them by tapping zones one by one, uncharted ones allowed. The preview shows the zones and how many are uncharted, the supply needed out and back and any shortfall, the ports on the way (uncharted or undockable ones marked), and the <strong>low-supply choice</strong>:</p>
+<ul>
+<li><strong>Turn back</strong> (the default): when the supply left is just enough to reach the nearest port where it may dock, the ship turns and sails there.</li>
+<li><strong>Carry on</strong>: the ship sails the path to its end and runs out of supply if it must, losing 1 in 10 of its crew each zone.</li>
+</ul>
+<p>A voyage is given only to ships in port, so it always leaves with full supply; ships at sea must put into a port first. Supply is naval&#39;s: 1 per zone, 60 for exploration ships, refilled by docking (food in friendly ports, gold in neutral ones, nothing in an enemy&#39;s or a rival&#39;s). Newly charted land shows its terrain, its owner if any and its ports, and nothing else.</p>
+<p><strong>The São Gabriel.</strong> The caravel São Gabriel waits in Lagos with 60 supply. The player draws a voyage of 34 zones, 21 uncharted. The preview shows supply 60 of 60, 34 out and 34 back, 8 short; it lists Arguin as a canoe landing with no dock and Elmina as uncharted, and offers Turn back and Carry on.</p>
+<p><strong>Castile 1493, the first voyage.</strong> Castile has the unlock and knows S5. Three caravels sail from Seville to the Canaries and dock for food from the province, then sail 17 uncharted zones west with 60 supply each. The preview shows enough to get there and back; they chart the Bahamas and the coast of Hispaniola, and come home.</p>
+<h3 id="colonial-governors-and-range"><a class="anchor" href="#colonial-governors-and-range" aria-label="Link to this section">#</a>Colonial governors and range</h3>
+<p>Knowing S5 <em>Ocean navigation</em> lets a country hire <strong>colonial governors</strong>. A governor is hired like any official, in any of your ports, for <strong>20 gold</strong> and a wage of <strong>5 gold a year</strong>. He is a person: 30 when hired, a year older each January, and he can die. He needs a <strong>slot</strong>:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Source</th><th>Slots</th></tr></thead>
+<tbody>
+<tr><td>S5 Ocean navigation</td><td>2</td></tr>
+<tr><td>S3 Outrigger voyaging (without S5)</td><td>1</td></tr>
+<tr><td>T8 Licensed trading companies</td><td>+1 on top</td></tr>
+<tr><td>T9 Joint-stock finance</td><td>+1 on top</td></tr>
+</tbody></table></div>
+<p>Slots are never lost. With no free slot you can&#39;t hire. A governor holding a slot doesn&#39;t count against the government&#39;s officials cap. He leaves his slot when his colony is founded (he becomes its ordinary official and the slot frees), when it fails (he dies), by old age or by dismissal. He waits in a port of yours until a ship picks him up, and any ship can carry him.</p>
+<p><strong>Colonial range</strong> is how many sea zones from your nearest port or colony a colony may be founded. It counts from your own ports (your lords&#39; ports and canoe landings included), your subjects&#39; ports and the colonies you have founded, but not from a colony still being founded. The range comes from your government form:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Range</th><th>Government forms</th></tr></thead>
+<tbody>
+<tr><td>40</td><td>company rule</td></tr>
+<tr><td>30</td><td>merchant republic, constitutional monarchy, constitutional republic</td></tr>
+<tr><td>20</td><td>feudal realm, diet monarchy, absolute monarchy, party state</td></tr>
+<tr><td>15</td><td>military order, military junta, colonial government</td></tr>
+<tr><td>10</td><td>household realm, bureaucratic empire, elective monarchy, city commune, soldier emirs, shogunate</td></tr>
+<tr><td>5</td><td>prince-bishopric, holy rule, paramount chiefdom, tribute empire, warlord domain</td></tr>
+<tr><td>0</td><td>peasant commune, clan council, chiefdom, horde, confederation</td></tr>
+</tbody></table></div>
+<p>Once a colony is founded, range is measured from it too, so colonies chain across an ocean. Range is checked only when the governor goes ashore: if your government changes and your range shrinks, colonies already being founded carry on. Portugal, a feudal realm with range 20, can found a colony on an unowned coast of Brazil about 10 zones from a Portuguese port in the Cape Verde islands.</p>
+<h3 id="founding-a-colony"><a class="anchor" href="#founding-a-colony" aria-label="Link to this section">#</a>Founding a colony</h3>
+<p>A province can be colonised only when it is charted, coastal, owned by no country, has at least one free tile, lies inside your colonial range, and nobody else is already founding a colony there.</p>
+<ul>
+<li>Land owned by a country, tribal countries (a chiefdom or clan council in the start list) included, can&#39;t be colonised; it can only be taken by war or treaty. Hispaniola, held by a Taíno chiefdom, is one such case.</li>
+<li>Land that no realm on the map owns belongs to a people with no country, even where old records name a people or tribe there. A colony there takes only the free tiles, and the people&#39;s tiles stay theirs.</li>
+</ul>
+<p><strong>Going ashore.</strong> When a ship carrying a governor is in the province&#39;s coastal zone and you give <em>Found colony</em>, the governor goes ashore and the colony starts at <strong>10 progress</strong>. Its <strong>local aggression</strong> is rolled at once from the peoples in the province and its neighbours (a coast across one sea zone counts) and shown:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Aggression</th><th>Chance</th><th>Average progress lost a month</th><th>Months to 100 on average</th><th>Food needed on average</th></tr></thead>
+<tbody>
+<tr><td>Peaceful</td><td>30 %</td><td>0</td><td>18</td><td>360 rations</td></tr>
+<tr><td>Wary</td><td>30 %</td><td>1</td><td>23</td><td>460</td></tr>
+<tr><td>Hostile</td><td>25 %</td><td>2</td><td>30</td><td>600</td></tr>
+<tr><td>Fierce</td><td>15 %</td><td>3</td><td>45</td><td>900</td></tr>
+</tbody></table></div>
+<p>If nobody lives in the province or any neighbour, the colony is Peaceful.</p>
+<p><strong>Each month</strong> a colony being founded gains 5 progress from its settling party, loses the <strong>locals&#39; pressure</strong> (a whole number from 0 to twice the aggression&#39;s average, each equally likely: 0–2 for Wary, 0–4 for Hostile, 0–6 for Fierce), and eats 20 rations of colony food. If it has no food left it loses a further 10 progress that month.</p>
+<p><strong>Colony food</strong> comes only from ships. Exploration ships carry colony stores apart from their supply (a caravel 300 rations, a voyaging canoe 100), loaded in any port where the ship could resupply at the same cost as resupply. <em>Unload stores</em> moves them into colony food in one day from the colony&#39;s coastal zone, with no port needed.</p>
+<ul>
+<li><strong>Founded</strong>: at 100 progress the province becomes one of your own royal provinces with its settlement at <em>settlement</em>. The governor stays as its official (now counting against the officials cap), his slot frees, and left-over colony food goes into the province&#39;s store. From there the <a href="/wiki/Provinces">Provinces</a> rules (settlers, local tiles) take over; it becomes a Colony subject only if you later charter it under the <a href="/wiki/Subjects">Subjects</a> rules. The event tree&#39;s colonial presence counts it, together with the trading posts you hold, but not colonies still being founded.</li>
+<li><strong>Lost</strong>: at 0 progress the governor dies, the colony food is lost, the slot frees and the province stays unowned. The colony is lost the same way if its governor dies of old age, or if another realm gains the province while you are founding it. A governor at sea dies if his ship sinks.</li>
+<li><strong>Abandon</strong>: while one of your ships is in the colony&#39;s zone you can take the governor back aboard. The colony food left ashore is lost. He can go ashore on another coast at once with <em>Found colony</em>; otherwise his slot stays used until he is home in a port.</li>
+</ul>
+<p><strong>Castile 1493, the second trip.</strong> Castile has a colonial governor in slot 1 of 2 and a feudal range of 20. Two caravels load 600 rations of colony stores and the governor and sail to an unowned coast on a small island 17 zones from the Canaries. Castile gives <em>Found colony</em>; the Taíno across the strait make the roll Hostile, and the caravels unload all 600 rations. The colony gains about 3 progress a month. After a bad run of rolls a third caravel brings 300 more rations in year two, and the colony reaches 100 in month 31 and becomes a Castilian province. The governor stays as its official and his slot frees for the next colony.</p>
+<h3 id="the-computer-players"><a class="anchor" href="#the-computer-players" aria-label="Link to this section">#</a>The computer players</h3>
+<p>A country whose catalogue personality favours expansion by sea sends exploration ships along the edge of its charted map, then founds colonies on the nearest unowned coasts, always loading the stores its rolled aggression needs on average plus a quarter: 450 rations for Peaceful, 575 for Wary, 750 for Hostile and 1,125 for Fierce. Land powers never explore. The AI uses the same commands as the player. Charted maps are stored as one bit per province and zone per country, and colonies update once a month with the province.</p>
+<h2 id="how-you-play-it"><a class="anchor" href="#how-you-play-it" aria-label="Link to this section">#</a>How you play it</h2>
+<p>Most of exploration happens on the fleet card and the map; the Colonies tab is its overview.</p>
+<ul>
+<li><strong>Order a caravel</strong> on the Port tab of a coastal province, like any ship. It sails in its own fleet of explorers and needs no admiral.</li>
+<li><strong>Explore</strong> on the fleet card (in port) folds the card away and brings up the <strong>voyage bar</strong> along the bottom of the map. Tap sea zones, under the parchment or not: each tap adds a leg, the course is drawn in gold, and the bar shows the zones, how many are uncharted, the supply out and back and any shortfall. Pick <em>Turn back</em> or <em>Carry on</em>, then <em>Set sail</em>; <em>Undo</em> takes back the last leg and <em>Cancel</em> drops the course. A zone too far out for your ships&#39; reach says why when tapped.</li>
+<li>As the fleet sails the <strong>parchment lifts</strong> from every zone and coast next to it, and a news line reports how many places the voyage charted when it ends.</li>
+<li><strong>The Colony section</strong> of the same card (once you know Ocean navigation): <em>Hire a colonial governor</em> in a port of yours, <em>Load</em> colony stores, then at sea beside an empty coast one <em>Found a colony in …</em> button per coast, each with the reason underneath when it can&#39;t be used. Beside your colony, <em>Unload</em> puts the stores ashore.</li>
+<li><strong>A colony being founded</strong> shows its card on the province: progress and the month&#39;s change, the locals, food and whether it will last, and <em>Abandon</em> when a ship of yours lies beside it. On the map it is a small flag over a ring that fills as it grows.</li>
+<li><strong>The Exploration map mode</strong> (Map mode menu) shows what you have charted, empty coasts inside your colonial range in bright green, empty land beyond it in pale green and colonies being founded in gold.</li>
+<li><strong>The Colonies tab</strong> of your country card: governors used of slots and the range, where each governor is (tap to go there), colonies being founded with their progress and food, those founded, and how many empty coasts lie in range, with a button to the Exploration map mode.</li>
+</ul>
+<p>On a phone in landscape the voyage bar sits between the overview button and End turn, wraps its buttons rather than shrinking them, and every reason is written under its button since there is no hover.</p>
+<p><strong>In the game today.</strong> Until the map records regions per province and who works each tile, a realm&#39;s region for the age gate comes from the event tree&#39;s region list or the scenario catalogue&#39;s region, every unowned land province has one free tile, and a founded colony keeps the people living there, who become yours. The computer players that explore are the sea-minded realms of the catalogue (Castile, Portugal, Novgorod): each keeps one caravel exploring the edge of its charts and, once it can hire governors, settles the nearest empty coast in range with the stores it needs.</p>
+<h2 id="how-it-connects"><a class="anchor" href="#how-it-connects" aria-label="Link to this section">#</a>How it connects</h2>
+<ul>
+<li><a href="/wiki/Naval">Naval</a>: ship families, the caravel and voyaging canoe, 60 supply, colony stores, docking and sailing reach; exploration gives back the unlock and the charted map.</li>
+<li><a href="/wiki/Research">Research</a>: S3, S4, S5, T8, T9 and S1.</li>
+<li><a href="/wiki/Historical-Events">Historical-Events</a>: the Age of Exploration and its regions open the gate; founded colonies count toward <code>colonial_presence</code>.</li>
+<li><a href="/wiki/Government">Government</a>: colonial range per form, the officials cap and the governor exemption.</li>
+<li><a href="/wiki/Provinces">Provinces</a>: the founded colony as province state, free tiles and the colonial governor official type.</li>
+<li><a href="/wiki/Subjects">Subjects</a>: a founded colony is a royal province until it is chartered as a Colony subject; subjects&#39; ports count for colonial range.</li>
+<li><a href="/wiki/World-Map">World-Map</a>: sea zones, coastal provinces and adjacency.</li>
+<li><a href="/wiki/The-1378-Start">The 1378 Start</a>: which land is owned at the start and which is unowned with peoples on it.</li>
+<li><a href="/wiki/Your-Realm">Your-Realm</a>: the country card line and the governor&#39;s gold and wage.</li>
+<li><a href="/wiki/Troop-Movement">Troop-Movement</a>: the shared planner and day loop voyages use.</li>
+<li><a href="/wiki/Diplomacy">Diplomacy</a>: war and rivalry close ports to a voyage.</li>
+<li><a href="/wiki/Map-and-Lenses">Map and Map Modes</a>: the parchment, paths, flags, range line and colony card.</li>
+<li><a href="/wiki/Time-and-Turns">Time-and-Turns</a>: the monthly colony update and the day loop.</li>
+</ul>
+<h2 id="numbers"><a class="anchor" href="#numbers" aria-label="Link to this section">#</a>Numbers</h2>
+<p>One exploration config file; only <code>exploration.unlock_age</code> is named by the design, the other keys are proposed. Everything except the age is <strong>provisional</strong> and still being balanced.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>exploration.unlock_age</code></td><td><code>age_of_exploration</code> (decided)</td></tr>
+<tr><td><code>exploration.unlock_inventions</code></td><td>S4 or S3</td></tr>
+<tr><td><code>exploration.colonial_unlock_invention</code></td><td>S5</td></tr>
+<tr><td><code>exploration.governor_slots</code></td><td>S5 2, else S3 1; T8 +1; T9 +1</td></tr>
+<tr><td><code>exploration.s3_min_range</code></td><td>10 zones</td></tr>
+<tr><td><code>exploration.range_by_form</code></td><td>40 / 30 / 20 / 15 / 10 / 5 / 0 (owned by government)</td></tr>
+<tr><td><code>exploration.start_charted_reach</code></td><td>6 steps</td></tr>
+<tr><td><code>exploration.progress_start</code></td><td>10</td></tr>
+<tr><td><code>exploration.progress_founded</code> / <code>lost</code></td><td>100 / 0</td></tr>
+<tr><td><code>exploration.progress_gain</code></td><td>+5 a month</td></tr>
+<tr><td><code>exploration.aggression</code></td><td>Peaceful 30 %, 0; Wary 30 %, 1; Hostile 25 %, 2; Fierce 15 %, 3</td></tr>
+<tr><td><code>exploration.pressure_roll_max_factor</code></td><td>0 to 2 × average</td></tr>
+<tr><td><code>exploration.food_per_month</code></td><td>20 rations</td></tr>
+<tr><td><code>exploration.no_food_progress_loss</code></td><td>10</td></tr>
+<tr><td><code>exploration.colony_stores</code></td><td>caravel 300, voyaging canoe 100</td></tr>
+<tr><td><code>exploration.unload_days</code></td><td>1</td></tr>
+<tr><td><code>exploration.governor_hire_gold</code> / <code>governor_wage_per_year</code></td><td>20 gold / 5 gold a year</td></tr>
+<tr><td><code>exploration.governor_age_when_hired</code></td><td>30</td></tr>
+<tr><td><code>exploration.ai.stores_margin</code></td><td>1.25</td></tr>
+</tbody></table></div>
+<h2 id="still-open"><a class="anchor" href="#still-open" aria-label="Link to this section">#</a>Still open</h2>
+<p>Nothing in exploration waits on a design decision any more. There is no first contact or disease when worlds meet: voyages chart land and nothing else happens, by design. The numbers above are provisional and will move with balancing.</p>
+<h2 id="for-developers"><a class="anchor" href="#for-developers" aria-label="Link to this section">#</a>For developers</h2>
+<ul>
+<li>Spec: <code>domain/exploration/spec.md</code> in the game repository, requirement code <strong>EXPL</strong> (EXPL-001 to EXPL-075; EXPL-069 to EXPL-074 are the screens).</li>
+<li>Features: <code>domain/exploration/features/</code>: <code>unlocking-exploration.feature</code>, <code>charted-map.feature</code>, <code>voyages.feature</code> (São Gabriel, Castile 1493), <code>colonial-governors.feature</code>, <code>founding-a-colony.feature</code> (Castile 1493) and <code>exploration-ai.feature</code>.</li>
+<li>Code: the rules in <code>packages/engine/src/domain/exploration/</code>, the game in <code>packages/engine/src/exploration.ts</code> (charts, unlock) and <code>colonies.ts</code> (voyages, governors, colonies, AI, the player&#39;s view); numbers in <code>packages/rules/data/domain/exploration.json</code>. Screens in <code>apps/client/src/ui/explore.ts</code>, checked on phones by <code>apps/client/scripts/explore-shots.mjs</code>.</li>
+</ul>

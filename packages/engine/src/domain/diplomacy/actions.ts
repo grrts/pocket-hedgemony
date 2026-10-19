@@ -21,7 +21,7 @@ export function envoySeats(d: Diplomacy, c: string): number {
   const s = C.envoys.seats;
   let n = s.base + Math.min(1, k.extraSeats) + (k.courtEnvoys ?? 0);
   if (k.provinces > s.extra_if_provinces_over.provinces) n += s.extra_if_provinces_over.seats;
-  for (const [inv, add] of Object.entries(s.inventions)) if (k.inventions.includes(inv)) n += add;
+  if (k.inventions.length) for (const [inv, add] of Object.entries(s.inventions)) if (k.inventions.includes(inv)) n += add;
   return n;
 }
 
@@ -32,7 +32,10 @@ export function envoysAbroad(d: Diplomacy, c: string): Envoy[] {
 }
 
 export function freeSeats(d: Diplomacy, c: string): number {
-  return envoySeats(d, c) - envoysAbroad(d, c).length;
+  // Counted without building envoysAbroad's list.
+  let abroad = 0;
+  for (const e of d.envoys) if (e.country === c && ABROAD.includes(e.status)) abroad++;
+  return envoySeats(d, c) - abroad;
 }
 
 /**
@@ -50,6 +53,14 @@ export function enforceSeats(d: Diplomacy, c: string): Envoy[] {
     over--;
   }
   return out;
+}
+
+/** enforceSeats for every country, only where the envoys abroad (counted in one pass) are over the seats. */
+function enforceAllSeats(d: Diplomacy): void {
+  const abroad = new Map<string, number>();
+  for (const e of d.envoys) if (ABROAD.includes(e.status)) abroad.set(e.country, (abroad.get(e.country) ?? 0) + 1);
+  // A recall touches only that country's envoys, so the others' counts hold.
+  for (const c of Object.keys(d.countries)) if ((abroad.get(c) ?? 0) > envoySeats(d, c)) enforceSeats(d, c);
 }
 
 /** The realm's province count changes (realm supplies it); seats follow at once. */
@@ -442,7 +453,7 @@ export function freedBy(d: Diplomacy, freed: string, liberator: string): void {
 const AIM_NAMES: Record<string, string> = {
   take_land: "Take land", seat_pretender: "Seat a pretender", tribute: "Tribute", free_people: "Free a people", break_subject: "Break a subject",
   defend_faith: "Defend the faith", punish: "Punish", raid: "Raid", no_aim: "No aim",
-  restore_imperial_land: "Restore imperial land", breaker_of_the_peace: "Breaker of the Peace",
+  restore_imperial_land: "Restore imperial land", breaker_of_the_peace: "Breaker of the Peace", bring_to_heel: "Bring to heel",
 };
 export const aimName = (id: string) => AIM_NAMES[id] ?? id;
 export const aimId = (name: string) => Object.entries(AIM_NAMES).find(([, n]) => n === name)?.[0] ?? name;
@@ -1193,7 +1204,7 @@ export function advanceMonth(d: Diplomacy, rng?: Rng): void {
   d.graph.date = d.date;
   lapseAsks(d);
   moveEnvoys(d);
-  for (const c of Object.keys(d.countries)) enforceSeats(d, c);
+  enforceAllSeats(d);
   fundingMonth(d, rng);
   for (const t of rel.expireTruces(d.graph)) emit(d, "TruceExpired", { pair: [t.source, t.target] });
   d.passages = d.passages.filter((p) => monthOf(d.date) < p.until);
@@ -1206,7 +1217,7 @@ export function advanceMonth(d: Diplomacy, rng?: Rng): void {
 export function envoysAndLedgers(d: Diplomacy): void {
   lapseAsks(d);
   moveEnvoys(d);
-  for (const c of Object.keys(d.countries)) enforceSeats(d, c);
+  enforceAllSeats(d);
   fadeLedgers(d);
 }
 

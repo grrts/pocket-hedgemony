@@ -192,6 +192,14 @@ export interface NationDef {
   commanders: CommanderDef[];
   /** Men under arms at the start (1444), a rough historical estimate; realms without one start with a quarter of their troop cap. */
   army?: number;
+  /** A sleeping realm (SETUP-080): listed from the start, holding nothing until it wakes. */
+  asleep?: true;
+  /** A spare sleeper with no name of its own, named and coloured when it wakes (SETUP-081). */
+  spare?: true;
+  /** The event tree's ids for this realm, besides its own id (SETUP-080). */
+  tree?: string[];
+  /** A sleeping realm's home land: the provinces it wakes on when nothing else names its land (SETUP-084). */
+  home?: string[];
 }
 
 export type Terrain =
@@ -260,8 +268,8 @@ export interface CultureNames {
   ranks?: Partial<Record<Rank, string>>;
 }
 
-/** What a commander is doing: leading an army, leading a fleet, or captaining a hired company. */
-export type Rank = "general" | "admiral" | "captain";
+/** What a commander is doing: leading an army, leading a fleet in one of its three posts (NAVY-152), or captaining a hired company. */
+export type Rank = "general" | "admiral" | "commodore" | "viceroy" | "captain";
 
 /** Names for officials and commanders by culture, and each realm's culture (feedback 33). */
 export interface NameBook {
@@ -314,4 +322,32 @@ export interface LivingDefines {
   reliefAboveMonths: number;
   /** Treasury gold a gift to a lord costs (realm: gift_of_gold raises his loyalty a step). */
   lordGiftGold: number;
+}
+
+/** A place a goal names: a point bound to the nearest land province (EVT-100). */
+export interface GoalPlace {
+  name: string;
+  at: [number, number];
+}
+
+/** What the game reads from a historical goal (EVT-100); none when the map can't express it. */
+export type GoalAim =
+  | { kind: "take"; places: GoalPlace[]; target?: string }
+  | { kind: "hold"; places: GoalPlace[]; target?: string }
+  | { kind: "subject" | "ally" | "fight" | "free"; target: string };
+
+/** A realm's historical goal with its reason (EVT-100, plan-1378 §2). */
+export interface GoalDef {
+  realm: string;
+  goal: string;
+  reason: string;
+  ends_when: string;
+  /** First and last year; a window with no last year stays open. */
+  window: [number, number | null];
+  weight: "weak" | "normal" | "strong";
+  deviation: string;
+  aim: GoalAim | null;
+  alternative?: GoalAim | null;
+  /** Keys of the history checkpoints' turning points it leads toward. */
+  toward?: string[];
 }

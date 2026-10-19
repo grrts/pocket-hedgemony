@@ -1,0 +1,2972 @@
+{
+  "date": "1914-06-28",
+  "label": "Sarajevo",
+  "why": "The assassination of Archduke Franz Ferdinand catches the European empires and their colonial holdings at their largest extent, on the eve of the war that ends four of them.",
+  "realms": [
+    {
+      "id": "england",
+      "name": "United Kingdom of Great Britain and Ireland",
+      "rank": "great_power",
+      "capital": {
+        "name": "London",
+        "at": [
+          -0.12,
+          51.5
+        ]
+      },
+      "overlord": null,
+      "ruler": "George V (PM H. H. Asquith)",
+      "catalogue_id": "england",
+      "note": "Map id england used for the United Kingdom as England's successor state. British India (direct rule), crown colonies and protectorates are counted as held by it; dominions and protected states are listed separately with overlord england. Irish Home Rule crisis at its height."
+    },
+    {
+      "id": "france",
+      "name": "French Republic",
+      "rank": "great_power",
+      "capital": {
+        "name": "Paris",
+        "at": [
+          2.35,
+          48.86
+        ]
+      },
+      "overlord": null,
+      "ruler": "President Raymond Poincaré (PM René Viviani)",
+      "catalogue_id": "france",
+      "note": "Third Republic; Algeria administered as départements; protectorates over Morocco, Tunisia, Annam, Cambodia, Laos."
+    },
+    {
+      "id": "germany",
+      "name": "German Empire",
+      "rank": "great_power",
+      "capital": {
+        "name": "Berlin",
+        "at": [
+          13.4,
+          52.52
+        ]
+      },
+      "overlord": null,
+      "ruler": "Wilhelm II, German Emperor (Chancellor Theobald von Bethmann Hollweg)",
+      "catalogue_id": null,
+      "note": "Federal empire proclaimed 18 Jan 1871; its member states are listed with overlord germany. Colonies (East Africa, South-West Africa, Kamerun, Togo, Pacific) held by the Reich."
+    },
+    {
+      "id": "austria",
+      "name": "Austria-Hungary",
+      "rank": "great_power",
+      "capital": {
+        "name": "Vienna",
+        "at": [
+          16.37,
+          48.21
+        ]
+      },
+      "overlord": null,
+      "ruler": "Franz Joseph I (Emperor of Austria, King of Hungary)",
+      "catalogue_id": "austria",
+      "note": "Dual Monarchy since the 1867 Compromise; Hungary is a co-equal kingdom, not a vassal, and is counted inside this realm. Heir Archduke Franz Ferdinand assassinated in Sarajevo this day."
+    },
+    {
+      "id": "muscovy",
+      "name": "Russian Empire",
+      "rank": "great_power",
+      "capital": {
+        "name": "Saint Petersburg",
+        "at": [
+          30.32,
+          59.94
+        ]
+      },
+      "overlord": null,
+      "ruler": "Nicholas II",
+      "catalogue_id": "muscovy",
+      "note": "Map id muscovy used for the Russian Empire. Includes Congress Poland, the Baltic and Caucasus governorates and Russian Turkestan."
+    },
+    {
+      "id": "savoy",
+      "name": "Kingdom of Italy",
+      "rank": "great_power",
+      "capital": {
+        "name": "Rome",
+        "at": [
+          12.5,
+          41.9
+        ]
+      },
+      "overlord": null,
+      "ruler": "Victor Emmanuel III (PM Antonio Salandra)",
+      "catalogue_id": null,
+      "note": "Kingdom of Sardinia (Savoy) renamed on unification, 17 Mar 1861. Holds Libya, Eritrea, Italian Somaliland and (occupied since 1912) the Dodecanese. Settimana Rossa unrest earlier in June."
+    },
+    {
+      "id": "united_states",
+      "name": "United States of America",
+      "rank": "great_power",
+      "capital": {
+        "name": "Washington, D.C.",
+        "at": [
+          -77.04,
+          38.9
+        ]
+      },
+      "overlord": null,
+      "ruler": "President Woodrow Wilson",
+      "catalogue_id": null,
+      "note": "Holds the Philippines, Puerto Rico, Hawaii, Panama Canal Zone; occupying Veracruz since 21 Apr 1914."
+    },
+    {
+      "id": "japan",
+      "name": "Empire of Japan",
+      "rank": "great_power",
+      "capital": {
+        "name": "Tokyo",
+        "at": [
+          139.69,
+          35.69
+        ]
+      },
+      "overlord": null,
+      "ruler": "Emperor Taishō (PM Ōkuma Shigenobu)",
+      "catalogue_id": null,
+      "note": "Map id japan; Korea annexed 1910, Taiwan since 1895, Kwantung leased territory."
+    },
+    {
+      "id": "ottomans",
+      "name": "Ottoman Empire",
+      "rank": "major",
+      "capital": {
+        "name": "Constantinople",
+        "at": [
+          28.98,
+          41.01
+        ]
+      },
+      "overlord": null,
+      "ruler": "Mehmed V (power with the CUP: Talat, Enver, Djemal Pasha)",
+      "catalogue_id": "ottoman",
+      "note": "Lost Libya (1912) and most of Rumelia (1913); retook Edirne in July 1913. Nominal suzerain of Egypt and Cyprus."
+    },
+    {
+      "id": "castile",
+      "name": "Kingdom of Spain",
+      "rank": "major",
+      "capital": {
+        "name": "Madrid",
+        "at": [
+          -3.7,
+          40.42
+        ]
+      },
+      "overlord": null,
+      "ruler": "Alfonso XIII (PM Eduardo Dato)",
+      "catalogue_id": "castile",
+      "note": "Map id castile used for Spain. Holds Ceuta, Melilla, the northern Moroccan protectorate zone, Canaries, Río de Oro, Spanish Guinea."
+    },
+    {
+      "id": "netherlands",
+      "name": "Kingdom of the Netherlands",
+      "rank": "major",
+      "capital": {
+        "name": "Amsterdam",
+        "at": [
+          4.9,
+          52.37
+        ]
+      },
+      "overlord": null,
+      "ruler": "Queen Wilhelmina (PM Pieter Cort van der Linden)",
+      "catalogue_id": null,
+      "note": "Government sits at The Hague. Holds the Dutch East Indies, Suriname, Curaçao."
+    },
+    {
+      "id": "china",
+      "name": "Republic of China",
+      "rank": "major",
+      "capital": {
+        "name": "Beijing",
+        "at": [
+          116.4,
+          39.9
+        ]
+      },
+      "overlord": null,
+      "ruler": "President Yuan Shikai",
+      "catalogue_id": null,
+      "note": "Qing abdicated 12 Feb 1912. Yuan governs under the Constitutional Compact of May 1914; provinces under military governors; Outer Mongolia and Tibet de facto lost."
+    },
+    {
+      "id": "brandenburg",
+      "name": "Kingdom of Prussia",
+      "rank": "major",
+      "capital": {
+        "name": "Berlin",
+        "at": [
+          13.4,
+          52.52
+        ]
+      },
+      "overlord": "germany",
+      "ruler": "Wilhelm II, King of Prussia",
+      "catalogue_id": "brandenburg",
+      "note": "Map id brandenburg used for Prussia, the dominant member state of the German Empire (Rhineland, East Prussia, Posen, Silesia, Schleswig-Holstein, Hanover)."
+    },
+    {
+      "id": "canada",
+      "name": "Dominion of Canada",
+      "rank": "major",
+      "capital": {
+        "name": "Ottawa",
+        "at": [
+          -75.7,
+          45.42
+        ]
+      },
+      "overlord": "england",
+      "ruler": "George V (Governor General Prince Arthur, Duke of Connaught; PM Robert Borden)",
+      "catalogue_id": null,
+      "note": "Self-governing dominion since Confederation, 1 Jul 1867."
+    },
+    {
+      "id": "australia",
+      "name": "Commonwealth of Australia",
+      "rank": "major",
+      "capital": {
+        "name": "Melbourne",
+        "at": [
+          144.96,
+          -37.81
+        ]
+      },
+      "overlord": "england",
+      "ruler": "George V (Governor-General Ronald Munro Ferguson; PM Joseph Cook)",
+      "catalogue_id": null,
+      "note": "Federated 1 Jan 1901; parliament sits in Melbourne pending Canberra."
+    },
+    {
+      "id": "south_africa",
+      "name": "Union of South Africa",
+      "rank": "major",
+      "capital": {
+        "name": "Pretoria",
+        "at": [
+          28.19,
+          -25.75
+        ]
+      },
+      "overlord": "england",
+      "ruler": "George V (Governor-General Viscount Gladstone; PM Louis Botha)",
+      "catalogue_id": null,
+      "note": "Union of 31 May 1910; Pretoria administrative, Cape Town legislative capital."
+    },
+    {
+      "id": "persia",
+      "name": "Persia (Qajar)",
+      "rank": "major",
+      "capital": {
+        "name": "Tehran",
+        "at": [
+          51.39,
+          35.69
+        ]
+      },
+      "overlord": null,
+      "ruler": "Ahmad Shah Qajar (crowned 21 Jul 1914 on coming of age)",
+      "catalogue_id": null,
+      "note": "Divided into Russian (north) and British (south-east) spheres by the 1907 convention; Russian troops in Tabriz and the north."
+    },
+    {
+      "id": "brazil",
+      "name": "Republic of the United States of Brazil",
+      "rank": "major",
+      "capital": {
+        "name": "Rio de Janeiro",
+        "at": [
+          -43.17,
+          -22.91
+        ]
+      },
+      "overlord": null,
+      "ruler": "President Hermes da Fonseca",
+      "catalogue_id": null
+    },
+    {
+      "id": "argentina",
+      "name": "Argentine Republic",
+      "rank": "major",
+      "capital": {
+        "name": "Buenos Aires",
+        "at": [
+          -58.38,
+          -34.6
+        ]
+      },
+      "overlord": null,
+      "ruler": "Victorino de la Plaza, acting for the ailing President Roque Sáenz Peña",
+      "catalogue_id": null
+    },
+    {
+      "id": "bavaria",
+      "name": "Kingdom of Bavaria",
+      "rank": "minor",
+      "capital": {
+        "name": "Munich",
+        "at": [
+          11.58,
+          48.14
+        ]
+      },
+      "overlord": "germany",
+      "ruler": "Ludwig III",
+      "catalogue_id": "bavaria_munich",
+      "note": "Map id bavaria. Member state of the German Empire with its own army and railways."
+    },
+    {
+      "id": "saxony",
+      "name": "Kingdom of Saxony",
+      "rank": "minor",
+      "capital": {
+        "name": "Dresden",
+        "at": [
+          13.74,
+          51.05
+        ]
+      },
+      "overlord": "germany",
+      "ruler": "Frederick Augustus III",
+      "catalogue_id": "saxony",
+      "note": "Member state of the German Empire."
+    },
+    {
+      "id": "wurttemberg",
+      "name": "Kingdom of Württemberg",
+      "rank": "minor",
+      "capital": {
+        "name": "Stuttgart",
+        "at": [
+          9.18,
+          48.78
+        ]
+      },
+      "overlord": "germany",
+      "ruler": "William II",
+      "catalogue_id": "wurttemberg_stuttgart",
+      "note": "Member state of the German Empire."
+    },
+    {
+      "id": "baden",
+      "name": "Grand Duchy of Baden",
+      "rank": "minor",
+      "capital": {
+        "name": "Karlsruhe",
+        "at": [
+          8.4,
+          49.01
+        ]
+      },
+      "overlord": "germany",
+      "ruler": "Frederick II",
+      "catalogue_id": "baden",
+      "note": "Member state of the German Empire."
+    },
+    {
+      "id": "hesse_darmstadt",
+      "name": "Grand Duchy of Hesse",
+      "rank": "minor",
+      "capital": {
+        "name": "Darmstadt",
+        "at": [
+          8.65,
+          49.87
+        ]
+      },
+      "overlord": "germany",
+      "ruler": "Ernst Ludwig",
+      "catalogue_id": "hesse",
+      "note": "Hesse-Darmstadt; member state of the German Empire."
+    },
+    {
+      "id": "mecklenburg",
+      "name": "Grand Duchy of Mecklenburg-Schwerin",
+      "rank": "minor",
+      "capital": {
+        "name": "Schwerin",
+        "at": [
+          11.41,
+          53.63
+        ]
+      },
+      "overlord": "germany",
+      "ruler": "Frederick Francis IV",
+      "catalogue_id": "mecklenburg",
+      "note": "Member state of the German Empire."
+    },
+    {
+      "id": "hamburg",
+      "name": "Free and Hanseatic City of Hamburg",
+      "rank": "minor",
+      "capital": {
+        "name": "Hamburg",
+        "at": [
+          9.99,
+          53.55
+        ]
+      },
+      "overlord": "germany",
+      "ruler": "Senate of Hamburg",
+      "catalogue_id": "hamburg",
+      "note": "City-state of the German Empire."
+    },
+    {
+      "id": "lubeck",
+      "name": "Free and Hanseatic City of Lübeck",
+      "rank": "minor",
+      "capital": {
+        "name": "Lübeck",
+        "at": [
+          10.69,
+          53.87
+        ]
+      },
+      "overlord": "germany",
+      "ruler": "Senate of Lübeck",
+      "catalogue_id": "lubeck",
+      "note": "City-state of the German Empire."
+    },
+    {
+      "id": "belgium",
+      "name": "Kingdom of Belgium",
+      "rank": "minor",
+      "capital": {
+        "name": "Brussels",
+        "at": [
+          4.35,
+          50.85
+        ]
+      },
+      "overlord": null,
+      "ruler": "Albert I",
+      "catalogue_id": null,
+      "note": "Independent since 1830; neutrality guaranteed by the 1839 Treaty of London. Holds the Belgian Congo (annexed 1908)."
+    },
+    {
+      "id": "luxembourg",
+      "name": "Grand Duchy of Luxembourg",
+      "rank": "minor",
+      "capital": {
+        "name": "Luxembourg",
+        "at": [
+          6.13,
+          49.61
+        ]
+      },
+      "overlord": null,
+      "ruler": "Grand Duchess Marie-Adélaïde",
+      "catalogue_id": "luxembourg",
+      "note": "Neutral since 1867; personal union with the Netherlands ended 1890; in the German customs union."
+    },
+    {
+      "id": "switzerland",
+      "name": "Swiss Confederation",
+      "rank": "minor",
+      "capital": {
+        "name": "Bern",
+        "at": [
+          7.45,
+          46.95
+        ]
+      },
+      "overlord": null,
+      "ruler": "Federal Council (President of the Confederation Arthur Hoffmann)",
+      "catalogue_id": "swiss_confederation",
+      "note": "Map id switzerland; federal state since 1848."
+    },
+    {
+      "id": "portugal",
+      "name": "Portuguese Republic",
+      "rank": "minor",
+      "capital": {
+        "name": "Lisbon",
+        "at": [
+          -9.14,
+          38.72
+        ]
+      },
+      "overlord": null,
+      "ruler": "President Manuel de Arriaga (PM Bernardino Machado)",
+      "catalogue_id": "portugal",
+      "note": "Republic since 5 Oct 1910; holds Angola, Mozambique, Portuguese Guinea, Goa, Macau, Timor."
+    },
+    {
+      "id": "denmark",
+      "name": "Kingdom of Denmark",
+      "rank": "minor",
+      "capital": {
+        "name": "Copenhagen",
+        "at": [
+          12.57,
+          55.68
+        ]
+      },
+      "overlord": null,
+      "ruler": "Christian X",
+      "catalogue_id": "denmark",
+      "note": "Holds Iceland (home rule), Greenland, Faroes, Danish West Indies."
+    },
+    {
+      "id": "sweden",
+      "name": "Kingdom of Sweden",
+      "rank": "minor",
+      "capital": {
+        "name": "Stockholm",
+        "at": [
+          18.07,
+          59.33
+        ]
+      },
+      "overlord": null,
+      "ruler": "Gustaf V (PM Hjalmar Hammarskjöld)",
+      "catalogue_id": "sweden"
+    },
+    {
+      "id": "norway",
+      "name": "Kingdom of Norway",
+      "rank": "minor",
+      "capital": {
+        "name": "Kristiania",
+        "at": [
+          10.75,
+          59.91
+        ]
+      },
+      "overlord": null,
+      "ruler": "Haakon VII",
+      "catalogue_id": "norway",
+      "note": "Union with Sweden dissolved 7 Jun 1905."
+    },
+    {
+      "id": "finland",
+      "name": "Grand Duchy of Finland",
+      "rank": "minor",
+      "capital": {
+        "name": "Helsinki",
+        "at": [
+          24.94,
+          60.17
+        ]
+      },
+      "overlord": "muscovy",
+      "ruler": "Nicholas II as Grand Duke (Governor-General Franz Albert Seyn)",
+      "catalogue_id": null,
+      "note": "Autonomous grand duchy under russification pressure."
+    },
+    {
+      "id": "serbia",
+      "name": "Kingdom of Serbia",
+      "rank": "minor",
+      "capital": {
+        "name": "Belgrade",
+        "at": [
+          20.46,
+          44.82
+        ]
+      },
+      "overlord": null,
+      "ruler": "Peter I (Crown Prince Alexander regent from 24 Jun 1914; PM Nikola Pašić)",
+      "catalogue_id": "serbia",
+      "note": "Doubled in size after the Balkan Wars (Kosovo, Vardar Macedonia)."
+    },
+    {
+      "id": "montenegro",
+      "name": "Kingdom of Montenegro",
+      "rank": "minor",
+      "capital": {
+        "name": "Cetinje",
+        "at": [
+          18.92,
+          42.39
+        ]
+      },
+      "overlord": null,
+      "ruler": "Nicholas I",
+      "catalogue_id": null,
+      "note": "Kingdom since 1910; gained part of the Sanjak in 1913."
+    },
+    {
+      "id": "bulgaria",
+      "name": "Tsardom of Bulgaria",
+      "rank": "minor",
+      "capital": {
+        "name": "Sofia",
+        "at": [
+          23.32,
+          42.7
+        ]
+      },
+      "overlord": null,
+      "ruler": "Tsar Ferdinand I (PM Vasil Radoslavov)",
+      "catalogue_id": null,
+      "note": "Autonomous principality 1878, independent 5 Oct 1908; lost the Second Balkan War."
+    },
+    {
+      "id": "romania",
+      "name": "Kingdom of Romania",
+      "rank": "minor",
+      "capital": {
+        "name": "Bucharest",
+        "at": [
+          26.1,
+          44.43
+        ]
+      },
+      "overlord": null,
+      "ruler": "Carol I",
+      "catalogue_id": null,
+      "note": "United Principalities of Wallachia and Moldavia (1859), independent 1878, kingdom 1881; took Southern Dobruja in 1913."
+    },
+    {
+      "id": "greece",
+      "name": "Kingdom of Greece",
+      "rank": "minor",
+      "capital": {
+        "name": "Athens",
+        "at": [
+          23.73,
+          37.98
+        ]
+      },
+      "overlord": null,
+      "ruler": "Constantine I (PM Eleftherios Venizelos)",
+      "catalogue_id": null,
+      "note": "Gained Macedonia, Epirus, Crete and the Aegean islands in 1912–13."
+    },
+    {
+      "id": "albania",
+      "name": "Principality of Albania",
+      "rank": "minor",
+      "capital": {
+        "name": "Durrës",
+        "at": [
+          19.45,
+          41.32
+        ]
+      },
+      "overlord": null,
+      "ruler": "Prince William of Wied",
+      "catalogue_id": null,
+      "note": "Independence proclaimed 28 Nov 1912; prince installed Mar 1914 under great-power guarantee; facing a peasant revolt and Greek-backed Northern Epirus autonomy."
+    },
+    {
+      "id": "monaco",
+      "name": "Principality of Monaco",
+      "rank": "minor",
+      "capital": {
+        "name": "Monaco",
+        "at": [
+          7.42,
+          43.73
+        ]
+      },
+      "overlord": null,
+      "ruler": "Albert I",
+      "catalogue_id": "monaco",
+      "note": "Under French protection (1861 treaty)."
+    },
+    {
+      "id": "san_marino",
+      "name": "Republic of San Marino",
+      "rank": "minor",
+      "capital": {
+        "name": "San Marino",
+        "at": [
+          12.45,
+          43.94
+        ]
+      },
+      "overlord": null,
+      "ruler": "Captains Regent",
+      "catalogue_id": "san_marino"
+    },
+    {
+      "id": "liechtenstein",
+      "name": "Principality of Liechtenstein",
+      "rank": "minor",
+      "capital": {
+        "name": "Vaduz",
+        "at": [
+          9.52,
+          47.14
+        ]
+      },
+      "overlord": null,
+      "ruler": "Johann II",
+      "catalogue_id": null,
+      "note": "Close customs and postal ties with Austria."
+    },
+    {
+      "id": "andorra",
+      "name": "Principality of Andorra",
+      "rank": "minor",
+      "capital": {
+        "name": "Andorra la Vella",
+        "at": [
+          1.52,
+          42.51
+        ]
+      },
+      "overlord": null,
+      "ruler": "Co-princes: the President of France and the Bishop of Urgell (Joan Benlloch i Vivó)",
+      "catalogue_id": "andorra"
+    },
+    {
+      "id": "egypt",
+      "name": "Khedivate of Egypt",
+      "rank": "minor",
+      "capital": {
+        "name": "Cairo",
+        "at": [
+          31.24,
+          30.04
+        ]
+      },
+      "overlord": "ottomans",
+      "ruler": "Khedive Abbas II Hilmi (British Agent and Consul-General Lord Kitchener)",
+      "catalogue_id": null,
+      "note": "De jure Ottoman vassal; under British military occupation since 1882 and in fact run by Britain. Britain declared a protectorate in Dec 1914. Co-ruler of Anglo-Egyptian Sudan."
+    },
+    {
+      "id": "yemen",
+      "name": "Zaydi Imamate of Yemen",
+      "rank": "minor",
+      "capital": {
+        "name": "Sanaa",
+        "at": [
+          44.21,
+          15.35
+        ]
+      },
+      "overlord": "ottomans",
+      "ruler": "Imam Yahya Muhammad Hamid ed-Din",
+      "catalogue_id": "zaydi_imamate",
+      "note": "Autonomy in the highlands under the 1911 Treaty of Daan; Ottoman garrison in Sanaa."
+    },
+    {
+      "id": "nejd",
+      "name": "Emirate of Nejd and Hasa",
+      "rank": "minor",
+      "capital": {
+        "name": "Riyadh",
+        "at": [
+          46.72,
+          24.69
+        ]
+      },
+      "overlord": "ottomans",
+      "ruler": "Abdulaziz ibn Saud",
+      "catalogue_id": null,
+      "note": "Took al-Hasa from the Ottomans in 1913; accepted the title of Ottoman wali of Nejd in a May 1914 treaty that was never fully implemented."
+    },
+    {
+      "id": "kuwait",
+      "name": "Sheikhdom of Kuwait",
+      "rank": "minor",
+      "capital": {
+        "name": "Kuwait",
+        "at": [
+          47.98,
+          29.37
+        ]
+      },
+      "overlord": "england",
+      "ruler": "Sheikh Mubarak al-Sabah",
+      "catalogue_id": null,
+      "note": "British protection by the secret 1899 agreement; the 1913 Anglo-Ottoman convention (unratified) called it an autonomous Ottoman kaza."
+    },
+    {
+      "id": "oman",
+      "name": "Sultanate of Muscat and Oman",
+      "rank": "minor",
+      "capital": {
+        "name": "Muscat",
+        "at": [
+          58.59,
+          23.61
+        ]
+      },
+      "overlord": null,
+      "ruler": "Sultan Taimur bin Feisal",
+      "catalogue_id": null,
+      "note": "Map id oman. Under strong British influence (informal protectorate). The interior Imamate revolt began in 1913."
+    },
+    {
+      "id": "afghanistan",
+      "name": "Emirate of Afghanistan",
+      "rank": "minor",
+      "capital": {
+        "name": "Kabul",
+        "at": [
+          69.17,
+          34.53
+        ]
+      },
+      "overlord": null,
+      "ruler": "Emir Habibullah Khan",
+      "catalogue_id": null,
+      "note": "Foreign relations controlled by Britain (Treaty of Gandamak 1879) though internally independent; overlord left null."
+    },
+    {
+      "id": "khiva",
+      "name": "Khanate of Khiva",
+      "rank": "minor",
+      "capital": {
+        "name": "Khiva",
+        "at": [
+          60.36,
+          41.38
+        ]
+      },
+      "overlord": "muscovy",
+      "ruler": "Isfandiyar Khan",
+      "catalogue_id": null,
+      "note": "Russian protectorate since 1873; Turkmen revolts in 1912–1916."
+    },
+    {
+      "id": "uzbek_khanate",
+      "name": "Emirate of Bukhara",
+      "rank": "minor",
+      "capital": {
+        "name": "Bukhara",
+        "at": [
+          64.42,
+          39.77
+        ]
+      },
+      "overlord": "muscovy",
+      "ruler": "Emir Sayyid Alim Khan",
+      "catalogue_id": null,
+      "note": "Russian protectorate since 1868/1873."
+    },
+    {
+      "id": "hyderabad",
+      "name": "Hyderabad State",
+      "rank": "minor",
+      "capital": {
+        "name": "Hyderabad",
+        "at": [
+          78.47,
+          17.36
+        ]
+      },
+      "overlord": "england",
+      "ruler": "Nizam Mir Osman Ali Khan",
+      "catalogue_id": null,
+      "note": "Largest Indian princely state, under British paramountcy."
+    },
+    {
+      "id": "mysore",
+      "name": "Kingdom of Mysore",
+      "rank": "minor",
+      "capital": {
+        "name": "Mysore",
+        "at": [
+          76.64,
+          12.3
+        ]
+      },
+      "overlord": "england",
+      "ruler": "Maharaja Krishnaraja Wadiyar IV",
+      "catalogue_id": null,
+      "note": "Princely state under British paramountcy."
+    },
+    {
+      "id": "kashmir",
+      "name": "Jammu and Kashmir",
+      "rank": "minor",
+      "capital": {
+        "name": "Srinagar",
+        "at": [
+          74.8,
+          34.08
+        ]
+      },
+      "overlord": "england",
+      "ruler": "Maharaja Pratap Singh",
+      "catalogue_id": "kashmir",
+      "note": "Map id kashmir. Princely state created by the 1846 Treaty of Amritsar."
+    },
+    {
+      "id": "dhar",
+      "name": "Dhar State",
+      "rank": "minor",
+      "capital": {
+        "name": "Dhar",
+        "at": [
+          75.3,
+          22.6
+        ]
+      },
+      "overlord": "england",
+      "ruler": "Raja Udaji Rao II Puar",
+      "catalogue_id": null,
+      "note": "Maratha princely state in the Central India Agency; Mandu lies within it."
+    },
+    {
+      "id": "nepal",
+      "name": "Kingdom of Nepal",
+      "rank": "minor",
+      "capital": {
+        "name": "Kathmandu",
+        "at": [
+          85.32,
+          27.72
+        ]
+      },
+      "overlord": null,
+      "ruler": "King Tribhuvan (Rana PM Chandra Shumsher)",
+      "catalogue_id": null,
+      "note": "Real power with the hereditary Rana prime ministers; close to Britain but not a protectorate."
+    },
+    {
+      "id": "bhutan",
+      "name": "Kingdom of Bhutan",
+      "rank": "minor",
+      "capital": {
+        "name": "Punakha",
+        "at": [
+          89.86,
+          27.58
+        ]
+      },
+      "overlord": "england",
+      "ruler": "Druk Gyalpo Ugyen Wangchuck",
+      "catalogue_id": null,
+      "note": "Foreign relations guided by Britain under the 1910 Treaty of Punakha."
+    },
+    {
+      "id": "tibet",
+      "name": "Tibet (Ganden Phodrang)",
+      "rank": "minor",
+      "capital": {
+        "name": "Lhasa",
+        "at": [
+          91.11,
+          29.65
+        ]
+      },
+      "overlord": null,
+      "ruler": "13th Dalai Lama Thubten Gyatso",
+      "catalogue_id": null,
+      "note": "Map id tibet. Expelled Chinese troops 1912–13, declared independence in Feb 1913; China's claim unresolved (Simla talks, convention initialled Jul 1914)."
+    },
+    {
+      "id": "mongols",
+      "name": "Bogd Khanate of Mongolia",
+      "rank": "minor",
+      "capital": {
+        "name": "Niislel Khüree (Urga)",
+        "at": [
+          106.92,
+          47.92
+        ]
+      },
+      "overlord": null,
+      "ruler": "Bogd Khan (8th Jebtsundamba Khutughtu)",
+      "catalogue_id": null,
+      "note": "Map id mongols used. Independent from 29 Dec 1911; China claims it; Russian-backed. The 1915 Kyakhta treaty later reduced it to autonomy under Chinese suzerainty."
+    },
+    {
+      "id": "ayutthaya",
+      "name": "Kingdom of Siam",
+      "rank": "minor",
+      "capital": {
+        "name": "Bangkok",
+        "at": [
+          100.5,
+          13.75
+        ]
+      },
+      "overlord": null,
+      "ruler": "King Vajiravudh (Rama VI)",
+      "catalogue_id": "ayutthaya",
+      "note": "Map id ayutthaya used for Siam (Chakri dynasty); Ayutthaya town itself lies within it."
+    },
+    {
+      "id": "dai_viet",
+      "name": "Empire of Annam (Nguyễn)",
+      "rank": "minor",
+      "capital": {
+        "name": "Huế",
+        "at": [
+          107.58,
+          16.46
+        ]
+      },
+      "overlord": "france",
+      "ruler": "Emperor Duy Tân",
+      "catalogue_id": "dai_viet",
+      "note": "Map id dai_viet. French protectorate over Annam; Tonkin a separate protectorate, Cochinchina a colony."
+    },
+    {
+      "id": "khmer",
+      "name": "Kingdom of Cambodia",
+      "rank": "minor",
+      "capital": {
+        "name": "Phnom Penh",
+        "at": [
+          104.92,
+          11.56
+        ]
+      },
+      "overlord": "france",
+      "ruler": "King Sisowath",
+      "catalogue_id": "cambodia",
+      "note": "Map id khmer. French protectorate since 1863; regained Siem Reap and Battambang from Siam in 1907."
+    },
+    {
+      "id": "lan_xang",
+      "name": "Kingdom of Luang Prabang",
+      "rank": "minor",
+      "capital": {
+        "name": "Luang Prabang",
+        "at": [
+          102.13,
+          19.89
+        ]
+      },
+      "overlord": "france",
+      "ruler": "King Sisavang Vong",
+      "catalogue_id": "lan_xang",
+      "note": "Map id lan_xang used. French protectorate within Laos."
+    },
+    {
+      "id": "johor",
+      "name": "Sultanate of Johor",
+      "rank": "minor",
+      "capital": {
+        "name": "Johor Bahru",
+        "at": [
+          103.76,
+          1.46
+        ]
+      },
+      "overlord": "england",
+      "ruler": "Sultan Ibrahim",
+      "catalogue_id": null,
+      "note": "Accepted a British General Adviser in May 1914."
+    },
+    {
+      "id": "brunei",
+      "name": "Sultanate of Brunei",
+      "rank": "minor",
+      "capital": {
+        "name": "Brunei Town",
+        "at": [
+          114.94,
+          4.89
+        ]
+      },
+      "overlord": "england",
+      "ruler": "Sultan Muhammad Jamalul Alam II",
+      "catalogue_id": "brunei",
+      "note": "British protectorate (1888), Resident since 1906."
+    },
+    {
+      "id": "sarawak",
+      "name": "Raj of Sarawak",
+      "rank": "minor",
+      "capital": {
+        "name": "Kuching",
+        "at": [
+          110.35,
+          1.55
+        ]
+      },
+      "overlord": "england",
+      "ruler": "Rajah Charles Brooke",
+      "catalogue_id": null,
+      "note": "British protectorate since 1888 under the Brooke White Rajahs."
+    },
+    {
+      "id": "ternate",
+      "name": "Sultanate of Ternate",
+      "rank": "minor",
+      "capital": {
+        "name": "Ternate",
+        "at": [
+          127.38,
+          0.79
+        ]
+      },
+      "overlord": "netherlands",
+      "ruler": "Sultan Muhammad Usman Shah",
+      "catalogue_id": "ternate",
+      "note": "Self-governing territory under Dutch sovereignty; the sultan was deposed by the Dutch in 1915."
+    },
+    {
+      "id": "ethiopia",
+      "name": "Ethiopian Empire",
+      "rank": "minor",
+      "capital": {
+        "name": "Addis Ababa",
+        "at": [
+          38.75,
+          9.03
+        ]
+      },
+      "overlord": null,
+      "ruler": "Lij Iyasu (uncrowned emperor)",
+      "catalogue_id": "ethiopia",
+      "note": "Menelik II died Dec 1913; Iyasu rules but was never crowned."
+    },
+    {
+      "id": "liberia",
+      "name": "Republic of Liberia",
+      "rank": "minor",
+      "capital": {
+        "name": "Monrovia",
+        "at": [
+          -10.8,
+          6.3
+        ]
+      },
+      "overlord": null,
+      "ruler": "President Daniel Edward Howard",
+      "catalogue_id": null,
+      "note": "Customs under an international receivership (1912 loan)."
+    },
+    {
+      "id": "morocco",
+      "name": "Sultanate of Morocco",
+      "rank": "minor",
+      "capital": {
+        "name": "Rabat",
+        "at": [
+          -6.84,
+          34.02
+        ]
+      },
+      "overlord": "france",
+      "ruler": "Sultan Yusef (Resident-General Hubert Lyautey)",
+      "catalogue_id": "morocco",
+      "note": "French protectorate by the Treaty of Fez, 30 Mar 1912; Spanish zone in the north and Tangier separate; Middle Atlas and southern resistance continuing."
+    },
+    {
+      "id": "tunis",
+      "name": "Beylik of Tunis",
+      "rank": "minor",
+      "capital": {
+        "name": "Tunis",
+        "at": [
+          10.18,
+          36.8
+        ]
+      },
+      "overlord": "france",
+      "ruler": "Bey Muhammad V an-Nasir",
+      "catalogue_id": null,
+      "note": "Map id tunis. French protectorate since the Treaty of Bardo, 1881."
+    },
+    {
+      "id": "zanzibar",
+      "name": "Sultanate of Zanzibar",
+      "rank": "minor",
+      "capital": {
+        "name": "Zanzibar",
+        "at": [
+          39.19,
+          -6.16
+        ]
+      },
+      "overlord": "england",
+      "ruler": "Sultan Khalifa bin Harub",
+      "catalogue_id": "zanzibar",
+      "note": "British protectorate since 1890."
+    },
+    {
+      "id": "sokoto",
+      "name": "Sokoto Caliphate",
+      "rank": "minor",
+      "capital": {
+        "name": "Sokoto",
+        "at": [
+          5.24,
+          13.06
+        ]
+      },
+      "overlord": "england",
+      "ruler": "Sultan Muhammadu Maiturare",
+      "catalogue_id": null,
+      "note": "Conquered 1903; ruled indirectly as a native authority in the Colony and Protectorate of Nigeria (amalgamated 1 Jan 1914)."
+    },
+    {
+      "id": "kano",
+      "name": "Kano Emirate",
+      "rank": "minor",
+      "capital": {
+        "name": "Kano",
+        "at": [
+          8.52,
+          12.0
+        ]
+      },
+      "overlord": "england",
+      "ruler": "Emir Muhammad Abbas",
+      "catalogue_id": "kano",
+      "note": "Map id kano. Native authority under British indirect rule in Northern Nigeria; formally a Sokoto emirate."
+    },
+    {
+      "id": "buganda",
+      "name": "Kingdom of Buganda",
+      "rank": "minor",
+      "capital": {
+        "name": "Mengo",
+        "at": [
+          32.58,
+          0.31
+        ]
+      },
+      "overlord": "england",
+      "ruler": "Kabaka Daudi Chwa II (regency until 1914)",
+      "catalogue_id": "buganda",
+      "note": "Under the Uganda Protectorate by the 1900 Agreement."
+    },
+    {
+      "id": "darfur",
+      "name": "Sultanate of Darfur",
+      "rank": "minor",
+      "capital": {
+        "name": "El Fasher",
+        "at": [
+          25.35,
+          13.63
+        ]
+      },
+      "overlord": null,
+      "ruler": "Sultan Ali Dinar",
+      "catalogue_id": null,
+      "note": "Nominally tributary to the Anglo-Egyptian Sudan, in practice independent until the British conquest of 1916."
+    },
+    {
+      "id": "newfoundland",
+      "name": "Dominion of Newfoundland",
+      "rank": "minor",
+      "capital": {
+        "name": "St. John's",
+        "at": [
+          -52.71,
+          47.56
+        ]
+      },
+      "overlord": "england",
+      "ruler": "George V (Governor Walter Davidson; PM Edward Morris)",
+      "catalogue_id": null
+    },
+    {
+      "id": "new_zealand",
+      "name": "Dominion of New Zealand",
+      "rank": "minor",
+      "capital": {
+        "name": "Wellington",
+        "at": [
+          174.78,
+          -41.29
+        ]
+      },
+      "overlord": "england",
+      "ruler": "George V (Governor Lord Liverpool; PM William Massey)",
+      "catalogue_id": null
+    },
+    {
+      "id": "tonga",
+      "name": "Kingdom of Tonga",
+      "rank": "minor",
+      "capital": {
+        "name": "Nukuʻalofa",
+        "at": [
+          -175.2,
+          -21.14
+        ]
+      },
+      "overlord": "england",
+      "ruler": "King George Tupou II",
+      "catalogue_id": null,
+      "note": "British protected state since 1900."
+    },
+    {
+      "id": "mexico",
+      "name": "United Mexican States",
+      "rank": "major",
+      "capital": {
+        "name": "Mexico City",
+        "at": [
+          -99.13,
+          19.43
+        ]
+      },
+      "overlord": null,
+      "ruler": "Victoriano Huerta (resigned 15 Jul 1914)",
+      "catalogue_id": null,
+      "note": "Revolution: Carranza's Constitutionalists (Villa, Obregón) and Zapata control most of the north and Morelos; Huerta still holds the capital and centre; the US occupies Veracruz."
+    },
+    {
+      "id": "guatemala",
+      "name": "Republic of Guatemala",
+      "rank": "minor",
+      "capital": {
+        "name": "Guatemala City",
+        "at": [
+          -90.51,
+          14.63
+        ]
+      },
+      "overlord": null,
+      "ruler": "President Manuel Estrada Cabrera",
+      "catalogue_id": null
+    },
+    {
+      "id": "honduras",
+      "name": "Republic of Honduras",
+      "rank": "minor",
+      "capital": {
+        "name": "Tegucigalpa",
+        "at": [
+          -87.21,
+          14.07
+        ]
+      },
+      "overlord": null,
+      "ruler": "President Francisco Bertrand",
+      "catalogue_id": null
+    },
+    {
+      "id": "el_salvador",
+      "name": "Republic of El Salvador",
+      "rank": "minor",
+      "capital": {
+        "name": "San Salvador",
+        "at": [
+          -89.19,
+          13.69
+        ]
+      },
+      "overlord": null,
+      "ruler": "Carlos Meléndez (acting president)",
+      "catalogue_id": null
+    },
+    {
+      "id": "nicaragua",
+      "name": "Republic of Nicaragua",
+      "rank": "minor",
+      "capital": {
+        "name": "Managua",
+        "at": [
+          -86.25,
+          12.13
+        ]
+      },
+      "overlord": null,
+      "ruler": "President Adolfo Díaz",
+      "catalogue_id": null,
+      "note": "US Marines stationed since 1912; Bryan–Chamorro treaty signed Aug 1914."
+    },
+    {
+      "id": "costa_rica",
+      "name": "Republic of Costa Rica",
+      "rank": "minor",
+      "capital": {
+        "name": "San José",
+        "at": [
+          -84.08,
+          9.93
+        ]
+      },
+      "overlord": null,
+      "ruler": "President Alfredo González Flores",
+      "catalogue_id": null
+    },
+    {
+      "id": "panama",
+      "name": "Republic of Panama",
+      "rank": "minor",
+      "capital": {
+        "name": "Panama City",
+        "at": [
+          -79.52,
+          8.98
+        ]
+      },
+      "overlord": null,
+      "ruler": "President Belisario Porras",
+      "catalogue_id": null,
+      "note": "Independent of Colombia 3 Nov 1903; the US holds the Canal Zone (canal opens 15 Aug 1914)."
+    },
+    {
+      "id": "cuba",
+      "name": "Republic of Cuba",
+      "rank": "minor",
+      "capital": {
+        "name": "Havana",
+        "at": [
+          -82.38,
+          23.13
+        ]
+      },
+      "overlord": null,
+      "ruler": "President Mario García Menocal",
+      "catalogue_id": null,
+      "note": "US right of intervention under the Platt Amendment; overlord left null."
+    },
+    {
+      "id": "haiti",
+      "name": "Republic of Haiti",
+      "rank": "minor",
+      "capital": {
+        "name": "Port-au-Prince",
+        "at": [
+          -72.34,
+          18.54
+        ]
+      },
+      "overlord": null,
+      "ruler": "President Oreste Zamor",
+      "catalogue_id": null,
+      "note": "Unstable; US occupation follows in 1915."
+    },
+    {
+      "id": "dominican_republic",
+      "name": "Dominican Republic",
+      "rank": "minor",
+      "capital": {
+        "name": "Santo Domingo",
+        "at": [
+          -69.9,
+          18.48
+        ]
+      },
+      "overlord": null,
+      "ruler": "President José Bordas Valdez",
+      "catalogue_id": null,
+      "note": "Civil war of 1914; US customs receivership since 1907."
+    },
+    {
+      "id": "colombia",
+      "name": "Republic of Colombia",
+      "rank": "minor",
+      "capital": {
+        "name": "Bogotá",
+        "at": [
+          -74.07,
+          4.71
+        ]
+      },
+      "overlord": null,
+      "ruler": "President Carlos Eugenio Restrepo",
+      "catalogue_id": null
+    },
+    {
+      "id": "venezuela",
+      "name": "United States of Venezuela",
+      "rank": "minor",
+      "capital": {
+        "name": "Caracas",
+        "at": [
+          -66.9,
+          10.49
+        ]
+      },
+      "overlord": null,
+      "ruler": "Juan Vicente Gómez (strongman; Victorino Márquez Bustillos provisional president)",
+      "catalogue_id": null
+    },
+    {
+      "id": "ecuador",
+      "name": "Republic of Ecuador",
+      "rank": "minor",
+      "capital": {
+        "name": "Quito",
+        "at": [
+          -78.47,
+          -0.18
+        ]
+      },
+      "overlord": null,
+      "ruler": "President Leónidas Plaza",
+      "catalogue_id": null
+    },
+    {
+      "id": "peru",
+      "name": "Republic of Peru",
+      "rank": "minor",
+      "capital": {
+        "name": "Lima",
+        "at": [
+          -77.04,
+          -12.05
+        ]
+      },
+      "overlord": null,
+      "ruler": "Óscar R. Benavides (provisional president after the Feb 1914 coup)",
+      "catalogue_id": null
+    },
+    {
+      "id": "bolivia",
+      "name": "Republic of Bolivia",
+      "rank": "minor",
+      "capital": {
+        "name": "La Paz",
+        "at": [
+          -68.15,
+          -16.5
+        ]
+      },
+      "overlord": null,
+      "ruler": "President Ismael Montes",
+      "catalogue_id": null,
+      "note": "Sucre is the constitutional capital; government sits in La Paz."
+    },
+    {
+      "id": "chile",
+      "name": "Republic of Chile",
+      "rank": "minor",
+      "capital": {
+        "name": "Santiago",
+        "at": [
+          -70.65,
+          -33.45
+        ]
+      },
+      "overlord": null,
+      "ruler": "President Ramón Barros Luco",
+      "catalogue_id": null
+    },
+    {
+      "id": "uruguay",
+      "name": "Oriental Republic of Uruguay",
+      "rank": "minor",
+      "capital": {
+        "name": "Montevideo",
+        "at": [
+          -56.16,
+          -34.9
+        ]
+      },
+      "overlord": null,
+      "ruler": "President José Batlle y Ordóñez",
+      "catalogue_id": null
+    },
+    {
+      "id": "paraguay",
+      "name": "Republic of Paraguay",
+      "rank": "minor",
+      "capital": {
+        "name": "Asunción",
+        "at": [
+          -57.58,
+          -25.28
+        ]
+      },
+      "overlord": null,
+      "ruler": "President Eduardo Schaerer",
+      "catalogue_id": null
+    },
+    {
+      "id": "hungary",
+      "name": "Kingdom of Hungary",
+      "rank": "minor",
+      "capital": {
+        "name": "Budapest",
+        "at": [
+          19.04,
+          47.5
+        ]
+      },
+      "overlord": "austria",
+      "ruler": "Franz Joseph I",
+      "catalogue_id": null,
+      "note": "Still standing; carried forward when realm ids were harmonised. Half of the Dual Monarchy since 1867."
+    },
+    {
+      "id": "bohemia",
+      "name": "Kingdom of Bohemia",
+      "rank": "minor",
+      "capital": {
+        "name": "Prague",
+        "at": [
+          14.42,
+          50.09
+        ]
+      },
+      "overlord": "austria",
+      "ruler": "Franz Joseph I",
+      "catalogue_id": "bohemia",
+      "note": "Still standing; carried forward when realm ids were harmonised. Crown land of Cisleithania."
+    },
+    {
+      "id": "amber",
+      "name": "Jaipur State (Amber)",
+      "rank": "minor",
+      "capital": {
+        "name": "Jaipur",
+        "at": [
+          75.82,
+          26.92
+        ]
+      },
+      "overlord": "england",
+      "ruler": "Madho Singh II",
+      "catalogue_id": "amber",
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    },
+    {
+      "id": "mewar",
+      "name": "Udaipur State (Mewar)",
+      "rank": "minor",
+      "capital": {
+        "name": "Udaipur",
+        "at": [
+          73.71,
+          24.58
+        ]
+      },
+      "overlord": "england",
+      "ruler": "Fateh Singh",
+      "catalogue_id": "mewar",
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    },
+    {
+      "id": "marwar",
+      "name": "Jodhpur State (Marwar)",
+      "rank": "minor",
+      "capital": {
+        "name": "Jodhpur",
+        "at": [
+          73.02,
+          26.29
+        ]
+      },
+      "overlord": "england",
+      "ruler": "Sumer Singh",
+      "catalogue_id": "marwar",
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    },
+    {
+      "id": "koch_bihar",
+      "name": "Cooch Behar State",
+      "rank": "minor",
+      "capital": {
+        "name": "Koch Bihar",
+        "at": [
+          89.45,
+          26.32
+        ]
+      },
+      "overlord": "england",
+      "ruler": "Jitendra Narayan",
+      "catalogue_id": null,
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    },
+    {
+      "id": "kolhapur",
+      "name": "Kolhapur State",
+      "rank": "minor",
+      "capital": {
+        "name": "Kolhapur",
+        "at": [
+          74.24,
+          16.7
+        ]
+      },
+      "overlord": "england",
+      "ruler": "Shahu",
+      "catalogue_id": null,
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    },
+    {
+      "id": "manipur",
+      "name": "Manipur State",
+      "rank": "minor",
+      "capital": {
+        "name": "Imphal",
+        "at": [
+          93.94,
+          24.81
+        ]
+      },
+      "overlord": "england",
+      "ruler": "Churachand Singh",
+      "catalogue_id": "manipur",
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    },
+    {
+      "id": "sulu",
+      "name": "Sultanate of Sulu",
+      "rank": "minor",
+      "capital": {
+        "name": "Jolo",
+        "at": [
+          121.0,
+          6.05
+        ]
+      },
+      "overlord": "united_states",
+      "ruler": "Jamalul Kiram II",
+      "catalogue_id": "sulu",
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    },
+    {
+      "id": "tidore",
+      "name": "Sultanate of Tidore",
+      "rank": "minor",
+      "capital": {
+        "name": "Tidore",
+        "at": [
+          127.4,
+          0.68
+        ]
+      },
+      "overlord": "netherlands",
+      "ruler": "Sultan (name uncertain)",
+      "catalogue_id": "tidore",
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    },
+    {
+      "id": "venad",
+      "name": "Travancore State",
+      "rank": "minor",
+      "capital": {
+        "name": "Thiruvananthapuram",
+        "at": [
+          76.95,
+          8.49
+        ]
+      },
+      "overlord": "england",
+      "ruler": "Moolam Thirunal Rama Varma VI",
+      "catalogue_id": "venad",
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    },
+    {
+      "id": "baroda",
+      "name": "Baroda State",
+      "rank": "minor",
+      "capital": {
+        "name": "Baroda",
+        "at": [
+          73.18,
+          22.31
+        ]
+      },
+      "overlord": "england",
+      "ruler": "Sayajirao Gaekwad III",
+      "catalogue_id": null,
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    },
+    {
+      "id": "gwalior",
+      "name": "Gwalior State",
+      "rank": "minor",
+      "capital": {
+        "name": "Gwalior",
+        "at": [
+          78.18,
+          26.22
+        ]
+      },
+      "overlord": "england",
+      "ruler": "Madho Rao Scindia",
+      "catalogue_id": "gwalior",
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    },
+    {
+      "id": "indore",
+      "name": "Indore State",
+      "rank": "minor",
+      "capital": {
+        "name": "Indore",
+        "at": [
+          75.86,
+          22.72
+        ]
+      },
+      "overlord": "england",
+      "ruler": "Tukoji Rao Holkar III",
+      "catalogue_id": null,
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    },
+    {
+      "id": "kalat",
+      "name": "Khanate of Kalat",
+      "rank": "minor",
+      "capital": {
+        "name": "Kalat",
+        "at": [
+          66.59,
+          29.03
+        ]
+      },
+      "overlord": "england",
+      "ruler": "Mahmud Khan II",
+      "catalogue_id": "baluch",
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    },
+    {
+      "id": "lahej",
+      "name": "Sultanate of Lahej",
+      "rank": "minor",
+      "capital": {
+        "name": "Lahej",
+        "at": [
+          44.88,
+          13.06
+        ]
+      },
+      "overlord": "england",
+      "ruler": "Abdali sultan (name uncertain)",
+      "catalogue_id": null,
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    },
+    {
+      "id": "kanem_bornu",
+      "name": "Bornu Emirate",
+      "rank": "minor",
+      "capital": {
+        "name": "Maiduguri (Yerwa)",
+        "at": [
+          13.16,
+          11.85
+        ]
+      },
+      "overlord": "england",
+      "ruler": "Shehu Abubakar Garbai",
+      "catalogue_id": "bornu",
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    },
+    {
+      "id": "brunswick",
+      "name": "Duchy of Brunswick",
+      "rank": "minor",
+      "capital": {
+        "name": "Brunswick",
+        "at": [
+          10.52,
+          52.27
+        ]
+      },
+      "overlord": "germany",
+      "ruler": "Ernest Augustus",
+      "catalogue_id": "brunswick_wolfenbuttel",
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    },
+    {
+      "id": "oldenburg",
+      "name": "Grand Duchy of Oldenburg",
+      "rank": "minor",
+      "capital": {
+        "name": "Oldenburg",
+        "at": [
+          8.21,
+          53.14
+        ]
+      },
+      "overlord": "germany",
+      "ruler": "Frederick Augustus II",
+      "catalogue_id": "oldenburg",
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    },
+    {
+      "id": "mutapa",
+      "name": "Mutapa",
+      "rank": "minor",
+      "capital": {
+        "name": "Lower Zambezi court (location uncertain)",
+        "at": [
+          31.5,
+          -16.3
+        ]
+      },
+      "overlord": null,
+      "ruler": "Mwenemutapa (name uncertain)",
+      "catalogue_id": "mutapa",
+      "note": "Still standing; carried forward when realm ids were harmonised. Last rump; conquered by Portugal 1917."
+    },
+    {
+      "id": "hejaz",
+      "name": "Sharifate of Mecca",
+      "rank": "minor",
+      "capital": {
+        "name": "Mecca",
+        "at": [
+          39.83,
+          21.42
+        ]
+      },
+      "overlord": "ottomans",
+      "ruler": "Sharif Hussein bin Ali",
+      "catalogue_id": "mecca",
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    }
+  ],
+  "great_powers": [
+    "england",
+    "france",
+    "germany",
+    "austria",
+    "muscovy",
+    "savoy",
+    "united_states",
+    "japan"
+  ],
+  "key_places": {
+    "london": {
+      "holder": "england",
+      "confidence": "high"
+    },
+    "calais": {
+      "holder": "france",
+      "confidence": "high"
+    },
+    "bordeaux": {
+      "holder": "france",
+      "confidence": "high"
+    },
+    "paris": {
+      "holder": "france",
+      "confidence": "high"
+    },
+    "rouen": {
+      "holder": "france",
+      "confidence": "high"
+    },
+    "nantes": {
+      "holder": "france",
+      "confidence": "high"
+    },
+    "dijon": {
+      "holder": "france",
+      "confidence": "high"
+    },
+    "marseille": {
+      "holder": "france",
+      "confidence": "high"
+    },
+    "edinburgh": {
+      "holder": "england",
+      "confidence": "high"
+    },
+    "dublin": {
+      "holder": "england",
+      "confidence": "high",
+      "note": "Ireland part of the United Kingdom; Home Rule Act passes in Sep 1914 but is suspended."
+    },
+    "bruges": {
+      "holder": "belgium",
+      "confidence": "high"
+    },
+    "amsterdam": {
+      "holder": "netherlands",
+      "confidence": "high"
+    },
+    "brussels": {
+      "holder": "belgium",
+      "confidence": "high"
+    },
+    "lisbon": {
+      "holder": "portugal",
+      "confidence": "high"
+    },
+    "toledo": {
+      "holder": "castile",
+      "confidence": "high"
+    },
+    "barcelona": {
+      "holder": "castile",
+      "confidence": "high"
+    },
+    "granada": {
+      "holder": "castile",
+      "confidence": "high"
+    },
+    "ceuta": {
+      "holder": "castile",
+      "confidence": "high"
+    },
+    "fez": {
+      "holder": "morocco",
+      "confidence": "high",
+      "note": "French protectorate zone of Morocco."
+    },
+    "tunis": {
+      "holder": "tunis",
+      "confidence": "high",
+      "note": "Beylik under French protectorate."
+    },
+    "algiers": {
+      "holder": "france",
+      "confidence": "high",
+      "note": "Algeria administered as French départements."
+    },
+    "milan": {
+      "holder": "savoy",
+      "confidence": "high"
+    },
+    "venice": {
+      "holder": "savoy",
+      "confidence": "high"
+    },
+    "genoa": {
+      "holder": "savoy",
+      "confidence": "high"
+    },
+    "florence": {
+      "holder": "savoy",
+      "confidence": "high"
+    },
+    "pisa": {
+      "holder": "savoy",
+      "confidence": "high"
+    },
+    "rome": {
+      "holder": "savoy",
+      "confidence": "high"
+    },
+    "naples": {
+      "holder": "savoy",
+      "confidence": "high"
+    },
+    "palermo": {
+      "holder": "savoy",
+      "confidence": "high"
+    },
+    "vienna": {
+      "holder": "austria",
+      "confidence": "high"
+    },
+    "prague": {
+      "holder": "austria",
+      "confidence": "high"
+    },
+    "munich": {
+      "holder": "bavaria",
+      "confidence": "high"
+    },
+    "berlin": {
+      "holder": "brandenburg",
+      "confidence": "high",
+      "note": "Capital of both Prussia and the German Empire; city governed within Prussia."
+    },
+    "dresden": {
+      "holder": "saxony",
+      "confidence": "high"
+    },
+    "cologne": {
+      "holder": "brandenburg",
+      "confidence": "high",
+      "note": "Prussian province, German Empire."
+    },
+    "lubeck": {
+      "holder": "lubeck",
+      "confidence": "high"
+    },
+    "bern": {
+      "holder": "switzerland",
+      "confidence": "high"
+    },
+    "copenhagen": {
+      "holder": "denmark",
+      "confidence": "high"
+    },
+    "stockholm": {
+      "holder": "sweden",
+      "confidence": "high"
+    },
+    "oslo": {
+      "holder": "norway",
+      "confidence": "high"
+    },
+    "visby": {
+      "holder": "sweden",
+      "confidence": "high"
+    },
+    "konigsberg": {
+      "holder": "brandenburg",
+      "confidence": "high",
+      "note": "Prussian province, German Empire."
+    },
+    "riga": {
+      "holder": "muscovy",
+      "confidence": "high"
+    },
+    "krakow": {
+      "holder": "austria",
+      "confidence": "high",
+      "note": "Galicia, Austrian crownland."
+    },
+    "vilnius": {
+      "holder": "muscovy",
+      "confidence": "high"
+    },
+    "kyiv": {
+      "holder": "muscovy",
+      "confidence": "high"
+    },
+    "novgorod": {
+      "holder": "muscovy",
+      "confidence": "high"
+    },
+    "moscow": {
+      "holder": "muscovy",
+      "confidence": "high"
+    },
+    "kazan": {
+      "holder": "muscovy",
+      "confidence": "high"
+    },
+    "astrakhan": {
+      "holder": "muscovy",
+      "confidence": "high"
+    },
+    "sarai": {
+      "holder": "muscovy",
+      "confidence": "high",
+      "note": "Lower Volga steppe, Astrakhan governorate."
+    },
+    "caffa": {
+      "holder": "muscovy",
+      "confidence": "high"
+    },
+    "buda": {
+      "holder": "austria",
+      "confidence": "high",
+      "note": "Budapest, capital of the Kingdom of Hungary within Austria-Hungary."
+    },
+    "belgrade": {
+      "holder": "serbia",
+      "confidence": "high"
+    },
+    "sofia": {
+      "holder": "bulgaria",
+      "confidence": "high"
+    },
+    "tarnovo": {
+      "holder": "bulgaria",
+      "confidence": "high"
+    },
+    "bucharest": {
+      "holder": "romania",
+      "confidence": "high"
+    },
+    "suceava": {
+      "holder": "austria",
+      "confidence": "medium",
+      "note": "Suceava lay in Austrian Bukovina, just north of the Romanian border."
+    },
+    "athens": {
+      "holder": "greece",
+      "confidence": "high"
+    },
+    "thessaloniki": {
+      "holder": "greece",
+      "confidence": "high"
+    },
+    "edirne": {
+      "holder": "ottomans",
+      "confidence": "high"
+    },
+    "constantinople": {
+      "holder": "ottomans",
+      "confidence": "high"
+    },
+    "bursa": {
+      "holder": "ottomans",
+      "confidence": "high"
+    },
+    "konya": {
+      "holder": "ottomans",
+      "confidence": "high"
+    },
+    "trebizond": {
+      "holder": "ottomans",
+      "confidence": "high"
+    },
+    "rhodes": {
+      "holder": "savoy",
+      "confidence": "medium",
+      "note": "Occupied by Italy since May 1912 (Dodecanese); formal Ottoman cession only in 1923."
+    },
+    "nicosia": {
+      "holder": "england",
+      "confidence": "medium",
+      "note": "Cyprus under British administration since 1878 but formally Ottoman until annexed in Nov 1914."
+    },
+    "tbilisi": {
+      "holder": "muscovy",
+      "confidence": "high"
+    },
+    "tabriz": {
+      "holder": "persia",
+      "confidence": "medium",
+      "note": "Persian sovereignty, but Russian troops have occupied Tabriz since 1909/1911."
+    },
+    "baghdad": {
+      "holder": "ottomans",
+      "confidence": "high"
+    },
+    "damascus": {
+      "holder": "ottomans",
+      "confidence": "high"
+    },
+    "jerusalem": {
+      "holder": "ottomans",
+      "confidence": "high"
+    },
+    "cairo": {
+      "holder": "egypt",
+      "confidence": "medium",
+      "note": "Khedivate, de jure Ottoman vassal, under British occupation."
+    },
+    "mecca": {
+      "holder": "ottomans",
+      "confidence": "high",
+      "note": "Hejaz Vilayet; Sharif Hussein bin Ali is Emir of Mecca under Ottoman rule."
+    },
+    "aden": {
+      "holder": "england",
+      "confidence": "high",
+      "note": "Aden Settlement, administered from British India (Bombay)."
+    },
+    "hormuz": {
+      "holder": "persia",
+      "confidence": "high"
+    },
+    "shiraz": {
+      "holder": "persia",
+      "confidence": "high"
+    },
+    "isfahan": {
+      "holder": "persia",
+      "confidence": "high"
+    },
+    "herat": {
+      "holder": "afghanistan",
+      "confidence": "high"
+    },
+    "samarkand": {
+      "holder": "muscovy",
+      "confidence": "high"
+    },
+    "urgench": {
+      "holder": "khiva",
+      "confidence": "medium",
+      "note": "Urgench lay in the Khanate of Khiva (Russian protectorate); the Amu Darya delta border with the Russian Amu Darya Department is close."
+    },
+    "kabul": {
+      "holder": "afghanistan",
+      "confidence": "high"
+    },
+    "kashgar": {
+      "holder": "china",
+      "confidence": "medium",
+      "note": "Xinjiang under Governor Yang Zengxin, loyal to the Republic in name."
+    },
+    "lahore": {
+      "holder": "england",
+      "confidence": "high",
+      "note": "British India, direct rule."
+    },
+    "delhi": {
+      "holder": "england",
+      "confidence": "high",
+      "note": "British India, direct rule."
+    },
+    "jaunpur": {
+      "holder": "england",
+      "confidence": "high",
+      "note": "British India, direct rule."
+    },
+    "gaur": {
+      "holder": "england",
+      "confidence": "high",
+      "note": "British India, direct rule."
+    },
+    "ahmedabad": {
+      "holder": "england",
+      "confidence": "high",
+      "note": "British India, direct rule."
+    },
+    "mandu": {
+      "holder": "dhar",
+      "confidence": "medium",
+      "note": "Mandu lies in Dhar State (princely state under British paramountcy)."
+    },
+    "gulbarga": {
+      "holder": "hyderabad",
+      "confidence": "high"
+    },
+    "vijayanagara": {
+      "holder": "england",
+      "confidence": "high",
+      "note": "Bellary district, Madras Presidency."
+    },
+    "calicut": {
+      "holder": "england",
+      "confidence": "high",
+      "note": "British India, direct rule."
+    },
+    "colombo": {
+      "holder": "england",
+      "confidence": "high",
+      "note": "Crown colony of Ceylon."
+    },
+    "kathmandu": {
+      "holder": "nepal",
+      "confidence": "high"
+    },
+    "lhasa": {
+      "holder": "tibet",
+      "confidence": "medium",
+      "note": "De facto independent; claimed by China."
+    },
+    "karakorum": {
+      "holder": "mongols",
+      "confidence": "medium",
+      "note": "Outer Mongolia under the Bogd Khanate; status disputed with China."
+    },
+    "beijing": {
+      "holder": "china",
+      "confidence": "high"
+    },
+    "nanjing": {
+      "holder": "china",
+      "confidence": "high"
+    },
+    "guangzhou": {
+      "holder": "china",
+      "confidence": "high"
+    },
+    "kunming": {
+      "holder": "china",
+      "confidence": "medium",
+      "note": "Yunnan under military governor Tang Jiyao, nominally loyal to Beijing."
+    },
+    "shenyang": {
+      "holder": "china",
+      "confidence": "high"
+    },
+    "seoul": {
+      "holder": "japan",
+      "confidence": "high"
+    },
+    "kyoto": {
+      "holder": "japan",
+      "confidence": "high"
+    },
+    "kamakura": {
+      "holder": "japan",
+      "confidence": "high"
+    },
+    "hakata": {
+      "holder": "japan",
+      "confidence": "high"
+    },
+    "shuri": {
+      "holder": "japan",
+      "confidence": "high"
+    },
+    "hanoi": {
+      "holder": "france",
+      "confidence": "high",
+      "note": "Capital of French Indochina; Tonkin protectorate, city a French concession."
+    },
+    "vijaya": {
+      "holder": "dai_viet",
+      "confidence": "medium",
+      "note": "Bình Định province of Annam, French protectorate."
+    },
+    "angkor": {
+      "holder": "khmer",
+      "confidence": "high",
+      "note": "Siem Reap, returned to French-protected Cambodia in 1907."
+    },
+    "ayutthaya": {
+      "holder": "ayutthaya",
+      "confidence": "high",
+      "note": "Siam."
+    },
+    "pegu": {
+      "holder": "england",
+      "confidence": "high",
+      "note": "Burma, a province of British India."
+    },
+    "ava": {
+      "holder": "england",
+      "confidence": "high",
+      "note": "Burma, a province of British India."
+    },
+    "malacca": {
+      "holder": "england",
+      "confidence": "high",
+      "note": "Straits Settlements."
+    },
+    "trowulan": {
+      "holder": "netherlands",
+      "confidence": "high",
+      "note": "Dutch East Indies (Java)."
+    },
+    "manila": {
+      "holder": "united_states",
+      "confidence": "high",
+      "note": "Philippine Islands."
+    },
+    "ternate": {
+      "holder": "ternate",
+      "confidence": "medium",
+      "note": "Sultanate under Dutch sovereignty."
+    },
+    "timbuktu": {
+      "holder": "france",
+      "confidence": "high",
+      "note": "Haut-Sénégal-Niger, French West Africa."
+    },
+    "gao": {
+      "holder": "france",
+      "confidence": "high",
+      "note": "Haut-Sénégal-Niger, French West Africa."
+    },
+    "niani": {
+      "holder": "france",
+      "confidence": "high",
+      "note": "French Guinea, French West Africa."
+    },
+    "kano": {
+      "holder": "kano",
+      "confidence": "high",
+      "note": "Emirate under British indirect rule (Nigeria)."
+    },
+    "kanem": {
+      "holder": "france",
+      "confidence": "medium",
+      "note": "Territoire militaire du Tchad, French Equatorial Africa; French control of Kanem established 1900s."
+    },
+    "benin_city": {
+      "holder": "england",
+      "confidence": "high",
+      "note": "Southern Provinces of Nigeria; Oba Eweka II restored as a native authority in 1914."
+    },
+    "mbanza_kongo": {
+      "holder": "portugal",
+      "confidence": "high",
+      "note": "Portuguese Angola (São Salvador do Congo); Kongo kingship nominal, after the 1913–14 revolt."
+    },
+    "great_zimbabwe": {
+      "holder": "england",
+      "confidence": "medium",
+      "note": "Southern Rhodesia, administered by the British South Africa Company under Crown charter."
+    },
+    "kilwa": {
+      "holder": "germany",
+      "confidence": "high",
+      "note": "German East Africa."
+    },
+    "mogadishu": {
+      "holder": "savoy",
+      "confidence": "high",
+      "note": "Italian Somaliland."
+    },
+    "zeila": {
+      "holder": "england",
+      "confidence": "high",
+      "note": "British Somaliland protectorate."
+    },
+    "gondar": {
+      "holder": "ethiopia",
+      "confidence": "high"
+    },
+    "cape": {
+      "holder": "south_africa",
+      "confidence": "high"
+    },
+    "tenochtitlan": {
+      "holder": "mexico",
+      "confidence": "high",
+      "note": "Huerta government holds Mexico City until Aug 1914."
+    },
+    "azcapotzalco": {
+      "holder": "mexico",
+      "confidence": "high",
+      "note": "Huerta government holds Mexico City until Aug 1914."
+    },
+    "tzintzuntzan": {
+      "holder": "mexico",
+      "confidence": "low",
+      "note": "Michoacán contested between federal forces and Constitutionalist bands in mid-1914; all factions counted as mexico."
+    },
+    "mayapan": {
+      "holder": "mexico",
+      "confidence": "medium",
+      "note": "Yucatán still under the federal (Huerta) government in June 1914."
+    },
+    "havana": {
+      "holder": "cuba",
+      "confidence": "high"
+    },
+    "santo_domingo": {
+      "holder": "dominican_republic",
+      "confidence": "high"
+    },
+    "cusco": {
+      "holder": "peru",
+      "confidence": "high"
+    },
+    "chan_chan": {
+      "holder": "peru",
+      "confidence": "high"
+    },
+    "quito": {
+      "holder": "ecuador",
+      "confidence": "high"
+    },
+    "bogota": {
+      "holder": "colombia",
+      "confidence": "high"
+    },
+    "salvador": {
+      "holder": "brazil",
+      "confidence": "high"
+    },
+    "buenos_aires": {
+      "holder": "argentina",
+      "confidence": "high"
+    },
+    "boston": {
+      "holder": "united_states",
+      "confidence": "high"
+    },
+    "quebec": {
+      "holder": "canada",
+      "confidence": "high"
+    },
+    "new_orleans": {
+      "holder": "united_states",
+      "confidence": "high"
+    },
+    "sydney": {
+      "holder": "australia",
+      "confidence": "high"
+    },
+    "singapore": {
+      "holder": "england",
+      "confidence": "high",
+      "note": "Straits Settlements."
+    }
+  },
+  "since_previous": {
+    "formed": [
+      "germany",
+      "china",
+      "canada",
+      "australia",
+      "south_africa",
+      "brazil",
+      "belgium",
+      "serbia",
+      "bulgaria",
+      "romania",
+      "greece",
+      "albania",
+      "nejd",
+      "kashmir",
+      "mongols",
+      "sarawak",
+      "liberia",
+      "zanzibar",
+      "newfoundland",
+      "new_zealand",
+      "tonga",
+      "mexico",
+      "guatemala",
+      "honduras",
+      "el_salvador",
+      "nicaragua",
+      "costa_rica",
+      "panama",
+      "cuba",
+      "dominican_republic",
+      "colombia",
+      "venezuela",
+      "ecuador",
+      "peru",
+      "bolivia",
+      "chile",
+      "uruguay"
+    ],
+    "ended": [
+      "naples",
+      "papal_states",
+      "florence",
+      "modena",
+      "parma",
+      "luneburg",
+      "hesse",
+      "frankfurt",
+      "krakow",
+      "wallachia",
+      "moldavia",
+      "ioannina_pashalik",
+      "shirvan",
+      "algiers",
+      "tripoli",
+      "baghdad_pashalik",
+      "diriyah",
+      "kokand",
+      "sikh_empire",
+      "sindh",
+      "mughals",
+      "maratha",
+      "nagpur",
+      "awadh",
+      "ahom",
+      "jurchens",
+      "korea",
+      "ryukyu",
+      "ava",
+      "vientiane",
+      "hawaii",
+      "wadai",
+      "funj",
+      "segou",
+      "timbuktu_tuareg",
+      "oyo",
+      "dahomey",
+      "asante",
+      "benin",
+      "kongo",
+      "rozvi",
+      "merina",
+      "kingdom_of_haiti",
+      "liga_federal",
+      "united_provinces_of_new_granada",
+      "mexican_insurgent_government",
+      "aceh",
+      "arma_pashalik",
+      "champa",
+      "champasak",
+      "gowa",
+      "kazakh_khanate",
+      "khalkha",
+      "kilwa",
+      "ladakh",
+      "mapuche",
+      "matamba",
+      "sicily",
+      "thanjavur",
+      "mossi"
+    ],
+    "first_listed": [
+      "finland",
+      "monaco",
+      "san_marino",
+      "liechtenstein",
+      "andorra",
+      "kuwait"
+    ],
+    "events": [
+      {
+        "key": "waterloo",
+        "name": "Battle of Waterloo",
+        "date": "1815-06-18",
+        "event_tree_id": "congress_of_vienna"
+      },
+      {
+        "key": "latin_american_independence",
+        "name": "Spanish American wars of independence end (Ayacucho)",
+        "date": "1824-12-09",
+        "event_tree_id": "latin_american_independence"
+      },
+      {
+        "key": "mexican_independence",
+        "name": "Army of the Three Guarantees enters Mexico City",
+        "date": "1821-09-27",
+        "event_tree_id": "latin_american_independence"
+      },
+      {
+        "key": "brazilian_independence",
+        "name": "Brazilian independence",
+        "date": "1822-09-07",
+        "event_tree_id": "brazilian_independence"
+      },
+      {
+        "key": "greek_independence",
+        "name": "London Protocol recognises Greece",
+        "date": "1830-02-03",
+        "event_tree_id": "greek_war_of_independence"
+      },
+      {
+        "key": "french_algeria",
+        "name": "French capture of Algiers",
+        "date": "1830-07-05",
+        "event_tree_id": "french_conquest_of_algeria"
+      },
+      {
+        "key": "belgian_revolution",
+        "name": "Belgian Revolution",
+        "date": "1830-08-25",
+        "event_tree_id": null
+      },
+      {
+        "key": "treaty_of_nanking",
+        "name": "Treaty of Nanking ends the First Opium War",
+        "date": "1842-08-29",
+        "event_tree_id": "first_opium_war"
+      },
+      {
+        "key": "treaty_of_guadalupe_hidalgo",
+        "name": "Treaty of Guadalupe Hidalgo",
+        "date": "1848-02-02",
+        "event_tree_id": "mexican_american_war"
+      },
+      {
+        "key": "revolutions_of_1848",
+        "name": "Revolutions of 1848 (February Revolution in Paris)",
+        "date": "1848-02-22",
+        "event_tree_id": "revolutions_of_1848"
+      },
+      {
+        "key": "taiping_rebellion",
+        "name": "Taiping Rebellion proclaimed at Jintian",
+        "date": "1851-01-11",
+        "event_tree_id": "taiping_rebellion"
+      },
+      {
+        "key": "treaty_of_paris_1856",
+        "name": "Treaty of Paris ends the Crimean War",
+        "date": "1856-03-30",
+        "event_tree_id": "crimean_war"
+      },
+      {
+        "key": "indian_rebellion",
+        "name": "Indian Rebellion breaks out at Meerut",
+        "date": "1857-05-10",
+        "event_tree_id": "indian_rebellion_of_1857"
+      },
+      {
+        "key": "kingdom_of_italy",
+        "name": "Proclamation of the Kingdom of Italy",
+        "date": "1861-03-17",
+        "event_tree_id": "italian_unification"
+      },
+      {
+        "key": "us_civil_war",
+        "name": "American Civil War (Fort Sumter to Appomattox)",
+        "date": "1861-04-12",
+        "event_tree_id": "us_civil_war"
+      },
+      {
+        "key": "austro_hungarian_compromise",
+        "name": "Austro-Hungarian Compromise",
+        "date": "1867-03-15",
+        "event_tree_id": null
+      },
+      {
+        "key": "canadian_confederation",
+        "name": "Canadian Confederation",
+        "date": "1867-07-01",
+        "event_tree_id": null
+      },
+      {
+        "key": "meiji_restoration",
+        "name": "Meiji Restoration",
+        "date": "1868-01-03",
+        "event_tree_id": "meiji_restoration"
+      },
+      {
+        "key": "suez_canal",
+        "name": "Opening of the Suez Canal",
+        "date": "1869-11-17",
+        "event_tree_id": "suez_canal"
+      },
+      {
+        "key": "capture_of_rome",
+        "name": "Capture of Rome",
+        "date": "1870-09-20",
+        "event_tree_id": "italian_unification"
+      },
+      {
+        "key": "german_empire",
+        "name": "Proclamation of the German Empire at Versailles",
+        "date": "1871-01-18",
+        "event_tree_id": "german_unification"
+      },
+      {
+        "key": "congress_of_berlin",
+        "name": "Treaty of Berlin",
+        "date": "1878-07-13",
+        "event_tree_id": null
+      },
+      {
+        "key": "british_occupation_of_egypt",
+        "name": "Battle of Tel el-Kebir; British occupation of Egypt",
+        "date": "1882-09-13",
+        "event_tree_id": "british_occupation_of_egypt"
+      },
+      {
+        "key": "berlin_conference",
+        "name": "Berlin Conference General Act",
+        "date": "1885-02-26",
+        "event_tree_id": "berlin_conference"
+      },
+      {
+        "key": "treaty_of_shimonoseki",
+        "name": "Treaty of Shimonoseki",
+        "date": "1895-04-17",
+        "event_tree_id": "first_sino_japanese_war"
+      },
+      {
+        "key": "battle_of_adwa",
+        "name": "Battle of Adwa",
+        "date": "1896-03-01",
+        "event_tree_id": "battle_of_adwa"
+      },
+      {
+        "key": "treaty_of_paris_1898",
+        "name": "Treaty of Paris ends the Spanish–American War",
+        "date": "1898-12-10",
+        "event_tree_id": "spanish_american_war"
+      },
+      {
+        "key": "australian_federation",
+        "name": "Federation of Australia",
+        "date": "1901-01-01",
+        "event_tree_id": "australian_federation"
+      },
+      {
+        "key": "treaty_of_vereeniging",
+        "name": "Treaty of Vereeniging ends the Second Boer War",
+        "date": "1902-05-31",
+        "event_tree_id": "south_african_war"
+      },
+      {
+        "key": "panama_independence",
+        "name": "Panama separates from Colombia",
+        "date": "1903-11-03",
+        "event_tree_id": "panama_canal"
+      },
+      {
+        "key": "treaty_of_portsmouth",
+        "name": "Treaty of Portsmouth ends the Russo-Japanese War",
+        "date": "1905-09-05",
+        "event_tree_id": "russo_japanese_war"
+      },
+      {
+        "key": "norwegian_independence",
+        "name": "Dissolution of the union of Norway and Sweden",
+        "date": "1905-06-07",
+        "event_tree_id": null
+      },
+      {
+        "key": "anglo_russian_convention",
+        "name": "Anglo-Russian Convention",
+        "date": "1907-08-31",
+        "event_tree_id": "anglo_russian_convention"
+      },
+      {
+        "key": "young_turk_revolution",
+        "name": "Young Turk Revolution",
+        "date": "1908-07-24",
+        "event_tree_id": "young_turk_revolution"
+      },
+      {
+        "key": "bosnian_annexation",
+        "name": "Austria-Hungary annexes Bosnia and Herzegovina",
+        "date": "1908-10-06",
+        "event_tree_id": null
+      },
+      {
+        "key": "union_of_south_africa",
+        "name": "Union of South Africa",
+        "date": "1910-05-31",
+        "event_tree_id": null
+      },
+      {
+        "key": "korea_annexed",
+        "name": "Japan annexes Korea",
+        "date": "1910-08-29",
+        "event_tree_id": "japanese_annexation_of_korea"
+      },
+      {
+        "key": "portuguese_republic",
+        "name": "Portuguese republic proclaimed",
+        "date": "1910-10-05",
+        "event_tree_id": null
+      },
+      {
+        "key": "mexican_revolution",
+        "name": "Mexican Revolution begins",
+        "date": "1910-11-20",
+        "event_tree_id": "mexican_revolution"
+      },
+      {
+        "key": "xinhai_revolution",
+        "name": "Wuchang Uprising (Xinhai Revolution)",
+        "date": "1911-10-10",
+        "event_tree_id": "xinhai_revolution"
+      },
+      {
+        "key": "qing_abdication",
+        "name": "Abdication of the Qing emperor",
+        "date": "1912-02-12",
+        "event_tree_id": "xinhai_revolution"
+      },
+      {
+        "key": "treaty_of_fez",
+        "name": "Treaty of Fez: French protectorate over Morocco",
+        "date": "1912-03-30",
+        "event_tree_id": null
+      },
+      {
+        "key": "treaty_of_ouchy",
+        "name": "Treaty of Ouchy ends the Italo-Turkish War",
+        "date": "1912-10-18",
+        "event_tree_id": "italian_invasion_of_libya"
+      },
+      {
+        "key": "treaty_of_bucharest_1913",
+        "name": "Treaty of Bucharest ends the Second Balkan War",
+        "date": "1913-08-10",
+        "event_tree_id": "balkan_wars"
+      },
+      {
+        "key": "sarajevo_assassination",
+        "name": "Assassination of Archduke Franz Ferdinand in Sarajevo",
+        "date": "1914-06-28",
+        "event_tree_id": "world_war_i"
+      }
+    ]
+  },
+  "tolerance": {
+    "key_places_match_share": 0.3
+  },
+  "sources": [
+    "Eric Hobsbawm, The Age of Empire 1875–1914 (1987)",
+    "Christopher Clark, The Sleepwalkers (2012)",
+    "C. A. Bayly, The Birth of the Modern World 1780–1914 (2004)",
+    "Jürgen Osterhammel, The Transformation of the World (2014)",
+    "Thomas Pakenham, The Scramble for Africa (1991)",
+    "Mark Mazower, The Balkans (2000)",
+    "Jonathan Spence, The Search for Modern China (1990)",
+    "Alan Knight, The Mexican Revolution (1986)"
+  ],
+  "open_questions": [
+    "Realm ids follow the map-id rule for continuing states (england = United Kingdom, castile = Spain, muscovy = Russia, brandenburg = Prussia, ayutthaya = Siam, khmer = Cambodia, dai_viet = Annam, mongols = Bogd Khanate); the event-tree files instead use britain, russia, ottoman. Germany and Italy use new ids (germany, italy) rather than brandenburg or savoy.",
+    "German member states (Prussia, Bavaria, Saxony, Lübeck) are given as holders with overlord germany; a check that wants the federal level should credit germany for Berlin, Cologne, Königsberg, Munich, Dresden and Lübeck.",
+    "Austria-Hungary is one realm (austria); Hungary is not listed separately as it was a partner in a dual monarchy rather than a vassal. Buda is therefore held by austria.",
+    "British India is counted as held directly by england (no separate british_raj realm); princely states (Hyderabad, Mysore, Kashmir, Dhar) and Bhutan are protected realms with overlord england.",
+    "Egypt is listed with overlord ottomans (de jure); in practice Britain governed it. Cyprus (Nicosia) is given to england though formally Ottoman until Nov 1914.",
+    "Mexico is one realm under Huerta although the Constitutionalists (Carranza, Villa, Obregón) and Zapatistas held most of the country; Tzintzuntzan (Michoacán) and Mayapán (Yucatán) are low-certainty as to which faction controlled them on this date.",
+    "Tibet and Mongolia are given as independent; China claimed both, and Mongolia accepted Chinese suzerainty in 1915.",
+    "Afghanistan, Oman, Cuba and Nicaragua have overlord null despite British or US control of foreign affairs or rights of intervention.",
+    "since_previous was recomputed against 1815.json in the id harmonisation (the Kingdom of Italy keeps savoy, the Qing are jurchens); argentina, paraguay and haiti already existed in 1815 and are not in formed. Short-lived realms that came and went (Gran Colombia, the Central American Federation, Texas, the Confederacy, the Peru–Bolivian Confederation) are not listed.",
+    "Names of some rulers of minor realms (Dhar, Ternate, Honduras, El Salvador acting president) are from general knowledge and not re-verified.",
+    "Id harmonisation: the Kingdom of Italy uses savoy (legal continuation of the Kingdom of Sardinia), Argentina continues the United Provinces of the Río de la Plata, Afghanistan the Durrani state, the Grand Duchy of Hesse uses hesse_darmstadt (Hesse-Kassel ended 1866). The Republic of China is counted as a new state (china formed), with the Qing (jurchens) ended.",
+    "Added as still standing: Hungary and Bohemia within Austria-Hungary, Indian princely states carried from 1815 (Jaipur, Udaipur, Jodhpur, Cooch Behar, Kolhapur, Manipur, Travancore, Baroda, Gwalior, Indore), Kalat, Lahej, Bornu, Brunswick, Oldenburg, Sulu, Tidore, the Mutapa rump and the Hejaz. Ended entries never listed in 1815 (German Confederation, Zulu, Transvaal, Orange Free State) were dropped."
+  ]
+}
