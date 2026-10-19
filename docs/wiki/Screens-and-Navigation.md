@@ -49,7 +49,7 @@ On a phone in landscape the logo sits top left, the column and icon row fill the
 One screen in three steps, with a strip at the top ("Realm · Options · Begin"). Back moves one step back, and from step 1 returns to the start screen without asking. The nation select music plays, its lead voice changing with the highlighted realm.
 
 1. **Realm.** Choose a realm on the map at world zoom, with filters (region, difficulty, free or locked) and a short list of suggested realms. Choosing a region frames it on the map and lists every realm there by name, one row each. Tapping a realm shows its card with its strengths at a glance and one line, Ways to grow ([The 1378 start](The-1378-Start)). A locked realm shows a padlock and a button to Unlock; coming back from a purchase returns you to step 1 with that realm still chosen. Quick start skips straight to Begin with the last options used and the realm you last tapped (or the first suggested one).
-2. **Options.** Difficulty, AI aggression, fog, historical or free events, ironman, and the end date, with presets that fill the whole step. The end date is 31 August of any year from 1494 to 1939; 31 August 1939 is the default.
+2. **Options.** Difficulty, AI aggression, fog, historical or free events, ironman, and the end date, with presets that fill the whole step. Difficulty is a row of Easy, Normal (chosen) and Hard, each with one line on what it changes ([The 1378 start](The-1378-Start#difficulty)). The end date is 31 August of any year from 1494 to 1939; 31 August 1939 is the default.
 3. **Begin.** A summary card (banner, ruler, capital, start date, options) and one big Begin button.
 
 ### Load and loading

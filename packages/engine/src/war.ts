@@ -30,6 +30,7 @@ import { goalPlacesHeldBy, goalPulls } from "./goals.ts";
 import goalsConfig from "../../rules/data/domain/events.json" with { type: "json" };
 import { cededProvinces, fittingAim, landTakenWithoutAim, monthlyRefusals, noteWarVictory, peaceVoices, refusedPeace, truceBroken, type GameWar } from "./peace.ts";
 import { aiAnswersDefence, defenceCalls, dissolveEmpire, whyNotDissolveTerm } from "./institutions.ts";
+import { aiWarChanceFactor } from "./difficulty.ts";
 
 /**
  * Milestone 1, war and conquest: wires the diplomacy context (who is at war,
@@ -1211,7 +1212,8 @@ export function monthlyDiplomacy(world: World, news: News[]): void {
  */
 export function aiDeclarations(world: World, news: News[]): void {
   const d = world.diplomacy;
-  const chance = world.rules.defines.war.aiDeclareChancePerMonth;
+  // The campaign's difficulty scales how readily the AI looks for a war (SETUP-101).
+  const chance = world.rules.defines.war.aiDeclareChancePerMonth * aiWarChanceFactor(world);
   const G = goalsConfig.goals;
   const O = dip.AF.opportunity;
   // Realms at war this month: a neighbour already fighting another is an opportunity (DIPL-242).

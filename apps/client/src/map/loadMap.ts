@@ -17,6 +17,9 @@ export interface MapImage {
 async function decode(url: string, width: number, height: number): Promise<Uint8ClampedArray> {
   const img = new Image();
   img.decoding = "async";
+  // A page in a sandboxed frame has an opaque origin, so even its own images
+  // count as another origin's: asked for with CORS, they can still be read.
+  img.crossOrigin = "anonymous";
   img.src = new URL(url, document.baseURI).href;
   await img.decode();
   const canvas = document.createElement("canvas");

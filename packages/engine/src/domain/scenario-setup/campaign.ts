@@ -71,6 +71,36 @@ export interface CampaignRules {
   end_date: string;
 }
 
+// ---------------------------------------------------------------------------
+// Difficulty (SETUP-099 to SETUP-103)
+
+/** The difficulty levels, easiest first: the same names the save library's options use. */
+export const DIFFICULTIES = config.campaign_rules.difficulty.levels as readonly Difficulty[];
+export type Difficulty = "easy" | "normal" | "hard";
+/** Normal: every factor 1, the game as balanced (SETUP-100). */
+export const DEFAULT_DIFFICULTY = config.campaign_rules.difficulty.default as Difficulty;
+
+/** What a difficulty changes, each a factor on today's rule (SETUP-101 to SETUP-103). */
+export interface DifficultyEffects {
+  /** On the AI's monthly chance to look for a war. */
+  ai_war_chance: number;
+  /** On the gold an AI realm's monthly income pays in; never the player's. */
+  ai_income: number;
+  /** On the monthly chance a plotting province of the player's realm rises. */
+  player_rising_chance: number;
+}
+
+const EFFECTS = config.campaign_rules.difficulty.effects as Record<Difficulty, DifficultyEffects>;
+
+/** A saved or chosen difficulty as a level; anything unknown (an old save) is normal. */
+export function difficultyOf(value: unknown): Difficulty {
+  return DIFFICULTIES.includes(value as Difficulty) ? (value as Difficulty) : DEFAULT_DIFFICULTY;
+}
+
+export function difficultyEffects(level: unknown): DifficultyEffects {
+  return EFFECTS[difficultyOf(level)];
+}
+
 export const CAMPAIGN_RULE_FIELDS = config.campaign_rules.fields as (keyof CampaignRules)[];
 export const DEFAULT_END_DATE = config.campaign_rules.default_end_date;
 

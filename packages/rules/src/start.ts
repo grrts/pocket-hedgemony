@@ -53,16 +53,17 @@ export const CHECKPOINT_START = "1444";
 function chosenStart(): string {
   const g = globalThis as { name?: unknown; location?: { search?: string; hash?: string }; sessionStorage?: Storage; process?: { env?: Record<string, string | undefined> }; WorkerGlobalScope?: unknown };
   const pick = (s: unknown) => (typeof s === "string" ? new URLSearchParams(s.replace(/^[?#]/, "")).get("start") : null);
-  const id = (g.WorkerGlobalScope !== undefined ? pick(g.name) : (pick(g.location?.search) ?? pick(g.location?.hash) ?? sessionStart(g.sessionStorage))) ?? g.process?.env?.PH_START ?? DEFAULT_START;
+  const id = (g.WorkerGlobalScope !== undefined ? pick(g.name) : (pick(g.location?.search) ?? pick(g.location?.hash) ?? sessionStart(g))) ?? g.process?.env?.PH_START ?? DEFAULT_START;
   return id === CHECKPOINT_START ? CHECKPOINT_START : DEFAULT_START;
 }
 
 /** The page's key for a start picked by a save from another start (SAVE-111): the page reopens in it to load that save. */
 export const SESSION_START_KEY = "ph-start";
 
-function sessionStart(store: Storage | undefined): string | null {
+/** Reading `sessionStorage` itself throws in a sandboxed frame without allow-same-origin, so the read is inside the try. */
+function sessionStart(g: { sessionStorage?: Storage }): string | null {
   try {
-    return store?.getItem(SESSION_START_KEY) ?? null;
+    return g.sessionStorage?.getItem(SESSION_START_KEY) ?? null;
   } catch {
     return null;
   }

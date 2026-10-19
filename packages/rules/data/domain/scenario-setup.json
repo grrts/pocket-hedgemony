@@ -3,7 +3,8 @@
   "_provisional": [
     "assessment_factors",
     "confidence_spread",
-    "africa.size_by_manpower"
+    "africa.size_by_manpower",
+    "campaign_rules.difficulty.effects"
   ],
   "reference_day": "1444-11-11",
   "catalogue": {
@@ -237,7 +238,17 @@
       "ironman",
       "end_date"
     ],
-    "default_end_date": "1939-08-31"
+    "default_end_date": "1939-08-31",
+    "difficulty": {
+      "$comment": "SETUP-099 to SETUP-103: what each difficulty changes. A factor on the AI's monthly chance to look for a war (war.ts aiDeclarations), on the gold an AI realm's monthly income pays into its treasury (treasury.ts runLedger; never the player's), and on the monthly chance a plotting province of the player's realm rises (rebels.ts risingChanceIn). Normal is 1 everywhere, the game as balanced. Provisional.",
+      "levels": ["easy", "normal", "hard"],
+      "default": "normal",
+      "effects": {
+        "easy": { "ai_war_chance": 0.5, "ai_income": 0.8, "player_rising_chance": 0.75 },
+        "normal": { "ai_war_chance": 1, "ai_income": 1, "player_rising_chance": 1 },
+        "hard": { "ai_war_chance": 1.5, "ai_income": 1.25, "player_rising_chance": 1.25 }
+      }
+    }
   },
   "map_to_catalogue": {
     "$comment": "X-13, D-SETUP-1: the 37 map ids that are not catalogue ids. A record id, or null where no record matches and the map's own data is kept.",

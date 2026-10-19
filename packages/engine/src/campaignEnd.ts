@@ -6,6 +6,7 @@ import { averagedScore, chapterEnds, economyScore, growth, powerScore, realmConf
 import { outcomeOf, type RealmScores } from "./domain/game-shell/ending.ts";
 import { eventsConfig } from "./domain/events/model.ts";
 import { switchCountry } from "./domain/achievements/index.ts";
+import { DEFAULT_DIFFICULTY, difficultyOf, type Difficulty } from "./domain/scenario-setup/campaign.ts";
 import * as nv from "./domain/naval/index.ts";
 
 /**
@@ -108,6 +109,8 @@ export interface CampaignEndState {
   dominationWon: boolean;
   /** The player played on as another realm: achievements end for this campaign (SHELL-096). */
   playedOn: boolean;
+  /** The campaign's difficulty, chosen at new game and fixed (SETUP-099); normal for a save from before it was kept. */
+  difficulty: Difficulty;
 }
 
 export function createCampaignEndState(N: number, start: GameDate): CampaignEndState {
@@ -134,6 +137,7 @@ export function createCampaignEndState(N: number, start: GameDate): CampaignEndS
     ending: null,
     dominationWon: false,
     playedOn: false,
+    difficulty: DEFAULT_DIFFICULTY,
   };
 }
 
@@ -493,6 +497,8 @@ export interface ScoreBreakdown {
 
 export interface CampaignView {
   endDate: string;
+  /** The campaign's difficulty, for Campaign rules (SETUP-099). */
+  difficulty: Difficulty;
   scoresDate: string;
   /** Every realm's Economy, Power and Technology, averaged over its last Januaries, three per realm. */
   scores: Int32Array;
@@ -550,7 +556,7 @@ const viewCache = new WeakMap<World, { key: string; view: CampaignView }>();
 
 export function campaignView(world: World): CampaignView {
   const c = world.campaign;
-  const key = `${c.scoresDate}/${c.scoresRun}|${c.ending ? `${c.ending.kind}/${c.ending.date}/${c.ending.realm}` : ""}|${world.player}|${c.playedOn}|${c.endDate}|${c.chapters.length}`;
+  const key = `${c.scoresDate}/${c.scoresRun}|${c.ending ? `${c.ending.kind}/${c.ending.date}/${c.ending.realm}` : ""}|${world.player}|${c.playedOn}|${c.endDate}|${c.chapters.length}|${c.difficulty}`;
   const hit = viewCache.get(world);
   if (hit && hit.key === key) return hit.view;
   const view = buildView(world);
@@ -580,6 +586,7 @@ function buildView(world: World): CampaignView {
   const next = chapterEnds(c.startYear, endYear, c.chapterYears).find((y) => y > c.chapterFrom) ?? endYear;
   return {
     endDate: c.endDate,
+    difficulty: c.difficulty,
     scoresDate: c.scoresDate,
     scores,
     growth: grown,
@@ -618,6 +625,8 @@ export interface SavedCampaignEnd {
   ending: Ending | null;
   dominationWon: boolean;
   playedOn: boolean;
+  /** Missing in saves from before difficulty was kept: normal. */
+  difficulty?: string;
 }
 
 export function saveCampaignEnd(world: World): SavedCampaignEnd {
@@ -638,7 +647,7 @@ export function saveCampaignEnd(world: World): SavedCampaignEnd {
     scores[id(n)] = [len, years, len <= YEARS && same(start, years.slice(0, 3)) ? 0 : start, same(chapter, start) ? 0 : chapter];
   }
   const chapters: SavedChapter[] = c.chapters.map((x) => ({ ...x, realm: x.realm >= 0 ? id(x.realm) : null, leaders: triple((k) => x.leaders[k]!.map(id)), ledger: x.ledger.map((r) => ({ ...r, nation: id(r.nation) })) }));
-  return { endDate: c.endDate, startYear: c.startYear, scores, startFloors: c.startFloors, chapterFloors: c.chapterFloors, chapterFrom: c.chapterFrom, chapters, largest: [...c.nationLargest], battlesWon: [...c.nationBattlesWon], ending: c.ending, dominationWon: c.dominationWon, playedOn: c.playedOn };
+  return { endDate: c.endDate, startYear: c.startYear, scores, startFloors: c.startFloors, chapterFloors: c.chapterFloors, chapterFrom: c.chapterFrom, chapters, largest: [...c.nationLargest], battlesWon: [...c.nationBattlesWon], ending: c.ending, dominationWon: c.dominationWon, playedOn: c.playedOn, difficulty: c.difficulty };
 }
 
 /** A save from before campaign end keeps the defaults; scores are worked out again from the world. */
@@ -659,6 +668,7 @@ export function restoreCampaignEnd(world: World, saved: SavedCampaignEnd | undef
     c.dominationWon = saved.dominationWon;
     c.playedOn = saved.playedOn;
     restoreScores(world, saved);
+    c.difficulty = difficultyOf(saved.difficulty);
   }
   const { owned } = landCounts(world);
   for (let n = 0; n < world.nationCount; n++) {

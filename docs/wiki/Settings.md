@@ -89,7 +89,7 @@ The files are kept in the app's user data folder on desktop and Steam, in the mo
 
 These are chosen on the new game screen, saved in the campaign, and shown read-only in Settings, under Campaign rules:
 
-- difficulty;
+- difficulty (Easy, Normal or Hard; what each changes is in [The 1378 start](The-1378-Start#difficulty));
 - AI temper;
 - fog of war;
 - historical or free events;

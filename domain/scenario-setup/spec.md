@@ -20,7 +20,7 @@ world; it does not run anything after the first turn.
   (gap item 26).
 - The relations snapshot used at start (country-relations, 1444 data).
 - Playable realms, the free tier (the Ottomans and France), and the realm picker's data.
-- Campaign rules chosen at new game (difficulty, AI temper, fog, events, ironman, end date) as setup data.
+- Campaign rules chosen at new game (difficulty, AI temper, fog, events, ironman, end date) as setup data, and what each difficulty level changes in play (SETUP-099 to SETUP-103).
 
 **Not in scope (owned by …)**
 - How government forms behave, reforms (government); lords, rulers and loyalty rules (realm).
@@ -398,6 +398,46 @@ with `?start=1444` in the address (or `#start=1444`).
 - SETUP-098 (Ubiquitous): Until each rule is moved to the 1378 map's own data, rules that name 1444 provinces shall read,
   in the 1378 start, the province of the 1378 map under each 1444 province's centre. [X-25] @placeholder `world/from-1444.json`
 
+### 5.11 Difficulty (Leroy, 19 October)
+
+Difficulty was a campaign rule the game kept and showed but nothing played by. It now changes three things, each a
+factor on a rule that already exists, applied at one point, with no new random draw: how readily the AI looks for a
+war, how much gold AI realms' income pays in, and how often the player's plotting provinces rise. On **normal** every
+factor is 1, so the game plays exactly as balanced. The numbers are provisional, in
+`scenario-setup.json` `campaign_rules.difficulty.effects`:
+
+| Level | AI looks for a war (`ai_war_chance`) | AI income paid in (`ai_income`) | Player's provinces rise (`player_rising_chance`) |
+|---|---|---|---|
+| easy | × 0.5 | × 0.8 | × 0.75 |
+| normal | × 1 | × 1 | × 1 |
+| hard | × 1.5 | × 1.25 | × 1.25 |
+
+**How the player uses it.** The player picks Easy, Normal or Hard on the new game options step (step 2, SHELL-033),
+where Normal is chosen and each button says in one line what it changes ("AI realms fight and earn as balanced";
+"AI realms are slower to war and poorer, your provinces calmer"; "AI realms are quicker to war and richer, your
+provinces more restless"); a preset fills it with the rest of the step. It is one row of three buttons among the
+campaign rules, not a card of its own, since it is chosen once. Afterwards it is fixed: the save library shows it on
+each campaign's row with the realm and date (SAVE header `options.difficulty`), and Settings → Campaign rules shows it
+read-only (SET-032). Nothing in play names it: the AI's wars, its treasury and the player's rising chances read as
+they always do, the rising chance on a province card already including the factor. On a phone in landscape the row
+is three 44-point buttons with their line under them in the options step's column, Wide and Tall alike, inside the
+safe areas, and nothing needs hover.
+
+- SETUP-099 (Ubiquitous): A campaign shall keep its difficulty, easy, normal or hard (the save library's names), in
+  the world from new game on and in every save; a save from before difficulty was kept, or an unknown level, plays
+  on normal. [Leroy 19 Oct; SETUP-054, SETUP-055]
+- SETUP-100 (Ubiquitous): On normal every difficulty factor shall be 1, so the game plays as balanced. [Leroy 19 Oct]
+  @placeholder `campaign_rules.difficulty.effects`
+- SETUP-101 (Ubiquitous): The AI's monthly chance to look for a war (`war.aiDeclareChancePerMonth`, with its goals'
+  pull) shall be multiplied by the difficulty's `ai_war_chance`: 0.5 on easy, 1.5 on hard. The price of war (WAR-228)
+  still decides whether it declares. [Leroy 19 Oct; WAR-228] @placeholder
+- SETUP-102 (Ubiquitous): When a new month pays each realm's income into its treasury, an AI realm's income shall be
+  multiplied by the difficulty's `ai_income` (0.8 on easy, 1.25 on hard); the player's income, and a realm's
+  deficit, shall be paid as they are. The ledger lines are not changed. [Leroy 19 Oct; REALM ledger] @placeholder
+- SETUP-103 (Ubiquitous): The monthly chance that a plotting province of the player's realm rises (X-9, with faith and
+  tongue, REALM-238) shall be multiplied by the difficulty's `player_rising_chance` (0.75 on easy, 1.25 on hard), at
+  most 1; AI realms' provinces rise as balanced. [Leroy 19 Oct; X-9] @placeholder
+
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
@@ -455,6 +495,8 @@ Nothing after the start. Before the first turn: build the starting world, then t
 | `scenario_setup.africa.size_by_manpower` | Provinces a new African nation takes by `manpower_potential` | very low 1, low 2, moderate 3, high 5, very high 8, unknown 2 (X-20) | Yes | `scenario-setup.json` |
 | `balance.africa.*` | Balance targets of African starts | SETUP-070 (X-20) | Yes | balancing model |
 | free realms | Free tier | Ottomans, France | No | store config |
+| `campaign_rules.difficulty.levels`, `.default` | Difficulty levels and the default | easy, normal, hard; normal | No | `scenario-setup.json` |
+| `campaign_rules.difficulty.effects` | Factors per level on the AI's war chance, AI income paid in, the player's rising chance (SETUP-100 to SETUP-103) | easy 0.5, 0.8, 0.75; normal 1, 1, 1; hard 1.5, 1.25, 1.25 | Yes | `scenario-setup.json` |
 
 ## 11. Seams
 
@@ -487,6 +529,8 @@ Nothing after the start. Before the first turn: build the starting world, then t
 - Each record's AI personality (tendencies, not scripts) is data the AI contexts read (country-catalogue
   README §5; `build/ai-personalities.md`).
 - Background-only records have no AI; playable subjects have their own AI under an overlord (schema).
+- The campaign's difficulty scales how readily AI realms look for a war and how much of their income pays in
+  (SETUP-101, SETUP-102); the AI's rules are otherwise the same at every level.
 
 ## 13. Decisions and open questions
 
@@ -510,6 +554,8 @@ Nothing after the start. Before the first turn: build the starting world, then t
 - **D-SETUP-19** Sleeping realms (Leroy, 18 Oct; X-24): realms founded after 1444 are listed from the start and asleep until they wake (SETUP-080 to SETUP-094). D-SETUP-2's "only a representation that owns map provinces is a realm" now reads "is a realm on the map in 1444"; a record that owns no province may be a sleeping realm.
 - **D-SETUP-18** African starts (Leroy, 18 Oct; X-20): in the four African regions, D-SETUP-2's "only a representation that owns map provinces is a realm" now applies after the catalogue's playable countries, subjects and peoples are given the unowned land around their capitals (SETUP-060 to SETUP-065); elsewhere D-SETUP-2 stands. Leroy asked for more of the historical states and tribes, even very small ones, and as little change to the rules of play as possible.
 - **D-SETUP-19** Added realms and the province grid (18 Oct; X-20, D-TRIBE-3): realms added from the catalogue (`grows` in the map nations data) take provinces as the map already cuts them, and never keep a piece of land apart the way the hand-placed capitals do, so every province keeps its id and every file that names provinces (ports, event places, anchors) stays valid. Sub-Saharan provinces are large (about 50,000 km² each), so where two capitals fall in one province the first in nation order keeps it and the other stays reference data (Kayor, Baol and Waalo in Jolof's province; Lamu and Pate in Mombasa's). The build lists them in `scenario-setup-report.json`. A finer African grid is a map change of its own. The start-date plan (1378) extends the same rows: a realm's capital, its own owner rules and `grows`.
+
+- **D-SETUP-20** Difficulty (Leroy, 19 Oct): difficulty changes the AI's readiness for war, the gold AI realms' income pays in and the player's rising chances, each as a provisional factor at one point, 1 on normal (SETUP-099 to SETUP-103). The rising factor is the player's only, since difficulty is about the player's game and AI realms' unrest shapes the world's history; the income factor is the AI's only, so the player's treasury always reads as its ledger. The war factor applies to every AI realm's monthly look for a war, not only toward the player, as no design names the player as a special target. This is the one place where the AI's numbers differ from the player's (DECISIONS rule 3), chosen by the player at new game.
 
 ## 14. Traceability
 
@@ -609,3 +655,9 @@ Nothing after the start. Before the first turn: build the starting world, then t
 | SETUP-096 | — | rules unit test `scenario-1378.test.ts` (the regions checked together) |
 | SETUP-097 | — | rules unit test `start-1378.test.ts` (sleeping realms and ports on 1378 provinces) |
 | SETUP-098 | — | start.ts (no scenario yet) |
+| SETUP-099 | difficulty.feature | A new campaign keeps its difficulty |
+| SETUP-099 | difficulty.feature | A save from before difficulty was kept plays on normal |
+| SETUP-100 | difficulty.feature | Normal plays as balanced |
+| SETUP-101 | difficulty.feature | The AI looks for a war by the difficulty |
+| SETUP-102 | difficulty.feature | AI income pays in by the difficulty, the player's never |
+| SETUP-103 | difficulty.feature | The player's plotting provinces rise by the difficulty |
