@@ -7,7 +7,7 @@
  */
 import provinceConfig from "../../../../rules/data/domain/province.json" with { type: "json" };
 import buildingsConfig from "../../../../rules/data/domain/buildings.json" with { type: "json" };
-import ports1444 from "../../../../rules/data/domain/naval-ports-1444.json" with { type: "json" };
+import { START_YEAR, startPorts as ports1444 } from "../../../../rules/src/start.ts";
 import { explorationConfig, polityRegion, regionData } from "../exploration/index.ts";
 import { catalogueRecord, hasRecord } from "./catalogue.ts";
 import { catalogueIdOf } from "./start.ts";
@@ -139,7 +139,7 @@ export function startTrade(provinces: readonly { id: string; name: string }[]): 
   const towns = new Set<number>();
   const portTowns = ports1444.towns as { name: string; tier: string; province: string | null }[];
   for (const a of buildingsConfig.anchors as { province: string; building: string; from_year: number; by_event?: boolean }[]) {
-    if (a.building !== "market" || a.from_year > 1444 || a.by_event) continue;
+    if (a.building !== "market" || a.from_year > START_YEAR || a.by_event) continue;
     let i = byName(a.province);
     if (i < 0) i = byId.get(portTowns.find((t) => sameName(t.name, a.province))?.province ?? "") ?? -1;
     if (i >= 0) towns.add(i);

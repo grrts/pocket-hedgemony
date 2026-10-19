@@ -1,5 +1,6 @@
 import { effectInPlay, IN_PLAY, LEVEL_RANK, RISK_DIMENSIONS, type HeritageLine, type HeritageView, type RealmAssessment, type RealmStrengths } from "@ph/engine";
 import { icon, type IconName } from "../art/ui.ts";
+import { START_YEAR } from "@ph/rules/start";
 
 /**
  * A realm's national strengths on its card (national-strengths HER-080..085):
@@ -213,12 +214,12 @@ export function heritageTab(s: RealmStrengths, v: HeritageView | null = null, go
           .map(([dim, label]) => bar(byDim.get(dim)!, label))
           .join("")}</ul></section>`,
       ).join("")
-    : `<p class="hint">The chronicles say little of this realm in 1444.</p>`;
+    : `<p class="hint">The chronicles say little of this realm in ${START_YEAR}.</p>`;
   return `<h3 class="sub">Heritage</h3>
     <div class="heritage">${parts}</div>
     ${ambitions}
     ${legacies}
-    <h3 class="sub">In 1444</h3>
+    <h3 class="sub">In ${START_YEAR}</h3>
     <p class="hint">How the chronicles judge the realm at the start, and what each sets it off with; a question mark where they are unsure, and there the start varies more between campaigns.</p>
     <div class="assessment-groups">${standing}</div>`;
 }

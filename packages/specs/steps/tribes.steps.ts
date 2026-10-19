@@ -5,7 +5,7 @@ import * as T from "@ph/engine/domain/tribes";
 import * as DIP from "@ph/engine/domain/diplomacy";
 import * as SETUP from "@ph/engine/domain/scenario-setup";
 import { startFaiths, startTongues } from "../../engine/src/peoples.ts";
-import sources from "../../../tools/mapgen/nations-1444.json" with { type: "json" };
+import sources from "../../rules/data/scenarios/1444/map-nations.json" with { type: "json" };
 import { steps, type Scenario } from "../src/registry.ts";
 
 const { Given, When, Then } = steps("tribes");

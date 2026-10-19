@@ -1,5 +1,5 @@
 {
- "$comment": "Tribes (domain/tribes/spec.md, TRIBE): tribal realms of North America and their hunting grounds. Values from the tribes design of 18 October 2026; every number is a placeholder balancing knob (DECISIONS rule 4). region_bounds draws each region of tribes.regions as a box of longitude and latitude, read against a realm's capital on the map, since map realms carry no catalogue region. new_tribe_regions, new_tribe_representations, new_tribe_provinces and new_tribes_left_out say which catalogue records the 1444 map adds as new tribes (TRIBE-002 to TRIBE-005); their home points are in tools/mapgen/nations-1444.json (grows).",
+ "$comment": "Tribes (domain/tribes/spec.md, TRIBE): tribal realms of North America and their hunting grounds. Values from the tribes design of 18 October 2026; every number is a placeholder balancing knob (DECISIONS rule 4). region_bounds draws each region of tribes.regions as a box of longitude and latitude, read against a realm's capital on the map, since map realms carry no catalogue region. new_tribe_regions, new_tribe_representations, new_tribe_provinces and new_tribes_left_out say which catalogue records the 1444 map adds as new tribes (TRIBE-002 to TRIBE-005); their home points are in packages/rules/data/scenarios/1444/map-nations.json (grows).",
  "regions": [
   "am_north"
  ],

@@ -1,5 +1,5 @@
 import raw from "../../../../rules/data/domain/diplomacy.json" with { type: "json" };
-import dataset from "../../../../rules/data/domain/diplomacy-relations-1444.json" with { type: "json" };
+import { startRelations as dataset } from "../../../../rules/src/start.ts";
 
 /** A relation type as the relations rules describe it. */
 export interface TypeRule {

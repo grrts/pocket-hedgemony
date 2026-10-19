@@ -674,7 +674,7 @@ Changes the design asks of other files (§18), recorded here; not edited:
 - **D-BLD-5** (was OQ-BLD-5) Landmarks stand at their building's top step and are marked as landmarks (Alhambra palace 3, Sankore school 3, Kremlin castle 3, Ulugh Beg observatory 1; Taj Mahal its own type at step 1). No step above the top is needed.
 - **D-BLD-6** (was OQ-BLD-6) Yearly fair: building a new one (market step 2) needs T6 and a market charter; fairs standing in 1444 stay; traders can be hired at the start without it. Trade v2 settles T6 (D-TRADE-3, D-RSCH-4).
 - **D-BLD-7** (was OQ-BLD-7) Caravanserai and counting house take trade v2's roles: the caravanserai gives land traders +25 % weight and stops bandits; the counting house lets foreign traders deposit with bills of exchange; "room" is dropped. Trade is the later design.
-- **D-BLD-8** (was OQ-BLD-8) Ports: `naval/data/ports-1444.json` (the rules' naval-ports-1444 data) is canonical for starting harbours. Trade and naval both use it.
+- **D-BLD-8** (was OQ-BLD-8) Ports: `naval/data/ports-1444.json` (the start scenario's ports.json in the rules) is canonical for starting harbours. Trade and naval both use it.
 - **D-BLD-9** (was OQ-BLD-9) Palace step 3 (royal city) needs G9, as the config says. Government's reform can require it too.
 - **D-BLD-10** (was OQ-BLD-10) Province adopts buildings §18 (D-PROV-9, D-PROV-12): hospital at start, wells, drains and dykes as ring works, miners in quarries, Works and Jobs lenses. The later design.
 - **D-BLD-11** (was OQ-BLD-11) A lord's province of yours counts as yours for material reach. Trade treats it the same way.

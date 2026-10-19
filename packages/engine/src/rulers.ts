@@ -5,7 +5,7 @@ import { cultureOf } from "./names.ts";
 import { realmConfig, successor, type Person, type ThroneLaw } from "./domain/realm/index.ts";
 import * as gov from "./domain/government/index.ts";
 import { formOf } from "./government.ts";
-import data from "../../rules/data/domain/rulers-1444.json" with { type: "json" };
+import { startRulers as data } from "../../rules/src/start.ts";
 
 /**
  * Rulers in play (realm REALM-233 to REALM-236): every realm has a ruler from

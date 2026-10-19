@@ -1,6 +1,7 @@
 import type { GovernmentView, NextFormView, RevolutionView } from "@ph/engine";
 import { icon } from "../art/ui.ts";
 import { regimeCard } from "./revolution.ts";
+import { START_YEAR } from "@ph/rules/start";
 
 /**
  * Government on the realm card (GOV-064 to GOV-066): the Government tab of
@@ -26,7 +27,7 @@ const FAMILY: Record<string, string> = {
 /** The reform waiting for a second tap, by form id; the player's choice, kept between renders. */
 export const governmentUi = { confirm: null as string | null };
 
-const PART: Record<string, string> = { form: "Form", custom: "Custom since 1444" };
+const PART: Record<string, string> = { form: "Form", custom: `Custom since ${START_YEAR}` };
 
 /** One cap: "x of y", a bar, its parts, and what going over it does. */
 function capBlock(label: string, used: number, cap: GovernmentView["officials"]["cap"], over: string, tab: string): string {

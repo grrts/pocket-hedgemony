@@ -4,7 +4,7 @@
  * read by the game and the specs alike.
  */
 import config from "../../../../rules/data/domain/subjects.json" with { type: "json" };
-import rulers from "../../../../rules/data/domain/subjects-rulers-1444.json" with { type: "json" };
+import { startSubjectsRulers as rulers } from "../../../../rules/src/start.ts";
 import { becomeSubjectAllowed, cardButtons, grantsLoosenAsk, kindIcon, outgrown, stepName, type FoldInContext, type Kind, type Reason, type SubjectBond, warAnswer } from "./index.ts";
 
 const P = config.playing_as_subject;
