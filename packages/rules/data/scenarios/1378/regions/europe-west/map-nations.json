@@ -19,7 +19,7 @@
   {"id": "savoy", "name": "Savoy", "capital": [5.92, 45.57], "army": 4000},
   {"id": "milan", "name": "Milan", "capital": [9.19, 45.46], "army": 7000},
   {"id": "visconti_pavia", "name": "Visconti Pavia", "capital": [9.16, 45.19], "color": "#5f7fa8", "army": 6000},
-  {"id": "venice", "name": "Venice", "capital": [12.33, 45.44], "color": "#41a6f6", "commanders": [{"name": "Vettor Pisani", "might": 3, "cunning": 3, "logistics": 3}, {"name": "Carlo Zeno", "might": 3, "cunning": 3, "logistics": 2}], "army": 10000},
+  {"id": "venice", "name": "Venice", "capital": [12.24, 45.49], "color": "#41a6f6", "commanders": [{"name": "Vettor Pisani", "might": 3, "cunning": 3, "logistics": 3}, {"name": "Carlo Zeno", "might": 3, "cunning": 3, "logistics": 2}], "army": 10000},
   {"id": "genoa", "name": "Genoa", "capital": [8.93, 44.41], "commanders": [{"name": "Luciano Doria", "might": 3, "cunning": 3, "logistics": 2}], "army": 8000},
   {"id": "florence", "name": "Florence", "capital": [11.25, 43.77], "commanders": [{"name": "John Hawkwood", "might": 4, "cunning": 4, "logistics": 3}], "army": 5000},
   {"id": "modena", "name": "Ferrara", "capital": [11.62, 44.84]},
