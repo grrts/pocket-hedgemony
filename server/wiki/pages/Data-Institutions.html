@@ -1,0 +1,209 @@
+<h1>Institutions data</h1>
+<p>Every value in the game&#39;s institutions config, exactly as the game reads it. This page is made from <code>packages/rules/data/domain/institutions.json</code> each time the config changes, so it always matches the game. How these values are used is explained on <a href="/wiki/Institutions">Institutions</a>.</p>
+<p>Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and values marked (provisional) are placeholders that may still change in balancing. Inventions are shown by id and name; see <a href="/wiki/Data-Research#inventions">Research data</a>.</p>
+<blockquote>
+<p>Institutions (domain/institutions/spec.md, INST): the Empire and the Shogunate. Values from the institutions design of 18 October 2026 (/mnt/project-files/institutions/institutions-design.md). Every number is a placeholder balancing knob. members_1444 is the design&#39;s worked X-13 match of the catalogue&#39;s imperial estates to map realms (OQ-INST-1: the Teutonic Order, nominal in the catalogue, is left out as the design lists it).</p>
+</blockquote>
+<h2 id="hold"><a class="anchor" href="#hold" aria-label="Link to this section">#</a>Hold</h2>
+<h3 id="words"><a class="anchor" href="#words" aria-label="Link to this section">#</a>Words</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>min</th><th>word</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>80</td><td>Strong</td></tr>
+<tr><td>2</td><td>50</td><td>Firm</td></tr>
+<tr><td>3</td><td>20</td><td>Weak</td></tr>
+<tr><td>4</td><td>0</td><td>Hollow</td></tr>
+</tbody></table></div>
+<h2 id="empire"><a class="anchor" href="#empire" aria-label="Link to this section">#</a>Empire</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>name</code></td><td>The Empire</td></tr>
+<tr><td><code>office</code></td><td>Emperor</td></tr>
+<tr><td><code>holder_1444</code></td><td>austria</td></tr>
+<tr><td><code>members_1444</code></td><td>austria, bavaria, bohemia, brandenburg, cologne, hamburg, hesse, lorraine, luneburg, mecklenburg, palatinate, pomerania, saxony, wurttemberg, switzerland, milan, savoy, modena</td></tr>
+<tr><td><code>faith</code></td><td>catholic</td></tr>
+<tr><td><code>head_of_faith</code></td><td>papal_states</td></tr>
+<tr><td><code>hold_start</code></td><td>35</td></tr>
+<tr><td><code>election_years_without_rulers</code></td><td>25</td></tr>
+<tr><td><code>election_months</code></td><td>1</td></tr>
+<tr><td><code>candidates_by_soldiers</code></td><td>3</td></tr>
+<tr><td><code>dues_per_member</code></td><td>1</td></tr>
+<tr><td><code>common_tax</code></td><td>0.05</td></tr>
+<tr><td><code>contingent</code></td><td>0.1</td></tr>
+<tr><td><code>one_realm_hold</code></td><td>80</td></tr>
+<tr><td><code>dissolve_years_at_zero</code></td><td>5</td></tr>
+<tr><td><code>dissolve_min_era</code></td><td>IV</td></tr>
+</tbody></table></div>
+<h3 id="seats-1444"><a class="anchor" href="#seats-1444" aria-label="Link to this section">#</a>Seats 1444</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>name</th><th>church</th><th>realm</th></tr></thead>
+<tbody>
+<tr><td>Mainz</td><td>yes</td><td></td></tr>
+<tr><td>Cologne</td><td></td><td>cologne</td></tr>
+<tr><td>Trier</td><td>yes</td><td></td></tr>
+<tr><td>Bohemia</td><td></td><td>bohemia</td></tr>
+<tr><td>Palatinate</td><td></td><td>palatinate</td></tr>
+<tr><td>Saxony</td><td></td><td>saxony</td></tr>
+<tr><td>Brandenburg</td><td></td><td>brandenburg</td></tr>
+</tbody></table></div>
+<h3 id="seek-vote"><a class="anchor" href="#seek-vote" aria-label="Link to this section">#</a>Seek vote</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>gift_gold</code></td><td>30</td></tr>
+<tr><td><code>tie</code></td><td>15</td></tr>
+<tr><td><code>fade_years</code></td><td>10</td></tr>
+</tbody></table></div>
+<h3 id="vote"><a class="anchor" href="#vote" aria-label="Link to this section">#</a>Vote</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>standing_divisor</code></td><td>4</td></tr>
+<tr><td><code>same_faith</code></td><td>10</td></tr>
+<tr><td><code>sitting_house</code></td><td>15</td></tr>
+<tr><td><code>strength_per_multiple</code></td><td>5</td></tr>
+<tr><td><code>strength_max</code></td><td>20</td></tr>
+<tr><td><code>at_war</code></td><td>-50</td></tr>
+</tbody></table></div>
+<h3 id="defence"><a class="anchor" href="#defence" aria-label="Link to this section">#</a>Defence</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>answer</code></td><td>10</td></tr>
+<tr><td><code>refuse</code></td><td>-15</td></tr>
+<tr><td><code>wrong</code></td><td>-25</td></tr>
+<tr><td><code>wrong_fade_years</code></td><td>20</td></tr>
+<tr><td><code>answer_months</code></td><td>1</td></tr>
+</tbody></table></div>
+<h3 id="hold-year"><a class="anchor" href="#hold-year" aria-label="Link to this section">#</a>Hold year</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>peace</code></td><td>2</td></tr>
+<tr><td><code>member_war</code></td><td>-3</td></tr>
+<tr><td><code>outsider_province</code></td><td>-2</td></tr>
+<tr><td><code>outsider_max</code></td><td>-10</td></tr>
+<tr><td><code>member_left</code></td><td>-5</td></tr>
+<tr><td><code>other_faith</code></td><td>-1</td></tr>
+<tr><td><code>augsburg_factor</code></td><td>0.5</td></tr>
+</tbody></table></div>
+<h3 id="admit"><a class="anchor" href="#admit" aria-label="Link to this section">#</a>Admit</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>base</code></td><td>0</td></tr>
+<tr><td><code>standing_divisor</code></td><td>4</td></tr>
+<tr><td><code>same_faith</code></td><td>10</td></tr>
+<tr><td><code>emperor_stronger</code></td><td>10</td></tr>
+</tbody></table></div>
+<h3 id="diet"><a class="anchor" href="#diet" aria-label="Link to this section">#</a>Diet</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>min_hold</code></td><td>50</td></tr>
+<tr><td><code>years_between</code></td><td>5</td></tr>
+<tr><td><code>months</code></td><td>1</td></tr>
+<tr><td><code>pass_cost</code></td><td>30</td></tr>
+<tr><td><code>fail_cost</code></td><td>10</td></tr>
+<tr><td><code>elector_weight</code></td><td>2</td></tr>
+</tbody></table></div>
+<h4 id="reasons"><a class="anchor" href="#reasons" aria-label="Link to this section">#</a>Reasons</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>hold_divisor</code></td><td>10</td></tr>
+<tr><td><code>standing_divisor</code></td><td>4</td></tr>
+<tr><td><code>same_faith</code></td><td>10</td></tr>
+<tr><td><code>outsider_next</code></td><td>15</td></tr>
+<tr><td><code>size_per_multiple</code></td><td>5</td></tr>
+<tr><td><code>size_max</code></td><td>20</td></tr>
+</tbody></table></div>
+<h3 id="reforms"><a class="anchor" href="#reforms" aria-label="Link to this section">#</a>Reforms</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>id</th><th>name</th><th>base</th><th>effect</th></tr></thead>
+<tbody>
+<tr><td>public_peace</td><td>Public Peace</td><td>10</td><td>A member that makes war on another member becomes a Breaker of the Peace.</td></tr>
+<tr><td>imperial_court</td><td>Imperial Court</td><td>5</td><td>Members take quarrels over land to court instead of to war.</td></tr>
+<tr><td>circles</td><td>Circles</td><td>5</td><td>Every member of a circle joins the defence when an outsider attacks one of them.</td></tr>
+<tr><td>common_tax</td><td>Common Tax</td><td>-10</td><td>Every member pays 5 in 100 of its tax to the Emperor in place of the dues.</td></tr>
+<tr><td>imperial_army</td><td>Imperial Army</td><td>-10</td><td>In a war to defend the Empire the Emperor commands a tenth of every member&#39;s soldiers.</td></tr>
+<tr><td>hereditary_crown</td><td>Hereditary Crown</td><td>-25</td><td>The Emperor&#39;s heir takes the crown; no more elections.</td></tr>
+<tr><td>one_realm</td><td>One Realm</td><td>-40</td><td>Every member&#39;s ruler becomes a great lord of the Emperor, and the Empire becomes one realm.</td></tr>
+</tbody></table></div>
+<h3 id="breaker"><a class="anchor" href="#breaker" aria-label="Link to this section">#</a>Breaker</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>aim_years</code></td><td>10</td></tr>
+</tbody></table></div>
+<h3 id="court"><a class="anchor" href="#court" aria-label="Link to this section">#</a>Court</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>base</code></td><td>-5</td></tr>
+<tr><td><code>aim</code></td><td>20</td></tr>
+<tr><td><code>standing_divisor</code></td><td>4</td></tr>
+<tr><td><code>hold_divisor</code></td><td>10</td></tr>
+<tr><td><code>answer_months</code></td><td>1</td></tr>
+</tbody></table></div>
+<h3 id="circles"><a class="anchor" href="#circles" aria-label="Link to this section">#</a>Circles</h3>
+<blockquote>
+<p>OQ-INST-2 default: the historical circles of 1512 matched to map members; Bohemia, Switzerland and the Italian members sat in no circle.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>Austrian</code></td><td>austria</td></tr>
+<tr><td><code>Bavarian</code></td><td>bavaria</td></tr>
+<tr><td><code>Swabian</code></td><td>wurttemberg</td></tr>
+<tr><td><code>Upper Rhenish</code></td><td>hesse, lorraine</td></tr>
+<tr><td><code>Electoral Rhenish</code></td><td>cologne, palatinate</td></tr>
+<tr><td><code>Lower Saxon</code></td><td>luneburg, mecklenburg, hamburg</td></tr>
+<tr><td><code>Upper Saxon</code></td><td>saxony, brandenburg, pomerania</td></tr>
+</tbody></table></div>
+<h2 id="shogunate"><a class="anchor" href="#shogunate" aria-label="Link to this section">#</a>Shogunate</h2>
+<blockquote>
+<p>INST-060 to INST-069 (institutions design §4). The Court&#39;s province is the map&#39;s Mie (p2110), which holds Kyoto and Japan&#39;s 1444 capital. Japan&#39;s land is Japan&#39;s 1444 provinces. The houses and their land are the realm data&#39;s starting_lords.house_lands (D-INST-1). The oath counts are placeholders in the reasons count&#39;s own scale.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>name</code></td><td>The Shogunate</td></tr>
+<tr><td><code>office</code></td><td>Shogun</td></tr>
+<tr><td><code>holder_1444</code></td><td>japan</td></tr>
+<tr><td><code>court_province</code></td><td>p2110</td></tr>
+<tr><td><code>hold_start</code></td><td>30</td></tr>
+<tr><td><code>appointed_hold</code></td><td>40</td></tr>
+<tr><td><code>summon_wealth_loss</code></td><td>0.1</td></tr>
+<tr><td><code>confirm_cost</code></td><td>5</td></tr>
+<tr><td><code>restoration_min_era</code></td><td>V</td></tr>
+</tbody></table></div>
+<h3 id="hold-year-1"><a class="anchor" href="#hold-year-1" aria-label="Link to this section">#</a>Hold year</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>no_revolt</code></td><td>3</td></tr>
+<tr><td><code>per_revolt</code></td><td>-5</td></tr>
+<tr><td><code>no_heir</code></td><td>-10</td></tr>
+<tr><td><code>unhappy_war</code></td><td>-3</td></tr>
+<tr><td><code>summoned</code></td><td>1</td></tr>
+</tbody></table></div>
+<h3 id="closed-country"><a class="anchor" href="#closed-country" aria-label="Link to this section">#</a>Closed country</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>min_era</code></td><td>III</td></tr>
+<tr><td><code>hold_per_year</code></td><td>2</td></tr>
+</tbody></table></div>
+<h3 id="oath"><a class="anchor" href="#oath" aria-label="Link to this section">#</a>Oath</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>base</code></td><td>-10</td></tr>
+<tr><td><code>standing_divisor</code></td><td>4</td></tr>
+<tr><td><code>stronger_per_multiple</code></td><td>10</td></tr>
+<tr><td><code>stronger_max</code></td><td>30</td></tr>
+<tr><td><code>hold_divisor</code></td><td>5</td></tr>
+<tr><td><code>answer_months</code></td><td>1</td></tr>
+</tbody></table></div>

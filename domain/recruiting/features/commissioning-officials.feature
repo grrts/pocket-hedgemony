@@ -172,3 +172,13 @@ Feature: Commanders from officials
     Given the country "France" has 60 gold
     When the player commissions the steward of "Reims"
     Then France has 10 gold left
+
+  @RECR-128 @RECR-129
+  Scenario: A general for the armies, an admiral for the fleets
+    Given the country "France" has 200 gold
+    When the player commissions the customs officer of a royal province as admiral
+    Then he starts with a customs officer's sea skills
+    And he can lead a fleet but not an army
+    When the player commissions the warden of a royal province as general
+    Then he starts with a warden's skills
+    And he can lead an army but not a fleet

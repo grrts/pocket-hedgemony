@@ -1,0 +1,384 @@
+<h1>Government data</h1>
+<p>Every value in the game&#39;s government config, exactly as the game reads it. This page is made from <code>packages/rules/data/domain/government.json</code> each time the config changes, so it always matches the game. How these values are used is explained on <a href="/wiki/Government">Government</a>.</p>
+<p>Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and values marked (provisional) are placeholders that may still change in balancing. Inventions are shown by id and name; see <a href="/wiki/Data-Research#inventions">Research data</a>.</p>
+<blockquote>
+<p>From government/config/government.yaml (version 2) and start-forms.yaml. Every number is a placeholder for balancing.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>colonial_governors_count_against_officials_cap</code></td><td>no</td></tr>
+<tr><td><code>revolution_ignores_era</code></td><td>yes</td></tr>
+<tr><td><code>admin_capacity_officials_per_point</code> (provisional)</td><td>1</td></tr>
+</tbody></table></div>
+<h2 id="over-cap"><a class="anchor" href="#over-cap" aria-label="Link to this section">#</a>Over cap</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>grievance</th><th>when</th><th>slips per lord over</th><th>order</th></tr></thead>
+<tbody>
+<tr><td>officials</td><td>grasping_officials</td><td></td><td></td><td></td></tr>
+<tr><td>lords</td><td></td><td>new_year</td><td>1</td><td>lowest_loyalty, most_provinces</td></tr>
+<tr><td>reform</td><td></td><td></td><td></td><td>lowest_loyalty, most_provinces</td></tr>
+</tbody></table></div>
+<h2 id="great-lord"><a class="anchor" href="#great-lord" aria-label="Link to this section">#</a>Great lord</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>provinces min</th><th>provinces max</th><th>down reasons</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>4</td><td>7</td><td>1</td></tr>
+<tr><td>2</td><td>8</td><td>999</td><td>2</td></tr>
+</tbody></table></div>
+<h2 id="subject-reach-start"><a class="anchor" href="#subject-reach-start" aria-label="Link to this section">#</a>Subject reach start</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>very_low</code></td><td>2</td></tr>
+<tr><td><code>low</code></td><td>3</td></tr>
+<tr><td><code>moderate</code></td><td>5</td></tr>
+<tr><td><code>high</code></td><td>7</td></tr>
+<tr><td><code>very_high</code></td><td>9</td></tr>
+</tbody></table></div>
+<h2 id="start"><a class="anchor" href="#start" aria-label="Link to this section">#</a>Start</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>form</code></td><td>historical, from config/start-forms.yaml</td></tr>
+<tr><td><code>lords</code></td><td>the catalogue&#39;s historical houses; a country with one province starts with none</td></tr>
+</tbody></table></div>
+<h2 id="buildings"><a class="anchor" href="#buildings" aria-label="Link to this section">#</a>Buildings</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>officials</th><th>lords</th><th>note</th><th>landmark step 4</th><th>needs</th><th>forms</th></tr></thead>
+<tbody>
+<tr><td>palace</td><td>6, 10, 16</td><td>2, 4, 6</td><td>by step</td><td>officials: (forbidden_city: 24; topkapi: 20); lords: 6</td><td></td><td></td></tr>
+<tr><td>seat</td><td>2, 4</td><td></td><td>by step; any number, one per province (D-GOV-10)</td><td></td><td></td><td></td></tr>
+<tr><td>chancery</td><td>4</td><td></td><td></td><td></td><td><a href="/wiki/Data-Research#inventions">G3 Tax registers</a></td><td></td></tr>
+<tr><td>court_of_law</td><td></td><td>2</td><td></td><td></td><td><a href="/wiki/Data-Research#inventions">G1 Written law codes</a></td><td></td></tr>
+<tr><td>diet_hall</td><td></td><td>3</td><td></td><td></td><td></td><td>feudal_realm, diet_monarchy, elective_monarchy, confederation</td></tr>
+<tr><td>hostage_residence</td><td></td><td>3</td><td></td><td></td><td></td><td>household_realm, tribute_empire, horde, warlord_domain, shogunate</td></tr>
+<tr><td>examination_hall</td><td>4</td><td></td><td></td><td></td><td><a href="/wiki/Data-Research#inventions">G4 Examination system</a></td><td></td></tr>
+<tr><td>parliament_house</td><td>6</td><td></td><td></td><td></td><td><a href="/wiki/Data-Research#inventions">G14 Written constitution</a></td><td></td></tr>
+</tbody></table></div>
+<h2 id="forms"><a class="anchor" href="#forms" aria-label="Link to this section">#</a>Forms</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>family</th><th>officials</th><th>lords</th><th>subject reach</th><th>colonial range</th><th>succession</th><th>event tree</th><th>next</th><th>self run</th></tr></thead>
+<tbody>
+<tr><td>feudal_realm</td><td>house</td><td>6</td><td>8</td><td>0</td><td>20</td><td>eldest_heir</td><td>monarchy</td><td>diet_monarchy, absolute_monarchy, elective_monarchy</td><td></td></tr>
+<tr><td>diet_monarchy</td><td>house</td><td>8</td><td>10</td><td>0</td><td>20</td><td>eldest_heir</td><td>monarchy</td><td>absolute_monarchy, constitutional_monarchy</td><td></td></tr>
+<tr><td>household_realm</td><td>house</td><td>10</td><td>4</td><td>1</td><td>10</td><td>strongest_son</td><td>monarchy</td><td>absolute_monarchy, bureaucratic_empire</td><td></td></tr>
+<tr><td>bureaucratic_empire</td><td>house</td><td>20</td><td>2</td><td>1</td><td>10</td><td>named_heir</td><td>monarchy</td><td>constitutional_monarchy</td><td></td></tr>
+<tr><td>elective_monarchy</td><td>house</td><td>4</td><td>12</td><td>-1</td><td>10</td><td>lords_elect</td><td>elective_monarchy</td><td>feudal_realm, diet_monarchy</td><td></td></tr>
+<tr><td>absolute_monarchy</td><td>house</td><td>16</td><td>4</td><td>1</td><td>20</td><td>eldest_heir</td><td>monarchy</td><td>constitutional_monarchy</td><td></td></tr>
+<tr><td>constitutional_monarchy</td><td>house</td><td>24</td><td>4</td><td>1</td><td>30</td><td>eldest_heir</td><td>constitutional_monarchy</td><td>constitutional_republic</td><td></td></tr>
+<tr><td>city_commune</td><td>citizens</td><td>8</td><td>4</td><td>-1</td><td>10</td><td>council_picks</td><td>republic</td><td>merchant_republic, feudal_realm, constitutional_republic</td><td></td></tr>
+<tr><td>merchant_republic</td><td>citizens</td><td>10</td><td>4</td><td>1</td><td>30</td><td>council_picks</td><td>merchant_republic</td><td>city_commune, feudal_realm, constitutional_republic</td><td></td></tr>
+<tr><td>peasant_commune</td><td>citizens</td><td>4</td><td>1</td><td>-2</td><td>0</td><td>assembly_picks</td><td>republic</td><td>city_commune, constitutional_republic</td><td></td></tr>
+<tr><td>constitutional_republic</td><td>citizens</td><td>24</td><td>0</td><td>0</td><td>30</td><td>elections</td><td>republic</td><td>constitutional_monarchy</td><td></td></tr>
+<tr><td>prince_bishopric</td><td>faith</td><td>6</td><td>3</td><td>-1</td><td>5</td><td>chapter_elects</td><td>theocracy</td><td>feudal_realm</td><td></td></tr>
+<tr><td>military_order</td><td>faith</td><td>8</td><td>4</td><td>0</td><td>15</td><td>brothers_elect</td><td>theocracy</td><td>feudal_realm</td><td></td></tr>
+<tr><td>holy_rule</td><td>faith</td><td>6</td><td>4</td><td>0</td><td>5</td><td>clergy_choose</td><td>theocracy</td><td>household_realm</td><td></td></tr>
+<tr><td>clan_council</td><td>kin</td><td>0</td><td>0</td><td>-2</td><td>0</td><td>elders_choose</td><td>tribal</td><td>chiefdom, confederation</td><td>yes</td></tr>
+<tr><td>chiefdom</td><td>kin</td><td>2</td><td>3</td><td>-1</td><td>0</td><td>chosen_from_lineage</td><td>tribal</td><td>paramount_chiefdom</td><td>yes</td></tr>
+<tr><td>paramount_chiefdom</td><td>kin</td><td>4</td><td>6</td><td>0</td><td>5</td><td>chosen_from_lineage</td><td>monarchy</td><td>tribute_empire, feudal_realm, household_realm</td><td></td></tr>
+<tr><td>tribute_empire</td><td>kin</td><td>6</td><td>12</td><td>3</td><td>5</td><td>royal_kin_choose</td><td>monarchy</td><td>household_realm, bureaucratic_empire</td><td></td></tr>
+<tr><td>horde</td><td>kin</td><td>2</td><td>10</td><td>2</td><td>0</td><td>eldest_of_house</td><td>nomadic_empire</td><td>household_realm, confederation</td><td></td></tr>
+<tr><td>confederation</td><td>kin</td><td>2</td><td>10</td><td>-1</td><td>0</td><td>members_rotate</td><td>confederation</td><td>feudal_realm, constitutional_republic</td><td></td></tr>
+<tr><td>warlord_domain</td><td>warriors</td><td>4</td><td>6</td><td>0</td><td>5</td><td>heir_or_adopted</td><td>monarchy</td><td>shogunate, feudal_realm</td><td></td></tr>
+<tr><td>shogunate</td><td>warriors</td><td>8</td><td>14</td><td>3</td><td>10</td><td>heir_or_adopted</td><td>monarchy</td><td>warlord_domain, constitutional_monarchy</td><td></td></tr>
+<tr><td>soldier_emirs</td><td>warriors</td><td>10</td><td>6</td><td>1</td><td>10</td><td>emirs_choose</td><td>monarchy</td><td>household_realm</td><td></td></tr>
+<tr><td>military_junta</td><td>warriors</td><td>20</td><td>2</td><td>0</td><td>15</td><td>generals_choose</td><td>military_junta</td><td>constitutional_republic</td><td></td></tr>
+<tr><td>party_state</td><td>modern</td><td>30</td><td>0</td><td>2</td><td>20</td><td>party_chooses</td><td>one_party_state</td><td>constitutional_republic</td><td></td></tr>
+<tr><td>company_rule</td><td>modern</td><td>8</td><td>4</td><td>2</td><td>40</td><td>owners_appoint</td><td>company</td><td>colonial_government</td><td></td></tr>
+<tr><td>colonial_government</td><td>modern</td><td>6</td><td>4</td><td>none</td><td>15</td><td>overlord_appoints</td><td>colonial_administration</td><td>none</td><td></td></tr>
+</tbody></table></div>
+<h2 id="reforms"><a class="anchor" href="#reforms" aria-label="Link to this section">#</a>Reforms</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>from</th><th>to</th><th>needs</th><th>gold</th><th>lords slip</th><th>helped by</th><th>automatic</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>clan_council</td><td>chiefdom</td><td>5 or more provinces</td><td>0</td><td>0</td><td></td><td></td></tr>
+<tr><td>2</td><td>clan_council</td><td>confederation</td><td>allied with 2 neighbours of the same people</td><td>0</td><td>0</td><td></td><td></td></tr>
+<tr><td>3</td><td>chiefdom</td><td>paramount_chiefdom</td><td>8 or more provinces</td><td>50</td><td>1</td><td></td><td></td></tr>
+<tr><td>4</td><td>paramount_chiefdom</td><td>tribute_empire</td><td>3 or more subjects</td><td>100</td><td>1</td><td></td><td></td></tr>
+<tr><td>5</td><td>paramount_chiefdom</td><td>feudal_realm</td><td>G2 Feudal grants</td><td>100</td><td>1</td><td></td><td></td></tr>
+<tr><td>6</td><td>paramount_chiefdom</td><td>household_realm</td><td>G1 Written law codes</td><td>100</td><td>2</td><td></td><td></td></tr>
+<tr><td>7</td><td>tribute_empire</td><td>household_realm</td><td>G3 Tax registers or G6 Quipu</td><td>150</td><td>2</td><td></td><td></td></tr>
+<tr><td>8</td><td>tribute_empire</td><td>bureaucratic_empire</td><td>G4 Examination system</td><td>200</td><td>3</td><td></td><td></td></tr>
+<tr><td>9</td><td>horde</td><td>household_realm</td><td>a palace in a town</td><td>150</td><td>2</td><td><a href="/wiki/Data-Research#inventions">G3 Tax registers</a>, <a href="/wiki/Data-Research#inventions">L7 Universities</a></td><td></td></tr>
+<tr><td>10</td><td>horde</td><td>confederation</td><td>no adult heir</td><td>0</td><td>0</td><td></td><td>yes</td></tr>
+<tr><td>11</td><td>feudal_realm</td><td>diet_monarchy</td><td>a diet hall</td><td>100</td><td>0</td><td></td><td></td></tr>
+<tr><td>12</td><td>feudal_realm</td><td>elective_monarchy</td><td>the ruling line dies out</td><td>0</td><td>0</td><td></td><td>yes</td></tr>
+<tr><td>13</td><td>feudal_realm, diet_monarchy</td><td>absolute_monarchy</td><td>G9 Professional bureaucracy, W12 Standing regiments</td><td>300</td><td>3</td><td></td><td></td></tr>
+<tr><td>14</td><td>diet_monarchy, absolute_monarchy, bureaucratic_empire</td><td>constitutional_monarchy</td><td>G14 Written constitution, a parliament house</td><td>200</td><td>1</td><td></td><td></td></tr>
+<tr><td>15</td><td>elective_monarchy</td><td>feudal_realm</td><td>the same house elected 3 times running</td><td>100</td><td>2</td><td></td><td></td></tr>
+<tr><td>16</td><td>elective_monarchy</td><td>diet_monarchy</td><td>a diet hall</td><td>100</td><td>1</td><td></td><td></td></tr>
+<tr><td>17</td><td>household_realm</td><td>absolute_monarchy</td><td>G9 Professional bureaucracy, W12 Standing regiments</td><td>250</td><td>2</td><td></td><td></td></tr>
+<tr><td>18</td><td>household_realm</td><td>bureaucratic_empire</td><td>G9 Professional bureaucracy, an examination hall</td><td>250</td><td>2</td><td></td><td></td></tr>
+<tr><td>19</td><td>city_commune</td><td>merchant_republic</td><td>4 or more traders abroad</td><td>100</td><td>1</td><td></td><td></td></tr>
+<tr><td>20</td><td>city_commune, merchant_republic</td><td>feudal_realm</td><td>one family led the city 3 times running</td><td>150</td><td>2</td><td></td><td></td></tr>
+<tr><td>21</td><td>merchant_republic</td><td>city_commune</td><td>trade in debt 3 years running</td><td>0</td><td>1</td><td></td><td>yes</td></tr>
+<tr><td>22</td><td>peasant_commune</td><td>city_commune</td><td>a city in the realm</td><td>50</td><td>0</td><td></td><td></td></tr>
+<tr><td>23</td><td>city_commune, merchant_republic, peasant_commune</td><td>constitutional_republic</td><td>G14 Written constitution, a parliament house</td><td>150</td><td>0</td><td></td><td></td></tr>
+<tr><td>24</td><td>prince_bishopric, military_order</td><td>feudal_realm</td><td>the ruler takes a reformed faith (religion design)</td><td>100</td><td>2</td><td></td><td></td></tr>
+<tr><td>25</td><td>holy_rule</td><td>household_realm</td><td>one family chose the ruler 3 times running</td><td>150</td><td>1</td><td></td><td></td></tr>
+<tr><td>26</td><td>warlord_domain</td><td>shogunate</td><td>holds the imperial capital, 8 or more lords</td><td>150</td><td>1</td><td></td><td></td></tr>
+<tr><td>27</td><td>warlord_domain</td><td>feudal_realm</td><td>G1 Written law codes</td><td>100</td><td>2</td><td></td><td></td></tr>
+<tr><td>28</td><td>shogunate</td><td>warlord_domain</td><td>the shogun loses the capital</td><td>0</td><td>0</td><td></td><td>yes</td></tr>
+<tr><td>29</td><td>shogunate</td><td>constitutional_monarchy</td><td>G14 Written constitution, a parliament house</td><td>250</td><td>4</td><td></td><td></td></tr>
+<tr><td>30</td><td>soldier_emirs</td><td>household_realm</td><td>one emir&#39;s family held the throne 3 reigns</td><td>150</td><td>2</td><td></td><td></td></tr>
+<tr><td>31</td><td>confederation</td><td>feudal_realm</td><td>one member holds over half the land</td><td>150</td><td>3</td><td></td><td></td></tr>
+<tr><td>32</td><td>constitutional_monarchy</td><td>constitutional_republic</td><td>the ruler deposed or abdicates</td><td>0</td><td>0</td><td></td><td>yes</td></tr>
+<tr><td>33</td><td>constitutional_republic</td><td>constitutional_monarchy</td><td>a king invited by parliament</td><td>0</td><td>0</td><td></td><td>yes</td></tr>
+<tr><td>34</td><td>company_rule</td><td>colonial_government</td><td>the crown takes over</td><td>0</td><td>1</td><td></td><td>yes</td></tr>
+</tbody></table></div>
+<h2 id="event-tree-map"><a class="anchor" href="#event-tree-map" aria-label="Link to this section">#</a>Event tree map</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>set</th><th>keep if in</th><th>before G14</th></tr></thead>
+<tbody>
+<tr><td>monarchy</td><td>feudal_realm</td><td>feudal_realm, diet_monarchy, household_realm, elective_monarchy, bureaucratic_empire, absolute_monarchy, constitutional_monarchy, paramount_chiefdom, tribute_empire, warlord_domain, shogunate, soldier_emirs</td><td></td></tr>
+<tr><td>elective_monarchy</td><td>elective_monarchy</td><td></td><td></td></tr>
+<tr><td>theocracy</td><td>holy_rule</td><td>prince_bishopric, military_order, holy_rule</td><td></td></tr>
+<tr><td>republic</td><td>constitutional_republic</td><td>city_commune, merchant_republic, peasant_commune, constitutional_republic</td><td>city_commune</td></tr>
+<tr><td>merchant_republic</td><td>merchant_republic</td><td></td><td></td></tr>
+<tr><td>tribal</td><td>chiefdom</td><td>clan_council, chiefdom</td><td></td></tr>
+<tr><td>confederation</td><td>confederation</td><td></td><td></td></tr>
+<tr><td>nomadic_empire</td><td>horde</td><td></td><td></td></tr>
+<tr><td>company</td><td>company_rule</td><td></td><td></td></tr>
+<tr><td>colonial_administration</td><td>colonial_government</td><td></td><td></td></tr>
+<tr><td>constitutional_monarchy</td><td>constitutional_monarchy</td><td></td><td></td></tr>
+<tr><td>liberal_democracy</td><td>constitutional_republic</td><td></td><td></td></tr>
+<tr><td>one_party_state</td><td>party_state</td><td></td><td></td></tr>
+<tr><td>communist</td><td>party_state</td><td></td><td></td></tr>
+<tr><td>fascist</td><td>party_state</td><td></td><td></td></tr>
+<tr><td>military_junta</td><td>military_junta</td><td></td><td></td></tr>
+</tbody></table></div>
+<h2 id="start-forms"><a class="anchor" href="#start-forms" aria-label="Link to this section">#</a>Start forms</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>default</code></td><td>chiefdom</td></tr>
+</tbody></table></div>
+<h3 id="kingdom-by-region"><a class="anchor" href="#kingdom-by-region" aria-label="Link to this section">#</a>Kingdom by region</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>eu_</code></td><td>feudal_realm</td></tr>
+<tr><td><code>as_anatolia_caucasus</code></td><td>feudal_realm</td></tr>
+<tr><td><code>as_levant_egypt_arabia</code></td><td>household_realm</td></tr>
+<tr><td><code>as_iran_transoxiana</code></td><td>household_realm</td></tr>
+<tr><td><code>as_south_asia_</code></td><td>feudal_realm</td></tr>
+<tr><td><code>as_china_inner_asia</code></td><td>feudal_realm</td></tr>
+<tr><td><code>as_steppe_siberia</code></td><td>horde</td></tr>
+<tr><td><code>as_japan_korea</code></td><td>warlord_domain</td></tr>
+<tr><td><code>af_north_sahara</code></td><td>household_realm</td></tr>
+<tr><td><code>af_</code></td><td>paramount_chiefdom</td></tr>
+<tr><td><code>am_</code></td><td>paramount_chiefdom</td></tr>
+<tr><td><code>oc_</code></td><td>paramount_chiefdom</td></tr>
+</tbody></table></div>
+<h4 id="as-se-asia"><a class="anchor" href="#as-se-asia" aria-label="Link to this section">#</a>As se asia</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>tier_a_b</code></td><td>tribute_empire</td></tr>
+<tr><td><code>tier_c</code></td><td>paramount_chiefdom</td></tr>
+</tbody></table></div>
+<h3 id="entity-type"><a class="anchor" href="#entity-type" aria-label="Link to this section">#</a>Entity type</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>empire</code></td><td>household_realm</td></tr>
+<tr><td><code>grand_duchy</code></td><td>feudal_realm</td></tr>
+<tr><td><code>duchy</code></td><td>feudal_realm</td></tr>
+<tr><td><code>principality</code></td><td>feudal_realm</td></tr>
+<tr><td><code>county</code></td><td>feudal_realm</td></tr>
+<tr><td><code>margraviate</code></td><td>feudal_realm</td></tr>
+<tr><td><code>landgraviate</code></td><td>feudal_realm</td></tr>
+<tr><td><code>electorate</code></td><td>feudal_realm</td></tr>
+<tr><td><code>lordship</code></td><td>feudal_realm</td></tr>
+<tr><td><code>despotate</code></td><td>feudal_realm</td></tr>
+<tr><td><code>voivodeship</code></td><td>feudal_realm</td></tr>
+<tr><td><code>prince_bishopric</code></td><td>prince_bishopric</td></tr>
+<tr><td><code>prince_archbishopric</code></td><td>prince_bishopric</td></tr>
+<tr><td><code>imperial_abbey</code></td><td>prince_bishopric</td></tr>
+<tr><td><code>theocracy</code></td><td>holy_rule</td></tr>
+<tr><td><code>imamate</code></td><td>holy_rule</td></tr>
+<tr><td><code>sharifate</code></td><td>holy_rule</td></tr>
+<tr><td><code>military_order</code></td><td>military_order</td></tr>
+<tr><td><code>republic</code></td><td>city_commune</td></tr>
+<tr><td><code>city_state</code></td><td>city_commune</td></tr>
+<tr><td><code>free_imperial_city</code></td><td>city_commune</td></tr>
+<tr><td><code>merchant_republic</code></td><td>merchant_republic</td></tr>
+<tr><td><code>peasant_republic</code></td><td>peasant_commune</td></tr>
+<tr><td><code>league</code></td><td>confederation</td></tr>
+<tr><td><code>confederation</code></td><td>confederation</td></tr>
+<tr><td><code>supranational_institution</code></td><td>confederation</td></tr>
+<tr><td><code>tribal_confederation</code></td><td>confederation</td></tr>
+<tr><td><code>ayllu_federation</code></td><td>confederation</td></tr>
+<tr><td><code>sultanate</code></td><td>household_realm</td></tr>
+<tr><td><code>emirate</code></td><td>household_realm</td></tr>
+<tr><td><code>beylik</code></td><td>household_realm</td></tr>
+<tr><td><code>atabegate</code></td><td>household_realm</td></tr>
+<tr><td><code>khanate</code></td><td>horde</td></tr>
+<tr><td><code>horde</code></td><td>horde</td></tr>
+<tr><td><code>nomadic_confederation</code></td><td>horde</td></tr>
+<tr><td><code>sheikhdom</code></td><td>chiefdom</td></tr>
+<tr><td><code>chiefdom</code></td><td>chiefdom</td></tr>
+<tr><td><code>cacicazgo</code></td><td>chiefdom</td></tr>
+<tr><td><code>tusi_chieftaincy</code></td><td>chiefdom</td></tr>
+<tr><td><code>paramount_chiefdom</code></td><td>paramount_chiefdom</td></tr>
+<tr><td><code>altepetl</code></td><td>paramount_chiefdom</td></tr>
+<tr><td><code>kuchkabal</code></td><td>paramount_chiefdom</td></tr>
+<tr><td><code>rajahnate</code></td><td>paramount_chiefdom</td></tr>
+<tr><td><code>hueyaltepetl</code></td><td>tribute_empire</td></tr>
+<tr><td><code>mandala_polity</code></td><td>tribute_empire</td></tr>
+<tr><td><code>stateless_society</code></td><td>clan_council</td></tr>
+<tr><td><code>segmentary_lineage_society</code></td><td>clan_council</td></tr>
+<tr><td><code>iwi_network</code></td><td>clan_council</td></tr>
+<tr><td><code>shugo_domain</code></td><td>warlord_domain</td></tr>
+<tr><td><code>shogunate</code></td><td>shogunate</td></tr>
+<tr><td><code>colonial_possession</code></td><td>colonial_government</td></tr>
+<tr><td><code>trading_post</code></td><td>colonial_government</td></tr>
+</tbody></table></div>
+<h3 id="text-rules"><a class="anchor" href="#text-rules" aria-label="Link to this section">#</a>Text rules</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>match</th><th>form</th><th>skip types</th><th>only types</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>ecclesiastic|bishop|archbishop|abbey|abbot</td><td>prince_bishopric</td><td>theocracy</td><td></td></tr>
+<tr><td>2</td><td>elective monarchy|elective kingship|elected king|elective personal union</td><td>elective_monarchy</td><td></td><td></td></tr>
+<tr><td>3</td><td>merchant republic|merchant oligarch</td><td>merchant_republic</td><td></td><td>republic, city_state, free_imperial_city, merchant_republic, other</td></tr>
+<tr><td>4</td><td>military order|order province|knightly order</td><td>military_order</td><td></td><td></td></tr>
+<tr><td>5</td><td>sufi order|monastic|religious corporation|temple</td><td>holy_rule</td><td></td><td>other, theocracy</td></tr>
+<tr><td>6</td><td>bureaucratic</td><td>bureaucratic_empire</td><td></td><td></td></tr>
+<tr><td>7</td><td>patrimonial</td><td>household_realm</td><td></td><td></td></tr>
+<tr><td>8</td><td>military companies|raiding bands|loyalist band|military lordship|warrior house</td><td>warlord_domain</td><td></td><td>other</td></tr>
+<tr><td>9</td><td>acephalous|communit|village|lineage organisation|lineage-based|suku|bands|communal|council|assembly|decentralised</td><td>clan_council</td><td></td><td>other</td></tr>
+<tr><td>10</td><td>chief|señor|senor|headman</td><td>chiefdom</td><td></td><td>other</td></tr>
+<tr><td>11</td><td>lordship|seigneur|baron|magnate|princely|appanage|eristav|malik|governorship|kingship|kingdom|monarch|saopha|warrior house</td><td>feudal_realm</td><td></td><td>other</td></tr>
+<tr><td>12</td><td>dependency|governorate|regional administration</td><td>colonial_government</td><td></td><td>other</td></tr>
+</tbody></table></div>
+<h3 id="overrides"><a class="anchor" href="#overrides" aria-label="Link to this section">#</a>Overrides</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>form</th><th>why</th></tr></thead>
+<tbody>
+<tr><td>ottoman</td><td>household_realm</td><td>palace servants (kul), timar grants, open succession among sons</td></tr>
+<tr><td>muscovy</td><td>household_realm</td><td>grand prince&#39;s household and boyars; appanages and service lands</td></tr>
+<tr><td>timurid_empire</td><td>household_realm</td><td>appanages for princes, household amirs</td></tr>
+<tr><td>delhi</td><td>household_realm</td><td>iqta grants to amirs</td></tr>
+<tr><td>vijayanagara</td><td>household_realm</td><td>nayaka service grants (amaram) from the raya</td></tr>
+<tr><td>bahmani</td><td>household_realm</td><td>tarafdar governors on service</td></tr>
+<tr><td>safaviyya</td><td>holy_rule</td><td>a Sufi order before it became a dynasty (1501)</td></tr>
+<tr><td>ming</td><td>bureaucratic_empire</td><td>examination officials, Six Ministries</td></tr>
+<tr><td>joseon</td><td>bureaucratic_empire</td><td>examination officials (yangban)</td></tr>
+<tr><td>dai_viet</td><td>bureaucratic_empire</td><td>Le dynasty examinations and Chinese-style ministries</td></tr>
+<tr><td>mamluk</td><td>soldier_emirs</td><td>bought soldiers rule; emirs choose the sultan</td></tr>
+<tr><td>venice</td><td>merchant_republic</td><td>patriciate, doge for life</td></tr>
+<tr><td>genoa</td><td>merchant_republic</td><td>merchant alberghi, doge</td></tr>
+<tr><td>ragusa</td><td>merchant_republic</td><td>patrician councils, rector</td></tr>
+<tr><td>lubeck</td><td>merchant_republic</td><td>council of merchant families, head of the Hanse</td></tr>
+<tr><td>hamburg</td><td>merchant_republic</td><td>merchant council</td></tr>
+<tr><td>hanseatic_league</td><td>confederation</td><td>league of towns (an institution)</td></tr>
+<tr><td>florence</td><td>city_commune</td><td>guild republic under Medici influence</td></tr>
+<tr><td>novgorod</td><td>city_commune</td><td>veche republic with a posadnik and archbishop</td></tr>
+<tr><td>pskov</td><td>city_commune</td><td>veche republic</td></tr>
+<tr><td>england</td><td>diet_monarchy</td><td>Parliament grants taxes</td></tr>
+<tr><td>aragon</td><td>diet_monarchy</td><td>Cortes of each realm of the crown</td></tr>
+<tr><td>aragon_kingdom</td><td>diet_monarchy</td><td>Cortes of Aragon</td></tr>
+<tr><td>catalonia</td><td>diet_monarchy</td><td>Corts and the Generalitat</td></tr>
+<tr><td>valencia</td><td>diet_monarchy</td><td>Corts of Valencia</td></tr>
+<tr><td>poland</td><td>elective_monarchy</td><td>Jagiellonian kings elected by the lords</td></tr>
+<tr><td>hungary</td><td>elective_monarchy</td><td>diet elects the king; regency of Hunyadi</td></tr>
+<tr><td>bohemia</td><td>elective_monarchy</td><td>estates elect; interregnum</td></tr>
+<tr><td>swiss_confederation</td><td>confederation</td><td>diet of cantons</td></tr>
+<tr><td>uri</td><td>peasant_commune</td><td>Landsgemeinde</td></tr>
+<tr><td>schwyz</td><td>peasant_commune</td><td>Landsgemeinde</td></tr>
+<tr><td>unterwalden</td><td>peasant_commune</td><td>Landsgemeinde</td></tr>
+<tr><td>glarus</td><td>peasant_commune</td><td>Landsgemeinde</td></tr>
+<tr><td>appenzell</td><td>peasant_commune</td><td>Landsgemeinde</td></tr>
+<tr><td>dithmarschen</td><td>peasant_commune</td><td>farmers&#39; republic</td></tr>
+<tr><td>iceland</td><td>peasant_commune</td><td>Althing under the crown</td></tr>
+<tr><td>haudenosaunee</td><td>confederation</td><td>league council of nations</td></tr>
+<tr><td>ashikaga</td><td>shogunate</td><td>military government over shugo houses</td></tr>
+<tr><td>japan_imperial_court</td><td>holy_rule</td><td>court monarchy whose power is ritual and appointment</td></tr>
+<tr><td>honganji_temples</td><td>holy_rule</td><td>self-governing temple corporations</td></tr>
+<tr><td>inca</td><td>tribute_empire</td><td>kept kuraka lords give labour and loyalty</td></tr>
+<tr><td>tenochtitlan</td><td>tribute_empire</td><td>tribute provinces of the Triple Alliance</td></tr>
+<tr><td>triple_alliance</td><td>tribute_empire</td><td>hegemonic tribute alliance</td></tr>
+<tr><td>texcoco</td><td>tribute_empire</td><td>partner in the Triple Alliance</td></tr>
+<tr><td>chimor</td><td>tribute_empire</td><td>coastal kingdom holding valley lords</td></tr>
+<tr><td>purepecha</td><td>tribute_empire</td><td>tribute state ruled from Tzintzuntzan</td></tr>
+<tr><td>mali</td><td>tribute_empire</td><td>mansa over clans and tributary rulers</td></tr>
+<tr><td>songhai</td><td>paramount_chiefdom</td><td>Sunni kingship before its expansion (1464)</td></tr>
+<tr><td>bornu</td><td>household_realm</td><td>Sayfawa mai with titled officials</td></tr>
+<tr><td>ethiopia</td><td>feudal_realm</td><td>Solomonic emperor with rases and a moving royal camp</td></tr>
+<tr><td>kongo</td><td>paramount_chiefdom</td><td>mani Kongo chosen by electors from the royal kin</td></tr>
+<tr><td>majapahit</td><td>tribute_empire</td><td>mandala over tributary courts</td></tr>
+<tr><td>ayutthaya</td><td>tribute_empire</td><td>mandala; sakdina ranks being set up</td></tr>
+<tr><td>papal_states</td><td>holy_rule</td><td>the pope chosen by cardinals</td></tr>
+<tr><td>teutonic_order</td><td>military_order</td><td>Grand Master and commanderies</td></tr>
+<tr><td>livonian_order</td><td>military_order</td><td>Landmeister and commanderies</td></tr>
+<tr><td>knights_hospitaller</td><td>military_order</td><td>Grand Master at Rhodes</td></tr>
+<tr><td>great_horde</td><td>horde</td><td>Jochid khans and begs</td></tr>
+<tr><td>crimea</td><td>horde</td><td>Giray khan with four clan beys</td></tr>
+<tr><td>kazan</td><td>horde</td><td>Chinggisid khan with clan beys over a settled Bulgar-Tatar base (GOV-067)</td></tr>
+<tr><td>northern_yuan</td><td>horde</td><td>Chinggisid khan and taishi</td></tr>
+<tr><td>oirat</td><td>horde</td><td>clan league under a taishi</td></tr>
+<tr><td>hre</td><td>elective_monarchy</td><td>electors choose the king; an institution over member realms</td></tr>
+<tr><td>council_of_basel</td><td>holy_rule</td><td>church council claiming authority over the pope</td></tr>
+<tr><td>neuchatel</td><td>feudal_realm</td><td>a county</td></tr>
+<tr><td>idrisid_sharifs_fez</td><td>holy_rule</td><td>sharifian lineage with religious standing</td></tr>
+<tr><td>kandy</td><td>feudal_realm</td><td>local aristocracy under a king</td></tr>
+<tr><td>silesia</td><td>confederation</td><td>duchies under the Bohemian crown</td></tr>
+<tr><td>bavarian_minor_estates</td><td>feudal_realm</td><td>small lordships</td></tr>
+<tr><td>franconian_minor_estates</td><td>feudal_realm</td><td>small lordships</td></tr>
+<tr><td>swabian_minor_estates</td><td>feudal_realm</td><td>small lordships</td></tr>
+<tr><td>upper_rhine_minor_estates</td><td>feudal_realm</td><td>small lordships</td></tr>
+<tr><td>ryukyu</td><td>feudal_realm</td><td>Sho kings over island lords (aji)</td></tr>
+<tr><td>qara_qoyunlu</td><td>horde</td><td>Turkmen tribal confederation under a ruling clan</td></tr>
+<tr><td>aq_qoyunlu</td><td>horde</td><td>Turkmen tribal confederation under a ruling clan</td></tr>
+<tr><td>nogai</td><td>horde</td><td>Bey-led horde of the Nogai steppe (GOV-067)</td></tr>
+</tbody></table></div>
+<h2 id="succession-names"><a class="anchor" href="#succession-names" aria-label="Link to this section">#</a>Succession names</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>eldest_heir</code></td><td>eldest heir</td></tr>
+<tr><td><code>strongest_son</code></td><td>strongest son</td></tr>
+<tr><td><code>named_heir</code></td><td>named heir</td></tr>
+<tr><td><code>lords_elect</code></td><td>lords elect</td></tr>
+<tr><td><code>council_picks</code></td><td>council picks</td></tr>
+<tr><td><code>assembly_picks</code></td><td>assembly picks</td></tr>
+<tr><td><code>elections</code></td><td>elections</td></tr>
+<tr><td><code>chapter_elects</code></td><td>chapter elects</td></tr>
+<tr><td><code>brothers_elect</code></td><td>brothers elect</td></tr>
+<tr><td><code>clergy_choose</code></td><td>clergy choose</td></tr>
+<tr><td><code>elders_choose</code></td><td>elders choose</td></tr>
+<tr><td><code>chosen_from_lineage</code></td><td>chosen from the chief&#39;s lineage</td></tr>
+<tr><td><code>royal_kin_choose</code></td><td>royal kin choose</td></tr>
+<tr><td><code>eldest_of_house</code></td><td>eldest of the house</td></tr>
+<tr><td><code>members_rotate</code></td><td>members take turns</td></tr>
+<tr><td><code>heir_or_adopted</code></td><td>heir or adopted son</td></tr>
+<tr><td><code>emirs_choose</code></td><td>emirs choose</td></tr>
+<tr><td><code>generals_choose</code></td><td>generals choose</td></tr>
+<tr><td><code>party_chooses</code></td><td>the party chooses</td></tr>
+<tr><td><code>owners_appoint</code></td><td>owners appoint</td></tr>
+<tr><td><code>overlord_appoints</code></td><td>overlord appoints</td></tr>
+</tbody></table></div>
+<h2 id="ai"><a class="anchor" href="#ai" aria-label="Link to this section">#</a>Ai</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>reform_month</code> (provisional)</td><td>1</td></tr>
+<tr><td><code>reform_gold_reserve_factor</code> (provisional)</td><td>2</td></tr>
+</tbody></table></div>
+<h2 id="riders-line"><a class="anchor" href="#riders-line" aria-label="Link to this section">#</a>Riders line</h2>
+<blockquote>
+<p>GOV-077: the horde&#39;s edge and its end, on the Government tab of a realm in these forms</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>forms</code></td><td>horde</td></tr>
+</tbody></table></div>
+<h3 id="fades-against"><a class="anchor" href="#fades-against" aria-label="Link to this section">#</a>Fades against</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>invention</th><th>label</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><a href="/wiki/Data-Research#inventions">W8 Field artillery</a></td><td>field guns</td></tr>
+<tr><td>2</td><td><a href="/wiki/Data-Research#inventions">W11 Flintlock and bayonet</a></td><td>flintlocks</td></tr>
+</tbody></table></div>

@@ -61,3 +61,7 @@ On the map, grounds are a light diagonal hatch in the tribe's colour at every zo
 ## The computer's tribes
 
 Each month a tribe of the computer with a free place claims the most peopled province it may; each January it takes in every ground it may, oldest first, while within its officials cap. A colonial power of the computer that holds twice the price asks for the land before settling on a ground, and founds there only after the answer.
+
+## Numbers
+
+Every value the game uses, made from its config so it always matches the game: [Tribes data](Data-Tribes). How they combine: [Formulas](Formulas).

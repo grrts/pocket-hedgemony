@@ -127,7 +127,7 @@ final class SiteTest extends WebTestCase
         $crawler = $client->request('GET', '/privacy');
 
         self::assertResponseIsSuccessful();
-        foreach (['email address', 'display name', 'one-way hash', 'date the account was made', 'ads removed', 'random number', 'sets no cookies'] as $text) {
+        foreach (['email address', 'display name', 'one-way hash', 'date the account was made', 'community moderator', 'random number', 'Reading the site sets no cookies'] as $text) {
             self::assertStringContainsString($text, $crawler->filter('.prose')->text());
         }
         self::assertSelectorNotExists('a[href^="mailto:"]');

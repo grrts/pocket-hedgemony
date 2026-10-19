@@ -1,0 +1,571 @@
+<h1>Realm data</h1>
+<p>Every value in the game&#39;s realm config, exactly as the game reads it. This page is made from <code>packages/rules/data/domain/realm.json</code> each time the config changes, so it always matches the game. How these values are used is explained on <a href="/wiki/Your-Realm">Your Realm</a>.</p>
+<p>Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and values marked (provisional) are placeholders that may still change in balancing. Inventions are shown by id and name; see <a href="/wiki/Data-Research#inventions">Research data</a>.</p>
+<blockquote>
+<p>Realm (domain/realm/spec.md), from country stats v3. Every number is a placeholder for config. Each stat lists the causes that gain it and the causes that lose it (REALM-001); amounts come from the context that owns the cause.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>harvest_steps</code></td><td>failed, poor, normal, good, bumper</td></tr>
+<tr><td><code>tax_rates</code></td><td>none, light, normal, heavy, crushing</td></tr>
+<tr><td><code>grain_price_gold_per_food</code> (provisional)</td><td>0.5</td></tr>
+<tr><td><code>subject_kinds</code></td><td>vassals, tributaries, unions, marches, colonies, protectorates</td></tr>
+<tr><td><code>daughters_inherit_crown</code> (provisional)</td><td>castile, navarre, aragon, portugal, england, scotland, naples, hungary, poland</td></tr>
+<tr><td><code>women_reform_multiplier</code> (provisional)</td><td>2</td></tr>
+</tbody></table></div>
+<h2 id="stats"><a class="anchor" href="#stats" aria-label="Link to this section">#</a>Stats</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>gain</th><th>lose</th></tr></thead>
+<tbody>
+<tr><td>gold</td><td>royal_taxes, lords_tax_share, trade, tribute, grain_sold, loot_and_ransoms, titles_sold, loan</td><td>soldiers_pay, officials_wages, school_upkeep, building, debt_interest, gifts_and_bribes, grain_bought, repayment</td></tr>
+<tr><td>debt</td><td>loan_taken, lord_lends</td><td>repaid, lender_died, lender_conquered, default</td></tr>
+<tr><td>harvest</td><td>farmland, farmers, inventions, peace</td><td>weather, army_marching, devastation, plague, cold_period</td></tr>
+<tr><td>local_store</td><td>harvest_surplus, castle_delivery</td><td>eating, army_refill, rot, raid</td></tr>
+<tr><td>herds</td><td>good_pasture, raiding, tribute</td><td>drought, hard_winter, raided, disease, famine_slaughter</td></tr>
+<tr><td>fish</td><td>fishing_boats, salting_invention</td><td>blockade, war_at_sea</td></tr>
+<tr><td>grain_price</td><td>bad_harvests, war, blockade</td><td>good_harvests, trade_route</td></tr>
+<tr><td>castle_store</td><td>collection, castle_delivery, grain_bought</td><td>garrison, spread, army_refill, rot, capture</td></tr>
+<tr><td>granary</td><td>granary_built, invention</td><td>siege_damage, neglect</td></tr>
+<tr><td>reach</td><td>road, river, canal, wagons, research</td><td>enemy_on_road, winter, devastation</td></tr>
+<tr><td>people</td><td>growth, migrants, conquest</td><td>famine, plague, war_deaths, refugees, forced_migration</td></tr>
+<tr><td>provinces</td><td>conquest, inheritance, purchase, lord_joins, colony</td><td>lost_war, ceded, lord_defects, breakaway</td></tr>
+<tr><td>royal_provinces</td><td>line_dies_out, seized_from_lord, conquest_kept</td><td>fief_granted</td></tr>
+<tr><td>officials</td><td>hired, graduated</td><td>dismissed, wages_unpaid, war_in_province</td></tr>
+<tr><td>faith</td><td>missionaries_and_clergy, schools, migrants, conversion_event</td><td>conquest, reformation, foreign_missionaries</td></tr>
+<tr><td>tongue</td><td>assimilation, settlers, schools</td><td>conquest, migration, separatists</td></tr>
+<tr><td>in_revolt</td><td>heavy_taxes, famine, foreign_faith_or_tongue, disloyal_lords, lost_war</td><td>rebels_defeated, demands_given, taxes_lowered, food</td></tr>
+<tr><td>lords</td><td>fief_granted, local_ruler_kept, title_sold, marriage, land_split, defector</td><td>line_dies_out, land_seized, trial, revolt_defeated, defected, merged, assassinated</td></tr>
+<tr><td>soldiers</td><td>raised, paid_company, retinue</td><td>battle, disease_and_hunger, desertion, disbanded</td></tr>
+<tr><td>recruits</td><td>yearly_refill, students_leave_school</td><td>soldiers_raised, sent_to_school, famine, plague</td></tr>
+<tr><td>horses</td><td>breeding, bought, herds, captured</td><td>battle, fodder_shortage, disease</td></tr>
+<tr><td>ships</td><td>built, captured, hired</td><td>battle, storm, rot, blockade</td></tr>
+<tr><td>castles</td><td>built, conquered</td><td>siege, neglect, demolished_in_peace</td></tr>
+<tr><td>commanders</td><td>hired, lord_or_heir_commands, promoted</td><td>battle_death, old_age, captured</td></tr>
+<tr><td>fallen</td><td>battle_deaths, siege_deaths</td><td>time</td></tr>
+<tr><td>heirs</td><td>birth, marriage, named</td><td>death, married_abroad, joined_rebel</td></tr>
+<tr><td>allies</td><td>alliance_mission, marriage, peace_term</td><td>alliance_broken, war_between, bribed_away</td></tr>
+<tr><td>enemies</td><td>war_declared, attacked</td><td>peace</td></tr>
+<tr><td>rivals</td><td>contested_claim, border_dispute</td><td>settled, destroyed</td></tr>
+<tr><td>subjects</td><td>forced_in_peace, asked_for_protection</td><td>independence_war, released, annexed</td></tr>
+<tr><td>oaths_broken</td><td>truce_broken, ally_abandoned, debt_default</td><td>time</td></tr>
+<tr><td>lands_taken</td><td>conquest</td><td>time, land_given_back</td></tr>
+<tr><td>envoys</td><td>sent</td><td>mission_ended, killed, held</td></tr>
+</tbody></table></div>
+<h2 id="loyalty"><a class="anchor" href="#loyalty" aria-label="Link to this section">#</a>Loyalty</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>steps</code></td><td>Loyal, Wavering, Disloyal, In revolt</td></tr>
+<tr><td><code>up</code></td><td>want_granted, gift_of_gold, office_at_court, marriage_into_ruling_house, victory_taken_part, long_secure_reign, fed_in_famine, shared_faith_and_tongue, war_against_rival</td></tr>
+<tr><td><code>down</code></td><td>heavy_taxes, land_seized_from_him, land_seized_from_another, war_lost, battle_lost, child_ruler, disputed_heir, new_ruler, grain_requisitioned, foreign_bribes, crown_borrowed, massacre, faith_not_shared, censured_by_head, slighted_at_court, lord_assassinated, assassin_caught</td></tr>
+</tbody></table></div>
+<h2 id="food"><a class="anchor" href="#food" aria-label="Link to this section">#</a>Food</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>collection_options</code></td><td>0, 25, 50, 75</td></tr>
+<tr><td><code>castle_share_rules</code></td><td>By people, Frontier first, Capital first, Equal, Custom</td></tr>
+<tr><td><code>spread_default</code></td><td>50/30/20</td></tr>
+<tr><td><code>siege_reserve_options</code></td><td>0, 3, 6, 12</td></tr>
+<tr><td><code>army_refill_options</code></td><td>Locals only, Castles hand out first, No refill in lords&#39; lands</td></tr>
+<tr><td><code>army_refill_default</code></td><td>Castles hand out first</td></tr>
+<tr><td><code>surplus_options</code></td><td>Keep, Sell to the treasury, Send to the capital castle, Send to subjects or allies</td></tr>
+<tr><td><code>surplus_default</code></td><td>Keep</td></tr>
+<tr><td><code>campaign_eat</code></td><td>2</td></tr>
+<tr><td><code>horse_eats</code></td><td>3</td></tr>
+<tr><td><code>months_per_year</code></td><td>12</td></tr>
+</tbody></table></div>
+<h3 id="spread-patterns"><a class="anchor" href="#spread-patterns" aria-label="Link to this section">#</a>Spread patterns</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>50/30/20</code></td><td>50, 30, 20</td></tr>
+<tr><td><code>Tight</code></td><td>80, 20, 0</td></tr>
+<tr><td><code>Wide</code></td><td>30, 35, 35</td></tr>
+</tbody></table></div>
+<h3 id="famine-rule-options"><a class="anchor" href="#famine-rule-options" aria-label="Link to this section">#</a>Famine rule options</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>Off</code></td><td>none</td></tr>
+<tr><td><code>1 month</code></td><td>1</td></tr>
+<tr><td><code>3 months</code></td><td>3</td></tr>
+</tbody></table></div>
+<h3 id="lords-castles"><a class="anchor" href="#lords-castles" aria-label="Link to this section">#</a>Lords castles</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>Loyal</code></td><td>1</td></tr>
+<tr><td><code>Wavering</code></td><td>0.5</td></tr>
+<tr><td><code>Disloyal</code></td><td>0</td></tr>
+<tr><td><code>In revolt</code></td><td>0</td></tr>
+</tbody></table></div>
+<h3 id="presets"><a class="anchor" href="#presets" aria-label="Link to this section">#</a>Presets</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>collection</th><th>castle shares</th><th>spread</th><th>siege reserve</th><th>army refill</th><th>surplus</th></tr></thead>
+<tbody>
+<tr><td>Feed the people</td><td>25</td><td>By people</td><td>Wide</td><td>3</td><td>Castles hand out first</td><td></td></tr>
+<tr><td>Fortress realm</td><td>50</td><td>Frontier first</td><td>Tight</td><td>12</td><td>Locals only</td><td></td></tr>
+<tr><td>War footing</td><td>75</td><td>Frontier first</td><td>50/30/20</td><td>6</td><td>Castles hand out first</td><td></td></tr>
+<tr><td>Merchant</td><td>50</td><td>Capital first</td><td>50/30/20</td><td>3</td><td>No refill in lords&#39; lands</td><td>Sell to the treasury</td></tr>
+</tbody></table></div>
+<h2 id="officials"><a class="anchor" href="#officials" aria-label="Link to this section">#</a>Officials</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>no_official_share</code></td><td>0.5</td></tr>
+</tbody></table></div>
+<h2 id="lords"><a class="anchor" href="#lords" aria-label="Link to this section">#</a>Lords</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>tax_share</code></td><td>0.5</td></tr>
+</tbody></table></div>
+<h3 id="labels"><a class="anchor" href="#labels" aria-label="Link to this section">#</a>Labels</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>feudal kingdom</code></td><td>noble</td></tr>
+<tr><td><code>city republic</code></td><td>merchant house</td></tr>
+<tr><td><code>theocracy</code></td><td>bishop or abbot</td></tr>
+<tr><td><code>steppe realm</code></td><td>clan chief</td></tr>
+<tr><td><code>chiefdom or stateless society</code></td><td>elder or lineage head</td></tr>
+</tbody></table></div>
+<h3 id="assassination-provisional"><a class="anchor" href="#assassination-provisional" aria-label="Link to this section">#</a>Assassination (provisional)</h3>
+<blockquote>
+<p>Sending an assassin after one of your lords (REALM-280 to REALM-285). gold: what it costs, paid whether or not it works. chance: the base chance it works; less by great_lord_penalty for each Great lord reason (REALM-162), never below min_chance. He dies through the shared death rules (people, REALM-273): his heir or a kinsman takes his lands at heir_loyalty, or with no one left they go back to the crown. On success every other lord of the realm falls others_steps steps and the rest of his house turns Disloyal when house_turns_disloyal; on failure he turns target_on_failure and every other lord falls others_steps_on_failure steps.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>gold</code></td><td>25</td></tr>
+<tr><td><code>chance</code></td><td>0.6</td></tr>
+<tr><td><code>great_lord_penalty</code></td><td>0.15</td></tr>
+<tr><td><code>min_chance</code></td><td>0.2</td></tr>
+<tr><td><code>heir_loyalty</code></td><td>Wavering</td></tr>
+<tr><td><code>house_turns_disloyal</code></td><td>yes</td></tr>
+<tr><td><code>others_steps</code></td><td>1</td></tr>
+<tr><td><code>others_steps_on_failure</code></td><td>1</td></tr>
+<tr><td><code>target_on_failure</code></td><td>Disloyal</td></tr>
+</tbody></table></div>
+<h2 id="windows"><a class="anchor" href="#windows" aria-label="Link to this section">#</a>Windows</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>fallen</code></td><td>10</td></tr>
+<tr><td><code>oaths_broken</code></td><td>30</td></tr>
+<tr><td><code>lands_taken</code></td><td>20</td></tr>
+</tbody></table></div>
+<h2 id="inheritance"><a class="anchor" href="#inheritance" aria-label="Link to this section">#</a>Inheritance</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>throne_laws</code></td><td>eldest son, eldest child, eldest of the house, strongest claimant, election by lords</td></tr>
+<tr><td><code>land_laws</code></td><td>to one heir, split among the sons</td></tr>
+</tbody></table></div>
+<h2 id="win"><a class="anchor" href="#win" aria-label="Link to this section">#</a>Win</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>domination_share</code></td><td>0.5</td></tr>
+<tr><td><code>subject_province_weight</code></td><td>0.5</td></tr>
+<tr><td><code>checked_month</code></td><td>1</td></tr>
+<tr><td><code>warship_men</code> (provisional)</td><td>100</td></tr>
+<tr><td><code>commander_men</code> (provisional)</td><td>1000</td></tr>
+<tr><td><code>army_power_per_men</code> (provisional)</td><td>1000</td></tr>
+</tbody></table></div>
+<h3 id="army-weights-provisional"><a class="anchor" href="#army-weights-provisional" aria-label="Link to this section">#</a>Army weights (provisional)</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>foot</code></td><td>1</td></tr>
+<tr><td><code>horse</code></td><td>2</td></tr>
+<tr><td><code>guns</code></td><td>3</td></tr>
+</tbody></table></div>
+<h2 id="campaign-end"><a class="anchor" href="#campaign-end" aria-label="Link to this section">#</a>Campaign end</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>year</code></td><td>1939</td></tr>
+<tr><td><code>month</code></td><td>8</td></tr>
+<tr><td><code>day</code></td><td>31</td></tr>
+</tbody></table></div>
+<h2 id="succession-by-form"><a class="anchor" href="#succession-by-form" aria-label="Link to this section">#</a>Succession by form</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>Eldest heir</code></td><td>eldest son</td></tr>
+<tr><td><code>Strongest son</code></td><td>strongest claimant</td></tr>
+<tr><td><code>Named heir</code></td><td>eldest son</td></tr>
+<tr><td><code>Lords elect</code></td><td>election by lords</td></tr>
+<tr><td><code>Council picks</code></td><td>election by lords</td></tr>
+<tr><td><code>Assembly picks</code></td><td>election by lords</td></tr>
+<tr><td><code>Elections</code></td><td>election by lords</td></tr>
+<tr><td><code>Chapter elects</code></td><td>election by lords</td></tr>
+<tr><td><code>Brothers elect</code></td><td>election by lords</td></tr>
+<tr><td><code>Clergy choose</code></td><td>election by lords</td></tr>
+<tr><td><code>Elders choose</code></td><td>election by lords</td></tr>
+<tr><td><code>From the chief&#39;s lineage</code></td><td>eldest of the house</td></tr>
+<tr><td><code>Royal kin choose</code></td><td>election by lords</td></tr>
+<tr><td><code>Eldest of the house</code></td><td>eldest of the house</td></tr>
+<tr><td><code>Members take turns</code></td><td>election by lords</td></tr>
+<tr><td><code>Heir or adopted son</code></td><td>eldest son</td></tr>
+<tr><td><code>Emirs choose</code></td><td>election by lords</td></tr>
+<tr><td><code>Generals choose</code></td><td>election by lords</td></tr>
+<tr><td><code>The party chooses</code></td><td>election by lords</td></tr>
+<tr><td><code>Owners appoint</code></td><td>election by lords</td></tr>
+<tr><td><code>Overlord appoints</code></td><td>election by lords</td></tr>
+</tbody></table></div>
+<h2 id="great-lord-provisional"><a class="anchor" href="#great-lord-provisional" aria-label="Link to this section">#</a>Great lord (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>one_reason_from</code></td><td>4</td></tr>
+<tr><td><code>two_reasons_from</code></td><td>8</td></tr>
+</tbody></table></div>
+<h2 id="event-stat-map"><a class="anchor" href="#event-stat-map" aria-label="Link to this section">#</a>Event stat map</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>legitimacy</code></td><td>loyal lords, heirs, years on throne</td></tr>
+<tr><td><code>stability</code></td><td>loyal lords, provinces in revolt</td></tr>
+<tr><td><code>war_weariness</code></td><td>Fallen, peace voices</td></tr>
+<tr><td><code>prestige</code></td><td>victories, lands taken</td></tr>
+<tr><td><code>admin_capacity</code></td><td>the officials cap</td></tr>
+<tr><td><code>tech_* and innovation</code></td><td>inventions from the research tree</td></tr>
+<tr><td><code>literacy</code></td><td>scholars and schools per thousand people</td></tr>
+<tr><td><code>food_security</code></td><td>local store, castle store, harvest, herds</td></tr>
+<tr><td><code>debt</code></td><td>debt</td></tr>
+<tr><td><code>treasury</code></td><td>gold</td></tr>
+<tr><td><code>navy_strength</code></td><td>warships</td></tr>
+<tr><td><code>naval_reach</code></td><td>warships</td></tr>
+<tr><td><code>army_strength</code></td><td>soldiers</td></tr>
+<tr><td><code>manpower</code></td><td>recruits</td></tr>
+<tr><td><code>trade_access</code></td><td>starting traders</td></tr>
+<tr><td><code>opinion</code></td><td>opinion</td></tr>
+<tr><td><code>trust</code></td><td>trust</td></tr>
+<tr><td><code>notoriety</code></td><td>notoriety</td></tr>
+</tbody></table></div>
+<h2 id="women-in-roles-provisional"><a class="anchor" href="#women-in-roles-provisional" aria-label="Link to this section">#</a>Women in roles (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>ruler</th><th>lord</th><th>commander</th><th>official</th><th>scholar</th></tr></thead>
+<tbody>
+<tr><td>default</td><td>0</td><td>0.05</td><td>0.02</td><td>0.02</td><td>0.05</td></tr>
+<tr><td>by_country</td><td></td><td></td><td></td><td></td><td></td></tr>
+</tbody></table></div>
+<h2 id="age-multipliers-provisional"><a class="anchor" href="#age-multipliers-provisional" aria-label="Link to this section">#</a>Age multipliers (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>Age of Revolutions</code></td><td>1.5</td></tr>
+<tr><td><code>Age of Industrialization</code></td><td>2</td></tr>
+<tr><td><code>Age of World Wars</code></td><td>3</td></tr>
+</tbody></table></div>
+<h2 id="starting-provisional"><a class="anchor" href="#starting-provisional" aria-label="Link to this section">#</a>Starting (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>levels</code></td><td>very_low, low, moderate, high, very_high</td></tr>
+<tr><td><code>gold_months_of_income</code></td><td>1, 2, 3, 5, 8</td></tr>
+<tr><td><code>gold_floor</code></td><td>10</td></tr>
+<tr><td><code>levies_share_of_ceiling</code></td><td>0.5, 0.65, 0.8, 0.9, 1</td></tr>
+<tr><td><code>debt_share_of_gold</code></td><td>1.5, 1, 0.5, 0.25, 0</td></tr>
+<tr><td><code>commanders</code></td><td>1, 1, 2, 3, 4</td></tr>
+<tr><td><code>royal_share</code></td><td>0.3, 0.4, 0.5, 0.6, 0.7</td></tr>
+<tr><td><code>officials_per_royal_province</code></td><td>0.5, 0.7, 0.9, 1, 1.2</td></tr>
+<tr><td><code>lords_loyal_share</code></td><td>0.2, 0.4, 0.6, 0.8, 0.9</td></tr>
+<tr><td><code>revolt_share</code></td><td>0.2, 0.1, 0.05, 0.02, 0</td></tr>
+<tr><td><code>lords_per_provinces</code></td><td>2, 3, 4, 6, 8</td></tr>
+<tr><td><code>schools_per_million</code></td><td>0, 1, 2, 4, 6</td></tr>
+<tr><td><code>traders</code></td><td>0, 1, 2, 3, 4</td></tr>
+<tr><td><code>envoys_at_court</code></td><td>0, 1, 1, 2, 3</td></tr>
+</tbody></table></div>
+<h3 id="per-thousand-people"><a class="anchor" href="#per-thousand-people" aria-label="Link to this section">#</a>Per thousand people</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>soldiers</code></td><td>1, 1.5, 2.5, 3.5, 5</td></tr>
+<tr><td><code>horses</code></td><td>0.2, 0.4, 0.8, 1.2, 1.6</td></tr>
+<tr><td><code>ships</code></td><td>0, 0.002, 0.005, 0.01, 0.02</td></tr>
+<tr><td><code>scholars</code></td><td>0, 0.002, 0.004, 0.006, 0.01</td></tr>
+</tbody></table></div>
+<h3 id="spread-by-confidence"><a class="anchor" href="#spread-by-confidence" aria-label="Link to this section">#</a>Spread by confidence</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>low</code></td><td>0.25</td></tr>
+<tr><td><code>medium</code></td><td>0.1</td></tr>
+<tr><td><code>high</code></td><td>0.05</td></tr>
+</tbody></table></div>
+<h2 id="starting-armies-provisional"><a class="anchor" href="#starting-armies-provisional" aria-label="Link to this section">#</a>Starting armies (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>men_per_commander</code></td><td>8000</td></tr>
+<tr><td><code>most_commanders</code></td><td>8</td></tr>
+</tbody></table></div>
+<h2 id="starting-lords-provisional"><a class="anchor" href="#starting-lords-provisional" aria-label="Link to this section">#</a>Starting lords (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>great_house_types</code></td><td>duchy, county, lordship, principality, march, margraviate, earldom, barony</td></tr>
+<tr><td><code>generated_one_per_provinces</code></td><td>4</td></tr>
+</tbody></table></div>
+<h3 id="great-houses"><a class="anchor" href="#great-houses" aria-label="Link to this section">#</a>Great houses</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>france</code></td><td>alencon, anjou, armagnac, bourbon, foix, nevers, orleans</td></tr>
+</tbody></table></div>
+<h3 id="house-lands"><a class="anchor" href="#house-lands" aria-label="Link to this section">#</a>House lands</h3>
+<blockquote>
+<p>D-INST-1 (was OQ-INST-3): a realm whose great houses the data seats on named land; the rest is royal. Japan: fourteen of the catalogue&#39;s shugo and Tohoku houses on the prefecture-sized provinces nearest their 1444 seats (the catalogue&#39;s Rokkaku, Isshiki and Togashi held land the map draws inside other provinces). The shogunate&#39;s lords cap is 14.</p>
+</blockquote>
+<h4 id="japan"><a class="anchor" href="#japan" aria-label="Link to this section">#</a>Japan</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>name</th><th>provinces</th></tr></thead>
+<tbody>
+<tr><td>hosokawa</td><td>Hosokawa</td><td>p2108, p2106, p2436</td></tr>
+<tr><td>hatakeyama</td><td>Hatakeyama</td><td>p2111</td></tr>
+<tr><td>shiba</td><td>Shiba</td><td>p2109</td></tr>
+<tr><td>yamana</td><td>Yamana</td><td>p2107</td></tr>
+<tr><td>ouchi</td><td>Ōuchi</td><td>p2104, p2432</td></tr>
+<tr><td>uesugi</td><td>Uesugi</td><td>p2116, p1828, p2115, p2117, p2119</td></tr>
+<tr><td>imagawa</td><td>Imagawa</td><td>p2114</td></tr>
+<tr><td>toki</td><td>Toki</td><td>p2112</td></tr>
+<tr><td>kyogoku</td><td>Kyōgoku</td><td>p2105</td></tr>
+<tr><td>otomo</td><td>Ōtomo</td><td>p2435, p2430</td></tr>
+<tr><td>shimazu</td><td>Shimazu</td><td>p2433, p2434</td></tr>
+<tr><td>takeda</td><td>Takeda</td><td>p2113</td></tr>
+<tr><td>date</td><td>Date</td><td>p1832, p1829, p2118</td></tr>
+<tr><td>nanbu</td><td>Nanbu</td><td>p1831, p1833, p1830</td></tr>
+</tbody></table></div>
+<h2 id="food-year-provisional"><a class="anchor" href="#food-year-provisional" aria-label="Link to this section">#</a>Food year (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>favoured_weight</code></td><td>2</td></tr>
+<tr><td><code>dry_terrains</code></td><td>desert, drylands, savanna</td></tr>
+<tr><td><code>no_harvest_terrains</code></td><td>tundra</td></tr>
+<tr><td><code>transfer_loss_per_province</code></td><td>0.02</td></tr>
+<tr><td><code>rot_per_season</code></td><td>0.05</td></tr>
+<tr><td><code>rot_per_season_with_granary</code></td><td>0.025</td></tr>
+</tbody></table></div>
+<h3 id="harvest-month"><a class="anchor" href="#harvest-month" aria-label="Link to this section">#</a>Harvest month</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>north</code></td><td>9</td></tr>
+<tr><td><code>south</code></td><td>3</td></tr>
+</tbody></table></div>
+<h3 id="weather"><a class="anchor" href="#weather" aria-label="Link to this section">#</a>Weather</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>bad_one_in</code></td><td>6</td></tr>
+<tr><td><code>good_one_in</code></td><td>6</td></tr>
+<tr><td><code>bad_name</code></td><td>bad weather</td></tr>
+</tbody></table></div>
+<h3 id="climate-weather"><a class="anchor" href="#climate-weather" aria-label="Link to this section">#</a>Climate weather</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>bad one in</th><th>good one in</th><th>bad name</th></tr></thead>
+<tbody>
+<tr><td>dry</td><td>4</td><td>8</td><td>drought</td></tr>
+<tr><td>monsoon</td><td>5</td><td>6</td><td>floods</td></tr>
+</tbody></table></div>
+<h3 id="rice-lands"><a class="anchor" href="#rice-lands" aria-label="Link to this section">#</a>Rice lands</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>lon</code></td><td>68, 146</td></tr>
+<tr><td><code>lat</code></td><td>-11, 30</td></tr>
+<tr><td><code>not_on</code></td><td>desert, drylands, mountains, tundra</td></tr>
+</tbody></table></div>
+<h3 id="base-harvest"><a class="anchor" href="#base-harvest" aria-label="Link to this section">#</a>Base harvest</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>poor</code></td><td>0.1</td></tr>
+<tr><td><code>normal</code></td><td>0.7</td></tr>
+<tr><td><code>good</code></td><td>0.15</td></tr>
+<tr><td><code>bumper</code></td><td>0.05</td></tr>
+</tbody></table></div>
+<h3 id="reach-by-road"><a class="anchor" href="#reach-by-road" aria-label="Link to this section">#</a>Reach by road</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>none</code></td><td>1</td></tr>
+<tr><td><code>track</code></td><td>1</td></tr>
+<tr><td><code>road</code></td><td>2</td></tr>
+<tr><td><code>paved road</code></td><td>2</td></tr>
+<tr><td><code>turnpike</code></td><td>3</td></tr>
+<tr><td><code>railway</code></td><td>4</td></tr>
+</tbody></table></div>
+<h2 id="debt-provisional"><a class="anchor" href="#debt-provisional" aria-label="Link to this section">#</a>Debt (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>interest_pct</code></td><td>10</td></tr>
+<tr><td><code>loan_cap_years_income</code></td><td>1</td></tr>
+<tr><td><code>loan_cap_years_income_with_T10</code></td><td>3</td></tr>
+<tr><td><code>refusal_pct_per_oath</code></td><td>10</td></tr>
+<tr><td><code>lord_loan_interest_pct</code></td><td>0</td></tr>
+<tr><td><code>interest_added_at_once_years</code></td><td>1</td></tr>
+<tr><td><code>lords_waver_once_per_months</code></td><td>12</td></tr>
+</tbody></table></div>
+<h2 id="officials-per-province"><a class="anchor" href="#officials-per-province" aria-label="Link to this section">#</a>Officials per province</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>plus_one</code></td><td><a href="/wiki/Data-Research#inventions">B2 Roads and post stations</a>, <a href="/wiki/Data-Research#inventions">G11 Postal service</a>, <a href="/wiki/Data-Research#inventions">T14 telegraphy</a></td></tr>
+</tbody></table></div>
+<h3 id="steps"><a class="anchor" href="#steps" aria-label="Link to this section">#</a>Steps</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>G1</code></td><td>1</td></tr>
+<tr><td><code>G9</code></td><td>2</td></tr>
+<tr><td><code>G16</code></td><td>3</td></tr>
+</tbody></table></div>
+<h2 id="ai-provisional"><a class="anchor" href="#ai-provisional" aria-label="Link to this section">#</a>Ai (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>food_preset_at_peace</code></td><td>Feed the people</td></tr>
+<tr><td><code>food_preset_at_war</code></td><td>War footing</td></tr>
+<tr><td><code>tax_at_peace</code></td><td>normal</td></tr>
+<tr><td><code>tax_at_war</code></td><td>heavy</td></tr>
+<tr><td><code>loan_when_gold_below</code></td><td>0</td></tr>
+<tr><td><code>repay_when_gold_above_years_upkeep</code></td><td>1</td></tr>
+<tr><td><code>gift_to_disloyal_lord_gold</code></td><td>20</td></tr>
+</tbody></table></div>
+<h2 id="stability"><a class="anchor" href="#stability" aria-label="Link to this section">#</a>Stability</h2>
+<blockquote>
+<p>REALM-199 to REALM-202 (F-75): stability is read from four pillars, lords, subjects, officials and provinces, each Steady, Uneasy, Troubled or Crumbling; the realm stands at its weakest pillar.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>steps</code></td><td>Steady, Uneasy, Troubled, Crumbling</td></tr>
+<tr><td><code>loyal_share_for_steady</code></td><td>0.5</td></tr>
+</tbody></table></div>
+<h3 id="empty-posts-share-provisional"><a class="anchor" href="#empty-posts-share-provisional" aria-label="Link to this section">#</a>Empty posts share (provisional)</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>uneasy_up_to</code></td><td>0.25</td></tr>
+<tr><td><code>troubled_up_to</code></td><td>0.5</td></tr>
+</tbody></table></div>
+<h3 id="restless-share-provisional"><a class="anchor" href="#restless-share-provisional" aria-label="Link to this section">#</a>Restless share (provisional)</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>troubled_from</code></td><td>0.1</td></tr>
+<tr><td><code>crumbling_from</code></td><td>0.25</td></tr>
+</tbody></table></div>
+<h2 id="titles-provisional"><a class="anchor" href="#titles-provisional" aria-label="Link to this section">#</a>Titles (provisional)</h2>
+<blockquote>
+<p>What lords and officials are called: the court language&#39;s family first, then the government form&#39;s family, then the default (REALM-242). Words only: no rule reads them.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>lord</th><th>lords</th><th>official</th><th>officials</th><th>kin</th><th>slavic</th><th>hellenic</th><th>turkic</th><th>iranian</th><th>more</th></tr></thead>
+<tbody>
+<tr><td>default</td><td>lord</td><td>lords</td><td>official</td><td>officials</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>by_form_family</td><td></td><td></td><td></td><td></td><td>lord: chief; lords: chiefs; official: headman; officials: headmen</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>by_language_family</td><td></td><td></td><td></td><td></td><td></td><td>lord: boyar; lords: boyars; official: voivode; officials: voivodes</td><td>lord: archon; lords: archons; official: kephale; officials: kephales</td><td>lord: bey; lords: beys; official: subashi; officials: subashis</td><td>lord: khan; lords: khans; official: darugha; officials: darughas</td><td>arab: (lord: emir; lords: emirs; official: wali; officials: walis); berber: (lord: sheikh; lords: sheikhs; official: qaid; officials: qaids); cushitic: (lord: garad; lords: garads; official: wali; officials: walis); semitic ethiopian: (lord: ras; lords: rases; official: shum; officials: shums); mande: (lord: chief; lords: chiefs; official: farba; officials: farbas); akan: (lord: ohene; lords: ahene; official: headman; officials: headmen); yoruba edo: (lord: chief; lords: chiefs; official: ilari; officials: ilaris); hausa fulani: (lord: sarki; lords: sarakuna; official: hakimi; officials: hakimai); bantu: (lord: chief; lords: chiefs; official: headman; officials: headmen); khoisan: (lord: headman; lords: headmen; official: elder; officials: elders); nilotic: (lord: chief; lords: chiefs; official: elder; officials: elders); indo aryan: (lord: thakur; lords: thakurs; official: amil; officials: amils); dravidian: (lord: nayaka; lords: nayakas; official: adhikari; officials: adhikaris); tibeto burman: (lord: myosa; lords: myosas; official: myothugyi; officials: myothugyis); tai: (lord: chao; lords: chaos; official: khun; officials: khuns); austronesian: (lord: datu; lords: datus; official: punggawa; officials: punggawas); sinitic: (lord: prince; lords: princes; official: magistrate; officials: magistrates); japonic: (lord: daimyo; lords: daimyo; official: daikan; officials: daikan); koreanic: (lord: yangban; lords: yangban; official: magistrate; officials: magistrates); mongolic: (lord: noyan; lords: noyans; official: darughachi; officials: darughachi); tungusic: (lord: beile; lords: beile; official: amban; officials: ambans); nahua: (lord: tlatoani; lords: tlatoque; official: calpixqui; officials: calpixque); maya: (lord: ajaw; lords: ajaws; official: batab; officials: batabs); andean: (lord: kuraka; lords: kurakas; official: tocricoc; officials: tocricocs); tupi guarani: (lord: chief; lords: chiefs; official: elder; officials: elders); algonquian: (lord: sachem; lords: sachems; official: headman; officials: headmen); iroquoian: (lord: chief; lords: chiefs; official: headman; officials: headmen); polynesian: (lord: chief; lords: chiefs; official: steward; officials: stewards); melanesian: (lord: big man; lords: big men; official: elder; officials: elders); aboriginal australian: (lord: elder; lords: elders; official: headman; officials: headmen); caucasian: (lord: prince; lords: princes; official: mouravi; officials: mouravis)</td></tr>
+</tbody></table></div>
+<h2 id="ruler-provisional"><a class="anchor" href="#ruler-provisional" aria-label="Link to this section">#</a>Ruler (provisional)</h2>
+<blockquote>
+<p>REALM-233 to REALM-237: rulers in play. Each January the ruler and heir age a year; a ruler dies with the chance of his age (people.death_per_year, REALM-270); an heirless ruler of an age to have children gains one; traits lean the AI&#39;s event choices (words matched in an option&#39;s effects) and give small bonuses (percent levers, as heritage&#39;s).</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>heir_at_start</code></td><td>0.75</td></tr>
+<tr><td><code>heir_age_gap</code></td><td>18, 32</td></tr>
+<tr><td><code>birth_per_year</code></td><td>0.15</td></tr>
+<tr><td><code>birth_ages</code></td><td>18, 50</td></tr>
+<tr><td><code>kinsman_age</code></td><td>20, 50</td></tr>
+<tr><td><code>child_under</code></td><td>16</td></tr>
+<tr><td><code>daughter_heir</code></td><td>0.2</td></tr>
+<tr><td><code>lean_factor</code></td><td>1.5</td></tr>
+</tbody></table></div>
+<h3 id="start-age"><a class="anchor" href="#start-age" aria-label="Link to this section">#</a>Start age</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>accession_from</code></td><td>14</td></tr>
+<tr><td><code>accession_to</code></td><td>40</td></tr>
+<tr><td><code>oldest</code></td><td>75</td></tr>
+<tr><td><code>unknown_since_years</code></td><td>2, 20</td></tr>
+</tbody></table></div>
+<h3 id="traits"><a class="anchor" href="#traits" aria-label="Link to this section">#</a>Traits</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>leans</th><th>bonus</th></tr></thead>
+<tbody>
+<tr><td>Pious</td><td>religion, convert, conversion, catholic, protestant, orthodox, islam, sikh, church, clergy, mission</td><td>faith_revolts_pct: -25</td></tr>
+<tr><td>Warlike</td><td>&quot;war&quot;, annex, vassalize, casus_belli, conquest, militar, manpower, army</td><td>recruit_refill_pct: 10</td></tr>
+<tr><td>Builder</td><td>admin_capacity, prosperity, canal, industrial, railway, telegraph, tech_, reform</td><td>building_cost_pct: -10</td></tr>
+<tr><td>Greedy</td><td>treasury, income, trade_route, revenue, extraction, &quot;debt&quot;</td><td>tax_reach_pct: 5</td></tr>
+</tbody></table></div>
+<h2 id="people-provisional"><a class="anchor" href="#people-provisional" aria-label="Link to this section">#</a>People (provisional)</h2>
+<blockquote>
+<p>REALM-270 to REALM-279: one ageing and death model for every person the game names. Each January everyone ages a year and dies with the chance of his age band (age under the first number, chance a year), times his kind&#39;s death_mult. Battle and assassination deaths go through the same path. start_age draws a person&#39;s age when the game first meets him (a seeded lord or commander, a newly hired official); a lord aged birth_ages without an heir gains one at birth_per_year; a lord starts with an heir at heir_at_start; a lord who dies heirless is followed by a kinsman (kinsman_age) at kinsman_share, else his line dies out. With ai_refills_posts an AI realm, or a lord, fills a dead official&#39;s post at once with a new man of his type.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>ai_refills_posts</code></td><td>yes</td></tr>
+</tbody></table></div>
+<h3 id="death-per-year"><a class="anchor" href="#death-per-year" aria-label="Link to this section">#</a>Death per year</h3>
+<ul>
+<li>5, 0.03</li>
+<li>16, 0.01</li>
+<li>40, 0.01</li>
+<li>50, 0.02</li>
+<li>60, 0.04</li>
+<li>70, 0.08</li>
+<li>999, 0.16</li>
+</ul>
+<h3 id="kinds"><a class="anchor" href="#kinds" aria-label="Link to this section">#</a>Kinds</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>death mult</th><th>start age</th><th>heir at start</th><th>heir age gap</th><th>birth per year</th><th>birth ages</th><th>kinsman share</th><th>kinsman age</th><th>hire age</th></tr></thead>
+<tbody>
+<tr><td>ruler</td><td>1</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>heir</td><td>1</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>lord</td><td>1</td><td>20, 65</td><td>0.75</td><td>18, 32</td><td>0.25</td><td>18, 50</td><td>0.5</td><td>18, 45</td><td></td></tr>
+<tr><td>official</td><td>1</td><td>25, 60</td><td></td><td></td><td></td><td></td><td></td><td></td><td>22, 40</td></tr>
+<tr><td>commander</td><td>1</td><td>25, 60</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>governor</td><td>1</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+</tbody></table></div>
+<h3 id="battle-death"><a class="anchor" href="#battle-death" aria-label="Link to this section">#</a>Battle death</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>loser</code></td><td>0.05</td></tr>
+<tr><td><code>reckless_mult</code></td><td>2</td></tr>
+</tbody></table></div>
+<h2 id="fallen-provisional"><a class="anchor" href="#fallen-provisional" aria-label="Link to this section">#</a>Fallen (provisional)</h2>
+<blockquote>
+<p>REALM-238: the fallen of the last 10 years (windows.fallen) push the realm&#39;s voices toward peace and slow its recruits&#39; refill, both read against its recruit ceiling.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>peace_share_per_ceiling</code></td><td>0.25</td></tr>
+<tr><td><code>peace_share_cap</code></td><td>0.25</td></tr>
+<tr><td><code>refill_slow_per_ceiling</code></td><td>0.5</td></tr>
+<tr><td><code>refill_floor</code></td><td>0.5</td></tr>
+</tbody></table></div>
+<h2 id="belief-provisional"><a class="anchor" href="#belief-provisional" aria-label="Link to this section">#</a>Belief (provisional)</h2>
+<blockquote>
+<p>REALM-239: under this Faith % or Tongue % a realm&#39;s faith or tongue risings start more often; low faith makes its lords seated among another faith waver each January, low tongue makes its officials&#39; effect grow more slowly.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>low_percent</code></td><td>50</td></tr>
+<tr><td><code>revolt_factor</code></td><td>1.5</td></tr>
+<tr><td><code>official_slow</code></td><td>0.5</td></tr>
+</tbody></table></div>

@@ -328,6 +328,8 @@ Not in yet: building or paying for houses, preachers, expulsion and the Inquisit
 
 ## Numbers
 
+Every value the game uses, made from its config so it always matches the game: [Religion data](Data-Religion). How they combine: [Formulas](Formulas).
+
 All numbers are **first-pass placeholders** in `religion.yaml`. Four defaults were kept on 16 October (still config values): communities at 10 %, *Wrong faith* at a third, the 25 % faith tax and the 3 % yearly move. The three-faith limit is a storage limit, not a balance number.
 
 | Key | Value |

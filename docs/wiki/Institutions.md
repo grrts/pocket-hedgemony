@@ -131,3 +131,7 @@ The Shogunate ends when the shogun's realm leaves the shogunate form, by reform 
 - **The peace sheet** offers *Dissolve the Empire* when you are at war with the Emperor, not a member, and it is era IV or later.
 - **The Institutions map mode** colours the Emperor and the shogun gold and the members light gold, marks the seats, hatches imperial land held by outsiders, and draws Japan by house while it is whole.
 - On a phone the card is a side sheet in the Wide layout and a bottom sheet in the Tall layout; every row and button is a full 44-point tap.
+
+## Numbers
+
+Every value the game uses, made from its config so it always matches the game: [Institutions data](Data-Institutions). How they combine: [Formulas](Formulas).
