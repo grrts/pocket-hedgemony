@@ -1278,6 +1278,11 @@
      "id": "eras-by-year",
      "text": "Eras by year",
      "level": 2
+    },
+    {
+     "id": "arms-and-fear",
+     "text": "Arms and fear",
+     "level": 2
     }
    ]
   },
@@ -6729,6 +6734,11 @@
     {
      "id": "the-computer-players",
      "text": "The computer players",
+     "level": 3
+    },
+    {
+     "id": "arms-and-fear",
+     "text": "Arms and fear",
      "level": 3
     },
     {

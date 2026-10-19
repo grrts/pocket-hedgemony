@@ -176,6 +176,19 @@ export interface DiplomacyConfig {
   eras_by_year: { era: string; from: number }[];
   oaths_broken_years: number;
   lands_taken_years: number;
+  /** AI arms and fear (DIPL-231 to DIPL-237): standing armies, mobilising at war, borrowing for war, fear of a much stronger neighbour. */
+  arms_and_fear: ArmsAndFearRule;
+}
+
+/** A value for each fear level. */
+export type ByFear = Record<FearWord, number>;
+export type FearWord = "calm" | "wary" | "threatened";
+
+export interface ArmsAndFearRule {
+  fear: { wary_ratio: number; threatened_ratio: number; ally_weight: number };
+  standing: { share_of_cap: number; match_neighbour: number; multiplier: ByFear; max_share_of_cap: ByFear; pay_share_of_income: ByFear; raise_per_month: number; slack: number };
+  war: { share_of_cap: number; per_province: number; pay_share_of_income: number };
+  borrow: { months_of_pay: number };
 }
 
 export const config = raw as unknown as DiplomacyConfig;

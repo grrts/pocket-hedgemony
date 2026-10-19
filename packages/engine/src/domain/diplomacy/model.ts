@@ -61,6 +61,15 @@ export interface Country {
   revolutionSigns: number;
   /** Sea zones the realm's coast touches (map supplies them). */
   seaZones: string[];
+  /** The neighbours the realm is Wary or Threatened of this month, most feared first (DIPL-231); measured again each month, never a lasting tie. */
+  fears?: Fear[];
+}
+
+/** Fear of a much stronger neighbour (DIPL-231): who, how much, and its strength over the realm's side's. */
+export interface Fear {
+  of: string;
+  level: "wary" | "threatened";
+  ratio: number;
 }
 
 export interface Province {
