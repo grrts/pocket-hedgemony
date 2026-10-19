@@ -3845,6 +3845,26 @@ button.paper.over {
   margin-top: 0;
   color: var(--cloth);
 }
+/* The plague card on a province's Overview (PROV-351): the step in words, the dead, and a full-width Quarantine button. */
+.plague-card {
+  padding: 6px 8px;
+  margin: 6px 0 8px;
+  border-left: 4px dashed var(--cloth);
+}
+.plague-card .sub {
+  margin-top: 0;
+}
+.plague-card p {
+  margin: 0 0 6px;
+}
+.plague-card .plague-toggle {
+  width: 100%;
+  flex-wrap: wrap;
+  gap: 2px 8px;
+}
+.plague-card .plague-toggle small {
+  color: var(--ink-soft);
+}
 .rising dl.facts dd small {
   display: block;
   color: var(--ink-soft);

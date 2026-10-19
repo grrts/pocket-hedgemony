@@ -572,7 +572,8 @@ function updateRatios(world: World): void {
       const share = enemy ? 0 : Math.max(0, officialBonus(world, p, "Customs officer", "trade_ratio_gain") + (moodIndex(world, p) >= 2 ? config.ratio.modifiers.riots : 0) + (world.navy.guarded[p] ? COMMODORE_GAIN : 0));
       gain = config.ratio.gain_per_trader * passing * (1 - ratio / config.ratio.max) * share;
     }
-    r[p] = Math.max(0, Math.min(config.ratio.max, ratio + gain - ratio * config.ratio.decay_share));
+    // A province closed against plague trades nothing while the quarantine lasts (TRADE-040, PROV-347).
+    r[p] = world.provinceQuarantine[p] ? config.ratio.modifiers.quarantine.set_ratio : Math.max(0, Math.min(config.ratio.max, ratio + gain - ratio * config.ratio.decay_share));
     world.provincePassed[p] = passing;
   }
   world.provincePassing.fill(0);

@@ -25,6 +25,7 @@ import { peoplesSnapshot, type PeoplesSnapshot } from "./peoples.ts";
 import { faithHeadsView, type FaithHeadsView } from "./faithHeads.ts";
 import { campaignView, setPlayer, type CampaignView } from "./campaignEnd.ts";
 import { GRIEVANCES, moodIndex, MOODS } from "./moods.ts";
+import { PLAGUE_STEPS, quarantineTaxShare } from "./plague.ts";
 import { CLASS_NAMES } from "./living.ts";
 import { canBorrow, heldTax, LEDGER, loanDebt, loanUnsettlesLords, LEDGER_LINES, NORMAL_TAX, TAX_RATES } from "./treasury.ts";
 import { feverOf, FEVER_STEPS } from "./land.ts";
@@ -221,6 +222,14 @@ export interface Snapshot {
   /** Each province's fever land (index into feverSteps: none, mild, harsh, deadly), PROV-243. */
   provinceFever: Int8Array;
   feverSteps: readonly string[];
+  /** Each province's plague step (index into plagueSteps: none, rumour, outbreak, burning out) and whether its owner has closed it (PROV-351). */
+  provincePlague: Int8Array;
+  provinceQuarantine: Uint8Array;
+  plagueSteps: readonly string[];
+  /** The sick provinces: step, plague weeks left at it (about a week each) and people dead of this plague so far. */
+  plague: { province: number; step: number; weeks: number; dead: number }[];
+  /** What a closed province still pays of its tax. */
+  quarantineTax: number;
   climates: readonly string[];
   /** What bad weather is called in each climate (drought, floods, bad weather). */
   badWeather: readonly string[];
@@ -514,6 +523,11 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       provinceClimate: provinceClimates(w).slice(),
       provinceFever: Int8Array.from({ length: w.provinceCount }, (_, p) => feverOf(w, p)),
       feverSteps: FEVER_STEPS,
+      provincePlague: w.provincePlague.slice(),
+      provinceQuarantine: w.provinceQuarantine.slice(),
+      plagueSteps: PLAGUE_STEPS,
+      plague: w.plagueSick.map((p) => ({ province: p, step: w.provincePlague[p]!, weeks: w.provincePlagueWeeks[p]!, dead: Math.round(w.provincePlagueDead[p]! * 1000) })),
+      quarantineTax: quarantineTaxShare(),
       provinceHarvestMonths: Array.from({ length: w.provinceCount }, (_, p) => (w.provinceWater[p] ? [] : harvestMonthsOf(w, p))),
       climates: CLIMATES,
       badWeather: CLIMATES.map(badWeatherName),
