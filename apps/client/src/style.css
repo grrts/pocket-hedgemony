@@ -7026,3 +7026,20 @@ div.chron-row {
   display: block;
   color: var(--ink-soft);
 }
+
+/* Sending an assassin after a lord (REALM-284): the confirm card on his screen, two 44-point buttons side by side. */
+.assassin-ask {
+  padding: 6px 8px;
+  margin: 6px 0 8px;
+  border-left: 4px solid var(--cloth);
+  background: var(--paper-light);
+}
+.assassin-ask .sub {
+  margin-top: 0;
+  color: var(--cloth);
+}
+.assassin-ask .confirm-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
