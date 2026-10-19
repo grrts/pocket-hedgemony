@@ -536,7 +536,8 @@
   {
    "key": "coronation_at_reims",
    "name": "Charles VII crowned at Reims",
-   "date": "1429-07-17"
+   "date": "1429-07-17",
+   "event": "relief_of_orleans"
   },
   {
    "key": "fall_of_thessaloniki",
@@ -586,7 +587,8 @@
   {
    "key": "france_retakes_paris",
    "name": "Charles VII's forces retake Paris",
-   "date": "1436-04-13"
+   "date": "1436-04-13",
+   "event": "congress_of_arras"
   },
   {
    "key": "council_of_florence_union",
