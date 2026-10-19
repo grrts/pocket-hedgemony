@@ -746,12 +746,11 @@ export function eraName(era: TreeEra): string {
  * era's. Ancient is the floor (RSCH-097).
  */
 export function standing(known: ReadonlySet<string>, t: Tree = tree()): TreeEra {
-  const all = new Map<TreeEra, number>();
+  const { all, eras } = eraCounts(t);
   const have = new Map<TreeEra, number>();
-  for (const inv of t.inventions.values()) {
-    if (outOfScope(inv)) continue;
-    all.set(inv.era, (all.get(inv.era) ?? 0) + 1);
-    if (known.has(inv.id)) have.set(inv.era, (have.get(inv.era) ?? 0) + 1);
+  for (const id of known) {
+    const e = eras.get(id);
+    if (e !== undefined) have.set(e, (have.get(e) ?? 0) + 1);
   }
   let found: TreeEra = TREE_ERAS[0]!;
   for (const era of TREE_ERAS) {
@@ -763,9 +762,31 @@ export function standing(known: ReadonlySet<string>, t: Tree = tree()): TreeEra 
   return found;
 }
 
+/** Each era's inventions in scope, and each such invention's era: counted once a tree, as every snapshot asks every realm's standing. */
+const eraCountsOf = new WeakMap<Tree, { size: number; all: Map<TreeEra, number>; eras: Map<string, TreeEra> }>();
+function eraCounts(t: Tree): { all: Map<TreeEra, number>; eras: Map<string, TreeEra> } {
+  const had = eraCountsOf.get(t);
+  if (had && had.size === t.inventions.size) return had;
+  const all = new Map<TreeEra, number>();
+  const eras = new Map<string, TreeEra>();
+  for (const inv of t.inventions.values()) {
+    if (outOfScope(inv)) continue;
+    all.set(inv.era, (all.get(inv.era) ?? 0) + 1);
+    eras.set(inv.id, inv.era);
+  }
+  const counts = { size: t.inventions.size, all, eras };
+  eraCountsOf.set(t, counts);
+  return counts;
+}
+
 /** Eras between a realm's standing and the era of the date: 0 when abreast of the times (RSCH-097). */
 export function behindBy(known: ReadonlySet<string>, date: Day, t: Tree = tree()): number {
-  return Math.max(0, eraIndex(eraOf(date)) - eraIndex(standing(known, t)));
+  return eraBehind(standing(known, t), date);
+}
+
+/** Eras between a standing already worked out and the era of the date. */
+export function eraBehind(standing: TreeEra, date: Day): number {
+  return Math.max(0, eraIndex(eraOf(date)) - eraIndex(standing));
 }
 
 /** Past inventions a realm lacks (to catch up). */

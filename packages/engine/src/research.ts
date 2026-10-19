@@ -564,6 +564,7 @@ export function researchView(world: World, n: number, arms: readonly string[]): 
     return { ...view(inv), cost, months: pace > 0 ? Math.max(1, Math.ceil(((cost - progress) / pace) * 12)) : null, ahead: rs.eraIndex(inv.era) > rs.eraIndex(era), partners, behindPct: rs.behindDiscountPct(inv.era, date) };
   };
   const t = rs.tree();
+  const standing = rs.standing(p.known, t);
   const options: StudyOption[] = [];
   const known: InventionView[] = [];
   for (const inv of t.inventions.values()) {
@@ -604,8 +605,8 @@ export function researchView(world: World, n: number, arms: readonly string[]): 
     pace: paceFor(p, null),
     contacts: [...p.contacts],
     group: p.group ?? null,
-    standing: rs.standing(p.known),
-    behind: rs.behindBy(p.known, date),
+    standing,
+    behind: rs.eraBehind(standing, date),
     pastMissing: rs.missingPast(p.known),
     behindNeighbours: behindNeighbours(world, n),
     harvestSteps: world.researchHarvest[n]!,
@@ -624,7 +625,8 @@ export function realmResearch(world: World): { known: number; study: string | nu
     for (const id of p.known) if (!mine.has(id)) ahead++;
     let behindYou = 0;
     for (const id of mine) if (!p.known.has(id)) behindYou++;
-    const base = { known: p.known.size, standing: rs.standing(p.known), behind: rs.behindBy(p.known, date), ahead, behindYou };
+    const standing = rs.standing(p.known);
+    const base = { known: p.known.size, standing, behind: rs.eraBehind(standing, date), ahead, behindYou };
     const s = p.studies[0];
     if (!s) return { ...base, study: null, pct: 0 };
     const cost = rs.studyCostFor(p, s.id, date);
