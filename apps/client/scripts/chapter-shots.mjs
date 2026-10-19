@@ -35,6 +35,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   await page.locator(".hint-note button:has-text('Stop hints')").click().catch(() => {});
   // Play week after week until the chapter card opens; anything else that stops Auto turns is waved through.
   for (let i = 0; i < 40 && !(await page.$(".chapter-card")); i++) {
+    if (process.env.DEBUG) console.log(i, await page.evaluate(() => document.querySelector(".hud")?.textContent?.slice(0, 80)));
     await page.evaluate(() => document.querySelectorAll(".alert .dismiss").forEach((b) => b.click()));
     if (await page.$("#panel:not([hidden]) .close")) await page.evaluate(() => document.querySelector("#panel .close")?.click());
     await page.click("#fab").catch(() => {});

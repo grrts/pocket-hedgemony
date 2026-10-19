@@ -172,7 +172,7 @@ export interface DiplomacyConfig {
     relation: Record<string, string>;
     new_effects: string[];
   };
-  answers: { delay_months: number; preview_before_sending: boolean };
+  answers: { delay_months: number; preview_before_sending: boolean; hint: { likely_from: number; unlikely_to: number } };
   eras_by_year: { era: string; from: number }[];
   oaths_broken_years: number;
   lands_taken_years: number;

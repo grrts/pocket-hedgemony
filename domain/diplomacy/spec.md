@@ -14,7 +14,7 @@ those types or adds a fact. Diplomacy adds no relation type of its own.
 - Envoys: seats, who an envoy is, the road, missions, residents, envoys held or lost.
 - The pair ledger of ties and wrongs, standing and its words, the two world-wide counts (Oaths broken, Lands
   taken) as reasons.
-- The reasons count: the one way every yes or no is decided, and the one-month delay of every answer.
+- The reasons count: the one way every yes or no is decided, the one-month delay of every answer, and the one-word hint before asking.
 - All diplomatic actions (section 6 of the design): alliances and calls to arms, marriages and pretenders,
   demands, passage, trade pacts and embargoes, pledges and sworn peace, subjects by agreement (the asking
   only), courting a foreign lord, gifts and visits, insults and rivals, funding rebels.
@@ -491,7 +491,7 @@ moderate 0; low −10; very low −20; unknown 0 (config).
 ### 5.5 The reasons count
 
 - DIPL-081 When an envoy's request is decided, the diplomacy context shall have the asked country list its reasons, each with a number, and answer yes only when the total is over zero. [diplomacy 5]
-- DIPL-082 The diplomacy context shall show no prediction of an answer before asking, and shall deliver the answer as a letter (yes or no with the full reasons list and numbers) a month after it is given. [diplomacy 5; decision 16 Oct; config `answers`]
+- DIPL-082 The diplomacy context shall show no total or number of an answer before asking, only the one-word hint of DIPL-229, and shall deliver the answer as a letter (yes or no with the full reasons list and numbers) a month after it is given. [diplomacy 5; decision 16 Oct; D-DIPL-39; config `answers`]
 - DIPL-083 The diplomacy context shall let the asker judge beforehand only from what it can see: the ledger, the stance, and the other side's soldiers (exact with a resident envoy, otherwise an estimate). [diplomacy 5]
 - DIPL-084 The diplomacy context shall put in every count: the action's negative base; standing ÷ 4; −10 per Oath broken if the action relies on the asker's word; the envoy's type and years-served reason; the asked country's personality (−30 to +30 by action); its ruler's traits (for example Pious +10 to anything asked by the same faith, Warlike −10 to sworn peace, Greedy +10 to anything with a gift); and a national strength where it says so. [diplomacy 5.1]
 - DIPL-085 The diplomacy context shall count strength as soldiers under arms, with allies who would come counted at half. [diplomacy 5.2]
@@ -648,7 +648,7 @@ moderate 0; low −10; very low −20; unknown 0 (config).
 
 - DIPL-183 The diplomacy lens shall colour every country by the viewer's relation: own colour for the viewer and its subjects; blue for allies and light blue for pledged to or by the viewer; green / pale green for Close / Warm; grey for Cool or nothing recorded; orange for Cold or Rival; red for Hostile, Bitter or at war (hatched when at war); a red border for a league against the viewer. [diplomacy 13.1]
 - DIPL-184 The diplomacy lens shall show envoys on the road as small riders with a dotted route line, only colours at world zoom, and riders and the war-aim icon (a crossed sword over countries the viewer holds a war aim against) at regional zoom. [diplomacy 13.1]
-- DIPL-185 The country diplomacy card shall show standing toward the viewer and the viewer's stance, ties and wrongs, relations, the viewer's war aims on that country, the last answer with a *Why?* button opening the full reasons list, and action buttons that show no prediction. [diplomacy 13.2]
+- DIPL-185 The country diplomacy card shall show standing toward the viewer and the viewer's stance, ties and wrongs, relations, the viewer's war aims on that country, the last answer with a *Why?* button opening the full reasons list, and action buttons that show no total or number, only the one-word hint of DIPL-229. [diplomacy 13.2; D-DIPL-39]
 - DIPL-186 When an action button is tapped, the diplomacy screen shall open an envoy picker showing which official, the days on the road, and which province loses its official meanwhile. [diplomacy 13.2]
 - DIPL-187 Where the screen is in landscape, the country diplomacy card shall sit on the right of the map instead of covering it. [diplomacy 13.2]
 - DIPL-188 The envoys strip shall show each seat as free, on the road (destination and days) or resident (court). [diplomacy 13.2]
@@ -747,6 +747,14 @@ Leroy found the Diplomacy tab's buttons far too large: each action was a full-wi
 
 #### How the player uses it: a compact Diplomacy tab
 - DIPL-227 Where: the realm card's Diplomacy tab, yours and another realm's, holds the same sections in the same order as DIPL-202, DIPL-208 and DIPL-220, but every action (the missions, *End the alliance*, *Court their loyalty* and its recall, *Demand tribute* and each province demand, and a subject's gift, loosen, release, hostage, resident and fold-in actions) is a tile in a grid: a 44-point button sized to its words with a small icon, and under it the one line on what it does or why not. Tiles sit two or three side by side when the card is wide (a phone held sideways, where the card fills the screen) and one to a row when it is narrow (the desktop side panel), so no button stretches across the whole card. Declaring war sits under its own *War* heading at the foot of the tab, and the peace terms, tribute levels and answer buttons sit in a row at their own width. Grouping and overview: unchanged, standing first, then envoys, courting, demands and war; your own Diplomacy tab stays the overview. Phone: every button at least 44 points high in the Wide and Tall layouts, text no smaller than the hints elsewhere, nothing that needs hover; checked on a small and a large phone held sideways and a desktop window with `apps/client/scripts/diplomacy-tab-shots.mjs`. [X-19, DIPL-202, DIPL-208, DIPL-220]
+
+### 5.32 A hint before asking (gaps review, Leroy 19 Oct)
+The answer to an ask comes as a letter a month after the envoy reaches the court, and until now nothing said beforehand whether it would be yes; on a phone, waiting weeks for a refusal feels bad. Each ask the reasons decide now shows one word before it is sent: how its count stands today, with no numbers. The answer is still counted when the envoy arrives, so the word is a guide, not a promise.
+
+- DIPL-229 For each ask of the player's that the reasons decide and that can be sent now (propose an alliance, arrange a marriage, offer overlordship, ask for protection, demand tribute, demand a province), the game shall show one word: *Likely* when the count as it would be made today is at least `answers.hint.likely_from` (+15), *Unlikely* when it is at most `answers.hint.unlikely_to` (−15), and *Unsure* between. A province demand is counted with *It's our heartland* for their capital. The words are counted once a month, as the world stands then. A courtesy visit and a gift always land and show no word. @placeholder [gaps review item 8; D-DIPL-39; config `answers.hint`]
+
+#### How the player uses it: a hint before asking
+- DIPL-230 Where: nothing new to find. On another realm's Diplomacy tab, each mission tile and *Demand tribute* starts its one line with the word in bold (*Likely* in green, *Unsure* in brown, *Unlikely* in red, the word itself saying it so colour is never needed), and each province demand button ends with it ("Demand Navarra · Unlikely"). The *Send an envoy* line says what the word means and that much can change before the envoy arrives. A mission that cannot be sent shows why, not a word. Grouping and overview: the word sits on the button it is about; the letter with its *Why?* stays the full answer, and your own Diplomacy tab the overview of envoys and answers. Phone: no new buttons; the tiles keep their 44-point buttons in the Wide and Tall layouts, the word is part of the line under the button, nothing needs hover. [X-19, DIPL-202, DIPL-208, DIPL-227]
 
 ## 6. Commands
 
@@ -902,6 +910,7 @@ The steps run after subjects and government in the global order (X-2, D-DIPL-31)
 | `ai.*` | AI | horizon; 5; −20; postures; negotiation | yes | diplomacy-rules.json |
 | `event_tree_mapping.*` | Events | section 5.21 | yes | diplomacy-rules.json |
 | `answers.delay_months` / `preview_before_sending` | Answers | 1; false | decided | diplomacy-rules.json |
+| `answers.hint.likely_from` / `answers.hint.unlikely_to` | The count at or above which an ask shows *Likely*, at or below which *Unlikely* (DIPL-229) | +15; −15 | yes | diplomacy.json |
 | `default_stance`, `implied_stance` | Stance defaults | neutral; war → hostile, alliance → friendly | game rule | relation-rules.json |
 | `types.friendly.duration.decay_months` | | 240 | yes | relation-rules.json |
 | `types.rival.duration.min_months_before_change` | | 120 | yes | relation-rules.json |
@@ -995,6 +1004,7 @@ The steps run after subjects and government in the global order (X-2, D-DIPL-31)
 - **D-DIPL-36** Second game slice, demands (milestone 5, provisional): only *Hand over a province* and *Pay tribute* run; *Pay tribute* given in makes the target a Tributary that pays 15 % of its tax and trade each month (the subjects context's Tributary share, SUBJ-005), and the 1444 Tributaries pay it too; AI realms demand before war only of other AI realms, because answering a demand is not yet on the player's screen; a province given in moves at once when the envoy is answered, and the letter follows a month later. Quick defaults so demands play now.
 - **D-DIPL-37** Third game slice, the player answers (milestone 5, provisional): the asks made of the player wait for their answer for the month the envoy stays at court, and no answer is a refusal, because an envoy does not wait forever and a demand ignored is a demand refused; the answer letter still reaches the asker a month later; this replaces D-DIPL-36's "AI realms demand before war only of other AI realms". Quick defaults so the player is asked now.
 - **D-DIPL-38** Fourth game slice, courting (milestone 5, provisional): a courting envoy stays at the court with the status of a resident and takes a seat, like the overlord's envoys at a subject's court (D-SUBJ-27); *his ruler pays him more* is read as his loyalty having risen during the season, since the game keeps no separate payment; a courted lord stops at Disloyal and does not rise in revolt from courting alone; a defecting lord keeps his land and comes over Wavering. Courting a subject is discovered like courting a lord, at 1 in 4 a season, with the same wrong. AI realms court only neighbours they hold as Rival or Hostile, so a large map's season stays cheap.
+- **D-DIPL-39** A hint before asking (Leroy, 19 Oct, the gaps review): the 16 Oct decision of no preview stands for the numbers, but each ask the reasons decide shows one word, *Likely*, *Unsure* or *Unlikely*, from its count as it stands that month, because waiting weeks for a refusal with no idea beforehand feels bad on a phone. The thresholds ±15 are placeholders; the word is counted once a month so the Diplomacy tab stays cheap with every realm listed.
 
 ## 14. Traceability
 
@@ -1291,3 +1301,5 @@ The steps run after subjects and government in the global order (X-2, D-DIPL-31)
 | DIPL-221 … DIPL-224 | features/neighbours-answer-conquest.feature | The league check runs each year; Grabbed land near us; The AI counts notoriety; A whole realm is gained by diplomacy |
 | DIPL-225 … DIPL-226 | features/neighbours-answer-conquest.feature | Your name abroad |
 | DIPL-227 | — | Presentation: apps/client/src/ui/statecraft.ts, apps/client/src/style.css (`.missions`, `.diplomacy-tab`); apps/client/scripts/diplomacy-tab-shots.mjs |
+| DIPL-229 | features/reasons-count.feature | A one-word hint before asking. Engine: packages/engine/test/statecraft.test.ts (the word follows the count, none on a visit, a gift or a mission that cannot be sent) |
+| DIPL-230 | — | Presentation: apps/client/src/ui/statecraft.ts (`odds`), apps/client/src/style.css (`.odds`) |

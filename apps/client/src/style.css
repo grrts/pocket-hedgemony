@@ -3960,6 +3960,11 @@ button[data-break-alliance] {
   line-height: 1.25;
 }
 
+/* How likely a yes is (DIPL-229): the word itself says it, the colour only backs it up. */
+.odds.likely { color: #3f6b2a; }
+.odds.unsure { color: var(--ink-soft); }
+.odds.unlikely { color: var(--cloth); }
+
 .diplomacy-tab .hint {
   font-size: 17px;
 }
