@@ -4239,7 +4239,7 @@ button.paper.over {
   background: #b13e53;
 }
 
-/* ---- Heritage in play: states, seals, warmth and the choice waiting (HER-084, HER-085) ---- */
+/* ---- Heritage in play: states, ambitions with progress and the choice waiting (HER-084, HER-085, X-27) ---- */
 
 .heritage-line .dormant {
   opacity: 0.6;
@@ -4248,8 +4248,7 @@ button.paper.over {
 .heritage-part.off {
   opacity: 0.7;
 }
-.heritage-part .chip,
-.seal .chip {
+.heritage-part .chip {
   display: inline-block;
   padding: 0 6px;
   border: 2px solid var(--outline);
@@ -4291,60 +4290,56 @@ button.paper.over {
   gap: 6px;
 }
 .heritage-ask button,
-.seal .counsel {
+.aim .counsel {
   min-height: 44px;
 }
-.seals {
+.aims {
   list-style: none;
   margin: 0;
   padding: 0;
 }
-.seal {
+/* One ambition: its theme, name, goal and progress; the New aim button sits under the words, so it fits a Tall panel too (X-27). */
+.aim {
   display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
+  grid-template-columns: auto 1fr;
+  align-items: start;
   gap: 4px 8px;
-  min-height: 44px;
   margin: 6px 0;
-  padding: 4px 8px;
+  padding: 6px 8px;
   border: 2px solid var(--outline);
   background: var(--paper-light);
 }
-.seal.sealed .what i {
-  color: var(--ink-soft);
+.aim.near {
+  background: var(--brass-light);
 }
-.seal .what small {
+.aim .what > * {
   display: block;
+}
+.aim .what small {
   color: var(--ink-soft);
 }
-.seal .counsel {
-  padding: 0 8px;
-  white-space: nowrap;
+.aim .progress {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 2px 0;
 }
-.seal .later {
-  color: var(--ink-soft);
-  white-space: nowrap;
-}
-.seal .warmth {
-  display: inline-flex;
-  gap: 2px;
-}
-.seal .warmth i {
-  width: 10px;
-  height: 14px;
+.aim .meter {
+  display: inline-block;
+  flex: 0 1 120px;
+  height: 10px;
   border: 2px solid var(--outline);
 }
-.seal .warmth.cold i.on {
-  background: var(--sea);
-}
-.seal .warmth.warm i.on {
+.aim .meter i {
+  display: block;
+  height: 100%;
   background: var(--brass);
 }
-.seal .warmth.hot i.on {
-  background: var(--cloth);
-}
-.seal .warm-box small {
-  color: var(--ink-soft);
+.aim .counsel {
+  grid-column: 2;
+  justify-self: start;
+  padding: 0 8px;
+  white-space: nowrap;
 }
 .heritage-part .past-list {
   margin: 0;
