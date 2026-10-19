@@ -141,7 +141,7 @@ describe("Your name abroad (DIPL-225, DIPL-226)", () => {
   });
 });
 
-describe("Neighbours who fear you (DIPL-233)", () => {
+describe("Neighbours who fear you (DIPL-236)", () => {
   const v: NameAbroadView = { notoriety: 10, word: "Trusted", landsTaken: 0, threshold: 8, leagues: [], fearful: [{ nation: 2, level: "threatened", ratio: 3.2 }, { nation: 3, level: "wary", ratio: 1.6 }], fearRatios: { wary: 1.5, threatened: 2.5 } };
   const html = nameAbroadHtml(v, name);
 

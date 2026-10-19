@@ -1,0 +1,15 @@
+# Accounts and cloud saves (domain/saves/spec.md §5.8). The numbers are the same as in
+# packages/rules/data/domain/saves.json (cloud.server, sign_in); a test keeps them in step.
+parameters:
+    cloud.access_token_minutes: 15
+    cloud.steam_ticket_identity: pockethegemony
+    env(STEAM_WEB_API_KEY): ''
+    env(STEAM_APP_ID): ''
+
+framework:
+    rate_limiter:
+        # Email sign-in from the game, per address and IP (SAVE-117), as the website's login_throttling.
+        api_sign_in:
+            policy: sliding_window
+            limit: 5
+            interval: '15 minutes'

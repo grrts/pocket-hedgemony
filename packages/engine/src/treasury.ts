@@ -277,7 +277,7 @@ export function repayLoan(world: World, n: number, gold: number): string | null 
 /**
  * The AI's monthly treasury (REALM-171): normal tax at peace and heavy at war,
  * a loan when its gold is below zero, or at war or Threatened below a few
- * months of its army's pay (DIPL-231), and repaying once it holds a year's
+ * months of its army's pay (DIPL-234), and repaying once it holds a year's
  * upkeep.
  */
 export function aiTreasury(world: World, news: News[]): void {
@@ -288,7 +288,7 @@ export function aiTreasury(world: World, news: News[]): void {
     const rate = TAX_RATES.indexOf((war ? ai.tax_at_war : ai.tax_at_peace) as TaxRateName);
     if (rate !== world.nationTaxDefault[n]) applyRate(world, n, -1, rate, news);
     const gold = world.nationTreasury[n]!;
-    // At war or Threatened a realm keeps its army's pay for a few months in hand (DIPL-231).
+    // At war or Threatened a realm keeps its army's pay for a few months in hand (DIPL-234).
     const pressed = war || dip.fearLevel(dip.country(world.diplomacy, world.nationIds[n]!).fears) === "threatened";
     const floor = pressed ? -world.nationLedger[n * LEDGER_LINES + PAY]! * dip.AF.borrow.months_of_pay : 0;
     if (gold < ai.loan_when_gold_below || gold < floor) {

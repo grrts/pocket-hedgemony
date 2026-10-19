@@ -1343,9 +1343,10 @@
   ]
  },
  "answers": {
-  "$comment": "No preview: the asker learns yes or no, with the full reasons list, a month after the answer is given.",
+  "$comment": "No preview of the count: the asker learns yes or no, with the full reasons list, a month after the answer is given. Before sending, an ask the reasons decide shows one word (DIPL-229): Likely when the count as it stands now is at least `hint.likely_from`, Unlikely when it is at most `hint.unlikely_to`, else Unsure. Placeholders for balance.",
   "delay_months": 1,
-  "preview_before_sending": false
+  "preview_before_sending": false,
+  "hint": { "likely_from": 15, "unlikely_to": -15 }
  },
  "eras_by_year": [
   {
@@ -1381,7 +1382,7 @@
  "oaths_broken_years": 30,
  "lands_taken_years": 20,
  "arms_and_fear": {
-  "$comment": "Leroy, 19 Oct (DIPL-228 to DIPL-234, F-165): every AI realm keeps a standing army sized against its neighbours, calls men across the whole realm at war and borrows for it, and feels Wary or Threatened beside a much stronger neighbour. There is no rivalry: fear is measured from the armies each month and leaves no lasting tie. Every number is provisional, for the balance model to tune.",
+  "$comment": "Leroy, 19 Oct (DIPL-231 to DIPL-237, F-165): every AI realm keeps a standing army sized against its neighbours, calls men across the whole realm at war and borrows for it, and feels Wary or Threatened beside a much stronger neighbour. There is no rivalry: fear is measured from the armies each month and leaves no lasting tie. Every number is provisional, for the balance model to tune.",
   "fear": {
    "$comment": "A neighbour's strength (WAR strength: men under arms, levies it can call and its lords' men) over the realm's own side's: its own strength plus ally_weight of each ally's, its overlord's and its subjects'.",
    "wary_ratio": 1.5,

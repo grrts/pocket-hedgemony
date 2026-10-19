@@ -741,12 +741,19 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 
 ## Answers
 
-> No preview: the asker learns yes or no, with the full reasons list, a month after the answer is given.
+> No preview of the count: the asker learns yes or no, with the full reasons list, a month after the answer is given. Before sending, an ask the reasons decide shows one word (DIPL-229): Likely when the count as it stands now is at least \`hint.likely\_from\`, Unlikely when it is at most \`hint.unlikely\_to\`, else Unsure. Placeholders for balance.
 
 | Key | Value |
 |---|---|
 | `delay_months` | 1 |
 | `preview_before_sending` | no |
+
+### Hint
+
+| Key | Value |
+|---|---|
+| `likely_from` | 15 |
+| `unlikely_to` | -15 |
 
 ## Eras by year
 
@@ -762,7 +769,7 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 
 ## Arms and fear
 
-> Leroy, 19 Oct (DIPL-228 to DIPL-234, F-165): every AI realm keeps a standing army sized against its neighbours, calls men across the whole realm at war and borrows for it, and feels Wary or Threatened beside a much stronger neighbour. There is no rivalry: fear is measured from the armies each month and leaves no lasting tie. Every number is provisional, for the balance model to tune.
+> Leroy, 19 Oct (DIPL-231 to DIPL-237, F-165): every AI realm keeps a standing army sized against its neighbours, calls men across the whole realm at war and borrows for it, and feels Wary or Threatened beside a much stronger neighbour. There is no rivalry: fear is measured from the armies each month and leaves no lasting tie. Every number is provisional, for the balance model to tune.
 
 | Name | wary ratio | threatened ratio | ally weight | share of cap | match neighbour | multiplier | max share of cap | pay share of income | raise per month | more |
 |---|---|---|---|---|---|---|---|---|---|---|

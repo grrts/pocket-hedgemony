@@ -133,9 +133,9 @@ export interface NameAbroadView {
   /** Lands taken at which a league may form in this era. */
   threshold: number;
   leagues: LeagueView[];
-  /** The neighbours Wary or Threatened of the player this month, most afraid first (DIPL-233). */
+  /** The neighbours Wary or Threatened of the player this month, most afraid first (DIPL-236). */
   fearful: { nation: number; level: "wary" | "threatened"; ratio: number }[];
-  /** Strength over a realm's side at which it is Wary, and Threatened (DIPL-228). */
+  /** Strength over a realm's side at which it is Wary, and Threatened (DIPL-231). */
   fearRatios: { wary: number; threatened: number };
 }
 

@@ -100,7 +100,7 @@ export function warPay(world: World, n: number): number {
 
 /**
  * Gold a month an AI realm would pay at war: its armies at war pay, and the
- * levies it would call in its first month (as aiRecruits does, DIPL-230).
+ * levies it would call in its first month (as aiRecruits does, DIPL-233).
  */
 export function aiWarPay(world: World, n: number): number {
   return warPay(world, n) + (warRaise(world, n) / 1000) * levyPer1000(world);
@@ -252,7 +252,7 @@ export function priceOfWar(world: World, a: number, b: number, ctx: PriceContext
 export function whyAiWontDeclare(world: World, n: number, t: number, price: PriceOfWar = priceOfWar(world, n, t)): string | null {
   const ratio = world.rules.defines.war.aiDeclareStrengthRatio;
   if (!(price.ourSide > price.theirSide * ratio)) return "their side is too strong";
-  // What lenders would give counts toward the chest: an AI realm borrows for its wars (DIPL-231).
+  // What lenders would give counts toward the chest: an AI realm borrows for its wars (DIPL-234).
   const chest = wf.W.ai.war_chest_months * aiWarPay(world, n);
   if (world.nationTreasury[n]! + canBorrow(world, n) < chest) return "no war chest";
   if (wouldSayPeaceAtDeclaration(world, n)) return "its people want peace";

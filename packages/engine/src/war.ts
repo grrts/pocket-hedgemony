@@ -1243,7 +1243,7 @@ function demandFirst(world: World, n: number, t: number): boolean {
   return false;
 }
 
-/** AI realms keep their standing armies at peace and call men across the realm at war (DIPL-229, DIPL-230). */
+/** AI realms keep their standing armies at peace and call men across the realm at war (DIPL-232, DIPL-233). */
 export function aiRaise(world: World, news: News[]): void {
   aiRecruits(world, news, (n) => !!dip.warOf(world.diplomacy, world.nationIds[n]!));
 }

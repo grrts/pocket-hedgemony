@@ -2566,7 +2566,7 @@ Then("they are not on its General tab", (s) => {
   expect(s.atWarTabs.General).toEqual([]);
 });
 
-// ---------------------------------------------------------------- arms and fear (DIPL-228, DIPL-229, F-165)
+// ---------------------------------------------------------------- arms and fear (DIPL-231, DIPL-232, F-165)
 
 Given("a realm whose side has a strength of {int}", (s, side: number) => {
   s.fearSide = side;

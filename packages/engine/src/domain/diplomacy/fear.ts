@@ -1,7 +1,7 @@
 import { config, type ByFear, type FearWord } from "./rules.ts";
 
 /**
- * Arms and fear (DIPL-228 to DIPL-231, Leroy 19 Oct): a realm measures each
+ * Arms and fear (DIPL-231 to DIPL-234, Leroy 19 Oct): a realm measures each
  * neighbour's strength against its own side's and keeps a standing army sized
  * against its neighbours and its fear. Pure rules; the engine's arms.ts feeds
  * them the world's numbers.
@@ -12,7 +12,7 @@ export const AF = config.arms_and_fear;
 /** Fear levels, calm first. */
 export const FEAR_WORDS: readonly FearWord[] = ["calm", "wary", "threatened"];
 
-/** A realm's fear of a neighbour whose strength is `ratio` times its own side's (DIPL-228). */
+/** A realm's fear of a neighbour whose strength is `ratio` times its own side's (DIPL-231). */
 export function fearOf(ratio: number): FearWord {
   if (ratio >= AF.fear.threatened_ratio) return "threatened";
   if (ratio >= AF.fear.wary_ratio) return "wary";
@@ -37,7 +37,7 @@ export interface StandingInput {
 }
 
 /**
- * The men an AI realm keeps under arms at peace (DIPL-229): the larger of a
+ * The men an AI realm keeps under arms at peace (DIPL-232): the larger of a
  * share of its troop cap and a share of its largest unfriendly neighbour's
  * force, times its fear's multiplier; never over its fear's share of the cap
  * nor what its fear's share of its income pays at a levy's pay.
@@ -54,7 +54,7 @@ export const worseFear = (a: FearWord, b: FearWord): FearWord => (FEAR_WORDS.ind
 
 export type { ByFear, FearWord };
 
-/** The worst fear a realm holds this month (DIPL-228), calm without any. */
+/** The worst fear a realm holds this month (DIPL-231), calm without any. */
 export function fearLevel(fears: readonly { level: FearWord }[] | undefined): FearWord {
   let worst: FearWord = "calm";
   for (const f of fears ?? []) worst = worseFear(worst, f.level);

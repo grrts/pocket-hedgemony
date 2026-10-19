@@ -308,7 +308,7 @@ function startDay(world: World, news: News[]): void {
     judgeNeglect(world);
     if (world.date.month === 1) mineYear(world, news);
     monthlyWorks(world, news);
-    // Each realm weighs its neighbours' strength before the AI builds, borrows, declares and calls men (DIPL-228).
+    // Each realm weighs its neighbours' strength before the AI builds, borrows, declares and calls men (DIPL-231).
     monthlyFear(world, news);
     aiWorks(world, news);
     monthlyChanges(world, news);

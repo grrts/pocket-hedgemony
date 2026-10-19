@@ -116,7 +116,7 @@ Two world-wide counts from [Your-Realm](Your-Realm) also act as reasons. Each **
 
 ### The reasons count
 
-Every yes or no is decided the same way: the asked country lists its reasons, each with a number, and answers yes only when the total is over zero. There is no prediction before asking, and the answer arrives as a **letter** a month after it is given, yes or no with the full reasons list. Beforehand you can judge only from what you can see: the ledger, the stance, and the other side's soldiers (exact with a resident, otherwise an estimate).
+Every yes or no is decided the same way: the asked country lists its reasons, each with a number, and answers yes only when the total is over zero. The answer arrives as a **letter** a month after it is given, yes or no with the full reasons list. Before you send, each ask the reasons decide shows one word on its button: **Likely** when its count as it stands this month is +15 or more, **Unlikely** at −15 or less, and **Unsure** between. No numbers are shown, and the count is made again when the envoy arrives, so much can change on the way. A courtesy visit and a gift always land and show no word. Beyond the word you can judge from what you can see: the ledger, the stance, and the other side's soldiers (exact with a resident, otherwise an estimate).
 
 Every count holds:
 
@@ -387,6 +387,7 @@ All numbers live in `diplomacy-rules.json` (or `relation-rules.json` for relatio
 | `truce.*` | 60 + 60 months; white 60 |
 | `leagues.*` | yearly; thresholds 8/8/8/6/6/4/4; count rows above; 2 members; dissolves below half |
 | `answers.delay_months` / `preview_before_sending` | 1 / false (decided) |
+| `answers.hint.likely_from` / `answers.hint.unlikely_to` | +15 / −15 (the one-word hint before asking) |
 | `types.friendly.duration.decay_months` | 240 |
 | `types.rival.duration.min_months_before_change` | 120 |
 | `types.hostile.duration.decay_months` | 120 |

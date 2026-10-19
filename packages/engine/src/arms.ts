@@ -8,7 +8,7 @@ import { neighbourRealms } from "./statecraft.ts";
 import { LEDGER, LEDGER_LINES } from "./treasury.ts";
 
 /**
- * Arms and fear (DIPL-228 to DIPL-231, Leroy 19 Oct): each month every realm
+ * Arms and fear (DIPL-231 to DIPL-234, Leroy 19 Oct): each month every realm
  * measures its neighbours' strength against its own side's and is Wary or
  * Threatened of a much stronger one; an AI realm keeps a standing army sized
  * against its neighbours and its fear, calls men across the whole realm at
@@ -29,7 +29,7 @@ export function strengths(world: World): Float64Array {
   return s;
 }
 
-/** A realm's friends, whom it counts on its side: its allies, its overlord and its subjects (DIPL-228). */
+/** A realm's friends, whom it counts on its side: its allies, its overlord and its subjects (DIPL-231). */
 function friendsOf(world: World, n: number): Set<number> {
   const g = world.diplomacy.graph;
   const id = world.nationIds[n]!;
@@ -43,9 +43,9 @@ function friendsOf(world: World, n: number): Set<number> {
 }
 
 /**
- * The month's fears (DIPL-228): each realm against each neighbour that is not
+ * The month's fears (DIPL-231): each realm against each neighbour that is not
  * its friend, the neighbour's strength over its own side's. A neighbour that
- * comes to be Threatened of the player says so in the news (DIPL-233).
+ * comes to be Threatened of the player says so in the news (DIPL-236).
  */
 export function monthlyFear(world: World, news: News[]): void {
   const d = world.diplomacy;
@@ -75,7 +75,7 @@ export function monthlyFear(world: World, news: News[]): void {
   }
 }
 
-/** The worst fear a realm holds this month (DIPL-228). */
+/** The worst fear a realm holds this month (DIPL-231). */
 export function fearOfRealm(world: World, n: number): dip.FearWord {
   return dip.fearLevel(dip.country(world.diplomacy, world.nationIds[n]!).fears);
 }
@@ -86,7 +86,7 @@ const levyPer1000 = (world: World) => rc.levyPay(1000, 99) * world.rules.defines
 /** A realm's gold a month before its army's pay, so the army it keeps is weighed against what it earns, not what is left. */
 const incomeBeforePay = (world: World, n: number) => world.nationMonthlyIncome[n]! - world.nationLedger[n * LEDGER_LINES + LEDGER.indexOf("army pay")]!;
 
-/** The men an AI realm keeps under arms at peace (DIPL-229). */
+/** The men an AI realm keeps under arms at peace (DIPL-232). */
 export function standingTargetOf(world: World, n: number, near: Set<number>[] = neighbourRealms(world)): number {
   const friends = friendsOf(world, n);
   let largest = 0;
@@ -94,7 +94,7 @@ export function standingTargetOf(world: World, n: number, near: Set<number>[] = 
   return dip.standingTarget({ cap: world.nationTroopCap[n]!, largestNeighbour: largest, income: incomeBeforePay(world, n), levyPer1000: levyPer1000(world), fear: fearOfRealm(world, n) });
 }
 
-/** Men an AI realm at war calls this month (DIPL-230): what it can call, within its share of the cap and what its income pays its whole army. */
+/** Men an AI realm at war calls this month (DIPL-233): what it can call, within its share of the cap and what its income pays its whole army. */
 export function warRaise(world: World, n: number): number {
   const per = levyPer1000(world);
   const pays = per > 0 ? ((Math.max(0, incomeBeforePay(world, n)) * AF.war.pay_share_of_income) / per) * 1000 - world.nationCapUsed[n]! : 0;
@@ -102,7 +102,7 @@ export function warRaise(world: World, n: number): number {
 }
 
 /**
- * The AI's men each month (DIPL-229, DIPL-230). At peace a realm keeps its
+ * The AI's men each month (DIPL-232, DIPL-233). At peace a realm keeps its
  * standing army: under the target it calls men, over it levies whose free
  * months are over go home, smallest first, never taking it under the target.
  * At war it calls men in every royal province it holds, the most men to call

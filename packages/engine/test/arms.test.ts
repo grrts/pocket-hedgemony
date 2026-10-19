@@ -11,7 +11,7 @@ import { restoreWorld, worldChunks } from "../src/domain/saves/world-chunks.ts";
 import * as dip from "../src/domain/diplomacy/index.ts";
 import { W } from "../src/domain/warfare/index.ts";
 
-/** Arms and fear (DIPL-228 to DIPL-233, Leroy 19 Oct). */
+/** Arms and fear (DIPL-231 to DIPL-236, Leroy 19 Oct). */
 
 const rules = loadDefaultRuleset();
 const tiles = loadMapTiles(rules);
@@ -20,7 +20,7 @@ const capital = (w: World, n: number) => w.provinceIndex.get(rules.nations[n]!.c
 const fears = (w: World, n: number) => dip.country(w.diplomacy, w.nationIds[n]!).fears ?? [];
 const AF = dip.AF;
 
-describe("fear of a stronger neighbour (DIPL-228)", () => {
+describe("fear of a stronger neighbour (DIPL-231)", () => {
   it("reads the levels from the strength ratio", () => {
     expect(dip.fearOf(AF.fear.wary_ratio - 0.01)).toBe("calm");
     expect(dip.fearOf(AF.fear.wary_ratio)).toBe("wary");
@@ -88,7 +88,7 @@ describe("fear of a stronger neighbour (DIPL-228)", () => {
   });
 });
 
-describe("standing armies at peace (DIPL-229)", () => {
+describe("standing armies at peace (DIPL-232)", () => {
   it("sizes the standing army by the cap, the largest unfriendly neighbour and fear, within its pay", () => {
     const base = { cap: 40000, largestNeighbour: 0, income: 1000, levyPer1000: 1, fear: "calm" as const };
     expect(dip.standingTarget(base)).toBeCloseTo(AF.standing.share_of_cap * 40000);
@@ -134,7 +134,7 @@ describe("standing armies at peace (DIPL-229)", () => {
   });
 });
 
-describe("calling men across the realm at war (DIPL-230)", () => {
+describe("calling men across the realm at war (DIPL-233)", () => {
   it("calls more than the old 10,000 a month, in provinces far from the capital too, within its share of the cap", () => {
     const w = createWorld(rules, 1, tiles);
     w.player = -1;
@@ -156,7 +156,7 @@ describe("calling men across the realm at war (DIPL-230)", () => {
   });
 });
 
-describe("borrowing for war (DIPL-231)", () => {
+describe("borrowing for war (DIPL-234)", () => {
   it("borrows up to a few months of its army's pay while Threatened, and not while calm", () => {
     const w = createWorld(rules, 1, tiles);
     w.player = -1;

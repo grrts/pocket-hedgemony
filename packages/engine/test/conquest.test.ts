@@ -237,7 +237,7 @@ describe("the price of war (WAR-228, WAR-229)", () => {
     w.nationTreasury[n] = 3 * aiWarPay(w, n) - loans;
     expect(aiWarPay(w, n)).toBeGreaterThan(0);
     expect(whyAiWontDeclare(w, n, t)).toBe("no war chest");
-    // What lenders would give counts toward the chest (DIPL-231).
+    // What lenders would give counts toward the chest (DIPL-234).
     w.nationTreasury[n] = 6 * aiWarPay(w, n) - loans;
     expect(whyAiWontDeclare(w, n, t)).toBeNull();
   });

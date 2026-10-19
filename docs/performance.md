@@ -105,7 +105,7 @@ Dragging an army plans a route each time the target changes.
   and copied the whole map; the yearly technology score threw an exception
   for the root and the boughs of every realm. Now only marked provinces are
   touched. At 20,000 provinces: about 80 ms, was about 90.
-- Standing armies (DIPL-229, F-165): until then the AI sent its levies home
+- Standing armies (DIPL-232, F-165): until then the AI sent its levies home
   before their pay began, so the bench's realms held no armies after the first
   weeks; now some 900 stand at 5,000 provinces and the turn is about 18 to
   21 ms on this container (main without them about 10 to 12). Engage walks

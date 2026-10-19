@@ -34,6 +34,10 @@ export const missionName = (action: string): string =>
 const tile = (button: string, hint: string) => `<div class="mission">${button}<p class="hint">${hint}</p></div>`;
 const why = (w: string) => `${esc(w.charAt(0).toUpperCase() + w.slice(1))}.`;
 
+/** How likely a yes is if they were asked now (DIPL-229): one word in its colour, never the numbers. */
+const odds = (h: string | null | undefined) => (h ? `<b class="odds ${h.toLowerCase()}">${esc(h)}</b> ` : "");
+const ODDS_LINE = "The word on each ask is how their reasons stand today: Likely, Unsure or Unlikely. Much can change before the envoy arrives.";
+
 /** The reasons a court counted, as a tap-to-open list (DIPL-081, the Why? letter). */
 function reasonsHtml(l: StatecraftView["letters"][number]): string {
   if (!l.reasons.length) return "";
@@ -58,17 +62,17 @@ export function realmStatecraft(v: StatecraftView | null, r: number, allied: boo
   const missions = atWar
     ? `<p class="hint">No envoys go to a court you are at war with, except to make peace.</p>`
     : `<h3 class="sub">Send an envoy</h3>
-    <p class="hint">${v.free} of your ${v.seats} envoy${v.seats === 1 ? "" : "s"} free. An envoy rides to their court, stays a month, and their answer reaches you a month after.</p>
+    <p class="hint">${v.free} of your ${v.seats} envoy${v.seats === 1 ? "" : "s"} free. An envoy rides to their court, stays a month, and their answer reaches you a month after. ${ODDS_LINE}</p>
     <div class="missions">${MISSIONS.map((m, k) => {
       const not = realm.why[k] ?? null;
       return not === null
-        ? tile(`<button class="wax" data-envoy="${m.action}">${icon("scroll", 1)}${m.label}</button>`, esc(m.does(v)))
+        ? tile(`<button class="wax" data-envoy="${m.action}">${icon("scroll", 1)}${m.label}</button>`, `${odds(realm.hints?.[k])}${esc(m.does(v))}`)
         : tile(`<button class="paper" disabled>${m.label}</button>`, why(not));
     }).join("")}${allied ? tile(`<button class="paper" data-break-alliance="${r}">End the alliance</button>`, "An oath broken: they will remember it (−40, fading over 20 years), and other courts trust you less.") : ""}</div>`;
   return `${standing}${away}${last}${missions}${atWar ? "" : courtSubjectHtml(v, r)}${atWar ? "" : demandsHtml(realm.demands)}`;
 }
 
-/** Whom a realm fears this month (DIPL-232): you first, as a line with its reason, then the neighbours it fears besides you. */
+/** Whom a realm fears this month (DIPL-235): you first, as a line with its reason, then the neighbours it fears besides you. */
 export function fearHtml(fears: StatecraftView["realms"][number]["fears"], me: number, realmButton: (n: number) => string): string {
   if (!fears?.length) return "";
   const word = (l: string) => (l === "threatened" ? "Threatened" : "Wary");
@@ -129,12 +133,12 @@ function demandsHtml(d: StatecraftView["realms"][number]["demands"]): string {
   if (d.why) return `${head}<p class="hint">${why(d.why)}</p>`;
   const tribute =
     d.tribute === null
-      ? tile(`<button class="wax" data-demand="pay_tribute">${icon("crown", 1)}Demand tribute</button>`, "They become your tributary and send you 15 in 100 of their tax and trade each month. A tributary stays out of your wars.")
+      ? tile(`<button class="wax" data-demand="pay_tribute">${icon("crown", 1)}Demand tribute</button>`, `${odds(d.tributeHint)}They become your tributary and send you 15 in 100 of their tax and trade each month. A tributary stays out of your wars.`)
       : tile(`<button class="paper" disabled>Demand tribute</button>`, why(d.tribute));
   const provinces = d.provinces.length
     ? `<p class="hint">Or demand a province on your border; giving up their capital counts against it (−30).</p><div class="missions">${d.provinces
         .slice(0, 8)
-        .map((p) => `<button class="paper" data-demand="hand_over_province" data-province="${p.province}">Demand ${esc(p.name)}${p.capital ? " (their capital)" : ""}</button>`)
+        .map((p) => `<button class="paper" data-demand="hand_over_province" data-province="${p.province}">Demand ${esc(p.name)}${p.capital ? " (their capital)" : ""}${p.hint ? ` · <span class="odds ${p.hint.toLowerCase()}">${esc(p.hint)}</span>` : ""}</button>`)
         .join("")}</div>`
     : "";
   return `${head}<div class="missions">${tribute}</div>${provinces}`;
