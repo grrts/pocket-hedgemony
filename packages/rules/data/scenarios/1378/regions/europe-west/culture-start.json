@@ -1,0 +1,1179 @@
+{
+ "$comment": "Court tongues and the mix of tongues of each western map realm on 20 September 1378; shares are provisional. tongues: only tongues not already in culture.json or the 1444 culture-start.",
+ "_provisional": [
+  "realms.*.mix"
+ ],
+ "tongues": {
+  "sicilian": {
+   "name": "Sicilian",
+   "family": "latin",
+   "way_of_life": "settled"
+  },
+  "sardinian": {
+   "name": "Sardinian",
+   "family": "latin",
+   "way_of_life": "settled"
+  },
+  "frisian": {
+   "name": "Frisian",
+   "family": "germanic",
+   "way_of_life": "settled"
+  }
+ },
+ "realms": {
+  "england": {
+   "court": "english",
+   "mix": [
+    [
+     "english",
+     0.88
+    ],
+    [
+     "welsh",
+     0.07
+    ],
+    [
+     "occitan",
+     0.05
+    ]
+   ],
+   "local": {
+    "english": "English",
+    "welsh": "Welsh",
+    "occitan": "Gascons"
+   }
+  },
+  "scotland": {
+   "court": "lowland_scots",
+   "mix": [
+    [
+     "lowland_scots",
+     0.55
+    ],
+    [
+     "gaelic_scottish",
+     0.45
+    ]
+   ],
+   "local": {
+    "lowland_scots": "Lowland Scots",
+    "gaelic_scottish": "Gaelic Highland and Island society"
+   }
+  },
+  "ireland": {
+   "court": "gaelic_irish",
+   "mix": [
+    [
+     "gaelic_irish",
+     0.9
+    ],
+    [
+     "english",
+     0.1
+    ]
+   ],
+   "local": {},
+   "faith": "catholic"
+  },
+  "france": {
+   "court": "french",
+   "mix": [
+    [
+     "french",
+     0.7
+    ],
+    [
+     "occitan",
+     0.27
+    ],
+    [
+     "franco_provencal",
+     0.03
+    ]
+   ],
+   "local": {
+    "french": "French (langue d'oïl)",
+    "occitan": "Occitan (Languedoc, Limousin, Périgord)",
+    "franco_provencal": "Franco-Provençal (Lyonnais and Dauphiné)"
+   }
+  },
+  "burgundy": {
+   "court": "french",
+   "mix": [
+    [
+     "french",
+     0.95
+    ],
+    [
+     "franco_provencal",
+     0.05
+    ]
+   ],
+   "local": {
+    "french": "Burgundians of the duchy",
+    "franco_provencal": "Franco-Provençal (Mâconnais border)"
+   }
+  },
+  "brittany": {
+   "court": "breton",
+   "mix": [
+    [
+     "breton",
+     0.55
+    ],
+    [
+     "french",
+     0.45
+    ]
+   ],
+   "local": {
+    "breton": "Breton",
+    "french": "Gallo/French"
+   }
+  },
+  "anjou": {
+   "court": "french",
+   "mix": [
+    [
+     "french",
+     1.0
+    ]
+   ],
+   "local": {
+    "french": "Angevins, Tourangeaux and Manceaux"
+   }
+  },
+  "berry": {
+   "court": "french",
+   "mix": [
+    [
+     "french",
+     0.55
+    ],
+    [
+     "occitan",
+     0.45
+    ]
+   ],
+   "local": {
+    "french": "Berrichons and Poitevins",
+    "occitan": "Auvergnats"
+   }
+  },
+  "bourbon": {
+   "court": "french",
+   "mix": [
+    [
+     "french",
+     0.8
+    ],
+    [
+     "occitan",
+     0.2
+    ]
+   ],
+   "local": {
+    "french": "Bourbonnais",
+    "occitan": "Occitan of the southern Bourbonnais"
+   }
+  },
+  "foix": {
+   "court": "occitan",
+   "mix": [
+    [
+     "occitan",
+     0.95
+    ],
+    [
+     "basque",
+     0.05
+    ]
+   ],
+   "local": {
+    "occitan": "Béarnais and Fuxéens (Gascon and Languedocien)",
+    "basque": "Basques of the western valleys"
+   }
+  },
+  "armagnac": {
+   "court": "occitan",
+   "mix": [
+    [
+     "occitan",
+     1.0
+    ]
+   ],
+   "local": {
+    "occitan": "Gascons and Rouergats"
+   }
+  },
+  "franche_comte": {
+   "court": "french",
+   "mix": [
+    [
+     "french",
+     0.9
+    ],
+    [
+     "franco_provencal",
+     0.1
+    ]
+   ],
+   "local": {
+    "french": "Artesians and Comtois",
+    "franco_provencal": "Franco-Provençal (southern Jura)"
+   }
+  },
+  "castile": {
+   "court": "castilian",
+   "mix": [
+    [
+     "castilian",
+     0.83
+    ],
+    [
+     "galician",
+     0.11
+    ],
+    [
+     "basque",
+     0.06
+    ]
+   ],
+   "local": {
+    "castilian": "Castilian",
+    "galician": "Galician",
+    "basque": "Basque (Biscay, Gipuzkoa, Álava)"
+   }
+  },
+  "aragon": {
+   "court": "catalan",
+   "mix": [
+    [
+     "catalan",
+     0.62
+    ],
+    [
+     "aragonese",
+     0.22
+    ],
+    [
+     "andalusi_arabic",
+     0.16
+    ]
+   ],
+   "local": {
+    "catalan": "Catalan (Catalonia, Valencia, Majorca)",
+    "aragonese": "Aragonese",
+    "andalusi_arabic": "Mudéjar (Muslim) communities, large in Valencia and Aragon"
+   }
+  },
+  "portugal": {
+   "court": "portuguese",
+   "mix": [
+    [
+     "portuguese",
+     0.97
+    ],
+    [
+     "jewish",
+     0.03
+    ]
+   ],
+   "local": {
+    "portuguese": "Portuguese",
+    "jewish": "Jewish communities"
+   }
+  },
+  "navarre": {
+   "court": "basque",
+   "mix": [
+    [
+     "basque",
+     0.6
+    ],
+    [
+     "castilian",
+     0.36
+    ],
+    [
+     "jewish",
+     0.04
+    ]
+   ],
+   "local": {
+    "basque": "Navarrese",
+    "castilian": "Romance-speaking southern Navarrese",
+    "jewish": "Jewish"
+   }
+  },
+  "granada": {
+   "court": "andalusi_arabic",
+   "mix": [
+    [
+     "andalusi_arabic",
+     1
+    ]
+   ],
+   "local": {
+    "andalusi_arabic": "Andalusi Arab-Berber Muslims"
+   }
+  },
+  "savoy": {
+   "court": "franco_provencal",
+   "mix": [
+    [
+     "franco_provencal",
+     0.6
+    ],
+    [
+     "piedmontese",
+     0.4
+    ]
+   ],
+   "local": {
+    "franco_provencal": "Savoyard (Franco-Provençal)",
+    "piedmontese": "Piedmontese (Savoy-Achaea)"
+   }
+  },
+  "milan": {
+   "court": "lombard",
+   "mix": [
+    [
+     "lombard",
+     0.8
+    ],
+    [
+     "emilian",
+     0.2
+    ]
+   ],
+   "local": {
+    "lombard": "Lombard",
+    "emilian": "Emilian (Parma, Reggio)"
+   }
+  },
+  "visconti_pavia": {
+   "court": "lombard",
+   "mix": [
+    [
+     "lombard",
+     0.6
+    ],
+    [
+     "piedmontese",
+     0.25
+    ],
+    [
+     "emilian",
+     0.15
+    ]
+   ],
+   "local": {
+    "lombard": "Lombard (Pavia, Como)",
+    "piedmontese": "Piedmontese (Novara, Vercelli, Alessandria, Asti)",
+    "emilian": "Emilian (Piacenza)"
+   }
+  },
+  "venice": {
+   "court": "venetian",
+   "mix": [
+    [
+     "venetian",
+     0.7
+    ],
+    [
+     "greek",
+     0.25
+    ],
+    [
+     "croatian",
+     0.05
+    ]
+   ],
+   "local": {
+    "venetian": "Venetian",
+    "greek": "Greek (Crete, Negroponte)",
+    "croatian": "Croatian (Istria)"
+   }
+  },
+  "genoa": {
+   "court": "ligurian",
+   "mix": [
+    [
+     "ligurian",
+     0.8
+    ],
+    [
+     "tuscan",
+     0.12
+    ],
+    [
+     "greek",
+     0.08
+    ]
+   ],
+   "local": {
+    "ligurian": "Ligurian",
+    "tuscan": "Corsican",
+    "greek": "Greek (Chios, Caffa, Famagusta)"
+   }
+  },
+  "florence": {
+   "court": "tuscan",
+   "mix": [
+    [
+     "tuscan",
+     1
+    ]
+   ],
+   "local": {
+    "tuscan": "Tuscan"
+   }
+  },
+  "modena": {
+   "court": "emilian",
+   "mix": [
+    [
+     "emilian",
+     0.8
+    ],
+    [
+     "venetian",
+     0.2
+    ]
+   ],
+   "local": {
+    "emilian": "Emilian (Ferrara, Modena)",
+    "venetian": "Venetian (Rovigo, the Polesine)"
+   }
+  },
+  "papal_states": {
+   "court": "italian",
+   "mix": [
+    [
+     "italian",
+     0.88
+    ],
+    [
+     "emilian",
+     0.12
+    ]
+   ],
+   "local": {
+    "italian": "Central Italian (Roman, Umbrian, Marchigian) populations",
+    "emilian": "Romagnol"
+   }
+  },
+  "naples": {
+   "court": "neapolitan",
+   "mix": [
+    [
+     "neapolitan",
+     0.84
+    ],
+    [
+     "occitan",
+     0.12
+    ],
+    [
+     "greek",
+     0.04
+    ]
+   ],
+   "local": {
+    "neapolitan": "Neapolitan and southern Italian",
+    "occitan": "Provençal (County of Provence, in personal union)",
+    "greek": "Greek communities in Calabria, Salento and Corfu"
+   }
+  },
+  "sicily": {
+   "court": "sicilian",
+   "mix": [
+    [
+     "sicilian",
+     0.95
+    ],
+    [
+     "greek",
+     0.05
+    ]
+   ],
+   "local": {
+    "sicilian": "Sicilian (and Maltese)",
+    "greek": "Greek communities"
+   }
+  },
+  "oristano": {
+   "court": "sardinian",
+   "mix": [
+    [
+     "sardinian",
+     1
+    ]
+   ],
+   "local": {
+    "sardinian": "Sardinian"
+   }
+  },
+  "verona": {
+   "court": "venetian",
+   "mix": [
+    [
+     "venetian",
+     1
+    ]
+   ],
+   "local": {
+    "venetian": "Venetian (Verona, Vicenza)"
+   }
+  },
+  "padua": {
+   "court": "venetian",
+   "mix": [
+    [
+     "venetian",
+     1
+    ]
+   ],
+   "local": {
+    "venetian": "Venetian (Padua)"
+   }
+  },
+  "pisa": {
+   "court": "tuscan",
+   "mix": [
+    [
+     "tuscan",
+     1
+    ]
+   ],
+   "local": {
+    "tuscan": "Tuscan (Pisa, Elba, the Maremma coast)"
+   }
+  },
+  "aquileia": {
+   "court": "friulian",
+   "mix": [
+    [
+     "friulian",
+     0.75
+    ],
+    [
+     "slovene",
+     0.15
+    ],
+    [
+     "venetian",
+     0.1
+    ]
+   ],
+   "local": {
+    "friulian": "Friulian",
+    "slovene": "Slovene (eastern Friuli)",
+    "venetian": "Venetian"
+   }
+  },
+  "montferrat": {
+   "court": "piedmontese",
+   "mix": [
+    [
+     "piedmontese",
+     1
+    ]
+   ],
+   "local": {
+    "piedmontese": "Piedmontese (Monferrato)"
+   }
+  },
+  "bologna": {
+   "court": "emilian",
+   "mix": [
+    [
+     "emilian",
+     1
+    ]
+   ],
+   "local": {
+    "emilian": "Emilian (Bologna)"
+   }
+  },
+  "siena": {
+   "court": "tuscan",
+   "mix": [
+    [
+     "tuscan",
+     1
+    ]
+   ],
+   "local": {
+    "tuscan": "Tuscan (Siena, the Maremma)"
+   }
+  },
+  "perugia": {
+   "court": "italian",
+   "mix": [
+    [
+     "italian",
+     1
+    ]
+   ],
+   "local": {
+    "italian": "Umbrian"
+   }
+  },
+  "flanders": {
+   "court": "french",
+   "mix": [
+    [
+     "flemish",
+     0.85
+    ],
+    [
+     "french",
+     0.15
+    ]
+   ],
+   "local": {
+    "flemish": "Flemings",
+    "french": "Walloon Flemings of Lille and Douai"
+   }
+  },
+  "holland": {
+   "court": "dutch",
+   "mix": [
+    [
+     "dutch",
+     0.55
+    ],
+    [
+     "french",
+     0.3
+    ],
+    [
+     "high_german",
+     0.15
+    ]
+   ],
+   "local": {
+    "dutch": "Hollanders and Zeelanders",
+    "french": "Hainuyers (Picard-speaking)",
+    "high_german": "Lower Bavarians of the Straubing share"
+   }
+  },
+  "brabant": {
+   "court": "french",
+   "mix": [
+    [
+     "flemish",
+     0.75
+    ],
+    [
+     "french",
+     0.25
+    ]
+   ],
+   "local": {
+    "flemish": "Brabanters",
+    "french": "Walloon Brabanters"
+   }
+  },
+  "luxembourg": {
+   "court": "french",
+   "mix": [
+    [
+     "french",
+     0.55
+    ],
+    [
+     "high_german",
+     0.45
+    ]
+   ],
+   "local": {
+    "french": "Walloons of the French Quarter",
+    "high_german": "Luxembourgers of the German Quarter"
+   }
+  },
+  "guelders": {
+   "court": "dutch",
+   "mix": [
+    [
+     "dutch",
+     1
+    ]
+   ],
+   "local": {
+    "dutch": "Guelderlanders"
+   }
+  },
+  "liege": {
+   "court": "french",
+   "mix": [
+    [
+     "french",
+     0.6
+    ],
+    [
+     "flemish",
+     0.4
+    ]
+   ],
+   "local": {
+    "french": "Walloons of Liège",
+    "flemish": "Lonenaars of Loon"
+   }
+  },
+  "utrecht": {
+   "court": "dutch",
+   "mix": [
+    [
+     "dutch",
+     0.7
+    ],
+    [
+     "low_german",
+     0.3
+    ]
+   ],
+   "local": {
+    "dutch": "Stichtenaars",
+    "low_german": "Low Saxons of the Oversticht and Drenthe"
+   }
+  },
+  "friesland": {
+   "court": "frisian",
+   "mix": [
+    [
+     "frisian",
+     0.8
+    ],
+    [
+     "low_german",
+     0.2
+    ]
+   ],
+   "local": {
+    "frisian": "West and East Frisians",
+    "low_german": "Groningers"
+   }
+  },
+  "lorraine": {
+   "court": "french",
+   "mix": [
+    [
+     "french",
+     0.7
+    ],
+    [
+     "high_german",
+     0.3
+    ]
+   ],
+   "local": {
+    "french": "Lorrainers (Romance)",
+    "high_german": "German Lorrainers"
+   }
+  },
+  "mainz": {
+   "court": "high_german",
+   "mix": [
+    [
+     "high_german",
+     1
+    ]
+   ],
+   "local": {
+    "high_german": "Rhine Franconians"
+   }
+  },
+  "trier": {
+   "court": "high_german",
+   "mix": [
+    [
+     "high_german",
+     1
+    ]
+   ],
+   "local": {
+    "high_german": "Moselle Franconians"
+   }
+  },
+  "cologne": {
+   "court": "high_german",
+   "mix": [
+    [
+     "high_german",
+     0.7
+    ],
+    [
+     "low_german",
+     0.3
+    ]
+   ],
+   "local": {
+    "high_german": "Rhinelanders",
+    "low_german": "Westphalians of the Sauerland"
+   }
+  },
+  "munster": {
+   "court": "low_german",
+   "mix": [
+    [
+     "low_german",
+     1
+    ]
+   ],
+   "local": {
+    "low_german": "Westphalians"
+   }
+  },
+  "palatinate": {
+   "court": "high_german",
+   "mix": [
+    [
+     "high_german",
+     1
+    ]
+   ],
+   "local": {
+    "high_german": "Rhine Franconians"
+   }
+  },
+  "hesse": {
+   "court": "high_german",
+   "mix": [
+    [
+     "high_german",
+     1
+    ]
+   ],
+   "local": {
+    "high_german": "Hessians"
+   }
+  },
+  "saxony": {
+   "court": "high_german",
+   "mix": [
+    [
+     "high_german",
+     0.95
+    ],
+    [
+     "sorbian",
+     0.05
+    ]
+   ],
+   "local": {
+    "high_german": "Meisseners and Thuringians",
+    "sorbian": "Sorbian (Wendish) villages"
+   }
+  },
+  "saxe_wittenberg": {
+   "court": "low_german",
+   "mix": [
+    [
+     "low_german",
+     0.85
+    ],
+    [
+     "high_german",
+     0.15
+    ]
+   ],
+   "local": {
+    "low_german": "Elbe Saxons of the Wittenberg circle",
+    "high_german": "East Central Germans"
+   }
+  },
+  "brandenburg": {
+   "court": "low_german",
+   "mix": [
+    [
+     "low_german",
+     0.96
+    ],
+    [
+     "sorbian",
+     0.04
+    ]
+   ],
+   "local": {
+    "low_german": "Brandenburgers (Low German)",
+    "sorbian": "Wendish remnants"
+   }
+  },
+  "luneburg": {
+   "court": "low_german",
+   "mix": [
+    [
+     "low_german",
+     1
+    ]
+   ],
+   "local": {
+    "low_german": "Eastphalian Low Saxons"
+   }
+  },
+  "brunswick_gottingen": {
+   "court": "low_german",
+   "mix": [
+    [
+     "low_german",
+     1
+    ]
+   ],
+   "local": {
+    "low_german": "Eastphalian Low Saxons"
+   }
+  },
+  "bremen": {
+   "court": "low_german",
+   "mix": [
+    [
+     "low_german",
+     1
+    ]
+   ],
+   "local": {
+    "low_german": "Low Saxons of the Elbe-Weser land"
+   }
+  },
+  "hamburg": {
+   "court": "low_german",
+   "mix": [
+    [
+     "low_german",
+     1
+    ]
+   ],
+   "local": {
+    "low_german": "German (Low German)"
+   }
+  },
+  "holstein": {
+   "court": "low_german",
+   "mix": [
+    [
+     "low_german",
+     0.72
+    ],
+    [
+     "danish",
+     0.23
+    ],
+    [
+     "frisian",
+     0.05
+    ]
+   ],
+   "local": {
+    "low_german": "Holsatians",
+    "danish": "South Jutlanders of Schleswig",
+    "frisian": "North Frisians"
+   }
+  },
+  "mecklenburg": {
+   "court": "low_german",
+   "mix": [
+    [
+     "low_german",
+     1
+    ]
+   ],
+   "local": {
+    "low_german": "Mecklenburgers"
+   }
+  },
+  "pomerania": {
+   "court": "low_german",
+   "mix": [
+    [
+     "low_german",
+     0.93
+    ],
+    [
+     "polish",
+     0.07
+    ]
+   ],
+   "local": {
+    "low_german": "Pomeranians",
+    "polish": "Slavic (Kashubian) villagers of Further Pomerania"
+   }
+  },
+  "austria": {
+   "court": "high_german",
+   "mix": [
+    [
+     "high_german",
+     0.86
+    ],
+    [
+     "slovene",
+     0.14
+    ]
+   ],
+   "local": {
+    "high_german": "German-speaking Austrians, Styrians, Tyroleans and the Swabian and Alemannic Vorlande",
+    "slovene": "Slovene-speaking population in Carniola, Lower Styria and southern Carinthia"
+   }
+  },
+  "bohemia": {
+   "court": "czech",
+   "mix": [
+    [
+     "czech",
+     0.6
+    ],
+    [
+     "high_german",
+     0.25
+    ],
+    [
+     "polish",
+     0.15
+    ]
+   ],
+   "local": {
+    "czech": "Czechs (majority in Bohemia)",
+    "high_german": "Germans (towns, borderlands, Egerland, Lower Silesia)",
+    "polish": "Polish-speaking Silesians (Upper Silesia, Opole)"
+   }
+  },
+  "moravia": {
+   "court": "czech",
+   "mix": [
+    [
+     "czech",
+     0.75
+    ],
+    [
+     "high_german",
+     0.25
+    ]
+   ],
+   "local": {
+    "czech": "Czechs (Moravians)",
+    "high_german": "Germans in the royal towns (Brno, Olomouc, Jihlava, Znojmo)"
+   }
+  },
+  "bavaria": {
+   "court": "high_german",
+   "mix": [
+    [
+     "high_german",
+     1
+    ]
+   ],
+   "local": {
+    "high_german": "Bavarians and Swabians"
+   },
+   "faith": "catholic"
+  },
+  "wurttemberg": {
+   "court": "high_german",
+   "mix": [
+    [
+     "high_german",
+     1
+    ]
+   ],
+   "local": {
+    "high_german": "Swabians"
+   },
+   "faith": "catholic"
+  },
+  "burgraviate_of_nuremberg": {
+   "court": "high_german",
+   "mix": [
+    [
+     "high_german",
+     1
+    ]
+   ],
+   "local": {
+    "high_german": "East Franconians"
+   }
+  },
+  "salzburg": {
+   "court": "high_german",
+   "mix": [
+    [
+     "high_german",
+     1
+    ]
+   ],
+   "local": {
+    "high_german": "Bavarian-speaking Salzburgers"
+   }
+  },
+  "switzerland": {
+   "court": "high_german",
+   "mix": [
+    [
+     "high_german",
+     1
+    ]
+   ],
+   "local": {
+    "high_german": "Alemannic Swiss Germans"
+   }
+  },
+  "denmark": {
+   "court": "danish",
+   "mix": [
+    [
+     "danish",
+     0.95
+    ],
+    [
+     "low_german",
+     0.05
+    ]
+   ],
+   "local": {
+    "danish": "Danish (with Scania, Halland, Blekinge and Gotland)",
+    "low_german": "German burghers and Hanseatic merchants"
+   }
+  },
+  "norway": {
+   "court": "norwegian",
+   "mix": [
+    [
+     "norwegian",
+     0.97
+    ],
+    [
+     "sami",
+     0.03
+    ]
+   ],
+   "local": {
+    "norwegian": "Norwegian (with Icelanders and Faroese of the skattlands)",
+    "sami": "Sámi"
+   }
+  },
+  "sweden": {
+   "court": "swedish",
+   "mix": [
+    [
+     "swedish",
+     0.72
+    ],
+    [
+     "finnish",
+     0.25
+    ],
+    [
+     "low_german",
+     0.03
+    ]
+   ],
+   "local": {
+    "swedish": "Swedish",
+    "finnish": "Finnish",
+    "low_german": "German burghers of Stockholm and the towns; Mecklenburg castellans"
+   }
+  }
+ }
+}
