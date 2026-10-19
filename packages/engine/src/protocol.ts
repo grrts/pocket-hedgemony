@@ -330,7 +330,7 @@ export interface Snapshot {
   /** The player's posts (PROV-342 to PROV-348): whether Auto-fill posts is on, the gold it keeps back, what filling every empty post costs now, and the best fit for each royal post of the player's, by province. */
   posts: { autoFill: boolean; reserve: number; fillAll: { posts: number; gold: number }; fit: Record<number, { type: number; why: string; foreign: boolean; gold: number }> };
   /** Every commander: who they serve (-1 = none), their skills and record, the army they lead (index in armies, -1 = at court) and the province they left as an official (-1 = none). */
-  commanders: { name: string; owner: number; age: number; might: number; cunning: number; logistics: number; victories: number; defeats: number; army: number; home: number; origin: string; fleet: number; lord: number }[];
+  commanders: { name: string; owner: number; age: number; might: number; cunning: number; logistics: number; victories: number; defeats: number; army: number; home: number; origin: string; fleet: number; lord: number; /** An admiral (fleets only) rather than a general (armies only), RECR-128. */ sea: boolean }[];
   /** Ports, sailors and fleets: every fleet for the map, the player's ports and fleets in full (navy.ts). */
   navy: NavyView;
   /** Fleets the player can hire now, free fleets first (hiredFleets.ts, F-115). */
@@ -617,6 +617,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         origin: c.origin ?? "",
         fleet: w.navy.fleets.find((f) => f.admiral === k)?.id ?? -1,
         lord: lordOfCommander(w, k),
+        sea: w.commanderSea[k] === 1,
       })),
       retinues:
         player >= 0

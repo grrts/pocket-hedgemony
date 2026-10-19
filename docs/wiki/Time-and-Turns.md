@@ -174,6 +174,8 @@ Which hemisphere a province is in comes from its latitude. Wet seasons follow th
 
 ## Numbers
 
+Every value the game uses, made from its config so it always matches the game: [Time and turns data](Data-Time-and-Turns). How they combine: [Formulas](Formulas).
+
 | Value | Design value | Provisional? |
 |---|---|---|
 | Start date | 20 September 1378 | No |

@@ -254,6 +254,8 @@ These rules come from Leroy's afternoon playtest of 18 October.
 
 ## Numbers
 
+Every value the game uses, made from its config so it always matches the game: [Naval data](Data-Naval). How they combine: [Formulas](Formulas).
+
 All values are **placeholders** in one naval config file (keys proposed by the spec; the design names only the file).
 
 | Key | Value |

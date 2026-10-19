@@ -1,0 +1,149 @@
+<h1>Exploration data</h1>
+<p>Every value in the game&#39;s exploration config, exactly as the game reads it. This page is made from <code>packages/rules/data/domain/exploration.json</code> each time the config changes, so it always matches the game. How these values are used is explained on <a href="/wiki/Exploration-and-Colonies">Exploration and Colonies</a>.</p>
+<p>Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and values marked (provisional) are placeholders that may still change in balancing. Inventions are shown by id and name; see <a href="/wiki/Data-Research#inventions">Research data</a>.</p>
+<blockquote>
+<p>Exploration (EXPL) config, from exploration/exploration-design.md v1 sections 2-8 and its section 10 decisions. Every number is a placeholder of the design except unlock_age (decided). Numbers that belong to naval (supply, reach, out-of-supply loss, docking, the exploration ship rows) are repeated under &#39;naval&#39; as this context reads them (naval-design 3.3, 6.3, 6.4, 7.2). Colonial range per government form is government&#39;s (government.json forms.*.colonial_range).</p>
+<p><code>comment\_unlock\_later\_ages</code>: D-EXPL-3: a region outside unlock_age&#39;s region list opens with the first age that starts later than unlock_age and covers it (age_of_atlantic_empires for north_america, age_of_reformations for middle_east and central_asia), read from exploration-regions.json.</p>
+<p><code>comment\_governor\_slots</code>: D-EXPL-4: the base is 2 with S5, else 1 with S3; T8 and T9 each add 1 to any base.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>unlock_age</code></td><td>age_of_exploration</td></tr>
+<tr><td><code>unlock_inventions</code></td><td><a href="/wiki/Data-Research#inventions">S4 Carrack and caravel</a>, <a href="/wiki/Data-Research#inventions">S3 Outrigger voyaging</a></td></tr>
+<tr><td><code>colonial_unlock_invention</code></td><td><a href="/wiki/Data-Research#inventions">S5 ocean_navigation</a></td></tr>
+<tr><td><code>s3_invention</code></td><td><a href="/wiki/Data-Research#inventions">S3 Outrigger voyaging</a></td></tr>
+<tr><td><code>s3_min_range</code> (provisional)</td><td>10</td></tr>
+<tr><td><code>start_charted_reach</code> (provisional)</td><td>6</td></tr>
+<tr><td><code>progress_start</code> (provisional)</td><td>10</td></tr>
+<tr><td><code>progress_founded</code></td><td>100</td></tr>
+<tr><td><code>progress_lost</code></td><td>0</td></tr>
+<tr><td><code>progress_gain</code> (provisional)</td><td>5</td></tr>
+<tr><td><code>pressure_roll_max_factor</code> (provisional)</td><td>2</td></tr>
+<tr><td><code>food_per_month</code> (provisional)</td><td>20</td></tr>
+<tr><td><code>no_food_progress_loss</code> (provisional)</td><td>10</td></tr>
+<tr><td><code>governor_hire_gold</code> (provisional)</td><td>20</td></tr>
+<tr><td><code>governor_wage_per_year</code> (provisional)</td><td>5</td></tr>
+<tr><td><code>governor_age_when_hired</code> (provisional)</td><td>30</td></tr>
+<tr><td><code>unload_days</code> (provisional)</td><td>1</td></tr>
+<tr><td><code>founded_settlement</code></td><td>settlement</td></tr>
+<tr><td><code>low_supply_choices</code></td><td>Turn back, Carry on</td></tr>
+<tr><td><code>default_low_supply</code></td><td>Turn back</td></tr>
+</tbody></table></div>
+<h2 id="governor-slots-provisional"><a class="anchor" href="#governor-slots-provisional" aria-label="Link to this section">#</a>Governor slots (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>S5</code></td><td>2</td></tr>
+<tr><td><code>T8</code></td><td>1</td></tr>
+<tr><td><code>T9</code></td><td>1</td></tr>
+<tr><td><code>S3</code></td><td>1</td></tr>
+</tbody></table></div>
+<h2 id="aggression-provisional"><a class="anchor" href="#aggression-provisional" aria-label="Link to this section">#</a>Aggression (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>level</th><th>chance pct</th><th>average loss</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Peaceful</td><td>30</td><td>0</td></tr>
+<tr><td>2</td><td>Wary</td><td>30</td><td>1</td></tr>
+<tr><td>3</td><td>Hostile</td><td>25</td><td>2</td></tr>
+<tr><td>4</td><td>Fierce</td><td>15</td><td>3</td></tr>
+</tbody></table></div>
+<h2 id="colony-stores-provisional"><a class="anchor" href="#colony-stores-provisional" aria-label="Link to this section">#</a>Colony stores (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>caravel</code></td><td>300</td></tr>
+<tr><td><code>voyaging_canoe</code></td><td>100</td></tr>
+</tbody></table></div>
+<h2 id="ai"><a class="anchor" href="#ai" aria-label="Link to this section">#</a>Ai</h2>
+<blockquote>
+<p>Exploration design 8: a country explores when its catalogue personality favours expansion by sea; the catalogue&#39;s only expansion mode by sea is &#39;colonization&#39;.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>sea_expansion_modes</code></td><td>colonization</td></tr>
+<tr><td><code>stores_margin</code> (provisional)</td><td>1.25</td></tr>
+</tbody></table></div>
+<h2 id="naval"><a class="anchor" href="#naval" aria-label="Link to this section">#</a>Naval</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>supply_per_zone</code></td><td>1</td></tr>
+<tr><td><code>out_of_supply_crew_loss</code></td><td>0.1</td></tr>
+<tr><td><code>undockable_port_tiers</code></td><td>landing</td></tr>
+</tbody></table></div>
+<h3 id="exploration-ships"><a class="anchor" href="#exploration-ships" aria-label="Link to this section">#</a>Exploration ships</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>supply</th><th>invention</th><th>crew</th><th>gold</th><th>timber</th><th>months</th><th>needs harbour</th><th>built on</th><th>open ocean from start</th></tr></thead>
+<tbody>
+<tr><td>caravel</td><td>60</td><td><a href="/wiki/Data-Research#inventions">S4 Carrack and caravel</a></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>voyaging_canoe</td><td>60</td><td><a href="/wiki/Data-Research#inventions">S3 Outrigger voyaging</a></td><td>20</td><td>5</td><td>1</td><td>1</td><td>no</td><td>any shore with seafolk</td><td>yes</td></tr>
+</tbody></table></div>
+<h3 id="other-ships"><a class="anchor" href="#other-ships" aria-label="Link to this section">#</a>Other ships</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>family</th><th>supply</th></tr></thead>
+<tbody>
+<tr><td>carrack</td><td>military</td><td>15</td></tr>
+<tr><td>galleon</td><td>military</td><td>15</td></tr>
+<tr><td>cog</td><td>trade</td><td>15</td></tr>
+</tbody></table></div>
+<h3 id="reach"><a class="anchor" href="#reach" aria-label="Link to this section">#</a>Reach</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>coast_only_before</code></td><td><a href="/wiki/Data-Research#inventions">S1 Magnetic compass and sea charts</a></td></tr>
+<tr><td><code>ocean_within_zones_of_coast</code></td><td>3</td></tr>
+<tr><td><code>ocean_with</code></td><td><a href="/wiki/Data-Research#inventions">S1 Magnetic compass and sea charts</a></td></tr>
+<tr><td><code>any_ocean_with</code></td><td><a href="/wiki/Data-Research#inventions">S5 ocean_navigation</a></td></tr>
+</tbody></table></div>
+<h3 id="docking"><a class="anchor" href="#docking" aria-label="Link to this section">#</a>Docking</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>realm</code></td><td>food</td></tr>
+<tr><td><code>lord</code></td><td>food</td></tr>
+<tr><td><code>subject</code></td><td>food</td></tr>
+<tr><td><code>ally</code></td><td>food</td></tr>
+<tr><td><code>peace</code></td><td>gold</td></tr>
+<tr><td><code>war</code></td><td>none</td></tr>
+<tr><td><code>rival</code></td><td>none</td></tr>
+</tbody></table></div>
+<h2 id="game"><a class="anchor" href="#game" aria-label="Link to this section">#</a>Game</h2>
+<blockquote>
+<p>The game&#39;s first slice (EXPL-075, D-EXPL-20): a realm&#39;s region for the age gate where the event tree&#39;s 1444 polity list has no entry, by the catalogue&#39;s region group; what the AI does with its exploration ships.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>fallback_region</code></td><td>europe</td></tr>
+</tbody></table></div>
+<h3 id="catalogue-regions"><a class="anchor" href="#catalogue-regions" aria-label="Link to this section">#</a>Catalogue regions</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>eu_</code></td><td>europe</td></tr>
+<tr><td><code>as_anatolia_caucasus</code></td><td>middle_east</td></tr>
+<tr><td><code>as_levant_egypt_arabia</code></td><td>middle_east</td></tr>
+<tr><td><code>as_iran_transoxiana</code></td><td>middle_east</td></tr>
+<tr><td><code>as_steppe_siberia</code></td><td>central_asia</td></tr>
+<tr><td><code>as_china_inner_asia</code></td><td>east_asia</td></tr>
+<tr><td><code>as_japan_korea</code></td><td>east_asia</td></tr>
+<tr><td><code>as_se_asia_</code></td><td>southeast_asia</td></tr>
+<tr><td><code>as_south_asia_</code></td><td>south_asia</td></tr>
+<tr><td><code>af_north_sahara</code></td><td>north_africa</td></tr>
+<tr><td><code>af_</code></td><td>sub_saharan_africa</td></tr>
+<tr><td><code>am_north</code></td><td>north_america</td></tr>
+<tr><td><code>am_mesoamerica_caribbean</code></td><td>central_america</td></tr>
+<tr><td><code>am_south</code></td><td>south_america</td></tr>
+<tr><td><code>oc_</code></td><td>oceania</td></tr>
+</tbody></table></div>
+<h3 id="ai-provisional"><a class="anchor" href="#ai-provisional" aria-label="Link to this section">#</a>Ai (provisional)</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>ship</code></td><td>caravel</td></tr>
+<tr><td><code>explorers</code></td><td>1</td></tr>
+<tr><td><code>most_zones_out</code></td><td>25</td></tr>
+<tr><td><code>reserve_gold</code></td><td>20</td></tr>
+</tbody></table></div>

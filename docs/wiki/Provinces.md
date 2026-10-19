@@ -506,6 +506,8 @@ The tile row is the province: tap a tile to see its building, its workers and wh
 
 ## Numbers
 
+Every value the game uses, made from its config so it always matches the game: [Province data](Data-Province). How they combine: [Formulas](Formulas).
+
 All province numbers are placeholders, kept in one province data file.
 
 | Value | Config key | Design value |

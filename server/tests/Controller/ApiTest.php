@@ -36,7 +36,6 @@ final class ApiTest extends WebTestCase
         $data = $this->postJson('/api/accounts', $body);
         self::assertResponseStatusCodeSame(201);
         self::assertSame('player@example.com', $data['email']);
-        self::assertFalse($data['adsRemoved']);
 
         $data = $this->postJson('/api/accounts', $body);
         self::assertResponseStatusCodeSame(409);

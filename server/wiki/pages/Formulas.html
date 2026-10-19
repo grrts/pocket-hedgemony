@@ -1,0 +1,456 @@
+<h1>Formulas</h1>
+<p>These are the formulas the game computes today, taken from the engine code and not from the design documents. Each formula names the engine file and function it comes from, and each number names its config key and its current value. Where a design rule is not in the engine yet, this page says so. The rules in words are on the system pages (<a href="/wiki/Warfare">Warfare</a>, <a href="/wiki/Trade">Trade</a>, <a href="/wiki/Research">Research</a>, <a href="/wiki/Provinces">Provinces</a>, <a href="/wiki/Troop-Movement">Troop movement</a>, <a href="/wiki/Rebellions">Rebellions</a>, <a href="/wiki/Your-Realm">Your realm</a>). Every config value is listed on the data pages, such as <a href="/wiki/Data-Warfare">Warfare data</a> and <a href="/wiki/Data-Defines">Core values</a>.</p>
+<p><strong>Gold</strong> below is treasury gold, the gold your purse shows; where a config file counts gold in a larger unit, the scale is named. <strong>Food</strong> in a store is counted in thousands of people fed for a month, and a <strong>ration</strong> is one person&#39;s food for a month. <strong>People</strong> are counted in thousands.</p>
+<h2 id="battles"><a class="anchor" href="#battles" aria-label="Link to this section">#</a>Battles</h2>
+<p>A battle is worked out in full the moment it starts, bell by bell, with no dice. The losses are then dealt out over the battle&#39;s rounds on the map. The rules are in <a href="/wiki/Warfare">Warfare</a>; the numbers are in <a href="/wiki/Data-Warfare">Warfare data</a> and <a href="/wiki/Data-Defines">Core values</a>.</p>
+<h3 id="when-two-armies-fight"><a class="anchor" href="#when-two-armies-fight" aria-label="Link to this section">#</a>When two armies fight</h3>
+<p>An army looks for enemies within its engagement range, in tiles, and only fights an enemy army in the same province.</p>
+<pre><code>range = min(war.engageMax, max(war.engageMin, war.engageBase + Cunning))
+</code></pre>
+<p>Here <code>war.engageBase</code> (defines.json) is (9), <code>war.engageMin</code> (10) and <code>war.engageMax</code> (15). An army with no commander uses <code>war.engageMin</code> (10). Garrison troops in the province join the side they belong to.</p>
+<p>Source: <code>packages/engine/src/war.ts</code> (engageRange, engage, joinGarrisons)</p>
+<h3 id="what-each-side-brings"><a class="anchor" href="#what-each-side-brings" aria-label="Link to this section">#</a>What each side brings</h3>
+<p>Each side&#39;s armies are turned into companies of at most <code>warfare.company_size.max</code> (warfare.json) (1000) men per arm. Every company takes its army&#39;s kind and drill. Companies start with no scars, so in the game today a company reaches troop level 2 (Drilled) at most. The side is led by the commander with the highest Might among its armies.</p>
+<p>The field is a fixed row of sectors chosen by the ground of the defender&#39;s tile:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Ground</th><th>Sectors</th></tr></thead>
+<tbody>
+<tr><td>Forest, jungle</td><td>Woods, Fields, Woods, Woods, Fields, Woods</td></tr>
+<tr><td>Hills, mountains</td><td>Waste, Pasture, Waste, Fields, Waste</td></tr>
+<tr><td>Marsh</td><td>Marsh, Fields, Marsh, Marsh</td></tr>
+<tr><td>Desert, drylands, tundra</td><td>Waste, Waste, Pasture, Waste, Waste</td></tr>
+<tr><td>Any other</td><td>Pasture, Fields, Fields, Town, Fields, Fields, Pasture</td></tr>
+</tbody></table></div>
+<p>At most the middle <code>warfare.battle.max_sectors</code> (7) sectors are used. A sector&#39;s room is <code>warfare.sectors.&lt;Sector&gt;.room</code> times <code>warfare.era_scale.&lt;era&gt;.room</code> (1 in eras I to V, 0.5 in VI, 0.25 in VII).</p>
+<p>Source: <code>packages/engine/src/war.ts</code> (battleArmy, battleRow, resolve); <code>packages/engine/src/domain/warfare/battle.ts</code> (battlefield, sectorOf)</p>
+<h3 id="troop-level"><a class="anchor" href="#troop-level" aria-label="Link to this section">#</a>Troop level</h3>
+<p>A company&#39;s level comes from its drill and scars, by era:</p>
+<pre><code>level 2 when drill &gt;= Drilled months
+level 3 when drill &gt;= Seasoned months and scars &gt;= 1
+level 4 when level 3 and scars &gt;= 3
+level 5 when level 4, scars &gt;= 5 and drill &gt;= Elite months
+</code></pre>
+<p>The months are <code>warfare.levels_by_era.&lt;era&gt;.drill</code> (I: 2, 4, 8; II: 3, 6, 12; III: 4, 8, 12; IV: 6, 12, 18). The scar counts are <code>warfare.level_scars</code> (Seasoned 1, Veteran 3, Elite 5). In era I a levy stops at level 3.</p>
+<p>Source: <code>packages/engine/src/domain/warfare/companies.ts</code> (levelOf)</p>
+<h3 id="hits-per-bell"><a class="anchor" href="#hits-per-bell" aria-label="Link to this section">#</a>Hits per bell</h3>
+<p>Every company in a sector with an enemy deals hits each bell:</p>
+<pre><code>hits = share × men × strength × obsolete × (1 + level hits) × (1 + Might bonus)
+       × (1 + sector and ground) × inventions × tired × hungry × forced march
+</code></pre>
+<ul>
+<li><code>share</code> is <code>warfare.hits_per_bell.base</code> (0.04), at least <code>era_VI</code> (0.06) in era VI and <code>era_VII</code> (0.08) in era VII.</li>
+<li><code>strength</code> is <code>warfare.arms.&lt;arm&gt;.strength</code>, for example levy foot (1.0), knights and lancers (3.5), bombards (5).</li>
+<li><code>obsolete</code> is 0.5 when the enemy knows the invention that made the arm obsolete, else 1.</li>
+<li><code>level hits</code> is <code>warfare.levels_by_era.&lt;era&gt;.hits</code> at the company&#39;s level (era I and II: −0.10, 0, +0.10, +0.20, +0.30).</li>
+<li><code>Might bonus</code> is <code>warfare.might_by_era.&lt;era&gt;.hits</code> × Might (era I: 0.08, II: 0.07, III and IV: 0.05, V: 0.04). Up to era V it counts only in the leader&#39;s sector, the sector where his side stood with the most men at the start. In eras VI and VII it counts for the whole army.</li>
+<li><code>sector and ground</code> adds up: the sector&#39;s <code>all</code> (marsh −0.25); the ground&#39;s change for the arm from <code>province.ground.troops</code> (province.json), for example horse on grassland +0.25, horse in mountains −0.40; pasture&#39;s horse bonus <code>warfare.sectors.Pasture.horse</code> (+0.10); the town&#39;s <code>defender</code> (+0.50) for the defender; a shore&#39;s <code>attack_across</code> (−0.20) for the attacker.</li>
+<li><code>inventions</code> is <code>1 + strength %/100</code>. In the game today this is 0.8 for a realm that does not know C01 <em>Iron smelting</em> (<code>research.without.C01.strength_pct</code>, −20), else 1.</li>
+<li><code>tired</code> is <code>1 − warfare.tired.penalty × max(0, bell in a row − warfare.tired.after_bells)</code>, so −0.10 for each bell past the 3rd in a row.</li>
+<li><code>hungry</code> is <code>1 + warfare.hunger_hits</code> (0.8) and <code>forced march</code> is <code>1 + warfare.forced_march.first_day_strength</code> (0.9). The game does not set either for its battles yet, so both are 1.</li>
+</ul>
+<p>Shot fires for a number of bells, then refills for one bell:</p>
+<pre><code>ammunition bells = warfare.logistics_by_era.&lt;era&gt;.ammo_base + Logistics
+</code></pre>
+<p>The battle reads era III&#39;s base (3) for eras I and II, so it is 3 + Logistics up to era IV.</p>
+<p>Source: <code>packages/engine/src/domain/warfare/battle.ts</code> (hitsOf, hitsShare, tiredness, mightEffect, ammunitionBells); <code>packages/engine/src/domain/warfare/resolver.ts</code> (fightRounds)</p>
+<h3 id="charges-braces-and-shooting"><a class="anchor" href="#charges-braces-and-shooting" aria-label="Link to this section">#</a>Charges, braces and shooting</h3>
+<pre><code>charge (Shock, open sector, first contact):   hits × warfare.roles.shock.first_contact (2)
+charge into Brace:                            chargers deal × warfare.roles.brace.chargers_deal (0.5)
+                                              and take enemy hits × (warfare.roles.brace.chargers_take − 1) (1) more
+shooting into a target:                       hits × sector cover × Brace factor × Heavy factor
+</code></pre>
+<p>Cover is <code>warfare.sectors.&lt;Sector&gt;.cover</code> (Woods and Town 0.5, else 1). Brace targets take <code>warfare.roles.brace.shot_taken</code> (×1.5). Heavy targets take half from arrows and spears. Guns hit their own sector and <code>warfare.roles.guns.reach</code> (1) sector on each side. The first bell is shooting only, unless a side&#39;s approach is Assault, which skips shooting and multiplies all losses by <code>warfare.assault_losses</code> (1.25).</p>
+<p>Source: <code>packages/engine/src/domain/warfare/battle.ts</code> (chargeOf, shotInto, gunTargets, firstBell); <code>packages/engine/src/domain/warfare/resolver.ts</code> (fightRounds)</p>
+<h3 id="who-takes-the-hits"><a class="anchor" href="#who-takes-the-hits" aria-label="Link to this section">#</a>Who takes the hits</h3>
+<p>A sector&#39;s hits are spread over the enemy companies there by their men. Each hit takes one man out:</p>
+<pre><code>taken from a company = min(its men, hits × loss multiplier × its men ÷ men targeted)
+fled    = taken × flee share
+killed  = (taken − fled) ÷ 2
+wounded = (taken − fled) ÷ 2
+</code></pre>
+<p>The loss multiplier is 1.25 when either side fights by Assault, times <code>warfare.traits.Reckless.losses</code> (1.3) for each Reckless commander.</p>
+<p>Source: <code>packages/engine/src/domain/warfare/resolver.ts</code> (fightRounds, hit); <code>packages/engine/src/domain/warfare/battle.ts</code> (splitHits)</p>
+<h3 id="flee-share"><a class="anchor" href="#flee-share" aria-label="Link to this section">#</a>Flee share</h3>
+<pre><code>flee share = warfare.flee.base − warfare.flee.content_factor × content
+           = 0.5 − 0.3 × content
+</code></pre>
+<p>Hired companies flee at <code>warfare.flee.hired</code> (0.3) plus <code>warfare.flee.per_month_owed</code> (0.1) per month of pay owed. Rebel bands flee at <code>warfare.flee.rebel</code> (0.5). In the game today a battle does not pass the realm&#39;s content share, so content counts as 1 and most companies flee at 0.2.</p>
+<p>Source: <code>packages/engine/src/domain/warfare/battle.ts</code> (fleeShare, fleeFromContent)</p>
+<h3 id="break-point-and-breaking"><a class="anchor" href="#break-point-and-breaking" aria-label="Link to this section">#</a>Break point and breaking</h3>
+<pre><code>break point = warfare.kinds.&lt;kind&gt;.break_point + level break + Might break
+              + homeland + hungry + pay owed + traits
+</code></pre>
+<ul>
+<li>Base by kind: levy (0.25), retinue (0.35), hired company (0.35), standing regiment (0.30), garrison (0.40), rebel band (0.20).</li>
+<li><code>level break</code> is <code>warfare.levels_by_era.&lt;era&gt;.break</code> at levels 3 to 5 (era I and II: +0.05, +0.10, +0.15), none below.</li>
+<li><code>Might break</code> is <code>warfare.might_by_era.&lt;era&gt;.break</code> × Might (era I and II: 0.03) in the leader&#39;s sector.</li>
+<li><code>homeland</code> is <code>warfare.break.homeland</code> (+0.05) when the side&#39;s realm owns the battle province.</li>
+<li><code>pay owed</code> is <code>warfare.break.pay_owed</code> (−0.05) per month owed; <code>hungry</code> is <code>warfare.break.hungry</code> (−0.10).</li>
+<li>Traits: <code>warfare.traits.Steady.army_break</code> (+0.05), <code>warfare.traits.Reckless.army_break</code> (−0.05).</li>
+</ul>
+<p>A company breaks when <code>killed + wounded + fled &gt; men at start × break point</code>. Its remaining men count as fled.</p>
+<p>An army breaks when any of these is true:</p>
+<pre><code>sectors lost &gt; sectors it started in ÷ 2
+losses &gt; men at start × (men-weighted average break point)
+camp taken and sectors lost &gt;= sectors started ÷ 3
+every company broken
+</code></pre>
+<p>If both break in the same bell, the one further past its line breaks:</p>
+<pre><code>how far past = max(losses ÷ (men × break point), sectors lost ÷ (sectors started ÷ 2))
+</code></pre>
+<p>Source: <code>packages/engine/src/domain/warfare/companies.ts</code> (breakPoint); <code>packages/engine/src/domain/warfare/battle.ts</code> (armyBreaks, whoBreaks); <code>packages/engine/src/domain/warfare/resolver.ts</code> (fightRounds)</p>
+<h3 id="orders-rotation-and-night"><a class="anchor" href="#orders-rotation-and-night" aria-label="Link to this section">#</a>Orders, rotation and night</h3>
+<pre><code>orders per bell = warfare.cunning_by_era.&lt;era&gt;.orders[Cunning]
+</code></pre>
+<p>The table runs from Cunning 0 to 5: era I (1, 1, 2, 2, 2, 2), eras II to V (1, 1, 2, 2, 3, 3). The commander with less Cunning gives his orders first. Each bell a side swaps up to Logistics tired companies (3 bells or more in a row) for fresh ones from reserve. After <code>warfare.battle.bells_per_day</code> (6) bells, night falls: half of each unbroken company&#39;s fled men come back (<code>warfare.after.fled_return</code>, 0.5). After <code>warfare.era_scale.&lt;era&gt;.max_days</code> (3 in eras I to V) days with no break, the attacker pulls back and the defender holds the field.</p>
+<p>Source: <code>packages/engine/src/domain/warfare/battle.ts</code> (ordersPerBell, overnight); <code>packages/engine/src/domain/warfare/resolver.ts</code> (fightRounds)</p>
+<h3 id="losses-on-the-map"><a class="anchor" href="#losses-on-the-map" aria-label="Link to this section">#</a>Losses on the map</h3>
+<p>The battle&#39;s result is dealt out over rounds of 4 hours:</p>
+<pre><code>rounds = max(1, ceil((attacker men + defender men) ÷ war.menPerBattleRound))
+</code></pre>
+<p><code>war.menPerBattleRound</code> (defines.json) is (6000). Each round a side loses its share of its final losses. The final loss of a side is:</p>
+<pre><code>side that holds the field: killed + wounded × (1 − 2/3) + fled × (1 − 0.5)
+side that loses:           killed + wounded + fled × (1 − 0.5)
+</code></pre>
+<p>The field-holder&#39;s wounded come back at <code>warfare.after.wounded_return</code> (2/3); the loser&#39;s wounded become prisoners. Half of the fled (<code>warfare.after.fled_return</code>, 0.5) come back. A beaten army with fewer than <code>war.disperseBelow</code> (100) men scatters; half its men go home to the recruit pools.</p>
+<p>Source: <code>packages/engine/src/war.ts</code> (resolve, fightRound, shareLosses, fallBack, disperse); <code>packages/engine/src/domain/warfare/battle.ts</code> (woundedAfter, fledAfter)</p>
+<h2 id="sieges-and-storming"><a class="anchor" href="#sieges-and-storming" aria-label="Link to this section">#</a>Sieges and storming</h2>
+<p>Sieges are explained in <a href="/wiki/Warfare">Warfare</a>. In the game today a siege has no guns: the besiegers always mine.</p>
+<h3 id="walls-and-garrison"><a class="anchor" href="#walls-and-garrison" aria-label="Link to this section">#</a>Walls and garrison</h3>
+<p>A province has walls when it has a castle work. Every capital has a stone castle.</p>
+<pre><code>walls = stone castle (capital, or castle step 2) or earthwork ring fort (castle step 1)
+garrison room = war.garrison.capital (1500), war.garrison.castle (1000) or war.garrison.fort (500), × heritage
+refill a month = garrison room × war.garrisonRecoveryPerMonth (0.1), when no enemy stands there
+walls bonus = (warfare.castles.&lt;castle&gt;.walls + warfare.castle_ground.&lt;ground&gt;) × max(0, 1 − breaches ÷ 3)
+</code></pre>
+<p>Stone castle walls are (1.00), earthwork ring forts (0.50); hills add (0.25) and mountains (0.50).</p>
+<p>Source: <code>packages/engine/src/war.ts</code> (wallsOf, maxGarrison, refillGarrison); <code>packages/engine/src/domain/warfare/sieges.ts</code> (wallsBonus, wallsWithBreaches)</p>
+<h3 id="a-siege-month"><a class="anchor" href="#a-siege-month" aria-label="Link to this section">#</a>A siege month</h3>
+<p>A siege month is every 28 days. The castle store starts at <code>garrison × war.castleStoreMonths</code> (6) rations.</p>
+<pre><code>closed      = besiegers &gt;= garrison × warfare.siege.close_ratio (3)
+eaten       = garrison × warfare.siege.ration (1)
+hunger loss = garrison × warfare.siege.hunger_loss (0.10), when the store runs short
+mining      = +1 month of mining; one breach every warfare.castles.&lt;castle&gt;.mining_months
+</code></pre>
+<p>Stone castles take (4) months per breach, earthwork ring forts (2). A castle that is not closed gets its food back each month.</p>
+<p>Source: <code>packages/engine/src/war.ts</code> (runOccupation); <code>packages/engine/src/domain/warfare/sieges.ts</code> (siegeMonth, isClosed, breachSpeed)</p>
+<h3 id="terms-and-storming"><a class="anchor" href="#terms-and-storming" aria-label="Link to this section">#</a>Terms and storming</h3>
+<p>After each siege month the garrison gives up when it has a breach, or less than <code>warfare.ai_honours.food_months</code> (1) month of food:</p>
+<pre><code>food months = store ÷ (garrison × 1)
+</code></pre>
+<p>It surrenders as prisoners when starving, otherwise it marches out with honours. If it holds, the besiegers storm when the walls allow it (a breach, or an earthwork ring fort, which can be scaled) and:</p>
+<pre><code>besiegers &gt;= garrison × warden × war.stormRatio (4)
+stormers lost = garrison × warden × storm losses × (1 + walls bonus)
+</code></pre>
+<p><code>warden</code> is 1 + <code>province.officials.effects.warden.garrison</code> (0.25) × his effect share, else 1. Storm losses are <code>warfare.storm.losses</code> (1.5), or <code>warfare.storm.scaling</code> (2) when scaling an earthwork ring fort. A province with no walls is occupied after <code>war.holdWeeks</code> (4) weeks of holding it.</p>
+<p>Source: <code>packages/engine/src/war.ts</code> (runOccupation); <code>packages/engine/src/domain/warfare/sieges.ts</code> (aiAcceptsHonours, stormable, storm, foodMonths)</p>
+<h2 id="food"><a class="anchor" href="#food" aria-label="Link to this section">#</a>Food</h2>
+<p>Harvests, stores and castles are explained in <a href="/wiki/Your-Realm">Your realm</a> and <a href="/wiki/Provinces">Provinces</a>. Their numbers are in <a href="/wiki/Data-Province">Province data</a>, <a href="/wiki/Data-Realm">Realm data</a> and <a href="/wiki/Data-Defines">Core values</a>.</p>
+<h3 id="what-the-land-feeds"><a class="anchor" href="#what-the-land-feeds" aria-label="Link to this section">#</a>What the land feeds</h3>
+<p>Each food class (farmers, herders, seafolk, woodsmen) feeds people a year:</p>
+<pre><code>food = ((workers − in slots) × bare rate + (in slots − on worn fields × 0.5) × building rate) × land yield
+bare rate = province.food.bare_per_worker (0.67) × the ground&#39;s people output
+building rate = farm rate (or food_per_worker) × the ground&#39;s building output, halved toward bare while works are neglected
+slots = tiles of the class&#39;s use × buildings.land.&lt;building&gt;.slots ÷ 1000 × works.slotScale (2.5)
+</code></pre>
+<p>A farm&#39;s rate is <code>works.farmRates</code> (defines.json) by its step (1.1, 1.3, 1.5). A ranch and a fishery give <code>food_per_worker</code> (1.33). Land yield is set once at the start so a province about feeds <code>works.seedFoodShare</code> (1.1) of its people, at most <code>works.maxLandYield</code> (3). Without a building, all workers are on bare land.</p>
+<p>Source: <code>packages/engine/src/land.ts</code> (classFood); <code>packages/engine/src/works.ts</code> (worksFood, seedWorks)</p>
+<h3 id="the-harvest"><a class="anchor" href="#the-harvest" aria-label="Link to this section">#</a>The harvest</h3>
+<p>The harvest comes in month <code>realm.food_year.harvest_month.north</code> (9) north of the equator and <code>south</code> (3) south of it. Rice lands of a realm that knows <em>Wet-rice terracing</em> harvest in both months; the tundra has none.</p>
+<pre><code>band = base roll + weather + war + harvest steps   (kept between failed and bumper)
+harvest food = farmers&#39; food × province.food.harvest.&lt;band&gt; × 12 ÷ harvests a year × steward
+</code></pre>
+<ul>
+<li>Base roll: <code>realm.food_year.base_harvest</code>: poor (0.1), normal (0.7), good (0.15), bumper (0.05).</li>
+<li>Weather, rolled once per region of about 10 degrees: −1 band for bad, +1 for good. Bad weather is 1 in <code>bad_one_in</code> (temperate 6, dry 4, monsoon 5); good is 1 in <code>good_one_in</code> (temperate 6, dry 8, monsoon 6).</li>
+<li>War: −1 band while the province is occupied or besieged.</li>
+<li>Harvest steps: +1 band per harvest invention known; −1 without F01 <em>Ox plough</em>.</li>
+<li>Bands: <code>province.food.harvest</code>: failed (0.3), poor (0.7), normal (1.0), good (1.15), bumper (1.3).</li>
+<li>Steward: 1 + <code>province.officials.effects.steward.food</code> (0.10) × his effect share.</li>
+</ul>
+<p>Source: <code>packages/engine/src/food.ts</code> (monthlyFood, harvestMonthsOf); <code>packages/engine/src/domain/realm/index.ts</code> (rollBaseHarvest, weatherFor)</p>
+<h3 id="eating-and-rot"><a class="anchor" href="#eating-and-rot" aria-label="Link to this section">#</a>Eating and rot</h3>
+<p>Every month:</p>
+<pre><code>store = store + herders&#39; + seafolk&#39;s + woodsmen&#39;s food − people
+</code></pre>
+<p>In March, June, September and December a province store loses <code>realm.food_year.rot_per_season</code> (0.05). A castle store loses the same, or <code>rot_per_season_with_granary</code> (0.025) with a granary.</p>
+<p>Source: <code>packages/engine/src/food.ts</code> (monthlyFood); <code>packages/engine/src/castleFood.ts</code> (shareFood)</p>
+<h3 id="castles-collect-and-hand-out"><a class="anchor" href="#castles-collect-and-hand-out" aria-label="Link to this section">#</a>Castles collect and hand out</h3>
+<p>At a province&#39;s harvest its castle collects:</p>
+<pre><code>sent = (store − people × castleFood.keepMonths) × collection % × lord share
+arrives = sent × (1 − realm.food_year.transfer_loss_per_province × ring)
+</code></pre>
+<p><code>castleFood.keepMonths</code> (defines.json) is (12). The collection share is your food policy (0, 25, 50 or 75 %). A lord&#39;s share is <code>realm.food.lords_castles</code> by his loyalty (Loyal 1, Wavering 0.5, else 0). The loss is (0.02) per ring. A province store above <code>castleFood.localStoreCapMonths</code> (18) months goes by the surplus rule. Food sold to the treasury pays:</p>
+<pre><code>gold = food × realm.grain_price_gold_per_food (0.5) × castleFood.grainGoldScale (0.008)
+</code></pre>
+<p>Source: <code>packages/engine/src/castleFood.ts</code> (shareFood, disposeSurplus)</p>
+<h3 id="relief-and-famine"><a class="anchor" href="#relief-and-famine" aria-label="Link to this section">#</a>Relief and famine</h3>
+<p>A province with a negative store first takes food from neighbours of the same realm that hold more than <code>living.reliefAboveMonths</code> (3) months. What is still missing starves:</p>
+<pre><code>unfed = min(shortfall ÷ 3, people ÷ 3, room ÷ (1 − flee))
+room  = (people + starved this year) × province.famine.year_share (0.2) − starved this year
+flee  = 0.25 if a neighbour holds more than 3 months of food, else 0
+</code></pre>
+<p>The fled quarter become homeless in that neighbour. Every class shrinks by the same share.</p>
+<p>Source: <code>packages/engine/src/food.ts</code> (monthlyFood, neighbourWithFood)</p>
+<h3 id="feeding-an-army"><a class="anchor" href="#feeding-an-army" aria-label="Link to this section">#</a>Feeding an army</h3>
+<p>An army eats each day a thirtieth of its monthly rations:</p>
+<pre><code>rations a month = (men × march.rationsPerSoldier × campaign + horses × march.rationsPerHorse)
+                  × max(0, 1 − Logistics × march.logisticsRationCut)
+wagons hold     = rations a month on campaign × march.monthsCarried × food carried %
+</code></pre>
+<p><code>march.rationsPerSoldier</code> (1), <code>march.rationsPerHorse</code> (3), <code>march.logisticsRationCut</code> (0.05) and <code>march.monthsCarried</code> (2) are in defines.json. <code>campaign</code> is <code>realm.food.campaign_eat</code> (2) while the realm is at war or the army stands outside its land, else 1. Food carried is 50 % without B01 <em>Wheel and carts</em> (<code>research.without.B01.food_carried_pct</code>).</p>
+<p>The army refills its wagons each day from the store where it stands:</p>
+<pre><code>refill a month = max(0, store × 1000 − reserve) × march.foraging.&lt;ground&gt;
+reserve        = people × 1000 × march.homeReserveMonths (2) at home or in neutral land; 0 in enemy land
+</code></pre>
+<p>Foraging runs from desert and tundra (0.1) to farmland (1). An army with empty wagons goes hungry:</p>
+<pre><code>men lost a day = men × march.hungerLossPerMonth (0.28) ÷ 30 × share of the day&#39;s food missing
+</code></pre>
+<p>Horses are lost at the same rate. Of the men lost, <code>warfare.hunger.die ÷ (die + desert)</code> (2/7) count as dead.</p>
+<p>Sickness on campaign and camp fever in sieges are not in the game yet.</p>
+<p>Source: <code>packages/engine/src/march.ts</code> (monthlyRations, wagonRations, refillRations); <code>packages/engine/src/turn.ts</code> (feedArmies, refillHere, campaigning)</p>
+<h2 id="money"><a class="anchor" href="#money" aria-label="Link to this section">#</a>Money</h2>
+<p>The treasury and tax are explained in <a href="/wiki/Your-Realm">Your realm</a>. The numbers are in <a href="/wiki/Data-Defines">Core values</a>, <a href="/wiki/Data-Realm">Realm data</a> and <a href="/wiki/Data-Recruiting">Recruiting data</a>.</p>
+<h3 id="the-monthly-ledger"><a class="anchor" href="#the-monthly-ledger" aria-label="Link to this section">#</a>The monthly ledger</h3>
+<p>On the 1st of each month:</p>
+<pre><code>change = tax + trade + grain + tribute + furs − army pay − officials − interest − works − schools − navy
+</code></pre>
+<p>Source: <code>packages/engine/src/treasury.ts</code> (runLedger, sumLedger)</p>
+<h3 id="tax"><a class="anchor" href="#tax" aria-label="Link to this section">#</a>Tax</h3>
+<pre><code>tax a month = people × economy.goldPerThousandPeoplePerMonth × rate × crown share
+              × tax collector × faith × heritage × trade × quarantine
+</code></pre>
+<ul>
+<li><code>economy.goldPerThousandPeoplePerMonth</code> (defines.json) is (0.004).</li>
+<li><code>rate</code> is <code>economy.taxRateFactor</code> for none, light, normal, heavy, crushing (0, 0.5, 1, 1.5, 2).</li>
+<li><code>crown share</code> = no official × mood × lord. No official is <code>recruiting.emptyProvince.&quot;Leave it&quot;.tax</code> (0.5). Mood is <code>province.tax.riots_factor</code> (0.5) while rioting or plotting, 0 while rebels hold the province. A Loyal or Wavering lord keeps <code>realm.lords.tax_share</code> (0.5); a Disloyal lord or one in revolt sends nothing.</li>
+<li><code>tax collector</code> is 1 + <code>province.officials.effects.tax collector.tax_reach</code> (0.20) × his effect share.</li>
+<li><code>faith</code> is the province&#39;s faith tax factor: more for a Restricted faith, nothing for a Persecuted one, else 1. <code>heritage</code> is your heritage&#39;s tax reach, 1 without one.</li>
+<li><code>trade</code> is <code>1 + floor(trade ratio ÷ trade.effects.tax_per_ratio_points.points) × tax</code>, so +1 % per 4 points of ratio.</li>
+<li><code>quarantine</code> is <code>province.plague.quarantine_tax_factor</code> (0.5) while the province is closed.</li>
+</ul>
+<p>An occupier collects <code>warfare.occupation.tax_share</code> (0.5) of what the province would pay its owner.</p>
+<p>An official&#39;s effect share grows with his years served:</p>
+<pre><code>share = 0.5 in his first year, then 0.5 + 0.5 × (years − 1) ÷ 4, and 1 from 5 years
+</code></pre>
+<p>These are <code>province.officials.first_year_share</code> (0.5) and <code>full_effect_years</code> (5). His years count at half pace in a realm of low Tongue %.</p>
+<p>Source: <code>packages/engine/src/treasury.ts</code> (provinceTax, crownTake, heldTax); <code>packages/engine/src/lords.ts</code> (crownShare); <code>packages/engine/src/moods.ts</code> (moodShare); <code>packages/engine/src/officials.ts</code> (officialBonus); <code>packages/engine/src/domain/province/rule.ts</code> (officialEffectShare)</p>
+<h3 id="army-pay"><a class="anchor" href="#army-pay" aria-label="Link to this section">#</a>Army pay</h3>
+<pre><code>pay a month = sum over arms (men of the arm × pay per man of its group) × kind multiplier × recruit.goldScale
+</code></pre>
+<ul>
+<li>Pay per man: <code>recruiting.levyPay</code> (0.15) for levy foot; <code>recruiting.payByGroup</code> foot (0.2), gunners (0.25), horse (0.4), knights (0.6); gun crews <code>gunCrew.payPerCrew</code> (1) per <code>gunCrew.men</code> (15).</li>
+<li>Kind multiplier: <code>warfare.kinds.&lt;kind&gt;.pay.multiplier</code>: levy (1), retinue (0), hired company (3), standing regiment (1.5), garrison (1).</li>
+<li><code>recruit.goldScale</code> (defines.json) is (0.004).</li>
+<li>A levy is free while it has been out <code>warfare.levy.free_months</code> (3) months or less and its realm is at peace.</li>
+</ul>
+<p>Men over the troop cap are paid twice:</p>
+<pre><code>realm pay = pay + (pay ÷ men) × min(men over the cap, men)
+</code></pre>
+<p>Calling a levy costs <code>men ÷ 1000 × recruiting.levyMoneyPer1000 (20) × recruit.goldScale (0.004)</code> at once.</p>
+<p>Source: <code>packages/engine/src/recruit.ts</code> (armyPay, allNationPay, withOverCap, recruit); <code>packages/engine/src/domain/recruiting/index.ts</code> (regimentPay, levyMoney)</p>
+<h3 id="troop-cap-and-desertion"><a class="anchor" href="#troop-cap-and-desertion" aria-label="Link to this section">#</a>Troop cap and desertion</h3>
+<pre><code>troop cap = sum over royal provinces you hold of people × 1000 × warfare.troop_cap.without
+</code></pre>
+<p><code>warfare.troop_cap.without</code> is (0.01). W12 adds <code>w12</code> (0.005), W15 multiplies by <code>w15</code> (2), W18 adds <code>w18</code> (0.01). Lords&#39; provinces and occupied provinces add nothing. Every soldier in an army counts against it except retinues, and so do men still gathering and hired companies under contract.</p>
+<p>Each month an army loses men to desertion:</p>
+<pre><code>share lost = over-cap desertion + unpaid desertion
+</code></pre>
+<p>Over-cap desertion is <code>warfare.over_cap.desertion</code> (0.05) for levies while the realm is over its cap. Unpaid desertion is <code>recruit.unpaidDesertion</code> (defines.json) (0.05) for every army while the treasury is below zero.</p>
+<p>Source: <code>packages/engine/src/recruit.ts</code> (recomputeCap, monthlyRecruits); <code>packages/engine/src/domain/warfare/stats.ts</code> (capShare, overCap)</p>
+<h3 id="recruits"><a class="anchor" href="#recruits" aria-label="Link to this section">#</a>Recruits</h3>
+<pre><code>ceiling = people × levies.menPerThousandPeople (30) × (1 + works.drillYardRecruits (0.15) × drill yard step)
+refill a month = (ceiling − recruits) × refillPerYear.base ÷ 12 × muster master × heritage × fallen × no official × mood
+</code></pre>
+<p><code>recruiting.refillPerYear.base</code> is (0.25). A muster master adds <code>province.officials.effects.muster master.recruit_refill</code> (0.25) × his share. The fallen factor is <code>max(realm.fallen.refill_floor (0.5), 1 − fallen in 10 years ÷ ceiling × refill_slow_per_ceiling (0.5))</code>.</p>
+<p>Source: <code>packages/engine/src/recruit.ts</code> (monthlyRecruits); <code>packages/engine/src/works.ts</code> (refreshRecruitCeiling); <code>packages/engine/src/fallen.ts</code> (refillPaces)</p>
+<h3 id="officials-loans-and-schools"><a class="anchor" href="#officials-loans-and-schools" aria-label="Link to this section">#</a>Officials, loans and schools</h3>
+<pre><code>official wage a month = economy.officialWagePerMonth (0.1) × heritage
+interest a month      = debt × realm.debt.interest_pct (10) ÷ 100 ÷ 12
+debt added by a loan  = gold × (1 + 10 ÷ 100 × realm.debt.interest_added_at_once_years (1))
+most you can borrow   = (12 × (tax + trade) × realm.debt.loan_cap_years_income (1) − debt) ÷ 1.1
+school upkeep a month = sum of research.school_upkeep.&lt;school&gt; ÷ 12, changed by inventions
+</code></pre>
+<p>School upkeep is temple or monastery school (2), madrasa (4), university (4), academy (6) a year.</p>
+<p>Source: <code>packages/engine/src/treasury.ts</code> (runLedger, monthlyInterest, loanDebt, canBorrow); <code>packages/engine/src/research.ts</code> (schoolUpkeepMonthly)</p>
+<h3 id="buildings"><a class="anchor" href="#buildings" aria-label="Link to this section">#</a>Buildings</h3>
+<pre><code>cost   = data gold × works.goldScale (0.2) × (1 − works.materialsAtHandSaving (0.2)) per material at hand × heritage
+upkeep a month = (step upkeep a year, or works.defaultUpkeepPerYear (0.25)) × works.goldScale (0.2) ÷ 12
+</code></pre>
+<p>Timber is at hand with a lumber camp, stone or bricks with a quarry. While your treasury is below zero your works are neglected and give half their effect.</p>
+<p>What works do in the game today:</p>
+<ul>
+<li>Farm: farmers in its slots feed <code>works.farmRates</code> (1.1, 1.3, 1.5) by step.</li>
+<li>Road: march hours in the province × <code>1 − works.roadSpeed (0.15) × step</code>.</li>
+<li>Drill yard: recruit ceiling × <code>1 + 0.15 × step</code>.</li>
+<li>Market: trade weight and visits served (see Trade); harbour: +0.25 weight for ships.</li>
+</ul>
+<p>Source: <code>packages/engine/src/works.ts</code> (workCost, workUpkeep, provinceUpkeep, judgeNeglect, roadHours)</p>
+<h2 id="trade"><a class="anchor" href="#trade" aria-label="Link to this section">#</a>Trade</h2>
+<p>Trade is explained in <a href="/wiki/Trade">Trade</a>. The numbers are in <a href="/wiki/Data-Trade">Trade data</a>.</p>
+<h3 id="trade-value"><a class="anchor" href="#trade-value" aria-label="Link to this section">#</a>Trade value</h3>
+<pre><code>goods value a year = sum over wares (loads × price per load)
+trade value a month = goods value × (1 + weights) ÷ 12 × trade.game.value_scale (0.08)
+</code></pre>
+<ul>
+<li>Wares: what the province&#39;s works make; the food surplus <code>max(0, yearly food − people) × trade.game.food_loads_per_thousand_fed (1)</code> as grain; craftsmen (thousands) × <code>crafts_loads_per_thousand</code> (1) as crafts.</li>
+<li>Prices: <code>trade.value.price_per_load</code>: staples (1), raw (2), finished (5), luxury (10), precious (12). Crafts count as finished.</li>
+<li>Weights: the market step (<code>weekly_market</code> 0.25, <code>yearly_fair</code> 0.5, <code>trading_house</code> 1.0), plus <code>harbour</code> (0.25) for ships. Weights are halved while your works are neglected.</li>
+</ul>
+<p>Values are counted again each January.</p>
+<p>Source: <code>packages/engine/src/trade.ts</code> (provinceWares, warePrice, weights, tradeValueAt, refreshTradeValues)</p>
+<h3 id="collecting"><a class="anchor" href="#collecting" aria-label="Link to this section">#</a>Collecting</h3>
+<p>Each time a trader enters a province:</p>
+<pre><code>collected = trade value × ratio ÷ 100 × hold × trade.collect.visit_share (0.2) × min(1, served ÷ visits this month)
+purse     = min(purse cap, purse + collected)
+purse cap = trader purse × trade.game.purse_scale (0.2)
+</code></pre>
+<ul>
+<li>Hold: <code>trade.land_traders.&lt;kind&gt;.hold</code> (pack caravan 1.0, camel caravan 1.5, river barge 1.5) or <code>sea_traders.cog_junk_dhow.hold</code> (2.0).</li>
+<li>Served visits: 2 with no market (<code>serves_without_market</code>), then 4, 8, 16 by market step.</li>
+<li>In another realm&#39;s province the owner takes <code>trade.collect.foreign_market_fee</code> (0.1) of it. Unclaimed and occupied provinces pay nothing.</li>
+</ul>
+<p>The trader empties its purse into your treasury in any trade city of yours it enters.</p>
+<p>Source: <code>packages/engine/src/trade.ts</code> (walk, served, kindRow, depositsAt)</p>
+<h3 id="ratio-gain-and-decay"><a class="anchor" href="#ratio-gain-and-decay" aria-label="Link to this section">#</a>Ratio gain and decay</h3>
+<p>At the end of each month:</p>
+<pre><code>gain      = trade.ratio.gain_per_trader (3) × traders passing × (1 − ratio ÷ 100) × modifier
+new ratio = min(100, max(0, ratio + gain − ratio × trade.ratio.decay_share (0.1)))
+modifier  = max(0, 1 + customs officer + riots + commodore)
+</code></pre>
+<ul>
+<li>A trader counts once per province per month. A ship sailing a sea lane counts <code>trade.ratio.sea_lane_trader_weight</code> (0.5) for each port on that lane.</li>
+<li>Customs officer: <code>province.officials.effects.customs officer.trade_ratio_gain</code> (0.15) × his share.</li>
+<li>Riots: <code>trade.ratio.modifiers.riots</code> (−0.5) while rioting or plotting.</li>
+<li>Commodore lying off the port: <code>naval.admiralPosts.commodore.tradeGain</code> (0.25).</li>
+<li>The modifier is 0 while the province is occupied, besieged or blockaded. A quarantined province&#39;s ratio is set to 0.</li>
+</ul>
+<p>With one trader passing every month the ratio settles where gain equals decay: <code>3 × (1 − r/100) = 0.1 × r</code>, so about 23.</p>
+<p>Source: <code>packages/engine/src/trade.ts</code> (updateRatios)</p>
+<h3 id="traders-on-the-road-and-their-cost"><a class="anchor" href="#traders-on-the-road-and-their-cost" aria-label="Link to this section">#</a>Traders on the road and their cost</h3>
+<p>A trader walks <code>march.daysPerMonth</code> (30) days a month, plus what it had left over.</p>
+<pre><code>land step days = march.daysToCross.&lt;ground&gt; × march.daysPerCrossing (6) × road hours × step factor
+</code></pre>
+<p>Step factors: pack caravan (0.75), camel caravan (0.75, or 0.5 in desert and drylands), river barge (0.4, rivers only). A cog takes <code>naval.ships.cog.stepDays</code> sea (2) or ocean (3) days a zone, and 1 day into a port.</p>
+<pre><code>trade line = deposits + market fees received − upkeep
+upkeep a month = trade.land_traders.&lt;kind&gt;.upkeep × works.goldScale (0.2)
+</code></pre>
+<p>Pack caravan upkeep is (0.5), so 0.1 gold a month. A cog&#39;s is <code>naval.ships.cog.upkeep</code> (1) × 0.2. A trader unpaid for <code>trade.upkeep.unpaid_months_to_lose</code> (6) months in a row is lost.</p>
+<p>Source: <code>packages/engine/src/trade.ts</code> (stepDays, monthlyTrade, tradeLine, kindRow)</p>
+<h2 id="research"><a class="anchor" href="#research" aria-label="Link to this section">#</a>Research</h2>
+<p>Research is explained in <a href="/wiki/Research">Research</a>. The numbers are in <a href="/wiki/Data-Research">Research data</a>.</p>
+<h3 id="scholar-years"><a class="anchor" href="#scholar-years" aria-label="Link to this section">#</a>Scholar-years</h3>
+<pre><code>scholar-years a month = (scholars × research.scholar_rate (1) + students × research.student_rate (0.2)) ÷ 12
+progress on a study  += scholar-years × study share × (1 + research bonus % ÷ 100)
+</code></pre>
+<p>The study share is <code>research.second_study_share</code> (0.5) with two studies, else 1. Research stops while no school is open, or after students were called to arms until they enrol again.</p>
+<p>Source: <code>packages/engine/src/domain/research/index.ts</code> (researchPerYear, researchMonth, addProgress, researchBonusPct)</p>
+<h3 id="invention-cost"><a class="anchor" href="#invention-cost" aria-label="Link to this section">#</a>Invention cost</h3>
+<pre><code>era cost = research.era_cost.&lt;era&gt; × era I pace
+ahead    = era cost × research.ahead_multiplier (2) ^ eras ahead of the date
+behind   = ahead × (1 − min(research.behind_discount_cap_pct (50), research.behind_discount_pct_per_era (25) × eras behind) ÷ 100)
+cost     = max(era cost × research.cost_floor_share (0.2), behind × (1 − spread % ÷ 100))
+</code></pre>
+<ul>
+<li>Era costs: Ancient (10), Medieval (15), I (20), II (40), III (80), IV (150), V (250), VI (400), VII (650).</li>
+<li>Era I pace: <code>max(1, (research.era_dates.II − start year) ÷ research.era_pace.reference_years (56))</code>. A 1378 start gives (1500 − 1378) ÷ 56 ≈ 2.18. Other eras are ×1.</li>
+<li>The era of the date: I from 1378, II from 1500, III from 1600, IV from 1700, V from 1800, VI from 1870, VII from 1914 (<code>research.era_dates</code>).</li>
+</ul>
+<p>So in Era I an Ancient invention costs 10 × 0.5 = 5 before spread, and a Medieval one 15 × 0.75 = 11.25.</p>
+<p>Source: <code>packages/engine/src/domain/research/index.ts</code> (eraCostFor, eraPace, costBeforeDiscounts, behindDiscountPct, discountedCost, studyCostFor)</p>
+<h3 id="spread"><a class="anchor" href="#spread" aria-label="Link to this section">#</a>Spread</h3>
+<pre><code>spread % = min(research.spread_cap_pct (60), per neighbour % × neighbours who know it)
+per neighbour % = research.spread_per_partner_pct (10) × (1 + spread bonus % of known inventions ÷ 100)
+</code></pre>
+<p>In the game today a neighbour is a realm that owns a province bordering one of yours by land. Neighbours are counted again each January. Trade partners do not count yet.</p>
+<p>Source: <code>packages/engine/src/domain/research/index.ts</code> (spreadPerPartnerPct, studyCostFor); <code>packages/engine/src/research.ts</code> (refreshNeighbours, partnersKnowing)</p>
+<h3 id="schools-students-and-scholars"><a class="anchor" href="#schools-students-and-scholars" aria-label="Link to this section">#</a>Schools, students and scholars</h3>
+<pre><code>seats    = sum over open schools of research.school_seats.&lt;school&gt;
+students wanted = min(seats you set, seats) − students
+</code></pre>
+<p>Seats: temple or monastery school (20), madrasa (30), university (60), academy (100). Students come out of your royal provinces&#39; recruit pools, each giving the same share. Each January:</p>
+<pre><code>graduates   = every cohort enrolled research.graduation_years (5) or more years ago
+scholars lost to old age = floor(scholars ÷ research.old_age_one_in (30))
+</code></pre>
+<p>Inventions such as L10 raise <code>old_age_one_in</code>. The Schoolmaster&#39;s year sooner is not in the game yet.</p>
+<p>Source: <code>packages/engine/src/research.ts</code> (enrol, takeRecruits, monthlyResearch); <code>packages/engine/src/domain/research/index.ts</code> (seats, fillSeats, graduateYear, oldAgeLoss)</p>
+<h3 id="without-the-past-inventions"><a class="anchor" href="#without-the-past-inventions" aria-label="Link to this section">#</a>Without the past inventions</h3>
+<p>A realm that lacks a past invention pays for it elsewhere (<code>research.without</code>):</p>
+<ul>
+<li>Without F01: −1 harvest step.</li>
+<li>Without F03: no horse arms and no camel caravans.</li>
+<li>Without B01: wagons hold 50 % of the food.</li>
+<li>Without C01: hits × 0.8 in battle.</li>
+</ul>
+<p>Source: <code>packages/engine/src/domain/research/index.ts</code> (without); <code>packages/engine/src/research.ts</code> (withoutOf)</p>
+<h2 id="movement"><a class="anchor" href="#movement" aria-label="Link to this section">#</a>Movement</h2>
+<p>Marching is explained in <a href="/wiki/Troop-Movement">Troop movement</a>. The numbers are in <a href="/wiki/Data-Defines">Core values</a> under <code>march</code>.</p>
+<h3 id="hours-to-cross-a-tile"><a class="anchor" href="#hours-to-cross-a-tile" aria-label="Link to this section">#</a>Hours to cross a tile</h3>
+<p>An army walks over the map&#39;s tiles. Each step onto a land tile takes:</p>
+<pre><code>pace  = march.daysPerCrossing × 24 ÷ march.tilesPerCrossing ÷ (1 + march.horseSpeedBonus × horses ÷ men)
+hours = pace × (march.daysToCross.&lt;ground&gt; + column) × across × (1 + march.snowSlowdown × snow) × road
+        + march.riverCrossingDays × 24 when stepping onto a river from a tile without one
+</code></pre>
+<ul>
+<li><code>march.daysPerCrossing</code> (6), <code>march.tilesPerCrossing</code> (14) and <code>march.horseSpeedBonus</code> (0.5): a foot army crosses a farmland tile in about 10.3 hours, a horse-only army in about 6.9.</li>
+<li><code>march.daysToCross</code>: farmland, grassland, savanna (1); drylands, hills (1.5); desert, forest, tundra (2); mountains, jungle, marsh (3).</li>
+<li><code>column</code> is <code>march.bigArmyExtraCrossings</code> (1) when the army has more men than the province&#39;s forage limit, else 0.</li>
+<li><code>across</code> is 1 north or south, the row&#39;s east-west width on the map going east or west, and the diagonal of the two going slantwise.</li>
+<li><code>road</code> is <code>1 − works.roadSpeed (0.15) × road step</code> of the province.</li>
+<li><code>march.riverCrossingDays</code> is (1), whatever the army&#39;s size.</li>
+</ul>
+<p>Snow comes from the province&#39;s temperature today, cooled 6.5 °C per km of the tile&#39;s height:</p>
+<pre><code>t    = clamp((1 − temperature) ÷ 6, 0, 1)
+snow = t × t × (3 − 2t)
+</code></pre>
+<p>So there is no snow at 1 °C or warmer, and full snow, doubling the hours, at −5 °C or colder.</p>
+<p>Forced march, march orders, the Cunning bonus, the guns penalty and great rivers are not in the game yet.</p>
+<p>Source: <code>packages/engine/src/march.ts</code> (tileStepHours, tilePace, forageLimitOf); <code>packages/engine/src/climate.ts</code> (snowCover); <code>packages/engine/src/works.ts</code> (roadHours)</p>
+<h3 id="forage-limit-and-route-days"><a class="anchor" href="#forage-limit-and-route-days" aria-label="Link to this section">#</a>Forage limit and route days</h3>
+<pre><code>forage limit = people × 1000 × march.rationsStoredPerPerson (0.5) × march.foraging.&lt;ground&gt; ÷ march.rationsPerSoldier (1)
+</code></pre>
+<p>The route planner first picks the provinces to pass through with the same numbers counted per province (half of each ground&#39;s crossing, the column and the river), then walks the tiles.</p>
+<p>Source: <code>packages/engine/src/march.ts</code> (forageLimit, stepDays, planRoute)</p>
+<h2 id="population-unrest-and-rebellion"><a class="anchor" href="#population-unrest-and-rebellion" aria-label="Link to this section">#</a>Population, unrest and rebellion</h2>
+<p>People and moods are explained in <a href="/wiki/Provinces">Provinces</a>; risings in <a href="/wiki/Rebellions">Rebellions</a>. The numbers are in <a href="/wiki/Data-Province">Province data</a> and <a href="/wiki/Data-Rebellions">Rebellions data</a>.</p>
+<h3 id="births-and-deaths"><a class="anchor" href="#births-and-deaths" aria-label="Link to this section">#</a>Births and deaths</h3>
+<p>Each month every class changes by a twelfth of its yearly rate:</p>
+<pre><code>net  = province.births.&lt;class&gt; − province.deaths.&lt;class&gt; − war − plague
+rate = net × heritage growth, when net is above 0; net otherwise
+class people = class people × (1 + rate ÷ 12)
+</code></pre>
+<ul>
+<li>Births: farmers, herders, woodsmen, seafolk, homeless (0.04); miners (0.035); craftsmen, market folk, clerks (0.03); clergy (0.005); scholars (0.01).</li>
+<li>Deaths: land classes and clergy and scholars (0.03); miners (0.04); craftsmen, market folk, clerks (0.035); homeless (0.05).</li>
+<li>War: <code>province.death_modifiers.war</code> (0.01) while the province is occupied, besieged or fought in.</li>
+<li>Plague: <code>province.decided.birth_points.plague</code> (−1 point, so 0.01) while plague is in the province.</li>
+</ul>
+<p>Other birth and death changes (food store, peace, hunger, burned tiles) are not in the game yet. Famine deaths are under Food.</p>
+<p>Source: <code>packages/engine/src/living.ts</code> (monthlyPeople); <code>packages/engine/src/domain/province/people.ts</code> (birthRate, deathRate, deathModifiers)</p>
+<h3 id="grievances-and-mood"><a class="anchor" href="#grievances-and-mood" aria-label="Link to this section">#</a>Grievances and mood</h3>
+<pre><code>count = grievances held + (taxWeight − 1 when Heavy taxes is held) + 1 more when Persecuted
+</code></pre>
+<p><code>taxWeight</code> is <code>province.tax.heavy_weight</code> (heavy 1, crushing 2). The mood follows the count: grumbling at <code>province.grievances.levels.grumbling</code> (2), rioting at <code>riots</code> (3, one more with a judge, <code>province.decided.judge_riots_extra</code>), plotting at <code>province.decided.plotting_at</code> (4).</p>
+<p>Some grievances start and end by thresholds:</p>
+<ul>
+<li>Hungry: starts under <code>province.grievances.hungry.starts_below_months</code> (1) month of food, ends above <code>ends_above_months</code> (3).</li>
+<li>Conscription: starts when recruits fall under <code>province.recruits.conscription_below</code> (0.25) of the ceiling, ends at <code>conscription_ends_at</code> (0.5).</li>
+<li>Soldiers quartered: an army stood there longer than one season (3 months).</li>
+<li>Bloodshed: a battle there in the last <code>province.grievances.bloodshed_years</code> (20) years.</li>
+</ul>
+<p>Source: <code>packages/engine/src/moods.ts</code> (grievanceCount, taxWeight, moodIndex, monthlyMoods); <code>packages/engine/src/domain/province/decided.ts</code> (moodOf)</p>
+<h3 id="the-chance-to-rise"><a class="anchor" href="#the-chance-to-rise" aria-label="Link to this section">#</a>The chance to rise</h3>
+<p>A plotting province rolls each month:</p>
+<pre><code>chance = province.decided.rise_chance.&lt;count&gt;   (4: 0.05, 5: 0.15, 6 or more: 0.30)
+         × realm.belief.revolt_factor (1.5) for a Faith or Homeland cause in a realm of low Faith or Tongue
+         + rebellions.provisional.grant_points (5) ÷ 100 while a granted demand of the same cause emboldens the realm
+</code></pre>
+<p>A Faith rising&#39;s chance also changes by the ruler&#39;s traits. A low share is under <code>realm.belief.low_percent</code> (50). A spark (a raised tax, a lost battle nearby) starts a rising at once in a rioting province.</p>
+<p>Source: <code>packages/engine/src/moods.ts</code> (risingChance); <code>packages/engine/src/domain/province/decided.ts</code> (riseChance); <code>packages/engine/src/rebels.ts</code> (risingChanceIn, monthlyRebels, spark); <code>packages/engine/src/belief.ts</code> (beliefRevoltFactor)</p>
+<h3 id="a-risings-band"><a class="anchor" href="#a-risings-band" aria-label="Link to this section">#</a>A rising&#39;s band</h3>
+<pre><code>men joining a month = floor(recruits × join share)
+join share = sum over classes (people of the class × rebellions.join_share for it) ÷ people
+spread chance = rebellions.provisional.spread_chance_per_month (0.1) to each neighbour of the realm with 3 or more grievances
+</code></pre>
+<p>Join shares are <code>rebellions.join_share</code>: homeless (0.3), the class the cause belongs to (0.1), faith or tongue causes (0.08), others (0.02). A band eats <code>men ÷ 1000</code> from the store where it stands. A band that holds no castle and has no lord or foreign backer loses <code>rebellions.starving_loss</code> (0.1) of its men a month when it has no food or fights only with tools. It melts away under <code>rebellions.provisional.melts_below_men</code> (200) men.</p>
+<p>Source: <code>packages/engine/src/rebels.ts</code> (joinShare, muster, monthlyBand)</p>

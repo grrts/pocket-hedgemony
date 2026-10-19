@@ -104,7 +104,8 @@ export type Order =
   /** The army's commander takes in the garrison troops where it stands. */
   | { type: "pickUp"; army: number; men?: number }
   /** Commission a province's official as a commander; release one back to his post. */
-  | { type: "commission"; province: number }
+  /** Commission the province's official as a general, or as an admiral when `sea` (RECR-128). */
+  | { type: "commission"; province: number; sea?: boolean }
   | { type: "release"; commander: number }
   /** Train levy foot of an army as another arm. */
   | { type: "train"; army: number; arm: string; men: number }
@@ -397,7 +398,7 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
     case "pickUp":
       return pickUp(world, actingNation, order.army, order.men);
     case "commission":
-      return commissionOfficial(world, actingNation, order.province, news);
+      return commissionOfficial(world, actingNation, order.province, news, !!order.sea);
     case "release":
       return releaseCommander(world, actingNation, order.commander);
     case "train":

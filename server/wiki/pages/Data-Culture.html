@@ -1,0 +1,263 @@
+<h1>Culture data</h1>
+<p>Every value in the game&#39;s culture config, exactly as the game reads it. This page is made from <code>packages/rules/data/domain/culture.json</code> each time the config changes, so it always matches the game. How these values are used is explained on <a href="/wiki/Culture">Culture</a>.</p>
+<p>Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and values marked (provisional) are placeholders that may still change in balancing. Inventions are shown by id and name; see <a href="/wiki/Data-Research#inventions">Research data</a>.</p>
+<blockquote>
+<p>Culture config (domain/culture/spec.md §10), from culture/culture-config.example.yaml version 1. All numbers are placeholders; &#39;_provisional&#39; lists the keys still being balanced. &#39;tongues_added&#39; are tongues the design or the feature files name with their family.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>families_event_tree</code></td><td>latin, germanic, slavic, hellenic, turkic, iranian, arab, berber, cushitic, semitic_ethiopian, mande, akan, yoruba_edo, hausa_fulani, bantu, khoisan, nilotic, indo_aryan, dravidian, tibeto_burman, tai, austroasiatic, austronesian, sinitic, japonic, koreanic, mongolic, tungusic, uralic, nahua, maya, andean, tupi_guarani, algonquian, iroquoian, creole_atlantic, polynesian, melanesian, aboriginal_australian</td></tr>
+<tr><td><code>families_added</code></td><td>celtic, baltic, caucasian, hebrew</td></tr>
+<tr><td><code>start_flag_chancery_tradition</code></td><td>ming, joseon, castile, ottoman</td></tr>
+<tr><td><code>charter_brought_by</code></td><td>the ruler, its lords, its towns, a homeland rising</td></tr>
+</tbody></table></div>
+<h2 id="relation-provisional"><a class="anchor" href="#relation-provisional" aria-label="Link to this section">#</a>Relation (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>tongue share weight</th><th>foreign rule</th><th>drift multiplier</th></tr></thead>
+<tbody>
+<tr><td>kin</td><td>1</td><td></td><td></td></tr>
+<tr><td>cousin</td><td>0.5</td><td>no</td><td>2</td></tr>
+<tr><td>stranger</td><td>0</td><td>yes</td><td></td></tr>
+<tr><td>trading</td><td>0</td><td>no</td><td></td></tr>
+</tbody></table></div>
+<h2 id="drift"><a class="anchor" href="#drift" aria-label="Link to this section">#</a>Drift</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>base_rate_per_year</code> (provisional)</td><td>0.005</td></tr>
+<tr><td><code>court_pull_needs_years_held</code> (provisional)</td><td>20</td></tr>
+<tr><td><code>court_pull_needs</code></td><td>own_official, lord_of_court_tongue</td></tr>
+<tr><td><code>drop_below_share</code> (provisional)</td><td>0.01</td></tr>
+</tbody></table></div>
+<h3 id="multipliers-provisional"><a class="anchor" href="#multipliers-provisional" aria-label="Link to this section">#</a>Multipliers (provisional)</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>town_classes</code></td><td>2</td></tr>
+<tr><td><code>school_in_pull_tongue</code></td><td>1.5</td></tr>
+<tr><td><code>schoolmaster_official</code></td><td>2</td></tr>
+<tr><td><code>homeland_of_drifting_tongue</code></td><td>0.5</td></tr>
+<tr><td><code>way_of_life_in_own_land</code></td><td>0.5</td></tr>
+<tr><td><code>diaspora</code></td><td>0.25</td></tr>
+<tr><td><code>nationalism_0_3</code></td><td>0.25</td></tr>
+<tr><td><code>own_tongue_charter</code></td><td>0</td></tr>
+</tbody></table></div>
+<h4 id="inventions"><a class="anchor" href="#inventions" aria-label="Link to this section">#</a>Inventions</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>printing</code></td><td>1.25</td></tr>
+<tr><td><code>mass_schooling</code></td><td>1.25</td></tr>
+<tr><td><code>newspapers</code></td><td>1.25</td></tr>
+<tr><td><code>railways</code></td><td>1.25</td></tr>
+</tbody></table></div>
+<h3 id="way-of-life-lands-provisional"><a class="anchor" href="#way-of-life-lands-provisional" aria-label="Link to this section">#</a>Way of life lands (provisional)</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>herding</code></td><td>grassland, drylands</td></tr>
+<tr><td><code>forest</code></td><td>forest, jungle</td></tr>
+<tr><td><code>seafaring</code></td><td>coastal</td></tr>
+</tbody></table></div>
+<h2 id="policy-provisional"><a class="anchor" href="#policy-provisional" aria-label="Link to this section">#</a>Policy (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>drift</th><th>school upkeep</th><th>grievance</th><th>stranger lords waver</th><th>needs any</th></tr></thead>
+<tbody>
+<tr><td>let_be</td><td>0.5</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>teach</td><td>1</td><td>1.1</td><td></td><td></td><td></td></tr>
+<tr><td>impose</td><td>2</td><td></td><td>banned_tongue</td><td>1</td><td>invention:printing, start_flag:chancery_tradition</td></tr>
+</tbody></table></div>
+<h2 id="officials"><a class="anchor" href="#officials" aria-label="Link to this section">#</a>Officials</h2>
+<h3 id="years-to-full-effect-provisional"><a class="anchor" href="#years-to-full-effect-provisional" aria-label="Link to this section">#</a>Years to full effect (provisional)</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>kin</code></td><td>5</td></tr>
+<tr><td><code>cousin</code></td><td>7</td></tr>
+<tr><td><code>stranger</code></td><td>10</td></tr>
+<tr><td><code>local_tongue</code></td><td>5</td></tr>
+</tbody></table></div>
+<h2 id="effects-provisional"><a class="anchor" href="#effects-provisional" aria-label="Link to this section">#</a>Effects (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>family_neighbour_research_weight</code></td><td>2</td></tr>
+</tbody></table></div>
+<h3 id="trading-people"><a class="anchor" href="#trading-people" aria-label="Link to this section">#</a>Trading people</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>min_share</code></td><td>0.02</td></tr>
+<tr><td><code>needs</code></td><td>market</td></tr>
+<tr><td><code>trade_value</code></td><td>0.1</td></tr>
+<tr><td><code>extra_traders</code></td><td>1</td></tr>
+</tbody></table></div>
+<h3 id="national-levy"><a class="anchor" href="#national-levy" aria-label="Link to this section">#</a>National levy</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>needs_nationalism</code></td><td>0.5</td></tr>
+<tr><td><code>kin_refill</code></td><td>1.25</td></tr>
+<tr><td><code>stranger_refill</code></td><td>0.75</td></tr>
+<tr><td><code>from_age</code></td><td>age_of_revolutions</td></tr>
+</tbody></table></div>
+<h2 id="nationalism-provisional"><a class="anchor" href="#nationalism-provisional" aria-label="Link to this section">#</a>Nationalism (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>cousins_become_strangers_at</code></td><td>0.3</td></tr>
+<tr><td><code>homeland_demands_country_at</code></td><td>0.5</td></tr>
+</tbody></table></div>
+<h2 id="engine-events-provisional"><a class="anchor" href="#engine-events-provisional" aria-label="Link to this section">#</a>Engine events (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>check_every_years</code></td><td>5</td></tr>
+</tbody></table></div>
+<h3 id="court-goes-native"><a class="anchor" href="#court-goes-native" aria-label="Link to this section">#</a>Court goes native</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>court_share_below</code></td><td>0.2</td></tr>
+<tr><td><code>for_years</code></td><td>50</td></tr>
+<tr><td><code>other_tongue_above</code></td><td>0.5</td></tr>
+<tr><td><code>recheck_years</code></td><td>25</td></tr>
+</tbody></table></div>
+<h3 id="new-tongue-abroad"><a class="anchor" href="#new-tongue-abroad" aria-label="Link to this section">#</a>New tongue abroad</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>settler_majority_years</code></td><td>100</td></tr>
+<tr><td><code>region</code></td><td>map macro-region</td></tr>
+<tr><td><code>separated_by_sea</code></td><td>top-level map region differs from the court capital&#39;s</td></tr>
+</tbody></table></div>
+<h3 id="merge-without-event"><a class="anchor" href="#merge-without-event" aria-label="Link to this section">#</a>Merge without event</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>needs_policy</code></td><td>impose</td></tr>
+<tr><td><code>years</code></td><td>50</td></tr>
+<tr><td><code>nation_state</code></td><td>court tongue is the merges_into of some tongue</td></tr>
+</tbody></table></div>
+<h2 id="family-default-by-region-provisional"><a class="anchor" href="#family-default-by-region-provisional" aria-label="Link to this section">#</a>Family default by region (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>ethiopian highlands</th><th>iberia</th><th>americas</th></tr></thead>
+<tbody>
+<tr><td>cushitic</td><td>oromo</td><td></td><td></td></tr>
+<tr><td>latin</td><td></td><td>castilian</td><td>castilian</td></tr>
+</tbody></table></div>
+<h2 id="tongues"><a class="anchor" href="#tongues" aria-label="Link to this section">#</a>Tongues</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>id</th><th>name</th><th>family</th><th>way of life</th><th>splits to</th><th>merges into</th><th>local names</th><th>diaspora</th></tr></thead>
+<tbody>
+<tr><td>french</td><td>French</td><td>latin</td><td>settled</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>occitan</td><td>Occitan</td><td>latin</td><td>settled</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>castilian</td><td>Castilian</td><td>latin</td><td>settled</td><td>criollo</td><td></td><td></td><td></td></tr>
+<tr><td>portuguese</td><td>Portuguese</td><td>latin</td><td>seafaring</td><td>brazilian</td><td></td><td></td><td></td></tr>
+<tr><td>criollo</td><td>Criollo</td><td>creole_atlantic</td><td>settled</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>brazilian</td><td>Brazilian</td><td>creole_atlantic</td><td>settled</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>tuscan</td><td>Tuscan</td><td>latin</td><td>settled</td><td></td><td>italian</td><td></td><td></td></tr>
+<tr><td>lombard</td><td>Lombard</td><td>latin</td><td>settled</td><td></td><td>italian</td><td></td><td></td></tr>
+<tr><td>neapolitan</td><td>Neapolitan</td><td>latin</td><td>settled</td><td></td><td>italian</td><td></td><td></td></tr>
+<tr><td>italian</td><td>Italian</td><td>latin</td><td>settled</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>high_german</td><td>High German</td><td>germanic</td><td>settled</td><td></td><td>german</td><td>Swabians, Franconians, Bavarians, Alemannic Swiss Germans</td><td></td></tr>
+<tr><td>low_german</td><td>Low German</td><td>germanic</td><td>settled</td><td></td><td>german</td><td>Westphalians, German (Eastphalian Low Saxon)</td><td></td></tr>
+<tr><td>german</td><td>German</td><td>germanic</td><td>settled</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>flemish</td><td>Flemish</td><td>germanic</td><td>settled</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>breton</td><td>Breton</td><td>celtic</td><td>seafaring</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>gaelic_irish</td><td>Irish</td><td>celtic</td><td>settled</td><td></td><td></td><td>Gaelic Irish</td><td></td></tr>
+<tr><td>mandinka</td><td>Mandinka</td><td>mande</td><td>settled</td><td></td><td></td><td>Mandinka (Maninka)</td><td></td></tr>
+<tr><td>bamana</td><td>Bamana</td><td>mande</td><td>settled</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>dyula</td><td>Dyula</td><td>mande</td><td>trading</td><td></td><td></td><td>Dyula and other Mande traders</td><td>yes</td></tr>
+<tr><td>fulbe</td><td>Fulbe</td><td>hausa_fulani</td><td>herding</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>armenian</td><td>Armenian</td><td>caucasian</td><td>trading</td><td></td><td></td><td></td><td>yes</td></tr>
+<tr><td>jewish</td><td>Jewish</td><td>hebrew</td><td>trading</td><td></td><td></td><td>Jewish communities, Jews</td><td>yes</td></tr>
+<tr><td>oromo</td><td>Oromo</td><td>cushitic</td><td>herding</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>manchu</td><td>Manchu</td><td>tungusic</td><td>forest</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>han</td><td>Han</td><td>sinitic</td><td>settled</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>lithuanian</td><td>Lithuanian</td><td>baltic</td><td>forest</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>georgian</td><td>Georgian</td><td>caucasian</td><td>settled</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>nahua</td><td>Nahua</td><td>nahua</td><td>settled</td><td></td><td></td><td></td><td></td></tr>
+</tbody></table></div>
+<h2 id="tongues-added"><a class="anchor" href="#tongues-added" aria-label="Link to this section">#</a>Tongues added</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>id</th><th>name</th><th>family</th><th>way of life</th><th>splits to</th></tr></thead>
+<tbody>
+<tr><td>swahili</td><td>Swahili</td><td>bantu</td><td>settled</td><td></td></tr>
+<tr><td>latvian</td><td>Latvian</td><td>baltic</td><td>settled</td><td></td></tr>
+<tr><td>catalan</td><td>Catalan</td><td>latin</td><td>settled</td><td></td></tr>
+<tr><td>anglo_american</td><td>Anglo-American</td><td>creole_atlantic</td><td>settled</td><td></td></tr>
+<tr><td>afrikaans</td><td>Afrikaans</td><td>creole_atlantic</td><td>settled</td><td></td></tr>
+<tr><td>english</td><td>English</td><td>germanic</td><td>settled</td><td>anglo_american</td></tr>
+<tr><td>dutch</td><td>Dutch</td><td>germanic</td><td>settled</td><td>afrikaans</td></tr>
+<tr><td>great_russian</td><td>Great Russian</td><td>none</td><td>settled</td><td></td></tr>
+<tr><td>ruthenian</td><td>Ruthenian</td><td>none</td><td>settled</td><td></td></tr>
+<tr><td>russian</td><td>Russian</td><td>none</td><td>settled</td><td></td></tr>
+<tr><td>andalusi_arabic</td><td>Andalusi Arabic</td><td>none</td><td>settled</td><td></td></tr>
+<tr><td>basque</td><td>Basque</td><td>none</td><td>settled</td><td></td></tr>
+<tr><td>norman</td><td>Norman</td><td>none</td><td>settled</td><td></td></tr>
+<tr><td>cherokee</td><td>Cherokee</td><td>none</td><td>settled</td><td></td></tr>
+<tr><td>galician</td><td>Galician</td><td>none</td><td>settled</td><td></td></tr>
+<tr><td>swedish</td><td>Swedish</td><td>germanic</td><td>settled</td><td></td></tr>
+<tr><td>bosnian</td><td>Bosnian</td><td>slavic</td><td>settled</td><td></td></tr>
+</tbody></table></div>
+<h2 id="merge-events"><a class="anchor" href="#merge-events" aria-label="Link to this section">#</a>Merge events</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>into</th></tr></thead>
+<tbody>
+<tr><td>italian_unification</td><td>italian</td></tr>
+<tr><td>german_unification</td><td>german</td></tr>
+</tbody></table></div>
+<h2 id="age-of-revolutions"><a class="anchor" href="#age-of-revolutions" aria-label="Link to this section">#</a>Age of revolutions</h2>
+<blockquote>
+<p>event-tree data/ages.yaml age_of_revolutions window</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>earliest_start</code></td><td>1750</td></tr>
+<tr><td><code>force_start</code></td><td>1800</td></tr>
+</tbody></table></div>
+<h2 id="dots"><a class="anchor" href="#dots" aria-label="Link to this section">#</a>Dots</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>kin</code></td><td>green</td></tr>
+<tr><td><code>cousin</code></td><td>yellow</td></tr>
+<tr><td><code>stranger</code></td><td>red</td></tr>
+<tr><td><code>trading</code></td><td>grey</td></tr>
+</tbody></table></div>
+<h2 id="lens"><a class="anchor" href="#lens" aria-label="Link to this section">#</a>Lens</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>far</code></td><td>family</td></tr>
+<tr><td><code>regional</code></td><td>language</td></tr>
+<tr><td><code>realm_toggle</code></td><td>same language, related or foreign for the player&#39;s realm</td></tr>
+</tbody></table></div>
+<h2 id="ai"><a class="anchor" href="#ai" aria-label="Link to this section">#</a>Ai</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>hegemon seeker</th><th>expansionist</th><th>isolationist</th><th>mercantile</th><th>opportunist</th><th>zealot</th></tr></thead>
+<tbody>
+<tr><td>policy</td><td>policy: teach; with_printing: impose</td><td>policy: teach; with_printing: impose</td><td>policy: let_be</td><td>policy: let_be</td><td>policy: teach</td><td>policy: teach</td></tr>
+<tr><td>levers</td><td>settlers into conquered border provinces, the war aim &quot;Gather our kin&quot; after 1789</td><td>settlers into conquered border provinces, the war aim &quot;Gather our kin&quot; after 1789</td><td>&quot;Own language&quot; charters to keep foreign peoples calm, a welcome for trading peoples</td><td>&quot;Own language&quot; charters to keep foreign peoples calm, a welcome for trading peoples</td><td>&quot;Free a people&quot; against neighbours with foreign homelands in revolt</td><td>expulsion of trading peoples of another faith</td></tr>
+</tbody></table></div>
+<h2 id="risings"><a class="anchor" href="#risings" aria-label="Link to this section">#</a>Risings</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>homeland_draw</code> (provisional)</td><td>0.08</td></tr>
+</tbody></table></div>
+<h2 id="refugees"><a class="anchor" href="#refugees" aria-label="Link to this section">#</a>Refugees</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>settle_after_years</code> (provisional)</td><td>2</td></tr>
+</tbody></table></div>
+<h2 id="schools"><a class="anchor" href="#schools" aria-label="Link to this section">#</a>Schools</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>learned_tongues</code></td><td>Latin, Classical Arabic</td></tr>
+</tbody></table></div>

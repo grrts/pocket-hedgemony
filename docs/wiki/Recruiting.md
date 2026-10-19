@@ -241,6 +241,8 @@ Each province is updated once a month: training months tick down and finished re
 
 ## Numbers
 
+Every value the game uses, made from its config so it always matches the game: [Recruiting data](Data-Recruiting). How they combine: [Formulas](Formulas).
+
 The numbers live in the recruiting config file. Most are **provisional** and waiting for a balancing pass.
 
 | Value | Design number |

@@ -353,6 +353,8 @@ The first part of statecraft is in the playable build: envoys, alliances, marria
 
 ## Numbers
 
+Every value the game uses, made from its config so it always matches the game: [Diplomacy data](Data-Diplomacy). How they combine: [Formulas](Formulas).
+
 All numbers live in `diplomacy-rules.json` (or `relation-rules.json` for relation types) and are **placeholders**, except the answer rules, which are decided.
 
 | Key | Value |
