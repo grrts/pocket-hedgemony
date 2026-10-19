@@ -36,7 +36,9 @@ Not in scope (owned by …):
 Newest decision first.
 
 1. `accounts/accounts-design.md`, draft 1, 19 October 2026 (agreed by Leroy on 19 Oct: one account with several
-   sign-ins, store sign-ins at launch, purchases per store), §4 and §5.
+   sign-ins, store sign-ins at launch, purchases per store), §4 and §5; §7 for sharing saves with the community
+   (Leroy, 19 Oct: "I want them exportable, so other people could actually load in the save files … an active
+   community thing").
 2. `save-system/README.md`, second draft 2026-10-16, §8 Decisions (settled by Leroy on 16 Oct: Export and
    Import yes; cloud saves on our Symfony server with optional accounts; default autosave every 12 months plus
    the Resume save every turn; cross-store cloud saves at launch, purchases stay per store), and all of §1–§7, §9.
@@ -81,6 +83,9 @@ Newest decision first.
 | Needs full game | The header flag saying a save's nation is locked without the full game | — |
 | Account | An optional Pocket Hegemony account on our server; needed only for cloud saves | A store account |
 | Device token | Long-lived sign-in token kept in the platform's secure storage | Access token |
+| Shared save | A public copy of one save, uploaded once and attached to a community post, that anyone can play | A cloud save (private, synced) |
+| Share code | The eight letters and digits that name a shared save (`K7QX-M2PA`), in its link `/s/<code>` | Save id |
+| Copy of a shared save | The new campaign a player starts from a shared save, with its own campaign id and `sharedFrom` | The shared save itself |
 
 ## 4. Domain model
 
@@ -120,6 +125,14 @@ Newest decision first.
 **UploadQueue** (one per device)
 - INV-SAVE-16: The queue survives restarts and empties oldest first when online, retrying with back-off.
 
+**SharedSave** (on the server; identity: share code)
+- Holds: the account that shared it, the community topic and post it came with, the header fields its card
+  shows, size, play count, removed at; the bytes under `shared/<code>.phsave`.
+- INV-SAVE-17: A shared save never carries the device name of the save it was made from, and never counts
+  toward the cloud quota.
+- INV-SAVE-18: A copy of a shared save is a new campaign: it never shares a campaign id with the author's saves
+  and is never ironman.
+
 ### Entities and value objects
 
 - **SaveKind** (value): `resume`, `autosave`, `manual`, `ironman`, exported (outside the game).
@@ -127,7 +140,7 @@ Newest decision first.
   `formatVersion`, `rulesHash`, `mapHash`, `turn`, `date {y, m}`, `playerNation`, `ironman`, `playSeconds`,
   `options {difficulty, events, endDate, aiTemper, fogOfWar, musicEra}` (D-SAVE-8), `tier {nation, needsFullGame, app}`
   (D-SAVE-13), `flags {ironman_unbroken, cheat_marked, switched_country, began_as_tutorial}` (D-SAVE-1), `worldHash`,
-  `thumbnail` (base64 PNG 96 × 64), and a modified mark (§6.3).
+  `thumbnail` (base64 PNG 96 × 64), a modified mark (§6.3), and on a copy of a shared save `sharedFrom {code, author}`.
 - **Chunk** (value): id, version, offset, length, CRC-32, deflate bytes. Ids: `core`, `ids`, `provinces`,
   `nations`, `armies`, `events`, `history`, `orders`, later `diplomacy`, `subjects`, `religion`, `culture`,
   `government`, `trade`, `ai` ….
@@ -255,6 +268,17 @@ Newest decision first.
 - SAVE-117: If email sign-in fails 5 times within 15 minutes for one address from one place, then the server shall refuse further tries until the 15 minutes have passed, as the website's sign-in does. [save-system §5.2 rate limits; config `cloud.server.sign_in_throttle`]
 - SAVE-118: Where the server has no Steam key configured, Steam sign-in shall answer "Steam sign-in is not available" and email sign-in shall keep working. [accounts-design §10]
 
+#### Shared saves
+
+- SAVE-124: A shared save shall be a copy of one save, uploaded once, public, and attached to a community post under a share code; it shall be separate from cloud sync, so sharing exposes none of the player's other saves and deleting a cloud save leaves the shared copy, while removing the shared save or a moderator hiding its topic takes it away. [accounts-design §7]
+- SAVE-125: When the player posts a share (`POST /api/shared-saves` with the file, a title, an optional note and what it is for), the server shall check the file as it checks an upload (SAVE-068), drop the device name from the copy's header, keep the bytes under `shared/<code>.phsave`, open a topic on the board the purpose picks ("Show my campaign": Strategy and campaign stories; "Help me with this": Saves to try; "Something broke": Bug reports) as the player, with the note, or a line naming the save, as its opening post, and return the code and the link `/s/<code>`. [accounts-design §7; config `cloud.shared.boards`]
+- SAVE-126: Sharing shall need the account (it posts as the player); shared saves shall not count toward the cloud quota, an account shall keep at most 50 of them, and each share shall count toward the community's limit on new topics. [accounts-design §7; config `cloud.shared.max_per_account`; placeholder]
+- SAVE-127: The server shall answer `GET /api/shared-saves/{code}` with the save card (title, author, realm, in-game date, turn, play time, game version, whether it was ironman, the modified mark, the map crop, plays) and `GET /api/shared-saves/{code}/file` with the bytes, counting a play; `/s/<code>` shall lead to the post with the save and `/s/<code>.phsave` download the file. If the save was removed or its topic or post is hidden, then each shall answer "There is no shared save with this code." [accounts-design §7]
+- SAVE-128: When the player opens a shared save, the save system shall start a new campaign of the player's own from it: a new campaign id and save id, kept as a Manual save on this device, with `sharedFrom` (the share code and the author's display name) in its header and in every later save of the campaign; the locked-nation check (SAVE-081), the newer-version check (SAVE-049) and the hash check (SAVE-094) shall apply as for any save. [accounts-design §7]
+- SAVE-129: If a shared save was ironman, then its copy shall open as a normal campaign, not ironman, with `ironman_unbroken` off, so it earns no achievements and sharing cannot carry an ironman run past a mistake. [accounts-design §7; X-16]
+- SAVE-130: When the player shares a save of a campaign that began as a copy of a shared save, the server shall accept "Reply in the original topic": the save goes up as a reply in the topic the original came from, with its own save card, unless that topic is locked or hidden. [accounts-design §7]
+- SAVE-131: When the player who shared a save removes it, the server shall refuse it from then on and delete its bytes; the topic stays, its card saying the save was removed. [accounts-design §7]
+
 ### 5.9 Store backups, Export and Import
 
 - SAVE-073: Where the game runs on Steam, the save folder (`<Electron userData>/saves`) shall be covered by Steam Auto-Cloud with root overrides mapping the Windows, macOS and Linux paths to one cloud folder, a quota of 500 MB and 2,000 files for the synced set only, and Dynamic Cloud Sync on so a suspended Deck uploads its saves. [save-system §5.3; config `store_backups.steam`]
@@ -316,6 +340,17 @@ Newest decision first.
 - SAVE-122: The Load card shall list the saves other devices put in the cloud with this device's own, each line from another device marked "from <device>", and download a save's bytes only when it is opened ("Connect to open this save from the cloud." while offline); Continue shall name the device of a save from another device (SAVE-014), and a campaign played on two devices shall show where each left off. Deleting a save on the Load card shall delete it in the cloud too. [accounts-design §3; SAVE-053, SAVE-054, SAVE-062, SAVE-064]
 - SAVE-123: On a phone in landscape the Account and cloud saves card shall be one scrolling column inside the safe areas in both the Wide and Tall layouts, with full-width fields and buttons at least 44 points high (Sign in and Sign out 48), and nothing that needs hover. [X-19; accounts-design §3]
 
+#### Sharing saves with the community
+
+- SAVE-132: The player shall find sharing where the saves already are: **Share** beside Load and Delete on an open Load line, **Share this campaign** in the game menu over the map (it shares where the player is now, the campaign's Resume save), and **Open a shared save** at the bottom of the Load card, where a share code is typed; on the website a topic's save card holds **Play this save**, which opens the web game with the code, and **Download**. Where the build names no cloud server, none of these shall show in the game. [X-19; accounts-design §7]
+- SAVE-133: The Share sheet shall be one card for the subject: the title, filled in with the save's name ("Castile, May 1492") and changeable; a short note; what it is for, as three large choices that pick the board (**Show my campaign**, **Help me with this**, **Something broke**), with **Reply in the original topic** first and chosen for a copy of a shared save (SAVE-130); then **Post to the community**. Signed out, the sheet shall say that sharing posts as the player and offer Sign in, which opens the Account and cloud saves card. When the save is posted, the sheet shall say "Shared. Your topic is on the community." with **Copy link**, **Share link** (the system share sheet, where the device has one) and **Open the topic**. [X-19; accounts-design §7; D-SAVE-19]
+- SAVE-134: The topic shall show the save card above the post it came with: the map crop, the save's title, the realm, the in-game date, the week, the play time, the game version, "Was ironman: opens as a normal campaign" and "Modified" when they apply, the share code to type in the game, and Play this save and Download; on the Load card a copy's lines shall say "From <author>'s campaign". [X-19; accounts-design §7]
+- SAVE-135: The overview of what the player shared shall be a **Shared saves** row on the Account and cloud saves card and a Shared saves list on the community's You page: each shared save with its title, how many times it was played, a link to its topic, and **Remove**, which asks first. [X-19; accounts-design §7]
+- SAVE-136: On a phone in landscape the Share sheet shall be one scrolling column inside the safe areas in both the Wide and Tall layouts, the three choices rows at least 64 points high, every other button and field at least 44, and no typing needed because the title has a default; on the website Play this save and Download shall fill the width on a narrow phone, and nothing shall need hover. [X-19; accounts-design §7]
+- SAVE-137: Where the phone and desktop builds register app links, the link `https://<domain>/s/<code>` shall open the game on that shared save, and fall back to the download and the store pages. [accounts-design §7]
+- SAVE-138: The website's new-topic form shall also take a `.phsave` attachment, so a player who never signs in from the game can share an exported file (SAVE-078). [accounts-design §7]
+- SAVE-139: Where a save needs Workshop mods (the header's `mods` list), its card shall say "Needs N Workshop mods (Steam only)" with links to them; saves shall never be put on the Workshop. [accounts-design §7; steam-design §4]
+
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
@@ -337,6 +372,9 @@ Newest decision first.
 | ClaimIronmanHead | system | Ironman upload | Accepted or split detected | `IronmanLineSplit` |
 | ResolveIronmanSplit | player | Split detected | One line kept, the other removed | `IronmanLineChosen` |
 | ImportDemoSaves | system (full game first launch) | Demo saves in the shared folder | Copied into the full game folder | — |
+| ShareSave | player | Signed in; online; under 50 shared saves | Shared save and its topic (or reply) made; code and link back | `SaveShared` |
+| OpenSharedSave | player | Online; the code names a shared save | A copy joins the Manual saves as a new campaign and opens | `SaveWritten(manual)`, `SaveLoaded` |
+| RemoveSharedSave | player (who shared it) | Confirmed | Shared save refused from then on; bytes deleted | — |
 
 Save commands are local to one player's device and never change the simulation; they carry no game orders.
 
@@ -353,6 +391,7 @@ Save commands are local to one player's device and never change the simulation; 
 | `SavesArrived` | Cloud headers fetched | headers, device names | game-shell (Load list, Continue "from Steam Deck") |
 | `IronmanLineSplit` | Server rejected an ironman upload | both lines' device and date | game-shell (the one prompt) |
 | `AccountSignedIn` / `AccountSignedOut` / `AccountDeleted` | Account changes | account id | settings (Account row, personal settings sync) |
+| `SaveShared` | A shared save was posted | code, link, topic | game-shell (the Share sheet's result) |
 
 ## 8. Policies (reactions to other contexts)
 
@@ -426,6 +465,11 @@ From `save-system/save-config.example.yaml` ("numbers here are the defaults the 
 | `kinds.autosave.every_6_months` | Months of "every 6 months" | January, July | yes | D-SAVE-9 |
 | `cloud.synced_files` | Files beside saves in the account sync | `settings-personal.json` | no | D-SAVE-6 |
 | `messages.ironman_import_offline` | Offline ironman import | "Connect to import an ironman save." | no | D-SAVE-15 |
+| `cloud.shared.max_per_account` | Shared saves an account keeps | 50 | yes (provisional) | saves.json |
+| `cloud.shared.boards` | Board each purpose posts to | show: strategy, help: saves, broke: bugs | no | saves.json |
+| `cloud.shared.code_length` | Letters and digits in a share code | 8 | no | saves.json |
+| `messages.shared` | After posting a share | "Shared. Your topic is on the community." | no | saves.json |
+| `messages.no_shared_save` | A code that names no shared save | "There is no shared save with this code." | no | saves.json |
 
 ## 11. Seams
 
@@ -478,6 +522,8 @@ None. AI countries' state is saved like any other (later an `ai` chunk); no AI d
 - **D-SAVE-16** (was OQ-SAVE-16) Every way out of an ironman campaign is an exit: "Save and quit", "Exit to main menu" and the app being closed write the ironman save; a kill mid-turn resumes from the Resume save and journal like any campaign. One rule for all exits.
 - **D-SAVE-17** The Load card lists each campaign's Resume save as its first line, "Where you left off", although SAVE-013 keeps Resume saves out of Load: with several campaigns and no manual saves, Continue alone reaches only the newest, and the player would have no way back to the others. One line per campaign, so the list stays short (X-19).
 - **D-SAVE-18** (Leroy, 19 Oct) Store sign-ins at launch, replacing "email and password only" in SAVE-059: on a Steam Deck or a phone a password is the step most players skip, and Steam sign-in on the phone links a Steam account to the phone with no email. One account gathers several sign-ins (SAVE-112), and purchases stay per store (SAVE-072, decided again on 19 Oct). Source: `accounts/accounts-design.md`.
+- **D-SAVE-19** (accounts-design §7, X-19) After Post to the community, the Share sheet itself turns into the result ("Shared. Your topic is on the community." with Copy link, Share link and Open the topic) instead of a toast with buttons: the game's toasts go after two seconds, too soon for a thumb on a phone held sideways, and the sheet is where the player's eyes already are. Until app links exist (SAVE-137), the website's Play this save opens the web game (`PLAY_URL?shared=<code>`), and Open a shared save on the Load card takes the code in any build.
+- **D-SAVE-20** The server answers the share with the code, not the bytes back, and makes the post itself, so a share is one call; the file travels base64 in the JSON body with the title and note, inside the 2 MB cap (SAVE-068). The shared copy's header has an empty `device`; the copy a player opens names their own device. Simplest single request.
 
 ## 14. Traceability
 
@@ -612,3 +658,6 @@ None. AI countries' state is saved like any other (later an `ai` chunk); no AI d
 | SAVE-112 … SAVE-118 | sign-in.feature | Server sign-in; checked by `server/tests/Controller/SessionTest.php` |
 | SAVE-061 … SAVE-070 | cloud-sync.feature | The server's side as well: `server/tests/Controller/SavesTest.php` (`App\Controller\SavesController`) |
 | SAVE-119 … SAVE-123 | — | Client screens; checked by `apps/client/src/cloud/sync.test.ts` (the card) and `api.test.ts` (sign-in messages) |
+| SAVE-124 … SAVE-131 | shared-saves.feature | Server: `server/tests/Controller/SharedSavesTest.php`; the copy (SAVE-128, SAVE-129) also by engine steps |
+| SAVE-132 … SAVE-136 | shared-saves.feature | Client screens; checked by `apps/client/src/cloud/share.test.ts` (the sheet, the copy) and the website's `SharedSavesTest.php` (the save card) |
+| SAVE-137 … SAVE-139 | shared-saves.feature | Not built yet: app links, the website's attachment and Workshop mods come later (todo) |

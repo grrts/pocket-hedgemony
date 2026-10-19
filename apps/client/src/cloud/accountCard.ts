@@ -1,11 +1,12 @@
-import { CloudError, errorText, type AccountCard } from "./api.ts";
+import { CloudError, errorText, type AccountCard, type SharedCard } from "./api.ts";
 import type { CloudSync } from "./sync.ts";
 
 /**
  * Settings → Account and cloud saves (accounts-design §3, SAVE-119 …): one
  * card for the subject. Signed out, the email sign-in and Make an account;
  * signed in, the display name, the cloud's status line (its overview),
- * Storage, Devices with Sign out on each, and Sign out. Store sign-ins (Steam,
+ * Storage, Devices with Sign out on each, Shared saves with Remove on each
+ * (SAVE-135), and Sign out. Store sign-ins (Steam,
  * Apple, Google) and Sync on Wi-Fi only join when they are built.
  */
 
@@ -20,11 +21,15 @@ export interface AccountView {
   /** The account card from the server, fetched when the section opens. */
   card: AccountCard | undefined;
   cardError: string;
-  /** The device whose Sign out was tapped, asking first. */
+  /** The device whose Sign out was tapped, or `shared:<code>` for a Remove, asking first. */
   confirm: string;
+  /** The saves this account shared with the community, fetched with the card (SAVE-135). */
+  shared: SharedCard[] | undefined;
 }
 
-export const accountView = (): AccountView => ({ form: "sign_in", email: "", busy: false, error: "", card: undefined, cardError: "", confirm: "" });
+export const accountView = (): AccountView => ({ form: "sign_in", email: "", busy: false, error: "", card: undefined, cardError: "", confirm: "", shared: undefined });
+
+const times = (n: number) => `Played ${n} time${n === 1 ? "" : "s"}`;
 
 const PLATFORMS: Record<string, string> = { steam: "Steam", desktop: "Computer", ios: "iPhone or iPad", android: "Android", web: "Browser" };
 
@@ -76,6 +81,20 @@ export function accountHtml(sync: CloudSync, v: AccountView, now = Date.now()): 
         v.confirm === d.id
           ? `<b>Sign out ${esc(d.name)}?</b><button class="wax" data-cloud-device-out="${esc(d.id)}"${v.busy ? " disabled" : ""}>Sign out</button><button class="paper" data-cloud-cancel>Keep</button>`
           : `<button class="paper" data-cloud-ask="${esc(d.id)}">Sign out</button>`
+      }</div>
+    </div>`,
+      )
+      .join("")}
+    <h4 class="sub">Shared saves</h4>
+    ${v.shared === undefined ? `<p class="hint">${v.card ? "Connect to see what you shared." : esc(v.cardError || "Loading…")}</p>` : v.shared.length ? "" : `<p class="hint">None yet. Open a save under Load and tap Share to post it to the community.</p>`}
+    ${(v.shared ?? [])
+      .map(
+        (s) => `<div class="set-row cloud-shared">
+      <div class="set-label"><b>${esc(s.title)}</b><small>${esc(times(s.plays))} · code ${esc(s.code.slice(0, 4))}-${esc(s.code.slice(4))}</small></div>
+      <div class="set-control">${
+        v.confirm === `shared:${s.code}`
+          ? `<b>Remove it? The topic stays.</b><button class="wax" data-cloud-unshare="${esc(s.code)}"${v.busy ? " disabled" : ""}>Remove</button><button class="paper" data-cloud-cancel>Keep</button>`
+          : `${s.topicUrl ? `<button class="paper" data-cloud-topic="${esc(s.topicUrl)}">Topic</button>` : ""}<button class="paper" data-cloud-ask="shared:${esc(s.code)}">Remove</button>`
       }</div>
     </div>`,
       )
@@ -142,19 +161,33 @@ export function bindAccount(card: HTMLElement, sync: CloudSync, v: AccountView, 
       }),
     ),
   );
+  card.querySelectorAll<HTMLButtonElement>("[data-cloud-topic]").forEach((b) => b.addEventListener("click", () => window.open(b.dataset.cloudTopic!, "_blank", "noopener")));
+  card.querySelectorAll<HTMLButtonElement>("[data-cloud-unshare]").forEach((b) =>
+    b.addEventListener("click", () =>
+      void act(async () => {
+        await api.removeShared(b.dataset.cloudUnshare!);
+        v.confirm = "";
+        v.shared = v.shared?.filter((s) => s.code !== b.dataset.cloudUnshare);
+      }),
+    ),
+  );
   card.querySelector("[data-cloud-sign-out]")?.addEventListener("click", () =>
     void act(async () => {
       await api.signOut();
       v.card = undefined;
+      v.shared = undefined;
     }),
   );
 }
 
-/** Fetches the devices for the card. */
+/** Fetches the devices and the shared saves for the card. */
 export async function loadCard(sync: CloudSync, v: AccountView, redraw: () => void): Promise<void> {
   if (!sync.api.signedIn) return;
   try {
-    v.card = await sync.api.getAccount();
+    // The shared saves are a row of their own: the devices show even when they could not be read.
+    const [card, shared] = await Promise.all([sync.api.getAccount(), sync.api.mySharedSaves().catch(() => undefined)]);
+    v.card = card;
+    v.shared = shared;
     v.cardError = "";
   } catch (e) {
     v.cardError = e instanceof CloudError && e.offline ? "Connect to see the devices." : errorText(e);

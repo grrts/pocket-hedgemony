@@ -44,6 +44,7 @@
                 <a class="post-when" href="{{ path('community_post', {id: post.id}) }}" title="Link to this post">{{ parts.when(post.createdAt) }}</a>
             </header>
             {% if post.hidden %}<p class="hidden-note">Hidden by a moderator: only moderators see this post.</p>{% endif %}
+            {% if shared[post.id] is defined %}{{ parts.save_card(shared[post.id]) }}{% endif %}
             <div class="post-body">{{ post.body|plain_text }}</div>
             {% if post.editedAt %}<p class="edited">Edited {{ parts.when(post.editedAt) }}</p>{% endif %}
             {% if app.user %}

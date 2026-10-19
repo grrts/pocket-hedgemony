@@ -12,7 +12,23 @@ Tap the three-line button at the top left of the map (or press `Esc`) to open th
 - **Autosaves** are set in Settings → Gameplay.
 - **Account and cloud saves** in Settings is where you sign in with your email or make an account; "Sign in to keep your saves on every device" at the bottom of the Load card opens it too. Once you are signed in, the card shows a status line ("Up to date", "3 saves waiting to upload", "Offline, will sync when connected", "Storage full"), how much of your storage you use, and your devices, each with Sign out. The saves you made on other devices show in Load marked "from Steam Deck" and the like, and come down when you open one. Deleting a save in Load deletes it in the cloud too. You can play without an account. Steam, Apple and Google sign-in come later.
 
+- **Share** sits beside Load and Delete when you open a save in Load, and **Share this campaign** is in the game menu. See Sharing saves with the community below.
+- **Open a shared save** at the bottom of the Load card takes the code of a save someone shared.
+
 On the web, saves are kept in your browser's storage on this device.
+
+## Sharing saves with the community
+
+Share a campaign so other players can play it: to show off a campaign, to ask for help with one that went wrong, or to report something that broke. It needs your account, because the save is posted to the community on the website as you.
+
+- **The Share sheet** holds the title (your save's name, which you can change), a short note if you want one, and what it is for: **Show my campaign** (posts to Strategy and campaign stories), **Help me with this** (posts to *Saves to try*, where others take over a stuck campaign) or **Something broke** (posts to Bug reports). Then **Post to the community**. The sheet then says "Shared. Your topic is on the community." with **Copy link**, **Share link** (your phone's share sheet) and **Open the topic**.
+- **On the website** the topic shows the save's card above your post: its map crop, title, realm, date, week, play time and game version, the share code, **Play this save** (opens the game in your browser) and **Download** (the `.phsave` file).
+- **Playing someone's save** starts a new campaign of your own: it never mixes with the author's saves, it joins your Manual saves, and its line in Load says "From Leroy's campaign". Type the code under Load → **Open a shared save**, or tap Play this save on the website.
+- **Sharing back.** When you share a campaign you took over this way, **Reply in the original topic** is the first choice: your save goes up as a reply with its own card, so a topic becomes a chain of saves people pass along.
+- **Fair and safe.** A shared ironman save opens as a normal campaign and earns no achievements. A locked country asks for the unlock as with any save, and a save from a newer version asks you to update the game. The server checks the file like any upload, and the shared copy drops your device name; nothing else in a save is personal. Shared saves don't count toward your cloud storage; you can keep up to 50. Deleting a save in Load leaves its shared copy; **Remove** takes it away, and moderators can hide a topic like any other.
+- **What you shared** is listed under **Shared saves** on the Account and cloud saves card, and on your page on the community, each with how many times it was played and Remove.
+
+Later: share links that open the phone and desktop apps directly, attaching an exported `.phsave` to a new topic on the website, and a note on saves that need Steam Workshop mods.
 
 ## How it works
 
@@ -234,6 +250,6 @@ The budgets are targets for a low-end Android phone, still to be confirmed by th
 
 ## For developers
 
-- Spec: [`domain/saves/spec.md`](https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/saves/spec.md), requirement code **SAVE** (SAVE-001 to SAVE-104).
-- Features: `domain/saves/features/` (save-kinds-and-continue, saving-by-hand, resume-and-orders-journal, safe-writing, save-file-format, migrations, cloud-sync, backups-export-import, free-tier-saves, ironman, integrity-and-testing).
+- Spec: [`domain/saves/spec.md`](https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/saves/spec.md), requirement code **SAVE** (SAVE-001 to SAVE-139).
+- Features: `domain/saves/features/` (save-kinds-and-continue, saving-by-hand, resume-and-orders-journal, safe-writing, save-file-format, migrations, cloud-sync, backups-export-import, free-tier-saves, ironman, integrity-and-testing, sign-in, shared-saves).
 - Code: `packages/engine/src/domain/saves/`. The engine core has `packages/engine/src/protocol.ts` (`newGame` with seed and nation only, `endTurn` with orders) and `hashWorld` in `packages/engine/src/hash.ts`; the save and load requests are still to be added. Test saves go in `packages/engine/test/saves/`.

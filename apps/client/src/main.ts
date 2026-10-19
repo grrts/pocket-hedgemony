@@ -125,7 +125,7 @@ import { formName } from "@ph/engine/domain/government";
 import { PICKER_REGIONS, pickerRegions, startTrade, waysToGrow } from "@ph/engine/domain/scenario-setup";
 import { pickerCardHtml, regionListHtml, regionSelectHtml, strongIn, strongInWords, waysToGrowHtml } from "./ui/realmPicker.ts";
 import { BATTLE_STEP_MS, bannerAt, COUNTRY_CARD_TABS, endTurnInAuto, endTurnLabel, keyEndsTurn, newAutoTurns, realmOverview, REALM_BOOK_TABS, sectionOf, SHELL as SHELL_RULES, startColumn, startIcons, stopAuto, switchAuto, tabHolds, WATCH_STEP_MS, weekPlayed, type AutoStop, type OverviewTile, type Platform as ShellPlatform } from "@ph/engine/domain/game-shell";
-import { autosaveDue, continueTarget, longDate, newCampaign, newManualSave, saveStart, savesConfig, type Campaign, type Platform as SavePlatform } from "@ph/engine/domain/saves";
+import { autosaveDue, continueTarget, longDate, newCampaign, newManualSave, saveStart, savesConfig, sharedFromLine, type Campaign, type Platform as SavePlatform } from "@ph/engine/domain/saves";
 import { SaveStore, type StoredSave } from "./saves/store.ts";
 import { animationsPref, autosaveEvery, autosavesKept, battleStepMs, batteryOn, dayMs, lensPatternsOn, livingPrefs, longPressMs, mapDetail, mapPower, onPrefs, setPref, textZoom, visionPref } from "./settings/prefs.ts";
 import { bandPattern, lensRamp, lensSet, nationColours, PATTERN_COUNT, patternCss, rgbHex, shown, visionIndex, type Vision } from "./map/colourVision.ts";
@@ -133,6 +133,7 @@ import { openSettingsAt, renderSettings, setHintsRows, setOwnSection } from "./u
 import { CloudApi, CloudError, cloudBase, webKeyValue, webTokenStore } from "./cloud/api.ts";
 import { CLOUD_PATH, CloudSync } from "./cloud/sync.ts";
 import { accountHtml, accountView, bindAccount, loadCard } from "./cloud/accountCard.ts";
+import { bindShareSheet, fetchSharedCopy, openError, shareSheetHtml, shareView, type ShareView } from "./cloud/share.ts";
 
 const rules = loadDefaultRuleset();
 // ?engine=main-thread forces the fallback path, for testing it.
@@ -7773,9 +7774,13 @@ if (cloud) {
 /** The saves the Load card and Continue list: this device's, and those in the cloud from other devices. */
 const listedSaves = (): StoredSave[] => (cloud ? [...savesList, ...cloud.remote(savesList)] : savesList);
 
-type ShellView = "menu" | "save" | "load" | "settings";
+type ShellView = "menu" | "save" | "load" | "settings" | "share";
 /** What the overlay shows, where it was opened from, and the card's own open line or question. */
 const shell: { view: ShellView | null; fromStart: boolean; open: string; confirm: string; busy: boolean; note: string; name: string } = { view: null, fromStart: false, open: "", confirm: "", busy: false, note: "", name: "" };
+/** The Share sheet's save and choices, and the card it was opened from (SAVE-133). */
+let sharing: { view: ShareView; from: "load" | "menu" } | undefined;
+/** Open a shared save on the Load card: the code typed so far, once the player asked for the field (SAVE-132). */
+const openShared = { shown: false, code: "" };
 
 const nationNameOf = (id: string) => nations[nationIndex.get(id) ?? -1]?.name ?? id;
 const flagOfId = (id: string) => nations[nationIndex.get(id) ?? -1];
@@ -8020,7 +8025,8 @@ function closeShell(): void {
 
 /** Back from a card goes to the game menu it was opened from, or closes (SHELL-067). */
 function backFromCard(): void {
-  if (shell.fromStart || !snapshot) closeShell();
+  if (shell.view === "share") backFromShare();
+  else if (shell.fromStart || !snapshot) closeShell();
   else openShell("menu", false);
 }
 
@@ -8031,10 +8037,20 @@ function renderShell(): void {
     renderSettings(overlay, backFromCard);
     return;
   }
-  overlay.innerHTML = shell.view === "menu" ? gameMenuHtml() : shell.view === "save" ? saveCardHtml() : loadCardHtml();
-  overlay.querySelector(".close")?.addEventListener("click", shell.view === "menu" ? closeShell : backFromCard);
+  overlay.innerHTML = shell.view === "menu" ? gameMenuHtml() : shell.view === "save" ? saveCardHtml() : shell.view === "share" ? shareCardHtml() : loadCardHtml();
+  overlay.querySelector(".close")?.addEventListener("click", shell.view === "menu" ? closeShell : shell.view === "share" ? backFromShare : backFromCard);
   if (shell.view === "save") bindSaveCard();
   if (shell.view === "load") bindLoadCard();
+  if (shell.view === "share" && sharing && cloud) {
+    bindShareSheet(overlay, sharing.view, {
+      api: cloud.api,
+      read: readForShare,
+      realm: nationNameOf,
+      redraw: () => {
+        if (shell.view === "share") renderShell();
+      },
+    });
+  }
 }
 
 const back = () => `<span class="panel-buttons"><button class="close" aria-label="${shell.fromStart || shell.view === "menu" ? "Close" : "Back to the game menu"}">${icon("close", 2)}</button></span>`;
@@ -8050,6 +8066,7 @@ function gameMenuHtml(): string {
       <button class="wax" data-shell="map">${icon("map", 2)} Return to the map</button>
       <button class="paper" data-shell="save">${icon("scroll", 2)} Save</button>
       <button class="paper" data-shell="load">${icon("scroll", 2)} Load</button>
+      ${cloud ? `<button class="paper" data-share-campaign${playing ? " disabled" : ""}>${icon("swords", 2)} Share this campaign</button>` : ""}
       <button class="paper" data-shell="settings">${icon("cog", 2)} Settings</button>
       <button class="paper" data-shell="achievements">${icon("trophy", 2)} Achievements${unseen(achProfile) ? ` <small>${unseen(achProfile)} new</small>` : ""}</button>
       <button class="paper" data-shell="exit">${icon("castle", 2)} Exit to main menu</button>
@@ -8071,7 +8088,7 @@ function saveLine(e: StoredSave, mark = ""): string {
   const h = e.header;
   const n = flagOfId(h.playerNation);
   return `<span class="save-thumb">${h.thumbnail ? `<img src="data:image/png;base64,${h.thumbnail}" alt="">` : icon("scroll", 2)}</span>
-    <span class="save-text"><b>${n ? pennant(n, 1) : ""}${esc(h.name)}</b><small>${mark ? `<em class="mark">${esc(mark)}</em> · ` : ""}${esc(nationNameOf(h.playerNation))} · ${esc(longDate(h.date))} · saved ${esc(savedAgo(h.savedAt))}${h.device !== DEVICE ? ` · from ${esc(h.device)}` : ""}</small></span>`;
+    <span class="save-text"><b>${n ? pennant(n, 1) : ""}${esc(h.name)}</b><small>${mark ? `<em class="mark">${esc(mark)}</em> · ` : ""}${esc(nationNameOf(h.playerNation))} · ${esc(longDate(h.date))} · saved ${esc(savedAgo(h.savedAt))}${h.device !== DEVICE ? ` · from ${esc(h.device)}` : ""}${h.sharedFrom ? ` · ${esc(sharedFromLine(h))}` : ""}</small></span>`;
 }
 
 /** The Save card (SAVE-106). */
@@ -8175,10 +8192,17 @@ function loadCardHtml(): string {
               ? `<span class="save-act ask"><b>Leave ${esc(snapshot ? dateText(snapshot.date) : "")} unsaved?</b><button class="wax" data-save-first="${esc(e.path)}">Save first</button><button class="paper" data-leave="${esc(e.path)}">Leave</button><button class="paper" data-cancel>Cancel</button></span>`
               : shell.confirm === `modified ${e.path}`
                 ? `<span class="save-act ask"><b>This save does not match its check and may have been edited.</b><button class="wax" data-accept="${esc(e.path)}">Open anyway</button><button class="paper" data-cancel>Cancel</button></span>`
-                : `<span class="save-act"><button class="wax" data-load="${esc(e.path)}"${shell.busy ? " disabled" : ""}>Load</button>${e.header.kind === "resume" ? "" : `<button class="paper" data-ask-delete="${esc(e.path)}">Delete</button>`}</span>`;
+                : `<span class="save-act"><button class="wax" data-load="${esc(e.path)}"${shell.busy ? " disabled" : ""}>Load</button>${cloud ? `<button class="paper" data-share="${esc(e.path)}">Share</button>` : ""}${e.header.kind === "resume" ? "" : `<button class="paper" data-ask-delete="${esc(e.path)}">Delete</button>`}</span>`;
         return `<li class="save-row${open ? " open" : ""}"><button class="save-pick" data-pick="${esc(e.path)}" aria-expanded="${open}">${saveLine(e, mark)}</button>${acts}</li>`;
       })
       .join("")}</ul>
+    ${
+      !cloud
+        ? ""
+        : openShared.shown
+          ? `<form class="open-shared"><label><span>Code of the shared save</span><input name="code" maxlength="12" value="${esc(openShared.code)}" placeholder="K7QX-M2PA" autocomplete="off" autocapitalize="characters" spellcheck="false"></label><button class="wax" type="submit"${shell.busy ? " disabled" : ""}>Open</button></form>`
+          : `<button class="paper cloud-invite" data-open-shared>Open a shared save</button>`
+    }
     ${cloud && !cloud.api.signedIn ? `<button class="paper cloud-invite" data-shell="settings" data-settings-section="account">Sign in to keep your saves on every device</button>` : ""}
   </div>`;
 }
@@ -8225,6 +8249,22 @@ function bindLoadCard(): void {
     }),
   );
   on("[data-accept]", (path) => void loadSave(path, true));
+  on("[data-share]", (path) => {
+    const e = listedSaves().find((x) => x.path === path);
+    if (e) openShare(e, "load");
+  });
+  overlay.querySelector("[data-open-shared]")?.addEventListener("click", () => {
+    openShared.shown = true;
+    renderShell();
+    overlay.querySelector<HTMLInputElement>(".open-shared input")?.focus();
+  });
+  const codeForm = overlay.querySelector<HTMLFormElement>(".open-shared");
+  const codeInput = codeForm?.querySelector<HTMLInputElement>("input");
+  codeInput?.addEventListener("input", () => (openShared.code = codeInput.value));
+  codeForm?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    void playShared(openShared.code);
+  });
   overlay.querySelector("[data-cancel]")?.addEventListener("click", () => {
     shell.confirm = "";
     renderShell();
@@ -8304,11 +8344,91 @@ async function loadSave(path: string, acceptModified = false, keepCurrent = true
   }
   mapSent = true;
   const h = e.header;
-  campaign = { campaignId: h.campaignId, playerNation: h.playerNation, nationName: nationNameOf(h.playerNation), ironman: h.ironman, options: h.options, modified: h.modified || acceptModified, playSeconds: h.playSeconds };
+  campaign = { campaignId: h.campaignId, playerNation: h.playerNation, nationName: nationNameOf(h.playerNation), ironman: h.ironman, options: h.options, modified: h.modified || acceptModified, playSeconds: h.playSeconds, ...(h.sharedFrom ? { sharedFrom: h.sharedFrom } : {}) };
   closeShell();
   enterGame(r.snapshot);
   // Loading an earlier point makes it where the player left off.
   if (h.kind !== "resume") void writeGameSave("resume");
+}
+
+// ---- sharing saves with the community (domain/saves SAVE-124 … SAVE-136) ----
+
+/** Opens the Share sheet for one save, from the Load card or the game menu. */
+function openShare(e: StoredSave, from: "load" | "menu"): void {
+  openShell("share", shell.fromStart);
+  sharing = { view: shareView(e.path, e.header), from };
+  renderShell();
+}
+
+/** Back from the Share sheet goes to the card it was opened from. */
+function backFromShare(): void {
+  const from = sharing?.from ?? "load";
+  sharing = undefined;
+  if (from === "menu" && snapshot) openShell("menu", false);
+  else openShell("load", shell.fromStart);
+}
+
+/** A save's bytes for sharing; one in the cloud only comes down first. */
+async function readForShare(path: string): Promise<Uint8Array | undefined> {
+  if (path.startsWith(CLOUD_PATH) && cloud) {
+    const entry = await cloud.download(path.slice(CLOUD_PATH.length));
+    await refreshSaves();
+    if (sharing) sharing.view.path = entry.path;
+    return saveStore.read(entry.path);
+  }
+  return saveStore.read(path);
+}
+
+/** Share this campaign, in the game menu: where the player is now, the campaign's newest Resume save (SAVE-132). */
+async function shareCampaign(): Promise<void> {
+  if (!campaign || playing) return;
+  if (changedSinceResume) await writeGameSave("resume");
+  await refreshSaves();
+  const e = savesList.find((x) => x.header.campaignId === campaign!.campaignId && (x.header.kind === "resume" || x.header.kind === "ironman"));
+  if (e) openShare(e, "menu");
+}
+
+/**
+ * Plays a shared save (SAVE-128, SAVE-129): it comes down and becomes a new
+ * campaign of the player's own, kept as a Manual save, and opens like any
+ * other save, with the nation lock and the version check.
+ */
+async function playShared(typed: string): Promise<void> {
+  if (!cloud || shell.busy) return;
+  if (shell.view !== "load") openShell("load");
+  shell.busy = true;
+  shell.note = "";
+  renderShell();
+  try {
+    const copy = await fetchSharedCopy(cloud.api, typed, { rng: new Rng(Date.now() >>> 0), now: Date.now(), device: DEVICE, platform: savePlatform });
+    await saveStore.commit(copy.path, copy.bytes, []);
+    await refreshSaves();
+    cloud.saved(copy.path);
+    void cloud.run("after_save");
+    shell.busy = false;
+    openShared.shown = false;
+    openShared.code = "";
+    await loadSave(copy.path);
+  } catch (e) {
+    shell.busy = false;
+    shell.note = openError(e);
+    renderShell();
+  }
+}
+
+document.addEventListener("click", (e) => {
+  const b = (e.target as HTMLElement).closest<HTMLButtonElement>("[data-share-campaign]");
+  if (b && !b.disabled) void shareCampaign();
+});
+
+/** The Share sheet over the dimmed map, for a save from the Load card or for this campaign (SAVE-133). */
+function shareCardHtml(): string {
+  const v = sharing?.view;
+  return `<div class="shell-card saves framed" role="dialog" aria-label="Share with the community">
+    <header><h2 class="ribbon">Share with the community</h2><span class="panel-buttons"><button class="close" aria-label="Back">${icon("close", 2)}</button></span></header>
+    ${v ? `<p class="hint">${esc(v.header.name)} · ${esc(nationNameOf(v.header.playerNation))} · ${esc(longDate(v.header.date))}</p>` : ""}
+    ${v && cloud ? shareSheetHtml(v, { signedIn: cloud.api.signedIn, systemShare: typeof navigator.share === "function" }) : ""}
+  </div>`;
 }
 
 /** Exit to main menu: where the player left off is kept, and the start screen offers Continue (SAVE-109). */
@@ -8384,6 +8504,15 @@ void refreshSaves().then(() => {
   if (!snapshot) renderPanel();
   // What other devices saved since the last launch, then this device's waiting uploads (SAVE-064, SAVE-065).
   void cloud?.run("launch");
+  // Play this save on the website opens the game with the share code (D-SAVE-19).
+  const sharedCode = startParams.get("shared");
+  if (sharedCode && cloud) {
+    const rest = new URLSearchParams(location.search);
+    rest.delete("shared");
+    history.replaceState(null, "", location.pathname + (rest.size ? `?${rest}` : "") + location.hash);
+    hideStart();
+    void playShared(sharedCode);
+  }
 });
 
 // Hooks for the scripted play-throughs (scripts/war-shots.mjs).

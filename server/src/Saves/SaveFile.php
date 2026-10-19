@@ -68,6 +68,32 @@ final class SaveFile
     }
 
     /**
+     * The same file with another header (a shared copy without its device name, SAVE-125):
+     * the chunks are kept byte for byte and the chunk table's offsets moved by the change in
+     * the header's length. `$bytes` must have passed parse().
+     *
+     * @param array<string, mixed> $header
+     */
+    public static function withHeader(string $bytes, array $header): string
+    {
+        $oldLength = unpack('V', $bytes, 6)[1];
+        $json = json_encode($header, \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE | \JSON_THROW_ON_ERROR);
+        $shift = \strlen($json) - $oldLength;
+        $p = 10 + $oldLength;
+        $count = unpack('v', $bytes, $p)[1];
+        $table = pack('v', $count);
+        $p += 2;
+        for ($i = 0; $i < $count; ++$i) {
+            $idLength = \ord($bytes[$p]);
+            ['version' => $version, 'offset' => $offset, 'length' => $length, 'crc' => $crc] = unpack('vversion/Voffset/Vlength/Vcrc', $bytes, $p + 1 + $idLength);
+            $table .= substr($bytes, $p, 1 + $idLength).pack('vVVV', $version, $offset + $shift, $length, $crc);
+            $p += 1 + $idLength + 14;
+        }
+
+        return substr($bytes, 0, 6).pack('V', \strlen($json)).$json.$table.substr($bytes, $p);
+    }
+
+    /**
      * The header fields the Save table keeps (SAVE-061), checked for their types.
      *
      * @return array{saveId: string, campaignId: string, kind: string, name: string, savedAt: int, device: string, platform: string, gameVersion: string, formatVersion: int, turn: int, year: int, month: int, nation: string, ironman: bool, parent: ?string}
