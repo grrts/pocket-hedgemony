@@ -14,6 +14,7 @@ import { STEPS_PER_DAY, hemisphereOf, isWetSeason, seasonOf, turnSpan, type Cale
 export * from "./layout.ts";
 export * from "./livingMap.ts";
 export * from "./onMap.ts";
+export * from "./effects.ts";
 
 // ---------------------------------------------------------------------------
 // Zoom levels and rendering (VIEW-001..006, INV-VIEW-2)

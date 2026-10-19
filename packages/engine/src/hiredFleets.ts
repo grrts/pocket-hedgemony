@@ -222,7 +222,7 @@ export function hireFleet(world: World, n: number, o: { free?: number; lent?: nu
   if (why) return why;
   const v = world.navy;
   world.nationTreasury[n] = world.nationTreasury[n]! - x.pay;
-  const captain = addCommander(world, n, wf.newCommander(x.captain, { ...x.skills, origin: "a hired captain" }));
+  const captain = addCommander(world, n, wf.newCommander(x.captain, { ...x.skills, origin: "a hired captain" }), undefined, true);
   let f: NavyFleet;
   if (x.free >= 0) {
     v.forHire = v.forHire.filter((y) => y.id !== x.free);

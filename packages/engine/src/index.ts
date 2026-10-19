@@ -11,7 +11,7 @@ export { cededProvinces, fittingAim, longWar, lordTraits, lordWant, maxCeded, pe
 export { hashWorld } from "./hash.ts";
 export { cultureOf, officialName, personName, rankedName } from "./names.ts";
 export { autoFillReserve, bestFit, hireGold, newLands, officialEffect, OFFICIALS, yearsServed, type OfficialEffectView, type PostFit } from "./officials.ts";
-export { aiCollect, aiRecruits, ARMS, COMMISSION_GOLD, commanderScreen, commissionOfficial, type CommanderScreen, FOOT_ARMS, HORSE_ARMS, KIND, KIND_NAMES, LEVY_UNIT, garrisonTroops, garrisonView, gatherDays, idleCommanders, isHorseArm, menByArm, monthlyRecruits, recruit, recruitRefusal, trainingGround, type GarrisonView } from "./recruit.ts";
+export { aiCollect, aiRecruits, ARMS, COMMISSION_GOLD, commanderScreen, commissionOfficial, commissionSkills, isAdmiral, type CommanderScreen, FOOT_ARMS, HORSE_ARMS, KIND, KIND_NAMES, LEVY_UNIT, garrisonTroops, garrisonView, gatherDays, idleCommanders, isHorseArm, menByArm, monthlyRecruits, recruit, recruitRefusal, trainingGround, type GarrisonView } from "./recruit.ts";
 export { CLASS_NAMES, CLASS_COUNT } from "./living.ts";
 export { catchChance, crowding, PLAGUE_STEPS, plagueDeaths, quarantineTaxFactor, setQuarantine, sickProvinces, spared, startOutbreak, weeklyPlague } from "./plague.ts";
 export { NOT_YET as ACHIEVEMENTS_NOT_YET, type Unlock as AchievementUnlock } from "./achievements.ts";
@@ -63,6 +63,8 @@ export { aiWaitsToFound, answerLandAsk, askForLand, claimGround, colonyStarts, f
 export { refillHere } from "./turn.ts";
 export { setForm } from "./government.ts";
 export { inAnyWar } from "./lords.ts";
+export { lordLands } from "./lords.ts";
+export { assassinate, assassinChance, assassinationGold, whyNotAssassinate } from "./assassination.ts";
 export { ungoverned } from "./recruit.ts";
 export { restoreSleeping, saveSleeping, spareSleepers, wakeRealm, type Waking, type WokenRealm } from "./sleeping.ts";
 export { createGoals, goalPulls, monthlyGoals, nearestLand, pullOf, timeFactor, type Goal, type GoalState } from "./goals.ts";

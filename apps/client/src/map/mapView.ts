@@ -96,6 +96,15 @@ export class MapView {
 
   readonly maxZoom = 40;
 
+  /** The view's size in CSS pixels, as last measured. */
+  get width(): number {
+    return this.viewW;
+  }
+
+  get height(): number {
+    return this.viewH;
+  }
+
   invalidate(): void {
     this.dirty = true;
   }

@@ -190,7 +190,7 @@ function leaderSection(f: FleetView, o: { admiralName: (c: number) => string; id
       ${o.idle.slice(0, 3).map((c) => `<button class="paper" data-fleet-admiral="${c.id}" title="${esc(c.skills)}">${f.admiral >= 0 ? "Hand over to" : "Appoint"} ${esc(c.name)}</button>`).join("")}
       ${f.admiral >= 0 ? `<button class="paper" data-fleet-admiral="-1">Send ${esc(o.admiralName(f.admiral))} back to court</button>` : ""}
       ${!f.needsAdmiral && f.admiral < 0 ? `<p class="hint">Explorers sail without one; a leader takes them in hand if war finds them.</p>` : ""}
-      ${!o.idle.length && f.admiral < 0 && f.needsAdmiral ? `<p class="hint">No commander waits at court. Commission an official as one first.</p><button class="paper" data-realm="${o.me}" data-realm-open="officials">Officials</button>` : ""}
+      ${!o.idle.length && f.admiral < 0 && f.needsAdmiral ? `<p class="hint">No admiral waits at court. Commission an official as admiral first.</p><button class="paper" data-realm="${o.me}" data-realm-open="officials">Officials</button>` : ""}
     </div>`;
 }
 
