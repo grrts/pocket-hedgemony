@@ -144,7 +144,7 @@ export function createGameEvents(world: World): GameEvents {
   // Whether a realm is a head's patron (RELG-154).
   state.conditions.faith_head_patron = (p, _w, ctx) => evt.resolve(p.who, ctx).some((id) => isHeadPatron(world, String(p.head), g.nationOf.get(id) ?? -1));
   // A historical figure comes to a realm as its lord (REALM-295): the tree reports it, the game seats him.
-  state.effects = { historical_lord: (p, _w, ctx, out) => evt.resolve(p.on, ctx).forEach((on) => out.push({ type: "historical_lord", target: on, values: { id: p.id } })) };
+  state.effects.historical_lord = (p, _w, ctx, out) => evt.resolve(p.on, ctx).forEach((on) => out.push({ type: "historical_lord", target: on, values: { id: p.id } }));
   sync(world, g);
   evt.yearlyAgeCheck(state, world.date.year);
   evt.periodCheck(state, world.date.year);
