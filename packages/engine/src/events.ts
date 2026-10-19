@@ -4,6 +4,7 @@ import rules from "../../rules/data/domain/events.json" with { type: "json" };
 import geography from "../../rules/data/domain/exploration-regions.json" with { type: "json" };
 import west from "../../rules/data/domain/events-bridge-west.json" with { type: "json" };
 import lordEvents from "../../rules/data/domain/events-bridge-lords.json" with { type: "json" };
+import sequels from "../../rules/data/domain/events-ambitions.json" with { type: "json" };
 import * as evt from "./domain/events/index.ts";
 import * as dip from "./domain/diplomacy/index.ts";
 import * as subj from "./domain/subjects/index.ts";
@@ -18,6 +19,7 @@ import { traitLean } from "./rulers.ts";
 import { faithOf, headEventChosen, isHeadPatron, setHeadPatron } from "./faithHeads.ts";
 import { spark } from "./rebels.ts";
 import { historicalLordComes, laterLord } from "./lords.ts";
+import { heritageStates } from "./domain/national-strengths/index.ts";
 
 /**
  * Milestone 6, history (first slice): the 1444 event tree fires in the game.
@@ -34,12 +36,14 @@ type Campaign = Pick<evt.Tree, "ages" | "periods" | "events" | "modifiers" | "lo
 /** A region's bridge events of 1378 to 1444, with the places, names and words they bring (EVT-085). */
 type Bridge = { events: Record<string, evt.EventDef>; places: Record<string, string[]>; entities: Record<string, string>; localization: Record<string, string> };
 const BRIDGES = [west, lordEvents] as unknown as Bridge[];
+/** Events that follow a realm's fulfilled ambition (HER-093). */
+const SEQUELS = sequels as unknown as Pick<Bridge, "events" | "localization">;
 const base = campaign as unknown as Campaign;
 const data: Campaign = {
   ...base,
-  events: Object.assign({}, base.events, ...BRIDGES.map((b) => b.events)),
+  events: Object.assign({}, base.events, ...BRIDGES.map((b) => b.events), SEQUELS.events),
   entities: Object.assign({}, base.entities, ...BRIDGES.map((b) => b.entities)),
-  localization: Object.assign({}, base.localization, ...BRIDGES.map((b) => b.localization)),
+  localization: Object.assign({}, base.localization, ...BRIDGES.map((b) => b.localization), SEQUELS.localization),
 };
 /** The bridge events' ids, which a later start counts as history (EVT-087). */
 const BRIDGE_EVENTS = new Set(BRIDGES.flatMap((b) => Object.keys(b.events)).filter((id) => !(id in base.events)));
@@ -150,6 +154,12 @@ export function createGameEvents(world: World): GameEvents {
   state.conditions.faith_head_patron = (p, _w, ctx) => evt.resolve(p.who, ctx).some((id) => isHeadPatron(world, String(p.head), g.nationOf.get(id) ?? -1));
   // A historical figure comes to a realm as its lord (REALM-295): the tree reports it, the game seats him.
   state.effects.historical_lord = (p, _w, ctx, out) => evt.resolve(p.on, ctx).forEach((on) => out.push({ type: "historical_lord", target: on, values: { id: p.id } }));
+  // A realm's heritage item in a state, such as an ambition done (HER-093); heritage is made after events, so it is read when asked.
+  state.conditions.heritage = (p, _w, ctx) =>
+    evt.resolve(p.who, ctx).some((id) => {
+      const h = world.heritage?.realms[g.nationOf.get(id) ?? -1];
+      return !!h && heritageStates(h, String(p.id)).includes(String(p.state));
+    });
   sync(world, g);
   evt.yearlyAgeCheck(state, world.date.year);
   evt.periodCheck(state, world.date.year);

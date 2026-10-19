@@ -1,0 +1,4437 @@
+{
+  "$comment": "Ambition sequels: historical-tree events that fire only after a realm has fulfilled one of its ambitions (national-strengths spec 5.4, HER-019). Each trigger holds the leaf {heritage: {who: <tree id>, id: <ambition id>, state: done}}, which the game answers true once that realm has marked that ambition done; ambition ids are realms.<map id>.heritage.ambitions[].id in national-strengths-realms.json, realms are named by their event-tree ids (events-places.json aliases). Same event shape as events-campaign.json; effects use only what the bridge (packages/engine/src/events.ts) lands or the tree keeps: treasury and debt, stability, legitimacy, tech tracks, prestige and the tree's existing modifiers.",
+  "events": {
+    "amb_casa_da_india": {
+      "id": "amb_casa_da_india",
+      "name": "The Casa da Índia",
+      "ages": [
+        "age_of_exploration",
+        "age_of_gunpowder_empires"
+      ],
+      "periods": [],
+      "regions": [
+        "europe",
+        "south_asia"
+      ],
+      "importance": "major",
+      "roles": {
+        "realm": {
+          "historical": [
+            "portugal"
+          ],
+          "select": "fixed",
+          "as": [
+            "initiator",
+            "beneficiary"
+          ]
+        }
+      },
+      "availability": {
+        "earliest": 1444,
+        "latest": null,
+        "mode": "reference",
+        "repeat": "one_time"
+      },
+      "trigger": {
+        "all": [
+          {
+            "exists": "portugal"
+          },
+          {
+            "heritage": {
+              "who": "portugal",
+              "id": "portugal_beyond_the_cape",
+              "state": "done"
+            }
+          }
+        ]
+      },
+      "invalidated_if": {
+        "not": {
+          "exists": "portugal"
+        }
+      },
+      "selection": {
+        "mode": "pool",
+        "mean_years": 3
+      },
+      "options": [
+        {
+          "id": "crown_monopoly",
+          "chooser": "$realm",
+          "historical": true,
+          "ai": {
+            "base": 70
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "+15%"
+                }
+              },
+              {
+                "on": "$realm",
+                "modifier": "colonial_revenue"
+              }
+            ]
+          }
+        },
+        {
+          "id": "licensed_merchants",
+          "chooser": "$realm",
+          "ai": {
+            "base": 30
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "+5%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "stability": 1
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "effects": {},
+      "history": {
+        "date": [
+          1500,
+          1509
+        ]
+      }
+    },
+    "amb_gold_of_mina_minted": {
+      "id": "amb_gold_of_mina_minted",
+      "name": "Mina gold at the Lisbon mint",
+      "ages": [
+        "age_of_exploration",
+        "age_of_gunpowder_empires"
+      ],
+      "periods": [],
+      "regions": [
+        "europe",
+        "sub_saharan_africa"
+      ],
+      "importance": "regional",
+      "roles": {
+        "realm": {
+          "historical": [
+            "portugal"
+          ],
+          "select": "fixed",
+          "as": [
+            "initiator",
+            "beneficiary"
+          ]
+        }
+      },
+      "availability": {
+        "earliest": 1444,
+        "latest": null,
+        "mode": "reference",
+        "repeat": "one_time"
+      },
+      "trigger": {
+        "all": [
+          {
+            "exists": "portugal"
+          },
+          {
+            "heritage": {
+              "who": "portugal",
+              "id": "portugal_gold_of_mina",
+              "state": "done"
+            }
+          }
+        ]
+      },
+      "invalidated_if": {
+        "not": {
+          "exists": "portugal"
+        }
+      },
+      "selection": {
+        "mode": "pool",
+        "mean_years": 2
+      },
+      "options": [
+        {
+          "id": "strike_cruzados",
+          "chooser": "$realm",
+          "historical": true,
+          "ai": {
+            "base": 60
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "+15%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "prestige": 5
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "pay_creditors",
+          "chooser": "$realm",
+          "ai": {
+            "base": 25
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "debt": "-30%"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "fund_voyages",
+          "chooser": "$realm",
+          "ai": {
+            "base": 15
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "+5%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "prestige": 10
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "effects": {},
+      "history": {
+        "date": [
+          1482,
+          1490
+        ]
+      }
+    },
+    "amb_governor_general_of_brazil": {
+      "id": "amb_governor_general_of_brazil",
+      "name": "A governor-general for Brazil",
+      "ages": [
+        "age_of_atlantic_empires",
+        "age_of_exploration"
+      ],
+      "periods": [],
+      "regions": [
+        "south_america",
+        "europe"
+      ],
+      "importance": "regional",
+      "roles": {
+        "realm": {
+          "historical": [
+            "portugal"
+          ],
+          "select": "fixed",
+          "as": [
+            "initiator",
+            "beneficiary"
+          ]
+        }
+      },
+      "availability": {
+        "earliest": 1490,
+        "latest": null,
+        "mode": "reference",
+        "repeat": "one_time"
+      },
+      "trigger": {
+        "all": [
+          {
+            "exists": "portugal"
+          },
+          {
+            "heritage": {
+              "who": "portugal",
+              "id": "portugal_land_of_the_true_cross",
+              "state": "done"
+            }
+          }
+        ]
+      },
+      "invalidated_if": {
+        "not": {
+          "exists": "portugal"
+        }
+      },
+      "selection": {
+        "mode": "pool",
+        "mean_years": 4
+      },
+      "options": [
+        {
+          "id": "royal_capital",
+          "chooser": "$realm",
+          "historical": true,
+          "ai": {
+            "base": 65
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "-10%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "legitimacy": 10,
+                  "prestige": 10
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "leave_to_lords",
+          "chooser": "$realm",
+          "ai": {
+            "base": 35
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "+5%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "stability": 1
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "effects": {},
+      "history": {
+        "date": 1549
+      }
+    },
+    "amb_capitulations_of_granada": {
+      "id": "amb_capitulations_of_granada",
+      "name": "The terms of Granada",
+      "ages": [
+        "age_of_gunpowder_empires",
+        "age_of_reformations"
+      ],
+      "periods": [],
+      "regions": [
+        "europe",
+        "north_africa"
+      ],
+      "importance": "major",
+      "roles": {
+        "realm": {
+          "historical": [
+            "castile"
+          ],
+          "select": "fixed",
+          "as": [
+            "initiator",
+            "beneficiary"
+          ]
+        }
+      },
+      "availability": {
+        "earliest": 1444,
+        "latest": null,
+        "mode": "reference",
+        "repeat": "one_time"
+      },
+      "trigger": {
+        "all": [
+          {
+            "exists": "castile"
+          },
+          {
+            "heritage": {
+              "who": "castile",
+              "id": "castile_the_pomegranate",
+              "state": "done"
+            }
+          }
+        ]
+      },
+      "invalidated_if": {
+        "not": {
+          "exists": "castile"
+        }
+      },
+      "selection": {
+        "mode": "pool",
+        "mean_years": 1
+      },
+      "options": [
+        {
+          "id": "keep_the_terms",
+          "chooser": "$realm",
+          "historical": true,
+          "ai": {
+            "base": 55
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "stability": 1
+                }
+              },
+              {
+                "on": "$realm",
+                "modifier": "religious_tolerance_policy",
+                "years": 30
+              }
+            ]
+          }
+        },
+        {
+          "id": "press_for_baptism",
+          "chooser": "$realm",
+          "ai": {
+            "base": 45
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "legitimacy": 10,
+                  "stability": -1,
+                  "prestige": 10
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "effects": {},
+      "history": {
+        "date": [
+          1491,
+          1492
+        ]
+      }
+    },
+    "amb_cortes_of_toledo": {
+      "id": "amb_cortes_of_toledo",
+      "name": "The Cortes of Toledo",
+      "ages": [
+        "age_of_gunpowder_empires"
+      ],
+      "periods": [],
+      "regions": [
+        "europe"
+      ],
+      "importance": "regional",
+      "roles": {
+        "realm": {
+          "historical": [
+            "castile"
+          ],
+          "select": "fixed",
+          "as": [
+            "initiator",
+            "beneficiary"
+          ]
+        }
+      },
+      "availability": {
+        "earliest": 1444,
+        "latest": null,
+        "mode": "reference",
+        "repeat": "one_time"
+      },
+      "trigger": {
+        "all": [
+          {
+            "exists": "castile"
+          },
+          {
+            "heritage": {
+              "who": "castile",
+              "id": "castile_tanto_monta",
+              "state": "done"
+            }
+          }
+        ]
+      },
+      "invalidated_if": {
+        "not": {
+          "exists": "castile"
+        }
+      },
+      "selection": {
+        "mode": "pool",
+        "mean_years": 2
+      },
+      "options": [
+        {
+          "id": "take_back_grants",
+          "chooser": "$realm",
+          "historical": true,
+          "ai": {
+            "base": 60
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "+15%"
+                }
+              },
+              {
+                "on": "$realm",
+                "modifier": "centralizing_reforms"
+              }
+            ]
+          }
+        },
+        {
+          "id": "spare_the_grandees",
+          "chooser": "$realm",
+          "ai": {
+            "base": 40
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "stability": 1,
+                  "legitimacy": 5
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "effects": {},
+      "history": {
+        "date": 1480
+      }
+    },
+    "amb_casa_de_contratacion": {
+      "id": "amb_casa_de_contratacion",
+      "name": "The House of Trade at Seville",
+      "ages": [
+        "age_of_exploration",
+        "age_of_atlantic_empires"
+      ],
+      "periods": [],
+      "regions": [
+        "europe",
+        "caribbean",
+        "central_america"
+      ],
+      "importance": "major",
+      "roles": {
+        "realm": {
+          "historical": [
+            "castile"
+          ],
+          "select": "fixed",
+          "as": [
+            "initiator",
+            "beneficiary"
+          ]
+        }
+      },
+      "availability": {
+        "earliest": 1470,
+        "latest": null,
+        "mode": "reference",
+        "repeat": "one_time"
+      },
+      "trigger": {
+        "all": [
+          {
+            "exists": "castile"
+          },
+          {
+            "heritage": {
+              "who": "castile",
+              "id": "castile_beyond_hierro",
+              "state": "done"
+            }
+          }
+        ]
+      },
+      "invalidated_if": {
+        "not": {
+          "exists": "castile"
+        }
+      },
+      "selection": {
+        "mode": "pool",
+        "mean_years": 3
+      },
+      "options": [
+        {
+          "id": "seville_monopoly",
+          "chooser": "$realm",
+          "historical": true,
+          "ai": {
+            "base": 65
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "+10%"
+                }
+              },
+              {
+                "on": "$realm",
+                "modifier": "colonial_revenue"
+              }
+            ]
+          }
+        },
+        {
+          "id": "open_ports",
+          "chooser": "$realm",
+          "ai": {
+            "base": 35
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "+5%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "stability": 1
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "effects": {},
+      "history": {
+        "date": 1503
+      }
+    },
+    "amb_bonds_of_the_new_king": {
+      "id": "amb_bonds_of_the_new_king",
+      "name": "Bonds of the new king",
+      "ages": [
+        "age_of_gunpowder_empires",
+        "age_of_reformations"
+      ],
+      "periods": [],
+      "regions": [
+        "europe"
+      ],
+      "importance": "regional",
+      "roles": {
+        "realm": {
+          "historical": [
+            "england"
+          ],
+          "select": "fixed",
+          "as": [
+            "initiator",
+            "beneficiary"
+          ]
+        }
+      },
+      "availability": {
+        "earliest": 1444,
+        "latest": null,
+        "mode": "reference",
+        "repeat": "one_time"
+      },
+      "trigger": {
+        "all": [
+          {
+            "exists": "england"
+          },
+          {
+            "heritage": {
+              "who": "england",
+              "id": "england_roses_reconciled",
+              "state": "done"
+            }
+          }
+        ]
+      },
+      "invalidated_if": {
+        "not": {
+          "exists": "england"
+        }
+      },
+      "selection": {
+        "mode": "pool",
+        "mean_years": 3
+      },
+      "options": [
+        {
+          "id": "bonds_and_fines",
+          "chooser": "$realm",
+          "historical": true,
+          "ai": {
+            "base": 60
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "+15%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "legitimacy": -5
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "general_pardon",
+          "chooser": "$realm",
+          "ai": {
+            "base": 40
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "stability": 1,
+                  "legitimacy": 5
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "effects": {},
+      "history": {
+        "date": [
+          1495,
+          1509
+        ]
+      }
+    },
+    "amb_court_of_augmentations": {
+      "id": "amb_court_of_augmentations",
+      "name": "The Court of Augmentations",
+      "ages": [
+        "age_of_reformations"
+      ],
+      "periods": [],
+      "regions": [
+        "europe"
+      ],
+      "importance": "major",
+      "roles": {
+        "realm": {
+          "historical": [
+            "england"
+          ],
+          "select": "fixed",
+          "as": [
+            "initiator",
+            "beneficiary"
+          ]
+        }
+      },
+      "availability": {
+        "earliest": 1500,
+        "latest": null,
+        "mode": "reference",
+        "repeat": "one_time"
+      },
+      "trigger": {
+        "all": [
+          {
+            "exists": "england"
+          },
+          {
+            "heritage": {
+              "who": "england",
+              "id": "england_supreme_head",
+              "state": "done"
+            }
+          }
+        ]
+      },
+      "invalidated_if": {
+        "not": {
+          "exists": "england"
+        }
+      },
+      "selection": {
+        "mode": "pool",
+        "mean_years": 2
+      },
+      "options": [
+        {
+          "id": "sell_abbey_lands",
+          "chooser": "$realm",
+          "historical": true,
+          "ai": {
+            "base": 55
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "+30%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "legitimacy": -5
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "keep_the_rents",
+          "chooser": "$realm",
+          "ai": {
+            "base": 30
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "modifier": "dissolution_of_monasteries"
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "+10%"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "endow_schools",
+          "chooser": "$realm",
+          "ai": {
+            "base": 15
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "+5%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "stability": 1
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "effects": {},
+      "history": {
+        "date": 1536
+      }
+    },
+    "amb_diwani_of_bengal": {
+      "id": "amb_diwani_of_bengal",
+      "name": "The diwani of Bengal",
+      "ages": [
+        "age_of_crisis_and_absolutism"
+      ],
+      "periods": [],
+      "regions": [
+        "south_asia",
+        "europe"
+      ],
+      "importance": "major",
+      "roles": {
+        "realm": {
+          "historical": [
+            "england"
+          ],
+          "select": "fixed",
+          "as": [
+            "initiator",
+            "beneficiary"
+          ]
+        }
+      },
+      "availability": {
+        "earliest": 1600,
+        "latest": null,
+        "mode": "reference",
+        "repeat": "one_time"
+      },
+      "trigger": {
+        "all": [
+          {
+            "exists": "england"
+          },
+          {
+            "heritage": {
+              "who": "england",
+              "id": "england_the_company",
+              "state": "done"
+            }
+          }
+        ]
+      },
+      "invalidated_if": {
+        "not": {
+          "exists": "england"
+        }
+      },
+      "selection": {
+        "mode": "pool",
+        "mean_years": 4
+      },
+      "options": [
+        {
+          "id": "take_the_diwani",
+          "chooser": "$realm",
+          "historical": true,
+          "ai": {
+            "base": 65
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "+20%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "prestige": 15
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "rule_through_nawab",
+          "chooser": "$realm",
+          "ai": {
+            "base": 35
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "stability": 1,
+                  "prestige": 5
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "effects": {},
+      "history": {
+        "date": 1765
+      }
+    },
+    "amb_army_kept_in_peace": {
+      "id": "amb_army_kept_in_peace",
+      "name": "An army kept in peace",
+      "ages": [
+        "age_of_gunpowder_empires"
+      ],
+      "periods": [],
+      "regions": [
+        "europe"
+      ],
+      "importance": "major",
+      "roles": {
+        "realm": {
+          "historical": [
+            "france"
+          ],
+          "select": "fixed",
+          "as": [
+            "initiator",
+            "beneficiary"
+          ]
+        }
+      },
+      "availability": {
+        "earliest": 1444,
+        "latest": null,
+        "mode": "reference",
+        "repeat": "one_time"
+      },
+      "trigger": {
+        "all": [
+          {
+            "exists": "france"
+          },
+          {
+            "heritage": {
+              "who": "france",
+              "id": "france_leopards_leave",
+              "state": "done"
+            }
+          }
+        ]
+      },
+      "invalidated_if": {
+        "not": {
+          "exists": "france"
+        }
+      },
+      "selection": {
+        "mode": "pool",
+        "mean_years": 2
+      },
+      "options": [
+        {
+          "id": "keep_the_companies",
+          "chooser": "$realm",
+          "historical": true,
+          "ai": {
+            "base": 65
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "-10%"
+                }
+              },
+              {
+                "on": "$realm",
+                "modifier": "standing_army_reform"
+              }
+            ]
+          }
+        },
+        {
+          "id": "disband_them",
+          "chooser": "$realm",
+          "ai": {
+            "base": 35
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "+10%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "stability": 1
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "effects": {},
+      "history": {
+        "date": [
+          1445,
+          1453
+        ]
+      }
+    },
+    "amb_parlement_of_dijon": {
+      "id": "amb_parlement_of_dijon",
+      "name": "A parlement at Dijon",
+      "ages": [
+        "age_of_gunpowder_empires"
+      ],
+      "periods": [],
+      "regions": [
+        "europe"
+      ],
+      "importance": "regional",
+      "roles": {
+        "realm": {
+          "historical": [
+            "france"
+          ],
+          "select": "fixed",
+          "as": [
+            "initiator",
+            "beneficiary"
+          ]
+        }
+      },
+      "availability": {
+        "earliest": 1444,
+        "latest": null,
+        "mode": "reference",
+        "repeat": "one_time"
+      },
+      "trigger": {
+        "all": [
+          {
+            "exists": "france"
+          },
+          {
+            "heritage": {
+              "who": "france",
+              "id": "france_dukes_inheritance",
+              "state": "done"
+            }
+          }
+        ]
+      },
+      "invalidated_if": {
+        "not": {
+          "exists": "france"
+        }
+      },
+      "selection": {
+        "mode": "pool",
+        "mean_years": 2
+      },
+      "options": [
+        {
+          "id": "confirm_privileges",
+          "chooser": "$realm",
+          "historical": true,
+          "ai": {
+            "base": 60
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "stability": 1,
+                  "legitimacy": 5
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "rule_by_governors",
+          "chooser": "$realm",
+          "ai": {
+            "base": 40
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "+10%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "stability": -1
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "effects": {},
+      "history": {
+        "date": [
+          1477,
+          1480
+        ]
+      }
+    },
+    "amb_cyprus_sugar": {
+      "id": "amb_cyprus_sugar",
+      "name": "The sugar estates of Cyprus",
+      "ages": [
+        "age_of_gunpowder_empires",
+        "age_of_exploration"
+      ],
+      "periods": [],
+      "regions": [
+        "europe",
+        "middle_east"
+      ],
+      "importance": "regional",
+      "roles": {
+        "realm": {
+          "historical": [
+            "venice"
+          ],
+          "select": "fixed",
+          "as": [
+            "initiator",
+            "beneficiary"
+          ]
+        }
+      },
+      "availability": {
+        "earliest": 1444,
+        "latest": null,
+        "mode": "reference",
+        "repeat": "one_time"
+      },
+      "trigger": {
+        "all": [
+          {
+            "exists": "venice"
+          },
+          {
+            "heritage": {
+              "who": "venice",
+              "id": "venice_queen_caterinas_gift",
+              "state": "done"
+            }
+          }
+        ]
+      },
+      "invalidated_if": {
+        "not": {
+          "exists": "venice"
+        }
+      },
+      "selection": {
+        "mode": "pool",
+        "mean_years": 2
+      },
+      "options": [
+        {
+          "id": "lease_estates",
+          "chooser": "$realm",
+          "historical": true,
+          "ai": {
+            "base": 60
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "+15%"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "garrison_island",
+          "chooser": "$realm",
+          "ai": {
+            "base": 40
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "-5%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "stability": 1,
+                  "prestige": 5
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "effects": {},
+      "history": {
+        "date": 1489
+      }
+    },
+    "amb_morea_resettled": {
+      "id": "amb_morea_resettled",
+      "name": "The Morea resettled",
+      "ages": [
+        "age_of_crisis_and_absolutism"
+      ],
+      "periods": [],
+      "regions": [
+        "europe"
+      ],
+      "importance": "regional",
+      "roles": {
+        "realm": {
+          "historical": [
+            "venice"
+          ],
+          "select": "fixed",
+          "as": [
+            "initiator",
+            "beneficiary"
+          ]
+        }
+      },
+      "availability": {
+        "earliest": 1444,
+        "latest": null,
+        "mode": "reference",
+        "repeat": "one_time"
+      },
+      "trigger": {
+        "all": [
+          {
+            "exists": "venice"
+          },
+          {
+            "heritage": {
+              "who": "venice",
+              "id": "venice_kingdom_of_the_morea",
+              "state": "done"
+            }
+          }
+        ]
+      },
+      "invalidated_if": {
+        "not": {
+          "exists": "venice"
+        }
+      },
+      "selection": {
+        "mode": "pool",
+        "mean_years": 3
+      },
+      "options": [
+        {
+          "id": "census_and_settlers",
+          "chooser": "$realm",
+          "historical": true,
+          "ai": {
+            "base": 55
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "-10%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "legitimacy": 5,
+                  "prestige": 10
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "farm_the_taxes",
+          "chooser": "$realm",
+          "ai": {
+            "base": 45
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "+15%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "stability": -1
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "effects": {},
+      "history": {
+        "date": [
+          1688,
+          1700
+        ]
+      }
+    },
+    "amb_city_repopulated": {
+      "id": "amb_city_repopulated",
+      "name": "The new capital",
+      "ages": [
+        "age_of_gunpowder_empires"
+      ],
+      "periods": [],
+      "regions": [
+        "middle_east",
+        "europe"
+      ],
+      "importance": "major",
+      "roles": {
+        "realm": {
+          "historical": [
+            "ottoman"
+          ],
+          "select": "fixed",
+          "as": [
+            "initiator",
+            "beneficiary"
+          ]
+        }
+      },
+      "availability": {
+        "earliest": 1444,
+        "latest": null,
+        "mode": "reference",
+        "repeat": "one_time"
+      },
+      "trigger": {
+        "all": [
+          {
+            "exists": "ottoman"
+          },
+          {
+            "heritage": {
+              "who": "ottoman",
+              "id": "ottoman_red_apple",
+              "state": "done"
+            }
+          }
+        ]
+      },
+      "invalidated_if": {
+        "not": {
+          "exists": "ottoman"
+        }
+      },
+      "selection": {
+        "mode": "pool",
+        "mean_years": 2
+      },
+      "options": [
+        {
+          "id": "bring_families",
+          "chooser": "$realm",
+          "historical": true,
+          "ai": {
+            "base": 60
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "province:constantinople",
+                "modifier": "repopulation_drive"
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "legitimacy": 5
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "palace_and_bazaar",
+          "chooser": "$realm",
+          "ai": {
+            "base": 40
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "-10%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "prestige": 20
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "effects": {},
+      "history": {
+        "date": [
+          1453,
+          1478
+        ]
+      }
+    },
+    "amb_relics_to_istanbul": {
+      "id": "amb_relics_to_istanbul",
+      "name": "The relics come to Istanbul",
+      "ages": [
+        "age_of_gunpowder_empires",
+        "age_of_reformations"
+      ],
+      "periods": [],
+      "regions": [
+        "middle_east",
+        "north_africa"
+      ],
+      "importance": "major",
+      "roles": {
+        "realm": {
+          "historical": [
+            "ottoman"
+          ],
+          "select": "fixed",
+          "as": [
+            "initiator",
+            "beneficiary"
+          ]
+        }
+      },
+      "availability": {
+        "earliest": 1460,
+        "latest": null,
+        "mode": "reference",
+        "repeat": "one_time"
+      },
+      "trigger": {
+        "all": [
+          {
+            "exists": "ottoman"
+          },
+          {
+            "heritage": {
+              "who": "ottoman",
+              "id": "ottoman_two_sanctuaries",
+              "state": "done"
+            }
+          }
+        ]
+      },
+      "invalidated_if": {
+        "not": {
+          "exists": "ottoman"
+        }
+      },
+      "selection": {
+        "mode": "pool",
+        "mean_years": 2
+      },
+      "options": [
+        {
+          "id": "guard_the_pilgrims",
+          "chooser": "$realm",
+          "historical": true,
+          "ai": {
+            "base": 70
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "modifier": "guardian_of_holy_cities"
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "legitimacy": 5
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "cairo_treasury",
+          "chooser": "$realm",
+          "ai": {
+            "base": 30
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "+15%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "prestige": 5
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "effects": {},
+      "history": {
+        "date": 1517
+      }
+    },
+    "amb_province_of_buda": {
+      "id": "amb_province_of_buda",
+      "name": "The province of Buda",
+      "ages": [
+        "age_of_gunpowder_empires",
+        "age_of_reformations"
+      ],
+      "periods": [],
+      "regions": [
+        "europe",
+        "middle_east"
+      ],
+      "importance": "regional",
+      "roles": {
+        "realm": {
+          "historical": [
+            "ottoman"
+          ],
+          "select": "fixed",
+          "as": [
+            "initiator",
+            "beneficiary"
+          ]
+        }
+      },
+      "availability": {
+        "earliest": 1450,
+        "latest": null,
+        "mode": "reference",
+        "repeat": "one_time"
+      },
+      "trigger": {
+        "all": [
+          {
+            "exists": "ottoman"
+          },
+          {
+            "heritage": {
+              "who": "ottoman",
+              "id": "ottoman_danube_march",
+              "state": "done"
+            }
+          }
+        ]
+      },
+      "invalidated_if": {
+        "not": {
+          "exists": "ottoman"
+        }
+      },
+      "selection": {
+        "mode": "pool",
+        "mean_years": 3
+      },
+      "options": [
+        {
+          "id": "direct_rule",
+          "chooser": "$realm",
+          "historical": true,
+          "ai": {
+            "base": 60
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "+10%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "legitimacy": 5
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "client_king",
+          "chooser": "$realm",
+          "ai": {
+            "base": 40
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "stability": 1
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "effects": {},
+      "history": {
+        "date": 1541
+      }
+    },
+    "amb_law_code_of_1497": {
+      "id": "amb_law_code_of_1497",
+      "name": "The law code of 1497",
+      "ages": [
+        "age_of_gunpowder_empires"
+      ],
+      "periods": [],
+      "regions": [
+        "europe"
+      ],
+      "importance": "regional",
+      "roles": {
+        "realm": {
+          "historical": [
+            "muscovy"
+          ],
+          "select": "fixed",
+          "as": [
+            "initiator",
+            "beneficiary"
+          ]
+        }
+      },
+      "availability": {
+        "earliest": 1444,
+        "latest": null,
+        "mode": "reference",
+        "repeat": "one_time"
+      },
+      "trigger": {
+        "all": [
+          {
+            "exists": "muscovy"
+          },
+          {
+            "heritage": {
+              "who": "muscovy",
+              "id": "muscovy_gather_the_rus_lands",
+              "state": "done"
+            }
+          }
+        ]
+      },
+      "invalidated_if": {
+        "not": {
+          "exists": "muscovy"
+        }
+      },
+      "selection": {
+        "mode": "pool",
+        "mean_years": 2
+      },
+      "options": [
+        {
+          "id": "one_code",
+          "chooser": "$realm",
+          "historical": true,
+          "ai": {
+            "base": 65
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "stability": 1,
+                  "legitimacy": 5
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "court_fees",
+          "chooser": "$realm",
+          "ai": {
+            "base": 35
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "+10%"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "effects": {},
+      "history": {
+        "date": 1497
+      }
+    },
+    "amb_kremlin_rebuilt": {
+      "id": "amb_kremlin_rebuilt",
+      "name": "The Kremlin rebuilt",
+      "ages": [
+        "age_of_gunpowder_empires"
+      ],
+      "periods": [],
+      "regions": [
+        "europe"
+      ],
+      "importance": "regional",
+      "roles": {
+        "realm": {
+          "historical": [
+            "muscovy"
+          ],
+          "select": "fixed",
+          "as": [
+            "initiator",
+            "beneficiary"
+          ]
+        }
+      },
+      "availability": {
+        "earliest": 1444,
+        "latest": null,
+        "mode": "reference",
+        "repeat": "one_time"
+      },
+      "trigger": {
+        "all": [
+          {
+            "exists": "muscovy"
+          },
+          {
+            "heritage": {
+              "who": "muscovy",
+              "id": "muscovy_stand_on_the_ugra",
+              "state": "done"
+            }
+          }
+        ]
+      },
+      "invalidated_if": {
+        "not": {
+          "exists": "muscovy"
+        }
+      },
+      "selection": {
+        "mode": "pool",
+        "mean_years": 3
+      },
+      "options": [
+        {
+          "id": "hire_italians",
+          "chooser": "$realm",
+          "historical": true,
+          "ai": {
+            "base": 60
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "-10%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "prestige": 15,
+                  "legitimacy": 5
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "timber_walls",
+          "chooser": "$realm",
+          "ai": {
+            "base": 40
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "+5%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "stability": 1
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "effects": {},
+      "history": {
+        "date": [
+          1485,
+          1495
+        ]
+      }
+    },
+    "amb_moscow_patriarchate": {
+      "id": "amb_moscow_patriarchate",
+      "name": "A patriarch in Moscow",
+      "ages": [
+        "age_of_reformations"
+      ],
+      "periods": [],
+      "regions": [
+        "europe",
+        "middle_east"
+      ],
+      "importance": "regional",
+      "roles": {
+        "realm": {
+          "historical": [
+            "muscovy"
+          ],
+          "select": "fixed",
+          "as": [
+            "initiator",
+            "beneficiary"
+          ]
+        }
+      },
+      "availability": {
+        "earliest": 1444,
+        "latest": null,
+        "mode": "reference",
+        "repeat": "one_time"
+      },
+      "trigger": {
+        "all": [
+          {
+            "exists": "muscovy"
+          },
+          {
+            "heritage": {
+              "who": "muscovy",
+              "id": "muscovy_third_rome",
+              "state": "done"
+            }
+          }
+        ]
+      },
+      "invalidated_if": {
+        "not": {
+          "exists": "muscovy"
+        }
+      },
+      "selection": {
+        "mode": "pool",
+        "mean_years": 4
+      },
+      "options": [
+        {
+          "id": "raise_the_see",
+          "chooser": "$realm",
+          "historical": true,
+          "ai": {
+            "base": 65
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "legitimacy": 10,
+                  "prestige": 10
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "keep_the_metropolitan",
+          "chooser": "$realm",
+          "ai": {
+            "base": 35
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "stability": 1
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "effects": {},
+      "history": {
+        "date": 1589
+      }
+    },
+    "amb_grain_down_the_vistula": {
+      "id": "amb_grain_down_the_vistula",
+      "name": "Grain down the Vistula",
+      "ages": [
+        "age_of_gunpowder_empires"
+      ],
+      "periods": [],
+      "regions": [
+        "europe"
+      ],
+      "importance": "regional",
+      "roles": {
+        "realm": {
+          "historical": [
+            "poland"
+          ],
+          "select": "fixed",
+          "as": [
+            "initiator",
+            "beneficiary"
+          ]
+        }
+      },
+      "availability": {
+        "earliest": 1444,
+        "latest": null,
+        "mode": "reference",
+        "repeat": "one_time"
+      },
+      "trigger": {
+        "all": [
+          {
+            "exists": "poland"
+          },
+          {
+            "heritage": {
+              "who": "poland",
+              "id": "poland_baltic_outlet",
+              "state": "done"
+            }
+          }
+        ]
+      },
+      "invalidated_if": {
+        "not": {
+          "exists": "poland"
+        }
+      },
+      "selection": {
+        "mode": "pool",
+        "mean_years": 2
+      },
+      "options": [
+        {
+          "id": "confirm_charter",
+          "chooser": "$realm",
+          "historical": true,
+          "ai": {
+            "base": 60
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "+10%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "stability": 1
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "royal_tolls",
+          "chooser": "$realm",
+          "ai": {
+            "base": 40
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "+20%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "legitimacy": -5
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "effects": {},
+      "history": {
+        "date": [
+          1466,
+          1500
+        ]
+      }
+    },
+    "amb_confederation_of_warsaw": {
+      "id": "amb_confederation_of_warsaw",
+      "name": "The Confederation of Warsaw",
+      "ages": [
+        "age_of_reformations"
+      ],
+      "periods": [],
+      "regions": [
+        "europe"
+      ],
+      "importance": "major",
+      "roles": {
+        "realm": {
+          "historical": [
+            "poland"
+          ],
+          "select": "fixed",
+          "as": [
+            "initiator",
+            "beneficiary"
+          ]
+        }
+      },
+      "availability": {
+        "earliest": 1444,
+        "latest": null,
+        "mode": "reference",
+        "repeat": "one_time"
+      },
+      "trigger": {
+        "all": [
+          {
+            "exists": "poland"
+          },
+          {
+            "heritage": {
+              "who": "poland",
+              "id": "poland_union_of_lublin",
+              "state": "done"
+            }
+          }
+        ]
+      },
+      "invalidated_if": {
+        "not": {
+          "exists": "poland"
+        }
+      },
+      "selection": {
+        "mode": "pool",
+        "mean_years": 3
+      },
+      "options": [
+        {
+          "id": "swear_the_peace",
+          "chooser": "$realm",
+          "historical": true,
+          "ai": {
+            "base": 65
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "modifier": "religious_tolerance_policy"
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "legitimacy": -5
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "one_faith",
+          "chooser": "$realm",
+          "ai": {
+            "base": 35
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "legitimacy": 10,
+                  "stability": -1
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "effects": {},
+      "history": {
+        "date": 1573
+      }
+    },
+    "amb_noon_bell": {
+      "id": "amb_noon_bell",
+      "name": "The noon bell",
+      "ages": [
+        "age_of_gunpowder_empires"
+      ],
+      "periods": [],
+      "regions": [
+        "europe",
+        "middle_east"
+      ],
+      "importance": "major",
+      "roles": {
+        "realm": {
+          "historical": [
+            "hungary"
+          ],
+          "select": "fixed",
+          "as": [
+            "initiator",
+            "beneficiary"
+          ]
+        }
+      },
+      "availability": {
+        "earliest": 1444,
+        "latest": null,
+        "mode": "reference",
+        "repeat": "one_time"
+      },
+      "trigger": {
+        "all": [
+          {
+            "exists": "hungary"
+          },
+          {
+            "heritage": {
+              "who": "hungary",
+              "id": "hungary_hold_belgrade",
+              "state": "done"
+            }
+          }
+        ]
+      },
+      "invalidated_if": {
+        "not": {
+          "exists": "hungary"
+        }
+      },
+      "selection": {
+        "mode": "pool",
+        "mean_years": 1
+      },
+      "options": [
+        {
+          "id": "feast_the_victory",
+          "chooser": "$realm",
+          "historical": true,
+          "ai": {
+            "base": 60
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "prestige": 15,
+                  "legitimacy": 5
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "repair_the_walls",
+          "chooser": "$realm",
+          "ai": {
+            "base": 40
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "-10%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "stability": 1
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "effects": {},
+      "history": {
+        "date": 1456
+      }
+    },
+    "amb_black_army": {
+      "id": "amb_black_army",
+      "name": "The Black Army",
+      "ages": [
+        "age_of_gunpowder_empires"
+      ],
+      "periods": [],
+      "regions": [
+        "europe"
+      ],
+      "importance": "regional",
+      "roles": {
+        "realm": {
+          "historical": [
+            "hungary"
+          ],
+          "select": "fixed",
+          "as": [
+            "initiator",
+            "beneficiary"
+          ]
+        }
+      },
+      "availability": {
+        "earliest": 1444,
+        "latest": null,
+        "mode": "reference",
+        "repeat": "one_time"
+      },
+      "trigger": {
+        "all": [
+          {
+            "exists": "hungary"
+          },
+          {
+            "heritage": {
+              "who": "hungary",
+              "id": "hungary_raven_in_vienna",
+              "state": "done"
+            }
+          }
+        ]
+      },
+      "invalidated_if": {
+        "not": {
+          "exists": "hungary"
+        }
+      },
+      "selection": {
+        "mode": "pool",
+        "mean_years": 2
+      },
+      "options": [
+        {
+          "id": "pay_the_army",
+          "chooser": "$realm",
+          "historical": true,
+          "ai": {
+            "base": 55
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "-15%"
+                }
+              },
+              {
+                "on": "$realm",
+                "modifier": "standing_army_reform"
+              }
+            ]
+          }
+        },
+        {
+          "id": "disband_army",
+          "chooser": "$realm",
+          "ai": {
+            "base": 45
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "-5%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "stability": 1
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "effects": {},
+      "history": {
+        "date": 1485
+      }
+    },
+    "amb_mahmal_caravan": {
+      "id": "amb_mahmal_caravan",
+      "name": "The mahmal sets out",
+      "ages": [
+        "age_of_gunpowder_empires"
+      ],
+      "periods": [],
+      "regions": [
+        "middle_east",
+        "north_africa"
+      ],
+      "importance": "major",
+      "roles": {
+        "realm": {
+          "historical": [
+            "mamluk"
+          ],
+          "select": "fixed",
+          "as": [
+            "initiator",
+            "beneficiary"
+          ]
+        }
+      },
+      "availability": {
+        "earliest": 1444,
+        "latest": null,
+        "mode": "reference",
+        "repeat": "one_time"
+      },
+      "trigger": {
+        "all": [
+          {
+            "exists": "mamluk"
+          },
+          {
+            "heritage": {
+              "who": "mamluk",
+              "id": "mamluk_holy_cities",
+              "state": "done"
+            }
+          }
+        ]
+      },
+      "invalidated_if": {
+        "not": {
+          "exists": "mamluk"
+        }
+      },
+      "selection": {
+        "mode": "pool",
+        "mean_years": 2
+      },
+      "options": [
+        {
+          "id": "lead_the_caravan",
+          "chooser": "$realm",
+          "historical": true,
+          "ai": {
+            "base": 65
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "modifier": "guardian_of_holy_cities"
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "legitimacy": 5
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "tax_the_road",
+          "chooser": "$realm",
+          "ai": {
+            "base": 35
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "+15%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "legitimacy": -5
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "effects": {},
+      "history": {
+        "date": [
+          1444,
+          1516
+        ]
+      }
+    },
+    "amb_suez_fleet": {
+      "id": "amb_suez_fleet",
+      "name": "The fleet of Suez",
+      "ages": [
+        "age_of_gunpowder_empires",
+        "age_of_exploration"
+      ],
+      "periods": [],
+      "regions": [
+        "middle_east",
+        "south_asia"
+      ],
+      "importance": "regional",
+      "roles": {
+        "realm": {
+          "historical": [
+            "mamluk"
+          ],
+          "select": "fixed",
+          "as": [
+            "initiator",
+            "beneficiary"
+          ]
+        }
+      },
+      "availability": {
+        "earliest": 1480,
+        "latest": null,
+        "mode": "reference",
+        "repeat": "one_time"
+      },
+      "trigger": {
+        "all": [
+          {
+            "exists": "mamluk"
+          },
+          {
+            "heritage": {
+              "who": "mamluk",
+              "id": "mamluk_red_sea_fleet",
+              "state": "done"
+            }
+          }
+        ]
+      },
+      "invalidated_if": {
+        "not": {
+          "exists": "mamluk"
+        }
+      },
+      "selection": {
+        "mode": "pool",
+        "mean_years": 2
+      },
+      "options": [
+        {
+          "id": "send_the_fleet",
+          "chooser": "$realm",
+          "historical": true,
+          "ai": {
+            "base": 60
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "-15%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "prestige": 15
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "guard_the_red_sea",
+          "chooser": "$realm",
+          "ai": {
+            "base": 40
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "-5%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "stability": 1
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "effects": {},
+      "history": {
+        "date": [
+          1505,
+          1508
+        ]
+      }
+    },
+    "amb_envoys_from_lisbon": {
+      "id": "amb_envoys_from_lisbon",
+      "name": "Envoys from Lisbon",
+      "ages": [
+        "age_of_exploration",
+        "age_of_gunpowder_empires"
+      ],
+      "periods": [],
+      "regions": [
+        "sub_saharan_africa",
+        "europe"
+      ],
+      "importance": "regional",
+      "roles": {
+        "realm": {
+          "historical": [
+            "mali"
+          ],
+          "select": "fixed",
+          "as": [
+            "initiator",
+            "beneficiary"
+          ]
+        },
+        "partner": {
+          "historical": [
+            "portugal"
+          ],
+          "select": "fixed",
+          "as": [
+            "participant",
+            "beneficiary"
+          ]
+        }
+      },
+      "availability": {
+        "earliest": 1444,
+        "latest": null,
+        "mode": "reference",
+        "repeat": "one_time"
+      },
+      "trigger": {
+        "all": [
+          {
+            "exists": "mali"
+          },
+          {
+            "exists": "portugal"
+          },
+          {
+            "heritage": {
+              "who": "mali",
+              "id": "mali_letters_to_lisbon",
+              "state": "done"
+            }
+          }
+        ]
+      },
+      "invalidated_if": {
+        "not": {
+          "exists": "mali"
+        }
+      },
+      "selection": {
+        "mode": "pool",
+        "mean_years": 3
+      },
+      "options": [
+        {
+          "id": "trade_for_horses",
+          "chooser": "$realm",
+          "historical": true,
+          "ai": {
+            "base": 60
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "-5%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "prestige": 5,
+                  "legitimacy": 5
+                }
+              },
+              {
+                "on": "$partner",
+                "stat": {
+                  "treasury": "+5%"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "keep_them_at_the_coast",
+          "chooser": "$realm",
+          "ai": {
+            "base": 40
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "stability": 1
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "effects": {},
+      "history": {
+        "date": [
+          1487,
+          1495
+        ]
+      }
+    },
+    "amb_debre_berhan": {
+      "id": "amb_debre_berhan",
+      "name": "Debre Berhan",
+      "ages": [
+        "age_of_gunpowder_empires"
+      ],
+      "periods": [],
+      "regions": [
+        "sub_saharan_africa",
+        "middle_east"
+      ],
+      "importance": "regional",
+      "roles": {
+        "realm": {
+          "historical": [
+            "ethiopia"
+          ],
+          "select": "fixed",
+          "as": [
+            "initiator",
+            "beneficiary"
+          ]
+        }
+      },
+      "availability": {
+        "earliest": 1444,
+        "latest": null,
+        "mode": "reference",
+        "repeat": "one_time"
+      },
+      "trigger": {
+        "all": [
+          {
+            "exists": "ethiopia"
+          },
+          {
+            "heritage": {
+              "who": "ethiopia",
+              "id": "ethiopia_field_of_gomit",
+              "state": "done"
+            }
+          }
+        ]
+      },
+      "invalidated_if": {
+        "not": {
+          "exists": "ethiopia"
+        }
+      },
+      "selection": {
+        "mode": "pool",
+        "mean_years": 2
+      },
+      "options": [
+        {
+          "id": "found_the_town",
+          "chooser": "$realm",
+          "historical": true,
+          "ai": {
+            "base": 60
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "-10%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "legitimacy": 10
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "share_the_spoils",
+          "chooser": "$realm",
+          "ai": {
+            "base": 40
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "+10%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "stability": 1
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "effects": {},
+      "history": {
+        "date": [
+          1456,
+          1468
+        ]
+      }
+    },
+    "amb_fasil_ghebbi": {
+      "id": "amb_fasil_ghebbi",
+      "name": "The castles of Gondar",
+      "ages": [
+        "age_of_crisis_and_absolutism"
+      ],
+      "periods": [],
+      "regions": [
+        "sub_saharan_africa"
+      ],
+      "importance": "regional",
+      "roles": {
+        "realm": {
+          "historical": [
+            "ethiopia"
+          ],
+          "select": "fixed",
+          "as": [
+            "initiator",
+            "beneficiary"
+          ]
+        }
+      },
+      "availability": {
+        "earliest": 1444,
+        "latest": null,
+        "mode": "reference",
+        "repeat": "one_time"
+      },
+      "trigger": {
+        "all": [
+          {
+            "exists": "ethiopia"
+          },
+          {
+            "heritage": {
+              "who": "ethiopia",
+              "id": "ethiopia_castles_of_gondar",
+              "state": "done"
+            }
+          }
+        ]
+      },
+      "invalidated_if": {
+        "not": {
+          "exists": "ethiopia"
+        }
+      },
+      "selection": {
+        "mode": "pool",
+        "mean_years": 3
+      },
+      "options": [
+        {
+          "id": "settle_at_gondar",
+          "chooser": "$realm",
+          "historical": true,
+          "ai": {
+            "base": 65
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "-10%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "stability": 1,
+                  "prestige": 10
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "keep_moving",
+          "chooser": "$realm",
+          "ai": {
+            "base": 35
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "legitimacy": 5
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "effects": {},
+      "history": {
+        "date": [
+          1636,
+          1667
+        ]
+      }
+    },
+    "amb_ordos_wall": {
+      "id": "amb_ordos_wall",
+      "name": "A wall along the Ordos",
+      "ages": [
+        "age_of_gunpowder_empires"
+      ],
+      "periods": [],
+      "regions": [
+        "east_asia",
+        "central_asia"
+      ],
+      "importance": "major",
+      "roles": {
+        "realm": {
+          "historical": [
+            "ming"
+          ],
+          "select": "fixed",
+          "as": [
+            "initiator",
+            "beneficiary"
+          ]
+        }
+      },
+      "availability": {
+        "earliest": 1444,
+        "latest": null,
+        "mode": "reference",
+        "repeat": "one_time"
+      },
+      "trigger": {
+        "all": [
+          {
+            "exists": "ming"
+          },
+          {
+            "heritage": {
+              "who": "ming",
+              "id": "ming_hold_beijing",
+              "state": "done"
+            }
+          }
+        ]
+      },
+      "invalidated_if": {
+        "not": {
+          "exists": "ming"
+        }
+      },
+      "selection": {
+        "mode": "pool",
+        "mean_years": 3
+      },
+      "options": [
+        {
+          "id": "build_the_wall",
+          "chooser": "$realm",
+          "historical": true,
+          "ai": {
+            "base": 65
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "-15%"
+                }
+              },
+              {
+                "on": "$realm",
+                "modifier": "defensive_frontier_policy",
+                "years": 40
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "stability": 1
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "buy_peace",
+          "chooser": "$realm",
+          "ai": {
+            "base": 35
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "-5%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "prestige": -5,
+                  "legitimacy": 5
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "effects": {},
+      "history": {
+        "date": [
+          1471,
+          1474
+        ]
+      }
+    },
+    "amb_new_calendar": {
+      "id": "amb_new_calendar",
+      "name": "A calendar from the west",
+      "ages": [
+        "age_of_crisis_and_absolutism"
+      ],
+      "periods": [],
+      "regions": [
+        "east_asia"
+      ],
+      "importance": "regional",
+      "roles": {
+        "realm": {
+          "historical": [
+            "ming"
+          ],
+          "select": "fixed",
+          "as": [
+            "initiator",
+            "beneficiary"
+          ]
+        }
+      },
+      "availability": {
+        "earliest": 1444,
+        "latest": null,
+        "mode": "reference",
+        "repeat": "one_time"
+      },
+      "trigger": {
+        "all": [
+          {
+            "exists": "ming"
+          },
+          {
+            "heritage": {
+              "who": "ming",
+              "id": "ming_red_barbarian_cannon",
+              "state": "done"
+            }
+          }
+        ]
+      },
+      "invalidated_if": {
+        "not": {
+          "exists": "ming"
+        }
+      },
+      "selection": {
+        "mode": "pool",
+        "mean_years": 3
+      },
+      "options": [
+        {
+          "id": "reform_calendar",
+          "chooser": "$realm",
+          "historical": true,
+          "ai": {
+            "base": 55
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "tech_state": 1,
+                  "legitimacy": -5
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "keep_old_methods",
+          "chooser": "$realm",
+          "ai": {
+            "base": 45
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "stability": 1
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "effects": {},
+      "history": {
+        "date": [
+          1629,
+          1634
+        ]
+      }
+    },
+    "amb_triumph_at_hampi": {
+      "id": "amb_triumph_at_hampi",
+      "name": "The triumph at Hampi",
+      "ages": [
+        "age_of_gunpowder_empires",
+        "age_of_exploration"
+      ],
+      "periods": [],
+      "regions": [
+        "south_asia"
+      ],
+      "importance": "regional",
+      "roles": {
+        "realm": {
+          "historical": [
+            "vijayanagara"
+          ],
+          "select": "fixed",
+          "as": [
+            "initiator",
+            "beneficiary"
+          ]
+        }
+      },
+      "availability": {
+        "earliest": 1444,
+        "latest": null,
+        "mode": "reference",
+        "repeat": "one_time"
+      },
+      "trigger": {
+        "all": [
+          {
+            "exists": "vijayanagara"
+          },
+          {
+            "heritage": {
+              "who": "vijayanagara",
+              "id": "vijayanagara_raichur_held",
+              "state": "done"
+            }
+          }
+        ]
+      },
+      "invalidated_if": {
+        "not": {
+          "exists": "vijayanagara"
+        }
+      },
+      "selection": {
+        "mode": "pool",
+        "mean_years": 2
+      },
+      "options": [
+        {
+          "id": "grand_festival",
+          "chooser": "$realm",
+          "historical": true,
+          "ai": {
+            "base": 60
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "-10%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "prestige": 15,
+                  "legitimacy": 5
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "pay_the_captains",
+          "chooser": "$realm",
+          "ai": {
+            "base": 40
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "-5%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "stability": 1
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "effects": {},
+      "history": {
+        "date": 1520
+      }
+    },
+    "amb_tumebamba": {
+      "id": "amb_tumebamba",
+      "name": "Tumebamba, a second Cusco",
+      "ages": [
+        "age_of_exploration"
+      ],
+      "periods": [],
+      "regions": [
+        "south_america"
+      ],
+      "importance": "regional",
+      "roles": {
+        "realm": {
+          "historical": [
+            "inca"
+          ],
+          "select": "fixed",
+          "as": [
+            "initiator",
+            "beneficiary"
+          ]
+        }
+      },
+      "availability": {
+        "earliest": 1444,
+        "latest": null,
+        "mode": "reference",
+        "repeat": "one_time"
+      },
+      "trigger": {
+        "all": [
+          {
+            "exists": "inca"
+          },
+          {
+            "heritage": {
+              "who": "inca",
+              "id": "inca_quito",
+              "state": "done"
+            }
+          }
+        ]
+      },
+      "invalidated_if": {
+        "not": {
+          "exists": "inca"
+        }
+      },
+      "selection": {
+        "mode": "pool",
+        "mean_years": 3
+      },
+      "options": [
+        {
+          "id": "royal_city",
+          "chooser": "$realm",
+          "historical": true,
+          "ai": {
+            "base": 60
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "-10%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "prestige": 10,
+                  "legitimacy": 5
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "settle_colonists",
+          "chooser": "$realm",
+          "ai": {
+            "base": 40
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "modifier": "mitma_resettlement",
+                "years": 20
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "stability": 1
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "effects": {},
+      "history": {
+        "date": [
+          1490,
+          1525
+        ]
+      }
+    },
+    "amb_smiths_to_cusco": {
+      "id": "amb_smiths_to_cusco",
+      "name": "The smiths go to Cusco",
+      "ages": [
+        "age_of_exploration"
+      ],
+      "periods": [],
+      "regions": [
+        "south_america"
+      ],
+      "importance": "regional",
+      "roles": {
+        "realm": {
+          "historical": [
+            "inca"
+          ],
+          "select": "fixed",
+          "as": [
+            "initiator",
+            "beneficiary"
+          ]
+        }
+      },
+      "availability": {
+        "earliest": 1444,
+        "latest": null,
+        "mode": "reference",
+        "repeat": "one_time"
+      },
+      "trigger": {
+        "all": [
+          {
+            "exists": "inca"
+          },
+          {
+            "heritage": {
+              "who": "inca",
+              "id": "inca_chimor",
+              "state": "done"
+            }
+          }
+        ]
+      },
+      "invalidated_if": {
+        "not": {
+          "exists": "inca"
+        }
+      },
+      "selection": {
+        "mode": "pool",
+        "mean_years": 2
+      },
+      "options": [
+        {
+          "id": "move_the_smiths",
+          "chooser": "$realm",
+          "historical": true,
+          "ai": {
+            "base": 60
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "+15%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "prestige": 5
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "leave_them",
+          "chooser": "$realm",
+          "ai": {
+            "base": 40
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "stability": 1
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "effects": {},
+      "history": {
+        "date": [
+          1470,
+          1480
+        ]
+      }
+    },
+    "amb_baptism_at_mbanza_kongo": {
+      "id": "amb_baptism_at_mbanza_kongo",
+      "name": "Baptism at Mbanza Kongo",
+      "ages": [
+        "age_of_exploration",
+        "age_of_atlantic_empires"
+      ],
+      "periods": [],
+      "regions": [
+        "sub_saharan_africa",
+        "europe"
+      ],
+      "importance": "regional",
+      "roles": {
+        "realm": {
+          "historical": [
+            "kongo"
+          ],
+          "select": "fixed",
+          "as": [
+            "initiator",
+            "beneficiary"
+          ]
+        },
+        "partner": {
+          "historical": [
+            "portugal"
+          ],
+          "select": "fixed",
+          "as": [
+            "participant"
+          ]
+        }
+      },
+      "availability": {
+        "earliest": 1470,
+        "latest": null,
+        "mode": "reference",
+        "repeat": "one_time"
+      },
+      "trigger": {
+        "all": [
+          {
+            "exists": "kongo"
+          },
+          {
+            "exists": "portugal"
+          },
+          {
+            "heritage": {
+              "who": "kongo",
+              "id": "kongo_strangers_from_the_sea",
+              "state": "done"
+            }
+          }
+        ]
+      },
+      "invalidated_if": {
+        "not": {
+          "exists": "kongo"
+        }
+      },
+      "selection": {
+        "mode": "pool",
+        "mean_years": 2
+      },
+      "options": [
+        {
+          "id": "accept_baptism",
+          "chooser": "$realm",
+          "historical": true,
+          "ai": {
+            "base": 60
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "legitimacy": 5,
+                  "prestige": 10
+                }
+              },
+              {
+                "on": "$partner",
+                "stat": {
+                  "prestige": 5
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "keep_the_old_shrines",
+          "chooser": "$realm",
+          "ai": {
+            "base": 40
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "stability": 1
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "effects": {},
+      "history": {
+        "date": 1491
+      }
+    },
+    "amb_el_badi": {
+      "id": "amb_el_badi",
+      "name": "The palace of El Badi",
+      "ages": [
+        "age_of_gunpowder_empires",
+        "age_of_reformations"
+      ],
+      "periods": [],
+      "regions": [
+        "north_africa",
+        "europe"
+      ],
+      "importance": "regional",
+      "roles": {
+        "realm": {
+          "historical": [
+            "morocco"
+          ],
+          "select": "fixed",
+          "as": [
+            "initiator",
+            "beneficiary"
+          ]
+        }
+      },
+      "availability": {
+        "earliest": 1520,
+        "latest": null,
+        "mode": "reference",
+        "repeat": "one_time"
+      },
+      "trigger": {
+        "all": [
+          {
+            "exists": "morocco"
+          },
+          {
+            "heritage": {
+              "who": "morocco",
+              "id": "morocco_three_kings",
+              "state": "done"
+            }
+          }
+        ]
+      },
+      "invalidated_if": {
+        "not": {
+          "exists": "morocco"
+        }
+      },
+      "selection": {
+        "mode": "pool",
+        "mean_years": 2
+      },
+      "options": [
+        {
+          "id": "build_el_badi",
+          "chooser": "$realm",
+          "historical": true,
+          "ai": {
+            "base": 55
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "+10%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "prestige": 15
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "fill_the_treasury",
+          "chooser": "$realm",
+          "ai": {
+            "base": 45
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "+25%"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "effects": {},
+      "history": {
+        "date": 1578
+      }
+    },
+    "amb_great_code_issued": {
+      "id": "amb_great_code_issued",
+      "name": "The great code issued",
+      "ages": [
+        "age_of_gunpowder_empires"
+      ],
+      "periods": [],
+      "regions": [
+        "east_asia"
+      ],
+      "importance": "regional",
+      "roles": {
+        "realm": {
+          "historical": [
+            "joseon"
+          ],
+          "select": "fixed",
+          "as": [
+            "initiator",
+            "beneficiary"
+          ]
+        }
+      },
+      "availability": {
+        "earliest": 1444,
+        "latest": null,
+        "mode": "reference",
+        "repeat": "one_time"
+      },
+      "trigger": {
+        "all": [
+          {
+            "exists": "joseon"
+          },
+          {
+            "heritage": {
+              "who": "joseon",
+              "id": "joseon_great_code",
+              "state": "done"
+            }
+          }
+        ]
+      },
+      "invalidated_if": {
+        "not": {
+          "exists": "joseon"
+        }
+      },
+      "selection": {
+        "mode": "pool",
+        "mean_years": 3
+      },
+      "options": [
+        {
+          "id": "issue_the_code",
+          "chooser": "$realm",
+          "historical": true,
+          "ai": {
+            "base": 65
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "stability": 1,
+                  "legitimacy": 5
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "leave_to_custom",
+          "chooser": "$realm",
+          "ai": {
+            "base": 35
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "+5%"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "effects": {},
+      "history": {
+        "date": 1485
+      }
+    },
+    "amb_hong_duc_code": {
+      "id": "amb_hong_duc_code",
+      "name": "The Hồng Đức code",
+      "ages": [
+        "age_of_exploration"
+      ],
+      "periods": [],
+      "regions": [
+        "southeast_asia"
+      ],
+      "importance": "regional",
+      "roles": {
+        "realm": {
+          "historical": [
+            "dai_viet"
+          ],
+          "select": "fixed",
+          "as": [
+            "initiator",
+            "beneficiary"
+          ]
+        }
+      },
+      "availability": {
+        "earliest": 1444,
+        "latest": null,
+        "mode": "reference",
+        "repeat": "one_time"
+      },
+      "trigger": {
+        "all": [
+          {
+            "exists": "dai_viet"
+          },
+          {
+            "heritage": {
+              "who": "dai_viet",
+              "id": "dai_viet_child_throne",
+              "state": "done"
+            }
+          }
+        ]
+      },
+      "invalidated_if": {
+        "not": {
+          "exists": "dai_viet"
+        }
+      },
+      "selection": {
+        "mode": "pool",
+        "mean_years": 3
+      },
+      "options": [
+        {
+          "id": "issue_the_code",
+          "chooser": "$realm",
+          "historical": true,
+          "ai": {
+            "base": 65
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "stability": 1,
+                  "legitimacy": 5
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "reward_the_lords",
+          "chooser": "$realm",
+          "ai": {
+            "base": 35
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "-5%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "legitimacy": 10
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "effects": {},
+      "history": {
+        "date": 1483
+      }
+    },
+    "amb_madrasa_at_bidar": {
+      "id": "amb_madrasa_at_bidar",
+      "name": "The madrasa at Bidar",
+      "ages": [
+        "age_of_gunpowder_empires"
+      ],
+      "periods": [],
+      "regions": [
+        "south_asia",
+        "middle_east"
+      ],
+      "importance": "regional",
+      "roles": {
+        "realm": {
+          "historical": [
+            "bahmanis"
+          ],
+          "select": "fixed",
+          "as": [
+            "initiator",
+            "beneficiary"
+          ]
+        }
+      },
+      "availability": {
+        "earliest": 1444,
+        "latest": null,
+        "mode": "reference",
+        "repeat": "one_time"
+      },
+      "trigger": {
+        "all": [
+          {
+            "exists": "bahmanis"
+          },
+          {
+            "heritage": {
+              "who": "bahmanis",
+              "id": "bahmani_konkan_and_goa",
+              "state": "done"
+            }
+          }
+        ]
+      },
+      "invalidated_if": {
+        "not": {
+          "exists": "bahmanis"
+        }
+      },
+      "selection": {
+        "mode": "pool",
+        "mean_years": 3
+      },
+      "options": [
+        {
+          "id": "build_the_college",
+          "chooser": "$realm",
+          "historical": true,
+          "ai": {
+            "base": 60
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "-10%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "prestige": 10,
+                  "tech_state": 1
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "fill_the_treasury",
+          "chooser": "$realm",
+          "ai": {
+            "base": 40
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "+15%"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "effects": {},
+      "history": {
+        "date": 1472
+      }
+    },
+    "amb_ngazargamu": {
+      "id": "amb_ngazargamu",
+      "name": "A walled capital at Ngazargamu",
+      "ages": [
+        "age_of_gunpowder_empires"
+      ],
+      "periods": [],
+      "regions": [
+        "sub_saharan_africa"
+      ],
+      "importance": "regional",
+      "roles": {
+        "realm": {
+          "historical": [
+            "bornu"
+          ],
+          "select": "fixed",
+          "as": [
+            "initiator",
+            "beneficiary"
+          ]
+        }
+      },
+      "availability": {
+        "earliest": 1444,
+        "latest": null,
+        "mode": "reference",
+        "repeat": "one_time"
+      },
+      "trigger": {
+        "all": [
+          {
+            "exists": "bornu"
+          },
+          {
+            "heritage": {
+              "who": "bornu",
+              "id": "bornu_back_across_the_lake",
+              "state": "done"
+            }
+          }
+        ]
+      },
+      "invalidated_if": {
+        "not": {
+          "exists": "bornu"
+        }
+      },
+      "selection": {
+        "mode": "pool",
+        "mean_years": 3
+      },
+      "options": [
+        {
+          "id": "raise_the_walls",
+          "chooser": "$realm",
+          "historical": true,
+          "ai": {
+            "base": 65
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "-10%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "stability": 1,
+                  "legitimacy": 5
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "keep_the_camp",
+          "chooser": "$realm",
+          "ai": {
+            "base": 35
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "prestige": 5
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "stability": 1
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "effects": {},
+      "history": {
+        "date": [
+          1460,
+          1475
+        ]
+      }
+    },
+    "amb_laws_of_malacca": {
+      "id": "amb_laws_of_malacca",
+      "name": "The laws of Malacca",
+      "ages": [
+        "age_of_exploration"
+      ],
+      "periods": [],
+      "regions": [
+        "southeast_asia"
+      ],
+      "importance": "regional",
+      "roles": {
+        "realm": {
+          "historical": [
+            "malacca"
+          ],
+          "select": "fixed",
+          "as": [
+            "initiator",
+            "beneficiary"
+          ]
+        }
+      },
+      "availability": {
+        "earliest": 1444,
+        "latest": null,
+        "mode": "reference",
+        "repeat": "one_time"
+      },
+      "trigger": {
+        "all": [
+          {
+            "exists": "malacca"
+          },
+          {
+            "heritage": {
+              "who": "malacca",
+              "id": "malacca_strait_hegemony",
+              "state": "done"
+            }
+          }
+        ]
+      },
+      "invalidated_if": {
+        "not": {
+          "exists": "malacca"
+        }
+      },
+      "selection": {
+        "mode": "pool",
+        "mean_years": 3
+      },
+      "options": [
+        {
+          "id": "write_the_laws",
+          "chooser": "$realm",
+          "historical": true,
+          "ai": {
+            "base": 65
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "stability": 1,
+                  "legitimacy": 5
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "raise_harbour_dues",
+          "chooser": "$realm",
+          "ai": {
+            "base": 35
+          },
+          "effects": {
+            "immediate": [
+              {
+                "on": "$realm",
+                "stat": {
+                  "treasury": "+15%"
+                }
+              },
+              {
+                "on": "$realm",
+                "stat": {
+                  "prestige": -5
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "effects": {},
+      "history": {
+        "date": [
+          1450,
+          1510
+        ]
+      }
+    }
+  },
+  "localization": {
+    "event.amb_casa_da_india.name": "The Casa da Índia",
+    "event.amb_casa_da_india.desc": "With a foothold on the Malabar coast, the crown opens a house on the Lisbon waterfront that takes in every cargo from the Indies. Pepper is weighed, taxed and sold on from its warehouses.",
+    "event.amb_casa_da_india.option.crown_monopoly": "Keep the pepper for the crown",
+    "event.amb_casa_da_india.option.licensed_merchants": "License the merchant houses",
+    "event.amb_gold_of_mina_minted.name": "Mina gold at the Lisbon mint",
+    "event.amb_gold_of_mina_minted.desc": "Each year the caravels from São Jorge da Mina unload gold dust at the Casa da Mina. The court must decide what the new wealth is for.",
+    "event.amb_gold_of_mina_minted.option.strike_cruzados": "Strike gold cruzados",
+    "event.amb_gold_of_mina_minted.option.pay_creditors": "Pay off the crown's creditors",
+    "event.amb_gold_of_mina_minted.option.fund_voyages": "Send the caravels further south",
+    "event.amb_governor_general_of_brazil.name": "A governor-general for Brazil",
+    "event.amb_governor_general_of_brazil.desc": "The captaincies hold the coast, but their lords quarrel and some fail. The crown sends a governor-general with soldiers, priests and settlers to build a capital on the Bay of All Saints.",
+    "event.amb_governor_general_of_brazil.option.royal_capital": "Build a royal capital at Bahia",
+    "event.amb_governor_general_of_brazil.option.leave_to_lords": "Leave the coast to its lords",
+    "event.amb_capitulations_of_granada.name": "The terms of Granada",
+    "event.amb_capitulations_of_granada.desc": "The last Nasrid king hands over the keys of the Alhambra. The terms he signed promise the Muslims of Granada their mosques, their law and their property.",
+    "event.amb_capitulations_of_granada.option.keep_the_terms": "Keep the terms",
+    "event.amb_capitulations_of_granada.option.press_for_baptism": "Press for baptism",
+    "event.amb_cortes_of_toledo.name": "The Cortes of Toledo",
+    "event.amb_cortes_of_toledo.desc": "With the two crowns joined, the monarchs call the Cortes at Toledo. They take back the crown lands and rents handed out in the civil wars and fill the royal council with men trained in law.",
+    "event.amb_cortes_of_toledo.option.take_back_grants": "Take back the grants",
+    "event.amb_cortes_of_toledo.option.spare_the_grandees": "Spare the great lords",
+    "event.amb_casa_de_contratacion.name": "The House of Trade at Seville",
+    "event.amb_casa_de_contratacion.desc": "Ships now sail each year to colonies across the ocean. The crown founds a house of trade at Seville to license every voyage, train pilots and register every cargo that comes back.",
+    "event.amb_casa_de_contratacion.option.seville_monopoly": "All ships through Seville",
+    "event.amb_casa_de_contratacion.option.open_ports": "Open the trade to other ports",
+    "event.amb_bonds_of_the_new_king.name": "Bonds of the new king",
+    "event.amb_bonds_of_the_new_king.desc": "The wars of the roses are over and the new dynasty sits firm. The king's council binds the great lords with heavy bonds of good behaviour, payable to the crown if they stray.",
+    "event.amb_bonds_of_the_new_king.option.bonds_and_fines": "Bind the lords with bonds",
+    "event.amb_bonds_of_the_new_king.option.general_pardon": "Grant a general pardon",
+    "event.amb_court_of_augmentations.name": "The Court of Augmentations",
+    "event.amb_court_of_augmentations.desc": "The crown now heads the church, and the abbeys' lands fall to it. A new court is set up to survey them, collect their rents and decide what to do with them.",
+    "event.amb_court_of_augmentations.option.sell_abbey_lands": "Sell the lands to the gentry",
+    "event.amb_court_of_augmentations.option.keep_the_rents": "Keep the rents for the crown",
+    "event.amb_court_of_augmentations.option.endow_schools": "Endow grammar schools",
+    "event.amb_diwani_of_bengal.name": "The diwani of Bengal",
+    "event.amb_diwani_of_bengal.desc": "The Company's traders dominate the Bengal trade. The Mughal emperor offers it the right to collect the land revenue of Bengal, Bihar and Orissa.",
+    "event.amb_diwani_of_bengal.option.take_the_diwani": "Take the revenue right",
+    "event.amb_diwani_of_bengal.option.rule_through_nawab": "Leave it to the nawab",
+    "event.amb_army_kept_in_peace.name": "An army kept in peace",
+    "event.amb_army_kept_in_peace.desc": "The English hold nothing in France but memories. Instead of sending the paid companies home, the king keeps them under arms in peacetime, paid from a yearly tax.",
+    "event.amb_army_kept_in_peace.option.keep_the_companies": "Keep the companies",
+    "event.amb_army_kept_in_peace.option.disband_them": "Disband them",
+    "event.amb_parlement_of_dijon.name": "A parlement at Dijon",
+    "event.amb_parlement_of_dijon.desc": "Dijon is the crown's. The estates of Burgundy ask the king to confirm their old rights; he can win them with a court of their own, or rule them by governors.",
+    "event.amb_parlement_of_dijon.option.confirm_privileges": "Confirm the privileges",
+    "event.amb_parlement_of_dijon.option.rule_by_governors": "Rule by governors",
+    "event.amb_cyprus_sugar.name": "The sugar estates of Cyprus",
+    "event.amb_cyprus_sugar.desc": "Cyprus is Venetian. Its sugar estates and salt pans pass to the republic, and the senate decides whether to lease them out or garrison the island first.",
+    "event.amb_cyprus_sugar.option.lease_estates": "Lease the estates",
+    "event.amb_cyprus_sugar.option.garrison_island": "Garrison the island",
+    "event.amb_morea_resettled.name": "The Morea resettled",
+    "event.amb_morea_resettled.desc": "The Morea is the republic's, but war has emptied its villages. Venice can count every field and invite settlers, or simply farm out the taxes.",
+    "event.amb_morea_resettled.option.census_and_settlers": "Count the land and invite settlers",
+    "event.amb_morea_resettled.option.farm_the_taxes": "Farm out the taxes",
+    "event.amb_city_repopulated.name": "The new capital",
+    "event.amb_city_repopulated.desc": "Constantinople is the sultan's capital, but its streets are half empty after the siege. He can move families from across the realm into the city, or spend on a palace and covered markets.",
+    "event.amb_city_repopulated.option.bring_families": "Move families into the city",
+    "event.amb_city_repopulated.option.palace_and_bazaar": "Build a palace and markets",
+    "event.amb_relics_to_istanbul.name": "The relics come to Istanbul",
+    "event.amb_relics_to_istanbul.desc": "Egypt and the Hejaz are the sultan's. The keys of Mecca and the relics kept in Cairo are sent to his capital, and with them the duty of guarding the pilgrim roads.",
+    "event.amb_relics_to_istanbul.option.guard_the_pilgrims": "Guard the holy cities",
+    "event.amb_relics_to_istanbul.option.cairo_treasury": "Take Cairo's treasury",
+    "event.amb_province_of_buda.name": "The province of Buda",
+    "event.amb_province_of_buda.desc": "Central Hungary is the sultan's. He can rule it directly from Buda with a governor and tax registers, or leave a client king to rule it for him.",
+    "event.amb_province_of_buda.option.direct_rule": "Rule it from Buda",
+    "event.amb_province_of_buda.option.client_king": "Leave a client king",
+    "event.amb_law_code_of_1497.name": "The law code of 1497",
+    "event.amb_law_code_of_1497.desc": "The Rus lands are gathered under one prince. His clerks write one code of law for all of them: the same courts, the same fees, and one day in the year when peasants may leave their lords.",
+    "event.amb_law_code_of_1497.option.one_code": "One law for all the lands",
+    "event.amb_law_code_of_1497.option.court_fees": "Raise the court fees",
+    "event.amb_kremlin_rebuilt.name": "The Kremlin rebuilt",
+    "event.amb_kremlin_rebuilt.desc": "No khan takes tribute from Moscow any longer. The grand prince hires builders from Italy to raise new brick walls and towers around the Kremlin, and new cathedrals inside them.",
+    "event.amb_kremlin_rebuilt.option.hire_italians": "Hire the Italian builders",
+    "event.amb_kremlin_rebuilt.option.timber_walls": "Make do with timber and earth",
+    "event.amb_moscow_patriarchate.name": "A patriarch in Moscow",
+    "event.amb_moscow_patriarchate.desc": "Constantinople is gone and Moscow's churches stand everywhere. The visiting patriarch of Constantinople is asked to raise the metropolitan of Moscow to patriarch.",
+    "event.amb_moscow_patriarchate.option.raise_the_see": "Raise the see",
+    "event.amb_moscow_patriarchate.option.keep_the_metropolitan": "Keep the old order",
+    "event.amb_grain_down_the_vistula.name": "Grain down the Vistula",
+    "event.amb_grain_down_the_vistula.desc": "Danzig is the crown's. Grain from the great estates floats down the Vistula to its quays and on to the west, and Danzig asks to keep its own laws and tolls in return.",
+    "event.amb_grain_down_the_vistula.option.confirm_charter": "Confirm the city's charter",
+    "event.amb_grain_down_the_vistula.option.royal_tolls": "Take the tolls for the crown",
+    "event.amb_confederation_of_warsaw.name": "The Confederation of Warsaw",
+    "event.amb_confederation_of_warsaw.desc": "One commonwealth now joins the two nations. With the throne empty, the nobles of every faith swear to keep the peace among themselves and never to make war over religion.",
+    "event.amb_confederation_of_warsaw.option.swear_the_peace": "Swear to the religious peace",
+    "event.amb_confederation_of_warsaw.option.one_faith": "Hold to one faith",
+    "event.amb_noon_bell.name": "The noon bell",
+    "event.amb_noon_bell.desc": "Belgrade has held. Across Christendom the church bells ring at noon to remember the victory, and the realm's defenders are praised from every pulpit.",
+    "event.amb_noon_bell.option.feast_the_victory": "Celebrate the victory",
+    "event.amb_noon_bell.option.repair_the_walls": "Repair the border forts",
+    "event.amb_black_army.name": "The Black Army",
+    "event.amb_black_army.desc": "The king holds Vienna. His paid soldiers, the Black Army, made the conquest, and they expect to be paid even now there is peace.",
+    "event.amb_black_army.option.pay_the_army": "Keep the army paid",
+    "event.amb_black_army.option.disband_army": "Pay them off and disband",
+    "event.amb_mahmal_caravan.name": "The mahmal sets out",
+    "event.amb_mahmal_caravan.desc": "The Hejaz is the sultan's and Cyprus pays him tribute. Each year the richly covered litter leads the pilgrim caravan from Cairo to Mecca under his banner.",
+    "event.amb_mahmal_caravan.option.lead_the_caravan": "Lead the pilgrims in state",
+    "event.amb_mahmal_caravan.option.tax_the_road": "Tax the pilgrim road",
+    "event.amb_suez_fleet.name": "The fleet of Suez",
+    "event.amb_suez_fleet.desc": "The Malabar trade still runs through the Red Sea despite the newcomers. The sultan builds a war fleet at Suez with timber brought from the north and sends it to India.",
+    "event.amb_suez_fleet.option.send_the_fleet": "Send the fleet to India",
+    "event.amb_suez_fleet.option.guard_the_red_sea": "Keep it in the Red Sea",
+    "event.amb_envoys_from_lisbon.name": "Envoys from Lisbon",
+    "event.amb_envoys_from_lisbon.desc": "The friendship with Portugal bears fruit. Portuguese envoys come up the Gambia to the mansa's court, offering horses and goods for gold and a promise of help.",
+    "event.amb_envoys_from_lisbon.option.trade_for_horses": "Trade gold for horses",
+    "event.amb_envoys_from_lisbon.option.keep_them_at_the_coast": "Keep them at the coast",
+    "event.amb_debre_berhan.name": "Debre Berhan",
+    "event.amb_debre_berhan.desc": "Adal is beaten. Where a light was seen in the sky over the field, the emperor founds a church and a new royal town, and holds court there.",
+    "event.amb_debre_berhan.option.found_the_town": "Found a royal town",
+    "event.amb_debre_berhan.option.share_the_spoils": "Share the spoils with the lords",
+    "event.amb_fasil_ghebbi.name": "The castles of Gondar",
+    "event.amb_fasil_ghebbi.desc": "The roving royal camp gives way to a fixed capital. At Gondar the emperor raises a walled compound of stone castles, churches and baths.",
+    "event.amb_fasil_ghebbi.option.settle_at_gondar": "Settle the court at Gondar",
+    "event.amb_fasil_ghebbi.option.keep_moving": "Keep the court on the move",
+    "event.amb_ordos_wall.name": "A wall along the Ordos",
+    "event.amb_ordos_wall.desc": "Beijing has held and the Oirat war is over. Officials propose a long rammed-earth wall across the Ordos border, manned by soldiers who farm their own land.",
+    "event.amb_ordos_wall.option.build_the_wall": "Build the wall",
+    "event.amb_ordos_wall.option.buy_peace": "Buy peace with gifts and markets",
+    "event.amb_new_calendar.name": "A calendar from the west",
+    "event.amb_new_calendar.desc": "The new cannon and the learning that came with them have proved themselves. A calendar bureau of Chinese scholars and Jesuit astronomers is asked to reform the calendar too.",
+    "event.amb_new_calendar.option.reform_calendar": "Reform the calendar",
+    "event.amb_new_calendar.option.keep_old_methods": "Keep the old methods",
+    "event.amb_triumph_at_hampi.name": "The triumph at Hampi",
+    "event.amb_triumph_at_hampi.desc": "Raichur and Mudgal are held. The king returns to his capital in triumph, and foreign merchants and envoys crowd the festival of nine nights.",
+    "event.amb_triumph_at_hampi.option.grand_festival": "Hold a grand festival",
+    "event.amb_triumph_at_hampi.option.pay_the_captains": "Reward the captains",
+    "event.amb_tumebamba.name": "Tumebamba, a second Cusco",
+    "event.amb_tumebamba.desc": "The northern quarter is won. The Sapa Inca builds a new royal city at Tumebamba, with temples, storehouses and a palace to match Cusco's.",
+    "event.amb_tumebamba.option.royal_city": "Build the royal city",
+    "event.amb_tumebamba.option.settle_colonists": "Settle loyal colonists instead",
+    "event.amb_smiths_to_cusco.name": "The smiths go to Cusco",
+    "event.amb_smiths_to_cusco.desc": "Chan Chan has fallen. Its goldsmiths and weavers are taken to Cusco to work for the Sapa Inca, and the Chimú king's treasure goes with them.",
+    "event.amb_smiths_to_cusco.option.move_the_smiths": "Move the craftsmen to Cusco",
+    "event.amb_smiths_to_cusco.option.leave_them": "Leave them in Chan Chan",
+    "event.amb_baptism_at_mbanza_kongo.name": "Baptism at Mbanza Kongo",
+    "event.amb_baptism_at_mbanza_kongo.desc": "The alliance with Portugal brings priests and masons to the capital. The king and his court are offered baptism, and his son takes a Portuguese name.",
+    "event.amb_baptism_at_mbanza_kongo.option.accept_baptism": "Accept baptism",
+    "event.amb_baptism_at_mbanza_kongo.option.keep_the_old_shrines": "Keep the old shrines",
+    "event.amb_el_badi.name": "The palace of El Badi",
+    "event.amb_el_badi.desc": "The Portuguese king lies dead on the field and his nobles are prisoners. Their ransoms flow into the treasury, and the new sultan begins a palace of marble at Marrakesh.",
+    "event.amb_el_badi.option.build_el_badi": "Build the palace",
+    "event.amb_el_badi.option.fill_the_treasury": "Keep the ransoms",
+    "event.amb_great_code_issued.name": "The great code issued",
+    "event.amb_great_code_issued.desc": "The government's offices have grown in number and order. After decades of drafting, the great code of the state is printed and sent to every magistrate.",
+    "event.amb_great_code_issued.option.issue_the_code": "Issue the code",
+    "event.amb_great_code_issued.option.leave_to_custom": "Leave it to local custom",
+    "event.amb_hong_duc_code.name": "The Hồng Đức code",
+    "event.amb_hong_duc_code.desc": "The child king has grown into a ruler with a loyal court. His officials draw up a full code of law and a new map of the realm, and examinations open to all.",
+    "event.amb_hong_duc_code.option.issue_the_code": "Issue the code",
+    "event.amb_hong_duc_code.option.reward_the_lords": "Reward the lords who stood by him",
+    "event.amb_madrasa_at_bidar.name": "The madrasa at Bidar",
+    "event.amb_madrasa_at_bidar.desc": "Goa and the Konkan bring their port dues to the sultan. His chief minister builds a great college at Bidar, with a library and teachers brought from Persia.",
+    "event.amb_madrasa_at_bidar.option.build_the_college": "Build the college",
+    "event.amb_madrasa_at_bidar.option.fill_the_treasury": "Keep the port dues",
+    "event.amb_ngazargamu.name": "A walled capital at Ngazargamu",
+    "event.amb_ngazargamu.desc": "The Bulala are beaten and the old lands across the lake are safe. The mai builds a walled capital, ending a century of wandering courts.",
+    "event.amb_ngazargamu.option.raise_the_walls": "Raise the walls",
+    "event.amb_ngazargamu.option.keep_the_camp": "Keep the court on the move",
+    "event.amb_laws_of_malacca.name": "The laws of Malacca",
+    "event.amb_laws_of_malacca.desc": "Both shores of the strait answer to Malacca. The sultan's court writes down the laws of the land and a code of the sea, for every captain who drops anchor in the harbour.",
+    "event.amb_laws_of_malacca.option.write_the_laws": "Write down the laws",
+    "event.amb_laws_of_malacca.option.raise_harbour_dues": "Raise the harbour dues"
+  }
+}
