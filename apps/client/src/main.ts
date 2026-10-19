@@ -7387,6 +7387,14 @@ Object.assign(globalThis, {
     panelCollapsed = false;
     renderPanel();
   },
+  /** Stages an outbreak in province p until the next snapshot and opens its card: plague takes years of play to come (scripts/plague-shots.mjs). */
+  __phStagePlague: (p: number, closed = false) => {
+    if (!snapshot) return;
+    snapshot.provincePlague[p] = OUTBREAK_STEP;
+    snapshot.provinceQuarantine[p] = closed ? 1 : 0;
+    snapshot.plague = [...snapshot.plague.filter((x) => x.province !== p), { province: p, step: OUTBREAK_STEP, weeks: 9, dead: 1400 }];
+    goToProvince(p, false);
+  },
   __phEmpire: () => snapshot?.empire ?? null,
   __phStageEmpire: (v: NonNullable<Snapshot["empire"]>) => {
     if (!snapshot) return;
