@@ -150,8 +150,10 @@ Lines are listed most urgent first. Each has an icon, one sentence and a Show bu
 
 **Winning.** There are two ways to win.
 
-- **World domination:** you own, or hold as subjects, at least half of the world's settled land provinces. It is checked every January, and reaching it wins at once: the campaign end sequence plays straight away, and the final result offers Keep playing, which takes you back to the map until the end date.
-- **Best at the end:** when the end date comes, the realm that leads the Economy, Power or Technology score wins in that score. No margin is needed, and a tie shares the win. The scores are worked out every January for the Realm book; see [Your realm](Your-Realm).
+- **World domination:** you own, or hold as subjects, every settled land province of the world. It is checked every January, and reaching it wins at once: the campaign end sequence plays straight away, and the final result offers Keep playing, which takes you back to the map until the end date.
+- **Best at the end:** when the end date comes, the realm that has grown most in the Economy, Power or Technology score wins in that score: each score's 25-year average against the realm's own start. No margin is needed, and a tie shares the win. The scores are worked out every January for the Realm book; see [Your realm](Your-Realm).
+
+**Chapters.** Every 100 years (January 1544, 1644, 1744 and 1844) a chapter closes and the chapter card opens by itself in the panel: the hundred years it covers, one line on how your realm did ("France led Power"), your growth and place in each score beside who led it, and the leading realms. **Play on** closes it and the next chapter begins; **Score** opens the Score tab, where every closed chapter stays listed and opens its card again. Auto turns stop at the end of that week. The last chapter closes with the campaign, on the end card.
 
 **Campaign end.** When the end date is reached (31 August 1939 by default, or the date chosen at the start) or you win by world domination, the final wrap-up events appear as normal event cards, then a closing sequence steps through your borders era by era at world zoom with the campaign end music, then the final result. There is no playing on past the end date.
 
@@ -268,7 +270,7 @@ All are provisional values, unless marked, kept in the game shell's and the map'
 | `shell.tap_target_gap` | 8 points |
 | `shell.controller_end_turn_hold` | 0.5 s (Menu on a controller, Enter on a keyboard) |
 | `shell.end_date_earliest_year` | 1494 |
-| `shell.domination_share` | half of the world's settled land provinces (decided) |
+| `shell.domination_share` | every settled land province of the world (decided) |
 | `shell.ledger_leaders` | 5 realms beside yours on the final result |
 | `shell.campaign_end_date_default` | 31 August 1939 (decided) |
 | `attention.*` | one table of warnings and thresholds |
