@@ -66,6 +66,7 @@
    "title": "Game data",
    "pages": [
     "Game-Data",
+    "Formulas",
     "Data-Defines",
     "Data-Time-and-Turns",
     "Data-Realm",
@@ -6790,6 +6791,257 @@
      "id": "for-developers",
      "text": "For developers",
      "level": 2
+    }
+   ]
+  },
+  "Formulas": {
+   "title": "Formulas",
+   "summary": "These are the formulas the game computes today, taken from the engine code and not from the design documents. Each formula names the engine file and function it comes from, and each number names its config key and…",
+   "headings": [
+    {
+     "id": "battles",
+     "text": "Battles",
+     "level": 2
+    },
+    {
+     "id": "when-two-armies-fight",
+     "text": "When two armies fight",
+     "level": 3
+    },
+    {
+     "id": "what-each-side-brings",
+     "text": "What each side brings",
+     "level": 3
+    },
+    {
+     "id": "troop-level",
+     "text": "Troop level",
+     "level": 3
+    },
+    {
+     "id": "hits-per-bell",
+     "text": "Hits per bell",
+     "level": 3
+    },
+    {
+     "id": "charges-braces-and-shooting",
+     "text": "Charges, braces and shooting",
+     "level": 3
+    },
+    {
+     "id": "who-takes-the-hits",
+     "text": "Who takes the hits",
+     "level": 3
+    },
+    {
+     "id": "flee-share",
+     "text": "Flee share",
+     "level": 3
+    },
+    {
+     "id": "break-point-and-breaking",
+     "text": "Break point and breaking",
+     "level": 3
+    },
+    {
+     "id": "orders-rotation-and-night",
+     "text": "Orders, rotation and night",
+     "level": 3
+    },
+    {
+     "id": "losses-on-the-map",
+     "text": "Losses on the map",
+     "level": 3
+    },
+    {
+     "id": "sieges-and-storming",
+     "text": "Sieges and storming",
+     "level": 2
+    },
+    {
+     "id": "walls-and-garrison",
+     "text": "Walls and garrison",
+     "level": 3
+    },
+    {
+     "id": "a-siege-month",
+     "text": "A siege month",
+     "level": 3
+    },
+    {
+     "id": "terms-and-storming",
+     "text": "Terms and storming",
+     "level": 3
+    },
+    {
+     "id": "food",
+     "text": "Food",
+     "level": 2
+    },
+    {
+     "id": "what-the-land-feeds",
+     "text": "What the land feeds",
+     "level": 3
+    },
+    {
+     "id": "the-harvest",
+     "text": "The harvest",
+     "level": 3
+    },
+    {
+     "id": "eating-and-rot",
+     "text": "Eating and rot",
+     "level": 3
+    },
+    {
+     "id": "castles-collect-and-hand-out",
+     "text": "Castles collect and hand out",
+     "level": 3
+    },
+    {
+     "id": "relief-and-famine",
+     "text": "Relief and famine",
+     "level": 3
+    },
+    {
+     "id": "feeding-an-army",
+     "text": "Feeding an army",
+     "level": 3
+    },
+    {
+     "id": "money",
+     "text": "Money",
+     "level": 2
+    },
+    {
+     "id": "the-monthly-ledger",
+     "text": "The monthly ledger",
+     "level": 3
+    },
+    {
+     "id": "tax",
+     "text": "Tax",
+     "level": 3
+    },
+    {
+     "id": "army-pay",
+     "text": "Army pay",
+     "level": 3
+    },
+    {
+     "id": "troop-cap-and-desertion",
+     "text": "Troop cap and desertion",
+     "level": 3
+    },
+    {
+     "id": "recruits",
+     "text": "Recruits",
+     "level": 3
+    },
+    {
+     "id": "officials-loans-and-schools",
+     "text": "Officials, loans and schools",
+     "level": 3
+    },
+    {
+     "id": "buildings",
+     "text": "Buildings",
+     "level": 3
+    },
+    {
+     "id": "trade",
+     "text": "Trade",
+     "level": 2
+    },
+    {
+     "id": "trade-value",
+     "text": "Trade value",
+     "level": 3
+    },
+    {
+     "id": "collecting",
+     "text": "Collecting",
+     "level": 3
+    },
+    {
+     "id": "ratio-gain-and-decay",
+     "text": "Ratio gain and decay",
+     "level": 3
+    },
+    {
+     "id": "traders-on-the-road-and-their-cost",
+     "text": "Traders on the road and their cost",
+     "level": 3
+    },
+    {
+     "id": "research",
+     "text": "Research",
+     "level": 2
+    },
+    {
+     "id": "scholar-years",
+     "text": "Scholar-years",
+     "level": 3
+    },
+    {
+     "id": "invention-cost",
+     "text": "Invention cost",
+     "level": 3
+    },
+    {
+     "id": "spread",
+     "text": "Spread",
+     "level": 3
+    },
+    {
+     "id": "schools-students-and-scholars",
+     "text": "Schools, students and scholars",
+     "level": 3
+    },
+    {
+     "id": "without-the-past-inventions",
+     "text": "Without the past inventions",
+     "level": 3
+    },
+    {
+     "id": "movement",
+     "text": "Movement",
+     "level": 2
+    },
+    {
+     "id": "hours-to-cross-a-tile",
+     "text": "Hours to cross a tile",
+     "level": 3
+    },
+    {
+     "id": "forage-limit-and-route-days",
+     "text": "Forage limit and route days",
+     "level": 3
+    },
+    {
+     "id": "population-unrest-and-rebellion",
+     "text": "Population, unrest and rebellion",
+     "level": 2
+    },
+    {
+     "id": "births-and-deaths",
+     "text": "Births and deaths",
+     "level": 3
+    },
+    {
+     "id": "grievances-and-mood",
+     "text": "Grievances and mood",
+     "level": 3
+    },
+    {
+     "id": "the-chance-to-rise",
+     "text": "The chance to rise",
+     "level": 3
+    },
+    {
+     "id": "a-risings-band",
+     "text": "A rising's band",
+     "level": 3
     }
    ]
   },

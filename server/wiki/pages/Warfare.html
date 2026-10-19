@@ -9,7 +9,7 @@
 <li><strong>Loads of arms</strong> come from the store at raising and from won fields, and are lost with killed and fled men, on a lost field, or sold at disbanding. A company short of the loads its troop type needs fights as the next troop type down (heavy infantry as levy infantry).</li>
 <li>Men join by raising, refilling from recruits, wounded coming back and enlisted prisoners, and leave by being killed, wounded, fleeing, deserting, falling sick, going hungry or being disbanded.</li>
 </ul>
-<p><strong>Troop level</strong> is read from drill and scars: 1 Raw, 2 Drilled, 3 Seasoned, 4 Veteran, 5 Elite. In eras I and II, Drilled comes at 3 months of drill, Seasoned at 6 months and 1 scar, Veteran at 3 scars, and Elite at 5 scars and 12 months of drill. Levels drop when new men dilute a company, after 5 years without a battle, when hungry, and all at once on disbanding. Standing regiments (W12) never drop below level 2.</p>
+<p><strong>Troop level</strong> is read from drill and scars: 1 Raw, 2 Drilled, 3 Seasoned, 4 Veteran, 5 Elite. In era I, Drilled comes at 2 months of drill, Seasoned at 4 months and 1 scar, Veteran at 3 scars, and Elite at 5 scars and 8 months of drill; later eras need longer (see <strong>Levels by era</strong> below). Levels drop when new men dilute a company, after 5 years without a battle, when hungry, and all at once on disbanding. Standing regiments (W12) never drop below level 2.</p>
 <p><strong>The troop types of eras I to IV:</strong></p>
 <div class="table-scroll"><table>
 <thead><tr><th>Arm</th><th>Strength per man</th><th>Needs per 100 men</th><th>Roles</th><th>Unlocked by</th></tr></thead>
@@ -337,13 +337,13 @@
 <li><a href="/wiki/Time-and-Turns">Time-and-Turns</a>: the weekly turn, the day loop and the order battles resolve in.</li>
 </ul>
 <h2 id="numbers"><a class="anchor" href="#numbers" aria-label="Link to this section">#</a>Numbers</h2>
-<p>Every value the game uses, made from its config so it always matches the game: <a href="/wiki/Data-Warfare">Warfare data</a>. How they combine: <a href="Formulas">Formulas</a>.</p>
+<p>Every value the game uses, made from its config so it always matches the game: <a href="/wiki/Data-Warfare">Warfare data</a>. How they combine: <a href="/wiki/Formulas">Formulas</a>.</p>
 <p>All warfare values live in <code>packages/rules/data/domain/warfare.json</code>; most are provisional and tuned in balancing. Amounts the designs left out are set as: a wagon costs 10 gold, a hired company costs twice standing pay, a season is 3 months, a ransom is 100 gold for a commander and 25 for a captain, and fever land doubles sickness. Key values:</p>
 <div class="table-scroll"><table>
 <thead><tr><th>Key</th><th>Value</th></tr></thead>
 <tbody>
 <tr><td><code>warfare.company_size_min</code> / <code>max</code></td><td>500 / 1,000</td></tr>
-<tr><td><code>warfare.drill_max</code>, <code>warfare.scars_max</code>, <code>warfare.scar_fade_years</code></td><td>12, 5, 5</td></tr>
+<tr><td><code>warfare.drill_max</code>, <code>warfare.scars_max</code>, <code>warfare.scar_fade_years</code></td><td>24, 5, 5</td></tr>
 <tr><td><code>warfare.kinds.&lt;kind&gt;.break_point</code></td><td>levy 25 %, retinue 35 %, hired 35 %, standing 30 %, garrison 40 %, rebel 20 %</td></tr>
 <tr><td><code>warfare.kinds.levy.free_months</code></td><td>3 (levies no longer go home on their own)</td></tr>
 <tr><td><code>warfare.kinds.hired.pay_multiplier</code>, <code>warfare.kinds.standing.pay_multiplier</code></td><td>3, 1.5</td></tr>

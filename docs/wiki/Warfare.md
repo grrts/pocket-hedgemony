@@ -13,7 +13,7 @@ Every army is made of **companies** of usually 500 to 1,000 men. Each company ha
 - **Loads of arms** come from the store at raising and from won fields, and are lost with killed and fled men, on a lost field, or sold at disbanding. A company short of the loads its troop type needs fights as the next troop type down (heavy infantry as levy infantry).
 - Men join by raising, refilling from recruits, wounded coming back and enlisted prisoners, and leave by being killed, wounded, fleeing, deserting, falling sick, going hungry or being disbanded.
 
-**Troop level** is read from drill and scars: 1 Raw, 2 Drilled, 3 Seasoned, 4 Veteran, 5 Elite. In eras I and II, Drilled comes at 3 months of drill, Seasoned at 6 months and 1 scar, Veteran at 3 scars, and Elite at 5 scars and 12 months of drill. Levels drop when new men dilute a company, after 5 years without a battle, when hungry, and all at once on disbanding. Standing regiments (W12) never drop below level 2.
+**Troop level** is read from drill and scars: 1 Raw, 2 Drilled, 3 Seasoned, 4 Veteran, 5 Elite. In era I, Drilled comes at 2 months of drill, Seasoned at 4 months and 1 scar, Veteran at 3 scars, and Elite at 5 scars and 8 months of drill; later eras need longer (see **Levels by era** below). Levels drop when new men dilute a company, after 5 years without a battle, when hungry, and all at once on disbanding. Standing regiments (W12) never drop below level 2.
 
 **The troop types of eras I to IV:**
 
@@ -424,7 +424,7 @@ All warfare values live in `packages/rules/data/domain/warfare.json`; most are p
 | Key | Value |
 |---|---|
 | `warfare.company_size_min` / `max` | 500 / 1,000 |
-| `warfare.drill_max`, `warfare.scars_max`, `warfare.scar_fade_years` | 12, 5, 5 |
+| `warfare.drill_max`, `warfare.scars_max`, `warfare.scar_fade_years` | 24, 5, 5 |
 | `warfare.kinds.<kind>.break_point` | levy 25 %, retinue 35 %, hired 35 %, standing 30 %, garrison 40 %, rebel 20 % |
 | `warfare.kinds.levy.free_months` | 3 (levies no longer go home on their own) |
 | `warfare.kinds.hired.pay_multiplier`, `warfare.kinds.standing.pay_multiplier` | 3, 1.5 |
