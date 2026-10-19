@@ -1,4 +1,4 @@
-import type { FoodView, Snapshot } from "@ph/engine";
+import { FOOD_BALANCE, type FoodView, type Snapshot } from "@ph/engine";
 import { icon } from "../art/ui.ts";
 import { fold } from "./fold.ts";
 
@@ -52,11 +52,33 @@ function storeBar(c: FoodView["castles"][number], reserve: number): string {
   return `<span class="store-bar" role="img" aria-label="${c.storeMonths.toFixed(1)} of ${c.capMonths} months stored"><i style="width:${pct.toFixed(1)}%"></i>${reserve > 0 ? `<b style="left:${mark.toFixed(1)}%"></b>` : ""}</span>`;
 }
 
-export function foodTab(s: Snapshot, name: (p: number) => string, thumb: (p: number) => string, held: number[]): string {
+/** The share of its people a province's land feeds in a normal year (its Land tab's first line). */
+export function landShare(s: Snapshot, p: number): number {
+  const tiles = s.landSheets[p] ?? [];
+  const people = s.provincePeople[p] ?? 0;
+  return people > 0 ? tiles.reduce((a, t) => a + t.feeds, 0) / people : 1;
+}
+
+/**
+ * The player's own provinces (no lord's) whose land feeds less than a little
+ * over their people in a normal year, the worst first (D-PROV-36): under
+ * FOOD_BALANCE.short they shrink, under .tight a poor harvest starves them.
+ * Births don't follow food, so building farms or a castle's store is the fix.
+ */
+export function shortProvinces(s: Snapshot, held: number[]): { p: number; share: number }[] {
+  return held
+    .filter((p) => s.provinceLord[p]! < 0)
+    .map((p) => ({ p, share: landShare(s, p) }))
+    .filter((x) => x.share < FOOD_BALANCE.tight)
+    .sort((a, b) => a.share - b.share || a.p - b.p);
+}
+
+export function foodTab(s: Snapshot, name: (p: number) => string, thumb: (p: number) => string, held: number[], fix: (p: number) => string): string {
   const f = s.food;
   if (!f) return "";
-  const hungry = held.filter((p) => s.provinceFoodMonths[p]! < 1).length;
-  const low = held.filter((p) => s.provinceFoodMonths[p]! >= 1 && s.provinceFoodMonths[p]! < 3).length;
+  const { hungry, low } = foodCounts(s, held);
+  const tight = shortProvinces(s, held);
+  const short = tight.filter((x) => x.share < FOOD_BALANCE.short).length;
   const fed = held.length - f.outside.length;
   const reach = Math.max(1, ...f.castles.map((c) => c.reach));
   const noGranary = f.castles.filter((c) => !c.granary);
@@ -67,6 +89,7 @@ export function foodTab(s: Snapshot, name: (p: number) => string, thumb: (p: num
     <div class="food-glance">
       <div class="${hungry ? "bad" : ""}"><b>${hungry}</b><small>hungry</small></div>
       <div class="${low ? "warn" : ""}"><b>${low}</b><small>running low</small></div>
+      <div class="${short ? "warn" : ""}"><b>${short}</b><small>short of food</small></div>
       <div><b>${fed}<small>/${held.length}</small></b><small>fed by castles</small></div>
     </div>
     <p>This year ${f.soldThisYear > 0.5 ? `you sold food for <b>${f.goldThisYear.toFixed(1)} gold</b>` : "you sold no food"}${spoiled ? ` and food that would feed <b>${fmt((f.spoiledThisYear / 12) * 1000)} people for a year spoiled</b>` : ""}.${spoiled && f.realm.surplus === "Keep" ? " Sell the surplus to turn it into gold." : ""}</p>`;
@@ -127,8 +150,29 @@ export function foodTab(s: Snapshot, name: (p: number) => string, thumb: (p: num
   // A reserve the castles without a granary can't hold is a warning, so it stays outside the fold.
   const shortReserve = noGranary.length && f.realm.siegeReserve > smallest ? `<p class="hint"><b>${noGranary.length} castle${noGranary.length === 1 ? "" : "s"} without a granary hold only ${smallest} months of the siege reserve.</b></p>` : "";
 
+  // Short of food (D-PROV-36): the land doesn't feed its people in a normal year, so the player builds; each row opens the Land tab.
+  const shortRows = tight
+    .slice(0, 12)
+    .map(({ p, share }) => {
+      const bad = share < FOOD_BALANCE.short;
+      return `<div class="province-row${bad ? " bad" : ""}">
+        <button class="place" data-open-land="${p}" title="Open ${esc(name(p))} on its Land tab">
+          <img class="thumb" src="${thumb(p)}" alt="" width="48" height="48">
+          <span class="place-name"><b>${esc(name(p))}</b><small>${bad ? "Shrinks each year" : "A poor harvest brings famine"} · ${esc(fix(p))}</small></span>
+          <span class="place-stats"><small>Land feeds ${Math.round(share * 100)} %</small><small>${s.provinceFoodMonths[p]!.toFixed(1)} months stored</small></span>
+        </button>
+      </div>`;
+    })
+    .join("");
+  const shortList = tight.length
+    ? `<h3 class="sub">Short of food</h3>
+      <p class="hint">Their land doesn't feed their people in a normal year, and people keep having children. Build a farm or clear land on the Land tab, or feed them from a castle.</p>
+      <div class="province-list">${shortRows}</div>${tight.length > 12 ? `<p class="hint">and ${tight.length - 12} more on Provinces, Short of food</p>` : ""}`
+    : "";
+
   return `
     ${glance}
+    ${shortList}
     <h3 class="sub">Presets</h3>
     <div class="choices food-presets">${presets}</div>
     ${shortReserve}
@@ -158,11 +202,12 @@ export function castleFoodSettings(s: Snapshot, p: number): string {
     </section>`;
 }
 
-/** Provinces with less than a month of food, and those with less than three. */
-export function foodCounts(s: Snapshot, held: number[]): { hungry: number; low: number } {
+/** Provinces with less than a month of food, those with less than three, and the player's own whose land feeds less than its people (D-PROV-36). */
+export function foodCounts(s: Snapshot, held: number[]): { hungry: number; low: number; short: number } {
   return {
     hungry: held.filter((p) => s.provinceFoodMonths[p]! < 1).length,
     low: held.filter((p) => s.provinceFoodMonths[p]! >= 1 && s.provinceFoodMonths[p]! < 3).length,
+    short: held.filter((p) => s.provinceLord[p]! < 0 && landShare(s, p) < FOOD_BALANCE.short).length,
   };
 }
 
