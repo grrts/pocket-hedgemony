@@ -627,24 +627,9 @@
    ]
   },
   {
-   "id": "ajuran",
-   "name": "Ajuran",
-   "color": "#2e8b57",
-   "capital": "p3533",
-   "tree": [
-    "ajuran"
-   ],
-   "home": [
-    "p3529",
-    "p3531",
-    "p3532",
-    "p3641"
-   ]
-  },
-  {
    "id": "kaffa",
    "name": "Kaffa",
-   "color": "#9a6b3c",
+   "color": "#2e8b57",
    "capital": "p3418",
    "tree": [
     "kaffa"
@@ -656,7 +641,7 @@
   {
    "id": "air_agadez",
    "name": "Aïr Sultanate",
-   "color": "#c2b280",
+   "color": "#9a6b3c",
    "capital": "p3081",
    "tree": [
     "air_agadez"
@@ -669,7 +654,7 @@
   {
    "id": "timbuktu_tuareg",
    "name": "Tuareg of the Niger bend",
-   "color": "#5f7f9f",
+   "color": "#c2b280",
    "capital": "p3075",
    "tree": [
     "timbuktu_tuareg"
@@ -681,7 +666,7 @@
   {
    "id": "massina_fulbe",
    "name": "Fulbe of Masina",
-   "color": "#7c5c8c",
+   "color": "#5f7f9f",
    "capital": "p3074",
    "tree": [
     "massina_fulbe"
@@ -693,7 +678,7 @@
   {
    "id": "canarian_lordship",
    "name": "Lordship of the Canary Islands",
-   "color": "#a0522d",
+   "color": "#7c5c8c",
    "capital": "p2465",
    "tree": [
     "canarian_lordship"
@@ -706,7 +691,7 @@
   {
    "id": "bougie",
    "name": "Bougie",
-   "color": "#4f7942",
+   "color": "#a0522d",
    "capital": "p1905",
    "tree": [
     "bougie"
@@ -719,7 +704,7 @@
   {
    "id": "debdou",
    "name": "Debdou",
-   "color": "#8f6f3f",
+   "color": "#4f7942",
    "capital": "p1888",
    "tree": [
     "debdou"
@@ -731,7 +716,7 @@
   {
    "id": "hintata_marrakesh",
    "name": "Hintata of Marrakesh",
-   "color": "#6a5acd",
+   "color": "#8f6f3f",
    "capital": "p2162",
    "tree": [
     "hintata_marrakesh"
@@ -743,7 +728,7 @@
   {
    "id": "loango",
    "name": "Loango",
-   "color": "#b07c4f",
+   "color": "#6a5acd",
    "capital": "p3731",
    "tree": [
     "loango"
@@ -755,7 +740,7 @@
   {
    "id": "buganda",
    "name": "Buganda",
-   "color": "#3f6f6f",
+   "color": "#b07c4f",
    "capital": "p3633",
    "tree": [
     "buganda"
@@ -767,7 +752,7 @@
   {
    "id": "ankole",
    "name": "Ankole",
-   "color": "#9c7a3c",
+   "color": "#3f6f6f",
    "capital": "p3631",
    "tree": [
     "ankole"
@@ -779,7 +764,7 @@
   {
    "id": "karagwe",
    "name": "Karagwe",
-   "color": "#7f8f5f",
+   "color": "#9c7a3c",
    "capital": "p3749",
    "tree": [
     "karagwe"
@@ -791,7 +776,7 @@
   {
    "id": "rwanda",
    "name": "Rwanda",
-   "color": "#a76f5f",
+   "color": "#7f8f5f",
    "capital": "p3630",
    "tree": [
     "rwanda"
@@ -804,7 +789,7 @@
   {
    "id": "mandara",
    "name": "Mandara",
-   "color": "#5c7c4c",
+   "color": "#a76f5f",
    "capital": "p3240",
    "tree": [
     "mandara"
@@ -814,7 +799,7 @@
   {
    "id": "coosa",
    "name": "Coosa",
-   "color": "#8a7a5a",
+   "color": "#5c7c4c",
    "capital": "p2155",
    "tree": [
     "coosa"
@@ -826,7 +811,7 @@
   {
    "id": "cherokee",
    "name": "Cherokee",
-   "color": "#c47a3a",
+   "color": "#8a7a5a",
    "capital": "p1871",
    "tree": [
     "cherokee"
@@ -839,7 +824,7 @@
   {
    "id": "creek",
    "name": "Creek",
-   "color": "#6f8faf",
+   "color": "#c47a3a",
    "capital": "p2152",
    "tree": [
     "creek"
@@ -852,6 +837,70 @@
     "p2155",
     "p2156"
    ]
+  },
+  {
+   "id": "maya_mani_xiu",
+   "name": "Maní (Xiu)",
+   "color": "#6f8faf",
+   "capital": "p2888",
+   "tree": [
+    "maya_mani_xiu"
+   ],
+   "home": []
+  },
+  {
+   "id": "maya_sotuta_cocom",
+   "name": "Sotuta (Cocom)",
+   "color": "#9b5d4a",
+   "capital": "p2888",
+   "tree": [
+    "maya_sotuta_cocom"
+   ],
+   "home": [
+    "p2888"
+   ]
+  },
+  {
+   "id": "maya_cupul",
+   "name": "Cupul",
+   "color": "#4c7a6a",
+   "capital": "p2888",
+   "tree": [
+    "maya_cupul"
+   ],
+   "home": []
+  },
+  {
+   "id": "maya_ecab",
+   "name": "Ecab",
+   "color": "#b5895a",
+   "capital": "p2889",
+   "tree": [
+    "maya_ecab"
+   ],
+   "home": [
+    "p2890"
+   ]
+  },
+  {
+   "id": "maya_chetumal",
+   "name": "Chetumal",
+   "color": "#6a7d3a",
+   "capital": "p2889",
+   "tree": [
+    "maya_chetumal"
+   ],
+   "home": []
+  },
+  {
+   "id": "maya_ah_canul",
+   "name": "Ah Canul",
+   "color": "#7d6aa0",
+   "capital": "p2887",
+   "tree": [
+    "maya_ah_canul"
+   ],
+   "home": []
   },
   {
    "id": "babur_kabul",

@@ -4762,6 +4762,18 @@
     "agaw": "Agaw"
    }
   },
+  "ajuran": {
+   "court": "somali",
+   "mix": [
+    [
+     "somali",
+     1
+    ]
+   ],
+   "local": {
+    "somali": "Somali (Ajuran and allied clans)"
+   }
+  },
   "kilwa": {
    "court": "swahili",
    "mix": [

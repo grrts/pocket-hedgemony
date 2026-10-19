@@ -1129,36 +1129,9 @@
    "why": "Khami rises in the south-west as Great Zimbabwe fades (c.1400-1450, disputed)."
   },
   {
-   "id": "ajuran",
-   "name": "Ajuran",
-   "color": "#2e8b57",
-   "capital": [
-    45.34,
-    2.04
-   ],
-   "home": [
-    {
-     "countries": [
-      "SOM"
-     ],
-     "bbox": [
-      41,
-      -1.7,
-      44.5,
-      6
-     ]
-    }
-   ],
-   "tree": [
-    "ajuran"
-   ],
-   "forms_about": 1420,
-   "why": "An inland Shabelle power; it holds Mogadishu's hinterland only in the 15th century (low confidence)."
-  },
-  {
    "id": "kaffa",
    "name": "Kaffa",
-   "color": "#9a6b3c",
+   "color": "#2e8b57",
    "capital": [
     36.24,
     7.27
@@ -1185,7 +1158,7 @@
   {
    "id": "air_agadez",
    "name": "Aïr Sultanate",
-   "color": "#c2b280",
+   "color": "#9a6b3c",
    "capital": [
     7.99,
     16.97
@@ -1212,7 +1185,7 @@
   {
    "id": "timbuktu_tuareg",
    "name": "Tuareg of the Niger bend",
-   "color": "#5f7f9f",
+   "color": "#c2b280",
    "capital": [
     -2.0,
     18.8
@@ -1239,7 +1212,7 @@
   {
    "id": "massina_fulbe",
    "name": "Fulbe of Masina",
-   "color": "#7c5c8c",
+   "color": "#5f7f9f",
    "capital": [
     -4.95,
     14.5
@@ -1266,7 +1239,7 @@
   {
    "id": "canarian_lordship",
    "name": "Lordship of the Canary Islands",
-   "color": "#a0522d",
+   "color": "#7c5c8c",
    "capital": [
     -13.56,
     29.06
@@ -1293,7 +1266,7 @@
   {
    "id": "bougie",
    "name": "Bougie",
-   "color": "#4f7942",
+   "color": "#a0522d",
    "capital": [
     5.08,
     36.75
@@ -1320,7 +1293,7 @@
   {
    "id": "debdou",
    "name": "Debdou",
-   "color": "#8f6f3f",
+   "color": "#4f7942",
    "capital": [
     -3.05,
     34.0
@@ -1347,7 +1320,7 @@
   {
    "id": "hintata_marrakesh",
    "name": "Hintata of Marrakesh",
-   "color": "#6a5acd",
+   "color": "#8f6f3f",
    "capital": [
     -7.99,
     31.63
@@ -1374,7 +1347,7 @@
   {
    "id": "loango",
    "name": "Loango",
-   "color": "#b07c4f",
+   "color": "#6a5acd",
    "capital": [
     11.82,
     -4.65
@@ -1401,7 +1374,7 @@
   {
    "id": "buganda",
    "name": "Buganda",
-   "color": "#3f6f6f",
+   "color": "#b07c4f",
    "capital": [
     32.5,
     0.3
@@ -1428,7 +1401,7 @@
   {
    "id": "ankole",
    "name": "Ankole",
-   "color": "#9c7a3c",
+   "color": "#3f6f6f",
    "capital": [
     30.8,
     -0.8
@@ -1455,7 +1428,7 @@
   {
    "id": "karagwe",
    "name": "Karagwe",
-   "color": "#7f8f5f",
+   "color": "#9c7a3c",
    "capital": [
     31.1,
     -1.6
@@ -1482,7 +1455,7 @@
   {
    "id": "rwanda",
    "name": "Rwanda",
-   "color": "#a76f5f",
+   "color": "#7f8f5f",
    "capital": [
     29.9,
     -2.0
@@ -1510,7 +1483,7 @@
   {
    "id": "mandara",
    "name": "Mandara",
-   "color": "#5c7c4c",
+   "color": "#a76f5f",
    "capital": [
     13.9,
     10.9
@@ -1538,7 +1511,7 @@
   {
    "id": "coosa",
    "name": "Coosa",
-   "color": "#8a7a5a",
+   "color": "#5c7c4c",
    "capital": [
     -84.75,
     34.6
@@ -1568,7 +1541,7 @@
   {
    "id": "cherokee",
    "name": "Cherokee",
-   "color": "#c47a3a",
+   "color": "#8a7a5a",
    "capital": [
     -84.2,
     35.5
@@ -1599,7 +1572,7 @@
   {
    "id": "creek",
    "name": "Creek",
-   "color": "#6f8faf",
+   "color": "#c47a3a",
    "capital": [
     -85.5,
     32.4
@@ -1620,6 +1593,185 @@
    ],
    "forms_about": 1600,
    "why": "The Creek Confederacy coalesces long after 1444; Mississippian chiefdoms hold the land (decision 6)."
+  },
+  {
+   "id": "maya_mani_xiu",
+   "name": "Maní (Xiu)",
+   "color": "#6f8faf",
+   "capital": [
+    -89.39,
+    20.39
+   ],
+   "home": [
+    {
+     "countries": [
+      "MEX"
+     ],
+     "admin1": [
+      "Yucatán"
+     ],
+     "bbox": [
+      -90,
+      19.9,
+      -89.2,
+      20.6
+     ]
+    }
+   ],
+   "tree": [
+    "maya_mani_xiu"
+   ],
+   "forms_about": 1441,
+   "why": "The Xiu lead the revolt that destroys Mayapan and rule Maní; the map id maya passes to them."
+  },
+  {
+   "id": "maya_sotuta_cocom",
+   "name": "Sotuta (Cocom)",
+   "color": "#9b5d4a",
+   "capital": [
+    -89.01,
+    20.6
+   ],
+   "home": [
+    {
+     "countries": [
+      "MEX"
+     ],
+     "admin1": [
+      "Yucatán"
+     ],
+     "bbox": [
+      -89.2,
+      20.4,
+      -88.6,
+      21
+     ]
+    }
+   ],
+   "tree": [
+    "maya_sotuta_cocom"
+   ],
+   "forms_about": 1441,
+   "why": "The surviving Cocom make Sotuta their domain after Mayapan falls."
+  },
+  {
+   "id": "maya_cupul",
+   "name": "Cupul",
+   "color": "#4c7a6a",
+   "capital": [
+    -88.2,
+    20.69
+   ],
+   "home": [
+    {
+     "countries": [
+      "MEX"
+     ],
+     "admin1": [
+      "Yucatán"
+     ],
+     "bbox": [
+      -88.6,
+      20.4,
+      -87.6,
+      21.3
+     ]
+    }
+   ],
+   "tree": [
+    "maya_cupul"
+   ],
+   "forms_about": 1441,
+   "why": "The Cupul lords rule from Saci (Valladolid) after Mayapan falls."
+  },
+  {
+   "id": "maya_ecab",
+   "name": "Ecab",
+   "color": "#b5895a",
+   "capital": [
+    -87.3,
+    21.4
+   ],
+   "home": [
+    {
+     "countries": [
+      "MEX"
+     ],
+     "admin1": [
+      "Quintana Roo"
+     ],
+     "bbox": [
+      -87.6,
+      20.4,
+      -86.7,
+      21.7
+     ]
+    }
+   ],
+   "tree": [
+    "maya_ecab"
+   ],
+   "forms_about": 1441,
+   "why": "Ecab on the north-east coast stands alone after Mayapan falls; its tie to the League is uncertain."
+  },
+  {
+   "id": "maya_chetumal",
+   "name": "Chetumal",
+   "color": "#6a7d3a",
+   "capital": [
+    -88.3,
+    18.5
+   ],
+   "home": [
+    {
+     "countries": [
+      "MEX",
+      "BLZ"
+     ],
+     "bbox": [
+      -89,
+      17.8,
+      -87.5,
+      19.5
+     ]
+    }
+   ],
+   "tree": [
+    "maya_chetumal"
+   ],
+   "forms_about": 1441,
+   "why": "Chetumal on the bay stands alone after Mayapan falls; its tie to the League is uncertain."
+  },
+  {
+   "id": "maya_ah_canul",
+   "name": "Ah Canul",
+   "color": "#7d6aa0",
+   "capital": [
+    -90.05,
+    20.37
+   ],
+   "home": [
+    {
+     "countries": [
+      "MEX"
+     ],
+     "admin1": [
+      "Campeche",
+      "Yucatán"
+     ],
+     "bbox": [
+      -90.6,
+      19.8,
+      -89.6,
+      21
+     ]
+    }
+   ],
+   "tree": [
+    "maya_ah_canul"
+   ],
+   "forms_about": 1441,
+   "why": "The Canul, the League's mercenary lineage, settle the Campeche coast after Mayapan falls."
   },
   {
    "id": "babur_kabul",
