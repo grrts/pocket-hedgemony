@@ -170,8 +170,9 @@ threshold) or fail.
   the 1444 count, provisional). [X-21]
 - BAL-020 *Every path is open to every size.* For the small band, the best strategy's mean score growth shall be at
   least `balance.checks.small_floor` (70 %, provisional) of the large band's best, so small realms are playable. [X-21]
-- BAL-021 *No collapse without cause.* No realm shall go bankrupt (debt over two years' income) at peace with no
-  rebels in more than `balance.checks.bankrupt_share` (5 %, provisional) of realm-runs. [X-21]
+- BAL-021 *No collapse without cause.* No realm shall go bankrupt (default on its debts, REALM-301, or owe more than two
+  years' income) at peace with no rebels in more than `balance.checks.bankrupt_share` (5 %, provisional) of realm-runs.
+  [X-21, X-29: with lenders capped at a year's income, a default is how a realm goes bankrupt]
 
 ### 5.5 Lever sweeps
 

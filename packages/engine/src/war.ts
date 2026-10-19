@@ -1,4 +1,5 @@
 import { lordsLoseWar } from "./lords.ts";
+import { markTaken } from "./newlyTaken.ts";
 import { battleDeath } from "./people.ts";
 import { armyDead, garrisonDead } from "./fallen.ts";
 import { castleStep } from "./works.ts";
@@ -962,6 +963,7 @@ function makePeace(world: World, war: dip.War, whole: boolean, a: number, b: num
     world.provinceOwner[p] = world.provinceOccupier[p]!;
     world.provinceLord[p] = -1;
     provinceTaken(world, p, news);
+    markTaken(world, p);
   }
   // Every other occupation between the realms making peace ends.
   const set = new Set(involved);
@@ -1016,6 +1018,7 @@ export function cedeProvince(world: World, p: number, to: number, news: News[]):
   world.provinceOwner[p] = to;
   world.provinceLord[p] = -1;
   provinceTaken(world, p, news);
+  markTaken(world, p);
   world.provinceOccupier[p] = -1;
   world.provinceHold[p] = 0;
   world.sieges.delete(p);

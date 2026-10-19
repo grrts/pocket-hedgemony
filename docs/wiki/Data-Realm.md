@@ -59,7 +59,7 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 |---|---|
 | `steps` | Loyal, Wavering, Disloyal, In revolt |
 | `up` | want\_granted, gift\_of\_gold, office\_at\_court, marriage\_into\_ruling\_house, victory\_taken\_part, long\_secure\_reign, fed\_in\_famine, shared\_faith\_and\_tongue, war\_against\_rival |
-| `down` | heavy\_taxes, land\_seized\_from\_him, land\_seized\_from\_another, war\_lost, battle\_lost, child\_ruler, disputed\_heir, new\_ruler, grain\_requisitioned, foreign\_bribes, crown\_borrowed, massacre, faith\_not\_shared, censured\_by\_head, slighted\_at\_court, lord\_assassinated, assassin\_caught |
+| `down` | heavy\_taxes, land\_seized\_from\_him, land\_seized\_from\_another, war\_lost, battle\_lost, child\_ruler, disputed\_heir, new\_ruler, grain\_requisitioned, foreign\_bribes, crown\_borrowed, crown\_defaulted, massacre, faith\_not\_shared, censured\_by\_head, slighted\_at\_court, lord\_assassinated, assassin\_caught |
 
 ## Food
 
@@ -419,6 +419,18 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 | `interest_added_at_once_years` | 1 |
 | `lords_waver_once_per_months` | 12 |
 
+### Default
+
+> X-29: a realm whose gold stays below zero with nothing more to borrow for broke\_months monthly steps defaults: its debt is gone and its gold set to nothing, each lord takes the crown\_defaulted cause lord\_steps times, stability reads Troubled for troubled\_years and lenders refuse it for lenders\_refuse\_years. Provisional.
+
+| Key | Value |
+|---|---|
+| `broke_months` | 3 |
+| `lord_steps` | 2 |
+| `troubled_years` | 2 |
+| `lenders_refuse_years` | 5 |
+| `provisional` | yes |
+
 ## Officials per province
 
 | Key | Value |
@@ -467,6 +479,30 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 |---|---|
 | `troubled_from` | 0.1 |
 | `crumbling_from` | 0.25 |
+
+### Effects
+
+> X-29: what low stability costs. tax and recruits are the shares the crown still collects of each province's tax and recruit refill; rising multiplies the monthly chance a plotting province rises. Steady and Uneasy cost nothing. Provisional.
+
+| Key | Value |
+|---|---|
+| `provisional` | yes |
+
+#### Troubled
+
+| Key | Value |
+|---|---|
+| `tax` | 0.9 |
+| `recruits` | 0.9 |
+| `rising` | 1.5 |
+
+#### Crumbling
+
+| Key | Value |
+|---|---|
+| `tax` | 0.75 |
+| `recruits` | 0.75 |
+| `rising` | 2 |
 
 ## Titles (provisional)
 
