@@ -10,7 +10,6 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **OQ-AUD-13** (audio): Palette reviewers and listening approval (release task): each palette needs a paid reviewer of its tradition, and every track needs Leroy's listening approval, before release.
 - **OQ-INST-1** (institutions): The X-13 match of catalogue imperial estates to map realms (Bavaria, Württemberg, Hamburg, Pomerania, Switzerland, Modena are split or renamed in the catalogue): the data list decides; it needs one pass of review.
 - **OQ-INST-2** (institutions): The ten circles on a 137-realm map: which map realms sit in which circle (data). Slice 2 default: the historical circles matched to the map members (Austrian, Bavarian, Swabian, Upper Rhenish, Electoral Rhenish, Lower Saxon, Upper Saxon); Bohemia, Switzerland and the Italian members sit in none.
-- **OQ-INST-3** (institutions): Which great houses Japan starts with as lords depends on the realm data's great-house list (D-REALM-10); the shogunate needs at least the 22 shugo houses of the catalogue.
 - **OQ-INST-4** (institutions): The heads of faith design may give the Papacy powers over the Emperor (crowning); the church seats then read that design.
 - **OQ-VIEW-8** (map-presentation): (release task) Budgets on real devices: targets on a low-end Android phone, an older iPhone, Steam Deck and Steam Machine need device tests.
 - **OQ-VIEW-11** (map-presentation): (default chosen) Band thresholds: living from zoom 16 and street level up to 96. Leroy can overrule. [living-map-design §9 OQ-LIVE-1]
@@ -243,6 +242,11 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-GOV-18**: First game slice (milestone 5, provisional): no cap buildings stand in the game yet, so each realm's caps carry *Custom since 1444*, what it held above its form on 1 January 1444, and every realm starts within both caps; conquests, new officials and a reform to a smaller form push a realm over. Reform gold is at the game's gold scale (× 0.2, as works and gifts are). Building needs and condition rows wait on their contexts. Map realms the catalogue names otherwise take their catalogue record's start form. It is the smallest rule that runs the design's caps without flooding every realm with grievances on day one.
 - **D-GOV-17**: (was OQ-GOV-17) "Newest hires first": an official's hire date is the day he entered service in that post, whether hired, a graduate or from a lord's line. One date for every official keeps one order.
 - **D-GOV-19**: (Leroy, 18 Oct: "design how far back the hordes are in terms of technology, and try and find the balance for it") Hordes start level in the horse line and one era level behind their settled neighbours in everything else (GOV-068), on the single tree's era levels (Ancient, Medieval, then Era I on; research §5.10). They catch up through one general rule, cheaper inventions from an earlier era (25 % per era, at most 50 %, GOV-070, folded into research as RSCH-112 because it helps every start that is behind), and by settling through the existing reform (GOV-072). No horde bonus or penalty is added: their edge (horse archers, *Feigned flight*, raids) and their limits (no castles or guns, few schools and officials) already exist, so the balance is set by the start sets and checked against four targets (GOV-069, GOV-071, GOV-073, GOV-074) that the balance model runs. The targets keep war against a horde a matter for diplomacy as well (tribute, alliances), as Leroy asked for war in general. All numbers are provisional.
+
+### Institutions (institutions)
+
+- **D-INST-1**: (was OQ-INST-3) Japan's great houses: the realm data seats fourteen of the catalogue's shugo and
+- **D-INST-2**: Slice 3 defaults where the design is silent or a neighbour is not built yet: a lord's wealth is kept
 
 ### Map presentation (map-presentation)
 

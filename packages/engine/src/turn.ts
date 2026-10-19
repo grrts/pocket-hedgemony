@@ -29,6 +29,7 @@ import { giveGift, grantFief, inAnyWar, lordGetsBuilding, monthlyLords, seizeFie
 import { clockStopped, dailyEndCheck, keepPlaying, playOn, weeklyEndCheck, yearlyScores } from "./campaignEnd.ts";
 import { noteMoment, turnEndAchievements } from "./achievements.ts";
 import { empireOrder, monthlyInstitutions, type EmpireOrder } from "./institutions.ts";
+import { shogunateOrder, type ShogunateOrder } from "./shogunate.ts";
 import { huntOf, monthlyTribes, tribesOrder, type TribesOrder } from "./tribes.ts";
 import { addDays, DAYS_PER_RATION_MONTH, DAYS_PER_TURN } from "./calendar.ts";
 import { corridor, monthlyRations, refillRations, wagonRations, planRoute, planTilePath, tileStepHours, type MarchingArmy } from "./march.ts";
@@ -189,6 +190,7 @@ export type Order =
   | ExploreOrder
   /** The Empire: stand for the crown, vote, seek a vote, grant a seat, admit a member (institutions.ts). */
   | EmpireOrder
+  | ShogunateOrder
   /** Hunting grounds: claim, leave, take in, ask for the land, answer an ask (tribes.ts). */
   | TribesOrder
   /** After world domination, play on to the end date; after game over, play on as another realm (SHELL-164). */
@@ -518,6 +520,8 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
       return verdictOrder(world, actingNation, order.rising, order.treatment, news);
     case "empire":
       return empireOrder(world, actingNation, order, news);
+    case "shogunate":
+      return shogunateOrder(world, actingNation, order, news);
     case "tribes":
       return tribesOrder(world, actingNation, order, news);
     case "answerRevolution":

@@ -221,5 +221,36 @@
   "one_realm_hold": 80,
   "dissolve_years_at_zero": 5,
   "dissolve_min_era": "IV"
+ },
+ "shogunate": {
+  "$comment": "INST-060 to INST-069 (institutions design §4). The Court's province is the map's Mie (p2110), which holds Kyoto and Japan's 1444 capital. Japan's land is Japan's 1444 provinces. The houses and their land are the realm data's starting_lords.house_lands (D-INST-1). The oath counts are placeholders in the reasons count's own scale.",
+  "name": "The Shogunate",
+  "office": "Shogun",
+  "holder_1444": "japan",
+  "court_province": "p2110",
+  "hold_start": 30,
+  "appointed_hold": 40,
+  "hold_year": {
+   "no_revolt": 3,
+   "per_revolt": -5,
+   "no_heir": -10,
+   "unhappy_war": -3,
+   "summoned": 1
+  },
+  "summon_wealth_loss": 0.1,
+  "confirm_cost": 5,
+  "closed_country": {
+   "min_era": "III",
+   "hold_per_year": 2
+  },
+  "oath": {
+   "base": -10,
+   "standing_divisor": 4,
+   "stronger_per_multiple": 10,
+   "stronger_max": 30,
+   "hold_divisor": 5,
+   "answer_months": 1
+  },
+  "restoration_min_era": "V"
  }
 }
