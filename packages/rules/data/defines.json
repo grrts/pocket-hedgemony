@@ -87,7 +87,6 @@
     "engageBase": 9,
     "engageMin": 10,
     "engageMax": 15,
-    "menPerBattleRound": 6000,
     "garrison": {
       "capital": 1500,
       "castle": 1000,

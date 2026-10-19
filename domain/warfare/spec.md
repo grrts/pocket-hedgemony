@@ -181,7 +181,7 @@ Newest decision first.
 - Holds: two sides (armies, castle garrison), battlefield sectors, bells fought, days fought, deployment,
   orders given, losses (killed, wounded, fled), result, one-line reason.
 - INV-WAR-16: A battlefield has at most 7 sectors (3 at sea).
-- INV-WAR-17: A battle day has 6 bells; the longest battle is 3 days in eras I–V.
+- INV-WAR-17: A battle day has 3 bells, fought in daylight; the longest battle is 5 days of fighting in eras I–V (F-158).
 - INV-WAR-18: Battles are resolved one at a time.
 
 **War** (identity: war id)
@@ -491,7 +491,7 @@ Newest decision first.
 ### 5.9 Battle: setting
 
 - WAR-089 When the day loop brings two hostile armies into the same province, the warfare system shall start a battle unless one withdraws first; an army may slip away before battle if its commander's Cunning is higher than the enemy's and it isn't trapped. [warfare §7.1; troop-movement §6.1; X-1]
-- WAR-090 The warfare system shall run a battle day as 6 bells and end a battle after at most 3 days (eras I–V), when the attacker pulls back. [warfare §7.1; eras §2]
+- WAR-090 The warfare system shall run a battle day as 3 bells, fought in daylight, and end a battle after at most 5 days of fighting (eras I–V), when the attacker pulls back. [warfare §7.1; eras §2; F-158]
 - WAR-091 The warfare system shall build the battlefield from up to 7 sectors, the middle 7 tiles of the province's tile row (all of them if fewer), each sector with its room and effects (sector table), and put each army's camp (wagons, food reserve, wounded, unplaced guns) behind it. [warfare §7.2]
 - WAR-092 The warfare system shall apply the province's ground on top of the sectors: foot, horse and guns modifiers, the defender bonus, and +10 % for locals in rough country. [warfare §7.2; province §3.1]
 - WAR-093 The warfare system shall stand men beyond a sector's room behind it as depth, and at the end of every bell move depth forward to fill the room. [warfare §7.2]
@@ -520,7 +520,7 @@ Newest decision first.
 
 - WAR-111 The warfare system shall run each bell in order: orders (less Cunning first, then the other, then Elite free orders); shooting; charges; melee; breaking; depth and rotation. [warfare §7.7]
 - WAR-112 In the first bell, the warfare system shall allow only shooting, unless an Assault commander advances. [warfare §7.7]
-- WAR-113 The warfare system shall compute each company's hits per bell as 4 % (by era) × men in the front × strength per man × roles × level × leader Might in its sector × sector and ground × inventions × tired (−10 % a bell) × hungry (−20 %) × forced march (−10 % on the first day). [warfare §7.8]
+- WAR-113 The warfare system shall compute each company's hits per bell as 2.5 % (by era) × men in the front × strength per man × roles × level × leader Might in its sector × sector and ground × inventions × tired (−10 % a bell) × hungry (−20 %) × forced march (−10 % on the first day). [warfare §7.8]
 - WAR-114 The warfare system shall make each hit take one man out of the line, and split it into fled by the flee share and the rest evenly into killed and wounded. [warfare §7.8]
 - WAR-115 The warfare system shall compute the flee share as 50 % − 30 % × the content share, where the content share is the share of people living in calm provinces (0 or 1 grievances). [warfare §7.8]
 - WAR-116 The warfare system shall take the content share by kind: levies and standing regiments from their home provinces; retinues from the lord's lands (half for a wavering lord, zero for a disloyal one); hired companies always 30 % flee share +10 % per month of pay owed; garrisons from their home provinces, fully content defending their own province's castle; rebel bands 50 % flee share. [warfare §7.8]
@@ -536,7 +536,7 @@ Newest decision first.
 
 ### 5.13 Night, aftermath, prisoners
 
-- WAR-123 When 6 bells pass without an army breaking, the warfare system shall bring night: either side may withdraw by its standing orders; the withdrawal is clean if its commander's Cunning is at least the enemy's, otherwise it counts as breaking with half the pursuit. [warfare §7.11]
+- WAR-123 When a day's 3 bells pass without an army breaking, the warfare system shall bring night: either side may withdraw by its standing orders; the withdrawal is clean if its commander's Cunning is at least the enemy's, otherwise it counts as breaking with half the pursuit. [warfare §7.11]
 - WAR-124 Overnight, the warfare system shall return fled men who will come back to their companies and refill ammunition. [warfare §7.11]
 - WAR-125 After a battle, the warfare system shall return two thirds of the field-holder's wounded after 5 weeks if the army is fed (the rest die), and make the broken side's wounded the winner's prisoners. [warfare §7.12]
 - WAR-126 After a battle, the warfare system shall return half of the field-holder's fled men within 2 weeks and send half home to recruits; of the broken side's fled, half return if the army reaches a friendly castle and half go home. [warfare §7.12]
@@ -552,8 +552,8 @@ Newest decision first.
 
 - WAR-134 The warfare system shall give each army standing orders that apply to every battle: retreat if outnumbered 2 to 1, 3 to 2, or never (checked before the battle and each night); attack or wait. [warfare §7.14]
 - WAR-135 The warfare system shall fight every running battle one round per step, in the order the battles started, with each result ready before its report shows. [warfare §7.15, §16; X-1]
-- WAR-136 While a battle the player's army or fleet is in is running, the warfare system shall fight it one round (one bell) per 4-hour step of the day loop, let the player change its standing orders, order a retreat or switch to another running battle at every step, offer no Skip to result, and after it ends show a battle report (who fought, where, the result, the losses and the one-line reason) that can be replayed later. [warfare §7.15; X-1; D-WAR-2]
-- WAR-137 When a battle involves no player, the warfare system shall fight its six rounds a day at once inside the day loop, never slowing the game, and put its report in the log; other armies may join it at the start of a day. [warfare §7.15; X-1]
+- WAR-136 While a battle the player's army or fleet is in is running, the warfare system shall fight it after its contact day one round (one bell) per daylight 4-hour step of the day loop (WAR-233, WAR-234), let the player change its standing orders, order a retreat or switch to another running battle at every step, offer no Skip to result, and after it ends show a battle report (who fought, where, the result, the losses and the one-line reason) that can be replayed later. [warfare §7.15; X-1; D-WAR-2]
+- WAR-137 When a battle involves no player, the warfare system shall fight its steps of the day (contact, bells and night alike, WAR-233, WAR-234) at once inside the day loop, never slowing the game, and put its report in the log; other armies may join it at the start of a day. [warfare §7.15; X-1]
 
 ### 5.15 Commander styles: origin, adoption, staleness, learning
 
@@ -570,7 +570,7 @@ Newest decision first.
 ### 5.16 Warfare through the eras
 
 - WAR-147 The warfare system shall fight each realm by the inventions it knows (W, B, S), with no world clock, so armies of different eras can meet on one field. [eras intro]
-- WAR-148 The warfare system shall scale battles by era: eras I–IV a bell is 2 hours, longest battle 3 days, room as in the sector table, hits 4 %; era V the same with 5 % at W16 and 6 % at W17; era VI a bell is half a day, longest battle 10 days, room halved, hits 6 % (8 % with W19); era VII a bell is a day, longest battle 30 days, room a quarter, hits 8 %. A battle longer than 3 days keeps its armies in the battle and carries over into the next month. [eras §2; D-WAR-10]
+- WAR-148 The warfare system shall scale battles by era: eras I–IV a bell is 4 hours, longest battle 5 days, room as in the sector table, hits 2.5 %; era V the same with 3 % at W16 and 4 % at W17; era VI a bell is half a day, longest battle 10 days, room halved, hits 4 % (5 % with W19); era VII a bell is a day, longest battle 30 days, room a quarter, hits 5 % (F-158). A battle longer than 3 days keeps its armies in the battle and carries over into the next month. [eras §2; D-WAR-10]
 - WAR-149 While an enemy knows the invention that made an arm obsolete, the warfare system shall have that arm fight at half strength against him. [eras §3]
 - WAR-150 When a realm learns the invention that makes one of its arms obsolete, the warfare system shall no longer let it raise that arm. [eras §3]
 - WAR-151 When a company re-arms to a new arm, the warfare system shall take its loads of arms and powder and drop it one level. [eras §3]
@@ -655,7 +655,7 @@ Newest decision first.
 ### Playtest feedback (17 October 2026)
 Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision, so it replaces the requirements it names.
 
-- WAR-207 The warfare system shall fight every battle one round per 4-hour step (X-1) and publish after each round each side's men, morale and losses so far; no battle is resolved in one go. [F-8; X-1]
+- WAR-207 The warfare system shall fight every battle over time, a bell per daylight 4-hour step after its contact day (X-1, WAR-233, WAR-234), and publish after each step each side's men, morale and losses so far and the battle's phase; the bells and losses are the resolver's own, bell by bell, never a length worked out from the men in it. [F-8; X-1; F-158]
 - WAR-208 The warfare system shall publish each siege's progress (days held, breaches, garrison left, food left in the castle) whenever it changes, for the map and the siege view. [F-9]
 - WAR-209 The warfare system shall never let an army exist without a commander: soldiers with no commander are their province's garrison troops (recruiting RECR-107), not an army. If an army loses its commander and no captain can take over, then it shall halt; in its own realm's land it becomes the garrison troops of the province it stands in, and abroad it waits there until a commander joins it. [F-13]
 - WAR-210 When a contract with a mercenary company is signed, the warfare system shall take the gold up front and have the company arrive at the realm's capital after the days it needs to march there from where it gathers, shown on the hire screen; until it arrives it is not on the map and cannot fight. While the capital is besieged or occupied, no company can be hired. [F-19; playtest feedback]
@@ -801,6 +801,20 @@ second call, and a retinue's losses in the peace voices (WAR-180).
   button, every row button is at least 44 × 44 points, states are words and not colour alone, and nothing needs hover.
   [X-26; X-19]
 
+### 5.27 Battle length (F-158, Leroy 19 Oct)
+
+Battles were over in under a day and armies broke too fast. In 1378–1600 the fighting itself took a few hours to a day, but armies shadowed each other, scouted, parleyed and deployed for a day or more before it, fought only by daylight, and the loser lost most of his men in the rout. These requirements replace the length that came from the men in a battle.
+
+- WAR-233 The warfare system shall fight a battle's bells only in the daylight steps of the day, from `warfare.battle.first_bell_hour` (8 o'clock) for `warfare.battle.bells_per_day` (3) 4-hour steps; in the night steps nobody fights and the overnight rule (WAR-123, WAR-124) applies. [F-158]
+- WAR-234 When two armies make contact, the warfare system shall first pass a contact day, at least `warfare.battle.contact_days` (1) and until the next morning's first bell, in which the armies scout and deploy: nobody is lost, armies in reach may still join (WAR-206), and a side may still retreat (WAR-205). [F-158]
+- WAR-235 The warfare system shall deal a battle's losses bell by bell as the resolver fought them, and publish each side's morale as how far it still is from breaking (1 untouched, 0 broken), not as a share of the rounds played. [F-158; WAR-207]
+- WAR-236 After a battle in which a side broke, the warfare system shall apply the pursuit (WAR-127) to the fleeing men who would have come back, dealt with the last bell. [F-158]
+
+#### How the player uses it: battle length
+- WAR-237 Where: the battle viewer over the map and the battle on the map show the phase in words, "In contact, deploying", "Day 2, fighting" or "Night after day 2, the camps rest", above each side's bars of men and morale; the player can retreat at any step, and on the contact day nobody has yet been lost. [F-158; X-19]
+- WAR-238 Grouping and overview: the phase belongs to the one battle viewer, with the men and morale bars it already holds; the news line of the battle's start and its end stay the overview. [F-158; X-19]
+- WAR-239 Phone: the phase is one line of text in the viewer's header in both the Wide and Tall layouts, nothing needs hover, and the contact day and the nights play no slower than a day does, so the player waits only through the bells. [F-158; X-19]
+
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
@@ -944,10 +958,11 @@ file `packages/rules/data/domain/warfare.json` (D-WAR-17).
 | warfare.forced_march | Effects | sickness ×2, levies −2 % a week, −10 % first day | yes | warfare |
 | warfare.scouting.riders_per_province | Scout range | 500 riders per province | yes | warfare |
 | warfare.rumour_error | Rumour error | up to a third | yes | warfare |
-| warfare.battle.bells_per_day / max_days | Bells | 6 / 3 (eras I–V), 10 (VI), 30 (VII) | yes | warfare |
+| warfare.battle.bells_per_day / max_days | Bells | 3 / 5 (eras I–V), 10 (VI), 30 (VII) | yes | warfare |
+| warfare.battle.contact_days / first_bell_hour | Contact day before the first bell; the hour of a day's first bell | 1 / 8 | yes | warfare |
 | warfare.battle.max_sectors | Sectors | 7 (3 at sea) | yes | warfare |
 | warfare.sectors | Sector table | §4 | yes | warfare |
-| warfare.hits_per_bell | Hits share of front | 4 % (I–IV), 5 %/6 % W16/W17, 6 %/8 % W19 (VI), 8 % (VII) | yes | warfare |
+| warfare.hits_per_bell | Hits share of front | 2.5 % (I–IV), 3 %/4 % W16/W17, 4 %/5 % W19 (VI), 5 % (VII) | yes | warfare |
 | warfare.room_by_era | Room multiplier | 1 (I–V), ½ (VI), ¼ (VII) | yes | warfare |
 | warfare.flee.base / content_factor | Flee share | 50 % / 30 % | yes | warfare |
 | warfare.flee.hired / per_month_owed / rebel | Flee share | 30 % / +10 % / 50 % | yes | warfare |
@@ -1215,7 +1230,7 @@ Decided on 17 October 2026 (domain/DECISIONS.md). None of warfare's questions is
 | WAR-088 | features/supply.feature | Magazines in occupied provinces |
 | WAR-089 | features/battle-bells.feature | Worked example: Troyes, 1450 |
 | WAR-089 | features/battle-setup.feature | Two hostile armies in one province fight unless one slips away |
-| WAR-090 | features/battle-setup.feature | A battle day has 6 bells and a battle at most 3 days |
+| WAR-090 | features/battle-setup.feature | A battle day has 3 bells and a battle at most 5 days |
 | WAR-091 | features/battle-setup.feature | The battlefield is the province's middle tiles: Troyes 1450; A province with fewer tiles uses all of them; Sector room and effects; Waste is open or rough by ground; Fighting in the town burns town buildings |
 | WAR-092 | features/battle-setup.feature | The ground applies on top of the sectors |
 | WAR-093 | features/battle-setup.feature | The battlefield is the province's middle tiles: Troyes 1450; Depth steps forward; A narrow field favours the small army |
@@ -1347,3 +1362,4 @@ Decided on 17 October 2026 (domain/DECISIONS.md). None of warfare's questions is
 | WAR-229 … WAR-232 | features/price-of-war.feature | The declare sheet shows the price of war; The war card |
 | WAR-240 … WAR-251 | features/peace-settlement.feature | What a province costs to demand; Capacity comes from what was won; Combining demands within the rules; The AI answers a demand; The AI asks by the same counts; A beaten AI surrenders; The peace table |
 | WAR-252 … WAR-262 | features/lords-retinues.feature | A lord's lands fill his retinue; Calling the lords; A lord leads his own retinue; A retinue goes home; A victory wins a lord's loyalty; The AI calls its lords; The Lords' men section |
+| WAR-233 … WAR-239 | features/battle-length.feature | A contact day before the first bell; Bells only by daylight; Losses and morale bell by bell; The pursuit after a rout; The phase in the battle viewer |

@@ -26,13 +26,13 @@ Feature: Warfare through the eras
 
     Examples:
       | era | inventions    | bell       | days | room      | hits |
-      | I   | none          | 2 hours    | 3    | all       | 4 %  |
-      | IV  | W11           | 2 hours    | 3    | all       | 4 %  |
-      | V   | W16           | 2 hours    | 3    | all       | 5 %  |
-      | V   | W17           | 2 hours    | 3    | all       | 6 %  |
-      | VI  | W17           | half a day | 10   | half      | 6 %  |
-      | VI  | W19           | half a day | 10   | half      | 8 %  |
-      | VII | W21           | a day      | 30   | a quarter | 8 %  |
+      | I   | none          | 4 hours    | 5    | all       | 2.5 % |
+      | IV  | W11           | 4 hours    | 5    | all       | 2.5 % |
+      | V   | W16           | 4 hours    | 5    | all       | 3 %   |
+      | V   | W17           | 4 hours    | 5    | all       | 4 %   |
+      | VI  | W17           | half a day | 10   | half      | 4 %   |
+      | VI  | W19           | half a day | 10   | half      | 5 %   |
+      | VII | W21           | a day      | 30   | a quarter | 5 %   |
 
   @WAR-149
   Scenario Outline: Obsolete arms fight at half strength against an enemy who knows the replacement

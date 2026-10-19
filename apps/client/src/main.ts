@@ -3341,6 +3341,12 @@ function watchBattle(province: number): void {
   }
 }
 
+/** Where a battle stands: the contact day, a day's fighting, or the night between (WAR-233, WAR-234). */
+function battlePhaseText(b: { phase: "contact" | "fighting" | "night"; day: number }): string {
+  if (b.phase === "contact") return "In contact, deploying";
+  return b.phase === "fighting" ? `Day ${Math.max(1, b.day)}, fighting` : `Night after day ${Math.max(1, b.day)}, the camps rest`;
+}
+
 /** The battle being watched: both hosts, men left of men at the start, and the round; then how it ended. */
 function renderBattleWatch(): void {
   const b = watching && snapshot?.battles.find((x) => x.province === watching!.province);
@@ -3351,7 +3357,7 @@ function renderBattleWatch(): void {
   const side = (n: number, men: number, start: number, morale: number) => `<div class="side">${pennant(nations[n]!)}<b>${esc(nations[n]!.name)}</b>
     <span class="bars"><span class="bar" title="Men left"><i style="width:${start ? pct(men / start) : 0}%;background:${nations[n]!.color}"></i></span><span class="bar morale" title="Morale left: ${pct(morale)}%"><i style="width:${pct(morale)}%"></i></span></span><span class="men">${fmt(men)}</span></div>`;
   battleWatch.innerHTML = `
-    <header><b>${icon("swords", 1)} Battle of ${esc(provinces[watching.province]!.name)}</b>${b ? `<small>Round ${Math.min(b.round + 1, b.rounds)} of ${b.rounds}</small>` : ""}
+    <header><b>${icon("swords", 1)} Battle of ${esc(provinces[watching.province]!.name)}</b>${b ? `<small>${battlePhaseText(b)}</small>` : ""}
       <button class="paper dismiss" aria-label="Stop watching">${icon("close", 1)}</button></header>
     ${b ? side(b.attacker, b.attMen, b.attStart, b.attMorale) + side(b.defender, b.defMen, b.defStart, b.defMorale) : `<p>${esc(watching.result ?? "The battle is over.")}</p>`}`;
   battleWatch.querySelector(".dismiss")!.addEventListener("click", () => {
@@ -6807,7 +6813,10 @@ async function endTurn(): Promise<void> {
       continue;
     }
     const battle = snapshot.battles.some((b) => b.player);
-    const ms = battle ? (watching && !watching.result ? (WATCH_STEP_MS * battleStepMs()) / BATTLE_STEP_MS : battleStepMs()) : dayMs();
+    // The contact day and the nights pass no slower than a day does; the bells play at battle speed.
+    const fighting = snapshot.battles.some((b) => b.player && b.phase === "fighting");
+    const stepMs = watching && !watching.result ? (WATCH_STEP_MS * battleStepMs()) / BATTLE_STEP_MS : battleStepMs();
+    const ms = battle ? (fighting ? stepMs : Math.min(stepMs, dayMs())) : dayMs();
     const t0 = performance.now();
     // Armies of the player's on the march, to tell when one arrives while Auto turns run (SHELL-161).
     const marching = auto.state === "on" ? marchingArmies() : null;

@@ -2664,6 +2664,8 @@ When("the month ends", (s) => {
   for (let m = 0; m < 12 && !s.news.some((n: G.News) => n.text.startsWith("The rising spreads")); m++) {
     restless(w, s.province);
     s.news.push(...playMonth(w));
+    // What the country takes from the province while it is still in revolt (the rising may end, won or beaten, the same month it spreads).
+    if (w.provinceRebels[s.province]! > 0) s.inRevolt = { rebels: w.provinceRebels[s.province], tax: G.provinceTax(w, s.province, w.provinceOwner[s.province]!), recruits: w.provinceRecruits[s.province] };
   }
 });
 Then("its neighbours may be drawn into revolt", (s) => {
@@ -2675,9 +2677,10 @@ Then("its neighbours may be drawn into revolt", (s) => {
 Then("the country loses taxes and recruits from {string}", (s, name: string) => {
   const w = s.game as GW;
   const p = placeOf(name);
-  expect(w.provinceRebels[p]).toBeGreaterThan(0);
-  expect(G.provinceTax(w, p, w.provinceOwner[p]!)).toBe(0);
-  expect(w.provinceRecruits[p]).toBeLessThanOrEqual(s.recruitsBefore);
+  const r = s.inRevolt ?? { rebels: w.provinceRebels[p], tax: G.provinceTax(w, p, w.provinceOwner[p]!), recruits: w.provinceRecruits[p] };
+  expect(r.rebels).toBeGreaterThan(0);
+  expect(r.tax).toBe(0);
+  expect(r.recruits).toBeLessThanOrEqual(s.recruitsBefore);
 });
 
 // the ruler ages and dies (REALM-100, REALM-234)
