@@ -324,7 +324,8 @@
   {
    "key": "jingnan_campaign_ends",
    "name": "Yongle Emperor enthroned after the Jingnan campaign",
-   "date": "1402-07-17"
+   "date": "1402-07-17",
+   "event": "jingnan_war"
   },
   {
    "key": "battle_of_ankara",
@@ -349,7 +350,8 @@
   {
    "key": "zheng_he_first_voyage",
    "name": "Zheng He's first voyage sets out",
-   "date": "1405-07-11"
+   "date": "1405-07-11",
+   "event": "treasure_voyages"
   },
   {
    "key": "venice_takes_padua",
