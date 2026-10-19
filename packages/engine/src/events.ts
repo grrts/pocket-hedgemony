@@ -43,7 +43,11 @@ const data: Campaign = {
 };
 /** The bridge events' ids, which a later start counts as history (EVT-087). */
 const BRIDGE_EVENTS = new Set(BRIDGES.flatMap((b) => Object.keys(b.events)).filter((id) => !(id in base.events)));
+/** A later figure who came before the start is not history the tree reads (REALM-295), so a later start keeps no record of him. */
+const PAST_EVENTS = [...BRIDGE_EVENTS].filter((id) => !(id in lordEvents.events));
 const PLACES: Record<string, string[]> = Object.assign({}, bridge.places, ...BRIDGES.map((b) => b.places));
+/** The last year a later figure's seat matters: a start after his window keeps no place for it (REALM-295). */
+const SEAT_UNTIL = new Map(Object.values(lordEvents.events).map((e) => [`area:seat_${e.id.slice("lord_".length)}`, e.availability.latest]));
 
 /** Statistics the game reads live; an event's change to one is kept as an adjustment on top. */
 const ADJUSTED = new Set(["legitimacy", "stability", "tech_state", "tech_economy", "tech_military"]);
@@ -117,6 +121,7 @@ export function createGameEvents(world: World): GameEvents {
   const treeId = world.nationIds.map((id, n) => world.rules.nations[n]!.tree?.[0] ?? aliases[id] ?? id);
   const nationOf = new Map(treeId.map((id, n) => [id, n]));
   const places = Object.entries(PLACES)
+    .filter(([key]) => (SEAT_UNTIL.get(key) ?? Infinity) >= world.date.year)
     .map(([key, ids]): [string, number[]] => [key, ids.map((id) => world.provinceIndex.get(id) ?? -1).filter((p) => p >= 0)])
     .filter(([, ps]) => ps.length > 0);
   for (const key of bridge.start.places) Object.assign(evt.place(tree, key).stats, bridge.start.place);
@@ -163,7 +168,7 @@ export function createGameEvents(world: World): GameEvents {
  */
 function pastBridgeEvents(state: evt.EventState, year: number, month: number): void {
   const start = evt.monthIndex(year, month);
-  for (const id of BRIDGE_EVENTS) {
+  for (const id of PAST_EVENTS) {
     const ev = state.events[id];
     if (!ev?.history) continue;
     const d = ev.history.date;
