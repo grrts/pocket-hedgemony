@@ -808,4 +808,4 @@ Every requirement has at least one scenario. REALM-005 and REALM-156 are also pr
 | REALM-281 | — | Covered by engine test (packages/engine/test/historicalLords.test.ts: the rest stay generated; no generated Hunyadi) |
 | REALM-282 | — | Covered by engine test (packages/engine/test/historicalLords.test.ts: the head of a seated house; no 1444 houses in 1378 France) |
 | REALM-283 | — | Covered by engine test (packages/engine/test/historicalLords.test.ts: his heir keeps the title, not the history) |
-| REALM-284 | — | Presentation only: the Lords tab and a lord's screen (apps/client/src/ui/lords.ts) |
+| REALM-284 | — | Presentation only: checked on phone screenshots in landscape (apps/client/scripts/historical-lords-shots.mjs) |
