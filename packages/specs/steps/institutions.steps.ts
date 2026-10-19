@@ -376,6 +376,11 @@ When("a call to defend the Empire concerns the player", (s) => {
 });
 Then("an answer card with two 44-point buttons waits in the News and on Needs attention", (s) => {
   const w = world(s);
+  if (s.oathAsk) {
+    expect(G.shogunateView(w, w.player)!.oath).toMatchObject({ shogun: G.shogunOf(w) });
+    expect(I.institutionCard("Short wide").minTap).toBeGreaterThanOrEqual(44);
+    return;
+  }
   if (s.dietAsk) {
     expect(view(s).reforms.diet).toMatchObject({ reform: "public_peace", playerVote: null });
     expect(I.institutionCard("Short wide").minTap).toBeGreaterThanOrEqual(44);
@@ -387,6 +392,13 @@ Then("an answer card with two 44-point buttons waits in the News and on Needs at
 });
 Then("silence counts as {string}", (s, silence: string) => {
   const w = world(s);
+  if (s.oathAsk) {
+    // A month without an answer is a refusal: the shogun holds Bring to heel on the player (INST-067, INST-083).
+    expect(I.SILENCE.oath).toBe(silence);
+    monthStep(s, 1445, 1);
+    expect(w.diplomacy.aims.some((a) => a.aim === "bring_to_heel" && a.target === w.nationIds[w.player])).toBe(true);
+    return;
+  }
   if (s.dietAsk) {
     // The player has not voted: the forecast counts them as no (INST-083).
     expect(I.SILENCE.diet).toBe(silence);

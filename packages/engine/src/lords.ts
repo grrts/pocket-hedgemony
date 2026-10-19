@@ -1,6 +1,6 @@
 import type { World } from "./world.ts";
 import type { News } from "./war.ts";
-import { personName } from "./names.ts";
+import { houseMemberName, personName } from "./names.ts";
 import { loyaltyCause, realmConfig, startingLords, type Lord, type Loyalty } from "./domain/realm/index.ts";
 
 /**
@@ -30,6 +30,8 @@ export interface RealmLord {
   commander?: number;
   /** His retinue on its way to his seat after a call: men and days until it stands there (WAR-253). */
   call?: { men: number; daysLeft: number };
+  /** His wealth as a share of what he had, in percent; unset is 100 (a summoned house's falls, INST-063). */
+  wealth?: number;
 }
 
 export interface LordState {
@@ -68,10 +70,15 @@ export function byDistance(world: World, n: number, capital: number): number[] {
 export function seedLords(world: World): void {
   const royalShare = realmConfig.starting.royal_share[2]!;
   const great = realmConfig.starting_lords.great_houses as Record<string, string[]>;
+  const seated = realmConfig.starting_lords.house_lands as unknown as Record<string, Record<string, { name: string; provinces: string[] }>>;
   for (let n = 0; n < world.nationCount; n++) {
     const def = world.rules.nations[n]!;
     const capital = world.provinceIndex.get(def.capital);
     if (capital === undefined) continue;
+    if (seated[def.id]) {
+      seatHouses(world, n, seated[def.id]!);
+      continue;
+    }
     const land = byDistance(world, n, capital);
     const start = startingLords(land.length, great[def.id] ?? []);
     const count = start.names.length || start.generated;
@@ -105,6 +112,17 @@ export function seedLords(world: World): void {
     }
     // What no lord reached by land goes to the nearest seat's lord in the list.
     for (const p of left) world.provinceLord[p] = first;
+  }
+}
+
+/** Great houses the realm data seats on named land (D-INST-1): each holds its listed provinces that the realm owns; the rest is royal. */
+function seatHouses(world: World, n: number, houses: Record<string, { name: string; provinces: string[] }>): void {
+  for (const h of Object.values(houses)) {
+    const land = h.provinces.map((id) => world.provinceIndex.get(id)).filter((p): p is number => p !== undefined && world.provinceOwner[p] === n);
+    if (!land.length) continue;
+    const k = world.lords.length;
+    world.lords.push({ name: houseMemberName(world.rules, n, land[0]! * 7, h.name), house: h.name, nation: n, loyalty: "Loyal", upCredit: 0 });
+    for (const p of land) world.provinceLord[p] = k;
   }
 }
 

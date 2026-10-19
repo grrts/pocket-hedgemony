@@ -620,10 +620,10 @@ export function relationLine(d: Diplomacy, holder: string, other: string): { rel
 }
 
 /** Standing of holder toward other: the ledger total, the event tree's `opinion` (DIPL-071). */
-export function standing(d: Diplomacy, holder: string, other: string): number {
+export function standing(d: Diplomacy, holder: string, other: string, ledger?: readonly LedgerEntry[], line?: { weight: number }): number {
   const o = d.standingOverride[key(holder, other)];
   if (o !== undefined) return o;
-  const n = ledgerOf(d, holder, other).reduce((s, e) => s + e.weight, 0) + relationLine(d, holder, other).weight;
+  const n = (ledger ?? ledgerOf(d, holder, other)).reduce((s, e) => s + e.weight, 0) + (line ?? relationLine(d, holder, other)).weight;
   const cap = config.ledger.standing_limit;
   return Math.max(-cap, Math.min(cap, n));
 }

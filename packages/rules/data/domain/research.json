@@ -2687,7 +2687,8 @@
     "hungary",
     "ragusa",
     "cyprus",
-    "knights_of_rhodes"
+    "knights_of_rhodes",
+    "canarian_lordship"
    ],
    "past": [
     "F01",
@@ -3123,7 +3124,10 @@
   },
   "horn": {
    "realms": [
-    "ethiopia"
+    "ethiopia",
+    "kaffa",
+    "hadiya",
+    "oromo"
    ],
    "past": [
     "F01",
@@ -3144,7 +3148,15 @@
    "realms": [
     "adal",
     "ajuran",
-    "kilwa"
+    "kilwa",
+    "mombasa",
+    "zanzibar",
+    "sofala",
+    "comoros",
+    "warsangali",
+    "afar_dankali",
+    "beja",
+    "madagascar_north_trading_towns"
    ],
    "past": [
     "F03",
@@ -3170,7 +3182,26 @@
     "songhai",
     "jolof",
     "kano",
-    "kanem_bornu"
+    "kanem_bornu",
+    "air_agadez",
+    "bulala",
+    "katsina",
+    "timbuktu_tuareg",
+    "biram",
+    "gobir",
+    "zamfara",
+    "zazzau",
+    "takrur_futa_toro",
+    "darfur_tunjur",
+    "kaabu",
+    "sine",
+    "fezzan",
+    "mzab",
+    "touggourt_ouargla",
+    "tuat",
+    "sanhaja_zenaga",
+    "tuareg_kel_ajjer",
+    "tubu_teda"
    ],
    "past": [
     "F03",
@@ -3190,7 +3221,12 @@
   },
   "volta": {
    "realms": [
-    "mossi"
+    "mossi",
+    "bono",
+    "dagbon",
+    "borgu",
+    "voltaic_stateless_societies",
+    "mande_kafus"
    ],
    "past": [
     "F03",
@@ -3204,7 +3240,47 @@
    "realms": [
     "benin",
     "kongo",
-    "mutapa"
+    "mutapa",
+    "loango",
+    "tio",
+    "oyo",
+    "allada_tado",
+    "igala",
+    "ijebu",
+    "kwararafa",
+    "akan_forest",
+    "cross_river_societies",
+    "igbo_societies",
+    "ijaw_delta",
+    "middle_belt_societies",
+    "upper_guinea_coast",
+    "windward_coast_peoples",
+    "ankole",
+    "buganda",
+    "karagwe",
+    "kitara",
+    "rwanda",
+    "madagascar_coast",
+    "madagascar_highlands",
+    "khoikhoi",
+    "san",
+    "kunene_peoples",
+    "equatorial_forest_societies",
+    "maasai_kenya_highlands",
+    "makua_lomwe",
+    "delagoa_lowland_chiefdoms",
+    "nguni",
+    "sotho_tswana",
+    "thulamela",
+    "tonga_zambezi",
+    "luba",
+    "lake_malawi_peoples",
+    "mbundu_chiefdoms",
+    "ovimbundu_central_angola",
+    "kwango_kasai_societies",
+    "gran_canaria",
+    "tenerife_menceyatos",
+    "la_palma"
    ],
    "past": [
     "C01"
@@ -3255,7 +3331,31 @@
     "huron",
     "cherokee",
     "creek",
-    "pueblo"
+    "pueblo",
+    "apalachee",
+    "calusa",
+    "caddo",
+    "casqui_pacaha",
+    "chumash",
+    "coast_salish",
+    "cofitachequi",
+    "fort_ancient",
+    "hopi",
+    "lenape",
+    "mandan_hidatsa",
+    "natchez_plaquemine",
+    "neutral_erie",
+    "ojibwe_anishinaabe",
+    "oneota",
+    "oodham",
+    "pacific_northwest",
+    "pawnee_plains_villagers",
+    "powhatan_precursors",
+    "southern_new_england_algonquians",
+    "st_lawrence_iroquoians",
+    "timucua",
+    "tlingit_haida",
+    "wakashan"
    ],
    "past": [],
    "inventions": [

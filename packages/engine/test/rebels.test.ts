@@ -139,6 +139,27 @@ describe("rebellions in the game", () => {
     expect(applyNow(w, { type: "setTax", province: p, rate: HEAVY }, me).rejectedOrders[0]!.reason).toMatch(/keeps light tax until/);
   });
 
+  it("a homeland rising that wins breaks away as a realm of its own, named for its homeland (REBL-058, SETUP-088)", () => {
+    const { w, me, p } = restless();
+    rise(w, me, p);
+    for (let i = 0; i < w.armies.count; i++) if (w.armies.owner[i] === me) w.armies.alive[i] = 0;
+    const b = w.bands[0]!;
+    b.cause = "Homeland";
+    let news: News[] = [];
+    for (let m = 0; m < 13 && w.bands.includes(b); m++) {
+      w.provinceStore[p] = w.provincePopulation[p]! * 6;
+      b.sources = ["lord's retinue"];
+      b.men = Math.max(b.men, 1000);
+      news = news.concat(nextMonth(w));
+    }
+    const n = w.provinceOwner[p]!;
+    expect(n).not.toBe(me);
+    expect(w.rules.nations[n]!.spare).toBe(true);
+    expect(w.rules.nations[n]!.name).toBe(rules.provinces[p]!.name);
+    expect(news.some((x) => x.kind === "founded" && x.nations.includes(n))).toBe(true);
+    expect(news.some((x) => x.text.includes(`break away as ${rules.provinces[p]!.name}`))).toBe(true);
+  });
+
   it("a plotting province rolls to rise by itself; AI realms answer their own risings", () => {
     const w = createWorld(rules, 3, tiles);
     w.player = -1;

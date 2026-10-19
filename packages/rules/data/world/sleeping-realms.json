@@ -1,5 +1,5 @@
 {
-  "_doc": "Sleeping realms (SETUP-080, SETUP-081, X-24): realms history founds after 1444, listed from the start and asleep until they wake. Spares have no name of their own; they are named and coloured when they wake.",
+  "_doc": "Sleeping realms (SETUP-080, SETUP-081, X-24): realms history founds after 1444, listed from the start and asleep until they wake. Spares have no name of their own; they are named and coloured when they wake. The great houses of Japan (Hosokawa to Nanbu) sleep until the Shogunate breaks (INST-065) and wake on the land their lord holds.",
   "spare_count": 12,
   "realms": [
     { "id": "spain", "name": "Spain", "color": "#d4a017", "capital": "p1601", "tree": ["spain"], "home": [] },
@@ -10,6 +10,20 @@
     { "id": "transylvania", "name": "Transylvania", "color": "#8e5a9b", "capital": "p1150", "tree": ["transylvania"], "home": ["p1150", "p1151", "p1153", "p1155", "p1156", "p1418", "p1425", "p1431"] },
     { "id": "czechoslovakia", "name": "Czechoslovakia", "color": "#3b6fb6", "capital": "p839", "tree": ["czechoslovakia"], "home": ["p836", "p839", "p840", "p843", "p1109", "p1113", "p1117"] },
     { "id": "poland_lithuania", "name": "Poland-Lithuania", "color": "#c0392b", "capital": "p1136", "tree": ["poland_lithuania"], "home": [] },
-    { "id": "russia", "name": "Russia", "color": "#2e7d4f", "capital": "p633", "tree": ["russia"], "home": [] }
+    { "id": "russia", "name": "Russia", "color": "#2e7d4f", "capital": "p633", "tree": ["russia"], "home": [] },
+    { "id": "hosokawa", "name": "Hosokawa", "color": "#b03a48", "capital": "p2108", "tree": ["hosokawa"], "home": ["p2108", "p2106", "p2436"] },
+    { "id": "hatakeyama", "name": "Hatakeyama", "color": "#4a7fb5", "capital": "p2111", "tree": ["hatakeyama"], "home": ["p2111"] },
+    { "id": "shiba", "name": "Shiba", "color": "#6c8f3f", "capital": "p2109", "tree": ["shiba"], "home": ["p2109"] },
+    { "id": "yamana", "name": "Yamana", "color": "#c98a2b", "capital": "p2107", "tree": ["yamana"], "home": ["p2107"] },
+    { "id": "ouchi", "name": "Ōuchi", "color": "#7a4f9e", "capital": "p2104", "tree": ["ouchi"], "home": ["p2104", "p2432"] },
+    { "id": "uesugi", "name": "Uesugi", "color": "#2f7f7a", "capital": "p2116", "tree": ["uesugi"], "home": ["p2116", "p1828", "p2115", "p2117", "p2119"] },
+    { "id": "imagawa", "name": "Imagawa", "color": "#a8663c", "capital": "p2114", "tree": ["imagawa"], "home": ["p2114"] },
+    { "id": "toki", "name": "Toki", "color": "#5d6fb0", "capital": "p2112", "tree": ["toki"], "home": ["p2112"] },
+    { "id": "kyogoku", "name": "Kyōgoku", "color": "#9b9b3a", "capital": "p2105", "tree": ["kyogoku"], "home": ["p2105"] },
+    { "id": "otomo", "name": "Ōtomo", "color": "#3f8f58", "capital": "p2435", "tree": ["otomo"], "home": ["p2435", "p2430"] },
+    { "id": "shimazu", "name": "Shimazu", "color": "#3a3a3a", "capital": "p2433", "tree": ["shimazu"], "home": ["p2433", "p2434"] },
+    { "id": "takeda", "name": "Takeda", "color": "#c0392b", "capital": "p2113", "tree": ["takeda"], "home": ["p2113"] },
+    { "id": "date", "name": "Date", "color": "#2b4f8f", "capital": "p1832", "tree": ["date"], "home": ["p1832", "p1829", "p2118"] },
+    { "id": "nanbu", "name": "Nanbu", "color": "#8f5a3a", "capital": "p1831", "tree": ["nanbu"], "home": ["p1831", "p1833", "p1830"] }
   ]
 }

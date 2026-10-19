@@ -10,7 +10,6 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **OQ-AUD-13** (audio): Palette reviewers and listening approval (release task): each palette needs a paid reviewer of its tradition, and every track needs Leroy's listening approval, before release.
 - **OQ-INST-1** (institutions): The X-13 match of catalogue imperial estates to map realms (Bavaria, Württemberg, Hamburg, Pomerania, Switzerland, Modena are split or renamed in the catalogue): the data list decides; it needs one pass of review.
 - **OQ-INST-2** (institutions): The ten circles on a 137-realm map: which map realms sit in which circle (data). Slice 2 default: the historical circles matched to the map members (Austrian, Bavarian, Swabian, Upper Rhenish, Electoral Rhenish, Lower Saxon, Upper Saxon); Bohemia, Switzerland and the Italian members sit in none.
-- **OQ-INST-3** (institutions): Which great houses Japan starts with as lords depends on the realm data's great-house list (D-REALM-10); the shogunate needs at least the 22 shugo houses of the catalogue.
 - **OQ-INST-4** (institutions): The heads of faith design may give the Papacy powers over the Emperor (crowning); the church seats then read that design.
 - **OQ-VIEW-8** (map-presentation): (release task) Budgets on real devices: targets on a low-end Android phone, an older iPhone, Steam Deck and Steam Machine need device tests.
 - **OQ-VIEW-11** (map-presentation): (default chosen) Band thresholds: living from zoom 16 and street level up to 96. Leroy can overrule. [living-map-design §9 OQ-LIVE-1]
@@ -170,6 +169,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-EVT-15**: (was OQ-EVT-15) When ages and periods are checked: in the turn in which 1 January falls, in the events step
 - **D-EVT-16**: (was OQ-EVT-16) The religion flags: religious_persecution_active, missionary_persecution and
 - **D-EVT-17**: First game slice of events (milestone 6, provisional): the bridge maps 13 realm ids of the map to
+- **D-EVT-18**: Founding events (Leroy, 18 Oct; X-24): a `create_country` founds the realm on the map through
 
 ### Exploration (exploration)
 
@@ -242,6 +242,11 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-GOV-18**: First game slice (milestone 5, provisional): no cap buildings stand in the game yet, so each realm's caps carry *Custom since 1444*, what it held above its form on 1 January 1444, and every realm starts within both caps; conquests, new officials and a reform to a smaller form push a realm over. Reform gold is at the game's gold scale (× 0.2, as works and gifts are). Building needs and condition rows wait on their contexts. Map realms the catalogue names otherwise take their catalogue record's start form. It is the smallest rule that runs the design's caps without flooding every realm with grievances on day one.
 - **D-GOV-17**: (was OQ-GOV-17) "Newest hires first": an official's hire date is the day he entered service in that post, whether hired, a graduate or from a lord's line. One date for every official keeps one order.
 - **D-GOV-19**: (Leroy, 18 Oct: "design how far back the hordes are in terms of technology, and try and find the balance for it") Hordes start level in the horse line and one era level behind their settled neighbours in everything else (GOV-068), on the single tree's era levels (Ancient, Medieval, then Era I on; research §5.10). They catch up through one general rule, cheaper inventions from an earlier era (25 % per era, at most 50 %, GOV-070, folded into research as RSCH-112 because it helps every start that is behind), and by settling through the existing reform (GOV-072). No horde bonus or penalty is added: their edge (horse archers, *Feigned flight*, raids) and their limits (no castles or guns, few schools and officials) already exist, so the balance is set by the start sets and checked against four targets (GOV-069, GOV-071, GOV-073, GOV-074) that the balance model runs. The targets keep war against a horde a matter for diplomacy as well (tribute, alliances), as Leroy asked for war in general. All numbers are provisional.
+
+### Institutions (institutions)
+
+- **D-INST-1**: (was OQ-INST-3) Japan's great houses: the realm data seats fourteen of the catalogue's shugo and
+- **D-INST-2**: Slice 3 defaults where the design is silent or a neighbour is not built yet: a lord's wealth is kept
 
 ### Map presentation (map-presentation)
 
@@ -553,6 +558,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-SETUP-17**: (was OQ-SETUP-17) Population scale: the map's figure is the province's people in thousands (Aube 305 thousand); the Troyes card's 72,000 is a town-sized illustration, not data. The map is the only complete set.
 - **D-SETUP-19**: Sleeping realms (Leroy, 18 Oct; X-24): realms founded after 1444 are listed from the start and asleep until they wake (SETUP-080 to SETUP-094). D-SETUP-2's "only a representation that owns map provinces is a realm" now reads "is a realm on the map in 1444"; a record that owns no province may be a sleeping realm.
 - **D-SETUP-18**: African starts (Leroy, 18 Oct; X-20): in the four African regions, D-SETUP-2's "only a representation that owns map provinces is a realm" now applies after the catalogue's playable countries, subjects and peoples are given the unowned land around their capitals (SETUP-060 to SETUP-065); elsewhere D-SETUP-2 stands. Leroy asked for more of the historical states and tribes, even very small ones, and as little change to the rules of play as possible.
+- **D-SETUP-19**: Added realms and the province grid (18 Oct; X-20, D-TRIBE-3): realms added from the catalogue (`grows` in the map nations data) take provinces as the map already cuts them, and never keep a piece of land apart the way the hand-placed capitals do, so every province keeps its id and every file that names provinces (ports, event places, anchors) stays valid. Sub-Saharan provinces are large (about 50,000 km² each), so where two capitals fall in one province the first in nation order keeps it and the other stays reference data (Kayor, Baol and Waalo in Jolof's province; Lamu and Pate in Mombasa's). The build lists them in `scenario-setup-report.json`. A finer African grid is a map change of its own. The start-date plan (1378) extends the same rows: a realm's capital, its own owner rules and `grows`.
 
 ### Settings (settings)
 
@@ -661,6 +667,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-TRIBE-3**: Where they go: each new tribe gets a home point (longitude and latitude of its heartland from its catalogue record) in the scenario data, like the map's capitals. A home province already owned in 1444 (Coosa under the Creek, perhaps Hopi and Zuni under the Pueblo) leaves the record as reference data (TRIBE-004), the simplest rule and the one X-13 already follows.
 - **D-TRIBE-4**: Keep gameplay as it is (Leroy, 18 Oct): no new resource, no new screen besides one tab, no new war rule. Hunting grounds reuse wrongs, the war aim *Punish*, the reasons count, foraging, self-run provinces and the officials cap. A tribe grows by claiming and taking in at about one province every few years per place in its range, slower than conquest and far slower than a colonial power, but it is never boxed in.
 - **D-TRIBE-5**: Pueblo: its 1444 form is a city commune (town polities), so it is not a tribal realm and gets no range; the Rio Grande towns grew by farming, not by walking new land. A reform into a tribal form would give it one.
+- **D-TRIBE-7**: Built 18 October 2026. Tribal regions are read off the map as a box of longitude and latitude per region (`tribes.region_bounds`), since map realms carry no catalogue region; North America is west of 50° W and north of 24.5° N. The asking price and the reasons count's numbers are in `tribes.ask`. "Needs no official" (GOV-023) now holds in a campaign: a clan council or chiefdom's own-people province with no official is not *Ungoverned*.
 - **D-TRIBE-6**: Hunting grounds stay unowned, so the colony rules (D-EXPL-2, PROV-250) are unchanged: anyone may still settle there, at the price of a fiercer people and an angry tribe, or by asking first.
 
 ### Troop movement (troop-movement)

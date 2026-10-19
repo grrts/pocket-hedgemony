@@ -30,6 +30,7 @@ This wiki explains every system in the game and how it works. Each page is writt
 | [Warfare](Warfare) | Battles, sieges, occupation, war through the eras |
 | [Naval](Naval) | Ports, sailors, admirals, fleets and sailing |
 | [Exploration and colonies](Exploration-and-Colonies) | Voyages into the unknown and founding colonies |
+| [Tribes and hunting grounds](Tribes-and-Hunting-Grounds) | Tribal realms, claiming and taking in hunting grounds, asking a tribe for its land |
 
 ## Statecraft
 

@@ -10,6 +10,7 @@ import { campaigning, halt, isMarching } from "./turn.ts";
 import { foodCarriedPct, spawnArmy, type World } from "./world.ts";
 import { armyBreak, atWar, controller, wallsOf, type News } from "./war.ts";
 import { armUnlocked, knownSet } from "./research.ts";
+import { selfRun } from "./tribes.ts";
 import { heritageFactor } from "./heritage.ts";
 import { noteRegiment } from "./achievements.ts";
 import { W as WORK, worksAt } from "./works.ts";
@@ -997,7 +998,8 @@ export function monthlyRecruits(world: World, news: News[]): void {
 
 /** A province of a realm whose official's post stands empty (he was commissioned). */
 export function ungoverned(world: World, p: number): boolean {
-  return world.provinceOwner[p]! >= 0 && world.provinceOfficial[p]! < 0;
+  // A clan council or chiefdom's own people run themselves (GOV-023, TRIBE-019).
+  return world.provinceOwner[p]! >= 0 && world.provinceOfficial[p]! < 0 && !selfRun(world, p);
 }
 
 /** A month of training: on at a castle of its own with no march under way, else held (RECR-050, RECR-100, RECR-109). */

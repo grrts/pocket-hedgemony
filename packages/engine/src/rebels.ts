@@ -1,4 +1,5 @@
 import type { World } from "./world.ts";
+import { spareSleepers, wakeRealm } from "./sleeping.ts";
 import { beliefRevoltFactor } from "./belief.ts";
 import * as rb from "./domain/rebellions/index.ts";
 import * as wf from "./domain/warfare/index.ts";
@@ -673,6 +674,17 @@ function rebelsWin(world: World, b: Band, news: News[]): void {
         news.push({ kind: "rebels", text: `The rebels win: ${where} break away to ${world.rules.nations[to]!.name}.`, nations: [b.owner, to], province: lands[0]! });
         return;
       }
+      // The realm that held them in 1444 wakes again when it is gone, else the first spare, named for their homeland (REBL-058, SETUP-088, SETUP-089).
+      const wake = to >= 0 && to !== b.owner ? to : spareSleepers(world)[0];
+      const owner = b.owner;
+      const lands = b.provinces.filter((p) => world.provinceOwner[p] === owner);
+      if (wake !== undefined && lands.length) {
+        endBand(world, b, "won", null, news);
+        wakeRealm(world, wake, { provinces: lands, breakFrom: owner }, news);
+        news.push({ kind: "rebels", text: `The rebels win: ${where} break away as ${world.rules.nations[wake]!.name}.`, nations: [owner, wake], province: lands[0]! });
+        return;
+      }
+      // With no spare left they rule themselves.
       for (const p of b.provinces) world.provinceSelfRule[p] = 1;
       lightTax(world, b.provinces, SELF_RULE);
       what = "they rule themselves, at light tax for good";

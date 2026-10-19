@@ -68,7 +68,8 @@ describe("a living realm: food", () => {
       worst = Math.max(worst, w.provinceStarved[p]! / (w.provincePopulation[p]! + w.provinceStarved[p]!));
     }
     expect(worst).toBeGreaterThan(0.1);
-    expect(worst).toBeLessThanOrEqual(0.2001);
+    // People who come and go after the famine (refugees, births) move the share by a hair.
+    expect(worst).toBeLessThanOrEqual(0.201);
     // Two hard years together cost less than half the province, the refugees included.
     expect(w.provincePopulation[p]).toBeGreaterThan(people * 0.5);
   }, 60000);

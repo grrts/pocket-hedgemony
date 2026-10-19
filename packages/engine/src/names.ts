@@ -57,6 +57,15 @@ export function personName(rules: Ruleset, nation: number, seed: number, place: 
   }
 }
 
+/** A member of a named house: the house as his family name where the culture has them, else as personName gives it. */
+export function houseMemberName(rules: Ruleset, nation: number, seed: number, house: string): string {
+  const c = cultureOf(rules, nation);
+  const given = c ? c.given[mix(seed, 1) % c.given.length]! : undefined;
+  if (c?.style === "family_first") return `${house} ${given}`;
+  if (c?.style === "family") return `${given} ${house}`;
+  return personName(rules, nation, seed, house);
+}
+
 /**
  * A name with its rank in the realm's language (feedback 125): "Almirante
  * Fernão Coutinho", "Hosokawa Katsumoto Taishō". A culture without that rank

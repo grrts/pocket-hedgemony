@@ -74,6 +74,7 @@ uniform sampler2D uOwner;    // per-province: rg = owner index + 1, b = 255 for 
 uniform sampler2D uSeason;   // per-province season, see seasonal()
 uniform sampler2D uSubject;  // per-province, for subjects (SUBJ-093): rgb = direct overlord's colour, a = 255 when a subject
 uniform sampler2D uSubjectOf; // per-province: rg = direct overlord's owner index + 1 (0 = nobody's subject)
+uniform sampler2D uHunt;     // per-province, for hunting grounds (TRIBE-028): rgb = the tribe's colour, a = 255 a ground, 110 a claim under way, 0 none
 uniform int uInfoWidth;
 uniform float uZoom;
 uniform float uTime;
@@ -87,6 +88,7 @@ uniform sampler2D uMini;     // the same at half size
 uniform sampler2D uTown;     // per-province town (VIEW-110, VIEW-113): r walls (0 none, 1 palisade, 2 stone), g road grade (0 track, 1 road, 2 paved), b worship variant, a style
 uniform sampler2D uTownAtlas; // town tiles: ${TOWN_VARIANTS} variants across, one row per cell kind (row = kind - 1)
 uniform float uLiving;       // 0..1: how far the living map has faded in (VIEW-101)
+uniform bool uFiefs;         // a data lens that draws fief borders and patterns too (the Institutions lens's great houses, INST-084)
 uniform vec3 uRoad[3];       // track, road, paved road
 out vec4 outColor;
 
@@ -129,9 +131,11 @@ int ownerOf(int id) {
 int lordTag(int id) { return int(texelFetch(uOwner, ivec2(id % uInfoWidth, id / uInfoWidth), 0).a * 255.0 + 0.5); }
 // Land faded back while other provinces are picked out (owner b = 64), e.g. while a lord's lands are lit.
 vec3 faded(vec3 c, int id) {
-  float b = texelFetch(uOwner, ivec2(id % uInfoWidth, id / uInfoWidth), 0).b;
-  return b > 0.2 && b < 0.4 ? mix(vec3(dot(c, vec3(0.3, 0.55, 0.15))), uParchmentDark, 0.25) * 0.75 : c;
+  int b = int(texelFetch(uOwner, ivec2(id % uInfoWidth, id / uInfoWidth), 0).b * 255.0 + 0.5);
+  return b < 128 && (b & 64) != 0 ? mix(vec3(dot(c, vec3(0.3, 0.55, 0.15))), uParchmentDark, 0.25) * 0.75 : c;
 }
+// Unowned land a data lens colours all the same (owner b bit 32), such as the Charts lens's empty coasts (EXPL-073, TRIBE-028).
+bool lensWashed(int id) { return uMode == 2 && (int(texelFetch(uOwner, ivec2(id % uInfoWidth, id / uInfoWidth), 0).b * 255.0 + 0.5) & 32) != 0; }
 // Land province (not a lake, not a sea zone).
 bool land(int id) {
   return id >= 0 && texelFetch(uOwner, ivec2(id % uInfoWidth, id / uInfoWidth), 0).b < 0.5;
@@ -186,6 +190,21 @@ float flags(int id) { return float(int(info(id).a * 255.0 + 0.5) >> 4); }
 vec3 hatch(vec3 c, int id, ivec2 q, int width) {
   if (uMode == 1 || (int(flags(id)) & 8) == 0) return c;
   return ((q.x + q.y) / width) % 2 == 0 ? mix(c, uInk, 0.35) : c;
+}
+// A hunting ground (TRIBE-028): a light diagonal hatch in the tribe's colour,
+// running the other way from the occupation hatch, one line in three; a dark
+// edge on each line keeps the pattern readable when the colours are close
+// (colour-vision modes). A claim under way shows the same lines fainter.
+vec3 hunt(vec3 c, int id, ivec2 q, int width) {
+  if (uMode == 1) return c;
+  vec4 h = texelFetch(uHunt, ivec2(id % uInfoWidth, id / uInfoWidth), 0);
+  if (h.a < 0.1) return c;
+  int d = (q.x + 4194304 - q.y) / width;
+  int k = d % 3;
+  bool ground = h.a > 0.7;
+  if (k == 0) return mix(c, h.rgb, ground ? 0.62 : 0.32);
+  if (k == 1 && ground) return mix(c, uInk, 0.18);
+  return c;
 }
 vec3 highlight(vec3 c, int id, float strength) {
   int f = int(flags(id));
@@ -451,7 +470,7 @@ vec3 tiled(bool mini) {
   }
   vec3 c = seasonal(tileAt(mini, terrain, variant, local), terrain, id, hash(a));
   int owner = ownerOf(id);
-  bool political = uMode != 1 && owner >= 0;
+  bool political = uMode != 1 && (owner >= 0 || lensWashed(id));
   if (political) {
     c = snowOver(realmWash(c, inf.rgb), id, terrain, hash(a));
     // A wider band of the owner's colour along its borders.
@@ -462,7 +481,7 @@ vec3 tiled(bool mini) {
     }
     if (edge) c = mix(c, inf.rgb, 0.35);
     // A lord's land (feedback 68): a sparse diaper of small dark crosses, like a fief's mantle.
-    if (lordTag(id) > 0 && uMode == 0) {
+    if (lordTag(id) > 0 && (uMode == 0 || uFiefs)) {
       ivec2 d = ivec2(a.x + ((a.y >> 3) & 1) * 4, a.y) & 7;
       if ((d.x == 2 && d.y >= 1 && d.y <= 3) || (d.y == 2 && d.x >= 1 && d.x <= 3)) c = mix(c, uInk, 0.28);
     }
@@ -499,13 +518,13 @@ vec3 tiled(bool mini) {
       c = mix(c, min(inf.rgb * 1.15 + 0.06, 1.0), 0.8);
     } else if (other2) {
       c = mix(c, uInk, 0.35);
-    } else if (political && uMode == 0 && ((iR != id && lordTag(iR) != lordTag(id)) || (iL != id && lordTag(iL) != lordTag(id)) || (iD != id && lordTag(iD) != lordTag(id)) || (iU != id && lordTag(iU) != lordTag(id)))) {
+    } else if (political && (uMode == 0 || uFiefs) && ((iR != id && lordTag(iR) != lordTag(id)) || (iL != id && lordTag(iL) != lordTag(id)) || (iD != id && lordTag(iD) != lordTag(id)) || (iU != id && lordTag(iU) != lordTag(id)))) {
       if (((a.x + a.y) >> 1 & 1) == 0) c = mix(c, uInk, 0.7); // dashed border between fiefs and royal land
     } else if ((iR != id || iL != id || iD != id || iU != id) && ((a.x + a.y) & 1) == 0) {
       c = mix(c, uInk, 0.5); // dotted province border
     }
   }
-  return highlight(hatch(faded(c, id), id, a, max(2, size / 2)), id, 0.18);
+  return highlight(hunt(hatch(faded(c, id), id, a, max(2, size / 2)), id, a, max(2, size / 4)), id, 0.18);
 }
 
 // Rough height of a terrain, for hill shading on the far map.
@@ -564,7 +583,7 @@ vec3 far() {
   if ((t == ${T.mountains}) && height(terrainAt(p - ivec2(1, 1))) > 1.0 && h > 0.7) c = mix(c, vec3(0.95), 0.6);
 
   int owner = ownerOf(id);
-  bool political = uMode != 1 && owner >= 0;
+  bool political = uMode != 1 && (owner >= 0 || lensWashed(id));
   // A subject (SUBJ-093) is washed in its direct overlord's colour with a thin
   // diagonal hatch in its own colour; a chain never stacks a second hatch.
   vec4 sub = subjectInfo(id);
@@ -592,11 +611,12 @@ vec3 far() {
     int u = idAt(p - ivec2(0, 1));
     if ((land(l) && ownerOf(l) != owner) || (land(u) && ownerOf(u) != owner)) c = mix(c, inf.rgb, 0.7);
     else if (provinceEdge) c *= (land(r) && lordTag(r) != lordTag(id)) || (land(d) && lordTag(d) != lordTag(id)) ? 0.5 : 0.72;
-    else if (uMode == 0 && lordTag(id) > 0 && uZoom > 3.0 && (p.x & 3) == 1 && (p.y & 3) == 1) c *= 0.8;
+    else if ((uMode == 0 || uFiefs) && lordTag(id) > 0 && uZoom > 3.0 && (p.x & 3) == 1 && (p.y & 3) == 1) c *= 0.8;
   } else if (provinceEdge && uZoom > 1.2) {
     c *= 0.72;
   }
-  return highlight(hatch(faded(c, id), id, p, 2), id, 0.3);
+  // The hunting hatch keeps about the same width on screen at every zoom.
+  return highlight(hunt(hatch(faded(c, id), id, p, 2), id, p, max(1, int(3.0 / uZoom))), id, 0.3);
 }
 
 // Undiscovered land and sea: old parchment with stains and a ruled grid.
@@ -688,6 +708,9 @@ export class MapRenderer {
   private subjectOfTex: WebGLTexture;
   private subjectOfData: Uint8Array;
   private subjectDirty = true;
+  private huntTex: WebGLTexture;
+  private huntData: Uint8Array;
+  private huntDirty = true;
   private atlasTex: WebGLTexture;
   private miniTex: WebGLTexture;
   private terrainColors: number[];
@@ -699,6 +722,8 @@ export class MapRenderer {
   private townAtlasTex: WebGLTexture;
   private u: Record<string, WebGLUniformLocation | null> = {};
   mode: MapMode = "political";
+  /** Under a data lens, draw the fief borders and pattern of the lords passed to setProvinceStyle (the Institutions lens's great houses). */
+  fiefs = false;
   readonly canvas: HTMLCanvasElement;
   readonly map: MapImage;
 
@@ -709,7 +734,7 @@ export class MapRenderer {
     if (!gl) throw new Error("WebGL2 is not available");
     this.gl = gl;
     this.program = link(gl, VERT, FRAG);
-    for (const name of ["uCenter", "uZoom", "uView", "uIds", "uTileOrigin", "uTileSize", "uInfo", "uOwner", "uInfoWidth", "uTime", "uMode", "uParchment", "uParchmentDark", "uTerrain", "uDepth", "uFoam", "uInk", "uHighlight", "uSand", "uForbid", "uAtlas", "uMini", "uLand", "uSeason", "uTown", "uTownAtlas", "uLiving", "uRoad", "uSubject", "uSubjectOf"]) {
+    for (const name of ["uCenter", "uZoom", "uView", "uIds", "uTileOrigin", "uTileSize", "uInfo", "uOwner", "uInfoWidth", "uTime", "uMode", "uParchment", "uParchmentDark", "uTerrain", "uDepth", "uFoam", "uInk", "uHighlight", "uSand", "uForbid", "uAtlas", "uMini", "uLand", "uSeason", "uTown", "uTownAtlas", "uLiving", "uFiefs", "uRoad", "uSubject", "uSubjectOf", "uHunt"]) {
       this.u[name] = gl.getUniformLocation(this.program, name);
     }
 
@@ -737,6 +762,8 @@ export class MapRenderer {
     this.subjectTex = makeDataTexture(gl, this.infoWidth, rows);
     this.subjectOfData = new Uint8Array(this.infoWidth * rows * 4);
     this.subjectOfTex = makeDataTexture(gl, this.infoWidth, rows);
+    this.huntData = new Uint8Array(this.infoWidth * rows * 4);
+    this.huntTex = makeDataTexture(gl, this.infoWidth, rows);
 
     const atlas = buildTileAtlas();
     this.atlasTex = makeDataTexture(gl, atlas.width, atlas.height);
@@ -797,8 +824,9 @@ export class MapRenderer {
    * lord: the lord holding it, -1 for royal land (drawn as a fief border and a pattern).
    * fade: land drawn faded to grey, so the provinces that are not stand out.
    * closed: land the armies being moved may not enter, drawn with red borders.
+   * wash: unowned land a data lens still washes in rgb (the Charts lens's empty coasts).
    */
-  setProvinceStyle(i: number, rgb: readonly number[], owner: number, terrain: number, flags: number, water = false, lord = -1, fade = false, closed = false): void {
+  setProvinceStyle(i: number, rgb: readonly number[], owner: number, terrain: number, flags: number, water = false, lord = -1, fade = false, closed = false, wash = false): void {
     const o = i * 4;
     this.infoData[o] = rgb[0]!;
     this.infoData[o + 1] = rgb[1]!;
@@ -807,7 +835,7 @@ export class MapRenderer {
     const ow = owner + 1;
     this.ownerData[o] = (ow >> 8) & 255;
     this.ownerData[o + 1] = ow & 255;
-    this.ownerData[o + 2] = water ? 255 : (fade ? 64 : 0) | (closed ? 16 : 0);
+    this.ownerData[o + 2] = water ? 255 : (fade ? 64 : 0) | (closed ? 16 : 0) | (wash ? 32 : 0);
     this.ownerData[o + 3] = lord >= 0 ? (lord % 255) + 1 : 0;
   }
 
@@ -877,6 +905,26 @@ export class MapRenderer {
     this.subjectDirty = true;
   }
 
+  /**
+   * Marks a province as a tribe's hunting ground (TRIBE-028): rgb is the
+   * tribe's colour, null clears it; claim draws the hatch fainter, for a claim
+   * under way. Sent with the next upload only when something changed.
+   */
+  setProvinceHunt(i: number, rgb: readonly number[] | null, claim: boolean): void {
+    const o = i * 4;
+    const h = this.huntData;
+    const r = rgb ? rgb[0]! : 0;
+    const g = rgb ? rgb[1]! : 0;
+    const b = rgb ? rgb[2]! : 0;
+    const a = rgb ? (claim ? 110 : 255) : 0;
+    if (h[o] === r && h[o + 1] === g && h[o + 2] === b && h[o + 3] === a) return;
+    h[o] = r;
+    h[o + 1] = g;
+    h[o + 2] = b;
+    h[o + 3] = a;
+    this.huntDirty = true;
+  }
+
   /** Every province's season for this turn, four bytes each, as seasonBytes() packs them. */
   setProvinceSeasons(bytes: Uint8Array): void {
     this.seasonData.set(bytes);
@@ -902,6 +950,11 @@ export class MapRenderer {
       gl.bindTexture(gl.TEXTURE_2D, this.subjectOfTex);
       gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, this.infoWidth, rows, gl.RGBA, gl.UNSIGNED_BYTE, this.subjectOfData);
       this.subjectDirty = false;
+    }
+    if (this.huntDirty) {
+      gl.bindTexture(gl.TEXTURE_2D, this.huntTex);
+      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, this.infoWidth, rows, gl.RGBA, gl.UNSIGNED_BYTE, this.huntData);
+      this.huntDirty = false;
     }
     if (this.seasonDirty) {
       gl.bindTexture(gl.TEXTURE_2D, this.seasonTex);
@@ -957,6 +1010,7 @@ export class MapRenderer {
     gl.bindTexture(gl.TEXTURE_2D, this.townAtlasTex);
     gl.uniform1i(this.u.uTownAtlas!, 8);
     gl.uniform1f(this.u.uLiving!, this.living);
+    gl.uniform1i(this.u.uFiefs!, this.fiefs ? 1 : 0);
     gl.uniform3fv(this.u.uRoad!, ["#8a6a44", PALETTE.clay, "#9a94a0"].flatMap((c) => hexToRgb(c).map((v) => v / 255)));
     gl.activeTexture(gl.TEXTURE9);
     gl.bindTexture(gl.TEXTURE_2D, this.subjectTex);
@@ -964,6 +1018,9 @@ export class MapRenderer {
     gl.activeTexture(gl.TEXTURE10);
     gl.bindTexture(gl.TEXTURE_2D, this.subjectOfTex);
     gl.uniform1i(this.u.uSubjectOf!, 10);
+    gl.activeTexture(gl.TEXTURE11);
+    gl.bindTexture(gl.TEXTURE_2D, this.huntTex);
+    gl.uniform1i(this.u.uHunt!, 11);
     gl.activeTexture(gl.TEXTURE0);
     gl.uniform1i(this.u.uIds!, 0);
 
