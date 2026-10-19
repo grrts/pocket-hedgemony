@@ -1,0 +1,786 @@
+/*
+ * The community forum (/community), on top of site.css: the same parchment sheets in
+ * wood frames, ribbon headings and pixel buttons as the game's panels. Mobile first:
+ * one column, with the overview's two columns from 960 px. Every tap target is at
+ * least 44 px and nothing needs hover.
+ */
+
+.community {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+}
+
+.community > *,
+.c-overview > * {
+  min-width: 0;
+}
+
+.community h1 {
+  margin: 6px 0 8px;
+  font: 48px/1.05 var(--title);
+  color: var(--ink);
+  text-shadow: 2px 2px 0 var(--paper-dark);
+  overflow-wrap: anywhere;
+}
+
+.community p {
+  margin: 6px 0;
+}
+
+.community .sheet {
+  padding: 8px 18px 20px;
+}
+
+.community .narrow {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+/* A section title on a red ribbon, as the game's panels have. */
+.c-h2 {
+  display: inline-block;
+  max-width: 100%;
+  margin: 10px 0 12px -8px;
+  padding: 0 4px;
+  border-style: solid;
+  border-width: 12px 32px;
+  border-image: url("art/ribbon.png") 3 8 fill / 12px 32px stretch;
+  font: 600 27px/30px var(--body);
+  letter-spacing: 0.5px;
+  color: var(--paper-light);
+  text-shadow: 2px 2px 0 var(--outline);
+  image-rendering: pixelated;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.c-notice {
+  margin: 0;
+  padding: 10px 14px;
+  background: url("art/parchment-dark.png") 0 0 / 64px;
+  border: 3px solid var(--wood-dark);
+  box-shadow: inset 6px 0 0 #3d6b2a, 0 4px 0 rgb(0 0 0 / 0.35);
+}
+
+.community .crumbs a,
+.board-latest a,
+.report-where a,
+.hint a,
+.empty a {
+  /* Inline, so a long title wraps with the sentence; the padding makes the tap area 44 px. */
+  padding: 12px 0;
+}
+
+/* ---- Overview ---- */
+
+.c-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 20px;
+}
+
+.c-head-text {
+  flex: 1 1 320px;
+}
+
+.c-head-actions,
+.guest-actions,
+.mod-tools,
+.form-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.mod-tools form {
+  margin: 0;
+}
+
+.count {
+  min-width: 26px;
+  padding: 2px 6px;
+  background: var(--cloth);
+  color: var(--paper-light);
+  text-shadow: 1px 1px 0 var(--outline);
+  box-shadow: 2px 2px 0 var(--outline);
+}
+
+.c-overview {
+  display: grid;
+  gap: 20px;
+  align-items: start;
+}
+
+.boards,
+.topics,
+.posts,
+.report-list,
+.reasons {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  column-gap: 12px;
+  padding: 12px 0;
+  border-top: 3px dashed var(--paper-dark);
+}
+
+.board:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.board > :not(.board-name) {
+  grid-column: 2;
+}
+
+.board-name {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  column-gap: 12px;
+  align-items: center;
+  min-height: 48px;
+  font: 600 28px/1.05 var(--body);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.board-name:hover span:last-child {
+  color: var(--cloth);
+  text-decoration: underline;
+}
+
+.board-icon {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 48px;
+  background: url("art/parchment-dark.png") 0 0 / 64px;
+  border: 3px solid var(--wood-dark);
+  box-shadow: inset 2px 2px 0 var(--paper-light);
+}
+
+.board-icon.big {
+  width: 72px;
+  height: 64px;
+  flex: none;
+}
+
+.board > p {
+  margin: 2px 0;
+}
+
+.board-desc {
+  color: var(--ink-soft);
+  font-size: 20px;
+  line-height: 1.25;
+}
+
+.board-stats {
+  font-size: 20px;
+}
+
+.board-latest {
+  font-size: 20px;
+  overflow-wrap: anywhere;
+}
+
+.board-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin-bottom: 12px;
+}
+
+.board-head > div {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.board-head h1 {
+  margin-bottom: 0;
+}
+
+.c-guest {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin: 0 0 12px;
+  padding: 6px 12px;
+  background: url("art/parchment-dark.png") 0 0 / 64px;
+  border: 3px solid var(--wood-dark);
+}
+
+/* ---- Topic lists ---- */
+
+.topic-row {
+  display: grid;
+  gap: 2px 16px;
+  padding: 10px 6px;
+  border-top: 2px solid var(--paper-dark);
+}
+
+.topic-row:nth-child(even) {
+  background: rgb(224 196 142 / 0.4);
+}
+
+.topics:not(.compact) .topic-row:first-child {
+  border-top: 3px solid var(--wood);
+}
+
+.topic-title {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 4px 0;
+  font-size: 25px;
+  line-height: 1.1;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.topic-meta,
+.topic-last {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 12px;
+  margin: 0 !important;
+  font-size: 19px;
+  color: var(--ink-soft);
+}
+
+.replies strong {
+  color: var(--ink);
+}
+
+.board-tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 8px;
+  background: var(--wood);
+  color: var(--paper-light);
+  text-shadow: 1px 1px 0 var(--outline);
+  font-size: 18px;
+}
+
+.badge,
+.tag {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 6px;
+  border: 2px solid currentColor;
+  font: 600 17px/1.1 var(--body);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  text-shadow: none;
+  vertical-align: middle;
+}
+
+.badge.lock {
+  color: var(--cloth);
+}
+
+.badge.hide,
+.is-hidden > .post-head .tag {
+  color: var(--ink-soft);
+}
+
+.tag {
+  margin-left: 4px;
+  color: var(--wood);
+  font-size: 15px;
+}
+
+.is-hidden {
+  opacity: 0.6;
+}
+
+.empty {
+  padding: 18px 0;
+  color: var(--ink-soft);
+}
+
+.pager {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 14px 0;
+}
+
+.pg {
+  display: inline-grid;
+  place-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 6px;
+  border: 3px solid var(--wood-dark);
+  background: var(--paper-light);
+  color: var(--ink);
+  font-size: 22px;
+  text-decoration: none;
+}
+
+.pg.on {
+  background: var(--wood);
+  color: var(--paper-light);
+  text-shadow: 1px 1px 0 var(--outline);
+}
+
+.pg.gap {
+  border-color: transparent;
+  background: none;
+}
+
+/* ---- A topic and its posts ---- */
+
+.topic-head {
+  padding-bottom: 8px;
+  border-bottom: 3px solid var(--wood);
+}
+
+.topic-head .badge {
+  font-size: 18px;
+}
+
+.topic-head .mod-tools {
+  margin-top: 8px;
+}
+
+.post {
+  margin: 16px 0;
+  background: var(--paper-light);
+  border: 3px solid var(--wood-dark);
+  box-shadow: 0 3px 0 rgb(36 21 12 / 0.35);
+  scroll-margin-top: 80px;
+}
+
+.post:target {
+  outline: 4px solid var(--brass);
+  outline-offset: 2px;
+}
+
+.post-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  background: url("art/parchment-dark.png") 0 0 / 64px;
+  border-bottom: 2px solid var(--wood-dark);
+}
+
+.post-who {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.post-who strong {
+  font-size: 23px;
+}
+
+.post-when {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: 19px;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.post-body {
+  padding: 4px 14px;
+  overflow-wrap: anywhere;
+}
+
+.post-body p {
+  max-width: 46em;
+  margin: 10px 0;
+}
+
+.edited,
+.hidden-note {
+  padding: 0 14px;
+  font-size: 18px;
+  color: var(--ink-soft);
+  font-style: italic;
+}
+
+.hidden-note {
+  margin: 8px 0 0 !important;
+  color: var(--cloth);
+}
+
+.post-tools {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 6px 10px 8px;
+}
+
+.post-tools form {
+  margin: 0;
+}
+
+.post-tools .btn,
+.post-tools button {
+  font-size: 19px;
+}
+
+/* A player's seal: the first letter of their name, in one of eight nation colours. */
+.seal {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border: 3px solid var(--outline);
+  box-shadow: inset 2px 2px 0 rgb(255 255 255 / 0.3), inset -2px -2px 0 rgb(0 0 0 / 0.25);
+  font: 600 24px/1 var(--body);
+  color: var(--paper-light);
+  text-shadow: 2px 2px 0 var(--outline);
+}
+
+.seal-0 { background: #a8323e; }
+.seal-1 { background: #1f3462; }
+.seal-2 { background: #3d6b2a; }
+.seal-3 { background: #b06a1c; }
+.seal-4 { background: #6a3b7a; }
+.seal-5 { background: #26706e; }
+.seal-6 { background: #7a4c2a; }
+.seal-7 { background: #8a7a22; }
+
+/* ---- Reply box and forms ---- */
+
+.reply {
+  margin-top: 18px;
+  scroll-margin-top: 80px;
+}
+
+.locked-note {
+  padding: 10px 14px;
+  border: 3px solid var(--cloth);
+  color: var(--cloth);
+  background: var(--paper-light);
+}
+
+.c-form {
+  display: grid;
+  gap: 6px;
+}
+
+.c-form input[type="text"],
+.c-form input[type="email"],
+.c-form input[type="password"],
+.c-form textarea {
+  width: 100%;
+  min-width: 0;
+}
+
+.c-form textarea {
+  min-height: 140px;
+  resize: vertical;
+  line-height: 1.3;
+  scroll-margin: 80px 0 120px;
+}
+
+.c-form [aria-invalid="true"] {
+  border-color: var(--cloth);
+}
+
+.field-label {
+  margin-top: 10px;
+  font-weight: 600;
+  font-size: 22px;
+}
+
+.field-error {
+  margin: 2px 0 6px !important;
+  padding: 4px 10px;
+  border-left: 6px solid var(--cloth);
+  background: rgb(168 50 62 / 0.12);
+  color: var(--cloth);
+  font-size: 20px;
+}
+
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  margin-top: 6px;
+}
+
+.form-row .btn.wax,
+.form-row button {
+  min-width: 140px;
+}
+
+.hint {
+  margin: 0 !important;
+  font-size: 19px;
+  color: var(--ink-soft);
+}
+
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  margin-top: 4px;
+  font-size: 21px;
+  cursor: pointer;
+}
+
+.check input {
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  accent-color: var(--wood);
+}
+
+.board-pick {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+  gap: 8px;
+  margin: 6px 0 0;
+  padding: 0;
+  border: 0;
+}
+
+.board-pick legend {
+  margin-bottom: 4px;
+  padding: 0;
+  font-weight: 600;
+  font-size: 22px;
+}
+
+.board-option {
+  position: relative;
+  display: block;
+  cursor: pointer;
+}
+
+.board-option input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  margin: 0;
+}
+
+.board-option-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 6px 10px;
+  border: 3px solid var(--wood-dark);
+  background: var(--paper-light);
+  font-size: 21px;
+  line-height: 1.1;
+}
+
+.board-option input:checked + .board-option-box {
+  background: var(--wood);
+  color: var(--paper-light);
+  text-shadow: 1px 1px 0 var(--outline);
+  box-shadow: inset 0 0 0 2px var(--brass);
+}
+
+.board-option input:focus-visible + .board-option-box {
+  outline: 3px solid var(--brass-light);
+  outline-offset: 2px;
+}
+
+.account-form .c-form {
+  max-width: 520px;
+}
+
+.you-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 10px;
+}
+
+.you-head .seal {
+  width: 64px;
+  height: 64px;
+  font-size: 44px;
+}
+
+.you-head h1 {
+  margin: 0;
+}
+
+.you-head p {
+  overflow-wrap: anywhere;
+}
+
+/* ---- Reports ---- */
+
+.quote {
+  margin: 10px 0;
+  padding: 6px 12px;
+  background: var(--paper-light);
+  border: 3px solid var(--wood-dark);
+  border-left-width: 8px;
+}
+
+.quote .post-body {
+  padding: 0;
+  max-height: 16em;
+  overflow: auto;
+}
+
+.quote-who {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quote-who .seal {
+  width: 30px;
+  height: 30px;
+  font-size: 20px;
+}
+
+.report {
+  padding: 14px 0;
+  border-top: 3px dashed var(--wood);
+}
+
+.report-where {
+  font-size: 24px;
+}
+
+.reasons li {
+  margin: 4px 0;
+  padding-left: 12px;
+  border-left: 4px solid var(--cloth);
+  overflow-wrap: anywhere;
+}
+
+.report .mod-tools {
+  margin-top: 10px;
+}
+
+/* ---- Wider screens ---- */
+
+@media (min-width: 960px) {
+  .c-overview {
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  }
+
+  .topics:not(.compact) .topic-row {
+    grid-template-columns: minmax(0, 1fr) 260px;
+    grid-template-areas: "title last" "meta last";
+    align-items: center;
+  }
+
+  .topics:not(.compact) .topic-row > :first-child {
+    grid-area: title;
+  }
+
+  .topics:not(.compact) .topic-meta {
+    grid-area: meta;
+  }
+
+  .topics:not(.compact) .topic-last {
+    grid-area: last;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+  }
+}
+
+/* ---- Phones ---- */
+
+@media (max-width: 500px) {
+  .community {
+    gap: 12px;
+  }
+
+  .community .sheet {
+    padding: 4px 10px 14px;
+  }
+
+  .community h1 {
+    font-size: 38px;
+  }
+
+  .c-h2 {
+    margin-left: -4px;
+    border-width: 6px 16px;
+    border-image-width: 6px 16px;
+    font-size: 24px;
+    line-height: 26px;
+  }
+
+  .post-body {
+    padding: 2px 10px;
+  }
+
+  .post-head {
+    padding: 4px 8px;
+  }
+
+  .form-row .btn.wax,
+  .form-row button {
+    flex: 1;
+  }
+
+  .form-buttons {
+    flex: 1;
+  }
+
+  .form-buttons > * {
+    flex: 1;
+  }
+}
+
+/* Short screens (a phone on its side, or with the keyboard up): the plank bar scrolls
+   away with the page, so the reply box keeps the room. */
+@media (max-height: 500px) {
+  .bar {
+    position: relative;
+  }
+
+  .post,
+  .reply,
+  .c-form textarea {
+    scroll-margin-top: 12px;
+  }
+
+  /* The reply box and its button fit together above the keyboard. */
+  .reply .c-form textarea {
+    min-height: 92px;
+    height: 92px;
+  }
+
+  .reply .hint {
+    display: none;
+  }
+
+  .reply .form-row {
+    justify-content: flex-end;
+    margin-top: 0;
+  }
+}

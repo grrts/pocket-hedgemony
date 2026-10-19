@@ -1,0 +1,34 @@
+{% extends 'community/layout.html.twig' %}
+{% import 'community/_parts.html.twig' as parts %}
+
+{% block title %}{{ account.displayName }} · Pocket Hegemony community{% endblock %}
+{% block meta %}<meta name="robots" content="noindex">{% endblock %}
+
+{% block community %}
+<section class="framed sheet narrow">
+    <p class="crumbs"><a href="{{ path('community') }}">Community</a> › Your account</p>
+    <header class="you-head">
+        {{ parts.seal(account) }}
+        <div>
+            <h1>{{ account.displayName }}</h1>
+            <p class="muted">{{ account.email }} · joined {{ account.createdAt|date('j M Y') }}{% if account.moderator %} · moderator{% endif %}</p>
+        </div>
+    </header>
+    <div class="mod-tools">
+        <a class="btn wax" href="{{ path('community_new') }}">{{ parts.icon('scroll') }}New topic</a>
+        {% if account.moderator %}<a class="btn paper" href="{{ path('community_reports') }}">Reports</a>{% endif %}
+        <form method="post" action="{{ path('community_signout') }}">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
+            <button class="btn paper" type="submit">Sign out</button>
+        </form>
+    </div>
+    <h2 class="c-h2">Your topics</h2>
+    {% if topics %}
+    <ol class="topics compact">
+        {% for topic in topics %}{{ parts.topic_row(topic, null) }}{% endfor %}
+    </ol>
+    {% else %}
+    <p class="empty">You have not started a topic yet.</p>
+    {% endif %}
+</section>
+{% endblock %}
