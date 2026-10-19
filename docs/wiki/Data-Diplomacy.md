@@ -741,12 +741,19 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 
 ## Answers
 
-> No preview: the asker learns yes or no, with the full reasons list, a month after the answer is given.
+> No preview of the count: the asker learns yes or no, with the full reasons list, a month after the answer is given. Before sending, an ask the reasons decide shows one word (DIPL-229): Likely when the count as it stands now is at least \`hint.likely\_from\`, Unlikely when it is at most \`hint.unlikely\_to\`, else Unsure. Placeholders for balance.
 
 | Key | Value |
 |---|---|
 | `delay_months` | 1 |
 | `preview_before_sending` | no |
+
+### Hint
+
+| Key | Value |
+|---|---|
+| `likely_from` | 15 |
+| `unlikely_to` | -15 |
 
 ## Eras by year
 

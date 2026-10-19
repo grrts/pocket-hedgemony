@@ -8,10 +8,10 @@ Keys are written as in the config. Shares are fractions (0.25 is 25 %). A value 
 |---|---|---|---|
 | [Core values](Data-Defines) | 321 | `defines.json` |  |
 | [Time and turns](Data-Time-and-Turns) | 373 | `domain/time-and-turns.json` | [Time and Turns](Time-and-Turns) |
-| [Realm](Data-Realm) | 901 | `domain/realm.json` | [Your Realm](Your-Realm) |
+| [Realm](Data-Realm) | 904 | `domain/realm.json` | [Your Realm](Your-Realm) |
 | [Province](Data-Province) | 927 | `domain/province.json` | [Provinces](Provinces) |
 | [Buildings](Data-Buildings) | 1503 | `domain/buildings.json` | [Buildings](Buildings) |
-| [Trade](Data-Trade) | 316 | `domain/trade.json` | [Trade](Trade) |
+| [Trade](Data-Trade) | 323 | `domain/trade.json` | [Trade](Trade) |
 | [Research](Data-Research) | 2138 | `domain/research.json` | [Research](Research) |
 | [Institutions](Data-Institutions) | 161 | `domain/institutions.json` | [Institutions](Institutions) |
 | [Warfare](Data-Warfare) | 1673 | `domain/warfare.json` | [Warfare](Warfare) |
@@ -22,7 +22,7 @@ Keys are written as in the config. Shares are fractions (0.25 is 25 %). A value 
 | [Tribes](Data-Tribes) | 40 | `domain/tribes.json` | [Tribes and Hunting Grounds](Tribes-and-Hunting-Grounds) |
 | [Government](Data-Government) | 805 | `domain/government.json` | [Government](Government) |
 | [Subjects](Data-Subjects) | 243 | `domain/subjects.json` | [Subjects](Subjects) |
-| [Diplomacy](Data-Diplomacy) | 765 | `domain/diplomacy.json` | [Diplomacy](Diplomacy) |
+| [Diplomacy](Data-Diplomacy) | 767 | `domain/diplomacy.json` | [Diplomacy](Diplomacy) |
 | [Religion](Data-Religion) | 754 | `domain/religion.json` | [Religion](Religion) |
 | [Culture](Data-Culture) | 354 | `domain/culture.json` | [Culture](Culture) |
 | [Rebellions](Data-Rebellions) | 222 | `domain/rebellions.json` | [Rebellions](Rebellions) |

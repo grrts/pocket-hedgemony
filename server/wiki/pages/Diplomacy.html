@@ -100,7 +100,7 @@
 <p>Standing shows as a word: <strong>Close</strong> (+100 or more), <strong>Warm</strong> (+30 to +99), <strong>Cool</strong> (−29 to +29), <strong>Cold</strong> (−30 to −99), <strong>Bitter</strong> (−100 or less), with the ledger one tap away.</p>
 <p>Two world-wide counts from <a href="/wiki/Your-Realm">Your-Realm</a> also act as reasons. Each <strong>Oath broken</strong> in the last 30 years is −10 in every count that relies on your word (alliances, pacts, sworn peace, pledges, marriages). <strong>Lands taken</strong> in the last 20 years drives leagues and is a reason in your neighbours&#39; alliance counts.</p>
 <h3 id="the-reasons-count"><a class="anchor" href="#the-reasons-count" aria-label="Link to this section">#</a>The reasons count</h3>
-<p>Every yes or no is decided the same way: the asked country lists its reasons, each with a number, and answers yes only when the total is over zero. There is no prediction before asking, and the answer arrives as a <strong>letter</strong> a month after it is given, yes or no with the full reasons list. Beforehand you can judge only from what you can see: the ledger, the stance, and the other side&#39;s soldiers (exact with a resident, otherwise an estimate).</p>
+<p>Every yes or no is decided the same way: the asked country lists its reasons, each with a number, and answers yes only when the total is over zero. The answer arrives as a <strong>letter</strong> a month after it is given, yes or no with the full reasons list. Before you send, each ask the reasons decide shows one word on its button: <strong>Likely</strong> when its count as it stands this month is +15 or more, <strong>Unlikely</strong> at −15 or less, and <strong>Unsure</strong> between. No numbers are shown, and the count is made again when the envoy arrives, so much can change on the way. A courtesy visit and a gift always land and show no word. Beyond the word you can judge from what you can see: the ledger, the stance, and the other side&#39;s soldiers (exact with a resident, otherwise an estimate).</p>
 <p>Every count holds:</p>
 <ul>
 <li>the action&#39;s negative <strong>base</strong>, which says how big the ask is;</li>
@@ -330,6 +330,7 @@
 <tr><td><code>truce.*</code></td><td>60 + 60 months; white 60</td></tr>
 <tr><td><code>leagues.*</code></td><td>yearly; thresholds 8/8/8/6/6/4/4; count rows above; 2 members; dissolves below half</td></tr>
 <tr><td><code>answers.delay_months</code> / <code>preview_before_sending</code></td><td>1 / false (decided)</td></tr>
+<tr><td><code>answers.hint.likely_from</code> / <code>answers.hint.unlikely_to</code></td><td>+15 / −15 (the one-word hint before asking)</td></tr>
 <tr><td><code>types.friendly.duration.decay_months</code></td><td>240</td></tr>
 <tr><td><code>types.rival.duration.min_months_before_change</code></td><td>120</td></tr>
 <tr><td><code>types.hostile.duration.decay_months</code></td><td>120</td></tr>

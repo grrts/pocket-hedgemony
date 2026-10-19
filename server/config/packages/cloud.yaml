@@ -3,8 +3,13 @@
 parameters:
     cloud.access_token_minutes: 15
     cloud.steam_ticket_identity: pockethegemony
+    cloud.max_save_mb: 2
+    cloud.quota_saves: 300
+    cloud.quota_mb: 200
+    cloud.tombstone_purge_days: 30
     env(STEAM_WEB_API_KEY): ''
     env(STEAM_APP_ID): ''
+    env(SAVES_DIR): '%kernel.project_dir%/var/saves/%kernel.environment%'
 
 framework:
     rate_limiter:
@@ -13,3 +18,8 @@ framework:
             policy: sliding_window
             limit: 5
             interval: '15 minutes'
+        # Save uploads, per account and per device (SAVE-070). The design gives no numbers; provisional.
+        api_saves:
+            policy: sliding_window
+            limit: 120
+            interval: '10 minutes'

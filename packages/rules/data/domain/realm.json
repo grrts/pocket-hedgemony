@@ -191,7 +191,7 @@
     "throne_laws": ["eldest son", "eldest child", "eldest of the house", "strongest claimant", "election by lords"],
     "land_laws": ["to one heir", "split among the sons"]
   },
-  "win": {"domination_share": 0.5, "subject_province_weight": 0.5, "checked_month": 1, "army_weights": {"foot": 1, "horse": 2, "guns": 3}, "warship_men": 100, "commander_men": 1000, "army_power_per_men": 1000},
+  "win": {"$comment": "X-28: the whole world for domination; each score is the average of the last average_years Januaries, judged as growth against the realm's own start (floored at the start_floor_quantile of all realms' starts); a chapter closes every chapter_years.", "domination_share": 1, "subject_province_weight": 0.5, "checked_month": 1, "army_weights": {"foot": 1, "horse": 2, "guns": 3}, "warship_men": 100, "army_power_per_men": 1000, "bank_cap_years_income": 1, "average_years": 25, "start_floor_quantile": 0.5, "chapter_years": 100},
   "campaign_end": { "year": 1939, "month": 8, "day": 31 },
   "grain_price_gold_per_food": 0.5,
   "card_extra_lines": ["Traders", "Trade ships", "Envoy seats", "Leagues against you", "Pretenders at court", "Arms store", "Powder store", "Prisoners", "Victories / Defeats", "Troop cap", "Preachers", "Subjects"],
@@ -312,5 +312,5 @@
     "revolt_factor": 1.5,
     "official_slow": 0.5
   },
-  "_provisional": ["grain_price_gold_per_food", "daughters_inherit_crown", "great_lord", "women_in_roles", "age_multipliers", "women_reform_multiplier", "starting", "starting_armies", "starting_lords", "food_year", "debt", "win.army_weights", "win.warship_men", "win.commander_men", "win.army_power_per_men", "ai", "stability.empty_posts_share", "stability.restless_share", "ruler", "people", "fallen", "belief", "titles", "lords.assassination"]
+  "_provisional": ["grain_price_gold_per_food", "daughters_inherit_crown", "great_lord", "women_in_roles", "age_multipliers", "women_reform_multiplier", "starting", "starting_armies", "starting_lords", "food_year", "debt", "win.army_weights", "win.warship_men", "win.bank_cap_years_income", "win.start_floor_quantile", "win.army_power_per_men", "ai", "stability.empty_posts_share", "stability.restless_share", "ruler", "people", "fallen", "belief", "titles", "lords.assassination"]
 }

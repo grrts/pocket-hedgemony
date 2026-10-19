@@ -10,7 +10,7 @@ import { CLASS_COUNT, classIndex } from "../src/living.ts";
 import { workIndex, WORK_COUNT, worksAt } from "../src/works.ts";
 import { tradeConfig } from "../src/domain/trade/index.ts";
 import {
-  bestRoute, dismissTrader, draftTradeRoute, estimateLoop, foundProblem, foundTrader, isTradeStop, kindRow, loopPath, monthlyTrade, provinceWares, refreshTradeValues,
+  bestRoute, dismissTrader, homedAt, homeSlots, isPort, draftTradeRoute, estimateLoop, foundProblem, foundTrader, isTradeStop, kindRow, loopPath, monthlyTrade, provinceWares, refreshTradeValues,
   routeOptions, routeProblem, setTradeRoute, startCount, suggestRoutes, tradeDay, tradeLine, tradeSeen, traderWalks, tradeTaxFactor, tradeValueAt, tradeView, warePrice,
 } from "../src/trade.ts";
 
@@ -135,8 +135,20 @@ describe("trade in the game (TRADE-129 to TRADE-140)", () => {
     // Too few market folk, and it is refused.
     x.provinceClasses[city * CLASS_COUNT + MARKET_FOLK] = 0.01;
     expect(foundProblem(x, fra, city, "pack_caravan")).toBe("needs 50 market folk");
-    x.nationTreasury[fra] = 0;
     x.provinceClasses[city * CLASS_COUNT + MARKET_FOLK] = 5;
+    // A city is home to as many traders as its market step allows, one more with a harbour (TRADE-159).
+    // Upkeep and founding gold are the kind's times the home slots' factors (D-TRADE-23).
+    const k = tradeConfig.land_traders.pack_caravan;
+    const H = tradeConfig.game.homes;
+    expect(kindRow(x, "pack_caravan").upkeep).toBeCloseTo(k.upkeep * x.rules.defines.works.goldScale * H.upkeep_factor, 9);
+    expect(kindRow(x, "pack_caravan").gold).toBeCloseTo(k.found * x.rules.defines.works.goldScale * H.found_factor, 9);
+    const slots = homeSlots(x, city);
+    expect(slots).toBe([0, 1, 2, 4][Math.min(worksAt(x, city, workIndex("market")), 3)]! + (isPort(x, city) ? 1 : 0));
+    for (let k = homedAt(x, city); k < slots; k++) x.traders.push({ ...t, id: 9000 + k });
+    expect(homedAt(x, city)).toBe(slots);
+    expect(foundProblem(x, fra, city, "pack_caravan")).toMatch(/^home to \d+ already/);
+    x.traders = x.traders.filter((o) => o.home !== city);
+    x.nationTreasury[fra] = 0;
     expect(foundProblem(x, fra, city, "pack_caravan")).toMatch(/^needs .* gold$/);
   });
 

@@ -3960,6 +3960,11 @@ button[data-break-alliance] {
   line-height: 1.25;
 }
 
+/* How likely a yes is (DIPL-229): the word itself says it, the colour only backs it up. */
+.odds.likely { color: #3f6b2a; }
+.odds.unsure { color: var(--ink-soft); }
+.odds.unlikely { color: var(--cloth); }
+
 .diplomacy-tab .hint {
   font-size: 17px;
 }
@@ -7261,4 +7266,32 @@ div.chron-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 6px;
+}
+
+/* ---- Chapters (SHELL-183, SHELL-184) ---- */
+
+.score-part .made.chapter {
+  grid-column: 1 / -1;
+}
+
+.chapter-due {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  margin: 6px 0;
+}
+
+.chapter-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 6px 0;
+}
+
+.chapter-list button {
+  min-height: 44px;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
 }

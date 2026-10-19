@@ -303,16 +303,20 @@ You win by **world domination** or by **leading one of three scores**, each buil
 
 | Score | Built from |
 |---|---|
-| **Economy** | Yearly income (taxes, lords' share, trade, tribute) plus the bank (gold minus debt) |
-| **Power** | Provinces held (subjects' provinces count half) plus army power (soldiers weighted by kind, warships, commanders) |
+| **Economy** | Yearly income (taxes, lords' share, trade, tribute) plus the bank (gold minus debt); gold in the bank counts only up to a year's income, debt counts in full |
+| **Power** | Provinces held (subjects' provinces count half) plus army power (soldiers weighted by kind, and warships); commanders add nothing |
 | **Technology** | Inventions known, each weighted by its era cost; nothing removes a known invention |
 
-- **World domination**: you and your subjects hold half of the world's settled land provinces (land with people) in the turn in which 1 January falls. Allies by marriage do not count.
-- **Score victory**: lead a score when the campaign's end date (default 31 August 1939) arrives. Leading earlier wins nothing, however wide the margin.
+- **World domination**: you and your subjects hold every settled land province of the world (land with people) in the turn in which 1 January falls. Allies by marriage do not count.
+- **Score victory**: lead a score's growth when the campaign's end date (default 31 August 1939) arrives. Leading earlier wins nothing, however wide the margin.
 
-Army power counts foot as 1, horse as 2, guns as 3, a warship as 100 men and a commander as 1,000, all over 1,000; the weights are provisional. Scores are worked out at the start and every January. A domination win happens at once and you may keep playing. At the end date the leader of each score wins, and ties share the win.
+**A fair score.** What is ranked and what wins is not a score on one day. Each score is the **average of your last 25 Januaries**, so a burst in the final year moves it little. It is judged as **growth against your own start**: the average divided by your score at the start of the campaign, shown as ×1.84. Brittany doubling its Power beats France standing still. So that a speck of a realm can't win by tripling almost nothing, every start is counted as at least the median start of all realms in that score.
 
-**Where you see it.** Every realm's General tab has a **Score** line: its Economy, Power and Technology with its rank in each. On your own card the line opens the **Score** tab: how each of your scores is made (income and bank; provinces and army power; inventions), your rank of how many realms still stand, and the five leading realms beside you. When the campaign ends the clock stops and the end card opens by itself (see [Screens and navigation](Screens-and-Navigation)).
+**Chapters.** Every 100 years a chapter closes, in the January turn of 1544, 1644, 1744 and 1844 (from a 1444 start). The chapter card opens by itself: how your realm grew over those hundred years in each score and its place, who led each, and the leading realms; then **Play on**. A chapter wins nothing, but it is a payoff on the way, and every chapter is a fresh race, measured from each realm's score when it began. The last chapter closes with the campaign, on the end card. Past chapters stay listed on the Score tab.
+
+Army power counts foot as 1, horse as 2, guns as 3 and a warship as 100 men, all over 1,000; the weights are provisional. Scores are worked out at the start and every January. A domination win happens at once and you may keep playing. At the end date the realm that has grown most in each score wins it, and ties (to two decimals) share the win.
+
+**Where you see it.** Every realm's General tab has a **Score** line: its growth in Economy, Power and Technology with its rank in each ("Economy ×1.84 · 3rd"). On your own card the line opens the **Score** tab: how each of your scores is made now (income and the bank as it counts; provinces and army power; inventions), its 25-year average against your start, your growth and rank this chapter, when the chapter closes, the five leading realms beside you, and the chapters closed so far, each opening its card again. When the campaign ends the clock stops and the end card opens by itself (see [Screens and navigation](Screens-and-Navigation)).
 
 ### Each month
 
@@ -391,9 +395,11 @@ All realm numbers are placeholders, kept in one realm data file.
 | Lands taken window | `lands_taken.window_years` | 20 years | Yes |
 | Women in roles | `women_in_roles` | not given | Yes |
 | Age multipliers | `age_multipliers` | not given | Yes |
-| World domination | `win.domination_share` | 60 % | Yes |
-| Score lead | `win.score_margin` | 50 % | Yes |
-| Years leading | `win.score_years` | 25 | Yes |
+| World domination | `win.domination_share` | the whole world | No |
+| Bank counted | `win.bank_cap_years_income` | 1 year's income | Yes |
+| Januaries averaged | `win.average_years` | 25 | No |
+| Floor under a start | `win.start_floor_quantile` | the median start | Yes |
+| Chapter length | `win.chapter_years` | 100 years | No |
 | Subjects in Power | `win.subject_province_weight` | ½ | Yes |
 | End date | `campaign.end_date` | 31 August 1939 | No (decided) |
 

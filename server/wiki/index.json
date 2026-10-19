@@ -1270,6 +1270,11 @@
      "level": 2
     },
     {
+     "id": "hint",
+     "text": "Hint",
+     "level": 3
+    },
+    {
      "id": "eras-by-year",
      "text": "Eras by year",
      "level": 2
@@ -6105,6 +6110,11 @@
      "id": "game-provisional",
      "text": "Game (provisional)",
      "level": 2
+    },
+    {
+     "id": "homes",
+     "text": "Homes",
+     "level": 3
     },
     {
      "id": "suggest",

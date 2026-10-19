@@ -166,14 +166,19 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 
 ## Win
 
+> X-28: the whole world for domination; each score is the average of the last average\_years Januaries, judged as growth against the realm's own start (floored at the start\_floor\_quantile of all realms' starts); a chapter closes every chapter\_years.
+
 | Key | Value |
 |---|---|
-| `domination_share` | 0.5 |
+| `domination_share` | 1 |
 | `subject_province_weight` | 0.5 |
 | `checked_month` | 1 |
 | `warship_men` (provisional) | 100 |
-| `commander_men` (provisional) | 1000 |
 | `army_power_per_men` (provisional) | 1000 |
+| `bank_cap_years_income` (provisional) | 1 |
+| `average_years` | 25 |
+| `start_floor_quantile` (provisional) | 0.5 |
+| `chapter_years` | 100 |
 
 ### Army weights (provisional)
 
