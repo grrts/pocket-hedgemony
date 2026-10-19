@@ -871,28 +871,37 @@ export function recount(world: World): void {
   recomputeCap(world);
   const now = world.nationLevies;
   const max = world.nationMaxLevies;
-  const lords = world.nationLordsMen;
   now.fill(0);
   max.fill(0);
-  lords.fill(0);
-  const known = new Map<number, ReadonlySet<string>>();
   for (let p = 0; p < world.provinceCount; p++) {
     const owner = world.provinceOwner[p]!;
-    if (owner < 0) continue;
-    // A lord's men answer his call, not the crown's levy (D-RECR-23, WAR-252): what he would bring by his
-    // loyalty, each province's recruits held to its share of his cap, counts toward how strong the realm looks.
-    const k = world.provinceLord[p]!;
-    if (k >= 0) {
-      const loyalty = world.lords[k]!.loyalty;
-      const share = loyalty === "Loyal" ? 1 : loyalty === "Wavering" ? wf.W.lords.wavering_share : 0;
-      if (!share || world.provinceOccupier[p]! >= 0) continue;
-      if (!known.has(owner)) known.set(owner, knownSet(world, owner));
-      const cap = world.provincePopulation[p]! * 1000 * wf.capShare({ official: world.provinceOfficial[p]! >= 0 }, known.get(owner));
-      lords[owner] = lords[owner]! + Math.min(world.provinceRecruits[p]!, cap) * share;
-      continue;
-    }
+    if (owner < 0 || world.provinceLord[p]! >= 0) continue;
     max[owner] = max[owner]! + world.provinceRecruitCeiling[p]!;
     if (world.provinceOccupier[p]! < 0) now[owner] = now[owner]! + world.provinceRecruits[p]!;
+  }
+  recountLordsMen(world);
+}
+
+/**
+ * The men each realm's lords would bring by their loyalty, each province's
+ * recruits held to its share of its lord's cap: they count toward how strong the
+ * realm looks (D-RECR-23, WAR-252).
+ */
+export function recountLordsMen(world: World): void {
+  const lords = world.nationLordsMen;
+  lords.fill(0);
+  if (!world.lords.length) return;
+  const loyalty = world.lords.map((l) => (l.loyalty === "Loyal" ? 1 : l.loyalty === "Wavering" ? wf.W.lords.wavering_share : 0));
+  // One share per realm, with and without an official (capShare's rule), worked out once.
+  const share = new Float64Array(world.nationCount * 2).fill(-1);
+  for (let p = 0; p < world.provinceCount; p++) {
+    const k = world.provinceLord[p]!;
+    if (k < 0 || !loyalty[k] || world.provinceOccupier[p]! >= 0) continue;
+    const owner = world.provinceOwner[p]!;
+    if (owner < 0) continue;
+    const at = owner * 2 + (world.provinceOfficial[p]! >= 0 ? 1 : 0);
+    if (share[at]! < 0) share[at] = wf.capShare({ official: at % 2 === 1 }, knownSet(world, owner));
+    lords[owner] = lords[owner]! + Math.min(world.provinceRecruits[p]!, world.provincePopulation[p]! * 1000 * share[at]!) * loyalty[k]!;
   }
 }
 

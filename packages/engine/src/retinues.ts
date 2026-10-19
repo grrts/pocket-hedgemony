@@ -2,7 +2,7 @@ import * as rc from "./domain/recruiting/index.ts";
 import * as wf from "./domain/warfare/index.ts";
 import type { GameWar } from "./peace.ts";
 import { lordWant } from "./peace.ts";
-import { addCommander, armyOf, KIND, recount } from "./recruit.ts";
+import { addCommander, armyOf, KIND, recountLordsMen } from "./recruit.ts";
 import { inAnyWar, lordLands, lordOfCommander, lordSendHome, loyaltyStep } from "./lords.ts";
 import { knownSet } from "./research.ts";
 import { halt } from "./turn.ts";
@@ -144,14 +144,12 @@ function lordCommander(world: World, lord: number): number {
 
 /** Each week: called retinues gather; when their days are up they take the field at the lord's seat under him (WAR-254). */
 export function weeklyRetinues(world: World, news: News[], days = 7): void {
-  let changed = false;
   world.lords.forEach((l, k) => {
     const call = l.call;
     if (!call) return;
     call.daysLeft -= days;
     if (call.daysLeft > 0) return;
     delete l.call;
-    changed = true;
     const seat = lordSeat(world, k);
     // Peace came, or the enemy took his land while they gathered: the men go back home.
     if (seat < 0 || !inAnyWar(world, l.nation) || l.loyalty === "Disloyal" || l.loyalty === "In revolt") {
@@ -162,7 +160,7 @@ export function weeklyRetinues(world: World, news: News[], days = 7): void {
     spawnArmy(world, l.nation, seat, call.men, lordCommander(world, k), horse, { kind: KIND.retinue, home: seat, drill: rc.drillAndBreak("trained").drill, horseArm: L.retinue_horse_arm });
     if (l.nation === world.player) news.push({ kind: "raised", text: `${l.name} takes the field at ${provinceName(world, seat)} with ${fmt(call.men)} men.`, nations: [l.nation], province: seat });
   });
-  if (changed) recount(world);
+  // The week's recount, which follows, counts the men sent home.
 }
 
 /**
@@ -203,7 +201,8 @@ export function monthlyRetinues(world: World, news: News[]): void {
     if (!atWar.has(n)) atWar.set(n, inAnyWar(world, n));
     if (atWar.get(n) && !callRefusal(world, n, k) && !callLord(world, n, k, news)) changed = true;
   });
-  if (changed) recount(world);
+  // A retinue counts toward no cap or levy: only the lords' men at home changed.
+  if (changed) recountLordsMen(world);
 }
 
 /** A lord whose retinue fought on the winning side gains a step of loyalty (REALM-088, WAR-257). */

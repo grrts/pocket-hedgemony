@@ -140,11 +140,17 @@ export function lordSendHome(world: World, lord: number, men: number): void {
   for (const p of lands) world.provinceRecruits[p] = world.provinceRecruits[p]! + Math.max(0, world.provinceRecruitCeiling[p]! - world.provinceRecruits[p]!) * share;
 }
 
-/** Moves a lord one step by a realm-context cause (REALM-088, REALM-089, great lords REALM-162). */
-export function loyaltyStep(world: World, lord: number, cause: string, news: News[] = []): void {
+/**
+ * Moves a lord one step by a realm-context cause (REALM-088, REALM-089, great
+ * lords REALM-162). A caller stepping many lords passes each one's number of
+ * provinces, counted in one pass, instead of a search of the map per lord.
+ */
+export function loyaltyStep(world: World, lord: number, cause: string, news: News[] = [], lands?: number): void {
   const l = world.lords[lord]!;
   const before = l.loyalty;
-  const view: Lord = { name: l.name, house: l.house, provinces: lordLands(world, lord).map(String), retinue: 0, wealth: 0, traits: [], loyalty: l.loyalty, upCredit: l.upCredit, sons: [] };
+  // A great lord is known by how many provinces he holds (greatLordReasons).
+  const provinces = lands === undefined ? lordLands(world, lord).map(String) : Array.from({ length: lands }, (_, i) => String(i));
+  const view: Lord = { name: l.name, house: l.house, provinces, retinue: 0, wealth: 0, traits: [], loyalty: l.loyalty, upCredit: l.upCredit, sons: [] };
   l.loyalty = loyaltyCause(view, cause);
   l.upCredit = view.upCredit ?? 0;
   if (l.nation === world.player && l.loyalty !== before && LOYALTY.indexOf(l.loyalty) > LOYALTY.indexOf(before)) {
@@ -211,7 +217,11 @@ export function monthlyLords(world: World, atPeace: (n: number) => boolean, news
     const l = world.provinceLord[p]!;
     if (l >= 0 && world.lords[l]!.nation !== world.provinceOwner[p]) world.provinceLord[p] = -1;
   }
-  if (world.date.month === 1) world.lords.forEach((l, k) => l.loyalty !== "Loyal" && atPeace(l.nation) && loyaltyStep(world, k, "long_secure_reign", news));
+  if (world.date.month === 1) {
+    const lands = new Int32Array(world.lords.length);
+    for (let p = 0; p < world.provinceCount; p++) if (world.provinceLord[p]! >= 0) lands[world.provinceLord[p]!]! += 1;
+    world.lords.forEach((l, k) => l.loyalty !== "Loyal" && atPeace(l.nation) && loyaltyStep(world, k, "long_secure_reign", news, lands[k]!));
+  }
   world.lords.forEach((l, k) => {
     if (l.nation === world.player || (l.loyalty !== "Disloyal" && l.loyalty !== "Wavering")) return;
     // REALM-171 gives when it has 20 domain gold; here, when the treasury holds two gifts.
