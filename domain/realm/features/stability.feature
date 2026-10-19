@@ -6,7 +6,7 @@ Feature: Stability, read from lords, subjects, officials and provinces
   @REALM-199
   Scenario: The realm stands at its weakest pillar
     Given the game starts with the country "France"
-    Then the stability of "France" reads the pillars lords, subjects, officials and provinces
+    Then the stability of "France" reads the pillars lords, subjects, officials, provinces and treasury
     And the stability of "France" is the step of its weakest pillar
 
   @REALM-200
@@ -52,7 +52,7 @@ Feature: Stability, read from lords, subjects, officials and provinces
     Given the player rules "France"
     When the player opens the General tab of the country card
     Then it shows the stability step, what it means and one row for each pillar with its counts and step
-    And tapping a pillar opens the Lords, Diplomacy, Officials or Provinces tab
+    And tapping a pillar opens the Lords, Diplomacy, Officials, Provinces or Treasury tab
 
   @REALM-205
   Scenario: A tidy top bar

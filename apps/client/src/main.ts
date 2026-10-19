@@ -6036,7 +6036,7 @@ function taxCuts(p: number): string {
   const s = snapshot!;
   const cuts: string[] = [];
   const days = s.provinceDaysToCapital[p]!;
-  if (s.provinceLord[p]! < 0 && days > THRONE.days) cuts.push(`${cutPct(1 - shareAtDays(days))} lost on the road: ${days >= THRONE.farCap ? `${THRONE.farCap}+` : days} days from the capital`);
+  if (s.provinceLord[p]! < 0 && days > THRONE.days) cuts.push(`${cutPct(1 - shareAtDays(days))}: far from the throne`);
   const st = s.stability ? STABILITY_EFFECTS[s.stability.step]! : null;
   if (st && st.tax < 1) cuts.push(`${cutPct(1 - st.tax)}: the realm is ${STABILITY[s.stability!.step]!.toLowerCase()} (General tab)`);
   return cuts.length ? `<br><small>${cuts.join("<br>")}</small>` : "";

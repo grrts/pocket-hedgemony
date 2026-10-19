@@ -123,8 +123,8 @@ Then("it shows the stability step, what it means and one row for each pillar wit
   expect(row.line).toMatch(new RegExp(`^All ${provinces} calm$|grumbling|rioting|plotting`));
 });
 
-Then("tapping a pillar opens the Lords, Diplomacy, Officials or Provinces tab", (s) => {
-  expect(Object.fromEntries(s.section.pillars.map((p: any) => [p.label, p.opens]))).toEqual({ Lords: "lords", Subjects: "diplomacy", Officials: "officials", Provinces: "provinces" });
+Then("tapping a pillar opens the Lords, Diplomacy, Officials, Provinces or Treasury tab", (s) => {
+  expect(Object.fromEntries(s.section.pillars.map((p: any) => [p.label, p.opens]))).toEqual({ Lords: "lords", Subjects: "diplomacy", Officials: "officials", Provinces: "provinces", Treasury: "treasury" });
 });
 
 // ------------------------------------------------------------ a province's Tax line (REALM-183)

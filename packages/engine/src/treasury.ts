@@ -366,9 +366,15 @@ export function defaultOn(world: World, n: number, news: News[]): void {
   world.nationTreasury[n] = 0;
   world.nationBrokeMonths[n] = 0;
   world.nationDefaultYear[n] = world.date.year;
+  // Each lord's provinces, counted once for all his steps (a great lord is known by them).
+  const lands = new Map<number, number>();
+  for (let p = 0; p < world.provinceCount; p++) {
+    const l = world.provinceLord[p]!;
+    if (l >= 0 && world.lords[l]!.nation === n) lands.set(l, (lands.get(l) ?? 0) + 1);
+  }
   world.lords.forEach((l, k) => {
     if (l.nation !== n || l.gone) return;
-    for (let i = 0; i < DEFAULT.lord_steps; i++) loyaltyStep(world, k, "crown_defaulted", news);
+    for (let i = 0; i < DEFAULT.lord_steps; i++) loyaltyStep(world, k, "crown_defaulted", news, lands.get(k) ?? 0);
   });
   sumLedger(world, n);
   const name = world.rules.nations[n]!.name;
