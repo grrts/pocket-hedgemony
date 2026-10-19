@@ -1,7 +1,7 @@
 // Art test page: every visual building block of the game on one page, for review.
 import { loadDefaultRuleset } from "@ph/rules";
 import { DEPTH_COLORS, PALETTE, TERRAIN_CATEGORIES, TERRAIN_COLORS, TERRAINS } from "./art/palette.ts";
-import { sprite, SPRITES, type SpriteName } from "./art/sprites.ts";
+import { FIGURES, figureSprite, sprite, SPRITES, type FigureName, type SpriteName } from "./art/sprites.ts";
 import { BIG_ROWS, SEA_ROW, SHALLOW_ROW, tileCanvas, VARIANTS } from "./art/tiles.ts";
 import { apparentAge, commanderSprite } from "./art/commanders.ts";
 import { portrait, setPortraitYear, type Look } from "./art/portraits.ts";
@@ -12,6 +12,8 @@ const rules = loadDefaultRuleset();
 const root = document.querySelector<HTMLElement>("#sheet")!;
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
 const nation = (id: string) => rules.nations.find((n) => n.id === id)!;
+/** The realms on the map in 1444: sleeping realms are never shown (SETUP-082). */
+const awake = rules.nations.filter((n) => !n.asleep);
 const pennant = (nation: FlagOf, scale = 2) => `<img class="px-icon flag" src="${flagUrl(nation, scale)}" alt="">`;
 
 const figure = (el: HTMLElement | string, caption: string) => {
@@ -134,6 +136,23 @@ section(
   }
 }
 
+// The living map's detailed figures (feedback 126)
+{
+  const body = section("Close-in figures", "The living map's soldiers, riders, guns, wagons, banner-bearers, tents, ships and traders, at twice the art density of the ground, so each ground pixel holds two by two of theirs. Further out the sprites above stand in for them.");
+  const colors = ["france", "england", "ottomans", "ming"].map(nation);
+  for (const name of Object.keys(FIGURES) as FigureName[]) {
+    const row = document.createElement("div");
+    row.className = "row";
+    for (const u of [2, 3, 4]) {
+      const art = figureSprite(name, colors[0]!.color, u, 1);
+      art.img.style.width = `${art.w}px`;
+      row.append(figure(art.img, `${name} u ${u}`));
+    }
+    for (const n of colors.slice(1)) row.append(figure(figureSprite(name, n.color, 4, 1).img, n.name));
+    body.append(row);
+  }
+}
+
 // Portraits
 {
   const body = section(
@@ -184,9 +203,17 @@ section(
 
 // Flags
 {
-  const body = section("Flags", `Every realm's own flag (src/art/nationFlags.ts), without a pole: ${rules.nations.length} realms.`);
+  const body = section("Flags", `Every realm's own flag (src/art/nationFlags.ts), without a pole: ${awake.length} realms.`);
   body.className = "grid";
-  for (const n of rules.nations) body.insertAdjacentHTML("beforeend", `<div class="chip">${pennant(n, 3)}<br>${esc(n.name)}</div>`);
+  for (const n of awake) body.insertAdjacentHTML("beforeend", `<div class="chip">${pennant(n, 3)}<br>${esc(n.name)}</div>`);
+}
+
+// The sleeping realms' flags, for review only: in the game none is seen until its realm wakes (SETUP-082). A spare flies the colour it wakes with.
+{
+  const listed = rules.nations.filter((n) => n.asleep && !n.spare);
+  const body = section("Flags of sleeping realms", `Flown once a realm wakes: ${listed.length} listed sleepers, and a spare in a colour it might wake with.`);
+  body.className = "grid";
+  for (const n of [...listed, { id: "spare_1", color: "#4f8f8a", name: "A spare, woken" }]) body.insertAdjacentHTML("beforeend", `<div class="chip">${pennant(n, 3)}<br>${esc(n.name)}</div>`);
 }
 
 // Palette
@@ -204,10 +231,10 @@ section(
 
 // Nations
 {
-  const body = section("Realm colours", `${rules.nations.length} realms in 1444. Neighbours never share a colour.`);
+  const body = section("Realm colours", `${awake.length} realms in 1444. Neighbours never share a colour.`);
   body.className = "grid";
   const size = new Map<string, number>();
   for (const p of rules.provinces) if (p.owner) size.set(p.owner, (size.get(p.owner) ?? 0) + 1);
-  const top = [...rules.nations].sort((a, b) => (size.get(b.id) ?? 0) - (size.get(a.id) ?? 0)).slice(0, 24);
+  const top = [...awake].sort((a, b) => (size.get(b.id) ?? 0) - (size.get(a.id) ?? 0)).slice(0, 24);
   for (const n of top) body.insertAdjacentHTML("beforeend", `<div class="chip">${pennant(n, 3)} ${esc(n.name)}<br>${size.get(n.id)} provinces</div>`);
 }

@@ -773,7 +773,8 @@ Then("it is the record {string}", (s, record: string) => {
 });
 
 Given("the map's {int} nations", (s, n: number) => {
-  s.nations = loadDefaultRuleset().nations;
+  // The sleeping realms come after the map's nations and are not on the 1444 map (SETUP-080).
+  s.nations = loadDefaultRuleset().nations.filter((x) => !x.asleep);
   expect(s.nations).toHaveLength(n);
 });
 
@@ -857,7 +858,7 @@ When("a new campaign starts", (s) => {
 
 Then("every nation with no catalogue assessment has {int} gold", (s, gold: number) => {
   const w = s.world;
-  for (const n of loadDefaultRuleset().nations) if (S.catalogueIdOf(n.id) === null) expect(w.nationTreasury[w.nationIndex.get(n.id)]).toBe(gold);
+  for (const n of loadDefaultRuleset().nations) if (!n.asleep && S.catalogueIdOf(n.id) === null) expect(w.nationTreasury[w.nationIndex.get(n.id)]).toBe(gold);
 });
 
 Then("its levies are {int} men per thousand people", (s, per: number) => {

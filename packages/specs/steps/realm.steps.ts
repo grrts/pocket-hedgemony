@@ -2480,7 +2480,7 @@ Then("the empty posts of {string} are its royal provinces farthest from its capi
 });
 Then("a realm with no catalogue assessment starts with {int} gold", (s, gold: number) => {
   const w = s.game as GW;
-  const bare = w.nationIds.filter((id) => !G.realmStrengths(id).assessments.length);
+  const bare = w.nationIds.filter((id, n) => !w.nationAsleep[n] && !G.realmStrengths(id).assessments.length);
   expect(bare.length).toBeGreaterThan(0);
   for (const id of bare) expect(w.nationTreasury[w.nationIndex.get(id)!]).toBe(gold);
 });

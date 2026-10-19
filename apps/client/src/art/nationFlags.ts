@@ -143,4 +143,14 @@ export const NATION_FLAGS: Record<string, Layer[]> = {
   cherokee: [["h", "O"], ["emblem", "star", "K"]],
   creek: [["h", "N"], ["emblem", "feather", "W"]],
   pueblo: [["h", "Y"], ["emblem", "sun", "R"]],
+  // Sleeping realms (SETUP-080): flown from the day they wake. A spare has none of its own and flies a cloth in the colour it woke with.
+  spain: [["h", "R", "Y", "Y", "R"], ["emblem", "crown", "R", "hoist", "Y"]],
+  dutch_republic: [["h", "O", "W", "B"]],
+  babur_kabul: [["h", "K"], ["border", "G"], ["emblem", "sun", "Y"]],
+  mughals: [["h", "G"], ["emblem", "sun", "Y"]],
+  sikh_empire: [["h", "O"], ["emblem", "sword", "b"]],
+  transylvania: [["h", "B", "R", "Y"]],
+  czechoslovakia: [["h", "W", "R"], ["hoist", "B"]],
+  poland_lithuania: [["h", "R"], ["border", "W"], ["emblem", "eagle", "W"]],
+  russia: [["h", "W", "B", "R"], ["emblem", "doubleEagle", "Y", "middle", "K"]],
 };

@@ -37,7 +37,7 @@ const rel = dip.relations;
 
 /** Something that happened this turn that a player may want to read. */
 export interface News {
-  kind: "war" | "joined" | "call" | "peace" | "battle" | "siege" | "occupied" | "freed" | "raised" | "refused" | "destroyed" | "famine" | "unrest" | "invention" | "built" | "envoy" | "reform" | "rebels" | "event" | "heritage" | "voyage" | "colony" | "crown" | "revolution" | "trade" | "ruler" | "campaign";
+  kind: "war" | "joined" | "call" | "peace" | "battle" | "siege" | "occupied" | "freed" | "raised" | "refused" | "destroyed" | "famine" | "unrest" | "invention" | "built" | "envoy" | "reform" | "rebels" | "event" | "heritage" | "voyage" | "colony" | "crown" | "revolution" | "trade" | "ruler" | "campaign" | "founded";
   text: string;
   /** Nations it is about, by index. */
   nations: number[];
@@ -81,7 +81,8 @@ export function maxGarrison(world: World, p: number): number {
 /** The 1444 relations between the map's realms (the dataset also lists realms the map folds into others). */
 export function createWarState(world: World): dip.Diplomacy {
   const d = dip.createFromDataset(isoDate(world));
-  const onMap = (id: string) => world.nationIndex.has(id);
+  // A sleeping realm has no ties in 1444 (SETUP-082).
+  const onMap = (id: string) => world.nationIndex.has(id) && !world.nationAsleep[world.nationIndex.get(id)!];
   d.graph.relations = d.graph.relations.filter((r) => onMap(r.source) && onMap(r.target));
   d.graph.facts = d.graph.facts.filter((f) => onMap(f.source) && onMap(f.target));
   // Wars already under way in November 1444 become wars the game can end.
