@@ -1247,6 +1247,9 @@ export function aiMarches(world: World): void {
       halt(world, i);
       continue;
     }
+    // Already on its way there: the route it walks stands (planning one is most of this step's cost).
+    const walking = a.route[i]!;
+    if (walking.length && walking[walking.length - 1] === target) continue;
     const route = planRoute(world.rules.defines.march, marchMap(world), here, target, { men, horse: a.horse[i]!, logistics: 0 }, routeBars(world, i));
     if (route) {
       // Walked a province at a time: each stretch is planned over the tiles as the army gets there.
