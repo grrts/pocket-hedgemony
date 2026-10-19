@@ -4,7 +4,7 @@ The peoples of North America cannot colonise, so a tribe starts with two or thre
 
 ## Which realms are tribes
 
-A realm is a **tribal realm** while its form is a clan council, a chiefdom or a confederation and its capital lies in North America. In 1444 that is the Iroquois, the Huron, the Cherokee and the Creek. The Pueblo are a city commune: their towns grew by farming, so they walk no grounds unless a reform makes them a tribal form. A realm that reforms out of a tribal form loses its grounds at once.
+A realm is a **tribal realm** while its form is a clan council, a chiefdom or a confederation and its capital lies in North America. At the 1378 start that includes the Iroquois and the Huron; the Cherokee and the Creek are not born yet and form later (see [The 1378 start](The-1378-Start)). The Pueblo are a city commune: their towns grew by farming, so they walk no grounds unless a reform makes them a tribal form. A realm that reforms out of a tribal form loses its grounds at once.
 
 ## The range
 

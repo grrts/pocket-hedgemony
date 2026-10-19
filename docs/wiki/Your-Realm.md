@@ -6,10 +6,10 @@ Your realm is your country as a whole: the treasury, the food network that runs 
 
 ### The country card
 
-The country card has four tabs: **General** first, then **Diplomacy**, **Trade** and **Army**. Your own realm's card is the Realm book, in six sections that open on the Overview (see [Screens and Navigation](Screens-and-Navigation)); another realm's card keeps these tabs. General is the one-screen summary of your country; Allies, Enemies and Oaths broken sit on the Diplomacy tab, where war and peace are declared, trade lines on Trade, and soldiers, commanders and ships on Army. France's General tab in 1444 might look like this:
+The country card has four tabs: **General** first, then **Diplomacy**, **Trade** and **Army**. Your own realm's card is the Realm book, in six sections that open on the Overview (see [Screens and Navigation](Screens-and-Navigation)); another realm's card keeps these tabs. General is the one-screen summary of your country; Allies, Enemies and Oaths broken sit on the Diplomacy tab, where war and peace are declared, trade lines on Trade, and soldiers, commanders and ships on Army. France's General tab at the start might look like this:
 
 ```
- FRANCE                     King Charles VII, 41 · 23 years on throne · 2 heirs
+ FRANCE                     King Charles V, 40 · 14 years on throne · 1 heir
  Gold      310          Food      9 castles feeding 41 of 52 provinces · 3 hungry
  People    9.5 m        Soldiers  22,000      (+48,000 recruits)
  Horses    6,000        Ships     12 war / 60 trade
@@ -210,7 +210,7 @@ Stability tells you at a glance how well your realm holds together. It is not a 
 | Pillar | What it reads | Steady | Uneasy | Troubled | Crumbling |
 |---|---|---|---|---|---|
 | Lords | Your landed lords by loyalty | Half or more Loyal, none Disloyal | Fewer than half Loyal | Any Disloyal | Any In revolt |
-| Subjects | Your subjects by loyalty (their 1444 standing for now) | Half or more Loyal, none Disloyal | Fewer than half Loyal | Any Disloyal | Any In revolt |
+| Subjects | Your subjects by loyalty (their standing at the start for now) | Half or more Loyal, none Disloyal | Fewer than half Loyal | Any Disloyal | Any In revolt |
 | Officials | Royal provinces whose official's post stands empty | None | Up to a quarter | Up to a half | More |
 | Provinces | Provinces rioting or plotting | None | Any rioting | Any plotting, or a tenth | A quarter |
 
@@ -242,10 +242,10 @@ The details live in [Recruiting](Recruiting), [Warfare](Warfare) and [Naval](Nav
 - **Traits**: two (for example Pious, Warlike, Builder, Greedy), given at birth and sometimes gained or rarely changed by events. They give small bonuses and lean event options.
 - **Marriages** are living ties to other ruling houses and your own lords, arranged with an heir or a princess, ended by death, divorce events and war between the houses. They give goodwill, loyalty and a path to inheriting another realm.
 
-**In the game now.** Your ruler is on the Overview of your Realm book, under the section tiles: name, age, years on the throne, the regent while a child rules, the two traits with what each does, and the heir (or who would follow under your law). Most realms start with their real ruler of 1444. Each January rulers grow a year older and an old one may die: about 1 in 100 a year under 40, 2 in their forties, 4 in their fifties, 8 in their sixties and 16 older. The heir takes the throne and every lord wavers a little; with no heir a kinsman takes it and the lords dispute it. An heirless ruler of 18 to 50 may have a child. A dispatch with the crown tells you of a death, a birth or a child coming of age, in your realm and on your borders. Traits: **Pious** makes faith risings a quarter rarer, **Warlike** refills recruits 10 % faster, **Builder** makes works 10 % cheaper and **Greedy** brings 5 % more tax to you; each also leans the choices an AI ruler makes in events.
+**In the game now.** Your ruler is on the Overview of your Realm book, under the section tiles: name, age, years on the throne, the regent while a child rules, the two traits with what each does, and the heir (or who would follow under your law). Most realms start with their real ruler of 20 September 1378. Each January rulers grow a year older and an old one may die: about 1 in 100 a year under 40, 2 in their forties, 4 in their fifties, 8 in their sixties and 16 older. The heir takes the throne and every lord wavers a little; with no heir a kinsman takes it and the lords dispute it. An heirless ruler of 18 to 50 may have a child. A dispatch with the crown tells you of a death, a birth or a child coming of age, in your realm and on your borders. Traits: **Pious** makes faith risings a quarter rarer, **Warlike** refills recruits 10 % faster, **Builder** makes works 10 % cheaper and **Greedy** brings 5 % more tax to you; each also leans the choices an AI ruler makes in events.
 
 
-**Women in roles.** Women can hold every role: ruler, lord, commander, official, scholar. The chance is set per country (or culture) per role from the catalogue's history and succession customs. Where the crown passes only through men (France), no woman inherits the throne, though a duke's daughter can inherit his duchy; where a daughter could inherit (Castile, Navarre), a queen regnant is possible. Wherever a ruler is a child, a queen mother can be regent. The chance rises as history's ages arrive: a little in the Age of Revolutions, more in the Age of Industrialization, more again in the Age of World Wars, and events and reforms can raise one country's chance earlier. Women who held roles in 1444 or appear in events are placed as they were; the chances apply only to characters the game generates.
+**Women in roles.** Women can hold every role: ruler, lord, commander, official, scholar. The chance is set per country (or culture) per role from the catalogue's history and succession customs. Where the crown passes only through men (France), no woman inherits the throne, though a duke's daughter can inherit his duchy; where a daughter could inherit (Castile, Navarre), a queen regnant is possible. Wherever a ruler is a child, a queen mother can be regent. The chance rises as history's ages arrive: a little in the Age of Revolutions, more in the Age of Industrialization, more again in the Age of World Wars, and events and reforms can raise one country's chance earlier. Women who held roles at the start (Joanna I of Naples, say) or appear in events are placed as they were; the chances apply only to characters the game generates.
 
 **Inheritance law** is fixed by each country's culture and history from the catalogue. You can't choose it, though events and reforms can change it. It decides who takes the throne (eldest son, eldest child, a brother or the eldest of the house, the strongest claimant among the lords, or an election by lords or a council) and whether a lord's land passes to one heir or is split among his sons.
 
@@ -265,7 +265,7 @@ While an envoy is abroad he runs no province, so his province pays half until he
 
 ### Starting values
 
-At the start, the catalogue's assessments set your counts: economic strength and fiscal resilience give gold and debt; manpower potential recruits; military capability soldiers, commanders and horses; naval capability ships; administrative capacity officials and royal provinces; political stability and unrest risk lords' loyalty and provinces in revolt; territorial cohesion the number of lords, their land and language; institutional development schools, scholars and inventions; trade access starting trade; diplomatic influence extra officials ready as envoys. A low-confidence record starts with a wider random range. Allies, rivals, subjects and enemies come from the 1444 relations file. See [The 1444 Start](The-1444-Start).
+At the start, the catalogue's assessments set your counts: economic strength and fiscal resilience give gold and debt; manpower potential recruits; military capability soldiers, commanders and horses; naval capability ships; administrative capacity officials and royal provinces; political stability and unrest risk lords' loyalty and provinces in revolt; territorial cohesion the number of lords, their land and language; institutional development schools, scholars and inventions; trade access starting trade; diplomatic influence extra officials ready as envoys. A low-confidence record starts with a wider random range. Allies, rivals, subjects and enemies come from the 1378 relations file. See [The 1378 Start](The-1378-Start).
 
 ### Events and the AI
 
@@ -327,7 +327,7 @@ Things you can do: set food policy, override a castle, apply a food preset; take
 - [Rebellions](Rebellions): disloyal lords, retinues and wealth for risings, in revolt counts.
 - [Revolutions](Revolutions): regimes set forms; émigré pretenders.
 - [Historical Events](Historical-Events): event country stats mapped as above; ages raise women-in-roles chances.
-- [The 1444 Start](The-1444-Start): starting counts from assessments and relations.
+- [The 1378 Start](The-1378-Start): starting counts from assessments and relations.
 - [National Strengths](National-Strengths): levers such as a lord loyalty shield.
 - [Naval](Naval): ship counts.
 - [Time and Turns](Time-and-Turns): weekly turns with monthly steps, seasons, the end date for judging scores.

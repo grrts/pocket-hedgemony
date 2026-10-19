@@ -78,7 +78,7 @@ Feature: Calendar and campaign span
     Examples:
       | what                                |
       | a new campaign                      |
-      | the tutorial "The Year of Varna"    |
+      | the tutorial "Murad's Frontier"     |
 
   @TIME-006
   Scenario Outline: The end date is chosen when the campaign starts and kept with it

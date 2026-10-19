@@ -162,7 +162,7 @@ Feature: Unlock the catalogue
       | independence_won | Our Own Banner | relation_changed | {started_as_subject: true, subject_of_anyone: false} | silver | 10 | campaign |
       | tribute_5 | Tribute Roads | turn_end | {tributaries_min: 5} | silver | 10 | campaign |
 
-  @ACH-015 @ACH-024 @placeholder
+  @ACH-015 @ACH-024 @ACH-089 @placeholder
   Scenario Outline: History achievement "<name>" unlocks on its moment
     Given the achievement "<id>" is locked
     And its test <test> holds
@@ -176,7 +176,11 @@ Feature: Unlock the catalogue
       | history_kept | As It Was Written | event_choice | {historical_choices_min: 25} | copper | 5 | campaign |
       | history_rewritten | Another Ending | event_choice | {nonhistorical_choices_in_major_events_min: 10} | silver | 10 | campaign |
       | paths_not_taken | Paths Not Taken | event_choice | {distinct_nonhistorical_options_min: 50} | gold | 20 | lifetime |
+      | kulikovo_free | Free of the Khan | date | {date: 1400-01-01, event_role: {event: battle_of_kulikovo, role: prince}, subject_of_anyone: false} | silver | 10 | campaign |
+      | kosovo_free | Blackbird Field | date | {date: 1400-01-01, event_role: {event: battle_of_kosovo, role: prince}, subject_of_anyone: false} | silver | 10 | campaign |
+      | ankara_weathered | The Storm Passes | date | {date: 1405-12-31, event_role: {event: battle_of_ankara, role: sultan}, subject_of_anyone: false} | silver | 10 | campaign |
       | walls_held_1453 | The Walls Held | date | {date: 1460-12-31, event_role: {event: fall_of_constantinople, role: defender}, owns: city:constantinople} | gold | 20 | campaign |
+      | timurid_heirs | The Conqueror's Heirs | date | {date: 1507-12-31, event_role: {event: death_of_timur, role: empire}, owns: city:samarkand} | gold | 20 | campaign |
       | four_quarters_hold | The Four Quarters Hold | date | {date: 1600-12-31, event_role: {event: inca_expansion, role: any}, owns: city:cusco, subject_of_anyone: false} | gold | 20 | campaign |
       | never_colonised | Unconquered | date | {date: 1914-01-01, start_macro_region_not: europe, capital_never_occupied_by_other_macro_region: true} | gold | 20 | campaign |
       | printing_early | The Presses Roll | invention_done | {invention: printing, before: 1470-01-01} | copper | 5 | campaign |
@@ -186,7 +190,7 @@ Feature: Unlock the catalogue
       | japan_whole_1600 | One Island Realm | province_gained | {owns_all: region:japan, before: 1600-01-01} | gold | 20 | campaign |
       | sahel_whole_1600 | Lord of the River Bend | province_gained | {owns_all: area:niger_bend, before: 1600-01-01} | gold | 20 | campaign |
 
-  @ACH-015 @ACH-025 @placeholder
+  @ACH-015 @ACH-025 @ACH-088 @placeholder
   Scenario Outline: Campaign achievement "<name>" unlocks on its moment
     Given the achievement "<id>" is locked
     And its test <test> holds
@@ -197,8 +201,9 @@ Feature: Unlock the catalogue
 
     Examples:
       | id | name | moment | test | tier | points | scope |
+      | reach_1444 | The Old Start | date | {date: 1444-11-11} | copper | 5 | campaign |
       | reach_1500 | New Century | date | {date: 1500-01-01} | copper | 5 | campaign |
-      | reach_1700 | Halfway Through Time | date | {date: 1700-01-01} | copper | 5 | campaign |
+      | reach_1700 | Three Centuries On | date | {date: 1700-01-01} | copper | 5 | campaign |
       | reach_1900 | The New Machine Age | date | {date: 1900-01-01} | silver | 10 | campaign |
       | campaign_complete | The Long Road | campaign_end | {reached_end_date: true} | crown | 40 | campaign |
       | from_one_hall | From One Hall | province_gained | {start_provinces_max: 1, provinces_min: 50} | gold | 20 | campaign |
@@ -212,6 +217,20 @@ Feature: Unlock the catalogue
     And the country holds 9999 gold in its treasury
     When the moment "turn_end" occurs
     Then the achievement "treasury_10000" stays locked
+
+  @ACH-089 @placeholder
+  Scenario Outline: A bridge event row needs the player's realm in its role
+    Given the achievement "kulikovo_free" is locked
+    And the player's realm <subject>
+    And the player's realm held the role "<role>" in the event "battle_of_kulikovo"
+    When the date 1400-01-01 comes
+    Then the achievement "kulikovo_free" <result>
+
+    Examples:
+      | subject | role | result |
+      | is no one's subject | prince | unlocks |
+      | is no one's subject | khan | stays locked |
+      | is a subject | prince | stays locked |
 
   @ACH-017 @placeholder
   Scenario: Counting House needs the gold at once, at turn end

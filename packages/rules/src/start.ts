@@ -34,20 +34,35 @@ import religion from "../data/domain/religion.json" with { type: "json" };
 import institutions from "../data/domain/institutions.json" with { type: "json" };
 import type { GameDate } from "./types.ts";
 
-/** The bundled start (X-25). New campaigns start here unless a dev switch picks another. */
-export const DEFAULT_START = "1444";
+/** The bundled start (X-25): new campaigns start on 20 September 1378. */
+export const DEFAULT_START = "1378";
+
+/** The main history checkpoint, kept as a playable start for tests and the history check (X-25). */
+export const CHECKPOINT_START = "1444";
 
 /**
- * The start the game runs from. 1444 is the bundled start until the switch-over
- * (milestone 10, step 7); the 1378 scenario can be tried behind a dev switch:
- * `?start=1378` (or `#start=1378`) on the page, which the client hands its
- * engine worker as the worker's name `start=1378`, or `PH_START=1378` in Node.
+ * The start the game runs from. New campaigns start in 1378; the 1444
+ * checkpoint can be opened behind a dev switch: `?start=1444` (or
+ * `#start=1444`) on the page, which the client hands its engine worker as the
+ * worker's name `start=1444`, or `PH_START=1444` in Node. The test configs
+ * pin `PH_START=1444`, so tests written against the 1444 world keep reading it.
  */
 function chosenStart(): string {
-  const g = globalThis as { name?: unknown; location?: { search?: string; hash?: string }; process?: { env?: Record<string, string | undefined> }; WorkerGlobalScope?: unknown };
+  const g = globalThis as { name?: unknown; location?: { search?: string; hash?: string }; sessionStorage?: Storage; process?: { env?: Record<string, string | undefined> }; WorkerGlobalScope?: unknown };
   const pick = (s: unknown) => (typeof s === "string" ? new URLSearchParams(s.replace(/^[?#]/, "")).get("start") : null);
-  const id = (g.WorkerGlobalScope !== undefined ? pick(g.name) : (pick(g.location?.search) ?? pick(g.location?.hash))) ?? g.process?.env?.PH_START ?? DEFAULT_START;
-  return id === "1378" ? "1378" : DEFAULT_START;
+  const id = (g.WorkerGlobalScope !== undefined ? pick(g.name) : (pick(g.location?.search) ?? pick(g.location?.hash) ?? sessionStart(g.sessionStorage))) ?? g.process?.env?.PH_START ?? DEFAULT_START;
+  return id === CHECKPOINT_START ? CHECKPOINT_START : DEFAULT_START;
+}
+
+/** The page's key for a start picked by a save from another start (SAVE-111): the page reopens in it to load that save. */
+export const SESSION_START_KEY = "ph-start";
+
+function sessionStart(store: Storage | undefined): string | null {
+  try {
+    return store?.getItem(SESSION_START_KEY) ?? null;
+  } catch {
+    return null;
+  }
 }
 
 /** The id of the scenario this run starts from: "1444" or "1378". */
@@ -57,8 +72,7 @@ const is1378 = START_ID === "1378";
 /**
  * The start scenario (X-25): the one place that names the folder the game
  * starts from. Everything that describes the world on the start day is read
- * through here, so moving the start (to 1378, milestone 10) changes this
- * file and its folder, not the engine.
+ * through here, so the engine never names a year.
  */
 export const START_SCENARIO = is1378 ? scenario1378 : scenario1444;
 
@@ -88,10 +102,9 @@ export const startWorld = {
 };
 
 // The domain rules were written against the 1444 map: some name 1444 provinces,
-// and the setup data mirrors the 1444 map nations. Another start rewrites those
+// and the setup data mirrors the 1444 map nations. The 1378 start rewrites those
 // tables in place once, here, before any rule reads them, so the engine keeps
-// reading one set of tables whichever start it runs (a dev-switch bridge until
-// the switch-over moves the rules to the start's own data).
+// reading one set of tables whichever start it runs (SETUP-098).
 if (is1378) {
   const ids = from1444.provinces as Record<string, string>;
   const remap = (v: unknown): unknown => {
