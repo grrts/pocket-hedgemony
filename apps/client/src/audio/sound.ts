@@ -3,6 +3,7 @@ import { decide, defaultSettings, evaluateState, layersFor, newDirector, peaceTr
 import { SR } from "./chip.ts";
 import { PALETTE_VOICES, paletteInstruments, renderTrack, TRACKS, writtenTrack, type Rendered } from "./tracks.ts";
 import { InstrumentStore } from "./samples.ts";
+import { renderBed } from "./ambience.ts";
 import { hasSound, renderSound } from "./sfx.ts";
 
 /**
@@ -14,13 +15,13 @@ import { hasSound, renderSound } from "./sfx.ts";
  * hidden (AUD-109).
  */
 
-export type SoundSettings = Pick<AudioSettings, "master" | "music" | "effects" | "musicOn" | "uiSounds">;
+export type SoundSettings = Pick<AudioSettings, "master" | "music" | "effects" | "musicOn" | "uiSounds" | "ambience" | "ambienceOn">;
 
 const STORE = "ph-sound";
 
 function loadSettings(): SoundSettings {
   const d = defaultSettings();
-  const base: SoundSettings = { master: d.master, music: d.music, effects: d.effects, musicOn: d.musicOn, uiSounds: d.uiSounds };
+  const base: SoundSettings = { master: d.master, music: d.music, effects: d.effects, musicOn: d.musicOn, uiSounds: d.uiSounds, ambience: d.ambience, ambienceOn: d.ambienceOn };
   try {
     const saved = JSON.parse(localStorage.getItem(STORE) ?? "null") as Partial<SoundSettings> | null;
     return saved ? { ...base, ...saved } : base;
@@ -38,6 +39,11 @@ interface Playing {
   sources: AudioBufferSourceNode[];
 }
 
+/** The ambience under a playing track, against its level in the silences between tracks (AUD-093, D-AUD-17). */
+const AMBIENCE_UNDER_TRACK = 0.3;
+/** Seconds the ambience takes to dip under a track, come back in a silence, or cross to another bed. */
+const AMBIENCE_FADE = 2;
+
 /** Effects of the interface (tapped panels), silenced by the Interface sounds switch (SET-052). */
 const UI_SOUND = /^ui_/;
 
@@ -48,6 +54,12 @@ export class Sound {
   private musicGain!: GainNode;
   private duck!: GainNode;
   private fxGain!: GainNode;
+  private ambGain!: GainNode;
+  private ambDuck!: GainNode;
+  private bed: { key: string; out: GainNode; src: AudioBufferSourceNode } | null = null;
+  private wantedBed: { bed: string; windier: boolean } | null = null;
+  private beds = new Map<string, Promise<[Float32Array, Float32Array]>>();
+  private bedWorker: Worker | null | undefined;
   private cache = new Map<string, Promise<Rendered>>();
   private instruments = new InstrumentStore();
   private playing: Playing | null = null;
@@ -92,12 +104,16 @@ export class Sound {
     this.musicGain = ctx.createGain();
     this.duck = ctx.createGain();
     this.fxGain = ctx.createGain();
+    this.ambGain = ctx.createGain();
+    this.ambDuck = ctx.createGain();
     this.duck.connect(this.musicGain).connect(this.master);
     this.fxGain.connect(this.master);
+    this.ambDuck.connect(this.ambGain).connect(this.master);
     this.master.connect(ctx.destination);
     this.applyVolumes();
     void ctx.resume();
     if (this.wanted) void this.play(this.wanted, "intro");
+    this.ambience(this.wantedBed);
   }
 
   /** True once the browser lets the game make sound. */
@@ -114,6 +130,7 @@ export class Sound {
       // Private windows may refuse storage; the settings still hold for this visit.
     }
     this.applyVolumes();
+    if (this.settings.ambienceOn && !this.bed) this.ambience(this.wantedBed);
     if (wasOn !== this.settings.musicOn) {
       // Music off stops the music entirely (AUD-114); on again picks up what the director wants.
       if (!this.settings.musicOn) this.stopMusic(0.5);
@@ -129,6 +146,7 @@ export class Sound {
     this.master.gain.setTargetAtTime(s.master, t, 0.05);
     this.musicGain.gain.setTargetAtTime(s.musicOn ? s.music : 0, t, 0.05);
     this.fxGain.gain.setTargetAtTime(s.effects, t, 0.05);
+    this.ambGain.gain.setTargetAtTime(s.ambienceOn ? s.ambience : 0, t, 0.05);
   }
 
   // ---------------------------------------------------------------- music
@@ -247,6 +265,8 @@ export class Sound {
     out.gain.setValueAtTime(0, when);
     out.gain.linearRampToValueAtTime(1, when + fade);
     out.connect(this.duck);
+    // The ambience comes up in the silence before a track and dips under it (AUD-093).
+    this.duckAmbience(old && silence > 0 ? now + 1.5 : null, when);
     const want = this.director && this.facts ? layersFor(this.director.track ?? "", this.facts) : [1];
     const layers: GainNode[] = [];
     const sources: AudioBufferSourceNode[] = [];
@@ -278,6 +298,7 @@ export class Sound {
     p.sources.forEach((s) => s.stop(t + fade + 0.1));
     this.playing = null;
     this.token++;
+    this.duckAmbience(t, null);
   }
 
   private async playStingerTrack(id: string): Promise<void> {
@@ -319,6 +340,82 @@ export class Sound {
     const def = TRACKS[written]!;
     const name = def.mode ? def.name : `${def.name} of ${PALETTE_VOICES[this.palette].name}`;
     return { name, why: this.director ? whyText(this.director.state) : "The title theme" };
+  }
+
+  // ---------------------------------------------------------------- ambience
+
+  /** The bed under the camera (AUD-079), or none; a new bed crosses over the old one. */
+  ambience(want: { bed: string; windier: boolean } | null): void {
+    this.wantedBed = want;
+    const key = want ? `${want.bed}${want.windier ? "+wind" : ""}` : null;
+    if (!this.ctx || this.bed?.key === key) return;
+    const ctx = this.ctx;
+    const old = this.bed;
+    if (old) {
+      const t = ctx.currentTime;
+      old.out.gain.setTargetAtTime(0, t, AMBIENCE_FADE / 3);
+      old.src.stop(t + AMBIENCE_FADE * 2);
+      this.bed = null;
+    }
+    if (!want || !key || !this.settings.ambienceOn) return;
+    void this.bedSamples(key, want.bed, want.windier).then(([L, R]) => {
+      // Another bed may have been asked for while this one was made.
+      if (this.wantedBed !== want || !this.settings.ambienceOn || this.bed) return;
+      const buf = ctx.createBuffer(2, L.length, SR);
+      buf.copyToChannel(L as Float32Array<ArrayBuffer>, 0);
+      buf.copyToChannel(R as Float32Array<ArrayBuffer>, 1);
+      const src = ctx.createBufferSource();
+      src.buffer = buf;
+      src.loop = true;
+      const out = ctx.createGain();
+      const t = ctx.currentTime;
+      out.gain.setValueAtTime(0, t);
+      out.gain.setTargetAtTime(1, t, AMBIENCE_FADE / 3);
+      src.connect(out).connect(this.ambDuck);
+      src.start(t, Math.random() * buf.duration);
+      this.bed = { key, out, src };
+    });
+  }
+
+  /** Brings the ambience up (in a silence) and down (under a track) at the given times. */
+  private duckAmbience(upAt: number | null, downAt: number | null): void {
+    if (!this.ctx) return;
+    const g = this.ambDuck.gain;
+    const t = this.ctx.currentTime;
+    g.cancelScheduledValues(t);
+    g.setValueAtTime(g.value, t);
+    if (upAt !== null) g.setTargetAtTime(1, upAt, AMBIENCE_FADE / 3);
+    if (downAt !== null) g.setTargetAtTime(AMBIENCE_UNDER_TRACK, downAt, AMBIENCE_FADE / 3);
+  }
+
+  /** A bed's samples, made once, in a worker where the browser allows one. */
+  private bedSamples(key: string, bed: string, windier: boolean): Promise<[Float32Array, Float32Array]> {
+    let hit = this.beds.get(key);
+    if (!hit) {
+      if (this.bedWorker === undefined) {
+        try {
+          this.bedWorker = new Worker(new URL("./ambience.worker.ts", import.meta.url), { type: "module" });
+        } catch {
+          this.bedWorker = null;
+        }
+      }
+      const worker = this.bedWorker;
+      hit = worker
+        ? new Promise<[Float32Array, Float32Array]>((resolve) => {
+            const on = (e: MessageEvent<{ key: string; L: Float32Array; R: Float32Array }>) => {
+              if (e.data.key !== key) return;
+              worker.removeEventListener("message", on);
+              resolve([e.data.L, e.data.R]);
+            };
+            worker.addEventListener("message", on);
+            // A worker that fails to load makes the beds here instead.
+            worker.addEventListener("error", () => resolve(renderBed(bed, windier)), { once: true });
+            worker.postMessage({ key, bed, windier });
+          })
+        : Promise.resolve(renderBed(bed, windier));
+      this.beds.set(key, hit);
+    }
+    return hit;
   }
 
   // ---------------------------------------------------------------- effects

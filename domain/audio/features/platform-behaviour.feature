@@ -99,7 +99,7 @@ Feature: Audio on each platform
     Then master volume is 0.8
     And music volume is 0.7, effects volume 0.8 and ambience volume 0.5
     And the variety is "own palette only"
-    And interface sounds are on, haptics are on, ambience is off
+    And interface sounds are on, haptics are on, ambience is on
     And mono, sound captions and reduced intensity are off
     When the player turns music off
     Then the synth's music is fully suspended
