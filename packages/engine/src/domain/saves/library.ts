@@ -1,4 +1,4 @@
-import type { Ruleset } from "@ph/rules";
+import { CHECKPOINT_START, START_ID, type Ruleset } from "@ph/rules";
 import { hashWorld } from "../../hash.ts";
 import type { Rng } from "../../rng.ts";
 import type { Order } from "../../turn.ts";
@@ -359,6 +359,7 @@ export function buildSave(ctx: SaveContext, campaign: Campaign, world: World, ki
     worldHash: hashWorld(restoreWorld(new Map(chunks.map((c) => [c.id, c])), world.rules, {}, world.tiles).world),
     thumbnail: thumbnail(world, campaign.playerNation),
     modified: campaign.modified,
+    start: START_ID,
   };
   if (kind === "ironman" && campaign.ironmanHead) header.parent = campaign.ironmanHead;
   return { header, bytes: encodeSave(header, chunks) };
@@ -631,10 +632,13 @@ export type Opened = {
 
 export type OpenResult =
   | Opened
-  | { kind: "rejected"; problem: "damaged" | "wrong-magic" | "newer-version"; message: string }
+  | { kind: "rejected"; problem: "damaged" | "wrong-magic" | "newer-version" | "other-start"; message: string }
   | { kind: "locked"; nation: string; message: string }
   | { kind: "hash warning"; message: string }
   | { kind: "refused"; reason: "ironman save failed the hash check" };
+
+/** The start a save's campaign began from (SAVE-111): saves from before the 1378 switch began in 1444. */
+export const saveStart = (header: Pick<SaveHeader, "start">): string => header.start ?? CHECKPOINT_START;
 
 /**
  * Opens a save (SaveLoader): CRCs, format version, the nation lock, format
@@ -652,6 +656,8 @@ export function openSave(bytes: Uint8Array, opts: OpenOptions, nationName: (id: 
   const header = { ...decoded.header };
   const buildVersion = opts.buildFormatVersion ?? FORMAT_VERSION;
   if (header.formatVersion > buildVersion) return { kind: "rejected", problem: "newer-version", message: M.newer_version };
+  // A campaign plays on in the world it began in (SAVE-111): the client reopens in that start first.
+  if (saveStart(header) !== START_ID) return { kind: "rejected", problem: "other-start", message: `This campaign began in ${saveStart(header)}.` };
   if (header.tier.needsFullGame && !opts.fullGame) {
     return { kind: "locked", nation: header.tier.nation, message: fill(M.locked_nation, { nation: nationName(header.tier.nation) }) };
   }

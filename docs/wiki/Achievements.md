@@ -1,6 +1,6 @@
 # Achievements
 
-Achievements are goals you can earn across your campaigns: a first harvest, a castle taken by terms, a century without a broken oath, Constantinople held past 1460. There are 75 at launch, the same list on Steam, Game Center and Google Play Games. They are earned only in ironman campaigns, and they never give anything inside the game: no bonus, no unlocked nation, no cosmetic.
+Achievements are goals you can earn across your campaigns: a first harvest, a castle taken by terms, a century without a broken oath, Constantinople held past 1460, Moscow free of the khan after Kulikovo. There are 80 at launch, the same list on Steam, Game Center and Google Play Games. They are earned only in ironman campaigns, and they never give anything inside the game: no bonus, no unlocked nation, no cosmetic.
 
 ## How it works
 
@@ -17,12 +17,12 @@ Achievements are goals you can earn across your campaigns: a first harvest, a ca
 
 | Tier | Points | Meant for | At launch |
 |---|---|---|---|
-| Copper | 5 | One action, or a goal most players reach in their first campaign | 39 |
-| Silver | 10 | A goal you aim for | 22 |
-| Gold | 20 | A whole campaign shaped around it | 11 |
+| Copper | 5 | One action, or a goal most players reach in their first campaign | 40 |
+| Silver | 10 | A goal you aim for | 25 |
+| Gold | 20 | A whole campaign shaped around it | 12 |
 | Crown | 40 | The hardest | 3 |
 
-Points show on Game Center and Google Play, not Steam. The list holds at most 100 achievements, ever, counting retired ones. Every achievement's points are a multiple of 5 and at most 40, and the total is at most 1,000. Launch ships 75 achievements worth 755 points, keeping 25 slots and 245 points for updates; after any update at least 10 slots and 100 points stay in reserve, and spare points should go mostly to new copper and silver goals. If a score or victory is added to the game, it gets its own achievements from the reserve. Names are at most 24 characters and texts at most 100.
+Points show on Game Center and Google Play, not Steam. The list holds at most 100 achievements, ever, counting retired ones. Every achievement's points are a multiple of 5 and at most 40, and the total is at most 1,000. Launch ships 80 achievements worth 810 points, keeping 20 slots and 190 points for updates; after any update at least 10 slots and 100 points stay in reserve, and spare points should go mostly to new copper and silver goals. If a score or victory is added to the game, it gets its own achievements from the reserve. Names are at most 24 characters and texts at most 100.
 
 These limits are the strictest of the three stores:
 
@@ -42,7 +42,7 @@ Some achievements are **levels of a ladder**: one count at rising steps. The har
 
 ### When tests run
 
-Each achievement names a **moment**, and when that moment occurs only the tests of rows naming it run. A `date` row is checked once, on that day. Tests run after the turn's own systems, at the very end of the turn order, so they read final values. If the test does not hold when its moment comes, the achievement stays locked.
+Each achievement names a **moment**, and when that moment occurs only the tests of rows naming it run. A `date` row is checked once, on that day, and never for a day on or before the day your campaign started. Tests run after the turn's own systems, at the very end of the turn order, so they read final values. If the test does not hold when its moment comes, the achievement stays locked.
 
 The moments are: turn end, year end, harvest, spring start, a date, battle end, sea battle end, siege end, war end, rebellion end, relation changed, province gained, invention done, regiment trained, lord created, charter granted, loan closed, style adopted, colony founded, contact made, fleet home, food policy changed, event choice, event end, 12 months after a succession, and campaign end.
 
@@ -76,7 +76,7 @@ An unlock is written to your profile and shown in-game at once, whether or not a
 
 ### Free tier and Steam demo
 
-The free iOS and Android download awards achievements as the full game does, and you keep them when you buy. A row marked full game cannot be earned with the free tier's countries alone; the free countries are the Ottomans and France, so at launch these are *Our Own Banner*, *The Walls Held*, *The Four Quarters Hold*, *From One Hall*, *Many Tents, One People*, *Many Crowns* and *Crowns of the World*. The Steam demo awards nothing to Steam directly; it keeps a local list from its ironman games, and when you buy the full game it reads the demo's profile and awards what you earned there.
+The free iOS and Android download awards achievements as the full game does, and you keep them when you buy. A row marked full game cannot be earned with the free tier's countries alone; the free countries are the Ottomans and France, so at launch these are *Our Own Banner*, *Free of the Khan*, *Blackbird Field*, *The Walls Held*, *The Conqueror's Heirs*, *The Four Quarters Hold*, *From One Hall*, *Many Tents, One People*, *Many Crowns* and *Crowns of the World*. The Steam demo awards nothing to Steam directly; it keeps a local list from its ironman games, and when you buy the full game it reads the demo's profile and awards what you earned there.
 
 ### Store ids and retiring
 
@@ -86,9 +86,9 @@ An achievement's `id` is never renamed after release, and every store id comes f
 
 Each achievement has one 32 × 32 icon in the game's pixel-art palette, with a 2-pixel frame in its tier's colour (copper, silver, gold, crown purple-gold). Icons are scaled with nearest-neighbour and no smoothing: × 2 for Steam (64) and × 16 for Game Center and Google Play (512). Steam's locked image uses the grey "unknown land" parchment tones of the map's fog. Each icon shows what the achievement is about, never a real flag or coat of arms.
 
-### The 75 achievements
+### The 80 achievements
 
-All thresholds are provisional placeholders for balancing.
+All thresholds are provisional placeholders for balancing. Every campaign starts on 20 September 1378 ([The 1378 start](The-1378-Start)); the dates below are calendar days, so they read the same from any start, and the start facts (one province, a decentralised people, starting as a subject, starting outside Europe) are taken on the day your campaign begins.
 
 **First steps** (8, 40 points)
 
@@ -185,14 +185,18 @@ All thresholds are provisional placeholders for balancing.
 | Our Own Banner | silver | You started as a subject and are no longer anyone's subject |
 | Tribute Roads | silver | You have 5 tributaries |
 
-**History** (12, 165 points)
+**History** (16, 215 points)
 
 | Name | Tier | Earned when |
 |---|---|---|
 | As It Was Written | copper | You make 25 historical choices (progress) |
 | Another Ending | silver | You make 10 non-historical choices in major events (progress) |
 | Paths Not Taken | gold | Across your games, 50 different non-historical options (lifetime, progress) |
+| Free of the Khan | silver | On 1 January 1400, having stood as the prince against the khan's horde at Kulikovo, you are nobody's subject (full game) |
+| Blackbird Field | silver | On 1 January 1400, having faced the sultan as the prince at Kosovo, you are nobody's subject (full game) |
+| The Storm Passes | silver | At the end of 1405, having met the conqueror's army as the sultan at Ankara, you are nobody's subject |
 | The Walls Held | gold | On 31 December 1460, as the defender in the fall of Constantinople, you own Constantinople |
+| The Conqueror's Heirs | gold | On 31 December 1507, as the empire left behind at Timur's death, you still own Samarkand (full game) |
 | The Four Quarters Hold | gold | On 31 December 1600, holding a role in the Inca expansion, you own Cusco and are nobody's subject |
 | Unconquered | gold | On 1 January 1914, having started outside Europe, your capital was never occupied by a realm whose capital lies in another of the 13 macro-regions (the Middle East counts as Asia) |
 | The Presses Roll | copper | You know printing before 1470 |
@@ -202,12 +206,13 @@ All thresholds are provisional placeholders for balancing.
 | One Island Realm | gold | You own all of Japan before 1600 |
 | Lord of the River Bend | gold | You own the whole Niger bend before 1600 |
 
-**Campaign** (8, 100 points)
+**Campaign** (9, 105 points)
 
 | Name | Tier | Earned when |
 |---|---|---|
+| The Old Start | copper | You reach 11 November 1444, the day after Varna, where campaigns used to begin |
 | New Century | copper | You reach 1500 |
-| Halfway Through Time | copper | You reach 1700 |
+| Three Centuries On | copper | You reach 1700 |
 | The New Machine Age | silver | You reach 1900 |
 | The Long Road | crown | You reach the campaign's end date |
 | From One Hall | gold | Starting with one province, you hold 50 (progress) |
@@ -224,8 +229,8 @@ All thresholds are provisional placeholders for balancing.
 
 ### In the playable build today
 
-- Open the game menu (the three-line button at the top left) and tap **Achievements**, or *Achievements* on the start screen. The Achievements card opens in the side panel: earned of 75 and points of 755 at the top, the eligibility line, a filter (*All*, *Within reach*, *Earned*), then one row of badges per category with its own count. Tap a badge for its text, tier and points, this campaign's progress bar, and the date you earned it. The harvest ladder is one badge in First steps with its level in the corner (3/5); its detail lists every level with its target and date and a bar to the next level, counted across all your campaigns.
-- A badge is the tier's frame round the category's sign (a coin for Realm, swords for War, an anchor for Sea…) until the 71 icons are drawn. Grey means locked; a dashed frame means **Not in the game yet**: 23 rows read systems the build does not have yet (charters, rulers and succession, trade hubs, winter quarters, marshals, styles, voyages and colonies, rebellions, regions of the world), and they stay locked until those land.
+- Open the game menu (the three-line button at the top left) and tap **Achievements**, or *Achievements* on the start screen. The Achievements card opens in the side panel: earned of 80 and points of 810 at the top, the eligibility line, a filter (*All*, *Within reach*, *Earned*), then one row of badges per category with its own count. Tap a badge for its text, tier and points, this campaign's progress bar, and the date you earned it. The harvest ladder is one badge in First steps with its level in the corner (3/5); its detail lists every level with its target and date and a bar to the next level, counted across all your campaigns.
+- A badge is the tier's frame round the category's sign (a coin for Realm, swords for War, an anchor for Sea…) until the icons are drawn. Grey means locked; a dashed frame means **Not in the game yet**: 23 rows read systems the build does not have yet (charters, rulers and succession, trade hubs, winter quarters, marshals, styles, voyages and colonies, rebellions, regions of the world), and they stay locked until those land. The four History rows of the decades after 1378 read the bridge events (Kulikovo, Kosovo, Ankara, Timur's death); they can be earned once those events run in your campaign.
 - When you earn one, a banner slides in under the date bar for three seconds and a line goes into the News; tap the banner to open the card at it. The game menu button (and the Achievements line in it) carries a red dot until you have looked. *Achievement toasts* in Settings → Gameplay turns the banner off; achievements still unlock.
 - Tests run at the end of each week's turn, after everything else. What you earn is kept on this device, apart from any campaign, so it stays when you start again or reload. The build has no saves yet, so every campaign counts as ironman.
 
@@ -247,7 +252,7 @@ All thresholds are provisional placeholders for balancing.
 - [Diplomacy](Diplomacy) and [Subjects](Subjects): alliances, rivals, independence, tributaries.
 - [Rebellions](Rebellions): how risings end, great revolts, unrest tiers.
 - [Historical events](Historical-Events): historical and non-historical choices, event roles, realm flags.
-- [The 1444 start](The-1444-Start): start province count, decentralised starts, start macro-region.
+- [The 1378 start](The-1378-Start): start province count, decentralised starts, start macro-region.
 - [Trade](Trade): trade hubs.
 
 Computer players have no part here; achievements are only for your realm.
@@ -272,12 +277,13 @@ Computer players have no part here; achievements are only for your realm.
 ## Still open
 
 - Store figures (points and counts) are checked again in each store's console before upload.
-- *The Walls Held* and *The Four Quarters Hold* get a sensitivity review of their names.
+- *The Walls Held*, *The Four Quarters Hold* and *The Conqueror's Heirs* get a sensitivity review of their names.
+- Rows for the Western Schism's end, Florence and Pisa, and the Ottomans holding Edirne and Bursa through Ankara wait for their events and places.
 - A last check before release that no achievement copies another game's list.
 
 ## For developers
 
-- Spec: [`domain/achievements/spec.md`](https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/achievements/spec.md), requirement code **ACH** (ACH-001 to ACH-075).
+- Spec: [`domain/achievements/spec.md`](https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/achievements/spec.md), requirement code **ACH** (ACH-001 to ACH-091).
 - Features: `domain/achievements/features/` (list-rules, unlock-catalogue, scope-and-progress, test-timing, eligibility, store-sync, free-tier-and-demo, icons, in-game-presentation).
 - Code: `packages/engine/src/domain/achievements/`.
 - The catalogue is `achievements.yaml` in the achievements design; its row ids (`first_harvest`, `walls_held_1453` …) are the stable ids every store id comes from.

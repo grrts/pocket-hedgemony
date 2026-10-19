@@ -89,7 +89,7 @@ Each step has its own gold, materials and months. While a building is being upgr
 
 A building drops **one step** after 10 years of neglect, when sacked, or when hit by an earthquake. A step-1 building that falls becomes ruined.
 
-The **market** shows how steps work: weekly market (1,500 market folk, village or bigger), yearly fair (2,400, needs T6 *Merchant fairs*, a market charter and a market town; fairs standing in 1444 stay), trading house (3,000, needs T3 *Bills of exchange* and a town or bigger).
+The **market** shows how steps work: weekly market (1,500 market folk, village or bigger), yearly fair (2,400, needs T6 *Merchant fairs*, a market charter and a market town; fairs standing at the start stay), trading house (3,000, needs T3 *Bills of exchange* and a town or bigger).
 
 ### Upkeep and condition
 
@@ -220,7 +220,7 @@ All numbers are step 1 on farmland and are placeholders. "g" is gold, "mo" month
 | Pilgrimage shrine | Named holy places only | 600 clergy | Draws pilgrims, who travel like traders and count as traders passing. Never on the build sheet: at start or founded by event | Not built |
 | Religious school (temple school, madrasa, yeshiva, Confucian academy) | Town slot | Scholars | Trains clergy and officials of the faith's kinds | As school |
 
-Holy places: Mecca and Medina, Rome, Jerusalem, Constantinople, Santiago, Echmiadzin, Aksum, Varanasi, Bodh Gaya, Lhasa, Mount Wutai, Qufu, Ise, Karbala, the Temple of the Tooth (Kotte in 1444, Kandy later), and Amritsar from the 1580s.
+Holy places: Mecca and Medina, Rome, Jerusalem, Constantinople, Santiago, Echmiadzin, Aksum, Varanasi, Bodh Gaya, Lhasa, Mount Wutai, Qufu, Ise, Karbala, the Temple of the Tooth (held by Gampola at the start, then Kotte and Kandy), and Amritsar from the 1580s.
 
 **Learning and health**
 
@@ -284,20 +284,20 @@ Only buildings and steps whose unlock (start, invention, government form, region
 
 ### Landmarks
 
-A **landmark** is a real, named building that stood or was built between 1444 and 1939. It counts as a step above its building type and has one effect of its own, written as a count. Landmarks are never on the build sheet: they are on the map at the start or founded by an event when the historical requirements are met. An event may found one elsewhere or not at all, but there are no invented landmarks.
+A **landmark** is a real, named building that stood or was built between 1378 and 1939. It counts as a step above its building type and has one effect of its own, written as a count. Landmarks are never on the build sheet: they are on the map at the start or founded by an event when the historical requirements are met. An event may found one elsewhere or not at all, but there are no invented landmarks.
 
-| Landmark | Place | In 1444? | Type | Its own effect |
+| Landmark | Place | At the start? | Type | Its own effect |
 |---|---|---|---|---|
 | Hagia Sophia | Constantinople | Yes (a mosque after the 1453 conversion event) | House of worship, step 4 | Its faith's houses of worship in every province in reach of the capital turn the faith mix twice as fast |
-| Forbidden City | Beijing | Yes | Palace, step 4 | +24 officials; lords at court never waver |
+| Forbidden City | Beijing | No (1420, by event) | Palace, step 4 | +24 officials; lords at court never waver |
 | Alhambra | Granada | Yes | Palace, step 3 | Granada's castle counts one step higher |
 | Great Mosque of Djenné | Djenné | Yes (earth) | House of worship, step 4 | No grievance from the doubled earth upkeep; traders passing +20 % in the replastering season |
 | Sankore Mosque and its schools | Timbuktu | Yes | School, step 3 | Scholars from any Muslim realm may settle here |
 | Masjid al-Haram | Mecca | Yes | Pilgrimage shrine, step 4 | The largest pilgrim flow in the world |
 | St Peter's Basilica | Rome | No (1506, by event) | House of worship, step 4 | While being built, realms of its faith can be asked for gifts toward it |
 | Topkapı Palace | Constantinople | No (1459, by event) | Palace, step 4 | +20 officials; the capital's seat runs two provinces |
-| Ulugh Beg Observatory | Samarkand | Yes (destroyed 1449 by event, historically) | Observatory, step 3 | Boats and Counting inventions 20 % cheaper for its owner |
-| Kremlin | Moscow | Yes (brick walls 1485 to 1495 by event) | Castle, step 3 | Palace and castle share one tile |
+| Ulugh Beg Observatory | Samarkand | No (1420s, by event; destroyed 1449, historically) | Observatory, step 3 | Boats and Counting inventions 20 % cheaper for its owner |
+| Kremlin | Moscow | Yes (white stone walls of 1367; brick walls 1485 to 1495 by event) | Castle, step 3 | Palace and castle share one tile |
 | Templo Mayor | Tenochtitlan | Yes | House of worship, step 4 | Lords of the Triple Alliance gain loyalty when the realm wins a war |
 | Coricancha | Cusco | Yes | House of worship, step 4 | Every province linked to Cusco by road counts one day closer |
 | Angkor | Angkor | Yes (court left around 1431) | House of worship, step 4, neglected | Upkeep can bring it back to sound; restoring it is a decision with its own event |
@@ -319,10 +319,10 @@ Events change buildings with five effects: add a building (placed on a fitting e
 - Buildings follow the map's wealth: wealth 1 has a farm or ranch on a third of its tiles; wealth 10 has every tile built and town buildings at step 2.
 - Town size follows population, and town slots fill by a regional template.
 - Houses of worship's faith, lords' buildings and landmarks come from the catalogue; allowed buildings and steps from start inventions.
-- Harbours and shipyards come from the naval 1444 port list (236 provinces).
+- Harbours and shipyards come from the start's port list.
 - Fixed mines, named markets and landmarks come from event anchors: Potosí (from 1545 by event), Kutná Hora, Falun; Bruges, the Champagne fairs, Malacca.
 
-See [The 1444 Start](The-1444-Start).
+See [The 1378 Start](The-1378-Start).
 
 ### The AI
 
@@ -350,7 +350,7 @@ A turn is one week. These steps run once a month, in the turn in which a new mon
 
 Each building stores just five small numbers (type, step, owner, condition, filled jobs); sites live in one realm-level list.
 
-### Worked example: Troyes, 1444 to 1452
+### Worked example: Troyes, 1444 to 1452 (on the 1444 checkpoint world)
 
 Troyes starts with 12 tiles (4 farms, a burned field, 2 ranches, a lumber camp, an empty woods tile, a fishery on the Seine, the castle and the town), 3,600 homeless, and a town with 6 full slots: a market, 3 loom houses, a church and a school.
 
@@ -388,7 +388,7 @@ The farm, ranch and fishery work the province's land, which is laid out in tiles
 
 **Upkeep.** Works cost upkeep each month, as the Works line of the treasury ledger. In a month the treasury is empty, your works give only half.
 
-**In 1444** the map's castles and forts stand, every capital has a stone castle, and richer provinces start with farms, ranches, markets, harbours and tracks. Other realms build too. Each month every realm at peace looks at one of its provinces and orders the first of a market, a farm, a harbour, a road, walls on a border or a drill yard that fits there, if it keeps a year of upkeep in hand.
+**At the start** the map's castles and forts stand, every capital has a stone castle, and richer provinces start with farms, ranches, markets, harbours and tracks. Other realms build too. Each month every realm at peace looks at one of its provinces and orders the first of a market, a farm, a harbour, a road, walls on a border or a drill yard that fits there, if it keeps a year of upkeep in hand.
 
 ## What you see
 
@@ -448,7 +448,7 @@ Costs and months are already multiplied by the ground. A grey row says what is m
 - [Research](Research): invention ids that unlock buildings and steps.
 - [Trade](Trade): trade roles of markets, caravanserais, warehouses, counting houses, trading posts, banks and harbours; the trade threshold for crafts appearing.
 - [Religion](Religion): houses of worship, minority houses, monasteries, shrines, conversions, clergy as owners.
-- [Naval](Naval): harbours, shipyards, naval bases, lighthouses; the 1444 port list.
+- [Naval](Naval): harbours, shipyards, naval bases, lighthouses; the port list.
 - [Government](Government): rule buildings as sources of officials and lords caps and reform requirements.
 - [Warfare](Warfare): raids, plunder, sacks, occupation, foraging, peace terms; castles, walls, arsenals, watchtowers, airfields.
 - [Recruiting](Recruiting): castle and drill-yard training room, barracks.
@@ -458,7 +458,7 @@ Costs and months are already multiplied by the ground. A grey row says what is m
 - [Rebellions](Rebellions): rebels loot a town building a season.
 - [Revolutions](Revolutions): counts of factories, rail stations and presses.
 - [Diplomacy](Diplomacy) and [Subjects](Subjects): treaties granting trading posts abroad or demanding castles demolished.
-- [The 1444 Start](The-1444-Start): wealth, population, faith, lords, start inventions, regional templates.
+- [The 1378 Start](The-1378-Start): wealth, population, faith, lords, start inventions, regional templates.
 - [Map and Map Modes](Map-and-Lenses): sprites by zoom, Works and Jobs map modes, landmark icons.
 - [Screens and Navigation](Screens-and-Navigation): Works screen, build sheet, building card, turn report lines.
 - [Time and Turns](Time-and-Turns): monthly, seasonal and yearly ticks.
@@ -500,7 +500,7 @@ Everything lives in one buildings config file, and every value is a placeholder.
 | Arsenal spoil, hospital, almshouse, AI reserve, AI homeless trigger, advice size | not yet in config | a tenth a year; 0.5 %; 3,000; a year's upkeep; 5 %; 5 lines |
 | Landmarks | `landmarks[]` | 15 listed, more in config |
 | Regional looks | `variants` | by region and faith |
-| 1444 ports | `start_ports.file` | `../naval/data/start-ports.json` |
+| Start ports | `start_ports.file` | `../naval/data/start-ports.json` |
 | Quake regions, fire chance | not yet in config | not given |
 
 ## Decided since the first draft
@@ -510,7 +510,7 @@ Everything lives in one buildings config file, and every value is a placeholder.
 - A master of works adds one more site of each kind, halves the months and takes 25 % off the gold.
 - Castles and roads have five steps. The track is known from the start; road and paved road need B2, the turnpike B9, and the railway C16.
 - Landmarks stand at their building's top step.
-- A new yearly fair needs T6 (Merchant fairs) and a market charter. Fairs already standing in 1444 stay.
+- A new yearly fair needs T6 (Merchant fairs) and a market charter. Fairs already standing at the start stay.
 - The caravanserai makes land traders 25 % stronger and keeps bandits away; the counting house lets foreign traders deposit with bills of exchange.
 - A lord's province counts as yours when fetching materials.
 - Any town walls, a palisade included, cut plunder to 1 in 6 buildings.

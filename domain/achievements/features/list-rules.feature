@@ -12,7 +12,7 @@ Feature: Rules the achievement list follows
   @ACH-002
   Scenario: One list for every store
     When the store lists are built from the YAML
-    Then Steam, Game Center and Google Play each receive the same 75 achievements
+    Then Steam, Game Center and Google Play each receive the same 80 achievements
 
   @ACH-003
   Scenario: Every achievement is original
@@ -26,6 +26,8 @@ Feature: Rules the achievement list follows
     Then no test names a country
     And only "japan_whole_1600" and "sahel_whole_1600" name a region
     And "walls_held_1453" names the event role "defender" of the event "fall_of_constantinople"
+    And "kulikovo_free" names the event role "prince" of the event "battle_of_kulikovo"
+    And "timurid_heirs" names the event role "empire" of the event "death_of_timur"
 
   @ACH-005
   Scenario: Harm is never rewarded
@@ -47,9 +49,9 @@ Feature: Rules the achievement list follows
   @ACH-008 @ACH-010 @ACH-011
   Scenario: The list stays inside the store limits
     Given the launch achievement list
-    Then it holds 75 achievements worth 755 points
+    Then it holds 80 achievements worth 810 points
     And every achievement's points are a multiple of 5 and at most 40
-    And 25 slots and 245 points are kept for updates
+    And 20 slots and 190 points are kept for updates
     And the list can never hold more than 100 achievements or 1000 points
 
   @ACH-009
@@ -60,10 +62,21 @@ Feature: Rules the achievement list follows
 
     Examples:
       | tier | points | count |
-      | copper | 5 | 39 |
-      | silver | 10 | 22 |
-      | gold | 20 | 11 |
+      | copper | 5 | 40 |
+      | silver | 10 | 25 |
+      | gold | 20 | 12 |
       | crown | 40 | 3 |
+
+  @ACH-087
+  Scenario: No test counts years from a start year
+    Given the achievement list
+    Then no test counts years from the start
+    And the start facts a test reads are "start_provinces", "start_polity_kind", "started_as_subject" and "start_macro_region"
+
+  @ACH-090
+  Scenario: Every event a test reads is defined
+    Given the achievement list
+    Then every event named in an event_role test is an event of the event tree or of its bridge events
 
   @ACH-012
   Scenario: An update keeps a reserve

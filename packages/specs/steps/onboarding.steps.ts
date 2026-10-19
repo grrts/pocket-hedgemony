@@ -56,8 +56,8 @@ Then("the pointing hand doesn't bob", (s) => {
 Then("the spotlight doesn't pulse", (s) => {
   expect(s.look.spotlightPulses).toBe(false);
 });
-Then("the border clash in chapter 5 can be skipped to the result", () => {
-  expect(T.battleView("Giurgiu", true).battleScreen).toBe(true);
+Then("the clash before Pera in chapter 5 can be skipped to the result", () => {
+  expect(T.battleView("Pera", true).battleScreen).toBe(true);
   expect(T.battleSkippable()).toBe(true);
 });
 Given("a look step is shown", (s) => {
@@ -282,8 +282,8 @@ When("the player presses Show me on {string}", (s, goal: string) => {
   s.showMe = T.showMe(goal);
 });
 Then("the matching tutorial steps run in this campaign", (s) => {
-  expect(s.showMe.steps).toEqual(["ch3.open_food_policy"]);
-  const run = T.showStep(3, 0, T.stepById(s.showMe.steps[0]));
+  expect(s.showMe.steps).toEqual(["ch6.open_food_policy"]);
+  const run = T.showStep(6, 0, T.stepById(s.showMe.steps[0]));
   expect(run.step.done).toBe("screen_open(food_policy)");
 });
 Then("no tutorial scenario override is applied", (s) => {
@@ -338,7 +338,7 @@ Given("the player uses a controller", (s) => {
   s.ctx = { lastInput: "controller" };
 });
 When("a step that wants the Food policy button is shown", (s) => {
-  s.step = T.stepById("ch3.open_food_policy");
+  s.step = T.stepById("ch6.open_food_policy");
   s.focus = T.controllerFocus(s.step);
 });
 Then("focus starts on the Food policy button", (s) => {
@@ -363,25 +363,30 @@ Then("the chapter 0 script for {string} asks the player to try each camera actio
   expect(new Set(s.script.cameraSteps).size).toBe(s.script.cameraSteps.length);
 });
 
-// ---------------------------------------------------------------- the Janissaries
+// ---------------------------------------------------------------- the Janissaries (the pençik and the first yeniçeri)
 
 Given("the Janissaries have joined the army in chapter 4", (s) => {
-  s.dev = T.devshirme();
+  expect(T.chapter(4).done_when).toContain("army of levies, riders and Janissaries with a commander");
+  s.pen = T.pencik();
 });
 When(/^the step opens the Janissary regiment's card and the "Why\?" on its men$/, (s) => {
-  s.line = s.dev.recruits_line;
+  s.line = s.pen.recruits_line;
 });
 Then("the recruits line reads {string}", (s, line: string) => {
   expect(s.line).toBe(line);
+  expect(s.line).not.toContain("devshirme");
+});
+Then("the lesson dates the pençik and the first yeniçeri to Murad's reign, c.1360s-1380s", (s) => {
+  expect(s.pen.dating).toContain("under Murad, c.1360s-1380s");
 });
 When("the player taps the recruits line", (s) => {
-  s.camera = s.dev.camera_to;
+  s.camera = s.pen.camera_to;
 });
-Then("the camera moves to the Rumelian provinces the corps drew from", (s) => {
-  expect(s.camera).toBe("the Rumelian provinces the corps drew from");
+Then("the camera moves to the border lands the raids took captives from", (s) => {
+  expect(s.camera).toBe("the border lands the raids took captives from");
 });
-When("the devshirme vignette opens", (s) => {
-  s.vignette = T.devshirme().vignette;
+When("the pençik vignette opens", (s) => {
+  s.vignette = T.pencik().vignette;
 });
 Then("it is marked depiction narrative_only", (s) => {
   expect(s.vignette.depiction).toBe("narrative_only");
@@ -397,13 +402,13 @@ Then("no button gives the player anything", (s) => {
 });
 When("the vignette closes", (s) => {
   s.lords = [lord("an Orthodox lord", "Loyal"), lord("another Orthodox lord", "Wavering")];
-  s.card = T.devshirmeCost(s.lords);
+  s.card = T.pencikCost(s.lords);
 });
-Then("a Rumelian province's card opens", (s) => {
+Then("the card of a raided border province opens", (s) => {
   expect(s.card).toBeDefined();
 });
-Then("its People line shows the boys taken", (s) => {
-  expect(s.card.peopleLine).toBe("boys taken");
+Then("its People line shows the captives taken", (s) => {
+  expect(s.card.peopleLine).toBe("captives taken");
 });
 Then("its grievances show {string}", (s, g: string) => {
   expect(s.card.grievance).toBe(g);
@@ -412,14 +417,14 @@ Then("the province's Orthodox lords sit one step lower in loyalty", (s) => {
   expect(s.lords.map((l: Lord) => l.loyalty)).toEqual(["Wavering", "Disloyal"]);
 });
 Then("the vizier says {string}", (s, line: string) => {
-  expect(T.devshirme().vizier_line).toBe(line);
-  expect(EN["tut.ch4.vizier_devshirme"]).toBe(line);
+  expect(T.pencik().vizier_line).toBe(line);
+  expect(EN["tut.ch4.vizier_pencik"]).toBe(line);
 });
 When("the player presses {string}", (s, button: string) => {
-  expect(T.devshirme().vignette.buttons).toContain(button);
-  s.entry = T.devshirmeEntry();
+  expect(T.pencik().vignette.buttons).toContain(button);
+  s.entry = T.pencikEntry();
 });
-Then("the Almanac's devshirme entry opens", (s) => {
+Then("the Almanac's pençik entry opens", (s) => {
   expect(s.entry).toBeDefined();
 });
 Then("its sources come from the catalogue's Ottoman record and standard histories, with no invented numbers", (s) => {
@@ -475,11 +480,11 @@ Then("that event has been dropped", (s) => {
 
 // ---------------------------------------------------------------- Needs attention
 
-const TURAHAN = cfg.scenario.overrides.lords.find((l) => l.house === "Turahan")!;
+const WAVERING_LORD = cfg.scenario.overrides.lords.find((l) => l.loyalty === "Wavering")!;
 const CONDITIONS: [RegExp, (s: Scenario, ...a: string[]) => void][] = [
   [/^the local store of "(\w+)" will reach zero before the next harvest$/, (s, p) => ((s.facts.storesRunningOut ??= []).push({ province: p!, month: "March" }))],
   [/^Murad's army has (\d+) days of food in reserve$/, (s, d) => ((s.facts.armies ??= []).push({ name: "Murad's army", place: "Edirne", reserveDays: Number(d) }))],
-  [/^the lord "([^"]+)" turns Wavering$/, (s, l) => ((s.facts.lords ??= []).push({ name: l!, loyalty: "Wavering", want: TURAHAN.want! }))],
+  [/^the lord "([^"]+)" turns Wavering$/, (s, l) => ((s.facts.lords ??= []).push({ name: l!, loyalty: "Wavering", want: WAVERING_LORD.want! }))],
   [/^the soldiers have not been paid for two months$/, (s) => (s.facts.monthsUnpaid = 2)],
   [/^gold will run out in under three months at this rate$/, (s) => (s.facts.gold = { monthsLeft: 2, emptyBy: "June" })],
   [/^(\d+) farmers are levied with the harvest three weeks away$/, (s, n) => (s.facts.leviedNearHarvest = { farmers: Number(n), weeks: 3 })],
@@ -610,24 +615,26 @@ Then("those checks are added to the one checks config file", (s) => {
 
 // ---------------------------------------------------------------- off script
 
-Given(/^the player's army lost the border clash at "Giurgiu"$/, (s) => {
+Given(/^the player's army lost the clash at "Pera"$/, (s) => {
+  expect(cfg.scenario.watch_speed.battle).toBe("Pera");
   s.stepText = T.clashStepText(false);
+  expect(T.clashStepText(true)).toBeNull();
 });
 Then("the step reads {string}", (s, text: string) => {
   expect(s.stepText).toBe(text);
 });
-When(/^the country "Hungary" fails to take one castle in two months$/, (s) => {
-  s.terms = T.hungaryOffersTerms(2);
-  expect(T.hungaryOffersTerms(1)).toBe(false);
+When("Andronikos IV's side fails to take one castle in two months", (s) => {
+  s.terms = T.andronikosOffersTerms(2);
+  expect(T.andronikosOffersTerms(1)).toBe(false);
 });
-Then("Hungary offers terms", (s) => {
+Then("Andronikos IV's side offers terms", (s) => {
   expect(s.terms).toBe(true);
 });
 Then("chapter 5 ends in peace", () => {
   expect(T.chapterDoneWhen(5, new Set(["peace signed"]))).toBe(true);
 });
 Given("a do step is shown", (s) => {
-  s.run = T.showStep(3, 0);
+  s.run = T.showStep(6, 0);
   expect(s.run.step.kind).toBe("do");
 });
 When("the player is idle for {int} seconds", (s, sec: number) => {
@@ -644,13 +651,13 @@ Then("the note adds {string}", (s, text: string) => {
   expect(T.noteText(s.run).endsWith(text)).toBe(true);
   expect(T.noteText(s.before)).not.toContain(text);
 });
-Given("chapter 6 needs a minimum of gold at its start", (s) => {
+Given("chapter 3 needs a minimum of gold at its start", (s) => {
   s.minimum = 100;
 });
 Given("the player has less than that minimum", (s) => {
   s.gold = 40;
 });
-When("chapter 6 starts", (s) => {
+When("chapter 3 starts", (s) => {
   s.loan = T.chapterStartLoan(s.minimum, s.gold, 0);
   s.loan2 = T.chapterStartLoan(s.minimum, s.gold, 1);
 });
@@ -662,31 +669,33 @@ Then("a scripted loan from a Genoese or Venetian banking house fills the gap", (
 Then("it is shown as a real debt line", (s) => {
   expect(s.loan.debtLine).toBe(true);
 });
-Given("the storm of the Hexamilion has failed", (s) => {
-  s.siege = { breached: false, moreaOffersTerms: false };
+Given("the storm of Serres has failed", (s) => {
+  s.siege = { breached: false, enemyOffersTerms: false };
 });
 Then("the siege carries on month by month", (s) => {
   expect(T.siegeMonth(s.siege)).toBe("carries on");
 });
-Then("the chapter ends when the wall is breached or the Morea offers terms", () => {
-  expect(T.siegeMonth({ breached: true, moreaOffersTerms: false })).toBe("chapter ends");
-  expect(T.siegeMonth({ breached: false, moreaOffersTerms: true })).toBe("chapter ends");
-  expect(T.chapterDoneWhen(8, new Set(["Hexamilion fallen or terms agreed"]))).toBe(true);
+Then("the chapter ends when the walls are breached or Manuel II offers terms", () => {
+  expect(T.siegeMonth({ breached: true, enemyOffersTerms: false })).toBe("chapter ends");
+  expect(T.siegeMonth({ breached: false, enemyOffersTerms: true })).toBe("chapter ends");
+  expect(T.chapterDoneWhen(8, new Set(["Serres fallen or terms agreed"]))).toBe(true);
 });
 
 // ---------------------------------------------------------------- pacing tools
 
-Given(/^chapter 3 offers "Advance to the harvest, (\w+) (\d+)"$/, (s, month: string, year: string) => {
-  expect(T.chapter(3).advance).toBe(true);
-  s.target = { year: Number(year), month: monthIndex(month, 0) + 1 };
+Given(/^chapter 6 offers "Advance to the harvest, (\w+) (\d+)"$/, (s, month: string, year: string) => {
+  expect(T.chapter(6)).toMatchObject({ advance: true, topic: "food", date: `June ${year}` });
+  s.harvestMonth = monthIndex(month, 0) + 1;
 });
 When("the player takes the Advance to… ribbon", (s) => {
+  // Chapter saves are not built yet (TUT-028), so the ribbon runs from the loaded start to its next harvest month.
   const w = createWorld(loadDefaultRuleset(), 7);
   s.world = w;
+  s.target = { year: w.date.month < s.harvestMonth ? w.date.year : w.date.year + 1, month: s.harvestMonth };
   s.adv = T.advanceTo(() => w.date, s.target, () => processTurn(w, [], 0));
 });
-Then(/^the turns run in a row until (\w+) (\d+)$/, (s, month: string, year: string) => {
-  expect({ year: s.world.date.year, month: s.world.date.month }).toEqual({ year: Number(year), month: monthIndex(month, 0) + 1 });
+Then("the turns run in a row until the harvest month", (s) => {
+  expect({ year: s.world.date.year, month: s.world.date.month }).toEqual(s.target);
   expect(s.adv.turns).toBe(s.adv.reports.length);
   expect(s.adv.turns).toBeGreaterThan(1);
 });
@@ -694,7 +703,7 @@ Then("one combined turn report is shown", (s) => {
   expect(s.adv.combinedReports).toBe(1);
 });
 Given("the step {string} allows only {string} and {string}", (s, id: string, a: string, b: string) => {
-  s.run = T.showStep(3, 0, T.stepById(id));
+  s.run = T.showStep(6, 0, T.stepById(id));
   expect(s.run.step.allow).toEqual([a, b]);
 });
 When("the player taps the levy button", (s) => {
@@ -708,7 +717,7 @@ Then("the levy button is dimmed, not hidden", (s) => {
   expect(s.control).toMatchObject({ dimmed: true, hidden: false });
 });
 Given("a do step with input focus is shown", (s) => {
-  s.run = T.showStep(3, 0);
+  s.run = T.showStep(6, 0);
   expect(T.controlState(s.run, "ui.levy").responds).toBe(false);
 });
 When("the player presses Free look", (s) => {
@@ -718,24 +727,31 @@ Then("every control responds for the rest of that step", (s) => {
   for (const c of ["ui.levy", "ui.lords", "camera", "ui.country_card.food"]) expect(T.controlState(s.run, c).responds).toBe(true);
   expect(s.run.ended).toBe(false);
 });
-Given(/^the AI country "(\w+)" wants a war "(against the Ottomans|in the Balkans)"$/, (s, country: string, target: string) => {
-  s.war = target === "against the Ottomans" ? { attacker: country, target: "Ottomans" } : { attacker: country, target: "Bosnia", region: "the Balkans" };
+const WAR_TARGETS: Record<string, { target: string; region?: string }> = {
+  "against the Ottomans": { target: "Ottomans" },
+  "in the Balkans": { target: "Bosnia", region: "the Balkans" },
+  "in western Anatolia": { target: "Hamid" },
+};
+Given(/^the AI country "(\w+)" wants a war "(against the Ottomans|in the Balkans|in western Anatolia)"$/, (s, country: string, target: string) => {
+  s.war = { attacker: country, ...WAR_TARGETS[target] };
 });
 Then("the war is held back", (s) => {
   expect(T.warHeldBack(s.war, s.running)).toBe(true);
   expect(T.warHeldBack(s.war, false)).toBe(false);
 });
-When("the crusaders' fleet reaches the Danube in chapter 4", (s) => {
-  expect(T.SCRIPTED_EVENTS.find((e) => e.id === "tut_danube_fleet")!.chapter).toBe(4);
-  s.war = { attacker: "Hungary", target: "Ottomans", scripted: true };
+When("John V reaches Murad in chapter 4", (s) => {
+  expect(T.scriptedEvent("tut_john_escapes").chapter).toBe(4);
+  expect(cfg.scenario.scripted_wars).toEqual(["the war for John V's throne"]);
+  s.war = { attacker: "Byzantium", target: "Ottomans", scripted: true };
 });
-Then("the crusade war against the Ottomans goes on", (s) => {
+Then("the war for John V's throne goes on", (s) => {
   expect(T.warHeldBack(s.war, s.running)).toBe(false);
   expect(T.warHeldBack({ ...s.war, scripted: false }, s.running)).toBe(true);
 });
-When("the border clash at Giurgiu starts in chapter 5", (s) => {
-  s.view = T.battleView("Giurgiu", true);
-  expect(T.battleView("Varna", true).battleScreen).toBe(false);
+When("the clash before Pera starts in chapter 5", (s) => {
+  s.view = T.battleView("Pera", true);
+  expect(T.battleView("Pera", false).battleScreen).toBe(false);
+  expect(T.battleView("Savra", true).battleScreen).toBe(false);
 });
 Then("the battle screen opens", (s) => {
   expect(s.view.battleScreen).toBe(true);
@@ -931,9 +947,9 @@ Then("the rest of the screen is dimmed to {int} %, not black", (s, pct: number) 
   expect(s.look.dim).toBe(pct / 100);
   expect(s.look.black).toBe(false);
 });
-Then("the note shows the face of the grand vizier Çandarlı Halil", (s) => {
-  expect(s.look.face).toBe("the grand vizier Çandarlı Halil");
-  expect(T.guideFace(true)).toBe("Çandarlı Halil");
+Then("the note shows the face of the grand vizier Çandarlı Kara Halil", (s) => {
+  expect(s.look.face).toBe("the grand vizier Çandarlı Kara Halil");
+  expect(T.guideFace(true)).toBe("Çandarlı Kara Halil");
 });
 Then("the counter reads {string}", (s, c: string) => {
   expect(T.stepCounter(s.run)).toBe(c);
@@ -1017,14 +1033,14 @@ Given("the date is {}", (s, date: string) => {
 });
 const DONE_WHEN: Record<string, string[]> = {
   'the player has opened the province card of "Edirne" and seen the Food and Faith lenses': ["province card of Edirne opened", "Food lens seen", "Faith lens seen"],
-  'the event "Murad goes back to Manisa" is answered and the turn report is read': ["Manisa event answered", "turn report read"],
+  'the event "Tribute from Constantinople" is answered and the turn report is read': ["tribute event answered", "turn report read"],
   "an official is placed and one wavering lord has been given his want, given a gift or left alone": ["official placed", "wavering lord handled"],
-  'a Food policy preset is chosen, the harvest turn is played and one hungry province\'s "Why?" is opened': ["food policy preset chosen", "harvest turn played", "hungry province Why opened"],
-  "an army of levies, lords' riders and Janissaries stands with a commander": ["army of levies, riders and Janissaries with a commander"],
-  "peace is signed": ["peace signed"],
   "an invention is chosen and the player has seen the recruit pool shrink": ["invention chosen", "recruit pool shrink seen"],
+  "an emperor is chosen and an army of levies, lords' riders and Janissaries stands with a commander": ["emperor chosen", "army of levies, riders and Janissaries with a commander"],
+  "peace is signed": ["peace signed"],
+  'a Food policy preset is chosen, the harvest turn is played and one hungry province\'s "Why?" is opened': ["food policy preset chosen", "harvest turn played", "hungry province Why opened"],
   'the rising in "Edirne" ends by any means': ["rising ended"],
-  "the Hexamilion falls or terms are agreed": ["Hexamilion fallen or terms agreed"],
+  "Serres falls or terms are agreed": ["Serres fallen or terms agreed"],
   "the player picks to keep playing these Ottomans or to start a new campaign": ["keep playing or new campaign picked"],
 };
 for (const [phrase, happened] of Object.entries(DONE_WHEN))
@@ -1045,34 +1061,51 @@ Then("the chapter list shows a tick on {string}", (s, name: string) => {
 Given("the tutorial's scripted events", (s) => {
   s.events = T.SCRIPTED_EVENTS;
 });
-Then("the tutorial starts on 11 November 1444, the day after the battle of Varna", () => {
-  expect(T.CHAPTERS.some((c) => c.name === "Varna")).toBe(false);
-  expect(T.historicalDate("tutorial start")).toBe("11 November 1444");
-  expect(T.tutorialStart().date).toBe("11 November 1444");
-  expect(T.historicalDate("battle of Varna")).toBe("10 November 1444");
+Then("the tutorial starts on 20 September 1378, the start of every campaign", () => {
+  expect(T.historicalDate("tutorial start")).toBe("20 September 1378");
+  expect(T.tutorialStart().date).toBe("20 September 1378");
+  expect(T.chapter(0).date).toBe("September 1378");
 });
-Then(/^Murad goes back to Manisa in (\w+ \d+)$/, (s, date: string) => {
-  expect(T.historicalDate("Murad goes back to Manisa")).toBe(date);
-  expect(s.events.find((e: T.ScriptedEvent) => e.id === "tut_murad_to_manisa").date).toBe(date);
+/** Each scripted event's date, as the event and the historical dates list both give it. */
+const EVENT_DATES: Record<string, keyof typeof cfg.historical_dates> = {
+  "Tribute from Constantinople": "tribute from Constantinople",
+  "John V and Manuel reach Murad": "John V and Manuel escape",
+  "John V back in Constantinople": "John V retakes Constantinople",
+  "The settlement of 1381": "the settlement of 1381",
+  "A bride for Bayezid": "the Germiyan marriage",
+  "The Hamid towns for sale": "the Hamid sale",
+  "Manuel goes to Thessaloniki": "Manuel goes to Thessaloniki",
+};
+Then(/^the event "([^"]+)" comes (?:in|on) (.+)$/, (s, name: string, date: string) => {
+  const e = s.events.find((x: T.ScriptedEvent) => x.name === name);
+  expect(e.date).toBe(date);
+  expect(T.historicalDate(EVENT_DATES[name]!)).toBe(date);
+  // Events come in chapter order, so no lesson pulls one forward.
+  const order = T.SCRIPTED_EVENTS.map((x) => x.chapter);
+  expect([...order].sort((a, b) => a - b)).toEqual(order);
 });
-Then(/^the crusaders' fleet is on the Danube in (summer \d+)$/, (s, date: string) => {
-  expect(T.historicalDate("the crusaders' fleet on the Danube")).toBe(date);
-  expect(s.events.find((e: T.ScriptedEvent) => e.id === "tut_danube_fleet").date).toBe(date);
+Then("Serres falls on 19 September 1383", () => {
+  expect(T.historicalDate("fall of Serres")).toBe("19 September 1383");
+  expect(T.chapter(8).date).toBe("August 1383");
 });
-Then(/^the storming of the Hexamilion comes in (\w+ \d+)$/, (s, date: string) => {
-  expect(T.historicalDate("storming of the Hexamilion")).toBe(date);
+Then("its date is {}", (s, date: string) => {
+  expect(s.event.date).toBe(date);
 });
-Given("the player asked Murad to stay in chapter 1", (s) => {
+Then("its history block names the other dating", (s) => {
+  expect(s.event.history.summary).toMatch(/1374|1378/);
+  expect(s.event.history.summary).toContain("so the tutorial uses 1381");
+});
+Given("the player asked after John V in chapter 1", (s) => {
   s.tut = T.startTutorial(T.newProgress());
   T.startChapter(s.tut, 1);
-  s.off = T.offScript("Ask him to stay this winter", 1);
+  s.off = T.offScript("Ask after John V", 1);
   s.world = { differed: true, chapterSave: s.tut.loadedSave };
 });
 Then("chapter 1 carries on from what happened, as a real campaign would", (s) => {
   // Nothing resets the world inside the chapter.
   T.tutorialInput(s.tut, { type: "confirm" });
   expect(s.tut.loadedSave).toBe(1);
-  expect(s.off.murad).toBe("stays at Edirne as a commander");
+  expect(s.off.effect).toBe("Andronikos's envoy leaves cold");
 });
 When("the player starts chapter 2", (s) => {
   T.startChapter(s.tut, 2);
@@ -1088,6 +1121,7 @@ Then("the opening card of chapter 2 says so in one line", (s) => {
 });
 Given("the scripted event {string}", (s, name: string) => {
   s.event = T.SCRIPTED_EVENTS.find((e) => e.name === name);
+  expect(s.event).toBeDefined();
 });
 Then("it has the event tree's history block with sources", (s) => {
   expect(s.event.history.summary.length).toBeGreaterThan(0);
@@ -1104,23 +1138,27 @@ Given("the tutorial scenario file", (s) => {
   s.sc = cfg.scenario;
   s.o = T.scenarioOverrides();
 });
-Then("it starts from the normal 11 November 1444 setup", (s) => {
-  expect(s.sc.base).toBe("the normal 11 November 1444 setup");
+Then("it starts from the normal 20 September 1378 setup", (s) => {
+  expect(s.sc.base).toBe("the normal 20 September 1378 setup");
+  expect(cfg.start_date).toBe("20 September 1378");
 });
-Then(/^the country "Ottomans" has Mehmed II, aged (\d+), as ruler, with Murad II retired at Manisa$/, (s, age: string) => {
-  expect(T.tutorialStart()).toMatchObject({ ruler: "Mehmed II", rulerAge: Number(age), retired: "Murad II", retiredAt: "Manisa" });
+Then(/^the country "Ottomans" has Murad I, aged (\d+), as ruler, with Bayezid, aged (\d+), as heir$/, (s, age: string, heirAge: string) => {
+  expect(T.tutorialStart()).toMatchObject({ ruler: "Murad I", rulerAge: Number(age), heir: "Bayezid", heirAge: Number(heirAge) });
   expect(cfg.tutorial_nation).toBe("Ottomans");
-  // The catalogue already has this court: no ruler or heir override.
+  // The 1378 setup already has this court: no ruler or heir override.
   expect("ruler" in s.o || "heir" in s.o).toBe(false);
 });
-Then("the crusade war is still open, with the league holding the Defend the faith aim", () => {
-  expect(T.tutorialStart()).toMatchObject({ crusadeWarOpen: true, leagueAim: "Defend the faith", aimGrantedBy: "the start state" });
+Then("Edirne is the capital and Bursa the second seat", () => {
+  expect(T.tutorialStart()).toMatchObject({ capital: "Edirne", secondSeat: "Bursa" });
 });
-Then("Çandarlı Halil is grand vizier", (s) => {
-  expect(s.o.grand_vizier).toBe("Çandarlı Halil");
+Then("Andronikos IV holds Constantinople, with John V and Manuel II in his prison", () => {
+  expect(T.tutorialStart()).toMatchObject({ emperor: "Andronikos IV", prisoners: ["John V", "Manuel II"] });
 });
-Then("the Evrenos, Mihal and Turahan families are lords, one of them wavering", (s) => {
-  expect(s.o.lords.map((l: { house: string }) => l.house)).toEqual(["Evrenos", "Mihal", "Turahan"]);
+Then("Çandarlı Kara Halil is grand vizier", (s) => {
+  expect(s.o.grand_vizier).toBe("Çandarlı Kara Halil");
+});
+Then("the Evrenos, Mihal and Timurtaş families are lords, one of them wavering", (s) => {
+  expect(s.o.lords.map((l: { house: string }) => l.house)).toEqual(["Evrenos", "Mihal", "Timurtaş"]);
   expect(s.o.lords.filter((l: { loyalty: string }) => l.loyalty === "Wavering")).toHaveLength(1);
 });
 Then("one royal province in Anatolia has no official", (s) => {
@@ -1138,8 +1176,9 @@ Then("the seed is fixed", (s) => {
 Given(/^a real campaign as the country "(\w+)" in (\d+)$/, (s) => {
   s.campaign = "real";
 });
-When("the month of June 1444 is played", (s) => {
-  s.fired = T.SCRIPTED_EVENTS.filter((e) => e.date === "June 1444" || e.date.endsWith("1444")).filter((e) => T.mayFire(e, s.campaign));
+When(/^the autumn of (\d+) is played$/, (s, year: string) => {
+  s.fired = T.SCRIPTED_EVENTS.filter((e) => e.date.endsWith(year)).filter((e) => T.mayFire(e, s.campaign));
+  expect(T.SCRIPTED_EVENTS.some((e) => e.date === `autumn ${year}`)).toBe(true);
 });
 Then("no event marked tutorial_only fires", (s) => {
   expect(s.fired).toEqual([]);
@@ -1149,52 +1188,79 @@ Then("no event marked tutorial_only fires", (s) => {
 Given("chapter {int} is played", (s, n: number) => {
   s.n = n;
 });
-Then(/^the country "Hungary" crosses the Danube at "Giurgiu" with Hunyadi commanding$/, (s) => {
-  const h = T.forcedAi("Hungary") as { chapter: number; marches_on: string; commander: string };
-  expect(h).toMatchObject({ chapter: s.n, marches_on: "Giurgiu", commander: "Hunyadi" });
+Then(/^Andronikos IV holds "(\w+)" with the country "(\w+)" and commands its sally$/, (s, place: string, ally: string) => {
+  expect(T.forcedAi("Andronikos IV")).toMatchObject({ chapter: s.n, realm: "Byzantium", holds: place, with: ally, commander: "Andronikos IV" });
 });
-Given("chapter 8 is played and the wall has fallen", (s) => {
-  s.wall = true;
+Given("chapter 8 is played and Serres has fallen", (s) => {
+  s.fallen = true;
+  expect(T.forcedAi("Manuel II")).toMatchObject({ chapter: 8, holds: "Serres" });
 });
-Then("the Morea accepts terms", (s) => {
-  expect(T.moreaAcceptsTerms(s.wall)).toBe(true);
-  expect(T.moreaAcceptsTerms(false)).toBe(false);
+Then("Manuel II accepts terms", (s) => {
+  expect(T.manuelAcceptsTerms(s.fallen)).toBe(true);
+  expect(T.manuelAcceptsTerms(false)).toBe(false);
 });
 
-// ---------------------------------------------------------------- the Varna crusade
+// ---------------------------------------------------------------- the Byzantine civil war
 
+Then(/^Andronikos IV holds the Byzantine throne from the start, since (.+)$/, (s, since: string) => {
+  s.war = T.civilWar();
+  expect(s.war).toMatchObject({ emperor: "Andronikos IV", since });
+  expect(T.historicalDate("Andronikos IV takes Constantinople")).toBe(since);
+});
+Then("John V and Manuel II are in his prison", (s) => {
+  expect(s.war.prisoners).toEqual(["John V", "Manuel II"]);
+});
+Then(/^the countries "(\w+)" and "(\w+)" are at war over (\w+)$/, (s, a: string, b: string, over: string) => {
+  expect(s.war.partnersAtWar).toMatchObject({ a, b, over });
+});
 When("chapter 3's last turn is played", (s) => {
   s.n = 3;
   // The news comes at the end of chapter 3; the event itself opens chapter 4.
-  expect(T.SCRIPTED_EVENTS.find((e) => e.id === "tut_danube_fleet")!.chapter).toBe(s.n + 1);
-  s.news = T.danubeNewsLine();
-});
-Then(/^a crusading league against the country "(\w+)" is at war from the start, regardless of the usual threshold$/, (s, c: string) => {
-  s.league = T.crusadeLeague();
-  expect(s.league.against).toBe(c);
-  expect(s.league.regardlessOfThreshold).toBe(true);
-  expect(T.tutorialStart().crusadeWarOpen).toBe(true);
-});
-Then(/^its members are (.+)$/, (s, list: string) => {
-  expect(s.league.members).toEqual([...list.matchAll(/"([^"]+)"/g)].map((m) => m[1]));
+  expect(T.scriptedEvent("tut_john_escapes").chapter).toBe(s.n + 1);
+  s.news = T.escapeNewsLine();
 });
 Then("the news reads {string}", (s, line: string) => {
   expect(s.news).toBe(line);
 });
-Then(/^"(\w+)" and "(\w+)" send fleets$/, (s, a: string, b: string) => {
-  expect(s.league.fleets).toEqual([a, b]);
-});
 Then("the country card shows {string}", (s, line: string) => {
-  expect(s.league.line).toBe(line);
+  expect(T.civilWar().cardLine).toBe(line);
 });
-Given("the Orthodox in Ottoman border provinces are Restricted, not Persecuted", (s) => {
-  expect(cfg.scenario.overrides.faith_policy.Orthodox).toBe("Restricted");
+Given("the event {string} is open in chapter 4", (s, name: string) => {
+  s.event = T.SCRIPTED_EVENTS.find((e) => e.name === name)!;
+  expect(s.event.chapter).toBe(4);
+  // The choose step that hands the player the event's choice.
+  s.step = T.chapterSteps(4).find((x) => x.anchor === `event.${s.event.id}`);
+  expect(s.step.kind).toBe("choose");
 });
-When("the player opens the crusade's war screen", (s) => {
-  s.screen = T.crusadeWarScreen();
+When(/^the player picks "(Back John V|Keep Andronikos IV)"$/, (s, choice: T.EmperorChoice) => {
+  expect(s.event.options).toContain(choice);
+  const r = T.stepInput(T.showStep(4, 0, s.step), { type: "choice", option: choice });
+  expect(r.lastChoice).toBe(choice);
+  s.side = T.emperorChoice(choice);
 });
-Then("the league's war aim is Defend the faith, held from the start state", (s) => {
-  expect(s.screen).toMatchObject({ aim: "Defend the faith", cause: "the start state" });
+Then(/^the Italian partner is "(\w+)", bringing (.+)$/, (s, partner: string, brings: string) => {
+  expect(s.side).toMatchObject({ partner, partner_brings: brings });
+});
+Then(/^the enemy is "([^"]+)", with "(\w+)" beside him$/, (s, enemy: string, enemyPartner: string) => {
+  expect(s.side).toMatchObject({ enemy, enemy_partner: enemyPartner });
+});
+const AIMS: Record<string, [string | null, string | null]> = {
+  "Seat a pretender, from John V at your court": ["Seat a pretender", "John V at your court"],
+  "none, since the emperor on the throne is already yours": [null, null],
+};
+Then(/^the Ottoman war aim is (.+)$/, (s, aim: string) => {
+  expect([s.side.war_aim, s.side.aim_granted_by]).toEqual(AIMS[aim]);
+});
+Given("the player backed John V", (s) => {
+  s.choice = "Back John V";
+  expect(T.emperorChoice(s.choice).historical).toBe(true);
+});
+When("the player opens the war screen of the war for John V's throne", (s) => {
+  expect(cfg.scenario.scripted_wars).toContain("the war for John V's throne");
+  s.screen = T.warScreen(s.choice);
+});
+Then("the war aim is Seat a pretender, from John V at your court", (s) => {
+  expect(s.screen).toMatchObject({ aim: "Seat a pretender", cause: "John V at your court" });
 });
 Then("the war screen shows the aim and its cause", (s) => {
   expect(s.screen.aim && s.screen.cause).toBeTruthy();
@@ -1202,42 +1268,57 @@ Then("the war screen shows the aim and its cause", (s) => {
 Then("one linked line explains why this aim and not Take land", (s) => {
   expect(s.screen.whyNotTakeLand.linked).toBe(true);
 });
-When("the player taps the league member {string}", (s, member: string) => {
-  const d = D.createDiplomacy("1444-11-11");
-  for (const c of T.crusadeLeague().members) D.country(d, c).faith = c === "Wallachia" ? "Orthodox" : "Catholic";
-  s.reasons = T.memberReasons(d, member, "Hungary");
+When("the player taps the partner {string}", (s, partner: string) => {
+  const d = D.createDiplomacy("1378-09-20");
+  D.country(d, "Venice").faith = "Catholic";
+  D.country(d, "Genoa").faith = "Catholic";
+  D.country(d, "Byzantium").faith = "Orthodox";
+  // Venice and John V's Byzantium both stand against Genoa, Andronikos's partner.
+  D.relations.setStance(d.graph, "Venice", "Genoa", "hostile");
+  D.relations.setStance(d.graph, "Byzantium", "Genoa", "hostile");
+  s.reasons = T.partnerReasons(d, partner, "Byzantium");
   s.d = d;
+  s.partner = partner;
 });
-Then("the member's reasons open on the same screen used for the player's own alliances", (s) => {
+Then("the partner's reasons open on the same screen used for the player's own alliances", (s) => {
   expect(s.reasons.screen).toBe("alliance reasons");
 });
-Then(/^"Same faith" shows \+(\d+) between the Catholic members$/, (s, w: string) => {
-  expect(s.reasons.entries.find((e: { name: string }) => e.name === "Same faith").weight).toBe(Number(w));
-  expect(T.memberReasons(s.d, "Wallachia", "Hungary").entries.find((e) => e.name === "Same faith")).toBeUndefined();
+Then(/^"Share a rival" shows \+(\d+) toward "(\w+)" while both stand against "(\w+)"$/, (s, w: string, other: string) => {
+  const entries = T.partnerReasons(s.d, s.partner, other).entries;
+  expect(entries.find((e) => e.name === "Share a rival")?.weight).toBe(Number(w));
+});
+Then(/^"Same faith" shows \+(\d+) toward "(\w+)" but not toward "(\w+)"$/, (s, w: string, same: string, other: string) => {
+  expect(T.partnerReasons(s.d, s.partner, same).entries.find((e) => e.name === "Same faith")?.weight).toBe(Number(w));
+  expect(T.partnerReasons(s.d, s.partner, other).entries.find((e) => e.name === "Same faith")).toBeUndefined();
 });
 function straitsWorld(fleetIn?: string): M.MoveWorld {
-  const land = (id: string): M.Place => ({ id, terrain: "grassland", owner: "Ottomans", harbour: true });
+  const land = (id: string, owner = "Ottomans"): M.Place => ({ id, terrain: "grassland", owner, harbour: true });
   const w: M.MoveWorld = {
-    date: { year: 1444, month: 10 },
-    places: { Lapseki: land("Lapseki"), Gallipoli: land("Gallipoli"), Uskudar: land("Uskudar"), Rumelihisari: land("Rumelihisari"), Dardanelles: { id: "Dardanelles", terrain: "sea" }, Bosporus: { id: "Bosporus", terrain: "sea" } },
-    neighbours: { Lapseki: ["Dardanelles"], Gallipoli: ["Dardanelles"], Uskudar: ["Bosporus"], Rumelihisari: ["Bosporus"], Dardanelles: ["Lapseki", "Gallipoli"], Bosporus: ["Uskudar", "Rumelihisari"] },
-    relations: { wars: [["Venice", "Ottomans"]], alliances: [], passage: [], subjects: [] },
+    date: { year: 1379, month: 6 },
+    places: { Lapseki: land("Lapseki"), Gallipoli: land("Gallipoli"), Uskudar: land("Uskudar"), Pera: land("Pera", "Genoa"), Dardanelles: { id: "Dardanelles", terrain: "sea" }, Bosporus: { id: "Bosporus", terrain: "sea" } },
+    neighbours: { Lapseki: ["Dardanelles"], Gallipoli: ["Dardanelles"], Uskudar: ["Bosporus"], Pera: ["Bosporus"], Dardanelles: ["Lapseki", "Gallipoli"], Bosporus: ["Uskudar", "Pera"] },
+    relations: { wars: [["Genoa", "Ottomans"]], alliances: [], passage: [], subjects: [] },
     movers: [],
     straits: [
       { a: "Lapseki", b: "Gallipoli", zone: "Dardanelles" },
-      { a: "Uskudar", b: "Rumelihisari", zone: "Bosporus" },
+      { a: "Uskudar", b: "Pera", zone: "Bosporus" },
     ],
   };
-  if (fleetIn) w.movers.push({ id: "crusade fleet", kind: "fleet", owner: "Venice", place: fleetIn, route: [], progress: 0, greyed: [] });
+  if (fleetIn) w.movers.push({ id: "Genoese galleys", kind: "fleet", owner: "Genoa", place: fleetIn, route: [], progress: 0, greyed: [] });
   return w;
 }
-Given("the crusaders' fleet holds the Dardanelles", (s) => {
-  s.w = straitsWorld("Dardanelles");
-  s.army = M.newArmy("murad", "Ottomans", "Lapseki", 20000);
+Given("Genoese galleys from Pera hold the Bosporus", (s) => {
+  expect(T.emperorChoice("Back John V").closed_strait).toBe("Bosporus");
+  s.w = straitsWorld("Bosporus");
+  s.army = M.newArmy("murad", "Ottomans", "Uskudar", 20000);
 });
-Then("the Dardanelles crossing shows as closed with the fleet's banner on it", (s) => {
-  expect(T.straitCrossing(s.w, s.army, "Lapseki", "Gallipoli")).toEqual({ open: false, banner: "Venice", reason: "strait closed" });
-  expect(T.straitCrossing(straitsWorld(), s.army, "Lapseki", "Gallipoli").open).toBe(true);
+Then(/^the Bosporus crossing shows as closed with the banner of "(\w+)" on it$/, (s, banner: string) => {
+  expect(T.straitCrossing(s.w, s.army, "Uskudar", "Pera")).toEqual({ open: false, banner, reason: "strait closed" });
+  expect(T.straitCrossing(straitsWorld(), s.army, "Uskudar", "Pera").open).toBe(true);
+});
+Then("the Dardanelles crossing at Gallipoli stays open", (s) => {
+  expect(cfg.scenario.civil_war.open_crossing).toBe("Gallipoli");
+  expect(T.straitCrossing(s.w, { ...s.army, place: "Lapseki" }, "Lapseki", "Gallipoli").open).toBe(true);
 });
 Given("chapter 0 is played and the Food lens has been seen", (s) => {
   s.run = T.showStep(0, 4);
@@ -1256,7 +1337,7 @@ Then("provinces where a community is {int} % or more are hatched", (s, pct: numb
   expect(T.faithLensHatched(pct / 100)).toBe(true);
   expect(T.faithLensHatched(pct / 100 - 0.01)).toBe(false);
 });
-Given("the league calls on the sultan's Christian subjects to rise", (s) => {
+Given("the Christian sipahis are called to ride for an emperor", (s) => {
   s.sipahis = lord("the Christian sipahis", "Wavering", { retinue: 2000 });
   s.pious = [lord("a Pious Sunni lord", "Loyal", { traits: ["Pious"] })];
 });
@@ -1276,7 +1357,7 @@ Then("the Christian sipahis do not bring their retinue when called", (s) => {
   expect(s.choice.retinue).toBe(0);
   expect(s.pious[0].loyalty).toBe("Loyal");
 });
-Then("the Christian sipahis' riders come to the Danube and Pious Sunni lords waver once", (s) => {
+Then("the Christian sipahis' riders come to Constantinople and Pious Sunni lords waver once", (s) => {
   expect(s.choice.retinue).toBe(2000);
   expect(s.pious[0].loyalty).toBe("Wavering");
 });
@@ -1287,51 +1368,55 @@ Then("Persecute is dimmed", (s) => {
   expect(s.persecute).toMatchObject({ shown: true, dimmed: true });
   expect(T.persecuteOption(false).dimmed).toBe(false);
 });
-Then("its note says it would give every Orthodox neighbour the Defend the faith aim and the crusade would only grow", (s) => {
+Then("its note says it would give every Orthodox neighbour the Defend the faith aim and turn both emperors against you", (s) => {
   expect(s.persecute.note).toContain("every Orthodox neighbour the Defend the faith aim");
-  expect(s.persecute.note).toContain("the crusade would only grow");
+  expect(s.persecute.note).toContain("turn both emperors against you");
 });
 Given("the Anatolian army of {int} men must reach Thrace", (s, men: number) => {
-  s.army = M.newArmy("anatolia", "Ottomans", "Uskudar", men);
+  s.army = M.newArmy("anatolia", "Ottomans", "Lapseki", men);
 });
-Given("the Dardanelles are closed by the crusaders' fleet", (s) => {
-  s.w = straitsWorld("Dardanelles");
-  expect(T.straitCrossing(s.w, { ...s.army, place: "Lapseki" }, "Lapseki", "Gallipoli").open).toBe(false);
+Given("the Bosporus is closed by the Genoese galleys", (s) => {
+  s.w = straitsWorld("Bosporus");
+  expect(T.straitCrossing(s.w, { ...s.army, place: "Uskudar" }, "Uskudar", "Pera").open).toBe(false);
 });
-When("the player sends the army over the Bosporus ferry", (s) => {
-  s.crossing = T.straitCrossing(s.w, s.army, "Uskudar", "Rumelihisari");
+When("the player sends the army over the Dardanelles at Gallipoli", (s) => {
+  s.crossing = T.straitCrossing(s.w, s.army, "Lapseki", "Gallipoli");
 });
 Then("the crossing takes {int} days", (s, days: number) => {
   expect(s.crossing).toEqual({ open: true, days });
 });
 Given("the battle at {string} has been fought", (s, place: string) => {
-  expect(place).toBe("Giurgiu");
+  expect(place).toBe(cfg.scenario.watch_speed.battle);
   s.sipahis = lord("the Christian sipahis", "Wavering", { retinue: 2000 });
-  s.report = T.clashReport({ won: true, choice: "Keep it Restricted", sipahis: s.sipahis, dead: { Ottomans: 1200, Hungary: 3400 } });
+  s.report = T.clashReport({ won: true, choice: "Keep it Restricted", emperor: "Back John V", sipahis: s.sipahis, dead: { Ottomans: 400, Byzantium: 900 } });
 });
 Then("the turn report shows the result together with the faith choice", (s) => {
   expect(s.report).toMatchObject({ result: "won", faithChoice: "Keep it Restricted" });
 });
-Then("it says how many Christian sipahis rode at Giurgiu, or why they stayed home", (s) => {
+Then("it says how many Christian sipahis rode at Pera, or why they stayed home", (s) => {
   expect(s.report).toMatchObject({ sipahisRode: 0, stayedHomeBecause: "Wavering" });
-  const loyal = T.clashReport({ won: true, choice: "Tolerate it", sipahis: lord("the Christian sipahis", "Loyal", { retinue: 2000 }), dead: {} });
+  const loyal = T.clashReport({ won: true, choice: "Tolerate it", emperor: "Back John V", sipahis: lord("the Christian sipahis", "Loyal", { retinue: 2000 }), dead: {} });
   expect(loyal).toMatchObject({ sipahisRode: 2000, stayedHomeBecause: null });
 });
-When("peace with {string} is signed", (s, c: string) => {
-  expect(c).toBe("Hungary");
+Then("it names what the Venetian partner brought", (s) => {
+  expect(s.report.partnerBrought).toBe("Venetian galleys");
+});
+When("peace with Andronikos IV's side is signed", (s) => {
+  expect(T.scriptedEvent("tut_settlement_1381").chapter).toBe(5);
   s.after = T.afterClashPeace();
 });
-Then("the league's war ends", (s) => {
-  expect(s.after.leagueWarEnds).toBe(true);
+Then("the war for John V's throne ends", (s) => {
+  expect(s.after.warEnds).toBe(true);
 });
-Then("the league ends with it", (s) => {
-  expect(s.after.leagueEnds).toBe(true);
+Then("the Genoese partner leaves the war with it", (s) => {
+  expect(s.after.partnerLeaves).toBe(true);
 });
 Then("the madrasa in {string} is Sunni", (s, p: string) => {
-  expect(T.chapter6Faith().madrasa).toEqual({ province: p, faith: "Sunni" });
+  expect(T.chapter(s.n).topic).toBe("research");
+  expect(T.chapter3Faith().madrasa).toEqual({ province: p, faith: "Sunni" });
 });
 When("the step opens a Rumelian province's Faith line", (s) => {
-  s.faith = T.chapter6Faith();
+  s.faith = T.chapter3Faith();
 });
 Then("the Orthodox community shows as {string}", (s, line: string) => {
   expect(s.faith.community).toBe("Orthodox");
@@ -1342,13 +1427,13 @@ Then(/^its "Why\?" links to the Almanac's religion page$/, (s) => {
 });
 Then("the turn report counts the dead of both sides the same way", (s) => {
   expect(s.report.dead).toEqual([
-    { side: "Ottomans", dead: 1200 },
-    { side: "Hungary", dead: 3400 },
+    { side: "Ottomans", dead: 400 },
+    { side: "Byzantium", dead: 900 },
   ]);
 });
 Then("no step rewards harm", (s) => {
   expect(s.report.reward).toBeNull();
-  expect(T.devshirme().vignette.gives).toEqual([]);
+  expect(T.pencik().vignette.gives).toEqual([]);
 });
 
 // ---------------------------------------------------------------- decisions of this pass (D-TUT-1 … D-TUT-15)
@@ -1403,17 +1488,19 @@ Given(/^the player picked "([^"]+)" on the event "([^"]+)"$/, (s, option: string
   expect(e.options).toContain(option);
   s.tut = T.startTutorial(T.newProgress());
   T.startChapter(s.tut, e.chapter);
-  s.off = T.offScript(option as "Ask him to stay this winter", e.chapter);
+  s.off = T.offScript(option as "Ask after John V", e.chapter);
   s.world = { differed: option !== e.options![0] };
 });
-Then("Murad stays at Edirne as a commander until the end of chapter 1", (s) => {
-  expect(s.off).toMatchObject({ chapter: 1, murad: "stays at Edirne as a commander", until: "the end of chapter 1" });
+Then("Andronikos's envoy leaves cold until the end of chapter 1", (s) => {
+  expect(s.off).toMatchObject({ chapter: 1, effect: "Andronikos's envoy leaves cold", until: "the end of chapter 1" });
+  expect(T.offScript("Take the tribute", 1).effect).toBeUndefined();
 });
-Then("chapter 2 starts from its chapter save with Murad at Manisa", (s) => {
+Then("chapter 2 starts from its chapter save with the tribute taken as in history", (s) => {
   expect(s.tut.loadedSave).toBe(2);
   expect(s.card.fromSave).toBe(2);
+  expect(s.card.backOnCourseLine).toBe(true);
   expect(s.off.carriesOver).toBe(false);
-  expect(T.tutorialStart().retiredAt).toBe("Manisa");
+  expect(T.scriptedEvent("tut_byzantine_tribute").options![0]).toBe("Take the tribute");
 });
 Given("the player left the wavering lord alone in chapter 2", (s) => {
   s.tut = T.startTutorial(T.newProgress());
@@ -1497,7 +1584,7 @@ When("a step is shown", (s) => {
 });
 Then("the face on the note is labelled {string}", (s, label: string) => {
   expect(T.guideFaceLabel()).toBe(label);
-  expect(T.guideFace(true)).toBe("Çandarlı Halil");
+  expect(T.guideFace(true)).toBe("Çandarlı Kara Halil");
 });
 
 // settings switches (D-TUT-13)

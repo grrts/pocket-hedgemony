@@ -25,7 +25,7 @@ When no stance is stored, the **implied stance** applies: Hostile at war, Friend
 | Subject | owned by [Subjects](Subjects) | independence won, release, annexation |
 | Truce | −10 line; no war until it expires | expiry, breaking it, an alliance, making a subject |
 
-Some combinations can't exist together: for example an Alliance can't sit with a Neutral, Hostile, At War, Subject or Truce, and At War can't sit with Friendly, Neutral, Alliance, Subject or Truce. A few are allowed only with a note (allies who compete over a contested object, a disloyal subject, a subject competing with its overlord). When effects happen together the order is At War, Truce, Subject, Alliance, Hostile, Rival, Friendly, Neutral, and a newer relation made in play wins over an older one unless the action's own conditions block it. Relations made in play are marked `gameplay` and never written back into the 1444 data. **Diplomatic facts** (royal marriage, dynastic claim, territorial claim, trade agreement, secondary tribute, shared ruler, membership, religious authority, and the new protection pledge) only feed reasons; they never create or block a relation.
+Some combinations can't exist together: for example an Alliance can't sit with a Neutral, Hostile, At War, Subject or Truce, and At War can't sit with Friendly, Neutral, Alliance, Subject or Truce. A few are allowed only with a note (allies who compete over a contested object, a disloyal subject, a subject competing with its overlord). When effects happen together the order is At War, Truce, Subject, Alliance, Hostile, Rival, Friendly, Neutral, and a newer relation made in play wins over an older one unless the action's own conditions block it. Relations made in play are marked `gameplay` and never written back into the start data. **Diplomatic facts** (royal marriage, dynastic claim, territorial claim, trade agreement, secondary tribute, shared ruler, membership, religious authority, and the new protection pledge) only feed reasons; they never create or block a relation.
 
 **The relation actions** move a pair between types:
 
@@ -38,7 +38,7 @@ Some combinations can't exist together: for example an Alliance can't sit with a
 - **Set rival** needs a contested object; **insult** makes the stance Hostile; **improve relations** moves one step from Hostile to Rival to Neutral to Friendly.
 - A war between other countries never rewrites a subject relation. A destroyed country loses all its relations.
 
-The 1444 dataset holds 280 relations and 19 facts (reference date 11 November 1444) and is checked by a validator before play.
+The start dataset holds 503 relations and 128 facts (reference date 20 September 1378), with each Catholic realm's obedience to the Pope in Rome or the Pope in Avignon, and is checked before play. Wars already under way include England against France, Venice against Genoa and its allies, Mamai's Horde against Moscow, Lithuania against the Teutonic and Livonian Orders, Champa against Dai Viet and Ming against the Northern Yuan. The 1444 checkpoint keeps its own 280 relations and 19 facts.
 
 ### Envoys
 
@@ -132,7 +132,7 @@ Every count holds:
 
 **Other common reasons:** *Too far to matter* −15 with no shared border and no shared neighbour, and *Very far* −15 more when an envoy needs over 60 days; *We share an enemy* +25 when both are at war with the same country; *You threaten our frontier* −5 for each province in your Lands taken that borders them; *We already have allies* −10 for each of their alliances beyond two. Each action adds at most two reasons of its own.
 
-**Hungary asks Venice, 11 November 1444.** Hungary and Venice are both at war with the Ottomans; Venice is allied with Florence, a hegemon seeker with high negotiation. Venice's standing toward Hungary is +10 (Same faith). Venice with half its allies has between 1 and 2 times Hungary's soldiers. Hungary's envoy is a Judge with 7 years served.
+**Hungary asks Venice, 11 November 1444** (on the 1444 checkpoint world). Hungary and Venice are both at war with the Ottomans; Venice is allied with Florence, a hegemon seeker with high negotiation. Venice's standing toward Hungary is +10 (Same faith). Venice with half its allies has between 1 and 2 times Hungary's soldiers. Hungary's envoy is a Judge with 7 years served.
 
 | Reason | Number |
 |---|---|
@@ -319,7 +319,7 @@ The first part of statecraft is in the playable build: envoys, alliances, marria
 - **Ending an alliance**: *End the alliance* on an ally's tab. It is an Oath broken: they remember it (−40, fading over 20 years), and other courts trust you less.
 - **Courting a lord**: tap a province of another realm, open its lord from *Governed by* (*Lord*), and if he is Wavering or Disloyal, *Court him*. One of your envoys stays at his court: each season he loses a step unless his ruler wins him back, and once Disloyal for a year with land next to yours he comes over with it (his old ruler remembers *Took our land*). Each season there is 1 in 4 they find out: *Courted our lord* (−25, fading over 10 years) and your envoy comes home. Your courting envoys are listed with your envoys abroad, and *Recall your envoy* frees the seat. Realms court the lords and subjects of neighbours they hold as rivals or hostile.
 - **The other realms** send envoys too: once a year each court picks the neighbour that thinks best of it and weighs an alliance and a marriage there, and sends the best ask its count says yes to, or a gift first when it is close. You see the alliances and marriages they make in the News.
-- **For now** an envoy is not a named official, so no province loses its official while he is away; every realm counts two unmarried children; and the royal marriages of 1444 count from the start. Envoys, letters and alliances are kept in your save.
+- **For now** an envoy is not a named official, so no province loses its official while he is away; every realm counts two unmarried children; and the royal marriages already made on the start day count from the start. Envoys, letters and alliances are kept in your save.
 
 ### Demands in the game today
 
@@ -348,7 +348,7 @@ The first part of statecraft is in the playable build: envoys, alliances, marria
 - [Government](Government): the officials cap and regencies.
 - [National-Strengths](National-Strengths): extra reasons, seats and unique war aims.
 - [Historical-Events](Historical-Events): opinion, trust, notoriety, relations, and the new effects.
-- [The-1444-Start](The-1444-Start): the 1444 relations, AI personalities, Italian states with G8.
+- [The 1378 Start](The-1378-Start): the 1378 relations, AI personalities, Italian states with G8.
 - [Time-and-Turns](Time-and-Turns), [Map and Map Modes](Map-and-Lenses), [Screens-and-Navigation](Screens-and-Navigation): turn order, the map mode, cards and letters.
 
 ## Numbers
@@ -393,4 +393,4 @@ Nothing. Every question is decided; numbers marked as placeholders in the data m
 - Spec: `domain/diplomacy/spec.md` in the game repository, requirement code **DIPL** (DIPL-001 to DIPL-194).
 - Features: `domain/diplomacy/features/`, 23 files including `relation-model.feature`, `relation-actions.feature`, `envoys.feature`, `reasons-count.feature` (Hungary and Venice), `declaring-war.feature`, `leagues.feature` and `funding-rebels.feature`.
 - Reference implementation of relation actions: `country-relations/tools/relations_engine.py`, with `country-relations/tests/test_rules.py` (27 tests) as the shared contract; config in `diplomacy-rules.json` and `country-relations/config/relation-rules.json`.
-- Code: `packages/engine/src/domain/diplomacy/` (`rules.ts`, `dates.ts`), with numbers in `packages/rules/data/domain/diplomacy.json` and the 1444 relations in `packages/rules/data/scenarios/1444/relations.json`.
+- Code: `packages/engine/src/domain/diplomacy/` (`rules.ts`, `dates.ts`), with numbers in `packages/rules/data/domain/diplomacy.json` and the relations at the start in `packages/rules/data/scenarios/1378/relations.json` (the 1444 checkpoint's in `scenarios/1444/relations.json`).

@@ -186,7 +186,7 @@ The computer always knows its own ambitions and treats them as goals with weight
 
 ## What you see
 
-- **In the game today.** Every realm's card has a **Heritage** line on its General tab, naming its birthright and its weakness. Tap it, or the **Heritage** tab, to see the birthright, each golden age with the age it belongs to, and the weakness; tap any of them for its full text and history note. Under them, **In 1444** shows how the chronicles judge the realm at the start: Strength (economy, manpower, army, navy, trade, standing abroad), Government (reach of rule, finances, stability, institutions, cohesion, prospects) and Dangers (unrest, threat from outside), each as five steps with a word, with a question mark where the chronicles are unsure. The tab is there for every realm, also before you pick one. 110 of the 137 realms on the map have heritage; the rest say none is recorded yet. Ambitions, legacies and golden ages beginning follow when heritage is checked each turn.
+- **In the game today.** Every realm's card has a **Heritage** line on its General tab, naming its birthright and its weakness. Tap it, or the **Heritage** tab, to see the birthright, each golden age with the age it belongs to, and the weakness; tap any of them for its full text and history note. Under them, **In 1378** shows how the chronicles judge the realm at the start: Strength (economy, manpower, army, navy, trade, standing abroad), Government (reach of rule, finances, stability, institutions, cohesion, prospects) and Dangers (unrest, threat from outside), each as five steps with a word, with a question mark where the chronicles are unsure. The tab is there for every realm, also before you pick one. 110 of the 137 realms on the map have heritage; the rest say none is recorded yet. Ambitions, legacies and golden ages beginning follow when heritage is checked each turn.
 
 - **The country card** gets one Heritage row: the birthright icon, the active golden age icon, three hidden ambition icons and the weakness icon. Tapping it opens the Heritage sheet.
 - **The heritage card** shows five rows, never more: Birthright, Golden age, Ambitions, Weakness and Legacies ("none yet" when empty). Tapping a row shows its full text, its history note and what it changes. A dormant birthright is greyed.
@@ -198,7 +198,7 @@ The computer always knows its own ambitions and treats them as goals with weight
 ## How it connects
 
 - [Historical events](Historical-Events): ages drive golden ages; heritage uses the condition language and proposes four effects and a condition.
-- [The 1444 start](The-1444-Start): catalogue fields, tiers, size assessments, personality and places feed generation.
+- [The 1378 start](The-1378-Start): catalogue fields, tiers, size assessments, personality and places feed generation.
 - [Your realm](Your-Realm): levers on treasury, officials, lords, loyalty, recruits, horses and envoys.
 - [Provinces](Provinces): levers on tax reach, harvests, growth, class slots, official types and grievances.
 - [Warfare](Warfare): levers on troop cap, break point, marching, sieges, garrisons and commanders.

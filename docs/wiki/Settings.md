@@ -170,7 +170,7 @@ Some switches appear in two sections but are one setting, so changing one change
 | Tutorial hints, and the action "Reset tutorial and hints" | On, Off | On |
 | Achievement toasts (Off hides the toast; achievements still unlock) | On, Off | On |
 | Place names | Historical, Modern | Historical |
-| Date format | 16 October 1444, 16 Oct 1444, 16.10.1444, 1444-10-16 | follows the language |
+| Date format | 20 September 1378, 20 Sep 1378, 20.09.1378, 1378-09-20 | follows the language |
 
 Autosave Off stops only the rotating autosaves, never the Resume save (see [Saving](Saving)). In an ironman campaign both autosave rows are hidden. When Confirm End turn asks, the question names the count ("3 warnings, 2 events wait for you · Look · End turn anyway"). Your battles never stop the turn and can't be skipped; they slow the week to 4-hour steps while they run, and that is not a setting. Turns are weeks, so the autosave goes by the calendar, never more than once a month. When events are still unanswered, End turn opens the first one instead of asking. There is no advisor row; muting a kind of warning happens on the Attention screen. Historical place names change with date and owner (Constantinople becomes Istanbul in Ottoman hands); no historical name list is planned, so both options show today's region names.
 
@@ -320,7 +320,7 @@ The Settings screen with its nine sections, the changed dot, per-row and per-sec
 - [Map and Map Modes](Map-and-Lenses): sharpness, map detail, animations, frame cap, colour vision, borders, patterns, place names and the parchment switch.
 - [Tutorial and help](Tutorial-and-Help): tutorial hints and their reset, tooltips and their delay, detailed tooltips.
 - [Achievements](Achievements): the toast switch; achievements only count in ironman.
-- [The 1444 start](The-1444-Start): the campaign rules shown read-only.
+- [The 1378 start](The-1378-Start): the campaign rules shown read-only.
 - [How a turn works](Time-and-Turns): Keep screen awake during the computer players' turn.
 - [Warfare](Warfare): battle playback speed and battle view controls.
 - [Historical events](Historical-Events): Jump to events.

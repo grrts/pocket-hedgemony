@@ -6,8 +6,8 @@ Feature: Tutorial steps and how they look
 
   @TUT-001 @TUT-002 @TUT-003 @TUT-054
   Scenario: Steps teach one thing on the real screens
-    Given the step "ch3.open_food_policy" of kind "do"
-    Then its text key "tut.ch3.open_food_policy" reads "Your castles feed the land around them. Open {ui:food_policy}."
+    Given the step "ch6.open_food_policy" of kind "do"
+    Then its text key "tut.ch6.open_food_policy" reads "Your castles feed the land around them. Open {ui:food_policy}."
     And its anchor is "ui.country_card.food"
     And it ends when the screen "food_policy" is open
     And its guide face is the vizier
@@ -36,7 +36,7 @@ Feature: Tutorial steps and how they look
       | {ui:food_policy} | the screen's name in bold with its icon |
       | {stat:gold} | the stat's icon and name, linked to its Almanac entry |
       | {place:edirne} | the name "Edirne", linked, moving the camera there when tapped |
-      | {lord:turahan} | the name "Turahan", linked, moving the camera there when tapped |
+      | {lord:evrenos} | the name "Evrenos", linked, moving the camera there when tapped |
 
   @TUT-060
   Scenario Outline: The note never covers the target
@@ -53,7 +53,7 @@ Feature: Tutorial steps and how they look
   Scenario: Spotlight, face and counter
     Given the second of six steps of chapter 0 is shown on "Edirne"
     Then the rest of the screen is dimmed to 50 %, not black
-    And the note shows the face of the grand vizier Çandarlı Halil
+    And the note shows the face of the grand vizier Çandarlı Kara Halil
     And the counter reads "2 / 6"
 
   @TUT-064
