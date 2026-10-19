@@ -7,6 +7,7 @@ import { goalAsks } from "./goals.ts";
 import goalsConfig from "../../rules/data/domain/events.json" with { type: "json" };
 import { LEDGER, LEDGER_LINES } from "./treasury.ts";
 import { houseView, yearlyCrowns, type HouseView } from "./crowns.ts";
+import { yearlyPeople } from "./people.ts";
 import { aiCourting, courtingView, monthlyCourting, type CourtingView } from "./courting.ts";
 import { bondOf, aiMayTakeSubject, aiOverlordEnvoys, aiOverlords, aiRisings, monthlySubjectEnvoys, makeSubject, seasonalSubjects, subjectByAgreement, subjectsView, type SubjectsView } from "./subjects.ts";
 
@@ -284,6 +285,8 @@ export function monthlyStatecraft(world: World, news: News[]): void {
   aiRisings(world, news);
   aiOverlords(world, news);
   aiOverlordEnvoys(world, news);
+  // Everyone ages and may die each January, then claims lapse (REALM-270, SUBJ-126).
+  yearlyPeople(world, news);
   yearlyCrowns(world, news);
   monthlyCourting(world, news);
   aiCourting(world, (s) => bondOf(world, s)?.loyalty ?? null);

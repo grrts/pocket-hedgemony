@@ -102,7 +102,7 @@ export function worldChunks(world: World, game: SavedGame): RawChunk[] {
     packChunk("provinces", V.provinces, {
       // Sieges under way, by province (occupation and garrisons are arrays below); the ground is the map's, not the save's.
       meta: { sieges: [...world.sieges].map(([p, st]) => [p, { ...st, siege: { ...st.siege, ground: undefined } }]), workNames: WORKS },
-      arrays: { owner: world.provinceOwner, population: world.provincePopulation, wealth: world.provinceWealth, recruits: world.provinceRecruits, official: world.provinceOfficial, officialSeed: world.provinceOfficialSeed, officialSince: world.provinceOfficialSince, officialFrom: world.provinceOfficialFrom, newLand: world.provinceNewLand, classes: world.provinceClasses, tax: world.provinceTax, food: world.provinceStore, harvest: world.provinceHarvest, weather: world.provinceWeather, starved: world.provinceStarved, grievances: Int32Array.from(world.provinceGrievances), armyMonths: world.provinceArmyMonths, battleYear: world.provinceBattleYear, lord: world.provinceLord, occupier: world.provinceOccupier, hold: world.provinceHold, holdBy: world.provinceHoldBy, garrison: world.provinceGarrison, works: world.provinceWorks, tiles: world.provinceTiles, castleStore: world.castleStore, game: world.provinceGame, hardWinter: world.provinceHardWinter, worn: world.provinceWorn, overwork: world.provinceOverwork, rested: world.provinceRested, seam: world.provinceSeam, seamYears: world.provinceSeamYears, changeTile: world.provinceChangeTile, change: world.provinceChange, changeLeft: world.provinceChangeLeft, changeMonths: world.provinceChangeMonths, changeGold: world.provinceChangeGold, ...tradeProvinceArrays(world) },
+      arrays: { owner: world.provinceOwner, population: world.provincePopulation, wealth: world.provinceWealth, recruits: world.provinceRecruits, official: world.provinceOfficial, officialSeed: world.provinceOfficialSeed, officialSince: world.provinceOfficialSince, officialFrom: world.provinceOfficialFrom, officialAge: world.provinceOfficialAge, newLand: world.provinceNewLand, classes: world.provinceClasses, tax: world.provinceTax, food: world.provinceStore, harvest: world.provinceHarvest, weather: world.provinceWeather, starved: world.provinceStarved, grievances: Int32Array.from(world.provinceGrievances), armyMonths: world.provinceArmyMonths, battleYear: world.provinceBattleYear, lord: world.provinceLord, occupier: world.provinceOccupier, hold: world.provinceHold, holdBy: world.provinceHoldBy, garrison: world.provinceGarrison, works: world.provinceWorks, tiles: world.provinceTiles, castleStore: world.castleStore, game: world.provinceGame, hardWinter: world.provinceHardWinter, worn: world.provinceWorn, overwork: world.provinceOverwork, rested: world.provinceRested, seam: world.provinceSeam, seamYears: world.provinceSeamYears, changeTile: world.provinceChangeTile, change: world.provinceChange, changeLeft: world.provinceChangeLeft, changeMonths: world.provinceChangeMonths, changeGold: world.provinceChangeGold, ...tradeProvinceArrays(world) },
     }),
     packChunk("nations", V.nations, {
       // Works being built and waiting, with works by name so a build with other works still reads them.
@@ -124,6 +124,8 @@ export function worldChunks(world: World, game: SavedGame): RawChunk[] {
         commanderOwner: world.commanderOwner,
         // Skills, victories, defeats and wounds of each commander, as they grow in battle.
         commanderRecord: Int32Array.from(world.commanders.flatMap((c) => [c.might, c.cunning, c.logistics, c.victories, c.defeats, c.wounds])),
+        // Each commander's age, as it grows each January (REALM-276).
+        commanderAge: Int32Array.from(world.commanders, (c) => c.age),
       },
     }),
     packChunk("armies", V.armies, {
@@ -259,6 +261,8 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
         if (prov.officialSince) world.provinceOfficialSince[t.index] = prov.officialSince[old]!;
         // A foreign specialist's realm; saves from before hiring have none.
         if (prov.newLand) world.provinceNewLand[t.index] = prov.newLand[old]!;
+        // Officials' ages; saves from before people aged draw them from each man's seed.
+        if (prov.officialAge) world.provinceOfficialAge[t.index] = prov.officialAge[old]!;
         if (prov.officialFrom) world.provinceOfficialFrom[t.index] = prov.officialFrom[old]! < 0 ? -1 : nationMap[prov.officialFrom[old]!]!;
         if (prov.tax) world.provinceTax[t.index] = prov.tax[old]!;
         classesFrom[t.index] = old;
@@ -440,6 +444,10 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
       world.commanderLogistics[now] = logistics!;
     });
   }
+  nat.commanderAge?.forEach((age, old) => {
+    const now = commanderMap[old]!;
+    if (now >= 0) world.commanders[now]!.age = age;
+  });
   if (nat.commanderOwner) {
     ids.commanders.forEach((_, old) => {
       const c = commanderMap[old]!;

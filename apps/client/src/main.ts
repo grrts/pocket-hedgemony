@@ -3953,7 +3953,7 @@ function renderPanelCard(): void {
         const c = cmd >= 0 ? cmdOf(cmd) : null;
         return `<div class="army">
           ${c ? commanderPortrait(rules, c.name, s.armies.owner[k]!) : `<img class="portrait" src="${spriteUrl("soldier", nations[s.armies.owner[k]!]!.color, 3)}" alt="">`}
-          <span class="who">${c ? `<b>${esc(titledOf(c))}</b><br><small>${roleOf(c)} · might ${c.might} · cunning ${c.cunning} · logistics ${c.logistics}</small>` : "<b>Army</b>"}<br>
+          <span class="who">${c ? `<b>${esc(titledOf(c))}</b><br><small>${roleOf(c)} · ${skills(c)}</small>` : "<b>Army</b>"}<br>
           ${fmt(s.armies.men[k]!)} men of ${esc(nations[s.armies.owner[k]!]!.name)}, ${fmt(s.armies.horse[k]!)} on horse${mine ? `<br><small>${supplyLine(k)}${marchLine(k)}</small>` : ""}</span>
           ${mine ? `<span class="army-buttons"><button data-army="${id}">${selected.has(id) ? "Pick a target" : "Move"}</button><button class="paper small" data-command="${id}" title="The commander's screen: troops, food, pay, training">Command</button></span>` : ""}
         </div>`;
@@ -4786,7 +4786,7 @@ function idleCommanders(): number[] {
     .map(({ i }) => i);
 }
 
-const skills = (c: Snapshot["commanders"][number]) => `might ${c.might} · cunning ${c.cunning} · logistics ${c.logistics}`;
+const skills = (c: Snapshot["commanders"][number]) => `${c.age ? `aged ${c.age} · ` : ""}might ${c.might} · cunning ${c.cunning} · logistics ${c.logistics}`;
 
 /**
  * A province's Garrison tab (PROV-302, RECR-116..120): men who can be called
@@ -5705,7 +5705,7 @@ function realmArmyTab(r: number, armyCount: number, men: number): string {
       <dt>Recruits</dt><dd>${fmt(s.nationLevies[r]!)} men who can be called</dd>
     </dl>
     ${list.length ? `<h3 class="sub">Commanders</h3>${list
-      .map((c) => `<div class="army">${commanderPortrait(rules, c.name, r)}<span class="who"><b>${esc(titledOf(c))}</b><br><small>${roleOf(c)} · might ${c.might} · cunning ${c.cunning} · logistics ${c.logistics}</small></span></div>`)
+      .map((c) => `<div class="army">${commanderPortrait(rules, c.name, r)}<span class="who"><b>${esc(titledOf(c))}</b><br><small>${roleOf(c)} · ${skills(c)}</small></span></div>`)
       .join("")}` : `<p class="hint">No commanders.</p>`}`;
 }
 

@@ -1,4 +1,5 @@
 import { crownShare, inAnyWar } from "./lords.ts";
+import { officialAge } from "./people.ts";
 import { refillPaces } from "./fallen.ts";
 import { moodShare } from "./moods.ts";
 import * as rc from "./domain/recruiting/index.ts";
@@ -103,6 +104,8 @@ export function createRecruitState(P: number, N: number) {
     provinceOfficialSince: new Int32Array(P),
     /** Realm a foreign specialist came from, -1 = one of the realm's own (PROV-334). */
     provinceOfficialFrom: new Int16Array(P).fill(-1),
+    /** Age of each post's official, 0 = drawn from his seed (people.ts). */
+    provinceOfficialAge: new Uint8Array(P),
     /** New land waiting for its owner's decision (officials.ts provinceTaken). */
     provinceNewLand: new Uint8Array(P),
     /** Province each commander was commissioned from, -1 = none. */
@@ -175,7 +178,7 @@ export function commissionOfficial(world: World, n: number, p: number, news: New
   const seed = world.provinceOfficialSeed[p]!;
   const name = officialAt(world, p)!;
   world.nationTreasury[n] = world.nationTreasury[n]! - cost;
-  const c = addCommander(world, n, wf.newCommander(name, { ...skills, origin: OFFICIALS[type]! }));
+  const c = addCommander(world, n, wf.newCommander(name, { ...skills, origin: OFFICIALS[type]!, age: officialAge(world, p) }));
   world.commanderHome[c] = p;
   world.commanderSeed[c] = seed;
   world.provinceOfficial[p] = -1;
@@ -196,6 +199,7 @@ export function releaseCommander(world: World, n: number, c: number): string | n
   if (world.provinceOfficialSeed[home] !== seed) (world.provinceOfficialSince[home] = world.day), (world.provinceOfficialFrom[home] = -1);
   world.provinceOfficial[home] = Math.max(0, type);
   world.provinceOfficialSeed[home] = seed;
+  world.provinceOfficialAge[home] = Math.min(255, world.commanders[c]!.age);
   world.commanderOwner[c] = -1;
   return null;
 }
