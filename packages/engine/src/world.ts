@@ -45,6 +45,7 @@ import { createCampaignEndState, seedCampaign, type CampaignEndState } from "./c
 import type { AchievementLog } from "./achievements.ts";
 import { createInstitutionsState, seedInstitutions, type InstitutionsState } from "./institutions.ts";
 import { createTribesState, seedTribes, type TribesState } from "./tribes.ts";
+import { createPlagueState, type PlagueState } from "./plague.ts";
 
 /**
  * Simulation state stored as parallel typed arrays (one array per field,
@@ -52,7 +53,7 @@ import { createTribesState, seedTribes, type TribesState } from "./tribes.ts";
  * cache-friendly to iterate every turn and lets whole arrays be copied or
  * transferred to the UI thread without serialising objects.
  */
-export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState, RebelState, RevolutionState, PeoplesState, TradeState, RulerState, FallenState, BeliefState, InstitutionsState, TribesState {
+export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState, RebelState, RevolutionState, PeoplesState, TradeState, RulerState, FallenState, BeliefState, InstitutionsState, TribesState, PlagueState {
   /** Heads of the faith: patrons, the Caliph, the conclave, censures (faithHeads.ts). */
   faithHeads: FaithHeadsState;
   /** Faiths a realm serves as the patron of their head while of another faith (RELG-145). */
@@ -490,6 +491,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     ...createFaithHeadsState(N),
     ...createInstitutionsState(),
     ...createTribesState(P),
+    ...createPlagueState(P, seed),
   };
   world.diplomacy = createWarState(world);
   seedClasses(world);

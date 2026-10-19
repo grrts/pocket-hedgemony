@@ -1,4 +1,5 @@
 import type { World } from "./world.ts";
+import { quarantineTaxFactor } from "./plague.ts";
 import { controller, type News } from "./war.ts";
 import { allNationPay, ungoverned } from "./recruit.ts";
 import { emptyProvinceEffect } from "./domain/recruiting/index.ts";
@@ -97,8 +98,8 @@ export function provinceTax(world: World, p: number, holder: number, share = cro
   // A tax collector brings more of it in (province officials table: +20 % reaching you).
   const collector = officialBonus(world, p, "Tax collector", "tax_reach");
   // Restricted faiths pay a quarter more on their share, Persecuted ones nothing (RELG-050, RELG-052); heritage may raise or lower what reaches the holder (tax_reach_pct, HER-078).
-  // A busy province owes more: 1 % for every 4 points of its trade ratio (TRADE-088).
-  return world.provincePopulation[p]! * economy.goldPerThousandPeoplePerMonth * taxFactor(world, taxRateOf(world, p, holder)) * share * collector * world.provinceFaithTax[p]! * heritageTaxReach(world, p) * tradeTaxFactor(world, p);
+  // A busy province owes more: 1 % for every 4 points of its trade ratio (TRADE-088); a closed one pays half while its quarantine lasts (PROV-357).
+  return world.provincePopulation[p]! * economy.goldPerThousandPeoplePerMonth * taxFactor(world, taxRateOf(world, p, holder)) * share * collector * world.provinceFaithTax[p]! * heritageTaxReach(world, p) * tradeTaxFactor(world, p) * quarantineTaxFactor(world, p);
 }
 
 /**

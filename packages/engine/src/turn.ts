@@ -33,6 +33,7 @@ import { noteMoment, turnEndAchievements } from "./achievements.ts";
 import { empireOrder, monthlyInstitutions, type EmpireOrder } from "./institutions.ts";
 import { shogunateOrder, type ShogunateOrder } from "./shogunate.ts";
 import { huntOf, monthlyTribes, tribesOrder, type TribesOrder } from "./tribes.ts";
+import { isPlagueWeek, setQuarantine, weeklyPlague } from "./plague.ts";
 import { addDays, DAYS_PER_RATION_MONTH, DAYS_PER_TURN } from "./calendar.ts";
 import { corridor, monthlyRations, refillRations, wagonRations, planRoute, planTilePath, tileStepHours, type MarchingArmy } from "./march.ts";
 import { foodCarriedPct, marchMap, NO_PATH, tileMarch, updateWeather, type World } from "./world.ts";
@@ -200,6 +201,8 @@ export type Order =
   | ShogunateOrder
   /** Hunting grounds: claim, leave, take in, ask for the land, answer an ask (tribes.ts). */
   | TribesOrder
+  /** Close a province of the realm against plague (quarantine), or open it again (QuarantineProvince, PROV-357). */
+  | { type: "quarantine"; province: number; on: boolean }
   /** After world domination, play on to the end date; after game over, play on as another realm (SHELL-164). */
   | { type: "keepPlaying" }
   | { type: "playOn"; nation: number };
@@ -320,6 +323,8 @@ function startDay(world: World, news: News[]): void {
     if (world.date.month === 1) yearlyScores(world, news);
     monthlyHeritage(world, news);
   }
+  // The plague week, on days 7, 14, 21 and 28 of the month (D-PROV-4): only the sick provinces are visited.
+  if (world.day > 0 && isPlagueWeek(world.date.day ?? 1)) weeklyPlague(world, news);
   if (world.day % DAYS_PER_TURN === 0) aiMarches(world);
 }
 
@@ -558,6 +563,8 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
       return order.do === "hire" || order.do === "dismiss" ? hiredFleetOrder(world, order, actingNation, news) : navyOrder(world, order, actingNation, news);
     case "explore":
       return exploreOrder(world, order, actingNation, news);
+    case "quarantine":
+      return setQuarantine(world, actingNation, order.province, order.on, news);
   }
 }
 
