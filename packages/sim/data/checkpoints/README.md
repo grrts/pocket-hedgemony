@@ -1,3 +1,5 @@
+*Copied from the project files (`start-date/checkpoints/`, 19 Oct 2026) for the history check (`packages/sim/src/history.ts`, BAL-031); this copy is now the one the game reads. `packages/rules/data/domain/chronicle.json` lists their turning points for the Chronicle and must agree with them (`packages/sim/test/history.test.ts`).*
+
 # History checkpoints
 
 These are snapshots of the real world on fixed dates. A headless run from the 1378 start is compared with them to
