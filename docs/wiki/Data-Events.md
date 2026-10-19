@@ -49,7 +49,7 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 | Key | Value |
 |---|---|
 | `pool_roll_interval_months` | 1 |
-| `max_pool_events_per_country_year` | 2 |
+| `max_pool_events_per_country_year` | 3 |
 | `decision_expiry_years` | 10 |
 
 #### Alternate history mode

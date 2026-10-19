@@ -21,7 +21,7 @@
  "balance": {
   "selection": {
    "pool_roll_interval_months": 1,
-   "max_pool_events_per_country_year": 2,
+   "max_pool_events_per_country_year": 3,
    "decision_expiry_years": 10,
    "alternate_history_mode": {
     "historical": {
