@@ -8,13 +8,51 @@ The Symfony app in [`server/`](../server) serves the game's website next to its 
 | `/wiki` | The wiki: every page of [`docs/wiki`](wiki), with search |
 | `/press` | The press kit: fact sheet, a short and a long description, the screenshots and the logo and crown art as downloads |
 | `/privacy` | The privacy policy: what the server really stores (accounts and usage records) and what the site does not do; use this address in the stores |
+| `/community` | The community forum's overview: every board with its topic and post counts and latest topic, and the latest topics across boards |
+| `/community/{board}` | One board (`general`, `strategy`, `ideas`, `bugs`): its topics, newest activity first, 25 a page |
+| `/community/t/{id}-{slug}` | One topic: its posts oldest first, 20 a page, and the reply box at the bottom |
+| `/community/new` | Start a topic (signed in) |
+| `/community/p/{id}` | A link to one post; leads to its page in the topic. `/edit` and `/report` edit or report it |
+| `/community/signin`, `/community/join` | Sign in with the game account (email and password), or make one |
+| `/community/you` | The signed-in player's page: their topics, and Sign out |
+| `/community/reports` | Moderators only: reported posts |
 
 ## How the player uses it
 
-1. **Where they find it.** Every page has the plank bar with the game's name (home), **Wiki** and, once `PLAY_URL` is set, a wax **Play** button. The footer links Wiki, **Press** and **Privacy**. The landing page's main button is **Play free in your browser**; until `PLAY_URL` is set it reads **Coming soon** instead. A store button shows for each store whose address is set. The wiki's sidebar has a search box and every page, grouped as the wiki's Home page groups them (Start here, Land and economy, Armies and the seas…). Each long page has an **On this page** box with its sections.
+1. **Where they find it.** Every page has the plank bar with the game's name (home), **Wiki**, **Community**, **Sign in** (or the signed-in player's name) and, once `PLAY_URL` is set, a wax **Play** button. The footer links Wiki, **Community**, **Press** and **Privacy**. The landing page's main button is **Play free in your browser**; until `PLAY_URL` is set it reads **Coming soon** instead. A store button shows for each store whose address is set. The wiki's sidebar has a search box and every page, grouped as the wiki's Home page groups them (Start here, Land and economy, Armies and the seas…). Each long page has an **On this page** box with its sections.
 2. **How it is grouped.** The landing page has one sheet per subject (map, provinces, war, diplomacy, history), each ending in a link to its wiki page. Press and privacy are a page each. The wiki has one page per subject, the same pages as `docs/wiki`. Links between pages stay inside the site, and `/wiki/trade` or `/wiki/Home` lead to the right page.
 3. **Overview.** The landing page is the overview of the game, and the press kit's fact sheet sums it up in a table. The wiki home is the overview of the wiki: every subject with one line on what it covers.
 4. **On a phone.** One column under 900 px wide: the page list and the contents fold into tap-to-open boxes above the page, wide tables scroll sideways inside their own box, frames shrink to half size under 500 px, and nothing needs hover (heading anchors only show on hover, and are hidden on phones). On the landing page the hero, each feature and the tiles stack into one column under 900 px, the two map shots stack under 600 px, and the buttons fill the width under 500 px. Links, buttons and fields are at least 44 px tall, and the bar respects safe areas. Checked in Chromium at 1366 × 860, iPhone 13 portrait and iPhone 13 landscape, with no sideways page scroll.
+
+## The community
+
+A small forum for players, in the same parchment and wood as the wiki ([`CommunityController`](../server/src/Controller/CommunityController.php), templates in `server/templates/community/`, styles in `server/public/site/community.css`).
+
+- **Boards** are fixed in [`server/config/packages/community.yaml`](../server/config/packages/community.yaml): General, Strategy and campaign stories, Ideas and feedback, Bug reports. They are not edited on the site.
+- **Topics** have a title, an author, a board, and are locked or hidden by moderators. **Posts** are plain text: shown escaped, with their paragraphs and line breaks, and http(s) addresses become `rel="nofollow ugc noopener"` links. The first post of a topic is its opening post; editing it also edits the title.
+- **Accounts** are the game's own (`Account`): players sign in with email and password (Symfony `form_login` with a session cookie, "Stay signed in" for 30 days), or join on `/community/join` with the same rules as `POST /api/accounts` (`App\Account\Registration`). Guests read everything that is not hidden; posting needs an account. The JSON API under `/api` has its own stateless firewall and never gets a session.
+- **Authors** can edit their post for 30 minutes after sending it, and delete nothing. Anyone signed in can report a post.
+- **Moderators** (`ROLE_MODERATOR`) hide and unhide posts and topics, lock and unlock topics (they can still reply to a locked topic), and see `/community/reports`. Hidden things show to nobody else, and hiding a post closes its reports. Grant or remove the role on the server:
+
+  ```sh
+  php bin/console app:community:moderator someone@example.com
+  php bin/console app:community:moderator someone@example.com --remove
+  ```
+
+- **Safety:** every form has a CSRF token; titles are 3 to 120 characters and posts 2 to 10,000; sign-ins are throttled (5 tries per 15 minutes), and rate limits (`config/packages/community.yaml`) allow 3 sign-ups per IP address an hour, and per account 5 new topics an hour, 10 replies in 10 minutes and 10 reports an hour.
+
+### How the player uses it
+
+1. **Where they find it.** **Community** in the plank bar on every page, next to **Wiki**, then **Sign in** (or, once signed in, their name, which opens their page with Sign out). The overview has **New topic**; each board has **New topic** too, with that board chosen. On a topic, the reply box is at the bottom; guests see **Join** and **Sign in** there instead, and come back to the topic after.
+2. **How it is grouped.** Everything about the forum lives under `/community`: one board per subject, one page per topic with its replies, and a post's Edit, Report and (for moderators) Hide buttons on the post itself. A moderator's topic tools (Lock, Hide) sit under the topic's title, and reports have one page.
+3. **Overview.** `/community` shows every board at a glance (topics, posts, latest topic and who posted last) beside the latest topics across all boards. Moderators see **Reports** there with the number of reported posts waiting.
+4. **On a phone.** One column under 960 px; the plank bar wraps its links to a second row on a narrow phone, and the player's name is cut short with an ellipsis. Topic rows, buttons, page numbers and fields are at least 44 px tall, links in running text get 44 px of tap room, and nothing needs hover. In a short window (a phone on its side, or with the keyboard up) the plank bar scrolls away with the page, and the reply box shrinks so it and **Post reply** fit above the keyboard. Text fields use 22 px type, so iOS does not zoom in. Checked in Chromium at 1366 × 860, iPhone 13 portrait and iPhone 13 landscape, with no sideways page scroll.
+
+To look at it with demo players and topics (dev only; every demo password is `demo-password`, and `mod@example.com` is a moderator):
+
+```sh
+cd server && php bin/console doctrine:schema:update --force && php bin/console app:community:demo
+```
 
 ## Keeping it in step with the game
 
@@ -31,7 +69,13 @@ php -S localhost:8000 -t public   # http://localhost:8000/wiki
 php bin/phpunit
 ```
 
-The site is part of the same Symfony app as the API, so it deploys with it: point the web server's document root at `server/public/`. Settings in `server/.env.local`:
+The site is part of the same Symfony app as the API, so it deploys with it: point the web server's document root at `server/public/`. After deploying a version that changes the entities (the community added its tables and an `account.roles` column), update the database schema; there are no migrations:
+
+```sh
+php bin/console doctrine:schema:update --force
+```
+
+Sessions are files in `server/var/sessions/`, and the rate limits are kept in the app cache (`server/var/cache/`), so the web server needs to write there. Settings in `server/.env.local`:
 
 | Setting | What it does |
 |---|---|

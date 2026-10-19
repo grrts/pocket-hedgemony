@@ -1,0 +1,42 @@
+{% extends 'community/layout.html.twig' %}
+{% import 'community/_parts.html.twig' as parts %}
+
+{% block title %}New topic · Pocket Hegemony community{% endblock %}
+{% block meta %}<meta name="robots" content="noindex">{% endblock %}
+
+{% block community %}
+<section class="framed sheet narrow">
+    <p class="crumbs"><a href="{{ path('community') }}">Community</a> › New topic</p>
+    <h1>New topic</h1>
+    {{ parts.error(errors, 'form') }}
+    <form method="post" action="{{ path('community_new') }}" class="c-form">
+        <input type="hidden" name="_token" value="{{ csrf_token('community-post') }}">
+        <fieldset class="board-pick"{% if errors.board is defined %} aria-describedby="board-error"{% endif %}>
+            <legend>Board</legend>
+            {% for board in boards %}
+            <label class="board-option">
+                <input type="radio" name="board" value="{{ board.slug }}" required{% if form.board == board.slug %} checked{% endif %}>
+                <span class="board-option-box">{{ parts.icon(board.icon) }}<span>{{ board.name }}</span></span>
+            </label>
+            {% endfor %}
+        </fieldset>
+        {{ parts.error(errors, 'board') }}
+
+        <label class="field-label" for="topic-title">Title</label>
+        <input id="topic-title" type="text" name="title" value="{{ form.title }}" required minlength="{{ constant('App\\Entity\\Topic::TITLE_MIN') }}" maxlength="{{ constant('App\\Entity\\Topic::TITLE_MAX') }}" autocomplete="off"{% if errors.title is defined %} aria-invalid="true" aria-describedby="title-error"{% endif %}>
+        {{ parts.error(errors, 'title') }}
+
+        <label class="field-label" for="topic-body">Your post</label>
+        <textarea id="topic-body" name="body" rows="9" required maxlength="{{ constant('App\\Entity\\Post::BODY_MAX') }}"{% if errors.body is defined %} aria-invalid="true" aria-describedby="body-error"{% endif %}>{{ form.body }}</textarea>
+        {{ parts.error(errors, 'body') }}
+
+        <div class="form-row">
+            <p class="hint">Plain text. Links start with http:// or https://.</p>
+            <span class="form-buttons">
+                <a class="btn paper" href="{{ form.board ? path('community_board', {board: form.board}) : path('community') }}">Cancel</a>
+                <button class="btn wax" type="submit">Post topic</button>
+            </span>
+        </div>
+    </form>
+</section>
+{% endblock %}
