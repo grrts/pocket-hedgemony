@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+{% set here = app.request.attributes.get('_route') ?? '' %}
+<header class="bar"><div class="wrap bar-row">
+    <a class="brand" href="/"><img class="px" src="/site/art/icon-crown.png" width="30" height="24" alt="">Pocket Hegemony</a>
+    <nav class="bar-nav" aria-label="Site">
+        <a href="{{ path('wiki') }}"{% if here starts with 'wiki' %} aria-current="page"{% endif %}>Wiki</a>
+        {% if play_url %}<a class="btn wax" href="{{ play_url }}">Play</a>{% endif %}
+    </nav>
+</div></header>
+<main class="wrap">
+{% block content %}{% endblock %}
+</main>
+<footer class="foot"><div class="wrap foot-row">
+    <span class="brand-small">Pocket Hegemony</span>
+    <a href="{{ path('wiki') }}">Wiki</a>
+</div></footer>
+{% endblock %}

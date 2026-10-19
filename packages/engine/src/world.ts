@@ -23,6 +23,7 @@ import { createConversionState, type ConversionState } from "./conversion.ts";
 import { syncCountries } from "./statecraft.ts";
 import { createCastleFoodState, seedCastleStores, type CastleFoodState } from "./castleFood.ts";
 import { createGameEvents, type GameEvents } from "./events.ts";
+import type { EverydayState } from "./everyday.ts";
 import { createGoals, monthlyGoals, type GoalState } from "./goals.ts";
 import { createGameHeritage, type GameHeritage } from "./heritage.ts";
 import { createGovernmentState, seedGovernment, type GovernmentState } from "./government.ts";
@@ -170,6 +171,8 @@ export interface World extends LivingState, TreasuryState, FoodState, MoodState,
   explore: ExplorationState;
   /** The event tree in play (milestone 6). */
   events?: GameEvents;
+  /** Everyday events (EVT-115): made on the first month that draws one. */
+  everyday?: EverydayState;
   /** Realms' historical goals (EVT-100, goals.ts). */
   goals?: GoalState;
   /** Win scores, the end date and how the campaign ended (campaignEnd.ts). */

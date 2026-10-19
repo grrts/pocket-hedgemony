@@ -109,7 +109,7 @@ console.log(`${animFrames >= ANIM_SHARE ? "PASS" : "FAIL"} animating overlay red
 // Ending turns: each day (or battle step) of the week as it plays, the engine
 // worker's answer, then taking it in on the main thread. Turns are played
 // first to warm up and are not timed, up to and past the first 1st of a month
-// (3 turns from 11 November 1444), so the monthly steps run once before any
+// (3 turns from the start), so the monthly steps run once before any
 // day is timed: the first run of a code path in the worker is far slower than
 // every later one, and that compile is not the turn the budget is about. CI runners share their CPUs, so a single
 // stalled day can break a budget that every other day meets by far. On CI the
@@ -120,10 +120,21 @@ console.log(`${animFrames >= ANIM_SHARE ? "PASS" : "FAIL"} animating overlay red
 // the 90th percentile): two stalled days pass, while a real regression slows
 // most days and still fails. When an attempt fails, three more turns are
 // played as a fresh attempt, up to three attempts; one must meet every budget.
+// The week stops for an event or a revolution until the player answers (EVT-044,
+// REVO-091), as France's choice of pope does in October 1378: the first
+// option is taken, as a player would, and the week plays on.
 const playTurns = async (n) => {
   for (let i = 0; i < n; i++) {
     await page.click(".end-turn");
-    await page.waitForFunction(() => !document.querySelector(".end-turn").classList.contains("playing"), null, { timeout: 60000 });
+    await page.waitForFunction(
+      () => {
+        const choice = document.querySelector("[data-event-option], [data-revolution-stance]");
+        if (choice && !choice.closest("[hidden]")) choice.click();
+        return !document.querySelector(".end-turn").classList.contains("playing");
+      },
+      null,
+      { timeout: 60000, polling: 250 },
+    );
   }
 };
 await playTurns(3);
