@@ -1,0 +1,437 @@
+/*
+ * The landing page (/) and the press kit (/press), on top of site.css: the same
+ * parchment, wood, wax and pixel fonts as the game. Screenshots come from
+ * `pnpm --filter @ph/client site-shots` (shots/). Jacquard 12 is drawn at
+ * multiples of 12 px so its pixels stay square.
+ */
+
+/* ---- Pieces shared by the pages ---- */
+
+.ribbon {
+  display: inline-block;
+  max-width: 100%;
+  min-height: 48px;
+  padding: 0 4px;
+  border-style: solid;
+  border-width: 12px 32px;
+  border-image: url("art/ribbon.png") 3 8 fill / 12px 32px stretch;
+  font: 600 26px/24px var(--body);
+  letter-spacing: 0.5px;
+  color: var(--paper-light);
+  text-shadow: 2px 2px 0 var(--outline);
+  image-rendering: pixelated;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: 600 19px/1.2 var(--body);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.more {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-right: 18px;
+  font-size: 22px;
+}
+
+.more::after {
+  content: " →";
+  white-space: pre;
+}
+
+.shot {
+  margin: 0;
+}
+
+.shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 4px solid var(--outline);
+  background: var(--sea-deep);
+  box-shadow: 0 4px 0 rgb(0 0 0 / 0.35);
+}
+
+.shot figcaption {
+  margin-top: 6px;
+  font-size: 19px;
+  color: var(--ink-soft);
+}
+
+/* ---- Ways to play ---- */
+
+.cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.cta .btn {
+  padding: 0 14px;
+}
+
+.btn.play {
+  min-height: 60px;
+  font-size: 26px;
+}
+
+.soon {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 0 16px;
+  background: url("art/parchment-dark.png") 0 0 / 64px;
+  border: 3px solid var(--wood-dark);
+  font: 600 24px/1 var(--body);
+  color: var(--ink);
+  image-rendering: pixelated;
+}
+
+.stores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.btn.store {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  min-height: 56px;
+  line-height: 1;
+}
+
+.btn.store small {
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--paper);
+}
+
+/* ---- The hero, on the sea ---- */
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  align-items: center;
+  gap: 36px;
+  padding: 20px 0 44px;
+}
+
+.hero-copy {
+  min-width: 0;
+}
+
+.wordmark {
+  margin: 14px 0 10px;
+  font: 400 84px/0.95 var(--title);
+  color: var(--paper-light);
+  text-shadow: 4px 4px 0 var(--outline), 0 4px 0 var(--outline);
+}
+
+.wordmark img {
+  margin: 0 16px 10px 0;
+  vertical-align: middle;
+  filter: drop-shadow(4px 4px 0 var(--outline));
+}
+
+.pitch {
+  margin: 0 0 6px;
+  max-width: 24em;
+  font-size: 28px;
+  line-height: 1.25;
+  color: var(--paper-light);
+  text-shadow: 2px 2px 0 var(--outline);
+}
+
+.platforms {
+  margin: 0 0 20px;
+  font-size: 24px;
+  color: var(--brass-light);
+  text-shadow: 2px 2px 0 var(--outline);
+}
+
+.hero .btn.paper {
+  color: var(--ink);
+}
+
+.hero-shot img {
+  border-width: 6px;
+}
+
+/* ---- Feature sheets ---- */
+
+.feature {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  align-items: center;
+  gap: 28px;
+  margin: 0 0 32px;
+  padding: 16px 20px 20px;
+}
+
+.feature.flip .feature-copy {
+  order: 2;
+}
+
+.feature.wide {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
+.feature.wide .feature-copy p {
+  max-width: 44em;
+}
+
+.feature h2,
+.closing h2 {
+  margin: 8px 0 10px;
+  font: 400 48px/1 var(--title);
+  color: var(--ink);
+  text-shadow: 2px 2px 0 var(--paper-dark);
+}
+
+.feature p {
+  margin: 0 0 8px;
+}
+
+.feature-shots {
+  display: grid;
+  gap: 16px;
+}
+
+.feature-shots.two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* ---- How it plays ---- */
+
+.plays {
+  margin: 44px 0 36px;
+}
+
+.sea-title {
+  margin: 0 0 18px;
+  font: 400 60px/1 var(--title);
+  color: var(--paper-light);
+  text-shadow: 4px 4px 0 var(--outline);
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 18px;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  padding: 6px 14px 10px;
+}
+
+.tile h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0 6px;
+  font: 600 27px/1.1 var(--body);
+}
+
+.tile p {
+  flex: 1;
+  margin: 0 0 6px;
+  font-size: 21px;
+}
+
+/* ---- Closing call ---- */
+
+.closing {
+  margin: 0 0 12px;
+  padding: 20px 24px 26px;
+  text-align: center;
+}
+
+.closing p {
+  max-width: 36em;
+  margin: 0 auto 18px;
+}
+
+.closing .cta {
+  justify-content: center;
+}
+
+.closing .stores {
+  justify-content: center;
+}
+
+/* ---- Press kit ---- */
+
+.press-intro {
+  font-size: 26px;
+  line-height: 1.3;
+}
+
+.facts th {
+  width: 11em;
+  white-space: normal;
+}
+
+.downloads {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  margin: 12px 0 24px;
+  padding: 0;
+  list-style: none;
+}
+
+.downloads li {
+  margin: 0;
+  max-width: none;
+}
+
+.downloads a {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 44px;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.downloads a:hover .dl-name {
+  color: var(--cloth);
+}
+
+.downloads img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 3px solid var(--outline);
+  background: var(--sea-deep);
+}
+
+.downloads .art img {
+  aspect-ratio: 16 / 7;
+  object-fit: contain;
+  padding: 12px;
+  image-rendering: pixelated;
+}
+
+.dl-name {
+  font-size: 21px;
+  color: var(--link);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  overflow-wrap: anywhere;
+}
+
+.dl-meta {
+  font-size: 18px;
+  color: var(--ink-soft);
+}
+
+/* ---- Narrow windows and phones ---- */
+
+@media (max-width: 899px) {
+  .hero,
+  .feature {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hero {
+    gap: 24px;
+    padding-bottom: 32px;
+  }
+
+  .feature.flip .feature-copy {
+    order: 0;
+  }
+
+  .wordmark {
+    font-size: 72px;
+  }
+}
+
+@media (max-width: 600px) {
+  .feature-shots.two {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Phones held sideways are short: keep the hero to the point. */
+@media (max-height: 500px) and (orientation: landscape) {
+  .hero {
+    padding-top: 8px;
+  }
+
+  .wordmark {
+    margin-top: 8px;
+    font-size: 60px;
+  }
+}
+
+@media (max-width: 500px) {
+  .ribbon {
+    min-height: 32px;
+    border-width: 6px 16px;
+    border-image-width: 6px 16px;
+    font-size: 21px;
+    line-height: 20px;
+  }
+
+  .wordmark {
+    font-size: 60px;
+  }
+
+  .wordmark img {
+    width: 40px;
+    height: 32px;
+  }
+
+  .pitch {
+    font-size: 25px;
+  }
+
+  .feature {
+    padding: 8px 10px 14px;
+    gap: 16px;
+  }
+
+  .feature h2,
+  .closing h2 {
+    font-size: 36px;
+  }
+
+  .sea-title {
+    font-size: 48px;
+  }
+
+  .closing {
+    padding: 12px 10px 18px;
+  }
+
+  .cta,
+  .stores {
+    width: 100%;
+  }
+
+  .cta .btn,
+  .soon {
+    flex: 1 1 100%;
+  }
+
+  .shot img {
+    border-width: 3px;
+  }
+}

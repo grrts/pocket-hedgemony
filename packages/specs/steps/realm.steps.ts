@@ -2693,6 +2693,7 @@ When("a year passes", (s) => {
   const w = s.game as GW;
   w.date.year++;
   w.date.month = 1;
+  G.yearlyPeople(w, []);
   G.yearlyCrowns(w, []);
 });
 Then(/^(?:he|she) is (\d+)$/, (s, age: string) => {
@@ -2709,7 +2710,7 @@ Then("an old ruler may die", (s) => {
   old.age = 90;
   for (let y = 0; y < 40 && w.rulers[n]!.name === old.name && w.rulers[n]!.age >= 90; y++) {
     w.date.year++;
-    G.yearlyCrowns(w, []);
+    G.yearlyPeople(w, []);
   }
   expect(w.rulers[n]!.age < 90 || w.rulers[n]!.name !== old.name).toBe(true);
   expect(w.rulers[n]!.years).toBe(0);

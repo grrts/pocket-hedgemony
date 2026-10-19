@@ -60,7 +60,6 @@ SLEEPING = {
     "kongo": (1390, "Lukeni lua Nimi takes the Mbanza Kongo area with Mbata's alliance (traditional date).", None),
     "mutapa": (1430, "Mutota moves north from Great Zimbabwe and conquers the Dande (traditional).", [31.0, -16.5]),
     "torwa": (1420, "Khami rises in the south-west as Great Zimbabwe fades (c.1400-1450, disputed).", None),
-    "ajuran": (1420, "An inland Shabelle power; it holds Mogadishu's hinterland only in the 15th century (low confidence).", None),
     "kaffa": (1390, "The Minjo dynasty founds Kaffa among the Gonga chiefdoms (traditional).", None),
     "air_agadez": (1405, "The Aïr confederations found a sultanate; its seat moves to Agadez c.1430.", None),
     "timbuktu_tuareg": (1433, "Akil's Tuareg take Timbuktu from a weakened Mali.", None),
@@ -78,19 +77,27 @@ SLEEPING = {
     "coosa": (1400, "The Coosa paramountcy at Little Egypt forms after Etowah's fall (c.1400-1500, disputed).", None),
     "cherokee": (1600, "The Cherokee coalesce as a nation long after 1444; Mississippian chiefdoms hold the land (decision 6).", None),
     "creek": (1600, "The Creek Confederacy coalesces long after 1444; Mississippian chiefdoms hold the land (decision 6).", None),
+    # The Yucatec kuchkabalob wake when Mayapan falls, c.1441 (decision 2). They are not 1444 map nations; Maní takes the map id maya (ids.json).
+    "maya_mani_xiu": (1441, "The Xiu lead the revolt that destroys Mayapan and rule Maní; the map id maya passes to them.", [-89.39, 20.39]),
+    "maya_sotuta_cocom": (1441, "The surviving Cocom make Sotuta their domain after Mayapan falls.", [-89.01, 20.6]),
+    "maya_cupul": (1441, "The Cupul lords rule from Saci (Valladolid) after Mayapan falls.", [-88.2, 20.69]),
+    "maya_ecab": (1441, "Ecab on the north-east coast stands alone after Mayapan falls; its tie to the League is uncertain.", [-87.3, 21.4]),
+    "maya_chetumal": (1441, "Chetumal on the bay stands alone after Mayapan falls; its tie to the League is uncertain.", [-88.3, 18.5]),
+    "maya_ah_canul": (1441, "The Canul, the League's mercenary lineage, settle the Campeche coast after Mayapan falls.", [-90.05, 20.37]),
 }
-SLEEPING_NAMES = {"adal": "Adal Sultanate", "kongo": "Kingdom of Kongo", "mutapa": "Mutapa", "torwa": "Torwa", "ajuran": "Ajuran", "kaffa": "Kaffa",
+SLEEPING_NAMES = {"adal": "Adal Sultanate", "kongo": "Kingdom of Kongo", "mutapa": "Mutapa", "torwa": "Torwa", "kaffa": "Kaffa",
                   "air_agadez": "Aïr Sultanate", "timbuktu_tuareg": "Tuareg of the Niger bend", "massina_fulbe": "Fulbe of Masina",
                   "canarian_lordship": "Lordship of the Canary Islands", "bougie": "Bougie", "debdou": "Debdou", "hintata_marrakesh": "Hintata of Marrakesh",
                   "loango": "Loango", "buganda": "Buganda", "ankole": "Ankole", "karagwe": "Karagwe", "rwanda": "Rwanda", "mandara": "Mandara",
-                  "coosa": "Coosa", "cherokee": "Cherokee", "creek": "Creek"}
+                  "coosa": "Coosa", "cherokee": "Cherokee", "creek": "Creek",
+                  "maya_mani_xiu": "Maní (Xiu)", "maya_sotuta_cocom": "Sotuta (Cocom)", "maya_cupul": "Cupul", "maya_ecab": "Ecab",
+                  "maya_chetumal": "Chetumal", "maya_ah_canul": "Ah Canul"}
 # Where each sleeping realm wakes, as owner rules (the merge step resolves them to provinces).
 SLEEPING_HOME = {
     "adal": [{"countries": ["DJI", "SOL", "ETH"], "bbox": [41, 8, 46, 12.5]}],
     "kongo": [{"countries": ["AGO", "COD", "COG"], "bbox": [12, -8.5, 16, -4]}],
     "mutapa": [{"countries": ["ZWE"], "bbox": [29, -18.5, 33, -15.5]}],
     "torwa": [{"countries": ["ZWE"], "bbox": [26, -22.5, 29.8, -18]}],
-    "ajuran": [{"countries": ["SOM"], "bbox": [41, -1.7, 44.5, 6]}],
     "kaffa": [{"countries": ["ETH"], "bbox": [35.5, 5.7, 36.5, 6.7]}],
     "air_agadez": [{"countries": ["NER"], "bbox": [5.5, 16.5, 9.5, 21]}],
     "timbuktu_tuareg": [{"countries": ["MLI"], "bbox": [-2.5, 16.7, -1.5, 17.7]}],
@@ -108,9 +115,16 @@ SLEEPING_HOME = {
     "coosa": [{"countries": ["USA"], "admin1": ["Georgia"], "bbox": [-85.6, 33.5, -83.5, 35]}],
     "cherokee": [{"countries": ["USA"], "admin1": ["Tennessee", "North Carolina"], "bbox": [-86, 34.5, -82, 36.7]}],
     "creek": [{"countries": ["USA"], "admin1": ["Alabama", "Georgia"]}],
+    "maya_mani_xiu": [{"countries": ["MEX"], "admin1": ["Yucatán"], "bbox": [-90, 19.9, -89.2, 20.6]}],
+    "maya_sotuta_cocom": [{"countries": ["MEX"], "admin1": ["Yucatán"], "bbox": [-89.2, 20.4, -88.6, 21]}],
+    "maya_cupul": [{"countries": ["MEX"], "admin1": ["Yucatán"], "bbox": [-88.6, 20.4, -87.6, 21.3]}],
+    "maya_ecab": [{"countries": ["MEX"], "admin1": ["Quintana Roo"], "bbox": [-87.6, 20.4, -86.7, 21.7]}],
+    "maya_chetumal": [{"countries": ["MEX", "BLZ"], "bbox": [-89, 17.8, -87.5, 19.5]}],
+    "maya_ah_canul": [{"countries": ["MEX"], "admin1": ["Campeche", "Yucatán"], "bbox": [-90.6, 19.8, -89.6, 21]}],
 }
 SLEEPING_COLORS = ["#a05a2c", "#6b8e23", "#8b4513", "#b8860b", "#2e8b57", "#9a6b3c", "#c2b280", "#5f7f9f", "#7c5c8c", "#a0522d", "#4f7942",
-                   "#8f6f3f", "#6a5acd", "#b07c4f", "#3f6f6f", "#9c7a3c", "#7f8f5f", "#a76f5f", "#5c7c4c", "#8a7a5a", "#c47a3a", "#6f8faf"]
+                   "#8f6f3f", "#6a5acd", "#b07c4f", "#3f6f6f", "#9c7a3c", "#7f8f5f", "#a76f5f", "#5c7c4c", "#8a7a5a", "#c47a3a", "#6f8faf",
+                   "#9b5d4a", "#4c7a6a", "#b5895a", "#6a7d3a", "#7d6aa0", "#a8644a"]
 
 # Changes to map nations that stay: new names, capitals, armies and commanders on the start day.
 # Armies are provisional, like the 1444 ones (REALM-196).
@@ -147,6 +161,8 @@ CHANGED = {
     "huron": {"note": "Ancestral Wendat villages on the north shore of Lake Ontario; the confederacy comes c.1440."},
     "oodham": {"name": "Hohokam platform-mound towns", "note": "The Classic Hohokam order of the Civano phase still stands; it collapses c.1450."},
     "great_zimbabwe": {"grows": False, "capitalFrom": "Great Zimbabwe", "note": "The plateau state near its height (decision 3); the gold goes to the coast through Kilwa's Sofala."},
+    "ajuran": {"capital": [45.2, 4.74], "capitalFrom": "the middle Shabelle (no seat is known in 1378; map point at Beledweyne in Hiiraan)",
+               "note": "An inland clan power on the Shabelle, dated only by tradition (low confidence); it keeps the southern Somali interior but not Mogadishu (decision 3)."},
     "mogadishu": {"grows": False, "capitalFrom": "Mogadishu", "note": "City sultanate on the Benadir coast, sultan unknown (decision 3)."},
 }
 
@@ -190,6 +206,7 @@ OWNERS = [
     {"nation": "ifat", "countries": ["ETH"], "bbox": [39.6, 9.4, 41, 11]},
     {"nation": "ethiopia", "countries": ["ETH", "ERI"], "bbox": [35, 6, 41, 16]},
     {"nation": "mogadishu", "countries": ["SOM"], "bbox": [44.6, 1.6, 46.2, 3.2]},
+    {"nation": "ajuran", "countries": ["SOM"], "bbox": [41, -1.7, 48, 6]},
     {"nation": "kilwa", "countries": ["TZA", "KEN"], "bbox": [38.5, -10.5, 41, -4]},
     {"nation": "great_zimbabwe", "countries": ["ZWE"]},
     # Mesoamerica: the Tepanecs hold the Basin; the Mexica only their island city.
@@ -401,6 +418,7 @@ rel("rival", "inuit_thule", "dene", None, "uncertain", "Projected back.")
 rel("rival", "inuit_thule", "innu_cree", None, "uncertain", "Projected back.")
 
 FACTS = [
+    ("trade_agreement", "ajuran", "mogadishu", None, "uncertain", "Shabelle produce reaches the port, if the Ajuran exist in 1378; not vassalage."),
     ("trade_agreement", "hafsid", "genoa", "13th c.", "confirmed", "Trade treaties renewed through the period."),
     ("trade_agreement", "hafsid", "venice", "13th c.", "confirmed", "Venetian trade at Tunis."),
     ("trade_agreement", "hafsid", "aragon", "13th c.", "probable", "Trade alongside corsair rivalry."),
@@ -502,7 +520,7 @@ assert len(towns) == len(port_names), port_names - {t["name"] for t in towns}
 
 sleeping = []
 for k, (i, (year, why, capital)) in enumerate(SLEEPING.items()):
-    n = by_id[i]
+    n = by_id.get(i, {})
     sleeping.append({"id": i, "name": SLEEPING_NAMES[i], "color": n.get("color") or SLEEPING_COLORS[k], "capital": capital or n["capital"],
                      "home": SLEEPING_HOME[i], "tree": [i], "forms_about": year, "why": why})
 
