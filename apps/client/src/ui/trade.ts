@@ -108,12 +108,6 @@ export function tradeTab(v: TradeView, s: Snapshot, name: (p: number) => string)
     ${busiest}`;
 }
 
-/** The General tab's line, opening the Trade tab (TRADE-144). */
-export function tradeLine(v: TradeView): string {
-  const bad = v.traders.some((t) => t.problem);
-  return `<dt>Trade</dt><dd><button class="paper${bad ? " over" : ""}" data-realm-open-tab="trade" title="Open the Trade tab">${icon("coin", 1)}${plural(v.traders.length, "trader")} <small>${signed(v.net)} gold a month</small></button></dd>`;
-}
-
 /** The province card's Trade line (TRADE-143): value, ratio, traders passing and top goods; "not seen" where the player can't see. */
 export function provinceTradeLine(s: Snapshot, p: number): string {
   if (!s.provinceTradeSeen[p]) return `<dt>Trade</dt><dd><small>not seen</small></dd>`;

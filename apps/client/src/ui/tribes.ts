@@ -1,5 +1,5 @@
 import type { TribesView } from "@ph/engine";
-import { askButton, claimButton, colonyNote, generalLine, groundLine, groundRow, leaveButton, rangeHeader, settlersRow, takeInButton, HUNT_KEY, type ButtonView } from "@ph/engine/domain/tribes";
+import { askButton, claimButton, colonyNote, groundLine, groundRow, leaveButton, rangeHeader, settlersRow, takeInButton, HUNT_KEY, type ButtonView } from "@ph/engine/domain/tribes";
 import { icon } from "../art/ui.ts";
 
 /**
@@ -74,13 +74,6 @@ function leaveHtml(p: number, ui: TribesUi): string {
     <p>${esc(b.confirm!)}</p>
     <div class="choices"><button class="wax" data-hunt-leave-yes="${p}">Leave it</button><button class="paper" data-hunt-leave-no>Keep it</button></div>
   </div>`;
-}
-
-/** TRIBE-027: the General tab's one line, which opens the Hunting grounds tab. */
-export function huntGeneralLine(m: Mine | null): string {
-  if (!m) return "";
-  const l = generalLine(m.held, m.size, m.fursPerMonth);
-  return `<dt>Range</dt><dd><button class="paper" data-realm-open-tab="${l.opens}">${icon("map", 1)}${esc(l.text)}</button></dd>`;
 }
 
 /** Another tribe's General tab: its grounds count (TRIBE-027). */

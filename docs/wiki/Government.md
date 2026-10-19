@@ -195,7 +195,7 @@ Open your realm (tap its name in the top bar) and choose the **Government** tab,
 - **Laws of the realm**: succession, how far your colonies may reach, and how many subjects you can hold against your reach.
 - **Reform**: a card for each form you can become, with the change in officials and lords, each need ✓ or ✗, the gold (the design's gold × 0.2, so 100 is 20) and the lords who will slip. Tap Reform, then confirm. Forms that come only by revolution, event or a condition say so. Needs for buildings, traders, families and alliances can't be met yet; inventions and province, lord and subject counts can.
 
-The General tab shows one line with your form and both caps, red when you are over, that opens the tab. Other realms' cards show their form. AI realms reform each January when they meet the needs with twice the gold.
+The Government page sits in your Realm book's Realm section, beside the Overview. Other realms' cards show their form. AI realms reform each January when they meet the needs with twice the gold.
 
 ## How it connects
 

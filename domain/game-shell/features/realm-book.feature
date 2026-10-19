@@ -51,6 +51,47 @@ Feature: Realm book
     Then each page of the Realm book sits in exactly one section
     And the page "Food" sits in the section "Economy"
 
+  @SHELL-170
+  Scenario: The overview has a tile per section
+    Given the realm stands as:
+      | gold      | 1200 |
+      | perMonth  | 5.5  |
+      | provinces | 12   |
+      | people    | 1800000 |
+      | armies    | 3    |
+      | men       | 14000 |
+      | fleets    | 1    |
+      | allies    | 2    |
+      | study     | Plough, 40 |
+    When the player opens the Realm book's Overview
+    Then the overview tiles are "Economy, Lands, Military, Diplomacy, Research"
+    And the tile "Economy" reads "1,200 gold · +5.5 a month" with the note "All provinces fed"
+    And the tile "Lands" reads "12 provinces" with the note "1,800,000 people"
+    And the tile "Military" reads "3 armies · 14,000 men" with the note "1 fleet"
+    And the tile "Diplomacy" reads "At peace" with the note "2 allies"
+    And the tile "Research" reads "Plough · 40 %" with the note "Studying"
+    And no tile is marked
+
+  @SHELL-171
+  Scenario Outline: A tile names what waits and opens it
+    Given the realm stands as:
+      | <what> | <count> |
+    When the player opens the Realm book's Overview
+    Then the tile "<tile>" is marked "<needs>"
+    And tapping the tile "<tile>" opens the page "<page>"
+
+    Examples:
+      | what        | count | tile      | needs                         | page            |
+      | hungry      | 2     | Economy   | 2 provinces hungry            | Food            |
+      | perMonth    | -3    | Economy   | Losing gold each month        | Treasury        |
+      | newLands    | 1     | Lands     | 1 new land to fill            | Officials       |
+      | verdicts    | 2     | Lands     | 2 beaten risings to judge     | Provinces       |
+      | risings     | 1     | Lands     | 1 uprising                    | Provinces       |
+      | huntWaits   | 1     | Lands     | Settlers wait on your grounds | Hunting grounds |
+      | answerWaits | 1     | Diplomacy | An answer waits               | Diplomacy       |
+      | study       | none  | Research  | Choose what to study          | Research        |
+      | beliefLow   | 1     | Research  | Faith or language low         | Peoples         |
+
   @SHELL-062
   Scenario: Show on map and back to the same place
     Given the Realm book is open on the tab "Military" scrolled to the army "Armée de Dunois"

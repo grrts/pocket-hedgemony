@@ -149,12 +149,12 @@ export function castleFoodSettings(s: Snapshot, p: number): string {
     </section>`;
 }
 
-/** The General tab's Food line: hungry and low counts, opening the Food tab. */
-export function foodLine(s: Snapshot, held: number[]): string {
-  const hungry = held.filter((p) => s.provinceFoodMonths[p]! < 1).length;
-  const low = held.filter((p) => s.provinceFoodMonths[p]! >= 1 && s.provinceFoodMonths[p]! < 3).length;
-  const text = hungry || low ? `${hungry ? `<b>${hungry} hungry</b>` : ""}${hungry && low ? ", " : ""}${low ? `${low} running low` : ""}` : "All provinces fed";
-  return `<dt>Food</dt><dd><button class="paper" data-realm-open-tab="food" title="Open the Food tab">${icon("castle", 1)}${text}</button></dd>`;
+/** Provinces with less than a month of food, and those with less than three. */
+export function foodCounts(s: Snapshot, held: number[]): { hungry: number; low: number } {
+  return {
+    hungry: held.filter((p) => s.provinceFoodMonths[p]! < 1).length,
+    low: held.filter((p) => s.provinceFoodMonths[p]! >= 1 && s.provinceFoodMonths[p]! < 3).length,
+  };
 }
 
 /** The castle line of a province's overview: its castle store, or the castle that feeds it, or none in reach. */

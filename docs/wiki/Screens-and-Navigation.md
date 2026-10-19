@@ -106,6 +106,8 @@ Your own realm's card is the Realm book. Tap your banner or a plaque in the top 
 | Diplomacy | Diplomacy | Who are my friends and foes? |
 | Research | Research, Peoples | What do we study and believe? |
 
+**The Overview** (Realm's first page) is the whole realm on one screen: your capital, then one tile for each other section with its key line (gold and gold a month, provinces and people, armies and men, war or peace, what you study), then your ruler and heir, the score and Stability's four pillars. A tile with a red edge says what waits on you ("2 provinces hungry", "1 new land to fill", "An answer waits", "Choose what to study"), and tapping it opens the page that holds it. What the old General tab repeated from other pages (government form, faiths and languages, lands by ground, heritage, the fallen, neighbours) now lives only on its own page.
+
 The six sections are one row of icons with their names under the card's title, in every shape; a section with several pages shows them in a second, lower row. Tapping a section opens the page you last looked at there. A red seal on Diplomacy means an offer or an envoy waits for your answer. Turn reports and battle replays live in the News (the scroll button in the top bar), which took the place of the old Chronicle. Another realm's card keeps its own tabs: General, Diplomacy, Trade, Army and Heritage. Show on map (on a screen that points at an army or province) closes the book, moves the camera and opens that card; Back returns to the book on the same tab and scroll position. A book screen opened from a card (Levy from a province card) stacks on the card, and Back returns to the card.
 
 ### The game menu

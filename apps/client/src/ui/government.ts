@@ -103,8 +103,3 @@ export function governmentTab(v: GovernmentView, revo?: RevolutionView | null): 
     ${v.next.length ? `<p class="hint">A reform changes the form for good: it costs gold, and some lords dislike it.</p><div class="next-forms">${v.next.map((x) => nextCard(v, x)).join("")}</div>` : `<p class="hint">This form has no next form.</p>`}`;
 }
 
-/** The General tab's line: form and both caps, opening the Government tab. */
-export function governmentLine(v: GovernmentView): string {
-  const over = v.officials.used > v.officials.cap.total || v.lords.used > v.lords.cap.total;
-  return `<dt>Government</dt><dd><button class="paper${over ? " over" : ""}" data-realm-open-tab="government" title="Open the Government tab">${icon("crown", 1)}${esc(v.form)} <small>officials ${v.officials.used}/${v.officials.cap.total} · lords ${v.lords.used}/${v.lords.cap.total}</small></button></dd>`;
-}
