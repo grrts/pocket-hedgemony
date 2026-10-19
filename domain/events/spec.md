@@ -576,7 +576,7 @@ toward, and whether each is on course, bent or gone (plan-1378 §4.6).
   first. [plan-1378 §4.6]
 
 #### How the player uses it: the Chronicle and realms' aims
-- EVT-097 Where: the News (SHELL-147) has a third tab, **History**, beside *Everything* and *Your realm*: the
+- EVT-097 Where: the News (SHELL-147) has a third tab, **History**, beside *All* (was *Everything*) and *Your realm*, in one row: the
   Chronicle card. Its first line counts the turning points ahead by state ("On course 9 · Bent 2 · Gone 1"), so
   history's course reads at a glance; under it *Ahead*, soonest first, then *Happened*, newest first. Each row is
   one 44-point line with the turning point's name, its history year, and its state as a word with an icon (never

@@ -159,6 +159,17 @@ The event data is checked offline before it ships. The build splits it into runt
 
 The build checks that every id exists, every condition and effect type is declared, every event has its roles, two to four options with one historical, that narrative-only events pay no perpetrator, that there are no mandatory prerequisite cycles, impossible triggers or jointly required exclusive pairs, that entities exist at the event's date, that flags read are set or declared, and that ages and periods have start and end conditions. It also reports coverage: any region with fewer than 2 events in an age that lists it, and an agency share (initiator, beneficiary and resister slots over all slots in a region) below 0.35. An error fails the build; warnings do not. The current result is 0 errors and 21 warnings; the anachronism warnings are corrected when a historian checks the sources before release.
 
+### Realms' historical goals
+
+History is a guide, not a script. Realms follow its normal course because each one pursues the goals it really had, for the reasons it had them: the Ottomans want the Balkans for their frontier lords, Florence wants Pisa because it needs a port. Each goal has a window of years, a weight (weak, normal or strong) and an aim the game can read: **take** some places, **hold** some places, make a realm a **subject**, **ally** with a realm, **fight** a realm, or **free** itself from an overlord. Goals about faith, trade or a succession are shown but not weighed.
+
+- **A goal ends with its reason.** A take goal ends once its realm holds every place it names, a hold goal once one of them is lost, an ally goal once the two are allied, and any goal once its target or its realm is gone. A goal pulls from five years before its window and fades over ten years after it.
+- **The AI weighs goals like any other wish.** A goal makes its realm look for a war more often, pick the realm holding its places as the target, and ask for those places first; an ally or subject goal sends envoys toward its target. A goal never lets a war past its price: a weak realm does not march however much it wants to.
+- **Every campaign differs.** At the start the seed shakes every goal: its weight varies by half either way, and a share of goals goes another way (10 % on Historical, 25 % on Plausible, 50 % on Free), taking the plausible alternative where there is one and dropping out where there is none. Historical also weighs goals ×1.5 and Free ×0.5.
+- **You are never steered.** Your realm's goals weigh nothing you do.
+
+The 1378 scenario holds about 760 goals, written region by region from the start-date research. The 1444 start has none.
+
 ### Hooks for other systems
 
 An event can carry a music tag (good event, bad event, major event, crisis, revolution) that moves the soundtrack. Events marked tutorial only never fire in a real campaign.
@@ -168,7 +179,8 @@ An event can carry a music tag (good event, bad event, major event, crisis, revo
 - **The event card.** A fired event opens as a modal card with its options. Events open one at a time, queued in date order.
 - **End turn waits for you.** Unanswered events block End turn until you choose.
 - **The "Events" choice** (Historical, Plausible or Free) is offered among the new game options.
-- **The chronicle** records events that were invalidated.
+- **The Chronicle.** The News has a **History** tab. Its first line counts the turning points ahead: on course, bent or gone. Under it, *Ahead* lists the turning points of history due within 25 years, soonest first, each with its history year. Tap one to see who is heading there: each realm with its goal and why it wants it. *Happened* lists those that happened, with the year and whether it was as in history (within ten years), early or late. A turning point is **bent** when it is more than ten years overdue, or when every realm heading there went another way; it is **gone** when it can no longer happen. At the foot, the closed fold *History's plan for your realm* holds your own realm's goals as hints, if you want them.
+- **Aims on a realm's card.** Another realm's General tab has an **Aims** fold with its live goals, each with its reason and its years.
 - **The end of the campaign** shows the final scores; there is no separate wrap-up event.
 
 ## How it connects

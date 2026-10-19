@@ -62,6 +62,8 @@ import { provinceWorks } from "./ui/works.ts";
 import { provinceLand } from "./ui/land.ts";
 import { castleFoodLine, castleFoodSettings, foodCounts, foodTab } from "./ui/food.ts";
 import { bindFolds } from "./ui/fold.ts";
+import { aimsFoldHtml, chronicleHtml, type ChronicleUi } from "./ui/chronicle.ts";
+import { startGoals, type GoalDef } from "@ph/rules";
 import { commanderPortrait, officialCard, officialOf, officialScreen, officialsTab, paintSiege, postScreen, siegeView, type SiegeInfo } from "./ui/people.ts";
 import { governanceCard, LOYALTY_ORDER, lordScreen, lordsTab, type LordLands, type LordView, type ProvinceRow } from "./ui/lords.ts";
 import { loadMapImage, type MapImage } from "./map/loadMap.ts";
@@ -250,6 +252,8 @@ const DISPATCHES_KEPT = 400;
 let unread = 0;
 /** The log shows only what concerns the player's realm. */
 let dispatchesMine = false;
+/** The News shows the Chronicle (EVT-097). */
+let newsHistory = false;
 /** Peace offers the player put off until next week (Later). */
 const putOffOffers = new Set<number>();
 /** Peace offers waiting for an answer and not put off. */
@@ -2872,6 +2876,8 @@ const monthText = (iso: string) => {
   const [y, m] = iso.split("-").map(Number);
   return `${m ? MONTHS[m - 1] + " " : ""}${y}`;
 };
+/** What the Chronicle and the Aims fold need from the shell (EVT-097, EVT-098). */
+const chronicleUi = (): ChronicleUi => ({ realm: (n) => realmButton(n), esc, me: snapshot?.playerNation ?? -1 });
 const realmButton = (n: number, tab?: "diplomacy") => `<button class="realm-link" data-realm="${n}"${tab ? ` data-realm-open="${tab}"` : ""}>${pennant(nations[n]!)}<b>${esc(nations[n]!.name)}</b></button>`;
 
 /** What the hunting grounds pieces need of the client (ui/tribes.ts). */
@@ -3428,8 +3434,8 @@ function renderNews(): void {
   }
   panel.innerHTML = `
     <header><h2 class="ribbon">News</h2>${closeButton()}</header>
-    <nav class="tabs"><button class="tab${dispatchesMine ? "" : " on"}" data-news-mine="0">Everything</button><button class="tab${dispatchesMine ? " on" : ""}" data-news-mine="1">Your realm</button></nav>
-    ${s.events.length || asksOf(s).length || s.peaceOffers.length || s.calls.length || shogunateAsks(s.shogunate) ? `<h3 class="sub">Waiting for you</h3>` : ""}
+    <nav class="tabs"><button class="tab${dispatchesMine || newsHistory ? "" : " on"}" data-news-mine="0">All</button><button class="tab${dispatchesMine && !newsHistory ? " on" : ""}" data-news-mine="1">Your realm</button><button class="tab${newsHistory ? " on" : ""}" data-news-history>History</button></nav>
+    ${newsHistory ? chronicleHtml(s.history.chronicle, s.history.goals, chronicleUi(), goalDefs) : `${s.events.length || asksOf(s).length || s.peaceOffers.length || s.calls.length || shogunateAsks(s.shogunate) ? `<h3 class="sub">Waiting for you</h3>` : ""}
     ${waitingEventsHtml(s.events)}
     ${asksHtml()}
     ${s.peaceOffers.map(offerHtml).join("")}
@@ -3457,8 +3463,13 @@ function renderNews(): void {
           .join("")}</ul>`,
       )
       .join("")}
-    ${days.length ? "" : `<p class="hint">Nothing of note yet.</p>`}`;
+    ${days.length ? "" : `<p class="hint">Nothing of note yet.</p>`}`}`;
   bindClose();
+  bindFolds(panel);
+  panel.querySelector<HTMLButtonElement>("[data-news-history]")?.addEventListener("click", () => {
+    newsHistory = true;
+    renderNews();
+  });
   showPanel(true);
   bindOffers();
   panel.querySelectorAll<HTMLButtonElement>("[data-event-open]").forEach((b) => b.addEventListener("click", openEventCard));
@@ -3471,6 +3482,7 @@ function renderNews(): void {
   panel.querySelectorAll<HTMLButtonElement>("[data-news-mine]").forEach((b) =>
     b.addEventListener("click", () => {
       dispatchesMine = b.dataset.newsMine === "1";
+      newsHistory = false;
       renderNews();
     }),
   );
@@ -5708,6 +5720,7 @@ function renderRealm(r: number): void {
       <dt>Lands</dt><dd>${topLands.map(([t, c]) => `${t} ${c}`).join(" · ")}</dd>
       ${heritageLine(strengths, s?.heritage[r] ?? null)}
     </dl>
+    ${s && !mine ? aimsFoldHtml(r, s.history.goals, chronicleUi(), goalDefs) : ""}
     ${neighbours.size ? `<h3 class="sub">Neighbours</h3><div class="nations">${[...neighbours]
       .map((j) => `<button class="paper nation" data-realm="${j}">${pennant(nations[j]!)}${esc(nations[j]!.name)}</button>`)
       .join("")}</div>` : ""}
@@ -6189,6 +6202,17 @@ function bindNationButtons(): void {
   panel.querySelectorAll<HTMLButtonElement>("[data-nation]").forEach((b) => b.addEventListener("click", () => void startGame(b.dataset.nation!)));
 }
 
+/** ?goals=<JSON list of goals> gives realms goals of the caller's own, to try the Chronicle and the Aims fold (EVT-097, EVT-098). */
+const goalsParam = (): GoalDef[] | undefined => {
+  const raw = new URLSearchParams(location.search).get("goals");
+  try {
+    return raw ? (JSON.parse(raw) as GoalDef[]) : undefined;
+  } catch {
+    return undefined;
+  }
+};
+const goalDefs: readonly GoalDef[] = goalsParam() ?? startGoals;
+
 /** ?end=YYYY-MM-DD brings the end date near, to try the end card (SHELL-164). */
 const endDateParam = (): { endDate?: string } => {
   const end = new URLSearchParams(location.search).get("end");
@@ -6298,7 +6322,7 @@ async function startGame(nation: string): Promise<void> {
   showLoading(`Gathering the court of ${name}…`, 0.15);
   await painted();
   loadingStage(`Mustering the armies of ${name}…`, 0.6);
-  const snap = await engine.send({ type: "newGame", seed: Date.now() >>> 0, playerNation: nation, ...(mapImage ? { map: mapTiles(mapImage) } : {}), ...endDateParam() });
+  const snap = await engine.send({ type: "newGame", seed: Date.now() >>> 0, playerNation: nation, ...(mapImage ? { map: mapTiles(mapImage) } : {}), ...endDateParam(), ...(goalsParam() ? { goals: goalsParam()! } : {}) });
   mapSent = true;
   // One new game is one campaign (SAVE-012).
   campaign = newCampaign(new Rng(Date.now() >>> 0), { playerNation: nation, nationName: name });

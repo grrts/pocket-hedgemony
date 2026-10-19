@@ -35,6 +35,8 @@ export interface ChronicleRow {
   happened?: { year: number; timing: "as in history" | "early" | "late" };
   /** Realms whose live goals lead toward it, each with the goal (an index into the scenario's goals). */
   heading: { realm: number; goal: number }[];
+  /** Why a bent one is bent: overdue, or the goals that led there went another way. */
+  bent?: "overdue" | "goals gone";
 }
 
 export interface ChronicleView {
@@ -96,7 +98,7 @@ export function chronicleView(world: World): ChronicleView {
     const near = hist <= year + C.horizon_years && (state !== "on_course" ? hist >= year - C.horizon_years : true);
     if (!near) continue;
     view.counts[state]++;
-    view.ahead.push({ key: t.key, name: t.name, year: hist, state, heading });
+    view.ahead.push({ key: t.key, name: t.name, year: hist, state, heading, ...(state === "bent" ? { bent: year > hist + C.on_course_years ? "overdue" : "goals gone" } : {}) });
   }
   view.ahead.sort((a, b) => a.year - b.year);
   view.happened.sort((a, b) => b.happened!.year - a.happened!.year || b.year - a.year);

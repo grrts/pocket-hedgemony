@@ -6752,3 +6752,64 @@ button.realm-link.hunt-line {
   min-height: 44px;
   margin-left: 4px;
 }
+
+/* The Chronicle (EVT-097): turning points ahead and happened, and realms' aims (EVT-098). */
+.chron-counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin: 6px 0 2px;
+  font-weight: 600;
+}
+.chron-row {
+  margin: 6px 0;
+  border: 2px solid var(--outline);
+  background: var(--paper-light);
+}
+div.chron-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 8px;
+  min-height: 44px;
+  padding: 2px 8px;
+}
+.chron-row small {
+  color: var(--ink-soft);
+}
+.chron-mark {
+  display: inline-block;
+  width: 1.2em;
+  color: var(--ink);
+}
+.chron-row.bent .chron-mark {
+  color: var(--wood);
+}
+.chron-row.gone {
+  background: var(--paper);
+}
+.chron-row.gone .chron-mark,
+.chron-row.gone b {
+  color: var(--ink-soft);
+}
+.chron-heading,
+.aims {
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.chron-heading li,
+.aims li {
+  min-height: 44px;
+  padding: 4px 0;
+  border-top: 1px solid var(--outline);
+}
+.chron-heading .why,
+.aims .why {
+  display: block;
+  color: var(--ink-soft);
+}
+.aims li small {
+  display: block;
+  color: var(--ink-soft);
+}

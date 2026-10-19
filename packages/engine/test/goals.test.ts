@@ -132,10 +132,10 @@ describe("the Chronicle (EVT-094 to EVT-096)", () => {
   it("bends one long overdue, or whose goals have all gone", () => {
     const w = withGoals([goal({})]);
     w.goals!.list[0]!.shaken = "dropped";
-    expect(row(w, "fall_of_constantinople")!.state).toBe("bent");
+    expect(row(w, "fall_of_constantinople")).toMatchObject({ state: "bent", bent: "goals gone" });
     const late = withGoals([]);
     late.date.year = 1470;
-    expect(row(late, "fall_of_constantinople")!.state).toBe("bent");
+    expect(row(late, "fall_of_constantinople")).toMatchObject({ state: "bent", bent: "overdue" });
   });
 
   it("marks one that can no longer happen as gone", () => {

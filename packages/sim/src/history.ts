@@ -153,14 +153,14 @@ export function historyReport(results: readonly HistoryResult[]): string {
   const dates = [...new Set(results.flatMap((r) => r.checkpoints.map((c) => c.date)))].sort();
   if (!dates.length) lines.push("No run reached a checkpoint: play more years.", "");
   else {
-    lines.push("| Checkpoint | Key places | Needed | Realms that exist | Great powers | Turning points | Mark |", "|---|---|---|---|---|---|---|");
+    lines.push("| Checkpoint | Key places (needed) | Realms · great powers | Turning points | Mark |", "|---|---|---|---|---|");
     for (const date of dates) {
       const cs = results.flatMap((r) => r.checkpoints.filter((c) => c.date === date));
       const avg = (f: (c: CheckpointResult) => number) => cs.reduce((t, c) => t + f(c), 0) / cs.length;
       const c0 = cs[0]!;
       const within = cs.filter((c) => c.within).length;
       lines.push(
-        `| ${date} ${c0.label} | ${pct(avg((c) => c.keyPlaces.share))} | ${c0.tolerance === null ? "all" : pct(c0.tolerance)} | ${avg((c) => c.realms.exist).toFixed(0)} of ${c0.realms.listed} | ${avg((c) => c.greatPowers.among).toFixed(1)} of ${c0.greatPowers.of} | ${avg((c) => c.turningPoints.happened).toFixed(1)} of ${c0.turningPoints.held} | ${within === cs.length ? "within history" : within ? `${within} of ${cs.length} within` : "apart"} |`,
+        `| ${date.slice(0, 4)} ${c0.label} | ${pct(avg((c) => c.keyPlaces.share))} (${c0.tolerance === null ? "all" : pct(c0.tolerance)}) | ${avg((c) => c.realms.exist).toFixed(0)} of ${c0.realms.listed} · ${avg((c) => c.greatPowers.among).toFixed(1)} of ${c0.greatPowers.of} | ${avg((c) => c.turningPoints.happened).toFixed(1)} of ${c0.turningPoints.held} | ${within === cs.length ? "within history" : within ? `${within} of ${cs.length} within` : "apart"} |`,
       );
     }
     lines.push("");
