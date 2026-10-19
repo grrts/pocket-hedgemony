@@ -219,9 +219,22 @@ export function declareWar(world: World, a: number, b: number, news: News[], o: 
 const AIM_ORDER = ["take_land", "seat_pretender", "break_subject", "free_people", "defend_faith", "punish", "tribute"];
 
 /** The aim a declaration of a on b takes when none is named: the best fitting aim a holds, else "no aim". */
-export function defaultAim(world: World, a: number, b: number): { aim: string; province?: string } | undefined {
+export function defaultAim(world: World, a: number, b: number): { aim: string; province?: string; source?: string } | undefined {
   const held = dip.warAimsOf(world.diplomacy, world.nationIds[a]!, world.nationIds[b]!);
   return AIM_ORDER.map((k) => held.find((h) => h.aim === k)).find((h) => h) ?? held.find((h) => h.aim === "no_aim");
+}
+
+/**
+ * The aim a declaration of a on b with none named is made with (WAR-229): the
+ * best fitting aim a holds, else "no aim"; a regency falls back to no aim for
+ * an aim it may not use, as declareWithAim does. The declare sheet names it,
+ * and the price of war reads "no aim" from it.
+ */
+export function declaringAim(world: World, a: number, b: number): { aim: string; province?: string; source?: string } {
+  const held = defaultAim(world, a, b);
+  if (!held || held.aim === "no_aim") return { aim: "no_aim" };
+  if (dip.country(world.diplomacy, world.nationIds[a]!).regency && !dip.config.war_aims.regency_allows.includes(held.aim)) return { aim: "no_aim" };
+  return held;
 }
 
 /** A regency may fight only some wars: an aim it may not use falls back to no aim. */

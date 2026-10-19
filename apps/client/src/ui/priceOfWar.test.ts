@@ -15,6 +15,7 @@ const price = (over: Partial<PriceOfWar> = {}): PriceOfWar => ({
   friends: [],
   threatened: [3, 4],
   waveringLords: 3,
+  aim: { aim: "no_aim" },
   noAim: true,
   truce: null,
   monthlyPay: 12.4,
@@ -73,7 +74,7 @@ describe("the declare sheet's Price of war (WAR-229, WAR-232)", () => {
   });
 
   it("puts Confirm at the foot, breaking the truce when one holds, with the censure and the name abroad link above it", () => {
-    const base = { target: 1, name, titles, income: 20, me: 0, censure: '<div class="censure-warn">x</div>', nameAbroad: { notoriety: 30, word: "Watched", landsTaken: 2, threshold: 8, leagues: [] } as NameAbroadView };
+    const base = { target: 1, name, provinceName: () => "Champagne", titles, income: 20, me: 0, censure: '<div class="censure-warn">x</div>', nameAbroad: { notoriety: 30, word: "Watched", landsTaken: 2, threshold: 8, leagues: [] } as NameAbroadView };
     const plain = declareSheetHtml({ ...base, price: price() });
     expect(plain).toContain('data-declare-confirm="1"');
     expect(plain).not.toContain("data-break-truce");
@@ -83,6 +84,26 @@ describe("the declare sheet's Price of war (WAR-229, WAR-232)", () => {
     const truce = declareSheetHtml({ ...base, price: price({ truce: { until: null } }) });
     expect(truce).toContain('data-break-truce="1"');
     expect(truce).toContain("Break the truce and declare war");
+  });
+
+  it("names the aim the war will be declared with, or No aim as a hurt when none is held", () => {
+    const base = { target: 1, name, provinceName: () => "Champagne", titles, income: 20, me: 0, censure: "", nameAbroad: null };
+    const none = declareSheetHtml({ ...base, price: price() });
+    expect(none).toContain('<span class="what">Aim</span><span class="value">No aim</span>');
+    expect(none).toMatch(/pow-line hurt"><summary><span class="hurt-mark"[^>]*>!<\/span><span class="what">Aim/);
+    const held = declareSheetHtml({ ...base, price: price({ aim: { aim: "take_land", province: 7, source: "held within 50 years" }, noAim: false }) });
+    expect(held).toContain('<span class="what">Aim</span><span class="value">Take land: Champagne</span>');
+    expect(held).toContain("You hold it because: held within 50 years.");
+    expect(held).not.toMatch(/pow-line hurt"><summary><span class="hurt-mark"[^>]*>!<\/span><span class="what">Aim/);
+    const punish = declareSheetHtml({ ...base, price: price({ aim: { aim: "punish", source: "refused hand_over_province" }, noAim: false }) });
+    expect(punish).toContain('<span class="value">Punish</span>');
+    expect(punish).toContain("refused hand over province");
+  });
+
+  it("leaves out the neighbours alarmed and the wavering lords when a fitting aim is held", () => {
+    const h = priceOfWarHtml(price({ aim: { aim: "take_land", province: 7 }, noAim: false }), { name, titles, income: 20 });
+    expect(h).not.toContain("Threatened us");
+    expect(h).not.toContain("will waver");
   });
 });
 

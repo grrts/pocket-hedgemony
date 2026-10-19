@@ -5840,6 +5840,7 @@ function renderDeclareSheet(r: number): void {
       target: r,
       price,
       name: (n) => nations[n]!.name,
+      provinceName: (p) => provinces[p]!.name,
       titles: titlesOf(me),
       income: s.nationMonthlyIncome[me]!,
       nameAbroad: s.statecraft?.nameAbroad ?? null,
