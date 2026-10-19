@@ -60,7 +60,7 @@ import { declareSheetHtml, nameAbroadHtml, warCardHtml, warPlaqueBars } from "./
 import { closeUpPoint, firstShown, jumpTarget, learningTab, newLearningUi, nodeAt, realmLearningLine, startStanding, studyNow } from "./ui/learning.ts";
 import { provinceWorks } from "./ui/works.ts";
 import { provinceLand } from "./ui/land.ts";
-import { castleFoodLine, castleFoodSettings, foodCounts, foodTab } from "./ui/food.ts";
+import { castleFoodLine, castleFoodSettings, foodCounts, foodTab, landShare as landShareOf } from "./ui/food.ts";
 import { bindFolds } from "./ui/fold.ts";
 import { aimsFoldHtml, chronicleHtml, type ChronicleUi } from "./ui/chronicle.ts";
 import { startGoals, type GoalDef } from "@ph/rules";
@@ -113,7 +113,7 @@ import { detailBands, EFFECTS, holderOf, momentParticles, moments, momentSeconds
 import { ParticleField } from "./map/particles.ts";
 import { TownLayer, townInfo } from "./map/towns.ts";
 import { bedUnderCamera, musicFacts, newFactMemory, playerPalette, playerWars, remember, type FactMemory } from "./audio/facts.ts";
-import { COMMISSION_GOLD, commissionSkills, hireGold, OFFICIALS, Rng, startFormOf } from "@ph/engine";
+import { COMMISSION_GOLD, commissionSkills, FOOD_BALANCE, hireGold, OFFICIALS, Rng, startFormOf } from "@ph/engine";
 import { formName } from "@ph/engine/domain/government";
 import { PICKER_REGIONS, pickerRegions, startTrade, waysToGrow } from "@ph/engine/domain/scenario-setup";
 import { pickerCardHtml, regionListHtml, regionSelectHtml, strongIn, strongInWords, waysToGrowHtml } from "./ui/realmPicker.ts";
@@ -4428,7 +4428,15 @@ function foodFacts(pi: number): string {
     men += s.armies.men[k]!;
   });
   const people = s.provincePeople[pi]! * 1000;
+  // What the land feeds in a normal year (D-PROV-36): people keep having children, so a short province shrinks until the player builds.
+  const share = landShare(pi);
+  const fixable = s.provinceOwner[pi] === s.playerNation && s.provinceLord[pi]! < 0 && share < FOOD_BALANCE.tight;
+  const shortWord = share < FOOD_BALANCE.short ? " · <b>short: it shrinks</b>" : share < FOOD_BALANCE.tight ? " · tight: a poor harvest starves it" : "";
+  const land = fixable
+    ? `<button class="paper" data-tab="land" title="Open the Land tab">${icon("hammer", 1)}${Math.round(share * 100)} % of its people${shortWord} · ${esc(foodFix(pi))}</button>`
+    : `${Math.round(share * 100)} % of its people in a normal year${shortWord}`;
   return `<dt>Food</dt><dd>${months.toFixed(1)} months stored${warn}</dd>
+      <dt>Land feeds</dt><dd>${land}</dd>
       <dt>Harvest</dt><dd>${harvestText(pi)}</dd>
       ${men > 0 && people > 0 ? `<dt>Armies</dt><dd>${fmt(men)} men here eat ${(eaten / people).toFixed(1)} months of this store a month</dd>` : ""}
       ${castleFoodLine(s, pi, (p) => provinces[p]!.name)}
@@ -4716,9 +4724,7 @@ function plagueRow(p: number): string {
 
 /** The share of its people a province's land feeds in a normal year (its Land tab's first line). */
 function landShare(p: number): number {
-  const tiles = snapshot?.landSheets[p] ?? [];
-  const people = snapshot?.provincePeople[p] ?? 0;
-  return people > 0 ? tiles.reduce((a, t) => a + t.feeds, 0) / people : 1;
+  return snapshot ? landShareOf(snapshot, p) : 1;
 }
 
 /** What would feed a short province, as its Land tab offers it: a farm, a better farm, clearing woods, or bringing food in. */
@@ -5968,7 +5974,7 @@ function renderRealm(r: number): void {
     : realmTab === "peoples" && peoples ? peoplesTab(peoples) + headCardHtml(s?.faithHeads?.card ?? null, (n) => nations[n]!.name, true)
     : realmTab === "treasury" ? treasurySection()
     : realmTab === "trade" && mine && s?.trade ? tradeTab(s.trade, s, (p) => provinces[p]!.name)
-    : realmTab === "food" ? foodTab(s!, (p) => provinces[p]!.name, (p) => (mapImage ? provinceThumb(mapImage, provinces.length, p, n.color) : ""), own)
+    : realmTab === "food" ? foodTab(s!, (p) => provinces[p]!.name, (p) => (mapImage ? provinceThumb(mapImage, provinces.length, p, n.color) : ""), own, foodFix)
     : realmTab === "trade" ? realmTradeTab(r, own, wealth, mine)
     : realmTab === "military" ? (mine ? warRoomSection() : realmArmyTab(r, armies.length, men))
     : realmTab === "navy" ? navyTab(s!.navy, r, { name: (p) => provinces[p]!.name, admiralName: titled, realmName: (n) => nations[n]!.name, forHire: s!.fleetsForHire.length })

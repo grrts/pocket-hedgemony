@@ -9,7 +9,7 @@ Keys are written as in the config. Shares are fractions (0.25 is 25 %). A value 
 | [Core values](Data-Defines) | 321 | `defines.json` |  |
 | [Time and turns](Data-Time-and-Turns) | 373 | `domain/time-and-turns.json` | [Time and Turns](Time-and-Turns) |
 | [Realm](Data-Realm) | 888 | `domain/realm.json` | [Your Realm](Your-Realm) |
-| [Province](Data-Province) | 921 | `domain/province.json` | [Provinces](Provinces) |
+| [Province](Data-Province) | 920 | `domain/province.json` | [Provinces](Provinces) |
 | [Buildings](Data-Buildings) | 1503 | `domain/buildings.json` | [Buildings](Buildings) |
 | [Trade](Data-Trade) | 311 | `domain/trade.json` | [Trade](Trade) |
 | [Research](Data-Research) | 2138 | `domain/research.json` | [Research](Research) |
