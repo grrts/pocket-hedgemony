@@ -401,6 +401,7 @@
   },
   "event_vassalize_type": {
    "vassal": "vassal",
+   "personal_union": "union",
    "tributary": "tributary",
    "colony": "colony",
    "protectorate": "protectorate",

@@ -1,0 +1,34 @@
+{% extends 'site/layout.html.twig' %}
+
+{% block content %}
+<div class="wiki">
+    <aside class="wiki-side">
+        <form class="search" action="{{ path('wiki_search') }}" method="get" role="search">
+            <label class="visually-hidden" for="wiki-q">Search the wiki</label>
+            <input id="wiki-q" type="search" name="q" value="{{ q ?? '' }}" placeholder="Search the wiki" maxlength="100">
+            <button class="btn" type="submit"><img class="px" src="/site/art/icon-scroll.png" width="20" height="22" alt="">Search</button>
+        </form>
+        <details class="framed pages" data-open-wide>
+            <summary>All pages</summary>
+            <nav aria-label="Wiki pages">
+                <a class="pages-home{% if slug is defined and slug == 'Home' %} on{% endif %}" href="{{ path('wiki') }}">Wiki home</a>
+                {% for group in nav %}
+                <h2>{{ group.title }}</h2>
+                <ul>
+                    {% for p in group.pages %}
+                    <li><a href="{{ path('wiki_page', {slug: p.slug}) }}"{% if slug is defined and slug == p.slug %} class="on" aria-current="page"{% endif %}>{{ p.title }}</a></li>
+                    {% endfor %}
+                </ul>
+                {% endfor %}
+            </nav>
+        </details>
+    </aside>
+    <div class="wiki-main">
+        {% block wiki %}{% endblock %}
+    </div>
+</div>
+<script>
+// The page list stands open beside the page on a wide screen, and folds away on a phone.
+if (matchMedia('(min-width: 900px)').matches) document.querySelectorAll('[data-open-wide]').forEach(d => d.open = true);
+</script>
+{% endblock %}

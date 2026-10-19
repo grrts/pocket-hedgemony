@@ -1,0 +1,9 @@
+twig:
+    file_name_pattern: '*.twig'
+    globals:
+        # The playable game's address; the site's Play buttons are hidden while it is empty.
+        play_url: '%env(PLAY_URL)%'
+
+when@test:
+    twig:
+        strict_variables: true

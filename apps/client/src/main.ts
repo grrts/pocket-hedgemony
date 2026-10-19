@@ -3180,6 +3180,8 @@ function renderEventCard(): void {
     eventFolded = true;
     renderEventCard();
     renderActions();
+    // An everyday event about a province shows it (EVT-121).
+    if (card.province !== undefined) goToProvince(card.province, true);
   });
   eventCard.querySelectorAll<HTMLButtonElement>("[data-event-option]").forEach((b) =>
     b.addEventListener("click", async () => {
@@ -6799,6 +6801,7 @@ function startMoreHtml(): string {
     ${tutorialFinished() ? `<button class="paper" data-start="tutorial">Tutorial</button>` : ""}
     <a class="paper-link" href="./style.html">Art test page</a>
     <p class="start-credits"><b>Pocket Hegemony</b> ${esc(GAME_VERSION)}. Made by Leroy with Claude.</p>
+    <p class="start-credits">Music played on the Fluid R3 GM soundfont by Frank Wen (CC BY 3.0).</p>
   </div>`;
 }
 

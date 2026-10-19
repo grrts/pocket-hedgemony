@@ -83,7 +83,7 @@ function drawTraits(rng: Rng): string[] {
 }
 
 /** A child born to the ruler: a daughter only where daughters may inherit the crown (REALM-107). */
-function child(world: World, n: number, age: number): Heir {
+export function child(world: World, n: number, age: number): Heir {
   const daughters = (realmConfig.daughters_inherit_crown as string[]).includes(world.nationIds[n]!);
   const sex = daughters && world.rulerRng.next() < R.daughter_heir ? "f" : "m";
   return { name: givenName(world, n), age, sex, relation: "child" };
