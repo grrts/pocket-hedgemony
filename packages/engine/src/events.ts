@@ -46,6 +46,8 @@ const PLACES: Record<string, string[]> = Object.assign({}, bridge.places, ...BRI
 /** Statistics the game reads live; an event's change to one is kept as an adjustment on top. */
 const ADJUSTED = new Set(["legitimacy", "stability", "tech_state", "tech_economy", "tech_military"]);
 const TECH = ["tech_state", "tech_economy", "tech_military"] as const;
+/** Derived statistics the tree still holds at its own start value until a realm context gives them (D-EVT-17). */
+const HELD = new Set(Object.keys(bridge.start.country).filter((k) => evt.isDerived(k)));
 /** Tree innovations and the research inventions that bring them (D-EVT-19). */
 const INNOVATIONS = Object.entries(rules.innovations_from_research).filter(([k]) => k !== "$comment") as [string, string][];
 
@@ -127,6 +129,7 @@ export function createGameEvents(world: World): GameEvents {
   const state = evt.newState(tree, { events: evt.campaignEvents(data.events), ages: data.ages, periods: data.periods });
   pastBridgeEvents(state, world.date.year, world.date.month);
   state.conditions = {};
+  state.effects = { stat: treeStat };
   leanByTraits(world, state, nationOf);
   evt.startCampaign(state, world.date.year);
   const knownAtStart = world.nationIds.map((_, n) => world.research[n]?.known.size ?? 0);
@@ -222,6 +225,34 @@ function leanByTraits(world: World, state: evt.EventState, nationOf: Map<string,
     return n === undefined ? 1 : traitLean(world, n, o.effects);
   };
 }
+
+/**
+ * A stat change as the tree lands it in the game (EVT-054, EVT-073): a derived
+ * statistic the tree still holds at its start value (naval reach, navy,
+ * military quality) takes the change on that reading, where later events read
+ * it; any other derived one is the game's own reading, so the change is told
+ * but not written. Everything else goes to the tree's own `stat` effect.
+ */
+const treeStat: evt.EffectEval = (p, w, ctx, out) => {
+  for (const [stat, change] of Object.entries(p.changes as Record<string, number | string>)) {
+    if (evt.routedTo(stat) || !evt.isDerived(stat)) {
+      evt.EFFECTS.stat!({ ...p, changes: { [stat]: change } }, w, ctx, out);
+      continue;
+    }
+    for (const t of evt.resolve(p.on, ctx)) {
+      const stats = HELD.has(stat) ? w.countries[t]?.stats : undefined;
+      if (!stats) {
+        out.push({ type: "stat", target: t, values: { stat, change, derived: true } });
+        continue;
+      }
+      const before = Number(stats[stat] ?? 0);
+      const range = evt.statRange(stat);
+      const after = evt.changeStat(before, change);
+      stats[stat] = range ? Math.min(range[1], Math.max(range[0], after)) : after;
+      out.push({ type: "stat", target: t, values: { stat, change, before, after: stats[stat] } });
+    }
+  }
+};
 
 /** A tree statistic, with legitimacy and stability read from the realm (D-EVT-4, D-EVT-17). */
 function statOf(world: World, g: GameEvents, id: string, stat: string): number | string | undefined {
@@ -549,7 +580,7 @@ function landEffect(world: World, g: GameEvents, e: evt.DomainEvent, news: News[
       return;
     }
     case "stat": {
-      if (n === undefined || v.routed) return;
+      if (n === undefined || v.routed || v.derived) return;
       const stat = String(v.stat);
       const delta = Number(v.after) - Number(v.before);
       const gold = typeof v.change === "number" ? v.change * world.rules.defines.works.goldScale : delta;

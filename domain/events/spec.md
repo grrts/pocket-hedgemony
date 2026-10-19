@@ -418,7 +418,9 @@ a bridge shows it the game as the tree's own world, and lands what the game alre
   the place to the realm, an `annex` hands it all of the target's land, a `treasury` or `debt` change moves the
   realm's gold or debt (a `%` change of what it holds, a number at the game's gold scale), and a change to
   legitimacy or stability is kept on top of the realm's own reading. Every other effect stays in the tree's world,
-  where later events read it. [EVT-045, EVT-056; D-EVT-17]
+  where later events read it. A change to a derived statistic the tree still holds at its start value (naval
+  reach, navy, military quality; D-EVT-17) lands on that reading; a change to any other derived statistic is not
+  written (EVT-054) and never stops the game. [EVT-045, EVT-054, EVT-056; D-EVT-17]
 - EVT-074 When an event fires for a realm or the AI answers one, the News shall say so ("Fall of
   Constantinople: Ottomans chooses “Imperial capital”"); a major event is told to every realm, any other to the
   realms in it and those close to them. [EVT-066; game-shell SHELL-082]

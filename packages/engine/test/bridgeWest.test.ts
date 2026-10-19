@@ -152,4 +152,30 @@ describe("bridge events of the West, 1378 to 1444 (EVT-085 to EVT-089)", () => {
     applyEventEffects(w, [{ rebels: { on: "england", type: "peasant", size: "medium" } }], []);
     expect(w.rebelSparks.map((s) => s.province)).toEqual([mine[0]]);
   });
+
+  it("Madeira and Cape Bojador raise Portugal's naval reach without stopping the game (EVT-054, EVT-073)", () => {
+    const w = from1378();
+    const tree = () => w.events!.state.world.countries.portugal!.stats;
+    expect(tree().naval_reach).toBe(10);
+    applyEventEffects(w, bridgeEvents.madeira_and_azores!.options[0]!.effects.immediate!, [], { navigator: ["portugal"] });
+    applyEventEffects(w, bridgeEvents.cape_bojador!.options[0]!.effects.immediate!, [], { navigator: ["portugal"] });
+    expect(tree().naval_reach).toBe(18);
+    expect(eventConditionHolds(w, { stat: { who: "portugal", stat: "naval_reach", op: ">=", value: 15 } })).toBe(true);
+  });
+
+  it("no stat change in the game's events stops the game (EVT-054, EVT-073)", () => {
+    const w = from1378();
+    const all = { ...(campaign.events as unknown as Record<string, evt.EventDef>), ...bridgeEvents };
+    const stats = new Set<string>();
+    for (const ev of Object.values(all))
+      for (const tiers of [ev.effects, ...ev.options.map((o) => o.effects)])
+        for (const list of Object.values(tiers ?? {}))
+          for (const e of (list as evt.Effect[]) ?? []) if (typeof e.stat === "object") for (const k of Object.keys(e.stat as object)) stats.add(k);
+    expect(stats.has("naval_reach")).toBe(true);
+    expect(stats.has("income")).toBe(true);
+    const before = { ...w.events!.state.world.countries.portugal!.stats };
+    for (const stat of stats) expect(() => applyEventEffects(w, [{ on: "portugal", stat: { [stat]: 1 } }], []), stat).not.toThrow();
+    // A derived statistic the game reads from the realm is not written (EVT-054).
+    expect(w.events!.state.world.countries.portugal!.stats.income).toBe(before.income);
+  });
 });
