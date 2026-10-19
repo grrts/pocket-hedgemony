@@ -13,10 +13,10 @@ Feature: Births, deaths and famine
 
     Examples:
       | class        | births | deaths |
-      | farmers      | 4.0 %  | 3.0 %  |
-      | herders      | 4.0 %  | 3.0 %  |
-      | woodsmen     | 4.0 %  | 3.0 %  |
-      | seafolk      | 4.0 %  | 3.0 %  |
+      | farmers      | 3.6 %  | 3.0 %  |
+      | herders      | 3.6 %  | 3.0 %  |
+      | woodsmen     | 3.6 %  | 3.0 %  |
+      | seafolk      | 3.6 %  | 3.0 %  |
       | miners       | 3.5 %  | 4.0 %  |
       | craftsmen    | 3.0 %  | 3.5 %  |
       | market folk  | 3.0 %  | 3.5 %  |
@@ -25,26 +25,24 @@ Feature: Births, deaths and famine
       | homeless     | 4.0 %  | 5.0 %  |
 
   @PROV-100 @PROV-297 @placeholder
-  Scenario: Troyes grows by 720 a year with no modifiers
+  Scenario: Troyes grows by 432 a year with no modifiers
     Given the province "Troyes" has 72,000 farmers and no birth or death modifiers
     When a year of monthly births and deaths passes
-    Then 2,880 are born and 2,160 die
-    And the province "Troyes" grows by 720 people
+    Then 2,592 are born and 2,160 die
+    And the province "Troyes" grows by 432 people
 
   @PROV-101 @PROV-297 @placeholder
   Scenario Outline: Birth modifiers are percentage points
+    # Births do not follow food (Leroy, 19 Oct; D-PROV-36)
     Given the province "Troyes" <condition>
     When the game works out the province's stats
     Then the yearly birth rate of its farmers is <rate>
 
     Examples:
       | condition                                   | rate  |
-      | has more than 6 months of food in store     | 4.5 % |
-      | has had 10 years of peace                   | 4.5 % |
-      | has less than 3 months of food in store     | 3.0 % |
-      | is short of food with the "Hungry" grievance | 2.0 % |
-      | has war in the province                     | 3.0 % |
-      | has plague                                  | 3.0 % |
+      | has had 10 years of peace                   | 4.1 % |
+      | has war in the province                     | 2.6 % |
+      | has plague                                  | 2.6 % |
 
   @PROV-102 @placeholder
   Scenario Outline: Death modifiers
