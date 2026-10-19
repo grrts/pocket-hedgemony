@@ -1311,12 +1311,32 @@
      "level": 4
     },
     {
+     "id": "general-dies",
+     "text": "General dies",
+     "level": 3
+    },
+    {
+     "id": "options-2",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "admiral-dies",
+     "text": "Admiral dies",
+     "level": 3
+    },
+    {
+     "id": "options-3",
+     "text": "Options",
+     "level": 4
+    },
+    {
      "id": "lord-slighted",
      "text": "Lord slighted",
      "level": 3
     },
     {
-     "id": "options-2",
+     "id": "options-4",
      "text": "Options",
      "level": 4
     },
@@ -1326,7 +1346,7 @@
      "level": 3
     },
     {
-     "id": "options-3",
+     "id": "options-5",
      "text": "Options",
      "level": 4
     },
@@ -1336,7 +1356,7 @@
      "level": 3
     },
     {
-     "id": "options-4",
+     "id": "options-6",
      "text": "Options",
      "level": 4
     },
@@ -1346,7 +1366,7 @@
      "level": 3
     },
     {
-     "id": "options-5",
+     "id": "options-7",
      "text": "Options",
      "level": 4
     },
@@ -1356,7 +1376,7 @@
      "level": 3
     },
     {
-     "id": "options-6",
+     "id": "options-8",
      "text": "Options",
      "level": 4
     },
@@ -1366,7 +1386,7 @@
      "level": 3
     },
     {
-     "id": "options-7",
+     "id": "options-9",
      "text": "Options",
      "level": 4
     },
@@ -1376,7 +1396,7 @@
      "level": 3
     },
     {
-     "id": "options-8",
+     "id": "options-10",
      "text": "Options",
      "level": 4
     },
@@ -1386,7 +1406,7 @@
      "level": 3
     },
     {
-     "id": "options-9",
+     "id": "options-11",
      "text": "Options",
      "level": 4
     },
@@ -1396,7 +1416,7 @@
      "level": 3
     },
     {
-     "id": "options-10",
+     "id": "options-12",
      "text": "Options",
      "level": 4
     },
@@ -1406,7 +1426,7 @@
      "level": 3
     },
     {
-     "id": "options-11",
+     "id": "options-13",
      "text": "Options",
      "level": 4
     }

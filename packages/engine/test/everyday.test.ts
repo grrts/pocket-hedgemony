@@ -197,4 +197,61 @@ describe("everyday events (EVT-115 to EVT-128)", () => {
     expect(answerEveryday(w, w.player, next.event, "close", [])).toBeNull();
     expect(w.provinceQuarantine[mine[2]!]).toBe(1);
   });
+
+  it("a general's death: his second may keep the men in the field, or they go home (EVT-132)", () => {
+    const w = france();
+    const n = w.player;
+    w.nationTreasury[n] = 1000;
+    const a = w.armies;
+    let i = -1;
+    for (let k = 0; k < a.count && i < 0; k++) if (a.alive[k] && a.owner[k] === n && a.commander[k]! >= 0 && a.battle[k]! < 0) i = k;
+    const lordLand = [...w.provinceLord.keys()].find((p) => w.provinceOwner[p] === n && w.provinceLord[p]! >= 0)!;
+    a.location[i] = lordLand;
+    a.tile[i] = w.tiles.centre[lordLand]!;
+    const news: News[] = [];
+    personDies(w, { kind: "commander", c: a.commander[i]! }, "old age", news);
+    // The men are on their way home (RECR-135) and a card asks about them.
+    expect(a.retreating[i]).toBe(1);
+    const card = everydayCards(w, n)[0]!;
+    expect(card.text).toMatch(/your general, has died at .*His second in command, .*, asks to lead them/);
+    expect(card.options.map((o) => o.id)).toEqual(["second", "home"]);
+    expect(card.options[0]!.effects).toEqual(["You: gold −15", expect.stringMatching(/leads them: Might [1-3], Cunning [1-3], Logistics [1-3]/)]);
+    expect(answerEveryday(w, n, card.event, "second", news)).toBeNull();
+    const c = a.commander[i]!;
+    expect(c).toBeGreaterThanOrEqual(0);
+    expect(w.commanderOwner[c]).toBe(n);
+    expect(a.retreating[i]).toBe(0);
+    expect(a.route[i]).toEqual([]);
+    expect(a.location[i]).toBe(lordLand);
+  });
+
+  it("a general's second is not offered once another commander has taken the men (EVT-132)", () => {
+    const w = france();
+    const n = w.player;
+    const a = w.armies;
+    let i = -1;
+    for (let k = 0; k < a.count && i < 0; k++) if (a.alive[k] && a.owner[k] === n && a.commander[k]! >= 0 && a.battle[k]! < 0) i = k;
+    personDies(w, { kind: "commander", c: a.commander[i]! }, "old age", []);
+    a.commander[i] = 0;
+    const card = everydayCards(w, n)[0]!;
+    expect(card.options.map((o) => o.id)).toEqual(["home"]);
+  });
+
+  it("an admiral's death: his flag captain may keep the fleet at sea (EVT-132)", () => {
+    const w = createWorld(rules, 1, tiles);
+    const n = w.nationIndex.get("venice")!;
+    w.player = n;
+    w.nationTreasury[n] = 1000;
+    const f = w.navy.fleets.find((x) => x.owner === n && x.ships.length)!;
+    const post = w.provinceOfficial.findIndex((o, q) => o >= 0 && w.provinceOwner[q] === n && w.provinceLord[q]! < 0);
+    expect(processTurn(w, [{ type: "commission", province: post, sea: true }], n).rejectedOrders).toEqual([]);
+    const c = w.commanderIds.length - 1;
+    f.admiral = c;
+    personDies(w, { kind: "commander", c }, "at sea", []);
+    const card = everydayCards(w, n)[0]!;
+    expect(card.text).toMatch(/your admiral, has died/);
+    expect(answerEveryday(w, n, card.event, "second", [])).toBeNull();
+    expect(f.admiral).toBeGreaterThan(c);
+    expect(f.fleeing).toBe(false);
+  });
 });

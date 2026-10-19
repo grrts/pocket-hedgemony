@@ -62,12 +62,13 @@ Deaths, child kings and the Emperor come from the game itself: an event that nee
 
 ### Everyday events
 
-Between the great events, your own realm asks for small choices. About every three to six months (two or three times a year) something happens to your officials, lords, family or stores, and an event card asks what you will do. No new one comes while another card waits for your answer, so they never pile up. Officials and lords die of their age, in battle or by an event, never by a roll of their own here: when one of yours dies, his card comes in place of the next one.
+Between the great events, your own realm asks for small choices. About every three to six months (two or three times a year) something happens to your officials, lords, family or stores, and an event card asks what you will do. No new one comes while another card waits for your answer, so they never pile up. Officials, lords and commanders die of their age, in battle or by an event, never by a roll of their own here: when one of yours dies, his card comes in place of the next one.
 
 | What happens | Your choices |
 |---|---|
 | An official of a royal province dies, of old age, in battle or in an event | His seat stands empty. Raise his deputy (free, starts at half the post's effect), send for a seasoned man (25 gold, keeps the full effect), or give the post to a lord's kinsman (starts at half, that lord grows more loyal). If you fill the post first, your answer leaves it as it is |
 | A lord dies and his heir takes his lands | Confirm the heir (as loyal as his father), ask a fee for the lands (gold, the heir less loyal), or take the lands for the crown (they become royal land, your other lords grow less loyal). A lord whose line dies out brings no card: his lands come back to the crown |
+| A general or admiral of yours dies, and his men or ships are not in a battle | They head home without him (see [Recruiting](Recruiting)), and his second in command or flag captain, with his skills on the card, asks to lead them instead. Give him the command (15 gold: he leads them where they are, and they take orders again) or let them go home. If someone else takes them up first, only going home is offered |
 | A lord feels slighted at court | Send him a gift (gold), give him an office (another lord grows jealous), or let him sulk (he grows less loyal) |
 | A lord speaks well of you | Reward him (gold, he grows more loyal) or thank him |
 | Two lords quarrel over a mill | Judge for one (he grows more loyal, the other less), or fine them both (gold, both less loyal) |

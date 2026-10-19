@@ -1,5 +1,5 @@
 {
-  "$comment": "Everyday events (domain/events/spec.md §5.22, EVT-115 to EVT-128; feedback 152). Small choices about the realm's own people and stores, drawn from what the game already holds: its officials, lords, ruler and heir, and food stores, plague reaching a province of the player's (EVT-130: not drawn; plague fires it), and the death of one of the player's officials or lords (EVT-122, EVT-123: not drawn; the death of people fires it). Each realm draws one every `months_between` months (a range), never while the player has an event waiting. `weight` is how often an event is drawn among the ones that can happen; `needs` names what it is about. Options list their effects in the engine's small vocabulary (gold, loyalty, official, lands, heir, heir_risk, food_back, new_lord, quarantine, care); `ai` weights the AI's pick; `needs` on an option hides it when the realm lacks what it asks. `{words}` in braces are filled with the names of who and where. Every number is a placeholder for balance.",
+  "$comment": "Everyday events (domain/events/spec.md §5.22, EVT-115 to EVT-128; feedback 152). Small choices about the realm's own people and stores, drawn from what the game already holds: its officials, lords, ruler and heir, and food stores, plague reaching a province of the player's (EVT-130: not drawn; plague fires it), and the death of one of the player's officials, lords, generals or admirals (EVT-122, EVT-123, EVT-132: not drawn; the death of people fires it). Each realm draws one every `months_between` months (a range), never while the player has an event waiting. `weight` is how often an event is drawn among the ones that can happen; `needs` names what it is about. Options list their effects in the engine's small vocabulary (gold, loyalty, official, lands, heir, heir_risk, food_back, new_lord, quarantine, care, command, home); `ai` weights the AI's pick; `needs` on an option hides it when the realm lacks what it asks (`lord2`: a second lord; `leaderless`: the dead commander's men or ships still without a leader). `{words}` in braces are filled with the names of who and where. Every number is a placeholder for balance.",
   "months_between": [3, 6],
   "first_within_months": 4,
   "food": { "min_store_months": 3, "min_store": 2 },
@@ -24,6 +24,26 @@
         { "id": "confirm", "name": "Confirm {son}", "ai": 4, "effects": [{ "new_lord": true }] },
         { "id": "relief", "name": "Ask a fee for his lands", "ai": 2, "effects": [{ "new_lord": true }, { "gold": 20 }, { "loyalty": "heavy_taxes", "who": "lord" }] },
         { "id": "take", "name": "Take his lands for the crown", "ai": 1, "effects": [{ "lands": "crown" }, { "loyalty": "land_seized_from_another", "who": "other_lords" }] }
+      ]
+    },
+    "general_dies": {
+      "weight": 0,
+      "needs": "death",
+      "title": "Death of {dead}",
+      "text": "{dead}, your general, has died at {province}. Without him his men take no orders and make for crown land, to stand there as a garrison. His second in command, {second}, asks to lead them in his place.",
+      "options": [
+        { "id": "second", "name": "Give {second} the command", "needs": "leaderless", "ai": 2, "effects": [{ "gold": -15 }, { "command": true }] },
+        { "id": "home", "name": "Let them go home", "ai": 1, "effects": [{ "home": "army" }] }
+      ]
+    },
+    "admiral_dies": {
+      "weight": 0,
+      "needs": "death",
+      "title": "Death of {dead}",
+      "text": "{dead}, your admiral, has died at {province}. Without him his ships take no orders and make for the nearest port of yours. His flag captain, {second}, asks to keep the fleet at sea under his own flag.",
+      "options": [
+        { "id": "second", "name": "Give {second} the fleet", "needs": "leaderless", "ai": 2, "effects": [{ "gold": -15 }, { "command": true }] },
+        { "id": "home", "name": "Let them sail home", "ai": 1, "effects": [{ "home": "fleet" }] }
       ]
     },
     "lord_slighted": {

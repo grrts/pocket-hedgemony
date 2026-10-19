@@ -2,7 +2,7 @@
 <p>Every value in the game&#39;s everyday events config, exactly as the game reads it. This page is made from <code>packages/rules/data/domain/events-everyday.json</code> each time the config changes, so it always matches the game. How these values are used is explained on <a href="/wiki/Historical-Events">Historical Events</a>.</p>
 <p>Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and values marked (provisional) are placeholders that may still change in balancing. Inventions are shown by id and name; see <a href="/wiki/Data-Research#inventions">Research data</a>.</p>
 <blockquote>
-<p>Everyday events (domain/events/spec.md §5.22, EVT-115 to EVT-128; feedback 152). Small choices about the realm&#39;s own people and stores, drawn from what the game already holds: its officials, lords, ruler and heir, and food stores, plague reaching a province of the player&#39;s (EVT-130: not drawn; plague fires it), and the death of one of the player&#39;s officials or lords (EVT-122, EVT-123: not drawn; the death of people fires it). Each realm draws one every `months_between` months (a range), never while the player has an event waiting. `weight` is how often an event is drawn among the ones that can happen; `needs` names what it is about. Options list their effects in the engine&#39;s small vocabulary (gold, loyalty, official, lands, heir, heir_risk, food_back, new_lord, quarantine, care); `ai` weights the AI&#39;s pick; `needs` on an option hides it when the realm lacks what it asks. `{words}` in braces are filled with the names of who and where. Every number is a placeholder for balance.</p>
+<p>Everyday events (domain/events/spec.md §5.22, EVT-115 to EVT-128; feedback 152). Small choices about the realm&#39;s own people and stores, drawn from what the game already holds: its officials, lords, ruler and heir, and food stores, plague reaching a province of the player&#39;s (EVT-130: not drawn; plague fires it), and the death of one of the player&#39;s officials, lords, generals or admirals (EVT-122, EVT-123, EVT-132: not drawn; the death of people fires it). Each realm draws one every `months_between` months (a range), never while the player has an event waiting. `weight` is how often an event is drawn among the ones that can happen; `needs` names what it is about. Options list their effects in the engine&#39;s small vocabulary (gold, loyalty, official, lands, heir, heir_risk, food_back, new_lord, quarantine, care, command, home); `ai` weights the AI&#39;s pick; `needs` on an option hides it when the realm lacks what it asks (`lord2`: a second lord; `leaderless`: the dead commander&#39;s men or ships still without a leader). `{words}` in braces are filled with the names of who and where. Every number is a placeholder for balance.</p>
 </blockquote>
 <div class="table-scroll"><table>
 <thead><tr><th>Key</th><th>Value</th></tr></thead>
@@ -52,6 +52,38 @@
 <tr><td>relief</td><td>Ask a fee for his lands</td><td>2</td><td>(new_lord: yes), (gold: 20), (loyalty: heavy_taxes; who: lord)</td></tr>
 <tr><td>take</td><td>Take his lands for the crown</td><td>1</td><td>(lands: crown), (loyalty: land_seized_from_another; who: other_lords)</td></tr>
 </tbody></table></div>
+<h3 id="general-dies"><a class="anchor" href="#general-dies" aria-label="Link to this section">#</a>General dies</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>weight</code></td><td>0</td></tr>
+<tr><td><code>needs</code></td><td>death</td></tr>
+<tr><td><code>title</code></td><td>Death of {dead}</td></tr>
+<tr><td><code>text</code></td><td>{dead}, your general, has died at {province}. Without him his men take no orders and make for crown land, to stand there as a garrison. His second in command, {second}, asks to lead them in his place.</td></tr>
+</tbody></table></div>
+<h4 id="options-2"><a class="anchor" href="#options-2" aria-label="Link to this section">#</a>Options</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>id</th><th>name</th><th>needs</th><th>ai</th><th>effects</th></tr></thead>
+<tbody>
+<tr><td>second</td><td>Give {second} the command</td><td>leaderless</td><td>2</td><td>(gold: -15), (command: yes)</td></tr>
+<tr><td>home</td><td>Let them go home</td><td></td><td>1</td><td>(home: army)</td></tr>
+</tbody></table></div>
+<h3 id="admiral-dies"><a class="anchor" href="#admiral-dies" aria-label="Link to this section">#</a>Admiral dies</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>weight</code></td><td>0</td></tr>
+<tr><td><code>needs</code></td><td>death</td></tr>
+<tr><td><code>title</code></td><td>Death of {dead}</td></tr>
+<tr><td><code>text</code></td><td>{dead}, your admiral, has died at {province}. Without him his ships take no orders and make for the nearest port of yours. His flag captain, {second}, asks to keep the fleet at sea under his own flag.</td></tr>
+</tbody></table></div>
+<h4 id="options-3"><a class="anchor" href="#options-3" aria-label="Link to this section">#</a>Options</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>id</th><th>name</th><th>needs</th><th>ai</th><th>effects</th></tr></thead>
+<tbody>
+<tr><td>second</td><td>Give {second} the fleet</td><td>leaderless</td><td>2</td><td>(gold: -15), (command: yes)</td></tr>
+<tr><td>home</td><td>Let them sail home</td><td></td><td>1</td><td>(home: fleet)</td></tr>
+</tbody></table></div>
 <h3 id="lord-slighted"><a class="anchor" href="#lord-slighted" aria-label="Link to this section">#</a>Lord slighted</h3>
 <div class="table-scroll"><table>
 <thead><tr><th>Key</th><th>Value</th></tr></thead>
@@ -61,7 +93,7 @@
 <tr><td><code>title</code></td><td>{lord} feels slighted</td></tr>
 <tr><td><code>text</code></td><td>{lord} of the house of {house} was seated below a lesser man at your table, and talks against you in his hall.</td></tr>
 </tbody></table></div>
-<h4 id="options-2"><a class="anchor" href="#options-2" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-4"><a class="anchor" href="#options-4" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th><th>needs</th></tr></thead>
 <tbody>
@@ -78,7 +110,7 @@
 <tr><td><code>title</code></td><td>{lord} speaks well of you</td></tr>
 <tr><td><code>text</code></td><td>{lord} of the house of {house} has been heard praising your rule in his hall. A word from you now could win him over.</td></tr>
 </tbody></table></div>
-<h4 id="options-3"><a class="anchor" href="#options-3" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-5"><a class="anchor" href="#options-5" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -94,7 +126,7 @@
 <tr><td><code>title</code></td><td>{lord} and {lord2} quarrel</td></tr>
 <tr><td><code>text</code></td><td>{lord} and {lord2} both claim a mill and its meadows on the edge of their lands, and each asks you to judge for him.</td></tr>
 </tbody></table></div>
-<h4 id="options-4"><a class="anchor" href="#options-4" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-6"><a class="anchor" href="#options-6" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -111,7 +143,7 @@
 <tr><td><code>title</code></td><td>{lord} is hurt</td></tr>
 <tr><td><code>text</code></td><td>{lord} of the house of {house} fell from his horse while hunting and lies in his hall with a broken leg.</td></tr>
 </tbody></table></div>
-<h4 id="options-5"><a class="anchor" href="#options-5" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-7"><a class="anchor" href="#options-7" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -127,7 +159,7 @@
 <tr><td><code>title</code></td><td>A child is born</td></tr>
 <tr><td><code>text</code></td><td>A {child} is born to {ruler}, and named {childName}. The bells ring in every town of the realm.</td></tr>
 </tbody></table></div>
-<h4 id="options-6"><a class="anchor" href="#options-6" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-8"><a class="anchor" href="#options-8" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th><th>needs</th></tr></thead>
 <tbody>
@@ -144,7 +176,7 @@
 <tr><td><code>title</code></td><td>{heir} falls ill</td></tr>
 <tr><td><code>text</code></td><td>Your heir {heir}, aged {heirAge}, is burning with fever. The court physicians shake their heads.</td></tr>
 </tbody></table></div>
-<h4 id="options-7"><a class="anchor" href="#options-7" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-9"><a class="anchor" href="#options-9" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -161,7 +193,7 @@
 <tr><td><code>title</code></td><td>Grain rots at {province}</td></tr>
 <tr><td><code>text</code></td><td>Damp has got into the granaries at {province}. The keepers have thrown out {loss} months of grain.</td></tr>
 </tbody></table></div>
-<h4 id="options-8"><a class="anchor" href="#options-8" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-10"><a class="anchor" href="#options-10" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th><th>needs</th></tr></thead>
 <tbody>
@@ -179,7 +211,7 @@
 <tr><td><code>title</code></td><td>Fire in the granary at {province}</td></tr>
 <tr><td><code>text</code></td><td>A fire in the night has burned half of {province}&#39;s granary: {loss} months of grain are lost.</td></tr>
 </tbody></table></div>
-<h4 id="options-9"><a class="anchor" href="#options-9" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-11"><a class="anchor" href="#options-11" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th><th>needs</th></tr></thead>
 <tbody>
@@ -196,7 +228,7 @@
 <tr><td><code>title</code></td><td>Plague at {province}</td></tr>
 <tr><td><code>text</code></td><td>Men are falling sick at {province}: fever, black swellings, death in three days. The townsfolk die first. What will you do?</td></tr>
 </tbody></table></div>
-<h4 id="options-10"><a class="anchor" href="#options-10" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-12"><a class="anchor" href="#options-12" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -214,7 +246,7 @@
 <tr><td><code>title</code></td><td>Rats in the stores at {province}</td></tr>
 <tr><td><code>text</code></td><td>Rats have overrun the stores at {province} and spoiled {loss} months of grain.</td></tr>
 </tbody></table></div>
-<h4 id="options-11"><a class="anchor" href="#options-11" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-13"><a class="anchor" href="#options-13" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>

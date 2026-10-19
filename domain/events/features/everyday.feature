@@ -62,6 +62,26 @@ Feature: Everyday events
     Then no everyday event waits for France
     And his provinces are royal land
 
+  @EVT-132
+  Scenario: A general's second keeps his men in the field
+    Given a general of France has died while his army stands in a lord's land
+    Then his men march for crown land without him
+    And a card names his second in command and his skills
+    When France gives the second the command
+    Then the second leads the army where it stands and it takes orders again
+
+  @EVT-132
+  Scenario: The second is not offered once the men have a leader
+    Given a general of France has died
+    When another general takes up his men before France answers
+    Then the card offers only to let them go home
+
+  @EVT-132
+  Scenario: An admiral's flag captain keeps the fleet at sea
+    Given an admiral of Venice has died at sea
+    When Venice gives his flag captain the fleet
+    Then the fleet stops sailing for port under its new admiral
+
   @EVT-131
   Scenario: A death while an everyday event waits brings no second card
     Given an everyday event waits for France

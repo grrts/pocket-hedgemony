@@ -729,7 +729,15 @@ and do not count toward its pool (EVT-033). Every number is a placeholder for ba
   step less loyal, heavy taxes) or take the lands for the crown, making them royal land and every other lord of the
   realm a step less loyal (land seized from another). A lord whose line dies out brings no card: his lands are the
   crown's already. [PROV-200, PROV-201; REALM-089; REALM-270, REALM-273]
-- EVT-131 A death fires its card (EVT-122, EVT-123) only while no everyday event waits for the player; a death
+- EVT-132 When a general or admiral of the player's dies, of any cause, and his army or fleet is not in a battle
+  (REALM-276), an everyday event shall tell of it while his men or ships go home without him (RECR-135 to
+  RECR-137), and his second in command (a general's) or flag captain (an admiral's), named on the card with skills
+  of 1 to 3 shown, shall ask to lead them in his place. Giving him the command costs gold; he becomes a commander of
+  the realm at their head, the march or voyage home stops where it is, and they take orders again. Letting them go
+  home costs nothing. If the men or ships have a leader again before the answer, or are in a battle, the second is
+  not offered. A dead AI commander brings no card. @placeholder [feedback 152: "a general falls", Leroy 19 Oct;
+  REALM-276; RECR-135 to RECR-137]
+- EVT-131 A death fires its card (EVT-122, EVT-123, EVT-132) only while no everyday event waits for the player; a death
   while one waits has its News line only (REALM-270). A death's card puts the realm's next drawn event off to at
   least `months_between`'s shortest gap (3 months) away. [EVT-117; Leroy, 19 Oct: "not too tedious"]
 - EVT-124 A child born to a ruler with no heir shall be the heir. A feast costs gold and makes the two least loyal
@@ -761,7 +769,9 @@ and do not count toward its pool (EVT-033). Every number is a placeholder for ba
   Brézé: a step more loyal"). *Look at the map* folds the card into End turn and, for an event about a province,
   opens that province. Grouping: every event is one card; lords, officials, the heir and stores stay on their own
   cards, where the result shows (the lord's loyalty, the post's years, the heir on the General tab, the store on the
-  Land tab). Overview: the News keeps a line for each, with what was chosen, and the realm's Lords list and
+  Land tab). A dead commander's card opens the province where he fell; the second, once given the command, is on the
+  army's or fleet's own card like any commander, and men or ships sent home are on the Garrison or Navy tab
+  (RECR-139). Overview: the News keeps a line for each, with what was chosen, and the realm's Lords list and
   Provinces list stay the overviews of loyalty and food. Phone: the card is the sheet it already is, in the Wide
   and Tall layouts, inside the safe areas, options in reach, nothing that needs hover. Rate: about two or three a
   year per realm, never stacking (EVT-117); a death's card takes the place of the next drawn one (EVT-131). [X-19; EVT-076]
@@ -1060,3 +1070,4 @@ before achievements and the autosave. The age and period checks run in the event
 | EVT-129 | — | Presentation: apps/client/src/ui/events.ts, the event card |
 | EVT-130 | — | Engine: packages/engine/test/everyday.test.ts (plague reaching the player's land opens one card) |
 | EVT-131 | — | Engine: packages/engine/test/everyday.test.ts (a death while one waits brings no second card) |
+| EVT-132 | everyday.feature | Engine: packages/engine/test/everyday.test.ts (a general's second keeps the men in the field; not offered once they have a leader; an admiral's flag captain keeps the fleet at sea) |

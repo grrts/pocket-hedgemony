@@ -10,6 +10,11 @@ import { child, dynastic, rulerLabel, throneLaw } from "./rulers.ts";
 import { realmConfig } from "./domain/realm/index.ts";
 import { onPlagueReached, setQuarantine } from "./plague.ts";
 import { onPersonDeath, personDies, type PersonDeath } from "./people.ts";
+import { addCommander } from "./recruit.ts";
+import { halt } from "./turn.ts";
+import { setCourse, type NavyFleet } from "./navy.ts";
+import { personName, rankedName } from "./names.ts";
+import * as wf from "./domain/warfare/index.ts";
 
 /**
  * Everyday events (events §5.22, EVT-115 to EVT-128; feedback 152): small
@@ -20,11 +25,12 @@ import { onPersonDeath, personDies, type PersonDeath } from "./people.ts";
  * waiting); the AI answers at once, the player on the same event card as the
  * historical events. The death of one of the player's officials or lords is
  * not drawn: it comes from the death of people (people.ts) and asks who takes
- * his seat or his lands.
+ * his seat or his lands; a commander's death asks whether his second keeps
+ * his men or ships in the field.
  */
 
-type Effect = { quarantine?: boolean; care?: boolean; gold?: number; loyalty?: string; who?: string; count?: number; official?: "new" | "seasoned"; lands?: "crown"; heir?: "child"; heir_risk?: number; food_back?: number; new_lord?: boolean };
-type OptionDef = { id: string; name: string; needs?: string; ai: number; effects: Effect[] };
+type Effect = { command?: boolean; home?: "army" | "fleet"; quarantine?: boolean; care?: boolean; gold?: number; loyalty?: string; who?: string; count?: number; official?: "new" | "seasoned"; lands?: "crown"; heir?: "child"; heir_risk?: number; food_back?: number; new_lord?: boolean };
+type OptionDef = { id: string; name: string; needs?: "lord2" | "leaderless"; ai: number; effects: Effect[] };
 type EventDef = { weight: number; needs: string; loss?: number; title: string; text: string; options: OptionDef[] };
 
 const DEFS = data.events as Record<string, EventDef>;
@@ -56,6 +62,10 @@ export interface EverydayEvent {
   /** A dead official's post: its type (an OFFICIALS index) and the day he took it. */
   type?: number;
   since?: number;
+  /** A dead general's army slot or a dead admiral's fleet id, and the skills of the second who asks for it (might, cunning, logistics). */
+  army?: number;
+  fleet?: number;
+  skills?: [number, number, number];
 }
 
 export interface EverydayState {
@@ -295,6 +305,18 @@ function deathCard(world: World, d: PersonDeath, news: News[]): void {
     // A line that died out has no heir to confirm: its lands are the crown's already.
     if (l.gone) return;
     ev = { id: "", def: "lord_dies", nation: n, at, lord: k, name: l.name, dead: d.name };
+  } else if (d.who.kind === "commander" && d.led) {
+    // His second asks to keep them in the field (EVT-132); an army in battle leaves it by the battle's rules (WAR-062).
+    const a = world.armies;
+    const i = d.led.army;
+    const f = d.led.fleet >= 0 ? world.navy.fleets.find((x) => x.id === d.led!.fleet) : undefined;
+    const sea = !(i >= 0 && a.alive[i] && a.owner[i] === n && a.battle[i]! < 0);
+    if (sea && !(f && f.owner === n && f.battle < 0 && f.ships.length)) return;
+    const skill = () => 1 + s.rng.int(3);
+    const skills: [number, number, number] = [skill(), skill(), skill()];
+    const capital = world.rules.provinces.find((q) => q.id === world.rules.nations[n]!.capital)?.name ?? "";
+    const name = rankedName(world.rules, n, personName(world.rules, n, s.rng.int(1 << 30), capital), "captain");
+    ev = sea ? { id: "", def: "admiral_dies", nation: n, at, province: f!.at, dead: d.name, fleet: f!.id, name, skills } : { id: "", def: "general_dies", nation: n, at, province: a.location[i]!, dead: d.name, army: i, name, skills };
   } else return;
   ev.id = `everyday:${++s.seq}`;
   s.pending.push(ev);
@@ -305,11 +327,20 @@ function deathCard(world: World, d: PersonDeath, news: News[]): void {
 onPlagueReached(plagueReached);
 onPersonDeath(deathCard);
 
-/** The options open to the realm: one that costs gold it lacks or asks a lord it has none of is hidden (EVT-120). */
+/** The options open to the realm: one that costs gold it lacks, asks a lord it has none of, or a command no longer free is hidden (EVT-120, EVT-132). */
 function openOptions(world: World, ev: EverydayEvent): OptionDef[] {
   const d = DEFS[ev.def]!;
   const gold = world.nationTreasury[ev.nation]!;
-  return d.options.filter((o) => (o.needs !== "lord2" || ev.lord2 !== undefined) && o.effects.every((e) => !(e.gold !== undefined && e.gold < 0 && gold < -e.gold)));
+  return d.options.filter((o) => (o.needs !== "lord2" || ev.lord2 !== undefined) && (o.needs !== "leaderless" || leaderless(world, ev) !== null) && o.effects.every((e) => !(e.gold !== undefined && e.gold < 0 && gold < -e.gold)));
+}
+
+/** The dead commander's army or fleet while it still has no leader and fights no battle, or null. */
+function leaderless(world: World, ev: EverydayEvent): { army: number } | { fleet: NavyFleet } | null {
+  const a = world.armies;
+  const i = ev.army;
+  if (i !== undefined) return a.alive[i] && a.owner[i] === ev.nation && a.commander[i]! < 0 && a.battle[i]! < 0 ? { army: i } : null;
+  const f = ev.fleet === undefined ? undefined : world.navy.fleets.find((x) => x.id === ev.fleet);
+  return f && f.owner === ev.nation && f.admiral < 0 && f.battle < 0 && f.ships.length ? { fleet: f } : null;
 }
 
 /** The player answers an everyday event (AnswerEvent). */
@@ -392,6 +423,25 @@ function choose(world: World, s: EverydayState, ev: EverydayEvent, o: OptionDef,
     else if (e.heir_risk) told.push(`${world.rulers[n]!.heir?.name ?? "The heir"} recovers.`);
     if (e.quarantine && ev.province !== undefined) setQuarantine(world, n, ev.province, true, mine ? news : []);
     if (e.care && ev.province !== undefined && world.provincePlague[ev.province]) world.provincePlagueCare[ev.province] = 1;
+    if (e.command && ev.name && ev.skills) {
+      // The second takes the dead man's place (EVT-132): the men stop walking home, the ships stop sailing for port.
+      const left = leaderless(world, ev);
+      const [might, cunning, logistics] = ev.skills;
+      if (left) {
+        const c = addCommander(world, n, wf.newCommander(ev.name, { might, cunning, logistics, origin: "a commander's second" }), undefined, "fleet" in left);
+        if ("army" in left) {
+          world.armies.commander[left.army] = c;
+          world.armies.retreating[left.army] = 0;
+          halt(world, left.army);
+        } else {
+          left.fleet.admiral = c;
+          if (left.fleet.fleeing) {
+            setCourse(left.fleet, []);
+            left.fleet.fleeing = false;
+          }
+        }
+      }
+    }
     if (e.food_back && ev.province !== undefined && ev.loss) world.provinceStore[ev.province] = world.provinceStore[ev.province]! + ev.loss * e.food_back;
   }
   if (mine) {
@@ -413,6 +463,7 @@ function fill(world: World, ev: EverydayEvent, text: string): string {
     lord2: () => lordName(world, ev.lord2),
     house: () => (ev.lord === undefined ? "" : world.lords[ev.lord]!.house),
     son: () => ev.name ?? "his son",
+    second: () => ev.name ?? "his second",
     // An event from an older save names the dead man by who held the post or the lands then.
     dead: () => ev.dead ?? (ev.lord !== undefined ? lordName(world, ev.lord) : p !== undefined ? (officialAt(world, p) ?? "Your official") : ""),
     lands: () => {
@@ -461,6 +512,9 @@ function describe(world: World, ev: EverydayEvent, e: Effect, o: OptionDef): str
   if (e.heir_risk) return `${Math.round(e.heir_risk * 10)} in 10 that ${world.rulers[ev.nation]?.heir?.name ?? "the heir"} dies`;
   if (e.quarantine) return "Its trade stops and its tax falls by half until you lift the quarantine; plague gets in and out far less";
   if (e.care) return "Half as many die, and the outbreak lasts the shortest time";
+  if (e.command && ev.skills) return `${ev.name} leads them: Might ${ev.skills[0]}, Cunning ${ev.skills[1]}, Logistics ${ev.skills[2]}`;
+  if (e.home === "army") return "The men stand as a garrison on crown land; a general can take them up from its Garrison tab";
+  if (e.home === "fleet") return "The ships wait in port for an admiral, on the Navy tab";
   if (e.food_back) return `${e.food_back === 0.5 ? "Half" : `${Math.round(e.food_back * 100)}%`} of the lost grain is made good`;
   return null;
 }
