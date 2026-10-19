@@ -581,10 +581,8 @@
       "berthSpacing": 2
     },
     "traders": {
-      "maxMovers": 3,
-      "maxPaths": 200,
-      "daysPerPath": 30,
-      "mover": {
+      "maxTraders": 300,
+      "figure": {
         "land": "caravan",
         "river": "barge",
         "sea": "trading ship"

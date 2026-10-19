@@ -4447,6 +4447,175 @@ button.paper.over {
   gap: 2px;
   font-size: 19px;
 }
+/* A trader's own card (TRADE-153): Now, Route, Better routes with Use, where its gold comes from, its buttons. */
+.trader-card p {
+  margin: 0 0 4px;
+  overflow-wrap: anywhere;
+}
+.trader-card small {
+  color: var(--ink-soft);
+}
+.trader-card .route-ends {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0 0 4px;
+}
+.trader-card .trader-buttons,
+.trader-card .confirm-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  margin-top: 8px;
+}
+.trader-card .trader-buttons button,
+.trader-card .confirm-row button {
+  min-height: 44px;
+  padding: 0 4px;
+  gap: 2px;
+}
+.trader-card .better {
+  list-style: none;
+  margin: 0 0 4px;
+  padding: 0;
+}
+.trader-card .better li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0;
+  border-bottom: 1px dashed var(--ink-soft);
+}
+.trader-card .better li span {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.trader-card .better button {
+  min-height: 44px;
+  min-width: 64px;
+}
+.sources {
+  margin: 0 0 4px;
+}
+.source-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+}
+.source-row button.link {
+  justify-content: flex-start;
+  gap: 4px;
+  border: 0;
+  border-image: none;
+  padding: 0;
+  min-height: 44px;
+  font: inherit;
+  color: var(--ink);
+  text-shadow: none;
+  text-decoration: underline;
+  text-align: left;
+}
+.src-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--paper-light);
+  border: 1px solid var(--ink-soft);
+}
+.src-bar i {
+  display: block;
+  height: 100%;
+  background: var(--brass);
+}
+.trader-card .foreign,
+.better-mark {
+  color: var(--cloth);
+}
+.better-mark {
+  color: #a8741a;
+}
+button.link {
+  background: none;
+  border: 0;
+  padding: 0;
+  min-height: 44px;
+  font: inherit;
+  color: inherit;
+  text-decoration: underline;
+  text-align: left;
+  cursor: pointer;
+}
+/* The best cities from where a route starts, as buttons in the route bar (TRADE-155). */
+.route-picks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+.route-picks button {
+  min-height: 44px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 2px 8px;
+}
+/* The Trade tab's traders, one row each, opening the trader's card (TRADE-156). */
+.trader-rows {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+  gap: 4px;
+}
+.trader-row {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+  min-height: 44px;
+  padding: 4px 8px;
+  text-align: left;
+  color: var(--ink);
+  text-shadow: none;
+}
+.trader-row .row-top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.trader-row .row-gold {
+  margin-left: auto;
+}
+.trader-row .row-route {
+  color: var(--ink-soft);
+  overflow-wrap: anywhere;
+}
+.trader-row .mark {
+  font-style: normal;
+}
+.trader-row .mark.bad {
+  color: var(--cloth);
+}
+.trader-row .mark.better {
+  color: #a8741a;
+}
+.trader-row.bad {
+  outline: 2px solid var(--cloth);
+}
+.use-all {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 6px;
+}
+.use-all p {
+  margin: 0;
+  flex: 1 1 200px;
+}
+.use-all button {
+  min-height: 44px;
+}
 /* Found a trader: a city, then one button per kind with its gold and upkeep, greyed with the reason. */
 .found-city {
   margin: 4px 0 8px;
@@ -7064,6 +7233,24 @@ div.chron-row {
   color: var(--ink-soft);
 }
 
+/* The treasury lifts when a trader banks gold (TRADE-157). */
+.plaque.gold.banked {
+  animation: banked 0.6s steps(4) 1;
+}
+@keyframes banked {
+  0% {
+    transform: translateY(0);
+    filter: brightness(1);
+  }
+  40% {
+    transform: translateY(-3px);
+    filter: brightness(1.25);
+  }
+  100% {
+    transform: translateY(0);
+    filter: brightness(1);
+  }
+}
 /* Sending an assassin after a lord (REALM-284): the confirm card on his screen, two 44-point buttons side by side. */
 .assassin-ask {
   padding: 6px 8px;
