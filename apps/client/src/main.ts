@@ -36,7 +36,7 @@ import {
 } from "@ph/engine";
 import type { GameDate } from "@ph/rules";
 import { askCard, courtLordHtml, myHouse, mySubjects, myStatecraft, overlordCard, realmStatecraft, subjectCard } from "./ui/statecraft.ts";
-import { rebelsUi, risingCard, risingsLine, risingsOverview, verdictCard, type Attacker } from "./ui/rebels.ts";
+import { rebelsUi, risingCard, risingsOverview, verdictCard, type Attacker } from "./ui/rebels.ts";
 import { heritageLine, heritageTab } from "./ui/heritage.ts";
 import { fitDraft, offerLine, peaceTable, startDraft, stepGold, togglePick, type PeaceDraft } from "./ui/peace.ts";
 import { fallenLine, rulerLines } from "./ui/ruler.ts";
@@ -52,15 +52,15 @@ import { stabilityPlaque, stabilitySection } from "./ui/stability.ts";
 import { cap, DEFAULT_TITLES } from "./ui/titles.ts";
 import { endCard, scoreLine, scoreTab } from "./ui/score.ts";
 import { lockRevolutionButtons, revolutionCardHtml, revolutionSection } from "./ui/revolution.ts";
-import { governmentLine, governmentTab, governmentUi } from "./ui/government.ts";
-import { isShipKind, provinceTradeLine, routeBar, stopBit, tradeLine, tradeTab, tradeUi, type Routing } from "./ui/trade.ts";
+import { governmentTab, governmentUi } from "./ui/government.ts";
+import { isShipKind, provinceTradeLine, routeBar, stopBit, tradeTab, tradeUi, type Routing } from "./ui/trade.ts";
 import { beliefData, beliefFacts, beliefLines, beliefUi, peoplesTab } from "./ui/belief.ts";
 import { censureWarningHtml, faithBadgeHtml, headCardHtml, seatKeyHtml } from "./ui/faithHeads.ts";
 import { declareSheetHtml, nameAbroadHtml, warCardHtml, warPlaqueBars } from "./ui/priceOfWar.ts";
-import { closeUpPoint, firstShown, jumpTarget, learningLine, learningTab, newLearningUi, nodeAt, realmLearningLine, startStanding } from "./ui/learning.ts";
+import { closeUpPoint, firstShown, jumpTarget, learningTab, newLearningUi, nodeAt, realmLearningLine, startStanding, studyNow } from "./ui/learning.ts";
 import { provinceWorks } from "./ui/works.ts";
 import { provinceLand } from "./ui/land.ts";
-import { castleFoodLine, castleFoodSettings, foodLine, foodTab } from "./ui/food.ts";
+import { castleFoodLine, castleFoodSettings, foodCounts, foodTab } from "./ui/food.ts";
 import { commanderPortrait, officialCard, officialOf, officialScreen, officialsTab, paintSiege, postScreen, siegeView, type SiegeInfo } from "./ui/people.ts";
 import { governanceCard, LOYALTY_ORDER, lordScreen, lordsTab, type LordLands, type LordView, type ProvinceRow } from "./ui/lords.ts";
 import { loadMapImage, type MapImage } from "./map/loadMap.ts";
@@ -76,7 +76,7 @@ import { eventCardHtml, waitingEventsHtml } from "./ui/events.ts";
 import { dietAnswerCard, electionAnswerCard, empireAsks, empireBadgeHtml, empireCard, empireUi, institutionsKey, institutionsRows, oathAnswerCard, rulingAnswerCards, shogunateAsks, shogunateCard, shogunateUi, shogunBadgeHtml, type InstitutionsUi } from "./ui/institutions.ts";
 import { fleetButton, fleetCard, fleetTitle, hireFleetsTab, navyTab, portTab } from "./ui/navy.ts";
 import { colonyCard, coloniesTab, colonySection, exploreSection, voyageBar } from "./ui/explore.ts";
-import { askRows, bindTribes, colonyGround, groundHead, groundSection, groundsCountLine, huntGeneralLine, huntKeyHtml, huntTab, type TribesUi } from "./ui/tribes.ts";
+import { askRows, bindTribes, colonyGround, groundHead, groundSection, groundsCountLine, huntKeyHtml, huntTab, type TribesUi } from "./ui/tribes.ts";
 import { HUNT_TAB, chartsCoast, settlersAlert } from "@ph/engine/domain/tribes";
 import { achievementName, achievementsCard, loadProfile, saveProfile, takeAchievements, tileKey, toastHtml, unseen, type Filter as AchFilter } from "./ui/achievements.ts";
 import { Hints, type HintTarget } from "./ui/hints.ts";
@@ -111,7 +111,7 @@ import { COMMISSION_GOLD, hireGold, OFFICIALS, Rng, startFormOf } from "@ph/engi
 import { formName } from "@ph/engine/domain/government";
 import { PICKER_REGIONS, pickerRegions, startTrade, waysToGrow } from "@ph/engine/domain/scenario-setup";
 import { pickerCardHtml, regionListHtml, regionSelectHtml, strongIn, strongInWords, waysToGrowHtml } from "./ui/realmPicker.ts";
-import { BATTLE_STEP_MS, bannerAt, COUNTRY_CARD_TABS, endTurnInAuto, endTurnLabel, keyEndsTurn, newAutoTurns, REALM_BOOK_TABS, sectionOf, SHELL as SHELL_RULES, startColumn, startIcons, stopAuto, switchAuto, tabHolds, WATCH_STEP_MS, weekPlayed, type AutoStop, type Platform as ShellPlatform } from "@ph/engine/domain/game-shell";
+import { BATTLE_STEP_MS, bannerAt, COUNTRY_CARD_TABS, endTurnInAuto, endTurnLabel, keyEndsTurn, newAutoTurns, realmOverview, REALM_BOOK_TABS, sectionOf, SHELL as SHELL_RULES, startColumn, startIcons, stopAuto, switchAuto, tabHolds, WATCH_STEP_MS, weekPlayed, type AutoStop, type OverviewTile, type Platform as ShellPlatform } from "@ph/engine/domain/game-shell";
 import { autosaveDue, continueTarget, longDate, newCampaign, newManualSave, savesConfig, type Campaign, type Platform as SavePlatform } from "@ph/engine/domain/saves";
 import { SaveStore, type StoredSave } from "./saves/store.ts";
 import { animationsPref, autosaveEvery, autosavesKept, battleStepMs, dayMs, livingPrefs, longPressMs, mapDetail, mapPower, onPrefs, setPref, textZoom } from "./settings/prefs.ts";
@@ -5358,6 +5358,7 @@ function warRoomSection(): string {
   const mine = s.commanders.map((c, i) => ({ c, i })).filter(({ c }) => c.owner === me);
   return `<h3 class="sub">Troops</h3>
     <p>${fmt(s.nationCapUsed[me]!)} men under arms or gathering, of a troop cap of ${fmt(s.nationTroopCap[me]!)}. Pay: ${s.pay.toFixed(1)} gold a month.</p>
+    ${s.fallen ? `<dl class="facts">${fallenLine(s.fallen)}</dl>` : ""}
     <p class="hint">Call men up from a province's Garrison tab, a thousand at a time.${gathering ? ` ${fmt(gathering)} men are gathering now.` : ""} Over the cap, pay doubles and levies desert.</p>
     ${s.musters.length ? `<div class="queue-head"><span>Recruiting</span><span>${fmt(gathering)} men</span></div>
     <ol class="queue">${s.musters
@@ -5570,6 +5571,51 @@ const pageOf = (t: RealmTab): string => {
 };
 
 /** The six sections in one row, and the open section's pages in a lower row when it has more than one (SHELL-167). */
+/**
+ * Realm's Overview on the player's own card (SHELL-170, SHELL-171): one line
+ * with the capital, then one tile per section with its key line, a note and
+ * what waits on the player (a tap opens the page that holds it), then ruler
+ * and heir, the score, Stability's pillars and the Revolution block under them. The banner is
+ * already in the top bar.
+ */
+function realmOverviewHtml(r: number, own: number[], people: number, armies: number, men: number, answerWaits: boolean): string {
+  const s = snapshot!;
+  const n = nations[r]!;
+  const capIdx = provinceIndex.get(n.capital)!;
+  const tribe = s.tribes.mine;
+  const tiles = realmOverview({
+    gold: s.nationTreasury[r]!,
+    perMonth: s.nationMonthlyIncome[r]!,
+    ...foodCounts(s, own),
+    provinces: own.length,
+    people,
+    newLands: s.newLands?.length ?? 0,
+    risings: s.rebels.risings.filter((x) => x.owner === r).length,
+    verdicts: s.rebels.verdicts.length,
+    huntWaits: tribe ? tribe.settlers.length + tribe.asks.length : 0,
+    armies,
+    men,
+    fleets: s.navy.fleets.filter((f) => f.owner === r).length,
+    wars: s.relations.filter((x) => x.state === "war").length,
+    allies: s.relations.filter((x) => x.state === "alliance").length,
+    subjects: s.relations.filter((x) => x.state === "overlord").length,
+    answerWaits,
+    study: s.research ? studyNow(s.research) : null,
+    beliefLow: !!s.beliefLow && (s.beliefLow.faith || s.beliefLow.tongue),
+  });
+  const tile = (t: OverviewTile) =>
+    `<button class="paper tile${t.needs ? " needs" : ""}" data-realm-open-tab="${PAGE_KEYS[t.page]}"${t.needs ? ` aria-label="${t.section}: ${esc(t.needs)}"` : ""}>${icon(SECTION_ICONS[t.section]!, 1)}<b>${t.section}</b><span>${esc(t.line)}</span>${t.needs ? `<em>${esc(t.needs)}</em>` : t.note ? `<small>${esc(t.note)}</small>` : ""}</button>`;
+  return `
+    <p class="overview-head"><b>Your realm</b> · ${own.length} province${own.length === 1 ? "" : "s"} ${empireBadgeHtml(s.empire, r) + shogunBadgeHtml(s.shogunate, r)} · Capital <button class="paper capital" data-go="${capIdx}">${icon("castle", 1)}${esc(provinces[capIdx]!.name)}</button></p>
+    <div class="overview-tiles">${tiles.map(tile).join("")}</div>
+    <dl class="facts">
+      ${s.rulers[r] ? rulerLines(s.rulers[r]!) : ""}
+      ${scoreLine(s.campaign, r, true)}
+    </dl>
+    ${s.stability ? stabilitySection(s.stability, titlesOf(r)) : ""}
+    ${s.revolution ? revolutionSection(s.revolution) : ""}`;
+}
+
 function realmBookNav(r: number, answerWaits: boolean): string {
   const tribe = snapshot!.tribes.mine;
   const page = pageOf(realmTab);
@@ -5641,28 +5687,22 @@ function renderRealm(r: number): void {
   const tab = (key: typeof realmTab, label: string, marked = false) => `<button class="tab${realmTab === key || (key === "military" && realmTab === "mercenaries") || (key === "navy" && realmTab === "hireFleets") ? " on" : ""}${marked ? " marked" : ""}" data-realm-tab="${key}"${marked ? ` aria-label="${label}: waits for your answer"` : ""}>${label}</button>`;
   // A peace offer or an envoy waiting for an answer marks the Diplomacy tab, on that realm's card and on your own (SHELL-141).
   const answerWaits = !!s && (s.peaceOffers.some((o) => (mine || o.from === r) && !putOffOffers.has(o.id)) || asksOf(s).some((a) => mine || a.from === r));
-  const general = `
+  const general = mine ? realmOverviewHtml(r, own, people, armies.length, men, answerWaits) : `
     <div class="realm-card">
       <img class="banner" src="${flagUrl(n, 6)}" alt="">
       <p>${s && s.playerNation === r ? "<b>Your realm</b>" : "<b>Realm</b>"} · ${own.length} province${own.length === 1 ? "" : "s"} ${s ? empireBadgeHtml(s.empire, r) + shogunBadgeHtml(s.shogunate, r) : ""}${!s ? ` · <b class="starts">${esc(startStanding(n.id))}</b>` : ""}<br>
       Capital <button class="paper capital" data-go="${capIdx}">${icon("castle", 1)}${esc(provinces[capIdx]!.name)}</button></p>
     </div>
     ${!s ? waysToGrowHtml(waysToGrow({ owners, neighbors: neighborIdx, water: isWater, trade: START_TRADE }, r)) : ""}
-    ${mine && s?.stability ? stabilitySection(s.stability, titlesOf(r)) : ""}
-    ${mine && s?.revolution ? revolutionSection(s.revolution) : ""}
     <dl class="facts">
       ${s?.rulers[r] ? rulerLines(s.rulers[r]!) : ""}
-      ${s ? scoreLine(s.campaign, r, mine) : ""}
+      ${s ? scoreLine(s.campaign, r, false) : ""}
       <dt>People</dt><dd>${fmt(people)}</dd>
-      ${s ? `<dt>Treasury</dt><dd>${mine ? `<button class="paper" data-realm-open-tab="treasury" title="Open the ledger">${icon("coin", 1)}${fmt(s.nationTreasury[r]!)} gold <small>${inc >= 0 ? "+" : ""}${inc.toFixed(1)} a month</small></button>` : `${fmt(s.nationTreasury[r]!)} gold <small>${inc >= 0 ? "+" : ""}${inc.toFixed(1)} a month</small>`}</dd>
-      ${mine && s.trade ? tradeLine(s.trade) : ""}
-      ${mine ? risingsLine(s.rebels, r) : ""}
-      ${mine && s.government ? governmentLine(s.government) : `<dt>Government</dt><dd>${esc(s.realmForms[r] ?? "")}</dd>`}
-      ${peoples ? beliefLines(peoples, mine, mine ? s.beliefLow : null, faithBadgeHtml(s.faithHeads?.badges[r] ?? null)) : ""}
-      ${mine && s.fallen ? fallenLine(s.fallen) : ""}
-      ${mine && s.research ? learningLine(s.research) : realmLearningLine(s.realmResearch[r])}
-      ${mine ? foodLine(s, own) : ""}
-      ${mine ? huntGeneralLine(s.tribes.mine) : groundsCountLine(s.tribes, r)}` : ""}
+      ${s ? `<dt>Treasury</dt><dd>${fmt(s.nationTreasury[r]!)} gold <small>${inc >= 0 ? "+" : ""}${inc.toFixed(1)} a month</small></dd>
+      <dt>Government</dt><dd>${esc(s.realmForms[r] ?? "")}</dd>
+      ${peoples ? beliefLines(peoples, false, null, faithBadgeHtml(s.faithHeads?.badges[r] ?? null)) : ""}
+      ${realmLearningLine(s.realmResearch[r])}
+      ${groundsCountLine(s.tribes, r)}` : ""}
       ${!s ? `<dt>Government</dt><dd>${esc(formName(startFormOf(n.id)))}</dd><dt>Strong in</dt><dd>${esc(strongInWords(n.id))}</dd>` : ""}
       <dt>Lands</dt><dd>${topLands.map(([t, c]) => `${t} ${c}`).join(" · ")}</dd>
       ${heritageLine(strengths, s?.heritage[r] ?? null)}

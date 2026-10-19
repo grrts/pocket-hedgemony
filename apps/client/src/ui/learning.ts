@@ -56,10 +56,9 @@ const monthsFor = (sy: number, pace: number): number | null => (pace > 0 ? Math.
 
 const pct = (r: Research) => (r.study ? Math.min(100, (r.study.progress / r.study.cost) * 100) : 0);
 
-/** The General tab's line: the study, how far along and the scholars, opening the Research tab (RSCH-088). */
-export function learningLine(r: Research): string {
-  const what = r.study ? `Studying <b>${esc(nice(r.study.name))}</b> · ${Math.floor(pct(r))} % · scholars ${fmt(r.scholars)}` : `<b>Nothing studied</b> · choose what to study`;
-  return `<dt>Research</dt><dd><button class="paper learning-line${r.study ? "" : " idle"}" data-realm-open-tab="learning" title="Open the Research tab">${icon("scroll", 1)}<span>${what}</span></button></dd>`;
+/** What is studied and how far it has come, for the Realm overview's tile (SHELL-170). */
+export function studyNow(r: Research): { name: string; pct: number } | null {
+  return r.study ? { name: nice(r.study.name), pct: pct(r) } : null;
 }
 
 /** "Era I · abreast of the times", "Ancient · behind the times by 2 eras" (RSCH-103, RSCH-104). */

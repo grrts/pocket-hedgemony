@@ -386,7 +386,7 @@ Everything about research and schools is in one place: the **Research** tab of y
 
 Elsewhere:
 
-- The **General** tab of your country card has a **Research** line, "Studying Three-field rotation · 40 % · scholars 6", that opens the tab.
+- The **Overview** of your Realm book has a **Research** tile, "Three-field rotation · 40 %", that opens the tab; it turns red with "Choose what to study" when nothing is studied.
 - Another country's card shows its standing, how many inventions it knows and what it studies, and how many inventions it knows that you don't: those are the ones it makes cheaper for you as a neighbour or trade partner.
 - The nation picker at the start of a campaign shows each country's standing next to its name ("Starts in Ancient", "Starts in Era I"), so you know a country starts behind before you choose it.
 - When you learn an invention and your queue is empty, an alert says "Learned X. Choose the next study." with **Open**. While nothing is studied, one alert asks you to choose. With something queued, the next study simply starts.
