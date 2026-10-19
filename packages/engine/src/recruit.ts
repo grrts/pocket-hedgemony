@@ -5,7 +5,9 @@ import { moodShare } from "./moods.ts";
 import * as rc from "./domain/recruiting/index.ts";
 import * as wf from "./domain/warfare/index.ts";
 import { mix, officialName, personName, rankedName } from "./names.ts";
-import { bestFit, emptyPosts, OFFICIALS, officialAt, officialBonus } from "./officials.ts";
+import { bestFit, emptyPosts, OFFICIALS, officialAt, officialBonus, yearsServed } from "./officials.ts";
+import * as nv from "./domain/naval/index.ts";
+import { isPort } from "./navy.ts";
 import { monthlyRations, wagonRations } from "./march.ts";
 import { campaigning, halt, isMarching } from "./turn.ts";
 import { foodCarriedPct, spawnArmy, type World } from "./world.ts";
@@ -114,6 +116,8 @@ export function createRecruitState(P: number, N: number) {
     commanderHome: [] as number[],
     /** Name seed of each commander commissioned from an official (-1 = none), so he goes back to a post as himself. */
     commanderSeed: [] as number[],
+    /** 1 for an admiral, 0 for a general (RECR-128). */
+    commanderSea: [] as number[],
   };
 }
 
@@ -124,8 +128,8 @@ const gold = (world: World, domainGold: number) => domainGold * world.rules.defi
 
 // ---------------------------------------------------------------- commanders
 
-/** Adds a commander to the realm and returns his index. */
-export function addCommander(world: World, owner: number, c: wf.Commander, id = `${world.nationIds[owner]}_${world.commanderIds.length + 1}`): number {
+/** Adds a commander to the realm and returns his index: a general, or an admiral when `sea` (RECR-128). */
+export function addCommander(world: World, owner: number, c: wf.Commander, id = `${world.nationIds[owner]}_${world.commanderIds.length + 1}`, sea = false): number {
   const k = world.commanderIds.length;
   world.commanderIds.push(id);
   const grow = <T extends Int16Array | Int8Array>(old: T, make: (n: number) => T, v: number): T => {
@@ -139,6 +143,7 @@ export function addCommander(world: World, owner: number, c: wf.Commander, id = 
   world.commanders.push({ ...c, country: world.nationIds[owner]! });
   world.commanderHome.push(-1);
   world.commanderSeed.push(-1);
+  world.commanderSea.push(sea ? 1 : 0);
   return k;
 }
 
@@ -149,13 +154,16 @@ export function armyOf(world: World, c: number): number {
   return -1;
 }
 
-/** Commanders of a realm who lead no army, best first. */
-export function idleCommanders(world: World, n: number): number[] {
+/** An admiral leads fleets only, a general armies only (RECR-128). */
+export const isAdmiral = (world: World, c: number): boolean => world.commanderSea[c] === 1;
+
+/** Commanders of a realm who lead no army, best first: only generals, or only admirals when `sea` is given. */
+export function idleCommanders(world: World, n: number, sea?: boolean): number[] {
   const busy = new Set<number>();
   const a = world.armies;
   for (let i = 0; i < a.count; i++) if (a.alive[i]) busy.add(a.commander[i]!);
   const out: number[] = [];
-  for (let c = 0; c < world.commanderIds.length; c++) if (world.commanderOwner[c] === n && !busy.has(c) && lordOfCommander(world, c) < 0) out.push(c);
+  for (let c = 0; c < world.commanderIds.length; c++) if (world.commanderOwner[c] === n && !busy.has(c) && lordOfCommander(world, c) < 0 && (sea === undefined || isAdmiral(world, c) === sea)) out.push(c);
   const score = (c: number) => world.commanders[c]!.might + world.commanders[c]!.cunning + world.commanders[c]!.logistics;
   return out.sort((x, y) => score(y) - score(x) || x - y);
 }
@@ -167,27 +175,41 @@ const RETINUE_OWN = "a lord's retinue stays whole under its lord: it can only ma
 export const COMMISSION_GOLD = rc.recruitingConfig.commissionCost;
 
 /**
+ * The skills an official of this type starts with as a general (RECR-070) or an admiral, whose years
+ * in a port province count double (NAVY-073), so the official's screen can show both before he is chosen.
+ */
+export function commissionSkills(type: string, years: number, inPort: boolean, sea: boolean): { might: number; cunning: number; logistics: number } {
+  if (sea) {
+    const { might, cunning, logistics } = nv.commissionAdmiral("", type.toLowerCase(), { yearsServed: years, inPortProvince: inPort }).admiral;
+    return { might, cunning, logistics };
+  }
+  return rc.commission({ official: type, type }).commission.skills ?? { might: 1, cunning: 1, logistics: 1 };
+}
+
+/**
  * Commission a province's official as a commander: he gets his type's skills and waits at court
  * (RECR-069..073). The post is left empty: the province pays half its tax and gives half its
- * recruits until he is released back to it (RECR-083 "Leave it").
+ * recruits until he is released back to it (RECR-083 "Leave it"). As a general he leads armies
+ * only; as an admiral (`sea`) fleets only, with the sea skills of his type, his years in a port
+ * province counting double (RECR-128, NAVY-073).
  */
-export function commissionOfficial(world: World, n: number, p: number, news: News[]): string | null {
+export function commissionOfficial(world: World, n: number, p: number, news: News[], sea = false): string | null {
   if (p < 0 || p >= world.provinceCount || world.provinceOwner[p] !== n) return "not your province";
   if (world.provinceLord[p]! >= 0) return `${provinceName(world, p)} is a lord's: his official serves the lord, not the crown`;
   const type = world.provinceOfficial[p]!;
   if (type < 0) return `${provinceName(world, p)} has no official to spare`;
   const { commission, cost } = rc.commission({ official: OFFICIALS[type]!, type: OFFICIALS[type]!, province: world.provinceIds[p]! });
   if (cost > world.nationTreasury[n]!) return "not enough gold";
-  const skills = commission.skills ?? { might: 1, cunning: 1, logistics: 1 };
   // The official himself takes the command, under his own name.
   const seed = world.provinceOfficialSeed[p]!;
   const name = officialAt(world, p)!;
+  const { might, cunning, logistics } = sea ? commissionSkills(OFFICIALS[type]!, yearsServed(world, p), isPort(world, p), true) : (commission.skills ?? { might: 1, cunning: 1, logistics: 1 });
   world.nationTreasury[n] = world.nationTreasury[n]! - cost;
-  const c = addCommander(world, n, wf.newCommander(name, { ...skills, origin: OFFICIALS[type]!, age: officialAge(world, p) }));
+  const c = addCommander(world, n, wf.newCommander(name, { might, cunning, logistics, origin: OFFICIALS[type]!, age: officialAge(world, p) }), undefined, sea);
   world.commanderHome[c] = p;
   world.commanderSeed[c] = seed;
   world.provinceOfficial[p] = -1;
-  if (n === world.player) news.push({ kind: "raised", text: `${name}, ${OFFICIALS[type]!.toLowerCase()} of ${provinceName(world, p)}, takes a commission as commander. The post stands empty until he returns.`, nations: [n], province: p });
+  if (n === world.player) news.push({ kind: "raised", text: `${name}, ${OFFICIALS[type]!.toLowerCase()} of ${provinceName(world, p)}, takes a commission as ${sea ? "admiral" : "general"}. The post stands empty until he returns.`, nations: [n], province: p });
   return null;
 }
 
@@ -673,6 +695,7 @@ export function splitTroops(world: World, n: number, army: number, arm: string, 
   const k = ARMS.indexOf(arm);
   if (k < 0) return `no arm ${arm}`;
   const c = commander ?? -1;
+  if (c >= 0 && isAdmiral(world, c)) return "an admiral leads fleets, not armies";
   if (c >= 0 && !idleCommanders(world, n).includes(c)) return "that commander already leads an army";
   const by = menByArm(world, army);
   men = Math.round(Math.min(men, by[k]!));
@@ -851,6 +874,7 @@ export function appointCommander(world: World, n: number, army: number, commande
     return null;
   }
   if (commander >= world.commanderIds.length || world.commanderOwner[commander] !== n) return "no such commander of yours";
+  if (isAdmiral(world, commander)) return "an admiral leads fleets, not armies";
   const other = armyOf(world, commander);
   if (other >= 0) {
     if (a.kind[other] === KIND.hired) return "a mercenary captain stays with his company";
@@ -1060,7 +1084,7 @@ export function aiRecruits(world: World, news: News[], atWarNow: (n: number) => 
   for (let n = 0; n < world.nationCount; n++) {
     if (n === world.player || world.nationGone[n] || !atWar[n]) continue;
     // Men it could not put under a commander would only stand as garrisons (feedback 28).
-    if (world.nationTreasury[n]! < COMMISSION_GOLD && !idleCommanders(world, n).length) continue;
+    if (world.nationTreasury[n]! < COMMISSION_GOLD && !idleCommanders(world, n, false).length) continue;
     const cap = capitalOf(world, n);
     if (callingPlace(world, n, cap)) continue;
     // Keep the levies' future pay within half the income.
@@ -1075,7 +1099,7 @@ export function aiRecruits(world: World, news: News[], atWarNow: (n: number) => 
 }
 
 const AI_MEN_PER_COMMANDER = 8000;
-const commandersOf = (world: World, n: number) => world.commanderOwner.reduce((t, o) => t + (o === n ? 1 : 0), 0);
+const commandersOf = (world: World, n: number) => world.commanderOwner.reduce((t, o, c) => t + (o === n && !isAdmiral(world, c) ? 1 : 0), 0);
 
 /** Each week, AI commanders take in the troops that have gathered, or a free (or newly commissioned) one leads them out. */
 export function aiCollect(world: World, news: News[]): void {
@@ -1094,7 +1118,7 @@ export function aiCollect(world: World, news: News[]): void {
   const idle = new Map<number, number[]>();
   for (let c = 0; c < world.commanderIds.length; c++) {
     const n = world.commanderOwner[c]!;
-    if (n < 0 || busy.has(c) || lordOfCommander(world, c) >= 0) continue;
+    if (n < 0 || busy.has(c) || isAdmiral(world, c) || lordOfCommander(world, c) >= 0) continue;
     const list = idle.get(n);
     if (list) list.push(c);
     else idle.set(n, [c]);
@@ -1121,7 +1145,7 @@ export function aiCollect(world: World, news: News[]): void {
       // A lord's official serves the lord, so only royal posts can give a commander.
       for (let p = 0; p < world.provinceCount && post < 0; p++) if (world.provinceOwner[p] === n && world.provinceLord[p]! < 0 && world.provinceOfficial[p]! >= 0) post = p;
       if (post < 0 || commissionOfficial(world, n, post, news)) continue;
-      free = idleCommanders(world, n);
+      free = idleCommanders(world, n, false);
     }
     const c = free[0]!;
     if (appointCommander(world, n, i, c)) continue;

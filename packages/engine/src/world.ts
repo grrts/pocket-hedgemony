@@ -171,6 +171,8 @@ export interface World extends LivingState, TreasuryState, FoodState, MoodState,
   commanderHome: number[];
   /** Name seed of each commander commissioned from an official, -1 = none. */
   commanderSeed: number[];
+  /** 1 for an admiral, who leads fleets only; 0 for a general, who leads armies only (RECR-128). */
+  commanderSea: number[];
   /** Ports, sailors, ships and fleets (navy.ts). */
   navy: NavyState;
   /** Charts, voyages, colonial governors and colonies being founded (exploration.ts, colonies.ts). */
@@ -520,6 +522,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   seedStartingPosts(world);
   world.commanderHome = commanderIds.map(() => -1);
   world.commanderSeed = commanderIds.map(() => -1);
+  world.commanderSea = commanderIds.map(() => 0);
   seedOfficials(world);
   seedGovernment(world);
   seedPeoples(world);

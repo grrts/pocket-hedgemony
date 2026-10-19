@@ -113,7 +113,7 @@ import { detailBands, EFFECTS, holderOf, momentParticles, moments, momentSeconds
 import { ParticleField } from "./map/particles.ts";
 import { TownLayer, townInfo } from "./map/towns.ts";
 import { bedUnderCamera, musicFacts, newFactMemory, playerPalette, playerWars, remember, type FactMemory } from "./audio/facts.ts";
-import { COMMISSION_GOLD, hireGold, OFFICIALS, Rng, startFormOf } from "@ph/engine";
+import { COMMISSION_GOLD, commissionSkills, hireGold, OFFICIALS, Rng, startFormOf } from "@ph/engine";
 import { formName } from "@ph/engine/domain/government";
 import { PICKER_REGIONS, pickerRegions, startTrade, waysToGrow } from "@ph/engine/domain/scenario-setup";
 import { pickerCardHtml, regionListHtml, regionSelectHtml, strongIn, strongInWords, waysToGrowHtml } from "./ui/realmPicker.ts";
@@ -198,13 +198,14 @@ type Commander = Snapshot["commanders"][number];
 const postOf = (x: Commander) => snapshot?.navy.fleets.find((f) => f.id === x.fleet)?.post ?? "admiral";
 /**
  * A commander's name with his rank in his realm's language (feedback 125):
- * his post at the head of a fleet (admiral, commodore or viceroy), general
- * otherwise. A hired captain's rank came with his name, in his company's language.
+ * his post at the head of a fleet (admiral, commodore or viceroy), admiral at court for one
+ * commissioned to lead fleets, general otherwise (RECR-128). A hired captain's rank came with his
+ * name, in his company's language.
  */
-const titledOf = (x: Commander) => (x.origin === "a hired captain" || x.owner < 0 || x.lord >= 0 ? x.name : rankedName(rules, x.owner, x.name, x.fleet >= 0 ? postOf(x) : "general"));
+const titledOf = (x: Commander) => (x.origin === "a hired captain" || x.owner < 0 || x.lord >= 0 ? x.name : rankedName(rules, x.owner, x.name, x.fleet >= 0 ? postOf(x) : x.sea ? "admiral" : "general"));
 const titled = (c: number) => titledOf(cmdOf(c));
 /** The same post in plain English, shown beside the ranked name. */
-const roleOf = (x: Commander) => (x.origin === "a hired captain" ? "hired captain" : x.lord >= 0 ? titlesOf(x.owner).lord : x.fleet >= 0 ? postOf(x) : "commander");
+const roleOf = (x: Commander) => (x.origin === "a hired captain" ? "hired captain" : x.lord >= 0 ? titlesOf(x.owner).lord : x.fleet >= 0 ? postOf(x) : x.sea ? "admiral" : "general");
 const neighborIdx = provinces.map((p) => p.neighbors.map((id) => provinceIndex.get(id)!));
 // The same, flat, for walks over the whole map each turn.
 const neighborStart = new Int32Array(provinces.length + 1);
@@ -490,12 +491,14 @@ document.addEventListener("click", (e) => {
   const b = (e.target as HTMLElement).closest<HTMLButtonElement>("[data-commission]");
   if (!b || b.disabled) return;
   const province = Number(b.dataset.commission);
-  void act({ type: "commission", province }).then(() => {
+  const sea = b.dataset.commissionSea !== undefined;
+  void act({ type: "commission", province, sea }).then(() => {
     if (!snapshot || snapshot.rejectedOrders.length) return;
     officialView = -1;
     newsView = false;
     realmView = snapshot.playerNation;
-    realmTab = "military";
+    // A general waits in the Military tab's Commanders list, an admiral on the Navy tab.
+    realmTab = sea ? "navy" : "military";
     renderPanel();
   });
 });
@@ -4234,6 +4237,9 @@ function moveFit(post: string, p: number): [number, string] {
   }
 }
 
+/** What an official would start with as a general and as an admiral (RECR-070, NAVY-073). */
+const commandChoice = (post: string, years: number, port: boolean) => ({ general: commissionSkills(post, years, port, false), admiral: commissionSkills(post, years, port, true), port });
+
 /** The official's screen shows every province to move him to, not just the best few. */
 let movesAll = false;
 
@@ -4264,7 +4270,7 @@ function renderOfficial(pi: number): void {
   }));
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(o.name)}</h2>${closeButton()}</header>
-    ${officialScreen(rules, o, me, COMMISSION_GOLD, s.nationTreasury[me]!, moves, movesAll || options.length <= 6, titlesOf(me), s.posts.fit[pi] ?? null)}
+    ${officialScreen(rules, o, me, COMMISSION_GOLD, s.nationTreasury[me]!, moves, movesAll || options.length <= 6, titlesOf(me), s.posts.fit[pi] ?? null, commandChoice(o.post, s.provinceOfficialYears[pi]!, s.navy.ports.some((x) => x.province === pi)))}
     <button class="back" data-back>${icon("scroll", 2)}Back to the officials</button>`;
   bindClose();
   showPanel(true);
@@ -4941,12 +4947,12 @@ const weeks = (w: number) => `${w} week${w === 1 ? "" : "s"}`;
 /** Days as the queue says them: "in 9 days", "tomorrow" (or bare, "14 days"). */
 const days = (d: number, inWord = true) => (inWord && d <= 1 ? "tomorrow" : `${inWord ? "in " : ""}${Math.max(1, Math.round(d))} day${Math.round(d) === 1 ? "" : "s"}`);
 
-/** Commanders of the player waiting at court, best first. */
-function idleCommanders(): number[] {
+/** Generals of the player waiting at court, or admirals when `sea`, best first (RECR-128). */
+function idleCommanders(sea = false): number[] {
   const s = snapshot!;
   return s.commanders
     .map((c, i) => ({ c, i }))
-    .filter(({ c }) => c.owner === s.playerNation && c.army < 0 && c.fleet < 0)
+    .filter(({ c }) => c.owner === s.playerNation && c.army < 0 && c.fleet < 0 && c.sea === sea)
     .sort((x, y) => y.c.might + y.c.cunning + y.c.logistics - (x.c.might + x.c.cunning + x.c.logistics))
     .map(({ i }) => i);
 }
@@ -5019,7 +5025,7 @@ function renderGarrison(pi: number): void {
           })
           .join("")
       : `<p class="hint">None. Men you call here wait in the garrison until a commander leads them or picks them up.</p>`}
-    ${g.troops.length ? `<p class="hint">${here.length ? `Commanders here: ${here.map((c) => esc(cmdOf(c.commander).name)).join(", ")}.` : idle.length ? "No commander stands here: one from court can lead them." : "No commander is free: commission an official from the Officials tab."}</p>` : ""}
+    ${g.troops.length ? `<p class="hint">${here.length ? `Commanders here: ${here.map((c) => esc(cmdOf(c.commander).name)).join(", ")}.` : idle.length ? "No commander stands here: one from court can lead them." : "No general is free: commission an official as general from the Officials tab."}</p>` : ""}
     </div>`;
   bindClose();
   bindProvinceTabs();
@@ -5156,7 +5162,7 @@ function renderFleet(id: number): void {
     ${fleetCard(f, mine, {
       name: (p) => provinces[p]!.name,
       admiralName: titled,
-      idle: idleCommanders().map((c) => ({ id: c, name: cmdOf(c).name, skills: skills(cmdOf(c)) })),
+      idle: idleCommanders(true).map((c) => ({ id: c, name: cmdOf(c).name, skills: skills(cmdOf(c)) })),
       armiesHere,
       fleetsHere: v.fleets.filter((x) => x.owner === me && x.at === f.at && x.id !== id && !x.battle),
       choosing: sailing === id,
@@ -5588,12 +5594,12 @@ function warRoomSection(): string {
     ${mine
       .map(({ c, i }) => {
         const k = c.army;
-        const where = k >= 0 ? `leads ${fmt(s.armies.men[k]!)} men at ${esc(provinces[s.armies.location[k]!]!.name)}` : "waits at court";
+        const where = k >= 0 ? `leads ${fmt(s.armies.men[k]!)} men at ${esc(provinces[s.armies.location[k]!]!.name)}` : c.fleet >= 0 ? "leads a fleet" : "waits at court";
         return `<div class="army">${commanderPortrait(rules, c.name, me)}<span class="who"><b>${esc(titledOf(c))}</b><br><small>${roleOf(c)} · ${skills(c)} · ${c.victories} won, ${c.defeats} lost</small><br><small>${where}</small></span>
           <span class="army-buttons">${k >= 0 ? `<button class="paper small" data-command="${s.armies.id[k]!}">Command</button>` : c.home >= 0 ? `<button class="paper small" data-release="${i}" title="Back to his post in ${esc(provinces[c.home]!.name)}">Release</button>` : ""}</span></div>`;
       })
       .join("")}
-    <p class="hint">New commanders are commissioned from a province's official, in its Garrison tab.</p>
+    <p class="hint">New generals and admirals are commissioned from a province's official, on his screen in the Officials tab.</p>
     ${mercenaryLine()}`;
 }
 
@@ -7704,13 +7710,13 @@ Object.assign(globalThis, {
     }
     return best;
   },
-  /** Commissions the first official of the player's who serves the crown (not a lord) as a commander. */
-  __phCommission: async () => {
+  /** Commissions the first official of the player's who serves the crown (not a lord) as a general, or as an admiral when `sea`. */
+  __phCommission: async (sea = false) => {
     if (!snapshot) return null;
     const me = snapshot.playerNation;
     const p = provinces.findIndex((_, i) => owners[i] === me && snapshot!.provinceLord[i]! < 0 && officialOf(snapshot!, i, me) && i !== provinceIndex.get(nations[me]!.capital));
     if (p < 0) return null;
-    await act({ type: "commission", province: p });
+    await act({ type: "commission", province: p, sea });
     return snapshot.rejectedOrders.map((r) => r.reason);
   },
   /** Takes the commander off the player's first led army, as the army card's leave button does (a fleet's leader when gold is short). */
@@ -7723,7 +7729,7 @@ Object.assign(globalThis, {
     return snapshot.rejectedOrders.map((r) => r.reason);
   },
   /** The first commander of the player's free to lead (scripts/navy-shots.mjs), or -1. */
-  __phIdleCommander: () => idleCommanders()[0] ?? -1,
+  __phIdleCommander: (sea = false) => idleCommanders(sea)[0] ?? -1,
   /** Declares war on a realm by id (scripts/navy-shots.mjs: a blockade). */
   __phWar: (id: string) => act({ type: "declareWar", target: nationIndex.get(id)! }).then(() => snapshot?.rejectedOrders.map((r) => r.reason) ?? []),
   /** The nearest sea zones (up to eight, nearest first), over the sea from port p, that lie beside a coastal province of a realm by id. */
