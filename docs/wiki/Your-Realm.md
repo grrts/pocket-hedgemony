@@ -50,7 +50,7 @@ The treasury keeps a **ledger** for the month: Tax and Trade coming in, Army pay
 
 Lenders let you owe up to **one year's tax and trade**. A loan costs at once: the gold you borrow **plus 10 % interest** goes onto your debt the moment you take it, and the debt keeps costing **10 % a year** while you owe it. Borrowing also makes the crown look weak: **every lord falls a step in loyalty**, at most once a year. You can repay any part at any time.
 
-**Default.** If your gold stays below zero and lenders will give no more for three months in a row, the crown defaults: what you owe is gone and your gold is set to nothing, but every lord falls two steps in loyalty (none below Disloyal), your treasury pillar reads Troubled for two years and lenders refuse you for five. You are warned in the news each month before, and the Treasury tab says how many months are left. AI realms default by the same rule.
+**Default.** If you owe lenders, your gold stays below zero and they will give no more for three months in a row, the crown defaults: what you owe is gone and your gold is set to nothing, but every lord falls two steps in loyalty (none below Disloyal), your treasury pillar reads Troubled for two years and lenders refuse you for five. You are warned in the news each month before, and the Treasury tab says how many months are left. AI realms default by the same rule.
 
 **New land.** For ten years after you take a province from another realm, by a peace or a demand, it holds the *Newly taken* grievance and costs half its tax again in garrisons and clerks, on the ledger's *Holding new land* line. Taken land with a foreign language and the wrong faith riots until it settles.
 
