@@ -70,7 +70,7 @@ describe("men and ships whose commander dies (RECR-135 to RECR-137)", () => {
     expect(act(w, { type: "navy", do: "admiral", fleet: f.id, commander: c }, n)).toEqual([]);
     // Out to sea, two zones off its port.
     const port = f.at;
-    const sea = w.adjList.subarray(w.adjStart[port]!, w.adjStart[port + 1]!).find((q) => w.provinceWater[q])!;
+    const sea = w.adjList.subarray(w.adjStart[port]!, w.adjStart[port + 1]!).find((q) => w.provinceWater[q] === 1)!;
     expect(act(w, { type: "navy", do: "sail", fleet: f.id, to: sea }, n)).toEqual([]);
     for (let t = 0; t < 6 && !w.provinceWater[f.at]; t++) processTurn(w, [], n);
     expect(w.provinceWater[f.at]).toBe(1);
