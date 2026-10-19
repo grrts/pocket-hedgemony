@@ -1,4 +1,6 @@
 import { inAnyWar, lordOfCommander, lordSendHome } from "./lords.ts";
+import { throneShare } from "./throne.ts";
+import { stabilityEffect } from "./stability.ts";
 import { officialAge } from "./people.ts";
 import { refillPaces } from "./fallen.ts";
 import { moodShare } from "./moods.ts";
@@ -992,11 +994,11 @@ export function monthlyRecruits(world: World, news: News[]): void {
   const fallen = refillPaces(world);
   for (let p = 0; p < world.provinceCount; p++) {
     const pool = { recruits: world.provinceRecruits[p]!, ceiling: world.provinceRecruitCeiling[p]! };
-    // A muster master refills the pool faster (province officials table: +25 %).
+    // A muster master refills the pool faster (province officials table: +25 %); royal land far from the throne and a troubled realm slower (X-29).
     const muster = officialBonus(world, p, "Muster master", "recruit_refill");
     const heritage = heritageFactor(world, world.provinceOwner[p]!, "recruit_refill_pct");
     const owner = world.provinceOwner[p]!;
-    rc.refill(pool as rc.ProvincePool, 1, rate * muster * heritage * (owner >= 0 ? fallen[owner]! : 1) * (ungoverned(world, p) ? empty : 1) * moodShare(world, p));
+    rc.refill(pool as rc.ProvincePool, 1, rate * muster * heritage * (owner >= 0 ? fallen[owner]! : 1) * (ungoverned(world, p) ? empty : 1) * moodShare(world, p) * throneShare(world, p) * stabilityEffect(world, owner).recruits);
     world.provinceRecruits[p] = pool.recruits;
   }
   recomputeCap(world);

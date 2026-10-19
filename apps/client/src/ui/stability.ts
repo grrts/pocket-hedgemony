@@ -27,6 +27,6 @@ export function stabilityPlaque(s: Stability, me: number, revo?: RevolutionView 
 export function stabilitySection(s: Stability, t: Titles = DEFAULT_TITLES): string {
   const m = sectionModel(s);
   return `<h3 class="sub">Stability: ${m.words}</h3>
-    <p class="hint">${m.note} Tap a pillar to see what to mend.</p>
+    <p class="hint">${m.note}${m.cost ? ` ${m.cost}` : ""} Tap a pillar to see what to mend.</p>
     <div class="pillars">${m.pillars.map((p) => `<button class="paper pillar step-${p.step}" data-realm-open-tab="${p.opens}"><b>${p.opens === "lords" ? cap(t.lords) : p.opens === "officials" ? cap(t.officials) : p.label}</b><span>${p.opens === "lords" ? p.line.replace(/^No lords/, `No ${t.lords}`) : p.line}</span><em>${p.words}</em></button>`).join("")}</div>`;
 }

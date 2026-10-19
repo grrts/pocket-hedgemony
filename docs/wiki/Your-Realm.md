@@ -50,6 +50,12 @@ The treasury keeps a **ledger** for the month: Tax and Trade coming in, Army pay
 
 Lenders let you owe up to **one year's tax and trade**. A loan costs at once: the gold you borrow **plus 10 % interest** goes onto your debt the moment you take it, and the debt keeps costing **10 % a year** while you owe it. Borrowing also makes the crown look weak: **every lord falls a step in loyalty**, at most once a year. You can repay any part at any time.
 
+**Default.** If you owe lenders, your gold stays below zero and they will give no more for three months in a row, the crown defaults: what you owe is gone and your gold is set to nothing, but every lord falls two steps in loyalty (none below Disloyal), your treasury pillar reads Troubled for two years and lenders refuse you for five. You are warned in the news each month before, and the Treasury tab says how many months are left. AI realms default by the same rule.
+
+**New land.** For ten years after you take a province from another realm, by a peace or a demand, it holds the *Newly taken* grievance and costs half its tax again in garrisons and clerks, on the ledger's *Holding new land* line. Taken land with a foreign language and the wrong faith riots until it settles.
+
+**Far from the throne.** Royal land more than 30 days from your capital sends less tax and recruits; see [Provinces](Provinces). Granting it to a lord avoids the cut.
+
 AI realms tax at normal in peace and heavy at war, borrow only when their gold falls below zero, and repay once they hold a year's army pay and wages.
 
 Where to find it: the gold plaque at the top of the screen shows your gold and change a month; tap it for the **Treasury** tab of your country card: your purse with how long the gold lasts, the month's gold in and out as bars, the realm tax default, and your debt as a meter against what lenders allow, with Borrow buttons that say what you will owe before you tap. To tax one province differently, open it: its Overview tab has a Tax line and a row of rate buttons, from *Realm default* to *Crushing*.
@@ -208,7 +214,7 @@ The words show on the country card's tabs, the Stability pillars, the Lords map 
 
 ### Stability
 
-Stability tells you at a glance how well your realm holds together. It is not a hidden number: it reads four pillars, and your realm is only as steady as the weakest of them.
+Stability tells you at a glance how well your realm holds together. It is not a hidden number: it reads five pillars, and your realm is only as steady as the weakest of them.
 
 | Pillar | What it reads | Steady | Uneasy | Troubled | Crumbling |
 |---|---|---|---|---|---|
@@ -216,10 +222,13 @@ Stability tells you at a glance how well your realm holds together. It is not a 
 | Subjects | Your subjects by loyalty (their standing at the start for now) | Half or more Loyal, none Disloyal | Fewer than half Loyal | Any Disloyal | Any In revolt |
 | Officials | Royal provinces whose official's post stands empty | None | Up to a quarter | Up to a half | More |
 | Provinces | Provinces rioting or plotting | None | Any rioting | Any plotting, or a tenth | A quarter |
+| Treasury | Your debts | Paying its way | Broke: a default is coming | For 2 years after a default | — |
+
+Low stability costs you. While **Troubled**, your provinces send 10 % less tax and recruits and plotting provinces rise half as often again; while **Crumbling**, 25 % less and twice as often. Steady and Uneasy cost nothing. The Stability section says what your step costs, and each province's Tax line names the cut.
 
 Officials matter twice: an empty post shows in the officials pillar, and the *Ungoverned* grievance it brings (and *Grasping officials* over the cap) pushes provinces toward riots. A judge holds riots off one grievance longer. Lords' own provinces are run by their own officials and do not count.
 
-The stability plaque in the top bar shows the step (amber when Uneasy, red when Troubled, blinking when Crumbling). Tap it to open your Realm book's Overview, where each pillar has a row; tap a row to open the Lords, Diplomacy, Officials or Provinces tab and mend it.
+The stability plaque in the top bar shows the step (amber when Uneasy, red when Troubled, blinking when Crumbling). Tap it to open your Realm book's Overview, where each pillar has a row; tap a row to open the Lords, Diplomacy, Officials, Provinces or Treasury tab and mend it.
 
 ### Army and navy at a glance
 

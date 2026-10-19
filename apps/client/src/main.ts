@@ -34,6 +34,12 @@ import {
   topBar,
   treasuryView,
   type Opens,
+  shareAtDays,
+  STABILITY,
+  STABILITY_EFFECTS,
+  DEFAULT_RULE,
+  takenUntil,
+  THRONE,
 } from "@ph/engine";
 import type { GameDate } from "@ph/rules";
 import { askCard, courtLordHtml, myHouse, mySubjects, myStatecraft, overlordCard, realmStatecraft, subjectCard } from "./ui/statecraft.ts";
@@ -356,7 +362,7 @@ let exploring: { fleet: number; path: number[]; legs: number[]; carryOn: boolean
 /** The tile tapped on the Land tab, or -1. */
 let landTile = -1;
 /** Map lens: how provinces are coloured. */
-type Lens = "realms" | "terrain" | "people" | "wealth" | "walls" | "food" | "lords" | "diplomacy" | "subjects" | "tongues" | "faiths" | "charts" | "trade" | "institutions";
+type Lens = "realms" | "terrain" | "people" | "wealth" | "walls" | "food" | "lords" | "diplomacy" | "subjects" | "tongues" | "faiths" | "charts" | "trade" | "institutions" | "throne";
 let lens: Lens = "realms";
 /** The trader route being drawn on the map, or null when the map is not in route mode (TRADE-142). */
 let routing: Routing | null = null;
@@ -869,6 +875,7 @@ const LENSES: { id: Lens; name: string; note: string }[] = [
   { id: "walls", name: "Walls", note: "castles and forts" },
   { id: "food", name: "Food", note: "men on campaign the store can feed" },
   { id: "lords", name: "Lords", note: "who holds your land" },
+  { id: "throne", name: "Days to capital", note: "royal land far from the throne sends less" },
   { id: "diplomacy", name: "Diplomacy", note: "friend or foe, envoys on the road" },
   { id: "subjects", name: "Subjects", note: "your subjects by loyalty, and your overlord" },
   { id: "tongues", name: "Languages", note: "the family of the language most speak" },
@@ -912,6 +919,19 @@ const LOYALTY_RGB = Object.fromEntries(Object.entries(LOYALTY_HEX).map(([k, v]) 
 const OVERLORD_HEX = "#7a4fa0";
 const OVERLORD_RGB = hexToRgb(OVERLORD_HEX);
 const loyaltyKey = (l: string): keyof typeof LOYALTY_HEX => (/disloyal/i.test(l) ? "disloyal" : /waver/i.test(l) ? "wavering" : "loyal");
+/** The Days to capital lens (X-29): near, far (amber to red as the cut grows) and lords' land. */
+const THRONE_HEX = { near: "#3f8f46", lord: "#9a8f7a" } as const;
+const THRONE_RGB = { near: hexToRgb(THRONE_HEX.near), lord: hexToRgb(THRONE_HEX.lord) };
+const THRONE_RAMP = [hexToRgb("#d8a03a"), hexToRgb("#b8323a")];
+function throneKey(): string {
+  const sw = (c: string) => `<i class="swatch" style="background:${c}"></i>`;
+  return `<div class="lens-key">
+    <span>${sw(THRONE_HEX.near)}Within ${THRONE.days} days: full tax and recruits</span>
+    <span>${sw("#d8a03a")}Far from the throne: sends less</span>
+    <span>${sw("#b8323a")}${THRONE.farCap} days or cut off: half</span>
+    <span>${sw(THRONE_HEX.lord)}A lord's land: run from his seat</span>
+  </div>`;
+}
 /** The key under the lens buttons: what each colour means. */
 const RELATION_KEY: [LensRelation, string][] = [
   ["own", "You and your subjects"],
@@ -968,7 +988,7 @@ function renderLensMenu(): void {
   lensMenu.innerHTML = `
     <h3 class="sub">Map mode</h3>
     ${LENSES.map((l) => `<button class="paper lens${l.id === lens ? " on" : ""}" data-lens="${l.id}"><b>${l.id === "lords" && snapshot ? cap(titlesOf(snapshot.playerNation).lords) : l.name}</b><small>${l.note}</small></button>`).join("")}
-    ${lens === "institutions" ? institutionsKey(INSTITUTION_HEX) : lens === "diplomacy" ? diplomacyKey() : lens === "subjects" ? subjectsKey() : lens === "tongues" || lens === "faiths" ? beliefKey() : lens === "charts" ? chartsKey() : lens === "trade" ? tradeKey() : ""}
+    ${lens === "institutions" ? institutionsKey(INSTITUTION_HEX) : lens === "diplomacy" ? diplomacyKey() : lens === "subjects" ? subjectsKey() : lens === "tongues" || lens === "faiths" ? beliefKey() : lens === "charts" ? chartsKey() : lens === "trade" ? tradeKey() : lens === "throne" ? throneKey() : ""}
     <label class="fog-toggle"><input type="checkbox" id="fog" ${fogOn ? "checked" : ""}> Hide unexplored lands</label>
     <label class="fog-toggle"><input type="checkbox" id="markers" ${markersOn ? "checked" : ""}> Markers: men and names over every army close in</label>`;
   lensMenu.querySelectorAll<HTMLButtonElement>("[data-lens]").forEach((b) =>
@@ -1090,6 +1110,13 @@ function lensColor(i: number): number[] {
       return WALL_RGB[wallsAt(i) ?? "none"];
     case "food":
       return ramp(FOOD_RAMP, Math.log10(Math.max(1, landFeeds(i))) / 5);
+    case "throne": {
+      // The player's royal land by its days to the capital: near in green, far from amber to red; lords' land is run from their seats.
+      if (!snapshot || o !== snapshot.playerNation) return o >= 0 ? nationRgb[o]!.map((v) => Math.round(v * 0.35 + 150)) : unownedRgb;
+      if (snapshot.provinceLord[i]! >= 0) return THRONE_RGB.lord;
+      const days = snapshot.provinceDaysToCapital[i]!;
+      return days <= THRONE.days ? THRONE_RGB.near : ramp(THRONE_RAMP, (days - THRONE.days) / (THRONE.farCap - THRONE.days));
+    }
     case "lords": {
       // The player's realm: royal land in gold, each lord's land in his own colour; other realms faded.
       if (!snapshot || o !== snapshot.playerNation) return o >= 0 ? nationRgb[o]!.map((v) => Math.round(v * 0.35 + 150)) : unownedRgb;
@@ -4414,6 +4441,8 @@ function renderPanelCard(): void {
       ${snapshot ? beliefFacts(snapshot.peoples, selectedProvince) : ""}
       <dt>Walls</dt><dd>${wallsAt(selectedProvince) ? WALL_NAMES[wallsAt(selectedProvince)!] : "None"}</dd>
       ${occupiers[selectedProvince]! >= 0 ? `<dt>Occupied</dt><dd>by ${esc(nations[occupiers[selectedProvince]!]!.name)}</dd>` : ""}
+      ${mineHere ? throneFact(selectedProvince) : ""}
+      ${mineHere ? newLandFact(selectedProvince) : ""}
       ${mineHere ? taxLine(selectedProvince) : ""}
     </dl>
     ${mineHere ? rateButtons(snapshot!.provinceTax[selectedProvince]!, "province") : ""}
@@ -5179,6 +5208,8 @@ const GRIEVANCE_FIX: Record<string, string> = {
   "Heavy taxes": "ends when the tax is normal or lighter; crushing counts twice",
   "Grasping officials": "the realm has more officials than its cap; ends when it is back within (Government tab)",
   Plague: "an outbreak rages here; ends when it burns out",
+  "Far from the throne": "royal land more than a month from the capital; ends when a lord holds it or the capital is nearer",
+  "Newly taken": "taken from another realm in the last 10 years; fades with time",
 };
 
 /** A province's mood and its grievances, with what each needs to end. */
@@ -6058,10 +6089,40 @@ function mercenarySection(): string {
 
 const gold2 = (g: number) => (Math.abs(g) < 10 ? g.toFixed(2) : g.toFixed(1));
 
+/** How far the province is from the capital, and what that costs (PROV-173, X-29). */
+function throneFact(p: number): string {
+  const s = snapshot!;
+  if (provinces[p]!.id === nations[s.playerNation]?.capital) return "";
+  const days = s.provinceDaysToCapital[p]!;
+  const say = days >= THRONE.farCap ? `${THRONE.farCap}+ days` : `${days} days`;
+  const note = s.provinceLord[p]! >= 0 ? (days > THRONE.days ? " · its lord runs it from his seat" : "") : days > THRONE.days ? ` · far from the throne: ${cutPct(1 - shareAtDays(days))} tax and recruits` : "";
+  return `<dt>To capital</dt><dd>${say}${note}</dd>`;
+}
+
+/** Land taken from another realm: what holding it costs, and until when (X-29). */
+function newLandFact(p: number): string {
+  const s = snapshot!;
+  const y = s.provinceTakenYear[p]!;
+  if (y < 0 || s.date.year >= takenUntil(y)) return "";
+  return `<dt>Newly taken</dt><dd>in ${y} · until ${takenUntil(y)} it costs garrisons and clerks (Holding new land on the Treasury tab) and holds the Newly taken grievance</dd>`;
+}
+
+/** Why a province sends less than its rate says, each with its share kept back (X-29). */
+function taxCuts(p: number): string {
+  const s = snapshot!;
+  const cuts: string[] = [];
+  const days = s.provinceDaysToCapital[p]!;
+  if (s.provinceLord[p]! < 0 && days > THRONE.days) cuts.push(`${cutPct(1 - shareAtDays(days))}: far from the throne`);
+  const st = s.stability ? STABILITY_EFFECTS[s.stability.step]! : null;
+  if (st && st.tax < 1) cuts.push(`${cutPct(1 - st.tax)}: the realm is ${STABILITY[s.stability!.step]!.toLowerCase()} (General tab)`);
+  return cuts.length ? `<br><small>${cuts.join("<br>")}</small>` : "";
+}
+const cutPct = (x: number) => `−${Math.round(x * 100)} %`;
+
 /** A province's Tax line: its rate, whether it follows the realm default, and the gold it pays a month (the engine's taxLine model, REALM-183). */
 function taxLine(p: number): string {
   const t = taxLineOf(snapshot!, p);
-  return `<dt>Tax</dt><dd>${t.rateLabel} (${t.followsDefault ? "realm default" : "own rate"}) · ${gold2(t.goldPerMonth)} gold a month</dd>`;
+  return `<dt>Tax</dt><dd>${t.rateLabel} (${t.followsDefault ? "realm default" : "own rate"}) · ${gold2(t.goldPerMonth)} gold a month${taxCuts(p)}</dd>`;
 }
 
 /**
@@ -6107,6 +6168,14 @@ async function actInTreasury(order: Order): Promise<void> {
  * loan costs said before the borrow buttons (REALM-184, REALM-198). What it
  * shows comes from the engine's treasuryView model.
  */
+/** The road to default, or what a default left behind (X-29): said on the Treasury tab before it happens. */
+function defaultNote(d: { monthsLeft: number; refuseUntil: number; defaulted: number }): string {
+  if (d.monthsLeft > 0)
+    return `<p class="hint warn"><b>The treasury is empty and lenders give no more.</b> Unless gold comes in, the crown defaults in ${d.monthsLeft === 1 ? "a month" : `${d.monthsLeft} months`}: the debt is gone, but the lords turn away, the realm is troubled for ${DEFAULT_RULE.troubledYears} years and lenders refuse it for ${DEFAULT_RULE.refuseYears}. Raise the tax, send soldiers home or sell grain.</p>`;
+  if (d.refuseUntil >= 0) return `<p class="hint warn">The crown defaulted in ${d.defaulted}: lenders refuse it until ${d.refuseUntil}.</p>`;
+  return "";
+}
+
 function treasurySection(): string {
   const s = snapshot!;
   const t = treasuryView(s);
@@ -6127,6 +6196,7 @@ function treasurySection(): string {
         <div class="purse-note">${lasts}</div>
       </div>
     </div>
+    ${defaultNote(s.debtTrouble)}
     <h3 class="sub">This month</h3>
     <div class="flow" role="img" aria-label="Gold in ${gold2(income)}, gold out ${gold2(spending)} a month">
       <span class="in" style="flex:${income.toFixed(3)}">In ${gold2(income)}</span><span class="out" style="flex:${spending.toFixed(3)}">Out ${gold2(spending)}</span>
