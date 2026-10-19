@@ -3,6 +3,7 @@ import bridge from "../../rules/data/domain/events-places.json" with { type: "js
 import rules from "../../rules/data/domain/events.json" with { type: "json" };
 import geography from "../../rules/data/domain/exploration-regions.json" with { type: "json" };
 import west from "../../rules/data/domain/events-bridge-west.json" with { type: "json" };
+import lordEvents from "../../rules/data/domain/events-bridge-lords.json" with { type: "json" };
 import * as evt from "./domain/events/index.ts";
 import * as dip from "./domain/diplomacy/index.ts";
 import * as subj from "./domain/subjects/index.ts";
@@ -16,6 +17,7 @@ import { noteChoice } from "./achievements.ts";
 import { traitLean } from "./rulers.ts";
 import { faithOf, headEventChosen, isHeadPatron, setHeadPatron } from "./faithHeads.ts";
 import { spark } from "./rebels.ts";
+import { historicalLordComes, laterLord } from "./lords.ts";
 
 /**
  * Milestone 6, history (first slice): the 1444 event tree fires in the game.
@@ -31,7 +33,7 @@ import { spark } from "./rebels.ts";
 type Campaign = Pick<evt.Tree, "ages" | "periods" | "events" | "modifiers" | "localization"> & { entities: Record<string, string> };
 /** A region's bridge events of 1378 to 1444, with the places, names and words they bring (EVT-085). */
 type Bridge = { events: Record<string, evt.EventDef>; places: Record<string, string[]>; entities: Record<string, string>; localization: Record<string, string> };
-const BRIDGES = [west] as unknown as Bridge[];
+const BRIDGES = [west, lordEvents] as unknown as Bridge[];
 const base = campaign as unknown as Campaign;
 const data: Campaign = {
   ...base,
@@ -141,6 +143,8 @@ export function createGameEvents(world: World): GameEvents {
   subjectConditions(world, g);
   // Whether a realm is a head's patron (RELG-154).
   state.conditions.faith_head_patron = (p, _w, ctx) => evt.resolve(p.who, ctx).some((id) => isHeadPatron(world, String(p.head), g.nationOf.get(id) ?? -1));
+  // A historical figure comes to a realm as its lord (REALM-295): the tree reports it, the game seats him.
+  state.effects = { historical_lord: (p, _w, ctx, out) => evt.resolve(p.on, ctx).forEach((on) => out.push({ type: "historical_lord", target: on, values: { id: p.id } })) };
   sync(world, g);
   evt.yearlyAgeCheck(state, world.date.year);
   evt.periodCheck(state, world.date.year);
@@ -652,6 +656,11 @@ function landEffect(world: World, g: GameEvents, e: evt.DomainEvent, news: News[
       bondsChanged(world);
       return;
     }
+    case "historical_lord": {
+      const h = laterLord(String(v.id));
+      if (n !== undefined && h) historicalLordComes(world, n, h, news);
+      return;
+    }
     case "rebels": {
       // The event is a spark (EVT-048, EVT-088): every aggrieved province of the realm or the place may rise.
       const what = REBEL_SPARKS[String(v.type)] ?? REBEL_SPARKS.noble!;
@@ -784,6 +793,11 @@ function describe(world: World, g: GameEvents, e: evt.Effect, roles: Record<stri
     case "relation":
       text = `${cap(who(p.who))} and ${who(p.other)}: ${humanize(String(p.type))}${p.set === false ? " ends" : ""}`;
       break;
+    case "historical_lord": {
+      const h = laterLord(String(p.id));
+      if (h) text = h.takes_over ? `${h.name} takes the lands of their lord as ${h.title}` : `${h.name} becomes ${who(p.on) === "you" ? "your" : `${who(p.on)}'s`} lord as ${h.title}`;
+      break;
+    }
     case "rebels":
       text = `Rebels rise in ${place(String(p.on).startsWith("$") ? who(p.on) : p.on)}`;
       break;
