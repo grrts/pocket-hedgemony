@@ -613,6 +613,8 @@
     "fromZoom": 2,
     "maxParticles": 240,
     "frameRate": 20,
+    "loopFrameRate": 10,
+    "emitMs": 250,
     "reducedShare": 0.5,
     "moments": {
       "flip": {
@@ -645,16 +647,20 @@
     "chimneys": {
       "fromZoom": 16,
       "coreCellsPerChimney": 5,
-      "maxPerTown": 3
+      "maxPerTown": 3,
+      "maxPuffs": 120,
+      "puffChance": 0.6
     },
     "snow": {
       "belowCelsius": 0,
-      "maxFlakes": 80
+      "maxFlakes": 80,
+      "perEmit": 10
     },
     "birds": {
       "flockMin": 3,
       "flockMax": 5,
-      "flocksOnScreen": 1
+      "flocksOnScreen": 1,
+      "chance": 0.04
     }
   }
 }

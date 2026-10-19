@@ -109,8 +109,8 @@ import {
   type FormationState,
 } from "@ph/engine/domain/map-presentation";
 import { provinceLevy } from "@ph/engine/domain/recruiting";
-import { detailBands, EFFECTS, holderOf, momentParticles, moments, momentSeconds, momentsShown, type MomentKind } from "@ph/engine/domain/map-presentation";
-import { ParticleField } from "./map/particles.ts";
+import { chimneysShown, detailBands, EFFECTS, holderOf, loopingEffects, momentParticles, moments, momentSeconds, momentsShown, snowing, type MomentKind } from "@ph/engine/domain/map-presentation";
+import { ParticleField, Shape } from "./map/particles.ts";
 import { TownLayer, townInfo } from "./map/towns.ts";
 import { bedUnderCamera, musicFacts, newFactMemory, playerPalette, playerWars, remember, type FactMemory } from "./audio/facts.ts";
 import { COMMISSION_GOLD, hireGold, OFFICIALS, Rng, startFormOf } from "@ph/engine";
@@ -1191,6 +1191,7 @@ function restyleProvinces(): void {
     seasonKey = key;
     const s = nextSeason?.key === key ? nextSeason.data : seasonsFor(date);
     view.renderer.setProvinceSeasons(s);
+    seasonNow = s;
     if (!previewMonth) {
       const next = addDays(date, DAYS_PER_TURN);
       setTimeout(() => (nextSeason = { key: dateKey(next), data: seasonsFor(next) }), 50);
@@ -3038,23 +3039,93 @@ function playMoments(before: Snapshot | null, next: Snapshot): void {
     if (sx < -40 || sy < -40 || sx > view.width + 40 || sy > view.height + 40) continue;
     const colour = m.nation >= 0 ? nations[m.nation]!.color : PALETTE.paper;
     particles.moment(m.kind, p.x!, p.y!, momentParticles(m.kind, animations), momentSeconds(m.kind), colour);
+    momentUntil = Math.max(momentUntil, performance.now() + momentSeconds(m.kind) * 1000);
   }
   if (particles.count) view.invalidate();
 }
 
-/** Moves the particles on to now and draws them, asking for the next frame at the effects' frame rate while any live. */
+/** Moves the particles on to now and draws them, asking for the next frame while any live: at the effects' frame rate during a moment, slower for the looping ones. */
 function drawParticles(o: OverlayContext): void {
   const now = performance.now();
   // A long gap (the tab hidden, the map idle) is not played out: the particles go on from where they were.
   particles.step(Math.min(0.1, Math.max(0, (now - (particleClock || now)) / 1000)));
   particleClock = now;
+  if (now - lastEmit >= EFFECTS.emitMs) {
+    lastEmit = now;
+    if (loopingEffects(animationsPref(), batteryOn()) && momentsShown(o.zoom)) emitLoops(o);
+  }
   if (!particles.count) {
     particleClock = 0;
     return;
   }
   // In art pixels a little bigger than the tokens', so a moment reads at arm's length, and the living band's close in (VIEW-102).
   particles.draw(o.ctx, o.toScreen, Math.max(3, Math.round(o.zoom / 8)), o.width, o.height);
-  if (!particleTick) particleTick = setTimeout(() => ((particleTick = 0), view.invalidate()), 1000 / EFFECTS.frameRate);
+  const rate = now < momentUntil ? EFFECTS.frameRate : EFFECTS.loopFrameRate;
+  if (!particleTick) particleTick = setTimeout(() => ((particleTick = 0), view.invalidate()), 1000 / rate);
+}
+
+/** The province temperatures this week, °C, from the season bytes the map is drawn with (seasonBytes). */
+let seasonNow: Uint8Array | null = null;
+const celsiusOf = (p: number) => (seasonNow ? (seasonNow[p * 4]! / 255) * 127.5 - 60 : 10);
+/** When the looping emitters last ran, and until when a moment keeps the particles at full frame rate. */
+let lastEmit = 0;
+let momentUntil = 0;
+
+/**
+ * The living world's looping effects (VIEW-146..VIEW-149), a few particles
+ * at a time on what is on screen: smoke from the towns' chimneys close in,
+ * riot smoke over risings, snow over provinces below freezing, and now and
+ * then a flock of birds. Each kind keeps under its own cap.
+ */
+function emitLoops(o: OverlayContext): void {
+  if (!snapshot) return;
+  const r = Math.random;
+  const pad = 40;
+  const on = (x: number, y: number) => {
+    const [sx, sy] = o.toScreen(x, y);
+    return sx > -pad && sy > -pad && sx < o.width + pad && sy < o.height + pad;
+  };
+  const W = view.map.width;
+  // Chimney smoke, close in, from the towns on screen.
+  if (chimneysShown(o.zoom) && townLayer && particles.countOf(Shape.Smoke) < EFFECTS.chimneys.maxPuffs)
+    for (let p = 0; p < provinces.length; p++) {
+      const at = provinces[p]!;
+      if (at.x === undefined || !on(at.x, at.y!) || !isKnown(p)) continue;
+      for (const t of townLayer.chimneys(p)) {
+        if (r() > EFFECTS.chimneys.puffChance) continue;
+        particles.add(Shape.Smoke, (t % W) + 0.5, Math.floor(t / W) + 0.3, 0, -2, r() * 2 - 1, -4 - r() * 3, 2 + r(), r() < 0.5 ? PALETTE.mist : PALETTE.steel);
+      }
+    }
+  // A thicker dark column over each standing rising.
+  for (const rising of snapshot.rebels.risings) {
+    const at = provinces[rising.location]!;
+    if (!isKnown(rising.location) || !on(at.x!, at.y!) || r() > 0.6) continue;
+    particles.add(Shape.Smoke, at.x!, at.y!, r() * 4 - 2, -3, r() * 2 - 1, -7 - r() * 4, 2.5, r() < 0.5 ? PALETTE.slate : PALETTE.ink);
+  }
+  // Snow over the provinces on screen below freezing, falling a short way and gone.
+  if (seasonNow && particles.countOf(Shape.Snow) < EFFECTS.snow.maxFlakes)
+    for (let k = 0; k < EFFECTS.snow.perEmit; k++) {
+      const sx = r() * o.width;
+      const sy = r() * o.height;
+      const p = view.provinceAt(sx, sy);
+      if (p < 0 || isWater[p] || !snowing(celsiusOf(p))) continue;
+      const [mx, my] = view.toMap(sx, sy);
+      particles.add(Shape.Snow, mx, my, 0, -12, 0, 6 + r() * 3, 2 + r(), PALETTE.paper);
+    }
+  // Now and then a flock crosses the land; gulls, white, by the coast.
+  if (particles.countOf(Shape.Bird) === 0 && r() < EFFECTS.birds.chance) {
+    const sx = o.width * (0.2 + r() * 0.6);
+    const sy = o.height * (0.2 + r() * 0.6);
+    const p = view.provinceAt(sx, sy);
+    if (p >= 0 && !isWater[p]) {
+      const [mx, my] = view.toMap(sx, sy);
+      const dir = r() < 0.5 ? -1 : 1;
+      const n = EFFECTS.birds.flockMin + Math.floor(r() * (EFFECTS.birds.flockMax - EFFECTS.birds.flockMin + 1));
+      const colour = provinces[p]!.coastal ? PALETTE.paper : PALETTE.ink;
+      // In a loose V behind the leader.
+      for (let k = 0; k < n; k++) particles.add(Shape.Bird, mx, my, -dir * k * 4 + r() * 2, (k % 2 ? 1 : -1) * Math.ceil(k / 2) * 2, dir * 16, -1 + r() * 2, 7, colour);
+    }
+  }
 }
 
 /** Takes in a fresh snapshot's map state. */
@@ -7636,6 +7707,11 @@ Object.assign(globalThis, {
     newsView = false;
     panelCollapsed = false;
     renderPanel();
+  },
+  /** Stages this temperature, °C, in every province for the snow until the next week: winter takes months of play (scripts/effects-shots.mjs). */
+  __phStageCelsius: (c: number) => {
+    seasonNow = new Uint8Array(provinces.length * 4);
+    for (let i = 0; i < provinces.length; i++) seasonBytes(seasonNow, i, c, 0, 0, 0);
   },
   /** Plays a map moment at province p, in a realm's colour: the things that cause one take a war or years of play (scripts/effects-shots.mjs). */
   __phMoment: (kind: MomentKind, p: number, nation = snapshot?.playerNation ?? 0) => {
