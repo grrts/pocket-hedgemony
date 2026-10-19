@@ -37,6 +37,7 @@ export { type RebelsView, type RisingView } from "./rebels.ts";
 export { type RegimeView, type RevolutionView, type Sign as RevolutionSign, type StanceView } from "./revolutions.ts";
 export { admit, answerRuling, callTheDiet, courtAims, passReform, defenceCalls, dietForecast, dissolveEmpire, empireDues, empireOrder, empireTax, empireView, headOfFaith, institutionsLens, monthlyInstitutions, realmsOf, seekVote, takeToCourt, whyNotDissolveTerm, type EmpireOrder, type EmpireView, type MemberView, type ReformsView, type SeatView } from "./institutions.ts";
 export type { EventCard } from "./events.ts";
+export { foundByEvent, treeView } from "./events.ts";
 export { adminCapacityRank, ASSESSMENT_DIMENSIONS, LEVEL_RANK, realmAssessment, realmStrengths, RISK_DIMENSIONS, type AssessmentConfidence, type AssessmentLevel, type HeritageLine, type RealmAssessment, type RealmHeritage, type RealmHeyday, type RealmStrengths } from "./realmStrengths.ts";
 export { effectInPlay, heritageChoice, heritageFactor, heritageTaxReach, heritageView, IN_PLAY, monthlyHeritage, type HeritageView } from "./heritage.ts";
 export { realmStartingCounts } from "./startingCounts.ts";

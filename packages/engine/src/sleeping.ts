@@ -36,6 +36,8 @@ export interface Waking {
   /** A spare's name and colour (SETUP-088); a listed sleeper keeps its own. */
   name?: string;
   color?: string;
+  /** The event tree's id for a spare, so the events know it once it wakes (SETUP-088). */
+  tree?: string;
 }
 
 /** What a woken realm is called, coloured and ruled from, where it differs from the data: saves keep it (SETUP-091). */
@@ -44,6 +46,8 @@ export interface WokenRealm {
   name: string;
   color: string;
   capital: string;
+  /** The event tree's id for a woken spare. */
+  tree?: string;
 }
 
 /** Colours a spare takes when it wakes, the first none of its neighbours has (SETUP-088). */
@@ -61,7 +65,7 @@ export function spareSleepers(world: World): number[] {
 /** Records a woken realm's name, colour and capital, for saves and the client (SETUP-091). */
 function noteWoken(world: World, n: number): void {
   const d = world.rules.nations[n]!;
-  world.woken = [...world.woken.filter((w) => w.id !== d.id), { id: d.id, name: d.name, color: d.color, capital: d.capital }];
+  world.woken = [...world.woken.filter((w) => w.id !== d.id), { id: d.id, name: d.name, color: d.color, capital: d.capital, ...(d.spare && d.tree?.length ? { tree: d.tree[0]! } : {}) }];
 }
 
 /** Puts back saved names, colours and capitals and who still sleeps (SETUP-091). */
@@ -77,7 +81,7 @@ export function restoreSleeping(world: World, saved: { asleep: string[]; woken: 
   for (const w of saved.woken) {
     const n = world.nationIndex.get(w.id);
     if (n === undefined) continue;
-    Object.assign(world.rules.nations[n]!, { name: w.name, color: w.color, capital: w.capital });
+    Object.assign(world.rules.nations[n]!, { name: w.name, color: w.color, capital: w.capital, ...(w.tree ? { tree: [w.tree] } : {}) });
   }
   world.woken = saved.woken.filter((w) => world.nationIndex.has(w.id));
 }
@@ -197,6 +201,7 @@ export function wakeRealm(world: World, n: number, w: Waking, news: News[]): boo
     if (w.name) def.name = w.name;
     else def.name = world.rules.provinces[land[0]!]!.name;
     def.color = w.color ?? spareColour(world, land);
+    if (w.tree) def.tree = [w.tree];
   }
   // Its capital: the data's when it holds it, else the largest from-realm's, else its first province (SETUP-083).
   const landSet = new Set(land);
