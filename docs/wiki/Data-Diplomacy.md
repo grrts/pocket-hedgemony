@@ -759,3 +759,14 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 | 5 | V | 1800 |
 | 6 | VI | 1870 |
 | 7 | VII | 1914 |
+
+## Arms and fear
+
+> Leroy, 19 Oct (DIPL-228 to DIPL-234, F-165): every AI realm keeps a standing army sized against its neighbours, calls men across the whole realm at war and borrows for it, and feels Wary or Threatened beside a much stronger neighbour. There is no rivalry: fear is measured from the armies each month and leaves no lasting tie. Every number is provisional, for the balance model to tune.
+
+| Name | wary ratio | threatened ratio | ally weight | share of cap | match neighbour | multiplier | max share of cap | pay share of income | raise per month | more |
+|---|---|---|---|---|---|---|---|---|---|---|
+| fear (provisional) | 1.5 | 2.5 | 0.5 |  |  |  |  |  |  |  |
+| standing (provisional) |  |  |  | 0.25 | 0.5 | calm: 1; wary: 1.5; threatened: 2 | calm: 0.5; wary: 0.7; threatened: 0.9 | calm: 0.4; wary: 0.5; threatened: 0.65 | 3 | slack: 1000 |
+| war (provisional) |  |  |  | 0.25 |  |  |  | 0.75 |  | per province: 3 |
+| borrow (provisional) |  |  |  |  |  |  |  |  |  | months of pay: 3 |

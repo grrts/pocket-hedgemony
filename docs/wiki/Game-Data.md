@@ -22,7 +22,7 @@ Keys are written as in the config. Shares are fractions (0.25 is 25 %). A value 
 | [Tribes](Data-Tribes) | 40 | `domain/tribes.json` | [Tribes and Hunting Grounds](Tribes-and-Hunting-Grounds) |
 | [Government](Data-Government) | 805 | `domain/government.json` | [Government](Government) |
 | [Subjects](Data-Subjects) | 243 | `domain/subjects.json` | [Subjects](Subjects) |
-| [Diplomacy](Data-Diplomacy) | 765 | `domain/diplomacy.json` | [Diplomacy](Diplomacy) |
+| [Diplomacy](Data-Diplomacy) | 785 | `domain/diplomacy.json` | [Diplomacy](Diplomacy) |
 | [Religion](Data-Religion) | 754 | `domain/religion.json` | [Religion](Religion) |
 | [Culture](Data-Culture) | 354 | `domain/culture.json` | [Culture](Culture) |
 | [Rebellions](Data-Rebellions) | 221 | `domain/rebellions.json` | [Rebellions](Rebellions) |

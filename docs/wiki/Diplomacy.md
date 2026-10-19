@@ -289,6 +289,14 @@ The AI decides with exactly the same counts, adding rows for its **posture** and
 
 Negotiation level adds very high +15 (and gifts count 25 % more), high +10, moderate 0, low −10, very low −20. Each month an AI with a free seat scores up to 5 candidate actions per free seat toward countries in its horizon (neighbours, neighbours' neighbours, anyone it has a relation or fact with, its rivals' enemies), estimates the other side's count with only what a player could see, sends the best one over zero, and sends a gift first when the best is a close no (−20 or better). It tries a demand before war unless it is an Opportunist and the target's armies are away. Opportunists and hegemon seekers fund rebels in a rival's provinces that already have two or more grievances.
 
+### Arms and fear
+
+Every month each country weighs each neighbour it does not count as a friend (friends are its allies, its overlord and its subjects) against its own side: its men under arms, the levies it can still call and its lords' men, with its friends counting half. A neighbour 1.5 times as strong makes it **Wary**; 2.5 times as strong makes it **Threatened**. There is no rivalry: fear is measured again each month and goes as soon as the balance changes.
+
+A computer country at peace keeps a **standing army**: a quarter of its troop cap, or half the largest force of an unfriendly neighbour if that is more, times 1.5 when Wary and 2 when Threatened. It never keeps more than a share of its cap (a half, 0.7 Wary, 0.9 Threatened) or more than a share of its income can pay. Under that it calls up to 3,000 men a month where its garrisons already stand; over it, levies whose free months are over go home, smallest first. At war it calls men in every royal province it holds, up to a quarter of its cap a month, within three quarters of its income. At war or Threatened it borrows up to three months of its army's pay, and counts what lenders would give toward its war chest.
+
+You see who fears you under **Name abroad** (*Neighbours who fear you*, with how many times their side you are), and on a country's diplomacy card a line says whether it is Wary or Threatened of you and whom else it fears. When a neighbour comes to feel Threatened by you, the news says so once.
+
 ### Each month
 
 Answer letters from last month are delivered; envoys arriving this month have their asks counted; rebel funding is charged and the caught chance rolled; at each season's end resident ties grow and courting rolls happen; truces, passages and timed war aims expire and envoys return; the AI acts. Once a year ledgers fade, leagues are checked and relations decay.
