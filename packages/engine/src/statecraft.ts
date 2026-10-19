@@ -133,6 +133,38 @@ function whyNotMission(world: World, n: number, t: number, action: string): stri
   return null;
 }
 
+/** The missions the reasons decide, which show a hint before sending (DIPL-229); a visit and a gift always land. */
+const COUNTED: readonly string[] = ["propose_alliance", "arrange_marriage", "offer_overlordship", "ask_protection"];
+
+/** How the count of n's ask of t stands now (DIPL-229). */
+function countNow(world: World, n: number, t: number, action: string, days: (a: string, b: string) => number, demandKind?: string): number {
+  const ask: dip.Ask = { action, asker: world.nationIds[n]!, asked: world.nationIds[t]!, ...(demandKind ? { demandKind } : {}) };
+  return dip.countAsk(world.diplomacy, ask, days).total;
+}
+
+/**
+ * How each ask of the player's would count with a realm now: the missions the
+ * reasons decide, tribute, and a province demand before It's our heartland.
+ * The view reads them for every realm, and a count reads the whole realm, so
+ * they are counted once a month, as the world stands then; the word is rough
+ * enough that a gift arriving mid-month waits for the next (DIPL-229).
+ */
+const hintCache = new WeakMap<World, { month: string; player: number; by: Map<number, Record<string, number>> }>();
+
+function countsNow(world: World, player: number, n: number, days: (a: string, b: string) => number): Record<string, number> {
+  const month = dip.monthOf(world.diplomacy.date);
+  let c = hintCache.get(world);
+  if (!c || c.month !== month || c.player !== player) hintCache.set(world, (c = { month, player, by: new Map() }));
+  let out = c.by.get(n);
+  if (!out) {
+    out = {};
+    for (const a of COUNTED) out[a] = countNow(world, player, n, a, days);
+    for (const k of DEMAND_KINDS) out[k] = countNow(world, player, n, "demand", days, k);
+    c.by.set(n, out);
+  }
+  return out;
+}
+
 /** Sends an envoy (an order of the player's or the AI's). */
 export function sendEnvoy(world: World, n: number, t: number, action: string): string | null {
   const why = whyNotEnvoy(world, n, t, action);
@@ -493,8 +525,11 @@ export interface StatecraftView {
   envoys: { target: number; action: string; status: string; arrival: string; home?: string }[];
   /** Answers received in the last two years, newest first, with the reasons each court counted. */
   letters: { from: number; action: string; answer: "yes" | "no" | "done"; text: string; reasons: { name: string; number: number }[]; total?: number; month: string }[];
-  /** For every other realm: what it thinks of the player, the ledger behind it, and why each mission can't be sent now (null when it can), in ENVOY_ACTIONS order. */
-  realms: Record<number, { standing: number; word: string; lines: StandingLine[]; why: (string | null)[]; married: boolean; demands: DemandView; notoriety: number; price: PriceOfWar | null }>;
+  /**
+   * For every other realm: what it thinks of the player, the ledger behind it, why each mission can't be sent now
+   * (null when it can) and, for one the reasons decide that can be sent, how likely a yes is (DIPL-229), in ENVOY_ACTIONS order.
+   */
+  realms: Record<number, { standing: number; word: string; lines: StandingLine[]; why: (string | null)[]; hints: (dip.AskHint | null)[]; married: boolean; demands: DemandView; notoriety: number; price: PriceOfWar | null }>;
   /** The player's own name abroad: notoriety, Lands taken against the league threshold and the leagues against them (DIPL-225). */
   nameAbroad: NameAbroadView;
   /** The player's subjects and its own overlord (SUBJ-091, SUBJ-102). */
@@ -521,7 +556,9 @@ export interface AskView {
 export interface DemandView {
   why: string | null;
   tribute: string | null;
-  provinces: { province: number; name: string; capital: boolean }[];
+  /** How likely they are to give in to each demand that can be made (DIPL-229). */
+  tributeHint: dip.AskHint | null;
+  provinces: { province: number; name: string; capital: boolean; hint: dip.AskHint }[];
 }
 
 export function statecraftView(world: World, player: number): StatecraftView | null {
@@ -540,16 +577,24 @@ export function statecraftView(world: World, player: number): StatecraftView | n
   const realms: StatecraftView["realms"] = {};
   // The declare sheet's Price of war (WAR-229) for every realm the player could declare on, sharing the player's own reads.
   const ctx = priceContext(world, player);
+  const days = countDays(world);
   for (let n = 0; n < world.nationCount; n++) {
     if (n === player || world.nationGone[n]) continue;
     const s = standingOf(world, n, player);
     const why = whyNotDemandAtAll(world, player, n);
     const near = why ? [] : demandableProvinces(world, player, n);
     const capital = world.provinceIndex.get(world.rules.nations[n]!.capital);
-    const demands: DemandView = { why, tribute: why ? why : whyNotDemand(world, player, n, "pay_tribute"), provinces: near.map((p) => ({ province: p, name: world.rules.provinces[p]!.name, capital: p === capital })) };
+    const tribute = why ? why : whyNotDemand(world, player, n, "pay_tribute");
+    const whys = ENVOY_ACTIONS.map((a) => whyNotEnvoy(world, player, n, a));
+    const counts = countsNow(world, player, n, days);
+    // A province demand is counted like any other, with It's our heartland for their capital (DIPL-204).
+    const heart = dip.config.actions.demand.heartland_province;
+    const provinces = near.map((p) => ({ province: p, name: world.rules.provinces[p]!.name, capital: p === capital, hint: dip.askHint(counts.hand_over_province! + (p === capital ? heart : 0)) }));
+    const demands: DemandView = { why, tribute, tributeHint: tribute === null ? dip.askHint(counts.pay_tribute!) : null, provinces };
     realms[n] = {
       ...s,
-      why: ENVOY_ACTIONS.map((a) => whyNotEnvoy(world, player, n, a)),
+      why: whys,
+      hints: ENVOY_ACTIONS.map((a, k) => (whys[k] === null && a in counts ? dip.askHint(counts[a]!) : null)),
       married: dip.marriagesBetween(d, me, world.nationIds[n]!) > 0,
       demands,
       notoriety: dip.notoriety(d, world.nationIds[n]!),

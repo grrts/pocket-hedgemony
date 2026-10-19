@@ -59,10 +59,31 @@ Feature: The reasons count
     And in "1445-03" the country "Hungary" receives a letter with the answer and every reason and number
 
   @DIPL-082
-  Scenario: Action buttons show no prediction
+  Scenario: Action buttons show no number
     Given the diplomacy rules are in force
     When the player opens the country diplomacy card of "Venice"
-    Then no action button shows a predicted answer or total
+    Then no action button shows a predicted total or any reason's number
+
+  @DIPL-229 @placeholder
+  Scenario Outline: A one-word hint before asking
+    Given the count of an alliance asked of "Venice" by "Hungary" stands at <total> this month
+    When the player opens the country diplomacy card of "Venice"
+    Then the mission "Propose an alliance" shows the word "<word>"
+
+    Examples:
+      | total | word     |
+      | 40    | Likely   |
+      | 15    | Likely   |
+      | 14    | Unsure   |
+      | 0     | Unsure   |
+      | -15   | Unlikely |
+      | -40   | Unlikely |
+
+  @DIPL-229
+  Scenario: Asks that always land show no word
+    Given the diplomacy rules are in force
+    When the player opens the country diplomacy card of "Venice"
+    Then the missions "Courtesy visit" and "Send a gift" show no word
 
   @DIPL-083
   Scenario Outline: What the asker can see before asking
