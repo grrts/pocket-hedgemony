@@ -344,9 +344,10 @@ export interface HistoricalLordDef {
   house: string;
   /** What he was called by his lands: "Earl of Northumberland". */
   title: string;
-  born: number;
+  /** His birth year, null where the sources give none (the game then draws his age as for any lord). */
+  born: number | null;
   /** The year he died in history; the game's own ageing decides when he dies in play. */
-  died: number;
+  died: number | null;
   /** Map provinces of his historical lands; the first is his seat. */
   provinces: string[];
   /** Two of the ruler traits the sources support. */

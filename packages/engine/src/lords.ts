@@ -152,15 +152,17 @@ function seatHistorical(world: World, n: number, capital: number, history: reado
   return seated;
 }
 
-/** Makes a lord the historical person: his name, house, title, traits, age and heir by the start year, and the line on who he was. */
+/** Makes a lord the historical person: his name, house, title, traits, age and heir by the start year (where the sources give his birth; else the game draws them), and the line on who he was. */
 export function asHistorical(world: World, l: RealmLord, h: HistoricalLordDef): void {
   const year = world.date.year;
   l.name = h.name;
   l.house = h.house;
   l.title = h.title;
   l.traits = [...h.traits];
-  l.age = Math.max(16, year - h.born);
-  l.heir = h.heir && year >= h.heir.born ? { name: h.heir.name, age: year - h.heir.born } : null;
+  if (h.born !== null) {
+    l.age = Math.max(16, year - h.born);
+    l.heir = h.heir && year >= h.heir.born ? { name: h.heir.name, age: year - h.heir.born } : null;
+  }
   l.historical = h.id;
   l.note = h.note;
 }
