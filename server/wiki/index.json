@@ -9668,6 +9668,11 @@
      "level": 3
     },
     {
+     "id": "difficulty",
+     "text": "Difficulty",
+     "level": 3
+    },
+    {
      "id": "what-you-see",
      "text": "What you see",
      "level": 2
