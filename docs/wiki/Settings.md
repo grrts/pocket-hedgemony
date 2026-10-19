@@ -11,7 +11,7 @@ What the game has built so far:
 - **Gameplay**: Tutorial hints (with how many of the six are done) and Reset tutorial and hints; Achievement toasts; Autosave and Autosaves kept per campaign; Turn playback speed (1×, 2×, 4×: how fast the week plays out after End turn) and Battle playback speed.
 - **Graphics**: Battery saver (Off, Auto, On) and the knobs it moves: Frame rate cap, Sharpness and Animations. Rows it moves say "Set by Battery saver". Auto follows your device's battery where the browser reports it.
 - **Audio**: Master, Music on or off and its volume, Effects volume and Interface sounds. The speaker button's Sound card changes the same settings.
-- **Accessibility**: Text size (Normal, Large, Larger) for the cards, menus and alerts.
+- **Accessibility**: Colour vision (Default, Red-weak, Green-weak, Blue-weak, No colour), with a sample of four neighbouring realms and a map mode's ramp in the chosen mode under it; Patterns on map modes; Text size (Normal, Large, Larger) for the cards, menus and alerts. A colour vision change redraws the map, the armies and routes and the map mode's key at once.
 
 Other rows join the screen as the game builds what they do.
 
@@ -266,6 +266,7 @@ The official Steam Input configuration for the Steam Controller and Steam Deck a
 
 - **Colour vision** swaps nation colours to a second assignment from the same 32-colour palette, chosen so neighbours stay distinguishable for that vision type, and each map mode's colour ramp to a safe one (blue to orange instead of red to green). No colour uses greys with patterns. Every mode keeps the map's season colours (snow, spring green, autumn gold, the wet season) apart: the colour-blind modes shift them with the safe ramp and No colour uses tile patterns. Seasons cannot be switched off.
 - **Patterns on map modes** adds hatching, dots and stripes by band, so a map mode reads without colour.
+- In the colour-blind modes the realms keep a colour near their own where they can, but never one their neighbours can't be told from by that kind of colour vision. Map modes that ran red to green (Food, Diplomacy, Subjects, Exploration) run orange for bad or hostile and blue for good or friendly, and the ramps (People, Wealth, Trade) run pale orange to dark blue, lighter to darker, so they also read in grey. With No colour every realm is a grey with a pattern of its own beside its neighbours.
 - **High contrast borders** draw nation borders in black and white ink two art pixels wide.
 - **Text size**: panels reflow and cards grow taller, not smaller.
 - **Plain font** replaces the pixel font and the blackletter titles with a clear, openly licensed sans such as Atkinson Hyperlegible.

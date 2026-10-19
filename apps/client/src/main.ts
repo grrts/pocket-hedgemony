@@ -127,7 +127,8 @@ import { pickerCardHtml, regionListHtml, regionSelectHtml, strongIn, strongInWor
 import { BATTLE_STEP_MS, bannerAt, COUNTRY_CARD_TABS, endTurnInAuto, endTurnLabel, keyEndsTurn, newAutoTurns, realmOverview, REALM_BOOK_TABS, sectionOf, SHELL as SHELL_RULES, startColumn, startIcons, stopAuto, switchAuto, tabHolds, WATCH_STEP_MS, weekPlayed, type AutoStop, type OverviewTile, type Platform as ShellPlatform } from "@ph/engine/domain/game-shell";
 import { autosaveDue, continueTarget, longDate, newCampaign, newManualSave, saveStart, savesConfig, type Campaign, type Platform as SavePlatform } from "@ph/engine/domain/saves";
 import { SaveStore, type StoredSave } from "./saves/store.ts";
-import { animationsPref, autosaveEvery, autosavesKept, battleStepMs, batteryOn, dayMs, livingPrefs, longPressMs, mapDetail, mapPower, onPrefs, setPref, textZoom } from "./settings/prefs.ts";
+import { animationsPref, autosaveEvery, autosavesKept, battleStepMs, batteryOn, dayMs, lensPatternsOn, livingPrefs, longPressMs, mapDetail, mapPower, onPrefs, setPref, textZoom, visionPref } from "./settings/prefs.ts";
+import { bandPattern, lensRamp, lensSet, nationColours, PATTERN_COUNT, patternCss, rgbHex, shown, visionIndex, type Vision } from "./map/colourVision.ts";
 import { openSettingsAt, renderSettings, setHintsRows, setOwnSection } from "./ui/settingsScreen.ts";
 import { CloudApi, CloudError, cloudBase, webKeyValue, webTokenStore } from "./cloud/api.ts";
 import { CLOUD_PATH, CloudSync } from "./cloud/sync.ts";
@@ -170,6 +171,17 @@ const nationIndex = new Map(nations.map((n, i) => [n.id, i]));
 const nationRgb = nations.map((n) => hexToRgb(n.color));
 /** Each realm as the rules list it, before any waking renamed or recoloured it. */
 const baseNations = nations.slice();
+/**
+ * Each realm as the rules list it or its waking made it, in its own colour;
+ * `nations` holds the same realms in the colours the colour vision setting
+ * draws them in (VIEW-047), so the map, armies, routes and cards all agree.
+ */
+const ownNations = nations.slice();
+/** Realms woken in this campaign: they take their colours after the rest, so a waking never recolours another realm. */
+const wokenRealms = new Set<number>();
+/** Colour vision as last applied (SET-095), and the pattern each realm carries with no colour. */
+let vision: Vision = visionPref();
+let nationPattern: number[] = [];
 /** The woken list last applied, so a snapshot with the same one costs nothing. */
 let wokenKey = "[]";
 /**
@@ -183,17 +195,55 @@ function applyWoken(s: Snapshot): void {
   const key = JSON.stringify(s.woken);
   if (key === wokenKey) return;
   wokenKey = key;
-  baseNations.forEach((d, i) => {
-    if (nations[i] === d) return;
-    nations[i] = d;
-    nationRgb[i] = hexToRgb(d.color);
-  });
+  baseNations.forEach((d, i) => (ownNations[i] = d));
+  wokenRealms.clear();
   for (const w of s.woken) {
     const i = nationIndex.get(w.id);
     if (i === undefined) continue;
-    nations[i] = { ...baseNations[i]!, name: w.name, color: w.color, capital: w.capital };
-    nationRgb[i] = hexToRgb(w.color);
+    ownNations[i] = { ...baseNations[i]!, name: w.name, color: w.color, capital: w.capital };
+    wokenRealms.add(i);
   }
+  recolourNations();
+}
+
+/**
+ * Draws every realm in the colours of the colour vision setting (VIEW-047,
+ * SET-095): its own, a second assignment from the 32-colour palette that
+ * keeps neighbours apart for a weak colour vision, or a grey and a pattern
+ * with no colour. Neighbours are the realms' lands at the start, and a woken
+ * realm's lands now.
+ */
+function recolourNations(): void {
+  const n = nations.length;
+  let colours = ownNations.map((d) => d.color);
+  let patterns = new Array<number>(n).fill(0);
+  if (vision.setting !== "default") {
+    const sizes = new Array<number>(n).fill(0);
+    const near = Array.from({ length: n }, () => new Set<number>());
+    const link = (own: ArrayLike<number>, only?: Set<number>) => {
+      for (let i = 0; i < provinces.length; i++) {
+        const a = own[i]!;
+        if (a < 0 || isWater[i]) continue;
+        for (const q of neighborIdx[i]!) {
+          const b = own[q]!;
+          if (b < 0 || b === a || (only && !only.has(a) && !only.has(b))) continue;
+          near[a]!.add(b);
+          near[b]!.add(a);
+        }
+      }
+    };
+    link(startOwners);
+    for (const o of startOwners) if (o >= 0) sizes[o]!++;
+    if (wokenRealms.size) link(owners, wokenRealms);
+    const order = [...Array(n).keys()].filter((i) => !wokenRealms.has(i)).sort((a, b) => sizes[b]! - sizes[a]! || a - b).concat([...wokenRealms].sort((a, b) => a - b));
+    ({ colours, patterns } = nationColours(vision, { colours, neighbours: near, order }));
+  }
+  for (let i = 0; i < n; i++) {
+    const d = ownNations[i]!;
+    nations[i] = colours[i] === d.color ? d : { ...d, color: colours[i]! };
+    nationRgb[i] = hexToRgb(colours[i]!);
+  }
+  nationPattern = patterns;
 }
 /** A realm still asleep (SETUP-082): never drawn, named or listed. Before a game, every sleeper is. */
 const asleep = (n: number) => (snapshot ? snapshot.nationAsleep[n] === 1 : !!nations[n]?.asleep);
@@ -258,6 +308,9 @@ let changedSinceResume = false;
 /** Every save on the device, newest first, as last read. */
 let savesList: StoredSave[] = [];
 let owners: Int16Array = Int16Array.from(provinces, (p) => (p.owner ? nationIndex.get(p.owner)! : -1));
+/** Who held each province at the start: the neighbours colour vision keeps apart (VIEW-047). */
+const startOwners = owners.slice();
+recolourNations();
 let occupiers: Int16Array = new Int16Array(provinces.length).fill(-1);
 /** The dispatches log: what concerned the player, newest first, kept from turn to turn (feedback 72). */
 let dispatches: { date: GameDate; news: News }[] = [];
@@ -835,6 +888,7 @@ async function boot(): Promise<void> {
   await painted();
   view = new MapView(document.querySelector("#map")!, image, provinces.length, { onTap, drawOverlay, onLongPress, longPressMs });
   view.setPower(mapPower());
+  view.renderer.vision = visionIndex(vision);
   // Read by the performance checks (scripts/perf.mjs).
   (globalThis as { __phMap?: MapView }).__phMap = view;
   restyleProvinces();
@@ -956,6 +1010,10 @@ const ROYAL_RGB = hexToRgb("#e9c35a");
 /** The Institutions map mode's colours (INST-084): the holder gold, members light gold, outsiders on imperial land red and hatched; Japan's great houses each a gold of their own. */
 const INSTITUTION_HEX = { gold: "#d0a248", "light gold": "#f1dc98", red: "#b8323a", "the house's own": "linear-gradient(90deg, #c98a4a 50%, #a8a457 50%)" } as Record<string, string>;
 const INSTITUTION_RGB = { emperor: hexToRgb("#d0a248"), member: hexToRgb("#f1dc98"), outsider: hexToRgb("#b8323a") };
+/** The Institutions key's colours as the colour vision setting draws them, and the pattern each carries. */
+const INSTITUTION_BASE: Record<string, number[]> = { gold: INSTITUTION_RGB.emperor, "light gold": INSTITUTION_RGB.member, red: INSTITUTION_RGB.outsider };
+const institutionColours = (): Record<string, string> => ({ ...INSTITUTION_HEX, ...Object.fromEntries(Object.entries(INSTITUTION_BASE).map(([k, c]) => [k, rgbHex(seenRgb(c))])) });
+const institutionPattern = (colour: string): string => (INSTITUTION_BASE[colour] ? patternCss(lensPattern(INSTITUTION_BASE[colour]!), seenRgb(INSTITUTION_BASE[colour]!)) : "");
 /** A colour per lord for the Lords lens: hues spread by the golden angle, kept clear of the crown's gold. */
 function lordRgb(k: number): number[] {
   return hslRgb((80 + ((k * 137.508) % 260)) / 360, 0.5, k % 2 ? 0.42 : 0.55);
@@ -975,6 +1033,112 @@ const RAMP = ["#f3e3b5", "#e8c172", "#d68a3c", "#b14a2e", "#6e1f2c"].map(hexToRg
 const WALL_RGB = { none: hexToRgb("#efe2bf"), fort: hexToRgb("#d08a2e"), castle: hexToRgb("#3c4a8e") };
 const FOOD_RAMP = ["#a8323e", "#d08a48", "#e9d79a", "#8cb85a", "#3f7a44"].map(hexToRgb);
 const ramp = (colors: number[][], t: number) => colors[Math.max(0, Math.min(colors.length - 1, Math.floor(t * colors.length)))]!;
+
+/*
+ * Colour vision on the lenses (VIEW-047, VIEW-048, SET-095, SET-096). The
+ * lenses pick their colours as above; the table below turns each into the
+ * colour the chosen mode draws (the safe blue to orange ramp, blue for good
+ * and friends, orange for bad and foes; or greys) and names the band whose
+ * pattern it carries when Patterns on lenses is on. The keys use the same
+ * table, so they always match the map.
+ */
+/** The weak colour visions' colours for the lenses whose own colours run red to green. */
+const SAFE_RELATION: Partial<Record<LensRelation, string>> = { ally: "#1f3f8a", pledged: "#5b7fc8", close: "#8fb0e0", warm: "#c4d6ee", cold: "#f2b878", hostile: "#c8601a", war: "#c8601a" };
+const SAFE_LOYALTY = { loyal: "#2c5a9e", wavering: "#f2c88a", disloyal: "#c8601a", overlord: "#5c5866" };
+const SAFE_SITES = { range: "#2f7fd0", beyond: "#a8c8ee", founding: "#f6e08a", hunt: "#c8601a" };
+interface LensTable {
+  colours: Map<string, number[]>;
+  /** Each colour's band, for its pattern; "hash" for lenses of many free colours (lords, languages, faiths); null for none. */
+  bands: Map<string, number> | "hash" | null;
+}
+const rgbKey = (c: readonly number[]) => c.join(",");
+function lensTable(): LensTable {
+  const colours = new Map<string, number[]>();
+  const bands = new Map<string, number>();
+  const add = (base: readonly (readonly number[])[], to: readonly number[][]) =>
+    base.forEach((c, i) => {
+      const k = rgbKey(c);
+      if (colours.has(k)) return;
+      colours.set(k, to[i]!);
+      bands.set(k, i);
+    });
+  const set = (base: Record<string, number[]>, safe: Record<string, string>) => add(Object.values(base), Object.values(lensSet(vision, base, safe)));
+  switch (lens) {
+    case "people":
+    case "wealth":
+      add(RAMP, lensRamp(vision, RAMP, "sequential"));
+      break;
+    case "food":
+      add(FOOD_RAMP, lensRamp(vision, FOOD_RAMP, "diverging"));
+      break;
+    case "trade":
+      add(TRADE_RAMP, lensRamp(vision, TRADE_RAMP, "sequential"));
+      break;
+    case "walls":
+      set(WALL_RGB, {});
+      break;
+    case "diplomacy":
+      set(Object.fromEntries(LENS_RELATIONS.filter((r) => r !== "own").map((r) => [r, RELATION_RGB[r]])), SAFE_RELATION as Record<string, string>);
+      break;
+    case "subjects":
+      set({ ...LOYALTY_RGB, overlord: OVERLORD_RGB }, SAFE_LOYALTY);
+      break;
+    case "charts":
+      set({ range: SITE_RGB[1]!, beyond: SITE_RGB[2]!, founding: SITE_RGB[3]!, hunt: HUNT_AMBER_RGB }, SAFE_SITES);
+      break;
+    case "institutions":
+      set(INSTITUTION_RGB, {});
+      break;
+    case "lords":
+    case "tongues":
+    case "faiths":
+      return { colours, bands: "hash" };
+    default:
+      return { colours, bands: null };
+  }
+  return { colours, bands };
+}
+let lensNow: LensTable = { colours: new Map(), bands: null };
+/** A lens colour as the colour vision setting draws it. */
+const seenRgb = (c: readonly number[]): number[] => lensNow.colours.get(rgbKey(c)) ?? shown(vision, c);
+/** The pattern a lens colour carries (VIEW-048), 0 none: only with Patterns on lenses, and never on empty or neutral land. */
+function lensPattern(c: readonly number[]): number {
+  const b = lensNow.bands;
+  if (!b || !lensPatternsOn()) return 0;
+  const k = rgbKey(c);
+  if (b !== "hash") return bandPattern(b.get(k) ?? -1);
+  if (k === rgbKey(unownedRgb) || k === rgbKey(RELATION_RGB.neutral)) return 0;
+  let h = 0;
+  for (let i = 0; i < k.length; i++) h = (h * 31 + k.charCodeAt(i)) >>> 0;
+  return bandPattern(h % PATTERN_COUNT);
+}
+/** A key's swatch in the colour and pattern the map draws for a lens colour. */
+function keySwatch(base: readonly number[], cls = ""): string {
+  const c = seenRgb(base);
+  return `<i class="swatch${cls ? ` ${cls}` : ""}" style="background-color:${rgbHex(c)};${patternCss(lensPattern(base), c)}"></i>`;
+}
+/** A key for the lenses that are a single ramp: each band from low to high. */
+function rampKey(colours: readonly number[][], labels: readonly string[], note: string): string {
+  return `<div class="lens-key">
+    ${colours.map((c, i) => `<span>${keySwatch(c)}${labels[i]}</span>`).join("")}
+    <p>${note}</p>
+  </div>`;
+}
+
+/** Applies a new colour vision or patterns setting at once (SET-003): realm colours, lens colours, keys, and the map's seasons. */
+let visionKey = "";
+function applyVision(): void {
+  const key = `${visionPref().setting}/${lensPatternsOn()}`;
+  if (key === visionKey) return;
+  visionKey = key;
+  vision = visionPref();
+  recolourNations();
+  if (!view) return;
+  view.renderer.vision = visionIndex(vision);
+  restyleProvinces();
+  renderLensMenu();
+  if (snapshot) renderPanel();
+}
 const lensMenu = document.querySelector<HTMLElement>("#lenses")!;
 
 /** Turns a lens on: the renderer's mode, the provinces' colours and the menu. */
@@ -991,7 +1155,7 @@ function renderLensMenu(): void {
   lensMenu.innerHTML = `
     <h3 class="sub">Map mode</h3>
     ${LENSES.map((l) => `<button class="paper lens${l.id === lens ? " on" : ""}" data-lens="${l.id}"><b>${l.id === "lords" && snapshot ? cap(titlesOf(snapshot.playerNation).lords) : l.name}</b><small>${l.note}</small></button>`).join("")}
-    ${lens === "institutions" ? institutionsKey(INSTITUTION_HEX) : lens === "diplomacy" ? diplomacyKey() : lens === "subjects" ? subjectsKey() : lens === "tongues" || lens === "faiths" ? beliefKey() : lens === "charts" ? chartsKey() : lens === "trade" ? tradeKey() : lens === "throne" ? throneKey() : ""}
+    ${lens === "institutions" ? institutionsKey(institutionColours(), institutionPattern) : lens === "diplomacy" ? diplomacyKey() : lens === "subjects" ? subjectsKey() : lens === "tongues" || lens === "faiths" ? beliefKey() : lens === "charts" ? chartsKey() : lens === "trade" ? tradeKey() : lens === "throne" ? throneKey() : lens === "people" ? rampKey(RAMP, ["Fewest", "Few", "Some", "Many", "Most"], "How many people live in each province.") : lens === "wealth" ? rampKey(RAMP, ["Poorest", "Poor", "Middling", "Rich", "Richest"], "Trade, crafts and land.") : lens === "food" ? rampKey(FOOD_RAMP, ["Feeds very few", "Feeds few", "Feeds some", "Feeds many", "Feeds most"], "How many men on campaign the land's store can feed.") : lens === "walls" ? rampKey(Object.values(WALL_RGB), ["No walls", "Fort", "Castle"], "Castles and forts.") : ""}
     <label class="fog-toggle"><input type="checkbox" id="fog" ${fogOn ? "checked" : ""}> Hide unexplored lands</label>
     <label class="fog-toggle"><input type="checkbox" id="markers" ${markersOn ? "checked" : ""}> Markers: men and names over every army close in</label>`;
   lensMenu.querySelectorAll<HTMLButtonElement>("[data-lens]").forEach((b) =>
@@ -1030,12 +1194,12 @@ function renderLensMenu(): void {
 /** The Charts lens's key (EXPL-073). */
 function chartsKey(): string {
   const ex = snapshot?.exploration;
-  const sw = (rgb: number[]) => `<i class="swatch" style="background:rgb(${rgb.join(",")})"></i>`;
+  const sw = (rgb: number[]) => keySwatch(rgb);
   return `<div class="lens-key">
     <span>${sw(SITE_RGB[1]!)}Empty coast inside your colonial range${ex?.colonial ? ` (${ex.range} zones)` : ""}</span>
     <span>${sw(SITE_RGB[2]!)}Empty land beyond it, or inland</span>
     <span>${sw(SITE_RGB[3]!)}A colony being founded</span>
-    ${huntKeyHtml(`rgb(${HUNT_AMBER_RGB.join(",")})`)}
+    ${huntKeyHtml(rgbHex(seenRgb(HUNT_AMBER_RGB)))}
     <span><i class="swatch parchment"></i>Not charted yet: send explorers</span>
     ${ex && !ex.colonial ? "<p>Colonies open with ocean navigation.</p>" : "<p>Tap an empty coast for what it takes to settle it.</p>"}
   </div>`;
@@ -1048,7 +1212,7 @@ const HUNT_AMBER_RGB = hexToRgb("#e08a2c");
 /** The diplomacy lens's key: a swatch for each relation, and what a tap does. */
 function subjectsKey(): string {
   const me = snapshot ? nations[snapshot.playerNation] : undefined;
-  const sw = (c: string) => `<i class="swatch" style="background:${c}"></i>`;
+  const sw = (c: string) => keySwatch(hexToRgb(c));
   const sv = snapshot?.statecraft?.subjects;
   return `<div class="lens-key">
     <span>${sw(me?.color ?? PALETTE.gold)}Your realm</span>
@@ -1062,7 +1226,7 @@ function subjectsKey(): string {
 
 function diplomacyKey(): string {
   const me = snapshot ? nations[snapshot.playerNation] : undefined;
-  const swatch = (r: LensRelation) => `<i class="swatch${r === "war" ? " hatched" : ""}" style="background:${r === "own" ? (me?.color ?? PALETTE.gold) : RELATION_HEX[r]}"></i>`;
+  const swatch = (r: LensRelation) => keySwatch(r === "own" ? hexToRgb(me?.color ?? PALETTE.gold) : RELATION_RGB[r], r === "war" ? "hatched" : "");
   return `<div class="lens-key">
     ${RELATION_KEY.map(([r, text]) => `<span>${swatch(r)}${text}</span>`).join("")}
     <span><i class="swatch league"></i>League against you</span>
@@ -1075,7 +1239,7 @@ function tradeKey(): string {
   const hex = (c: number[]) => `rgb(${c.join(",")})`;
   const steps = ["0 to 19 %", "20 to 39 %", "40 to 59 %", "60 to 79 %", "80 % and over"];
   return `<div class="lens-key">
-    ${TRADE_RAMP.map((c, i) => `<span><i class="swatch" style="background:${hex(c)}"></i>${steps[i]}</span>`).join("")}
+    ${TRADE_RAMP.map((c, i) => `<span>${keySwatch(c)}${steps[i]}</span>`).join("")}
     <span><i class="swatch" style="background:${hex(TRADE_UNSEEN_RGB)}"></i>Not seen</span>
     <p>Trade ratio: how busy each province's trade is. Zoom in to see your traders' loops with their purses, and a coin on each trade city.</p>
   </div>`;
@@ -1091,10 +1255,10 @@ function beliefKey(): string {
     if (k) count.set(k, (count.get(k) ?? 0) + 1);
   }
   const rows = [...count].sort((a, b) => b[1] - a[1]).slice(0, 12);
-  const rgb = (k: string) => `rgb(${(lens === "tongues" ? familyRgb(k) : faithRgb(k)).join(",")})`;
+  const sw = (k: string) => keySwatch(lens === "tongues" ? familyRgb(k) : faithRgb(k));
   const label = (k: string) => (lens === "tongues" ? k.charAt(0).toUpperCase() + k.slice(1).replace(/_/g, " ") : faithName(k));
   return `<div class="lens-key">
-    ${rows.map(([k]) => `<span><i class="swatch" style="background:${rgb(k)}"></i>${esc(label(k))}</span>`).join("")}
+    ${rows.map(([k]) => `<span>${sw(k)}${esc(label(k))}</span>`).join("")}
     ${lens === "faiths" ? `<span><i class="swatch hatched" style="background:#b9b3a4"></i>A second faith holds 30% or more</span>${seatKeyHtml(snapshot.faithHeads)}` : ""}
     <p>Tap a province for its ${lens === "tongues" ? "Language" : "Faith"} line${lens === "faiths" ? ", or a seat for its head of the faith" : ""}.</p>
   </div>`;
@@ -1200,6 +1364,7 @@ function seasonsFor(date: GameDate): Uint8Array {
 
 function restyleProvinces(): void {
   known = snapshot?.exploration.charted ?? null;
+  lensNow = lensTable();
   for (let i = 0; i < provinces.length; i++) {
     const o = owners[i]!;
     const occ = occupiers[i]!;
@@ -1220,7 +1385,11 @@ function restyleProvinces(): void {
       const t = townInfo(rules, snapshot, i);
       view.renderer.setTownInfo(i, t.walls, t.roadGrade, t.worship, t.style);
     }
-    view.renderer.setProvinceStyle(i, isWater[i] ? unownedRgb : hatched && lens === "realms" ? (rebels ? rebelRgb : nationRgb[occ]!) : lensColor(i), o, terrainIdx[i]!, flags, isWater[i], lord, litLord >= 0 && !lit, closed, lens === "charts" && o < 0 && !isWater[i] && (snapshot?.exploration.sites[i] ?? 0) > 0);
+    const base = isWater[i] ? unownedRgb : hatched && lens === "realms" ? (rebels ? rebelRgb : nationRgb[occ]!) : lensColor(i);
+    // Patterns (VIEW-048): a lens band's with Patterns on lenses, a realm's own with no colour (VIEW-047).
+    const pattern = isWater[i] || unseen || lens === "terrain" ? 0 : lens === "realms" ? (o >= 0 && !hatched ? (nationPattern[o] ?? 0) : 0) : lens === "lords" && o !== snapshot?.playerNation ? 0 : lensPattern(base);
+    view.renderer.setProvincePattern(i, pattern);
+    view.renderer.setProvinceStyle(i, isWater[i] ? unownedRgb : seenRgb(base), o, terrainIdx[i]!, flags, isWater[i], lord, litLord >= 0 && !lit, closed, lens === "charts" && o < 0 && !isWater[i] && (snapshot?.exploration.sites[i] ?? 0) > 0);
     // At world zoom a subject is washed in its direct overlord's colour with a hatch in its own,
     // and its border with that overlord is dotted (SUBJ-093). Occupied land keeps its occupation hatch.
     const overlord = lens === "realms" && !hatched && o >= 0 && !isWater[i] ? (snapshot?.nationOverlord[o] ?? -1) : -1;
@@ -8189,6 +8358,7 @@ overlay.addEventListener("click", (e) => {
 /** Settings apply at once (SET-003): text size, the map's battery knobs, and the cards that show them. */
 function applyPrefs(): void {
   document.documentElement.style.setProperty("--text-zoom", String(textZoom()));
+  applyVision();
   document.documentElement.dataset.animations = animationsPref().toLowerCase();
   view?.setPower(mapPower());
   if (!soundMenu.hidden) renderSoundMenu();
