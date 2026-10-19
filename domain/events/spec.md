@@ -37,6 +37,8 @@ contexts extend, and the data build that validates all of it.
 
 Newest decision first.
 
+0. `start-date/plan-1378.md` §5 and `start-date/research/europe-west.md` (goals with reasons), 19 Oct 2026: the
+   West's bridge events of 1378 to 1444 (EVT-085 to EVT-089, D-EVT-20).
 0. `start-date/plan-1378.md` §3.1 (18 Oct 2026, Leroy's choices of 18 and 19 Oct): the campaign starts on
    20 September 1378; a new Age of Schism and Conquerors; Gunpowder Empires and Exploration start by their
    conditions; the periods move and new ones cover 1378 to 1444 (EVT-081 to EVT-084, D-EVT-19).
@@ -498,6 +500,62 @@ at a 1444 start, by its conditions rather than by its date.
   map in the Wide and Tall layouts, inside the safe areas, its text scrolling while the options stay in reach,
   every button at least 44 points high, nothing that needs hover. [X-19, SHELL-070, SHELL-080, SHELL-081]
 
+### 5.17 Bridge events of the West, 1378 to 1444 (milestone 10, step 6, 19 October 2026)
+
+History from the 1378 start to 1444 reaches the West as events (plan-1378 §5, rows Church, Empire, France and
+England, Iberia and Italy). Like every event they are conditional and mostly `approximate`: likeliest near their
+history year when their conditions hold, never forced by the date (EVT-004, EVT-019, plan-1378 §2).
+
+- EVT-085 The game shall join each region's bridge file (`events-bridge-<region>.json`: its events, the places they
+  name with their map provinces, entity names and words) to the campaign's events when a campaign loads. A bridge
+  event with the id of a campaign event replaces it, which is how a 1444 event is re-dated (EVT-089). [plan-1378 §5;
+  D-EVT-20]
+- EVT-086 The bridge shall show the tree, each month, three more things of each realm: its state faith as the tree
+  first meets it (an event's change of faith is the tree's own after), its ruler's age and years on the throne as
+  the statistics `ruler_age` and `ruler_years` (0 through a new ruler's first year), and these flags: `regency`
+  while a regent rules for a child, `emperor` on the realm whose ruler holds the Empire, `empire_member` on each
+  member. So "the king has died", "a child is king" and "the Emperor" are conditions an event can read.
+  [D-EVT-20; REALM-100; INST-010]
+- EVT-087 When a campaign starts, the game shall count every bridge event whose history date lies before the start
+  as having happened, with its historical option and holders, and shall not apply its effects again (the start's
+  own data shows them). A date of a year alone counts as under way all that year. So a 1444 campaign plays as
+  before, and an event that needs a bridge event (EVT-089) can still follow there; a 1378 campaign has none of them
+  yet. [D-EVT-20]
+- EVT-088 The game shall run the West's 54 bridge events (`events-bridge-west.json`; ★ marks the 18 turning points
+  the history check will watch):
+
+| Region | Events (history year) |
+|---|---|
+| Church | France declares for Clement ★ (1378), A realm chooses its Pope ★ (1378–87, once for each Catholic realm of Europe: Rome, Avignon or neutral, leaning by its ties to France and England), Urban deposes Joanna (1380), Wyclif and the Lollards (1382), Council of Pisa (1409), Council of Constance ★ (1414, ends the Western Schism), Hus burned (1415), Defenestration of Prague ★ (1419, starts the Hussite wars), Council of Basel (1431), Union of Florence (1439) |
+| Empire | Wenceslaus succeeds Charles IV ★ (1378), Neuberg partition (1379), Battle of Sempach (1386), Battle of Näfels (1388), Swabian City War (1388), Deposition of Wenceslaus ★ (1400), Rupert's Italian venture (1401), Sigismund King of the Romans (1410), Brandenburg to the Hohenzollerns (1415, a union under Brandenburg), Saxony to the Wettins (1423, Saxony annexes Saxe-Wittenberg), Hussite crusades ★ (1420–31), Albert of Austria takes three crowns (1438, unions of Hungary and Bohemia), Frederick III (1440) |
+| France and England | Brittany confiscated (1378), The uncles' regency (1380), Peasants' Revolt ★ (1381), Madness of Charles VI (1392), Richard II deposed ★ (1399), Murder of Orléans (1407), Armagnac–Burgundian war (1411), Cabochien revolt (1413), Agincourt ★ (1415, Normandy passes to England two years on if the war goes on), Treaty of Troyes ★ (1420, Paris to England), Joan of Arc ★ (1429), Congress of Arras ★ (1435, Paris back to France a year on), Écorcheurs (1435) |
+| Iberia | Portuguese crisis ★ (1383), Aljubarrota ★ (1385), Lancaster's claim to Castile (1386), Compromise of Caspe (1412), Conquest of Ceuta ★ (1415), Madeira and the Azores (1420, sets `atlantic_island_bases`, so the Age of Exploration can start), Past Cape Bojador (1434), Alfonso V takes Naples (1435, a union under Aragon) |
+| Italy | War of Chioggia ★ (1378), Peace of Turin (1381), Charles of Durazzo takes Naples (1381), Gian Galeazzo seizes Milan ★ (1385, Pavia annexes Milan), Milan made a duchy (1395), Death of Gian Galeazzo (1402), Florence takes Pisa (1406), Ladislaus marches on Rome (1408), Lombard wars (1425, Brescia to Venice), Sforza weds the duke's daughter (1441) |
+
+  The events chain by their conditions and follow-ups: the obedience each realm chooses is a flag Urban's and
+  Pisa's events read, the madness opens the princes' feud that Orléans's murder, the civil war, Agincourt and
+  Troyes follow, Ceuta leads to the islands and the islands to Bojador. Durazzo's and Alfonso's events give the
+  `claim_on_naples` and Sforza's the `claim_on_milan` the Italian Wars read. A `rebels` effect is a spark in each
+  aggrieved province of the realm or place it names (EVT-048, REBL-010). Effects the game does not simulate yet
+  (prestige, casus belli, relations other than subjects) stay in the tree's world, where later events read them
+  (EVT-073). @placeholder [plan-1378 §5; europe-west.md goals; D-EVT-20]
+- EVT-089 The game shall run these 1444 events from the 1378 start, re-dated (the same events otherwise):
+  `end_of_hundred_years_war` from 1420, needing Agincourt or Troyes first; `wars_of_the_roses` from 1430, needing
+  Richard II's deposition; `union_of_castile_and_aragon` from 1415, needing the Compromise of Caspe;
+  `fall_of_granada` and `alhambra_decree` from 1400; `printing_press_spreads` from 1440. The West's other events with
+  `earliest: 1444` keep it, because their history needs what the bridge period builds first: `castile_portugal_union`
+  (the war of 1475 over a Castilian succession), `columbus_first_voyage`, `portuguese_cape_route`,
+  `treaty_of_tordesillas` and `portuguese_elmina` (ocean reach after Bojador). [plan-1378 §5; D-EVT-20]
+
+#### How the player uses it: the bridge events
+- Where: nothing new is built. A bridge event for the player's realm opens the event card over the map like any
+  other (EVT-076): its name, its history year, what happened then, and its options as 44-point buttons with their
+  effects in words, the historical one marked *As in history*. Playing France in 1378, the first card is *France
+  declares for Clement*; playing Castile, *A realm chooses its Pope* asks Rome, Avignon or neutral. Grouping and
+  overview: one card per event; the News keeps a line for each that fired, so the run of history from 1378 reads
+  there, and the Chronicle card (plan-1378 §4.6) will show the turning points on course, bent or gone. Phone: the
+  card's Wide and Tall sheets, safe areas and 44-point buttons, nothing that needs hover (EVT-076). [X-19]
+
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
@@ -709,6 +767,20 @@ before achievements and the autosave. The age and period checks run in the event
   (EXPL-076). Conditions name only events the tree has; the bridge events of 1378 to 1444 will start and end
   the new periods when they are written (plan-1378 step 6).
 
+- **D-EVT-20** Bridge events of the West (plan-1378 §5; milestone 10, step 6; quick calls by the integrator under
+  Leroy's rule of quick decisions): each region keeps its own bridge file, joined to the campaign at load, so the
+  regions are written side by side (EVT-085). A bridge event before the start counts as history rather than being
+  dropped, so re-dated 1444 events can need one and still run from 1444 (EVT-087). The tree is shown the ruler's
+  age and years, the regency and the Emperor, so deaths, regencies and imperial politics are read from the game's
+  own rulers and Empire instead of from dates (EVT-086); a faith is seeded once, as the tree's `religion` effect
+  lands nowhere else yet. Choices: the Schism obedience is a flag on each realm, asked once per Catholic realm,
+  France first; the Visconti state after 1385 is whoever holds Milan's province (the role binds by `owns`), so the
+  realm Gian Galeazzo's coup leaves standing carries the later events; Ceuta (a port below map size) changes no
+  land; Madeira's settlement sets `atlantic_island_bases`, which already starts the Age of Exploration; the age of
+  Schism keeps 1449 as Basel's end. Tests run the events on today's map set back to 1378 until the 1378 map is
+  joined. Provisional. Effects stay small (prestige, legitimacy, a share of the treasury) where the game cannot
+  yet land the real thing.
+
 ## 14. Traceability
 
 | Requirement | Feature file | Scenario |
@@ -734,3 +806,4 @@ before achievements and the autosave. The age and period checks run in the event
 | EVT-082 | ages-and-periods.feature | Forced dates; bombards among three great powers; two are not enough; the fall of Constantinople; Portugal's ocean ships; Exploration's window. Engine: packages/engine/test/events.test.ts |
 | EVT-083 | — | Engine: packages/engine/test/events.test.ts (without bombards or ocean ships the two ages wait) |
 | EVT-084 | — | Presentation: nothing new on screen |
+| EVT-085 – 089 | bridge-west.feature | A 1444 campaign already has the West's history; a 1378 campaign has none yet; France declares for Clement, then the realms choose; the tree sees a regent and the Emperor; Troyes gives Paris to England; the end of the Hundred Years' War needs the Lancastrian conquest. Engine: packages/engine/test/bridgeWest.test.ts (build checks, places and modifiers, the uncles' regency on the player's card, rebels as sparks) |
