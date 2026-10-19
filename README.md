@@ -11,7 +11,7 @@ A turn-based, 8-bit grand strategy game for phones, desktop and the web, startin
 | `apps/client` | The web game (Vite). Runs the engine in a Web Worker. |
 | `apps/desktop` | Electron wrapper around the client build. |
 | `apps/mobile` | Capacitor wrapper (iOS and Android) around the client build. |
-| `server` | Symfony 7.4 API for accounts and metrics. |
+| `server` | Symfony 7.4 app: the API for accounts and metrics, and the website with the wiki at `/wiki` ([docs/website.md](docs/website.md)). |
 | `tools/mapgen` | Builds the world map and the 1444 setup from Natural Earth (public domain) data and the Köppen-Geiger climate map (CC BY 4.0). |
 
 ## Running it
