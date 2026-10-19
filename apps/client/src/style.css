@@ -5195,6 +5195,44 @@ button.link {
   font-size: 19px;
 }
 
+/* A choice of more than four values (Colour vision): a grid of buttons under the name, each a full tap target. */
+.set-control.wide {
+  flex-basis: 100%;
+}
+
+.seg.many {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 168px), 1fr));
+  width: 100%;
+}
+
+/* What Colour vision draws: sample realms and a lens ramp in the chosen mode (SET-095). */
+.vision-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  flex-basis: 100%;
+}
+
+.vision-sample {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.vision-sample small {
+  margin-right: 4px;
+  font-size: 16px;
+  color: var(--ink-soft);
+}
+
+.vision-sample .swatch {
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--ink);
+}
+
 .reset-section {
   margin: 10px 0 4px;
 }
