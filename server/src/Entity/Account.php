@@ -29,9 +29,6 @@ class Account implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private \DateTimeImmutable $createdAt;
 
-    /** Set when the player buys "remove ads"; the client stops showing the start-screen ad. */
-    #[ORM\Column]
-    private bool $adsRemoved = false;
 
     /**
      * Roles beyond ROLE_PLAYER, such as ROLE_MODERATOR (granted by app:community:moderator).
@@ -68,16 +65,6 @@ class Account implements UserInterface, PasswordAuthenticatedUserInterface
     public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
-    }
-
-    public function hasAdsRemoved(): bool
-    {
-        return $this->adsRemoved;
-    }
-
-    public function setAdsRemoved(bool $adsRemoved): void
-    {
-        $this->adsRemoved = $adsRemoved;
     }
 
     public function getPassword(): string

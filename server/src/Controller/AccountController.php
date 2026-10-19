@@ -38,7 +38,6 @@ final class AccountController
             'id' => $account->getId()->toRfc4122(),
             'email' => $account->getEmail(),
             'displayName' => $account->getDisplayName(),
-            'adsRemoved' => $account->hasAdsRemoved(),
         ], Response::HTTP_CREATED);
     }
 }
