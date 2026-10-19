@@ -4,14 +4,14 @@ import { eraIndex, eraName, isPast, newProgramme, outOfScope, pathTo, standing, 
 import { icon } from "../art/ui.ts";
 
 /**
- * Research on screen (research RSCH-084 to RSCH-090, RSCH-100 to RSCH-111).
- * The Research tab of the player's country card is one screen: a header with
- * the realm's standing and a Schools button, the study queue as a strip along
- * the top, jump chips, and the one invention tree drawn as one picture (the
- * four branches as bands, the eras as column groups) with the picked
- * invention's sheet beside it (500 px wide or more) or sliding up from the
- * bottom. The tree has two zoom levels, Close up and Whole tree. Schools is
- * the second part. The General tab carries one line that opens the tab.
+ * Research on screen (research RSCH-084 to RSCH-090, RSCH-100 to RSCH-114).
+ * Research is its own screen over the map, opened from the top bar's research
+ * plaque, the General tab's line or an alert. It has three parts: Next (what
+ * is studied, the queue and the inventions that can be started, best first),
+ * Tree (the one invention tree drawn as one picture, the four branches as
+ * bands and the eras as column groups, with the picked invention's sheet
+ * beside it or sliding up from the bottom; two zoom levels, Close up and
+ * Whole tree) and Schools.
  */
 
 type Research = NonNullable<Snapshot["research"]>;
@@ -19,7 +19,7 @@ type Option = Research["options"][number];
 
 /** What the player left open in the Research tab, kept across redraws. */
 export interface LearningUi {
-  part: "tree" | "schools";
+  part: "next" | "tree" | "schools";
   /** Close up (named nodes) or Whole tree (the whole tree fits the frame, RSCH-101). */
   zoom: "close" | "whole";
   /** The invention tapped, or null for the current study. */
@@ -34,7 +34,7 @@ export interface LearningUi {
   slide: boolean;
 }
 
-export const newLearningUi = (): LearningUi => ({ part: "tree", zoom: "close", pick: null, open: new Set(), scroll: null, center: null, slide: false });
+export const newLearningUi = (): LearningUi => ({ part: "next", zoom: "close", pick: null, open: new Set(), scroll: null, center: null, slide: false });
 
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
 const fmt = (n: number) => Math.round(n).toLocaleString("en-US");
@@ -56,10 +56,15 @@ const monthsFor = (sy: number, pace: number): number | null => (pace > 0 ? Math.
 
 const pct = (r: Research) => (r.study ? Math.min(100, (r.study.progress / r.study.cost) * 100) : 0);
 
-/** The General tab's line: the study, how far along and the scholars, opening the Research tab (RSCH-088). */
+/** The General tab's line: the study, how far along and the scholars, opening the Research screen (RSCH-088). */
 export function learningLine(r: Research): string {
   const what = r.study ? `Studying <b>${esc(nice(r.study.name))}</b> · ${Math.floor(pct(r))} % · scholars ${fmt(r.scholars)}` : `<b>Nothing studied</b> · choose what to study`;
-  return `<dt>Research</dt><dd><button class="paper learning-line${r.study ? "" : " idle"}" data-realm-open-tab="learning" title="Open the Research tab">${icon("scroll", 1)}<span>${what}</span></button></dd>`;
+  return `<dt>Research</dt><dd><button class="paper learning-line${r.study ? "" : " idle"}" data-realm-open-tab="learning" title="Open Research">${icon("scroll", 1)}<span>${what}</span></button></dd>`;
+}
+
+/** The standing in a few words for the Research screen's header: "Abreast of the times", "Behind by 2 eras" (RSCH-103). */
+export function standingShort(behind: number): string {
+  return behind ? `Behind by ${behind} era${behind === 1 ? "" : "s"}` : "Abreast of the times";
 }
 
 /** "Era I · abreast of the times", "Ancient · behind the times by 2 eras" (RSCH-103, RSCH-104). */
@@ -408,31 +413,7 @@ function sheet(r: Research, st: Map<string, State>, ui: LearningUi): string {
     </aside>`;
 }
 
-// ---------------------------------------------------------------- the queue strip, the overview and the jumps
-
-/** The study queue along the top: the current study with its bar and time left, then the queued inventions in order (RSCH-107, RSCH-110). */
-function queueStrip(r: Research, ui: LearningUi): string {
-  const study = r.study
-    ? `<button class="paper q-study" data-inv="${r.study.id}" aria-label="Studying ${esc(nice(r.study.name))}, ${Math.floor(pct(r))} %"><span class="q-name">${icon("scroll", 1)}<b>${esc(nice(r.study.name))}</b></span><span class="study-meter"><i style="width:${pct(r).toFixed(1)}%"></i></span><small>${Math.floor(pct(r))} % · ${paceText(r.study.months)} left</small></button>`
-    : `<p class="q-study idle"><b>Nothing studied.</b> Tap ◆ in the tree, then Study now.</p>`;
-  const chips = r.queue
-    .map((q, k) => {
-      const on = ui.pick === q.id;
-      return `<span class="q-item${on ? " on" : ""}" role="listitem"><button class="paper q-chip${q.waiting ? " waiting" : ""}" data-inv="${q.id}"><i class="qn">${k + 1}</i><span><b>${esc(nice(q.name))}</b><small>${paceText(q.months)}${q.waiting ? " · waits" : ""}</small></span></button>${on ? queueButtons(r, q.id, k) : ""}</span>`;
-    })
-    .join("");
-  const free = r.queueLength - r.queue.length;
-  return `<div class="queue-strip" role="list" aria-label="Study queue">${study}${chips}<span class="q-free">${r.queue.length ? `${free} of ${r.queueLength} free` : `Queue empty: up to ${r.queueLength} studies follow by themselves`}</span></div>`;
-}
-
-/** The overview line: standing, catching up, the pace and how much of the tree is known (RSCH-084, RSCH-103). */
-function overview(r: Research): string {
-  const inPlay = [...treeLayout().at.keys()].filter((id) => tree().inventions.has(id)).length;
-  const missing = r.pastMissing.length;
-  const stand = `${standingText(r.standing, r.behind)}${missing ? ` · ${missing} past invention${missing === 1 ? "" : "s"} to catch up` : ""}`;
-  const pace = `${fmt(r.scholars)} scholars · ${fmt(r.students)} students · <b>${years(r.perYear || r.pace)}</b> scholar-years a year · ${r.known.length} of ${inPlay} known`;
-  return `<p class="learn-standing">${missing ? `<button class="paper standing" data-jump="catch" title="Show the first past invention in the tree">${stand}</button>` : `<b class="standing">${stand}</b>`}<small>${pace}</small></p>`;
-}
+// ---------------------------------------------------------------- the jumps
 
 /** The inventions that can be studied and are not studied or queued already: the ◆ of the tree. */
 const openIds = (r: Research) => r.options.map((o) => o.id).filter((id) => id !== r.study?.id && !r.queue.some((q) => q.id === id));
@@ -502,27 +483,109 @@ function schoolsPart(rules: Ruleset, r: Research, gold: number, open: ReadonlySe
     ${found}`;
 }
 
-// ---------------------------------------------------------------- the tab
+// ---------------------------------------------------------------- the Next part
 
-/** The Research tab: one screen with the queue, the tree and the sheet, or the Schools (RSCH-107). */
+/** The inventions to offer in Next, best first: past ones to catch up, then the cheapest (RSCH-113). */
+export function nextPicks(r: Research): { option: Option; catchUp: boolean; cheapest: boolean }[] {
+  const t = tree();
+  const ids = new Set(openIds(r));
+  const open = r.options.filter((o) => ids.has(o.id));
+  const low = Math.min(...open.map((o) => o.cost));
+  const catchUp = (o: Option) => isPast(t.inventions.get(o.id)!);
+  return open
+    .map((option) => ({ option, catchUp: catchUp(option), cheapest: false }))
+    .sort((a, b) => Number(b.catchUp) - Number(a.catchUp) || a.option.cost - b.option.cost || a.option.name.localeCompare(b.option.name))
+    .map((x, k, all) => ({ ...x, cheapest: !x.catchUp && x.option.cost === low && all.findIndex((y) => !y.catchUp && y.option.cost === low) === k }));
+}
+
+/** What an invention does, in its own one line. */
+const doesOf = (id: string) => cap(tree().inventions.get(id)?.unlocks ?? "");
+
+/** "4 years", "7 months": the time an invention takes at the realm's pace. */
+const timeText = (months: number | null) => (months === null ? "no progress" : months <= 24 ? `${months} month${months === 1 ? "" : "s"}` : `${Math.round(months / 12)} years`);
+
+/** Next: the study with its bar, the queue in order, and the inventions that can be started, best first (RSCH-113). */
+function nextPart(r: Research): string {
+  const now = r.study
+    ? `<button class="paper next-now" data-learn-pick="${r.study.id}" aria-label="Studying ${esc(nice(r.study.name))}, ${Math.floor(pct(r))} %: show it in the tree">
+        <b class="next-name">${esc(nice(r.study.name))}</b>
+        <span class="next-does">${esc(doesOf(r.study.id))}</span>
+        <span class="study-meter" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.floor(pct(r))}"><i style="width:${pct(r).toFixed(1)}%"></i></span>
+        <span class="next-meta"><span>${Math.floor(pct(r))} %</span><span>${timeText(r.study.months)} left</span></span>
+      </button>`
+    : `<p class="next-now idle"><b>Nothing is being studied.</b> Pick one to start.</p>`;
+  const rows = r.queue
+    .map(
+      (q, k) => `<li class="next-q${q.waiting ? " waiting" : ""}">
+        <button class="paper q-name" data-learn-pick="${q.id}"><i class="qn">${k + 1}</i><span>${esc(nice(q.name))}</span><small>${q.waiting ? "waits" : timeText(q.months)}</small></button>
+        <button class="paper" data-move="${q.id}" data-by="-1" ${k === 0 ? "disabled" : ""} aria-label="Study ${esc(nice(q.name))} one place earlier">▲</button>
+        <button class="paper q-out" data-unqueue="${q.id}" aria-label="Remove ${esc(nice(q.name))} from the queue">✕</button>
+      </li>`,
+    )
+    .join("");
+  const room = r.queueLength - r.queue.length;
+  const queue = `<p class="next-label">Queue · ${r.queue.length} of ${r.queueLength}</p>
+    ${r.queue.length ? `<ol class="next-queue">${rows}</ol>` : `<p class="next-empty">Empty. Tap ＋ on an invention and it follows by itself.</p>`}`;
+  const picks = nextPicks(r);
+  const cards = picks
+    .map(({ option: o, catchUp, cheapest }) => {
+      const tags = [catchUp ? `<b class="tag catch">Catch up</b>` : "", cheapest ? `<b class="tag cheap">Cheapest</b>` : "", o.partners ? `<b class="tag known-by">Neighbours know it</b>` : "", o.ahead ? `<b class="tag ahead">Ahead of its time</b>` : ""].join("");
+      const act = !r.study
+        ? `<button class="wax next-act" data-study="${o.id}" aria-label="Study ${esc(nice(o.name))} now">Study</button>`
+        : room > 0
+          ? `<button class="paper next-act add" data-queue-study="${o.id}" aria-label="Add ${esc(nice(o.name))} to the queue">＋</button>`
+          : `<button class="paper next-act" disabled aria-label="The queue is full">Full</button>`;
+      return `<li class="next-card${catchUp || cheapest ? " best" : ""}">
+          <button class="paper next-pick" data-learn-pick="${o.id}">
+            <b class="next-name">${esc(nice(o.name))}</b>
+            <span class="next-does">${esc(doesOf(o.id))}</span>
+            <span class="next-tags">${tags}<span>${timeText(o.months)}</span></span>
+          </button>
+          ${act}
+        </li>`;
+    })
+    .join("");
+  return `<div class="next-part">
+      <div class="next-left">
+        <p class="next-label">Studying now</p>
+        ${now}
+        ${queue}
+      </div>
+      <div class="next-right">
+        <p class="next-label">You can start · best first</p>
+        ${picks.length ? `<ul class="next-cards">${cards}</ul>` : `<p class="next-empty">Nothing can be started now: everything in reach is studied or queued.</p>`}
+        <button class="paper next-more" data-learn-part="tree">${icon("scroll", 1)}Further ahead? Plan it in the Tree</button>
+      </div>
+    </div>`;
+}
+
+// ---------------------------------------------------------------- the screen
+
+/** The header every part shares: the standing, the pace, and the three parts as tabs (RSCH-107, RSCH-113). */
+function screenHead(r: Research, ui: LearningUi): string {
+  const missing = r.pastMissing.length;
+  const stand = `${esc(standingShort(r.behind))}${missing ? ` · ${missing} to catch up` : ""}`;
+  const standing = missing ? `<button class="paper learn-stand behind" data-jump="catch" title="Show the first past invention in the tree">${stand}</button>` : `<span class="learn-stand">${stand}</span>`;
+  const part = (key: LearningUi["part"], label: string) => `<button class="paper learn-part" data-learn-part="${key}" aria-pressed="${ui.part === key}">${label}</button>`;
+  return `<div class="learn-head">
+      <div class="learn-parts" role="group" aria-label="Research">${part("next", "Next")}${part("tree", "Tree")}${part("schools", `Schools · ${r.schools.length + r.founding.length}`)}</div>
+      <p class="learn-standing">${standing}<small>${esc(eraName(r.era as TreeEra))} · ${fmt(r.scholars)} scholars · ${years(r.perYear || r.pace)} scholar-years a year</small></p>
+    </div>`;
+}
+
+/** The Research screen: Next, Tree or Schools under one header (RSCH-107, RSCH-113). */
 export function learningTab(rules: Ruleset, r: Research, gold: number, ui: LearningUi = newLearningUi()): string {
-  const schools = r.schools.length + r.founding.length;
-  if (ui.part === "schools") {
-    return `<div class="learn-screen schools-part">
-        <div class="learn-head">${overview(r)}<button class="paper" data-learn-part="tree">${icon("scroll", 1)}Back to the tree</button></div>
-        ${schoolsPart(rules, r, gold, ui.open)}
-      </div>`;
-  }
+  const head = `${screenHead(r, ui)}${r.stopped ? `<p class="warn">Research has stopped: the students were called to arms. Fill seats again in Schools.</p>` : ""}`;
+  if (ui.part === "schools") return `<div class="learn-screen schools-part">${head}${schoolsPart(rules, r, gold, ui.open)}</div>`;
+  if (ui.part === "next") return `<div class="learn-screen next">${head}${nextPart(r)}</div>`;
   const st = states(r);
   const lay = treeLayout();
   const focus = focusOf(r, ui);
   const path = lit(r, st, focus);
   const slide = ui.slide;
   ui.slide = false;
-  return `<div class="learn-screen">
-      <div class="learn-head">${overview(r)}<button class="paper" data-learn-part="schools">${icon("castle", 1)}Schools · ${schools}</button></div>
-      ${r.stopped ? `<p class="warn">Research has stopped: the students were called to arms.</p>` : ""}
-      ${queueStrip(r, ui)}
+  return `<div class="learn-screen tree-part">
+      ${head}
       ${jumps(r, ui)}
       <div class="tree-wrap${ui.pick ? " picked" : ""}">
         <div class="tree-col">

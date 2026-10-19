@@ -36,17 +36,20 @@ export type TopBarItem =
   | { key: "date"; plaque: true; opens: null }
   | { key: "gold"; plaque: true; opens: Opens; gold: number; perMonth: number; falling: boolean }
   | { key: "stability"; plaque: true; opens: Opens; step: number; words: string; heldBackBy: string[] }
+  | { key: "research"; plaque: true; opens: Opens; study: string | null; pct: number }
   | { key: "war"; plaque: true; opens: Opens }
   | { key: "dispatches"; plaque: true; opens: Opens; count: number; urgent: boolean };
 
-export type TopBarInput = Pick<Snapshot, "playerNation" | "nationTreasury" | "nationMonthlyIncome" | "stability" | "wars" | "calls" | "peaceOffers">;
+export type TopBarInput = Pick<Snapshot, "playerNation" | "nationTreasury" | "nationMonthlyIncome" | "stability" | "wars" | "calls" | "peaceOffers"> & Partial<Pick<Snapshot, "research">>;
 
 /**
  * The top bar, in order: the realm's flag and name, the date, gold with its
- * change a month, stability, the war plaque while at war, and dispatches
- * (REALM-205). Gold opens the Treasury tab (REALM-185), stability the General
- * tab on its Stability section (REALM-203), war the Diplomacy tab. `unread` is
- * the news the player has not read yet.
+ * change a month, stability, research, the war plaque while at war, and
+ * dispatches (REALM-205). Gold opens the Treasury tab (REALM-185), stability
+ * the General tab on its Stability section (REALM-203), research the Research
+ * screen with the study's progress, or marked while nothing is studied
+ * (RSCH-113), war the Diplomacy tab. `unread` is the news the player has not
+ * read yet.
  */
 export function topBar(s: TopBarInput, unread: number, asks = 0): TopBarItem[] {
   const me = s.playerNation;
@@ -58,6 +61,10 @@ export function topBar(s: TopBarInput, unread: number, asks = 0): TopBarItem[] {
     { key: "gold", plaque: true, opens: { card: "realm", tab: "treasury" }, gold: s.nationTreasury[me]!, perMonth: inc, falling: inc < 0 },
   ];
   if (s.stability) items.push({ key: "stability", plaque: true, opens: { card: "realm", tab: "general", section: "stability" }, ...stabilityPlaque(s.stability) });
+  if (s.research) {
+    const st = s.research.study;
+    items.push({ key: "research", plaque: true, opens: { card: "realm", tab: "learning" }, study: st?.name ?? null, pct: st ? Math.min(100, Math.floor((st.progress / st.cost) * 100)) : 0 });
+  }
   if (atWar) items.push({ key: "war", plaque: true, opens: { card: "realm", tab: "diplomacy" } });
   items.push({ key: "dispatches", plaque: true, opens: { news: true }, count: unread + s.calls.length + s.peaceOffers.length + asks, urgent: s.calls.length > 0 || s.peaceOffers.length > 0 || asks > 0 });
   return items;

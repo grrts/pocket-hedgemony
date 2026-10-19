@@ -446,6 +446,8 @@ document.addEventListener("click", (e) => {
   lordView = -1;
   declareFor = -1;
   realmTab = (b.dataset.realmOpen as typeof realmTab | undefined) ?? "general";
+  // Research opened from outside starts on Next: what to study (RSCH-113).
+  if (realmTab === "learning") learningUi.part = "next";
   newsView = false;
   panelCollapsed = false;
   renderPanel();
@@ -2823,6 +2825,8 @@ function renderHud(): void {
           return `<button class="plaque" data-realm="${me}"${open(p.opens)} title="Treasury: gold, and change per month. Opens the ledger">${icon("coin", 1)}${fmt(p.gold)} <small class="${p.falling ? "down" : ""}">${p.perMonth >= 0 ? "+" : ""}${p.perMonth.toFixed(1)}</small></button>`;
         case "stability":
           return stabilityPlaque(s.stability!, me, s.revolution);
+        case "research":
+          return `<button class="plaque research-plaque${p.study ? "" : " idle"}" data-realm="${me}"${open(p.opens)} title="${p.study ? `Research: studying ${esc(p.study)}, ${p.pct} %` : "Research: nothing studied, choose a study"}">${icon("scroll", 1)}<span class="plaque-text">${p.study ? `${p.pct}%` : "Study!"}</span></button>`;
         case "war":
           return `<button class="plaque at-war" data-realm="${me}"${open(p.opens)} data-war-focus title="Your wars: your side's peace voices, amber past a third, red past half">${icon("swords", 1)}At war${warPlaqueBars(myWarsRaw(), me)}</button>`;
         case "dispatches":
@@ -3528,8 +3532,8 @@ function showPanel(open: boolean, reopenIcon: "scroll" | "crown" = "scroll"): vo
     armyList.hidden = true;
   }
   panel.classList.toggle("chooser", reopenIcon === "crown");
-  // The Research tab's one screen takes a wider card on a desktop (RSCH-107).
-  panel.classList.toggle("research", open && !!panel.querySelector(".learn-screen:not(.schools-part)"));
+  // Research is a screen of its own: it fills the screen under the top bar (RSCH-113).
+  panel.classList.toggle("research", open && !!panel.querySelector(".learn-screen"));
   panel.hidden = !open || panelCollapsed;
   // While a course is drawn the voyage bar stands in for the folded card (EXPL-074).
   reopen.hidden = !open || !panelCollapsed || !!exploring;
@@ -5646,7 +5650,11 @@ function renderRealm(r: number): void {
     : realmTab === "learning" && s?.research ? learningTab(rules, s.research, s.nationTreasury[r]!, learningUi)
     : realmTab === "officials" ? officialsTab(rules, own.filter((i) => s!.provinceLord[i]! < 0).map((i) => ({ province: i, official: officialOf(s!, i, r) })), r, own.filter((i) => s!.provinceLord[i]! >= 0).length, r === s!.playerNation ? s!.newLands : [], titlesOf(r))
     : general;
-  panel.innerHTML = `
+  // Research is its own screen over the map, with its own parts in place of the card's tabs (RSCH-113).
+  const research = realmTab === "learning" && mine && !!s?.research;
+  panel.innerHTML = research
+    ? `<header><h2 class="ribbon">Research</h2>${closeButton()}</header>${content}`
+    : `
     <header><h2 class="ribbon">${esc(n.name)}</h2>${closeButton()}</header>
     ${s ? `<nav class="tabs">${COUNTRY_TABS.map(([key, label]) => tab(key, label, key === "diplomacy" && answerWaits)).join("")}${mine ? tab("government", "Government") + tab("peoples", "Peoples") + tab("score", "Score") + tab("treasury", "Treasury") + tab("food", "Food") + tab("provinces", "Provinces") + tab("learning", "Research") + tab("navy", "Navy") + tab("colonies", "Colonies") + (s.tribes.mine ? tab(HUNT_TAB.id, HUNT_TAB.label, s.tribes.mine.settlers.length > 0 || s.tribes.mine.asks.length > 0) : "") + tab("officials", cap(titlesOf(r).officials)) + tab("lords", cap(titlesOf(r).lords)) : ""}${tab("heritage", "Heritage")}</nav>` : `<nav class="tabs">${tab("general", "General")}${tab("heritage", "Heritage")}</nav>`}
     ${content}`;
@@ -5722,6 +5730,7 @@ function renderRealm(r: number): void {
       realmTab = b.dataset.realmOpenTab as typeof realmTab;
       // A line naming an invention opens the tree on it (GOV-078).
       if (b.dataset.learnPick) Object.assign(learningUi, { part: "tree", pick: b.dataset.learnPick, center: b.dataset.learnPick, slide: true });
+      else if (realmTab === "learning") learningUi.part = "next";
       renderPanel();
     }),
   );
@@ -5963,9 +5972,16 @@ function bindLearning(): void {
     renderPanel();
   });
   on("[data-inv]", (b) => pick(b.dataset.inv!, !b.closest(".tree-view")));
+  // Next names an invention: the Tree opens on it with its sheet.
+  on("[data-learn-pick]", (b) => {
+    learningUi.part = "tree";
+    learningUi.zoom = "close";
+    pick(b.dataset.learnPick!, true);
+  });
   on("[data-jump]", (b) => {
     const id = jumpTarget(r, b.dataset.jump!, learningUi.pick);
     if (!id) return;
+    learningUi.part = "tree";
     learningUi.zoom = "close";
     pick(id, true);
   });
@@ -6001,7 +6017,7 @@ function bindLearning(): void {
   });
   // The tree frame: Close up keeps its scroll, or brings what was asked for into the middle.
   const frame = screen.querySelector<HTMLElement>(".tree-view");
-  if (frame?.classList.contains("close")) {
+  if (frame?.classList.contains("near")) {
     const want = learningUi.center ?? (learningUi.scroll ? null : firstShown(r));
     learningUi.center = null;
     if (want) {

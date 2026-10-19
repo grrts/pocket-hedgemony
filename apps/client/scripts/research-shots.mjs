@@ -1,12 +1,13 @@
-// Research on one screen (RSCH-084 to RSCH-111): the nation picker's standing, the "choose what to study"
-// alert, the Research tab as one screen (queue strip, jump chips, the one tree with its four branch bands,
-// the sheet beside it or sliding up from the bottom), Study now, Add to queue, Queue the path, moving and
-// removing in the queue, the Whole tree zoom and tapping a place in it, Schools, the General tab's line and
-// another realm's line. France plays on every size; Mali (which starts in Ancient) shows Catch up.
+// Research as its own screen (RSCH-084 to RSCH-113): the nation picker's standing, the "choose what to study"
+// alert, the top bar's research plaque, Next (the study, the queue and what can be started, best first),
+// Study and ＋ from Next, the Tree (jump chips, the one tree with its four branch bands, the sheet beside it
+// or sliding up from the bottom), Queue the path, the Whole tree zoom and tapping a place in it, moving and
+// removing in the queue, Schools, the General tab's line and another realm's line. France plays on every
+// size; Mali (which starts in Ancient) shows Catch up first.
 // Sizes: a phone held sideways (844 × 390), a narrow upright window (390 × 844, the Tall layout) and a desktop.
-// Checks: one picture with four bands, no bough tabs, a locked invention offers no Study now, queue and
-// path orders land, every tap target in the tab at least 44 px, and the panel never scrolls sideways
-// (the tree and the queue strip scroll inside themselves).
+// Checks: no country-card tabs over Research, the top bar fits, one picture with four bands, no bough tabs,
+// a locked invention offers no Study now, queue and path orders land, every tap target on the screen at
+// least 44 px, and the panel never scrolls sideways (the tree scrolls inside itself).
 // Usage: pnpm build && node scripts/research-shots.mjs <outDir>
 import { chromium } from "playwright-core";
 import { preview } from "vite";
@@ -73,42 +74,54 @@ for (const [size, device, realms] of sizes) {
       await page.click(".hud [data-realm]");
       await page.click("[data-realm-tab=learning]");
     }
-    await page.waitForSelector(".learn-screen");
+    await page.waitForSelector(".learn-screen.next");
     await page.waitForTimeout(300);
     await shot("research");
-    // One picture: four branch bands, no bough tabs (RSCH-100).
-    if ((await page.locator(".tree-view.near .tree-bands .band-name").count()) !== 4) fail(name, "the tree has not four bands");
-    if (await page.locator("[data-bough]").count()) fail(name, "the bough tabs are still there");
-    if ((await page.locator(".tree-eras b.now").count()) !== 1) fail(name, "no era marked Now");
+    // Research is its own screen: no country-card tabs, the top bar's plaque asks for a study (RSCH-113).
+    if (await page.locator(".panel nav.tabs").count()) fail(name, "the country card's tabs show over Research");
+    if (!(await page.locator(".hud .research-plaque.idle").count())) fail(name, "the top bar has no research plaque asking for a study");
+    const hudOver = await page.evaluate(() => {
+      const h = document.querySelector(".hud");
+      return h.scrollWidth - h.clientWidth;
+    });
+    if (hudOver > 1) fail(name, "the top bar overflows by", hudOver);
+    if (!(await page.locator(".next-card").count())) fail(name, "Next offers nothing to start");
     await checkTargets("at the start");
     if (realm === "mali") {
-      // Behind the times: the standing line and Catch up (RSCH-102, RSCH-103).
-      const standing = await page.locator(".learn-standing .standing").textContent();
-      if (!/behind the times/.test(standing)) fail(name, "standing reads", standing);
+      // Behind the times: the standing and Catch up first in Next (RSCH-103, RSCH-113).
+      const standing = await page.locator(".learn-stand").textContent();
+      if (!/Behind by/.test(standing)) fail(name, "standing reads", standing);
+      if (!(await page.locator(".next-card").first().locator(".tag.catch").count())) fail(name, "Next does not put a past invention first");
       await press(page.locator("[data-jump=catch]").last());
       await shot("catch-up");
       if (!(await page.locator(".pick-sheet.picked .pick-without").count())) fail(name, "a past invention's sheet has no Without it line");
-      await press(page.locator("[data-jump=catch]").last());
-      await shot("catch-up-next");
       await page.close();
       continue;
     }
+    // Study the first pick, then queue the next two from Next (RSCH-113).
+    await press(page.locator(".next-card [data-study]").first());
+    await page.waitForSelector("button.next-now");
+    if (!(await page.locator(".hud .research-plaque:not(.idle)").count())) fail(name, "the plaque does not show the study");
+    await press(page.locator(".next-card [data-queue-study]").first());
+    await page.waitForSelector(".next-q");
+    await press(page.locator(".next-card [data-queue-study]").first());
+    await page.waitForTimeout(200);
+    await shot("next");
+    await checkTargets("in Next with a queue");
+    // The tree: one picture, four branch bands, no bough tabs (RSCH-100).
+    await press(page.locator(".learn-parts [data-learn-part=tree]"));
+    await page.waitForSelector(".tree-view.near");
+    await shot("tree");
+    if ((await page.locator(".tree-view.near .tree-bands .band-name").count()) !== 4) fail(name, "the tree has not four bands");
+    if (await page.locator("[data-bough]").count()) fail(name, "the bough tabs are still there");
+    if ((await page.locator(".tree-eras b.now").count()) !== 1) fail(name, "no era marked Now");
+    await checkTargets("in the tree");
     // A locked invention far off: the sheet shows the path and offers no Study now (RSCH-109).
     await press(page.locator(".tnode.locked").nth(30));
     await shot("path");
     if (await page.locator(".pick-sheet [data-study]").count()) fail(name, "a locked invention offers Study now");
     if (!(await page.locator(".tnode.path").count())) fail(name, "the path is not drawn in the tree");
     if (size === "tall") await checkTargets("with the sheet up");
-    // Study now on one that can be studied.
-    await press(page.locator("[data-jump=open]"));
-    await shot("open");
-    await press(page.locator(".pick-sheet [data-study]"));
-    await page.waitForSelector(".q-study:not(.idle)");
-    await shot("studying");
-    // Add to queue: the next one that can be studied.
-    await press(page.locator("[data-jump=open]"));
-    await press(page.locator(".pick-sheet [data-queue-study]"));
-    await page.waitForSelector(".q-chip");
     // Queue the path to a locked invention whose path fits.
     const locked = page.locator(".tnode.locked");
     let queued = false;
@@ -123,17 +136,9 @@ for (const [size, device, realms] of sizes) {
       }
     }
     if (!queued) fail(name, "no path could be queued");
-    const chips = await page.locator(".q-chip").count();
-    if (chips < 2) fail(name, "the queue holds", chips);
+    // The order's answer redraws the screen: wait for it before tapping on.
+    await page.waitForTimeout(500);
     if (!(await page.locator(".tnode .qn").count())) fail(name, "queued inventions carry no place number in the tree");
-    // A chip selects its invention and shows ◀ ▶ ✕ (RSCH-110).
-    await press(page.locator(".q-chip").first());
-    await shot("queue-chip");
-    await checkTargets("with the queue");
-    await press(page.locator(".q-item.on [data-unqueue]"));
-    await page.waitForTimeout(200);
-    if ((await page.locator(".q-chip").count()) >= chips) fail(name, "✕ did not remove from the queue");
-    await shot("queue-removed");
     // Whole tree, then a place tapped in it opens Close up there (RSCH-101).
     if (size === "tall" && (await page.locator("[data-sheet-close]").count())) await press(page.locator("[data-sheet-close]"));
     await press(page.locator("[data-zoom]"));
@@ -149,22 +154,37 @@ for (const [size, device, realms] of sizes) {
     await shot("close-there");
     const moved = await page.evaluate(() => document.querySelector(".tree-view.near").scrollLeft);
     if (moved < 200) fail(name, "Close up did not open at the place tapped", moved);
-    // Schools, one button away in the header.
-    await press(page.locator("[data-learn-part=schools]"));
+    // Back in Next: the queue moves and ✕ removes (RSCH-110).
+    await press(page.locator(".learn-parts [data-learn-part=next]"));
+    const rows = await page.locator(".next-q").count();
+    if (rows < 3) fail(name, "the queue holds", rows);
+    const second = await page.locator(".next-q .q-name span").nth(1).textContent();
+    await press(page.locator(".next-q [data-by='-1']").nth(1));
+    await page.waitForTimeout(200);
+    if ((await page.locator(".next-q .q-name span").first().textContent()) !== second) fail(name, "▲ did not move the study earlier");
+    await press(page.locator(".next-q [data-unqueue]").first());
+    await page.waitForTimeout(200);
+    if ((await page.locator(".next-q").count()) >= rows) fail(name, "✕ did not remove from the queue");
+    await shot("queue-moved");
+    // Schools, one tab away.
+    await press(page.locator(".learn-parts [data-learn-part=schools]"));
     await shot("schools");
     await checkTargets("in Schools");
-    await press(page.locator("[data-learn-part=tree]"));
-    // The General tab's line, then another realm's card (RSCH-088, RSCH-104).
-    await page.click("[data-realm-tab=general]");
+    // The General tab's line opens Research on Next, then another realm's card (RSCH-088, RSCH-104).
+    await page.click(".hud button.realm");
     await page.waitForTimeout(200);
     await page.locator(".learning-line").scrollIntoViewIfNeeded();
     await shot("general-line");
+    await press(page.locator(".learning-line"));
+    if (!(await page.locator(".learn-screen.next").count())) fail(name, "the General line does not open Next");
+    await page.click(".hud button.realm");
+    await page.waitForTimeout(200);
     await press(page.locator(".nations [data-realm]").first());
     await page.waitForTimeout(300);
     const line = page.locator("dt:text-is('Research') + dd");
     await line.scrollIntoViewIfNeeded();
     const text = await line.textContent();
-    if (!/(abreast of|behind) the times/.test(text) || !/you don't/.test(text)) fail(name, "another realm's Research line reads", text);
+    if (!/(abreast of|behind) the times/.test(text) || !/ahead of you/.test(text)) fail(name, "another realm's Research line reads", text);
     await shot("other-realm");
     await page.close();
   }
