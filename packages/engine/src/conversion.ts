@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import type { World } from "./world.ts";
 import type { News } from "./war.ts";
 import { provinceConfig } from "./domain/province/model.ts";
@@ -162,7 +163,7 @@ export function aiChanges(world: World): void {
     const n = world.provinceOwner[p]!;
     if (n < 0 || world.provinceWater[p] || changing(world, p)) continue;
     const lord = world.provinceLord[p]! >= 0;
-    if (n === world.player && !lord) continue;
+    if (isHuman(world, n) && !lord) continue;
     let fed = 0;
     for (const c of FOOD_CLASSES) fed += worksFood(world, p, c);
     if (fed >= world.provincePopulation[p]!) continue;

@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import type { World } from "./world.ts";
 import type { News } from "./war.ts";
 import { controller } from "./war.ts";
@@ -539,7 +540,7 @@ export function aiWorks(world: World, news: News[]): void {
   const reserveMin = world.rules.defines.works.aiReserveGold;
   for (let n = 0; n < world.nationCount; n++) {
     const land = lands[n]!;
-    if (n === world.player || world.nationGone[n] || !land.length || world.nationTreasury[n]! < reserveMin || inAnyWar(world, n)) continue;
+    if (isHuman(world, n) || world.nationGone[n] || !land.length || world.nationTreasury[n]! < reserveMin || inAnyWar(world, n)) continue;
     const reserve = Math.max(reserveMin, 12 * worksUpkeep(world, n));
     // The first shipyard comes before the other works, however busy the realm is.
     let y = -1;

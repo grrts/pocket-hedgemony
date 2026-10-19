@@ -95,7 +95,10 @@ import {
 } from "@ph/engine/domain/map-presentation";
 import { provinceLevy } from "@ph/engine/domain/recruiting";
 import { musicFacts, newFactMemory, playerPalette, playerWars, remember, type FactMemory } from "./audio/facts.ts";
-import { COMMISSION_GOLD, hireGold, OFFICIALS, Rng } from "@ph/engine";
+import { COMMISSION_GOLD, hireGold, OFFICIALS, resolutionOrder, Rng, type PlayerOrders } from "@ph/engine";
+import { mpStore, type MpStore } from "./multiplayer/store.ts";
+import { deviceId, hostGame, remember as rememberGame, remembered, sendTurn, startOnline, takeSeat, watchGame, watchGames, watchSeats, watchTurns, type OnlineGame, type Seat, type TurnDoc } from "./multiplayer/lobby.ts";
+import { hotseatPickHtml, lobbyHtml, menuHtml, playersHtml, type PlayerRow, type RealmLook } from "./multiplayer/screens.ts";
 import { SHELL as SHELL_RULES, endTurnInAuto, endTurnLabel, newAutoTurns, startColumn, startIcons, stopAuto, switchAuto, weekPlayed, type AutoStop, type Platform as ShellPlatform } from "@ph/engine/domain/game-shell";
 import { autosaveDue, continueTarget, longDate, newCampaign, newManualSave, savesConfig, type Campaign, type Platform as SavePlatform } from "@ph/engine/domain/saves";
 import { SaveStore, type StoredSave } from "./saves/store.ts";
@@ -344,6 +347,44 @@ const settingsButton = document.querySelector<HTMLButtonElement>("#settings")!;
 const hints = new Hints();
 /** The commander list is put away. */
 let armyListClosed = true;
+
+/**
+ * Multiplayer (prototype, docs/multiplayer.md): the realms people play, the
+ * ones played on this device, and this week's orders in hand. Null in a game of one.
+ */
+interface MpState {
+  mode: "hotseat" | "online";
+  /** Every player's realm, by nation index, in order. */
+  humans: number[];
+  /** The realms played on this device, in the order they plan (Pass and play: all of them). */
+  local: number[];
+  /** The realm on screen, planning its week. */
+  planning: number;
+  /** This week's orders in hand, by realm. */
+  orders: Map<number, PlayerOrders>;
+  /** Online: Ready was pressed this week; the week plays when every player's orders are in. */
+  waiting: boolean;
+  /** The world's hash at this week's start: every device's must agree. */
+  weekHash: string;
+  outOfStep: string | null;
+  /** Pass and play: the realm the device is being passed to (-1: none). */
+  cover: number;
+  online: { store: MpStore; game: OnlineGame; turns: Map<string, TurnDoc>; stop: () => void } | null;
+}
+let mp: MpState | null = null;
+/** Choosing realms for a multiplayer game: what tapping a realm does. */
+let mpPicking: { kind: "hotseat"; chosen: string[] } | { kind: "host" } | { kind: "join"; code: string } | null = null;
+/** An online game waiting for its host to start it. */
+let mpLobby: { store: MpStore; game: OnlineGame; seats: Seat[]; realm: string; stop: () => void } | null = null;
+/** The Players card is open. */
+let mpView = false;
+/** The Multiplayer dialog over the start screen, and the games it lists. */
+let startMp = false;
+let mpGames: OnlineGame[] | null = null;
+let mpReach: MpStore["reach"] | null = null;
+let stopGames: (() => void) | null = null;
+/** Resolving or catching up a week: nothing else starts meanwhile. */
+let mpBusy = false;
 armyButton.addEventListener("click", () => {
   armyListClosed = !armyListClosed;
   lensMenu.hidden = true;
@@ -469,10 +510,20 @@ document.addEventListener(
     if ((e.target as HTMLElement).closest("[data-realm], [data-news], [data-official], [data-show-province], [data-go-province], .go-there")) {
       achView = false;
       empireOpen = false;
+      mpView = false;
     }
   },
   { capture: true },
 );
+// The Players plaque opens the Players card (multiplayer).
+document.addEventListener("click", (e) => {
+  if (!(e.target as HTMLElement).closest("[data-mp-players]") || !mp) return;
+  mpView = true;
+  realmView = -1;
+  newsView = false;
+  panelCollapsed = false;
+  renderPanel();
+});
 achToast.addEventListener("click", () => {
   const id = achToast.dataset.id;
   achToast.hidden = true;
@@ -729,7 +780,8 @@ async function boot(): Promise<void> {
   renderPanel();
   hideLoading();
   sound.title();
-  hints.mount({ target: hintTarget, moment: () => ({ eventOpen: !eventCard.hidden || !overlay.hidden || !revolutionCard.hidden, turnPlaying: playing }), sfx: (id) => sound.sfx(id) });
+  // The first-campaign hints wait while a multiplayer game is chosen or played: they teach a game of one.
+  hints.mount({ target: hintTarget, moment: () => ({ eventOpen: !eventCard.hidden || !overlay.hidden || !revolutionCard.hidden || !!mp || !!mpPicking || !!mpLobby, turnPlaying: playing }), sfx: (id) => sound.sfx(id) });
 }
 
 // ---- map styling ----
@@ -2362,7 +2414,7 @@ function renderHud(): void {
           return `<button class="plaque dispatches${p.urgent ? " urgent" : ""}" data-news title="News: everything that happened, newest first">${icon("scroll", 1)}${p.count || ""}</button>`;
       }
     })
-    .join("\n    ");
+    .join("\n    ") + mpPlaque();
 }
 
 /** Wars the player fights, with the player's side first. */
@@ -2412,6 +2464,11 @@ const realmButton = (n: number, tab?: "diplomacy") => `<button class="realm-link
 /** Sends an order that acts at once (war, peace, levies), then shows what came of it. */
 async function act(order: Order): Promise<void> {
   if (acting || !snapshot) return;
+  // Multiplayer: orders are given while the week is planned; the week plays the same on every device.
+  if (mp && (playing || mp.waiting || mpBusy)) {
+    alertPlayer(playing ? "The week is playing: orders wait for the next week." : "Your orders are in: the week plays when every player is ready.", "scroll");
+    return;
+  }
   acting = true;
   takeSnapshot(await engine.send({ type: "act", order }), 0);
   acting = false;
@@ -2543,7 +2600,7 @@ function logNews(s: Snapshot): void {
   if (fresh.length) {
     stopAuto(auto, "event");
     eventFolded = false;
-    if (playing && !paused) {
+    if (playing && !paused && !mp) {
       paused = true;
       pausedForEvent = true;
     }
@@ -2551,7 +2608,7 @@ function logNews(s: Snapshot): void {
   renderEventCard();
   // A revolution breaking out covers the map, and the week waits for the answer (REVO-091).
   if (s.revolution?.outbreak) stopAuto(auto, "revolution");
-  if (s.revolution?.outbreak && playing && !paused) {
+  if (s.revolution?.outbreak && playing && !paused && !mp) {
     paused = true;
     pausedForEvent = true;
   }
@@ -2825,7 +2882,9 @@ function renderNews(): void {
 /** The End turn button in the corner; while the week plays, it pauses and resumes. */
 function renderActions(): void {
   fab.hidden = !snapshot;
-  autoButton.hidden = !snapshot;
+  // Auto turns are for a game of one: in multiplayer every week waits for every player.
+  autoButton.hidden = !snapshot || !!mp;
+  fab.classList.toggle("mp-waiting", !!mp?.waiting);
   autoButton.classList.toggle("on", auto.state === "on");
   autoButton.classList.toggle("stopping", auto.state === "stopping");
   autoButton.setAttribute("aria-pressed", String(auto.state === "on"));
@@ -2852,7 +2911,11 @@ function renderActions(): void {
       ? paused
         ? "Play on (Space)"
         : stopping ?? (auto.state === "on" ? "Stop Auto turns at the end of this week (Space)" : "Pause (Space)")
-      : `End turn (Space): on to ${dateText(addDays(snapshot.date, DAYS_PER_TURN))}`;
+      : mp
+        ? mp.waiting
+          ? "Your orders are in: waiting for the other players (tap to see who)"
+          : `Ready (Space): your orders for the week to ${dateText(addDays(snapshot.date, DAYS_PER_TURN))} are done`
+        : `End turn (Space): on to ${dateText(addDays(snapshot.date, DAYS_PER_TURN))}`;
   renderArmyList();
 }
 
@@ -3046,6 +3109,15 @@ function renderPanelCard(): void {
     renderAchievements();
     return;
   }
+  if (mpView && mp && snapshot) {
+    renderMpPlayers();
+    return;
+  }
+  mpView = false;
+  if (mpLobby && !snapshot) {
+    renderMpLobby();
+    return;
+  }
   if (empireOpen && snapshot?.empire) {
     renderEmpire();
     return;
@@ -3090,8 +3162,9 @@ function renderPanelCard(): void {
     return;
   }
   if (!snapshot && selectedProvince < 0) {
+    const pickTitle = !mpPicking ? "Choose your realm" : mpPicking.kind === "hotseat" ? "Choose 2 to 4 realms" : mpPicking.kind === "host" ? "Host: your realm" : `Game ${mpPicking.code}: your realm`;
     panel.innerHTML = `
-      <header><h2 class="ribbon">Choose your realm</h2><span class="panel-buttons"><button class="fold" aria-label="Minimise">${icon("collapse", 2)}</button><button class="close" data-start-back aria-label="Back to the start screen">${icon("close", 2)}</button></span></header>
+      <header><h2 class="ribbon">${esc(pickTitle)}</h2><span class="panel-buttons"><button class="fold" aria-label="Minimise">${icon("collapse", 2)}</button><button class="close" data-start-back aria-label="Back to the start screen">${icon("close", 2)}</button></span></header>
       <div class="nations">${FEATURED.filter((id) => nationIndex.has(id))
         .map((id) => {
           const n = nations[nationIndex.get(id)!]!;
@@ -3099,15 +3172,18 @@ function renderPanelCard(): void {
           return `<button class="paper nation" data-nation="${n.id}">${pennant(n)}<span class="nation-name">${esc(n.name)}<small class="starts">${esc(startStanding(n.id))}</small></span></button>`;
         })
         .join("")}</div>
+      ${mpPicking?.kind === "hotseat" ? hotseatPickHtml(mpLook, mpPicking.chosen) : ""}
       <p class="hint">Or tap any realm on the map: ${nations.length} to choose from. <a href="./style.html">Art test page</a></p>
       <button class="paper ach-open" data-ach-open>${icon("trophy", 2)}Achievements<small>${Object.keys(achProfile.unlocked).length} earned · every campaign can earn them</small></button>
       <p class="diag" id="diag">${diagnosticsLine()}</p>`;
     bindNationButtons();
     panel.querySelector("[data-ach-open]")!.addEventListener("click", () => openAchievements());
     panel.querySelector("[data-start-back]")!.addEventListener("click", () => {
+      mpPicking = null;
       startOn = true;
       renderPanel();
     });
+    bindMpPicker();
     showPanel(true, "crown");
     return;
   }
@@ -5243,6 +5319,7 @@ function bindClose(): void {
     realmView = -1;
     achView = false;
     empireOpen = false;
+    mpView = false;
     headView = null;
     declareFor = -1;
     selectedProvince = -1;
@@ -5253,7 +5330,7 @@ function bindClose(): void {
 }
 
 function bindNationButtons(): void {
-  panel.querySelectorAll<HTMLButtonElement>("[data-nation]").forEach((b) => b.addEventListener("click", () => void startGame(b.dataset.nation!)));
+  panel.querySelectorAll<HTMLButtonElement>("[data-nation]").forEach((b) => b.addEventListener("click", () => chooseRealm(b.dataset.nation!)));
 }
 
 // ---- first-campaign hints ----
@@ -5491,8 +5568,10 @@ function hearSnapshot(): void {
  * the player's men fight, so marches, battles and sieges are seen as they go
  * (TIME-076). Ending the turn again while it plays pauses it, and again goes on.
  */
-async function endTurn(): Promise<void> {
+async function endTurn(force = false): Promise<void> {
   if (!snapshot) return;
+  // Multiplayer: the week plays once every player's orders are in (force), not on this device's say.
+  if (force) return playWeek();
   // While an event waits, End turn opens it instead (EVT-044, SHELL-070).
   if (snapshot.events.length) {
     openEventCard();
@@ -5532,6 +5611,14 @@ async function endTurn(): Promise<void> {
     renderActions();
     return;
   }
+  // Multiplayer: End turn is Ready; the week plays when everyone is.
+  if (mp) return mpReady();
+  return playWeek();
+}
+
+/** Plays the week out, a day or a 4-hour step at a time (TIME-076). */
+async function playWeek(): Promise<void> {
+  if (!snapshot) return;
   playing = true;
   paused = false;
   // Saves still waiting for a quiet moment wait for the end of this week instead.
@@ -5577,21 +5664,23 @@ async function endTurn(): Promise<void> {
   sound.sfx(weekStart && snapshot.date.year > weekStart.year ? "turn_month_new_year" : "turn_ready");
   const began = weekStart;
   weekStart = snapshot.date;
-  // The saves wait for a quiet moment, so pressing End turn again never waits on them.
-  savesOwedFrom ??= began;
-  afterTurnTimer = window.setTimeout(() => {
-    afterTurnTimer = 0;
-    const from = savesOwedFrom;
-    savesOwedFrom = null;
-    void savesAfterTurn(from);
-  }, SAVE_DELAY_MS);
+  // The saves wait for a quiet moment, so pressing End turn again never waits on them. A multiplayer game is not saved.
+  if (!mp) savesOwedFrom ??= began;
+  if (!mp)
+    afterTurnTimer = window.setTimeout(() => {
+      afterTurnTimer = 0;
+      const from = savesOwedFrom;
+      savesOwedFrom = null;
+      void savesAfterTurn(from);
+    }, SAVE_DELAY_MS);
   musicDecides();
   restyleProvinces();
   renderHud();
   renderPanel();
   renderActions();
   renderDiagnostics();
-  afterWeekInAuto();
+  if (mp) mpWeekEnded();
+  else afterWeekInAuto();
 }
 
 /** The player's armies on the march, by id. */
@@ -5764,18 +5853,19 @@ function showStart(): void {
       ? `<button class="wax start-play" data-start="play">${nation ? pennant(nation, 3) : icon("crown", 3)}<span><b>Play</b>${e.detail ? `<small>${esc(e.detail)}</small>` : ""}</span></button>`
       : `<button class="paper" data-start="${e.target}">${esc(e.label)}</button>`;
   startEl.innerHTML = `
-    <div class="start-band framed">
+    <div class="start-band framed"${startMp ? " hidden" : ""}>
       <h1 class="start-logo">Pocket Hegemony</h1>
-      <nav class="start-column" aria-label="Start">${column.map(entry).join("")}</nav>
+      <nav class="start-column" aria-label="Start">${column.map(entry).join("")}<button class="paper" data-start="multiplayer">Multiplayer</button></nav>
       <div class="start-icons">${startIcons(SHELL_PLATFORM)
         .map((name) => `<button class="paper" data-start-icon="${name}">${icon(START_ICONS[name]!, 2)}<small>${name}</small></button>`)
         .join("")}</div>
     </div>
     ${startMore ? startMoreHtml() : ""}
+    ${startMp ? menuHtml(mpLook, mpGames, mpReach, { lastCode: remembered()?.code ?? null }) : ""}
     <span class="start-version">v${GAME_VERSION}</span>`;
   startEl.hidden = false;
   document.body.classList.add("starting");
-  startEl.querySelector<HTMLButtonElement>(".start-play")!.focus({ preventScroll: true });
+  if (!startMp) startEl.querySelector<HTMLButtonElement>(".start-play")!.focus({ preventScroll: true });
   panStart(cont ? cont.entry.header.playerNation : SHELL_RULES.start.regions[Math.floor(Math.random() * SHELL_RULES.start.regions.length)]!);
 }
 
@@ -5816,7 +5906,8 @@ function panStart(nationId: string): void {
     if (!startOn || startEl.hidden) return;
     // A sine path: the pan eases to a stop at each end and turns back.
     const phase = ((now - t0) / 1000) * (SHELL_RULES.start.panSpeed / reach);
-    view.lookAt(cap.x! + reach * Math.sin(phase), cap.y! + reach * 0.25 * Math.sin(phase * 0.5), SHELL_RULES.start.zoomLevel);
+    // The map may still be loading behind the first start screen.
+    view?.lookAt(cap.x! + reach * Math.sin(phase), cap.y! + reach * 0.25 * Math.sin(phase * 0.5), SHELL_RULES.start.zoomLevel);
     startPan = requestAnimationFrame(step);
   };
   startPan = requestAnimationFrame(step);
@@ -5845,6 +5936,7 @@ startEl.addEventListener("click", (e) => {
   } else if (what === "Settings") openShell("settings", true);
   else if (what === "Achievements") openAchievements();
   else if (what === "Wiki") window.open(SHELL_RULES.start.wikiUrl, "_blank", "noopener");
+  else if (what === "multiplayer") openMpMenu();
   else if (what === "More") {
     startMore = !startMore;
     showStart();
@@ -6236,6 +6328,8 @@ void refreshSaves().then(() => {
 
 // Hooks for the scripted play-throughs (scripts/war-shots.mjs).
 Object.assign(globalThis, {
+  /** Multiplayer, for the shots script: this device's week, its hash at the week's start and whether it is out of step. */
+  __phMp: () => (mp && snapshot ? { turn: snapshot.turn, hash: mp.weekHash, outOfStep: mp.outOfStep, waiting: mp.waiting, cover: mp.cover } : null),
   __phNation: (id: string) => nationIndex.get(id),
   __phTurn: () => snapshot?.turn ?? -1,
   /** The player's ports and fleets, and an order for the navy (scripts/navy-shots.mjs). */
@@ -6400,6 +6494,393 @@ Object.assign(globalThis, {
     if (p >= 0) view.lookAt(provinces[p]!.x!, provinces[p]!.y!, 4);
   },
 });
+
+// ---- multiplayer (prototype, docs/multiplayer.md) ----
+
+const mpLook: RealmLook = {
+  name: (id) => nationNameOf(id),
+  pennant: (id, scale = 2) => {
+    const n = flagOfId(id);
+    return n ? pennant(n, scale) : "";
+  },
+};
+const idOf = (n: number) => nations[n]!.id;
+
+/** The Multiplayer dialog over the start screen, with the online games kept up to date. */
+function openMpMenu(): void {
+  startMp = true;
+  startMore = false;
+  showStart();
+  if (stopGames) return;
+  void mpStore().then((store) => {
+    mpReach = store.reach;
+    stopGames = watchGames(store, (games) => {
+      mpGames = games;
+      if (startMp && !startEl.hidden) showStart();
+    });
+    if (startMp) showStart();
+  });
+}
+
+function closeMpMenu(): void {
+  startMp = false;
+  stopGames?.();
+  stopGames = null;
+}
+
+startEl.addEventListener("click", (e) => {
+  const b = (e.target as HTMLElement).closest<HTMLElement>("[data-mp], [data-mp-join], [data-mp-rejoin]");
+  if (!b) return;
+  if (b.dataset.mp === "close") {
+    closeMpMenu();
+    showStart();
+    return;
+  }
+  if (b.dataset.mpRejoin) {
+    const code = b.dataset.mpRejoin;
+    const game = mpGames?.find((g) => g.code === code);
+    closeMpMenu();
+    hideStart();
+    if (game) void mpStore().then((store) => joinOnline(store, game, b.dataset.realm!));
+    return;
+  }
+  mpPicking = b.dataset.mpJoin ? { kind: "join", code: b.dataset.mpJoin } : b.dataset.mp === "host" ? { kind: "host" } : { kind: "hotseat", chosen: [] };
+  closeMpMenu();
+  hideStart();
+  selectedProvince = -1;
+  renderPanel();
+});
+
+/** A realm tapped on the chooser or the map: a game of one, or a seat in a multiplayer game. */
+function chooseRealm(id: string): void {
+  if (!mpPicking) {
+    void startGame(id);
+    return;
+  }
+  if (mpPicking.kind === "hotseat") {
+    const c = mpPicking.chosen;
+    if (c.includes(id)) c.splice(c.indexOf(id), 1);
+    else if (c.length < 4) c.push(id);
+    else alertPlayer("Pass and play takes four realms at most.", "crown");
+    selectedProvince = -1;
+    restyleProvinces();
+    renderPanel();
+    return;
+  }
+  void mpSit(id);
+}
+
+function bindMpPicker(): void {
+  if (mpPicking?.kind !== "hotseat") return;
+  const pick = mpPicking;
+  panel.querySelectorAll<HTMLButtonElement>("[data-mp-unpick]").forEach((b) => b.addEventListener("click", () => chooseRealm(b.dataset.mpUnpick!)));
+  panel.querySelector<HTMLButtonElement>("[data-mp-go]")?.addEventListener("click", () => {
+    if (pick.chosen.length < 2) return;
+    mpPicking = null;
+    void startMpGame(Date.now() >>> 0, pick.chosen, pick.chosen[0]!, "hotseat", null);
+  });
+}
+
+/** Takes a seat in an online game: hosts a new one, or joins one, then waits in its lobby. */
+async function mpSit(id: string): Promise<void> {
+  const store = await mpStore();
+  const pick = mpPicking;
+  if (!pick || pick.kind === "hotseat") return;
+  if (pick.kind === "host") {
+    enterLobby(store, await hostGame(store, id), id);
+    return;
+  }
+  const seat = (await store.get(`mp/${pick.code}/seats/${id}`)) as Seat | null;
+  if (seat && seat.device !== deviceId()) {
+    alertPlayer(`${nationNameOf(id)} is taken in game ${pick.code}: choose another realm.`, "crown");
+    return;
+  }
+  const game = (await store.get(`mp/${pick.code}`)) as OnlineGame | null;
+  if (!game) {
+    alertPlayer(`Game ${pick.code} is gone.`, "crown");
+    return;
+  }
+  await takeSeat(store, pick.code, id);
+  enterLobby(store, game, id);
+}
+
+function enterLobby(store: MpStore, game: OnlineGame, realm: string): void {
+  mpPicking = null;
+  selectedProvince = -1;
+  rememberGame({ code: game.code, realm });
+  const stops: (() => void)[] = [];
+  mpLobby = { store, game, seats: [], realm, stop: () => stops.forEach((f) => f()) };
+  stops.push(
+    watchSeats(store, game.code, (seats) => {
+      if (!mpLobby) return;
+      mpLobby.seats = seats;
+      renderPanel();
+    }),
+  );
+  stops.push(
+    watchGame(store, game.code, (g) => {
+      if (!mpLobby || !g) return;
+      mpLobby.game = g;
+      if (!g.started) return renderPanel();
+      const l = mpLobby;
+      l.stop();
+      mpLobby = null;
+      void joinOnline(l.store, g, l.realm);
+    }),
+  );
+  restyleProvinces();
+  renderPanel();
+}
+
+function renderMpLobby(): void {
+  const l = mpLobby!;
+  panel.innerHTML = lobbyHtml(mpLook, l.game, l.seats, l.realm, `<span class="panel-buttons"><button class="close" data-mp-leave-lobby aria-label="Leave the game">${icon("close", 2)}</button></span>`);
+  panel.querySelector("[data-mp-leave-lobby]")!.addEventListener("click", () => {
+    l.stop();
+    mpLobby = null;
+    startOn = true;
+    renderPanel();
+  });
+  panel.querySelector<HTMLButtonElement>("[data-mp-start]")?.addEventListener("click", (e) => {
+    (e.currentTarget as HTMLButtonElement).disabled = true;
+    void startOnline(l.store, l.game, l.seats);
+  });
+  showPanel(true, "crown");
+}
+
+/** Starts a multiplayer game: every device makes the same world from the same seed. */
+async function startMpGame(seed: number, humanIds: string[], me: string, mode: MpState["mode"], online: { store: MpStore; game: OnlineGame } | null): Promise<void> {
+  showLoading(mode === "hotseat" ? "Gathering the courts…" : `Joining game ${online!.game.code}…`, 0.15);
+  await painted();
+  const snap = await engine.send({ type: "newGame", seed, playerNation: me, humans: humanIds, ...(mapImage ? { map: mapTiles(mapImage) } : {}) });
+  mapSent = true;
+  campaign = null;
+  const me_ = nationIndex.get(me)!;
+  mp = {
+    mode,
+    humans: humanIds.map((id) => nationIndex.get(id)!).sort((a, b) => a - b),
+    local: mode === "hotseat" ? humanIds.map((id) => nationIndex.get(id)!) : [me_],
+    planning: me_,
+    orders: new Map(),
+    waiting: false,
+    weekHash: snap.hash,
+    outOfStep: null,
+    cover: -1,
+    online: null,
+  };
+  enterGame(snap);
+  if (online) {
+    const m = mp;
+    m.online = { ...online, turns: new Map(), stop: () => {} };
+    m.online.stop = watchTurns(online.store, online.game.code, (docs) => {
+      if (mp !== m || !m.online) return;
+      for (const d of docs) m.online.turns.set(`${d.turn}-${d.realm}`, d);
+      void mpAdvanceIfReady();
+    });
+  } else if (mode === "hotseat") mpCover(mp.local[0]!);
+}
+
+/** Opens an online game that has started, as one of its realms: the weeks already played are played again here. */
+async function joinOnline(store: MpStore, game: OnlineGame, realm: string): Promise<void> {
+  rememberGame({ code: game.code, realm });
+  await startMpGame(game.seed, game.humans, realm, "online", { store, game });
+}
+
+/**
+ * Online: once every player's orders for this week are in, carry them out and
+ * play the week. Weeks already played elsewhere (coming back to a game) are
+ * played again at once, without the playback.
+ */
+async function mpAdvanceIfReady(): Promise<void> {
+  const m = mp;
+  if (!m?.online || mpBusy || playing || !snapshot) return;
+  const t = snapshot.turn;
+  const docOf = (n: number, turn = t) => m.online!.turns.get(`${turn}-${idOf(n)}`);
+  // Every device writes the hash it had at the week's start: one that differs is out of step.
+  for (const n of m.humans) {
+    const d = docOf(n);
+    if (d && d.hash && m.weekHash && d.hash !== m.weekHash && !m.outOfStep) {
+      m.outOfStep = `Out of step with ${nations[n]!.name} since week ${t + 1}: the devices no longer agree on the world. Leave and come back to the game to play it again from the start.`;
+      alertPlayer(m.outOfStep, "crown");
+    }
+  }
+  if (docOf(m.planning) && !m.waiting) m.waiting = true;
+  const docs = m.humans.map((n) => docOf(n));
+  if (!docs.every(Boolean)) {
+    renderHud();
+    renderActions();
+    if (mpView) renderPanel();
+    return;
+  }
+  mpBusy = true;
+  try {
+    // Catching up: the next week is also complete, so this one is played without the playback.
+    const quick = m.humans.every((n) => docOf(n, t + 1));
+    await mpResolve(docs.map((d) => d!.orders), quick);
+  } finally {
+    mpBusy = false;
+  }
+  void mpAdvanceIfReady();
+}
+
+/** Ready: this realm's orders for the week are done. */
+async function mpReady(): Promise<void> {
+  const m = mp;
+  if (!m || !snapshot || mpBusy) return;
+  if (m.waiting) {
+    mpView = true;
+    panelCollapsed = false;
+    renderPanel();
+    return;
+  }
+  const r = await engine.request({ type: "planned" });
+  if (r.type !== "planned") return;
+  m.orders.set(m.planning, r.orders);
+  if (m.mode === "hotseat") {
+    const next = m.local.find((n) => !m.orders.has(n));
+    if (next !== undefined) return mpCover(next);
+    mpBusy = true;
+    try {
+      await mpResolve(m.humans.map((n) => m.orders.get(n)!), false);
+    } finally {
+      mpBusy = false;
+    }
+    return;
+  }
+  m.waiting = true;
+  renderHud();
+  renderActions();
+  try {
+    await sendTurn(m.online!.store, m.online!.game.code, { turn: snapshot.turn, realm: idOf(m.planning), orders: r.orders, hash: m.weekHash, device: deviceId() });
+  } catch (e) {
+    m.waiting = false;
+    alertPlayer(`Your orders did not reach the table (${e instanceof Error ? e.message : String(e)}). Press Ready again.`, "scroll");
+    renderActions();
+  }
+}
+
+/** Every player's orders together, from the week's start, then the week played. */
+async function mpResolve(all: PlayerOrders[], quick: boolean): Promise<void> {
+  const t = snapshot!.turn;
+  takeSnapshot(await engine.send({ type: "resolve", all }), 0);
+  applySnapshot();
+  logNews(snapshot!);
+  for (const r of snapshot!.rejectedOrders) alertPlayer(`Not done: ${r.reason}.`, "scroll");
+  if (!quick) return endTurn(true);
+  while (snapshot!.turn === t) takeSnapshot(await engine.send({ type: "advance", steps: 42 }), 0);
+  applySnapshot();
+  logNews(snapshot!);
+  restyleProvinces();
+  mpWeekEnded();
+}
+
+/** The week is over: the next one is planned. */
+function mpWeekEnded(): void {
+  const m = mp;
+  if (!m || !snapshot) return;
+  m.weekHash = snapshot.hash || m.weekHash;
+  m.orders.clear();
+  m.waiting = false;
+  if (m.mode === "hotseat") mpCover(m.local[0]!);
+  renderHud();
+  renderActions();
+  if (!panel.hidden) renderPanel();
+}
+
+const mpCoverEl = document.createElement("div");
+mpCoverEl.className = "mp-cover";
+mpCoverEl.hidden = true;
+app.append(mpCoverEl);
+
+/** Pass and play: the map is covered while the device goes to the next player. */
+function mpCover(n: number): void {
+  const m = mp!;
+  m.cover = n;
+  const realm = nations[n]!;
+  mpCoverEl.innerHTML = `<div class="framed mp-cover-card" role="dialog" aria-label="Pass the device">
+    <p class="mp-note">Week ${snapshot!.turn + 1} · ${dateText(snapshot!.date)}</p>
+    <h2 class="ribbon">Pass to ${esc(realm.name)}</h2>
+    <p>${pennant(realm, 4)}</p>
+    <p class="mp-note">${m.local.filter((x) => m.orders.has(x)).length} of ${m.local.length} realms have their orders in. The others' stay hidden.</p>
+    <button class="wax play" data-mp-plan>${icon("crown", 2)}Plan as ${esc(realm.name)}</button>
+  </div>`;
+  mpCoverEl.hidden = false;
+  mpCoverEl.querySelector("[data-mp-plan]")!.addEventListener("click", () => void mpPlanAs(n));
+}
+
+/** Pass and play: the next player plans the week from its start, without the others' orders. */
+async function mpPlanAs(n: number): Promise<void> {
+  const m = mp!;
+  const snap = await engine.send({ type: "plan", nation: n });
+  m.planning = n;
+  m.cover = -1;
+  mpCoverEl.hidden = true;
+  snapshot = null;
+  takeSnapshot(snap, 0);
+  realmView = -1;
+  officialView = -1;
+  lordView = -1;
+  armyView = -1;
+  fleetView = -1;
+  newsView = false;
+  mpView = false;
+  selected.clear();
+  dispatches = [];
+  unread = 0;
+  alerted.clear();
+  alerts.replaceChildren();
+  applySnapshot();
+  const cap = provinceIndex.get(nations[n]!.capital)!;
+  selectedProvince = cap;
+  panelCollapsed = true;
+  view.lookAt(provinces[cap]!.x!, provinces[cap]!.y!, 4);
+  restyleProvinces();
+  renderHud();
+  renderPanel();
+  renderActions();
+  askedStudy = -1;
+  askForStudy(snapshot!);
+}
+
+/** Each player and where they stand this week. */
+function mpRows(): PlayerRow[] {
+  const m = mp!;
+  const t = snapshot!.turn;
+  return m.humans.map((n): PlayerRow => {
+    const realm = idOf(n);
+    if (m.mode === "hotseat") return { realm, state: m.orders.has(n) ? "ready" : n === m.planning && m.cover < 0 ? "planning" : "waiting" };
+    // The game is entered (and its HUD drawn) before the online table is watched.
+    if (m.online?.turns.has(`${t}-${realm}`)) return { realm, state: "ready" };
+    return { realm, state: n === m.planning ? "you" : "waiting" };
+  });
+}
+
+/** The HUD's Players plaque: every player's pennant, lit once their orders are in. */
+function mpPlaque(): string {
+  if (!mp || !snapshot) return "";
+  const rows = mpRows();
+  const ready = rows.filter((r) => r.state === "ready").length;
+  return `<button class="plaque mp-plaque${mp.outOfStep ? " urgent" : ""}" data-mp-players title="Players: ${ready} of ${rows.length} ready this week">${rows
+    .map((r) => `<span class="mp-pip${r.state === "ready" ? " ready" : ""}">${mpLook.pennant(r.realm, 1)}</span>`)
+    .join("")}<small>${ready}/${rows.length}</small></button>`;
+}
+
+function renderMpPlayers(): void {
+  const m = mp!;
+  const s = snapshot!;
+  panel.innerHTML = playersHtml(
+    mpLook,
+    { mode: m.mode, ...(m.online ? { code: m.online.game.code, reach: m.online.store.reach } : {}), week: s.turn, rows: mpRows(), order: resolutionOrder(m.humans, s.turn).map(idOf), outOfStep: m.outOfStep },
+    closeButton(),
+  );
+  bindClose();
+  panel.querySelector("[data-mp-leave]")!.addEventListener("click", () => {
+    m.online?.stop();
+    rememberGame(null);
+    location.reload();
+  });
+  showPanel(true);
+}
 
 renderDiagnostics();
 void selfTest();

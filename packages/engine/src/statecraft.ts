@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import type { World } from "./world.ts";
 import { cedeProvince, relationState, type News } from "./war.ts";
 import { grabbedLand, nameAbroadView, type NameAbroadView } from "./conquest.ts";
@@ -49,7 +50,7 @@ export function syncCountries(world: World): void {
     c.provinces = Math.max(1, provinces[n]!);
     c.gold = world.nationTreasury[n]!;
     c.goldToSpare = world.nationTreasury[n]! > giftGold(world) * 2;
-    c.ai = n !== world.player;
+    c.ai = !isHuman(world, n);
     // Every ruling house has a son or daughter to marry until dynasties are simulated (DIPL-104).
     c.unmarriedChildren = 2;
     c.capital = world.rules.nations[n]!.capital;
@@ -399,7 +400,7 @@ function aiEnvoys(world: World): void {
   const turn = world.date.year * 12 + world.date.month;
   const near = neighbourRealms(world);
   for (let n = 0; n < world.nationCount; n++) {
-    if (n === world.player || world.nationGone[n] || (n + turn) % AI_EVERY_MONTHS !== 0) continue;
+    if (isHuman(world, n) || world.nationGone[n] || (n + turn) % AI_EVERY_MONTHS !== 0) continue;
     const id = world.nationIds[n]!;
     if (dip.freeSeats(d, id) <= 0) continue;
     // The neighbour who thinks best of us is the one worth an envoy; only that court's asks are counted in full.

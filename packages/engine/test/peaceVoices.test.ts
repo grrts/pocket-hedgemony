@@ -145,7 +145,7 @@ describe("the price of war: refusing an obliged peace (WAR-221, WAR-181)", () =>
     // A levy of 10,000 at home, and Castile's offer asking only for what it occupies.
     const home = land.find((p) => w.provinceOccupier[p]! < 0)!;
     const levy = spawnArmy(w, fr, home, 10000);
-    w.peaceOffers.push({ id: 1, from: foe, terms: "take" });
+    w.peaceOffers.push({ id: 1, from: foe, to: fr, terms: "take" });
     expect(applyNow(w, { type: "answerPeace", offer: 1, yes: false }, fr).rejectedOrders).toEqual([]);
     expect(x.refused).toContain("france");
     expect(refusingPeace(w, fr)).toBe(true);
@@ -167,7 +167,7 @@ describe("the price of war: refusing an obliged peace (WAR-221, WAR-181)", () =>
     const x = war(w, foe, fr);
     for (const p of landOf(w, fr)) w.provinceOccupier[p] = foe;
     w.day++;
-    w.peaceOffers.push({ id: 2, from: foe, terms: "white" });
+    w.peaceOffers.push({ id: 2, from: foe, to: fr, terms: "white" });
     applyNow(w, { type: "answerPeace", offer: 2, yes: false }, fr);
     expect(x.refused).toContain("france");
     w.provinceOccupier.fill(-1);

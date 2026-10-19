@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import type { World } from "./world.ts";
 import { cedeProvince, type News } from "./war.ts";
 import { LOYALTY, loyaltyStep } from "./lords.ts";
@@ -131,8 +132,8 @@ export function monthlyCourting(world: World, news: News[]): void {
       end(world, c);
       if (victim !== undefined) dip.addRuleEntry(d, world.nationIds[victim]!, c.by, "wrongs", "courted_our_lord");
       const whom = lord ? lord.name : name(t);
-      if (by === world.player) news.push({ kind: "envoy", text: `${victim === undefined ? "They" : name(victim)} found out your envoy courting ${whom}: he is sent home, and they will remember it.`, nations: [by, t] });
-      else if (victim === world.player) news.push({ kind: "envoy", text: `An envoy of ${name(by)} was caught courting ${c.lord === undefined ? `${whom}, your subject` : `${whom}, your lord`}, and sent home.`, nations: [victim, by] });
+      if (isHuman(world, by)) news.push({ kind: "envoy", text: `${victim === undefined ? "They" : name(victim)} found out your envoy courting ${whom}: he is sent home, and they will remember it.`, nations: [by, t] });
+      else if (isHuman(world, victim)) news.push({ kind: "envoy", text: `An envoy of ${name(by)} was caught courting ${c.lord === undefined ? `${whom}, your subject` : `${whom}, your lord`}, and sent home.`, nations: [victim!, by] });
       continue;
     }
     if (!lord || c.lord === undefined) continue;
@@ -158,7 +159,7 @@ function defect(world: World, c: Courting, by: number, t: number, news: News[]):
   lord.nation = by;
   lord.loyalty = "Wavering";
   news.push(...quiet.filter((x) => x.kind !== "envoy"));
-  if (by === world.player || t === world.player) news.push({ kind: "envoy", text: `${lord.name} leaves ${world.rules.nations[t]!.name} and comes over to ${world.rules.nations[by]!.name} with his ${land.length} province${land.length === 1 ? "" : "s"}.`, nations: [by, t], ...(land.length ? { province: land[0]! } : {}) });
+  if (isHuman(world, by) || isHuman(world, t)) news.push({ kind: "envoy", text: `${lord.name} leaves ${world.rules.nations[t]!.name} and comes over to ${world.rules.nations[by]!.name} with his ${land.length} province${land.length === 1 ? "" : "s"}.`, nations: [by, t], ...(land.length ? { province: land[0]! } : {}) });
 }
 
 /**
@@ -180,7 +181,7 @@ export function aiCourting(world: World, loyaltyOf: (s: number) => string | null
   for (const r of pairs) {
     const n = world.nationIndex.get(r.source);
     const t = world.nationIndex.get(r.target);
-    if (n === undefined || t === undefined || n === world.player || busy.has(r.source) || world.nationGone[n] || world.nationGone[t]) continue;
+    if (n === undefined || t === undefined || isHuman(world, n) || busy.has(r.source) || world.nationGone[n] || world.nationGone[t]) continue;
     if (!dip.borders(d, r.source, r.target)) continue;
     const k = world.lords.findIndex((l, i) => l.nation === t && (l.loyalty === "Wavering" || l.loyalty === "Disloyal") && lordBorders(world, i, n));
     if (k >= 0 && !court(world, n, t, k)) {

@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import type { World } from "./world.ts";
 import type { News } from "./war.ts";
 import start from "../../rules/data/domain/culture-start-1444.json" with { type: "json" };
@@ -408,7 +409,7 @@ function applyPending(world: World, n: number, news: News[]): void {
         for (let k = 0; k < SLOTS; k++) if (world.provinceHouses[p * SLOTS + k] === f) world.provinceHouses[p * SLOTS + k] = NO_FAITH;
       }
     }
-    if (n === world.player) news.push({ kind: "reform", text: `${faithName(FAITH_IDS[f]!)} is now ${FAITH_POLICIES[w]} in the realm.`, nations: [n] });
+    if (isHuman(world, n)) news.push({ kind: "reform", text: `${faithName(FAITH_IDS[f]!)} is now ${FAITH_POLICIES[w]} in the realm.`, nations: [n] });
   }
 }
 

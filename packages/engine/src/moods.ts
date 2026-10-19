@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import type { World } from "./world.ts";
 import type { News } from "./war.ts";
 import { ungoverned } from "./recruit.ts";
@@ -129,7 +130,7 @@ export function monthlyMoods(world: World, news: News[]): void {
     const before = MOODS.indexOf(moodOf(grievanceCount(world, p), isJudge(world.provinceOfficial[p]!)).mood);
     world.provinceGrievances[p] = now;
     const after = moodIndex(world, p);
-    if (owner === world.player && after >= 2 && after > before) {
+    if (isHuman(world, owner) && after >= 2 && after > before) {
       const name = world.rules.provinces[p]!.name;
       news.push({ kind: "unrest", text: after === 3 ? `${name} is plotting a rising: ${grievancesOf(world, p).join(", ").toLowerCase()}` : `Riots in ${name}: ${grievancesOf(world, p).join(", ").toLowerCase()}`, nations: [owner], province: p });
     }

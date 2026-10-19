@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import type { World } from "./world.ts";
 import { officialPace } from "./belief.ts";
 import type { News } from "./war.ts";
@@ -140,7 +141,7 @@ export function swapOfficials(world: World, n: number, a: number, b: number, new
   world.provinceOfficialFrom[a] = world.provinceOfficialFrom[b]!;
   world.provinceOfficialFrom[b] = fa;
   world.provinceOfficialSince[a] = world.provinceOfficialSince[b] = world.day;
-  if (n === world.player) {
+  if (isHuman(world, n)) {
     const pa = world.rules.provinces[a]!.name;
     const pb = world.rules.provinces[b]!.name;
     const moved = (who: string, type: number, from: string, to: string) => `${who}, ${OFFICIALS[type]!.toLowerCase()}, moves from ${from} to ${to}`;
@@ -196,7 +197,7 @@ export function hireOfficial(world: World, n: number, p: number, type: number, f
   world.provinceOfficialSeed[p] = (p + world.day * 31) % world.provinceCount;
   world.provinceOfficialSince[p] = world.day;
   world.provinceOfficialFrom[p] = foreign ? abroad(world, n, p) : -1;
-  if (n === world.player) {
+  if (isHuman(world, n)) {
     const from = foreign ? ` from ${world.rules.nations[world.provinceOfficialFrom[p]!]!.name}` : "";
     news.push({ kind: "raised", text: `${officialAt(world, p)}, a ${OFFICIALS[type]!.toLowerCase()}${from}, takes up the post at ${place} for ${gold} gold. A new post starts him at half his effect.`, nations: [n], province: p });
   }
@@ -213,7 +214,7 @@ export function provinceTaken(world: World, p: number): void {
   world.provinceOfficial[p] = -1;
   world.provinceOfficialFrom[p] = -1;
   world.provinceOfficialSince[p] = world.day;
-  world.provinceNewLand[p] = world.provinceOwner[p] === world.player ? 1 : 0;
+  world.provinceNewLand[p] = isHuman(world, world.provinceOwner[p]) ? 1 : 0;
 }
 
 /** The realm's new land still waiting for a decision (PROV-340): its post empty and no lord granted it. */

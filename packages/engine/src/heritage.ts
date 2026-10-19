@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import * as ns from "./domain/national-strengths/index.ts";
 import { traitPct } from "./rulers.ts";
 import * as dip from "./domain/diplomacy/index.ts";
@@ -111,8 +112,8 @@ export function monthlyHeritage(world: World, news: News[]): void {
     const before = h.ambitions.length;
     for (const a of ageBeginnings(h, facts)) ns.ageBegins(h, a);
     const happened = ns.monthTick(h, facts, rngFor(world, n));
-    if (n !== world.player) while (h.ask) ns.aiAnswer(h);
-    if (n === world.player) tellPlayer(world, n, h, happened, before, news);
+    if (!isHuman(world, n)) while (h.ask) ns.aiAnswer(h);
+    if (isHuman(world, n)) tellPlayer(world, n, h, happened, before, news);
     h.digest = [];
     // The log is the library's record for tests; the game keeps only the month's.
     h.log = [];

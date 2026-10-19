@@ -1,0 +1,56 @@
+# Multiplayer (prototype)
+
+A playable test of multiplayer, on its own branch, to find out whether it works and whether it is fun. Nothing here is decided: if Leroy keeps it, it becomes a context in `domain/` with its own spec and features.
+
+## The turn model: simultaneous weeks
+
+Every player plans the same week at once. When all have pressed **Ready**, every device goes back to the week's start, carries out all players' orders and plays the week. Nobody waits for another player's whole turn, and on a phone a week's planning fits in a spare minute.
+
+Why simultaneous and not one player after the other:
+
+- The game already freezes the clock while the player plans and then plays a week out by itself; a week of orders is the natural unit to exchange.
+- Turn by turn would make each player wait for every other player's planning *and* would hand the last player a view of everyone's moves.
+- The engine is deterministic from the seed, so only the orders cross the network: a week of orders is a few hundred bytes.
+
+Fairness: when two players' orders compete (the same company to hire, a war declared on someone who also acts), they are carried out in an order that turns each week (week 1: lowest realm first, week 2 the next, and so on). The Players card shows this week's order.
+
+What simultaneous costs: an order you give while planning acts at once on your own copy of the week (as in a game of one), but someone else's orders that week can change the outcome. A split army or a new commander keeps working even when another player's order took its number first (see "Under the hood").
+
+## How the player uses it
+
+1. **Where they find it, what they tap.** Start screen → **Multiplayer**. Two choices:
+   - **Pass and play**: tap 2 to 4 realms (in the realm list or on the map), then **Start**. A cover hides the map and says "Pass to Castile"; that player taps **Plan as Castile**, gives orders as in a game of one and taps the hourglass (**Ready**). The cover comes up for the next player, who plans from the week's start without seeing the first player's orders. After the last Ready the week plays and the cover comes back for the first player.
+   - **Online**: **Host a game** and tap your realm; the lobby shows the four-letter code and who has sat down. Others open Multiplayer, tap the game and their realm. The host taps **Start**. Each player plans and taps **Ready**; the hourglass dims while the others still plan, and the week plays on every device once all are in. **Games under way** lists every running game with a button per realm, to come back after closing the page (the weeks played so far are replayed at once).
+2. **Grouping.** Everything multiplayer is in three places: the Multiplayer dialog (games), the lobby card (one game before it starts) and the **Players** card (one game while it runs, with Leave). The game's own cards are unchanged.
+3. **Overview.** The **Players plaque** on the top bar shows every player's pennant, lit when their orders are in, and "1/2". Tapping it opens the Players card: who is ready, the order orders go in this week, whether every device agrees on the world, and Leave the game.
+4. **Phone in landscape.** The dialog, lobby, Players card and cover are the game's existing parchment cards and buttons, at least 44 points tall, inside the safe areas; nothing needs hover. The cover is full screen on purpose: it hides the map while the phone changes hands. Checked on a Pixel 7 and an iPad Pro, both in landscape (`apps/client/scripts/multiplayer-shots.mjs`).
+
+## What is different in a multiplayer game
+
+- Auto turns, saves and achievements are off: the game is the shared order list, and achievements are earned in a game of one.
+- The week no longer stops for an event or a revolution; they wait for the next week's planning, and Ready is blocked until they are answered (as End turn is).
+- While the week plays, and once Ready is pressed, orders wait for the next week.
+- Peace between two players is asked and answered: the offer reaches the other player's Dispatches the next week, and they accept or refuse it. The AI no longer answers for a player.
+- The first-campaign hints stay quiet.
+
+## Under the hood
+
+- `packages/engine/src/humans.ts`: the engine had one `world.player` that the AI left alone. It now asks `isHuman(world, n)`, which is every player's realm in multiplayer (`world.humans`) and the player in a game of one. `world.player` is left only for what this device shows.
+- `packages/engine/src/multiplayer.ts`: `cloneWorld` copies the world at the week's start (about 60 ms on the real map), `applyAll` carries out every player's orders in the turning order, and maps the armies, commanders, fleets, governors and traders an order made on the planning copy to the numbers they get when everyone's orders are applied.
+- The engine host (`protocol.ts`) records the orders given while planning, and has three new requests: `plan` (plan as a realm from the week's start, for Pass and play), `planned` (this week's orders to send) and `resolve` (everyone's orders, from the week's start).
+- Online play keeps the lobby and orders in the published Artifact's shared database (`mp/<code>`, `mp/<code>/seats/<realm>`, `mp/<code>/turns/<week>-<realm>`). Outside an Artifact the same code uses the browser's storage, shared between tabs, which is how the dev server and the shots script test it.
+- Each device writes the world's hash at the week's start with its orders; a device that disagrees says "Out of step" on the plaque and the Players card.
+
+## Bugs found on the way (they affect the game of one too)
+
+- **Playback changed the outcome.** A cache of "who is at war" was kept for the day; if the screens read it between two 4-hour steps before a war began that day, armies ate as if at peace. So the same week played at normal speed and through a battle (smaller steps) could end differently. Fixed in `turn.ts` (the list is worked out each time).
+- **A loaded save does not play on exactly as the game it was written from.** Trade keeps its yearly route weights outside the world (a cache in `trade.ts`), so they are lost in a save and on a copy. Multiplayer is not affected (every device copies the world at the same moment), but saves are; not fixed here.
+
+## Known gaps of the prototype
+
+- Diplomacy between players beyond war and peace (alliances, envoys' asks, calls to arms) follows the game-of-one rules: it works for the realm asked, but has not been played through.
+- One vote per Imperial election or Diet is counted for the players (the engine kept a single player vote); the last player to vote wins it.
+- News about another player's realm can read "you" when it reaches you (the texts were written for one player).
+- Pass and play keeps no news log per player: each player sees the news from the last week played.
+- No chat, no timer for a player who never presses Ready, no way to drop a player, no host migration.
+- Anyone who can open the Artifact can join a game; others need Contributor access to the Artifact to write orders.

@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import type { World } from "./world.ts";
 import type { News } from "./war.ts";
 import * as dip from "./domain/diplomacy/index.ts";
@@ -308,7 +309,7 @@ function withLords(world: World, n: number, rule: (lords: (Lord & { warlike?: bo
     if (LOYALTY_RANK.indexOf(views[i]!.loyalty) > LOYALTY_RANK.indexOf(l.loyalty)) worse++;
     l.loyalty = views[i]!.loyalty;
   });
-  if (worse && n === world.player) news.push({ kind: "unrest", text: `${worse} of your lord${worse === 1 ? "" : "s"} waver: ${why}.`, nations: [n] });
+  if (worse && isHuman(world, n)) news.push({ kind: "unrest", text: `${worse} of your lord${worse === 1 ? "" : "s"} waver: ${why}.`, nations: [n] });
   return worse;
 }
 
@@ -332,7 +333,7 @@ export function refusedPeace(world: World, n: number, war: dip.War, news: News[]
   const id = world.nationIds[n]!;
   if (gw.refused?.includes(id)) return;
   (gw.refused ??= []).push(id);
-  if (n === world.player) news.push({ kind: "unrest", text: `${Math.round(v.share * 100)} in 100 of your voices wanted that peace: each season of this war your lords lose a step of loyalty and your levies desert twice as fast.`, nations: [n] });
+  if (isHuman(world, n)) news.push({ kind: "unrest", text: `${Math.round(v.share * 100)} in 100 of your voices wanted that peace: each season of this war your lords lose a step of loyalty and your levies desert twice as fast.`, nations: [n] });
 }
 
 /** Realm n refuses an obliged peace in some war: its levies desert twice as fast (WAR-181). */

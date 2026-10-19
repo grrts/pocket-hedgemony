@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import type { World } from "./world.ts";
 import type { News } from "./war.ts";
 import * as gov from "./domain/government/index.ts";
@@ -189,7 +190,7 @@ function slip(world: World, lord: number, why: string, news: News[]): void {
   const next = Math.min(LOYALTY.indexOf("Disloyal"), i + 1);
   if (next <= i) return;
   l.loyalty = LOYALTY[next]!;
-  if (l.nation === world.player) news.push({ kind: "unrest", text: `${l.name} is now ${l.loyalty.toLowerCase()}: ${why}`, nations: [l.nation] });
+  if (isHuman(world, l.nation)) news.push({ kind: "unrest", text: `${l.name} is now ${l.loyalty.toLowerCase()}: ${why}`, nations: [l.nation] });
 }
 
 /**
@@ -218,7 +219,7 @@ export function monthlyGovernment(world: World, news: News[]): void {
   for (let n = 0; n < world.nationCount; n++) {
     if (world.nationGone[n]) continue;
     for (const k of pickLords(world, c, n, c.lords[n]!.length - lordsCap(world, n))) slip(world, k, "more lords than the realm can hold", news);
-    if (n === world.player) continue;
+    if (isHuman(world, n)) continue;
     const to = gov.aiReform(reformCountry(world, n, c), world.date.month);
     if (to) reformWith(world, n, to, c, news);
   }
@@ -237,7 +238,7 @@ function reformWith(world: World, n: number, to: gov.FormId, c: Census, news: Ne
   world.nationTreasury[n] = world.nationTreasury[n]! - reformGold(world, r.goldPaid);
   setForm(world, n, to);
   for (const k of pickLords(world, c, n, r.lordsSlip)) slip(world, k, `the reform to ${gov.formName(to).toLowerCase()}`, news);
-  if (n === world.player) news.push({ kind: "reform", text: `${world.rules.nations[n]!.name} reforms from ${gov.formName(from).toLowerCase()} to ${gov.formName(to).toLowerCase()}`, nations: [n] });
+  if (isHuman(world, n)) news.push({ kind: "reform", text: `${world.rules.nations[n]!.name} reforms from ${gov.formName(from).toLowerCase()} to ${gov.formName(to).toLowerCase()}`, nations: [n] });
   return null;
 }
 

@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import type { World } from "./world.ts";
 import { checkDestroyed, declareWar, strength, type News } from "./war.ts";
 import { peaceShare } from "./peace.ts";
@@ -212,11 +213,11 @@ export function seasonalSubjects(world: World, news: News[]): void {
     t.bond.reasons = t.bond.reasons.filter((x) => x.until === undefined || x.until > now);
     if (after === before) continue;
     changed = true;
-    if (world.player === t.o || world.player === t.s) {
+    if (isHuman(world, t.o) || isHuman(world, t.s)) {
       const name = (n: number) => world.rules.nations[n]!.name;
       news.push({
         kind: "envoy",
-        text: world.player === t.o ? `${name(t.s)}, your subject, is now ${STEP_WORD[after]}${after === "disloyal" ? ": it pays you nothing and refuses your calls" : ""}.` : `You grow ${STEP_WORD[after]} toward ${name(t.o)}, your overlord.`,
+        text: isHuman(world, t.o) ? `${name(t.s)}, your subject, is now ${STEP_WORD[after]}${after === "disloyal" ? ": it pays you nothing and refuses your calls" : ""}.` : `You grow ${STEP_WORD[after]} toward ${name(t.o)}, your overlord.`,
         nations: [t.s, t.o],
       });
     }
@@ -370,7 +371,7 @@ export function monthlySubjectEnvoys(world: World, news: News[]): void {
     if (since !== undefined && now - since >= HOSTAGE_MONTHS) {
       sendHeirHome(b);
       bondsChanged(world);
-      if (t.o === world.player || t.s === world.player) news.push({ kind: "envoy", text: `${name(t.s)}'s heir goes home from ${name(t.o)}'s court to take up his inheritance.`, nations: [t.o, t.s] });
+      if (isHuman(world, t.o) || isHuman(world, t.s)) news.push({ kind: "envoy", text: `${name(t.s)}'s heir goes home from ${name(t.o)}'s court to take up his inheritance.`, nations: [t.o, t.s] });
     }
     if (!b.tighten && !b.foldIn) continue;
     const action = b.foldIn ? "subject_fold_in" : "subject_tighten";
@@ -387,7 +388,7 @@ export function monthlySubjectEnvoys(world: World, news: News[]): void {
       t.r.subject_kind = b.kind;
       news.push({ kind: "envoy", text: `${name(t.s)} is now ${name(t.o)}'s vassal.`, nations: [t.s, t.o] });
     } else if (step === "stopped") {
-      if (t.o === world.player) news.push({ kind: "envoy", text: `${name(t.s)} is no longer Loyal: your envoy stops folding it in and comes home.`, nations: [t.s, t.o] });
+      if (isHuman(world, t.o)) news.push({ kind: "envoy", text: `${name(t.s)} is no longer Loyal: your envoy stops folding it in and comes home.`, nations: [t.s, t.o] });
     } else if (step === "folded_in") foldInRealm(world, t.s, t.o, news);
   }
 }
@@ -528,7 +529,7 @@ export function independencePeace(world: World, war: dip.War, cededFrom: Readonl
  */
 export function aiRisings(world: World, news: News[]): void {
   if (!subj.isSeasonEnd(world.date.month)) return;
-  const ties = subjectTies(world).filter((t) => t.bond.loyalty === "disloyal" && t.s !== world.player);
+  const ties = subjectTies(world).filter((t) => t.bond.loyalty === "disloyal" && !isHuman(world, t.s));
   if (!ties.length) return;
   const d = world.diplomacy;
   const g = d.graph;
@@ -573,7 +574,7 @@ export function aiOverlordEnvoys(world: World, news: News[]): void {
   // One fold-in at a time for each overlord, and only for a third of the realms: those that like centralising.
   const folding = new Set(ties.filter((t) => t.bond.foldIn).map((t) => t.o));
   for (const t of ties) {
-    if (t.o === world.player) continue;
+    if (isHuman(world, t.o)) continue;
     const centralising = (t.o * 7) % 3 === 0;
     // A Union ready to merge is merged at once (SUBJ-098, SUBJ-129).
     if (centralising && t.bond.kind === "union" && !whyNotSubjectAction(world, t.o, t.s, "merge")) {
@@ -606,7 +607,7 @@ export function subjectByAgreement(world: World, overlord: number, subject: numb
 export function aiOverlords(world: World, news: News[]): void {
   if (!subj.isSeasonEnd(world.date.month)) return;
   for (const t of subjectTies(world)) {
-    if (t.o === world.player || t.bond.loyalty !== "disloyal") continue;
+    if (isHuman(world, t.o) || t.bond.loyalty !== "disloyal") continue;
     if (!dip.warOf(world.diplomacy, world.nationIds[t.o]!)) continue;
     if (!whyNotSubjectAction(world, t.o, t.s, "loosen")) subjectAction(world, t.o, t.s, "loosen", news);
   }

@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import * as ex from "./domain/exploration/index.ts";
 import * as nv from "./domain/naval/index.ts";
 import { catalogueRecord, hasRecord } from "./domain/scenario-setup/catalogue.ts";
@@ -146,7 +147,7 @@ export function stepVoyages(world: World, news: News[]): void {
     const f = fleetById(world, v.fleet);
     if (!f) return false;
     if (!f.route.length) {
-      if (f.owner === world.player) {
+      if (isHuman(world, f.owner)) {
         const where = world.provinceWater[f.at] ? `in the ${name(world, f.at)}` : `at ${name(world, f.at)}`;
         news.push({ kind: "voyage", text: `${v.turnedBack ? "Short of supply, your explorers came back" : "Your explorers' voyage ends"} ${where}: ${v.charted} new place${v.charted === 1 ? "" : "s"} charted.`, nations: [f.owner], province: f.at });
       }
@@ -188,7 +189,7 @@ function hireGovernor(world: World, n: number, id: number, news: News[]): string
   const e = world.explore;
   const g: ColonialGovernor = { id: ++e.seq, owner: n, name: personName(world.rules, n, mix(f.at, e.seq + 1), name(world, f.at)), age: CFG.governor_age_when_hired, port: -1, fleet: id, colony: -1, homeward: false };
   e.governors.push(g);
-  if (n === world.player) news.push({ kind: "colony", text: `${g.name} takes the post of colonial governor and goes aboard at ${name(world, f.at)}.`, nations: [n], province: f.at });
+  if (isHuman(world, n)) news.push({ kind: "colony", text: `${g.name} takes the post of colonial governor and goes aboard at ${name(world, f.at)}.`, nations: [n], province: f.at });
   return null;
 }
 
@@ -241,7 +242,7 @@ function unloadStores(world: World, n: number, id: number, news: News[]): string
   if (!rations) return "the holds are empty";
   for (const s of f.ships) s.stores = 0;
   c.food += rations;
-  if (n === world.player) news.push({ kind: "colony", text: `${rations} rations go ashore at ${name(world, c.province)}.`, nations: [n], province: c.province });
+  if (isHuman(world, n)) news.push({ kind: "colony", text: `${rations} rations go ashore at ${name(world, c.province)}.`, nations: [n], province: c.province });
   return null;
 }
 
@@ -307,7 +308,7 @@ function foundColony(world: World, n: number, id: number, p: number, news: News[
   g.colony = p;
   g.homeward = false;
   world.explore.colonies.push({ province: p, owner: n, governor: g.id, progress: CFG.progress_start, aggression, food: 0, lastChange: 0 });
-  if (n === world.player) news.push({ kind: "colony", text: `${g.name} goes ashore at ${name(world, p)} and starts a colony. The locals are ${aggression.toLowerCase()}.`, nations: [n], province: p });
+  if (isHuman(world, n)) news.push({ kind: "colony", text: `${g.name} goes ashore at ${name(world, p)} and starts a colony. The locals are ${aggression.toLowerCase()}.`, nations: [n], province: p });
   return null;
 }
 
@@ -322,7 +323,7 @@ function abandon(world: World, n: number, p: number, news: News[]): string | nul
   g.fleet = ship.id;
   g.homeward = true;
   e.colonies.splice(e.colonies.indexOf(c), 1);
-  if (n === world.player) news.push({ kind: "colony", text: `${g.name} gives up the colony at ${name(world, p)} and comes back aboard. The food ashore is lost.`, nations: [n], province: p });
+  if (isHuman(world, n)) news.push({ kind: "colony", text: `${g.name} gives up the colony at ${name(world, p)} and comes back aboard. The food ashore is lost.`, nations: [n], province: p });
   return null;
 }
 
@@ -352,7 +353,7 @@ function founded(world: World, c: ColonyFounding, news: News[]): void {
 function lost(world: World, c: ColonyFounding, why: string, news: News[]): void {
   const e = world.explore;
   e.governors = e.governors.filter((g) => g.id !== c.governor);
-  if (c.owner === world.player) news.push({ kind: "colony", text: `The colony at ${name(world, c.province)} is lost: ${why}.`, nations: [c.owner], province: c.province });
+  if (isHuman(world, c.owner)) news.push({ kind: "colony", text: `The colony at ${name(world, c.province)} is lost: ${why}.`, nations: [c.owner], province: c.province });
 }
 
 // ---------------------------------------------------------------- each day and month
@@ -457,7 +458,7 @@ function aiExploration(world: World, news: News[]): void {
   const sea = seaMindedRealms(world);
   const e = world.explore;
   for (let n = 0; n < world.nationCount; n++) {
-    if (!sea[n] || n === world.player || world.nationGone[n] || !explorationUnlocked(world, n)) continue;
+    if (!sea[n] || isHuman(world, n) || world.nationGone[n] || !explorationUnlocked(world, n)) continue;
     const fleets = world.navy.fleets.filter((f) => f.owner === n && allExplorers(f));
     const building = world.navy.hulls.filter((h) => h.owner === n && nv.shipRow(h.type).family === "exploration").length;
     if (fleets.length + building < AI.explorers) aiBuyExplorer(world, n, news);

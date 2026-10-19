@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import type { World } from "./world.ts";
 import { atWar, type News } from "./war.ts";
 import { tradeConfig as config } from "./domain/trade/index.ts";
@@ -605,7 +606,7 @@ export function monthlyTrade(world: World, news: News[]): void {
   }
   for (const t of lost) {
     removeTrader(world, t);
-    if (t.owner === world.player) news.push({ kind: "trade", text: `Unpaid for six months, the ${KIND_NAME[t.kind].toLowerCase()} of ${world.rules.provinces[t.home]!.name} has been given up.`, nations: [t.owner], province: t.home });
+    if (isHuman(world, t.owner)) news.push({ kind: "trade", text: `Unpaid for six months, the ${KIND_NAME[t.kind].toLowerCase()} of ${world.rules.provinces[t.home]!.name} has been given up.`, nations: [t.owner], province: t.home });
   }
   if (world.date.month === 1) refreshTradeValues(world);
   aiTrade(world);
@@ -808,7 +809,7 @@ function aiTrade(world: World): void {
   const count = new Int32Array(world.nationCount);
   for (const t of world.traders) count[t.owner]!++;
   for (const t of world.traders) {
-    if (t.owner === world.player || t.id % 12 !== turn) continue;
+    if (isHuman(world, t.owner) || t.id % 12 !== turn) continue;
     // A loop that pays well enough is kept; the AI looks for another when it pays little or is broken.
     const row = kindRow(world, t.kind);
     if (t.blocked < 0 && t.stops.length >= 2 && estimateLoop(world, t.owner, t.kind, pathOf(world, t)).expected >= row.upkeep * G.ai_keep_route_over_upkeep) continue;
@@ -824,7 +825,7 @@ function aiTrade(world: World): void {
   for (let n = 0; n < world.nationCount; n++) {
     // A realm the catalogue gives no trade access founds none in this slice (D-TRADE-20).
     const start = startCount(world, n);
-    if (n % 12 !== turn || n === world.player || world.nationGone[n] || start === 0 || count[n]! >= G.ai_max_traders_per_start * start + 1) continue;
+    if (n % 12 !== turn || isHuman(world, n) || world.nationGone[n] || start === 0 || count[n]! >= G.ai_max_traders_per_start * start + 1) continue;
     const home = homes(world, n)[0];
     if (home === undefined) continue;
     const kind = kindFor(world, n, home, count[n]!);

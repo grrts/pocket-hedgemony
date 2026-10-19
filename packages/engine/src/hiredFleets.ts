@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import * as nv from "./domain/naval/index.ts";
 import * as wf from "./domain/warfare/index.ts";
 import * as rel from "./domain/diplomacy/relations.ts";
@@ -134,7 +135,7 @@ function voyageHome(world: World, n: number, at: number, ships: readonly string[
 
 /** The realm's best warship fleet idle in one of its own ports, which it may lend: none while it fights or is out of the sea powers. */
 function lendable(world: World, lender: number, hirer: number): NavyFleet | null {
-  if (lender === hirer || world.nationGone[lender] || lender === world.player) return null;
+  if (lender === hirer || world.nationGone[lender] || isHuman(world, lender)) return null;
   const level = levelOf(world, lender);
   if (!level || !H.lenderLevels.includes(level)) return null;
   if (inAnyWar(world, lender) || atWar(world, lender, hirer)) return null;
@@ -241,7 +242,7 @@ export function hireFleet(world: World, n: number, o: { free?: number; lent?: nu
   f.landAt = -1;
   f.fleeing = false;
   offerCache.delete(world);
-  if (n === world.player || x.from === world.player) {
+  if (isHuman(world, n) || isHuman(world, x.from)) {
     news.push({ kind: "raised", text: `${x.name} (${x.ships.length} ship${x.ships.length === 1 ? "" : "s"} under ${x.captain}) is hired for ${x.pay.toFixed(1)} gold a month; it reaches ${world.rules.provinces[x.port]!.name} in ${x.days} days.`, nations: x.from >= 0 ? [n, x.from] : [n], province: x.port });
   }
   return null;
@@ -284,7 +285,7 @@ function release(world: World, f: NavyFleet, news: News[], why: "dismissed" | "u
     }
   }
   offerCache.delete(world);
-  if (hirer === world.player || lender === world.player) {
+  if (isHuman(world, hirer) || isHuman(world, lender)) {
     const text = why === "unpaid" ? `${h.name} leaves your service: the treasury can't pay it.` : why === "called home" ? `${h.name} is called home by ${h.group}.` : `${h.name} is dismissed and sails off.`;
     news.push({ kind: "refused", text, nations: lender >= 0 ? [hirer, lender] : [hirer] });
   }
@@ -323,7 +324,7 @@ function aiHire(world: World, news: News[]): void {
     if (f.hire) hired[f.owner] = 1;
   }
   for (let n = 0; n < world.nationCount; n++) {
-    if (n === world.player || world.nationGone[n] || hired[n] || !inAnyWar(world, n)) continue;
+    if (isHuman(world, n) || world.nationGone[n] || hired[n] || !inAnyWar(world, n)) continue;
     let enemy = 0;
     for (let e = 0; e < world.nationCount; e++) if (strength[e]! > enemy && atWar(world, n, e)) enemy = strength[e]!;
     if (enemy <= strength[n]!) continue;

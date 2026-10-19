@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import type { World } from "./world.ts";
 import { controller, type News } from "./war.ts";
 import { allNationPay, ungoverned } from "./recruit.ts";
@@ -275,7 +276,7 @@ export function repayLoan(world: World, n: number, gold: number): string | null 
 export function aiTreasury(world: World, news: News[]): void {
   const ai = realmConfig.ai;
   for (let n = 0; n < world.nationCount; n++) {
-    if (n === world.player || world.nationGone[n]) continue;
+    if (isHuman(world, n) || world.nationGone[n]) continue;
     const rate = TAX_RATES.indexOf((inAnyWar(world, n) ? ai.tax_at_war : ai.tax_at_peace) as TaxRateName);
     if (rate !== world.nationTaxDefault[n]) applyRate(world, n, -1, rate, news);
     const gold = world.nationTreasury[n]!;

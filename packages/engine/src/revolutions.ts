@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import { revolutionRuler } from "./rulers.ts";
 import type { World } from "./world.ts";
 import type { News } from "./war.ts";
@@ -195,7 +196,7 @@ export function monthlyRevolutions(world: World, news: News[]): void {
 function breakOut(world: World, n: number, family: Family, news: News[]): void {
   const r = world.revo[n]!;
   r.readySince = -1;
-  if (n === world.player) {
+  if (isHuman(world, n)) {
     r.outbreak = family;
     news.push({ kind: "revolution", text: `Revolution in ${realmName(world, n)}: ${rv.family(family).idea} Choose how to answer it.`, nations: [n], begins: true });
     return;
@@ -267,7 +268,7 @@ function takeStance(world: World, n: number, stance: Stance, family: Family, new
     const band = p >= 0 ? startRevolutionRising(world, p, { cause: f.cause as Cause, family, musters: G.fight_first_musters }, news) : null;
     if (band) {
       r.rising = band.id;
-      news.push({ kind: "revolution", text: `${n === world.player ? "You fight" : `${realmName(world, n)} fights`} the revolution: ${band.leader?.name ?? "its leaders"} raise${band.leader ? "s" : ""} ${fmt(band.men)} men in ${pname(world, p)}.`, nations: [n], province: p, ...(n === world.player ? { begins: true as const } : {}) });
+      news.push({ kind: "revolution", text: `${isHuman(world, n) ? "You fight" : `${realmName(world, n)} fights`} the revolution: ${band.leader?.name ?? "its leaders"} raise${band.leader ? "s" : ""} ${fmt(band.men)} men in ${pname(world, p)}.`, nations: [n], province: p, ...(isHuman(world, n) ? { begins: true as const } : {}) });
       notifyNeighbours(world, n, `Revolution in ${realmName(world, n)}: the crown fights it, and ${fmt(band.men)} rise in ${pname(world, p)}.`, news);
       return;
     }
@@ -276,7 +277,7 @@ function takeStance(world: World, n: number, stance: Stance, family: Family, new
     what = `"${label}": too few rise, and the movement scatters for now`;
   }
   r.graceUntil = monthIndex(world) + 12 * G.grace_years;
-  if (n === world.player) news.push({ kind: "revolution", text: `You answer the revolution with ${what}.`, nations: [n] });
+  if (isHuman(world, n)) news.push({ kind: "revolution", text: `You answer the revolution with ${what}.`, nations: [n] });
   else notifyNeighbours(world, n, `Revolution in ${realmName(world, n)}: the ruler ${STANCE_NEWS[stance]}, ${what}.`, news);
 }
 
@@ -328,7 +329,7 @@ export function revolutionSettled(world: World, b: Band, outcome: "won" | "crush
     r.stopped = true;
     text = `The revolution in ${realmName(world, n)} ends in a deal: stopped, not solved.`;
   }
-  if (n === world.player) news.push({ kind: "revolution", text, nations: [n], province: b.provinces[0]!, begins: true });
+  if (isHuman(world, n)) news.push({ kind: "revolution", text, nations: [n], province: b.provinces[0]!, begins: true });
   else notifyNeighbours(world, n, text, news);
 }
 

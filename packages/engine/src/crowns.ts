@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import type { World } from "./world.ts";
 import type { News } from "./war.ts";
 import * as dip from "./domain/diplomacy/index.ts";
@@ -68,11 +69,11 @@ export function yearlyCrowns(world: World, news: News[]): void {
     if (until === undefined) return true;
     const keep = until > now && !gone(p.throne) && !gone(p.court);
     const court = world.nationIndex.get(p.court);
-    if (!keep && court === world.player && !gone(p.throne)) news.push({ kind: "crown", text: `Your house's claim to the throne of ${name(world.nationIndex.get(p.throne)!)} lapses.`, nations: [court] });
+    if (!keep && isHuman(world, court) && !gone(p.throne)) news.push({ kind: "crown", text: `Your house's claim to the throne of ${name(world.nationIndex.get(p.throne)!)} lapses.`, nations: [court!] });
     return keep;
   });
   for (let n = 0; n < world.nationCount; n++) {
-    if (world.nationGone[n] || n === world.player) continue;
+    if (world.nationGone[n] || isHuman(world, n)) continue;
     if (dip.draw(d) >= C.heirless_per_year) continue;
     const id = world.nationIds[n]!;
     const before = d.pretenders.length;
@@ -118,7 +119,7 @@ export function inheritCrown(world: World, n: number, news: News[]): void {
       return;
     }
     d.pretenders = d.pretenders.filter((p) => !(p.throne === id && p.court === house));
-    news.push({ kind: "crown", text: h === world.player ? `The last of ${name(n)}'s line dies: its crown passes to your ruler. ${name(n)} is now your union.` : `The last of ${name(n)}'s line dies: its crown passes to the ruler of ${name(h)}, a union of two crowns.`, nations: [n, h] });
+    news.push({ kind: "crown", text: isHuman(world, h) ? `The last of ${name(n)}'s line dies: its crown passes to your ruler. ${name(n)} is now your union.` : `The last of ${name(n)}'s line dies: its crown passes to the ruler of ${name(h)}, a union of two crowns.`, nations: [n, h] });
     return;
   }
 }

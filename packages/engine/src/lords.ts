@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import type { World } from "./world.ts";
 import type { News } from "./war.ts";
 import { personName } from "./names.ts";
@@ -126,7 +127,7 @@ export function loyaltyStep(world: World, lord: number, cause: string, news: New
   const view: Lord = { name: l.name, house: l.house, provinces: lordLands(world, lord).map(String), retinue: 0, wealth: 0, traits: [], loyalty: l.loyalty, upCredit: l.upCredit, sons: [] };
   l.loyalty = loyaltyCause(view, cause);
   l.upCredit = view.upCredit ?? 0;
-  if (l.nation === world.player && l.loyalty !== before && LOYALTY.indexOf(l.loyalty) > LOYALTY.indexOf(before)) {
+  if (isHuman(world, l.nation) && l.loyalty !== before && LOYALTY.indexOf(l.loyalty) > LOYALTY.indexOf(before)) {
     news.push({ kind: "unrest", text: `${l.name} is now ${l.loyalty.toLowerCase()}`, nations: [l.nation] });
   }
 }
@@ -192,7 +193,7 @@ export function monthlyLords(world: World, atPeace: (n: number) => boolean, news
   }
   if (world.date.month === 1) world.lords.forEach((l, k) => l.loyalty !== "Loyal" && atPeace(l.nation) && loyaltyStep(world, k, "long_secure_reign", news));
   world.lords.forEach((l, k) => {
-    if (l.nation === world.player || (l.loyalty !== "Disloyal" && l.loyalty !== "Wavering")) return;
+    if (isHuman(world, l.nation) || (l.loyalty !== "Disloyal" && l.loyalty !== "Wavering")) return;
     // REALM-171 gives when it has 20 domain gold; here, when the treasury holds two gifts.
     if (world.nationTreasury[l.nation]! >= giftGold(world) * 2) giveGift(world, l.nation, k);
   });

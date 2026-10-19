@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import campaign from "../../rules/data/domain/events-campaign.json" with { type: "json" };
 import bridge from "../../rules/data/domain/events-places.json" with { type: "json" };
 import * as evt from "./domain/events/index.ts";
@@ -71,12 +72,7 @@ export function createGameEvents(world: World): GameEvents {
   evt.startCampaign(state, world.date.year);
   const knownAtStart = world.nationIds.map((_, n) => world.research[n]?.known.size ?? 0);
   const g: GameEvents = { state, rng: new Rng(world.weatherSeed ^ 0x5eed), treeId, nationOf, places, eventRelations: [], adjust: {}, stability: new Map(), knownAtStart };
-  state.conditions.stat = (p, w, ctx) => evt.resolve(p.who, ctx).some((id) => evt.compare(statOf(world, g, id, String(p.stat)), String(p.op), p.value as number | string));
-  // Opinion is the standing one court holds of another (D-EVT-4, diplomacy's ledger), read only when asked.
-  state.conditions.opinion = (p, _w, ctx) =>
-    evt.resolve(p.who, ctx).some((a) => evt.resolve(p.other, ctx).some((b) => evt.compare(opinionOf(world, g, a, b), String(p.op), Number(p.value))));
-  // Whether a realm is a head's patron (RELG-154).
-  state.conditions.faith_head_patron = (p, _w, ctx) => evt.resolve(p.who, ctx).some((id) => isHeadPatron(world, String(p.head), g.nationOf.get(id) ?? -1));
+  bindConditions(world, g);
   sync(world, g);
   evt.yearlyAgeCheck(state, world.date.year);
   evt.periodCheck(state, world.date.year);
@@ -85,6 +81,22 @@ export function createGameEvents(world: World): GameEvents {
   for (const ev of Object.values(state.events)) evt.eligible(state, ev);
   state.bound = bound;
   return g;
+}
+
+/**
+ * The tree's conditions and the AI's lean read the game's world through
+ * closures; a copy of the world (cloneWorld, multiplayer) binds them anew.
+ */
+export function bindConditions(world: World, g: GameEvents): void {
+  const state = g.state;
+  state.conditions = {};
+  leanByTraits(world, state, g.nationOf);
+  state.conditions.stat = (p, w, ctx) => evt.resolve(p.who, ctx).some((id) => evt.compare(statOf(world, g, id, String(p.stat)), String(p.op), p.value as number | string));
+  // Opinion is the standing one court holds of another (D-EVT-4, diplomacy's ledger), read only when asked.
+  state.conditions.opinion = (p, _w, ctx) =>
+    evt.resolve(p.who, ctx).some((a) => evt.resolve(p.other, ctx).some((b) => evt.compare(opinionOf(world, g, a, b), String(p.op), Number(p.value))));
+  // Whether a realm is a head's patron (RELG-154).
+  state.conditions.faith_head_patron = (p, _w, ctx) => evt.resolve(p.who, ctx).some((id) => isHeadPatron(world, String(p.head), g.nationOf.get(id) ?? -1));
 }
 
 /** The chooser's ruler's traits lean the AI's pick (REALM-104). */
@@ -148,7 +160,7 @@ function sync(world: World, g: GameEvents): void {
     const id = g.treeId[n]!;
     const c = evt.country(w, id);
     c.exists = !world.nationGone[n];
-    c.human = n === world.player;
+    c.human = isHuman(world, n);
     c.enemies = [];
     c.relations = g.eventRelations.filter((r) => r.who === id).map((r) => ({ other: r.other, type: r.type }));
     c.borders = dip.neighbours(d, world.nationIds[n]!).map((x) => g.treeId[world.nationIndex.get(x) ?? -1] ?? x);

@@ -105,8 +105,10 @@ export interface World extends LivingState, TreasuryState, FoodState, MoodState,
 
   armies: ArmyPool;
 
-  /** The nation the player rules, or -1; the AI leaves it alone. */
+  /** The nation the player rules, or -1; the AI leaves it alone. In multiplayer, the realm this device shows (views only). */
   player: number;
+  /** Multiplayer: every realm a person plays, which the AI leaves alone; null in a game of one player (then it is `player`). */
+  humans: number[] | null;
   /** Who is at war, allied, under truce or subject: the diplomacy context's state. */
   diplomacy: Diplomacy;
   /** Nation occupying each province in a war, -1 = none. */
@@ -435,6 +437,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     commanders,
     armies: createArmyPool(Math.max(16, N * 2)),
     player: -1,
+    humans: null,
     diplomacy: null!,
     provinceOccupier: new Int16Array(P).fill(-1),
     provinceHold: new Uint8Array(P),

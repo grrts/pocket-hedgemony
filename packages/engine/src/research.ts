@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import warfareData from "../../rules/data/domain/warfare.json" with { type: "json" };
 import buildingsData from "../../rules/data/domain/buildings.json" with { type: "json" };
 import * as rs from "./domain/research/index.ts";
@@ -240,7 +241,7 @@ function learned(world: World, n: number, id: string, news: News[]): void {
   refreshHarvest(world, n);
   noteInvention(world, n, id);
   // With a queue the next study starts by itself and nothing asks the player to choose (RSCH-108).
-  if (n === world.player && world.research[n]!.studies.length === 0) news.push({ kind: "invention", text: `Learned ${nameOf(id)}. Choose the next study.`, nations: [n] });
+  if (isHuman(world, n) && world.research[n]!.studies.length === 0) news.push({ kind: "invention", text: `Learned ${nameOf(id)}. Choose the next study.`, nations: [n] });
 }
 
 // ---------------------------------------------------------------- the month
@@ -265,7 +266,7 @@ export function monthlyResearch(world: World, news: News[]): void {
     const p = world.research[f.nation];
     if (!p || world.provinceOwner[f.province] !== f.nation) return false;
     const school = rs.gainSchool(p, world.provinceIds[f.province]!, f.type, p.known.has(rs.schoolInvention(f.type)) ? "build" : "clergy_founds");
-    if (f.nation === world.player) news.push({ kind: "invention", text: `A ${schoolName(school.type)} opens in ${world.rules.provinces[f.province]!.name}: ${rs.seatsOf(school.type)} more seats.`, nations: [f.nation], province: f.province });
+    if (isHuman(world, f.nation)) news.push({ kind: "invention", text: `A ${schoolName(school.type)} opens in ${world.rules.provinces[f.province]!.name}: ${rs.seatsOf(school.type)} more seats.`, nations: [f.nation], province: f.province });
     return false;
   });
   for (let n = 0; n < world.nationCount; n++) {
@@ -275,11 +276,11 @@ export function monthlyResearch(world: World, news: News[]): void {
       rs.graduateYear(p, date.year);
       rs.changeScholars(p, "old_age", rs.oldAgeLoss(p));
     }
-    if (n !== world.player) aiResearch(world, n, date);
+    if (!isHuman(world, n)) aiResearch(world, n, date);
     enrol(world, n, land[n]);
     for (const id of rs.researchMonth(p, date, partnersFor(world, n))) learned(world, n, id, news);
     // The AI chooses its next study at once, so it never sits idle a month.
-    if (n !== world.player) aiChoose(world, n, date);
+    if (!isHuman(world, n)) aiChoose(world, n, date);
   }
   recount(world);
 }

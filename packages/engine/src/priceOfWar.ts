@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import type { World } from "./world.ts";
 import { defaultAim, relationState, strength } from "./war.ts";
 import { censureOf } from "./faithHeads.ts";
@@ -215,7 +216,7 @@ export function priceOfWar(world: World, a: number, b: number, ctx: PriceContext
   const target = strengthOf(world, ctx, b);
   for (const id of ctx.allies.get(aid) ?? []) {
     const n = world.nationIndex.get(id);
-    if (n === undefined || n === world.player || seen.has(n) || dip.warOf(d, id)) continue;
+    if (n === undefined || isHuman(world, n) || seen.has(n) || dip.warOf(d, id)) continue;
     if (strengthOf(world, ctx, n) * 2 >= target) add(friends, id, "alliance");
   }
   const st = relationState(world, a, b);

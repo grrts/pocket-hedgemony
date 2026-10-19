@@ -36,6 +36,8 @@ export interface Election {
   why: string;
   /** The player's own seat's choice, if they made one before it ended. */
   playerVote?: string;
+  /** The realm that cast it (multiplayer: one of the players). */
+  playerVoter?: string;
 }
 
 export interface Empire {

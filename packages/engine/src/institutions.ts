@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import type { World } from "./world.ts";
 import type { News } from "./war.ts";
 import { answerCall, cedeProvince, checkDestroyed, controller, strength, warBetween } from "./war.ts";
@@ -113,7 +114,7 @@ function election(world: World, e: inst.Empire, news: News[]): void {
   const west = eventFired(world, "peace_of_westphalia");
   if (e.election && dip.monthOf(date(world)) >= e.election.ends) {
     const was = e.holder;
-    const out = inst.endElection(world.diplomacy, e, r, headOfFaith(world), rulerOf(world), world.player >= 0 ? world.nationIds[world.player] : undefined);
+    const out = inst.endElection(world.diplomacy, e, r, headOfFaith(world), rulerOf(world), e.election.playerVoter ?? (world.humans ? undefined : world.player >= 0 ? world.nationIds[world.player] : undefined));
     if (out?.winner) {
       const t = inst.tally(out.votes, Object.values(out.votes).filter((v, i, a) => a.indexOf(v) === i));
       const words = t.map((x) => `${nameOf(world, x.candidate)} ${x.votes}`).join(" · ");
@@ -285,7 +286,8 @@ function outsiderNext(world: World, e: inst.Empire): (id: string) => boolean {
 
 /** Today's Diet forecast on a reform: the votes and the tally (INST-041, INST-081). */
 export function dietForecast(world: World, e: inst.ReformedEmpire, reform: inst.ReformId) {
-  const me = world.player >= 0 ? world.nationIds[world.player]! : "";
+  // The realm whose vote was cast; in multiplayer never the device's own realm, which differs from device to device.
+  const me = e.diet?.playerVoter ?? (!world.humans && world.player >= 0 ? world.nationIds[world.player]! : "");
   const own = me && inst.isMember(e, me) && e.diet ? { realm: me, vote: e.diet.playerVote } : undefined;
   return inst.dietTally(world.diplomacy, e, reform, realmsOf(world), { outsiderNext: outsiderNext(world, e) }, own);
 }
@@ -302,7 +304,7 @@ function diet(world: World, e: inst.ReformedEmpire, news: News[]): void {
     if (out.passed) reformPassed(world, e, out.reform, news);
     return;
   }
-  if (!e.holder || idx(world, e.holder) === world.player) return;
+  if (!e.holder || isHuman(world, idx(world, e.holder))) return;
   const next = inst.nextReform(e);
   if (!next || inst.whyNotCallDiet(e, d.date)) return;
   const t = dietForecast(world, e, next);
@@ -381,7 +383,7 @@ function rulings(world: World, e: inst.ReformedEmpire, news: News[]): void {
   for (const x of e.rulings) if (!x.answer && x.answerOn <= now) answerRuling(world, e, x, true, news);
   if (world.date.month !== 1 || !inst.passed(e, "imperial_court")) return;
   for (const m of e.members) {
-    if (idx(world, m) === world.player) continue;
+    if (isHuman(world, idx(world, m))) continue;
     for (const t of e.members) {
       if (t === m || inst.whyNotCourt(e, m, t)) continue;
       const aim = dip.warAimsOf(world.diplomacy, m, t).find((a) => a.aim === "take_land" && a.province);
@@ -411,7 +413,7 @@ export function takeToCourt(world: World, n: number, t: number, province: string
   const ruling = inst.rule(e, { plaintiff: me, defendant: them, province, forPlaintiff, date: world.diplomacy.date });
   const pname = world.rules.provinces[world.provinceIndex.get(province)!]?.name ?? province;
   news.push({ kind: "crown", text: forPlaintiff ? `The Imperial Court rules that ${name(world, t)} hands ${pname} to ${name(world, n)}.` : `The Imperial Court rules for ${name(world, t)}: ${pname} stays where it is.`, nations: [n, t], ...(world.provinceIndex.has(province) ? { province: world.provinceIndex.get(province)! } : {}) });
-  if (forPlaintiff && t !== world.player) answerRuling(world, e, ruling, strength(world, t) <= strength(world, idx(world, e.holder ?? "")) + strength(world, n), news);
+  if (forPlaintiff && !isHuman(world, t)) answerRuling(world, e, ruling, strength(world, t) <= strength(world, idx(world, e.holder ?? "")) + strength(world, n), news);
   return null;
 }
 
@@ -513,6 +515,7 @@ export function empireOrder(world: World, n: number, o: EmpireOrder, news: News[
       const c = world.nationIds[o.candidate];
       if (!c || !e.election.candidates.includes(c)) return "not a candidate";
       e.election.playerVote = c;
+      e.election.playerVoter = me;
       return null;
     }
     case "seekVote":
@@ -535,6 +538,7 @@ export function empireOrder(world: World, n: number, o: EmpireOrder, news: News[
       if (!r.diet) return "no Diet sits";
       if (!inst.isMember(e, me)) return "not a member of the Empire";
       r.diet.playerVote = o.yes ? "yes" : "no";
+      r.diet.playerVoter = me;
       return null;
     }
     case "court":

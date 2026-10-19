@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import type { World } from "./world.ts";
 import type { News } from "./war.ts";
 import * as dip from "./domain/diplomacy/index.ts";
@@ -367,7 +368,7 @@ export function sendConclaveGold(world: World, n: number, gold: number): string 
 function aiConclaveGold(world: World): void {
   const entries = conclaveEntries(world);
   for (const e of entries) {
-    if (e.n === world.player || dip.warOf(world.diplomacy, e.realm)) continue;
+    if (isHuman(world, e.n) || dip.warOf(world.diplomacy, e.realm)) continue;
     const need = H.goldToWin(conclaveEntries(world), e.realm);
     if (need === null || need === 0) continue;
     const spare = world.nationTreasury[e.n]! - world.nationMonthlyIncome[e.n]! * FH.conclave.ai_spare_months_of_income;
@@ -443,7 +444,7 @@ function censureUpkeep(world: World, news: News[]): void {
     const mine = (aim: dip.WarAim) => aim.target === world.nationIds[c.nation] && aim.aim === "punish" && aim.source === wrong && !aim.until;
     if (kept === 0) d.aims = d.aims.filter((aim) => !mine(aim));
     else for (const aim of d.aims) if (mine(aim)) aim.until = c.until;
-    if (c.nation === world.player) news.push({ kind: "event", text: kept === 0 ? `${cap(h.name)} lifts his censure: you gave back all you took.` : `${cap(h.name)}'s censure lasts until ${c.until}, while its wrong fades.`, nations: [c.nation] });
+    if (isHuman(world, c.nation)) news.push({ kind: "event", text: kept === 0 ? `${cap(h.name)} lifts his censure: you gave back all you took.` : `${cap(h.name)}'s censure lasts until ${c.until}, while its wrong fades.`, nations: [c.nation] });
   }
   st.censures = st.censures.filter((c) => !c.until || now < c.until);
 }
@@ -513,7 +514,7 @@ export function raiseOwnPatriarch(world: World, n: number, news: News[]): string
 /** The AI claims the caliphate and raises its own patriarch whenever offered (RELG-156). */
 function aiFaithHeads(world: World, news: News[]): void {
   for (let n = 0; n < world.nationCount; n++) {
-    if (n === world.player || world.nationGone[n]) continue;
+    if (isHuman(world, n) || world.nationGone[n]) continue;
     const f = faithOf(world, n);
     if (f === "sunni" && !whyNotClaimCaliphate(world, n)) claimCaliphate(world, n, news);
     if (f === "orthodox" && !whyNotOwnPatriarch(world, n)) raiseOwnPatriarch(world, n, news);

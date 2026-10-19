@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import { lordsLoseWar } from "./lords.ts";
 import { armyDead, garrisonDead } from "./fallen.ts";
 import { castleStep } from "./works.ts";
@@ -231,7 +232,7 @@ export function answerAiCalls(world: World, news: News[]): void {
   const d = world.diplomacy;
   for (const call of d.calls.filter((c) => !c.answer)) {
     const n = world.nationIndex.get(call.called)!;
-    if (n === world.player) continue;
+    if (isHuman(world, n)) continue;
     const enemy = world.nationIndex.get(call.against)!;
     // A subject answers its overlord by its loyalty and kind (SUBJ-028, SUBJ-038).
     const yes = call.via === "subject" ? subjectAnswersCall(world, n) : call.via === "empire" ? aiAnswersDefence(world, call) : call.kind === "defensive" || (!dip.warOf(d, call.called) && strength(world, n) * 2 >= strength(world, enemy));
@@ -823,7 +824,14 @@ export function offerPeace(world: World, a: number, b: number, terms: PeaceTerms
   const loser = terms === "take" ? sideB : terms === "give" ? sideA : null;
   const winner = terms === "take" ? sideA : terms === "give" ? sideB : null;
   const ceded = loser && winner ? loser.flatMap((l) => cededProvinces(world, l, winner, picks)) : [];
-  if (terms !== "give" && !aiAsks && b !== world.player) {
+  // Multiplayer: a player asked by another player answers for themselves, by the next month (answerPeace).
+  if (!aiAsks && isHuman(world, a) && isHuman(world, b) && world.humans) {
+    if (world.peaceOffers.some((o) => o.from === a && o.to === b)) return "your envoy already waits for their answer";
+    world.peaceOffers.push({ id: world.turn * 100 + world.peaceOffers.length, from: a, to: b, terms, ...(picks.length ? { provinces: [...picks] } : {}) });
+    news.push({ kind: "peace", text: `${name(world, a)} offers peace to ${name(world, b)}; the answer comes from ${name(world, b)}.`, nations: [a, b] });
+    return null;
+  }
+  if (terms !== "give" && !aiAsks && !isHuman(world, b)) {
     const voices = peaceVoices(world, b, war);
     const share = voices.share;
     const months = dip.monthsBetween(war.start, dip.monthOf(world.diplomacy.date));
@@ -961,7 +969,11 @@ export function checkDestroyed(world: World, news: News[]): void {
 export interface PeaceOffer {
   id: number;
   from: number;
+  /** The player it is offered to (one of the players in multiplayer). */
+  to: number;
   terms: PeaceTerms;
+  /** Between two players: the asker's picks of the land to take. */
+  provinces?: number[];
 }
 
 /**
@@ -971,31 +983,31 @@ export interface PeaceOffer {
  * and it holds the player's land, it asks for that; after a long war, or
  * when its own people want peace, a white peace. An offer lasts a month.
  */
-function aiOffersPeace(world: World, war: dip.War, ai: number, news: News[]): void {
+function aiOffersPeace(world: World, war: dip.War, ai: number, human: number, news: News[]): void {
   const sa = sidesOf(world, war, ai);
   const aiObliged = peaceVoices(world, ai, war).obliged;
-  const playerObliged = peaceVoices(world, world.player, war).obliged;
+  const playerObliged = peaceVoices(world, human, war).obliged;
   const months = dip.monthsBetween(war.start, dip.monthOf(world.diplomacy.date));
   // What one peace would hand over each way, at most a third of each loser's land (WAR-227).
   const lost = sa.ours.reduce((t, l) => t + cededProvinces(world, l, sa.theirs).length, 0);
   const won = sa.theirs.reduce((t, l) => t + cededProvinces(world, l, sa.ours).length, 0);
   const terms: PeaceTerms | null = aiObliged && lost ? "give" : playerObliged && won ? "take" : aiObliged || rel.aiMustAcceptPeace(months) ? "white" : null;
   if (!terms) return;
-  world.peaceOffers.push({ id: world.turn * 100 + world.peaceOffers.length, from: ai, terms });
+  world.peaceOffers.push({ id: world.turn * 100 + world.peaceOffers.length, from: ai, to: human, terms });
   const what = terms === "give" ? `and gives up the ${lost} province${lost === 1 ? "" : "s"} you hold` : terms === "take" ? `if you give up the ${won} province${won === 1 ? "" : "s"} it holds` : "with no land changing hands";
-  news.push({ kind: "peace", text: `${name(world, ai)} offers peace ${what}.`, nations: [ai, world.player] });
+  news.push({ kind: "peace", text: `${name(world, ai)} offers peace ${what}.`, nations: [ai, human] });
 }
 
 /** The player takes or turns down a peace offer. */
-export function answerPeace(world: World, id: number, yes: boolean, news: News[]): string | null {
-  const offer = world.peaceOffers.find((o) => o.id === id);
+export function answerPeace(world: World, id: number, yes: boolean, news: News[], by: number = world.player): string | null {
+  const offer = world.peaceOffers.find((o) => o.id === id && o.to === by);
   if (!offer) return "that offer has lapsed";
   world.peaceOffers = world.peaceOffers.filter((o) => o !== offer);
-  if (!warBetween(world, offer.from, world.player)) return "you are no longer at war with them";
-  if (yes) return offerPeace(world, offer.from, world.player, offer.terms, news, true);
+  if (!warBetween(world, offer.from, by)) return "you are no longer at war with them";
+  if (yes) return offerPeace(world, offer.from, by, offer.terms, news, true, offer.provinces ?? []);
   // Turning down a peace the realm's voices oblige it to take costs lords and levies each season (WAR-181).
-  refusedPeace(world, world.player, warBetween(world, offer.from, world.player)!, news);
-  news.push({ kind: "refused", text: `You turn down ${name(world, offer.from)}'s offer of peace.`, nations: [offer.from, world.player] });
+  refusedPeace(world, by, warBetween(world, offer.from, by)!, news);
+  news.push({ kind: "refused", text: `You turn down ${name(world, offer.from)}'s offer of peace.`, nations: [offer.from, by] });
   return null;
 }
 
@@ -1006,8 +1018,8 @@ export function monthlyDiplomacy(world: World, news: News[]): void {
   d.calls = d.calls.filter((c) => d.wars.some((w) => w.id === c.war));
   // An offer left unanswered for a month is refused (WAR-181).
   for (const o of world.peaceOffers) {
-    const war = warBetween(world, o.from, world.player);
-    if (war) refusedPeace(world, world.player, war, news);
+    const war = warBetween(world, o.from, o.to);
+    if (war) refusedPeace(world, o.to, war, news);
   }
   world.peaceOffers = [];
   monthlyRefusals(world, news);
@@ -1016,8 +1028,9 @@ export function monthlyDiplomacy(world: World, news: News[]): void {
     const att = world.nationIndex.get(war.declarer)!;
     const def = world.nationIndex.get(war.target)!;
     if (!d.wars.includes(war)) continue;
-    if (att === world.player || def === world.player) {
-      aiOffersPeace(world, war, att === world.player ? def : att, news);
+    if (isHuman(world, att) || isHuman(world, def)) {
+      // Between two players no AI offers anything: they make their own peace.
+      if (!(isHuman(world, att) && isHuman(world, def))) aiOffersPeace(world, war, isHuman(world, att) ? def : att, isHuman(world, att) ? att : def, news);
       continue;
     }
     // Each leader by its own peace voices (WAR-183, WAR-221): an obliged leader gives up what the enemy occupies.
@@ -1044,7 +1057,7 @@ export function aiDeclarations(world: World, news: News[]): void {
   const d = world.diplomacy;
   const chance = world.rules.defines.war.aiDeclareChancePerMonth;
   for (let n = 0; n < world.nationCount; n++) {
-    if (n === world.player || world.nationGone[n] || dip.warOf(d, world.nationIds[n]!)) continue;
+    if (isHuman(world, n) || world.nationGone[n] || dip.warOf(d, world.nationIds[n]!)) continue;
     if (world.rng.next() >= chance) continue;
     const ctx = priceContext(world, n);
     const targets = dip
@@ -1094,7 +1107,7 @@ export function aiMarches(world: World): void {
   for (let i = 0; i < a.count; i++) {
     if (!a.alive[i]) continue;
     const n = a.owner[i]!;
-    if (n === world.player || !enemies[n]!.size || a.commander[i]! < 0 || a.battle[i]! >= 0 || a.retreating[i]) continue;
+    if (isHuman(world, n) || !enemies[n]!.size || a.commander[i]! < 0 || a.battle[i]! >= 0 || a.retreating[i]) continue;
     if (a.route[i]!.length && world.rng.int(4) !== 0) continue;
     const here = a.location[i]!;
     const foes = enemies[n]!;

@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import type { World } from "./world.ts";
 import { beliefRevoltFactor } from "./belief.ts";
 import * as rb from "./domain/rebellions/index.ts";
@@ -268,7 +269,7 @@ const SPARK_TEXT: Record<string, string> = {
 export const sparkText = (spark: string): string => SPARK_TEXT[spark] ?? spark.replace(/^the /, "");
 
 /** "You" for the player, else the realm's name. */
-const who = (world: World, n: number, you: string, they: string) => (n === world.player ? you : `${world.rules.nations[n]!.name} ${they}`);
+const who = (world: World, n: number, you: string, they: string) => (isHuman(world, n) ? you : `${world.rules.nations[n]!.name} ${they}`);
 
 const demandOf = (b: Band) => (C.card.demand as Partial<Record<rb.Cause, string>>)[b.cause] ?? rb.demandOf(b.cause);
 
@@ -544,7 +545,7 @@ function rebelsBeaten(world: World, b: Band, news: News[]): void {
   const v: Verdict = { id: b.id, owner: b.owner, cause: b.cause, leader: b.leader?.name ?? "", province: home, provinces: [...b.provinces], homeless: s.homeless };
   b.men = 0;
   endBand(world, b, "scattered", null, news);
-  if (b.owner === world.player) world.verdicts.push(v);
+  if (isHuman(world, b.owner)) world.verdicts.push(v);
   else treatRebels(world, v, "Punish the leaders", news);
 }
 
@@ -750,7 +751,7 @@ export function answerRebels(world: World, n: number, id: number, answer: string
     const chance = t.works === "usually" ? P.talk_usually_chance : t.works === "rarely" ? P.talk_rarely_chance : P.talk_other_chance;
     if (world.rng.next() < chance) {
       giveDemand(world, b, true);
-      endBand(world, b, "talked", `${n === world.player ? "Your" : `${world.rules.nations[n]!.name}'s`} talks with the rebels of ${where} end in a deal: half their demand, and they go home.`, news);
+      endBand(world, b, "talked", `${isHuman(world, n) ? "Your" : `${world.rules.nations[n]!.name}'s`} talks with the rebels of ${where} end in a deal: half their demand, and they go home.`, news);
     } else news.push({ kind: "rebels", text: `Talks with the rebels of ${where} fail.`, nations: [n], province: b.location });
   } else {
     const r = asRising(world, b);
@@ -775,12 +776,12 @@ export function treatRebels(world: World, v: Verdict, t: rb.Treatment, news: New
     const k = v.province * CLASS_COUNT + homeless;
     world.provinceClasses[k] = Math.max(0, world.provinceClasses[k]! - v.homeless / 1000);
     world.provinceRecruits[v.province] = Math.min(world.provinceRecruitCeiling[v.province]!, world.provinceRecruits[v.province]! + v.homeless);
-    if (v.owner === world.player) news.push({ kind: "rebels", text: `You pardon the rebels of ${where}: they go back to their work.`, nations: [v.owner], province: v.province });
+    if (isHuman(world, v.owner)) news.push({ kind: "rebels", text: `You pardon the rebels of ${where}: they go back to their work.`, nations: [v.owner], province: v.province });
     return;
   }
   for (const p of v.provinces) rb.treat(rb.newRising(String(v.id), v.cause, where), t, locksOf(p), year);
   if (t === "Punish the leaders") {
-    if (v.owner === world.player) news.push({ kind: "rebels", text: `${v.leader || "The leaders"} of ${where} ${v.leader ? "is" : "are"} executed: no ${v.cause.toLowerCase()} rising there for ${C.punish_lock_years} years.`, nations: [v.owner], province: v.province });
+    if (isHuman(world, v.owner)) news.push({ kind: "rebels", text: `${v.leader || "The leaders"} of ${where} ${v.leader ? "is" : "are"} executed: no ${v.cause.toLowerCase()} rising there for ${C.punish_lock_years} years.`, nations: [v.owner], province: v.province });
     return;
   }
   // Massacre: Bloodshed for 20 years over every province of the realm of the same people, and their lords waver.
@@ -794,7 +795,7 @@ export function treatRebels(world: World, v: Verdict, t: rb.Treatment, news: New
     if (world.provinceLord[p]! >= 0) lords.add(world.provinceLord[p]!);
   }
   for (const l of lords) loyaltyStep(world, l, "massacre", news);
-  if (v.owner === world.player) news.push({ kind: "rebels", text: `The rebels of ${where} are massacred. No rising there for ${C.massacre_lock_years} years, but Bloodshed lies on every province of their people.`, nations: [v.owner], province: v.province });
+  if (isHuman(world, v.owner)) news.push({ kind: "rebels", text: `The rebels of ${where} are massacred. No rising there for ${C.massacre_lock_years} years, but Bloodshed lies on every province of their people.`, nations: [v.owner], province: v.province });
 }
 
 /** The player's verdict, by its rising's id. */
@@ -816,7 +817,7 @@ export function verdictOrder(world: World, n: number, id: number, treatment: str
 function aiRebels(world: World, news: News[]): void {
   const a = world.armies;
   for (const b of [...world.bands]) {
-    if (b.owner === world.player) continue;
+    if (isHuman(world, b.owner)) continue;
     const costs = answerCost(world, b);
     let best = -1;
     let dist = Infinity;

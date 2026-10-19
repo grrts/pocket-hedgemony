@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import type { World } from "./world.ts";
 import type { News } from "./war.ts";
 import { Rng } from "./rng.ts";
@@ -200,7 +201,7 @@ export function newRuler(world: World, n: number, news: News[], step: (lord: num
   });
   const pron = old.sex === "f" ? "She" : "He";
   const what = disputed ? `${pron} leaves no heir: a kinsman, ${ruler.name}, ${ruler.age}, takes the throne, and the lords dispute it.` : `${ruler.name}, ${ruler.age}, takes the throne${child ? `, with ${ruler.regent ?? "the council"} as regent` : ""}.`;
-  if (n === world.player) news.push({ kind: "ruler", text: `${rulerLabel(old)} dies at ${old.age}. ${what} Your lords waver at a new ruler.`, nations: [n] });
+  if (isHuman(world, n)) news.push({ kind: "ruler", text: `${rulerLabel(old)} dies at ${old.age}. ${what} Your lords waver at a new ruler.`, nations: [n] });
   else if (bordersPlayer(world, n)) news.push({ kind: "ruler", text: `${rulerLabel(old)} of ${world.rules.nations[n]!.name} dies at ${old.age}. ${what}`, nations: [n, world.player] });
 }
 
@@ -233,7 +234,7 @@ export function yearlyRulers(world: World, news: News[], die: (n: number) => voi
     if (r.heir) r.heir.age++;
     if (r.regent && r.age >= R.child_under) {
       r.regent = null;
-      if (n === world.player) news.push({ kind: "ruler", text: `${rulerLabel(r)} comes of age and rules without a regent.`, nations: [n] });
+      if (isHuman(world, n)) news.push({ kind: "ruler", text: `${rulerLabel(r)} comes of age and rules without a regent.`, nations: [n] });
     }
     if (rng.next() < deathChance(r.age)) {
       die(n);
@@ -242,7 +243,7 @@ export function yearlyRulers(world: World, news: News[], die: (n: number) => voi
     const [from, to] = R.birth_ages;
     if (!r.heir && dynastic(throneLaw(world, n)) && r.age >= from! && r.age <= to! && rng.next() < R.birth_per_year) {
       r.heir = child(world, n, 0);
-      if (n === world.player) news.push({ kind: "ruler", text: `An heir is born to ${rulerLabel(r)}: ${r.heir.sex === "f" ? "a daughter" : "a son"}, ${r.heir.name}.`, nations: [n] });
+      if (isHuman(world, n)) news.push({ kind: "ruler", text: `An heir is born to ${rulerLabel(r)}: ${r.heir.sex === "f" ? "a daughter" : "a son"}, ${r.heir.name}.`, nations: [n] });
     }
   }
 }

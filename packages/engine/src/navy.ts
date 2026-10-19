@@ -1,3 +1,4 @@
+import { isHuman } from "./humans.ts";
 import warfareData from "../../rules/data/domain/warfare.json" with { type: "json" };
 import * as nv from "./domain/naval/index.ts";
 import type { World } from "./world.ts";
@@ -364,7 +365,7 @@ export function layDown(world: World, news: News[], only = -1): void {
     v.sailors[p] = v.sailors[p]! - row.crew;
     v.waited[p] = 0;
     v.hulls.push({ province: p, owner: o.owner, type: o.type, monthsLeft: row.months, months: row.months, crew: row.crew, slipway: true });
-    if (o.owner === world.player) news.push({ kind: "built", text: `A ${o.type} is laid down at ${provinceName(world, p)}: ${plural(row.months, "month")} to launch.`, nations: [o.owner], province: p });
+    if (isHuman(world, o.owner)) news.push({ kind: "built", text: `A ${o.type} is laid down at ${provinceName(world, p)}: ${plural(row.months, "month")} to launch.`, nations: [o.owner], province: p });
     return false;
   });
 }
@@ -650,7 +651,7 @@ export function buyShip(world: World, n: number, p: number, type: string, news: 
   world.navy.orders.push({ province: p, owner: n, type, gold });
   const before = world.navy.hulls.length;
   layDown(world, news, p);
-  if (n === world.player && world.navy.hulls.length === before) news.push({ kind: "built", text: `A ${type} is ordered at ${provinceName(world, p)}; it waits in the queue for a slipway and its crew.`, nations: [n], province: p });
+  if (isHuman(world, n) && world.navy.hulls.length === before) news.push({ kind: "built", text: `A ${type} is ordered at ${provinceName(world, p)}; it waits in the queue for a slipway and its crew.`, nations: [n], province: p });
   return null;
 }
 
@@ -948,7 +949,7 @@ function seaBattles(world: World, news: News[]): void {
     friends.forEach((f) => ((f.battle = b.id), (b.start[0] += fleetStrength(f))));
     foes.forEach((f) => ((f.battle = b.id), (b.start[1] += fleetStrength(f))));
     v.battles.push(b);
-    const players = [...friends, ...foes].some((f) => f.owner === world.player);
+    const players = [...friends, ...foes].some((f) => isHuman(world, f.owner));
     news.push({ kind: "battle", text: `A sea battle begins in the ${zoneName(world, zone)}: ${nationName(world, b.leaders[0])} against ${nationName(world, b.leaders[1])}.`, nations: [b.leaders[0], b.leaders[1]], province: zone, ...(players ? { begins: true as const } : {}) });
   }
   for (const b of [...v.battles]) fightSeaRound(world, b, news);
@@ -1086,7 +1087,7 @@ export function monthlyNavy(world: World, news: News[]): void {
     if (--h.monthsLeft > 0) return true;
     if (world.provinceOwner[h.province] !== h.owner) return false;
     portFleet(world, h.owner, h.province, h.type).ships.push(newShip(world, h.type, h.crew, h.province));
-    if (h.owner === world.player) news.push({ kind: "built", text: `A ${h.type} is launched at ${provinceName(world, h.province)}.`, nations: [h.owner], province: h.province });
+    if (isHuman(world, h.owner)) news.push({ kind: "built", text: `A ${h.type} is launched at ${provinceName(world, h.province)}.`, nations: [h.owner], province: h.province });
     return false;
   });
   // A slipway freed by a launch takes the next ship in the queue.
@@ -1163,7 +1164,7 @@ function aiNavy(world: World, news: News[]): void {
   for (let p = 0; p < world.provinceCount; p++) {
     const o = world.provinceOwner[p]!;
     // Only a port with a shipyard musters and builds (D-NAVY-33); the AI's works build one where it has none.
-    if (o >= 0 && o !== world.player && world.provinceOccupier[p]! < 0 && isPort(world, p) && shipyardOf(world, p) > 0) ports[o]!.push(p);
+    if (o >= 0 && !isHuman(world, o) && world.provinceOccupier[p]! < 0 && isPort(world, p) && shipyardOf(world, p) > 0) ports[o]!.push(p);
   }
   const ships = new Int32Array(world.nationCount);
   for (const f of v.fleets) ships[f.owner] = ships[f.owner]! + f.ships.length;
@@ -1186,7 +1187,7 @@ function aiNavy(world: World, news: News[]): void {
   const idle = new Map<number, number[]>();
   for (const f of v.fleets) {
     // Exploration ships are the exploration AI's (colonies.ts).
-    if (f.owner === world.player || f.battle >= 0 || !f.ships.length || allExplorers(f)) continue;
+    if (isHuman(world, f.owner) || f.battle >= 0 || !f.ships.length || allExplorers(f)) continue;
     if (f.admiral < 0) {
       if (!idle.has(f.owner)) idle.set(f.owner, idleCommanders(world, f.owner).filter((c) => !v.fleets.some((x) => x.admiral === c)));
       const c = idle.get(f.owner)!.shift();

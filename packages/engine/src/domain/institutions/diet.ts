@@ -24,6 +24,8 @@ export interface Diet {
   ends: string;
   /** The player's own vote, if cast; silence counts as no (INST-083). */
   playerVote?: "yes" | "no";
+  /** The realm that cast it (multiplayer: one of the players). */
+  playerVoter?: string;
 }
 
 /** A ruling of the Imperial Court (INST-043) waiting on the losing side, or kept. */

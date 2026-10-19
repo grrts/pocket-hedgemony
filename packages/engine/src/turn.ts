@@ -1,3 +1,4 @@
+import { humansOf, isHuman } from "./humans.ts";
 import { armyDead } from "./fallen.ts";
 import { W as WARFARE } from "./domain/warfare/index.ts";
 import { monthlyPeople } from "./living.ts";
@@ -245,7 +246,7 @@ export function processTurn(world: World, orders: readonly Order[], actingNation
   }
   news.push(...advance(world, STEPS_PER_TURN - world.step));
   // The acting realm's ledger is current at the end of its turn, as the player's is each week.
-  if (actingNation >= 0 && actingNation !== world.player && actingNation < world.nationCount) runLedger(world, false, actingNation);
+  if (actingNation >= 0 && !isHuman(world, actingNation) && actingNation < world.nationCount) runLedger(world, false, actingNation);
   return { turn: world.turn, rejectedOrders, news };
 }
 
@@ -312,7 +313,7 @@ function endDay(world: World, news: News[]): void {
     aiCollect(world, news);
     recount(world);
     // The player's ledger is kept current each week; every realm's is worked out when the month turns.
-    if (world.player >= 0) runLedger(world, false, world.player);
+    for (const h of humansOf(world)) runLedger(world, false, h);
     answerAiCalls(world, news);
     // Achievement tests read the turn's final values, last of all (ACH-033).
     turnEndAchievements(world);
@@ -336,7 +337,7 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
     case "offerPeace":
       return offerPeace(world, actingNation, order.target, order.terms, news, false, order.provinces ?? []);
     case "answerPeace":
-      return answerPeace(world, order.offer, order.yes, news);
+      return answerPeace(world, order.offer, order.yes, news, actingNation);
     case "answerCall": {
       const call = world.diplomacy.calls.find((c) => c.id === order.call && c.called === world.nationIds[actingNation] && !c.answer);
       if (!call) return "no such call to arms";
@@ -578,14 +579,14 @@ export function campaigning(world: World, slot: number): boolean {
   return world.provinceOwner[world.armies.location[slot]!] !== owner || realmsAtWar(world).has(owner);
 }
 
-/** The realms in any war, worked out once a day. */
-const atWarCache = new WeakMap<World, { day: number; set: Set<number> }>();
+/**
+ * The realms in any war. Worked out each time it is read: a cache kept for the
+ * day went stale when a war began later that day, so whether the screens had
+ * read it between two steps changed how armies ate (multiplayer desync).
+ */
 function realmsAtWar(world: World): Set<number> {
-  const hit = atWarCache.get(world);
-  if (hit && hit.day === world.day) return hit.set;
   const set = new Set<number>();
   for (const w of world.diplomacy.wars) for (const id of [...w.attackers, ...w.defenders]) set.add(world.nationIndex.get(id) ?? -1);
-  atWarCache.set(world, { day: world.day, set });
   return set;
 }
 
