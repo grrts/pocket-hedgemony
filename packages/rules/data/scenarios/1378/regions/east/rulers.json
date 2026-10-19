@@ -1,0 +1,497 @@
+{
+ "$comment": "Each east map realm's ruler on 20 September 1378 (REALM-233), from start-date/research/east.md and checkpoints/1378.json; age on the start day where the birth year is known.",
+ "rulers": {
+  "ottomans": {
+   "title": "Bey",
+   "name": "Murad I",
+   "since": 1362,
+   "age": 52,
+   "heir": {
+    "name": "Bayezid",
+    "age": 18
+   }
+  },
+  "byzantium": {
+   "title": "Emperor",
+   "name": "Andronikos IV",
+   "since": 1376,
+   "age": 30,
+   "heir": {
+    "name": "John VII",
+    "age": 8
+   }
+  },
+  "morea": {
+   "title": "Despot",
+   "name": "Manuel Kantakouzenos",
+   "since": 1349,
+   "age": 52
+  },
+  "serbia": {
+   "title": "Prince",
+   "name": "Lazar Hrebeljanović",
+   "since": 1371,
+   "age": 49,
+   "heir": {
+    "name": "Stefan Lazarević",
+    "age": 1
+   }
+  },
+  "brankovic": {
+   "title": "Lord",
+   "name": "Vuk Branković",
+   "since": 1371,
+   "age": 33,
+   "heir": {
+    "name": "Đurađ Branković",
+    "age": 1
+   }
+  },
+  "bosnia": {
+   "title": "King",
+   "name": "Tvrtko I",
+   "since": 1353,
+   "age": 40
+  },
+  "ragusa": null,
+  "wallachia": {
+   "title": "Voivode",
+   "name": "Radu I",
+   "since": 1377,
+   "heir": {
+    "name": "Dan"
+   }
+  },
+  "zeta": {
+   "title": "Lord",
+   "name": "Balša II",
+   "since": 1378
+  },
+  "albania": {
+   "title": "Prince",
+   "name": "Karl Thopia",
+   "since": 1359
+  },
+  "bulgaria_tarnovo": {
+   "title": "Tsar",
+   "name": "Ivan Shishman",
+   "since": 1371,
+   "age": 28
+  },
+  "bulgaria_vidin": {
+   "title": "Tsar",
+   "name": "Ivan Sratsimir",
+   "since": 1356,
+   "age": 53,
+   "heir": {
+    "name": "Konstantin"
+   }
+  },
+  "dobruja": {
+   "title": "Despot",
+   "name": "Dobrotitsa",
+   "since": 1354,
+   "heir": {
+    "name": "Ivanko"
+   }
+  },
+  "arta": {
+   "title": "Despot",
+   "name": "Gjin Bua Shpata",
+   "since": 1374
+  },
+  "ioannina": {
+   "title": "Despot",
+   "name": "Thomas Preljubović",
+   "since": 1367
+  },
+  "thessaly": {
+   "title": "Caesar",
+   "name": "Alexios Angelos Philanthropenos",
+   "since": 1373
+  },
+  "achaea": {
+   "title": "Princess",
+   "name": "Joanna I",
+   "since": 1373,
+   "age": 52
+  },
+  "athens": {
+   "title": "Duchess",
+   "name": "Maria of Sicily",
+   "since": 1377,
+   "age": 15
+  },
+  "epirus": {
+   "title": "Count Palatine",
+   "name": "Carlo I Tocco",
+   "since": 1377
+  },
+  "naxos": {
+   "title": "Duke",
+   "name": "Niccolò III dalle Carceri",
+   "since": 1371
+  },
+  "lesbos": {
+   "title": "Lord",
+   "name": "Francesco I Gattilusio",
+   "since": 1355,
+   "heir": {
+    "name": "Francesco II"
+   }
+  },
+  "knights_of_rhodes": {
+   "title": "Grand Master",
+   "name": "Juan Fernández de Heredia",
+   "since": 1377,
+   "age": 68
+  },
+  "cyprus": {
+   "title": "King",
+   "name": "Peter II",
+   "since": 1369,
+   "age": 21,
+   "heir": {
+    "name": "James",
+    "age": 44
+   }
+  },
+  "karaman": {
+   "title": "Bey",
+   "name": "Alaeddin Ali",
+   "since": 1361
+  },
+  "germiyan": {
+   "title": "Bey",
+   "name": "Süleyman Şah",
+   "since": 1363,
+   "heir": {
+    "name": "Yakub"
+   }
+  },
+  "aydin": {
+   "title": "Bey",
+   "name": "Isa",
+   "since": 1360
+  },
+  "mentese": {
+   "title": "Bey",
+   "name": "Ahmed Gazi",
+   "since": 1360
+  },
+  "saruhan": {
+   "title": "Bey",
+   "name": "Ishak",
+   "since": 1362
+  },
+  "hamid": {
+   "title": "Bey",
+   "name": "Kemaleddin Hüseyin",
+   "since": 1352
+  },
+  "teke": {
+   "title": "Bey",
+   "name": "Mehmed",
+   "since": 1373
+  },
+  "candar": {
+   "title": "Bey",
+   "name": "Kötürüm Bayezid",
+   "since": 1361,
+   "heir": {
+    "name": "Süleyman"
+   }
+  },
+  "eretnids": {
+   "title": "Sultan",
+   "name": "Ala al-Din Ali",
+   "since": 1365
+  },
+  "erzincan": {
+   "title": "Emir",
+   "name": "Pir Hüseyin",
+   "since": null
+  },
+  "dulkadir": {
+   "title": "Bey",
+   "name": "Ghars al-Din Khalil",
+   "since": 1353
+  },
+  "trebizond": {
+   "title": "Emperor",
+   "name": "Alexios III",
+   "since": 1349,
+   "age": 40,
+   "heir": {
+    "name": "Manuel",
+    "age": 14
+   }
+  },
+  "aq_qoyunlu": {
+   "title": "Bey",
+   "name": "Qutlugh",
+   "since": null
+  },
+  "artuqids": {
+   "title": "Malik",
+   "name": "al-Zahir Majd al-Din Isa",
+   "since": 1376
+  },
+  "hasankeyf": null,
+  "qara_qoyunlu": {
+   "title": "Bey",
+   "name": "Bayram Khwaja",
+   "since": 1351
+  },
+  "georgia": {
+   "title": "King",
+   "name": "Bagrat V",
+   "since": 1360,
+   "heir": {
+    "name": "George"
+   }
+  },
+  "shirvan": {
+   "title": "Shirvanshah",
+   "name": "Hushang",
+   "since": 1372
+  },
+  "hungary": {
+   "title": "King",
+   "name": "Louis I the Great",
+   "since": 1342,
+   "age": 52,
+   "heir": {
+    "name": "Mary",
+    "age": 7
+   }
+  },
+  "poland": {
+   "title": "King (absent; the queen mother Elizabeth governs)",
+   "name": "Louis I the Great",
+   "since": 1370,
+   "age": 52,
+   "heir": {
+    "name": "Mary",
+    "age": 7
+   }
+  },
+  "lithuania": {
+   "title": "Grand Duke (with his uncle Kęstutis at Trakai)",
+   "name": "Jogaila",
+   "since": 1377,
+   "age": null
+  },
+  "teutonic_order": {
+   "title": "Grand Master",
+   "name": "Winrich von Kniprode",
+   "since": 1351,
+   "age": 68
+  },
+  "livonian_order": {
+   "title": "Master",
+   "name": "Wilhelm von Vrimersheim",
+   "since": 1364,
+   "age": null
+  },
+  "riga": {
+   "title": "Archbishop",
+   "name": "Johann IV von Sinten",
+   "since": 1374,
+   "age": null
+  },
+  "dorpat": {
+   "title": "Bishop",
+   "name": "Heinrich von Velde",
+   "since": null,
+   "age": null
+  },
+  "osel_wiek": null,
+  "mazovia": {
+   "title": "Duke",
+   "name": "Siemowit III",
+   "since": 1341,
+   "age": 58,
+   "heir": {
+    "name": "Janusz",
+    "age": 32
+   }
+  },
+  "moldavia": {
+   "title": "Voivode",
+   "name": "Petru I Mușat",
+   "since": 1375,
+   "age": null,
+   "heir": {
+    "name": "Roman Mușat"
+   }
+  },
+  "smolensk": {
+   "title": "Grand Prince",
+   "name": "Sviatoslav Ivanovich",
+   "since": 1359,
+   "age": null,
+   "heir": {
+    "name": "Yury Sviatoslavich"
+   }
+  },
+  "muscovy": {
+   "title": "Grand Prince of Moscow and Vladimir",
+   "name": "Dmitry Ivanovich (Donskoy)",
+   "since": 1359,
+   "age": 27,
+   "heir": {
+    "name": "Vasily",
+    "age": 6
+   }
+  },
+  "tver": {
+   "title": "Grand Prince",
+   "name": "Mikhail II Aleksandrovich",
+   "since": 1368,
+   "age": 45,
+   "heir": {
+    "name": "Ivan Mikhailovich",
+    "age": 21
+   }
+  },
+  "ryazan": {
+   "title": "Grand Prince",
+   "name": "Oleg Ivanovich",
+   "since": 1350,
+   "age": null,
+   "heir": {
+    "name": "Fyodor Olgovich"
+   }
+  },
+  "suzdal_nizhny": {
+   "title": "Grand Prince",
+   "name": "Dmitry Konstantinovich",
+   "since": 1365,
+   "age": 55,
+   "heir": {
+    "name": "Boris Konstantinovich"
+   }
+  },
+  "novgorod": {
+   "title": "Archbishop (with the veche)",
+   "name": "Alexius",
+   "since": 1360,
+   "age": null
+  },
+  "pskov": {
+   "title": "Prince (with the veche)",
+   "name": "Andrei Olgerdovich",
+   "since": 1377,
+   "age": null
+  },
+  "vyatka": null,
+  "timurids": {
+   "title": "Amir",
+   "name": "Timur",
+   "since": 1370,
+   "age": 42,
+   "heir": {
+    "name": "Umar Shaykh",
+    "age": 22
+   }
+  },
+  "moghulistan": {
+   "title": "Amir",
+   "name": "Qamar ud-Din Dughlat",
+   "since": 1368
+  },
+  "jalayirids": {
+   "title": "Sultan",
+   "name": "Husayn I Jalayir",
+   "since": 1374,
+   "heir": {
+    "name": "Ahmad Jalayir"
+   }
+  },
+  "muzaffarids": {
+   "title": "Shah",
+   "name": "Shah Shuja",
+   "since": 1358,
+   "age": 45,
+   "heir": {
+    "name": "Zayn al-Abidin"
+   }
+  },
+  "kartids": {
+   "title": "Malik",
+   "name": "Ghiyath al-Din Pir Ali",
+   "since": 1370,
+   "heir": {
+    "name": "Pir Muhammad"
+   }
+  },
+  "sarbadars": {
+   "title": "Khwaja",
+   "name": "Ali-yi Mu'ayyad",
+   "since": 1364
+  },
+  "sufids": {
+   "title": "Amir",
+   "name": "Yusuf Sufi",
+   "since": 1372,
+   "heir": {
+    "name": "Sulayman Sufi"
+   }
+  },
+  "astarabad": {
+   "title": "Amir",
+   "name": "Amir Wali",
+   "since": null
+  },
+  "lur_buzurg": {
+   "title": "Atabeg",
+   "name": "Pir Ahmad",
+   "since": 1378
+  },
+  "lur_kuchak": {
+   "title": "Atabeg",
+   "name": "Izz al-Din",
+   "since": null
+  },
+  "gilan": {
+   "title": "Sayyid",
+   "name": "Ali Kiya",
+   "since": 1370
+  },
+  "mazandaran": {
+   "title": "Sayyid",
+   "name": "Qawam al-Din Mar'ashi",
+   "since": 1359,
+   "heir": {
+    "name": "Kamal al-Din"
+   }
+  },
+  "sistan": {
+   "title": "Malik",
+   "name": "Qutb al-Din Muhammad",
+   "since": null
+  },
+  "badakhshan": null,
+  "great_horde": {
+   "title": "Beylerbey",
+   "name": "Mamai",
+   "since": 1361
+  },
+  "white_horde": {
+   "title": "Khan",
+   "name": "Tokhtamysh",
+   "since": 1378
+  },
+  "arab_shah_horde": {
+   "title": "Khan",
+   "name": "Arab Shah",
+   "since": 1377
+  },
+  "volga_bulgaria": {
+   "title": "Emir",
+   "name": "Hasan",
+   "since": null
+  }
+ }
+}

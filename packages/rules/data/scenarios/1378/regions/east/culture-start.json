@@ -1,0 +1,1490 @@
+{
+ "$comment": "Court tongues, tongue mixes and faiths of the east's map realms on 20 September 1378 (CULT-094); shares are provisional. tongues: only tongues new to the game.",
+ "tongues": {
+  "mesopotamian_arabic": {
+   "name": "Mesopotamian Arabic",
+   "family": "arab",
+   "way_of_life": "settled"
+  },
+  "luri": {
+   "name": "Luri",
+   "family": "iranian",
+   "way_of_life": "herding"
+  },
+  "gilaki": {
+   "name": "Gilaki",
+   "family": "iranian",
+   "way_of_life": "settled"
+  },
+  "mazandarani": {
+   "name": "Mazandarani",
+   "family": "iranian",
+   "way_of_life": "settled"
+  },
+  "pamiri": {
+   "name": "Pamiri",
+   "family": "iranian",
+   "way_of_life": "settled"
+  }
+ },
+ "realms": {
+  "ottomans": {
+   "court": "turkish",
+   "mix": [
+    [
+     "turkish",
+     0.55
+    ],
+    [
+     "greek",
+     0.25
+    ],
+    [
+     "bulgarian",
+     0.2
+    ]
+   ],
+   "local": {
+    "turkish": "Turkish (Anatolian Turkish and Turkmen)",
+    "greek": "Greek (Bithynia, Thrace)",
+    "bulgarian": "Bulgarians of Thrace"
+   }
+  },
+  "byzantium": {
+   "court": "greek",
+   "mix": [
+    [
+     "greek",
+     0.95
+    ],
+    [
+     "bulgarian",
+     0.05
+    ]
+   ],
+   "local": {
+    "greek": "Greek (Romaioi)",
+    "bulgarian": "Bulgarians of the Black Sea towns"
+   }
+  },
+  "morea": {
+   "court": "greek",
+   "mix": [
+    [
+     "greek",
+     0.8
+    ],
+    [
+     "albanian",
+     0.2
+    ]
+   ],
+   "local": {
+    "greek": "Greek",
+    "albanian": "Albanian settlers"
+   }
+  },
+  "serbia": {
+   "court": "serbian",
+   "mix": [
+    [
+     "serbian",
+     0.9
+    ],
+    [
+     "aromanian",
+     0.1
+    ]
+   ],
+   "local": {
+    "serbian": "Serb",
+    "aromanian": "Vlach"
+   },
+   "faith": "orthodox"
+  },
+  "brankovic": {
+   "court": "serbian",
+   "mix": [
+    [
+     "serbian",
+     0.75
+    ],
+    [
+     "albanian",
+     0.15
+    ],
+    [
+     "aromanian",
+     0.1
+    ]
+   ],
+   "local": {
+    "serbian": "Serb",
+    "albanian": "Albanian",
+    "aromanian": "Vlach"
+   },
+   "faith": "orthodox"
+  },
+  "bosnia": {
+   "court": "bosnian",
+   "mix": [
+    [
+     "bosnian",
+     0.85
+    ],
+    [
+     "aromanian",
+     0.1
+    ],
+    [
+     "croatian",
+     0.05
+    ]
+   ],
+   "local": {
+    "bosnian": "Bosnian Slavs",
+    "aromanian": "Vlachs",
+    "croatian": "Croats of Hum"
+   }
+  },
+  "ragusa": {
+   "court": "dalmatian",
+   "mix": [
+    [
+     "croatian",
+     0.7
+    ],
+    [
+     "dalmatian",
+     0.3
+    ]
+   ],
+   "local": {
+    "croatian": "Slavic Ragusans",
+    "dalmatian": "Romance (Dalmatian) patricians"
+   }
+  },
+  "wallachia": {
+   "court": "romanian",
+   "mix": [
+    [
+     "romanian",
+     0.92
+    ],
+    [
+     "bulgarian",
+     0.08
+    ]
+   ],
+   "local": {
+    "romanian": "Romanian (Vlach)",
+    "bulgarian": "Bulgarian and Slav minorities"
+   }
+  },
+  "zeta": {
+   "court": "serbian",
+   "mix": [
+    [
+     "serbian",
+     0.55
+    ],
+    [
+     "albanian",
+     0.45
+    ]
+   ],
+   "local": {
+    "serbian": "Serb",
+    "albanian": "Albanian"
+   }
+  },
+  "albania": {
+   "court": "albanian",
+   "mix": [
+    [
+     "albanian",
+     0.9
+    ],
+    [
+     "greek",
+     0.1
+    ]
+   ],
+   "local": {
+    "albanian": "Albanian",
+    "greek": "Greek"
+   },
+   "faith": "catholic"
+  },
+  "bulgaria_tarnovo": {
+   "court": "bulgarian",
+   "mix": [
+    [
+     "bulgarian",
+     0.9
+    ],
+    [
+     "aromanian",
+     0.05
+    ],
+    [
+     "greek",
+     0.05
+    ]
+   ],
+   "local": {
+    "bulgarian": "Bulgarian",
+    "aromanian": "Vlach",
+    "greek": "Greek"
+   },
+   "faith": "orthodox"
+  },
+  "bulgaria_vidin": {
+   "court": "bulgarian",
+   "mix": [
+    [
+     "bulgarian",
+     0.8
+    ],
+    [
+     "romanian",
+     0.2
+    ]
+   ],
+   "local": {
+    "bulgarian": "Bulgarian",
+    "romanian": "Vlach"
+   },
+   "faith": "orthodox"
+  },
+  "dobruja": {
+   "court": "bulgarian",
+   "mix": [
+    [
+     "bulgarian",
+     0.6
+    ],
+    [
+     "greek",
+     0.2
+    ],
+    [
+     "tatar",
+     0.2
+    ]
+   ],
+   "local": {
+    "bulgarian": "Bulgarian",
+    "greek": "Greek coast towns",
+    "tatar": "Turkic (Cuman and Tatar) settlers"
+   },
+   "faith": "orthodox"
+  },
+  "arta": {
+   "court": "albanian",
+   "mix": [
+    [
+     "greek",
+     0.6
+    ],
+    [
+     "albanian",
+     0.3
+    ],
+    [
+     "aromanian",
+     0.1
+    ]
+   ],
+   "local": {
+    "greek": "Greek",
+    "albanian": "Albanian clans",
+    "aromanian": "Vlach"
+   },
+   "faith": "orthodox"
+  },
+  "ioannina": {
+   "court": "serbian",
+   "mix": [
+    [
+     "greek",
+     0.85
+    ],
+    [
+     "aromanian",
+     0.1
+    ],
+    [
+     "albanian",
+     0.05
+    ]
+   ],
+   "local": {
+    "greek": "Greek",
+    "aromanian": "Vlach",
+    "albanian": "Albanian",
+    "serbian": "Serbian rulers"
+   },
+   "faith": "orthodox"
+  },
+  "thessaly": {
+   "court": "greek",
+   "mix": [
+    [
+     "greek",
+     0.7
+    ],
+    [
+     "aromanian",
+     0.3
+    ]
+   ],
+   "local": {
+    "greek": "Greek",
+    "aromanian": "Vlachs (\"Great Vlachia\")"
+   },
+   "faith": "orthodox"
+  },
+  "achaea": {
+   "court": "french",
+   "mix": [
+    [
+     "greek",
+     1
+    ]
+   ],
+   "local": {
+    "greek": "Greek",
+    "french": "Frankish and Italian lords"
+   },
+   "faith": "catholic"
+  },
+  "athens": {
+   "court": "catalan",
+   "mix": [
+    [
+     "greek",
+     0.95
+    ],
+    [
+     "albanian",
+     0.05
+    ]
+   ],
+   "local": {
+    "greek": "Greek",
+    "albanian": "Albanian settlers",
+    "catalan": "Catalan settlers and garrison"
+   },
+   "faith": "catholic"
+  },
+  "epirus": {
+   "court": "tuscan",
+   "mix": [
+    [
+     "greek",
+     1
+    ]
+   ],
+   "local": {
+    "greek": "Greek islanders",
+    "tuscan": "Italian (Tocco) court"
+   },
+   "faith": "catholic"
+  },
+  "naxos": {
+   "court": "venetian",
+   "mix": [
+    [
+     "greek",
+     1
+    ]
+   ],
+   "local": {
+    "greek": "Greek islanders",
+    "venetian": "Venetian-Lombard lords"
+   },
+   "faith": "catholic"
+  },
+  "lesbos": {
+   "court": "ligurian",
+   "mix": [
+    [
+     "greek",
+     1
+    ]
+   ],
+   "local": {
+    "greek": "Greek islanders",
+    "ligurian": "Genoese lords"
+   },
+   "faith": "catholic"
+  },
+  "knights_of_rhodes": {
+   "court": "french",
+   "mix": [
+    [
+     "greek",
+     1
+    ]
+   ],
+   "local": {
+    "greek": "Greek islanders",
+    "french": "Latin knights (French, Italian, Spanish, English, German)"
+   }
+  },
+  "cyprus": {
+   "court": "french",
+   "mix": [
+    [
+     "greek",
+     0.88
+    ],
+    [
+     "levantine_arabic",
+     0.07
+    ],
+    [
+     "armenian",
+     0.05
+    ]
+   ],
+   "local": {
+    "greek": "Greek Cypriot",
+    "levantine_arabic": "Maronites",
+    "armenian": "Armenians",
+    "french": "Frankish (Latin) nobility"
+   }
+  },
+  "karaman": {
+   "court": "turkmen",
+   "mix": [
+    [
+     "turkmen",
+     0.45
+    ],
+    [
+     "turkish",
+     0.4
+    ],
+    [
+     "greek",
+     0.15
+    ]
+   ],
+   "local": {
+    "turkmen": "Turkmen",
+    "turkish": "Urban Turkish-speaking Muslims",
+    "greek": "Greek and Armenian Christians"
+   }
+  },
+  "germiyan": {
+   "court": "turkish",
+   "mix": [
+    [
+     "turkish",
+     0.8
+    ],
+    [
+     "greek",
+     0.2
+    ]
+   ],
+   "local": {
+    "turkish": "Turks and Turkmen",
+    "greek": "Greeks"
+   },
+   "faith": "sunni"
+  },
+  "aydin": {
+   "court": "turkish",
+   "mix": [
+    [
+     "turkish",
+     0.7
+    ],
+    [
+     "greek",
+     0.3
+    ]
+   ],
+   "local": {
+    "turkish": "Turks",
+    "greek": "Greeks of the coast"
+   },
+   "faith": "sunni"
+  },
+  "mentese": {
+   "court": "turkish",
+   "mix": [
+    [
+     "turkish",
+     0.7
+    ],
+    [
+     "greek",
+     0.3
+    ]
+   ],
+   "local": {
+    "turkish": "Turks",
+    "greek": "Greeks of the coast"
+   },
+   "faith": "sunni"
+  },
+  "saruhan": {
+   "court": "turkish",
+   "mix": [
+    [
+     "turkish",
+     0.75
+    ],
+    [
+     "greek",
+     0.25
+    ]
+   ],
+   "local": {
+    "turkish": "Turks",
+    "greek": "Greeks"
+   },
+   "faith": "sunni"
+  },
+  "hamid": {
+   "court": "turkish",
+   "mix": [
+    [
+     "turkish",
+     0.6
+    ],
+    [
+     "turkmen",
+     0.3
+    ],
+    [
+     "greek",
+     0.1
+    ]
+   ],
+   "local": {
+    "turkish": "Turks",
+    "turkmen": "Turkmen",
+    "greek": "Greeks"
+   },
+   "faith": "sunni"
+  },
+  "teke": {
+   "court": "turkish",
+   "mix": [
+    [
+     "turkish",
+     0.6
+    ],
+    [
+     "turkmen",
+     0.25
+    ],
+    [
+     "greek",
+     0.15
+    ]
+   ],
+   "local": {
+    "turkish": "Turks",
+    "turkmen": "Turkmen",
+    "greek": "Greeks of Antalya"
+   },
+   "faith": "sunni"
+  },
+  "candar": {
+   "court": "turkish",
+   "mix": [
+    [
+     "turkish",
+     0.85
+    ],
+    [
+     "greek",
+     0.15
+    ]
+   ],
+   "local": {
+    "turkish": "Turks",
+    "greek": "Greeks"
+   }
+  },
+  "eretnids": {
+   "court": "turkish",
+   "mix": [
+    [
+     "turkish",
+     0.55
+    ],
+    [
+     "turkmen",
+     0.25
+    ],
+    [
+     "armenian",
+     0.1
+    ],
+    [
+     "greek",
+     0.1
+    ]
+   ],
+   "local": {
+    "turkish": "Turks",
+    "turkmen": "Turkmen",
+    "armenian": "Armenians",
+    "greek": "Greeks"
+   },
+   "faith": "sunni"
+  },
+  "erzincan": {
+   "court": "turkish",
+   "mix": [
+    [
+     "turkish",
+     0.5
+    ],
+    [
+     "armenian",
+     0.35
+    ],
+    [
+     "kurdish",
+     0.15
+    ]
+   ],
+   "local": {
+    "turkish": "Turks and Turkmen",
+    "armenian": "Armenians",
+    "kurdish": "Kurds"
+   },
+   "faith": "sunni"
+  },
+  "dulkadir": {
+   "court": "turkmen",
+   "mix": [
+    [
+     "turkmen",
+     0.6
+    ],
+    [
+     "kurdish",
+     0.25
+    ],
+    [
+     "armenian",
+     0.15
+    ]
+   ],
+   "local": {
+    "turkmen": "Turkmen",
+    "kurdish": "Kurds",
+    "armenian": "Armenians"
+   }
+  },
+  "trebizond": {
+   "court": "greek",
+   "mix": [
+    [
+     "greek",
+     0.7
+    ],
+    [
+     "laz",
+     0.2
+    ],
+    [
+     "armenian",
+     0.1
+    ]
+   ],
+   "local": {
+    "greek": "Pontic Greeks",
+    "laz": "Laz",
+    "armenian": "Armenians"
+   }
+  },
+  "aq_qoyunlu": {
+   "court": "turkmen",
+   "mix": [
+    [
+     "turkmen",
+     0.45
+    ],
+    [
+     "kurdish",
+     0.3
+    ],
+    [
+     "armenian",
+     0.25
+    ]
+   ],
+   "local": {
+    "turkmen": "Bayındır and other Turkmen tribes",
+    "kurdish": "Kurds",
+    "armenian": "Armenians"
+   }
+  },
+  "artuqids": {
+   "court": "turkish",
+   "mix": [
+    [
+     "kurdish",
+     0.4
+    ],
+    [
+     "levantine_arabic",
+     0.3
+    ],
+    [
+     "armenian",
+     0.3
+    ]
+   ],
+   "local": {
+    "kurdish": "Kurds",
+    "levantine_arabic": "Arabs",
+    "armenian": "Armenians and Syriac Christians",
+    "turkish": "Turkish Artuqid court"
+   },
+   "faith": "sunni"
+  },
+  "hasankeyf": {
+   "court": "kurdish",
+   "mix": [
+    [
+     "kurdish",
+     0.6
+    ],
+    [
+     "levantine_arabic",
+     0.2
+    ],
+    [
+     "armenian",
+     0.2
+    ]
+   ],
+   "local": {
+    "kurdish": "Kurds",
+    "levantine_arabic": "Arabs",
+    "armenian": "Armenians and Syriac Christians"
+   },
+   "faith": "sunni"
+  },
+  "qara_qoyunlu": {
+   "court": "turkmen",
+   "mix": [
+    [
+     "kurdish",
+     0.4
+    ],
+    [
+     "armenian",
+     0.3
+    ],
+    [
+     "turkmen",
+     0.3
+    ]
+   ],
+   "local": {
+    "kurdish": "Kurds",
+    "armenian": "Armenians",
+    "turkmen": "Oghuz Turkmen tribes"
+   }
+  },
+  "georgia": {
+   "court": "georgian",
+   "mix": [
+    [
+     "georgian",
+     0.82
+    ],
+    [
+     "armenian",
+     0.1
+    ],
+    [
+     "ossetian",
+     0.08
+    ]
+   ],
+   "local": {
+    "georgian": "Georgians (Kartvelians)",
+    "armenian": "Armenians",
+    "ossetian": "Ossetians"
+   }
+  },
+  "shirvan": {
+   "court": "persian",
+   "mix": [
+    [
+     "persian",
+     0.45
+    ],
+    [
+     "azerbaijani",
+     0.35
+    ],
+    [
+     "lezgin",
+     0.2
+    ]
+   ],
+   "local": {
+    "persian": "Persian-speaking Tats",
+    "azerbaijani": "Turkic population",
+    "lezgin": "Lezgins"
+   }
+  },
+  "hungary": {
+   "court": "hungarian",
+   "mix": [
+    [
+     "hungarian",
+     0.72
+    ],
+    [
+     "croatian",
+     0.14
+    ],
+    [
+     "slovak",
+     0.14
+    ]
+   ],
+   "local": {
+    "hungarian": "Hungarian (Magyar), with Székelys",
+    "croatian": "Croatian and Dalmatian",
+    "slovak": "Slovak, Ruthenian and Romanian in the uplands and Transylvania"
+   }
+  },
+  "poland": {
+   "court": "polish",
+   "mix": [
+    [
+     "polish",
+     0.88
+    ],
+    [
+     "ruthenian",
+     0.06
+    ],
+    [
+     "high_german",
+     0.06
+    ]
+   ],
+   "local": {
+    "polish": "Polish",
+    "ruthenian": "Ruthenian (Chełm and Belz)",
+    "high_german": "German burghers in Kraków and the towns"
+   }
+  },
+  "lithuania": {
+   "court": "lithuanian",
+   "mix": [
+    [
+     "ruthenian",
+     0.75
+    ],
+    [
+     "lithuanian",
+     0.25
+    ]
+   ],
+   "local": {
+    "ruthenian": "Ruthenian (Orthodox Rus of the Gediminid appanages)",
+    "lithuanian": "Lithuanian and Samogitian (pagan)"
+   },
+   "faith": "baltic_traditional"
+  },
+  "teutonic_order": {
+   "court": "low_german",
+   "mix": [
+    [
+     "low_german",
+     0.5
+    ],
+    [
+     "polish",
+     0.3
+    ],
+    [
+     "old_prussian",
+     0.2
+    ]
+   ],
+   "local": {
+    "low_german": "German settlers and burghers",
+    "polish": "Polish (Kashubian in Pomerelia, Chełmno land)",
+    "old_prussian": "Old Prussian (Baltic) population"
+   }
+  },
+  "livonian_order": {
+   "court": "low_german",
+   "mix": [
+    [
+     "latvian",
+     0.5
+    ],
+    [
+     "estonian",
+     0.42
+    ],
+    [
+     "low_german",
+     0.08
+    ]
+   ],
+   "local": {
+    "latvian": "Latvian peasantry (Curonian, Semigallian, Latgalian)",
+    "estonian": "Estonian peasantry (Harria, Wierland)",
+    "low_german": "German knights and burghers"
+   }
+  },
+  "riga": {
+   "court": "low_german",
+   "mix": [
+    [
+     "latvian",
+     0.85
+    ],
+    [
+     "low_german",
+     0.15
+    ]
+   ],
+   "local": {
+    "latvian": "Latvian and Livonian peasantry",
+    "low_german": "German burghers of Riga and the archbishop's vassals"
+   }
+  },
+  "dorpat": {
+   "court": "low_german",
+   "mix": [
+    [
+     "estonian",
+     0.9
+    ],
+    [
+     "low_german",
+     0.1
+    ]
+   ],
+   "local": {
+    "estonian": "Estonian peasantry",
+    "low_german": "German chapter, vassals and Hanse burghers"
+   }
+  },
+  "osel_wiek": {
+   "court": "low_german",
+   "mix": [
+    [
+     "estonian",
+     0.92
+    ],
+    [
+     "low_german",
+     0.08
+    ]
+   ],
+   "local": {
+    "estonian": "Estonian peasantry of Ösel and Wiek",
+    "low_german": "German chapter and vassals"
+   }
+  },
+  "mazovia": {
+   "court": "polish",
+   "mix": [
+    [
+     "polish",
+     1.0
+    ]
+   ],
+   "local": {
+    "polish": "Polish (Mazovian)"
+   }
+  },
+  "moldavia": {
+   "court": "romanian",
+   "mix": [
+    [
+     "romanian",
+     0.85
+    ],
+    [
+     "ruthenian",
+     0.15
+    ]
+   ],
+   "local": {
+    "romanian": "Romanian (Moldavian)",
+    "ruthenian": "Ruthenian (north)"
+   }
+  },
+  "smolensk": {
+   "court": "great_russian",
+   "mix": [
+    [
+     "great_russian",
+     0.6
+    ],
+    [
+     "ruthenian",
+     0.4
+    ]
+   ],
+   "local": {
+    "great_russian": "East Slavic (Smolensk Krivichi)",
+    "ruthenian": "Ruthenian of the western borderland"
+   }
+  },
+  "muscovy": {
+   "court": "great_russian",
+   "mix": [
+    [
+     "great_russian",
+     0.96
+    ],
+    [
+     "komi",
+     0.04
+    ]
+   ],
+   "local": {
+    "great_russian": "Great Russian (East Slavic)",
+    "komi": "Finnic groups (Merya descendants) in the north and east"
+   }
+  },
+  "tver": {
+   "court": "great_russian",
+   "mix": [
+    [
+     "great_russian",
+     1.0
+    ]
+   ],
+   "local": {
+    "great_russian": "Great Russian (East Slavic)"
+   }
+  },
+  "ryazan": {
+   "court": "great_russian",
+   "mix": [
+    [
+     "great_russian",
+     0.92
+    ],
+    [
+     "mordvin",
+     0.08
+    ]
+   ],
+   "local": {
+    "great_russian": "Great Russian (East Slavic)",
+    "mordvin": "Mordvins (Meshchera) on the eastern border"
+   }
+  },
+  "suzdal_nizhny": {
+   "court": "great_russian",
+   "mix": [
+    [
+     "great_russian",
+     0.85
+    ],
+    [
+     "mordvin",
+     0.1
+    ],
+    [
+     "mari",
+     0.05
+    ]
+   ],
+   "local": {
+    "great_russian": "Great Russian (East Slavic)",
+    "mordvin": "Mordvins south of the Volga",
+    "mari": "Mari (Cheremis) east of Nizhny"
+   }
+  },
+  "novgorod": {
+   "court": "great_russian",
+   "mix": [
+    [
+     "great_russian",
+     0.8
+    ],
+    [
+     "karelian",
+     0.12
+    ],
+    [
+     "komi",
+     0.08
+    ]
+   ],
+   "local": {
+    "great_russian": "Great Russian (Novgorodian Slavs)",
+    "karelian": "Karelians, Votes, Izhorians, Vepsians",
+    "komi": "Komi and other tributaries of the north"
+   }
+  },
+  "pskov": {
+   "court": "great_russian",
+   "mix": [
+    [
+     "great_russian",
+     1.0
+    ]
+   ],
+   "local": {
+    "great_russian": "Great Russian (Pskovian)"
+   }
+  },
+  "vyatka": {
+   "court": "great_russian",
+   "mix": [
+    [
+     "great_russian",
+     0.7
+    ],
+    [
+     "komi",
+     0.15
+    ],
+    [
+     "mari",
+     0.15
+    ]
+   ],
+   "local": {
+    "great_russian": "Russian colonists round Khlynov",
+    "komi": "Udmurts (Votyaks)",
+    "mari": "Mari (Cheremis)"
+   }
+  },
+  "timurids": {
+   "court": "chagatai",
+   "mix": [
+    [
+     "persian",
+     0.7
+    ],
+    [
+     "chagatai",
+     0.3
+    ]
+   ],
+   "local": {
+    "persian": "Persian (Tajik) townsmen and farmers of the oases",
+    "chagatai": "Chaghatay Turkic tribes and Timur's military class"
+   }
+  },
+  "moghulistan": {
+   "court": "moghul",
+   "mix": [
+    [
+     "moghul",
+     0.55
+    ],
+    [
+     "uyghur",
+     0.3
+    ],
+    [
+     "kyrgyz",
+     0.15
+    ]
+   ],
+   "local": {
+    "moghul": "Turkicised Mongol (Moghul) tribes of the Ili and Issyk-Kul",
+    "uyghur": "Oasis Turks of Kashgar and the Tarim",
+    "kyrgyz": "Kyrgyz groups"
+   }
+  },
+  "jalayirids": {
+   "court": "persian",
+   "mix": [
+    [
+     "persian",
+     0.4
+    ],
+    [
+     "mesopotamian_arabic",
+     0.35
+    ],
+    [
+     "azerbaijani",
+     0.25
+    ]
+   ],
+   "local": {
+    "persian": "Persian townsmen of Azerbaijan and Persian Iraq; the Mongol Jalayir dynasty rules through a Persian chancery",
+    "mesopotamian_arabic": "Arabs of Baghdad, Hilla, Wasit and Basra",
+    "azerbaijani": "Turkic and Turkmen population of Azerbaijan"
+   },
+   "faith": "sunni"
+  },
+  "muzaffarids": {
+   "court": "persian",
+   "mix": [
+    [
+     "persian",
+     0.9
+    ],
+    [
+     "luri",
+     0.1
+    ]
+   ],
+   "local": {
+    "persian": "Persians of Fars, Kerman, Yazd and Isfahan",
+    "luri": "Lur and Shul tribes of the Zagros"
+   },
+   "faith": "sunni"
+  },
+  "kartids": {
+   "court": "persian",
+   "mix": [
+    [
+     "persian",
+     0.9
+    ],
+    [
+     "turkmen",
+     0.1
+    ]
+   ],
+   "local": {
+    "persian": "Tajik (Persian) townsmen of Herat and Ghur",
+    "turkmen": "Turkic nomads of Badghis"
+   },
+   "faith": "sunni"
+  },
+  "sarbadars": {
+   "court": "persian",
+   "mix": [
+    [
+     "persian",
+     1
+    ]
+   ],
+   "local": {
+    "persian": "Persians of western Khorasan"
+   },
+   "faith": "shia"
+  },
+  "sufids": {
+   "court": "tatar",
+   "mix": [
+    [
+     "chagatai",
+     0.45
+    ],
+    [
+     "tatar",
+     0.35
+    ],
+    [
+     "persian",
+     0.2
+    ]
+   ],
+   "local": {
+    "chagatai": "Turkic-speaking Khwarazmians",
+    "tatar": "Qongrat and other Kipchak tribes",
+    "persian": "Persian-speaking townsmen of Urgench"
+   },
+   "faith": "sunni"
+  },
+  "astarabad": {
+   "court": "chagatai",
+   "mix": [
+    [
+     "persian",
+     0.7
+    ],
+    [
+     "turkmen",
+     0.3
+    ]
+   ],
+   "local": {
+    "persian": "Persians of Gurgan",
+    "turkmen": "Turkmen of Dehistan and the Gurgan plain"
+   },
+   "faith": "sunni"
+  },
+  "lur_buzurg": {
+   "court": "luri",
+   "mix": [
+    [
+     "luri",
+     1
+    ]
+   ],
+   "local": {
+    "luri": "Bakhtiari Lurs"
+   },
+   "faith": "sunni"
+  },
+  "lur_kuchak": {
+   "court": "luri",
+   "mix": [
+    [
+     "luri",
+     0.85
+    ],
+    [
+     "kurdish",
+     0.15
+    ]
+   ],
+   "local": {
+    "luri": "Lurs of Khurramabad",
+    "kurdish": "Kurds of the western valleys"
+   }
+  },
+  "gilan": {
+   "court": "gilaki",
+   "mix": [
+    [
+     "gilaki",
+     1
+    ]
+   ],
+   "local": {
+    "gilaki": "Gilaks of eastern Gilan"
+   }
+  },
+  "mazandaran": {
+   "court": "mazandarani",
+   "mix": [
+    [
+     "mazandarani",
+     1
+    ]
+   ],
+   "local": {
+    "mazandarani": "Tabari-speaking Mazandaranis"
+   }
+  },
+  "sistan": {
+   "court": "persian",
+   "mix": [
+    [
+     "persian",
+     0.85
+    ],
+    [
+     "baluch",
+     0.15
+    ]
+   ],
+   "local": {
+    "persian": "Persians of Zaranj and the Helmand",
+    "baluch": "Baluch herders"
+   }
+  },
+  "badakhshan": {
+   "court": "persian",
+   "mix": [
+    [
+     "persian",
+     0.7
+    ],
+    [
+     "pamiri",
+     0.3
+    ]
+   ],
+   "local": {
+    "persian": "Tajiks of the Kokcha valley",
+    "pamiri": "Pamiri mountain peoples"
+   }
+  },
+  "great_horde": {
+   "court": "tatar",
+   "mix": [
+    [
+     "tatar",
+     0.8
+    ],
+    [
+     "greek",
+     0.1
+    ],
+    [
+     "circassian",
+     0.1
+    ]
+   ],
+   "local": {
+    "tatar": "Kipchak-Turkic Tatars of the western Jochid ulus",
+    "greek": "Greeks of the Crimea",
+    "circassian": "Circassians of the Kuban"
+   }
+  },
+  "white_horde": {
+   "court": "tatar",
+   "mix": [
+    [
+     "tatar",
+     0.7
+    ],
+    [
+     "uzbek",
+     0.3
+    ]
+   ],
+   "local": {
+    "tatar": "Kipchak and Mongol clans of the Ulus of Orda",
+    "uzbek": "Eastern Jochid tribes later called Uzbek"
+   },
+   "faith": "sunni"
+  },
+  "arab_shah_horde": {
+   "court": "tatar",
+   "mix": [
+    [
+     "tatar",
+     1
+    ]
+   ],
+   "local": {
+    "tatar": "Kipchak Tatars of the Volga left bank"
+   },
+   "faith": "sunni"
+  },
+  "volga_bulgaria": {
+   "court": "kazan_tatar",
+   "mix": [
+    [
+     "kazan_tatar",
+     0.6
+    ],
+    [
+     "chuvash",
+     0.25
+    ],
+    [
+     "mari",
+     0.15
+    ]
+   ],
+   "local": {
+    "kazan_tatar": "Muslim Bulgars of the middle Volga",
+    "chuvash": "Chuvash",
+    "mari": "Mari (Cheremis)"
+   },
+   "faith": "sunni"
+  }
+ }
+}
