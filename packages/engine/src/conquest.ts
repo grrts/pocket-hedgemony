@@ -133,6 +133,10 @@ export interface NameAbroadView {
   /** Lands taken at which a league may form in this era. */
   threshold: number;
   leagues: LeagueView[];
+  /** The neighbours Wary or Threatened of the player this month, most afraid first (DIPL-236). */
+  fearful: { nation: number; level: "wary" | "threatened"; ratio: number }[];
+  /** Strength over a realm's side at which it is Wary, and Threatened (DIPL-231). */
+  fearRatios: { wary: number; threatened: number };
 }
 
 export function leagueView(world: World, target: number): LeagueView | null {
@@ -150,5 +154,11 @@ export function nameAbroadView(world: World, player: number): NameAbroadView {
   const id = world.nationIds[player]!;
   const notoriety = dip.notoriety(d, id);
   const league = leagueView(world, player);
-  return { notoriety, word: notorietyWord(notoriety), landsTaken: dip.landsTakenWithin(d, id, holdsFn(world)), threshold: dip.leagueThreshold(d), leagues: league ? [league] : [] };
+  const fearful: NameAbroadView["fearful"] = [];
+  for (let n = 0; n < world.nationCount; n++) {
+    const f = !world.nationGone[n] && n !== player ? dip.country(d, world.nationIds[n]!).fears?.find((x) => x.of === id) : undefined;
+    if (f) fearful.push({ nation: n, level: f.level, ratio: f.ratio });
+  }
+  fearful.sort((a, b) => b.ratio - a.ratio || a.nation - b.nation);
+  return { notoriety, word: notorietyWord(notoriety), landsTaken: dip.landsTakenWithin(d, id, holdsFn(world)), threshold: dip.leagueThreshold(d), leagues: league ? [league] : [], fearful, fearRatios: { wary: dip.AF.fear.wary_ratio, threatened: dip.AF.fear.threatened_ratio } };
 }

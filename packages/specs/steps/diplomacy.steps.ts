@@ -2565,3 +2565,44 @@ Then("they are not on its General tab", (s) => {
   expect(s.cardTabs.General).toEqual([]);
   expect(s.atWarTabs.General).toEqual([]);
 });
+
+// ---------------------------------------------------------------- arms and fear (DIPL-231, DIPL-232, F-165)
+
+Given("a realm whose side has a strength of {int}", (s, side: number) => {
+  s.fearSide = side;
+});
+Given("a neighbour, neither ally, overlord nor subject, with a strength of {int}", (s, n: number) => {
+  s.fearNeighbour = n;
+});
+When("the realm measures its neighbours", (s) => {
+  if (s.fearNeighbour !== undefined) s.fear = D.fearOf((s.fearNeighbour as number) / (s.fearSide as number));
+  if (s.fearFriends) s.fearSide = D.ownSide(s.fearOwn as number, s.fearFriends as number[]);
+});
+Then("it is {word} of that neighbour", (s, fear: string) => {
+  expect(s.fear).toBe(fear);
+});
+Given("a realm with a strength of {int} and allies with strengths of {int} and {int}", (s, own: number, a: number, b: number) => {
+  s.fearOwn = own;
+  s.fearFriends = [a, b];
+});
+Then("its side counts {int}", (s, side: number) => {
+  expect(s.fearSide).toBe(side);
+});
+Given("an AI realm at peace with a troop cap of {int} and {int} gold a month before army pay", (s, cap: number, income: number) => {
+  s.standing = { cap, income, largestNeighbour: 0, levyPer1000: 1, fear: "calm" };
+});
+Given("the largest force under arms of a neighbour that is not its friend is {int} men", (s, men: number) => {
+  (s.standing as D.StandingInput).largestNeighbour = men;
+});
+Given("a levy's pay is {int} gold a month per 1000 men", (s, gold: number) => {
+  (s.standing as D.StandingInput).levyPer1000 = gold;
+});
+Given("the realm is {word}", (s, fear: string) => {
+  (s.standing as D.StandingInput).fear = fear as D.FearWord;
+});
+When("it sizes its standing army", (s) => {
+  s.target = D.standingTarget(s.standing as D.StandingInput);
+});
+Then("it keeps {int} men under arms", (s, men: number) => {
+  expect(s.target).toBeCloseTo(men);
+});

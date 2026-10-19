@@ -414,7 +414,7 @@ export function answerAsk(world: World, n: number, id: string, yes: boolean, new
 
 /** Realms next to each realm, from the map; worked out again when owners change. */
 const neighbourCache = new WeakMap<World, { key: string; table: Set<number>[] }>();
-function neighbourRealms(world: World): Set<number>[] {
+export function neighbourRealms(world: World): Set<number>[] {
   let owned = 0;
   for (let p = 0; p < world.provinceCount; p++) owned = (owned * 31 + world.provinceOwner[p]! + 2) | 0;
   const key = String(owned);
@@ -517,6 +517,8 @@ export function standingOf(world: World, holder: number, other: number): { stand
 
 /** What the Diplomacy tab shows of statecraft for the player (DIPL-197 to DIPL-202). */
 export interface StatecraftView {
+  /** The player's realm. */
+  me: number;
   seats: number;
   free: number;
   /** Gold a gift costs. */
@@ -527,9 +529,10 @@ export interface StatecraftView {
   letters: { from: number; action: string; answer: "yes" | "no" | "done"; text: string; reasons: { name: string; number: number }[]; total?: number; month: string }[];
   /**
    * For every other realm: what it thinks of the player, the ledger behind it, why each mission can't be sent now
-   * (null when it can) and, for one the reasons decide that can be sent, how likely a yes is (DIPL-229), in ENVOY_ACTIONS order.
+   * (null when it can) and, for one the reasons decide that can be sent, how likely a yes is (DIPL-229), in ENVOY_ACTIONS order;
+   * and whom it fears (DIPL-235).
    */
-  realms: Record<number, { standing: number; word: string; lines: StandingLine[]; why: (string | null)[]; hints: (dip.AskHint | null)[]; married: boolean; demands: DemandView; notoriety: number; price: PriceOfWar | null }>;
+  realms: Record<number, { standing: number; word: string; lines: StandingLine[]; why: (string | null)[]; hints: (dip.AskHint | null)[]; married: boolean; demands: DemandView; notoriety: number; price: PriceOfWar | null; fears: FearView[] }>;
   /** The player's own name abroad: notoriety, Lands taken against the league threshold and the leagues against them (DIPL-225). */
   nameAbroad: NameAbroadView;
   /** The player's subjects and its own overlord (SUBJ-091, SUBJ-102). */
@@ -540,6 +543,21 @@ export interface StatecraftView {
   courting: CourtingView | null;
   /** Envoys waiting at the player's court for an answer, oldest first (DIPL-211): what they ask, and the month it stands until. */
   asks: AskView[];
+}
+
+/** A neighbour a realm is Wary or Threatened of this month (DIPL-231, DIPL-235): who, how much, and its strength over the realm's side's. */
+export interface FearView {
+  nation: number;
+  level: "wary" | "threatened";
+  ratio: number;
+}
+
+/** The neighbours a realm fears this month, most feared first. */
+export function fearsOf(world: World, n: number): FearView[] {
+  return (dip.country(world.diplomacy, world.nationIds[n]!).fears ?? []).flatMap((f) => {
+    const x = world.nationIndex.get(f.of);
+    return x === undefined || world.nationGone[x] ? [] : [{ nation: x, level: f.level, ratio: f.ratio }];
+  });
 }
 
 /** An ask waiting on the player: the asker, the mission, a demand's kind and province, and the last month to answer. */
@@ -599,6 +617,7 @@ export function statecraftView(world: World, player: number): StatecraftView | n
       demands,
       notoriety: dip.notoriety(d, world.nationIds[n]!),
       price: mayPrice(world, player, n, ctx.counts) ? priceOfWar(world, player, n, ctx) : null,
+      fears: fearsOf(world, n),
     };
   }
   const subjects = subjectsView(world, player, (n) => world.nationLedger[n * LEDGER_LINES + LEDGER.indexOf("tribute")]!);
@@ -615,7 +634,7 @@ export function statecraftView(world: World, player: number): StatecraftView | n
         until: p.until,
       };
     });
-  return { seats, free, giftGold: giftGold(world), envoys, letters, realms, subjects, house: houseView(world, player), courting: courtingView(world, player), asks, nameAbroad: nameAbroadView(world, player) };
+  return { me: player, seats, free, giftGold: giftGold(world), envoys, letters, realms, subjects, house: houseView(world, player), courting: courtingView(world, player), asks, nameAbroad: nameAbroadView(world, player) };
 }
 
 /** A realm the player could declare war on: no war, alliance or subject tie between them (a truce may be broken). */

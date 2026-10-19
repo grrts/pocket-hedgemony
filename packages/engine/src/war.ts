@@ -15,7 +15,8 @@ import { halt, marchTo, routeBars } from "./turn.ts";
 import { marchMap, NO_PATH, type World } from "./world.ts";
 import { battleWon } from "./campaignEnd.ts";
 import { retinueScatters, retinuesWon } from "./retinues.ts";
-import { aiRecruits, ARMS, canCall, commanderBattle, KIND, KIND_NAMES, menByArm, sendHome } from "./recruit.ts";
+import { aiRecruits } from "./arms.ts";
+import { ARMS, canCall, commanderBattle, KIND, KIND_NAMES, menByArm, sendHome } from "./recruit.ts";
 import { withoutOf } from "./research.ts";
 import { officialBonus, provinceTaken } from "./officials.ts";
 import { noteBattle, notePeace, noteSiege } from "./achievements.ts";
@@ -411,8 +412,22 @@ export function engage(world: World, news: News[]): void {
   const cols = Math.ceil(W / CELL);
   const cells = new Map<number, number[]>();
   const cellOf = (t: number) => Math.floor((t % W) / CELL) + Math.floor(t / W / CELL) * cols;
+  // Armies at war in each province: only armies in the same province meet, so one alone there looks no further.
+  const inProvince = new Map<number, number>();
+  // Garrisons of realms at war by province, for joinGarrisons.
+  const garrisons = new Map<number, number[]>();
+  // The armies of realms at war, the only ones that can meet.
+  const atWar: number[] = [];
   for (let i = 0; i < a.count; i++) {
-    if (!a.alive[i] || a.retreating[i] || !enemies[a.owner[i]!]!.size) continue;
+    if (!a.alive[i] || !enemies[a.owner[i]!]?.size) continue;
+    if (a.commander[i]! < 0) {
+      const g = garrisons.get(a.location[i]!);
+      if (g) g.push(i);
+      else garrisons.set(a.location[i]!, [i]);
+    }
+    if (a.retreating[i]) continue;
+    atWar.push(i);
+    inProvince.set(a.location[i]!, (inProvince.get(a.location[i]!) ?? 0) + 1);
     const k = cellOf(a.tile[i]!);
     const list = cells.get(k);
     if (list) list.push(i);
@@ -437,12 +452,12 @@ export function engage(world: World, news: News[]): void {
       if (foeOfAtt === foeOfDef || a.commander[j]! < 0 || a.location[j] !== b.province || tileDistance(world, a.tile[j]!, b.tile) > engageRange(world, j)) return;
       joinBattle(world, b, j, foeOfAtt ? "defenders" : "attackers");
     });
-    joinGarrisons(world, b, enemies);
+    joinGarrisons(world, b, enemies, garrisons);
   }
-  for (let i = 0; i < a.count; i++) {
+  for (const i of atWar) {
     if (!a.alive[i] || a.battle[i]! >= 0 || a.retreating[i] || a.commander[i]! < 0) continue;
     const n = a.owner[i]!;
-    if (!enemies[n]!.size) continue;
+    if ((inProvince.get(a.location[i]!) ?? 0) < 2) continue;
     const range = engageRange(world, i);
     let foe = -1;
     let best = Infinity;
@@ -452,15 +467,15 @@ export function engage(world: World, news: News[]): void {
       const d = tileDistance(world, a.tile[i]!, a.tile[j]!);
       if (d <= range && d < best) ((best = d), (foe = j));
     });
-    if (foe >= 0) joinGarrisons(world, startBattle(world, [i], [foe], news), enemies);
+    if (foe >= 0) joinGarrisons(world, startBattle(world, [i], [foe], news), enemies, garrisons);
   }
 }
 
 /** Garrison troops fight in any battle in their own province, wherever in it they stand (RECR-107). */
-function joinGarrisons(world: World, b: Battle, enemies: Set<number>[]): void {
+function joinGarrisons(world: World, b: Battle, enemies: Set<number>[], garrisons: Map<number, number[]>): void {
   const a = world.armies;
   const sideOwners = [b.attackers.map((s) => a.owner[s]!), b.defenders.map((s) => a.owner[s]!)];
-  for (let j = 0; j < a.count; j++) {
+  for (const j of garrisons.get(b.province) ?? []) {
     if (!a.alive[j] || a.commander[j]! >= 0 || a.battle[j]! >= 0 || a.location[j] !== b.province || !enemies[a.owner[j]!]!.size) continue;
     const n = a.owner[j]!;
     const foeOfAtt = sideOwners[0]!.some((o) => enemies[n]!.has(o));
@@ -708,8 +723,9 @@ export function runOccupation(world: World, newMonth: boolean, news: News[]): vo
   const enemies = enemyTable(world);
   const present = new Map<number, number[]>();
   for (let i = 0; i < a.count; i++) {
-    // Armies marching through or fighting a battle don't hold the land.
-    if (!a.alive[i] || a.battle[i]! >= 0 || a.retreating[i] || a.pathAt[i]! < a.path[i]!.length) continue;
+    // Armies marching through or fighting a battle don't hold the land. A realm at war with no one neither takes nor
+    // defends land against anyone (its own land's attacker is its enemy), so its standing armies are passed over.
+    if (!a.alive[i] || a.battle[i]! >= 0 || a.retreating[i] || a.pathAt[i]! < a.path[i]!.length || !enemies[a.owner[i]!]?.size) continue;
     const list = present.get(a.location[i]!) ?? [];
     list.push(i);
     present.set(a.location[i]!, list);
@@ -1243,7 +1259,7 @@ function demandFirst(world: World, n: number, t: number): boolean {
   return false;
 }
 
-/** AI realms at war raise levies they can pay for; at peace they send levies home before their pay begins. */
+/** AI realms keep their standing armies at peace and call men across the realm at war (DIPL-232, DIPL-233). */
 export function aiRaise(world: World, news: News[]): void {
   aiRecruits(world, news, (n) => !!dip.warOf(world.diplomacy, world.nationIds[n]!));
 }
