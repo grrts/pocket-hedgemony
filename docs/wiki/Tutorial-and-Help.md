@@ -134,9 +134,27 @@ The list folds into a single icon with a count and never covers the map. Each go
 
 ### First-campaign hints
 
-In your first campaign a small parchment note along the bottom of the screen says what to tap next, and a brass ring pulses around the button or card it means. There are six, one at a time: choose a realm, move an army (Commanders, a commander, then the land to march to), end the turn, recruit (a province's Garrison tab, then Recruit), build (the Build tab, then Build) and send an envoy (a neighbour's Diplomacy tab, then a mission). Doing the thing ticks its hint off, in any order, and the next one appears; an order the game refuses ticks nothing. When what to tap is not on screen, Show me opens the card that holds it. The × dismisses one hint, and Stop hints turns them all off.
+Until the Murad's Frontier chapters are playable, the first-campaign hints are the tutorial you meet. In your first campaign a small parchment note says what to tap next, and a brass ring pulses around the exact button, card or spot on the map it means, one tap at a time. There are thirteen, one after another, and together they walk you through the main systems:
 
-The note sits between the overview button and End turn and moves under the top bar when what it points at is low, so it never covers it; the ring takes no taps, so the button under it works as ever. The counter ("3 / 6") shows how far you are. Hints wait while an event card or the game menu is open, or a week plays. Which hints are done stays with you, not with the save: a second campaign picks up where the first left off, and once all six are done they never come back. In Settings (the cog in the side tools, or the game menu), Gameplay holds the Tutorial hints switch with "n of 6 done" and "Reset tutorial and hints", which brings all six back.
+| # | Hint | What you tap |
+|---|---|---|
+| 1 | Choose a realm | The Ottomans under Murad I (the tutorial's realm), or any realm you like |
+| 2 | Open a province's card | Your capital on the map, then its name at the bottom left |
+| 3 | Open your realm's book | Your banner in the top bar |
+| 4 | Change the map mode | Map mode, then Wealth |
+| 5 | Move an army | Commanders, a commander, then a province next to the army |
+| 6 | End the turn | End turn |
+| 7 | Read the news | The scroll in the top bar |
+| 8 | Choose a study | Your banner, Research, Can study, then Study now |
+| 9 | Recruit | Your capital's card, the Garrison tab, then Recruit |
+| 10 | Build | The Build tab, then Build |
+| 11 | Meet your lords | Your banner, Lands, then your lords' page |
+| 12 | See your gold | The gold in the top bar |
+| 13 | Send an envoy | A neighbour's land on the map, its card, its realm, the Diplomacy tab, then a mission |
+
+Doing the thing ticks its hint off, in any order, and the next one appears; an order the game refuses ticks nothing, and a hint you have already done (a study already chosen) is skipped. When what to tap is not on screen, Show me opens the card that holds it or turns the map to it. The × dismisses one hint, and Stop hints turns them all off.
+
+The note sits between the overview button and End turn. When that would cover the ring or an open card, it moves beside the card, or under the top bar, so it never covers what it points at; a button half hidden at the bottom of a card is scrolled into view first. The ring takes no taps, so the button under it works as ever. The counter ("3 / 13") shows how far you are. Hints wait while an event card, the game menu or the loading screen is up, or a week plays. Which hints are done stays with you, not with the save: a second campaign picks up where the first left off, and once all thirteen are done they never come back. In Settings (the cog in the side tools, or the game menu), Gameplay holds the Tutorial hints switch with "n of 13 done" and "Reset tutorial and hints", which brings them all back. Tutorial on the start screen does the same and starts you at the realm list.
 
 ### Needs attention
 

@@ -26,7 +26,7 @@ import { hiredFleetOrder, monthlyHiredFleets, type HireOrder } from "./hiredFlee
 import { dailyExploration, exploreOrder, monthlyColonies, stepVoyages, type ExploreOrder } from "./colonies.ts";
 import { monthlyPeoples, setFaithPolicy, setTonguePolicy } from "./peoples.ts";
 import { claimCaliphate, faithHeadsWars, monthlyFaithHeads, raiseOwnPatriarch, sendConclaveGold } from "./faithHeads.ts";
-import { hireOfficial, settleLand, swapOfficials } from "./officials.ts";
+import { dismissOfficial, fillAllPosts, hireOfficial, monthlyPosts, setAutoFill, settleLand, swapOfficials } from "./officials.ts";
 import { giveGift, grantFief, inAnyWar, lordGetsBuilding, monthlyLords, seizeFief } from "./lords.ts";
 import { clockStopped, dailyEndCheck, keepPlaying, playOn, weeklyEndCheck, yearlyScores } from "./campaignEnd.ts";
 import { noteMoment, turnEndAchievements } from "./achievements.ts";
@@ -128,6 +128,11 @@ export type Order =
   | { type: "hireOfficial"; province: number; official: number; foreign: boolean }
   /** Keep a province just taken as royal land with its post empty for now (SettleLand, PROV-340). */
   | { type: "settleLand"; province: number }
+  /** Dismiss a royal post's official, or replace him with a hire of another type (PROV-345). */
+  | { type: "dismissOfficial"; province: number; hire?: { official: number; foreign: boolean } }
+  /** Auto-fill posts on or off (PROV-342); fill every empty post now (PROV-348). */
+  | { type: "autoFillPosts"; on: boolean }
+  | { type: "fillPosts" }
   /** Research: choose the invention to study, how many students to keep, empty the schools into recruits, found a school in a town. */
   | { type: "setStudy"; invention: string }
   /** The study queue (RSCH-108 to RSCH-110): add one, queue the path to one, take one out, move one a place earlier (-1) or later (1). */
@@ -283,6 +288,8 @@ function startDay(world: World, news: News[]): void {
     monthlyResearch(world, news);
     monthlyTrade(world, news);
     runLedger(world, true);
+    // With the month's gold in, realms fill their empty posts (PROV-342).
+    monthlyPosts(world, news);
     monthlyNavy(world, news);
     monthlyHiredFleets(world, news);
     monthlyColonies(world, news);
@@ -411,6 +418,18 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
     }
     case "settleLand":
       return settleLand(world, actingNation, order.province);
+    case "dismissOfficial": {
+      const reason = dismissOfficial(world, actingNation, order.province, order.hire ? { type: order.hire.official, foreign: !!order.hire.foreign } : null, news);
+      if (!reason) runLedger(world, false);
+      return reason;
+    }
+    case "autoFillPosts":
+      return setAutoFill(world, actingNation, !!order.on);
+    case "fillPosts": {
+      const reason = fillAllPosts(world, actingNation, news);
+      if (!reason) runLedger(world, false);
+      return reason;
+    }
     case "hireOfficial": {
       const reason = hireOfficial(world, actingNation, order.province, order.official, !!order.foreign, news);
       if (!reason) runLedger(world, false);

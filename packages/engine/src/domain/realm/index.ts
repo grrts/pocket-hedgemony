@@ -1,5 +1,5 @@
 import config from "../../../../rules/data/domain/realm.json" with { type: "json" };
-import { effectsOf, eraCost, invention, tree } from "../research/index.ts";
+import { effectsOf, eraCost, tree } from "../research/index.ts";
 import type { Rng } from "../../rng.ts";
 
 const effects = (id: string) => tree().inventions.get(id)?.effects;
@@ -872,13 +872,12 @@ export function economyScore(income: number, gold: number, debtOwed: number): { 
 
 /** Technology: inventions known, each weighted by its era cost (REALM-153). */
 export function technologyScore(known: Iterable<string>): number {
+  const inventions = tree().inventions;
   let n = 0;
   for (const id of known) {
-    try {
-      n += eraCost(invention(id).era);
-    } catch {
-      // the root and the boughs are not inventions of an era
-    }
+    // The root and the boughs are not inventions of an era.
+    const inv = inventions.get(id);
+    if (inv) n += eraCost(inv.era);
   }
   return n;
 }

@@ -113,6 +113,7 @@ export function worldChunks(world: World, game: SavedGame): RawChunk[] {
         maxLevies: world.nationMaxLevies,
         monthlyIncome: world.nationMonthlyIncome,
         taxDefault: world.nationTaxDefault,
+        manualPosts: world.nationManualPosts,
         debt: world.nationDebt,
         loanMonth: world.nationLoanMonth,
         ledger: world.nationLedger,
@@ -333,6 +334,7 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
     if (nat.maxLevies) world.nationMaxLevies[n] = nat.maxLevies[old]!;
     if (nat.monthlyIncome) world.nationMonthlyIncome[n] = nat.monthlyIncome[old]!;
     if (nat.taxDefault) world.nationTaxDefault[n] = nat.taxDefault[old]!;
+    if (nat.manualPosts) world.nationManualPosts[n] = nat.manualPosts[old]!;
     if (nat.debt) world.nationDebt[n] = nat.debt[old]!;
     if (nat.loanMonth) world.nationLoanMonth[n] = nat.loanMonth[old]!;
     // Saves from before a ledger line was added hold fewer lines a realm; the ledger is worked out again each week.

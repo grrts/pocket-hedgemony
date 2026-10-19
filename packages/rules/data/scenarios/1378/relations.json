@@ -9157,6 +9157,17 @@
    ]
   },
   {
+   "id": "f_ajuran__mogadishu__trade_agreement",
+   "fact": "trade_agreement",
+   "source": "ajuran",
+   "target": "mogadishu",
+   "direction": "mutual",
+   "start_date": null,
+   "explanation": "Shabelle produce reaches the port, if the Ajuran exist in 1378; not vassalage.",
+   "confidence": "low",
+   "source_ids": []
+  },
+  {
    "id": "f_hafsid__genoa__trade_agreement",
    "fact": "trade_agreement",
    "source": "hafsid",

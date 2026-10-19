@@ -218,7 +218,8 @@
       "colonial governor": {}
     },
     "school_trains": { "madrasa": ["judge", "chaplain"], "university": ["judge", "steward"], "academy": ["master of works", "warden"] },
-    "hire": { "gold": 25, "foreign_multiplier": 2, "provisional": true }
+    "hire": { "gold": 25, "foreign_multiplier": 2, "provisional": true },
+    "auto_fill": { "$comment": "PROV-342, PROV-343: gold auto-fill keeps back, and months of food under which a steward fits best.", "reserve_gold": 20, "hungry_months": 1, "traders_passing": 3, "provisional": true }
   },
   "loyalty": ["In revolt", "Disloyal", "Wavering", "Loyal"],
   "homeland": { "years": 100 },
