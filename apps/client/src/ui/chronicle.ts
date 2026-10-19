@@ -3,9 +3,9 @@ import type { ChronicleRow, ChronicleView, GoalView } from "@ph/engine";
 import { fold } from "./fold.ts";
 
 /**
- * The Chronicle (EVT-097): the News's History tab, with the turning points
+ * The Chronicle (EVT-112): the News's History tab, with the turning points
  * ahead and whether each is on course, bent or gone, and those that happened;
- * and every realm's aims (EVT-098), on another realm's card and as hints for
+ * and every realm's aims (EVT-113), on another realm's card and as hints for
  * the player's own realm at the foot of the History tab.
  */
 
@@ -44,7 +44,7 @@ function rowHtml(r: ChronicleRow, ui: ChronicleUi, defs: readonly GoalDef[]): st
   return fold(`chron:${r.key}`, title, `${summary} · ${r.heading.length} heading there`, body).replace('class="inst-fold"', `class="inst-fold chron-row ${r.state}"`);
 }
 
-/** The History tab of the News (EVT-097). */
+/** The History tab of the News (EVT-112). */
 export function chronicleHtml(view: ChronicleView, goals: readonly GoalView[], ui: ChronicleUi, defs: readonly GoalDef[] = startGoals): string {
   const c = view.counts;
   const mine = goals.filter((g) => g.realm === ui.me && goalOf(g.goal, defs));
@@ -70,7 +70,7 @@ function aimsList(goals: readonly GoalView[], ui: ChronicleUi, defs: readonly Go
     .join("")}</ul>`;
 }
 
-/** The Aims fold on another realm's General tab (EVT-098); nothing when it has no live goal. */
+/** The Aims fold on another realm's General tab (EVT-113); nothing when it has no live goal. */
 export function aimsFoldHtml(realm: number, goals: readonly GoalView[], ui: ChronicleUi, defs: readonly GoalDef[] = startGoals): string {
   const its = goals.filter((g) => g.realm === realm && goalOf(g.goal, defs));
   if (!its.length) return "";

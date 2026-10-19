@@ -324,19 +324,19 @@ export interface LivingDefines {
   lordGiftGold: number;
 }
 
-/** A place a goal names: a point bound to the nearest land province (EVT-085). */
+/** A place a goal names: a point bound to the nearest land province (EVT-100). */
 export interface GoalPlace {
   name: string;
   at: [number, number];
 }
 
-/** What the game reads from a historical goal (EVT-085); none when the map can't express it. */
+/** What the game reads from a historical goal (EVT-100); none when the map can't express it. */
 export type GoalAim =
   | { kind: "take"; places: GoalPlace[]; target?: string }
   | { kind: "hold"; places: GoalPlace[]; target?: string }
   | { kind: "subject" | "ally" | "fight" | "free"; target: string };
 
-/** A realm's historical goal with its reason (EVT-085, plan-1378 §2). */
+/** A realm's historical goal with its reason (EVT-100, plan-1378 §2). */
 export interface GoalDef {
   realm: string;
   goal: string;

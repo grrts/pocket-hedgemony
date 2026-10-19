@@ -298,7 +298,7 @@ function startDay(world: World, news: News[]): void {
     monthlyConquest(world, news);
     // Institutions read standing and forms and add war aims, so they come after diplomacy and before the wars (INST §9).
     monthlyInstitutions(world, news);
-    // Goals end with their reasons and pull their realms before the AI looks for wars (EVT-088 to EVT-090).
+    // Goals end with their reasons and pull their realms before the AI looks for wars (EVT-103 to EVT-105).
     monthlyGoals(world);
     aiDeclarations(world, news);
     // A war just declared may be censured, or call a patron to a holy place (RELG-147, RELG-149).

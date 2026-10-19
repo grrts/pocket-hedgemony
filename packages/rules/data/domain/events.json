@@ -1209,7 +1209,7 @@
   "humanist_learning": "L6"
  },
  "goals": {
-  "$comment": "Realms' historical goals (EVT-085 to EVT-093). Provisional (plan-1378 §2).",
+  "$comment": "Realms' historical goals (EVT-100 to EVT-108). Provisional (plan-1378 §2).",
   "weights": {
    "weak": 0.5,
    "normal": 1,
@@ -1234,7 +1234,7 @@
   "envoy_points_per_pull": 10
  },
  "chronicle": {
-  "$comment": "The Chronicle card (EVT-094 to EVT-096). Provisional.",
+  "$comment": "The Chronicle card (EVT-109 to EVT-111). Provisional.",
   "on_course_years": 10,
   "horizon_years": 25
  }

@@ -7,7 +7,7 @@ import { Rng } from "./rng.ts";
 import type { World } from "./world.ts";
 
 /**
- * Realms' historical goals (EVT-085 to EVT-093, plan-1378 §2). History is a
+ * Realms' historical goals (EVT-100 to EVT-108, plan-1378 §2). History is a
  * reference, not a script: each realm pursues the goals it really had, for the
  * reasons it had them, and a goal ends when its reason does. The seed shakes
  * every realm's goals at the start; the AI weighs what is left like any other
@@ -28,7 +28,7 @@ export interface Goal {
   /** The provinces the aim's places are bound to. */
   places: number[];
   target: number;
-  /** Weight word × the seed's shake × the preset (EVT-086). */
+  /** Weight word × the seed's shake × the preset (EVT-101). */
   weight: number;
   shaken: "kept" | "swapped" | "dropped";
   end: { why: GoalEnd; year: number } | null;
@@ -37,7 +37,7 @@ export interface Goal {
 export interface GoalState {
   defs: readonly GoalDef[];
   list: Goal[];
-  /** Each realm's pull toward other realms this month (EVT-089), AI realms only. */
+  /** Each realm's pull toward other realms this month (EVT-104), AI realms only. */
   pulls: Map<number, number>[];
 }
 
@@ -75,7 +75,7 @@ function bind(world: World, aim: GoalAim | null | undefined): { places: number[]
   return { places: [], target: realmOf(world, aim.target) ?? -1 };
 }
 
-/** The scenario's goals, shaken by the campaign's seed (EVT-086). */
+/** The scenario's goals, shaken by the campaign's seed (EVT-101). */
 export function createGoals(world: World, defs: readonly GoalDef[] = startGoals, mode: Mode = modeOf(world)): GoalState {
   const rng = new Rng(world.weatherSeed ^ 0x60a15);
   const share = G.deviate_share[mode];
@@ -98,7 +98,7 @@ function modeOf(world: World): Mode {
 
 const yearNow = (world: World) => world.date.year + (world.date.month - 1) / 12;
 
-/** A goal's time factor (EVT-087): 1 inside its window, rising before it and fading after it. */
+/** A goal's time factor (EVT-102): 1 inside its window, rising before it and fading after it. */
 export function timeFactor(def: GoalDef, year: number): number {
   const [from, to] = def.window;
   if (year < from) return Math.max(0, 1 - (from - year) / G.lead_years);
@@ -108,7 +108,7 @@ export function timeFactor(def: GoalDef, year: number): number {
 
 const exists = (world: World, n: number) => n >= 0 && !world.nationGone[n] && !world.nationAsleep[n];
 
-/** Why a live goal ends now, if it does (EVT-088). */
+/** Why a live goal ends now, if it does (EVT-103). */
 function endOf(world: World, g: Goal, year: number): GoalEnd | null {
   // A sleeper counts as gone to every system, but its goals wait for it to wake.
   if (world.nationAsleep[g.realm]) return null;
@@ -136,13 +136,13 @@ function endOf(world: World, g: Goal, year: number): GoalEnd | null {
 /** A goal not ended and not dropped by the seed's shake. */
 export const isLive = (g: Goal): boolean => !g.end && g.shaken !== "dropped";
 
-/** A live goal's pull now (EVT-087). */
+/** A live goal's pull now (EVT-102). */
 export function pullOf(world: World, g: Goal): number {
   if (!isLive(g) || !exists(world, g.realm)) return 0;
   return g.weight * timeFactor(world.goals!.defs[g.def]!, yearNow(world));
 }
 
-/** Each month: goals whose reason ended end, and every AI realm's pull toward others is counted again (EVT-088, EVT-089). */
+/** Each month: goals whose reason ended end, and every AI realm's pull toward others is counted again (EVT-103, EVT-104). */
 export function monthlyGoals(world: World, endGoals = true): void {
   const s = world.goals;
   if (!s) return;
@@ -155,7 +155,7 @@ export function monthlyGoals(world: World, endGoals = true): void {
       g.end = { why, year: world.date.year };
       continue;
     }
-    // The player's realm is never steered (EVT-092).
+    // The player's realm is never steered (EVT-107).
     if (g.realm === world.player || !g.aim) continue;
     const pull = pullOf(world, g);
     if (pull <= 0) continue;
@@ -169,12 +169,12 @@ export function monthlyGoals(world: World, endGoals = true): void {
   }
 }
 
-/** Realm n's pull toward each other realm this month (EVT-089). */
+/** Realm n's pull toward each other realm this month (EVT-104). */
 export function goalPulls(world: World, n: number): ReadonlyMap<number, number> | undefined {
   return world.goals?.pulls[n];
 }
 
-/** Provinces t holds that n's live take goals name, strongest goal first (EVT-090). */
+/** Provinces t holds that n's live take goals name, strongest goal first (EVT-105). */
 export function goalPlacesHeldBy(world: World, n: number, t: number): number[] {
   const s = world.goals;
   if (!s || n === world.player) return [];
@@ -184,7 +184,7 @@ export function goalPlacesHeldBy(world: World, n: number, t: number): number[] {
     .flatMap((g) => g.places.filter((p) => world.provinceOwner[p] === t));
 }
 
-/** The envoys n's live ally and subject goals call for, with each goal's pull (EVT-091). */
+/** The envoys n's live ally and subject goals call for, with each goal's pull (EVT-106). */
 export function goalAsks(world: World, n: number): { target: number; actions: string[]; pull: number }[] {
   const s = world.goals;
   if (!s || n === world.player) return [];
@@ -195,7 +195,7 @@ export function goalAsks(world: World, n: number): { target: number; actions: st
   });
 }
 
-/** What a save keeps of each goal (EVT-093). */
+/** What a save keeps of each goal (EVT-108). */
 export function saveGoals(world: World): { def: number; weight: number; shaken: Goal["shaken"]; end: Goal["end"] }[] | undefined {
   return world.goals?.list.map((g) => ({ def: g.def, weight: g.weight, shaken: g.shaken, end: g.end }));
 }

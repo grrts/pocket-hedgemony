@@ -1,4 +1,4 @@
 {
-  "$comment": "Realms' historical goals on the start day (EVT-085). The 1444 start has none: goals come with the 1378 scenario, whose regions write them in regions/<key>/goals.json.",
+  "$comment": "Realms' historical goals on the start day (EVT-100). The 1444 start has none: goals come with the 1378 scenario, whose regions write them in regions/<key>/goals.json.",
   "goals": []
 }

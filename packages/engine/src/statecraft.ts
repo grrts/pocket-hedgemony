@@ -412,7 +412,7 @@ function aiEnvoys(world: World): void {
       const w = dip.standing(d, world.nationIds[x]!, id);
       if (w > warmest) [t, warmest] = [x, w];
     }
-    // Besides the warmest neighbour, the realms its ally and subject goals name (EVT-091).
+    // Besides the warmest neighbour, the realms its ally and subject goals name (EVT-106).
     const asks = goalAsks(world, n);
     if (t < 0 && !asks.length) continue;
     const days = countDays(world);

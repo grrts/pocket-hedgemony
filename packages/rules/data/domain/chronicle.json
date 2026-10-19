@@ -1,5 +1,5 @@
 {
- "$comment": "The turning points of the history checkpoints (packages/sim/data/checkpoints, since_previous.events), for the Chronicle (EVT-094). `event` is the tree event when its id is not the key. Regenerate from the checkpoints: packages/sim/test/history.test.ts checks they agree.",
+ "$comment": "The turning points of the history checkpoints (packages/sim/data/checkpoints, since_previous.events), for the Chronicle (EVT-109). `event` is the tree event when its id is not the key. Regenerate from the checkpoints: packages/sim/test/history.test.ts checks they agree.",
  "turning_points": [
   {
    "key": "peace_of_almazan",

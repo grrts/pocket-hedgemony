@@ -281,7 +281,7 @@ export interface Snapshot {
   peoples: PeoplesSnapshot;
   /** Win scores, ranks, the player's breakdown and ledger, and how the campaign ended. */
   campaign: CampaignView;
-  /** The Chronicle and every realm's live historical goals (EVT-094 to EVT-098). */
+  /** The Chronicle and every realm's live historical goals (EVT-109 to EVT-113). */
   history: { chronicle: ChronicleView; goals: GoalView[] };
   /** Heads of the faith: seats, each realm's Faith-line badge, the player's Head of the faith card and the censure a war would bring (RELG-135 to RELG-138). */
   faithHeads: FaithHeadsView;
@@ -688,7 +688,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
           setPlayer(world, idx);
           // A nearer end date (YYYY-MM-DD), for trying the end card (SHELL-164).
           if (req.endDate && /^\d{4}-\d\d-\d\d$/.test(req.endDate)) world.campaign.endDate = req.endDate;
-          // Goals of the caller's own, for trying the Chronicle and the Aims fold (EVT-097, EVT-098).
+          // Goals of the caller's own, for trying the Chronicle and the Aims fold (EVT-112, EVT-113).
           if (req.goals) {
             world.goals = createGoals(world, req.goals);
             monthlyGoals(world, false);

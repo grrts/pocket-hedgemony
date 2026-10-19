@@ -34,7 +34,7 @@ function withGoals(defs: GoalDef[], mode?: "historical" | "plausible" | "diverge
   return w;
 }
 
-describe("historical goals (EVT-085 to EVT-093)", () => {
+describe("historical goals (EVT-100 to EVT-108)", () => {
   it("binds a place to the land province nearest it", () => {
     const w = createWorld(rules, 1, tiles);
     expect(w.provinceOwner[nearestLand(w, CONSTANTINOPLE)]).toBe(nation(w, "byzantium"));
@@ -50,7 +50,7 @@ describe("historical goals (EVT-085 to EVT-093)", () => {
     expect(goalPulls(g, nation(g, "ottomans"))?.get(nation(g, "mamluks"))).toBeCloseTo(2);
   });
 
-  it("pulls its realm toward the holder of its places while its time is near (EVT-087, EVT-089)", () => {
+  it("pulls its realm toward the holder of its places while its time is near (EVT-102, EVT-104)", () => {
     const w = withGoals([goal({})]);
     expect(goalPulls(w, nation(w, "ottomans"))?.get(nation(w, "byzantium"))).toBeCloseTo(2);
     expect(goalPlacesHeldBy(w, nation(w, "ottomans"), nation(w, "byzantium"))).toEqual([nearestLand(w, CONSTANTINOPLE)]);
@@ -63,7 +63,7 @@ describe("historical goals (EVT-085 to EVT-093)", () => {
     expect(timeFactor(goal({ window: [1378, null] }), 1600)).toBe(1);
   });
 
-  it("ends a goal when its reason ends (EVT-088)", () => {
+  it("ends a goal when its reason ends (EVT-103)", () => {
     const w = withGoals([goal({}), goal({ realm: "byzantium", goal: "Hold the city", aim: { kind: "hold", places: [{ name: "Constantinople", at: CONSTANTINOPLE }] } }), goal({ realm: "castile", goal: "Ally Portugal", aim: { kind: "ally", target: "portugal" } })]);
     const city = nearestLand(w, CONSTANTINOPLE);
     w.provinceOwner[city] = nation(w, "ottomans");
@@ -79,7 +79,7 @@ describe("historical goals (EVT-085 to EVT-093)", () => {
     expect(w.goals!.list[0]!.end?.why).toBe("lapsed");
   });
 
-  it("shakes the goals by the seed and the preset: Free goes its own way more than Historical (EVT-086)", () => {
+  it("shakes the goals by the seed and the preset: Free goes its own way more than Historical (EVT-101)", () => {
     const defs = Array.from({ length: 400 }, (_, k) => goal({ goal: `Goal ${k}`, alternative: k % 2 ? { kind: "fight", target: "byzantium" } : null }));
     const moved = (mode: "historical" | "divergent") => withGoals(defs, mode).goals!.list.filter((g) => g.shaken !== "kept").length;
     expect(moved("historical")).toBeLessThan(80);
@@ -90,7 +90,7 @@ describe("historical goals (EVT-085 to EVT-093)", () => {
     expect(saveGoals(withGoals(defs, "historical"))).toEqual(saveGoals(w));
   });
 
-  it("never steers the player's realm (EVT-092)", () => {
+  it("never steers the player's realm (EVT-107)", () => {
     const w = createWorld(rules, 1, tiles);
     w.player = nation(w, "ottomans");
     w.goals = createGoals(w, [goal({})]);
@@ -99,19 +99,19 @@ describe("historical goals (EVT-085 to EVT-093)", () => {
     expect(goalPlacesHeldBy(w, w.player, nation(w, "byzantium"))).toEqual([]);
   });
 
-  it("never lets a goal past the price of war: a weak realm does not march (EVT-090)", () => {
+  it("never lets a goal past the price of war: a weak realm does not march (EVT-105)", () => {
     const w = withGoals([goal({ realm: "byzantium", goal: "Beat the Ottomans", aim: { kind: "fight", target: "ottomans" } })]);
     w.rules.defines.war.aiDeclareChancePerMonth = 1;
     for (let k = 0; k < 20; k++) aiDeclarations(w, []);
     expect(relationState(w, nation(w, "byzantium"), nation(w, "ottomans")).state).not.toBe("war");
   });
 
-  it("asks for envoys toward the realms its ally and subject goals name (EVT-091)", () => {
+  it("asks for envoys toward the realms its ally and subject goals name (EVT-106)", () => {
     const w = withGoals([goal({ realm: "castile", goal: "Ally Portugal", aim: { kind: "ally", target: "portugal" } })]);
     expect(goalAsks(w, nation(w, "castile"))).toEqual([{ target: nation(w, "portugal"), actions: ["propose_alliance", "arrange_marriage"], pull: 2 }]);
   });
 
-  it("keeps every goal's state in a save (EVT-093)", () => {
+  it("keeps every goal's state in a save (EVT-108)", () => {
     const w = withGoals([goal({}), goal({ window: [1400, 1420] })], "plausible");
     const copy = createWorld(rules, 9, tiles);
     copy.goals = createGoals(copy, w.goals!.defs);
@@ -120,7 +120,7 @@ describe("historical goals (EVT-085 to EVT-093)", () => {
   });
 });
 
-describe("the Chronicle (EVT-094 to EVT-096)", () => {
+describe("the Chronicle (EVT-109 to EVT-111)", () => {
   const row = (w: World, key: string) => [...chronicleView(w).ahead, ...chronicleView(w).happened].find((r) => r.key === key);
 
   it("shows a turning point ahead on course, with the realms heading there", () => {

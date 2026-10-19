@@ -6,7 +6,7 @@ import chronicle from "../data/domain/chronicle.json" with { type: "json" };
 import nations1444 from "../data/scenarios/1444/map-nations.json" with { type: "json" };
 import type { GoalAim, GoalDef } from "../src/types.ts";
 
-// Every region's historical goals (EVT-085): realms and targets known, aims the
+// Every region's historical goals (EVT-100): realms and targets known, aims the
 // game can read, windows in years and turning points the Chronicle knows.
 const dir = join(import.meta.dirname, "../data/scenarios/1378/regions");
 const regions = readdirSync(dir).filter((k) => existsSync(join(dir, k, "map-nations.json")));
@@ -31,9 +31,10 @@ function aimProblems(a: GoalAim | null | undefined): string[] {
   return known.has(a.target) ? [] : [`unknown target ${a.target}`];
 }
 
-describe("the 1378 historical goals (EVT-085)", () => {
-  it("every region that is built has its goals", () => {
-    for (const k of regions) expect(read(k, "goals.json", { goals: [] }).goals.length, k).toBeGreaterThan(50);
+describe("the 1378 historical goals (EVT-100)", () => {
+  it("every researched region has its goals", () => {
+    // arabia is the join's small gap-filler (Hejaz, Yemen, Oman), researched with no goals of its own.
+    for (const k of ["east", "europe-west", "asia", "africa-americas"]) expect(read(k, "goals.json", { goals: [] }).goals.length, k).toBeGreaterThan(50);
   });
 
   it("names known realms, readable aims, windows in years and known turning points", () => {

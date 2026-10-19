@@ -1,12 +1,10 @@
 import defines from "../data/defines.json" with { type: "json" };
 import units from "../data/units.json" with { type: "json" };
 import names from "../data/names.json" with { type: "json" };
-import map from "../data/scenarios/1444/world/map.json" with { type: "json" };
-import nations from "../data/scenarios/1444/world/nations.json" with { type: "json" };
-import provinces from "../data/scenarios/1444/world/provinces.json" with { type: "json" };
-import sleeping from "../data/scenarios/1444/world/sleeping-realms.json" with { type: "json" };
 import type { NationDef, Ruleset } from "./types.ts";
-import { START_DATE } from "./start.ts";
+import { START_DATE, startWorld } from "./start.ts";
+
+const { map, nations, provinces, sleeping } = startWorld;
 import { validateRuleset } from "./validate.ts";
 
 export type * from "./types.ts";

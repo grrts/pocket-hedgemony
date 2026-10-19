@@ -9,7 +9,7 @@ faith, holy places, the one rule per faith, faith waves and the religion events,
 systems.
 
 **In scope**
-- The faith list (event tree `religions` + hussite, jain, asian_traditional), families, the relations layered /
+- The faith list (event tree `religions` + hussite, jain, asian_traditional, baltic_traditional), families, the relations layered /
   rooted / kin.
 - The faith mix: pulls, hold, the yearly move, small shares, hidden believers.
 - The religion rules on faith buildings (pull, serving, take-over, tithes); not the buildings themselves.
@@ -80,7 +80,7 @@ Newest decision first.
 ### Aggregates
 
 **FaithCatalogue** (reference data, config `faiths`, `relations`)
-- INV-RELG-1: faith ids are the event tree's `religions` plus hussite, jain, asian_traditional.
+- INV-RELG-1: faith ids are the event tree's `religions` plus hussite, jain, asian_traditional and baltic_traditional.
 - INV-RELG-2: every faith has one family; `secular` has family none and no houses.
 
 **ProvinceFaith** (identity: province id; storage of the top three is province's)
@@ -117,8 +117,8 @@ Newest decision first.
 ## 5. Requirements
 
 ### 5.1 Faiths and relations
-- RELG-001 The religion system shall use the event tree's `religions` list plus `hussite`, `jain` and `asian_traditional` as faith ids. [religion §2.1; enums-additions]
-- RELG-002 The religion system shall give each faith one family: christian (catholic, protestant, anglican, orthodox, oriental_christian, hussite), islamic (sunni, shia, ibadi), indic (hindu, sikh, jain), buddhist (theravada, mahayana, vajrayana), east_asian (shinto, confucian_ritual, daoist), jewish, traditional (indigenous_american, african_traditional, pacific_traditional, siberian_steppe_traditional, asian_traditional), none (secular). [religion §2.1; config faiths]
+- RELG-001 The religion system shall use the event tree's `religions` list plus `hussite`, `jain`, `asian_traditional` and `baltic_traditional` (Lithuania and Samogitia before their baptisms, from the 1378 start, X-25) as faith ids. [religion §2.1; enums-additions; plan-1378 §4.4]
+- RELG-002 The religion system shall give each faith one family: christian (catholic, protestant, anglican, orthodox, oriental_christian, hussite), islamic (sunni, shia, ibadi), indic (hindu, sikh, jain), buddhist (theravada, mahayana, vajrayana), east_asian (shinto, confucian_ritual, daoist), jewish, traditional (indigenous_american, african_traditional, pacific_traditional, siberian_steppe_traditional, asian_traditional, baltic_traditional), none (secular). [religion §2.1; config faiths]
 - RELG-003 The religion system shall show each faith by the catalogue's local name while the engine uses the faith id. [religion §2.1]
 - RELG-004 The religion system shall keep Yazidi, Druze and Zoroastrian communities only as named minorities in the catalogue, not as faith ids. [religion §2.1]
 - RELG-005 The religion system shall treat shinto, mahayana, confucian_ritual and daoist as layered with each other, and each traditional faith as layered with any faith once they have shared a province for 100 years. [religion §2.2; config relations]

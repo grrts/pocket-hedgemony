@@ -168,7 +168,7 @@ export interface World extends LivingState, TreasuryState, FoodState, MoodState,
   explore: ExplorationState;
   /** The event tree in play (milestone 6). */
   events?: GameEvents;
-  /** Realms' historical goals (EVT-085, goals.ts). */
+  /** Realms' historical goals (EVT-100, goals.ts). */
   goals?: GoalState;
   /** Win scores, the end date and how the campaign ended (campaignEnd.ts). */
   campaign: CampaignEndState;
@@ -556,7 +556,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
 
   // The event tree starts with the campaign, so its first month costs no more than any other.
   world.events = createGameEvents(world);
-  // Realms' historical goals, shaken by the seed and the Events preset (EVT-086).
+  // Realms' historical goals, shaken by the seed and the Events preset (EVT-101).
   world.goals = createGoals(world);
   monthlyGoals(world, false);
   // Heritage reads the tree's ages, so it starts after it: three ambitions drawn, the birthright in force.

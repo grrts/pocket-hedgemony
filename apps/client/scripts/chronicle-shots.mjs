@@ -1,4 +1,4 @@
-// The Chronicle (EVT-097) and another realm's Aims fold (EVT-098), on a small and a large phone held sideways, a
+// The Chronicle (EVT-112) and another realm's Aims fold (EVT-113), on a small and a large phone held sideways, a
 // phone held upright, a tablet held upright and a desktop window. The 1444 start has no goals, so ?goals= gives a
 // few realms goals of their own to show who is heading toward each turning point.
 // Usage: pnpm build && node scripts/chronicle-shots.mjs <outDir>

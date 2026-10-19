@@ -13,7 +13,7 @@ a ruler and tongues for every map nation, 184 relations and 44 facts on the star
 **Map scale.** Map provinces in western Europe are about 15,000–20,000 km², so realms smaller than that (Jülich,
 Berg, Werle, Lübeck, Mantua, Lucca and the like) stay catalogue records with relations and subject rows but no land.
 Two map capitals in one province break the map generator, so a few capitals are moved to a nearby residence
-(Brandenburg at Berlin, Mainz at Eltville, Trier at Koblenz); the notes below say where.
+(Brandenburg at Berlin, Mainz at Eltville, Trier at Koblenz, and Venice at Mestre, since the lagoon point fell into Padua's province when the regions were joined); the notes below say where.
 
 **Owner rules** are ordered enclaves first (land a western realm holds abroad: Venice's Crete, Negroponte, Modon,
 Coron and Tenedos; Genoa's Corsica, Chios, Famagusta and Crimean coast; Habsburg Alsace; Norway's Orkney), then the
@@ -21,7 +21,7 @@ southern Empire and Nordic lands, Iberia and Italy, the British Isles and France
 Empire. A few home rules name a realm another region defines (`hungary` for Burgenland and Prekmurje, `poland` for
 the Częstochowa corner, `novgorod` for North Karelia, `morocco` for Ceuta and Melilla).
 
-**Goals:** each realm's historical goals with their reasons are in `goals.json` (plan-1378 §2, EVT-085)
+**Goals:** each realm's historical goals with their reasons are in `goals.json` (plan-1378 §2, EVT-100)
 (step 6); the generated `world/` comes when all four regions are joined and the map generator is run.
 
 The notes below are the calls made in each part, with confidence, kept for the source pass.

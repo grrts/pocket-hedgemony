@@ -5,7 +5,7 @@ import { isLive, type Goal } from "./goals.ts";
 import type { World } from "./world.ts";
 
 /**
- * The Chronicle (EVT-094 to EVT-096): the history checkpoints' turning points
+ * The Chronicle (EVT-109 to EVT-111): the history checkpoints' turning points
  * that the event tree holds, whether each has happened, and whether those not
  * yet happened are on course, bent or gone, with the realms whose goals lead
  * there. It reads the game and changes nothing.
@@ -41,24 +41,24 @@ export interface ChronicleRow {
 
 export interface ChronicleView {
   counts: { on_course: number; bent: number; gone: number };
-  /** Not yet happened, soonest first (EVT-096). */
+  /** Not yet happened, soonest first (EVT-111). */
   ahead: ChronicleRow[];
   /** Happened, newest first. */
   happened: ChronicleRow[];
 }
 
-/** Each live goal of a realm, as a realm's Aims fold and the Chronicle show it (EVT-098). */
+/** Each live goal of a realm, as a realm's Aims fold and the Chronicle show it (EVT-113). */
 export interface GoalView {
   goal: number;
   realm: number;
   target: number;
-  /** Whether it took its alternative at the start (EVT-086). */
+  /** Whether it took its alternative at the start (EVT-101). */
   swapped: boolean;
 }
 
 const startDate = `${START_DATE.year}-${String(START_DATE.month).padStart(2, "0")}-${String(START_DATE.day).padStart(2, "0")}`;
 
-/** The tree event of a turning point in this campaign, if the tree holds one (EVT-094). */
+/** The tree event of a turning point in this campaign, if the tree holds one (EVT-109). */
 export function treeEventOf(world: World, t: TurningPoint): string | null {
   const events = world.events?.state.events;
   if (!events) return null;
@@ -66,7 +66,7 @@ export function treeEventOf(world: World, t: TurningPoint): string | null {
   return events[id] ? id : null;
 }
 
-/** The Chronicle now (EVT-094 to EVT-096). */
+/** The Chronicle now (EVT-109 to EVT-111). */
 export function chronicleView(world: World): ChronicleView {
   const view: ChronicleView = { counts: { on_course: 0, bent: 0, gone: 0 }, ahead: [], happened: [] };
   const ev = world.events?.state;
@@ -92,7 +92,7 @@ export function chronicleView(world: World): ChronicleView {
     }
     const latest = def.availability.latest;
     const gone = !!ev.invalidated[id] || (latest != null && year > latest) || (def.exclusive_with ?? []).some((x) => ev.world.history.some((o) => o.event === x));
-    // Goals lead here and none still pursues its own aim (EVT-095).
+    // Goals lead here and none still pursues its own aim (EVT-110).
     const goalsGone = leading.length > 0 && !leading.some((g) => isLive(g) && g.shaken === "kept" && !world.nationGone[g.realm]);
     const state: ChronicleState = gone ? "gone" : year > hist + C.on_course_years || goalsGone ? "bent" : "on_course";
     const near = hist <= year + C.horizon_years && (state !== "on_course" ? hist >= year - C.horizon_years : true);
@@ -105,7 +105,7 @@ export function chronicleView(world: World): ChronicleView {
   return view;
 }
 
-/** Every realm's live goals (EVT-098); the client reads their words from the scenario's goals. */
+/** Every realm's live goals (EVT-113); the client reads their words from the scenario's goals. */
 export function goalViews(world: World): GoalView[] {
   return (world.goals?.list ?? []).filter((g) => isLive(g) && !world.nationAsleep[g.realm]).map((g) => ({ goal: g.def, realm: g.realm, target: g.target, swapped: g.shaken === "swapped" }));
 }

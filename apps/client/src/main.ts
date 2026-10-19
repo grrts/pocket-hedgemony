@@ -252,7 +252,7 @@ const DISPATCHES_KEPT = 400;
 let unread = 0;
 /** The log shows only what concerns the player's realm. */
 let dispatchesMine = false;
-/** The News shows the Chronicle (EVT-097). */
+/** The News shows the Chronicle (EVT-112). */
 let newsHistory = false;
 /** Peace offers the player put off until next week (Later). */
 const putOffOffers = new Set<number>();
@@ -2876,7 +2876,7 @@ const monthText = (iso: string) => {
   const [y, m] = iso.split("-").map(Number);
   return `${m ? MONTHS[m - 1] + " " : ""}${y}`;
 };
-/** What the Chronicle and the Aims fold need from the shell (EVT-097, EVT-098). */
+/** What the Chronicle and the Aims fold need from the shell (EVT-112, EVT-113). */
 const chronicleUi = (): ChronicleUi => ({ realm: (n) => realmButton(n), esc, me: snapshot?.playerNation ?? -1 });
 const realmButton = (n: number, tab?: "diplomacy") => `<button class="realm-link" data-realm="${n}"${tab ? ` data-realm-open="${tab}"` : ""}>${pennant(nations[n]!)}<b>${esc(nations[n]!.name)}</b></button>`;
 
@@ -6202,7 +6202,7 @@ function bindNationButtons(): void {
   panel.querySelectorAll<HTMLButtonElement>("[data-nation]").forEach((b) => b.addEventListener("click", () => void startGame(b.dataset.nation!)));
 }
 
-/** ?goals=<JSON list of goals> gives realms goals of the caller's own, to try the Chronicle and the Aims fold (EVT-097, EVT-098). */
+/** ?goals=<JSON list of goals> gives realms goals of the caller's own, to try the Chronicle and the Aims fold (EVT-112, EVT-113). */
 const goalsParam = (): GoalDef[] | undefined => {
   const raw = new URLSearchParams(location.search).get("goals");
   try {
