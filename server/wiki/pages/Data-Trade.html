@@ -337,8 +337,20 @@
 <tr><td><code>ai_candidates</code></td><td>8</td></tr>
 <tr><td><code>ai_max_traders_per_start</code></td><td>2</td></tr>
 <tr><td><code>ai_found_reserve</code></td><td>3</td></tr>
-<tr><td><code>ai_keep_route_over_upkeep</code></td><td>4</td></tr>
+<tr><td><code>ai_keep_route_over_upkeep</code></td><td>1</td></tr>
 <tr><td><code>feed_max</code></td><td>256</td></tr>
+</tbody></table></div>
+<h3 id="homes"><a class="anchor" href="#homes" aria-label="Link to this section">#</a>Homes</h3>
+<blockquote>
+<p>D-TRADE-23, home slots (trade rework, 19 October, Leroy chose A): a city is home to at most by_market_step[its market step] traders, and a port to port more; traders over that from the 1444 start stay but none more is founded there until one is gone. Upkeep and founding gold are the kind&#39;s times upkeep_factor and found_factor, so a poor route loses money; ai_keep_route_over_upkeep was 4 at the old upkeep, now 1.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>by_market_step</code></td><td>0, 1, 2, 4</td></tr>
+<tr><td><code>port</code></td><td>1</td></tr>
+<tr><td><code>upkeep_factor</code></td><td>4</td></tr>
+<tr><td><code>found_factor</code></td><td>3</td></tr>
 </tbody></table></div>
 <h3 id="suggest"><a class="anchor" href="#suggest" aria-label="Link to this section">#</a>Suggest</h3>
 <blockquote>

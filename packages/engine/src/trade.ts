@@ -24,6 +24,8 @@ import { planTilePath } from "./march.ts";
  */
 
 const G = config.game;
+/** Home slots, upkeep and founding gold (D-TRADE-23). */
+const H = G.homes;
 
 /** The kinds a realm can found in this slice: caravans and barges by land, the 1444 trade ship by sea. */
 export const TRADER_KINDS = ["pack_caravan", "camel_caravan", "river_barge", "cog_junk_dhow"] as const;
@@ -283,10 +285,10 @@ const goldScale = (world: World) => world.rules.defines.works.goldScale;
 export function kindRow(world: World, kind: GameTraderKind): KindRow {
   if (isShip(kind)) {
     const s = config.sea_traders.cog_junk_dhow;
-    return { kind, name: KIND_NAME[kind], gold: COG.gold * goldScale(world), upkeep: COG.upkeep * goldScale(world), hold: s.hold, purse: s.purse * G.purse_scale, crew: COG.crew, crewClass: "seafolk" };
+    return { kind, name: KIND_NAME[kind], gold: COG.gold * goldScale(world) * H.found_factor, upkeep: COG.upkeep * goldScale(world) * H.upkeep_factor, hold: s.hold, purse: s.purse * G.purse_scale, crew: COG.crew, crewClass: "seafolk" };
   }
   const k = config.land_traders[kind];
-  return { kind, name: KIND_NAME[kind], gold: k.found * goldScale(world), upkeep: k.upkeep * goldScale(world), hold: k.hold, purse: k.purse * G.purse_scale, crew: k.crew.count, crewClass: "market folk" };
+  return { kind, name: KIND_NAME[kind], gold: k.found * goldScale(world) * H.found_factor, upkeep: k.upkeep * goldScale(world) * H.upkeep_factor, hold: k.hold, purse: k.purse * G.purse_scale, crew: k.crew.count, crewClass: "market folk" };
 }
 
 const DESERT = config.land_traders.camel_caravan.desert_grounds as string[];
@@ -898,8 +900,22 @@ export function foundProblem(world: World, n: number, city: number, kind: GameTr
   if (kind === "river_barge" && !world.provinceRiver[city]) return "needs a river";
   const cls = isShip(kind) ? SEAFOLK : MARKET_FOLK;
   if (world.provinceClasses[city * CLASS_COUNT + cls]! * 1000 < row.crew) return `needs ${row.crew} ${row.crewClass}`;
+  const slots = homeSlots(world, city);
+  if (homedAt(world, city) >= slots) return slots === 0 ? "needs a market" : `home to ${slots} already; a bigger market homes more`;
   if (world.nationTreasury[n]! < row.gold) return `needs ${Math.ceil(row.gold * 10) / 10} gold`;
   return null;
+}
+
+/** How many traders a city can be home to: by its market step, and more for a port (TRADE-159). */
+export function homeSlots(world: World, city: number): number {
+  return (H.by_market_step[Math.min(marketStep(world, city), 3)] ?? 0) + (isPort(world, city) ? H.port : 0);
+}
+
+/** How many traders are at home in a city now. */
+export function homedAt(world: World, city: number): number {
+  let k = 0;
+  for (const t of world.traders) if (t.home === city) k++;
+  return k;
 }
 
 function addTrader(world: World, n: number, home: number, kind: GameTraderKind, stops: number[]): GameTrader {
@@ -1007,7 +1023,8 @@ function aiTrade(world: World): void {
     // A realm the catalogue gives no trade access founds none in this slice (D-TRADE-20).
     const start = startCount(world, n);
     if (n % 12 !== turn || n === world.player || world.nationGone[n] || start === 0 || count[n]! >= G.ai_max_traders_per_start * start + 1) continue;
-    const home = homes(world, n)[0];
+    // The first of its cities with a slot free (TRADE-160).
+    const home = homes(world, n).find((p) => homedAt(world, p) < homeSlots(world, p));
     if (home === undefined) continue;
     const kind = kindFor(world, n, home, count[n]!);
     const row = kindRow(world, kind);
@@ -1135,6 +1152,9 @@ export interface TraderView {
 
 export interface FoundOption {
   city: number;
+  /** Traders at home there and how many it can be home to (TRADE-159). */
+  homed: number;
+  slots: number;
   kinds: { kind: GameTraderKind; name: string; gold: number; upkeep: number; why: string | null }[];
 }
 
@@ -1232,7 +1252,7 @@ export function tradeView(world: World, n: number): TradeView {
     if (world.provinceOwner[p] !== n || world.provinceTradeCity[p] === 0) continue;
     centres.push({ province: p, value: tradeValueAt(world, p), ratio: world.provinceTradeRatio[p]!, passing: world.provincePassed[p]! });
     if (marketStep(world, p) === 0 && !isPort(world, p)) continue;
-    found.push({ city: p, kinds: TRADER_KINDS.map((kind) => ({ kind, name: KIND_NAME[kind], gold: kindRow(world, kind).gold, upkeep: kindRow(world, kind).upkeep, why: foundProblem(world, n, p, kind) })) });
+    found.push({ city: p, homed: homedAt(world, p), slots: homeSlots(world, p), kinds: TRADER_KINDS.map((kind) => ({ kind, name: KIND_NAME[kind], gold: kindRow(world, kind).gold, upkeep: kindRow(world, kind).upkeep, why: foundProblem(world, n, p, kind) })) });
   }
   centres.sort((a, b) => b.value * (b.ratio + 1) - a.value * (a.ratio + 1));
   found.sort((a, b) => tradeValueAt(world, b.city) - tradeValueAt(world, a.city));

@@ -328,8 +328,19 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 | `ai_candidates` | 8 |
 | `ai_max_traders_per_start` | 2 |
 | `ai_found_reserve` | 3 |
-| `ai_keep_route_over_upkeep` | 4 |
+| `ai_keep_route_over_upkeep` | 1 |
 | `feed_max` | 256 |
+
+### Homes
+
+> D-TRADE-23, home slots (trade rework, 19 October, Leroy chose A): a city is home to at most by\_market\_step\[its market step\] traders, and a port to port more; traders over that from the 1444 start stay but none more is founded there until one is gone. Upkeep and founding gold are the kind's times upkeep\_factor and found\_factor, so a poor route loses money; ai\_keep\_route\_over\_upkeep was 4 at the old upkeep, now 1.
+
+| Key | Value |
+|---|---|
+| `by_market_step` | 0, 1, 2, 4 |
+| `port` | 1 |
+| `upkeep_factor` | 4 |
+| `found_factor` | 3 |
 
 ### Suggest
 
