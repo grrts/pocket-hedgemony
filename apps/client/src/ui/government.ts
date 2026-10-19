@@ -44,11 +44,25 @@ function capBlock(label: string, used: number, cap: GovernmentView["officials"][
 const subjectsLaw = (r: number | null) =>
   r === null ? "None: this form holds no subjects" : r === 0 ? "Leaves your subject limit as it is" : r > 0 ? `Raises your subject limit by ${r}` : `Lowers your subject limit by ${-r}`;
 
+/** A horde's edge and its end, opening the first invention its riders fade against in the tree (GOV-077). */
+function ridersLaw(r: GovernmentView["riders"]): string {
+  if (!r?.length) return "";
+  const list = r.map((x) => `${esc(x.label)} (${esc(x.id)})`);
+  const named = list.length > 1 ? `${list.slice(0, -1).join(", ")} and ${list[list.length - 1]}` : list[0];
+  return `<dt>Your riders</dt><dd><button class="paper law-line" data-realm-open-tab="learning" data-learn-pick="${esc(r[0]!.id)}">Strong until your enemies field ${named}</button></dd>`;
+}
+
 /** One form the realm can become: what changes, what it needs and the button (or why not). */
 function nextCard(v: GovernmentView, x: NextFormView): string {
   const offNow = v.officials.cap.parts.find((p) => p.source === "form")?.value ?? 0;
   const lordsNow = v.lords.cap.parts.find((p) => p.source === "form")?.value ?? 0;
-  const change = `Officials ${signed(x.officials - offNow)} · Lords ${signed(x.lords - lordsNow)}`;
+  const reachNow = v.laws.subjectReach;
+  const reach = reachNow !== null && x.subjectReach !== null && x.subjectReach !== reachNow ? ` · Subject reach ${signed(x.subjectReach - reachNow)}` : "";
+  const change = `Officials ${signed(x.officials - offNow)} · Lords ${signed(x.lords - lordsNow)}${reach}`;
+  // A reform keeps every invention (INV-RSCH-1); the card names those that help in the new form, opening them in the tree (GOV-077, GOV-078).
+  const helped = x.helpedBy.length
+    ? `<button class="paper law-line" data-realm-open-tab="learning" data-learn-pick="${esc(x.helpedBy[0]!.id)}">Keeps every invention you know. Helps once settled: ${x.helpedBy.map((h) => `${esc(h.id)} ${esc(h.name)}`).join(", ")}</button>`
+    : "";
   const needs = x.needs.length
     ? `<ul class="needs">${x.needs.map((n) => `<li class="${n.met ? "met" : "unmet"}">${n.met ? "✓" : "✗"} ${esc(n.label)}</li>`).join("")}</ul>`
     : "";
@@ -64,7 +78,7 @@ function nextCard(v: GovernmentView, x: NextFormView): string {
   const cost = x.way === "reform" ? `<small>${x.gold} gold${x.lordsSlip ? ` · ${x.lordsSlip} lord${x.lordsSlip === 1 ? "" : "s"} lose${x.lordsSlip === 1 ? "s" : ""} a step` : " · no lord minds"}</small>` : "";
   return `<div class="next-form framed-soft">
       <p><b>${esc(x.name)}</b> <small>${esc(FAMILY[x.family] ?? x.family)}</small><br><small>${change}</small></p>
-      ${needs}${cost}${action}
+      ${helped}${needs}${cost}${action}
     </div>`;
 }
 
@@ -82,7 +96,7 @@ export function governmentTab(v: GovernmentView, revo?: RevolutionView | null): 
     <dl class="facts">
       <dt>Succession</dt><dd>${esc(cap1(v.laws.succession))}</dd>
       <dt>Colonies</dt><dd>${v.laws.colonialRange ? `Up to ${v.laws.colonialRange} sea zones from your ports` : "None"}</dd>
-      <dt>Subjects</dt><dd>${subjectsLaw(v.laws.subjectReach)}</dd>
+      <dt>Subjects</dt><dd>${subjectsLaw(v.laws.subjectReach)}</dd>${ridersLaw(v.riders)}
     </dl>
     <h3 class="sub">Reform</h3>
     ${v.next.length ? `<p class="hint">A reform changes the form for good: it costs gold, and some lords dislike it.</p><div class="next-forms">${v.next.map((x) => nextCard(v, x)).join("")}</div>` : `<p class="hint">This form has no next form.</p>`}`;

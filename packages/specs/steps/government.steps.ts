@@ -51,6 +51,7 @@ import {
   type ReformCountry,
   type ReformResult,
 } from "@ph/engine/domain/government";
+import * as R from "@ph/engine/domain/research";
 import { steps, type Scenario } from "../src/registry.ts";
 
 const { Given, When, Then } = steps("government");
@@ -86,12 +87,12 @@ function country(s: Scenario, name: string): Country {
   s.countries ??= {};
   s.countries[name] ??= {
     name,
-    form: "feudal_realm",
+    form: s.start1444 ? startForm1444(name) : "feudal_realm",
     buildings: [],
     strengths: [],
     officials: [],
     lords: [],
-    inventions: new Set(),
+    inventions: s.start1444 ? R.startingKnowledgeFor(name) : new Set(),
     facts: new Set(),
     gold: 0,
     goldBefore: 0,
@@ -101,6 +102,16 @@ function country(s: Scenario, name: string): Country {
     subjectNames: [],
   } satisfies Country;
   return s.countries[name];
+}
+
+let records1444: Map<string, CatalogueRecord> | undefined;
+
+/** A map nation's 1444 form by the start-form rules (GOV-043, GOV-058). */
+function startForm1444(name: string): FormId {
+  records1444 ??= new Map(startRecords1444().map((r) => [r.id, r]));
+  const r = records1444.get(name);
+  if (!r) throw new Error(`No 1444 record for ${name}`);
+  return assignStartForm(r).form;
 }
 
 function setOfficials(c: Country, n: number): void {
@@ -931,4 +942,44 @@ When("the 1444 start is set up", (s) => {
 
 Then("the country {string} starts with {int} lords", (s, name: string, n: number) => {
   expect(country(s, name).lords.length).toBe(n);
+});
+
+// ---------------------------------------------------------------------------
+// Hordes and technology (GOV-067 to GOV-072)
+// ---------------------------------------------------------------------------
+
+Given("the campaign starts on 11 November 1444", (s) => {
+  s.start1444 = true;
+});
+
+Then("the country {string} is in the start group {string}", (s, name: string, group: string) => {
+  expect(R.startGroupOf(name)).toBe(group);
+});
+
+// Before anything happens it sets what the country knows; after the start or an action it checks it.
+Given(/^the country "([^"]+)" (knows|does not know) the invention "([^"]+)"$/, (s, name: string, knows: string, id: string) => {
+  const c = country(s, name);
+  if (!s.start1444 && !s.acted) {
+    if (knows === "knows") c.inventions.add(id);
+    else c.inventions.delete(id);
+    return;
+  }
+  expect(c.inventions.has(id), `${name} ${knows} ${id}`).toBe(knows === "knows");
+});
+
+Then(/^the form's (officials|lords) of "([^"]+)" are (\d+)$/, (s, which: "officials" | "lords", name: string, n: string) => {
+  expect(form(country(s, name).form)[which]).toBe(Number(n));
+});
+
+Given("the country {string} has no neighbour or trade partner who knows the invention {string}", (s, _name: string, id: string) => {
+  s.partners = { ...s.partners, [id]: 0 };
+});
+
+Given("{int} neighbours of the country {string} know the invention {string}", (s, n: number, _name: string, id: string) => {
+  s.partners = { ...s.partners, [id]: n };
+});
+
+Then("the invention {string} costs {string} {int} scholar-years", (s, id: string, name: string, cost: number) => {
+  const date = { year: s.year ?? 1444, month: s.month ?? 1 };
+  expect(R.studyCostFor(R.newProgramme(name), id, date, s.partners?.[id] ?? 0)).toBeCloseTo(cost);
 });
