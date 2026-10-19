@@ -283,7 +283,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-HER-10**: (was OQ-HER-10) Pool maximum: 7 is a cap for every pool, generated or authored; age ambitions join on top
 - **D-HER-11**: (was OQ-HER-11) Envoy reading: diplomacy's resident envoy (an envoy who stays at one court) is the envoy
 - **D-HER-12**: (was OQ-HER-12) AI choices: the AI makes inactive the golden age, and lets go the legacy, with the fewest lever
-- **D-HER-13**: (was OQ-HER-13) Warmth band edges: cold under a third, warm from a third to under two thirds, hot from two
+- **D-HER-13**: *(replaced by X-27: warmth is no longer shown; within reach starts at two thirds, HER-021)* (was OQ-HER-13) Warmth band edges: cold under a third, warm from a third to under two thirds, hot from two
 - **D-HER-14**: (was OQ-HER-14) Mark share: exactly a third; a mark is a legacy and counts toward the cap of 5. A mark is
 - **D-HER-15**: (was OQ-HER-15) Archetype count: 27 archetypes are kept; one that no generated country scores best on is
 - **D-HER-16**: (was OQ-HER-16) Unbound ids: a place name binds to the land province nearest the scenario map's place of
@@ -292,6 +292,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-HER-20**: (18 Oct) Day-one heritage: an ambition that could only be lost (deadline gone or fail holding, like a
 - **D-HER-21**: (18 Oct, the coordinator's brief) Heritage is evaluated monthly, in the month's block right after the
 - **D-HER-22**: (18 Oct) Levers in play: the nine of HER-088, the ones whose rule the game already has. A lever narrowed
+- **D-HER-23**: (19 Oct, X-27, Leroy) Ambitions in plain sight: an open ambition shows its name, plain goal and progress,
 - **D-HER-17**: (was OQ-HER-17) Formed countries beyond the caps: the formed country keeps the forming country's own
 
 ### Naval (naval)
@@ -387,6 +388,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-PROV-32**: (18 Oct) Fever land: ground first (jungle 2, marsh and savanna 1), one more in the tropics, one more per two marsh tiles, one less per quinine and sanitation known; mild, harsh and deadly add 5, 15 and 30 % a year to the death rate of people born elsewhere, the same steps as plague, and locals take a tenth. Quinine and sanitation are not in the research tree yet, so the game's fever land falls only with draining. Provisional numbers.
 - **D-PROV-33**: (18 Oct) Tax owed is 0.12 gold a year per 1,000 workers in working land buildings and 0.5 per 1,000 townsfolk at the normal rate, scaled by the realm's tax steps (0, ½, 1, 1½, 2), less the homeless cut (D-PROV-1) and half under riots. Burned and fallow tiles make nothing and so owe nothing. Troyes's 61,500 workers and 6,900 townsfolk owe about 11 gold, as its card says. Tolls are trade's and never counted here. Provisional numbers.
 - **D-PROV-34**: (18 Oct) Travel: winter makes roads and rivers half as slow again, an enemy army on the road or a broken road doubles the road's days (the detour), and a sea route closed in war is no route. Days to capital is the fastest of the routes to the capital or a seat as things stand. Provisional numbers.
+- **D-PROV-36**: (19 Oct, Leroy: "Birthrates should not reflect food", "You can lower birthrates to 3.6") Land classes are born at 3.6 % a year against 3.0 % deaths, so a fed, peaceful province grows about 0.6 % a year (it was 1 %). Births do not follow the food store or the *Hungry* grievance: people go on having children through hard years, and feeding them is the realm's task, with farms, ranches, fisheries and castles. The province card and the Food tab show where a normal year's food falls short so the player can build before famine comes.
 - **D-PROV-35**: (18 Oct) Sickness: men born on the ground lose half its monthly rate and are spared fever land; everyone else takes the full rate and fever land counts as High (D-PROV-15). People made homeless by a burned tile who stay in the province join the homeless.
 
 ### Realm (realm)
