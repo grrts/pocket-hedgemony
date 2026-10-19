@@ -490,8 +490,8 @@ export function nextPicks(r: Research): { option: Option; catchUp: boolean; chea
   const t = tree();
   const ids = new Set(openIds(r));
   const open = r.options.filter((o) => ids.has(o.id));
-  const low = Math.min(...open.map((o) => o.cost));
   const catchUp = (o: Option) => isPast(t.inventions.get(o.id)!);
+  const low = Math.min(...open.filter((o) => !catchUp(o)).map((o) => o.cost));
   return open
     .map((option) => ({ option, catchUp: catchUp(option), cheapest: false }))
     .sort((a, b) => Number(b.catchUp) - Number(a.catchUp) || a.option.cost - b.option.cost || a.option.name.localeCompare(b.option.name))
@@ -561,21 +561,17 @@ function nextPart(r: Research): string {
 
 // ---------------------------------------------------------------- the screen
 
-/** The header every part shares: the standing, the pace, and the three parts as tabs (RSCH-107, RSCH-113). */
-function screenHead(r: Research, ui: LearningUi): string {
+/** The line every part starts with: the standing, the era and the pace (RSCH-103, RSCH-113); the parts themselves are the Realm book's pages row. */
+function screenHead(r: Research): string {
   const missing = r.pastMissing.length;
   const stand = `${esc(standingShort(r.behind))}${missing ? ` · ${missing} to catch up` : ""}`;
   const standing = missing ? `<button class="paper learn-stand behind" data-jump="catch" title="Show the first past invention in the tree">${stand}</button>` : `<span class="learn-stand">${stand}</span>`;
-  const part = (key: LearningUi["part"], label: string) => `<button class="paper learn-part" data-learn-part="${key}" aria-pressed="${ui.part === key}">${label}</button>`;
-  return `<div class="learn-head">
-      <div class="learn-parts" role="group" aria-label="Research">${part("next", "Next")}${part("tree", "Tree")}${part("schools", `Schools · ${r.schools.length + r.founding.length}`)}</div>
-      <p class="learn-standing">${standing}<small>${esc(eraName(r.era as TreeEra))} · ${fmt(r.scholars)} scholars · ${years(r.perYear || r.pace)} scholar-years a year</small></p>
-    </div>`;
+  return `<p class="learn-standing">${standing}<small>${esc(eraName(r.era as TreeEra))} · ${fmt(r.scholars)} scholars · ${years(r.perYear || r.pace)} scholar-years a year</small></p>`;
 }
 
 /** The Research screen: Next, Tree or Schools under one header (RSCH-107, RSCH-113). */
 export function learningTab(rules: Ruleset, r: Research, gold: number, ui: LearningUi = newLearningUi()): string {
-  const head = `${screenHead(r, ui)}${r.stopped ? `<p class="warn">Research has stopped: the students were called to arms. Fill seats again in Schools.</p>` : ""}`;
+  const head = `${screenHead(r)}${r.stopped ? `<p class="warn">Research has stopped: the students were called to arms. Fill seats again in Schools.</p>` : ""}`;
   if (ui.part === "schools") return `<div class="learn-screen schools-part">${head}${schoolsPart(rules, r, gold, ui.open)}</div>`;
   if (ui.part === "next") return `<div class="learn-screen next">${head}${nextPart(r)}</div>`;
   const st = states(r);

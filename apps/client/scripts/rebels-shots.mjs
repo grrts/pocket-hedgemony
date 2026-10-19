@@ -73,6 +73,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   // The Provinces tab's Risings block.
   await page.click(".hud button.realm");
   await page.waitForTimeout(300);
+  await page.click("#panel [data-realm-section=Lands]").catch(() => {});
   await page.click("[data-realm-tab=provinces]");
   await page.waitForTimeout(300);
   await page.evaluate(async (r) => {

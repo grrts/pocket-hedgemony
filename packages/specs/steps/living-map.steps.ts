@@ -6,7 +6,7 @@ import { loadMapTiles } from "@ph/engine/node";
 import { createWorld, landGrid, tradePaths, tradeSeen, type LandGrid } from "@ph/engine";
 import {
   animatedFigures, bandArtPixels, bandFade, detailBands, figureArms, figureCount, figuresAnimate, figuresLeft, formation, hamletCount, hamletSpots,
-  hullCount, hullsInPort, kindOfByte, linksOfByte, livingBand, neighbours4, pieceLabels, pieceUnit, roadGrade, roadLines, roadPath, settlementBytes,
+  hullCount, hullsInPort, keepsRoad, kindOfByte, linksOfByte, livingBand, neighbours4, pieceLabels, pieceUnit, roadGrade, roadLines, roadPath, settlementBytes,
   tapBox, tapTarget, tileDistance, townCells, townFootprint, townGrowthOrder, townPeopleThousands, townPlan, townsToRefresh, traderMovers, worksSpot, LIVING_MAP,
   type LivingBand, type MapDetail, type TownState,
 } from "@ph/engine/domain/map-presentation";
@@ -146,6 +146,26 @@ Then("every road runs over land from town to town in steps north, east, south or
     expect([r.path[0], r.path.at(-1)]).toEqual([r.from, r.to]);
     for (const t of r.path) expect(grid.provinceAt(t)).toBeGreaterThan(0);
     for (let i = 1; i < r.path.length; i++) expect(neighbours4(grid, r.path[i - 1])).toContain(r.path[i]);
+  }
+});
+Given("towns at {string}, {string} and a town between them", (s, a: string, b: string) => {
+  const { grid } = world();
+  const seat = (name: string) => ({ province: province(name), seed: grid.centre[province(name)]!, roadStep: 0 });
+  s.ends = [seat(a), seat(b)];
+  const [x0, y0, x1, y1] = s.ends.flatMap((t: { seed: number }) => [t.seed % grid.width, Math.floor(t.seed / grid.width)]) as [number, number, number, number];
+  s.between = { province: -1, seed: Math.round((y0 + y1) / 2) * grid.width + Math.round((x0 + x1) / 2), roadStep: 0 };
+});
+Then("{string} and {string} keep no road of their own", (s) => expect(keepsRoad(world().grid, s.ends[0], s.ends[1], [s.between])).toBe(false));
+Then("with no town between them they keep one", (s) => expect(keepsRoad(world().grid, s.ends[0], s.ends[1], [])).toBe(true));
+Then("the road strays no more than {int} pixels from the straight line between the towns", (s, most: number) => {
+  const { grid } = world();
+  expect(s.path).not.toBeNull();
+  const xy = (t: number): [number, number] => [t % grid.width, Math.floor(t / grid.width)];
+  const [fx, fy] = xy(s.path[0]), [tx, ty] = xy(s.path.at(-1));
+  const len = Math.hypot(tx - fx, ty - fy);
+  for (const t of s.path) {
+    const [x, y] = xy(t);
+    expect(Math.abs((x - fx) * (ty - fy) - (y - fy) * (tx - fx)) / len).toBeLessThanOrEqual(most);
   }
 });
 When("a road is laid from {string} to {string}", (s, a: string, b: string) => {

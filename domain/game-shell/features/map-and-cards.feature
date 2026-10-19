@@ -74,10 +74,10 @@ Feature: Map and cards
     Then the top bar shows 5 plaques
     And the other 2 move into the country card
 
-  @SHELL-048
+  @SHELL-048 @SHELL-168
   Scenario: Tool column
     When the screen "map" is drawn
-    Then the tool column at the right edge holds "map mode", "go to capital" and "Realm book"
+    Then the tool column at the right edge holds "map mode", "go to capital", "commanders" and "sound"
 
   @SHELL-049
   Scenario Outline: End turn badge opens Attention

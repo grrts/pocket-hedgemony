@@ -308,7 +308,7 @@ A turn is one week. These steps run once a month, in the turn in which a new mon
 - **The lord card** for each named lord.
 - **The Food policy screen**, with realm defaults, per-castle overrides and the four presets.
 - **The treasury**: gold, debt and lenders.
-- **The top bar**: your realm, the date, gold and its change a month, stability, the war plaque while at war, and the News button.
+- **The top bar**: your realm, the date, gold and its change a month, stability, research (your study's %, or Study! in red when nothing is studied; it opens [Research](Research)), the war plaque while at war, and the News button.
 
 Things you can do: set food policy, override a castle, apply a food preset; take a loan, repay or default; hire and dismiss officials; grant a fief, keep a local ruler, sell a title; seize a lord's land, put a disloyal lord on trial; give a lord gold, an office or a marriage, or grant his want; call a loyal lord's retinue; name an heir; burn your own fields.
 

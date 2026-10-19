@@ -344,6 +344,42 @@ int settlementAt(ivec2 p) {
 bool walled(int b) { int k = b & 15; return (k >= 3 && k <= 8) || k == 12; }
 vec4 townInfo(int id) { return floor(texelFetch(uTown, ivec2(id % uInfoWidth, id / uInfoWidth), 0) * 255.0 + 0.5); }
 const vec3 FLAG = ${glsl(TOWN_FLAG)};
+// A road through a map pixel (VIEW-113): from the middle to each linked side,
+// or, where it only turns a corner, straight across from one side to the
+// other, so a road stepping north-east runs as one slanting line. A track is a
+// worn footpath, broken where the grass grows over it; a road a cart way with
+// ruts and a soft verge; a paved road laid stones with a kerb.
+float segment(vec2 f, vec2 s0, vec2 s1) {
+  vec2 d = s1 - s0;
+  return length(f - s0 - d * clamp(dot(f - s0, d) / dot(d, d), 0.0, 1.0));
+}
+vec3 livingRoad(vec3 c, ivec2 a, ivec2 q, int links, int grade) {
+  const float H = ${TOWN_TILE / 2}.0;
+  vec2 f = vec2(q) + 0.5;
+  vec2 side[4] = vec2[4](vec2(H, 0.0), vec2(2.0 * H, H), vec2(H, 2.0 * H), vec2(0.0, H));
+  float d = 1e3;
+  bool corner = links == 3 || links == 6 || links == 12 || links == 9;
+  if (corner) {
+    int s0 = links == 9 ? 3 : (links == 3 ? 0 : links == 6 ? 1 : 2);
+    d = segment(f, side[s0], side[(s0 + 1) & 3]);
+  } else {
+    for (int i = 0; i < 4; i++) if ((links & (1 << i)) != 0) d = min(d, segment(f, vec2(H), side[i]));
+  }
+  float n = hash(a + 3);
+  if (grade == 0) {
+    // A footpath one art pixel wide, the ground showing through here and there.
+    if (d < 0.75 && n < 0.93) c = mix(c, uRoad[0], 0.85);
+    return c;
+  }
+  if (grade == 1) {
+    if (d < 1.0) c = uRoad[1] * (n > 0.72 ? 0.84 : 1.0);
+    else if (d < 1.8) c = mix(c, uRoad[1], 0.25);
+    return c;
+  }
+  if (d < 1.1) c = uRoad[2] * (((a.x + a.y) & 1) == 0 ? 1.0 : 0.9) * (n > 0.85 ? 0.85 : 1.0);
+  else if (d < 1.9) c = mix(c, uInk, 0.22);
+  return c;
+}
 vec3 livingTown(vec3 c, ivec2 p, ivec2 a, int id, int terrain, vec3 realm) {
   int b = settlementAt(p);
   if (b == 0) return c;
@@ -353,19 +389,7 @@ vec3 livingTown(vec3 c, ivec2 p, ivec2 a, int id, int terrain, vec3 realm) {
   ivec2 fine = ivec2(floor(vMap * ${TOWN_TILE}.0)); // the town atlas's finer art pixel
   ivec2 fq = fine & ${TOWN_TILE - 1};
   vec4 ti = townInfo(id);
-  if (links != 0) {
-    // A two-pixel road from the middle of the map pixel to each linked side; a track is broken.
-    bool mid = q.x >= 3 && q.x <= 4;
-    bool row = q.y >= 3 && q.y <= 4;
-    bool on = (mid && row) || ((links & 1) != 0 && mid && q.y <= 4) || ((links & 2) != 0 && row && q.x >= 3) || ((links & 4) != 0 && mid && q.y >= 3) || ((links & 8) != 0 && row && q.x <= 4);
-    // A darker verge one pixel either side, so the road reads on every ground.
-    bool wide = q.x >= 2 && q.x <= 5;
-    bool tall = q.y >= 2 && q.y <= 5;
-    bool verge = !on && ((wide && tall) || ((links & 1) != 0 && wide && q.y <= 5) || ((links & 2) != 0 && tall && q.x >= 2) || ((links & 4) != 0 && wide && q.y >= 2) || ((links & 8) != 0 && tall && q.x <= 5));
-    int grade = clamp(int(ti.g), 0, 2);
-    if (on) c = uRoad[grade] * (hash(a + 3) > 0.8 ? 0.88 : 1.0);
-    else if (verge) c = mix(c, uInk, grade == 0 ? 0.18 : 0.3);
-  }
+  if (links != 0) c = livingRoad(c, a, q, links, clamp(int(ti.g), 0, 2));
   if (kind == 0) return c;
   bool woods = terrain == ${T.forest} || terrain == ${T.broadleaf} || terrain == ${T.jungle} || terrain == ${T.highlands};
   int variant = kind == 6 ? int(ti.b) : kind == 9 ? (woods ? 2 : terrain == ${T.hills} ? 1 : terrain == ${T.mountains} || terrain == ${T.badlands} ? 0 : 3) : int(hash(p + ivec2(13, 7)) * ${TOWN_VARIANTS}.0);

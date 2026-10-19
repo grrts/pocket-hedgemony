@@ -5,7 +5,7 @@
 // removing in the queue, Schools, the General tab's line and another realm's line. France plays on every
 // size; Mali (which starts in Ancient) shows Catch up first.
 // Sizes: a phone held sideways (844 × 390), a narrow upright window (390 × 844, the Tall layout) and a desktop.
-// Checks: no country-card tabs over Research, the top bar fits, one picture with four bands, no bough tabs,
+// Checks: Next, Tree and Schools in the Realm book's pages row, the top bar fits, one picture with four bands, no bough tabs,
 // a locked invention offers no Study now, queue and path orders land, every tap target on the screen at
 // least 44 px, and the panel never scrolls sideways (the tree scrolls inside itself).
 // Usage: pnpm build && node scripts/research-shots.mjs <outDir>
@@ -72,13 +72,15 @@ for (const [size, device, realms] of sizes) {
     else {
       // The alert may have given way to others: the realm button in the top bar opens the card.
       await page.click(".hud [data-realm]");
-      await page.click("[data-realm-tab=learning]");
+      await page.click("#panel [data-realm-section=Research]");
+      await page.click(".tabs.pages [data-learn-part=next]");
     }
     await page.waitForSelector(".learn-screen.next");
     await page.waitForTimeout(300);
     await shot("research");
-    // Research is its own screen: no country-card tabs, the top bar's plaque asks for a study (RSCH-113).
-    if (await page.locator(".panel nav.tabs").count()) fail(name, "the country card's tabs show over Research");
+    // Research takes the screen; its parts stand in the Realm book's pages row, and the top bar's plaque asks for a study (RSCH-113).
+    const parts = await page.locator(".tabs.pages .tab").allTextContents();
+    if (!/^Next,Tree,Schools · \d+,Peoples$/.test(parts.join(","))) fail(name, "the pages row reads", parts);
     if (!(await page.locator(".hud .research-plaque.idle").count())) fail(name, "the top bar has no research plaque asking for a study");
     const hudOver = await page.evaluate(() => {
       const h = document.querySelector(".hud");
@@ -109,7 +111,7 @@ for (const [size, device, realms] of sizes) {
     await shot("next");
     await checkTargets("in Next with a queue");
     // The tree: one picture, four branch bands, no bough tabs (RSCH-100).
-    await press(page.locator(".learn-parts [data-learn-part=tree]"));
+    await press(page.locator(".tabs.pages [data-learn-part=tree]"));
     await page.waitForSelector(".tree-view.near");
     await shot("tree");
     if ((await page.locator(".tree-view.near .tree-bands .band-name").count()) !== 4) fail(name, "the tree has not four bands");
@@ -155,7 +157,7 @@ for (const [size, device, realms] of sizes) {
     const moved = await page.evaluate(() => document.querySelector(".tree-view.near").scrollLeft);
     if (moved < 200) fail(name, "Close up did not open at the place tapped", moved);
     // Back in Next: the queue moves and ✕ removes (RSCH-110).
-    await press(page.locator(".learn-parts [data-learn-part=next]"));
+    await press(page.locator(".tabs.pages [data-learn-part=next]"));
     const rows = await page.locator(".next-q").count();
     if (rows < 3) fail(name, "the queue holds", rows);
     const second = await page.locator(".next-q .q-name span").nth(1).textContent();
@@ -167,7 +169,7 @@ for (const [size, device, realms] of sizes) {
     if ((await page.locator(".next-q").count()) >= rows) fail(name, "✕ did not remove from the queue");
     await shot("queue-moved");
     // Schools, one tab away.
-    await press(page.locator(".learn-parts [data-learn-part=schools]"));
+    await press(page.locator(".tabs.pages [data-learn-part=schools]"));
     await shot("schools");
     await checkTargets("in Schools");
     // The General tab's line opens Research on Next, then another realm's card (RSCH-088, RSCH-104).
