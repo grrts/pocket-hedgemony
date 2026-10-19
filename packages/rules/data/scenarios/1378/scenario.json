@@ -1,0 +1,22 @@
+{
+  "$comment": "The 1378 start scenario (X-25), being built (milestone 10, step 5). Not bundled yet: the game still starts from scenarios/1444 until the switch-over (step 7). Each region's data lives in regions/<key>/ with the same file names and shapes as the 1444 folder; packages/rules/test/scenario-1378.test.ts reads and checks them together. The world/ folder (the generated map) comes when the regions are joined and tools/mapgen is run for this scenario.",
+  "id": "1378",
+  "name": "Autumn 1378",
+  "date": { "year": 1378, "month": 9, "day": 20 },
+  "eras": {
+    "$comment": "Era I is stretched back to the start (X-25), so the start falls in Era I as in 1444.",
+    "start": "I",
+    "before_start": ["A", "M"]
+  },
+  "regions": ["europe-west", "east", "asia", "africa-americas"],
+  "files": {
+    "regions/<key>/map-nations.json": "the region's map nations with their capitals (SETUP-040)",
+    "regions/<key>/map-owners.json": "owner rules handing the region's provinces to map nations, first match wins (SETUP-041); scoped by country, so the regions' order does not matter",
+    "regions/<key>/rulers.json": "each map realm's ruler on the start day (REALM-233)",
+    "regions/<key>/culture-start.json": "court tongues, province tongues and faiths on the start day (CULT-094)",
+    "regions/<key>/relations.json": "relations and facts between realms on the start day (DIPL-020, SETUP-022)",
+    "regions/<key>/subjects.json": "subject records and stances on the start day (SUBJ)",
+    "regions/<key>/sleeping-realms.json": "realms not yet born on the start day, asleep until they form (X-24, X-25)",
+    "regions/<key>/README.md": "what the region covers, its sources and confidence"
+  }
+}
