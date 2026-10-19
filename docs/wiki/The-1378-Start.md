@@ -306,6 +306,18 @@ A **colony** can be founded only in a province no country owns. Land of a tribe 
 
 At new game you set the **campaign rules**: difficulty, AI temper, fog, historical, plausible or free events, ironman, and the end date (default 31 August 1939). Presets fill the whole step at once. The rules are saved with the campaign, can't be changed afterwards, and are shown read-only under Pause, Campaign rules.
 
+### Difficulty
+
+Difficulty is **Easy**, **Normal** or **Hard**, picked on the options step (Normal is chosen) and shown on each campaign's row in the save library and read-only under Campaign rules. It changes three things, each a factor on a rule the game already has; on Normal every factor is 1 and the game plays exactly as balanced. The numbers are provisional.
+
+| | Easy | Normal | Hard |
+|---|---|---|---|
+| How readily AI realms look for a war each month | × 0.5 | × 1 | × 1.5 |
+| Gold an AI realm's monthly income pays into its treasury | × 0.8 | × 1 | × 1.25 |
+| Chance a plotting province of **your** realm rises each month | × 0.75 | × 1 | × 1.25 |
+
+An AI realm still counts the price of war before it declares, whatever the difficulty. Your own income is never changed, nor a realm's deficit, and AI realms' provinces rise as balanced. The rising chance a province card shows already includes the factor. Difficulty draws no new random numbers, so the same seed and the same rules still give the same campaign.
+
 A new game starts from a **seed**, your nation and the options, and gets a random campaign id. The same seed and the same rules always give the same starting world, including how each realm's goals are shaken. Each save header records your nation and whether it needs the full game. Loading a save of a locked realm asks you to unlock it; the save is never deleted.
 
 ## What you see

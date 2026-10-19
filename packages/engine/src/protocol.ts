@@ -27,6 +27,7 @@ import { tribesView, type TribesView } from "./tribes.ts";
 import { peoplesSnapshot, type PeoplesSnapshot } from "./peoples.ts";
 import { faithHeadsView, type FaithHeadsView } from "./faithHeads.ts";
 import { campaignView, setPlayer, type CampaignView } from "./campaignEnd.ts";
+import { setDifficulty } from "./difficulty.ts";
 import { GRIEVANCES, moodIndex, MOODS } from "./moods.ts";
 import { PLAGUE_STEPS, quarantineTaxShare } from "./plague.ts";
 import { CLASS_NAMES } from "./living.ts";
@@ -79,7 +80,7 @@ const companyView = (c: FreeCompany): CompanyView => ({
 /** Messages the UI thread sends to the engine worker. */
 export type EngineRequest =
   /** `map` is the map's images as the UI decoded them, so armies march over its tiles; without it they stand still. */
-  | { id: number; type: "newGame"; seed: number; playerNation: string; map?: MapTiles; endDate?: string; chapterYears?: number; goals?: GoalDef[] }
+  | { id: number; type: "newGame"; seed: number; playerNation: string; map?: MapTiles; endDate?: string; chapterYears?: number; goals?: GoalDef[]; /** The campaign's difficulty, as the save library's options name it; normal when not given (SETUP-099). */ difficulty?: string }
   /** Plays a whole week at once (the start-up probe and the benchmarks). */
   | { id: number; type: "endTurn"; orders: Order[] }
   /** Plays the clock on by some 4-hour steps (six a day). */
@@ -745,6 +746,8 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
           // A nearer end date (YYYY-MM-DD), for trying the end card (SHELL-164).
           if (req.endDate && /^\d{4}-\d\d-\d\d$/.test(req.endDate)) world.campaign.endDate = req.endDate;
           if (req.chapterYears && req.chapterYears > 0) world.campaign.chapterYears = Math.round(req.chapterYears);
+          // The difficulty chosen at new game, fixed for the campaign (SETUP-099).
+          setDifficulty(world, req.difficulty);
           // Goals of the caller's own, for trying the Chronicle and the Aims fold (EVT-112, EVT-113).
           if (req.goals) {
             world.goals = createGoals(world, req.goals);

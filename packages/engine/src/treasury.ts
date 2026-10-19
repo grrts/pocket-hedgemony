@@ -21,6 +21,7 @@ import { governorWages } from "./colonies.ts";
 import { W as WARFARE } from "./domain/warfare/index.ts";
 import { empireDues, empireTax } from "./institutions.ts";
 import { fursOf } from "./tribes.ts";
+import { incomePaidIn } from "./difficulty.ts";
 
 /**
  * Tax rates and the treasury ledger (milestone 3): each province pays at its
@@ -192,7 +193,8 @@ export function runLedger(world: World, pay: boolean, only = -1): void {
     sumLedger(world, n);
   }
   if (!pay) return;
-  for (let n = 0; n < world.nationCount; n++) world.nationTreasury[n] = world.nationTreasury[n]! + world.nationMonthlyIncome[n]!;
+  // An AI realm's income pays in by the campaign's difficulty (SETUP-102).
+  for (let n = 0; n < world.nationCount; n++) world.nationTreasury[n] = world.nationTreasury[n]! + incomePaidIn(world, n, world.nationMonthlyIncome[n]!);
 }
 
 /** Debt a loan of this much gold adds: the gold plus its interest, all at once (REALM-188). */
