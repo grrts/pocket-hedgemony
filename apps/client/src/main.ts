@@ -1479,8 +1479,9 @@ function drawOverlay(o: OverlayContext): void {
 
   // The trader whose card is open: its way there and back under any map mode (TRADE-154).
   const following = drawFollowedTrader(o, onScreen);
+  const banking = drawBankings(o, onScreen);
   // Close in, traders walk their paths; about ten frames a second is enough for them, as for the hammers (VIEW-130).
-  if ((drawTraders(o, onScreen) || following) && !traderTick) traderTick = setTimeout(() => ((traderTick = 0), view.invalidate()), 100);
+  if ((drawTraders(o, onScreen) || following || banking) && !traderTick) traderTick = setTimeout(() => ((traderTick = 0), view.invalidate()), 100);
 
   // The Faiths map mode marks each head of the faith's seat; a tap on it opens his card (RELG-138).
   if (lens === "faiths" && snapshot && zoom >= 1.1) {
@@ -2106,11 +2107,100 @@ function drawTraders(o: OverlayContext, onScreen: (x: number, y: number, pad?: n
     // The trader whose card is open stands in brackets, as a chosen army does (TRADE-154).
     if (w.id === traderView) brackets(ctx, x - u, y - u, iw + 2 * u, ih + 2 * u, u, Math.floor(performance.now() / 300) % 2, PALETTE.gold);
     ctx.drawImage(img, x, y, iw, ih);
+    // A coin glints over a trader as it collects (TRADE-157).
+    const glint = glints.get(w.id);
+    if (glint !== undefined) {
+      const age = performance.now() - glint;
+      const coin = coinImages[0]!;
+      if (age > GLINT_MS) glints.delete(w.id);
+      else if (age >= 0 && coin.complete) ctx.drawImage(coin, Math.round(x + iw / 2 - coin.width / 2), Math.round(y - coin.height - (moving ? (age / GLINT_MS) * 4 * u : 0)));
+    }
     const box = tapBox(iw, ih, 1);
     traderHitBoxes.push({ mine: w.mine ? w.id : -1, x: x + iw / 2 - box.w / 2, y: y + ih / 2 - box.h / 2, w: box.w, h: box.h });
   }
   ctx.restore();
-  return moving && performance.now() - stepStart < stepMs;
+  return (moving && performance.now() - stepStart < stepMs) || glints.size > 0;
+}
+
+/** Gold the player's traders banked, by city, as it shows on the map; and the traders glinting as they collect (TRADE-157). */
+const bankings: { province: number; gold: number; born: number }[] = [];
+const glints = new Map<number, number>();
+const GLINT_MS = 500;
+const BANK_MS = 1900;
+let lastClink = 0;
+
+/** Takes in what the player's traders collected and banked since the last snapshot, spread over the step it plays in. */
+function hearTradeFeed(next: Snapshot, ms: number): void {
+  const feed = next.tradeFeed ?? [];
+  if (!feed.length) return;
+  const now = performance.now();
+  const banked = new Map<number, number>();
+  feed.forEach((f, i) => {
+    if (f.deposit) banked.set(f.province, (banked.get(f.province) ?? 0) + f.gold);
+    else glints.set(f.trader, now + (i / feed.length) * ms);
+  });
+  let k = 0;
+  for (const [province, gold] of banked) bankings.push({ province, gold, born: now + (k++ / banked.size) * Math.min(ms, 800) });
+  if (bankings.length > 40) bankings.splice(0, bankings.length - 40);
+  if (banked.size) {
+    // A quiet clink, at most once a second, and the treasury figure lifts.
+    if (now - lastClink > 1000) {
+      sound.sfx("econ_income");
+      lastClink = now;
+    }
+    // After the HUD is drawn again for this snapshot.
+    if (animationsPref() !== "Off")
+      requestAnimationFrame(() => {
+        const plaque = document.querySelector<HTMLElement>(".plaque.gold");
+        plaque?.classList.add("banked");
+        setTimeout(() => plaque?.classList.remove("banked"), 700);
+      });
+  }
+  view.invalidate();
+}
+
+/**
+ * Banking on the map (TRADE-157): from regional zoom in, under any map mode, a coin drops into the city where a
+ * trader banked and its gold rises over it and fades; still where Animations is Off. Under the Trade map mode, the
+ * player's busy trade cities (ratio over half) twinkle now and then. Returns true while anything is shown.
+ */
+function drawBankings(o: OverlayContext, onScreen: (x: number, y: number, pad?: number) => boolean): boolean {
+  const now = performance.now();
+  for (let i = bankings.length - 1; i >= 0; i--) if (now - bankings[i]!.born > BANK_MS) bankings.splice(i, 1);
+  const s = snapshot;
+  if (!s || o.zoom < REGIONAL_ZOOM) return bankings.length > 0;
+  const { ctx } = o;
+  const u = tokenUnit(o.zoom);
+  const still = animationsPref() === "Off";
+  const coin = coinImages[u >= 3 ? 1 : 0]!;
+  let twinkling = false;
+  if (lens === "trade" && !still && coin.complete)
+    for (let p = 0; p < provinces.length; p++) {
+      if (owners[p] !== s.playerNation || !s.provinceTradeCity[p] || s.provinceTradeRatio[p]! <= 50) continue;
+      twinkling = true;
+      // Each city twinkles for a fifth of a second every three, at its own moment.
+      if ((now + p * 397) % 3000 > 200) continue;
+      const [sx, sy] = o.toScreen(provinces[p]!.x!, provinces[p]!.y!);
+      if (!onScreen(sx, sy)) continue;
+      ctx.fillStyle = PALETTE.paper;
+      ctx.fillRect(Math.round(sx + 9 * u), Math.round(sy - 9 * u), u, 3 * u);
+      ctx.fillRect(Math.round(sx + 8 * u), Math.round(sy - 8 * u), 3 * u, u);
+    }
+  for (const b of bankings) {
+    const age = now - b.born;
+    if (age < 0 || !isKnown(b.province)) continue;
+    const [sx, sy] = o.toScreen(provinces[b.province]!.x!, provinces[b.province]!.y!);
+    if (!onScreen(sx, sy, 40)) continue;
+    const drop = still ? 1 : Math.min(1, age / 300);
+    const fade = Math.max(0, (age - BANK_MS * 0.65) / (BANK_MS * 0.35));
+    ctx.save();
+    ctx.globalAlpha = 1 - fade;
+    if (coin.complete) ctx.drawImage(coin, Math.round(sx - coin.width / 2), Math.round(sy - coin.height - 2 * u - (1 - drop) * 20 * u));
+    const rise = still ? 0 : Math.min(1, age / 1200) * 12 * u;
+    if (age > 200 || still) drawPlate(ctx, `+${b.gold >= 10 ? Math.round(b.gold) : b.gold.toFixed(1)}`, sx, sy - coin.height - 14 * u - rise, u);
+    ctx.restore();
+  }
+  return bankings.length > 0 || twinkling;
 }
 /**
  * The trader whose card is open (TRADE-154): its whole loop dotted in the realm's colour, the way ahead to the stop
@@ -3044,6 +3134,7 @@ function takeSnapshot(next: Snapshot, ms: number): void {
   const at = new Map<number, [number, number]>();
   if (snapshot) for (let k = 0; k < snapshot.armies.id.length; k++) at.set(snapshot.armies.id[k]!, armyPosition(k));
   walkedBefore = new Map((snapshot?.traderWalks ?? []).map((w) => [w.id, w]));
+  hearTradeFeed(next, ms);
   const ships = new Map<number, { at: [number, number]; path: number[] }>();
   if (snapshot) for (const f of snapshot.navy.fleets) ships.set(f.id, { at: fleetPosition(f), path: f.path });
   fleetFrom = ships;
@@ -6112,6 +6203,12 @@ function bindTrade(): void {
   panel.querySelectorAll<HTMLButtonElement>("[data-trader-route]").forEach((b) => b.addEventListener("click", () => startRoute(id(b, "traderRoute"))));
   panel.querySelectorAll<HTMLButtonElement>("[data-trader-show]").forEach((b) => b.addEventListener("click", () => showTrader(id(b, "traderShow"))));
   panel.querySelectorAll<HTMLButtonElement>("[data-trader-open]").forEach((b) => b.addEventListener("click", () => openTraderCard(id(b, "traderOpen"))));
+  // Use all better routes: each trader takes its best one, in turn (TRADE-156).
+  panel.querySelector<HTMLButtonElement>("[data-trader-use-all]")?.addEventListener("click", async (e) => {
+    (e.currentTarget as HTMLButtonElement).disabled = true;
+    for (const t of snapshot?.trade?.traders ?? []) if (t.better[0]) await act({ type: "setTradeRoute", trader: t.id, stops: t.better[0].stops.slice() });
+    renderPanel();
+  });
   panel.querySelectorAll<HTMLButtonElement>("[data-trader-ask]").forEach((b) =>
     b.addEventListener("click", () => {
       tradeUi.dismiss = id(b, "traderAsk");
@@ -7841,6 +7938,8 @@ Object.assign(globalThis, {
   __phTraderPath: () => (snapshot?.trade?.traders[0]?.path ?? []).map((p) => provinces[p]!.id),
   /** The traders drawn close in, with their tap boxes in CSS pixels (VIEW-123, VIEW-125). */
   __phTraderBoxes: () => traderHitBoxes.slice(),
+  /** Gold banked on the map now, coins still showing (TRADE-157). */
+  __phBankings: () => bankings.length,
   /** Centres the map on the player's first trader walking over land, at a zoom. */
   __phLookAtTrader: (zoom: number) => {
     const w = snapshot?.traderWalks.find((x) => x.mine && x.medium === "land" && x.from !== x.to) ?? snapshot?.traderWalks[0];

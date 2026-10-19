@@ -351,8 +351,8 @@ realm sees what trade earns and where it comes from, and the map shows gold bein
 - TRADE-149 While a route is chosen with where it starts set, the game shall give up to `suggest.draft_options` cities it
   could go to from there, each with its estimate a month and days there and back, best first. [F-160, TRADE-054]
 - TRADE-150 The game shall sum the realm's trade: gold deposited and market fees taken this month so far, gold carried in
-  its traders' purses, and where its gold comes from (each province's gold a month over its traders' last trips, best
-  first, with the market fees paid). [F-159]
+  its traders' purses, and where its gold comes from (each province's gold a month over its traders' last trips, or
+  this trip so far for a trader on its first, best first, with the market fees paid). [F-159]
 - TRADE-151 Last month's visits per province shall be kept in the save for the estimate's crowding. [SAVE, TRADE-147]
 - TRADE-152 The game shall tell the map each collection and deposit of the player's traders since it last looked (which
   trader, where, how much), at most `trade.game.feed_max`, never saved. [F-161]
@@ -379,8 +379,9 @@ realm sees what trade earns and where it comes from, and the map shows gold bein
   star when a trader could earn more. [F-159, TRADE-141, TRADE-144]
 - TRADE-157 Banking on the map: from regional zoom in, under any map mode, when one of the player's traders deposits, a
   coin bag drops into the city with its gold rising over it ("+2.4") and a quiet coin sound (at most once a day per city),
-  and the treasury figure ticks up; each collection glints a small coin over the trader. Trade cities with a ratio over
-  50 % show a small market glint. All of it follows the Animations setting. [F-161]
+  and the treasury figure lifts; each collection glints a small coin over the trader. Under the Trade map mode the
+  player's trade cities with a ratio over 50 % twinkle now and then. All of it follows the Animations setting (still
+  where it is Off). [F-161]
 - TRADE-158 Phone: the trader card is a panel card fitting the Wide and Tall layouts and folding to keep the map in view;
   rows, Use and the card's buttons are at least 44 points high and wrap; the route bar stays inside the safe areas; gold
   labels are drawn only for cities on screen and never under the route bar; nothing needs hover. [X-19, SHELL-108,

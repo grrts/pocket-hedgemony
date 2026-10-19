@@ -1204,8 +1204,8 @@ export function tradeView(world: World, n: number): TradeView {
       const last = t.srcLast.length > 0;
       const sources = pairs(last ? t.srcLast : t.src);
       const fees = last ? t.feesLast : t.fees;
-      // The realm's sources are each trader's last trip as gold a month.
-      if (last && est.loopDays > 0) {
+      // The realm's sources are each trader's last trip as gold a month, or this one so far while it is on its first.
+      if (sources.length && est.loopDays > 0) {
         const months = Math.max(est.loopDays, 1) / dpm;
         for (const x of sources) realmSrc.set(x.province, (realmSrc.get(x.province) ?? 0) + x.gold / months);
         realmFees += fees / months;

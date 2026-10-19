@@ -35,39 +35,42 @@ export function stopsText(stops: readonly number[], name: (p: number) => string)
   return `${stops.map((p) => esc(name(p))).join(" → ")} and back`;
 }
 
-/** One trader: kind and home, its stops, purse, what it brings and deposited, what is wrong, and its three buttons. */
-function traderCard(t: TraderView, name: (p: number) => string): string {
+/** One trader as a row of the overview: kind and route, a purse bar, gold a month, a mark for a problem or a better route; it opens the trader's card (TRADE-156). */
+function traderRow(t: TraderView, name: (p: number) => string): string {
   const full = t.purseMax > 0 ? Math.min(100, (t.purse / t.purseMax) * 100) : 0;
-  const asking = tradeUi.dismiss === t.id;
-  const buttons = asking
-    ? `<p>Dismiss it? Its crew go home to ${esc(name(t.home))}.</p>
-      <div class="confirm-row"><button class="wax" data-trader-dismiss="${t.id}">Dismiss</button><button class="paper" data-trader-keep>Keep it</button></div>`
-    : `<div class="trader-buttons">
-        <button class="paper" data-trader-route="${t.id}">${icon("scroll", 1)}Route</button>
-        <button class="paper" data-trader-open="${t.id}">${icon("map", 1)}Open</button>
-        <button class="paper" data-trader-ask="${t.id}">${icon("close", 1)}Dismiss</button>
-      </div>`;
-  return `<div class="trader framed-soft${t.problem ? " bad" : ""}">
-      <p class="trader-head"><button class="link" data-trader-open="${t.id}"><b>${esc(t.name)}</b></button> <small>of ${esc(name(t.home))}</small>${t.better.length ? ` <small class="better-mark" title="A better route is open">★ better route</small>` : ""}</p>
-      <p class="trader-stops">${stopsText(t.stops, name)}${t.stops.length >= 2 ? ` <small>· ${t.loopDays} days there and back</small>` : ""}</p>
+  const net = t.expected - t.upkeep;
+  const marks = `${t.problem ? `<i class="mark bad" title="${esc(cap1(t.problem))}">!</i>` : ""}${t.better.length ? `<i class="mark better" title="A better route is open">★</i>` : ""}`;
+  return `<button class="paper trader-row${t.problem ? " bad" : ""}" data-trader-open="${t.id}">
+      <span class="row-top"><b>${esc(t.name)}</b>${marks}<span class="row-gold ${net < 0 ? "down" : "up"}">${signed(net)}</span></span>
+      <small class="row-route">${t.stops.length >= 2 ? `${esc(name(t.stops[0]!))} → ${esc(name(t.stops[1]!))}` : "No route"}</small>
       <span class="progress purse-bar" role="img" aria-label="Purse ${gold(t.purse)} of ${gold(t.purseMax)} gold"><i style="width:${full.toFixed(1)}%"></i></span>
-      <p class="trader-gold"><small>Purse ${gold(t.purse)} of ${gold(t.purseMax)}</small><br>
-        About <b>${signed(t.expected)}</b> a month, upkeep ${gold(t.upkeep)} · last month deposited <b>${gold(t.lastMonth)}</b></p>
-      ${t.problem ? `<p class="trader-why">${esc(cap1(t.problem))}.</p>` : ""}
-      ${buttons}
-    </div>`;
+    </button>`;
 }
 
-/** The Trade tab of the player's own card (TRADE-141). */
+/** The Trade tab of the player's own card, an overview (TRADE-141, TRADE-156): this month, where the gold comes from, the traders, founding and the busiest cities. */
 export function tradeTab(v: TradeView, s: Snapshot, name: (p: number) => string): string {
-  const last = `<dl class="facts trade-last">
-      <dt>Deposits</dt><dd>${signed(v.deposits)}</dd>
-      <dt>Market fees</dt><dd>${signed(v.fees)}</dd>
-      <dt>Upkeep</dt><dd>${signed(-v.upkeep)}</dd>
-      <dt>Trade line</dt><dd class="${v.net < 0 ? "down" : "up"}">${icon("coin", 1)}${signed(v.net)} gold a month</dd>
+  const month = `<dl class="facts trade-last">
+      <dt>Banked so far</dt><dd>${icon("coin", 1)}${signed(v.depositsNow)}</dd>
+      <dt>On the road</dt><dd>${gold(v.onRoad)} <small>in purses</small></dd>
+      <dt>Market fees</dt><dd>${signed(v.feesNow)}</dd>
+      <dt>Last month</dt><dd class="${v.net < 0 ? "down" : "up"}">${signed(v.net)} <small>after ${gold(v.upkeep)} upkeep</small></dd>
     </dl>`;
+  const top = v.sources[0]?.gold ?? 0;
+  const abroad = v.sources.reduce((a, x) => a + (s.provinceOwner[x.province] !== s.playerNation ? x.gold : 0), 0);
+  const sources = v.sources.length
+    ? `<div class="sources">${v.sources
+        .map(
+          (x) => `<div class="source-row"><button class="link" data-show-province="${x.province}">${esc(name(x.province))}${s.provinceOwner[x.province] !== s.playerNation ? ` <small class="foreign">abroad</small>` : ""}</button>
+          <span class="src-bar"><i style="width:${top > 0 ? ((x.gold / top) * 100).toFixed(0) : 0}%"></i></span><b>${gold(x.gold)}</b></div>`,
+        )
+        .join("")}</div>
+      <p><small>Gold a month over each trader's last trip there and back (this one so far, for a trader on its first): ${v.sourcesTotal > 0 ? Math.round((abroad / v.sourcesTotal) * 100) : 0} % from abroad, ${gold(v.sourcesFees)} a month paid in market fees.</small></p>`
+    : `<p class="hint">Your traders have not collected yet.</p>`;
+  const better = v.traders.filter((t) => t.better.length);
+  const gain = better.reduce((a, t) => a + t.better[0]!.gain, 0);
   const traders = v.traders.length
-    ? `<div class="traders">${v.traders.map((t) => traderCard(t, name)).join("")}</div>`
+    ? `${better.length ? `<div class="use-all"><p>${plural(better.length, "trader")} could earn more, about <b class="up">${signed(gain)}</b> a month in all.</p><button class="wax" data-trader-use-all>Use all better routes</button></div>` : ""}
+      <div class="trader-rows">${v.traders.map((t) => traderRow(t, name)).join("")}</div>`
     : `<p class="hint">You have no traders. Found one below: it goes between two trade cities through the busiest land and brings their gold home.</p>`;
   const cities = tradeUi.allCities ? v.found : v.found.slice(0, FOUND_SHOWN);
   const found = v.found.length
@@ -100,7 +103,8 @@ export function tradeTab(v: TradeView, s: Snapshot, name: (p: number) => string)
         .join("")}</div>`
     : `<p class="hint">You hold no trade city yet.</p>`;
   const strongest = v.centres[0];
-  return `<h3 class="sub">Last month</h3>${last}
+  return `<h3 class="sub">This month</h3>${month}
+    <h3 class="sub">Where the gold comes from</h3>${sources}
     <h3 class="sub">Traders</h3>${traders}
     ${fold("trade-found", "Found a trader", v.found.length ? `${plural(v.found.length, "city", "cities")} can found one` : "No city can found one", `<p class="hint">Its crew leave the city; it starts on the best route from there.</p>${found}`, !v.traders.length)}
     ${fold("trade-cities", "Busiest cities", strongest ? `${esc(name(strongest.province))} ${gold(strongest.value)} a month` : "None yet", `<p class="hint">Value a month and trade ratio: traders passing raise the ratio, and the ratio raises tax.</p>${busiest}`)}`;
