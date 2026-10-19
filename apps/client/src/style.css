@@ -7691,3 +7691,174 @@ p.fear.threatened {
   align-items: flex-start;
   text-align: left;
 }
+
+/* ---- First-launch question (SHELL-131, TUT-104) ----
+   Over the start screen, in More's frame: three ways in, each with one line on what it is. */
+.start-ask {
+  width: min(360px, calc(100% - 32px));
+  max-height: calc(100% - 16px);
+  overflow-y: auto;
+}
+
+.start-ask button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-height: 52px;
+  padding: 6px 12px;
+  text-align: left;
+}
+
+.start-ask button small {
+  font-size: 15px;
+  opacity: 0.85;
+}
+
+/* ---- The tutorial "Murad's Frontier" (onboarding TUT-131 … TUT-134, D-TUT-19) ----
+   One parchment note with the Grand Vizier's label and the step counter, placed like the hints'
+   note so it never covers what it points at; a spotlight that takes no taps rings the thing to tap
+   and dims the rest of the screen to half (TUT-060, TUT-061). */
+.coach-note {
+  position: fixed;
+  left: 50%;
+  bottom: max(8px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  z-index: 11;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 10px;
+  width: min(480px, calc(100vw - 2 * max(10px, env(safe-area-inset-left), env(safe-area-inset-right)) - 150px));
+  max-height: 33vh;
+  overflow: auto;
+  padding: 2px 4px 4px 6px;
+  border-width: 8px;
+  border-image-width: 8px;
+  font-size: 18px;
+  line-height: 1.15;
+  animation: hint-in 0.2s steps(4);
+}
+
+.coach-note.top {
+  bottom: auto;
+  top: calc(env(safe-area-inset-top) + 50px);
+}
+
+.coach-note[hidden] {
+  display: none;
+}
+
+.coach-face {
+  flex: 1 1 100%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink);
+}
+
+.coach-face b {
+  font: 600 16px/1 var(--body);
+}
+
+.coach-face small {
+  margin-left: 6px;
+  font: 600 15px/1 var(--body);
+  color: var(--ink-soft);
+}
+
+.coach-note p {
+  flex: 1 1 14em;
+  margin: 0;
+  color: var(--ink);
+}
+
+/* A place named in the step moves the camera there; its tap area reaches 44 points without moving the line. */
+.coach-place {
+  display: inline;
+  min-height: 0;
+  margin: -13px -2px;
+  padding: 13px 2px;
+  border: 0;
+  border-image: none;
+  background: none;
+  font: inherit;
+  font-weight: 700;
+  color: var(--ink);
+  text-shadow: none;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.coach-buttons {
+  flex: none;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.coach-buttons button {
+  min-height: 44px;
+  padding: 0 10px;
+  font-size: 17px;
+}
+
+.coach-buttons .leave {
+  width: 44px;
+  padding: 0;
+}
+
+.coach-note.end .coach-buttons {
+  flex-wrap: wrap;
+}
+
+.coach-spot {
+  position: fixed;
+  z-index: 10;
+  pointer-events: none;
+  border: 3px solid var(--brass-light);
+  box-shadow:
+    0 0 0 3px var(--outline),
+    inset 0 0 0 2px var(--outline);
+}
+
+.coach-dim {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  background: rgb(0 0 0 / 0.5);
+}
+
+.coach-spot[hidden],
+.coach-dim[hidden] {
+  display: none;
+}
+
+/* Idle on a do step: the ring pulses again (TUT-033); never under reduced motion (TUT-111). */
+.coach-spot.pulse {
+  animation: hint-pulse 1s steps(2) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .coach-spot.pulse {
+    animation: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .coach-note {
+    width: calc(100vw - 2 * max(8px, env(safe-area-inset-left), env(safe-area-inset-right)));
+    bottom: calc(max(10px, env(safe-area-inset-bottom)) + 72px);
+  }
+}
+
+/* A phone held upright shows only its turn-sideways notice; the step waits (TUT-134). */
+@media (orientation: portrait) and (pointer: coarse) {
+  .coach-note,
+  .coach-dim,
+  .coach-spot {
+    display: none !important;
+  }
+}

@@ -91,8 +91,9 @@ import { colonyCard, coloniesTab, colonySection, exploreSection, voyageBar } fro
 import { askRows, bindTribes, colonyGround, groundHead, groundSection, groundsCountLine, huntKeyHtml, huntTab, type TribesUi } from "./ui/tribes.ts";
 import { HUNT_TAB, chartsCoast, settlersAlert } from "@ph/engine/domain/tribes";
 import { achievementName, achievementsCard, loadProfile, saveProfile, takeAchievements, tileKey, toastHtml, unseen, type Filter as AchFilter } from "./ui/achievements.ts";
-import { Hints, mapSpot, type HintTarget } from "./ui/hints.ts";
-import type { Hint } from "@ph/engine/domain/onboarding";
+import { Hints, mapSpot, visibleBox, type HintTarget } from "./ui/hints.ts";
+import { Coach } from "./ui/tutorial.ts";
+import { placeProvince, type Hint, type Step } from "@ph/engine/domain/onboarding";
 import {
   animatedFigures,
   bandArtPixels,
@@ -123,10 +124,10 @@ import { TownLayer, townInfo } from "./map/towns.ts";
 import { bedUnderCamera, musicFacts, newFactMemory, playerPalette, playerWars, remember, type FactMemory } from "./audio/facts.ts";
 import { COMMISSION_GOLD, commissionSkills, FOOD_BALANCE, hireGold, OFFICIALS, Rng, startFormOf } from "@ph/engine";
 import { formName } from "@ph/engine/domain/government";
-import { campaignOptionsOf, PICKER_REGIONS, pickerRegions, startTrade, waysToGrow, type NewGameChoices } from "@ph/engine/domain/scenario-setup";
+import { campaignOptionsOf, DEFAULT_CHOICES, PICKER_REGIONS, pickerRegions, startTrade, waysToGrow, type NewGameChoices } from "@ph/engine/domain/scenario-setup";
 import { pickerCardHtml, regionListHtml, regionSelectHtml, strongIn, strongInWords, waysToGrowHtml } from "./ui/realmPicker.ts";
 import { loadLastChoices, newGameOptionsHtml, rulesLine, saveLastChoices, setRule, type RuleKey } from "./ui/newGame.ts";
-import { BATTLE_STEP_MS, bannerAt, COUNTRY_CARD_TABS, endTurnInAuto, endTurnLabel, keyEndsTurn, newAutoTurns, realmOverview, REALM_BOOK_TABS, sectionOf, SHELL as SHELL_RULES, startColumn, startIcons, stopAuto, switchAuto, tabHolds, WATCH_STEP_MS, weekPlayed, type AutoStop, type OverviewTile, type Platform as ShellPlatform } from "@ph/engine/domain/game-shell";
+import { BATTLE_STEP_MS, bannerAt, COUNTRY_CARD_TABS, endTurnInAuto, endTurnLabel, keyEndsTurn, newAutoTurns, realmOverview, REALM_BOOK_TABS, sectionOf, firstLaunchQuestion, SHELL as SHELL_RULES, startColumn, startIcons, stopAuto, switchAuto, tabHolds, WATCH_STEP_MS, weekPlayed, type AutoStop, type OverviewTile, type Platform as ShellPlatform } from "@ph/engine/domain/game-shell";
 import { autosaveDue, continueTarget, longDate, newCampaign, newManualSave, saveStart, savesConfig, sharedFromLine, type Campaign, type Platform as SavePlatform } from "@ph/engine/domain/saves";
 import { SaveStore, type StoredSave } from "./saves/store.ts";
 import { FileSaveStore, moveIntoFolder, type SaveStoreLike } from "./saves/fileStore.ts";
@@ -511,6 +512,8 @@ const achToasts: { id: string; date: string; province?: number }[] = [];
 const soundMenu = document.querySelector<HTMLElement>("#sound-menu")!;
 /** First-campaign hints (onboarding TUT-121 … TUT-130). */
 const hints = new Hints();
+/** The tutorial "Murad's Frontier" (onboarding TUT-131 … TUT-134, D-TUT-19). */
+const coach = new Coach();
 /** The commander list is put away. */
 let armyListClosed = true;
 armyButton.addEventListener("click", () => {
@@ -885,6 +888,7 @@ setHintsRows({
   setOn: (on) => hints.setOn(on),
   reset: () => {
     hints.reset();
+    coach.reset();
     if (!hints.state.on) hints.setOn(true);
     // Mid-campaign the realm is already chosen.
     if (snapshot) hints.did("realm chosen");
@@ -906,7 +910,7 @@ async function boot(): Promise<void> {
   const image = (mapImage = await loadMapImage(rules.map!, provinces.length));
   loadingStage("Raising the realms…", 0.75);
   await painted();
-  view = new MapView(document.querySelector("#map")!, image, provinces.length, { onTap, drawOverlay, onLongPress, longPressMs });
+  view = new MapView(document.querySelector("#map")!, image, provinces.length, { onTap, drawOverlay, onLongPress, longPressMs, onCamera: (a) => coach.did(`camera_action(${a})`) });
   view.setPower(mapPower());
   view.renderer.vision = visionIndex(vision);
   // Read by the performance checks (scripts/perf.mjs).
@@ -937,7 +941,18 @@ async function boot(): Promise<void> {
   hideLoading();
   sound.title();
   // A hint waits while a card is up: an event, a revolution, a realm founded, the loading screen (TUT-126, SETUP-094).
-  hints.mount({ target: hintTarget, moment: () => ({ eventOpen: !eventCard.hidden || !overlay.hidden || !revolutionCard.hidden || !!alerts.querySelector(".founding") || loadingShown(), turnPlaying: playing }), sfx: (id) => sound.sfx(id) });
+  // The tutorial's note teaches while it runs: the hints wait for it to end (D-TUT-19).
+  hints.mount({ target: hintTarget, moment: () => ({ eventOpen: coach.running || !eventCard.hidden || !overlay.hidden || !revolutionCard.hidden || !!alerts.querySelector(".founding") || loadingShown(), turnPlaying: playing }), sfx: (id) => sound.sfx(id) });
+  coach.mount({
+    target: coachTarget,
+    held: () => !snapshot || !eventCard.hidden || !overlay.hidden || !revolutionCard.hidden || loadingShown() || startOn,
+    sfx: (id) => sound.sfx(id),
+    goTo: (key) => {
+      const i = placeIndex(key);
+      if (i >= 0) view.lookAt(provinces[i]!.x!, provinces[i]!.y!, Math.max(view.camera.zoom, 4));
+    },
+    end: endTutorial,
+  });
 }
 
 // ---- map styling ----
@@ -1165,6 +1180,7 @@ const lensMenu = document.querySelector<HTMLElement>("#lenses")!;
 function setLens(l: Lens): void {
   lens = l;
   if (l !== "realms") hints.did("lens");
+  if (TUTORIAL_LENS[l]) coach.did(`lens(${TUTORIAL_LENS[l]})`);
   view.renderer.mode = lens === "realms" ? "political" : lens === "terrain" ? "terrain" : "lens";
   view.renderer.fiefs = lens === "institutions";
   restyleProvinces();
@@ -2898,6 +2914,7 @@ function onLongPress(_sx: number, _sy: number, province: number): void {
 }
 
 function onTap(sx: number, sy: number, province: number): void {
+  coach.mapTap();
   // While a route is drawn, a tap picks its next stop (TRADE-142).
   if (routing) return routeTap(province);
   traderView = -1;
@@ -7201,6 +7218,76 @@ const endDateParam = (): { endDate?: string; chapterYears?: number } => {
   const chapter = Number(q.get("chapter"));
   return { ...(end ? { endDate: end } : {}), ...(chapter > 0 ? { chapterYears: chapter } : {}) };
 };
+// ---- the tutorial "Murad's Frontier" (onboarding TUT-131 … TUT-134, D-TUT-19) ----
+
+/** The map modes the tutorial's lens steps name (ch0.food_lens, ch0.faith_lens). */
+const TUTORIAL_LENS: Partial<Record<Lens, string>> = { food: "Food", faiths: "Faith" };
+
+/** The map province a place token names, by its name on the map (TUT-059), or -1. */
+function placeIndex(key: string): number {
+  const name = placeProvince(key);
+  return name ? provinces.findIndex((p) => p.name === name) : -1;
+}
+
+/**
+ * Where a tutorial step's anchor is on the screen as it stands, one tap at a
+ * time (TUT-131): a place on the map, or its card through the name at the
+ * bottom left; a map mode through Map mode, then the mode. The camera steps
+ * point at nothing: the whole map is theirs.
+ */
+function coachTarget(step: Step): HintTarget {
+  if (!snapshot) return {};
+  const [kind, key] = [step.anchor.split(".")[0], step.anchor.split(".").slice(1).join(".")];
+  if (kind === "place") {
+    const i = placeIndex(key);
+    if (i < 0) return {};
+    const show = () => view.lookAt(provinces[i]!.x!, provinces[i]!.y!, Math.max(view.camera.zoom, 4));
+    if (step.done === "screen_open(province_card)") return provinceCardTarget(i, "", () => openProvinceTab(i, "overview"));
+    return mapTarget(i, "", show);
+  }
+  if (step.anchor.startsWith("ui.lens.")) {
+    const want = Object.entries(TUTORIAL_LENS).find(([, name]) => name!.toLowerCase() === step.anchor.slice("ui.lens.".length))?.[0];
+    if (!lensMenu.hidden && want) return { el: lensMenu.querySelector(`[data-lens="${want}"]`) };
+    const mode = document.querySelector<HTMLButtonElement>("#mode")!;
+    // A card filling a narrow screen hides Map mode: fold it away first, or Show me does both.
+    const show = () => {
+      panelCollapsed = true;
+      renderPanel();
+      if (lensMenu.hidden) mode.click();
+    };
+    const fold = !panel.hidden && !visibleBox(mode) ? panel.querySelector(".panel-buttons .fold") : null;
+    return { el: fold ?? mode, show };
+  }
+  return {};
+}
+
+/** Starts the tutorial: a new Ottoman campaign on the 1378 start with a fixed seed, and the vizier's first step (StartTutorial, TUT-025). */
+async function beginTutorial(): Promise<void> {
+  hideStart();
+  coach.begin();
+  await startGame("ottomans", { ...DEFAULT_CHOICES, ironman: false }, 1378);
+  // The step sits on the realm as it starts: the capital in view, no card open.
+  coach.refresh();
+}
+
+/** The end card's choice, or Leave (TUT-005, TUT-107, D-TUT-19). */
+function endTutorial(how: "keep ruling" | "new campaign" | "left"): void {
+  if (how === "keep ruling") {
+    // The tutorial's campaign becomes the player's own, marked so it is never ironman (X-16).
+    if (campaign) campaign.beganAsTutorial = true;
+    changedSinceResume = true;
+    if (snapshot) askForStudy(snapshot);
+    hints.refresh();
+    renderHud();
+    return;
+  }
+  // Back to the start screen (left: the step is kept for next time), or straight to New campaign.
+  const u = new URL(location.href);
+  u.searchParams.delete("new");
+  if (how === "new campaign") u.searchParams.set("new", "");
+  location.assign(u.toString());
+}
+
 // ---- first-campaign hints ----
 
 /** Opens one of the player's provinces on a tab, as tapping it and the tab would. */
@@ -7423,15 +7510,17 @@ function hintViews(): void {
   }
   if (!panel.hidden && newsView) hints.did("news opened");
   if (s.research?.study) hints.did("setStudy");
+  // The tutorial's card step: the card of the place it names is open (ch0.open_card).
+  if (coach.running && ownProvinceOpen() && selectedProvince === placeIndex("edirne")) coach.did("screen_open(province_card)");
 }
 
-/** Begin: a new game from a seed, the realm and the campaign rules of the options step (SETUP-056). */
-async function startGame(nation: string, picked: NewGameChoices): Promise<void> {
+/** Begin: a new game from a seed, the realm and the campaign rules of the options step (SETUP-056); the tutorial passes its fixed seed. */
+async function startGame(nation: string, picked: NewGameChoices, seed = Date.now() >>> 0): Promise<void> {
   const name = nations[nationIndex.get(nation)!]!.name;
   showLoading(`Gathering the court of ${name}…`, 0.15);
   await painted();
   loadingStage(`Mustering the armies of ${name}…`, 0.6);
-  const snap = await engine.send({ type: "newGame", seed: Date.now() >>> 0, playerNation: nation, choices: picked, difficulty: picked.difficulty, ...(mapImage ? { map: mapTiles(mapImage) } : {}), ...endDateParam(), ...(goalsParam() ? { goals: goalsParam()! } : {}) });
+  const snap = await engine.send({ type: "newGame", seed, playerNation: nation, choices: picked, difficulty: picked.difficulty, ...(mapImage ? { map: mapTiles(mapImage) } : {}), ...endDateParam(), ...(goalsParam() ? { goals: goalsParam()! } : {}) });
   mapSent = true;
   // One new game is one campaign (SAVE-012); ironman is chosen here and kept (SAVE-086), the rules travel in every save (SETUP-055).
   campaign = newCampaign(new Rng(Date.now() >>> 0), { playerNation: nation, nationName: name, ironman: picked.ironman, options: campaignOptionsOf(picked) });
@@ -7487,7 +7576,8 @@ function enterGame(snap: Snapshot): void {
   renderActions();
   hideLoading();
   askedStudy = -1;
-  askForStudy(snapshot!);
+  // In the tutorial the vizier's note leads; the study is asked after the first week as ever.
+  if (!coach.running) askForStudy(snapshot!);
   hints.did("realm chosen");
 }
 
@@ -7908,8 +7998,10 @@ document.querySelector("#app")!.append(startEl);
 const SHELL_PLATFORM: ShellPlatform = runtimeNow === "capacitor-ios" ? "iOS" : runtimeNow === "capacitor-android" ? "Android" : runtimeNow === "electron" ? "desktop" : "web";
 const START_ICONS: Record<string, Parameters<typeof icon>[0]> = { Settings: "cog", Achievements: "trophy", Wiki: "scroll", More: "menu", Quit: "close" };
 let startMore = false;
+/** The first-launch question is up over the start screen (SHELL-131). */
+let startAsk = false;
 let startPan = 0;
-const tutorialFinished = () => hints.progress().done >= hints.progress().of;
+const tutorialFinished = () => coach.finished;
 
 /** The start screen: Play with the waiting campaign, the ways into a campaign, the icon row, the map panning behind (SHELL-150..156). */
 function showStart(): void {
@@ -7938,6 +8030,7 @@ function showStart(): void {
         .join("")}</div>
     </div>
     ${startMore ? startMoreHtml() : ""}
+    ${startAsk ? startAskHtml() : ""}
     <span class="start-version">v${GAME_VERSION}</span>`;
   startEl.hidden = false;
   document.body.classList.add("starting");
@@ -7956,10 +8049,46 @@ function startMoreHtml(): string {
   </div>`;
 }
 
+/** "New to Pocket Hegemony?": asked once, the first time Play has no campaign to continue (SHELL-131, TUT-104). */
+function startAskHtml(): string {
+  const q = firstLaunchQuestion({ asked: false, campaignExists: false })!;
+  const notes: Record<string, string> = { "Play the tutorial": "Murad's Frontier: learn the map as the Ottomans in 1378", "Guided campaign": "Any realm, with hints that point at what to tap", "I know the way": "Any realm, no hints" };
+  return `<div class="start-more start-ask framed" role="dialog" aria-label="${esc(q.question)}">
+    <header><h2 class="ribbon">${esc(q.question)}</h2></header>
+    ${q.choices.map((c) => `<button class="${c === q.focus ? "wax" : "paper"}" data-start="ask" data-choice="${esc(c)}"><b>${esc(c)}</b><small>${esc(notes[c] ?? "")}</small></button>`).join("")}
+  </div>`;
+}
+
+const FIRST_LAUNCH_KEY = "ph-first-launch-asked";
+function firstLaunchAsked(): boolean {
+  try {
+    return localStorage.getItem(FIRST_LAUNCH_KEY) === "1";
+  } catch {
+    return true;
+  }
+}
+
+/** AnswerFirstLaunch: the tutorial, or New campaign with the hints on or off (SHELL-131; the hints stand in for guided first turns, D-TUT-16). */
+function answerFirstLaunch(choice: string): void {
+  try {
+    localStorage.setItem(FIRST_LAUNCH_KEY, "1");
+  } catch {
+    // Asked again next visit.
+  }
+  startAsk = false;
+  const c = SHELL_RULES.firstLaunchChoices[choice as keyof typeof SHELL_RULES.firstLaunchChoices];
+  if (!c) return;
+  if (c.opens !== "new_campaign") return void beginTutorial();
+  if (hints.state.on !== c.guidedTurns) hints.setOn(c.guidedTurns);
+  hideStart();
+  renderPanel();
+}
+
 /** Leaves the start screen for the map: the panning stops and the map takes input again. */
 function hideStart(): void {
   startOn = false;
   startMore = false;
+  startAsk = false;
   startEl.hidden = true;
   document.body.classList.remove("starting");
   cancelAnimationFrame(startPan);
@@ -7981,6 +8110,8 @@ function panStart(nationId: string): void {
   const t0 = performance.now();
   const step = (now: number) => {
     if (!startOn || startEl.hidden) return;
+    // The start screen can show before the map has loaded: the pan waits for it.
+    if (!view) return void (startPan = requestAnimationFrame(step));
     // A sine path: the pan eases to a stop at each end and turns back.
     const phase = ((now - t0) / 1000) * (SHELL_RULES.start.panSpeed / reach);
     view.lookAt(cap.x! + reach * Math.sin(phase), cap.y! + reach * 0.25 * Math.sin(phase * 0.5), SHELL_RULES.start.zoomLevel);
@@ -8000,16 +8131,17 @@ startEl.addEventListener("click", (e) => {
       void loadSave(cont.entry.path, false, false);
       return;
     }
+    // The first time, with no campaign yet, the game asks how the player wants to begin (SHELL-131, TUT-104).
+    if (firstLaunchQuestion({ asked: firstLaunchAsked(), campaignExists: savesList.length > 0 })) {
+      startAsk = true;
+      startMore = false;
+      showStart();
+      return;
+    }
     hideStart();
     renderPanel();
-  } else if (what === "load") openShell("load", true);
-  else if (what === "tutorial") {
-    // The first-campaign hints are the tutorial for now: they start over and walk a new campaign.
-    hints.reset();
-    if (!hints.state.on) hints.setOn(true);
-    hideStart();
-    renderPanel();
-  } else if (what === "Settings") openShell("settings", true);
+  } else if (what === "ask") answerFirstLaunch(b.dataset.choice!); else if (what === "load") openShell("load", true);
+  else if (what === "tutorial") void beginTutorial(); else if (what === "Settings") openShell("settings", true);
   else if (what === "Achievements") openAchievements();
   else if (what === "Wiki") window.open(SHELL_RULES.start.wikiUrl, "_blank", "noopener");
   else if (what === "More") {
@@ -8075,7 +8207,8 @@ let savesOwedFrom: GameDate | null = null;
 
 /** After End turn: the autosave when a month on the interval began (SAVE-008), then the Resume save (SAVE-007). */
 async function savesAfterTurn(began: GameDate | null): Promise<void> {
-  if (!snapshot || !campaign) return;
+  // The tutorial keeps no saves of its own until the player keeps ruling (D-TUT-19).
+  if (!snapshot || !campaign || coach.running) return;
   const d = snapshot.date;
   const monthBegins = began && (began.month !== d.month || began.year !== d.year) ? d.month : null;
   if (autosaveDue(autosaveEvery(), monthBegins, campaign.ironman)) await writeGameSave("autosave", { name: `Auto · ${longDate({ y: d.year, m: d.month })}` });
@@ -8091,7 +8224,7 @@ document.addEventListener("visibilitychange", () => {
   }
   // The time played up to now counts before the app is put away.
   else if (campaign) campaign.playSeconds += Math.round((performance.now() - playClock) / 1000);
-  if (document.visibilityState !== "hidden" || !campaign || !snapshot || playing) return;
+  if (document.visibilityState !== "hidden" || !campaign || !snapshot || playing || coach.running) return;
   if (savesOwedFrom) {
     clearTimeout(afterTurnTimer);
     const from = savesOwedFrom;
@@ -8169,6 +8302,7 @@ function gameMenuHtml(): string {
     ${campaign ? `<p class="menu-rules"><b>Rules</b> ${esc(rulesLine(campaign.options, campaign.ironman))}${campaign.ironman ? "<br><small>Ironman: saved after every week, no going back.</small>" : ""}</p>` : ""}
     <div class="menu-list">
       <button class="wax" data-shell="map">${icon("map", 2)} Return to the map</button>
+      ${coach.running ? `<button class="paper" data-shell="tut-skip">${icon("hourglass", 2)} Skip this chapter</button><button class="paper" data-shell="tut-leave">${icon("close", 2)} Leave the tutorial</button>` : ""}
       ${campaign?.ironman ? "" : `<button class="paper" data-shell="save">${icon("scroll", 2)} Save</button>`}
       <button class="paper" data-shell="load">${icon("scroll", 2)} Load</button>
       ${cloud ? `<button class="paper" data-share-campaign${playing ? " disabled" : ""}>${icon("swords", 2)} Share this campaign</button>` : ""}
@@ -8541,6 +8675,8 @@ function shareCardHtml(): string {
 /** Exit to main menu: where the player left off is kept, and the start screen offers Continue (SAVE-109). */
 async function exitToMenu(): Promise<void> {
   if (playing) return;
+  // Leaving the tutorial this way keeps its step, as Leave does (TUT-005).
+  if (coach.running) return coach.leave();
   showLoading("Keeping your place…", 0.5);
   await painted();
   await writeGameSave("resume");
@@ -8555,6 +8691,13 @@ document.addEventListener("click", (e) => {
   const v = b.dataset.shell!;
   if (v === "map") closeShell();
   else if (v === "exit") void exitToMenu();
+  else if (v === "tut-skip") {
+    closeShell();
+    coach.skipChapter();
+  } else if (v === "tut-leave") {
+    closeShell();
+    coach.leave();
+  }
   else if (v === "achievements") {
     closeShell();
     openAchievements();

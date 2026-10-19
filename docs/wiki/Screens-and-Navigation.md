@@ -29,7 +29,7 @@ The menu has two groups:
 | Column | **Play** (large, wax-red, focused first) | Always | With a campaign in progress it shows the realm's banner, name and date ("France · May 1503") and loads the newest save; otherwise New campaign |
 | Column | New campaign | While a campaign is in progress | New campaign |
 | Column | Load | While any save exists | Load |
-| Column | Tutorial | Until the tutorial is finished, then under More | The tutorial's chapter list |
+| Column | Tutorial | Until every chapter you can play is done, then under More | Murad's Frontier at the step you left off (its chapter list once more than one chapter can be played) |
 | Icon row | Settings | Always | Settings, over the start screen |
 | Icon row | Achievements | Always | Achievements |
 | Icon row | Wiki | Always | This wiki, in your browser; the game stays where it was |
@@ -40,7 +40,7 @@ The version number sits small in the lower right corner. Back on the start scree
 
 On a phone in landscape the logo sits top left, the column and icon row fill the left third on a parchment band, and the map pans across the rest; on a tablet held upright the map fills the top half and the menu sits below it. Play is at least 56 points tall, everything else at least 44, and each icon has its name under it.
 
-**New to Pocket Hegemony?** The very first time you press Play, with no campaign yet, the game asks once: Play the tutorial (focused), Guided campaign, or I know the way. The tutorial starts at its first chapter; Guided campaign opens New campaign with the goals list for your first year switched on; I know the way opens New campaign without it. See [Tutorial and help](Tutorial-and-Help).
+**New to Pocket Hegemony?** The very first time you press Play, with no campaign yet, the game asks once: Play the tutorial (focused), Guided campaign, or I know the way. The tutorial starts at its first chapter, as the Ottomans in 1378; Guided campaign opens New campaign with the first-campaign hints switched on (they stand in for the goals list for now); I know the way opens New campaign with them off. While the tutorial runs, the game menu adds Skip this chapter and Leave the tutorial under Return to the map. See [Tutorial and help](Tutorial-and-Help).
 
 **The free tier.** The free mobile download and the Steam demo let you play the Ottomans and France, with nothing else held back. They show a small "Full game" ribbon beside the logo on the start screen that leads to Unlock, never as a pop-up. No version of the game shows ads. The Unlock screen offers one purchase, the full game, which unlocks every realm; it shows the store's price and a Buy button, and on phones also Restore purchases.
 
