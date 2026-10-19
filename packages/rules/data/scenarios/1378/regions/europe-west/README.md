@@ -21,7 +21,7 @@ southern Empire and Nordic lands, Iberia and Italy, the British Isles and France
 Empire. A few home rules name a realm another region defines (`hungary` for Burgenland and Prekmurje, `poland` for
 the Częstochowa corner, `novgorod` for North Karelia, `morocco` for Ceuta and Melilla).
 
-**Not here yet:** each realm's historical goals with their reasons (plan-1378 §2) come with the bridge events
+**Goals:** each realm's historical goals with their reasons are in `goals.json` (plan-1378 §2, EVT-100)
 (step 6); the generated `world/` comes when all four regions are joined and the map generator is run.
 
 The notes below are the calls made in each part, with confidence, kept for the source pass.

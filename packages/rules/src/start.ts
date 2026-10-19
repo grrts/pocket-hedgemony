@@ -5,6 +5,7 @@ import ports1444 from "../data/scenarios/1444/ports.json" with { type: "json" };
 import rulers1444 from "../data/scenarios/1444/rulers.json" with { type: "json" };
 import subjects1444 from "../data/scenarios/1444/subjects.json" with { type: "json" };
 import subjectsRulers1444 from "../data/scenarios/1444/subjects-rulers.json" with { type: "json" };
+import goals1444 from "../data/scenarios/1444/goals.json" with { type: "json" };
 import map1444 from "../data/scenarios/1444/world/map.json" with { type: "json" };
 import nations1444 from "../data/scenarios/1444/world/nations.json" with { type: "json" };
 import provinces1444 from "../data/scenarios/1444/world/provinces.json" with { type: "json" };
@@ -16,6 +17,7 @@ import ports1378 from "../data/scenarios/1378/world/ports.json" with { type: "js
 import rulers1378 from "../data/scenarios/1378/rulers.json" with { type: "json" };
 import subjects1378 from "../data/scenarios/1378/subjects.json" with { type: "json" };
 import subjectsRulers1378 from "../data/scenarios/1378/subjects-rulers.json" with { type: "json" };
+import goals1378 from "../data/scenarios/1378/goals.json" with { type: "json" };
 import mapNations1378 from "../data/scenarios/1378/map-nations.json" with { type: "json" };
 import mapToCatalogue1378 from "../data/scenarios/1378/map-to-catalogue.json" with { type: "json" };
 import map1378 from "../data/scenarios/1378/world/map.json" with { type: "json" };
@@ -32,7 +34,7 @@ import worldMap from "../data/domain/world-map.json" with { type: "json" };
 import realm from "../data/domain/realm.json" with { type: "json" };
 import religion from "../data/domain/religion.json" with { type: "json" };
 import institutions from "../data/domain/institutions.json" with { type: "json" };
-import type { GameDate } from "./types.ts";
+import type { GameDate, GoalDef } from "./types.ts";
 
 /** The bundled start (X-25). New campaigns start here unless a dev switch picks another. */
 export const DEFAULT_START = "1444";
@@ -78,6 +80,9 @@ export const startPorts = (is1378 ? ports1378 : ports1444) as typeof ports1444;
 export const startRulers = (is1378 ? rulers1378 : rulers1444) as typeof rulers1444;
 export const startSubjects = (is1378 ? subjects1378 : subjects1444) as unknown as typeof subjects1444;
 export const startSubjectsRulers = (is1378 ? subjectsRulers1378 : subjectsRulers1444) as typeof subjectsRulers1444;
+
+/** Realms' historical goals on the start day (EVT-100); the 1444 start has none. */
+export const startGoals: readonly GoalDef[] = (is1378 ? goals1378 : goals1444).goals as unknown as GoalDef[];
 
 /** The generated map of the start (tools/mapgen): image metadata, nations, provinces and sleeping realms. */
 export const startWorld = {

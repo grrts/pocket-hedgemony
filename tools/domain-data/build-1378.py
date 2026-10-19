@@ -155,11 +155,11 @@ with open(f"{out}/subjects.json", "w", encoding="utf-8") as f:
     f.write(',\n "stances": [\n' + ",\n".join("  " + json.dumps(r, ensure_ascii=False) for r in stances) + "\n ]")
     f.write(',\n "religious_heads": ' + json.dumps(heads) + ',\n "playable_subjects": ' + json.dumps(sorted(playable)) + "\n}\n")
 
-# Historical goals with their reasons (plan-1378 §2, EVT-085): every region's, in region order.
+# Historical goals with their reasons (plan-1378 §2, EVT-100): every region's, in region order.
 goals = []
 for key in REGIONS:
     goals += region(key, "goals.json", {"goals": []})["goals"]
-write("goals.json", {"$comment": gen("goals.json") + " Realms' historical goals on the start day (EVT-085), every region's in region order.", "goals": goals})
+write("goals.json", {"$comment": gen("goals.json") + " Realms' historical goals on the start day (EVT-100), every region's in region order.", "goals": goals})
 
 # Map ids whose catalogue record has another id (on top of scenario-setup.json's map_to_catalogue).
 map_to_catalogue = {}

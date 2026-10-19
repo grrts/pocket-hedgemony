@@ -1,0 +1,3467 @@
+{
+ "date": "1444-11-11",
+ "label": "The day after Varna",
+ "why": "The main reference: the day after the Battle of Varna, the date of the existing 1444 map and country catalogue.",
+ "realms": [
+  {
+   "id": "england",
+   "name": "Kingdom of England",
+   "rank": "great_power",
+   "capital": {
+    "name": "London",
+    "at": [
+     -0.12,
+     51.5
+    ]
+   },
+   "overlord": null,
+   "ruler": "Henry VI",
+   "catalogue_id": "england",
+   "note": "Holds Normandy, Maine, Gascony and Calais; Truce of Tours with France since May 1444."
+  },
+  {
+   "id": "scotland",
+   "name": "Kingdom of Scotland",
+   "rank": "major",
+   "capital": {
+    "name": "Edinburgh",
+    "at": [
+     -3.19,
+     55.95
+    ]
+   },
+   "overlord": null,
+   "ruler": "James II",
+   "catalogue_id": "scotland",
+   "note": "Minority of James II, Black Douglas ascendancy."
+  },
+  {
+   "id": "ireland",
+   "name": "Gaelic Irish lordships",
+   "rank": "minor",
+   "capital": {
+    "name": "Cashel",
+    "at": [
+     -7.25,
+     52.65
+    ]
+   },
+   "overlord": null,
+   "ruler": "Gaelic and Gaelicised lords (no single ruler)",
+   "catalogue_id": null,
+   "note": "Map grouping for the Gaelic lordships outside the English Pale."
+  },
+  {
+   "id": "france",
+   "name": "Kingdom of France",
+   "rank": "great_power",
+   "capital": {
+    "name": "Paris",
+    "at": [
+     2.35,
+     48.85
+    ]
+   },
+   "overlord": null,
+   "ruler": "Charles VII",
+   "catalogue_id": "france",
+   "note": "Paris regained 1436; army reform under way during the truce."
+  },
+  {
+   "id": "burgundy",
+   "name": "Burgundian State",
+   "rank": "great_power",
+   "capital": {
+    "name": "Dijon",
+    "at": [
+     5.04,
+     47.32
+    ]
+   },
+   "overlord": null,
+   "ruler": "Philip III",
+   "catalogue_id": "burgundy",
+   "note": "Holds Burgundy, Flanders, Artois, Brabant, Holland, Hainaut and Luxembourg (1443)."
+  },
+  {
+   "id": "brittany",
+   "name": "Duchy of Brittany",
+   "rank": "minor",
+   "capital": {
+    "name": "Rennes",
+    "at": [
+     -1.68,
+     48.11
+    ]
+   },
+   "overlord": "france",
+   "ruler": "Francis I",
+   "catalogue_id": "brittany"
+  },
+  {
+   "id": "provence",
+   "name": "County of Provence",
+   "rank": "minor",
+   "capital": {
+    "name": "Aix-en-Provence",
+    "at": [
+     5.45,
+     43.53
+    ]
+   },
+   "overlord": null,
+   "ruler": "René of Anjou (Count since 1434; lost Naples 1442)",
+   "catalogue_id": "provence"
+  },
+  {
+   "id": "savoy",
+   "name": "Duchy of Savoy",
+   "rank": "minor",
+   "capital": {
+    "name": "Chambéry",
+    "at": [
+     5.92,
+     45.57
+    ]
+   },
+   "overlord": null,
+   "ruler": "Louis I",
+   "catalogue_id": "savoy",
+   "note": "Duke Amadeus VIII is antipope Felix V."
+  },
+  {
+   "id": "lorraine",
+   "name": "Duchy of Lorraine",
+   "rank": "minor",
+   "capital": {
+    "name": "Nancy",
+    "at": [
+     6.18,
+     48.69
+    ]
+   },
+   "overlord": null,
+   "ruler": "Isabella with René of Anjou",
+   "catalogue_id": "lorraine"
+  },
+  {
+   "id": "navarre",
+   "name": "Kingdom of Navarre",
+   "rank": "minor",
+   "capital": {
+    "name": "Pamplona",
+    "at": [
+     -1.64,
+     42.82
+    ]
+   },
+   "overlord": null,
+   "ruler": "Juan II (King consort, Blanche I died 1441)",
+   "catalogue_id": "navarre"
+  },
+  {
+   "id": "castile",
+   "name": "Crown of Castile",
+   "rank": "major",
+   "capital": {
+    "name": "Toledo",
+    "at": [
+     -4.02,
+     39.86
+    ]
+   },
+   "overlord": null,
+   "ruler": "Juan II",
+   "catalogue_id": "castile",
+   "note": "Álvaro de Luna dominant; Olmedo still ahead (1445)."
+  },
+  {
+   "id": "aragon",
+   "name": "Crown of Aragon",
+   "rank": "major",
+   "capital": {
+    "name": "Zaragoza",
+    "at": [
+     -0.88,
+     41.65
+    ]
+   },
+   "overlord": null,
+   "ruler": "Alfonso V the Magnanimous (resides in Naples)",
+   "catalogue_id": "aragon",
+   "note": "Includes Sicily, Sardinia, Valencia and Catalonia."
+  },
+  {
+   "id": "portugal",
+   "name": "Kingdom of Portugal",
+   "rank": "major",
+   "capital": {
+    "name": "Lisbon",
+    "at": [
+     -9.14,
+     38.72
+    ]
+   },
+   "overlord": null,
+   "ruler": "Afonso V (minor; regent Peter, Duke of Coimbra)",
+   "catalogue_id": "portugal",
+   "note": "Holds Ceuta since 1415; voyages past Cape Bojador."
+  },
+  {
+   "id": "granada",
+   "name": "Emirate of Granada",
+   "rank": "minor",
+   "capital": {
+    "name": "Granada",
+    "at": [
+     -3.6,
+     37.18
+    ]
+   },
+   "overlord": "castile",
+   "ruler": "Muhammad IX al-Aysar",
+   "catalogue_id": "granada",
+   "note": "Tributary of Castile."
+  },
+  {
+   "id": "milan",
+   "name": "Duchy of Milan",
+   "rank": "major",
+   "capital": {
+    "name": "Milan",
+    "at": [
+     9.19,
+     45.46
+    ]
+   },
+   "overlord": null,
+   "ruler": "Filippo Maria Visconti",
+   "catalogue_id": "milan",
+   "note": "Last Visconti duke."
+  },
+  {
+   "id": "venice",
+   "name": "Republic of Venice",
+   "rank": "major",
+   "capital": {
+    "name": "Venice",
+    "at": [
+     12.33,
+     45.44
+    ]
+   },
+   "overlord": null,
+   "ruler": "Francesco Foscari",
+   "catalogue_id": "venice"
+  },
+  {
+   "id": "genoa",
+   "name": "Republic of Genoa",
+   "rank": "minor",
+   "capital": {
+    "name": "Genoa",
+    "at": [
+     8.93,
+     44.41
+    ]
+   },
+   "overlord": null,
+   "ruler": "Raffaele Adorno",
+   "catalogue_id": "genoa",
+   "note": "Independent of Milan since 1435; colonies at Caffa, Chios, Pera."
+  },
+  {
+   "id": "florence",
+   "name": "Republic of Florence",
+   "rank": "minor",
+   "capital": {
+    "name": "Florence",
+    "at": [
+     11.25,
+     43.77
+    ]
+   },
+   "overlord": null,
+   "ruler": "Cosimo de' Medici (de facto)",
+   "catalogue_id": "florence",
+   "note": "Holds Pisa since 1406."
+  },
+  {
+   "id": "modena",
+   "name": "Duchy of Ferrara and Modena (Este)",
+   "rank": "minor",
+   "capital": {
+    "name": "Ferrara",
+    "at": [
+     11.62,
+     44.84
+    ]
+   },
+   "overlord": "papal_states",
+   "ruler": "Leonello d'Este (Marquis)",
+   "catalogue_id": "ferrara"
+  },
+  {
+   "id": "papal_states",
+   "name": "Papal States",
+   "rank": "major",
+   "capital": {
+    "name": "Rome",
+    "at": [
+     12.48,
+     41.9
+    ]
+   },
+   "overlord": null,
+   "ruler": "Eugenius IV",
+   "catalogue_id": "papal_states",
+   "note": "Eugene IV back in Rome since 1443; Council of Basel and antipope Felix V in schism."
+  },
+  {
+   "id": "naples",
+   "name": "Kingdom of Naples",
+   "rank": "major",
+   "capital": {
+    "name": "Naples",
+    "at": [
+     14.25,
+     40.85
+    ]
+   },
+   "overlord": null,
+   "ruler": "Alfonso I (Alfonso V of Aragon)",
+   "catalogue_id": "naples",
+   "note": "Conquered by Alfonso 1442; personal union with the Crown of Aragon."
+  },
+  {
+   "id": "austria",
+   "name": "Austria (Habsburg)",
+   "rank": "major",
+   "capital": {
+    "name": "Vienna",
+    "at": [
+     16.37,
+     48.21
+    ]
+   },
+   "overlord": null,
+   "ruler": "Frederick V (King of the Romans as Frederick III; guardian of Ladislaus Posthumous)",
+   "catalogue_id": "austria"
+  },
+  {
+   "id": "bohemia",
+   "name": "Kingdom of Bohemia",
+   "rank": "major",
+   "capital": {
+    "name": "Prague",
+    "at": [
+     14.42,
+     50.09
+    ]
+   },
+   "overlord": null,
+   "ruler": "Interregnum: Ladislaus Posthumous recognised, governed by Landfrieden unions",
+   "catalogue_id": "bohemia",
+   "note": "Hussite kingdom without a resident king."
+  },
+  {
+   "id": "bavaria",
+   "name": "Bavaria (Wittelsbach duchies)",
+   "rank": "minor",
+   "capital": {
+    "name": "Munich",
+    "at": [
+     11.58,
+     48.14
+    ]
+   },
+   "overlord": null,
+   "ruler": "Albert III (Bavaria-Munich); Henry XVI (Landshut); Louis VIII (Ingolstadt)",
+   "catalogue_id": "bavaria_munich",
+   "note": "Divided into three duchies."
+  },
+  {
+   "id": "wurttemberg",
+   "name": "County of Württemberg",
+   "rank": "minor",
+   "capital": {
+    "name": "Stuttgart",
+    "at": [
+     9.18,
+     48.78
+    ]
+   },
+   "overlord": null,
+   "ruler": "Louis I and Ulrich V (divided 1442)",
+   "catalogue_id": null
+  },
+  {
+   "id": "palatinate",
+   "name": "Electoral Palatinate",
+   "rank": "minor",
+   "capital": {
+    "name": "Heidelberg",
+    "at": [
+     8.14,
+     49.35
+    ]
+   },
+   "overlord": null,
+   "ruler": "Louis IV",
+   "catalogue_id": "palatinate"
+  },
+  {
+   "id": "cologne",
+   "name": "Electorate of Cologne",
+   "rank": "minor",
+   "capital": {
+    "name": "Bonn",
+    "at": [
+     7.1,
+     50.73
+    ]
+   },
+   "overlord": null,
+   "ruler": "Archbishop Dietrich II of Moers",
+   "catalogue_id": "cologne",
+   "note": "The city of Cologne governs itself."
+  },
+  {
+   "id": "cologne_city",
+   "name": "City of Cologne",
+   "rank": "minor",
+   "capital": {
+    "name": "Cologne",
+    "at": [
+     6.96,
+     50.94
+    ]
+   },
+   "overlord": null,
+   "ruler": "City council of the Gaffeln",
+   "catalogue_id": "cologne_city"
+  },
+  {
+   "id": "hesse",
+   "name": "Landgraviate of Hesse",
+   "rank": "minor",
+   "capital": {
+    "name": "Kassel",
+    "at": [
+     9.48,
+     51.31
+    ]
+   },
+   "overlord": null,
+   "ruler": "Louis I",
+   "catalogue_id": "hesse"
+  },
+  {
+   "id": "saxony",
+   "name": "Electorate of Saxony",
+   "rank": "minor",
+   "capital": {
+    "name": "Meissen",
+    "at": [
+     13.47,
+     51.16
+    ]
+   },
+   "overlord": null,
+   "ruler": "Frederick II the Gentle with William III",
+   "catalogue_id": "saxony",
+   "note": "Partition of Altenburg 1445 and the Saxon Fratricidal War ahead."
+  },
+  {
+   "id": "brandenburg",
+   "name": "Margraviate of Brandenburg",
+   "rank": "minor",
+   "capital": {
+    "name": "Berlin-Cölln",
+    "at": [
+     13.4,
+     52.52
+    ]
+   },
+   "overlord": null,
+   "ruler": "Frederick II Irontooth",
+   "catalogue_id": "brandenburg"
+  },
+  {
+   "id": "luneburg",
+   "name": "Duchy of Brunswick-Lüneburg",
+   "rank": "minor",
+   "capital": {
+    "name": "Celle",
+    "at": [
+     10.41,
+     53.25
+    ]
+   },
+   "overlord": null,
+   "ruler": "Otto IV and Frederick II (joint)",
+   "catalogue_id": "luneburg"
+  },
+  {
+   "id": "hamburg",
+   "name": "Free City of Hamburg",
+   "rank": "minor",
+   "capital": {
+    "name": "Hamburg",
+    "at": [
+     10.0,
+     53.55
+    ]
+   },
+   "overlord": null,
+   "ruler": "City council",
+   "catalogue_id": "hamburg"
+  },
+  {
+   "id": "lubeck",
+   "name": "Free Imperial City of Lübeck",
+   "rank": "minor",
+   "capital": {
+    "name": "Lübeck",
+    "at": [
+     10.69,
+     53.87
+    ]
+   },
+   "overlord": null,
+   "ruler": "Council and burgomasters",
+   "catalogue_id": "lubeck",
+   "note": "Leading town of the Hanseatic League."
+  },
+  {
+   "id": "mecklenburg",
+   "name": "Duchy of Mecklenburg",
+   "rank": "minor",
+   "capital": {
+    "name": "Schwerin",
+    "at": [
+     11.42,
+     53.63
+    ]
+   },
+   "overlord": null,
+   "ruler": "Henry IV",
+   "catalogue_id": "mecklenburg"
+  },
+  {
+   "id": "pomerania",
+   "name": "Duchy of Pomerania",
+   "rank": "minor",
+   "capital": {
+    "name": "Stettin",
+    "at": [
+     14.55,
+     53.43
+    ]
+   },
+   "overlord": null,
+   "ruler": "Joachim of Stettin; Wartislaw IX of Wolgast; Eric of Pomerania claims Stolp",
+   "catalogue_id": null
+  },
+  {
+   "id": "switzerland",
+   "name": "Old Swiss Confederacy",
+   "rank": "minor",
+   "capital": {
+    "name": "Bern",
+    "at": [
+     7.45,
+     46.95
+    ]
+   },
+   "overlord": null,
+   "ruler": "Federal Diet (no single ruler)",
+   "catalogue_id": "swiss_confederation",
+   "note": "At war with Zürich and Habsburg (Old Zürich War); St. Jakob an der Birs August 1444."
+  },
+  {
+   "id": "teutonic_order",
+   "name": "Teutonic Order in Prussia",
+   "rank": "major",
+   "capital": {
+    "name": "Marienburg",
+    "at": [
+     19.03,
+     54.04
+    ]
+   },
+   "overlord": null,
+   "ruler": "Konrad von Erlichshausen",
+   "catalogue_id": "teutonic_order",
+   "note": "Prussian Confederation of estates formed 1440."
+  },
+  {
+   "id": "livonian_order",
+   "name": "Livonian Order",
+   "rank": "minor",
+   "capital": {
+    "name": "Riga",
+    "at": [
+     24.1,
+     56.95
+    ]
+   },
+   "overlord": "teutonic_order",
+   "ruler": "Master Heidenreich Vincke von Overberg",
+   "catalogue_id": "livonian_order",
+   "note": "Shares Riga with the archbishop."
+  },
+  {
+   "id": "denmark",
+   "name": "Kingdom of Denmark (Kalmar Union)",
+   "rank": "major",
+   "capital": {
+    "name": "Copenhagen",
+    "at": [
+     12.57,
+     55.68
+    ]
+   },
+   "overlord": null,
+   "ruler": "Christopher of Bavaria",
+   "catalogue_id": "denmark",
+   "note": "Senior kingdom of the Kalmar Union."
+  },
+  {
+   "id": "sweden",
+   "name": "Kingdom of Sweden",
+   "rank": "minor",
+   "capital": {
+    "name": "Stockholm",
+    "at": [
+     18.07,
+     59.33
+    ]
+   },
+   "overlord": "denmark",
+   "ruler": "Christopher of Bavaria",
+   "catalogue_id": "sweden",
+   "note": "Personal union with Denmark (Kalmar Union)."
+  },
+  {
+   "id": "norway",
+   "name": "Kingdom of Norway",
+   "rank": "minor",
+   "capital": {
+    "name": "Oslo",
+    "at": [
+     10.75,
+     59.91
+    ]
+   },
+   "overlord": "denmark",
+   "ruler": "Christopher of Bavaria",
+   "catalogue_id": "norway",
+   "note": "Personal union with Denmark (Kalmar Union)."
+  },
+  {
+   "id": "gotland",
+   "name": "Gotland under Eric of Pomerania",
+   "rank": "minor",
+   "capital": {
+    "name": "Visby",
+    "at": [
+     18.3,
+     57.64
+    ]
+   },
+   "overlord": null,
+   "ruler": "Eric of Pomerania (deposed King of the Kalmar Union)",
+   "catalogue_id": "gotland",
+   "note": "Eric rules Gotland from Visborg castle and wages war at sea."
+  },
+  {
+   "id": "poland",
+   "name": "Kingdom of Poland",
+   "rank": "major",
+   "capital": {
+    "name": "Kraków",
+    "at": [
+     19.94,
+     50.06
+    ]
+   },
+   "overlord": null,
+   "ruler": "Władysław III, killed at Varna on 10 November 1444 (death not yet known; interregnum follows)",
+   "catalogue_id": "poland"
+  },
+  {
+   "id": "lithuania",
+   "name": "Grand Duchy of Lithuania",
+   "rank": "major",
+   "capital": {
+    "name": "Vilnius",
+    "at": [
+     25.28,
+     54.69
+    ]
+   },
+   "overlord": null,
+   "ruler": "Casimir IV Jagiellon",
+   "catalogue_id": "lithuania",
+   "note": "Kyiv held by the appanage prince Olelko (Alexander) since 1440."
+  },
+  {
+   "id": "hungary",
+   "name": "Kingdom of Hungary",
+   "rank": "major",
+   "capital": {
+    "name": "Buda",
+    "at": [
+     19.04,
+     47.5
+    ]
+   },
+   "overlord": null,
+   "ruler": "Władysław I, killed at Varna on 10 November 1444; Ladislaus V (child) rival claimant",
+   "catalogue_id": "hungary",
+   "note": "Holds Belgrade; John Hunyadi escapes Varna."
+  },
+  {
+   "id": "moldavia",
+   "name": "Principality of Moldavia",
+   "rank": "minor",
+   "capital": {
+    "name": "Suceava",
+    "at": [
+     26.25,
+     47.65
+    ]
+   },
+   "overlord": "poland",
+   "ruler": "Stephen II (shares power with Iliaș)",
+   "catalogue_id": "moldavia"
+  },
+  {
+   "id": "wallachia",
+   "name": "Principality of Wallachia",
+   "rank": "minor",
+   "capital": {
+    "name": "Târgoviște",
+    "at": [
+     25.45,
+     44.93
+    ]
+   },
+   "overlord": null,
+   "ruler": "Vlad II Dracul",
+   "catalogue_id": "wallachia",
+   "note": "Sent troops to Varna; Ottoman tributary in practice."
+  },
+  {
+   "id": "serbia",
+   "name": "Serbian Despotate",
+   "rank": "minor",
+   "capital": {
+    "name": "Smederevo",
+    "at": [
+     20.93,
+     44.66
+    ]
+   },
+   "overlord": "ottomans",
+   "ruler": "Đurađ Branković",
+   "catalogue_id": "serbia",
+   "note": "Restored by the Peace of Szeged (1444)."
+  },
+  {
+   "id": "bosnia",
+   "name": "Kingdom of Bosnia",
+   "rank": "minor",
+   "capital": {
+    "name": "Bobovac",
+    "at": [
+     17.27,
+     44.34
+    ]
+   },
+   "overlord": "ottomans",
+   "ruler": "Stephen Thomas",
+   "catalogue_id": "bosnia"
+  },
+  {
+   "id": "albania",
+   "name": "Albanian lords (League of Lezhë)",
+   "rank": "minor",
+   "capital": {
+    "name": "Krujë",
+    "at": [
+     19.78,
+     41.51
+    ]
+   },
+   "overlord": null,
+   "ruler": "Skanderbeg (leader of the League of Lezhë, March 1444)",
+   "catalogue_id": null,
+   "note": "Skanderbeg won at Torvioll in June 1444."
+  },
+  {
+   "id": "ragusa",
+   "name": "Republic of Ragusa",
+   "rank": "minor",
+   "capital": {
+    "name": "Ragusa",
+    "at": [
+     18.09,
+     42.65
+    ]
+   },
+   "overlord": "hungary",
+   "ruler": "Rector and Great Council",
+   "catalogue_id": "ragusa"
+  },
+  {
+   "id": "byzantium",
+   "name": "Byzantine Empire",
+   "rank": "minor",
+   "capital": {
+    "name": "Constantinople",
+    "at": [
+     28.98,
+     41.01
+    ]
+   },
+   "overlord": "ottomans",
+   "ruler": "John VIII Palaiologos",
+   "catalogue_id": "byzantium",
+   "note": "Ottoman tributary; Church union of Florence (1439) contested."
+  },
+  {
+   "id": "morea",
+   "name": "Despotate of the Morea",
+   "rank": "minor",
+   "capital": {
+    "name": "Mistra",
+    "at": [
+     22.37,
+     37.07
+    ]
+   },
+   "overlord": "byzantium",
+   "ruler": "Constantine Palaiologos and Thomas Palaiologos",
+   "catalogue_id": "morea",
+   "note": "Constantine rebuilt the Hexamilion and forced Athens to pay tribute in 1444."
+  },
+  {
+   "id": "athens",
+   "name": "Duchy of Athens",
+   "rank": "minor",
+   "capital": {
+    "name": "Athens",
+    "at": [
+     23.73,
+     37.98
+    ]
+   },
+   "overlord": "ottomans",
+   "ruler": "Nerio II Acciaioli",
+   "catalogue_id": "athens",
+   "note": "Ottoman tributary; made tributary to Constantine of the Morea in 1444."
+  },
+  {
+   "id": "ottomans",
+   "name": "Ottoman Sultanate",
+   "rank": "great_power",
+   "capital": {
+    "name": "Edirne",
+    "at": [
+     26.55,
+     41.68
+    ]
+   },
+   "overlord": null,
+   "ruler": "Mehmed II (first reign), with Murad II, victor of Varna, in command",
+   "catalogue_id": "ottoman",
+   "note": "Varna fought on 10 November 1444."
+  },
+  {
+   "id": "karaman",
+   "name": "Beylik of Karaman",
+   "rank": "minor",
+   "capital": {
+    "name": "Konya",
+    "at": [
+     32.49,
+     37.87
+    ]
+   },
+   "overlord": null,
+   "ruler": "İbrahim II",
+   "catalogue_id": "karaman"
+  },
+  {
+   "id": "candar",
+   "name": "Beylik of Candar (Isfendiyarids)",
+   "rank": "minor",
+   "capital": {
+    "name": "Kastamonu",
+    "at": [
+     33.78,
+     41.38
+    ]
+   },
+   "overlord": "ottomans",
+   "ruler": "İsmail Bey",
+   "catalogue_id": "candar"
+  },
+  {
+   "id": "trebizond",
+   "name": "Empire of Trebizond",
+   "rank": "minor",
+   "capital": {
+    "name": "Trebizond",
+    "at": [
+     39.72,
+     41.0
+    ]
+   },
+   "overlord": null,
+   "ruler": "John IV Megas Komnenos",
+   "catalogue_id": "trebizond"
+  },
+  {
+   "id": "dulkadir",
+   "name": "Beylik of Dulkadir",
+   "rank": "minor",
+   "capital": {
+    "name": "Elbistan",
+    "at": [
+     36.94,
+     37.58
+    ]
+   },
+   "overlord": "mamluks",
+   "ruler": "Süleyman Bey",
+   "catalogue_id": "dulkadir"
+  },
+  {
+   "id": "aq_qoyunlu",
+   "name": "Aq Qoyunlu",
+   "rank": "minor",
+   "capital": {
+    "name": "Amid",
+    "at": [
+     40.23,
+     37.92
+    ]
+   },
+   "overlord": null,
+   "ruler": "Jahangir (sons of Qara Yuluk Osman contend)",
+   "catalogue_id": "aq_qoyunlu"
+  },
+  {
+   "id": "qara_qoyunlu",
+   "name": "Qara Qoyunlu",
+   "rank": "major",
+   "capital": {
+    "name": "Tabriz",
+    "at": [
+     46.29,
+     38.08
+    ]
+   },
+   "overlord": null,
+   "ruler": "Jahan Shah",
+   "catalogue_id": "qara_qoyunlu",
+   "note": "Baghdad held by Jahan Shah's rival brother Ispend until 1445."
+  },
+  {
+   "id": "cyprus",
+   "name": "Kingdom of Cyprus",
+   "rank": "minor",
+   "capital": {
+    "name": "Nicosia",
+    "at": [
+     33.36,
+     35.17
+    ]
+   },
+   "overlord": "mamluks",
+   "ruler": "John II of Lusignan",
+   "catalogue_id": "cyprus",
+   "note": "Mamluk tributary since 1426."
+  },
+  {
+   "id": "knights_of_rhodes",
+   "name": "Knights Hospitaller",
+   "rank": "minor",
+   "capital": {
+    "name": "Rhodes",
+    "at": [
+     28.22,
+     36.44
+    ]
+   },
+   "overlord": null,
+   "ruler": "Grand Master Jean de Lastic",
+   "catalogue_id": "knights_hospitaller",
+   "note": "Withstood the Mamluk siege of Rhodes in 1444."
+  },
+  {
+   "id": "georgia",
+   "name": "Kingdom of Georgia",
+   "rank": "minor",
+   "capital": {
+    "name": "Tbilisi",
+    "at": [
+     44.79,
+     41.72
+    ]
+   },
+   "overlord": null,
+   "ruler": "Vakhtang IV",
+   "catalogue_id": "georgia"
+  },
+  {
+   "id": "shirvan",
+   "name": "Shirvanshahs",
+   "rank": "minor",
+   "capital": {
+    "name": "Shamakhi",
+    "at": [
+     48.64,
+     40.63
+    ]
+   },
+   "overlord": null,
+   "ruler": "Khalilullah I",
+   "catalogue_id": "shirvan"
+  },
+  {
+   "id": "muscovy",
+   "name": "Grand Principality of Moscow",
+   "rank": "major",
+   "capital": {
+    "name": "Moscow",
+    "at": [
+     37.62,
+     55.75
+    ]
+   },
+   "overlord": "great_horde",
+   "ruler": "Vasily II",
+   "catalogue_id": "muscovy",
+   "note": "Civil war with Dmitry Shemyaka; captured by Kazan in 1445 (ahead)."
+  },
+  {
+   "id": "novgorod",
+   "name": "Novgorod Republic",
+   "rank": "minor",
+   "capital": {
+    "name": "Novgorod",
+    "at": [
+     31.27,
+     58.52
+    ]
+   },
+   "overlord": null,
+   "ruler": "Archbishop Euthymius II and the veche",
+   "catalogue_id": "novgorod"
+  },
+  {
+   "id": "pskov",
+   "name": "Pskov Republic",
+   "rank": "minor",
+   "capital": {
+    "name": "Pskov",
+    "at": [
+     28.33,
+     57.82
+    ]
+   },
+   "overlord": null,
+   "ruler": "Veche",
+   "catalogue_id": "pskov"
+  },
+  {
+   "id": "tver",
+   "name": "Grand Principality of Tver",
+   "rank": "minor",
+   "capital": {
+    "name": "Tver",
+    "at": [
+     35.9,
+     56.86
+    ]
+   },
+   "overlord": "great_horde",
+   "ruler": "Boris Alexandrovich",
+   "catalogue_id": "tver"
+  },
+  {
+   "id": "ryazan",
+   "name": "Grand Principality of Ryazan",
+   "rank": "minor",
+   "capital": {
+    "name": "Ryazan",
+    "at": [
+     39.74,
+     54.63
+    ]
+   },
+   "overlord": "great_horde",
+   "ruler": "Ivan Fyodorovich",
+   "catalogue_id": "ryazan"
+  },
+  {
+   "id": "kazan",
+   "name": "Khanate of Kazan",
+   "rank": "minor",
+   "capital": {
+    "name": "Kazan",
+    "at": [
+     49.11,
+     55.79
+    ]
+   },
+   "overlord": null,
+   "ruler": "Ulugh Muhammad",
+   "catalogue_id": "kazan",
+   "note": "Ulugh Muhammad seized Kazan c. 1438 (traditional 1438; some date it 1445)."
+  },
+  {
+   "id": "great_horde",
+   "name": "Great Horde",
+   "rank": "major",
+   "capital": {
+    "name": "Sarai",
+    "at": [
+     45.6,
+     47.8
+    ]
+   },
+   "overlord": null,
+   "ruler": "Küchük Muhammad",
+   "catalogue_id": "great_horde",
+   "note": "Rump of the Golden Horde."
+  },
+  {
+   "id": "crimea",
+   "name": "Crimean Khanate",
+   "rank": "minor",
+   "capital": {
+    "name": "Qırq Yer",
+    "at": [
+     33.86,
+     44.75
+    ]
+   },
+   "overlord": null,
+   "ruler": "Hacı I Giray",
+   "catalogue_id": "crimea"
+  },
+  {
+   "id": "nogai",
+   "name": "Nogai Horde",
+   "rank": "minor",
+   "capital": {
+    "name": "Saraychik",
+    "at": [
+     51.9,
+     47.1
+    ]
+   },
+   "overlord": null,
+   "ruler": "Waqqas Bey",
+   "catalogue_id": "nogai"
+  },
+  {
+   "id": "uzbek_khanate",
+   "name": "Uzbek Khanate (Abu'l-Khayr)",
+   "rank": "major",
+   "capital": {
+    "name": "Sighnaq",
+    "at": [
+     68.4,
+     44.0
+    ]
+   },
+   "overlord": null,
+   "ruler": "Abu'l-Khayr Khan",
+   "catalogue_id": "uzbek_khanate"
+  },
+  {
+   "id": "mamluks",
+   "name": "Mamluk Sultanate",
+   "rank": "great_power",
+   "capital": {
+    "name": "Cairo",
+    "at": [
+     31.24,
+     30.04
+    ]
+   },
+   "overlord": null,
+   "ruler": "al-Zahir Jaqmaq",
+   "catalogue_id": "mamluk"
+  },
+  {
+   "id": "hejaz",
+   "name": "Sharifate of Mecca",
+   "rank": "minor",
+   "capital": {
+    "name": "Mecca",
+    "at": [
+     39.83,
+     21.42
+    ]
+   },
+   "overlord": "mamluks",
+   "ruler": "Sharif Abu al-Qasim ibn Hasan ibn Ajlan",
+   "catalogue_id": "mecca"
+  },
+  {
+   "id": "yemen",
+   "name": "Rasulid Yemen",
+   "rank": "minor",
+   "capital": {
+    "name": "Ta'izz",
+    "at": [
+     44.02,
+     13.58
+    ]
+   },
+   "overlord": null,
+   "ruler": "al-Muzaffar Yusuf III (contested)",
+   "catalogue_id": "rasulid_yemen",
+   "note": "Rasulid power failing; Tahirids rising."
+  },
+  {
+   "id": "oman",
+   "name": "Oman (Nabhani kings and Ibadi imams)",
+   "rank": "minor",
+   "capital": {
+    "name": "Bahla",
+    "at": [
+     57.53,
+     22.93
+    ]
+   },
+   "overlord": null,
+   "ruler": "Nabhani king (unknown); Ibadi imam",
+   "catalogue_id": "oman_nabhani"
+  },
+  {
+   "id": "hormuz",
+   "name": "Kingdom of Hormuz",
+   "rank": "minor",
+   "capital": {
+    "name": "Hormuz",
+    "at": [
+     56.46,
+     27.1
+    ]
+   },
+   "overlord": "timurids",
+   "ruler": "Malik of Hormuz (name uncertain)",
+   "catalogue_id": "hormuz",
+   "note": "Pays tribute to the Timurids."
+  },
+  {
+   "id": "timurids",
+   "name": "Timurid Empire",
+   "rank": "great_power",
+   "capital": {
+    "name": "Herat",
+    "at": [
+     62.2,
+     34.35
+    ]
+   },
+   "overlord": null,
+   "ruler": "Shah Rukh",
+   "catalogue_id": "timurid_empire",
+   "note": "Ulugh Beg governs Transoxiana from Samarkand."
+  },
+  {
+   "id": "moghulistan",
+   "name": "Moghulistan",
+   "rank": "minor",
+   "capital": {
+    "name": "Aksu",
+    "at": [
+     80.26,
+     41.17
+    ]
+   },
+   "overlord": null,
+   "ruler": "Esen Buqa II",
+   "catalogue_id": "moghulistan",
+   "note": "Kashgar held by the Dughlat amirs."
+  },
+  {
+   "id": "oirat",
+   "name": "Oirat Confederation",
+   "rank": "major",
+   "capital": {
+    "name": "Dzungaria",
+    "at": [
+     92.0,
+     47.0
+    ]
+   },
+   "overlord": null,
+   "ruler": "Esen Taishi",
+   "catalogue_id": "oirat",
+   "note": "Dominates the Mongol steppe."
+  },
+  {
+   "id": "mongols",
+   "name": "Northern Yuan",
+   "rank": "minor",
+   "capital": {
+    "name": "Karakorum region",
+    "at": [
+     102.83,
+     47.2
+    ]
+   },
+   "overlord": null,
+   "ruler": "Taisun Khan (puppet of Esen Taishi)",
+   "catalogue_id": "northern_yuan"
+  },
+  {
+   "id": "tibet",
+   "name": "Phagmodrupa Tibet",
+   "rank": "minor",
+   "capital": {
+    "name": "Nedong",
+    "at": [
+     91.75,
+     29.25
+    ]
+   },
+   "overlord": null,
+   "ruler": "Gongma Drakpa Jungne",
+   "catalogue_id": "phagmodrupa"
+  },
+  {
+   "id": "ming",
+   "name": "Ming Dynasty",
+   "rank": "great_power",
+   "capital": {
+    "name": "Beijing",
+    "at": [
+     116.4,
+     39.9
+    ]
+   },
+   "overlord": null,
+   "ruler": "Zhengtong Emperor (Wang Zhen dominant at court)",
+   "catalogue_id": "ming"
+  },
+  {
+   "id": "jurchens",
+   "name": "Jurchen tribes",
+   "rank": "minor",
+   "capital": {
+    "name": "Upper Sungari",
+    "at": [
+     126.6,
+     45.75
+    ]
+   },
+   "overlord": "ming",
+   "ruler": "Tribal chiefs under Ming guards",
+   "catalogue_id": null
+  },
+  {
+   "id": "korea",
+   "name": "Joseon",
+   "rank": "major",
+   "capital": {
+    "name": "Hanseong",
+    "at": [
+     126.98,
+     37.57
+    ]
+   },
+   "overlord": "ming",
+   "ruler": "Sejong",
+   "catalogue_id": "joseon",
+   "note": "Hangul created 1443."
+  },
+  {
+   "id": "japan",
+   "name": "Ashikaga Shogunate",
+   "rank": "major",
+   "capital": {
+    "name": "Kyoto",
+    "at": [
+     135.77,
+     35.01
+    ]
+   },
+   "overlord": null,
+   "ruler": "No shogun in office; heir Ashikaga Yoshinari (Yoshimasa); Emperor Go-Hanazono",
+   "catalogue_id": "ashikaga",
+   "note": "Hosokawa and Hatakeyama kanrei govern; Kantō under the Uesugi."
+  },
+  {
+   "id": "ryukyu",
+   "name": "Kingdom of Ryukyu",
+   "rank": "minor",
+   "capital": {
+    "name": "Shuri",
+    "at": [
+     127.72,
+     26.22
+    ]
+   },
+   "overlord": "ming",
+   "ruler": "Shō Shitatsu",
+   "catalogue_id": "ryukyu"
+  },
+  {
+   "id": "dai_viet",
+   "name": "Đại Việt",
+   "rank": "major",
+   "capital": {
+    "name": "Đông Kinh",
+    "at": [
+     105.85,
+     21.03
+    ]
+   },
+   "overlord": "ming",
+   "ruler": "Lê Nhân Tông (child)",
+   "catalogue_id": "dai_viet"
+  },
+  {
+   "id": "champa",
+   "name": "Champa",
+   "rank": "minor",
+   "capital": {
+    "name": "Vijaya",
+    "at": [
+     109.2,
+     13.8
+    ]
+   },
+   "overlord": "ming",
+   "ruler": "Maha Vijaya",
+   "catalogue_id": "champa"
+  },
+  {
+   "id": "lan_xang",
+   "name": "Lan Xang",
+   "rank": "minor",
+   "capital": {
+    "name": "Luang Prabang",
+    "at": [
+     102.13,
+     19.89
+    ]
+   },
+   "overlord": null,
+   "ruler": "Chakkaphat Phaen Phaeo",
+   "catalogue_id": "lan_xang"
+  },
+  {
+   "id": "lan_na",
+   "name": "Lan Na",
+   "rank": "minor",
+   "capital": {
+    "name": "Chiang Mai",
+    "at": [
+     98.99,
+     18.79
+    ]
+   },
+   "overlord": null,
+   "ruler": "Tilokaraj",
+   "catalogue_id": "lan_na"
+  },
+  {
+   "id": "ayutthaya",
+   "name": "Ayutthaya",
+   "rank": "major",
+   "capital": {
+    "name": "Ayutthaya",
+    "at": [
+     100.57,
+     14.35
+    ]
+   },
+   "overlord": null,
+   "ruler": "Borommarachathirat II",
+   "catalogue_id": "ayutthaya"
+  },
+  {
+   "id": "khmer",
+   "name": "Cambodia",
+   "rank": "minor",
+   "capital": {
+    "name": "Chaktomuk",
+    "at": [
+     104.92,
+     11.56
+    ]
+   },
+   "overlord": null,
+   "ruler": "Ponhea Yat",
+   "catalogue_id": "cambodia",
+   "note": "Royal court left Angkor after the Ayutthayan attack of 1431."
+  },
+  {
+   "id": "ava",
+   "name": "Kingdom of Ava",
+   "rank": "minor",
+   "capital": {
+    "name": "Ava",
+    "at": [
+     96.0,
+     21.9
+    ]
+   },
+   "overlord": null,
+   "ruler": "Narapati I",
+   "catalogue_id": "ava"
+  },
+  {
+   "id": "pegu",
+   "name": "Hanthawaddy",
+   "rank": "minor",
+   "capital": {
+    "name": "Pegu",
+    "at": [
+     96.48,
+     17.33
+    ]
+   },
+   "overlord": null,
+   "ruler": "Binnya Ran I",
+   "catalogue_id": "hanthawaddy"
+  },
+  {
+   "id": "majapahit",
+   "name": "Majapahit",
+   "rank": "major",
+   "capital": {
+    "name": "Trowulan",
+    "at": [
+     112.37,
+     -7.56
+    ]
+   },
+   "overlord": null,
+   "ruler": "Suhita",
+   "catalogue_id": "majapahit",
+   "note": "In decline."
+  },
+  {
+   "id": "malacca",
+   "name": "Malacca Sultanate",
+   "rank": "minor",
+   "capital": {
+    "name": "Malacca",
+    "at": [
+     102.25,
+     2.2
+    ]
+   },
+   "overlord": "ming",
+   "ruler": "Abu Syahid",
+   "catalogue_id": "malacca"
+  },
+  {
+   "id": "brunei",
+   "name": "Brunei",
+   "rank": "minor",
+   "capital": {
+    "name": "Kota Batu",
+    "at": [
+     114.94,
+     4.9
+    ]
+   },
+   "overlord": null,
+   "ruler": "Sulaiman",
+   "catalogue_id": "brunei"
+  },
+  {
+   "id": "tondo",
+   "name": "Tondo",
+   "rank": "minor",
+   "capital": {
+    "name": "Tondo",
+    "at": [
+     120.97,
+     14.62
+    ]
+   },
+   "overlord": null,
+   "ruler": "Lakan (name unknown)",
+   "catalogue_id": "tondo"
+  },
+  {
+   "id": "ternate",
+   "name": "Sultanate of Ternate",
+   "rank": "minor",
+   "capital": {
+    "name": "Gamalama",
+    "at": [
+     127.38,
+     0.79
+    ]
+   },
+   "overlord": null,
+   "ruler": "Kolano Gapi Baguna II (traditional)",
+   "catalogue_id": "ternate"
+  },
+  {
+   "id": "delhi",
+   "name": "Delhi Sultanate (Sayyid)",
+   "rank": "minor",
+   "capital": {
+    "name": "Delhi",
+    "at": [
+     77.2,
+     28.6
+    ]
+   },
+   "overlord": null,
+   "ruler": "Muhammad Shah",
+   "catalogue_id": "delhi",
+   "note": "Rule barely extends beyond the Delhi area."
+  },
+  {
+   "id": "sirhind_lodi",
+   "name": "Lodi Punjab",
+   "rank": "minor",
+   "capital": {
+    "name": "Sirhind",
+    "at": [
+     76.38,
+     30.65
+    ]
+   },
+   "overlord": "delhi",
+   "ruler": "Malik Bahlul Lodi",
+   "catalogue_id": "sirhind_lodi",
+   "note": "Holds Lahore, Dipalpur and Sirhind as a nominal Sayyid vassal."
+  },
+  {
+   "id": "jaunpur",
+   "name": "Jaunpur Sultanate",
+   "rank": "major",
+   "capital": {
+    "name": "Jaunpur",
+    "at": [
+     82.68,
+     25.75
+    ]
+   },
+   "overlord": null,
+   "ruler": "Mahmud Shah Sharqi",
+   "catalogue_id": "jaunpur"
+  },
+  {
+   "id": "bengal",
+   "name": "Bengal Sultanate",
+   "rank": "major",
+   "capital": {
+    "name": "Gaur",
+    "at": [
+     88.13,
+     24.87
+    ]
+   },
+   "overlord": null,
+   "ruler": "Nasiruddin Mahmud Shah",
+   "catalogue_id": "bengal"
+  },
+  {
+   "id": "bahmanis",
+   "name": "Bahmani Sultanate",
+   "rank": "major",
+   "capital": {
+    "name": "Bidar",
+    "at": [
+     77.52,
+     17.91
+    ]
+   },
+   "overlord": null,
+   "ruler": "Ala al-Din Ahmad Shah II",
+   "catalogue_id": "bahmani",
+   "note": "Capital moved from Gulbarga to Bidar c. 1429."
+  },
+  {
+   "id": "vijayanagar",
+   "name": "Vijayanagara Empire",
+   "rank": "major",
+   "capital": {
+    "name": "Vijayanagara",
+    "at": [
+     76.46,
+     15.33
+    ]
+   },
+   "overlord": null,
+   "ruler": "Deva Raya II",
+   "catalogue_id": "vijayanagara"
+  },
+  {
+   "id": "calicut",
+   "name": "Calicut (Zamorin)",
+   "rank": "minor",
+   "capital": {
+    "name": "Calicut",
+    "at": [
+     75.78,
+     11.25
+    ]
+   },
+   "overlord": null,
+   "ruler": "The Zamorin (name not known)",
+   "catalogue_id": "calicut"
+  },
+  {
+   "id": "kotte",
+   "name": "Kingdom of Kotte",
+   "rank": "minor",
+   "capital": {
+    "name": "Kotte",
+    "at": [
+     79.9,
+     6.89
+    ]
+   },
+   "overlord": null,
+   "ruler": "Parakramabahu VI",
+   "catalogue_id": "kotte"
+  },
+  {
+   "id": "gujarat",
+   "name": "Gujarat Sultanate",
+   "rank": "major",
+   "capital": {
+    "name": "Ahmedabad",
+    "at": [
+     72.57,
+     23.02
+    ]
+   },
+   "overlord": null,
+   "ruler": "Muhammad Shah II",
+   "catalogue_id": "gujarat"
+  },
+  {
+   "id": "malwa",
+   "name": "Malwa Sultanate",
+   "rank": "minor",
+   "capital": {
+    "name": "Mandu",
+    "at": [
+     75.4,
+     22.35
+    ]
+   },
+   "overlord": null,
+   "ruler": "Mahmud Shah I Khalji",
+   "catalogue_id": "malwa"
+  },
+  {
+   "id": "mewar",
+   "name": "Mewar",
+   "rank": "minor",
+   "capital": {
+    "name": "Chittor",
+    "at": [
+     74.65,
+     24.88
+    ]
+   },
+   "overlord": null,
+   "ruler": "Rana Kumbha",
+   "catalogue_id": "mewar"
+  },
+  {
+   "id": "orissa",
+   "name": "Orissa (Eastern Ganga)",
+   "rank": "minor",
+   "capital": {
+    "name": "Cuttack",
+    "at": [
+     85.83,
+     20.46
+    ]
+   },
+   "overlord": null,
+   "ruler": "Kapilendra Deva (Gajapati)",
+   "catalogue_id": null,
+   "note": "Kapilendra Deva founded the Gajapati line c. 1434."
+  },
+  {
+   "id": "kashmir",
+   "name": "Kashmir Sultanate",
+   "rank": "minor",
+   "capital": {
+    "name": "Srinagar",
+    "at": [
+     74.8,
+     34.08
+    ]
+   },
+   "overlord": null,
+   "ruler": "Zain-ul-Abidin",
+   "catalogue_id": "kashmir"
+  },
+  {
+   "id": "multan",
+   "name": "Langah/Qureshi Multan",
+   "rank": "minor",
+   "capital": {
+    "name": "Multan",
+    "at": [
+     71.47,
+     30.2
+    ]
+   },
+   "overlord": null,
+   "ruler": "Shaikh Yusuf Qureshi",
+   "catalogue_id": "multan"
+  },
+  {
+   "id": "sindh",
+   "name": "Sindh (Samma)",
+   "rank": "minor",
+   "capital": {
+    "name": "Thatta",
+    "at": [
+     67.92,
+     24.75
+    ]
+   },
+   "overlord": null,
+   "ruler": "Samma Jam",
+   "catalogue_id": "sindh"
+  },
+  {
+   "id": "nepal_malla",
+   "name": "Nepal (Malla)",
+   "rank": "minor",
+   "capital": {
+    "name": "Bhaktapur",
+    "at": [
+     85.43,
+     27.67
+    ]
+   },
+   "overlord": null,
+   "ruler": "Yaksha Malla",
+   "catalogue_id": "nepal_malla"
+  },
+  {
+   "id": "ahom",
+   "name": "Ahom Kingdom",
+   "rank": "minor",
+   "capital": {
+    "name": "Charaideo",
+    "at": [
+     94.64,
+     26.98
+    ]
+   },
+   "overlord": null,
+   "ruler": "Susenphaa",
+   "catalogue_id": "ahom"
+  },
+  {
+   "id": "morocco",
+   "name": "Marinid Sultanate",
+   "rank": "minor",
+   "capital": {
+    "name": "Fez",
+    "at": [
+     -5.0,
+     34.03
+    ]
+   },
+   "overlord": null,
+   "ruler": "Abd al-Haqq II (regent Abu Zakariya al-Wattasi)",
+   "catalogue_id": "morocco"
+  },
+  {
+   "id": "tlemcen",
+   "name": "Zayyanid Tlemcen",
+   "rank": "minor",
+   "capital": {
+    "name": "Tlemcen",
+    "at": [
+     -1.31,
+     34.88
+    ]
+   },
+   "overlord": "tunis",
+   "ruler": "Abu al-Abbas Ahmad",
+   "catalogue_id": "tlemcen"
+  },
+  {
+   "id": "tunis",
+   "name": "Hafsid Sultanate",
+   "rank": "major",
+   "capital": {
+    "name": "Tunis",
+    "at": [
+     10.18,
+     36.8
+    ]
+   },
+   "overlord": null,
+   "ruler": "Abu Amr Uthman",
+   "catalogue_id": "hafsid"
+  },
+  {
+   "id": "mali",
+   "name": "Mali Empire",
+   "rank": "major",
+   "capital": {
+    "name": "Niani (site disputed)",
+    "at": [
+     -7.99,
+     12.64
+    ]
+   },
+   "overlord": null,
+   "ruler": "Mansa of Mali (probably Musa III)",
+   "catalogue_id": "mali",
+   "note": "Lost Timbuktu to the Tuareg in 1433."
+  },
+  {
+   "id": "timbuktu_tuareg",
+   "name": "Tuareg of the Niger bend (Akil)",
+   "rank": "minor",
+   "capital": {
+    "name": "Timbuktu",
+    "at": [
+     -3.0,
+     16.77
+    ]
+   },
+   "overlord": null,
+   "ruler": "Akil ag Malwal",
+   "catalogue_id": "timbuktu_tuareg",
+   "note": "Took Timbuktu from Mali in 1433."
+  },
+  {
+   "id": "songhai",
+   "name": "Songhai (Gao)",
+   "rank": "minor",
+   "capital": {
+    "name": "Gao",
+    "at": [
+     -0.04,
+     16.27
+    ]
+   },
+   "overlord": null,
+   "ruler": "Sunni of Gao (possibly Sulayman Dama)",
+   "catalogue_id": "songhai"
+  },
+  {
+   "id": "jolof",
+   "name": "Jolof Empire",
+   "rank": "minor",
+   "capital": {
+    "name": "Mbengue",
+    "at": [
+     -16.0,
+     15.4
+    ]
+   },
+   "overlord": null,
+   "ruler": "Burba Jolof",
+   "catalogue_id": "jolof"
+  },
+  {
+   "id": "mossi",
+   "name": "Mossi kingdoms",
+   "rank": "minor",
+   "capital": {
+    "name": "Ouagadougou",
+    "at": [
+     -1.53,
+     12.37
+    ]
+   },
+   "overlord": null,
+   "ruler": "Mogho Naba",
+   "catalogue_id": null
+  },
+  {
+   "id": "kano",
+   "name": "Kano",
+   "rank": "minor",
+   "capital": {
+    "name": "Kano",
+    "at": [
+     8.52,
+     12.0
+    ]
+   },
+   "overlord": "kanem_bornu",
+   "ruler": "Abdullahi Burja",
+   "catalogue_id": "kano"
+  },
+  {
+   "id": "kanem_bornu",
+   "name": "Bornu (Sayfawa)",
+   "rank": "minor",
+   "capital": {
+    "name": "Bornu (no fixed capital)",
+    "at": [
+     13.15,
+     11.85
+    ]
+   },
+   "overlord": null,
+   "ruler": "Sayfawa mai",
+   "catalogue_id": "bornu",
+   "note": "Sayfawa driven from Kanem to Bornu."
+  },
+  {
+   "id": "bulala",
+   "name": "Bulala of Kanem",
+   "rank": "minor",
+   "capital": {
+    "name": "Kanem",
+    "at": [
+     15.3,
+     14.25
+    ]
+   },
+   "overlord": null,
+   "ruler": "Bulala ruler (unknown)",
+   "catalogue_id": "bulala",
+   "note": "Hold Kanem after expelling the Sayfawa."
+  },
+  {
+   "id": "benin",
+   "name": "Kingdom of Benin",
+   "rank": "minor",
+   "capital": {
+    "name": "Benin City",
+    "at": [
+     5.63,
+     6.34
+    ]
+   },
+   "overlord": null,
+   "ruler": "Ewuare",
+   "catalogue_id": "benin"
+  },
+  {
+   "id": "kongo",
+   "name": "Kingdom of Kongo",
+   "rank": "minor",
+   "capital": {
+    "name": "Mbanza Kongo",
+    "at": [
+     14.24,
+     -6.27
+    ]
+   },
+   "overlord": null,
+   "ruler": "Manikongo (name uncertain)",
+   "catalogue_id": "kongo"
+  },
+  {
+   "id": "ethiopia",
+   "name": "Ethiopian Empire",
+   "rank": "major",
+   "capital": {
+    "name": "Mobile court (Debre Berhan from 1450s)",
+    "at": [
+     38.75,
+     9.03
+    ]
+   },
+   "overlord": null,
+   "ruler": "Zara Yaqob",
+   "catalogue_id": "ethiopia"
+  },
+  {
+   "id": "adal",
+   "name": "Adal Sultanate",
+   "rank": "minor",
+   "capital": {
+    "name": "Dakkar",
+    "at": [
+     43.48,
+     11.35
+    ]
+   },
+   "overlord": null,
+   "ruler": "Ahmad Badlay",
+   "catalogue_id": "adal",
+   "note": "Defeated by Zara Yaqob at Gomit (1445) ahead."
+  },
+  {
+   "id": "ajuran",
+   "name": "Ajuran",
+   "rank": "minor",
+   "capital": {
+    "name": "Merca",
+    "at": [
+     44.77,
+     1.71
+    ]
+   },
+   "overlord": null,
+   "ruler": "Garen imam",
+   "catalogue_id": "ajuran"
+  },
+  {
+   "id": "mogadishu",
+   "name": "Sultanate of Mogadishu",
+   "rank": "minor",
+   "capital": {
+    "name": "Mogadishu",
+    "at": [
+     45.34,
+     2.05
+    ]
+   },
+   "overlord": null,
+   "ruler": "Sultan (name unknown)",
+   "catalogue_id": "mogadishu"
+  },
+  {
+   "id": "kilwa",
+   "name": "Kilwa Sultanate",
+   "rank": "minor",
+   "capital": {
+    "name": "Kilwa",
+    "at": [
+     39.52,
+     -8.96
+    ]
+   },
+   "overlord": null,
+   "ruler": "Mahdali sultan (uncertain)",
+   "catalogue_id": "kilwa"
+  },
+  {
+   "id": "great_zimbabwe",
+   "name": "Great Zimbabwe",
+   "rank": "minor",
+   "capital": {
+    "name": "Great Zimbabwe",
+    "at": [
+     30.93,
+     -20.27
+    ]
+   },
+   "overlord": null,
+   "ruler": "Unknown",
+   "catalogue_id": "great_zimbabwe",
+   "note": "In decline; Mutapa rising to the north."
+  },
+  {
+   "id": "mutapa",
+   "name": "Mutapa",
+   "rank": "minor",
+   "capital": {
+    "name": "Zvongombe",
+    "at": [
+     31.0,
+     -16.5
+    ]
+   },
+   "overlord": null,
+   "ruler": "Nyatsimba Mutota (traditional)",
+   "catalogue_id": "mutapa"
+  },
+  {
+   "id": "aztecs",
+   "name": "Triple Alliance (Mexica)",
+   "rank": "major",
+   "capital": {
+    "name": "Tenochtitlan",
+    "at": [
+     -99.13,
+     19.43
+    ]
+   },
+   "overlord": null,
+   "ruler": "Moctezuma I Ilhuicamina (huey tlatoani of Tenochtitlan)",
+   "catalogue_id": "triple_alliance",
+   "note": "With Texcoco (Nezahualcoyotl) and Tlacopan."
+  },
+  {
+   "id": "purepecha",
+   "name": "Purépecha state",
+   "rank": "minor",
+   "capital": {
+    "name": "Tzintzuntzan",
+    "at": [
+     -101.6,
+     19.52
+    ]
+   },
+   "overlord": null,
+   "ruler": "Tangáxoan I (probable)",
+   "catalogue_id": "purepecha"
+  },
+  {
+   "id": "zapotec",
+   "name": "Zapotec (Zaachila)",
+   "rank": "minor",
+   "capital": {
+    "name": "Zaachila",
+    "at": [
+     -96.72,
+     17.06
+    ]
+   },
+   "overlord": null,
+   "ruler": "Coqui of Zaachila (unknown)",
+   "catalogue_id": "zaachila"
+  },
+  {
+   "id": "maya",
+   "name": "Maní (Xiu)",
+   "rank": "minor",
+   "capital": {
+    "name": "Maní",
+    "at": [
+     -89.39,
+     20.39
+    ]
+   },
+   "overlord": null,
+   "ruler": "Xiu halach uinic",
+   "catalogue_id": "maya_mani_xiu",
+   "note": "Yucatán split into rival kuchkabalob after Mayapan fell c. 1441."
+  },
+  {
+   "id": "inca",
+   "name": "Inca (Tawantinsuyu)",
+   "rank": "major",
+   "capital": {
+    "name": "Cusco",
+    "at": [
+     -71.97,
+     -13.53
+    ]
+   },
+   "overlord": null,
+   "ruler": "Pachacuti",
+   "catalogue_id": "inca"
+  },
+  {
+   "id": "chimu",
+   "name": "Chimor",
+   "rank": "major",
+   "capital": {
+    "name": "Chan Chan",
+    "at": [
+     -79.07,
+     -8.11
+    ]
+   },
+   "overlord": null,
+   "ruler": "Minchancaman or predecessor (uncertain)",
+   "catalogue_id": "chimor"
+  },
+  {
+   "id": "muisca",
+   "name": "Muisca (Zipa of Bacatá)",
+   "rank": "minor",
+   "capital": {
+    "name": "Bacatá",
+    "at": [
+     -73.37,
+     5.53
+    ]
+   },
+   "overlord": null,
+   "ruler": "Zipa (name uncertain)",
+   "catalogue_id": null
+  },
+  {
+   "id": "iroquois",
+   "name": "Haudenosaunee",
+   "rank": "minor",
+   "capital": {
+    "name": "Onondaga",
+    "at": [
+     -76.15,
+     43.05
+    ]
+   },
+   "overlord": null,
+   "ruler": "Council of clan chiefs",
+   "catalogue_id": "haudenosaunee"
+  },
+  {
+   "id": "epirus",
+   "name": "Despotate of Epirus (Tocco)",
+   "rank": "minor",
+   "capital": {
+    "name": "Arta",
+    "at": [
+     20.99,
+     39.16
+    ]
+   },
+   "overlord": null,
+   "ruler": "Carlo II Tocco",
+   "catalogue_id": "epirus",
+   "note": "Still standing; carried forward when realm ids were harmonised. Ioannina lost to the Ottomans in 1430."
+  },
+  {
+   "id": "jaffna",
+   "name": "Jaffna Kingdom",
+   "rank": "minor",
+   "capital": {
+    "name": "Nallur",
+    "at": [
+     80.03,
+     9.67
+    ]
+   },
+   "overlord": null,
+   "ruler": "Kanakasooriya Cinkaiariyan",
+   "catalogue_id": "jaffna",
+   "note": "Still standing; carried forward when realm ids were harmonised."
+  },
+  {
+   "id": "khandesh",
+   "name": "Faruqi Khandesh",
+   "rank": "minor",
+   "capital": {
+    "name": "Thalner",
+    "at": [
+     74.97,
+     21.25
+    ]
+   },
+   "overlord": null,
+   "ruler": "Mubarak Khan Faruqi",
+   "catalogue_id": "khandesh",
+   "note": "Still standing; carried forward when realm ids were harmonised."
+  },
+  {
+   "id": "lucca",
+   "name": "Republic of Lucca",
+   "rank": "minor",
+   "capital": {
+    "name": "Lucca",
+    "at": [
+     10.5,
+     43.84
+    ]
+   },
+   "overlord": null,
+   "ruler": "Republic (Anziani)",
+   "catalogue_id": "lucca",
+   "note": "Still standing; carried forward when realm ids were harmonised. Republic restored after the fall of Paolo Guinigi (1430)."
+  },
+  {
+   "id": "montferrat",
+   "name": "Marquisate of Montferrat",
+   "rank": "minor",
+   "capital": {
+    "name": "Casale",
+    "at": [
+     8.45,
+     45.13
+    ]
+   },
+   "overlord": null,
+   "ruler": "Gian Giacomo Palaeologus",
+   "catalogue_id": "montferrat",
+   "note": "Still standing; carried forward when realm ids were harmonised."
+  },
+  {
+   "id": "riga",
+   "name": "Archbishopric of Riga",
+   "rank": "minor",
+   "capital": {
+    "name": "Riga",
+    "at": [
+     24.11,
+     56.95
+    ]
+   },
+   "overlord": null,
+   "ruler": "Henning Scharpenberg",
+   "catalogue_id": "riga",
+   "note": "Still standing; carried forward when realm ids were harmonised."
+  },
+  {
+   "id": "samudra_pasai",
+   "name": "Samudra Pasai",
+   "rank": "minor",
+   "capital": {
+    "name": "Pasai",
+    "at": [
+     97.1,
+     5.18
+    ]
+   },
+   "overlord": null,
+   "ruler": "Sultan (name uncertain)",
+   "catalogue_id": "samudra_pasai",
+   "note": "Still standing; carried forward when realm ids were harmonised."
+  },
+  {
+   "id": "kiche",
+   "name": "K'iche'",
+   "rank": "minor",
+   "capital": {
+    "name": "Q'umarkaj",
+    "at": [
+     -91.17,
+     15.02
+    ]
+   },
+   "overlord": null,
+   "ruler": "K'iq'ab",
+   "catalogue_id": "kiche",
+   "note": "Still standing; carried forward when realm ids were harmonised."
+  },
+  {
+   "id": "quitu_cara",
+   "name": "Quitu-Cara",
+   "rank": "minor",
+   "capital": {
+    "name": "Quito",
+    "at": [
+     -78.47,
+     -0.18
+    ]
+   },
+   "overlord": null,
+   "ruler": "Uncertain",
+   "catalogue_id": "quitu_cara",
+   "note": "Still standing; carried forward when realm ids were harmonised."
+  },
+  {
+   "id": "tyrol",
+   "name": "County of Tyrol",
+   "rank": "minor",
+   "capital": {
+    "name": "Innsbruck",
+    "at": [
+     11.39,
+     47.27
+    ]
+   },
+   "overlord": null,
+   "ruler": "Sigismund (under the guardianship of Frederick III)",
+   "catalogue_id": "tyrol",
+   "note": "Still standing; carried forward when realm ids were harmonised."
+  },
+  {
+   "id": "siena",
+   "name": "Republic of Siena",
+   "rank": "minor",
+   "capital": {
+    "name": "Siena",
+    "at": [
+     11.33,
+     43.32
+    ]
+   },
+   "overlord": null,
+   "ruler": "Republic (Concistoro)",
+   "catalogue_id": "siena",
+   "note": "Still standing; carried forward when realm ids were harmonised."
+  },
+  {
+   "id": "maynila",
+   "name": "Maynila",
+   "rank": "minor",
+   "capital": {
+    "name": "Maynila",
+    "at": [
+     120.98,
+     14.6
+    ]
+   },
+   "overlord": null,
+   "ruler": "Rulers unknown",
+   "catalogue_id": null,
+   "note": "Still standing; carried forward when realm ids were harmonised."
+  },
+  {
+   "id": "mantua",
+   "name": "Mantua",
+   "rank": "minor",
+   "capital": {
+    "name": "Mantua",
+    "at": [
+     10.79,
+     45.16
+    ]
+   },
+   "overlord": null,
+   "ruler": "Ludovico III Gonzaga",
+   "catalogue_id": "mantua",
+   "note": "Still standing; carried forward when realm ids were harmonised."
+  },
+  {
+   "id": "sicily",
+   "name": "Kingdom of Sicily",
+   "rank": "minor",
+   "capital": {
+    "name": "Palermo",
+    "at": [
+     13.36,
+     38.12
+    ]
+   },
+   "overlord": "aragon",
+   "ruler": "Alfonso V of Aragon",
+   "catalogue_id": "sicily",
+   "note": "Still standing; carried forward when realm ids were harmonised."
+  }
+ ],
+ "great_powers": [
+  "ming",
+  "ottomans",
+  "timurids",
+  "mamluks",
+  "france",
+  "burgundy",
+  "england"
+ ],
+ "key_places": {
+  "london": {
+   "holder": "england",
+   "confidence": "high"
+  },
+  "calais": {
+   "holder": "england",
+   "confidence": "high",
+   "note": "Pale of Calais, English since 1347."
+  },
+  "bordeaux": {
+   "holder": "england",
+   "confidence": "high",
+   "note": "English Gascony until 1453."
+  },
+  "paris": {
+   "holder": "france",
+   "confidence": "high",
+   "note": "Retaken from the English in April 1436."
+  },
+  "rouen": {
+   "holder": "england",
+   "confidence": "high",
+   "note": "Capital of Lancastrian Normandy until 1449."
+  },
+  "nantes": {
+   "holder": "brittany",
+   "confidence": "high",
+   "note": "Duchy of Brittany under French suzerainty."
+  },
+  "dijon": {
+   "holder": "burgundy",
+   "confidence": "high"
+  },
+  "marseille": {
+   "holder": "provence",
+   "confidence": "high",
+   "note": "County of Provence under René of Anjou."
+  },
+  "edinburgh": {
+   "holder": "scotland",
+   "confidence": "high"
+  },
+  "dublin": {
+   "holder": "england",
+   "confidence": "high",
+   "note": "Lordship of Ireland (English Pale), governed by the King's lieutenant."
+  },
+  "bruges": {
+   "holder": "burgundy",
+   "confidence": "high",
+   "note": "County of Flanders."
+  },
+  "amsterdam": {
+   "holder": "burgundy",
+   "confidence": "high",
+   "note": "County of Holland, Burgundian since 1433."
+  },
+  "brussels": {
+   "holder": "burgundy",
+   "confidence": "high",
+   "note": "Duchy of Brabant, Burgundian since 1430."
+  },
+  "lisbon": {
+   "holder": "portugal",
+   "confidence": "high"
+  },
+  "toledo": {
+   "holder": "castile",
+   "confidence": "high"
+  },
+  "barcelona": {
+   "holder": "aragon",
+   "confidence": "high"
+  },
+  "granada": {
+   "holder": "granada",
+   "confidence": "high"
+  },
+  "ceuta": {
+   "holder": "portugal",
+   "confidence": "high",
+   "note": "Portuguese since 1415."
+  },
+  "fez": {
+   "holder": "morocco",
+   "confidence": "high",
+   "note": "Marinid sultan under the Wattasid regent."
+  },
+  "tunis": {
+   "holder": "tunis",
+   "confidence": "high"
+  },
+  "algiers": {
+   "holder": "tunis",
+   "confidence": "low",
+   "note": "Hafsid sphere under local Tha'aliba notables; Zayyanid Tlemcen also claims it."
+  },
+  "milan": {
+   "holder": "milan",
+   "confidence": "high"
+  },
+  "venice": {
+   "holder": "venice",
+   "confidence": "high"
+  },
+  "genoa": {
+   "holder": "genoa",
+   "confidence": "high"
+  },
+  "florence": {
+   "holder": "florence",
+   "confidence": "high"
+  },
+  "pisa": {
+   "holder": "florence",
+   "confidence": "high"
+  },
+  "rome": {
+   "holder": "papal_states",
+   "confidence": "high"
+  },
+  "naples": {
+   "holder": "naples",
+   "confidence": "high",
+   "note": "Alfonso V of Aragon, King of Naples since 1442."
+  },
+  "palermo": {
+   "holder": "aragon",
+   "confidence": "high",
+   "note": "Kingdom of Sicily, ruled by a viceroy of Alfonso V."
+  },
+  "vienna": {
+   "holder": "austria",
+   "confidence": "high"
+  },
+  "prague": {
+   "holder": "bohemia",
+   "confidence": "medium",
+   "note": "Hussite estates rule in the interregnum; Poděbrady takes Prague in 1448."
+  },
+  "munich": {
+   "holder": "bavaria",
+   "confidence": "high",
+   "note": "Bavaria-Munich."
+  },
+  "berlin": {
+   "holder": "brandenburg",
+   "confidence": "high"
+  },
+  "dresden": {
+   "holder": "saxony",
+   "confidence": "high"
+  },
+  "cologne": {
+   "holder": "cologne_city",
+   "confidence": "medium",
+   "note": "The city governs itself; the archbishop-elector resides at Bonn. Formally a Free Imperial City only from 1475."
+  },
+  "lubeck": {
+   "holder": "lubeck",
+   "confidence": "high",
+   "note": "Free Imperial City, head of the Hanse."
+  },
+  "bern": {
+   "holder": "switzerland",
+   "confidence": "high"
+  },
+  "copenhagen": {
+   "holder": "denmark",
+   "confidence": "high"
+  },
+  "stockholm": {
+   "holder": "sweden",
+   "confidence": "high"
+  },
+  "oslo": {
+   "holder": "norway",
+   "confidence": "high"
+  },
+  "visby": {
+   "holder": "gotland",
+   "confidence": "high",
+   "note": "Eric of Pomerania holds Gotland from Visborg 1437-1449."
+  },
+  "konigsberg": {
+   "holder": "teutonic_order",
+   "confidence": "high"
+  },
+  "riga": {
+   "holder": "livonian_order",
+   "confidence": "medium",
+   "note": "City shared between the Order and the Archbishop of Riga; the city council is largely self-governing."
+  },
+  "krakow": {
+   "holder": "poland",
+   "confidence": "high"
+  },
+  "vilnius": {
+   "holder": "lithuania",
+   "confidence": "high"
+  },
+  "kyiv": {
+   "holder": "lithuania",
+   "confidence": "medium",
+   "note": "Appanage Principality of Kiev under Olelko Vladimirovich (from 1440)."
+  },
+  "novgorod": {
+   "holder": "novgorod",
+   "confidence": "high"
+  },
+  "moscow": {
+   "holder": "muscovy",
+   "confidence": "high"
+  },
+  "kazan": {
+   "holder": "kazan",
+   "confidence": "medium",
+   "note": "Ulugh Muhammad's khanate; its founding date is disputed (1438 or 1445)."
+  },
+  "astrakhan": {
+   "holder": "great_horde",
+   "confidence": "medium",
+   "note": "Astrakhan Khanate forms only c. 1466."
+  },
+  "sarai": {
+   "holder": "great_horde",
+   "confidence": "medium"
+  },
+  "caffa": {
+   "holder": "genoa",
+   "confidence": "high",
+   "note": "Genoese Gazaria, under the Consul of Caffa."
+  },
+  "buda": {
+   "holder": "hungary",
+   "confidence": "high"
+  },
+  "belgrade": {
+   "holder": "hungary",
+   "confidence": "high",
+   "note": "Hungarian since 1427; withstood the Ottoman siege of 1440."
+  },
+  "sofia": {
+   "holder": "ottomans",
+   "confidence": "high"
+  },
+  "tarnovo": {
+   "holder": "ottomans",
+   "confidence": "high"
+  },
+  "bucharest": {
+   "holder": "wallachia",
+   "confidence": "high"
+  },
+  "suceava": {
+   "holder": "moldavia",
+   "confidence": "high"
+  },
+  "athens": {
+   "holder": "athens",
+   "confidence": "medium",
+   "note": "Duchy of Athens (Acciaioli), Ottoman tributary; tributary to the Morea from 1444 until 1446."
+  },
+  "thessaloniki": {
+   "holder": "ottomans",
+   "confidence": "high",
+   "note": "Ottoman since 1430."
+  },
+  "edirne": {
+   "holder": "ottomans",
+   "confidence": "high"
+  },
+  "constantinople": {
+   "holder": "byzantium",
+   "confidence": "high"
+  },
+  "bursa": {
+   "holder": "ottomans",
+   "confidence": "high"
+  },
+  "konya": {
+   "holder": "karaman",
+   "confidence": "high"
+  },
+  "trebizond": {
+   "holder": "trebizond",
+   "confidence": "high"
+  },
+  "rhodes": {
+   "holder": "knights_of_rhodes",
+   "confidence": "high"
+  },
+  "nicosia": {
+   "holder": "cyprus",
+   "confidence": "high"
+  },
+  "tbilisi": {
+   "holder": "georgia",
+   "confidence": "high"
+  },
+  "tabriz": {
+   "holder": "qara_qoyunlu",
+   "confidence": "high"
+  },
+  "baghdad": {
+   "holder": "qara_qoyunlu",
+   "confidence": "medium",
+   "note": "Held by Ispend, Jahan Shah's rival brother, until his death in 1445."
+  },
+  "damascus": {
+   "holder": "mamluks",
+   "confidence": "high"
+  },
+  "jerusalem": {
+   "holder": "mamluks",
+   "confidence": "high"
+  },
+  "cairo": {
+   "holder": "mamluks",
+   "confidence": "high"
+  },
+  "mecca": {
+   "holder": "hejaz",
+   "confidence": "high",
+   "note": "Sharifate of Mecca under Mamluk suzerainty."
+  },
+  "aden": {
+   "holder": "yemen",
+   "confidence": "low",
+   "note": "Late Rasulid rule, contested; the Tahirids take Aden in 1454."
+  },
+  "hormuz": {
+   "holder": "hormuz",
+   "confidence": "medium",
+   "note": "Kingdom of Hormuz, Timurid tributary."
+  },
+  "shiraz": {
+   "holder": "timurids",
+   "confidence": "high"
+  },
+  "isfahan": {
+   "holder": "timurids",
+   "confidence": "high"
+  },
+  "herat": {
+   "holder": "timurids",
+   "confidence": "high"
+  },
+  "samarkand": {
+   "holder": "timurids",
+   "confidence": "high",
+   "note": "Ulugh Beg's seat."
+  },
+  "urgench": {
+   "holder": "timurids",
+   "confidence": "medium",
+   "note": "Timurid Khwarazm; Uzbek raids."
+  },
+  "kabul": {
+   "holder": "timurids",
+   "confidence": "high"
+  },
+  "kashgar": {
+   "holder": "moghulistan",
+   "confidence": "medium",
+   "note": "Dughlat amirs under the Moghul khans."
+  },
+  "lahore": {
+   "holder": "sirhind_lodi",
+   "confidence": "medium",
+   "note": "Bahlul Lodi holds Lahore and Sirhind as a nominal vassal of the Sayyid sultan."
+  },
+  "delhi": {
+   "holder": "delhi",
+   "confidence": "high"
+  },
+  "jaunpur": {
+   "holder": "jaunpur",
+   "confidence": "high"
+  },
+  "gaur": {
+   "holder": "bengal",
+   "confidence": "high"
+  },
+  "ahmedabad": {
+   "holder": "gujarat",
+   "confidence": "high"
+  },
+  "mandu": {
+   "holder": "malwa",
+   "confidence": "high"
+  },
+  "gulbarga": {
+   "holder": "bahmanis",
+   "confidence": "high",
+   "note": "Capital moved to Bidar c. 1429."
+  },
+  "vijayanagara": {
+   "holder": "vijayanagar",
+   "confidence": "high"
+  },
+  "calicut": {
+   "holder": "calicut",
+   "confidence": "high",
+   "note": "The Zamorin of Calicut; independent of Vijayanagara."
+  },
+  "colombo": {
+   "holder": "kotte",
+   "confidence": "high",
+   "note": "Parakramabahu VI of Kotte."
+  },
+  "kathmandu": {
+   "holder": "nepal_malla",
+   "confidence": "high",
+   "note": "Yaksha Malla."
+  },
+  "lhasa": {
+   "holder": "tibet",
+   "confidence": "medium",
+   "note": "Phagmodrupa regime; Lhasa area under its lords."
+  },
+  "karakorum": {
+   "holder": "mongols",
+   "confidence": "low",
+   "note": "Northern Yuan khan Taisun is a puppet of Esen Taishi of the Oirats, who really controls Mongolia."
+  },
+  "beijing": {
+   "holder": "ming",
+   "confidence": "high"
+  },
+  "nanjing": {
+   "holder": "ming",
+   "confidence": "high"
+  },
+  "guangzhou": {
+   "holder": "ming",
+   "confidence": "high"
+  },
+  "kunming": {
+   "holder": "ming",
+   "confidence": "high"
+  },
+  "shenyang": {
+   "holder": "ming",
+   "confidence": "high",
+   "note": "Liaodong Regional Military Commission."
+  },
+  "seoul": {
+   "holder": "korea",
+   "confidence": "high"
+  },
+  "kyoto": {
+   "holder": "japan",
+   "confidence": "high"
+  },
+  "kamakura": {
+   "holder": "japan",
+   "confidence": "medium",
+   "note": "Kantō under the Uesugi kanrei; the Kamakura kubo post is vacant until 1449."
+  },
+  "hakata": {
+   "holder": "japan",
+   "confidence": "medium",
+   "note": "Contested by the Ōuchi and Shōni."
+  },
+  "shuri": {
+   "holder": "ryukyu",
+   "confidence": "high"
+  },
+  "hanoi": {
+   "holder": "dai_viet",
+   "confidence": "high"
+  },
+  "vijaya": {
+   "holder": "champa",
+   "confidence": "high"
+  },
+  "angkor": {
+   "holder": "khmer",
+   "confidence": "medium",
+   "note": "Angkor largely abandoned by the court after 1431."
+  },
+  "ayutthaya": {
+   "holder": "ayutthaya",
+   "confidence": "high"
+  },
+  "pegu": {
+   "holder": "pegu",
+   "confidence": "high"
+  },
+  "ava": {
+   "holder": "ava",
+   "confidence": "high"
+  },
+  "malacca": {
+   "holder": "malacca",
+   "confidence": "high"
+  },
+  "trowulan": {
+   "holder": "majapahit",
+   "confidence": "high"
+  },
+  "manila": {
+   "holder": "tondo",
+   "confidence": "low",
+   "note": "Tagalog polities of Manila Bay (Tondo; Maynila); records thin."
+  },
+  "ternate": {
+   "holder": "ternate",
+   "confidence": "medium"
+  },
+  "timbuktu": {
+   "holder": "timbuktu_tuareg",
+   "confidence": "medium",
+   "note": "Tuareg under Akil since 1433; Songhai takes it in 1468."
+  },
+  "gao": {
+   "holder": "songhai",
+   "confidence": "high"
+  },
+  "niani": {
+   "holder": "mali",
+   "confidence": "medium",
+   "note": "Site of Niani disputed."
+  },
+  "kano": {
+   "holder": "kano",
+   "confidence": "high"
+  },
+  "kanem": {
+   "holder": "bulala",
+   "confidence": "medium",
+   "note": "Bulala hold Kanem; the Sayfawa have moved to Bornu."
+  },
+  "benin_city": {
+   "holder": "benin",
+   "confidence": "high"
+  },
+  "mbanza_kongo": {
+   "holder": "kongo",
+   "confidence": "medium"
+  },
+  "great_zimbabwe": {
+   "holder": "great_zimbabwe",
+   "confidence": "low",
+   "note": "Great Zimbabwe declining; Mutapa founded to the north c. 1430."
+  },
+  "kilwa": {
+   "holder": "kilwa",
+   "confidence": "high"
+  },
+  "mogadishu": {
+   "holder": "mogadishu",
+   "confidence": "low",
+   "note": "Sultanate of Mogadishu; its relation to the Ajuran is uncertain."
+  },
+  "zeila": {
+   "holder": "adal",
+   "confidence": "high"
+  },
+  "gondar": {
+   "holder": "ethiopia",
+   "confidence": "high",
+   "note": "Gondar not yet founded; the area is Ethiopian."
+  },
+  "cape": {
+   "holder": null,
+   "confidence": "high",
+   "note": "Khoikhoi herders, no state."
+  },
+  "tenochtitlan": {
+   "holder": "aztecs",
+   "confidence": "high"
+  },
+  "azcapotzalco": {
+   "holder": "aztecs",
+   "confidence": "high",
+   "note": "Tepanec power broken in 1428; subject to the Triple Alliance."
+  },
+  "tzintzuntzan": {
+   "holder": "purepecha",
+   "confidence": "high"
+  },
+  "mayapan": {
+   "holder": null,
+   "confidence": "medium",
+   "note": "Mayapan abandoned c. 1441; Yucatán split among kuchkabalob (Xiu, Cocom and others)."
+  },
+  "havana": {
+   "holder": null,
+   "confidence": "high",
+   "note": "Taíno chiefdoms, no state."
+  },
+  "santo_domingo": {
+   "holder": null,
+   "confidence": "high",
+   "note": "Taíno cacicazgos, no state."
+  },
+  "cusco": {
+   "holder": "inca",
+   "confidence": "high"
+  },
+  "chan_chan": {
+   "holder": "chimu",
+   "confidence": "high"
+  },
+  "quito": {
+   "holder": null,
+   "confidence": "high",
+   "note": "Quitu-Cara chiefdoms, no state; Inca conquest later."
+  },
+  "bogota": {
+   "holder": "muisca",
+   "confidence": "high",
+   "note": "Zipa of Bacatá."
+  },
+  "salvador": {
+   "holder": null,
+   "confidence": "high",
+   "note": "Tupinambá villages, no state."
+  },
+  "buenos_aires": {
+   "holder": null,
+   "confidence": "high",
+   "note": "Querandí bands, no state."
+  },
+  "boston": {
+   "holder": null,
+   "confidence": "high",
+   "note": "Massachusett villages, no state."
+  },
+  "quebec": {
+   "holder": null,
+   "confidence": "high",
+   "note": "St. Lawrence Iroquoian village of Stadacona, no state."
+  },
+  "new_orleans": {
+   "holder": null,
+   "confidence": "high",
+   "note": "Mississippian chiefdoms, no state."
+  },
+  "sydney": {
+   "holder": null,
+   "confidence": "high",
+   "note": "Aboriginal (Eora) peoples, no state."
+  },
+  "singapore": {
+   "holder": "malacca",
+   "confidence": "low",
+   "note": "Former Temasek, in Malacca's sphere."
+  }
+ },
+ "since_previous": {
+  "formed": [
+   "gotland",
+   "albania",
+   "kazan",
+   "crimea",
+   "nogai",
+   "uzbek_khanate",
+   "dai_viet",
+   "sirhind_lodi",
+   "multan",
+   "timbuktu_tuareg",
+   "mutapa"
+  ],
+  "ended": [
+   "dauphinist_france",
+   "bar",
+   "aquileia",
+   "tabor",
+   "holland",
+   "brabant",
+   "zeta",
+   "germiyan",
+   "jalayirids",
+   "kamakura_kubo",
+   "sukhothai",
+   "tepanecs",
+   "achaea",
+   "nanzan",
+   "oristano",
+   "aydin",
+   "mentese",
+   "saxe_wittenberg"
+  ],
+  "first_listed": [
+   "ireland",
+   "wurttemberg",
+   "hesse",
+   "luneburg",
+   "hamburg",
+   "oman",
+   "jurchens",
+   "ahom",
+   "mossi",
+   "ajuran",
+   "iroquois"
+  ],
+  "events": [
+   {
+    "key": "death_of_henry_v",
+    "name": "Death of Henry V; Henry VI king of England and (in Lancastrian claim) France",
+    "date": "1422-08-31",
+    "event_tree_id": null
+   },
+   {
+    "key": "ming_capital_beijing",
+    "name": "Ming court formally moves to Beijing",
+    "date": "1421-02-02",
+    "event_tree_id": null
+   },
+   {
+    "key": "siege_of_constantinople_1422",
+    "name": "Murad II besieges Constantinople",
+    "date": "1422-06-20",
+    "event_tree_id": null
+   },
+   {
+    "key": "treaty_of_delft",
+    "name": "Treaty of Delft: Jacqueline of Hainaut cedes rule of Holland to Philip the Good",
+    "date": "1428-07-03",
+    "event_tree_id": null
+   },
+   {
+    "key": "tepanec_war",
+    "name": "Triple Alliance overthrows Azcapotzalco",
+    "date": "1428",
+    "event_tree_id": null
+   },
+   {
+    "key": "relief_of_orleans",
+    "name": "Joan of Arc relieves Orléans",
+    "date": "1429-05-08",
+    "event_tree_id": null
+   },
+   {
+    "key": "coronation_at_reims",
+    "name": "Charles VII crowned at Reims",
+    "date": "1429-07-17",
+    "event_tree_id": null
+   },
+   {
+    "key": "fall_of_thessaloniki",
+    "name": "Ottomans take Thessaloniki from Venice",
+    "date": "1430-03-29",
+    "event_tree_id": null
+   },
+   {
+    "key": "death_of_vytautas",
+    "name": "Death of Vytautas; Lithuanian succession war",
+    "date": "1430-10-27",
+    "event_tree_id": null
+   },
+   {
+    "key": "council_of_basel",
+    "name": "Council of Basel opens",
+    "date": "1431-07-23",
+    "event_tree_id": null
+   },
+   {
+    "key": "ayutthaya_sacks_angkor",
+    "name": "Ayutthaya takes Angkor; Khmer court moves south",
+    "date": "1431",
+    "event_tree_id": null
+   },
+   {
+    "key": "last_zheng_he_voyage",
+    "name": "Zheng He's seventh and last voyage",
+    "date": "1431-1433",
+    "event_tree_id": null
+   },
+   {
+    "key": "tuareg_take_timbuktu",
+    "name": "Tuareg under Akil take Timbuktu from Mali",
+    "date": "1433",
+    "event_tree_id": null
+   },
+   {
+    "key": "battle_of_lipany",
+    "name": "Battle of Lipany ends radical Hussite power",
+    "date": "1434-05-30",
+    "event_tree_id": null
+   },
+   {
+    "key": "cape_bojador",
+    "name": "Gil Eanes rounds Cape Bojador",
+    "date": "1434",
+    "event_tree_id": null
+   },
+   {
+    "key": "congress_of_arras",
+    "name": "Treaty of Arras: Burgundy reconciles with Charles VII",
+    "date": "1435-09-21",
+    "event_tree_id": null
+   },
+   {
+    "key": "france_retakes_paris",
+    "name": "Charles VII's forces retake Paris",
+    "date": "1436-04-13",
+    "event_tree_id": null
+   },
+   {
+    "key": "chanka_war",
+    "name": "Pachacuti defeats the Chanka and takes power in Cusco",
+    "date": "c. 1438",
+    "event_tree_id": null
+   },
+   {
+    "key": "council_of_florence_union",
+    "name": "Union of the Churches proclaimed at Florence",
+    "date": "1439-07-06",
+    "event_tree_id": null
+   },
+   {
+    "key": "deposition_of_eric_of_pomerania",
+    "name": "Eric of Pomerania deposed in Denmark and Sweden; Christopher of Bavaria king",
+    "date": "1439-1440",
+    "event_tree_id": null
+   },
+   {
+    "key": "crimean_khanate_founded",
+    "name": "Hacı Giray establishes the Crimean Khanate",
+    "date": "1441",
+    "event_tree_id": null
+   },
+   {
+    "key": "fall_of_mayapan",
+    "name": "Fall of Mayapan; Yucatán fragments",
+    "date": "c. 1441",
+    "event_tree_id": null
+   },
+   {
+    "key": "alfonso_takes_naples",
+    "name": "Alfonso V of Aragon takes Naples",
+    "date": "1442-06-02",
+    "event_tree_id": null
+   },
+   {
+    "key": "long_campaign",
+    "name": "Hunyadi's Long Campaign in the Balkans",
+    "date": "1443-1444",
+    "event_tree_id": null
+   },
+   {
+    "key": "league_of_lezhe",
+    "name": "Skanderbeg forms the League of Lezhë",
+    "date": "1444-03-02",
+    "event_tree_id": null
+   },
+   {
+    "key": "truce_of_tours",
+    "name": "Truce of Tours between England and France",
+    "date": "1444-05-28",
+    "event_tree_id": null
+   },
+   {
+    "key": "peace_of_szeged",
+    "name": "Peace of Edirne-Szeged; Serbian Despotate restored",
+    "date": "1444-08",
+    "event_tree_id": null
+   },
+   {
+    "key": "battle_of_st_jakob",
+    "name": "Battle of St. Jakob an der Birs",
+    "date": "1444-08-26",
+    "event_tree_id": null
+   },
+   {
+    "key": "battle_of_varna",
+    "name": "Battle of Varna: Murad II defeats the crusade; Władysław III killed",
+    "date": "1444-11-10",
+    "event_tree_id": null
+   }
+  ]
+ },
+ "tolerance": {
+  "key_places_match_share": 0.7
+ },
+ "sources": [
+  "The New Cambridge Medieval History, vol. VII (c. 1415-c. 1500)",
+  "Halil İnalcık, The Ottoman Empire: The Classical Age 1300-1600",
+  "Colin Imber, The Crusade of Varna, 1443-45",
+  "Jonathan Sumption, The Hundred Years War IV: Cursed Kings, and Christopher Allmand, The Hundred Years War",
+  "Beatrice Forbes Manz, Power, Politics and Religion in Timurid Iran",
+  "The Cambridge History of China, vol. 7 (The Ming Dynasty, part 1)",
+  "Richard M. Eaton, India in the Persianate Age, 1000-1765",
+  "Nehemia Levtzion, Ancient Ghana and Mali; and the Tarikh al-Sudan",
+  "Ross Hassig, Aztec Warfare; Terence D'Altroy, The Incas",
+  "Project data: tools/mapgen/nations-1444.json, owners-1444.json, packages/rules/data/world/provinces.json, rulers-1444.json, subjects-1444.json, country catalogue"
+ ],
+ "open_questions": [
+  "Poland and Hungary: Władysław III died at Varna on 10 November 1444, but his death was not confirmed for months; both kingdoms are shown with him as the (dead) ruler and an interregnum.",
+  "Kazan: whether Ulugh Muhammad's khanate dates from 1438 or 1445 is disputed.",
+  "Mutapa vs Great Zimbabwe: whether Great Zimbabwe still functioned as a state in 1444 is uncertain.",
+  "Mogadishu: whether the sultanate was independent of the Ajuran in 1444 is uncertain.",
+  "Algiers: Hafsid, Zayyanid or local Tha'aliba control is unclear.",
+  "Karakorum: held by the Northern Yuan khan in name, by Esen Taishi (Oirat) in fact.",
+  "Great powers chosen by judgement; England is included for its French holdings despite its decline.",
+  "Ids not on the map (cologne_city, lubeck, gotland, athens, morea, hormuz, calicut, kotte, nepal_malla, ryukyu, tondo, ternate, bulala, timbuktu_tuareg, great_zimbabwe, mogadishu, sirhind_lodi) are catalogue ids; the ended list was aligned with the 1420 checkpoint in the id harmonisation (tepanecs, holland, maya and great_horde are the canonical ids).",
+  "Map vs history: calais: map says burgundy, history says england",
+  "Map vs history: rouen: map says france, history says england",
+  "Map vs history: nantes: map says france, history says brittany",
+  "Map vs history: dublin: map says ireland, history says england",
+  "Map vs history: ceuta: map says morocco, history says portugal",
+  "Map vs history: algiers: map says no owner, history says tunis",
+  "Map vs history: cologne: map says cologne, history says cologne_city",
+  "Map vs history: lubeck: map says denmark, history says lubeck",
+  "Map vs history: visby: map says sweden, history says gotland",
+  "Map vs history: caffa: map says crimea, history says genoa",
+  "Map vs history: belgrade: map says serbia, history says hungary",
+  "Map vs history: athens: map says ottomans, history says athens",
+  "Map vs history: hormuz: map says timurids, history says hormuz",
+  "Map vs history: lahore: map says delhi, history says sirhind_lodi",
+  "Map vs history: calicut: map says vijayanagar, history says calicut",
+  "Map vs history: colombo: map says no owner, history says kotte",
+  "Map vs history: kathmandu: map says no owner, history says nepal_malla",
+  "Map vs history: shuri: map says no owner, history says ryukyu",
+  "Map vs history: manila: map says no owner, history says tondo",
+  "Map vs history: ternate: map says no owner, history says ternate",
+  "Map vs history: timbuktu: map says songhai, history says timbuktu_tuareg",
+  "Map vs history: kanem: map says no owner, history says bulala",
+  "Map vs history: great_zimbabwe: map says mutapa, history says great_zimbabwe",
+  "Map vs history: mogadishu: map says ajuran, history says mogadishu",
+  "Map vs history: mayapan: map says maya, history says no state",
+  "Id harmonisation: the Great Horde continues the Golden Horde (one id, great_horde); the splits are recorded as Kazan, Crimea, Nogai and the Uzbeks forming. Maya continues the League of Mayapan under the map id, now as Maní (Xiu).",
+  "Bar is counted as ended when René of Anjou joined it to Lorraine (1431–1441); the Dauphinist kingdom as ended on reunification under Charles VII. Realms still standing were added: Tocco Epirus, Jaffna, Khandesh, Lucca, Montferrat, Riga, Samudra Pasai, K'iche', Quitu-Cara, Tyrol, Siena, Maynila, Mantua, Sicily."
+ ]
+}

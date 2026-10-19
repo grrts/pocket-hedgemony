@@ -3,6 +3,7 @@
 //
 //   pnpm --filter @ph/sim campaign [--years 50] [--seeds 1,2,3] [--map real|synthetic] [--jobs 4] [--out DIR]
 //   pnpm --filter @ph/sim breaker  (--realms france,castile | --all) [--years 50] [--seed 1] [--map real] [--jobs 4] [--out DIR]
+//   pnpm --filter @ph/sim history [--years 70] [--seeds 1,2,3] [--jobs 4] [--out DIR]   (the history check, BAL-031)
 //   pnpm --filter @ph/sim strategies [--years 50] [--seeds 1,2,3] [--probes france,mali] [--strategies conqueror,builder,diplomat,court]
 //                                    [--sweep [--levers a.b,c.d | provisional]] [--map real|synthetic] [--jobs 4] [--out DIR]
 //
@@ -24,6 +25,7 @@ import { runJobs, type Job, type JobResult } from "./jobs.ts";
 import { leverExists, sweepLevers, type Lever } from "./levers.ts";
 import type { ProbeResult } from "./probe.ts";
 import { STRATEGIES, type StrategyName } from "./strategies.ts";
+import { historyReport, type HistoryResult } from "./history.ts";
 import { markdownReport } from "./report.ts";
 import { rulesFor, type MapKind } from "./world.ts";
 
@@ -60,7 +62,20 @@ const out = a.out ?? join(new URL("..", import.meta.url).pathname, "out", `${sta
 if (command === "campaign") await campaigns();
 else if (command === "breaker") await breakers();
 else if (command === "strategies") await strategies();
-else fail("usage: cli.ts campaign|breaker|strategies [options]; see the top of src/cli.ts");
+else if (command === "history") await history();
+else fail("usage: cli.ts campaign|breaker|strategies|history [options]; see the top of src/cli.ts");
+
+/** The history check (BAL-031 to BAL-034): never fails on history, since realms are meant to go their own way. */
+async function history(): Promise<void> {
+  const seeds = (a.seeds ?? config.run.seeds.join(",")).split(",").map(Number);
+  const jobs: Job[] = seeds.map((seed) => ({ kind: "history", options: { seed, years, map } }));
+  console.log(`${jobs.length} history run(s) of ${years} years on the ${map} map, ${threads} at a time → ${out}`);
+  const results = ((await runJobs(jobs, threads, progress)) as HistoryResult[]).sort((x, y) => x.seed - y.seed);
+  mkdirSync(out, { recursive: true });
+  writeFileSync(join(out, "history.json"), JSON.stringify(results, null, 1));
+  writeFileSync(join(out, "history.md"), historyReport(results));
+  console.log(`Report: ${join(out, "history.md")}`);
+}
 
 async function campaigns(): Promise<void> {
   const seeds = (a.seeds ?? config.run.seeds.join(",")).split(",").map(Number);
@@ -144,6 +159,10 @@ async function strategies(): Promise<void> {
 }
 
 function progress(r: JobResult, left: number): void {
+  if (r.kind === "history") {
+    console.log(`  history seed ${r.seed}: to ${r.endYear} in ${Math.round(r.seconds)} s, ${r.checkpoints.length} checkpoint(s)${r.error ? `, stopped: ${r.error}` : ""}; ${left} left`);
+    return;
+  }
   const what = r.kind === "campaign" ? `campaign seed ${r.seed}` : r.kind === "breaker" ? `bot as ${r.realm}` : `${r.strategy}${r.realm ? ` as ${r.realm}` : ""} seed ${r.seed}${r.lever ? ` (${r.lever.path} × ${r.lever.factor})` : ""}`;
   const broken = r.findings.filter((f) => f.severity === "broken").length;
   console.log(`  ${what}: ${r.weeks} weeks in ${Math.round(r.seconds)} s, ${r.findings.length} finding(s)${broken ? `, ${broken} broken` : ""}; ${left} left`);

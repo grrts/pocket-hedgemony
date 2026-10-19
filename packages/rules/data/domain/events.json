@@ -1209,5 +1209,35 @@
   "ocean_navigation": "S4",
   "printing": "L5",
   "humanist_learning": "L6"
+ },
+ "goals": {
+  "$comment": "Realms' historical goals (EVT-100 to EVT-108). Provisional (plan-1378 §2).",
+  "weights": {
+   "weak": 0.5,
+   "normal": 1,
+   "strong": 2
+  },
+  "shake_low": 0.5,
+  "shake_high": 1.5,
+  "deviate_share": {
+   "historical": 0.1,
+   "plausible": 0.25,
+   "divergent": 0.5
+  },
+  "preset_mult": {
+   "historical": 1.5,
+   "plausible": 1,
+   "divergent": 0.5
+  },
+  "lead_years": 5,
+  "lapse_years": 10,
+  "war_chance_per_pull": 1,
+  "target_weight_per_pull": 4,
+  "envoy_points_per_pull": 10
+ },
+ "chronicle": {
+  "$comment": "The Chronicle card (EVT-109 to EVT-111). Provisional.",
+  "on_course_years": 10,
+  "horizon_years": 25
  }
 }
