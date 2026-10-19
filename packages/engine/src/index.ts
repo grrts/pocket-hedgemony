@@ -60,3 +60,5 @@ export { setForm } from "./government.ts";
 export { inAnyWar } from "./lords.ts";
 export { ungoverned } from "./recruit.ts";
 export { restoreSleeping, saveSleeping, spareSleepers, wakeRealm, type Waking, type WokenRealm } from "./sleeping.ts";
+export { createGoals, goalPulls, monthlyGoals, nearestLand, pullOf, timeFactor, type Goal, type GoalState } from "./goals.ts";
+export { chronicleView, goalViews, TURNING_POINTS, treeEventOf, type ChronicleRow, type ChronicleState, type ChronicleView, type GoalView, type TurningPoint } from "./chronicle.ts";

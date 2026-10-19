@@ -23,6 +23,7 @@ import { createConversionState, type ConversionState } from "./conversion.ts";
 import { syncCountries } from "./statecraft.ts";
 import { createCastleFoodState, seedCastleStores, type CastleFoodState } from "./castleFood.ts";
 import { createGameEvents, type GameEvents } from "./events.ts";
+import { createGoals, monthlyGoals, type GoalState } from "./goals.ts";
 import { createGameHeritage, type GameHeritage } from "./heritage.ts";
 import { createGovernmentState, seedGovernment, type GovernmentState } from "./government.ts";
 import { createTradeState, seedTrade, type TradeState } from "./trade.ts";
@@ -167,6 +168,8 @@ export interface World extends LivingState, TreasuryState, FoodState, MoodState,
   explore: ExplorationState;
   /** The event tree in play (milestone 6). */
   events?: GameEvents;
+  /** Realms' historical goals (EVT-085, goals.ts). */
+  goals?: GoalState;
   /** Win scores, the end date and how the campaign ended (campaignEnd.ts). */
   campaign: CampaignEndState;
   /** Every realm's heritage in play: birthright, heydays, ambitions, legacies and burden (HER-078). */
@@ -553,6 +556,9 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
 
   // The event tree starts with the campaign, so its first month costs no more than any other.
   world.events = createGameEvents(world);
+  // Realms' historical goals, shaken by the seed and the Events preset (EVT-086).
+  world.goals = createGoals(world);
+  monthlyGoals(world, false);
   // Heritage reads the tree's ages, so it starts after it: three ambitions drawn, the birthright in force.
   world.heritage = createGameHeritage(world);
   // Worked out again with heritage's tax in force, so lenders and the treasury card know the income the realm will have.

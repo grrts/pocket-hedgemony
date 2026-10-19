@@ -5,6 +5,7 @@ import { fallenEffect, type FallenEffect } from "./fallen.ts";
 import { lowFaith, lowTongue } from "./belief.ts";
 import { heritageViews, type HeritageView } from "./heritage.ts";
 import { statecraftView, type StatecraftView } from "./statecraft.ts";
+import { chronicleView, goalViews, type ChronicleView, type GoalView } from "./chronicle.ts";
 import { achievementsView, startAchievements } from "./achievements.ts";
 import { eventCards, type EventCard } from "./events.ts";
 import { diplomacyLensView, type DiplomacyLensView } from "./diplomacyLens.ts";
@@ -279,6 +280,8 @@ export interface Snapshot {
   peoples: PeoplesSnapshot;
   /** Win scores, ranks, the player's breakdown and ledger, and how the campaign ended. */
   campaign: CampaignView;
+  /** The Chronicle and every realm's live historical goals (EVT-094 to EVT-098). */
+  history: { chronicle: ChronicleView; goals: GoalView[] };
   /** Heads of the faith: seats, each realm's Faith-line badge, the player's Head of the faith card and the censure a war would bring (RELG-135 to RELG-138). */
   faithHeads: FaithHeadsView;
   /** The player's men gathering in provinces: men still to come, days to the next thousand and to the last. */
@@ -556,6 +559,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       })(),
       peoples: peoplesSnapshot(w),
       campaign: campaignView(w),
+      history: { chronicle: chronicleView(w), goals: goalViews(w) },
       faithHeads: faithHeadsView(w, player),
       musters: w.musters.filter((m) => m.nation === player).map((m) => ({ province: m.province, men: m.men, daysLeft: m.daysLeft, daysAll: daysToGather(w, m) })),
       gatherDays: player >= 0 ? gatherDays(w, player) : 14,

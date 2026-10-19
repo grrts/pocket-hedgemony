@@ -323,3 +323,30 @@ export interface LivingDefines {
   /** Treasury gold a gift to a lord costs (realm: gift_of_gold raises his loyalty a step). */
   lordGiftGold: number;
 }
+
+/** A place a goal names: a point bound to the nearest land province (EVT-085). */
+export interface GoalPlace {
+  name: string;
+  at: [number, number];
+}
+
+/** What the game reads from a historical goal (EVT-085); none when the map can't express it. */
+export type GoalAim =
+  | { kind: "take" | "hold"; places: GoalPlace[]; target?: string }
+  | { kind: "subject" | "ally" | "fight" | "free"; target: string };
+
+/** A realm's historical goal with its reason (EVT-085, plan-1378 §2). */
+export interface GoalDef {
+  realm: string;
+  goal: string;
+  reason: string;
+  ends_when: string;
+  /** First and last year; a window with no last year stays open. */
+  window: [number, number | null];
+  weight: "weak" | "normal" | "strong";
+  deviation: string;
+  aim: GoalAim | null;
+  alternative?: GoalAim | null;
+  /** Keys of the history checkpoints' turning points it leads toward. */
+  toward?: string[];
+}

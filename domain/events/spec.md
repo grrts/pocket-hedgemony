@@ -89,6 +89,12 @@ Newest decision first.
 | Alternate history mode | Game rule preset: historical, plausible, divergent. | |
 | Agency share | (initiator + beneficiary + resister) / all role slots of a region. | |
 | prosperity, innovations, trade_hubs, notoriety, integration_strain | The tree's own names that replaced genre terms. | |
+| Historical goal | A realm's goal from history with its reason, window, weight and aim; ends when its reason does (EVT-085). | Event, war aim |
+| Aim (of a goal) | What the game reads from a goal: take, hold, subject, ally, fight, free, or none. | War aim (diplomacy) |
+| Pull | How strongly a live goal draws its realm, from its weight, shake, preset and time (EVT-087). | Standing |
+| Shake | The seed's change to a realm's goals at the start: weights vary, some goals deviate or drop (EVT-086). | |
+| Turning point | A historic event of the history checkpoints that the event tree holds (EVT-094). | |
+| Chronicle | The History tab of the News: the turning points and whether each is on course, bent or gone (EVT-097). | The old Chronicle tab of the Realm book (SHELL-169) |
 
 ## 4. Domain model
 
@@ -498,6 +504,95 @@ at a 1444 start, by its conditions rather than by its date.
   map in the Wide and Tall layouts, inside the safe areas, its text scrolling while the options stay in reach,
   every button at least 44 points high, nothing that needs hover. [X-19, SHELL-070, SHELL-080, SHELL-081]
 
+### 5.17 Realms' historical goals (milestone 10, 19 October 2026)
+
+History is a reference, not a script, and realms follow its normal course because each pursues the goals it really
+had, for the reasons it had them (Leroy, 18 Oct; X-25; plan-1378 §2). A goal ends when its reason does. The AI
+weighs goals like any other wish and never above what it can afford.
+
+- EVT-085 The scenario shall give realms historical goals (`scenarios/<id>/regions/<key>/goals.json`), each with its
+  realm, the goal, its reason and when it ends in words, a window of years, a weight (weak, normal or strong), a
+  plausible alternative in words, an **aim** the game can read or none, optionally the alternative as an aim, and
+  the turning points it leads toward (the history checkpoints' event keys). The aims are **take** (hold these
+  places), **hold** (keep these places), **subject** (make that realm a subject), **ally** (an alliance or a
+  marriage with that realm), **fight** (beat that realm in war) and **free** (throw off that realm's overlordship).
+  A place is a point bound to the nearest land province, as heritage binds its places (D-HER-16). A goal with no aim
+  is shown and never weighed. A goal of a realm that is not on the map waits until that realm wakes. [plan-1378 §2,
+  §4.1; X-25]
+- EVT-086 At the start of each campaign the game shall shake every realm's goals with the campaign's seed: each
+  goal's weight is multiplied by a factor drawn between `goals.shake_low` (0.5) and `goals.shake_high` (1.5); a
+  share of the goals deviates by the Events preset (`goals.deviate_share`: Historical 10 %, Plausible 25 %, Free
+  50 %), a goal with an alternative aim taking it and one without being dropped; then every weight is multiplied
+  by the preset's `goals.preset_mult` (×1.5, ×1, ×0.5). Every realm's goals differ from one campaign to the next,
+  while the big picture usually holds. @placeholder [plan-1378 §2; EVT-035, EVT-036]
+- EVT-087 A goal's pull shall be its weight word's number (`goals.weights`: weak 0.5, normal 1, strong 2) times its
+  shake and preset factors, times its time factor: 1 inside its window, rising from 0 over `goals.lead_years` (5)
+  before it, and fading to 0 over `goals.lapse_years` (10) after it, when the goal has lapsed; a window with no last year stays open. @placeholder
+  [plan-1378 §2: "while its reason holds and its time is near"]
+- EVT-088 The game shall end a goal, each month, when its reason ends: a take goal when its realm holds all its
+  places (achieved); a hold goal when its realm has lost one of them (lost); a subject goal when the target is its
+  realm's subject, an ally goal when the two are allied, and a free goal when its realm is no longer the target's
+  subject (achieved); a fight goal when its realm has taken land from the target since the start (achieved); a subject, ally, fight
+  or free goal when its target is gone (gone); and every goal of a realm that is gone. An ended goal never comes
+  back. [plan-1378 §2: "the goal ends if its reason ends"]
+- EVT-089 A realm's pull toward another realm shall be the sum of the pulls of its live goals aimed at it: a take
+  goal at the holder of any of its places, a subject or fight goal at its target. [plan-1378 §2]
+- EVT-090 An AI realm at peace shall multiply its monthly chance of looking for a war (WAR-228) by 1 +
+  `goals.war_chance_per_pull` (1) × its greatest pull toward a neighbour, and pick its target among the neighbours
+  that pass the price of war with weight 1 + `goals.target_weight_per_pull` (4) × its pull toward each. A goal never
+  lets a war past the price of war: a weak realm does not march however strong its goal. When the target holds a
+  place of one of its take goals, its demand before war (DIPL-180) asks for that province first, and a Take land aim
+  it holds on that province is the war's aim. @placeholder [plan-1378 §2; WAR-228; DIPL-180]
+- EVT-091 An AI realm sending an envoy shall weigh, besides its warmest neighbour, the targets of its live ally
+  goals (propose an alliance, arrange a marriage) and subject goals (offer overlordship), adding
+  `goals.envoy_points_per_pull` (10) × the goal's pull to the count of that ask; every other reason of the count
+  still counts (DIPL-223), and the envoy goes only when the total is above 0. @placeholder [plan-1378 §2; DIPL-223]
+- EVT-092 The player's realm is never steered: its goals weigh nothing the player does, and the game never acts on
+  them for the player. [plan-1378 §2; X-25]
+- EVT-093 A save shall keep every goal's state: its shaken weight, whether it deviated or was dropped, and whether
+  and how it ended. [SAVE]
+
+### 5.18 The Chronicle (milestone 10, 19 October 2026)
+
+The Chronicle is the overview of history: the turning points that have happened, those realms' goals are heading
+toward, and whether each is on course, bent or gone (plan-1378 §4.6).
+
+- EVT-094 The Chronicle shall list the historic turning points of the history checkpoints (each checkpoint's events
+  since the previous one, with key, name and date) that the event tree holds, by the checkpoint's `event_tree_id` or
+  an event whose id is the key. [plan-1378 §2, §4.6]
+- EVT-095 The Chronicle shall give each turning point one state:
+  - **Happened** when its event has fired, with the year; *as in history* within `chronicle.on_course_years` (10)
+    of its history year, else *early* or *late*;
+  - **Gone** when it can no longer happen: its event is invalidated, past its latest year, or an event exclusive
+    with it has fired;
+  - **Bent** when it has not happened more than `chronicle.on_course_years` after its history year, or when goals
+    lead toward it and none of them is still live with its own aim (each deviated, was dropped, lapsed, was lost
+    or lost its realm);
+  - **On course** otherwise.
+  @placeholder [plan-1378 §4.6]
+- EVT-096 The Chronicle shall show *Ahead* the turning points not yet happened whose history year is at most
+  `chronicle.horizon_years` (25) away, and those Bent or Gone whose history year passed within the same span, each
+  with the realms whose live goals lead toward it and those goals; and *Happened* the ones that fired, newest
+  first. [plan-1378 §4.6]
+
+#### How the player uses it: the Chronicle and realms' aims
+- EVT-097 Where: the News (SHELL-147) has a third tab, **History**, beside *Everything* and *Your realm*: the
+  Chronicle card. Its first line counts the turning points ahead by state ("On course 9 · Bent 2 · Gone 1"), so
+  history's course reads at a glance; under it *Ahead*, soonest first, then *Happened*, newest first. Each row is
+  one 44-point line with the turning point's name, its history year, and its state as a word with an icon (never
+  colour alone); a tap opens the row to show who is heading there, each realm as a button that opens its card,
+  with the goal and its reason ("Ottomans: Break Lazar's Serbia, because Lazar's coalition blocks the road
+  north"). Grouping: everything about history's course is on this one card; the event card and the News lines
+  stay as they are (EVT-076). Overview: the Chronicle card is the overview of history. [X-19; plan-1378 §4.6]
+- EVT-098 Another realm's General tab shall hold an **Aims** fold, its line counting the realm's live goals
+  ("Aims · 3"), each goal with its reason, its window and its target as a button; the player's own goals are shown
+  only if the player opens the closed *History's plan for your realm* fold at the foot of the History tab, as hints
+  that nothing enforces. [plan-1378 §2: "Other realms' goals show on their realm card"; X-19]
+- EVT-099 Phone: on a phone held sideways the News is the side panel (Wide) or the lower sheet (Tall); the History
+  tab scrolls down, never sideways; every row, fold line and realm button is at least 44 points tall inside the
+  safe areas; nothing needs hover. Checked with `apps/client/scripts/chronicle-shots.mjs` on a phone held sideways
+  and upright. [X-19; plan-1378 §4.6]
+
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
@@ -581,6 +676,16 @@ before achievements and the autosave. The age and period checks run in the event
 | campaign end date | Last day of the campaign | 31 August 1939 | no (a setting) | settings; events.json campaign.end_date |
 | per event `selection.mean_years`, `modifiers`, option `ai.base` | Per-event balance | per event | yes | data/events/*.yaml |
 | per modifier `changes`, `years` | Per-modifier magnitudes | per modifier | yes (design values) | data/modifiers.yaml |
+| goals.weights | A goal's pull by its weight word (EVT-087) | weak 0.5, normal 1, strong 2 | yes | events.json |
+| goals.shake_low, goals.shake_high | The seed's shake of each goal's weight (EVT-086) | 0.5, 1.5 | yes | events.json |
+| goals.deviate_share | Share of goals that deviate, by preset (EVT-086) | historical 0.10, plausible 0.25, divergent 0.50 | yes (plan-1378 §2 "provisional") | events.json |
+| goals.preset_mult | Goal weight by preset (EVT-086) | historical 1.5, plausible 1, divergent 0.5 | yes | events.json |
+| goals.lead_years, goals.lapse_years | How far before its window a goal pulls, and how long after (EVT-087) | 5, 10 | yes | events.json |
+| goals.war_chance_per_pull | Extra chance of looking for a war per pull (EVT-090) | 1 | yes | events.json |
+| goals.target_weight_per_pull | Weight of a neighbour as a war target per pull (EVT-090) | 4 | yes | events.json |
+| goals.envoy_points_per_pull | Count points of an envoy toward a goal's target per pull (EVT-091) | 10 | yes | events.json |
+| chronicle.on_course_years | Years from its history year a turning point is on course (EVT-095) | 10 | yes | events.json |
+| chronicle.horizon_years | Years ahead and behind the Chronicle shows (EVT-096) | 25 | yes | events.json |
 
 ## 11. Seams
 
@@ -610,6 +715,9 @@ before achievements and the autosave. The age and period checks run in the event
 
 ## 12. AI
 
+- Each realm weighs its historical goals (EVT-085 to EVT-091): a goal's pull raises how often it looks for a war,
+  which neighbour it picks and which province it asks for, and the count of an envoy toward an ally or a subject it
+  wants; it never lets a war past the price of war (WAR-228) nor an envoy past its count (DIPL-223).
 - The AI picks among options by base weight times named factors (EVT-042); historical options are multiplied
   by the preset's `historical_option_mult`.
 - A decision the AI leaves unanswered for 10 years lapses into the pool (EVT-032).
@@ -734,3 +842,6 @@ before achievements and the autosave. The age and period checks run in the event
 | EVT-082 | ages-and-periods.feature | Forced dates; bombards among three great powers; two are not enough; the fall of Constantinople; Portugal's ocean ships; Exploration's window. Engine: packages/engine/test/events.test.ts |
 | EVT-083 | — | Engine: packages/engine/test/events.test.ts (without bombards or ocean ships the two ages wait) |
 | EVT-084 | — | Presentation: nothing new on screen |
+| EVT-085 – 093 | historical-goals.feature | A goal ends with its reason; the seed shakes the goals; a goal's pull fades after its window; a goal draws the AI's war but not past its price; an ally goal sends an envoy; the player is never steered. Engine: packages/engine/test/goals.test.ts; data: packages/rules/test/goals-1378.test.ts |
+| EVT-094 – 096 | chronicle.feature | A turning point happened as in history; late; bent when its goals are gone; gone when invalidated. Engine: packages/engine/test/goals.test.ts |
+| EVT-097 – 099 | — | Presentation: apps/client/src/ui/chronicle.ts, the History tab and the Aims fold; apps/client/scripts/chronicle-shots.mjs |
