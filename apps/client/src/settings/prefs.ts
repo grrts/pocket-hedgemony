@@ -49,8 +49,8 @@ const profile = detectProfile({ runtime: runtime.startsWith("capacitor") ? "capa
 const firstLaunch = store.read("settings-device.json") === undefined;
 export const prefs: SettingsState = readSettings(store, profile).state;
 
-/** Where the game runs, for which rows show (SET-035 …). */
-export const env = { platform: runtime === "web" ? ("web" as const) : runtime === "electron" ? ("desktop" as const) : ("mobile" as const), touch: matchMedia("(pointer: coarse)").matches };
+/** Where the game runs, for which rows show (SET-035 …); `ironman` is set while an ironman campaign is played, which hides the autosave rows (SAVE-087). */
+export const env: { platform: "web" | "desktop" | "mobile"; touch: boolean; ironman?: boolean } = { platform: runtime === "web" ? "web" : runtime === "electron" ? "desktop" : "mobile", touch: matchMedia("(pointer: coarse)").matches };
 
 // The Sound card's choices from before Settings existed carry over once.
 if (firstLaunch) {

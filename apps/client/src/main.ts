@@ -123,12 +123,13 @@ import { TownLayer, townInfo } from "./map/towns.ts";
 import { bedUnderCamera, musicFacts, newFactMemory, playerPalette, playerWars, remember, type FactMemory } from "./audio/facts.ts";
 import { COMMISSION_GOLD, commissionSkills, FOOD_BALANCE, hireGold, OFFICIALS, Rng, startFormOf } from "@ph/engine";
 import { formName } from "@ph/engine/domain/government";
-import { PICKER_REGIONS, pickerRegions, startTrade, waysToGrow } from "@ph/engine/domain/scenario-setup";
+import { campaignOptionsOf, PICKER_REGIONS, pickerRegions, startTrade, waysToGrow, type NewGameChoices } from "@ph/engine/domain/scenario-setup";
 import { pickerCardHtml, regionListHtml, regionSelectHtml, strongIn, strongInWords, waysToGrowHtml } from "./ui/realmPicker.ts";
+import { loadLastChoices, newGameOptionsHtml, rulesLine, saveLastChoices, setRule, type RuleKey } from "./ui/newGame.ts";
 import { BATTLE_STEP_MS, bannerAt, COUNTRY_CARD_TABS, endTurnInAuto, endTurnLabel, keyEndsTurn, newAutoTurns, realmOverview, REALM_BOOK_TABS, sectionOf, SHELL as SHELL_RULES, startColumn, startIcons, stopAuto, switchAuto, tabHolds, WATCH_STEP_MS, weekPlayed, type AutoStop, type OverviewTile, type Platform as ShellPlatform } from "@ph/engine/domain/game-shell";
 import { autosaveDue, continueTarget, longDate, newCampaign, newManualSave, saveStart, savesConfig, sharedFromLine, type Campaign, type Platform as SavePlatform } from "@ph/engine/domain/saves";
 import { SaveStore, type StoredSave } from "./saves/store.ts";
-import { animationsPref, autosaveEvery, autosavesKept, battleStepMs, batteryOn, dayMs, lensPatternsOn, livingPrefs, longPressMs, mapDetail, mapPower, onPrefs, setPref, textZoom, visionPref } from "./settings/prefs.ts";
+import { animationsPref, autosaveEvery, env as settingsEnv, autosavesKept, battleStepMs, batteryOn, dayMs, lensPatternsOn, livingPrefs, longPressMs, mapDetail, mapPower, onPrefs, setPref, textZoom, visionPref } from "./settings/prefs.ts";
 import { bandPattern, lensRamp, lensSet, nationColours, PATTERN_COUNT, patternCss, rgbHex, shown, visionIndex, type Vision } from "./map/colourVision.ts";
 import { openSettingsAt, renderSettings, setHintsRows, setOwnSection } from "./ui/settingsScreen.ts";
 import { CloudApi, CloudError, cloudBase, webKeyValue, webTokenStore } from "./cloud/api.ts";
@@ -426,8 +427,22 @@ let lens: Lens = "realms";
 let routing: Routing | null = null;
 /** Whether the route being drawn was started from the trader's own card, which it returns to. */
 let routeFromCard = false;
-/** Parchment over lands the player's realm doesn't know yet (a toggle while it's judged). */
+/** Parchment over lands the player's realm doesn't know yet (a display switch, SET-033). */
 let fogOn = true;
+/** The campaign's fog of war rule (SETUP-054): off, the whole map is shown and the display switch has nothing to hide. */
+const fogRule = (): boolean => campaign?.options.fogOfWar !== false;
+/** The realm whose options step is open before Begin (SETUP-054), or null. */
+let optionsFor: string | null = null;
+/** The options step's choices, the last new game's to begin with (SETUP-058). */
+let choices: NewGameChoices = loadLastChoices(localStore());
+/** Local storage, which a private window or a sandboxed frame may refuse. */
+function localStore(): Storage | null {
+  try {
+    return localStorage;
+  } catch {
+    return null;
+  }
+}
 /** Provinces the player has charted (bit p of byte p >> 3, EXPL-010), or null before a realm is chosen. */
 let known: Uint8Array | null = null;
 
@@ -1158,7 +1173,7 @@ function renderLensMenu(): void {
     <h3 class="sub">Map mode</h3>
     ${LENSES.map((l) => `<button class="paper lens${l.id === lens ? " on" : ""}" data-lens="${l.id}"><b>${l.id === "lords" && snapshot ? cap(titlesOf(snapshot.playerNation).lords) : l.name}</b><small>${l.note}</small></button>`).join("")}
     ${lens === "institutions" ? institutionsKey(institutionColours(), institutionPattern) : lens === "diplomacy" ? diplomacyKey() : lens === "subjects" ? subjectsKey() : lens === "tongues" || lens === "faiths" ? beliefKey() : lens === "charts" ? chartsKey() : lens === "trade" ? tradeKey() : lens === "throne" ? throneKey() : lens === "people" ? rampKey(RAMP, ["Fewest", "Few", "Some", "Many", "Most"], "How many people live in each province.") : lens === "wealth" ? rampKey(RAMP, ["Poorest", "Poor", "Middling", "Rich", "Richest"], "Trade, crafts and land.") : lens === "food" ? rampKey(FOOD_RAMP, ["Feeds very few", "Feeds few", "Feeds some", "Feeds many", "Feeds most"], "How many men on campaign the land's store can feed.") : lens === "walls" ? rampKey(Object.values(WALL_RGB), ["No walls", "Fort", "Castle"], "Castles and forts.") : ""}
-    <label class="fog-toggle"><input type="checkbox" id="fog" ${fogOn ? "checked" : ""}> Hide unexplored lands</label>
+    ${fogRule() ? `<label class="fog-toggle"><input type="checkbox" id="fog" ${fogOn ? "checked" : ""}> Hide unexplored lands</label>` : `<p class="hint">No fog of war in this campaign: every land is shown.</p>`}
     <label class="fog-toggle"><input type="checkbox" id="markers" ${markersOn ? "checked" : ""}> Markers: men and names over every army close in</label>`;
   lensMenu.querySelectorAll<HTMLButtonElement>("[data-lens]").forEach((b) =>
     b.addEventListener("click", () => {
@@ -1178,7 +1193,7 @@ function renderLensMenu(): void {
       renderPanel();
     }),
   );
-  lensMenu.querySelector<HTMLInputElement>("#fog")!.addEventListener("change", (e) => {
+  lensMenu.querySelector<HTMLInputElement>("#fog")?.addEventListener("change", (e) => {
     fogOn = (e.target as HTMLInputElement).checked;
     restyleProvinces();
   });
@@ -1339,7 +1354,7 @@ function lensColor(i: number): number[] {
 }
 
 /** Charted by the player: the parchment lifts from it (EXPL-015); under the Charts lens the parchment shows whatever the fog switch says. */
-const isKnown = (i: number) => (!fogOn && lens !== "charts") || !known || (known[i >> 3]! & (1 << (i & 7))) !== 0;
+const isKnown = (i: number) => ((!fogOn || !fogRule()) && lens !== "charts") || !known || (known[i >> 3]! & (1 << (i & 7))) !== 0;
 
 /** Latitude and longitude of a province's centre. */
 const latOf = (p: { y?: number }) => rules.map!.latTop - (p.y ?? 0) / rules.map!.pxPerDeg;
@@ -4452,8 +4467,8 @@ function frameProvinces(list: readonly number[], maxZoom = 8): void {
 }
 
 function renderPanelCard(): void {
-  panel.classList.remove("declaring");
-  const shows = `${achView}/${empireOpen}/${shogunateOpen}/${newsView}/${realmView}/${realmTab}/${declareFor}/${officialView}/${lordView}/${armyView}/${fleetView}/${traderView}/${selectedProvince}/${provinceTab}`;
+  panel.classList.remove("declaring", "ng-step");
+  const shows = `${optionsFor}/${achView}/${empireOpen}/${shogunateOpen}/${newsView}/${realmView}/${realmTab}/${declareFor}/${officialView}/${lordView}/${armyView}/${fleetView}/${traderView}/${selectedProvince}/${provinceTab}`;
   if (shows !== panelShows) {
     panelShows = shows;
     panel.scrollTop = 0;
@@ -4472,6 +4487,11 @@ function renderPanelCard(): void {
     renderAchievements();
     return;
   }
+  if (optionsFor && !snapshot) {
+    renderOptionsStep(optionsFor);
+    return;
+  }
+  optionsFor = null;
   if (empireOpen && snapshot?.empire) {
     renderEmpire();
     return;
@@ -4539,7 +4559,7 @@ function renderPanelCard(): void {
       <header><h2 class="ribbon">Choose your realm</h2><span class="panel-buttons"><button class="fold" aria-label="Minimise">${icon("collapse", 2)}</button><button class="close" data-start-back aria-label="Back to the start screen">${icon("close", 2)}</button></span></header>
       ${regionSelectHtml(PICKER_REGIONS.map((r) => ({ ...r, count: realmRegion.filter((x, i) => x === r.id && !nations[i]!.asleep).length })), pickRegion, nations.filter((n) => !n.asleep).length)}
       ${pickRegion ? regionListHtml(regionName, regionRealms(pickRegion).map((r) => ({ index: r, name: nations[r]!.name, provinces: realmSize(r), standing: startStanding(nations[r]!.id), pennant: pennant(nations[r]!) }))) : featured}
-      <button class="paper ach-open" data-ach-open>${icon("trophy", 2)}Achievements<small>${Object.keys(achProfile.unlocked).length} earned · every campaign can earn them</small></button>
+      <button class="paper ach-open" data-ach-open>${icon("trophy", 2)}Achievements<small>${Object.keys(achProfile.unlocked).length} earned · ironman campaigns earn them</small></button>
       <p class="diag" id="diag">${diagnosticsLine()}</p>`;
     bindNationButtons();
     panel.querySelector<HTMLSelectElement>("[data-pick-region]")!.addEventListener("change", (e) => {
@@ -7112,8 +7132,51 @@ function bindClose(): void {
   });
 }
 
+/** Choosing a realm (a suggested one, or Rule on its card) opens the options step before Begin (SETUP-054). */
 function bindNationButtons(): void {
-  panel.querySelectorAll<HTMLButtonElement>("[data-nation]").forEach((b) => b.addEventListener("click", () => void startGame(b.dataset.nation!)));
+  panel.querySelectorAll<HTMLButtonElement>("[data-nation]").forEach((b) =>
+    b.addEventListener("click", () => {
+      optionsFor = b.dataset.nation!;
+      panelCollapsed = false;
+      renderPanel();
+    }),
+  );
+}
+
+/** The options step: one card with the campaign rules and Begin (SETUP-054, SHELL-033, SHELL-034). */
+function renderOptionsStep(nation: string): void {
+  const n = nations[nationIndex.get(nation)!]!;
+  panel.innerHTML = newGameOptionsHtml({
+    realm: pennant(n),
+    realmName: n.name,
+    nation,
+    start: dateText(START_SCENARIO.date),
+    choices,
+    closeIcon: icon("close", 2),
+    crownIcon: icon("crown", 2),
+  });
+  panel.querySelector("[data-options-back]")!.addEventListener("click", () => {
+    optionsFor = null;
+    renderPanel();
+  });
+  panel.querySelectorAll<HTMLButtonElement>("[data-rule]").forEach((b) =>
+    b.addEventListener("click", () => {
+      choices = setRule(choices, b.dataset.rule as RuleKey, b.dataset.value!);
+      const top = panel.scrollTop;
+      renderPanel();
+      panel.scrollTop = top;
+    }),
+  );
+  panel.querySelector<HTMLSelectElement>("[data-rule-end]")!.addEventListener("change", (e) => {
+    choices = setRule(choices, "endDate", (e.target as HTMLSelectElement).value);
+  });
+  panel.querySelector<HTMLButtonElement>("[data-begin]")!.addEventListener("click", () => {
+    optionsFor = null;
+    saveLastChoices(localStore(), choices);
+    void startGame(nation, choices);
+  });
+  showPanel(true, "crown");
+  panel.classList.add("ng-step");
 }
 
 /** ?goals=<JSON list of goals> gives realms goals of the caller's own, to try the Chronicle and the Aims fold (EVT-112, EVT-113). */
@@ -7359,15 +7422,16 @@ function hintViews(): void {
   if (s.research?.study) hints.did("setStudy");
 }
 
-async function startGame(nation: string): Promise<void> {
+/** Begin: a new game from a seed, the realm and the campaign rules of the options step (SETUP-056). */
+async function startGame(nation: string, picked: NewGameChoices): Promise<void> {
   const name = nations[nationIndex.get(nation)!]!.name;
   showLoading(`Gathering the court of ${name}…`, 0.15);
   await painted();
   loadingStage(`Mustering the armies of ${name}…`, 0.6);
-  const snap = await engine.send({ type: "newGame", seed: Date.now() >>> 0, playerNation: nation, ...(mapImage ? { map: mapTiles(mapImage) } : {}), ...endDateParam(), ...(goalsParam() ? { goals: goalsParam()! } : {}) });
+  const snap = await engine.send({ type: "newGame", seed: Date.now() >>> 0, playerNation: nation, choices: picked, difficulty: picked.difficulty, ...(mapImage ? { map: mapTiles(mapImage) } : {}), ...endDateParam(), ...(goalsParam() ? { goals: goalsParam()! } : {}) });
   mapSent = true;
-  // One new game is one campaign (SAVE-012).
-  campaign = newCampaign(new Rng(Date.now() >>> 0), { playerNation: nation, nationName: name });
+  // One new game is one campaign (SAVE-012); ironman is chosen here and kept (SAVE-086), the rules travel in every save (SETUP-055).
+  campaign = newCampaign(new Rng(Date.now() >>> 0), { playerNation: nation, nationName: name, ironman: picked.ironman, options: campaignOptionsOf(picked) });
   enterGame(snap);
 }
 
@@ -7412,6 +7476,9 @@ function enterGame(snap: Snapshot): void {
   panelCollapsed = true;
   view.lookAt(provinces[cap]!.x!, provinces[cap]!.y!, 4);
   restyleProvinces();
+  // The map mode menu's fog switch follows the campaign's fog of war rule, and Settings hides autosaves in ironman.
+  renderLensMenu();
+  settingsEnv.ironman = !!campaign?.ironman;
   renderHud();
   renderPanel();
   renderActions();
@@ -7948,9 +8015,12 @@ let saving: Promise<unknown> = Promise.resolve();
  * engine worker makes the bytes and says what they replace, and the store
  * keeps them in one transaction. Saves run one after another.
  */
-function writeGameSave(kind: "manual" | "autosave" | "resume", opts: { name?: string; replace?: string } = {}): Promise<StoredSave | { error: string }> {
+function writeGameSave(asked: "manual" | "autosave" | "resume", opts: { name?: string; replace?: string } = {}): Promise<StoredSave | { error: string }> {
   const run = async (): Promise<StoredSave | { error: string }> => {
     if (!campaign || !snapshot) return { error: "No campaign is being played." };
+    // An ironman campaign keeps one save line, written where a Resume save would be (SAVE-010), and no others (SAVE-087).
+    if (campaign.ironman && asked !== "resume") return { error: "An ironman campaign is saved after every week, and only then." };
+    const kind = campaign.ironman ? "ironman" : asked;
     const c = { ...campaign, playSeconds: playSeconds() };
     const listing = (await saveStore.list()).filter((e) => e.header.campaignId === c.campaignId && e.header.kind === kind).map((e) => ({ path: e.path, head: e.head }));
     const r = await engine.request({ type: "save", kind, campaign: c, listing, device: DEVICE, platform: savePlatform, gameVersion: GAME_VERSION, now: Date.now(), ...(kind === "autosave" ? { keep: autosavesKept() } : {}), ...opts });
@@ -7963,7 +8033,9 @@ function writeGameSave(kind: "manual" | "autosave" | "resume", opts: { name?: st
         cloud.saved(r.path, r.removed);
         void cloud.run("after_save");
       }
-      if (kind === "resume") changedSinceResume = false;
+      if (kind === "resume" || kind === "ironman") changedSinceResume = false;
+      // The next ironman save names this one as its parent (INV-SAVE-10).
+      if (r.ironmanHead && campaign?.campaignId === c.campaignId) campaign.ironmanHead = r.ironmanHead;
       return entry;
     } catch (e) {
       // The old saves stay as they were (SAVE-023).
@@ -8074,10 +8146,11 @@ function gameMenuHtml(): string {
   const n = nations[s.playerNation]!;
   return `<div class="shell-card game-menu framed" role="dialog" aria-label="Game menu">
     <header><h2 class="ribbon">${pennant(n)} ${esc(n.name)}</h2>${back()}</header>
-    <p class="menu-date">${dateText(s.date)} · week ${s.turn + 1}${unsavedWeeks() ? ` · ${unsavedWeeks()} week${unsavedWeeks() > 1 ? "s" : ""} since your last save` : ""}</p>
+    <p class="menu-date">${dateText(s.date)} · week ${s.turn + 1}${!campaign?.ironman && unsavedWeeks() ? ` · ${unsavedWeeks()} week${unsavedWeeks() > 1 ? "s" : ""} since your last save` : ""}</p>
+    ${campaign ? `<p class="menu-rules"><b>Rules</b> ${esc(rulesLine(campaign.options, campaign.ironman))}${campaign.ironman ? "<br><small>Ironman: saved after every week, no going back.</small>" : ""}</p>` : ""}
     <div class="menu-list">
       <button class="wax" data-shell="map">${icon("map", 2)} Return to the map</button>
-      <button class="paper" data-shell="save">${icon("scroll", 2)} Save</button>
+      ${campaign?.ironman ? "" : `<button class="paper" data-shell="save">${icon("scroll", 2)} Save</button>`}
       <button class="paper" data-shell="load">${icon("scroll", 2)} Load</button>
       ${cloud ? `<button class="paper" data-share-campaign${playing ? " disabled" : ""}>${icon("swords", 2)} Share this campaign</button>` : ""}
       <button class="paper" data-shell="settings">${icon("cog", 2)} Settings</button>
@@ -8178,13 +8251,15 @@ function loadLines(): { entry: StoredSave; mark: string }[] {
   const all = listedSaves().sort((a, b) => b.header.savedAt - a.header.savedAt || b.header.turn - a.header.turn);
   const seen = new Set<string>();
   const resumes: StoredSave[] = [];
+  // An ironman campaign is listed as the campaign itself (SAVE-010); the one being played offers no earlier point (SAVE-087).
+  const playingIronman = campaign?.ironman && snapshot ? campaign.campaignId : null;
   for (const e of all) {
     const line = `${e.header.campaignId}|${e.header.device}`;
-    if (e.header.kind !== "resume" || seen.has(line)) continue;
+    if ((e.header.kind !== "resume" && e.header.kind !== "ironman") || seen.has(line) || e.header.campaignId === playingIronman) continue;
     seen.add(line);
     resumes.push(e);
   }
-  return [...resumes.map((entry) => ({ entry, mark: "Where you left off" })), ...all.filter((e) => e.header.kind === "manual" || e.header.kind === "autosave").map((entry) => ({ entry, mark: entry.header.kind === "autosave" ? "Auto" : "" }))];
+  return [...resumes.map((entry) => ({ entry, mark: entry.header.kind === "ironman" ? "Ironman" : "Where you left off" })), ...all.filter((e) => e.header.kind === "manual" || e.header.kind === "autosave").map((entry) => ({ entry, mark: entry.header.kind === "autosave" ? "Auto" : "" }))];
 }
 
 /** The Load card (SAVE-107). */
@@ -8205,7 +8280,7 @@ function loadCardHtml(): string {
               ? `<span class="save-act ask"><b>Leave ${esc(snapshot ? dateText(snapshot.date) : "")} unsaved?</b><button class="wax" data-save-first="${esc(e.path)}">Save first</button><button class="paper" data-leave="${esc(e.path)}">Leave</button><button class="paper" data-cancel>Cancel</button></span>`
               : shell.confirm === `modified ${e.path}`
                 ? `<span class="save-act ask"><b>This save does not match its check and may have been edited.</b><button class="wax" data-accept="${esc(e.path)}">Open anyway</button><button class="paper" data-cancel>Cancel</button></span>`
-                : `<span class="save-act"><button class="wax" data-load="${esc(e.path)}"${shell.busy ? " disabled" : ""}>Load</button>${cloud ? `<button class="paper" data-share="${esc(e.path)}">Share</button>` : ""}${e.header.kind === "resume" ? "" : `<button class="paper" data-ask-delete="${esc(e.path)}">Delete</button>`}</span>`;
+                : `<span class="save-act"><button class="wax" data-load="${esc(e.path)}"${shell.busy ? " disabled" : ""}>Load</button>${cloud ? `<button class="paper" data-share="${esc(e.path)}">Share</button>` : ""}${e.header.kind === "resume" || e.header.kind === "ironman" ? "" : `<button class="paper" data-ask-delete="${esc(e.path)}">Delete</button>`}</span>`;
         return `<li class="save-row${open ? " open" : ""}"><button class="save-pick" data-pick="${esc(e.path)}" aria-expanded="${open}">${saveLine(e, mark)}</button>${acts}</li>`;
       })
       .join("")}</ul>
@@ -8357,11 +8432,11 @@ async function loadSave(path: string, acceptModified = false, keepCurrent = true
   }
   mapSent = true;
   const h = e.header;
-  campaign = { campaignId: h.campaignId, playerNation: h.playerNation, nationName: nationNameOf(h.playerNation), ironman: h.ironman, options: h.options, modified: h.modified || acceptModified, playSeconds: h.playSeconds, ...(h.sharedFrom ? { sharedFrom: h.sharedFrom } : {}) };
+  campaign = { campaignId: h.campaignId, playerNation: h.playerNation, nationName: nationNameOf(h.playerNation), ironman: h.ironman, options: h.options, modified: h.modified || acceptModified, playSeconds: h.playSeconds, ...(h.sharedFrom ? { sharedFrom: h.sharedFrom } : {}), ...(h.kind === "ironman" ? { ironmanHead: h.saveId } : {}) };
   closeShell();
   enterGame(r.snapshot);
-  // Loading an earlier point makes it where the player left off.
-  if (h.kind !== "resume") void writeGameSave("resume");
+  // Loading an earlier point makes it where the player left off; an ironman save already is.
+  if (h.kind !== "resume" && h.kind !== "ironman") void writeGameSave("resume");
 }
 
 // ---- sharing saves with the community (domain/saves SAVE-124 … SAVE-136) ----

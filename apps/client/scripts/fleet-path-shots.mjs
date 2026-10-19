@@ -15,6 +15,7 @@ for (const [name, device] of [["landscape", devices["Pixel 7 landscape"]], ["sma
   await page.goto("http://localhost:4184/");
   await page.waitForSelector(`[data-nation=${nation}]`, { timeout: 60000 });
   await page.click(`[data-nation=${nation}]`);
+  await page.click("[data-begin]");
   await page.waitForSelector(".hud [data-news]", { timeout: 60000 });
   await page.locator("[data-hint=stop]").first().click({ timeout: 3000 }).catch(() => {});
   await page.click(".panel .close").catch(() => {});

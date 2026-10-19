@@ -12,6 +12,7 @@ page.on("pageerror", (e) => console.log("pageerror:", e.message));
 await page.goto("http://localhost:4175/");
 await page.waitForSelector(".map-layer", { timeout: 30000 });
 await page.click("[data-nation=castile]");
+await page.click("[data-begin]");
 await page.waitForTimeout(500);
 // Open Portugal's overview from the realm button list and declare war.
 await page.evaluate(() => {
