@@ -129,10 +129,13 @@ import { loadLastChoices, newGameOptionsHtml, rulesLine, saveLastChoices, setRul
 import { BATTLE_STEP_MS, bannerAt, COUNTRY_CARD_TABS, endTurnInAuto, endTurnLabel, keyEndsTurn, newAutoTurns, realmOverview, REALM_BOOK_TABS, sectionOf, SHELL as SHELL_RULES, startColumn, startIcons, stopAuto, switchAuto, tabHolds, WATCH_STEP_MS, weekPlayed, type AutoStop, type OverviewTile, type Platform as ShellPlatform } from "@ph/engine/domain/game-shell";
 import { autosaveDue, continueTarget, longDate, newCampaign, newManualSave, saveStart, savesConfig, sharedFromLine, type Campaign, type Platform as SavePlatform } from "@ph/engine/domain/saves";
 import { SaveStore, type StoredSave } from "./saves/store.ts";
+import { FileSaveStore, moveIntoFolder, type SaveStoreLike } from "./saves/fileStore.ts";
+import { desktopBridge } from "./desktop.ts";
 import { animationsPref, autosaveEvery, env as settingsEnv, autosavesKept, battleStepMs, batteryOn, dayMs, lensPatternsOn, livingPrefs, longPressMs, mapDetail, mapPower, onPrefs, setPref, textZoom, visionPref } from "./settings/prefs.ts";
 import { bandPattern, lensRamp, lensSet, nationColours, PATTERN_COUNT, patternCss, rgbHex, shown, visionIndex, type Vision } from "./map/colourVision.ts";
 import { openSettingsAt, renderSettings, setHintsRows, setOwnSection } from "./ui/settingsScreen.ts";
-import { CloudApi, CloudError, cloudBase, webKeyValue, webTokenStore } from "./cloud/api.ts";
+import { CloudApi, CloudError, cloudBase, desktopTokenStore, webKeyValue, webTokenStore } from "./cloud/api.ts";
+import { SteamSignIn } from "./cloud/steam.ts";
 import { CLOUD_PATH, CloudSync } from "./cloud/sync.ts";
 import { accountHtml, accountView, bindAccount, loadCard } from "./cloud/accountCard.ts";
 import { bindShareSheet, fetchSharedCopy, openError, shareSheetHtml, shareView, type ShareView } from "./cloud/share.ts";
@@ -7809,13 +7812,22 @@ async function selfTest(): Promise<void> {
 
 
 // ---- saves, the game menu and Settings (domain/saves, domain/settings "How the player uses it") ----
-const saveStore = new SaveStore();
+/** The desktop shell's bridge (save folder, safeStorage, Steam), or undefined in a browser or on a phone. */
+const desktop = desktopBridge();
+/** On the desktop saves are files in the save folder Steam Auto-Cloud syncs (SAVE-144); elsewhere IndexedDB. */
+const saveStore: SaveStoreLike = desktop ? new FileSaveStore(desktop.saves) : new SaveStore();
+/** Saves an earlier desktop build kept in IndexedDB move into the folder once (SAVE-144). */
+const savesMoved: Promise<unknown> = desktop
+  ? moveIntoFolder(new SaveStore(), saveStore, webKeyValue()).catch((e) => console.warn("moving saves into the folder failed", e))
+  : Promise.resolve();
 const overlay = document.querySelector<HTMLElement>("#overlay")!;
 const toast = document.querySelector<HTMLElement>("#toast")!;
 const runtimeNow = detectRuntime();
 const savePlatform: SavePlatform = runtimeNow === "capacitor-ios" ? "ios" : runtimeNow === "capacitor-android" ? "android" : runtimeNow === "electron" ? "desktop" : "web";
-/** The device's name as saves carry it (Continue says "from …" for another device's save). */
-const DEVICE = { ios: "iPhone", android: "Android", desktop: "Desktop", web: "Browser" }[savePlatform];
+/** The device's name as saves carry it (Continue says "from …" for another device's save); a Steam Deck says so (SAVE-142). */
+const DEVICE = desktop?.steamDeck ? "Steam Deck" : { ios: "iPhone", android: "Android", desktop: "Desktop", web: "Browser" }[savePlatform];
+/** How this device names itself to the server: the platform `steam` while Steam runs (SAVE-142). */
+const SERVER_DEVICE = { name: DEVICE, platform: desktop?.steam ? "steam" : savePlatform };
 const GAME_VERSION = "0.1.0";
 const SM = savesConfig.messages;
 
@@ -7824,7 +7836,11 @@ const SM = savesConfig.messages;
  * its server in VITE_CLOUD_API; without one nothing of them shows (D-SET-22).
  */
 const cloudUrl = cloudBase();
-const cloud = cloudUrl ? new CloudSync(new CloudApi(cloudUrl, webTokenStore()), saveStore, webKeyValue(), { device: DEVICE }) : undefined;
+const cloud = cloudUrl
+  ? new CloudSync(new CloudApi(cloudUrl, desktop?.secret.usable ? desktopTokenStore(desktop.secret) : webTokenStore()), saveStore, webKeyValue(), { device: DEVICE })
+  : undefined;
+/** Steam sign-in, in the Steam build with Steam running (SAVE-141, SAVE-146). */
+const steamSignIn = cloud && desktop?.steam ? new SteamSignIn(cloud, desktop.steam, webKeyValue(), SERVER_DEVICE, savesConfig.sign_in.steam_ticket_identity) : undefined;
 const cloudView = accountView();
 let cardLoading = false;
 if (cloud) {
@@ -7838,10 +7854,12 @@ if (cloud) {
           if (shell.view === "settings") renderShell();
         });
       }
-      return accountHtml(cloud, cloudView);
+      return accountHtml(cloud, cloudView, Date.now(), steamSignIn);
     },
-    bind: (card, redraw) => bindAccount(card, cloud, cloudView, { name: DEVICE, platform: savePlatform }, redraw),
+    bind: (card, redraw) => bindAccount(card, cloud, cloudView, SERVER_DEVICE, redraw, steamSignIn),
   });
+  // The Steam build signs in by itself, once the saves are in the folder; a failure waits on the card (SAVE-141).
+  if (steamSignIn) void savesMoved.then(() => steamSignIn.atLaunch());
   cloud.onChange = () =>
     void refreshSaves().then(() => {
       // A sign-in form being typed in is left alone.
@@ -7873,6 +7891,7 @@ function unsavedWeeks(): number {
 }
 
 async function refreshSaves(): Promise<void> {
+  await savesMoved;
   savesList = await saveStore.list();
 }
 

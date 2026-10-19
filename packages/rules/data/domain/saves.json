@@ -158,7 +158,30 @@
           "windows",
           "macos",
           "linux"
-        ]
+        ],
+        "partner_site": {
+          "root": "WinAppDataRoaming",
+          "subdirectory": "Pocket Hegemony/saves",
+          "pattern": "*.phsave",
+          "os": "all",
+          "recursive": true,
+          "overrides": [
+            {
+              "os": "macos",
+              "root": "MacAppSupport",
+              "path": "Pocket Hegemony/saves"
+            },
+            {
+              "os": "linux",
+              "root": "LinuxHome",
+              "path": ".config/Pocket Hegemony/saves",
+              "replace_path": true
+            }
+          ]
+        },
+        "product_name": "Pocket Hegemony",
+        "app_id_env": "PH_STEAM_APP_ID",
+        "dev_app_id": 480
       },
       "android": {
         "auto_backup": true,

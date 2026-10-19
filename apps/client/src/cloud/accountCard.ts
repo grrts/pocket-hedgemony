@@ -1,13 +1,15 @@
 import { CloudError, errorText, type AccountCard, type SharedCard } from "./api.ts";
+import type { SteamSignIn } from "./steam.ts";
 import type { CloudSync } from "./sync.ts";
 
 /**
  * Settings → Account and cloud saves (accounts-design §3, SAVE-119 …): one
- * card for the subject. Signed out, the email sign-in and Make an account;
- * signed in, the display name, the cloud's status line (its overview),
- * Storage, Devices with Sign out on each, Shared saves with Remove on each
- * (SAVE-135), and Sign out. Store sign-ins (Steam,
- * Apple, Google) and Sync on Wi-Fi only join when they are built.
+ * card for the subject. Signed out, Sign in with Steam in the Steam build
+ * (SAVE-146), the email sign-in and Make an account; signed in, the display
+ * name, the cloud's status line (its overview), Sign-ins (SAVE-147), Storage,
+ * Devices with Sign out on each, Shared saves with Remove on each (SAVE-135),
+ * and Sign out. Apple and Google sign-in and Sync on Wi-Fi only join when
+ * they are built.
  */
 
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
@@ -46,13 +48,35 @@ function seen(iso: string, now: number): string {
   return `last seen ${new Date(t).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}`;
 }
 
-export function accountHtml(sync: CloudSync, v: AccountView, now = Date.now()): string {
+const PROVIDERS: Record<string, string> = { steam: "Steam", apple: "Apple", google: "Google", email: "Email", password: "Email" };
+
+/**
+ * The Sign-ins row (SAVE-147): Steam first, with the Steam name on this
+ * computer (the server knows only the SteamID), then email with its address.
+ */
+function signInsRow(card: AccountCard | undefined, steam: SteamSignIn | undefined): string {
+  if (!card?.signIns.length) return "";
+  const order = (p: string) => (p === "steam" ? 0 : p === "email" || p === "password" ? 2 : 1);
+  const rows = [...card.signIns].sort((a, b) => order(a.provider) - order(b.provider));
+  const label = (s: { provider: string; label: string }) =>
+    s.provider === "steam" ? (steam?.steam.name ? `Steam · ${steam.steam.name}` : "Steam") : s.provider === "email" || s.provider === "password" ? `Email · ${s.label}` : (PROVIDERS[s.provider] ?? s.provider);
+  return `<div class="set-row cloud-sign-ins"><div class="set-label"><b>Sign-ins</b><small>${rows.map((s) => esc(label(s))).join("<br>")}</small></div></div>`;
+}
+
+/** `steam` is there only in the Steam build with Steam running (SAVE-146). */
+export function accountHtml(sync: CloudSync, v: AccountView, now = Date.now(), steam?: SteamSignIn): string {
   const api = sync.api;
   const error = v.error ? `<p class="note" role="alert">${esc(v.error)}</p>` : "";
   if (!api.signedIn) {
     const register = v.form === "register";
+    const steamPart = steam
+      ? `<button class="wax cloud-steam" data-cloud-steam${v.busy ? " disabled" : ""}>Sign in with Steam</button>
+      ${steam.error ? `<p class="note" role="alert">${esc(steam.error)}</p>` : ""}
+      <p class="hint">Or use email instead:</p>`
+      : "";
     return `<div class="cloud-card">
       <p class="hint">Sign in to keep your saves on every device. The game plays fully without an account.</p>
+      ${steamPart}
       ${error}
       <form class="cloud-form" data-cloud-form="${v.form}">
         <label><span>Email</span><input name="email" type="email" autocomplete="email" value="${esc(v.email)}" required></label>
@@ -66,10 +90,14 @@ export function accountHtml(sync: CloudSync, v: AccountView, now = Date.now()): 
   const u = sync.usage();
   const devices = v.card?.devices ?? [];
   const state = sync.state();
+  // An account made with Steam alone has no email (accounts-design §4): the line names the sign-in instead (SAVE-147).
+  const withSteam = !!steam || !!v.card?.signIns.some((s) => s.provider === "steam");
+  const under = api.account?.email ?? (withSteam ? "Signed in with Steam" : "");
   return `<div class="cloud-card">
-    <div class="set-row"><div class="set-label"><b>${esc(api.account?.displayName ?? "")}</b><small>${esc(api.account?.email ?? "")}</small></div></div>
+    <div class="set-row"><div class="set-label"><b>${esc(api.account?.displayName ?? "")}</b><small>${esc(under)}</small></div></div>
     <p class="cloud-status${state === "up_to_date" ? "" : " warn"}" role="status">${esc(sync.statusText())}</p>
     ${error}
+    ${signInsRow(v.card, steam)}
     <div class="set-row"><div class="set-label"><b>Storage</b><small>${u ? `${u.saves} of ${u.quotaSaves} saves · ${mb(u.bytes)} of ${mb(u.quotaBytes)}` : "Counted after the next sync."}</small></div></div>
     <h4 class="sub">Devices</h4>
     ${v.card ? "" : `<p class="hint">${esc(v.cardError || "Loading the devices…")}</p>`}
@@ -107,7 +135,7 @@ export function accountHtml(sync: CloudSync, v: AccountView, now = Date.now()): 
  * Binds the card's buttons. `device` is how this device names itself to the
  * server; `redraw` draws the section again.
  */
-export function bindAccount(card: HTMLElement, sync: CloudSync, v: AccountView, device: { name: string; platform: string }, redraw: () => void): void {
+export function bindAccount(card: HTMLElement, sync: CloudSync, v: AccountView, device: { name: string; platform: string }, redraw: () => void, steam?: SteamSignIn): void {
   const api = sync.api;
   const act = async (work: () => Promise<unknown>) => {
     v.busy = true;
@@ -135,6 +163,20 @@ export function bindAccount(card: HTMLElement, sync: CloudSync, v: AccountView, 
       void sync.signedIn();
       void loadCard(sync, v, redraw);
     });
+  });
+  card.querySelector<HTMLButtonElement>("[data-cloud-steam]")?.addEventListener("click", async () => {
+    if (!steam) return;
+    v.busy = true;
+    v.error = "";
+    redraw();
+    try {
+      await steam.signIn();
+      void loadCard(sync, v, redraw);
+    } catch {
+      // steam.error holds the reason, shown under the button.
+    }
+    v.busy = false;
+    redraw();
   });
   card.querySelector<HTMLButtonElement>("[data-cloud-switch]")?.addEventListener("click", (e) => {
     v.form = (e.currentTarget as HTMLButtonElement).dataset.cloudSwitch as AccountView["form"];

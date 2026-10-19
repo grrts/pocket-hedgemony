@@ -54,9 +54,9 @@ export interface DeviceTokens {
 }
 
 /**
- * Where the device token lives (SAVE-057): the web keeps it in localStorage;
- * desktop `safeStorage`, the iOS Keychain and the Android Keystore come later
- * behind the same two calls.
+ * Where the device token lives (SAVE-057): the web keeps it in localStorage,
+ * the desktop in `safeStorage` (`desktopTokenStore`); the iOS Keychain and the
+ * Android Keystore come later behind the same two calls.
  */
 export interface TokenStore {
   load(): DeviceTokens | undefined;
@@ -75,6 +75,39 @@ export function webTokenStore(kv: KeyValue = webKeyValue(), key = "ph.cloud-devi
       }
     },
     save: (t) => kv.set(key, t ? JSON.stringify(t) : undefined),
+  };
+}
+
+/** The desktop's safeStorage behind preload.cjs (SAVE-143); `set` answers false where it cannot encrypt. */
+export interface SecretStore {
+  get(): string | undefined;
+  set(value: string | undefined): boolean;
+}
+
+/**
+ * The device token on the desktop (SAVE-143): encrypted with safeStorage; where
+ * that cannot encrypt, in web storage as on the web. A token web storage kept
+ * before moves into safeStorage once it can.
+ */
+export function desktopTokenStore(secret: SecretStore, fallback: TokenStore = webTokenStore()): TokenStore {
+  return {
+    load: () => {
+      const text = secret.get();
+      if (text) {
+        try {
+          return JSON.parse(text) as DeviceTokens;
+        } catch {
+          return undefined;
+        }
+      }
+      const old = fallback.load();
+      if (old && secret.set(JSON.stringify(old))) fallback.save(undefined);
+      return old;
+    },
+    save: (t) => {
+      if (secret.set(t ? JSON.stringify(t) : undefined)) fallback.save(undefined);
+      else fallback.save(t);
+    },
   };
 }
 
@@ -191,6 +224,13 @@ export function errorText(e: unknown): string {
       return "An account with this email already exists. Sign in instead.";
     case "invalid_input":
       return e.message !== "invalid_input" ? e.message : "Check the fields and try again.";
+    // Steam sign-in (SAVE-118, SAVE-141): the server's own words.
+    case "steam_unavailable":
+      return e.message !== e.code ? e.message : "Steam sign-in is not available.";
+    case "steam_refused":
+      return e.message !== e.code ? e.message : "Steam did not accept the sign-in.";
+    case "steam_ticket":
+      return "Steam could not sign you in just now. Check that Steam is online and try again.";
     // Shared saves (SAVE-125 … SAVE-131): the server's own words.
     case "no_shared_save":
     case "too_many_shared":
@@ -251,6 +291,21 @@ export class CloudApi {
   /** `POST /api/sessions` with email and password. */
   async signIn(email: string, password: string, device: { name: string; platform: string }): Promise<AccountInfo> {
     const r = await this.json<{ accessToken: string; accessTokenExpiresIn: number; deviceToken: string; deviceId: string; account: AccountInfo }>("POST", "/api/sessions", { email, password, device }, false);
+    this.keep(r);
+    return r.account;
+  }
+
+  /**
+   * `POST /api/sessions` with a Steam Web API ticket (hex) and the Steam name,
+   * which names the account when this Steam account has none yet (SAVE-113).
+   */
+  async signInWithSteam(steamTicket: string, displayName: string, device: { name: string; platform: string }): Promise<AccountInfo> {
+    const r = await this.json<{ accessToken: string; accessTokenExpiresIn: number; deviceToken: string; deviceId: string; account: AccountInfo }>(
+      "POST",
+      "/api/sessions",
+      { steamTicket, ...(displayName ? { displayName } : {}), device },
+      false,
+    );
     this.keep(r);
     return r.account;
   }
