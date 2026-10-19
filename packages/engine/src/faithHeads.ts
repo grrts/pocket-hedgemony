@@ -1,5 +1,5 @@
 import type { World } from "./world.ts";
-import type { News } from "./war.ts";
+import { declaringAim, type News } from "./war.ts";
 import * as dip from "./domain/diplomacy/index.ts";
 import * as relg from "./domain/religion/index.ts";
 import { FAITH_IDS, NO_FAITH, SLOTS } from "./peoples.ts";
@@ -645,8 +645,9 @@ export function faithHeadsView(world: World, player: number): FaithHeadsView {
   const heads = liveHeads(world);
   const censure: FaithHeadsView["censure"] = {};
   if (player >= 0) for (let b = 0; b < world.nationCount; b++) {
-    if (b === player || world.nationGone[b]) continue;
-    const c = censurePreview(world, player, b);
+    if (b === player || world.nationGone[b] || faithOf(world, b) !== faithOf(world, player)) continue;
+    // Only a war on a fellow believer is censured (RELG-149). Priced with the aim the declare sheet will declare with (WAR-229).
+    const c = censurePreview(world, player, b, declaringAim(world, player, b).aim);
     if (c) censure[b] = c;
   }
   return {
