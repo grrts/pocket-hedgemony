@@ -156,6 +156,22 @@ export function seedPeoples(world: World): void {
   refreshBeliefs(world);
 }
 
+/**
+ * A woken realm's court tongue and state faith (SETUP-083): those of the
+ * realm it takes after when that realm's are its capital's own, else the
+ * capital's largest; its faith policy as that realm's.
+ */
+export function wakePeoples(world: World, n: number, capital: number, donor: number): void {
+  const F = FAITH_IDS.length;
+  const tongue = world.provinceTongue[capital * SLOTS]!;
+  const faith = world.provinceFaith[capital * SLOTS]!;
+  world.nationCourt[n] = tongue !== NO_TONGUE ? tongue : donor >= 0 ? world.nationCourt[donor]! : NO_TONGUE;
+  world.nationStateFaith[n] = faith !== NO_FAITH ? faith : donor >= 0 ? world.nationStateFaith[donor]! : NO_FAITH;
+  if (donor >= 0) world.nationFaithPolicy.copyWithin(n * F, donor * F, (donor + 1) * F);
+  else world.nationFaithPolicy.fill(FAITH_POLICIES.indexOf("tolerated"), n * F, (n + 1) * F);
+  refreshBeliefs(world);
+}
+
 // ---------------------------------------------------------------- reading and writing the arrays
 
 /** A province's tongues as shares, largest first. */

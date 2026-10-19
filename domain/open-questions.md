@@ -551,6 +551,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-SETUP-15**: (was OQ-SETUP-15) Province names: modern region names stay. D-MAP-6 settles it.
 - **D-SETUP-16**: (was OQ-SETUP-16) Coverage and certainty: a disputed, partial or stub record enters play only if it owns map provinces, and low confidence only widens its start range (D-SETUP-6). X-13 settles it.
 - **D-SETUP-17**: (was OQ-SETUP-17) Population scale: the map's figure is the province's people in thousands (Aube 305 thousand); the Troyes card's 72,000 is a town-sized illustration, not data. The map is the only complete set.
+- **D-SETUP-19**: Sleeping realms (Leroy, 18 Oct; X-24): realms founded after 1444 are listed from the start and asleep until they wake (SETUP-080 to SETUP-094). D-SETUP-2's "only a representation that owns map provinces is a realm" now reads "is a realm on the map in 1444"; a record that owns no province may be a sleeping realm.
 - **D-SETUP-18**: African starts (Leroy, 18 Oct; X-20): in the four African regions, D-SETUP-2's "only a representation that owns map provinces is a realm" now applies after the catalogue's playable countries, subjects and peoples are given the unowned land around their capitals (SETUP-060 to SETUP-065); elsewhere D-SETUP-2 stands. Leroy asked for more of the historical states and tribes, even very small ones, and as little change to the rules of play as possible.
 
 ### Settings (settings)

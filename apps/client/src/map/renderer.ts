@@ -331,8 +331,10 @@ int effId(vec2 m) {
 
 // The living map (VIEW-105..VIEW-115): the alpha of the id texture holds each
 // map pixel's settlement byte, the cell kind in bits 0-3 and road links
-// N/E/S/W in bits 4-7. Towns are drawn over the terrain in the ground's own
-// art pixels; walls are worked out from neighbouring core cells.
+// N/E/S/W in bits 4-7. Roads are drawn in the ground's own art pixels so they
+// meet the terrain art; buildings and walls at the town atlas's finer density
+// (TOWN_TILE per map pixel, twice the ground's), the walls worked out from
+// neighbouring core cells.
 int settlementAt(ivec2 p) {
   ivec2 local = clamp(p - uTileOrigin, ivec2(0), uTileSize - 1);
   return int(texelFetch(uIds, local, 0).a * 255.0 + 0.5);
@@ -346,7 +348,9 @@ vec3 livingTown(vec3 c, ivec2 p, ivec2 a, int id, int terrain, vec3 realm) {
   if (b == 0) return c;
   int kind = b & 15;
   int links = b >> 4;
-  ivec2 q = a & ${TOWN_TILE - 1};
+  ivec2 q = a & 7; // the ground's art pixel within the map pixel, for the roads
+  ivec2 fine = ivec2(floor(vMap * ${TOWN_TILE}.0)); // the town atlas's finer art pixel
+  ivec2 fq = fine & ${TOWN_TILE - 1};
   vec4 ti = townInfo(id);
   if (links != 0) {
     // A two-pixel road from the middle of the map pixel to each linked side; a track is broken.
@@ -364,19 +368,19 @@ vec3 livingTown(vec3 c, ivec2 p, ivec2 a, int id, int terrain, vec3 realm) {
   if (kind == 0) return c;
   bool woods = terrain == ${T.forest} || terrain == ${T.broadleaf} || terrain == ${T.jungle} || terrain == ${T.highlands};
   int variant = kind == 6 ? int(ti.b) : kind == 9 ? (woods ? 2 : terrain == ${T.hills} ? 1 : terrain == ${T.mountains} || terrain == ${T.badlands} ? 0 : 3) : int(hash(p + ivec2(13, 7)) * ${TOWN_VARIANTS}.0);
-  ivec2 tq = q;
+  ivec2 tq = fq;
   if (kind == 7) {
     // Docks are painted with the quay to the north and the water to the south: turn them to face the water.
     const int L = ${TOWN_TILE - 1};
-    if (!land(idAt(p + ivec2(0, -1)))) tq = ivec2(q.x, L - q.y);
-    else if (!land(idAt(p + ivec2(1, 0)))) tq = ivec2(q.y, q.x);
-    else if (!land(idAt(p + ivec2(-1, 0)))) tq = ivec2(q.y, L - q.x);
+    if (!land(idAt(p + ivec2(0, -1)))) tq = ivec2(fq.x, L - fq.y);
+    else if (!land(idAt(p + ivec2(1, 0)))) tq = ivec2(fq.y, fq.x);
+    else if (!land(idAt(p + ivec2(-1, 0)))) tq = ivec2(fq.y, L - fq.x);
   }
   vec4 t = texelFetch(uTownAtlas, ivec2((variant & ${TOWN_VARIANTS - 1}) * ${TOWN_TILE} + tq.x, (kind - 1) * ${TOWN_TILE} + tq.y), 0);
   if (t.a > 0.5) {
     c = distance(t.rgb, FLAG) < 0.02 ? realm : t.rgb;
     // Snow on the roofs in winter (VIEW-128, VIEW-072).
-    c = mix(c, vec3(0.94, 0.96, 1.0), 0.6 * snowAt(id, terrain, hash(a)));
+    c = mix(c, vec3(0.94, 0.96, 1.0), 0.6 * snowAt(id, terrain, hash(fine)));
   }
   int walls = int(ti.r);
   if (walls > 0 && walled(b)) {
@@ -384,11 +388,31 @@ vec3 livingTown(vec3 c, ivec2 p, ivec2 a, int id, int terrain, vec3 realm) {
     bool s = !walled(settlementAt(p + ivec2(0, 1)));
     bool w = !walled(settlementAt(p + ivec2(-1, 0)));
     bool e = !walled(settlementAt(p + ivec2(1, 0)));
-    bool wall = (n && q.y == 0) || (s && q.y == ${TOWN_TILE - 1}) || (w && q.x == 0) || (e && q.x == ${TOWN_TILE - 1});
-    bool cornerX = (w && q.x <= 1) || (e && q.x >= ${TOWN_TILE - 2});
-    bool cornerY = (n && q.y <= 1) || (s && q.y >= ${TOWN_TILE - 2});
-    if (walls == 2 && cornerX && cornerY) c = ((q.x + q.y) & 1) == 0 ? ${glsl("#b5aebb")} : ${glsl("#77707e")};
-    else if (wall) c = walls == 1 ? (((q.x + q.y) & 1) == 0 ? ${glsl("#8a5a2a")} : ${glsl("#5a3a1a")}) : (((q.x + q.y) & 1) == 0 ? ${glsl("#9a94a0")} : ${glsl("#4a4552")});
+    // Two fine pixels thick: the outer one crenellated (stone) or the stake tips
+    // (palisade), the inner one the wall walk or the stakes' shaded side.
+    const int L2 = ${TOWN_TILE - 1};
+    int outer = -1; // distance from the outside edge, 0 or 1, on a wall pixel
+    int along = 0;  // position along the wall, for the pattern
+    if (n && fq.y <= 1) { outer = fq.y; along = fine.x; }
+    if (s && fq.y >= L2 - 1) { outer = L2 - fq.y; along = fine.x; }
+    if (w && fq.x <= 1) { outer = fq.x; along = fine.y; }
+    if (e && fq.x >= L2 - 1) { outer = L2 - fq.x; along = fine.y; }
+    // Inside corners: close the gap where the wall turns round a cell outside it.
+    if (outer < 0 && (fq.x <= 1 || fq.x >= L2 - 1) && (fq.y <= 1 || fq.y >= L2 - 1)) {
+      ivec2 d = ivec2(fq.x <= 1 ? -1 : 1, fq.y <= 1 ? -1 : 1);
+      if (!walled(settlementAt(p + d))) { outer = 1; along = fine.x; }
+    }
+    // Stone corner towers, 4 × 4 fine pixels, with a crenellated rim.
+    bool cornerX = (w && fq.x <= 3) || (e && fq.x >= L2 - 3);
+    bool cornerY = (n && fq.y <= 3) || (s && fq.y >= L2 - 3);
+    if (walls == 2 && cornerX && cornerY) {
+      ivec2 t = ivec2(w && fq.x <= 3 ? fq.x : L2 - fq.x, n && fq.y <= 3 ? fq.y : L2 - fq.y);
+      bool rim = t.x == 0 || t.y == 0 || t.x == 3 || t.y == 3;
+      c = rim ? (((fine.x + fine.y) & 1) == 0 ? ${glsl("#b5aebb")} : ${glsl("#4a4552")}) : (t.x + t.y <= 3 ? ${glsl("#d8d0b0")} : ${glsl("#9a94a0")});
+    } else if (outer >= 0) {
+      if (walls == 1) c = outer == 0 ? ((along & 1) == 0 ? ${glsl("#c06a44")} : ${glsl("#5a3a1a")}) : ((along & 1) == 0 ? ${glsl("#8a5a2a")} : ${glsl("#5a3a1a")});
+      else c = outer == 0 ? (((along >> 1) & 1) == 0 ? ${glsl("#b5aebb")} : ${glsl("#4a4552")}) : ${glsl("#9a94a0")};
+    }
   }
   return c;
 }

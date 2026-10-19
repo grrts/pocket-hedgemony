@@ -1,4 +1,5 @@
 import { realmConfig } from "./domain/realm/index.ts";
+import type { WokenRealm } from "./sleeping.ts";
 import { rulerViews, type RulerView } from "./rulers.ts";
 import { fallenEffect, type FallenEffect } from "./fallen.ts";
 import { lowFaith, lowTongue } from "./belief.ts";
@@ -121,6 +122,10 @@ export interface Snapshot {
   /** Hour of the day (0, 4, 8 … 20). */
   hour: number;
   playerNation: number;
+  /** 1 for a sleeping realm, never drawn, named or listed (SETUP-082). */
+  nationAsleep: Uint8Array;
+  /** Woken realms' names, colours and capitals, where the data's differ or a spare took its own (SETUP-091). */
+  woken: WokenRealm[];
   /** worldHash at the end of a whole turn or a new game; empty for a day or step played (hashing the world costs more than the day). */
   hash: string;
   computeMs: number;
@@ -425,6 +430,8 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       date: { ...w.date },
       hour: w.step * HOURS_PER_STEP,
       playerNation: player,
+      nationAsleep: w.nationAsleep.slice(),
+      woken: w.woken.map((x) => ({ ...x })),
       hash: withHash ? hashWorld(w) : "",
       computeMs: now() - started,
       rejectedOrders,
@@ -678,11 +685,14 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         case "endTurn": {
           if (!world) throw new Error("no game in progress");
           const report = processTurn(world, req.orders, player);
+          // A union can fold the player's realm into a new one (SETUP-085).
+          player = world.player;
           return snapshot(req.id, started, report.rejectedOrders, report.news);
         }
         case "advance": {
           if (!world) throw new Error("no game in progress");
           const news = advance(world, Math.max(1, Math.min(req.steps, 42)));
+          player = world.player;
           return snapshot(req.id, started, [], news, false);
         }
         case "act": {

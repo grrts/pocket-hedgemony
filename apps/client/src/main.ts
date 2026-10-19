@@ -42,7 +42,7 @@ import { fitDraft, offerLine, peaceTable, startDraft, stepGold, togglePick, type
 import { fallenLine, rulerLines } from "./ui/ruler.ts";
 import { loadDefaultRuleset } from "@ph/rules";
 import { hexToRgb, PALETTE, TERRAINS } from "./art/palette.ts";
-import { sprite, spriteUrl } from "./art/sprites.ts";
+import { figureSprite, sprite, spriteUrl } from "./art/sprites.ts";
 import { icon, iconUrl, installUiArt, flagCanvas, flagUrl, UI_COLORS, type FlagOf } from "./art/ui.ts";
 import { apparentAge, eraOfYear } from "./art/commanders.ts";
 import { lookOfCulture, setPortraitYear } from "./art/portraits.ts";
@@ -134,7 +134,7 @@ const diagnostics: Diagnostics = {
 // Read by the wrapper smoke tests.
 (globalThis as { __phDiagnostics?: Diagnostics }).__phDiagnostics = diagnostics;
 
-// ?feature=great_horde adds realms to the list, for the screenshot scripts.
+/** The realms the picker offers first; sleeping realms are never among them (SETUP-082). ?feature=great_horde adds realms to the list, for the screenshot scripts. */
 const FEATURED = ["france", "england", "castile", "portugal", "ottomans", "byzantium", "austria", "muscovy", "ming", "aztecs", "inca", "mali", ...(new URLSearchParams(location.search).get("feature")?.split(",") ?? [])];
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 /** "11 November 1444", or "11 Nov 1444" short. */
@@ -147,6 +147,35 @@ const nations = rules.nations;
 const provinceIndex = new Map(provinces.map((p, i) => [p.id, i]));
 const nationIndex = new Map(nations.map((n, i) => [n.id, i]));
 const nationRgb = nations.map((n) => hexToRgb(n.color));
+/** Each realm as the rules list it, before any waking renamed or recoloured it. */
+const baseNations = nations.slice();
+/** The woken list last applied, so a snapshot with the same one costs nothing. */
+let wokenKey = "[]";
+/**
+ * A woken realm's name, colour and capital (SETUP-083, SETUP-088): a spare
+ * takes a name and colour when it wakes, a listed sleeper may take a new
+ * capital. They go into the client's own copy of the realms, so the map,
+ * flags and every card show them; each entry is replaced, never changed, as
+ * the rules' objects are shared.
+ */
+function applyWoken(s: Snapshot): void {
+  const key = JSON.stringify(s.woken);
+  if (key === wokenKey) return;
+  wokenKey = key;
+  baseNations.forEach((d, i) => {
+    if (nations[i] === d) return;
+    nations[i] = d;
+    nationRgb[i] = hexToRgb(d.color);
+  });
+  for (const w of s.woken) {
+    const i = nationIndex.get(w.id);
+    if (i === undefined) continue;
+    nations[i] = { ...baseNations[i]!, name: w.name, color: w.color, capital: w.capital };
+    nationRgb[i] = hexToRgb(w.color);
+  }
+}
+/** A realm still asleep (SETUP-082): never drawn, named or listed. Before a game, every sleeper is. */
+const asleep = (n: number) => (snapshot ? snapshot.nationAsleep[n] === 1 : !!nations[n]?.asleep);
 const unownedRgb = hexToRgb(PALETTE.unowned);
 /** Rebels' colour: land they hold is hatched in it, their bands carry it (REBL-066). */
 const REBEL_COLOR = "#2b1d1a";
@@ -754,7 +783,8 @@ async function boot(): Promise<void> {
   renderPanel();
   hideLoading();
   sound.title();
-  hints.mount({ target: hintTarget, moment: () => ({ eventOpen: !eventCard.hidden || !overlay.hidden || !revolutionCard.hidden, turnPlaying: playing }), sfx: (id) => sound.sfx(id) });
+  // A hint waits while a card is up: an event, a revolution, a realm founded (TUT-126, SETUP-094).
+  hints.mount({ target: hintTarget, moment: () => ({ eventOpen: !eventCard.hidden || !overlay.hidden || !revolutionCard.hidden || !!alerts.querySelector(".founding"), turnPlaying: playing }), sfx: (id) => sound.sfx(id) });
 }
 
 // ---- map styling ----
@@ -1247,6 +1277,7 @@ function drawOverlay(o: OverlayContext): void {
   if (zoom >= 1.1 && icons > 0) {
     ctx.globalAlpha = icons;
     nations.forEach((n, i) => {
+      if (asleep(i) || !provinceIndex.has(n.capital)) return;
       const p = provinces[provinceIndex.get(n.capital)!]!;
       if (owners[provinceIndex.get(n.capital)!] !== i || !isKnown(provinceIndex.get(n.capital)!)) return;
       const [sx, sy] = o.toScreen(p.x!, p.y!);
@@ -1286,7 +1317,9 @@ function drawOverlay(o: OverlayContext): void {
     ctx.textAlign = "center";
     ctx.textBaseline = "top";
     nations.forEach((n, i) => {
-      const c = provinceIndex.get(n.capital)!;
+      const c = provinceIndex.get(n.capital);
+      // A sleeping realm has no seat on the map (a spare has no capital at all until it wakes, SETUP-082).
+      if (c === undefined || asleep(i)) return;
       if (!nameOnMap({ name: provinces[c]!.name, ownersCapital: owners[c] === i }) || !isKnown(c)) return;
       const [sx, sy] = o.toScreen(provinces[c]!.x!, provinces[c]!.y!);
       if (onScreen(sx, sy)) pixelText(ctx, provinces[c]!.name, sx, sy + 7 * spriteScale, 12);
@@ -1979,18 +2012,14 @@ function drawTraders(o: OverlayContext, onScreen: (x: number, y: number, pad?: n
       const [px, py] = o.toScreen(m.x, m.y);
       const sx = px - m.uy * 5 * u, sy = py + m.ux * 5 * u;
       if (!onScreen(sx, sy)) continue;
-      const img = sprite(m.sprite, color, u);
-      const x = Math.round(sx - img.width / 2);
-      const y = Math.round(sy - img.height + 2 * u);
-      if (m.right) {
-        ctx.save();
-        ctx.translate(x + img.width, y);
-        ctx.scale(-1, 1);
-        ctx.drawImage(img, 0, 0);
-        ctx.restore();
-      } else ctx.drawImage(img, x, y);
-      const box = tapBox(img.width, img.height, 1);
-      traderHitBoxes.push({ mine: path.mine, x: x + img.width / 2 - box.w / 2, y: y + img.height / 2 - box.h / 2, w: box.w, h: box.h });
+      // Caravans and barges are drawn walking left, the ship sailing right.
+      const east = m.sprite === "cog" ? m.right : !m.right;
+      const { img, w, h } = figureSprite(m.sprite, color, u, east ? 1 : -1);
+      const x = Math.round(sx - w / 2);
+      const y = Math.round(sy - h + u);
+      ctx.drawImage(img, x, y, w, h);
+      const box = tapBox(w, h, 1);
+      traderHitBoxes.push({ mine: path.mine, x: x + w / 2 - box.w / 2, y: y + h / 2 - box.h / 2, w: box.w, h: box.h });
     }
   }
   ctx.restore();
@@ -2149,22 +2178,16 @@ function drawHulls(o: OverlayContext, f: FleetView, liv: LivingView, now: number
   ctx.save();
   ctx.globalAlpha = liv.living;
   for (const p of spots.sort((a, b) => a.y - b.y)) {
-    const img = sprite(frame ? "hull1" : "hull0", color, u);
-    const x = Math.round(p.x - img.width / 2);
-    const y = Math.round(p.y - img.height + 3 * u);
+    const { img, w, h } = figureSprite(frame ? "hull1" : "hull0", color, u, p.dir);
+    const x = Math.round(p.x - w / 2);
+    const y = Math.round(p.y - h + 3 * u);
     // A wake astern while it sails, broken on alternate frames.
     if (underway) {
       ctx.fillStyle = PALETTE.paper;
-      const stern = p.dir > 0 ? x - u : x + img.width;
-      for (let i = 0; i < 3; i++) ctx.fillRect(stern - p.dir * (i * 2 + frame) * u, y + img.height - 2 * u + (i % 2) * u, u, u);
+      const stern = p.dir > 0 ? x - u : x + w;
+      for (let i = 0; i < 3; i++) ctx.fillRect(stern - p.dir * (i * 2 + frame) * u, y + h - 2 * u + (i % 2) * u, u, u);
     }
-    if (p.dir < 0) {
-      ctx.save();
-      ctx.translate(x + img.width, y);
-      ctx.scale(-1, 1);
-      ctx.drawImage(img, 0, 0);
-      ctx.restore();
-    } else ctx.drawImage(img, x, y);
+    ctx.drawImage(img, x, y, w, h);
     // Powder smoke drifting off the guns in a battle.
     if (f.battle) {
       ctx.fillStyle = PALETTE.mist;
@@ -2868,12 +2891,28 @@ function takeSnapshot(next: Snapshot, ms: number): void {
   const ships = new Map<number, { at: [number, number]; path: number[] }>();
   if (snapshot) for (const f of snapshot.navy.fleets) ships.set(f.id, { at: fleetPosition(f), path: f.path });
   fleetFrom = ships;
+  applyWoken(next);
   snapshot = next;
+  followPlayerRealm(next);
   setPortraitYear(next.date.year);
   hearAchievements(next);
   drawnAt = at;
   stepStart = performance.now();
   stepMs = ms;
+}
+
+/**
+ * The campaign follows the realm the player plays: after Play on (SHELL-096),
+ * and when the player's realm was formed into another (SETUP-085, SETUP-093),
+ * its saves are of the new realm, under its name. The top bar reads the
+ * snapshot's realm itself.
+ */
+function followPlayerRealm(s: Snapshot): void {
+  if (!campaign) return;
+  const n = nations[s.playerNation]!;
+  if (campaign.playerNation === n.id && campaign.nationName === n.name) return;
+  campaign.playerNation = n.id;
+  campaign.nationName = n.name;
 }
 
 /** Takes in a fresh snapshot's map state. */
@@ -2887,7 +2926,7 @@ function applySnapshot(): void {
 
 const NEWS_ICON: Record<News["kind"], "swords" | "castle" | "crown" | "scroll"> = {
   war: "swords", joined: "swords", call: "swords", battle: "swords", peace: "crown", siege: "castle", occupied: "castle", freed: "castle", raised: "swords", refused: "scroll", destroyed: "crown", famine: "scroll", unrest: "scroll",
-  invention: "scroll", built: "castle", envoy: "scroll", event: "scroll", reform: "crown", rebels: "swords", heritage: "crown", voyage: "scroll", colony: "crown", crown: "crown", revolution: "crown", trade: "scroll", ruler: "crown", campaign: "crown", tribe: "crown",
+  invention: "scroll", built: "castle", envoy: "scroll", event: "scroll", reform: "crown", rebels: "swords", heritage: "crown", voyage: "scroll", colony: "crown", crown: "crown", revolution: "crown", trade: "scroll", ruler: "crown", campaign: "crown", founded: "crown", tribe: "crown",
 };
 
 /** The end card (SHELL-164): how the campaign ended, the outcome, the scores and the highs, with its two choices. */
@@ -2951,7 +2990,9 @@ function logNews(s: Snapshot): void {
   const me = s.playerNation;
   const news = [...s.rejectedOrders.map((r): News => ({ kind: "refused", text: `Not done: ${r.reason}.`, nations: [me] })), ...s.news];
   dispatches = [...news.reverse().map((n) => ({ date: { ...s.date }, news: n })), ...dispatches].slice(0, DISPATCHES_KEPT);
-  unread += news.filter((x) => x.nations.includes(me) && x.kind !== "raised").length;
+  unread += news.filter((x) => (x.nations.includes(me) || x.major) && x.kind !== "raised").length;
+  // A realm founded: a dispatch card with its flag, every realm hears it (SETUP-092).
+  showFoundings(news.filter((x) => x.kind === "founded"));
   for (const x of news) {
     // A work of the player's finished: said over the map, with Go there.
     if (x.kind === "built" && x.nations.includes(me) && x.province !== undefined) alertPlayer(x.text, "castle", { province: x.province });
@@ -3150,6 +3191,41 @@ function alertPlayer(text: string, what: "swords" | "castle" | "crown" | "scroll
   if (!to.battle) setTimeout(remove, ALERT_MS);
 }
 
+/**
+ * The founding card (SETUP-092 to SETUP-094): a major dispatch over the map
+ * with the new realm's flag and name and what it was made from, and, when
+ * the player's realm was formed into it, that it is theirs now. Show on the
+ * map centres the map on its capital; Close puts it away. It stays until the
+ * player does either, as the alerts for battles do, and the line is in the
+ * dispatches too. One card per realm founded.
+ */
+function showFoundings(news: News[]): void {
+  const realms = new Map<number, News[]>();
+  for (const x of news) realms.set(x.nations[0]!, [...(realms.get(x.nations[0]!) ?? []), x]);
+  for (const [n, lines] of realms) {
+    const key = `founded ${n} ${lines.map((x) => x.text).join(" ")}`;
+    if (alerted.has(key)) continue;
+    alerted.add(key);
+    const realm = nations[n]!;
+    // "Your realm is now Spain" comes first, then how it was founded.
+    const text = lines.sort((a, b) => Number(b.text.startsWith("Your realm")) - Number(a.text.startsWith("Your realm"))).map((x) => `<p>${esc(x.text)}</p>`).join("");
+    const el = document.createElement("div");
+    el.className = "alert founding framed";
+    el.setAttribute("role", "status");
+    el.dataset.founding = String(n);
+    el.innerHTML = `<div class="founding-head">${pennant(realm, 3)}<div><small>A realm is founded</small><b>${esc(realm.name)}</b>${text}</div></div>
+      <div class="founding-choices">${lines[0]!.province !== undefined ? `<button class="wax go-there">${icon("map", 1)}Show on the map</button>` : ""}<button class="paper close-founding">${icon("close", 1)}Close</button></div>`;
+    el.querySelector(".close-founding")!.addEventListener("click", () => el.remove());
+    el.querySelector(".go-there")?.addEventListener("click", () => {
+      el.remove();
+      // Close enough to see the new realm's land in its colour, with its name over it.
+      goThere(lines[0]!.province!, 2);
+    });
+    alerts.append(el);
+    while (alerts.children.length > ALERTS_SHOWN) ([...alerts.children].find((x) => !(x as HTMLElement).dataset.battle && !(x as HTMLElement).dataset.founding) ?? alerts.firstElementChild!).remove();
+  }
+}
+
 /** Clears the alerts the log now shows, keeping those for a battle the week waits on. */
 function clearAlerts(): void {
   alerts.querySelectorAll<HTMLElement>(".alert:not([data-battle])").forEach((el) => el.remove());
@@ -3254,7 +3330,8 @@ function bindEmpire(): void {
 function renderNews(): void {
   const s = snapshot!;
   const me = s.playerNation;
-  const mine = (x: News) => x.nations.includes(me);
+  // Major news is every realm's (a realm founded, SETUP-092).
+  const mine = (x: News) => x.nations.includes(me) || !!x.major;
   const items = dispatchesMine ? dispatches.filter((x) => mine(x.news)) : dispatches;
   // One heading per day, newest day first.
   const days: { date: GameDate; news: News[] }[] = [];
@@ -3289,7 +3366,7 @@ function renderNews(): void {
     ${days
       .map(
         (d) => `<h3 class="sub news-day">${dateText(d.date)}</h3><ul class="news">${d.news
-          .map((x) => `<li class="${mine(x) ? "mine" : ""}">${icon(NEWS_ICON[x.kind], 1)}<span>${esc(x.text)}</span>${x.province !== undefined ? `<button class="paper go" data-go-province="${x.province}" title="Show on the map" aria-label="Show on the map">${icon("map", 1)}</button>` : ""}</li>`)
+          .map((x) => `<li class="${mine(x) ? "mine" : ""}">${x.kind === "founded" ? pennant(nations[x.nations[0]!]!, 1) : icon(NEWS_ICON[x.kind], 1)}<span>${esc(x.text)}</span>${x.province !== undefined ? `<button class="paper go" data-go-province="${x.province}" title="Show on the map" aria-label="Show on the map">${icon("map", 1)}</button>` : ""}</li>`)
           .join("")}</ul>`,
       )
       .join("")}
@@ -3589,14 +3666,14 @@ function renderPanelCard(): void {
   if (!snapshot && selectedProvince < 0) {
     panel.innerHTML = `
       <header><h2 class="ribbon">Choose your realm</h2><span class="panel-buttons"><button class="fold" aria-label="Minimise">${icon("collapse", 2)}</button><button class="close" data-start-back aria-label="Back to the start screen">${icon("close", 2)}</button></span></header>
-      <div class="nations">${FEATURED.filter((id) => nationIndex.has(id))
+      <div class="nations">${FEATURED.filter((id) => nationIndex.has(id) && !nations[nationIndex.get(id)!]!.asleep)
         .map((id) => {
           const n = nations[nationIndex.get(id)!]!;
           // Each realm's standing at the start, so a realm that starts behind says so before it is chosen (RSCH-105).
           return `<button class="paper nation" data-nation="${n.id}">${pennant(n)}<span class="nation-name">${esc(n.name)}<small class="starts">${esc(startStanding(n.id))}</small></span></button>`;
         })
         .join("")}</div>
-      <p class="hint">Or tap any realm on the map: ${nations.length} to choose from. <a href="./style.html">Art test page</a></p>
+      <p class="hint">Or tap any realm on the map: ${nations.filter((n) => !n.asleep).length} to choose from. <a href="./style.html">Art test page</a></p>
       <button class="paper ach-open" data-ach-open>${icon("trophy", 2)}Achievements<small>${Object.keys(achProfile.unlocked).length} earned · every campaign can earn them</small></button>
       <p class="diag" id="diag">${diagnosticsLine()}</p>`;
     bindNationButtons();
@@ -6018,6 +6095,8 @@ function enterGame(snap: Snapshot): void {
 async function playOnAs(r: number): Promise<void> {
   await act({ type: "playOn", nation: r });
   if (snapshot?.playerNation !== r) return;
+  // The campaign now plays another realm (D-SAVE-1); its saves follow it (followPlayerRealm).
+  if (campaign) campaign.switchedCountry = true;
   const cap = provinceIndex.get(nations[r]!.capital)!;
   realmView = -1;
   selectedProvince = cap;
@@ -6869,6 +6948,8 @@ Object.assign(globalThis, {
   /** The most provinces the player holds of any one enemy, from the peace tables (scripts/peace-table-shots.mjs). */
   __phPeaceTable: () => Math.max(0, ...(snapshot?.settlements ?? []).map((x) => x.provinces.length)),
   __phTurn: () => snapshot?.turn ?? -1,
+  /** The founding card for staged news: a realm founded takes decades of play (scripts/founding-shots.mjs). */
+  __phFoundingCard: (news: News[]) => showFoundings(news),
   /** The player's ports and fleets, and an order for the navy (scripts/navy-shots.mjs). */
   __phNavy: () => snapshot?.navy ?? null,
   __phNavyOrder: (o: Record<string, unknown>) => act({ type: "navy", ...o } as Order).then(() => snapshot?.rejectedOrders.map((r) => r.reason) ?? []),
@@ -7073,6 +7154,15 @@ Object.assign(globalThis, {
     selected.clear();
     selected.add(snapshot.armies.id[k]!);
     view.lookAt(...armyPosition(k), zoom);
+  },
+  /** Centres the map on the player's first fleet, at a zoom; false when it has none. */
+  __phLookAtFleet: (zoom = 20) => {
+    const f = snapshot?.navy.fleets.find((g) => g.owner === snapshot!.playerNation);
+    if (!f) return false;
+    // In port its hulls lie at the town's berths.
+    if (isWater[f.at]) view.lookAt(...fleetPosition(f), zoom);
+    else view.lookAt(provinces[f.at]!.x!, provinces[f.at]!.y!, zoom);
+    return true;
   },
   /** Centres the map on the first battle, if any. */
   __phLookAtBattle: (zoom = 8) => {

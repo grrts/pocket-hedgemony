@@ -42,7 +42,8 @@ describe("research", () => {
     // Ming knows printing (RSCH-076's extra list).
     expect(knows(w, w.nationIndex.get("ming")!, "L5")).toBe(true);
     // No realm starts unable to learn.
-    for (const prog of w.research) expect(prog.schools.filter((s) => s.open).length).toBeGreaterThan(0);
+    // A sleeping realm founds its school once it wakes (SETUP-083).
+    for (const prog of w.research.filter((_, n) => !w.nationAsleep[n])) expect(prog.schools.filter((s) => s.open).length).toBeGreaterThan(0);
   });
 
   it("moves the study a twelfth of the year's scholar-years each month", () => {
@@ -94,7 +95,8 @@ describe("research", () => {
     expect(rs.eligibility(w.research[aztecs]!, "F03", { year: 1444 })).toEqual({ ok: false, reason: "contact" });
     expect(armUnlocked(w, aztecs, "light horse")).toBe(false);
     expect(armUnlocked(w, w.nationIndex.get("france")!, "light horse")).toBe(true);
-    for (const p of w.research) expect(p.group).toBeDefined();
+    // A sleeping realm takes its start group when it wakes (SETUP-083).
+    w.research.forEach((p, n) => !w.nationAsleep[n] && expect(p.group).toBeDefined());
   });
 
   it("takes students from the recruit pools and gives them back when called to arms", () => {
@@ -116,7 +118,7 @@ describe("research", () => {
     const { w, me } = setup();
     untilNewMonth(w, me);
     for (let n = 0; n < w.nationCount; n++) {
-      if (n === me) continue;
+      if (n === me || w.nationAsleep[n]) continue;
       expect(w.research[n]!.studies.length).toBe(1);
     }
     const eng = w.nationIndex.get("england")!;

@@ -467,7 +467,7 @@ export const hasGranary = (world: World, p: number): boolean => worksAt(world, p
  */
 export function seedWorks(world: World): void {
   const set = (p: number, w: WorkName, step: number) => (world.provinceWorks[p * WORK_COUNT + W[w]] = step);
-  const capitals = new Set(world.rules.nations.map((n) => world.provinceIndex.get(n.capital)));
+  const capitals = new Set(world.rules.nations.filter((n) => !n.asleep).map((n) => world.provinceIndex.get(n.capital)));
   for (let p = 0; p < world.provinceCount; p++) {
     if (world.provinceWater[p]) continue;
     const def = world.rules.provinces[p]!;
