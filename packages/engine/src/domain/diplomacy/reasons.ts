@@ -325,3 +325,11 @@ export function ownTotal(c: Count): number {
 }
 
 export { overlord };
+
+/** The one word shown before an ask is sent (DIPL-229): how the count stands now, with no numbers. */
+export type AskHint = "Likely" | "Unsure" | "Unlikely";
+
+export function askHint(total: number): AskHint {
+  const h = config.answers.hint;
+  return total >= h.likely_from ? "Likely" : total <= h.unlikely_to ? "Unlikely" : "Unsure";
+}
