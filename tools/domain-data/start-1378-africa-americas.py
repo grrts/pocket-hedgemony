@@ -503,8 +503,21 @@ assert len(towns) == len(port_names), port_names - {t["name"] for t in towns}
 sleeping = []
 for k, (i, (year, why, capital)) in enumerate(SLEEPING.items()):
     n = by_id[i]
-    sleeping.append({"id": i, "name": SLEEPING_NAMES[i], "color": n.get("color") or SLEEPING_COLORS[k], "capital_at": capital or n["capital"],
-                     "home_rules": SLEEPING_HOME[i], "tree": [i], "forms_about": year, "why": why})
+    sleeping.append({"id": i, "name": SLEEPING_NAMES[i], "color": n.get("color") or SLEEPING_COLORS[k], "capital": capital or n["capital"],
+                     "home": SLEEPING_HOME[i], "tree": [i], "forms_about": year, "why": why})
+
+# 1378 realms with neither a map nation nor a catalogue record, named for the relations (regions/README.md).
+ENTITIES = [
+    ("air_tuareg", "Aïr Tuareg and Takedda"),
+    ("ayarmaca", "Ayarmaca"),
+    ("cusco_basin_lordships", "Lordships of the Cusco basin"),
+    ("eastern_canary_chiefdoms", "Chiefdoms of the eastern Canaries"),
+    ("jarid_oasis_lords", "Lords of the Jarid and Zab"),
+    ("southern_basin_altepetl", "Altepetl of the southern Basin"),
+    ("xaltocan", "Xaltocan"),
+]
+entities = [{"id": i, "name": nm} for i, nm in ENTITIES]
+assert not {i for i, _ in ENTITIES} & ({n["id"] for n in nations} | {s["id"] for s in sleeping})
 
 # ── Write ────────────────────────────────────────────────────────────────────
 
@@ -525,13 +538,13 @@ write("culture-start.json", {"$comment": f"Court tongues and the people's tongue
                              "_provisional": ["realms.*.mix"], "tongues": tongues, "realms": realms_culture})
 write("relations.json", {"schema_version": "1.0", "reference_date": DATE,
                          "description": f"Relations between entities of Africa and the Americas on 20 September 1378, keyed by country-catalogue ids (new records use the research's proposed ids: ifat, marinid_marrakesh, tepanecs, maya, air_tuareg, eastern_canary_chiefdoms, jarid_oasis_lords, lower_congo_chiefdoms, xaltocan, southern_basin_altepetl, ayarmaca, cusco_basin_lordships). Confidence: high = confirmed, medium = probable, low = uncertain or disputed. {BASIS}",
-                         "rules_file": "../config/relation-rules.json", "relations": relations, "facts": facts})
+                         "rules_file": "../config/relation-rules.json", "relations": relations, "facts": facts, "entities": entities})
 write("subjects.json", {"$comment": f"Subject records on 20 September 1378 for Africa and the Americas as the subjects context reads them: [subject, overlord, kind, autonomy, start]; stances: hostile and rival relations. {BASIS}",
                         "subjects": subjects, "stances": stances, "religious_heads": [], "playable_subjects": playable})
 write("subjects-rulers.json", {"$comment": f"Rulers of the subjects above on 20 September 1378. {BASIS}", "rulers": dict(sorted(subject_rulers.items()))})
 write("ports.json", {"source": f"The 1444 towns of naval/data/ports-1444.json in these regions with their holders on 20 September 1378. province_1444 is a hint only: the merge step places each town by lat and lon on the 1378 map. {BASIS}",
                      "towns": towns, "not_placed": []})
-write("sleeping-realms.json", {"_doc": f"Realms of Africa and the Americas born between 1379 and 1444, or later, that the 1444 map shows: listed from the start and asleep until they form (SETUP-080, X-25). capital_at and home_rules are resolved to provinces by the merge step. {BASIS}",
+write("sleeping-realms.json", {"_doc": f"Realms of Africa and the Americas born between 1379 and 1444, or later, that the 1444 map shows: listed from the start and asleep until they form (SETUP-080, X-25). capital is a [lon, lat] point and home a list of owner-rule selectors, which the merge step resolves to provinces of the 1378 map. {BASIS}",
                                "realms": sleeping})
 write("map-to-catalogue.json", {"$comment": "Map nations of this fragment whose id is not their 1378 catalogue record.", "map_to_catalogue": MAP_TO_CATALOGUE})
 print(f"{len(nations)} map nations, {len(OWNERS)} owner rules, {len(relations)} relations, {len(facts)} facts, {len(subjects)} subjects, {len(towns)} ports, {len(sleeping)} sleeping realms")

@@ -1,15 +1,15 @@
 {
- "_doc": "Realms of Africa and the Americas born between 1379 and 1444, or later, that the 1444 map shows: listed from the start and asleep until they form (SETUP-080, X-25). capital_at and home_rules are resolved to provinces by the merge step. From start-date/research/africa-americas.md and research/decisions.md; built by tools/domain-data/start-1378-africa-americas.py from the 1444 files.",
+ "_doc": "Realms of Africa and the Americas born between 1379 and 1444, or later, that the 1444 map shows: listed from the start and asleep until they form (SETUP-080, X-25). capital is a [lon, lat] point and home a list of owner-rule selectors, which the merge step resolves to provinces of the 1378 map. From start-date/research/africa-americas.md and research/decisions.md; built by tools/domain-data/start-1378-africa-americas.py from the 1444 files.",
  "realms": [
   {
    "id": "adal",
    "name": "Adal Sultanate",
    "color": "#a05a2c",
-   "capital_at": [
+   "capital": [
     43.48,
     11.35
    ],
-   "home_rules": [
+   "home": [
     {
      "countries": [
       "DJI",
@@ -34,11 +34,11 @@
    "id": "kongo",
    "name": "Kingdom of Kongo",
    "color": "#6b8e23",
-   "capital_at": [
+   "capital": [
     14.24,
     -6.27
    ],
-   "home_rules": [
+   "home": [
     {
      "countries": [
       "AGO",
@@ -63,11 +63,11 @@
    "id": "mutapa",
    "name": "Mutapa",
    "color": "#8b4513",
-   "capital_at": [
+   "capital": [
     31.0,
     -16.5
    ],
-   "home_rules": [
+   "home": [
     {
      "countries": [
       "ZWE"
@@ -90,11 +90,11 @@
    "id": "torwa",
    "name": "Torwa",
    "color": "#b8860b",
-   "capital_at": [
+   "capital": [
     28.38,
     -20.16
    ],
-   "home_rules": [
+   "home": [
     {
      "countries": [
       "ZWE"
@@ -117,11 +117,11 @@
    "id": "ajuran",
    "name": "Ajuran",
    "color": "#2e8b57",
-   "capital_at": [
+   "capital": [
     45.34,
     2.04
    ],
-   "home_rules": [
+   "home": [
     {
      "countries": [
       "SOM"
@@ -144,11 +144,11 @@
    "id": "kaffa",
    "name": "Kaffa",
    "color": "#9a6b3c",
-   "capital_at": [
+   "capital": [
     36.24,
     7.27
    ],
-   "home_rules": [
+   "home": [
     {
      "countries": [
       "ETH"
@@ -171,11 +171,11 @@
    "id": "air_agadez",
    "name": "Aïr Sultanate",
    "color": "#c2b280",
-   "capital_at": [
+   "capital": [
     7.99,
     16.97
    ],
-   "home_rules": [
+   "home": [
     {
      "countries": [
       "NER"
@@ -198,11 +198,11 @@
    "id": "timbuktu_tuareg",
    "name": "Tuareg of the Niger bend",
    "color": "#5f7f9f",
-   "capital_at": [
+   "capital": [
     -2.0,
     18.8
    ],
-   "home_rules": [
+   "home": [
     {
      "countries": [
       "MLI"
@@ -225,11 +225,11 @@
    "id": "massina_fulbe",
    "name": "Fulbe of Masina",
    "color": "#7c5c8c",
-   "capital_at": [
+   "capital": [
     -4.95,
     14.5
    ],
-   "home_rules": [
+   "home": [
     {
      "countries": [
       "MLI"
@@ -252,11 +252,11 @@
    "id": "canarian_lordship",
    "name": "Lordship of the Canary Islands",
    "color": "#a0522d",
-   "capital_at": [
+   "capital": [
     -13.56,
     29.06
    ],
-   "home_rules": [
+   "home": [
     {
      "countries": [
       "ESP"
@@ -279,11 +279,11 @@
    "id": "bougie",
    "name": "Bougie",
    "color": "#4f7942",
-   "capital_at": [
+   "capital": [
     5.08,
     36.75
    ],
-   "home_rules": [
+   "home": [
     {
      "countries": [
       "DZA"
@@ -306,11 +306,11 @@
    "id": "debdou",
    "name": "Debdou",
    "color": "#8f6f3f",
-   "capital_at": [
+   "capital": [
     -3.05,
     34.0
    ],
-   "home_rules": [
+   "home": [
     {
      "countries": [
       "MAR"
@@ -333,11 +333,11 @@
    "id": "hintata_marrakesh",
    "name": "Hintata of Marrakesh",
    "color": "#6a5acd",
-   "capital_at": [
+   "capital": [
     -7.99,
     31.63
    ],
-   "home_rules": [
+   "home": [
     {
      "countries": [
       "MAR"
@@ -360,11 +360,11 @@
    "id": "loango",
    "name": "Loango",
    "color": "#b07c4f",
-   "capital_at": [
+   "capital": [
     11.82,
     -4.65
    ],
-   "home_rules": [
+   "home": [
     {
      "countries": [
       "COG"
@@ -387,11 +387,11 @@
    "id": "buganda",
    "name": "Buganda",
    "color": "#3f6f6f",
-   "capital_at": [
+   "capital": [
     32.5,
     0.3
    ],
-   "home_rules": [
+   "home": [
     {
      "countries": [
       "UGA"
@@ -414,11 +414,11 @@
    "id": "ankole",
    "name": "Ankole",
    "color": "#9c7a3c",
-   "capital_at": [
+   "capital": [
     30.8,
     -0.8
    ],
-   "home_rules": [
+   "home": [
     {
      "countries": [
       "UGA"
@@ -441,11 +441,11 @@
    "id": "karagwe",
    "name": "Karagwe",
    "color": "#7f8f5f",
-   "capital_at": [
+   "capital": [
     31.1,
     -1.6
    ],
-   "home_rules": [
+   "home": [
     {
      "countries": [
       "TZA"
@@ -468,11 +468,11 @@
    "id": "rwanda",
    "name": "Rwanda",
    "color": "#a76f5f",
-   "capital_at": [
+   "capital": [
     29.9,
     -2.0
    ],
-   "home_rules": [
+   "home": [
     {
      "countries": [
       "RWA",
@@ -496,11 +496,11 @@
    "id": "mandara",
    "name": "Mandara",
    "color": "#5c7c4c",
-   "capital_at": [
+   "capital": [
     13.9,
     10.9
    ],
-   "home_rules": [
+   "home": [
     {
      "countries": [
       "CMR",
@@ -524,11 +524,11 @@
    "id": "coosa",
    "name": "Coosa",
    "color": "#8a7a5a",
-   "capital_at": [
+   "capital": [
     -84.75,
     34.6
    ],
-   "home_rules": [
+   "home": [
     {
      "countries": [
       "USA"
@@ -554,11 +554,11 @@
    "id": "cherokee",
    "name": "Cherokee",
    "color": "#c47a3a",
-   "capital_at": [
+   "capital": [
     -84.2,
     35.5
    ],
-   "home_rules": [
+   "home": [
     {
      "countries": [
       "USA"
@@ -585,11 +585,11 @@
    "id": "creek",
    "name": "Creek",
    "color": "#6f8faf",
-   "capital_at": [
+   "capital": [
     -85.5,
     32.4
    ],
-   "home_rules": [
+   "home": [
     {
      "countries": [
       "USA"

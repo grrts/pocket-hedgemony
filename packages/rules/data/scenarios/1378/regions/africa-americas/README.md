@@ -16,7 +16,8 @@ Built by `python3 tools/domain-data/start-1378-africa-americas.py /mnt/project-f
 ## Fields the merge step resolves
 
 Province ids change whenever any region's borders change, so this fragment gives places by coordinates:
-- `sleeping-realms.json` has `capital_at` (lon, lat) and `home_rules` (owner rules) in place of the 1444 `capital` and `home` province ids. It also adds `forms_about` and `why`.
+- `sleeping-realms.json` gives `capital` as (lon, lat) and `home` as owner-rule selectors, where 1444 has province ids. It also adds `forms_about` and `why`.
+- `relations.json` declares in `entities` the 1378 realms that are neither map nations nor catalogue records (Xaltocan, the Aïr Tuareg and others).
 - `ports.json` towns carry `lat` and `lon` from `naval/data/ports-1444.json`, and `province_1444` only as a hint.
 - `map-nations.json` entries may carry a `note` (display text, ignored by mapgen).
 - `map-to-catalogue.json` lists the map ids whose 1378 catalogue record has another id.

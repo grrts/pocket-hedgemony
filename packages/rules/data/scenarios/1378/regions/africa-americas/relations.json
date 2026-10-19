@@ -1669,5 +1669,35 @@
    "confidence": "medium",
    "source_ids": []
   }
+ ],
+ "entities": [
+  {
+   "id": "air_tuareg",
+   "name": "Aïr Tuareg and Takedda"
+  },
+  {
+   "id": "ayarmaca",
+   "name": "Ayarmaca"
+  },
+  {
+   "id": "cusco_basin_lordships",
+   "name": "Lordships of the Cusco basin"
+  },
+  {
+   "id": "eastern_canary_chiefdoms",
+   "name": "Chiefdoms of the eastern Canaries"
+  },
+  {
+   "id": "jarid_oasis_lords",
+   "name": "Lords of the Jarid and Zab"
+  },
+  {
+   "id": "southern_basin_altepetl",
+   "name": "Altepetl of the southern Basin"
+  },
+  {
+   "id": "xaltocan",
+   "name": "Xaltocan"
+  }
  ]
 }
