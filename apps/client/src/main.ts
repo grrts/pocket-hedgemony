@@ -122,7 +122,10 @@ import { BATTLE_STEP_MS, bannerAt, COUNTRY_CARD_TABS, endTurnInAuto, endTurnLabe
 import { autosaveDue, continueTarget, longDate, newCampaign, newManualSave, saveStart, savesConfig, type Campaign, type Platform as SavePlatform } from "@ph/engine/domain/saves";
 import { SaveStore, type StoredSave } from "./saves/store.ts";
 import { animationsPref, autosaveEvery, autosavesKept, battleStepMs, batteryOn, dayMs, livingPrefs, longPressMs, mapDetail, mapPower, onPrefs, setPref, textZoom } from "./settings/prefs.ts";
-import { openSettingsAt, renderSettings, setHintsRows } from "./ui/settingsScreen.ts";
+import { openSettingsAt, renderSettings, setHintsRows, setOwnSection } from "./ui/settingsScreen.ts";
+import { CloudApi, CloudError, cloudBase, webKeyValue, webTokenStore } from "./cloud/api.ts";
+import { CLOUD_PATH, CloudSync } from "./cloud/sync.ts";
+import { accountHtml, accountView, bindAccount, loadCard } from "./cloud/accountCard.ts";
 
 const rules = loadDefaultRuleset();
 // ?engine=main-thread forces the fallback path, for testing it.
@@ -7411,6 +7414,41 @@ const DEVICE = { ios: "iPhone", android: "Android", desktop: "Desktop", web: "Br
 const GAME_VERSION = "0.1.0";
 const SM = savesConfig.messages;
 
+/**
+ * Cloud saves (SAVE-052 … SAVE-069, SAVE-119 …): only in a build that names
+ * its server in VITE_CLOUD_API; without one nothing of them shows (D-SET-22).
+ */
+const cloudUrl = cloudBase();
+const cloud = cloudUrl ? new CloudSync(new CloudApi(cloudUrl, webTokenStore()), saveStore, webKeyValue(), { device: DEVICE }) : undefined;
+const cloudView = accountView();
+let cardLoading = false;
+if (cloud) {
+  setOwnSection("account", {
+    html: () => {
+      // The devices come fresh each time Settings opens.
+      if (cloud.api.signedIn && !cloudView.card && !cardLoading) {
+        cardLoading = true;
+        void loadCard(cloud, cloudView, () => {
+          cardLoading = false;
+          if (shell.view === "settings") renderShell();
+        });
+      }
+      return accountHtml(cloud, cloudView);
+    },
+    bind: (card, redraw) => bindAccount(card, cloud, cloudView, { name: DEVICE, platform: savePlatform }, redraw),
+  });
+  cloud.onChange = () =>
+    void refreshSaves().then(() => {
+      // A sign-in form being typed in is left alone.
+      if (shell.view === "load" || (shell.view === "settings" && cloud.api.signedIn)) renderShell();
+      else if (!shell.view && startOn && !startEl.hidden) showStart();
+    });
+  addEventListener("online", () => void cloud.run("resume"));
+}
+
+/** The saves the Load card and Continue list: this device's, and those in the cloud from other devices. */
+const listedSaves = (): StoredSave[] => (cloud ? [...savesList, ...cloud.remote(savesList)] : savesList);
+
 type ShellView = "menu" | "save" | "load" | "settings";
 /** What the overlay shows, where it was opened from, and the card's own open line or question. */
 const shell: { view: ShellView | null; fromStart: boolean; open: string; confirm: string; busy: boolean; note: string; name: string } = { view: null, fromStart: false, open: "", confirm: "", busy: false, note: "", name: "" };
@@ -7447,19 +7485,21 @@ const tutorialFinished = () => hints.progress().done >= hints.progress().of;
 
 /** The start screen: Play with the waiting campaign, the ways into a campaign, the icon row, the map panning behind (SHELL-150..156). */
 function showStart(): void {
-  const cont = continueTarget(savesList, DEVICE, nationNameOf);
+  const cont = continueTarget(listedSaves(), DEVICE, nationNameOf);
   const nation = cont ? flagOfId(cont.entry.header.playerNation) : undefined;
   const d = cont?.entry.header.date;
+  // A save from another device says so, as Continue does (SAVE-014).
+  const from = cont && cont.entry.header.device !== DEVICE ? ` (from ${cont.entry.header.device})` : "";
   const column = startColumn({
     campaign: cont && d ? { realm: nationNameOf(cont.entry.header.playerNation), date: { year: d.y, month: d.m }, borders: "" } : null,
-    saves: savesList.length,
+    saves: listedSaves().length,
     tutorialFinished: tutorialFinished(),
     platform: SHELL_PLATFORM,
     edition: "full game",
   });
   const entry = (e: (typeof column)[number]) =>
     e.label === "Play"
-      ? `<button class="wax start-play" data-start="play">${nation ? pennant(nation, 3) : icon("crown", 3)}<span><b>Play</b>${e.detail ? `<small>${esc(e.detail)}</small>` : ""}</span></button>`
+      ? `<button class="wax start-play" data-start="play">${nation ? pennant(nation, 3) : icon("crown", 3)}<span><b>Play</b>${e.detail ? `<small>${esc(e.detail + from)}</small>` : ""}</span></button>`
       : `<button class="paper" data-start="${e.target}">${esc(e.label)}</button>`;
   startEl.innerHTML = `
     <div class="start-band framed">
@@ -7526,7 +7566,7 @@ startEl.addEventListener("click", (e) => {
   if (!b) return;
   const what = b.dataset.start ?? b.dataset.startIcon!;
   if (what === "play" || what === "loading" || what === "new_campaign") {
-    const cont = continueTarget(savesList, DEVICE, nationNameOf);
+    const cont = continueTarget(listedSaves(), DEVICE, nationNameOf);
     if (what !== "new_campaign" && cont) {
       hideStart();
       void loadSave(cont.entry.path, false, false);
@@ -7576,6 +7616,11 @@ function writeGameSave(kind: "manual" | "autosave" | "resume", opts: { name?: st
     try {
       const entry = await saveStore.commit(r.path, r.bytes, r.removed);
       await refreshSaves();
+      // Its upload is queued, and sent now if the device is online (SAVE-065).
+      if (cloud) {
+        cloud.saved(r.path, r.removed);
+        void cloud.run("after_save");
+      }
       if (kind === "resume") changedSinceResume = false;
       return entry;
     } catch (e) {
@@ -7606,7 +7651,11 @@ async function savesAfterTurn(began: GameDate | null): Promise<void> {
 
 // The Resume save follows the app being put away, when orders were given since (SAVE-007).
 document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "visible") playClock = performance.now();
+  if (document.visibilityState === "visible") {
+    playClock = performance.now();
+    // Back in the app: what other devices saved meanwhile (SAVE-064); going away adds no cloud work (SAVE-066).
+    void cloud?.run("resume");
+  }
   // The time played up to now counts before the app is put away.
   else if (campaign) campaign.playSeconds += Math.round((performance.now() - playClock) / 1000);
   if (document.visibilityState !== "hidden" || !campaign || !snapshot || playing) return;
@@ -7626,6 +7675,7 @@ function sayDone(text: string): void {
 }
 
 function openShell(view: ShellView, fromStart = !snapshot): void {
+  if (view === "settings") cloudView.card = undefined;
   shell.view = view;
   shell.fromStart = fromStart;
   shell.open = "";
@@ -7696,8 +7746,8 @@ const savedAgo = (ms: number) => {
 function saveLine(e: StoredSave, mark = ""): string {
   const h = e.header;
   const n = flagOfId(h.playerNation);
-  return `<span class="save-thumb"><img src="data:image/png;base64,${h.thumbnail}" alt=""></span>
-    <span class="save-text"><b>${n ? pennant(n, 1) : ""}${esc(h.name)}</b><small>${mark ? `<em class="mark">${esc(mark)}</em> · ` : ""}${esc(nationNameOf(h.playerNation))} · ${esc(longDate(h.date))} · saved ${esc(savedAgo(h.savedAt))}</small></span>`;
+  return `<span class="save-thumb">${h.thumbnail ? `<img src="data:image/png;base64,${h.thumbnail}" alt="">` : icon("scroll", 2)}</span>
+    <span class="save-text"><b>${n ? pennant(n, 1) : ""}${esc(h.name)}</b><small>${mark ? `<em class="mark">${esc(mark)}</em> · ` : ""}${esc(nationNameOf(h.playerNation))} · ${esc(longDate(h.date))} · saved ${esc(savedAgo(h.savedAt))}${h.device !== DEVICE ? ` · from ${esc(h.device)}` : ""}</small></span>`;
 }
 
 /** The Save card (SAVE-106). */
@@ -7766,16 +7816,21 @@ function bindSaveCard(): void {
   });
 }
 
-/** The Load card's lines: each campaign's Resume save first, then every other save, newest first (SAVE-107, D-SAVE-17). */
+/**
+ * The Load card's lines: each campaign's Resume save first, then every other save, newest first (SAVE-107, D-SAVE-17);
+ * a campaign played on two devices keeps both lines of play, each marked with its device (SAVE-054).
+ */
 function loadLines(): { entry: StoredSave; mark: string }[] {
+  const all = listedSaves().sort((a, b) => b.header.savedAt - a.header.savedAt || b.header.turn - a.header.turn);
   const seen = new Set<string>();
   const resumes: StoredSave[] = [];
-  for (const e of savesList) {
-    if (e.header.kind !== "resume" || seen.has(e.header.campaignId)) continue;
-    seen.add(e.header.campaignId);
+  for (const e of all) {
+    const line = `${e.header.campaignId}|${e.header.device}`;
+    if (e.header.kind !== "resume" || seen.has(line)) continue;
+    seen.add(line);
     resumes.push(e);
   }
-  return [...resumes.map((entry) => ({ entry, mark: "Where you left off" })), ...savesList.filter((e) => e.header.kind === "manual" || e.header.kind === "autosave").map((entry) => ({ entry, mark: entry.header.kind === "autosave" ? "Auto" : "" }))];
+  return [...resumes.map((entry) => ({ entry, mark: "Where you left off" })), ...all.filter((e) => e.header.kind === "manual" || e.header.kind === "autosave").map((entry) => ({ entry, mark: entry.header.kind === "autosave" ? "Auto" : "" }))];
 }
 
 /** The Load card (SAVE-107). */
@@ -7800,6 +7855,7 @@ function loadCardHtml(): string {
         return `<li class="save-row${open ? " open" : ""}"><button class="save-pick" data-pick="${esc(e.path)}" aria-expanded="${open}">${saveLine(e, mark)}</button>${acts}</li>`;
       })
       .join("")}</ul>
+    ${cloud && !cloud.api.signedIn ? `<button class="paper cloud-invite" data-shell="settings" data-settings-section="account">Sign in to keep your saves on every device</button>` : ""}
   </div>`;
 }
 
@@ -7815,7 +7871,10 @@ function bindLoadCard(): void {
     renderShell();
   });
   on("[data-delete]", (path) => {
-    void saveStore.remove(path).then(async () => {
+    // The cloud's copy goes too, so other devices learn of it (SAVE-062).
+    const id = listedSaves().find((x) => x.path === path)?.header.saveId;
+    if (cloud && id) cloud.deleted(id);
+    void (path.startsWith(CLOUD_PATH) ? Promise.resolve() : saveStore.remove(path)).then(async () => {
       await refreshSaves();
       shell.open = "";
       shell.confirm = "";
@@ -7872,6 +7931,23 @@ function sessionSet(key: string, value: string | null): void {
 }
 
 async function loadSave(path: string, acceptModified = false, keepCurrent = true): Promise<void> {
+  // A save from another device comes down when it is opened (SAVE-064).
+  if (path.startsWith(CLOUD_PATH) && cloud) {
+    shell.busy = true;
+    if (shell.view) renderShell();
+    try {
+      path = (await cloud.download(path.slice(CLOUD_PATH.length))).path;
+      await refreshSaves();
+    } catch (err) {
+      shell.busy = false;
+      // Continue on the start screen has no card open yet: the Load card says why.
+      if (!shell.view) openShell("load");
+      shell.note = err instanceof CloudError && err.offline ? "Connect to open this save from the cloud." : "This save could not be fetched from the cloud.";
+      renderShell();
+      return;
+    }
+    shell.busy = false;
+  }
   const bytes = await saveStore.read(path);
   const e = savesList.find((x) => x.path === path);
   if (!bytes || !e) {
@@ -7981,6 +8057,8 @@ void refreshSaves().then(() => {
     return;
   }
   if (!snapshot) renderPanel();
+  // What other devices saved since the last launch, then this device's waiting uploads (SAVE-064, SAVE-065).
+  void cloud?.run("launch");
 });
 
 // Hooks for the scripted play-throughs (scripts/war-shots.mjs).

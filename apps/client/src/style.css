@@ -4953,6 +4953,16 @@ button.link {
   background: var(--sea);
 }
 
+/* A save in the cloud only: no map crop until it comes down. */
+.save-thumb:not(:has(img)) {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 48px;
+  border: 2px solid var(--outline);
+  background: var(--paper-light);
+}
+
 .save-text {
   display: flex;
   flex-direction: column;
@@ -5187,6 +5197,59 @@ button.link {
 
 .reset-section {
   margin: 10px 0 4px;
+}
+
+/* Account and cloud saves: one column of full-width fields and buttons, the status line on top (SAVE-119 …). */
+.cloud-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  zoom: var(--text-zoom, 1);
+}
+
+.cloud-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cloud-form label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+  font-size: 17px;
+}
+
+.cloud-form input {
+  min-height: 44px;
+  padding: 0 8px;
+  border: 3px solid var(--outline);
+  background: var(--paper-light);
+  font: 400 21px/1 var(--body);
+  color: var(--ink);
+}
+
+.cloud-form button,
+.cloud-sign-out {
+  min-height: 48px;
+}
+
+.cloud-status {
+  margin: 2px 0;
+  font-weight: 600;
+}
+
+.cloud-status.warn {
+  color: var(--cloth);
+}
+
+.cloud-device .set-control {
+  flex-wrap: wrap;
+}
+
+.cloud-invite {
+  flex: none;
+  margin-top: 6px;
 }
 
 /* A tall window: the sections first, a section full screen with Back (SET-012). */
