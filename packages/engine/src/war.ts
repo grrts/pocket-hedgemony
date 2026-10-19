@@ -689,28 +689,34 @@ export function nearest(world: World, from: number, test: (p: number) => boolean
 export function runOccupation(world: World, newMonth: boolean, news: News[]): void {
   const a = world.armies;
   const enemies = enemyTable(world);
-  // The armies standing in each province, as a list per province through `next` (a Map of arrays cost most of this daily pass).
-  const first = new Int32Array(world.provinceCount).fill(-1);
-  const next = new Int32Array(a.count);
-  for (let i = a.count - 1; i >= 0; i--) {
+  const present = new Map<number, number[]>();
+  for (let i = 0; i < a.count; i++) {
     // Armies marching through or fighting a battle don't hold the land.
     if (!a.alive[i] || a.battle[i]! >= 0 || a.retreating[i] || a.pathAt[i]! < a.path[i]!.length) continue;
-    next[i] = first[a.location[i]!]!;
-    first[a.location[i]!] = i;
+    const list = present.get(a.location[i]!) ?? [];
+    list.push(i);
+    present.set(a.location[i]!, list);
   }
   const holdDays = world.rules.defines.war.holdWeeks * 7;
+  // The provinces with an army standing in them, marked so the rest (most of
+  // the map, every day) are passed over without a lookup.
+  const armed = new Uint8Array(world.provinceCount);
+  for (const p of present.keys()) armed[p] = 1;
+  const water = world.provinceWater;
+  const owners = world.provinceOwner;
+  const holds = world.provinceHold;
+  const sieges = world.sieges;
   for (let p = 0; p < world.provinceCount; p++) {
-    if (world.provinceWater[p] || world.provinceOwner[p]! < 0) continue;
-    const owner = world.provinceOwner[p]!;
+    if (water[p] || owners[p]! < 0) continue;
+    const owner = owners[p]!;
     // No army there: nothing is held or besieged, and the walls fill again (most provinces, most days).
-    if (first[p]! < 0) {
-      world.provinceHold[p] = 0;
-      if (world.sieges.size && world.sieges.delete(p)) news.push({ kind: "siege", text: `The siege of ${provinceName(world, p)} is lifted.`, nations: [owner], province: p });
-      if (newMonth && world.provinceOccupier[p]! < 0) world.provinceGarrison[p] = Math.min(maxGarrison(world, p), world.provinceGarrison[p]! + maxGarrison(world, p) * world.rules.defines.war.garrisonRecoveryPerMonth);
+    if (!armed[p]) {
+      holds[p] = 0;
+      if (sieges.size && sieges.delete(p)) news.push({ kind: "siege", text: `The siege of ${provinceName(world, p)} is lifted.`, nations: [owner], province: p });
+      if (newMonth && world.provinceOccupier[p]! < 0) refillGarrison(world, p);
       continue;
     }
-    const slots: number[] = [];
-    for (let i = first[p]!; i >= 0; i = next[i]!) slots.push(i);
+    const slots = present.get(p)!;
     const ctl = controller(world, p);
     // The rightful owner (or a partner at war with the occupier) frees occupied land; anyone at war with the holder takes it.
     const hostile = slots.filter((s) => enemies[ctl]!.has(a.owner[s]!));
@@ -718,7 +724,7 @@ export function runOccupation(world: World, newMonth: boolean, news: News[]): vo
     if (!hostile.length || defended) {
       world.provinceHold[p] = 0;
       if (world.sieges.delete(p) && !hostile.length) news.push({ kind: "siege", text: `The siege of ${provinceName(world, p)} is lifted.`, nations: [owner], province: p });
-      if (newMonth && world.provinceOccupier[p]! < 0) world.provinceGarrison[p] = Math.min(maxGarrison(world, p), world.provinceGarrison[p]! + maxGarrison(world, p) * world.rules.defines.war.garrisonRecoveryPerMonth);
+      if (newMonth && world.provinceOccupier[p]! < 0) refillGarrison(world, p);
       continue;
     }
     // The first realm to besiege or hold a province is the one that takes it (Leroy, F-45); the
@@ -780,6 +786,12 @@ export function runOccupation(world: World, newMonth: boolean, news: News[]): vo
       }
     }
   }
+}
+
+/** A month's refill of a held province's garrison, up to what its walls hold. */
+function refillGarrison(world: World, p: number): void {
+  const max = maxGarrison(world, p);
+  world.provinceGarrison[p] = Math.min(max, world.provinceGarrison[p]! + max * world.rules.defines.war.garrisonRecoveryPerMonth);
 }
 
 function occupy(world: World, p: number, by: number, text: string, news: News[]): void {
@@ -922,7 +934,7 @@ function makePeace(world: World, war: dip.War, whole: boolean, a: number, b: num
   for (const p of ceded) {
     world.provinceOwner[p] = world.provinceOccupier[p]!;
     world.provinceLord[p] = -1;
-    provinceTaken(world, p);
+    provinceTaken(world, p, news);
   }
   // Every other occupation between the realms making peace ends.
   const set = new Set(involved);
@@ -976,7 +988,7 @@ export function cedeProvince(world: World, p: number, to: number, news: News[]):
   if (from < 0 || from === to) return;
   world.provinceOwner[p] = to;
   world.provinceLord[p] = -1;
-  provinceTaken(world, p);
+  provinceTaken(world, p, news);
   world.provinceOccupier[p] = -1;
   world.provinceHold[p] = 0;
   world.sieges.delete(p);

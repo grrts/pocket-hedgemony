@@ -82,7 +82,7 @@ import { colonyCard, coloniesTab, colonySection, exploreSection, voyageBar } fro
 import { askRows, bindTribes, colonyGround, groundHead, groundSection, groundsCountLine, huntKeyHtml, huntTab, type TribesUi } from "./ui/tribes.ts";
 import { HUNT_TAB, chartsCoast, settlersAlert } from "@ph/engine/domain/tribes";
 import { achievementName, achievementsCard, loadProfile, saveProfile, takeAchievements, tileKey, toastHtml, unseen, type Filter as AchFilter } from "./ui/achievements.ts";
-import { Hints, type HintTarget } from "./ui/hints.ts";
+import { Hints, mapSpot, type HintTarget } from "./ui/hints.ts";
 import type { Hint } from "@ph/engine/domain/onboarding";
 import {
   animatedFigures,
@@ -494,6 +494,13 @@ document.addEventListener("click", (e) => {
     renderPanel();
   });
 });
+// Auto-fill posts on or off, and Fill all, on the Officials tab (PROV-348).
+document.addEventListener("click", (e) => {
+  const t = e.target as HTMLElement;
+  const auto = t.closest<HTMLButtonElement>("[data-auto-fill]");
+  if (auto) void act({ type: "autoFillPosts", on: auto.dataset.autoFill === "1" }).then(() => renderPanel());
+  if (t.closest("[data-fill-posts]")) void act({ type: "fillPosts" }).then(() => renderPanel());
+});
 // New land kept as royal land with its post empty (PROV-340).
 document.addEventListener("click", (e) => {
   const b = (e.target as HTMLElement).closest<HTMLButtonElement>("[data-settle]");
@@ -826,8 +833,8 @@ async function boot(): Promise<void> {
   renderPanel();
   hideLoading();
   sound.title();
-  // A hint waits while a card is up: an event, a revolution, a realm founded (TUT-126, SETUP-094).
-  hints.mount({ target: hintTarget, moment: () => ({ eventOpen: !eventCard.hidden || !overlay.hidden || !revolutionCard.hidden || !!alerts.querySelector(".founding"), turnPlaying: playing }), sfx: (id) => sound.sfx(id) });
+  // A hint waits while a card is up: an event, a revolution, a realm founded, the loading screen (TUT-126, SETUP-094).
+  hints.mount({ target: hintTarget, moment: () => ({ eventOpen: !eventCard.hidden || !overlay.hidden || !revolutionCard.hidden || !!alerts.querySelector(".founding") || loadingShown(), turnPlaying: playing }), sfx: (id) => sound.sfx(id) });
 }
 
 // ---- map styling ----
@@ -930,6 +937,7 @@ const lensMenu = document.querySelector<HTMLElement>("#lenses")!;
 /** Turns a lens on: the renderer's mode, the provinces' colours and the menu. */
 function setLens(l: Lens): void {
   lens = l;
+  if (l !== "realms") hints.did("lens");
   view.renderer.mode = lens === "realms" ? "political" : lens === "terrain" ? "terrain" : "lens";
   view.renderer.fiefs = lens === "institutions";
   restyleProvinces();
@@ -2842,7 +2850,7 @@ function renderHud(): void {
         case "date":
           return `<span class="plaque turn-label" title="${dateText(s.date)}, ${seasonName(latOf(provinces[provinceIndex.get(n.capital)!]!), s.date.month).toLowerCase()}: one turn is a week">${dateText(s.date, true)}${clockText(playbackHour(s.hour, s.battles.some((b) => b.player)))}</span>`;
         case "gold":
-          return `<button class="plaque" data-realm="${me}"${open(p.opens)} title="Treasury: gold, and change per month. Opens the ledger">${icon("coin", 1)}${fmt(p.gold)} <small class="${p.falling ? "down" : ""}">${p.perMonth >= 0 ? "+" : ""}${p.perMonth.toFixed(1)}</small></button>`;
+          return `<button class="plaque gold" data-realm="${me}"${open(p.opens)} title="Treasury: gold, and change per month. Opens the ledger">${icon("coin", 1)}${fmt(p.gold)} <small class="${p.falling ? "down" : ""}">${p.perMonth >= 0 ? "+" : ""}${p.perMonth.toFixed(1)}</small></button>`;
         case "stability":
           return stabilityPlaque(s.stability!, me, s.revolution);
         case "war":
@@ -3690,7 +3698,10 @@ function renderPanel(): void {
   }
   // Whatever the card, the buttons a revolution's regime locks say so (REVO-092).
   lockRevolutionButtons(panel, snapshot?.revolution);
-  if (!panelDepth) noteScreen();
+  if (!panelDepth) {
+    noteScreen();
+    hintViews();
+  }
 }
 
 /** The Head of the faith card's buttons: conclave gold in steps, Claim the caliphate, Raise our own patriarch. */
@@ -4169,7 +4180,7 @@ function renderOfficial(pi: number): void {
   }));
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(o.name)}</h2>${closeButton()}</header>
-    ${officialScreen(rules, o, me, COMMISSION_GOLD, s.nationTreasury[me]!, moves, movesAll || options.length <= 6, titlesOf(me))}
+    ${officialScreen(rules, o, me, COMMISSION_GOLD, s.nationTreasury[me]!, moves, movesAll || options.length <= 6, titlesOf(me), s.posts.fit[pi] ?? null)}
     <button class="back" data-back>${icon("scroll", 2)}Back to the officials</button>`;
   bindClose();
   showPanel(true);
@@ -4191,6 +4202,33 @@ function renderOfficial(pi: number): void {
       });
     }),
   );
+  // Replace him with the best fit in one step; the screen turns into the new official's own (PROV-345).
+  panel.querySelector<HTMLButtonElement>("[data-replace]")?.addEventListener("click", (e) => {
+    const b = e.currentTarget as HTMLButtonElement;
+    if (b.disabled) return;
+    void act({ type: "dismissOfficial", province: pi, hire: { official: Number(b.dataset.replaceType), foreign: b.dataset.replaceForeign === "1" } }).then(() => {
+      if (!snapshot || snapshot.rejectedOrders.length) return;
+      newsView = false;
+      panel.scrollTop = 0;
+      renderPanel();
+    });
+  });
+  // Dismiss asks once more in place, so a stray tap does not lose him (PROV-351); then the post's screen follows.
+  panel.querySelector<HTMLButtonElement>("[data-dismiss]")?.addEventListener("click", (e) => {
+    const b = e.currentTarget as HTMLButtonElement;
+    if (!b.dataset.confirm) {
+      b.dataset.confirm = "1";
+      b.classList.add("wax");
+      b.textContent = `Dismiss ${o.name}? Yes`;
+      return;
+    }
+    void act({ type: "dismissOfficial", province: pi }).then(() => {
+      if (!snapshot || snapshot.rejectedOrders.length) return;
+      newsView = false;
+      panel.scrollTop = 0;
+      renderPanel();
+    });
+  });
   panel.querySelector("[data-back]")?.addEventListener("click", () => {
     officialView = -1;
     realmView = s.playerNation;
@@ -4224,7 +4262,7 @@ function renderPost(pi: number): void {
   const hires = OFFICIALS.map((t, type) => ({ type, home: home.has(t) }));
   panel.innerHTML = `
     <header><h2 class="ribbon">Post at ${esc(provinces[pi]!.name)}</h2>${closeButton()}</header>
-    ${postScreen(rules, pi, moves, movesAll || options.length <= 4, hires, { home: hireGold(false), foreign: hireGold(true) }, s.nationTreasury[me]!, titlesOf(me))}
+    ${postScreen(rules, pi, moves, movesAll || options.length <= 4, hires, { home: hireGold(false), foreign: hireGold(true) }, s.nationTreasury[me]!, titlesOf(me), s.posts.fit[pi] ?? null)}
     <button class="back" data-back>${icon("scroll", 2)}Back to the officials</button>`;
   bindClose();
   showPanel(true);
@@ -5796,7 +5834,7 @@ function renderRealm(r: number): void {
     : realmTab === "lords" ? realmLords(r)
     : realmTab === "provinces" ? provincesTab(r)
     : realmTab === "learning" && s?.research ? learningTab(rules, s.research, s.nationTreasury[r]!, learningUi)
-    : realmTab === "officials" ? officialsTab(rules, own.filter((i) => s!.provinceLord[i]! < 0).map((i) => ({ province: i, official: officialOf(s!, i, r) })), r, own.filter((i) => s!.provinceLord[i]! >= 0).length, r === s!.playerNation ? s!.newLands : [], titlesOf(r))
+    : realmTab === "officials" ? officialsTab(rules, own.filter((i) => s!.provinceLord[i]! < 0).map((i) => ({ province: i, official: officialOf(s!, i, r) })), r, own.filter((i) => s!.provinceLord[i]! >= 0).length, r === s!.playerNation ? s!.newLands : [], titlesOf(r), r === s!.playerNation ? s!.posts : null)
     : general;
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(n.name)}</h2>${closeButton()}</header>
@@ -6303,56 +6341,150 @@ function nearestNeighbour(): number {
   return [...count].sort((a, b) => b[1] - a[1])[0]?.[0] ?? s.relations.find((r) => r.nation !== s.playerNation)?.nation ?? -1;
 }
 
-/** Where each first-campaign hint points as the screen stands now (TUT-127): the button or card to tap, and Show me when it is not on screen. */
+/** The loading screen is up (a campaign starting or opening): the hints wait for the map. */
+function loadingShown(): boolean {
+  const l = document.querySelector<HTMLElement>("#loader");
+  return !!l && !l.hidden && !l.classList.contains("done");
+}
+
+/** A hint that points at a province on the map: the province when it is in open view, else the fold button of the card in the way. */
+function mapTarget(i: number, line: string, show: () => void): HintTarget {
+  const at = provinceSpot(i);
+  const fold = !mapSpot(at) && !panel.hidden ? panel.querySelector(".panel-buttons .fold") : null;
+  return fold ? { el: fold, line: "Fold this card away to see the map.", show } : { at, line, show };
+}
+
+/** A province's spot on the screen, for a hint that points at the map (TUT-127). */
+function provinceSpot(i: number): [number, number] {
+  const [x, y] = view.toScreen(provinces[i]!.x!, provinces[i]!.y!);
+  const r = view.renderer.canvas.getBoundingClientRect();
+  return [r.left + x, r.top + y];
+}
+
+/** The player's own province card is open (any tab). */
+function ownProvinceOpen(): boolean {
+  const s = snapshot;
+  return !panel.hidden && !!s && realmView < 0 && officialView < 0 && lordView < 0 && armyView < 0 && fleetView < 0 && !newsView && selectedProvince >= 0 && owners[selectedProvince] === s.playerNation;
+}
+
+/** Opens a page of the player's realm book, for a hint's Show me. */
+function openRealmPage(tab: RealmTab): void {
+  realmView = snapshot!.playerNation;
+  realmTab = tab;
+  officialView = -1;
+  lordView = -1;
+  armyView = -1;
+  fleetView = -1;
+  newsView = false;
+  panelCollapsed = false;
+  renderPanel();
+}
+
+/**
+ * The way to a page of the player's realm book, one tap at a time: the banner
+ * in the top bar, then the page's section, then its tab, then the button on it.
+ */
+function realmPageTarget(tab: RealmTab, button: string | null, lines: { banner: string; section: string }): HintTarget {
+  const s = snapshot!;
+  const show = () => openRealmPage(tab);
+  if (panel.hidden || realmView !== s.playerNation) return { el: hud.querySelector(".realm"), line: lines.banner, show };
+  if (realmTab === tab) return button ? { el: panel.querySelector(`${button}:not([disabled])`) ?? panel.querySelector(button), show } : {};
+  const page = panel.querySelector(`[data-realm-tab="${tab}"]`);
+  if (page) return { el: page, line: lines.section, show };
+  return { el: panel.querySelector(`[data-realm-section="${sectionOf(pageOf(tab))}"]`) ?? panel.querySelector(`[data-realm-open-tab="${tab}"]`), line: lines.section, show };
+}
+
+/**
+ * The way to one of the player's province cards: the province's name at the
+ * bottom left once it is chosen, else the province itself on the map.
+ */
+function provinceCardTarget(i: number, then: string, show: () => void): HintTarget {
+  const name = provinces[i]!.name;
+  const chosen = selectedProvince >= 0 && owners[selectedProvince] === snapshot!.playerNation;
+  if (chosen && !reopen.hidden) return { el: reopen, line: `Open ${provinces[selectedProvince]!.name}'s card: tap its name at the bottom left${then}.`, show };
+  return mapTarget(i, `Tap ${name} on the map, then its name at the bottom left${then}.`, show);
+}
+
+/** Where each first-campaign hint points as the screen stands now (TUT-127): the button, card or spot on the map to tap at this step of it, and Show me when it is not on screen. */
 function hintTarget(h: Hint): HintTarget {
   const s = snapshot;
-  const open = !panel.hidden;
   const capital = s ? provinceIndex.get(nations[s.playerNation]!.capital)! : -1;
-  const provinceOpen = open && !!s && realmView < 0 && officialView < 0 && lordView < 0 && armyView < 0 && fleetView < 0 && !newsView && selectedProvince >= 0 && owners[selectedProvince] === s.playerNation;
+  const provinceOpen = ownProvinceOpen();
+  if (h.id !== "realm" && !s) return {};
   switch (h.id) {
-    case "realm":
+    case "realm": {
       if (s) return {};
       if (panelCollapsed) return { el: reopen };
+      const play = panel.querySelector(".play");
       return {
-        el: panel.querySelector(".play") ?? panel.querySelector(".nation"),
+        el: play ?? panel.querySelector('.nation[data-nation="ottomans"]') ?? panel.querySelector(".nation"),
+        ...(play ? { line: `Tap ${play.textContent!.trim()} to begin, or close this card and pick another realm.` } : {}),
         show: () => {
           realmView = -1;
           selectedProvince = -1;
           renderPanel();
         },
       };
+    }
+    case "province":
+      return provinceCardTarget(capital, "", () => openProvinceTab(capital, "overview"));
+    case "realm_book":
+      return { el: hud.querySelector(".realm") };
+    case "lens":
+      if (!lensMenu.hidden) return { el: lensMenu.querySelector('[data-lens="wealth"]'), line: "Pick Wealth: the map colours each province by its riches. Realms brings the borders back." };
+      return { el: document.querySelector("#mode") };
     case "move": {
-      if (!s) return {};
-      if (selected.size) return { line: "Now tap the land to march to: the army sets off at once." };
-      if (!armyList.hidden) return { el: armyList.querySelector("[data-pick]") };
+      if (selected.size) {
+        // A march: the ring sits on land next to the chosen army.
+        const from = s!.armies.location[armySlot([...selected][0]!)]!;
+        const near = neighborIdx[from]?.filter((n) => !isWater[n]).sort((a, b) => Number(owners[b] === s!.playerNation) - Number(owners[a] === s!.playerNation)) ?? [];
+        const to = near.find((n) => mapSpot(provinceSpot(n))) ?? near[0];
+        if (to === undefined) return { line: "Now tap the land to march to: the army sets off at once." };
+        return { at: provinceSpot(to), line: `Now tap ${provinces[to]!.name}, or any land, to march there: the army sets off at once.`, show: () => view.lookAt(provinces[to]!.x!, provinces[to]!.y!, Math.max(view.camera.zoom, 4)) };
+      }
+      if (!armyList.hidden) return { el: armyList.querySelector("[data-pick]"), line: "Pick a commander from the list." };
       const openList = () => {
         panelCollapsed = true;
         renderPanel();
         armyListClosed = false;
         lensMenu.hidden = true;
         soundMenu.hidden = true;
-            armyButton.setAttribute("aria-expanded", "true");
+        armyButton.setAttribute("aria-expanded", "true");
         renderArmyList();
       };
-      return { el: (open && panel.querySelector("[data-army]")) || armyButton, show: openList };
+      return { el: (!panel.hidden && panel.querySelector("[data-army]")) || armyButton, show: openList };
     }
     case "end_turn":
       return { el: fab };
+    case "news":
+      return { el: hud.querySelector("[data-news]") };
+    case "study": {
+      const way = realmPageTarget("learning", "[data-study]", { banner: "Choose what your scholars study: tap your banner in the top bar to open your realm's book.", section: "Now open Research." });
+      if (way.el !== null || realmTab !== "learning") return way;
+      // No invention picked yet: Can study brings one up with its Study now.
+      const pickOne = panel.querySelector("[data-jump=open]");
+      return { ...way, el: pickOne, ...(pickOne ? { line: "Tap Can study: it brings up an invention your scholars can start now." } : {}) };
+    }
     case "recruit":
     case "build": {
-      if (!s || capital < 0) return {};
+      if (capital < 0) return {};
       const tab = h.id === "recruit" ? "garrison" : "build";
       const button = h.id === "recruit" ? "[data-recruit]" : "[data-build]";
       const show = () => openProvinceTab(provinceOpen ? selectedProvince : capital, tab);
       if (provinceOpen && provinceTab === tab) return { el: panel.querySelector(`${button}:not([disabled])`) ?? panel.querySelector(button), show };
       if (provinceOpen) return { el: panel.querySelector(`[data-tab="${tab}"]`), show };
-      return { show };
+      return provinceCardTarget(capital, `, then the ${h.id === "recruit" ? "Garrison" : "Build"} tab`, show);
     }
+    case "lords": {
+      const t = titlesOf(s!.playerNation);
+      return realmPageTarget("lords", null, { banner: `Meet your ${t.lords}, who hold land for you and want things in return: tap your banner in the top bar.`, section: `Now open Lands, then ${cap(t.lords)}.` });
+    }
+    case "treasury":
+      return { el: hud.querySelector(".plaque.gold"), show: () => openRealmPage("treasury") };
     case "envoy": {
-      if (!s) return {};
+      const n = realmView >= 0 && realmView !== s!.playerNation ? realmView : nearestNeighbour();
+      if (n < 0) return {};
       const show = () => {
-        const n = realmView >= 0 && realmView !== s.playerNation ? realmView : nearestNeighbour();
-        if (n < 0) return;
         realmView = n;
         realmTab = "diplomacy";
         officialView = -1;
@@ -6361,11 +6493,41 @@ function hintTarget(h: Hint): HintTarget {
         panelCollapsed = false;
         renderPanel();
       };
-      if (open && realmView >= 0 && realmView !== s.playerNation) return { el: realmTab === "diplomacy" ? panel.querySelector("[data-envoy]") : panel.querySelector('[data-realm-tab="diplomacy"]'), show };
-      return { show };
+      const name = nations[n]!.name;
+      if (!panel.hidden && realmView === n) return { el: realmTab === "diplomacy" ? panel.querySelector("[data-envoy]") : panel.querySelector('[data-realm-tab="diplomacy"]') ?? panel.querySelector('[data-realm-section="Diplomacy"]'), show };
+      // From one of the neighbour's provinces: its card names its realm.
+      const theirs = selectedProvince >= 0 && owners[selectedProvince] === n;
+      if (theirs && !panel.hidden) return { el: panel.querySelector(`[data-realm="${n}"]`), line: `Tap ${name} to open its realm card.`, show };
+      if (theirs && !reopen.hidden) return { el: reopen, line: `Open ${provinces[selectedProvince]!.name}'s card: tap its name at the bottom left.`, show };
+      const border = borderProvince(n);
+      return border >= 0 ? mapTarget(border, `Send an envoy to ${name}: tap their land on the map.`, show) : { show };
     }
   }
   return {};
+}
+
+/** The neighbour's province that touches the player's land, nearest the capital, preferring one in open view on the map. */
+function borderProvince(n: number): number {
+  const s = snapshot!;
+  const cap = provinces[provinceIndex.get(nations[s.playerNation]!.capital)!]!;
+  const border: number[] = [];
+  for (let p = 0; p < owners.length; p++) if (owners[p] === n && neighborIdx[p]!.some((q) => owners[q] === s.playerNation)) border.push(p);
+  border.sort((a, b) => Math.hypot(provinces[a]!.x! - cap.x!, provinces[a]!.y! - cap.y!) - Math.hypot(provinces[b]!.x! - cap.x!, provinces[b]!.y! - cap.y!));
+  return border.find((p) => mapSpot(provinceSpot(p))) ?? border[0] ?? -1;
+}
+
+/** The hints a look ticks off: a card or page opened, or a study already chosen (TUT-122). */
+function hintViews(): void {
+  const s = snapshot;
+  if (!s) return;
+  if (ownProvinceOpen()) hints.did("province opened");
+  if (!panel.hidden && realmView === s.playerNation) {
+    hints.did("realm opened");
+    if (realmTab === "lords") hints.did("lords opened");
+    if (realmTab === "treasury") hints.did("treasury opened");
+  }
+  if (!panel.hidden && newsView) hints.did("news opened");
+  if (s.research?.study) hints.did("setStudy");
 }
 
 async function startGame(nation: string): Promise<void> {
