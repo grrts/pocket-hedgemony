@@ -61,6 +61,7 @@ import { closeUpPoint, firstShown, jumpTarget, learningTab, newLearningUi, nodeA
 import { provinceWorks } from "./ui/works.ts";
 import { provinceLand } from "./ui/land.ts";
 import { castleFoodLine, castleFoodSettings, foodCounts, foodTab } from "./ui/food.ts";
+import { bindFolds } from "./ui/fold.ts";
 import { commanderPortrait, officialCard, officialOf, officialScreen, officialsTab, paintSiege, postScreen, siegeView, type SiegeInfo } from "./ui/people.ts";
 import { governanceCard, LOYALTY_ORDER, lordScreen, lordsTab, type LordLands, type LordView, type ProvinceRow } from "./ui/lords.ts";
 import { loadMapImage, type MapImage } from "./map/loadMap.ts";
@@ -5741,6 +5742,7 @@ function renderRealm(r: number): void {
   showPanel(true);
   bindNavyLinks();
   if (s) bindHunt();
+  bindFolds(panel);
   panel.querySelectorAll("[data-show-charts]").forEach((b) => b.addEventListener("click", () => setLens("charts")));
   panel.querySelectorAll<HTMLButtonElement>("[data-lens-open]").forEach((b) => b.addEventListener("click", () => setLens(b.dataset.lensOpen as Lens)));
   panel.querySelector("[data-go]")?.addEventListener("click", () => {

@@ -1,5 +1,6 @@
 import type { GameTraderKind, Snapshot, TradeView, TraderView } from "@ph/engine";
 import { icon } from "../art/ui.ts";
+import { fold } from "./fold.ts";
 
 /**
  * Trade on the realm card and the map (TRADE-141 to TRADE-145): the Trade tab
@@ -98,14 +99,11 @@ export function tradeTab(v: TradeView, s: Snapshot, name: (p: number) => string)
         )
         .join("")}</div>`
     : `<p class="hint">You hold no trade city yet.</p>`;
+  const strongest = v.centres[0];
   return `<h3 class="sub">Last month</h3>${last}
     <h3 class="sub">Traders</h3>${traders}
-    <h3 class="sub">Found a trader</h3>
-    <p class="hint">Its crew leave the city; it starts on the best route from there.</p>
-    ${found}
-    <h3 class="sub">Busiest cities</h3>
-    <p class="hint">Value a month and trade ratio: traders passing raise the ratio, and the ratio raises tax.</p>
-    ${busiest}`;
+    ${fold("trade-found", "Found a trader", v.found.length ? `${plural(v.found.length, "city", "cities")} can found one` : "No city can found one", `<p class="hint">Its crew leave the city; it starts on the best route from there.</p>${found}`, !v.traders.length)}
+    ${fold("trade-cities", "Busiest cities", strongest ? `${esc(name(strongest.province))} ${gold(strongest.value)} a month` : "None yet", `<p class="hint">Value a month and trade ratio: traders passing raise the ratio, and the ratio raises tax.</p>${busiest}`)}`;
 }
 
 /** The province card's Trade line (TRADE-143): value, ratio, traders passing and top goods; "not seen" where the player can't see. */
