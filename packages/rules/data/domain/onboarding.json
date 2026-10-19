@@ -868,8 +868,23 @@
   "first_hints": [
     {
       "id": "realm",
-      "line": "Choose a realm to rule: tap one here, or any realm on the map.",
+      "line": "Choose a realm to rule. The Ottomans under Murad I make a good first realm: tap them, or any realm you like.",
       "done": "realm chosen"
+    },
+    {
+      "id": "province",
+      "line": "Open your capital's card: tap its name at the bottom left. Every province you hold has a card like it.",
+      "done": "province opened"
+    },
+    {
+      "id": "realm_book",
+      "line": "Open your realm's book: tap your banner in the top bar. It holds your government, money, lands, army and envoys.",
+      "done": "realm opened"
+    },
+    {
+      "id": "lens",
+      "line": "Change what the map shows: tap Map mode, then pick Wealth.",
+      "done": "lens"
     },
     {
       "id": "move",
@@ -882,6 +897,16 @@
       "done": "turn ended"
     },
     {
+      "id": "news",
+      "line": "See what happened this week: tap the scroll in the top bar.",
+      "done": "news opened"
+    },
+    {
+      "id": "study",
+      "line": "Choose what your scholars study: in your realm's book, open Research and tap Study now on an invention.",
+      "done": "setStudy"
+    },
+    {
       "id": "recruit",
       "line": "Recruit men: in a province's Garrison tab, tap Recruit.",
       "done": "recruit"
@@ -890,6 +915,16 @@
       "id": "build",
       "line": "Build a work: in a province's Build tab, tap Build on one.",
       "done": "build"
+    },
+    {
+      "id": "lords",
+      "line": "Meet your lords, who hold land for you and want things in return: in your realm's book, open Lands, then Lords.",
+      "done": "lords opened"
+    },
+    {
+      "id": "treasury",
+      "line": "See where your gold comes from and goes: tap your gold in the top bar.",
+      "done": "treasury opened"
     },
     {
       "id": "envoy",
