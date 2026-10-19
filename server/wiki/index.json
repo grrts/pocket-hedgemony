@@ -6080,6 +6080,11 @@
      "id": "game-provisional",
      "text": "Game (provisional)",
      "level": 2
+    },
+    {
+     "id": "suggest",
+     "text": "Suggest",
+     "level": 3
     }
    ]
   },

@@ -667,6 +667,11 @@ export function hullsInPort(hulls: number, berths: number): { atBerth: number; w
   return { atBerth, waiting: hulls - atBerth };
 }
 
+export type TraderMedium = "land" | "river" | "sea";
+
+/** The figure a trader is drawn as: a caravan on land, a barge on a river, a trading ship at sea (VIEW-123). */
+export const traderFigure = (medium: TraderMedium): string => (L.traders.figure as Record<string, string>)[medium]!;
+
 /**
  * The berths of a port town, as map pixels: the water pixels next to its town
  * pixels, the docks' first, then in the town's growth order, every
@@ -686,24 +691,17 @@ export function berthSpots(grid: LandGrid, town: readonly number[]): number[] {
   return water.filter((_, i) => i % L.hulls.berthSpacing === 0);
 }
 
-export interface TradePathFeed {
-  id: number;
-  medium: "land" | "river" | "sea";
-  traders: number;
-}
-
 /**
- * The movers on a busy trade path: up to maxMovers (a caravan on land, a
- * barge on a river, a trading ship at sea), spaced evenly and moving with the
- * game clock from a start seeded by the path, so they never jump between
- * frames or turns. `at` is the share of the way along the path (VIEW-123).
+ * Where a trader stands on the leg it walks, from the daily walk's share of
+ * the way (VIEW-123): the tile it last reached and the share of the way on to
+ * the next, as an army steps along its tiles. A leg of one tile or none keeps
+ * it there.
  */
-export function traderMovers(path: TradePathFeed, gameDays: number): { kind: string; at: number }[] {
-  const n = Math.min(L.traders.maxMovers, Math.max(0, Math.floor(path.traders)));
-  const kind = (L.traders.mover as Record<string, string>)[path.medium]!;
-  const start = unit(path.id, 7);
-  const along = gameDays / L.traders.daysPerPath;
-  return Array.from({ length: n }, (_, i) => ({ kind, at: (((start + along + i / n) % 1) + 1) % 1 }));
+export function traderOnLeg(tiles: number, progress: number): { index: number; frac: number } {
+  if (tiles < 2) return { index: 0, frac: 0 };
+  const along = Math.min(1, Math.max(0, progress)) * (tiles - 1);
+  const index = Math.min(tiles - 2, Math.floor(along));
+  return { index, frac: along - index };
 }
 
 // ---------------------------------------------------------------------------
