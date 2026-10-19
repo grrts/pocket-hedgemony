@@ -1,6 +1,8 @@
 import { lowpassState, SR, type Env, type WaveName } from "./chip.ts";
 import { drumHit, hall, pad, softBass, softPulse, softWave, type Drum } from "./voices.ts";
 import type { Palette } from "@ph/engine/domain/audio";
+import { BANDS, DRUM_INSTRUMENT, WAVE_INSTRUMENT, type Instrument } from "./instruments.ts";
+import { NO_KIT, sampledHit, sampledNote, tailOf, type Kit } from "./samples.ts";
 
 /**
  * The first music for the PH-5 chip (music-design §3, §4), pulled forward for
@@ -66,6 +68,8 @@ interface Part {
   at?: number;
   layer?: number;
   gate?: number;
+  /** The instrument that plays it, over the palette's band. */
+  inst?: Instrument;
   o?: Env & { duty?: number; vol?: number; vibrato?: boolean; wave?: WaveName };
 }
 
@@ -188,7 +192,7 @@ export const TRACKS: Record<string, TrackDef> = {
       { v: "P1", oct: 1, seq: TITLE_MELODY, o: { duty: 0.25, vol: 0.8, vibrato: true, decay: 0.6, sustain: 0.7 } },
       { v: "W", seq: broken(TITLE_ROOTS, 1, 4), o: { vol: 0.35, decay: 0.3, sustain: 0.15 } },
       { v: "T", oct: -1, seq: TITLE_ROOTS.map((r) => `${r}:2 ${fifthBelow(r)}:2`).join(" ") },
-      { v: "S", seq: padLine(TITLE_ROOTS, 4), o: { vol: 0.25 } },
+      { v: "S", seq: padLine(TITLE_ROOTS, 4), inst: "choir_aahs", o: { vol: 0.25 } },
     ],
     drums: [{ seq: "boom:4 r:12 boom:4 r:12" }],
   },
@@ -464,6 +468,8 @@ export function writtenTrack(id: string): string | null {
 
 const GAIN: Record<Voice | "N", number> = { P1: 0.3, P2: 0.15, T: 0.5, W: 0.3, S: 0.2, N: 0.32 };
 const PAN: Record<Voice | "N", number> = { P1: -0.15, P2: 0.3, T: 0, W: 0.2, S: -0.05, N: 0 };
+/** Level of each voice on the sampled instruments, against the chip's levels in GAIN (D-AUD-16). */
+const SAMPLED: Record<Voice | "N", number> = { P1: 0.75, P2: 0.6, T: 0.3, W: 1, S: 0.8, N: 0.4 };
 /** How much of the hall is heard against the dry voices. */
 const HALL = 0.3;
 
@@ -482,7 +488,7 @@ const breathe = () => new Promise<void>((r) => setTimeout(r, 0));
  * Synthesizes a track for a palette. Loops are cut to their exact length so
  * they repeat seamlessly; stingers keep a second of tail.
  */
-export async function renderTrack(id: string, palette: Palette, breathe_ = breathe): Promise<Rendered> {
+export async function renderTrack(id: string, palette: Palette, breathe_ = breathe, kit: Kit = NO_KIT): Promise<Rendered> {
   // Gives the page a frame whenever about 6 ms of work has piled up.
   let since = performance.now();
   const slice = async () => {
@@ -503,7 +509,9 @@ export async function renderTrack(id: string, palette: Palette, breathe_ = breat
   const voices = Array.from({ length: layerCount }, () => ({ P1: new Float32Array(length), P2: new Float32Array(length), T: new Float32Array(length), W: new Float32Array(length), S: new Float32Array(length), N: new Float32Array(length) }));
   // A loop's tail wraps round to its start, so notes ringing over the end aren't cut.
   const wrap = !def.stinger;
+  const band = trackBand(id, palette);
   for (const part of def.parts) {
+    const sampled = kit.get(partInstrument(part, band));
     const out = voices[(part.layer ?? 1) - 1]![part.v];
     let b = part.at ?? 0;
     for (const tok of part.seq.split(/\s+/).filter(Boolean)) {
@@ -515,6 +523,11 @@ export async function renderTrack(id: string, palette: Palette, breathe_ = breat
         const o = { ...part.o, ...(part.v === "W" && !part.o?.wave ? { wave: pv.wave } : {}) };
         // A chord like 1-3-5 sounds each of its notes, less any that would rub against a lower one in this tuning.
         for (const f of chordHz(note!, table, root, part.oct ?? 0)) {
+          if (sampled) {
+            const vol = SAMPLED[part.v] * (part.o?.vol ?? 1);
+            writeWrapped(out, s, n + tailOf(sampled), wrap, (dst, at) => sampledNote(dst, at, n, f, sampled, vol));
+            continue;
+          }
           const write = (dst: Float32Array, at: number) =>
             part.v === "T" ? softBass(dst, at, n, f) : part.v === "W" ? softWave(dst, at, n, f, o) : part.v === "S" ? pad(dst, at, n, f, o) : softPulse(dst, at, n, f, o);
           writeWrapped(out, s, n, wrap, write);
@@ -531,6 +544,15 @@ export async function renderTrack(id: string, palette: Palette, breathe_ = breat
       const [k, beats] = tok.split(":");
       if (k !== "r") {
         const s = Math.floor(b * spb * SR);
+        const skin = DRUM_INSTRUMENT[k!];
+        const sampled = skin && kit.get(skin.inst);
+        if (skin && sampled) {
+          const len = sampled.notes[0]!.length;
+          writeWrapped(out, s, len, wrap, (dst, at) => sampledHit(dst, at, sampled, skin.note, SAMPLED.N));
+          await slice();
+          b += Number(beats);
+          continue;
+        }
         const hit = drumHit(k as Drum);
         writeWrapped(out, s, hit.length, wrap, (dst, at) => {
           for (let i = 0; i < hit.length && at + i < dst.length; i++) dst[at + i]! += hit[i]!;
@@ -596,6 +618,31 @@ export async function renderTrack(id: string, palette: Palette, breathe_ = breat
     for (let i = a; i < b; i++) (L[i]! *= scale), (R[i]! *= scale);
   });
   return { layers, seconds: wrap ? length / SR : seconds, barSeconds: def.bar * spb, stinger: !!def.stinger };
+}
+
+/** The band a track plays on: the palette's, with the war lead on war tracks and battle stingers. */
+function trackBand(id: string, palette: Palette) {
+  const band = BANDS[palette];
+  return /^(war_|battle_)/.test(id) ? { ...band, lead: band.war } : band;
+}
+
+/** The instrument of a part: its own, else its voice's place in the band, a timbre the part asks for standing in for the regional voice. */
+function partInstrument(part: Part, band: (typeof BANDS)[Palette]): Instrument {
+  if (part.inst) return part.inst;
+  if (part.v === "P1") return band.lead;
+  if (part.v === "P2") return band.answer;
+  if (part.v === "T") return band.bass;
+  if (part.v === "S") return band.pad;
+  return part.o?.wave ? WAVE_INSTRUMENT[part.o.wave] : band.regional;
+}
+
+/** Every instrument a palette's music can ask for, to load before its first track. */
+export function paletteInstruments(palette: Palette): Instrument[] {
+  const war = trackBand("war_", palette);
+  const names = new Set<Instrument>([...Object.values(BANDS[palette]), war.lead]);
+  for (const t of Object.values(TRACKS)) for (const p of t.parts) names.add(partInstrument(p, BANDS[palette]));
+  for (const d of Object.values(DRUM_INSTRUMENT)) if (d) names.add(d.inst);
+  return [...names];
 }
 
 /**

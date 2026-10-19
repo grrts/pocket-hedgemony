@@ -16,6 +16,7 @@ import { monthlyMoods } from "./moods.ts";
 import { answerRebels, dailyRebels, monthlyRebels, verdictOrder } from "./rebels.ts";
 import { answerRevolution, lockedOrder, monthlyRevolutions } from "./revolutions.ts";
 import { answerEvent, monthlyEvents } from "./events.ts";
+import { answerEveryday, monthlyEveryday } from "./everyday.ts";
 import { monthlyGoals } from "./goals.ts";
 import { heritageChoice, monthlyHeritage, payCounsel } from "./heritage.ts";
 import { monthlyGovernment, reform } from "./government.ts";
@@ -314,6 +315,7 @@ function startDay(world: World, news: News[]): void {
     libraryEvents(world, news);
     aiRaise(world, news);
     // Events come last in the month, after every other system (X-2).
+    monthlyEveryday(world, news);
     monthlyEvents(world, news);
     if (world.date.month === 1) yearlyScores(world, news);
     monthlyHeritage(world, news);
@@ -509,7 +511,7 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
     case "heritageChoice":
       return heritageChoice(world, actingNation, order.id);
     case "answerEvent":
-      return answerEvent(world, actingNation, order.event, order.option, news);
+      return order.event.startsWith("everyday:") ? answerEveryday(world, actingNation, order.event, order.option, news) : answerEvent(world, actingNation, order.event, order.option, news);
     case "makeDemand":
       syncCountries(world);
       return makeDemand(world, actingNation, order.target, order.kind, order.province ?? -1);

@@ -22,8 +22,8 @@ describe("1378 start: Africa and the Americas", () => {
       expect(ids.has(s.id)).toBe(false);
       expect(s.forms_about).toBeGreaterThan(1378);
     }
-    for (const id of ["adal", "kongo", "mutapa", "cherokee", "creek"]) expect(sleeping.realms.some((s) => s.id === id)).toBe(true);
-    for (const id of ["ifat", "tepanecs", "chanka", "great_zimbabwe", "mogadishu"]) expect(ids.has(id)).toBe(true);
+    for (const id of ["adal", "kongo", "mutapa", "cherokee", "creek", "maya_mani_xiu", "maya_sotuta_cocom"]) expect(sleeping.realms.some((s) => s.id === id)).toBe(true);
+    for (const id of ["ifat", "tepanecs", "chanka", "great_zimbabwe", "mogadishu", "ajuran"]) expect(ids.has(id)).toBe(true);
   });
 
   it("gives every map nation a ruler entry and its tongues", () => {

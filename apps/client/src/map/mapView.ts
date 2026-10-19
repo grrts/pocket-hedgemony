@@ -176,6 +176,11 @@ export class MapView {
     return [((x % this.map.width) + this.map.width) % this.map.width, y];
   }
 
+  /** The province under the middle of the view (what the ambience hears, AUD-079). */
+  provinceAtCentre(): number {
+    return this.provinceAt(this.viewW / 2, this.viewH / 2);
+  }
+
   provinceAt(sx: number, sy: number): number {
     const [x, y] = this.toMap(sx, sy);
     const px = Math.floor(x);

@@ -109,7 +109,7 @@ import {
 import { provinceLevy } from "@ph/engine/domain/recruiting";
 import { detailBands } from "@ph/engine/domain/map-presentation";
 import { TownLayer, townInfo } from "./map/towns.ts";
-import { musicFacts, newFactMemory, playerPalette, playerWars, remember, type FactMemory } from "./audio/facts.ts";
+import { bedUnderCamera, musicFacts, newFactMemory, playerPalette, playerWars, remember, type FactMemory } from "./audio/facts.ts";
 import { COMMISSION_GOLD, hireGold, OFFICIALS, Rng, startFormOf } from "@ph/engine";
 import { formName } from "@ph/engine/domain/government";
 import { PICKER_REGIONS, pickerRegions, startTrade, waysToGrow } from "@ph/engine/domain/scenario-setup";
@@ -712,14 +712,14 @@ function renderSoundButton(): void {
 }
 
 /** The Sound card's controls are the Audio rows of Settings (SET-132). */
-const SOUND_PREF: Record<string, string> = { master: "audio.master", music: "audio.music_volume", effects: "audio.effects_volume", musicOn: "audio.music", uiSounds: "audio.interface_sounds" };
+const SOUND_PREF: Record<string, string> = { master: "audio.master", music: "audio.music_volume", effects: "audio.effects_volume", musicOn: "audio.music", uiSounds: "audio.interface_sounds", ambience: "audio.ambience_volume", ambienceOn: "audio.ambience" };
 
 /** The Sound menu (domain/audio "How the player uses it"): what plays and why, and the volumes, in one card. */
 function renderSoundMenu(): void {
   if (soundMenu.hidden) return;
   const st = sound.settings;
   const pct = (v: number) => Math.round(v * 100);
-  const toggle = (key: "musicOn" | "uiSounds") =>
+  const toggle = (key: "musicOn" | "uiSounds" | "ambienceOn") =>
     `<button class="paper toggle${st[key] ? " on" : ""}" data-toggle="${key}" data-sfx="none" aria-pressed="${st[key]}">${st[key] ? "On" : "Off"}</button>`;
   const slider = (key: "master" | "music" | "effects", label: string, off = false, after = `<output>${pct(st[key])}%</output>`) =>
     `<label class="sound-row${off ? " off" : ""}"><span>${label}</span><input type="range" min="0" max="100" step="5" value="${pct(st[key])}" data-vol="${key}" aria-label="${label} volume"${off ? " disabled" : ""}>${after}</label>`;
@@ -729,8 +729,9 @@ function renderSoundMenu(): void {
     ${slider("master", "Volume")}
     <div class="sound-row${st.musicOn ? "" : " off"}"><span>Music</span><input type="range" min="0" max="100" step="5" value="${pct(st.music)}" data-vol="music" aria-label="Music volume"${st.musicOn ? "" : " disabled"}>${toggle("musicOn")}</div>
     ${slider("effects", "Effects")}
-    <div class="sound-row"><span>Buttons</span><small>A click on every tap</small>${toggle("uiSounds")}</div>
-    <button class="paper all-sound" data-shell="settings" data-settings-section="audio">${icon("cog", 1)} All sound settings</button>`;
+    <div class="sound-row${st.ambienceOn ? "" : " off"}"><span>Ambience</span><input type="range" min="0" max="100" step="5" value="${pct(st.ambience)}" data-vol="ambience" aria-label="Ambience volume"${st.ambienceOn ? "" : " disabled"}>${toggle("ambienceOn")}</div>
+    <div class="sound-foot"><div class="sound-row"><span>Buttons</span><small>A click on every tap</small>${toggle("uiSounds")}</div>
+    <button class="paper all-sound" data-shell="settings" data-settings-section="audio">${icon("cog", 1)} <span class="all-word">All sound settings</span><span class="short-word">Sound settings</span></button></div>`;
   renderNowPlaying();
   soundMenu.querySelectorAll<HTMLInputElement>("[data-vol]").forEach((input) =>
     input.addEventListener("input", () => {
@@ -742,7 +743,7 @@ function renderSoundMenu(): void {
   soundMenu.querySelectorAll<HTMLInputElement>("[data-vol]").forEach((input) => input.addEventListener("change", () => sound.sfx(input.dataset.vol === "music" ? "ui_tap_soft" : "ui_tap")));
   soundMenu.querySelectorAll<HTMLButtonElement>("[data-toggle]").forEach((b) =>
     b.addEventListener("click", () => {
-      const key = b.dataset.toggle as "musicOn" | "uiSounds";
+      const key = b.dataset.toggle as "musicOn" | "uiSounds" | "ambienceOn";
       const on = !sound.settings[key];
       setPref(SOUND_PREF[key]!, on);
       sound.sfx(on ? "ui_toggle_on" : "ui_toggle_off");
@@ -763,6 +764,14 @@ function renderNowPlaying(): void {
 }
 renderSoundButton();
 renderTrophy();
+
+// The ambience follows the ground under the middle of the map, checked each second (AUD-079).
+setInterval(() => {
+  if (!view || !snapshot) return sound.ambience(null);
+  const p = view.provinceAtCentre();
+  const capital = p >= 0 && nations.some((n) => n.capital === provinces[p]!.id);
+  sound.ambience(bedUnderCamera(snapshot, p, provinces[p]?.terrain, view.camera.zoom, capital));
+}, 1000);
 
 // ---- settings ----
 hints.onChange = () => {
@@ -3187,6 +3196,8 @@ function renderEventCard(): void {
     eventFolded = true;
     renderEventCard();
     renderActions();
+    // An everyday event about a province shows it (EVT-121).
+    if (card.province !== undefined) goToProvince(card.province, true);
   });
   eventCard.querySelectorAll<HTMLButtonElement>("[data-event-option]").forEach((b) =>
     b.addEventListener("click", async () => {
@@ -6833,6 +6844,7 @@ function startMoreHtml(): string {
     ${tutorialFinished() ? `<button class="paper" data-start="tutorial">Tutorial</button>` : ""}
     <a class="paper-link" href="./style.html">Art test page</a>
     <p class="start-credits"><b>Pocket Hegemony</b> ${esc(GAME_VERSION)}. Made by Leroy with Claude.</p>
+    <p class="start-credits">Music played on the Fluid R3 GM soundfont by Frank Wen (CC BY 3.0).</p>
   </div>`;
 }
 

@@ -1,0 +1,58 @@
+{% extends 'community/layout.html.twig' %}
+{% import 'community/_parts.html.twig' as parts %}
+
+{% block title %}Community · Pocket Hegemony{% endblock %}
+{% block description %}Talk with other Pocket Hegemony players: strategy, campaign stories, ideas and bug reports.{% endblock %}
+
+{% block community %}
+<header class="framed sheet c-head">
+    <div class="c-head-text">
+        <h1>Community</h1>
+        <p>Talk with other players about the game: how you play, what you would change, and what broke.</p>
+    </div>
+    <div class="c-head-actions">
+        {% if app.user %}
+            <a class="btn wax" href="{{ path('community_new') }}">{{ parts.icon("scroll") }}New topic</a>
+            {% if is_granted('ROLE_MODERATOR') %}
+            <a class="btn paper" href="{{ path('community_reports') }}">Reports{% if open_reports %} <span class="count">{{ open_reports }}</span>{% endif %}</a>
+            {% endif %}
+        {% else %}
+            {{ parts.guest(path('community')) }}
+        {% endif %}
+    </div>
+</header>
+
+<div class="c-overview">
+    <section class="framed sheet" aria-labelledby="boards-h">
+        <h2 id="boards-h" class="c-h2">Boards</h2>
+        <ul class="boards">
+            {% for board in boards %}
+            <li class="board">
+                <a class="board-name" href="{{ path('community_board', {board: board.slug}) }}">
+                    <span class="board-icon">{{ parts.icon(board.icon, 3) }}</span>
+                    <span>{{ board.name }}</span>
+                </a>
+                <p class="board-desc">{{ board.description }}</p>
+                <p class="board-stats"><strong>{{ board.topics }}</strong> {{ board.topics == 1 ? 'topic' : 'topics' }} · <strong>{{ board.posts }}</strong> {{ board.posts == 1 ? 'post' : 'posts' }}</p>
+                {% if board.latest %}
+                <p class="board-latest">Latest: <a href="{{ path('community_topic', {id: board.latest.id, slug: board.latest.slug}) }}">{{ board.latest.title }}</a> <span class="muted">· {{ board.latest.lastPoster.displayName }}, {{ parts.when(board.latest.lastActivityAt) }}</span></p>
+                {% else %}
+                <p class="board-latest muted">No topics yet.</p>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+    </section>
+
+    <section class="framed sheet" aria-labelledby="latest-h">
+        <h2 id="latest-h" class="c-h2">Latest topics</h2>
+        {% if latest %}
+        <ol class="topics compact">
+            {% for topic in latest %}{{ parts.topic_row(topic, post_counts[topic.id] ?? 1, boards|filter(b => b.slug == topic.board)|first) }}{% endfor %}
+        </ol>
+        {% else %}
+        <p class="muted">Nobody has posted yet. Start the first topic!</p>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

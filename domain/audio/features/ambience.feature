@@ -1,13 +1,13 @@
 @context-audio
 Feature: The ambience bed
-  As a player who turns it on
+  As a player
   I want a quiet bed of wind, surf or market under the map
-  So that the silences between tracks feel like a place
+  So that the map feels like a place, under the music and in the silences between tracks
 
   @AUD-080
-  Scenario: Off by default
+  Scenario: On by default
     Given a fresh install
-    Then the ambience setting is off
+    Then the ambience setting is on
 
   @AUD-079 @placeholder
   Scenario Outline: The bed follows the ground under the camera

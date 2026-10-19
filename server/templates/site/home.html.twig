@@ -1,0 +1,112 @@
+{% extends 'site/layout.html.twig' %}
+
+{% block title %}Pocket Hegemony: 8-bit grand strategy, 1378 to 1939{% endblock %}
+{% block description %}An 8-bit grand strategy game for phones, desktop and the web. Lead one of hundreds of realms from 1378 to 1939, one week per turn, on a pixel-art map of the whole world.{% endblock %}
+{% block meta %}<meta property="og:image" content="{{ app.request.schemeAndHttpHost }}/site/shots/desktop.webp">{% endblock %}
+{% block stylesheets %}<link rel="stylesheet" href="/site/home.css">{% endblock %}
+
+{# A game screenshot by name, from the controller's list (missing ones are left out). #}
+{% macro shot(name, shots, eager = false) %}
+{% if shots[name] is defined %}{% set s = shots[name] %}<img src="{{ s.url }}" width="{{ s.width }}" height="{{ s.height }}" alt="{{ s.caption }}"{% if not eager %} loading="lazy"{% endif %} decoding="async">{% endif %}
+{% endmacro %}
+
+{% block content %}
+{% import _self as m %}
+<section class="hero">
+    <div class="hero-copy">
+        <span class="ribbon">An 8-bit grand strategy game</span>
+        <h1 class="wordmark"><img class="px" src="/site/art/icon-crown.png" width="60" height="48" alt="">Pocket Hegemony</h1>
+        <p class="pitch">Lead one of hundreds of realms from 1378 to 1939, one week per turn, on a pixel-art map of the whole world.</p>
+        <p class="platforms">For phones, desktop and the web.</p>
+        {% include 'site/_cta.html.twig' with {wiki: true} %}
+    </div>
+    <figure class="shot hero-shot">{{ m.shot('desktop', shots, true) }}</figure>
+</section>
+
+<section class="feature framed wide" aria-labelledby="f-map">
+    <div class="feature-copy">
+        <span class="kicker"><img class="px" src="/site/art/icon-map.png" width="22" height="20" alt="">The map</span>
+        <h2 id="f-map">The whole world, from the globe to a single town</h2>
+        <p>The map is home: you play on it, and every card opens over it. Zoomed out, you see the realms of the world. Close in, towns, fields, woods, rivers and armies on the march, and lands you have not charted yet lie under parchment.</p>
+        <a class="more" href="{{ path('wiki_page', {slug: 'Map-and-Lenses'}) }}">Map and map modes</a>
+    </div>
+    <div class="feature-shots two">
+        <figure class="shot">{{ m.shot('map-far', shots) }}<figcaption>Zoomed out</figcaption></figure>
+        <figure class="shot">{{ m.shot('map-close', shots) }}<figcaption>Close in</figcaption></figure>
+    </div>
+</section>
+
+<section class="feature framed flip" aria-labelledby="f-provinces">
+    <div class="feature-copy">
+        <span class="kicker"><img class="px" src="/site/art/icon-castle.png" width="24" height="18" alt="">Provinces</span>
+        <h2 id="f-provinces">Real people on real land</h2>
+        <p>Each province is a row of 4 to 16 tiles with real people working real buildings. Gold is taxed here, food grows here and recruits are raised here. Every number on its card is something you can count, with how you gain it and how you lose it.</p>
+        <a class="more" href="{{ path('wiki_page', {slug: 'Provinces'}) }}">Provinces</a>
+    </div>
+    <div class="feature-shots"><figure class="shot">{{ m.shot('province', shots) }}</figure></div>
+</section>
+
+<section class="feature framed" aria-labelledby="f-war">
+    <div class="feature-copy">
+        <span class="kicker"><img class="px" src="/site/art/icon-swords.png" width="20" height="20" alt="">War</span>
+        <h2 id="f-war">Battles with no dice</h2>
+        <p>Draw a route with your finger and see how many days the march takes and how much food will be left. Battles are fought bell by bell and decided by the commanders, the troops, the realm's inventions and the ground. Every war costs gold, men and your lords' patience.</p>
+        <a class="more" href="{{ path('wiki_page', {slug: 'Warfare'}) }}">Warfare</a>
+        <a class="more" href="{{ path('wiki_page', {slug: 'Troop-Movement'}) }}">Troop movement</a>
+    </div>
+    <div class="feature-shots"><figure class="shot">{{ m.shot('battle', shots) }}</figure></div>
+</section>
+
+<section class="feature framed flip" aria-labelledby="f-diplomacy">
+    <div class="feature-copy">
+        <span class="kicker"><img class="px" src="/site/art/icon-scroll.png" width="20" height="22" alt="">Diplomacy</span>
+        <h2 id="f-diplomacy">Every answer comes with its reasons</h2>
+        <p>Send envoys to other courts. Each answer arrives as a letter with the full list of reasons and their numbers, and over zero is yes. There is no hidden score, so you can see why and try again differently.</p>
+        <a class="more" href="{{ path('wiki_page', {slug: 'Diplomacy'}) }}">Diplomacy</a>
+    </div>
+    <div class="feature-shots"><figure class="shot">{{ m.shot('diplomacy', shots) }}</figure></div>
+</section>
+
+<section class="feature framed" aria-labelledby="f-events">
+    <div class="feature-copy">
+        <span class="kicker"><img class="px" src="/site/art/icon-trophy.png" width="20" height="22" alt="">History</span>
+        <h2 id="f-events">Five centuries of turning points</h2>
+        <p>History arrives as cards with choices, from the fall of Constantinople to the Great Depression. Events follow the state of the world, not a fixed calendar, so history can come early, late, differently or not at all.</p>
+        <a class="more" href="{{ path('wiki_page', {slug: 'Historical-Events'}) }}">Historical events</a>
+    </div>
+    <div class="feature-shots"><figure class="shot">{{ m.shot('event', shots) }}</figure></div>
+</section>
+
+<section class="plays" aria-labelledby="how">
+    <h2 id="how" class="sea-title">How it plays</h2>
+    <div class="tiles">
+        <div class="tile framed">
+            <h3><img class="px" src="/site/art/icon-hourglass.png" width="16" height="22" alt="">One week per turn</h3>
+            <p>Give your orders and press End turn. The seven days of the week then play out on the map for every army, fleet and trader at once.</p>
+            <a class="more" href="{{ path('wiki_page', {slug: 'Time-and-Turns'}) }}">How a turn works</a>
+        </div>
+        <div class="tile framed">
+            <h3><img class="px" src="/site/art/icon-crown.png" width="20" height="16" alt="">1378 to 1939</h3>
+            <p>Every campaign starts on 20 September 1378, with about 315 realms on the map, and ends on 31 August 1939. Hold half the world's settled land, or lead in Economy, Power or Technology at the end.</p>
+            <a class="more" href="{{ path('wiki_page', {slug: 'The-1378-Start'}) }}">The 1378 start</a>
+        </div>
+        <div class="tile framed">
+            <h3><img class="px" src="/site/art/icon-map.png" width="22" height="20" alt="">Stop any time</h3>
+            <p>Phones play held sideways. Every End turn saves, so you never lose more than the orders since your last turn, and the game plays offline.</p>
+            <a class="more" href="{{ path('wiki_page', {slug: 'Saving'}) }}">Saving</a>
+        </div>
+        <div class="tile framed">
+            <h3><img class="px" src="/site/art/icon-scroll.png" width="20" height="22" alt="">Learn as you play</h3>
+            <p>The tutorial, Murad's Frontier, teaches the game in ten chapters as the Ottomans, from the first autumn of 1378.</p>
+            <a class="more" href="{{ path('wiki_page', {slug: 'Tutorial-and-Help'}) }}">Tutorial and help</a>
+        </div>
+    </div>
+</section>
+
+<section class="closing framed" aria-labelledby="closing">
+    <span class="ribbon">Free to start</span>
+    <h2 id="closing">Your realm is waiting</h2>
+    <p>The free download and the Steam demo let you play the Ottomans and France, with nothing else held back. One purchase, the full game, unlocks every realm. No version of the game shows ads.</p>
+    {% include 'site/_cta.html.twig' with {wiki: true} %}
+</section>
+{% endblock %}

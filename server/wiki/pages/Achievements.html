@@ -1,0 +1,265 @@
+<h1>Achievements</h1>
+<p>Achievements are goals you can earn across your campaigns: a first harvest, a castle taken by terms, a century without a broken oath, Constantinople held past 1460, Moscow free of the khan after Kulikovo. There are 80 at launch, the same list on Steam, Game Center and Google Play Games. They are earned only in ironman campaigns, and they never give anything inside the game: no bonus, no unlocked nation, no cosmetic.</p>
+<h2 id="how-it-works"><a class="anchor" href="#how-it-works" aria-label="Link to this section">#</a>How it works</h2>
+<h3 id="fair-and-our-own"><a class="anchor" href="#fair-and-our-own" aria-label="Link to this section">#</a>Fair and our own</h3>
+<ul>
+<li><strong>One list everywhere.</strong> Steam, Game Center and Google Play Games share the same achievements.</li>
+<li><strong>Our own goals.</strong> Every achievement is written for Pocket Hegemony&#39;s own systems; no name, condition or icon is taken from another commercial game.</li>
+<li><strong>Situations, not countries.</strong> A test describes a situation. Where a historical event is involved, it uses the event&#39;s role, so whoever holds that role can earn it. Only <em>One Island Realm</em> and <em>Lord of the River Bend</em> name a region.</li>
+<li><strong>Nothing for harm.</strong> No achievement is tied to a narrative-only event, to conquering a named people, or to sacking or scorching land.</li>
+<li><strong>Grounded.</strong> Every test reads a stat or a moment that an existing design defines; where the system is not designed yet, the row points at the gap list.</li>
+<li><strong>No luck-only goals.</strong> Each goal can be planned for.</li>
+</ul>
+<h3 id="tiers-and-points"><a class="anchor" href="#tiers-and-points" aria-label="Link to this section">#</a>Tiers and points</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Tier</th><th>Points</th><th>Meant for</th><th>At launch</th></tr></thead>
+<tbody>
+<tr><td>Copper</td><td>5</td><td>One action, or a goal most players reach in their first campaign</td><td>40</td></tr>
+<tr><td>Silver</td><td>10</td><td>A goal you aim for</td><td>25</td></tr>
+<tr><td>Gold</td><td>20</td><td>A whole campaign shaped around it</td><td>12</td></tr>
+<tr><td>Crown</td><td>40</td><td>The hardest</td><td>3</td></tr>
+</tbody></table></div>
+<p>Points show on Game Center and Google Play, not Steam. The list holds at most 100 achievements, ever, counting retired ones. Every achievement&#39;s points are a multiple of 5 and at most 40, and the total is at most 1,000. Launch ships 80 achievements worth 810 points, keeping 20 slots and 190 points for updates; after any update at least 10 slots and 100 points stay in reserve, and spare points should go mostly to new copper and silver goals. If a score or victory is added to the game, it gets its own achievements from the reserve. Names are at most 24 characters and texts at most 100.</p>
+<p>These limits are the strictest of the three stores:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Limit</th><th>Steam</th><th>Game Center</th><th>Google Play Games</th><th>Adopted</th></tr></thead>
+<tbody>
+<tr><td>Number</td><td>100 until Valve&#39;s confidence check</td><td>100</td><td>200 to 400</td><td>100 at most, ever</td></tr>
+<tr><td>Points</td><td>none</td><td>max 100 each, 1,000 total</td><td>multiples of 5, 5 to 200 each, 1,000 total (newer docs 2,000)</td><td>multiples of 5, max 40, 1,000 total</td></tr>
+<tr><td>Hidden</td><td>yes</td><td>yes</td><td>yes</td><td>yes, spoilers only</td></tr>
+<tr><td>Progress</td><td>stats at set steps</td><td>percent</td><td>incremental, up to 10,000 steps</td><td>one game counter, reported each store&#39;s way</td></tr>
+<tr><td>Icon</td><td>64 × 64</td><td>512 or 1024</td><td>512</td><td>32 × 32 pixel art, scaled by whole numbers</td></tr>
+</tbody></table></div>
+<h3 id="scope-and-hidden-achievements"><a class="anchor" href="#scope-and-hidden-achievements" aria-label="Link to this section">#</a>Scope and hidden achievements</h3>
+<p>Most achievements are <strong>campaign</strong> scope: the whole condition must be met inside one game. Seven are <strong>lifetime</strong>: their counter adds up across games in your player profile and is mirrored to the store&#39;s progress where it has one. There is no hidden achievement at launch; <code>hidden</code> is kept for later event chains whose very existence is the surprise. A hidden achievement shows as &quot;Hidden achievement&quot; with its tier, its name and text secret until earned.</p>
+<p>Some achievements are <strong>levels of a ladder</strong>: one count at rising steps. The harvest ladder counts province harvests (each of your provinces that brings in its harvest adds one) across all your campaigns: <em>First Harvest</em> at 1, then <em>Ten Harvests</em>, <em>A Hundred Harvests</em>, <em>A Thousand Harvests</em> and <em>Ten Thousand Harvests</em>. Each level is its own achievement with its own points, as the stores have no levels, but the game shows the ladder as one badge marked with the level reached, such as 3/5.</p>
+<h3 id="when-tests-run"><a class="anchor" href="#when-tests-run" aria-label="Link to this section">#</a>When tests run</h3>
+<p>Each achievement names a <strong>moment</strong>, and when that moment occurs only the tests of rows naming it run. A <code>date</code> row is checked once, on that day, and never for a day on or before the day your campaign started. Tests run after the turn&#39;s own systems, at the very end of the turn order, so they read final values. If the test does not hold when its moment comes, the achievement stays locked.</p>
+<p>The moments are: turn end, year end, harvest, spring start, a date, battle end, sea battle end, siege end, war end, rebellion end, relation changed, province gained, invention done, regiment trained, lord created, charter granted, loan closed, style adopted, colony founded, contact made, fleet home, food policy changed, event choice, event end, 12 months after a succession, and campaign end.</p>
+<h3 id="which-games-count"><a class="anchor" href="#which-games-count" aria-label="Link to this section">#</a>Which games count</h3>
+<p>A campaign earns achievements only while all three hold:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Save flag</th><th>Must be</th></tr></thead>
+<tbody>
+<tr><td><code>ironman_unbroken</code></td><td>true: the campaign started as ironman and never left it</td></tr>
+<tr><td><code>cheat_marked</code></td><td>false: no debug, editor or &quot;free play&quot; cheat was used, even once</td></tr>
+<tr><td><code>switched_country</code></td><td>false: you still play the realm you started with</td></tr>
+</tbody></table></div>
+<p>A campaign that is not ironman earns nothing, for good. A cheat marks the save for good, and nothing from it is awarded, in-game or on any store. Playing on as another country after game over stops achievements from that moment. Any difficulty counts, with historical or free events. The tutorial earns none, and its last card tells you achievements start in a real campaign. Lifetime counters only count campaigns that pass all three flags. The pause menu and the new game screen show whether the campaign can earn achievements, and you are warned once before an action that would end eligibility (turning on a cheat, switching country after game over).</p>
+<h3 id="progress-bars"><a class="anchor" href="#progress-bars" aria-label="Link to this section">#</a>Progress bars</h3>
+<p>18 rows have a progress bar: a game counter reported to each store against its target.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Store</th><th>How progress is reported</th></tr></thead>
+<tbody>
+<tr><td>Google Play</td><td>An incremental achievement; targets above 10,000 are reported in steps (people in tens of thousands, gold in tens)</td></tr>
+<tr><td>Game Center</td><td>Percent complete</td></tr>
+<tr><td>Steam</td><td>A stat bound to the achievement, with a progress popup at 25, 50 and 75 percent</td></tr>
+</tbody></table></div>
+<p>Campaign counters reset with each new game, and progress goes to a store only when it beats the best value already reported there, so a store&#39;s progress never goes down. The in-game list shows this campaign&#39;s own value.</p>
+<h3 id="offline-and-failed-calls"><a class="anchor" href="#offline-and-failed-calls" aria-label="Link to this section">#</a>Offline and failed calls</h3>
+<p>An unlock is written to your profile and shown in-game at once, whether or not a store is reachable. Unlocks that have not reached a store wait in a queue, sent whenever the store is reachable and retried at start-up and every few minutes. On start-up the game reads the store&#39;s list and sends anything it is missing, so a new phone or a reinstall catches up.</p>
+<h3 id="free-tier-and-steam-demo"><a class="anchor" href="#free-tier-and-steam-demo" aria-label="Link to this section">#</a>Free tier and Steam demo</h3>
+<p>The free iOS and Android download awards achievements as the full game does, and you keep them when you buy. A row marked full game cannot be earned with the free tier&#39;s countries alone; the free countries are the Ottomans and France, so at launch these are <em>Our Own Banner</em>, <em>Free of the Khan</em>, <em>Blackbird Field</em>, <em>The Walls Held</em>, <em>The Conqueror&#39;s Heirs</em>, <em>The Four Quarters Hold</em>, <em>From One Hall</em>, <em>Many Tents, One People</em>, <em>Many Crowns</em> and <em>Crowns of the World</em>. The Steam demo awards nothing to Steam directly; it keeps a local list from its ironman games, and when you buy the full game it reads the demo&#39;s profile and awards what you earned there.</p>
+<h3 id="store-ids-and-retiring"><a class="anchor" href="#store-ids-and-retiring" aria-label="Link to this section">#</a>Store ids and retiring</h3>
+<p>An achievement&#39;s <code>id</code> is never renamed after release, and every store id comes from it: Steam uses <code>ACH_</code> plus the id in capitals; Game Center uses the bundle id plus <code>.ach.</code> plus the id; Google Play&#39;s console-generated ids are kept in <code>achievements.google.json</code>. A build step writes each store&#39;s upload file (Steam&#39;s VDF or web form, App Store Connect&#39;s list, Google&#39;s CSV) from the YAML, with localised names and texts. A retired achievement is hidden in every store and its test turned off, but never deleted, so you keep what you earned.</p>
+<h3 id="icons"><a class="anchor" href="#icons" aria-label="Link to this section">#</a>Icons</h3>
+<p>Each achievement has one 32 × 32 icon in the game&#39;s pixel-art palette, with a 2-pixel frame in its tier&#39;s colour (copper, silver, gold, crown purple-gold). Icons are scaled with nearest-neighbour and no smoothing: × 2 for Steam (64) and × 16 for Game Center and Google Play (512). Steam&#39;s locked image uses the grey &quot;unknown land&quot; parchment tones of the map&#39;s fog. Each icon shows what the achievement is about, never a real flag or coat of arms.</p>
+<h3 id="the-80-achievements"><a class="anchor" href="#the-80-achievements" aria-label="Link to this section">#</a>The 80 achievements</h3>
+<p>All thresholds are provisional placeholders for balancing. Every campaign starts on 20 September 1378 (<a href="/wiki/The-1378-Start">The 1378 start</a>); the dates below are calendar days, so they read the same from any start, and the start facts (one province, a decentralised people, starting as a subject, starting outside Europe) are taken on the day your campaign begins.</p>
+<p><strong>First steps</strong> (8, 40 points)</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>Tier</th><th>Earned when</th></tr></thead>
+<tbody>
+<tr><td>First Harvest</td><td>copper</td><td>You see your first harvest</td></tr>
+<tr><td>Set the Table</td><td>copper</td><td>You change your food policy</td></tr>
+<tr><td>Mustered</td><td>copper</td><td>You train your first regiment</td></tr>
+<tr><td>Ink and Candle</td><td>copper</td><td>You finish your first invention</td></tr>
+<tr><td>Stone upon Stone</td><td>copper</td><td>You gain your first castle (built, or taken in a siege)</td></tr>
+<tr><td>A Letter Sealed</td><td>copper</td><td>You form an alliance</td></tr>
+<tr><td>Ink on the Treaty</td><td>copper</td><td>A war ends with a peace treaty you signed</td></tr>
+<tr><td>A Year in the Ledger</td><td>copper</td><td>You have played 12 months</td></tr>
+</tbody></table></div>
+<p><strong>Realm</strong> (12, 130 points)</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>Tier</th><th>Earned when</th></tr></thead>
+<tbody>
+<tr><td>Full Granaries</td><td>silver</td><td>With at least 10 provinces, 60 months with no hungry province (progress)</td></tr>
+<tr><td>Famine Relief</td><td>copper</td><td>You release famine relief to a province and nobody there dies of famine that year</td></tr>
+<tr><td>Seven Fat Years</td><td>copper</td><td>Your capital has a good harvest or better 7 years in a row (progress)</td></tr>
+<tr><td>Clean Books</td><td>copper</td><td>You repay a loan of at least 1,000</td></tr>
+<tr><td>Counting House</td><td>silver</td><td>You hold 10,000 gold (progress)</td></tr>
+<tr><td>Many Hearths</td><td>silver</td><td>Your realm has 10 million people (progress)</td></tr>
+<tr><td>Where Roads Meet</td><td>copper</td><td>You own a trade hub</td></tr>
+<tr><td>Long Reach</td><td>copper</td><td>Any castle reaches 3 rings</td></tr>
+<tr><td>Ten Harvests</td><td>copper</td><td>Bring in 10 province harvests across your campaigns (lifetime; harvest ladder level 2)</td></tr>
+<tr><td>A Hundred Harvests</td><td>silver</td><td>100 province harvests (lifetime; level 3)</td></tr>
+<tr><td>A Thousand Harvests</td><td>gold</td><td>1,000 province harvests (lifetime; level 4)</td></tr>
+<tr><td>Ten Thousand Harvests</td><td>crown</td><td>10,000 province harvests (lifetime; level 5)</td></tr>
+</tbody></table></div>
+<p><strong>Lords and rule</strong> (6, 35 points)</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>Tier</th><th>Earned when</th></tr></thead>
+<tbody>
+<tr><td>Raised Up</td><td>copper</td><td>You create a lord</td></tr>
+<tr><td>Not One Waverer</td><td>silver</td><td>You have at least 10 lords and none Wavering or Disloyal</td></tr>
+<tr><td>A Clerk in Every Town</td><td>copper</td><td>30 royal provinces have an official (progress)</td></tr>
+<tr><td>Chartered Towns</td><td>copper</td><td>5 charters are in force (progress)</td></tr>
+<tr><td>Long Live the Ruler</td><td>copper</td><td>A ruler reigns 40 years</td></tr>
+<tr><td>The Crown Passes</td><td>copper</td><td>No new rebellion in the 12 months after a succession</td></tr>
+</tbody></table></div>
+<p><strong>Learning</strong> (7, 85 points)</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>Tier</th><th>Earned when</th></tr></thead>
+<tbody>
+<tr><td>Halls of Learning</td><td>copper</td><td>You have 5 schools</td></tr>
+<tr><td>A Hundred Pens</td><td>copper</td><td>You have 100 scholars (progress)</td></tr>
+<tr><td>Quiet Years</td><td>silver</td><td>10 inventions since your last war (progress)</td></tr>
+<tr><td>First in the World</td><td>silver</td><td>You are first in the world to an invention of era III or later</td></tr>
+<tr><td>Age of Reason&#39;s Tools</td><td>copper</td><td>You finish an era IV invention</td></tr>
+<tr><td>Steam and Wire</td><td>silver</td><td>You finish an era VI invention</td></tr>
+<tr><td>The Whole Tree</td><td>crown</td><td>You know every invention in scope (progress)</td></tr>
+</tbody></table></div>
+<p><strong>War</strong> (8, 65 points)</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>Tier</th><th>Earned when</th></tr></thead>
+<tbody>
+<tr><td>Fewer, Better</td><td>silver</td><td>You win a battle outnumbered two to one</td></tr>
+<tr><td>Open the Gates</td><td>copper</td><td>A siege ends by terms</td></tr>
+<tr><td>Over the Walls</td><td>copper</td><td>A siege ends by storm</td></tr>
+<tr><td>A Purse at the Gate</td><td>copper</td><td>A castle is bought</td></tr>
+<tr><td>Wintered Well</td><td>copper</td><td>An army of 10,000 or more in winter quarters loses at most 5 % over the winter</td></tr>
+<tr><td>The Marshal</td><td>copper</td><td>A Marshal wins a battle for you</td></tr>
+<tr><td>A New Way of War</td><td>silver</td><td>You adopt a commander style</td></tr>
+<tr><td>Not One Field</td><td>gold</td><td>You win a defensive war against an enemy with twice your people, losing no province</td></tr>
+</tbody></table></div>
+<p><strong>Sea and the wider world</strong> (6, 55 points)</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>Tier</th><th>Earned when</th></tr></thead>
+<tbody>
+<tr><td>Master of the Swell</td><td>copper</td><td>You win a sea battle</td></tr>
+<tr><td>Merchant Fleet</td><td>silver</td><td>You have 100 trade ships (progress)</td></tr>
+<tr><td>Beyond the Horizon</td><td>copper</td><td>A fleet crosses an ocean and comes home</td></tr>
+<tr><td>Strangers on the Shore</td><td>copper</td><td>You make contact by sea with another macro-region</td></tr>
+<tr><td>Treaty on the Shore</td><td>silver</td><td>You found a colony with the consent of the local people</td></tr>
+<tr><td>All the Way Round</td><td>gold</td><td>A fleet sails round the world and comes home</td></tr>
+</tbody></table></div>
+<p><strong>Order</strong> (3, 35 points)</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>Tier</th><th>Earned when</th></tr></thead>
+<tbody>
+<tr><td>Heard Them Out</td><td>copper</td><td>A rebellion ends because you granted its demand</td></tr>
+<tr><td>The Realm Holds</td><td>silver</td><td>You beat a great revolt</td></tr>
+<tr><td>A Quiet Land</td><td>gold</td><td>With at least 20 provinces, 300 months with no unrest tier (progress)</td></tr>
+</tbody></table></div>
+<p><strong>Abroad</strong> (5, 45 points)</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>Tier</th><th>Earned when</th></tr></thead>
+<tbody>
+<tr><td>Friends in Many Courts</td><td>copper</td><td>You have 3 alliances</td></tr>
+<tr><td>Old Grudges Buried</td><td>silver</td><td>A rival becomes an ally</td></tr>
+<tr><td>My Word Is Iron</td><td>silver</td><td>100 years played with no oath broken (progress)</td></tr>
+<tr><td>Our Own Banner</td><td>silver</td><td>You started as a subject and are no longer anyone&#39;s subject</td></tr>
+<tr><td>Tribute Roads</td><td>silver</td><td>You have 5 tributaries</td></tr>
+</tbody></table></div>
+<p><strong>History</strong> (16, 215 points)</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>Tier</th><th>Earned when</th></tr></thead>
+<tbody>
+<tr><td>As It Was Written</td><td>copper</td><td>You make 25 historical choices (progress)</td></tr>
+<tr><td>Another Ending</td><td>silver</td><td>You make 10 non-historical choices in major events (progress)</td></tr>
+<tr><td>Paths Not Taken</td><td>gold</td><td>Across your games, 50 different non-historical options (lifetime, progress)</td></tr>
+<tr><td>Free of the Khan</td><td>silver</td><td>On 1 January 1400, having stood as the prince against the khan&#39;s horde at Kulikovo, you are nobody&#39;s subject (full game)</td></tr>
+<tr><td>Blackbird Field</td><td>silver</td><td>On 1 January 1400, having faced the sultan as the prince at Kosovo, you are nobody&#39;s subject (full game)</td></tr>
+<tr><td>The Storm Passes</td><td>silver</td><td>At the end of 1405, having met the conqueror&#39;s army as the sultan at Ankara, you are nobody&#39;s subject</td></tr>
+<tr><td>The Walls Held</td><td>gold</td><td>On 31 December 1460, as the defender in the fall of Constantinople, you own Constantinople</td></tr>
+<tr><td>The Conqueror&#39;s Heirs</td><td>gold</td><td>On 31 December 1507, as the empire left behind at Timur&#39;s death, you still own Samarkand (full game)</td></tr>
+<tr><td>The Four Quarters Hold</td><td>gold</td><td>On 31 December 1600, holding a role in the Inca expansion, you own Cusco and are nobody&#39;s subject</td></tr>
+<tr><td>Unconquered</td><td>gold</td><td>On 1 January 1914, having started outside Europe, your capital was never occupied by a realm whose capital lies in another of the 13 macro-regions (the Middle East counts as Asia)</td></tr>
+<tr><td>The Presses Roll</td><td>copper</td><td>You know printing before 1470</td></tr>
+<tr><td>Chains Broken</td><td>silver</td><td>Your realm abolishes slavery before 1800</td></tr>
+<tr><td>Stayed Home</td><td>silver</td><td>With at least 50 provinces, you stay out of the First World War</td></tr>
+<tr><td>Weathered the Crash</td><td>copper</td><td>Hit by the Great Depression, you do not default</td></tr>
+<tr><td>One Island Realm</td><td>gold</td><td>You own all of Japan before 1600</td></tr>
+<tr><td>Lord of the River Bend</td><td>gold</td><td>You own the whole Niger bend before 1600</td></tr>
+</tbody></table></div>
+<p><strong>Campaign</strong> (9, 105 points)</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>Tier</th><th>Earned when</th></tr></thead>
+<tbody>
+<tr><td>The Old Start</td><td>copper</td><td>You reach 11 November 1444, the day after Varna, where campaigns used to begin</td></tr>
+<tr><td>New Century</td><td>copper</td><td>You reach 1500</td></tr>
+<tr><td>Three Centuries On</td><td>copper</td><td>You reach 1700</td></tr>
+<tr><td>The New Machine Age</td><td>silver</td><td>You reach 1900</td></tr>
+<tr><td>The Long Road</td><td>crown</td><td>You reach the campaign&#39;s end date</td></tr>
+<tr><td>From One Hall</td><td>gold</td><td>Starting with one province, you hold 50 (progress)</td></tr>
+<tr><td>Many Tents, One People</td><td>copper</td><td>Starting as a decentralised realm, you reach 1500</td></tr>
+<tr><td>Many Crowns</td><td>copper</td><td>Across your games, 10 different realms played 10 years each (lifetime, progress, full game)</td></tr>
+<tr><td>Crowns of the World</td><td>silver</td><td>Across your games, realms in 6 world regions played 10 years each (lifetime, progress, full game)</td></tr>
+</tbody></table></div>
+<h2 id="what-you-see"><a class="anchor" href="#what-you-see" aria-label="Link to this section">#</a>What you see</h2>
+<ul>
+<li><strong>The toast:</strong> slides in at the top for three seconds with the icon, name and tier, and a short chip-tune sting. While a battle or event screen is open, it waits until the screen closes. With &quot;Achievement toasts&quot; off in <a href="/wiki/Settings">Settings</a>, there is no toast but the achievement still unlocks.</li>
+<li><strong>The achievements screen:</strong> reached from More on the main menu, a grid of icons grouped by category. Selecting one shows its text, progress and the date earned. An &quot;earnable in this campaign&quot; filter shows achievements not yet earned and not already ruled out (for example a date that has passed).</li>
+<li><strong>The turn report</strong> gets one line per unlock, with a jump to where it happened when there is a place (the castle, the battlefield).</li>
+<li><strong>Eligibility</strong> shows on the pause menu and the new game screen, with a one-time warning before you lose it.</li>
+</ul>
+<h3 id="in-the-playable-build-today"><a class="anchor" href="#in-the-playable-build-today" aria-label="Link to this section">#</a>In the playable build today</h3>
+<ul>
+<li>Open the game menu (the three-line button at the top left) and tap <strong>Achievements</strong>, or <em>Achievements</em> on the start screen. The Achievements card opens in the side panel: earned of 80 and points of 810 at the top, the eligibility line, a filter (<em>All</em>, <em>Within reach</em>, <em>Earned</em>), then one row of badges per category with its own count. Tap a badge for its text, tier and points, this campaign&#39;s progress bar, and the date you earned it. The harvest ladder is one badge in First steps with its level in the corner (3/5); its detail lists every level with its target and date and a bar to the next level, counted across all your campaigns.</li>
+<li>A badge is the tier&#39;s frame round the category&#39;s sign (a coin for Realm, swords for War, an anchor for Sea…) until the icons are drawn. Grey means locked; a dashed frame means <strong>Not in the game yet</strong>: 23 rows read systems the build does not have yet (charters, rulers and succession, trade hubs, winter quarters, marshals, styles, voyages and colonies, rebellions, regions of the world), and they stay locked until those land. The four History rows of the decades after 1378 read the bridge events (Kulikovo, Kosovo, Ankara, Timur&#39;s death); they can be earned once those events run in your campaign.</li>
+<li>When you earn one, a banner slides in under the date bar for three seconds and a line goes into the News; tap the banner to open the card at it. The game menu button (and the Achievements line in it) carries a red dot until you have looked. <em>Achievement toasts</em> in Settings → Gameplay turns the banner off; achievements still unlock.</li>
+<li>Tests run at the end of each week&#39;s turn, after everything else. What you earn is kept on this device, apart from any campaign, so it stays when you start again or reload. The build has no saves yet, so every campaign counts as ironman.</li>
+</ul>
+<h2 id="how-it-connects"><a class="anchor" href="#how-it-connects" aria-label="Link to this section">#</a>How it connects</h2>
+<ul>
+<li><a href="/wiki/Saving">Saving</a>: the three save flags, the player profile and its cloud sync, demo carry-over.</li>
+<li><a href="/wiki/Time-and-Turns">How a turn works</a>: turn end, year end, harvest, spring, dates and campaign end; tests run last.</li>
+<li><a href="/wiki/Screens-and-Navigation">Screens and navigation</a>: the screen, toast, turn report line, eligibility indicator and the game-over warning.</li>
+<li><a href="/wiki/Settings">Settings</a>: the Achievement toasts switch.</li>
+<li><a href="/wiki/Music-and-Sound">Music and sound</a>: the unlock sound.</li>
+<li><a href="/wiki/Tutorial-and-Help">Tutorial and help</a>: tutorial saves are never ironman, so the tutorial earns none.</li>
+<li><a href="/wiki/Your-Realm">Your realm</a>: harvests, food policy, gold, loans, people, castle reach, lords, ruler years, succession, schools, scholars, trade ships, oaths.</li>
+<li><a href="/wiki/Provinces">Provinces</a>: hungry provinces, famine relief, officials, charters, provinces gained.</li>
+<li><a href="/wiki/Research">Research</a>: inventions, eras, first in the world.</li>
+<li><a href="/wiki/Recruiting">Recruiting</a>: regiments trained, the Marshal.</li>
+<li><a href="/wiki/Warfare">Warfare</a>: battles, sieges, wars, winter quarters, commander styles.</li>
+<li><a href="/wiki/Naval">Naval</a>: sea battles, fleets home, ocean crossings, circumnavigation.</li>
+<li><a href="/wiki/Exploration-and-Colonies">Exploration and colonies</a>: contact by sea, colonies founded with consent.</li>
+<li><a href="/wiki/Diplomacy">Diplomacy</a> and <a href="/wiki/Subjects">Subjects</a>: alliances, rivals, independence, tributaries.</li>
+<li><a href="/wiki/Rebellions">Rebellions</a>: how risings end, great revolts, unrest tiers.</li>
+<li><a href="/wiki/Historical-Events">Historical events</a>: historical and non-historical choices, event roles, realm flags.</li>
+<li><a href="/wiki/The-1378-Start">The 1378 start</a>: start province count, decentralised starts, start macro-region.</li>
+<li><a href="/wiki/Trade">Trade</a>: trade hubs.</li>
+</ul>
+<p>Computer players have no part here; achievements are only for your realm.</p>
+<h2 id="numbers"><a class="anchor" href="#numbers" aria-label="Link to this section">#</a>Numbers</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th><th>Status</th></tr></thead>
+<tbody>
+<tr><td><code>tiers.copper</code> / <code>silver</code> / <code>gold</code> / <code>crown</code></td><td>5 / 10 / 20 / 40</td><td>fixed (store rule)</td></tr>
+<tr><td><code>achievements[].test</code> thresholds</td><td>as in the lists above</td><td>provisional placeholders</td></tr>
+<tr><td><code>achievements[].progress.target</code></td><td>as in the lists above</td><td>provisional placeholders</td></tr>
+<tr><td>Maximum achievements</td><td>100</td><td>fixed</td></tr>
+<tr><td>Maximum points each / in total</td><td>40 / 1,000</td><td>fixed</td></tr>
+<tr><td>Reserve after an update</td><td>10 slots, 100 points</td><td>fixed</td></tr>
+<tr><td>Name / text length</td><td>24 / 100 characters</td><td>fixed</td></tr>
+<tr><td>Google step threshold</td><td>10,000</td><td>store limit</td></tr>
+<tr><td>Steam progress popups</td><td>25, 50, 75 %</td><td>fixed</td></tr>
+<tr><td>Toast duration</td><td>3 seconds</td><td></td></tr>
+<tr><td>Store retry interval</td><td>5 minutes</td><td>provisional</td></tr>
+<tr><td>Icon</td><td>32 × 32, 2-pixel frame</td><td>fixed</td></tr>
+</tbody></table></div>
+<h2 id="still-open"><a class="anchor" href="#still-open" aria-label="Link to this section">#</a>Still open</h2>
+<ul>
+<li>Store figures (points and counts) are checked again in each store&#39;s console before upload.</li>
+<li><em>The Walls Held</em>, <em>The Four Quarters Hold</em> and <em>The Conqueror&#39;s Heirs</em> get a sensitivity review of their names.</li>
+<li>Rows for the Western Schism&#39;s end, Florence and Pisa, and the Ottomans holding Edirne and Bursa through Ankara wait for their events and places.</li>
+<li>A last check before release that no achievement copies another game&#39;s list.</li>
+</ul>
+<h2 id="for-developers"><a class="anchor" href="#for-developers" aria-label="Link to this section">#</a>For developers</h2>
+<ul>
+<li>Spec: <a href="https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/achievements/spec.md" rel="noopener"><code>domain/achievements/spec.md</code></a>, requirement code <strong>ACH</strong> (ACH-001 to ACH-091).</li>
+<li>Features: <code>domain/achievements/features/</code> (list-rules, unlock-catalogue, scope-and-progress, test-timing, eligibility, store-sync, free-tier-and-demo, icons, in-game-presentation).</li>
+<li>Code: <code>packages/engine/src/domain/achievements/</code>.</li>
+<li>The catalogue is <code>achievements.yaml</code> in the achievements design; its row ids (<code>first_harvest</code>, <code>walls_held_1453</code> …) are the stable ids every store id comes from.</li>
+</ul>

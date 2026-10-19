@@ -112,6 +112,16 @@
   "note": "Newaya Maryam, with a moving royal camp in Shewa; at war with Ifat, whose revolt pulls at the Muslim tributaries."
  },
  {
+  "id": "ajuran",
+  "name": "Ajuran",
+  "capital": [
+   45.2,
+   4.74
+  ],
+  "capitalFrom": "the middle Shabelle (no seat is known in 1378; map point at Beledweyne in Hiiraan)",
+  "note": "An inland clan power on the Shabelle, dated only by tradition (low confidence); it keeps the southern Somali interior but not Mogadishu (decision 3)."
+ },
+ {
   "id": "kilwa",
   "name": "Kilwa",
   "capital": [

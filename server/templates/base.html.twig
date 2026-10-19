@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+        <title>{% block title %}Pocket Hegemony{% endblock %}</title>
+        <meta name="description" content="{% block description %}An 8-bit grand strategy game for phones, desktop and the web: lead a realm from the Middle Ages to 1939, one week per turn.{% endblock %}">
+        <meta name="theme-color" content="#4e2f18">
+        <link rel="icon" type="image/png" href="/site/art/icon-crown.png">
+        <meta property="og:type" content="website">
+        <meta property="og:site_name" content="Pocket Hegemony">
+        <meta property="og:title" content="{{ block('title') }}">
+        <meta property="og:description" content="{{ block('description') }}">
+        <meta property="og:url" content="{{ app.request.uri }}">
+        {% block meta %}{% endblock %}
+        <link rel="preload" href="/site/fonts/jersey-10-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+        <link rel="preload" href="/site/fonts/jacquard-12-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+        <link rel="stylesheet" href="/site/site.css">
+        {% block stylesheets %}{% endblock %}
+    </head>
+    <body>
+        {% block body %}{% endblock %}
+    </body>
+</html>

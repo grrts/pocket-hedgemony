@@ -13,15 +13,39 @@ security:
             # Ensure dev tools and static assets are always allowed
             pattern: ^/(_profiler|_wdt|assets|build)/
             security: false
+        # The game's JSON API: no sessions, as before the website had a sign-in.
+        api:
+            pattern: ^/api/
+            stateless: true
+            lazy: true
+            provider: accounts
+        # The website: players sign in with their game account (email and password)
+        # on /community/signin, and stay signed in with a session.
         main:
             lazy: true
             provider: accounts
-
-            # Activate different ways to authenticate:
-            # https://symfony.com/doc/current/security.html#the-firewall
-
-            # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
+            form_login:
+                login_path: community_signin
+                check_path: community_signin
+                username_parameter: email
+                password_parameter: password
+                enable_csrf: true
+                csrf_token_id: authenticate
+                default_target_path: community
+                target_path_parameter: next
+            login_throttling:
+                max_attempts: 5
+                interval: '15 minutes'
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 2592000 # 30 days
+                remember_me_parameter: remember
+                signature_properties: [password]
+            logout:
+                path: community_signout
+                target: community
+                enable_csrf: true
+                csrf_token_id: logout
 
     # Note: Only the *first* matching rule is applied
     access_control:
