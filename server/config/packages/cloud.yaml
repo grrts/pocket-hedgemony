@@ -7,6 +7,9 @@ parameters:
     cloud.quota_saves: 300
     cloud.quota_mb: 200
     cloud.tombstone_purge_days: 30
+    # Shared saves (cloud.shared in saves.json): how many an account keeps, and the board each purpose posts to.
+    cloud.shared_max_per_account: 50
+    cloud.shared_boards: { show: strategy, help: saves, broke: bugs }
     env(STEAM_WEB_API_KEY): ''
     env(STEAM_APP_ID): ''
     env(SAVES_DIR): '%kernel.project_dir%/var/saves/%kernel.environment%'

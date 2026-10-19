@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Account\Registration;
 use App\Entity\Account;
+use App\Repository\SharedSaveRepository;
 use App\Repository\TopicRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -98,7 +99,7 @@ final class CommunityAccountController extends AbstractController
 
     #[Route('/you', name: 'community_you', methods: ['GET'])]
     #[IsGranted('ROLE_PLAYER')]
-    public function you(TopicRepository $topics): Response
+    public function you(TopicRepository $topics, SharedSaveRepository $shared): Response
     {
         $account = $this->getUser();
         \assert($account instanceof Account);
@@ -106,6 +107,8 @@ final class CommunityAccountController extends AbstractController
         return $this->render('community/you.html.twig', [
             'account' => $account,
             'topics' => $topics->findBy(['author' => $account, 'hidden' => false], ['lastActivityAt' => 'DESC'], 10),
+            // The overview of what the player shared (SAVE-135).
+            'shared' => $shared->ofAccount($account),
         ]);
     }
 }
