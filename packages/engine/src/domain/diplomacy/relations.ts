@@ -113,7 +113,7 @@ export function find(g: RelationGraph, type: string, a: string, b: string, order
 }
 
 export function has(g: RelationGraph, type: string, a: string, b: string): boolean {
-  return find(g, type, a, b).length > 0;
+  return recordsOf(g, a, b).some((r) => r.type === type && samePair(r, a, b));
 }
 
 function stanceRecord(g: RelationGraph, a: string, b: string): RelationRecord | undefined {
@@ -142,12 +142,17 @@ export function storedStanceRecord(g: RelationGraph, a: string, b: string): Rela
   return stanceRecord(g, a, b);
 }
 
+/** The relations that imply a stance, in the data's order (the `$` rows are not relations). */
+const IMPLIED_STANCE = Object.entries(rules.implied_stance).filter(([t]) => !t.startsWith("$"));
+
 /** Stance of a toward b: stored, else implied (Hostile at war, Friendly allied), else the default (DIPL-005). */
 export function stance(g: RelationGraph, a: string, b: string): string {
   const s = storedStance(g, a, b);
   if (s) return s;
-  for (const [t, implied] of Object.entries(rules.implied_stance)) {
-    if (!t.startsWith("$") && has(g, t, a, b)) return implied;
+  const records = recordsOf(g, a, b);
+  if (!records.length) return rules.default_stance;
+  for (const [t, implied] of IMPLIED_STANCE) {
+    if (records.some((r) => r.type === t && samePair(r, a, b))) return implied;
   }
   return rules.default_stance;
 }

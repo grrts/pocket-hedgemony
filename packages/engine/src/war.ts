@@ -709,7 +709,15 @@ export function runOccupation(world: World, newMonth: boolean, news: News[]): vo
   const owners = world.provinceOwner;
   const holds = world.provinceHold;
   const sieges = world.sieges;
-  for (let p = 0; p < world.provinceCount; p++) {
+  // Off the 1st of the month only provinces with an army, a siege or a hold change, so only they are visited, in order.
+  let visit: number[] | null = null;
+  if (!newMonth) {
+    const marked = [...present.keys(), ...sieges.keys()];
+    for (let p = 0; p < world.provinceCount; p++) if (holds[p]) marked.push(p);
+    visit = [...new Set(marked)].sort((x, y) => x - y);
+  }
+  for (let k = 0, end = visit ? visit.length : world.provinceCount; k < end; k++) {
+    const p = visit ? visit[k]! : k;
     if (water[p] || owners[p]! < 0) continue;
     const owner = owners[p]!;
     // No army there: nothing is held or besieged, and the walls fill again (most provinces, most days).
