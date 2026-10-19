@@ -282,7 +282,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-HER-10**: (was OQ-HER-10) Pool maximum: 7 is a cap for every pool, generated or authored; age ambitions join on top
 - **D-HER-11**: (was OQ-HER-11) Envoy reading: diplomacy's resident envoy (an envoy who stays at one court) is the envoy
 - **D-HER-12**: (was OQ-HER-12) AI choices: the AI makes inactive the golden age, and lets go the legacy, with the fewest lever
-- **D-HER-13**: (was OQ-HER-13) Warmth band edges: cold under a third, warm from a third to under two thirds, hot from two
+- **D-HER-13**: *(replaced by X-27: warmth is no longer shown; within reach starts at two thirds, HER-021)* (was OQ-HER-13) Warmth band edges: cold under a third, warm from a third to under two thirds, hot from two
 - **D-HER-14**: (was OQ-HER-14) Mark share: exactly a third; a mark is a legacy and counts toward the cap of 5. A mark is
 - **D-HER-15**: (was OQ-HER-15) Archetype count: 27 archetypes are kept; one that no generated country scores best on is
 - **D-HER-16**: (was OQ-HER-16) Unbound ids: a place name binds to the land province nearest the scenario map's place of
@@ -291,6 +291,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-HER-20**: (18 Oct) Day-one heritage: an ambition that could only be lost (deadline gone or fail holding, like a
 - **D-HER-21**: (18 Oct, the coordinator's brief) Heritage is evaluated monthly, in the month's block right after the
 - **D-HER-22**: (18 Oct) Levers in play: the nine of HER-088, the ones whose rule the game already has. A lever narrowed
+- **D-HER-23**: (19 Oct, X-27, Leroy) Ambitions in plain sight: an open ambition shows its name, plain goal and progress,
 - **D-HER-17**: (was OQ-HER-17) Formed countries beyond the caps: the formed country keeps the forming country's own
 
 ### Naval (naval)

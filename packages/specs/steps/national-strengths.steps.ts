@@ -60,12 +60,12 @@ function madeUpAmbition(id: string, i: number, historical: boolean): N.Ambition 
 function evaluateAll(s: Scenario): void {
   for (const h of Object.values(heritages(s))) N.evaluate(h, world(s), rng(s));
 }
-/** Puts one pool ambition among the open ones, sealed (or stirred). */
-function open(h: N.Heritage, pick: (a: N.Ambition) => boolean, state: "sealed" | "stirred" = "sealed"): N.Heritage["ambitions"][number] {
+/** Puts one pool ambition among the open ones. */
+function open(h: N.Heritage, pick: (a: N.Ambition) => boolean): N.Heritage["ambitions"][number] {
   const a = h.pool.find(pick) ?? h.waitingForAge.find(pick);
   if (!a) throw new Error("No such ambition in the pool");
   h.pool = h.pool.filter((x) => x !== a);
-  const entry = { item: a, state, warmth: 0, band: "cold" as N.Band };
+  const entry: N.Heritage["ambitions"][number] = { item: a, state: "open", share: 0, near: false };
   h.ambitions.push(entry);
   return entry;
 }
@@ -426,53 +426,30 @@ Then("at least one of them is tagged historical", (s) => {
   for (const d of s.draws) expect(d.some((a: { item: N.Ambition }) => a.item.historical)).toBe(true);
 });
 
-Given("the country {string} has the hidden ambition with hint {string}", (s, name: string, hint: string) => {
-  s.amb = open(heritage(s, name), (a) => a.hint === hint);
+Given("the country {string} has the open ambition {string}", (s, name: string, amb: string) => {
+  s.subject = name;
+  s.amb = open(heritage(s, name), (a) => a.name === amb);
 });
 When("the player opens the heritage card", (s) => {
-  s.view = N.ambitionView(s.amb);
+  s.view = N.ambitionView(s.amb, world(s), heritage(s, s.subject).country);
 });
-Then("the ambition shows a theme icon and the hint", (s) => {
+Then("the ambition shows its name, its plain goal and its progress", (s) => {
   expect(N.nsConfig.themes).toContain(s.view.theme);
-  expect(s.view.hint).toBe(s.amb.item.hint);
+  expect(s.view.name).toBe(s.amb.item.name);
+  expect(s.view.goal).toBe(s.amb.item.text);
+  expect(s.view.progress).toEqual({ have: 0, need: 1 });
 });
-Then("its plain goal is not shown", (s) => {
-  expect(s.view.plainGoal).toBeUndefined();
-  expect(Object.values(s.view)).not.toContain(s.amb.item.text);
+Then("it names its promised legacy {string} as a great legacy", (s, legacy: string) => {
+  expect(s.view.legacy).toBe(legacy);
+  expect(s.view.great).toBe(true);
 });
-
-Given("the country {string} has a hidden ambition", (s, name: string) => {
-  s.subject = name;
-  s.amb = open(heritage(s, name), (a) => a.id === "venice_lion_on_the_adda");
-});
-When("its hint condition holds", (s) => {
-  if (s.amb) {
-    satisfy(s.amb.item.stir, world(s), heritage(s, s.subject).country);
-  } else {
-    const h = heritage(s, s.subject);
-    satisfy(h.burden!.item.shed, world(s), h.country);
-  }
-  evaluateAll(s);
-});
-Then("the ambition is hinted", (s) => {
-  expect(s.amb.state).toBe("stirred");
-});
-Then("it shows a warmth, the name of the legacy it promises and its deadline", (s) => {
-  const v = N.ambitionView(s.amb);
-  expect(["cold", "warm", "hot"]).toContain(v.warmth);
-  expect(v.legacy).toBe(s.amb.item.legacy.name);
-  expect(v.deadline).toBe(s.amb.item.window[1]);
-});
-Then("the hint stays the only words shown", (s) => {
-  const v = N.ambitionView(s.amb);
-  expect(v.hint).toBe(s.amb.item.hint);
-  expect(v.plainGoal).toBeUndefined();
+Then("what the legacy gives is not shown", (s) => {
+  const v = N.ambitionView(s.amb, world(s), heritage(s, s.subject).country);
+  expect(v.reward).toBeUndefined();
+  expect(JSON.stringify(v)).not.toContain(s.amb.item.legacy.text);
+  expect(JSON.stringify(v)).not.toContain('"effects"');
 });
 
-Given("the country {string} has the hinted ambition {string}", (s, name: string, amb: string) => {
-  s.subject = name;
-  s.amb = open(heritage(s, name), (a) => a.name === amb, "stirred");
-});
 When("{string} holds {string}", (s, name: string, place: string) => {
   (facts(s, name).places ??= []).push(place);
   evaluateAll(s);
@@ -480,9 +457,9 @@ When("{string} holds {string}", (s, name: string, place: string) => {
 Then("the legacy {string} is granted", (s, name: string) => {
   expect(heritage(s, s.subject).legacies.map((l) => l.name)).toContain(name);
 });
-Then("the plain goal is shown for the first time", (s) => {
-  expect(N.ambitionView(s.amb).plainGoal).toBe(s.amb.item.text);
+Then("what the legacy gives is shown for the first time", (s) => {
   expect(s.amb.state).toBe("done");
+  expect(N.ambitionView(s.amb).reward).toBe(s.amb.item.legacy.text);
 });
 Then(/^a new ambition is drawn(?: from the pool)?$/, (s) => {
   const log = heritage(s, s.subject).log.map((e) => e.type);
@@ -515,43 +492,58 @@ Then("the ambition is lost without penalty", (s) => {
   expect(h.legacies).toEqual(s.before.legacies);
   expect(h.burden).toEqual(s.before.burden);
 });
-Then("its plain goal is shown as what might have been", (s) => {
-  expect(N.ambitionView(s.amb).plainGoal).toBe(s.amb.item.text);
-});
 
-Given("an ambition's goal is a single count leaf of {int} markets", (s, n: number) => {
+/** A made-up realm whose one ambition has the given goal, open. */
+function oneGoal(s: Scenario, goal: N.Condition): void {
   const data = madeUp("testland", 0);
-  data.ambitions = [{ ...madeUpAmbition("testland", 0, true), goal: { count: { who: "this", thing: "building:market", op: ">=", value: n } } }];
+  data.ambitions = [{ ...madeUpAmbition("testland", 0, true), goal }];
   s.subject = "Testland";
-  s.amb = open(heritage(s, "Testland", data), () => true, "stirred");
-});
+  s.amb = open(heritage(s, "Testland", data), () => true);
+}
+const market = (n: number): N.Condition => ({ count: { who: "this", thing: "building:market", op: ">=", value: n } });
+const place = (p: string): N.Condition => ({ holds_place: { who: "this", place: p } });
+
+Given("an ambition's goal is a single count leaf of {int} markets", (s, n: number) => oneGoal(s, market(n)));
+Given("an ambition's goal is a count of {int} markets", (s, n: number) => oneGoal(s, market(n)));
+Given("an ambition's goal is {int} places that must all be held", (s, n: number) => oneGoal(s, { all: ["Ceuta", "Tangier", "Arzila"].slice(0, n).map(place) }));
+Given("an ambition's goal is one of {int} places", (s, n: number) => oneGoal(s, { any: ["Goa", "Calicut", "Cochin"].slice(0, n).map(place) }));
+Given("an ambition's goal is one of a count of {int} markets or a place", (s, n: number) => oneGoal(s, { any: [market(n), place("Calicut")] }));
 Given("the country has {int} markets", (s, n: number) => {
   (facts(s, "Testland").counts ??= {})["building:market"] = n;
 });
+Given("the country holds {int} of them", (s, n: number) => {
+  facts(s, "Testland").places = ["Ceuta", "Tangier", "Arzila"].slice(0, n);
+});
+Given("the country holds neither", (s) => {
+  facts(s, "Testland").places = [];
+});
+Then("its progress is {int} of {int}", (s, have: number, need: number) => {
+  expect(N.progress(s.amb.item.goal, world(s), heritage(s, s.subject).country)).toEqual({ have, need });
+  expect(N.ambitionView(s.amb, world(s), heritage(s, s.subject).country).progress).toEqual({ have, need });
+});
 Then("the goal counts as two thirds met", (s) => {
-  expect(s.amb.warmth).toBeCloseTo(2 / 3, 10);
-  expect(s.amb.state).toBe("stirred");
+  expect(s.amb.share).toBeCloseTo(2 / 3, 10);
+  expect(s.amb.state).toBe("open");
 });
 
-Given("an ambition's goal is a single holds_place condition", (s) => {
-  const data = madeUp("testland", 0);
-  data.ambitions = [{ ...madeUpAmbition("testland", 0, true), goal: { holds_place: { who: "this", place: "Kilwa" } } }];
-  s.subject = "Testland";
-  s.amb = open(heritage(s, "Testland", data), () => true, "stirred");
-});
+Given("an ambition's goal is a single holds_place condition", (s) => oneGoal(s, place("Kilwa")));
 When("the place is taken", (s) => {
-  s.bands = [];
+  s.seen = [];
+  const look = () => {
+    const v = N.ambitionView(s.amb, world(s), "testland");
+    s.seen.push(v.state === "done" ? "done" : `${v.progress!.have}/${v.progress!.need}${v.near ? " near" : ""}`);
+  };
   for (let year = 1444; year < 1450; year++) {
     world(s).year = year;
     evaluateAll(s);
-    s.bands.push(N.ambitionView(s.amb).warmth);
+    look();
   }
   (facts(s, "Testland").places ??= []).push("Kilwa");
   evaluateAll(s);
-  s.bands.push(N.ambitionView(s.amb).warmth);
+  look();
 });
-Then("the warmth goes from cold straight to done", (s) => {
-  expect(s.bands).toEqual(["cold", "cold", "cold", "cold", "cold", "cold", "done"]);
+Then("the progress goes from 0 of 1 straight to done, never within reach", (s) => {
+  expect(s.seen).toEqual(["0/1", "0/1", "0/1", "0/1", "0/1", "0/1", "done"]);
 });
 
 Given("a drawn ambition's goal already holds on 11 Nov 1444", (s) => {
@@ -587,21 +579,35 @@ Given("the country {string} last paid counsel {int} years ago", (s, name: string
   h.counselYear = world(s).year - years;
   s.treasury = { gold: 1000 };
 });
-When("{string} asks for counsel on one ambition", (s, name: string) => {
-  s.counsel = N.payCounsel(heritage(s, name), s.amb.item.id, world(s), s.era, s.treasury);
+Given("the country {string} has an open ambition and an empty pool", (s, name: string) => {
+  s.subject = name;
+  const h = heritage(s, name);
+  s.amb = open(h, (a) => a.id === "venice_lion_on_the_adda");
+  h.pool = [];
+  s.era = "I";
+  s.treasury = { gold: 1000 };
 });
-Then("it pays {int} gold and the ambition is hinted and shows its warmth", (s, gold: number) => {
-  expect(s.counsel).toEqual({ ok: true, gold });
+When("{string} asks for counsel on one ambition", (s, name: string) => {
+  s.counsel = N.payCounsel(heritage(s, name), s.amb.item.id, world(s), s.era, s.treasury, rng(s));
+});
+Then("it pays {int} gold and the ambition goes back to the pool for another", (s, gold: number) => {
+  const h = heritage(s, s.subject);
+  expect(s.counsel).toMatchObject({ ok: true, gold });
   expect(s.treasury.gold).toBe(1000 - gold);
-  expect(s.amb.state).toBe("stirred");
-  const v = N.ambitionView(s.amb);
-  expect(["cold", "warm", "hot"]).toContain(v.warmth);
-  expect(v.plainGoal).toBeUndefined();
+  expect(h.pool).toContain(s.amb.item);
+  expect(N.openAmbitions(h).map((a) => a.item.id)).not.toContain(s.amb.item.id);
+  expect(N.openAmbitions(h).map((a) => a.item.id)).toContain(s.counsel.drawn.id);
 });
 Then("counsel is refused", (s) => {
   expect(s.counsel).toEqual({ ok: false, reason: "too_soon" });
   expect(s.treasury.gold).toBe(1000);
-  expect(s.amb.state).toBe("sealed");
+  expect(s.amb.state).toBe("open");
+  expect(N.openAmbitions(heritage(s, s.subject))).toContain(s.amb);
+});
+Then("counsel is refused as nothing is left to draw", (s) => {
+  expect(s.counsel).toEqual({ ok: false, reason: "none_left" });
+  expect(s.treasury.gold).toBe(1000);
+  expect(N.openAmbitions(heritage(s, s.subject))).toContain(s.amb);
 });
 
 Given("the pool of {string} has an entry naming the {string}", (s, name: string, age: string) => {
@@ -644,10 +650,10 @@ Then("only ambitions tagged historical are drawn", (s) => {
     for (const a of d) expect(a.item.historical).toBe(true);
   }
 });
-Then("no setting reveals ambitions", (s) => {
+Then("no setting reveals rewards", (s) => {
   expect(N.RULES.ambitions.history_mode_setting.values).toEqual(["drawn", "historical_only"]);
-  expect(N.RULES.ambitions.never_revealed).toBe(true);
-  for (const d of s.draws) for (const a of d) expect(N.ambitionView(a).plainGoal).toBeUndefined();
+  expect(N.RULES.ambitions.reward_hidden_until_done).toBe(true);
+  for (const d of s.draws) for (const a of d) expect(N.ambitionView(a).reward).toBeUndefined();
 });
 
 Given("the AI country {string} has {int} active ambitions", (s, name: string, n: number) => {
@@ -882,7 +888,7 @@ Given("the country {string} has {int} officials", (s, name: string, n: number) =
 });
 Given("the country {string} has done the ambition {string}", (s, name: string, id: string) => {
   const h = heritage(s, name);
-  const a = open(h, (x) => x.id === id, "stirred");
+  const a = open(h, (x) => x.id === id);
   satisfy(a.item.goal, world(s), h.country);
   evaluateAll(s);
   expect(a.state).toBe("done");
@@ -1258,19 +1264,6 @@ Then("the golden age is active for {int} years even though its condition fails",
   expect(s.heyday.state).toBe("asleep");
 });
 
-When("an event applies stir_ambition on it", (s) => {
-  N.stirAmbitionByEvent(heritage(s, s.subject), s.amb.item.id, world(s));
-});
-Then("the ambition is hinted and shows its warmth", (s) => {
-  expect(s.amb.state).toBe("stirred");
-  expect(["cold", "warm", "hot"]).toContain(N.ambitionView(s.amb).warmth);
-});
-Then("its words stay a hint", (s) => {
-  const v = N.ambitionView(s.amb);
-  expect(v.hint).toBe(s.amb.item.hint);
-  expect(v.plainGoal).toBeUndefined();
-});
-
 Given("the country {string} has a weakness", (s, name: string) => {
   s.subject = name;
   expect(heritage(s, name).burden!.state).toBe("held");
@@ -1333,22 +1326,16 @@ Given("the golden age {string} is active in the {string}", (s, name: string, age
   evaluateAll(s);
   expect(hd.state).toBe("awake");
 });
-Given("{string} has {int} active ambitions, one of them hinted and warm", (s, name: string, n: number) => {
+Given("{string} has {int} open ambitions, one of them within reach", (s, name: string, n: number) => {
   const h = heritage(s, name);
   N.startCampaign(h, rng(s), world(s));
-  const open3 = N.openAmbitions(h);
-  expect(open3).toHaveLength(n);
-  // The goal of one is partly met: one of three places held (warm from a third, D-HER-13).
-  const lion = h.ambitions.find((a) => a.item.id === "venice_lion_on_the_adda") ?? (open3[0]!.state === "sealed" ? open3[0]! : open3[0]!);
-  if (lion.item.id === "venice_lion_on_the_adda") {
-    satisfy(lion.item.stir, world(s), h.country);
-    (facts(s, name).places ??= []).push("Bergamo");
-  } else {
-    N.stirAmbitionByEvent(h, lion.item.id, world(s));
-    lion.band = "warm";
-  }
+  expect(N.openAmbitions(h)).toHaveLength(n);
+  // One open ambition gets a goal of three places, two of them held: two thirds met (HER-021).
+  const one = N.openAmbitions(h)[0]!;
+  one.item = { ...one.item, goal: { all: ["Bergamo", "Brescia", "Crema"].map((place) => ({ holds_place: { who: "this", place } })) } };
+  (facts(s, name).places ??= []).push("Bergamo", "Brescia");
   evaluateAll(s);
-  expect(N.openAmbitions(h).filter((a) => a.state === "stirred" && a.band === "warm")).toHaveLength(1);
+  expect(one.near).toBe(true);
 });
 Given("{string} has the weakness {string} and no legacies", (s, name: string, burden: string) => {
   const h = heritage(s, name);
@@ -1383,7 +1370,7 @@ Then("galleys build 30 % faster, the capital's garrison is 40 % stronger and por
   expect(N.leverIn(h, "garrison_pct", { capital: false })).toBe(0);
 });
 
-Given("the country {string} has a birthright, an active golden age, 3 hidden ambitions and a weakness", (s, name: string) => {
+Given("the country {string} has a birthright, an active golden age, 3 open ambitions and a weakness", (s, name: string) => {
   s.subject = name;
   const h = heritage(s, name);
   const hd = h.heydays[0]!;
@@ -1391,14 +1378,15 @@ Given("the country {string} has a birthright, an active golden age, 3 hidden amb
   satisfy(hd.item.wakes, world(s), h.country);
   N.startCampaign(h, rng(s), world(s));
   evaluateAll(s);
-  expect(N.openAmbitions(h).map((a) => a.state)).toEqual(["sealed", "sealed", "sealed"]);
+  expect(N.openAmbitions(h).map((a) => a.state)).toEqual(["open", "open", "open"]);
 });
 When("the player opens the country card", (s) => {
   s.row = N.heritageRow(heritage(s, s.subject));
 });
-Then("one Heritage row shows the birthright icon, the golden age icon, three hidden ambitions and the weakness icon", (s) => {
+Then("one Heritage row shows the birthright icon, the golden age icon, the progress of the three ambitions and the weakness icon", (s) => {
   const h = heritage(s, s.subject);
-  expect(s.row).toMatchObject({ birthright: h.birthrights[0]!.item.id, heyday: h.heydays[0]!.item.id, seals: ["sealed", "sealed", "sealed"], burden: h.burden!.item.id });
+  expect(s.row).toMatchObject({ birthright: h.birthrights[0]!.item.id, heyday: h.heydays[0]!.item.id, ambitions: N.openAmbitions(h).map((a) => a.share), burden: h.burden!.item.id });
+  expect(s.row.ambitions).toHaveLength(3);
 });
 Then("tapping it opens the Heritage sheet", (s) => {
   expect(s.row.opens).toBe("Heritage sheet");
@@ -1411,37 +1399,38 @@ Given("the country {string} has an ambition", (s, name: string) => {
     ...madeUpAmbition(h.country, 0, true),
     goal: { all: ["Bergamo", "Brescia", "Crema", "Cremona"].map((place) => ({ holds_place: { who: "this", place } })) },
   };
-  h.pool.push(a);
-  s.amb = open(h, (x) => x === a);
+  h.pool = [a];
+  s.ambDef = a;
 });
-When("it is revealed", (s) => {
+When("a new ambition comes up", (s) => {
   const h = heritage(s, s.subject);
   h.digest = [];
   s.logFrom = h.log.length;
-  satisfy(s.amb.item.stir, world(s), h.country);
-  evaluateAll(s);
-  expect(s.amb.state).toBe("stirred");
+  N.drawAmbitions(h, rng(s), { world: world(s) });
+  s.amb = ambition(h, s.ambDef.id);
 });
-When("its warmth rises to hot", (s) => {
+When("it comes within reach", (s) => {
   const h = heritage(s, s.subject);
-  satisfy(s.amb.item.stir, world(s), h.country);
+  s.amb = open(h, (x) => x === s.ambDef);
   (facts(s, s.subject).places ??= []).push("Bergamo", "Brescia");
   evaluateAll(s);
-  expect(s.amb.band).toBe("warm");
+  expect(s.amb.near).toBe(false);
   h.digest = [];
   s.logFrom = h.log.length;
   facts(s, s.subject).places!.push("Crema");
   evaluateAll(s);
-  expect(s.amb.band).toBe("hot");
+  expect(s.amb.near).toBe(true);
 });
 Then("a small quiet animation plays", (s) => {
-  const moments = heritage(s, s.subject).log.slice(s.logFrom).filter((e) => e.type === "AmbitionStirred" || e.type === "WarmthChanged");
+  const moments = heritage(s, s.subject).log.slice(s.logFrom).filter((e) => e.type === "AmbitionDrawn" || e.type === "AmbitionNear");
   expect(moments).toHaveLength(1);
 });
 Then("the monthly digest has one line about it", (s) => {
   const h = heritage(s, s.subject);
-  expect(h.digest).toHaveLength(1);
-  expect(h.digest[0]).toContain(s.amb.item.hint);
+  // The game turns a drawn ambition into its news line; coming within reach is the library's own digest line.
+  const lines = h.digest.length ? h.digest : h.log.slice(s.logFrom).filter((e) => e.type === "AmbitionDrawn").map(() => s.amb.item.name);
+  expect(lines).toHaveLength(1);
+  expect(lines[0]).toContain(s.amb.item.name);
 });
 
 Given("the player is choosing a country", () => {});
@@ -1449,8 +1438,8 @@ When("the player looks at {string}", (s, name: string) => {
   s.data = N.exampleHeritage(idOf(name));
   s.picker = N.pickerSummary(s.data);
 });
-Then("the picker shows its birthright and weakness, a count of its hidden ambitions and its golden ages as ages", (s) => {
-  expect(s.picker).toEqual({ birthright: s.data.birthright.name, burden: s.data.burden.name, sealedAmbitions: 3, heydayAges: s.data.heydays.map((h: N.Heyday) => h.age) });
+Then("the picker shows its birthright and weakness, a count of its ambitions and its golden ages as ages", (s) => {
+  expect(s.picker).toEqual({ birthright: s.data.birthright.name, burden: s.data.burden.name, ambitions: 3, heydayAges: s.data.heydays.map((h: N.Heyday) => h.age) });
   expect(Object.values(s.picker).flat()).not.toContain(s.data.ambitions[0].text);
 });
 
@@ -1458,22 +1447,23 @@ Then("the picker shows its birthright and weakness, a count of its hidden ambiti
 
 const tax = (points: number): N.Effect[] => [{ lever: "tax_reach_pct", value: Math.round(points * 10) }];
 
-// D-HER-13: warmth bands at a third and two thirds
+// HER-021: within reach from two thirds
 Given("an ambition's goal has {int} leaf conditions", (s, n: number) => {
   const h = heritage(s, "Warmland", { ...madeUp("warmland", 0), ambitions: [] });
   const a = madeUpAmbition("warmland", 0, true);
   a.goal = { all: Array.from({ length: n }, (_, i) => ({ knows: { who: "this", invention: `inv${i}` } })) };
-  h.ambitions.push({ item: a, state: "stirred", warmth: 0, band: "cold" });
+  h.ambitions.push({ item: a, state: "open", share: 0, near: false });
   s.amb = h.ambitions[0];
+  s.subject = "Warmland";
 });
 Given("{int} of them hold", (s, n: number) => {
   facts(s, "Warmland").knows = Array.from({ length: n }, (_, i) => `inv${i}`);
 });
-Then("its warmth is {string}", (s, warmth: string) => {
-  if (warmth === "done") expect(s.amb.state).toBe("done");
+Then(/^the ambition is (not within reach|within reach|done)$/, (s, verdict: string) => {
+  if (verdict === "done") expect(s.amb.state).toBe("done");
   else {
-    expect(s.amb.state).toBe("stirred");
-    expect(s.amb.band).toBe(warmth);
+    expect(s.amb.state).toBe("open");
+    expect(s.amb.near).toBe(verdict === "within reach");
   }
 });
 
@@ -1482,20 +1472,25 @@ Given("the country {string} has kept a resident envoy at the court of {string}",
   heritage(s, reader);
   s.host = heritage(s, host);
   N.startCampaign(s.host, rng(s), world(s));
-  expect(N.envoyReading(s.host, 1, rng(s))).toBeNull();
+  expect(N.envoyReading(s.host, 1, rng(s), world(s))).toBeNull();
 });
 When("{int} years have passed", (s, years: number) => {
-  s.reading = N.envoyReading(s.host, years, rng(s));
+  s.reading = N.envoyReading(s.host, years, rng(s), world(s));
 });
-Then("{string} learns the hint and warmth of one active ambition of {string}", (s, _reader: string, _host: string) => {
+Then("{string} learns the name, goal and progress of one open ambition of {string}", (s, _reader: string, _host: string) => {
   const open = N.openAmbitions(s.host);
   expect(s.reading).not.toBeNull();
-  expect(open.map((a) => a.item.hint)).toContain(s.reading.hint);
-  expect(["cold", "warm", "hot"]).toContain(s.reading.band);
+  const a = open.find((x) => x.item.name === s.reading.name)!;
+  expect(a).toBeTruthy();
+  expect(s.reading.goal).toBe(a.item.text);
+  expect(s.reading.progress).toEqual(N.progress(a.item.goal, world(s), s.host.country));
 });
-Then("never its plain goal", (s) => {
+Then("never its reward", (s) => {
   const text = JSON.stringify(s.reading);
-  for (const a of N.openAmbitions(s.host)) expect(text).not.toContain(a.item.text);
+  for (const a of N.openAmbitions(s.host)) {
+    expect(text).not.toContain(a.item.legacy.text);
+    expect(text).not.toContain(a.item.legacy.name);
+  }
 });
 
 // D-HER-10: pool limits
@@ -1707,14 +1702,14 @@ Then("it can only take forest, hill, herding, steppe, desert, island, mountain, 
   for (const id of s.scored) expect(N.DECENTRALISED_ARCHETYPES).toContain(id);
 });
 
-// HER-072: the map shimmers over a hot ambition
-Given("the country {string} has a hot ambition naming {string}, {string} and {string}", (s, name: string, a: string, b: string, c: string) => {
+// HER-072: the map shimmers over an ambition within reach
+Given("the country {string} has an ambition within reach naming {string}, {string} and {string}", (s, name: string, a: string, b: string, c: string) => {
   const h = heritage(s, name);
   const amb = N.exampleHeritage(idOf(name)).ambitions.find((x) => JSON.stringify(x.goal).includes(a))!;
-  h.ambitions.push({ item: amb, state: "stirred", warmth: 0, band: "cold" });
+  h.ambitions.push({ item: amb, state: "open", share: 0, near: false });
   facts(s, name).places = [a, b];
   evaluateAll(s);
-  expect(h.ambitions.at(-1)!.band).toBe("hot");
+  expect(h.ambitions.at(-1)!.near).toBe(true);
   s.names = [a, b, c];
   s.who = name;
 });
@@ -1860,12 +1855,14 @@ Then("officials' wages in {string} are as they always were", (s, name: string) =
 When("the player reads the Heritage tab of {string}", (s, name: string) => {
   s.view = heritageView(game(s), realmOf(s, name));
 });
-Then("it shows {int} ambitions with their hints, never their plain goals", (s, n: number) => {
+Then("it shows {int} ambitions with their goals and progress, never their rewards", (s, n: number) => {
   const v = s.view as NonNullable<ReturnType<typeof heritageView>>;
   expect(v.ambitions).toHaveLength(n);
   for (const a of v.ambitions!) {
-    expect(a.hint).toBeTruthy();
-    expect(a.plainGoal).toBeUndefined();
+    expect(a.goal).toBeTruthy();
+    expect(a.progress!.need).toBeGreaterThan(0);
+    expect(a.legacy).toBeTruthy();
+    expect(a.reward).toBeUndefined();
   }
   expect(v.counsel!.gold).toBeGreaterThan(0);
 });
@@ -1874,9 +1871,9 @@ Then("it shows each golden age's state", (s) => {
   expect(v.heydays.length).toBeGreaterThan(0);
   for (const x of v.heydays) expect(["waiting", "awake", "asleep", "ended"]).toContain(x.state);
 });
-Then("it counts {int} hidden ambitions and shows none of them", (s, n: number) => {
+Then("it counts {int} open ambitions and shows none of them", (s, n: number) => {
   const v = s.view as NonNullable<ReturnType<typeof heritageView>>;
-  expect(v.sealed).toBe(n);
+  expect(v.open).toBe(n);
   expect(v.ambitions).toBeUndefined();
   expect(v.counsel).toBeUndefined();
 });
@@ -1901,4 +1898,42 @@ Then("no choice waits and {int} golden ages are active", (s, n: number) => {
   const h = game(s).heritage!.realms[game(s).player]!;
   expect(h.ask).toBeNull();
   expect(h.heydays.filter((x) => x.state === "awake")).toHaveLength(n);
+});
+
+// HER-090: requirements
+Given("the country {string} has in its pool an ambition requiring {string} done", (s, name: string, earlier: string) => {
+  s.subject = name;
+  const h = heritage(s, name);
+  const first = h.pool.find((a) => a.name === earlier)!;
+  s.earlier = first;
+  s.follow = { ...madeUpAmbition(h.country, 7, false), requires: { heritage: { who: "this", id: first.id, state: "done" } } };
+  s.first = open(h, (a) => a === first);
+  h.pool = [s.follow];
+});
+When("ambitions are drawn while {string} is open", (s) => {
+  N.drawAmbitions(heritage(s, s.subject), rng(s), { world: world(s) });
+});
+Then("the ambition stays in the pool", (s) => {
+  const h = heritage(s, s.subject);
+  expect(h.pool).toContain(s.follow);
+  expect(h.ambitions.map((a) => a.item.id)).not.toContain(s.follow.id);
+});
+When("{string} is done", (s) => {
+  const h = heritage(s, s.subject);
+  world(s).heritage = heritages(s);
+  satisfy(s.earlier.goal, world(s), h.country);
+  evaluateAll(s);
+  expect(s.first.state).toBe("done");
+});
+Then("the ambition can be drawn", (s) => {
+  expect(heritage(s, s.subject).ambitions.map((a) => a.item.id)).toContain(s.follow.id);
+});
+Given("the country {string} has in its pool an ambition requiring the event {string}", (s, name: string, event: string) => {
+  s.subject = name;
+  const h = heritage(s, name);
+  s.follow = { ...madeUpAmbition(h.country, 7, false), requires: { event: { id: event } } };
+  h.pool = [s.follow];
+});
+When("ambitions are drawn before the event has happened", (s) => {
+  N.drawAmbitions(heritage(s, s.subject), rng(s), { world: world(s) });
 });
