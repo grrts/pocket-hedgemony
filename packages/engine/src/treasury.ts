@@ -326,10 +326,10 @@ export function defaultWeighs(world: World, n: number): number | null {
   return y >= 0 && world.date.year - y < DEFAULT.troubled_years ? y + DEFAULT.troubled_years : null;
 }
 
-/** Whether realm n is broke now: its gold is below zero and lenders would not cover it. */
+/** Whether realm n is broke now: it owes lenders, its gold is below zero and they would not cover it. A realm that owes nothing has nothing to default on. */
 export function isBroke(world: World, n: number): boolean {
   const gold = world.nationTreasury[n]!;
-  return gold < 0 && canBorrow(world, n) < -gold;
+  return gold < 0 && world.nationDebt[n]! > 0 && canBorrow(world, n) < -gold;
 }
 
 /** Monthly steps a broke realm has left before it defaults, for the warning. */
