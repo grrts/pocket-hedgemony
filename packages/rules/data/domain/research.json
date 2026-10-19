@@ -1,5 +1,5 @@
 {
- "$comment": "Research (domain/research/spec.md). Era costs, rates and seats are placeholders from the research tree and country stats v3 section 7. Inventions are the 174 rows of the tree (research-tree.md), one config row each. The 13 past inventions of eras A and M come first (RSCH-092); start groups decide each map nation's 1444 knowledge (RSCH-098).",
+ "$comment": "Research (domain/research/spec.md). Era costs, rates and seats are placeholders from the research tree and country stats v3 section 7. Inventions are the 174 rows of the tree (research-tree.md), one config row each. The 13 past inventions of eras A and M come first (RSCH-092); start groups decide each map nation's knowledge at the start (RSCH-098). Era I runs from the start (1378 at the earliest) to 1500; `starts` holds what differs for a start other than 11 November 1444 (RSCH-114), and `era_pace` paces Era I to the start (RSCH-113).",
  "root": {
   "id": "R0",
   "name": "Settled life"
@@ -49,7 +49,7 @@
  "era_dates": {
   "A": -3000,
   "M": 600,
-  "I": 1444,
+  "I": 1378,
   "II": 1500,
   "III": 1600,
   "IV": 1700,
@@ -57,6 +57,11 @@
   "VI": 1870,
   "VII": 1914,
   "VIII": 1960
+ },
+ "era_pace": {
+  "$comment": "Era I pacing (RSCH-113): Era I's cost per invention is multiplied by (the year Era II begins - the campaign's start year) / reference_years, never below 1. A 1444 start is x1, a 1378 start about x2.18. Provisional: the balance model tunes it.",
+  "era": "I",
+  "reference_years": 56
  },
  "campaign_end": {
   "year": 1939,
@@ -146,7 +151,7 @@
    "parent": "R1",
    "or_parents": [],
    "also_needs": [],
-   "unlocks": "Farmland at the 1444 harvest; opens the Heavy plough",
+   "unlocks": "Farmland at the harvest of the start; opens the Heavy plough",
    "start_regions": [],
    "without": "Farmland harvests one step worse"
   },
@@ -2597,7 +2602,9 @@
   "era_cost.M",
   "behind_discount_pct_per_era",
   "behind_discount_cap_pct",
-  "cost_floor_share"
+  "cost_floor_share",
+  "era_pace",
+  "starts"
  ],
  "era_names": {
   "A": "Ancient",
@@ -3633,6 +3640,165 @@
    "G1",
    "L1"
   ]
+ },
+ "starts": {
+  "1378": {
+   "$comment": "The 20 September 1378 start (plan-1378 section 3.2, D-RSCH-23). Applied only to a campaign that starts in 1378, on top of start_groups, start_add and start_remove. join puts a realm in a group for this start, ids not yet on the map included (each is checked once it is a map nation); add and remove change a realm's set for this start.",
+   "date": {
+    "year": 1378,
+    "month": 9,
+    "day": 20
+   },
+   "join": {
+    "jalayirids": "islamic",
+    "muzaffarids": "islamic",
+    "kartids": "islamic",
+    "sarbadars": "islamic",
+    "hormuz": "islamic",
+    "germiyan": "islamic",
+    "aydin": "islamic",
+    "mentese": "islamic",
+    "saruhan": "islamic",
+    "hamid": "islamic",
+    "eretnids": "islamic",
+    "white_horde": "hordes",
+    "naghachu": "hordes",
+    "sufids": "khanates",
+    "timurids": "khanates",
+    "bulgaria_tarnovo": "orthodox",
+    "bulgaria_vidin": "orthodox",
+    "dobruja": "orthodox",
+    "brankovic": "orthodox",
+    "zeta": "orthodox",
+    "morea": "orthodox",
+    "suzdal_nizhny": "orthodox",
+    "achaea": "latin",
+    "athens": "latin",
+    "padua": "latin",
+    "verona": "latin",
+    "pisa": "latin",
+    "visconti_pavia": "latin",
+    "oristano": "latin",
+    "sicily": "latin",
+    "flanders": "latin",
+    "brabant": "latin",
+    "holland": "latin",
+    "saxe_wittenberg": "latin",
+    "lubeck": "latin",
+    "riga": "latin",
+    "cologne_city": "latin",
+    "avignon_papacy": "latin",
+    "yunnan_yuan": "china",
+    "japan_southern_court": "japan",
+    "kamakura_kubo": "japan",
+    "ryukyu": "japan",
+    "hokuzan": "japan",
+    "nanzan": "japan",
+    "calicut": "south_asia",
+    "kotte": "south_asia",
+    "nepal_malla": "south_asia",
+    "sukhothai": "se_mainland",
+    "singapura": "se_maritime",
+    "tondo": "se_maritime",
+    "ternate": "se_maritime",
+    "ifat": "swahili_somali",
+    "mogadishu": "swahili_somali",
+    "great_zimbabwe": "forest_africa",
+    "tepanecs": "mesoamerica",
+    "quitu_cara": "andes"
+   },
+   "add": {
+    "jalayirids": [
+     "L3"
+    ],
+    "hormuz": [
+     "T5",
+     "S1",
+     "S2",
+     "F11"
+    ],
+    "calicut": [
+     "S1",
+     "S2",
+     "T5"
+    ],
+    "morea": [
+     "L01",
+     "S1",
+     "S2"
+    ],
+    "flanders": [
+     "T2",
+     "T3",
+     "F8"
+    ],
+    "brabant": [
+     "T2",
+     "T3"
+    ],
+    "holland": [
+     "F8"
+    ],
+    "cologne_city": [
+     "T2",
+     "T3"
+    ],
+    "lubeck": [
+     "T2",
+     "T3"
+    ],
+    "pisa": [
+     "T2",
+     "T3",
+     "S2"
+    ],
+    "visconti_pavia": [
+     "T2",
+     "T3"
+    ],
+    "padua": [
+     "T2"
+    ],
+    "avignon_papacy": [
+     "T2"
+    ],
+    "sicily": [
+     "S2"
+    ],
+    "great_zimbabwe": [
+     "B02"
+    ]
+   },
+   "remove": {
+    "ottomans": [
+     "W3",
+     "W5",
+     "G3"
+    ],
+    "bohemia": [
+     "W4"
+    ],
+    "hungary": [
+     "W4"
+    ],
+    "portugal": [
+     "S4"
+    ],
+    "castile": [
+     "S4"
+    ],
+    "timurids": [
+     "L3",
+     "W3"
+    ],
+    "ming": [
+     "G3"
+    ],
+    "yunnan_yuan": [
+     "G3"
+    ]
+   }
+  }
  },
  "behind_discount_pct_per_era": 25,
  "behind_discount_cap_pct": 50,
