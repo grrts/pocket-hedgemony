@@ -1,0 +1,167 @@
+<h1>World Map</h1>
+<p>The world map is the ground every other system stands on: about 4,400 land provinces and about 4,700 sea zones covering the whole world, each with its terrain, rivers, coasts and neighbours. It is built once from real-world data and never changes during a campaign, so every army, fleet and trader plans its way across the same fixed geography. This page explains how the map is made, what each place knows about itself, and how the map keeps old saves working when it changes between versions.</p>
+<h2 id="how-it-works"><a class="anchor" href="#how-it-works" aria-label="Link to this section">#</a>How it works</h2>
+<h3 id="the-grid"><a class="anchor" href="#the-grid" aria-label="Link to this section">#</a>The grid</h3>
+<p>The world is a pixel image <strong>5,760 by 2,144 pixels</strong>, at 16 pixels per degree, which is about 7 km per pixel at the equator. It runs from 78° north to 56° south. Every pixel belongs to exactly one place (a land province or a sea zone), or to no place at all: large lakes are punched out, and the polar band is left empty.</p>
+<p>The map is build data. Nothing in it changes during a campaign, and none of it is stored in a save.</p>
+<h3 id="land-provinces"><a class="anchor" href="#land-provinces" aria-label="Link to this section">#</a>Land provinces</h3>
+<p>Provinces start from <strong>modern first-level admin regions</strong> (states, counties, oblasts and so on), which are then merged or split until they are roughly even in size. The target size is set per part of the world, so Europe, India and China are cut more finely than Siberia or the Sahara. The default target is 1,100 pixels; Western and Central Europe aims for 380 and the far north for 3,200.</p>
+<ul>
+<li>A province is <strong>named</strong> after the modern admin region that covers most of it, plus a compass point when it was split (for example &quot;West Pskov&quot;). Provinces keep these modern names; there are no historical names.</li>
+<li>Large lakes are punched out of the land, and connected pieces of one admin region (exclaves, islands) become their own pieces. Islands smaller than 10 pixels are dropped.</li>
+<li>The current build has <strong>9,158 places</strong>: about 4,400 land provinces (<code>p0</code> to <code>p4410</code>) followed by about 4,700 sea zones (<code>sea0</code> onward).</li>
+</ul>
+<p>Each land province carries:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Fact</th><th>What it means</th></tr></thead>
+<tbody>
+<tr><td>Id</td><td><code>p</code> plus a number</td></tr>
+<tr><td>Name</td><td>Modern region name, plus a compass point if split</td></tr>
+<tr><td>Centre</td><td>x and y on the grid</td></tr>
+<tr><td>Size</td><td>Its size in pixels</td></tr>
+<tr><td>Ground</td><td>One of the 11 grounds (see below)</td></tr>
+<tr><td>Coastal</td><td>Whether it touches a sea zone</td></tr>
+<tr><td>River</td><td>Whether three or more river pixels run through it</td></tr>
+<tr><td>Neighbours</td><td>Every land province and sea zone it touches</td></tr>
+</tbody></table></div>
+<p>A province&#39;s size on the map sets how many <strong>tiles</strong> it has on its <a href="/wiki/Provinces">Provinces</a> card: 4 for the smallest, 16 for the largest. Only provinces on a coast, lake or navigable river get <strong>shore tiles</strong>, 1 to 3 of them, set from their coast and rivers.</p>
+<h3 id="sea-zones-and-straits"><a class="anchor" href="#sea-zones-and-straits" aria-label="Link to this section">#</a>Sea zones and straits</h3>
+<p>Water is split into sea zones that are equal in kilometres at every latitude, so the number of zones a fleet crosses really measures how long it takes:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Kind</th><th>Terrain value</th><th>Size</th></tr></thead>
+<tbody>
+<tr><td>Coastal zone</td><td><code>sea</code></td><td>about 150 km across</td></tr>
+<tr><td>Open-ocean zone</td><td><code>ocean</code></td><td>about 300 km across</td></tr>
+</tbody></table></div>
+<p>Sea zones take real sea names from Natural Earth&#39;s marine areas.</p>
+<p>Some narrow waters are closed on a 7 km grid even though ships sailed through them. A config list of <strong>straits</strong> joins those seas: the Bosporus, the Dardanelles, the Kerch Strait, the Øresund, the Great Belt, the Strait of Gibraltar, the Strait of Messina, the Strait of Hormuz, the Bab-el-Mandeb, the Strait of Malacca, the Garabogaz strait and the Strait of Maracaibo.</p>
+<p>A separate config list of <strong>strait crossings</strong> names land neighbours across a narrow strait that armies may cross by ferry, such as across the Bosporus, the Øresund, Messina, Kerch and Gibraltar. The rules for crossing belong to <a href="/wiki/Troop-Movement">Troop Movement</a>. Armies have no way into a sea zone at all except aboard ships.</p>
+<h3 id="terrain-22-tile-types-11-grounds"><a class="anchor" href="#terrain-22-tile-types-11-grounds" aria-label="Link to this section">#</a>Terrain: 22 tile types, 11 grounds</h3>
+<p>The map draws <strong>22 tile types</strong> so the world looks varied, but the simulation plays every province as one of <strong>11 grounds</strong>. The ground is what matters for troops, buildings and people; the tile type is mostly how it looks.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Category</th><th>Tile type</th><th>Plays as ground</th></tr></thead>
+<tbody>
+<tr><td>Temperate</td><td>grassland</td><td>grassland</td></tr>
+<tr><td></td><td>farmland</td><td>farmland</td></tr>
+<tr><td></td><td>broadleaf</td><td>forest</td></tr>
+<tr><td></td><td>mediterranean</td><td>grassland</td></tr>
+<tr><td></td><td>paddies</td><td>farmland</td></tr>
+<tr><td>Boreal and polar</td><td>forest (pine, taiga)</td><td>forest</td></tr>
+<tr><td></td><td>tundra</td><td>tundra</td></tr>
+<tr><td></td><td>glacier</td><td>tundra</td></tr>
+<tr><td>Dry lands</td><td>steppe</td><td>grassland</td></tr>
+<tr><td></td><td>drylands</td><td>drylands</td></tr>
+<tr><td></td><td>desert (stony)</td><td>desert</td></tr>
+<tr><td></td><td>dunes (sand sea)</td><td>desert</td></tr>
+<tr><td></td><td>colddesert</td><td>desert</td></tr>
+<tr><td>Tropical</td><td>savanna</td><td>savanna</td></tr>
+<tr><td></td><td>jungle</td><td>jungle</td></tr>
+<tr><td>Wetlands</td><td>marsh</td><td>marsh</td></tr>
+<tr><td></td><td>swamp</td><td>marsh</td></tr>
+<tr><td>Hills and mountains</td><td>hills</td><td>hills</td></tr>
+<tr><td></td><td>mountains (grey rock)</td><td>mountains</td></tr>
+<tr><td></td><td>snowpeaks</td><td>mountains</td></tr>
+<tr><td></td><td>badlands (red rock)</td><td>mountains</td></tr>
+<tr><td></td><td>highlands (green)</td><td>mountains</td></tr>
+</tbody></table></div>
+<p>The 11 grounds are farmland, grassland, savanna, drylands, desert, hills, mountains, forest, jungle, marsh and tundra.</p>
+<p><strong>How each pixel gets its type.</strong> The generator decides every pixel in four passes:</p>
+<ol>
+<li><strong>Climate</strong>, from the Köppen-Geiger climate map: rainforest, savanna, steppe, desert, Mediterranean, temperate, taiga, tundra or ice.</li>
+<li><strong>Mountain ranges</strong>, from Natural Earth, each with a rim of hills 1 to 3 pixels wide. The mountain type follows the climate: badlands in desert climates, highlands in tropical climates, snowpeaks in alpine and polar climates, in the high core of large ranges and north of 50°, and grey-rock mountains everywhere else.</li>
+<li><strong>Wetlands</strong>, from Natural Earth: swamp in the tropics (the Sudd, the Pantanal), marsh elsewhere (the Pripet, the Fens).</li>
+<li><strong>Woods and fields</strong> break each zone up. How wooded the land is follows the climate&#39;s natural forest (after the WWF ecoregions), blurred across climate borders by a degree or two and wobbled with noise, so taiga, mixed forest and broadleaf fade into each other. Where 1444 was crowded, some wood is cleared for fields: rice paddies in monsoon Asia and farmland elsewhere (the Paris basin), in proportion to how crowded the region was.</li>
+</ol>
+<p><strong>How a province gets its ground.</strong> Each province takes one ground by the province ground rule:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Province is…</th><th>Ground</th></tr></thead>
+<tbody>
+<tr><td>More than half mountain</td><td>mountains</td></tr>
+<tr><td>A quarter or more hills or mountain</td><td>hills</td></tr>
+<tr><td>Temperate land more than 60 % wooded</td><td>forest</td></tr>
+<tr><td>Otherwise</td><td>the most common ground under it</td></tr>
+</tbody></table></div>
+<p>So a province that is 55 % mountain is mountains; one that is 20 % mountain and 10 % hills is hills; one that is 10 % of each and mostly grassland is grassland. Grassland in the most crowded parts of 1444 counts as farmland ground, and the config can force lowland valleys such as the Po valley.</p>
+<p>Each tile type also <strong>suggests starting tile uses</strong> for the province card: farmland suggests fields, steppe suggests pasture, badlands suggests waste with mines, and so on.</p>
+<p>A few terrain effects adopted by <a href="/wiki/Troop-Movement">Troop Movement</a> hold as map facts: snow peaks close passes in winter, dunes need camels for guns and give no foraging, glacier is impassable, and paddies are slower in the wet season. No other terrain effects exist: broadleaf, mediterranean, pine forest, steppe, cold desert, swamp, badlands and highlands play only through their ground, and mediterranean and steppe land plays as grassland. Each land province also stores its most common tile type, so these effects know where they apply.</p>
+<p><strong>Ocean depth</strong> is stored for every water pixel in five bands from Natural Earth&#39;s sea-floor data: under 200 m, 1 km, 3 km, 5 km, and deeper.</p>
+<h3 id="rivers"><a class="anchor" href="#rivers" aria-label="Link to this section">#</a>Rivers</h3>
+<p>Rivers come from Natural Earth&#39;s river centre lines (scale ranks 0 to 8), traced as paths of map pixels. Each pixel knows the river&#39;s size and which neighbouring pixels it flows to, so every river draws as one clean line.</p>
+<ul>
+<li>Rivers of scale rank 0 to 4 are <strong>great rivers</strong> (size 2); the rest are size 1.</li>
+<li>A province with three or more river pixels is a <strong>river province</strong>.</li>
+<li>A config list of <strong>fords</strong> names river crossings that count as bridges in summer and autumn, such as the Ebro at Tortosa and the Danube at Vidin.</li>
+</ul>
+<p>A province has a <strong>navigable river</strong> when a great river runs through at least three of its pixels. Only coasts, lake shores and navigable rivers give a province shore tiles; a small river does not.</p>
+<p>In winter, from December to March, rivers north of latitude 55 <strong>freeze</strong>: crossing them costs no extra time, as if they were not there.</p>
+<h3 id="passes-and-roads"><a class="anchor" href="#passes-and-roads" aria-label="Link to this section">#</a>Passes and roads</h3>
+<p>A config list of <strong>passes</strong> marks mountain provinces with a historic road through them: the Great St Bernard, the Khyber, the Brenner, the Pyrenees at Roncesvalles and others. Movement rules for passes belong to <a href="/wiki/Troop-Movement">Troop Movement</a>.</p>
+<p>Each province has <strong>one road step</strong> for the whole province: track, road, paved road, turnpike or railway. The map only holds it as a fact; building roads belongs to <a href="/wiki/Provinces">Provinces</a> and <a href="/wiki/Buildings">Buildings</a>, and movement and <a href="/wiki/Trade">Trade</a> read it.</p>
+<h3 id="one-graph-for-land-and-sea"><a class="anchor" href="#one-graph-for-land-and-sea" aria-label="Link to this section">#</a>One graph for land and sea</h3>
+<p>All land provinces and sea zones form <strong>one graph</strong> of places and their neighbours. A province neighbours the sea zones it touches, and any province with a sea-zone neighbour is marked coastal. Neighbour lists are always two-way: if A lists B, B lists A. Every mover, player or AI, plans on the same graph.</p>
+<h3 id="regions"><a class="anchor" href="#regions" aria-label="Link to this section">#</a>Regions</h3>
+<p>The map uses the <a href="/wiki/Historical-Events">Historical Events</a> geography: <strong>13 macro-regions</strong> (Europe, the Middle East, North Africa, Sub-Saharan Africa, South Asia, Central and North Asia, East Asia, Southeast Asia, Oceania, North America, Mesoamerica and Central America, the Caribbean, South America) with their sub-regions and 257 areas. The event tree also names <strong>anchor provinces</strong> such as Constantinople, Potosí and Malacca, and each resolves to one province on the map. The map generator has its own density and settlement regions, and modern admin regions supply names.</p>
+<h3 id="map-versions"><a class="anchor" href="#map-versions" aria-label="Link to this section">#</a>Map versions</h3>
+<p>If the map generator splits or merges provinces, it writes a <strong>rename table</strong> (<code>old id → new ids, with shares</code>) that ships with the map. Every built map has a <code>mapHash</code>, and saves record it. When a save made on an older map is loaded, its provinces are mapped through the rename table. See <a href="/wiki/Saving">Saving</a>.</p>
+<h3 id="sources-and-credits"><a class="anchor" href="#sources-and-credits" aria-label="Link to this section">#</a>Sources and credits</h3>
+<p>The map credits its data: Natural Earth (public domain), the Köppen-Geiger climate maps of Beck et al. 2018 (CC BY 4.0, attribution required), and the WWF terrestrial ecoregions of Olson et al. 2001.</p>
+<h2 id="what-you-see"><a class="anchor" href="#what-you-see" aria-label="Link to this section">#</a>What you see</h2>
+<p>The world map has no screen of its own; <a href="/wiki/Map-and-Lenses">Map and Map Modes</a> draws it. What it hands over for drawing:</p>
+<ul>
+<li>The <strong>province id image</strong>, which says which place each pixel belongs to.</li>
+<li>The <strong>terrain image</strong>: terrain per pixel in the red channel, ocean depth in the green channel (0 on land, otherwise depth band plus one), and river size and links where a river runs.</li>
+<li>Province and sea zone names, rivers and depth bands.</li>
+</ul>
+<h2 id="how-it-connects"><a class="anchor" href="#how-it-connects" aria-label="Link to this section">#</a>How it connects</h2>
+<ul>
+<li><a href="/wiki/Provinces">Provinces</a>: reads ground, size (tile count), coastal and river (shore tiles) and the road step.</li>
+<li><a href="/wiki/Troop-Movement">Troop Movement</a>: plans on the graph; reads ground, river and great-river flags, passes, fords and strait crossings.</li>
+<li><a href="/wiki/Naval">Naval</a>: reads sea zones and their kind, coasts and straits.</li>
+<li><a href="/wiki/Trade">Trade</a>: routes over the graph, roads, rivers and sea zones.</li>
+<li><a href="/wiki/Warfare">Warfare</a>: reads ground for battles, roads and rivers.</li>
+<li><a href="/wiki/Exploration-and-Colonies">Exploration and Colonies</a>: graph steps for the charted start; coastal provinces.</li>
+<li><a href="/wiki/The-1378-Start">The 1378 Start</a>: places to own; size, terrain and coast for starting population and wealth; asks for rebuilds when provinces must be split.</li>
+<li><a href="/wiki/Historical-Events">Historical Events</a>: shares region ids, areas and anchor provinces.</li>
+<li><a href="/wiki/Map-and-Lenses">Map and Map Modes</a>: draws the id image, terrain, depth and rivers.</li>
+<li><a href="/wiki/Saving">Saving</a>: <code>mapHash</code> and the rename table; map data is never saved.</li>
+<li><a href="/wiki/Buildings">Buildings</a>: ground (build cost), shore tiles, anchors for fixed mines and markets.</li>
+</ul>
+<p>When a rebuild splits provinces, <a href="/wiki/Naval">Naval</a> reruns its port placement.</p>
+<h2 id="numbers"><a class="anchor" href="#numbers" aria-label="Link to this section">#</a>Numbers</h2>
+<p>These are the map generator&#39;s settings. None are game balance placeholders except where noted.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Value</th><th>Config key</th><th>Design value</th><th>Provisional?</th></tr></thead>
+<tbody>
+<tr><td>Pixels per degree</td><td><code>pxPerDeg</code></td><td>16</td><td>No</td></tr>
+<tr><td>Latitude band</td><td><code>latTop</code>, <code>latBottom</code></td><td>78, −56</td><td>No</td></tr>
+<tr><td>Largest lakes punched out</td><td><code>lakeMaxScalerank</code></td><td>3</td><td>No</td></tr>
+<tr><td>Smallest island kept</td><td><code>minIslandSize</code></td><td>10 pixels</td><td>No</td></tr>
+<tr><td>Merge and split thresholds</td><td><code>minFactor</code>, <code>maxFactor</code></td><td>0.4, 1.7 of the target</td><td>No</td></tr>
+<tr><td>Target province size</td><td><code>defaultTarget</code>, <code>density[]</code></td><td>1,100 px; Western and Central Europe 380 … far north 3,200</td><td>No</td></tr>
+<tr><td>Forced lowlands</td><td><code>lowlands[]</code></td><td>Po valley</td><td>No</td></tr>
+<tr><td>Sea zone seeds and sizes</td><td><code>seas.coastSpacing</code>, <code>oceanSpacing</code>, <code>coastBand</code>, <code>minSeaSize</code></td><td>22, 44, 20, 150 pixels</td><td>No</td></tr>
+<tr><td>Sea straits</td><td><code>straits[]</code></td><td>12 named</td><td>No</td></tr>
+<tr><td>Province ground thresholds</td><td><code>MOUNTAIN_SHARE</code>, <code>HILL_SHARE</code> (in <code>mapgen.ts</code>)</td><td>0.5, 0.25</td><td>No</td></tr>
+<tr><td>Tiles per province</td><td>tile count range (province config)</td><td>4 to 16</td><td>Yes</td></tr>
+<tr><td>Great rivers</td><td>great river ranks</td><td>scale ranks 0 to 4</td><td>No</td></tr>
+<tr><td>River province</td><td>river province threshold</td><td>3 river pixels</td><td>No</td></tr>
+<tr><td>Strait crossings, passes, fords</td><td>troop-movement <code>march</code> config</td><td>named examples only</td><td>Yes (lists still to fill)</td></tr>
+</tbody></table></div>
+<h2 id="frozen-seas"><a class="anchor" href="#frozen-seas" aria-label="Link to this section">#</a>Frozen seas</h2>
+<p>Seasons show on the map. From December to March the far northern seas freeze: the Gulf of Bothnia, the White Sea, the Arctic seas, Hudson Bay, Foxe Basin and the North Western Passages. Fleets cannot enter a frozen sea, and a port on a frozen sea cannot be used until the ice goes.</p>
+<h2 id="other-map-facts"><a class="anchor" href="#other-map-facts" aria-label="Link to this section">#</a>Other map facts</h2>
+<ul>
+<li><strong>Crossing a strait on foot.</strong> Armies cross five straits as if they were land borders: the Bosporus (Istanbul holds both shores), the Øresund, Messina, Kerch and Gibraltar. These are not the same as the sea straits fleets use.</li>
+<li><strong>Lakes.</strong> A lake shore gives shore tiles, but a harbour needs a real sea next to it. Fleets can sail the large lakes, such as Ladoga and the Great Lakes, but not smaller ones.</li>
+<li><strong>Map size.</strong> The map keeps its 4,411 land provinces. Some ports share a province, and Melos and Malé are not on the map.</li>
+<li><strong>Hills and mountains.</strong> A province that is at least half mountain is mountains, and one that is at least a quarter hill or mountain is hills.</li>
+</ul>
+<h2 id="still-open"><a class="anchor" href="#still-open" aria-label="Link to this section">#</a>Still open</h2>
+<p>Nothing about the map is left open. The frozen months and the latitude for frozen rivers are first values that balancing may change.</p>
+<h2 id="for-developers"><a class="anchor" href="#for-developers" aria-label="Link to this section">#</a>For developers</h2>
+<ul>
+<li>Spec: <a href="https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/world-map/spec.md" rel="noopener"><code>domain/world-map/spec.md</code></a>, requirement code <strong>MAP</strong>.</li>
+<li>Features: <code>domain/world-map/features/</code> (grid-and-provinces, sea-zones-and-straits, terrain, rivers-passes-roads, graph-and-regions, map-versions).</li>
+<li>Map generator: <code>tools/mapgen/mapgen.ts</code>, <code>tools/mapgen/terrain.ts</code>, settings in <code>tools/mapgen/config.json</code>. Built data: <code>packages/rules/data/scenarios/1378/world/provinces.json</code> and <code>map.json</code> for the start, and the same files under <code>scenarios/1444/world/</code> for the 1444 checkpoint. Terrain notes: <code>docs/terrain.md</code>.</li>
+<li>The engine reads the graph in <code>packages/engine/src/world.ts</code> (<code>adjStart</code>, <code>adjList</code>). Rules code for this context goes in <code>packages/engine/src/domain/world-map/</code>.</li>
+</ul>

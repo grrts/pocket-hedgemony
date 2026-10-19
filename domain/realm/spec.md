@@ -206,7 +206,7 @@ Holds: castle store, granary size, reach, overrides of food policy.
 - REALM-086: A disloyal lord shall be able to defect to a neighbour with his provinces, or rebel. [§5.2, §5.4]
 - REALM-087: When two lords' houses join by marriage, they shall merge into one bigger lord. [§5.4]
 - REALM-088: Loyalty shall rise with granting his want, gifts of gold, offices at court, marriages into the ruling house, victories he took part in, a long secure reign with a clear heir, feeding his lands in famine, and sharing your faith and language. [§5.5]
-- REALM-089: Loyalty shall fall with heavy or crushing taxes, seizing land from him or another lord, lost wars and battles, a child ruler, a disputed heir or a new ruler, requisitioning his grain, a foreign rival's bribes and promises, and the crown borrowing (REALM-189). [§5.5, feedback 61]
+- REALM-089: Loyalty shall fall with heavy or crushing taxes, seizing land from him or another lord, lost wars and battles, a child ruler, a disputed heir or a new ruler, requisitioning his grain, a foreign rival's bribes and promises, the crown borrowing (REALM-189), and being slighted at court (EVT-125). [§5.5, feedback 61; feedback 152]
 
 ### 5.10 Army and navy summary
 - REALM-090: Soldiers (foot, horse and later guns) shall be gained by raising recruits (gold), hiring paid companies, and lords bringing retinues; lost by battle deaths, disease and hunger on campaign, desertion when unpaid or unfed, and disbanding; they cost gold every month and eat grain. [§6]
