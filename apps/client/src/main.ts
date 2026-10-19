@@ -2094,11 +2094,18 @@ function drawFleets(o: OverlayContext, ctx: CanvasRenderingContext2D, u: number,
     const pts = [o.toScreen(...fleetPosition(f))];
     const path = tiled && f.tile >= 0 ? f.path : [];
     for (const t of path) pts.push(o.toScreen(...tileXY(t)));
-    // The zones past this leg, the last to the spot tapped.
+    // The whole voyage runs over the water tiles, as a march over the land (NAVY-148); while it sails a leg alone, the zones past it, the last to the spot tapped.
     const goal = sailGoal.get(f.id);
-    const zones = path.length ? f.route.slice(1) : f.route;
+    const zones = path.length && f.whole ? [] : path.length ? f.route.slice(1) : f.route;
     zones.forEach((q, i) => pts.push(o.toScreen(...(tiled && goal && i === zones.length - 1 && goal.zone === q ? tileXY(goal.tile) : ([provinces[q]!.x!, provinces[q]!.y!] as [number, number])))));
     drawRoute(ctx, { pts, u, color: nations[s.playerNation]!.color, weeks: [], t: now, viewWidth: o.width });
+    // The days still to sail over the course's end, as over a march's.
+    if (f.days > 0) {
+      ctx.textAlign = "center";
+      ctx.textBaseline = "bottom";
+      const [bx, by] = pts.at(-1)!;
+      pixelText(ctx, hoursText(f.days * 24), bx, by - 13 * u, 10);
+    }
   }
   // The course being drawn for explorers, in gold over the sea (EXPL-069).
   const draft = exploring && s.navy.fleets.find((f) => f.id === exploring!.fleet);
@@ -2232,13 +2239,14 @@ function drawHulls(o: OverlayContext, f: FleetView, liv: LivingView, now: number
       ctx.fillStyle = PALETTE.mist;
       for (let i = 0; i < 4; i++) {
         const k = (Math.floor(now / 250) + i * 3) % 6;
-        ctx.fillRect(Math.round(p.x + p.dir * (6 + k) * u), Math.round(y + img.height - (4 + i + k / 2) * u), 2 * u, 2 * u);
+        ctx.fillRect(Math.round(p.x + p.dir * (6 + k) * u), Math.round(y + h - (4 + i + k / 2) * u), 2 * u, 2 * u);
       }
     }
+    // The hull's size on the map, not its art's pixels (sharper on a phone's dense screen), so the brackets and tap box fit it.
     x0 = Math.min(x0, x);
     y0 = Math.min(y0, y);
-    x1 = Math.max(x1, x + img.width);
-    y1 = Math.max(y1, y + img.height);
+    x1 = Math.max(x1, x + w);
+    y1 = Math.max(y1, y + h);
   }
   if (selected) brackets(ctx, x0, y0, x1 - x0, y1 - y0, u, 1 + (Math.floor(now / 260) % 2), PALETTE.gold);
   let bottom = y1;
@@ -2457,11 +2465,12 @@ function onTap(sx: number, sy: number, province: number): void {
     if (province >= 0 && isWater[province]) addLeg(province);
     return;
   }
-  // Armies sit on top of provinces, so check them first, with some room around each for fingers.
-  const PAD = 8;
-  // A banner takes taps in a box of at least 44 points; where boxes overlap, the nearest banner wins (feedback 21).
-  const hit = bannerAt(armyHitBoxes, sx, sy);
-  const fleetHit = fleetHitBoxes.find((b) => b.mine && sx >= b.x - PAD && sx <= b.x + b.w + PAD && sy >= b.y - PAD && sy <= b.y + b.h + PAD);
+  // Armies and fleets sit on top of provinces, so check them first. A banner or a ship takes taps in a box of
+  // at least 44 points; where boxes overlap, the nearest one wins, so a fleet in port beside an army is chosen
+  // as readily as the army (feedback 21, VIEW-125).
+  const piece = bannerAt<{ x: number; y: number; w: number; h: number; id: number; fleet?: boolean }>([...armyHitBoxes, ...fleetHitBoxes.filter((b) => b.mine).map((b) => ({ ...b, fleet: true }))], sx, sy);
+  const hit = piece && !piece.fleet ? piece : undefined;
+  const fleetHit = piece?.fleet ? piece : undefined;
   // Close in, one of the player's caravans, barges or ships opens its card in the Trade tab; others fall through to the land (VIEW-125).
   const traderHit = !hit && !fleetHit && !selected.size && sailing < 0 ? traderHitBoxes.find((b) => b.mine >= 0 && sx >= b.x && sx <= b.x + b.w && sy >= b.y && sy <= b.y + b.h) : undefined;
   if (traderHit && snapshot) return openTraderCard(traderHit.mine);
@@ -2471,7 +2480,9 @@ function onTap(sx: number, sy: number, province: number): void {
     else pickFleet(fleetHit.id);
     return;
   }
-  if (sailing >= 0 && snapshot && province >= 0 && (isWater[province] || neighborIdx[province]!.some((q) => isWater[q]))) {
+  // With a fleet chosen, a tap on one of the player's armies chooses the army, as with armies; anything else by the sea is where to sail.
+  const mineHit = !!hit && !!snapshot && snapshot.armies.owner[armySlot(hit.id)] === snapshot.playerNation;
+  if (sailing >= 0 && snapshot && !mineHit && province >= 0 && (isWater[province] || neighborIdx[province]!.some((q) => isWater[q]))) {
     // A sea zone, a port or a shore: the fleet sets sail at once (an army aboard lands on a shore).
     const fleet = sailing;
     sailing = -1;
@@ -7520,6 +7531,8 @@ Object.assign(globalThis, {
     else view.lookAt(provinces[f.at]!.x!, provinces[f.at]!.y!, zoom);
     return true;
   },
+  /** The tap boxes of the fleets drawn now, on screen (scripts/fleet-path-shots.mjs). */
+  __phFleetBoxes: () => fleetHitBoxes.map((b) => ({ ...b })),
   /** Centres the map on the first battle, if any. */
   __phLookAtBattle: (zoom = 8) => {
     const b = snapshot?.battles[0];

@@ -346,9 +346,10 @@ export function planTilePath(m: TileMarch, from: number, to: number, allowed: Ui
  * Shortest sail over water tiles from one tile to another (A* on distance,
  * eight ways round), only through tiles of the sea zones marked in `zones`;
  * null when there is none. Fleets sail a zone at a time, so the search spans
- * two zones (feedback 122).
+ * two zones (feedback 122). With `landCost`, it may cross land at that many
+ * times the cost of water: a strait too narrow for the map's tiles.
  */
-export function planSeaPath(grid: TileGrid, rowWidth: Float32Array, from: number, to: number, zones: Uint8Array): Int32Array | null {
+export function planSeaPath(grid: TileGrid, rowWidth: Float32Array, from: number, to: number, zones: Uint8Array, landCost = 0): Int32Array | null {
   const W = grid.width;
   if (from === to || grid.cell[to] !== WATER) return null;
   let x0 = W;
@@ -400,10 +401,12 @@ export function planSeaPath(grid: TileGrid, rowWidth: Float32Array, from: number
         if (nx < x0 || nx > x1) continue;
         const n = ny * W + nx;
         const ln = (ny - y0) * bw + nx - x0;
-        if (s.closed[ln] || grid.cell[n] !== WATER) continue;
+        if (s.closed[ln]) continue;
+        const wet = grid.cell[n] === WATER;
+        if (!wet && !landCost) continue;
         const z = grid.province[n]! - 1;
-        if (n !== to && (z < 0 || !zones[z])) continue;
-        const c = base + (dx === 0 ? 1 : dy === 0 ? rowWidth[ny]! : Math.hypot(1, rowWidth[ny]!));
+        if (wet && n !== to && (z < 0 || !zones[z])) continue;
+        const c = base + (dx === 0 ? 1 : dy === 0 ? rowWidth[ny]! : Math.hypot(1, rowWidth[ny]!)) * (wet ? 1 : landCost);
         if (c >= s.g[ln]!) continue;
         s.g[ln] = c;
         s.prev[ln] = t;
