@@ -42,7 +42,7 @@ import { fitDraft, offerLine, peaceTable, startDraft, stepGold, togglePick, type
 import { fallenLine, rulerLines } from "./ui/ruler.ts";
 import { loadDefaultRuleset } from "@ph/rules";
 import { hexToRgb, PALETTE, TERRAINS } from "./art/palette.ts";
-import { sprite, spriteUrl } from "./art/sprites.ts";
+import { figureSprite, sprite, spriteUrl } from "./art/sprites.ts";
 import { icon, iconUrl, installUiArt, flagCanvas, flagUrl, UI_COLORS, type FlagOf } from "./art/ui.ts";
 import { apparentAge, eraOfYear } from "./art/commanders.ts";
 import { lookOfCulture, setPortraitYear } from "./art/portraits.ts";
@@ -1968,18 +1968,14 @@ function drawTraders(o: OverlayContext, onScreen: (x: number, y: number, pad?: n
       const [px, py] = o.toScreen(m.x, m.y);
       const sx = px - m.uy * 5 * u, sy = py + m.ux * 5 * u;
       if (!onScreen(sx, sy)) continue;
-      const img = sprite(m.sprite, color, u);
-      const x = Math.round(sx - img.width / 2);
-      const y = Math.round(sy - img.height + 2 * u);
-      if (m.right) {
-        ctx.save();
-        ctx.translate(x + img.width, y);
-        ctx.scale(-1, 1);
-        ctx.drawImage(img, 0, 0);
-        ctx.restore();
-      } else ctx.drawImage(img, x, y);
-      const box = tapBox(img.width, img.height, 1);
-      traderHitBoxes.push({ mine: path.mine, x: x + img.width / 2 - box.w / 2, y: y + img.height / 2 - box.h / 2, w: box.w, h: box.h });
+      // Caravans and barges are drawn walking left, the ship sailing right.
+      const east = m.sprite === "cog" ? m.right : !m.right;
+      const { img, w, h } = figureSprite(m.sprite, color, u, east ? 1 : -1);
+      const x = Math.round(sx - w / 2);
+      const y = Math.round(sy - h + u);
+      ctx.drawImage(img, x, y, w, h);
+      const box = tapBox(w, h, 1);
+      traderHitBoxes.push({ mine: path.mine, x: x + w / 2 - box.w / 2, y: y + h / 2 - box.h / 2, w: box.w, h: box.h });
     }
   }
   ctx.restore();
@@ -2138,22 +2134,16 @@ function drawHulls(o: OverlayContext, f: FleetView, liv: LivingView, now: number
   ctx.save();
   ctx.globalAlpha = liv.living;
   for (const p of spots.sort((a, b) => a.y - b.y)) {
-    const img = sprite(frame ? "hull1" : "hull0", color, u);
-    const x = Math.round(p.x - img.width / 2);
-    const y = Math.round(p.y - img.height + 3 * u);
+    const { img, w, h } = figureSprite(frame ? "hull1" : "hull0", color, u, p.dir);
+    const x = Math.round(p.x - w / 2);
+    const y = Math.round(p.y - h + 3 * u);
     // A wake astern while it sails, broken on alternate frames.
     if (underway) {
       ctx.fillStyle = PALETTE.paper;
-      const stern = p.dir > 0 ? x - u : x + img.width;
-      for (let i = 0; i < 3; i++) ctx.fillRect(stern - p.dir * (i * 2 + frame) * u, y + img.height - 2 * u + (i % 2) * u, u, u);
+      const stern = p.dir > 0 ? x - u : x + w;
+      for (let i = 0; i < 3; i++) ctx.fillRect(stern - p.dir * (i * 2 + frame) * u, y + h - 2 * u + (i % 2) * u, u, u);
     }
-    if (p.dir < 0) {
-      ctx.save();
-      ctx.translate(x + img.width, y);
-      ctx.scale(-1, 1);
-      ctx.drawImage(img, 0, 0);
-      ctx.restore();
-    } else ctx.drawImage(img, x, y);
+    ctx.drawImage(img, x, y, w, h);
     // Powder smoke drifting off the guns in a battle.
     if (f.battle) {
       ctx.fillStyle = PALETTE.mist;
@@ -7007,6 +6997,15 @@ Object.assign(globalThis, {
     selected.clear();
     selected.add(snapshot.armies.id[k]!);
     view.lookAt(...armyPosition(k), zoom);
+  },
+  /** Centres the map on the player's first fleet, at a zoom; false when it has none. */
+  __phLookAtFleet: (zoom = 20) => {
+    const f = snapshot?.navy.fleets.find((g) => g.owner === snapshot!.playerNation);
+    if (!f) return false;
+    // In port its hulls lie at the town's berths.
+    if (isWater[f.at]) view.lookAt(...fleetPosition(f), zoom);
+    else view.lookAt(provinces[f.at]!.x!, provinces[f.at]!.y!, zoom);
+    return true;
   },
   /** Centres the map on the first battle, if any. */
   __phLookAtBattle: (zoom = 8) => {
