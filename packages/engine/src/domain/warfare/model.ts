@@ -17,7 +17,7 @@ export type Era = Exclude<ResearchEra, "VIII">;
 /** Eras I to VII in scope (era VIII is out of scope for the campaign). */
 export const ERAS: readonly Era[] = ["I", "II", "III", "IV", "V", "VI", "VII"];
 export const eraIndex = (e: Era): number => ERAS.indexOf(e);
-/** The research era of a year (eras I 1444 … VII 1914). */
+/** The research era of a year (eras I from the start, 1378 at the earliest, … VII 1914). */
 export const eraOfYear = (year: number): Era => {
   const e = researchEraOf({ year });
   return e === "VIII" ? "VII" : e;

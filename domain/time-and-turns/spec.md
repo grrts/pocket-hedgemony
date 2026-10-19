@@ -242,7 +242,7 @@ Newest decision first.
 
 - TIME-063 (Ubiquitous): Ages shall start and end by their own conditions inside their window, and shall be forced to start or end by their forced dates so a stalled game still advances. [event-tree README "Ages and periods"]
 - TIME-064 (Ubiquitous): Ages may overlap, and a period may belong to several ages. [ages_and_periods.md]
-- TIME-065 (Ubiquitous): Research and warfare eras shall follow the calendar in the dated bands I 1444–1500, II 1500–1600, III 1600–1700, IV 1700–1800, V 1800–1870, VI 1870–1914, VII 1914 to the end date. [research-tree; gap-lists items 22–23; X-14]
+- TIME-065 (Ubiquitous): Research and warfare eras shall follow the calendar in the dated bands I from the start to 1500 (1378–1500; a campaign that starts in 1444 begins inside it), II 1500–1600, III 1600–1700, IV 1700–1800, V 1800–1870, VI 1870–1914, VII 1914 to the end date. [research-tree; gap-lists items 22–23; X-14; research D-RSCH-23]
 
 ### 5.11 Decided rules
 
@@ -521,7 +521,7 @@ the turn in which a new month, season or year begins (X-18). What each system do
 | TIME-062 | cadences.feature | The 12-month autosave falls each January |
 | TIME-063 | ages-and-eras.feature | An age is forced to start or end by its forced date |
 | TIME-064 | ages-and-eras.feature | Ages overlap |
-| TIME-065 | ages-and-eras.feature | Eras are dated bands ending at the campaign end |
+| TIME-065 | ages-and-eras.feature | Eras are dated bands ending at the campaign end (Era I from 1378) |
 | TIME-066 | battles-in-turn.feature | Any battle can be replayed from its notice |
 | TIME-067 | end-turn.feature | The player's orders come first, then each AI realm's by nation index |
 | TIME-068 | day-loop.feature | On the same day armies move before fleets |

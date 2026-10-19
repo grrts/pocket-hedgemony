@@ -52,8 +52,8 @@ Each invention costs scholar-years by its era:
 | Era | Years | Cost in scholar-years |
 |---|---|---|
 | Ancient | before 600 | 10 |
-| Medieval | 600 to 1443 | 15 |
-| I | 1444 to 1500 | 20 |
+| Medieval | 600 to 1377 | 15 |
+| I | the start (1378) to 1500 | 20 (more in a campaign that starts before 1444, see below) |
 | II | 1500 to 1600 | 40 |
 | III | 1600 to 1700 | 80 |
 | IV | 1700 to 1800 | 150 |
@@ -83,7 +83,7 @@ There is **one tree**, from the root **Settled life**, which everyone knows. It 
 - **R3 Counting and records**
 - **R4 Boats**
 
-The tree reaches back before 1444 with two **past eras**, **Ancient** (before 600) and **Medieval** (600 to 1443), and then runs through Eras I to VII. Inventions grow era by era, and many need an invention from another branch. The letter in an invention's id only says what it is about (F food, C crafts and industry, T trade, S sea, W war, B building, G government, L learning); it is not a separate tree. Each invention is one config row (`id`, `parent`, `also_needs`, `era`, `unlocks`, `start_regions`), so new inventions such as Andean terrace farming, Ethiopian church schools or Javanese irrigation can be hung anywhere on the tree without code.
+The tree reaches back before the start with two **past eras**, **Ancient** (before 600) and **Medieval** (600 to 1377), and then runs through Eras I to VII. Era I runs from the start to 1500: a campaign from 1444 plays its last 56 years, and a campaign from 1378 all 122 of them, so there an Era I invention costs about 2.2 times as much and a realm still reaches Era II around 1500 (the number is a first guess for balancing). Inventions grow era by era, and many need an invention from another branch. The letter in an invention's id only says what it is about (F food, C crafts and industry, T trade, S sea, W war, B building, G government, L learning); it is not a separate tree. Each invention is one config row (`id`, `parent`, `also_needs`, `era`, `unlocks`, `start_regions`), so new inventions such as Andean terrace farming, Ethiopian church schools or Javanese irrigation can be hung anywhere on the tree without code.
 
 The tree holds **187 inventions**: 13 past inventions and 174 from 1444 on. Twenty of them keep ids the event tree uses (marked "event id" below) so events keep working; the event tree's technology and innovation stats read them from the tree. Where another system gives an invention's effect in numbers ([Warfare](Warfare), [Trade](Trade), [Exploration and Colonies](Exploration-and-Colonies)), that system owns the numbers. Nuclear physics and Rocketry are never studied, and the other Era VII inventions stay in play until August 1939 with what they did by then.
 
@@ -109,7 +109,7 @@ These 13 are what a country of 1444 may or may not already know. Most countries 
 
 #### Without it
 
-Four past inventions hold a country below the 1444 baseline while it lacks them. Countries that know them play exactly as before; only the laggards change. All four numbers are placeholders for balancing.
+Four past inventions hold a country below the baseline at the start while it lacks them. Countries that know them play exactly as before; only the laggards change. All four numbers are placeholders for balancing.
 
 - **Without F01 Ox plough**, your farmland harvests one step worse.
 - **Without F03 Riding and pack animals**, you raise no horse regiments (light cavalry, horse archers, knights and lancers, camel riders) and send no camel caravans. For a country of the Americas, F03 can't even be studied until first contact with a country from across the ocean; in the game that happens when such a country comes to own land bordering yours.
@@ -341,6 +341,8 @@ A start set is always **complete**: every invention in it has its parent (or one
 So in 1444 the Latin, Orthodox, Islamic, South Asian and East Asian countries stand in Era I with 23 to 38 inventions, maritime Southeast Asia in Era I with 21, and mainland Southeast Asia is split between Medieval and Era I. The khanates, hordes, Tibet, Ethiopia, the Swahili coast and the Sahel stand in Ancient with 7 to 15. Forest Africa stands in Ancient with 3 or 4 (iron but no horses), and Mesoamerica, the Andes and North America in Ancient with 2 to 10, without iron or horses. No African country south of the Sahara starts with B1 *Stone castles*: they defend with B4 earthworks until they learn dressed stone.
 
 **Standing.** Your standing is the latest era, from Ancient on, of which you know at least a quarter of the inventions, and a quarter of every earlier era's too. Ancient is the floor: no country stands lower. If your standing is earlier than the era of today's date, you are **behind the times** by the eras in between: a country standing in Ancient in 1444 is behind the times by 2 eras. Standing changes nothing by itself; it tells you, and the AI, how far behind a country is.
+
+**A campaign from 1378.** The game still starts in 1444. When a campaign can start on 20 September 1378, the same groups apply with a few changes for that year: the Ottomans don't yet know bombards, gunpowder infantry or tax registers; Bohemia and Hungary have no wagon fort; Portugal and Castile have no carrack and caravel (Genoa and Venice do); Ming has no tax registers yet (the Yellow Registers come by event in 1381); Timur's realm stands with the settled khanates and has no observatory, while the Jalayirids keep the Maragha tradition. The realms of 1378 that the 1444 map lacks, such as the Jalayirids, the Anatolian beyliks, the White Horde or the Tepanecs, start in the group of their neighbours.
 
 See [The 1444 Start](The-1444-Start).
 
