@@ -329,3 +329,15 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 | `ai_max_traders_per_start` | 2 |
 | `ai_found_reserve` | 3 |
 | `ai_keep_route_over_upkeep` | 4 |
+| `feed_max` | 256 |
+
+### Suggest
+
+> Better routes offered on a trader's card (trade rework, 19 October): at most count, each worth at least min\_gain\_share more than the route now and min\_gain gold a month more; while a route is chosen, up to draft\_options cities it could go to carry their estimate on the map.
+
+| Key | Value |
+|---|---|
+| `count` | 3 |
+| `min_gain_share` | 0.2 |
+| `min_gain` | 0.2 |
+| `draft_options` | 12 |

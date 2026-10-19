@@ -435,6 +435,17 @@ The Economy pages were the longest in the book: Food 8.9 phone screens, with a p
 
   How the player uses it: on a phone held sideways the Food page is now under two screens: the counts, the four presets and two folds. Tapping Customise shows each setting with its one-line explanation; picking a choice keeps the fold open. A fold's line ("40 % · Even · 3 mo · Below 1 month · Keep") tells the player what is set without opening it. Each fold's summary is a 44-point tap target, and nothing needs hover.
 
+### Interface animations (Leroy, 19 October 2026)
+Leroy found the game's animations underwhelming; the particles and animations design (`/mnt/project-files/visuals/particles-and-animations-design.md`, section 5) gives the buttons and plaques small pixel animations. Each is a stepped animation so it stays pixel-crisp, and none plays with Animations Off (SET) or when the system asks for reduced motion; the button press is not an animation and always shows.
+
+- SHELL-173: While the player holds a button, the game shell shall draw it pressed down one pixel of its art; a top-bar plaque keeps its paper face. [particles-and-animations-design 5]
+- SHELL-174: When the player's gold changes between two draws of the top bar, the gold plaque shall count from the value it shows to the new one in 6 steps over about 0.3 seconds, the number tinted green when gold rose and red when it fell, and a small coin with the same colour shall pop up from the plaque and fade out in steps; a further change during the count counts on from the value shown. [particles-and-animations-design 5]
+- SHELL-175: When the date changes, the date plaque shall drop the new day into place in 2 steps. [particles-and-animations-design 5]
+- SHELL-176: When an event card or the revolution card first shows, it shall unroll from the top in 4 steps like a scroll; a card that is redrawn while open does not unroll again. [particles-and-animations-design 5]
+- SHELL-177: When the number of unread dispatches goes up, the dispatches plaque shall bounce once. [particles-and-animations-design 5]
+
+  How the player uses it: there is nothing to tap or find. The animations play on the buttons and plaques the player already uses, where they are already looking as the week plays out: the gold plaque counts and shows a coin as money comes in or goes out, the date drops each day, the dispatches plaque bounces as news comes in, and an event unrolls over the map. Each belongs to the thing whose number changed, so there is no new screen; the plaques and the News stay the record. They are drawn in the plaques' own pixels inside the top bar, under the safe areas, in the Wide and Tall layouts alike; the button press works on touch and nothing needs hover. **Settings → Animations** Off, or the system's reduced motion, stops them all.
+
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
@@ -849,5 +860,6 @@ Decided on 17 October 2026 under `domain/DECISIONS.md`. No question stays open.
 | SHELL-170 | realm-book.feature | The overview has a tile per section |
 | SHELL-171 | realm-book.feature | A tile names what waits and opens it |
 | SHELL-172 | — | Presentation only: the client's folds (`apps/client/src/ui/fold.ts`), checked on screenshots |
+| SHELL-173–177 | — | Presentation only: the client's stepped CSS animations (`apps/client/src/style.css`, `renderHud` in `apps/client/src/main.ts`), checked on screenshots |
 | SHELL-164 | campaign-end.feature | The end card when the end date comes; The end card at game over; The end card after world domination |
 | SHELL-144–146 | layout-by-shape.feature | Each subject has one home; Important things have an overview; Every screen fits a phone in landscape |

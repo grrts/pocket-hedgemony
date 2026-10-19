@@ -38,7 +38,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
     console.log(name, "tap box", Math.round(box.w), Math.round(box.h));
     await page.mouse.click(box.x + box.w / 2, box.y + box.h / 2);
     await page.waitForTimeout(400);
-    console.log(name, "trade tab open", await page.evaluate(() => !!document.querySelector("#panel:not([hidden]) .traders")));
+    console.log(name, "trader card open", await page.evaluate(() => !!document.querySelector("#panel:not([hidden]) .trader-card")));
     await shot("tapped");
   } else console.log(name, "no French mover on screen to tap");
   await page.evaluate(() => document.querySelector("#panel .close")?.click());
