@@ -1,7 +1,7 @@
 import type { GameDate, Ground, Ruleset } from "@ph/rules";
 import type { WokenRealm } from "./sleeping.ts";
 import { groundOf, rowWidths, wagonRations, type MarchMap, type TileMarch } from "./march.ts";
-import { placeClimate, provinceTemperature, type PlaceClimate } from "./climate.ts";
+import { landTemperatures, placeClimate, type PlaceClimate } from "./climate.ts";
 import { pointTileGrid, type TileGrid } from "./tiles.ts";
 import { Rng } from "./rng.ts";
 import type { Diplomacy } from "./domain/diplomacy/index.ts";
@@ -641,7 +641,7 @@ export function marchMap(world: World): MarchMap {
 
 /** Each province's sea-level temperature for today (the snow on its tiles slows marches). */
 export function updateWeather(world: World): void {
-  for (let p = 0; p < world.provinceCount; p++) if (!world.provinceWater[p]) world.provinceTemperature[p] = provinceTemperature(world.provincePlace[p]!, world.date);
+  landTemperatures(world.provincePlace, world.provinceWater, world.date, world.provinceTemperature);
 }
 
 /** The world's tiles as a march over them sees them today. */

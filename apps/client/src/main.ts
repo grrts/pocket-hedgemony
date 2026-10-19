@@ -4372,7 +4372,8 @@ const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "Ju
  */
 function harvestText(pi: number): string {
   const s = snapshot!;
-  const months = s.provinceHarvestMonths[pi]!;
+  const bits = s.provinceHarvestMonths[pi]!;
+  const months = MONTH_NAMES.map((_, m) => m + 1).filter((m) => bits & (1 << (m - 1)));
   if (!months.length) return "none · the tundra grows no crops";
   const h = s.provinceHarvest[pi]!;
   const w = s.provinceWeather[pi]!;
