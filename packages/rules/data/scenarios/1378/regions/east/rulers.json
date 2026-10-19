@@ -492,6 +492,11 @@
    "title": "Emir",
    "name": "Hasan",
    "since": null
+  },
+  "mamluks": {
+   "title": "Sultan",
+   "name": "al-Mansur Ali II",
+   "since": 1377
   }
  }
 }

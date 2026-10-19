@@ -165,5 +165,6 @@
   {"nation": "great_horde", "countries": ["RUS"], "admin1": ["Crimea", "Sevastopol", "Volgograd", "Saratov", "Kalmyk", "Rostov", "Krasnodar", "Adygey", "Stavropol'", "Voronezh", "Belgorod", "Lipetsk", "Tambov", "Penza", "Mordovia"]},
   {"nation": null, "countries": ["RUS"]},
   {"nation": "great_horde", "countries": ["UKR"], "admin1": ["Kherson", "Zaporizhzhya", "Donets'k", "Luhans'k", "Mykolayiv", "Dnipropetrovs'k", "Kharkiv"]},
-  {"nation": "great_horde", "countries": ["UKR"]}
+  {"nation": "great_horde", "countries": ["UKR"]},
+  {"nation": "mamluks", "countries": ["EGY", "ISR", "PSX", "LBN", "JOR", "SYR"]}
 ]

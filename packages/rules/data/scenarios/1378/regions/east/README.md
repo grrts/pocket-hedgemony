@@ -109,6 +109,7 @@ bohemia (Duchy of Oświęcim, a bbox in Lesser Poland).
 - North Caucasus (Dagestan, Chechnya, Ingush, North Ossetia, Kabardin-Balkar, Karachay-Cherkess) falls to my RUS catch-all, `null`. If part A wants alania_ossetia or kazikumukh land there, its rules must come before mine.
 - My UKR and RUS catch-alls (great_horde for UKR, null for RUS) assume part B's rules come first. Without them, Lviv, Kiev and the other western admin1s would show as great_horde, and Moscow and Novgorod as null.
 - In subjects and relations I used map-nation ids (`timurids`, `mamluks`), not the catalogue's `timurid_empire` and `mamluk`.
+- `mamluks` (the Mamluk Sultanate) is an east map nation, because east's Cilicia rules, relations and subjects name it and no region covers `as_levant_egypt_arabia`. It holds Egypt and the Levant (EGY, ISR, PSX, LBN, JOR, SYR) as in 1444, with its 1444 tongues. Ruler: the child sultan al-Mansur Ali II (from 1377), with the amirs Barquq and Baraka holding power, as in `checkpoints/1378.json`; his age is left out (birth year uncertain). The Hejaz stays with the Sharifs of Mecca, a Mamluk vassal in the checkpoint; it and Barqa wait for whichever thread builds Arabia and Libya.
 
 ### Calls where east.md was unsure (confidence)
 - Sighnaq on the start day: Tokhtamysh (`white_horde`), medium-low. Timur-Malik is not modelled. His claim could be added as an internal pretender.
