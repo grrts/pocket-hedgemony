@@ -13,12 +13,14 @@ security:
             # Ensure dev tools and static assets are always allowed
             pattern: ^/(_profiler|_wdt|assets|build)/
             security: false
-        # The game's JSON API: no sessions, as before the website had a sign-in.
+        # The game's JSON API: no sessions; the game sends its access token as a Bearer token.
         api:
             pattern: ^/api/
             stateless: true
             lazy: true
             provider: accounts
+            custom_authenticators: [App\Security\ApiTokenAuthenticator]
+            entry_point: App\Security\ApiTokenAuthenticator
         # The website: players sign in with their game account (email and password)
         # on /community/signin, and stay signed in with a session.
         main:

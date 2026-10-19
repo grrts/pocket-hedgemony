@@ -79,11 +79,15 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 
 ### Ambitions
 
-> `comment\_envoy`: D-HER-11: a resident envoy (diplomacy) kept this many years at a foreign court learns the hint and warmth of one of that country's active ambitions, never its plain goal.
+> `comment\_envoy`: D-HER-11, X-27: a resident envoy (diplomacy) kept this many years at a foreign court learns the goal and progress of one of that country's open ambitions, never its reward.
 >
 > `comment\_legacies`: A sixth legacy asks the player which one to let go.
 >
-> `comment\_pool`: D-HER-10: a pool holds pool\_min\_\* to pool\_max entries; age ambitions join on top and do not count.
+> `comment\_reward`: X-27: an open ambition shows its goal and progress; its reward shows only the legacy's name until the ambition is fulfilled.
+>
+> `comment\_within\_reach`: X-27: an ambition is within reach once this share of its goal is met (replaces the warmth bands of D-HER-13).
+>
+> `comment\_pool`: D-HER-10: the heritage build gives each country pool\_min\_\* to pool\_max entries; age ambitions, the ambitions file's own and the common ones join on top and do not count (X-27).
 
 | Key | Value |
 |---|---|
@@ -95,12 +99,13 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 | `age_ambitions_join_pool_when_age_starts` | yes |
 | `envoy_reveal_years` | 2 |
 | `max_legacies` | 5 |
-| `never_revealed` | yes |
+| `reward_hidden_until_done` | yes |
+| `within_reach` | 0.666667 |
 | `pool_max` (provisional) | 7 |
 
 #### Counsel
 
-> Have the court read one ambition: it stirs at once and shows its warmth. Its words stay a hint; ambitions are never fully revealed while open.
+> X-27: ask the court for a new aim: one open ambition goes back to the pool and another is drawn at once.
 
 | Key | Value |
 |---|---|
@@ -109,22 +114,12 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 
 #### History mode setting
 
-> drawn: 3 drawn from the pool with one historical guaranteed. historical\_only: only ambitions tagged historical. No setting reveals ambitions.
+> drawn: 3 drawn from the pool with one historical guaranteed. historical\_only: only ambitions tagged historical. No setting reveals rewards.
 
 | Key | Value |
 |---|---|
 | `values` | drawn, historical\_only |
 | `default` | drawn |
-
-#### Warmth bands
-
-> D-HER-13: cold under a third, warm under two thirds, hot from two thirds.
-
-| Key | Value |
-|---|---|
-| `cold` | 0 |
-| `warm` | 0.333333 |
-| `hot` | 0.666667 |
 
 ### Burden
 

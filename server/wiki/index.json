@@ -1886,11 +1886,6 @@
      "level": 4
     },
     {
-     "id": "warmth-bands",
-     "text": "Warmth bands",
-     "level": 4
-    },
-    {
      "id": "burden",
      "text": "Burden",
      "level": 3
@@ -2376,6 +2371,11 @@
      "id": "food",
      "text": "Food",
      "level": 2
+    },
+    {
+     "id": "balance",
+     "text": "Balance",
+     "level": 3
     },
     {
      "id": "harvest",

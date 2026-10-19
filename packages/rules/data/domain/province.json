@@ -126,6 +126,7 @@
   },
   "almshouse": { "shelters": 3000 },
   "food": {
+    "balance": { "$comment": "D-PROV-36: a normal year's food against what the people eat. Under short the province grows less than it eats and the card and the Food tab ask for a farm; under tight one poor harvest brings famine.", "short": 1.0, "tight": 1.05 },
     "bare_per_worker": 0.67,
     "harvest": { "bumper": 1.3, "good": 1.15, "normal": 1.0, "poor": 0.7, "failed": 0.3 },
     "harvest_order": ["failed", "poor", "normal", "good", "bumper"],
@@ -154,7 +155,7 @@
     "food": ["farmers", "herders", "woodsmen", "seafolk"],
     "no_overflow": ["scholars"]
   },
-  "births": { "farmers": 0.04, "herders": 0.04, "woodsmen": 0.04, "seafolk": 0.04, "miners": 0.035, "craftsmen": 0.03, "market folk": 0.03, "clerks": 0.03, "clergy_celibate": 0.005, "scholars": 0.01, "homeless": 0.04 },
+  "births": { "farmers": 0.036, "herders": 0.036, "woodsmen": 0.036, "seafolk": 0.036, "miners": 0.035, "craftsmen": 0.03, "market folk": 0.03, "clerks": 0.03, "clergy_celibate": 0.005, "scholars": 0.01, "homeless": 0.04 },
   "deaths": { "farmers": 0.03, "herders": 0.03, "woodsmen": 0.03, "seafolk": 0.03, "miners": 0.04, "craftsmen": 0.035, "market folk": 0.035, "clerks": 0.035, "clergy": 0.03, "scholars": 0.03, "homeless": 0.05 },
   "death_modifiers": {
     "plague": { "rumour": 0.05, "outbreak": 0.15, "worst": 0.30 },
@@ -356,7 +357,7 @@
       "Schools, Students, Scholars": "school buildings, students here and scholars here",
       "Officials": "your officials in royal provinces and seats"
     },
-    "birth_points": { "food over 6 months": 0.5, "10 years of peace": 0.5, "food under 3 months": -1, "Hungry": -2, "war": -1, "plague": -1 },
+    "birth_points": { "10 years of peace": 0.5, "war": -1, "plague": -1 },
     "tax_travel_loss_per_day": 0.05,
     "tax_collector_bonus": 0.2,
     "town_size_floors": { "hamlet": 0, "village": 1000, "market town": 3000, "town": 8000, "city": 20000, "great city": 40000 },
