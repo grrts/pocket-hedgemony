@@ -218,6 +218,18 @@
   ]
  },
  {
+  "nation": "ajuran",
+  "countries": [
+   "SOM"
+  ],
+  "bbox": [
+   41,
+   -1.7,
+   48,
+   6
+  ]
+ },
+ {
   "nation": "kilwa",
   "countries": [
    "TZA",

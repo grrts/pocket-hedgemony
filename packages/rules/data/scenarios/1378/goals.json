@@ -13239,6 +13239,10 @@
      }
     ]
    },
+   "alternative": {
+    "kind": "ally",
+    "target": "maya_mani_xiu"
+   },
    "toward": [
     "fall_of_mayapan"
    ]
@@ -13254,7 +13258,10 @@
    ],
    "weight": "normal",
    "deviation": "Rule by marriage ties",
-   "aim": null
+   "aim": {
+    "kind": "subject",
+    "target": "maya_mani_xiu"
+   }
   },
   {
    "realm": "maya",
@@ -13268,6 +13275,25 @@
    "weight": "normal",
    "deviation": "",
    "aim": null
+  },
+  {
+   "realm": "maya_mani_xiu",
+   "goal": "Overthrow the Cocom",
+   "reason": "They resent Cocom tyranny and the mercenaries",
+   "ends_when": "Mayapan is destroyed",
+   "window": [
+    1378,
+    1441
+   ],
+   "weight": "strong",
+   "deviation": "",
+   "aim": {
+    "kind": "fight",
+    "target": "maya"
+   },
+   "toward": [
+    "fall_of_mayapan"
+   ]
   },
   {
    "realm": "inca",
@@ -14560,12 +14586,6 @@
   },
   {
    "region": "africa-americas",
-   "realm": "maya_mani_xiu",
-   "goal": "Overthrow the Cocom",
-   "why": "not a 1378 realm"
-  },
-  {
-   "region": "africa-americas",
    "realm": "kiche",
    "goal": "Build a capital and centralise the lineages",
    "why": "not a 1378 realm"
@@ -15075,18 +15095,6 @@
    "realm": "zapotec",
    "goal": "Lead the Valley of Oaxaca",
    "alternative": "ally mixteca_alta"
-  },
-  {
-   "region": "africa-americas",
-   "realm": "maya",
-   "goal": "Keep Cocom rule over the league",
-   "alternative": "ally maya_mani_xiu"
-  },
-  {
-   "region": "africa-americas",
-   "realm": "maya",
-   "goal": "Hold the lords with foreign mercenaries",
-   "aim": "subject maya_mani_xiu"
   },
   {
    "region": "africa-americas",

@@ -27,6 +27,8 @@ const BUILT = new Set([
   "audio.music_volume",
   "audio.effects_volume",
   "audio.interface_sounds",
+  "audio.ambience",
+  "audio.ambience_volume",
   "accessibility.text_size",
 ]);
 

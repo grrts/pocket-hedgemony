@@ -133,6 +133,7 @@ main.wrap {
 
 .bar-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 12px;
   min-height: 56px;
@@ -164,12 +165,24 @@ main.wrap {
 .bar-nav a:not(.btn) {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  min-width: 44px;
   min-height: 44px;
   padding: 0 10px;
   font-size: 24px;
   color: var(--paper-light);
   text-decoration: none;
   text-shadow: 2px 2px 0 var(--outline);
+}
+
+/* The signed-in player's name (the community's sign-in). */
+.bar-nav a.bar-you:not(.btn) {
+  display: block;
+  max-width: 10em;
+  line-height: 44px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .bar-nav a:not(.btn):hover,
@@ -631,6 +644,8 @@ textarea {
 .foot a {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  min-width: 44px;
   min-height: 44px;
   color: var(--paper);
 }

@@ -1,0 +1,49 @@
+{% extends 'site/layout.html.twig' %}
+
+{% block title %}Privacy · Pocket Hegemony{% endblock %}
+{% block description %}What Pocket Hegemony stores about you, and why: the game, the optional account, usage statistics and this website.{% endblock %}
+
+{% block content %}
+<article class="framed sheet">
+<div class="prose">
+    <h1>Privacy</h1>
+    <p>This page says what Pocket Hegemony stores about you and why. We keep as little as we can, we never sell it, and we don't use it for advertising.</p>
+
+    <h2 id="game">The game</h2>
+    <p>You can play without an account, and the game plays offline. Your campaigns, settings and achievements are kept on your own device, and our server does not store them. Steam Cloud or your phone's own backup may copy them, under those services' terms.</p>
+
+    <h2 id="account">If you make an account</h2>
+    <p>An account is optional. When you make one, our server stores:</p>
+    <ul>
+        <li>your email address, to sign you in;</li>
+        <li>the display name you choose;</li>
+        <li>your password, only as a one-way hash, so nobody can read it, us included;</li>
+        <li>the date the account was made;</li>
+        <li>one yes-or-no flag for a purchase made with the account (stored as "ads removed").</li>
+    </ul>
+    <p>Purchases themselves go through the App Store, Google Play or Steam, under their own privacy policies. We don't see or store your payment details.</p>
+
+    <h2 id="statistics">Usage statistics</h2>
+    <p>The game can send us short records of what happens in play, such as a campaign starting or a turn ending, so we can see how the game is played and fix what goes wrong. Where the law asks for your consent, the game asks first and sends nothing until you agree, and you can turn it off in Settings. Each record holds:</p>
+    <ul>
+        <li>what happened (for example "campaign started") and when;</li>
+        <li>a few details about the event itself;</li>
+        <li>a random number your game made when it was installed, which says nothing about who you are;</li>
+        <li>which version of the game sent it: the web, desktop, iPhone or Android;</li>
+        <li>your account's number, only if you are signed in;</li>
+        <li>the time our server received it.</li>
+    </ul>
+    <p>The records never hold your email address or your name.</p>
+
+    <h2 id="website">This website</h2>
+    <p>This website sets no cookies and has no ads, trackers or analytics. Like any web server, the server that hosts it may keep short technical logs of requests (address, page and time) to keep the site running and safe.</p>
+
+    <h2 id="rights">Your data, your choice</h2>
+    <p>You can ask us to show you what we hold about you, to correct it, or to delete your account and everything linked to it.
+    {% if support_email %}Write to <a href="mailto:{{ support_email }}">{{ support_email }}</a>.{% else %}Use the contact details on the game's store page.{% endif %}</p>
+
+    <h2 id="changes">Changes</h2>
+    <p>If what we store changes, this page changes first. Last updated 19 October 2026.</p>
+</div>
+</article>
+{% endblock %}
