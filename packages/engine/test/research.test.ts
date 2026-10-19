@@ -42,7 +42,8 @@ describe("research", () => {
     // Ming knows printing (RSCH-076's extra list).
     expect(knows(w, w.nationIndex.get("ming")!, "L5")).toBe(true);
     // No realm starts unable to learn.
-    for (const prog of w.research) expect(prog.schools.filter((s) => s.open).length).toBeGreaterThan(0);
+    // A sleeping realm founds its school once it wakes (SETUP-083).
+    for (const prog of w.research.filter((_, n) => !w.nationAsleep[n])) expect(prog.schools.filter((s) => s.open).length).toBeGreaterThan(0);
   });
 
   it("moves the study a twelfth of the year's scholar-years each month", () => {

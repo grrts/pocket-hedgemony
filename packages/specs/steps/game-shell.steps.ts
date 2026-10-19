@@ -3575,7 +3575,9 @@ Given("a game as {string} begins with the end date {string}", (s, realm: string,
 
 Then("every realm's card shows its three scores with a rank in each", (s) => {
   const v = campaignView(playWorld(s));
+  // A sleeping realm has no card (SETUP-082).
   for (let n = 0; n < playWorld(s).nationCount; n++) for (let k = 0; k < 3; k++) {
+    if (playWorld(s).nationAsleep[n]) continue;
     expect(Number.isFinite(v.scores[n * 3 + k])).toBe(true);
     expect(v.ranks[n * 3 + k]).toBeGreaterThan(0);
   }
