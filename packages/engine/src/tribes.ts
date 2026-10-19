@@ -646,7 +646,7 @@ export function tribesView(world: World, n: number): TribesView {
 // ---------------------------------------------------------------- saves and the hash
 
 export interface SavedTribes {
-  grounds: [string, string, number][];
+  hunts: [string, string, number][];
   claims: [string, string, number][];
   barred: [string, string, number][];
   asks: [number, string, string, string, number, number][];
@@ -659,10 +659,10 @@ export function saveTribes(world: World): SavedTribes {
   const N = (n: number) => world.nationIds[n]!;
   const P = (p: number) => world.provinceIds[p]!;
   const T = world.tribes;
-  const grounds: SavedTribes["grounds"] = [];
-  for (let p = 0; p < world.provinceCount; p++) if (world.provinceHunt[p]! >= 0) grounds.push([P(p), N(world.provinceHunt[p]!), world.provinceHuntSince[p]!]);
+  const hunts: SavedTribes["hunts"] = [];
+  for (let p = 0; p < world.provinceCount; p++) if (world.provinceHunt[p]! >= 0) hunts.push([P(p), N(world.provinceHunt[p]!), world.provinceHuntSince[p]!]);
   return {
-    grounds,
+    hunts,
     claims: T.claims.map((c) => [N(c.realm), P(c.province), c.ends]),
     barred: T.barred.map((b) => [N(b.realm), P(b.province), b.until]),
     asks: T.asks.map((a) => [a.id, N(a.asker), N(a.tribe), P(a.province), a.gold, a.answerOn]),
@@ -678,7 +678,7 @@ export function restoreTribes(world: World, saved: SavedTribes | undefined): voi
   const N = (id: string) => world.nationIndex.get(id) ?? -1;
   const P = (id: string) => world.provinceIndex.get(id) ?? -1;
   world.provinceHunt.fill(-1);
-  for (const [p, n, since] of saved.grounds) if (P(p) >= 0 && N(n) >= 0) ((world.provinceHunt[P(p)] = N(n)), (world.provinceHuntSince[P(p)] = since));
+  for (const [p, n, since] of saved.hunts ?? []) if (P(p) >= 0 && N(n) >= 0) ((world.provinceHunt[P(p)] = N(n)), (world.provinceHuntSince[P(p)] = since));
   const ok = <T extends { realm?: number; province: number }>(x: T) => x.province >= 0 && (x.realm === undefined || x.realm >= 0);
   world.tribes = {
     claims: saved.claims.map(([n, p, ends]) => ({ realm: N(n), province: P(p), ends })).filter(ok),
