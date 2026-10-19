@@ -1365,8 +1365,8 @@ export interface SavedTrade {
 }
 
 /** By province: trade ratio, goods value a year, weight and trade stop as counted last January, and this month's traders passing and visits so far. */
-export function tradeProvinceArrays(world: World): Record<string, Float32Array | Uint8Array | Int32Array> {
-  return { tradeRatio: world.provinceTradeRatio, tradeGoods: world.provinceGoodsValue, tradeWeight: world.provinceWeight, tradeCity: world.provinceTradeCity, tradePassing: world.provincePassing, tradeVisits: Int32Array.from(world.provinceVisits), tradeVisitsLast: Uint8Array.from(world.provinceVisitsLast, (v) => Math.min(255, v)) };
+export function tradeProvinceArrays(world: World): Record<string, Float32Array | Uint8Array | Int16Array | Int32Array> {
+  return { tradeRatio: world.provinceTradeRatio, tradeGoods: world.provinceGoodsValue, tradeWeight: world.provinceWeight, tradeCity: world.provinceTradeCity, tradePassing: world.provincePassing, tradeVisits: Int16Array.from(world.provinceVisits, (v) => Math.min(32767, v)), tradeVisitsLast: Uint8Array.from(world.provinceVisitsLast, (v) => Math.min(255, v)) };
 }
 
 export function saveTrade(world: World): SavedTrade {
