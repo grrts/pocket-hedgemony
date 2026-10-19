@@ -1,7 +1,7 @@
 {
  "schema_version": "1.0",
  "reference_date": "1378-09-20",
- "description": "Historically supported relations between South, East and Southeast Asian entities on 20 September 1378, keyed by country-catalogue ids (new records by their research ids), from start-date/research/asia.md. A missing pair means nothing is recorded, not Neutral. Relations naming a realm outside these regions (hormuz, mamluk) are this region's half of a cross-region pair.",
+ "description": "Historically supported relations between South, East and Southeast Asian entities on 20 September 1378, keyed by country-catalogue ids (new records by their research ids), from start-date/research/asia.md. A missing pair means nothing is recorded, not Neutral. Relations naming a realm outside these regions (hormuz, mamluk) are this region's half of a cross-region pair. entities: 1378 realms that are neither map nations nor catalogue records yet.",
  "rules_file": "../config/relation-rules.json",
  "relations": [
   {
@@ -2125,6 +2125,16 @@
    "source_ids": [
     "src_research_asia_1378"
    ]
+  }
+ ],
+ "entities": [
+  {
+   "id": "hokuzan",
+   "name": "Hokuzan"
+  },
+  {
+   "id": "nanzan",
+   "name": "Nanzan"
   }
  ]
 }

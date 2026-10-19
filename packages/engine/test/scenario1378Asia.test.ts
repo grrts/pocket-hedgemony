@@ -56,6 +56,7 @@ describe("1378 scenario: Asia", () => {
     for (const r of sleeping.realms) {
       expect(ids.has(r.id), r.id).toBe(false);
       expect(r.home.length, r.id).toBeGreaterThan(0);
+      expect(r.capital, r.id).toHaveLength(2);
     }
     for (const id of ["malacca", "jaunpur", "gujarat", "malwa", "multan", "oirat"]) expect(sleeping.realms.map((r) => r.id)).toContain(id);
   });

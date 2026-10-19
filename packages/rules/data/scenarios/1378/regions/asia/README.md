@@ -15,7 +15,7 @@ and generates its `world/`. The game still starts in 1444 until the switch-over 
 | `relations.json` | `1444/relations.json` | 119 relations and 14 facts of the start day, keyed by catalogue ids |
 | `subjects.json` | `1444/subjects.json` | Subjects and stances derived from `relations.json` |
 | `subjects-rulers.json` | `1444/subjects-rulers.json` | The ruler of every catalogue record in these regions that exists on the start day, and of the 11 new records |
-| `sleeping-realms.json` | `1444/world/sleeping-realms.json` | Sleeping realms, with the capital as `capital_at` [lon, lat] and the home as owner-rule selectors, because province ids change when the 1378 world is generated |
+| `sleeping-realms.json` | `1444/world/sleeping-realms.json` | Sleeping realms, with the capital as [lon, lat] and the home as owner-rule selectors, because province ids change when the 1378 world is generated |
 
 ## What changes from 1444
 
