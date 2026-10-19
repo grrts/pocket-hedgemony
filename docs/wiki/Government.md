@@ -35,7 +35,7 @@ Both show as "x of y". Every lord counts exactly 1 toward the lords cap, however
 
 The buildings themselves (cost, slot, jobs) belong to [Buildings](Buildings).
 
-**France in 1444** is a feudal realm with a palace at step 2, 3 seats at step 1 and a court of law. Its officials cap is 22 (form 6, palace 10, three seats 6) and its lords cap 14 (form 8, palace 4, court of law 2). With 18 officials and 11 lords, the government card reads "Officials 18 of 22" and "Lords 11 of 14", within both caps. **The Ottomans**, a household realm with a palace at step 2, a chancery, 4 seats at step 1 and a hostage residence, have an officials cap of 32 and a lords cap of 11.
+**France in 1444**, measured on the 1444 checkpoint world, is a feudal realm with a palace at step 2, 3 seats at step 1 and a court of law. Its officials cap is 22 (form 6, palace 10, three seats 6) and its lords cap 14 (form 8, palace 4, court of law 2). With 18 officials and 11 lords, the government card reads "Officials 18 of 22" and "Lords 11 of 14", within both caps. **The Ottomans**, a household realm with a palace at step 2, a chancery, 4 seats at step 1 and a hostage residence, have an officials cap of 32 and a lords cap of 11.
 
 ### The 27 forms
 
@@ -156,7 +156,7 @@ A confederation, a military junta and a party state list the constitutional repu
 
 ### Hordes and technology
 
-A **horde** is a realm with the Horde form: the Great Horde, Crimea, Kazan, the Nogais, the Uzbeks, Moghulistan, the Oirats, the Mongols and the Qara Qoyunlu in 1444.
+A **horde** is a realm with the Horde form. At the 1378 start that is the Hordes of the steppe (Mamai's Horde, the White Horde of Tokhtamysh and Arab Shah's Horde), Moghulistan, the Northern Yuan and the Qara Qoyunlu. Crimea, Kazan, the Nogais, the Uzbeks and the Oirats are not born yet and form later as hordes (see [The 1378 start](The-1378-Start)).
 
 **How far behind.** A steppe horde starts level with anyone in the horse (riding, composite-bow horse archery, horse breeding) and one era level behind its settled neighbours (Muscovy, the Ottomans, the Timurids, Ming) in everything else: no stone castles, no steel or gunpowder, no knights or wagon forts, no feudal grants or royal chancery. It keeps writing, written law and temple schools, and the Islamic hordes keep madrasas.
 
@@ -168,9 +168,9 @@ A **horde** is a realm with the Horde form: the Great Horde, Crimea, Kazan, the 
 
 **Where you see it.** The Learning tab's overview says how many inventions your neighbours know that you don't, and each invention's sheet shows its "Behind the times" discount. A horde's Government tab says how long its riders stay strong and what settling changes. Another realm's card says how many inventions it is ahead of or behind you.
 
-All numbers here are provisional, set against balance targets: a horde's Technology score about half of Muscovy's in 1444; a horde that studies closes the gap by about 1550; field wins against an equal settled army 6 in 10 in Era I, 5 in 10 in Era II and at most 1 in 4 from Era III; and at least a third of a horde's gold from raids and tribute in Era I.
+All numbers here are provisional, set against balance targets: a horde's Technology score about half of Muscovy's at the start; a horde that studies closes the gap by about 1550; field wins against an equal settled army 6 in 10 in Era I, 5 in 10 in Era II and at most 1 in 4 from Era III; and at least a third of a horde's gold from raids and tribute in Era I.
 
-### The start in 1444
+### The start
 
 Each catalogue record gets its start form by the first rule that applies: a hand-set override (75 of them), then text rules on the catalogue's government form text in order (some only for certain entity types, some skipping them), then for kingdoms a rule by region (in Southeast Asia tier A and B kingdoms become tribute empires and tier C paramount chiefdoms; a kingdom in a region with no rule becomes a feudal realm), then the entity type table, then the default chiefdom. Nobody starts as an absolute monarchy, constitutional monarchy, constitutional republic, military junta, party state or company rule. Each country starts with the catalogue's historical houses as lords (none if it has only one province), and its caps come from its start form and its start buildings.
 
@@ -191,7 +191,7 @@ Each month any change that happens by itself is applied, the caps are recomputed
 Open your realm (tap its name in the top bar) and choose the **Government** tab, next to General:
 
 - **Your form** and its family.
-- **Officials x of y** and **Lords x of y**, each with a bar and its parts. Until cap buildings can be built, each cap has a part *Custom since 1444*: what your realm held above its form at the start, so nobody starts over a cap. Conquests, new officials and a reform to a smaller form can push you over; the cap turns red and says what follows. Tap a cap to open the Officials or Lords tab, where you can move or commission officials and grant or take back fiefs.
+- **Officials x of y** and **Lords x of y**, each with a bar and its parts. Until cap buildings can be built, each cap has a part *Custom since 1378*: what your realm held above its form at the start, so nobody starts over a cap. Conquests, new officials and a reform to a smaller form can push you over; the cap turns red and says what follows. Tap a cap to open the Officials or Lords tab, where you can move or commission officials and grant or take back fiefs.
 - **Laws of the realm**: succession, how far your colonies may reach, and how many subjects you can hold against your reach.
 - **Reform**: a card for each form you can become, with the change in officials and lords, each need ✓ or ✗, the gold (the design's gold × 0.2, so 100 is 20) and the lords who will slip. Tap Reform, then confirm. Forms that come only by revolution, event or a condition say so. Needs for buildings, traders, families and alliances can't be met yet; inventions and province, lord and subject counts can.
 
@@ -214,7 +214,7 @@ The Government page sits in your Realm book's Realm section, beside the Overview
 - [Warfare](Warfare): army coups and the shogun's capital.
 - [Trade](Trade): traders abroad and trade debt as reform needs.
 - [Diplomacy](Diplomacy): alliances with neighbours as a need.
-- [The-1444-Start](The-1444-Start): start forms and lords.
+- [The 1378 Start](The-1378-Start): start forms and lords.
 - [Map and Map Modes](Map-and-Lenses): the government card.
 
 ## Numbers

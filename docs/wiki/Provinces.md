@@ -10,7 +10,7 @@ The province is where your realm actually lives. Gold is taxed here, food grows 
 - **Every stat explains itself.** Tap any line on the province card and you get its gain and lose list, so you can always see why a number moved.
 - **One config file.** All rates and limits (jobs per building, food per worker, ground tables, slots per town size, toll effects, grievance thresholds) live in one province config file. Every number on this page is a placeholder until balanced.
 
-### Our running example: Troyes in 1444
+### Our running example: Troyes in 1444 (on the 1444 checkpoint world)
 
 Troyes is a royal province of France, 3 days from Paris, on farmland with 12 tiles: four farms, one burned field, two ranches, a lumber camp, a second woods tile with no building, a fishery, the castle and the town. It has 72,000 people, a tax collector of 6 years, and Duke Philip of Burgundy as a pretender. We will come back to it throughout this page.
 
@@ -385,7 +385,7 @@ The event tree speaks in abstract province stats, and each becomes a concrete ch
 
 ### Starting values
 
-At the start each province takes its tile count from its size on the map, its ground from terrain, its tile mix from ground, its shore tiles from coast and rivers, its people from population, and how many buildings start built (and its town size) from wealth. Wealth then stops being a live stat. The rest comes from the catalogue, the research tree, region tables and event anchors; see [The 1444 Start](The-1444-Start).
+At the start each province takes its tile count from its size on the map, its ground from terrain, its tile mix from ground, its shore tiles from coast and rivers, its people from population, and how many buildings start built (and its town size) from wealth. Wealth then stops being a live stat. The rest comes from the catalogue, the research tree, region tables and event anchors; see [The 1378 Start](The-1378-Start).
 
 ### What is stored and when it updates
 
@@ -405,13 +405,13 @@ Every province is laid out in **4 to 16 tiles** from the map: bigger provinces h
 
 **Food comes from the tiles.** A farm in the province works all its fields: each fields tile has work for 30,000 farmers, who feed 1.1 people each at a plain farm, 1.3 at a mill farm and 1.5 at an enclosed farm. Farmers past that, or with no farm at all, work bare land and feed 0.67 each. Ranches do the same for herders on pasture and fisheries for seafolk on the shore (1.33 each). The ground matters too: farmland farms better, mountains and marsh worse.
 
-**In 1444** every province about feeds itself: its people's own ways of working the land (terraces, ditches, herding on the move) make up what its buildings leave short of 110 % of its needs in a normal year. That stays fixed, so as the people grow, a better farm or another ranch is what feeds them. A poor harvest bites.
+**At the start** every province about feeds itself: its people's own ways of working the land (terraces, ditches, herding on the move) make up what its buildings leave short of 110 % of its needs in a normal year. That stays fixed, so as the people grow, a better farm or another ranch is what feeds them. A poor harvest bites.
 
 **Hunting.** Woodsmen hunt in the woods: each woods tile has room for 3,750 hunters, who feed 0.67 each, more in the northern forests and tundra, less in thin woods. Woodsmen past that room scrape by on half. Crowd the woods and the game thins, year by year, down to a third; fewer hunters let it come back. A **hunting lodge** makes the hunters in the woods bring in half as much again, and gives furs in the north. In the north a **hard winter** (about one year in five or eight) cuts the catch to 0.6.
 
 **Changing a tile.** You can clear woods into fields (3 years), turn fields to pasture or plough pasture back (a season each), drain marsh (3 years, needs *Polder drainage*) and irrigate dry waste (2 years, needs *Qanat and canal irrigation*). Each costs gold up front, more on hard ground; a province changes one tile at a time, and stopping gives half the gold back. The ground itself never changes. Lords change their own land, and other countries change theirs, by a simple rule: a province that can't feed itself drains, irrigates or clears woods.
 
-**Mines and salt.** A province in hills or mountains may have an ore deposit under its waste: iron, copper, tin, silver, gold or rock salt, with so many years of digging left. Tap the waste tile on the Land tab to see it. A mine needs the ore deposit and timber from a lumber camp in the province or next door; it gives work for 6,000 miners and adds trade, three times as much for silver or gold. Each January it digs a year off the deposit, and when it runs out the mine closes. Kutná Hora's silver (in Středočeský) and Falun's copper (in Dalarna) are already dug in 1444. On a dry or warm coast, saltworks on the shore make salt and add trade too.
+**Mines and salt.** A province in hills or mountains may have an ore deposit under its waste: iron, copper, tin, silver, gold or rock salt, with so many years of digging left. Tap the waste tile on the Land tab to see it. A mine needs the ore deposit and timber from a lumber camp in the province or next door; it gives work for 6,000 miners and adds trade, three times as much for silver or gold. Each January it digs a year off the deposit, and when it runs out the mine closes. Kutná Hora's silver (in Středočeský) and Falun's copper (in Dalarna) are already dug at the start. On a dry or warm coast, saltworks on the shore make salt and add trade too.
 
 **Worn fields.** Fields farmed year after year with more farmers than they hold wear out: after 30 years of it one fields tile turns **worn** and gives half, then the next 30 years another. Each rotation invention your realm knows (*Three-field rotation*, *Fodder crops*, *Four-field rotation*) makes that half as long again. Farmers work the sound fields first, so once the sound fields hold them all, the worn tile rests, and after 5 years of rest it is sound again. A better farm, fewer farmers (settlers, recruits, a new town building) or clearing woods for more fields lets it rest. Grassland and savanna start mostly as pasture.
 
@@ -448,7 +448,7 @@ The tile row is the province: tap a tile to see its building, its workers and wh
 ## How it connects
 
 - [World Map](World-Map): ground, size (tile count), coast, rivers, neighbours.
-- [The 1444 Start](The-1444-Start): starting values for every province.
+- [The 1378 Start](The-1378-Start): starting values for every province.
 - [Time and Turns](Time-and-Turns): monthly, seasonal, yearly and weekly ticks.
 - [Buildings](Buildings): building list, slots, construction, upkeep and owners; the province supplies tiles, ground and classes.
 - [Research](Research): inventions unlock buildings, tile changes, harvest steps, road and castle steps.

@@ -40,7 +40,7 @@ An age is a broad frame over the world with a window, start and end conditions a
 
 Each age also lists its regions, so systems that care whether "the age has begun in your region" (exploration, national strengths, music) can read it. There are 13 ages in the data and these 10 are inside the campaign.
 
-The campaign is moving to a start on 20 September 1378, the day the Western Schism begins. The **Age of Schism and Conquerors** covers the years from then to the fall of Constantinople: two popes, Timur's campaigns, the early Ming fleets. It is under way from the first day in every region and ends once the Schism and the Council of Basel are over and Constantinople has fallen. **Gunpowder Empires** starts when three of the eight great powers (the realms with the most provinces) know Bombards, or when Constantinople falls. **Exploration** starts when Portugal or Castile has the ocean ships (Carrack and caravel) or holds the Atlantic islands. A fast world starts them early and a slow one waits for 1453 and 1445. A campaign that starts in 1444 has all three under way from the start, as before.
+The campaign starts on 20 September 1378, the day the Western Schism begins. The **Age of Schism and Conquerors** covers the years from then to the fall of Constantinople: two popes, Timur's campaigns, the early Ming fleets. It is under way from the first day in every region and ends once the Schism and the Council of Basel are over and Constantinople has fallen. **Gunpowder Empires** starts when three of the eight great powers (the realms with the most provinces) know Bombards, or when Constantinople falls. **Exploration** starts when Portugal or Castile has the ocean ships (Carrack and caravel) or holds the Atlantic islands. A fast world starts them early and a slow one waits for 1453 and 1445. The 1444 checkpoint world, opened with `?start=1444`, has all three under way from the start.
 
 ### Periods
 
@@ -210,7 +210,7 @@ An event can carry a music tag (good event, bad event, major event, crisis, revo
 - [Screens and navigation](Screens-and-Navigation): the event card, the queue and blocking End turn.
 - [Music and sound](Music-and-Sound): music tags on events.
 - [Achievements](Achievements): your roles and historical or non-historical choices.
-- [Tutorial and help](Tutorial-and-Help): tutorial-only scripted events such as the Varna crusade.
+- [Tutorial and help](Tutorial-and-Help): tutorial-only scripted events.
 - [How a turn works](Time-and-Turns): events run after every other system's monthly, seasonal and yearly steps, just before achievements and the autosave.
 
 ### Each month

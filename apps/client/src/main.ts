@@ -40,14 +40,14 @@ import { rebelsUi, risingCard, risingsOverview, verdictCard, type Attacker } fro
 import { heritageLine, heritageTab } from "./ui/heritage.ts";
 import { fitDraft, offerLine, peaceTable, startDraft, stepGold, togglePick, type PeaceDraft } from "./ui/peace.ts";
 import { fallenLine, rulerLines } from "./ui/ruler.ts";
-import { loadDefaultRuleset, START_SCENARIO } from "@ph/rules";
+import { DEFAULT_START, loadDefaultRuleset, SESSION_START_KEY, START_ID, START_SCENARIO, startRulers } from "@ph/rules";
 import { hexToRgb, PALETTE, TERRAINS } from "./art/palette.ts";
 import { figureSprite, sprite, spriteUrl } from "./art/sprites.ts";
 import { icon, iconUrl, installUiArt, flagCanvas, flagUrl, UI_COLORS, type FlagOf, type IconName } from "./art/ui.ts";
 import { apparentAge, eraOfYear } from "./art/commanders.ts";
 import { lookOfCulture, setPortraitYear } from "./art/portraits.ts";
 import { EngineClient } from "./engineClient.ts";
-import { hideLoading, loadingStage, painted, showLoading } from "./loading.ts";
+import { hideLoading, loadingStage, painted, setLoadingStart, showLoading } from "./loading.ts";
 import { stabilityPlaque, stabilitySection } from "./ui/stability.ts";
 import { cap, DEFAULT_TITLES } from "./ui/titles.ts";
 import { endCard, scoreLine, scoreTab } from "./ui/score.ts";
@@ -115,7 +115,7 @@ import { formName } from "@ph/engine/domain/government";
 import { PICKER_REGIONS, pickerRegions, startTrade, waysToGrow } from "@ph/engine/domain/scenario-setup";
 import { pickerCardHtml, regionListHtml, regionSelectHtml, strongIn, strongInWords, waysToGrowHtml } from "./ui/realmPicker.ts";
 import { BATTLE_STEP_MS, bannerAt, COUNTRY_CARD_TABS, endTurnInAuto, endTurnLabel, keyEndsTurn, newAutoTurns, realmOverview, REALM_BOOK_TABS, sectionOf, SHELL as SHELL_RULES, startColumn, startIcons, stopAuto, switchAuto, tabHolds, WATCH_STEP_MS, weekPlayed, type AutoStop, type OverviewTile, type Platform as ShellPlatform } from "@ph/engine/domain/game-shell";
-import { autosaveDue, continueTarget, longDate, newCampaign, newManualSave, savesConfig, type Campaign, type Platform as SavePlatform } from "@ph/engine/domain/saves";
+import { autosaveDue, continueTarget, longDate, newCampaign, newManualSave, saveStart, savesConfig, type Campaign, type Platform as SavePlatform } from "@ph/engine/domain/saves";
 import { SaveStore, type StoredSave } from "./saves/store.ts";
 import { animationsPref, autosaveEvery, autosavesKept, battleStepMs, dayMs, livingPrefs, longPressMs, mapDetail, mapPower, onPrefs, setPref, textZoom } from "./settings/prefs.ts";
 import { openSettingsAt, renderSettings, setHintsRows } from "./ui/settingsScreen.ts";
@@ -140,15 +140,16 @@ const diagnostics: Diagnostics = {
 // Read by the wrapper smoke tests.
 (globalThis as { __phDiagnostics?: Diagnostics }).__phDiagnostics = diagnostics;
 
-// The suggested realms: the great powers of each part of the world, and one start per part of Africa (SETUP-074); sleeping realms are never among them (SETUP-082).
+// The suggested realms: the great powers of each part of the world, and one start per part of Africa, as the start lists them (SETUP-074); sleeping realms are never among them (SETUP-082).
 // ?feature=great_horde adds realms to the list, for the screenshot scripts.
-const FEATURED = ["france", "england", "castile", "portugal", "ottomans", "byzantium", "austria", "muscovy", "ming", "aztecs", "inca", "mali", "benin", "kongo", "ethiopia", "kilwa", ...(new URLSearchParams(location.search).get("feature")?.split(",") ?? [])];
+const FEATURED = [...START_SCENARIO.suggested, ...(new URLSearchParams(location.search).get("feature")?.split(",") ?? [])];
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-/** "11 November 1444", or "11 Nov 1444" short. */
 /** The hour beside the date in the top bar, while the player's battle runs (VIEW-076). */
 const clockText = (hour: string | null) => (hour ? ` <small>${hour}</small>` : "");
+/** "20 September 1378", or "20 Sep 1378" short. */
 const dateText = (d: GameDate, short = false) => `${d.day ?? 1} ${short ? MONTHS[d.month - 1]!.slice(0, 3) : MONTHS[d.month - 1]} ${d.year}`;
 
+setLoadingStart(START_SCENARIO.name);
 const provinces = rules.provinces;
 const nations = rules.nations;
 const provinceIndex = new Map(provinces.map((p, i) => [p.id, i]));
@@ -5675,6 +5676,13 @@ function realmArmyTab(r: number, armyCount: number, men: number): string {
       .join("")}` : `<p class="hint">No commanders.</p>`}`;
 }
 
+/** Who rules the realm on the start day, and the day the campaign begins, for the picker's card (SHELL-034). */
+function startRulerLine(id: string): string {
+  const v = (startRulers.rulers as unknown as Record<string, { title?: string; name: string; age?: number | null; heir?: { name: string; age?: number | null } | null } | null>)[id];
+  const ruler = v ? `<dt>Ruler</dt><dd class="ruler">${icon("crown", 1)}<b>${esc(v.title ? `${v.title} ${v.name}` : v.name)}</b>${v.age ? `, ${v.age}` : ""}${v.heir ? ` <small>heir ${esc(v.heir.name)}${v.heir.age != null ? `, ${v.heir.age}` : ""}</small>` : ""}</dd>` : "";
+  return `${ruler}<dt>Starts</dt><dd>${dateText(START_SCENARIO.date)}</dd>`;
+}
+
 function renderRealm(r: number): void {
   const n = nations[r]!;
   const s = snapshot;
@@ -5716,7 +5724,7 @@ function renderRealm(r: number): void {
       ${peoples ? beliefLines(peoples, false, null, faithBadgeHtml(s.faithHeads?.badges[r] ?? null)) : ""}
       ${realmLearningLine(s.realmResearch[r])}
       ${groundsCountLine(s.tribes, r)}` : ""}
-      ${!s ? `<dt>Government</dt><dd>${esc(formName(startFormOf(n.id)))}</dd><dt>Strong in</dt><dd>${esc(strongInWords(n.id))}</dd>` : ""}
+      ${!s ? `${startRulerLine(n.id)}<dt>Government</dt><dd>${esc(formName(startFormOf(n.id)))}</dd><dt>Strong in</dt><dd>${esc(strongInWords(n.id))}</dd>` : ""}
       <dt>Lands</dt><dd>${topLands.map(([t, c]) => `${t} ${c}`).join(" · ")}</dd>
       ${heritageLine(strengths, s?.heritage[r] ?? null)}
     </dl>
@@ -7147,6 +7155,25 @@ function bindLoadCard(): void {
  * Opens a save (SHELL-039): the campaign being played keeps where it was left
  * first; the engine checks and opens the file and the map shows it.
  */
+/** The page's key for a save waiting to load once the page has reopened in its start (SAVE-111). */
+const OPEN_SAVE_KEY = "ph-open-save";
+/** Session storage, which a private window or a sandboxed frame may refuse. */
+function sessionGet(key: string): string | null {
+  try {
+    return sessionStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+function sessionSet(key: string, value: string | null): void {
+  try {
+    if (value === null) sessionStorage.removeItem(key);
+    else sessionStorage.setItem(key, value);
+  } catch {
+    // Without session storage the save opens in the default start's world only.
+  }
+}
+
 async function loadSave(path: string, acceptModified = false, keepCurrent = true): Promise<void> {
   const bytes = await saveStore.read(path);
   const e = savesList.find((x) => x.path === path);
@@ -7156,6 +7183,15 @@ async function loadSave(path: string, acceptModified = false, keepCurrent = true
     return;
   }
   if (keepCurrent && campaign && snapshot && changedSinceResume) await writeGameSave("resume");
+  // A campaign plays on in the world it began in (SAVE-111): the page reopens in that start and loads the save there.
+  const began = saveStart(e.header);
+  if (began !== START_ID) {
+    showLoading(`Opening ${e.header.name}…`, 0.2);
+    sessionSet(SESSION_START_KEY, began === DEFAULT_START ? null : began);
+    sessionSet(OPEN_SAVE_KEY, path);
+    location.reload();
+    return;
+  }
   shell.busy = true;
   showLoading(`Opening ${e.header.name}…`, 0.2);
   await painted();
@@ -7184,6 +7220,8 @@ async function exitToMenu(): Promise<void> {
   showLoading("Keeping your place…", 0.5);
   await painted();
   await writeGameSave("resume");
+  // The menu and new campaigns are back in the default start (SAVE-111).
+  sessionSet(SESSION_START_KEY, null);
   location.reload();
 }
 
@@ -7230,6 +7268,20 @@ function applyPrefs(): void {
 onPrefs(applyPrefs);
 applyPrefs();
 void refreshSaves().then(() => {
+  // A save from another start reopened the page in its start: load it now (SAVE-111).
+  const waiting = sessionGet(OPEN_SAVE_KEY);
+  sessionSet(OPEN_SAVE_KEY, null);
+  if (waiting && savesList.some((x) => x.path === waiting)) {
+    hideStart();
+    void loadSave(waiting, false, false);
+    return;
+  }
+  if (waiting && START_ID !== DEFAULT_START) {
+    // The save is gone: back to the default start for the menu and new campaigns.
+    sessionSet(SESSION_START_KEY, null);
+    location.reload();
+    return;
+  }
   if (!snapshot) renderPanel();
 });
 

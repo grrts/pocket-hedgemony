@@ -1,8 +1,9 @@
 {
-  "$comment": "The start scenario (X-25): the day the game starts on, its research era, and the files beside this one that describe the world on that day. The engine and specs read the start from here through packages/rules/src/start.ts, never a year written in code. The campaign is to start on 20 September 1378 (X-25); until that scenario is built (milestone 10, step 5) the bundled start is 11 November 1444, the day the country catalogue and relations data describe.",
+  "$comment": "The start scenario (X-25): the day the game starts on, its research era, and the files beside this one that describe the world on that day. The engine and specs read the start from here through packages/rules/src/start.ts, never a year written in code. New campaigns start on 20 September 1378 (X-25, scenarios/1378); 11 November 1444, the day the country catalogue and relations data describe, stays as the main history checkpoint, the world the tests read, and a start behind ?start=1444 (PH_START=1444 in Node). suggested: the realm picker's suggested realms (SETUP-074).",
   "id": "1444",
   "name": "Autumn 1444",
   "date": { "year": 1444, "month": 11, "day": 11 },
+  "suggested": ["france", "england", "castile", "portugal", "ottomans", "byzantium", "austria", "muscovy", "ming", "aztecs", "inca", "mali", "benin", "kongo", "ethiopia", "kilwa"],
   "eras": {
     "$comment": "The research era the start falls in, and the eras whose inventions count as known before the start (RSCH-091). The eras' dates are the tree's (research.json era_dates).",
     "start": "I",

@@ -6,14 +6,14 @@ Feature: Pacing tools the tutorial adds
 
   @TUT-019
   Scenario: Advance to the harvest
-    Given chapter 3 offers "Advance to the harvest, September 1445"
+    Given chapter 6 offers "Advance to the harvest, September 1381"
     When the player takes the Advance to… ribbon
-    Then the turns run in a row until September 1445
+    Then the turns run in a row until the harvest month
     And one combined turn report is shown
 
   @TUT-020
   Scenario: Input focus during a do step
-    Given the step "ch3.open_food_policy" allows only "ui.country_card.food" and "camera"
+    Given the step "ch6.open_food_policy" allows only "ui.country_card.food" and "camera"
     When the player taps the levy button
     Then nothing happens
     And the levy button is dimmed, not hidden
@@ -33,16 +33,17 @@ Feature: Pacing tools the tutorial adds
     Examples:
       | country | target |
       | Karaman | against the Ottomans |
+      | Germiyan | in western Anatolia |
       | Serbia | in the Balkans |
 
   @TUT-022
   Scenario: Scripted wars still happen
     Given the tutorial is running
-    When the crusaders' fleet reaches the Danube in chapter 4
-    Then the crusade war against the Ottomans goes on
+    When John V reaches Murad in chapter 4
+    Then the war for John V's throne goes on
 
   @TUT-023 @placeholder
-  Scenario: The border clash at watch speed
-    When the border clash at Giurgiu starts in chapter 5
+  Scenario: The clash before Pera at watch speed
+    When the clash before Pera starts in chapter 5
     Then the battle screen opens
     And one bell plays every 3 seconds

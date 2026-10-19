@@ -1,3 +1,4 @@
+import { readFileSync, readdirSync } from "node:fs";
 import { expect } from "vitest";
 import { steps, type Scenario } from "../src/registry.ts";
 import { loadDefaultRuleset } from "@ph/rules";
@@ -8,7 +9,8 @@ const { Given, When, Then } = steps("achievements");
 
 // ---------------------------------------------------------------- helpers
 
-const START = "1444-11-11";
+// The date a moment falls on when a scenario names none: the start of every new campaign (X-25).
+const START = "1378-09-20";
 
 function campaign(s: Scenario): A.CampaignAchievements {
   // Scenarios that say nothing about eligibility play an unbroken ironman campaign.
@@ -305,6 +307,32 @@ Then("{string} names the event role {string} of the event {string}", (_s, id: st
   expect(def(id).test.event_role).toEqual({ event, role });
 });
 
+// ACH-087: tests read start facts, never years counted from a start year.
+Then("no test counts years from the start", (s) => {
+  for (const d of s.list as A.AchievementDefinition[]) for (const k of Object.keys(d.test)) expect(k, d.id).not.toMatch(/since_start|from_start|start_year|start_date/);
+});
+Then("the start facts a test reads are {string}, {string}, {string} and {string}", (s, a: string, b: string, c: string, e: string) => {
+  const keys = [a, b, c, e];
+  const read = new Set<string>();
+  for (const d of s.list as A.AchievementDefinition[]) for (const k of Object.keys(d.test)) if (/^start/.test(k)) read.add(k.replace(/_(min|max|not)$/, ""));
+  for (const k of read) expect(keys, k).toContain(k);
+});
+
+// ACH-090: an event_role names an event the event tree or a bridge file defines.
+Then("every event named in an event_role test is an event of the event tree or of its bridge events", (s) => {
+  const dir = new URL("../../rules/data/domain/", import.meta.url);
+  const files = readdirSync(dir).filter((f) => f === "events-tree.json" || f === "events-campaign.json" || /^events-bridge-.*\.json$/.test(f));
+  expect(files).toContain("events-bridge-east.json");
+  const known = new Set<string>();
+  for (const f of files) {
+    const events = (JSON.parse(readFileSync(new URL(f, dir), "utf8")) as { events: unknown }).events;
+    for (const id of Array.isArray(events) ? events.map((e: { id: string }) => e.id) : Object.keys(events as object)) known.add(id);
+  }
+  const named = (s.list as A.AchievementDefinition[]).flatMap((d) => (typeof d.test.event_role === "object" ? [[d.id, (d.test.event_role as { event: string }).event] as const] : []));
+  expect(named.length).toBeGreaterThan(0);
+  for (const [id, event] of named) expect(known.has(event), `${id}: ${event}`).toBe(true);
+});
+
 Given("an event marked {string}", (s, depiction: string) => {
   expect(depiction).toBe("narrative_only");
   s.events = A.NARRATIVE_ONLY_EVENTS;
@@ -445,6 +473,21 @@ Given("the country holds {int} gold in its treasury", (s, gold: number) => {
 Then("the achievement {string} stays locked", (s, id: string) => {
   expect(earnedIds(s)).not.toContain(id);
   expect(campaign(s).earned[id]).toBeUndefined();
+});
+// ACH-089: a bridge event row reads the player's role in that event and whether it is anyone's subject.
+Given(/^the player's realm (is no one's subject|is a subject)$/, (s, which: string) => {
+  facts(s).subject_of_anyone = which === "is a subject";
+});
+Given("the player's realm held the role {string} in the event {string}", (s, role: string, event: string) => {
+  const f = facts(s);
+  f.event_roles = [...((f.event_roles as { event: string; role: string }[] | undefined) ?? []), { event, role }];
+});
+// ACH-088: the campaign's start day; date rows on or before it are never earned.
+Given("the campaign started on {word}", (s, start: string) => {
+  s.c = A.newCampaign({ ironman: true, start });
+});
+When("the date {word} comes", (s, date: string) => {
+  occur(s, "date", facts(s), date);
 });
 Given("the player's army ends a siege with the result {string}", (s, result: string) => {
   facts(s).siege_result = result;
@@ -689,7 +732,7 @@ Then("{string} stays earned", (s, id: string) => {
 Then("the achievement {string} can't be earned with the free countries alone", (_s, id: string) => {
   expect(A.earnableWithFreeCountries(def(id))).toBe(false);
   expect(A.ACHIEVEMENTS.filter((d) => !A.earnableWithFreeCountries(d)).map((d) => d.id)).toEqual([
-    "independence_won", "walls_held_1453", "four_quarters_hold", "from_one_hall", "decentralised_1500", "many_crowns", "every_macro_region",
+    "independence_won", "kulikovo_free", "kosovo_free", "walls_held_1453", "timurid_heirs", "four_quarters_hold", "from_one_hall", "decentralised_1500", "many_crowns", "every_macro_region",
   ]);
 });
 

@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-// The dev switch (rules/src/start.ts): PH_START=1378 makes the 1378 scenario the
+// The start switch (rules/src/start.ts): PH_START=1378 makes the 1378 scenario the
 // start. Set before the first import, since the start is chosen when the module loads.
 process.env.PH_START = "1378";
 const rules = await import("../src/index.ts");
 
-describe("the 1378 start behind the dev switch (X-25)", () => {
+describe("the 1378 start (X-25)", () => {
   it("starts on 20 September 1378 with the 1378 world", () => {
     expect(rules.START_ID).toBe("1378");
     expect(rules.START_DATE).toEqual({ year: 1378, month: 9, day: 20 });

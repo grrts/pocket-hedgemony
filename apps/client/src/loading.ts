@@ -21,9 +21,15 @@ const TIPS = [
   "An army bigger than the land can feed marches slower and eats its wagons bare.",
   "Snow lies on the high passes first: in winter, go round the mountains.",
   "A province's official runs it: commission one as a commander and the post stands empty.",
+  // The world on the start day, 20 September 1378 (X-25).
+  "Two Popes reign from 1378, in Rome and Avignon: every Catholic realm follows one of them.",
+  "Realms not yet born sleep off the map until their land, faith and language come together.",
+  "Every realm chases the goals it had in history, for as long as the reason for them holds.",
+  "Murad's Ottomans hold Gallipoli again: the crossing between Anatolia and Thrace is theirs.",
 ];
 
 const root = document.querySelector<HTMLElement>("#loader");
+const subEl = root?.querySelector<HTMLElement>(".loader-sub");
 const stageEl = root?.querySelector<HTMLElement>(".loader-stage");
 const tipEl = root?.querySelector<HTMLElement>(".loader-tip");
 const barEl = root?.querySelector<HTMLElement>(".loader-bar i");
@@ -66,6 +72,11 @@ function setStage(stage: string): void {
 
 function nextTip(): void {
   if (tipEl) tipEl.textContent = `Tip: ${TIPS[Math.floor(Math.random() * TIPS.length)]}`;
+}
+
+/** Names the start under the game's name ("Autumn 1378"); the page's own markup names the default start. */
+export function setLoadingStart(name: string): void {
+  if (subEl) subEl.textContent = name;
 }
 
 /** Shows the loading screen (again), titled with what is loading. */

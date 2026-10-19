@@ -6,9 +6,9 @@ Exploration is how your realm sails into the unknown and plants colonies there. 
 
 ### Unlocking exploration
 
-A country gets the **exploration unlock** when it knows S4 *Carrack and caravel* (or S3 *Outrigger voyaging*) and the **Age of Exploration** has begun in its region. Once the age has begun there, the gate stays open for that country even after the age ends. The gating age is one config line, `exploration.unlock_age`, set to the event tree's `age_of_exploration`. Regions outside that age's list wait for the first later age that covers them: North America opens with the Age of Atlantic Empires (1520), the Middle East and central Asia with the Age of Reformations (1530). So the Mamluks can know S4 in 1444 and still not explore until then.
+A country gets the **exploration unlock** when it knows S4 *Carrack and caravel* (or S3 *Outrigger voyaging*) and the **Age of Exploration** has begun in its region. Once the age has begun there, the gate stays open for that country even after the age ends. The gating age is one config line, `exploration.unlock_age`, set to the event tree's `age_of_exploration`. Regions outside that age's list wait for the first later age that covers them: North America opens with the Age of Atlantic Empires (1520), the Middle East and central Asia with the Age of Reformations (1530). So the Mamluks can know S4 early and still not explore until then.
 
-In 1444 Portugal, Castile, Genoa and Venice know S4 and have the unlock. Ming knows S1 and S2 but not S4, so it must research S4 first.
+At the 1378 start nobody can explore. Genoa and Venice know S4, but the Age of Exploration has not begun; it starts when Portugal or Castile has the ocean ships or holds the Atlantic islands (earliest 1415, and by 1445 at the latest), see [Historical Events](Historical-Events). Portugal and Castile don't know S4 yet and must research it first. Ming knows S1 and S2 but not S4.
 
 Without the unlock you can't buy exploration ships: no caravel without S4, no voyaging canoe without S3, and the age gate applies to voyaging canoes too. Where an exploration ship may sail is [Naval](Naval)'s research rule: with S4 and S1 within 3 zones of a coast, with S5 the open ocean. Early voyages creep along the coasts.
 
@@ -69,7 +69,7 @@ Once a colony is founded, range is measured from it too, so colonies chain acros
 
 A province can be colonised only when it is charted, coastal, owned by no country, has at least one free tile, lies inside your colonial range, and nobody else is already founding a colony there.
 
-- Land owned by a country, tribal countries (a chiefdom or clan council in the 1444 list) included, can't be colonised; it can only be taken by war or treaty. Hispaniola, held by a Taíno chiefdom, is one such case.
+- Land owned by a country, tribal countries (a chiefdom or clan council in the start list) included, can't be colonised; it can only be taken by war or treaty. Hispaniola, held by a Taíno chiefdom, is one such case.
 - Land that no realm on the map owns belongs to a people with no country, even where old records name a people or tribe there. A colony there takes only the free tiles, and the people's tiles stay theirs.
 
 **Going ashore.** When a ship carrying a governor is in the province's coastal zone and you give *Found colony*, the governor goes ashore and the colony starts at **10 progress**. Its **local aggression** is rolled at once from the peoples in the province and its neighbours (a coast across one sea zone counts) and shown:
@@ -111,7 +111,7 @@ Most of exploration happens on the fleet card and the map; the Colonies tab is i
 
 On a phone in landscape the voyage bar sits between the overview button and End turn, wraps its buttons rather than shrinking them, and every reason is written under its button since there is no hover.
 
-**In the game today.** Until the map records regions per province and who works each tile, a realm's region for the age gate comes from the event tree's 1444 list or the scenario catalogue's region, every unowned land province has one free tile, and a founded colony keeps the people living there, who become yours. The computer players that explore are the sea-minded realms of the catalogue (Castile, Portugal, Novgorod): each keeps one caravel exploring the edge of its charts and, once it can hire governors, settles the nearest empty coast in range with the stores it needs.
+**In the game today.** Until the map records regions per province and who works each tile, a realm's region for the age gate comes from the event tree's region list or the scenario catalogue's region, every unowned land province has one free tile, and a founded colony keeps the people living there, who become yours. The computer players that explore are the sea-minded realms of the catalogue (Castile, Portugal, Novgorod): each keeps one caravel exploring the edge of its charts and, once it can hire governors, settles the nearest empty coast in range with the stores it needs.
 
 ## How it connects
 
@@ -122,7 +122,7 @@ On a phone in landscape the voyage bar sits between the overview button and End 
 - [Provinces](Provinces): the founded colony as province state, free tiles and the colonial governor official type.
 - [Subjects](Subjects): a founded colony is a royal province until it is chartered as a Colony subject; subjects' ports count for colonial range.
 - [World-Map](World-Map): sea zones, coastal provinces and adjacency.
-- [The-1444-Start](The-1444-Start): which land is owned in 1444 and which is unowned with peoples on it.
+- [The 1378 Start](The-1378-Start): which land is owned at the start and which is unowned with peoples on it.
 - [Your-Realm](Your-Realm): the country card line and the governor's gold and wage.
 - [Troop-Movement](Troop-Movement): the shared planner and day loop voyages use.
 - [Diplomacy](Diplomacy): war and rivalry close ports to a voyage.

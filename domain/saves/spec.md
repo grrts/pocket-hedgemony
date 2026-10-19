@@ -214,6 +214,10 @@ Newest decision first.
 - SAVE-049: If a save's `formatVersion` is newer than the build's, then the save system shall not open it and shall say "This save is from a newer version of Pocket Hegemony. Update the game to open it." [save-system §4.4, §2.5]
 - SAVE-050: Each release shall add at least two saves from that build (one early game, one late game) to `packages/engine/test/saves/`; every test run shall load every save from every earlier release and run one turn; a release shall not ship if any old save fails; the changelog shall say when a release changes the format. [save-system §4.4]
 - SAVE-051: When a save is loaded into a build with changed rules, the rule changes shall apply from the next turn on, with the saved `Rng` state, so a balance patch changes outcomes from then on but never corrupts the save. [save-system §4.4]
+- SAVE-111: A save shall record the start its campaign began from (`start` in the header; a save without one began in
+  1444, before campaigns moved to 1378). When the player opens a save from another start, the game shall reopen in that
+  start's world and load the save there, without asking; the save system shall never open a save in another start's
+  world. Exit to main menu shall return to the default start, so new campaigns begin in 1378. [X-25; SETUP-095]
 
 ### 5.8 Cloud saves
 
@@ -586,3 +590,4 @@ None. AI countries' state is saved like any other (later an `ai` chunk); no AI d
 | SAVE-103 | resume-and-orders-journal.feature | A choice at a before-the-battle stop goes into the journal |
 | SAVE-104 | cloud-sync.feature | Personal settings ride the account sync |
 | SAVE-105 … SAVE-110 | — | Client screens; checked by apps/client/scripts/saves-shots.mjs |
+| SAVE-111 | — | engine unit test `saves-start.test.ts` (the header names the start; a save from another start is refused); the client reopens in the save's start (main.ts `loadSave`) |
