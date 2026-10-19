@@ -24,7 +24,7 @@
   ],
   "files": {
     "regions/<key>/": "each region's part, in the shapes of the 1444 folder (see regions/README.md); the source of every joined file",
-    "map-nations.json, map-owners.json, rulers.json, culture-start.json, relations.json, subjects.json, subjects-rulers.json": "the regions joined in the order of regions (generated; fix the region and re-run build-1378.py)",
+    "map-nations.json, map-owners.json, rulers.json, culture-start.json, relations.json, subjects.json, subjects-rulers.json, goals.json": "the regions joined in the order of regions (generated; fix the region and re-run build-1378.py); relations and subjects read a map id whose record has another id as that record (SETUP-049)",
     "map-to-catalogue.json": "map nations whose 1378 catalogue record has another id, over scenario-setup.json's map_to_catalogue (generated)",
     "sleeping-realms.json, ports.json": "sleeping realms and port towns by [lon, lat] or owner-rule selector (generated); mapgen places them in world/",
     "world/": "the generated map (map, nations, provinces, sleeping realms, ports, the build report, and from-1444.json mapping each 1444 province to this map's) built by tools/mapgen"

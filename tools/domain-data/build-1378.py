@@ -5,7 +5,7 @@ scenario.json lists, in that order, and writes the scenario's own files beside
 scenario.json, in the shapes of the 1444 folder:
 
   map-nations.json, map-owners.json, rulers.json, culture-start.json,
-  relations.json, subjects.json, subjects-rulers.json, map-to-catalogue.json,
+  relations.json, subjects.json, subjects-rulers.json, goals.json, map-to-catalogue.json,
   sleeping-realms.json, ports.json
 
 Places that only the generated map can turn into province ids (sleeping
@@ -88,18 +88,27 @@ for key in REGIONS:
     realms.update(c["realms"])
 write("culture-start.json", {"$comment": gen("culture-start.json") + " Court tongues, province tongues and faiths on the start day (CULT-094); the tongue list is the 1444 one plus the tongues the regions add.", "_provisional": culture_1444.get("_provisional", True), "tongues": tongues, "realms": realms})
 
+# Relations and subjects are keyed by catalogue ids (SETUP-049). A region that wrote a map id whose
+# record has another id (mamluks for mamluk, ottomans for ottoman) is read as that record.
+setup_map = {k: v for k, v in load("packages/rules/data/domain/scenario-setup.json")["map_to_catalogue"].items() if k != "$comment"}
+for key in REGIONS:
+    setup_map.update(region(key, "map-to-catalogue.json", {"map_to_catalogue": {}})["map_to_catalogue"])
+record_of = lambda i: setup_map.get(i) or i
+
 # Relations and facts. A cross-region pair both regions recorded is kept once, from the first region.
 relations, facts, entities, obedience = [], [], {}, {}
 seen_rel, seen_fact = set(), set()
 for key in REGIONS:
     r = region(key, "relations.json", {"relations": [], "facts": []})
     for x in r["relations"]:
+        x = {**x, "source": record_of(x["source"]), "target": record_of(x["target"])}
         k = (x["type"], *sorted((x["source"], x["target"])))
         if x["id"] in seen_rel or k in seen_rel:
             continue
         seen_rel |= {x["id"], k}
         relations.append(x)
     for x in r.get("facts", []):
+        x = {**x, "source": record_of(x["source"]), "target": record_of(x["target"])}
         k = (x["fact"], x["source"], x["target"])
         if x["id"] in seen_fact or k in seen_fact:
             continue
@@ -127,10 +136,12 @@ seen_sub, seen_stance = set(), set()
 for key in REGIONS:
     s = region(key, "subjects.json", {"subjects": []})
     for row in s["subjects"]:
+        row = [record_of(row[0]), record_of(row[1]), *row[2:]]
         if (row[0], row[1]) not in seen_sub:
             seen_sub.add((row[0], row[1]))
             subjects.append(row)
     for row in s.get("stances", []):
+        row = [record_of(row[0]), record_of(row[1]), *row[2:]]
         k = tuple(sorted(row[:2]))
         if k not in seen_stance:
             seen_stance.add(k)
@@ -143,6 +154,12 @@ with open(f"{out}/subjects.json", "w", encoding="utf-8") as f:
     f.write(',\n "subjects": [\n' + ",\n".join("  " + json.dumps(r, ensure_ascii=False) for r in subjects) + "\n ]")
     f.write(',\n "stances": [\n' + ",\n".join("  " + json.dumps(r, ensure_ascii=False) for r in stances) + "\n ]")
     f.write(',\n "religious_heads": ' + json.dumps(heads) + ',\n "playable_subjects": ' + json.dumps(sorted(playable)) + "\n}\n")
+
+# Historical goals with their reasons (plan-1378 §2, EVT-085): every region's, in region order.
+goals = []
+for key in REGIONS:
+    goals += region(key, "goals.json", {"goals": []})["goals"]
+write("goals.json", {"$comment": gen("goals.json") + " Realms' historical goals on the start day (EVT-085), every region's in region order.", "goals": goals})
 
 # Map ids whose catalogue record has another id (on top of scenario-setup.json's map_to_catalogue).
 map_to_catalogue = {}
