@@ -1666,3 +1666,44 @@ Then("the Settings row reads {string}", (s, text: string) => {
   const p = T.hintsProgress(hints(s));
   expect(`${p.done} of ${p.of} done`).toBe(text);
 });
+
+// ---------------------------------------------------------------- the chapters playable today (D-TUT-19)
+
+When("the player finishes every step of chapter {int}", (s, n: number) => {
+  const t = tutorial(s);
+  T.startChapter(t, n);
+  for (const step of T.chapterSteps(n)) {
+    expect(t.run!.step.id).toBe(step.id);
+    const input: T.StepInput =
+      step.kind === "look" ? { type: "confirm" } : step.kind === "choose" ? { type: "choice", option: "any" } : step.kind === "watch" ? { type: "played out" } : { type: "condition", done: step.done };
+    T.tutorialInput(t, input);
+  }
+});
+Then("chapter {int} is done", (s, n: number) => {
+  expect(T.chapterOver(s.tut)).toBe(true);
+  expect(s.tut.progress.done).toContain(n);
+  expect(s.tut.events.at(-1)).toMatchObject({ type: "ChapterCompleted", chapter: n });
+});
+Then("the tutorial keeps no step to resume", (s) => {
+  expect(s.tut.progress.current).toBeNull();
+  // Started again, the tutorial opens the first chapter rather than the ended step.
+  expect(T.startTutorial(s.tut.progress).run!.index).toBe(0);
+});
+Given("only chapter {int} can be played today", (_s, n: number) => {
+  expect(T.playableNow()).toEqual([n]);
+});
+Then("no further chapter follows", (s) => {
+  expect(T.nextPlayable(s.tut.run.chapter)).toBeNull();
+});
+Then("the tutorial counts as finished", (s) => {
+  expect(T.tutorialFinished(s.tut.progress)).toBe(true);
+  expect(T.tutorialFinished(T.newProgress())).toBe(false);
+});
+Given("the place token {string}", (s, key: string) => {
+  s.place = key;
+  expect(T.resolveText(`{place:${key}}`, { lastInput: "touch" })[0]).toMatchObject({ kind: "name" });
+});
+Then("it points at the map province {string}", (s, name: string) => {
+  expect(T.placeProvince(s.place)).toBe(name);
+  expect(loadDefaultRuleset().provinces.some((p) => p.name === name)).toBe(true);
+});
