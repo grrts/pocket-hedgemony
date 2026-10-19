@@ -39,7 +39,8 @@ import { buildSheets, landSheets, slotsOf, slotsUsed, townSize, workCost, WORKS,
 import { buildingType } from "./domain/buildings/index.ts";
 import type { GameDate, GoalDef, Ruleset } from "@ph/rules";
 import { hashWorld } from "./hash.ts";
-import { advance, applyNow, campaigning, HOURS_PER_STEP, mayMarchInto, processTurn, refillHere, type Order } from "./turn.ts";
+import { advance, applyNow, campaigning, forageCut, HOURS_PER_STEP, mayMarchInto, processTurn, refillHere, type Order } from "./turn.ts";
+import { supplyNotes } from "./castleSupply.ts";
 import { createWorld, tileMarch, type World } from "./world.ts";
 import { settlementsView, type SettlementView } from "./settlement.ts";
 import { armyBreak, controller, relationState, SIEGE_MONTH_DAYS, type News } from "./war.ts";
@@ -381,6 +382,8 @@ export interface Snapshot {
     /** 1 while on campaign (at war or abroad: men eat double), and the rations a month the store where it stands can give it. */
     campaigning: Uint8Array;
     refill: number[];
+    /** Why an army of the player's runs short, in words for its food line (WAR-266): enemy castles near its foragers, besieging. */
+    supplyNotes: string[][];
     /** Share of its men an army can lose before it breaks (the player's armies only; 0 for others). */
     breakPoint: number[];
     training: ({ arm: string; men: number; months: number } | null)[];
@@ -683,6 +686,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         rations: live.map((slot) => armyRations(w, slot)),
         campaigning: Uint8Array.from(live, (slot) => Number(campaigning(w, slot))),
         refill: live.map((slot) => (a.owner[slot] === player ? refillHere(w, slot) : 0)),
+        supplyNotes: live.map((slot) => (a.owner[slot] === player ? supplyNotes(w, slot, forageCut(w, slot)) : [])),
         breakPoint: live.map((slot) => (a.owner[slot] === player ? armyBreak(w, slot) : 0)),
         training: live.map((slot) => (a.trainArm[slot]! >= 0 ? { arm: ARMS[a.trainArm[slot]!]!, men: a.trainMen[slot]!, months: a.trainLeft[slot]! } : null)),
       },

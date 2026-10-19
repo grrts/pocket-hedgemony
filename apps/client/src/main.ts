@@ -1,5 +1,6 @@
 import {
   addDays,
+  wallsFoodText,
   DAYS_PER_TURN,
   forageLimit,
   groundOf,
@@ -2775,6 +2776,13 @@ const coinImages = [1, 2].map((scale) => Object.assign(new Image(), { src: iconU
 const crownImage = Object.assign(new Image(), { src: iconUrl("crown", 2) });
 
 /** A province's walls: its castle as the works stand now (the map's before a game starts), a stone castle in every capital. */
+/** What a province's walls keep from enemy foragers while its owner holds them (WAR-268): the cut by castle step. */
+function wallsFoodNote(p: number): string {
+  if (!snapshot || occupiers[p]! >= 0) return "";
+  const step = Math.max(snapshot.provinceWorks[p * snapshot.works.length + CASTLE]!, wallsAt(p) === "castle" ? 2 : 1);
+  return `<br><small>${esc(wallsFoodText(step))}</small>`;
+}
+
 function wallsAt(p: number): "castle" | "fort" | null {
   const owner = nations[owners[p]!];
   if (owner && owner.capital === provinces[p]!.id) return "castle";
@@ -3198,7 +3206,12 @@ function supplyLine(k: number): string {
   const land = refill <= 0
     ? enemy ? "foragers find nothing here" : `the locals here have nothing to spare above their ${march.homeReserveMonths} months`
     : `${enemy ? "foragers can take" : "the locals can give"} ${fmt(refill)} rations a month here${refill < need ? ", less than it eats" : ""}`;
-  return `Food for ${months.toFixed(1)} months${s.armies.campaigning[k] ? " · on campaign, men eat double" : ""} · ${land}`;
+  return `Food for ${months.toFixed(1)} months${s.armies.campaigning[k] ? " · on campaign, men eat double" : ""} · ${land}${castleSupplyNotes(k)}`;
+}
+
+/** Why the enemy's castles make an army go hungry (WAR-266): foragers find less near them, besiegers eat more. */
+function castleSupplyNotes(k: number): string {
+  return snapshot!.armies.supplyNotes[k]!.map((n) => ` · ${esc(n)}`).join("");
 }
 
 function marchLine(k: number): string {
@@ -4611,7 +4624,7 @@ function renderPanelCard(): void {
       ${snapshot ? foodFacts(selectedProvince) : ""}
       ${snapshot && own >= 0 ? moodFacts(selectedProvince) : ""}
       ${snapshot ? beliefFacts(snapshot.peoples, selectedProvince) : ""}
-      <dt>Walls</dt><dd>${wallsAt(selectedProvince) ? WALL_NAMES[wallsAt(selectedProvince)!] : "None"}</dd>
+      <dt>Walls</dt><dd>${wallsAt(selectedProvince) ? `${WALL_NAMES[wallsAt(selectedProvince)!]}${wallsFoodNote(selectedProvince)}` : "None"}</dd>
       ${occupiers[selectedProvince]! >= 0 ? `<dt>Occupied</dt><dd>by ${esc(nations[occupiers[selectedProvince]!]!.name)}</dd>` : ""}
       ${mineHere ? throneFact(selectedProvince) : ""}
       ${mineHere ? newLandFact(selectedProvince) : ""}

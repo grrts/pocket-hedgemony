@@ -11,6 +11,7 @@ import { bestFit, emptyPosts, OFFICIALS, officialAt, officialBonus, yearsServed 
 import * as nv from "./domain/naval/index.ts";
 import { isPort } from "./navy.ts";
 import { monthlyRations, wagonRations } from "./march.ts";
+import { besiegerEat } from "./castleSupply.ts";
 import { campaigning, halt, isMarching } from "./turn.ts";
 import { foodCarriedPct, spawnArmy, type World } from "./world.ts";
 import { armyBreak, atWar, controller, wallsOf, type News } from "./war.ts";
@@ -360,7 +361,8 @@ function withOverCap(world: World, n: number, pay: number, men: number): number 
 export function armyRations(world: World, slot: number): number {
   const a = world.armies;
   const c = a.commander[slot]!;
-  return monthlyRations(world.rules.defines.march, { men: a.men[slot]!, horse: a.horse[slot]!, logistics: c >= 0 ? world.commanderLogistics[c]! : 0, campaigning: campaigning(world, slot) });
+  const eat = besiegerEat(world, slot);
+  return monthlyRations(world.rules.defines.march, { men: a.men[slot]!, horse: a.horse[slot]!, logistics: c >= 0 ? world.commanderLogistics[c]! : 0, campaigning: campaigning(world, slot) }) * eat;
 }
 
 // ---------------------------------------------------------------- the pools
