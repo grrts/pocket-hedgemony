@@ -20,9 +20,9 @@ Feature: Hunting grounds
   Scenario: The Creek's grounds in 1444
     Given the date is 11 November 1444
     And the country "Creek" has the form "Chiefdom"
-    And the unowned land provinces touching the Creek are "Northeast Florida" with 52 people, "Southeast South Carolina" with 46, "North Mississippi" with 41 and "West Tennessee" with 32
+    And the unowned land provinces touching the Creek are "Southeast Mississippi" with 52 people, "Southeast Missouri" with 46, "North Mississippi" with 41 and "West Tennessee" with 32
     When a campaign starts
-    Then the hunting grounds of "Creek" are "Northeast Florida", "Southeast South Carolina" and "North Mississippi"
+    Then the hunting grounds of "Creek" are "Southeast Mississippi", "Southeast Missouri" and "North Mississippi"
 
   @TRIBE-007
   Scenario: Two tribes reaching for the same land
@@ -37,10 +37,10 @@ Feature: Hunting grounds
   Scenario: Claiming a ground
     # config key: tribes.claim_months
     Given the country "Cherokee" has 2 of 3 hunting grounds and no claim under way
-    And the unowned province "East Kentucky" touches the land of "Cherokee"
-    When "Cherokee" claims "East Kentucky" on 1 March 1446
-    Then a claim on "East Kentucky" runs until 1 June 1446
-    And on 1 June 1446 "East Kentucky" is a hunting ground of "Cherokee"
+    And the unowned province "Southeast Tennessee" touches the land of "Cherokee"
+    When "Cherokee" claims "Southeast Tennessee" on 1 March 1446
+    Then a claim on "Southeast Tennessee" runs until 1 June 1446
+    And on 1 June 1446 "Southeast Tennessee" is a hunting ground of "Cherokee"
 
   @TRIBE-008
   Scenario Outline: A claim that may not be made
@@ -68,9 +68,9 @@ Feature: Hunting grounds
 
   @TRIBE-011
   Scenario: A ground that gets an owner
-    Given "Northeast Florida" is a hunting ground of "Creek"
-    When a colony of "Castile" is founded in "Northeast Florida"
-    Then "Northeast Florida" is no longer a hunting ground of "Creek"
+    Given "Southeast Mississippi" is a hunting ground of "Creek"
+    When a colony of "Castile" is founded in "Southeast Mississippi"
+    Then "Southeast Mississippi" is no longer a hunting ground of "Creek"
     And "Creek" has a free place in its range
 
   @TRIBE-012
@@ -94,8 +94,8 @@ Feature: Hunting grounds
 
   @TRIBE-015
   Scenario Outline: Armies in hunting grounds
-    Given "South Québec" is a hunting ground of "Iroquois"
-    And an army of "<realm>" stands in "South Québec"
+    Given "Southwest Québec 4" is a hunting ground of "Iroquois"
+    And an army of "<realm>" stands in "Southwest Québec 4"
     Then the army refills its wagons there as in <land>
 
     Examples:
@@ -113,7 +113,7 @@ Feature: Hunting grounds
 
   @TRIBE-017
   Scenario: A ground stays unowned
-    Given "Massachusetts" is a hunting ground of "Iroquois"
-    Then "Massachusetts" pays no tax, needs no official and raises no levy
-    And "Massachusetts" does not count toward world domination for "Iroquois"
-    And the people of "Massachusetts" are a people with no country
+    Given "Vermont" is a hunting ground of "Iroquois"
+    Then "Vermont" pays no tax, needs no official and raises no levy
+    And "Vermont" does not count toward world domination for "Iroquois"
+    And the people of "Vermont" are a people with no country

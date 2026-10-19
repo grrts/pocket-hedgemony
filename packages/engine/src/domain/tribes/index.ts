@@ -1,4 +1,6 @@
 import config from "../../../../rules/data/domain/tribes.json" with { type: "json" };
+import report from "../../../../rules/data/domain/scenario-setup-report.json" with { type: "json" };
+import { allRecords, type CatalogueRow } from "../scenario-setup/catalogue.ts";
 
 /**
  * Tribes (TRIBE, domain/tribes/spec.md): which realms are tribal realms, and
@@ -215,3 +217,30 @@ export function landAskCount(f: LandAskFacts): { reasons: LandReason[]; total: n
 /** TRIBE-033: the AI asks first only while it holds the price twice over. */
 export const aiMayAsk = (gold: number): boolean => gold >= C.land_price * C.ai.ask_when_gold_times;
 export * from "./screens.ts";
+
+// ---------------------------------------------------------------- new tribes on the 1444 map (TRIBE-002 to TRIBE-005)
+// The map build places them (tools/mapgen, nations-1444.json `grows`); these read the same config and the build's report.
+
+/** TRIBE-001 by catalogue region: a tribal form whose record lies in a tribal region. */
+export const isTribalRealmIn = (form: string, region: string): boolean => isTribalForm(form) && C.regions.includes(region);
+
+/** Records the new-tribe rule looks at, and the ones it leaves out as not of 1444 or already on the map (TRIBE-002, D-TRIBE-2). */
+export function newTribeRecords(): CatalogueRow[] {
+  const leftOut = C.new_tribes_left_out as Record<string, string>;
+  return allRecords().filter((r) => C.new_tribe_regions.includes(r.region) && C.new_tribe_representations.includes(r.representation) && !Object.hasOwn(leftOut, r.id));
+}
+
+/** Provinces a new tribe starts with, by catalogue tier (TRIBE-003). */
+export function newTribeProvinces(tier: string): number {
+  return (C.new_tribe_provinces as Record<string, number>)[tier] ?? 1;
+}
+
+/** Added realms the map build left as reference data, with the province and realm that held their capital (SETUP-064, TRIBE-004). */
+export function leftOutAtBuild(): { id: string; capital: string; owner: string }[] {
+  return report.left_out;
+}
+
+/** Each added realm's wanted and built size (SETUP-063, TRIBE-003). */
+export function grownAtBuild(): Record<string, { wanted: number; got: number }> {
+  return report.grown;
+}

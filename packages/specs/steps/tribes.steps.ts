@@ -3,14 +3,17 @@ import { loadDefaultRuleset } from "@ph/rules";
 import * as G from "@ph/engine";
 import * as T from "@ph/engine/domain/tribes";
 import * as DIP from "@ph/engine/domain/diplomacy";
+import * as SETUP from "@ph/engine/domain/scenario-setup";
+import { startFaiths, startTongues } from "../../engine/src/peoples.ts";
+import sources from "../../../tools/mapgen/nations-1444.json" with { type: "json" };
 import { steps, type Scenario } from "../src/registry.ts";
 
 const { Given, When, Then } = steps("tribes");
 
 /**
- * Tribes (TRIBE-001, TRIBE-006 to TRIBE-033). The start's walk and the range
+ * Tribes (TRIBE-001 to TRIBE-033). The start's walk and the range
  * sizes are checked on the domain's own rules with the provinces a scenario
- * names; everything else on a whole 1444 campaign, where the five tribal
+ * names; everything else on a whole 1444 campaign, where the tribal
  * realms of the map walk their grounds: claims, furs, taking in, settlers,
  * asks for the land, the AI and what the screens read.
  */
@@ -60,7 +63,10 @@ function ground(s: S, realm: string, p: string, since?: number): void {
   const w = world(s);
   const q = province(s, p);
   expect(w.provinceOwner[q]).toBe(-1);
-  G.makeGround(w, nation(s, realm), q, since ?? month(s));
+  // A full range gives up its newest ground first, so the realm keeps within its range size.
+  const n = nation(s, realm);
+  if (G.huntOf(w, q) !== n) keepGrounds(s, realm, Math.max(0, G.rangeOf(w, n) - 1));
+  G.makeGround(w, n, q, since ?? month(s));
 }
 /** Leaves the realm with only `keep` of its grounds (the newest go). */
 function keepGrounds(s: S, realm: string, keep: number): void {
@@ -176,7 +182,7 @@ Then("on {} {string} is a hunting ground of {string}", (s, date: string, p: stri
 Given("the country {string} is a tribal realm", (s, name: string) => {
   expect(G.isTribal(world(s), nation(s, name))).toBe(true);
   s.realm = name;
-  s.target = "East Kentucky";
+  s.target = "Southeast Tennessee";
 });
 Given("its range has no free place", (s) => {
   const w = world(s);
@@ -197,7 +203,7 @@ Given("a colony is being founded in the province", (s) => {
 });
 Given("the province touches neither its land nor its grounds", (s) => {
   keepGrounds(s, s.realm, 1);
-  s.target = "Massachusetts";
+  s.target = "Vermont";
 });
 Given("the province is owned by a realm", (s) => {
   keepGrounds(s, s.realm, 1);
@@ -657,6 +663,7 @@ Then("the General tab shows {string}, opening this tab", (s, line: string) => {
 });
 Given("the player plays {string} and {string} is founding a colony on its ground {string}", (s, realm: string, founder: string, p: string) => {
   play(s, realm);
+  if (G.huntOf(world(s), province(s, p)) !== nation(s, realm)) ground(s, realm, p);
   world(s).explore.colonies.push({ province: province(s, p), owner: nation(s, founder), governor: -1, progress: 10, aggression: "Hostile", food: 0, lastChange: 0 });
   s.founder = founder;
   s.site = p;
@@ -695,18 +702,19 @@ Then("{string} stands beside {string}", (s, a: string, b: string) => {
 });
 Given("the player plays {string}", (s, realm: string) => play(s, realm));
 When("{string} starts founding a colony on the Creek's ground {string}", (s, realm: string, p: string) => {
+  if (G.huntOf(world(s), province(s, p)) !== nation(s, "Creek")) ground(s, "Creek", p);
   G.colonyStarts(world(s), nation(s, realm), province(s, p), "Wary", s.news);
 });
 Then("a short alert over the map says {string} with {string}", (s, text: string, button: string) => {
   const n = (s.news as G.News[]).find((x) => x.kind === "tribe" && x.text === text)!;
   expect(n.province).toBeGreaterThanOrEqual(0);
-  const a = T.settlersAlert("Castile", "Northeast Florida");
+  const a = T.settlersAlert("Castile", "Southeast Mississippi");
   expect(a.text).toBe(text);
   expect(a.buttons).toContain(button);
 });
 Then("the dispatches keep it", (s) => {
   expect((s.news as G.News[]).some((x) => x.kind === "tribe")).toBe(true);
-  expect(T.settlersAlert("Castile", "Northeast Florida").kept).toBe(true);
+  expect(T.settlersAlert("Castile", "Southeast Mississippi").kept).toBe(true);
 });
 
 Given(/^the game runs on a phone in the (Wide|Tall) layout$/, (s, layout: string) => {
@@ -714,7 +722,7 @@ Given(/^the game runs on a phone in the (Wide|Tall) layout$/, (s, layout: string
 });
 When("the player opens the Hunting grounds tab and a province card with claim buttons", (s) => {
   s.card = T.tribesCard(s.shape);
-  s.buttons = [T.claimButton(null), T.claimButton("no free place"), T.takeInButton("held 6 of 10 years"), T.leaveButton("East Kentucky"), T.askButton(10, null)];
+  s.buttons = [T.claimButton(null), T.claimButton("no free place"), T.takeInButton("held 6 of 10 years"), T.leaveButton("Southeast Tennessee"), T.askButton(10, null)];
 });
 Then("every button is at least 44 points high and no reason is shown only on hover", (s) => {
   for (const b of s.buttons) expect(b.minHeight).toBeGreaterThanOrEqual(44);
@@ -723,4 +731,66 @@ Then("every button is at least 44 points high and no reason is shown only on hov
 });
 Then("the tab's rows stack in one column with no sideways scrolling", (s) => {
   expect(s.card).toMatchObject({ columns: 1, sidewaysScroll: false });
+});
+
+// ---------------------------------------------------------------- new tribes on the 1444 map (TRIBE-002 to TRIBE-005)
+// Read from the built map and the map build's report.
+
+const ownedBy = (id: string) => RULES.provinces.filter((p) => p.owner === id);
+const realmOf = (name: string) => RULES.nations.find((n) => n.name === name || n.id === name.toLowerCase());
+
+Given(/^the catalogue record "([^"]+)" of region "([^"]+)" is a "([^"]+)"(?: of tier (\w))?$/, (s, id: string, region: string, rep: string, tier?: string) => {
+  const r = SETUP.catalogueRecord(id);
+  expect(r.region).toBe(region);
+  expect(r.representation).toBe(rep);
+  if (tier) expect(r.tier).toBe(tier);
+  s.id = id;
+});
+
+Given("the record {string} existed on 11 November 1444", (_s, id: string) => {
+  expect(T.newTribeRecords().map((r) => r.id)).toContain(id);
+});
+
+Given("the home province of {string} is owned by no realm", (_s, id: string) => {
+  expect(T.leftOutAtBuild().map((l) => l.id)).not.toContain(id);
+  const home = (sources as { id: string; grows?: boolean }[]).find((n) => n.id === id);
+  expect(home?.grows).toBe(true);
+});
+
+Then("{string} is a realm on the map with {int} provinces", (_s, id: string, n: number) => {
+  expect(ownedBy(id)).toHaveLength(n);
+  expect(T.grownAtBuild()[id]!.wanted).toBe(T.newTribeProvinces(SETUP.catalogueRecord(id).tier));
+});
+
+Then("{string} is not a realm on the map", (_s, id: string) => {
+  expect(RULES.nations.find((n) => n.id === id)).toBeUndefined();
+  expect(ownedBy(id)).toHaveLength(0);
+});
+
+Given("the home province of {string} is owned by {string} in 1444", (s, id: string, realm: string) => {
+  const l = T.leftOutAtBuild().find((x) => x.id === id);
+  expect(l?.owner).toBe(realmOf(realm)!.id);
+  s.home = l!.capital;
+});
+
+Then("{string} keeps its provinces", (s, realm: string) => {
+  expect(RULES.provinces.find((p) => p.id === s.home)!.owner).toBe(realmOf(realm)!.id);
+});
+
+Given("the catalogue record {string} becomes a realm when a campaign starts", (s, id: string) => {
+  expect(ownedBy(id).length).toBeGreaterThan(0);
+  expect(T.tribesConfig.new_tribe_regions).toContain(SETUP.catalogueRecord(id).region);
+  s.id = id;
+});
+
+Then("its form comes from the start-form rules", (s) => {
+  expect(SETUP.NEVER_START_FORMS).not.toContain(SETUP.startForm(SETUP.startFormRecord(s.id)).form);
+});
+
+Then("its tongue, faith, starting numbers and personality come from the rules every realm uses", (s) => {
+  expect(startTongues(s.id)?.court).toBeTruthy();
+  expect(startFaiths(s.id)?.stateFaith).toBeTruthy();
+  const r = SETUP.catalogueRecord(s.id);
+  expect(Object.keys(r.assessments)).toHaveLength(14);
+  expect(SETUP.catalogueIdOf(s.id)).toBe(s.id);
 });
