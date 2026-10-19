@@ -63,7 +63,7 @@ function chapterList(v: CampaignView): string {
   return `<div class="chapter-list">${v.chapters
     .map((c, i) => {
       const led = SCORES.filter((_, k) => c.leaders[k]!.includes(c.realm));
-      return `<button class="paper" data-chapter="${i}"><b>Chapter ${roman(c.n)} · ${c.from}–${c.to}</b><span>${led.length ? `${icon("crown", 1)}Led ${led.join(", ")}` : SCORES.map((s, k) => `${s} ${ordinal(c.ranks[k]!)}`).join(" · ")}</span></button>`;
+      return `<button class="paper" data-chapter="${i}"><b>Chapter ${roman(c.n)} · ${c.from}–${c.to}</b><span>${led.length ? `${icon("crown", 1)} Led ${led.join(", ")}` : SCORES.map((s, k) => `${s} ${ordinal(c.ranks[k]!)}`).join(" · ")}</span></button>`;
     })
     .join("")}</div>`;
 }
@@ -85,7 +85,7 @@ export function chapterCard(v: CampaignView, i: number, name: (n: number) => str
   const c = v.chapters[i]!;
   const me = c.realm;
   const led = SCORES.filter((_, k) => c.leaders[k]!.includes(me));
-  const verdict = me < 0 ? "" : led.length ? `${esc(name(me))} led ${led.join(" and ")}` : `${esc(name(me))}'s best: ${SCORES[[0, 1, 2].sort((a, b) => c.ranks[a]! - c.ranks[b]!)[0]!]} ${ordinal(Math.min(...c.ranks))} of ${c.realms}`;
+  const verdict = me < 0 ? "" : led.length ? `${esc(name(me))} led ${led.length > 1 ? `${led.slice(0, -1).join(", ")} and ${led.at(-1)}` : led[0]}` : `${esc(name(me))}'s best: ${SCORES[[0, 1, 2].sort((a, b) => c.ranks[a]! - c.ranks[b]!)[0]!]} ${ordinal(Math.min(...c.ranks))} of ${c.realms}`;
   const rows = SCORES.map((s, k) => {
     const leaders = c.leaders[k]!.map(name).map(esc).join(", ");
     return `<div class="score-part"><b>${s}</b><span class="total">${me < 0 ? "" : `${times(c.growth[k]!)} · ${ordinal(c.ranks[k]!)}`}</span><span class="made">Led by ${leaders || "no one"}, ${times(c.leaderGrowth[k]!)}</span><em>${me < 0 ? "" : `of ${c.realms}`}</em></div>`;
@@ -93,7 +93,7 @@ export function chapterCard(v: CampaignView, i: number, name: (n: number) => str
   return `<div class="end-card chapter-card">
     <p class="end-headline">${c.from}–${c.to}</p>
     ${verdict ? `<p class="end-outcome${led.length ? " won" : ""}">${icon(led.length ? "crown" : "scroll", 2)}<b>${verdict}</b></p>` : ""}
-    <p class="hint">Growth over the chapter: each score's average of its last 25 Januaries against the realm's score when the chapter began.</p>
+    <p class="hint">Growth since the chapter began, from each score's 25-year average.</p>
     <div class="score-parts">${rows}</div>
     <h3 class="sub">The leading realms</h3>
     ${ledgerTable(c.ledger, me, name)}

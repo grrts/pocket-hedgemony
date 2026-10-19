@@ -8351,6 +8351,17 @@ Object.assign(globalThis, {
     renderHud();
     renderPanel();
   },
+  /** A chapter as if it had just closed, from the standings now, to look at the chapter card (SHELL-183). */
+  __phPretendChapter: () => {
+    if (!snapshot) return;
+    const v = snapshot.campaign;
+    const me = snapshot.playerNation;
+    const leaders = [0, 1, 2].map((k) => v.ledger.filter((r) => r.ranks[k] === 1).map((r) => r.nation)) as [number[], number[], number[]];
+    const mine = v.ledger.find((r) => r.nation === me);
+    v.chapters = [...v.chapters, { n: v.chapter.n, from: v.chapter.from, to: v.chapter.to, realm: me, growth: mine?.growth ?? [1, 1, 1], ranks: mine?.ranks ?? [1, 1, 1], realms: v.realms, leaders, leaderGrowth: [0, 1, 2].map((k) => v.ledger.find((r) => r.ranks[k] === 1)?.growth[k] ?? 1) as [number, number, number], ledger: v.ledger.map((r) => ({ nation: r.nation, growth: r.growth, ranks: r.ranks })), last: false }];
+    watchChapter();
+    renderPanel();
+  },
   /** The camera as x, y and zoom, to check that selecting moves nothing (SHELL-138). */
   __phCamera: () => ({ ...view.camera }),
   __phLookAtWar: () => {

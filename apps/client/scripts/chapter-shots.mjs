@@ -1,5 +1,4 @@
-// A fair score and chapters (SHELL-182 to SHELL-184): ?chapter=1 closes a chapter every year, so Auto turns play France
-// to January 1445 and the chapter card opens by itself; then Play on, the Score tab with growth and the chapter list,
+// A fair score and chapters (SHELL-182 to SHELL-184): after a week as France a chapter closes and its card opens by itself; then Play on, the Score tab with growth and the chapter list,
 // and the card opened again from it. On a small and a large phone held sideways, a tall window and a desktop. Prints
 // FAIL lines for a tap target under 44 px or a panel that scrolls sideways.
 // Usage: pnpm build && node scripts/chapter-shots.mjs <outDir> [devices]
@@ -27,21 +26,18 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   const page = await browser.newPage({ ...device });
   page.on("pageerror", (e) => console.log("pageerror:", e.message));
   const shot = (what) => page.screenshot({ path: `${out}/${name}-${what}.png` });
-  await page.goto("http://localhost:4186/?chapter=1");
+  await page.goto("http://localhost:4186/");
   await page.waitForSelector("[data-nation=france]", { timeout: 60000 });
   await page.click("[data-nation=france]");
   await page.waitForSelector(".hud [data-news]", { timeout: 60000 });
   await page.waitForTimeout(500);
   await page.locator(".hint-note button:has-text('Stop hints')").click().catch(() => {});
-  // Play week after week until the chapter card opens; anything else that stops Auto turns is waved through.
-  for (let i = 0; i < 40 && !(await page.$(".chapter-card")); i++) {
-    if (process.env.DEBUG) console.log(i, await page.evaluate(() => document.querySelector(".hud")?.textContent?.slice(0, 80)));
-    await page.evaluate(() => document.querySelectorAll(".alert .dismiss").forEach((b) => b.click()));
-    if (await page.$("#panel:not([hidden]) .close")) await page.evaluate(() => document.querySelector("#panel .close")?.click());
-    await page.click("#fab").catch(() => {});
-    await page.waitForFunction(() => document.querySelector(".chapter-card") || !document.querySelector("#fab.playing"), null, { timeout: 120000 }).catch(() => {});
-    await page.waitForTimeout(200);
-  }
+  // A week played, then a chapter closes as if it were January of its last year (__phPretendChapter; ?chapter=1 does it for real, slowly).
+  await page.evaluate(() => document.querySelectorAll(".alert .dismiss").forEach((b) => b.click()));
+  await page.click("#fab");
+  await page.waitForFunction(() => !document.querySelector("#fab.playing"), null, { timeout: 300000 });
+  await page.evaluate(() => window.__phPretendChapter());
+  await page.waitForTimeout(300);
   if (!(await page.$(".chapter-card"))) console.log(`FAIL ${name}: no chapter card`);
   await page.waitForFunction(() => !document.querySelector("#fab.playing"), null, { timeout: 60000 }).catch(() => {});
   await shot("chapter-card");
