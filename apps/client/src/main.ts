@@ -8722,7 +8722,8 @@ async function mpOpenCode(code: string, realm: string | null): Promise<void> {
     if (!game) return openMpMenu(`No game ${code}. Check the code with its host.`);
     const seat = await mySeat(table, code, realm);
     if (game.started) {
-      const mine = seat && game.humans.includes(seat.realm) ? seat.realm : null;
+      // A realm from Your games is this player's (the store's seats know only the tab that sat down).
+      const mine = realm && game.humans.includes(realm) ? realm : seat && game.humans.includes(seat.realm) ? seat.realm : null;
       if (!mine) return openMpMenu(`Game ${code} has already started without you.`);
       // Back in Your games, if it was left from the Players card (MP-051).
       await table.sit(code, mine);
