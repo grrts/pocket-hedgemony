@@ -197,3 +197,10 @@ Feature: Ambitions
     Given the country "Portugal" has in its pool an ambition requiring the event "fall_of_constantinople"
     When ambitions are drawn before the event has happened
     Then the ambition stays in the pool
+
+  @HER-093 @placeholder
+  Scenario: Events that follow an ambition
+    Given the country "Portugal" has the open ambition "Beyond the Cape of Storms"
+    When the ambition is done
+    Then the event "The Casa da Índia" can fire for "Portugal"
+    And before that it cannot
