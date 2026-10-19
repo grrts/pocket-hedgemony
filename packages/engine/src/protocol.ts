@@ -217,10 +217,10 @@ export interface Snapshot {
   provinceHarvest: Int8Array;
   provinceStarved: Float32Array;
   harvests: readonly string[];
-  /** The weather of each province's last harvest (-1 bad, 0 normal, 1 good), its harvest climate (index into climates) and the months it harvests. */
+  /** The weather of each province's last harvest (-1 bad, 0 normal, 1 good), its harvest climate (index into climates) and the months it harvests (bit m-1 set for month m: one number a province, not an array, as the snapshot is copied every day). */
   provinceWeather: Int8Array;
   provinceClimate: Int8Array;
-  provinceHarvestMonths: number[][];
+  provinceHarvestMonths: Uint16Array;
   /** Each province's fever land (index into feverSteps: none, mild, harsh, deadly), PROV-243. */
   provinceFever: Int8Array;
   feverSteps: readonly string[];
@@ -315,9 +315,9 @@ export interface Snapshot {
   /** Name of the official at each province's post, or null when it stands empty (or no realm owns it). */
   provinceOfficialName: (string | null)[];
   /** Years the official at each post has served there, to one decimal (0 when empty); his effect grows to full at 5 (see officialEffect). */
-  provinceOfficialYears: number[];
+  provinceOfficialYears: Float64Array;
   /** Realm a foreign specialist at each post came from (nation index), -1 = one of the realm's own (PROV-334). */
-  provinceOfficialFrom: number[];
+  provinceOfficialFrom: Int16Array;
   /** The player's provinces just taken that wait for a decision before the turn ends: fill the post, grant it, or keep it royal (PROV-340). */
   newLands: number[];
   /** The player's posts (PROV-342 to PROV-348): whether Auto-fill posts is on, the gold it keeps back, what filling every empty post costs now, and the best fit for each royal post of the player's, by province. */
@@ -534,7 +534,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       plagueSteps: PLAGUE_STEPS,
       plague: w.plagueSick.map((p) => ({ province: p, step: w.provincePlague[p]!, weeks: w.provincePlagueWeeks[p]!, dead: Math.round(w.provincePlagueDead[p]! * 1000) })),
       quarantineTax: quarantineTaxShare(),
-      provinceHarvestMonths: Array.from({ length: w.provinceCount }, (_, p) => (w.provinceWater[p] ? [] : harvestMonthsOf(w, p))),
+      provinceHarvestMonths: Uint16Array.from({ length: w.provinceCount }, (_, p) => (w.provinceWater[p] ? 0 : harvestMonthsOf(w, p).reduce((bits, m) => bits | (1 << (m - 1)), 0))),
       climates: CLIMATES,
       badWeather: CLIMATES.map(badWeatherName),
       ...(mapNetwork(w), { provinceCastle: w.provinceCastle.slice(), provinceRing: w.provinceRing.slice() }),
@@ -590,8 +590,8 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       freeCompanies: player >= 0 ? freeCompaniesFor(w, player).map((c) => ({ ...companyView(c), id: c.id, pay: companyPay(w, c, player), weeks: companyWeeks(w, c, player) })) : [],
       provinceOfficial: Array.from(w.provinceOfficial, (o) => (o >= 0 ? OFFICIALS[o]! : null)),
       provinceOfficialName: Array.from({ length: w.provinceCount }, (_, p) => officialAt(w, p)),
-      provinceOfficialYears: Array.from({ length: w.provinceCount }, (_, p) => Math.floor(yearsServed(w, p) * 10) / 10),
-      provinceOfficialFrom: Array.from(w.provinceOfficialFrom),
+      provinceOfficialYears: Float64Array.from({ length: w.provinceCount }, (_, p) => Math.floor(yearsServed(w, p) * 10) / 10),
+      provinceOfficialFrom: w.provinceOfficialFrom.slice(),
       newLands: player >= 0 ? newLands(w, player) : [],
       posts: player >= 0 ? postsView(w, player) : { autoFill: false, reserve: autoFillReserve(), fillAll: { posts: 0, gold: 0 }, fit: {} },
       commanders: w.commanders.map((c, k) => ({
