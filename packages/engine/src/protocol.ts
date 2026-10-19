@@ -309,7 +309,7 @@ export interface Snapshot {
   /** The player's provinces just taken that wait for a decision before the turn ends: fill the post, grant it, or keep it royal (PROV-340). */
   newLands: number[];
   /** Every commander: who they serve (-1 = none), their skills and record, the army they lead (index in armies, -1 = at court) and the province they left as an official (-1 = none). */
-  commanders: { name: string; owner: number; might: number; cunning: number; logistics: number; victories: number; defeats: number; army: number; home: number; origin: string; fleet: number }[];
+  commanders: { name: string; owner: number; might: number; cunning: number; logistics: number; victories: number; defeats: number; army: number; home: number; origin: string; fleet: number; /** An admiral (fleets only) rather than a general (armies only), RECR-128. */ sea: boolean }[];
   /** Ports, sailors and fleets: every fleet for the map, the player's ports and fleets in full (navy.ts). */
   navy: NavyView;
   /** Fleets the player can hire now, free fleets first (hiredFleets.ts, F-115). */
@@ -586,6 +586,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         home: w.commanderHome[k]!,
         origin: c.origin ?? "",
         fleet: w.navy.fleets.find((f) => f.admiral === k)?.id ?? -1,
+        sea: w.commanderSea[k] === 1,
       })),
       navy: navyView(w, player),
       fleetsForHire: player >= 0 ? fleetOffersView(w, player) : [],

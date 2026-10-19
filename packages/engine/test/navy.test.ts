@@ -127,8 +127,12 @@ describe("ports and fleets", () => {
     expect(f.ships).toHaveLength(2);
     // An army in the port boards: it needs an admiral first.
     const post = w.provinceOfficial.findIndex((o, q) => o >= 0 && w.provinceOwner[q] === me && q !== port && w.provinceLord[q]! < 0);
-    expect(act(w, { type: "commission", province: post }, me)).toEqual([]);
+    // A general can't lead a fleet: the official is commissioned as admiral (RECR-128).
+    expect(act(w, { type: "commission", province: post, sea: true }, me)).toEqual([]);
     const c = w.commanderIds.length - 1;
+    expect(w.commanderSea[c]).toBe(1);
+    const general = w.commanderIds.findIndex((_, k) => w.commanderOwner[k] === me && !w.commanderSea[k]);
+    expect(act(w, { type: "navy", do: "admiral", fleet: f.id, commander: general }, me)[0]).toMatch(/general leads armies/);
     let slot = -1;
     for (let i = 0; i < w.armies.count; i++) if (w.armies.alive[i] && w.armies.owner[i] === me && w.armies.commander[i]! >= 0) slot = i;
     w.armies.location[slot] = port;

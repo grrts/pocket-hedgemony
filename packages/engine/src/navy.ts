@@ -6,7 +6,8 @@ import { knows } from "./research.ts";
 import * as rs from "./domain/research/index.ts";
 import { slotsOf, slotsUsed, WORK_COUNT, workIndex, worksAt, workStepName } from "./works.ts";
 import { classesOf } from "./living.ts";
-import { armyOf, idleCommanders } from "./recruit.ts";
+import { armyOf, commissionOfficial, COMMISSION_GOLD, idleCommanders, isAdmiral } from "./recruit.ts";
+import { OFFICIALS } from "./officials.ts";
 import { halt, mayMarchInto } from "./turn.ts";
 import { isCharted, whyNoExploration } from "./exploration.ts";
 import { noteMoment } from "./achievements.ts";
@@ -986,6 +987,7 @@ function setAdmiral(world: World, n: number, id: number, c: number, post?: nv.Po
   }
   if (c >= world.commanderIds.length || world.commanderOwner[c] !== n) return "no such commander of yours";
   if (post !== undefined && !nv.isPost(post)) return "no such post";
+  if (!isAdmiral(world, c)) return "a general leads armies: commission an official as admiral to lead a fleet";
   if (armyOf(world, c) >= 0) return "that commander leads an army";
   if (world.navy.fleets.some((x) => x.admiral === c && x !== f)) return "that commander already leads a fleet";
   // A new leader takes the post that fits the fleet unless one is named; the same leader keeps his unless told (NAVY-153).
@@ -1585,6 +1587,20 @@ export function navyCosts(world: World): Float64Array {
  * no admiral takes an idle commander; at war, a fleet hunts enemy fleets it
  * outnumbers near by, and at peace a fleet at sea goes home (naval §11).
  */
+/** The royal post an AI realm takes an admiral from: the fleet's port if it has an official, else a customs officer, else any official. */
+function admiralPost(world: World, n: number, port: number): number {
+  const royal = (p: number) => world.provinceOwner[p] === n && world.provinceLord[p]! < 0 && world.provinceOfficial[p]! >= 0;
+  if (port >= 0 && port < world.provinceCount && royal(port)) return port;
+  const customs = OFFICIALS.indexOf("Customs officer");
+  let any = -1;
+  for (let p = 0; p < world.provinceCount; p++) {
+    if (!royal(p)) continue;
+    if (world.provinceOfficial[p] === customs) return p;
+    if (any < 0) any = p;
+  }
+  return any;
+}
+
 function aiNavy(world: World, news: News[]): void {
   const v = world.navy;
   const ai = G.ai;
@@ -1617,8 +1633,13 @@ function aiNavy(world: World, news: News[]): void {
     // Exploration ships are the exploration AI's (colonies.ts).
     if (f.owner === world.player || f.battle >= 0 || !f.ships.length || allExplorers(f)) continue;
     if (f.admiral < 0) {
-      if (!idle.has(f.owner)) idle.set(f.owner, idleCommanders(world, f.owner).filter((c) => !v.fleets.some((x) => x.admiral === c)));
-      const c = idle.get(f.owner)!.shift();
+      if (!idle.has(f.owner)) idle.set(f.owner, idleCommanders(world, f.owner, true).filter((c) => !v.fleets.some((x) => x.admiral === c)));
+      let c = idle.get(f.owner)!.shift();
+      // No admiral waits at court: a fleet that needs one commissions an official as admiral, the port's own first (RECR-128).
+      if (c === undefined && needsAdmiral(f) && world.nationTreasury[f.owner]! >= ai.reserveGold + COMMISSION_GOLD) {
+        const seat = admiralPost(world, f.owner, f.at);
+        if (seat >= 0 && !commissionOfficial(world, f.owner, seat, news, true)) c = world.commanderIds.length - 1;
+      }
       if (c !== undefined) {
         f.admiral = c;
         f.post = nv.fittingPost(f.ships.map((s) => s.type));

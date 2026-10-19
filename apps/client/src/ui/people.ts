@@ -139,8 +139,19 @@ export interface MoveOption {
   fit: string;
 }
 
-/** An official's own screen: who they are, the post and what it does now, moving him to another province, and commissioning him. */
-export function officialScreen(rules: Ruleset, o: Official, nation: number, gold: number, treasury: number, moves: MoveOption[], allMoves: boolean, t: Titles = DEFAULT_TITLES): string {
+/** Might, cunning and logistics an official would start with in a command. */
+export interface CommandSkills {
+  might: number;
+  cunning: number;
+  logistics: number;
+}
+
+/** An official's own screen: who they are, the post and what it does now, moving him to another province, and commissioning him as a general or an admiral. */
+export function officialScreen(rules: Ruleset, o: Official, nation: number, gold: number, treasury: number, moves: MoveOption[], allMoves: boolean, t: Titles = DEFAULT_TITLES, command: { general: CommandSkills; admiral: CommandSkills; port: boolean } = { general: { might: 1, cunning: 1, logistics: 1 }, admiral: { might: 1, cunning: 1, logistics: 1 }, port: false }): string {
+  const short = gold > treasury;
+  const skillLine = (k: CommandSkills) => `might ${k.might} · cunning ${k.cunning} · logistics ${k.logistics}`;
+  const commission = (sea: boolean) =>
+    `<button class="wax commission" data-commission="${o.province}"${sea ? " data-commission-sea" : ""} ${short ? "disabled" : ""}>Commission as ${sea ? "admiral" : "general"} · ${gold} gold<small>${sea ? "Leads fleets" : "Leads armies"}: ${skillLine(sea ? command.admiral : command.general)}</small></button>`;
   const place = rules.provinces[o.province]!.name;
   const e = officialEffect(o.post, o.years);
   return `<div class="person-card">${officialPortrait(rules, o, nation, 5)}
@@ -162,9 +173,9 @@ export function officialScreen(rules: Ruleset, o: Official, nation: number, gold
       .join("")}</div>
     ${allMoves ? "" : `<button class="paper small more" data-moves-all>Show every province</button>`}
     <h3 class="sub">Command</h3>
-    <p class="hint">Commissioned, ${esc(o.name)} waits at court to lead an army. The post stands empty meanwhile: half tax and recruits.</p>
-    <div class="choices"><button class="wax" data-commission="${o.province}" ${gold > treasury ? "disabled" : ""}>Commission as commander · ${gold} gold</button></div>
-    ${gold > treasury ? `<p class="hint">Not enough gold: the commission costs ${gold}.</p>` : ""}`;
+    <p class="hint">Commissioned, ${esc(o.name)} waits at court: as a general to lead an army, as an admiral to lead a fleet. He stays one or the other until released. The post stands empty meanwhile: half tax and recruits.${command.port ? " His years in this port count double at sea." : ""}</p>
+    <div class="choices">${commission(false)}${commission(true)}</div>
+    ${short ? `<p class="hint">Not enough gold: the commission costs ${gold}.</p>` : ""}`;
 }
 
 /** A type the empty post could be filled with by hiring: what it would do here, and whether one can be found at home. */

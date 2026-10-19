@@ -3,6 +3,9 @@ import * as R from "@ph/engine/domain/recruiting";
 import { provinceConfig } from "@ph/engine/domain/province";
 import { type MoveWorld, type Place } from "@ph/engine/domain/troop-movement";
 import { aiCollect, applyNow, ARMS, commanderScreen, commissionOfficial, createWorld, cultureOf, OFFICIALS, recruit, type World, garrisonTroops, garrisonView, gatherDays, idleCommanders, KIND, LEVY_UNIT, menByArm, monthlyRecruits, personName, rankedName, Rng, spawnArmy, trainingGround, WORK_COUNT, workIndex, type CommanderScreen, type Order } from "@ph/engine";
+import { appointCommander, commissionSkills } from "../../engine/src/recruit.ts";
+import { isPort, newFleet } from "../../engine/src/navy.ts";
+import { yearsServed } from "../../engine/src/officials.ts";
 import { commanderAt, garrisonMen, levyGame, playDays, province, type LevyGame } from "./levy-game.ts";
 import { loadDefaultRuleset } from "@ph/rules";
 import { steps, type Scenario } from "../src/registry.ts";
@@ -1831,6 +1834,8 @@ Then("training is ordered from it", (s) => {
 function gameFrance(s: Scenario): { w: World; n: number } {
   return levyGame(s);
 }
+/** The realm's generals (the AI's fleets commission admirals of their own meanwhile, RECR-130). */
+const generalsOf = (w: World, n: number) => w.commanderIds.filter((_, c) => w.commanderOwner[c] === n && !w.commanderSea[c]).length;
 function royalPostOf(w: World, n: number, type: string): number {
   for (let p = 0; p < w.provinceCount; p++) if (w.provinceOwner[p] === n && w.provinceLord[p]! < 0 && OFFICIALS[w.provinceOfficial[p]!] === type) return p;
   throw new Error(`no royal ${type}`);
@@ -1839,7 +1844,7 @@ Given('the country "France" raises a new army', (s) => {
   const { w, n } = gameFrance(s);
   const capital = w.provinceIndex.get(w.rules.nations[n]!.capital)!;
   w.nationTreasury[n] = 10_000;
-  s.commanders = w.commanderIds.length;
+  s.commanders = generalsOf(w, n);
   s.armies = w.armies.count;
   expect(recruit(w, n, capital, 1, [])).toBeNull();
   playDays(levyGame(s), 28);
@@ -1848,9 +1853,9 @@ Given('the country "France" raises a new army', (s) => {
 Then("the army has no commander until the player commissions an official or one already serving takes it", (s) => {
   const { w, n } = gameFrance(s);
   // The men stand in the province without a commander: no commander was made for them.
-  expect(w.commanderIds.length).toBe(s.commanders);
+  expect(generalsOf(w, n)).toBe(s.commanders);
   expect(commissionOfficial(w, n, royalPostOf(w, n, "Steward"), [])).toBeNull();
-  expect(w.commanderIds.length).toBe(s.commanders + 1);
+  expect(generalsOf(w, n)).toBe(s.commanders + 1);
 });
 Then("no commander is attached to an army by default", (s) => {
   const { w } = gameFrance(s);
@@ -1868,4 +1873,46 @@ When('the player commissions the steward of "Reims"', (s) => {
 Then("France has 10 gold left", (s) => {
   const { w, n } = gameFrance(s);
   expect(w.nationTreasury[n]).toBe(10);
+});
+
+// RECR-128, RECR-129: a general for the armies, an admiral for the fleets.
+Given('the country "France" has 200 gold', (s) => {
+  const { w, n } = gameFrance(s);
+  w.nationTreasury[n] = 200;
+});
+When(/^the player commissions the (customs officer|warden) of a royal province as (admiral|general)$/, (s, type: string, post: string) => {
+  const { w, n } = gameFrance(s);
+  const p = royalPostOf(w, n, type === "warden" ? "Warden" : "Customs officer");
+  s.years = yearsServed(w, p);
+  s.port = isPort(w, p);
+  expect(commissionOfficial(w, n, p, [], post === "admiral")).toBeNull();
+  s.commander = w.commanderIds.length - 1;
+});
+Then(/^he starts with a (customs officer|warden)'s (sea )?skills$/, (s, type: string, sea: string | null) => {
+  const { w } = gameFrance(s);
+  const c = w.commanders[s.commander as number]!;
+  const want = commissionSkills(type === "warden" ? "Warden" : "Customs officer", s.years as number, s.port as boolean, !!sea);
+  expect({ might: c.might, cunning: c.cunning, logistics: c.logistics }).toEqual(want);
+  // A customs officer at sea leans on cunning (NAVY-073), on land he is a plain 1, 1, 1 at best.
+  if (sea) expect(want.cunning).toBeGreaterThanOrEqual(3);
+});
+const franceFleet = (w: World, n: number) => {
+  const port = w.provinceIndex.get(w.rules.nations[n]!.capital)!;
+  return newFleet(w, n, port, w.tiles.centre[port]!);
+};
+const franceArmy = (w: World, n: number) => spawnArmy(w, n, w.provinceIndex.get(w.rules.nations[n]!.capital)!, 1000, -1);
+Then("he can lead a fleet but not an army", (s) => {
+  const { w, n } = gameFrance(s);
+  const c = s.commander as number;
+  const f = franceFleet(w, n);
+  expect(applyNow(w, { type: "navy", do: "admiral", fleet: f.id, commander: c }, n).rejectedOrders).toEqual([]);
+  expect(f.admiral).toBe(c);
+  expect(appointCommander(w, n, franceArmy(w, n), c)).toMatch(/admiral leads fleets/);
+});
+Then("he can lead an army but not a fleet", (s) => {
+  const { w, n } = gameFrance(s);
+  const c = s.commander as number;
+  expect(appointCommander(w, n, franceArmy(w, n), c)).toBeNull();
+  const f = franceFleet(w, n);
+  expect(applyNow(w, { type: "navy", do: "admiral", fleet: f.id, commander: c }, n).rejectedOrders.map((r) => r.reason)).toEqual([expect.stringMatching(/general leads armies/)]);
 });
