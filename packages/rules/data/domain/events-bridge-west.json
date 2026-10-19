@@ -640,7 +640,7 @@
    },
    "follow_ups": [
     {
-     "event": "hus_burned",
+     "event": "burning_of_hus",
      "delay": [
       10,
       40
@@ -935,7 +935,7 @@
    "effects": {},
    "follow_ups": [
     {
-     "event": "hus_burned",
+     "event": "burning_of_hus",
      "delay": [
       0,
       2
@@ -951,8 +951,8 @@
     "confidence": "high"
    }
   },
-  "hus_burned": {
-   "id": "hus_burned",
+  "burning_of_hus": {
+   "id": "burning_of_hus",
    "name": "Jan Hus burned at Constance",
    "ages": [
     "age_of_schism_and_conquerors"
@@ -1055,7 +1055,7 @@
    "effects": {},
    "follow_ups": [
     {
-     "event": "defenestration_of_prague",
+     "event": "first_defenestration_of_prague",
      "delay": [
       1,
       6
@@ -1068,8 +1068,8 @@
     "confidence": "high"
    }
   },
-  "defenestration_of_prague": {
-   "id": "defenestration_of_prague",
+  "first_defenestration_of_prague": {
+   "id": "first_defenestration_of_prague",
    "name": "The Defenestration of Prague",
    "ages": [
     "age_of_schism_and_conquerors"
@@ -1187,7 +1187,7 @@
    "effects": {},
    "follow_ups": [
     {
-     "event": "hussite_crusades",
+     "event": "anti_hussite_crusade",
      "delay": [
       0,
       3
@@ -1321,8 +1321,8 @@
     "confidence": "high"
    }
   },
-  "union_of_florence": {
-   "id": "union_of_florence",
+  "council_of_florence_union": {
+   "id": "council_of_florence_union",
    "name": "The Union of Florence",
    "ages": [
     "age_of_schism_and_conquerors",
@@ -1411,7 +1411,7 @@
        {
         "set_flag": {
          "on": "byzantium",
-         "id": "union_of_florence",
+         "id": "council_of_florence_union",
          "years": 0
         }
        },
@@ -2681,8 +2681,8 @@
     "confidence": "high"
    }
   },
-  "hussite_crusades": {
-   "id": "hussite_crusades",
+  "anti_hussite_crusade": {
+   "id": "anti_hussite_crusade",
    "name": "The Hussite crusades",
    "ages": [
     "age_of_schism_and_conquerors",
@@ -2732,7 +2732,7 @@
    },
    "requires": {
     "event": {
-     "id": "defenestration_of_prague"
+     "id": "first_defenestration_of_prague"
     }
    },
    "trigger": {
@@ -3713,8 +3713,8 @@
     "confidence": "high"
    }
   },
-  "orleans_murdered": {
-   "id": "orleans_murdered",
+  "murder_of_orleans": {
+   "id": "murder_of_orleans",
    "name": "The murder of Louis of Orléans",
    "ages": [
     "age_of_schism_and_conquerors"
@@ -4382,7 +4382,7 @@
    "effects": {},
    "follow_ups": [
     {
-     "event": "joan_of_arc",
+     "event": "relief_of_orleans",
      "delay": [
       5,
       12
@@ -4395,8 +4395,8 @@
     "confidence": "high"
    }
   },
-  "joan_of_arc": {
-   "id": "joan_of_arc",
+  "relief_of_orleans": {
+   "id": "relief_of_orleans",
    "name": "Joan of Arc",
    "ages": [
     "age_of_schism_and_conquerors",
@@ -4610,7 +4610,7 @@
       "any": [
        {
         "event": {
-         "id": "joan_of_arc"
+         "id": "relief_of_orleans"
         }
        },
        {
@@ -4954,7 +4954,7 @@
    "effects": {},
    "follow_ups": [
     {
-     "event": "aljubarrota",
+     "event": "battle_of_aljubarrota",
      "delay": [
       0,
       3
@@ -4970,8 +4970,8 @@
     "confidence": "high"
    }
   },
-  "aljubarrota": {
-   "id": "aljubarrota",
+  "battle_of_aljubarrota": {
+   "id": "battle_of_aljubarrota",
    "name": "The Battle of Aljubarrota",
    "ages": [
     "age_of_schism_and_conquerors"
@@ -5413,7 +5413,7 @@
    },
    "optional": [
     {
-     "event": "aljubarrota",
+     "event": "battle_of_aljubarrota",
      "weight": 1.5
     }
    ],
@@ -6364,7 +6364,7 @@
    "effects": {},
    "follow_ups": [
     {
-     "event": "milan_made_a_duchy",
+     "event": "milan_made_duchy",
      "delay": [
       3,
       12
@@ -6377,8 +6377,8 @@
     "confidence": "high"
    }
   },
-  "milan_made_a_duchy": {
-   "id": "milan_made_a_duchy",
+  "milan_made_duchy": {
+   "id": "milan_made_duchy",
    "name": "Milan made a duchy",
    "ages": [
     "age_of_schism_and_conquerors"
@@ -6538,7 +6538,7 @@
     "all": [
      {
       "event": {
-       "id": "milan_made_a_duchy"
+       "id": "milan_made_duchy"
       }
      },
      {
@@ -8271,22 +8271,22 @@
   "event.council_of_constance.desc": "The King of the Romans calls the Church to Constance. The council deposes the Pisan pope and Benedict XIII, accepts Gregory XII's resignation and elects Martin V in 1417. The Western Schism is over.",
   "event.council_of_constance.option.end_the_schism": "End the Schism",
   "event.council_of_constance.option.let_the_popes_quarrel": "Let the popes quarrel",
-  "event.hus_burned.name": "Jan Hus burned at Constance",
-  "event.hus_burned.desc": "Jan Hus preaches Wyclif's reform in Prague. Summoned to the council under a safe-conduct, he is condemned and burned on 6 July 1415, and Bohemia takes his death as an insult to the kingdom.",
-  "event.hus_burned.option.burn_hus": "Hus is burned",
-  "event.hus_burned.option.spare_hus": "Hus is spared",
-  "event.defenestration_of_prague.name": "The Defenestration of Prague",
-  "event.defenestration_of_prague.desc": "In July 1419 Hussites storm Prague's New Town Hall and throw the councillors from the windows. Weeks later King Wenceslaus dies, and Bohemia rises against his heir Sigismund.",
-  "event.defenestration_of_prague.option.the_hussites_rise": "The Hussites rise",
-  "event.defenestration_of_prague.option.grant_the_chalice": "Grant the chalice",
+  "event.burning_of_hus.name": "Jan Hus burned at Constance",
+  "event.burning_of_hus.desc": "Jan Hus preaches Wyclif's reform in Prague. Summoned to the council under a safe-conduct, he is condemned and burned on 6 July 1415, and Bohemia takes his death as an insult to the kingdom.",
+  "event.burning_of_hus.option.burn_hus": "Hus is burned",
+  "event.burning_of_hus.option.spare_hus": "Hus is spared",
+  "event.first_defenestration_of_prague.name": "The Defenestration of Prague",
+  "event.first_defenestration_of_prague.desc": "In July 1419 Hussites storm Prague's New Town Hall and throw the councillors from the windows. Weeks later King Wenceslaus dies, and Bohemia rises against his heir Sigismund.",
+  "event.first_defenestration_of_prague.option.the_hussites_rise": "The Hussites rise",
+  "event.first_defenestration_of_prague.option.grant_the_chalice": "Grant the chalice",
   "event.council_of_basel.name": "The Council of Basel",
   "event.council_of_basel.desc": "The council that meets at Basel in 1431 claims to stand above the pope. It makes peace with the Hussites, deposes Eugenius IV and elects its own antipope, Felix V, before it dissolves in 1449.",
   "event.council_of_basel.option.council_over_pope": "The council defies the pope",
   "event.council_of_basel.option.pope_masters_the_council": "The pope masters it",
-  "event.union_of_florence.name": "The Union of Florence",
-  "event.union_of_florence.desc": "Hard pressed by the Ottomans, the Byzantine emperor comes to Florence in 1439 and signs a union of the Greek and Latin Churches in return for help. At home the union is hated.",
-  "event.union_of_florence.option.sign_the_union": "Sign the union",
-  "event.union_of_florence.option.refuse_the_union": "Refuse the union",
+  "event.council_of_florence_union.name": "The Union of Florence",
+  "event.council_of_florence_union.desc": "Hard pressed by the Ottomans, the Byzantine emperor comes to Florence in 1439 and signs a union of the Greek and Latin Churches in return for help. At home the union is hated.",
+  "event.council_of_florence_union.option.sign_the_union": "Sign the union",
+  "event.council_of_florence_union.option.refuse_the_union": "Refuse the union",
   "event.wenceslaus_succeeds.name": "Wenceslaus succeeds Charles IV",
   "event.wenceslaus_succeeds.desc": "Emperor Charles IV dies at Prague on 29 November 1378. His son Wenceslaus, already King of the Romans, follows him without an election, and the Luxembourg lands are shared among the brothers: Sigismund keeps Brandenburg, Jobst Moravia.",
   "event.wenceslaus_succeeds.option.share_the_lands": "Share the lands",
@@ -8327,10 +8327,10 @@
   "event.saxony_to_the_wettins.desc": "The Ascanian electors of Saxe-Wittenberg die out in 1422. Sigismund grants the electorate to Frederick the Warlike of Meissen, and the Wettin lands take the name of Saxony.",
   "event.saxony_to_the_wettins.option.take_the_electorate": "Take the electorate",
   "event.saxony_to_the_wettins.option.let_lauenburg_inherit": "Let Lauenburg inherit",
-  "event.hussite_crusades.name": "The Hussite crusades",
-  "event.hussite_crusades.desc": "Sigismund leads five crusades into Bohemia between 1420 and 1431. Žižka's wagon forts beat every one, and the war ends only with the Compacts of Basel in 1436.",
-  "event.hussite_crusades.option.launch_the_crusades": "Launch the crusades",
-  "event.hussite_crusades.option.treat_with_the_hussites": "Treat with the Hussites",
+  "event.anti_hussite_crusade.name": "The Hussite crusades",
+  "event.anti_hussite_crusade.desc": "Sigismund leads five crusades into Bohemia between 1420 and 1431. Žižka's wagon forts beat every one, and the war ends only with the Compacts of Basel in 1436.",
+  "event.anti_hussite_crusade.option.launch_the_crusades": "Launch the crusades",
+  "event.anti_hussite_crusade.option.treat_with_the_hussites": "Treat with the Hussites",
   "event.albert_ii_king.name": "Albert of Austria takes three crowns",
   "event.albert_ii_king.desc": "Sigismund dies in December 1437 without a son. His son-in-law Albert of Austria is chosen King of Hungary and of Bohemia and King of the Romans, the first Habsburg on the throne since 1308.",
   "event.albert_ii_king.option.take_three_crowns": "Take the three crowns",
@@ -8360,10 +8360,10 @@
   "event.madness_of_charles_vi.desc": "Riding through the forest of Le Mans in August 1392, Charles VI goes mad and kills four of his own men. For thirty years his fits come and go, and the princes fight over who governs in his name.",
   "event.madness_of_charles_vi.option.the_king_goes_mad": "The king goes mad",
   "event.madness_of_charles_vi.option.the_king_recovers": "The king recovers",
-  "event.orleans_murdered.name": "The murder of Louis of Orléans",
-  "event.orleans_murdered.desc": "The king's brother Louis of Orléans and his cousin John the Fearless of Burgundy fight for the council of a mad king. On 23 November 1407 John's men cut Louis down in a Paris street.",
-  "event.orleans_murdered.option.strike_at_orleans": "Strike at Orléans",
-  "event.orleans_murdered.option.reconcile_at_court": "Reconcile at court",
+  "event.murder_of_orleans.name": "The murder of Louis of Orléans",
+  "event.murder_of_orleans.desc": "The king's brother Louis of Orléans and his cousin John the Fearless of Burgundy fight for the council of a mad king. On 23 November 1407 John's men cut Louis down in a Paris street.",
+  "event.murder_of_orleans.option.strike_at_orleans": "Strike at Orléans",
+  "event.murder_of_orleans.option.reconcile_at_court": "Reconcile at court",
   "event.armagnac_burgundian_war.name": "The Armagnac–Burgundian war",
   "event.armagnac_burgundian_war.desc": "Orléans's son and his father-in-law Bernard of Armagnac raise the princes against Burgundy. From 1411 France has a civil war inside the English war, and both sides court the English.",
   "event.armagnac_burgundian_war.option.civil_war": "Civil war",
@@ -8380,10 +8380,10 @@
   "event.treaty_of_troyes.desc": "After John the Fearless is murdered at Montereau, Burgundy joins England. At Troyes on 21 May 1420 the mad Charles VI disinherits his son, makes Henry V his heir and gives him his daughter. English and Burgundian garrisons hold Paris.",
   "event.treaty_of_troyes.option.accept_troyes": "Accept the treaty",
   "event.treaty_of_troyes.option.refuse_troyes": "Refuse the treaty",
-  "event.joan_of_arc.name": "Joan of Arc",
-  "event.joan_of_arc.desc": "In 1429 a peasant girl from Domrémy convinces the Dauphin that God has sent her. She breaks the siege of Orléans in May and brings him to Reims to be crowned. The English burn her at Rouen in 1431, but the tide has turned.",
-  "event.joan_of_arc.option.trust_the_maid": "Trust the Maid",
-  "event.joan_of_arc.option.send_her_home": "Send her home",
+  "event.relief_of_orleans.name": "Joan of Arc",
+  "event.relief_of_orleans.desc": "In 1429 a peasant girl from Domrémy convinces the Dauphin that God has sent her. She breaks the siege of Orléans in May and brings him to Reims to be crowned. The English burn her at Rouen in 1431, but the tide has turned.",
+  "event.relief_of_orleans.option.trust_the_maid": "Trust the Maid",
+  "event.relief_of_orleans.option.send_her_home": "Send her home",
   "event.congress_of_arras.name": "The Congress of Arras",
   "event.congress_of_arras.desc": "In September 1435 Philip the Good makes peace with Charles VII at Arras, avenged for his father's murder and freed from homage. The English walk out, and Paris opens its gates to the French king in 1436.",
   "event.congress_of_arras.option.make_peace_with_france": "Make peace with France",
@@ -8396,10 +8396,10 @@
   "event.portuguese_crisis.desc": "Ferdinand I dies in 1383 and his only child Beatriz is married to John I of Castile. Lisbon rises, the Master of Avis kills the queen's favourite, and the Cortes of Coimbra make him king in 1385.",
   "event.portuguese_crisis.option.avis_takes_the_crown": "The Master of Avis is king",
   "event.portuguese_crisis.option.accept_castile": "Accept Beatriz and Castile",
-  "event.aljubarrota.name": "The Battle of Aljubarrota",
-  "event.aljubarrota.desc": "John I of Castile invades to take his wife's crown. On 14 August 1385 King John of Avis and Nuno Álvares Pereira, with English archers, destroy his army at Aljubarrota. The Treaty of Windsor binds England and Portugal the next year.",
-  "event.aljubarrota.option.portuguese_victory": "Portugal wins",
-  "event.aljubarrota.option.castilian_victory": "Castile wins",
+  "event.battle_of_aljubarrota.name": "The Battle of Aljubarrota",
+  "event.battle_of_aljubarrota.desc": "John I of Castile invades to take his wife's crown. On 14 August 1385 King John of Avis and Nuno Álvares Pereira, with English archers, destroy his army at Aljubarrota. The Treaty of Windsor binds England and Portugal the next year.",
+  "event.battle_of_aljubarrota.option.portuguese_victory": "Portugal wins",
+  "event.battle_of_aljubarrota.option.castilian_victory": "Castile wins",
   "event.lancaster_claim_in_castile.name": "Lancaster's claim to Castile",
   "event.lancaster_claim_in_castile.desc": "John of Gaunt claims Castile through his wife Constance, daughter of Peter the Cruel. He lands in Galicia in 1386 with Portugal's help, but his army melts away, and at Bayonne in 1388 he sells the claim: his daughter marries the Castilian heir.",
   "event.lancaster_claim_in_castile.option.invade_and_bargain": "Invade, then bargain",
@@ -8440,10 +8440,10 @@
   "event.gian_galeazzo_coup.desc": "On 6 May 1385 Gian Galeazzo Visconti, lord of Pavia, rides out to greet his uncle Bernabò outside Milan and arrests him. Bernabò dies in prison, and the Visconti state is one again.",
   "event.gian_galeazzo_coup.option.seize_bernabo": "Seize Bernabò",
   "event.gian_galeazzo_coup.option.share_the_state": "Share the state",
-  "event.milan_made_a_duchy.name": "Milan made a duchy",
-  "event.milan_made_a_duchy.desc": "For 100,000 florins Wenceslaus makes Gian Galeazzo Duke of Milan in 1395, the first duke in Italy by imperial grant. Gian Galeazzo goes on to take Pisa, Siena, Perugia and Bologna.",
-  "event.milan_made_a_duchy.option.buy_the_title": "Buy the title",
-  "event.milan_made_a_duchy.option.remain_an_imperial_vicar": "Remain a vicar",
+  "event.milan_made_duchy.name": "Milan made a duchy",
+  "event.milan_made_duchy.desc": "For 100,000 florins Wenceslaus makes Gian Galeazzo Duke of Milan in 1395, the first duke in Italy by imperial grant. Gian Galeazzo goes on to take Pisa, Siena, Perugia and Bologna.",
+  "event.milan_made_duchy.option.buy_the_title": "Buy the title",
+  "event.milan_made_duchy.option.remain_an_imperial_vicar": "Remain a vicar",
   "event.death_of_gian_galeazzo.name": "Death of Gian Galeazzo",
   "event.death_of_gian_galeazzo.desc": "Gian Galeazzo dies of plague in September 1402 with Florence almost at his mercy. His sons are boys, the condottieri carve up his state, and the threat to Tuscany is gone.",
   "event.death_of_gian_galeazzo.option.the_state_breaks_up": "The state breaks up",
