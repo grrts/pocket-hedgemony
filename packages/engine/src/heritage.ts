@@ -517,6 +517,7 @@ export interface SavedRealmHeritage {
   dormant?: number[];
   /** [id, state, years awake, forced until]. */
   heydays: [string, ns.HeydayState, number, number?][];
+  /** Read from saves before X-27 only: the pool is now whatever of the realm's ambitions is neither drawn nor waiting for its age. */
   pool?: string[];
   waiting?: string[];
   /** [id, state, share met, within reach]; saves before X-27 hold "sealed" or "stirred" and a warmth band. */
@@ -546,8 +547,6 @@ export function saveHeritage(world: World): Record<string, SavedRealmHeritage> |
     };
     const dormant = h.birthrights.flatMap((b, k) => (b.dormant ? [k] : []));
     if (dormant.length) r.dormant = dormant;
-    const pool = ids(h.pool.map((a) => a.id));
-    if (pool) r.pool = pool;
     const waiting = ids(h.waitingForAge.map((a) => a.id));
     if (waiting) r.waiting = waiting;
     const legacies = ids(h.legacies.map((l) => l.id));
@@ -585,12 +584,14 @@ export function restoreHeritage(world: World, saved: Record<string, SavedRealmHe
       if (forcedUntil !== undefined) hd.forcedUntil = forcedUntil;
     }
     const pick = (ids: string[] = []) => ids.map(long).flatMap((id) => (ambitions.has(id) ? [ambitions.get(id)!] : []));
-    h.pool = pick(s.pool);
     h.waitingForAge = pick(s.waiting);
     // Before X-27 an open ambition was "sealed" or "stirred", and "hot" was within reach.
     h.ambitions = s.ambitions.flatMap(([id, state, share, near]) =>
       ambitions.has(long(id)) ? [{ item: ambitions.get(long(id))!, state: (state as string) === "sealed" || (state as string) === "stirred" ? "open" : state, share, near: near === true || near === "hot" }] : [],
     );
+    // The pool is every ambition of the realm neither drawn nor waiting for its age, so ambitions written later join old saves too.
+    const taken = new Set([...h.waitingForAge, ...h.ambitions.map((a) => a.item)].map((a) => a.id));
+    h.pool = d.ambitions.filter((a) => !taken.has(a.id));
     h.legacies = (s.legacies ?? []).map(long).flatMap((id) => (legacies.has(id) ? [legacies.get(id)!] : []));
     if (h.burden) {
       h.burden.state = s.burden?.state ?? "held";
