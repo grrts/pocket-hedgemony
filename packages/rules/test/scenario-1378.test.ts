@@ -2,6 +2,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import catalogue from "../data/domain/scenario-setup-catalogue.json" with { type: "json" };
+import cultureDomain from "../data/domain/culture.json" with { type: "json" };
 import culture1444 from "../data/scenarios/1444/culture-start.json" with { type: "json" };
 import provinces1444 from "../data/scenarios/1444/world/provinces.json" with { type: "json" };
 
@@ -47,7 +48,7 @@ const nationIds = new Set(regions.flatMap((r) => r.nations.map((n) => n.id)));
 const sleepingIds = new Set(regions.flatMap((r) => r.sleeping.realms.map((s) => s.id)));
 const entityIds = new Set(regions.flatMap((r) => (r.relations.entities ?? []).map((e) => e.id)));
 const known = (id: string) => nationIds.has(id) || sleepingIds.has(id) || entityIds.has(id) || id in catalogue.records;
-const tongues = new Set([...Object.keys(culture1444.tongues), ...regions.flatMap((r) => Object.keys(r.culture.tongues ?? {}))]);
+const tongues = new Set([...cultureDomain.tongues.map((t) => t.id), ...Object.keys(culture1444.tongues), ...regions.flatMap((r) => Object.keys(r.culture.tongues ?? {}))]);
 const provinceIds = new Set((provinces1444 as { id: string }[]).map((p) => p.id));
 const isLonlat = (c: unknown) => Array.isArray(c) && c.length === 2 && Math.abs(c[0]) <= 180 && Math.abs(c[1]) <= 90;
 const place = (c: string | Lonlat | Selector) =>
