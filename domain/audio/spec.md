@@ -148,7 +148,7 @@ Config split: turkic → `mena` if the nation's capital is west of longitude 55,
 - Peace regional (24): `peace_<palette>_<early|late>`; early written for Eras I–III, late for IV–V; era
   arrangement variants give 60 palette × era combinations.
 - Peace era themes (5): `era_1` … `era_5`, shared by all nations, between palettes; play once in full after an era change.
-- Situations and moods (7): `diplomacy` (realm book open on Abroad; single quiet layer; regional W lead);
+- Situations and moods (7): `diplomacy` (realm book open on its Diplomacy section; single quiet layer; regional W lead);
   `prosperity` (brighter variant of the palette's track key); `unrest` (base + drone; second layer when rebels
   are in the field); `crisis` (disaster, plague, famine or succession crisis chain active; low pulses,
   irregular noise, no melody until resolved); `revolution` (revolution period touching the player, Era IV on;
@@ -172,7 +172,7 @@ Config split: turkic → `mena` if the nation's capital is west of longitude 55,
 2. Losing war: `war_losing`.
 3. Active war: `world_war` > `war_naval` > `war_siege` > `war_campaign` > `war_mobilize`.
 4. Crisis: `revolution` > `crisis` > `unrest`.
-5. Screen moods: `diplomacy` (realm book on its Abroad tab).
+5. Screen moods: `diplomacy` (realm book on its Diplomacy section).
 6. Good times: `prosperity`, `exploration`.
 7. Peace rotation.
 

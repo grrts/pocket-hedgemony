@@ -2639,7 +2639,7 @@
   "town_size": "town",
   "slots": 6
  },
- "starting_ports_file": "naval-ports-1444",
+ "starting_ports_file": "scenarios/1444/ports.json",
  "lord_province_counts_as_yours": true,
  "caravanserai_land_trader_weight": 0.25,
  "_provisional": [

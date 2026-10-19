@@ -393,4 +393,4 @@ Nothing. Every question is decided; numbers marked as placeholders in the data m
 - Spec: `domain/diplomacy/spec.md` in the game repository, requirement code **DIPL** (DIPL-001 to DIPL-194).
 - Features: `domain/diplomacy/features/`, 23 files including `relation-model.feature`, `relation-actions.feature`, `envoys.feature`, `reasons-count.feature` (Hungary and Venice), `declaring-war.feature`, `leagues.feature` and `funding-rebels.feature`.
 - Reference implementation of relation actions: `country-relations/tools/relations_engine.py`, with `country-relations/tests/test_rules.py` (27 tests) as the shared contract; config in `diplomacy-rules.json` and `country-relations/config/relation-rules.json`.
-- Code: `packages/engine/src/domain/diplomacy/` (`rules.ts`, `dates.ts`), with numbers in `packages/rules/data/domain/diplomacy.json` and the 1444 relations in `packages/rules/data/domain/diplomacy-relations-1444.json`.
+- Code: `packages/engine/src/domain/diplomacy/` (`rules.ts`, `dates.ts`), with numbers in `packages/rules/data/domain/diplomacy.json` and the 1444 relations in `packages/rules/data/scenarios/1444/relations.json`.

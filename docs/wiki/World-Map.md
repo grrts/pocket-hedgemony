@@ -201,5 +201,5 @@ Nothing about the map is left open. The frozen months and the latitude for froze
 
 - Spec: [`domain/world-map/spec.md`](https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/world-map/spec.md), requirement code **MAP**.
 - Features: `domain/world-map/features/` (grid-and-provinces, sea-zones-and-straits, terrain, rivers-passes-roads, graph-and-regions, map-versions).
-- Map generator: `tools/mapgen/mapgen.ts`, `tools/mapgen/terrain.ts`, settings in `tools/mapgen/config.json`. Built data: `packages/rules/data/world/provinces.json` and `map.json`. Terrain notes: `docs/terrain.md`.
+- Map generator: `tools/mapgen/mapgen.ts`, `tools/mapgen/terrain.ts`, settings in `tools/mapgen/config.json`. Built data: `packages/rules/data/scenarios/1444/world/provinces.json` and `map.json`. Terrain notes: `docs/terrain.md`.
 - The engine reads the graph in `packages/engine/src/world.ts` (`adjStart`, `adjList`). Rules code for this context goes in `packages/engine/src/domain/world-map/`.

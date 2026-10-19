@@ -153,8 +153,8 @@ Newest decision first.
 ### 5.6 Layout by window shape
 
 - VIEW-039 (Ubiquitous): Screens shall be laid out by the shape of the window, not by the device. [screen-flow §1.5, §7.1]
-- VIEW-040 (State-driven): While the window is Short wide (phones in landscape, height under 500 CSS px), the map shall come first, cards are side sheets on the left (45 % of the screen), the Realm book's tabs a left icon rail, and the top bar one thin row. [screen-flow §7.1, §4.3]
-- VIEW-041 (State-driven): While the window is Tall (tablets in portrait, desktop windows taller than wide), cards shall be bottom sheets (55 % height, draggable), the Realm book's tabs a bottom icon row, and the tool column on the right edge above End turn. [screen-flow §7.1, §4.3]
+- VIEW-040 (State-driven): While the window is Short wide (phones in landscape, height under 500 CSS px), the map shall come first, cards are side sheets on the left (45 % of the screen), the Realm book's sections one row of icons with names (SHELL-167), and the top bar one thin row. [screen-flow §7.1, §4.3]
+- VIEW-041 (State-driven): While the window is Tall (tablets in portrait, desktop windows taller than wide), cards shall be bottom sheets (55 % height, draggable), the Realm book's sections one row of icons with names (SHELL-167), and the tool column on the right edge above End turn. [screen-flow §7.1, §4.3]
 - VIEW-042 (State-driven): While the window is Large (tablets in landscape, desktop, Steam Deck 1280 × 800), side sheets shall have a fixed width (380 px at UI scale 1), menus are centred with a maximum width, and nothing stretches edge to edge. [screen-flow §7.1, §4.3]
 - VIEW-043 (State-driven): While the window is Far (TV and Steam Machine), the Large layout shall be used with UI scale raised so body text is about 1/30 of screen height, thicker focus frames, and nothing in the outer 5 % of the screen. [screen-flow §7.1; settings §3.1]
 - VIEW-044 (Ubiquitous): Phones shall play in landscape only, in every screen; a phone held upright shows "Turn your phone sideways". [screen-flow §7.2, decided 16 Oct; settings §11.1]
@@ -247,7 +247,8 @@ Towns
 - VIEW-110 (State-driven): While a province has a fort, its core shall be ringed by a palisade along its outer edges, and while it has a castle, by a stone wall with towers, worked out from neighbouring core cells as coasts are. [living-map-design §3.2, §3.5]
 - VIEW-111 (Ubiquitous): The countryside shall make `clamp(0, 6, round(rural thousands / 40))` hamlets of 1 or 2 houses on strip fields, each on a seeded land pixel at least 4 pixels from the town and from each other. [living-map-design §3.3]
 - VIEW-112 (Ubiquitous): A mine, quarry or lumber camp shall mark one seeded pixel of the province on matching ground (mountains or hills, hills, forest), and farms add field strips round the outskirts. [living-map-design §3.2]
-- VIEW-113 (Ubiquitous): A road line shall run over land from each town to the town of each neighbouring province, round the water and across rivers on a bridge pixel, drawn as a track, or as a road or paved road where both ends' road step is that high; each hamlet gets a track to its nearest town or hamlet within 8 pixels. [living-map-design §3.3]
+- VIEW-113 (Ubiquitous): A road line shall run over land from each town to the town of each neighbouring province, unless a third town neighbouring both is nearer to each of them than they are to each other (the way then runs through that town), round the water and across rivers on a bridge pixel, keeping near the straight line between the towns (each step costs `roads.straightness` (0.4) more per pixel it strays from it) so it winds only for the ground; it is drawn as a worn footpath (track), a cart road with ruts or a paved road with a kerb where both ends' road step is that high, cutting the corner where it only turns, so a road going north-east is one slanting line and not stairs; each hamlet gets a track to its nearest town or hamlet within 8 pixels. [living-map-design §3.3]
+- VIEW-133 (Ubiquitous): Land no realm holds shall be unsettled in the living band: it has no town, hamlets, works or roads, and no road from a neighbour ends there; when a realm takes or settles it, its town and roads appear in the next game month, and the roads round it are laid again. [living-map-design §3.1, §3.3]
 - VIEW-114 (State-driven): While an army marches or a caravan travels in the living band, it shall be drawn along the road line where the road runs its way; the movement rules do not change. [living-map-design §3.3]
 - VIEW-115 (Ubiquitous): The map shall carry towns as one settlement byte per map pixel in the free alpha channel of the province id texture: bits 0-3 the cell kind (0 none, 1 hamlet, 2 outskirts, 3 core, 4 keep, 5 market, 6 worship, 7 docks, 8 drill yard, 9 mine, quarry or camp, 10 ash, 11 building site, 12 landmark) and bits 4-7 the road links north, east, south and west; a change rewrites only the alpha of the chunks it touches, and below the living band the byte is ignored. [living-map-design §3.5]
 
@@ -520,7 +521,8 @@ None. AI nations run in the same worker turn, which the turn budgets cover (VIEW
 | VIEW-110 | living-map.feature | Walls by castle step |
 | VIEW-111 | living-map.feature | The countryside makes hamlets; Hamlets stand apart from the town and each other |
 | VIEW-112 | living-map.feature | A mine marks one pixel of the province |
-| VIEW-113 | living-map.feature | Roads are graded by both ends; Roads join neighbouring towns over land; No road reaches an island |
+| VIEW-113 | living-map.feature | Roads are graded by both ends; Roads join neighbouring towns over land; No road reaches an island; A town between two others carries their road; Roads keep near the straight line |
+| VIEW-133 | — | presentation only: the client lays no town or road on land no realm holds |
 | VIEW-114 | — | presentation only: drawing marches and caravans along the road line |
 | VIEW-115 | living-map.feature | The settlement byte packs kind and road links |
 | VIEW-116 | living-map.feature | One figure per thousand men; Figures are split by arm |

@@ -69,7 +69,7 @@ Feature: Calendar and campaign span
     And it is the last turn
 
   @TIME-005
-  Scenario Outline: Every campaign starts on 11 November 1444
+  Scenario Outline: Every campaign starts on the start scenario's day, 11 November 1444 in the bundled scenario
     When <what> is started
     Then the date is "November 1444"
     And the start day is 11

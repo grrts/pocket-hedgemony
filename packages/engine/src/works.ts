@@ -1,6 +1,7 @@
 import type { World } from "./world.ts";
 import type { News } from "./war.ts";
 import { controller } from "./war.ts";
+import { START_YEAR } from "../../rules/src/start.ts";
 import { inAnyWar } from "./lords.ts";
 import { LEDGER, LEDGER_LINES } from "./treasury.ts";
 import { buildingType, buildingsConfig, siteKind, townAtLeast, type TownSize } from "./domain/buildings/index.ts";
@@ -16,7 +17,7 @@ import { heritageFactor } from "./heritage.ts";
 const provinceMines = provinceConfig.mines;
 const MINE_ANCHORS = new Set(Object.keys(provinceMines.anchors));
 /** The trade towns the geography anchors name keep their market in 1444, however poor the province (SETUP-068). */
-const MARKET_ANCHORS = new Set(buildingsConfig.anchors.filter((a) => a.building === "market" && a.from_year <= 1444).map((a) => a.province));
+const MARKET_ANCHORS = new Set(buildingsConfig.anchors.filter((a) => a.building === "market" && a.from_year <= START_YEAR).map((a) => a.province));
 
 /**
  * Works (milestone 4, first slice of the buildings context): the crown builds

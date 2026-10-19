@@ -1350,11 +1350,11 @@ Then("the era theme {string} is the same for every nation", (s, id: string) => {
     expect(A.peaceSources(d, ALL).find((o) => o.source === "era_theme")!.track).toBe(id);
   }
 });
-Given("the realm book is open on its Abroad tab in peace", (s) => {
-  s.track = A.evaluateState({ era: "I", atWar: false, screen: "realm_book", realmBookTab: "Abroad" }, "peace").state;
+Given("the realm book is open on its Diplomacy section in peace", (s) => {
+  s.track = A.evaluateState({ era: "I", atWar: false, screen: "realm_book", realmBookTab: "Diplomacy" }, "peace").state;
   // Other tabs keep the state; war still outranks the mood.
   expect(A.evaluateState({ era: "I", atWar: false, screen: "realm_book", realmBookTab: "Realm" }, "peace").state).toBe("peace");
-  expect(A.evaluateState({ era: "I", atWar: true, monthsSinceDeclaration: 5, screen: "realm_book", realmBookTab: "Abroad" }, "peace").state).toBe("war_campaign");
+  expect(A.evaluateState({ era: "I", atWar: true, monthsSinceDeclaration: 5, screen: "realm_book", realmBookTab: "Diplomacy" }, "peace").state).toBe("war_campaign");
 });
 Given("a plague event chain is active", (s) => {
   s.track = A.evaluateState({ era: "I", eventChains: ["crisis"] }).state;

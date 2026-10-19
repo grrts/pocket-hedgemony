@@ -32,7 +32,7 @@ Feature: How a campaign ends
 
     Examples:
       | choice                       | result                                                      |
-      | Look back                    | the tab "Chronicle" opens read-only                          |
+      | Look back                    | the News opens read-only                                     |
       | Play on as another realm     | the player can pick any realm on the current map             |
       | Main menu                    | the main menu is shown                                       |
 

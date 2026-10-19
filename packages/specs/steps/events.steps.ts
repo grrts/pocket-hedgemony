@@ -2,6 +2,7 @@ import { expect } from "vitest";
 import { steps, type Scenario } from "../src/registry.ts";
 import { Rng } from "@ph/engine";
 import * as E from "@ph/engine/domain/events";
+import { START_YEAR } from "@ph/rules";
 
 const { Given, When, Then } = steps("events");
 
@@ -150,7 +151,7 @@ Then("the event {string} can still fire in a campaign", (s, id: string) => {
 Given("the start condition of the age {string} has never held", (s, age: string) => {
   s.age = age;
   s.holds = (() => false) as E.Holds;
-  s.checked = Math.min(E.eventsConfig.campaign.start_year, E.ageDef(age).window.earliest_start) - 1;
+  s.checked = Math.min(START_YEAR, E.ageDef(age).window.earliest_start) - 1;
 });
 function runYearsTo(s: Scenario, year: number): void {
   for (let y = (s.checked ?? year - 1) + 1; y <= year; y++) {

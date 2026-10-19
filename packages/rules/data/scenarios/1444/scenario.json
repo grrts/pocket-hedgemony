@@ -1,0 +1,22 @@
+{
+  "$comment": "The start scenario (X-25): the day the game starts on, its research era, and the files beside this one that describe the world on that day. The engine and specs read the start from here through packages/rules/src/start.ts, never a year written in code. The campaign is to start on 20 September 1378 (X-25); until that scenario is built (milestone 10, step 5) the bundled start is 11 November 1444, the day the country catalogue and relations data describe.",
+  "id": "1444",
+  "name": "Autumn 1444",
+  "date": { "year": 1444, "month": 11, "day": 11 },
+  "eras": {
+    "$comment": "The research era the start falls in, and the eras whose inventions count as known before the start (RSCH-091). The eras' dates are the tree's (research.json era_dates).",
+    "start": "I",
+    "before_start": ["A", "M"]
+  },
+  "files": {
+    "world": "world/: the generated map (map, nations, provinces, sleeping realms), built by tools/mapgen from map-nations.json and map-owners.json",
+    "map-nations.json": "the map's nations with their capitals (SETUP-040)",
+    "map-owners.json": "owner rules handing provinces to the map's nations, first match wins (SETUP-041)",
+    "rulers.json": "each map realm's ruler on the start day (REALM-233), built by tools/domain-data/rulers-1444.py",
+    "culture-start.json": "court tongues, province tongues and faiths on the start day (CULT-094)",
+    "relations.json": "the relations and facts between realms on the start day (DIPL-020, SETUP-022)",
+    "subjects.json": "the subject records on the start day (SUBJ)",
+    "subjects-rulers.json": "the rulers the subjects context names on the start day",
+    "ports.json": "the towns placed as ports on the start day (NAVY-013, NAVY-014)"
+  }
+}

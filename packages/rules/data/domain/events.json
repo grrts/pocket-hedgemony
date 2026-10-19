@@ -1,7 +1,6 @@
 {
  "$comment": "Event tree rules (domain/events/spec.md). balance = event-tree/data/balance.yaml; vocabulary, enums and statistics are the event tree's closed lists. All balance values are placeholders.",
  "campaign": {
-  "start_year": 1444,
   "end_date": "1939-08-31",
   "out_of_scope_ages": [
    "age_of_decolonization",

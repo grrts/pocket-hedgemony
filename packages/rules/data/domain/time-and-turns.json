@@ -1,16 +1,10 @@
 {
-  "$comment": "Time and turns (domain/time-and-turns/spec.md). Turn order from DECISIONS X-2, weeks X-3, seasons X-4, start date X-5, victory timing X-12, the 1939 cut X-14. Wet seasons are placeholders; ages from event-tree/data/ages.yaml.",
+  "$comment": "Time and turns (domain/time-and-turns/spec.md). Turn order from DECISIONS X-2, weeks X-3, seasons X-4, start date X-25 (the start scenario's day, packages/rules/data/scenarios), victory timing X-12, the 1939 cut X-14. Wet seasons are placeholders; ages from event-tree/data/ages.yaml.",
   "_provisional": [
     "seasons.wetSeason",
     "playback.secondsPer10Days",
     "playback.secondsPerBattleStep"
   ],
-  "startDate": {
-    "year": 1444,
-    "month": 11,
-    "day": 11,
-    "$comment": "X-5: every campaign starts on 11 November 1444. defines.json startDate is still March 1444 (a request to the game build); newCampaign uses this value."
-  },
   "endDate": "1939-08-31",
   "campaignRules": [
     "difficulty",

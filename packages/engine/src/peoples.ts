@@ -1,6 +1,6 @@
 import type { World } from "./world.ts";
 import type { News } from "./war.ts";
-import start from "../../rules/data/domain/culture-start-1444.json" with { type: "json" };
+import { START_YEAR, startCulture as start } from "../../rules/src/start.ts";
 import * as cult from "./domain/culture/index.ts";
 import * as relg from "./domain/religion/index.ts";
 import { catalogueIdOf } from "./domain/scenario-setup/index.ts";
@@ -658,7 +658,7 @@ export function tongueLine(d: PeoplesData, p: number): TongueLine | null {
     rows: Object.entries(pt.people).map(([t, sh]) => ({ tongue: t, name: tongueName(t), share: sh, relation: cult.relationTo(cc.court, t, pt.nationalism), homeland: pt.homelandOf.includes(t) })),
     pull: ex.pull,
     pullName: tongueName(ex.pull),
-    why: ex.pull === cc.court ? (held === HELD_BEFORE_START ? "held from before 1444 and governed for the court" : `held since ${held} and governed for the court`) : held !== HELD_BEFORE_START && d.year - held < cult.cultureConfig.drift.court_pull_needs_years_held ? `the majority language; the court's pulls after ${cult.cultureConfig.drift.court_pull_needs_years_held} years held (since ${held})` : "the majority language; the court's pulls only where an official or a lord governs",
+    why: ex.pull === cc.court ? (held === HELD_BEFORE_START ? `held from before ${START_YEAR} and governed for the court` : `held since ${held} and governed for the court`) : held !== HELD_BEFORE_START && d.year - held < cult.cultureConfig.drift.court_pull_needs_years_held ? `the majority language; the court's pulls after ${cult.cultureConfig.drift.court_pull_needs_years_held} years held (since ${held})` : "the majority language; the court's pulls only where an official or a lord governs",
     groups: ex.groups.map((g) => ({ name: tongueName(g.tongue), rate: g.rate, reasons: g.multipliers })),
     heldSince: held === HELD_BEFORE_START ? null : held,
   };

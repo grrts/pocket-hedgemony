@@ -73,10 +73,9 @@ await page.tap("[data-envoy]");
 await page.waitForFunction(() => document.querySelector(".hint-note")?.hidden, null, { timeout: 10000 }).catch(() => {});
 console.log("after envoy hidden:", await page.locator(".hint-note").isHidden(), await hint(), await page.locator(".alert").allTextContents());
 if (!(await page.locator(".hint-note").isHidden())) failed = true;
-await page.tap("#settings").catch(async () => {
-  await page.tap(".panel .close");
-  await page.tap("#settings");
-});
+// Settings open from the game menu (SHELL-168).
+await page.tap(".hud .game-menu");
+await page.tap(".game-menu [data-shell=settings]");
 await page.tap(".settings [data-section=gameplay]");
 await page.waitForTimeout(300);
 await shot("12-settings");

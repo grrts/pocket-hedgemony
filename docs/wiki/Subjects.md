@@ -264,4 +264,4 @@ Nothing. Every question is decided; numbers marked as placeholders in the data (
 - Spec: `domain/subjects/spec.md` in the game repository, requirement code **SUBJ** (SUBJ-001 to SUBJ-106).
 - Features: `domain/subjects/features/`, 17 files including `ladder-and-kinds.feature`, `loyalty.feature`, `overlord-actions.feature`, `folding-in.feature`, `losing-subjects.feature` and the worked example `france-1444-1453.feature`.
 - Config: `subjects/config/subject-rules.json` in the designs.
-- Code: `packages/engine/src/domain/subjects/`, with numbers in `packages/rules/data/domain/subjects.json` and the 1444 subjects in `packages/rules/data/domain/subjects-1444.json`.
+- Code: `packages/engine/src/domain/subjects/`, with numbers in `packages/rules/data/domain/subjects.json` and the 1444 subjects in `packages/rules/data/scenarios/1444/subjects.json`.

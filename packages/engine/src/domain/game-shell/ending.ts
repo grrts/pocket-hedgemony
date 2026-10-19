@@ -39,12 +39,12 @@ export function gameOver(sh: Shell, cause: { line: string; year: number }, highs
 export const playOnButton = (): { label: string; says: string } => ({ label: "Play on as another realm", says: SHELL.strings.playOnWarning });
 
 /** A choice on the game over card (SHELL-095). */
-export function gameOverChoice(sh: Shell, choice: string, realmsOnMap: readonly string[] = []): { chronicle: "read only" } | { pick: string[] } | { mainMenu: true } {
+export function gameOverChoice(sh: Shell, choice: string, realmsOnMap: readonly string[] = []): { news: "read only" } | { pick: string[] } | { mainMenu: true } {
   if (topId(sh) !== "game_over") throw new Error("Game over is not showing");
   switch (choice) {
     case "Look back":
-      push(sh, { id: "realm_book", tab: "Chronicle", subject: "read only" });
-      return { chronicle: "read only" };
+      push(sh, { id: "turn_report", subject: "read only" });
+      return { news: "read only" };
     case "Play on as another realm":
       return { pick: realmsOnMap.filter((r) => r !== sh.campaign?.realm) };
     case "Main menu":

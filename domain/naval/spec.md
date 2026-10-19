@@ -710,7 +710,7 @@ enemy merchant crews surrender faster); master of works 0/1/2 none (his fleet's 
 berth); chaplain, schoolmaster 0/1/1 none; marshal 2/2/1 any.
 
 **Ports data**: `naval/data/ports-1444.tsv` (hand-edited), generated `ports-1444.json` and `start-ports.json`
-by `naval/tools/place_ports.py <repo root>` (reads `packages/rules/data/world/provinces.json`, `map.json`,
+by `naval/tools/place_ports.py <repo root>` (reads `packages/rules/data/scenarios/1444/world/provinces.json`, `map.json`,
 `apps/client/public/map/provinces.png`; needs Pillow).
 
 ## 11. Seams

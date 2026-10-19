@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { loadDefaultRuleset, validateRuleset, RulesetError } from "../src/index.ts";
+import { loadDefaultRuleset, validateRuleset, RulesetError, START_DATE, START_ERAS, START_SCENARIO } from "../src/index.ts";
+import research from "../data/domain/research.json" with { type: "json" };
 
 describe("rules", () => {
   it("loads the bundled 1444 scenario", () => {
@@ -16,6 +17,15 @@ describe("rules", () => {
     const reach = new Set([seas.find((p) => p.name.includes("Black Sea"))!.id]);
     for (const id of reach) for (const n of byId.get(id)!.neighbors) if (byId.get(n)!.terrain === "sea" || byId.get(n)!.terrain === "ocean") reach.add(n);
     expect([...reach].some((id) => byId.get(id)!.name.includes("Atlantic"))).toBe(true);
+  });
+
+  it("reads the start from the start scenario (X-25)", () => {
+    expect(START_SCENARIO.id).toBe("1444");
+    expect(loadDefaultRuleset().defines.startDate).toEqual(START_DATE);
+    // The start falls in its era, and the eras before it come before it in the tree.
+    const dates = research.era_dates as Record<string, number>;
+    expect(dates[START_ERAS.start]).toBeLessThanOrEqual(START_DATE.year);
+    for (const e of START_ERAS.before_start) expect(research.eras.indexOf(e)).toBeLessThan(research.eras.indexOf(START_ERAS.start));
   });
 
   it("rejects unknown owners and one-way borders", () => {

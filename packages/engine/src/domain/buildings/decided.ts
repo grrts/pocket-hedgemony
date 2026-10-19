@@ -66,7 +66,7 @@ export function tradeRole(type: "caravanserai" | "counting house"): string {
     : "foreign traders deposit with bills of exchange";
 }
 
-/** The data file that sets 1444 harbours (D-BLD-8). */
+/** The data file that sets the starting harbours: the start scenario's ports (D-BLD-8, X-25). */
 export function startingPortsFile(): string {
   return cfg.starting_ports_file;
 }

@@ -1,10 +1,5 @@
 {
   "$comment": "Global balance numbers. Every value here can be tuned without touching engine code.",
-  "startDate": {
-    "year": 1444,
-    "month": 11,
-    "day": 11
-  },
   "economy": {
     "goldPerThousandPeoplePerMonth": 0.004,
     "goldPerWealthPerMonth": 0.06,
