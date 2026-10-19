@@ -394,7 +394,7 @@ start sets of RSCH-051 and RSCH-076 (D-RSCH-21). Nothing already in the tree cha
 
 - RSCH-093: These Era I and II rows shall take new needs from the past inventions, everything else in their rows unchanged: B1 parent B02; F1 parent F02; F5 also needs B01; F11 parent F03; C1 also needs G01; C2 parent C01; W1 also needs F03; W2 parent C02 and also needs F03; W3 also needs C03; W4 also needs B01; W6 also needs C01; G1 parent G01; L1 parent G01 or G6 *Quipu and knot records*; L2 parent G01; T1 also needs F03; T2 parent T01 and also needs L01; T4 also needs T01; T5 also needs S01; S1 and S2 parent S01; S4 also needs S02. [D-RSCH-21]
 - RSCH-094: A past invention a realm lacks shall hold it below the 1444 baseline, so realms that know it play exactly as now: without F01 its farmland harvests one step worse (province owns the step); without F03 it raises no horse regiments and sends no camel caravans (recruiting, warfare and trade own these); without B01 its armies carry half the food (troop-movement owns the carrying); without C01 its regiments fight 20 % weaker (warfare owns the strength). The other past inventions only open later ones. @placeholder [D-RSCH-21]
-- RSCH-095: A past invention shall cost Ancient 10 and Medieval 15 scholar-years before discounts, is never studied ahead, and takes the spread discount from neighbours and trade partners like any invention (RSCH-034), so a realm next to realms that know it catches up fastest. @placeholder [D-RSCH-21]
+- RSCH-095: A past invention shall cost Ancient 10 and Medieval 15 scholar-years before discounts, is never studied ahead, is cheaper for lying behind the times (RSCH-112), and takes the spread discount from neighbours and trade partners like any invention (RSCH-034), so a realm next to realms that know it catches up fastest. @placeholder [D-RSCH-21]
 - RSCH-096: For a realm of the Americas, F03 *Riding and pack animals* shall be a contact invention: it opens when exploration reports that realm's first contact with a realm from across the ocean, as F9 opens with the Atlantic crossing (RSCH-077). [D-RSCH-21]
 
 **Standing**
@@ -423,8 +423,8 @@ may move realms between groups or change a group's set; this table is the data t
 | Latin Christendom (`latin`) | england, scotland, ireland, france, burgundy, brittany, provence, savoy, lorraine, navarre, castile, aragon, portugal, milan, venice, genoa, florence, modena, papal_states, naples, austria, bohemia, bavaria, wurttemberg, palatinate, cologne, hesse, saxony, brandenburg, luneburg, hamburg, mecklenburg, pomerania, switzerland, teutonic_order, livonian_order, denmark, sweden, norway, poland, lithuania, hungary, ragusa, cyprus, knights_of_rhodes, canarian_lordship | all 13 | B1, F1, F4, F5, C1, C2, W2, W3, G1, G2, G5, L1, S1 | Era I |
 | Orthodox Europe (`orthodox`) | byzantium, moldavia, wallachia, serbia, bosnia, albania, georgia, trebizond, muscovy, novgorod, pskov, tver, ryazan | all but L01 | B1, F1, F4, F5, C1, C2, W2, G1, G2, G5, L1 | Era I |
 | Islamic heartlands (`islamic`) | ottomans, karaman, candar, dulkadir, aq_qoyunlu, qara_qoyunlu, shirvan, mamluks, hejaz, yemen, oman, timurids, granada, morocco, tlemcen, tunis | all but F02 | B1, C1, C2, C4, F3, F4, F5, G1, G5, L1, L2, T1, W1, W2 | Era I |
-| Settled khanates (`khanates`) | kazan, crimea, uzbek_khanate | F01, F03, B01, B02, C01, G01, T01 | B1, C1, G1, L1, L2, T1, W1, F11 | Ancient |
-| Steppe hordes (`hordes`) | great_horde, nogai, moghulistan, oirat, mongols, jurchens | F03, B01, C01, G01 | G1, W1, F11 | Ancient |
+| Settled khanates (`khanates`) | kazan, crimea, uzbek_khanate | F01, F02, F03, B01, B02, C01, G01, T01, L01 | C1, G1, L1, L2, T1, W1, F11 | Medieval |
+| Steppe hordes (`hordes`) | great_horde, nogai, moghulistan, oirat, mongols, jurchens | F01, F02, F03, B01, C01, G01, L01 | G1, L1, W1, F11 | Medieval |
 | Himalaya (`himalaya`) | tibet | F01, F03, B01, B02, C01, G01, T01 | B1, C1, G1, G5, L1 | Ancient |
 | South Asia (`south_asia`) | delhi, jaunpur, bengal, bahmanis, vijayanagar, gujarat, malwa, mewar, orissa, gondwana, kashmir, multan, sindh, ahom | all but F02 | B1, C1, C2, C4, F4, F5, G1, G2, G5, L1, W1, W2, L9 | Era I |
 | China (`china`) | ming | all 13 | B1, B2, B3, C1, C2, C3, C4, F2, F4, F5, F7, G1, G3, G4, L1, L2, L3, L5, T4, W3, W4, W5, S1, S2, L9 | Era I |
@@ -465,6 +465,7 @@ may move realms between groups or change a group's set; this table is the data t
 | florence | T2, T3 | — |
 | genoa | T2, T3, S2, S4 | — |
 | gondwana | — | C03 |
+| great_horde | L2 | — |
 | granada | S1, S2 | — |
 | gujarat | L2, S1, S2, T5 | — |
 | hamburg | T2, T3 | — |
@@ -492,6 +493,7 @@ may move realms between groups or change a group's set; this table is the data t
 | mutapa | B02 | — |
 | naples | S2 | — |
 | navarre | F11 | — |
+| nogai | L2 | — |
 | oman | T5, S1, S2, F11 | — |
 | ottomans | B2, G3, S1, S2, W3, W5, C5, L9 | — |
 | papal_states | T2 | — |
@@ -511,10 +513,15 @@ may move realms between groups or change a group's set; this table is the data t
 | yemen | T5, S1, S2, F11 | — |
 
 What the groups give in 1444: Latin, Orthodox, Islamic, South Asian and East Asian realms stand in Era I with 23 to
-38 inventions, maritime Southeast Asia in Era I with 21, and mainland Southeast Asia is split between Medieval and Era I; the khanates, hordes, Tibet, the Horn,
+38 inventions, maritime Southeast Asia in Era I with 21, and mainland Southeast Asia is split between Medieval and Era I; the khanates and hordes stand in Medieval with 11 to 16,
+one era level below their settled neighbours outside the horse line (government GOV-068); Tibet, the Horn,
 the Swahili coast and the Sahel stand in Ancient with 7 to 15; Forest Africa stands in Ancient with 3 or 4 (iron but no
 horses), and Mesoamerica, the Andes and North America in Ancient with 2 to 10, without iron or horses. No African realm south of the Sahara starts with B1 *Stone
 castles*: they defend with B4 earthworks until they learn dressed stone.
+
+### 5.12 Behind the times (18 October 2026, D-GOV-19)
+
+- RSCH-112: Every realm shall pay less for an invention of an era earlier than the current date: 25 % less for each era it lies behind, at most 50 % off (`research.behind_discount_pct_per_era` 25, `research.behind_discount_cap_pct` 50), applied after the cost by era and before the spread from neighbours and trade partners (RSCH-034); an invention never costs less than a fifth of its era cost (`research.cost_floor_share` 0.2). The past eras count like any other: in 1450 an Ancient invention is two eras behind and a Medieval one, one. What the world already knows is cheap to learn and what is new still costs full price, so a realm that starts behind (hordes, African and American starts) catches up. The research AI's rule (RSCH-078) then studies these first. @placeholder [Leroy 18 Oct; government GOV-070; D-GOV-19]
 
 ### How the player uses the one tree
 - RSCH-100: The Tree part of the Learning tab shall draw the whole tree as one picture, never one bough at a time: the root *Settled life* at the left, then a column per era (Ancient, Medieval, I to VII), and the four boughs as four horizontal bands of the same picture, each with its name pinned at the left edge while the tree scrolls. The era headings stay pinned along the top, the era of the current date marked "Now". Parent lines are always drawn, across bands too; an "also needs" line, in any band, is drawn only for the picked invention, highlighted, and its sheet lists them. This replaces the bough tabs of RSCH-084. [Leroy 18 Oct, X-19]
@@ -600,6 +607,7 @@ On era boundaries (by date): costs of studying ahead change.
 | without | What lacking F01, F03, B01, C01 costs (RSCH-094) | F01 −1 harvest step; F03 no horse regiments or caravans; B01 half the food carried; C01 −20 % strength | yes | research.json |
 | queue_length | Inventions a study queue holds after the current study | 5 | yes | research.json |
 | standing_share | Share of an era's inventions that gives standing in it | 0.25 | yes | research.json |
+| behind_discount_pct_per_era / behind_discount_cap_pct / cost_floor_share | Cheaper for an era behind the date (RSCH-112) | 25 % per era / 50 % / a fifth of the era cost | yes | research.json |
 | regional_contacts | Inventions that open only on a contact for the realms of some start groups | F03 on first contact across the ocean for mesoamerica, andes and north_america (RSCH-096); F9's contact stays on its row (RSCH-077) | no | research.json |
 | past_eras, era_names | The eras before 1444 and their names | A Ancient, M Medieval | no | research.json |
 
@@ -732,6 +740,7 @@ Every requirement has at least one scenario. The invention list (§5.8) is check
 | RSCH-091, RSCH-092, RSCH-093, RSCH-095 | past-eras.feature | Two eras before 1444; Past inventions open the Era I rows; A past invention is cheap and spreads |
 | RSCH-094 | past-eras.feature | Without a past invention a realm plays below the baseline |
 | RSCH-096 | past-eras.feature | Horses reach the Americas only by contact |
+| RSCH-112 | government hordes.feature | Inventions from an earlier era cost less; Behind the times and spread from neighbours add up |
 | RSCH-097 | past-eras.feature | Standing |
 | RSCH-098, RSCH-099 | start-groups.feature | Every realm starts from its group; Start sets are complete; Who starts behind |
 | RSCH-100 … RSCH-106 | — | Client screens; checked by apps/client/scripts/research-shots.mjs and apps/client/src/ui/learning.test.ts (one picture, zoom, tap targets, no sideways scroll) |

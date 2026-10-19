@@ -2594,7 +2594,10 @@
   "standing_share",
   "queue_length",
   "era_cost.A",
-  "era_cost.M"
+  "era_cost.M",
+  "behind_discount_pct_per_era",
+  "behind_discount_cap_pct",
+  "cost_floor_share"
  ],
  "era_names": {
   "A": "Ancient",
@@ -2820,15 +2823,16 @@
    ],
    "past": [
     "F01",
+    "F02",
     "F03",
     "B01",
     "B02",
     "C01",
     "G01",
-    "T01"
+    "T01",
+    "L01"
    ],
    "inventions": [
-    "B1",
     "C1",
     "G1",
     "L1",
@@ -2848,13 +2852,17 @@
     "jurchens"
    ],
    "past": [
+    "F01",
+    "F02",
     "F03",
     "B01",
     "C01",
-    "G01"
+    "G01",
+    "L01"
    ],
    "inventions": [
     "G1",
+    "L1",
     "W1",
     "F11"
    ]
@@ -3440,6 +3448,9 @@
    "S1",
    "S2"
   ],
+  "great_horde": [
+   "L2"
+  ],
   "gujarat": [
    "L2",
    "S1",
@@ -3528,6 +3539,9 @@
   ],
   "navarre": [
    "F11"
+  ],
+  "nogai": [
+   "L2"
   ],
   "oman": [
    "T5",
@@ -3619,5 +3633,8 @@
    "G1",
    "L1"
   ]
- }
+ },
+ "behind_discount_pct_per_era": 25,
+ "behind_discount_cap_pct": 50,
+ "cost_floor_share": 0.2
 }
