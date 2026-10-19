@@ -55,6 +55,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
     b.remove();
   });
   await page.waitForTimeout(300);
+  await page.click("#panel [data-realm-section=Lands]").catch(() => {});
   await page.click("[data-realm-tab=provinces], [data-tab=provinces]").catch((e) => console.log("no provinces tab", e.message));
   await page.waitForTimeout(300);
   await page.click("[data-province-sort=short]").catch((e) => console.log("no short sort", e.message));

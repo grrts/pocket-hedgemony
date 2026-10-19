@@ -10,3 +10,4 @@ export * from "./catalogue.ts";
 export * from "./map.ts";
 export * from "./start.ts";
 export * from "./campaign.ts";
+export * from "./picker.ts";

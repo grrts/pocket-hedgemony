@@ -16,7 +16,7 @@ Feature: Realm book
       | tab       | holds                                  |
       | Realm     | Overview, Government, Heritage, Score  |
       | Economy   | Treasury, Trade, Food                  |
-      | Lands     | Provinces, Officials, Lords, Colonies  |
+      | Lands     | Provinces, Officials, Lords, Colonies, Hunting grounds |
       | Military  | Army, Navy                             |
       | Diplomacy | Diplomacy                              |
       | Research  | Research, Peoples                      |

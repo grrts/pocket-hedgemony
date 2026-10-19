@@ -131,6 +131,11 @@ export function seedRulers(world: World): void {
   const rng = world.rulerRng;
   const s = R.start_age;
   for (let n = 0; n < world.nationCount; n++) {
+    // A sleeping realm has its ruler drawn when it wakes (SETUP-083), so the dice of the realms on the map stay as they were.
+    if (world.nationAsleep[n]) {
+      world.rulers[n] = { title: null, name: "", sex: "m", age: 30, years: 0, traits: [], heir: null, regent: null };
+      continue;
+    }
     const rec = RECORDS[world.nationIds[n]!] ?? null;
     const years = rec?.since != null ? Math.max(0, world.date.year - rec.since) : between(rng, s.unknown_since_years);
     const age = rec?.age ?? Math.min(s.oldest, years + between(rng, [s.accession_from, s.accession_to]));
@@ -140,7 +145,19 @@ export function seedRulers(world: World): void {
     world.rulers[n] = r;
   }
   // Regents read the lords, who are seeded first.
-  for (let n = 0; n < world.nationCount; n++) if (world.rulers[n]!.age < R.child_under) world.rulers[n]!.regent = regentOf(world, n);
+  for (let n = 0; n < world.nationCount; n++) if (!world.nationAsleep[n] && world.rulers[n]!.age < R.child_under) world.rulers[n]!.regent = regentOf(world, n);
+}
+
+/** A woken realm's first ruler (SETUP-083): a man of its own people, the campaign's dice for his age, traits and heir. */
+export function wakeRuler(world: World, n: number): void {
+  const rng = world.rulerRng;
+  const s = R.start_age;
+  const years = between(rng, s.unknown_since_years);
+  const age = Math.min(s.oldest, years + between(rng, [s.accession_from, s.accession_to]));
+  const r: GameRuler = { title: null, name: givenName(world, n), sex: "m", age, years, traits: drawTraits(rng), heir: null, regent: null };
+  r.heir = drawHeir(world, n, age);
+  world.rulers[n] = r;
+  if (r.age < R.child_under) r.regent = regentOf(world, n);
 }
 
 /** The yearly chance a ruler of this age dies (REALM-100, `ruler.death_per_year`). */

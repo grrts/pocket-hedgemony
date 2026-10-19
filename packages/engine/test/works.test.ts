@@ -40,6 +40,7 @@ describe("works (milestone 4)", () => {
   it("stands the map's castles and a stone castle in every capital in 1444", () => {
     const w = createWorld(rules, 1, tiles);
     for (const n of rules.nations) {
+      if (n.asleep) continue;
       const cap = w.provinceIndex.get(n.capital)!;
       expect(worksAt(w, cap, work("castle"))).toBe(2);
     }
@@ -390,7 +391,8 @@ describe("works (milestone 4)", () => {
 
   it("makes salt on a dry or warm coast (feedback 87)", () => {
     const w = createWorldOnce();
-    const n = nation(w, "castile");
+    // Castile's Canary salt pans went to the Guanche and the lordship (X-20); Aragon's and Portugal's coasts make salt.
+    const n = ["castile", "aragon", "portugal", "mamluks"].map((id) => nation(w, id)).find((m) => [...Array(w.provinceCount).keys()].some((q) => w.provinceOwner[q] === m && !whyNot(w, m, q, work("saltworks"))))!;
     const p = whereFits(w, n, "saltworks");
     expect(buildSheet(w, n, p).some((r) => r.name === "saltworks")).toBe(true);
   });

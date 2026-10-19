@@ -439,6 +439,10 @@ export function orderShape(order: Order): string {
       return "answer the revolution";
     case "empire":
       return "act in the Empire";
+    case "shogunate":
+      return "act in the Shogunate";
+    case "tribes":
+      return "act on a hunting ground";
     case "keepPlaying":
       return "keep playing after a win";
     case "playOn":

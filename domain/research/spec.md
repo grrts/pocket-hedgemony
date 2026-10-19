@@ -414,13 +414,13 @@ start sets of RSCH-051 and RSCH-076 (D-RSCH-21). Nothing already in the tree cha
 
 ### 5.11 Start groups (18 October 2026)
 
-The start of every one of the 137 map nations. The standing column is what RSCH-097 gives with these sets.
+The start of every one of the 237 map nations (the African and tribal realms added by SETUP-060 and TRIBE-002 joined the groups their neighbours start in, X-20). The standing column is what RSCH-097 gives with these sets.
 Past inventions by id (RSCH-092); Era I and II by the ids of §5.8. The Hordes, African start and tribal designs
 may move realms between groups or change a group's set; this table is the data they change.
 
 | Group | Realms | Past inventions known (of 13) | Era I and II inventions known | Standing in 1444 |
 |---|---|---|---|---|
-| Latin Christendom (`latin`) | england, scotland, ireland, france, burgundy, brittany, provence, savoy, lorraine, navarre, castile, aragon, portugal, milan, venice, genoa, florence, modena, papal_states, naples, austria, bohemia, bavaria, wurttemberg, palatinate, cologne, hesse, saxony, brandenburg, luneburg, hamburg, mecklenburg, pomerania, switzerland, teutonic_order, livonian_order, denmark, sweden, norway, poland, lithuania, hungary, ragusa, cyprus, knights_of_rhodes | all 13 | B1, F1, F4, F5, C1, C2, W2, W3, G1, G2, G5, L1, S1 | Era I |
+| Latin Christendom (`latin`) | england, scotland, ireland, france, burgundy, brittany, provence, savoy, lorraine, navarre, castile, aragon, portugal, milan, venice, genoa, florence, modena, papal_states, naples, austria, bohemia, bavaria, wurttemberg, palatinate, cologne, hesse, saxony, brandenburg, luneburg, hamburg, mecklenburg, pomerania, switzerland, teutonic_order, livonian_order, denmark, sweden, norway, poland, lithuania, hungary, ragusa, cyprus, knights_of_rhodes, canarian_lordship | all 13 | B1, F1, F4, F5, C1, C2, W2, W3, G1, G2, G5, L1, S1 | Era I |
 | Orthodox Europe (`orthodox`) | byzantium, moldavia, wallachia, serbia, bosnia, albania, georgia, trebizond, muscovy, novgorod, pskov, tver, ryazan | all but L01 | B1, F1, F4, F5, C1, C2, W2, G1, G2, G5, L1 | Era I |
 | Islamic heartlands (`islamic`) | ottomans, karaman, candar, dulkadir, aq_qoyunlu, qara_qoyunlu, shirvan, mamluks, hejaz, yemen, oman, timurids, granada, morocco, tlemcen, tunis | all but F02 | B1, C1, C2, C4, F3, F4, F5, G1, G5, L1, L2, T1, W1, W2 | Era I |
 | Settled khanates (`khanates`) | kazan, crimea, uzbek_khanate | F01, F02, F03, B01, B02, C01, G01, T01, L01 | C1, G1, L1, L2, T1, W1, F11 | Medieval |
@@ -432,14 +432,14 @@ may move realms between groups or change a group's set; this table is the data t
 | Japan (`japan`) | japan | all but F02, C03 | B1, C1, C2, C4, F2, F4, F5, G1, G2, G5, L1, S1, S2, W2 | Era I |
 | Mainland Southeast Asia (`se_mainland`) | dai_viet, champa, lan_xang, lan_na, ayutthaya, khmer, ava, pegu | all but F02, L01, S02 | B1, C1, C2, C4, F2, F4, G1, G5, L1 | Medieval / Era I |
 | Maritime Southeast Asia (`se_maritime`) | majapahit, malacca, brunei | all but F02, L01, S02 | C1, C4, F2, F4, G1, G5, L1, S2, S3, T5 | Era I |
-| Christian Horn (`horn`) | ethiopia | F01, F03, B02, C01, G01 | B1, C1, G1, G5, L1 | Ancient |
-| Swahili and Somali coast (`swahili_somali`) | adal, ajuran, kilwa | F03, B02, C01, G01, T01, S01 | C1, F4, G1, L1, L2, S2, T5 | Ancient |
-| Sahel empires (`sahel`) | mali, songhai, jolof, kano, kanem_bornu | F03, C01, G01 | B4, C1, F4, G1, L1, L2, T1, L9 | Ancient |
-| Volta kingdoms (`volta`) | mossi | F03, C01 | B4 | Ancient |
-| Forest and plateau Africa (`forest_africa`) | benin, kongo, mutapa | C01 | B4, F4 | Ancient |
+| Christian Horn (`horn`) | ethiopia, kaffa, hadiya, oromo | F01, F03, B02, C01, G01 | B1, C1, G1, G5, L1 | Ancient |
+| Swahili and Somali coast (`swahili_somali`) | adal, ajuran, kilwa, mombasa, zanzibar, sofala, comoros, warsangali, afar_dankali, beja, madagascar_north_trading_towns | F03, B02, C01, G01, T01, S01 | C1, F4, G1, L1, L2, S2, T5 | Ancient |
+| Sahel empires (`sahel`) | mali, songhai, jolof, kano, kanem_bornu, air_agadez, bulala, katsina, timbuktu_tuareg, biram, gobir, zamfara, zazzau, takrur_futa_toro, darfur_tunjur, kaabu, sine, fezzan, mzab, touggourt_ouargla, tuat, sanhaja_zenaga, tuareg_kel_ajjer, tubu_teda | F03, C01, G01 | B4, C1, F4, G1, L1, L2, T1, L9 | Ancient |
+| Volta kingdoms (`volta`) | mossi, bono, dagbon, borgu, voltaic_stateless_societies, mande_kafus | F03, C01 | B4 | Ancient |
+| Forest and plateau Africa (`forest_africa`) | benin, kongo, mutapa, loango, tio, oyo, allada_tado, igala, ijebu, kwararafa, akan_forest, cross_river_societies, igbo_societies, ijaw_delta, middle_belt_societies, upper_guinea_coast, windward_coast_peoples, ankole, buganda, karagwe, kitara, rwanda, madagascar_coast, madagascar_highlands, khoikhoi, san, kunene_peoples, equatorial_forest_societies, maasai_kenya_highlands, makua_lomwe, delagoa_lowland_chiefdoms, nguni, sotho_tswana, thulamela, tonga_zambezi, luba, lake_malawi_peoples, mbundu_chiefdoms, ovimbundu_central_angola, kwango_kasai_societies, gran_canaria, tenerife_menceyatos, la_palma | C01 | B4, F4 | Ancient |
 | Mesoamerica (`mesoamerica`) | aztecs, zapotec, maya, purepecha | B02, G01 | F4, G1, L1, F9 | Ancient |
 | Andes (`andes`) | inca, chimu, muisca | B02, S01 | F3, F4, G6, F9 | Ancient |
-| North American peoples (`north_america`) | iroquois, huron, cherokee, creek, pueblo | none | F4, F9 | Ancient |
+| North American peoples (`north_america`) | iroquois, huron, cherokee, creek, pueblo, apalachee, calusa, caddo, casqui_pacaha, chumash, coast_salish, cofitachequi, fort_ancient, hopi, lenape, mandan_hidatsa, natchez_plaquemine, neutral_erie, ojibwe_anishinaabe, oneota, oodham, pacific_northwest, pawnee_plains_villagers, powhatan_precursors, southern_new_england_algonquians, st_lawrence_iroquoians, timucua, tlingit_haida, wakashan | none | F4, F9 | Ancient |
 
 | Realm | Also knows | Does not know |
 |---|---|---|

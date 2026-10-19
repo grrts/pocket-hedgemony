@@ -1,12 +1,13 @@
-import type { EmpireView, SeatView } from "@ph/engine";
-import { EMPIRE_FOLDS, INSTITUTIONS_KEY, SILENCE, empireBadge, institutionRow } from "@ph/engine/domain/institutions";
+import type { EmpireView, HouseView, SeatView, ShogunateView } from "@ph/engine";
+import { EMPIRE_FOLDS, INSTITUTIONS_KEY, SHOGUNATE_FOLDS, SILENCE, empireBadge, institutionRow } from "@ph/engine/domain/institutions";
 import { icon } from "../art/ui.ts";
 
 /**
- * The institutions on screen (INST-080 to INST-085, the Empire): the
- * Institutions row on the player's own Diplomacy tab, the badge on a member's
- * country card, the Empire card with its four folds (the Diet and its reforms,
- * the Imperial Court), its answer cards in the News and the key of the
+ * The institutions on screen (INST-080 to INST-085, the Empire and the
+ * Shogunate): the Institutions row on the player's own Diplomacy tab, the badge
+ * on a member's country card, the Empire card with its four folds (the Diet and
+ * its reforms, the Imperial Court), the Shogunate card with its three (the
+ * houses, the Court, hold), their answer cards in the News and the key of the
  * Institutions map mode. The words come
  * from the institutions context (screens.ts); this file lays them out as
  * 44-point rows and buttons that open on tap.
@@ -34,11 +35,17 @@ export const empireUi = { open: new Set<string>(["Election"]), seat: null as str
 export const tallyText = (v: EmpireView, ui: InstitutionsUi) => v.tally.map((t) => `${esc(ui.name(t.candidate))} ${t.votes}`).join(" · ");
 
 /** INST-080: the Institutions row on the player's own Diplomacy tab, one 44-point line per institution they belong to. */
-export function institutionsRows(v: EmpireView | null, ui: InstitutionsUi): string {
-  if (!v || !v.role || v.ended) return "";
-  const text = institutionRow({ name: v.name, office: "Emperor", holder: v.emperor >= 0 ? ui.name(v.emperor) : "none", hold: v.hold, role: v.role });
-  return `<h3 class="sub">Institutions</h3>
-    <button class="paper institution-row" data-empire-open>${icon("crown", 1)}<span>${esc(text)}</span></button>`;
+export function institutionsRows(v: EmpireView | null, sh: ShogunateView | null, ui: InstitutionsUi): string {
+  const rows: string[] = [];
+  if (v && v.role && !v.ended) {
+    const text = institutionRow({ name: v.name, office: "Emperor", holder: v.emperor >= 0 ? ui.name(v.emperor) : "none", hold: v.hold, role: v.role });
+    rows.push(`<button class="paper institution-row" data-empire-open>${icon("crown", 1)}<span>${esc(text)}</span></button>`);
+  }
+  if (sh && sh.role && !sh.ended) {
+    const text = institutionRow({ name: sh.name, office: "Shogun", holder: sh.shogun >= 0 ? ui.name(sh.shogun) : "vacant", hold: sh.hold, role: sh.role });
+    rows.push(`<button class="paper institution-row" data-shogunate-open>${icon("crown", 1)}<span>${esc(text)}</span></button>`);
+  }
+  return rows.length ? `<h3 class="sub">Institutions</h3>${rows.join("")}` : "";
 }
 
 /** INST-080: the badge on a member's country card (Emperor, Elector, Empire); it opens the Empire card. */
@@ -49,12 +56,17 @@ export function empireBadgeHtml(v: EmpireView | null, realm: number): string {
   return word ? `<button class="paper empire-badge" data-empire-open title="Opens the Empire card">${icon("crown", 1)}${word}</button>` : "";
 }
 
+/** INST-080: the Shogun badge on the shogun's country card; it opens the Shogunate card. */
+export function shogunBadgeHtml(v: ShogunateView | null, realm: number): string {
+  return v && !v.ended && v.shogun >= 0 && v.shogun === realm ? `<button class="paper empire-badge" data-shogunate-open title="Opens the Shogunate card">${icon("crown", 1)}Shogun</button>` : "";
+}
+
 /** The hold bar: the number and its word, never colour alone (INST-085). */
-const holdBar = (v: EmpireView) =>
+const holdBar = (v: { hold: number; word: string }) =>
   `<div class="hold-bar" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${v.hold}" aria-label="Hold ${v.hold}, ${v.word}"><i style="width:${v.hold}%"></i><span>Hold ${v.hold} · ${v.word}</span></div>`;
 
-const fold = (name: string, summary: string, body: string) =>
-  `<details class="inst-fold" data-fold="${name}"${empireUi.open.has(name) ? " open" : ""}><summary><b>${name}</b><small>${summary}</small></summary><div class="inst-body">${body}</div></details>`;
+const fold = (name: string, summary: string, body: string, open = empireUi.open) =>
+  `<details class="inst-fold" data-fold="${name}"${open.has(name) ? " open" : ""}><summary><b>${name}</b><small>${summary}</small></summary><div class="inst-body">${body}</div></details>`;
 
 /** INST-081: the Empire card: header, then the folds Election, Reforms, Members and Hold. */
 export function empireCard(v: EmpireView, ui: InstitutionsUi): string {
@@ -266,11 +278,118 @@ export function empireAsks(v: EmpireView | null): number {
   return (v.reforms.diet && v.role && !v.reforms.diet.playerVote ? 1 : 0) + v.reforms.rulings.length + (v.election && hasOwnSeat(v) && v.election.playerVote < 0 ? 1 : 0);
 }
 
+// ---------------------------------------------------------------- the Shogunate (INST-082, INST-083)
+
+/** Which of the Shogunate card's folds are open and whether the port picker shows; kept between redraws. */
+export const shogunateUi = { open: new Set<string>(["Houses"]), picking: false };
+
+const plural = (n: number, one: string) => `${n} ${one}${n === 1 ? "" : "s"}`;
+/** Houses Wavering or worse: the ones the shogun's hold has to win back. */
+const shaky = (v: ShogunateView) => v.houses.filter((h) => h.loyalty !== "Loyal").length;
+
+/** INST-082: the Shogunate card: header with the warning line while hold is Weak or lower, then the folds Houses, The Court and Hold. */
+export function shogunateCard(v: ShogunateView, ui: InstitutionsUi): string {
+  const held = v.shogun >= 0;
+  const header = `<div class="realm-card empire-head">
+      ${held ? ui.banner(v.shogun) : ""}
+      <p><b>Shogun: ${held ? esc(ui.name(v.shogun)) : "the office stands vacant"}</b><br>
+      ${held ? `${v.ruler ? `${esc(v.ruler)} · ` : ""}in office since ${esc(ui.month(v.since))}` : v.broke ? `The Shogunate broke in ${esc(ui.month(v.broke))}` : ""}<br>
+      <b>You:</b> ${v.role ?? "not a member"}</p>
+    </div>
+    ${held ? holdBar(v) : ""}
+    ${v.warning && !v.ended ? `<p class="warn shogun-warn">${icon("swords", 1)}<span>${esc(v.warning)}: at a season's end with hold 0, or if the shogun loses the Court's province, each house rules its own land.</span></p>` : ""}
+    ${v.ended ? `<p class="hint">The Shogunate ended in ${esc(ui.month(v.ended.date))}: ${esc(v.ended.how)}.</p>` : !held ? `<p class="hint">Japan has broken into warlord domains. A member that holds the Court's province and over half of Japan's land may ask the Court to make it shogun.</p>` : ""}`;
+  if (v.ended) return header;
+  const [houses, court, hold] = SHOGUNATE_FOLDS;
+  const open = shogunateUi.open;
+  return `${header}
+    ${fold(houses, held ? `${plural(v.houses.length, "great house")}${shaky(v) ? ` · ${shaky(v)} wavering or worse` : " · all loyal"}` : plural(v.members.length, "member realm"), held ? housesFold(v) : membersOfJapan(v, ui), open)}
+    ${fold(court, `${v.court.province >= 0 ? esc(ui.province(v.court.province)) : "Kyoto"}: ${v.court.holder >= 0 ? esc(ui.name(v.court.holder)) : "no one"}${v.closed ? " · the country is closed" : ""}`, courtFold(v, ui), open)}
+    ${held ? fold(hold, `${v.hold} · ${v.word}`, shogunHoldFold(v), open) : ""}`;
+}
+
+/** A great house: lord, house, land, loyalty in words, wealth below 100 %, and the shogun's Summon or Release and Confirm, each with why not. */
+function houseRow(v: ShogunateView, h: HouseView): string {
+  const shogun = v.role === "Shogun";
+  const facts = [plural(h.provinces, "province"), h.loyalty, h.wealth < 100 ? `wealth ${h.wealth} %` : "", h.summoned ? "at the capital" : ""].filter(Boolean).join(" · ");
+  const summon = h.summoned
+    ? `<button class="paper" data-house-release="${h.lord}">Release</button>`
+    : `<button class="paper" data-house-summon="${h.lord}"${h.summonWhyNot ? " disabled" : ""}>Summon</button>`;
+  const confirm = `<button class="paper" data-house-confirm="${h.lord}"${h.confirmWhyNot ? " disabled" : ""}>Confirm</button>`;
+  const why = [!h.summoned && h.summonWhyNot ? `Summon: ${h.summonWhyNot}.` : "", h.confirmWhyNot ? `Confirm: ${h.confirmWhyNot}.` : ""].filter(Boolean).join(" ");
+  return `<div class="house-row framed-soft">
+    <button class="paper house-lord" data-lord-open="${h.lord}"><span><b>${esc(h.house)}</b> <small>${esc(h.name.replace(h.house, "").trim() || h.name)}</small></span><small>${esc(facts)}</small></button>
+    ${shogun ? `<div class="choices two">${summon}${confirm}</div>${why ? `<p class="hint">${esc(why)}</p>` : ""}` : ""}
+  </div>`;
+}
+
+function housesFold(v: ShogunateView): string {
+  return `<div class="houses">${v.houses.map((h) => houseRow(v, h)).join("")}</div>
+    ${v.role === "Shogun" ? `<p class="hint">Summon: the house waits at your capital, cannot join a rising and loses a tenth of its wealth a year; hold +1 a year each, while hold is Firm or better. Confirm: once per lord per ruler, the house grows a step more loyal for 5 hold.</p>` : ""}
+    <p class="hint">Tap a house to open its lord's card.</p>`;
+}
+
+/** While the office is vacant: each member realm with how many of Japan's provinces it holds; a tap opens its country card. */
+function membersOfJapan(v: ShogunateView, ui: InstitutionsUi): string {
+  if (!v.members.length) return `<p class="hint">No warlord domain has its capital in Japan.</p>`;
+  return `<div class="members">${[...v.members]
+    .sort((a, b) => b.provinces - a.provinces)
+    .map((m) => `<button class="paper member-row" data-realm="${m.realm}">${ui.pennant(m.realm)}<span><b>${esc(ui.name(m.realm))}</b><small>holds ${plural(m.provinces, "province")} of Japan${m.realm === v.court.holder ? " · holds the Court" : ""}</small></span></button>`)
+    .join("")}</div>`;
+}
+
+/** INST-066, INST-068: who holds Kyoto, Ask the Court or why not, and the shogun's Close the country (with its port) or Open the ports. */
+function courtFold(v: ShogunateView, ui: InstitutionsUi): string {
+  const where = v.court.province >= 0 ? esc(ui.province(v.court.province)) : "Kyoto";
+  const holder = v.court.holder >= 0 ? `<button class="paper member-row" data-realm="${v.court.holder}">${ui.pennant(v.court.holder)}<span><b>${esc(ui.name(v.court.holder))}</b><small>holds ${where}, the Court's province</small></span></button>` : `<p>No one holds ${where}.</p>`;
+  const ask =
+    v.shogun >= 0
+      ? ""
+      : v.askWhyNot
+        ? `<p class="hint">Ask the Court: ${esc(v.askWhyNot)}.</p>`
+        : `<button class="wax wide" data-ask-court>${icon("crown", 1)}Ask the Court</button><p class="hint">The Court makes you shogun: you take the shogunate at no gold, with hold 40, and every other member is asked to swear to you.</p>`;
+  return `${holder}${ask}${v.role === "Shogun" ? closedCountry(v, ui) : v.closed ? `<p>The country is closed: foreign traders trade only at ${esc(ui.province(v.closed.port))}.</p>` : ""}`;
+}
+
+function closedCountry(v: ShogunateView, ui: InstitutionsUi): string {
+  if (v.closed) return `<h4>The closed country</h4><p>Foreign traders trade only at <b>${esc(ui.province(v.closed.port))}</b>; foreign faiths send no missionaries in; hold +2 a year.</p><button class="paper wide" data-open-ports>Open the ports</button>`;
+  const head = `<h4>Close the country</h4><p class="hint">Foreign traders would trade only at the one port you name, foreign faiths send no missionaries in, and hold gains 2 a year, until you open the ports.</p>`;
+  if (v.closeWhyNot) return `${head}<p class="hint">Close the country: ${esc(v.closeWhyNot)}.</p>`;
+  if (!v.ports.length) return `${head}<p class="hint">Close the country: you hold no port to keep open.</p>`;
+  return `${head}<button class="${shogunateUi.picking ? "paper on" : "wax"} wide" data-close-pick aria-expanded="${shogunateUi.picking}">Close the country</button>
+    ${shogunateUi.picking ? `<p class="hint">Which port stays open to foreign traders?</p><div class="choices">${v.ports.map((p) => `<button class="paper" data-close-port="${p}">${esc(ui.province(p))}</button>`).join("")}</div>` : ""}`;
+}
+
+function shogunHoldFold(v: ShogunateView): string {
+  const gain = v.year.filter((l) => l.number > 0), lose = v.year.filter((l) => l.number < 0);
+  return `${holdBar(v)}
+    <p class="hint">Hold is how strong the shogun is over the houses: Hollow under 20, Weak under 50, Firm under 80, then Strong. It is counted each January; each season the houses read it, warming at Firm or Strong and cooling at Hollow.</p>
+    <h4>This year so far</h4>
+    ${gain.length || lose.length ? lines("Gains", gain) + lines("Losses", lose) : `<p class="hint">Nothing yet; with no house in revolt, hold gains 3 in January.</p>`}
+    ${v.record.length ? `<h4>Last year's count</h4>${lines("Gains", v.record.filter((l) => l.number > 0))}${lines("Losses", v.record.filter((l) => l.number < 0))}` : ""}`;
+}
+
+/** INST-083: the oath's answer card in the News: Swear or Refuse, the reasons count on tap; silence is a refusal. */
+export function oathAnswerCard(v: ShogunateView | null, ui: InstitutionsUi): string {
+  const o = v?.oath;
+  if (!v || !o) return "";
+  return `<div class="call framed-soft empire-ask oath-ask">
+    <p>${icon("crown", 2)}<span><b>Swear to the shogun:</b> the Court has made ${esc(ui.name(o.shogun))} Shogun and asks you to swear. Sworn, your realm becomes one of its great houses with its land, Wavering; refusing, you stay a realm and the shogun may bring you to heel. Answer by ${esc(ui.month(o.ends))}.</span></p>
+    <div class="choices two"><button class="wax" data-oath="1">Swear</button><button class="paper" data-oath="0">Refuse</button></div>
+    <details class="inst-fold small"><summary><b>Your reasons</b><small>${signed(o.total)} · ${o.total > 0 ? "they say swear" : "they say refuse"}</small></summary><div class="inst-body"><dl class="facts">${o.reasons.map((r) => `<dt>${esc(r.name)}</dt><dd>${signed(r.number)}</dd>`).join("")}</dl></div></details>
+    <p class="hint">If you don't answer, it counts as a ${SILENCE.oath}.</p>
+    <button class="paper" data-shogunate-open>Open the Shogunate card</button>
+  </div>`;
+}
+
+/** How many of the Shogunate's answer cards wait on the player (the News plaque's count). */
+export const shogunateAsks = (v: ShogunateView | null): number => (v?.oath && !v.ended ? 1 : 0);
+
 /** INST-084: the Institutions map mode's key, each colour with its pattern in words. */
 export function institutionsKey(colours: Record<string, string>): string {
-  const sw = (k: (typeof INSTITUTIONS_KEY)[number]) => `<i class="swatch${k.pattern === "hatched" ? " hatched" : k.pattern === "seat mark" ? " seat" : ""}" style="background:${colours[k.colour] ?? "#ccc"}"></i>`;
+  const sw = (k: (typeof INSTITUTIONS_KEY)[number]) => `<i class="swatch${k.pattern === "hatched" ? " hatched" : k.pattern === "seat mark" ? " seat" : k.pattern === "house border" ? " house" : ""}" style="background:${colours[k.colour] ?? "#ccc"}"></i>`;
   return `<div class="lens-key">
     ${INSTITUTIONS_KEY.map((k) => `<span>${sw(k)}${k.what} <small>(${k.colour}, ${k.pattern})</small></span>`).join("")}
-    <p>Electors carry a crown mark when zoomed in. Tap a member for the Empire card.</p>
+    <p>Electors and the Shogun carry a crown mark when zoomed in; a dashed border and a pattern of small crosses set each great house of Japan apart. Tap a member for the Empire card, Japan for the Shogunate card.</p>
   </div>`;
 }

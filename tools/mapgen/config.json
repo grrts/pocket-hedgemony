@@ -43,6 +43,13 @@
   ],
   "defaultDensity": 0.8,
   "defaultWealth": 1,
+  "$subSaharanComment": "SETUP-067: modern countries of the event tree's Sub-Saharan Africa macro-region (MAP-039), where the stand-in castle rule builds earthworks; stoneCastles are the anchors that name a stone castle there.",
+  "subSaharanCountries": ["AGO", "BDI", "BEN", "BFA", "BWA", "CAF", "CIV", "CMR", "COD", "COG", "COM", "CPV", "DJI", "ERI", "ETH", "GAB", "GHA", "GIN", "GMB", "GNB", "GNQ", "KEN", "LBR", "LSO", "MDG", "MLI", "MOZ", "MRT", "MUS", "MWI", "NAM", "NER", "NGA", "RWA", "SDN", "SDS", "SEN", "SLE", "SOL", "SOM", "SSD", "STP", "SWZ", "SYC", "TCD", "TGO", "TZA", "UGA", "ZAF", "ZMB", "ZWE"],
+  "stoneCastles": [
+    { "name": "Great Zimbabwe", "at": [30.93, -20.27] },
+    { "name": "Kilwa", "at": [39.51, -8.96] },
+    { "name": "Mombasa", "at": [39.66, -4.04] }
+  ],
   "palette": ["#3b5dc9", "#b13e53", "#ffcd75", "#38b764", "#ef7d57", "#41a6f6", "#a7f070", "#5d275d", "#73eff7", "#257179", "#c97d3b", "#8f4fa8", "#d9a066", "#6abe30", "#df7126", "#5b6ee1", "#d95763", "#76428a", "#99e550", "#fbf236", "#847e87", "#8f974a", "#cbdbfc", "#e8a0bf", "#4b692f", "#ac3232", "#306082", "#eec39a", "#639bff", "#bd8d5a", "#9badb7", "#45283c"],
   "seas": {
     "$comment": "Sea zone seed spacing in pixels (about 7 km each): coastal zones are about 150 km across, ocean zones about 300 km.",

@@ -442,9 +442,11 @@ export function standingOf(world: World, holder: number, other: number): { stand
   const d = world.diplomacy;
   const a = world.nationIds[holder]!;
   const b = world.nationIds[other]!;
-  const n = dip.standing(d, a, b);
-  const lines: StandingLine[] = dip.ledgerOf(d, a, b).map((e) => ({ name: e.name, weight: Math.round(e.weight) }));
+  // The ledger and relation line are read once, for the standing and its lines alike.
+  const ledger = dip.ledgerOf(d, a, b);
   const line = dip.relationLine(d, a, b);
+  const n = dip.standing(d, a, b, ledger, line);
+  const lines: StandingLine[] = ledger.map((e) => ({ name: e.name, weight: Math.round(e.weight) }));
   if (line.weight) lines.unshift({ name: RELATION_NAME[line.relation] ?? line.relation.replace(/_/g, " "), weight: line.weight });
   return { standing: Math.round(n), word: dip.standingWord(n), lines };
 }
