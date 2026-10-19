@@ -2,6 +2,7 @@ import { startGoals, type GoalAim, type GoalDef } from "@ph/rules";
 import config from "../../rules/data/domain/events.json" with { type: "json" };
 import * as dip from "./domain/diplomacy/index.ts";
 import { pixelOf } from "./domain/world-map/index.ts";
+import { realmStrengths } from "./realmStrengths.ts";
 import { Rng } from "./rng.ts";
 import type { World } from "./world.ts";
 
@@ -55,10 +56,23 @@ export function nearestLand(world: World, at: readonly [number, number]): number
   return best;
 }
 
+/**
+ * The realm a goal names: the regions write map ids (mamluks, ottomans) and a
+ * scenario may name its realms by catalogue record (mamluk, ottoman), so either
+ * form finds the other.
+ */
+export function realmOf(world: World, id: string | undefined): number | undefined {
+  if (!id) return undefined;
+  const n = world.nationIndex.get(id) ?? world.nationIndex.get(realmStrengths(id).catalogue ?? "");
+  if (n !== undefined) return n;
+  for (let k = 0; k < world.nationIds.length; k++) if (realmStrengths(world.nationIds[k]!).catalogue === id) return k;
+  return undefined;
+}
+
 function bind(world: World, aim: GoalAim | null | undefined): { places: number[]; target: number } {
   if (!aim) return { places: [], target: -1 };
   if (aim.kind === "take" || aim.kind === "hold") return { places: [...new Set(aim.places.map((p) => nearestLand(world, p.at)).filter((p) => p >= 0))], target: -1 };
-  return { places: [], target: world.nationIndex.get(aim.target ?? "") ?? -1 };
+  return { places: [], target: realmOf(world, aim.target) ?? -1 };
 }
 
 /** The scenario's goals, shaken by the campaign's seed (EVT-086). */
@@ -66,7 +80,7 @@ export function createGoals(world: World, defs: readonly GoalDef[] = startGoals,
   const rng = new Rng(world.weatherSeed ^ 0x60a15);
   const share = G.deviate_share[mode];
   const list = defs.flatMap((d, def): Goal[] => {
-    const realm = world.nationIndex.get(d.realm);
+    const realm = realmOf(world, d.realm);
     if (realm === undefined) return [];
     const shake = G.shake_low + rng.next() * (G.shake_high - G.shake_low);
     const deviates = rng.next() < share;
@@ -191,7 +205,7 @@ export function restoreGoals(world: World, saved: ReturnType<typeof saveGoals>):
   const defs = world.goals.defs;
   world.goals.list = saved.flatMap((x): Goal[] => {
     const d = defs[x.def];
-    const realm = d && world.nationIndex.get(d.realm);
+    const realm = d && realmOf(world, d.realm);
     if (!d || realm === undefined) return [];
     const aim = x.shaken === "swapped" ? (d.alternative ?? d.aim) : d.aim;
     return [{ def: x.def, realm, aim, ...bind(world, aim), weight: x.weight, shaken: x.shaken, end: x.end }];

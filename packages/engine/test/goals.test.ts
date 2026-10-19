@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { loadMapTiles } from "../src/node/mapTiles.ts";
 import { loadDefaultRuleset, type GoalDef } from "@ph/rules";
 import { createWorld, type World } from "../src/index.ts";
-import { createGoals, goalAsks, goalPlacesHeldBy, goalPulls, monthlyGoals, nearestLand, restoreGoals, saveGoals, timeFactor } from "../src/goals.ts";
+import { createGoals, goalAsks, realmOf, goalPlacesHeldBy, goalPulls, monthlyGoals, nearestLand, restoreGoals, saveGoals, timeFactor } from "../src/goals.ts";
 import { chronicleView, goalViews } from "../src/chronicle.ts";
 import { aiDeclarations, relationState } from "../src/war.ts";
 import * as dip from "../src/domain/diplomacy/index.ts";
@@ -38,6 +38,16 @@ describe("historical goals (EVT-085 to EVT-093)", () => {
   it("binds a place to the land province nearest it", () => {
     const w = createWorld(rules, 1, tiles);
     expect(w.provinceOwner[nearestLand(w, CONSTANTINOPLE)]).toBe(nation(w, "byzantium"));
+  });
+
+  it("finds a realm by its map id or its catalogue record", () => {
+    const w = createWorld(rules, 1, tiles);
+    expect(realmOf(w, "ottoman")).toBe(nation(w, "ottomans"));
+    expect(realmOf(w, "ottomans")).toBe(nation(w, "ottomans"));
+    expect(realmOf(w, "mamluk")).toBe(nation(w, "mamluks"));
+    expect(realmOf(w, "atlantis")).toBeUndefined();
+    const g = withGoals([goal({ realm: "ottoman", aim: { kind: "fight", target: "mamluk" } })]);
+    expect(goalPulls(g, nation(g, "ottomans"))?.get(nation(g, "mamluks"))).toBeCloseTo(2);
   });
 
   it("pulls its realm toward the holder of its places while its time is near (EVT-087, EVT-089)", () => {
