@@ -109,7 +109,8 @@ import {
   type FormationState,
 } from "@ph/engine/domain/map-presentation";
 import { provinceLevy } from "@ph/engine/domain/recruiting";
-import { detailBands } from "@ph/engine/domain/map-presentation";
+import { detailBands, EFFECTS, holderOf, momentParticles, moments, momentSeconds, momentsShown, type MomentKind } from "@ph/engine/domain/map-presentation";
+import { ParticleField } from "./map/particles.ts";
 import { TownLayer, townInfo } from "./map/towns.ts";
 import { bedUnderCamera, musicFacts, newFactMemory, playerPalette, playerWars, remember, type FactMemory } from "./audio/facts.ts";
 import { COMMISSION_GOLD, hireGold, OFFICIALS, Rng, startFormOf } from "@ph/engine";
@@ -119,7 +120,7 @@ import { pickerCardHtml, regionListHtml, regionSelectHtml, strongIn, strongInWor
 import { BATTLE_STEP_MS, bannerAt, COUNTRY_CARD_TABS, endTurnInAuto, endTurnLabel, keyEndsTurn, newAutoTurns, realmOverview, REALM_BOOK_TABS, sectionOf, SHELL as SHELL_RULES, startColumn, startIcons, stopAuto, switchAuto, tabHolds, WATCH_STEP_MS, weekPlayed, type AutoStop, type OverviewTile, type Platform as ShellPlatform } from "@ph/engine/domain/game-shell";
 import { autosaveDue, continueTarget, longDate, newCampaign, newManualSave, saveStart, savesConfig, type Campaign, type Platform as SavePlatform } from "@ph/engine/domain/saves";
 import { SaveStore, type StoredSave } from "./saves/store.ts";
-import { animationsPref, autosaveEvery, autosavesKept, battleStepMs, dayMs, livingPrefs, longPressMs, mapDetail, mapPower, onPrefs, setPref, textZoom } from "./settings/prefs.ts";
+import { animationsPref, autosaveEvery, autosavesKept, battleStepMs, batteryOn, dayMs, livingPrefs, longPressMs, mapDetail, mapPower, onPrefs, setPref, textZoom } from "./settings/prefs.ts";
 import { openSettingsAt, renderSettings, setHintsRows } from "./ui/settingsScreen.ts";
 
 const rules = loadDefaultRuleset();
@@ -1720,6 +1721,8 @@ function drawOverlay(o: OverlayContext): void {
     }
     ctx.globalAlpha = 1;
   }
+  // The map's moments over everything, where the player is looking (VIEW-140).
+  drawParticles(o);
   if (animating) view.invalidate();
   else if (figuresTicking && !figureTick) figureTick = setTimeout(() => ((figureTick = 0), view.invalidate()), 1000 / LIVING_MAP.figures.frameRate);
   if (performance.now() - stepStart < stepMs) view.invalidate();
@@ -2981,6 +2984,7 @@ function takeSnapshot(next: Snapshot, ms: number): void {
   if (snapshot) for (const f of snapshot.navy.fleets) ships.set(f.id, { at: fleetPosition(f), path: f.path });
   fleetFrom = ships;
   applyWoken(next);
+  playMoments(snapshot, next);
   snapshot = next;
   followPlayerRealm(next);
   setPortraitYear(next.date.year);
@@ -3002,6 +3006,55 @@ function followPlayerRealm(s: Snapshot): void {
   if (campaign.playerNation === n.id && campaign.nationName === n.name) return;
   campaign.playerNation = n.id;
   campaign.nationName = n.name;
+}
+
+/** The map's particles: one-shot moments, and later the looping smoke, snow and birds (VIEW-140..VIEW-150). */
+const particles = new ParticleField(EFFECTS.maxParticles);
+let particleTick: ReturnType<typeof setTimeout> | 0 = 0;
+/** When the particles last moved (performance.now). */
+let particleClock = 0;
+
+const heldOf = (s: Snapshot) => Array.from(s.provinceOwner, (o, p) => holderOf(o, s.provinceOccupier[p]!));
+const plagueOf = (s: Snapshot) => new Map(s.plague.map((x) => [x.province, x.step]));
+
+/**
+ * What a played day changed, as moments on the map where the player is
+ * looking (VIEW-140..VIEW-145): a province changing hands, a work finished,
+ * a rising, a plague breaking out, a gold shower for the realm's news.
+ * Off screen, or zoomed out to the world, nothing plays; the news log has it all.
+ */
+function playMoments(before: Snapshot | null, next: Snapshot): void {
+  const animations = animationsPref();
+  if (!view || animations === "Off" || !momentsShown(view.camera.zoom)) return;
+  const capital = provinceIndex.get(nations[next.playerNation]!.capital) ?? -1;
+  const list = moments({
+    me: next.playerNation, capital, heldBefore: before ? heldOf(before) : null, heldAfter: heldOf(next), news: next.news,
+    ...(before ? { plagueBefore: plagueOf(before), plagueAfter: plagueOf(next) } : {}), outbreakStep: next.plagueSteps.indexOf("outbreak"),
+  });
+  for (const m of list) {
+    const p = provinces[m.province];
+    if (!p || !isKnown(m.province)) continue;
+    const [sx, sy] = view.toScreen(p.x!, p.y!);
+    if (sx < -40 || sy < -40 || sx > view.width + 40 || sy > view.height + 40) continue;
+    const colour = m.nation >= 0 ? nations[m.nation]!.color : PALETTE.paper;
+    particles.moment(m.kind, p.x!, p.y!, momentParticles(m.kind, animations), momentSeconds(m.kind), colour);
+  }
+  if (particles.count) view.invalidate();
+}
+
+/** Moves the particles on to now and draws them, asking for the next frame at the effects' frame rate while any live. */
+function drawParticles(o: OverlayContext): void {
+  const now = performance.now();
+  // A long gap (the tab hidden, the map idle) is not played out: the particles go on from where they were.
+  particles.step(Math.min(0.1, Math.max(0, (now - (particleClock || now)) / 1000)));
+  particleClock = now;
+  if (!particles.count) {
+    particleClock = 0;
+    return;
+  }
+  // In art pixels a little bigger than the tokens', so a moment reads at arm's length, and the living band's close in (VIEW-102).
+  particles.draw(o.ctx, o.toScreen, Math.max(3, Math.round(o.zoom / 8)), o.width, o.height);
+  if (!particleTick) particleTick = setTimeout(() => ((particleTick = 0), view.invalidate()), 1000 / EFFECTS.frameRate);
 }
 
 /** Takes in a fresh snapshot's map state. */
@@ -7549,6 +7602,11 @@ Object.assign(globalThis, {
   /** The most provinces the player holds of any one enemy, from the peace tables (scripts/peace-table-shots.mjs). */
   __phPeaceTable: () => Math.max(0, ...(snapshot?.settlements ?? []).map((x) => x.provinces.length)),
   __phTurn: () => snapshot?.turn ?? -1,
+  /** A realm's capital province and its point on the map. */
+  __phCapitalOf: (n: number) => {
+    const p = provinceIndex.get(nations[n]!.capital)!;
+    return { province: p, x: provinces[p]!.x!, y: provinces[p]!.y! };
+  },
   /** The founding card for staged news: a realm founded takes decades of play (scripts/founding-shots.mjs). */
   __phFoundingCard: (news: News[]) => showFoundings(news),
   /** The player's ports and fleets, and an order for the navy (scripts/navy-shots.mjs). */
@@ -7578,6 +7636,13 @@ Object.assign(globalThis, {
     newsView = false;
     panelCollapsed = false;
     renderPanel();
+  },
+  /** Plays a map moment at province p, in a realm's colour: the things that cause one take a war or years of play (scripts/effects-shots.mjs). */
+  __phMoment: (kind: MomentKind, p: number, nation = snapshot?.playerNation ?? 0) => {
+    const at = provinces[p]!;
+    particles.moment(kind, at.x!, at.y!, momentParticles(kind, animationsPref()), momentSeconds(kind), nations[nation]!.color);
+    view.invalidate();
+    return particles.count;
   },
   /** Stages an outbreak in province p until the next snapshot and opens its card: plague takes years of play to come (scripts/plague-shots.mjs). */
   __phStagePlague: (p: number, closed = false) => {
