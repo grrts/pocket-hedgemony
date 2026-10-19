@@ -414,7 +414,7 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
   // Hunting grounds by province and realm id; a save from before them keeps the 1444 ranges.
   restoreTribes(world, natMeta.tribes);
   // Tongues and faiths by province and realm; a save from before them keeps the 1444 start.
-  restorePeoples(world, natMeta.peoples);
+  restorePeoples(world, natMeta.peoples, ids);
   // Heads of the faith by realm id; a save from before them keeps the 1444 heads (RELG-155).
   restoreFaithHeads(world, natMeta.faithHeads);
   readBeliefShares(world);
