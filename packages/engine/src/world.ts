@@ -14,7 +14,7 @@ import { byDistance, createLordState, seedLords, type LordState } from "./lords.
 import { mix, personName } from "./names.ts";
 import { realmConfig } from "./domain/realm/index.ts";
 import { createLivingState, seedClasses, type LivingState } from "./living.ts";
-import { addCommander, ARMS, armIndex, createRecruitState, recount, FOOT_ARMS, HORSE_ARMS, KIND, OFFICIALS, type FreeCompany, type Mercenary, type Muster, refreshFreeCompanies } from "./recruit.ts";
+import { addCommander, ARMS, armIndex, createRecruitState, recount, recountLordsMen, FOOT_ARMS, HORSE_ARMS, KIND, OFFICIALS, type FreeCompany, type Mercenary, type Muster, refreshFreeCompanies } from "./recruit.ts";
 import { seedOfficials } from "./officials.ts";
 import { createResearchState, seedResearch, withoutOf, type ResearchState } from "./research.ts";
 import { createWorksState, seedWorks, type WorksState } from "./works.ts";
@@ -99,6 +99,8 @@ export interface World extends LivingState, TreasuryState, FoodState, MoodState,
   nationTreasury: Float64Array;
   nationLevies: Float64Array;
   nationMaxLevies: Float64Array;
+  /** Men each realm's lords would bring if called now, by loyalty (WAR-252): part of how strong it looks. */
+  nationLordsMen: Float64Array;
   nationMonthlyIncome: Float64Array;
   /** Each realm's administrative capacity from the catalogue, 1 (very low) to 5 (very high), 0 unknown: how far its rule reaches (realmStrengths.ts). */
   nationAdminCapacity: Int8Array;
@@ -213,7 +215,7 @@ export interface ArmyPool {
   battle: Int32Array;
   /** The province the army last marched in from (-1 = none): the way back past an enemy castle. */
   cameFrom: Int32Array;
-  /** Company kind: levy or hired (see KIND). */
+  /** Company kind: levy, hired or a lord's retinue (see KIND). */
   kind: Uint8Array;
   /** Province the men were levied from (-1 = none, as for a hired company): its people lose the army's dead (WAR-226). */
   home: Int32Array;
@@ -445,6 +447,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     nationTreasury: Float64Array.from(rules.nations, (n) => (n.asleep ? 0 : rules.defines.economy.startingTreasury)),
     nationLevies: new Float64Array(N),
     nationMaxLevies: new Float64Array(N),
+    nationLordsMen: new Float64Array(N),
     nationMonthlyIncome: new Float64Array(N),
     nationAdminCapacity: Int8Array.from(nationIds, adminCapacityRank),
     commanderIds,
@@ -553,6 +556,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   seedRegions(world);
   seedCharts(world);
   recount(world);
+  recountLordsMen(world);
   refreshFreeCompanies(world);
   // The ledger is worked out from the start, so lenders and the treasury card know the realm's income.
   runLedger(world, false);

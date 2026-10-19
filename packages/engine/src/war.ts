@@ -12,6 +12,7 @@ import { GROUNDS } from "./tiles.ts";
 import { halt, marchTo, routeBars } from "./turn.ts";
 import { marchMap, NO_PATH, type World } from "./world.ts";
 import { battleWon } from "./campaignEnd.ts";
+import { retinueScatters, retinuesWon } from "./retinues.ts";
 import { aiRecruits, ARMS, canCall, commanderBattle, KIND, KIND_NAMES, menByArm, sendHome } from "./recruit.ts";
 import { withoutOf } from "./research.ts";
 import { officialBonus, provinceTaken } from "./officials.ts";
@@ -271,9 +272,9 @@ export function answerCall(world: World, call: dip.Call, yes: boolean, news: New
   );
 }
 
-/** Men in the field plus levies at home: how strong a realm looks to others. */
+/** Men in the field plus levies and the lords' men at home: how strong a realm looks to others. */
 export function strength(world: World, n: number): number {
-  let men = canCall(world, n);
+  let men = canCall(world, n) + world.nationLordsMen[n]!;
   const a = world.armies;
   for (let i = 0; i < a.count; i++) if (a.alive[i] && a.owner[i] === n) men += a.men[i]!;
   return men;
@@ -584,6 +585,7 @@ export function fightRound(world: World, news: News[]): void {
     const loseStart = b.attackerWins ? b.defStart : b.attStart;
     commanderBattle(world, b.attackerWins ? b.attLead : b.defLead, true, winStart < loseStart);
     battleWon(world, winner);
+    retinuesWon(world, winSlots, news);
     commanderBattle(world, b.attackerWins ? b.defLead : b.attLead, false, false);
     endBattle(world, b);
     noteBattle(world, winner, loser, winStart, loseStart, b.province);
@@ -651,7 +653,8 @@ function fallBack(world: World, s: number, enemies: Set<number>[], news: News[])
 function disperse(world: World, s: number, text: string, news: News[]): void {
   const a = world.armies;
   // Half the men who survive find their way home to the pools; hired men just leave.
-  if (a.kind[s] !== KIND.hired) sendHome(world, a.owner[s]!, a.men[s]! * 0.5);
+  if (a.kind[s] === KIND.retinue) retinueScatters(world, s, a.men[s]! * 0.5);
+  else if (a.kind[s] !== KIND.hired) sendHome(world, a.owner[s]!, a.men[s]! * 0.5);
   a.alive[s] = 0;
   halt(world, s);
   news.push({ kind: "battle", text, nations: [a.owner[s]!], province: a.location[s]! });
@@ -1256,6 +1259,9 @@ export function aiMarches(world: World): void {
       halt(world, i);
       continue;
     }
+    // Already on its way there: the route it walks stands (planning one is most of this step's cost).
+    const walking = a.route[i]!;
+    if (walking.length && walking[walking.length - 1] === target) continue;
     const route = planRoute(world.rules.defines.march, marchMap(world), here, target, { men, horse: a.horse[i]!, logistics: 0 }, routeBars(world, i));
     if (route) {
       // Walked a province at a time: each stretch is planned over the tiles as the army gets there.

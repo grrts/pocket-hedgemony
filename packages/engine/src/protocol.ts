@@ -11,7 +11,8 @@ import { achievementsView, startAchievements } from "./achievements.ts";
 import { eventCards, type EventCard } from "./events.ts";
 import { everydayCards } from "./everyday.ts";
 import { diplomacyLensView, type DiplomacyLensView } from "./diplomacyLens.ts";
-import { giftGold } from "./lords.ts";
+import { giftGold, lordOfCommander } from "./lords.ts";
+import { retinueView, type RetinueState } from "./retinues.ts";
 import { stabilityOf, type Stability } from "./stability.ts";
 import { governmentView, realmForms, realmTitles, type GovernmentView } from "./government.ts";
 import type { Titles } from "./domain/realm/index.ts";
@@ -247,6 +248,8 @@ export interface Snapshot {
   /** Every lord (index = provinceLord's value): name, house, realm, loyalty and provinces held; the gold a gift costs. */
   lords: { name: string; house: string; nation: number; loyalty: string; lands: number }[];
   provinceLord: Int16Array;
+  /** The player's lords' retinues (WAR-252 to WAR-262): what each would bring, gathering or in the field (army = index in armies, -1), and why he can't be called. */
+  retinues: { lord: number; state: RetinueState; wouldBring: number; atHome: number; cap: number; gathering?: { men: number; days: number }; army: number; seat: number; refusal: string | null; leavesAfter: number | null }[];
   /** Each realm's direct overlord by nation index, -1 when it is nobody's subject (SUBJ-093: the world-zoom map washes a subject in it). */
   nationOverlord: Int16Array;
   giftGold: number;
@@ -320,7 +323,7 @@ export interface Snapshot {
   /** The player's posts (PROV-342 to PROV-348): whether Auto-fill posts is on, the gold it keeps back, what filling every empty post costs now, and the best fit for each royal post of the player's, by province. */
   posts: { autoFill: boolean; reserve: number; fillAll: { posts: number; gold: number }; fit: Record<number, { type: number; why: string; foreign: boolean; gold: number }> };
   /** Every commander: who they serve (-1 = none), their skills and record, the army they lead (index in armies, -1 = at court) and the province they left as an official (-1 = none). */
-  commanders: { name: string; owner: number; might: number; cunning: number; logistics: number; victories: number; defeats: number; army: number; home: number; origin: string; fleet: number }[];
+  commanders: { name: string; owner: number; might: number; cunning: number; logistics: number; victories: number; defeats: number; army: number; home: number; origin: string; fleet: number; lord: number }[];
   /** Ports, sailors and fleets: every fleet for the map, the player's ports and fleets in full (navy.ts). */
   navy: NavyView;
   /** Fleets the player can hire now, free fleets first (hiredFleets.ts, F-115). */
@@ -603,7 +606,16 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         home: w.commanderHome[k]!,
         origin: c.origin ?? "",
         fleet: w.navy.fleets.find((f) => f.admiral === k)?.id ?? -1,
+        lord: lordOfCommander(w, k),
       })),
+      retinues:
+        player >= 0
+          ? w.lords.flatMap((l, k) => {
+              if (l.nation !== player) return [];
+              const v = retinueView(w, player, k);
+              return [{ lord: k, ...v, army: v.army >= 0 ? live.indexOf(v.army) : -1 }];
+            })
+          : [],
       navy: navyView(w, player),
       fleetsForHire: player >= 0 ? fleetOffersView(w, player) : [],
       exploration: explorationView(w, player),

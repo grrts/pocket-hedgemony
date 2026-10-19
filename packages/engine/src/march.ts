@@ -103,14 +103,20 @@ export function planRoute(d: MarchDefines, map: MarchMap, from: number, to: numb
   const n = map.ground.length;
   // stepDays(p, q) = (half[p] + enter[q]) * pace + river[q], split per province.
   const pace = d.daysPerCrossing / (1 + d.horseSpeedBonus * (a.men > 0 ? Math.min(1, a.horse / a.men) : 0));
-  const half = new Float64Array(n);
-  const enter = new Float64Array(n).fill(Infinity);
-  for (let p = 0; p < n; p++) {
+  // Each province's costs are worked out when the search first reaches it: most searches stop long before the far side of the map.
+  const half = new Float64Array(n).fill(NaN);
+  const enter = new Float64Array(n);
+  const reach = (p: number) => {
+    if (half[p] === half[p]) return;
     const g = map.ground[p];
-    if (!g) continue;
+    if (!g) {
+      half[p] = 0;
+      enter[p] = Infinity;
+      return;
+    }
     half[p] = (d.daysToCross[g] / 2) * pace;
     enter[p] = half[p]! + (a.men > forageLimit(d, map, p) ? d.bigArmyExtraCrossings * pace : 0) + (map.river[p] ? d.riverCrossingDays : 0);
-  }
+  };
   const dist = new Float64Array(n).fill(Infinity);
   const prev = new Int32Array(n).fill(-1);
   // Binary heap of (cost, province); a province may sit in it more than once.
@@ -165,10 +171,12 @@ export function planRoute(d: MarchDefines, map: MarchMap, from: number, to: numb
     if (done[p]) continue;
     done[p] = 1;
     if (p === to) break;
+    reach(p);
     const base = dist[p]! + half[p]!;
     for (let k = map.adjStart[p]!, end = map.adjStart[p + 1]!; k < end; k++) {
       const q = map.adjList[k]!;
       if (barred?.(p, q)) continue;
+      reach(q);
       const c = base + enter[q]!;
       if (c < dist[q]!) {
         dist[q] = c;

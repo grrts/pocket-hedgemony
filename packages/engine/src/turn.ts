@@ -28,6 +28,7 @@ import { monthlyPeoples, setFaithPolicy, setTonguePolicy } from "./peoples.ts";
 import { claimCaliphate, faithHeadsWars, monthlyFaithHeads, raiseOwnPatriarch, sendConclaveGold } from "./faithHeads.ts";
 import { dismissOfficial, fillAllPosts, hireOfficial, monthlyPosts, setAutoFill, settleLand, swapOfficials } from "./officials.ts";
 import { giveGift, grantFief, inAnyWar, lordGetsBuilding, monthlyLords, seizeFief } from "./lords.ts";
+import { callLord, callLords, monthlyRetinues, weeklyRetinues } from "./retinues.ts";
 import { clockStopped, dailyEndCheck, keepPlaying, playOn, weeklyEndCheck, yearlyScores } from "./campaignEnd.ts";
 import { noteMoment, turnEndAchievements } from "./achievements.ts";
 import { empireOrder, monthlyInstitutions, type EmpireOrder } from "./institutions.ts";
@@ -49,6 +50,7 @@ import {
   nationPay,
   pickUp,
   recount,
+  recountLordsMen,
   cancelRecruit,
   recruit,
   releaseCommander,
@@ -121,6 +123,8 @@ export type Order =
   | { type: "repay"; gold: number }
   /** Give a lord gold, grant him a royal province, or take a province back from its lord. */
   | { type: "gift"; lord: number }
+  /** Call the lords' retinues to war: every lord, or one (WAR-253). */
+  | { type: "callLords"; lord?: number }
   | { type: "grantFief"; province: number; lord: number }
   | { type: "seizeFief"; province: number }
   /** Move officials between two royal provinces: they swap posts, or one takes the other's empty post (AssignOfficial). */
@@ -317,6 +321,8 @@ function startDay(world: World, news: News[]): void {
     // A demand made before war may reach the player's court this month (DIPL-213).
     libraryEvents(world, news);
     aiRaise(world, news);
+    // Retinues go home at peace or when their lord no longer serves; the AI calls its lords (WAR-256, WAR-258).
+    monthlyRetinues(world, news);
     // Events come last in the month, after every other system (X-2).
     monthlyEveryday(world, news);
     monthlyEvents(world, news);
@@ -340,8 +346,10 @@ function endDay(world: World, news: News[]): void {
   dailyEndCheck(world, news);
   if (world.day % DAYS_PER_TURN === 0) {
     weeklyMusters(world, news);
+    weeklyRetinues(world, news);
     aiCollect(world, news);
     recount(world);
+    recountLordsMen(world);
     // The player's ledger is kept current each week; every realm's is worked out when the month turns.
     if (world.player >= 0) runLedger(world, false, world.player);
     answerAiCalls(world, news);
@@ -411,6 +419,11 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
       return repayLoan(world, actingNation, order.gold);
     case "gift":
       return giveGift(world, actingNation, order.lord);
+    case "callLords": {
+      const refused = order.lord === undefined ? callLords(world, actingNation, news) : callLord(world, actingNation, order.lord, news);
+      if (!refused) recountLordsMen(world);
+      return refused;
+    }
     case "grantFief":
       return grantFief(world, actingNation, order.province, order.lord);
     case "seizeFief":

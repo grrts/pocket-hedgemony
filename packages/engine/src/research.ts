@@ -167,13 +167,14 @@ function landOf(world: World): number[][] {
 }
 
 /**
- * Takes up to `men` recruits from realm n's held provinces, each giving the
+ * Takes up to `men` recruits from realm n's held royal provinces, each giving the
  * same share of its pool; returns how many. `land` lists the realm's
  * provinces when the caller has it.
  */
 function takeRecruits(world: World, n: number, men: number, land?: readonly number[]): number {
   if (men <= 0) return 0;
-  const held = (land ?? landOf(world)[n]!).filter((p) => world.provinceOwner[p] === n && controller(world, p) === n);
+  // The crown's recruits: a lord's land fills his own retinue (WAR-252).
+  const held = (land ?? landOf(world)[n]!).filter((p) => world.provinceOwner[p] === n && world.provinceLord[p]! < 0 && controller(world, p) === n);
   let pool = 0;
   for (const p of held) pool += world.provinceRecruits[p]!;
   const take = Math.min(men, Math.floor(pool));

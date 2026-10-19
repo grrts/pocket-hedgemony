@@ -6604,6 +6604,19 @@ details.pow-line > .hint {
   min-height: 44px;
 }
 
+/* Lords' men in the Army tab (WAR-259 to WAR-262): one full-width call, rows with 44-point buttons. */
+button[data-call-lords] {
+  width: 100%;
+  margin: 4px 0;
+}
+.retinue-sum {
+  margin: 4px 0;
+}
+.retinue-row .army-buttons button.small {
+  min-height: 44px;
+  min-width: 44px;
+}
+
 /* ---- Your realm's six sections (SHELL-165..167, ui-review): one row of icons with names under the title, and the
    open section's pages in a lower row. Neither row wraps or scrolls (F-111); six fit the 45 % sheet of a phone held
    sideways, each a 44-point target or more. ---- */

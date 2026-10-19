@@ -338,6 +338,8 @@ export function orderShape(order: Order): string {
       return "repay a loan";
     case "gift":
       return "give a lord gold";
+    case "callLords":
+      return "call the lords to war";
     case "grantFief":
       return "grant a fief";
     case "seizeFief":

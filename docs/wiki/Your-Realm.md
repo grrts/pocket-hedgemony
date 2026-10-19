@@ -162,7 +162,7 @@ The lord card is the same in every society; only the label changes: nobles, merc
 
 **Where you find them.** Open a province and the first thing on it is who governs it: its lord, with his loyalty and buttons to open him or seize the land, or *Royal land* with a **Grant as fief** button that lists your lords, neighbours first. Its official sits under him; a lord's official serves the lord, so you can't make him a commander. The country card's **Lords** tab is the overview: how much of the realm is royal land, and a row per lord with his portrait, house, lands and loyalty. Tap a lord to open his screen: his lands as a list, a gift while he is not loyal, royal provinces you can grant him (nearest first), and **Show his lands on the map**, which fades the rest of the map and frames his provinces. On the map a lord's land always carries a fine pattern of crosses and a dashed border, and the **Lords** map mode colours each of your lords' lands in his own colour.
 
-**Lords versus officials.** A lord costs no gold, but keeps half the taxes of his provinces and keeps their recruits as his retinue. He obeys according to his loyalty, and can be removed only by force, a trial or his line dying out.
+**Lords versus officials.** A lord costs no gold, but keeps half the taxes of his provinces and keeps their recruits as his retinue. He obeys according to his loyalty, and can be removed only by force, a trial or his line dying out. At war you call his retinue from the Army tab or his screen, and he leads it himself (see [Warfare](Warfare)); each row of the Lords tab shows his men's state beside his loyalty.
 
 **How you gain lords:**
 
