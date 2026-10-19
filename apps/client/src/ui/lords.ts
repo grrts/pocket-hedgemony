@@ -23,6 +23,9 @@ export interface LordView {
   nation: number;
   loyalty: string;
   lands: number;
+  /** His age and the heir who takes his lands when he dies (REALM-273); unset in an older snapshot. */
+  age?: number;
+  heir?: { name: string; age: number } | null;
 }
 
 /** What each loyalty step means for the crown. */
@@ -66,7 +69,7 @@ export function lordsTab(rules: Ruleset, lords: LordView[], lands: Map<number, L
       const ll = lands.get(l.k)!;
       return `<button class="paper lord-row" data-lord-open="${l.k}">
         ${lordPortrait(rules, l, 2)}
-        <span class="lord-who"><b>${esc(l.name)}</b><small>House ${esc(l.house)} · ${l.lands} province${l.lands === 1 ? "" : "s"} · ${fmt(ll.people * 1000)} people</small></span>
+        <span class="lord-who"><b>${esc(l.name)}</b><small>House ${esc(l.house)}${l.age ? ` · ${l.age}` : ""} · ${l.lands} province${l.lands === 1 ? "" : "s"} · ${fmt(ll.people * 1000)} people</small></span>
         <span class="lord-state">${loyaltyBadge(l.loyalty)}<small>${gold2(ll.crownGold)} gold a month${retinues.has(l.k) ? ` · ${RETINUE_SHORT[retinues.get(l.k)!.state]}` : ""}</small></span>
       </button>`;
     })
@@ -113,6 +116,8 @@ export function lordScreen(
     ${o.court ?? ""}
     ${o.retinue ?? ""}
     <dl class="facts">
+      ${l.age ? `<dt>Age</dt><dd>${l.age}</dd>
+      <dt>Heir</dt><dd>${l.heir ? `${esc(l.heir.name)}, ${l.heir.age}` : `None: if he dies, his line dies out and his lands return to the crown`}</dd>` : ""}
       <dt>Lands</dt><dd>${ll.provinces.length} province${ll.provinces.length === 1 ? "" : "s"}, ${fmt(ll.people * 1000)} people</dd>
       <dt>To you</dt><dd>${gold2(ll.crownGold)} gold a month${l.loyalty === "Loyal" || l.loyalty === "Wavering" ? " (half of their tax)" : ""}</dd>
       <dt>${esc(cap(t.officials))}</dt><dd>His own run his lands; you can't commission them.</dd>

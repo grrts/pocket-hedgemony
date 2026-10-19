@@ -145,6 +145,10 @@ export function swapOfficials(world: World, n: number, a: number, b: number, new
   world.provinceOfficialSeed[b] = sa;
   world.provinceOfficialFrom[a] = world.provinceOfficialFrom[b]!;
   world.provinceOfficialFrom[b] = fa;
+  // Each man keeps his age as he moves (REALM-275).
+  const ga = world.provinceOfficialAge[a]!;
+  world.provinceOfficialAge[a] = world.provinceOfficialAge[b]!;
+  world.provinceOfficialAge[b] = ga;
   world.provinceOfficialSince[a] = world.provinceOfficialSince[b] = world.day;
   if (n === world.player) {
     const pa = world.rules.provinces[a]!.name;
@@ -188,6 +192,8 @@ function seat(world: World, n: number, p: number, type: number, foreign: boolean
   // A new man: his name comes from a seed no official of this post has carried at the start.
   world.provinceOfficialSeed[p] = (p + world.day * 31) % world.provinceCount;
   world.provinceOfficialSince[p] = world.day;
+  // A new man's age is drawn from his seed (people.ts officialAge).
+  world.provinceOfficialAge[p] = 0;
   world.provinceOfficialFrom[p] = foreign ? abroad(world, n, p) : -1;
 }
 
@@ -224,6 +230,7 @@ export function provinceTaken(world: World, p: number, news: News[] = []): void 
   world.provinceOfficial[p] = -1;
   world.provinceOfficialFrom[p] = -1;
   world.provinceOfficialSince[p] = world.day;
+  world.provinceOfficialAge[p] = 0;
   const n = world.provinceOwner[p]!;
   const auto = n >= 0 && autoFills(world, n);
   // A realm that fills its own posts fills this one at once if its gold allows, and does not wait on the player (PROV-344).

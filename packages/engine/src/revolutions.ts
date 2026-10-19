@@ -354,7 +354,7 @@ export function rebelsWonAgainst(world: World, b: Band, news: News[]): void {
 function waverAll(world: World, n: number, to?: string): void {
   const floor = LOYALTY.indexOf("Disloyal");
   for (const l of world.lords) {
-    if (l.nation !== n) continue;
+    if (l.nation !== n || l.gone) continue;
     const i = LOYALTY.indexOf(l.loyalty);
     const next = to ? Math.max(i, LOYALTY.indexOf(to as (typeof LOYALTY)[number])) : Math.min(floor, i + 1);
     if (next > i) l.loyalty = LOYALTY[next]!;

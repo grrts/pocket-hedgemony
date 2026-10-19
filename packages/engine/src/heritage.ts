@@ -299,6 +299,7 @@ export function worldFacts(world: World, g: GameHeritage): ns.WorldFacts {
   const a = world.armies;
   for (let i = 0; i < a.count; i++) if (a.alive[i] && a.owner[i]! >= 0) counts[a.owner[i]!]!.soldiers! += a.men[i]!;
   for (const l of world.lords) {
+    if (l.gone) continue;
     counts[l.nation]!.lords!++;
     if (l.loyalty === "Loyal") counts[l.nation]!.loyal_lords!++;
   }
