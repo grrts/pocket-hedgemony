@@ -16,8 +16,8 @@ let cached: { rules: Ruleset; grid: TileGrid } | null = null;
 export function loadMapTiles(rules: Ruleset): TileGrid {
   if (cached?.rules === rules) return cached.grid;
   // The start's own images (rules.map names them, as the client loads them).
-  const ids = decodeRgb(fileURLToPath(new URL(rules.map.provinceImage, PUBLIC_DIR)));
-  const terrain = decodeRgb(fileURLToPath(new URL(rules.map.terrainImage, PUBLIC_DIR)));
+  const ids = decodeRgb(fileURLToPath(new URL(rules.map?.provinceImage ?? "map/provinces.png", PUBLIC_DIR)));
+  const terrain = decodeRgb(fileURLToPath(new URL(rules.map?.terrainImage ?? "map/terrain.png", PUBLIC_DIR)));
   const n = ids.width * ids.height;
   const province = new Uint16Array(n);
   for (let p = 0, i = 0; p < n; p++, i += 3) province[p] = (ids.rgb[i]! << 16) | (ids.rgb[i + 1]! << 8) | ids.rgb[i + 2]!;
