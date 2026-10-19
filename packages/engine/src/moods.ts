@@ -132,9 +132,9 @@ export function monthlyMoods(world: World, news: News[]): void {
     if (world.provinceGrasping[p]) now |= bit("Grasping officials");
     // An outbreak raging here is a grievance (PROV-356).
     if (world.provincePlague[p] === 2) now |= bit("Plague");
-    // Royal land too far from the capital (PROV-174, X-28).
+    // Royal land too far from the capital (PROV-174, X-29).
     if (farFromThrone(world, p)) now |= FAR;
-    // Land taken from another realm in the last ten years (X-28).
+    // Land taken from another realm in the last ten years (X-29).
     if (world.provinceTakenYear[p]! >= 0 && newlyTaken(world, p)) now |= NEWLY;
     const before = MOODS.indexOf(moodOf(grievanceCount(world, p), isJudge(world.provinceOfficial[p]!)).mood);
     world.provinceGrievances[p] = now;

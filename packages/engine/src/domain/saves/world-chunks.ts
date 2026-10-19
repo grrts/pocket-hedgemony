@@ -268,7 +268,7 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
         if (prov.officialSince) world.provinceOfficialSince[t.index] = prov.officialSince[old]!;
         // A foreign specialist's realm; saves from before hiring have none.
         if (prov.newLand) world.provinceNewLand[t.index] = prov.newLand[old]!;
-        // The year it was taken from another realm (X-28); saves from before have none newly taken.
+        // The year it was taken from another realm (X-29); saves from before have none newly taken.
         if (prov.takenYear) world.provinceTakenYear[t.index] = prov.takenYear[old]!;
         // Officials' ages; saves from before people aged draw them from each man's seed.
         if (prov.officialAge) world.provinceOfficialAge[t.index] = prov.officialAge[old]!;
@@ -346,7 +346,7 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
     if (nat.manualPosts) world.nationManualPosts[n] = nat.manualPosts[old]!;
     if (nat.debt) world.nationDebt[n] = nat.debt[old]!;
     if (nat.loanMonth) world.nationLoanMonth[n] = nat.loanMonth[old]!;
-    // Months broke and the last default (X-28); saves from before have none.
+    // Months broke and the last default (X-29); saves from before have none.
     if (nat.brokeMonths) world.nationBrokeMonths[n] = nat.brokeMonths[old]!;
     if (nat.defaultYear) world.nationDefaultYear[n] = nat.defaultYear[old]!;
     // Saves from before a ledger line was added hold fewer lines a realm; the ledger is worked out again each week.
@@ -551,7 +551,7 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
   // A save from before trade is given the start's traders, on the world as loaded.
   if (!natMeta.trade) seedTrade(world);
 
-  // Days to each capital are derived from who owns what: worked out for the land as loaded (X-28).
+  // Days to each capital are derived from who owns what: worked out for the land as loaded (X-29).
   world.throneKeys = new Uint32Array(0);
   monthlyThrone(world);
   // So is each realm's stability step.

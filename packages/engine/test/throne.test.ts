@@ -17,7 +17,7 @@ function nextMonth(w: World): void {
 
 const royalFar = (w: World, n: number) => Array.from({ length: w.provinceCount }, (_, p) => p).filter((p) => w.provinceOwner[p] === n && farFromThrone(w, p));
 
-describe("far from the throne (PROV-173, PROV-174, X-28)", () => {
+describe("far from the throne (PROV-173, PROV-174, X-29)", () => {
   it("counts days to the capital over the realm's land: the capital 0, its neighbours a few days", () => {
     const w = createWorld(rules, 1, tiles);
     const castile = w.nationIndex.get("castile")!;

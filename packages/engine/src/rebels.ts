@@ -152,7 +152,7 @@ function neighbours(world: World, p: number): number[] {
 export function risingChanceIn(world: World, p: number): number {
   const base = risingChance(world, p);
   if (base <= 0) return base;
-  // A Troubled or Crumbling realm's plotting provinces rise more often (X-28).
+  // A Troubled or Crumbling realm's plotting provinces rise more often (X-29).
   const chance = Math.min(1, base * stabilityEffect(world, world.provinceOwner[p]!).rising);
   const found = rb.heaviestCause(weighted(world, p));
   return found ? Math.min(1, chance * beliefRevoltFactor(world, world.provinceOwner[p]!, found.cause)) : chance;

@@ -17,7 +17,7 @@ function nextMonth(w: World): void {
   processTurn(w, [], w.player);
 }
 
-describe("newly taken land (X-28)", () => {
+describe("newly taken land (X-29)", () => {
   it("holds the grievance and costs upkeep on the New land line for ten years", () => {
     const w = createWorld(rules, 1, tiles);
     const castile = w.nationIndex.get("castile")!;

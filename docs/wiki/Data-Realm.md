@@ -421,7 +421,7 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 
 ### Default
 
-> X-28: a realm whose gold stays below zero with nothing more to borrow for broke\_months monthly steps defaults: its debt is gone and its gold set to nothing, each lord takes the crown\_defaulted cause lord\_steps times, stability reads Troubled for troubled\_years and lenders refuse it for lenders\_refuse\_years. Provisional.
+> X-29: a realm whose gold stays below zero with nothing more to borrow for broke\_months monthly steps defaults: its debt is gone and its gold set to nothing, each lord takes the crown\_defaulted cause lord\_steps times, stability reads Troubled for troubled\_years and lenders refuse it for lenders\_refuse\_years. Provisional.
 
 | Key | Value |
 |---|---|
@@ -482,7 +482,7 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 
 ### Effects
 
-> X-28: what low stability costs. tax and recruits are the shares the crown still collects of each province's tax and recruit refill; rising multiplies the monthly chance a plotting province rises. Steady and Uneasy cost nothing. Provisional.
+> X-29: what low stability costs. tax and recruits are the shares the crown still collects of each province's tax and recruit refill; rising multiplies the monthly chance a plotting province rises. Steady and Uneasy cost nothing. Provisional.
 
 | Key | Value |
 |---|---|

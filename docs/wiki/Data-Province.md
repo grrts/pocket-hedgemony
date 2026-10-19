@@ -521,7 +521,7 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 
 ## Newly taken
 
-> X-28: for years after a province is taken from another realm by a peace or a demand, it has Newly taken (one grievance) and costs its owner upkeep\_share\_of\_tax of its tax at the normal rate again each month, on the ledger's New land line. Provisional.
+> X-29: for years after a province is taken from another realm by a peace or a demand, it has Newly taken (one grievance) and costs its owner upkeep\_share\_of\_tax of its tax at the normal rate again each month, on the ledger's New land line. Provisional.
 
 | Key | Value |
 |---|---|
@@ -531,7 +531,7 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 
 ## Far from throne
 
-> PROV-173, PROV-174, X-28: days from a royal province to the capital over the realm's own land (the march's crossing days) and the sea (sea\_zone\_days a zone). Past days it has Far from the throne and sends the crown cut\_per\_10\_days less tax and recruits for every 10 days beyond, down to least\_share. A lord's province is run from his seat and is never far. Provisional.
+> PROV-173, PROV-174, X-29: days from a royal province to the capital over the realm's own land (the march's crossing days) and the sea (sea\_zone\_days a zone). Past days it has Far from the throne and sends the crown cut\_per\_10\_days less tax and recruits for every 10 days beyond, down to least\_share. A lord's province is run from his seat and is never far. Provisional.
 
 | Key | Value |
 |---|---|

@@ -9,7 +9,7 @@ import type { News } from "../src/war.ts";
 const rules = loadDefaultRuleset();
 const tiles = loadMapTiles(rules);
 
-describe("default (X-28)", () => {
+describe("default (X-29)", () => {
   it("warns a broke realm twice, then defaults: debt gone, lords turned, troubled, no lenders", () => {
     const w = createWorld(rules, 1, tiles);
     const n = w.nationIndex.get("castile")!;

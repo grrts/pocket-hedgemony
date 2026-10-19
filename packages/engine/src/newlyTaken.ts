@@ -2,7 +2,7 @@ import type { World } from "./world.ts";
 import { provinceConfig } from "./domain/province/model.ts";
 
 /**
- * Newly taken land (X-28): for `newly_taken.years` after a province is taken
+ * Newly taken land (X-29): for `newly_taken.years` after a province is taken
  * from another realm, by a peace or handed over, it holds *Newly taken* (one
  * grievance) and costs its holder `newly_taken.upkeep_share_of_tax` of its tax
  * at the normal rate again each month, on the ledger's New land line: the

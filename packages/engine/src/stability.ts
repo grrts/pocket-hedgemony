@@ -10,7 +10,7 @@ const cfg = realmConfig.stability;
 /**
  * Stability (realm REALM-199 to REALM-202, F-75): not a stored number but a
  * reading of the realm's pillars, lords, subjects, officials and
- * provinces, and since X-28 its treasury. Each pillar takes one of four steps, and the realm stands as
+ * provinces, and since X-29 its treasury. Each pillar takes one of four steps, and the realm stands as
  * steady as its weakest pillar.
  */
 
@@ -61,7 +61,7 @@ interface LandCounts {
 const DEFAULT = realmConfig.debt.default;
 
 /**
- * The treasury pillar (X-28): Troubled for `debt.default.troubled_years` after a default, Uneasy
+ * The treasury pillar (X-29): Troubled for `debt.default.troubled_years` after a default, Uneasy
  * while the realm is broke and heading for one, else Steady. Counts: the default's year (-1 none),
  * the year it stops weighing, and the monthly steps left before a default (0 when not broke).
  */
@@ -118,7 +118,7 @@ export function stabilityOf(world: World, n: number): Stability {
   return reading(lords, subjectsByLoyalty(world, n), c, treasuryPillar(world, n));
 }
 
-// ------------------------------------------------------------ what stability costs (X-28)
+// ------------------------------------------------------------ what stability costs (X-29)
 
 export interface StabilityState {
   /** Each realm's stability step (index into STABILITY), read in the monthly step; derived, so not saved. */

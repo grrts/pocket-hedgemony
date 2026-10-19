@@ -584,9 +584,9 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   monthlyGoals(world, false);
   // Heritage reads the tree's ages, so it starts after it: three ambitions drawn, the birthright in force.
   world.heritage = createGameHeritage(world);
-  // Days to each capital, for Far from the throne (X-28).
+  // Days to each capital, for Far from the throne (X-29).
   monthlyThrone(world);
-  // Each realm's stability, for what it costs (X-28).
+  // Each realm's stability, for what it costs (X-29).
   monthlyStability(world);
   // Worked out again with heritage's tax in force, so lenders and the treasury card know the income the realm will have.
   runLedger(world, false);

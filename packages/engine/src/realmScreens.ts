@@ -115,14 +115,14 @@ export interface StabilitySectionView {
   step: number;
   words: string;
   note: string;
-  /** What this step costs the realm, or what the first costly step would (X-28). */
+  /** What this step costs the realm, or what the first costly step would (X-29). */
   cost: string;
   pillars: PillarRow[];
 }
 
 const RISING_WORDS = (x: number) => (x >= 2 ? `${x === 2 ? "twice" : `${x} times`} as often` : `${Math.round((x - 1) * 100)} % more often`);
 
-/** What a step costs in words (X-28): less tax and recruits, plotting provinces rising more often; for a step that costs nothing, what the first costly one would. */
+/** What a step costs in words (X-29): less tax and recruits, plotting provinces rising more often; for a step that costs nothing, what the first costly one would. */
 export function stabilityCost(step: number): string {
   const say = (e: (typeof STABILITY_EFFECTS)[number], gets: string) => {
     const take = [e.tax < 1 && `${Math.round((1 - e.tax) * 100)} % less tax`, e.recruits < 1 && `${Math.round((1 - e.recruits) * 100)} % fewer recruits`].filter(Boolean).join(" and ");

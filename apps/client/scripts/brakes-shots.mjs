@@ -1,4 +1,4 @@
-// Brakes on big realms (X-28) as Lithuania in 1378: a far province's card (To capital, the Tax line's cut), the Days to
+// Brakes on big realms (X-29) as Lithuania in 1378: a far province's card (To capital, the Tax line's cut), the Days to
 // capital lens and the Stability section with what the step costs; on a small and a large phone held sideways, a
 // tall window and a desktop.
 // Usage: pnpm build && node scripts/brakes-shots.mjs <outDir> [devices]

@@ -9,7 +9,7 @@ import { stabilityCost } from "../src/realmScreens.ts";
 const rules = loadDefaultRuleset();
 const tiles = loadMapTiles(rules);
 
-describe("what low stability costs (X-28)", () => {
+describe("what low stability costs (X-29)", () => {
   it("reads every realm in one pass as stabilityOf does", () => {
     const w = createWorld(rules, 1, tiles);
     monthlyStability(w);

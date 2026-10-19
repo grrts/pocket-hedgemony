@@ -214,7 +214,7 @@ export interface Snapshot {
   debtLimit: number;
   loanDebtFactor: number;
   loanUnsettlesLords: boolean;
-  /** The player's road to default and after (X-28): monthly steps left before a default (0 = not broke), and the year lenders stop refusing after one (-1 = they lend). */
+  /** The player's road to default and after (X-29): monthly steps left before a default (0 = not broke), and the year lenders stop refusing after one (-1 = they lend). */
   debtTrouble: { monthsLeft: number; refuseUntil: number; defaulted: number };
   /** Months of eating in each province's store, its last harvest (index into harvests, -1 = none yet) and people starved there this year (thousands). */
   provinceFoodMonths: Float32Array;
@@ -249,9 +249,9 @@ export interface Snapshot {
   provinceMood: Int8Array;
   grievanceNames: readonly string[];
   moods: readonly string[];
-  /** Days from each owned province to its realm's capital, at most THRONE.farCap (PROV-173, X-28). */
+  /** Days from each owned province to its realm's capital, at most THRONE.farCap (PROV-173, X-29). */
   provinceDaysToCapital: Uint8Array;
-  /** Year each province was taken from another realm, -1 = none; newly taken for NEWLY_TAKEN_YEARS after (X-28). */
+  /** Year each province was taken from another realm, -1 = none; newly taken for NEWLY_TAKEN_YEARS after (X-29). */
   provinceTakenYear: Int16Array;
   /** Every lord (index = provinceLord's value): name, house, realm, loyalty and provinces held; the gold a gift costs. */
   /** Lords by index; age, heir and gone for REALM-273 (a gone lord's line died out and he is listed nowhere). */

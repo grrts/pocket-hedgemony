@@ -400,7 +400,7 @@ export function runChecks(set: RunSet, c: BalanceConfig): CheckResult[] {
   return out;
 }
 
-/** Defaulted on its debts (X-28), or debt over `years` years' income (any debt with no income). */
+/** Defaulted on its debts (X-29), or debt over `years` years' income (any debt with no income). */
 export const isBankrupt = (r: Pick<RealmYear, "debt" | "income" | "defaulted">, years: number) => !!r.defaulted || (r.debt > 0 && (r.income <= 0 || r.debt > years * r.income));
 
 export function runWars(r: ProbeResult, longMonths: number): RunWars {

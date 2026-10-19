@@ -44,7 +44,7 @@ export interface RealmYear {
   subjectsPower: number;
   treasury: number;
   debt: number;
-  /** It defaulted on its debts since the last row (REALM-301, X-28). */
+  /** It defaulted on its debts since the last row (REALM-301, X-29). */
   defaulted?: boolean;
   /** Net income over the months since the last row (a year, after the first). */
   income: number;

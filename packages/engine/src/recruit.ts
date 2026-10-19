@@ -994,7 +994,7 @@ export function monthlyRecruits(world: World, news: News[]): void {
   const fallen = refillPaces(world);
   for (let p = 0; p < world.provinceCount; p++) {
     const pool = { recruits: world.provinceRecruits[p]!, ceiling: world.provinceRecruitCeiling[p]! };
-    // A muster master refills the pool faster (province officials table: +25 %); royal land far from the throne and a troubled realm slower (X-28).
+    // A muster master refills the pool faster (province officials table: +25 %); royal land far from the throne and a troubled realm slower (X-29).
     const muster = officialBonus(world, p, "Muster master", "recruit_refill");
     const heritage = heritageFactor(world, world.provinceOwner[p]!, "recruit_refill_pct");
     const owner = world.provinceOwner[p]!;

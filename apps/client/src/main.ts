@@ -919,7 +919,7 @@ const LOYALTY_RGB = Object.fromEntries(Object.entries(LOYALTY_HEX).map(([k, v]) 
 const OVERLORD_HEX = "#7a4fa0";
 const OVERLORD_RGB = hexToRgb(OVERLORD_HEX);
 const loyaltyKey = (l: string): keyof typeof LOYALTY_HEX => (/disloyal/i.test(l) ? "disloyal" : /waver/i.test(l) ? "wavering" : "loyal");
-/** The Days to capital lens (X-28): near, far (amber to red as the cut grows) and lords' land. */
+/** The Days to capital lens (X-29): near, far (amber to red as the cut grows) and lords' land. */
 const THRONE_HEX = { near: "#3f8f46", lord: "#9a8f7a" } as const;
 const THRONE_RGB = { near: hexToRgb(THRONE_HEX.near), lord: hexToRgb(THRONE_HEX.lord) };
 const THRONE_RAMP = [hexToRgb("#d8a03a"), hexToRgb("#b8323a")];
@@ -6089,7 +6089,7 @@ function mercenarySection(): string {
 
 const gold2 = (g: number) => (Math.abs(g) < 10 ? g.toFixed(2) : g.toFixed(1));
 
-/** How far the province is from the capital, and what that costs (PROV-173, X-28). */
+/** How far the province is from the capital, and what that costs (PROV-173, X-29). */
 function throneFact(p: number): string {
   const s = snapshot!;
   if (provinces[p]!.id === nations[s.playerNation]?.capital) return "";
@@ -6099,7 +6099,7 @@ function throneFact(p: number): string {
   return `<dt>To capital</dt><dd>${say}${note}</dd>`;
 }
 
-/** Land taken from another realm: what holding it costs, and until when (X-28). */
+/** Land taken from another realm: what holding it costs, and until when (X-29). */
 function newLandFact(p: number): string {
   const s = snapshot!;
   const y = s.provinceTakenYear[p]!;
@@ -6107,7 +6107,7 @@ function newLandFact(p: number): string {
   return `<dt>Newly taken</dt><dd>in ${y} · until ${takenUntil(y)} it costs garrisons and clerks (Holding new land on the Treasury tab) and holds the Newly taken grievance</dd>`;
 }
 
-/** Why a province sends less than its rate says, each with its share kept back (X-28). */
+/** Why a province sends less than its rate says, each with its share kept back (X-29). */
 function taxCuts(p: number): string {
   const s = snapshot!;
   const cuts: string[] = [];
@@ -6168,7 +6168,7 @@ async function actInTreasury(order: Order): Promise<void> {
  * loan costs said before the borrow buttons (REALM-184, REALM-198). What it
  * shows comes from the engine's treasuryView model.
  */
-/** The road to default, or what a default left behind (X-28): said on the Treasury tab before it happens. */
+/** The road to default, or what a default left behind (X-29): said on the Treasury tab before it happens. */
 function defaultNote(d: { monthsLeft: number; refuseUntil: number; defaulted: number }): string {
   if (d.monthsLeft > 0)
     return `<p class="hint warn"><b>The treasury is empty and lenders give no more.</b> Unless gold comes in, the crown defaults in ${d.monthsLeft === 1 ? "a month" : `${d.monthsLeft} months`}: the debt is gone, but the lords turn away, the realm is troubled for ${DEFAULT_RULE.troubledYears} years and lenders refuse it for ${DEFAULT_RULE.refuseYears}. Raise the tax, send soldiers home or sell grain.</p>`;

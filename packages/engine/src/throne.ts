@@ -2,7 +2,7 @@ import type { World } from "./world.ts";
 import { provinceConfig } from "./domain/province/model.ts";
 
 /**
- * Far from the throne (PROV-173, PROV-174, X-28): each province's days to its
+ * Far from the throne (PROV-173, PROV-174, X-29): each province's days to its
  * realm's capital, over the realm's own land and the sea. A royal province
  * more than `far_from_throne.days` away has the grievance and sends the crown
  * less tax and fewer recruits, the further the less; a lord's province is run
@@ -165,7 +165,7 @@ export function monthlyThrone(world: World): void {
   for (let n = 0; n < N; n++) if (changed[n]) walkFrom(world, n);
 }
 
-/** Whether a province has Far from the throne: royal land further from the capital than `far_from_throne.days` (PROV-174, X-28). */
+/** Whether a province has Far from the throne: royal land further from the capital than `far_from_throne.days` (PROV-174, X-29). */
 export function farFromThrone(world: World, p: number): boolean {
   return world.provinceOwner[p]! >= 0 && world.provinceLord[p]! < 0 && world.provinceDaysToCapital[p]! > F.days;
 }
