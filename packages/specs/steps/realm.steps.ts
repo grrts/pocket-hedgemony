@@ -2841,7 +2841,6 @@ Given(/^the player plays "([^"]+)"$/, (s, realm: string) => {
 // ------------------------------------------------------------ sending an assassin after a lord (REALM-280 to REALM-283)
 // These run against the game: a fresh world, the realm's own lords, and the order the player gives.
 
-const A = M.realmConfig.lords.assassination;
 const landed = (s: S, realm: string): number[] => lordsOf(s, realm).filter((k) => G.lordLands(s.game, k).length > 0);
 /** Sends the assassin after lord k: he succeeds or is caught as the scenario says, else the seeded draw decides. */
 function sendAssassin(s: S, realm: string, k: number, outcome?: string): void {
@@ -2867,6 +2866,15 @@ When(/^"([^"]+)" sends an assassin after one of its lords(?: and (he succeeds|he
 When(/^"([^"]+)" sends an assassin after one of them and (he succeeds|he is caught)$/, (s, realm: string, outcome: string) => {
   sendAssassin(s, realm, s.pair[0], outcome);
 });
+Given("one of its lords has an heir", (s) => {
+  const w = s.game as GW;
+  s.heirOf = landed(s, "France")[0]!;
+  G.lordAge(w, s.heirOf);
+  w.lords[s.heirOf]!.heir = { name: "Bernard", age: 20 };
+});
+When(/^"([^"]+)" sends an assassin after him and (he succeeds|he is caught)$/, (s, realm: string, outcome: string) => {
+  sendAssassin(s, realm, s.heirOf, outcome);
+});
 When("{string} sends an assassin after a lord of another realm", (s, realm: string) => {
   const n = realmOf(s, realm);
   const other = (s.game as GW).lords.findIndex((l, k) => l.nation !== n && G.lordLands(s.game, k).length > 0);
@@ -2887,11 +2895,10 @@ Given("two lords of {string} are of one house", (s, realm: string) => {
   (s.game as GW).lords[b!]!.house = (s.game as GW).lords[a!]!.house;
   s.pair = [a, b];
 });
-Then("that lord is dead and an heir of his house holds his lands, {string}", (s, loyalty: string) => {
+Then("that lord is dead and his heir holds his lands, {string}", (s, loyalty: string) => {
   expect(s.refused).toBe(null);
   const l = (s.game as GW).lords[s.target]!;
-  expect(A.land_goes_to).toBe("heir");
-  expect(l.name).not.toBe(s.targetName);
+  expect(l.name).toBe("Bernard");
   expect(l.house).toBe(s.targetHouse);
   expect(l.loyalty).toBe(loyalty);
   expect(G.lordLands(s.game, s.target)).toEqual(s.targetLands);

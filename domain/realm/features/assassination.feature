@@ -41,10 +41,11 @@ Feature: Sending an assassin after a lord
 
   @REALM-282 @placeholder
   Scenario: The assassin succeeds
-    # config: lords.assassination.land_goes_to, lords.assassination.heir_loyalty, lords.assassination.others_steps
+    # config: lords.assassination.heir_loyalty, lords.assassination.others_steps
     Given every lord of "France" is "Loyal"
-    When "France" sends an assassin after one of its lords and he succeeds
-    Then that lord is dead and an heir of his house holds his lands, "Wavering"
+    And one of its lords has an heir
+    When "France" sends an assassin after him and he succeeds
+    Then that lord is dead and his heir holds his lands, "Wavering"
     And every other lord of "France" is "Wavering"
 
   @REALM-282 @placeholder

@@ -90,7 +90,8 @@ export interface AssassinAsk {
   /** 0 to 1, and the base chance against an ordinary lord. */
   chance: number;
   base: number;
-  landGoesTo: string;
+  /** His heir's name, or null: then a kinsman may take his lands, or the crown. */
+  heir: string | null;
   heirLoyalty: string;
   onFailure: string;
   /** Other lords of the realm who will think less of the crown, and how many of them are his own house. */
@@ -106,7 +107,7 @@ const pct = (x: number) => `${Math.round(x * 100)} %`;
  */
 export function assassinCard(l: LordView, a: AssassinAsk, treasury: number, t: Titles = DEFAULT_TITLES): string {
   const others = a.others ? `every other ${esc(t.lord)} of yours (${a.others}) falls a step of loyalty` : "";
-  const heir = a.landGoesTo === "crown" ? "his lands become royal land" : `his heir takes his lands, ${esc(a.heirLoyalty.toLowerCase())}`;
+  const heir = a.heir ? `his heir ${esc(a.heir)} takes his lands, ${esc(a.heirLoyalty.toLowerCase())}` : `with no heir, a kinsman may take his lands, ${esc(a.heirLoyalty.toLowerCase())}, or they return to the crown`;
   const house = a.house ? `the other ${a.house} of House ${esc(l.house)} turn${a.house === 1 ? "s" : ""} disloyal` : "";
   const success = [`${esc(l.name)} dies`, heir, house, others].filter(Boolean).join("; ");
   const failure = [`he turns ${esc(a.onFailure.toLowerCase())}`, a.others ? `every other ${esc(t.lord)} still falls a step` : ""].filter(Boolean).join(", and ");

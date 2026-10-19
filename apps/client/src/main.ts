@@ -4377,7 +4377,7 @@ function renderLord(k: number): void {
   // Who an assassin would unsettle: every other lord of the realm with land, and how many of them are his house.
   const others = lordViews().filter((o) => o.nation === l.nation && o.k !== k && o.lands > 0);
   const a = s.assassination;
-  const assassin = { open: assassinAsk === k, gold: a.gold, chance: s.lords[k]!.assassinChance, base: a.base, landGoesTo: a.landGoesTo, heirLoyalty: a.heirLoyalty, onFailure: a.onFailure, others: others.length, house: others.filter((o) => o.house === l.house).length };
+  const assassin = { open: assassinAsk === k, gold: a.gold, chance: s.lords[k]!.assassinChance, base: a.base, heir: s.lords[k]!.heir?.name ?? null, heirLoyalty: a.heirLoyalty, onFailure: a.onFailure, others: others.length, house: others.filter((o) => o.house === l.house).length };
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(l.name)}</h2>${closeButton()}</header>
     ${lordScreen(rules, l, lands, { lit: litLord === k, gift: s.giftGold, treasury: s.nationTreasury[s.playerNation]!, mine, holdings, grants, allGrants: grantAll || royal.length <= 6, court: mine ? "" : courtLordHtml(s.statecraft, k, l.nation), assassin }, titlesOf(l.nation))}`;

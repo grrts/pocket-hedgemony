@@ -174,12 +174,11 @@
       "chiefdom or stateless society": "elder or lineage head"
     },
     "assassination": {
-      "$comment": "Sending an assassin after one of your lords (REALM-280 to REALM-285). gold: what it costs, paid whether or not it works. chance: the base chance it works; less by great_lord_penalty for each Great lord reason (REALM-162), never below min_chance. land_goes_to: 'heir' (a new lord of his house takes his lands at heir_loyalty) or 'crown' (his lands become royal land). On success every other lord of the realm falls others_steps steps and the rest of his house turns Disloyal when house_turns_disloyal; on failure he turns target_on_failure and every other lord falls others_steps_on_failure steps.",
+      "$comment": "Sending an assassin after one of your lords (REALM-280 to REALM-285). gold: what it costs, paid whether or not it works. chance: the base chance it works; less by great_lord_penalty for each Great lord reason (REALM-162), never below min_chance. He dies through the shared death rules (people, REALM-273): his heir or a kinsman takes his lands at heir_loyalty, or with no one left they go back to the crown. On success every other lord of the realm falls others_steps steps and the rest of his house turns Disloyal when house_turns_disloyal; on failure he turns target_on_failure and every other lord falls others_steps_on_failure steps.",
       "gold": 25,
       "chance": 0.6,
       "great_lord_penalty": 0.15,
       "min_chance": 0.2,
-      "land_goes_to": "heir",
       "heir_loyalty": "Wavering",
       "house_turns_disloyal": true,
       "others_steps": 1,

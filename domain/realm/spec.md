@@ -418,12 +418,12 @@ A lord who grows too troublesome can be killed, but murder at court is never sec
 
 - REALM-280: A realm shall be able to send an assassin after any lord of its own who holds land, whatever his loyalty; it costs `lords.assassination.gold` (25 gold), spent whether or not he succeeds, and is refused without the gold or for another realm's lord. [Leroy 19 October; provisional]
 - REALM-281: The assassin shall succeed with the base chance (60 %), 15 points less for each Great lord reason (REALM-162), never below 20 %; the dice are the campaign's seeded draw. [Leroy 19 October; provisional]
-- REALM-282: When the assassin succeeds, the lord shall die: an heir of his house takes his lands as a Wavering lord (or, where `land_goes_to` is `crown`, his lands become royal land); every other lord of his house shall become Disloyal; and every other lord of the realm shall fall one step (the cause *A lord assassinated*). [Leroy 19 October; provisional]
+- REALM-282: When the assassin succeeds, the lord shall die by the shared death rules (cause *assassinated*, REALM-273): his heir, or else perhaps a kinsman, takes his lands as a Wavering lord, and with no one left they return to the crown; every other lord of his house shall become Disloyal; and every other lord of the realm shall fall one step (the cause *A lord assassinated*). [Leroy 19 October; provisional]
 - REALM-283: When the assassin is caught, the lord shall become Disloyal, and every other lord of the realm shall fall one step (the cause *An assassin caught*). [Leroy 19 October; provisional]
 - REALM-285: The computer players shall not send assassins (a default until a design gives them a reason to). [Leroy 19 October]
 
 #### How the player uses it: assassination
-- REALM-284: The player finds it on the lord's own screen (Lords tab, or the lord's button on a province's "Governed by" card), where an **Assassinate…** button sits beside Gift. Tapping it opens a confirm card on the same screen, in the lord's own subject: the cost, the chance he succeeds (and that a great lord is well guarded), what follows if it works (he dies, his heir takes his lands, his house turns disloyal, how many other lords fall a step) and if the assassin is caught, with **Send the assassin** and **Cancel**. The outcome goes to the news log, and the Lords tab, the overview, shows every lord's new loyalty and the Lords pillar of stability. On a phone in landscape the card fits the side panel in the Wide and Tall layouts: its two buttons sit side by side at 44 points high, the text wraps, and nothing needs hover (each button names what it does). [X-19]
+- REALM-284: The player finds it on the lord's own screen (Lords tab, or the lord's button on a province's "Governed by" card), where an **Assassinate…** button sits beside Gift. Tapping it opens a confirm card on the same screen, in the lord's own subject: the cost, the chance he succeeds (and that a great lord is well guarded), what follows if it works (he dies, his heir by name takes his lands or, with none, a kinsman or the crown, his house turns disloyal, how many other lords fall a step) and if the assassin is caught, with **Send the assassin** and **Cancel**. The outcome goes to the news log, and the Lords tab, the overview, shows every lord's new loyalty and the Lords pillar of stability. On a phone in landscape the card fits the side panel in the Wide and Tall layouts: its two buttons sit side by side at 44 points high, the text wraps, and nothing needs hover (each button names what it does). [X-19]
 
 ## 6. Commands
 
@@ -442,7 +442,7 @@ A lord who grows too troublesome can be killed, but murder at court is never sec
 | SellTitle(province) | player / AI | Royal province; a buyer | Gold; weak loyal lord | LordCreated, GoldChanged |
 | SeizeLordLand(lord, provinces) | player / AI | — | Land royal; lords waver | LordLandSeized, LordLoyaltyChanged |
 | PutLordOnTrial(lord) | player / AI | Lord disloyal | Lord removed; his house disloyal | LordExecuted |
-| AssassinateLord(lord) | player | Own lord with land; the gold | Gold spent; he dies and his heir (or the crown) takes his lands, or he turns disloyal; every other lord falls a step (REALM-280 to REALM-283) | LordAssassinated / AssassinCaught, LordLoyaltyChanged |
+| AssassinateLord(lord) | player | Own lord with land; the gold | Gold spent; he dies (personDies) and his heir, a kinsman or the crown takes his lands, or he turns disloyal; every other lord falls a step (REALM-280 to REALM-283) | LordAssassinated / AssassinCaught, LordLoyaltyChanged |
 | GiftToLord(lord, gold / office / marriage) | player / AI | Gold or an office or a marriage candidate | Loyalty up | LordLoyaltyChanged |
 | GrantLordWant(lord) | player / AI | Want is grantable | Loyalty up | LordLoyaltyChanged |
 | CallRetinue(lord) | player / AI | Lord loyal | Retinue joins | RetinueCalled |
@@ -544,7 +544,7 @@ All numbers are placeholders ("Numbers are placeholders for config"). The file i
 | great_lord | Great lord reasons | 4 to 7 provinces one, 8+ two | no | realm.json |
 | succession_by_form | Throne law per government succession | table | no | realm.json |
 | ai | Realm AI | presets, tax, loan, gift, fiefs | yes | realm.json |
-| lords.assassination | Assassin's gold, chance, Great lord penalty and floor, where the land goes, the heir's loyalty, the house and the other lords' reactions | 25 gold; 60 %, −15 per reason, 20 % floor; heir, Wavering; house Disloyal; others one step either way; the target Disloyal if caught | yes | realm.json |
+| lords.assassination | Assassin's gold, chance, Great lord penalty and floor, the heir's loyalty, the house and the other lords' reactions | 25 gold; 60 %, −15 per reason, 20 % floor; the heir Wavering; house Disloyal; others one step either way; the target Disloyal if caught | yes | realm.json |
 
 ## 11. Seams
 
