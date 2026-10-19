@@ -262,7 +262,7 @@ Newest decision first.
 - EVT-032 If a decision offered to an AI country is left unanswered for `decision_expiry_years` (10), then
   it lapses and re-enters the pool (it is rolled as a pool event) if still eligible. A decision offered to
   the player never lapses (EVT-044). [balance.yaml; screen-flow §4.6; D-EVT-8]
-- EVT-033 The game shall fire at most `max_pool_events_per_country_year` (2) pool events per country per year.
+- EVT-033 The game shall fire at most `max_pool_events_per_country_year` (3) pool events per country per year.
   [balance.yaml]
 - EVT-034 When an event fires, the game shall boost each follow-up's weight by its `boost` during its `delay`
   window, cap any boost at `max_boost` (5.0), fade it linearly over `boost_decay_years` (10) after the window
@@ -696,9 +696,9 @@ drawn from what the game already holds (officials, lords and their loyalty, the 
 from `packages/rules/data/domain/events-everyday.json`, and stand beside the event tree: they are not tree events
 and do not count toward its pool (EVT-033). Every number is a placeholder for balance (D-EVT-22).
 
-- EVT-115 Each realm shall draw one everyday event every `months_between` months (3 to 6, rolled after each
+- EVT-115 Each realm shall draw one everyday event every `months_between` months (2 to 4, rolled after each
   draw), its first within `first_within_months` (4) of the start, so realms do not all draw in the same month.
-  @placeholder [feedback 152; D-EVT-22]
+  @placeholder [feedback 152: "a choice every 2 to 4 months"; D-EVT-22; gaps review item 3]
 - EVT-116 When a realm draws, the game shall pick by `weight` among the everyday events the realm could have now,
   each bound to who and where it is about; a realm with nothing to bind draws nothing that month. The AI answers
   at once by the options' `ai` weights; the player's waits on the event card (EVT-044). [feedback 152]
@@ -710,7 +710,9 @@ and do not count toward its pool (EVT-033). Every number is a placeholder for ba
   a lord hurt, a child born to the ruler (a ruler of an age to have children under a law of heirs by blood, with no
   regent), the heir falling ill (an heir under the age of a child ruler), and grain lost from a province's store
   (rot, fire, rats) where it holds at least `food.min_store_months` (3) months and `food.min_store` (2) thousand
-  months of food. A lord in revolt or with no land is never drawn. [feedback 152; REALM-088, REALM-089]
+  months of food. A lord in revolt or with no land is never drawn. Beside these come the events of EVT-133 to
+  EVT-135, each listed with its options in `events-everyday.json` and on the wiki's Data-Events-Everyday page.
+  [feedback 152; REALM-088, REALM-089]
 - EVT-119 Every everyday event shall have two or three options, each with its effects shown in words, at least one
   costing nothing. [EVT-039; feedback 152]
 - EVT-120 If an option costs more gold than the realm holds, or asks for a second lord the realm does not have,
@@ -743,6 +745,34 @@ and do not count toward its pool (EVT-033). Every number is a placeholder for ba
   or *Keep the roads open*. Plague fires it; it is never drawn and does not wait for EVT-117. @placeholder
   [feedback 152; PROV-240 to PROV-242]
 
+**More everyday events, by region and era** (gaps review item 3, Leroy 19 Oct: "Both"). Twelve events would
+repeat endlessly over a campaign of five centuries, so the pool grows to about fifty, many of them about one
+province of the realm and many limited to a part of the world or a span of years.
+
+- EVT-133 An everyday event may name the regions it comes to (`where`: regions or wider regions of
+  `exploration-regions.json`, a realm's region being the event tree's, EVT-078) and the years it comes in (`from`,
+  `to`); a realm draws only the events of its region and the current year. Besides those of EVT-118, the events are
+  about one province of the realm (any, a coastal one, or the capital, never an occupied one; the options that ask a
+  second lord ask its own lord, else the least loyal one), a landed lord and one of his provinces, or a living
+  official at a royal post: a rich harvest, hail, bandits, a fallen bridge, a town fire, a flood, a scholar seeking a
+  patron, a lord asking for a market or raising walls, an official skimming the tolls, old soldiers asking for land,
+  wolves, a tutor for the heir, a comet, silver found, pilgrims; in Europe tournaments (to 1600), quarrelling guilds,
+  a printer (1460 to 1600), witch trials (1560 to 1700), enclosure (1550 to 1850), coffee houses (1550 to 1800);
+  anywhere railways (from 1830), strikes (from 1820), cholera (1817 to 1910) and a newspaper (from 1780); in the
+  Middle East, North Africa and Central Asia raided caravans, failing water channels, locusts and endowments; in
+  Africa gold traders, cattle raids and late rains; in South and Southeast Asia a failed monsoon, temple festivals and
+  revenue surveys; in East Asia river dykes, cheating at the examinations, pirates and a tea master; spice ships,
+  the ball game, maize blight, voyagers, horse fairs, hard winters and furs where they belong. @placeholder
+  [gaps review item 3; feedback 152]
+- EVT-134 The player's realm shall not draw the same everyday event again within `rest_years` (20) of the last
+  time it came; if every event it could have is resting, it draws nothing that month. The plague card (EVT-130) is
+  not drawn and so does not rest. When each event last came is kept in the save. The AI's events are never seen and do not rest. @placeholder [gaps review item 3]
+- EVT-135 An event about a province may also, by the option chosen: add or take months of food in its store
+  (`food`, months of eating for its people), add or take a share of its people (`people`, every class alike) or of
+  its recruits (`recruits`, up to its ceiling), or lighten its tax for some years (`light_tax`, as a rising's light
+  tax, REB). Each shows on the card in words ("Creuse: +2 months of food in store", "Creuse: 1 in 100 of its people
+  lost", "Creuse: light tax for a year"). [EVT-119; PROV-104]
+
 #### How the player uses it: everyday events
 - EVT-129 Where: nothing new to find. An everyday event opens the same event card over the map and pauses the week
   (EVT-076): its title names who or where ("Death of Gilles de Chabannes", "Grain rots at Creuse"), *In your
@@ -753,8 +783,10 @@ and do not count toward its pool (EVT-033). Every number is a placeholder for ba
   cards, where the result shows (the lord's loyalty, the post's years, the heir on the General tab, the store on the
   Land tab). Overview: the News keeps a line for each, with what was chosen, and the realm's Lords list and
   Provinces list stay the overviews of loyalty and food. Phone: the card is the sheet it already is, in the Wide
-  and Tall layouts, inside the safe areas, options in reach, nothing that needs hover. Rate: about two or three a
-  year per realm, never stacking (EVT-117). [X-19; EVT-076]
+  and Tall layouts, inside the safe areas, options in reach, nothing that needs hover. Rate: about three to five a
+  year per realm, never stacking (EVT-117), and never the same one twice in 20 years (EVT-134). The new events are the same card, with nothing new to learn; an event
+  about a province opens that province from *Look at the map*, where its store, people and tax show on the Land tab.
+  [X-19; EVT-076]
 
 ## 6. Commands
 
@@ -814,7 +846,7 @@ before achievements and the autosave. The age and period checks run in the event
 | Key | Meaning | Value in the design | Placeholder? | Config file |
 |---|---|---|---|---|
 | selection.pool_roll_interval_months | How often pool events roll | 1 | yes | data/balance.yaml |
-| selection.max_pool_events_per_country_year | Pacing cap | 2 | yes | data/balance.yaml |
+| selection.max_pool_events_per_country_year | Pacing cap | 3 (was 2; raised with the everyday events, feedback 152) | yes | data/balance.yaml |
 | selection.decision_expiry_years | Unanswered decision lapses | 10 | yes | data/balance.yaml |
 | campaign.events_choice | New-game "Events" choice → preset | Historical, Plausible (default), Free → historical, plausible, divergent | no | events.json |
 | date_binding.approximate_peak_mult | Approximate event's chance in its history year | 2.0 | yes (provisional) | events.json |
@@ -1047,3 +1079,4 @@ before achievements and the autosave. The age and period checks run in the event
 | EVT-115 – 128 | everyday.feature | A choice every few months; none while one waits; an official's death; an option the realm cannot pay; spoiled grain; a lord's death; a child born heirless. Engine: packages/engine/test/everyday.test.ts |
 | EVT-129 | — | Presentation: apps/client/src/ui/events.ts, the event card |
 | EVT-130 | — | Engine: packages/engine/test/everyday.test.ts (plague reaching the player's land opens one card) |
+| EVT-133 – 135 | everyday.feature | Events of the realm's region and era; never the same within 20 years. Engine: packages/engine/test/everyday.test.ts (about fifty events, each with a free option and known regions; region and era; no repeat in 20 years through a save; a rich harvest fills the store and hail lightens the tax) |

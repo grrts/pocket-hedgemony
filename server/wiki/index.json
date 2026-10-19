@@ -1414,6 +1414,476 @@
      "id": "options-11",
      "text": "Options",
      "level": 4
+    },
+    {
+     "id": "good-harvest",
+     "text": "Good harvest",
+     "level": 3
+    },
+    {
+     "id": "options-12",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "hail",
+     "text": "Hail",
+     "level": 3
+    },
+    {
+     "id": "options-13",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "bandits",
+     "text": "Bandits",
+     "level": 3
+    },
+    {
+     "id": "options-14",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "bridge-falls",
+     "text": "Bridge falls",
+     "level": 3
+    },
+    {
+     "id": "options-15",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "town-fire",
+     "text": "Town fire",
+     "level": 3
+    },
+    {
+     "id": "options-16",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "flood",
+     "text": "Flood",
+     "level": 3
+    },
+    {
+     "id": "options-17",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "scholar",
+     "text": "Scholar",
+     "level": 3
+    },
+    {
+     "id": "options-18",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "market-charter",
+     "text": "Market charter",
+     "level": 3
+    },
+    {
+     "id": "options-19",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "walls-without-leave",
+     "text": "Walls without leave",
+     "level": 3
+    },
+    {
+     "id": "options-20",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "skimming-official",
+     "text": "Skimming official",
+     "level": 3
+    },
+    {
+     "id": "options-21",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "veterans",
+     "text": "Veterans",
+     "level": 3
+    },
+    {
+     "id": "options-22",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "wolves",
+     "text": "Wolves",
+     "level": 3
+    },
+    {
+     "id": "options-23",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "tutor",
+     "text": "Tutor",
+     "level": 3
+    },
+    {
+     "id": "options-24",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "omen",
+     "text": "Omen",
+     "level": 3
+    },
+    {
+     "id": "options-25",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "silver-found",
+     "text": "Silver found",
+     "level": 3
+    },
+    {
+     "id": "options-26",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "pilgrims",
+     "text": "Pilgrims",
+     "level": 3
+    },
+    {
+     "id": "options-27",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "tournament",
+     "text": "Tournament",
+     "level": 3
+    },
+    {
+     "id": "options-28",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "guilds-quarrel",
+     "text": "Guilds quarrel",
+     "level": 3
+    },
+    {
+     "id": "options-29",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "printer",
+     "text": "Printer",
+     "level": 3
+    },
+    {
+     "id": "options-30",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "witch-trials",
+     "text": "Witch trials",
+     "level": 3
+    },
+    {
+     "id": "options-31",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "enclosure",
+     "text": "Enclosure",
+     "level": 3
+    },
+    {
+     "id": "options-32",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "coffee-house",
+     "text": "Coffee house",
+     "level": 3
+    },
+    {
+     "id": "options-33",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "railway",
+     "text": "Railway",
+     "level": 3
+    },
+    {
+     "id": "options-34",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "strike",
+     "text": "Strike",
+     "level": 3
+    },
+    {
+     "id": "options-35",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "cholera",
+     "text": "Cholera",
+     "level": 3
+    },
+    {
+     "id": "options-36",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "newspaper",
+     "text": "Newspaper",
+     "level": 3
+    },
+    {
+     "id": "options-37",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "caravan-raided",
+     "text": "Caravan raided",
+     "level": 3
+    },
+    {
+     "id": "options-38",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "qanat",
+     "text": "Qanat",
+     "level": 3
+    },
+    {
+     "id": "options-39",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "locusts",
+     "text": "Locusts",
+     "level": 3
+    },
+    {
+     "id": "options-40",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "endowment",
+     "text": "Endowment",
+     "level": 3
+    },
+    {
+     "id": "options-41",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "gold-traders",
+     "text": "Gold traders",
+     "level": 3
+    },
+    {
+     "id": "options-42",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "cattle-raid",
+     "text": "Cattle raid",
+     "level": 3
+    },
+    {
+     "id": "options-43",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "rains-late",
+     "text": "Rains late",
+     "level": 3
+    },
+    {
+     "id": "options-44",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "monsoon-fails",
+     "text": "Monsoon fails",
+     "level": 3
+    },
+    {
+     "id": "options-45",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "temple-festival",
+     "text": "Temple festival",
+     "level": 3
+    },
+    {
+     "id": "options-46",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "revenue-survey",
+     "text": "Revenue survey",
+     "level": 3
+    },
+    {
+     "id": "options-47",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "river-dykes",
+     "text": "River dykes",
+     "level": 3
+    },
+    {
+     "id": "options-48",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "exam-scandal",
+     "text": "Exam scandal",
+     "level": 3
+    },
+    {
+     "id": "options-49",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "pirates",
+     "text": "Pirates",
+     "level": 3
+    },
+    {
+     "id": "options-50",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "tea-master",
+     "text": "Tea master",
+     "level": 3
+    },
+    {
+     "id": "options-51",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "spice-merchants",
+     "text": "Spice merchants",
+     "level": 3
+    },
+    {
+     "id": "options-52",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "ball-game",
+     "text": "Ball game",
+     "level": 3
+    },
+    {
+     "id": "options-53",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "maize-blight",
+     "text": "Maize blight",
+     "level": 3
+    },
+    {
+     "id": "options-54",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "voyagers",
+     "text": "Voyagers",
+     "level": 3
+    },
+    {
+     "id": "options-55",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "horse-fair",
+     "text": "Horse fair",
+     "level": 3
+    },
+    {
+     "id": "options-56",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "hard-winter",
+     "text": "Hard winter",
+     "level": 3
+    },
+    {
+     "id": "options-57",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "fur-tribute",
+     "text": "Fur tribute",
+     "level": 3
+    },
+    {
+     "id": "options-58",
+     "text": "Options",
+     "level": 4
     }
    ]
   },
