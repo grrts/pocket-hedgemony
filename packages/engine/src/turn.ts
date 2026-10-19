@@ -29,6 +29,7 @@ import { giveGift, grantFief, inAnyWar, lordGetsBuilding, monthlyLords, seizeFie
 import { clockStopped, dailyEndCheck, keepPlaying, playOn, weeklyEndCheck, yearlyScores } from "./campaignEnd.ts";
 import { noteMoment, turnEndAchievements } from "./achievements.ts";
 import { empireOrder, monthlyInstitutions, type EmpireOrder } from "./institutions.ts";
+import { huntOf, monthlyTribes, tribesOrder, type TribesOrder } from "./tribes.ts";
 import { addDays, DAYS_PER_RATION_MONTH, DAYS_PER_TURN } from "./calendar.ts";
 import { corridor, monthlyRations, refillRations, wagonRations, planRoute, planTilePath, tileStepHours, type MarchingArmy } from "./march.ts";
 import { foodCarriedPct, marchMap, NO_PATH, tileMarch, updateWeather, type World } from "./world.ts";
@@ -188,6 +189,8 @@ export type Order =
   | ExploreOrder
   /** The Empire: stand for the crown, vote, seek a vote, grant a seat, admit a member (institutions.ts). */
   | EmpireOrder
+  /** Hunting grounds: claim, leave, take in, ask for the land, answer an ask (tribes.ts). */
+  | TribesOrder
   /** After world domination, play on to the end date; after game over, play on as another realm (SHELL-164). */
   | { type: "keepPlaying" }
   | { type: "playOn"; nation: number };
@@ -263,6 +266,8 @@ function startDay(world: World, news: News[]): void {
     monthlyPeople(world, news);
     monthlyFood(world, news);
     monthlyGovernment(world, news);
+    // Hunting grounds read the form and come before the ledger pays their furs (TRIBE §9).
+    monthlyTribes(world, news);
     monthlyPeoples(world, news);
     monthlyFaithHeads(world, news);
     monthlyBelief(world, news);
@@ -513,6 +518,8 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
       return verdictOrder(world, actingNation, order.rising, order.treatment, news);
     case "empire":
       return empireOrder(world, actingNation, order, news);
+    case "tribes":
+      return tribesOrder(world, actingNation, order, news);
     case "answerRevolution":
       return answerRevolution(world, actingNation, order.stance, news);
     case "moveBuild":
@@ -587,7 +594,8 @@ export function refillHere(world: World, slot: number, map = marchMap(world)): n
   const p = world.armies.location[slot]!;
   if (world.provinceWater[p]) return 0;
   const d = world.rules.defines.march;
-  const owner = world.provinceOwner[p]!;
+  // A tribe's hunting ground is its land to forage: friendly to it and its allies, enemy land to its enemies (TRIBE-015).
+  const owner = world.provinceOwner[p]! >= 0 ? world.provinceOwner[p]! : huntOf(world, p);
   const enemy = owner >= 0 && atWar(world, owner, world.armies.owner[slot]!);
   const reserve = enemy ? 0 : world.provincePopulation[p]! * 1000 * d.homeReserveMonths;
   return refillRations(d, map.ground[p]!, Math.max(0, world.provinceStore[p]!) * 1000, reserve);
