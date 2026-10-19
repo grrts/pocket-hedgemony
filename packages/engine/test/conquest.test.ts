@@ -7,7 +7,7 @@ import { monthlyConquest, nameAbroadView } from "../src/conquest.ts";
 import { libraryEvents, statecraftView, syncCountries } from "../src/statecraft.ts";
 import { foldInRealm, makeSubject } from "../src/subjects.ts";
 import { canBorrow } from "../src/treasury.ts";
-import { maxCededProvinces, priceOfWar, whyAiWontDeclare, wouldSayPeaceAtDeclaration, aiWarPay } from "../src/priceOfWar.ts";
+import { atWarElsewhere, maxCededProvinces, priceOfWar, whyAiWontDeclare, wouldSayPeaceAtDeclaration, aiWarPay } from "../src/priceOfWar.ts";
 import * as dip from "../src/domain/diplomacy/index.ts";
 
 const rules = loadDefaultRuleset();
@@ -194,7 +194,7 @@ describe("the price of war (WAR-228, WAR-229)", () => {
   function scene() {
     const w = createWorld(rules, 1, tiles);
     const n = nation(w, "castile");
-    const t = dip.neighbours(w.diplomacy, "castile").map((c) => nation(w, c)).find((x) => relationState(w, n, x).state === null && !w.nationGone[x])!;
+    const t = dip.neighbours(w.diplomacy, "castile").map((c) => nation(w, c)).find((x) => relationState(w, n, x).state === null && !w.nationGone[x] && !atWarElsewhere(w, x, n))!;
     alone(w, t);
     alone(w, n);
     for (let k = 0; k < w.nationCount; k++) setStrength(w, k, 0);

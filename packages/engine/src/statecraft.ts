@@ -317,6 +317,7 @@ export function monthlyStatecraft(world: World, news: News[]): void {
     if (l.to === me || l.answer === "yes") {
       const from = world.nationIndex.get(l.from)!;
       news.push({ kind: "envoy", text: letterText(world, l), nations: l.to === me ? [to] : [to, from] });
+      if (me && l.answer === "yes" && l.action === "propose_alliance" && l.to !== me && l.from !== me) alliedAgainstYou(world, to, from, news);
     }
   }
   // Letters are kept two years for the Why? on the Diplomacy tab; the library's event log is not kept.
@@ -336,6 +337,18 @@ export function monthlyStatecraft(world: World, news: News[]): void {
   aiEnvoys(world);
   // An AI envoy to a near court arrives this month: the player hears of the ask at once.
   libraryEvents(world, news);
+}
+
+/**
+ * DIPL-244: when two realms that both fear the player ally, and one of them
+ * borders the player, the news says they have allied against the player out
+ * of fear.
+ */
+export function alliedAgainstYou(world: World, a: number, b: number, news: News[]): void {
+  const near = neighbourRealms(world)[world.player]!;
+  if (!dip.alliedOutOfFear(world.diplomacy, world.nationIds[a]!, world.nationIds[b]!, world.nationIds[world.player]!, (x) => near.has(world.nationIndex.get(x) ?? -1))) return;
+  const name = (k: number) => world.rules.nations[k]!.name;
+  news.push({ kind: "envoy", text: `${name(a)} and ${name(b)} ally out of fear of your strength: they will answer each other's call against you.`, nations: [world.player, a, b] });
 }
 
 /** Acts on what the library reports: subject ties agreed, demands given in, and asks waiting on the player (DIPL-211). */
@@ -447,8 +460,11 @@ function aiEnvoys(world: World): void {
   const turn = world.date.year * 12 + world.date.month;
   const near = neighbourRealms(world);
   for (let n = 0; n < world.nationCount; n++) {
-    if (n === world.player || world.nationGone[n] || (n + turn) % AI_EVERY_MONTHS !== 0) continue;
+    if (n === world.player || world.nationGone[n]) continue;
     const id = world.nationIds[n]!;
+    // A Threatened realm weighs its envoys more often (DIPL-239).
+    const fear = dip.fearLevel(dip.country(d, id).fears);
+    if ((n + turn) % dip.envoyEveryMonths(fear, AI_EVERY_MONTHS) !== 0) continue;
     if (dip.freeSeats(d, id) <= 0) continue;
     // The neighbour who thinks best of us is the one worth an envoy; only that court's asks are counted in full.
     let t = -1;
@@ -463,7 +479,9 @@ function aiEnvoys(world: World): void {
     }
     // Besides the warmest neighbour, the realms its ally and subject goals name (EVT-106).
     const asks = goalAsks(world, n);
-    if (t < 0 && !asks.length) continue;
+    // A Threatened realm also weighs an alliance with realms beside what it fears that fear it too (DIPL-239).
+    const partners = fear === "threatened" ? fearPartners(world, n, near) : [];
+    if (t < 0 && !asks.length && !partners.length) continue;
     const days = countDays(world);
     let best: { t: number; action: string; total: number } | null = null;
     // Nothing changes while the asks are weighed: each court's envoy check and the reach are read once.
@@ -485,12 +503,22 @@ function aiEnvoys(world: World): void {
     };
     if (t >= 0) for (const action of ["propose_alliance", "arrange_marriage", "offer_overlordship"] as const) weigh(t, action, 0);
     for (const a of asks) for (const action of a.actions) weigh(a.target, action, goalsConfig.goals.envoy_points_per_pull * a.pull);
+    for (const x of partners) if (x !== t) weigh(x, "propose_alliance", 0);
     if (!best) continue;
     best = best as { t: number; action: string; total: number };
     const choice = dip.aiChoose(best.total);
     if (choice === "send") sendEnvoy(world, n, best.t, best.action);
     else if (choice === "gift_first" && dip.country(d, id).goldToSpare) sendEnvoy(world, n, best.t, "send_gift");
   }
+}
+
+/** Partners against a common fear (DIPL-239), by index: the map's realms beside the realm n is Threatened of most that fear it too. */
+export function fearPartners(world: World, n: number, near: Set<number>[] = neighbourRealms(world)): number[] {
+  const ids = (x: string) => {
+    const k = world.nationIndex.get(x);
+    return k === undefined ? [] : [...near[k]!].filter((j) => !world.nationGone[j]).map((j) => world.nationIds[j]!);
+  };
+  return dip.fearPartners(world.diplomacy, world.nationIds[n]!, ids).map((x) => world.nationIndex.get(x)!);
 }
 
 /** One line of the standing between two realms, as the Diplomacy tab shows it. */
@@ -552,6 +580,14 @@ export interface FearView {
   ratio: number;
 }
 
+/** A reason's name with the realms it names in brackets read by their names ("We fear the same realm (Ottomans)"). */
+export function reasonName(world: World, name: string): string {
+  return name.replace(/\(([^()]*)\)$/, (all, ids: string) => {
+    const names = ids.split(", ").map((id) => world.nationIndex.get(id));
+    return names.every((k) => k !== undefined) ? `(${names.map((k) => world.rules.nations[k!]!.name).join(", ")})` : all;
+  });
+}
+
 /** The neighbours a realm fears this month, most feared first. */
 export function fearsOf(world: World, n: number): FearView[] {
   return (dip.country(world.diplomacy, world.nationIds[n]!).fears ?? []).flatMap((f) => {
@@ -591,7 +627,7 @@ export function statecraftView(world: World, player: number): StatecraftView | n
   const letters = d.letters
     .filter((l) => l.to === me && l.deliverOn <= month)
     .sort((a, b) => b.deliverOn.localeCompare(a.deliverOn))
-    .map((l) => ({ from: world.nationIndex.get(l.from) ?? -1, action: l.action, answer: l.answer, text: letterText(world, l), reasons: l.reasons.map((r) => ({ name: r.name, number: Math.round(r.number) })), ...(l.total !== undefined ? { total: Math.round(l.total) } : {}), month: l.deliverOn }));
+    .map((l) => ({ from: world.nationIndex.get(l.from) ?? -1, action: l.action, answer: l.answer, text: letterText(world, l), reasons: l.reasons.map((r) => ({ name: reasonName(world, r.name), number: Math.round(r.number) })), ...(l.total !== undefined ? { total: Math.round(l.total) } : {}), month: l.deliverOn }));
   const realms: StatecraftView["realms"] = {};
   // The declare sheet's Price of war (WAR-229) for every realm the player could declare on, sharing the player's own reads.
   const ctx = priceContext(world, player);

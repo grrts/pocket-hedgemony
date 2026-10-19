@@ -4,6 +4,7 @@ import { expect } from "vitest";
 import { Rng } from "@ph/engine";
 import * as D from "@ph/engine/domain/diplomacy";
 import { relations as rel, type Diplomacy } from "@ph/engine/domain/diplomacy";
+import { buildingType } from "@ph/engine/domain/buildings";
 import { steps, type Scenario, type Table } from "../src/registry.ts";
 
 const { Given, When, Then } = steps("diplomacy");
@@ -2605,4 +2606,91 @@ When("it sizes its standing army", (s) => {
 });
 Then("it keeps {int} men under arms", (s, men: number) => {
   expect(s.target).toBeCloseTo(men);
+});
+
+// ---------------------------------------------------------------- acting on fear (DIPL-238 to DIPL-244, F-166)
+
+/** Realm a fears realm x at a level, with a ratio that stands for it. */
+function addFear(s: Scenario, a: string, x: string, level: "wary" | "threatened"): void {
+  const co = c(s, a);
+  co.fears = [...(co.fears ?? []).filter((f) => f.of !== x), { of: x, level, ratio: level === "threatened" ? 3 : 2 }];
+}
+
+Given(/^the country "([^"]*)" fears the country "([^"]*)" as (Wary|Threatened)$/, (s, a: string, x: string, level: string) => addFear(s, a, x, level.toLowerCase() as "wary" | "threatened"));
+When("{string} asks {string} for an alliance", (s, a: string, b: string) => {
+  s.count = D.countAsk(w(s), { action: "propose_alliance", asker: a, asked: b });
+});
+When("{string} asks {string} for a royal marriage", (s, a: string, b: string) => {
+  s.count = D.countAsk(w(s), { action: "arrange_marriage", asker: a, asked: b });
+});
+
+Given("the countries {string}, {string}, {string} and {string} border {string}", (s, a: string, b: string, k: string, e: string, x: string) => {
+  for (const y of [a, b, k, e]) D.setBorder(w(s), y, x);
+});
+Given("{string} with {int} soldiers, {string} with {int} and {string} with {int} fear {string}", (s, a: string, na: number, b: string, nb: number, k: string, nk: number, x: string) => {
+  for (const [y, men] of [[a, na], [b, nb], [k, nk]] as const) {
+    c(s, y).soldiers = men;
+    addFear(s, y, x, "wary");
+  }
+});
+Given("{string} fears no one", (s, a: string) => void delete c(s, a).fears);
+When("{string} looks for allies against its fear", (s, a: string) => {
+  s.partners = D.fearPartners(w(s), a);
+});
+Then("it weighs an alliance with {string}, {string} and {string}, in that order", (s, a: string, b: string, k: string) => {
+  expect(s.partners).toEqual([a, b, k]);
+});
+Then("a Threatened realm weighs its envoys every {int} months instead of every {int}", (s, k: number, usual: number) => {
+  expect(D.envoyEveryMonths("threatened", usual)).toBe(k);
+  expect(D.envoyEveryMonths("wary", usual)).toBe(usual);
+  expect(D.envoyEveryMonths("calm", usual)).toBe(usual);
+});
+
+Given("an AI realm at peace that is {word} of a neighbour", (s, fear: string) => {
+  s.fearWord = fear;
+});
+When("it orders its works", (s) => {
+  s.castleStep = D.defenceCastleStep(s.fearWord as D.FearWord);
+});
+Then("it walls its border with that neighbour up to castle step {int}", (s, step: number) => {
+  expect(s.castleStep).toBe(step);
+});
+
+Given("an AI realm that is {word}", (s, fear: string) => {
+  s.fearWord = fear;
+});
+When("it weighs the study of {string}", (s, id: string) => {
+  // The fortification inventions are those that unlock a castle step (buildings data).
+  const fortification = new Set(buildingType("castle").steps.flatMap((x) => (x.unlocked_by && x.unlocked_by !== "start" ? [x.unlocked_by] : [])));
+  s.studyWeight = D.studyCostWeight(id, s.fearWord as D.FearWord, fortification);
+});
+Then("it counts {float} of its study cost", (s, weight: number) => {
+  expect(s.studyWeight).toBeCloseTo(weight);
+});
+
+Given("the AI's usual strength ratio before a declaration is {int}", (s, base: number) => {
+  s.declareBase = base;
+});
+Given(/^its target (is|is not) at war with another realm$/, (s, busy: string) => {
+  s.targetBusy = busy === "is";
+});
+Given(/^this month it (gambles|does not gamble)$/, (s, g: string) => {
+  s.gamble = g === "gambles";
+});
+When("it weighs the declaration", (s) => {
+  s.declareRatio = D.declareRatio(s.declareBase as number, !!s.targetBusy, !!s.gamble);
+});
+Then("its side needs {float} times the target's side", (s, ratio: number) => {
+  expect(s.declareRatio).toBeCloseTo(ratio);
+});
+
+Given("the player is {string}", (s, me: string) => {
+  s.me = me;
+});
+Given("{string} borders {string}", (s, a: string, b: string) => D.setBorder(w(s), a, b));
+When("{string} and {string} ally", (s, a: string, b: string) => {
+  s.alliedOutOfFear = D.alliedOutOfFear(w(s), a, b, s.me as string);
+});
+Then("the player hears that they ally out of fear of their strength", (s) => {
+  expect(s.alliedOutOfFear).toBe(true);
 });

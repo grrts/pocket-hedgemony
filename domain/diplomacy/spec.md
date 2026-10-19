@@ -774,6 +774,25 @@ model to tune.
 - DIPL-236 Overview: your own Diplomacy tab's *Your name abroad* card (DIPL-225) has a *Neighbours who fear you* row, after any league and before notoriety: how many fear you and how many are Threatened, opening on a tap to each of them with Wary or Threatened and how many times their side you are, and the ratios at which a neighbour becomes Wary and Threatened. The row is marked red with its "!" when any is Threatened. When a neighbour comes to be Threatened by you, a news line says so, once. [F-165; X-19]
 - DIPL-237 Phone: in landscape the fear lines and the row are inside the card's single column within the safe area, the row and each realm link are at least 44 points tall and open on a tap, the ratio is text so colour is never the only sign, and nothing needs hover. [F-165; X-19]
 
+### 5.34 Acting on fear (F-166, Leroy 19 Oct)
+Leroy, 19 October: a realm that finds a neighbour's military strength too high should feel threatened and act
+accordingly: make alliances, keep a bigger defence force (DIPL-232), build a technological advantage and invest in
+defences that help it defend. Realms should take the opportunities they get, and sometimes gamble a little. There is
+still no rivalry system: everything here reads the month's fears (DIPL-231), which are measured afresh each month and
+leave no lasting tie. Every number is `diplomacy.arms_and_fear.*`, provisional, for the balance model to tune.
+
+- DIPL-238 When a realm counts an alliance asked of it, and both it and the asker fear one realm (DIPL-231), the count shall hold *We fear the same realm (that realm)* at `allies.same_fear` for the asked realm's own fear of it: +15 when Wary, +30 when Threatened. When they fear several realms in common, the one that gives most is counted, once. The AI and the player's asks are counted alike (DIPL-081). [F-166; DIPL-090]
+- DIPL-239 While Threatened, an AI realm shall weigh its envoys every `allies.envoy_every_months` (3) months instead of once a year, and besides its warmest neighbour (DIPL-178) shall weigh an alliance with up to `allies.partners` (3) realms that border the realm it is Threatened of most and fear it too, the strongest first, whether or not they border it; its allies, overlord and subjects are not counted. It sends the best ask that would be a yes, as DIPL-178 and DIPL-179 say. [F-166; DIPL-178]
+- DIPL-240 While at peace and Wary or Threatened, an AI realm shall order walls before its other works (but after a first shipyard): a castle, or its next step, in the province bordering the realm it fears most whose castle stands lowest (counting one on order), the most people first, until those castles reach `defences.castle_step` for its fear (Wary 1, earthworks; Threatened 2, stone). It needs the invention each step asks (BLD rules unchanged) and keeps `defences.reserve_share` of its usual reserve for these walls (Wary all of it, Threatened a half). A calm realm builds as before. [F-166; BLD AI]
+- DIPL-241 While Wary or Threatened, an AI realm choosing its next study shall weigh the study cost of warfare inventions (ids starting `technology.warfare_prefix`, W) and of the inventions that unlock a castle step (buildings data: B4, B1, B5, B6, B13) by `technology.cost_weight` (Wary 0.8, Threatened 0.6), and study the invention that costs least after the weight (RSCH-078 otherwise unchanged). [F-166; RSCH-078]
+- DIPL-242 An AI realm shall take its chances against a neighbour already at war with another realm: it looks for a war at `opportunity.at_war_chance_factor` (2) times its monthly chance when such a neighbour is there, needs `opportunity.at_war_ratio_factor` (0.75) of the usual strength ratio over that target's side (WAR-228), and picks such a target `opportunity.at_war_target_weight` (3) times as likely. [F-166; WAR-228]
+- DIPL-243 Each month an AI realm looks for a war (DIPL-242, WAR-228), a roll of the world's dice under `opportunity.gamble_chance` (0.1) lets it gamble that month: it needs `opportunity.gamble_ratio_factor` (0.8) of the strength ratio. The ratio an AI needs is never under `opportunity.min_ratio` (1.2) nor over the usual ratio. The roll is the seeded world's, so a campaign stays deterministic. The war chest, peace voices, notoriety and censure checks of WAR-228 are unchanged. [F-166; WAR-228; X-15]
+
+#### How the player uses it: realms acting on fear
+- DIPL-244 Where and grouping: *We fear the same realm (name)* shows as a row of the Why? of every answer letter on the Diplomacy tab, yours and another realm's, like every other reason (DIPL-081), with the feared realm named. When two realms that both fear you ally and one of them borders you, the news says so once: "Savoy and Provence ally out of fear of your strength: they will answer each other's call against you." The walls, studies and declarations show where they already do: the province's castle and site, the realm's research on its card, and the war news. Nothing new sits elsewhere. [F-166; X-19]
+- DIPL-245 Overview: the *Neighbours who fear you* row of *Your name abroad* (DIPL-236) stays the one place that shows who fears you and so who may ally, wall and arm against you; another realm's Diplomacy tab keeps its fear lines (DIPL-235). [F-166; X-19]
+- DIPL-246 Phone: the reasons row is text in the Why? list inside the card's single column, opening on a tap of at least 44 points, with no hover; the news line is a Dispatches line like any other. [F-166; X-19]
+
 ## 6. Commands
 
 All commands are data, the same for player and AI.
@@ -945,6 +964,10 @@ The steps run after subjects and government in the global order (X-2, D-DIPL-31)
 | diplomacy.arms_and_fear.standing | The AI's standing army at peace: share of the cap, share of the largest unfriendly neighbour's force, fear multipliers, caps by fear, pay share by fear, thousands a month, slack (DIPL-232) | a quarter; a half; 1, 1.5, 2; 0.5, 0.7, 0.9; 0.4, 0.5, 0.65; 3; 1,000 | yes | diplomacy |
 | diplomacy.arms_and_fear.war | The AI's call at war: share of the cap a month, thousands a province, pay share (DIPL-233) | a quarter; 3; 0.75 | yes | diplomacy |
 | diplomacy.arms_and_fear.borrow | Months of army pay a realm at war or Threatened keeps in hand by borrowing (DIPL-234) | 3 | yes | diplomacy |
+| diplomacy.arms_and_fear.allies | We fear the same realm by the asked's fear; months between a Threatened realm's envoys; partners weighed (DIPL-238, DIPL-239) | Wary +15, Threatened +30; 3; 3 | yes | diplomacy |
+| diplomacy.arms_and_fear.defences | Castle step wanted on the border with the most feared realm, and the share of the reserve kept, by fear (DIPL-240) | Wary 1, Threatened 2; Wary 1, Threatened a half | yes | diplomacy |
+| diplomacy.arms_and_fear.technology | Warfare id prefix and the study cost weight of warfare and fortification inventions by fear (DIPL-241) | W; Wary 0.8, Threatened 0.6 | yes | diplomacy |
+| diplomacy.arms_and_fear.opportunity | Against a target at war elsewhere: ratio factor, chance factor, pick weight; the gamble's chance and ratio factor; the floor ratio (DIPL-242, DIPL-243) | 0.75, 2, 3; 0.1, 0.8; 1.2 | yes | diplomacy |
 
 ## 11. Seams
 
@@ -988,6 +1011,12 @@ The steps run after subjects and government in the global order (X-2, D-DIPL-31)
 - Arms and fear (F-165): each month every realm measures its neighbours against its own side and is Wary or
   Threatened of a much stronger one; an AI realm keeps a standing army sized against its neighbours and its fear,
   calls men across the realm at war and borrows for war or when Threatened (DIPL-231 to DIPL-234). No rivalry.
+- Acting on fear (F-166): realms that fear the same realm count *We fear the same realm* in an alliance; a
+  Threatened realm weighs its envoys every 3 months and looks for partners beside the realm it fears; a Wary or
+  Threatened realm walls its border with the realm it fears most and studies warfare and fortification sooner
+  (DIPL-238 to DIPL-241).
+- Opportunities and gambles (F-166): a neighbour at war elsewhere draws the AI's eye, needs a smaller edge and is
+  likelier picked; now and then, by chance, an AI gambles on a smaller edge (DIPL-242, DIPL-243).
 
 ## 13. Decisions and open questions
 
@@ -1330,3 +1359,5 @@ The steps run after subjects and government in the global order (X-2, D-DIPL-31)
 | DIPL-230 | — | Presentation: apps/client/src/ui/statecraft.ts (`odds`), apps/client/src/style.css (`.odds`) |
 | DIPL-231 … DIPL-234 | features/arms-and-fear.feature | Fear of a stronger neighbour; A standing army sized against the neighbours; Calling men across the realm at war; Borrowing for war — engine: packages/engine/test/arms.test.ts |
 | DIPL-235 … DIPL-237 | features/arms-and-fear.feature | Who fears whom — presentation: apps/client/src/ui/statecraft.ts (`fearHtml`), apps/client/src/ui/priceOfWar.ts (`nameAbroadHtml`), apps/client/src/ui/priceOfWar.test.ts |
+| DIPL-238 … DIPL-243 | features/acting-on-fear.feature | We fear the same realm; Partners against a common fear; Walls on the feared border; Arms in research; Taking an opportunity; A gamble — engine: packages/engine/test/fearActs.test.ts |
+| DIPL-244 … DIPL-246 | features/acting-on-fear.feature | Allies against you out of fear — presentation: the Why? list (apps/client/src/ui/statecraft.ts `reasonsHtml`), packages/engine/src/statecraft.ts (`reasonName`, `alliedAgainstYou`) |

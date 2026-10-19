@@ -251,16 +251,24 @@ export function priceOfWar(world: World, a: number, b: number, ctx: PriceContext
   };
 }
 
+/** Whether realm t is at war with a realm other than n (DIPL-242). */
+export function atWarElsewhere(world: World, t: number, n: number): boolean {
+  const nid = world.nationIds[n]!;
+  return rel.enemiesOf(world.diplomacy.graph, world.nationIds[t]!).some((e) => e !== nid);
+}
+
 /**
  * Why the AI realm n would not declare on t now, or null when it may (WAR-228):
  * its side must beat t's side, with everyone called against it, by
- * `warfare.ai.declare_strength_ratio`; its treasury must hold
+ * `warfare.ai.declare_strength_ratio`, less against a target already at war
+ * elsewhere and in a month it gambles (DIPL-242, DIPL-243); its treasury must hold
  * `warfare.ai.war_chest_months` of its pay at war; its own peace voices must
  * not say peace on the day; and its notoriety must be under
  * `diplomacy.ai.notoriety_restraint` unless it is Warlike or a hegemon seeker.
  */
-export function whyAiWontDeclare(world: World, n: number, t: number, price: PriceOfWar = priceOfWar(world, n, t)): string | null {
-  const ratio = world.rules.defines.war.aiDeclareStrengthRatio;
+export function whyAiWontDeclare(world: World, n: number, t: number, price: PriceOfWar = priceOfWar(world, n, t), gamble = false): string | null {
+  // A target already at war with another realm is an opportunity; a month's gamble accepts a little less (DIPL-242, DIPL-243).
+  const ratio = dip.declareRatio(world.rules.defines.war.aiDeclareStrengthRatio, atWarElsewhere(world, t, n), gamble);
   if (!(price.ourSide > price.theirSide * ratio)) return "their side is too strong";
   // What lenders would give counts toward the chest: an AI realm borrows for its wars (DIPL-234).
   const chest = wf.W.ai.war_chest_months * aiWarPay(world, n);
