@@ -26,11 +26,11 @@ function fleet(w: World, who: number, at: number, type: string, count = 1): Navy
   return f;
 }
 
-/** A commander of realm `who` made from an official, free of any army. */
+/** An admiral of realm `who` made from an official, free of any fleet (RECR-128). */
 function commander(w: World, who: number): number {
   w.nationTreasury[who] = 1000;
   const post = w.provinceOfficial.findIndex((o, q) => o >= 0 && w.provinceOwner[q] === who && w.provinceLord[q]! < 0);
-  expect(act(w, { type: "commission", province: post }, who)).toEqual([]);
+  expect(act(w, { type: "commission", province: post, sea: true }, who)).toEqual([]);
   return w.commanderIds.length - 1;
 }
 

@@ -7372,13 +7372,13 @@ Object.assign(globalThis, {
     }
     return best;
   },
-  /** Commissions the first official of the player's who serves the crown (not a lord) as a commander. */
-  __phCommission: async () => {
+  /** Commissions the first official of the player's who serves the crown (not a lord) as a general, or as an admiral when `sea`. */
+  __phCommission: async (sea = false) => {
     if (!snapshot) return null;
     const me = snapshot.playerNation;
     const p = provinces.findIndex((_, i) => owners[i] === me && snapshot!.provinceLord[i]! < 0 && officialOf(snapshot!, i, me) && i !== provinceIndex.get(nations[me]!.capital));
     if (p < 0) return null;
-    await act({ type: "commission", province: p });
+    await act({ type: "commission", province: p, sea });
     return snapshot.rejectedOrders.map((r) => r.reason);
   },
   /** Takes the commander off the player's first led army, as the army card's leave button does (a fleet's leader when gold is short). */
@@ -7391,7 +7391,7 @@ Object.assign(globalThis, {
     return snapshot.rejectedOrders.map((r) => r.reason);
   },
   /** The first commander of the player's free to lead (scripts/navy-shots.mjs), or -1. */
-  __phIdleCommander: () => idleCommanders()[0] ?? -1,
+  __phIdleCommander: (sea = false) => idleCommanders(sea)[0] ?? -1,
   /** Declares war on a realm by id (scripts/navy-shots.mjs: a blockade). */
   __phWar: (id: string) => act({ type: "declareWar", target: nationIndex.get(id)! }).then(() => snapshot?.rejectedOrders.map((r) => r.reason) ?? []),
   /** The nearest sea zones (up to eight, nearest first), over the sea from port p, that lie beside a coastal province of a realm by id. */
