@@ -2378,6 +2378,11 @@
      "level": 2
     },
     {
+     "id": "balance",
+     "text": "Balance",
+     "level": 3
+    },
+    {
      "id": "harvest",
      "text": "Harvest",
      "level": 3
