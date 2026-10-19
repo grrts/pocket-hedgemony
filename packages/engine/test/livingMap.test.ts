@@ -2,9 +2,9 @@ import { describe, expect, it } from "vitest";
 import { loadDefaultRuleset } from "@ph/rules";
 import { fileURLToPath } from "node:url";
 import { decodeRgb, loadMapTiles } from "../src/node/mapTiles.ts";
-import { landGrid, LandGridScan } from "../src/tiles.ts";
+import { groundOfCell, landGrid, LandGridScan, WATER } from "../src/tiles.ts";
 import {
-  animatedFigures, bandFade, detailBands, figureArms, figureCount, figuresLeft, formation, hamletCount, hamletSpots, hullCount, hullsInPort,
+  animatedFigures, bandFade, detailBands, figureArms, figureCount, figuresLeft, formation, hamletCount, hamletSpots, hullCount, hullsInPort, berthSpots,
   kindOfByte, linksOfByte, livingBand, neighbours4, pieceLabels, pieceUnit, roadGrade, roadLines, roadPath, settlementBytes, tapBox, tapTarget,
   tileDistance, townCells, townFootprint, townGrowthOrder, townPeopleThousands, townPlan, townsToRefresh, traderMovers, wallEdges, worksSpot, changedBox,
 } from "../src/domain/map-presentation/index.ts";
@@ -214,6 +214,15 @@ describe("living map: figures, hulls and movers", () => {
     expect(hullCount(80, "living")).toBe(8);
     expect(hullCount(12, "street")).toBe(12);
     expect(hullsInPort(5, 3)).toEqual({ atBerth: 3, waiting: 2 });
+    // Genova's waterfront: berths on water next to the town, a berth every other water pixel, the docks' first.
+    const fp = townFootprint(grid, idx("Genova"), 12);
+    const plan = townPlan(grid, fp, { coastal: true, harbour: true });
+    const docks = [...plan.special].find(([, k]) => k === "docks")?.[0];
+    const town = docks === undefined ? fp.tiles : [docks, ...fp.tiles.filter((t) => t !== docks)];
+    const berths = berthSpots(grid, town);
+    expect(berths.length).toBeGreaterThan(0);
+    for (const b of berths) expect(groundOfCell(grid.cellAt(b))).toBe(WATER);
+    if (plan.piers.length) expect(plan.piers).toContain(berths[0]);
   });
 
   it("moves up to three traders along a path, evenly spaced and steady from turn to turn", () => {

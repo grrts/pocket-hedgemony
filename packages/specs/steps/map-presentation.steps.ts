@@ -110,12 +110,15 @@ import {
   iceColour,
   icedSea,
   mapNames,
+  placeLabels,
   playbackAdvance,
   playbackHour,
   routeStrokeOver,
   seaIceAt,
   siegeProgressMarks,
   type IceSampler,
+  type LabelAsk,
+  type LabelSpot,
 } from "@ph/engine/domain/map-presentation";
 import { foodMonths as wfFoodMonths, newSiege as wfNewSiege, siegeMonth as wfSiegeMonth } from "@ph/engine/domain/warfare";
 import { decodeRgb } from "@ph/engine/node";
@@ -289,6 +292,41 @@ Then("the siege shows how long it has held, its breaches, its garrison and its f
   expect(s.siegeView.foodMonths).toBeLessThan(6);
   expect(siegeProgressMarks("Local", s.siegeView)).toEqual([plate]);
   expect(siegeProgressMarks("World", s.siegeView)).toEqual([]);
+});
+
+// VIEW-133: Castile's name sits where Portugal's would; the Livonian Order's next to Pskov's.
+const LABEL_ASKS: LabelAsk[] = [
+  { id: 1, anchors: [[100, 100]], w: 120, h: 30, size: 28, minSize: 9 }, // Castile
+  { id: 2, anchors: [[70, 100], [50, 60], [50, 140]], w: 110, h: 30, size: 24, minSize: 9 }, // Portugal
+  { id: 3, anchors: [[400, 100]], w: 200, h: 30, size: 28, minSize: 9 }, // Livonian Order
+  { id: 4, anchors: [[470, 105], [480, 140]], w: 70, h: 20, size: 18, minSize: 9 }, // Pskov
+  { id: 5, anchors: [[100, 100]], w: 600, h: 40, size: 9, minSize: 9 }, // no room anywhere
+];
+const box = (a: LabelAsk, s: LabelSpot) => {
+  const k = s.size / a.size;
+  return [s.x - (a.w * k) / 2, s.y - (a.h * k) / 2, s.x + (a.w * k) / 2, s.y + (a.h * k) / 2] as const;
+};
+Given("the realm names of Iberia and the Baltic are placed zoomed out", (s) => {
+  s.labelSpots = placeLabels(LABEL_ASKS);
+});
+Then("no two realm names overlap", (s) => {
+  const spots: LabelSpot[] = s.labelSpots;
+  const boxes = spots.map((p) => box(LABEL_ASKS.find((a) => a.id === p.id)!, p));
+  for (let i = 0; i < boxes.length; i++)
+    for (let j = i + 1; j < boxes.length; j++) {
+      const [a, b] = [boxes[i]!, boxes[j]!];
+      expect(a[0] < b[2] && a[2] > b[0] && a[1] < b[3] && a[3] > b[1], `${spots[i]!.id} over ${spots[j]!.id}`).toBe(false);
+    }
+  expect(spots.map((p) => p.id).sort()).toEqual([1, 2, 3, 4]);
+});
+Then("{string} keeps its full size and {string} moves or shrinks to make room", (s, _big: string, _small: string) => {
+  const spots: LabelSpot[] = s.labelSpots;
+  expect(spots.find((p) => p.id === 1)).toEqual({ id: 1, x: 100, y: 100, size: 28 });
+  const portugal = spots.find((p) => p.id === 2)!;
+  expect(portugal.size < 24 || portugal.x !== 70 || portugal.y !== 100).toBe(true);
+});
+Then("a name with no room left is not drawn", (s) => {
+  expect((s.labelSpots as LabelSpot[]).some((p) => p.id === 5)).toBe(false);
 });
 
 // VIEW-079: the real map's provinces, the capitals of 1444.

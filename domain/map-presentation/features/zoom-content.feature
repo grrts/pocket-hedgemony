@@ -183,6 +183,13 @@ Feature: What each zoom shows
     Then no land province names are drawn except on each country's capital
     And a selected province shows its name on its name tab and card
 
+  @VIEW-133
+  Scenario: Realm names never overlap
+    Given the realm names of Iberia and the Baltic are placed zoomed out
+    Then no two realm names overlap
+    And "Castile" keeps its full size and "Portugal" moves or shrinks to make room
+    And a name with no room left is not drawn
+
   @VIEW-083 @feedback-55
   Scenario: Realms show their national flags
     When the player looks at the top bar as "France"

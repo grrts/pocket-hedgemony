@@ -52,7 +52,7 @@ Feature: Starting government forms in 1444
       | papal_states    | Holy rule           |
       | teutonic_order  | Military order      |
       | great_horde     | Horde               |
-      | kazan           | Household realm     |
+      | kazan           | Horde               |
       | silesia         | Confederation       |
       | qara_qoyunlu    | Horde               |
 
