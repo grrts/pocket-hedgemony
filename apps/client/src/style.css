@@ -5268,8 +5268,14 @@ button.link {
 }
 
 .cloud-form button,
-.cloud-sign-out {
+.cloud-sign-out,
+.cloud-steam {
   min-height: 48px;
+}
+
+/* Sign in with Steam fills the column, above the email form (SAVE-146, SAVE-148). */
+.cloud-steam {
+  width: 100%;
 }
 
 .cloud-status {

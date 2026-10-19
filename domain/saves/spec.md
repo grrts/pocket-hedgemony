@@ -39,6 +39,7 @@ Newest decision first.
    sign-ins, store sign-ins at launch, purchases per store), §4 and §5; §7 for sharing saves with the community
    (Leroy, 19 Oct: "I want them exportable, so other people could actually load in the save files … an active
    community thing").
+   §9 and §11 step 4 for the desktop: Steamworks, Steam sign-in, saves as files and Auto-Cloud.
 2. `save-system/README.md`, second draft 2026-10-16, §8 Decisions (settled by Leroy on 16 Oct: Export and
    Import yes; cloud saves on our Symfony server with optional accounts; default autosave every 12 months plus
    the Resume save every turn; cross-store cloud saves at launch, purchases stay per store), and all of §1–§7, §9.
@@ -83,6 +84,9 @@ Newest decision first.
 | Needs full game | The header flag saying a save's nation is locked without the full game | — |
 | Account | An optional Pocket Hegemony account on our server; needed only for cloud saves | A store account |
 | Device token | Long-lived sign-in token kept in the platform's secure storage | Access token |
+| Steam build | The desktop game started with a Steam app id, from the build's `PH_STEAM_APP_ID` or from Steam itself, with the Steam client running | The desktop game without Steam |
+| Web API ticket | The ticket Steamworks gives for the identity `pockethegemony` (`GetAuthTicketForWebApi`), which the server checks with Steam | A Steam session ticket |
+| Save folder | `<Electron userData>/saves` on the desktop, one `.phsave` file per save, the folder Steam Auto-Cloud syncs | IndexedDB |
 | Shared save | A public copy of one save, uploaded once and attached to a community post, that anyone can play | A cloud save (private, synced) |
 | Share code | The eight letters and digits that name a shared save (`K7QX-M2PA`), in its link `/s/<code>` | Save id |
 | Copy of a shared save | The new campaign a player starts from a shared save, with its own campaign id and `sharedFrom` | The shared save itself |
@@ -268,6 +272,13 @@ Newest decision first.
 - SAVE-117: If email sign-in fails 5 times within 15 minutes for one address from one place, then the server shall refuse further tries until the 15 minutes have passed, as the website's sign-in does. [save-system §5.2 rate limits; config `cloud.server.sign_in_throttle`]
 - SAVE-118: Where the server has no Steam key configured, Steam sign-in shall answer "Steam sign-in is not available" and email sign-in shall keep working. [accounts-design §10]
 
+#### Steam on the desktop
+
+- SAVE-140: Where the desktop game has a Steam app id (`--steam-app-id`, the build's `PH_STEAM_APP_ID`, or the `SteamAppId` Steam sets when it starts the game) and the Steam client is running, the game shall start Steamworks through `steamworks.js`, loaded only then; if there is no app id, the library or its native part cannot load, or Steam is not running, then the game shall run as the desktop game without Steam (email sign-in, the same save folder), with no error shown to the player. [accounts-design §4, §9; D-SAVE-21]
+- SAVE-141: When the Steam build starts and the device is signed out, the game shall sign in with Steam by itself: it gets a Web API ticket for the identity in `sign_in.steam_ticket_identity` and sends it with the player's Steam name to `POST /api/sessions` (SAVE-113), so the player types nothing. If the player signed out on this device, then the game shall not sign in by itself again until they tap Sign in with Steam. If the silent sign-in fails (offline, Steam refused the ticket, the server has no Steam key), then the game shall say nothing at launch, keep playing, and show the reason on the Account and cloud saves card. [accounts-design §3, §4; SAVE-113, SAVE-118]
+- SAVE-142: Where the game runs on Steam, the device shall name itself to the server with the platform `steam`, and on a Steam Deck (where Steam sets `SteamDeck=1`) the device and its saves shall be named "Steam Deck", so another device's Load card and Continue say "from Steam Deck" (SAVE-014). [accounts-design §3; SAVE-014, SAVE-053]
+- SAVE-143: On the desktop the device token shall be kept encrypted with Electron's `safeStorage` in the userData folder (SAVE-057); if `safeStorage` cannot encrypt on this computer, then it shall stay in the game's web storage as on the web, and a token kept there before shall move into `safeStorage` once it can. [accounts-design §4, §9; SAVE-057]
+
 #### Shared saves
 
 - SAVE-124: A shared save shall be a copy of one save, uploaded once, public, and attached to a community post under a share code; it shall be separate from cloud sync, so sharing exposes none of the player's other saves and deleting a cloud save leaves the shared copy, while removing the shared save or a moderator hiding its topic takes it away. [accounts-design §7]
@@ -282,6 +293,8 @@ Newest decision first.
 ### 5.9 Store backups, Export and Import
 
 - SAVE-073: Where the game runs on Steam, the save folder (`<Electron userData>/saves`) shall be covered by Steam Auto-Cloud with root overrides mapping the Windows, macOS and Linux paths to one cloud folder, a quota of 500 MB and 2,000 files for the synced set only, and Dynamic Cloud Sync on so a suspended Deck uploads its saves. [save-system §5.3; config `store_backups.steam`]
+- SAVE-144: Where the game runs on the desktop, with or without Steam, the save system shall keep each save as its own `.phsave` file in the save folder under the same name as in the cloud, `<campaignId>/<savedAt>-<saveId>.phsave` (SAVE-053): written to a `.tmp` file beside it, flushed and renamed into place before the saves it replaces are removed (SAVE-032); the Load card shall read only each file's header (SAVE-036), and a file that is not a readable save shall be left alone and not listed. Saves an earlier desktop build kept in IndexedDB shall move into the folder once, on the first launch that has it. [accounts-design §9; SAVE-032, SAVE-036, SAVE-053]
+- SAVE-145: Steam Auto-Cloud shall be set in the Steamworks partner site (App Admin → Steam Cloud) as: byte quota 500 MB and 2,000 files; one root path, root `WinAppDataRoaming`, subdirectory `Pocket Hegemony/saves`, pattern `*.phsave`, OS all, recursive; root overrides `WinAppDataRoaming` → `MacAppSupport` on macOS with the path unchanged, and `WinAppDataRoaming` → `LinuxHome` on Linux with the path replaced by `.config/Pocket Hegemony/saves`; Dynamic Cloud Sync on. The desktop app's product name "Pocket Hegemony" makes the userData folder these paths name. [save-system §5.3; config `cloud.store_backups.steam`; D-SAVE-21]
 - SAVE-074: Where the game runs on Android, Auto Backup shall include the synced set through the backup rules file (within its 25 MB per-app limit) and exclude the orders journal. [save-system §5.3]
 - SAVE-075: Where the game runs on iOS or iPadOS, the device's own iCloud backup shall include the save folder. [save-system §5.3]
 - SAVE-076: Where the game runs on the web, saves shall live in IndexedDB, the game shall ask for persistent storage (`navigator.storage.persist()`), and signing in shall be the only way a web player keeps saves beyond the browser. [save-system §5.3]
@@ -350,6 +363,12 @@ Newest decision first.
 - SAVE-137: Where the phone and desktop builds register app links, the link `https://<domain>/s/<code>` shall open the game on that shared save, and fall back to the download and the store pages. [accounts-design §7]
 - SAVE-138: The website's new-topic form shall also take a `.phsave` attachment, so a player who never signs in from the game can share an exported file (SAVE-078). [accounts-design §7]
 - SAVE-139: Where a save needs Workshop mods (the header's `mods` list), its card shall say "Needs N Workshop mods (Steam only)" with links to them; saves shall never be put on the Workshop. [accounts-design §7; steam-design §4]
+
+#### Signing in with Steam
+
+- SAVE-146: The player shall find Steam sign-in where every sign-in is, on the Account and cloud saves card in Settings (SAVE-119); in the Steam build most players never look, because the game signs in by itself (SAVE-141). While signed out, the card shall hold **Sign in with Steam** above the email form, with the reason under it when the silent sign-in failed; without Steam it shall not show. [X-19; accounts-design §3, §4; SAVE-120]
+- SAVE-147: While signed in, the card shall show the account's sign-ins in one **Sign-ins** row, Steam first (with the Steam name on this computer) and email with its address, and under the display name "Signed in with Steam" in place of the email for an account that has none; together with the status line (SAVE-121) this is the overview of the account at a glance. Everything about the account stays on this one card. [X-19; accounts-design §3; SAVE-121]
+- SAVE-148: On a Steam Deck (1280 × 800, held in landscape, touch or controller) and on a phone in landscape the card shall stay one scrolling column inside the safe areas in the Wide and Tall layouts, with Sign in with Steam full width and 48 points high and nothing that needs hover (SAVE-123). [X-19; accounts-design §3]
 
 ## 6. Commands
 
@@ -451,6 +470,9 @@ From `save-system/save-config.example.yaml` ("numbers here are the defaults the 
 | `cloud.server.wifi_only_default` | Wi-Fi only default | false | no | save-config.yaml |
 | `cloud.server.ironman_head_check` | Ironman head check | true | no | save-config.yaml |
 | `cloud.store_backups.steam` | Steam | auto_cloud, 500 MB, 2000 files, dynamic cloud sync | platform | save-config.yaml |
+| `cloud.store_backups.steam.partner_site` | Auto-Cloud root path, pattern and overrides to enter in Steamworks (SAVE-145) | root `WinAppDataRoaming`, `Pocket Hegemony/saves`, `*.phsave`, recursive; macOS `MacAppSupport`; Linux `LinuxHome` `.config/Pocket Hegemony/saves` | no | saves.json |
+| `cloud.store_backups.steam.app_id_env` | Where the build's Steam app id comes from (SAVE-140) | `PH_STEAM_APP_ID`, else Steam's `SteamAppId` | no | saves.json |
+| `cloud.store_backups.steam.dev_app_id` | Valve's test app, for trying Steam out only (D-SAVE-21) | 480 (Spacewar) | no | saves.json |
 | `cloud.store_backups.android` | Android | auto_backup (25 MB limit, journal excluded) | platform | save-config.yaml |
 | `cloud.store_backups.ios` | iOS | device_backup | platform | save-config.yaml |
 | `cloud.store_backups.web` | Web | indexeddb_persist | platform | save-config.yaml |
@@ -524,6 +546,7 @@ None. AI countries' state is saved like any other (later an `ai` chunk); no AI d
 - **D-SAVE-18** (Leroy, 19 Oct) Store sign-ins at launch, replacing "email and password only" in SAVE-059: on a Steam Deck or a phone a password is the step most players skip, and Steam sign-in on the phone links a Steam account to the phone with no email. One account gathers several sign-ins (SAVE-112), and purchases stay per store (SAVE-072, decided again on 19 Oct). Source: `accounts/accounts-design.md`.
 - **D-SAVE-19** (accounts-design §7, X-19) After Post to the community, the Share sheet itself turns into the result ("Shared. Your topic is on the community." with Copy link, Share link and Open the topic) instead of a toast with buttons: the game's toasts go after two seconds, too soon for a thumb on a phone held sideways, and the sheet is where the player's eyes already are. Until app links exist (SAVE-137), the website's Play this save opens the web game (`PLAY_URL?shared=<code>`), and Open a shared save on the Load card takes the code in any build.
 - **D-SAVE-20** The server answers the share with the code, not the bytes back, and makes the post itself, so a share is one call; the file travels base64 in the JSON body with the title and note, inside the 2 MB cap (SAVE-068). The shared copy's header has an empty `device`; the copy a player opens names their own device. Simplest single request.
+- **D-SAVE-21** (accounts-design §9, step 4) Steam on the desktop: the app id comes from `--steam-app-id`, the build's `PH_STEAM_APP_ID` or Steam's own `SteamAppId`, never from a constant in the code, so a build without either is the plain desktop game; Valve's test app 480 (Spacewar) is used only by `pnpm --filter @ph/desktop steam` for trying it out. Auto-Cloud takes every `.phsave` file in the save folder (SAVE-145), not only the synced set of SAVE-073: the files on disk are already bounded by the kept counts (2 Resume, 3 autosaves per campaign, 100 manual), an Auto-Cloud pattern cannot tell the kinds apart without a second folder, and the extra files are the older autosaves and the backup Resume save, which are harmless on the other computer. The orders journal is not a `.phsave` file, so it stays local. Simpler rule (DECISIONS rule 2).
 
 ## 14. Traceability
 
@@ -661,3 +684,16 @@ None. AI countries' state is saved like any other (later an `ai` chunk); no AI d
 | SAVE-124 … SAVE-131 | shared-saves.feature | Server: `server/tests/Controller/SharedSavesTest.php`; the copy (SAVE-128, SAVE-129) also by engine steps |
 | SAVE-132 … SAVE-136 | shared-saves.feature | Client screens; checked by `apps/client/src/cloud/share.test.ts` (the sheet, the copy) and the website's `SharedSavesTest.php` (the save card) |
 | SAVE-137 … SAVE-139 | shared-saves.feature | Not built yet: app links, the website's attachment and Workshop mods come later (todo) |
+| SAVE-140 | steam-desktop.feature | Without Steam the desktop game plays as before |
+| SAVE-140 | — | Also `apps/desktop/test/steam.test.mjs` (no app id, missing library, Steam not running) |
+| SAVE-141 | steam-desktop.feature | The Steam build signs in by itself |
+| SAVE-141 | steam-desktop.feature | A player who signed out is not signed in again |
+| SAVE-141 | steam-desktop.feature | A silent sign-in that fails says nothing at launch |
+| SAVE-141 | — | Also `apps/client/src/cloud/steam.test.ts` |
+| SAVE-142 | steam-desktop.feature | A Steam Deck names itself |
+| SAVE-143 | steam-desktop.feature | The device token on the desktop |
+| SAVE-144 | steam-desktop.feature | Saves are files in the save folder |
+| SAVE-144 | steam-desktop.feature | Saves kept in IndexedDB move into the folder once |
+| SAVE-144 | — | Also `apps/desktop/test/saves.test.mjs` and `apps/client/src/saves/fileStore.test.ts` |
+| SAVE-145 | steam-desktop.feature | The Auto-Cloud settings in the partner site |
+| SAVE-146 … SAVE-148 | steam-desktop.feature | Client screens; checked by `apps/client/src/cloud/steam.test.ts` (the card) |
