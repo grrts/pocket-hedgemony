@@ -1,4 +1,5 @@
 import { lordsLoseWar } from "./lords.ts";
+import { battleDeath } from "./people.ts";
 import { armyDead, garrisonDead } from "./fallen.ts";
 import { castleStep } from "./works.ts";
 import { markBattle } from "./moods.ts";
@@ -587,6 +588,8 @@ export function fightRound(world: World, news: News[]): void {
     battleWon(world, winner);
     retinuesWon(world, winSlots, news);
     commanderBattle(world, b.attackerWins ? b.defLead : b.attLead, false, false);
+    // The losing commander may fall (WAR-062): people.ts says what follows.
+    battleDeath(world, b.attackerWins ? b.defLead : b.attLead, news);
     endBattle(world, b);
     noteBattle(world, winner, loser, winStart, loseStart, b.province);
     noteWarBattle(world, winner, loser, b.attackerWins ? b.attDealt : b.defDealt, b.attackerWins ? b.defDealt : b.attDealt);

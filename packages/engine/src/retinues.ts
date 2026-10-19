@@ -4,6 +4,7 @@ import type { GameWar } from "./peace.ts";
 import { lordWant } from "./peace.ts";
 import { addCommander, armyOf, KIND, recountLordsMen } from "./recruit.ts";
 import { inAnyWar, lordLands, lordOfCommander, lordSendHome, loyaltyStep } from "./lords.ts";
+import { lordAge } from "./people.ts";
 import { knownSet } from "./research.ts";
 import { halt } from "./turn.ts";
 import { controller, type News } from "./war.ts";
@@ -138,7 +139,7 @@ function lordCommander(world: World, lord: number): number {
   const l = world.lords[lord]!;
   if (l.commander !== undefined && world.commanderOwner[l.commander] === l.nation) return l.commander;
   const skill = () => 1 + world.rng.int(3);
-  l.commander = addCommander(world, l.nation, wf.newCommander(l.name, { might: skill(), cunning: skill(), logistics: skill(), origin: "a lord" }));
+  l.commander = addCommander(world, l.nation, wf.newCommander(l.name, { might: skill(), cunning: skill(), logistics: skill(), age: lordAge(world, lord).age, origin: "a lord" }));
   return l.commander;
 }
 
