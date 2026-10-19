@@ -207,6 +207,7 @@ Build report: 706 countries with heritage (58 hand-written, 648 generated), 3,55
 - HER-027 Where the setting "History mode" is "Historical only", the heritage context shall draw only ambitions tagged historical; the default is "Drawn"; no setting reveals rewards. [ns §2.3; rules history_mode_setting; X-27]
 - HER-028 The tutorial shall teach ambitions with one ambition, its goal and progress shown like any other and its reward named but secret. [ns §2.3; X-27]
 - HER-090 Where an ambition names a requirement (`requires`), the heritage context shall draw it only while the requirement holds; until then it stays in the pool. A requirement may name an earlier ambition done (`heritage {who: this, id, state: done}`), so ambitions follow on from one another, or an event that has happened. [X-27]
+- HER-093 Certain history events shall follow a fulfilled ambition: their trigger holds `heritage {who: <realm>, id: <ambition>, state: done}`, which the game answers from that realm's heritage, so an event such as the Casa da Índia comes only after Portugal has gone beyond the Cape. They are written in `events-ambitions.json` beside the campaign events, one-time and weighed like any other, and reach the player as an ordinary event card; nothing on the Heritage tab says which events an ambition opens, in keeping with the hidden reward. [X-27; HER-068]
 
 #### How the player uses it (ambitions, X-19, X-27)
 - HER-091 The player's ambitions shall live on the realm card's Heritage tab, under Ambitions: one 44-point row each with its theme icon, its name, its plain goal, a progress meter with "have/need", the promised legacy's name, its deadline if any and "within reach" once it is, highlighted; and, when counsel can be asked, a 44-point "New aim" button priced in gold, placed under the words so it fits the Tall layout. Settled ambitions sit under "Past": a fulfilled one with its legacy and what it gives, a lost one with its goal. [X-19; X-27]
@@ -515,6 +516,7 @@ Requests to other designs (`requests-to-other-designs.md`), worked around, nothi
 | HER-005..007 | birthright.feature | all scenarios |
 | HER-008..013 | heydays.feature | all scenarios |
 | HER-014..028, HER-090 | ambitions.feature | all scenarios |
+| HER-093 | ambitions.feature | Events that follow an ambition; checked by packages/engine/test/ambitionEvents.test.ts |
 | HER-091, HER-092 | heritage-in-play.feature | The Heritage tab shows heritage in play; client screens checked by apps/client/src/ui/heritage.test.ts |
 | HER-029..034 | legacies-and-burdens.feature | all scenarios |
 | HER-035..039 | levers.feature | all scenarios |

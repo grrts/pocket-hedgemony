@@ -175,6 +175,8 @@ The current build has 706 countries with heritage (58 hand-written, 648 generate
 
 Heritage proposes effects and a condition to the event tree. `grant_legacy` grants a legacy; `wake_heyday` makes a golden age active for a number of years even if its condition fails; `shed_burden` overcomes the weakness. (`stir_ambition`, which revealed a hidden ambition, is retired now that goals are in plain sight.) The `heritage` condition lets events ask about heritage, so an event can require an ambition fulfilled, and the `event_weight` and `event_option` levers raise an event's weight or open an option for the country.
 
+Forty history events wait on an ambition done: the Casa da Índia after Portugal goes beyond the Cape, the Kremlin rebuilt after Muscovy stands on the Ugra, the Hồng Đức code after Đại Việt's child throne, and so on for 22 realms. They come as ordinary event cards, and nothing tells you beforehand which ambition opens which event.
+
 ### The computer
 
 The computer always knows its own ambitions and treats them as goals with weight 1.5 next to its personality priorities. When it completes one, it gets the legacy just as you would. Golden ages give it a reason to change course across the centuries. It can read your ambitions through a resident envoy kept 2 years at your court. When a third golden age would begin or a sixth legacy arrives, it lets the weakest one go (the one worth the fewest points).
