@@ -62,6 +62,8 @@ describe("people age and die (REALM-270 to REALM-279)", () => {
     expect(w.lords[k]!.name).toBe("Jean");
     expect(w.lords[k]!.age).toBe(20);
     expect(landsOf(w, k)).toEqual(lands);
+    // No kinsman steps in this time.
+    w.rulerRng.next = () => 0.999;
     personDies(w, { kind: "lord", lord: k }, "assassinated", news as never);
     expect(w.lords[k]!.gone).toBe(true);
     for (const p of lands) {

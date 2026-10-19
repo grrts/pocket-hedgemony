@@ -268,12 +268,12 @@
     "lean_factor": 1.5
   },
   "people": {
-    "$comment": "REALM-270 to REALM-279: one ageing and death model for every person the game names. Each January everyone ages a year and dies with the chance of his age band (age under the first number, chance a year), times his kind's death_mult. Battle and assassination deaths go through the same path. start_age draws a person's age when the game first meets him (a seeded lord or commander, a newly hired official); a lord aged birth_ages without an heir gains one at birth_per_year; a lord starts with an heir at heir_at_start. With ai_refills_posts an AI realm, or a lord, fills a dead official's post at once with a new man of his type.",
+    "$comment": "REALM-270 to REALM-279: one ageing and death model for every person the game names. Each January everyone ages a year and dies with the chance of his age band (age under the first number, chance a year), times his kind's death_mult. Battle and assassination deaths go through the same path. start_age draws a person's age when the game first meets him (a seeded lord or commander, a newly hired official); a lord aged birth_ages without an heir gains one at birth_per_year; a lord starts with an heir at heir_at_start; a lord who dies heirless is followed by a kinsman (kinsman_age) at kinsman_share, else his line dies out. With ai_refills_posts an AI realm, or a lord, fills a dead official's post at once with a new man of his type.",
     "death_per_year": [[5, 0.03], [16, 0.01], [40, 0.01], [50, 0.02], [60, 0.04], [70, 0.08], [999, 0.16]],
     "kinds": {
       "ruler": { "death_mult": 1 },
       "heir": { "death_mult": 1 },
-      "lord": { "death_mult": 1, "start_age": [20, 65], "heir_at_start": 0.75, "heir_age_gap": [18, 32], "birth_per_year": 0.15, "birth_ages": [18, 50] },
+      "lord": { "death_mult": 1, "start_age": [20, 65], "heir_at_start": 0.75, "heir_age_gap": [18, 32], "birth_per_year": 0.25, "birth_ages": [18, 50], "kinsman_share": 0.5, "kinsman_age": [18, 45] },
       "official": { "death_mult": 1, "start_age": [25, 60], "hire_age": [22, 40] },
       "commander": { "death_mult": 1, "start_age": [25, 60] },
       "governor": { "death_mult": 1 }

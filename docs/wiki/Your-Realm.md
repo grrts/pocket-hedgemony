@@ -250,7 +250,7 @@ The details live in [Recruiting](Recruiting), [Warfare](Warfare) and [Naval](Nav
 | Who | Where you see his age | When he dies |
 |---|---|---|
 | Your heir | General tab, beside the ruler | Your ruler has no heir until a child is born; die then, and the lords dispute the throne. Abroad, a ruler who dies without a son may give married houses a claim |
-| A lord | His row on the Lords tab; his age and heir on his screen | His heir takes his lands, loyalty and want. With no heir his line dies out and his lands come back to you as royal land, with their posts empty |
+| A lord | His row on the Lords tab; his age and heir on his screen | His heir takes his lands, loyalty and want; with no heir, a kinsman of his house half the time. Otherwise his line dies out and his lands come back to you as royal land, with their posts empty |
 | An official | His card on the province and the Officials tab | His post stands empty: fill it from the province card. AI realms and lords fill theirs at once |
 | A commander or admiral | With his skills on the Military tab and the army card | He leaves your service and his army or fleet has no commander until you name another. Past 60 his Might falls, past 65 his Cunning |
 | A colonial governor | The Exploration tab | His colony is lost if he was founding one |

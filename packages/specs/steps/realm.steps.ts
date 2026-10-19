@@ -2791,6 +2791,8 @@ Given(/^a lord of "([^"]+)" with (an|no) heir$/, (s, realm: string, has: string)
   const k = lordWithLand(w, realmOf(s, realm));
   G.lordAge(w, k);
   w.lords[k]!.heir = has === "an" ? { name: "Jean", age: 20 } : null;
+  // No kinsman steps in either.
+  if (has === "no") w.rulerRng.next = () => 0.999;
   s.lord = k;
   s.lands = [...w.provinceLord.keys()].filter((p) => w.provinceLord[p] === k);
 });

@@ -152,14 +152,16 @@ function lordDies(world: World, k: number, d: Omit<PersonDeath, "who">, news: Ne
   const l = world.lords[k]!;
   const n = l.nation;
   const title = n === world.player ? realmTitles(world)[n]!.lord : "lord";
-  const heir = l.heir;
+  // With no son, a brother or cousin of the house may still take the lands (`people.kinds.lord.kinsman_share`).
+  const son = l.heir;
+  const heir = son ?? (dice(world) < K.lord.kinsman_share ? { name: houseMemberName(world.rules, n, mix(k + 1, world.day + 7), l.house), age: ageFrom(mix(k + 1, world.day), K.lord.kinsman_age) } : null);
   if (heir) {
     l.name = heir.name;
     l.age = heir.age;
     l.heir = null;
     l.upCredit = 0;
     delete l.traits;
-    if (n === world.player) news.push({ kind: "ruler", text: `${d.name}, ${title} of the house of ${l.house}, ${how(d.cause, d.age)}. His heir ${l.name}, ${l.age}, holds his lands now.`, nations: [n] });
+    if (n === world.player) news.push({ kind: "ruler", text: `${d.name}, ${title} of the house of ${l.house}, ${how(d.cause, d.age)}. His ${heir === son ? "heir" : "kinsman"} ${l.name}, ${l.age}, holds his lands now.`, nations: [n] });
   } else {
     l.gone = true;
     l.heir = null;
