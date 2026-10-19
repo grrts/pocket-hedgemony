@@ -109,8 +109,8 @@ import {
   type FormationState,
 } from "@ph/engine/domain/map-presentation";
 import { provinceLevy } from "@ph/engine/domain/recruiting";
-import { detailBands, EFFECTS, holderOf, momentParticles, moments, momentSeconds, momentsShown, type MomentKind } from "@ph/engine/domain/map-presentation";
-import { ParticleField } from "./map/particles.ts";
+import { chimneysShown, detailBands, EFFECTS, holderOf, loopingEffects, momentParticles, moments, momentSeconds, momentsShown, snowing, type MomentKind } from "@ph/engine/domain/map-presentation";
+import { ParticleField, Shape } from "./map/particles.ts";
 import { TownLayer, townInfo } from "./map/towns.ts";
 import { bedUnderCamera, musicFacts, newFactMemory, playerPalette, playerWars, remember, type FactMemory } from "./audio/facts.ts";
 import { COMMISSION_GOLD, commissionSkills, hireGold, OFFICIALS, Rng, startFormOf } from "@ph/engine";
@@ -1196,6 +1196,7 @@ function restyleProvinces(): void {
     seasonKey = key;
     const s = nextSeason?.key === key ? nextSeason.data : seasonsFor(date);
     view.renderer.setProvinceSeasons(s);
+    seasonNow = s;
     if (!previewMonth) {
       const next = addDays(date, DAYS_PER_TURN);
       setTimeout(() => (nextSeason = { key: dateKey(next), data: seasonsFor(next) }), 50);
@@ -2864,6 +2865,54 @@ function armySlot(id: number): number {
 // ---- HUD and panels ----
 const pennant = (nation: FlagOf, scale = 2) => `<img class="px-icon flag" src="${flagUrl(nation, scale)}" alt="">`;
 
+// The top bar's one-shot animations (SHELL-174, SHELL-175, SHELL-177): what each plaque last showed and when its animation began.
+const hudShot = { nation: -1, goldFrom: 0, goldTo: NaN, goldAt: -1e9, day: "", dayAt: -1e9, unread: 0, unreadAt: -1e9 };
+let goldTick = 0;
+const GOLD_MS = 300;
+
+/** Whether the interface plays its small animations: not with Animations Off or the system's reduced motion. */
+const uiMotion = () => animationsPref() !== "Off" && !matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/** The gold the plaque shows now: it counts from the old value to the new in 6 steps. */
+function goldShown(): number {
+  const k = Math.min(6, Math.floor(((performance.now() - hudShot.goldAt) / GOLD_MS) * 6));
+  return k >= 6 ? hudShot.goldTo : hudShot.goldFrom + ((hudShot.goldTo - hudShot.goldFrom) * k) / 6;
+}
+
+/** Writes each counting step into the gold plaque, whichever render drew it, until the count is done. */
+function tickGold(): void {
+  const el = hud.querySelector(".gold-n");
+  if (el) el.textContent = fmt(goldShown());
+  goldTick = goldShown() === hudShot.goldTo ? 0 : window.setTimeout(tickGold, GOLD_MS / 6);
+  // The tint goes once the count is done.
+  if (!goldTick) el?.classList.remove("up", "down");
+}
+
+/** A class attribute that adds `shot` while an animation begun at `at` still runs, delayed so a re-render carries it on rather than restarting it. */
+function shotClass(base: string, shot: string, at: number, ms: number): string {
+  const t = performance.now() - at;
+  return t < ms ? `class="${base} ${shot}" style="animation-delay:-${Math.round(t)}ms"` : `class="${base}"`;
+}
+
+/** Notes what changed on the plaques since the last render and starts their animations. */
+function noteHudChanges(me: number, gold: number, day: string, count: number): void {
+  const now = performance.now();
+  const moving = uiMotion() && hudShot.nation === me;
+  if (gold !== hudShot.goldTo) {
+    // A new value counts on from what the plaque shows, even mid-count.
+    hudShot.goldFrom = moving ? goldShown() : gold;
+    hudShot.goldTo = gold;
+    hudShot.goldAt = moving ? now : -1e9;
+    clearTimeout(goldTick);
+    if (moving) goldTick = window.setTimeout(tickGold, GOLD_MS / 6);
+  }
+  if (day !== hudShot.day && moving) hudShot.dayAt = now;
+  if (count > hudShot.unread && moving) hudShot.unreadAt = now;
+  hudShot.day = day;
+  hudShot.unread = count;
+  hudShot.nation = me;
+}
+
 function renderHud(): void {
   if (!snapshot) {
     hud.innerHTML = `
@@ -2876,22 +2925,26 @@ function renderHud(): void {
   const n = nations[me]!;
   // The plaques, their order and what each opens come from the engine's top-bar model (REALM-205).
   const open = (o: Opens) => (o && "card" in o && o.tab ? ` data-realm-open="${o.tab}"` : "");
+  const bar = topBar({ ...s, peaceOffers: s.peaceOffers.filter((o) => !putOffOffers.has(o.id)) }, unread, asksOf(s).length + empireAsks(s.empire) + shogunateAsks(s.shogunate));
+  const goldP = bar.find((p) => p.key === "gold");
+  const newsP = bar.find((p) => p.key === "dispatches");
+  noteHudChanges(me, goldP?.key === "gold" ? goldP.gold : hudShot.goldTo, dateText(s.date, true), newsP?.key === "dispatches" ? newsP.count : 0);
   hud.innerHTML = `<button class="icon-only game-menu" data-shell="menu" title="Game menu" aria-label="Game menu">${icon("menu", 2)}<span class="dot" hidden></span></button>
-    ` + topBar({ ...s, peaceOffers: s.peaceOffers.filter((o) => !putOffOffers.has(o.id)) }, unread, asksOf(s).length + empireAsks(s.empire) + shogunateAsks(s.shogunate))
+    ` + bar
     .map((p) => {
       switch (p.key) {
         case "realm":
           return `<button class="realm" data-realm="${me}" title="Your realm">${pennant(n, 2)}<b>${esc(n.name)}</b></button>`;
         case "date":
-          return `<span class="plaque turn-label" title="${dateText(s.date)}, ${seasonName(latOf(provinces[provinceIndex.get(n.capital)!]!), s.date.month).toLowerCase()}: one turn is a week">${dateText(s.date, true)}${clockText(playbackHour(s.hour, s.battles.some((b) => b.player)))}</span>`;
+          return `<span class="plaque turn-label" title="${dateText(s.date)}, ${seasonName(latOf(provinces[provinceIndex.get(n.capital)!]!), s.date.month).toLowerCase()}: one turn is a week"><span ${shotClass("day", "flip", hudShot.dayAt, 200)}>${dateText(s.date, true)}</span>${clockText(playbackHour(s.hour, s.battles.some((b) => b.player)))}</span>`;
         case "gold":
-          return `<button class="plaque gold" data-realm="${me}"${open(p.opens)} title="Treasury: gold, and change per month. Opens the ledger">${icon("coin", 1)}${fmt(p.gold)} <small class="${p.falling ? "down" : ""}">${p.perMonth >= 0 ? "+" : ""}${p.perMonth.toFixed(1)}</small></button>`;
+          return `<button class="plaque gold" data-realm="${me}"${open(p.opens)} title="Treasury: gold, and change per month. Opens the ledger">${icon("coin", 1)}<span class="gold-n${goldShown() === p.gold ? "" : p.gold > hudShot.goldFrom ? " up" : " down"}">${fmt(goldShown())}</span> <small class="${p.falling ? "down" : ""}">${p.perMonth >= 0 ? "+" : ""}${p.perMonth.toFixed(1)}</small><i ${shotClass("gold-pop", p.gold > hudShot.goldFrom ? "up" : "down", hudShot.goldAt, 600)} aria-hidden="true">${icon("coin", 1)}</i></button>`;
         case "stability":
           return stabilityPlaque(s.stability!, me, s.revolution);
         case "war":
           return `<button class="plaque at-war" data-realm="${me}"${open(p.opens)} data-war-focus title="Your wars: your side's peace voices, amber past a third, red past half">${icon("swords", 1)}At war${warPlaqueBars(myWarsRaw(), me)}</button>`;
         case "dispatches":
-          return `<button class="plaque dispatches${p.urgent ? " urgent" : ""}" data-news title="News: everything that happened, newest first">${icon("scroll", 1)}${p.count || ""}</button>`;
+          return `<button ${shotClass(`plaque dispatches${p.urgent ? " urgent" : ""}`, "bounce", hudShot.unreadAt, 300)} data-news title="News: everything that happened, newest first">${icon("scroll", 1)}${p.count || ""}</button>`;
       }
     })
     .join("\n    ");
@@ -3055,23 +3108,93 @@ function playMoments(before: Snapshot | null, next: Snapshot): void {
     if (sx < -40 || sy < -40 || sx > view.width + 40 || sy > view.height + 40) continue;
     const colour = m.nation >= 0 ? nations[m.nation]!.color : PALETTE.paper;
     particles.moment(m.kind, p.x!, p.y!, momentParticles(m.kind, animations), momentSeconds(m.kind), colour);
+    momentUntil = Math.max(momentUntil, performance.now() + momentSeconds(m.kind) * 1000);
   }
   if (particles.count) view.invalidate();
 }
 
-/** Moves the particles on to now and draws them, asking for the next frame at the effects' frame rate while any live. */
+/** Moves the particles on to now and draws them, asking for the next frame while any live: at the effects' frame rate during a moment, slower for the looping ones. */
 function drawParticles(o: OverlayContext): void {
   const now = performance.now();
   // A long gap (the tab hidden, the map idle) is not played out: the particles go on from where they were.
   particles.step(Math.min(0.1, Math.max(0, (now - (particleClock || now)) / 1000)));
   particleClock = now;
+  if (now - lastEmit >= EFFECTS.emitMs) {
+    lastEmit = now;
+    if (loopingEffects(animationsPref(), batteryOn()) && momentsShown(o.zoom)) emitLoops(o);
+  }
   if (!particles.count) {
     particleClock = 0;
     return;
   }
   // In art pixels a little bigger than the tokens', so a moment reads at arm's length, and the living band's close in (VIEW-102).
   particles.draw(o.ctx, o.toScreen, Math.max(3, Math.round(o.zoom / 8)), o.width, o.height);
-  if (!particleTick) particleTick = setTimeout(() => ((particleTick = 0), view.invalidate()), 1000 / EFFECTS.frameRate);
+  const rate = now < momentUntil ? EFFECTS.frameRate : EFFECTS.loopFrameRate;
+  if (!particleTick) particleTick = setTimeout(() => ((particleTick = 0), view.invalidate()), 1000 / rate);
+}
+
+/** The province temperatures this week, °C, from the season bytes the map is drawn with (seasonBytes). */
+let seasonNow: Uint8Array | null = null;
+const celsiusOf = (p: number) => (seasonNow ? (seasonNow[p * 4]! / 255) * 127.5 - 60 : 10);
+/** When the looping emitters last ran, and until when a moment keeps the particles at full frame rate. */
+let lastEmit = 0;
+let momentUntil = 0;
+
+/**
+ * The living world's looping effects (VIEW-146..VIEW-149), a few particles
+ * at a time on what is on screen: smoke from the towns' chimneys close in,
+ * riot smoke over risings, snow over provinces below freezing, and now and
+ * then a flock of birds. Each kind keeps under its own cap.
+ */
+function emitLoops(o: OverlayContext): void {
+  if (!snapshot) return;
+  const r = Math.random;
+  const pad = 40;
+  const on = (x: number, y: number) => {
+    const [sx, sy] = o.toScreen(x, y);
+    return sx > -pad && sy > -pad && sx < o.width + pad && sy < o.height + pad;
+  };
+  const W = view.map.width;
+  // Chimney smoke, close in, from the towns on screen.
+  if (chimneysShown(o.zoom) && townLayer && particles.countOf(Shape.Smoke) < EFFECTS.chimneys.maxPuffs)
+    for (let p = 0; p < provinces.length; p++) {
+      const at = provinces[p]!;
+      if (at.x === undefined || !on(at.x, at.y!) || !isKnown(p)) continue;
+      for (const t of townLayer.chimneys(p)) {
+        if (r() > EFFECTS.chimneys.puffChance) continue;
+        particles.add(Shape.Smoke, (t % W) + 0.5, Math.floor(t / W) + 0.3, 0, -2, r() * 2 - 1, -4 - r() * 3, 2 + r(), r() < 0.5 ? PALETTE.mist : PALETTE.steel);
+      }
+    }
+  // A thicker dark column over each standing rising.
+  for (const rising of snapshot.rebels.risings) {
+    const at = provinces[rising.location]!;
+    if (!isKnown(rising.location) || !on(at.x!, at.y!) || r() > 0.6) continue;
+    particles.add(Shape.Smoke, at.x!, at.y!, r() * 4 - 2, -3, r() * 2 - 1, -7 - r() * 4, 2.5, r() < 0.5 ? PALETTE.slate : PALETTE.ink);
+  }
+  // Snow over the provinces on screen below freezing, falling a short way and gone.
+  if (seasonNow && particles.countOf(Shape.Snow) < EFFECTS.snow.maxFlakes)
+    for (let k = 0; k < EFFECTS.snow.perEmit; k++) {
+      const sx = r() * o.width;
+      const sy = r() * o.height;
+      const p = view.provinceAt(sx, sy);
+      if (p < 0 || isWater[p] || !snowing(celsiusOf(p))) continue;
+      const [mx, my] = view.toMap(sx, sy);
+      particles.add(Shape.Snow, mx, my, 0, -12, 0, 6 + r() * 3, 2 + r(), PALETTE.paper);
+    }
+  // Now and then a flock crosses the land; gulls, white, by the coast.
+  if (particles.countOf(Shape.Bird) === 0 && r() < EFFECTS.birds.chance) {
+    const sx = o.width * (0.2 + r() * 0.6);
+    const sy = o.height * (0.2 + r() * 0.6);
+    const p = view.provinceAt(sx, sy);
+    if (p >= 0 && !isWater[p]) {
+      const [mx, my] = view.toMap(sx, sy);
+      const dir = r() < 0.5 ? -1 : 1;
+      const n = EFFECTS.birds.flockMin + Math.floor(r() * (EFFECTS.birds.flockMax - EFFECTS.birds.flockMin + 1));
+      const colour = provinces[p]!.coastal ? PALETTE.paper : PALETTE.ink;
+      // In a loose V behind the leader.
+      for (let k = 0; k < n; k++) particles.add(Shape.Bird, mx, my, -dir * k * 4 + r() * 2, (k % 2 ? 1 : -1) * Math.ceil(k / 2) * 2, dir * 16, -1 + r() * 2, 7, colour);
+    }
+  }
 }
 
 /** Takes in a fresh snapshot's map state. */
@@ -3254,9 +3377,12 @@ function logNews(s: Snapshot): void {
 /** The player's revolution's choice card while it waits on a stance (REVO-091): it cannot be folded away. */
 function renderRevolutionCard(): void {
   const v = snapshot?.revolution;
+  const opening = revolutionCard.hidden;
   revolutionCard.hidden = !v?.outbreak;
   if (!v?.outbreak) return;
   revolutionCard.innerHTML = revolutionCardHtml(v, nations[snapshot!.playerNation]!.name);
+  // The card unrolls when it first shows, not on each re-render (SHELL-176).
+  if (opening) revolutionCard.firstElementChild!.classList.add("unroll");
   revolutionCard.querySelectorAll<HTMLButtonElement>("[data-revolution-stance]").forEach((b) =>
     b.addEventListener("click", async () => {
       await act({ type: "answerRevolution", stance: b.dataset.revolutionStance as "lead" | "bend" | "fight" });
@@ -7612,6 +7738,7 @@ overlay.addEventListener("click", (e) => {
 /** Settings apply at once (SET-003): text size, the map's battery knobs, and the cards that show them. */
 function applyPrefs(): void {
   document.documentElement.style.setProperty("--text-zoom", String(textZoom()));
+  document.documentElement.dataset.animations = animationsPref().toLowerCase();
   view?.setPower(mapPower());
   if (!soundMenu.hidden) renderSoundMenu();
   renderSoundButton();
@@ -7676,6 +7803,11 @@ Object.assign(globalThis, {
     newsView = false;
     panelCollapsed = false;
     renderPanel();
+  },
+  /** Stages this temperature, °C, in every province for the snow until the next week: winter takes months of play (scripts/effects-shots.mjs). */
+  __phStageCelsius: (c: number) => {
+    seasonNow = new Uint8Array(provinces.length * 4);
+    for (let i = 0; i < provinces.length; i++) seasonBytes(seasonNow, i, c, 0, 0, 0);
   },
   /** Plays a map moment at province p, in a realm's colour: the things that cause one take a war or years of play (scripts/effects-shots.mjs). */
   __phMoment: (kind: MomentKind, p: number, nation = snapshot?.playerNation ?? 0) => {

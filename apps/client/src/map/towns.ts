@@ -1,7 +1,7 @@
 import type { Ruleset } from "@ph/rules";
 import { FAITH_FAMILY, LandGridScan, SLOTS, WORKS, type LandGrid, type Snapshot } from "@ph/engine";
 import {
-  hamletCount, hamletSpots, keepsRoad, LIVING_MAP, roadLines, settlementByte, townCellKinds, townCells, townFootprint, townGrowthOrder, townPeopleThousands, townPlan,
+  chimneyCount, hamletCount, hamletSpots, keepsRoad, LIVING_MAP, roadLines, settlementByte, townCellKinds, townCells, townFootprint, townGrowthOrder, townPeopleThousands, townPlan,
   worksSpot, neighbours4, roadPath, berthSpots, type CellKind, type RoadLine, type TownPlan,
 } from "@ph/engine/domain/map-presentation";
 import type { MapImage } from "./loadMap.ts";
@@ -22,6 +22,8 @@ import type { MapImage } from "./loadMap.ts";
 
 const WORK = Object.fromEntries(WORKS.map((w, i) => [w, i])) as Record<string, number>;
 const WORSHIP = LIVING_MAP.worshipVariant as Record<string, number>;
+/** The town's core: packed houses and the special cells taken from it (VIEW-107, VIEW-109). */
+const CORE = new Set<CellKind>(["core", "keep", "market", "worship", "drill yard", "landmark"]);
 
 interface ProvinceTown {
   /** What it was worked out from; a change of key redoes it. */
@@ -30,6 +32,8 @@ interface ProvinceTown {
   hamlets: number[];
   /** Where its hulls lie in port, worked out when first asked for (VIEW-122). */
   berths?: number[];
+  /** Its smoking chimneys, worked out when first asked for (VIEW-146). */
+  chimneys?: number[];
 }
 
 /** Per province: walls (0 none, 1 palisade, 2 stone), road grade, worship variant, and the town style (VIEW-110, VIEW-113, VIEW-131). */
@@ -103,6 +107,18 @@ export class TownLayer {
       town.berths = berthSpots(this.grid, [...docks, ...cells.map(([t]) => t).filter((t) => !docks.includes(t))]);
     }
     return town.berths;
+  }
+
+  /** A town's smoking chimneys, as map pixels of its core spread from the seed outwards; empty until its town is laid (VIEW-146). */
+  chimneys(p: number): number[] {
+    const town = this.towns.get(p);
+    if (!town) return [];
+    if (!town.chimneys) {
+      const core = [...town.tiles].filter(([, k]) => CORE.has(k)).map(([t]) => t);
+      const n = chimneyCount(core.length);
+      town.chimneys = Array.from({ length: n }, (_, i) => core[Math.floor((i * core.length) / n)]!);
+    }
+    return town.chimneys;
   }
 
   /** The box of map pixels whose byte changed since the last call, or null. */

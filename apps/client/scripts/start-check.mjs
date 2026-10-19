@@ -43,7 +43,7 @@ async function play(device, tag, query, nation, firstWeek) {
   await page.waitForTimeout(1500);
   await page.screenshot({ path: `${out}/${tag}-start.png` });
   await page.click(".end-turn");
-  await page.waitForSelector(`.turn-label:text('${firstWeek}')`, { timeout: 90000 });
+  await page.waitForSelector(`.turn-label .day:text('${firstWeek}')`, { timeout: 90000 });
   await page.screenshot({ path: `${out}/${tag}-week.png` });
   console.log(`PASS ${tag}: one week as ${nation} (${d.engineMode})`);
   await context.close();
