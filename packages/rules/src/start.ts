@@ -18,6 +18,7 @@ import rulers1378 from "../data/scenarios/1378/rulers.json" with { type: "json" 
 import subjects1378 from "../data/scenarios/1378/subjects.json" with { type: "json" };
 import subjectsRulers1378 from "../data/scenarios/1378/subjects-rulers.json" with { type: "json" };
 import goals1378 from "../data/scenarios/1378/goals.json" with { type: "json" };
+import lords1378 from "../data/scenarios/1378/lords.json" with { type: "json" };
 import mapNations1378 from "../data/scenarios/1378/map-nations.json" with { type: "json" };
 import mapToCatalogue1378 from "../data/scenarios/1378/map-to-catalogue.json" with { type: "json" };
 import map1378 from "../data/scenarios/1378/world/map.json" with { type: "json" };
@@ -34,7 +35,7 @@ import worldMap from "../data/domain/world-map.json" with { type: "json" };
 import realm from "../data/domain/realm.json" with { type: "json" };
 import religion from "../data/domain/religion.json" with { type: "json" };
 import institutions from "../data/domain/institutions.json" with { type: "json" };
-import type { GameDate, GoalDef } from "./types.ts";
+import type { GameDate, GoalDef, HistoricalLords } from "./types.ts";
 
 /** The bundled start (X-25): new campaigns start on 20 September 1378. */
 export const DEFAULT_START = "1378";
@@ -97,6 +98,9 @@ export const startSubjectsRulers = (is1378 ? subjectsRulers1378 : subjectsRulers
 
 /** Realms' historical goals on the start day (EVT-100); the 1444 start has none. */
 export const startGoals: readonly GoalDef[] = (is1378 ? goals1378 : goals1444).goals as unknown as GoalDef[];
+
+/** Historical lords seated on the start day and the figures events may bring in later (REALM-280); the 1444 start has none. */
+export const startLords: HistoricalLords = is1378 ? (lords1378 as unknown as HistoricalLords) : { realms: {}, later: {} };
 
 /** The generated map of the start (tools/mapgen): image metadata, nations, provinces and sleeping realms. */
 export const startWorld = {

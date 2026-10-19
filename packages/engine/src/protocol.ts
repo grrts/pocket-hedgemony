@@ -56,7 +56,7 @@ import { realmResearch, researchView, type ResearchView } from "./research.ts";
 import { lordAge, officialAge } from "./people.ts";
 import { autoFillReserve, autoFills, fillAllCost, fitHires, newLands, officialAt, yearsServed } from "./officials.ts";
 import { armyPay, armyRations, ARMS, menByArm, companyMen, companyPay, companyWeeks, freeCompaniesFor, type FreeCompany, nationPay, OFFICIALS, daysToGather, gatherDays, garrisonViews, trainingGrounds, type GarrisonView } from "./recruit.ts";
-import { warPeaceView, type WarPeaceView } from "./peace.ts";
+import { lordTraits, warPeaceView, type WarPeaceView } from "./peace.ts";
 import { subjectTies } from "./subjects.ts";
 
 /** A free company as the UI shows it: men by arm, only the arms it has. */
@@ -249,7 +249,7 @@ export interface Snapshot {
   moods: readonly string[];
   /** Every lord (index = provinceLord's value): name, house, realm, loyalty and provinces held; the gold a gift costs. */
   /** Lords by index; age, heir and gone for REALM-273 (a gone lord's line died out and he is listed nowhere). */
-  lords: { name: string; house: string; nation: number; loyalty: string; lands: number; age: number; heir: { name: string; age: number } | null; gone: boolean; /** The chance an assassin sent after him succeeds (REALM-281). */ assassinChance: number }[];
+  lords: { name: string; house: string; nation: number; loyalty: string; lands: number; age: number; heir: { name: string; age: number } | null; gone: boolean; /** The chance an assassin sent after him succeeds (REALM-281). */ assassinChance: number; traits: string[]; title?: string; note?: string; historical?: boolean }[];
   provinceLord: Int16Array;
   /** The player's lords' retinues (WAR-252 to WAR-262): what each would bring, gathering or in the field (army = index in armies, -1), and why he can't be called. */
   retinues: { lord: number; state: RetinueState; wouldBring: number; atHome: number; cap: number; gathering?: { men: number; days: number }; army: number; seat: number; refusal: string | null; leavesAfter: number | null }[];
@@ -553,7 +553,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       lords: (() => {
         const lands = new Int32Array(w.lords.length);
         for (let p = 0; p < w.provinceCount; p++) if (w.provinceLord[p]! >= 0) lands[w.provinceLord[p]!]!++;
-        return w.lords.map((l, k) => ({ name: l.name, house: l.house, nation: l.nation, loyalty: l.loyalty, lands: lands[k]!, ...lordAge(w, k), gone: !!l.gone, assassinChance: assassinationChance({ provinces: new Array<string>(lands[k]!) }) }));
+        return w.lords.map((l, k) => ({ name: l.name, house: l.house, nation: l.nation, loyalty: l.loyalty, lands: lands[k]!, ...lordAge(w, k), gone: !!l.gone, assassinChance: assassinationChance({ provinces: new Array<string>(lands[k]!) }), traits: lordTraits(w, k), ...(l.title ? { title: l.title } : {}), ...(l.historical ? { note: l.note ?? "", historical: true } : {}) }));
       })(),
       provinceLord: w.provinceLord.slice(),
       nationOverlord: (() => {

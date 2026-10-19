@@ -7,7 +7,7 @@ import { regentOf, rulerLabel, yearlyRulers } from "./rulers.ts";
 import { rulerDies } from "./crowns.ts";
 import { hireGold, officialAt, OFFICIALS } from "./officials.ts";
 import { realmTitles } from "./government.ts";
-import { lordOfCommander } from "./lords.ts";
+import { lordOfCommander, newHolder } from "./lords.ts";
 
 /**
  * People in play (REALM-270 to REALM-279): every person the game names, the
@@ -162,6 +162,7 @@ function lordDies(world: World, k: number, d: Omit<PersonDeath, "who">, news: Ne
     l.heir = null;
     l.upCredit = 0;
     delete l.traits;
+    newHolder(l);
     if (n === world.player) news.push({ kind: "ruler", text: `${d.name}, ${title} of the house of ${l.house}, ${how(d.cause, d.age)}. His ${heir === son ? "heir" : "kinsman"} ${l.name}, ${l.age}, holds his lands now.`, nations: [n] });
   } else {
     l.gone = true;
