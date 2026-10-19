@@ -26,7 +26,7 @@ export { CHANGES, type ChangeName, type ChangeRow } from "./conversion.ts";
 export { castleCap, FOOD_SETTINGS, foodView, mapNetwork, reachOf, setFood, setFoodPreset, shareFood, SURPLUS_RULES, type CastleView, type FoodView } from "./castleFood.ts";
 export { capsOf, formOf, governmentView, realmTitles, type GovernmentView, type NextFormView } from "./government.ts";
 export { titlesFor, type Titles } from "./domain/realm/index.ts";
-export { TRADER_KINDS, traderKindName, type FoundOption, type GameTraderKind, type KindRow, type RouteEstimate, type TradeView, type TraderView, type TraderWalk } from "./trade.ts";
+export { TRADER_KINDS, traderKindName, type FoundOption, type GameTraderKind, type KindRow, type RouteEstimate, type RouteSuggestion, type TradeFeedItem, type TradeView, type TraderView, type TraderWalk } from "./trade.ts";
 export { tradeSeen, traderWalks } from "./trade.ts";
 export { FAITH_FAMILY, FAITH_IDS, FAITH_POLICIES, faithLine, faithName, NO_FAITH, NO_TONGUE, peoplesDataOf, peoplesView, SLOTS, TONGUE_FAMILY, TONGUE_IDS, TONGUE_POLICIES, tongueLine, tongueName, type FaithRow, type PeoplesSnapshot, type PeoplesView, type TongueLine, type TongueRow } from "./peoples.ts";
 export { censurePreview, faithBadge, faithHeadsView, headCard, type FaithHeadsView, type HeadCard } from "./faithHeads.ts";

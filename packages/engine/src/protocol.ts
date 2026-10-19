@@ -11,7 +11,7 @@ import { giftGold } from "./lords.ts";
 import { stabilityOf, type Stability } from "./stability.ts";
 import { governmentView, realmForms, realmTitles, type GovernmentView } from "./government.ts";
 import type { Titles } from "./domain/realm/index.ts";
-import { goodsOf, kindRow, TRADER_KINDS, tradeSeen, traderWalks, tradeValueAt, tradeView, type KindRow, type TradeView, type TraderWalk } from "./trade.ts";
+import { goodsOf, kindRow, TRADER_KINDS, tradeSeen, traderWalks, tradeValueAt, tradeView, type KindRow, type TradeFeedItem, type TradeView, type TraderWalk } from "./trade.ts";
 import { LIVING_MAP } from "./domain/map-presentation/livingMap.ts";
 import { rebelsView, type RebelsView } from "./rebels.ts";
 import { revolutionView, type RevolutionView } from "./revolutions.ts";
@@ -255,6 +255,8 @@ export interface Snapshot {
   provinceTradeSeen: Uint8Array;
   /** The traders the player may see, where the daily walk has them, for the living map (VIEW-132). */
   traderWalks: TraderWalk[];
+  /** The player's traders' collections and deposits since the last snapshot, oldest first, for the map to show (TRADE-152). */
+  tradeFeed: TradeFeedItem[];
   /** What each province the player sees trades: its goods, most gold first, with loads a year and gold a month. */
   provinceGoods: Record<number, { ware: string; loads: number; gold: number }[]>;
   /** Tongues and faiths of every province and realm; the UI reads them with peoples.ts (tongueLine, faithLine, peoplesView). */
@@ -514,6 +516,8 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       realmTitles: realmTitles(w),
       trade: player >= 0 ? tradeView(w, player) : null,
       traderKinds: TRADER_KINDS.map((k) => kindRow(w, k)),
+      // Read once: the next snapshot carries only what came after.
+      tradeFeed: w.tradeFeed.splice(0),
       provinceTradeValue: Float32Array.from({ length: w.provinceCount }, (_, p) => tradeValueAt(w, p)),
       provinceTradeRatio: Uint8Array.from(w.provinceTradeRatio, (r) => Math.round(r)),
       provinceTradePassing: Uint8Array.from(w.provincePassed, (x) => Math.min(255, Math.round(x))),

@@ -11,7 +11,7 @@ import { workIndex, WORK_COUNT, worksAt } from "../src/works.ts";
 import { tradeConfig } from "../src/domain/trade/index.ts";
 import {
   bestRoute, dismissTrader, draftTradeRoute, estimateLoop, foundProblem, foundTrader, isTradeStop, kindRow, loopPath, monthlyTrade, provinceWares, refreshTradeValues,
-  routeProblem, setTradeRoute, startCount, tradeDay, tradeLine, tradeSeen, traderWalks, tradeTaxFactor, tradeValueAt, tradeView, warePrice,
+  routeOptions, routeProblem, setTradeRoute, startCount, suggestRoutes, tradeDay, tradeLine, tradeSeen, traderWalks, tradeTaxFactor, tradeValueAt, tradeView, warePrice,
 } from "../src/trade.ts";
 
 const rules = loadDefaultRuleset();
@@ -299,5 +299,122 @@ describe("traders walk a day at a time (TRADE-132, VIEW-132)", () => {
     expect(mine.to).toBe(t.path[(t.at + 1) % t.path.length]);
     expect(traderWalks(w, fra, 3)).toHaveLength(3);
     expect(traderWalks(w, -1, 100000)).toHaveLength(w.traders.length);
+  });
+});
+
+describe("following and steering a trader (TRADE-146 to TRADE-152)", () => {
+  const fra = (w: World) => nation(w, "france");
+
+  it("estimates what a route brings within a fifth of what its trader deposits over a year (TRADE-147)", () => {
+    const x = createWorld(rules, 1, tiles);
+    x.player = fra(x);
+    let got = 0, est = 0;
+    let month = x.date.month;
+    for (let k = 0; k < 52; k++) {
+      processTurn(x, [], -1);
+      if (x.date.month === month) continue;
+      month = x.date.month;
+      for (const t of tradeView(x, fra(x)).traders) ((got += t.lastMonth), (est += t.expected));
+    }
+    expect(got).toBeGreaterThan(0);
+    expect(Math.abs(est - got) / got).toBeLessThan(0.2);
+  });
+
+  it("carries no more than a purse between deposits, so a long loop brings less than its collections (TRADE-147)", () => {
+    const x = createWorld(rules, 1, tiles);
+    const n = fra(x);
+    const t = x.traders.find((y) => y.owner === n && y.kind === "pack_caravan")!;
+    const path = loopPath(x, n, t.kind, t.stops)!;
+    const e = estimateLoop(x, n, t.kind, path, 0, path);
+    const months = e.loopDays / x.rules.defines.march.daysPerMonth;
+    // Never more than a purse each deposit.
+    expect(e.expected * months).toBeLessThanOrEqual(kindRow(x, t.kind).purse * e.deposits + 1e-9);
+  });
+
+  it("shows where a trader is going and where its gold came from on its last trip (TRADE-146)", () => {
+    const x = createWorld(rules, 1, tiles);
+    x.player = fra(x);
+    for (let k = 0; k < 12; k++) processTurn(x, [], -1);
+    const v = tradeView(x, fra(x));
+    const t = v.traders.find((y) => y.stops.length >= 2 && y.sourcesTrip === "last")!;
+    expect(t.stops).toContain(t.heading);
+    expect(t.headingDays).toBeGreaterThanOrEqual(t.nextDays);
+    expect(t.path).toContain(t.next);
+    expect(t.sources.length).toBeGreaterThan(0);
+    for (let i = 1; i < t.sources.length; i++) expect(t.sources[i - 1]!.gold).toBeGreaterThanOrEqual(t.sources[i]!.gold);
+    for (const s of t.sources) expect(t.path).toContain(s.province);
+  });
+
+  it("offers better routes worth at least a fifth and 0.2 gold more, from the start or home, and Use sets one (TRADE-148)", () => {
+    const x = createWorld(rules, 1, tiles);
+    const n = fra(x);
+    x.player = n;
+    const views = tradeView(x, n).traders;
+    const tv = views.find((y) => y.better.length > 0)!;
+    expect(tv).toBeDefined();
+    for (const b of tv.better) {
+      expect(b.gain).toBeGreaterThanOrEqual(tradeConfig.game.suggest.min_gain);
+      expect(b.expected).toBeGreaterThanOrEqual(tv.expected * (1 + tradeConfig.game.suggest.min_gain_share) - 1e-9);
+      expect([tv.stops[0], tv.home]).toContain(b.stops[0]);
+      expect(b.stops.join()).not.toBe(tv.stops.join());
+    }
+    expect(tv.better.length).toBeLessThanOrEqual(tradeConfig.game.suggest.count);
+    const t = x.traders.find((y) => y.id === tv.id)!;
+    // Looking at suggestions changes nothing in the game.
+    const before = hashWorld(x);
+    suggestRoutes(x, t, tv.expected);
+    expect(hashWorld(x)).toBe(before);
+    expect(setTradeRoute(x, n, t.id, tv.better[0]!.stops)).toBeNull();
+    const now = tradeView(x, n).traders.find((y) => y.id === t.id)!;
+    expect(now.expected).toBeGreaterThan(tv.expected);
+  });
+
+  it("while a route is chosen, gives each city it could go to from its start its estimate, best first (TRADE-149)", () => {
+    const x = createWorld(rules, 1, tiles);
+    const n = fra(x);
+    x.player = n;
+    const t = x.traders.find((y) => y.owner === n && y.kind === "pack_caravan")!;
+    expect(draftTradeRoute(x, n, t.id, [t.stops[0]!])).toBeNull();
+    const d = tradeView(x, n).draft!;
+    expect(d.options.length).toBeGreaterThan(0);
+    expect(d.options.length).toBeLessThanOrEqual(tradeConfig.game.suggest.draft_options);
+    for (let i = 1; i < d.options.length; i++) expect(d.options[i - 1]!.expected).toBeGreaterThanOrEqual(d.options[i]!.expected);
+    expect(d.options.map((o) => o.city)).toEqual(routeOptions(x, n, t.kind, t.stops[0]!, 0, t.path).slice(0, d.options.length).map((o) => o.stops[1]));
+  });
+
+  it("sums the realm's trade: gold on the road, this month so far and where the gold comes from (TRADE-150)", () => {
+    const x = createWorld(rules, 1, tiles);
+    const n = fra(x);
+    x.player = n;
+    for (let k = 0; k < 12; k++) processTurn(x, [], -1);
+    const v = tradeView(x, n);
+    expect(v.onRoad).toBeCloseTo(x.traders.filter((t) => t.owner === n).reduce((a, t) => a + t.purse, 0), 9);
+    expect(v.depositsNow).toBe(x.nationTradeNow[n * 2]);
+    expect(v.sources.length).toBeGreaterThan(0);
+    expect(v.sourcesTotal).toBeGreaterThanOrEqual(v.sources.reduce((a, s) => a + s.gold, 0) - 1e-9);
+  });
+
+  it("tells the map of each collection and deposit of the player's traders, once (TRADE-152)", () => {
+    const x = createWorld(rules, 1, tiles);
+    x.player = fra(x);
+    x.tradeFeed = [];
+    for (let d = 0; d < 30; d++) tradeDay(x);
+    expect(x.tradeFeed.some((f) => f.deposit)).toBe(true);
+    expect(x.tradeFeed.some((f) => !f.deposit)).toBe(true);
+    const mine = new Set(x.traders.filter((t) => t.owner === x.player).map((t) => t.id));
+    for (const f of x.tradeFeed) {
+      expect(mine.has(f.trader)).toBe(true);
+      expect(f.gold).toBeGreaterThan(0);
+    }
+    expect(x.tradeFeed.length).toBeLessThanOrEqual(tradeConfig.game.feed_max);
+  });
+
+  it("keeps where each trader's gold came from in a save (TRADE-146)", () => {
+    const x = createWorld(rules, 1, tiles);
+    for (let k = 0; k < 8; k++) processTurn(x, [], -1);
+    const chunks = worldChunks(x, { playerNation: "france", options: {} as never });
+    const back = restoreWorld(new Map(chunks.map((c) => [c.id, c])), rules, {}, tiles).world;
+    expect(back.traders.map((t) => t.srcLast)).toEqual(x.traders.map((t) => t.srcLast));
+    expect(Array.from(back.provinceVisitsLast)).toEqual(Array.from(x.provinceVisitsLast));
   });
 });

@@ -642,6 +642,14 @@
     "ai_candidates": 8,
     "ai_max_traders_per_start": 2,
     "ai_found_reserve": 3,
-    "ai_keep_route_over_upkeep": 4
+    "ai_keep_route_over_upkeep": 4,
+    "suggest": {
+      "$comment": "Better routes offered on a trader's card (trade rework, 19 October): at most count, each worth at least min_gain_share more than the route now and min_gain gold a month more; while a route is chosen, up to draft_options cities it could go to carry their estimate on the map.",
+      "count": 3,
+      "min_gain_share": 0.2,
+      "min_gain": 0.2,
+      "draft_options": 12
+    },
+    "feed_max": 256
   }
 }
