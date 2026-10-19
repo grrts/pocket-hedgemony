@@ -54,7 +54,7 @@ A yes pays the tribe, gives up the ground (the tribe may not claim it again for 
 
 ## The Hunting grounds tab
 
-A tribal realm's card has a **Hunting grounds** tab in the Lands group, beside Colonies: settlers on your grounds at the top in red with Go there, asks for your land, "Hunting grounds n of m" with a bar, the claim under way and its end date, then one row per ground with its people, years held and furs, a ground ready to take in first. The General tab carries one line, "Hunting grounds n of m · furs x gold a month", that opens it.
+A tribal realm's card has a **Hunting grounds** tab in the Lands group, beside Colonies: settlers on your grounds at the top in red with Go there, asks for your land, "Hunting grounds n of m" with a bar, the claim under way and its end date, then one row per ground with its people, years held and furs, a ground ready to take in first. When settlers or asks wait, the Lands tile on your Realm book's Overview turns red and opens it.
 
 On the map, grounds are a light diagonal hatch in the tribe's colour at every zoom, in the political and Charts lenses. In the Charts lens an empty coast that is someone's hunting ground is amber, not green, so you see before sailing that settling there angers a tribe.
 

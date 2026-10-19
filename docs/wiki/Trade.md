@@ -281,11 +281,11 @@ Trade runs in the game as a first slice: traders you own walk there and back bet
 
 Where you find it:
 
-- **The Trade tab** of your realm card, next to Treasury: last month's deposits, fees and upkeep; your traders, best first, each with its route ("Paris → Lyon and back"), its days there and back, a purse bar, about what it brings a month, what it deposited last month and what is wrong, with **Route**, **Show** and **Dismiss**; **Found a trader** in each of your cities that can, one button per kind with its gold and upkeep (greyed with the reason when it can't); and your **busiest cities**.
+- **The Trade tab** of your realm card, next to Treasury: last month's deposits, fees and upkeep; your traders, best first, each with its route ("Paris → Lyon and back"), its days there and back, a purse bar, about what it brings a month, what it deposited last month and what is wrong, with **Route**, **Show** and **Dismiss**; then two folds you open with a tap: **Found a trader** (its line says how many cities can; it starts open while you have no trader), with one button per kind with its gold and upkeep in each city, greyed with the reason when it can't; and **Busiest cities** (its line names the busiest).
 - **Setting a route**: tap **Route** on a trader. The map switches to the Trade map mode and a bar along the bottom asks you to tap where it starts, then where it goes; a third city moves where it goes. You never draw the way: it is found through the most populated land and drawn on the map, with the preview (days there and back, provinces collected in, about how much a month, the best provinces). Then **Confirm** (or tap the end again), **Undo** or **Cancel**.
 - **The Trade map mode**: provinces coloured by trade ratio, what you don't see in parchment; zoomed in, your traders' ways there and back as dotted lines with each trader and its purse, and a coin on every trade stop.
 - **The province card** has a Trade line: value a month, ratio, traders passing and its top goods.
-- **The General tab** has one line, "Trade: N traders · +x gold a month", that opens the Trade tab.
+- **The Overview** of your Realm book has an Economy tile with your gold and gold a month; the Trade page sits beside Treasury and Food in the Economy section.
 
 Not yet: tolls, trade pacts and embargoes, bandits and capture on the road, lords' traders, ships other than the cog, copying a route and the "once" mode.
 

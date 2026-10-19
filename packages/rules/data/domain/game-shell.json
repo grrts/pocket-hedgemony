@@ -354,6 +354,15 @@
       "Peoples"
     ]
   },
+  "realmOverview": {
+    "tiles": [
+      "Economy",
+      "Lands",
+      "Military",
+      "Diplomacy",
+      "Research"
+    ]
+  },
   "attention": {
     "famine in a province within two months": {
       "group": "Warnings",

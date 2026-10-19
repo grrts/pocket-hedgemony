@@ -7,6 +7,9 @@ import {
   ACTIONS,
   REALM_BOOK_TABS,
   sectionOf,
+  realmOverview,
+  type OverviewInput,
+  type OverviewTile,
   SHELL,
   addBookSection,
   adCard,
@@ -222,7 +225,7 @@ import {
   watchedBattleEnds,
   type Tracked,
 } from "@ph/engine/domain/game-shell";
-import { steps, type Scenario } from "../src/registry.ts";
+import { steps, type Scenario, type Table } from "../src/registry.ts";
 
 const { Given, When, Then } = steps("game-shell");
 
@@ -3654,4 +3657,55 @@ Then("each page of the Realm book sits in exactly one section", () => {
 
 Then("the page {string} sits in the section {string}", (_s, page: string, section: string) => {
   expect(sectionOf(page)).toBe(section);
+});
+
+// The Realm overview (SHELL-170, SHELL-171)
+
+const OVERVIEW_BASE: OverviewInput = { gold: 0, perMonth: 0, hungry: 0, low: 0, provinces: 1, people: 0, newLands: 0, risings: 0, verdicts: 0, huntWaits: 0, armies: 0, men: 0, fleets: 0, wars: 0, allies: 0, subjects: 0, answerWaits: false, study: { name: "Plough", pct: 10 }, beliefLow: false };
+
+Given("the realm stands as:", (s, table: Table) => {
+  const v: OverviewInput = { ...OVERVIEW_BASE };
+  for (const [key, value] of table) {
+    if (key === "study") {
+      const [name, pct] = value!.split(",").map((x) => x.trim());
+      v.study = value === "none" ? null : { name: name!, pct: Number(pct) };
+    } else if (key === "answerWaits" || key === "beliefLow") v[key] = value === "1";
+    else (v as unknown as Record<string, number>)[key!] = Number(value);
+  }
+  s.overviewInput = v;
+});
+
+When("the player opens the Realm book's Overview", (s) => {
+  s.tiles = realmOverview(s.overviewInput as OverviewInput);
+});
+
+const overviewTile = (s: Scenario, section: string): OverviewTile => {
+  const t = (s.tiles as OverviewTile[]).find((x) => x.section === section);
+  expect(t, section).toBeDefined();
+  return t!;
+};
+
+Then("the overview tiles are {string}", (s, list: string) => {
+  expect((s.tiles as OverviewTile[]).map((t) => t.section)).toEqual(list.split(", "));
+  for (const t of s.tiles as OverviewTile[]) expect(REALM_BOOK_TABS).toContain(t.section);
+});
+
+Then("the tile {string} reads {string} with the note {string}", (s, section: string, line: string, note: string) => {
+  const t = overviewTile(s, section);
+  expect(t.line).toBe(line);
+  expect(t.note).toBe(note);
+});
+
+Then("no tile is marked", (s) => {
+  expect((s.tiles as OverviewTile[]).filter((t) => t.needs)).toEqual([]);
+});
+
+Then("the tile {string} is marked {string}", (s, section: string, needs: string) => {
+  expect(overviewTile(s, section).needs).toBe(needs);
+});
+
+Then("tapping the tile {string} opens the page {string}", (s, section: string, page: string) => {
+  const t = overviewTile(s, section);
+  expect(t.page).toBe(page);
+  expect(sectionOf(t.page)).toBe(section);
 });

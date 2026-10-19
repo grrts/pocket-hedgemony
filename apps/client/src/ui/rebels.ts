@@ -107,10 +107,3 @@ export function risingsOverview(v: RebelsView, me: number, name: (p: number) => 
   return `<h3 class="sub">Uprisings</h3><div class="risings">${[...verdicts, ...rows].join("")}</div>`;
 }
 
-/** The General tab's line: risings and verdicts, opening the Provinces tab. */
-export function risingsLine(v: RebelsView, me: number): string {
-  const n = v.risings.filter((r) => r.owner === me).length;
-  if (!n && !v.verdicts.length) return "";
-  const what = [n ? plural(n, "uprising") : "", v.verdicts.length ? `${v.verdicts.length} beaten, waiting on you` : ""].filter(Boolean).join(" · ");
-  return `<dt>Uprisings</dt><dd><button class="paper over" data-realm-open-tab="provinces" title="Open the Provinces tab">${icon("swords", 1)}${what}</button></dd>`;
-}

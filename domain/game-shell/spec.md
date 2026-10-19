@@ -420,6 +420,21 @@ Leroy asked to re-evaluate every screen and merge where possible, since the play
 
   How the player uses it: the player taps the realm banner (or a plaque) and the Realm book opens as the side sheet beside the live map. Six sections in one row, each a 44-point icon with its name under it, answer one question each: how is the realm, where does the money and food come from, who runs which land, what can fight, who are friends and foes, and what do we study and believe. A section with several pages shows them as a short row under it, so the player always sees where they are and never scans sixteen tabs. Realm's Overview is the overview of the whole realm. On a phone held sideways both rows fit the 45 % sheet; on a tablet held upright the card is a bottom sheet with the same rows. Nothing needs hover.
 
+### The Realm overview (Leroy, 18 October 2026)
+The General tab had grown into a wall of 4.5 phone screens that repeated a line from nearly every other tab as plain text, with nothing saying what needed the player (ui-review). Realm's Overview becomes the overview of the whole realm: who rules, how stable it is, the score, and one tile per other section.
+
+- SHELL-170: The Realm book's Overview shall show the realm banner and capital, the ruler and heir, the Score line (SHELL-162), Stability with its pillars (REALM-204) and a rising revolution (REVO), then one tile for each of Economy, Lands, Military, Diplomacy and Research in the book's order, each with its key line and a short note: gold and gold a month with food; provinces and people; armies and men with fleets; war or peace with allies and subjects; the study and how far it has come. *On the player's own card these tiles take the place of the General lines of TRADE-144, RSCH-088 and TRIBE-027; another realm's General tab is unchanged.* [Leroy 18 Oct; ui-review]
+- SHELL-171: When something in a section waits on the player, its Overview tile shall be marked and name it (hungry provinces or a month that loses gold; new lands to fill, beaten risings to judge, uprisings or settlers waiting; an answer waiting; nothing studied, or faith or language low), and a tap on a tile shall open the page that holds it (Food for food, Officials for new lands, Provinces for risings, Hunting grounds for settlers, Peoples for belief), or else the section's first page. [Leroy 18 Oct; ui-review; SHELL-141]
+
+  How the player uses it: the player opens the Realm book on Realm and reads the whole realm in one screen on a phone held sideways: the ruler, Stability's four pillars and five tiles, two to a row, each at least 44 points tall. A red edge and one line say what waits ("2 provinces hungry", "An answer waits"); tapping the tile goes straight to it. What used to be repeated here (government form, faiths and languages, lands by ground, heritage, the fallen, neighbours) stays on its own page in its section, one tap away, so nothing is explained twice. Nothing needs hover.
+
+### Less to read on each page (Leroy, 18 October 2026)
+The Economy pages were the longest in the book: Food 8.9 phone screens, with a paragraph under each of its settings, and Trade 6.9 (ui-review). Settings and long lists the player opens now and then move behind a tap.
+
+- SHELL-172: A Realm book page shall keep what the player acts on most at the top and put settings and long lists they open now and then in folds, each fold's line saying what it holds at a glance; a fold stays as the player left it while the book is open, so a choice made inside it keeps it open. Food keeps how many provinces are hungry or running low and the presets, with the five settings in a Customise fold whose line reads the current choices and the castles in a Castles fold that opens by itself while a castle is besieged or cut off; a siege reserve the castles without a granary can't hold stays outside as a warning. Trade keeps last month and the traders, with Found a trader (open while the player has no trader) and Busiest cities in folds. [Leroy 18 Oct; ui-review]
+
+  How the player uses it: on a phone held sideways the Food page is now under two screens: the counts, the four presets and two folds. Tapping Customise shows each setting with its one-line explanation; picking a choice keeps the fold open. A fold's line ("40 % · Even · 3 mo · Below 1 month · Keep") tells the player what is set without opening it. Each fold's summary is a 44-point tap target, and nothing needs hover.
+
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
@@ -831,5 +846,8 @@ Decided on 17 October 2026 under `domain/DECISIONS.md`. No question stays open.
 | SHELL-165 | realm-book.feature | Sections and the pages they hold; Every page has one section |
 | SHELL-167 | realm-book.feature | Sections in every shape |
 | SHELL-168 | map-and-cards.feature | Tool column |
+| SHELL-170 | realm-book.feature | The overview has a tile per section |
+| SHELL-171 | realm-book.feature | A tile names what waits and opens it |
+| SHELL-172 | — | Presentation only: the client's folds (`apps/client/src/ui/fold.ts`), checked on screenshots |
 | SHELL-164 | campaign-end.feature | The end card when the end date comes; The end card at game over; The end card after world domination |
 | SHELL-144–146 | layout-by-shape.feature | Each subject has one home; Important things have an overview; Every screen fits a phone in landscape |

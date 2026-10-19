@@ -6,7 +6,7 @@ Your realm is your country as a whole: the treasury, the food network that runs 
 
 ### The country card
 
-The country card has four tabs: **General** first, then **Diplomacy**, **Trade** and **Army**. General is the one-screen summary of your country; Allies, Enemies and Oaths broken sit on the Diplomacy tab, where war and peace are declared, trade lines on Trade, and soldiers, commanders and ships on Army. France's General tab in 1444 might look like this:
+The country card has four tabs: **General** first, then **Diplomacy**, **Trade** and **Army**. Your own realm's card is the Realm book, in six sections that open on the Overview (see [Screens and Navigation](Screens-and-Navigation)); another realm's card keeps these tabs. General is the one-screen summary of your country; Allies, Enemies and Oaths broken sit on the Diplomacy tab, where war and peace are declared, trade lines on Trade, and soldiers, commanders and ships on Army. France's General tab in 1444 might look like this:
 
 ```
  FRANCE                     King Charles VII, 41 · 23 years on throne · 2 heirs
@@ -76,7 +76,7 @@ A province outside every castle's reach lives on its own harvest.
 
 ### The Food policy screen
 
-One **Food policy** sets realm-wide defaults on the realm's **Food** tab, and a castle can have its own collection and siege reserve. Set those on the castle's own province, under **Castle food** on its Overview; tapping a castle on the Food tab takes you there, and **Realm** puts it back on the realm's setting.
+One **Food policy** sets realm-wide defaults on the realm's **Food** tab, and a castle can have its own collection and siege reserve. Set those on the castle's own province, under **Castle food** on its Overview; tapping a castle on the Food tab takes you there, and **Realm** puts it back on the realm's setting. The Food page shows how many provinces are hungry or running low and the presets; the five settings sit in a **Customise** fold whose line reads your current choices, and the castles in a **Castles** fold that opens by itself while one is besieged or its roads are cut.
 
 | Setting | Options |
 |---|---|
@@ -216,7 +216,7 @@ Stability tells you at a glance how well your realm holds together. It is not a 
 
 Officials matter twice: an empty post shows in the officials pillar, and the *Ungoverned* grievance it brings (and *Grasping officials* over the cap) pushes provinces toward riots. A judge holds riots off one grievance longer. Lords' own provinces are run by their own officials and do not count.
 
-The stability plaque in the top bar shows the step (amber when Uneasy, red when Troubled, blinking when Crumbling). Tap it to open your country card's General tab, where each pillar has a row; tap a row to open the Lords, Diplomacy, Officials or Provinces tab and mend it.
+The stability plaque in the top bar shows the step (amber when Uneasy, red when Troubled, blinking when Crumbling). Tap it to open your Realm book's Overview, where each pillar has a row; tap a row to open the Lords, Diplomacy, Officials or Provinces tab and mend it.
 
 ### Army and navy at a glance
 
@@ -230,7 +230,7 @@ The stability plaque in the top bar shows the step (amber when Uneasy, red when 
 | **Commanders** (Might, Cunning, Logistics) | Hiring, a lord or heir taking command, promotion after victory | Death in battle, old age, capture |
 | **Fallen** | Your soldiers killed in battles and sieges in the last 10 years | Many dead push people and lords toward peace and slow recruit refills |
 
-The Fallen line on your General tab says what your dead are doing: with a quarter of your recruit ceiling fallen, about a sixteenth more of your voices want peace (at most a quarter), and with half of it fallen recruits refill at three quarters of their pace (never under half).
+The Fallen line on your Military section's Army page says what your dead are doing: with a quarter of your recruit ceiling fallen, about a sixteenth more of your voices want peace (at most a quarter), and with half of it fallen recruits refill at three quarters of their pace (never under half).
 
 The details live in [Recruiting](Recruiting), [Warfare](Warfare) and [Naval](Naval).
 
@@ -242,7 +242,7 @@ The details live in [Recruiting](Recruiting), [Warfare](Warfare) and [Naval](Nav
 - **Traits**: two (for example Pious, Warlike, Builder, Greedy), given at birth and sometimes gained or rarely changed by events. They give small bonuses and lean event options.
 - **Marriages** are living ties to other ruling houses and your own lords, arranged with an heir or a princess, ended by death, divorce events and war between the houses. They give goodwill, loyalty and a path to inheriting another realm.
 
-**In the game now.** Your ruler is on the General tab of your country card, under Stability: name, age, years on the throne, the regent while a child rules, the two traits with what each does, and the heir (or who would follow under your law). Most realms start with their real ruler of 1444. Each January rulers grow a year older and an old one may die: about 1 in 100 a year under 40, 2 in their forties, 4 in their fifties, 8 in their sixties and 16 older. The heir takes the throne and every lord wavers a little; with no heir a kinsman takes it and the lords dispute it. An heirless ruler of 18 to 50 may have a child. A dispatch with the crown tells you of a death, a birth or a child coming of age, in your realm and on your borders. Traits: **Pious** makes faith risings a quarter rarer, **Warlike** refills recruits 10 % faster, **Builder** makes works 10 % cheaper and **Greedy** brings 5 % more tax to you; each also leans the choices an AI ruler makes in events.
+**In the game now.** Your ruler is on the Overview of your Realm book, under the section tiles: name, age, years on the throne, the regent while a child rules, the two traits with what each does, and the heir (or who would follow under your law). Most realms start with their real ruler of 1444. Each January rulers grow a year older and an old one may die: about 1 in 100 a year under 40, 2 in their forties, 4 in their fifties, 8 in their sixties and 16 older. The heir takes the throne and every lord wavers a little; with no heir a kinsman takes it and the lords dispute it. An heirless ruler of 18 to 50 may have a child. A dispatch with the crown tells you of a death, a birth or a child coming of age, in your realm and on your borders. Traits: **Pious** makes faith risings a quarter rarer, **Warlike** refills recruits 10 % faster, **Builder** makes works 10 % cheaper and **Greedy** brings 5 % more tax to you; each also leans the choices an AI ruler makes in events.
 
 
 **Women in roles.** Women can hold every role: ruler, lord, commander, official, scholar. The chance is set per country (or culture) per role from the catalogue's history and succession customs. Where the crown passes only through men (France), no woman inherits the throne, though a duke's daughter can inherit his duchy; where a daughter could inherit (Castile, Navarre), a queen regnant is possible. Wherever a ruler is a child, a queen mother can be regent. The chance rises as history's ages arrive: a little in the Age of Revolutions, more in the Age of Industrialization, more again in the Age of World Wars, and events and reforms can raise one country's chance earlier. Women who held roles in 1444 or appear in events are placed as they were; the chances apply only to characters the game generates.

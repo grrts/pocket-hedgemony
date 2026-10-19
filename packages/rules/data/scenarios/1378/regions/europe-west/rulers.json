@@ -1,0 +1,548 @@
+{
+ "$comment": "Each western map realm's ruler on 20 September 1378, from research/europe-west.md and checkpoints/1378.json.",
+ "rulers": {
+  "england": {
+   "title": "King",
+   "name": "Richard II",
+   "since": 1377,
+   "age": 11,
+   "heir": {
+    "name": "John of Gaunt",
+    "age": 38
+   }
+  },
+  "scotland": {
+   "title": "King",
+   "name": "Robert II",
+   "since": 1371,
+   "age": 62,
+   "heir": {
+    "name": "John, Earl of Carrick",
+    "age": 41
+   }
+  },
+  "ireland": null,
+  "france": {
+   "title": "King",
+   "name": "Charles V",
+   "since": 1364,
+   "age": 40,
+   "heir": {
+    "name": "Charles",
+    "age": 9
+   }
+  },
+  "burgundy": {
+   "title": "Duke",
+   "name": "Philip II",
+   "since": 1363,
+   "age": 36,
+   "heir": {
+    "name": "John",
+    "age": 7
+   }
+  },
+  "brittany": {
+   "title": "Duke",
+   "name": "John IV",
+   "since": 1365,
+   "age": 39
+  },
+  "anjou": {
+   "title": "Duke",
+   "name": "Louis I",
+   "since": 1360,
+   "age": 39,
+   "heir": {
+    "name": "Louis",
+    "age": 0
+   }
+  },
+  "berry": {
+   "title": "Duke",
+   "name": "John",
+   "since": 1360,
+   "age": 37
+  },
+  "bourbon": {
+   "title": "Duke",
+   "name": "Louis II",
+   "since": 1356,
+   "age": 41
+  },
+  "foix": {
+   "title": "Count",
+   "name": "Gaston III Fébus",
+   "since": 1343,
+   "age": 47,
+   "heir": {
+    "name": "Gaston",
+    "age": 16
+   }
+  },
+  "armagnac": {
+   "title": "Count",
+   "name": "John II",
+   "since": 1373,
+   "age": 45,
+   "heir": {
+    "name": "John",
+    "age": 19
+   }
+  },
+  "franche_comte": {
+   "title": "Countess",
+   "name": "Margaret I",
+   "since": 1361,
+   "age": 68,
+   "heir": {
+    "name": "Louis of Male",
+    "age": 47
+   }
+  },
+  "castile": {
+   "title": "King",
+   "name": "Henry II",
+   "since": 1369,
+   "age": 44,
+   "heir": {
+    "name": "John",
+    "age": 20
+   }
+  },
+  "aragon": {
+   "title": "King",
+   "name": "Peter IV",
+   "since": 1336,
+   "age": 59,
+   "heir": {
+    "name": "John",
+    "age": 27
+   }
+  },
+  "portugal": {
+   "title": "King",
+   "name": "Ferdinand I",
+   "since": 1367,
+   "age": 32,
+   "heir": {
+    "name": "Beatriz",
+    "age": 5
+   }
+  },
+  "navarre": {
+   "title": "King",
+   "name": "Charles II",
+   "since": 1349,
+   "age": 45,
+   "heir": {
+    "name": "Charles",
+    "age": 17
+   }
+  },
+  "granada": {
+   "title": "Sultan",
+   "name": "Muhammad V",
+   "since": 1362,
+   "age": 40,
+   "heir": {
+    "name": "Yusuf",
+    "age": 22
+   }
+  },
+  "savoy": {
+   "title": "Count",
+   "name": "Amadeus VI",
+   "since": 1343,
+   "age": 44,
+   "heir": {
+    "name": "Amadeus",
+    "age": 18
+   }
+  },
+  "milan": {
+   "title": "Lord",
+   "name": "Bernabò Visconti",
+   "since": 1354,
+   "age": 55,
+   "heir": {
+    "name": "Marco",
+    "age": 25
+   }
+  },
+  "visconti_pavia": {
+   "title": "Lord",
+   "name": "Gian Galeazzo Visconti",
+   "since": 1378,
+   "age": 26,
+   "heir": {
+    "name": "Azzone",
+    "age": 10
+   }
+  },
+  "venice": {
+   "title": "Doge",
+   "name": "Andrea Contarini",
+   "since": 1368,
+   "age": 78
+  },
+  "genoa": {
+   "title": "Doge",
+   "name": "Nicolò Guarco",
+   "since": 1378
+  },
+  "florence": {
+   "title": "Signoria",
+   "name": "Minor-guild regime",
+   "since": 1378
+  },
+  "modena": {
+   "title": "Marquis",
+   "name": "Niccolò II d'Este",
+   "since": 1361,
+   "age": 40,
+   "heir": {
+    "name": "Alberto",
+    "age": 31
+   }
+  },
+  "papal_states": {
+   "title": "Pope",
+   "name": "Urban VI",
+   "since": 1378,
+   "age": 60
+  },
+  "naples": {
+   "title": "Queen",
+   "name": "Joanna I",
+   "since": 1343,
+   "age": 52
+  },
+  "sicily": {
+   "title": "Queen",
+   "name": "Maria",
+   "since": 1377,
+   "age": 15
+  },
+  "oristano": {
+   "title": "Judge",
+   "name": "Hugh III",
+   "since": 1376,
+   "age": 41
+  },
+  "verona": {
+   "title": "Lords",
+   "name": "Bartolomeo II and Antonio della Scala",
+   "since": 1375
+  },
+  "padua": {
+   "title": "Lord",
+   "name": "Francesco I da Carrara",
+   "since": 1350,
+   "age": 52,
+   "heir": {
+    "name": "Francesco Novello",
+    "age": 19
+   }
+  },
+  "pisa": {
+   "title": "Lord",
+   "name": "Pietro Gambacorta",
+   "since": 1369
+  },
+  "aquileia": {
+   "title": "Patriarch",
+   "name": "Marquard of Randeck",
+   "since": 1365
+  },
+  "montferrat": {
+   "title": "Marquis",
+   "name": "Otto III (Secondotto)",
+   "since": 1372,
+   "age": 18,
+   "heir": {
+    "name": "John",
+    "age": 16
+   }
+  },
+  "bologna": {
+   "title": "Commune",
+   "name": "Anziani and Gonfaloniere di giustizia",
+   "since": 1376
+  },
+  "siena": {
+   "title": "Commune",
+   "name": "Concistoro of the Riformatori",
+   "since": 1368
+  },
+  "perugia": {
+   "title": "Commune",
+   "name": "Priors of the Raspanti regime",
+   "since": 1375
+  },
+  "flanders": {
+   "title": "Count",
+   "name": "Louis II of Male",
+   "since": 1346,
+   "age": 47,
+   "heir": {
+    "name": "Margaret of Male",
+    "age": 28
+   }
+  },
+  "holland": {
+   "title": "Regent",
+   "name": "Albert I of Bavaria-Straubing (for his insane brother Count William V)",
+   "since": 1358,
+   "age": 42,
+   "heir": {
+    "name": "William",
+    "age": 13
+   }
+  },
+  "brabant": {
+   "title": "Duchess",
+   "name": "Joanna (with Duke Wenceslaus I)",
+   "since": 1355,
+   "age": 56
+  },
+  "luxembourg": {
+   "title": "Duke",
+   "name": "Wenceslaus I",
+   "since": 1353,
+   "age": 41,
+   "heir": {
+    "name": "Wenceslaus, King of the Romans",
+    "age": 17
+   }
+  },
+  "guelders": {
+   "title": "Duke",
+   "name": "William I of Jülich (disputed by Mathilda and John of Blois)",
+   "since": 1377,
+   "age": 14
+  },
+  "liege": {
+   "title": "Prince-Bishop",
+   "name": "Arnold of Horne",
+   "since": 1378,
+   "age": null
+  },
+  "utrecht": {
+   "title": "Bishop",
+   "name": "Arnold of Horne (translated to Liège; Florence of Wevelinkhoven takes possession Nov 1379)",
+   "since": 1371,
+   "age": null
+  },
+  "friesland": null,
+  "lorraine": {
+   "title": "Duke",
+   "name": "John I",
+   "since": 1346,
+   "age": 32,
+   "heir": {
+    "name": "Charles",
+    "age": 14
+   }
+  },
+  "mainz": {
+   "title": "Archbishop-Elector",
+   "name": "Adolf I of Nassau (disputed by Louis of Meissen)",
+   "since": 1373,
+   "age": 25
+  },
+  "trier": {
+   "title": "Archbishop-Elector",
+   "name": "Kuno II of Falkenstein",
+   "since": 1362,
+   "age": null
+  },
+  "cologne": {
+   "title": "Archbishop-Elector",
+   "name": "Frederick III of Saarwerden",
+   "since": 1370,
+   "age": 30
+  },
+  "munster": {
+   "title": "Prince-Bishop",
+   "name": "Florence of Wevelinkhoven",
+   "since": 1364,
+   "age": null
+  },
+  "palatinate": {
+   "title": "Elector",
+   "name": "Rupert I",
+   "since": 1353,
+   "age": 69,
+   "heir": {
+    "name": "Rupert II",
+    "age": 53
+   }
+  },
+  "hesse": {
+   "title": "Landgrave",
+   "name": "Hermann II the Learned",
+   "since": 1376,
+   "age": 37
+  },
+  "saxony": {
+   "title": "Margrave",
+   "name": "Frederick III the Strict (jointly with Balthasar and William I)",
+   "since": 1349,
+   "age": 45,
+   "heir": {
+    "name": "Frederick",
+    "age": 8
+   }
+  },
+  "saxe_wittenberg": {
+   "title": "Elector",
+   "name": "Wenceslaus I",
+   "since": 1370,
+   "age": null
+  },
+  "brandenburg": {
+   "title": "Margrave",
+   "name": "Sigismund of Luxembourg (a minor, under Charles IV)",
+   "since": 1378,
+   "age": 10
+  },
+  "luneburg": {
+   "title": "Duke",
+   "name": "Albert of Saxe-Wittenberg (with Elector Wenceslaus I; disputed by the Welfs)",
+   "since": 1373,
+   "age": null
+  },
+  "brunswick_gottingen": {
+   "title": "Duke",
+   "name": "Otto I the Evil (also regent of Brunswick-Wolfenbüttel)",
+   "since": 1367,
+   "age": null
+  },
+  "bremen": {
+   "title": "Prince-Archbishop",
+   "name": "Albert II of Brunswick-Lüneburg",
+   "since": 1360,
+   "age": null
+  },
+  "hamburg": null,
+  "holstein": {
+   "title": "Count",
+   "name": "Henry II 'Iron Henry' (jointly with Nicholas)",
+   "since": 1340,
+   "age": null,
+   "heir": {
+    "name": "Gerhard",
+    "age": 11
+   }
+  },
+  "mecklenburg": {
+   "title": "Duke",
+   "name": "Albert II",
+   "since": 1329,
+   "age": 60,
+   "heir": {
+    "name": "Henry III",
+    "age": 41
+   }
+  },
+  "pomerania": {
+   "title": "Duke",
+   "name": "Swantibor III of Stettin (with Bogislaw VII; the Wolgast and Stolp lines rule apart)",
+   "since": 1372,
+   "age": 27
+  },
+  "austria": {
+   "title": "Duke",
+   "name": "Albert III (jointly with Leopold III)",
+   "since": 1365,
+   "age": 29,
+   "heir": {
+    "name": "Albert IV",
+    "age": 1
+   }
+  },
+  "bohemia": {
+   "title": "King",
+   "name": "Charles IV",
+   "since": 1346,
+   "age": 62,
+   "heir": {
+    "name": "Wenceslaus",
+    "age": 17
+   }
+  },
+  "moravia": {
+   "title": "Margrave",
+   "name": "Jobst",
+   "since": 1375,
+   "age": 26,
+   "heir": {
+    "name": "Prokop",
+    "age": 24
+   }
+  },
+  "bavaria": {
+   "title": "Duke",
+   "name": "Stephen III (jointly with Frederick and John II)",
+   "since": 1375,
+   "age": 41,
+   "heir": {
+    "name": "Louis",
+    "age": 10
+   }
+  },
+  "wurttemberg": {
+   "title": "Count",
+   "name": "Eberhard II",
+   "since": 1344,
+   "age": 63,
+   "heir": {
+    "name": "Ulrich",
+    "age": 36
+   }
+  },
+  "burgraviate_of_nuremberg": {
+   "title": "Burgrave",
+   "name": "Frederick V",
+   "since": 1357,
+   "age": 45,
+   "heir": {
+    "name": "John",
+    "age": 9
+   }
+  },
+  "salzburg": {
+   "title": "Archbishop",
+   "name": "Pilgrim II von Puchheim",
+   "since": 1365
+  },
+  "switzerland": null,
+  "denmark": {
+   "title": "King",
+   "name": "Olaf II",
+   "since": 1376,
+   "age": 7
+  },
+  "norway": {
+   "title": "King",
+   "name": "Haakon VI",
+   "since": 1343,
+   "age": 38,
+   "heir": {
+    "name": "Olaf",
+    "age": 7
+   }
+  },
+  "sweden": {
+   "title": "King",
+   "name": "Albert of Mecklenburg",
+   "since": 1364,
+   "age": 40,
+   "heir": {
+    "name": "Eric",
+    "age": 13
+   }
+  }
+ }
+}
