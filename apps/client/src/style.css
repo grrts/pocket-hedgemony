@@ -1126,6 +1126,52 @@ button.small {
   padding: 0;
 }
 
+/* The founding card (SETUP-092 to SETUP-094): a major dispatch in the alerts'
+   place, inside the safe areas: the new realm's flag and name, what it was
+   made from, and its two 44-point buttons under them. */
+.alert.founding {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  padding: 6px 6px 4px 8px;
+}
+
+.founding-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.founding-head > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.founding-head small {
+  display: block;
+  color: var(--ink-soft);
+}
+
+.founding-head b {
+  display: block;
+  font-size: 1.2em;
+}
+
+.founding-head p {
+  margin: 2px 0 0;
+}
+
+.founding-choices {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.alert .founding-choices button {
+  min-width: 44px;
+}
+
 /* The battle being watched (feedback 73): along the bottom, between the
    overview button and End turn, so the fight on the map stays in view. */
 .battle-watch {
