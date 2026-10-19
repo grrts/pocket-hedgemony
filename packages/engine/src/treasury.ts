@@ -16,6 +16,7 @@ import { navyCosts } from "./navy.ts";
 import { governorWages } from "./colonies.ts";
 import { W as WARFARE } from "./domain/warfare/index.ts";
 import { empireDues, empireTax } from "./institutions.ts";
+import { fursOf } from "./tribes.ts";
 
 /**
  * Tax rates and the treasury ledger (milestone 3): each province pays at its
@@ -30,7 +31,7 @@ export const NORMAL_TAX = 2;
 const HEAVY_TAX = 3;
 
 /** Lines of the ledger, in the order the snapshot sends them. */
-export const LEDGER = ["tax", "trade", "army pay", "officials", "interest", "works", "schools", "grain", "tribute", "navy"] as const;
+export const LEDGER = ["tax", "trade", "army pay", "officials", "interest", "works", "schools", "grain", "tribute", "navy", "furs"] as const;
 export const LEDGER_LINES = LEDGER.length;
 const TAX = 0;
 const TRADE = 1;
@@ -42,6 +43,7 @@ const SCHOOLS = 6;
 const GRAIN = 7;
 const TRIBUTE = 8;
 const NAVY = 9;
+const FURS = 10;
 
 /** Nothing invented yet: interest and loan caps are the realm context's for a realm without banks. */
 const KNOWN: ReadonlySet<string> = new Set();
@@ -160,6 +162,7 @@ export function runLedger(world: World, pay: boolean, only = -1): void {
   const armyPay = allNationPay(world);
   const navy = navyCosts(world);
   const governors = governorWages(world);
+  const furs = fursOf(world);
   for (let n = only >= 0 ? only : 0; n < (only >= 0 ? only + 1 : world.nationCount); n++) {
     L[n * LEDGER_LINES + PAY] = -armyPay[n]!;
     L[n * LEDGER_LINES + SCHOOLS] = -schoolUpkeepMonthly(world, n);
@@ -170,6 +173,8 @@ export function runLedger(world: World, pay: boolean, only = -1): void {
     L[n * LEDGER_LINES + GRAIN] = world.nationGrainGold[n]!;
     // The Emperor's dues from the members come in with the tribute (INST-032).
     L[n * LEDGER_LINES + TRIBUTE] = L[n * LEDGER_LINES + TRIBUTE]! + empireDues(world, n);
+    // Furs and hides from the hunting grounds (TRIBE-014).
+    L[n * LEDGER_LINES + FURS] = furs[n]!;
     sumLedger(world, n);
   }
   if (!pay) return;
