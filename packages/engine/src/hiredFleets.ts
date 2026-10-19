@@ -8,7 +8,7 @@ import { addCommander } from "./recruit.ts";
 import { personName, mix } from "./names.ts";
 import { Rng } from "./rng.ts";
 import { realmStrengths } from "./realmStrengths.ts";
-import { allExplorers, blockaded, carriesOf, dockRight, fightsOf, fleetStrength, isPort, newShip, planVoyage, type FreeFleet, type NavyFleet } from "./navy.ts";
+import { allExplorers, blockaded, carriesOf, dockRight, fightsOf, fleetStrength, isPort, newShip, planVoyage, setCourse, type FreeFleet, type NavyFleet } from "./navy.ts";
 
 /**
  * Fleets for hire (F-115, naval spec "Hired fleets"): free fleets of the
@@ -267,14 +267,13 @@ function release(world: World, f: NavyFleet, news: News[], why: "dismissed" | "u
   f.admiral = -1;
   f.landAt = -1;
   f.fleeing = false;
-  f.progress = 0;
-  f.route = [];
+  setCourse(f, []);
   if (lender < 0) {
     v.fleets.splice(v.fleets.indexOf(f), 1);
   } else {
     f.owner = lender;
     const plan = planVoyage(world, f, (p) => dockRight(world, lender, p) === "food", { knownWaters: true });
-    if (plan) f.route = plan.path;
+    if (plan) setCourse(f, plan.path);
     else {
       // No way home by sea: it is back in the lender's best port at once.
       let port = -1;

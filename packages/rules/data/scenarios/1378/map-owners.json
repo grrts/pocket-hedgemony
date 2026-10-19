@@ -418,6 +418,7 @@
   {"nation": "ifat", "countries": ["ETH"], "bbox": [39.6, 9.4, 41, 11]},
   {"nation": "ethiopia", "countries": ["ETH", "ERI"], "bbox": [35, 6, 41, 16]},
   {"nation": "mogadishu", "countries": ["SOM"], "bbox": [44.6, 1.6, 46.2, 3.2]},
+  {"nation": "ajuran", "countries": ["SOM"], "bbox": [41, -1.7, 48, 6]},
   {"nation": "kilwa", "countries": ["TZA", "KEN"], "bbox": [38.5, -10.5, 41, -4]},
   {"nation": "great_zimbabwe", "countries": ["ZWE"]},
   {"nation": "aztecs", "countries": ["MEX"], "admin1": ["Distrito Federal"]},

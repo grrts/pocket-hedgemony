@@ -33,6 +33,15 @@ class Account implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private bool $adsRemoved = false;
 
+    /**
+     * Roles beyond ROLE_PLAYER, such as ROLE_MODERATOR (granted by app:community:moderator).
+     * Nullable so adding the column to a filled table needs nothing but doctrine:schema:update.
+     *
+     * @var list<string>|null
+     */
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private ?array $roles = null;
+
     public function __construct(string $email, string $displayName)
     {
         $this->id = Uuid::v7();
@@ -88,7 +97,22 @@ class Account implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getRoles(): array
     {
-        return ['ROLE_PLAYER'];
+        return array_values(array_unique(['ROLE_PLAYER', ...($this->roles ?? [])]));
+    }
+
+    public function addRole(string $role): void
+    {
+        $this->roles = array_values(array_unique([...($this->roles ?? []), $role]));
+    }
+
+    public function removeRole(string $role): void
+    {
+        $this->roles = array_values(array_diff($this->roles ?? [], [$role])) ?: null;
+    }
+
+    public function isModerator(): bool
+    {
+        return \in_array('ROLE_MODERATOR', $this->getRoles(), true);
     }
 
     public function eraseCredentials(): void

@@ -53,7 +53,7 @@ Feature: Music and effects together
     When an effect of priority 2 plays
     Then the ambience ducks by 6 dB
     When a music track starts
-    Then the ambience fades out over 2 seconds
+    Then the ambience dips under the track over 2 seconds
 
   @AUD-094
   Scenario: The game menu leaves the music alone

@@ -1,0 +1,660 @@
+/*
+ * The website in the game's own look: parchment sheets in carved wood frames over
+ * the sea, a plank bar on top, and the game's pixel fonts. The art in art/ and the
+ * fonts in fonts/ are exported from the game by `pnpm --filter @ph/client site-art`;
+ * the colours match apps/client/src/style.css. Pixel art is only ever scaled by
+ * whole steps (2×) so pixels stay square.
+ */
+
+@font-face {
+  font-family: "Jersey 10";
+  src: url("fonts/jersey-10-latin-400-normal.woff2") format("woff2");
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Jersey 10";
+  src: url("fonts/jersey-10-latin-ext-400-normal.woff2") format("woff2");
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: "Jacquard 12";
+  src: url("fonts/jacquard-12-latin-400-normal.woff2") format("woff2");
+  font-display: swap;
+}
+
+:root {
+  color-scheme: light;
+  --outline: #24150c;
+  --ink: #3a2414;
+  --ink-soft: #6b4a2c;
+  --paper: #efdcae;
+  --paper-light: #f8ecc8;
+  --paper-dark: #e0c48e;
+  --wood: #7a4c2a;
+  --wood-dark: #4e2f18;
+  --brass: #d0a248;
+  --brass-light: #f6dc8a;
+  --cloth: #a8323e;
+  --sea: #1f3462;
+  --sea-deep: #172848;
+  --link: #8a2a1c;
+  --body: "Jersey 10", "Courier New", ui-monospace, monospace;
+  --title: "Jacquard 12", "Jersey 10", serif;
+  --gutter: max(16px, env(safe-area-inset-left));
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: 72px;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  color: var(--ink);
+  font: 400 22px/1.35 var(--body);
+  font-synthesis: none;
+  /* The sea, with the faint dither of the game's deep water. */
+  background:
+    repeating-conic-gradient(var(--sea) 0 25%, #213868 0 50%) 0 0 / 4px 4px,
+    var(--sea);
+  background-attachment: fixed;
+}
+
+img.px,
+.px {
+  image-rendering: pixelated;
+  vertical-align: middle;
+}
+
+a {
+  color: var(--link);
+  text-underline-offset: 3px;
+}
+
+a:hover {
+  color: var(--cloth);
+}
+
+:focus-visible {
+  outline: 3px solid var(--brass-light);
+  outline-offset: 2px;
+}
+
+.wrap {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding-left: var(--gutter);
+  padding-right: max(16px, env(safe-area-inset-right));
+}
+
+main.wrap {
+  flex: 1;
+  padding-top: 20px;
+  padding-bottom: 32px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.muted {
+  color: var(--ink-soft);
+}
+
+/* ---- Plank bar ---- */
+
+.bar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  padding-top: env(safe-area-inset-top);
+  background: url("art/planks.png") 0 0 / 64px repeat;
+  image-rendering: pixelated;
+  border-bottom: 4px solid var(--outline);
+  box-shadow: 0 4px 0 rgb(0 0 0 / 0.3);
+}
+
+.bar-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  font: 32px/1 var(--title);
+  color: var(--paper-light);
+  text-decoration: none;
+  text-shadow: 3px 3px 0 var(--outline);
+  white-space: nowrap;
+}
+
+.brand:hover {
+  color: var(--brass-light);
+}
+
+.bar-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.bar-nav a:not(.btn) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 10px;
+  font-size: 24px;
+  color: var(--paper-light);
+  text-decoration: none;
+  text-shadow: 2px 2px 0 var(--outline);
+}
+
+/* The signed-in player's name (the community's sign-in). */
+.bar-nav a.bar-you:not(.btn) {
+  display: block;
+  max-width: 10em;
+  line-height: 44px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bar-nav a:not(.btn):hover,
+.bar-nav a[aria-current] {
+  color: var(--brass-light);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+}
+
+@media (max-width: 520px) {
+  .brand {
+    font-size: 26px;
+  }
+
+  .brand img {
+    width: 20px;
+    height: 16px;
+  }
+
+  .bar-nav a:not(.btn) {
+    padding: 0 6px;
+    font-size: 22px;
+  }
+}
+
+/* ---- Frames and buttons, as in the game ---- */
+
+.framed {
+  border: 16px solid transparent;
+  border-image: url("art/wood-frame.png") 8 / 16px round;
+  background: url("art/parchment.png") 0 0 / 64px repeat;
+  background-clip: padding-box;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 4px 0 rgb(0 0 0 / 0.45));
+}
+
+.btn,
+button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 8px solid transparent;
+  border-image: url("art/btn.png") 4 fill / 8px stretch;
+  background: none;
+  font: 600 22px/1 var(--body);
+  color: var(--paper-light);
+  text-decoration: none;
+  text-shadow: 2px 2px 0 var(--outline);
+  image-rendering: pixelated;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.btn:active,
+button:active {
+  border-image-source: url("art/btn-down.png");
+  transform: translateY(2px);
+}
+
+.btn.wax {
+  border-image-source: url("art/btn-wax.png");
+  color: var(--brass-light);
+}
+
+.btn.wax:active {
+  border-image-source: url("art/btn-wax-down.png");
+}
+
+.btn.paper {
+  border-image-source: url("art/btn-paper.png");
+  color: var(--ink);
+  text-shadow: none;
+}
+
+.btn:hover,
+button:hover {
+  color: var(--brass-light);
+}
+
+.btn.paper:hover {
+  color: var(--cloth);
+}
+
+input[type="search"],
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea {
+  min-height: 44px;
+  padding: 6px 10px;
+  border: 3px solid var(--wood-dark);
+  border-radius: 0;
+  background: var(--paper-light);
+  color: var(--ink);
+  font: 22px/1.2 var(--body);
+  box-shadow: inset 2px 2px 0 var(--paper-dark);
+}
+
+/* Small screens: frames at half size, as in the game. */
+@media (max-width: 500px) {
+  .framed {
+    border-width: 8px;
+    border-image-width: 8px;
+  }
+}
+
+/* ---- The wiki ---- */
+
+.wiki {
+  display: grid;
+  grid-template-columns: 290px minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.wiki-side {
+  position: sticky;
+  top: 80px;
+  display: grid;
+  gap: 14px;
+  max-height: calc(100vh - 96px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+.search {
+  display: flex;
+  gap: 6px;
+}
+
+.search input {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+}
+
+.wiki-side > * {
+  min-width: 0;
+}
+
+.pages summary,
+.toc summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  font: 600 24px/1 var(--body);
+  cursor: pointer;
+  list-style: none;
+}
+
+.pages summary::-webkit-details-marker,
+.toc summary::-webkit-details-marker {
+  display: none;
+}
+
+.pages summary::after,
+.toc summary::after {
+  content: "+";
+  margin-left: auto;
+  font-size: 28px;
+  color: var(--ink-soft);
+}
+
+.pages[open] summary::after,
+.toc[open] summary::after {
+  content: "−";
+}
+
+.pages {
+  padding: 0 4px 6px;
+}
+
+.pages h2 {
+  margin: 12px 0 2px;
+  font: 600 18px/1.2 var(--body);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.pages ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pages a {
+  display: flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 6px;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.pages a:hover {
+  color: var(--cloth);
+  text-decoration: underline;
+}
+
+.pages a.on {
+  background: url("art/parchment-dark.png") 0 0 / 64px;
+  color: var(--cloth);
+  box-shadow: inset 4px 0 0 var(--cloth);
+}
+
+.sheet {
+  padding: 8px 18px 24px;
+}
+
+.crumbs {
+  margin: 4px 0 0;
+  color: var(--ink-soft);
+  font-size: 19px;
+}
+
+.toc {
+  float: right;
+  width: 290px;
+  margin: 8px 0 16px 24px;
+  padding: 2px 12px 8px;
+  background: url("art/parchment-dark.png") 0 0 / 64px;
+  border: 3px solid var(--wood-dark);
+}
+
+.toc ol {
+  margin: 4px 0 0;
+  padding-left: 26px;
+  font-size: 20px;
+}
+
+.toc li {
+  margin: 4px 0;
+}
+
+.prose h1 {
+  margin: 12px 0 14px;
+  font: 52px/1.05 var(--title);
+  color: var(--ink);
+  text-shadow: 2px 2px 0 var(--paper-dark);
+}
+
+.prose h2,
+.prose h3,
+.prose h4 {
+  position: relative;
+  line-height: 1.1;
+  color: var(--ink);
+}
+
+.prose h2 {
+  clear: both;
+  margin: 34px 0 12px;
+  padding-bottom: 6px;
+  font: 40px/1.05 var(--title);
+  border-bottom: 3px solid var(--wood);
+}
+
+.prose h3 {
+  margin: 26px 0 8px;
+  font-size: 30px;
+  font-weight: 600;
+}
+
+.prose h4 {
+  margin: 20px 0 6px;
+  font-size: 25px;
+}
+
+.prose .anchor {
+  position: absolute;
+  left: -0.9em;
+  padding-right: 0.2em;
+  color: var(--ink-soft);
+  text-decoration: none;
+  opacity: 0;
+}
+
+.prose :is(h2, h3, h4):hover .anchor,
+.prose .anchor:focus {
+  opacity: 1;
+}
+
+.prose p,
+.prose li {
+  max-width: 46em;
+}
+
+.prose li {
+  margin: 4px 0;
+}
+
+.prose code {
+  padding: 0 4px;
+  background: var(--paper-dark);
+  font: 0.82em/1 ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  overflow-wrap: anywhere;
+}
+
+.prose pre {
+  overflow: auto;
+  padding: 10px 12px;
+  background: var(--paper-dark);
+  border: 3px solid var(--wood-dark);
+}
+
+.prose pre code {
+  padding: 0;
+  overflow-wrap: normal;
+}
+
+.prose blockquote {
+  margin: 12px 0;
+  padding: 4px 14px;
+  border-left: 6px solid var(--cloth);
+  background: url("art/parchment-dark.png") 0 0 / 64px;
+}
+
+.prose hr {
+  border: 0;
+  border-top: 3px dashed var(--wood);
+  margin: 24px 0;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  margin: 12px 0 18px;
+  border: 3px solid var(--wood-dark);
+  -webkit-overflow-scrolling: touch;
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 20px;
+  line-height: 1.25;
+}
+
+.prose th,
+.prose td {
+  padding: 6px 10px;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 2px solid var(--paper-dark);
+}
+
+.prose th {
+  background: var(--wood);
+  color: var(--paper-light);
+  text-shadow: 1px 1px 0 var(--outline);
+  white-space: nowrap;
+}
+
+.prose tbody tr:nth-child(even) {
+  background: rgb(224 196 142 / 0.45);
+}
+
+.hits {
+  padding-left: 30px;
+}
+
+.hits li {
+  margin: 0 0 16px;
+}
+
+.hits a {
+  font-size: 26px;
+}
+
+.hits p {
+  margin: 2px 0 0;
+  color: var(--ink-soft);
+  font-size: 20px;
+}
+
+/* Phones and narrow windows: one column; the page list and contents fold away. */
+@media (max-width: 899px) {
+  .wiki {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .wiki-side {
+    position: static;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .pages {
+    padding: 0 4px;
+  }
+
+  .pages ul {
+    columns: 2 220px;
+  }
+
+  .pages a {
+    min-height: 44px;
+  }
+
+  .toc {
+    float: none;
+    width: auto;
+    margin: 8px 0 12px;
+  }
+
+  .toc li a {
+    display: inline-block;
+    padding: 6px 0;
+  }
+}
+
+@media (max-width: 500px) {
+  main.wrap {
+    padding-top: 12px;
+  }
+
+  .sheet {
+    padding: 4px 10px 16px;
+  }
+
+  .prose h1 {
+    font-size: 40px;
+  }
+
+  .prose h2 {
+    font-size: 32px;
+  }
+
+  .prose h3 {
+    font-size: 26px;
+  }
+
+  .prose .anchor {
+    display: none;
+  }
+}
+
+/* ---- Footer ---- */
+
+.foot {
+  padding: 18px 0 calc(18px + env(safe-area-inset-bottom));
+  background: var(--sea-deep);
+  border-top: 4px solid var(--outline);
+  color: var(--paper);
+}
+
+.foot-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 20px;
+}
+
+.foot a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  color: var(--paper);
+}
+
+.foot a:hover {
+  color: var(--brass-light);
+}
+
+.brand-small {
+  font: 26px/1 var(--title);
+  color: var(--paper-light);
+}

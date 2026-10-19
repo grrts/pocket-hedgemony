@@ -1,0 +1,277 @@
+<h1>Music and sound</h1>
+<p>Every sound in Pocket Hegemony, music and effects alike, is synthesized live on PH-5, a small virtual 8-bit sound chip, from note data; the game ships no audio files. The music follows history: it changes with the era, sounds like your own corner of the world, swells when war comes and quiets in peace, and every track carries the same five-note Hegemony motif. Effects tell you what just happened without ever stepping on the music, and everything you hear also has something you can see, so the game is fully playable muted.</p>
+<h2 id="how-it-works"><a class="anchor" href="#how-it-works" aria-label="Link to this section">#</a>How it works</h2>
+<h3 id="original-by-design"><a class="anchor" href="#original-by-design" aria-label="Link to this section">#</a>Original by design</h3>
+<p>All music is original: no melody, track name or soundtrack structure from any other commercial game, no national anthems and no modern copyrighted songs. Public-domain folk tunes may inspire an idiom, but every melody is newly written. Every effect is synthesized too: no samples, no sound from another game, no recorded real-world audio, and no voices anywhere.</p>
+<h3 id="the-ph-5-chip"><a class="anchor" href="#the-ph-5-chip" aria-label="Link to this section">#</a>The PH-5 chip</h3>
+<p><strong>Music voices</strong> (at most five at once):</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Voice</th><th>What it is</th></tr></thead>
+<tbody>
+<tr><td>P1, P2</td><td>Pulse waves, duty 12.5, 25, 50 or 75 %, 16-step volume envelope, vibrato, pitch slide</td></tr>
+<tr><td>T</td><td>A 4-bit stepped triangle, on or off only</td></tr>
+<tr><td>W</td><td>A 32-sample 4-bit wavetable, swappable per pattern</td></tr>
+<tr><td>N</td><td>Noise, long and short, with an envelope</td></tr>
+<tr><td>W2</td><td>A second wavetable for brass and string sections, allowed only in music era V</td></tr>
+</tbody></table></div>
+<p>Chords are faked with arpeggios, never played on one voice. Each track stores a tuning table (cents per scale degree), so neutral intervals, slendro, pelog, seven-equal and other tunings are possible. Allowed: pitch slides, vibrato, duty sweeps, volume envelopes, one short echo (a single tap of 60 to 250 ms, used sparingly) and pan up to 30 % off centre per voice. Not allowed: samples, reverb tails, more voices. Bass lines sit an octave higher than on a console, with the triangle&#39;s stepped shape kept, so they are heard on phone speakers that reproduce little below about 200 Hz. A gentle low-pass around 9 kHz smooths the master mix.</p>
+<p><strong>In the game now: the music&#39;s soft voices.</strong> The first playtests found the strict chip harsh, &quot;noise mostly&quot; (Leroy, 17 Oct). So the music keeps the voices&#39; roles, its tunes and the motif but plays them soft: the pulses and bass are rounded (their buzzing upper harmonics rolled off), volumes glide instead of stepping, a pad holds each bar&#39;s chord under the tune, the drums are tuned skins and a woodblock with only a breath of noise for the snare and cymbal, and a small hall gives the music some room. The effects below keep the chip&#39;s sound, which playtesters liked as it is.</p>
+<p><strong>The tunes, rewritten.</strong> The tunes are written chord first: each bar has a chord, the tune lands on one of its notes on the beat, the bass walks the chord&#39;s root and fifth, and the regional instrument breaks the chord gently under it. Peace tunes use only chords that sound right in every region&#39;s tuning, so a nation&#39;s music changes colour, not into clashes. The early peace tune is a pastoral air followed by a dance, the late one a march, and every track still carries the Hegemony motif.</p>
+<p><strong>Effect voices</strong> are a separate bank of three, so an effect never takes a music voice:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Voice</th><th>What it is</th></tr></thead>
+<tbody>
+<tr><td>S1</td><td>Pulse, the four duties, 16-step envelope, pitch sweep, arpeggio up to 4 steps</td></tr>
+<tr><td>S2</td><td>Noise, long and short, envelope, noise-pitch sweep</td></tr>
+<tr><td>S3</td><td>Stepped triangle, or any music wavetable, chosen per sound</td></tr>
+</tbody></table></div>
+<p>Each effect is a short program ticked 60 times a second, each tick setting pitch, volume, duty or noise mode per voice. Effects have their own bus and volume, the same 9 kHz low-pass and 30 % pan limit. Every effect is under 2 seconds (most under 300 ms), except ambience, with no reverb tails and the one-tap echo only for large sounds. Nothing important sits below 200 Hz: a cannon&#39;s thump comes from a noise burst and a fast pitch drop that starts high.</p>
+<h3 id="the-hegemony-motif"><a class="anchor" href="#the-hegemony-motif" aria-label="Link to this section">#</a>The Hegemony motif</h3>
+<p>Five notes: scale degrees 1, 5, 4, 5 and the octave above 1, long-short-short-long-long. Every track quotes it at least once. The title track states it plainly, and every age stinger ends on it. When you press End turn, the <code>turn_end</code> chime plays notes 1 and 5; when the new turn is ready, <code>turn_ready</code> answers with 4, 5 and the high 1.</p>
+<h3 id="music-eras"><a class="anchor" href="#music-eras" aria-label="Link to this section">#</a>Music eras</h3>
+<p>The era is taken from the game year (the calendar). A technology basis (the average of your three tech tracks) is kept in config but turned off.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Era</th><th>Years</th><th>Ages that open in it</th><th>Style</th></tr></thead>
+<tbody>
+<tr><td>I</td><td>the start (1378) to 1519</td><td>Schism and Conquerors, Gunpowder Empires, Exploration</td><td>Drones, modal melody with a second voice, frame drums, 60 to 90 bpm</td></tr>
+<tr><td>II</td><td>1520 to 1649</td><td>Reformations, Atlantic Empires</td><td>Two-part counterpoint, dance rhythms in 3, plucked-string wavetables</td></tr>
+<tr><td>III</td><td>1650 to 1789</td><td>Crisis and Absolutism</td><td>Walking bass, ornamented leads, harpsichord-like arpeggios, formal marches</td></tr>
+<tr><td>IV</td><td>1790 to 1869</td><td>Revolutions, Industrialization</td><td>Bigger dynamics, dotted marches, folk-song melodies, first syncopation</td></tr>
+<tr><td>V</td><td>1870 to 31 August 1939</td><td>Imperialism, World Wars</td><td>The W2 voice: brass and string swells, snare rolls, ragtime and early-jazz rhythm</td></tr>
+</tbody></table></div>
+<p>Era boundaries come from configuration. There is no era after V and no music for the ages after the campaign (Decolonization, Cold War, Globalization); music stops at the campaign end.</p>
+<h3 id="palettes"><a class="anchor" href="#palettes" aria-label="Link to this section">#</a>Palettes</h3>
+<p>Your primary culture group picks one of twelve regional palettes: its scales, tuning tables, rhythms, wavetables and lead voice.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Palette</th><th>Culture groups</th><th>Starting idioms</th></tr></thead>
+<tbody>
+<tr><td>Western and Central Europe</td><td>latin, germanic</td><td>Church modes, drone fifths, bransle and pavane rhythms; later tonal marches</td></tr>
+<tr><td>Eastern Europe and the Balkans</td><td>slavic, hellenic, uralic</td><td>Uneven meters (7/8, 9/8), minor with a raised 4th, call and response, bell-like wavetable</td></tr>
+<tr><td>Middle East and North Africa</td><td>arab, western turkic, iranian, berber, semitic</td><td>Maqam and dastgah tuning tables, long slides, 10/8 and 6/8 cycles, plucked lute</td></tr>
+<tr><td>Steppe and Inner Asia</td><td>eastern turkic, mongolic, tungusic</td><td>Pentatonic, drone with overtone-like duty sweeps, galloping 6/8</td></tr>
+<tr><td>South Asia</td><td>indo_aryan, dravidian, tibeto_burman</td><td>Drone, raga-like rules per track, tala cycles of 7, 10 and 16</td></tr>
+<tr><td>East Asia</td><td>sinitic, japonic, koreanic</td><td>Anhemitonic pentatonic, sparse textures, plucked zither; Japanese and Korean tuning variants</td></tr>
+<tr><td>Southeast Asia</td><td>tai, austroasiatic, austronesian</td><td>Interlocking pulses, slendro and pelog tables, metallophone, gong-cycle structure</td></tr>
+<tr><td>West Africa and the Sahel</td><td>mande, akan, yoruba_edo, hausa_fulani</td><td>3 over 2, harp-lute ostinato, talking-drum-like bends</td></tr>
+<tr><td>East, Central and Southern Africa</td><td>bantu, nilotic, cushitic, semitic_ethiopian, khoisan</td><td>Interlocking thumb piano, hocket, Ethiopian qenet modes</td></tr>
+<tr><td>The Americas, Indigenous</td><td>nahua, maya, andean, tupi_guarani, algonquian, iroquoian</td><td>Pentatonic and tritonic, flute-like lead, frame and log drums; Andean and Mesoamerican variants</td></tr>
+<tr><td>Oceania</td><td>polynesian, melanesian, aboriginal_australian</td><td>Chant-like narrow melody, body percussion, drone</td></tr>
+<tr><td>Atlantic and creole</td><td>atlantic_creole, any colonial nation founded after 1500</td><td>One palette of its own drawing on European, West African and Americas music (no mixing by culture share); habanera, later swing</td></tr>
+</tbody></table></div>
+<p>The turkic group goes to Middle East and North Africa if the capital lies west of longitude 55, otherwise to the steppe. When your primary culture changes, your palette changes from the next track on.</p>
+<h3 id="the-tracks"><a class="anchor" href="#the-tracks" aria-label="Link to this section">#</a>The tracks</h3>
+<p>Loops last 60 to 150 seconds with 2 to 8 second intros, and play once or twice before the next pick. Stingers last 3 to 10 seconds. The first release ships 47 loops and 21 stingers.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Group</th><th>Tracks</th></tr></thead>
+<tbody>
+<tr><td>Interface and frame (6)</td><td><code>title</code> (title and main menu; the full motif, era-neutral, all five voices); <code>nation_select</code> (new campaign; calm; its lead timbre follows the highlighted realm&#39;s palette with the same notes); <code>load_resume</code> (loading and coming back to the app; a 6 second intro, then the normal pick); <code>game_over</code> (slow, unresolved, ending on motif degree 4); <code>campaign_end</code> (the title theme in late era V style, then the motif in your palette); <code>credits</code> (a medley of motif quotes from every palette)</td></tr>
+<tr><td>Peace by palette (24)</td><td><code>peace_&lt;palette&gt;_early</code> (written for eras I to III) and <code>peace_&lt;palette&gt;_late</code> (eras IV and V). Each is stored once with era arrangements: melody and harmony stay, tempo, percussion and wavetables follow the era, giving 60 palette and era combinations</td></tr>
+<tr><td>Era themes (5)</td><td><code>era_1</code> to <code>era_5</code>, shared by all nations</td></tr>
+<tr><td>Situations and moods (7)</td><td><code>diplomacy</code> (Realm book on Diplomacy; one quiet layer); <code>prosperity</code> (a brighter take on your palette); <code>unrest</code> (base and drone, plus a second layer while rebels are in the field); <code>crisis</code> (disaster, plague, famine or succession crisis; low pulses, irregular noise, no melody until resolved); <code>revolution</code> (a revolution period touching you, era IV on; fast march ending on the motif inverted); <code>exploration</code> (explorers or colonists active and the camera on open ocean); <code>world_war</code> (most great powers at war, era V on; replaces <code>war_campaign</code>, heavier, with W2 brass)</td></tr>
+<tr><td>War, layered (5)</td><td><code>war_mobilize</code> (drum ostinato, then bass); <code>war_campaign</code> (main theme; a counter-melody when your army is within 2 provinces of an enemy; full percussion when a battle is fought this turn); <code>war_siege</code> (slow pulse, plus tension as the siege nears its end); <code>war_naval</code> (wave-like arpeggio, lead, percussion); <code>war_losing</code> (a minor-key <code>war_campaign</code>, plus drone). Layers fade at bar lines. War percussion follows the era (frame drum, field drum, snare and bass drum, then mechanized and noise-heavy); the lead follows your palette</td></tr>
+<tr><td>Stingers (21)</td><td>nine <code>age_&lt;id&gt;</code> (one per age up to the World Wars, ending on the motif); <code>war_declared</code> (in the attacker&#39;s palette when a rival declares on you); <code>battle_won</code>, <code>battle_lost</code>; <code>war_won</code>, <code>war_lost</code>; <code>discovery</code>; <code>innovation</code>; <code>ruler_new</code>; <code>alliance</code>; <code>event_good</code>, <code>event_bad</code>, <code>event_major</code></td></tr>
+</tbody></table></div>
+<h3 id="the-music-director"><a class="anchor" href="#the-music-director" aria-label="Link to this section">#</a>The music director</h3>
+<p>The director runs on the main thread from each turn&#39;s results and the screen you are on, never inside the engine, so it cannot affect the simulation. It reads the screen, the Realm book tab, the camera&#39;s region and zoom, and whether the app is in the foreground; your nation&#39;s culture group, war state and trend, armies near enemies, sieges, battles this turn, an occupied capital, your lords&#39; loyalty, the share of provinces plotting or risen, and the treasury trend; and the world&#39;s year, active ages, periods and event chains with music tags, and how many great powers are at war.</p>
+<p>It holds one state at a time, chosen by the highest rule that holds:</p>
+<ol>
+<li><strong>Screen rules:</strong> title and main menu play <code>title</code>; new campaign <code>nation_select</code>; loading <code>load_resume</code>; game over, campaign end and credits their own tracks; the battle screen war tracks; the siege screen <code>war_siege</code>. Screens marked &quot;unchanged&quot; keep the current state.</li>
+<li><strong>Losing a war:</strong> <code>war_losing</code>.</li>
+<li><strong>At war:</strong> <code>world_war</code>, then <code>war_naval</code>, <code>war_siege</code>, <code>war_campaign</code>, <code>war_mobilize</code>.</li>
+<li><strong>Crisis:</strong> <code>revolution</code>, then <code>crisis</code>, then <code>unrest</code>.</li>
+<li><strong>Screen moods:</strong> <code>diplomacy</code> on the Realm book&#39;s Diplomacy section.</li>
+<li><strong>Good times:</strong> <code>prosperity</code>, <code>exploration</code>.</li>
+<li><strong>Peace rotation.</strong></li>
+</ol>
+<p><strong>Changing state.</strong> The director only decides at turn end or on a screen change. It waits for the next bar line (war, crisis) or phrase end (peace, at most 8 bars) and crossfades over one bar; layers also fade over one bar. A state is held at least 45 seconds, though even a one-turn war gets its stinger. Going down in priority (a war ends) plays the matching stinger, then 3 to 6 seconds of silence, then the new state from its intro. Going up (a war starts) cuts in at the next bar.</p>
+<p><strong>Stingers</strong> play over the music, ducking it by 6 dB, or in the gap between tracks. A stinger is never a state. An event card plays its stinger and ducks the music without changing state.</p>
+<p><strong>Peace rotation.</strong> Picks are weighted: your own palette 60 %, the era theme 20 %, the palette of the region the camera has looked at for 20 seconds at regional zoom 15 % (&quot;you hear where you look&quot;, only at track changes), and a neighbour&#39;s palette 5 %. None of the last 3 tracks repeats. Each peace track plays 1 or 2 loops, then 10 to 40 seconds of silence. The era arrangement is chosen when a track starts. When the era changes, the next peace track is that era&#39;s theme in full, after the age stinger that caused the change. With variety set to &quot;own palette only&quot;, only your palette is picked.</p>
+<p><strong>Zoom mix.</strong> At world view the full arrangement plays; at local zoom percussion drops 3 dB and the lead comes forward 1 dB. Over a battle province in wartime at local zoom, <code>war_campaign</code>&#39;s third layer comes in even between battles.</p>
+<h3 id="who-marks-which-moment"><a class="anchor" href="#who-marks-which-moment" aria-label="Link to this section">#</a>Who marks which moment</h3>
+<p>When the music has a stinger for a moment, effects stay out of the way: they may lead in to it, but never play over its tune.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Moment</th><th>Music</th><th>Effects</th></tr></thead>
+<tbody>
+<tr><td>War declared</td><td><code>war_declared</code></td><td>nothing</td></tr>
+<tr><td>Battle result</td><td><code>battle_won</code> / <code>battle_lost</code></td><td><code>battle_rout</code> before it, then silence</td></tr>
+<tr><td>Peace signed</td><td><code>war_won</code> / <code>war_lost</code></td><td><code>diplo_peace_signed</code> first</td></tr>
+<tr><td>Invention adopted</td><td><code>innovation</code></td><td>nothing</td></tr>
+<tr><td>Discovery</td><td><code>discovery</code></td><td><code>map_fog_reveal</code> when the land appears on screen</td></tr>
+<tr><td>New ruler</td><td><code>ruler_new</code></td><td><code>realm_ruler_dies</code> first if the old ruler died</td></tr>
+<tr><td>Event card</td><td><code>event_good</code> / <code>event_bad</code> / <code>event_major</code></td><td><code>event_open</code></td></tr>
+<tr><td>Age begins</td><td><code>age_&lt;id&gt;</code></td><td>nothing</td></tr>
+</tbody></table></div>
+<h3 id="effects-through-the-centuries"><a class="anchor" href="#effects-through-the-centuries" aria-label="Link to this section">#</a>Effects through the centuries</h3>
+<ul>
+<li><strong>Fixed</strong> sounds (taps, toggles, errors, scrolls, the map) never change.</li>
+<li><strong>Game-year</strong> sounds (turn chimes, notification pings, the event scroll) change with the music era, but only slightly. The turn chimes keep their notes: era I has a 12.5 % duty doubling and no bell, each later era adds one arpeggio step, and era V adds a short swell on an effects voice (never a music voice).</li>
+<li><strong>Army</strong> sounds (marching, shooting, guns, charges, sieges, ships) change with the warfare era of the army&#39;s own inventions (I to VII), so two armies of different eras on one field sound different. Marching: frame drum and loose steps in I and II; field drum and measured steps in III and IV; snare and boots in V and VI; an engine drone with motor transport in VII. Shooting: bow and crossbow I to II, matchlock II to III, volley IV to V, rifle V to VI, machine gun VI to VII.</li>
+<li>The turn chimes use your palette&#39;s wavetable and tuning, and the court horn your palette&#39;s lead. Everything else is shared; battle sounds differ by era and troop type, not culture.</li>
+<li>The catalogue stops at warfare era VII and music era V; there is nothing for 1945 onward.</li>
+</ul>
+<h3 id="the-effects-catalogue"><a class="anchor" href="#the-effects-catalogue" aria-label="Link to this section">#</a>The effects catalogue</h3>
+<p>129 sounds in 12 groups, named <code>&lt;group&gt;_&lt;name&gt;</code>, with a priority from 1 (highest) to 5.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Group (count)</th><th>Sounds</th></tr></thead>
+<tbody>
+<tr><td>Interface (21)</td><td><code>ui_tap</code>, <code>ui_tap_soft</code>, <code>ui_back</code>, <code>ui_confirm</code> (motif 1 to 5, for choices that cost something), <code>ui_cancel</code>, <code>ui_error</code>, <code>ui_toggle_on</code>/<code>off</code>, <code>ui_panel_open</code>/<code>close</code>, <code>ui_tab</code>, <code>ui_scroll_tick</code>, <code>ui_slider</code> (pitch rises with value), <code>ui_drag_pick</code>/<code>drop</code>, <code>ui_text_key</code>, <code>ui_tooltip</code> (off by default), <code>ui_hint</code> (a tutorial hint), <code>ui_achievement</code> (the motif on bells), <code>ui_save</code> (manual save), <code>ui_purchase</code></td></tr>
+<tr><td>Frame (6)</td><td><code>frame_logo</code>, <code>frame_start</code> (&quot;Tap to start&quot;), <code>frame_nation_pick</code> (in that realm&#39;s palette), <code>frame_campaign_begin</code>, <code>frame_pause</code>/<code>frame_resume</code></td></tr>
+<tr><td>Turn (5)</td><td><code>turn_end</code>, <code>turn_working</code> (a tick every 500 ms if the engine is still computing after 600 ms; never on fast turns), <code>turn_ready</code>, <code>turn_month_new_year</code> (adds a bell in January), <code>turn_report_open</code>. An autosave plays nothing</td></tr>
+<tr><td>Map (8)</td><td><code>map_select_province</code> (knock pitched by terrain), <code>map_select_own</code>, <code>map_zoom_step</code>, <code>map_lens</code>, <code>map_overview</code>, <code>map_fog_reveal</code>, <code>map_ping</code>, <code>map_border_change</code> (rising if you gain, falling if you lose, silent if neither side is you)</td></tr>
+<tr><td>Armies and fleets (15)</td><td><code>army_select</code> (horse adds a clop, guns a wheel creak), <code>army_order_move</code>, <code>army_march_loop</code>, <code>army_arrive</code>, <code>army_split</code>, <code>army_merge</code>, <code>army_levy_call</code> (a horn on the palette lead), <code>army_lords_call</code>, <code>army_hire</code>, <code>army_trained</code>, <code>army_disband</code>, <code>army_hungry</code> (repeats only when it gets worse), <code>army_winter_quarters</code>, <code>fleet_select</code>, <code>fleet_order_move</code></td></tr>
+<tr><td>Battle (18)</td><td><code>battle_start</code> (attacker&#39;s horn first), <code>battle_bell</code> (two strikes for the day&#39;s last bell), <code>battle_order</code>, <code>battle_shoot_bow</code>, <code>_crossbow</code>, <code>_matchlock</code>, <code>_volley</code>, <code>_rifle</code>, <code>_mg</code>, <code>battle_gun</code>, <code>battle_shell</code> (no falling whistle), <code>battle_charge_horse</code>, <code>battle_charge_foot</code>, <code>battle_melee</code>, <code>battle_brace</code>, <code>battle_sector_lost</code>, <code>battle_rout</code>, <code>battle_air</code> (era VII)</td></tr>
+<tr><td>Siege (10)</td><td><code>siege_begin</code>, <code>siege_closed</code>, <code>siege_bombard</code>, <code>siege_mining</code>, <code>siege_breach</code>, <code>siege_repair</code>, <code>siege_sally</code>, <code>siege_storm</code>, <code>siege_terms</code>, <code>siege_fall</code> (a lower bell for your own castle)</td></tr>
+<tr><td>Sea (5)</td><td><code>sea_battle_start</code>, <code>sea_broadside</code>, <code>sea_sink</code>, <code>sea_blockade</code>, <code>sea_landing</code></td></tr>
+<tr><td>Economy (8)</td><td><code>econ_income</code> (once per turn), <code>econ_income_big</code>, <code>econ_spend</code>, <code>econ_debt</code>, <code>econ_build_start</code>, <code>econ_build_done</code>, <code>econ_trade</code>, <code>econ_harvest</code> (rising if good, falling if famine looms)</td></tr>
+<tr><td>Realm and diplomacy (14)</td><td><code>realm_research_pick</code>, <code>realm_law</code>, <code>realm_ruler_dies</code>, <code>realm_heir_born</code>, <code>realm_stability_up</code>/<code>down</code> (a lord&#39;s loyalty steps up or down), <code>realm_unrest</code>, <code>realm_rising</code>, <code>realm_fire</code> (quiet and sombre), <code>realm_plague</code>, <code>diplo_envoy_sent</code>, <code>diplo_accepted</code>/<code>refused</code> (a court horn on the palette lead), <code>diplo_peace_signed</code></td></tr>
+<tr><td>Events and notifications (9)</td><td><code>event_open</code>, <code>event_choice</code>, <code>event_chain_next</code>, <code>notify_ping</code>, <code>notify_alert</code> (urgent: army in danger, castle closed, pay owed), <code>notify_war</code>, <code>notify_battle_far</code>, <code>notify_diplo</code>, <code>notify_batch</code></td></tr>
+<tr><td>Ambience (10)</td><td><code>amb_sea_coast</code>, <code>amb_sea_ocean</code>, <code>amb_wind_plain</code>, <code>amb_forest</code>, <code>amb_jungle</code>, <code>amb_desert</code>, <code>amb_mountain</code>, <code>amb_marsh</code>, <code>amb_town</code> (a factory whistle from era V), <code>amb_war_front</code></td></tr>
+</tbody></table></div>
+<p>Two aliases point at <code>ui_error</code>: <code>army_order_invalid</code> and <code>econ_cant_afford</code>.</p>
+<p><strong>On the battle screen</strong> at normal speed, sounds follow the order of a bell (orders, shooting, charges, melee, breaking), one per step from the sector nearest the screen centre, other sectors only if a voice is free. Skipping ahead plays only <code>battle_start</code>, <code>battle_rout</code> and the music stinger.</p>
+<h3 id="ambience"><a class="anchor" href="#ambience" aria-label="Link to this section">#</a>Ambience</h3>
+<p>Ambience is off by default. When on, it plays a bed chosen by what is under the camera at regional or local zoom: one of the ten loops of 4 to 12 seconds, noise with occasional wavetable notes. There is no weather, but in winter months the plain and forest beds are windier. Ambience may fill the silences between peace tracks.</p>
+<h3 id="many-things-at-once"><a class="anchor" href="#many-things-at-once" aria-label="Link to this section">#</a>Many things at once</h3>
+<ul>
+<li><strong>Turn results.</strong> When a new turn is shown, at most 5 effects play, 150 ms apart: first what happened to your armies, castles or ruler (highest priority first), then what is in view. Everything else is shown silently. With five or more notifications in a turn, <code>notify_batch</code> plays instead.</li>
+<li><strong>Voice stealing.</strong> A new sound with no free voice takes the voice of the lowest-priority sound playing, if that is lower than its own; otherwise it is dropped.</li>
+<li><strong>Cooldowns.</strong> The same sound does not restart within its cooldown: 50 ms by default, 40 ms for scroll ticks, 20 ms for sliders, 2 s for alerts, 5 s for unrest.</li>
+<li><strong>Variation.</strong> Repeating sounds vary by up to a semitone and a new noise seed, except sounds whose pitch carries meaning.</li>
+<li><strong>Position.</strong> A map sound is panned by its screen position up to 30 %, gets quieter toward the edge (0.4 at the edge) and is muted off screen. Notifications always play centred and are never muted.</li>
+<li><strong>Zoom.</strong> At world zoom only notifications play from the map; at regional zoom also army orders, battle starts, siege breaches, sea battle starts and map sounds; at local zoom everything.</li>
+</ul>
+<h3 id="mixing-with-the-music"><a class="anchor" href="#mixing-with-the-music" aria-label="Link to this section">#</a>Mixing with the music</h3>
+<ul>
+<li>While a stinger plays, effects of priority 3 to 5 are dropped and priority 1 and 2 are ducked 4 dB.</li>
+<li>Effects duck the music only for six sounds (<code>battle_start</code>, <code>siege_breach</code>, <code>siege_storm</code>, <code>realm_rising</code>, <code>realm_ruler_dies</code>, <code>sea_battle_start</code>), by 4 dB for their length. No other sound ducks it, however long.</li>
+<li>Ambience ducks 6 dB under any priority 1 or 2 effect and fades out over 2 s when a music track starts.</li>
+<li>The game menu leaves the music as it is.</li>
+<li>While several of your battles run at once, you hear the battle sounds of the one on screen; switching battles switches the sounds.</li>
+<li>A <code>ui_tap</code> sits about 6 dB below the music&#39;s average, a priority 1 sound peaks about 3 dB above it, and the whole mix aims at −16 LUFS.</li>
+<li>Several achievements in one turn play <code>ui_achievement</code> once.</li>
+</ul>
+<h3 id="platform-behaviour"><a class="anchor" href="#platform-behaviour" aria-label="Link to this section">#</a>Platform behaviour</h3>
+<ul>
+<li>PH-5 runs in an AudioWorklet at the device&#39;s sample rate, fed by a main-thread scheduler about 100 ms ahead. If the worklet cannot start, the same voices are built from standard oscillators and a looping noise buffer.</li>
+<li>Music and effects together stay under 2 % of one core on a mid-range phone.</li>
+<li>Audio starts on the first tap; the title&#39;s &quot;Tap to start&quot; is that tap. A mobile cold start has a silent splash and the first sound is <code>frame_start</code>; desktop and Steam play <code>frame_logo</code>.</li>
+<li>In the background, or with the tab hidden, sound is suspended, and it resumes with <code>load_resume</code>. Notifications that arrived while you were away play no sound.</li>
+<li>On iPhone the game uses the &quot;ambient&quot; audio session: it mixes with your other audio apps and respects the silent switch; effects follow the same session as music. On desktop, &quot;Play in background&quot; (off by default) keeps the sound going when the window is hidden; on the web it always pauses.</li>
+<li>Interface sounds start within one audio block of the tap (about 3 ms) by a direct message to the worklet; map and battle sounds go through the scheduler so they line up with animation.</li>
+<li><strong>Haptics</strong> on phones (on by default, never on desktop, working with sound off): all light: <code>ui_error</code>, <code>turn_ready</code>, <code>battle_start</code>, <code>siege_breach</code>, and <code>realm_ruler_dies</code> once.</li>
+</ul>
+<h3 id="the-sound-card"><a class="anchor" href="#the-sound-card" aria-label="Link to this section">#</a>The Sound card</h3>
+<p>The speaker button in the side tools, under the map mode and your commanders, opens the Sound card: what is playing now and why (for example &quot;Mobilizing: war has been declared, the armies gather&quot;), the volume, music on or off with its volume, the effects volume, and button sounds on or off. The speaker shows struck through while music is off, so you can tell without opening it. Sound starts with your first tap, as browsers and phones require, and your choices stay on the device.</p>
+<p>In this first cut the game plays the title theme, two peace tunes for each half of the eras in your palette&#39;s own tuning and timbre, prosperity, diplomacy, mobilizing, campaign (whose layers join as your armies close on the enemy and fight), siege, a losing war, unrest and crisis, with stingers for war declared, battles won and lost, and wars won and lost. Turns chime at their end and start (the full motif at a new year), taps click, and marches, levies, battles, sieges, famine and unrest each have a sound.</p>
+<h3 id="settings"><a class="anchor" href="#settings" aria-label="Link to this section">#</a>Settings</h3>
+<p>Master, music, effects and ambience volumes; music on or off (off fully suspends the synth); variety; zoom mix; ambience on or off; interface sounds on or off; haptics; mono; sound captions; reduced intensity. Defaults: master 0.8, music 0.7, effects 0.8, ambience 0.5 when on, variety &quot;My palette only&quot;, interface sounds on, haptics on (phones). The tooltip sound is never played. The rows themselves live in <a href="/wiki/Settings">Settings</a>.</p>
+<h3 id="accessibility"><a class="anchor" href="#accessibility" aria-label="Link to this section">#</a>Accessibility</h3>
+<ul>
+<li>Every sound has a visual partner (a toast, an icon flash or an animation), so the game is fully playable muted.</li>
+<li><strong>Sound captions</strong> show off-screen sounds as a small caption at the screen edge toward where they came from (&quot;Battle at Troyes&quot; with crossed swords). Off by default, they turn on by themselves when you turn sound off.</li>
+<li><strong>Mono</strong> turns pan off.</li>
+<li>Rising and falling pairs (gain and loss) differ by rhythm or timbre as well as pitch.</li>
+<li><strong>Reduced intensity</strong> removes the echo, softens priority 1 sounds by 4 dB, and turns off the machine-gun stutter and sharp attacks.</li>
+</ul>
+<h3 id="care"><a class="anchor" href="#care" aria-label="Link to this section">#</a>Care</h3>
+<ul>
+<li>Palettes describe musical features, not ethnic stereotypes, and never use a &quot;generic exotic&quot; scale shared across unrelated traditions. Each palette&#39;s tracks are reviewed by a musician or scholar of that tradition before release and credited.</li>
+<li>Colonized peoples are never written as an &quot;enemy&quot; or &quot;primitive&quot; side, and Indigenous and African palettes get the same development across all five eras as European ones.</li>
+<li>A narrative-only event gets no stinger at all.</li>
+<li>A peace with neither gain nor loss plays no stinger.</li>
+<li>Tutorial steps play <code>ui_hint</code> when they appear and <code>ui_confirm</code> when done, and a new warning plays <code>notify_alert</code>; none of them lowers the music.</li>
+<li>Plunder, razing, massacres, enslavement and narrative-only events never get coins, chimes, fanfares or any rising, rewarding sound (at most <code>realm_fire</code> or a single low bell), and plunder adds gold silently.</li>
+<li>Colonial conquest has no distinct &quot;victory&quot; sound, and Indigenous and African arms sound by era and type with the same quality as anyone&#39;s.</li>
+<li>Era VII machine guns, shells and gas sound at a distance without exaggeration: no screams, no wounded, no speech or crowds anywhere. &quot;Shout&quot; sounds are pulse sweeps.</li>
+</ul>
+<h3 id="how-it-is-made"><a class="anchor" href="#how-it-is-made" aria-label="Link to this section">#</a>How it is made</h3>
+<p>Tracks are written as MML text, one file per track, in <code>packages/rules/data/music/tracks/</code>, compiled to JSON (patterns, order list, loop point, layers, era variants). Sounds are text blocks in <code>packages/rules/data/audio/sfx/&lt;group&gt;.sfx</code>, compiled by the same step. The build checks the voice budget, range per voice, loop length, that the motif appears and that every id the director names exists; for sounds it fails on more than three voices, 2 seconds or longer (ambience exempt), a missing named sound, a missing era variant a troop type needs, a <code>ui_</code> sound of 10 ms or less, or a sound with no visual partner named. Every number the director and mixer use lives in <code>music.yaml</code> and <code>sfx.yaml</code>, so balancing needs no code. Events can carry <code>music:</code> and <code>sfx:</code> tags, and a <code>bindings</code> table maps game events to sound ids.</p>
+<p>Tools: <code>/music.html</code> lists every track with any palette, era variant and layer toggled and live voice use, plus an Effects tab with every sound and a &quot;busy turn&quot; button that fires 40 battle results at once; a render script bounces any track or sound to WAV; and the diagnostics line shows the current music state, track, layer and why it was chosen, and the last five effects with which were dropped and why.</p>
+<p>The music is written in-house by Claude in MML. Each track ships with a rendered MP3 that Leroy approves by ear before it goes into the game; a failing track is reworked, not shipped. If the first milestone&#39;s tracks fail that gate, an outside chiptune composer is commissioned for the title theme and the motif only.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Milestone</th><th>Music</th><th>Effects</th></tr></thead>
+<tbody>
+<tr><td>M1 / S1 Proof of sound</td><td>Synth, scheduler, <code>/music.html</code>, MML compiler, <code>title</code>, two early peace tracks, <code>war_campaign</code> with 3 layers, three stingers</td><td>Effects bank, direct path, <code>.sfx</code> compiler, Effects tab, all interface and turn sounds, income, spend, province select</td></tr>
+<tr><td>M2 / S2 Playable loop</td><td>Director, <code>music.yaml</code>, event tags, mobile behaviour, nation select, diplomacy, crisis, mobilize, losing, <code>era_1</code> and <code>era_2</code></td><td>Priorities, cooldowns, turn results, ducking, <code>sfx.yaml</code>, haptics, frame, notify and event sounds, army orders, battle start and rout</td></tr>
+<tr><td>M3 / S3 The world</td><td>Early tracks for all palettes, remaining war and mood tracks, the first five age stingers</td><td>Battle set eras I to IV, siege, sea, economy, realm, diplomacy</td></tr>
+<tr><td>M4 / S4 The centuries</td><td>Late tracks, era themes 3 to 5, remaining age stingers, the era matrix, cultural reviews</td><td>Era V to VII variants, ambience, captions, reduced intensity, loudness pass</td></tr>
+</tbody></table></div>
+<h2 id="what-you-see"><a class="anchor" href="#what-you-see" aria-label="Link to this section">#</a>What you see</h2>
+<p>Audio has its own visuals only where they partner a sound: captions at the screen edge, toasts and icon flashes. Developers see <code>/music.html</code> and the diagnostics line. Everything else (settings rows, screens) belongs to <a href="/wiki/Settings">Settings</a> and <a href="/wiki/Screens-and-Navigation">Screens and navigation</a>.</p>
+<h2 id="how-it-connects"><a class="anchor" href="#how-it-connects" aria-label="Link to this section">#</a>How it connects</h2>
+<ul>
+<li><a href="/wiki/Screens-and-Navigation">Screens and navigation</a>: screen ids and their music column, the Realm book tab, pause, &quot;Tap to start&quot;, toasts and captions.</li>
+<li><a href="/wiki/Settings">Settings</a>: every audio setting.</li>
+<li><a href="/wiki/Time-and-Turns">How a turn works</a>: turn end, turn ready, the game year and January.</li>
+<li><a href="/wiki/Map-and-Lenses">Map and Map Modes</a>: camera position, region and zoom, what is on screen, terrain under the camera.</li>
+<li><a href="/wiki/Culture">Culture</a>: your primary culture group, its changes and culture mix.</li>
+<li><a href="/wiki/The-1378-Start">The 1378 start</a>: capital longitude for the turkic split, colonial founding dates.</li>
+<li><a href="/wiki/Warfare">Warfare</a>: war declared, war trend, occupied capital, battles, bells, routs, sieges, army eras and troop types.</li>
+<li><a href="/wiki/Naval">Naval</a>: sea battles, broadsides, sinkings, blockades, landings, fleet orders.</li>
+<li><a href="/wiki/Troop-Movement">Troop movement</a>: march orders, arrivals, winter quarters.</li>
+<li><a href="/wiki/Recruiting">Recruiting</a>: levy, lords, hiring, training, disbanding.</li>
+<li><a href="/wiki/Your-Realm">Your realm</a>: ruler deaths and new rulers, heirs, lords&#39; loyalty, treasury, income, debt, laws.</li>
+<li><a href="/wiki/Provinces">Provinces</a>: harvest, plague, unrest thresholds.</li>
+<li><a href="/wiki/Rebellions">Rebellions</a> and <a href="/wiki/Revolutions">Revolutions</a>: risings, rebels in the field, revolutions touching you.</li>
+<li><a href="/wiki/Historical-Events">Historical events</a>: event cards, chains, choices, tags, narrative-only events, ages.</li>
+<li><a href="/wiki/Research">Research</a>: inventions adopted and research picks.</li>
+<li><a href="/wiki/Exploration-and-Colonies">Exploration and colonies</a>: discoveries, explorers and colonists, fog lifting.</li>
+<li><a href="/wiki/Diplomacy">Diplomacy</a>: alliances, treaties, envoys and answers.</li>
+<li><a href="/wiki/Buildings">Buildings</a> and <a href="/wiki/Trade">Trade</a>: buildings ordered and finished, traders and routes.</li>
+<li><a href="/wiki/Achievements">Achievements</a>: the unlock sound.</li>
+<li><a href="/wiki/Tutorial-and-Help">Tutorial and help</a>: <code>ui_hint</code> for steps, and the sounds the tutorial asks for.</li>
+<li><a href="/wiki/Saving">Saving</a>: <code>ui_save</code> for a manual save; autosave is silent.</li>
+</ul>
+<p>Audio never feeds back into the engine, and computer players hear nothing (though <code>war_declared</code> uses the attacking computer&#39;s palette).</p>
+<h3 id="each-turn"><a class="anchor" href="#each-turn" aria-label="Link to this section">#</a>Each turn</h3>
+<p>After the simulation and turn report are ready, audio reads your war state, battles and sieges, capital, unrest, lords&#39; loyalty, treasury trend, active ages and tagged chains, the year and your culture group; evaluates the music state and schedules the change; plays the turn results; then <code>turn_ready</code> (or <code>turn_month_new_year</code> in the turn in which January begins). A turn is one week, so the turn chimes play every week, while month, season and year cues play once, in the turn in which that month, season or year begins.</p>
+<h2 id="numbers"><a class="anchor" href="#numbers" aria-label="Link to this section">#</a>Numbers</h2>
+<p>From <code>music.yaml</code> and <code>sfx.yaml</code>. Almost all are provisional placeholders; the era basis, campaign end and ambience default are decided.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>eras.basis</code></td><td>calendar (decided)</td></tr>
+<tr><td><code>eras.bands</code></td><td>I 1378, II 1520, III 1650, IV 1790, V 1870</td></tr>
+<tr><td><code>eras.campaign_end</code></td><td>1939-08-31 (fixed)</td></tr>
+<tr><td><code>palettes.split.turkic</code></td><td>west of longitude 55 → Middle East, else steppe</td></tr>
+<tr><td><code>states.war_losing</code></td><td>more than half your peace voices would accept the enemy&#39;s terms, or capital occupied</td></tr>
+<tr><td><code>states.world_war</code></td><td>60 % of the 8 great powers (most provinces) at war, era V</td></tr>
+<tr><td><code>states.war_naval</code></td><td>60 % of battles at sea in the last 5 months</td></tr>
+<tr><td><code>states.war_siege</code></td><td>a siege active and no field battle in the last 3 months</td></tr>
+<tr><td><code>states.war_mobilize</code></td><td>at most 2 months since declaration, no battle yet</td></tr>
+<tr><td><code>states.revolution</code></td><td>revolution period touching you, era IV on</td></tr>
+<tr><td><code>states.unrest</code></td><td>25 % of provinces plotting or risen</td></tr>
+<tr><td><code>states.prosperity</code></td><td>no disloyal lord and at least half loyal, treasury rising, 10 years at peace</td></tr>
+<tr><td><code>transitions.min_seconds_in_state</code></td><td>45</td></tr>
+<tr><td><code>transitions.max_phrase_wait_bars</code> / <code>crossfade_bars</code></td><td>8 / 1</td></tr>
+<tr><td><code>transitions.silence_after_stinger_seconds</code></td><td>3 to 6</td></tr>
+<tr><td><code>transitions.stinger_duck_db</code></td><td>−6</td></tr>
+<tr><td><code>rotation.weights</code></td><td>0.60, 0.20, 0.15, 0.05</td></tr>
+<tr><td><code>rotation.camera_dwell_seconds</code></td><td>20</td></tr>
+<tr><td><code>rotation.no_repeat_last</code></td><td>3</td></tr>
+<tr><td><code>rotation.silence_between_seconds</code></td><td>10 to 40</td></tr>
+<tr><td><code>zoom_mix</code></td><td>−3 dB percussion, +1 dB lead at local zoom</td></tr>
+<tr><td><code>mix.master_lowpass_hz</code> / <code>max_pan</code> / <code>target_loudness_lufs</code></td><td>9000 / 0.3 / −16</td></tr>
+<tr><td><code>defaults.music_volume</code> / <code>sfx_volume</code></td><td>0.7 / 0.8</td></tr>
+<tr><td><code>defaults.ambience</code></td><td>false (decided)</td></tr>
+<tr><td><code>bank.tick_hz</code> / <code>max_length_ms</code></td><td>60 / 2000</td></tr>
+<tr><td><code>buses</code></td><td>master 0.8, music 0.7, effects 0.8, ambience 0.5</td></tr>
+<tr><td><code>defaults.variety</code></td><td>own palette only</td></tr>
+<tr><td><code>priority.defaults_by_group</code></td><td>ui 3, frame 1, turn 1, map 3, army 2, fleet 2, battle 3, siege 3, sea 3, econ 3, realm 2, diplo 2, event 2, notify 3</td></tr>
+<tr><td><code>cooldown_ms</code></td><td>default 50, scroll 40, slider 20, alert 2000, unrest 5000</td></tr>
+<tr><td><code>turn_results</code></td><td>max 5, 150 ms apart, batch at 5</td></tr>
+<tr><td><code>turn_working</code></td><td>after 600 ms, every 500 ms</td></tr>
+<tr><td><code>distance</code></td><td>linear, edge 0.4, mute off screen</td></tr>
+<tr><td>CPU budget</td><td>under 2 % of one core on a mid-range phone</td></tr>
+</tbody></table></div>
+<h2 id="still-open"><a class="anchor" href="#still-open" aria-label="Link to this section">#</a>Still open</h2>
+<ul>
+<li>Each palette needs a paid reviewer from its musical tradition, and every track needs Leroy&#39;s listening approval, before release.</li>
+<li>The iPhone audio session is to be checked on real devices before release.</li>
+</ul>
+<h2 id="for-developers"><a class="anchor" href="#for-developers" aria-label="Link to this section">#</a>For developers</h2>
+<ul>
+<li>Spec: <a href="https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/audio/spec.md" rel="noopener"><code>domain/audio/spec.md</code></a>, requirement code <strong>AUD</strong> (AUD-001 to AUD-137).</li>
+<li>Features: <code>domain/audio/features/</code> (sound-chip, motif, eras-and-palettes, track-list, music-director, peace-rotation, effects-catalogue, effects-era-and-region, ambience, busy-turns-and-mixing, music-and-effects-together, platform-behaviour, audio-accessibility, care, audio-data-build).</li>
+<li>Code: <code>packages/engine/src/domain/audio/</code> (music, effects, platform); data in <code>packages/rules/data/domain/audio.json</code>. The director and synth run on the client, never in the engine. Track and sound data go in <code>packages/rules/data/music/tracks/</code> and <code>packages/rules/data/audio/sfx/</code>.</li>
+</ul>
