@@ -498,6 +498,38 @@ at a 1444 start, by its conditions rather than by its date.
   map in the Wide and Tall layouts, inside the safe areas, its text scrolling while the options stay in reach,
   every button at least 44 points high, nothing that needs hover. [X-19, SHELL-070, SHELL-080, SHELL-081]
 
+### 5.18 Bridge events of 1378 to 1444: the East (milestone 10, step 6)
+
+The East's bridge events live in `events-bridge-east.json`, written by `tools/domain-data/build_bridge_east.py`:
+North and East (Kulikovo to Grunwald and the Muscovite war of succession), the Ottomans and the Balkans (John V
+restored to the Crusade of Varna), the steppe and Iran (Tokhtamysh to Abu'l-Khayr's Uzbeks) and the Mamluks and
+the Horn of Africa (Barquq to Zara Yaqob). Timur in India is the South file's `sack_of_delhi`.
+
+- EVT-090 The East's bridge events shall all belong to the Age of Schism and Conquerors, none shall be
+  `mandatory`, and most shall be `approximate`, so each is likeliest near its history year while its
+  conditions hold and none is forced by its date. Its turning points (★ in plan-1378 §5) shall be among them:
+  Kulikovo, Tokhtamysh burns Moscow, the Union of Krewo, Grunwald, Kosovo, Nikopolis, Ankara, the Crusade of
+  Varna, Tokhtamysh unites the Horde, Timur's three-year and five-year campaigns, the Terek, the death of Timur,
+  and the Khanates of Kazan and Crimea. [plan-1378 §2, §5; D-EVT-21]
+- EVT-091 Every East bridge event shall pass the tree's build checks (EVT-062) together with the campaign's
+  events, shall name realms by their tree ids (`ottoman`, `mamluk`, `timurid_empire`, `golden_horde`), and shall
+  name only places that its file or `events-places.json` maps to provinces. [EVT-057, EVT-062; D-EVT-17;
+  D-EVT-21]
+- EVT-092 The campaign events of the East that waited only for the year 1444 shall be copied into the East file
+  with an earlier `earliest` and nothing else changed: the fall of Constantinople (1390), Mohács (1400), the
+  Union of Lublin (1386), the Ottoman conquest of the Mamluks (1400), the conquest of Kazan (1438), the Kazakh
+  khanate (1428) and the Shaybanid conquest of Transoxiana (1428); a bridge event replaces the campaign event of
+  the same id. [plan-1378 §5; D-EVT-21]
+- EVT-093 The Crusade of Varna shall be a bridge event like the others: open from 1425 to 1465, likeliest
+  in 1444, it fires when a realm on the Ottoman border is at war with the Ottomans or has just made the Long
+  Campaign, and not once the Ottomans hold Constantinople. [plan-1378 §5; D-EVT-21]
+
+#### How the player uses it
+- EVT-094 Nothing new is tapped: an East bridge event that fires for the player opens the event card
+  (EVT-076) with its name, its history year, its summary and two or three options, one marked *As in
+  history*; every one has its name, summary and option labels in the localization. Grouping and overview: each
+  event is one card, and the News keeps the line; the Chronicle card (plan-1378 §4.6) is the overview of the
+  bridge events and comes with the history check. Phone: as EVT-076. [X-19; EVT-061, EVT-076]
 ### 5.19 Bridge events of 1378 to 1444: Asia, Africa and the Americas (milestone 10, 19 October 2026)
 
 The south's turning points between the 1378 start and 1444 (plan-1378 §5, rows South Asia, East Asia, Southeast
@@ -757,6 +789,16 @@ before achievements and the autosave. The age and period checks run in the event
   the great powers by provinces held (EVT-083). Exploration's gate reads the tree's own age when the tree runs
   (EXPL-076). Conditions name only events the tree has; the bridge events of 1378 to 1444 will start and end
   the new periods when they are written (plan-1378 step 6).
+- **D-EVT-21** The East's bridge events (milestone 10, step 6; integrator's picks, 19 Oct): 46 new events and 7
+  re-dated ones (EVT-090 to EVT-093). Realms go by tree ids, places by 1444 province ids in the file's own
+  `places`. The Horde union of east.md is Tokhtamysh's event: the Golden Horde absorbs the White Horde and Arab
+  Shah's Horde and keeps the id `golden_horde` (map `great_horde`). The Livonian and Prussian confederations and
+  Giskra's Upper Hungary come as events, not sleeping realms (decisions.md 5); Kazan, Crimea, the Uzbeks, Adal and
+  Galich wake by `create_country`. Ankara starts the Ottoman Interregnum and Mehmed I ends it; Timur's death ends
+  his conquests and opens the Timurid fragmentation (EVT-081). The Crusade of Varna keeps its id and opens in
+  1425, with the Long Campaign as its forerunner. Mamluk events are written from general scholarship (no
+  research file covers them), with confidence in each event's history block. Kalmar and Engelbrekt are the
+  West's; Timur in India is the South's `sack_of_delhi`.
 
 - **D-EVT-22** Bridge events for Asia, Africa and the Americas (milestone 10, step 6; 19 Oct 2026): the region
   files share one shape (the campaign's events, names, entities and places as lists of map provinces) and one
@@ -791,6 +833,8 @@ before achievements and the autosave. The age and period checks run in the event
 | EVT-082 | ages-and-periods.feature | Forced dates; bombards among three great powers; two are not enough; the fall of Constantinople; Portugal's ocean ships; Exploration's window. Engine: packages/engine/test/events.test.ts |
 | EVT-083 | — | Engine: packages/engine/test/events.test.ts (without bombards or ocean ships the two ages wait) |
 | EVT-084 | — | Presentation: nothing new on screen |
+| EVT-090 – 093 | bridge-east.feature | The East's bridge events and turning points; build checks, tree ids and places; the re-dated campaign events; the Crusade of Varna waits for a war on the Ottoman border |
+| EVT-094 | bridge-east.feature | Every East event reads on the card: name, summary, two or three options, one historical |
 | EVT-095 | bridge-south.feature | The southern events are well formed and never forced; from 1444 the earlier ones have happened as in history |
 | EVT-096 | bridge-south.feature | The Inca expand after beating the Chanka; a fled court does not; the 1444 floors give way to their reasons |
 | EVT-097 | bridge-south.feature | Malacca is founded only after Singapura falls |
