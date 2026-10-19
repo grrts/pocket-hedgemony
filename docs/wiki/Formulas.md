@@ -676,12 +676,12 @@ rate = net × heritage growth, when net is above 0; net otherwise
 class people = class people × (1 + rate ÷ 12)
 ```
 
-- Births: farmers, herders, woodsmen, seafolk, homeless (0.04); miners (0.035); craftsmen, market folk, clerks (0.03); clergy (0.005); scholars (0.01).
+- Births: farmers, herders, woodsmen, seafolk (0.036); homeless (0.04); miners (0.035); craftsmen, market folk, clerks (0.03); clergy (0.005); scholars (0.01).
 - Deaths: land classes and clergy and scholars (0.03); miners (0.04); craftsmen, market folk, clerks (0.035); homeless (0.05).
 - War: `province.death_modifiers.war` (0.01) while the province is occupied, besieged or fought in.
 - Plague: `province.decided.birth_points.plague` (−1 point, so 0.01) while plague is in the province.
 
-Other birth and death changes (food store, peace, hunger, burned tiles) are not in the game yet. Famine deaths are under Food.
+Food does not change births: a hungry province goes on having children, and its shortage shows as famine. Other birth and death changes (peace, burned tiles) are not in the game yet. Famine deaths are under Food.
 
 Source: `packages/engine/src/living.ts` (monthlyPeople); `packages/engine/src/domain/province/people.ts` (birthRate, deathRate, deathModifiers)
 

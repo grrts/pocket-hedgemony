@@ -2737,21 +2737,18 @@ When("a year of monthly births and deaths passes", (s) => {
   s.born = Math.round(born);
   s.died = Math.round(died);
 });
-Then("2,880 are born and 2,160 die", (s) => {
-  expect(s.born).toBe(2880);
+Then("2,592 are born and 2,160 die", (s) => {
+  expect(s.born).toBe(2592);
   expect(s.died).toBe(2160);
 });
-Then("the province {string} grows by 720 people", (s) => {
-  expect(s.born - s.died).toBe(720);
+Then("the province {string} grows by 432 people", (s) => {
+  expect(s.born - s.died).toBe(432);
 });
 const BIRTH_COND: Record<string, string> = {
-  "has more than 6 months of food in store": "food over 6 months",
   "has had 10 years of peace": "10 years of peace",
-  "has less than 3 months of food in store": "food under 3 months",
-  'is short of food with the "Hungry" grievance': "Hungry",
   "has plague": "plague",
 };
-Given(/^the province "([^"]+)" (has more than 6 months of food in store|has had 10 years of peace|has less than 3 months of food in store|is short of food with the "Hungry" grievance|has plague)$/, (s, name: string, c: string) => {
+Given(/^the province "([^"]+)" (has had 10 years of peace|has plague)$/, (s, name: string, c: string) => {
   prov(s, name);
   (s.birthConds ??= []).push(BIRTH_COND[c]!);
 });

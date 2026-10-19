@@ -3661,7 +3661,7 @@ Then("the page {string} sits in the section {string}", (_s, page: string, sectio
 
 // The Realm overview (SHELL-170, SHELL-171)
 
-const OVERVIEW_BASE: OverviewInput = { gold: 0, perMonth: 0, hungry: 0, low: 0, provinces: 1, people: 0, newLands: 0, risings: 0, verdicts: 0, huntWaits: 0, armies: 0, men: 0, fleets: 0, wars: 0, allies: 0, subjects: 0, answerWaits: false, study: { name: "Plough", pct: 10 }, beliefLow: false };
+const OVERVIEW_BASE: OverviewInput = { gold: 0, perMonth: 0, hungry: 0, low: 0, short: 0, provinces: 1, people: 0, newLands: 0, risings: 0, verdicts: 0, huntWaits: 0, armies: 0, men: 0, fleets: 0, wars: 0, allies: 0, subjects: 0, answerWaits: false, study: { name: "Plough", pct: 10 }, beliefLow: false };
 
 Given("the realm stands as:", (s, table: Table) => {
   const v: OverviewInput = { ...OVERVIEW_BASE };
