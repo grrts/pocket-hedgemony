@@ -10,7 +10,7 @@ Every playable country has a heritage: what it is good at because of where and w
 |---|---|
 | Birthright | The one always-on strength that comes from who the country is |
 | Golden age | A strength tied to one historical age, active while that age is running and its condition holds |
-| Ambitions | Hidden goals drawn from the country's own pool |
+| Ambitions | Goals drawn from the country's own pool: you see the goal and how far you are; the reward stays a secret until you earn it |
 | Legacies | Permanent strengths you earned |
 | Weakness | Something from history that holds you back until you overcome it |
 
@@ -39,42 +39,37 @@ At most 2 golden ages can be active at once. If a third would begin, you are ask
 
 ### Ambitions
 
-Each country has a pool of 4 to 7 ambitions (at least 5 for hand-written countries, at least 4 for generated ones). When the campaign starts, 3 are drawn as your active ambitions, and at least one of them is tagged historical. Castile, with a pool of 6 of which 2 are historical, gets 3 drawn with at least one historical among them. If a drawn ambition's goal already holds on the first day, it is put back and another is drawn: no free wins.
+Each country has a pool of ambitions: 4 to 7 of its own from the heritage build (at least 5 for hand-written countries, at least 4 for generated ones), plus the ones written for it later in the ambitions file. When the campaign starts, 3 are drawn as your open ambitions, and at least one of them is tagged historical. Castile, with a pool of 6 of which 2 are historical, gets 3 drawn with at least one historical among them. If a drawn ambition's goal already holds on the first day, it is put back and another is drawn: no free wins.
 
-Ambitions stay hidden. While an ambition is open, its plain goal is never shown.
+**You see the goal, not the reward.** An open ambition shows its name, its plain goal and your progress, such as "Hold eight colonies or posts in Brazil: 3/8". Of the reward you only see the name of the legacy it promises, such as "Estado da Índia", and whether it is a great legacy. What the legacy actually gives is shown when you fulfil the ambition.
 
 | State | What you see |
 |---|---|
-| Hidden | Only its theme icon (land, sea, trade, faith, crown, learning, survival or wealth) and a one-line riddle hint, such as Venice's "The Visconti line is ending; the river is a border only by habit." |
-| Hinted | Its hint condition held, so it is revealed. The hint is still the only words shown, but now you also see its warmth, the name of the legacy it promises and its deadline, if it has one |
-| Done | The goal holds. You get the legacy, the plain goal is shown for the first time, and a new ambition is drawn |
-| Lost | The deadline passed or the fail condition held. No penalty: the plain goal is shown as what might have been, and a new ambition is drawn |
+| Open | Its theme icon (land, sea, trade, faith, crown, learning, survival or wealth), its name, its plain goal, a progress meter ("3/8"), the name of the legacy it promises and its deadline, if it has one |
+| Done | The goal holds. You get the legacy, see what it gives for the first time, and a new ambition is drawn |
+| Lost | The deadline passed or the fail condition held. No penalty, a new ambition is drawn, and the reward stays a secret |
 
 When Portugal holds Calicut, its ambition "Beyond the Cape of Storms" is done and grants the legacy "Estado da Índia". If its window ends in 1560, the ambition is lost when 1561 begins.
 
-**Warmth** is the share of the goal's conditions that currently hold, shown in three bands: cold (under a third), warm (from a third to under two thirds) and hot (two thirds or more). A count condition counts as partly met by how far it has come: a goal of 12 markets with 8 built is two thirds met. A goal that is a single yes-or-no condition goes from cold straight to done.
+**Progress** reads as have of need. A count shows the count against its target: 8 markets of 12 is "8/12". A goal of several parts that must all hold counts the parts held: 2 of the 3 places is "2/3". A goal met in one of several ways shows the way nearest done. A single yes-or-no goal shows "0/1" until it is done.
 
-| Goal conditions | Holding | Warmth |
-|---|---|---|
-| 3 | 0 | cold |
-| 3 | 1 | warm |
-| 3 | 2 | warm |
-| 3 | 3 | done |
-| 4 | 3 | hot |
+**Within reach.** Once two thirds of a goal is met, the ambition is within reach: its row is highlighted and you get one line about it. A count counts as partly met by how far it has come, so 8 markets of 12 is within reach. A yes-or-no goal goes from 0/1 straight to done.
 
-**Counsel.** Once every 10 years you can pay gold to reveal one ambition at once and see its warmth. Its words stay a hint. The price rises by era:
+**Requirements.** Some ambitions can only be drawn once something has happened: an earlier ambition fulfilled, an event of history, or a coast to sail from. Until then they wait in the pool. So ambitions follow on from one another, and finishing one can open the next.
+
+**Counsel: a new aim.** Once every 10 years you can pay gold to set one open ambition aside; it goes back to the pool and the court draws another in its place at once. The price rises by era:
 
 | Era | I | II | III | IV | V | VI | VII |
 |---|---|---|---|---|---|---|---|
 | Gold | 30 | 50 | 80 | 120 | 180 | 260 | 380 |
 
-**Envoys.** A country that keeps a resident envoy at a foreign court for 2 years learns the hint and warmth of one of that country's active ambitions, never its plain goal. Milan with an envoy at Venice's court learns one of Venice's. The computer can do the same to you.
+**Envoys.** A country that keeps a resident envoy at a foreign court for 2 years learns the name, goal and progress of one of that country's open ambitions, never its reward. Milan with an envoy at Venice's court learns one of Venice's. The computer can do the same to you. Without an envoy, another realm's card only counts its ambitions.
 
 **Age ambitions.** Some pool entries name an age; they join the pool when that age begins.
 
-**History mode.** A campaign setting chooses "Drawn" (the default) or "Historical only", which draws only historical ambitions. No setting reveals ambitions.
+**History mode.** A campaign setting chooses "Drawn" (the default) or "Historical only", which draws only historical ambitions. No setting reveals rewards.
 
-The [tutorial](Tutorial-and-Help) teaches ambitions with one ambition whose hint is plain.
+The [tutorial](Tutorial-and-Help) teaches ambitions with one ambition, its goal and progress shown like any other and its reward named but secret.
 
 ### Legacies
 
@@ -178,7 +173,7 @@ The current build has 706 countries with heritage (58 hand-written, 648 generate
 
 ### Events
 
-Heritage proposes four effects and one condition to the event tree. `grant_legacy` grants a legacy; `wake_heyday` makes a golden age active for a number of years even if its condition fails; `stir_ambition` reveals an ambition, keeping its words a hint; `shed_burden` overcomes the weakness. The `heritage` condition lets events ask about heritage, and the `event_weight` and `event_option` levers raise an event's weight or open an option for the country.
+Heritage proposes effects and a condition to the event tree. `grant_legacy` grants a legacy; `wake_heyday` makes a golden age active for a number of years even if its condition fails; `shed_burden` overcomes the weakness. (`stir_ambition`, which revealed a hidden ambition, is retired now that goals are in plain sight.) The `heritage` condition lets events ask about heritage, so an event can require an ambition fulfilled, and the `event_weight` and `event_option` levers raise an event's weight or open an option for the country.
 
 ### The computer
 
@@ -188,16 +183,18 @@ The computer always knows its own ambitions and treats them as goals with weight
 
 - **In the game today.** Every realm's card has a **Heritage** line on its General tab, naming its birthright and its weakness. Tap it, or the **Heritage** tab, to see the birthright, each golden age with the age it belongs to, and the weakness; tap any of them for its full text and history note. Under them, **In 1378** shows how the chronicles judge the realm at the start: Strength (economy, manpower, army, navy, trade, standing abroad), Government (reach of rule, finances, stability, institutions, cohesion, prospects) and Dangers (unrest, threat from outside), each as five steps with a word, with a question mark where the chronicles are unsure. The tab is there for every realm, also before you pick one. 110 of the 137 realms on the map have heritage; the rest say none is recorded yet. Ambitions, legacies and golden ages beginning follow when heritage is checked each turn.
 
-- **The country card** gets one Heritage row: the birthright icon, the active golden age icon, three hidden ambition icons and the weakness icon. Tapping it opens the Heritage sheet.
+- **Your ambitions** are on the **Heritage** tab of your realm card, under Ambitions: one row each with its theme icon, name, goal, a progress meter with "have/need", the legacy it promises, its deadline and "within reach" once it is. When the court can be asked, each row has a **New aim** button with its price. Settled ambitions are under **Past**: a fulfilled one with its legacy and what it gives, a lost one with its goal.
+- **The overview.** The **Heritage** line on the General tab shows each open ambition's progress at a glance ("ambitions 3/8 · 0/1 · 5/12"); another realm's line only counts them. A new ambition, one within reach, one fulfilled and one lost each send one dispatch that opens the Heritage tab.
+- **The country card** gets one Heritage row: the birthright icon, the active golden age icon, the progress of the open ambitions and the weakness icon. Tapping it opens the Heritage sheet.
 - **The heritage card** shows five rows, never more: Birthright, Golden age, Ambitions, Weakness and Legacies ("none yet" when empty). Tapping a row shows its full text, its history note and what it changes. A dormant birthright is greyed.
-- **Reveal moments.** When a hidden ambition is revealed or warmth rises from warm to hot, a small quiet animation plays and one line goes into the monthly digest.
-- **Map shimmer.** While an ambition that names places or areas is hot, the map shimmers faintly over its region, without outlining or naming the target.
-- **The nation picker** shows each country's birthright and weakness, a count of hidden ambitions, and its golden ages as the ages they belong to.
+- **Quiet moments.** When a new ambition is drawn or one comes within reach, a small quiet animation plays and one line goes into the monthly digest.
+- **Map shimmer.** While an ambition that names places or areas is within reach, the map shimmers faintly over its region, without outlining or naming the target.
+- **The nation picker** shows each country's birthright and weakness, a count of its ambitions, and its golden ages as the ages they belong to.
 - Every country has the same system in every tier; the free tier only limits which countries you can pick.
 
 ## How it connects
 
-- [Historical events](Historical-Events): ages drive golden ages; heritage uses the condition language and proposes four effects and a condition.
+- [Historical events](Historical-Events): ages drive golden ages; heritage uses the condition language and proposes effects and a condition; an event can require an ambition fulfilled.
 - [The 1378 start](The-1378-Start): catalogue fields, tiers, size assessments, personality and places feed generation.
 - [Your realm](Your-Realm): levers on treasury, officials, lords, loyalty, recruits, horses and envoys.
 - [Provinces](Provinces): levers on tax reach, harvests, growth, class slots, official types and grievances.
@@ -216,7 +213,7 @@ The computer always knows its own ambitions and treats them as goals with weight
 - [Screens and navigation](Screens-and-Navigation): heritage row and sheet, nation picker, digest lines.
 - [Map and Map Modes](Map-and-Lenses): the shimmer over hot ambitions; place names bound to provinces.
 - [Settings](Settings): the history mode setting.
-- [Tutorial and help](Tutorial-and-Help): the tutorial ambition with a plain hint.
+- [Tutorial and help](Tutorial-and-Help): the tutorial ambition, its goal and progress shown.
 - [How a turn works](Time-and-Turns): dates, eras for counsel gold, and years counted.
 
 ### Each turn
@@ -244,7 +241,8 @@ From `heritage-rules.json` and `levers.json`. All are provisional placeholders e
 | `ambitions.envoy_reveal_years` | 2 |
 | `ambitions.history_mode_setting` | drawn (default), historical only |
 | `ambitions.max_legacies` | 5 (decided) |
-| `ambitions.warmth_bands` | cold under a third, warm from a third, hot from two thirds |
+| `ambitions.within_reach` | two thirds of the goal met |
+| `ambitions.reward_hidden_until_done` | true (decided, X-27) |
 | `ambitions.pool_max` | 7 (age ambitions join on top) |
 | `inheritance.claim_years` | 30 |
 | `burden.per_country_max` / `turned_legacy` | 1 / true |
