@@ -4,7 +4,7 @@ Every value in the game's everyday events config, exactly as the game reads it. 
 
 Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and values marked (provisional) are placeholders that may still change in balancing. Inventions are shown by id and name; see [Research data](Data-Research#inventions).
 
-> Everyday events (domain/events/spec.md §5.22, EVT-115 to EVT-128; feedback 152). Small choices about the realm's own people and stores, drawn from what the game already holds: its officials, lords, ruler and heir, and food stores, and plague reaching a province of the player's (EVT-130: not drawn; plague fires it). Each realm draws one every \`months\_between\` months (a range), never while the player has an event waiting. \`weight\` is how often an event is drawn among the ones that can happen; \`needs\` names what it is about. Options list their effects in the engine's small vocabulary (gold, loyalty, official, lands, heir, heir\_risk, food\_back, new\_lord, quarantine, care); \`ai\` weights the AI's pick; \`needs\` on an option hides it when the realm lacks what it asks. \`{words}\` in braces are filled with the names of who and where. Every number is a placeholder for balance.
+> Everyday events (domain/events/spec.md §5.22, EVT-115 to EVT-128; feedback 152). Small choices about the realm's own people and stores, drawn from what the game already holds: its officials, lords, ruler and heir, and food stores, plague reaching a province of the player's (EVT-130: not drawn; plague fires it), and the death of one of the player's officials or lords (EVT-122, EVT-123: not drawn; the death of people fires it). Each realm draws one every \`months\_between\` months (a range), never while the player has an event waiting. \`weight\` is how often an event is drawn among the ones that can happen; \`needs\` names what it is about. Options list their effects in the engine's small vocabulary (gold, loyalty, official, lands, heir, heir\_risk, food\_back, new\_lord, quarantine, care); \`ai\` weights the AI's pick; \`needs\` on an option hides it when the realm lacks what it asks. \`{words}\` in braces are filled with the names of who and where. Every number is a placeholder for balance.
 
 | Key | Value |
 |---|---|
@@ -24,10 +24,10 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 
 | Key | Value |
 |---|---|
-| `weight` | 2 |
-| `needs` | official |
-| `title` | Death of {official} |
-| `text` | {official}, your {type} at {province}, has died after {years} years in the post. His clerks wait to hear who will take his seat. |
+| `weight` | 0 |
+| `needs` | death |
+| `title` | Death of {dead} |
+| `text` | {dead}, your {type} at {province}, has died after {years} years in the post. The seat stands empty, and his clerks wait to hear who will take it. |
 
 #### Options
 
@@ -41,10 +41,10 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 
 | Key | Value |
 |---|---|
-| `weight` | 2 |
-| `needs` | lord |
-| `title` | Death of {lord} |
-| `text` | {lord} of the house of {house} has died. His son {son} asks you to confirm him in his father's lands ({lands}). |
+| `weight` | 0 |
+| `needs` | death |
+| `title` | Death of {dead} |
+| `text` | {dead} of the house of {house} has died. His heir {son} has taken his lands ({lands}) and asks you to confirm him in them. |
 
 #### Options
 

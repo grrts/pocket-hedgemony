@@ -705,24 +705,33 @@ and do not count toward its pool (EVT-033). Every number is a placeholder for ba
 - EVT-117 While an event, historical or everyday, waits for the player's answer, no new everyday event shall
   come to the player; the draw waits a month at a time. A decision the player may take or leave (EVT-031) does not
   hold one back. [Leroy, 19 Oct: "not too much, so the gameplay doesn't feel too tedious"]
-- EVT-118 Everyday events shall be: an official's death (a royal post with an official), a lord's death, a lord
+- EVT-118 Everyday events drawn shall be: a lord
   slighted at court (Loyal or Wavering), a lord speaking well of you (Wavering or Disloyal), two lords quarrelling,
   a lord hurt, a child born to the ruler (a ruler of an age to have children under a law of heirs by blood, with no
   regent), the heir falling ill (an heir under the age of a child ruler), and grain lost from a province's store
   (rot, fire, rats) where it holds at least `food.min_store_months` (3) months and `food.min_store` (2) thousand
-  months of food. A lord in revolt or with no land is never drawn. [feedback 152; REALM-088, REALM-089]
+  months of food. A lord in revolt or with no land is never drawn. The death of an official or a lord is not
+  drawn: it comes from the death of people (EVT-122, EVT-123). [feedback 152; REALM-088, REALM-089; REALM-270]
 - EVT-119 Every everyday event shall have two or three options, each with its effects shown in words, at least one
   costing nothing. [EVT-039; feedback 152]
 - EVT-120 If an option costs more gold than the realm holds, or asks for a second lord the realm does not have,
   then the game shall not offer it. [EVT-041]
 - EVT-121 The player's everyday events shall show on the event card with the realm's own story instead of a year
   in history, marked *In your realm*. [EVT-076]
-- EVT-122 An official's death shall leave the post to a new man: the deputy, who starts at half the post's effect
+- EVT-122 When an official at a royal post of the player's dies, of any cause (REALM-270, REALM-275, which empty
+  the post), an everyday event shall ask who takes his seat: the deputy, who starts at half the post's effect
   (PROV-192); a seasoned man sent for, for gold, who keeps the post's years and so its effect; or a lord's kinsman,
-  who starts at half and makes that lord a step more loyal. [PROV-192; REALM-088 office at court]
-- EVT-123 A lord's death shall pass his lands to his son, as loyal as his father; the crown may ask a fee (gold,
-  the son a step less loyal, heavy taxes) or take the lands for the crown, making them royal land and every other
-  lord of the realm a step less loyal (land seized from another). [PROV-200, PROV-201; REALM-089]
+  who starts at half and makes that lord a step more loyal. The new man is of the dead man's type. If the post is
+  filled before the answer (by hand or by auto-fill, PROV-342), the answer leaves it as it is. A lord's man and an
+  AI realm's are replaced at once (REALM-275), with no card. [PROV-192; REALM-088 office at court; REALM-270]
+- EVT-123 When a lord of the player's dies, of any cause, and his heir takes his lands (REALM-273), an everyday
+  event shall ask the crown to confirm the heir, as loyal as his father; the crown may ask a fee (gold, the heir a
+  step less loyal, heavy taxes) or take the lands for the crown, making them royal land and every other lord of the
+  realm a step less loyal (land seized from another). A lord whose line dies out brings no card: his lands are the
+  crown's already. [PROV-200, PROV-201; REALM-089; REALM-270, REALM-273]
+- EVT-131 A death fires its card (EVT-122, EVT-123) only while no everyday event waits for the player; a death
+  while one waits has its News line only (REALM-270). A death's card puts the realm's next drawn event off to at
+  least `months_between`'s shortest gap (3 months) away. [EVT-117; Leroy, 19 Oct: "not too tedious"]
 - EVT-124 A child born to a ruler with no heir shall be the heir. A feast costs gold and makes the two least loyal
   lords a step more loyal; promising the child to a lord's house makes him a step more loyal (marriage into the
   ruling house). [REALM-100 to REALM-107, REALM-088]
@@ -733,7 +742,8 @@ and do not count toward its pool (EVT-033). Every number is a placeholder for ba
   requisitioning it from the province's lord, else another lord (a step less loyal), makes half of it good.
   [feedback 152; PROV-104]
 - EVT-127 If the player trusts the sick heir to prayer, then the heir shall die with the chance the option shows
-  (3 in 10). [feedback 152]
+  (3 in 10), by the death of people (REALM-270, REALM-272), which tells the player and leaves the ruler
+  heirless. [feedback 152]
 - EVT-128 The everyday events' state (each realm's next draw, the player's waiting events, the count and the dice)
   shall be kept in the save; a save from before them starts the draws afresh. [EVT-075]
 
@@ -754,7 +764,7 @@ and do not count toward its pool (EVT-033). Every number is a placeholder for ba
   Land tab). Overview: the News keeps a line for each, with what was chosen, and the realm's Lords list and
   Provinces list stay the overviews of loyalty and food. Phone: the card is the sheet it already is, in the Wide
   and Tall layouts, inside the safe areas, options in reach, nothing that needs hover. Rate: about two or three a
-  year per realm, never stacking (EVT-117). [X-19; EVT-076]
+  year per realm, never stacking (EVT-117); a death's card takes the place of the next drawn one (EVT-131). [X-19; EVT-076]
 
 ## 6. Commands
 
@@ -985,8 +995,10 @@ before achievements and the autosave. The age and period checks run in the event
   (one every 3 to 6 months, none while one waits) is set below the 2 to 4 months of the research so play stays
   light, as Leroy asked; `months_between` tunes it. Effects use only what the game already has; one new loyalty
   cause, *slighted at court*, joins the down list. Province disease is its own mechanic (province PROV-240 to
-  PROV-242) and comes in the next change. The deaths of officials and lords roll on their own for now; once the
-  shared ageing and death of people lands (the "Death across all people" work), they fire from it instead.
+  PROV-242) and comes in the next change. The deaths of officials and lords, and of the heir trusted to prayer, go
+  through the death of people (REALM-270, `personDies`); the cards for officials and lords hang on its hook
+  (`onPersonDeath`) and never roll a death of their own, so a man dies once, of his age or a battle or an event,
+  and the card asks only what follows.
 
 - **D-EVT-21** The East's bridge events (milestone 10, step 6; integrator's picks, 19 Oct): 46 new events and 7
   re-dated ones (EVT-090 to EVT-093). Realms go by tree ids, places by 1444 province ids in the file's own
@@ -1047,3 +1059,4 @@ before achievements and the autosave. The age and period checks run in the event
 | EVT-115 – 128 | everyday.feature | A choice every few months; none while one waits; an official's death; an option the realm cannot pay; spoiled grain; a lord's death; a child born heirless. Engine: packages/engine/test/everyday.test.ts |
 | EVT-129 | — | Presentation: apps/client/src/ui/events.ts, the event card |
 | EVT-130 | — | Engine: packages/engine/test/everyday.test.ts (plague reaching the player's land opens one card) |
+| EVT-131 | — | Engine: packages/engine/test/everyday.test.ts (a death while one waits brings no second card) |

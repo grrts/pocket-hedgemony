@@ -2,7 +2,7 @@
 <p>Every value in the game&#39;s everyday events config, exactly as the game reads it. This page is made from <code>packages/rules/data/domain/events-everyday.json</code> each time the config changes, so it always matches the game. How these values are used is explained on <a href="/wiki/Historical-Events">Historical Events</a>.</p>
 <p>Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and values marked (provisional) are placeholders that may still change in balancing. Inventions are shown by id and name; see <a href="/wiki/Data-Research#inventions">Research data</a>.</p>
 <blockquote>
-<p>Everyday events (domain/events/spec.md §5.22, EVT-115 to EVT-128; feedback 152). Small choices about the realm&#39;s own people and stores, drawn from what the game already holds: its officials, lords, ruler and heir, and food stores, and plague reaching a province of the player&#39;s (EVT-130: not drawn; plague fires it). Each realm draws one every `months_between` months (a range), never while the player has an event waiting. `weight` is how often an event is drawn among the ones that can happen; `needs` names what it is about. Options list their effects in the engine&#39;s small vocabulary (gold, loyalty, official, lands, heir, heir_risk, food_back, new_lord, quarantine, care); `ai` weights the AI&#39;s pick; `needs` on an option hides it when the realm lacks what it asks. `{words}` in braces are filled with the names of who and where. Every number is a placeholder for balance.</p>
+<p>Everyday events (domain/events/spec.md §5.22, EVT-115 to EVT-128; feedback 152). Small choices about the realm&#39;s own people and stores, drawn from what the game already holds: its officials, lords, ruler and heir, and food stores, plague reaching a province of the player&#39;s (EVT-130: not drawn; plague fires it), and the death of one of the player&#39;s officials or lords (EVT-122, EVT-123: not drawn; the death of people fires it). Each realm draws one every `months_between` months (a range), never while the player has an event waiting. `weight` is how often an event is drawn among the ones that can happen; `needs` names what it is about. Options list their effects in the engine&#39;s small vocabulary (gold, loyalty, official, lands, heir, heir_risk, food_back, new_lord, quarantine, care); `ai` weights the AI&#39;s pick; `needs` on an option hides it when the realm lacks what it asks. `{words}` in braces are filled with the names of who and where. Every number is a placeholder for balance.</p>
 </blockquote>
 <div class="table-scroll"><table>
 <thead><tr><th>Key</th><th>Value</th></tr></thead>
@@ -22,10 +22,10 @@
 <div class="table-scroll"><table>
 <thead><tr><th>Key</th><th>Value</th></tr></thead>
 <tbody>
-<tr><td><code>weight</code></td><td>2</td></tr>
-<tr><td><code>needs</code></td><td>official</td></tr>
-<tr><td><code>title</code></td><td>Death of {official}</td></tr>
-<tr><td><code>text</code></td><td>{official}, your {type} at {province}, has died after {years} years in the post. His clerks wait to hear who will take his seat.</td></tr>
+<tr><td><code>weight</code></td><td>0</td></tr>
+<tr><td><code>needs</code></td><td>death</td></tr>
+<tr><td><code>title</code></td><td>Death of {dead}</td></tr>
+<tr><td><code>text</code></td><td>{dead}, your {type} at {province}, has died after {years} years in the post. The seat stands empty, and his clerks wait to hear who will take it.</td></tr>
 </tbody></table></div>
 <h4 id="options"><a class="anchor" href="#options" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
@@ -39,10 +39,10 @@
 <div class="table-scroll"><table>
 <thead><tr><th>Key</th><th>Value</th></tr></thead>
 <tbody>
-<tr><td><code>weight</code></td><td>2</td></tr>
-<tr><td><code>needs</code></td><td>lord</td></tr>
-<tr><td><code>title</code></td><td>Death of {lord}</td></tr>
-<tr><td><code>text</code></td><td>{lord} of the house of {house} has died. His son {son} asks you to confirm him in his father&#39;s lands ({lands}).</td></tr>
+<tr><td><code>weight</code></td><td>0</td></tr>
+<tr><td><code>needs</code></td><td>death</td></tr>
+<tr><td><code>title</code></td><td>Death of {dead}</td></tr>
+<tr><td><code>text</code></td><td>{dead} of the house of {house} has died. His heir {son} has taken his lands ({lands}) and asks you to confirm him in them.</td></tr>
 </tbody></table></div>
 <h4 id="options-1"><a class="anchor" href="#options-1" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>

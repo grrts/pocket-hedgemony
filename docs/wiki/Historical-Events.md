@@ -62,18 +62,18 @@ Deaths, child kings and the Emperor come from the game itself: an event that nee
 
 ### Everyday events
 
-Between the great events, your own realm asks for small choices. About every three to six months (two or three times a year) something happens to your officials, lords, family or stores, and an event card asks what you will do. No new one comes while another card waits for your answer, so they never pile up.
+Between the great events, your own realm asks for small choices. About every three to six months (two or three times a year) something happens to your officials, lords, family or stores, and an event card asks what you will do. No new one comes while another card waits for your answer, so they never pile up. Officials and lords die of their age, in battle or by an event, never by a roll of their own here: when one of yours dies, his card comes in place of the next one.
 
 | What happens | Your choices |
 |---|---|
-| An official dies in a royal province | Raise his deputy (free, starts at half the post's effect), send for a seasoned man (25 gold, keeps the full effect), or give the post to a lord's kinsman (starts at half, that lord grows more loyal) |
-| A lord dies | Confirm his son (as loyal as his father), ask a fee for the lands (gold, the son less loyal), or take the lands for the crown (they become royal land, your other lords grow less loyal) |
+| An official of a royal province dies, of old age, in battle or in an event | His seat stands empty. Raise his deputy (free, starts at half the post's effect), send for a seasoned man (25 gold, keeps the full effect), or give the post to a lord's kinsman (starts at half, that lord grows more loyal). If you fill the post first, your answer leaves it as it is |
+| A lord dies and his heir takes his lands | Confirm the heir (as loyal as his father), ask a fee for the lands (gold, the heir less loyal), or take the lands for the crown (they become royal land, your other lords grow less loyal). A lord whose line dies out brings no card: his lands come back to the crown |
 | A lord feels slighted at court | Send him a gift (gold), give him an office (another lord grows jealous), or let him sulk (he grows less loyal) |
 | A lord speaks well of you | Reward him (gold, he grows more loyal) or thank him |
 | Two lords quarrel over a mill | Judge for one (he grows more loyal, the other less), or fine them both (gold, both less loyal) |
 | A lord is hurt hunting | Send your physician (gold, he grows more loyal) or your prayers |
 | A child is born to your ruler | Hold a feast (gold, your two least loyal lords grow more loyal), promise the child to a lord's house (that lord grows more loyal), or give thanks quietly. With no heir, the child becomes your heir |
-| Your young heir falls ill | Pay the best physicians (gold) or trust in prayer (3 in 10 that the heir dies) |
+| Your young heir falls ill | Pay the best physicians (gold) or trust in prayer (3 in 10 that the heir dies, leaving the ruler without one) |
 | Grain rots, burns or is eaten by rats in a store | The grain is lost whatever you choose; buy grain (gold) or take it from a lord's barns (he grows less loyal) to make half of it good, or bear the loss |
 | Plague reaches one of your provinces | Close the province (its trade stops and its tax halves while closed), send physicians (gold: half as many die and it is over sooner), or keep the roads open. Only one plague card waits at a time; the News tells of the rest |
 

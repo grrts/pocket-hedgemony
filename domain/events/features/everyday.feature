@@ -45,16 +45,28 @@ Feature: Everyday events
 
   @EVT-123
   Scenario: The crown takes a dead lord's lands
-    Given a lord of France has died
+    Given a lord of France has died and his heir has taken his lands
     When France takes his lands for the crown
     Then his provinces are royal land
     And the other lords of France fear for their own
 
   @EVT-123
-  Scenario: The son follows his father
-    Given a lord of France has died
-    When France confirms his son
-    Then the son holds the lands under his own name
+  Scenario: The heir follows his father
+    Given a lord of France has died and his heir has taken his lands
+    When France confirms the heir
+    Then the heir holds the lands under his own name
+
+  @EVT-123
+  Scenario: A line that dies out brings no card
+    Given a lord of France with no heir and no kinsman has died
+    Then no everyday event waits for France
+    And his provinces are royal land
+
+  @EVT-131
+  Scenario: A death while an everyday event waits brings no second card
+    Given an everyday event waits for France
+    When one of France's officials dies
+    Then only that one everyday event waits
 
   @EVT-124
   Scenario: A child born to an heirless ruler is the heir
