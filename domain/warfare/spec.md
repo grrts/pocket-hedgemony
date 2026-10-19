@@ -134,7 +134,7 @@ Newest decision first.
 | Surrender | A beaten AI side's unconditional peace: the victor asks anything the rules allow (WAR-245) | Siege surrender (WAR-170) |
 | Victories / Defeats | Battles won and lost (country: last 20 years; commander: lifetime record) | Scars |
 | Fallen | All killed, counted on the country (country 6) | — |
-| Era | Research era I 1444–1500, II 1500–1600, III 1600–1700, IV 1700–1800, V 1800–1870, VI 1870–1914, VII 1914–1939 (cut) | — |
+| Era | Research era I from the start (1378) to 1500, II 1500–1600, III 1600–1700, IV 1700–1800, V 1800–1870, VI 1870–1914, VII 1914–1939 (cut) | — |
 
 ## 4. Domain model
 

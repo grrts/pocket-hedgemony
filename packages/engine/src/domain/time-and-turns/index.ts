@@ -1306,7 +1306,7 @@ export function agesRunning(year: number): Age[] {
 
 export type Era = "I" | "II" | "III" | "IV" | "V" | "VI" | "VII";
 
-/** Eras follow the calendar: I 1444–1500 … VII 1914 to the end date (X-14, D-TIME-9). */
+/** Eras follow the calendar: I from the start (1378 at the earliest) to 1500 … VII 1914 to the end date (X-14, D-TIME-9, TIME-065). */
 export function eraOf(date: GameDate): Era {
   let era: Era = "I";
   for (const e of config.eras) if (date.year >= e.from) era = e.era as Era;

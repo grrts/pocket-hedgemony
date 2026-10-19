@@ -37,6 +37,9 @@ contexts extend, and the data build that validates all of it.
 
 Newest decision first.
 
+0. `start-date/plan-1378.md` §3.1 (18 Oct 2026, Leroy's choices of 18 and 19 Oct): the campaign starts on
+   20 September 1378; a new Age of Schism and Conquerors; Gunpowder Empires and Exploration start by their
+   conditions; the periods move and new ones cover 1378 to 1444 (EVT-081 to EVT-084, D-EVT-19).
 1. `planning/gap-lists.md` "Decisions already made" (16 Oct 2026): the game stops 31 August 1939; the event
    tree's Second World War events and its Decolonization, Cold War and Globalization ages are out of scope;
    item 24 (event tree fixes); item 20 (order of a turn).
@@ -152,8 +155,8 @@ Newest decision first.
 
 ### 5.1 Campaign span
 
-- EVT-001 The game shall run events from 1444 to the campaign's end date, 31 August 1939 by default (one
-  setting). [gap-lists decisions]
+- EVT-001 The game shall run events from the campaign's start to its end date, 31 August 1939 by default (one
+  setting). [gap-lists decisions; plan-1378 §3.1]
 - EVT-002 When a campaign loads its events, the game shall drop every event whose history starts after
   31 August 1939 (59 in the current data: world_war_ii, holocaust, bengal_famine_1943, atomic_bombings and the
   events of cold_war_to_present, decolonization_1945_1994 and the post-1939 events of coverage_gaps) and shall
@@ -189,18 +192,20 @@ Newest decision first.
   starts at its `force_start` and ends at its `force_end` regardless, so a stalled game still advances.
   [ages.yaml header; README]
 - EVT-012 The game shall allow several ages to be active at once. [ages.yaml header]
-- EVT-013 The game shall run the 9 in-scope ages with these windows and forced dates: Gunpowder Empires (1444–
-  1760; force start 1444, force end 1760); Exploration (1444–1680; 1444, 1680); Reformations (1480–1700; 1530,
+- EVT-013 The game shall run the 10 in-scope ages with these windows and forced dates: Schism and Conquerors
+  (1378–1460; force start 1378, force end 1460); Gunpowder Empires (1420–1760; 1453, 1760); Exploration
+  (1415–1680; 1445, 1680); Reformations (1480–1700; 1530,
   1700); Atlantic Empires (1480–1880; 1520, 1880); Crisis and Absolutism (1590–1790; 1640, 1790); Revolutions
   (1750–1880; 1800, 1880); Industrialization (1700–1950; 1830, 1950); Imperialism (1800–1945; 1860, 1945);
-  World Wars (1890–1960; 1925, 1960), with their start and end conditions as in ages.yaml. [ages.yaml]
+  World Wars (1890–1960; 1925, 1960), with their start and end conditions as in ages.yaml. [ages.yaml;
+  plan-1378 §3.1; D-EVT-19]
 - EVT-014 The game shall list each age's regions, so systems that read "the age has begun in your region"
   (exploration, national strengths, music) can use them. [ages.yaml; exploration §2]
 
 ### 5.4 Periods
 
 - EVT-015 The game shall make a period active when its start condition holds inside its window (`start:
-  initial` = active at the 1444 start) and end it when its end condition holds, so a period can start early,
+  initial` = active at the campaign's start when the start lies inside its window) and end it when its end condition holds, so a period can start early,
   late or never. [periods.yaml header]
 - EVT-016 The game shall derive each period's and each age's event list from the events' own `periods` and
   `ages` fields. [periods.yaml header; ages.yaml header]
@@ -389,7 +394,7 @@ The event tree now runs in the game's month for every realm (D-EVT-17). The libr
 a bridge shows it the game as the tree's own world, and lands what the game already simulates.
 
 - EVT-069 When a campaign starts, the game shall load the campaign's events (the tree's 247 events whose history
-  starts before the end date, no tutorial-only ones), every age, period and modifier, start the 1444 periods,
+  starts before the end date, no tutorial-only ones), every age, period and modifier, start the start's periods,
   and check the ages and periods of the start year at once. [EVT-002, EVT-011, EVT-015; D-EVT-17]
 - EVT-070 Each month, as the last of the month's work, the game shall show the tree every realm under its tree id
   (aliases where the map's id differs), whether it exists, its wars, alliances, subjects and truces, its land
@@ -427,6 +432,57 @@ a bridge shows it the game as the tree's own world, and lands what the game alre
   region:germany). [EVT-030; D-EVT-18]
 - EVT-080 The map's Japan, Korea and Khmer shall be the tree's Ashikaga, Joseon and Cambodia, as the catalogue
   has them, so the events written for them fire (the Ōnin War, the Imjin War). [D-EVT-17; D-EVT-18]
+
+### 5.16 Ages and periods from 1378 (milestone 10, 19 October 2026)
+
+The campaign is to start on 20 September 1378 (Leroy, 18 Oct; plan-1378). The ages and periods now run from that
+start, and a campaign that still starts in 1444 plays them as before: every age and period of 1444 is under way
+at a 1444 start, by its conditions rather than by its date.
+
+- EVT-081 The game shall run these periods from the start (periods.yaml):
+
+| Period | Window | Starts | Ends |
+|---|---|---|---|
+| Western Schism (new) | 1378–1418 | at the start | with its window (the Council of Constance's bridge event, later) |
+| Timur's conquests (new) | 1378–1405 | at the start | when Timur's realm is gone, or with its window (his death, 1405) |
+| Hundred Years' War, Caroline phase (new) | 1378–1396 | at the start | when England and France are no longer at war |
+| Hundred Years' War, Lancastrian phase (new) | 1399–1453 | when England and France are at war again after the Caroline phase | the end of the Hundred Years' War, or peace |
+| Ottoman Interregnum (new) | 1400–1420 | only if the Ottomans fall under Timur's realm, or are at war with it at stability −2 or worse | when they are free of it, at peace with it and at stability 0 or better |
+| Hussite wars (new) | 1415–1440 | when religious rebels rise in Bohemia | in 1436, or when the rebels are gone |
+| Ming treasure voyages (new) | 1403–1435 | when the Ming stand at stability +1 or better | in 1433, when the Ming fall to −1 or worse, or are gone |
+| Majapahit's decline (new) | 1389–1527 | while Majapahit stands (after Hayam Wuruk, 1389) | when Majapahit is gone |
+| Ottoman expansion | 1378–1620 | at the start | as before |
+| Muscovite consolidation | 1378–1620 | at the start | as before |
+| Southeast Asian mainland and maritime states | 1378–1700 | at the start | as before |
+| Timurid fragmentation | 1400–1540 | once Timur's conquests are over | as before |
+| Late Ming | 1424–1650 | after Yongle, once the treasure voyages are over | as before |
+| Songhai and the Sahel | 1378–1640 | when Songhai stands on its own | as before |
+| Aztec and Inca expansion | 1428–1580 | when the Triple Alliance or the Inca stand | as before |
+| Portuguese oceanic expansion | 1415–1640 | when the Age of Exploration is under way and Portugal stands | as before |
+
+  The new periods belong to the Age of Schism and Conquerors; the periods under way from the start belong to it
+  as well as to their later ages. Where a new period's history turns on an event of 1378 to 1444 (Constance,
+  Timur's death, Ankara, the Defenestration, the voyages), that bridge event will start or end it by
+  `start_period` and `end_period` (EVT-017); until those events are written, the period runs by the conditions
+  above. @placeholder [plan-1378 §3.1, §5; D-EVT-19]
+- EVT-082 The game shall start the Age of Schism and Conquerors at the start, in every region, and end it once the
+  Western Schism is over, the Council of Basel is over (1449 until its bridge event is written) and Constantinople
+  has fallen or Byzantium is gone. Gunpowder Empires shall start from 1420 when 3 of the 8 great powers (EVT-083)
+  know bombards, or when Constantinople falls. Exploration shall start from 1415 when Portugal or Castile knows the
+  ocean ships or holds the Atlantic islands (the engine's `atlantic_island_bases` flag); the Ceuta and island
+  bridge events add to this later. A world that moves fast starts them early, a slow one waits for their forced
+  years. @placeholder [plan-1378 §3.1; D-EVT-19]
+- EVT-083 The bridge shall show the tree, each month, the innovations a realm has adopted as including the research
+  inventions it knows, by the table `innovations_from_research` (bombards: W3 Bombards, gunpowder_infantry: W5,
+  ocean_navigation: S4 Carrack and caravel, printing: L5, humanist_learning: L6), and its `great_power_score` as
+  the number of provinces it holds, so the 8 great powers are the 8 realms with the most provinces, as music and
+  diplomacy count them (D-AUD-2). [D-EVT-19; D-EVT-17]
+
+#### How the player uses it
+- EVT-084 Nothing new is tapped: an age or a period that starts shows as before, in the News and in the systems
+  that read it (exploration, national strengths, music). From the 1378 start the Age of Schism and Conquerors is
+  under way on the first day, so it brings no stinger (AUD-033 keeps its nine). The Chronicle card, the overview
+  of history from 1378, comes with the bridge events (plan-1378 §4.6). [X-19; plan-1378 §3.1]
 
 #### How the player uses it: the event card
 - EVT-076 Where: when an event fires for the player, the week pauses and the event card opens over the map,
@@ -513,6 +569,7 @@ before achievements and the autosave. The age and period checks run in the event
 | follow_ups.boost_decay_years | Linear fade after the window | 10 | yes | data/balance.yaml |
 | ai_factors | Named AI factors | 7 factors (EVT-042); high_unrest: more than 0.5 of provinces at 4+ grievances | yes | data/balance.yaml; events.json ai_factor_rules |
 | rebel_sizes | Share of the province's recruit pool that rises | small 0.125, medium 0.25, large 0.5, huge 1.0 | yes (provisional) | events.json |
+| innovations_from_research | Tree innovation → research invention the bridge reads it from (EVT-083) | bombards W3, gunpowder_infantry W5, ocean_navigation S4, printing L5, humanist_learning L6 | no | events.json |
 | stat_mapping | Event-tree statistic → concrete change (D-EVT-4) | province §15 table, country §11, trade v2, diplomacy 11 | food_security step size provisional | events.json |
 | derived_formulas | k_supply, good_base_yield, tech_economy_bonus, terrain_supply_mult | 1, 1, 0, 1 | yes (provisional) | events.json |
 | modifier_rules.default_stacking | Default stacking | refresh | yes | data/balance.yaml |
@@ -640,6 +697,18 @@ before achievements and the autosave. The age and period checks run in the event
   joseon and cambodia (EVT-080). The tree's later "japan" and "korea" (Meiji Japan, the Korean Empire) are other
   entities and are founded when their events say so.
 
+- **D-EVT-19** Ages and periods from 1378 (Leroy, 18 Oct; plan-1378 §3.1; milestone 10, step 4): a new age, the
+  Age of Schism and Conquerors, runs from the start to about 1460; Gunpowder Empires and Exploration start by
+  their conditions inside wider windows, forced on in 1453 and 1445; the eight periods that started `initial` in
+  1444 get a start in 1378 or a start condition, and eight new periods cover 1378 to 1444 (EVT-081, EVT-082).
+  The conditions are written so that a campaign that still starts in 1444 has every one of its ages and periods
+  under way as before: bombards among the great powers and Portugal's ocean ships hold at that start, and the
+  periods whose windows closed before 1444 never start. The tree cannot see research or provinces, so the bridge
+  shows it the inventions a realm knows as innovations (a new innovation, `bombards`, joins the tree's list) and
+  the great powers by provinces held (EVT-083). Exploration's gate reads the tree's own age when the tree runs
+  (EXPL-076). Conditions name only events the tree has; the bridge events of 1378 to 1444 will start and end
+  the new periods when they are written (plan-1378 step 6).
+
 ## 14. Traceability
 
 | Requirement | Feature file | Scenario |
@@ -661,3 +730,7 @@ before achievements and the autosave. The age and period checks run in the event
 | EVT-069 … EVT-075 | — | Engine: packages/engine/test/events.test.ts (ages and periods at the start, the AI's Fall of Constantinople, the player's card and answer, the save) |
 | EVT-076 | — | Presentation: apps/client/src/ui/events.ts, the event card |
 | EVT-077 – 080 | founding.feature | Founding events wake sleeping realms; regions and aliases bind |
+| EVT-081 | ages-and-periods.feature | The periods under way at the 1378 start; Timur's death opens the Timurid fragmentation; the Lancastrian phase; the Ottoman Interregnum; from a 1444 start the periods that closed before it never start |
+| EVT-082 | ages-and-periods.feature | Forced dates; bombards among three great powers; two are not enough; the fall of Constantinople; Portugal's ocean ships; Exploration's window. Engine: packages/engine/test/events.test.ts |
+| EVT-083 | — | Engine: packages/engine/test/events.test.ts (without bombards or ocean ships the two ages wait) |
+| EVT-084 | — | Presentation: nothing new on screen |

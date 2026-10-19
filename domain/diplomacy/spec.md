@@ -363,7 +363,7 @@ the table has fifteen rows and twenty named actions; the table is canonical, D-D
 
 | Era | Change |
 |---|---|
-| I 1444–1500 | Envoys only travel; no residents except the Italian states (start with G8); marriages the strongest tie |
+| I from the start (1378) to 1500 | Envoys only travel; no residents except the Italian states (start with G8); marriages the strongest tie |
 | II 1500–1600 | G8 spreads; residents give sight of other courts |
 | III 1600–1700 | Many-sided peace, or earlier if event `peace_of_westphalia` fires |
 | IV 1700–1800 | League threshold 8 → 6; *Married houses* +10 |

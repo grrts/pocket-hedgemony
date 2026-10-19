@@ -259,7 +259,7 @@ When at least two say yes, the league forms, named after X ("League against Veni
 
 | Era | Change |
 |---|---|
-| I 1444 to 1500 | envoys only travel; residents only with G8 (the Italian states start with it); marriages the strongest tie |
+| I the start (1378) to 1500 | envoys only travel; residents only with G8 (the Italian states start with it); marriages the strongest tie |
 | II 1500 to 1600 | G8 spreads; residents give sight of other courts |
 | III 1600 to 1700 | many-sided peace, or earlier if the event `peace_of_westphalia` fires |
 | IV 1700 to 1800 | league threshold 8 to 6; *Married houses* +10 |

@@ -148,13 +148,13 @@ Which hemisphere a province is in comes from its latitude. Wet seasons follow th
 
 ### Ages and eras
 
-**Ages** are history's big situations, owned by [Historical Events](Historical-Events). Each starts and ends by its own conditions inside a window of years, and each has forced dates so a stalled game still moves on. Ages may overlap. The ages in the game are Gunpowder Empires, Exploration, Reformations, Atlantic Empires, Crisis and Absolutism, Revolutions, Industrialization, Imperialism and World Wars. An age whose window runs past 1939, like World Wars, simply runs to the end date; an age that would start on an event after 1939 never starts.
+**Ages** are history's big situations, owned by [Historical Events](Historical-Events). Each starts and ends by its own conditions inside a window of years, and each has forced dates so a stalled game still moves on. Ages may overlap. The ages in the game are Schism and Conquerors, Gunpowder Empires, Exploration, Reformations, Atlantic Empires, Crisis and Absolutism, Revolutions, Industrialization, Imperialism and World Wars. An age whose window runs past 1939, like World Wars, simply runs to the end date; an age that would start on an event after 1939 never starts.
 
 **Eras** follow the calendar:
 
 | Era | Years |
 |---|---|
-| I | 1444 to 1500 |
+| I | the start (1378) to 1500 |
 | II | 1500 to 1600 |
 | III | 1600 to 1700 |
 | IV | 1700 to 1800 |
