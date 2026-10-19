@@ -175,6 +175,7 @@ The lord card is the same in every society; only the label changes: nobles, merc
 - When a lord dies with several sons, his lands pass by the realm's inheritance law, possibly split between them.
 - A disloyal lord across the border can **defect to you** with his land.
 - At the start, some lords are **real people of history**: in 1378 John of Gaunt and Henry Percy in England, the Wolf of Badenoch in Scotland, Kęstutis and Vytautas in Lithuania, Gazi Evrenos among the Ottomans, Yi Seong-gye in Korea and about forty more, each on his own lands with his real title, traits, age and heir. Every other lord is generated, about one per 4 provinces, and never takes a historical lord's family name. A historical lord carries a small **History** tag on the Lords tab, and his screen says in one line who he was. History is where he starts, not a script: he ages and dies by the game's rules, and his heir keeps his title but not his story.
+- Some figures **come later**: Nuno Álvares Pereira, John Hunyadi, Jan Žižka, Zhu Di and a few others can arrive by event around the years they rose in history, if you still hold their home province. Welcome one and he becomes the lord there, taking the place of a generated lord (Skirgaila and Aleksandras Olelka take over from whoever holds the seat); refuse and you lose a little prestige.
 
 **How you lose lords:**
 
