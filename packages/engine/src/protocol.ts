@@ -247,6 +247,8 @@ export interface Snapshot {
   provinceMood: Int8Array;
   grievanceNames: readonly string[];
   moods: readonly string[];
+  /** Days from each owned province to its realm's capital, at most THRONE.farCap (PROV-173, X-28). */
+  provinceDaysToCapital: Uint8Array;
   /** Every lord (index = provinceLord's value): name, house, realm, loyalty and provinces held; the gold a gift costs. */
   /** Lords by index; age, heir and gone for REALM-273 (a gone lord's line died out and he is listed nowhere). */
   lords: { name: string; house: string; nation: number; loyalty: string; lands: number; age: number; heir: { name: string; age: number } | null; gone: boolean; /** The chance an assassin sent after him succeeds (REALM-281). */ assassinChance: number; traits: string[]; title?: string; note?: string; historical?: boolean }[];
@@ -552,6 +554,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       provinceMood: Int8Array.from({ length: w.provinceCount }, (_, p) => moodIndex(w, p)),
       grievanceNames: GRIEVANCES,
       moods: MOODS,
+      provinceDaysToCapital: w.provinceDaysToCapital.slice(),
       lords: (() => {
         const lands = new Int32Array(w.lords.length);
         for (let p = 0; p < w.provinceCount; p++) if (w.provinceLord[p]! >= 0) lands[w.provinceLord[p]!]!++;
@@ -702,6 +705,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       snap.provinceRing,
       snap.provinceGrievances,
       snap.provinceMood,
+      snap.provinceDaysToCapital,
       snap.provinceRebels,
       snap.rebels.chance,
       snap.provinceLord,

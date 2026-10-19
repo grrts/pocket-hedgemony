@@ -47,6 +47,7 @@ import type { AchievementLog } from "./achievements.ts";
 import { createInstitutionsState, seedInstitutions, type InstitutionsState } from "./institutions.ts";
 import { createTribesState, seedTribes, type TribesState } from "./tribes.ts";
 import { createPlagueState, type PlagueState } from "./plague.ts";
+import { createThroneState, monthlyThrone, type ThroneState } from "./throne.ts";
 
 /**
  * Simulation state stored as parallel typed arrays (one array per field,
@@ -54,7 +55,7 @@ import { createPlagueState, type PlagueState } from "./plague.ts";
  * cache-friendly to iterate every turn and lets whole arrays be copied or
  * transferred to the UI thread without serialising objects.
  */
-export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState, RebelState, RevolutionState, PeoplesState, TradeState, RulerState, FallenState, BeliefState, InstitutionsState, TribesState, PlagueState {
+export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState, RebelState, RevolutionState, PeoplesState, TradeState, RulerState, FallenState, BeliefState, InstitutionsState, TribesState, PlagueState, ThroneState {
   /** Heads of the faith: patrons, the Caliph, the conclave, censures (faithHeads.ts). */
   faithHeads: FaithHeadsState;
   /** Faiths a realm serves as the patron of their head while of another faith (RELG-145). */
@@ -500,6 +501,7 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     ...createInstitutionsState(),
     ...createTribesState(P),
     ...createPlagueState(P, seed),
+    ...createThroneState(P),
   };
   world.diplomacy = createWarState(world);
   seedClasses(world);
@@ -578,6 +580,8 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   monthlyGoals(world, false);
   // Heritage reads the tree's ages, so it starts after it: three ambitions drawn, the birthright in force.
   world.heritage = createGameHeritage(world);
+  // Days to each capital, for Far from the throne (X-28).
+  monthlyThrone(world);
   // Worked out again with heritage's tax in force, so lenders and the treasury card know the income the realm will have.
   runLedger(world, false);
   // Lords, officials and commanders of 1444 get their ages (REALM-274).

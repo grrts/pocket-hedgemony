@@ -296,6 +296,14 @@ settlement, settlers, local people's tiles.
 - PROV-172: A navigable river shall be fixed, shown as shore tiles; canals add one (*Grand canals*, *Canal locks*); a wrecked canal or silting removes it. River provinces count one ring closer for castle food spread. [§9]
 - PROV-173: Days to capital shall be the travel time to the capital or nearest seat by the fastest road, river or sea route, longer in winter and with enemy armies, broken roads or a sea route closed in war. [§9]
 - PROV-174: While days to capital are above a limit (example 30), the province shall have *Far from the throne*. [§9, §12.1]
+- PROV-175: Days to capital shall be counted from the realm's capital over its own land (each step the march's days to cross both grounds, plus a day for a river) and the sea (`far_from_throne.sea_zone_days` a sea zone); a realm that has lost its capital counts from its most populous province, and a province it can't reach over its land or the sea is as far as can be. They are worked out again in the monthly step whenever land has changed hands. [X-28]
+- PROV-176: While royal land is far from the throne, it shall send the crown `far_from_throne.cut_per_10_days` (0.1) less of its tax and recruit refill for every 10 days past the limit, down to `far_from_throne.least_share` (half, at 80 days). A province a lord holds is run from his seat: it is never far from the throne. [X-28]
+
+#### How the player uses it: far from the throne
+- The province card's Overview shows *To capital* with the days, and for far royal land the share it loses (for example "far from the throne: −20 % tax and recruits"); its Tax line says the same under the gold, so the player sees why it pays less. A lord's land far away says its lord runs it from his seat. [X-28]
+- *Far from the throne* is listed with the province's grievances and counts toward its mood like the rest. [X-28]
+- The *Days to capital* lens colours the player's royal land: green within the limit, amber to red as the cut grows, a lord's land in grey, other realms faded; its key says what each colour costs. This is the overview at a glance. [X-28]
+- The choice it brings: grant far land to a lord (no cut, but he keeps his share and may turn) or keep it royal and accept the cut. Nothing needs hover; the lens and the card work by tap on a phone in either layout. [X-28]
 
 ### 5.17 Governance
 - PROV-180: Each province shall have an owner, gained by conquest, inheritance, purchase, a lord joining with his land or a colony, and lost by losing a war, a lord defecting, rebels breaking away or ceding it. [§10.1]
@@ -634,6 +642,9 @@ province config file but no file name or keys; keys below are proposed by this s
 | province.tax.lord_share | Lord keeps | half | yes | province config |
 | province.tax.free_travel_days | Days before travel losses | 5 | yes | province config |
 | province.far_from_throne.days | Days to capital limit | 30 (example) | yes | province config |
+| province.far_from_throne.cut_per_10_days | Share of tax and recruits lost every 10 days past the limit | 0.1 (X-28) | yes | province config |
+| province.far_from_throne.least_share | Least share a far province still sends | 0.5 (X-28) | yes | province config |
+| province.far_from_throne.sea_zone_days | Days to cross a sea zone toward the capital | 8 (X-28) | yes | province config |
 | province.officials.full_effect_years | Years to full effect | 5 (half in first year) | yes | province config |
 | province.officials.hire.gold | Gold up front to hire a native official | 25 (PROV-333) | yes | province config |
 | province.officials.hire.foreign_multiplier | A foreign specialist's price against a native's | 2 (PROV-334) | yes | province config |
@@ -885,6 +896,8 @@ Every requirement has at least one scenario. PROV-292 (card layout) is also pres
 | PROV-172 | roads-and-travel.feature | Canals add a river, war wrecks it |
 | PROV-173 | roads-and-travel.feature | Days to capital follow the fastest route |
 | PROV-174 | roads-and-travel.feature | Far from the throne |
+| PROV-175 | roads-and-travel.feature | Days to capital are counted over the realm's land and the sea |
+| PROV-176 | roads-and-travel.feature | Far royal land sends less; a lord's land is never far |
 | PROV-180 | governance.feature | A province changes owner |
 | PROV-181 | governance.feature | What governance gives |
 | PROV-181 | governance.feature | A subject ruler governs a subject's province |

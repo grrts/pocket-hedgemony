@@ -13,6 +13,7 @@ import { backersOf, bondOf, riseUp, subjectAction, subjectChoice } from "./subje
 import { court, recallCourting } from "./courting.ts";
 import { aiWorks, cancelWork, judgeNeglect, mineYear, monthlyWorks, moveQueued, orderWork } from "./works.ts";
 import { monthlyMoods } from "./moods.ts";
+import { monthlyThrone } from "./throne.ts";
 import { answerRebels, dailyRebels, monthlyRebels, verdictOrder } from "./rebels.ts";
 import { answerRevolution, lockedOrder, monthlyRevolutions } from "./revolutions.ts";
 import { answerEvent, monthlyEvents } from "./events.ts";
@@ -291,6 +292,8 @@ function startDay(world: World, news: News[]): void {
     monthlyPeoples(world, news);
     monthlyFaithHeads(world, news);
     monthlyBelief(world, news);
+    // Days to each capital, if land changed hands, before the grievances read them (X-28).
+    monthlyThrone(world);
     monthlyMoods(world, news);
     monthlyRebels(world, news);
     monthlyRevolutions(world, news);

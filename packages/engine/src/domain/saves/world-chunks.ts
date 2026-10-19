@@ -27,6 +27,7 @@ import { hashWorld } from "../../hash.ts";
 import { Rng } from "../../rng.ts";
 import type { Order } from "../../turn.ts";
 import { createArmyPool, createWorld, type World } from "../../world.ts";
+import { monthlyThrone } from "../../throne.ts";
 import { groundOfCell, WATER, type TileGrid } from "../../tiles.ts";
 import type { Battle, SiegeState } from "../../war.ts";
 import { addCommander, ARMS, type FreeCompany, type Mercenary, type Muster } from "../../recruit.ts";
@@ -541,6 +542,9 @@ export function restoreWorld(chunks: Map<string, RawChunk>, rules: Ruleset, tabl
   restorePlague(world, natMeta.plague, mapP);
   // A save from before trade is given the start's traders, on the world as loaded.
   if (!natMeta.trade) seedTrade(world);
+
+  // Days to each capital are derived from who owns what: worked out for the land as loaded (X-28).
+  monthlyThrone(world);
 
   const events = chunks.has("events") ? (unpackChunk(chunks.get("events")!).meta as unknown as EventsState) : { ...EMPTY_EVENTS };
   const history = chunks.has("history") ? ((unpackChunk(chunks.get("history")!).meta.timeline as unknown[]) ?? []) : [];

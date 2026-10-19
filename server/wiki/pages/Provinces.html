@@ -209,7 +209,7 @@
 <ul>
 <li>Each province has <strong>one road step</strong>: track, road, paved road, turnpike, railway. Each step is unlocked by an invention and built for gold × the ground&#39;s build cost. Roads are lost by neglect without upkeep, fighting and floods.</li>
 <li>A <strong>navigable river</strong> is fixed and shown as shore tiles; canals add one (<em>Grand canals</em>, <em>Canal locks</em>), and a wrecked canal or silting removes it. River provinces count one ring closer for castle food spread.</li>
-<li><strong>Days to capital</strong> is the travel time to the capital or nearest seat by the fastest road, river or sea route, longer in winter, with enemy armies, broken roads or a sea route closed in war. Above a limit (for example 30 days), the province has <em>Far from the throne</em>.</li>
+<li><strong>Days to capital</strong> is the travel time to the capital or nearest seat by the fastest road, river or sea route, longer in winter, with enemy armies, broken roads or a sea route closed in war. Above a limit (30 days), the province has <em>Far from the throne</em>. Days count from the capital over the realm&#39;s own land and the sea, and are worked out again whenever land changes hands; a realm that lost its capital counts from its largest province. Royal land far from the throne sends a tenth less tax and recruits for every 10 days past the limit, down to half at 80 days. A lord&#39;s province is run from his seat and is never far, so granting distant land is one answer. The province card shows <em>To capital</em> and the share lost, and the <em>Days to capital</em> lens colours your royal land from green to red.</li>
 </ul>
 <h3 id="who-owns-and-governs-it"><a class="anchor" href="#who-owns-and-governs-it" aria-label="Link to this section">#</a>Who owns and governs it</h3>
 <ul>
@@ -299,7 +299,7 @@
 <tr><td>Ungoverned</td><td>No official (a royal province without yours, or a lord&#39;s without his)</td><td>An official is assigned</td></tr>
 <tr><td>Harsh lord</td><td>The lord is Cruel or Greedy, or hostile to the people&#39;s faith or language</td><td>The lord changes</td></tr>
 <tr><td>Broken charter</td><td>A charter revoked in the last 20 years</td><td>Time</td></tr>
-<tr><td>Far from the throne</td><td>Days to capital above the limit</td><td>A seat nearby; roads; moving the capital</td></tr>
+<tr><td>Far from the throne</td><td>Royal land with days to capital above the limit</td><td>Granting it to a lord; land nearer the capital</td></tr>
 <tr><td>Plague</td><td>An outbreak here</td><td>It burns out</td></tr>
 <tr><td>Bloodshed</td><td>A rising of the same faith or language was massacred in the last 20 years</td><td>Time</td></tr>
 <tr><td>Requisitioned</td><td>An army, yours or anyone&#39;s, takes food from the store</td><td>A season after the last taking</td></tr>
@@ -479,6 +479,9 @@
 <tr><td>Tax without official / lord&#39;s share</td><td><code>province.tax.no_official</code>, <code>province.tax.lord_share</code></td><td>half / half</td></tr>
 <tr><td>Free travel days for tax</td><td><code>province.tax.free_travel_days</code></td><td>5</td></tr>
 <tr><td>Far from the throne</td><td><code>province.far_from_throne.days</code></td><td>30 (example)</td></tr>
+<tr><td>Far from the throne: cut per 10 days past the limit</td><td><code>province.far_from_throne.cut_per_10_days</code></td><td>0.1</td></tr>
+<tr><td>Far from the throne: least share sent</td><td><code>province.far_from_throne.least_share</code></td><td>0.5</td></tr>
+<tr><td>Days to cross a sea zone toward the capital</td><td><code>province.far_from_throne.sea_zone_days</code></td><td>8</td></tr>
 <tr><td>Official full effect</td><td><code>province.officials.full_effect_years</code></td><td>5 years (half in the first)</td></tr>
 <tr><td>Official effects</td><td><code>province.officials.effects</code></td><td>table above</td></tr>
 <tr><td>Homeland</td><td><code>province.homeland.years</code></td><td>100 years</td></tr>

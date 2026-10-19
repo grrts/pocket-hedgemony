@@ -512,9 +512,15 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 
 ## Far from throne
 
+> PROV-173, PROV-174, X-28: days from a royal province to the capital over the realm's own land (the march's crossing days) and the sea (sea\_zone\_days a zone). Past days it has Far from the throne and sends the crown cut\_per\_10\_days less tax and recruits for every 10 days beyond, down to least\_share. A lord's province is run from his seat and is never far. Provisional.
+
 | Key | Value |
 |---|---|
 | `days` | 30 |
+| `cut_per_10_days` | 0.1 |
+| `least_share` | 0.5 |
+| `sea_zone_days` | 8 |
+| `provisional` | yes |
 
 ## Officials
 

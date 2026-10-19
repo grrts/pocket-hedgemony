@@ -5,6 +5,7 @@ import { allNationPay, ungoverned } from "./recruit.ts";
 import { emptyProvinceEffect } from "./domain/recruiting/index.ts";
 import { interestPct, loanCap, realmConfig } from "./domain/realm/index.ts";
 import { moodShare } from "./moods.ts";
+import { throneShare } from "./throne.ts";
 import { taxCapped, taxRaised } from "./rebels.ts";
 import { crownShare, inAnyWar, loyaltyStep } from "./lords.ts";
 import { officialBonus } from "./officials.ts";
@@ -87,10 +88,10 @@ export function taxFactor(world: World, rate: number): number {
 /**
  * What of a province's tax and trade reaches the crown: a province whose official was commissioned
  * pays half (recruiting RECR-083, "Leave it"), rioting or plotting provinces pay half (PROV-162), and
- * a lord keeps his share (REALM-072).
+ * a lord keeps his share (REALM-072), and royal land far from the throne sends less (PROV-174, X-28).
  */
 export function crownTake(world: World, p: number): number {
-  return (ungoverned(world, p) ? emptyProvinceEffect("Leave it").tax : 1) * moodShare(world, p) * crownShare(world, p);
+  return (ungoverned(world, p) ? emptyProvinceEffect("Leave it").tax : 1) * moodShare(world, p) * crownShare(world, p) * throneShare(world, p);
 }
 
 export function provinceTax(world: World, p: number, holder: number, share = crownTake(world, p)): number {
