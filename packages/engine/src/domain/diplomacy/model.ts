@@ -494,9 +494,10 @@ export function eraAtLeast(d: Diplomacy, era: string): boolean {
 export function entryRule(d: Diplomacy, kind: "ties" | "wrongs", id: string): EntryRule {
   let r: EntryRule = { ...(config.ledger[kind][id] as EntryRule) };
   if (kind === "ties") {
-    for (const era of ERAS) {
-      if (!eraAtLeast(d, era)) break;
-      const over = config.eras[era]?.ties?.[id];
+    // The eras up to the current one, read once (eraAtLeast for each).
+    const now = ERAS.indexOf(eraOf(d));
+    for (let i = 0; i <= now; i++) {
+      const over = config.eras[ERAS[i]!]?.ties?.[id];
       if (over) r = { ...r, ...over };
     }
   }
@@ -562,7 +563,10 @@ function wrongWhile(d: Diplomacy, id: string, weight: number, condition: string)
 }
 
 export function marriagesBetween(d: Diplomacy, a: string, b: string): number {
-  return d.marriages.filter((m) => pairKey(m.a, m.b) === pairKey(a, b)).length;
+  const k = pairKey(a, b);
+  let n = 0;
+  for (const m of d.marriages) if (pairKey(m.a, m.b) === k) n++;
+  return n;
 }
 
 /** Ties and wrongs that hold while something is true, read from the world each time. */
@@ -576,9 +580,10 @@ export function conditionalEntries(d: Diplomacy, holder: string, other: string):
   }
   // A third country both hold a stored Rival or Hostile stance toward (one pass each, not one per country).
   const foe = (s: string | undefined) => s === "rival" || s === "hostile";
-  const theirs = storedStancesOf(d.graph, other);
+  let theirs: Map<string, string> | undefined;
   let shared = false;
-  for (const [c, s] of storedStancesOf(d.graph, holder)) if (c !== holder && c !== other && foe(s) && foe(theirs.get(c))) shared = true;
+  // Other's stances are read only once holder has a foe to share.
+  for (const [c, s] of storedStancesOf(d.graph, holder)) if (c !== holder && c !== other && foe(s) && foe((theirs ??= storedStancesOf(d.graph, other)).get(c))) shared = true;
   if (shared) out.push(tieWhile(d, "share_a_rival", entryRule(d, "ties", "share_a_rival").weight!, "true"));
   if (h.faith && h.faith === o.faith) out.push(tieWhile(d, "same_faith", entryRule(d, "ties", "same_faith").weight!, "true"));
   if (h.cultureGroup && h.cultureGroup === o.cultureGroup) out.push(tieWhile(d, "same_culture_group", entryRule(d, "ties", "same_culture_group").weight!, "true"));
@@ -613,9 +618,12 @@ export function ledgerOf(d: Diplomacy, holder: string, other: string): LedgerEnt
 export function relationLine(d: Diplomacy, holder: string, other: string): { relation: string; weight: number } {
   const lines = config.ledger.stance_lines;
   const order = config.relations.precedence.order;
-  const candidates = [stateOf(d.graph, holder, other), stance(d.graph, holder, other)].filter((x): x is string => !!x && x in lines);
-  candidates.sort((a, b) => order.indexOf(a) - order.indexOf(b));
-  const relation = candidates[0] ?? config.relations.default_stance;
+  // The state wins a tie in precedence, as the stable sort of [state, stance] had it.
+  const st = stateOf(d.graph, holder, other);
+  const sn = stance(d.graph, holder, other);
+  const a = st && st in lines ? st : null;
+  const b = sn && sn in lines ? sn : null;
+  const relation = (a !== null && b !== null ? (order.indexOf(b) < order.indexOf(a) ? b : a) : a ?? b) ?? config.relations.default_stance;
   return { relation, weight: lines[relation] ?? 0 };
 }
 
@@ -623,7 +631,14 @@ export function relationLine(d: Diplomacy, holder: string, other: string): { rel
 export function standing(d: Diplomacy, holder: string, other: string, ledger?: readonly LedgerEntry[], line?: { weight: number }): number {
   const o = d.standingOverride[key(holder, other)];
   if (o !== undefined) return o;
-  const n = (ledger ?? ledgerOf(d, holder, other)).reduce((s, e) => s + e.weight, 0) + (line ?? relationLine(d, holder, other)).weight;
+  // Summed in ledgerOf's order without building its array.
+  let n = 0;
+  if (ledger) for (const e of ledger) n += e.weight;
+  else {
+    for (const e of d.ledgers[key(holder, other)] ?? []) n += e.weight;
+    for (const e of conditionalEntries(d, holder, other)) n += e.weight;
+  }
+  n += (line ?? relationLine(d, holder, other)).weight;
   const cap = config.ledger.standing_limit;
   return Math.max(-cap, Math.min(cap, n));
 }
