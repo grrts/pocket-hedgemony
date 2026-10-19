@@ -15,6 +15,8 @@ describe("start scenarios (X-25)", () => {
     for (const o of s.mapOwners) if (o.nation !== null) expect(realms, `owner rule for ${o.nation}`).toContain(o.nation);
     for (const id of Object.keys(s.rulers)) expect(realms, `ruler of ${id}`).toContain(id);
     for (const id of Object.keys(s.culture.realms)) expect(realms, `tongues of ${id}`).toContain(id);
+    for (const r of [...s.relations, ...s.facts]) expect(realms, `source of ${r.id}`).toContain(r.source);
+    for (const [id, pope] of Object.entries(s.obedience)) (expect(realms, `obedience of ${id}`).toContain(id), expect(["rome", "avignon", null]).toContain(pope));
     for (const t of s.ports) expect(realms, `port ${t.name}`).toContain(t.holder);
   });
 });

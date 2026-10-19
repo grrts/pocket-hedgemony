@@ -20,6 +20,10 @@ export interface ScenarioData {
   rulers: Record<string, unknown>;
   culture: { tongues: Record<string, unknown>; realms: Record<string, unknown> };
   relations: { id: string; source: string; target: string; type: string }[];
+  /** Standing facts between realms (claims, marriages), as relations.json's facts. */
+  facts: { id: string; fact: string; source: string; target: string }[];
+  /** The Pope each Catholic realm follows on the start day (the Western Schism, plan-1378 4.4): realm -> "rome" | "avignon" | null (undecided). */
+  obedience: Record<string, "rome" | "avignon" | null>;
   subjects: unknown[];
   subjectsRulers: Record<string, unknown>;
   ports: { name: string; holder: string }[];
@@ -36,7 +40,7 @@ export function readScenario(id: string): ScenarioData {
     const path = join(part, file);
     return existsSync(path) ? JSON.parse(readFileSync(path, "utf8")) : undefined;
   };
-  const out: ScenarioData = { scenario, regionOf: new Map(), mapNations: [], mapOwners: [], sleepingRealms: [], rulers: {}, culture: { tongues: {}, realms: {} }, relations: [], subjects: [], subjectsRulers: {}, ports: [] };
+  const out: ScenarioData = { scenario, regionOf: new Map(), mapNations: [], mapOwners: [], sleepingRealms: [], rulers: {}, culture: { tongues: {}, realms: {} }, relations: [], facts: [], obedience: {}, subjects: [], subjectsRulers: {}, ports: [] };
   const clashes: string[] = [];
   const claim = (key: string, region: string) => {
     const had = out.regionOf.get(key);
@@ -58,7 +62,10 @@ export function readScenario(id: string): ScenarioData {
     const culture = read(part, "culture-start.json");
     merge(out.culture.tongues, culture?.tongues, "tongue", region);
     merge(out.culture.realms, culture?.realms, "culture", region);
-    for (const r of read(part, "relations.json")?.relations ?? []) (claim(`relation:${r.id}`, region), out.relations.push(r));
+    const relations = read(part, "relations.json");
+    for (const r of relations?.relations ?? []) (claim(`relation:${r.id}`, region), out.relations.push(r));
+    for (const f of relations?.facts ?? []) (claim(`relation:${f.id}`, region), out.facts.push(f));
+    merge(out.obedience, relations?.obedience, "obedience", region);
     out.subjects.push(...(read(part, "subjects.json")?.subjects ?? []));
     merge(out.subjectsRulers, read(part, "subjects-rulers.json")?.rulers, "subject-ruler", region);
     out.ports.push(...(read(part, "ports.json")?.towns ?? []));
