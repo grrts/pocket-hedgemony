@@ -3,6 +3,7 @@ import { W as WARFARE } from "./domain/warfare/index.ts";
 import { monthlyPeople } from "./living.ts";
 import { monthlyBelief } from "./belief.ts";
 import { setFood, setFoodPreset } from "./castleFood.ts";
+import { monthlyFear } from "./arms.ts";
 import { aiTreasury, monthlyDebts, repayLoan, runLedger, setTax, takeLoan } from "./treasury.ts";
 import { monthlyFood } from "./food.ts";
 import { callStudentsToArms, foundSchool, monthlyResearch, moveQueued as moveQueuedStudy, queuePath, queueStudy, setSeats, setStudy, unqueue } from "./research.ts";
@@ -39,7 +40,7 @@ import { shogunateOrder, type ShogunateOrder } from "./shogunate.ts";
 import { huntOf, monthlyTribes, tribesOrder, type TribesOrder } from "./tribes.ts";
 import { isPlagueWeek, setQuarantine, weeklyPlague } from "./plague.ts";
 import { addDays, DAYS_PER_RATION_MONTH, DAYS_PER_TURN } from "./calendar.ts";
-import { corridor, monthlyRations, refillRations, wagonRations, planRoute, planTilePath, tileStepHours, type MarchingArmy } from "./march.ts";
+import { corridor, monthlyRations, rations, refillRations, wagonRations, planRoute, planTilePath, tileStepHours, type MarchingArmy } from "./march.ts";
 import { foodCarriedPct, marchMap, NO_PATH, tileMarch, updateWeather, type World } from "./world.ts";
 import {
   aiCollect,
@@ -313,6 +314,8 @@ function startDay(world: World, news: News[]): void {
     judgeNeglect(world);
     if (world.date.month === 1) mineYear(world, news);
     monthlyWorks(world, news);
+    // Each realm weighs its neighbours' strength before the AI builds, borrows, declares and calls men (DIPL-231).
+    monthlyFear(world, news);
     aiWorks(world, news);
     monthlyChanges(world, news);
     aiChanges(world);
@@ -866,10 +869,12 @@ function feedArmies(world: World): void {
     if (!a.alive[i]) continue;
     const n = a.owner[i]!;
     if (carried[n]! < 0) carried[n] = foodCarriedPct(world, n);
-    const army = { ...marching(world, i), campaigning: campaigning(world, i), foodCarriedPct: carried[n]! };
-    const need = monthlyRations(d, army) * day;
+    const c = a.commander[i]!;
+    const logistics = c >= 0 ? world.commanderLogistics[c]! : 0;
+    const need = rations(d, a.men[i]!, a.horse[i]!, logistics, campaigning(world, i)) * day;
     a.food[i] = a.food[i]! - need;
-    const room = wagonRations(d, army) - a.food[i]!;
+    // wagonRations: the months carried of eating on campaign.
+    const room = rations(d, a.men[i]!, a.horse[i]!, logistics, true) * d.monthsCarried * (carried[n]! / 100) - a.food[i]!;
     if (room > 0) {
       const take = Math.min(room, refillHere(world, i, map) * day);
       a.food[i] = a.food[i]! + take;

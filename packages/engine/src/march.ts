@@ -38,8 +38,12 @@ export function groundOf(terrain: Terrain): Ground | null {
  * a thousand rations are one unit of a province's store (feedback 83).
  */
 export function monthlyRations(d: MarchDefines, a: MarchingArmy): number {
-  const men = a.men * d.rationsPerSoldier * (a.campaigning ? realmConfig.food.campaign_eat : 1);
-  return (men + a.horse * d.rationsPerHorse) * Math.max(0, 1 - a.logistics * d.logisticsRationCut);
+  return rations(d, a.men, a.horse, a.logistics, !!a.campaigning);
+}
+
+/** monthlyRations without building an army, for the daily pass over every army. */
+export function rations(d: MarchDefines, men: number, horse: number, logistics: number, campaigning: boolean): number {
+  return (men * d.rationsPerSoldier * (campaigning ? realmConfig.food.campaign_eat : 1) + horse * d.rationsPerHorse) * Math.max(0, 1 - logistics * d.logisticsRationCut);
 }
 
 /** Rations an army's wagons hold: its months carried of eating on campaign. */
