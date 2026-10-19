@@ -1,12 +1,14 @@
 import { Rng } from "@ph/engine";
 import { decide, defaultSettings, evaluateState, layersFor, newDirector, peaceTrackId, playStinger, stingerEnded, tick, type AudioSettings, type Cue, type Director, type Ending, type MusicFacts, type Palette } from "@ph/engine/domain/audio";
 import { SR } from "./chip.ts";
-import { PALETTE_VOICES, renderTrack, TRACKS, writtenTrack, type Rendered } from "./tracks.ts";
+import { PALETTE_VOICES, paletteInstruments, renderTrack, TRACKS, writtenTrack, type Rendered } from "./tracks.ts";
+import { InstrumentStore } from "./samples.ts";
 import { hasSound, renderSound } from "./sfx.ts";
 
 /**
  * The game's sound: the music director (domain/audio, AUD-036 on) choosing
- * what plays, the chip's tracks and effects synthesized in the page, and the
+ * what plays, the tracks rendered in the page on the palette's sampled
+ * instruments (D-AUD-16), the chip's effects synthesized, and the
  * player's sound settings kept on this device (settings: Device group).
  * Audio starts on the first tap (AUD-107) and goes quiet while the game is
  * hidden (AUD-109).
@@ -47,6 +49,7 @@ export class Sound {
   private duck!: GainNode;
   private fxGain!: GainNode;
   private cache = new Map<string, Promise<Rendered>>();
+  private instruments = new InstrumentStore();
   private playing: Playing | null = null;
   private director: Director | null = null;
   private facts: MusicFacts | null = null;
@@ -198,17 +201,18 @@ export class Sound {
     p.layers.forEach((g, i) => g.gain.setTargetAtTime(i === 0 || want.includes(i + 1) ? 1 : 0, t, p.rendered.barSeconds / 3));
   }
 
+  /** Every track plays on its palette's band, so even the fixed-key ones are kept per palette. */
   private keyOf(id: string): string | null {
     const written = writtenTrack(id);
-    if (!written) return null;
-    return TRACKS[written]!.mode ? written : `${written}@${this.palette}`;
+    return written ? `${written}@${this.palette}` : null;
   }
 
   private rendered(key: string): Promise<Rendered> {
     let hit = this.cache.get(key);
     if (!hit) {
-      const [written, palette] = key.split("@");
-      hit = renderTrack(written!, (palette ?? this.palette) as Palette);
+      const [written, p] = key.split("@") as [string, Palette];
+      // The band is fetched before the first track of a palette; a pack that fails plays on the chip.
+      hit = this.instruments.load(paletteInstruments(p)).then(() => renderTrack(written, p, undefined, this.instruments));
       this.cache.set(key, hit);
     }
     return hit;
@@ -278,7 +282,7 @@ export class Sound {
 
   private async playStingerTrack(id: string): Promise<void> {
     if (!this.ctx || !this.settings.musicOn || !TRACKS[id]) return;
-    const r = await this.rendered(id);
+    const r = await this.rendered(this.keyOf(id)!);
     const ctx = this.ctx;
     const [L, R] = r.layers[0]!;
     const buf = ctx.createBuffer(2, L.length, SR);
