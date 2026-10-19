@@ -6,7 +6,9 @@ import { icon } from "../art/ui.ts";
  * the map, oldest first. The year it happened in history and what happened
  * then, what comes whatever is chosen, and each option as a 44-point button
  * with its effects in words, the historical one marked. Look at the map folds
- * it into the End turn button until the player comes back to it.
+ * it into the End turn button until the player comes back to it. An everyday
+ * event of the realm's own people (EVT-121) has no year in history: its story
+ * is told as it happens, and Look at the map goes to the province it is about.
  */
 
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
@@ -14,17 +16,19 @@ const list = (lines: string[]) => (lines.length ? `<ul class="event-effects">${l
 
 export function eventCardHtml(card: EventCard, waiting: number): string {
   const history = card.year ? `In history, ${card.year}` : "In history";
+  const story = card.everyday ? `<p>${esc(card.text)}</p>` : `<p><b>${esc(history)}:</b> ${esc(card.text)}</p>`;
+  const what = card.kind === "offered" ? "A decision for you" : card.everyday ? "In your realm" : card.major ? "A great event" : "An event";
   return `
     <header>
       <div>
         <h2 class="ribbon" id="event-title">${esc(card.title)}</h2>
-        <small>${card.kind === "offered" ? "A decision for you" : card.major ? "A great event" : "An event"}${waiting > 1 ? ` · ${waiting - 1} more waiting` : ""}</small>
+        <small>${what}${waiting > 1 ? ` · ${waiting - 1} more waiting` : ""}</small>
       </div>
       <button class="paper fold" data-event-fold title="Look at the map" aria-label="Look at the map">${icon("map", 2)}</button>
     </header>
     <div class="event-body">
       <div class="event-story">
-        ${card.text ? `<p><b>${esc(history)}:</b> ${esc(card.text)}</p>` : ""}
+        ${card.text ? story : ""}
         ${card.always.length ? `<h3 class="sub">Whatever you choose</h3>${list(card.always)}` : ""}
       </div>
       <div class="event-options">

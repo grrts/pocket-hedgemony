@@ -1,0 +1,69 @@
+@context-events
+Feature: Everyday events
+  As a player
+  I want small choices about my officials, lords, family and stores every few months
+  So that the realm feels alive between the great events of history
+
+  @EVT-115 @EVT-116
+  Scenario: A choice comes every few months
+    Given France is played from 11 November 1444
+    When five years pass and each everyday event is answered at once
+    Then France has had between 8 and 21 everyday events
+    And no AI realm has an everyday event waiting
+
+  @EVT-117
+  Scenario: No new everyday event while one waits
+    Given France is played and an everyday event waits for its answer
+    When three years pass without an answer
+    Then only that one everyday event waits
+
+  @EVT-122
+  Scenario: A seasoned man keeps the post's years
+    Given France's official at a royal province has died
+    When France sends for a seasoned man
+    Then France pays 25 gold
+    And the post keeps the years its official had served
+
+  @EVT-122
+  Scenario: The deputy starts afresh
+    Given France's official at a royal province has died
+    When France raises his deputy
+    Then the post's years start again from today
+
+  @EVT-120
+  Scenario: An option the realm cannot pay is not offered
+    Given France holds 5 gold
+    And France's official at a royal province has died
+    Then the card does not offer to send for a seasoned man
+
+  @EVT-126
+  Scenario: Spoiled grain is lost at once and buying grain makes half of it good
+    Given grain has rotted in a store of France's
+    Then the card says how many months of grain were lost whatever France chooses
+    When France buys grain from merchants
+    Then half of the lost grain is back in the store
+
+  @EVT-123
+  Scenario: The crown takes a dead lord's lands
+    Given a lord of France has died
+    When France takes his lands for the crown
+    Then his provinces are royal land
+    And the other lords of France fear for their own
+
+  @EVT-123
+  Scenario: The son follows his father
+    Given a lord of France has died
+    When France confirms his son
+    Then the son holds the lands under his own name
+
+  @EVT-124
+  Scenario: A child born to an heirless ruler is the heir
+    Given France's ruler is 30 and has no heir
+    When a child is born to him and France gives thanks quietly
+    Then the child is France's heir
+
+  @EVT-128
+  Scenario: The waiting event is kept in the save
+    Given two of France's lords quarrel and the event waits for France
+    When the game is saved and loaded
+    Then the same event waits for France
