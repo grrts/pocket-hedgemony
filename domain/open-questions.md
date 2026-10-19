@@ -16,6 +16,13 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **OQ-VIEW-12** (map-presentation): (default chosen) Footprint scale: `sqrt(town thousands) × 1.5`, capped at 30 cells, so Toledo's 119 thousand town people in 1444 make the design's 15 to 20 cells (at 1.0 it was 11); to be tuned so big cities read clearly without swallowing small provinces. [OQ-LIVE-2]
 - **OQ-VIEW-13** (map-presentation): (default chosen) Street level on the phone default: Medium has no street level, to spare the battery; High only. [OQ-LIVE-3]
 - **OQ-VIEW-14** (map-presentation): (default chosen) First landmarks: Toledo, Constantinople (Hagia Sophia), Rome, Paris, Venice, Cairo, Beijing (the Forbidden City) and Cuzco. [OQ-LIVE-4]
+- **OQ-MP-1** (multiplayer): A player who never presses Ready: is there a timer, and what happens to the realm then (AI takes it, the week plays without its orders)? The prototype has none.
+- **OQ-MP-2** (multiplayer): Dropping a player or moving the host after start.
+- **OQ-MP-3** (multiplayer): Games that never start: how long the server keeps them before removing them.
+- **OQ-MP-4** (multiplayer): Out of step: the server marks it, but the only cure is replaying from the start. Should a device that disagrees fetch the agreed world instead?
+- **OQ-MP-5** (multiplayer): Diplomacy between players beyond war and peace (alliances, calls to arms, envoys' asks) and Imperial votes have not been played through.
+- **OQ-MP-6** (multiplayer): Is online multiplayer part of the paid game, the demo, or both (accounts §6)?
+- **OQ-MP-7** (multiplayer): Push notifications when a game waits on you (phones), instead of opening the game to see.
 - **OQ-RSCH-23** (research): Florence's head start in humanist learning (plan-1378 §3.2): L6 needs L5 or L2, which Florence lacks in 1378, so knowing it would break RSCH-099. A bridge event (Salutati) or a tree change is for Leroy to choose.
 - **OQ-REVO-7** (revolutions): (release task) The seven new sources in additions.yaml are `verified: false`; checking them is a source review, not code.
 - **OQ-SAVE-5** (saves): (release task) The server quota (300 saves / 200 MB) is set once real sizes are measured, and which social sign-ins ship at launch is a store decision.

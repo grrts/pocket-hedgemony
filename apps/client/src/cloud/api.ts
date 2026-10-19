@@ -124,6 +124,23 @@ export interface Changes {
   usage: Usage | undefined;
 }
 
+/** An online game as the server gives it (server/src/Controller/GamesController.php). */
+export interface GameTable {
+  game: { code: string; seed: number; host: string; created: number; humans: string[]; started: boolean; ended: boolean; version: number; outOfStep: number | null };
+  seats: { realm: string; player: string; at: number; mine: boolean }[];
+  /** Only for a seated account. */
+  weeks: { week: number; realm: string; orders: unknown; hash: string }[];
+}
+
+export interface MyGameRow {
+  code: string;
+  realm: string;
+  started: boolean;
+  week: number | null;
+  waitingOn: string[];
+  yourMove: boolean;
+}
+
 /**
  * A call that did not succeed. `status` 0 means the server was not reached
  * (offline); `code` is the server's error word (`wrong_email_or_password`,
@@ -270,6 +287,45 @@ export class CloudApi {
     await this.call("DELETE", `/api/campaigns/${encodeURIComponent(campaignId)}`);
   }
 
+  // ---------------------------------------------------------------- multiplayer (domain/multiplayer MP-020 … MP-051)
+
+  /** `POST /api/games`: a new game with this account on `realm`. */
+  hostGame(realm: string): Promise<GameTable> {
+    return this.json<GameTable>("POST", "/api/games", { realm });
+  }
+
+  /** `GET /api/games`: Your games. */
+  async myGames(): Promise<MyGameRow[]> {
+    return (await this.json<{ games: MyGameRow[] }>("GET", "/api/games")).games;
+  }
+
+  /** `GET /api/games/{code}?since=`; undefined when the game is as `etag` says (304). */
+  async getGame(code: string, since: number, etag?: string): Promise<{ table: GameTable; etag: string | undefined } | undefined> {
+    const res = await this.call("GET", `/api/games/${encodeURIComponent(code)}?since=${since}`, undefined, true, etag ? { "If-None-Match": etag } : {});
+    if (res.status === 304) return undefined;
+    return { table: (await res.json()) as GameTable, etag: res.headers.get("ETag") ?? undefined };
+  }
+
+  /** `PUT /api/games/{code}/seats/{realm}`. */
+  sitGame(code: string, realm: string): Promise<GameTable> {
+    return this.json<GameTable>("PUT", `/api/games/${encodeURIComponent(code)}/seats/${encodeURIComponent(realm)}`);
+  }
+
+  /** `DELETE /api/games/{code}/seats/mine`. */
+  async leaveGame(code: string): Promise<void> {
+    await this.call("DELETE", `/api/games/${encodeURIComponent(code)}/seats/mine`);
+  }
+
+  /** `POST /api/games/{code}/start`, by the host. */
+  startGame(code: string): Promise<GameTable> {
+    return this.json<GameTable>("POST", `/api/games/${encodeURIComponent(code)}/start`);
+  }
+
+  /** `PUT /api/games/{code}/weeks/{week}`: a realm's orders for one week. */
+  async sendWeek(code: string, week: number, body: { realm: string; orders: unknown; hash: string }): Promise<void> {
+    await this.json("PUT", `/api/games/${encodeURIComponent(code)}/weeks/${week}`, body);
+  }
+
   // ---------------------------------------------------------------- tokens
 
   private keep(r: { accessToken: string; accessTokenExpiresIn: number; deviceToken: string; deviceId: string; account: AccountInfo }): void {
@@ -318,8 +374,8 @@ export class CloudApi {
 
   // ---------------------------------------------------------------- requests
 
-  private async send(method: string, path: string, body?: { body: BodyInit; type: string }, bearer?: string): Promise<Response> {
-    const headers: Record<string, string> = { Accept: "application/json" };
+  private async send(method: string, path: string, body?: { body: BodyInit; type: string }, bearer?: string, extra: Record<string, string> = {}): Promise<Response> {
+    const headers: Record<string, string> = { Accept: "application/json", ...extra };
     if (body) headers["Content-Type"] = body.type;
     if (bearer) headers.Authorization = `Bearer ${bearer}`;
     try {
@@ -330,20 +386,21 @@ export class CloudApi {
   }
 
   /** A signed-in call: on a 401 the access token is refreshed once and the call made again. */
-  private async call(method: string, path: string, body?: { body: BodyInit; type: string }, auth = true): Promise<Response> {
+  private async call(method: string, path: string, body?: { body: BodyInit; type: string }, auth = true, extra: Record<string, string> = {}): Promise<Response> {
     const used = auth ? await this.bearer() : undefined;
-    let res = await this.send(method, path, body, used);
+    let res = await this.send(method, path, body, used, extra);
     if (auth && res.status === 401) {
       // Another call may have refreshed meanwhile; then its new token is tried as it is.
       if (this.access?.token === used) await this.refresh();
       if (!this.access) throw new CloudError(401, "signed_out");
-      res = await this.send(method, path, body, this.access!.token);
+      res = await this.send(method, path, body, this.access!.token, extra);
       if (res.status === 401) {
         this.forget();
         throw new CloudError(401, "signed_out");
       }
     }
-    if (!res.ok) throw await failure(res);
+    // 304 answers a conditional ask (If-None-Match): nothing changed.
+    if (!res.ok && res.status !== 304) throw await failure(res);
     return res;
   }
 

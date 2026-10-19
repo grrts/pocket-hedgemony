@@ -1,6 +1,11 @@
-# Multiplayer (prototype)
+# Multiplayer
 
-A playable test of multiplayer, on its own branch, to find out whether it works and whether it is fun. Nothing here is decided: if Leroy keeps it, it becomes a context in `domain/` with its own spec and features.
+Multiplayer on its own branch, not merged until Leroy says so. The rules are in `domain/multiplayer/spec.md` (MP) with its features; this page explains how it works and why.
+
+Two tables carry an online game between devices:
+
+- **Our server** (`server/src/Controller/GamesController.php`), when the build has one (`VITE_CLOUD_API`). It uses the accounts of cloud saves: the player signs in once, and their games follow them to every device.
+- **The Artifact's shared database or the browser's storage**, the prototype's table, in a build without a server (the published Artifact, the dev server). The Artifact cannot reach our server: its page may not call other sites.
 
 ## The turn model: simultaneous weeks
 
@@ -38,7 +43,10 @@ What simultaneous costs: an order you give while planning acts at once on your o
 - `packages/engine/src/humans.ts`: the engine had one `world.player` that the AI left alone. It now asks `isHuman(world, n)`, which is every player's realm in multiplayer (`world.humans`) and the player in a game of one. `world.player` is left only for what this device shows.
 - `packages/engine/src/multiplayer.ts`: `cloneWorld` copies the world at the week's start (about 60 ms on the real map), `applyAll` carries out every player's orders in the turning order, and maps the armies, commanders, fleets, governors and traders an order made on the planning copy to the numbers they get when everyone's orders are applied.
 - The engine host (`protocol.ts`) records the orders given while planning, and has three new requests: `plan` (plan as a realm from the week's start, for Pass and play), `planned` (this week's orders to send) and `resolve` (everyone's orders, from the week's start).
-- Online play keeps the lobby and orders in the published Artifact's shared database: `mp/<code>` for the game and `mp/<code>/players/<realm>` for a realm's seat and all its weeks of orders, so a game is at most five documents however long it runs (the database holds 25,000, so about 5,000 games; a real release would keep games on our own server). Outside an Artifact the same code uses the browser's storage, shared between tabs, which is how the dev server and the shots script test it.
+- **Our server's table**: `POST /api/games` (host: code, seed, the host's seat), `GET /api/games` (Your games, marking those waiting on you), `GET /api/games/{code}?since=` (game, seats with player names, and the weeks' orders from a week on, only to seated players; `ETag` so an unchanged game costs a 304), `PUT /api/games/{code}/seats/{realm}` (sit, or move your seat before the start), `DELETE /api/games/{code}/seats/mine` (leave; the host leaving before the start ends the game; after the start it only leaves Your games), `POST /api/games/{code}/start` (host, two seats or more), `PUT /api/games/{code}/weeks/{week}` (your realm's orders and week-start hash, once; a week only after everyone sent the one before; two different hashes mark the game out of step). Three tables: `mp_game`, `mp_seat`, `mp_week`. The server never plays the game; it keeps orders and refuses what breaks the table's rules. Limits and seat count are provisional (`config/packages/multiplayer.yaml`).
+- The game asks its server every 2 seconds while a game is open (15 when the page is hidden), and gets "not changed" almost always. Each device carries out a week's orders as the realm whose seat sent them, so nobody can give orders for another realm.
+- Checked end to end: `apps/client/scripts/multiplayer-server-shots.mjs` plays two accounts on two separate browsers against a local server (three weeks agree; a third browser of the same account comes back from Your games and catches up); `server/tests/Controller/GamesTest.php` covers the table's rules.
+- The prototype's table keeps the lobby and orders in the published Artifact's shared database: `mp/<code>` for the game and `mp/<code>/players/<realm>` for a realm's seat and all its weeks of orders, so a game is at most five documents however long it runs (the database holds 25,000, so about 5,000 games; a real release would keep games on our own server). Outside an Artifact the same code uses the browser's storage, shared between tabs, which is how the dev server and the shots script test it.
 - Who may play online: the Artifact's database lets only its owner, and people invited by email as Editor (while the page has no public link), write. Everyone else can open the page and see games but not sit down; the Multiplayer dialog says so, and a refused write says why.
 - Each device writes the world's hash at the week's start with its orders; a device that disagrees says "Out of step" on the plaque and the Players card.
 
@@ -54,4 +62,9 @@ What simultaneous costs: an order you give while planning acts at once on your o
 - News about another player's realm can read "you" when it reaches you (the texts were written for one player).
 - Pass and play keeps no news log per player: each player sees the news from the last week played.
 - No chat, no timer for a player who never presses Ready, no way to drop a player, no host migration.
-- Only the Artifact's owner and its Editors can play online (see above); our own server with accounts would lift this.
+- Only the Artifact's owner and its Editors can play online in the Artifact (see above); on our server anyone with an account can.
+- Every poll is preceded by a browser CORS check while the game and the server are on different addresses; serving the web game from the server's address would halve the requests.
+
+## What is needed to go live
+
+The server work is done and tested locally; going live needs what accounts need (accounts-design §10): a domain with HTTPS, a host for the Symfony server with Postgres, and the web game's address in `CORS_ALLOW_ORIGINS`. Then a build with `VITE_CLOUD_API` set plays online on the server.

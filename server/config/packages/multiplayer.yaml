@@ -1,0 +1,17 @@
+# Online multiplayer (domain/multiplayer/spec.md §10). Every number here is provisional (@placeholder).
+parameters:
+    multiplayer.max_players: 8
+    multiplayer.max_orders_kb: 256
+
+framework:
+    rate_limiter:
+        # Hosting, sitting down, starting and sending orders, per account and per device (MP-039).
+        api_games:
+            policy: sliding_window
+            limit: 300
+            interval: '10 minutes'
+        # Asking for changes, per account: one device at 2 s is 300 in ten minutes (MP-037, MP-039).
+        api_games_read:
+            policy: sliding_window
+            limit: 1200
+            interval: '10 minutes'

@@ -126,8 +126,9 @@ import { PICKER_REGIONS, pickerRegions, startTrade, waysToGrow } from "@ph/engin
 import { pickerCardHtml, regionListHtml, regionSelectHtml, strongIn, strongInWords, waysToGrowHtml } from "./ui/realmPicker.ts";
 import { BATTLE_STEP_MS, bannerAt, COUNTRY_CARD_TABS, endTurnInAuto, endTurnLabel, keyEndsTurn, newAutoTurns, realmOverview, REALM_BOOK_TABS, sectionOf, SHELL as SHELL_RULES, startColumn, startIcons, stopAuto, switchAuto, tabHolds, WATCH_STEP_MS, weekPlayed, type AutoStop, type OverviewTile, type Platform as ShellPlatform } from "@ph/engine/domain/game-shell";
 import { autosaveDue, continueTarget, longDate, newCampaign, newManualSave, saveStart, savesConfig, type Campaign, type Platform as SavePlatform } from "@ph/engine/domain/saves";
-import { mpStore, type MpStore } from "./multiplayer/store.ts";
-import { cleanCode, deviceId, findGame, forget as forgetGame, hostGame, remember as rememberGame, rememberedGames, seatOf, sendTurn, startOnline, takeSeat, watchGame, watchSeats, watchTurns, type OnlineGame, type Seat, type TurnDoc } from "./multiplayer/lobby.ts";
+import { mpStore } from "./multiplayer/store.ts";
+import { cleanCode, storeTable, type MyGame, type OnlineGame, type Seat, type Table, type TurnDoc } from "./multiplayer/lobby.ts";
+import { serverTable } from "./multiplayer/server.ts";
 import { hotseatPickHtml, lobbyHtml, menuHtml, playersHtml, type PlayerRow, type RealmLook } from "./multiplayer/screens.ts";
 import { SaveStore, type StoredSave } from "./saves/store.ts";
 import { animationsPref, autosaveEvery, autosavesKept, battleStepMs, batteryOn, dayMs, livingPrefs, longPressMs, mapDetail, mapPower, onPrefs, setPref, textZoom } from "./settings/prefs.ts";
@@ -467,19 +468,23 @@ interface MpState {
   hashes?: string[];
   /** Pass and play: the realm the device is being passed to (-1: none). */
   cover: number;
-  online: { store: MpStore; game: OnlineGame; turns: Map<string, TurnDoc>; stop: () => void } | null;
+  online: { table: Table; game: OnlineGame; turns: Map<string, TurnDoc>; stop: () => void } | null;
 }
 let mp: MpState | null = null;
 /** Choosing realms for a multiplayer game: what tapping a realm does. */
 let mpPicking: { kind: "hotseat"; chosen: string[] } | { kind: "host" } | { kind: "join"; code: string } | null = null;
 /** An online game waiting for its host to start it. */
-let mpLobby: { store: MpStore; game: OnlineGame; seats: Seat[]; realm: string; stop: () => void } | null = null;
+let mpLobby: { table: Table; game: OnlineGame; seats: Seat[]; realm: string; stop: () => void } | null = null;
 /** The Players card is open. */
 let mpView = false;
 /** The Multiplayer dialog over the start screen: the table it reaches, and what it last has to say. */
 let startMp = false;
-let mpReach: MpStore["reach"] | null = null;
+let mpReach: Table["reach"] | null = null;
 let mpCanWrite: boolean | null = null;
+/** Your games, as the table last gave them. */
+let mpMine: MyGame[] = [];
+/** The code being typed, kept when the dialog is drawn again (Your games arriving must not wipe it). */
+let mpTyped = "";
 let mpMessage: string | null = null;
 let mpMenuBusy = false;
 /** Resolving or catching up a week: nothing else starts meanwhile. */
@@ -7756,7 +7761,7 @@ function showStart(): void {
         .join("")}</div>
     </div>
     ${startMore ? startMoreHtml() : ""}
-    ${startMp ? menuHtml(mpLook, { reach: mpReach, canWrite: mpCanWrite, mine: rememberedGames(), message: mpMessage, busy: mpMenuBusy }) : ""}
+    ${startMp ? (loadMpMenu(), menuHtml(mpLook, { reach: mpReach, canWrite: mpCanWrite, signIn: !!cloud && !cloud.api.signedIn, mine: mpMine, typed: mpTyped, message: mpMessage, busy: mpMenuBusy })) : ""}
     <span class="start-version">v${GAME_VERSION}</span>`;
   startEl.hidden = false;
   document.body.classList.add("starting");
@@ -8632,13 +8637,48 @@ function openMpMenu(message: string | null = null): void {
   startMore = false;
   mpMessage = message;
   mpMenuBusy = false;
+  mpLoaded = false;
   showStart();
-  if (mpReach) return;
-  void mpStore().then((store) => {
-    mpReach = store.reach;
-    mpCanWrite = store.canWrite;
-    if (startMp && !startEl.hidden) showStart();
+}
+
+/** What the dialog shows from the table: whom it reaches, and Your games. Asked once each time the dialog opens. */
+let mpLoaded = false;
+function loadMpMenu(): void {
+  const table = mpTable();
+  if (mpLoaded || !table) return;
+  mpLoaded = true;
+  const redraw = () => {
+    if (!startMp || startEl.hidden || shell.view) return;
+    const typing = document.activeElement?.id === "mp-code-input";
+    showStart();
+    if (typing) startEl.querySelector<HTMLInputElement>("#mp-code-input")?.focus();
+  };
+  void table.then(async (t) => {
+    mpReach = t.reach;
+    mpCanWrite = t.canWrite;
+    redraw();
+    mpMine = await t.mine().catch(() => mpMine);
+    redraw();
   });
+}
+
+let storeTableP: Promise<Table> | undefined;
+let ourServer: Table | undefined;
+/**
+ * The game table: our server, as the signed-in account, when the build has
+ * one (MP-020), and nothing until the player signs in (MP-021); else the
+ * prototype's shared store (the Artifact's database, or this browser's).
+ */
+function mpTable(): Promise<Table> | null {
+  if (cloud) return cloud.api.signedIn ? Promise.resolve((ourServer ??= serverTable(cloud.api))) : null;
+  return (storeTableP ??= mpStore().then(storeTable));
+}
+
+/** The table, or the sign-in the player must do first. */
+async function needTable(): Promise<Table> {
+  const t = mpTable();
+  if (!t) throw Object.assign(new Error("signed_out"), { code: "signed_out" });
+  return t;
 }
 
 function closeMpMenu(): void {
@@ -8652,7 +8692,23 @@ function mpFailure(e: unknown): string {
   if (code === "invalid_argument" || code === "not_granted" || code === "revoked")
     return "This page did not let you write to the table: you can open it but not play online. The page's owner can invite you by email as an Editor.";
   if (code === "quota_exceeded") return "The table is full: no new games fit on this page.";
+  if (code === "signed_out") return "Sign in to play online: your account keeps your games on every device.";
+  if (code === "offline") return "Can't reach the server. Check the connection and try again.";
+  if (code === "rate_limited") return "Too many requests at once. Wait a moment and try again.";
+  if (code === "taken") return "That realm is taken: choose another.";
+  if (code === "started") return "That game has already started without you.";
+  if (code === "full") return "That game is full.";
+  if (code === "not_found") return "There is no such game. Check the code with its host.";
+  if (e instanceof CloudError && e.message !== e.code) return e.message;
   return `The table did not answer (${e instanceof Error ? e.message : (code ?? String(e))}). Try again.`;
+}
+
+/** This player's seat in a game: the realm they came back with, or the one the table says is theirs. */
+async function mySeat(table: Table, code: string, realm: string | null): Promise<Seat | null> {
+  const remembered = realm ?? (await table.mine().catch(() => [] as MyGame[])).find((g) => g.code === code)?.realm;
+  if (!remembered) return null;
+  const seat = await table.seatOf(code, remembered);
+  return seat?.mine ? seat : null;
 }
 
 /** Looks up a game by its code, then sits down in it, comes back to it, or says why not. */
@@ -8661,20 +8717,23 @@ async function mpOpenCode(code: string, realm: string | null): Promise<void> {
   mpMessage = null;
   showStart();
   try {
-    const store = await mpStore();
-    const game = await findGame(store, code);
-    if (!game) return openMpMenu(`No game ${code} on this table. Check the code with its host.`);
+    const table = await needTable();
+    const game = await table.find(code);
+    if (!game) return openMpMenu(`No game ${code}. Check the code with its host.`);
+    const seat = await mySeat(table, code, realm);
     if (game.started) {
-      const mine = realm && game.humans.includes(realm) ? realm : rememberedGames().find((g) => g.code === code && game.humans.includes(g.realm))?.realm;
+      const mine = seat && game.humans.includes(seat.realm) ? seat.realm : null;
       if (!mine) return openMpMenu(`Game ${code} has already started without you.`);
+      // Back in Your games, if it was left from the Players card (MP-051).
+      await table.sit(code, mine);
       closeMpMenu();
       hideStart();
-      await joinOnline(store, game, mine);
+      await joinOnline(table, game, mine);
       return;
     }
     closeMpMenu();
     hideStart();
-    if (realm && (await seatOf(store, code, realm))?.device === deviceId()) return enterLobby(store, game, realm);
+    if (seat) return enterLobby(table, game, seat.realm);
     mpPicking = { kind: "join", code };
     selectedProvince = -1;
     renderPanel();
@@ -8682,6 +8741,10 @@ async function mpOpenCode(code: string, realm: string | null): Promise<void> {
     openMpMenu(mpFailure(e));
   }
 }
+
+startEl.addEventListener("input", (e) => {
+  if ((e.target as HTMLElement).id === "mp-code-input") mpTyped = (e.target as HTMLInputElement).value;
+});
 
 startEl.addEventListener("submit", (e) => {
   const form = (e.target as HTMLElement).closest<HTMLFormElement>("[data-mp-join-form]");
@@ -8744,27 +8807,31 @@ function bindMpPicker(): void {
 
 /** Takes a seat in an online game: hosts a new one, or joins one, then waits in its lobby. */
 async function mpSit(id: string): Promise<void> {
-  const store = await mpStore();
   const pick = mpPicking;
   if (!pick || pick.kind === "hotseat") return;
   try {
+    const table = await needTable();
     if (pick.kind === "host") {
-      enterLobby(store, await hostGame(store, id), id);
+      enterLobby(table, await table.host(id), id);
       return;
     }
-    const seat = await seatOf(store, pick.code, id);
-    if (seat && seat.device !== deviceId()) {
+    const seat = await table.seatOf(pick.code, id);
+    if (seat && !seat.mine) {
       alertPlayer(`${nationNameOf(id)} is taken in game ${pick.code}: choose another realm.`, "crown");
       return;
     }
-    const game = await findGame(store, pick.code);
+    const game = await table.find(pick.code);
     if (!game || game.started) {
       alertPlayer(game ? `Game ${pick.code} started without you.` : `Game ${pick.code} is gone.`, "crown");
       return;
     }
-    await takeSeat(store, pick.code, id);
-    enterLobby(store, game, id);
+    await table.sit(pick.code, id);
+    enterLobby(table, game, id);
   } catch (e) {
+    if ((e as { code?: string }).code === "taken") {
+      alertPlayer(`${nationNameOf(id)} is taken in game ${pick.kind === "join" ? pick.code : ""}: choose another realm.`, "crown");
+      return;
+    }
     // Say why, where the player is looking: a write the table refused used to fail silently.
     mpPicking = null;
     renderPanel();
@@ -8772,28 +8839,39 @@ async function mpSit(id: string): Promise<void> {
   }
 }
 
-function enterLobby(store: MpStore, game: OnlineGame, realm: string): void {
+function enterLobby(table: Table, game: OnlineGame, realm: string): void {
   mpPicking = null;
   selectedProvince = -1;
-  rememberGame(game.code, realm);
   const stops: (() => void)[] = [];
-  mpLobby = { store, game, seats: [], realm, stop: () => stops.forEach((f) => f()) };
+  mpLobby = { table, game, seats: [], realm, stop: () => stops.forEach((f) => f()) };
+  let seen = false;
   stops.push(
-    watchSeats(store, game.code, (seats) => {
+    table.watchSeats(game.code, (seats) => {
       if (!mpLobby) return;
       mpLobby.seats = seats;
       renderPanel();
     }),
   );
   stops.push(
-    watchGame(store, game.code, (g) => {
-      if (!mpLobby || !g) return;
+    table.watchGame(game.code, (g) => {
+      if (!mpLobby) return;
+      if (!g) {
+        // The host left before the start (MP-028).
+        if (!seen) return;
+        mpLobby.stop();
+        mpLobby = null;
+        startOn = true;
+        renderPanel();
+        alertPlayer(`Game ${game.code} has ended: its host left.`, "crown");
+        return;
+      }
+      seen = true;
       mpLobby.game = g;
       if (!g.started) return renderPanel();
       const l = mpLobby;
       l.stop();
       mpLobby = null;
-      void joinOnline(l.store, g, l.realm);
+      void joinOnline(l.table, g, l.realm);
     }),
   );
   restyleProvinces();
@@ -8805,6 +8883,7 @@ function renderMpLobby(): void {
   panel.innerHTML = lobbyHtml(mpLook, l.game, l.seats, l.realm, `<span class="panel-buttons"><button class="close" data-mp-leave-lobby aria-label="Leave the game">${icon("close", 2)}</button></span>`);
   panel.querySelector("[data-mp-leave-lobby]")!.addEventListener("click", () => {
     l.stop();
+    void l.table.leave(l.game.code).catch(() => {});
     mpLobby = null;
     startOn = true;
     renderPanel();
@@ -8812,7 +8891,7 @@ function renderMpLobby(): void {
   panel.querySelector<HTMLButtonElement>("[data-mp-start]")?.addEventListener("click", (e) => {
     const button = e.currentTarget as HTMLButtonElement;
     button.disabled = true;
-    startOnline(l.store, l.game, l.seats).catch((err: unknown) => {
+    l.table.start(l.game, l.seats).catch((err: unknown) => {
       button.disabled = false;
       alertPlayer(mpFailure(err), "crown");
     });
@@ -8821,7 +8900,7 @@ function renderMpLobby(): void {
 }
 
 /** Starts a multiplayer game: every device makes the same world from the same seed. */
-async function startMpGame(seed: number, humanIds: string[], me: string, mode: MpState["mode"], online: { store: MpStore; game: OnlineGame } | null): Promise<void> {
+async function startMpGame(seed: number, humanIds: string[], me: string, mode: MpState["mode"], online: { table: Table; game: OnlineGame } | null): Promise<void> {
   showLoading(mode === "hotseat" ? "Gathering the courts…" : `Joining game ${online!.game.code}…`, 0.15);
   await painted();
   const snap = await engine.send({ type: "newGame", seed, playerNation: me, humans: humanIds, ...(mapImage ? { map: mapTiles(mapImage) } : {}) });
@@ -8844,7 +8923,7 @@ async function startMpGame(seed: number, humanIds: string[], me: string, mode: M
   if (online) {
     const m = mp;
     m.online = { ...online, turns: new Map(), stop: () => {} };
-    m.online.stop = watchTurns(online.store, online.game.code, (docs) => {
+    m.online.stop = online.table.watchTurns(online.game.code, (docs) => {
       if (mp !== m || !m.online) return;
       for (const d of docs) m.online.turns.set(`${d.turn}-${d.realm}`, d);
       void mpAdvanceIfReady();
@@ -8853,9 +8932,8 @@ async function startMpGame(seed: number, humanIds: string[], me: string, mode: M
 }
 
 /** Opens an online game that has started, as one of its realms: the weeks already played are played again here. */
-async function joinOnline(store: MpStore, game: OnlineGame, realm: string): Promise<void> {
-  rememberGame(game.code, realm);
-  await startMpGame(game.seed, game.humans, realm, "online", { store, game });
+async function joinOnline(table: Table, game: OnlineGame, realm: string): Promise<void> {
+  await startMpGame(game.seed, game.humans, realm, "online", { table, game });
 }
 
 /**
@@ -8888,7 +8966,8 @@ async function mpAdvanceIfReady(): Promise<void> {
   try {
     // Catching up: the next week is also complete, so this one is played without the playback.
     const quick = m.humans.every((n) => docOf(n, t + 1));
-    await mpResolve(docs.map((d) => d!.orders), quick);
+    // Orders act for the realm whose seat sent them, whatever realm they name (MP-012).
+    await mpResolve(docs.map((d) => ({ ...d!.orders, nation: nationIndex.get(d!.realm)! })), quick);
   } finally {
     mpBusy = false;
   }
@@ -8923,7 +9002,7 @@ async function mpReady(): Promise<void> {
   renderHud();
   renderActions();
   try {
-    await sendTurn(m.online!.store, m.online!.game.code, { turn: snapshot.turn, realm: idOf(m.planning), orders: r.orders, hash: m.weekHash, device: deviceId() });
+    await m.online!.table.send(m.online!.game.code, { turn: snapshot.turn, realm: idOf(m.planning), orders: r.orders, hash: m.weekHash });
   } catch (e) {
     m.waiting = false;
     alertPlayer(`Your orders did not reach the table (${e instanceof Error ? e.message : String(e)}). Press Ready again.`, "scroll");
@@ -9044,14 +9123,14 @@ function renderMpPlayers(): void {
   const s = snapshot!;
   panel.innerHTML = playersHtml(
     mpLook,
-    { mode: m.mode, ...(m.online ? { code: m.online.game.code, reach: m.online.store.reach } : {}), week: s.turn, rows: mpRows(), order: resolutionOrder(m.humans, s.turn).map(idOf), outOfStep: m.outOfStep },
+    { mode: m.mode, ...(m.online ? { code: m.online.game.code, reach: m.online.table.reach } : {}), week: s.turn, rows: mpRows(), order: resolutionOrder(m.humans, s.turn).map(idOf), outOfStep: m.outOfStep },
     closeButton(),
   );
   bindClose();
   panel.querySelector("[data-mp-leave]")!.addEventListener("click", () => {
     m.online?.stop();
-    if (m.online) forgetGame(m.online.game.code);
-    location.reload();
+    const left = m.online ? m.online.table.leave(m.online.game.code).catch(() => {}) : Promise.resolve();
+    void left.then(() => location.reload());
   });
   showPanel(true);
 }

@@ -16,6 +16,7 @@ Every system of Pocket Hegemony as a bounded context: a domain spec (`spec.md`, 
 | [Government](government/spec.md) | GOV | [features](government/features/) |
 | [Institutions](institutions/spec.md) | INST | [features](institutions/features/) |
 | [Map presentation](map-presentation/spec.md) | VIEW | [features](map-presentation/features/) |
+| [Multiplayer](multiplayer/spec.md) | MP | [features](multiplayer/features/) |
 | [National strengths](national-strengths/spec.md) | HER | [features](national-strengths/features/) |
 | [Naval](naval/spec.md) | NAVY | [features](naval/features/) |
 | [Onboarding](onboarding/spec.md) | TUT | [features](onboarding/features/) |

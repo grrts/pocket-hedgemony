@@ -1,5 +1,5 @@
 import { icon } from "../art/ui.ts";
-import type { OnlineGame, Seat } from "./lobby.ts";
+import type { MyGame, OnlineGame, Seat } from "./lobby.ts";
 
 /** What the screens need to name and draw a realm. */
 export interface RealmLook {
@@ -16,10 +16,12 @@ const esc = (s: string) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
  */
 export function menuHtml(
   look: RealmLook,
-  o: { reach: "online" | "this browser" | null; canWrite: boolean | null; mine: { code: string; realm: string }[]; message: string | null; busy: boolean },
+  o: { reach: "online" | "this browser" | null; canWrite: boolean | null; signIn: boolean; mine: MyGame[]; typed: string; message: string | null; busy: boolean },
 ): string {
-  const online =
-    o.reach === null
+  const online = o.signIn
+    ? `<p class="mp-note">Online games are kept with your account, so you can play them from any of your devices.</p>
+    <button class="wax" data-shell="settings" data-settings-section="account">${icon("crown", 2)}<span><b>Sign in to play online</b><small>then host a game or join one by its code</small></span></button>`
+    : o.reach === null
       ? `<p class="mp-note">Looking for the shared table…</p>`
       : o.canWrite === false
         ? `<p class="mp-note mp-bad">You can open this page but not write to it, so you cannot sit at an online game. The page's owner can invite you by email as an Editor (the page must not also be shared by a public link).</p>`
@@ -27,7 +29,7 @@ export function menuHtml(
     <button class="paper" data-mp="host" ${o.busy ? "disabled" : ""}>${icon("castle", 2)}<span><b>Host a game</b><small>choose your realm, then share the code</small></span></button>
     <form class="mp-join" data-mp-join-form>
       <label for="mp-code-input">Join a game</label>
-      <input id="mp-code-input" name="code" class="paper" placeholder="CODE" maxlength="5" autocomplete="off" autocapitalize="characters" spellcheck="false" enterkeyhint="go" required ${o.busy ? "disabled" : ""}>
+      <input id="mp-code-input" name="code" class="paper" placeholder="CODE" value="${esc(o.typed)}" maxlength="5" autocomplete="off" autocapitalize="characters" spellcheck="false" enterkeyhint="go" required ${o.busy ? "disabled" : ""}>
       <button class="wax" type="submit" ${o.busy ? "disabled" : ""}>Join</button>
     </form>
     ${o.message ? `<p class="mp-note mp-bad" role="alert">${esc(o.message)}</p>` : ""}
@@ -36,7 +38,7 @@ export function menuHtml(
         ? `<h3>Your games</h3><div class="mp-games">${o.mine
             .map(
               (g) =>
-                `<button class="paper mp-game" data-mp-rejoin="${esc(g.code)}" data-realm="${esc(g.realm)}" ${o.busy ? "disabled" : ""}><span class="mp-code">${esc(g.code)}</span>${look.pennant(g.realm)}<span>${esc(look.name(g.realm))}<small>tap to continue</small></span></button>`,
+                `<button class="paper mp-game" data-mp-rejoin="${esc(g.code)}" data-realm="${esc(g.realm)}" ${o.busy ? "disabled" : ""}><span class="mp-code">${esc(g.code)}</span>${look.pennant(g.realm)}<span>${esc(look.name(g.realm))}<small>${g.yourMove ? "<b>waiting for your orders</b>" : g.started === false ? "in the lobby" : "tap to continue"}</small></span></button>`,
             )
             .join("")}</div>`
         : ""
@@ -56,7 +58,7 @@ export function lobbyHtml(look: RealmLook, game: OnlineGame, seats: Seat[], me: 
   return `<header><h2 class="ribbon">Game ${esc(game.code)}</h2>${closeButtons}</header>
     <p class="mp-note">Share the code <b class="mp-code">${esc(game.code)}</b>: others open Multiplayer, type it under Join a game and choose a realm.</p>
     <ul class="mp-players">${seats
-      .map((s) => `<li>${look.pennant(s.realm)}<b>${esc(look.name(s.realm))}</b><small>${s.realm === me ? "you" : s.realm === game.host ? "host" : "ready to start"}</small></li>`)
+      .map((s) => `<li>${look.pennant(s.realm)}<b>${esc(look.name(s.realm))}</b><small>${s.player ? `${esc(s.player)} · ` : ""}${s.realm === me ? "you" : s.realm === game.host ? "host" : "ready to start"}</small></li>`)
       .join("")}</ul>
     ${
       host

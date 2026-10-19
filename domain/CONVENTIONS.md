@@ -160,3 +160,4 @@ Every requirement has at least one scenario, or a line saying why not (for examp
 | TUT | onboarding | tutorial |
 | AUD | audio | music-design, sound-effects |
 | BAL | balance | X-21 (Leroy, 18 Oct), DECISIONS rule 4, realm §12 scores |
+| MP | multiplayer | Leroy, multiplayer thread (18–19 Oct), docs/multiplayer.md, accounts-design §8 |
