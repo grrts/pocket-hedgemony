@@ -75,10 +75,10 @@ Feature: How a campaign ends
 
     Examples:
       | held | month    | result                                                       |
-      | 1000 | January  | the win "World domination" fires and campaign end starts     |
-      | 1200 | January  | the win "World domination" fires and campaign end starts     |
-      | 999  | January  | no win fires                                                 |
-      | 1200 | June     | no win fires                                                 |
+      | 2000 | January  | the win "World domination" fires and campaign end starts     |
+      | 1999 | January  | no win fires                                                 |
+      | 1000 | January  | no win fires                                                 |
+      | 2000 | June     | no win fires                                                 |
 
   @SHELL-129
   Scenario: Keep playing after world domination
