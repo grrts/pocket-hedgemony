@@ -1,5 +1,5 @@
 // Stages plague in one of France's provinces and screenshots its province card, a closed province, and the
-// Provinces overview's Sick list, on a small and a large phone held sideways (PROV-350 to PROV-353).
+// Provinces overview's Sick list, on a small and a large phone held sideways (PROV-360 to PROV-363).
 // Usage: pnpm build && node scripts/plague-shots.mjs <outDir>
 import { chromium, devices } from "playwright-core";
 import { preview } from "vite";

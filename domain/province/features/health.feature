@@ -75,10 +75,10 @@ Feature: Health and the land's condition
     When the factories and the coal mine close
     Then the smoke goes
 
-  # Plague in the game (Leroy, 18 October 2026): PROV-342 to PROV-350. Troyes stands in Aube and Reims
+  # Plague in the game (Leroy, 18 October 2026): PROV-352 to PROV-360. Troyes stands in Aube and Reims
   # in Marne, two provinces of France next to each other. Plague weeks are days 7, 14, 21 and 28.
 
-  @PROV-342 @placeholder
+  @PROV-352 @placeholder
   Scenario: Plague breaks out now and then, most in crowded towns
     # plague.start_chance_year 0.003 and the crowding numbers are provisional.
     Given a new campaign with no plague anywhere
@@ -86,14 +86,14 @@ Feature: Health and the land's condition
     Then each of the largest realms had plague somewhere in some years, but not in most
     And a province with more townsfolk is more likely to catch it
 
-  @PROV-343 @placeholder
+  @PROV-353 @placeholder
   Scenario: Plague spreads to land next door, less into a closed province
     Given the province "Troyes" has a plague outbreak in the game
     Then the chance it reaches "Reims" this plague week is the road's chance times the crowding of "Reims"
     When the country "France" closes "Reims"
     Then the chance it reaches "Reims" this plague week is a quarter of that
 
-  @PROV-343
+  @PROV-353
   Scenario: Nothing leaves a closed province by trade
     Given the province "Troyes" has a plague outbreak in the game
     And the country "France" closes "Troyes"
@@ -103,14 +103,14 @@ Feature: Health and the land's condition
     And a plague week passes in which every road, river and sea route would carry plague
     Then every healthy province next to "Troyes" catches it
 
-  @PROV-344
+  @PROV-354
   Scenario: An army carries plague
     Given the province "Troyes" has a plague outbreak in the game
     And an army of "France" stands in "Troyes" on a plague week
     When the army stands in "Reims" on a plague week in which every army would carry plague
     Then the province "Reims" has plague "rumour"
 
-  @PROV-345 @PROV-349
+  @PROV-355 @PROV-359
   Scenario: Plague runs its weeks in the game
     Given plague breaks out in the player's province "Troyes"
     Then the province "Troyes" has plague "rumour"
@@ -122,14 +122,14 @@ Feature: Health and the land's condition
     And the player hears once that the plague in "Troyes" burned out
     And plague cannot break out in "Troyes" again for 12 years
 
-  @PROV-346
+  @PROV-356
   Scenario: Plague kills townsfolk first in the game
     Given the province "Troyes" has a plague outbreak in the game
     When a plague week passes
     Then the townsfolk of "Troyes" die faster than its countryfolk
     And the dead of the plague in "Troyes" are counted
 
-  @PROV-347
+  @PROV-357
   Scenario: Closing a province against plague
     Given the province "Troyes" has a trade ratio of 40 in the game
     When the country "France" closes "Troyes"
@@ -138,7 +138,7 @@ Feature: Health and the land's condition
     When the country "France" lifts the quarantine on "Troyes"
     Then "Troyes" is open
 
-  @PROV-348
+  @PROV-358
   Scenario: The AI closes its crowded towns
     Given "Troyes" is a crowded town of an AI realm with plague "rumour"
     When 4 plague weeks pass
@@ -146,7 +146,7 @@ Feature: Health and the land's condition
     When plague weeks pass until the plague in "Troyes" is gone
     Then its realm has opened "Troyes" again
 
-  @PROV-350
+  @PROV-360
   Scenario: Plague is kept in the save
     Given the province "Troyes" has a plague outbreak in the game
     And the country "France" closes "Reims"

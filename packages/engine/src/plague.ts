@@ -7,7 +7,7 @@ import { deathModifiers } from "./domain/province/people.ts";
 import { plagueWeekDays } from "./domain/province/decided.ts";
 
 /**
- * Plague (province PROV-240 to PROV-242, PROV-342 to PROV-353): a province
+ * Plague (province PROV-240 to PROV-242, PROV-352 to PROV-363): a province
  * catches it, goes through the steps rumour, outbreak and burning out, and is
  * spared for some years after. It starts rarely, most often in crowded towns
  * and shanty camps, and spreads on the plague weeks (days 7, 14, 21 and 28 of
@@ -112,7 +112,7 @@ function canCatch(world: World, p: number): boolean {
   return held(world, p) && world.provincePlague[p] === NONE && !spared(world, p);
 }
 
-/** Land a realm holds, with people: land no realm holds has scattered folk and no towns, and plague neither starts nor spreads there (PROV-342). */
+/** Land a realm holds, with people: land no realm holds has scattered folk and no towns, and plague neither starts nor spreads there (PROV-352). */
 function held(world: World, p: number): boolean {
   return !world.provinceWater[p] && world.provinceOwner[p]! >= 0 && world.provincePopulation[p]! > 0;
 }
@@ -160,7 +160,7 @@ export function startOutbreak(world: World, p: number, news: News[]): boolean {
 
 /**
  * Realm n closes province p (quarantine, on) or opens it again (off)
- * (QuarantineProvince, PROV-347). While closed, its trade ratio stays at 0,
+ * (QuarantineProvince, PROV-357). While closed, its trade ratio stays at 0,
  * its tax falls to plague.quarantine_tax_factor, nothing spreads out of it by
  * road, river or sea, and less gets in. Returns why not, or null.
  */
@@ -175,7 +175,7 @@ export function setQuarantine(world: World, n: number, p: number, on: boolean, n
   return null;
 }
 
-/** What a closed province still pays of its tax (PROV-347). */
+/** What a closed province still pays of its tax (PROV-357). */
 export function quarantineTaxFactor(world: World, p: number): number {
   return world.provinceQuarantine[p] ? C.quarantine_tax_factor : 1;
 }
@@ -194,7 +194,7 @@ export function plagueDeathRate(world: World, p: number): number {
 }
 
 /**
- * One plague week's dead in p (PROV-346): a week's share of the plague death
+ * One plague week's dead in p (PROV-356): a week's share of the plague death
  * rate, taken from the townsfolk first, at most plague.town_week_share_max of
  * each town class a week, and the rest from the countryfolk by their shares.
  * Returns the dead, in thousands.
@@ -225,7 +225,7 @@ export function plagueDeaths(world: World, p: number): number {
 }
 
 /**
- * The AI's rule (PROV-348): when an outbreak begins in a crowded town of an AI
+ * The AI's rule (PROV-358): when an outbreak begins in a crowded town of an AI
  * realm (crowding 1 or more), the realm closes it, and opens it again when the
  * plague is gone. It leaves its countryside open: closing it costs more than it saves.
  */
@@ -236,7 +236,7 @@ function aiQuarantine(world: World, p: number, on: boolean): void {
   setQuarantine(world, owner, p, on, []);
 }
 
-/** Moves p on by a plague week: deaths, then the step's weeks run down (PROV-345, PROV-346). Returns false once it is gone. */
+/** Moves p on by a plague week: deaths, then the step's weeks run down (PROV-355, PROV-356). Returns false once it is gone. */
 function weekOf(world: World, p: number, news: News[]): boolean {
   plagueDeaths(world, p);
   const left = world.provincePlagueWeeks[p]! - 1;
@@ -278,13 +278,13 @@ function tryCatch(world: World, q: number, chance: number, news: News[], from: n
   if (world.plagueRng.next() < catchChance(world, q, chance)) catchPlague(world, q, news, from, how);
 }
 
-/** The chance plague reaches q this week from a link of chance `base`: more in crowded towns and shanty camps, less into a closed province (PROV-343, PROV-347). */
+/** The chance plague reaches q this week from a link of chance `base`: more in crowded towns and shanty camps, less into a closed province (PROV-353, PROV-357). */
 export function catchChance(world: World, q: number, base: number): number {
   return base * catchWeight(world, q) * (world.provinceQuarantine[q] ? C.into_quarantine_factor : 1);
 }
 
 /**
- * The plague week (PROV-343 to PROV-346), on days 7, 14, 21 and 28: the sick
+ * The plague week (PROV-353 to PROV-356), on days 7, 14, 21 and 28: the sick
  * provinces move on a week, then plague spreads from every outbreak, then
  * armies pick it up and carry it, and on the first plague week of the month
  * new outbreaks may start anywhere.
@@ -293,7 +293,7 @@ export function weeklyPlague(world: World, news: News[]): void {
   // Sick provinces move on a week; those it leaves come off the list.
   const before = world.plagueSick;
   if (before.length) world.plagueSick = before.filter((p) => weekOf(world, p, news));
-  // Spread from each outbreak to its neighbours (PROV-343).
+  // Spread from each outbreak to its neighbours (PROV-353).
   const sick = world.plagueSick.slice();
   const adj = world.adjList;
   for (const s of sick) {
@@ -318,7 +318,7 @@ export function weeklyPlague(world: World, news: News[]): void {
   if ((world.date.day ?? 1) === WEEK_DAYS[0]) newOutbreaks(world, news);
 }
 
-/** Armies pick plague up where it rages and may bring it where they stand for plague.army_carry_weeks after (PROV-344). */
+/** Armies pick plague up where it rages and may bring it where they stand for plague.army_carry_weeks after (PROV-354). */
 function spreadWithArmies(world: World, news: News[]): void {
   const carriers = world.plagueCarriers;
   if (!world.plagueSick.length && !carriers.size) return;
@@ -341,7 +341,7 @@ function spreadWithArmies(world: World, news: News[]): void {
   }
 }
 
-/** New outbreaks, rolled once a month: each province's yearly chance, by its crowding and shanty camps (PROV-342). */
+/** New outbreaks, rolled once a month: each province's yearly chance, by its crowding and shanty camps (PROV-352). */
 function newOutbreaks(world: World, news: News[]): void {
   const chance = C.start_chance_year / 12;
   const rng = world.plagueRng;

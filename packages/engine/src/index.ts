@@ -10,7 +10,7 @@ export { answerCall, atWar, cedeProvince, controller, declareWar, engageRange, o
 export { cededProvinces, fittingAim, longWar, lordTraits, lordWant, maxCeded, peaceShare, peaceVoices, refusingPeace, warPeaceView, type GameWar, type PeaceVoices, type WarPeaceView } from "./peace.ts";
 export { hashWorld } from "./hash.ts";
 export { cultureOf, officialName, personName, rankedName } from "./names.ts";
-export { hireGold, newLands, officialEffect, OFFICIALS, yearsServed, type OfficialEffectView } from "./officials.ts";
+export { autoFillReserve, bestFit, hireGold, newLands, officialEffect, OFFICIALS, yearsServed, type OfficialEffectView, type PostFit } from "./officials.ts";
 export { aiCollect, aiRecruits, ARMS, COMMISSION_GOLD, commanderScreen, commissionOfficial, type CommanderScreen, FOOT_ARMS, HORSE_ARMS, KIND, KIND_NAMES, LEVY_UNIT, garrisonTroops, garrisonView, gatherDays, idleCommanders, isHorseArm, menByArm, monthlyRecruits, recruit, recruitRefusal, trainingGround, type GarrisonView } from "./recruit.ts";
 export { CLASS_NAMES, CLASS_COUNT } from "./living.ts";
 export { catchChance, crowding, PLAGUE_STEPS, plagueDeaths, quarantineTaxFactor, setQuarantine, sickProvinces, spared, startOutbreak, weeklyPlague } from "./plague.ts";

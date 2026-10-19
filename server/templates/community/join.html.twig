@@ -1,0 +1,30 @@
+{% extends 'community/layout.html.twig' %}
+{% import 'community/_parts.html.twig' as parts %}
+
+{% block title %}Join · Pocket Hegemony community{% endblock %}
+{% block meta %}<meta name="robots" content="noindex">{% endblock %}
+
+{% block community %}
+<section class="framed sheet narrow account-form">
+    <h1>Join</h1>
+    <p>Make a Pocket Hegemony account to start topics and reply. Reading needs no account.</p>
+    {{ parts.error(errors, 'form') }}
+    <form method="post" action="{{ path('community_join') }}" class="c-form">
+        <input type="hidden" name="_token" value="{{ csrf_token('join') }}">
+        {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+        <label class="field-label" for="join-name">Name <span class="muted">(shown on your posts)</span></label>
+        <input id="join-name" type="text" name="displayName" value="{{ form.displayName }}" required minlength="2" maxlength="40" autocomplete="nickname"{% if errors.displayName is defined %} aria-invalid="true" aria-describedby="displayName-error"{% endif %}>
+        {{ parts.error(errors, 'displayName') }}
+        <label class="field-label" for="join-email">Email <span class="muted">(never shown)</span></label>
+        <input id="join-email" type="email" name="email" value="{{ form.email }}" required maxlength="180" autocomplete="email" autocapitalize="off" spellcheck="false"{% if errors.email is defined %} aria-invalid="true" aria-describedby="email-error"{% endif %}>
+        {{ parts.error(errors, 'email') }}
+        <label class="field-label" for="join-password">Password <span class="muted">(8 characters or more)</span></label>
+        <input id="join-password" type="password" name="password" required minlength="8" maxlength="200" autocomplete="new-password"{% if errors.password is defined %} aria-invalid="true" aria-describedby="password-error"{% endif %}>
+        {{ parts.error(errors, 'password') }}
+        <div class="form-row">
+            <p class="hint">Have an account? <a href="{{ path('community_signin', next ? {next: next} : {}) }}">Sign in</a></p>
+            <button class="btn wax" type="submit">Join</button>
+        </div>
+    </form>
+</section>
+{% endblock %}

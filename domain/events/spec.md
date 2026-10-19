@@ -735,8 +735,8 @@ and do not count toward its pool (EVT-033). Every number is a placeholder for ba
 - EVT-128 The everyday events' state (each realm's next draw, the player's waiting events, the count and the dice)
   shall be kept in the save; a save from before them starts the draws afresh. [EVT-075]
 
-- EVT-130 When plague reaches a province of the player's (PROV-349), an everyday event shall ask what to do, unless
-  one about plague already waits: *Close the province* (quarantine, PROV-347), *Send physicians and burn the sick
+- EVT-130 When plague reaches a province of the player's (PROV-359), an everyday event shall ask what to do, unless
+  one about plague already waits: *Close the province* (quarantine, PROV-357), *Send physicians and burn the sick
   houses* (gold; `plague.care_death_cut` (0.5) fewer die there and its outbreak lasts the shortest time, one season),
   or *Keep the roads open*. Plague fires it; it is never drawn and does not wait for EVT-117. @placeholder
   [feedback 152; PROV-240 to PROV-242]

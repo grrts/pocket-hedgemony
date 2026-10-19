@@ -218,7 +218,8 @@
       "colonial governor": {}
     },
     "school_trains": { "madrasa": ["judge", "chaplain"], "university": ["judge", "steward"], "academy": ["master of works", "warden"] },
-    "hire": { "gold": 25, "foreign_multiplier": 2, "provisional": true }
+    "hire": { "gold": 25, "foreign_multiplier": 2, "provisional": true },
+    "auto_fill": { "$comment": "PROV-342, PROV-343: gold auto-fill keeps back, and months of food under which a steward fits best.", "reserve_gold": 20, "hungry_months": 1, "traders_passing": 3, "provisional": true }
   },
   "loyalty": ["In revolt", "Disloyal", "Wavering", "Loyal"],
   "homeland": { "years": 100 },
@@ -243,7 +244,7 @@
     "care_death_cut": 0.5,
     "outbreak_seasons": [1, 2],
     "links": ["road", "river", "sea route", "army", "refugees"],
-    "$comment": "PROV-342 to PROV-353 (18 October 2026): the game's plague. Every number below is provisional. Weeks are plague weeks, the days of decided.plague_week_days (four a month). A province's crowding is its townsfolk share over crowd_town_share, kept between crowd_min and crowd_max.",
+    "$comment": "PROV-352 to PROV-363 (18 October 2026): the game's plague. Every number below is provisional. Weeks are plague weeks, the days of decided.plague_week_days (four a month). A province's crowding is its townsfolk share over crowd_town_share, kept between crowd_min and crowd_max.",
     "start_chance_year": 0.003,
     "crowd_town_share": 0.1,
     "crowd_min": 0.5,

@@ -25,6 +25,8 @@ describe("a living realm: moods", () => {
     nextMonth(w);
     expect(MOODS[moodIndex(w, p)]).toBe("calm");
     w.provinceStore.fill(0);
+    // The post must stay empty: the crown would fill it otherwise (PROV-342).
+    applyNow(w, { type: "autoFillPosts", on: false }, me);
     expect(applyNow(w, { type: "commission", province: p }, me).rejectedOrders).toEqual([]);
     nextMonth(w);
     expect(grievancesOf(w, p)).toEqual(expect.arrayContaining(["Hungry", "Ungoverned"]));

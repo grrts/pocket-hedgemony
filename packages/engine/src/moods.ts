@@ -126,7 +126,7 @@ export function monthlyMoods(world: World, news: News[]): void {
     if (battle >= 0 && world.date.year - battle < g.bloodshed_years) now |= bit("Bloodshed");
     if (taxWeight(world, p) > 0) now |= bit("Heavy taxes");
     if (world.provinceGrasping[p]) now |= bit("Grasping officials");
-    // An outbreak raging here is a grievance (PROV-346).
+    // An outbreak raging here is a grievance (PROV-356).
     if (world.provincePlague[p] === 2) now |= bit("Plague");
     const before = MOODS.indexOf(moodOf(grievanceCount(world, p), isJudge(world.provinceOfficial[p]!)).mood);
     world.provinceGrievances[p] = now;

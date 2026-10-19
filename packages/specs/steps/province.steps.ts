@@ -1,5 +1,5 @@
 import { expect } from "vitest";
-import { applyNow, ARMS, catchChance, cedeProvince, CLASS_COUNT, CLASS_NAMES, createWorld, crowding, garrisonView, KIND, newLands, officialEffect as gameOfficialEffect, provinceTax, Rng, setQuarantine, spared, spawnArmy, startOutbreak, weeklyPlague, yearsServed, type GarrisonView } from "@ph/engine";
+import { applyNow, ARMS, bestFit, catchChance, cedeProvince, CLASS_COUNT, CLASS_NAMES, createWorld, crowding, garrisonView, hireGold, KIND, newLands, OFFICIALS, processTurn, officialEffect as gameOfficialEffect, provinceTax, Rng, setQuarantine, spared, spawnArmy, startOutbreak, weeklyPlague, yearsServed, type GarrisonView } from "@ph/engine";
 import { restoreWorld, worldChunks } from "@ph/engine/domain/saves";
 import { loadDefaultRuleset } from "@ph/rules";
 import { commanderAt, levyGame, province } from "./levy-game.ts";
@@ -3270,7 +3270,7 @@ Then("End turn waits until the player fills the post, grants it to a lord or kee
   expect(newLands(s.game, s.me)).toEqual([]);
 });
 
-// ---------------------------------------------------------------- plague in the game (PROV-342 to PROV-350)
+// ---------------------------------------------------------------- plague in the game (PROV-352 to PROV-360)
 
 const PL = cfg.plague;
 const TOWN = new Set<string>(cfg.classes.town);
@@ -3513,4 +3513,114 @@ When("the plague game is saved and loaded", (s) => {
   const back = restoreWorld(new Map(worldChunks(w, { playerNation: "france", options: {} as never }).map((c) => [c.id, c])), w.rules).world;
   s.game = { ...levyGame(s), w: back };
   s.loaded = back;
+});
+
+// Officials with fewer taps (PROV-342 to PROV-347).
+const royalOf = (w: any, n: number): number[] => Array.from({ length: w.provinceCount }, (_, p) => p).filter((p) => w.provinceOwner[p] === n && w.provinceLord[p] < 0);
+const filledOf = (w: any, n: number): number[] => royalOf(w, n).filter((p) => w.provinceOfficial[p] >= 0);
+Given("the player has turned Auto-fill posts off", (s) => {
+  expect(applyNow(s.game, { type: "autoFillPosts", on: false }, s.me).rejectedOrders).toEqual([]);
+});
+Given("{int} of its royal posts stand empty and its officials cap has room for them", (s, k: number) => {
+  s.emptied = filledOf(s.game, s.me).slice(0, k);
+  for (const p of s.emptied) s.game.provinceOfficial[p] = -1;
+});
+Given("{int} of its royal posts stand empty and its officials cap has room for {int}", (s, k: number, room: number) => {
+  s.emptied = filledOf(s.game, s.me).slice(0, k);
+  for (const p of s.emptied) s.game.provinceOfficial[p] = -1;
+  s.game.nationCustomOfficials[s.me] -= k - room;
+});
+Given("it has gold for two hires and the 20 gold kept back", (s) => {
+  s.game.nationTreasury[s.me] = 20 + 2 * hireGold(false) + 5;
+});
+When("a new month begins", (s) => {
+  const w = s.game;
+  const m = w.date.month;
+  s.news = [];
+  while (w.date.month === m) s.news.push(...processTurn(w, [], w.player).news);
+});
+Then("the two posts with the most people are filled by their best fit", (s) => {
+  const w = s.game;
+  const most = [...s.emptied].sort((a: number, b: number) => w.provincePopulation[b] - w.provincePopulation[a] || a - b);
+  for (const p of most.slice(0, 2)) expect(w.provinceOfficial[p]).toBe(bestFit(w, p).type);
+  expect(w.provinceOfficial[most[2]]).toBe(-1);
+});
+Then("the treasury keeps at least {int} gold", (s, g: number) => {
+  expect(s.game.nationTreasury[s.me]).toBeGreaterThanOrEqual(g);
+});
+Then("the player reads one line of news naming both hires", (s) => {
+  const lines = s.news.filter((x: { text: string }) => x.text.startsWith("Auto-fill:"));
+  expect(lines.length).toBe(1);
+  expect(lines[0].text.split(";").length).toBe(2);
+});
+Then("{int} of the two posts is filled", (s, k: number) => {
+  expect(s.emptied.filter((p: number) => s.game.provinceOfficial[p] >= 0).length).toBe(k);
+});
+Given("a royal province of {string} that is calm, fed, unwalled or inland, and no trade city", (s) => {
+  const w = s.game;
+  s.post = royalOf(w, s.me)[0];
+  w.provinceStore[s.post] = w.provincePopulation[s.post] * 12;
+  w.provinceGrievances[s.post] = 0;
+  w.provincePassed[s.post] = 0;
+});
+Then("its best fit is a tax collector, for its tax a month", (s) => {
+  const f = bestFit(s.game, s.post);
+  expect(OFFICIALS[f.type]).toBe("Tax collector");
+  expect(f.why).toMatch(/gold tax a month/);
+});
+When("the province riots", (s) => {
+  s.game.provinceGrievances[s.post] = 0xffff;
+});
+Then("its best fit is a judge, for the riots", (s) => {
+  expect(bestFit(s.game, s.post)).toEqual({ type: OFFICIALS.indexOf("Judge"), why: "riots here" });
+});
+Given("it has gold and room under its officials cap", (s) => {
+  s.game.nationTreasury[s.me] = 1000;
+  s.game.nationCustomOfficials[s.me] += 5;
+});
+Then("the province's post is filled by its best fit", (s) => {
+  expect(s.game.provinceOfficial[s.taken]).toBe(bestFit(s.game, s.taken).type);
+});
+Then("End turn does not wait on it", (s) => {
+  expect(newLands(s.game, s.me)).toEqual([]);
+});
+Given("it has {int} gold", (s, g: number) => {
+  s.game.nationTreasury[s.me] = g;
+});
+When("the player replaces an official with a native hire of another type serving elsewhere", (s) => {
+  const w = s.game;
+  const own = filledOf(w, s.me);
+  s.post = own[0];
+  s.newType = w.provinceOfficial[own.find((p) => w.provinceOfficial[p] !== w.provinceOfficial[s.post])!];
+  expect(applyNow(w, { type: "dismissOfficial", province: s.post, hire: { official: s.newType, foreign: false } }, s.me).rejectedOrders).toEqual([]);
+});
+Then("the new official holds the post in his first year and {int} gold are paid", (s, g: number) => {
+  expect(s.game.provinceOfficial[s.post]).toBe(s.newType);
+  expect(yearsServed(s.game, s.post)).toBe(0);
+  expect(s.game.nationTreasury[s.me]).toBe(100 - g);
+});
+When("the player dismisses an official", (s) => {
+  expect(applyNow(s.game, { type: "dismissOfficial", province: s.post }, s.me).rejectedOrders).toEqual([]);
+});
+Then("his post stands empty", (s) => {
+  expect(s.game.provinceOfficial[s.post]).toBe(-1);
+});
+Given("an official was commissioned and his post filled since", (s) => {
+  const w = s.game;
+  w.nationTreasury[s.me] = 1000;
+  s.post = filledOf(w, s.me)[0];
+  expect(applyNow(w, { type: "commission", province: s.post }, s.me).rejectedOrders).toEqual([]);
+  s.commander = w.commanderOwner.findLastIndex((o: number) => o === s.me);
+  w.provinceOfficial[s.post] = 0;
+  for (const p of royalOf(w, s.me)) if (w.provinceOfficial[p] < 0) w.provinceOfficial[p] = 0;
+});
+When("the player releases him with another post empty", (s) => {
+  const w = s.game;
+  s.other = filledOf(w, s.me).find((p) => p !== s.post);
+  w.provinceOfficial[s.other] = -1;
+  expect(applyNow(w, { type: "release", commander: s.commander }, s.me).rejectedOrders).toEqual([]);
+});
+Then("he takes that post in his first year", (s) => {
+  expect(s.game.provinceOfficial[s.other]).toBeGreaterThanOrEqual(0);
+  expect(yearsServed(s.game, s.other)).toBe(0);
 });

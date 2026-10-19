@@ -4,7 +4,7 @@ import { moodShare } from "./moods.ts";
 import * as rc from "./domain/recruiting/index.ts";
 import * as wf from "./domain/warfare/index.ts";
 import { mix, officialName, personName, rankedName } from "./names.ts";
-import { OFFICIALS, officialAt, officialBonus } from "./officials.ts";
+import { bestFit, emptyPosts, OFFICIALS, officialAt, officialBonus } from "./officials.ts";
 import { monthlyRations, wagonRations } from "./march.ts";
 import { campaigning, halt, isMarching } from "./turn.ts";
 import { foodCarriedPct, spawnArmy, type World } from "./world.ts";
@@ -105,6 +105,8 @@ export function createRecruitState(P: number, N: number) {
     provinceOfficialFrom: new Int16Array(P).fill(-1),
     /** New land waiting for its owner's decision (officials.ts provinceTaken). */
     provinceNewLand: new Uint8Array(P),
+    /** 1 where the realm leaves its empty posts for the player to fill: Auto-fill posts is off (PROV-342). */
+    nationManualPosts: new Uint8Array(N),
     /** Province each commander was commissioned from, -1 = none. */
     commanderHome: [] as number[],
     /** Name seed of each commander commissioned from an official (-1 = none), so he goes back to a post as himself. */
@@ -187,10 +189,14 @@ export function commissionOfficial(world: World, n: number, p: number, news: New
 export function releaseCommander(world: World, n: number, c: number): string | null {
   if (c < 0 || c >= world.commanderIds.length || world.commanderOwner[c] !== n) return "no such commander of yours";
   if (armyOf(world, c) >= 0) return "he leads an army: give it to another commander or leave it as a garrison first";
-  const home = world.commanderHome[c]!;
-  if (home < 0 || world.provinceOwner[home] !== n) return "he has no post in your lands to go back to";
-  if (world.provinceOfficial[home]! >= 0) return `another official holds his post at ${provinceName(world, home)} now`;
   const type = OFFICIALS.indexOf(world.commanders[c]!.origin as (typeof OFFICIALS)[number]);
+  let home = world.commanderHome[c]!;
+  // His old post filled meanwhile (auto-fill or a hire), he takes the empty royal post that suits his type best (PROV-346).
+  if (home < 0 || world.provinceOwner[home] !== n || world.provinceLord[home]! >= 0 || world.provinceOfficial[home]! >= 0) {
+    const free = emptyPosts(world, n);
+    if (!free.length) return home >= 0 && world.provinceOwner[home] === n ? `another official holds his post at ${provinceName(world, home)} now, and no post stands empty: dismiss an official or wait for a post` : "no post stands empty for him: dismiss an official or wait for a post";
+    home = free.find((p) => bestFit(world, p).type === type) ?? free[0]!;
+  }
   const seed = world.commanderSeed[c]! >= 0 ? world.commanderSeed[c]! : home;
   // Back at his own post he keeps his years there; if someone else held it meanwhile he starts again.
   if (world.provinceOfficialSeed[home] !== seed) (world.provinceOfficialSince[home] = world.day), (world.provinceOfficialFrom[home] = -1);

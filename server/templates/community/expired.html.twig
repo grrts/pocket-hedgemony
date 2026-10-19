@@ -1,0 +1,12 @@
+{% extends 'community/layout.html.twig' %}
+
+{% block title %}Form expired · Pocket Hegemony community{% endblock %}
+{% block meta %}<meta name="robots" content="noindex">{% endblock %}
+
+{% block community %}
+<section class="framed sheet narrow">
+    <h1>That form expired</h1>
+    <p>The page was open too long, or you signed in or out in another tab. Go back, reload the page and send it again.</p>
+    <p><a class="btn paper" href="{{ path('community') }}">Back to the community</a></p>
+</section>
+{% endblock %}

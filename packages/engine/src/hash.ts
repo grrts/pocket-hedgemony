@@ -114,6 +114,7 @@ export function hashWorld(world: World): string {
   feed(world.provinceOfficialSince);
   feed(world.provinceOfficialFrom);
   feed(world.provinceNewLand);
+  feed(world.nationManualPosts);
   feed(live(a.trainArm));
   feed(live(a.trainMen));
   feed(live(a.trainLeft));

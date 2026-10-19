@@ -34,7 +34,7 @@ function week(w: World, news: News[] = []): News[] {
 const landNeighbours = (w: World, p: number) => Array.from(w.adjList.subarray(w.adjStart[p]!, w.adjStart[p + 1]!)).filter((q) => !w.provinceWater[q] && w.provinceOwner[q]! >= 0);
 const town = new Set(provinceConfig.classes.town);
 
-describe("plague (PROV-342 to PROV-353)", () => {
+describe("plague (PROV-352 to PROV-363)", () => {
   it("starts with no plague anywhere", () => {
     const { w } = game();
     expect(w.plagueSick).toEqual([]);

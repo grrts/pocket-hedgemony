@@ -1,7 +1,7 @@
 import { PALETTE } from "../art/palette.ts";
 
 /**
- * Plague on the screens (province PROV-351 to PROV-353): the plague card on a
+ * Plague on the screens (province PROV-361 to PROV-363): the plague card on a
  * province's Overview, with its step, the dead so far and the Quarantine
  * button; and the mark over a sick province on the map, a pale door with the
  * plague cross, barred while the province is closed. Everything the card says

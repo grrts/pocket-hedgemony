@@ -18,7 +18,7 @@ export interface OverviewInput {
   newLands: number;
   risings: number;
   verdicts: number;
-  /** Provinces with plague (PROV-352). */
+  /** Provinces with plague (PROV-362). */
   sick?: number;
   /** Settlers or asks waiting on a tribal realm's Hunting grounds (TRIBE-027). */
   huntWaits: number;

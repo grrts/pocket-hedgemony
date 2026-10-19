@@ -288,7 +288,7 @@ export function takeIn(world: World, n: number, p: number, news: News[]): string
   world.provinceLord[p] = -1;
   world.provinceOccupier[p] = -1;
   world.provinceHold[p] = 0;
-  provinceTaken(world, p);
+  provinceTaken(world, p, news);
   const own = ownPeople(world, n, p);
   // Their own people run themselves: no post waits to be filled (GOV-023).
   if (own && selfRun(world, p)) world.provinceNewLand[p] = 0;

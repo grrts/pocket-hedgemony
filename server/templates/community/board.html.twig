@@ -1,0 +1,37 @@
+{% extends 'community/layout.html.twig' %}
+{% import 'community/_parts.html.twig' as parts %}
+
+{% block title %}{{ board.name }}{{ page > 1 ? ', page ' ~ page }} · Pocket Hegemony community{% endblock %}
+{% block description %}{{ board.description }}{% endblock %}
+
+{% block community %}
+<section class="framed sheet">
+    <p class="crumbs"><a href="{{ path('community') }}">Community</a> › {{ board.name }}</p>
+    <header class="board-head">
+        <span class="board-icon big">{{ parts.icon(board.icon, 4) }}</span>
+        <div>
+            <h1>{{ board.name }}</h1>
+            <p class="board-desc">{{ board.description }}</p>
+        </div>
+        {% if app.user %}
+        <a class="btn wax" href="{{ path('community_new', {board: board.slug}) }}">{{ parts.icon("scroll") }}New topic</a>
+        {% endif %}
+    </header>
+    {% if not app.user %}
+    <div class="c-guest">
+        <p>Join or sign in to start a topic or reply.</p>
+        {{ parts.guest(path('community_board', {board: board.slug})) }}
+    </div>
+    {% endif %}
+
+    {% if topics %}
+    <ol class="topics">
+        {% for topic in topics %}{{ parts.topic_row(topic, post_counts[topic.id] ?? 1) }}{% endfor %}
+    </ol>
+    {% else %}
+    <p class="empty">No topics here yet.{% if app.user %} <a href="{{ path('community_new', {board: board.slug}) }}">Start the first one</a>.{% endif %}</p>
+    {% endif %}
+
+    {{ parts.pager(page, pages, 'community_board', {board: board.slug}) }}
+</section>
+{% endblock %}
