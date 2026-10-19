@@ -6,6 +6,7 @@ import { restoreWorld, worldChunks } from "../src/domain/saves/world-chunks.ts";
 import { answerEveryday, everydayCards, fireEverydayNow, monthlyEveryday } from "../src/everyday.ts";
 import { lordLands } from "../src/lords.ts";
 import type { News } from "../src/war.ts";
+import { startOutbreak } from "../src/plague.ts";
 
 const rules = loadDefaultRuleset();
 const tiles = loadMapTiles(rules);
@@ -129,5 +130,21 @@ describe("everyday events (EVT-115 to EVT-128)", () => {
     const r = processTurn(w, [{ type: "answerEvent", event: ev.id, option }], w.player);
     expect(r.rejectedOrders).toEqual([]);
     expect(everydayCards(w, w.player).some((c) => c.event === ev.id)).toBe(false);
+  });
+  it("plague reaching the player's land opens one card: close the province, or pay physicians (EVT-130)", () => {
+    const w = france();
+    const mine = [...Array(w.provinceCount).keys()].filter((p) => w.provinceOwner[p] === w.player && w.provincePopulation[p]! > 0);
+    expect(startOutbreak(w, mine[0]!, [])).toBe(true);
+    expect(startOutbreak(w, mine[1]!, [])).toBe(true);
+    const cards = everydayCards(w, w.player);
+    expect(cards).toHaveLength(1);
+    expect(cards[0]!.title).toBe(`Plague at ${w.rules.provinces[mine[0]!]!.name}`);
+    expect(cards[0]!.options.map((o) => o.id)).toEqual(["close", "physicians", "open"]);
+    expect(answerEveryday(w, w.player, cards[0]!.event, "physicians", [])).toBeNull();
+    expect(w.provincePlagueCare[mine[0]!]).toBe(1);
+    expect(startOutbreak(w, mine[2]!, [])).toBe(true);
+    const next = everydayCards(w, w.player)[0]!;
+    expect(answerEveryday(w, w.player, next.event, "close", [])).toBeNull();
+    expect(w.provinceQuarantine[mine[2]!]).toBe(1);
   });
 });

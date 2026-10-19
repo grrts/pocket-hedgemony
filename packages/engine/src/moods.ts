@@ -15,7 +15,7 @@ import { BELIEF_GRIEVANCES, hasBelief } from "./peoples.ts";
  */
 
 /** The grievances this game tracks so far, one bit each (province §5.22). */
-export const GRIEVANCES = ["Hungry", "Conscription", "Soldiers quartered", "Ungoverned", "Foreign rule", "Bloodshed", "Heavy taxes", "Grasping officials", "Banned language", "Wrong faith", "Persecuted"] as const;
+export const GRIEVANCES = ["Hungry", "Conscription", "Soldiers quartered", "Ungoverned", "Foreign rule", "Bloodshed", "Heavy taxes", "Grasping officials", "Banned language", "Wrong faith", "Persecuted", "Plague"] as const;
 export type GrievanceName = (typeof GRIEVANCES)[number];
 const bit = (g: GrievanceName) => 1 << GRIEVANCES.indexOf(g);
 
@@ -126,6 +126,8 @@ export function monthlyMoods(world: World, news: News[]): void {
     if (battle >= 0 && world.date.year - battle < g.bloodshed_years) now |= bit("Bloodshed");
     if (taxWeight(world, p) > 0) now |= bit("Heavy taxes");
     if (world.provinceGrasping[p]) now |= bit("Grasping officials");
+    // An outbreak raging here is a grievance (PROV-356).
+    if (world.provincePlague[p] === 2) now |= bit("Plague");
     const before = MOODS.indexOf(moodOf(grievanceCount(world, p), isJudge(world.provinceOfficial[p]!)).mood);
     world.provinceGrievances[p] = now;
     const after = moodIndex(world, p);

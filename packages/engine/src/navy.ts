@@ -1064,7 +1064,8 @@ export function stepNavy(world: World, hours: number, news: News[]): void {
   // Ships waiting in a queue are laid down as their crews come in (D-NAVY-33).
   if (world.step === 0) layDown(world, news);
   if (!v.fleets.length) {
-    if (v.blockade.some((x) => x !== 0)) refreshBlockades(world, news);
+    // With no fleets a blockade can only be lifted, and only where one was marked.
+    if (anyMarked(v)) refreshBlockades(world, news);
     return;
   }
   const a = world.armies;
@@ -1128,10 +1129,25 @@ export function closedBy(world: World, n: number, z: number): number[] {
  */
 export function refreshBlockades(world: World, news: News[]): void {
   const v = world.navy;
-  const before = v.blockade.slice();
-  v.blockade.fill(0);
-  v.blockadeFleet.fill(0);
-  v.guarded.fill(0);
+  // Only the provinces the last refresh marked are cleared and looked at again,
+  // not the whole map every step; arrays it did not mark (a loaded save) are cleared whole.
+  const last = marked.get(v.blockade);
+  const before = new Map<number, number>();
+  if (last && last.fleet === v.blockadeFleet && last.guarded === v.guarded) {
+    for (const p of last.provinces) {
+      if (v.blockade[p]) before.set(p, v.blockade[p]!);
+      v.blockade[p] = 0;
+      v.blockadeFleet[p] = 0;
+      v.guarded[p] = 0;
+    }
+  } else {
+    for (let p = 0; p < v.blockade.length; p++) if (v.blockade[p]) before.set(p, v.blockade[p]!);
+    v.blockade.fill(0);
+    v.blockadeFleet.fill(0);
+    v.guarded.fill(0);
+  }
+  const provinces: number[] = [];
+  marked.set(v.blockade, { fleet: v.blockadeFleet, guarded: v.guarded, provinces });
   v.escorts.clear();
   for (const f of v.fleets) {
     const still = !!world.provinceWater[f.at] && !f.route.length && f.battle < 0 && !f.fleeing && f.ships.length > 0;
@@ -1141,7 +1157,7 @@ export function refreshBlockades(world: World, news: News[]): void {
       else v.escorts.set(f.at, [f.owner]);
       for (let k = world.adjStart[f.at]!; k < world.adjStart[f.at + 1]!; k++) {
         const p = world.adjList[k]!;
-        if (!world.provinceWater[p] && world.provinceOwner[p] === f.owner) v.guarded[p] = 1;
+        if (!world.provinceWater[p] && world.provinceOwner[p] === f.owner) ((v.guarded[p] = 1), provinces.push(p));
       }
     }
     const was = f.blockading;
@@ -1152,8 +1168,8 @@ export function refreshBlockades(world: World, news: News[]): void {
       f.blockading = false;
       continue;
     }
-    if (!v.blockade[f.at]) ((v.blockade[f.at] = f.owner + 1), (v.blockadeFleet[f.at] = f.id));
-    for (const p of ports) if (!v.blockade[p]) ((v.blockade[p] = f.owner + 1), (v.blockadeFleet[p] = f.id));
+    if (!v.blockade[f.at]) ((v.blockade[f.at] = f.owner + 1), (v.blockadeFleet[f.at] = f.id), provinces.push(f.at));
+    for (const p of ports) if (!v.blockade[p]) ((v.blockade[p] = f.owner + 1), (v.blockadeFleet[p] = f.id), provinces.push(p));
     if (!was && f.owner === world.player) {
       const whose = nationName(world, controller(world, ports[0]!));
       news.push({ kind: "war", text: `Your fleet lies off the coast in the ${zoneName(world, f.at)} and closes ${ports.length === 1 ? `the port of ${provinceName(world, ports[0]!)}` : `${ports.length} ports of ${whose}`}: their trade ships can't pass, and prizes come to you.`, nations: [f.owner], province: f.at });
@@ -1162,8 +1178,9 @@ export function refreshBlockades(world: World, news: News[]): void {
   if (world.player < 0) return;
   // The player's ports newly closed, one line for each realm closing them.
   const closed = new Map<number, number[]>();
-  for (let p = 0; p < world.provinceCount; p++) {
-    if (!v.blockade[p] || before[p] === v.blockade[p] || world.provinceWater[p] || world.provinceOwner[p] !== world.player) continue;
+  // In province order, as a pass over the whole map would find them.
+  for (const p of [...new Set(provinces)].sort((x, y) => x - y)) {
+    if (!v.blockade[p] || (before.get(p) ?? 0) === v.blockade[p] || world.provinceWater[p] || world.provinceOwner[p] !== world.player) continue;
     const list = closed.get(v.blockade[p]! - 1);
     if (list) list.push(p);
     else closed.set(v.blockade[p]! - 1, [p]);
@@ -1173,6 +1190,19 @@ export function refreshBlockades(world: World, news: News[]): void {
     const list = names.length === 1 ? names[0]! : `${names.slice(0, -1).join(", ")} and ${names.at(-1)}`;
     news.push({ kind: "war", text: `${nationName(world, by)}'s ships blockade ${list}: no trade gains there until they are driven off.`, nations: [world.player, by], province: ports[0]! });
   }
+}
+
+/** The provinces each blockade array's last refresh marked, with the fleet and guard arrays it marked alongside. */
+const marked = new WeakMap<Int16Array, { fleet: Int32Array; guarded: Uint8Array; provinces: number[] }>();
+
+/** Whether any province is blockaded or guarded, read from the marks; arrays seen to be all clear are marked so, once. */
+function anyMarked(v: NavyState): boolean {
+  const last = marked.get(v.blockade);
+  if (last && last.fleet === v.blockadeFleet && last.guarded === v.guarded) return last.provinces.length > 0;
+  if (v.blockade.some((x) => x !== 0)) return true;
+  if (v.blockadeFleet.some((x) => x !== 0) || v.guarded.some((x) => x !== 0)) return true;
+  marked.set(v.blockade, { fleet: v.blockadeFleet, guarded: v.guarded, provinces: [] });
+  return false;
 }
 
 /** Whether a trade ship of realm n may pass zone z: not while an enemy blockades it, unless a commodore of n's lies there (NAVY-157). */

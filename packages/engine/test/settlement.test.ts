@@ -178,6 +178,7 @@ describe("peace settlement scoring in the game", () => {
     for (let i = 0; i < w.armies.count; i++) if (w.armies.owner[i] === foe) w.armies.alive[i] = 0;
     for (let p = 0; p < w.provinceCount; p++) if (w.provinceOwner[p] === foe) w.provinceRecruits[p] = 0;
     w.nationLevies[foe] = 0;
+    w.nationLordsMen[foe] = 0;
     expect(strength(w, foe)).toBeLessThan(strength(w, me) * 0.25);
     expect(settlementTable(w, me, foe)!.beaten).toBe(true);
     const news: News[] = [];
@@ -203,6 +204,7 @@ describe("peace settlement scoring in the game", () => {
     for (let i = 0; i < w.armies.count; i++) if (w.armies.owner[i] === foe) w.armies.alive[i] = 0;
     for (let p = 0; p < w.provinceCount; p++) if (w.provinceOwner[p] === foe) w.provinceRecruits[p] = 0;
     w.nationLevies[foe] = 0;
+    w.nationLordsMen[foe] = 0;
     const news: News[] = [];
     monthlyDiplomacy(w, news);
     expect(news.some((x) => /surrenders unconditionally to Castile/.test(x.text))).toBe(true);

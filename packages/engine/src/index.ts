@@ -10,9 +10,10 @@ export { answerCall, atWar, cedeProvince, controller, declareWar, engageRange, o
 export { cededProvinces, fittingAim, longWar, lordTraits, lordWant, maxCeded, peaceShare, peaceVoices, refusingPeace, warPeaceView, type GameWar, type PeaceVoices, type WarPeaceView } from "./peace.ts";
 export { hashWorld } from "./hash.ts";
 export { cultureOf, officialName, personName, rankedName } from "./names.ts";
-export { hireGold, newLands, officialEffect, OFFICIALS, yearsServed, type OfficialEffectView } from "./officials.ts";
+export { autoFillReserve, bestFit, hireGold, newLands, officialEffect, OFFICIALS, yearsServed, type OfficialEffectView, type PostFit } from "./officials.ts";
 export { aiCollect, aiRecruits, ARMS, COMMISSION_GOLD, commanderScreen, commissionOfficial, commissionSkills, isAdmiral, type CommanderScreen, FOOT_ARMS, HORSE_ARMS, KIND, KIND_NAMES, LEVY_UNIT, garrisonTroops, garrisonView, gatherDays, idleCommanders, isHorseArm, menByArm, monthlyRecruits, recruit, recruitRefusal, trainingGround, type GarrisonView } from "./recruit.ts";
 export { CLASS_NAMES, CLASS_COUNT } from "./living.ts";
+export { catchChance, crowding, PLAGUE_STEPS, plagueDeaths, quarantineTaxFactor, setQuarantine, sickProvinces, spared, startOutbreak, weeklyPlague } from "./plague.ts";
 export { NOT_YET as ACHIEVEMENTS_NOT_YET, type Unlock as AchievementUnlock } from "./achievements.ts";
 export { createEngineHost, type EngineRequest, type EngineResponse, type MapTiles, type Snapshot, type HostReply, type SaveListing } from "./protocol.ts";
 export type { FleetView, NavyOrder, NavyView } from "./navy.ts";
@@ -49,7 +50,9 @@ export { LENS_RELATIONS, type LensRelation, type DiplomacyLensView } from "./dip
 export { deathChance, rulerLabel, rulerViews, seedRulers, throneLaw, traitLean, traitNote, traitPct, TRAITS, yearlyRulers, type GameRuler, type Heir, type RulerView } from "./rulers.ts";
 export { addFallen, FALLEN_MONTHS, fallenEffect, fallenOf, refillPaces, type FallenEffect } from "./fallen.ts";
 export { beliefRevoltFactor, lowFaith, lowTongue, monthlyBelief, officialPace, readBeliefShares } from "./belief.ts";
-export { succeed, yearlyCrowns } from "./crowns.ts";
+export { rulerDies, succeed, yearlyCrowns } from "./crowns.ts";
+export { battleDeath, lordAge, officialAge, onPersonDeath, personDies, yearlyPeople, type DeathCause, type DeathListener, type PersonDeath, type PersonRef } from "./people.ts";
+export { deathChance as personDeathChance, type PersonKind } from "./mortality.ts";
 export { risingChanceIn, spark } from "./rebels.ts";
 export { PILLAR_TAB, pillarLine, RATE_LABELS, rateButtons, STABILITY_NOTE, stabilityPlaque, stabilitySection, taxLine, TOP_BAR_PLAQUE, topBar, treasuryView, type LedgerRow, type Opens, type PillarRow, type RateButton, type RealmTab, type StabilitySectionView, type TaxLineView, type TopBarInput, type TopBarItem, type TreasuryInput, type TreasuryView } from "./realmScreens.ts";
 export { reportFailedHarvests } from "./food.ts";

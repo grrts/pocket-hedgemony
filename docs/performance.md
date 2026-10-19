@@ -67,6 +67,9 @@ one worker answer and one apply.
 Rules:
 
 - The worker sends typed arrays and transfers them; no JSON of the world.
+  The snapshot is copied to the main thread every day, in one task, so a
+  per-province field is a typed array (bits for a small set, such as the
+  harvest months), never an array of numbers or arrays.
 - Applying a day updates textures and redraws once; panels re-render only
   what is open. Seasons change once a week, worked out ahead while the
   player looks at the map.
@@ -94,6 +97,14 @@ Dragging an army plans a route each time the target changes.
   scanned every relation in the world); with the relations indexed by realm
   it is about 55 ms.
 - Engine turn: 0.2 ms at 5,000 provinces, 0.4 ms at 20,000.
+- Engine turn bench (`pnpm bench`, 5,000 provinces and 500 nations): about
+  13.5 ms on this container, was 17 to 19 ms and over budget on CI (25.7 ms of
+  25). The daily occupation pass looked every province up in a map of the
+  armies and tried to lift a siege in each; each 4-hour step with no fleets
+  scanned every province for a blockade, and refreshing blockades cleared
+  and copied the whole map; the yearly technology score threw an exception
+  for the root and the boughs of every realm. Now only marked provinces are
+  touched. At 20,000 provinces: about 80 ms, was about 90.
 - Animation: every frame (was one in five, so marching armies moved at
   5 fps: the redraw request made while drawing was wiped right after).
 - Route: about 4 ms at 5,000 and 20,000 provinces (was about 8 ms).

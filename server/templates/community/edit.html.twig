@@ -1,0 +1,32 @@
+{% extends 'community/layout.html.twig' %}
+{% import 'community/_parts.html.twig' as parts %}
+
+{% block title %}Edit post · Pocket Hegemony community{% endblock %}
+{% block meta %}<meta name="robots" content="noindex">{% endblock %}
+
+{% block community %}
+<section class="framed sheet narrow">
+    <p class="crumbs"><a href="{{ path('community') }}">Community</a> › <a href="{{ path('community_board', {board: board.slug}) }}">{{ board.name }}</a> › <a href="{{ path('community_post', {id: post.id}) }}">{{ topic.title }}</a></p>
+    <h1>Edit post</h1>
+    {% if not is_granted('ROLE_MODERATOR') %}<p class="muted">You can edit a post for 30 minutes after you send it.</p>{% endif %}
+    {{ parts.error(errors, 'form') }}
+    <form method="post" action="{{ path('community_edit', {id: post.id}) }}" class="c-form">
+        <input type="hidden" name="_token" value="{{ csrf_token('community-post') }}">
+        {% if opening %}
+        <label class="field-label" for="topic-title">Title</label>
+        <input id="topic-title" type="text" name="title" value="{{ form.title }}" required minlength="{{ constant('App\\Entity\\Topic::TITLE_MIN') }}" maxlength="{{ constant('App\\Entity\\Topic::TITLE_MAX') }}" autocomplete="off"{% if errors.title is defined %} aria-invalid="true" aria-describedby="title-error"{% endif %}>
+        {{ parts.error(errors, 'title') }}
+        {% endif %}
+        <label class="field-label" for="post-body">Post</label>
+        <textarea id="post-body" name="body" rows="9" required maxlength="{{ constant('App\\Entity\\Post::BODY_MAX') }}"{% if errors.body is defined %} aria-invalid="true" aria-describedby="body-error"{% endif %}>{{ form.body }}</textarea>
+        {{ parts.error(errors, 'body') }}
+        <div class="form-row">
+            <p class="hint">Plain text. Links start with http:// or https://.</p>
+            <span class="form-buttons">
+                <a class="btn paper" href="{{ path('community_post', {id: post.id}) }}">Cancel</a>
+                <button class="btn wax" type="submit">Save</button>
+            </span>
+        </div>
+    </form>
+</section>
+{% endblock %}

@@ -1,5 +1,5 @@
 {
-  "$comment": "Everyday events (domain/events/spec.md §5.22, EVT-115 to EVT-128; feedback 152). Small choices about the realm's own people and stores, drawn from what the game already holds: its officials, lords, ruler and heir, and food stores. Each realm draws one every `months_between` months (a range), never while the player has an event waiting. `weight` is how often an event is drawn among the ones that can happen; `needs` names what it is about. Options list their effects in the engine's small vocabulary (gold, loyalty, official, lands, heir, heir_risk, food_back, new_lord); `ai` weights the AI's pick; `needs` on an option hides it when the realm lacks what it asks. `{words}` in braces are filled with the names of who and where. Every number is a placeholder for balance.",
+  "$comment": "Everyday events (domain/events/spec.md §5.22, EVT-115 to EVT-128; feedback 152). Small choices about the realm's own people and stores, drawn from what the game already holds: its officials, lords, ruler and heir, and food stores, and plague reaching a province of the player's (EVT-130: not drawn; plague fires it). Each realm draws one every `months_between` months (a range), never while the player has an event waiting. `weight` is how often an event is drawn among the ones that can happen; `needs` names what it is about. Options list their effects in the engine's small vocabulary (gold, loyalty, official, lands, heir, heir_risk, food_back, new_lord, quarantine, care); `ai` weights the AI's pick; `needs` on an option hides it when the realm lacks what it asks. `{words}` in braces are filled with the names of who and where. Every number is a placeholder for balance.",
   "months_between": [3, 6],
   "first_within_months": 4,
   "food": { "min_store_months": 3, "min_store": 2 },
@@ -111,6 +111,17 @@
         { "id": "buy", "name": "Buy grain from merchants", "ai": 2, "effects": [{ "gold": -20 }, { "food_back": 0.5 }] },
         { "id": "requisition", "name": "Take grain from {lord2}'s barns", "needs": "lord2", "ai": 1, "effects": [{ "food_back": 0.5 }, { "loyalty": "grain_requisitioned", "who": "lord2" }] },
         { "id": "bear", "name": "Bear the loss", "ai": 2, "effects": [] }
+      ]
+    },
+    "plague_reaches": {
+      "weight": 0,
+      "needs": "plague",
+      "title": "Plague at {province}",
+      "text": "Men are falling sick at {province}: fever, black swellings, death in three days. The townsfolk die first. What will you do?",
+      "options": [
+        { "id": "close", "name": "Close the province", "ai": 1, "effects": [{ "quarantine": true }] },
+        { "id": "physicians", "name": "Send physicians and burn the sick houses", "ai": 1, "effects": [{ "gold": -20 }, { "care": true }] },
+        { "id": "open", "name": "Keep the roads open", "ai": 1, "effects": [] }
       ]
     },
     "rats": {

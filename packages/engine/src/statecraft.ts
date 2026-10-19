@@ -7,6 +7,7 @@ import { goalAsks } from "./goals.ts";
 import goalsConfig from "../../rules/data/domain/events.json" with { type: "json" };
 import { LEDGER, LEDGER_LINES } from "./treasury.ts";
 import { houseView, yearlyCrowns, type HouseView } from "./crowns.ts";
+import { yearlyPeople } from "./people.ts";
 import { aiCourting, courtingView, monthlyCourting, type CourtingView } from "./courting.ts";
 import { bondOf, aiMayTakeSubject, aiOverlordEnvoys, aiOverlords, aiRisings, monthlySubjectEnvoys, makeSubject, seasonalSubjects, subjectByAgreement, subjectsView, type SubjectsView } from "./subjects.ts";
 
@@ -94,14 +95,25 @@ const envoyTo = (world: World, n: number, t: number) => world.diplomacy.envoys.f
 /** Why realm n can't send this envoy to t now, or null. */
 export function whyNotEnvoy(world: World, n: number, t: number, action: string): string | null {
   if (!(ENVOY_ACTIONS as readonly string[]).includes(action)) return "no such mission";
+  return whyNotCourt(world, n, t) ?? whyNotMission(world, n, t, action);
+}
+
+/** Why realm n can't send any envoy to t now, or null. */
+function whyNotCourt(world: World, n: number, t: number): string | null {
   if (n < 0 || t < 0 || n >= world.nationCount || t >= world.nationCount || n === t) return "no such realm";
   if (world.nationGone[t]) return "that realm is gone";
+  const a = world.nationIds[n]!;
+  if (rel.has(world.diplomacy.graph, "at_war", a, world.nationIds[t]!)) return "you are at war";
+  if (envoyTo(world, n, t)) return "an envoy is already on the way";
+  if (dip.freeSeats(world.diplomacy, a) <= 0) return "no free envoy: every seat is taken";
+  return null;
+}
+
+/** Why realm n can't send this mission to t, once an envoy can ride there. */
+function whyNotMission(world: World, n: number, t: number, action: string): string | null {
   const g = world.diplomacy.graph;
   const a = world.nationIds[n]!;
   const b = world.nationIds[t]!;
-  if (rel.has(g, "at_war", a, b)) return "you are at war";
-  if (envoyTo(world, n, t)) return "an envoy is already on the way";
-  if (dip.freeSeats(world.diplomacy, a) <= 0) return "no free envoy: every seat is taken";
   if (action === "propose_alliance") {
     if (rel.has(g, "alliance", a, b)) return "already allies";
     if (rel.overlord(g, a) === b || rel.overlord(g, b) === a) return "a subject is bound already";
@@ -284,6 +296,8 @@ export function monthlyStatecraft(world: World, news: News[]): void {
   aiRisings(world, news);
   aiOverlords(world, news);
   aiOverlordEnvoys(world, news);
+  // Everyone ages and may die each January, then claims lapse (REALM-270, SUBJ-126).
+  yearlyPeople(world, news);
   yearlyCrowns(world, news);
   monthlyCourting(world, news);
   aiCourting(world, (s) => bondOf(world, s)?.loyalty ?? null);
@@ -410,18 +424,29 @@ function aiEnvoys(world: World): void {
     for (const x of near[n]!) {
       if (world.nationGone[x]) continue;
       const w = dip.standing(d, world.nationIds[x]!, id);
-      if (w > warmest) [t, warmest] = [x, w];
+      if (w > warmest) {
+        t = x;
+        warmest = w;
+      }
     }
     // Besides the warmest neighbour, the realms its ally and subject goals name (EVT-106).
     const asks = goalAsks(world, n);
     if (t < 0 && !asks.length) continue;
     const days = countDays(world);
     let best: { t: number; action: string; total: number } | null = null;
+    // Nothing changes while the asks are weighed: each court's envoy check and the reach are read once.
+    const court = new Map<number, string | null>();
+    let mayTake: boolean | undefined;
+    const warm = t;
     const weigh = (t: number, action: string, extra: number) => {
-      if (whyNotEnvoy(world, n, t, action)) return;
+      if (!(ENVOY_ACTIONS as readonly string[]).includes(action)) return;
+      let why = court.get(t);
+      if (why === undefined) court.set(t, (why = whyNotCourt(world, n, t)));
+      if (why !== null || whyNotMission(world, n, t, action)) return;
       // An AI overlord takes no subject that would put it more than 1 over its reach (SUBJ-098).
-      if (action === "offer_overlordship" && !aiMayTakeSubject(world, n)) return;
-      const count = dip.countAsk(d, { action, asker: id, asked: world.nationIds[t]! }, days);
+      if (action === "offer_overlordship" && !(mayTake ??= aiMayTakeSubject(world, n))) return;
+      // The warmest neighbour's standing toward us is known already.
+      const count = dip.countAsk(d, { action, asker: id, asked: world.nationIds[t]! }, days, t === warm ? warmest : undefined);
       // The AI counts the other court's notoriety against binding itself to it (DIPL-223).
       const total = count.total - (dip.NOTORIETY_ASKS.includes(action) ? dip.notorietyPoints(d, world.nationIds[t]!) : 0) + extra;
       if (!best || total > best.total) best = { t, action, total };

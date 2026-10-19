@@ -337,8 +337,23 @@ settlement, settlers, local people's tiles.
 - PROV-339: Phone: the post's screen fits the side panel in landscape in the Wide and Tall layouts and the bottom sheet in portrait; each type row and button is at least 44 points tall and spells out its effect, so nothing needs hover. [X-19; PROV-309]
 
 #### Land just taken and a lord's land (feedback 120 and 121, 18 October 2026)
-- PROV-340: When a realm takes a province, by peace or handed over, the province's official shall be lost with it (fled or killed, PROV-194): its post stands empty and it is royal land. Until the player decides for each such province (fill the post, grant it to a lord, or keep it royal with the post empty), End turn shall open the Officials tab, which lists them first under "New lands" with those three buttons. [feedback 121; PROV-194, PROV-303]
+- PROV-340: When a realm takes a province, by peace or handed over, the province's official shall be lost with it (fled or killed, PROV-194): its post stands empty and it is royal land. Until the player decides for each such province (fill the post, grant it to a lord, or keep it royal with the post empty), End turn shall open the Officials tab, which lists them first under "New lands" with those three buttons. [feedback 121; PROV-194, PROV-303] *Applies only while the player's Auto-fill posts is off (PROV-344).*
 - PROV-341: In a lord's province the player shall not call levies (its men answer the lord's call for his retinue) nor change its tiles (he decides on his land); he may set its tax, at the loyalty cost of REALM-187, and pay for a building there, which becomes the lord's and wins him a step as a gift of gold (PROV-206). The governance card says so in one line. [feedback 120; PROV-202, PROV-206, REALM-187]
+
+#### Officials with fewer taps (Leroy, 19 October 2026)
+Leroy found getting, hiring, firing and moving officials tedious: about five taps for each empty post, End turn stopping for every province taken, no way to fire one. The crown now fills its own posts unless the player turns that off, and every one-off choice is a single tap (F-157).
+- PROV-342: Where a realm fills its posts itself (every AI realm, and the player's while *Auto-fill posts* is on, as it is in a new campaign), at the start of each month it shall fill its empty royal posts, most people first, each with the best fit for the province (PROV-343): hired at home when someone of that type serves in another of its royal posts, else as a foreign specialist, at the price of PROV-333 and PROV-334. It stops when a hire would leave less than `province.officials.auto_fill.reserve_gold` (20 gold, provisional) in the treasury or take the realm's officials over its officials cap (GOV-001); the post of an occupied province waits until it is freed. [F-157; PROV-333, PROV-334, D-PROV-19, default chosen]
+- PROV-343: The best fit for a province shall be, in this order: a judge where it riots or plots; a steward where its store holds less than `province.officials.auto_fill.hungry_months` (1, provisional) of food; a warden where it has walls and borders a realm it is at war with; a customs officer where at least `province.officials.auto_fill.traders_passing` (3, provisional) traders passed last month, since he speeds only the gain they bring (TRADE-035); otherwise a tax collector. Each comes with its reason in a few words ("riots here", "under a month of food", "walls facing the enemy", "traders pass here", "2.1 gold tax a month"). [F-157; PROV-190, default chosen]
+- PROV-344: While the player's *Auto-fill posts* is on, land just taken shall not wait for a decision (PROV-340 applies only while it is off): its post is filled at once by PROV-342 when the gold allows, else with a later month's filling, and it can be granted to a lord at any time. [F-157; PROV-340]
+- PROV-345: The ruler may dismiss the official of a royal post: he leaves the realm's service, no gold comes back, and the post stands empty. He may also replace him in one step with a hire of another type, which is refused, keeping the official, when the hire would be (PROV-333 to PROV-335). A lord's official cannot be dismissed: he serves the lord (PROV-202). [F-157; PROV-194, PROV-202]
+- PROV-346: When a commissioned official is released and his old post is filled (by auto-fill or a hire), he shall take the empty royal post that fits his type best, starting at half his effect; with no post empty, the release is refused and says to dismiss an official or wait for a post. [F-157; RECR-087, PROV-192]
+- PROV-347: A month's filling shall reach the player as one line of news naming each hire, its post and the gold spent ("Auto-fill: Jean Morel, tax collector, at Troyes; Pierre Lenoir, judge, at Rouen. 50 gold."), and a post it could not fill for want of gold as one line too, at most once a year. [F-157]
+
+#### How the player uses it: filling, replacing and dismissing
+- PROV-348: Where: the Officials tab opens with the *Auto-fill posts* switch (on or off, one line on what it does and the gold it keeps back); under Empty posts, a *Fill all · N gold* button fills every empty post at once by PROV-342's choices and price, whatever the switch, until the gold runs out. An empty post's screen opens with the best fit and its reason as one *Hire · 25 gold* button (*Foreign · 50 gold* when no one at home knows the type), above the officials who could move in and the full list of types. An official's screen has, above Command, *Replace with* the best fit (when it is another type) and *Dismiss*. [F-157; X-19; PROV-336, PROV-306]
+- PROV-349: Grouping: auto-fill and Fill all sit with the empty posts they fill on the Officials tab; replacing and dismissing sit on the official's own screen with moving and commissioning, so everything about one post stays on one screen (PROV-337). [F-157; X-19]
+- PROV-350: Overview: the Officials tab says whether auto-fill is on and counts the empty posts with what filling them all would cost; the Officials pillar of Stability (REALM-201) stays the at-a-glance view on the General tab. [F-157; X-19; PROV-338]
+- PROV-351: Phone: in landscape the switch, Fill all, the best-fit button, Replace and Dismiss fit the side panel in the Wide and Tall layouts and the bottom sheet in portrait; each is at least 44 points tall and says in words what it does and costs, and nothing needs hover. Dismiss asks once more in place (the button turns into *Dismiss him? Yes*) so a stray tap does not lose an official. [F-157; X-19; PROV-339]
 
 ### Land in the game (feedback 80 and 87, 17 October 2026)
 - PROV-310: Until the land's tile changes are played, each province shall lay out its 4 to 16 tiles from the map: the count from its size (the smallest 4, the largest 16, on a log scale between the 5th and 95th percentile of province sizes), one Town tile, 1 to 3 Shore tiles on a coast (more with more seafolk), and the rest shared out by the share of each use in the ground of the map squares under it. [PROV-010, PROV-011, PROV-018, D-PROV-25]
@@ -417,6 +432,24 @@ settlement, settlers, local people's tiles.
 - PROV-243: Fever land shall be none, mild, harsh or deadly, set by ground and climate, with marsh tiles adding to it; lowered by draining marsh and later inventions (quinine, sanitation); soldiers and settlers from elsewhere die there, locals mostly don't. [§12.2]
 - PROV-244: From era V, factories and coal mines shall make smoke; townsfolk get sick and tiles become worn; closing them and later inventions reduce it; smoke feeds the event tree's climate stats. [§12.2]
 
+### Plague in the game (Leroy, 18 October 2026)
+*Leroy:* "provinces can be sick, a disease can break out, just like in history, like the Black Plague." The game runs PROV-240 to PROV-242 as below (`packages/engine/src/plague.ts`). Every number is provisional (`province.plague.*`, listed in `_provisional`), set so that plague recurs in a region about once a decade, as it did from 1378 to the 1450s, and a large realm sees an outbreak somewhere in its land every few years, not every few months. A province's **crowding** is its townsfolk share over 10 % (`plague.crowd_town_share`), kept between 0.5 and 3. Hospitals, wells and drains, refugees carrying plague and buildings going fallow are not in the game yet: they come with those buildings and with refugees.
+
+- PROV-352: Once a month, on the first plague week, each province a realm holds shall roll a yearly chance of `plague.start_chance_year` (0.3 %) that plague breaks out there, times its crowding and twice that in shanty camps (PROV-123). Land no realm holds has scattered folk and no towns: plague neither starts nor spreads there. [PROV-240, PROV-123]
+- PROV-353: Each plague week (days 7, 14, 21 and 28, D-PROV-4), plague shall spread from every province in outbreak: to each land province next door at `plague.spread_week` (4 %), half as much again along a river both share (`plague.river_factor`), and by ship to every other coast of each sea zone it touches at `plague.sea_spread_week` (0.15 %). Each chance is multiplied by the target's crowding, doubled in shanty camps, and cut to a quarter (`plague.into_quarantine_factor`) when the target is closed. A closed province sends nothing out by road, river or sea. A province already sick, or spared, cannot catch it. [PROV-240, PROV-241]
+- PROV-354: An army standing in a province in outbreak on a plague week shall carry plague for `plague.army_carry_weeks` (4) plague weeks, and on each of them may bring it to the province it stands in at `plague.army_spread_week` (15 %), by that province's crowding as above. Quarantine does not stop an army. [PROV-240]
+- PROV-355: A province that catches plague shall go through rumour for `plague.rumour_weeks` (4) plague weeks, outbreak for a season or two (`plague.outbreak_seasons`, rolled, `plague.weeks_per_season` 12 plague weeks each) and burning out for `plague.burning_out_weeks` (4), then have no plague and be spared for `plague.spared_years` (12) years: its survivors don't catch it again soon. [PROV-240, PROV-241]
+- PROV-356: Each plague week a sick province shall lose a 48th of the yearly plague death rate of PROV-102 (+5 % at rumour and burning out, +15 % in outbreak, +30 % in outbreak in shanty camps). The dead come from the townsfolk first, at most `plague.town_week_share_max` (2 %) of each town class a week, and the rest from the countryfolk by their shares. While sick its births fall by a point (PROV-101), and while it is in outbreak it has the *Plague* grievance. [PROV-101, PROV-102, PROV-242]
+- PROV-357: The owner of a land province shall be able to close it (QuarantineProvince), sick or healthy, and to open it again, at no gold cost. While it is closed its trade ratio is 0 and no trader trades there (TRADE-040), it pays `plague.quarantine_tax_factor` (half) of its tax, nothing spreads out of it by trade, and plague gets in at a quarter of the chance. It stays closed until the owner lifts the quarantine; after that its trade ratio grows back as traders return. [PROV-241]
+- PROV-358: An AI realm shall close a province of its own when an outbreak begins there and the province is a crowded town (crowding 1 or more), and open it again when the plague is gone; it leaves its countryside open, where closing costs more than it saves. [PROV-241]
+- PROV-359: The player shall hear once when plague reaches a province of theirs, saying how it came (broke out there, along a road, down a river, by ship from a named province, with an army), and once when it burns out there, with its dead; closing and lifting a quarantine each say what it costs. [X-19]
+- PROV-360: Plague is part of the save: each sick province's step, weeks left and dead, the closed provinces, the spared ones with the day their plague ended, the armies carrying it, and plague's own seeded draws, which never shift any other roll of the game. A save from before plague loads with no plague and no province closed. [SAVE, X-25]
+
+#### How the player uses it: plague
+- PROV-361: Where: the player taps a sick province on the map, marked at Region zoom by a pale door with the plague cross (barred with a plank while it is closed, VIEW-011, VIEW-128); its Overview tab opens with a plague card under the siege view: the step in words with about how long it lasts yet, the dead so far ("townsfolk first"), whether it is closed and what that costs, and, on the player's own province, one full-width button, **Quarantine** or **Lift quarantine**, that spells out its cost under its label. A healthy province of the player's shows the card only while it is closed or plague is next door, so it can be closed before plague arrives. [X-19]
+- PROV-362: Grouping and overview: everything about a province's plague sits on that one card. The realm's Provinces tab counts the sick and closed provinces in a line at the top, its **Sick** tab (beside Short of food, with the count) lists them worst first, each row saying the step, the dead and whether it is closed, and the Lands tile of the realm's Overview says "Plague in N provinces" and opens the Provinces tab. The *Plague* grievance shows in the province's mood line. [X-19]
+- PROV-363: Phone: the card fits the side panel in landscape in the Wide and Tall layouts and the bottom sheet in portrait, within the safe areas; the button is at least 44 points tall and full width, the Sick tab wraps with the other tabs (F-111), every state is written in words (never colour alone), and nothing needs hover. [X-19]
+
 ### 5.24 Colonies and the people already there
 - PROV-250: A colony shall be founded only in a province no country owns; land held by any country, tribal countries included, can only be gained by war, treaty, marriage or a lord joining. [§12.3]
 - PROV-251: A colony shall take only the free tiles (nobody works them); tiles the local people work stay theirs. [§12.3]
@@ -477,13 +510,15 @@ Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision
 | RebuildBurnedTile(tile, gold) | player / AI | Tile Burned | Faster rebuild | TileRebuilt |
 | AssignOfficial(official, province) | player / AI | Official free, or serving in another royal province of the realm; province royal or seat, not a lord's | Governed by official; years served 0; an official already there takes the mover's old post (both start at half), else the old post stands empty (PROV-303) | OfficialAssigned, GrievanceEnded |
 | HireOfficial(province, type, foreign) | player | Royal province of the realm, post empty, not a lord's; a native hire's type serves in another royal post of the realm; gold ≥ price | Official of that type in post, years served 0; price paid (PROV-333, PROV-334) | OfficialHired |
-| DismissOfficial(official) | player / AI | — | Province ungoverned | OfficialDismissed, GrievanceStarted |
+| DismissOfficial(province, hire?) | player | Royal province of the realm with an official, not a lord's; with hire, that hire's preconditions | Post empty, or filled by the new hire at half his effect (PROV-345) | OfficialDismissed, OfficialHired |
+| SetAutoFill(on) | player | — | The realm fills its own empty posts each month, or not (PROV-342) | — |
+| FillPosts | player | Empty royal posts; gold | Each empty post filled by its best fit until the gold runs out (PROV-348) | OfficialHired |
 | HireOfficial(type) | player / AI | Gold; colonial governor needs a slot | New official | OfficialHired |
 | LendOfficialToLord(official, lord) / RecallLentOfficial | player / AI | Official free / lent | Works for the lord; loyalty up | OfficialLent / OfficialRecalled |
 | PayForBuildingInLordProvince(lord, tile, building) | player / AI | Lord not in revolt for the loyalty step | Lord owns building; loyalty +1 step | BuildingFunded |
 | GrantCharter(province, kind) / RevokeCharter | player / AI | Owner | Charter in force / *Broken charter* 20 years | CharterGranted / CharterRevoked |
 | BuildRoad(province, step) | player / AI | Invention known; gold | Road one step up | RoadBuilt |
-| QuarantineProvince(province, on/off) | player / AI | Owner | Trade stops; plague slowed | QuarantineChanged |
+| QuarantineProvince(province, on/off) | player / AI | Owner; land; not already in that state | Trade ratio 0, half tax, nothing spreads out by trade, a quarter of the chance in (PROV-357); stays until lifted | QuarantineChanged |
 | AssignGarrison(castle, soldiers) | player / AI | Own soldiers present | Garrison set | GarrisonChanged |
 | RepairWalls(castle) | player / AI | Breaches; gold | Breach removed after months | WallsRepaired |
 | SendSettlers(from, to, count) | player / AI | Homeless in source; free tiles in colony or frontier | Settlers arrive | SettlersSent |
@@ -544,7 +579,7 @@ Reads first: realm's food policy and castle deliveries, owner and war state, inv
 Each season: food check and famine (§6.2); store rot (realm); *Hungry*, *Requisitioned*, *Soldiers quartered* timers.
 Each autumn (and twice for rice): harvest roll (realm food year).
 Each year: recruits refill; tax owed; years held, official years served; burned tile rebuild; worn tile checks (overwork wears, rest recovers); mine seams fall; upkeep and neglect (buildings); woods regrowth after 10 unworked years; refugees settle after 2 years.
-Each week while an outbreak runs (days 7, 14, 21, 28): plague (D-PROV-4).
+Each plague week (days 7, 14, 21, 28; D-PROV-4): the sick provinces move on a week and lose their dead, plague spreads from each outbreak to its neighbours and with armies, and on the first plague week of the month new outbreaks are rolled (PROV-352 to PROV-356). Only the sick provinces are visited, except for the monthly roll.
 
 ## 10. Configuration
 
@@ -602,6 +637,9 @@ province config file but no file name or keys; keys below are proposed by this s
 | province.officials.full_effect_years | Years to full effect | 5 (half in first year) | yes | province config |
 | province.officials.hire.gold | Gold up front to hire a native official | 25 (PROV-333) | yes | province config |
 | province.officials.hire.foreign_multiplier | A foreign specialist's price against a native's | 2 (PROV-334) | yes | province config |
+| province.officials.auto_fill.reserve_gold | Gold auto-fill keeps back in the treasury | 20 (PROV-342) | yes | province config |
+| province.officials.auto_fill.hungry_months | Months of food under which a steward fits best | 1 (PROV-343) | yes | province config |
+| province.officials.auto_fill.traders_passing | Traders passing in a month from which a customs officer fits best | 3 (PROV-343) | yes | province config |
 | province.officials.effects | Type effects | tax collector +20 % reaches you; steward +10 % food, store rot ×½; judge riots +1 grievance, *Broken charter* ×2 fade; master of works −25 % cost, ×½ time, burned rebuild ×2; muster master refill +25 %; customs officer +15 % trade ratio gain (fees and tolls are collected in full with or without him, D-TRADE-10); chaplain faith ×2; schoolmaster language ×2, graduate 1 year sooner; warden garrison +25 %, walls repair ×2, castle store rot ×½; colonial governor none | yes | province config |
 | province.homeland.years | Years to gain or lose homeland | 100 | yes | province config |
 | province.pretender.years | Old ruler's right after losing a province | 50 | yes | province config |
@@ -610,6 +648,16 @@ province config file but no file name or keys; keys below are proposed by this s
 | province.walls.max_breaches | Breaches | 3 | yes | province config |
 | province.grievances.levels | Calm / grumbling / riots / rebels | 0–1 / 2 / 3 / 4+ | yes | province config |
 | province.plague.steps | Plague steps | none, rumour, outbreak, burning out | no (states) | province config |
+| province.plague.start_chance_year | Yearly chance plague breaks out in a province, at crowding 1, rolled monthly | 0.003 | yes (provisional, PROV-352 to PROV-357) | province config |
+| province.plague.crowd_town_share / crowd_min / crowd_max | Crowding: townsfolk share over this, kept between | 0.1 / 0.5 / 3 | yes (provisional, PROV-352 to PROV-357) | province config |
+| province.plague.rumour_weeks / weeks_per_season / burning_out_weeks | Plague weeks at rumour, per outbreak season, at burning out | 4 / 12 / 4 | yes (provisional, PROV-352 to PROV-357) | province config |
+| province.plague.outbreak_seasons | Outbreak lasts a season or two | 1–2 | yes (provisional, PROV-352 to PROV-357) | province config |
+| province.plague.spread_week / river_factor / sea_spread_week | Weekly chance to land next door; along a river; by ship to each coast of the waters | 0.04 / 1.5 / 0.0015 | yes (provisional, PROV-352 to PROV-357) | province config |
+| province.plague.into_quarantine_factor | Share of the chance into a closed province | 0.25 | yes (provisional, PROV-352 to PROV-357) | province config |
+| province.plague.army_carry_weeks / army_spread_week | Weeks an army carries plague; weekly chance it brings it | 4 / 0.15 | yes (provisional, PROV-352 to PROV-357) | province config |
+| province.plague.spared_years | Years a province is spared after its plague burns out | 12 | yes (provisional, PROV-352 to PROV-357) | province config |
+| province.plague.town_week_share_max | Most of each town class plague takes in a week | 0.02 | yes (provisional, PROV-352 to PROV-357) | province config |
+| province.plague.quarantine_tax_factor | Tax a closed province still pays | 0.5 | yes (provisional, PROV-352 to PROV-357) | province config |
 | province.fever_land.steps | Fever land steps | none, mild, harsh, deadly | no (states) | province config |
 
 ## 11. Seams
@@ -645,6 +693,7 @@ province config file but no file name or keys; keys below are proposed by this s
 - Lords hire and pay their own officials from their wealth (§10.3).
 - Lords and towns demand charters for loyalty or a loan (§10.4).
 - Province AI: tax normal (heavy at war), tolls low, no charters unless forced, officials to the most populous royal provinces first, food through the realm presets (D-PROV-19).
+- Plague: the AI closes its crowded towns (crowding 1 or more) when an outbreak begins there and opens them when the plague is gone; it leaves its countryside open (PROV-358).
 
 ## 13. Decisions and open questions
 
@@ -868,6 +917,11 @@ Every requirement has at least one scenario. PROV-292 (card layout) is also pres
 | PROV-334 | officials.feature | A foreign specialist costs more |
 | PROV-340 | officials.feature | A province just taken waits for a decision |
 | PROV-341 | — | Engine: packages/engine/test/officials.test.ts (no levy in a lord's land); presentation: the governance card |
+| PROV-342, 343, 347 | officials.feature | The crown fills its empty posts each month; The best fit for a province |
+| PROV-344 | officials.feature | Land just taken is filled, not waited on |
+| PROV-345 | officials.feature | Dismissing and replacing an official |
+| PROV-346 | officials.feature | A released commander takes another post |
+| PROV-348–351 | — | Presentation: apps/client/src/ui/people.ts Officials tab, post and official screens, checked on phone screenshots in landscape and portrait |
 | PROV-336–339 | — | Presentation: apps/client/src/ui/people.ts post screen, checked on phone screenshots in landscape and portrait |
 | PROV-310 … PROV-313 | — | Engine: packages/engine/test/works.test.ts (tiles, farms on fields, 1444 food) |
 | PROV-314 … PROV-316 | — | Presentation: apps/client/scripts/land-shots.mjs on phones in landscape |
@@ -923,6 +977,17 @@ Every requirement has at least one scenario. PROV-292 (card layout) is also pres
 | PROV-243 | health.feature | Fever land |
 | PROV-243 | health.feature | Locals mostly survive fever land |
 | PROV-244 | health.feature | Factories make smoke from era V |
+| PROV-352 | health.feature | Plague breaks out now and then, most in crowded towns |
+| PROV-353 | health.feature | Plague spreads to land next door, less into a closed province; Nothing leaves a closed province by trade |
+| PROV-354 | health.feature | An army carries plague |
+| PROV-355 | health.feature | Plague runs its weeks in the game |
+| PROV-356 | health.feature | Plague kills townsfolk first in the game |
+| PROV-357 | health.feature | Closing a province against plague |
+| PROV-358 | health.feature | The AI closes its crowded towns |
+| PROV-359 | health.feature | Plague runs its weeks in the game |
+| PROV-360 | health.feature | Plague is kept in the save |
+| PROV-352 … PROV-360 | — | Engine: packages/engine/test/plague.test.ts |
+| PROV-361 … PROV-363 | — | Presentation: apps/client/src/ui/plague.ts plague card and map mark, the Provinces tab's Sick list; checked on phone screenshots in landscape and portrait |
 | PROV-250 | colonies.feature | Only unowned provinces can be colonised |
 | PROV-251 | colonies.feature | A colony takes only the free tiles |
 | PROV-252 | colonies.feature | Settlement steps are gained |

@@ -122,7 +122,9 @@ console.log(`${animFrames >= ANIM_SHARE ? "PASS" : "FAIL"} animating overlay red
 // played as a fresh attempt, up to three attempts; one must meet every budget.
 // The week stops for an event or a revolution until the player answers (EVT-044,
 // REVO-091), as France's choice of pope does in October 1378: the first
-// option is taken, as a player would, and the week plays on.
+// option is taken, as a player would, and the week plays on. It also waits at a
+// battle of the player's (feedback 73), as at France's first battle in November
+// 1378 since lords lead their own retinues: End turn plays on, as a player would.
 const playTurns = async (n) => {
   for (let i = 0; i < n; i++) {
     await page.click(".end-turn");
@@ -130,6 +132,9 @@ const playTurns = async (n) => {
       () => {
         const choice = document.querySelector("[data-event-option], [data-revolution-stance]");
         if (choice && !choice.closest("[hidden]")) choice.click();
+        // A battle of the player's holds the week too (feedback 73): play on, as the player would.
+        const endTurn = document.querySelector(".end-turn");
+        if (endTurn.classList.contains("paused") && document.querySelector(".alert[data-battle]")) endTurn.click();
         return !document.querySelector(".end-turn").classList.contains("playing");
       },
       null,

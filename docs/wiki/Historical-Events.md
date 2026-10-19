@@ -75,6 +75,7 @@ Between the great events, your own realm asks for small choices. About every thr
 | A child is born to your ruler | Hold a feast (gold, your two least loyal lords grow more loyal), promise the child to a lord's house (that lord grows more loyal), or give thanks quietly. With no heir, the child becomes your heir |
 | Your young heir falls ill | Pay the best physicians (gold) or trust in prayer (3 in 10 that the heir dies) |
 | Grain rots, burns or is eaten by rats in a store | The grain is lost whatever you choose; buy grain (gold) or take it from a lord's barns (he grows less loyal) to make half of it good, or bear the loss |
+| Plague reaches one of your provinces | Close the province (its trade stops and its tax halves while closed), send physicians (gold: half as many die and it is over sooner), or keep the roads open. Only one plague card waits at a time; the News tells of the rest |
 
 An option you can't pay for isn't offered, and at least one choice always costs nothing. Other realms get the same events and answer them at once, so their lords die, quarrel and change their minds too. *Look at the map* on a card about a province opens that province.
 

@@ -1,5 +1,6 @@
 import { expect } from "vitest";
-import { applyNow, ARMS, cedeProvince, createWorld, garrisonView, KIND, newLands, officialEffect as gameOfficialEffect, Rng, spawnArmy, yearsServed, type GarrisonView } from "@ph/engine";
+import { applyNow, ARMS, bestFit, catchChance, cedeProvince, CLASS_COUNT, CLASS_NAMES, createWorld, crowding, garrisonView, hireGold, KIND, newLands, OFFICIALS, processTurn, officialEffect as gameOfficialEffect, provinceTax, Rng, setQuarantine, spared, spawnArmy, startOutbreak, weeklyPlague, yearsServed, type GarrisonView } from "@ph/engine";
+import { restoreWorld, worldChunks } from "@ph/engine/domain/saves";
 import { loadDefaultRuleset } from "@ph/rules";
 import { commanderAt, levyGame, province } from "./levy-game.ts";
 import * as P from "@ph/engine/domain/province";
@@ -3267,4 +3268,359 @@ Then("End turn waits until the player fills the post, grants it to a lord or kee
   expect(newLands(s.game, s.me)).toEqual([s.taken]);
   expect(applyNow(s.game, { type: "settleLand", province: s.taken }, s.me).rejectedOrders).toEqual([]);
   expect(newLands(s.game, s.me)).toEqual([]);
+});
+
+// ---------------------------------------------------------------- plague in the game (PROV-352 to PROV-360)
+
+const PL = cfg.plague;
+const TOWN = new Set<string>(cfg.classes.town);
+/** A plague week that is not the month's first, so no new outbreak is rolled: only the sick move on and spread. */
+function plagueWeek(s: Scenario): void {
+  const w = levyGame(s).w;
+  w.date = { ...w.date, day: 14 };
+  w.day += 7;
+  weeklyPlague(w, (s.news ??= []));
+}
+/** A plague week with a link's chance raised so that it surely carries plague, then put back. */
+function sureWeek(s: Scenario, keys: (keyof typeof PL)[]): void {
+  const was = keys.map((k) => PL[k]);
+  for (const k of keys) (PL as Record<string, unknown>)[k] = 100;
+  try {
+    plagueWeek(s);
+  } finally {
+    keys.forEach((k, i) => ((PL as Record<string, unknown>)[k] = was[i]));
+  }
+}
+const at = (s: Scenario, name: string): number => province(levyGame(s), name);
+const landNext = (s: Scenario, p: number): number[] => {
+  const w = levyGame(s).w;
+  return Array.from(w.adjList.subarray(w.adjStart[p]!, w.adjStart[p + 1]!)).filter((q) => !w.provinceWater[q] && w.provinceOwner[q]! >= 0);
+};
+const STEP = (name: string): number => P.provinceConfig.plague.steps.indexOf(name);
+
+Given("a new campaign with no plague anywhere", (s) => {
+  expect(levyGame(s).w.plagueSick).toEqual([]);
+});
+When("{int} years of plague weeks pass", (s, years: number) => {
+  const w = levyGame(s).w;
+  w.player = -1;
+  const counts = new Map<number, number>();
+  w.provinceOwner.forEach((o) => o >= 0 && counts.set(o, (counts.get(o) ?? 0) + 1));
+  s.big = [...counts].filter(([, n]) => n >= 40).map(([n]) => n);
+  s.sickYears = new Map<number, Set<number>>((s.big as number[]).map((n) => [n, new Set()]));
+  s.caught = new Map<number, number>();
+  s.years = years;
+  for (let m = 0; m < years * 12; m++) {
+    for (const d of cfg.decided.plague_week_days) {
+      w.date = { year: 1400 + Math.floor(m / 12), month: (m % 12) + 1, day: d };
+      w.day += 7;
+      const before = new Set(w.plagueSick);
+      weeklyPlague(w, []);
+      for (const p of w.plagueSick) {
+        s.sickYears.get(w.provinceOwner[p]!)?.add(w.date.year);
+        if (!before.has(p)) s.caught.set(p, (s.caught.get(p) ?? 0) + 1);
+      }
+    }
+  }
+});
+Then("each of the largest realms had plague somewhere in some years, but not in most", (s) => {
+  const shares = (s.big as number[]).map((n) => s.sickYears.get(n)!.size / s.years);
+  const mean = shares.reduce((a, b) => a + b, 0) / shares.length;
+  expect(mean).toBeGreaterThan(0.08);
+  expect(mean).toBeLessThan(0.6);
+});
+Then("a province with more townsfolk is more likely to catch it", (s) => {
+  const w = levyGame(s).w;
+  const p = at(s, "Troyes");
+  const before = catchChance(w, p, 0.1);
+  const row = w.provinceClasses.subarray(p * CLASS_COUNT, (p + 1) * CLASS_COUNT);
+  CLASS_NAMES.forEach((c, k) => TOWN.has(c) && (row[k] = row[k]! * 3));
+  w.provincePopulation[p] = row.reduce((a, b) => a + b, 0);
+  expect(catchChance(w, p, 0.1)).toBeGreaterThan(before);
+});
+Given("the province {string} has a plague outbreak in the game", (s, name: string) => {
+  const w = levyGame(s).w;
+  const p = at(s, name);
+  expect(startOutbreak(w, p, [])).toBe(true);
+  w.provincePlague[p] = STEP("outbreak");
+  w.provincePlagueWeeks[p] = PL.weeks_per_season;
+  s.sick = p;
+});
+Then("the chance it reaches {string} this plague week is the road's chance times the crowding of {string}", (s, name: string) => {
+  const w = levyGame(s).w;
+  const q = at(s, name);
+  s.chance = catchChance(w, q, PL.spread_week);
+  expect(s.chance).toBeCloseTo(PL.spread_week * crowding(w, q), 9);
+});
+Then("the chance it reaches {string} this plague week is a quarter of that", (s, name: string) => {
+  expect(catchChance(levyGame(s).w, at(s, name), PL.spread_week)).toBeCloseTo(s.chance * PL.into_quarantine_factor, 9);
+});
+When("the country {string} closes {string}", (s, _c: string, name: string) => {
+  const g = levyGame(s);
+  expect(setQuarantine(g.w, g.n, at(s, name), true, (s.news ??= []))).toBeNull();
+});
+When("the country {string} lifts the quarantine on {string}", (s, _c: string, name: string) => {
+  const g = levyGame(s);
+  expect(setQuarantine(g.w, g.n, at(s, name), false, (s.news ??= []))).toBeNull();
+});
+When("a plague week passes in which every road, river and sea route would carry plague", (s) => sureWeek(s, ["spread_week", "sea_spread_week"]));
+Then("no province next to {string} catches it", (s, name: string) => {
+  const w = levyGame(s).w;
+  expect(landNext(s, at(s, name)).every((q) => w.provincePlague[q] === 0)).toBe(true);
+});
+Then("every healthy province next to {string} catches it", (s, name: string) => {
+  const w = levyGame(s).w;
+  expect(landNext(s, at(s, name)).every((q) => w.provincePlague[q] === STEP("rumour") || spared(w, q))).toBe(true);
+});
+Given("an army of {string} stands in {string} on a plague week", (s, _c: string, name: string) => {
+  const g = levyGame(s);
+  s.army = spawnArmy(g.w, g.n, at(s, name), 1000);
+  const was = PL.spread_week;
+  PL.spread_week = 0;
+  try {
+    plagueWeek(s);
+  } finally {
+    PL.spread_week = was;
+  }
+});
+When("the army stands in {string} on a plague week in which every army would carry plague", (s, name: string) => {
+  const g = levyGame(s);
+  g.w.armies.location[s.army] = at(s, name);
+  const was = PL.spread_week;
+  PL.spread_week = 0;
+  try {
+    sureWeek(s, ["army_spread_week"]);
+  } finally {
+    PL.spread_week = was;
+  }
+});
+Then("the province {string} has plague {string}", (s, name: string, step: string) => {
+  expect(levyGame(s).w.provincePlague[at(s, name)]).toBe(STEP(step));
+});
+Given("plague breaks out in the player's province {string}", (s, name: string) => {
+  const g = levyGame(s);
+  s.news = [];
+  expect(startOutbreak(g.w, at(s, name), s.news)).toBe(true);
+});
+Then("the player hears that plague reached {string}", (s, name: string) => {
+  const p = at(s, name);
+  expect((s.news as { kind: string; province?: number; text: string }[]).filter((n) => n.kind === "plague" && n.province === p && n.text.startsWith("Plague in"))).toHaveLength(1);
+});
+When("{int} plague weeks pass", (s, n: number) => {
+  const was = PL.spread_week;
+  PL.spread_week = 0;
+  try {
+    for (let i = 0; i < n; i++) plagueWeek(s);
+  } finally {
+    PL.spread_week = was;
+  }
+});
+When("plague weeks pass until the plague in {string} is gone", (s, name: string) => {
+  const w = levyGame(s).w;
+  const p = at(s, name);
+  s.outbreakWeeks = 0;
+  const was = PL.spread_week;
+  PL.spread_week = 0;
+  try {
+    for (let i = 0; i < 200 && w.provincePlague[p] !== 0; i++) {
+      if (w.provincePlague[p] === STEP("outbreak")) s.outbreakWeeks++;
+      plagueWeek(s);
+    }
+  } finally {
+    PL.spread_week = was;
+  }
+  expect(w.provincePlague[p]).toBe(0);
+});
+Then("its outbreak lasted a season or two", (s) => {
+  expect([PL.weeks_per_season, 2 * PL.weeks_per_season]).toContain(s.outbreakWeeks);
+});
+Then("the player hears once that the plague in {string} burned out", (s, name: string) => {
+  const p = at(s, name);
+  expect((s.news as { kind: string; province?: number; text: string }[]).filter((n) => n.kind === "plague" && n.province === p && n.text.includes("burned out"))).toHaveLength(1);
+});
+Then("plague cannot break out in {string} again for {int} years", (s, name: string, years: number) => {
+  const w = levyGame(s).w;
+  const p = at(s, name);
+  expect(PL.spared_years).toBe(years);
+  expect(startOutbreak(w, p, [])).toBe(false);
+  w.day += years * 365;
+  expect(spared(w, p)).toBe(false);
+});
+When("a plague week passes", (s) => {
+  const w = levyGame(s).w;
+  const p = s.sick as number;
+  s.classesBefore = Array.from(w.provinceClasses.subarray(p * CLASS_COUNT, (p + 1) * CLASS_COUNT));
+  const was = PL.spread_week;
+  PL.spread_week = 0;
+  try {
+    plagueWeek(s);
+  } finally {
+    PL.spread_week = was;
+  }
+});
+Then("the townsfolk of {string} die faster than its countryfolk", (s, name: string) => {
+  const w = levyGame(s).w;
+  const p = at(s, name);
+  const after = Array.from(w.provinceClasses.subarray(p * CLASS_COUNT, (p + 1) * CLASS_COUNT));
+  const sum = (r: number[], town: boolean) => r.reduce((a, n, k) => a + (TOWN.has(CLASS_NAMES[k]!) === town ? n : 0), 0);
+  const b = s.classesBefore as number[];
+  const townRate = 1 - sum(after, true) / sum(b, true);
+  const countryRate = 1 - sum(after, false) / sum(b, false);
+  expect(townRate).toBeGreaterThan(0);
+  expect(townRate).toBeGreaterThan(countryRate);
+});
+Then("the dead of the plague in {string} are counted", (s, name: string) => {
+  expect(levyGame(s).w.provincePlagueDead[at(s, name)]).toBeGreaterThan(0);
+});
+Given("the province {string} has a trade ratio of {int} in the game", (s, name: string, r: number) => {
+  const g = levyGame(s);
+  const p = at(s, name);
+  g.w.provinceTradeRatio[p] = r;
+  s.taxBefore = provinceTax(g.w, p, g.n);
+});
+Then("the trade ratio of {string} is {int}", (s, name: string, r: number) => {
+  expect(levyGame(s).w.provinceTradeRatio[at(s, name)]).toBe(r);
+});
+Then("{string} pays at most half its tax", (s, name: string) => {
+  const g = levyGame(s);
+  expect(provinceTax(g.w, at(s, name), g.n)).toBeLessThanOrEqual(s.taxBefore * PL.quarantine_tax_factor + 1e-9);
+});
+Then("{string} is open", (s, name: string) => {
+  expect(levyGame(s).w.provinceQuarantine[at(s, name)]).toBe(0);
+});
+Then("{string} is closed", (s, name: string) => {
+  expect((s.loaded ?? levyGame(s).w).provinceQuarantine[at(s, name)]).toBe(1);
+});
+Given("{string} is a crowded town of an AI realm with plague {string}", (s, name: string, step: string) => {
+  const w = levyGame(s).w;
+  w.player = -1;
+  const p = at(s, name);
+  const row = w.provinceClasses.subarray(p * CLASS_COUNT, (p + 1) * CLASS_COUNT);
+  CLASS_NAMES.forEach((c, k) => TOWN.has(c) && (row[k] = row[k]! * 10));
+  w.provincePopulation[p] = row.reduce((a, b) => a + b, 0);
+  expect(crowding(w, p)).toBeGreaterThanOrEqual(1);
+  expect(startOutbreak(w, p, [])).toBe(true);
+  expect(w.provincePlague[p]).toBe(STEP(step));
+});
+Then("its realm has closed {string}", (s, name: string) => {
+  expect(levyGame(s).w.provinceQuarantine[at(s, name)]).toBe(1);
+});
+Then("its realm has opened {string} again", (s, name: string) => {
+  expect(levyGame(s).w.provinceQuarantine[at(s, name)]).toBe(0);
+});
+When("the plague game is saved and loaded", (s) => {
+  const w = levyGame(s).w;
+  const back = restoreWorld(new Map(worldChunks(w, { playerNation: "france", options: {} as never }).map((c) => [c.id, c])), w.rules).world;
+  s.game = { ...levyGame(s), w: back };
+  s.loaded = back;
+});
+
+// Officials with fewer taps (PROV-342 to PROV-347).
+const royalOf = (w: any, n: number): number[] => Array.from({ length: w.provinceCount }, (_, p) => p).filter((p) => w.provinceOwner[p] === n && w.provinceLord[p] < 0);
+const filledOf = (w: any, n: number): number[] => royalOf(w, n).filter((p) => w.provinceOfficial[p] >= 0);
+Given("the player has turned Auto-fill posts off", (s) => {
+  expect(applyNow(s.game, { type: "autoFillPosts", on: false }, s.me).rejectedOrders).toEqual([]);
+});
+Given("{int} of its royal posts stand empty and its officials cap has room for them", (s, k: number) => {
+  s.emptied = filledOf(s.game, s.me).slice(0, k);
+  for (const p of s.emptied) s.game.provinceOfficial[p] = -1;
+});
+Given("{int} of its royal posts stand empty and its officials cap has room for {int}", (s, k: number, room: number) => {
+  s.emptied = filledOf(s.game, s.me).slice(0, k);
+  for (const p of s.emptied) s.game.provinceOfficial[p] = -1;
+  s.game.nationCustomOfficials[s.me] -= k - room;
+});
+Given("it has gold for two hires and the 20 gold kept back", (s) => {
+  s.game.nationTreasury[s.me] = 20 + 2 * hireGold(false) + 5;
+});
+When("a new month begins", (s) => {
+  const w = s.game;
+  const m = w.date.month;
+  s.news = [];
+  while (w.date.month === m) s.news.push(...processTurn(w, [], w.player).news);
+});
+Then("the two posts with the most people are filled by their best fit", (s) => {
+  const w = s.game;
+  const most = [...s.emptied].sort((a: number, b: number) => w.provincePopulation[b] - w.provincePopulation[a] || a - b);
+  for (const p of most.slice(0, 2)) expect(w.provinceOfficial[p]).toBe(bestFit(w, p).type);
+  expect(w.provinceOfficial[most[2]]).toBe(-1);
+});
+Then("the treasury keeps at least {int} gold", (s, g: number) => {
+  expect(s.game.nationTreasury[s.me]).toBeGreaterThanOrEqual(g);
+});
+Then("the player reads one line of news naming both hires", (s) => {
+  const lines = s.news.filter((x: { text: string }) => x.text.startsWith("Auto-fill:"));
+  expect(lines.length).toBe(1);
+  expect(lines[0].text.split(";").length).toBe(2);
+});
+Then("{int} of the two posts is filled", (s, k: number) => {
+  expect(s.emptied.filter((p: number) => s.game.provinceOfficial[p] >= 0).length).toBe(k);
+});
+Given("a royal province of {string} that is calm, fed, unwalled or inland, and no trade city", (s) => {
+  const w = s.game;
+  s.post = royalOf(w, s.me)[0];
+  w.provinceStore[s.post] = w.provincePopulation[s.post] * 12;
+  w.provinceGrievances[s.post] = 0;
+  w.provincePassed[s.post] = 0;
+});
+Then("its best fit is a tax collector, for its tax a month", (s) => {
+  const f = bestFit(s.game, s.post);
+  expect(OFFICIALS[f.type]).toBe("Tax collector");
+  expect(f.why).toMatch(/gold tax a month/);
+});
+When("the province riots", (s) => {
+  s.game.provinceGrievances[s.post] = 0xffff;
+});
+Then("its best fit is a judge, for the riots", (s) => {
+  expect(bestFit(s.game, s.post)).toEqual({ type: OFFICIALS.indexOf("Judge"), why: "riots here" });
+});
+Given("it has gold and room under its officials cap", (s) => {
+  s.game.nationTreasury[s.me] = 1000;
+  s.game.nationCustomOfficials[s.me] += 5;
+});
+Then("the province's post is filled by its best fit", (s) => {
+  expect(s.game.provinceOfficial[s.taken]).toBe(bestFit(s.game, s.taken).type);
+});
+Then("End turn does not wait on it", (s) => {
+  expect(newLands(s.game, s.me)).toEqual([]);
+});
+Given("it has {int} gold", (s, g: number) => {
+  s.game.nationTreasury[s.me] = g;
+});
+When("the player replaces an official with a native hire of another type serving elsewhere", (s) => {
+  const w = s.game;
+  const own = filledOf(w, s.me);
+  s.post = own[0];
+  s.newType = w.provinceOfficial[own.find((p) => w.provinceOfficial[p] !== w.provinceOfficial[s.post])!];
+  expect(applyNow(w, { type: "dismissOfficial", province: s.post, hire: { official: s.newType, foreign: false } }, s.me).rejectedOrders).toEqual([]);
+});
+Then("the new official holds the post in his first year and {int} gold are paid", (s, g: number) => {
+  expect(s.game.provinceOfficial[s.post]).toBe(s.newType);
+  expect(yearsServed(s.game, s.post)).toBe(0);
+  expect(s.game.nationTreasury[s.me]).toBe(100 - g);
+});
+When("the player dismisses an official", (s) => {
+  expect(applyNow(s.game, { type: "dismissOfficial", province: s.post }, s.me).rejectedOrders).toEqual([]);
+});
+Then("his post stands empty", (s) => {
+  expect(s.game.provinceOfficial[s.post]).toBe(-1);
+});
+Given("an official was commissioned and his post filled since", (s) => {
+  const w = s.game;
+  w.nationTreasury[s.me] = 1000;
+  s.post = filledOf(w, s.me)[0];
+  expect(applyNow(w, { type: "commission", province: s.post }, s.me).rejectedOrders).toEqual([]);
+  s.commander = w.commanderOwner.findLastIndex((o: number) => o === s.me);
+  w.provinceOfficial[s.post] = 0;
+  for (const p of royalOf(w, s.me)) if (w.provinceOfficial[p] < 0) w.provinceOfficial[p] = 0;
+});
+When("the player releases him with another post empty", (s) => {
+  const w = s.game;
+  s.other = filledOf(w, s.me).find((p) => p !== s.post);
+  w.provinceOfficial[s.other] = -1;
+  expect(applyNow(w, { type: "release", commander: s.commander }, s.me).rejectedOrders).toEqual([]);
+});
+Then("he takes that post in his first year", (s) => {
+  expect(s.game.provinceOfficial[s.other]).toBeGreaterThanOrEqual(0);
+  expect(yearsServed(s.game, s.other)).toBe(0);
 });

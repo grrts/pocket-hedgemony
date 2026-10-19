@@ -9,6 +9,7 @@ import { OFFICIALS, officialAt, yearsServed } from "./officials.ts";
 import { storeMonths } from "./food.ts";
 import { child, dynastic, rulerLabel, throneLaw } from "./rulers.ts";
 import { realmConfig } from "./domain/realm/index.ts";
+import { setQuarantine } from "./plague.ts";
 
 /**
  * Everyday events (events §5.22, EVT-115 to EVT-128; feedback 152): small
@@ -20,12 +21,15 @@ import { realmConfig } from "./domain/realm/index.ts";
  * same event card as the historical events.
  */
 
-type Effect = { gold?: number; loyalty?: string; who?: string; count?: number; official?: "new" | "seasoned"; lands?: "crown"; heir?: "child"; heir_risk?: number; food_back?: number; new_lord?: boolean };
+type Effect = { quarantine?: boolean; care?: boolean; gold?: number; loyalty?: string; who?: string; count?: number; official?: "new" | "seasoned"; lands?: "crown"; heir?: "child"; heir_risk?: number; food_back?: number; new_lord?: boolean };
 type OptionDef = { id: string; name: string; needs?: string; ai: number; effects: Effect[] };
 type EventDef = { weight: number; needs: string; loss?: number; title: string; text: string; options: OptionDef[] };
 
 const DEFS = data.events as Record<string, EventDef>;
 const IDS = Object.keys(DEFS);
+/** The events a month may draw (plague comes only when it reaches a province), and their weights together. */
+const DRAWN = IDS.filter((d) => DEFS[d]!.weight > 0);
+const DRAWN_WEIGHT = DRAWN.reduce((a, d) => a + DEFS[d]!.weight, 0);
 const UP = new Set(realmConfig.loyalty.up as string[]);
 const R = realmConfig.ruler;
 
@@ -205,20 +209,24 @@ export function monthlyEveryday(world: World, news: News[]): void {
     }
     s.due[n] = now + between(s.rng, data.months_between);
     m ??= { lords: landedLords(world), provinces: provincesBy(world) };
-    // Draw by weight among the events this realm could have now.
-    const bound: EverydayEvent[] = [];
-    const weights: number[] = [];
-    for (const def of IDS) {
+    // Draw by weight among the events this realm could have now. One that has nothing to be
+    // about is set aside and the draw is made again among the rest, which picks with the same
+    // odds as weighing only those that could come, while binding just the one or two drawn.
+    const left = DRAWN.slice();
+    let total = DRAWN_WEIGHT;
+    while (left.length) {
+      let roll = s.rng.next() * total;
+      let k = 0;
+      while (k < left.length - 1 && (roll -= DEFS[left[k]!]!.weight) >= 0) k++;
+      const def = left[k]!;
       const ev = bind(world, s, m, def, n);
-      if (!ev) continue;
-      bound.push(ev);
-      weights.push(DEFS[def]!.weight);
+      if (ev) {
+        fire(world, s, ev, news);
+        break;
+      }
+      total -= DEFS[def]!.weight;
+      left.splice(k, 1);
     }
-    if (!bound.length) continue;
-    let roll = s.rng.next() * weights.reduce((a, b) => a + b, 0);
-    let k = 0;
-    while (k < bound.length - 1 && (roll -= weights[k]!) >= 0) k++;
-    fire(world, s, bound[k]!, news);
   }
 }
 
@@ -243,6 +251,20 @@ function fire(world: World, s: EverydayState, ev: EverydayEvent, news: News[]): 
   }
   s.pending.push(ev);
   news.push({ kind: "event", text: `${fill(world, ev, DEFS[ev.def]!.title)}: your answer is awaited.`, nations: [ev.nation], ...(ev.province !== undefined ? { province: ev.province } : {}) });
+}
+
+/**
+ * Plague reaches a province of the player's (EVT-130): a card asks what to do,
+ * unless one about plague already waits (the News tells of the rest). Plague
+ * itself fires it; it is never drawn. The AI follows its own quarantine rule.
+ */
+export function plagueReached(world: World, p: number): void {
+  const n = world.provinceOwner[p]!;
+  if (n < 0 || n !== world.player) return;
+  const s = stateOf(world);
+  if (s.pending.some((e) => e.def === "plague_reaches")) return;
+  const ev: EverydayEvent = { id: `everyday:${++s.seq}`, def: "plague_reaches", nation: n, at: monthIndex(world), province: p };
+  s.pending.push(ev);
 }
 
 /** The options open to the realm: one that costs gold it lacks or asks a lord it has none of is hidden (EVT-120). */
@@ -323,6 +345,8 @@ function choose(world: World, s: EverydayState, ev: EverydayEvent, o: OptionDef,
         r.heir = null;
       }
     } else if (e.heir_risk) told.push(`${world.rulers[n]!.heir?.name ?? "The heir"} recovers.`);
+    if (e.quarantine && ev.province !== undefined) setQuarantine(world, n, ev.province, true, mine ? news : []);
+    if (e.care && ev.province !== undefined && world.provincePlague[ev.province]) world.provincePlagueCare[ev.province] = 1;
     if (e.food_back && ev.province !== undefined && ev.loss) world.provinceStore[ev.province] = world.provinceStore[ev.province]! + ev.loss * e.food_back;
   }
   if (mine) {
@@ -389,6 +413,8 @@ function describe(world: World, ev: EverydayEvent, e: Effect, o: OptionDef): str
     return r && !r.heir && dynastic(throneLaw(world, ev.nation)) ? `${ev.name} becomes your heir` : null;
   }
   if (e.heir_risk) return `${Math.round(e.heir_risk * 10)} in 10 that ${world.rulers[ev.nation]?.heir?.name ?? "the heir"} dies`;
+  if (e.quarantine) return "Its trade stops and its tax falls by half until you lift the quarantine; plague gets in and out far less";
+  if (e.care) return "Half as many die, and the outbreak lasts the shortest time";
   if (e.food_back) return `${e.food_back === 0.5 ? "Half" : `${Math.round(e.food_back * 100)}%`} of the lost grain is made good`;
   return null;
 }

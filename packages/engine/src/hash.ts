@@ -6,6 +6,7 @@ import { rebelsHashData } from "./rebels.ts";
 import { revolutionsHashData } from "./revolutions.ts";
 import { institutionsHashData } from "./institutions.ts";
 import { tribesHashData } from "./tribes.ts";
+import { plagueHashData } from "./plague.ts";
 import type { World } from "./world.ts";
 
 /**
@@ -56,7 +57,7 @@ export function hashWorld(world: World): string {
   feed(world.nationNeglect);
   feed(Float64Array.from(world.sites.flatMap((s) => [s.nation, s.province, s.work, s.step, s.monthsLeft])));
   feed(Int32Array.from(world.workQueue.flatMap((q) => [q.nation, q.province, q.work, q.step])));
-  feed(Int32Array.from(world.lords.flatMap((l) => [l.nation, LOYALTY.indexOf(l.loyalty), l.upCredit])));
+  feed(Int32Array.from(world.lords.flatMap((l) => [l.nation, LOYALTY.indexOf(l.loyalty), l.upCredit, l.age ?? -1, l.heir?.age ?? -1, l.gone ? 1 : 0])));
   feed(researchHashData(world));
   feed(castleFoodHashData(world));
   // Army fields of live slots only: a dead slot keeps whatever it held, and a save drops it.
@@ -81,7 +82,7 @@ export function hashWorld(world: World): string {
   feed(live(a.home));
   feed(live(a.drill));
   feed(live(a.mix, a.mix.length / a.alive.length));
-  feed(new Int32Array(world.commanders.flatMap((c) => [c.might, c.cunning, c.logistics, c.victories, c.defeats])));
+  feed(new Int32Array(world.commanders.flatMap((c) => [c.might, c.cunning, c.logistics, c.victories, c.defeats, c.age])));
   feed(new Float64Array(world.musters.flatMap((m) => [m.nation, m.province, m.men, m.daysLeft])));
   feed(new Float64Array(world.mercs.flatMap((m) => [m.nation, m.company.id, m.weeksLeft])));
   feed(new Float64Array(world.freeCompanies.flatMap((c) => [c.id, c.home, ...c.byArm])));
@@ -97,6 +98,7 @@ export function hashWorld(world: World): string {
   feed(revolutionsHashData(world));
   feed(institutionsHashData(world));
   feed(tribesHashData(world));
+  for (const v of plagueHashData(world)) feed(v);
   feed(world.provinceLightTax);
   feed(world.provinceSelfRule);
   feed(world.provinceTongue);
@@ -111,7 +113,9 @@ export function hashWorld(world: World): string {
   feed(world.provinceOfficialSeed);
   feed(world.provinceOfficialSince);
   feed(world.provinceOfficialFrom);
+  feed(world.provinceOfficialAge);
   feed(world.provinceNewLand);
+  feed(world.nationManualPosts);
   feed(live(a.trainArm));
   feed(live(a.trainMen));
   feed(live(a.trainLeft));

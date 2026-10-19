@@ -11,7 +11,8 @@ import { achievementsView, startAchievements } from "./achievements.ts";
 import { eventCards, type EventCard } from "./events.ts";
 import { everydayCards } from "./everyday.ts";
 import { diplomacyLensView, type DiplomacyLensView } from "./diplomacyLens.ts";
-import { giftGold } from "./lords.ts";
+import { giftGold, lordOfCommander } from "./lords.ts";
+import { retinueView, type RetinueState } from "./retinues.ts";
 import { stabilityOf, type Stability } from "./stability.ts";
 import { governmentView, realmForms, realmTitles, type GovernmentView } from "./government.ts";
 import type { Titles } from "./domain/realm/index.ts";
@@ -26,6 +27,7 @@ import { peoplesSnapshot, type PeoplesSnapshot } from "./peoples.ts";
 import { faithHeadsView, type FaithHeadsView } from "./faithHeads.ts";
 import { campaignView, setPlayer, type CampaignView } from "./campaignEnd.ts";
 import { GRIEVANCES, moodIndex, MOODS } from "./moods.ts";
+import { PLAGUE_STEPS, quarantineTaxShare } from "./plague.ts";
 import { CLASS_NAMES } from "./living.ts";
 import { canBorrow, heldTax, LEDGER, loanDebt, loanUnsettlesLords, LEDGER_LINES, NORMAL_TAX, TAX_RATES } from "./treasury.ts";
 import { feverOf, FEVER_STEPS } from "./land.ts";
@@ -50,7 +52,8 @@ import { openSave, writeSave, memoryStorage, type Campaign, type SaveHeader, typ
 import { Rng } from "./rng.ts";
 import { explorationView, type ExplorationView } from "./colonies.ts";
 import { realmResearch, researchView, type ResearchView } from "./research.ts";
-import { newLands, officialAt, yearsServed } from "./officials.ts";
+import { lordAge, officialAge } from "./people.ts";
+import { autoFillReserve, autoFills, fillAllCost, fitHires, newLands, officialAt, yearsServed } from "./officials.ts";
 import { armyPay, armyRations, ARMS, menByArm, companyMen, companyPay, companyWeeks, freeCompaniesFor, type FreeCompany, nationPay, OFFICIALS, daysToGather, gatherDays, garrisonViews, trainingGrounds, type GarrisonView } from "./recruit.ts";
 import { warPeaceView, type WarPeaceView } from "./peace.ts";
 import { subjectTies } from "./subjects.ts";
@@ -215,13 +218,21 @@ export interface Snapshot {
   provinceHarvest: Int8Array;
   provinceStarved: Float32Array;
   harvests: readonly string[];
-  /** The weather of each province's last harvest (-1 bad, 0 normal, 1 good), its harvest climate (index into climates) and the months it harvests. */
+  /** The weather of each province's last harvest (-1 bad, 0 normal, 1 good), its harvest climate (index into climates) and the months it harvests (bit m-1 set for month m: one number a province, not an array, as the snapshot is copied every day). */
   provinceWeather: Int8Array;
   provinceClimate: Int8Array;
-  provinceHarvestMonths: number[][];
+  provinceHarvestMonths: Uint16Array;
   /** Each province's fever land (index into feverSteps: none, mild, harsh, deadly), PROV-243. */
   provinceFever: Int8Array;
   feverSteps: readonly string[];
+  /** Each province's plague step (index into plagueSteps: none, rumour, outbreak, burning out) and whether its owner has closed it (PROV-361). */
+  provincePlague: Int8Array;
+  provinceQuarantine: Uint8Array;
+  plagueSteps: readonly string[];
+  /** The sick provinces: step, plague weeks left at it (about a week each) and people dead of this plague so far. */
+  plague: { province: number; step: number; weeks: number; dead: number }[];
+  /** What a closed province still pays of its tax. */
+  quarantineTax: number;
   climates: readonly string[];
   /** What bad weather is called in each climate (drought, floods, bad weather). */
   badWeather: readonly string[];
@@ -236,8 +247,11 @@ export interface Snapshot {
   grievanceNames: readonly string[];
   moods: readonly string[];
   /** Every lord (index = provinceLord's value): name, house, realm, loyalty and provinces held; the gold a gift costs. */
-  lords: { name: string; house: string; nation: number; loyalty: string; lands: number }[];
+  /** Lords by index; age, heir and gone for REALM-273 (a gone lord's line died out and he is listed nowhere). */
+  lords: { name: string; house: string; nation: number; loyalty: string; lands: number; age: number; heir: { name: string; age: number } | null; gone: boolean }[];
   provinceLord: Int16Array;
+  /** The player's lords' retinues (WAR-252 to WAR-262): what each would bring, gathering or in the field (army = index in armies, -1), and why he can't be called. */
+  retinues: { lord: number; state: RetinueState; wouldBring: number; atHome: number; cap: number; gathering?: { men: number; days: number }; army: number; seat: number; refusal: string | null; leavesAfter: number | null }[];
   /** Each realm's direct overlord by nation index, -1 when it is nobody's subject (SUBJ-093: the world-zoom map washes a subject in it). */
   nationOverlord: Int16Array;
   giftGold: number;
@@ -303,13 +317,17 @@ export interface Snapshot {
   /** Name of the official at each province's post, or null when it stands empty (or no realm owns it). */
   provinceOfficialName: (string | null)[];
   /** Years the official at each post has served there, to one decimal (0 when empty); his effect grows to full at 5 (see officialEffect). */
-  provinceOfficialYears: number[];
+  provinceOfficialYears: Float64Array;
   /** Realm a foreign specialist at each post came from (nation index), -1 = one of the realm's own (PROV-334). */
-  provinceOfficialFrom: number[];
+  provinceOfficialFrom: Int16Array;
+  /** Age of each post's official, 0 for an empty post (REALM-275). */
+  provinceOfficialAge: Uint8Array;
   /** The player's provinces just taken that wait for a decision before the turn ends: fill the post, grant it, or keep it royal (PROV-340). */
   newLands: number[];
+  /** The player's posts (PROV-342 to PROV-348): whether Auto-fill posts is on, the gold it keeps back, what filling every empty post costs now, and the best fit for each royal post of the player's, by province. */
+  posts: { autoFill: boolean; reserve: number; fillAll: { posts: number; gold: number }; fit: Record<number, { type: number; why: string; foreign: boolean; gold: number }> };
   /** Every commander: who they serve (-1 = none), their skills and record, the army they lead (index in armies, -1 = at court) and the province they left as an official (-1 = none). */
-  commanders: { name: string; owner: number; might: number; cunning: number; logistics: number; victories: number; defeats: number; army: number; home: number; origin: string; fleet: number; /** An admiral (fleets only) rather than a general (armies only), RECR-128. */ sea: boolean }[];
+  commanders: { name: string; owner: number; age: number; might: number; cunning: number; logistics: number; victories: number; defeats: number; army: number; home: number; origin: string; fleet: number; lord: number; /** An admiral (fleets only) rather than a general (armies only), RECR-128. */ sea: boolean }[];
   /** Ports, sailors and fleets: every fleet for the map, the player's ports and fleets in full (navy.ts). */
   navy: NavyView;
   /** Fleets the player can hire now, free fleets first (hiredFleets.ts, F-115). */
@@ -515,7 +533,12 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       provinceClimate: provinceClimates(w).slice(),
       provinceFever: Int8Array.from({ length: w.provinceCount }, (_, p) => feverOf(w, p)),
       feverSteps: FEVER_STEPS,
-      provinceHarvestMonths: Array.from({ length: w.provinceCount }, (_, p) => (w.provinceWater[p] ? [] : harvestMonthsOf(w, p))),
+      provincePlague: w.provincePlague.slice(),
+      provinceQuarantine: w.provinceQuarantine.slice(),
+      plagueSteps: PLAGUE_STEPS,
+      plague: w.plagueSick.map((p) => ({ province: p, step: w.provincePlague[p]!, weeks: w.provincePlagueWeeks[p]!, dead: Math.round(w.provincePlagueDead[p]! * 1000) })),
+      quarantineTax: quarantineTaxShare(),
+      provinceHarvestMonths: Uint16Array.from({ length: w.provinceCount }, (_, p) => (w.provinceWater[p] ? 0 : harvestMonthsOf(w, p).reduce((bits, m) => bits | (1 << (m - 1)), 0))),
       climates: CLIMATES,
       badWeather: CLIMATES.map(badWeatherName),
       ...(mapNetwork(w), { provinceCastle: w.provinceCastle.slice(), provinceRing: w.provinceRing.slice() }),
@@ -527,7 +550,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       lords: (() => {
         const lands = new Int32Array(w.lords.length);
         for (let p = 0; p < w.provinceCount; p++) if (w.provinceLord[p]! >= 0) lands[w.provinceLord[p]!]!++;
-        return w.lords.map((l, k) => ({ name: l.name, house: l.house, nation: l.nation, loyalty: l.loyalty, lands: lands[k]! }));
+        return w.lords.map((l, k) => ({ name: l.name, house: l.house, nation: l.nation, loyalty: l.loyalty, lands: lands[k]!, ...lordAge(w, k), gone: !!l.gone }));
       })(),
       provinceLord: w.provinceLord.slice(),
       nationOverlord: (() => {
@@ -571,12 +594,15 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       freeCompanies: player >= 0 ? freeCompaniesFor(w, player).map((c) => ({ ...companyView(c), id: c.id, pay: companyPay(w, c, player), weeks: companyWeeks(w, c, player) })) : [],
       provinceOfficial: Array.from(w.provinceOfficial, (o) => (o >= 0 ? OFFICIALS[o]! : null)),
       provinceOfficialName: Array.from({ length: w.provinceCount }, (_, p) => officialAt(w, p)),
-      provinceOfficialYears: Array.from({ length: w.provinceCount }, (_, p) => Math.floor(yearsServed(w, p) * 10) / 10),
-      provinceOfficialFrom: Array.from(w.provinceOfficialFrom),
+      provinceOfficialYears: Float64Array.from({ length: w.provinceCount }, (_, p) => Math.floor(yearsServed(w, p) * 10) / 10),
+      provinceOfficialFrom: w.provinceOfficialFrom.slice(),
+      provinceOfficialAge: Uint8Array.from({ length: w.provinceCount }, (_, p) => (w.provinceOfficial[p]! >= 0 ? officialAge(w, p) : 0)),
       newLands: player >= 0 ? newLands(w, player) : [],
+      posts: player >= 0 ? postsView(w, player) : { autoFill: false, reserve: autoFillReserve(), fillAll: { posts: 0, gold: 0 }, fit: {} },
       commanders: w.commanders.map((c, k) => ({
         name: c.name,
         owner: w.commanderOwner[k]!,
+        age: c.age,
         might: c.might,
         cunning: c.cunning,
         logistics: c.logistics,
@@ -586,8 +612,17 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         home: w.commanderHome[k]!,
         origin: c.origin ?? "",
         fleet: w.navy.fleets.find((f) => f.admiral === k)?.id ?? -1,
+        lord: lordOfCommander(w, k),
         sea: w.commanderSea[k] === 1,
       })),
+      retinues:
+        player >= 0
+          ? w.lords.flatMap((l, k) => {
+              if (l.nation !== player) return [];
+              const v = retinueView(w, player, k);
+              return [{ lord: k, ...v, army: v.army >= 0 ? live.indexOf(v.army) : -1 }];
+            })
+          : [],
       navy: navyView(w, player),
       fleetsForHire: player >= 0 ? fleetOffersView(w, player) : [],
       exploration: explorationView(w, player),
@@ -778,4 +813,9 @@ function pathHours(world: World, slot: number): Float32Array {
     out[k - from] = Math.max(0, hours);
   }
   return out;
+}
+
+/** The player's posts for the Officials tab and the post and official screens (PROV-348). */
+function postsView(w: World, n: number): Snapshot["posts"] {
+  return { autoFill: autoFills(w, n), reserve: autoFillReserve(), fillAll: fillAllCost(w, n), fit: fitHires(w, n) };
 }
