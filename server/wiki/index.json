@@ -6087,6 +6087,11 @@
      "level": 2
     },
     {
+     "id": "homes",
+     "text": "Homes",
+     "level": 3
+    },
+    {
      "id": "suggest",
      "text": "Suggest",
      "level": 3
