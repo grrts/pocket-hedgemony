@@ -27,6 +27,9 @@ type EventDef = { weight: number; needs: string; loss?: number; title: string; t
 
 const DEFS = data.events as Record<string, EventDef>;
 const IDS = Object.keys(DEFS);
+/** The events a month may draw (plague comes only when it reaches a province), and their weights together. */
+const DRAWN = IDS.filter((d) => DEFS[d]!.weight > 0);
+const DRAWN_WEIGHT = DRAWN.reduce((a, d) => a + DEFS[d]!.weight, 0);
 const UP = new Set(realmConfig.loyalty.up as string[]);
 const R = realmConfig.ruler;
 
@@ -206,21 +209,24 @@ export function monthlyEveryday(world: World, news: News[]): void {
     }
     s.due[n] = now + between(s.rng, data.months_between);
     m ??= { lords: landedLords(world), provinces: provincesBy(world) };
-    // Draw by weight among the events this realm could have now.
-    const bound: EverydayEvent[] = [];
-    const weights: number[] = [];
-    for (const def of IDS) {
-      if (!DEFS[def]!.weight) continue;
+    // Draw by weight among the events this realm could have now. One that has nothing to be
+    // about is set aside and the draw is made again among the rest, which picks with the same
+    // odds as weighing only those that could come, while binding just the one or two drawn.
+    const left = DRAWN.slice();
+    let total = DRAWN_WEIGHT;
+    while (left.length) {
+      let roll = s.rng.next() * total;
+      let k = 0;
+      while (k < left.length - 1 && (roll -= DEFS[left[k]!]!.weight) >= 0) k++;
+      const def = left[k]!;
       const ev = bind(world, s, m, def, n);
-      if (!ev) continue;
-      bound.push(ev);
-      weights.push(DEFS[def]!.weight);
+      if (ev) {
+        fire(world, s, ev, news);
+        break;
+      }
+      total -= DEFS[def]!.weight;
+      left.splice(k, 1);
     }
-    if (!bound.length) continue;
-    let roll = s.rng.next() * weights.reduce((a, b) => a + b, 0);
-    let k = 0;
-    while (k < bound.length - 1 && (roll -= weights[k]!) >= 0) k++;
-    fire(world, s, bound[k]!, news);
   }
 }
 
