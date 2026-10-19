@@ -1419,6 +1419,9 @@ button.small {
   align-items: flex-start;
   gap: 2px;
   min-height: 44px;
+  /* Long options grow taller instead of being squeezed and cut off. */
+  flex-shrink: 0;
+  height: auto;
   padding: 6px 10px;
   text-align: left;
 }

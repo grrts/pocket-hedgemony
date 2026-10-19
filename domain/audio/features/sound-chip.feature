@@ -1,14 +1,14 @@
 @context-audio
 Feature: The PH-5 sound chip
   As a player
-  I want music and effects from one small 8-bit chip with honest limits
-  So that the game sounds like one handheld everywhere and stays tiny to download
+  I want effects from one small 8-bit chip with honest limits, and music on real instruments
+  So that the game sounds like one handheld everywhere, stays small to download, and its music is pleasant to hear
 
   @AUD-003
-  Scenario: Everything is synthesized from note data
+  Scenario: Effects are synthesized; the music plays its own tunes on instrument packs
     Given the game is installed
-    Then it ships no recorded audio files for music or effects
-    And every sound is synthesized at runtime on the PH-5 chip
+    Then the only audio files it ships are the music's instrument packs
+    And every effect is synthesized at runtime on the PH-5 chip
 
   @AUD-004 @AUD-005
   Scenario Outline: Music voices per era
@@ -29,7 +29,7 @@ Feature: The PH-5 sound chip
 
     Examples:
       | thing |
-      | a sample of a real instrument |
+      | a sample outside the instrument packs |
       | a reverb tail |
       | a chord on one voice |
       | a sixth voice in Era III |

@@ -653,6 +653,10 @@ export interface EventCard {
   /** What happens whatever is chosen. */
   always: string[];
   options: { id: string; name: string; historical: boolean; effects: string[] }[];
+  /** An everyday event of the realm's own people (EVT-121): no year in history. */
+  everyday?: boolean;
+  /** The province it is about, for Look at the map. */
+  province?: number;
 }
 
 /** The events waiting for a realm's answer, oldest first (EVT-044). */

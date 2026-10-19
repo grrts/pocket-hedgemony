@@ -9,6 +9,7 @@ import { chronicleView, goalViews, type ChronicleView, type GoalView } from "./c
 import { createGoals, monthlyGoals } from "./goals.ts";
 import { achievementsView, startAchievements } from "./achievements.ts";
 import { eventCards, type EventCard } from "./events.ts";
+import { everydayCards } from "./everyday.ts";
 import { diplomacyLensView, type DiplomacyLensView } from "./diplomacyLens.ts";
 import { giftGold } from "./lords.ts";
 import { stabilityOf, type Stability } from "./stability.ts";
@@ -468,7 +469,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
       rulers: rulerViews(w),
       fallen: player >= 0 ? fallenEffect(w, player) : null,
       beliefLow: player >= 0 ? { faith: lowFaith(w, player), tongue: lowTongue(w, player), under: realmConfig.belief.low_percent } : null,
-      events: eventCards(w, player),
+      events: [...eventCards(w, player), ...everydayCards(w, player)],
       diplomacyLens: diplomacyLensView(w, player),
       sieges: [...w.sieges].map(([p, st]) => {
         const food = foodMonths(st.siege);

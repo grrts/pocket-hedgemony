@@ -41,6 +41,7 @@ export { askTheCourt, breakShogunate, closeCountry, closedTo, confirmHouse, endS
 export type { EventCard } from "./events.ts";
 export { foundByEvent, treeView } from "./events.ts";
 export { answerEvent, applyEventEffects, createGameEvents, eventCards, eventConditionHolds, monthlyEvents } from "./events.ts";
+export { answerEveryday, everydayCards, monthlyEveryday } from "./everyday.ts";
 export { adminCapacityRank, ASSESSMENT_DIMENSIONS, LEVEL_RANK, realmAssessment, realmStrengths, RISK_DIMENSIONS, type AssessmentConfidence, type AssessmentLevel, type HeritageLine, type RealmAssessment, type RealmHeritage, type RealmHeyday, type RealmStrengths } from "./realmStrengths.ts";
 export { effectInPlay, heritageChoice, heritageFactor, heritageTaxReach, heritageView, IN_PLAY, monthlyHeritage, type HeritageView } from "./heritage.ts";
 export { realmStartingCounts } from "./startingCounts.ts";

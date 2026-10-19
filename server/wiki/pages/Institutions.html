@@ -1,0 +1,120 @@
+<h1>Institutions</h1>
+<p>Some realms belong to something bigger than themselves. At the 1378 start that is <strong>the Empire</strong>, whose Emperor is elected by seven seats and is only as strong as his hold over its members. <strong>The Shogunate</strong> in Japan works the same way: the shogun is only as strong as his hold over the great houses. Every number here is provisional and lives in <code>institutions.json</code>.</p>
+<h2 id="hold"><a class="anchor" href="#hold" aria-label="Link to this section">#</a>Hold</h2>
+<p>An institution&#39;s office is worth its <strong>hold</strong>, 0 to 100, named by a word: <strong>Hollow</strong> (0 to 19), <strong>Weak</strong> (20 to 49), <strong>Firm</strong> (50 to 79) and <strong>Strong</strong> (80 to 100). Some things move it at once (answering a call to defend a member); the rest is added up each January, and the Hold fold shows each gain and loss with its cause.</p>
+<p>What the Empire&#39;s hold counts each year:</p>
+<div class="table-scroll"><table>
+<thead><tr><th></th><th style="text-align:right">Hold</th></tr></thead>
+<tbody>
+<tr><td>No war between members and no imperial land held by outsiders</td><td style="text-align:right">+2</td></tr>
+<tr><td>Each war between two members</td><td style="text-align:right">−3</td></tr>
+<tr><td>Each imperial province an outsider holds</td><td style="text-align:right">−2 (at most −10)</td></tr>
+<tr><td>Each member that left</td><td style="text-align:right">−5</td></tr>
+<tr><td>Each member whose faith is not the Emperor&#39;s (halved after the Peace of Augsburg, none after Westphalia)</td><td style="text-align:right">−1</td></tr>
+<tr><td>Defending a member when called</td><td style="text-align:right">+10</td></tr>
+<tr><td>Refusing, or not answering, a call to defend a member</td><td style="text-align:right">−15</td></tr>
+</tbody></table></div>
+<h2 id="the-empire"><a class="anchor" href="#the-empire" aria-label="Link to this section">#</a>The Empire</h2>
+<h3 id="members-and-imperial-land"><a class="anchor" href="#members-and-imperial-land" aria-label="Link to this section">#</a>Members and imperial land</h3>
+<p>On 20 September 1378 the crown is held by <strong>Charles IV</strong> of the house of Luxembourg, King of Bohemia, aged 62. In history he dies on 29 November, in the tenth week, and his son <strong>Wenceslaus</strong>, aged 17 and already elected King of the Romans, follows him without an election. Wenceslaus&#39;s deposition (1400) and the reigns of Rupert, Jobst and Sigismund are events. The members are the realms whose capital lies in imperial land, from the Low Countries&#39; fiefs, Lorraine and Savoy to Bohemia, Austria and the north German princes and cities. The hold starts at 35 (Weak); Wenceslaus&#39;s Empire is weak, and this first value may be set lower.</p>
+<p><em>In the game today</em> the member list in <code>institutions.json</code> is still the one of the 1444 checkpoint (18 members, with Austria and Frederick III holding the crown); the 1378 list replaces it.</p>
+<p><strong>Imperial land</strong> is every province the members held on the start day. It never changes: a province an outsider takes stays imperial land, held by an outsider, and the Emperor holds the war aim <em>Restore imperial land</em> on whoever holds it.</p>
+<p>A member leaves when its capital is no longer in imperial land, when it becomes the subject of a realm outside the Empire, or when it is gone. The Emperor can ask a realm whose capital lies in imperial land to join; it answers by the reasons count.</p>
+<h3 id="seats-and-the-election"><a class="anchor" href="#seats-and-the-election" aria-label="Link to this section">#</a>Seats and the election</h3>
+<p>Seven seats elect the Emperor: Cologne, Bohemia, the Palatinate, Saxe-Wittenberg and Brandenburg, held by those realms, and the <strong>church seats</strong> of Mainz and Trier, which vote for the candidate the Pope thinks best of. A realm holds at most one seat, but a house can hold two: in 1378 the Luxembourgs hold both Bohemia and Brandenburg. Meissen and Thuringia, the Wettins&#39; land, have no seat yet; the Saxon seat passes to the Wettins (1423) and Brandenburg to the Hohenzollerns (1415) by event. When a seat&#39;s realm leaves or is gone, the seat stands <strong>vacant</strong> until the Emperor grants it to a member without one.</p>
+<p>The seats elect a new Emperor when the Emperor dies or his realm leaves the Empire. The election sits for a month. The candidates are the sitting house, the three members with the most soldiers and every member whose ruler stands for the crown, all of the Catholic faith until the Peace of Westphalia. Each seat votes for the candidate it rates highest:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Reason</th><th style="text-align:right"></th></tr></thead>
+<tbody>
+<tr><td>Standing toward the candidate</td><td style="text-align:right">÷ 4</td></tr>
+<tr><td>Same faith</td><td style="text-align:right">+10</td></tr>
+<tr><td>The sitting house</td><td style="text-align:right">+15</td></tr>
+<tr><td>A strong crown: the candidate has more soldiers</td><td style="text-align:right">+5 for each multiple, at most +20</td></tr>
+<tr><td>Sought our vote</td><td style="text-align:right">+15, fading over 10 years</td></tr>
+<tr><td>At war with the candidate</td><td style="text-align:right">−50</td></tr>
+</tbody></table></div>
+<p>Most votes win; a tie goes to the sitting house, then to the candidate with more soldiers. If you hold a seat, you cast its vote yourself while the election sits; if you say nothing, your seat votes by its reasons.</p>
+<p><strong>Seek their vote</strong> sends an envoy with a 30-gold gift to an elector&#39;s court. When he arrives, the elector holds the tie <em>Sought our vote</em> toward you.</p>
+<h3 id="the-emperor"><a class="anchor" href="#the-emperor" aria-label="Link to this section">#</a>The Emperor</h3>
+<ul>
+<li><strong>Defend the Empire.</strong> When a realm outside the Empire declares war on a member, or holds a member&#39;s imperial land in a war, the Emperor is called to defend it. Answering gives +10 hold. Refusing, or saying nothing for a month, costs 15 hold, and the attacked member and every elector hold the wrong <em>Left us to our fate</em> toward him.</li>
+<li><strong>Dues.</strong> Each month the Emperor receives 1 gold per member times hold ÷ 100, on the Tribute line of the treasury.</li>
+<li>He grants vacant seats and asks realms to join.</li>
+<li>He is bound by every reform like any member.</li>
+</ul>
+<h3 id="the-diet-and-the-reforms"><a class="anchor" href="#the-diet-and-the-reforms" aria-label="Link to this section">#</a>The Diet and the reforms</h3>
+<p>While hold is 50 or more, the Emperor may call the <strong>Diet</strong>, at most once every five years, on the next reform of the ladder. The reforms pass in order:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Reform</th><th>What it does</th></tr></thead>
+<tbody>
+<tr><td>Public Peace</td><td>A member that declares war on another member is a <strong>Breaker of the Peace</strong>: for ten years the Emperor and every member hold a war aim on it, and the Emperor is called to defend its victim.</td></tr>
+<tr><td>Imperial Court</td><td>A member with a war aim on another member&#39;s province may take it to court instead of to war. The court rules by the aim, both sides&#39; standing toward the Emperor and the hold. A ruling for the plaintiff moves the province with no war; refusing it makes the refuser a Breaker of the Peace. Saying nothing for a month hands it over.</td></tr>
+<tr><td>Circles</td><td>When an outsider attacks a member, every member of its circle joins the defence. The circles: Austrian, Bavarian, Swabian, Upper Rhenish, Electoral Rhenish, Lower Saxon and Upper Saxon.</td></tr>
+<tr><td>Common Tax</td><td>Every member pays 5 in 100 of its tax to the Emperor each month, in place of the dues.</td></tr>
+<tr><td>Imperial Army</td><td>When the Emperor answers a call to defend the Empire, he raises a contingent of a tenth of every member&#39;s soldiers at his capital for the war; it goes home with the peace.</td></tr>
+<tr><td>Hereditary Crown</td><td>The Emperor&#39;s heir takes the crown; no more elections.</td></tr>
+<tr><td>One Realm</td><td>Needs hold 80. Every other member&#39;s ruler becomes a great lord of the Emperor with his land, Wavering, and the Empire becomes one realm.</td></tr>
+</tbody></table></div>
+<p>The Diet sits for a month. Every member votes yes or no by its reasons; an elector&#39;s vote counts twice, and over half the votes pass it. Passing spends 30 hold and failing 10. If you are a member you vote on an answer card; saying nothing counts as no.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>A member&#39;s reason to vote yes</th><th style="text-align:right"></th></tr></thead>
+<tbody>
+<tr><td>The reform itself</td><td style="text-align:right">Public Peace +10, Imperial Court and Circles +5, Common Tax and Imperial Army −10, Hereditary Crown −25, One Realm −40</td></tr>
+<tr><td>The Empire&#39;s hold</td><td style="text-align:right">÷ 10</td></tr>
+<tr><td>Standing toward the Emperor</td><td style="text-align:right">÷ 4</td></tr>
+<tr><td>Same faith as the Emperor</td><td style="text-align:right">+10</td></tr>
+<tr><td>An outsider holds imperial land next to us</td><td style="text-align:right">+15</td></tr>
+<tr><td>Small beside the Emperor (or strong beside him)</td><td style="text-align:right">+5 (or −5) for each multiple, at most 20</td></tr>
+</tbody></table></div>
+<h3 id="faith-and-the-end"><a class="anchor" href="#faith-and-the-end" aria-label="Link to this section">#</a>Faith and the end</h3>
+<ul>
+<li>After the <strong>Peace of Westphalia</strong> an eighth seat goes to the largest member without one, and a member&#39;s faith no longer costs hold.</li>
+<li>The Empire is <strong>dissolved</strong> when its hold has stood at 0 for five years in a row, or when a realm outside it that beat the Emperor in a war takes the peace term <strong>Dissolve the Empire</strong> (from era IV). Every member is then a free realm and every imperial war aim ends.</li>
+</ul>
+<h2 id="the-shogunate"><a class="anchor" href="#the-shogunate" aria-label="Link to this section">#</a>The Shogunate</h2>
+<h3 id="the-houses"><a class="anchor" href="#the-houses" aria-label="Link to this section">#</a>The houses</h3>
+<p>Japan starts as the shogun&#39;s realm, with hold 30 (Weak). In 1378 the Southern Court still holds out against the Ashikaga shogun Yoshimitsu as a realm of its own, at war with him. Its fourteen <strong>great houses</strong> are its lords, each on its own land: Hosokawa, Hatakeyama, Shiba, Yamana, Ōuchi, Uesugi, Imagawa, Toki, Kyōgoku, Ōtomo, Shimazu, Takeda, Date and Nanbu. The rest is the shogun&#39;s own: Mie, where the Court sits in Kyoto, the three Nagasaki provinces and Ehime.</p>
+<p>What the Shogunate&#39;s hold counts each year:</p>
+<div class="table-scroll"><table>
+<thead><tr><th></th><th style="text-align:right">Hold</th></tr></thead>
+<tbody>
+<tr><td>No house in revolt</td><td style="text-align:right">+3</td></tr>
+<tr><td>Each house in revolt</td><td style="text-align:right">−5</td></tr>
+<tr><td>No adult heir</td><td style="text-align:right">−10</td></tr>
+<tr><td>At war while over half the houses are Wavering or worse</td><td style="text-align:right">−3</td></tr>
+<tr><td>Each house summoned to the capital</td><td style="text-align:right">+1</td></tr>
+<tr><td>The closed country</td><td style="text-align:right">+2</td></tr>
+<tr><td>Confirming a house&#39;s land</td><td style="text-align:right">−5</td></tr>
+</tbody></table></div>
+<p>Each season the houses read the hold: at Firm or Strong each grows a step more loyal, at Weak nothing happens, and at Hollow each grows a step less loyal.</p>
+<h3 id="the-shoguns-actions"><a class="anchor" href="#the-shoguns-actions" aria-label="Link to this section">#</a>The shogun&#39;s actions</h3>
+<ul>
+<li><strong>Summon a house</strong> (while hold is Firm or better): its lord lives at the capital, his wealth falls by a tenth each year and he cannot join a rising. The summons ends when you release him or when hold falls below Firm.</li>
+<li><strong>Confirm a house&#39;s land</strong>, once per house for each ruler: the house grows a step more loyal, for 5 hold.</li>
+<li><strong>Close the country</strong> (from era III, while hold is Firm or better): foreign traders may trade only at the one port you name and foreign faiths send no preachers in. It ends when you open the ports or when the Perry Expedition forces them open.</li>
+</ul>
+<h3 id="the-break"><a class="anchor" href="#the-break" aria-label="Link to this section">#</a>The break</h3>
+<p>At a season&#39;s end with hold 0, or as soon as the shogun loses Mie, the Shogunate <strong>breaks</strong>: each great house becomes its own warlord domain on its land, the shogun keeps only his own provinces, and the Ōnin War begins if it has not. The office of Shogun then stands vacant, and every warlord domain with its capital in Japan is a member.</p>
+<p>A member that holds Mie and owns, or holds as subjects, over half of Japan&#39;s 32 provinces can <strong>Ask the Court</strong>: it becomes the Shogunate at no cost, with hold 40, and every other member is asked to <strong>swear to the shogun</strong>. One that swears becomes his great house with its land, Wavering; one that refuses stays a realm, and the shogun holds the war aim <em>Bring to heel</em> on it. If you are asked, an answer card waits a month; silence is a refusal.</p>
+<p>What a member weighs before it swears:</p>
+<div class="table-scroll"><table>
+<thead><tr><th></th><th style="text-align:right">Reasons</th></tr></thead>
+<tbody>
+<tr><td>Base (keeping its own realm)</td><td style="text-align:right">−10</td></tr>
+<tr><td>Standing toward the shogun</td><td style="text-align:right">a quarter of it</td></tr>
+<tr><td>The shogun has more soldiers</td><td style="text-align:right">+10 for each multiple, at most +30</td></tr>
+<tr><td>The shogun&#39;s hold</td><td style="text-align:right">(hold − 50) ÷ 5</td></tr>
+</tbody></table></div>
+<h3 id="the-end"><a class="anchor" href="#the-end" aria-label="Link to this section">#</a>The end</h3>
+<p>The Shogunate ends when the shogun&#39;s realm leaves the shogunate form, by reform to a constitutional monarchy or by a revolution.</p>
+<h2 id="where-you-find-it"><a class="anchor" href="#where-you-find-it" aria-label="Link to this section">#</a>Where you find it</h2>
+<ul>
+<li><strong>Your Diplomacy tab</strong> has an Institutions row while you belong to one: &quot;The Empire · Emperor: Bohemia · Hold 35 Weak · You: Elector&quot;. Tap it for the Empire card.</li>
+<li><strong>A member&#39;s country card</strong> shows a badge, Emperor, Elector or Empire, that opens the Empire card.</li>
+<li><strong>The Empire card</strong> has a header (the Emperor, the hold bar, your role) and four folds: <strong>Election</strong> (each seat and whom it would vote for today, the tally, Stand for the crown, a seat&#39;s reasons and Seek their vote), <strong>Reforms</strong> (the ladder with the passed reforms ticked, the next one&#39;s effect, its cost and today&#39;s forecast, <em>Call the Diet</em> for the Emperor, <em>Vote yes</em> and <em>Vote no</em> while the Diet sits, and <em>Take to court</em> once the Imperial Court has passed), <strong>Members</strong> (each member with its land, faith, seat and badges) and <strong>Hold</strong> (the year&#39;s gains and losses).</li>
+<li><strong>The Shogunate card</strong> has a header (the shogun, the hold bar, your role) and three folds: <strong>Houses</strong> (each great house with its lord, land, loyalty and <em>Summon</em> or <em>Confirm</em>, or each member realm while the office is vacant), <strong>The Court</strong> (who holds Mie, <em>Ask the Court</em> when you qualify, <em>Close the country</em> or <em>Open the ports</em>) and <strong>Hold</strong>. While hold is Weak or lower it warns: &quot;At hold 0 the houses break away&quot;.</li>
+<li><strong>News</strong> carries the call to defend a member, the election&#39;s vote, a sitting Diet, a court ruling against you and a request to swear to the shogun as answer cards.</li>
+<li><strong>The peace sheet</strong> offers <em>Dissolve the Empire</em> when you are at war with the Emperor, not a member, and it is era IV or later.</li>
+<li><strong>The Institutions map mode</strong> colours the Emperor and the shogun gold and the members light gold, marks the seats, hatches imperial land held by outsiders, and draws Japan by house while it is whole.</li>
+<li>On a phone the card is a side sheet in the Wide layout and a bottom sheet in the Tall layout; every row and button is a full 44-point tap.</li>
+</ul>
