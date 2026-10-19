@@ -69,6 +69,8 @@ export interface DeclareSheetInput {
   /** The engine's Price of war for it (WAR-229); null when the engine prices no war on it (nothing to show but the terms). */
   price: PriceOfWar | null;
   name: (n: number) => string;
+  /** A province's name, for the province a Take land aim names. */
+  provinceName: (p: number) => string;
   /** What the player's realm calls its lords (REALM-242): "lords", "boyars", "beys". */
   titles: Titles;
   /** The player's gold a month, to mark war pay that outruns it. */
@@ -153,16 +155,19 @@ export function priceOfWarHtml(p: PriceOfWar, o: Pick<DeclareSheetInput, "name" 
 export function declareSheetHtml(o: DeclareSheetInput): string {
   const p = o.price;
   const them = esc(o.name(o.target));
-  const aim = p && !p.noAim ? "Your best aim" : "No aim";
+  const noAim = p?.noAim ?? true;
+  const aim = p && !noAim ? `${aimName(p.aim.aim)}${p.aim.province !== undefined ? `: ${esc(o.provinceName(p.aim.province))}` : ""}` : "No aim";
+  // Why the aim is held, in words: "held within 50 years", "refused hand over province".
+  const source = p?.aim.source ? ` You hold it because: ${esc(p.aim.source.replace(/_/g, " "))}.` : "";
   const terms = `<section class="declare-terms">
       <h3 class="sub">Terms</h3>
       ${reasonRow(
         "Aim",
         aim,
-        p?.noAim ?? true
+        noAim
           ? `You hold no aim against ${them}. A war with no aim alarms your neighbours and costs your lords' loyalty when you take land; a war aim (from a demand they refused, land you held, a pretender) makes it a war they understand.`
-          : "The best aim you hold against them: a war they understand.",
-        p?.noAim ?? true,
+          : `The best aim you hold against ${them}, and the one this war is declared with: a war they understand, so your neighbours are not alarmed and your lords don't waver when you take land.${source}`,
+        noAim,
       )}
       ${o.censure}
       ${o.nameAbroad ? `<button class="paper name-abroad-link" data-realm="${o.me}" data-realm-open="diplomacy">${icon("crown", 1)}Your name abroad: <b>${o.nameAbroad.word}</b></button>` : ""}

@@ -98,6 +98,20 @@ Feature: The price of war
     And it says "at most 4 of their 11 provinces"
     And every line and Confirm are at least 44 points tall and open their reason on tap
 
+  @WAR-229
+  Scenario Outline: The declare sheet names the aim the war is declared with
+    Given the country "England" holds <held> against "France"
+    When England's player opens the declare sheet against "France"
+    Then the sheet's terms name the aim "<shown>"
+    And the Price of war block <alarm> the neighbours who will hold Threatened us and the lords who will waver
+    And Confirm declares the war with the aim "<shown>"
+
+    Examples:
+      | held                                       | shown                | alarm         |
+      | no fitting aim                             | No aim               | lists         |
+      | the aim "Take land" naming "Normandy"      | Take land: Normandy  | does not list |
+      | the aims "Punish" and "Take land" naming "Normandy" | Take land: Normandy | does not list |
+
   @WAR-230 @WAR-231
   Scenario: The war card
     Given the player's realm "France" is at war with "Burgundy" and 55 in 100 of its voices say peace
