@@ -971,7 +971,12 @@ export function stepNavy(world: World, hours: number, news: News[]): void {
   // Ships waiting in a queue are laid down as their crews come in (D-NAVY-33).
   if (world.step === 0) layDown(world, news);
   if (!v.fleets.length) {
-    if (v.blockade.some((x) => x !== 0)) refreshBlockades(world, news);
+    // A plain loop: this runs every step, and a callback per province cost more than the rest of the step.
+    for (let p = 0; p < v.blockade.length; p++) {
+      if (v.blockade[p] === 0) continue;
+      refreshBlockades(world, news);
+      break;
+    }
     return;
   }
   const a = world.armies;

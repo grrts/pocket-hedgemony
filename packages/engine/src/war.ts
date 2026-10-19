@@ -687,26 +687,28 @@ export function nearest(world: World, from: number, test: (p: number) => boolean
 export function runOccupation(world: World, newMonth: boolean, news: News[]): void {
   const a = world.armies;
   const enemies = enemyTable(world);
-  const present = new Map<number, number[]>();
-  for (let i = 0; i < a.count; i++) {
+  // The armies standing in each province, as a list per province through `next` (a Map of arrays cost most of this daily pass).
+  const first = new Int32Array(world.provinceCount).fill(-1);
+  const next = new Int32Array(a.count);
+  for (let i = a.count - 1; i >= 0; i--) {
     // Armies marching through or fighting a battle don't hold the land.
     if (!a.alive[i] || a.battle[i]! >= 0 || a.retreating[i] || a.pathAt[i]! < a.path[i]!.length) continue;
-    const list = present.get(a.location[i]!) ?? [];
-    list.push(i);
-    present.set(a.location[i]!, list);
+    next[i] = first[a.location[i]!]!;
+    first[a.location[i]!] = i;
   }
   const holdDays = world.rules.defines.war.holdWeeks * 7;
   for (let p = 0; p < world.provinceCount; p++) {
     if (world.provinceWater[p] || world.provinceOwner[p]! < 0) continue;
     const owner = world.provinceOwner[p]!;
-    const slots = present.get(p);
     // No army there: nothing is held or besieged, and the walls fill again (most provinces, most days).
-    if (!slots) {
+    if (first[p]! < 0) {
       world.provinceHold[p] = 0;
-      if (world.sieges.delete(p)) news.push({ kind: "siege", text: `The siege of ${provinceName(world, p)} is lifted.`, nations: [owner], province: p });
+      if (world.sieges.size && world.sieges.delete(p)) news.push({ kind: "siege", text: `The siege of ${provinceName(world, p)} is lifted.`, nations: [owner], province: p });
       if (newMonth && world.provinceOccupier[p]! < 0) world.provinceGarrison[p] = Math.min(maxGarrison(world, p), world.provinceGarrison[p]! + maxGarrison(world, p) * world.rules.defines.war.garrisonRecoveryPerMonth);
       continue;
     }
+    const slots: number[] = [];
+    for (let i = first[p]!; i >= 0; i = next[i]!) slots.push(i);
     const ctl = controller(world, p);
     // The rightful owner (or a partner at war with the occupier) frees occupied land; anyone at war with the holder takes it.
     const hostile = slots.filter((s) => enemies[ctl]!.has(a.owner[s]!));

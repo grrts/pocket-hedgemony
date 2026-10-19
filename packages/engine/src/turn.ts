@@ -47,6 +47,7 @@ import {
   nationPay,
   pickUp,
   recount,
+  recountLordsMen,
   cancelRecruit,
   recruit,
   releaseCommander,
@@ -331,6 +332,7 @@ function endDay(world: World, news: News[]): void {
     weeklyRetinues(world, news);
     aiCollect(world, news);
     recount(world);
+    recountLordsMen(world);
     // The player's ledger is kept current each week; every realm's is worked out when the month turns.
     if (world.player >= 0) runLedger(world, false, world.player);
     answerAiCalls(world, news);
@@ -400,8 +402,11 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
       return repayLoan(world, actingNation, order.gold);
     case "gift":
       return giveGift(world, actingNation, order.lord);
-    case "callLords":
-      return order.lord === undefined ? callLords(world, actingNation, news) : callLord(world, actingNation, order.lord, news);
+    case "callLords": {
+      const refused = order.lord === undefined ? callLords(world, actingNation, news) : callLord(world, actingNation, order.lord, news);
+      if (!refused) recountLordsMen(world);
+      return refused;
+    }
     case "grantFief":
       return grantFief(world, actingNation, order.province, order.lord);
     case "seizeFief":

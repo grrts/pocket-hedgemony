@@ -880,13 +880,14 @@ export function recount(world: World): void {
     max[owner] = max[owner]! + world.provinceRecruitCeiling[p]!;
     if (world.provinceOccupier[p]! < 0) now[owner] = now[owner]! + world.provinceRecruits[p]!;
   }
-  recountLordsMen(world);
 }
 
 /**
  * The men each realm's lords would bring by their loyalty, each province's
  * recruits held to its share of its lord's cap: they count toward how strong the
- * realm looks (D-RECR-23, WAR-252).
+ * realm looks (D-RECR-23, WAR-252). An estimate for the other realms, so it is
+ * worked out at the end of each week and after the lords are called, not on
+ * every recount.
  */
 export function recountLordsMen(world: World): void {
   const lords = world.nationLordsMen;
