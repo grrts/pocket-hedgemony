@@ -2294,7 +2294,7 @@ Then("the account and every save are deleted", (s) => {
 });
 Given("the game is at launch", () => {});
 When("the sign-in options are listed on {string}", (s, platform: string) => {
-  s.options = S.signInOptions(PLATFORMS[platform] ?? platform.toLowerCase(), s.later ?? []);
+  s.options = S.signInOptions(platform === "Steam" ? "steam" : (PLATFORMS[platform] ?? platform.toLowerCase()), s.later ?? []);
 });
 Then("{string} are offered", (s, opts: string) => {
   expect(s.options.join(", ")).toBe(opts);
