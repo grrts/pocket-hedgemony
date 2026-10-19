@@ -1485,6 +1485,30 @@
     "mari": "Mari (Cheremis)"
    },
    "faith": "sunni"
+  },
+  "mamluks": {
+   "court": "circassian",
+   "mix": [
+    [
+     "egyptian_arabic",
+     0.6
+    ],
+    [
+     "levantine_arabic",
+     0.3
+    ],
+    [
+     "bedouin_arabic",
+     0.1
+    ]
+   ],
+   "local": {
+    "egyptian_arabic": "Egyptian Arabic-speaking Muslims",
+    "levantine_arabic": "Syrian Arabs",
+    "bedouin_arabic": "Bedouin",
+    "circassian": "Circassian, Turkic and other mamluk elite"
+   },
+   "faith": "sunni"
   }
  }
 }
