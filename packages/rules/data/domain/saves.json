@@ -177,7 +177,16 @@
     },
     "synced_files": [
       "settings-personal.json"
-    ]
+    ],
+    "shared": {
+      "max_per_account": 50,
+      "boards": {
+        "show": "strategy",
+        "help": "saves",
+        "broke": "bugs"
+      },
+      "code_length": 8
+    }
   },
   "export_import": true,
   "ironman": {
@@ -205,7 +214,10 @@
     "continue_from": "Continue: {nation}, {date} (from {device})",
     "new_save": "New save",
     "load_newer_first": "Load the newer game first.",
-    "ironman_import_offline": "Connect to import an ironman save."
+    "ironman_import_offline": "Connect to import an ironman save.",
+    "shared": "Shared. Your topic is on the community.",
+    "no_shared_save": "There is no shared save with this code.",
+    "shared_from": "From {author}'s campaign"
   },
   "free_tier": {
     "free_nations": [
@@ -268,6 +280,7 @@
     "desktop": "save dialog"
   },
   "_provisional": [
+    "cloud.shared.max_per_account",
     "desktop_quit_wait_seconds",
     "kinds.autosave.every_6_months",
     "orders_journal.safety_interval_seconds"

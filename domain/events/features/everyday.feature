@@ -1,14 +1,14 @@
 @context-events
 Feature: Everyday events
   As a player
-  I want small choices about my officials, lords, family and stores every few months
+  I want small choices about my officials, lords, family, stores and provinces every few months
   So that the realm feels alive between the great events of history
 
   @EVT-115 @EVT-116
   Scenario: A choice comes every few months
     Given France is played from 11 November 1444
     When five years pass and each everyday event is answered at once
-    Then France has had between 8 and 21 everyday events
+    Then France has had between 12 and 31 everyday events
     And no AI realm has an everyday event waiting
 
   @EVT-117
@@ -67,3 +67,30 @@ Feature: Everyday events
     Given two of France's lords quarrel and the event waits for France
     When the game is saved and loaded
     Then the same event waits for France
+
+  @EVT-133 @placeholder
+  Scenario Outline: An event comes only to realms of its region and era
+    Given <realm> is played in <year>
+    Then the everyday event "<event>" <can> come to <realm>
+
+    Examples:
+      | realm  | year | event         | can    |
+      | France | 1444 | tournament    | can    |
+      | France | 1444 | railway       | cannot |
+      | France | 1850 | railway       | can    |
+      | France | 1850 | tournament    | cannot |
+      | France | 1444 | monsoon_fails | cannot |
+      | Delhi  | 1444 | monsoon_fails | can    |
+
+  @EVT-134 @placeholder
+  Scenario: The same event never comes twice in 20 years
+    Given France is played from 11 November 1444
+    When twenty years pass and each everyday event is answered at once
+    Then no drawn everyday event came to France twice
+    And when each came is kept in the save
+
+  @EVT-135
+  Scenario: A rich harvest fills the store
+    Given a rich harvest at one of France's provinces waits for France
+    When France fills the granaries
+    Then the province's store holds 2 more months of food for its people

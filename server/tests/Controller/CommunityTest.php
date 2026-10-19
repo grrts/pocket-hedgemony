@@ -94,7 +94,7 @@ final class CommunityTest extends WebTestCase
 
         $crawler = $this->client->request('GET', '/community');
         self::assertResponseIsSuccessful();
-        self::assertSame(4, $crawler->filter('.board')->count());
+        self::assertSame(5, $crawler->filter('.board')->count());
         self::assertSelectorTextContains('.boards', 'Strategy and campaign stories');
         self::assertSelectorTextContains('.boards', '1 topic · 2 posts');
         self::assertSelectorTextContains('.topics', 'Holding Constantinople');

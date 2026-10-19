@@ -116,6 +116,42 @@ export interface Usage {
   quotaBytes: number;
 }
 
+/** What a shared save is for: the board its topic goes to, or a reply in the topic it came from (SAVE-125, SAVE-130). */
+export type SharePurpose = "show" | "help" | "broke" | "reply";
+
+/** A shared save's card, as the server gives it (SAVE-127). */
+export interface SharedCard {
+  code: string;
+  title: string;
+  author: string;
+  nation: string;
+  realm: string;
+  date: { y: number; m: number };
+  turn: number;
+  playSeconds: number;
+  gameVersion: string;
+  ironman: boolean;
+  modified: boolean;
+  thumbnail: string;
+  plays: number;
+  topicUrl?: string;
+}
+
+/** What the server answers a share with. */
+export interface Shared {
+  code: string;
+  shownCode: string;
+  link: string;
+  topicUrl: string;
+}
+
+/** The bytes as base64, in pieces so a 2 MB save does not overflow the call stack. */
+export function base64(bytes: Uint8Array): string {
+  let text = "";
+  for (let i = 0; i < bytes.length; i += 0x8000) text += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  return btoa(text);
+}
+
 export interface Changes {
   saves: RemoteSave[];
   tombstones: { saveId: string; deletedAt: number }[];
@@ -155,6 +191,15 @@ export function errorText(e: unknown): string {
       return "An account with this email already exists. Sign in instead.";
     case "invalid_input":
       return e.message !== "invalid_input" ? e.message : "Check the fields and try again.";
+    // Shared saves (SAVE-125 … SAVE-131): the server's own words.
+    case "no_shared_save":
+    case "too_many_shared":
+    case "topic_locked":
+    case "no_topic":
+    case "rate_limited":
+    case "damaged":
+    case "too_big":
+      return e.message !== e.code ? e.message : "Something went wrong. Try again.";
     default:
       return "Something went wrong. Try again.";
   }
@@ -268,6 +313,33 @@ export class CloudApi {
 
   async deleteCampaign(campaignId: string): Promise<void> {
     await this.call("DELETE", `/api/campaigns/${encodeURIComponent(campaignId)}`);
+  }
+
+  // ---------------------------------------------------------------- shared saves (SAVE-124 … SAVE-131)
+
+  /** `POST /api/shared-saves`: posts one save to the community as the player. */
+  shareSave(input: { bytes: Uint8Array; title: string; note: string; realm: string; purpose: SharePurpose }): Promise<Shared> {
+    return this.json<Shared>("POST", "/api/shared-saves", { file: base64(input.bytes), title: input.title, note: input.note, realm: input.realm, purpose: input.purpose });
+  }
+
+  /** `GET /api/shared-saves/{code}`: anyone may read a card. */
+  async sharedCard(code: string): Promise<SharedCard> {
+    return (await this.json<{ save: SharedCard }>("GET", `/api/shared-saves/${encodeURIComponent(code)}`, undefined, false)).save;
+  }
+
+  /** `GET /api/shared-saves/{code}/file`: the bytes; the server counts a play. */
+  async sharedFile(code: string): Promise<Uint8Array> {
+    const res = await this.call("GET", `/api/shared-saves/${encodeURIComponent(code)}/file`, undefined, false);
+    return new Uint8Array(await res.arrayBuffer());
+  }
+
+  /** `GET /api/shared-saves`: what this account shared, for the Shared saves row. */
+  async mySharedSaves(): Promise<SharedCard[]> {
+    return (await this.json<{ shared: SharedCard[] }>("GET", "/api/shared-saves")).shared;
+  }
+
+  async removeShared(code: string): Promise<void> {
+    await this.call("DELETE", `/api/shared-saves/${encodeURIComponent(code)}`);
   }
 
   // ---------------------------------------------------------------- tokens

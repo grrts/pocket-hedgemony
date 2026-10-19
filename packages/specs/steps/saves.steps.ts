@@ -1553,6 +1553,12 @@ function mismatched(s: Scenario, ironman: boolean): void {
   s.saveBytes = reheader(w.bytes, (h) => (h.worldHash = "00000000"));
 }
 When("the player opens it", (s) => {
+  // A shared save (SAVE-128): its copy, a new campaign of the player's own, is what opens.
+  if (s.shared) {
+    s.copy = S.sharedCopy(s.shared.bytes, ctx(s, { device: "iPhone", platform: "ios" }), s.shared.from);
+    s.opened = S.openSave(s.copy.bytes, opener(s));
+    return;
+  }
   if (s.hashMismatch) {
     s.result = S.openSave(s.saveBytes, opener(s));
     if (s.result.kind === "hash warning") s.accepted = S.openSave(s.saveBytes, { ...opener(s), acceptModified: true });
@@ -2787,4 +2793,38 @@ Then("the orders journal holds {string} on day {int}", (s, choice: string, day: 
 
 Then("the account's synced files include {string}", (_s, file: string) => {
   expect(S.syncedFiles()).toContain(file);
+});
+
+// ---------------------------------------------------------------- shared saves (SAVE-128, SAVE-129)
+
+Given("a shared save {string} by {string} with the code {string}", (s, _name: string, author: string, code: string) => {
+  s.shared = { bytes: write(s, "manual").bytes, from: { code, author } };
+});
+Given("a shared save of an ironman campaign", (s) => {
+  campaign(s, "Castile", true);
+  s.shared = { bytes: write(s, "ironman").bytes, from: { code: "K7QXM2PA", author: "Leroy" } };
+});
+Then("a new campaign with its own campaign id joins the Manual saves", (s) => {
+  expect(s.copy.header.campaignId).not.toBe(campaign(s).campaignId);
+  expect(s.copy.header.kind).toBe("manual");
+  expect(s.copy.path).toBe(S.fileName(s.copy.header));
+  expect(s.opened.kind).toBe("opened");
+});
+Then("its header says it came from {string} by {string}", (s, code: string, author: string) => {
+  expect(S.readHeader(s.copy.bytes).sharedFrom).toEqual({ code, author });
+});
+Then("every later save of that campaign says so too", (s) => {
+  const h = s.copy.header as S.SaveHeader;
+  const played: S.Campaign = { campaignId: h.campaignId, playerNation: h.playerNation, nationName: nationName(h.playerNation), ironman: h.ironman, options: h.options, modified: false, playSeconds: h.playSeconds, sharedFrom: h.sharedFrom! };
+  const later = S.writeSave(ctx(s), played, world(s), "resume");
+  expect(later.header.sharedFrom).toEqual(h.sharedFrom);
+});
+Then("the copy is not ironman", (s) => {
+  expect(S.readHeader(s.shared.bytes).ironman).toBe(true);
+  expect(s.copy.header.ironman).toBe(false);
+  expect(s.opened.kind).toBe("opened");
+  expect(s.opened.header.ironman).toBe(false);
+});
+Then("its flag ironman_unbroken is off", (s) => {
+  expect(s.copy.header.flags.ironman_unbroken).toBe(false);
 });
