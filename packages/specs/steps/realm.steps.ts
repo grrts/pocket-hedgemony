@@ -2660,10 +2660,15 @@ When("the month ends", (s) => {
   const w = s.game as GW;
   s.recruitsBefore = w.provinceRecruits[s.province];
   s.news = [];
-  // A rising takes a neighbour at a tenth a month (rebellions provisional.spread_chance_per_month): play on a year at most.
-  for (let m = 0; m < 12 && !s.news.some((n: G.News) => n.text.startsWith("The rising spreads")); m++) {
+  // A rising takes a neighbour at a tenth a month (rebellions provisional.spread_chance_per_month): play on three years at most,
+  // sparking it again should it end, until a month in which it spreads and still holds the province, so the scenario does not
+  // hang on one run of the dice.
+  for (let m = 0; m < 36; m++) {
     restless(w, s.province);
-    s.news.push(...playMonth(w));
+    if (!w.provinceRebels[s.province]) G.spark(w, s.province, "the tax rate of the province is raised");
+    const month = playMonth(w);
+    s.news.push(...month);
+    if (w.provinceRebels[s.province] && month.some((n: G.News) => n.text.startsWith("The rising spreads"))) break;
   }
 });
 Then("its neighbours may be drawn into revolt", (s) => {

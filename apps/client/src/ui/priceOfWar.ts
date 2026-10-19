@@ -21,6 +21,8 @@ export const monthText = (iso: string) => {
   const [y, m] = iso.split("-").map(Number);
   return `${m ? MONTHS[m - 1] + " " : ""}${y}`;
 };
+/** A ratio as "3.2 times", "twice", "1.5 times". */
+const times = (r: number) => (r === 2 ? "twice" : `${Number.isInteger(r) ? r : r.toFixed(1)} times`);
 const plural = (n: number, one: string, many = `${one}s`) => `${fmt(n)} ${n === 1 ? one : many}`;
 const pct = (share: number) => Math.round(Math.max(0, Math.min(1, share)) * 100);
 
@@ -275,6 +277,12 @@ export function nameAbroadHtml(v: NameAbroadView, name: (n: number) => string): 
   const over = v.landsTaken >= v.threshold;
   const landsBar = `<span class="lands-bar${over ? " red" : v.landsTaken * 4 >= v.threshold * 3 ? " amber" : ""}" role="img" aria-label="${v.landsTaken} of ${v.threshold}"><i style="width:${fill.toFixed(0)}%"></i></span>`;
   const lands = `<details class="pow-line lands${over ? " hurt" : ""}"><summary>${over ? HURT : `<span class="calm-mark" aria-hidden="true"></span>`}<span class="what">Lands taken (20 years)</span>${landsBar}<span class="value">${over ? `${v.landsTaken} of ${v.threshold}: a league may form` : `${v.landsTaken} of ${v.threshold} before a league`}</span></summary><p class="hint">Provinces you took in the last 20 years and still hold. At ${v.threshold} in this era, the realms that border you or the land you took may join a league against you each new year. Land fades from the count after 20 years.</p></details>`;
+  const afraid = v.fearful ?? [];
+  const threatened = afraid.filter((f) => f.level === "threatened").length;
+  const fearList = `<ul class="league-members">${afraid.map((f) => `<li><button class="realm-link" data-realm="${f.nation}" data-realm-open="diplomacy"><b>${esc(name(f.nation))}</b></button><span>${f.level === "threatened" ? "Threatened" : "Wary"} · you are ${times(f.ratio)} their side</span></li>`).join("")}</ul>`;
+  const fear = afraid.length
+    ? `<details class="pow-line fearful${threatened ? " hurt" : ""}"><summary>${threatened ? HURT : `<span class="calm-mark" aria-hidden="true"></span>`}<span class="what">Neighbours who fear you</span><span class="value">${plural(afraid.length, "realm")}${threatened ? ` · ${fmt(threatened)} threatened` : ""}</span></summary>${fearList}<p class="hint">A neighbour is Wary of you when your strength is ${times(v.fearRatios.wary)} its side's (its own and half its allies'), Threatened from ${times(v.fearRatios.threatened)}. It keeps more men under arms against you, and a Threatened one borrows to pay them. Measured again each month.</p></details>`
+    : "";
   const noto = reasonRow(
     "Notoriety",
     `<b>${v.word}</b> <small>(${Math.round(v.notoriety)})</small>`,
@@ -283,6 +291,6 @@ export function nameAbroadHtml(v: NameAbroadView, name: (n: number) => string): 
   );
   return `<section class="name-abroad framed-soft" id="name-abroad">
     <h3 class="sub">Your name abroad</h3>
-    ${leagues.join("")}${noto}${lands}
+    ${leagues.join("")}${fear}${noto}${lands}
   </section>`;
 }

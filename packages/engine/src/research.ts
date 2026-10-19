@@ -76,15 +76,22 @@ const ARM_UNLOCK = warfareData.arms as Record<string, { unlock?: string }>;
 /** Whether realm n may train an arm: one its realm had at the start, or whose invention it knows (warfare arms' `unlock`). */
 export function armUnlocked(world: World, n: number, arm: string): boolean {
   // Without F03 *Riding and pack animals* a realm raises no horse regiments (RSCH-094).
-  if (rs.without(knownSet(world, n)).noArms.includes(arm)) return false;
+  if (withoutOf(world, n).noArms.includes(arm)) return false;
   const unlock = ARM_UNLOCK[arm]?.unlock ?? "start";
   return unlock === "start" || knows(world, n, unlock);
 }
 
 /** What lacking past inventions costs realm n now (RSCH-094): the other systems read it. */
 export function withoutOf(world: World, n: number): rs.Without {
-  return rs.without(knownSet(world, n));
+  // Read for every army every day: worked out again only when the realm learns something (a known set only grows; a new one replaces it).
+  const known = knownSet(world, n);
+  const hit = withoutCache.get(known);
+  if (hit && hit.size === known.size) return hit.without;
+  const without = rs.without(known);
+  withoutCache.set(known, { size: known.size, without });
+  return without;
 }
+const withoutCache = new WeakMap<ReadonlySet<string>, { size: number; without: rs.Without }>();
 
 /** The school a realm founds: a madrasa where it knows L2, else a temple or monastery school (RSCH-003). */
 function schoolTypeFor(p: rs.Programme): rs.SchoolType | null {

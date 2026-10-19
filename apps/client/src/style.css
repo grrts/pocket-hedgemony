@@ -6975,3 +6975,15 @@ div.chron-row {
   grid-template-columns: 1fr 1fr;
   gap: 6px;
 }
+/* ---- Fear of a stronger neighbour (DIPL-232): a line under what a realm thinks of you ---- */
+p.fear {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+  min-height: 44px;
+  margin: 4px 0;
+}
+p.fear.threatened {
+  color: var(--cloth);
+}

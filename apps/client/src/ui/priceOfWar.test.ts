@@ -73,7 +73,7 @@ describe("the declare sheet's Price of war (WAR-229, WAR-232)", () => {
   });
 
   it("puts Confirm at the foot, breaking the truce when one holds, with the censure and the name abroad link above it", () => {
-    const base = { target: 1, name, titles, income: 20, me: 0, censure: '<div class="censure-warn">x</div>', nameAbroad: { notoriety: 30, word: "Watched", landsTaken: 2, threshold: 8, leagues: [] } as NameAbroadView };
+    const base = { target: 1, name, titles, income: 20, me: 0, censure: '<div class="censure-warn">x</div>', nameAbroad: { notoriety: 30, word: "Watched", landsTaken: 2, threshold: 8, leagues: [], fearful: [], fearRatios: { wary: 1.5, threatened: 2.5 } } as NameAbroadView };
     const plain = declareSheetHtml({ ...base, price: price() });
     expect(plain).toContain('data-declare-confirm="1"');
     expect(plain).not.toContain("data-break-truce");
@@ -118,7 +118,7 @@ describe("the war card and the war plaque (WAR-230, WAR-231)", () => {
 });
 
 describe("Your name abroad (DIPL-225, DIPL-226)", () => {
-  const v: NameAbroadView = { notoriety: 55, word: "Feared", landsTaken: 6, threshold: 8, leagues: [{ target: 5, members: [{ nation: 2, soldiers: 20000 }, { nation: 3, soldiers: 5000 }, { nation: 4, soldiers: 8000 }] }] };
+  const v: NameAbroadView = { notoriety: 55, word: "Feared", landsTaken: 6, threshold: 8, leagues: [{ target: 5, members: [{ nation: 2, soldiers: 20000 }, { nation: 3, soldiers: 5000 }, { nation: 4, soldiers: 8000 }] }], fearful: [], fearRatios: { wary: 1.5, threatened: 2.5 } };
   const html = nameAbroadHtml(v, name);
 
   it("shows the notoriety word, Lands taken against the threshold and the league with its members and soldiers first", () => {
@@ -138,5 +138,25 @@ describe("Your name abroad (DIPL-225, DIPL-226)", () => {
 
   it("says when a league may form", () => {
     expect(nameAbroadHtml({ ...v, landsTaken: 9, leagues: [] }, name)).toContain("9 of 8: a league may form");
+  });
+});
+
+describe("Neighbours who fear you (DIPL-233)", () => {
+  const v: NameAbroadView = { notoriety: 10, word: "Trusted", landsTaken: 0, threshold: 8, leagues: [], fearful: [{ nation: 2, level: "threatened", ratio: 3.2 }, { nation: 3, level: "wary", ratio: 1.6 }], fearRatios: { wary: 1.5, threatened: 2.5 } };
+  const html = nameAbroadHtml(v, name);
+
+  it("lists each neighbour who fears you with how much stronger you are, before notoriety", () => {
+    expect(html).toContain("Neighbours who fear you");
+    expect(html).toContain("2 realms · 1 threatened");
+    expect(html).toContain("Threatened · you are 3.2 times their side");
+    expect(html).toContain("Wary · you are 1.6 times their side");
+    expect(html).toContain('data-realm="2" data-realm-open="diplomacy"');
+    expect(html.indexOf("Neighbours who fear you")).toBeLessThan(html.indexOf("Notoriety"));
+  });
+
+  it("marks the row as hurting only when someone is threatened, and leaves it out when no one fears you", () => {
+    expect(html).toContain('class="pow-line fearful hurt"');
+    expect(nameAbroadHtml({ ...v, fearful: [v.fearful[1]!] }, name)).toContain('class="pow-line fearful"><summary><span class="calm-mark"');
+    expect(nameAbroadHtml({ ...v, fearful: [] }, name)).not.toContain("Neighbours who fear you");
   });
 });

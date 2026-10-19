@@ -398,7 +398,7 @@ export function canCall(world: World, n: number): number {
  * each thousand gathers in two weeks, one after another, then stands in the
  * province as troops without a commander (RECR-008..018).
  */
-export function recruit(world: World, n: number, p: number, thousands: number, news: News[]): string | null {
+export function recruit(world: World, n: number, p: number, thousands: number, news: News[], recountAfter = true): string | null {
   const refused = recruitRefusal(world, n, p, thousands);
   if (refused) return refused;
   const men = Math.round(thousands) * LEVY_UNIT;
@@ -408,7 +408,9 @@ export function recruit(world: World, n: number, p: number, thousands: number, n
   const days = gatherDays(world, n);
   if (queued) queued.men += men;
   else world.musters.push({ nation: n, province: p, men, daysLeft: days });
-  recount(world);
+  // Many calls in a row (the AI's month) count the men gathering and recount once at the end.
+  if (recountAfter) recount(world);
+  else world.nationCapUsed[n] = world.nationCapUsed[n]! + men;
   if (n === world.player) news.push({ kind: "raised", text: `${fmt(men)} men of ${provinceName(world, p)} are called up; they gather a thousand every ${days} days.`, nations: [n], province: p });
   return null;
 }
@@ -1065,41 +1067,23 @@ function trainMonth(world: World, i: number, news: News[]): void {
 
 // ---------------------------------------------------------------- the AI
 
-/**
- * AI realms at war call men, a thousand at a time, from their capital and the
- * land around it, as far as their purse allows; at peace they send levies home
- * before their pay begins.
- */
-export function aiRecruits(world: World, news: News[], atWarNow: (n: number) => boolean): void {
-  const a = world.armies;
-  const levyPer1000 = gold(world, rc.levyPay(1000, 99));
-  const atWar = Uint8Array.from({ length: world.nationCount }, (_, n) => (atWarNow(n) ? 1 : 0));
-  // At peace, levies go home before their pay begins (one pass over the armies for every realm, one recount after it).
-  let sent = false;
-  for (let i = 0; i < a.count; i++) {
-    const n = a.owner[i]!;
-    if (a.alive[i] && n !== world.player && !world.nationGone[n] && !atWar[n] && a.kind[i] === KIND.levy && a.monthsOut[i]! >= wf.W.levy.free_months) sent = disbandArmy(world, n, i, false) === null || sent;
+const AI_MEN_PER_COMMANDER = 8000;
+/** Each realm's first royal province with an official, -1 for none. */
+function firstRoyalPosts(world: World): Int32Array {
+  const out = new Int32Array(world.nationCount).fill(-1);
+  for (let p = 0; p < world.provinceCount; p++) {
+    const n = world.provinceOwner[p]!;
+    if (n >= 0 && out[n]! < 0 && world.provinceLord[p]! < 0 && world.provinceOfficial[p]! >= 0) out[n] = p;
   }
-  if (sent) recount(world);
-  for (let n = 0; n < world.nationCount; n++) {
-    if (n === world.player || world.nationGone[n] || !atWar[n]) continue;
-    // Men it could not put under a commander would only stand as garrisons (feedback 28).
-    if (world.nationTreasury[n]! < COMMISSION_GOLD && !idleCommanders(world, n, false).length) continue;
-    const cap = capitalOf(world, n);
-    if (callingPlace(world, n, cap)) continue;
-    // Keep the levies' future pay within half the income.
-    let budget = Math.floor(Math.min(canCall(world, n), ((world.nationMonthlyIncome[n]! * 0.5) / levyPer1000) * 1000, 10000) / 1000);
-    if (budget < 2) continue;
-    for (const p of [cap, ...neighbours(world, cap)]) {
-      if (budget < 1 || callingPlace(world, n, p) || world.musters.some((m) => m.nation === n && m.province === p)) continue;
-      const k = Math.min(budget, 3, Math.floor(world.provinceRecruits[p]! / 1000));
-      if (k >= 1 && !recruit(world, n, p, k, news)) budget -= k;
-    }
-  }
+  return out;
 }
 
-const AI_MEN_PER_COMMANDER = 8000;
-const commandersOf = (world: World, n: number) => world.commanderOwner.reduce((t, o, c) => t + (o === n && !isAdmiral(world, c) ? 1 : 0), 0);
+/** Each realm's generals (commanders who are not admirals), counted once. */
+function generalCounts(world: World): Int32Array {
+  const out = new Int32Array(world.nationCount);
+  world.commanderOwner.forEach((o, c) => o >= 0 && !isAdmiral(world, c) && out[o]!++);
+  return out;
+}
 
 /** Each week, AI commanders take in the troops that have gathered, or a free (or newly commissioned) one leads them out. */
 export function aiCollect(world: World, news: News[]): void {
@@ -1124,6 +1108,8 @@ export function aiCollect(world: World, news: News[]): void {
     else idle.set(n, [c]);
   }
   const score = (c: number) => world.commanders[c]!.might + world.commanders[c]!.cunning + world.commanders[c]!.logistics;
+  let generals: Int32Array | null = null;
+  let posts: Int32Array | null = null;
   for (const list of idle.values()) list.sort((x, y) => score(y) - score(x) || x - y);
   for (let i = 0; i < a.count; i++) {
     if (!a.alive[i] || a.commander[i]! >= 0) continue;
@@ -1140,11 +1126,15 @@ export function aiCollect(world: World, news: News[]): void {
       // Commissions cost and empty a post, so the AI makes one only for at least
       // `aiCommissionMinMen` men without a commander, and keeps about one commander
       // to each 8,000 men it has under arms (RECR-115, feedback 28).
-      if (a.men[i]! < rc.recruitingConfig.aiCommissionMinMen || commandersOf(world, n) >= 1 + world.nationCapUsed[n]! / AI_MEN_PER_COMMANDER) continue;
-      let post = -1;
-      // A lord's official serves the lord, so only royal posts can give a commander.
-      for (let p = 0; p < world.provinceCount && post < 0; p++) if (world.provinceOwner[p] === n && world.provinceLord[p]! < 0 && world.provinceOfficial[p]! >= 0) post = p;
+      if (a.men[i]! < rc.recruitingConfig.aiCommissionMinMen) continue;
+      generals ??= generalCounts(world);
+      if (generals[n]! >= 1 + world.nationCapUsed[n]! / AI_MEN_PER_COMMANDER) continue;
+      // A lord's official serves the lord, so only royal posts can give a commander: each realm's first, found in one pass.
+      posts ??= firstRoyalPosts(world);
+      const post = posts[n]!;
       if (post < 0 || commissionOfficial(world, n, post, news)) continue;
+      generals![n]!++;
+      posts = null;
       free = idleCommanders(world, n, false);
     }
     const c = free[0]!;

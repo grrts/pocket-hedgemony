@@ -5432,7 +5432,7 @@ function relationsSection(r: number): string {
       ${table ? peaceTable(table, peaceDraftFor(r), { province: (p) => provinces[p]!.name, realm: (n) => nations[n]!.name, lost }) : ""}
       ${dissolve ? `<div class="choices"><button class="paper" data-peace="dissolve">${icon("crown", 1)}Dissolve the Empire</button></div><p class="hint">Dissolve the Empire: every member becomes a free realm and every imperial war aim ends; no land changes hands.</p>` : ""}
       ${masterPeace(r, whole)}
-      ${realmStatecraft(s.statecraft, r, false, true)}`;
+      ${realmStatecraft(s.statecraft, r, false, true, (n) => realmButton(n, "diplomacy"))}`;
   }
   const line =
     rel?.state === "truce" ? `A truce holds${rel.until ? ` until ${monthText(rel.until)}` : ""}: no war before then.`
@@ -5443,7 +5443,7 @@ function relationsSection(r: number): string {
   return `<h3 class="sub">Relations</h3><p>${line}</p>
     ${rel?.state === "overlord" ? subjectCard(s.statecraft, r, (n) => realmButton(n, "diplomacy"), nations[r]!.name) : ""}
     ${rel?.state === "subject" && s.statecraft?.subjects?.overlord?.overlord === r ? overlordCard(s.statecraft, (n) => realmButton(n, "diplomacy")) : ""}
-    ${realmStatecraft(s.statecraft, r, rel?.state === "alliance", false)}
+    ${realmStatecraft(s.statecraft, r, rel?.state === "alliance", false, (n) => realmButton(n, "diplomacy"))}
     ${rel && rel.state !== "truce" ? "" : `<h3 class="sub">War</h3><div class="choices"><button class="wax" data-declare="${r}">${icon("swords", 1)}Declare war</button></div><p class="hint">Shows the price of war before you confirm.</p>`}`;
 }
 
@@ -7803,11 +7803,12 @@ Object.assign(globalThis, {
   /** Sends one of the player's envoys to a realm by id, on a mission (ENVOY_ACTIONS). */
   __phEnvoy: (id: string, action = "courtesy_visit") => act({ type: "sendEnvoy", target: nationIndex.get(id)!, action }),
   /** Redraws the open Your name abroad card from a given view by realm ids, to check how a league looks (price-of-war-shots.mjs). */
-  __phNameAbroad: (v: { notoriety: number; landsTaken: number; threshold: number; leagues: { members: [string, number][] }[] }) => {
+  __phNameAbroad: (v: { notoriety: number; landsTaken: number; threshold: number; leagues: { members: [string, number][] }[]; fearful?: [string, "wary" | "threatened", number][] }) => {
     const el = panel.querySelector("#name-abroad");
     const word = v.notoriety >= 75 ? "Hated" : v.notoriety >= 50 ? "Feared" : v.notoriety >= 25 ? "Watched" : "Trusted";
     const leagues = v.leagues.map((l) => ({ target: snapshot!.playerNation, members: l.members.map(([id, soldiers]) => ({ nation: nationIndex.get(id)!, soldiers })) }));
-    if (el) el.outerHTML = nameAbroadHtml({ ...v, word, leagues }, (n) => nations[n]!.name);
+    const fearful = (v.fearful ?? []).map(([id, level, ratio]) => ({ nation: nationIndex.get(id)!, level, ratio }));
+    if (el) el.outerHTML = nameAbroadHtml({ ...v, word, leagues, fearful, fearRatios: { wary: 1.5, threatened: 2.5 } }, (n) => nations[n]!.name);
   },
   /** Id of the province the player's first army with a commander stands in. */
   __phArmyProvince: () => {

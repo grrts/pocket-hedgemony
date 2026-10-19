@@ -41,7 +41,7 @@ function reasonsHtml(l: StatecraftView["letters"][number]): string {
 }
 
 /** Another realm's statecraft: standing and its reasons, an envoy on the way, the last answer, and the missions to send. */
-export function realmStatecraft(v: StatecraftView | null, r: number, allied: boolean, atWar: boolean): string {
+export function realmStatecraft(v: StatecraftView | null, r: number, allied: boolean, atWar: boolean, realmButton: (n: number) => string = () => ""): string {
   const realm = v?.realms[r];
   if (!v || !realm) return "";
   const envoy = v.envoys.find((e) => e.target === r);
@@ -49,7 +49,8 @@ export function realmStatecraft(v: StatecraftView | null, r: number, allied: boo
   const standing = `<h3 class="sub">What they think of you</h3>
     <p><b>${esc(realm.word)}</b> (${signed(realm.standing)})${realm.married ? " · your houses are married" : ""}</p>
     ${crownsLine(v, r, realm.married)}
-    ${realm.lines.length ? `<dl class="facts">${realm.lines.map((x) => `<dt>${esc(x.name)}</dt><dd>${signed(x.weight)}</dd>`).join("")}</dl>` : `<p class="hint">You have had no dealings with them yet.</p>`}`;
+    ${realm.lines.length ? `<dl class="facts">${realm.lines.map((x) => `<dt>${esc(x.name)}</dt><dd>${signed(x.weight)}</dd>`).join("")}</dl>` : `<p class="hint">You have had no dealings with them yet.</p>`}
+    ${fearHtml(realm.fears, v.me, realmButton)}`;
   const away = envoy
     ? `<p>${icon("scroll", 1)} Your envoy ${envoy.status === "road" ? `rides to ${missionName(envoy.action)}; he reaches their court in ${monthText(envoy.arrival)}` : envoy.status === "court" ? `is at their court to ${missionName(envoy.action)}` : "is on his way home"}.</p>`
     : "";
@@ -65,6 +66,19 @@ export function realmStatecraft(v: StatecraftView | null, r: number, allied: boo
         : tile(`<button class="paper" disabled>${m.label}</button>`, why(not));
     }).join("")}${allied ? tile(`<button class="paper" data-break-alliance="${r}">End the alliance</button>`, "An oath broken: they will remember it (−40, fading over 20 years), and other courts trust you less.") : ""}</div>`;
   return `${standing}${away}${last}${missions}${atWar ? "" : courtSubjectHtml(v, r)}${atWar ? "" : demandsHtml(realm.demands)}`;
+}
+
+/** Whom a realm fears this month (DIPL-232): you first, as a line with its reason, then the neighbours it fears besides you. */
+export function fearHtml(fears: StatecraftView["realms"][number]["fears"], me: number, realmButton: (n: number) => string): string {
+  if (!fears?.length) return "";
+  const word = (l: string) => (l === "threatened" ? "Threatened" : "Wary");
+  const you = fears.find((f) => f.nation === me);
+  const others = fears.filter((f) => f.nation !== me);
+  const mine = you
+    ? `<p class="fear ${you.level}">${icon("swords", 1)} <b>${word(you.level)} of you</b>: your strength is ${you.ratio.toFixed(1)} times their side's. They keep more men under arms against you${you.level === "threatened" ? " and borrow to pay them" : ""}.</p>`
+    : "";
+  const rest = others.length ? `<p class="fear">${icon("swords", 1)} They fear ${others.map((f) => `${realmButton(f.nation)} <small>(${word(f.level)})</small>`).join(", ")}.</p>` : "";
+  return mine + rest;
 }
 
 const COURT_DOES = "Each season there is 1 in 4 that they find out: they will hold it against you (−25, fading over 10 years) and send him home.";
