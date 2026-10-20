@@ -7,6 +7,7 @@ use App\Entity\Account;
 use App\Entity\Entitlement;
 use App\Entity\Topic;
 use App\Tests\SaveBuilder;
+use App\Tests\StoreKeys;
 use App\Tests\StoreMock;
 use App\Tests\TestKeys;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -41,6 +42,7 @@ final class CombineAccountsTest extends WebTestCase
     {
         $this->clock = new MockClock('2026-10-20 12:00:00');
         Clock::set($this->clock);
+        StoreKeys::install(\dirname(__DIR__, 2));
         $this->client = static::createClient();
         $em = $this->em();
         $tool = new SchemaTool($em);
