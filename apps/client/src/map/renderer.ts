@@ -314,6 +314,9 @@ bool riverFrozen(int id, int t, float grain) { return smoothstep(-3.0, -8.0, tem
 // leaves in autumn, blossom in spring, rain in the wet season; snow is
 // already the lightest land.
 vec3 seasonMarks(vec3 c, int t, int id, ivec2 a) {
+#if LITE >= 1
+  return c;
+#endif
   if (uVision != 4) return c;
   vec4 s = seasonAt(id);
   float h = hash(a + ivec2(31, 17));
@@ -328,6 +331,9 @@ int patternOf(int id) { return int(texelFetch(uSubjectOf, ivec2(id % uInfoWidth,
 // about three screen pixels at every zoom, anchored to the map; the marks are
 // dark on light colours and light on dark ones, so they read on every grey.
 vec3 lensPattern(vec3 c, int id, vec2 m) {
+#if LITE >= 1
+  return c;
+#endif
   if (uMode == 1) return c;
   int k = patternOf(id);
   if (k == 0) return c;
@@ -389,6 +395,9 @@ float segment(vec2 f, vec2 s0, vec2 s1) {
   return length(f - s0 - d * clamp(dot(f - s0, d) / dot(d, d), 0.0, 1.0));
 }
 vec3 livingRoad(vec3 c, ivec2 a, ivec2 q, int links, int grade) {
+#if LITE >= 2
+  return c;
+#endif
   const float H = ${TOWN_TILE / 2}.0;
   vec2 f = vec2(q) + 0.5;
   vec2 side[4] = vec2[4](vec2(H, 0.0), vec2(2.0 * H, H), vec2(H, 2.0 * H), vec2(0.0, H));
@@ -416,6 +425,9 @@ vec3 livingRoad(vec3 c, ivec2 a, ivec2 q, int links, int grade) {
   return c;
 }
 vec3 livingTown(vec3 c, ivec2 p, ivec2 a, int id, int terrain, vec3 realm) {
+#if LITE >= 2
+  return c;
+#endif
   int b = settlementAt(p);
   if (b == 0) return c;
   int kind = b & 15;
@@ -716,13 +728,21 @@ vec3 forbidden(vec3 c, vec2 m) {
 }
 
 void main() {
+#if LITE >= 4
+  outColor = vec4(0.25, 0.55, 0.3, 1.0);
+  return;
+#endif
   vec2 m = vMap;
   int id = idAt(ivec2(floor(m)));
   if (unknown(id)) {
     outColor = vec4(parchment(m), 1.0);
     return;
   }
+#if LITE >= 3
+  vec3 c = far();
+#else
   vec3 c = uZoom >= ${DETAIL_ZOOM}.0 ? tiled(false) : uZoom >= ${MID_ZOOM}.0 ? tiled(true) : far();
+#endif
   c = forbidden(c, m);
   // A dark seam where the known world meets the unknown.
   ivec2 p = ivec2(floor(m));
@@ -798,10 +818,7 @@ export class MapRenderer {
     this.bare = bare;
     // Start-up goes through the checked context too, so a texture an iPhone rejects is named.
     const gl = (this.gl = this.watched(bare));
-    this.program = link(gl, VERT, FRAG);
-    for (const name of ["uCenter", "uZoom", "uView", "uIds", "uTileOrigin", "uTileSize", "uInfo", "uOwner", "uInfoWidth", "uTime", "uMode", "uParchment", "uParchmentDark", "uTerrain", "uDepth", "uFoam", "uInk", "uHighlight", "uSand", "uForbid", "uAtlas", "uMini", "uLand", "uSeason", "uTown", "uTownAtlas", "uLiving", "uFiefs", "uRoad", "uSubject", "uSubjectOf", "uHunt", "uVision"]) {
-      this.u[name] = gl.getUniformLocation(this.program, name);
-    }
+    this.program = this.linkMap(0);
 
     // Split the id image into tiles the GPU can hold, with 1px overlap for border checks.
     const maxTex = Math.min(gl.getParameter(gl.MAX_TEXTURE_SIZE) as number, 4096);
@@ -844,6 +861,47 @@ export class MapRenderer {
     this.miniTex = makeDataTexture(gl, mini.width, mini.height);
     gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, mini.width, mini.height, gl.RGBA, gl.UNSIGNED_BYTE, mini.rgba);
     this.terrainColors = rowColors(atlas).slice(0, TERRAINS.length * 3);
+  }
+
+  /**
+   * How much of the map shader is left out, for a device that rejects the
+   * full one (an iPhone answering 1282 to the draw): 0 all of it; 1 without
+   * the colour-vision marks; 2 also without the living map's towns and roads;
+   * 3 only the far view at every zoom; 4 one flat colour, to tell the shader
+   * from everything else.
+   */
+  lite = 0;
+
+  /** Links the map shader at a level of `lite` and looks up its uniforms. */
+  private linkMap(lite: number): WebGLProgram {
+    const gl = this.gl;
+    const program = link(gl, VERT, FRAG.replace("#version 300 es\n", `#version 300 es\n#define LITE ${lite}\n`));
+    for (const name of ["uCenter", "uZoom", "uView", "uIds", "uTileOrigin", "uTileSize", "uInfo", "uOwner", "uInfoWidth", "uTime", "uMode", "uParchment", "uParchmentDark", "uTerrain", "uDepth", "uFoam", "uInk", "uHighlight", "uSand", "uForbid", "uAtlas", "uMini", "uLand", "uSeason", "uTown", "uTownAtlas", "uLiving", "uFiefs", "uRoad", "uSubject", "uSubjectOf", "uHunt", "uVision"]) {
+      this.u[name] = gl.getUniformLocation(program, name);
+    }
+    return program;
+  }
+
+  /**
+   * Swaps in the next simpler map shader after the device rejected a draw,
+   * and starts checking again; false once there is nothing simpler left.
+   */
+  simplify(): boolean {
+    while (this.lite < 4) {
+      this.lite++;
+      try {
+        const program = this.linkMap(this.lite);
+        this.bare.deleteProgram(this.program);
+        this.program = program;
+        while (this.bare.getError() !== this.bare.NO_ERROR);
+        this.firstError = null;
+        this.gl = this.watched(this.bare);
+        return true;
+      } catch {
+        // This level does not even link here; try the next.
+      }
+    }
+    return false;
   }
 
   /** The first WebGL call that raised an error while starting up, with the error code; null while none has. */
@@ -920,7 +978,7 @@ export class MapRenderer {
     const buf = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buf);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([x, y, x + w, y, x, y + h, x + w, y + h]), gl.STATIC_DRAW);
-    const loc = gl.getAttribLocation(this.program, "aPos");
+    const loc = 0; // aPos, bound by link() for every level of the shader
     gl.enableVertexAttribArray(loc);
     gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
     gl.bindVertexArray(null);
@@ -1193,6 +1251,7 @@ function link(gl: WebGL2RenderingContext, vs: string, fs: string): WebGLProgram 
   const p = gl.createProgram()!;
   gl.attachShader(p, compile(gl.VERTEX_SHADER, vs));
   gl.attachShader(p, compile(gl.FRAGMENT_SHADER, fs));
+  gl.bindAttribLocation(p, 0, "aPos");
   gl.linkProgram(p);
   if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p) ?? "link error");
   return p;
