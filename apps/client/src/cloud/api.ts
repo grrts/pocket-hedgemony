@@ -119,6 +119,13 @@ export interface DeviceRow {
   current: boolean;
 }
 
+/**
+ * What a store sign-in sends the server (SAVE-149 … SAVE-151): Apple's identity token or Google's
+ * ID token with the nonce whose SHA-256 the store signed into it, or the one-time code Steam in the
+ * browser came back with.
+ */
+export type StoreProof = { appleIdentityToken: string; nonce: string } | { googleIdToken: string; nonce: string } | { steamOpenIdCode: string };
+
 export interface AccountCard extends AccountInfo {
   signIns: { provider: string; label: string }[];
   devices: DeviceRow[];
@@ -231,6 +238,31 @@ export function errorText(e: unknown): string {
       return e.message !== e.code ? e.message : "Steam did not accept the sign-in.";
     case "steam_ticket":
       return "Steam could not sign you in just now. Check that Steam is online and try again.";
+    // Apple, Google and Steam in the browser (SAVE-149 … SAVE-156): the server's own words where it gives them.
+    case "apple_unavailable":
+      return e.message !== e.code ? e.message : "Sign in with Apple is not available.";
+    case "apple_refused":
+      return e.message !== e.code ? e.message : "Apple did not accept the sign-in.";
+    case "google_unavailable":
+      return e.message !== e.code ? e.message : "Google sign-in is not available.";
+    case "google_refused":
+      return e.message !== e.code ? e.message : "Google did not accept the sign-in.";
+    case "sign_in_expired":
+      return e.message !== e.code ? e.message : "The sign-in took too long or was used already. Try again.";
+    case "sign_in_cancelled":
+      return "The sign-in was cancelled.";
+    case "sign_in_sheet":
+      return "The sign-in could not open. Try again.";
+    case "return_not_allowed":
+      return "This build of the game cannot sign in with Steam in the browser.";
+    case "linked_to_another_account":
+      return "This sign-in already belongs to another Pocket Hegemony account.";
+    case "already_has_steam":
+      return "This account already has a Steam sign-in.";
+    case "already_has_apple":
+      return "This account already has a Sign in with Apple.";
+    case "already_has_google":
+      return "This account already has a Google sign-in.";
     // Shared saves (SAVE-125 … SAVE-131): the server's own words.
     case "no_shared_save":
     case "too_many_shared":
@@ -308,6 +340,31 @@ export class CloudApi {
     );
     this.keep(r);
     return r.account;
+  }
+
+  /**
+   * `POST /api/sessions` with a store's proof (SAVE-149 … SAVE-151); `displayName` names the account
+   * when the store has none yet and gives no name itself (Apple's name comes only the first time).
+   */
+  async signInWithStore(proof: StoreProof, displayName: string | undefined, device: { name: string; platform: string }): Promise<AccountInfo> {
+    const r = await this.json<{ accessToken: string; accessTokenExpiresIn: number; deviceToken: string; deviceId: string; account: AccountInfo }>(
+      "POST",
+      "/api/sessions",
+      { ...proof, ...(displayName ? { displayName } : {}), device },
+      false,
+    );
+    this.keep(r);
+    return r.account;
+  }
+
+  /** `POST /api/account/sign-ins` with a store's proof: adds that sign-in to this account (SAVE-153). */
+  async addSignIn(proof: StoreProof): Promise<AccountCard["signIns"]> {
+    return (await this.json<{ signIns: AccountCard["signIns"] }>("POST", "/api/account/sign-ins", proof)).signIns;
+  }
+
+  /** `POST /api/sessions/steam-openid`: Steam's sign-in address, coming back to `returnUrl` (SAVE-151, SAVE-152). */
+  async steamOpenIdUrl(returnUrl: string): Promise<string> {
+    return (await this.json<{ url: string }>("POST", "/api/sessions/steam-openid", { return: returnUrl }, false)).url;
   }
 
   /** `POST /api/accounts`, then signs the new account in on this device. */

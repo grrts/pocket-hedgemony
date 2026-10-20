@@ -295,7 +295,10 @@
       ]
     },
     "ios_needs": "Sign in with Apple",
-    "steam_ticket_identity": "pockethegemony"
+    "steam_ticket_identity": "pockethegemony",
+    "token_leeway_seconds": 60,
+    "browser_code_minutes": 5,
+    "app_return": "pockethegemony://auth/steam"
   },
   "export": {
     "android": "share sheet",
@@ -306,6 +309,8 @@
     "cloud.shared.max_per_account",
     "desktop_quit_wait_seconds",
     "kinds.autosave.every_6_months",
-    "orders_journal.safety_interval_seconds"
+    "orders_journal.safety_interval_seconds",
+    "sign_in.browser_code_minutes",
+    "sign_in.token_leeway_seconds"
   ]
 }

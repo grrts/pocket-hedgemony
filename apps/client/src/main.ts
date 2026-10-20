@@ -139,6 +139,8 @@ import { CloudApi, CloudError, cloudBase, desktopTokenStore, webKeyValue, webTok
 import { SteamSignIn } from "./cloud/steam.ts";
 import { CLOUD_PATH, CloudSync } from "./cloud/sync.ts";
 import { accountHtml, accountView, bindAccount, loadCard } from "./cloud/accountCard.ts";
+import { capacitorBridge, noBridge, webBridge, type CapacitorLike } from "./cloud/bridge.ts";
+import { APP_RETURN, StoreSignIn } from "./cloud/storeSignIn.ts";
 import { bindShareSheet, fetchSharedCopy, openError, shareSheetHtml, shareView, type ShareView } from "./cloud/share.ts";
 
 const rules = loadDefaultRuleset();
@@ -7931,6 +7933,29 @@ const cloud = cloudUrl
   : undefined;
 /** Steam sign-in, in the Steam build with Steam running (SAVE-141, SAVE-146). */
 const steamSignIn = cloud && desktop?.steam ? new SteamSignIn(cloud, desktop.steam, webKeyValue(), SERVER_DEVICE, savesConfig.sign_in.steam_ticket_identity) : undefined;
+/**
+ * Apple, Google, and Steam in the browser sheet (SAVE-149 … SAVE-156): on a phone through its
+ * plugins, on the web through the stores' own scripts and Steam in the same tab; the desktop
+ * app has none of them (the Steam build signs in with its ticket above).
+ */
+const env = import.meta.env as Record<string, string | undefined>;
+const signInBridge =
+  runtimeNow === "capacitor-ios" || runtimeNow === "capacitor-android"
+    ? capacitorBridge((globalThis as { Capacitor?: CapacitorLike }).Capacitor ?? {}, {
+        googleClientId: env.VITE_GOOGLE_CLIENT_ID?.trim() || undefined,
+        // The app's bundle id (apps/mobile/capacitor.config.json); iOS uses it whatever is passed.
+        appleClientId: "com.pockethegemony.app",
+        appleRedirectUri: env.VITE_APPLE_REDIRECT_URI?.trim() || undefined,
+        appReturn: APP_RETURN,
+      })
+    : runtimeNow === "electron"
+      ? noBridge
+      : webBridge({
+          googleClientId: env.VITE_GOOGLE_CLIENT_ID?.trim() || undefined,
+          appleServicesId: env.VITE_APPLE_SERVICES_ID?.trim() || undefined,
+          appleRedirectUri: env.VITE_APPLE_REDIRECT_URI?.trim() || undefined,
+        });
+const storeSignIn = cloud ? new StoreSignIn(cloud, signInBridge, webKeyValue(), SERVER_DEVICE, desktop?.steam ? "steam" : savePlatform) : undefined;
 const cloudView = accountView();
 let cardLoading = false;
 if (cloud) {
@@ -7944,10 +7969,20 @@ if (cloud) {
           if (shell.view === "settings") renderShell();
         });
       }
-      return accountHtml(cloud, cloudView, Date.now(), steamSignIn);
+      return accountHtml(cloud, cloudView, Date.now(), steamSignIn, storeSignIn);
     },
-    bind: (card, redraw) => bindAccount(card, cloud, cloudView, SERVER_DEVICE, redraw, steamSignIn),
+    bind: (card, redraw) => bindAccount(card, cloud, cloudView, SERVER_DEVICE, redraw, steamSignIn, storeSignIn),
   });
+  // On the web the page went to Steam and came back with a code: finish the sign-in and show the
+  // card where the player tapped, with the reason when it failed (SAVE-151, SAVE-155).
+  if (storeSignIn) {
+    void storeSignIn.resume().then((done) => {
+      if (!done && !storeSignIn.error) return;
+      cloudView.card = undefined;
+      openSettingsAt("account");
+      openShell("settings", true);
+    });
+  }
   // The Steam build signs in by itself, once the saves are in the folder; a failure waits on the card (SAVE-141).
   if (steamSignIn) void savesMoved.then(() => steamSignIn.atLaunch());
   cloud.onChange = () =>

@@ -7,7 +7,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * A store sign-in an account holds (SAVE-112): a Steam account today, Apple and Google later.
+ * A store sign-in an account holds (SAVE-112): a Steam account, an Apple id or a Google id.
  * Email and password stay on the account itself.
  */
 #[ORM\Entity(repositoryClass: IdentityRepository::class)]
@@ -15,6 +15,9 @@ use Doctrine\ORM\Mapping as ORM;
 class Identity
 {
     public const STEAM = 'steam';
+    public const APPLE = 'apple';
+    public const GOOGLE = 'google';
+    public const PROVIDERS = [self::STEAM, self::APPLE, self::GOOGLE];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
