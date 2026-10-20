@@ -32,6 +32,17 @@ class IronmanHead
         $this->saveId = $saveId;
     }
 
+    public function getCampaignId(): string
+    {
+        return $this->campaignId;
+    }
+
+    /** The head moves with its campaign when two accounts are combined (SAVE-189). */
+    public function moveAccount(Account $account): void
+    {
+        $this->account = $account;
+    }
+
     public function getSaveId(): string
     {
         return $this->saveId;

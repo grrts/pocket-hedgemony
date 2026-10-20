@@ -2948,3 +2948,87 @@ Then("the save is kept", (s) => {
 Then("a new campaign as {string} starts at once", (s, nation: string) => {
   expect(S.gate(nationId(nation), unlocked(s))).toBe("go");
 });
+
+// ================================================================ combining accounts (SAVE-189 … SAVE-193)
+
+type HeldSave = { saveId: string; campaignId: string; removed: boolean };
+const heldSaves = (s: Scenario, account: string): HeldSave[] => ((s.held ??= {})[account] ??= []);
+
+Given(/^the campaign "([^"]+)" has the saves "([^"]+)" and "([^"]+)" on the account "([^"]+)"$/, (s, campaign: string, a: string, b: string, account: string) => {
+  heldSaves(s, account).push(...[a, b].map((saveId) => ({ saveId, campaignId: campaign, removed: false })));
+});
+Given(/^the save "([^"]+)" is removed on the account "([^"]+)" only$/, (s, saveId: string, account: string) => {
+  heldSaves(s, account).find((r) => r.saveId === saveId)!.removed = true;
+});
+When(/^the two accounts are combined into "([^"]+)"$/, (s, staying: string) => {
+  s.staying = staying;
+  const other = Object.keys(s.held ?? {}).find((a) => a !== staying);
+  if (other) {
+    // Every save of both is kept; a save id on both is one file, kept once (SAVE-189).
+    const kept = new Map(heldSaves(s, staying).map((r) => [r.saveId, r]));
+    for (const r of heldSaves(s, other)) {
+      const mine = kept.get(r.saveId);
+      if (!mine || S.keptSave(mine, r) === "other") kept.set(r.saveId, r);
+    }
+    s.combined = [...kept.values()];
+  }
+  if (s.heads) {
+    const mine = s.heads[staying] as { saveId: string; savedAt: number };
+    const theirs = Object.entries(s.heads).find(([a]) => a !== staying)![1] as { saveId: string; savedAt: number };
+    s.head = S.keptIronmanHead(mine, theirs) === "other" ? theirs.saveId : mine.saveId;
+  }
+  if (s.entitlements) {
+    const mine = s.entitlements[staying] as S.HeldStatus;
+    const theirs = Object.entries(s.entitlements).find(([a]) => a !== staying)![1] as S.HeldStatus;
+    s.kept = S.keptEntitlement(mine, theirs) === "other" ? { status: theirs, from: "other" } : { status: mine, from: "staying" };
+  }
+});
+Then(/^the account "([^"]+)" holds the saves "([^"]+)", "([^"]+)" and "([^"]+)" of the campaign "([^"]+)"$/, (s, account: string, a: string, b: string, c: string, campaign: string) => {
+  expect(s.staying).toBe(account);
+  const rows = s.combined as HeldSave[];
+  expect(rows.map((r) => r.saveId).sort()).toEqual([a, b, c].sort());
+  expect(rows.every((r) => r.campaignId === campaign)).toBe(true);
+});
+Then(/^the save "([^"]+)" is held once and not removed$/, (s, saveId: string) => {
+  const rows = (s.combined as HeldSave[]).filter((r) => r.saveId === saveId);
+  expect(rows).toHaveLength(1);
+  expect(rows[0]!.removed).toBe(false);
+});
+
+Given(/^the ironman campaign "([^"]+)" has its head at the save "([^"]+)" saved in (\w+) (\d+) on the account "([^"]+)"$/, (s, campaign: string, saveId: string, month: string, year: string, account: string) => {
+  s.ironCampaign = campaign;
+  (s.heads ??= {})[account] = { saveId, savedAt: Number(year) * 12 + monthOf(month) };
+});
+Then(/^the ironman head of "([^"]+)" is the save "([^"]+)"$/, (s, campaign: string, saveId: string) => {
+  expect(s.ironCampaign).toBe(campaign);
+  expect(s.head).toBe(saveId);
+});
+Then(/^an ironman upload that follows "([^"]+)" is told to load the newer game first$/, (s, parent: string) => {
+  // SAVE-089: only a save whose parent is the head is accepted.
+  expect(s.head).not.toBe(parent);
+});
+
+Given(/^the account "([^"]+)" holds an? (active|refunded|revoked) App Store purchase$/, (s, account: string, status: string) => {
+  (s.entitlements ??= {})[account] = status;
+});
+Then(/^the account holds one App Store purchase, the (active|refunded|revoked|staying account's) one$/, (s, kept: string) => {
+  if (kept === "staying account's") expect(s.kept.from).toBe("staying");
+  else expect(s.kept.status).toBe(kept);
+});
+Then(/^the full game is (unlocked|locked) on the App Store$/, (s, state: string) => {
+  expect(S.fullGameUnlocked({ store: "apple", owned: false, server: s.kept.status })).toBe(state === "unlocked");
+});
+
+Given(/^the account holds the Steam account "\d{17}" and the email "[^"]+"$/, (s) => {
+  s.signIns = ["steam", "email"] as S.SignInKind[];
+});
+When("the player removes the email sign-in", (s) => {
+  expect(S.mayRemoveSignIn(s.signIns, "email")).toBe(true);
+  s.signIns = (s.signIns as S.SignInKind[]).filter((k) => k !== "email");
+});
+Then("the account holds the Steam sign-in only, and the device stays signed in", (s) => {
+  expect(s.signIns).toEqual(["steam"]);
+});
+Then(/^removing the Steam sign-in is refused with "last_sign_in"$/, (s) => {
+  expect(S.mayRemoveSignIn(s.signIns, "steam")).toBe(false);
+});
