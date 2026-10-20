@@ -793,10 +793,11 @@ export class MapRenderer {
   constructor(canvas: HTMLCanvasElement, map: MapImage, provinceCount: number) {
     this.canvas = canvas;
     this.map = map;
-    const gl = canvas.getContext("webgl2", { antialias: false, alpha: false, preserveDrawingBuffer: false });
-    if (!gl) throw new Error("WebGL2 is not available");
-    this.bare = gl;
-    this.gl = this.watched(gl);
+    const bare = canvas.getContext("webgl2", { antialias: false, alpha: false, preserveDrawingBuffer: false });
+    if (!bare) throw new Error("WebGL2 is not available");
+    this.bare = bare;
+    // Start-up goes through the checked context too, so a texture an iPhone rejects is named.
+    const gl = (this.gl = this.watched(bare));
     this.program = link(gl, VERT, FRAG);
     for (const name of ["uCenter", "uZoom", "uView", "uIds", "uTileOrigin", "uTileSize", "uInfo", "uOwner", "uInfoWidth", "uTime", "uMode", "uParchment", "uParchmentDark", "uTerrain", "uDepth", "uFoam", "uInk", "uHighlight", "uSand", "uForbid", "uAtlas", "uMini", "uLand", "uSeason", "uTown", "uTownAtlas", "uLiving", "uFiefs", "uRoad", "uSubject", "uSubjectOf", "uHunt", "uVision"]) {
       this.u[name] = gl.getUniformLocation(this.program, name);
