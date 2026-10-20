@@ -153,7 +153,7 @@ export function startAchievements(world: World, o: { ironman?: boolean } = {}): 
       realm: id,
       start: isoOf(world),
       ...(world.options ? { difficulty: world.campaign.difficulty } : {}),
-      // Achievements name historical or free events (ACH-038); plausible counts as free, the history not followed.
+      // Any events choice counts (ACH-038); plausible is filed as free, the history not followed.
       ...(world.options?.events ? { events: world.options.events === "historical" ? ("historical" as const) : ("free" as const) } : {}),
     }),
     profile: A.newProfile(),

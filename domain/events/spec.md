@@ -46,7 +46,7 @@ Newest decision first.
    tree's Second World War events and its Decolonization, Cold War and Globalization ages are out of scope;
    item 24 (event tree fixes); item 20 (order of a turn).
 2. `screen-flow/screen-flow-design.md` §4.6, G7 (16 Oct): unanswered events block End turn; events open one
-   at a time; options include historical or free events; the end-of-campaign wrap-up.
+   at a time; options include historical, plausible or free events (D-SETUP-21); the end-of-campaign wrap-up.
 3. Sibling designs proposing additions (16 Oct): `religion/religion-design.md` §10.2–10.4, §18 and
    `religion/event-tree-additions/`; `revolutions/changes-for-other-designs.md` and
    `revolutions/generated/event_tree_patch/`; `culture/culture-design.md` §6, §11; `subjects/subjects-design.md`

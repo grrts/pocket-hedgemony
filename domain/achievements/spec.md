@@ -286,7 +286,7 @@ Unlock texts (what the player reads) are the `text` field of each row; see `achi
 - ACH-035 If a campaign is not ironman, then the achievements context shall award no achievement in that campaign, for good. [achievements §5.2]
 - ACH-036 If a debug, editor or "free play" cheat is used even once, then the achievements context shall treat the save as marked for good and award nothing from it, in-game or on any store. [achievements §5.2, §11]
 - ACH-037 When the player switches to another country after game over, the achievements context shall stop awarding achievements from that moment. [achievements §5.2, §11]
-- ACH-038 The achievements context shall let an ironman campaign earn achievements at any difficulty, with historical or free events. [achievements §5.2]
+- ACH-038 The achievements context shall let an ironman campaign earn achievements at any difficulty, with historical, plausible or free events. [achievements §5.2]
 - ACH-039 The achievements context shall award no achievement in the tutorial. [achievements §5.2; tutorial §12]
 - ACH-040 The achievements context shall read three flags on the save: `ironman_unbroken`, `cheat_marked` and `switched_country`. [achievements §5.2]
 - ACH-041 The achievements context shall count a campaign towards lifetime counters only if it passes all three flags. [achievements §5.2]

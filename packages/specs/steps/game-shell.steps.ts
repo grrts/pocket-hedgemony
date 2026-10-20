@@ -737,11 +737,11 @@ When(/^the player moves to step (\d)$/, (s, step: string) => {
   acted(s);
 });
 
-Then("the options offered are difficulty, AI aggression, fog, historical or free events, ironman, and the end date", (_s) => {
-  expect(campaignOptions()).toEqual(["difficulty", "AI aggression", "fog", "historical or free events", "ironman", "end date"]);
+Then("the options offered are difficulty, AI aggression, fog, historical, plausible or free events, ironman, and the end date", (_s) => {
+  expect(campaignOptions()).toEqual(["difficulty", "AI aggression", "fog", "historical, plausible or free events", "ironman", "end date"]);
 });
 
-const PRESET = { difficulty: "normal", "AI aggression": "calm", fog: "on", "historical or free events": "historical", ironman: "off", "end date": "1939-08-31" };
+const PRESET = { difficulty: "normal", "AI aggression": "calm", fog: "on", "historical, plausible or free events": "historical", ironman: "off", "end date": "1939-08-31" };
 
 When("the player picks a preset", (s) => {
   s.filled = applyPreset(s.nc, PRESET);
