@@ -29,6 +29,8 @@ export interface MapViewEvents {
   onLongPress?(screenX: number, screenY: number, province: number): void;
   longPressMs?(): number;
   drawOverlay(o: OverlayContext): void;
+  /** The player moved the camera by hand: a drag that pans, or a pinch, wheel or double tap that zooms (the tutorial's camera steps, TUT-103). */
+  onCamera?(action: "pan" | "zoom"): void;
 }
 
 /**
@@ -257,6 +259,7 @@ export class MapView {
         const dist = Math.hypot(a!.x - b!.x, a!.y - b!.y);
         const mid = { x: (a!.x + b!.x) / 2, y: (a!.y + b!.y) / 2 };
         this.zoomAt(mid.x, mid.y, (this.gesture.startZoom * dist) / this.gesture.pinchDist);
+        this.events.onCamera?.("zoom");
       }
     });
 
@@ -267,6 +270,8 @@ export class MapView {
       this.pointers.delete(e.pointerId);
       if (p && this.gesture && this.pointers.size === 0) {
         if (this.gesture.moved < 8 && e.type === "pointerup") this.events.onTap(p.x, p.y, this.provinceAt(p.x, p.y));
+        // A one-finger drag of some length pans; a pinch or a long-press is marked 99 and is not one.
+        else if (this.gesture.moved >= 40 && this.gesture.moved !== 99 && this.gesture.pinchDist === 0) this.events.onCamera?.("pan");
         this.gesture = null;
       }
       if (this.pointers.size === 1 && this.gesture) this.gesture.moved = 99;
@@ -280,12 +285,14 @@ export class MapView {
         e.preventDefault();
         const { x, y } = local(e as unknown as PointerEvent);
         this.zoomAt(x, y, this.camera.zoom * Math.exp(-e.deltaY * 0.0015));
+        this.events.onCamera?.("zoom");
       },
       { passive: false },
     );
     el.addEventListener("dblclick", (e) => {
       const { x, y } = local(e as unknown as PointerEvent);
       this.zoomAt(x, y, this.camera.zoom * 2);
+      this.events.onCamera?.("zoom");
     });
   }
 }

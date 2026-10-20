@@ -230,15 +230,47 @@ function resume(t: Tutorial, n: number, index: number): void {
   t.events.push({ type: "StepShown", chapter: n, step: step.id });
 }
 
-/** Feeds an input; an ended step moves on to the next, or the chapter's end. */
+/**
+ * Feeds an input; an ended step moves on to the next, or the chapter's end:
+ * the last step ended marks the chapter done and clears the place to resume
+ * (TUT-013, TUT-004), and the run stays ended for the caller to close.
+ */
 export function tutorialInput(t: Tutorial, input: StepInput): void {
-  if (!t.run) return;
+  if (!t.run || t.run.ended) return;
   t.run = stepInput(t.run, input);
   if (!t.run.ended) return;
   const { chapter: n, index, step, how } = t.run;
   t.events.push({ type: how === "skipped" ? "StepSkipped" : "StepCompleted", chapter: n, step: step.id });
   if (index + 1 < chapterSteps(n).length) resume(t, n, index + 1);
-  else t.run = { ...t.run };
+  else {
+    markDone(t.progress, n);
+    t.progress.current = null;
+    t.events.push({ type: "ChapterCompleted", chapter: n });
+  }
+}
+
+/** The chapter's last step has ended: the chapter is over (TUT-013). */
+export const chapterOver = (t: Tutorial): boolean => !!t.run?.ended && t.run.index + 1 >= chapterSteps(t.run.chapter).length;
+
+/** The chapters the game can play today; the rest wait for their chapter saves and scripted events (D-TUT-19). */
+export const playableNow = (): number[] => [...config.playable_now];
+
+/** The next chapter after n that can be played today, or null: the tutorial's end card comes next (D-TUT-19). */
+export function nextPlayable(n: number): number | null {
+  return playableNow().find((c) => c > n) ?? null;
+}
+
+/** The tutorial is finished once every chapter playable today is done; Tutorial then moves under More (SHELL-152, D-TUT-19). */
+export const tutorialFinished = (p: Progress): boolean => playableNow().every((n) => p.done.includes(n));
+
+/** The map province a place token points at, by its name on the map (TUT-059). */
+export function placeProvince(key: string): string | null {
+  return (config.tokens.place_province as Record<string, string>)[key] ?? null;
+}
+
+/** A tutorial string by key, for the note's own words (TUT-113). */
+export function tutorialString(key: string, lang = "en"): string {
+  return (config.strings as Record<string, Record<string, string>>)[lang]![key] ?? key;
 }
 
 /** The tutorial's three pause-menu lines (TUT-064). */
