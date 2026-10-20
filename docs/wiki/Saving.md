@@ -170,6 +170,8 @@ Play Games saved games and an iCloud Documents container are not used.
 
 On phones the free download and the full game are the same app, so saves carry over with nothing to do; buying the unlock removes the lock. Each header records your nation and whether it needs the full game. Loading a locked nation's save without the full game shows the unlock screen instead of failing, and never deletes the save. If a purchase is refunded or revoked, the saves stay and those nations ask to be unlocked again.
 
+**Buying the full game.** Each store sells the full game once: on Steam it is the paid game itself (the demo is a separate app), and on an iPhone, iPad or Android phone it is the one in-app purchase, `full_game`, in the free download. A purchase unlocks the full game on the store where you bought it; your account carries your saves to every device, but not the purchase. While the full game is locked, the start screen shows a small **Full game** ribbon, and More holds **Unlock**; both open the Unlock card, which also opens by itself when you choose a realm or open a save that needs the full game. The card shows what it unlocks, **Buy** with the store's own price, and on phones **Restore purchases**, and says the result right there ("The full game is unlocked on this device."). Once unlocked, the realm or save you chose is one tap away, and the ribbon is gone. The game asks your store first, so it works offline and without an account; when you are signed in, our server checks the purchase too, so a refund locks the full game again (your saves always stay) and one purchase can't be used by two accounts.
+
 With the Steam demo and the full game on the same computer, the full game finds the demo's saves on first launch and copies them into its own folder, and Steam Cloud keeps them from then on. A signed-in demo player's saves sync to the full game on any computer or phone; without an account, Export and Import do the same. Each save records which app wrote it (free, demo or full game) but no list of limits, so the full game simply opens a demo save with no limits.
 
 ### Ironman
@@ -198,6 +200,7 @@ Send a report, on the failure screen, attaches the Resume save and the orders jo
 - The Cloud saves row and "Sync on Wi-Fi only" in [Settings](Settings), and the autosave interval and count rows.
 - The ironman split prompt, asked once.
 - The unlock screen for a locked nation's save.
+- The Full game ribbon on the start screen and the Unlock card, with Buy and, on phones, Restore purchases.
 
 ## How it connects
 

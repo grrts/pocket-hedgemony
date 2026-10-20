@@ -9,7 +9,7 @@ use App\Account\Steam\SteamWebApi;
 use Symfony\Component\HttpClient\Response\MockResponse;
 
 /**
- * Every store as the tests see it: Steam's ticket check (SteamMock), Apple's and Google's key sets
+ * Every store as the tests see it: Steam's ticket check (SteamMock), the purchase checks (StoresMock), Apple's and Google's key sets
  * (the local TestKeys "apple-1" and "google-1"), and Steam's OpenID check_authentication, which
  * confirms an answer whose signature is "good-sig". Every other call fails the test.
  */
@@ -21,6 +21,10 @@ final class StoreMock
     public function __invoke(string $method, string $url, array $options = []): MockResponse
     {
         self::$calls[] = [$method, $url];
+        // The purchase checks' store calls (Steam ownership, App Store, Google Play) answer from StoresMock.
+        if (StoresMock::handles($url)) {
+            return (new StoresMock())($method, $url, $options);
+        }
         if (str_starts_with($url, SteamWebApi::URL)) {
             return (new SteamMock())($method, $url);
         }

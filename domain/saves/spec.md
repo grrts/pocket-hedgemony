@@ -15,7 +15,8 @@ In scope:
 - Cloud saves on the Pocket Hegemony (Symfony) server: accounts and sign-in, storage, API, sync timing,
   server checks, quotas; store backups (Steam Auto-Cloud, Android Auto Backup, iOS device backup, web
   IndexedDB); Export and Import.
-- Free tier and full game: locked-nation saves, refunds, Steam demo carry-over.
+- Free tier and full game: locked-nation saves, refunds, Steam demo carry-over; the purchase of the full game on
+  each store, the server's checks of it and the stores' refund notifications, and the game's unlock state.
 - Ironman: one line per campaign, ironman-head check, the offline split conflict.
 - Integrity: CRCs, `worldHash`, the "modified" mark; bug-report attachments; release tests; the engine
   worker's save and load requests.
@@ -41,6 +42,9 @@ Newest decision first.
    community thing").
    §9 and §11 step 4 for the desktop: Steamworks, Steam sign-in, saves as files and Auto-Cloud.
    §3, §4, §8 and §11 step 5 for phones and the web: Sign in with Apple, Google, and Steam in the browser sheet.
+   §6, §8, §10 and §11 step 6 for purchases: the unlock, the server's checks and the store webhooks (Leroy, 19 Oct:
+   cross-buy is per store; Steam is a paid app with a demo; the phones are a free download with a `full_game`
+   in-app purchase).
 2. `save-system/README.md`, second draft 2026-10-16, §8 Decisions (settled by Leroy on 16 Oct: Export and
    Import yes; cloud saves on our Symfony server with optional accounts; default autosave every 12 months plus
    the Resume save every turn; cross-store cloud saves at launch, purchases stay per store), and all of §1–§7, §9.
@@ -91,6 +95,10 @@ Newest decision first.
 | Shared save | A public copy of one save, uploaded once and attached to a community post, that anyone can play | A cloud save (private, synced) |
 | Share code | The eight letters and digits that name a shared save (`K7QX-M2PA`), in its link `/s/<code>` | Save id |
 | Copy of a shared save | The new campaign a player starts from a shared save, with its own campaign id and `sharedFrom` | The shared save itself |
+| Full game purchase | The one thing each store sells: the paid app on Steam, the non-consumable in-app product `full_game` on the App Store and Google Play | The Steam demo (a separate app) |
+| Entitlement | The server's record of one account's full game purchase on one store: the store's reference for it and its status (`active`, `refunded`, `revoked`) | A sign-in (identity) |
+| Store bridge | The small interface each platform's shell gives the game for its own store: owned or not, the proof, the price, Buy, Restore purchases | The cloud API |
+| Store proof | What the store hands the game for a purchase and the server checks: a StoreKit 2 signed transaction, a Play purchase token, or (Steam) the SteamID of the sign-in | A receipt shown to the player |
 
 ## 4. Domain model
 
@@ -129,6 +137,13 @@ Newest decision first.
 
 **UploadQueue** (one per device)
 - INV-SAVE-16: The queue survives restarts and empties oldest first when online, retrying with back-off.
+
+**Entitlement** (on the server; identity: account and store)
+- Holds: the product, the store's reference for the purchase (SteamID and app id; Apple original transaction id;
+  Google order id, and the token's hash), status, environment, first verified, last checked.
+- INV-SAVE-19: An account has at most one entitlement per store, and a store reference belongs to at most one
+  account.
+- INV-SAVE-20: An entitlement unlocks the full game only on its own store (cross-buy is per store).
 
 **SharedSave** (on the server; identity: share code)
 - Holds: the account that shared it, the community topic and post it came with, the header fields its card
@@ -321,6 +336,21 @@ Newest decision first.
 - SAVE-084: Where a demo player is signed in, their saves shall sync through our server to the full game on any computer or phone; without an account, Export and Import shall do the same. [save-system §6.1]
 - SAVE-085: The save system shall store in the header's `tier` the app that wrote the save (`free`, `demo` or `full`) and no list of limits, and the full game shall open such a save with no limits. [save-system §6.1; D-SAVE-13]
 
+#### Purchases and the server's checks
+
+- SAVE-170: The full game shall be one purchase per store, and it shall unlock the full game only on the store where it was bought: on Steam the paid app (the demo is a separate app id and unlocks nothing), on the App Store and Google Play the non-consumable in-app product `full_game` in the free download. The account carries the saves across stores, never a purchase. [accounts-design §6 (cross-buy per store, Leroy 19 Oct); SAVE-072; config `purchases.product_id`]
+- SAVE-171: The server shall keep one entitlement per account and store: the product, the store's reference for the purchase (SteamID and app id; the Apple original transaction id; the Google order id with the purchase token's hash), its status (`active`, `refunded` or `revoked`), the store's environment, when it was first verified and when last checked. One store reference shall belong to at most one account: a purchase already held by another account shall be refused with "This purchase is on another Pocket Hegemony account." [accounts-design §6, §8; D-SAVE-22]
+- SAVE-172: The server shall answer `GET /api/entitlements/{store}` (`steam`, `apple` or `google`) for the signed-in account with whether the full game is unlocked on that store, the status (`active`, `refunded`, `revoked` or `none`), when it was last checked, and the tag the store's purchase should carry for this account: on the App Store the `appAccountToken`, which is the account id; on Google Play the `obfuscatedAccountId`, a SHA-256 hash of it. [accounts-design §6]
+- SAVE-173: When the Steam entitlement is asked for and the last check is older than 24 hours or there is none, or `POST /api/purchases` asks for Steam, the server shall check `ISteamUser/CheckAppOwnership` with the publisher key for the full game's app id and the account's SteamID; it shall record the entitlement active when Steam says the app is owned, mark it refunded when Steam says it no longer is, and, while Steam cannot be reached, answer what it last recorded. An account without a Steam sign-in shall have no Steam entitlement. [accounts-design §6; config `purchases.steam_recheck_hours`; D-SAVE-22]
+- SAVE-174: When the game sends an App Store purchase (`POST /api/purchases` with the StoreKit 2 signed transaction), the server shall accept it only if the JWS is signed with ES256, its `x5c` chain runs leaf, intermediate, root with each certificate signed by the next, the root is the Apple Root CA - G3 the server is configured with, the intermediate and the leaf carry Apple's marker extensions (`1.2.840.113635.100.6.2.1`, `1.2.840.113635.100.6.11.1`), every certificate was valid at the transaction's `signedDate`, the signature checks with the leaf's key, and the transaction names our bundle id, the product `full_game`, the Production environment (Sandbox only where the server is set to accept it) and no `appAccountToken` but this account's. A transaction with a `revocationDate` shall be recorded as revoked. [accounts-design §6; D-SAVE-22]
+- SAVE-175: When the game sends a Google Play purchase token, the server shall read it with the Play Developer API `purchases.products.get` for our package and `full_game`, signed in as its service account; it shall record the entitlement active only when the purchase state is purchased, refuse a token Play does not know, answer a pending purchase as pending without unlocking, refuse a purchase whose `obfuscatedExternalAccountId` names another account, and acknowledge a purchased one that is not acknowledged yet, so Play does not refund it after 3 days. [accounts-design §6]
+- SAVE-176: The server shall listen for App Store Server Notifications V2 at `POST /api/stores/apple/notifications`: it shall check the signed payload and the transaction inside it as in SAVE-174, mark the entitlement refunded on `REFUND`, revoked on `REVOKE` (Family Sharing ended) and active again on `REFUND_REVERSED`, record a `ONE_TIME_CHARGE` whose `appAccountToken` names an account, answer 200 to every notification that passes the check (also one about a purchase it does not hold), and refuse one that does not. [accounts-design §6]
+- SAVE-177: The server shall listen for Google Play real-time developer notifications, pushed by Pub/Sub to `POST /api/stores/google/notifications?token=<push token>`: it shall refuse a push without the configured push token or for another package, mark refunded the entitlement whose purchase token or order a `voidedPurchaseNotification` names, read a purchase again with `purchases.products.get` on a `oneTimeProductNotification`, and accept every other push it could read (a test notification, a purchase it does not hold) so Pub/Sub does not send it again. A daily command, `app:stores:google-voided`, shall read Play's voided purchases list as well. [accounts-design §6; D-SAVE-22]
+- SAVE-178: Where a store's settings are not set on the server, that store shall be unavailable: its entitlement, purchase and notification calls shall answer 503 with `store_unavailable` and a message that names it ("App Store purchases are not available on this server."), while the other stores, sign-in and saves keep working. [accounts-design §10; SAVE-118]
+- SAVE-179: The game shall ask its own store first, through the store bridge its platform's shell gives it, which works offline and needs no account. Where the build names a cloud server and the player is signed in, the game shall also ask the server for this store's entitlement and decide from both: on Steam the running paid app is the full game whatever the server answers, as Steam keeps its own licences; on the App Store and Google Play an active entitlement unlocks the full game, a refunded or revoked one locks it again even while the store's own answer still says owned, and with no answer (offline, signed out, the store unavailable on the server) or no entitlement yet, the store's answer decides. When the store says owned and the server holds no active entitlement, the game shall first send the store's proof and then decide from the answer. [accounts-design §6]
+- SAVE-180: Where the build names no cloud server, or its shell gives no store bridge (the web game, the desktop game without Steam), the game shall stay the full game as it is today, with no unlock state, ribbon or Restore purchases. [accounts-design §9; D-SET-22]
+- SAVE-181: While the full game is locked on this store, the game shall open the Unlock card in place of loading a save of a locked nation (with the message of SAVE-081) and in place of starting a new campaign of a realm that needs the full game; when it locks again after a refund or revocation every save shall stay (SAVE-082), and once it unlocks, the save or realm the player asked for shall be one tap away. [accounts-design §6; SAVE-081, SAVE-082; SHELL-032, SHELL-105]
+
 ### 5.11 Ironman
 
 - SAVE-086: The save system shall let ironman be chosen only when a campaign starts, and it cannot be turned off. [save-system §6.2]
@@ -385,6 +415,12 @@ Newest decision first.
 - SAVE-155: The player shall find the phone and web sign-ins where every sign-in is, on the Account and cloud saves card (SAVE-119). While signed out, the card shall hold one full-width button per store sign-in this platform offers, in SAVE-059's order: on an iPhone or iPad **Sign in with Apple** then **Sign in with Steam**; on Android **Sign in with Google** then **Sign in with Steam**; on the web **Sign in with Steam**, **Sign in with Google**, **Sign in with Apple**; then "Or use email instead:" and the email form (SAVE-120). Tapping Apple or Google shall open the system's own sheet over the game; tapping Steam shall open Steam's page in the browser sheet, which closes and comes back to the game by itself (on the web the page goes to Steam and back to the game). While a sign-in runs, the buttons shall wait; a failed or cancelled try shall say why under the buttons and leave the card as it was. A button shall show only where this build can start that sign-in, and on iOS, if Sign in with Apple cannot be started, no other store sign-in shall show either (SAVE-059). [X-19; accounts-design §3, §4; SAVE-059, SAVE-146]
 - SAVE-156: While signed in, the **Sign-ins** row (SAVE-147) shall list Apple and Google with Steam and email, and under the display name the card shall say "Signed in with Apple", "Signed in with Google" or "Signed in with Steam" for an account that has no email. Under the row, one **Add** button per store sign-in this platform offers and the account does not hold yet ("Add Sign in with Apple", "Add Sign in with Google", "Add Sign in with Steam") shall run the same sign-in and add it (SAVE-153); one that belongs to another account shall say "This sign-in already belongs to another Pocket Hegemony account." in the card. Everything about the account stays on this one card, and the Sign-ins row with the status line (SAVE-121) is its overview at a glance. [X-19; accounts-design §3, §5; SAVE-147]
 - SAVE-157: On a phone in landscape the store sign-in buttons shall be full width and 48 points high, the Add buttons at least 44, inside the safe areas in the Wide and Tall layouts; the Apple and Google sheets and the browser sheet are the system's own and need no typing, only the email fallback does, and nothing shall need hover. [X-19; accounts-design §3; SAVE-123]
+#### Buying the full game
+
+- SAVE-182: The player shall find buying in one place, the **Unlock** card: opened from the small "Full game" ribbon on the start screen (SHELL-029) and from More → Unlock (SHELL-154) while the full game is locked on this store, and in place of a locked realm's new campaign or a locked nation's save (SAVE-181); never as a pop-up and never before playing. [X-19; accounts-design §3]
+- SAVE-183: The Unlock card shall hold everything about the purchase in one card: what it unlocks ("The full game: every realm"), **Buy** with the store's own price, **Restore purchases** on phones, and the result in the card itself ("The full game is unlocked on this device.", "Waiting for the store to confirm the payment.", "No purchase of the full game was found for this store account.", "This purchase is on another Pocket Hegemony account."); it shall name no other store and no other way to pay, within Apple's and Google's rules. A cancelled purchase shall add no message (SHELL-105). [X-19; accounts-design §3, §6; SHELL-135]
+- SAVE-184: The start screen shall be the overview of the unlock at a glance: the "Full game" ribbon shows while the full game is locked on this store, goes once it is unlocked, and comes back after a refund. [X-19; SHELL-029]
+- SAVE-185: On a phone in landscape the Unlock card shall be one scrolling column inside the safe areas in both the Wide and Tall layouts, with Buy full width and 48 points high, Restore purchases at least 44 points high, the store's own sheet doing the paying, and nothing that needs hover. [X-19; accounts-design §3]
 
 ## 6. Commands
 
@@ -410,6 +446,10 @@ Newest decision first.
 | ShareSave | player | Signed in; online; under 50 shared saves | Shared save and its topic (or reply) made; code and link back | `SaveShared` |
 | OpenSharedSave | player | Online; the code names a shared save | A copy joins the Manual saves as a new campaign and opens | `SaveWritten(manual)`, `SaveLoaded` |
 | RemoveSharedSave | player (who shared it) | Confirmed | Shared save refused from then on; bytes deleted | — |
+| BuyFullGame | player (Unlock card) | Store bridge; online | The store's sheet; the proof sent to the server when signed in | `FullGameUnlocked` |
+| RestorePurchases | player (Unlock card, phones) | Store bridge; online | The store's past purchase found and sent to the server | `FullGameUnlocked`, or nothing found |
+| CheckEntitlement | system (launch, sign-in) | Store bridge; cloud server named | The store's and the server's answers decide the unlock | `FullGameUnlocked` / `FullGameLocked` |
+| RecordStoreNotification | store (App Store, Pub/Sub) | Signed, or carrying the push token | Entitlement marked refunded, revoked or active | — |
 
 Save commands are local to one player's device and never change the simulation; they carry no game orders.
 
@@ -427,6 +467,7 @@ Save commands are local to one player's device and never change the simulation; 
 | `IronmanLineSplit` | Server rejected an ironman upload | both lines' device and date | game-shell (the one prompt) |
 | `AccountSignedIn` / `AccountSignedOut` / `AccountDeleted` | Account changes | account id | settings (Account row, personal settings sync) |
 | `SaveShared` | A shared save was posted | code, link, topic | game-shell (the Share sheet's result) |
+| `FullGameUnlocked` / `FullGameLocked` | The unlock on this store changed (purchase, restore, refund, revocation) | store | game-shell (ribbon, Unlock card, realm picker, locked saves) |
 
 ## 8. Policies (reactions to other contexts)
 
@@ -511,13 +552,17 @@ From `save-system/save-config.example.yaml` ("numbers here are the defaults the 
 | `cloud.shared.code_length` | Letters and digits in a share code | 8 | no | saves.json |
 | `messages.shared` | After posting a share | "Shared. Your topic is on the community." | no | saves.json |
 | `messages.no_shared_save` | A code that names no shared save | "There is no shared save with this code." | no | saves.json |
+| `purchases.product_id` | The full game's product on the App Store and Google Play (SAVE-170) | `full_game` | no | saves.json |
+| `purchases.stores` | The stores that sell the full game, each unlocking only itself (SAVE-170) | steam, apple, google | no | saves.json |
+| `purchases.steam_recheck_hours` | How old the Steam check may be before it runs again (SAVE-173) | 24 (design: at most daily) | no | saves.json |
+| `purchases.messages` | The Unlock card's results (SAVE-183) and the server's refusals (SAVE-171, SAVE-178) | see saves.json | no | saves.json |
 
 ## 11. Seams
 
 | Other context | Direction | Pattern | What crosses |
 |---|---|---|---|
 | time-and-turns | upstream | Conformist | Deterministic `processTurn`, `Rng` state, turn number and date, `Order` values, the turn boundary |
-| game-shell | downstream | Customer–Supplier | Continue target and label, Load list (campaigns, saves, devices), Save slots, toasts and messages, lifecycle events (background, resume, quit), unlock screen on locked saves, ironman split prompt |
+| game-shell | downstream | Customer–Supplier | Continue target and label, Load list (campaigns, saves, devices), Save slots, toasts and messages, lifecycle events (background, resume, quit), unlock screen on locked saves, ironman split prompt; whether the full game is unlocked on this store (`FullGameUnlocked` / `FullGameLocked`) for the ribbon, the Unlock card and the realm picker |
 | settings | partnership | Partnership | Autosave interval and count values, Cloud saves row, Wi-Fi only, account sign-in; personal settings ride the same account sync and store backups |
 | achievements | downstream | Customer–Supplier | `ironman` flag, modified mark and the header flags `ironman_unbroken`, `cheat_marked`, `switched_country`, `began_as_tutorial` (X-16, D-SAVE-1); lifetime counters and the demo list live in the player profile |
 | onboarding | downstream | Customer–Supplier | Tutorial progress and Needs attention mutes live in the player profile and sync with it, not in the save (X-16, D-SAVE-1); chapter saves shipped read-only; the `began_as_tutorial` flag |
@@ -567,6 +612,8 @@ None. AI countries' state is saved like any other (later an `ai` chunk); no AI d
 - **D-SAVE-20** The server answers the share with the code, not the bytes back, and makes the post itself, so a share is one call; the file travels base64 in the JSON body with the title and note, inside the 2 MB cap (SAVE-068). The shared copy's header has an empty `device`; the copy a player opens names their own device. Simplest single request.
 - **D-SAVE-21** (accounts-design §9, step 4) Steam on the desktop: the app id comes from `--steam-app-id`, the build's `PH_STEAM_APP_ID` or Steam's own `SteamAppId`, never from a constant in the code, so a build without either is the plain desktop game; Valve's test app 480 (Spacewar) is used only by `pnpm --filter @ph/desktop steam` for trying it out. Auto-Cloud takes every `.phsave` file in the save folder (SAVE-145), not only the synced set of SAVE-073: the files on disk are already bounded by the kept counts (2 Resume, 3 autosaves per campaign, 100 manual), an Auto-Cloud pattern cannot tell the kinds apart without a second folder, and the extra files are the older autosaves and the backup Resume save, which are harmless on the other computer. The orders journal is not a `.phsave` file, so it stays local. Simpler rule (DECISIONS rule 2).
 - **D-SAVE-22** (accounts-design §4, §8, §11 step 5) Phones and the web: (1) the game hands Apple and Google the SHA-256 of its nonce and sends the server the nonce itself, for both stores, so one rule checks both tokens and a token copied on its own cannot be used without the nonce; (2) the game asks `POST /api/sessions/steam-openid` for Steam's address instead of opening a bare `/auth/steam/start`, so "Steam sign-in is not available." shows on the card as SAVE-118 does instead of on a browser error page; (3) the one-time code is a row the server marks used in one update, so two exchanges of the same code cannot both win, and the row keeps Steam's response nonce so the same answer is never taken twice; (4) the tokens are checked with PHP's own OpenSSL against the stores' key sets, with no new library; (5) on phones the bridge starts the stores through small Capacitor plugins (`SignInWithApple`, `SocialLogin` for Google's Credential Manager, `Browser` and `App` for the browser sheet and the return link), shown only when the build has them, and on the web through Apple's and Google's own sign-in scripts, shown only when the build names its Apple Services ID and Google client id. Revoking the Apple token on account deletion (accounts-design §8) comes with Delete account. Fewest moving parts that keep each check on the server.
+
+- **D-SAVE-23** (accounts-design §6, §8, §11 step 6) Purchases. The design's `purchase` table is kept as one **entitlement per account and store**: a player buys the full game once per store, so a second purchase on the same store after a refund takes the place of the first (its reference changes) instead of adding a row; the store reference stays unique, so one purchase is never claimed by two accounts. Steam ownership is checked when the game asks for the Steam entitlement (at most daily) rather than inside sign-in and token refresh, so sign-in stays as it is and the answer is the same. On Steam the server never locks the running paid app, because Steam itself keeps the licence and a refunded app does not start. The Pub/Sub push is checked with a secret token in the push URL, which Google's push subscriptions support, rather than Google's signed OIDC token, so the server fetches no Google keys; a notification never creates an entitlement the server cannot match to a purchase it holds. The App Store Server API confirmation (design §6) is left for later: the signed transaction's chain to Apple's root is Apple's own way to check it offline. Sandbox transactions are refused unless the server is set to accept them (`APPLE_ACCEPT_SANDBOX`), so a production server never unlocks a test purchase. Simplest rules that keep the design's guarantees (DECISIONS rule 2).
 
 ## 14. Traceability
 
@@ -719,3 +766,12 @@ None. AI countries' state is saved like any other (later an `ai` chunk); no AI d
 | SAVE-146 … SAVE-148 | steam-desktop.feature | Client screens; checked by `apps/client/src/cloud/steam.test.ts` (the card) |
 | SAVE-149 … SAVE-154 | store-sign-in.feature | Server: `server/tests/Controller/StoreSignInTest.php`, `server/tests/IdTokensTest.php` and `server/tests/SteamOpenIdTest.php` (local keys, mocked HTTP) |
 | SAVE-155 … SAVE-157 | store-sign-in.feature | Client screens; checked by `apps/client/src/cloud/storeSignIn.test.ts` (the card, the bridge) |
+| SAVE-170 | purchases.feature | A purchase unlocks only its own store |
+| SAVE-171 | purchases.feature | One purchase, one account |
+| SAVE-172 … SAVE-178 | purchases.feature | The server's side; checked by `server/tests/Controller/PurchasesTest.php`, `server/tests/Controller/StoreNotificationsTest.php` and `server/tests/Purchases/*Test.php`, every store call mocked and every key and certificate made in the test |
+| SAVE-179 | purchases.feature | The game decides from its store and the server |
+| SAVE-179 | purchases.feature | The store's proof goes up first |
+| SAVE-180 | purchases.feature | Without a cloud server or a store bridge nothing changes |
+| SAVE-181 | purchases.feature | A locked realm or save opens the Unlock card |
+| SAVE-179 … SAVE-181 | — | Also `apps/client/src/cloud/purchases.test.ts` (the bridge, the decision, the card) |
+| SAVE-182 … SAVE-185 | — | Client screens; checked by `apps/client/src/cloud/purchases.test.ts` (the Unlock card's lines, buttons and messages) |
