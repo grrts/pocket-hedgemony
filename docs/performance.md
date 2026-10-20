@@ -113,6 +113,17 @@ Dragging an army plans a route each time the target changes.
   garrisons join a battle from a list by province, armies eat without a
   throwaway object, the AI calls men without a recount per province and
   gathers its standing army where its garrisons stand.
+- Main failed the timing checks twice after the standing armies (zoom 4
+  overlay 2.7 ms of 2.5, then the 5,000-province turn 26.1 ms of 25), both on
+  runners about twice as slow as usual (map shading 357 to 523 ms a frame,
+  usually about 166). The overlay was unchanged; the turn had lost its
+  headroom. Engage now returns at once when no two realms' armies at war
+  share a province and no battle is fought (most steps), and builds its cells
+  only where armies can meet; an army still where it last charted from
+  charts nothing more; realms at peace share one empty enemy set; pay is
+  counted without an array per army; the AI's weekly marches list armies by
+  province without copying. About 5 % off the turn on this container (14.6
+  ms, was 15.8), the same world to the bit.
 - Animation: every frame (was one in five, so marching armies moved at
   5 fps: the redraw request made while drawing was wiped right after).
 - Route: about 4 ms at 5,000 and 20,000 provinces (was about 8 ms).

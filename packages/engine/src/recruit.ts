@@ -292,9 +292,11 @@ export function armyPay(world: World, slot: number): number {
   const a = world.armies;
   const kind = a.kind[slot]!;
   if (kind === KIND.levy && a.monthsOut[slot]! <= wf.W.levy.free_months && !inAnyWar(world, a.owner[slot]!)) return 0;
-  const by = menByArm(world, slot);
+  // menByArm without the array: this runs for every army each month.
+  const foot = a.men[slot]! - a.horse[slot]!;
+  const horse = a.horse[slot]!;
   let pay = 0;
-  ARMS.forEach((arm, k) => (pay += armPay(arm, by[k]!)));
+  for (let k = 0; k < ARMS.length; k++) pay += armPay(ARMS[k]!, (isHorseArm(ARMS[k]!) ? horse : foot) * a.mix[slot * A + k]!);
   return gold(world, pay * kindMultiplier(kind)) * (kind === KIND.hired ? heritageFactor(world, a.owner[slot]!, "hired_company_cost_pct") : 1);
 }
 

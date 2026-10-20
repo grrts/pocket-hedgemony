@@ -123,26 +123,30 @@ export function atWar(world: World, a: number, b: number): boolean {
 }
 
 /** Enemies of each nation, by index, for the phases that test many pairs; worked out again when the wars change. */
-const enemyCache = new WeakMap<World, { key: string; table: Set<number>[] }>();
+const enemyCache = new WeakMap<World, { relations: number; wars: number; seq: number; day: number; table: Set<number>[] }>();
 function enemyTable(world: World): Set<number>[] {
-  const g = world.diplomacy.graph;
-  const key = `${g.relations.length}|${world.diplomacy.wars.length}|${world.diplomacy.seq}|${world.day}`;
+  const d = world.diplomacy;
+  const relations = d.graph.relations.length;
   const hit = enemyCache.get(world);
-  if (hit && hit.key === key) return hit.table;
+  if (hit && hit.relations === relations && hit.wars === d.wars.length && hit.seq === d.seq && hit.day === world.day) return hit.table;
   const table = buildEnemyTable(world);
-  enemyCache.set(world, { key, table });
+  enemyCache.set(world, { relations, wars: d.wars.length, seq: d.seq, day: world.day, table });
   return table;
 }
 
+/** The enemies of a realm at peace: one set shared by them all, never written to. */
+const NO_ENEMIES: ReadonlySet<number> = new Set<number>();
+
 function buildEnemyTable(world: World): Set<number>[] {
-  const t = world.nationIds.map(() => new Set<number>());
+  const t: Set<number>[] = new Array(world.nationIds.length).fill(NO_ENEMIES);
+  const own = (n: number) => (t[n] === NO_ENEMIES ? (t[n] = new Set<number>()) : t[n]!);
   for (const r of world.diplomacy.graph.relations) {
     if (r.type !== "at_war") continue;
     const a = world.nationIndex.get(r.source);
     const b = world.nationIndex.get(r.target);
     if (a === undefined || b === undefined) continue;
-    t[a]!.add(b);
-    t[b]!.add(a);
+    own(a).add(b);
+    own(b).add(a);
   }
   return t;
 }
@@ -413,26 +417,42 @@ export function engage(world: World, news: News[]): void {
   const cols = Math.ceil(W / CELL);
   const cells = new Map<number, number[]>();
   const cellOf = (t: number) => Math.floor((t % W) / CELL) + Math.floor(t / W / CELL) * cols;
-  // Armies at war in each province: only armies in the same province meet, so one alone there looks no further.
+  // The realm whose armies at war stand in each province, MIXED where two realms' do: only armies in the
+  // same province meet, so a province with one realm's armies alone looks no further.
+  const MIXED = -2;
   const inProvince = new Map<number, number>();
-  // Garrisons of realms at war by province, for joinGarrisons.
-  const garrisons = new Map<number, number[]>();
-  // The armies of realms at war, the only ones that can meet.
+  // The armies of realms at war, the only ones that can meet, and their garrisons.
   const atWar: number[] = [];
+  const held: number[] = [];
+  let crowded = false;
   for (let i = 0; i < a.count; i++) {
     if (!a.alive[i] || !enemies[a.owner[i]!]?.size) continue;
-    if (a.commander[i]! < 0) {
-      const g = garrisons.get(a.location[i]!);
-      if (g) g.push(i);
-      else garrisons.set(a.location[i]!, [i]);
-    }
+    if (a.commander[i]! < 0) held.push(i);
     if (a.retreating[i]) continue;
     atWar.push(i);
-    inProvince.set(a.location[i]!, (inProvince.get(a.location[i]!) ?? 0) + 1);
+    const was = inProvince.get(a.location[i]!);
+    if (was === undefined) inProvince.set(a.location[i]!, a.owner[i]!);
+    else if (was !== a.owner[i] && was !== MIXED) (inProvince.set(a.location[i]!, MIXED), (crowded = true));
+  }
+  // Most steps no two realms' armies at war share a province and no battle is fought: nobody meets.
+  if (!crowded && !world.battles.length) return;
+  const fought = new Set(world.battles.map((b) => b.province));
+  const mixed = (p: number) => inProvince.get(p) === MIXED;
+  const meets = (p: number) => mixed(p) || fought.has(p);
+  for (const i of atWar) {
+    if (!meets(a.location[i]!)) continue;
     const k = cellOf(a.tile[i]!);
     const list = cells.get(k);
     if (list) list.push(i);
     else cells.set(k, [i]);
+  }
+  // Garrisons of realms at war by province, for joinGarrisons.
+  const garrisons = new Map<number, number[]>();
+  for (const i of held) {
+    if (!meets(a.location[i]!)) continue;
+    const g = garrisons.get(a.location[i]!);
+    if (g) g.push(i);
+    else garrisons.set(a.location[i]!, [i]);
   }
   const near = (t: number, range: number, visit: (j: number) => void) => {
     const x = Math.floor((t % W) / CELL);
@@ -458,7 +478,7 @@ export function engage(world: World, news: News[]): void {
   for (const i of atWar) {
     if (!a.alive[i] || a.battle[i]! >= 0 || a.retreating[i] || a.commander[i]! < 0) continue;
     const n = a.owner[i]!;
-    if ((inProvince.get(a.location[i]!) ?? 0) < 2) continue;
+    if (!mixed(a.location[i]!)) continue;
     const range = engageRange(world, i);
     let foe = -1;
     let best = Infinity;
@@ -1286,7 +1306,12 @@ export function aiMarches(world: World): void {
   const a = world.armies;
   const enemies = enemyTable(world);
   const armiesAt = new Map<number, number[]>();
-  for (let i = 0; i < a.count; i++) if (a.alive[i]) armiesAt.set(a.location[i]!, [...(armiesAt.get(a.location[i]!) ?? []), i]);
+  for (let i = 0; i < a.count; i++) {
+    if (!a.alive[i]) continue;
+    const list = armiesAt.get(a.location[i]!);
+    if (list) list.push(i);
+    else armiesAt.set(a.location[i]!, [i]);
+  }
   for (let i = 0; i < a.count; i++) {
     if (!a.alive[i]) continue;
     const n = a.owner[i]!;
