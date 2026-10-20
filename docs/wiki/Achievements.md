@@ -56,7 +56,7 @@ A campaign earns achievements only while all three hold:
 | `cheat_marked` | false: no debug, editor or "free play" cheat was used, even once |
 | `switched_country` | false: you still play the realm you started with |
 
-A campaign that is not ironman earns nothing, for good. A cheat marks the save for good, and nothing from it is awarded, in-game or on any store. Playing on as another country after game over stops achievements from that moment. Any difficulty counts, with historical or free events. The tutorial earns none, and its last card tells you achievements start in a real campaign. Lifetime counters only count campaigns that pass all three flags. The pause menu and the new game screen show whether the campaign can earn achievements, and you are warned once before an action that would end eligibility (turning on a cheat, switching country after game over).
+A campaign that is not ironman earns nothing, for good. A cheat marks the save for good, and nothing from it is awarded, in-game or on any store. Playing on as another country after game over stops achievements from that moment. Any difficulty counts, with historical, plausible or free events. The tutorial earns none, and its last card tells you achievements start in a real campaign. Lifetime counters only count campaigns that pass all three flags. The pause menu and the new game screen show whether the campaign can earn achievements, and you are warned once before an action that would end eligibility (turning on a cheat, switching country after game over).
 
 ### Progress bars
 
