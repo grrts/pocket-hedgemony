@@ -58,6 +58,9 @@ export class MapView {
   private viewH = 0;
   readonly map: MapImage;
   private events: MapViewEvents;
+  /** The first error the map shader drew with, while simpler ones are tried; frames drawn cleanly since the last one. */
+  private mapError: string | null = null;
+  private cleanFrames = 0;
   readonly stats: FrameStats = { frames: 0, mapMs: [], overlayMs: [] };
   private readonly waitForGpu = new URLSearchParams(location.search).has("perf");
 
@@ -72,7 +75,7 @@ export class MapView {
       root.append(c);
     }
     this.renderer = new MapRenderer(gl, map, provinceCount);
-    gl.addEventListener("webglcontextlost", () => this.drawFailed("the graphics context was lost"));
+    gl.addEventListener("webglcontextlost", () => this.drawFailed("The map could not be drawn on this device: the graphics context was lost"));
     this.octx = this.overlay.getContext("2d")!;
     this.bindInput();
     new ResizeObserver(() => this.resize()).observe(root);
@@ -159,8 +162,18 @@ export class MapView {
       // A device that cannot run the map shader draws nothing and says so only here.
       const late = this.renderer.gl.getError();
       const err = this.renderer.firstError ?? (late ? `${late} outside any call` : null);
-      if (err !== null) this.drawFailed(`WebGL error ${err}`);
-      if (err !== null || this.stats.frames >= 2) this.renderer.stopWatching();
+      if (err !== null) {
+        // Try a simpler map before giving up, and say on the map which one drew (or that none did).
+        this.mapError ??= `WebGL error ${err}`;
+        this.cleanFrames = 0;
+        if (!this.renderer.simplify()) {
+          this.drawFailed(`The map could not be drawn on this device: ${this.mapError}`);
+          this.renderer.stopWatching();
+        }
+      } else if (++this.cleanFrames >= 2) {
+        if (this.mapError) this.drawFailed(`The map is drawn in simple mode ${this.renderer.lite} on this device after ${this.mapError}`);
+        this.renderer.stopWatching();
+      }
     }
     const t1 = performance.now();
     const ctx = this.octx;
@@ -181,14 +194,14 @@ export class MapView {
     if (st.mapMs.length > 240) (st.mapMs.shift(), st.overlayMs.shift());
   }
 
-  /** Says on the map that it could not be drawn, with what the device reports, so a player's screenshot names the cause. */
-  private drawFailed(why: string): void {
+  /** Says on the map that it could not be drawn (or only simply), with what the device reports, so a player's screenshot names the cause. */
+  private drawFailed(what: string): void {
     if (this.root.querySelector(".map-failed")) return;
     const gl = this.renderer.gl;
     const info = gl.isContextLost() ? "" : ` · ${gl.getParameter(gl.RENDERER)} · ${gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS)} textures`;
     const p = document.createElement("p");
     p.className = "map-failed";
-    p.textContent = `The map could not be drawn on this device: ${why}${info}.`;
+    p.textContent = `${what}${info}.`;
     this.root.append(p);
   }
 
