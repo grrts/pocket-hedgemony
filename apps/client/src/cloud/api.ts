@@ -454,6 +454,18 @@ export class CloudApi {
     await this.call("DELETE", `/api/shared-saves/${encodeURIComponent(code)}`);
   }
 
+  // ---------------------------------------------------------------- purchases (SAVE-172 … SAVE-175)
+
+  /** `GET /api/entitlements/{store}`: is the full game unlocked on this store? (purchases.ts reads the answer). */
+  entitlement(store: string): Promise<unknown> {
+    return this.json("GET", `/api/entitlements/${encodeURIComponent(store)}`);
+  }
+
+  /** `POST /api/purchases`: the store's proof (a signed transaction, a purchase token, or nothing for Steam). */
+  submitPurchase(store: string, proof: object): Promise<unknown> {
+    return this.json("POST", "/api/purchases", { ...proof, store });
+  }
+
   // ---------------------------------------------------------------- tokens
 
   private keep(r: { accessToken: string; accessTokenExpiresIn: number; deviceToken: string; deviceId: string; account: AccountInfo }): void {

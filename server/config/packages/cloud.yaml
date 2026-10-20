@@ -20,6 +20,18 @@ parameters:
     env(APPLE_CLIENT_IDS): ''
     env(GOOGLE_CLIENT_IDS): ''
     env(SIGN_IN_RETURN_URLS): ''
+    # Purchases (purchases in saves.json; domain/saves SAVE-170 … SAVE-178, docs/purchases.md). A store
+    # whose settings are empty is unavailable; the others keep working.
+    cloud.purchases.steam_recheck_hours: 24
+    env(APPLE_BUNDLE_ID): ''
+    env(APPLE_ROOT_CERTIFICATE): ''
+    env(APPLE_PRODUCT_ID): 'full_game'
+    env(APPLE_ACCEPT_SANDBOX): '0'
+    env(APPLE_APP_APPLE_ID): ''
+    env(GOOGLE_PLAY_PACKAGE_NAME): ''
+    env(GOOGLE_PLAY_SERVICE_ACCOUNT): ''
+    env(GOOGLE_PLAY_PRODUCT_ID): 'full_game'
+    env(GOOGLE_PUBSUB_PUSH_TOKEN): ''
     env(SAVES_DIR): '%kernel.project_dir%/var/saves/%kernel.environment%'
 
 framework:

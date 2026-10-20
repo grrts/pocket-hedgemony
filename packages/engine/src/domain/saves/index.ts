@@ -10,3 +10,4 @@ export * from "./world-chunks.ts";
 export * from "./migrations.ts";
 export * from "./library.ts";
 export * from "./cloud.ts";
+export * from "./purchases.ts";

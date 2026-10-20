@@ -248,6 +248,24 @@
       "france"
     ]
   },
+  "purchases": {
+    "product_id": "full_game",
+    "stores": [
+      "steam",
+      "apple",
+      "google"
+    ],
+    "steam_recheck_hours": 24,
+    "messages": {
+      "unlocks": "The full game: every realm",
+      "unlocked": "The full game is unlocked on this device.",
+      "pending": "Waiting for the store to confirm the payment.",
+      "nothing_to_restore": "No purchase of the full game was found for this store account.",
+      "other_account": "This purchase is on another Pocket Hegemony account.",
+      "failed": "The store could not finish the purchase. Try again.",
+      "unavailable": "{store} purchases are not available on this server."
+    }
+  },
   "platform_events": {
     "ios": {
       "App plugin pause": "pause",

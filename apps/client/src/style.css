@@ -5470,6 +5470,37 @@ button.link {
   min-height: 44px;
 }
 
+/* The Unlock card: one scrolling column, Buy full width and 48 high, Restore purchases 44 (SAVE-185). */
+.unlock-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+}
+
+.unlock-what,
+.unlock-done {
+  margin: 4px 0;
+  font-size: 19px;
+}
+
+.unlock-buy {
+  width: 100%;
+  min-height: 48px;
+}
+
+.unlock-restore {
+  width: 100%;
+  min-height: 44px;
+}
+
+/* The start screen's small Full game ribbon while the full game is locked here (SHELL-029, SAVE-184). */
+.start-ribbon {
+  align-self: center;
+  min-height: 44px;
+  padding: 0 14px;
+}
+
 .cloud-status {
   margin: 2px 0;
   font-weight: 600;

@@ -2864,3 +2864,87 @@ Then("the desktop app's product name is {string}", (_s, name: string) => {
   expect(steamBackup().product_name).toBe(name);
   expect(steamBackup().partner_site.subdirectory.startsWith(`${name}/`)).toBe(true);
 });
+
+// ================================================================ purchases (SAVE-170 … SAVE-181)
+
+const STORE_OF: Record<string, S.Store> = { Steam: "steam", "the Android phone": "google" };
+const unlocked = (s: Scenario): boolean =>
+  s.noUnlockState ? true : S.fullGameUnlocked({ store: s.store, owned: s.owned, ...(s.serverAnswer && s.serverAnswer !== "no answer" ? { server: s.serverAnswer } : {}) });
+
+Given("the account is signed in on Steam and on an Android phone", (s) => {
+  const deck = dev(s, "Steam Deck");
+  const phone = dev(s, "Pixel 8");
+  s.syncedCampaign = playOffline(s, deck, "Portugal", 1);
+  sync(s, deck);
+  sync(s, phone);
+  s.phone = phone;
+});
+Then(/^the full game is (unlocked|locked) on (Steam|the Android phone)$/, (s, state: string, where: string) => {
+  const store = STORE_OF[where]!;
+  // Each store answers for its own purchase only: the account's other stores are never asked (cross-buy per store).
+  const owned = store === "steam" ? s.purchases.steam : s.purchases.android;
+  expect(S.fullGameUnlocked({ store, owned, server: owned ? "active" : "none" })).toBe(state === "unlocked");
+});
+Then("the account's saves are on both", (s) => {
+  const id = s.syncedCampaign.campaignId;
+  expect(S.entries(s.phone.storage).some((e) => e.header.campaignId === id)).toBe(true);
+  expect(S.entries(dev(s, "Steam Deck").storage).some((e) => e.header.campaignId === id)).toBe(true);
+});
+
+Given("the game runs on the store {string}", (s, store: string) => {
+  expect(S.STORES).toContain(store);
+  s.store = store;
+});
+Given(/^the store says the full game is (owned|not owned)$/, (s, state: string) => {
+  s.owned = state === "owned";
+});
+Given("the full game is not bought on this store", (s) => {
+  s.owned = false;
+  s.serverAnswer = "none";
+});
+Given("the server's answer is {string}", (s, answer: string) => {
+  s.serverAnswer = answer;
+});
+Then(/^the full game is (unlocked|locked) on this device$/, (s, state: string) => {
+  expect(unlocked(s)).toBe(state === "unlocked");
+});
+Then("the game sends the store's proof before it decides", (s) => {
+  expect(S.proofFirst({ store: s.store, owned: s.owned, server: s.serverAnswer })).toBe(true);
+  // Once the server holds the proof its active answer decides, and a refund is never sent up again.
+  expect(S.proofFirst({ store: s.store, owned: s.owned, server: "active" })).toBe(false);
+  expect(S.proofFirst({ store: s.store, owned: s.owned, server: "refunded" })).toBe(false);
+});
+
+Given(/^the build (names|names no) a cloud server and its shell (gives|gives no) a store bridge$/, (s, server: string, bridge: string) => {
+  s.noUnlockState = !S.hasUnlockState({ cloudServer: server === "names", storeBridge: bridge === "gives" });
+});
+Then("there is no unlock state", (s) => {
+  expect(s.noUnlockState).toBe(true);
+});
+
+When("the player starts a new campaign as {string}", (s, nation: string) => {
+  s.gated = S.gate(nationId(nation), unlocked(s));
+  s.chosen = nation;
+});
+Then("the Unlock card opens with {string} still chosen", (s, nation: string) => {
+  expect(s.gated).toBe("unlock");
+  expect(s.chosen).toBe(nation);
+});
+When("the player opens a save of the nation {string}", (s, nation: string) => {
+  s.campaign = undefined;
+  campaign(s, nation);
+  s.lockedSave = write(s, "resume");
+  s.gated = S.gate(S.readHeader(s.lockedSave.bytes).tier.nation, unlocked(s));
+  s.result = S.openSave(s.lockedSave.bytes, { rules: RULES, fullGame: unlocked(s) }, nationName);
+});
+Then("the Unlock card opens with {string}", (s, msg: string) => {
+  expect(s.gated).toBe("unlock");
+  expect(s.result.kind).toBe("locked");
+  expect(s.result.message).toBe(msg);
+});
+Then("the save is kept", (s) => {
+  expect(storage(s).read(s.lockedSave.path)).toBeDefined();
+});
+Then("a new campaign as {string} starts at once", (s, nation: string) => {
+  expect(S.gate(nationId(nation), unlocked(s))).toBe("go");
+});

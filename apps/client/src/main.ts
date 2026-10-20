@@ -128,7 +128,7 @@ import { campaignOptionsOf, DEFAULT_CHOICES, PICKER_REGIONS, pickerRegions, star
 import { pickerCardHtml, regionListHtml, regionSelectHtml, strongIn, strongInWords, waysToGrowHtml } from "./ui/realmPicker.ts";
 import { loadLastChoices, newGameOptionsHtml, rulesLine, saveLastChoices, setRule, type RuleKey } from "./ui/newGame.ts";
 import { BATTLE_STEP_MS, bannerAt, COUNTRY_CARD_TABS, endTurnInAuto, endTurnLabel, keyEndsTurn, newAutoTurns, realmOverview, REALM_BOOK_TABS, sectionOf, firstLaunchQuestion, SHELL as SHELL_RULES, startColumn, startIcons, stopAuto, switchAuto, tabHolds, WATCH_STEP_MS, weekPlayed, type AutoStop, type OverviewTile, type Platform as ShellPlatform } from "@ph/engine/domain/game-shell";
-import { autosaveDue, continueTarget, longDate, newCampaign, newManualSave, saveStart, savesConfig, sharedFromLine, type Campaign, type Platform as SavePlatform } from "@ph/engine/domain/saves";
+import { autosaveDue, continueTarget, gate, longDate, newCampaign, newManualSave, saveStart, savesConfig, sharedFromLine, type Campaign, type Platform as SavePlatform } from "@ph/engine/domain/saves";
 import { SaveStore, type StoredSave } from "./saves/store.ts";
 import { FileSaveStore, moveIntoFolder, type SaveStoreLike } from "./saves/fileStore.ts";
 import { desktopBridge } from "./desktop.ts";
@@ -142,6 +142,7 @@ import { accountHtml, accountView, bindAccount, loadCard } from "./cloud/account
 import { capacitorBridge, noBridge, webBridge, type CapacitorLike } from "./cloud/bridge.ts";
 import { APP_RETURN, StoreSignIn } from "./cloud/storeSignIn.ts";
 import { bindShareSheet, fetchSharedCopy, openError, shareSheetHtml, shareView, type ShareView } from "./cloud/share.ts";
+import { bindUnlock, Purchases, purchasesApi, shellStoreBridge, steamStoreBridge, unlockHtml } from "./cloud/purchases.ts";
 
 const rules = loadDefaultRuleset();
 // ?engine=main-thread forces the fallback path, for testing it.
@@ -7519,6 +7520,11 @@ function hintViews(): void {
 
 /** Begin: a new game from a seed, the realm and the campaign rules of the options step (SETUP-056); the tutorial passes its fixed seed. */
 async function startGame(nation: string, picked: NewGameChoices, seed = Date.now() >>> 0): Promise<void> {
+  // A realm that needs the full game opens the Unlock card while it is locked here (SAVE-181).
+  if (gate(nation, fullGame()) === "unlock") {
+    openUnlock({ nation, choices: picked });
+    return;
+  }
   const name = nations[nationIndex.get(nation)!]!.name;
   showLoading(`Gathering the court of ${name}…`, 0.15);
   await painted();
@@ -7957,6 +7963,25 @@ const signInBridge =
           appleRedirectUri: env.VITE_APPLE_REDIRECT_URI?.trim() || undefined,
         });
 const storeSignIn = cloud ? new StoreSignIn(cloud, signInBridge, webKeyValue(), SERVER_DEVICE, desktop?.steam ? "steam" : savePlatform) : undefined;
+/**
+ * Buying the full game (SAVE-179 … SAVE-185): only in a build with a cloud server whose shell gives a
+ * store bridge (the Steam build, or a phone shell's `phStore`); everywhere else the game stays the full
+ * game as before (SAVE-180).
+ */
+const storeBridge = desktop?.steam ? steamStoreBridge() : shellStoreBridge();
+const purchases = cloud && storeBridge ? new Purchases(storeBridge, purchasesApi(cloud.api), webKeyValue()) : undefined;
+/** Whether the full game is unlocked on this store. */
+const fullGame = () => purchases?.unlocked ?? true;
+/** What the Unlock card was opened for: a realm to start or a locked save to open (SAVE-181). */
+let unlocking: { nation?: string; choices?: NewGameChoices; path?: string; message?: string } = {};
+if (purchases) {
+  purchases.onChange = () => {
+    if (shell.view === "unlock") renderShell();
+    else if (!shell.view && startOn && !startEl.hidden) showStart();
+  };
+  // The Steam build asks once it has signed in by itself, so its check is recorded on the account.
+  if (!steamSignIn) void purchases.refresh();
+}
 const cloudView = accountView();
 let cardLoading = false;
 if (cloud) {
@@ -7985,9 +8010,15 @@ if (cloud) {
     });
   }
   // The Steam build signs in by itself, once the saves are in the folder; a failure waits on the card (SAVE-141).
-  if (steamSignIn) void savesMoved.then(() => steamSignIn.atLaunch());
+  if (steamSignIn) void savesMoved.then(() => steamSignIn.atLaunch()).then(() => purchases?.refresh());
+  // Signing in or out asks the server again about this store (SAVE-179).
+  let purchasesSignedIn = cloud.api.signedIn;
   cloud.onChange = () =>
     void refreshSaves().then(() => {
+      if (purchases && cloud.api.signedIn !== purchasesSignedIn) {
+        purchasesSignedIn = cloud.api.signedIn;
+        void purchases.refresh();
+      }
       // A sign-in form being typed in is left alone.
       if (shell.view === "load" || (shell.view === "settings" && cloud.api.signedIn)) renderShell();
       else if (!shell.view && startOn && !startEl.hidden) showStart();
@@ -7998,7 +8029,7 @@ if (cloud) {
 /** The saves the Load card and Continue list: this device's, and those in the cloud from other devices. */
 const listedSaves = (): StoredSave[] => (cloud ? [...savesList, ...cloud.remote(savesList)] : savesList);
 
-type ShellView = "menu" | "save" | "load" | "settings" | "share";
+type ShellView = "menu" | "save" | "load" | "settings" | "share" | "unlock";
 /** What the overlay shows, where it was opened from, and the card's own open line or question. */
 const shell: { view: ShellView | null; fromStart: boolean; open: string; confirm: string; busy: boolean; note: string; name: string } = { view: null, fromStart: false, open: "", confirm: "", busy: false, note: "", name: "" };
 /** The Share sheet's save and choices, and the card it was opened from (SAVE-133). */
@@ -8051,7 +8082,7 @@ function showStart(): void {
     saves: listedSaves().length,
     tutorialFinished: tutorialFinished(),
     platform: SHELL_PLATFORM,
-    edition: "full game",
+    edition: fullGame() ? "full game" : "free mobile",
   });
   const entry = (e: (typeof column)[number]) =>
     e.label === "Play"
@@ -8060,6 +8091,7 @@ function showStart(): void {
   startEl.innerHTML = `
     <div class="start-band framed">
       <h1 class="start-logo">Pocket Hegemony</h1>
+      ${fullGame() ? "" : `<button class="paper start-ribbon" data-start="unlock">${icon("crown", 1)} Full game</button>`}
       <nav class="start-column" aria-label="Start">${column.map(entry).join("")}</nav>
       <div class="start-icons">${startIcons(SHELL_PLATFORM)
         .map((name) => `<button class="paper" data-start-icon="${name}">${icon(START_ICONS[name]!, 2)}<small>${name}</small></button>`)
@@ -8079,6 +8111,7 @@ function startMoreHtml(): string {
   return `<div class="start-more framed" role="dialog" aria-label="More">
     <header><h2 class="ribbon">More</h2><span class="panel-buttons"><button class="close" data-start-icon="More" aria-label="Close">${icon("close", 2)}</button></span></header>
     ${tutorialFinished() ? `<button class="paper" data-start="tutorial">Tutorial</button>` : ""}
+    ${fullGame() ? "" : `<button class="paper" data-start="unlock">Unlock</button>`}
     <a class="paper-link" href="./style.html">Art test page</a>
     <p class="start-credits"><b>Pocket Hegemony</b> ${esc(GAME_VERSION)}. Made by Leroy with Claude.</p>
     <p class="start-credits">Music played on the Fluid R3 GM soundfont by Frank Wen (CC BY 3.0).</p>
@@ -8177,6 +8210,10 @@ startEl.addEventListener("click", (e) => {
     hideStart();
     renderPanel();
   } else if (what === "ask") answerFirstLaunch(b.dataset.choice!); else if (what === "load") openShell("load", true);
+  else if (what === "unlock") {
+    startMore = false;
+    openUnlock();
+  }
   else if (what === "tutorial") void beginTutorial(); else if (what === "Settings") openShell("settings", true);
   else if (what === "Achievements") openAchievements();
   else if (what === "Wiki") window.open(SHELL_RULES.start.wikiUrl, "_blank", "noopener");
@@ -8310,10 +8347,11 @@ function renderShell(): void {
     renderSettings(overlay, backFromCard);
     return;
   }
-  overlay.innerHTML = shell.view === "menu" ? gameMenuHtml() : shell.view === "save" ? saveCardHtml() : shell.view === "share" ? shareCardHtml() : loadCardHtml();
+  overlay.innerHTML = shell.view === "menu" ? gameMenuHtml() : shell.view === "save" ? saveCardHtml() : shell.view === "share" ? shareCardHtml() : shell.view === "unlock" ? unlockCardHtml() : loadCardHtml();
   overlay.querySelector(".close")?.addEventListener("click", shell.view === "menu" ? closeShell : shell.view === "share" ? backFromShare : backFromCard);
   if (shell.view === "save") bindSaveCard();
   if (shell.view === "load") bindLoadCard();
+  if (shell.view === "unlock" && purchases) bindUnlock(overlay, purchases, unlockedGo);
   if (shell.view === "share" && sharing && cloud) {
     bindShareSheet(overlay, sharing.view, {
       api: cloud.api,
@@ -8596,6 +8634,11 @@ async function loadSave(path: string, acceptModified = false, keepCurrent = true
     renderShell();
     return;
   }
+  // A locked nation's save opens the Unlock card and stays as it is (SAVE-081, SAVE-181).
+  if (e.header.tier.needsFullGame && !fullGame()) {
+    openUnlock({ path, message: SM.locked_nation.replace("{nation}", nationNameOf(e.header.tier.nation)) });
+    return;
+  }
   if (keepCurrent && campaign && snapshot && changedSinceResume) await writeGameSave("resume");
   // A campaign plays on in the world it began in (SAVE-111): the page reopens in that start and loads the save there.
   const began = saveStart(e.header);
@@ -8706,6 +8749,34 @@ function shareCardHtml(): string {
     ${v ? `<p class="hint">${esc(v.header.name)} · ${esc(nationNameOf(v.header.playerNation))} · ${esc(longDate(v.header.date))}</p>` : ""}
     ${v && cloud ? shareSheetHtml(v, { signedIn: cloud.api.signedIn, systemShare: typeof navigator.share === "function" }) : ""}
   </div>`;
+}
+
+// ---- buying the full game (domain/saves SAVE-179 … SAVE-185) ----
+
+/** Opens the Unlock card, for a realm the player chose or a locked save, or on its own. */
+function openUnlock(o: { nation?: string; choices?: NewGameChoices; path?: string; message?: string } = {}): void {
+  unlocking = o;
+  openShell("unlock", shell.fromStart || !snapshot);
+}
+
+/** The Unlock card over the dimmed map or the start screen: the one place for the purchase (SAVE-182, SAVE-183). */
+function unlockCardHtml(): string {
+  const opened = { ...(unlocking.nation ? { realm: nationNameOf(unlocking.nation) } : {}), ...(unlocking.message ? { message: unlocking.message } : {}) };
+  return `<div class="shell-card saves framed" role="dialog" aria-label="Unlock">
+    <header><h2 class="ribbon">${icon("crown", 2)} Unlock</h2>${back()}</header>
+    ${purchases ? unlockHtml(purchases, opened) : ""}
+  </div>`;
+}
+
+/** Once unlocked, the realm or save the player asked for is one tap away (SAVE-181). */
+function unlockedGo(): void {
+  const o = unlocking;
+  unlocking = {};
+  closeShell();
+  if (o.nation) {
+    hideStart();
+    void startGame(o.nation, o.choices ?? DEFAULT_CHOICES);
+  } else if (o.path) void loadSave(o.path);
 }
 
 /** Exit to main menu: where the player left off is kept, and the start screen offers Continue (SAVE-109). */

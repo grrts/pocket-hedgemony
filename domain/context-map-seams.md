@@ -1117,7 +1117,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | game-shell | upstream | Customer–Supplier | Newest save and its header summary (Continue label, title background), Load list (flat, newest first), the Resume save and orders journal (closed at End turn, written on backgrounding), ironman flag, Needs attention mutes and tutorial progress in the save (X-16), locked-nation check, damaged-save failures |
-| saves | downstream | Customer–Supplier | Continue target and label, Load list (campaigns, saves, devices), Save slots, toasts and messages, lifecycle events (background, resume, quit), unlock screen on locked saves, ironman split prompt |
+| saves | downstream | Customer–Supplier | Continue target and label, Load list (campaigns, saves, devices), Save slots, toasts and messages, lifecycle events (background, resume, quit), unlock screen on locked saves, ironman split prompt; whether the full game is unlocked on this store (`FullGameUnlocked` / `FullGameLocked`) for the ribbon, the Unlock card and the realm picker |
 
 ## game-shell ↔ scenario-setup
 
