@@ -5436,6 +5436,7 @@ const GRIEVANCE_FIX: Record<string, string> = {
   Plague: "an outbreak rages here; ends when it burns out",
   "Far from the throne": "royal land more than a month from the capital; ends when a lord holds it or the capital is nearer",
   "Newly taken": "taken from another realm in the last 10 years; fades with time",
+  "Unjust war": "your realm fights a war it declared with no aim; ends with that war",
 };
 
 /** A province's mood and its grievances, with what each needs to end. */

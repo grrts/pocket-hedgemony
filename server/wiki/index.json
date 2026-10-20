@@ -1200,6 +1200,11 @@
      "level": 2
     },
     {
+     "id": "no-aim-penalty",
+     "text": "No aim penalty",
+     "level": 3
+    },
+    {
      "id": "truce",
      "text": "Truce",
      "level": 2
@@ -7185,6 +7190,11 @@
      "id": "declaring-war",
      "text": "Declaring war",
      "level": 3
+    },
+    {
+     "id": "a-war-with-no-aim",
+     "text": "A war with no aim",
+     "level": 4
     },
     {
      "id": "peace-and-truces",

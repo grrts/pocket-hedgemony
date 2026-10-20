@@ -7862,3 +7862,21 @@ p.fear.threatened {
     display: none !important;
   }
 }
+
+/* A war with no aim (F-167): its costs sit framed in red at the head of the Price of war. */
+.aimless-warn {
+  margin: 4px 0 8px;
+  padding: 6px 8px;
+  border-color: var(--cloth);
+}
+.aimless-warn > .warn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 2px;
+  font-weight: 700;
+  color: var(--cloth);
+}
+.aimless-warn > .hint {
+  margin: 6px 0 0;
+}

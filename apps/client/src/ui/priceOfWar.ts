@@ -83,6 +83,71 @@ export interface DeclareSheetInput {
   censure: string;
 }
 
+/**
+ * What a war with no aim costs the day it is declared (F-167): a red-framed
+ * block at the head of the Price of war, one row a cost, each opening its
+ * reason on a tap. "" for a war with an aim.
+ */
+export function aimlessWarHtml(p: PriceOfWar, o: Pick<DeclareSheetInput, "name" | "titles">): string {
+  const a = p.aimless;
+  if (!a) return "";
+  const lords = esc(o.titles.lords);
+  const steps = a.lordSteps === 1 ? "a step" : `${fmt(a.lordSteps)} steps`;
+  const rows: string[] = [];
+  rows.push(
+    reasonRow(
+      `Your ${lords}`,
+      a.lords ? `${fmt(a.lords)} lose ${steps} of loyalty at once` : `none left to lose loyalty`,
+      `Every one of your ${lords}, Warlike or not, loses ${steps} of loyalty the day you declare. A Disloyal ${esc(o.titles.lord)} pays you no tax, refuses your call to arms and may go over to a neighbour; your stability falls with them. Those who still can waver again when you take land.`,
+      true,
+    ),
+  );
+  rows.push(
+    reasonRow(
+      "Your name abroad",
+      `+${fmt(a.notoriety)} notoriety`,
+      `Every realm that knows you holds the wrong <em>Notorious deed</em> toward you, fading over 30 years. Notoriety makes realms refuse your alliances and marriages and band into leagues against you.`,
+      true,
+    ),
+  );
+  rows.push(
+    reasonRow(
+      "Your people",
+      `<em>Unjust war</em> in ${plural(a.provinces, "province")}`,
+      "Every province of yours holds the grievance <em>Unjust war</em> until the war ends: a step nearer to riots and risings everywhere.",
+      true,
+    ),
+  );
+  rows.push(
+    reasonRow(
+      "Peace voices",
+      `+${pct(a.peaceShare)} in 100 say peace`,
+      "Your realm wants this war over from the first day: past half, you must take a fair peace or pay for refusing it.",
+      true,
+    ),
+  );
+  if (a.alliesStayOut.length) {
+    const names = a.alliesStayOut.map((n) => esc(o.name(n)));
+    rows.push(reasonRow("Your allies", `${plural(a.alliesStayOut.length, "ally", "allies")} stay out`, `No ally owes you a war with no aim, and none will come: ${names.join(", ")}.`, true));
+  }
+  if (p.threatened.length) {
+    const names = p.threatened.map((n) => esc(o.name(n)));
+    rows.push(
+      reasonRow(
+        "Neighbours alarmed",
+        `${plural(p.threatened.length, "realm")} will hold <em>Threatened us</em>`,
+        `A war with no aim alarms everyone near you. These realms will hold the wrong <em>Threatened us</em> toward you: ${names.join(", ")}.`,
+        true,
+      ),
+    );
+  }
+  return `<div class="aimless-warn framed-soft">
+    <p class="warn">${HURT}A war with no aim: you hold no reason to fight ${esc(o.name(p.target))}.</p>
+    ${rows.join("")}
+    <p class="hint">Make a demand first: if they refuse, you hold an aim and none of this applies.</p>
+  </div>`;
+}
+
 /** The Price of war block (WAR-229): each line a row that opens its reason, hurting lines red. */
 export function priceOfWarHtml(p: PriceOfWar, o: Pick<DeclareSheetInput, "name" | "titles" | "income">): string {
   const them = esc(o.name(p.target));
@@ -103,7 +168,8 @@ export function priceOfWarHtml(p: PriceOfWar, o: Pick<DeclareSheetInput, "name" 
       behind,
     ),
   );
-  if (p.noAim && p.threatened.length) {
+  // An older price without the aimless block still lists the neighbours alarmed here.
+  if (p.noAim && !p.aimless && p.threatened.length) {
     const names = p.threatened.map((n) => esc(o.name(n)));
     rows.push(
       reasonRow(
@@ -114,7 +180,7 @@ export function priceOfWarHtml(p: PriceOfWar, o: Pick<DeclareSheetInput, "name" 
       ),
     );
   }
-  if (p.noAim && p.waveringLords > 0) {
+  if (p.noAim && !p.aimless && p.waveringLords > 0) {
     const word = p.waveringLords === 1 ? o.titles.lord : o.titles.lords;
     rows.push(reasonRow(`Your ${esc(o.titles.lords)}`, `${fmt(p.waveringLords)} ${esc(word)} will waver`, `You hold no fitting aim against ${them}: when you take land in this war, every one of your ${esc(o.titles.lords)} who isn't Warlike drops a step of loyalty.`, true));
   }
@@ -143,7 +209,7 @@ export function priceOfWarHtml(p: PriceOfWar, o: Pick<DeclareSheetInput, "name" 
       "A single peace can take at most a third of a realm's provinces, rounded up, and its capital only with its last province. Swallowing a realm takes several wars.",
     ),
   );
-  return `<section class="price-of-war"><h3 class="sub">Price of war</h3>${rows.join("")}</section>`;
+  return `<section class="price-of-war"><h3 class="sub">Price of war</h3>${aimlessWarHtml(p, o)}${rows.join("")}</section>`;
 }
 
 /**
@@ -165,7 +231,7 @@ export function declareSheetHtml(o: DeclareSheetInput): string {
         "Aim",
         aim,
         noAim
-          ? `You hold no aim against ${them}. A war with no aim alarms your neighbours and costs your lords' loyalty when you take land; a war aim (from a demand they refused, land you held, a pretender) makes it a war they understand.`
+          ? `You hold no aim against ${them}. A war with no aim costs you dearly the day you declare it (see the price): your lords turn, your name abroad darkens, your people call it unjust. A war aim (from a demand they refused, land you held, a pretender) makes it a war they understand.`
           : `The best aim you hold against ${them}, and the one this war is declared with: a war they understand, so your neighbours are not alarmed and your lords don't waver when you take land.${source}`,
         noAim,
       )}
@@ -179,7 +245,7 @@ export function declareSheetHtml(o: DeclareSheetInput): string {
     <div class="declare-cols">${price}${terms}</div>
     <div class="declare-confirm">
       <button class="paper" data-declare-back>Back</button>
-      <button class="wax" data-declare-confirm="${o.target}"${truce ? ` data-break-truce="1"` : ""}>${icon("swords", 1)}${truce ? "Break the truce and declare war" : `Declare war on ${them}`}</button>
+      <button class="wax" data-declare-confirm="${o.target}"${truce ? ` data-break-truce="1"` : ""}>${icon("swords", 1)}${truce ? "Break the truce and declare war" : noAim ? `Declare war with no aim` : `Declare war on ${them}`}</button>
     </div>
   </div>`;
 }

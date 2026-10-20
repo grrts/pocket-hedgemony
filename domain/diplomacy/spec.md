@@ -793,6 +793,23 @@ leave no lasting tie. Every number is `diplomacy.arms_and_fear.*`, provisional, 
 - DIPL-245 Overview: the *Neighbours who fear you* row of *Your name abroad* (DIPL-236) stays the one place that shows who fears you and so who may ally, wall and arm against you; another realm's Diplomacy tab keeps its fear lines (DIPL-235). [F-166; X-19]
 - DIPL-246 Phone: the reasons row is text in the Why? list inside the card's single column, opening on a tap of at least 44 points, with no hover; the news line is a Dispatches line like any other. [F-166; X-19]
 
+### 5.35 A war with no aim costs dearly (F-167, Leroy 20 Oct)
+
+*Leroy, 20 Oct:* "No aim wars should punish you giganticly. Loyalty of lords should decline instantly. You can think of more penalties." A war with no aim stays allowed (DIPL-146), but on top of *Threatened us* (DIPL-151) and the wavering when land is taken (WAR-222) the declarer now pays at once. The numbers are `diplomacy.war_aims.no_aim_penalty`, provisional.
+
+- DIPL-247 When a realm declares war with the aim *No aim*, the game shall have every one of its lords, Warlike or not, take the loyalty cause `aimless_war` `no_aim_penalty.lord_steps` times (2) that same day, falling no lower than Disloyal (REALM-088); the player gets one news line saying how many turned. [F-167]
+- DIPL-248 When a realm declares war with the aim *No aim*, the game shall add `no_aim_penalty.notoriety` (15) notoriety as a notorious deed (DIPL-174): the wrong *Notorious deed* with every realm that knows it, fading over 30 years, counted in its notoriety for leagues and asks (DIPL-221, DIPL-223). [F-167]
+- DIPL-249 While a realm fights a war it declared with the aim *No aim*, every province it owns shall hold the grievance *Unjust war* (rebels' cause Tax), from the day of the declaration until the war ends. [F-167; PROV-230]
+- DIPL-250 While a realm fights a war it declared with the aim *No aim*, its peace voices in that war shall count `no_aim_penalty.peace_share` (25 in 100) more for peace, up to all of them (WAR-221). [F-167]
+- DIPL-251 When `no_aim_penalty.allies_refuse` holds, an AI ally called to the declarer's side of a war with the aim *No aim* shall refuse the call; the refusal of an offensive call breaks nothing (D-DIPL-2), so no oath is broken and the alliance stands. The declare sheet counts such allies out of *Your side*. [F-167; D-DIPL-9]
+- DIPL-252 When `no_aim_penalty.ai_only_if_reckless` holds, an AI realm shall not declare a war with the aim *No aim* unless its ruler is Warlike or it seeks hegemony (WAR-228); it tries a demand first as before (DIPL-180), and a refused demand gives it an aim. A subject rising for its freedom (SUBJ-077) declares with no aim but pays none of DIPL-247 to DIPL-250. [F-167; WAR-228]
+
+How the player uses it:
+
+- DIPL-253 Where: *Declare war* on another realm's Diplomacy tab opens the declare sheet (WAR-229). When the player holds no aim, a red-framed block *A war with no aim* heads the *Price of war*, before anything else, with one row per cost: *Your lords* (how many lose how many steps at once), *Your name abroad* (the notoriety gained), *Your people* (*Unjust war* in how many provinces), *Peace voices* (how many in 100 more say peace), *Your allies* (who stays out, when any), and *Neighbours alarmed*. Each row opens its reason on a tap. The block ends with the way out: make a demand first, and a refusal gives an aim. The Terms' *Aim* row says *No aim* in red, and Confirm reads *Declare war with no aim*. [F-167; X-19]
+- DIPL-254 Grouping and overview: every cost sits on the one declare sheet, beside the rest of the price, so the player weighs it once before Confirm. After the declaration it shows where each thing already lives: the lords on the Lords tab and the stability plaque, the notoriety on *Your name abroad* (DIPL-225), *Unjust war* in each province's mood line with what ends it, the peace voices on the war plaque and war card (WAR-230, WAR-231), and one news line. [F-167; X-19]
+- DIPL-255 Phone: the block is text rows inside the sheet's columns in the Wide layout and its single scrolling column in the Tall one, each row at least 44 points tall and opening on a tap with no hover; the red frame and the "!" mark each row, so colour is never the only sign; Confirm stays pinned inside the safe area. [F-167; X-19; WAR-232]
+
 ## 6. Commands
 
 All commands are data, the same for player and AI.
@@ -967,6 +984,7 @@ The steps run after subjects and government in the global order (X-2, D-DIPL-31)
 | diplomacy.arms_and_fear.allies | We fear the same realm by the asked's fear; months between a Threatened realm's envoys; partners weighed (DIPL-238, DIPL-239) | Wary +15, Threatened +30; 3; 3 | yes | diplomacy |
 | diplomacy.arms_and_fear.defences | Castle step wanted on the border with the most feared realm, and the share of the reserve kept, by fear (DIPL-240) | Wary 1, Threatened 2; Wary 1, Threatened a half | yes | diplomacy |
 | diplomacy.arms_and_fear.technology | Warfare id prefix and the study cost weight of warfare and fortification inventions by fear (DIPL-241) | W; Wary 0.8, Threatened 0.6 | yes | diplomacy |
+| diplomacy.war_aims.no_aim_penalty | A war with no aim: loyalty steps for every lord, notoriety gained, peace voices added, whether AI allies refuse, whether only a reckless AI declares one (DIPL-247 to DIPL-252) | 2; 15; 0.25; yes; yes | yes | diplomacy |
 | diplomacy.arms_and_fear.opportunity | Against a target at war elsewhere: ratio factor, chance factor, pick weight; the gamble's chance and ratio factor; the floor ratio (DIPL-242, DIPL-243) | 0.75, 2, 3; 0.1, 0.8; 1.2 | yes | diplomacy |
 
 ## 11. Seams
@@ -1360,4 +1378,5 @@ The steps run after subjects and government in the global order (X-2, D-DIPL-31)
 | DIPL-231 … DIPL-234 | features/arms-and-fear.feature | Fear of a stronger neighbour; A standing army sized against the neighbours; Calling men across the realm at war; Borrowing for war — engine: packages/engine/test/arms.test.ts |
 | DIPL-235 … DIPL-237 | features/arms-and-fear.feature | Who fears whom — presentation: apps/client/src/ui/statecraft.ts (`fearHtml`), apps/client/src/ui/priceOfWar.ts (`nameAbroadHtml`), apps/client/src/ui/priceOfWar.test.ts |
 | DIPL-238 … DIPL-243 | features/acting-on-fear.feature | We fear the same realm; Partners against a common fear; Walls on the feared border; Arms in research; Taking an opportunity; A gamble — engine: packages/engine/test/fearActs.test.ts |
+| DIPL-247 … DIPL-255 | features/no-aim-war.feature | Lords turn the day a war with no aim is declared; The name abroad darkens; An unjust war while it lasts; Peace voices lean to peace; Allies stay out; The AI keeps from wars with no aim; A rising pays nothing; The declare sheet shows the cost — engine: packages/engine/test/aimlessWar.test.ts; presentation: apps/client/src/ui/priceOfWar.ts `aimlessWarHtml` |
 | DIPL-244 … DIPL-246 | features/acting-on-fear.feature | Allies against you out of fear — presentation: the Why? list (apps/client/src/ui/statecraft.ts `reasonsHtml`), packages/engine/src/statecraft.ts (`reasonName`, `alliedAgainstYou`) |

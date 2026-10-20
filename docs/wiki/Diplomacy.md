@@ -231,6 +231,19 @@ You declare war, and offer or ask for peace, from the **Diplomacy tab** of the o
 
 A declaration needs a target and exactly one aim you hold. Any Alliance, Truce or Pledge with the target must be broken first, each an Oath broken. The same turn, offensive calls go to your allies, defensive calls to the target's allies and pledgers, both sides' subjects come in by their kind (a Union joins at once, a Vassal or Protectorate is called and answers by its loyalty, a March joins when the enemy borders it, a Tributary or Colony stays out), and members of a league against you are brought in; answers arrive a month later. The aim is shown to every country, and for a war with no aim every neighbour of yours records *Threatened us*. A Union, Colony or Protectorate can't declare war, and a Vassal can't declare war on its overlord's allies; they join their overlord's wars or start an independence war. A realm under a regency may fight only defensive wars and Raids.
 
+#### A war with no aim
+
+You may always declare war with no aim, but it costs you dearly from the day you declare:
+
+- **Your lords turn.** Every lord, Warlike or not, loses two steps of loyalty at once: a Loyal lord becomes Disloyal. A Disloyal lord pays no tax, refuses your call to arms and may go over to a neighbour, and your stability falls with them.
+- **Your name abroad darkens.** You gain 15 notoriety, and every realm that knows you holds the wrong *Notorious deed* toward you, fading over 30 years. Notoriety makes realms refuse your alliances and marriages and band into leagues against you.
+- **Your people call it unjust.** Every province of yours holds the grievance *Unjust war* until the war ends, a step nearer to riots everywhere.
+- **Your realm wants peace.** Your peace voices count 25 in 100 more for peace in that war, so you may soon be bound to take a fair peace.
+- **Your allies stay out.** No ally owes you a war with no aim; they refuse the call without breaking the alliance.
+- **Your neighbours are alarmed** (*Threatened us*), and when you take land your lords who aren't Warlike waver again.
+
+The AI never declares a war with no aim unless its ruler is Warlike or it seeks hegemony. A subject rising for its freedom pays none of this. The way out is a demand: if they refuse it, you hold an aim. The declare sheet heads its *Price of war* with this whole cost in a red frame, and *Confirm* reads *Declare war with no aim*. The numbers are in `diplomacy.war_aims.no_aim_penalty`.
+
 **Hungary prepares to declare war on the Ottomans.** Hungary holds the aim Take land for Nikopol from the Want of its lord John Hunyadi. The declaration sheet shows the aim "Take land: Nikopol" and its source, Wallachia and the Papal States as called on Hungary's side, Serbia as an Ottoman tributary that does not join, and how many of Hungary's voices lean to peace. It does not show how the called countries will answer. It offers *Send a demand first* and *Declare*.
 
 ### Peace and truces
