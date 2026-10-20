@@ -5446,6 +5446,30 @@ button.link {
   width: 100%;
 }
 
+/* Apple, Google and Steam in the browser: full width, 48 points high (SAVE-155, SAVE-157). */
+.cloud-store {
+  width: 100%;
+  min-height: 48px;
+}
+
+/* Apple asks for its button in black with white text (Human Interface Guidelines, Sign in with Apple). */
+.cloud-store.cloud-apple {
+  background: #000;
+  color: #fff;
+}
+
+/* Add a sign-in, under the Sign-ins row (SAVE-156): 44 points high, wrapping on a narrow phone. */
+.cloud-add-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.cloud-add {
+  flex: 1 1 auto;
+  min-height: 44px;
+}
+
 .cloud-status {
   margin: 2px 0;
   font-weight: 600;

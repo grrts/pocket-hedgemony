@@ -1,15 +1,17 @@
 import { CloudError, errorText, type AccountCard, type SharedCard } from "./api.ts";
 import type { SteamSignIn } from "./steam.ts";
+import { STORE_LABEL, type StoreSignIn } from "./storeSignIn.ts";
 import type { CloudSync } from "./sync.ts";
 
 /**
  * Settings → Account and cloud saves (accounts-design §3, SAVE-119 …): one
- * card for the subject. Signed out, Sign in with Steam in the Steam build
- * (SAVE-146), the email sign-in and Make an account; signed in, the display
- * name, the cloud's status line (its overview), Sign-ins (SAVE-147), Storage,
- * Devices with Sign out on each, Shared saves with Remove on each (SAVE-135),
- * and Sign out. Apple and Google sign-in and Sync on Wi-Fi only join when
- * they are built.
+ * card for the subject. Signed out, the store sign-ins this platform offers
+ * (Sign in with Steam in the Steam build, SAVE-146; Apple, Google and Steam in
+ * the browser on phones and the web, SAVE-155), the email sign-in and Make an
+ * account; signed in, the display name, the cloud's status line (its
+ * overview), Sign-ins with Add buttons (SAVE-147, SAVE-156), Storage, Devices
+ * with Sign out on each, Shared saves with Remove on each (SAVE-135), and Sign
+ * out. Sync on Wi-Fi only joins when it is built.
  */
 
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
@@ -63,17 +65,33 @@ function signInsRow(card: AccountCard | undefined, steam: SteamSignIn | undefine
   return `<div class="set-row cloud-sign-ins"><div class="set-label"><b>Sign-ins</b><small>${rows.map((s) => esc(label(s))).join("<br>")}</small></div></div>`;
 }
 
-/** `steam` is there only in the Steam build with Steam running (SAVE-146). */
-export function accountHtml(sync: CloudSync, v: AccountView, now = Date.now(), steam?: SteamSignIn): string {
+/** The store sign-ins on the card: Steam's ticket in the Steam build, else what the bridge can start. */
+function storesShown(steam: SteamSignIn | undefined, store: StoreSignIn | undefined) {
+  return (store?.stores() ?? []).filter((s) => !(steam && s === "steam"));
+}
+
+/**
+ * `steam` is there only in the Steam build with Steam running (SAVE-146);
+ * `store` wherever cloud saves are on (SAVE-155).
+ */
+export function accountHtml(sync: CloudSync, v: AccountView, now = Date.now(), steam?: SteamSignIn, store?: StoreSignIn): string {
   const api = sync.api;
   const error = v.error ? `<p class="note" role="alert">${esc(v.error)}</p>` : "";
+  const storeError = store?.error ? `<p class="note" role="alert">${esc(store.error)}</p>` : "";
+  const waiting = v.busy || !!store?.busy;
   if (!api.signedIn) {
     const register = v.form === "register";
-    const steamPart = steam
-      ? `<button class="wax cloud-steam" data-cloud-steam${v.busy ? " disabled" : ""}>Sign in with Steam</button>
-      ${steam.error ? `<p class="note" role="alert">${esc(steam.error)}</p>` : ""}
+    const stores = storesShown(steam, store);
+    const buttons = [
+      steam ? `<button class="wax cloud-steam" data-cloud-steam${waiting ? " disabled" : ""}>Sign in with Steam</button>` : "",
+      ...stores.map((s) => `<button class="wax cloud-store cloud-${s}" data-cloud-store="${s}"${waiting ? " disabled" : ""}>${STORE_LABEL[s]}</button>`),
+    ].join("");
+    const steamPart =
+      steam || stores.length
+        ? `${buttons}
+      ${steam?.error ? `<p class="note" role="alert">${esc(steam.error)}</p>` : ""}${storeError}
       <p class="hint">Or use email instead:</p>`
-      : "";
+        : "";
     return `<div class="cloud-card">
       <p class="hint">Sign in to keep your saves on every device. The game plays fully without an account.</p>
       ${steamPart}
@@ -90,14 +108,20 @@ export function accountHtml(sync: CloudSync, v: AccountView, now = Date.now(), s
   const u = sync.usage();
   const devices = v.card?.devices ?? [];
   const state = sync.state();
-  // An account made with Steam alone has no email (accounts-design §4): the line names the sign-in instead (SAVE-147).
-  const withSteam = !!steam || !!v.card?.signIns.some((s) => s.provider === "steam");
-  const under = api.account?.email ?? (withSteam ? "Signed in with Steam" : "");
+  // An account made with a store alone has no email (accounts-design §4): the line names the sign-in instead (SAVE-147, SAVE-156).
+  const held = v.card?.signIns.map((s) => s.provider) ?? [];
+  const first = steam ? "steam" : (["steam", "apple", "google"] as const).find((p) => held.includes(p));
+  const under = api.account?.email ?? (first ? `Signed in with ${{ steam: "Steam", apple: "Apple", google: "Google" }[first]}` : "");
+  const addable = v.card && store ? storesShown(steam, store).filter((s) => !held.includes(s)) : [];
+  const addRow = addable.length
+    ? `<div class="cloud-add-row">${addable.map((s) => `<button class="paper cloud-add" data-cloud-add="${s}"${waiting ? " disabled" : ""}>Add ${STORE_LABEL[s]}</button>`).join("")}</div>`
+    : "";
   return `<div class="cloud-card">
     <div class="set-row"><div class="set-label"><b>${esc(api.account?.displayName ?? "")}</b><small>${esc(under)}</small></div></div>
     <p class="cloud-status${state === "up_to_date" ? "" : " warn"}" role="status">${esc(sync.statusText())}</p>
     ${error}
     ${signInsRow(v.card, steam)}
+    ${addRow}${storeError}
     <div class="set-row"><div class="set-label"><b>Storage</b><small>${u ? `${u.saves} of ${u.quotaSaves} saves · ${mb(u.bytes)} of ${mb(u.quotaBytes)}` : "Counted after the next sync."}</small></div></div>
     <h4 class="sub">Devices</h4>
     ${v.card ? "" : `<p class="hint">${esc(v.cardError || "Loading the devices…")}</p>`}
@@ -135,11 +159,13 @@ export function accountHtml(sync: CloudSync, v: AccountView, now = Date.now(), s
  * Binds the card's buttons. `device` is how this device names itself to the
  * server; `redraw` draws the section again.
  */
-export function bindAccount(card: HTMLElement, sync: CloudSync, v: AccountView, device: { name: string; platform: string }, redraw: () => void, steam?: SteamSignIn): void {
+export function bindAccount(card: HTMLElement, sync: CloudSync, v: AccountView, device: { name: string; platform: string }, redraw: () => void, steam?: SteamSignIn, store?: StoreSignIn): void {
   const api = sync.api;
   const act = async (work: () => Promise<unknown>) => {
     v.busy = true;
     v.error = "";
+    // A store's old reason would only confuse once the player moved on to the email form.
+    if (store) store.error = "";
     redraw();
     try {
       await work();
@@ -178,6 +204,26 @@ export function bindAccount(card: HTMLElement, sync: CloudSync, v: AccountView, 
     v.busy = false;
     redraw();
   });
+  // Apple, Google and Steam in the browser (SAVE-155, SAVE-156): the store's own sheet, then the card again.
+  const storeTap = (work: (s: StoreSignIn) => Promise<boolean>) => async () => {
+    if (!store) return;
+    v.busy = true;
+    v.error = "";
+    redraw();
+    try {
+      if (await work(store)) await loadCard(sync, v, () => {});
+    } catch {
+      // store.error holds the reason, shown under the buttons.
+    }
+    v.busy = false;
+    redraw();
+  };
+  card.querySelectorAll<HTMLButtonElement>("[data-cloud-store]").forEach((b) =>
+    b.addEventListener("click", storeTap((s) => s.signIn(b.dataset.cloudStore as Parameters<StoreSignIn["signIn"]>[0]))),
+  );
+  card.querySelectorAll<HTMLButtonElement>("[data-cloud-add]").forEach((b) =>
+    b.addEventListener("click", storeTap((s) => s.add(b.dataset.cloudAdd as Parameters<StoreSignIn["add"]>[0]))),
+  );
   card.querySelector<HTMLButtonElement>("[data-cloud-switch]")?.addEventListener("click", (e) => {
     v.form = (e.currentTarget as HTMLButtonElement).dataset.cloudSwitch as AccountView["form"];
     v.error = "";

@@ -2,7 +2,13 @@
 
 namespace App\Controller;
 
+use App\Account\IdToken\AppleIdTokens;
+use App\Account\IdToken\GoogleIdTokens;
 use App\Account\Registration;
+use App\Account\SignInCodes;
+use App\Account\SignInRefused;
+use App\Account\SignInUnavailable;
+use App\Account\StoreIdentity;
 use App\Account\Steam\SteamRefused;
 use App\Account\Steam\SteamTickets;
 use App\Account\Steam\SteamUnavailable;
@@ -27,13 +33,30 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
- * Signing the game in (domain/saves/spec.md SAVE-057, SAVE-112 … SAVE-118): with email and
- * password or with a Steam ticket, refreshing the tokens, the account's sign-ins and devices,
- * and signing a device out.
+ * Signing the game in (domain/saves/spec.md SAVE-057, SAVE-112 … SAVE-118, SAVE-149 … SAVE-154):
+ * with email and password, a Steam ticket, a Steam browser code, an Apple identity token or a
+ * Google ID token; refreshing the tokens, the account's sign-ins and devices, and signing a device out.
  */
 final class SessionController
 {
     use JsonInput;
+
+    /** The store sign-ins, by the field that carries each one's proof. */
+    private const STORE_PROOFS = ['steamTicket', 'steamOpenIdCode', 'appleIdentityToken', 'googleIdToken'];
+
+    /** What each store's sign-in answers when the server is not set up for it or the store is out of reach (SAVE-118, SAVE-154). */
+    private const UNAVAILABLE = [
+        Identity::STEAM => 'Steam sign-in is not available.',
+        Identity::APPLE => 'Sign in with Apple is not available.',
+        Identity::GOOGLE => 'Google sign-in is not available.',
+    ];
+
+    /** What each store's sign-in answers when the store or our checks say no. */
+    private const REFUSED = [
+        Identity::STEAM => 'Steam did not accept the sign-in.',
+        Identity::APPLE => 'Apple did not accept the sign-in.',
+        Identity::GOOGLE => 'Google did not accept the sign-in.',
+    ];
 
     public function __construct(
         private readonly EntityManagerInterface $em,
@@ -45,6 +68,9 @@ final class SessionController
         private readonly ValidatorInterface $validator,
         private readonly Tokens $tokens,
         private readonly SteamTickets $steam,
+        private readonly AppleIdTokens $apple,
+        private readonly GoogleIdTokens $google,
+        private readonly SignInCodes $codes,
         private readonly ClockInterface $clock,
         private readonly RateLimiterFactoryInterface $apiSignInLimiter,
     ) {
@@ -58,10 +84,9 @@ final class SessionController
             'name' => [new Assert\NotBlank(), new Assert\Type('string'), new Assert\Length(max: 60)],
             'platform' => [new Assert\NotBlank(), new Assert\Choice(choices: Device::PLATFORMS)],
         ]);
-        $steam = \array_key_exists('steamTicket', $data);
-        $errors = $this->validate($this->validator, $data, $steam
-            ? new Assert\Collection([
-                'steamTicket' => [new Assert\NotBlank(), new Assert\Type('string')],
+        $proof = self::proofIn($data);
+        $errors = $this->validate($this->validator, $data, null !== $proof
+            ? new Assert\Collection(self::proofFields($proof) + [
                 'displayName' => new Assert\Optional([new Assert\Type('string')]),
                 'device' => $device,
             ])
@@ -75,16 +100,17 @@ final class SessionController
         }
 
         $created = false;
-        if ($steam) {
-            $steamId = $this->steamId($data['steamTicket']);
-            if ($steamId instanceof JsonResponse) {
-                return $steamId;
+        if (null !== $proof) {
+            $who = $this->storeIdentity($proof, $data);
+            if ($who instanceof JsonResponse) {
+                return $who;
             }
-            $identity = $this->identities->findOneBy(['provider' => Identity::STEAM, 'subject' => $steamId]);
+            $identity = $this->identities->findOneBy(['provider' => $who->provider, 'subject' => $who->subject]);
             if (null === $identity) {
-                $account = new Account(null, self::displayNameOr($data['displayName'] ?? null));
+                // The account is named with the name the store gives (Google), else the one the game passes (Steam, Apple).
+                $account = new Account(null, self::displayNameOr($who->name ?? $data['displayName'] ?? null));
                 $this->em->persist($account);
-                $this->em->persist(new Identity($account, Identity::STEAM, $steamId, $this->clock->now()));
+                $this->em->persist(new Identity($account, $who->provider, $who->subject, $this->clock->now()));
                 $created = true;
             } else {
                 $account = $identity->getAccount();
@@ -139,30 +165,31 @@ final class SessionController
         ]);
     }
 
-    /** Adds a sign-in to the signed-in account: a Steam account, or email and password (SAVE-112). */
+    /** Adds a sign-in to the signed-in account: a store sign-in, or email and password (SAVE-112, SAVE-153). */
     #[Route('/api/account/sign-ins', name: 'account_add_sign_in', methods: ['POST'])]
     #[IsGranted('ROLE_PLAYER')]
     public function addSignIn(#[CurrentUser] Account $account, Request $request): JsonResponse
     {
         $data = $this->decode($request);
-        if (\array_key_exists('steamTicket', $data)) {
-            if ($errors = $this->validate($this->validator, $data, new Assert\Collection(['steamTicket' => [new Assert\NotBlank(), new Assert\Type('string')]]))) {
+        $proof = self::proofIn($data);
+        if (null !== $proof) {
+            if ($errors = $this->validate($this->validator, $data, new Assert\Collection(self::proofFields($proof)))) {
                 return $errors;
             }
-            $steamId = $this->steamId($data['steamTicket']);
-            if ($steamId instanceof JsonResponse) {
-                return $steamId;
+            $who = $this->storeIdentity($proof, $data);
+            if ($who instanceof JsonResponse) {
+                return $who;
             }
-            $existing = $this->identities->findOneBy(['provider' => Identity::STEAM, 'subject' => $steamId]);
+            $existing = $this->identities->findOneBy(['provider' => $who->provider, 'subject' => $who->subject]);
             if (null !== $existing) {
                 return $existing->getAccount() === $account
                     ? new JsonResponse(['signIns' => $this->signIns($account)])
                     : new JsonResponse(['error' => 'linked_to_another_account'], Response::HTTP_CONFLICT);
             }
-            if (null !== $this->identities->findOneBy(['account' => $account, 'provider' => Identity::STEAM])) {
-                return new JsonResponse(['error' => 'already_has_steam'], Response::HTTP_CONFLICT);
+            if (null !== $this->identities->findOneBy(['account' => $account, 'provider' => $who->provider])) {
+                return new JsonResponse(['error' => 'already_has_'.$who->provider], Response::HTTP_CONFLICT);
             }
-            $this->em->persist(new Identity($account, Identity::STEAM, $steamId, $this->clock->now()));
+            $this->em->persist(new Identity($account, $who->provider, $who->subject, $this->clock->now()));
         } else {
             $constraint = Registration::constraint();
             unset($constraint->fields['displayName']);
@@ -197,19 +224,57 @@ final class SessionController
         return new Response(status: Response::HTTP_NO_CONTENT);
     }
 
-    /** The SteamID a ticket stands for, or the answer to send when Steam says no. */
-    private function steamId(string $ticket): string|JsonResponse
+    /** The store sign-in a request carries, by its proof's field, or null for email and password. */
+    private static function proofIn(array $data): ?string
     {
+        foreach (self::STORE_PROOFS as $field) {
+            if (\array_key_exists($field, $data)) {
+                return $field;
+            }
+        }
+
+        return null;
+    }
+
+    /** @return array<string, mixed> the fields each store's proof is made of */
+    private static function proofFields(string $proof): array
+    {
+        $text = [new Assert\NotBlank(), new Assert\Type('string'), new Assert\Length(max: 8192)];
+
+        return match ($proof) {
+            'appleIdentityToken', 'googleIdToken' => [$proof => $text, 'nonce' => [new Assert\NotBlank(), new Assert\Type('string'), new Assert\Length(max: 200)]],
+            default => [$proof => $text],
+        };
+    }
+
+    /** Who the store says the player is, or the answer to send when it says no or cannot be asked. */
+    private function storeIdentity(string $proof, array $data): StoreIdentity|JsonResponse
+    {
+        $provider = match ($proof) {
+            'appleIdentityToken' => Identity::APPLE,
+            'googleIdToken' => Identity::GOOGLE,
+            default => Identity::STEAM,
+        };
         try {
-            return $this->steam->steamIdFor($ticket);
-        } catch (SteamUnavailable) {
-            return new JsonResponse(['error' => 'steam_unavailable', 'message' => 'Steam sign-in is not available.'], Response::HTTP_SERVICE_UNAVAILABLE);
-        } catch (SteamRefused) {
-            return new JsonResponse(['error' => 'steam_refused', 'message' => 'Steam did not accept the sign-in.'], Response::HTTP_UNAUTHORIZED);
+            switch ($proof) {
+                case 'steamTicket':
+                    return new StoreIdentity(Identity::STEAM, $this->steam->steamIdFor($data['steamTicket']));
+                case 'steamOpenIdCode':
+                    return $this->codes->redeem($data['steamOpenIdCode'], Identity::STEAM)
+                        ?? new JsonResponse(['error' => 'sign_in_expired', 'message' => 'The sign-in took too long or was used already. Try again.'], Response::HTTP_UNAUTHORIZED);
+                case 'appleIdentityToken':
+                    return $this->apple->verify($data['appleIdentityToken'], $data['nonce']);
+                default:
+                    return $this->google->verify($data['googleIdToken'], $data['nonce']);
+            }
+        } catch (SteamUnavailable|SignInUnavailable) {
+            return new JsonResponse(['error' => $provider.'_unavailable', 'message' => self::UNAVAILABLE[$provider]], Response::HTTP_SERVICE_UNAVAILABLE);
+        } catch (SteamRefused|SignInRefused) {
+            return new JsonResponse(['error' => $provider.'_refused', 'message' => self::REFUSED[$provider]], Response::HTTP_UNAUTHORIZED);
         }
     }
 
-    /** The player's Steam name when it fits the community's rule for names (2 to 40 characters). */
+    /** The name the store or the game gives, when it fits the community's rule for names (2 to 40 characters). */
     private static function displayNameOr(mixed $name): string
     {
         $name = \is_string($name) ? trim(preg_replace('/\s+/u', ' ', $name) ?? '') : '';
