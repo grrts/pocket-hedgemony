@@ -755,7 +755,9 @@ export function seasonBytes(out: Uint8Array, i: number, temperature: number, aut
 }
 
 export class MapRenderer {
-  readonly gl: WebGL2RenderingContext;
+  /** The context; checked call by call until stopWatching, then the bare context. */
+  gl: WebGL2RenderingContext;
+  private bare: WebGL2RenderingContext;
   private program: WebGLProgram;
   private tiles: Tile[] = [];
   private infoTex: WebGLTexture;
@@ -793,6 +795,7 @@ export class MapRenderer {
     this.map = map;
     const gl = canvas.getContext("webgl2", { antialias: false, alpha: false, preserveDrawingBuffer: false });
     if (!gl) throw new Error("WebGL2 is not available");
+    this.bare = gl;
     this.gl = this.watched(gl);
     this.program = link(gl, VERT, FRAG);
     for (const name of ["uCenter", "uZoom", "uView", "uIds", "uTileOrigin", "uTileSize", "uInfo", "uOwner", "uInfoWidth", "uTime", "uMode", "uParchment", "uParchmentDark", "uTerrain", "uDepth", "uFoam", "uInk", "uHighlight", "uSand", "uForbid", "uAtlas", "uMini", "uLand", "uSeason", "uTown", "uTownAtlas", "uLiving", "uFiefs", "uRoad", "uSubject", "uSubjectOf", "uHunt", "uVision"]) {
@@ -845,21 +848,34 @@ export class MapRenderer {
   /** The first WebGL call that raised an error while starting up, with the error code; null while none has. */
   firstError: string | null = null;
 
+  /** Whether calls are still checked one by one (start-up and the first frames). */
+  get watching(): boolean {
+    return this.gl !== this.bare;
+  }
+
+  /**
+   * Goes back to the bare context once the first frames drew (or one failed):
+   * a getError after every call stalls the GPU pipeline, which cost the main
+   * thread whole seconds while the turns played.
+   */
+  stopWatching(): void {
+    this.gl = this.bare;
+  }
+
   /**
    * The context with every call checked for an error during start-up and the
    * first frames, so a device that rejects one (an iPhone with 1282, say)
    * names the call on the map instead of only the code.
    */
   private watched(gl: WebGL2RenderingContext): WebGL2RenderingContext {
-    let left = 20000;
     return new Proxy(gl, {
       get: (target, key) => {
         const v = Reflect.get(target, key, target) as unknown;
         if (typeof v !== "function") return v;
-        if (key === "getError" || left <= 0) return (v as (...a: unknown[]) => unknown).bind(target);
+        if (key === "getError") return (v as (...a: unknown[]) => unknown).bind(target);
         return (...args: unknown[]) => {
           const r = (v as (...a: unknown[]) => unknown).apply(target, args);
-          if (--left > 0 && this.firstError === null) {
+          if (this.firstError === null) {
             const err = target.getError();
             if (err !== target.NO_ERROR) {
               const arg = (a: unknown) => (typeof a === "number" ? String(a) : typeof a === "string" ? JSON.stringify(a.slice(0, 20)) : a === null ? "null" : ArrayBuffer.isView(a) ? `bytes[${a.byteLength}]` : typeof a);
