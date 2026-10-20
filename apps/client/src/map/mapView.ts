@@ -155,10 +155,10 @@ export class MapView {
     const t0 = performance.now();
     this.renderer.draw(cam, t / 1000);
     if (this.waitForGpu) this.renderer.gl.finish();
-    if (this.stats.frames === 0) {
+    if (this.stats.frames < 30) {
       // A device that cannot run the map shader draws nothing and says so only here.
-      const err = this.renderer.gl.getError();
-      if (err !== this.renderer.gl.NO_ERROR) this.drawFailed(`WebGL error ${err}`);
+      const err = this.renderer.firstError ?? (this.renderer.gl.getError() || null);
+      if (err !== null) this.drawFailed(`WebGL error ${err}`);
     }
     const t1 = performance.now();
     const ctx = this.octx;
