@@ -141,7 +141,7 @@ export interface DiplomacyConfig {
       flag: string;
     };
   };
-  war_aims: { held_province_years: number; refused_demand_years: number; punish_years: number; tribute_by_strength_multiple: number; regency_allows: string[] };
+  war_aims: { held_province_years: number; refused_demand_years: number; punish_years: number; tribute_by_strength_multiple: number; regency_allows: string[]; no_aim_penalty: { lord_steps: number; notoriety: number; peace_share: number; allies_refuse: boolean; ai_only_if_reckless: boolean } };
   truce: { base_months: number; extra_months_if_land_or_subject: number; white_peace_months: number };
   leagues: {
     threshold_by_era: Record<string, number>;

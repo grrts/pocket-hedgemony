@@ -17,6 +17,7 @@ const price = (over: Partial<PriceOfWar> = {}): PriceOfWar => ({
   waveringLords: 3,
   aim: { aim: "no_aim" },
   noAim: true,
+  aimless: null,
   truce: null,
   monthlyPay: 12.4,
   maxCeded: 4,
@@ -43,6 +44,37 @@ const war = (share: number, over: Partial<NonNullable<Snapshot["wars"][number]["
     cede: { attacker: { max: 3, of: 9, now: 0 }, defender: { max: 4, of: 11, now: 2 } },
     ...over,
   },
+});
+
+describe("a war with no aim on the declare sheet (F-167)", () => {
+  const aimless = { lords: 5, lordSteps: 2, notoriety: 15, provinces: 12, peaceShare: 0.25, alliesStayOut: [6] };
+  const p = price({ aimless });
+  const base = { target: 1, name, provinceName: () => "Champagne", titles, income: 20, me: 0, censure: "", nameAbroad: null };
+
+  it("heads the Price of war with every cost, each a red row that opens its reason", () => {
+    const html = priceOfWarHtml(p, { name, titles, income: 20 });
+    expect(html.indexOf("aimless-warn")).toBeLessThan(html.indexOf("Against you"));
+    expect(html).toContain("5 lose 2 steps of loyalty at once");
+    expect(html).toContain("Warlike or not");
+    expect(html).toContain("+15 notoriety");
+    expect(html).toContain("<em>Unjust war</em> in 12 provinces");
+    expect(html).toContain("+25 in 100 say peace");
+    expect(html).toContain("1 ally stay out");
+    expect(html).toContain("Castile");
+    expect(html).toContain("2 realms will hold <em>Threatened us</em>");
+    // Neighbours alarmed shows once, inside the block.
+    expect(html.split("Neighbours alarmed").length).toBe(2);
+    // The lords show once too: the wavering on taking land is told inside the block.
+    expect(html).not.toContain("will waver");
+    expect(html.match(/class="pow-line hurt"/g)!.length).toBeGreaterThanOrEqual(6);
+  });
+
+  it("names Confirm for what it is, and shows nothing of it for a war with an aim", () => {
+    expect(declareSheetHtml({ ...base, price: p })).toContain("Declare war with no aim");
+    const held = declareSheetHtml({ ...base, price: price({ aim: { aim: "take_land", province: 7 }, noAim: false }) });
+    expect(held).not.toContain("aimless-warn");
+    expect(held).toContain("Declare war on Burgundy");
+  });
 });
 
 describe("the declare sheet's Price of war (WAR-229, WAR-232)", () => {

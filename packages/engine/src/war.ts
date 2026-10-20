@@ -24,13 +24,14 @@ import { demandableProvinces, makeDemand, whyNotDemand } from "./statecraft.ts";
 import { heritageFactor } from "./heritage.ts";
 import { lostBattle } from "./rebels.ts";
 import { bestTerms, markSurrender, noteWarBattle, settlementTable } from "./settlement.ts";
-import { priceContext, priceOfWar, whyAiWontDeclare } from "./priceOfWar.ts";
+import { heedsNoNotoriety, priceContext, priceOfWar, whyAiWontDeclare } from "./priceOfWar.ts";
 import { grabbedLand } from "./conquest.ts";
 import { goalPlacesHeldBy, goalPulls } from "./goals.ts";
 import goalsConfig from "../../rules/data/domain/events.json" with { type: "json" };
 import { cededProvinces, fittingAim, landTakenWithoutAim, monthlyRefusals, noteWarVictory, peaceVoices, refusedPeace, truceBroken, type GameWar } from "./peace.ts";
 import { aiAnswersDefence, defenceCalls, dissolveEmpire, whyNotDissolveTerm } from "./institutions.ts";
 import { aiWarChanceFactor } from "./difficulty.ts";
+import { aimless, aimlessWarDeclared, NO_AIM } from "./aimlessWar.ts";
 
 /**
  * Milestone 1, war and conquest: wires the diplomacy context (who is at war,
@@ -176,6 +177,8 @@ export interface DeclareOptions {
   /** The province a Take land aim names. */
   province?: string;
   breakTruce?: boolean;
+  /** A subject rising for its freedom (SUBJ-077): its war has no aim but pays no price for it (F-167). */
+  rising?: boolean;
 }
 
 /**
@@ -212,6 +215,8 @@ export function declareWar(world: World, a: number, b: number, news: News[], o: 
   }
   if (aim.province) (war as GameWar).aimProvince = aim.province;
   news.push({ kind: "war", text: `${name(world, a)} declares war on ${name(world, b)}.`, nations: [a, b] });
+  // A war with no aim costs its declarer dearly from the first day (F-167).
+  if (aimless(war) && !o.rising) aimlessWarDeclared(world, a, news);
   for (const id of [...war.attackers, ...war.defenders]) {
     const n = world.nationIndex.get(id)!;
     if (n !== a && n !== b) news.push({ kind: "joined", text: `${name(world, n)} joins the war on the side of ${name(world, war.attackers.includes(id) ? a : b)}.`, nations: [n, a, b] });
@@ -261,6 +266,12 @@ export function answerAiCalls(world: World, news: News[]): void {
     const n = world.nationIndex.get(call.called)!;
     if (n === world.player) continue;
     const enemy = world.nationIndex.get(call.against)!;
+    // An ally need not join a war with no aim, and the AI stays out of it (F-167, D-DIPL-9).
+    const war = d.wars.find((w) => w.id === call.war);
+    if (NO_AIM.allies_refuse && call.via === "alliance" && call.kind === "offensive" && war && aimless(war)) {
+      answerCall(world, call, false, news);
+      continue;
+    }
     // A subject answers its overlord by its loyalty and kind (SUBJ-028, SUBJ-038).
     const yes = call.via === "subject" ? subjectAnswersCall(world, n) : call.via === "empire" ? aiAnswersDefence(world, call) : call.kind === "defensive" || (!dip.warOf(d, call.called) && strength(world, n) * 2 >= strength(world, enemy));
     answerCall(world, call, yes, news);
@@ -1258,6 +1269,8 @@ export function aiDeclarations(world: World, news: News[]): void {
     const weight = (x: number) => (1 + G.target_weight_per_pull * (pulls?.get(x) ?? 0)) * (busy(x) ? O.at_war_target_weight : 1);
     const t = most > 0 || targets.some(busy) ? weightedPick(world, targets, weight) : targets[world.rng.int(targets.length)]!;
     if (demandFirst(world, n, t)) continue;
+    // A war with no aim costs too much for any but a reckless realm (F-167).
+    if (NO_AIM.ai_only_if_reckless && declaringAim(world, n, t).aim === "no_aim" && !heedsNoNotoriety(world, n)) continue;
     // A Take land aim on a place one of its goals names is the war's aim (EVT-105).
     const place = goalPlacesHeldBy(world, n, t).map((p) => world.provinceIds[p]!).find((p) => dip.warAimsOf(d, world.nationIds[n]!, world.nationIds[t]!).some((h) => h.aim === "take_land" && h.province === p));
     declareWar(world, n, t, news, place ? { aim: "take_land", province: place } : {});

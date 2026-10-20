@@ -1184,6 +1184,15 @@
   "punish_years": 5,
   "tribute_by_strength_multiple": 3,
   "no_aim_wrong_to_neighbours": "threatened_us",
+  "no_aim_penalty": {
+   "$comment": "F-167 (Leroy, 20 Oct): a war declared with no aim punishes the declarer hugely, the moment it is declared. Every lord, Warlike or not, takes the aimless_war loyalty cause lord_steps times; the declarer gains notoriety (the Notorious deed wrong with every realm that knows it, DIPL-174); each of its provinces holds the Unjust war grievance while the war lasts; its peace voices count peace_share more for peace; its allies may refuse the call with no oath broken (allies_refuse); the AI declares one only when Warlike or a hegemon seeker (ai_only_if_reckless). A subject rising for its freedom pays none of it. Provisional.",
+   "lord_steps": 2,
+   "notoriety": 15,
+   "peace_share": 0.25,
+   "allies_refuse": true,
+   "ai_only_if_reckless": true,
+   "provisional": true
+  },
   "regency_allows": [
    "defensive",
    "raid"

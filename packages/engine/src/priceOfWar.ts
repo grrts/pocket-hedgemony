@@ -8,6 +8,7 @@ import * as rc from "./domain/recruiting/index.ts";
 import { kindFights } from "./domain/subjects/index.ts";
 import { ARMS, armyPay, canCall, KIND, KIND_NAMES, menByArm } from "./recruit.ts";
 import { LOYALTY } from "./lords.ts";
+import { lordsWhoTurn, NO_AIM } from "./aimlessWar.ts";
 import { warRaise } from "./arms.ts";
 import { canBorrow } from "./treasury.ts";
 
@@ -47,6 +48,12 @@ export interface PriceOfWar {
   aim: { aim: string; province?: number; source?: string };
   /** The declarer holds no fitting aim against the target: the war is declared with no aim. */
   noAim: boolean;
+  /**
+   * What a war with no aim costs the declarer the day it is declared (F-167), null for a war with
+   * an aim: its lords who lose loyalty and by how many steps, the notoriety it gains, its provinces
+   * that will hold Unjust war, what its peace voices gain, and its allies who stay out.
+   */
+  aimless: { lords: number; lordSteps: number; notoriety: number; provinces: number; peaceShare: number; alliesStayOut: number[] } | null;
   /** A truce the declaration breaks, and the month it would have lasted to. */
   truce: { until: string | null } | null;
   /** Gold a month the declarer's armies draw at war, levies paid from their first month (WAR-225). */
@@ -134,6 +141,8 @@ export interface PriceContext {
   threatened: number[];
   waveringLords: number;
   monthlyPay: number;
+  /** Lords who would lose loyalty in a war with no aim (F-167). */
+  lordsWhoTurn: number;
   leagueAgainstA: string[];
   allies: Map<string, string[]>;
   pledgers: Map<string, string[]>;
@@ -169,6 +178,7 @@ export function priceContext(world: World, a: number): PriceContext {
     threatened,
     waveringLords,
     monthlyPay: warPay(world, a),
+    lordsWhoTurn: lordsWhoTurn(world, a),
     leagueAgainstA: dip.leagueAgainst(d, aid)?.members ?? [],
     allies,
     pledgers,
@@ -216,15 +226,19 @@ export function priceOfWar(world: World, a: number, b: number, ctx: PriceContext
     const fights = kindFights(dip.subjectKind(d, id));
     if (fights === "always_if_loyal_or_wavering" || fights === "when_called_by_loyalty" || (fights === "own_frontier_only" && dip.borders(d, id, aid))) add(against, id, "subject");
   }
+  const held = declaringAim(world, a, b);
+  const noAim = held.aim === "no_aim";
   const friends: PriceOfWarCall[] = [];
+  const alliesStayOut: number[] = [];
   const target = strengthOf(world, ctx, b);
   for (const id of ctx.allies.get(aid) ?? []) {
     const n = world.nationIndex.get(id);
     if (n === undefined || n === world.player || seen.has(n) || dip.warOf(d, id)) continue;
-    if (strengthOf(world, ctx, n) * 2 >= target) add(friends, id, "alliance");
+    // An AI ally stays out of a war with no aim (F-167).
+    if (noAim && NO_AIM.allies_refuse) alliesStayOut.push(n);
+    else if (strengthOf(world, ctx, n) * 2 >= target) add(friends, id, "alliance");
   }
   const st = relationState(world, a, b);
-  const held = declaringAim(world, a, b);
   const aimProvince = held.province === undefined ? undefined : world.provinceIndex.get(held.province);
   const aim: PriceOfWar["aim"] = { aim: held.aim, ...(aimProvince !== undefined ? { province: aimProvince } : {}), ...(held.source && held.aim !== "no_aim" ? { source: held.source } : {}) };
   const ourSide = strengthOf(world, ctx, a) + friends.reduce((t, c) => t + c.soldiers, 0);
@@ -241,7 +255,10 @@ export function priceOfWar(world: World, a: number, b: number, ctx: PriceContext
     threatened: ctx.threatened.filter((n) => n !== b),
     waveringLords: ctx.waveringLords,
     aim,
-    noAim: aim.aim === "no_aim",
+    noAim,
+    aimless: noAim
+      ? { lords: ctx.lordsWhoTurn, lordSteps: NO_AIM.lord_steps, notoriety: NO_AIM.notoriety, provinces: ctx.counts[a]!, peaceShare: NO_AIM.peace_share, alliesStayOut }
+      : null,
     truce: st.state === "truce" ? { until: st.until ?? null } : null,
     monthlyPay: ctx.monthlyPay,
     maxCeded: maxCededProvinces(world, b, ctx.counts),

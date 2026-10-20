@@ -607,6 +607,19 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 | `no_aim_wrong_to_neighbours` | threatened\_us |
 | `regency_allows` | defensive, raid |
 
+### No aim penalty
+
+> F-167 (Leroy, 20 Oct): a war declared with no aim punishes the declarer hugely, the moment it is declared. Every lord, Warlike or not, takes the aimless\_war loyalty cause lord\_steps times; the declarer gains notoriety (the Notorious deed wrong with every realm that knows it, DIPL-174); each of its provinces holds the Unjust war grievance while the war lasts; its peace voices count peace\_share more for peace; its allies may refuse the call with no oath broken (allies\_refuse); the AI declares one only when Warlike or a hegemon seeker (ai\_only\_if\_reckless). A subject rising for its freedom pays none of it. Provisional.
+
+| Key | Value |
+|---|---|
+| `lord_steps` | 2 |
+| `notoriety` | 15 |
+| `peace_share` | 0.25 |
+| `allies_refuse` | yes |
+| `ai_only_if_reckless` | yes |
+| `provisional` | yes |
+
 ## Truce
 
 | Key | Value |
