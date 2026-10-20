@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Account\AccountCombiner;
+use App\Account\CombineTokens;
 use App\Account\IdToken\AppleIdTokens;
 use App\Account\IdToken\GoogleIdTokens;
 use App\Account\Registration;
@@ -35,7 +37,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 /**
  * Signing the game in (domain/saves/spec.md SAVE-057, SAVE-112 … SAVE-118, SAVE-149 … SAVE-154):
  * with email and password, a Steam ticket, a Steam browser code, an Apple identity token or a
- * Google ID token; refreshing the tokens, the account's sign-ins and devices, and signing a device out.
+ * Google ID token; refreshing the tokens, the account's sign-ins and devices, signing a device out, and
+ * combining two accounts and removing a sign-in (SAVE-186 … SAVE-193).
  */
 final class SessionController
 {
@@ -50,6 +53,8 @@ final class SessionController
         Identity::APPLE => 'Sign in with Apple is not available.',
         Identity::GOOGLE => 'Google sign-in is not available.',
     ];
+
+    private const LINKED = 'This sign-in already belongs to another Pocket Hegemony account.';
 
     /** What each store's sign-in answers when the store or our checks say no. */
     private const REFUSED = [
@@ -73,7 +78,35 @@ final class SessionController
         private readonly SignInCodes $codes,
         private readonly ClockInterface $clock,
         private readonly RateLimiterFactoryInterface $apiSignInLimiter,
+        private readonly AccountCombiner $combiner,
+        private readonly CombineTokens $combineTokens,
     ) {
+    }
+
+    /**
+     * The refusal of a sign-in that belongs to another account, with the offer to combine (SAVE-186):
+     * what the other account holds, whether a store both hold blocks it (SAVE-188), and the token.
+     */
+    private function offer(Account $account, Account $other, string $provider): JsonResponse
+    {
+        $about = $this->combiner->describe($account, $other);
+        $blocked = $about['blockedBy'];
+        unset($about['blockedBy']);
+
+        return new JsonResponse([
+            'error' => 'linked_to_another_account',
+            'message' => self::LINKED,
+            'combine' => ['signIn' => $provider, 'account' => $about, 'blockedBy' => $blocked]
+                + (null === $blocked ? ['token' => $this->combineTokens->issue($account, $other)] : ['message' => self::bothHave($blocked)]),
+        ], Response::HTTP_CONFLICT);
+    }
+
+    /** Why two accounts that both hold one store's sign-in are not combined (SAVE-188). */
+    private static function bothHave(string $kind): string
+    {
+        $name = ['steam' => 'a Steam sign-in', 'apple' => 'a Sign in with Apple', 'google' => 'a Google sign-in', 'email' => 'an email sign-in'][$kind] ?? 'that sign-in';
+
+        return "Both accounts have {$name}. Remove one of them, then add this sign-in again.";
     }
 
     #[Route('/api/sessions', name: 'session_create', methods: ['POST'])]
@@ -150,10 +183,16 @@ final class SessionController
     #[IsGranted('ROLE_PLAYER')]
     public function show(#[CurrentUser] Account $account, Request $request): JsonResponse
     {
+        return new JsonResponse($this->card($account, $request));
+    }
+
+    /** @return array<string, mixed> the account card's sign-ins and devices */
+    private function card(Account $account, Request $request): array
+    {
         $current = $request->attributes->get('_device');
         $devices = $this->devices->findBy(['account' => $account, 'signedOutAt' => null], ['lastSeenAt' => 'DESC']);
 
-        return new JsonResponse($this->accountJson($account) + [
+        return $this->accountJson($account) + [
             'signIns' => $this->signIns($account),
             'devices' => array_map(fn (Device $d) => [
                 'id' => $d->getId()->toRfc4122(),
@@ -162,7 +201,7 @@ final class SessionController
                 'lastSeenAt' => $d->getLastSeenAt()->format(\DATE_ATOM),
                 'current' => $current instanceof Device && $current->getId()->equals($d->getId()),
             ], $devices),
-        ]);
+        ];
     }
 
     /** Adds a sign-in to the signed-in account: a store sign-in, or email and password (SAVE-112, SAVE-153). */
@@ -184,7 +223,7 @@ final class SessionController
             if (null !== $existing) {
                 return $existing->getAccount() === $account
                     ? new JsonResponse(['signIns' => $this->signIns($account)])
-                    : new JsonResponse(['error' => 'linked_to_another_account'], Response::HTTP_CONFLICT);
+                    : $this->offer($account, $existing->getAccount(), $who->provider);
             }
             if (null !== $this->identities->findOneBy(['account' => $account, 'provider' => $who->provider])) {
                 return new JsonResponse(['error' => 'already_has_'.$who->provider], Response::HTTP_CONFLICT);
@@ -199,8 +238,19 @@ final class SessionController
             if (null !== $account->getEmail()) {
                 return new JsonResponse(['error' => 'already_has_email'], Response::HTTP_CONFLICT);
             }
-            if ($this->registration->isEmailTaken($data['email'])) {
-                return new JsonResponse(['error' => 'linked_to_another_account'], Response::HTTP_CONFLICT);
+            $owner = $this->accounts->findOneBy(['email' => mb_strtolower(trim($data['email']))]);
+            if (null !== $owner) {
+                // The offer to combine comes only with that account's password, and the tries count as sign-ins (SAVE-186, SAVE-117).
+                $limiter = $this->apiSignInLimiter->create(mb_strtolower(trim($data['email'])).'|'.($request->getClientIp() ?? 'unknown'));
+                if (!$limiter->consume()->isAccepted()) {
+                    return new JsonResponse(['error' => 'too_many_tries'], Response::HTTP_TOO_MANY_REQUESTS);
+                }
+                if ('' === $owner->getPassword() || !$this->hasher->isPasswordValid($owner, $data['password'])) {
+                    return new JsonResponse(['error' => 'linked_to_another_account', 'message' => self::LINKED], Response::HTTP_CONFLICT);
+                }
+                $limiter->reset();
+
+                return $this->offer($account, $owner, 'email');
             }
             $account->setEmail($data['email']);
             $account->setPassword($this->hasher->hashPassword($account, $data['password']));
@@ -208,6 +258,57 @@ final class SessionController
         $this->em->flush();
 
         return new JsonResponse(['signIns' => $this->signIns($account)], Response::HTTP_CREATED);
+    }
+
+    /**
+     * Combines the account the offer named with this one (SAVE-187 … SAVE-192): the token from the
+     * refusal of SAVE-186 is the proof the player passed the other account's sign-in.
+     */
+    #[Route('/api/account/merge', name: 'account_merge', methods: ['POST'])]
+    #[IsGranted('ROLE_PLAYER')]
+    public function merge(#[CurrentUser] Account $account, Request $request): JsonResponse
+    {
+        $data = $this->decode($request);
+        $offer = \is_string($data['combineToken'] ?? null) ? $this->combineTokens->read($data['combineToken']) : null;
+        if (null === $offer || $offer['staying'] !== $account->getId()->toRfc4122()) {
+            return new JsonResponse(['error' => 'combine_expired', 'message' => 'The offer to combine ran out. Add the sign-in again.'], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+        $other = $this->accounts->find($offer['other']);
+        if (null === $other || $other === $account) {
+            return new JsonResponse(['error' => 'nothing_to_combine', 'message' => 'That account is already combined or gone.'], Response::HTTP_GONE);
+        }
+        if (null !== ($both = $this->combiner->blockedBy($account, $other))) {
+            return new JsonResponse(['error' => 'both_have_'.$both, 'message' => self::bothHave($both)], Response::HTTP_CONFLICT);
+        }
+        $name = $other->getDisplayName();
+        $id = $account->getId();
+        $moved = $this->combiner->combine($account, $other);
+        // The combiner cleared what the entity manager held; the account is read again.
+        $account = $this->accounts->find($id);
+
+        return new JsonResponse($this->card($account, $request) + ['combined' => ['displayName' => $name] + $moved]);
+    }
+
+    /** Removes one sign-in while another remains (SAVE-193). */
+    #[Route('/api/account/sign-ins/{provider}', name: 'account_remove_sign_in', requirements: ['provider' => 'steam|apple|google|email'], methods: ['DELETE'])]
+    #[IsGranted('ROLE_PLAYER')]
+    public function removeSignIn(#[CurrentUser] Account $account, string $provider): JsonResponse
+    {
+        $held = $this->combiner->signInKinds($account);
+        if (!\in_array($provider, $held, true)) {
+            return new JsonResponse(['error' => 'not_found', 'message' => 'This account has no such sign-in.'], Response::HTTP_NOT_FOUND);
+        }
+        if (\count($held) < 2) {
+            return new JsonResponse(['error' => 'last_sign_in', 'message' => 'An account keeps at least one sign-in.'], Response::HTTP_CONFLICT);
+        }
+        if ('email' === $provider) {
+            $account->removeEmail();
+        } else {
+            $this->em->remove($this->identities->findOneBy(['account' => $account, 'provider' => $provider]));
+        }
+        $this->em->flush();
+
+        return new JsonResponse(['signIns' => $this->signIns($account)]);
     }
 
     /** Signs a device out, this one or another of the account's (SAVE-116). */

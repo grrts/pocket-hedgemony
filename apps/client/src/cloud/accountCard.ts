@@ -1,4 +1,5 @@
 import { CloudError, errorText, type AccountCard, type SharedCard } from "./api.ts";
+import { combinedLine, combineHtml } from "./combine.ts";
 import type { SteamSignIn } from "./steam.ts";
 import { STORE_LABEL, type StoreSignIn } from "./storeSignIn.ts";
 import type { CloudSync } from "./sync.ts";
@@ -9,7 +10,9 @@ import type { CloudSync } from "./sync.ts";
  * (Sign in with Steam in the Steam build, SAVE-146; Apple, Google and Steam in
  * the browser on phones and the web, SAVE-155), the email sign-in and Make an
  * account; signed in, the display name, the cloud's status line (its
- * overview), Sign-ins with Add buttons (SAVE-147, SAVE-156), Storage, Devices
+ * overview), Sign-ins with Add buttons (SAVE-147, SAVE-156), Remove on each
+ * while there are two or more (SAVE-195), the question whether to combine
+ * when an Add brings another account's sign-in (SAVE-194), Storage, Devices
  * with Sign out on each, Shared saves with Remove on each (SAVE-135), and Sign
  * out. Sync on Wi-Fi only joins when it is built.
  */
@@ -29,9 +32,11 @@ export interface AccountView {
   confirm: string;
   /** The saves this account shared with the community, fetched with the card (SAVE-135). */
   shared: SharedCard[] | undefined;
+  /** A line about what just happened, such as two accounts combined (SAVE-194). */
+  notice: string;
 }
 
-export const accountView = (): AccountView => ({ form: "sign_in", email: "", busy: false, error: "", card: undefined, cardError: "", confirm: "", shared: undefined });
+export const accountView = (): AccountView => ({ form: "sign_in", email: "", busy: false, error: "", card: undefined, cardError: "", confirm: "", shared: undefined, notice: "" });
 
 const times = (n: number) => `Played ${n} time${n === 1 ? "" : "s"}`;
 
@@ -52,17 +57,34 @@ function seen(iso: string, now: number): string {
 
 const PROVIDERS: Record<string, string> = { steam: "Steam", apple: "Apple", google: "Google", email: "Email", password: "Email" };
 
+/** What Remove asks about each sign-in (SAVE-195). */
+const REMOVE_NAME: Record<string, string> = { steam: "Steam", apple: "Sign in with Apple", google: "Google sign-in", email: "the email sign-in" };
+
 /**
  * The Sign-ins row (SAVE-147): Steam first, with the Steam name on this
  * computer (the server knows only the SteamID), then email with its address.
+ * With two or more, each has Remove, which asks first in its row (SAVE-195);
+ * the last one has none.
  */
-function signInsRow(card: AccountCard | undefined, steam: SteamSignIn | undefined): string {
+function signInsRow(card: AccountCard | undefined, steam: SteamSignIn | undefined, v?: AccountView): string {
   if (!card?.signIns.length) return "";
   const order = (p: string) => (p === "steam" ? 0 : p === "email" || p === "password" ? 2 : 1);
   const rows = [...card.signIns].sort((a, b) => order(a.provider) - order(b.provider));
   const label = (s: { provider: string; label: string }) =>
     s.provider === "steam" ? (steam?.steam.name ? `Steam · ${steam.steam.name}` : "Steam") : s.provider === "email" || s.provider === "password" ? `Email · ${s.label}` : (PROVIDERS[s.provider] ?? s.provider);
-  return `<div class="set-row cloud-sign-ins"><div class="set-label"><b>Sign-ins</b><small>${rows.map((s) => esc(label(s))).join("<br>")}</small></div></div>`;
+  if (rows.length < 2) return `<div class="set-row cloud-sign-ins"><div class="set-label"><b>Sign-ins</b><small>${rows.map((s) => esc(label(s))).join("<br>")}</small></div></div>`;
+  const kind = (p: string) => (p === "password" ? "email" : p);
+  return `<div class="set-row cloud-sign-ins"><div class="set-label"><b>Sign-ins</b></div></div>
+    ${rows
+      .map((s) => {
+        const k = kind(s.provider);
+        const control =
+          v?.confirm === `sign-in:${k}`
+            ? `<b>Remove ${esc(REMOVE_NAME[k] ?? k)}? This device stays signed in.</b><button class="wax" data-cloud-unlink="${esc(k)}"${v.busy ? " disabled" : ""}>Remove</button><button class="paper" data-cloud-cancel>Keep</button>`
+            : `<button class="paper" data-cloud-ask="sign-in:${esc(k)}">Remove</button>`;
+        return `<div class="set-row cloud-sign-in"><div class="set-label"><small>${esc(label(s))}</small></div><div class="set-control">${control}</div></div>`;
+      })
+      .join("")}`;
 }
 
 /** The store sign-ins on the card: Steam's ticket in the Steam build, else what the bridge can start. */
@@ -113,14 +135,18 @@ export function accountHtml(sync: CloudSync, v: AccountView, now = Date.now(), s
   const first = steam ? "steam" : (["steam", "apple", "google"] as const).find((p) => held.includes(p));
   const under = api.account?.email ?? (first ? `Signed in with ${{ steam: "Steam", apple: "Apple", google: "Google" }[first]}` : "");
   const addable = v.card && store ? storesShown(steam, store).filter((s) => !held.includes(s)) : [];
-  const addRow = addable.length
-    ? `<div class="cloud-add-row">${addable.map((s) => `<button class="paper cloud-add" data-cloud-add="${s}"${waiting ? " disabled" : ""}>Add ${STORE_LABEL[s]}</button>`).join("")}</div>`
-    : "";
+  // An Add that brought a sign-in of another account asks, once, whether to combine them, in place of the Add buttons (SAVE-194).
+  const addRow = store?.offer
+    ? combineHtml(store.offer, api.account?.displayName ?? "", v.busy, now)
+    : addable.length
+      ? `<div class="cloud-add-row">${addable.map((s) => `<button class="paper cloud-add" data-cloud-add="${s}"${waiting ? " disabled" : ""}>Add ${STORE_LABEL[s]}</button>`).join("")}</div>`
+      : "";
+  const notice = v.notice ? `<p class="note cloud-notice" role="status">${esc(v.notice)}</p>` : "";
   return `<div class="cloud-card">
     <div class="set-row"><div class="set-label"><b>${esc(api.account?.displayName ?? "")}</b><small>${esc(under)}</small></div></div>
     <p class="cloud-status${state === "up_to_date" ? "" : " warn"}" role="status">${esc(sync.statusText())}</p>
-    ${error}
-    ${signInsRow(v.card, steam)}
+    ${error}${notice}
+    ${signInsRow(v.card, steam, v)}
     ${addRow}${storeError}
     <div class="set-row"><div class="set-label"><b>Storage</b><small>${u ? `${u.saves} of ${u.quotaSaves} saves · ${mb(u.bytes)} of ${mb(u.quotaBytes)}` : "Counted after the next sync."}</small></div></div>
     <h4 class="sub">Devices</h4>
@@ -164,6 +190,7 @@ export function bindAccount(card: HTMLElement, sync: CloudSync, v: AccountView, 
   const act = async (work: () => Promise<unknown>) => {
     v.busy = true;
     v.error = "";
+    v.notice = "";
     // A store's old reason would only confuse once the player moved on to the email form.
     if (store) store.error = "";
     redraw();
@@ -223,6 +250,35 @@ export function bindAccount(card: HTMLElement, sync: CloudSync, v: AccountView, 
   );
   card.querySelectorAll<HTMLButtonElement>("[data-cloud-add]").forEach((b) =>
     b.addEventListener("click", storeTap((s) => s.add(b.dataset.cloudAdd as Parameters<StoreSignIn["add"]>[0]))),
+  );
+  // Combining two accounts (SAVE-187, SAVE-194): the server moves everything here, then the sync brings the saves.
+  card.querySelector<HTMLButtonElement>("[data-cloud-combine]")?.addEventListener("click", () =>
+    void act(async () => {
+      const offer = store?.offer;
+      if (!offer?.token) return;
+      try {
+        const r = await api.combineAccounts(offer.token);
+        v.card = r;
+        v.notice = combinedLine(r.combined.displayName);
+        void sync.run("launch");
+        void loadCard(sync, v, redraw);
+      } finally {
+        if (store) store.offer = undefined;
+      }
+    }),
+  );
+  card.querySelector<HTMLButtonElement>("[data-cloud-combine-close]")?.addEventListener("click", () => {
+    if (store) store.offer = undefined;
+    redraw();
+  });
+  card.querySelectorAll<HTMLButtonElement>("[data-cloud-unlink]").forEach((b) =>
+    b.addEventListener("click", () =>
+      void act(async () => {
+        const signIns = await api.removeSignIn(b.dataset.cloudUnlink!);
+        v.confirm = "";
+        if (v.card) v.card = { ...v.card, signIns };
+      }),
+    ),
   );
   card.querySelector<HTMLButtonElement>("[data-cloud-switch]")?.addEventListener("click", (e) => {
     v.form = (e.currentTarget as HTMLButtonElement).dataset.cloudSwitch as AccountView["form"];

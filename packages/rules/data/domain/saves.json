@@ -316,7 +316,8 @@
     "steam_ticket_identity": "pockethegemony",
     "token_leeway_seconds": 60,
     "browser_code_minutes": 5,
-    "app_return": "pockethegemony://auth/steam"
+    "app_return": "pockethegemony://auth/steam",
+    "combine_minutes": 10
   },
   "export": {
     "android": "share sheet",
@@ -329,6 +330,7 @@
     "kinds.autosave.every_6_months",
     "orders_journal.safety_interval_seconds",
     "sign_in.browser_code_minutes",
+    "sign_in.combine_minutes",
     "sign_in.token_leeway_seconds"
   ]
 }

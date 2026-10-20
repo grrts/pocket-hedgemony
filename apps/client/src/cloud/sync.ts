@@ -253,7 +253,8 @@ export class CloudSync {
   private async fetchChanges(): Promise<void> {
     for (;;) {
       const r = await this.api.changes(this.mem.cursor);
-      const rows = new Map(this.mem.rows.map((x) => [x.saveId, x]));
+      // After two accounts were combined the list starts over: the cloud lines held so far give way to it (SAVE-192).
+      const rows = new Map(r.reset ? [] : this.mem.rows.map((x) => [x.saveId, x]));
       for (const s of r.saves) rows.set(s.saveId, s);
       const local = r.tombstones.length ? await this.saves.list() : [];
       for (const t of r.tombstones) {

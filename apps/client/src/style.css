@@ -5510,8 +5510,39 @@ button.link {
   color: var(--cloth);
 }
 
-.cloud-device .set-control {
+.cloud-device .set-control,
+.cloud-sign-in .set-control {
   flex-wrap: wrap;
+}
+
+.cloud-sign-in .set-control button {
+  min-height: 44px;
+}
+
+/* The question when an Add brings a sign-in of another account (SAVE-194, SAVE-197): in the card's one
+   column, Combine accounts full width and 48 points high, Keep apart and OK 44. */
+.cloud-combine {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  border: 3px solid var(--outline);
+  background: var(--paper-light);
+}
+
+.cloud-combine p {
+  margin: 0;
+}
+
+.cloud-combine-yes {
+  width: 100%;
+  min-height: 48px;
+  font-weight: 600;
+}
+
+.cloud-combine-no {
+  width: 100%;
+  min-height: 44px;
 }
 
 .cloud-invite {

@@ -131,6 +131,30 @@ export interface AccountCard extends AccountInfo {
   devices: DeviceRow[];
 }
 
+/**
+ * The offer that comes with a sign-in of another account (SAVE-186): what that account holds, the
+ * sign-in both accounts hold when that blocks combining (SAVE-188), and otherwise the token.
+ */
+export interface CombineOffer {
+  signIn: string;
+  account: { displayName: string; saves: number; sharedSaves: number; purchases: string[]; storageFull: boolean; sharedFull: boolean };
+  blockedBy: string | null;
+  token?: string;
+  message?: string;
+}
+
+/** The offer a refused Add carries, if it carries one. */
+export function combineOffer(e: unknown): CombineOffer | undefined {
+  if (!(e instanceof CloudError) || e.code !== "linked_to_another_account") return undefined;
+  const offer = e.body?.combine as CombineOffer | undefined;
+  return offer && typeof offer === "object" && offer.account ? offer : undefined;
+}
+
+/** What `POST /api/account/merge` answers: the account card, and what came over (SAVE-187). */
+export interface Combined extends AccountCard {
+  combined: { displayName: string; signIns: number; devices: number; saves: number; sharedSaves: number; purchases: number };
+}
+
 /** One save's header as the server's Save table keeps it (SAVE-061). */
 export interface RemoteSave {
   saveId: string;
@@ -198,6 +222,8 @@ export interface Changes {
   cursor: string;
   more: boolean;
   usage: Usage | undefined;
+  /** The device came over from an account combined into this one: the list starts over (SAVE-192). */
+  reset: boolean;
 }
 
 /**
@@ -208,10 +234,13 @@ export interface Changes {
 export class CloudError extends Error {
   readonly status: number;
   readonly code: string;
-  constructor(status: number, code: string, message?: string) {
+  /** The server's whole answer, for refusals that carry more than a word (the offer to combine, SAVE-186). */
+  readonly body: Record<string, unknown> | undefined;
+  constructor(status: number, code: string, message?: string, body?: Record<string, unknown>) {
     super(message ?? code);
     this.status = status;
     this.code = code;
+    this.body = body;
   }
   get offline(): boolean {
     return this.status === 0;
@@ -263,6 +292,18 @@ export function errorText(e: unknown): string {
       return "This account already has a Sign in with Apple.";
     case "already_has_google":
       return "This account already has a Google sign-in.";
+    // Combining accounts and removing a sign-in (SAVE-186 … SAVE-193): the server's own words.
+    case "combine_expired":
+      return e.message !== e.code ? e.message : "The offer to combine ran out. Add the sign-in again.";
+    case "nothing_to_combine":
+      return e.message !== e.code ? e.message : "That account is already combined or gone.";
+    case "both_have_steam":
+    case "both_have_apple":
+    case "both_have_google":
+    case "both_have_email":
+      return e.message !== e.code ? e.message : "Both accounts have a sign-in of the same kind. Remove one of them, then add this sign-in again.";
+    case "last_sign_in":
+      return "An account keeps at least one sign-in.";
     // Shared saves (SAVE-125 … SAVE-131): the server's own words.
     case "no_shared_save":
     case "too_many_shared":
@@ -362,6 +403,16 @@ export class CloudApi {
     return (await this.json<{ signIns: AccountCard["signIns"] }>("POST", "/api/account/sign-ins", proof)).signIns;
   }
 
+  /** `POST /api/account/merge`: combines the account the offer named into this one (SAVE-187). */
+  combineAccounts(combineToken: string): Promise<Combined> {
+    return this.json<Combined>("POST", "/api/account/merge", { combineToken });
+  }
+
+  /** `DELETE /api/account/sign-ins/{provider}`: removes a sign-in while another remains (SAVE-193). */
+  async removeSignIn(provider: string): Promise<AccountCard["signIns"]> {
+    return (await this.json<{ signIns: AccountCard["signIns"] }>("DELETE", `/api/account/sign-ins/${encodeURIComponent(provider)}`)).signIns;
+  }
+
   /** `POST /api/sessions/steam-openid`: Steam's sign-in address, coming back to `returnUrl` (SAVE-151, SAVE-152). */
   async steamOpenIdUrl(returnUrl: string): Promise<string> {
     return (await this.json<{ url: string }>("POST", "/api/sessions/steam-openid", { return: returnUrl }, false)).url;
@@ -395,7 +446,7 @@ export class CloudApi {
 
   /** `GET /api/saves?since=<cursor>`. */
   async changes(since: string | undefined): Promise<Changes> {
-    const r = await this.json<{ saves?: Record<string, unknown>[]; tombstones?: { saveId: string; deletedAt: unknown }[]; cursor: string | number; more?: boolean; usage?: Usage }>(
+    const r = await this.json<{ saves?: Record<string, unknown>[]; tombstones?: { saveId: string; deletedAt: unknown }[]; cursor: string | number; more?: boolean; usage?: Usage; reset?: boolean }>(
       "GET",
       `/api/saves${since ? `?since=${encodeURIComponent(since)}` : ""}`,
     );
@@ -405,6 +456,7 @@ export class CloudApi {
       cursor: String(r.cursor),
       more: !!r.more,
       usage: r.usage,
+      reset: !!r.reset,
     };
   }
 
@@ -552,12 +604,14 @@ export class CloudApi {
 async function failure(res: Response): Promise<CloudError> {
   let code = `http_${res.status}`;
   let message: string | undefined;
+  let body: Record<string, unknown> | undefined;
   try {
     const j = (await res.json()) as { error?: string; message?: string; details?: { field: string; message: string }[] };
     if (j.error) code = j.error;
     message = j.message ?? j.details?.map((d) => d.message).join(" ");
+    body = j as Record<string, unknown>;
   } catch {
     // No JSON body.
   }
-  return new CloudError(res.status, code, message);
+  return new CloudError(res.status, code, message, body);
 }

@@ -1,5 +1,5 @@
 import { savesConfig, signInOptions } from "@ph/engine/domain/saves";
-import { CloudError, errorText, type AccountInfo, type KeyValue, type StoreProof } from "./api.ts";
+import { CloudError, combineOffer, errorText, type AccountInfo, type CombineOffer, type KeyValue, type StoreProof } from "./api.ts";
 import type { SignInBridge, Store } from "./bridge.ts";
 import type { CloudSync } from "./sync.ts";
 
@@ -42,6 +42,10 @@ export class StoreSignIn {
   error = "";
   /** The store whose sheet is open, while it is. */
   busy: Store | undefined;
+  /** The offer to combine that the last Add brought, with when it came, until the player answers it (SAVE-194). */
+  offer: (CombineOffer & { at: number }) | undefined;
+  /** The clock, for how old the offer is. */
+  now: () => number = Date.now;
 
   /**
    * `platform` is SAVE-059's key for the build (`ios`, `android`, `web`, `steam`, `desktop`);
@@ -144,7 +148,15 @@ export class StoreSignIn {
 
   private async finish(proof: StoreProof, name: string | undefined, intent: Intent): Promise<AccountInfo | undefined> {
     if (intent === "add") {
-      await this.sync.api.addSignIn(proof);
+      this.offer = undefined;
+      try {
+        await this.sync.api.addSignIn(proof);
+      } catch (e) {
+        // A sign-in of another account: the card asks whether to combine the two (SAVE-186, SAVE-194).
+        const offer = combineOffer(e);
+        if (!offer) throw e;
+        this.offer = { ...offer, at: this.now() };
+      }
       return undefined;
     }
     const account = await this.sync.api.signInWithStore(proof, name, this.device);

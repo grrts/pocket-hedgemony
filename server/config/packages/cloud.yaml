@@ -7,6 +7,8 @@ parameters:
     # Google's tokens, and how long Steam's browser answer and the one-time code may take.
     cloud.sign_in_leeway_seconds: 60
     cloud.sign_in_code_minutes: 5
+    # How long the offer to combine two accounts lasts (sign_in.combine_minutes, SAVE-186; provisional).
+    cloud.sign_in_combine_minutes: 10
     cloud.max_save_mb: 2
     cloud.quota_saves: 300
     cloud.quota_mb: 200

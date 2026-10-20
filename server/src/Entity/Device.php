@@ -50,6 +50,13 @@ class Device
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $signedOutAt = null;
 
+    /**
+     * When the device came over from an account that was combined into this one (SAVE-192): its next
+     * change listing starts over from the beginning, then this is cleared.
+     */
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $movedAt = null;
+
     public function __construct(Account $account, string $name, string $platform, \DateTimeImmutable $now)
     {
         $this->id = Uuid::v7();
@@ -108,6 +115,15 @@ class Device
     public function seen(\DateTimeImmutable $now): void
     {
         $this->lastSeenAt = $now;
+    }
+
+    /** True once after the device moved to another account (SAVE-192): the caller starts its changes over. */
+    public function takeMoved(): bool
+    {
+        $moved = null !== $this->movedAt;
+        $this->movedAt = null;
+
+        return $moved;
     }
 
     /** Ends both tokens at once (SAVE-116). */

@@ -64,6 +64,13 @@ class Account implements UserInterface, PasswordAuthenticatedUserInterface
         $this->email = mb_strtolower(trim($email));
     }
 
+    /** Removes email and password sign-in (SAVE-193), or hands it on when two accounts are combined (SAVE-187). */
+    public function removeEmail(): void
+    {
+        $this->email = null;
+        $this->password = '';
+    }
+
     public function getDisplayName(): string
     {
         return $this->displayName;
