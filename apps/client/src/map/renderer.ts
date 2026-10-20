@@ -73,7 +73,7 @@ uniform sampler2D uInfo;     // per-province: rgb = fill colour, a = flags
 uniform sampler2D uOwner;    // per-province: rg = owner index + 1, b = 255 for sea zones (else +64 faded, +16 closed to the moving armies), a = lord tag (0 = royal land)
 uniform sampler2D uSeason;   // per-province season, see seasonal()
 uniform sampler2D uSubject;  // per-province, for subjects (SUBJ-093): rgb = direct overlord's colour, a = 255 when a subject
-uniform sampler2D uSubjectOf; // per-province: rg = direct overlord's owner index + 1 (0 = nobody's subject)
+uniform sampler2D uSubjectOf; // per-province: rg = direct overlord's owner index + 1 (0 = nobody's subject); b = the pattern its lens band or realm carries (VIEW-048): 0 none, 1 hatching, 2 dots, 3 stripes, 4 to 6 the same twice as dense
 uniform sampler2D uHunt;     // per-province, for hunting grounds (TRIBE-028): rgb = the tribe's colour, a = 255 a ground, 110 a claim under way, 0 none
 uniform int uInfoWidth;
 uniform float uZoom;
@@ -90,7 +90,6 @@ uniform sampler2D uTownAtlas; // town tiles: ${TOWN_VARIANTS} variants across, o
 uniform float uLiving;       // 0..1: how far the living map has faded in (VIEW-101)
 uniform bool uFiefs;         // a data lens that draws fief borders and patterns too (the Institutions lens's great houses, INST-084)
 uniform vec3 uRoad[3];       // track, road, paved road
-uniform sampler2D uPattern;  // per-province, r = the pattern its lens band or realm carries (VIEW-048): 0 none, 1 hatching, 2 dots, 3 stripes, 4 to 6 the same twice as dense
 uniform int uVision;         // colour vision (SET-095, SET-130): 0 normal, 1 red-weak, 2 green-weak, 3 blue-weak, 4 no colour
 out vec4 outColor;
 
@@ -324,7 +323,7 @@ vec3 seasonMarks(vec3 c, int t, int id, ivec2 a) {
   if (s.a > 0.25 && (a.x & 3) == 0 && ((a.y >> 1) % 3) == 0) return mix(c, uInk, 0.35);
   return c;
 }
-int patternOf(int id) { return int(texelFetch(uPattern, ivec2(id % uInfoWidth, id / uInfoWidth), 0).r * 255.0 + 0.5); }
+int patternOf(int id) { return int(texelFetch(uSubjectOf, ivec2(id % uInfoWidth, id / uInfoWidth), 0).b * 255.0 + 0.5); }
 // A lens band's or a realm's pattern (VIEW-048), drawn in pattern pixels of
 // about three screen pixels at every zoom, anchored to the map; the marks are
 // dark on light colours and light on dark ones, so they read on every grey.
@@ -771,9 +770,6 @@ export class MapRenderer {
   private huntTex: WebGLTexture;
   private huntData: Uint8Array;
   private huntDirty = true;
-  private patternTex: WebGLTexture;
-  private patternData: Uint8Array;
-  private patternDirty = true;
   /** Colour vision as the shader numbers it (SET-095, SET-130): 0 normal, 1 to 3 the weak types, 4 no colour. */
   vision = 0;
   private atlasTex: WebGLTexture;
@@ -799,7 +795,7 @@ export class MapRenderer {
     if (!gl) throw new Error("WebGL2 is not available");
     this.gl = gl;
     this.program = link(gl, VERT, FRAG);
-    for (const name of ["uCenter", "uZoom", "uView", "uIds", "uTileOrigin", "uTileSize", "uInfo", "uOwner", "uInfoWidth", "uTime", "uMode", "uParchment", "uParchmentDark", "uTerrain", "uDepth", "uFoam", "uInk", "uHighlight", "uSand", "uForbid", "uAtlas", "uMini", "uLand", "uSeason", "uTown", "uTownAtlas", "uLiving", "uFiefs", "uRoad", "uSubject", "uSubjectOf", "uHunt", "uPattern", "uVision"]) {
+    for (const name of ["uCenter", "uZoom", "uView", "uIds", "uTileOrigin", "uTileSize", "uInfo", "uOwner", "uInfoWidth", "uTime", "uMode", "uParchment", "uParchmentDark", "uTerrain", "uDepth", "uFoam", "uInk", "uHighlight", "uSand", "uForbid", "uAtlas", "uMini", "uLand", "uSeason", "uTown", "uTownAtlas", "uLiving", "uFiefs", "uRoad", "uSubject", "uSubjectOf", "uHunt", "uVision"]) {
       this.u[name] = gl.getUniformLocation(this.program, name);
     }
 
@@ -829,8 +825,6 @@ export class MapRenderer {
     this.subjectOfTex = makeDataTexture(gl, this.infoWidth, rows);
     this.huntData = new Uint8Array(this.infoWidth * rows * 4);
     this.huntTex = makeDataTexture(gl, this.infoWidth, rows);
-    this.patternData = new Uint8Array(this.infoWidth * rows * 4);
-    this.patternTex = makeDataTexture(gl, this.infoWidth, rows);
 
     const atlas = buildTileAtlas();
     this.atlasTex = makeDataTexture(gl, atlas.width, atlas.height);
@@ -992,11 +986,15 @@ export class MapRenderer {
     this.huntDirty = true;
   }
 
-  /** The pattern a province carries (VIEW-048): its lens band's or, with no colour, its realm's; 0 none. */
+  /**
+   * The pattern a province carries (VIEW-048): its lens band's or, with no
+   * colour, its realm's; 0 none. It rides in the subject texture's spare
+   * channel, which keeps the map at the twelve textures it ran on iPhones with.
+   */
   setProvincePattern(i: number, code: number): void {
-    if (this.patternData[i * 4] === code) return;
-    this.patternData[i * 4] = code;
-    this.patternDirty = true;
+    if (this.subjectOfData[i * 4 + 2] === code) return;
+    this.subjectOfData[i * 4 + 2] = code;
+    this.subjectDirty = true;
   }
 
   /** Every province's season for this turn, four bytes each, as seasonBytes() packs them. */
@@ -1029,11 +1027,6 @@ export class MapRenderer {
       gl.bindTexture(gl.TEXTURE_2D, this.huntTex);
       gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, this.infoWidth, rows, gl.RGBA, gl.UNSIGNED_BYTE, this.huntData);
       this.huntDirty = false;
-    }
-    if (this.patternDirty) {
-      gl.bindTexture(gl.TEXTURE_2D, this.patternTex);
-      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, this.infoWidth, rows, gl.RGBA, gl.UNSIGNED_BYTE, this.patternData);
-      this.patternDirty = false;
     }
     if (this.seasonDirty) {
       gl.bindTexture(gl.TEXTURE_2D, this.seasonTex);
@@ -1100,9 +1093,6 @@ export class MapRenderer {
     gl.activeTexture(gl.TEXTURE11);
     gl.bindTexture(gl.TEXTURE_2D, this.huntTex);
     gl.uniform1i(this.u.uHunt!, 11);
-    gl.activeTexture(gl.TEXTURE12);
-    gl.bindTexture(gl.TEXTURE_2D, this.patternTex);
-    gl.uniform1i(this.u.uPattern!, 12);
     gl.uniform1i(this.u.uVision!, this.vision);
     gl.activeTexture(gl.TEXTURE0);
     gl.uniform1i(this.u.uIds!, 0);

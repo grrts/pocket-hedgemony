@@ -72,6 +72,7 @@ export class MapView {
       root.append(c);
     }
     this.renderer = new MapRenderer(gl, map, provinceCount);
+    gl.addEventListener("webglcontextlost", () => this.drawFailed("the graphics context was lost"));
     this.octx = this.overlay.getContext("2d")!;
     this.bindInput();
     new ResizeObserver(() => this.resize()).observe(root);
@@ -154,6 +155,11 @@ export class MapView {
     const t0 = performance.now();
     this.renderer.draw(cam, t / 1000);
     if (this.waitForGpu) this.renderer.gl.finish();
+    if (this.stats.frames === 0) {
+      // A device that cannot run the map shader draws nothing and says so only here.
+      const err = this.renderer.gl.getError();
+      if (err !== this.renderer.gl.NO_ERROR) this.drawFailed(`WebGL error ${err}`);
+    }
     const t1 = performance.now();
     const ctx = this.octx;
     ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
@@ -171,6 +177,17 @@ export class MapView {
     st.mapMs.push(t1 - t0);
     st.overlayMs.push(performance.now() - t1);
     if (st.mapMs.length > 240) (st.mapMs.shift(), st.overlayMs.shift());
+  }
+
+  /** Says on the map that it could not be drawn, with what the device reports, so a player's screenshot names the cause. */
+  private drawFailed(why: string): void {
+    if (this.root.querySelector(".map-failed")) return;
+    const gl = this.renderer.gl;
+    const info = gl.isContextLost() ? "" : ` · ${gl.getParameter(gl.RENDERER)} · ${gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS)} textures`;
+    const p = document.createElement("p");
+    p.className = "map-failed";
+    p.textContent = `The map could not be drawn on this device: ${why}${info}.`;
+    this.root.append(p);
   }
 
   toScreen(x: number, y: number): [number, number] {

@@ -87,6 +87,19 @@ img,
   text-shadow: 3px 3px 0 var(--outline);
 }
 
+/* The map's own failure line (mapView drawFailed): low on the map, under the cards, so a screenshot shows it. */
+.map-failed {
+  position: absolute;
+  left: max(16px, env(safe-area-inset-left));
+  right: max(16px, env(safe-area-inset-right));
+  bottom: 16px;
+  margin: 0;
+  text-align: center;
+  color: var(--paper-light);
+  text-shadow: 2px 2px 0 var(--outline);
+  pointer-events: none;
+}
+
 /* ---- Frames ---- */
 
 .framed {
