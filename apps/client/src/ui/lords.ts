@@ -23,13 +23,25 @@ export interface LordView {
   nation: number;
   loyalty: string;
   lands: number;
+  /** His age and the heir who takes his lands when he dies (REALM-273); unset in an older snapshot. */
+  age?: number;
+  heir?: { name: string; age: number } | null;
+  /** His two traits (REALM-070); unset in an older snapshot. */
+  traits?: string[];
+  /** What his lands make him ("Earl of Northumberland"), and for a real person of history one line on who he was (REALM-290, REALM-294). */
+  title?: string;
+  note?: string;
+  historical?: boolean;
 }
+
+/** The mark after a real person's name: he lived, and his card says who he was (REALM-294). */
+const HISTORY_MARK = ` <span class="history-mark" title="A real person of history">History</span>`;
 
 /** What each loyalty step means for the crown. */
 export const LOYALTY_NOTE: Record<string, string> = {
-  Loyal: "gives half his lands' tax and recruits",
-  Wavering: "gives half, but a step from disloyal",
-  Disloyal: "gives nothing",
+  Loyal: "gives half his lands' tax and brings all his men when called to war",
+  Wavering: "gives half his tax, brings half his men and leaves after 6 months; a step from disloyal",
+  Disloyal: "gives nothing and won't come to war",
   "In revolt": "has risen against you",
 };
 
@@ -57,7 +69,7 @@ export interface LordLands {
  * row per lord (portrait, house, loyalty, lands and what he gives), the
  * troublesome first. A row opens the lord's screen.
  */
-export function lordsTab(rules: Ruleset, lords: LordView[], lands: Map<number, LordLands>, royal: number, all: number, t: Titles = DEFAULT_TITLES): string {
+export function lordsTab(rules: Ruleset, lords: LordView[], lands: Map<number, LordLands>, royal: number, all: number, t: Titles = DEFAULT_TITLES, retinues: Map<number, RetinueRow> = new Map()): string {
   const sorted = [...lords].sort((a, b) => LOYALTY_ORDER.indexOf(a.loyalty) - LOYALTY_ORDER.indexOf(b.loyalty) || b.lands - a.lands);
   const share = all ? Math.round(((all - royal) / all) * 100) : 0;
   const counts = LOYALTY_ORDER.map((l) => [l, lords.filter((x) => x.loyalty === l).length] as const).filter(([, c]) => c > 0);
@@ -66,8 +78,8 @@ export function lordsTab(rules: Ruleset, lords: LordView[], lands: Map<number, L
       const ll = lands.get(l.k)!;
       return `<button class="paper lord-row" data-lord-open="${l.k}">
         ${lordPortrait(rules, l, 2)}
-        <span class="lord-who"><b>${esc(l.name)}</b><small>House ${esc(l.house)} · ${l.lands} province${l.lands === 1 ? "" : "s"} · ${fmt(ll.people * 1000)} people</small></span>
-        <span class="lord-state">${loyaltyBadge(l.loyalty)}<small>${gold2(ll.crownGold)} gold a month</small></span>
+        <span class="lord-who"><b>${esc(l.name)}${l.historical ? HISTORY_MARK : ""}</b><small>${l.title ? esc(l.title) : `House ${esc(l.house)}`}${l.age ? ` · ${l.age}` : ""} · ${l.lands} province${l.lands === 1 ? "" : "s"} · ${fmt(ll.people * 1000)} people</small></span>
+        <span class="lord-state">${loyaltyBadge(l.loyalty)}<small>${gold2(ll.crownGold)} gold a month${retinues.has(l.k) ? ` · ${RETINUE_SHORT[retinues.get(l.k)!.state]}` : ""}</small></span>
       </button>`;
     })
     .join("");
@@ -76,7 +88,50 @@ export function lordsTab(rules: Ruleset, lords: LordView[], lands: Map<number, L
     </div>
     <p><b>${royal}</b> of ${all} provinces are royal land and give you all their tax. ${lords.length ? `<b>${lords.length}</b> ${esc(lords.length === 1 ? `${t.lord} holds` : `${t.lords} hold`)} the other ${all - royal}: ${counts.map(([l, c]) => `${c} ${l.toLowerCase()}`).join(", ")}.` : ""}</p>
     ${lords.length ? `<div class="lord-list">${rows}</div>` : `<p class="hint">No ${esc(t.lords)}: every province is royal land.</p>`}
-    <p class="hint">Open ${esc(an(t.lord))} to see his lands on the map, send a gift, seize land or grant him a province. Gifts, fiefs and quiet years raise loyalty; lost wars and seized land lower it.</p>`;
+    <p class="hint">Open ${esc(an(t.lord))} to see his lands on the map, send a gift, seize land, grant him a province or send an assassin. Gifts, fiefs and quiet years raise loyalty; lost wars, seized land and murdered ${esc(t.lords)} lower it.</p>`;
+}
+
+/** What the player needs to weigh an assassin (REALM-280 to REALM-284). */
+export interface AssassinAsk {
+  /** The confirm card is open. */
+  open: boolean;
+  gold: number;
+  /** 0 to 1, and the base chance against an ordinary lord. */
+  chance: number;
+  base: number;
+  /** His heir's name, or null: then a kinsman may take his lands, or the crown. */
+  heir: string | null;
+  heirLoyalty: string;
+  onFailure: string;
+  /** Other lords of the realm who will think less of the crown, and how many of them are his own house. */
+  others: number;
+  house: number;
+}
+
+const pct = (x: number) => `${Math.round(x * 100)} %`;
+
+/**
+ * The confirm card for an assassin, opened from the lord's screen: what it
+ * costs, the odds, and what follows either way, with Send and Cancel.
+ */
+export function assassinCard(l: LordView, a: AssassinAsk, treasury: number, t: Titles = DEFAULT_TITLES): string {
+  const others = a.others ? `every other ${esc(t.lord)} of yours (${a.others}) falls a step of loyalty` : "";
+  const heir = a.heir ? `his heir ${esc(a.heir)} takes his lands, ${esc(a.heirLoyalty.toLowerCase())}` : `with no heir, a kinsman may take his lands, ${esc(a.heirLoyalty.toLowerCase())}, or they return to the crown`;
+  const house = a.house ? `the other ${a.house} of House ${esc(l.house)} turn${a.house === 1 ? "s" : ""} disloyal` : "";
+  const success = [`${esc(l.name)} dies`, heir, house, others].filter(Boolean).join("; ");
+  const failure = [`he turns ${esc(a.onFailure.toLowerCase())}`, a.others ? `every other ${esc(t.lord)} still falls a step` : ""].filter(Boolean).join(", and ");
+  const short = treasury < a.gold;
+  return `<section class="assassin-ask" aria-label="Send an assassin">
+      <h3 class="sub">Send an assassin after ${esc(l.name)}?</h3>
+      <p><b>${a.gold} gold</b>, spent either way · <b>${pct(a.chance)}</b> he succeeds${a.chance < a.base ? " (a great lord is well guarded)" : ""}</p>
+      <p><b>If it works:</b> ${success}.</p>
+      <p><b>If he is caught:</b> ${failure}.</p>
+      <p class="hint">Whatever happens, your ${esc(t.lords)} know whose knife it was.</p>
+      <div class="confirm-row">
+        <button class="wax" data-assassinate="${l.k}" ${short ? "disabled" : ""}>${short ? `Needs ${a.gold} gold` : "Send the assassin"}</button>
+        <button class="paper" data-assassin-cancel>Cancel</button>
+      </div>
+    </section>`;
 }
 
 export interface ProvinceRow {
@@ -89,14 +144,15 @@ export interface ProvinceRow {
 
 /**
  * A lord's own screen: who he is and how loyal, what his lands give, a
- * button that lights them up on the map, a gift, his lands (each opens its
- * province, with Seize), and royal provinces to grant him, nearest first.
+ * button that lights them up on the map, a gift, Assassinate (with its
+ * confirm card), his lands (each opens its province, with Seize), and royal
+ * provinces to grant him, nearest first.
  */
 export function lordScreen(
   rules: Ruleset,
   l: LordView,
   ll: LordLands,
-  o: { lit: boolean; gift: number; treasury: number; mine: boolean; holdings: ProvinceRow[]; grants: ProvinceRow[]; allGrants: boolean; court?: string },
+  o: { lit: boolean; gift: number; treasury: number; mine: boolean; holdings: ProvinceRow[]; grants: ProvinceRow[]; allGrants: boolean; court?: string; retinue?: string; assassin?: AssassinAsk },
   t: Titles = DEFAULT_TITLES,
 ): string {
   const row = (r: ProvinceRow, button: string) => `<div class="place-row">
@@ -104,14 +160,21 @@ export function lordScreen(
         <img class="thumb" src="${r.thumb}" alt="" width="48" height="48"><span><b>${esc(r.name)}</b><small>${esc(r.note)}</small></span>
       </button>${button}</div>`;
   return `<div class="person-card">${lordPortrait(rules, l, 5)}
-      <div><p><b>${esc(l.name)}</b></p><p>House ${esc(l.house)}</p><p>${loyaltyBadge(l.loyalty)}</p><p class="hint">He ${esc(LOYALTY_NOTE[l.loyalty] ?? "")}.</p></div>
+      <div><p><b>${esc(l.name)}${l.historical ? HISTORY_MARK : ""}</b></p>${l.title ? `<p>${esc(l.title)}</p>` : ""}<p>House ${esc(l.house)}</p><p>${loyaltyBadge(l.loyalty)}</p><p class="hint">He ${esc(LOYALTY_NOTE[l.loyalty] ?? "")}.</p></div>
     </div>
+    ${l.historical && l.note ? `<p class="lord-note"><b>In history.</b> ${esc(l.note)}</p>` : ""}
     <div class="choices">
       <button class="wax" data-lord-light="${l.k}" aria-pressed="${o.lit}">${o.lit ? "Stop showing his lands" : "Show his lands on the map"}</button>
       ${o.mine && l.loyalty !== "Loyal" ? `<button class="paper" data-gift="${l.k}" ${o.treasury < o.gift ? "disabled" : ""} title="A gift of gold raises his loyalty a step">Gift · ${o.gift} gold</button>` : ""}
+      ${o.mine && o.assassin && !o.assassin.open ? `<button class="paper" data-assassin-ask="${l.k}" title="Have him killed: every other ${esc(t.lord)} will think less of you">Assassinate…</button>` : ""}
     </div>
+    ${o.mine && o.assassin?.open ? assassinCard(l, o.assassin, o.treasury, t) : ""}
     ${o.court ?? ""}
+    ${o.retinue ?? ""}
     <dl class="facts">
+      ${l.age ? `<dt>Age</dt><dd>${l.age}</dd>
+      <dt>Heir</dt><dd>${l.heir ? `${esc(l.heir.name)}, ${l.heir.age}` : `None: if he dies, his line dies out and his lands return to the crown`}</dd>` : ""}
+      ${l.traits?.length ? `<dt>Traits</dt><dd>${l.traits.map(esc).join(", ")}</dd>` : ""}
       <dt>Lands</dt><dd>${ll.provinces.length} province${ll.provinces.length === 1 ? "" : "s"}, ${fmt(ll.people * 1000)} people</dd>
       <dt>To you</dt><dd>${gold2(ll.crownGold)} gold a month${l.loyalty === "Loyal" || l.loyalty === "Wavering" ? " (half of their tax)" : ""}</dd>
       <dt>${esc(cap(t.officials))}</dt><dd>His own run his lands; you can't commission them.</dd>
@@ -148,4 +211,107 @@ export function governanceCard(
         .map((t) => `<button class="paper person-tile" data-grant="${o.province}" data-lord="${t.k}">${lordPortrait(rules, t, 2)}<span><b>${esc(t.name)}</b><small>${esc(t.loyalty)} · ${t.lands} province${t.lands === 1 ? "" : "s"}</small></span></button>`)
         .join("")}</div>` : ""}`;
   return `<section class="governance"><h3 class="sub">Governed by</h3>${lordRow}${o.official}</section>`;
+}
+
+/** A lord's retinue as the snapshot gives it (WAR-252 to WAR-262). */
+export interface RetinueRow {
+  lord: number;
+  state: "ready" | "gathering" | "in the field" | "refuses" | "no men";
+  wouldBring: number;
+  atHome: number;
+  cap: number;
+  gathering?: { men: number; days: number };
+  /** Index into the snapshot's armies, -1 when not in the field. */
+  army: number;
+  seat: number;
+  refusal: string | null;
+  /** Months in the field before a wavering lord goes home, or null: he stays to the end. */
+  leavesAfter: number | null;
+}
+
+const weeks = (d: number) => {
+  const w = Math.max(1, Math.ceil(d / 7));
+  return `${w} week${w === 1 ? "" : "s"}`;
+};
+
+/** A retinue's state in words (WAR-260): never colour alone. */
+export function retinueWords(r: RetinueRow, place: (p: number) => string, armyMen: (k: number) => number, armyAt: (k: number) => number): string {
+  switch (r.state) {
+    case "ready":
+      return `ready: would bring ${fmt(r.wouldBring)} men`;
+    case "gathering":
+      return `gathering: ${fmt(r.gathering?.men ?? 0)} men at ${esc(place(r.seat))} in ${weeks(r.gathering?.days ?? 0)}`;
+    case "in the field":
+      return `in the field: ${fmt(armyMen(r.army))} men at ${esc(place(armyAt(r.army)))}`;
+    case "refuses":
+      return "refuses to come";
+    case "no men":
+      return "no men to send";
+  }
+}
+
+/** Short state for the Lords tab row (WAR-261). */
+export const RETINUE_SHORT: Record<RetinueRow["state"], string> = { ready: "men ready", gathering: "men gathering", "in the field": "in the field", refuses: "won't come", "no men": "no men" };
+
+/**
+ * The Army tab's Lords' men section (WAR-259 to WAR-262): one line summing the
+ * lords' men, the Call the lords button (greyed, with the reason in words, at
+ * peace), and a row per lord with his loyalty, state and Command.
+ */
+export function lordsMenSection(
+  rules: Ruleset,
+  rows: RetinueRow[],
+  lords: LordView[],
+  o: { atWar: boolean; place: (p: number) => string; armyMen: (k: number) => number; armyAt: (k: number) => number; armyId: (k: number) => number },
+  t: Titles = DEFAULT_TITLES,
+): string {
+  if (!rows.length) return "";
+  const sum = (st: RetinueRow["state"], men: (r: RetinueRow) => number) => {
+    const of = rows.filter((r) => r.state === st);
+    return { n: of.length, men: of.reduce((x, r) => x + men(r), 0) };
+  };
+  const ready = sum("ready", (r) => r.wouldBring);
+  const gathering = sum("gathering", (r) => r.gathering?.men ?? 0);
+  const field = sum("in the field", (r) => o.armyMen(r.army));
+  const refusing = sum("refuses", () => 0);
+  const parts = [
+    ready.n ? `${ready.n} ready with ${fmt(ready.men)} men` : "",
+    gathering.n ? `${gathering.n} gathering ${fmt(gathering.men)} men` : "",
+    field.n ? `${field.n} in the field with ${fmt(field.men)}` : "",
+    refusing.n ? `${refusing.n} refusing to come` : "",
+  ].filter(Boolean);
+  const callable = rows.some((r) => r.refusal === null);
+  const why = !o.atWar ? `${cap(t.lords)} are called only at war.` : !callable ? `No ${t.lord} can be called now: each is out already, has no men or refuses.` : "";
+  const byLord = new Map(lords.map((l) => [l.k, l]));
+  const sorted = [...rows].sort((a, b) => LOYALTY_ORDER.indexOf(byLord.get(b.lord)!.loyalty) - LOYALTY_ORDER.indexOf(byLord.get(a.lord)!.loyalty) || b.wouldBring - a.wouldBring);
+  return `<h3 class="sub">${esc(cap(t.lords))}' men</h3>
+    <p class="retinue-sum">${parts.length ? parts.join(" · ") : `No ${esc(t.lord)} has men to send.`}</p>
+    <button class="wax wide" data-call-lords ${o.atWar && callable ? "" : "disabled"}>Call the ${esc(t.lords)}</button>
+    ${why ? `<p class="hint">${esc(why)}</p>` : `<p class="hint">Each comes by his loyalty: a loyal ${esc(t.lord)} brings all his men and stays to the end, a wavering one brings half, later, and leaves after some months, a disloyal one stays home. They cost you nothing and lead only their own men.</p>`}
+    <div class="lord-list">${sorted
+      .map((r) => {
+        const l = byLord.get(r.lord)!;
+        const button = r.state === "in the field" ? `<button class="paper small" data-command="${o.armyId(r.army)}">Command</button>` : `<button class="paper small" data-lord-open="${l.k}">Open</button>`;
+        return `<div class="army retinue-row">${lordPortrait(rules, l, 2)}
+          <span class="who"><b>${esc(l.name)}</b><br>${loyaltyBadge(l.loyalty)} <small>${retinueWords(r, o.place, o.armyMen, o.armyAt)}</small></span>
+          <span class="army-buttons">${button}</span></div>`;
+      })
+      .join("")}</div>`;
+}
+
+/** The Retinue block on a lord's own screen (WAR-259, WAR-260): his men, and Call him, Command or Send him home. */
+export function retinueBlock(l: LordView, r: RetinueRow, o: { atWar: boolean; place: (p: number) => string; armyMen: (k: number) => number; armyAt: (k: number) => number; armyId: (k: number) => number }): string {
+  const buttons =
+    r.state === "in the field"
+      ? `<button class="paper" data-command="${o.armyId(r.army)}">Command</button><button class="paper" data-send-home="${o.armyId(r.army)}">Send him home</button>`
+      : r.state === "gathering"
+        ? ""
+        : `<button class="wax" data-call-lord="${l.k}" ${r.refusal ? "disabled" : ""}>Call him · ${fmt(r.wouldBring)} men</button>`;
+  return `<h3 class="sub">Retinue</h3>
+    <dl class="facts">
+      <dt>Now</dt><dd>${retinueWords(r, o.place, o.armyMen, o.armyAt)}</dd>
+      <dt>At most</dt><dd>${fmt(r.cap)} men from his lands; ${fmt(r.atHome)} at home now</dd>
+    </dl>
+    ${buttons ? `<div class="choices">${buttons}</div>` : ""}
+    ${r.refusal && r.state !== "in the field" && r.state !== "gathering" ? `<p class="hint">${esc(r.refusal.charAt(0).toUpperCase() + r.refusal.slice(1))}.</p>` : ""}`;
 }

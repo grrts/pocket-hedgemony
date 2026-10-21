@@ -1,0 +1,362 @@
+<h1>Your Realm</h1>
+<p>Your realm is your country as a whole: the treasury, the food network that runs through your castles, your people and land, your named lords, your army and navy at a glance, your ruler and family, your standing abroad, and how a campaign is won. Most of what the realm shows is the sum of its <a href="/wiki/Provinces">Provinces</a>, gathered on one country card where every number is something you can count, with a list of how you gain it and how you lose it.</p>
+<h2 id="how-it-works"><a class="anchor" href="#how-it-works" aria-label="Link to this section">#</a>How it works</h2>
+<h3 id="the-country-card"><a class="anchor" href="#the-country-card" aria-label="Link to this section">#</a>The country card</h3>
+<p>The country card has four tabs: <strong>General</strong> first, then <strong>Diplomacy</strong>, <strong>Trade</strong> and <strong>Army</strong>. Your own realm&#39;s card is the Realm book, in six sections that open on the Overview (see <a href="/wiki/Screens-and-Navigation">Screens and Navigation</a>); another realm&#39;s card keeps these tabs. General is the one-screen summary of your country; Allies, Enemies and Oaths broken sit on the Diplomacy tab, where war and peace are declared, trade lines on Trade, and soldiers, commanders and ships on Army. France&#39;s General tab at the start might look like this:</p>
+<pre><code> FRANCE                     King Charles V, 40 · 14 years on throne · 1 heir
+ Gold      310          Food      9 castles feeding 41 of 52 provinces · 3 hungry
+ People    9.5 m        Soldiers  22,000      (+48,000 recruits)
+ Horses    6,000        Ships     12 war / 60 trade
+ Castles   31           Officials 40 for 18 royal provinces
+ Lords     11 named: 7 loyal, 3 wavering, 1 disloyal
+ Schools   4 (200 students, 35 scholars) · studying: Bastion forts 62 %
+ Faith     96 %         Language   71 %        In revolt 2
+ Allies 2  Enemies 1  Oaths broken 0       Fallen (10 yrs) 31,000
+</code></pre>
+<p>It shows the ruler (title, name, age, years on throne, heirs), Gold, Food (how many castles feed how many provinces, and how many are hungry), People, Soldiers (plus recruits), Horses, Ships (war and trade), Castles, Officials (for how many royal provinces), Lords (named, by loyalty), Schools (students, scholars, current study and progress), Faith, Language, In revolt, Allies, Enemies, Oaths broken, Fallen in the last 10 years, and your rank in each win score.</p>
+<p>People, recruits, food, horses, ships, castles, faith, language, in revolt, schools and officials are always <strong>sums over your provinces</strong>, never stored separately. Every number here is a placeholder until balanced.</p>
+<h3 id="treasury"><a class="anchor" href="#treasury" aria-label="Link to this section">#</a>Treasury</h3>
+<p><strong>Gold</strong> is the coins in your treasury.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>You gain gold by</th><th>You lose gold by</th></tr></thead>
+<tbody>
+<tr><td>Taxes from royal provinces</td><td>Soldiers&#39; pay (every month)</td></tr>
+<tr><td>A share of lords&#39; taxes</td><td>Officials&#39; wages</td></tr>
+<tr><td>Trade</td><td>School upkeep</td></tr>
+<tr><td>Tribute from subjects</td><td>Building</td></tr>
+<tr><td>Selling grain</td><td>Debt interest</td></tr>
+<tr><td>Loot and ransoms</td><td>Gifts and bribes</td></tr>
+<tr><td>Selling titles</td><td>Buying grain</td></tr>
+</tbody></table></div>
+<p><strong>Debt</strong> records how much you owe and to whom: a bank, a merchant city, a lord or another ruler. You take it on with a loan, or when lords lend in exchange for favours. It goes away when you repay it, when the lender dies or is conquered, or when you <strong>default</strong>. Debt costs yearly interest. Defaulting wipes the debt but counts as an <strong>oath broken</strong>. A lord you owe money to gets more demanding.</p>
+<p><strong>Tax</strong> is set per province, with a realm default (see <a href="/wiki/Provinces">Provinces</a>). A revolt can force it down. Heavy taxes fill the treasury but make lords waver and provinces revolt.</p>
+<h4 id="tax-and-the-treasury-in-play"><a class="anchor" href="#tax-and-the-treasury-in-play" aria-label="Link to this section">#</a>Tax and the treasury in play</h4>
+<p>Every province pays at its own tax rate or, until you give it one, at your realm&#39;s default, which starts at normal. Against normal, <strong>none</strong> pays nothing, <strong>light</strong> half, <strong>heavy</strong> one and a half times and <strong>crushing</strong> double. A province whose official has been made a commander pays half, and so does one that riots or plots. Heavy tax gives the province the <em>Heavy taxes</em> grievance, and crushing counts as two. A lord&#39;s province gives you only your share, and raising its rate to heavy or crushing makes its lord waver. A busy province owes more: every 4 points of its trade ratio add 1 %. Trade itself comes from your traders (see <a href="/wiki/Trade">Trade</a>), whatever the rate.</p>
+<p>The treasury keeps a <strong>ledger</strong> for the month: Tax and Trade coming in, Army pay, Officials and Interest going out. Their sum is your change a month, paid in on the 1st. Each official at his post earns 0.1 gold a month; a commissioned official draws no wage while he commands. Wages and interest are paid a twelfth each month.</p>
+<p>Lenders let you owe up to <strong>one year&#39;s tax and trade</strong>. A loan costs at once: the gold you borrow <strong>plus 10 % interest</strong> goes onto your debt the moment you take it, and the debt keeps costing <strong>10 % a year</strong> while you owe it. Borrowing also makes the crown look weak: <strong>every lord falls a step in loyalty</strong>, at most once a year. You can repay any part at any time.</p>
+<p><strong>Default.</strong> If you owe lenders, your gold stays below zero and they will give no more for three months in a row, the crown defaults: what you owe is gone and your gold is set to nothing, but every lord falls two steps in loyalty (none below Disloyal), your treasury pillar reads Troubled for two years and lenders refuse you for five. You are warned in the news each month before, and the Treasury tab says how many months are left. AI realms default by the same rule.</p>
+<p><strong>New land.</strong> For ten years after you take a province from another realm, by a peace or a demand, it holds the <em>Newly taken</em> grievance and costs half its tax again in garrisons and clerks, on the ledger&#39;s <em>Holding new land</em> line. Taken land with a foreign language and the wrong faith riots until it settles.</p>
+<p><strong>Far from the throne.</strong> Royal land more than 30 days from your capital sends less tax and recruits; see <a href="/wiki/Provinces">Provinces</a>. Granting it to a lord avoids the cut.</p>
+<p>AI realms tax at normal in peace and heavy at war, borrow only when their gold falls below zero, and repay once they hold a year&#39;s army pay and wages.</p>
+<p>Where to find it: the gold plaque at the top of the screen shows your gold and change a month; tap it for the <strong>Treasury</strong> tab of your country card: your purse with how long the gold lasts, the month&#39;s gold in and out as bars, the realm tax default, and your debt as a meter against what lenders allow, with Borrow buttons that say what you will owe before you tap. To tax one province differently, open it: its Overview tab has a Tax line and a row of rate buttons, from <em>Realm default</em> to <em>Crushing</em>.</p>
+<h3 id="food-provinces-grow-it-castles-move-it"><a class="anchor" href="#food-provinces-grow-it-castles-move-it" aria-label="Link to this section">#</a>Food: provinces grow it, castles move it</h3>
+<p>Food lives in provinces: each grows, stores and eats its own. <strong>Castles are the hubs</strong> that collect it and spread it.</p>
+<p><strong>In each province:</strong></p>
+<ul>
+<li><strong>Harvest</strong>: bumper, good, normal, poor or failed. Better with farmland, people working it, inventions and peace; worse with weather, armies marching through, burned tiles, plague killing farmers and cold periods. It is the province&#39;s main food each autumn.</li>
+<li><strong>Local store</strong>, in months of food: filled by what is left after collection and by castle deliveries; emptied by people eating, armies refilling their reserve, yearly rot and raids. When it hits zero, the province starves.</li>
+<li><strong>Herds</strong> (pastoral provinces), in thousands of head: grown on good pasture, by raiding and tribute; lost to drought, hard winters, raids, disease and slaughter in famine. Pastoral peoples eat from herds, which move with their owners and can&#39;t be besieged.</li>
+<li><strong>Fish</strong> (coastal provinces): a steady catch, improved by salting inventions, lost to blockade and war at sea.</li>
+<li><strong>Grain price</strong> at each market, per sack: up with bad harvests across the region, war and blockades; down with good harvests and trade routes. You can buy and sell grain for gold.</li>
+</ul>
+<p><strong>In each castle:</strong></p>
+<ul>
+<li><strong>Castle store</strong>: filled by collection, deliveries from other castles and buying; emptied by feeding the garrison, spreading to the land around, handing out to armies refilling at home, rot and capture.</li>
+<li><strong>Granary size</strong>: raised by building granaries (gold) and inventions such as <em>Ever-normal granaries</em>; lowered by siege damage and neglect. Bigger granaries hold more and rot less.</li>
+<li><strong>Reach</strong>, in rings of provinces: raised by roads, rivers, canals, wagons (horses) and research; cut by enemy armies on the roads, winter and burned land.</li>
+</ul>
+<p>A province outside every castle&#39;s reach lives on its own harvest.</p>
+<h3 id="the-food-policy-screen"><a class="anchor" href="#the-food-policy-screen" aria-label="Link to this section">#</a>The Food policy screen</h3>
+<p>One <strong>Food policy</strong> sets realm-wide defaults on the realm&#39;s <strong>Food</strong> tab, and a castle can have its own collection and siege reserve. Set those on the castle&#39;s own province, under <strong>Castle food</strong> on its Overview; tapping a castle on the Food tab takes you there, and <strong>Realm</strong> puts it back on the realm&#39;s setting. The Food page shows how many provinces are hungry, running low or short of food, then a <strong>Short of food</strong> list: your own provinces whose land doesn&#39;t feed their people in a normal year, worst first, each naming the fix (build a farm, improve it, clear woods) and opening its Land tab. People keep having children through hard years, so a short province shrinks by famine until you build. Then come the presets; the five settings sit in a <strong>Customise</strong> fold whose line reads your current choices, and the castles in a <strong>Castles</strong> fold that opens by itself while one is besieged or its roads are cut.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Setting</th><th>Options</th></tr></thead>
+<tbody>
+<tr><td><strong>Collection</strong>: share of each province&#39;s surplus sent to the nearest castle</td><td>0 %, 25 %, 50 %, 75 %</td></tr>
+<tr><td><strong>Castle shares</strong>: how collected food is divided between castles</td><td>by people, frontier first, capital first, equal, or custom (a slider per castle, summing to 100 %)</td></tr>
+<tr><td><strong>Sharing out</strong>: how a castle hands out food by ring (own province / next ring / ring beyond)</td><td>default 50/30/20; Tight 80/20/0; Wide 30/35/35</td></tr>
+<tr><td><strong>Siege reserve</strong>: months a castle keeps and never spreads</td><td>0, 3, 6, 12</td></tr>
+<tr><td><strong>Army refill</strong>: how armies refill their own reserve at home</td><td>locals only (default, from the local store), castles hand out first, no refill in lords&#39; lands</td></tr>
+<tr><td><strong>Famine relief</strong>: below this, a province&#39;s castle feeds it first, ignoring how food is shared out</td><td>off, 1 month, 3 months</td></tr>
+<tr><td><strong>Surplus</strong> above granary size</td><td>keep (it rots), sell on the market, send to the capital castle, send to subjects or allies</td></tr>
+</tbody></table></div>
+<p><strong>Lords&#39; castles</strong> follow the policy by loyalty: loyal lords follow it, wavering lords half of it, disloyal lords keep their food.</p>
+<p><strong>Presets</strong> fill the whole screen at once:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Preset</th><th>Collection</th><th>Castle shares</th><th>Sharing out</th><th>Siege reserve</th><th>Army refill</th></tr></thead>
+<tbody>
+<tr><td>Feed the people</td><td>25 %</td><td>by people</td><td>Wide</td><td>3 months</td><td>castles hand out first</td></tr>
+<tr><td>Fortress realm</td><td>50 %</td><td>frontier first</td><td>Tight</td><td>12 months</td><td>locals only</td></tr>
+<tr><td>War footing</td><td>75 %</td><td>frontier first</td><td>50/30/20</td><td>6 months</td><td>castles hand out first</td></tr>
+<tr><td>Merchant</td><td>50 %</td><td>capital first</td><td>50/30/20</td><td>3 months</td><td>no refill in lords&#39; lands; surplus sold</td></tr>
+</tbody></table></div>
+<h3 id="the-year-of-food"><a class="anchor" href="#the-year-of-food" aria-label="Link to this section">#</a>The year of food</h3>
+<ol>
+<li><strong>Autumn</strong>: every province rolls its harvest. Weather is rolled by region, so neighbours suffer together and grain prices rise for all of them.</li>
+<li><strong>Collection</strong>: the collection share of each province&#39;s surplus goes to its nearest castle in reach.</li>
+<li><strong>Castle shares</strong>: castles exchange food until each holds its share. Food moving between castles loses some of its load for every province it travels.</li>
+<li><strong>Sharing out</strong>: each castle keeps its siege reserve and hands out the rest to the rings around it by its sharing-out pattern.</li>
+<li><strong>Through the year</strong> people eat. Soldiers on campaign eat double, and a horse eats like three men. Stores rot a little each season, less with granaries.</li>
+</ol>
+<p><strong>Under pressure:</strong></p>
+<ul>
+<li>A besieged castle stops spreading and lives on its own store.</li>
+<li>An enemy army sitting between a castle and its outer ring stops food spreading past it, so cutting the roads starves the outer ring without a battle.</li>
+<li>Rice lands get two harvests on irrigated land, but war can wreck their canals. Maize, potatoes and cassava arrive through the research tree after Atlantic contact.</li>
+<li>When a province runs out of food, people die, survivors flee to neighbours or abroad, revolts become likely, and the lord of that land turns disloyal. The event tree&#39;s famine events read the same stores.</li>
+<li>You can burn your own fields ahead of an invader (scorched earth) to starve him.</li>
+</ul>
+<h3 id="harvests-and-army-supply-in-the-game-today"><a class="anchor" href="#harvests-and-army-supply-in-the-game-today" aria-label="Link to this section">#</a>Harvests and army supply in the game today</h3>
+<ul>
+<li><strong>Each province rolls its own harvest</strong>: 1 in 10 poor, 7 in 10 normal, 15 in 100 good and 1 in 20 bumper. Its region&#39;s weather, an enemy in the province and your harvest inventions then move it a step each, so a failed harvest comes from a poor roll in a bad year, or bad weather with an enemy at the gates.</li>
+<li><strong>Weather depends on the climate.</strong> A region rolls once, and each province reads it by its climate: temperate land has bad weather 1 year in 6, dry land (desert, drylands, savanna) a drought 1 in 4, and the monsoon lands of Asia floods 1 in 5. Neighbours still suffer together.</li>
+<li><strong>When the harvest comes in</strong>: once a year in September in the north and March in the south. Rice lands from India to South China and the Indies harvest in both March and September once their realm knows <em>Wet-rice terracing</em>, each harvest bringing half the year&#39;s food, so one bad season costs only half. The tundra grows no crops; it lives on herds, hunting and fishing, which bring food every month.</li>
+<li><strong>Armies eat from the land.</strong> A man eats a month of food a month at home, double on campaign (while your realm is at war or the army is abroad), and a horse like three men. An army refills its wagons from the store of the province where it stands. In your own or friendly land the locals keep two months for themselves; in enemy land the foragers take what they find on that ground. What an army takes leaves the store, so a long stay or a march through poor land brings hunger to the province, and then to the army.</li>
+<li><strong>Where you see it</strong>: the province card&#39;s Overview shows the last harvest and why (&quot;poor · drought in the region&quot;), when it comes in, and how many months of the store the armies standing there eat a month. The Provinces tab counts your last harvests and marks poor and failed ones on each row. A failed harvest sends a news item. The army&#39;s supply line says how long its wagons last, whether it eats double on campaign, and what the land there gives it. The Food map mode shows how many men on campaign each province could feed.</li>
+</ul>
+<h3 id="people-and-land"><a class="anchor" href="#people-and-land" aria-label="Link to this section">#</a>People and land</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Stat</th><th>Gained by</th><th>Lost by</th></tr></thead>
+<tbody>
+<tr><td><strong>People</strong> (thousands, summed over provinces)</td><td>Growth when fed and at peace; migrants fleeing famine or war elsewhere; conquest</td><td>Famine, plague, war deaths, refugees leaving, forced migration events</td></tr>
+<tr><td><strong>Provinces held</strong></td><td>Conquest, inheritance, purchase, a lord joining with his land, colonies</td><td>Losing wars, a lord defecting, revolts breaking away, ceding in peace</td></tr>
+<tr><td><strong>Royal provinces</strong></td><td>A lord&#39;s line dying out, seizing a lord&#39;s land, conquest kept for yourself</td><td>Granting land to make a new lord</td></tr>
+<tr><td><strong>Officials</strong></td><td>Hiring (gold up front, wages yearly), school graduates</td><td>Dismissal, unpaid wages, war in their province</td></tr>
+<tr><td><strong>Faith</strong> (% sharing the ruler&#39;s religion)</td><td>Missionaries and clergy, schools of your faith, migrants of your faith, conversion events</td><td>Conquering other faiths, reformations, foreign missionaries</td></tr>
+<tr><td><strong>Language</strong> (% sharing the ruler&#39;s culture)</td><td>Slow assimilation, settlers, schools</td><td>Conquest, migration, separatist movements</td></tr>
+<tr><td><strong>In revolt</strong> (provinces with riots or rebels)</td><td>Heavy taxes, famine, foreign faith or language, disloyal lords stirring, lost wars</td><td>Defeating rebels, giving in, lowering taxes, food</td></tr>
+</tbody></table></div>
+<p>Each province needs an official or a lord to pay properly. A royal province gives full taxes and recruits, but <strong>without an official it pays half taxes and gives half recruits</strong>. One official runs one province with G1, two with G9 and three with G16, plus one more each for B2, G11 and T14. A low Faith share means religious revolts and wavering clergy lords; a low Language share means separatist revolts and slower officials. Provinces in revolt lose taxes and recruits and spread trouble to neighbours. Under half counts as low: risings of that kind come half again as often, the lords seated among another faith waver each January (in a theocracy, all of them), and with a low Tongue officials&#39; years count at half pace. The General tab marks a low Faith or Tongue with a warning line under it. A rising spreads to a restless neighbour at about a tenth a month.</p>
+<h3 id="lords"><a class="anchor" href="#lords" aria-label="Link to this section">#</a>Lords</h3>
+<p>Each lord is a named character with a card:</p>
+<pre><code> Duke Philip of Burgundy        House Valois-Burgundy, age 48
+ Lands: 6 provinces    Retinue: 4,000 men    Wealth: 220 gold
+ Traits: Ambitious, Rich       Loyalty: Wavering
+ Wants: the county of Champagne
+</code></pre>
+<div class="table-scroll"><table>
+<thead><tr><th>Field</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td>Lands</td><td>Provinces he governs, always at least one, run by his own officials</td></tr>
+<tr><td>Retinue</td><td>His own soldiers from his lands; he brings them when called, if loyal</td></tr>
+<tr><td>Wealth</td><td>His own gold; he can lend to you or fund a revolt</td></tr>
+<tr><td>Traits</td><td>Two words that shape what he wants and how he reacts</td></tr>
+<tr><td>Want</td><td>One concrete goal: a province, an office, a marriage, lower taxes, a war against someone</td></tr>
+<tr><td>Loyalty</td><td>Loyal, Wavering, Disloyal, In revolt</td></tr>
+<tr><td>Heir</td><td>Who inherits his land</td></tr>
+</tbody></table></div>
+<p>The lord card is the same in every society; only the label changes: nobles, merchant houses in city republics, bishops and abbots in theocracies, clan chiefs on the steppe, elders and lineage heads in chiefdoms and stateless societies.</p>
+<p><strong>Where you find them.</strong> Open a province and the first thing on it is who governs it: its lord, with his loyalty and buttons to open him or seize the land, or <em>Royal land</em> with a <strong>Grant as fief</strong> button that lists your lords, neighbours first. Its official sits under him; a lord&#39;s official serves the lord, so you can&#39;t make him a commander. The country card&#39;s <strong>Lords</strong> tab is the overview: how much of the realm is royal land, and a row per lord with his portrait, house, lands and loyalty. Tap a lord to open his screen: his lands as a list, a gift while he is not loyal, royal provinces you can grant him (nearest first), and <strong>Show his lands on the map</strong>, which fades the rest of the map and frames his provinces. On the map a lord&#39;s land always carries a fine pattern of crosses and a dashed border, and the <strong>Lords</strong> map mode colours each of your lords&#39; lands in his own colour.</p>
+<p><strong>Lords versus officials.</strong> A lord costs no gold, but keeps half the taxes of his provinces and keeps their recruits as his retinue. He obeys according to his loyalty, and can be removed only by force, a trial, an assassin or his line dying out. At war you call his retinue from the Army tab or his screen, and he leads it himself (see <a href="/wiki/Warfare">Warfare</a>); each row of the Lords tab shows his men&#39;s state beside his loyalty.</p>
+<p><strong>Sending an assassin.</strong> A lord who grows too troublesome can be killed. On his screen, <strong>Assassinate…</strong> opens a card that shows the cost (25 gold, spent either way), the chance it works (60 %, 15 points less for each Great lord reason, never below 20 %) and what follows. If it works he dies: his heir takes his lands as a wavering lord (with no heir, a kinsman may, or the lands return to the crown), the rest of his house turns disloyal, and every other lord of yours falls a step of loyalty. If the assassin is caught, the lord turns disloyal and every other lord still falls a step. Murder at court is never a secret, so use it when one lord costs you more than the trust of all the others. The computer players never send assassins. All the numbers are in <code>lords.assassination</code> in the realm data.</p>
+<p><strong>How you gain lords:</strong></p>
+<ul>
+<li><strong>Grant a fief</strong> of one or more royal provinces to a commander, relative, favourite or loyal official: a new loyal lord, whose provinces no longer need an official.</li>
+<li><strong>Keep a defeated local ruler</strong> after a conquest: he becomes a lord who starts disloyal, with no officials needed and the people calm.</li>
+<li><strong>Sell a title</strong>: a rich merchant buys a province as a fief, giving gold now and a weak but loyal lord.</li>
+<li><strong>Marriage</strong> can bring a foreign or local house in as a lord with its land.</li>
+<li>When a lord dies with several sons, his lands pass by the realm&#39;s inheritance law, possibly split between them.</li>
+<li>A disloyal lord across the border can <strong>defect to you</strong> with his land.</li>
+<li>At the start, some lords are <strong>real people of history</strong>: in 1378 John of Gaunt and Henry Percy in England, the Wolf of Badenoch in Scotland, Kęstutis and Vytautas in Lithuania, Gazi Evrenos among the Ottomans, Yi Seong-gye in Korea and about forty more, each on his own lands with his real title, traits, age and heir. Every other lord is generated, about one per 4 provinces, and never takes a historical lord&#39;s family name. A historical lord carries a small <strong>History</strong> tag on the Lords tab, and his screen says in one line who he was. History is where he starts, not a script: he ages and dies by the game&#39;s rules, and his heir keeps his title but not his story.</li>
+<li>Some figures <strong>come later</strong>: Nuno Álvares Pereira, John Hunyadi, Jan Žižka, Zhu Di and a few others can arrive by event around the years they rose in history, if you still hold their home province. Welcome one and he becomes the lord there, taking the place of a generated lord (Skirgaila and Aleksandras Olelka take over from whoever holds the seat); refuse and you lose a little prestige.</li>
+</ul>
+<p><strong>How you lose lords:</strong></p>
+<ul>
+<li>His line dies out: his land returns as royal provinces needing officials.</li>
+<li>You <strong>seize his land</strong> by decree: other lords waver, and he may rebel.</li>
+<li>You <strong>try and execute</strong> a disloyal lord: all lords of his house become disloyal.</li>
+<li>His revolt is defeated: his land returns to you, or to a loyal claimant you pick.</li>
+<li>A disloyal lord <strong>defects</strong> to a neighbour with his provinces, or rebels.</li>
+<li>Two lords&#39; houses join by marriage and merge into one bigger lord.</li>
+</ul>
+<p><strong>Loyalty:</strong></p>
+<div class="table-scroll"><table>
+<thead><tr><th>Rises with</th><th>Falls with</th></tr></thead>
+<tbody>
+<tr><td>Granting his want</td><td>Heavy or crushing taxes</td></tr>
+<tr><td>Gifts of gold, offices at court</td><td>Seizing land from him or another lord</td></tr>
+<tr><td>Marriages into the ruling house</td><td>Lost wars and battles</td></tr>
+<tr><td>Victories he took part in</td><td>A child ruler, a disputed heir or a new ruler</td></tr>
+<tr><td>A long secure reign with a clear heir</td><td>Requisitioning his grain</td></tr>
+<tr><td>Feeding his lands in famine</td><td>A foreign rival&#39;s bribes and promises</td></tr>
+<tr><td>Sharing your faith and language</td><td></td></tr>
+</tbody></table></div>
+<p>Paying for a building in a lord&#39;s province raises his loyalty one step. A famine in his land turns him disloyal; riots or a heavy demand on his province make him waver. At New Year, each lord over the government&#39;s cap drops one loyalty step (see <a href="/wiki/Government">Government</a>).</p>
+<h3 id="what-your-lords-and-officials-are-called"><a class="anchor" href="#what-your-lords-and-officials-are-called" aria-label="Link to this section">#</a>What your lords and officials are called</h3>
+<p>Every realm names its lords and officials in its own words. A Russian prince has boyars and voivodes, the Ottomans beys and subashis, Japan daimyo and daikan, Ethiopia rases and shums, the Inca kurakas and tocricocs, and the peoples of the Americas and much of Africa chiefs and headmen. The word comes from the family of your court&#39;s language, and a realm ruled by kin calls them chiefs and headmen where its language has no word of its own. Everyone else keeps lords and officials.</p>
+<p>The words show on the country card&#39;s tabs, the Stability pillars, the Lords map mode, a lord&#39;s and an official&#39;s screen and a province&#39;s &quot;Governed by&quot; card. Another realm&#39;s card uses its own words. Only the words change: chiefs and daimyo follow exactly the same rules as lords, and post types such as Warden or Tax collector stay the same everywhere.</p>
+<h3 id="stability"><a class="anchor" href="#stability" aria-label="Link to this section">#</a>Stability</h3>
+<p>Stability tells you at a glance how well your realm holds together. It is not a hidden number: it reads five pillars, and your realm is only as steady as the weakest of them.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Pillar</th><th>What it reads</th><th>Steady</th><th>Uneasy</th><th>Troubled</th><th>Crumbling</th></tr></thead>
+<tbody>
+<tr><td>Lords</td><td>Your landed lords by loyalty</td><td>Half or more Loyal, none Disloyal</td><td>Fewer than half Loyal</td><td>Any Disloyal</td><td>Any In revolt</td></tr>
+<tr><td>Subjects</td><td>Your subjects by loyalty (their standing at the start for now)</td><td>Half or more Loyal, none Disloyal</td><td>Fewer than half Loyal</td><td>Any Disloyal</td><td>Any In revolt</td></tr>
+<tr><td>Officials</td><td>Royal provinces whose official&#39;s post stands empty</td><td>None</td><td>Up to a quarter</td><td>Up to a half</td><td>More</td></tr>
+<tr><td>Provinces</td><td>Provinces rioting or plotting</td><td>None</td><td>Any rioting</td><td>Any plotting, or a tenth</td><td>A quarter</td></tr>
+<tr><td>Treasury</td><td>Your debts</td><td>Paying its way</td><td>Broke: a default is coming</td><td>For 2 years after a default</td><td>—</td></tr>
+</tbody></table></div>
+<p>Low stability costs you. While <strong>Troubled</strong>, your provinces send 10 % less tax and recruits and plotting provinces rise half as often again; while <strong>Crumbling</strong>, 25 % less and twice as often. Steady and Uneasy cost nothing. The Stability section says what your step costs, and each province&#39;s Tax line names the cut.</p>
+<p>Officials matter twice: an empty post shows in the officials pillar, and the <em>Ungoverned</em> grievance it brings (and <em>Grasping officials</em> over the cap) pushes provinces toward riots. A judge holds riots off one grievance longer. Lords&#39; own provinces are run by their own officials and do not count.</p>
+<p>The stability plaque in the top bar shows the step (amber when Uneasy, red when Troubled, blinking when Crumbling). Tap it to open your Realm book&#39;s Overview, where each pillar has a row; tap a row to open the Lords, Diplomacy, Officials, Provinces or Treasury tab and mend it.</p>
+<h3 id="army-and-navy-at-a-glance"><a class="anchor" href="#army-and-navy-at-a-glance" aria-label="Link to this section">#</a>Army and navy at a glance</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Stat</th><th>Gained by</th><th>Lost by</th></tr></thead>
+<tbody>
+<tr><td><strong>Soldiers</strong> (foot, horse, later guns)</td><td>Raising recruits (gold), hiring paid companies, lords bringing retinues</td><td>Battle deaths, disease and hunger on campaign, desertion when unpaid or unfed, disbanding. They cost gold every month and eat grain</td></tr>
+<tr><td><strong>Recruits</strong></td><td>Each year from people in royal provinces, and students leaving school</td><td>Raising soldiers, sending young men to school, famine, plague. The army and schools share them</td></tr>
+<tr><td><strong>Horses</strong></td><td>Breeding on grassland, buying from steppe and Arabian traders, herds, capture</td><td>Battle, fodder shortages, disease. They cap how many horsemen you field, and wagons move grain</td></tr>
+<tr><td><strong>Ships</strong> (war and trade)</td><td>Building in ports (timber provinces help), capture, hiring</td><td>Battle, storms, rot without upkeep, blockade. Warships fight and blockade; trade ships earn gold and fish and carry armies</td></tr>
+<tr><td><strong>Castles</strong></td><td>Building, conquest</td><td>Sieges, neglect, demolition in a peace</td></tr>
+<tr><td><strong>Commanders</strong> (Might, Cunning, Logistics)</td><td>Hiring, a lord or heir taking command, promotion after victory</td><td>Death in battle, old age, capture</td></tr>
+<tr><td><strong>Fallen</strong></td><td>Your soldiers killed in battles and sieges in the last 10 years</td><td>Many dead push people and lords toward peace and slow recruit refills</td></tr>
+</tbody></table></div>
+<p>The Fallen line on your Military section&#39;s Army page says what your dead are doing: with a quarter of your recruit ceiling fallen, about a sixteenth more of your voices want peace (at most a quarter), and with half of it fallen recruits refill at three quarters of their pace (never under half).</p>
+<p>The details live in <a href="/wiki/Recruiting">Recruiting</a>, <a href="/wiki/Warfare">Warfare</a> and <a href="/wiki/Naval">Naval</a>.</p>
+<h3 id="ruler-and-family"><a class="anchor" href="#ruler-and-family" aria-label="Link to this section">#</a>Ruler and family</h3>
+<ul>
+<li><strong>Age</strong> rises each year, and old rulers die. A child ruler needs a regent: a lord, or a queen mother.</li>
+<li><strong>Years on throne</strong> rise each year and reset on death, deposition or abdication. New rulers start with more wavering lords.</li>
+<li><strong>Heirs</strong> are gained by births, marriages and adopting or naming an heir; lost by death, marrying daughters abroad, and heirs going over to a rebel lord. If the ruler dies with no heir, the realm falls into a <strong>succession war</strong> among the lords.</li>
+<li><strong>Traits</strong>: two (for example Pious, Warlike, Builder, Greedy), given at birth and sometimes gained or rarely changed by events. They give small bonuses and lean event options.</li>
+<li><strong>Marriages</strong> are living ties to other ruling houses and your own lords, arranged with an heir or a princess, ended by death, divorce events and war between the houses. They give goodwill, loyalty and a path to inheriting another realm.</li>
+</ul>
+<p><strong>In the game now.</strong> Your ruler is on the Overview of your Realm book, under the section tiles: name, age, years on the throne, the regent while a child rules, the two traits with what each does, and the heir (or who would follow under your law). Most realms start with their real ruler of 20 September 1378. Each January rulers and heirs grow a year older and may die, by the table below that every person shares. The heir takes the throne and every lord wavers a little; with no heir a kinsman takes it and the lords dispute it. An heirless ruler of 18 to 50 may have a child. A dispatch with the crown tells you of a death, a birth or a child coming of age, in your realm and on your borders. Traits: <strong>Pious</strong> makes faith risings a quarter rarer, <strong>Warlike</strong> refills recruits 10 % faster, <strong>Builder</strong> makes works 10 % cheaper and <strong>Greedy</strong> brings 5 % more tax to you; each also leans the choices an AI ruler makes in events.</p>
+<p><strong>Everyone ages and dies.</strong> Not only the ruler: every person the game names grows a year older each January and may die, by one table for all of them (about 3 in 100 a year for a small child, 1 under 40, 2 in their forties, 4 in their fifties, 8 in their sixties, 16 older). A battle can kill the losing commander (1 in 20, more if he is Reckless), and other causes, an assassin or an event, end a life the same way.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Who</th><th>Where you see his age</th><th>When he dies</th></tr></thead>
+<tbody>
+<tr><td>Your heir</td><td>General tab, beside the ruler</td><td>Your ruler has no heir until a child is born; die then, and the lords dispute the throne. Abroad, a ruler who dies without a son may give married houses a claim</td></tr>
+<tr><td>A lord</td><td>His row on the Lords tab; his age and heir on his screen</td><td>His heir takes his lands, loyalty and want; with no heir, a kinsman of his house half the time. Otherwise his line dies out and his lands come back to you as royal land, with their posts empty</td></tr>
+<tr><td>An official</td><td>His card on the province and the Officials tab</td><td>His post stands empty: fill it from the province card. AI realms and lords fill theirs at once</td></tr>
+<tr><td>A commander or admiral</td><td>With his skills on the Military tab and the army card</td><td>He leaves your service and his army or fleet has no commander until you name another. Past 60 his Might falls, past 65 his Cunning. A lord leading his own retinue is the lord himself: if he falls, his heir leads the men on, and with no heir they go home</td></tr>
+<tr><td>A colonial governor</td><td>The Exploration tab</td><td>His colony is lost if he was founding one</td></tr>
+</tbody></table></div>
+<p>Each death in your realm reaches your dispatches in one line saying what follows.</p>
+<p><strong>Women in roles.</strong> Women can hold every role: ruler, lord, commander, official, scholar. The chance is set per country (or culture) per role from the catalogue&#39;s history and succession customs. Where the crown passes only through men (France), no woman inherits the throne, though a duke&#39;s daughter can inherit his duchy; where a daughter could inherit (Castile, Navarre), a queen regnant is possible. Wherever a ruler is a child, a queen mother can be regent. The chance rises as history&#39;s ages arrive: a little in the Age of Revolutions, more in the Age of Industrialization, more again in the Age of World Wars, and events and reforms can raise one country&#39;s chance earlier. Women who held roles at the start (Joanna I of Naples, say) or appear in events are placed as they were; the chances apply only to characters the game generates.</p>
+<p><strong>Inheritance law</strong> is fixed by each country&#39;s culture and history from the catalogue. You can&#39;t choose it, though events and reforms can change it. It decides who takes the throne (eldest son, eldest child, a brother or the eldest of the house, the strongest claimant among the lords, or an election by lords or a council) and whether a lord&#39;s land passes to one heir or is split among his sons.</p>
+<h3 id="abroad"><a class="anchor" href="#abroad" aria-label="Link to this section">#</a>Abroad</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Stat</th><th>Gained by</th><th>Lost by</th></tr></thead>
+<tbody>
+<tr><td><strong>Allies</strong></td><td>An envoy&#39;s alliance mission, marriages, peace terms</td><td>Breaking the alliance, war between you, a rival bribing them away. Called into your wars</td></tr>
+<tr><td><strong>Enemies</strong></td><td>Declaring war or being attacked</td><td>Making peace</td></tr>
+<tr><td><strong>Rivals</strong> (competing for a throne, a province, a trade city)</td><td>A contested claim or border dispute</td><td>Settling it, or one side destroyed. The AI targets them, and wars against them please your lords</td></tr>
+<tr><td><strong>Subjects</strong> (vassals and tributaries)</td><td>Forcing it in a peace; a weak neighbour asking for protection</td><td>Their independence war, release, annexation. They give tribute in gold or grain, and troops</td></tr>
+<tr><td><strong>Oaths broken</strong> (last 30 years)</td><td>Broken truces, abandoned allies, debt defaults</td><td>Time. Others refuse alliances and loans</td></tr>
+<tr><td><strong>Lands taken</strong> (last 20 years)</td><td>Provinces seized</td><td>Giving land back, time. When high, neighbours band together against you</td></tr>
+<tr><td><strong>Envoys</strong></td><td>Officials sent abroad, one mission each (alliance, marriage, peace, gift)</td><td>The mission ending; killed or held abroad</td></tr>
+</tbody></table></div>
+<p>While an envoy is abroad he runs no province, so his province pays half until he returns. The old <em>Merchants</em> stat is replaced by <a href="/wiki/Trade">Trade</a>&#39;s traders and trade ships.</p>
+<h3 id="starting-values"><a class="anchor" href="#starting-values" aria-label="Link to this section">#</a>Starting values</h3>
+<p>At the start, the catalogue&#39;s assessments set your counts: economic strength and fiscal resilience give gold and debt; manpower potential recruits; military capability soldiers, commanders and horses; naval capability ships; administrative capacity officials and royal provinces; political stability and unrest risk lords&#39; loyalty and provinces in revolt; territorial cohesion the number of lords, their land and language; institutional development schools, scholars and inventions; trade access starting trade; diplomatic influence extra officials ready as envoys. A low-confidence record starts with a wider random range. Allies, rivals, subjects and enemies come from the 1378 relations file. See <a href="/wiki/The-1378-Start">The 1378 Start</a>.</p>
+<h3 id="events-and-the-ai"><a class="anchor" href="#events-and-the-ai" aria-label="Link to this section">#</a>Events and the AI</h3>
+<p>The event tree&#39;s abstract country stats each map to concrete realm stats: legitimacy to loyal lords, heirs and years on throne; stability to loyal lords and provinces in revolt; war weariness to Fallen; prestige to battles won and lands taken; administrative capacity to officials; technology and innovation to inventions; literacy to scholars and schools per thousand people; food security to stores, harvest and herds; debt and treasury to debt and gold; navy strength and naval reach to warships; army strength and manpower to soldiers and recruits.</p>
+<p>The AI reads the same counts as you and doesn&#39;t cheat on food. An <strong>opportunist</strong> (the Ottomans eyeing Hungary) attacks when a neighbour&#39;s lords waver or its soldiers drop; an <strong>isolationist</strong> (Korea) fills its schools and avoids war; a <strong>hegemon seeker</strong> (France) keeps its recruits for the army.</p>
+<h3 id="how-a-campaign-is-won"><a class="anchor" href="#how-a-campaign-is-won" aria-label="Link to this section">#</a>How a campaign is won</h3>
+<p>You win by <strong>world domination</strong> or by <strong>leading one of three scores</strong>, each built only from realm stats:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Score</th><th>Built from</th></tr></thead>
+<tbody>
+<tr><td><strong>Economy</strong></td><td>Yearly income (taxes, lords&#39; share, trade, tribute) plus the bank (gold minus debt); gold in the bank counts only up to a year&#39;s income, debt counts in full</td></tr>
+<tr><td><strong>Power</strong></td><td>Provinces held (subjects&#39; provinces count half) plus army power (soldiers weighted by kind, and warships); commanders add nothing</td></tr>
+<tr><td><strong>Technology</strong></td><td>Inventions known, each weighted by its era cost; nothing removes a known invention</td></tr>
+</tbody></table></div>
+<ul>
+<li><strong>World domination</strong>: you and your subjects hold every settled land province of the world (land with people) in the turn in which 1 January falls. Allies by marriage do not count.</li>
+<li><strong>Score victory</strong>: lead a score&#39;s growth when the campaign&#39;s end date (default 31 August 1939) arrives. Leading earlier wins nothing, however wide the margin.</li>
+</ul>
+<p><strong>A fair score.</strong> What is ranked and what wins is not a score on one day. Each score is the <strong>average of your last 25 Januaries</strong>, so a burst in the final year moves it little. It is judged as <strong>growth against your own start</strong>: the average divided by your score at the start of the campaign, shown as ×1.84. Brittany doubling its Power beats France standing still. So that a speck of a realm can&#39;t win by tripling almost nothing, every start is counted as at least the median start of all realms in that score.</p>
+<p><strong>Chapters.</strong> Every 100 years a chapter closes, in the January turn of 1544, 1644, 1744 and 1844 (from a 1444 start). The chapter card opens by itself: how your realm grew over those hundred years in each score and its place, who led each, and the leading realms; then <strong>Play on</strong>. A chapter wins nothing, but it is a payoff on the way, and every chapter is a fresh race, measured from each realm&#39;s score when it began. The last chapter closes with the campaign, on the end card. Past chapters stay listed on the Score tab.</p>
+<p>Army power counts foot as 1, horse as 2, guns as 3 and a warship as 100 men, all over 1,000; the weights are provisional. Scores are worked out at the start and every January. A domination win happens at once and you may keep playing. At the end date the realm that has grown most in each score wins it, and ties (to two decimals) share the win.</p>
+<p><strong>Where you see it.</strong> Every realm&#39;s General tab has a <strong>Score</strong> line: its growth in Economy, Power and Technology with its rank in each (&quot;Economy ×1.84 · 3rd&quot;). On your own card the line opens the <strong>Score</strong> tab: how each of your scores is made now (income and the bank as it counts; provinces and army power; inventions), its 25-year average against your start, your growth and rank this chapter, when the chapter closes, the five leading realms beside you, and the chapters closed so far, each opening its card again. When the campaign ends the clock stops and the end card opens by itself (see <a href="/wiki/Screens-and-Navigation">Screens and navigation</a>).</p>
+<h3 id="each-month"><a class="anchor" href="#each-month" aria-label="Link to this section">#</a>Each month</h3>
+<p>A turn is one week. These steps run once a month, in the turn in which a new month begins.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Cadence</th><th>What happens</th></tr></thead>
+<tbody>
+<tr><td>Monthly</td><td>Pay soldiers; add income; desertion if unpaid or unfed; apply loyalty causes; check the ruler&#39;s death and succession; check score victory</td></tr>
+<tr><td>Each season</td><td>Eating and rot of castle and local stores; famine relief releases</td></tr>
+<tr><td>Each autumn</td><td>Harvest roll by region, collection, castle shares, sharing out</td></tr>
+<tr><td>Yearly</td><td>Debt interest; officials&#39; wages; recruits refill; ruler and lords age; years on throne; old entries drop out of Fallen, Oaths broken and Lands taken</td></tr>
+<tr><td>New Year</td><td>Lords over the cap lose a loyalty step</td></tr>
+</tbody></table></div>
+<h2 id="what-you-see"><a class="anchor" href="#what-you-see" aria-label="Link to this section">#</a>What you see</h2>
+<ul>
+<li><strong>The country card</strong>, as above, including your rank in each score.</li>
+<li><strong>The lord card</strong> for each named lord.</li>
+<li><strong>The Food policy screen</strong>, with realm defaults, per-castle overrides and the four presets.</li>
+<li><strong>The treasury</strong>: gold, debt and lenders.</li>
+<li><strong>The top bar</strong>: your realm, the date, gold and its change a month, stability, the war plaque while at war, and the News button.</li>
+</ul>
+<p>Things you can do: set food policy, override a castle, apply a food preset; take a loan, repay or default; hire and dismiss officials; grant a fief, keep a local ruler, sell a title; seize a lord&#39;s land, put a disloyal lord on trial; give a lord gold, an office or a marriage, or grant his want; call a loyal lord&#39;s retinue; name an heir; burn your own fields.</p>
+<h2 id="how-it-connects"><a class="anchor" href="#how-it-connects" aria-label="Link to this section">#</a>How it connects</h2>
+<ul>
+<li><a href="/wiki/Provinces">Provinces</a>: province sums, tax reaching you, stores and harvests, grievances that make lords waver; the realm sends food policy, castle deliveries and fief grants.</li>
+<li><a href="/wiki/Research">Research</a>: gold for schools and the recruit pool for students; inventions feed the Technology score and officials-per-province effects.</li>
+<li><a href="/wiki/Buildings">Buildings</a>: castles, granaries, building costs and upkeep.</li>
+<li><a href="/wiki/Warfare">Warfare</a>: soldiers, horses, commanders, Fallen, army food refill, sieges, victories.</li>
+<li><a href="/wiki/Recruiting">Recruiting</a>: recruits and gold for levies; commanders.</li>
+<li><a href="/wiki/Diplomacy">Diplomacy</a>: allies, enemies, rivals, oaths broken, lands taken, envoys, marriages.</li>
+<li><a href="/wiki/Subjects">Subjects</a>: subjects and tribute; folding a subject in makes its ruler a lord.</li>
+<li><a href="/wiki/Government">Government</a>: officials and lords caps, succession by form, lords over the cap.</li>
+<li><a href="/wiki/Trade">Trade</a>: trade income (deposits, fees, tolls); traders and trade ships replace merchants.</li>
+<li><a href="/wiki/Religion">Religion</a> and <a href="/wiki/Culture">Culture</a>: faith and language shares and their effects on lords.</li>
+<li><a href="/wiki/Rebellions">Rebellions</a>: disloyal lords, retinues and wealth for risings, in revolt counts.</li>
+<li><a href="/wiki/Revolutions">Revolutions</a>: regimes set forms; émigré pretenders.</li>
+<li><a href="/wiki/Historical-Events">Historical Events</a>: event country stats mapped as above; ages raise women-in-roles chances.</li>
+<li><a href="/wiki/The-1378-Start">The 1378 Start</a>: starting counts from assessments and relations.</li>
+<li><a href="/wiki/National-Strengths">National Strengths</a>: levers such as a lord loyalty shield.</li>
+<li><a href="/wiki/Naval">Naval</a>: ship counts.</li>
+<li><a href="/wiki/Time-and-Turns">Time and Turns</a>: weekly turns with monthly steps, seasons, the end date for judging scores.</li>
+<li><a href="/wiki/Screens-and-Navigation">Screens and Navigation</a>: scores, ranks and the campaign result for the end screens.</li>
+<li><a href="/wiki/Achievements">Achievements</a>: score updates and campaign wins.</li>
+<li><a href="/wiki/Map-and-Lenses">Map and Map Modes</a>: country card fields.</li>
+</ul>
+<h2 id="numbers"><a class="anchor" href="#numbers" aria-label="Link to this section">#</a>Numbers</h2>
+<p>Every value the game uses, made from its config so it always matches the game: <a href="/wiki/Data-Realm">Realm data</a>. How they combine: <a href="/wiki/Formulas">Formulas</a>.</p>
+<p>All realm numbers are placeholders, kept in one realm data file.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Value</th><th>Config key</th><th>Design value</th><th>Provisional?</th></tr></thead>
+<tbody>
+<tr><td>Collection options</td><td><code>food.collection.options</code></td><td>0 / 25 / 50 / 75 %</td><td>Yes</td></tr>
+<tr><td>Castle share rules</td><td><code>food.castle_shares.options</code></td><td>by people, frontier first, capital first, equal, custom</td><td>No</td></tr>
+<tr><td>Sharing-out patterns</td><td><code>food.spread.default</code> / <code>presets</code></td><td>50/30/20; Tight 80/20/0; Wide 30/35/35</td><td>Yes</td></tr>
+<tr><td>Siege reserve</td><td><code>food.siege_reserve.options</code></td><td>0 / 3 / 6 / 12 months</td><td>Yes</td></tr>
+<tr><td>Army refill</td><td><code>food.army_refill.options</code></td><td>locals only, castles first, no refill in lords&#39; lands</td><td>No</td></tr>
+<tr><td>Famine relief</td><td><code>food.famine_rule.options</code></td><td>off / 1 / 3 months</td><td>Yes</td></tr>
+<tr><td>Surplus</td><td><code>food.surplus.options</code></td><td>keep, sell, capital castle, subjects or allies</td><td>No</td></tr>
+<tr><td>Lords&#39; castles</td><td><code>food.lords_castles</code></td><td>loyal all, wavering half, disloyal none</td><td>Yes</td></tr>
+<tr><td>Presets</td><td><code>food.presets</code></td><td>four, as above</td><td>Yes</td></tr>
+<tr><td>Soldiers on campaign eat</td><td><code>food.campaign_eat</code></td><td>×2</td><td>Yes</td></tr>
+<tr><td>A horse eats like</td><td><code>food.horse_eats</code></td><td>3 men</td><td>Yes</td></tr>
+<tr><td>Loss moving food between castles</td><td><code>food.transfer_loss_per_province</code></td><td>not given</td><td>Yes</td></tr>
+<tr><td>Store rot</td><td><code>food.rot_per_season</code></td><td>&quot;a little&quot;</td><td>Yes</td></tr>
+<tr><td>Tax steps</td><td><code>tax.rates</code></td><td>none / light / normal / heavy / crushing</td><td>No</td></tr>
+<tr><td>Gold at each tax step</td><td><code>economy.taxRateFactor</code></td><td>not given; 0, ½, 1, 1½, 2 times normal</td><td>Yes</td></tr>
+<tr><td>An official&#39;s wage</td><td><code>economy.officialWagePerMonth</code></td><td>not given; 0.1 gold a month</td><td>Yes</td></tr>
+<tr><td>Loans</td><td><code>debt</code></td><td>10 % a year; up to a year&#39;s income</td><td>Yes</td></tr>
+<tr><td>Royal province without official</td><td><code>officials.no_official_share</code></td><td>half tax, half recruits</td><td>Yes</td></tr>
+<tr><td>Lord keeps</td><td><code>lords.tax_share</code></td><td>half</td><td>Yes</td></tr>
+<tr><td>Fallen window</td><td><code>fallen.window_years</code></td><td>10 years</td><td>Yes</td></tr>
+<tr><td>Oaths broken window</td><td><code>oaths.window_years</code></td><td>30 years</td><td>Yes</td></tr>
+<tr><td>Lands taken window</td><td><code>lands_taken.window_years</code></td><td>20 years</td><td>Yes</td></tr>
+<tr><td>Women in roles</td><td><code>women_in_roles</code></td><td>not given</td><td>Yes</td></tr>
+<tr><td>Age multipliers</td><td><code>age_multipliers</code></td><td>not given</td><td>Yes</td></tr>
+<tr><td>World domination</td><td><code>win.domination_share</code></td><td>the whole world</td><td>No</td></tr>
+<tr><td>Bank counted</td><td><code>win.bank_cap_years_income</code></td><td>1 year&#39;s income</td><td>Yes</td></tr>
+<tr><td>Januaries averaged</td><td><code>win.average_years</code></td><td>25</td><td>No</td></tr>
+<tr><td>Floor under a start</td><td><code>win.start_floor_quantile</code></td><td>the median start</td><td>Yes</td></tr>
+<tr><td>Chapter length</td><td><code>win.chapter_years</code></td><td>100 years</td><td>No</td></tr>
+<tr><td>Subjects in Power</td><td><code>win.subject_province_weight</code></td><td>½</td><td>Yes</td></tr>
+<tr><td>End date</td><td><code>campaign.end_date</code></td><td>31 August 1939</td><td>No (decided)</td></tr>
+</tbody></table></div>
+<h2 id="decided-since-the-first-draft"><a class="anchor" href="#decided-since-the-first-draft" aria-label="Link to this section">#</a>Decided since the first draft</h2>
+<ul>
+<li>Tax has five steps: none, light, normal, heavy and crushing. You set them per province, with a realm default.</li>
+<li>There is no grain market: surplus grain is sold to your own treasury, and missing grain is bought from it, at a fixed price.</li>
+<li>Armies refill from castles first by default.</li>
+<li>The throne passes by your government form&#39;s succession rule. A lord with 4 to 7 provinces has one <em>Great lord</em> reason to waver; one with 8 or more has two.</li>
+<li>Women can be lords (5 %), commanders (2 %), officials (2 %) or scholars (5 %). These chances grow ×1.5, ×2 and ×3 in the last three ages.</li>
+<li>Loans cost 10 % a year, less with banking inventions, and are capped at one year&#39;s income (three with T10). Each broken oath adds 10 % to the chance a lender refuses.</li>
+<li>The harvest comes in September in the north and in March in the south. Each region rolls its weather once a harvest: 1 in 6 bad, 1 in 6 good in temperate land, 1 in 4 drought in dry land and 1 in 5 floods in monsoon land. Each province also rolls its own harvest first (feedback 82).</li>
+<li>A child ruler, under 16, rules through the queen mother, or else through the most loyal lord.</li>
+<li>Starting counts come from each country&#39;s assessments, with a seeded spread for countries we know less about.</li>
+</ul>
+<h2 id="still-open"><a class="anchor" href="#still-open" aria-label="Link to this section">#</a>Still open</h2>
+<p>Nothing. Every question about the realm has been decided; numbers marked as placeholders are tuned during balancing.</p>
+<h2 id="for-developers"><a class="anchor" href="#for-developers" aria-label="Link to this section">#</a>For developers</h2>
+<ul>
+<li>Spec: <a href="https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/realm/spec.md" rel="noopener"><code>domain/realm/spec.md</code></a>, requirement code <strong>REALM</strong> (REALM-001 to REALM-156).</li>
+<li>Features: <code>domain/realm/features/</code> (country-card, treasury, province-food, castle-food, food-policy, food-year, people-and-land, lords, army-and-navy, ruler-and-family, women-in-roles, abroad, starting-values, events-and-ai, win-scores).</li>
+<li>Code: rules code for this context goes in <code>packages/engine/src/domain/realm/</code>, balance numbers in <code>packages/rules/data/domain/realm.json</code>. Today&#39;s engine keeps each nation&#39;s treasury and levies in <code>packages/engine/src/world.ts</code> and runs income and upkeep in <code>runEconomy</code> in <code>packages/engine/src/turn.ts</code>.</li>
+</ul>

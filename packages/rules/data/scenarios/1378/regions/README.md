@@ -12,6 +12,7 @@ Every file is optional and has the shape of its 1444 counterpart in `scenarios/1
 | `culture-start.json` | `{ tongues: { <new tongue>: { name, family, way_of_life } }, realms: { <nation>: { court, mix, local, faith? } } }`; tongues already in the 1444 file need not be repeated |
 | `relations.json` | `{ relations: [...], facts: [...], entities?: [{ id, name }] }` in the 1444 shape; `entities` names 1378 realms that are neither on the map nor in the catalogue |
 | `subjects.json` | `{ subjects: [[subject, overlord, kind, autonomy, start]], stances: [[a, b, stance]] }` |
+| `goals.json` | `{ goals: [{ realm, goal, reason, ends_when, window: [from, to \| null], weight, deviation, aim, alternative?, toward? }] }`: each realm's historical goals with the aim the AI weighs (EVT-100, `GoalDef` in `packages/rules/src/types.ts`); checked by `packages/rules/test/goals-1378.test.ts`. When the regions are joined, the scenario's `goals.json` is every region's goals in this order, and `startGoals` (`packages/rules/src/start.ts`) reads it |
 | `sleeping-realms.json` | `{ realms: [{ id, name, color?, capital, home, tree? }] }`: realms not yet born on the start day; places are 1444 province ids or `[lon, lat]`; `home` entries may also be owner-rule selectors `{ countries, admin1?, regions?, bbox? }`, which survive a new map |
 | `README.md` | what the region covers, its sources and its confidence |
 

@@ -3197,6 +3197,21 @@
     ]
   },
   {
+    "id": "ajuran",
+    "name": "Ajuran",
+    "color": "#e8a0bf",
+    "capital": "p3534",
+    "commanders": [
+      {
+        "id": "ajuran_1",
+        "name": "General of Ajuran",
+        "might": 1,
+        "cunning": 1,
+        "logistics": 1
+      }
+    ]
+  },
+  {
     "id": "kilwa",
     "name": "Kilwa",
     "color": "#b13e53",
@@ -3426,7 +3441,7 @@
   {
     "id": "mogadishu",
     "name": "Mogadishu",
-    "color": "#76428a",
+    "color": "#d95763",
     "capital": "p3533",
     "commanders": [
       {

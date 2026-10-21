@@ -1,0 +1,329 @@
+<h1>Settings</h1>
+<p>Settings let you shape how Pocket Hegemony looks, sounds and handles on your device, from interface scale and colour vision to controller buttons and battery use. They never change the rules, balance or the computer players: anything that would is a campaign rule, chosen when you start a new game. Most settings pick sensible defaults from the kind of device you play on, apply at once, and follow you between devices if you sign in.</p>
+<h2 id="where-you-find-it"><a class="anchor" href="#where-you-find-it" aria-label="Link to this section">#</a>Where you find it</h2>
+<p>Open Settings from the game menu (the three-line button at the top left of the map, or <code>Esc</code>) or from the start screen. Sections are on the left and their rows on the right; in a tall window the sections come first. Each row says what it does under its name, a red dot marks a value you changed, and a long press on the name (or a right-click) puts it back. Reset this section is at the end of each section.</p>
+<p>What the game has built so far:</p>
+<ul>
+<li><strong>Gameplay</strong>: Tutorial hints (with how many of the six are done) and Reset tutorial and hints; Achievement toasts; Autosave and Autosaves kept per campaign; Turn playback speed (1×, 2×, 4×: how fast the week plays out after End turn) and Battle playback speed.</li>
+<li><strong>Graphics</strong>: Battery saver (Off, Auto, On) and the knobs it moves: Frame rate cap, Sharpness and Animations. Rows it moves say &quot;Set by Battery saver&quot;. Auto follows your device&#39;s battery where the browser reports it.</li>
+<li><strong>Audio</strong>: Master, Music on or off and its volume, Effects volume and Interface sounds. The speaker button&#39;s Sound card changes the same settings.</li>
+<li><strong>Accessibility</strong>: Colour vision (Default, Red-weak, Green-weak, Blue-weak, No colour), with a sample of four neighbouring realms and a map mode&#39;s ramp in the chosen mode under it; Patterns on map modes; Text size (Normal, Large, Larger) for the cards, menus and alerts. A colour vision change redraws the map, the armies and routes and the map mode&#39;s key at once.</li>
+</ul>
+<p>Other rows join the screen as the game builds what they do.</p>
+<h2 id="how-it-works"><a class="anchor" href="#how-it-works" aria-label="Link to this section">#</a>How it works</h2>
+<h3 id="the-principles"><a class="anchor" href="#the-principles" aria-label="Link to this section">#</a>The principles</h3>
+<ul>
+<li><strong>Data, not code.</strong> Every setting is one entry in <code>settings.yaml</code>, with its section, type, options, default per device profile, platforms and how it applies. Adding or moving a setting, or changing a default, needs no code change, and the Settings screen is built from that file in its order.</li>
+<li><strong>A profile gives every default.</strong> On first launch the game picks a device profile and takes every default from it.</li>
+<li><strong>Changes apply at once.</strong> A change applies immediately with a preview behind the open panel; there is no Apply button. The only exception is Display mode, which asks &quot;Keep this display?&quot; and reverts after 15 seconds.</li>
+<li><strong>Every input works.</strong> Every row works with touch, mouse, keyboard and controller. No slider needs a drag and no row needs hover: sliders step with the d-pad or arrow keys and accept a tap at a position.</li>
+<li><strong>Nothing lost.</strong> Opening Settings in a campaign loses nothing, and closing it returns you to the exact map spot.</li>
+<li><strong>Never the simulation.</strong> Settings never change rules, balance or AI.</li>
+</ul>
+<h3 id="where-settings-opens"><a class="anchor" href="#where-settings-opens" aria-label="Link to this section">#</a>Where Settings opens</h3>
+<p>Settings opens as an overlay, from the cog on the title screen and from More. In a campaign, the game menu opens Settings over the dimmed map; Settings holds Campaign rules as a read-only section listing the rules the campaign started with. There is no separate pause menu. <code>Esc</code> or the Menu button opens the game menu. On Steam, the Controller section has a button that opens Steam&#39;s own binding panel.</p>
+<p>There is no settings wizard. On first launch, only these questions appear, and only when needed, each on one screen: the language (only when the system language is not supported); crash reports and usage statistics (when the privacy design requires consent); and &quot;Is this text easy to read?&quot; with Smaller, Fine and Bigger (Big screen profile only).</p>
+<h3 id="the-settings-screen"><a class="anchor" href="#the-settings-screen" aria-label="Link to this section">#</a>The Settings screen</h3>
+<p>In a landscape window (on every device) the section list is on the left, the section&#39;s rows on the right, and a one-line description of the focused row at the bottom. In a tall window (tablets in portrait, tall desktop windows) the section list comes first and a section&#39;s rows open full screen on tap, with Back to return. Phones are landscape only.</p>
+<p>The nine sections, in order: Gameplay, Graphics, Audio, Controls, Accessibility, Language, Account and cloud saves, Privacy, About.</p>
+<p>Each row shows its name, its current value, and a small &quot;changed&quot; dot when the value differs from the profile default. A long press on a row only explains it; right-click or X on a row resets it to its profile default. Each section ends with Reset this section, and About has Reset all settings.</p>
+<p>With a controller: LB and RB switch sections, the d-pad moves between rows, A changes or opens, d-pad left and right step a value, B goes back, X resets the row, and Y shows the long description.</p>
+<h3 id="device-profiles"><a class="anchor" href="#device-profiles" aria-label="Link to this section">#</a>Device profiles</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Profile</th><th>Detected when</th></tr></thead>
+<tbody>
+<tr><td>Phone</td><td>Mobile app with the screen&#39;s short side under 600 CSS px</td></tr>
+<tr><td>Tablet</td><td>Mobile app with the short side 600 CSS px or more</td></tr>
+<tr><td>Steam Deck</td><td>Steam reports it is running on a Steam Deck</td></tr>
+<tr><td>Big screen</td><td>Steam is in Big Picture mode, on a Steam Machine, or on a TV-class display</td></tr>
+<tr><td>Desktop</td><td>Desktop app or the web otherwise</td></tr>
+</tbody></table></div>
+<p>Changing Graphics → Device profile reloads every default you have not changed yourself. Connecting a controller on any profile adds controller prompts and focus outlines without switching profile.</p>
+<p>Per-profile defaults (every other setting has one default for all profiles):</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Setting</th><th>Phone</th><th>Tablet</th><th>Desktop</th><th>Steam Deck</th><th>Big screen</th></tr></thead>
+<tbody>
+<tr><td>Interface scale</td><td>Auto</td><td>Auto</td><td>100 %</td><td>112 %</td><td>175 %</td></tr>
+<tr><td>Text size</td><td>Normal</td><td>Normal</td><td>Normal</td><td>Normal</td><td>Large</td></tr>
+<tr><td>Display mode</td><td>n/a</td><td>n/a</td><td>Windowed</td><td>Fullscreen</td><td>Fullscreen</td></tr>
+<tr><td>Frame rate cap</td><td>60</td><td>60</td><td>Display rate</td><td>60</td><td>60</td></tr>
+<tr><td>Battery saver</td><td>Auto</td><td>Auto</td><td>Off</td><td>Auto</td><td>Off</td></tr>
+<tr><td>Sharpness</td><td>Balanced</td><td>Balanced</td><td>Native</td><td>Native</td><td>Native</td></tr>
+<tr><td>Map detail</td><td>Medium</td><td>High</td><td>High</td><td>High</td><td>High</td></tr>
+<tr><td>Touch target size</td><td>Large</td><td>Normal</td><td>n/a</td><td>Normal</td><td>n/a</td></tr>
+<tr><td>Screen margins</td><td>0</td><td>0</td><td>0</td><td>0</td><td>5 %, calibration offered once</td></tr>
+<tr><td>Edge scrolling</td><td>n/a</td><td>n/a</td><td>On in fullscreen</td><td>Off</td><td>Off</td></tr>
+<tr><td>Controller cursor speed</td><td>n/a</td><td>n/a</td><td>Medium</td><td>Medium</td><td>Slow</td></tr>
+</tbody></table></div>
+<p>Big screen uses the <a href="/wiki/Screens-and-Navigation">Far layout</a>: 175 % scale with Large text puts body text at about 35 px on a 1080p TV, and the 5 % margin keeps everything out of the overscan band. Auto interface scale picks the largest step at which a 360 × 640 CSS px layout still fits (small phones 100 %, large ones up to 125 %).</p>
+<h3 id="storage-and-sync"><a class="anchor" href="#storage-and-sync" aria-label="Link to this section">#</a>Storage and sync</h3>
+<p>Every setting belongs to one of two groups:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Group</th><th>What is in it</th><th>Synced?</th></tr></thead>
+<tbody>
+<tr><td>Device</td><td>Graphics, audio volumes, screen margins, controller deadzones, battery saver</td><td>No, stays on this device</td></tr>
+<tr><td>Personal</td><td>Gameplay, accessibility, language, key bindings, hint switches</td><td>Yes, across your devices</td></tr>
+</tbody></table></div>
+<p>They live in two small JSON files, <code>settings-device.json</code> and <code>settings-personal.json</code>, each with a version number. While you are signed in to a Pocket Hegemony account, the personal file syncs through the account on every platform and across stores, the newest change winning setting by setting. Without an account, each store&#39;s free backup carries them: Steam Auto-Cloud on the personal file next to the save folder; iOS device backup and Android Auto Backup restore both files on a new device (no live sync); nothing on the web.</p>
+<p>The files are kept in the app&#39;s user data folder on desktop and Steam, in the mobile app&#39;s preferences on iOS and Android, and in <code>localStorage</code> on the web. On reading, unknown keys are dropped, invalid values fall back to the profile default, and a broken file never stops the game from starting. When a file&#39;s version goes up, small migration steps rename or convert keys. Settings are never stored inside a campaign save, so loading any save never changes anyone&#39;s settings. Moving from the free tier to the full game keeps your settings.</p>
+<h3 id="campaign-rules"><a class="anchor" href="#campaign-rules" aria-label="Link to this section">#</a>Campaign rules</h3>
+<p>These are chosen on the new game screen, saved in the campaign, and shown read-only in Settings, under Campaign rules:</p>
+<ul>
+<li>difficulty (Easy, Normal or Hard; what each changes is in <a href="/wiki/The-1378-Start#difficulty">The 1378 start</a>);</li>
+<li>AI temper;</li>
+<li>fog of war;</li>
+<li>historical, plausible or free events (plausible by default);</li>
+<li>ironman (achievements only count in ironman);</li>
+<li>the campaign end date (default 31 August 1939);</li>
+<li>whether music eras follow the calendar or technology.</li>
+</ul>
+<p>The map mode menu&#39;s &quot;Hide unexplored lands&quot; stays a display switch, because it only hides unknown lands visually. It would become a campaign rule only if fog ever hid information the computer uses.</p>
+<p>In this build the campaign rules are difficulty, events, fog of war, ironman and the end date, chosen on the <em>Rules of the campaign</em> card (<a href="/wiki/The-1378-Start#campaign-rules">The 1378 start</a>), and the game menu shows them read-only in one line under the date. With fog of war off, &quot;Hide unexplored lands&quot; gives way to a line saying every land is shown. While an ironman campaign is played, Settings hides Autosave and Autosaves kept.</p>
+<h3 id="graphics"><a class="anchor" href="#graphics" aria-label="Link to this section">#</a>Graphics</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Setting</th><th>Options</th><th>Default</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>Device profile</td><td>Phone, Tablet, Desktop, Steam Deck, Big screen</td><td>detected</td><td></td></tr>
+<tr><td>Display mode (desktop)</td><td>Windowed, Fullscreen</td><td>per profile</td><td>Fullscreen is borderless at the display&#39;s own resolution; no resolution list; reverts after 15 s unless kept</td></tr>
+<tr><td>Interface scale</td><td>Auto, 75, 88, 100, 112, 125, 150, 175, 200 %</td><td>per profile</td><td>Panels, cards, icons and text scale together in eighths to keep pixel art on near-whole multiples</td></tr>
+<tr><td>Pixel scaling</td><td>Crisp, Smooth</td><td>Crisp</td><td>Crisp snaps art to whole pixels and may leave a margin; Smooth fills exactly and blurs edges slightly</td></tr>
+<tr><td>Sharpness</td><td>Native, Balanced, Battery</td><td>per profile</td><td>The map draws with up to 3 (Native), 2 (Balanced) or 1 (Battery) screen pixels per CSS pixel; applies on the next map redraw</td></tr>
+<tr><td>Frame rate cap</td><td>30, 60, 120, Display rate</td><td>per profile</td><td>When nothing moves the map does not redraw at all</td></tr>
+<tr><td>Battery saver</td><td>Off, Auto, On</td><td>per profile</td><td>See below</td></tr>
+<tr><td>Map detail</td><td>Low, Medium, High</td><td>per profile</td><td>Low: no 8 × 8 close-in tiles, no surf, no forest blending. Medium: 8 × 8 tiles and still water. High: everything</td></tr>
+<tr><td>Animations</td><td>Full, Reduced, Off</td><td>Full</td><td>Water, marching columns, flags, smoke and battle motion; Off shows battle results as still frames</td></tr>
+<tr><td>Keep screen awake during the AI turn (mobile)</td><td>On, Off</td><td>On</td><td></td></tr>
+<tr><td>Screen margins (desktop, Steam)</td><td>0 to 10 % in 1 % steps</td><td>0 (Big screen 5 %)</td><td>A calibration screen of four corner marks pulled in with the stick</td></tr>
+<tr><td>Show performance line</td><td>Off, FPS, Full diagnostics</td><td>Off</td><td>The existing diagnostics line moves here</td></tr>
+</tbody></table></div>
+<p><strong>Battery saver.</strong> On sets a 30 fps cap, Battery sharpness, reduced animations, map redraws only on change, and fewer music voices. It never touches the computer players: their turn has the same budget on every device. Auto turns it on when the device reports battery saving (iOS Low Power Mode, Android Battery Saver, or a Steam Deck on battery under 20 %).</p>
+<p><strong>The four performance knobs</strong> are Sharpness, Frame rate cap, Map detail and Animations. Battery saver moves them all at once.</p>
+<div class="table-scroll"><table>
+<thead><tr><th></th><th>Sharpness</th><th>Frame cap</th><th>Map detail</th><th>Animations</th></tr></thead>
+<tbody>
+<tr><td>Cheapest</td><td>Battery (1×)</td><td>30</td><td>Low</td><td>Off</td></tr>
+<tr><td>Phone default</td><td>Balanced (up to 2×)</td><td>60</td><td>Medium</td><td>Full</td></tr>
+<tr><td>Richest</td><td>Native (up to 3×)</td><td>Display rate</td><td>High</td><td>Full</td></tr>
+</tbody></table></div>
+<p>Performance targets are measured at the phone defaults and checked once with Battery saver on.</p>
+<h3 id="audio"><a class="anchor" href="#audio" aria-label="Link to this section">#</a>Audio</h3>
+<p>There are three buses, each with its own volume: <strong>Music</strong> (tracks and stingers), <strong>Effects</strong> (world and interface sounds: taps, the End turn chime, marching, battle, siege, coins) and <strong>Ambience</strong> (the bed between peace tracks and under the map).</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Setting</th><th>Options</th><th>Default</th></tr></thead>
+<tbody>
+<tr><td>Master volume</td><td>0 to 100 % in 5 % steps</td><td>80 %</td></tr>
+<tr><td>Music volume</td><td>0 to 100 %</td><td>70 %</td></tr>
+<tr><td>Music</td><td>On, Off (Off fully suspends the synth)</td><td>On</td></tr>
+<tr><td>Music variety</td><td>My palette only, All palettes</td><td>My palette only</td></tr>
+<tr><td>Zoom mix (the mix follows the zoom level)</td><td>On, Off</td><td>On</td></tr>
+<tr><td>Effects volume</td><td>0 to 100 %</td><td>80 %</td></tr>
+<tr><td>Interface sounds (Off silences taps and panels, keeps world effects)</td><td>On, Off</td><td>On</td></tr>
+<tr><td>Ambience</td><td>On, Off</td><td>Off</td></tr>
+<tr><td>Ambience volume (greyed while Ambience is off)</td><td>0 to 100 %</td><td>50 %</td></tr>
+<tr><td>Haptics (mobile; light vibrations on five moments, never on desktop)</td><td>On, Off</td><td>On on phones</td></tr>
+<tr><td>Play sound in the background (desktop, web)</td><td>On, Off</td><td>Off</td></tr>
+<tr><td>Let other apps&#39; audio play (mobile; applies on restart)</td><td>On, Off</td><td>On</td></tr>
+<tr><td>Sound captions</td><td>On, Off</td><td>Off</td></tr>
+<tr><td>Reduced intensity</td><td>On, Off</td><td>Off</td></tr>
+<tr><td>Mono audio</td><td>On, Off</td><td>Off</td></tr>
+</tbody></table></div>
+<p>On mobile the game always goes silent in the background. With &quot;Let other apps&#39; audio play&quot; on, if other audio is playing at launch, game music starts muted and effects play over it, respecting the iPhone silent switch. Sound captions turn on by themselves when Master or every bus is set to 0 or off; off-screen sounds then show a small caption at the screen edge toward where they came from (&quot;Battle at Troyes&quot;). Reduced intensity means no echo, the most important sounds 4 dB softer, and no sharp attacks.</p>
+<p>Some switches appear in two sections but are one setting, so changing one changes the other: Haptics (Audio and Controls), and Sound captions, Reduced intensity and Mono audio (Audio and Accessibility).</p>
+<h3 id="gameplay"><a class="anchor" href="#gameplay" aria-label="Link to this section">#</a>Gameplay</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Setting</th><th>Options</th><th>Default</th></tr></thead>
+<tbody>
+<tr><td>Autosave</td><td>Every month, Every 6 months, Every 12 months (each January), Off</td><td>Every 12 months</td></tr>
+<tr><td>Autosaves kept per campaign</td><td>1, 3, 5</td><td>3</td></tr>
+<tr><td>Confirm End turn</td><td>Off, When the Attention screen has lines, Always</td><td>Off</td></tr>
+<tr><td>Battle playback speed</td><td>1×, 2×, 4× (one 4-hour battle step takes half a second at 1×)</td><td>1×</td></tr>
+<tr><td>Open the turn report</td><td>Every turn, When something important happened, Never</td><td>When something important happened</td></tr>
+<tr><td>Jump to events (the camera glides to the event&#39;s province)</td><td>On, Off</td><td>On</td></tr>
+<tr><td>Tooltips (hover after the delay, long press, or Y on a controller)</td><td>On, Off</td><td>On</td></tr>
+<tr><td>Tooltip delay (desktop, web)</td><td>Instant, Short 0.3 s, Long 0.8 s</td><td>Short</td></tr>
+<tr><td>Detailed tooltips (the full breakdown, &quot;+12 from the market, −3 from the war tax&quot;)</td><td>On, Off</td><td>Off</td></tr>
+<tr><td>Tutorial hints, and the action &quot;Reset tutorial and hints&quot;</td><td>On, Off</td><td>On</td></tr>
+<tr><td>Achievement toasts (Off hides the toast; achievements still unlock)</td><td>On, Off</td><td>On</td></tr>
+<tr><td>Place names</td><td>Historical, Modern</td><td>Historical</td></tr>
+<tr><td>Date format</td><td>20 September 1378, 20 Sep 1378, 20.09.1378, 1378-09-20</td><td>follows the language</td></tr>
+</tbody></table></div>
+<p>Autosave Off stops only the rotating autosaves, never the Resume save (see <a href="/wiki/Saving">Saving</a>). In an ironman campaign both autosave rows are hidden. When Confirm End turn asks, the question names the count (&quot;3 warnings, 2 events wait for you · Look · End turn anyway&quot;). Your battles never stop the turn and can&#39;t be skipped; they slow the week to 4-hour steps while they run, and that is not a setting. Turns are weeks, so the autosave goes by the calendar, never more than once a month. When events are still unanswered, End turn opens the first one instead of asking. There is no advisor row; muting a kind of warning happens on the Attention screen. Historical place names change with date and owner (Constantinople becomes Istanbul in Ottoman hands); no historical name list is planned, so both options show today&#39;s region names.</p>
+<h3 id="controls"><a class="anchor" href="#controls" aria-label="Link to this section">#</a>Controls</h3>
+<p><strong>Touch</strong> (mobile, and touch screens on desktop):</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Setting</th><th>Options</th><th>Default</th></tr></thead>
+<tbody>
+<tr><td>Main hand (Left moves the action bar and End turn to the left and the game menu button to the right)</td><td>Right, Left</td><td>Right</td></tr>
+<tr><td>Long-press time</td><td>Short 0.3 s, Medium 0.5 s, Long 0.8 s</td><td>Medium</td></tr>
+<tr><td>Double-tap to zoom</td><td>On, Off</td><td>On</td></tr>
+<tr><td>Pan and zoom speed</td><td>Slow, Medium, Fast</td><td>Medium</td></tr>
+</tbody></table></div>
+<p><strong>Mouse and keyboard</strong> (desktop, web):</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Setting</th><th>Options</th><th>Default</th></tr></thead>
+<tbody>
+<tr><td>Right-click gives orders</td><td>On, Off</td><td>On</td></tr>
+<tr><td>Wheel zoom</td><td>Toward the cursor, Toward the centre</td><td>Toward the cursor</td></tr>
+<tr><td>Edge scrolling</td><td>On, Off, On in fullscreen</td><td>per profile</td></tr>
+<tr><td>Pan speed for keys and edge</td><td>Slow, Medium, Fast</td><td>Medium</td></tr>
+</tbody></table></div>
+<p>With Right-click on, left-click selects an army and right-click on a province marches it; with it off, you use the touch flow (tap army, tap province; there is no confirm step). The touch flow always works too. Any action can be rebound, with two keys per action; a conflict asks &quot;Also bound to X, swap?&quot;.</p>
+<p>Default keys:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Action</th><th>Keys</th></tr></thead>
+<tbody>
+<tr><td>Pan</td><td>W A S D or the arrow keys</td></tr>
+<tr><td>Zoom</td><td>wheel, <code>+</code> / <code>−</code>, <code>Q</code> / <code>E</code></td></tr>
+<tr><td>End turn</td><td><code>Enter</code> (hold 0.5 s, or press twice when Hold actions is off)</td></tr>
+<tr><td>Game menu</td><td><code>Esc</code></td></tr>
+<tr><td>Map modes (realms, terrain, people, wealth, walls, food)</td><td><code>1</code> to <code>6</code>, <code>Tab</code> cycles</td></tr>
+<tr><td>Next / previous army</td><td><code>.</code> / <code>,</code></td></tr>
+<tr><td>Next notification</td><td><code>N</code></td></tr>
+<tr><td>Turn report</td><td><code>R</code></td></tr>
+<tr><td>Jump to capital</td><td><code>Home</code></td></tr>
+<tr><td>Ledger</td><td><code>L</code></td></tr>
+</tbody></table></div>
+<p><strong>Controller:</strong></p>
+<div class="table-scroll"><table>
+<thead><tr><th>Setting</th><th>Options</th><th>Default</th></tr></thead>
+<tbody>
+<tr><td>Button prompts</td><td>Auto, Xbox, PlayStation, Nintendo, Steam Controller, Steam Deck</td><td>Auto (the last controller used)</td></tr>
+<tr><td>Confirm button (swaps confirm and back)</td><td>Bottom (A / ✕), Right (B / ○)</td><td>Bottom; Right when a Nintendo layout is detected</td></tr>
+<tr><td>Cursor speed</td><td>Slow, Medium, Fast</td><td>per profile</td></tr>
+<tr><td>Cursor acceleration</td><td>On, Off</td><td>On</td></tr>
+<tr><td>Snap to provinces (the cursor slows over a province&#39;s centre and its armies, so a stick can hit small provinces in the Holy Roman Empire)</td><td>Off, Light, Strong</td><td>Light</td></tr>
+<tr><td>Stick deadzone (not shown on Steam)</td><td>5 to 30 %</td><td>12 %</td></tr>
+<tr><td>Vibration</td><td>Off, Light, Full</td><td>Light</td></tr>
+<tr><td>Gyro cursor (Steam Controller, Deck, PlayStation)</td><td>Off, While touching the right trackpad or stick, Always</td><td>Off</td></tr>
+<tr><td>Hold to open the action menu</td><td>Hold, Tap</td><td>Hold</td></tr>
+</tbody></table></div>
+<p>On Steam, prompts come from Steam Input so they match your own bindings, rebinding happens in Steam&#39;s own panel (&quot;Open Steam controller settings&quot;), and the in-game rebind list, deadzone and gyro rows hide. Off Steam (iOS, Android, web, non-Steam desktop), controllers come through the Gamepad API and the in-game rebind list and deadzone row appear; the gyro row shows only where the platform reports motion.</p>
+<p>Default controller layout (Xbox names):</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Input</th><th>Map</th><th>Menus and panels</th><th>Battle view</th></tr></thead>
+<tbody>
+<tr><td>Left stick</td><td>map cursor</td><td>move focus</td><td></td></tr>
+<tr><td>Right stick</td><td>pan</td><td>scroll</td><td>pan</td></tr>
+<tr><td>LT / RT</td><td>zoom out / in</td><td>previous / next page</td><td>slower / faster</td></tr>
+<tr><td>A</td><td>select</td><td>confirm</td><td>change standing orders</td></tr>
+<tr><td>B</td><td>deselect, back</td><td>back</td><td>leave the battle view</td></tr>
+<tr><td>X</td><td>action menu</td><td>reset row</td><td>order a retreat</td></tr>
+<tr><td>Y</td><td>info card</td><td>long description</td><td>commander&#39;s line</td></tr>
+<tr><td>LB / RB</td><td>previous / next army</td><td>previous / next tab</td><td>previous / next running battle</td></tr>
+<tr><td>D-pad up / down</td><td>cycle map modes</td><td>move focus</td><td></td></tr>
+<tr><td>D-pad left / right</td><td>previous / next notification</td><td>step a value</td><td></td></tr>
+<tr><td>View</td><td>turn report; hold 0.5 s for End turn</td><td></td><td></td></tr>
+<tr><td>Menu</td><td>game menu</td><td>close the panel</td><td>game menu</td></tr>
+<tr><td>Left stick click</td><td>jump to capital</td><td></td><td></td></tr>
+<tr><td>Right stick click</td><td>recentre on the selection</td><td></td><td></td></tr>
+</tbody></table></div>
+<p>The official Steam Input configuration for the Steam Controller and Steam Deck adds: the right trackpad as a mouse-like cursor with momentum; the left trackpad for panning, with a click zooming to the province under the cursor; back grips for previous and next notification and for the ledger and turn report; and gyro off by default, offered as &quot;aim while touching the right trackpad&quot;. On Steam the game declares three action sets (Map, Menu, Battle) plus a Text layer for the on-screen keyboard, and ships official configurations for the Steam Controller, Steam Deck, Xbox, PlayStation and Nintendo controllers.</p>
+<h3 id="accessibility"><a class="anchor" href="#accessibility" aria-label="Link to this section">#</a>Accessibility</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Setting</th><th>Options</th><th>Default</th></tr></thead>
+<tbody>
+<tr><td>Colour vision</td><td>Default, Red-weak, Green-weak, Blue-weak, No colour</td><td>Default</td></tr>
+<tr><td>Patterns on map modes</td><td>On, Off</td><td>Off (On with No colour)</td></tr>
+<tr><td>Borders</td><td>Normal, Thick, High contrast</td><td>Normal</td></tr>
+<tr><td>Text size</td><td>Normal (17 px), Large (20 px), Larger (24 px), before interface scale</td><td>per profile</td></tr>
+<tr><td>Font</td><td>Pixel, Plain</td><td>Pixel</td></tr>
+<tr><td>High contrast panels</td><td>On, Off</td><td>Off</td></tr>
+<tr><td>Touch target size</td><td>Normal (44 points), Large (56 points)</td><td>per profile</td></tr>
+<tr><td>Reduced motion</td><td>Follow system, On, Off</td><td>Follow system</td></tr>
+<tr><td>No flashes</td><td>On, Off</td><td>Off</td></tr>
+<tr><td>Hold actions</td><td>On, Off</td><td>On</td></tr>
+<tr><td>Screen reader support</td><td>Follow system</td><td></td></tr>
+</tbody></table></div>
+<ul>
+<li><strong>Colour vision</strong> swaps nation colours to a second assignment from the same 32-colour palette, chosen so neighbours stay distinguishable for that vision type, and each map mode&#39;s colour ramp to a safe one (blue to orange instead of red to green). No colour uses greys with patterns. Every mode keeps the map&#39;s season colours (snow, spring green, autumn gold, the wet season) apart: the colour-blind modes shift them with the safe ramp and No colour uses tile patterns. Seasons cannot be switched off.</li>
+<li><strong>Patterns on map modes</strong> adds hatching, dots and stripes by band, so a map mode reads without colour.</li>
+<li>In the colour-blind modes the realms keep a colour near their own where they can, but never one their neighbours can&#39;t be told from by that kind of colour vision. Map modes that ran red to green (Food, Diplomacy, Subjects, Exploration) run orange for bad or hostile and blue for good or friendly, and the ramps (People, Wealth, Trade) run pale orange to dark blue, lighter to darker, so they also read in grey. With No colour every realm is a grey with a pattern of its own beside its neighbours.</li>
+<li><strong>High contrast borders</strong> draw nation borders in black and white ink two art pixels wide.</li>
+<li><strong>Text size</strong>: panels reflow and cards grow taller, not smaller.</li>
+<li><strong>Plain font</strong> replaces the pixel font and the blackletter titles with a clear, openly licensed sans such as Atkinson Hyperlegible.</li>
+<li><strong>High contrast panels</strong>: solid backgrounds instead of parchment, stronger outlines, no text over patterns.</li>
+<li><strong>Reduced motion</strong>: camera cuts instead of glides, no screen shake, and Animations drop to Reduced. It follows the system setting by default.</li>
+<li><strong>No flashes</strong> removes cannon flashes, lightning and white flashes on battle results.</li>
+<li><strong>Hold actions</strong> off replaces every &quot;hold to&quot; (End turn, the action menu) with &quot;press twice&quot;.</li>
+<li><strong>Screen reader support</strong>: menus, panels and cards carry labels for VoiceOver, TalkBack and Narrator. The map itself is not narrated, but the selected province&#39;s card is.</li>
+</ul>
+<p>When a setting drives others (Battery saver, Reduced motion, Colour vision &quot;No colour&quot;), each driven row shows &quot;Set by &lt;setting&gt;&quot; and can still be changed by hand.</p>
+<h3 id="language"><a class="anchor" href="#language" aria-label="Link to this section">#</a>Language</h3>
+<ul>
+<li><strong>Language:</strong> the launch list; default is the system language if supported, otherwise English. Interface text changes live; event and catalogue text reload on the next panel open. A language in a non-Latin script joins the list only once the localisation design has a font for it, because the pixel font covers Latin only.</li>
+<li><strong>Number format:</strong> follows the language, 1,000.5, 1.000,5 or 1 000,5.</li>
+</ul>
+<h3 id="account-privacy-and-about"><a class="anchor" href="#account-privacy-and-about" aria-label="Link to this section">#</a>Account, privacy and about</h3>
+<ul>
+<li><strong>Account:</strong> Sign in or Create account; when signed in, your email and Sign out. Default signed out, never a wall before playing. The Load screen&#39;s &quot;Sign in to sync&quot; opens the same flow.</li>
+<li>While signed in: <strong>Cloud saves</strong> (On by default, syncing saves and personal settings), <strong>Sync on Wi-Fi only</strong> (Off by default), the list of signed-in devices each with Sign out, and <strong>Delete account and saves</strong> with a confirmation (also reachable from Privacy).</li>
+<li><strong>Privacy:</strong> Send crash reports and Send anonymous usage statistics (asked on first launch), and, in the free mobile tier only if the ad stays, Ad consent, which reopens the consent form.</li>
+<li><strong>About:</strong> version and build number, Restore purchases (which Apple requires to be reachable), Credits and licences, Reset all settings, and Copy diagnostics (the diagnostics line and your settings on the clipboard for support).</li>
+</ul>
+<h3 id="platform-notes"><a class="anchor" href="#platform-notes" aria-label="Link to this section">#</a>Platform notes</h3>
+<ul>
+<li><strong>Steam Deck:</strong> body text about 19 px at 112 % (17 px at 100 %) at 1280 × 800; starts fullscreen with Deck glyphs; Settings needs no mouse or keyboard anywhere; naming a save calls Steam&#39;s floating gamepad keyboard.</li>
+<li><strong>Big screen:</strong> 175 % scale and Large text (the same physical size at 4K), a slow cursor, a 5 % margin with the calibration screen, focus outlines always on.</li>
+<li><strong>Safe areas</strong> (notch, home bar, camera hole) are always respected; this is not a setting.</li>
+<li><strong>Android:</strong> the back gesture behaves like B or <code>Esc</code>: it closes the top panel, then opens the game menu, and never quits the game from the map without asking.</li>
+<li><strong>iOS:</strong> the silent switch and &quot;Let other apps&#39; audio play&quot; use the native ambient audio session.</li>
+</ul>
+<h3 id="the-settings-file-format"><a class="anchor" href="#the-settings-file-format" aria-label="Link to this section">#</a>The settings file format</h3>
+<p>Each entry in <code>settings.yaml</code> carries an <code>id</code> (<code>section.name</code>, also the key in the settings files), <code>section</code>, <code>type</code> (choice, toggle, slider, binding, action), <code>options</code>, <code>default</code>, <code>default_by_profile</code>, <code>platforms</code>, <code>hide_on</code> (rows Steam Input owns), <code>applies</code> (live, view, restart), <code>sync</code> (device or personal) and optionally <code>sets_when_on</code>. A slider adds <code>min</code>, <code>max</code> and <code>step</code>; an action is a button such as Reset or Restore purchases. Names and descriptions are string keys (<code>settings.&lt;id&gt;.name</code>, <code>settings.&lt;id&gt;.desc</code>), never text in the file.</p>
+<h3 id="tests"><a class="anchor" href="#tests" aria-label="Link to this section">#</a>Tests</h3>
+<ul>
+<li>A smoke test opens Settings on each profile, steps through every row with the keyboard only, and fails if focus is lost or a row cannot be reached.</li>
+<li>A schema test checks that <code>settings.yaml</code> loads, every default is one of its options, and every string key exists in English.</li>
+<li>The accessibility checks include screenshots of the map in each colour vision mode run through a colour-blindness simulator.</li>
+<li>On a Steam Deck, every row must be reachable with the built-in controls and legible at arm&#39;s length.</li>
+</ul>
+<h2 id="what-you-see"><a class="anchor" href="#what-you-see" aria-label="Link to this section">#</a>What you see</h2>
+<p>The Settings screen with its nine sections, the changed dot, per-row and per-section reset, the &quot;Keep this display?&quot; question, the calibration screen, &quot;Set by …&quot; on driven rows, and the read-only Campaign rules section.</p>
+<h2 id="how-it-connects"><a class="anchor" href="#how-it-connects" aria-label="Link to this section">#</a>How it connects</h2>
+<ul>
+<li><a href="/wiki/Saving">Saving</a>: the autosave values, the Cloud saves row, Wi-Fi only, account and devices; personal settings ride the same account sync and store backups.</li>
+<li><a href="/wiki/Screens-and-Navigation">Screens and navigation</a>: where Settings opens, Confirm End turn, the turn report, the Far layout, scale and text size, prompts, hold actions, main hand, Android back.</li>
+<li><a href="/wiki/Music-and-Sound">Music and sound</a>: buses, volumes, music variety, zoom mix, ambience, haptics, captions, reduced intensity, mono and background play.</li>
+<li><a href="/wiki/Map-and-Lenses">Map and Map Modes</a>: sharpness, map detail, animations, frame cap, colour vision, borders, patterns, place names and the parchment switch.</li>
+<li><a href="/wiki/Tutorial-and-Help">Tutorial and help</a>: tutorial hints and their reset, tooltips and their delay, detailed tooltips.</li>
+<li><a href="/wiki/Achievements">Achievements</a>: the toast switch; achievements only count in ironman.</li>
+<li><a href="/wiki/The-1378-Start">The 1378 start</a>: the campaign rules shown read-only.</li>
+<li><a href="/wiki/Time-and-Turns">How a turn works</a>: Keep screen awake during the computer players&#39; turn.</li>
+<li><a href="/wiki/Warfare">Warfare</a>: battle playback speed and battle view controls.</li>
+<li><a href="/wiki/Historical-Events">Historical events</a>: Jump to events.</li>
+</ul>
+<p>Settings have no part in the monthly turn.</p>
+<h2 id="numbers"><a class="anchor" href="#numbers" aria-label="Link to this section">#</a>Numbers</h2>
+<p>From <code>settings.yaml</code>. These are settled values, not placeholders, unless noted.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>constants.battery_auto_threshold</code></td><td>0.20</td></tr>
+<tr><td><code>constants.display_revert_seconds</code></td><td>15</td></tr>
+<tr><td><code>constants.interface_scale_auto_min_layout</code></td><td>360 × 640 CSS px</td></tr>
+<tr><td><code>graphics.interface_scale.options</code></td><td>auto, 75, 88, 100, 112, 125, 150, 175, 200</td></tr>
+<tr><td><code>graphics.sharpness</code></td><td>Native ≤ 3, Balanced ≤ 2, Battery 1</td></tr>
+<tr><td><code>graphics.battery_saver.sets_when_on</code></td><td>frame cap 30, sharpness battery, animations reduced, worker budget low</td></tr>
+<tr><td><code>graphics.screen_margins</code></td><td>0 to 10 %, step 1, Big screen 5</td></tr>
+<tr><td><code>audio.master</code> / <code>music_volume</code> / <code>effects_volume</code> / <code>ambience_volume</code></td><td>80 / 70 / 80 / 50</td></tr>
+<tr><td><code>gameplay.tooltip_delay</code></td><td>instant, 0.3 s, 0.8 s</td></tr>
+<tr><td><code>gameplay.battle_speed</code></td><td>1, 2, 4</td></tr>
+<tr><td><code>controls.long_press</code></td><td>0.3 / 0.5 / 0.8 s</td></tr>
+<tr><td><code>controls.keys.end_turn</code></td><td>Enter, hold 0.5 s</td></tr>
+<tr><td><code>controls.deadzone</code></td><td>5 to 30 %, default 12</td></tr>
+<tr><td><code>controls.pad.map.end_turn.hold_seconds</code></td><td>0.5</td></tr>
+<tr><td><code>accessibility.text_size.body_px</code></td><td>17 / 20 / 24</td></tr>
+<tr><td><code>accessibility.touch_targets.points</code></td><td>44 / 56</td></tr>
+<tr><td>Interface sounds level (sound effects config)</td><td>about 6 dB under the music</td></tr>
+<tr><td>Steam Deck and Big screen body text</td><td>about 19 px and 35 px, still to check against Valve&#39;s guidance</td></tr>
+</tbody></table></div>
+<h2 id="still-open"><a class="anchor" href="#still-open" aria-label="Link to this section">#</a>Still open</h2>
+<ul>
+<li>Privacy and consent rows, the store screens and Restore purchases, and the Big screen and Steam Deck text sizes need a store and Valve Steamworks check before release.</li>
+</ul>
+<h2 id="for-developers"><a class="anchor" href="#for-developers" aria-label="Link to this section">#</a>For developers</h2>
+<ul>
+<li>Spec: <a href="https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/settings/spec.md" rel="noopener"><code>domain/settings/spec.md</code></a>, requirement code <strong>SET</strong> (SET-001 to SET-130).</li>
+<li>Features: <code>domain/settings/features/</code> (settings-screen, device-profiles, storage-and-sync, campaign-rules, graphics, audio, gameplay, controls, accessibility, language-account-about, platform-notes, settings-data).</li>
+<li>Code: <code>packages/engine/src/domain/settings/</code>, data in <code>packages/rules/data/domain/settings.json</code>. The example file is <code>settings/settings.example.yaml</code> in the designs. Today&#39;s client caps the device-pixel ratio at 2 in <code>apps/client/src/map/mapView.ts</code> (to become Sharpness) and shows the diagnostics line (to move behind Show performance line). The smoke test extends <code>pnpm --filter @ph/client smoke</code>.</li>
+</ul>

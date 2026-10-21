@@ -1,6 +1,6 @@
 {
  "$comment": "Warfare (domain/warfare/spec.md). One warfare config file (WAR-199). Every value is a placeholder from warfare-design v5, warfare-eras and warfare-styles (spec §10); key names follow spec §10. Era VIII and the part of era VII after 31 August 1939 are out of scope.",
- "_provisional": ["hits_per_bell", "kinds", "flee", "troop_cap", "drill_max", "sectors.Shore.attack_across", "ai.standing_orders", "ai.raids_at", "ai.war_chest_months", "amounts", "later_arms", "levels_by_era", "era_scale", "occupation.tax_share"],
+ "_provisional": ["hits_per_bell", "kinds", "flee", "troop_cap", "drill_max", "sectors.Shore.attack_across", "ai.standing_orders", "ai.raids_at", "ai.war_chest_months", "amounts", "later_arms", "levels_by_era", "era_scale", "occupation.tax_share", "lords.min_men", "lords.retinue_horse_share", "lords.retinue_horse_arm"],
  "$decisions": "D-WAR-1..21 (spec §13). Standing regiments break at 30 % (D-WAR-15), the Shore sector costs -20 % across a river (D-WAR-5), drill runs to 24 (D-WAR-9).",
  "skill_growth": {
   "$comment": "WAR-158, D-WAR-13: the staff college is the academy of eras VI-VII.",
@@ -81,7 +81,7 @@
  "troop_cap": { "with_official": 0.02, "muster_master": 0.03, "without": 0.01, "w12": 0.005, "w15": 2, "w18": 0.01 },
  "over_cap": { "pay": 2, "desertion": 0.05 },
  "levy_gather_days": 14,
- "lords": { "loyal_days": 21, "wavering_days": 42, "wavering_stay_months": 6, "wavering_share": 0.5 },
+ "lords": { "loyal_days": 21, "wavering_days": 42, "wavering_stay_months": 6, "wavering_share": 0.5, "min_men": 100, "retinue_horse_share": 0.2, "retinue_horse_arm": "knights and lancers" },
  "free_companies": [
   { "group": "Swiss and German foot", "people": "Swiss Confederacy", "regions": ["Swiss Confederacy", "the Empire"] },
   { "group": "Italian condottieri", "people": "Italian states", "regions": ["Italy"] },
@@ -256,6 +256,7 @@
  },
  "castle_ground": { "hills": 0.25, "mountains": 0.50 },
  "siege": { "close_ratio": 3, "b7_multiplier": 1.5, "repair_men": 200, "sally_share": 0.3333333333333333, "hunger_loss": 0.10, "hunger_break": -0.10, "fever_after_months": 3, "fever_mul": 2, "ration": 1 },
+ "castle_supply": { "$comment": "Castles starve besiegers (Leroy, 19 Oct; WAR-263 to WAR-269): a held castle gathers the land's food behind its walls, so enemy foragers find less in its province (by castle step: earthwork, stone, bastion, star, concrete) and reach_share of that in the provinces it reaches by road; armies besieging it eat more by its step.", "provisional": true, "forage_cut_by_step": [0.3, 0.45, 0.6, 0.7, 0.8], "reach_share": 0.5, "besieger_eat_by_step": [1.15, 1.25, 1.3, 1.35, 1.4] },
  "storm": { "room_per_breach": 500, "losses": 1.5, "scaling": 2, "bells": 6 },
  "sack": { "plunder_tax_years": 1, "town_buildings": 0.3333333333333333, "townsfolk": 0.10, "cruel": 1.5 },
  "relief_bonus": 0.10,

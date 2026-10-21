@@ -79,7 +79,7 @@ Newest decision first.
 | Season | Three months. North: spring March–May, summer June–August, autumn September–November, winter December–February; the south the other way round, by the province's latitude (X-4) | Wet season (defined per climate) |
 | Harvest month | September in the north, March in the south; rice paddies harvest in both (D-TIME-5) | — |
 | Battle step | A 4-hour step while a battle the player's army or fleet is in runs: time keeps passing, the player may change standing orders, retreat or switch battle; there is no skip (X-1) | The battle report |
-| World domination | Owning or holding as subjects half of the world's settled land provinces; checked each January turn (X-12) | Best at the end |
+| World domination | Owning or holding as subjects every settled land province of the world; checked each January turn (X-12, X-28) | Best at the end |
 | Best at the end | On 31 August 1939 the realm leading the Economy, Power or Technology score wins in that score; ties share (X-12) | — |
 | Winter | December to February in the north, June to August in the south | Snow-pass closure (December to March / June to September) |
 | Wet season | By climate: monsoon Asia June–September, Sahel and savanna July–September, Amazon December–May (config) | Winter |
@@ -160,7 +160,7 @@ Newest decision first.
 - TIME-007 (Event-driven): When the end date is reached, the game shall end the campaign: the final wrap-up event or events, the closing sequence and the final result. [screen-flow E2]
 - TIME-008 (Unwanted): If the end date has been reached, then the game shall not process any further turn ("no play on past the end date"). [screen-flow E2]
 - TIME-009 (Ubiquitous): The game shall contain no content after 1939: no Era VIII, no 1939–1960 part of Era VII, no Second World War events and no Decolonization, Cold War or Globalization ages. [gap-lists decisions, items 22–24]
-- TIME-010 (Event-driven): When a January turn finds a realm owning or holding as subjects half of the world's settled land provinces, the game shall declare its world-domination win at once and let the campaign go on to the end date. [X-12; D-TIME-10]
+- TIME-010 (Event-driven): When a January turn finds a realm owning or holding as subjects every one of the world's settled land provinces (X-28; it was half), the game shall declare its world-domination win at once and let the campaign go on to the end date. [X-12; D-TIME-10]
 
 ### 5.2 Orders and End turn
 
@@ -291,7 +291,7 @@ troop-movement). `NewGame`'s request shape is the one save-system §9 suggests f
 | `MonthEnded` | The turn in which a new month begins, at its end | turn, month | every context with a monthly step |
 | `SeasonStarted` | The turn in which 1 March, 1 June, 1 September or 1 December falls (D-TIME-5) | season by hemisphere | province, buildings, subjects, diplomacy, naval |
 | `YearStarted` | The January turn (D-TIME-6) | year | province, buildings, culture, religion, diplomacy, realm (domination check), achievements (`year_end`) |
-| `WorldDominationReached` | A January turn finds a realm at half the settled land provinces | nation, date | game-shell, achievements |
+| `WorldDominationReached` | A January turn finds a realm holding every settled land province | nation, date | game-shell, achievements |
 | `TurnEnded` | Date advanced | turn, new date, rejected orders | saves (Resume save), achievements (`turn_end`), onboarding (checks), game-shell (events, turn report), audio |
 | `CampaignEnded` | End date reached | date, reason, winners by score | game-shell (E2, E3), achievements (`campaign_end`), events (wrap-up) |
 
@@ -379,7 +379,7 @@ the turn in which a new month, season or year begins (X-18). What each system do
 | `seasons.startMonths`, `seasons.harvestMonth`, `seasons.paddyHarvestMonths` | Seasonal and harvest months | 3, 6, 9, 12; north 9, south 3; 3 and 9 | No (X-4) | `time-and-turns.json` |
 | `yearlyMonth`, `fiveYearlyEvery` | Yearly and five-yearly steps | January; years divisible by 5 | No (D-TIME-6) | `time-and-turns.json` |
 | `turnStages`, `monthlyContextOrder`, `moverKindOrder` | Turn order | as X-2 | No | `time-and-turns.json` |
-| `victory.dominationShare`, `victory.checkMonth` | World domination | half; January | No (X-12) | `time-and-turns.json` |
+| `victory.dominationShare`, `victory.checkMonth` | World domination | the whole world, 1; January | No (X-12, X-28) | `time-and-turns.json` |
 | `playback.secondsPer10Days` | Month playback speed | 1 | Yes | `time-and-turns.json` |
 | `playback.secondsPerBattleStep` | Playback of one 4-hour step while a player battle runs | 0.5 | Yes | `time-and-turns.json` |
 | `battleStepsPerDay` | Steps a day splits into while a player battle runs | 6 (4 hours each) | No (X-1) | `time-and-turns.json` |
@@ -433,7 +433,7 @@ the turn in which a new month, season or year begins (X-18). What each system do
 
 ## 13. Decisions and open questions
 
-- **D-TIME-1** (was OQ-TIME-1) Start date: every campaign, the tutorial "The Year of Varna" included, starts on the start scenario's day with the turn counter at 0; the scenario's `scenario.json` holds the date and `newCampaign` uses it (the ruleset's `defines.startDate` is filled from it). X-25 moves the start to 20 September 1378; the bundled scenario stays 11 November 1444, the day the catalogue and relations data describe, until the 1378 scenario is built.
+- **D-TIME-1** (was OQ-TIME-1) Start date: every campaign, the tutorial "Murad's Frontier" included, starts on the start scenario's day with the turn counter at 0; the scenario's `scenario.json` holds the date and `newCampaign` uses it (the ruleset's `defines.startDate` is filled from it). X-25 moved the start to 20 September 1378 (the 1378 scenario, the default since the switch-over); 11 November 1444 stays as the main history checkpoint and the world the tests read.
 - **D-TIME-2** (was OQ-TIME-2) Global turn order: a turn runs orders, the day loop, monthly steps in the context order province, buildings, recruiting, realm, research, trade, subjects, government, diplomacy, culture, religion, rebellions, revolutions, then seasonal steps, yearly steps, events, achievements, autosave, and last the date moves; warfare, naval and exploration, which X-2 does not list, run their monthly steps first, as they close the day loop. X-2 settles it, and the context order replaces the old "buildings before overflow" and "faith mix with traders" constraints.
 - **D-TIME-3** (was OQ-TIME-3) Battles inside the turn: a battle starts on the day the day loop brings two hostile armies together and is fought one round per 4-hour step; while any player battle runs, each day is six 4-hour steps, each moving every other mover a sixth of a day, so armies can march in and join; the player may change standing orders, retreat, or switch between running battles at any step, and cannot skip the result; AI-only battles fight six rounds a day at once and never slow the game; any battle can be replayed from its notice. X-1 (Leroy, 17 Oct) settles it.
 - **D-TIME-4** (was OQ-TIME-4) Turn and month length: a turn is one week of 7 days, the last ending on 31 August 1939 and maybe shorter; a month has its real length, 28 to 31 days, with Gregorian leap years for every year (no 1582 switch); weekly steps (army food and hunger, plunder, raids, forced-march desertion, plague) run once at the end of every turn; monthly, seasonal and yearly steps run once at the end of the turn in which a new month, season or year begins, so their amounts keep their size; no rule counts in turns. X-3 and X-18 (Leroy, 17 Oct) settle it.
@@ -442,7 +442,7 @@ the turn in which a new month, season or year begins (X-18). What each system do
 - **D-TIME-7** (was OQ-TIME-7) Interrupted turns: a backgrounded app pauses the turn and carries on; a killed app processes the turn again from the last turn-boundary save with the same orders, which gives the same result because the turn is deterministic. Both texts hold for their own case, so the simpler reading keeps both.
 - **D-TIME-8** (was OQ-TIME-8) Ages past 1939: an age or period whose window opens before 31 August 1939 is cut at the end date (the Age of World Wars runs to the end), and an age that would start on a post-1939 event, the Age of Decolonization, never starts. X-14 settles it.
 - **D-TIME-9** (was OQ-TIME-9) Eras: eras follow the calendar, I 1378–1500 to VII 1914 to the end date, and Era VIII is dropped. X-14 settles it.
-- **D-TIME-10** (was OQ-TIME-10) When victory is judged: world domination (half of the world's settled land provinces owned or held as subjects) is checked in every January turn and wins at once without ending the campaign; the Economy, Power and Technology leaders are judged only on 31 August 1939, with ties sharing the win; realm owns the score formulas. X-12 settles it.
+- **D-TIME-10** (was OQ-TIME-10) When victory is judged: world domination (half of the world's settled land provinces owned or held as subjects) is checked in every January turn and wins at once without ending the campaign; the Economy, Power and Technology leaders are judged only on 31 August 1939, with ties sharing the win; realm owns the score formulas. X-12 settles it. *X-28 (Leroy, 19 Oct) changes it: world domination is the whole world, and the leaders are judged by growth of a 25-year average.*
 - **D-TIME-11** (was OQ-TIME-11) Campaign seed: setup and any warm-up (such as trade's months of traders) draw from the campaign's one `Rng` before turn 0 and move neither the date nor the turn counter. One seed and one generator is the simplest rule that keeps a campaign reproducible.
 - **D-TIME-12** (was OQ-TIME-12) Several acting nations: the player's orders are taken first, then each AI realm's in ascending nation index, each realm's in the order given. X-2 settles it.
 - **D-TIME-13** (was OQ-TIME-13) Order within a day: armies move, then fleets, then traders (and trade ships), then exploration ships, each kind in ascending id; then arrivals and battles, with sieges once a month in the monthly steps; so an army crossing a strait on the day an enemy fleet arrives there crosses first. X-2 settles it.

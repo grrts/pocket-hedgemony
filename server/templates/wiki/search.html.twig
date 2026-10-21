@@ -1,0 +1,22 @@
+{% extends 'wiki/layout.html.twig' %}
+
+{% block title %}{{ q ? 'Search: ' ~ q : 'Search' }} · Pocket Hegemony wiki{% endblock %}
+{% block meta %}<meta name="robots" content="noindex">{% endblock %}
+
+{% block wiki %}
+<article class="framed sheet">
+    <h1>Search</h1>
+    {% if not q %}
+    <p>Type a word above, such as <a href="{{ path('wiki_search', {q: 'siege'}) }}">siege</a>, <a href="{{ path('wiki_search', {q: 'trade ratio'}) }}">trade ratio</a> or <a href="{{ path('wiki_search', {q: 'heir'}) }}">heir</a>.</p>
+    {% elseif hits is empty %}
+    <p>No page mentions <strong>{{ q }}</strong>. Try fewer or shorter words.</p>
+    {% else %}
+    <p class="muted">{{ hits|length }} {{ hits|length == 1 ? 'page mentions' : 'pages mention' }} <strong>{{ q }}</strong>.</p>
+    <ol class="hits">
+        {% for hit in hits %}
+        <li><a href="{{ path('wiki_page', {slug: hit.slug}) }}">{{ hit.title }}</a><p>{{ hit.snippet }}</p></li>
+        {% endfor %}
+    </ol>
+    {% endif %}
+</article>
+{% endblock %}

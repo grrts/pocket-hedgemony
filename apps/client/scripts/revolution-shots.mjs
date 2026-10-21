@@ -75,6 +75,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
     continue;
   }
   await page.click("[data-nation=castile]");
+  await page.click("[data-begin]");
   await page.waitForFunction(() => window.__phTurn() >= 0, null, { timeout: 90000 });
   await page.waitForTimeout(1500);
   // First-campaign hints would cover the shots: stop them.

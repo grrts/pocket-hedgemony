@@ -30,7 +30,8 @@ describe("historical events (milestone 6)", () => {
       w.date = { ...w.date, month: (m % 12) + 1, year: 1445 + Math.floor(m / 12) };
       monthlyEvents(w, news);
     }
-    expect(w.events!.state.world.history.every((h) => h.year >= 1445)).toBe(true);
+    // The bridge events of 1378 to 1444 are history already (EVT-087); nothing fires before the months played.
+    expect(w.events!.state.world.history.filter((h) => h.year >= 1444).every((h) => h.year >= 1445)).toBe(true);
   });
 
   it("at the 1444 start the ages and periods of 1378 that still hold are under way, the rest are over (EVT-013, EVT-015, EVT-081)", () => {

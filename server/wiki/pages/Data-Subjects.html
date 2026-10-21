@@ -1,0 +1,316 @@
+<h1>Subjects data</h1>
+<p>Every value in the game&#39;s subjects config, exactly as the game reads it. This page is made from <code>packages/rules/data/domain/subjects.json</code> each time the config changes, so it always matches the game. How these values are used is explained on <a href="/wiki/Subjects">Subjects</a>.</p>
+<p>Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and values marked (provisional) are placeholders that may still change in balancing. Inventions are shown by id and name; see <a href="/wiki/Data-Research#inventions">Research data</a>.</p>
+<blockquote>
+<p>Placeholder balance values for subjects-design.md. Loyalty steps are the lords&#39; steps (country stats 5.5). No percentage meter. Copied from subjects/config/subject-rules.json. Keys under reasons marked from_design are the design&#39;s own numbers (subjects-design 4, 5) that the source config does not list.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>schema_version</code></td><td>1</td></tr>
+</tbody></table></div>
+<h2 id="gift"><a class="anchor" href="#gift" aria-label="Link to this section">#</a>Gift</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>months_of_income</code> (provisional)</td><td>6</td></tr>
+</tbody></table></div>
+<h2 id="loyalty"><a class="anchor" href="#loyalty" aria-label="Link to this section">#</a>Loyalty</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>steps</code></td><td>loyal, wavering, disloyal, in_revolt</td></tr>
+<tr><td><code>check_every_months</code></td><td>3</td></tr>
+<tr><td><code>step_up_at</code></td><td>2</td></tr>
+<tr><td><code>step_down_at</code></td><td>-2</td></tr>
+<tr><td><code>min_months_between_same_direction_steps</code></td><td>12</td></tr>
+<tr><td><code>start_1444_hostile_stance_steps_down</code></td><td>1</td></tr>
+</tbody></table></div>
+<h3 id="effects"><a class="anchor" href="#effects" aria-label="Link to this section">#</a>Effects</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>pays</th><th>call</th><th>foreign envoys</th><th>can fold in</th><th>goes home after months</th><th>hides army</th><th>state</th></tr></thead>
+<tbody>
+<tr><td>loyal</td><td>1</td><td>full_at_once</td><td>refused</td><td>yes</td><td></td><td></td><td></td></tr>
+<tr><td>wavering</td><td>0.5</td><td>half_late</td><td>listens</td><td></td><td>6</td><td></td><td></td></tr>
+<tr><td>disloyal</td><td>0</td><td>refuses</td><td>seeks_backer</td><td></td><td></td><td>yes</td><td></td></tr>
+<tr><td>in_revolt</td><td>0</td><td></td><td></td><td></td><td></td><td></td><td>independence_war</td></tr>
+</tbody></table></div>
+<h3 id="start-1444-by-autonomy"><a class="anchor" href="#start-1444-by-autonomy" aria-label="Link to this section">#</a>Start 1444 by autonomy</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>very_low</code></td><td>loyal</td></tr>
+<tr><td><code>low</code></td><td>loyal</td></tr>
+<tr><td><code>moderate</code></td><td>loyal</td></tr>
+<tr><td><code>high</code></td><td>wavering</td></tr>
+<tr><td><code>very_high</code></td><td>wavering</td></tr>
+</tbody></table></div>
+<h3 id="tint-by-step"><a class="anchor" href="#tint-by-step" aria-label="Link to this section">#</a>Tint by step</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>loyal</code></td><td>green</td></tr>
+<tr><td><code>wavering</code></td><td>yellow</td></tr>
+<tr><td><code>disloyal</code></td><td>orange</td></tr>
+<tr><td><code>in_revolt</code></td><td>red</td></tr>
+<tr><td><code>from_design</code></td><td>10.3</td></tr>
+</tbody></table></div>
+<h2 id="kinds"><a class="anchor" href="#kinds" aria-label="Link to this section">#</a>Kinds</h2>
+<h3 id="vassal"><a class="anchor" href="#vassal" aria-label="Link to this section">#</a>Vassal</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>icon</code></td><td>shield</td></tr>
+<tr><td><code>pays_share</code></td><td>0.1</td></tr>
+<tr><td><code>fights</code></td><td>when_called_by_loyalty</td></tr>
+<tr><td><code>own_diplomacy</code></td><td>limited</td></tr>
+<tr><td><code>own_subjects</code></td><td>yes</td></tr>
+<tr><td><code>overlord_owes</code></td><td>defence</td></tr>
+<tr><td><code>reach_weight</code></td><td>1</td></tr>
+<tr><td><code>drift</code></td><td>0</td></tr>
+<tr><td><code>fold_in</code></td><td>lord</td></tr>
+</tbody></table></div>
+<h3 id="tributary"><a class="anchor" href="#tributary" aria-label="Link to this section">#</a>Tributary</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>icon</code></td><td>chest</td></tr>
+<tr><td><code>pays_share</code></td><td>0.15</td></tr>
+<tr><td><code>fights</code></td><td>never</td></tr>
+<tr><td><code>own_diplomacy</code></td><td>full</td></tr>
+<tr><td><code>own_subjects</code></td><td>yes</td></tr>
+<tr><td><code>overlord_owes</code></td><td>defence_except_from_overlord</td></tr>
+<tr><td><code>reach_weight</code></td><td>0.5</td></tr>
+<tr><td><code>drift</code></td><td>-1</td></tr>
+<tr><td><code>fold_in</code></td><td>tighten_first</td></tr>
+</tbody></table></div>
+<h3 id="union"><a class="anchor" href="#union" aria-label="Link to this section">#</a>Union</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>icon</code></td><td>two_crowns</td></tr>
+<tr><td><code>pays_share</code></td><td>0.05</td></tr>
+<tr><td><code>fights</code></td><td>always_if_loyal_or_wavering</td></tr>
+<tr><td><code>own_diplomacy</code></td><td>none</td></tr>
+<tr><td><code>own_subjects</code></td><td>yes</td></tr>
+<tr><td><code>overlord_owes</code></td><td>defence, shared_ruler</td></tr>
+<tr><td><code>reach_weight</code></td><td>1</td></tr>
+<tr><td><code>drift</code></td><td>0</td></tr>
+<tr><td><code>fold_in</code></td><td>merge_crowns</td></tr>
+<tr><td><code>merge_requires_years</code></td><td>50</td></tr>
+</tbody></table></div>
+<h3 id="march"><a class="anchor" href="#march" aria-label="Link to this section">#</a>March</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>icon</code></td><td>watchtower</td></tr>
+<tr><td><code>pays_share</code></td><td>0</td></tr>
+<tr><td><code>fights</code></td><td>own_frontier_only</td></tr>
+<tr><td><code>own_diplomacy</code></td><td>no_alliances</td></tr>
+<tr><td><code>own_subjects</code></td><td>no</td></tr>
+<tr><td><code>overlord_owes</code></td><td>yearly_stipend</td></tr>
+<tr><td><code>reach_weight</code></td><td>0.5</td></tr>
+<tr><td><code>drift</code></td><td>-1</td></tr>
+<tr><td><code>fold_in</code></td><td>lord</td></tr>
+</tbody></table></div>
+<h3 id="colony"><a class="anchor" href="#colony" aria-label="Link to this section">#</a>Colony</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>icon</code></td><td>anchor</td></tr>
+<tr><td><code>pays_share</code></td><td>0.25</td></tr>
+<tr><td><code>fights</code></td><td>defends_self</td></tr>
+<tr><td><code>own_diplomacy</code></td><td>none</td></tr>
+<tr><td><code>own_subjects</code></td><td>no</td></tr>
+<tr><td><code>overlord_owes</code></td><td>defence, sea_route</td></tr>
+<tr><td><code>reach_weight</code></td><td>1</td></tr>
+<tr><td><code>drift</code></td><td>0</td></tr>
+<tr><td><code>fold_in</code></td><td>royal_land</td></tr>
+</tbody></table></div>
+<h4 id="stages"><a class="anchor" href="#stages" aria-label="Link to this section">#</a>Stages</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>pays share</th><th>min provinces</th><th>militia</th><th>min years</th><th>fold in</th></tr></thead>
+<tbody>
+<tr><td>outpost</td><td>0.25</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>settled</td><td>0.25</td><td>5</td><td>yes</td><td></td><td></td></tr>
+<tr><td>self_governing</td><td>0.1</td><td>10</td><td></td><td>50</td><td>never</td></tr>
+</tbody></table></div>
+<h3 id="protectorate"><a class="anchor" href="#protectorate" aria-label="Link to this section">#</a>Protectorate</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>icon</code></td><td>key</td></tr>
+<tr><td><code>pays_share</code></td><td>0.1</td></tr>
+<tr><td><code>fights</code></td><td>when_called_by_loyalty</td></tr>
+<tr><td><code>own_diplomacy</code></td><td>none</td></tr>
+<tr><td><code>own_subjects</code></td><td>no</td></tr>
+<tr><td><code>overlord_owes</code></td><td>defence</td></tr>
+<tr><td><code>reach_weight</code></td><td>1</td></tr>
+<tr><td><code>drift</code></td><td>-1</td></tr>
+<tr><td><code>fold_in</code></td><td>lord</td></tr>
+<tr><td><code>min_era</code></td><td>VI</td></tr>
+<tr><td><code>min_era_overseas_trade_empire</code></td><td>IV</td></tr>
+<tr><td><code>overseas_trade_empire_min_regions</code> (provisional)</td><td>2</td></tr>
+</tbody></table></div>
+<h2 id="ties"><a class="anchor" href="#ties" aria-label="Link to this section">#</a>Ties</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>loyalty</th><th>claim on overlord throne if line ends</th><th>pays share</th><th>fights</th><th>reach weight</th><th>second master share</th><th>loyalty if harmed</th></tr></thead>
+<tbody>
+<tr><td>kin</td><td>1</td><td>yes</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>held_of_the_church</td><td></td><td></td><td>0.01</td><td>never</td><td></td><td></td><td></td></tr>
+<tr><td>held_in_fief</td><td></td><td></td><td>0.01</td><td>never</td><td>0.5</td><td></td><td></td></tr>
+<tr><td>second_master</td><td></td><td></td><td></td><td></td><td></td><td>0.05</td><td></td></tr>
+<tr><td>hostage_at_court</td><td>1</td><td></td><td></td><td></td><td></td><td></td><td>-2</td></tr>
+</tbody></table></div>
+<h2 id="reasons"><a class="anchor" href="#reasons" aria-label="Link to this section">#</a>Reasons</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>arrow</th><th>test</th><th>unless</th><th>months</th><th>also</th><th>min years</th><th>per subject over reach to furthest</th><th>note</th><th>vassal max province share</th><th>from design</th></tr></thead>
+<tbody>
+<tr><td>much_stronger</td><td>1</td><td>overlord_soldiers &gt;= 3 * subject_soldiers</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>not_much_stronger</td><td>-1</td><td>subject_soldiers &gt;= 0.5 * overlord_soldiers</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>same_faith</td><td>1</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>different_faith</td><td>-1</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>persecuted_faith</td><td>-2</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>same_people</td><td>1</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>different_people</td><td>-1</td><td></td><td>accepted_culture</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>defended</td><td>1</td><td></td><td></td><td>240</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>left_alone</td><td>-1</td><td></td><td></td><td>240</td><td>oath_broken</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>gift</td><td>1</td><td></td><td></td><td>60</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>marriage</td><td>1</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>resident_at_court</td><td>1</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>courted</td><td>-1</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>common_enemy</td><td>1</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>long_held</td><td>1</td><td></td><td></td><td></td><td></td><td>30</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>light_tribute</td><td>1</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>heavy_tribute</td><td>-1</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>crushing_tribute</td><td>-2</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>lost_war</td><td>-1</td><td></td><td></td><td>120</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>new_overlord_ruler</td><td>-1</td><td></td><td></td><td>60</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>stretched_thin (provisional)</td><td>-1</td><td></td><td></td><td></td><td></td><td></td><td>-1</td><td>Every subject -1; the N furthest subjects -1 more each, N = reach used beyond reach rounded up (D-SUBJ-7)</td><td></td><td></td></tr>
+<tr><td>far_away</td><td>-1</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>outgrown</td><td>-1</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>0.5</td><td></td></tr>
+<tr><td>hostile_stance</td><td>-2</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>rival_stance</td><td>-1</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>given_a_crown</td><td>1</td><td></td><td></td><td>120</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>loosened</td><td>2</td><td></td><td></td><td>120</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>force_used_on_other_subject</td><td>-1</td><td></td><td></td><td>60</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>deposed_other_subject</td><td>-1</td><td></td><td></td><td>60</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>lapse_annexation</td><td>-1</td><td></td><td></td><td>120</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>refused_call_again</td><td>-1</td><td></td><td></td><td>12</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>missed_stipend</td><td>-1</td><td></td><td></td><td>12</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>master_of_others</td><td>-3</td><td>subject has subjects of its own</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>lent_official</td><td>1</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>4: Lend an official, +1</td></tr>
+<tr><td>left_other_subject_alone</td><td>-1</td><td></td><td></td><td>60</td><td></td><td></td><td></td><td></td><td></td><td>5: your other subjects take a -1 reason for 5 years</td></tr>
+<tr><td>quarrel_forbidden</td><td>-1</td><td></td><td></td><td>60</td><td></td><td></td><td></td><td></td><td></td><td>5: forbid it (both get -1 for 5 years)</td></tr>
+<tr><td>kin</td><td>1</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>ties.kin</td></tr>
+<tr><td>withholds_tribute</td><td>-2</td><td></td><td></td><td></td><td></td><td></td><td></td><td>While the subject withholds its tribute; it also steps one toward Disloyal each season end (SUBJ-132, D-SUBJ-31)</td><td></td><td></td></tr>
+</tbody></table></div>
+<h2 id="tribute-levels"><a class="anchor" href="#tribute-levels" aria-label="Link to this section">#</a>Tribute levels</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>none</code></td><td>0</td></tr>
+<tr><td><code>light</code></td><td>0.5</td></tr>
+<tr><td><code>normal</code></td><td>1</td></tr>
+<tr><td><code>heavy</code></td><td>1.5</td></tr>
+<tr><td><code>crushing</code></td><td>2</td></tr>
+</tbody></table></div>
+<h2 id="reach-by-administrative-capacity"><a class="anchor" href="#reach-by-administrative-capacity" aria-label="Link to this section">#</a>Reach by administrative capacity</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>very_low</code></td><td>2</td></tr>
+<tr><td><code>low</code></td><td>3</td></tr>
+<tr><td><code>moderate</code></td><td>5</td></tr>
+<tr><td><code>high</code></td><td>7</td></tr>
+<tr><td><code>very_high</code></td><td>9</td></tr>
+</tbody></table></div>
+<h2 id="raise-lord"><a class="anchor" href="#raise-lord" aria-label="Link to this section">#</a>Raise lord</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>min_provinces</code></td><td>3</td></tr>
+<tr><td><code>allowed_loyalty</code></td><td>loyal, wavering</td></tr>
+<tr><td><code>kinds</code></td><td>vassal, march</td></tr>
+</tbody></table></div>
+<h2 id="fold-in"><a class="anchor" href="#fold-in" aria-label="Link to this section">#</a>Fold in</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>min_loyal_years</code></td><td>10</td></tr>
+<tr><td><code>min_years_as_subject</code></td><td>20</td></tr>
+<tr><td><code>needs_path</code></td><td>yes</td></tr>
+<tr><td><code>needs_lord_capacity</code></td><td>yes</td></tr>
+<tr><td><code>envoy_months_per_province</code></td><td>1</td></tr>
+<tr><td><code>foreign_rule_grievance_years</code></td><td>10</td></tr>
+<tr><td><code>start_1444_years_if_unknown</code></td><td>20</td></tr>
+</tbody></table></div>
+<h2 id="tighten"><a class="anchor" href="#tighten" aria-label="Link to this section">#</a>Tighten</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>envoy_months</code></td><td>6</td></tr>
+<tr><td><code>requires</code></td><td>loyal</td></tr>
+<tr><td><code>refusal_steps_down</code></td><td>1</td></tr>
+<tr><td><code>order</code></td><td>tributary, vassal</td></tr>
+</tbody></table></div>
+<h2 id="loosen"><a class="anchor" href="#loosen" aria-label="Link to this section">#</a>Loosen</h2>
+<h3 id="order"><a class="anchor" href="#order" aria-label="Link to this section">#</a>Order</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>vassal</code></td><td>tributary</td></tr>
+<tr><td><code>protectorate</code></td><td>tributary</td></tr>
+</tbody></table></div>
+<h2 id="rising"><a class="anchor" href="#rising" aria-label="Link to this section">#</a>Rising</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>needs_backer_or_overlord_losing</code></td><td>yes</td></tr>
+<tr><td><code>overlord_losing_peace_voice_share</code></td><td>0.5</td></tr>
+<tr><td><code>disloyal_neighbours_join</code></td><td>yes</td></tr>
+</tbody></table></div>
+<h2 id="mapping-1444"><a class="anchor" href="#mapping-1444" aria-label="Link to this section">#</a>Mapping 1444</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>vassal</th><th>fief</th><th>appanage</th><th>tributary</th><th>personal union</th><th>frontier commandery</th><th>colony</th><th>estate</th><th>protectorate</th><th>more</th></tr></thead>
+<tbody>
+<tr><td>relations_subject_kind</td><td>vassal</td><td>vassal, held_in_fief_or_held_of_the_church_if_overlord_is_religious_head</td><td>vassal, kin</td><td>tributary</td><td>union</td><td>march</td><td>colony</td><td>lord</td><td></td><td></td></tr>
+<tr><td>event_vassalize_type</td><td>vassal</td><td></td><td></td><td>tributary</td><td>union</td><td></td><td>colony</td><td></td><td>protectorate</td><td>puppet: protectorate; dominion: colony, self_governing</td></tr>
+</tbody></table></div>
+<h2 id="subjects-with-subjects"><a class="anchor" href="#subjects-with-subjects" aria-label="Link to this section">#</a>Subjects with subjects</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>reach_multiplier</code></td><td>3</td></tr>
+<tr><td><code>reach_per_own_subject</code></td><td>1</td></tr>
+<tr><td><code>overlord_can_act_on_sub_subjects</code></td><td>no</td></tr>
+</tbody></table></div>
+<h2 id="crowns"><a class="anchor" href="#crowns" aria-label="Link to this section">#</a>Crowns</h2>
+<blockquote>
+<p>Personal unions in the game (SUBJ-126, SUBJ-127, D-SUBJ-30, REALM-272): when a ruler dies without a direct heir (people.death_per_year), no_heir_share of those deaths leave no heir at all; a claim lasts claim_years.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>no_heir_share</code></td><td>0.25</td></tr>
+<tr><td><code>claim_years</code></td><td>20</td></tr>
+</tbody></table></div>
+<h2 id="playing-as-subject"><a class="anchor" href="#playing-as-subject" aria-label="Link to this section">#</a>Playing as subject</h2>
+<blockquote>
+<p>The player&#39;s side of the tie in the game (SUBJ-131 … SUBJ-139, D-SUBJ-31). Placeholders.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>dimensions</th><th>levels</th><th>needs</th><th>peace voice share over</th><th>kind with land path</th><th>kind otherwise</th></tr></thead>
+<tbody>
+<tr><td>cautious_when</td><td>unrest_risk, external_threat_exposure</td><td>high, very_high</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>turn_the_tables</td><td></td><td></td><td>outgrown: more provinces than the overlord</td><td>0.75</td><td>vassal</td><td>tributary</td></tr>
+</tbody></table></div>
+<h2 id="map"><a class="anchor" href="#map" aria-label="Link to this section">#</a>Map</h2>
+<blockquote>
+<p>How subjects are drawn on the map (subjects-design 10.3, SUBJ-093): at world zoom a subject is washed in its direct overlord&#39;s colour with a diagonal hatch this many map pixels wide in its own colour.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>world_zoom_hatch_px</code></td><td>2</td></tr>
+</tbody></table></div>

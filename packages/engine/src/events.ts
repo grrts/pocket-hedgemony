@@ -2,6 +2,10 @@ import campaign from "../../rules/data/domain/events-campaign.json" with { type:
 import bridge from "../../rules/data/domain/events-places.json" with { type: "json" };
 import rules from "../../rules/data/domain/events.json" with { type: "json" };
 import geography from "../../rules/data/domain/exploration-regions.json" with { type: "json" };
+import west from "../../rules/data/domain/events-bridge-west.json" with { type: "json" };
+import lordEvents from "../../rules/data/domain/events-bridge-lords.json" with { type: "json" };
+import sequels from "../../rules/data/domain/events-ambitions.json" with { type: "json" };
+import setup from "../../rules/data/domain/scenario-setup.json" with { type: "json" };
 import * as evt from "./domain/events/index.ts";
 import * as dip from "./domain/diplomacy/index.ts";
 import * as subj from "./domain/subjects/index.ts";
@@ -13,7 +17,10 @@ import { spareSleepers, wakeRealm, type Waking } from "./sleeping.ts";
 import type { World } from "./world.ts";
 import { noteChoice } from "./achievements.ts";
 import { traitLean } from "./rulers.ts";
-import { headEventChosen, isHeadPatron, setHeadPatron } from "./faithHeads.ts";
+import { faithOf, headEventChosen, isHeadPatron, setHeadPatron } from "./faithHeads.ts";
+import { spark } from "./rebels.ts";
+import { historicalLordComes, laterLord } from "./lords.ts";
+import { heritageStates } from "./domain/national-strengths/index.ts";
 
 /**
  * Milestone 6, history (first slice): the 1444 event tree fires in the game.
@@ -27,11 +34,31 @@ import { headEventChosen, isHeadPatron, setHeadPatron } from "./faithHeads.ts";
  */
 
 type Campaign = Pick<evt.Tree, "ages" | "periods" | "events" | "modifiers" | "localization"> & { entities: Record<string, string> };
-const data = campaign as unknown as Campaign;
+/** A region's bridge events of 1378 to 1444, with the places, names and words they bring (EVT-085). */
+type Bridge = { events: Record<string, evt.EventDef>; places: Record<string, string[]>; entities: Record<string, string>; localization: Record<string, string> };
+const BRIDGES = [west, lordEvents] as unknown as Bridge[];
+/** Events that follow a realm's fulfilled ambition (HER-093). */
+const SEQUELS = sequels as unknown as Pick<Bridge, "events" | "localization">;
+const base = campaign as unknown as Campaign;
+const data: Campaign = {
+  ...base,
+  events: Object.assign({}, base.events, ...BRIDGES.map((b) => b.events), SEQUELS.events),
+  entities: Object.assign({}, base.entities, ...BRIDGES.map((b) => b.entities)),
+  localization: Object.assign({}, base.localization, ...BRIDGES.map((b) => b.localization), SEQUELS.localization),
+};
+/** The bridge events' ids, which a later start counts as history (EVT-087). */
+const BRIDGE_EVENTS = new Set(BRIDGES.flatMap((b) => Object.keys(b.events)).filter((id) => !(id in base.events)));
+/** A later figure who came before the start is not history the tree reads (REALM-295), so a later start keeps no record of him. */
+const PAST_EVENTS = [...BRIDGE_EVENTS].filter((id) => !(id in lordEvents.events));
+const PLACES: Record<string, string[]> = Object.assign({}, bridge.places, ...BRIDGES.map((b) => b.places));
+/** The last year a later figure's seat matters: a start after his window keeps no place for it (REALM-295). */
+const SEAT_UNTIL = new Map(Object.values(lordEvents.events).map((e) => [`area:seat_${e.id.slice("lord_".length)}`, e.availability.latest]));
 
 /** Statistics the game reads live; an event's change to one is kept as an adjustment on top. */
 const ADJUSTED = new Set(["legitimacy", "stability", "tech_state", "tech_economy", "tech_military"]);
 const TECH = ["tech_state", "tech_economy", "tech_military"] as const;
+/** Derived statistics the tree still holds at its own start value until a realm context gives them (D-EVT-17). */
+const HELD = new Set(Object.keys(bridge.start.country).filter((k) => evt.isDerived(k)));
 /** Tree innovations and the research inventions that bring them (D-EVT-19). */
 const INNOVATIONS = Object.entries(rules.innovations_from_research).filter(([k]) => k !== "$comment") as [string, string][];
 
@@ -92,13 +119,25 @@ function regionOf(world: World, g: GameEvents, n: number): string | undefined {
 const provinceKey = (p: string) => `g:${p}`;
 
 /** The events of the tree, the bridge's aliases and places, set up for a new game. */
+/**
+ * The alternate-history preset the campaign plays with: the new game's events
+ * choice through its preset (SETUP-054, D-SETUP-7: historical → historical,
+ * free → plausible); a world made without campaign rules keeps the default.
+ */
+export function eventsModeOf(world: World): evt.AlternateHistoryMode {
+  const choice = world.options?.events;
+  const mode = choice ? (setup.events_presets as Record<string, string>)[choice] : undefined;
+  return (mode as evt.AlternateHistoryMode | undefined) ?? evt.defaultRules().mode;
+}
+
 export function createGameEvents(world: World): GameEvents {
   const tree = evt.emptyWorld(world.date.year, world.date.month);
   const aliases = bridge.aliases as Record<string, string>;
   // A sleeping realm is known to the tree by its own id; a woken spare by the one it took (SETUP-088).
   const treeId = world.nationIds.map((id, n) => world.rules.nations[n]!.tree?.[0] ?? aliases[id] ?? id);
   const nationOf = new Map(treeId.map((id, n) => [id, n]));
-  const places = Object.entries(bridge.places as Record<string, string[]>)
+  const places = Object.entries(PLACES)
+    .filter(([key]) => (SEAT_UNTIL.get(key) ?? Infinity) >= world.date.year)
     .map(([key, ids]): [string, number[]] => [key, ids.map((id) => world.provinceIndex.get(id) ?? -1).filter((p) => p >= 0)])
     .filter(([, ps]) => ps.length > 0);
   for (const key of bridge.start.places) Object.assign(evt.place(tree, key).stats, bridge.start.place);
@@ -110,8 +149,10 @@ export function createGameEvents(world: World): GameEvents {
   for (const id of treeId) evt.country(tree, id).stats = { ...bridge.start.country };
   // A sleeping realm is not yet in the world (SETUP-082).
   treeId.forEach((id, n) => world.nationAsleep[n] && (evt.country(tree, id).exists = false));
-  const state = evt.newState(tree, { events: evt.campaignEvents(data.events), ages: data.ages, periods: data.periods });
+  const state = evt.newState(tree, { events: evt.campaignEvents(data.events), ages: data.ages, periods: data.periods }, { ...evt.defaultRules(), mode: eventsModeOf(world) });
+  pastBridgeEvents(state, world.date.year, world.date.month);
   state.conditions = {};
+  state.effects = { stat: treeStat };
   leanByTraits(world, state, nationOf);
   evt.startCampaign(state, world.date.year);
   const knownAtStart = world.nationIds.map((_, n) => world.research[n]?.known.size ?? 0);
@@ -123,6 +164,14 @@ export function createGameEvents(world: World): GameEvents {
   subjectConditions(world, g);
   // Whether a realm is a head's patron (RELG-154).
   state.conditions.faith_head_patron = (p, _w, ctx) => evt.resolve(p.who, ctx).some((id) => isHeadPatron(world, String(p.head), g.nationOf.get(id) ?? -1));
+  // A historical figure comes to a realm as its lord (REALM-295): the tree reports it, the game seats him.
+  state.effects.historical_lord = (p, _w, ctx, out) => evt.resolve(p.on, ctx).forEach((on) => out.push({ type: "historical_lord", target: on, values: { id: p.id } }));
+  // A realm's heritage item in a state, such as an ambition done (HER-093); heritage is made after events, so it is read when asked.
+  state.conditions.heritage = (p, _w, ctx) =>
+    evt.resolve(p.who, ctx).some((id) => {
+      const h = world.heritage?.realms[g.nationOf.get(id) ?? -1];
+      return !!h && heritageStates(h, String(p.id)).includes(String(p.state));
+    });
   sync(world, g);
   evt.yearlyAgeCheck(state, world.date.year);
   evt.periodCheck(state, world.date.year);
@@ -131,6 +180,27 @@ export function createGameEvents(world: World): GameEvents {
   for (const ev of Object.values(state.events)) evt.eligible(state, ev);
   state.bound = bound;
   return g;
+}
+
+/**
+ * A campaign that starts after a bridge event's history date has that history
+ * already (EVT-087): the event counts as having happened, with its historical
+ * option and holders, so the later events that need it can follow. Its effects
+ * are not applied again: the start's own data already shows them.
+ */
+function pastBridgeEvents(state: evt.EventState, year: number, month: number): void {
+  const start = evt.monthIndex(year, month);
+  for (const id of PAST_EVENTS) {
+    const ev = state.events[id];
+    if (!ev?.history) continue;
+    const d = ev.history.date;
+    const [y, m] = String(Array.isArray(d) ? d[0] : d).split("-").map(Number);
+    // A date of a year alone is under way all that year.
+    if (!Number.isFinite(y) || (m ? evt.monthIndex(y!, m) : evt.monthIndex(y! + 1, 1)) > start) continue;
+    const option = ev.options.find((o) => o.historical)?.id;
+    const roles = Object.fromEntries(Object.entries(ev.roles).map(([r, d]) => [r, [...d.historical]]));
+    state.world.history.push({ event: id, year: y!, month: m || 1, roles, ...(option ? { option } : {}) });
+  }
 }
 
 /** The game's own bond of the realm `subject` under `overlord` (tree ids), if both are realms and the tie stands. */
@@ -187,6 +257,34 @@ function leanByTraits(world: World, state: evt.EventState, nationOf: Map<string,
   };
 }
 
+/**
+ * A stat change as the tree lands it in the game (EVT-054, EVT-073): a derived
+ * statistic the tree still holds at its start value (naval reach, navy,
+ * military quality) takes the change on that reading, where later events read
+ * it; any other derived one is the game's own reading, so the change is told
+ * but not written. Everything else goes to the tree's own `stat` effect.
+ */
+const treeStat: evt.EffectEval = (p, w, ctx, out) => {
+  for (const [stat, change] of Object.entries(p.changes as Record<string, number | string>)) {
+    if (evt.routedTo(stat) || !evt.isDerived(stat)) {
+      evt.EFFECTS.stat!({ ...p, changes: { [stat]: change } }, w, ctx, out);
+      continue;
+    }
+    for (const t of evt.resolve(p.on, ctx)) {
+      const stats = HELD.has(stat) ? w.countries[t]?.stats : undefined;
+      if (!stats) {
+        out.push({ type: "stat", target: t, values: { stat, change, derived: true } });
+        continue;
+      }
+      const before = Number(stats[stat] ?? 0);
+      const range = evt.statRange(stat);
+      const after = evt.changeStat(before, change);
+      stats[stat] = range ? Math.min(range[1], Math.max(range[0], after)) : after;
+      out.push({ type: "stat", target: t, values: { stat, change, before, after: stats[stat] } });
+    }
+  }
+};
+
 /** A tree statistic, with legitimacy and stability read from the realm (D-EVT-4, D-EVT-17). */
 function statOf(world: World, g: GameEvents, id: string, stat: string): number | string | undefined {
   const w = g.state.world;
@@ -226,7 +324,7 @@ function sync(world: World, g: GameEvents): void {
   const lords = new Float64Array(world.nationCount);
   const loyal = new Float64Array(world.nationCount);
   for (const l of world.lords) {
-    if (l.nation < 0) continue;
+    if (l.nation < 0 || l.gone) continue;
     lords[l.nation]!++;
     if (l.loyalty === "Loyal") loyal[l.nation]!++;
   }
@@ -238,6 +336,11 @@ function sync(world: World, g: GameEvents): void {
     held[o]!++;
     if (world.provinceGrievances[p]) aggrieved[o]!++;
   }
+  // A sleeping realm has no ties to show (SETUP-082).
+  const tree = (id: string) => {
+    const n = world.nationIndex.get(id) ?? -1;
+    return world.nationAsleep[n] ? undefined : g.treeId[n];
+  };
   for (let n = 0; n < world.nationCount; n++) {
     // A sleeping realm is the tree's own until it wakes (SETUP-082).
     if (world.nationAsleep[n]) continue;
@@ -262,12 +365,26 @@ function sync(world: World, g: GameEvents): void {
     if (known) for (const [inn, inv] of INNOVATIONS) if (known.has(inv) && !(c.innovations ??= []).includes(inn)) c.innovations.push(inn);
     // The great powers are the realms with the most provinces (D-AUD-2), so the score is the count (D-EVT-19).
     c.stats.great_power_score = held[n]!;
+    // Its state faith as the tree first meets it; an event's change to it is the tree's own after (EVT-086).
+    if (c.religion === undefined && faithOf(world, n)) c.religion = faithOf(world, n);
+    // Its ruler: age, years on the throne (0 in a new ruler's first year), and a regent ruling for a child (EVT-086).
+    const ruler = world.rulers[n];
+    if (ruler) {
+      c.stats.ruler_age = ruler.age;
+      c.stats.ruler_years = ruler.years;
+    }
+    c.flags = ruler?.regent ? ["regency"] : [];
   }
-  // A sleeping realm has no ties to show (SETUP-082).
-  const tree = (id: string) => {
-    const n = world.nationIndex.get(id) ?? -1;
-    return world.nationAsleep[n] ? undefined : g.treeId[n];
-  };
+  // The Emperor and the members of the Empire (EVT-086).
+  const e = world.empire;
+  if (e && !e.ended) {
+    for (const m of e.members) {
+      const id = tree(m);
+      if (id) (evt.country(w, id).flags ??= []).push("empire_member");
+    }
+    const holder = e.holder ? tree(e.holder) : undefined;
+    if (holder) (evt.country(w, holder).flags ??= []).push("emperor");
+  }
   for (const r of d.graph.relations) {
     const x = tree(r.source);
     const y = tree(r.target);
@@ -414,6 +531,9 @@ function recallSubjectEnvoys(world: World, b: subj.SubjectBond, actions: readonl
   d.envoys = d.envoys.filter((e) => !(e.country === b.overlord && e.target === b.subject && actions.includes(e.action) && e.status === "resident"));
 }
 
+/** The rebellions spark an event's rising stands for, by the tree's rebel type (EVT-088). */
+const REBEL_SPARKS: Record<string, string> = { peasant: "the tax rate of the province is raised", religious: "a preacher of a new faith arrives", noble: "a pretender lands with men" };
+
 const KIND_WORDS: Record<subj.Kind, string> = { vassal: "a vassal", tributary: "a tributary", union: "a union", march: "a march", colony: "a colony", protectorate: "a protectorate" };
 
 /**
@@ -491,7 +611,7 @@ function landEffect(world: World, g: GameEvents, e: evt.DomainEvent, news: News[
       return;
     }
     case "stat": {
-      if (n === undefined || v.routed) return;
+      if (n === undefined || v.routed || v.derived) return;
       const stat = String(v.stat);
       const delta = Number(v.after) - Number(v.before);
       const gold = typeof v.change === "number" ? v.change * world.rules.defines.works.goldScale : delta;
@@ -563,6 +683,18 @@ function landEffect(world: World, g: GameEvents, e: evt.DomainEvent, news: News[
       bondsChanged(world);
       return;
     }
+    case "historical_lord": {
+      const h = laterLord(String(v.id));
+      if (n !== undefined && h) historicalLordComes(world, n, h, news);
+      return;
+    }
+    case "rebels": {
+      // The event is a spark (EVT-048, EVT-088): every aggrieved province of the realm or the place may rise.
+      const what = REBEL_SPARKS[String(v.type)] ?? REBEL_SPARKS.noble!;
+      const ps = n !== undefined ? [...Array(world.provinceCount).keys()].filter((p) => world.provinceOwner[p] === n) : (g.places.find(([k]) => k === target)?.[1] ?? []);
+      for (const p of ps) if (world.provinceGrievances[p]) spark(world, p, what);
+      return;
+    }
     case "relation": {
       const other = String(v.other);
       const type = String(v.type);
@@ -588,6 +720,10 @@ export interface EventCard {
   /** What happens whatever is chosen. */
   always: string[];
   options: { id: string; name: string; historical: boolean; effects: string[] }[];
+  /** An everyday event of the realm's own people (EVT-121): no year in history. */
+  everyday?: boolean;
+  /** The province it is about, for Look at the map. */
+  province?: number;
 }
 
 /** The events waiting for a realm's answer, oldest first (EVT-044). */
@@ -684,6 +820,11 @@ function describe(world: World, g: GameEvents, e: evt.Effect, roles: Record<stri
     case "relation":
       text = `${cap(who(p.who))} and ${who(p.other)}: ${humanize(String(p.type))}${p.set === false ? " ends" : ""}`;
       break;
+    case "historical_lord": {
+      const h = laterLord(String(p.id));
+      if (h) text = h.takes_over ? `${h.name} takes the lands of their lord as ${h.title}` : `${h.name} becomes ${who(p.on) === "you" ? "your" : `${who(p.on)}'s`} lord as ${h.title}`;
+      break;
+    }
     case "rebels":
       text = `Rebels rise in ${place(String(p.on).startsWith("$") ? who(p.on) : p.on)}`;
       break;
@@ -715,6 +856,8 @@ function describe(world: World, g: GameEvents, e: evt.Effect, roles: Record<stri
 /** What a save keeps of the event tree: its world and clock, the dice and the bridge's own records (not the data). */
 export type SavedEvents = Omit<evt.EventState, "rules" | "events" | "ages" | "periods" | "log" | "conditions" | "effects" | "mayRefire" | "lean"> & {
   rng: number[];
+  /** The alternate-history preset the campaign plays with (SETUP-054); a save without it played the default. */
+  mode?: evt.AlternateHistoryMode;
   eventRelations: GameEvents["eventRelations"];
   /** The game's own adjustments ("adjust" would read as map adjacency to the save checks). */
   shifts: GameEvents["adjust"];
@@ -724,14 +867,16 @@ export function saveEvents(world: World): SavedEvents | undefined {
   const g = world.events;
   if (!g) return undefined;
   const { rules: _r, events: _e, ages: _a, periods: _p, log: _l, conditions: _c, effects: _f, mayRefire: _m, lean: _n, ...kept } = g.state;
-  return { ...kept, rng: [...g.rng.state], eventRelations: g.eventRelations, shifts: g.adjust };
+  return { ...kept, rng: [...g.rng.state], eventRelations: g.eventRelations, shifts: g.adjust, mode: g.state.rules.mode };
 }
 
 /** Puts a saved event tree back on a restored world; a save from before events keeps the fresh 1444 tree. */
 export function restoreEvents(world: World, saved: SavedEvents): void {
   const g = createGameEvents(world);
-  const { rng, eventRelations, shifts, ...state } = saved;
+  const { rng, eventRelations, shifts, mode, ...state } = saved;
   Object.assign(g.state, state);
+  // The preset stays the one the campaign began with; a save from before the options step played the default.
+  g.state.rules = { ...g.state.rules, mode: mode ?? evt.defaultRules().mode };
   g.rng = new Rng(Uint32Array.from(rng));
   g.eventRelations = eventRelations;
   g.adjust = shifts;

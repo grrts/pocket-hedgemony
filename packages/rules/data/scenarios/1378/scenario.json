@@ -1,5 +1,5 @@
 {
-  "$comment": "The 1378 start scenario (X-25), milestone 10. The regions' data lives in regions/<key>/; tools/domain-data/build-1378.py joins them into the files beside this one, and tools/mapgen/mapgen.ts 1378 builds world/ from those. New campaigns still start in 1444 until the switch-over (step 7); this start runs behind the dev switch ?start=1378 (PH_START=1378 in Node), read through packages/rules/src/start.ts.",
+  "$comment": "The 1378 start scenario (X-25), milestone 10. The regions' data lives in regions/<key>/; tools/domain-data/build-1378.py joins them into the files beside this one, and tools/mapgen/mapgen.ts 1378 builds world/ from those. New campaigns start here (step 7, the switch-over); the 1444 checkpoint runs behind ?start=1444 (PH_START=1444 in Node), read through packages/rules/src/start.ts. suggested: the realm picker's suggested realms, the great powers of each part of the world and one start per part of Africa (SETUP-074).",
   "id": "1378",
   "name": "Autumn 1378",
   "date": {
@@ -7,6 +7,7 @@
     "month": 9,
     "day": 20
   },
+  "suggested": ["france", "england", "castile", "portugal", "venice", "hungary", "ottomans", "byzantium", "muscovy", "great_horde", "timurids", "delhi", "ming", "aztecs", "inca", "mali", "benin", "tio", "ethiopia", "kilwa"],
   "eras": {
     "$comment": "Era I is stretched back to the start (X-25), so the start falls in Era I as in 1444.",
     "start": "I",

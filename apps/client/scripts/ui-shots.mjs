@@ -15,6 +15,7 @@ await page.waitForTimeout(250);
 await page.screenshot({ path: `${out}/u1-loading.png` });
 await page.waitForSelector("[data-nation=castile]", { timeout: 60000 });
 await page.click("[data-nation=castile]");
+await page.click("[data-begin]");
 await page.waitForTimeout(150);
 await page.screenshot({ path: `${out}/u2-loading-game.png` });
 await page.waitForSelector(".hud [data-news]", { timeout: 60000 });

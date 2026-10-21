@@ -1,0 +1,47 @@
+{% extends 'community/layout.html.twig' %}
+{% import 'community/_parts.html.twig' as parts %}
+
+{% block title %}Reports · Pocket Hegemony community{% endblock %}
+{% block meta %}<meta name="robots" content="noindex">{% endblock %}
+
+{% block community %}
+<section class="framed sheet">
+    <p class="crumbs"><a href="{{ path('community') }}">Community</a> › Reports</p>
+    <h1>Reported posts</h1>
+    {% if open is empty %}
+    <p class="empty">No open reports. All quiet.</p>
+    {% else %}
+    <p class="muted">{{ open|length }} {{ open|length == 1 ? 'post is' : 'posts are' }} waiting, the oldest report first. Hiding a post closes its reports; dismiss them when nothing is wrong.</p>
+    <ol class="report-list">
+        {% for item in open %}
+        {% set post = item.post %}
+        <li class="report">
+            <p class="report-where"><a href="{{ path('community_post', {id: post.id}) }}">{{ post.topic.title }}</a>{{ parts.badges(post.topic) }}</p>
+            <blockquote class="quote">
+                <p class="quote-who">{{ parts.seal(post.author) }} <strong>{{ post.author.displayName }}</strong> <span class="muted">{{ parts.when(post.createdAt) }}</span></p>
+                <div class="post-body">{{ post.body|plain_text }}</div>
+            </blockquote>
+            <ul class="reasons">
+                {% for report in item.reports %}
+                <li><strong>{{ report.reporter.displayName }}</strong> <span class="muted">{{ parts.when(report.createdAt) }}</span>{% if report.reason %}: {{ report.reason }}{% else %} <span class="muted">(no reason given)</span>{% endif %}</li>
+                {% endfor %}
+            </ul>
+            <div class="mod-tools">
+                <form method="post" action="{{ path('community_hide_post', {id: post.id}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('community-moderate') }}">
+                    <input type="hidden" name="hidden" value="1">
+                    <input type="hidden" name="back" value="{{ path('community_reports') }}">
+                    <button class="btn wax" type="submit">Hide post</button>
+                </form>
+                <form method="post" action="{{ path('community_dismiss', {id: post.id}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('community-moderate') }}">
+                    <button class="btn paper" type="submit">Dismiss</button>
+                </form>
+                <a class="btn paper" href="{{ path('community_post', {id: post.id}) }}">Open in topic</a>
+            </div>
+        </li>
+        {% endfor %}
+    </ol>
+    {% endif %}
+</section>
+{% endblock %}

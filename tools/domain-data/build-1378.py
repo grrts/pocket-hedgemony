@@ -13,6 +13,9 @@ realms' capitals and homes, port towns) are written as [lon, lat] or owner-rule
 selectors; `tools/mapgen/mapgen.ts 1378` then builds world/ and resolves them
 there (world/sleeping-realms.json, world/ports.json).
 
+The goals bind to the realms the generated map keeps (world/), so after a change
+to map nations or owners run mapgen and then this script once more.
+
 Region data stays in the regions: fix a region's folder and re-run this, never
 edit the joined files.
 
@@ -155,12 +158,6 @@ with open(f"{out}/subjects.json", "w", encoding="utf-8") as f:
     f.write(',\n "stances": [\n' + ",\n".join("  " + json.dumps(r, ensure_ascii=False) for r in stances) + "\n ]")
     f.write(',\n "religious_heads": ' + json.dumps(heads) + ',\n "playable_subjects": ' + json.dumps(sorted(playable)) + "\n}\n")
 
-# Historical goals with their reasons (plan-1378 §2, EVT-085): every region's, in region order.
-goals = []
-for key in REGIONS:
-    goals += region(key, "goals.json", {"goals": []})["goals"]
-write("goals.json", {"$comment": gen("goals.json") + " Realms' historical goals on the start day (EVT-085), every region's in region order.", "goals": goals})
-
 # Map ids whose catalogue record has another id (on top of scenario-setup.json's map_to_catalogue).
 map_to_catalogue = {}
 for key in REGIONS:
@@ -185,6 +182,54 @@ write("sleeping-realms.json", {
     "$comment": gen("sleeping-realms.json") + " Realms not yet born on 20 September 1378 (SETUP-080, X-24, X-25): the regions' realms, then the 1444 sleeping realms no region lists (carried_from_1444). Places are [lon, lat] or owner-rule selectors; tools/mapgen resolves them into world/sleeping-realms.json.",
     "spare_count": sleeping_1444["spare_count"],
     "realms": sleeping,
+})
+
+# Historical goals with their reasons (plan-1378 §2, EVT-100): every region's, in region order.
+# A goal binds to a realm on the 1378 map or asleep in it, by its id or its catalogue record. The
+# regions also wrote goals for realms that are another map realm's on this map (ALIASES) and for
+# cities, lordships and peoples below map scale; those goals are dropped here, on purpose and listed.
+ALIASES = {
+    "hre": "bohemia",  # Wenceslaus is King of the Romans and of Bohemia; the Empire has no realm of its own
+    "kalmar_union": "denmark",  # Margaret's three crowns are won from Denmark
+    "lordship_of_ireland": "england",  # the Pale is the English crown's; the map's ireland is Gaelic Ulster
+    "english_france": "england",  # Calais and the Gascon footholds
+    "john_v": "byzantium",
+    "rasulid_yemen": "yemen",
+}
+# The realms the generated map keeps: mapgen leaves out map nations too small to hold a province.
+world = lambda name, empty: load(f"{out}/world/{name}") if os.path.exists(f"{out}/world/{name}") else empty
+on_map = {n["id"] for n in world("nations.json", nations)} | {s["id"] for s in world("sleeping-realms.json", {"realms": sleeping})["realms"]}
+left_out = (nation_ids | {s["id"] for s in sleeping}) - on_map
+binds = lambda i: i in on_map or record_of(i) in on_map or i in {record_of(k) for k in on_map}
+goals, dropped, dropped_aims = [], [], []
+for key in REGIONS:
+    for g in region(key, "goals.json", {"goals": []})["goals"]:
+        g = {**g, "realm": ALIASES.get(g["realm"], g["realm"])}
+        if not binds(g["realm"]):
+            why = "left out of the map, too small for a province" if g["realm"] in left_out else "not a 1378 realm"
+            dropped.append({"region": key, "realm": g["realm"], "goal": g["goal"], "why": why})
+            continue
+        for k in ("aim", "alternative"):
+            a = g.get(k)
+            if not a or not a.get("target"):
+                continue
+            a = g[k] = {**a, "target": ALIASES.get(a["target"], a["target"])}
+            if binds(a["target"]):
+                continue
+            if a["kind"] in ("take", "hold"):  # the places carry the aim; the target only names it
+                del a["target"]
+                continue
+            dropped_aims.append({"region": key, "realm": g["realm"], "goal": g["goal"], k: f"{a['kind']} {a['target']}"})
+            if k == "aim":
+                g["aim"] = None
+            else:
+                del g["alternative"]
+        goals.append(g)
+write("goals.json", {
+    "$comment": gen("goals.json") + " Realms' historical goals on the start day (EVT-100), every region's in region order. Realm and target ids are 1378 realms (some through the join's ALIASES); dropped lists the goals of realms below map scale, dropped_aims the aims whose target is, so the goal stays as a reason without one.",
+    "goals": goals,
+    "dropped": dropped,
+    "dropped_aims": dropped_aims,
 })
 
 # Port towns, by [lon, lat]. Regions that list their towns give the holder; elsewhere the
@@ -212,4 +257,5 @@ with open(f"{out}/ports.json", "w", encoding="utf-8") as f:
     f.write(',\n "towns": [\n' + ",\n".join("  " + json.dumps(t, ensure_ascii=False) for t in towns) + "\n ]\n}\n")
 
 print(f"{len(nations)} map nations, {len(owners)} owner rules, {len(rulers)} rulers, {len(realms)} culture realms, "
-      f"{len(relations)} relations, {len(facts)} facts, {len(subjects)} subjects, {len(sleeping)} sleeping realms, {len(towns)} port towns")
+      f"{len(relations)} relations, {len(facts)} facts, {len(subjects)} subjects, {len(sleeping)} sleeping realms, {len(towns)} port towns, "
+      f"{len(goals)} goals ({len(dropped)} dropped, {len(dropped_aims)} aims dropped)")

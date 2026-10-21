@@ -1,5 +1,6 @@
 import { monthsBetween } from "./dates.ts";
 import { config } from "./rules.ts";
+import { sameFear } from "./fear.ts";
 import { alliesOf, enemiesOf, hasFact, overlord, stance } from "./relations.ts";
 import { borders, country, neighbours, notorietyPoints, oathsBroken, standing, strength, type Ask, type Count, type Diplomacy, type Reason } from "./model.ts";
 
@@ -118,10 +119,10 @@ function traits(d: Diplomacy, ask: Ask): Reason[] {
 export type DaysFn = (from: string, to: string) => number | undefined;
 
 /** Reasons in every count (DIPL-084 … DIPL-092). */
-function common(d: Diplomacy, ask: Ask, days?: DaysFn): Reason[] {
+function common(d: Diplomacy, ask: Ask, days?: DaysFn, known?: number): Reason[] {
   const out: Reason[] = [];
   const { asker, asked } = ask;
-  out.push({ name: "Standing / 4", number: quarter(standing(d, asked, asker), R.standing_divisor) });
+  out.push({ name: "Standing / 4", number: quarter(known ?? standing(d, asked, asker), R.standing_divisor) });
   if (R.relies_on_word.includes(ask.action)) {
     const per = country(d, asked).posture === "opportunist" ? Number(config.ai.posture.opportunist!.own_view_per_oath_broken) : R.per_oath_broken;
     const n = oathsBroken(d, asker);
@@ -155,6 +156,11 @@ function common(d: Diplomacy, ask: Ask, days?: DaysFn): Reason[] {
   }
   const shared = enemiesOf(d.graph, asker).filter((e) => enemiesOf(d.graph, asked).includes(e));
   if (shared.length) out.push({ name: `We share an enemy (${shared.join(", ")})`, number: R.share_an_enemy });
+  // Two realms that fear the same realm draw together, the more when the asked is Threatened (DIPL-238, F-166).
+  if (ask.action === "propose_alliance") {
+    const fear = sameFear(country(d, asker).fears, country(d, asked).fears);
+    if (fear) out.push({ name: `We fear the same realm (${fear.of})`, number: fear.number });
+  }
   const frontier = d.taken.filter((t) => t.by === asker && d.provinces[t.province]?.borders.includes(asked)).length;
   if (frontier) out.push({ name: "You threaten our frontier", number: R.frontier_threat_per_province * frontier });
   out.push(...notorietyReasons(d, ask.action, asker, asked));
@@ -268,16 +274,19 @@ function callReasons(d: Diplomacy, ask: Ask): Reason[] {
   return out;
 }
 
-/** Makes the count of an ask; yes only when the total is over zero (DIPL-081). */
-export function countAsk(d: Diplomacy, ask: Ask, days?: DaysFn): Count {
+/**
+ * Makes the count of an ask; yes only when the total is over zero (DIPL-081).
+ * `known` is the asked's standing toward the asker, when the caller has just read it.
+ */
+export function countAsk(d: Diplomacy, ask: Ask, days?: DaysFn, known?: number): Count {
   const label = ask.action === "propose_alliance" ? "alliance" : ask.action.replace(/_/g, " ");
   const reasons: Reason[] = [{ name: `Base (${label})`, number: baseOf(ask), own: true, kind: "base" }];
   if (ask.action === "call_to_arms") {
     reasons.push(...callReasons(d, ask));
-    reasons.push({ name: "Standing / 4", number: quarter(standing(d, ask.asked, ask.asker), R.standing_divisor) });
+    reasons.push({ name: "Standing / 4", number: quarter(known ?? standing(d, ask.asked, ask.asker), R.standing_divisor) });
     reasons.push(...personality(d, ask), ...negotiation(d, ask));
   } else {
-    reasons.push(...common(d, ask, days), ...ownReasons(d, ask));
+    reasons.push(...common(d, ask, days, known), ...ownReasons(d, ask));
   }
   const total = reasons.reduce((s, r) => s + r.number, 0);
   return { ask, reasons, total, yes: total > 0 };
@@ -322,3 +331,11 @@ export function ownTotal(c: Count): number {
 }
 
 export { overlord };
+
+/** The one word shown before an ask is sent (DIPL-229): how the count stands now, with no numbers. */
+export type AskHint = "Likely" | "Unsure" | "Unlikely";
+
+export function askHint(total: number): AskHint {
+  const h = config.answers.hint;
+  return total >= h.likely_from ? "Likely" : total <= h.unlikely_to ? "Unlikely" : "Unsure";
+}

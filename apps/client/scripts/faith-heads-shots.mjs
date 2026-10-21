@@ -41,6 +41,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   await page.goto("http://localhost:4185/?view=1460,560,1.4");
   await page.waitForSelector("[data-nation=castile]", { timeout: 60000 });
   await page.click("[data-nation=castile]");
+  await page.click("[data-begin]");
   await page.waitForSelector(".hud [data-news]", { timeout: 60000 });
   await page.waitForTimeout(500);
   await page.click("[data-hint=stop]").catch(() => {});

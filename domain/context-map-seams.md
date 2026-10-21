@@ -694,7 +694,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| onboarding | upstream | Conformist | Event-started leagues, reasons count, member reasons screen |
+| onboarding | upstream | Conformist | Pretenders and the Seat a pretender war aim, the event effect `pretender`, reasons count, the alliance reasons screen |
 
 ## diplomacy ↔ province
 
@@ -839,7 +839,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 |---|---|---|---|
 | events | downstream (they extend this) | Customer–Supplier | Ages for golden ages; condition language; adopted (D-EVT-11) effects grant_legacy, wake_heyday, stir_ambition, shed_burden and condition heritage; requested missing events, areas, hubs and sea ids |
 | national-strengths | upstream | Conformist | Ages (`ages.yaml`) and their start/end, the condition language, event ids for event_weight/event_option; the `stat` lever lands through the events mapping (D-EVT-4, D-HER-6); heritage runs right after the event tree each turn |
-| national-strengths | downstream | Published Language | Four effects (grant_legacy, wake_heyday, stir_ambition, shed_burden) and the `heritage` condition (adopted, D-EVT-11) |
+| national-strengths | downstream | Published Language | Effects grant_legacy, wake_heyday and shed_burden (stir_ambition retired, X-27) and the `heritage` condition (adopted, D-EVT-11), which lets an event require an ambition done |
 
 ## events ↔ naval (one-sided)
 
@@ -852,7 +852,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | events | downstream | Customer–Supplier | `tutorial_only` scripted events in event format; requested Varna crusade and abdication events |
-| onboarding | upstream | Customer–Supplier | Event format, `history` block, `tutorial_only`, `narrative_only`; scripted events stay in the tutorial scenario file and the league's aim comes from the start state (D-TUT-9) |
+| onboarding | upstream | Customer–Supplier | Event format, `history` block, `tutorial_only`, `narrative_only`; scripted events stay in the tutorial scenario file (D-TUT-9); John V placed at the Ottoman court as a pretender by the event "John V and Manuel reach Murad" |
 
 ## events ↔ province
 
@@ -1117,7 +1117,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | game-shell | upstream | Customer–Supplier | Newest save and its header summary (Continue label, title background), Load list (flat, newest first), the Resume save and orders journal (closed at End turn, written on backgrounding), ironman flag, Needs attention mutes and tutorial progress in the save (X-16), locked-nation check, damaged-save failures |
-| saves | downstream | Customer–Supplier | Continue target and label, Load list (campaigns, saves, devices), Save slots, toasts and messages, lifecycle events (background, resume, quit), unlock screen on locked saves, ironman split prompt |
+| saves | downstream | Customer–Supplier | Continue target and label, Load list (campaigns, saves, devices), Save slots, toasts and messages, lifecycle events (background, resume, quit), unlock screen on locked saves, ironman split prompt; whether the full game is unlocked on this store (`FullGameUnlocked` / `FullGameLocked`) for the ribbon, the Unlock card and the realm picker |
 
 ## game-shell ↔ scenario-setup
 
@@ -1330,7 +1330,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | map-presentation | upstream | Published Language | Ambition shimmer |
-| national-strengths | downstream | Published Language | Shimmer over hot ambition regions |
+| national-strengths | downstream | Published Language | Shimmer over the regions of ambitions within reach |
 
 ## map-presentation ↔ naval
 
@@ -1444,7 +1444,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| national-strengths | downstream | Customer–Supplier | Tutorial ambition with a plain hint |
+| national-strengths | downstream | Customer–Supplier | Tutorial ambition, its goal and progress shown |
 | onboarding | upstream | Conformist | *Kapıkulu household* birthright; Realms Almanac strengths |
 
 ## national-strengths ↔ province
@@ -1634,7 +1634,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| onboarding | upstream | Conformist | Levy, regiments, Janissaries, recruit pool, Marshal (the devshirme stays tutorial narrative, D-TUT-8) |
+| onboarding | upstream | Conformist | Levy, regiments, Janissaries, recruit pool, Marshal (the pençik stays tutorial narrative, D-TUT-8, D-TUT-17) |
 
 ## onboarding ↔ religion (one-sided)
 
@@ -1659,7 +1659,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| onboarding | upstream | Conformist | Normal 1444 setup, `owners-1444.json`, the Ottoman catalogue record (dates, lords, Hunyadi) |
+| onboarding | upstream | Conformist | The normal 20 September 1378 setup (`scenarios/1378/`: rulers, map owners, relations, goals), the Ottoman catalogue record |
 | scenario-setup | downstream | Conformist | The Ottomans 1444 for the tutorial |
 
 ## onboarding ↔ settings
@@ -1686,13 +1686,13 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| onboarding | upstream | Conformist | Strait crossings, Bosporus ferry, closed Dardanelles, days to cross |
+| onboarding | upstream | Conformist | Strait crossings, the Gallipoli ferry, a strait closed by an enemy fleet, days to cross |
 
 ## onboarding ↔ warfare (one-sided)
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| onboarding | upstream | Conformist | Defend the faith aim, battles, battle screen, sieges, storming, terms, peace voices, army food reserve, pay owed |
+| onboarding | upstream | Conformist | Battles, battle screen, sieges, storming, terms, peace voices, army food reserve, pay owed, lords' Wants as war aims |
 
 ## onboarding ↔ world-map (one-sided)
 

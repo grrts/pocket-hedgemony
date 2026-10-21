@@ -47,6 +47,7 @@ for (const [name, device] of [
   await page.waitForTimeout(300);
   await page.waitForSelector("[data-nation=japan]", { timeout: 10000 }).catch(() => console.log("no Rule Japan button"));
   await tap("[data-nation=japan]");
+  await tap("[data-begin]");
   await page.waitForSelector(".hud [data-news]", { timeout: 60000 });
   await page.waitForTimeout(500);
   await page.evaluate(() => document.querySelector("[data-hint=stop]")?.click());

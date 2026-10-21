@@ -229,7 +229,7 @@ The first slice plays risings on the eight grievances the game tracks, so the ri
 - **Beating them**: march an army with a commander onto the band. If you win, the rebels scatter and the same card asks for your verdict: Pardon, Punish the leaders or Massacre. Massacre asks once more. An army that stands four weeks in a held province the band has left takes it back.
 - **Overview**: your realm's Provinces tab opens with an Uprisings block listing every rising and every beaten rising waiting on you, and the Lands tile on your Realm book's Overview turns red and names the uprisings; tapping it opens the Provinces page. A plotting province's mood line gives its chance to rise each month.
 - **Answers today**: granting a tax demand puts the tax back to normal and ends the musters there. A hunger demand opens the castle granary (up to 4 months of food). A homeland demand gives self-rule, so *Foreign rule* no longer counts there and the tax stays light for good. A town demand sends your armies out of their land. Talks cost 10 gold a province, once a month. A bribe costs 1 gold per 100 rebels.
-- **If they win** (a year held, or the capital's castle taken): tax and town risings keep their tax light for 10 years; hunger risings empty the castles into their stores and turn their lords disloyal; a homeland rising breaks away to the realm that held it in 1444, which comes back if it was gone; a people that rose in their own realm's land found a new realm named for their homeland, with a founding card and a truce with the realm they left.
+- **If they win** (a year held, or the capital's castle taken): tax and town risings keep their tax light for 10 years; hunger risings empty the castles into their stores and turn their lords disloyal; a homeland rising breaks away to the realm that held it at the start, which comes back if it was gone; a people that rose in their own realm's land found a new realm named for their homeland, with a founding card and a truce with the realm they left.
 
 ## How it connects
 
@@ -247,12 +247,14 @@ The first slice plays risings on the eight grievances the game tracks, so the ri
 - [Recruiting](Recruiting): recruits lost to rebels.
 - [Buildings](Buildings): looting one town building a season; town walls stop looting without storming.
 - [Trade](Trade): traders avoid riots, bandits appear, and rebels act as an enemy army for trade.
-- [The-1444-Start](The-1444-Start): a new country for a won homeland rising.
+- [The 1378 Start](The-1378-Start): a new country for a won homeland rising.
 - [Exploration-and-Colonies](Exploration-and-Colonies): colonies, local people's tiles and resistance.
 - [Map and Map Modes](Map-and-Lenses): steps on the map, rising icons and the *Grievances* map mode.
 - [Time-and-Turns](Time-and-Turns): where the monthly steps sit in the turn.
 
 ## Numbers
+
+Every value the game uses, made from its config so it always matches the game: [Rebellions data](Data-Rebellions). How they combine: [Formulas](Formulas).
 
 All numbers are **placeholders** in the province config. The key names are the spec's own labels, since the design names only the groups.
 

@@ -10,7 +10,7 @@ Eastern Europe, the Balkans and the Aegean, Anatolia, the Caucasus, the Rus land
 | `relations.json` | relations and facts on the start day, landless actors as `entities`, and each Catholic realm's `obedience` in the Schism |
 | `subjects.json` | subject records and stances |
 | `sleeping-realms.json` | realms not yet born (Kazan, Crimea, the Nogai, the Uzbeks, the Mushasha, Herzegovina, the Kastrioti and others) |
-| `goals.json` | historical goals with their reasons, for the AI to weigh from step 6 |
+| `goals.json` | historical goals with their reasons, and the aims the AI weighs (EVT-100 to EVT-106) |
 
 Day-one wars: Mamai's Horde against Moscow (after the Vozha), Arta against Ioannina, the Hospitallers against Arta, and the Orders against Lithuania. The Byzantine civil war is one realm, `byzantium` under Andronikos IV, with John V's claim as a fact. Venice and Genoa's colonies come from `europe-west`.
 

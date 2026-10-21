@@ -31,6 +31,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
     continue;
   }
   await page.click("[data-nation=portugal]");
+  await page.click("[data-begin]");
   await page.waitForSelector(".hud [data-news]", { timeout: 60000 });
   await page.waitForTimeout(500);
   await page.locator("[data-hint=stop]").first().click({ timeout: 3000 }).catch(() => {});
@@ -149,14 +150,15 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   await page.goto("http://localhost:4183/");
   await page.waitForSelector("[data-nation=ottomans]", { timeout: 60000 });
   await page.click("[data-nation=ottomans]");
+  await page.click("[data-begin]");
   await page.waitForSelector(".hud [data-news]", { timeout: 60000 });
   await page.locator("[data-hint=stop]").first().click({ timeout: 3000 }).catch(() => {});
   flagship = await page.evaluate(() => window.__phNavy().mine.find((m) => m.ships.some((s) => s.type === "galley"))?.id ?? -1);
   const home = await page.evaluate((id) => window.__phNavy().fleets.find((f) => f.id === id)?.at ?? -1, flagship);
-  const leader = await page.evaluate(() => window.__phCommission());
+  const leader = await page.evaluate(() => window.__phCommission(true));
   console.log(name, "ottoman fleet", flagship, "commission", JSON.stringify(leader));
   if (leader?.length) console.log(name, "free commander", await page.evaluate(() => window.__phFreeCommander()));
-  const idle = await page.evaluate(() => window.__phIdleCommander());
+  const idle = await page.evaluate(() => window.__phIdleCommander(true));
   console.log(name, "admiral", idle, await page.evaluate(([fleet, commander]) => window.__phNavyOrder({ do: "admiral", fleet, commander }), [flagship, idle]));
   let off = -1;
   const foes = await page.evaluate((p) => window.__phCoastRealms(p), home);

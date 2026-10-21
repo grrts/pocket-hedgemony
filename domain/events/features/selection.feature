@@ -36,12 +36,12 @@ Feature: Selection and pacing
     And the event re-enters the pool
 
   @EVT-033 @placeholder
-  Scenario: At most two pool events per country per year
+  Scenario: At most three pool events per country per year
     # config: selection.max_pool_events_per_country_year
-    Given the country "France" has had 2 pool events this year
-    And a third pool event for "France" wins its roll
+    Given the country "France" has had 3 pool events this year
+    And another pool event for "France" wins its roll
     When the month is processed
-    Then the third event does not fire for "France" this year
+    Then that event does not fire for "France" this year
 
   @EVT-034 @placeholder
   Scenario Outline: Follow-up boosts

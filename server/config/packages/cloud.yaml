@@ -1,0 +1,50 @@
+# Accounts and cloud saves (domain/saves/spec.md §5.8). The numbers are the same as in
+# packages/rules/data/domain/saves.json (cloud.server, sign_in); a test keeps them in step.
+parameters:
+    cloud.access_token_minutes: 15
+    cloud.steam_ticket_identity: pockethegemony
+    # Store sign-ins on phones and the web (SAVE-149 … SAVE-154): the clock leeway for Apple's and
+    # Google's tokens, and how long Steam's browser answer and the one-time code may take.
+    cloud.sign_in_leeway_seconds: 60
+    cloud.sign_in_code_minutes: 5
+    # How long the offer to combine two accounts lasts (sign_in.combine_minutes, SAVE-186; provisional).
+    cloud.sign_in_combine_minutes: 10
+    cloud.max_save_mb: 2
+    cloud.quota_saves: 300
+    cloud.quota_mb: 200
+    cloud.tombstone_purge_days: 30
+    # Shared saves (cloud.shared in saves.json): how many an account keeps, and the board each purpose posts to.
+    cloud.shared_max_per_account: 50
+    cloud.shared_boards: { show: strategy, help: saves, broke: bugs }
+    env(STEAM_WEB_API_KEY): ''
+    env(STEAM_APP_ID): ''
+    # Without these the sign-in answers "… is not available" (SAVE-154).
+    env(APPLE_CLIENT_IDS): ''
+    env(GOOGLE_CLIENT_IDS): ''
+    env(SIGN_IN_RETURN_URLS): ''
+    # Purchases (purchases in saves.json; domain/saves SAVE-170 … SAVE-178, docs/purchases.md). A store
+    # whose settings are empty is unavailable; the others keep working.
+    cloud.purchases.steam_recheck_hours: 24
+    env(APPLE_BUNDLE_ID): ''
+    env(APPLE_ROOT_CERTIFICATE): ''
+    env(APPLE_PRODUCT_ID): 'full_game'
+    env(APPLE_ACCEPT_SANDBOX): '0'
+    env(APPLE_APP_APPLE_ID): ''
+    env(GOOGLE_PLAY_PACKAGE_NAME): ''
+    env(GOOGLE_PLAY_SERVICE_ACCOUNT): ''
+    env(GOOGLE_PLAY_PRODUCT_ID): 'full_game'
+    env(GOOGLE_PUBSUB_PUSH_TOKEN): ''
+    env(SAVES_DIR): '%kernel.project_dir%/var/saves/%kernel.environment%'
+
+framework:
+    rate_limiter:
+        # Email sign-in from the game, per address and IP (SAVE-117), as the website's login_throttling.
+        api_sign_in:
+            policy: sliding_window
+            limit: 5
+            interval: '15 minutes'
+        # Save uploads, per account and per device (SAVE-070). The design gives no numbers; provisional.
+        api_saves:
+            policy: sliding_window
+            limit: 120
+            interval: '10 minutes'

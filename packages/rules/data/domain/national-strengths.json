@@ -67,7 +67,7 @@
    "redraw_on_complete_or_fail": true,
    "age_ambitions_join_pool_when_age_starts": true,
    "counsel": {
-    "$comment": "Have the court read one ambition: it stirs at once and shows its warmth. Its words stay a hint; ambitions are never fully revealed while open.",
+    "$comment": "X-27: ask the court for a new aim: one open ambition goes back to the pool and another is drawn at once.",
     "cooldown_years": 10,
     "gold_by_era": [
      30,
@@ -80,26 +80,23 @@
     ]
    },
    "envoy_reveal_years": 2,
-   "$comment_envoy": "D-HER-11: a resident envoy (diplomacy) kept this many years at a foreign court learns the hint and warmth of one of that country's active ambitions, never its plain goal.",
+   "$comment_envoy": "D-HER-11, X-27: a resident envoy (diplomacy) kept this many years at a foreign court learns the goal and progress of one of that country's open ambitions, never its reward.",
    "history_mode_setting": {
     "values": [
      "drawn",
      "historical_only"
     ],
     "default": "drawn",
-    "$comment": "drawn: 3 drawn from the pool with one historical guaranteed. historical_only: only ambitions tagged historical. No setting reveals ambitions."
+    "$comment": "drawn: 3 drawn from the pool with one historical guaranteed. historical_only: only ambitions tagged historical. No setting reveals rewards."
    },
    "max_legacies": 5,
    "$comment_legacies": "A sixth legacy asks the player which one to let go.",
-   "never_revealed": true,
-   "warmth_bands": {
-    "$comment": "D-HER-13: cold under a third, warm under two thirds, hot from two thirds.",
-    "cold": 0.0,
-    "warm": 0.3333333333333333,
-    "hot": 0.6666666666666666
-   },
+   "reward_hidden_until_done": true,
+   "$comment_reward": "X-27: an open ambition shows its goal and progress; its reward shows only the legacy's name until the ambition is fulfilled.",
+   "within_reach": 0.6666666666666666,
+   "$comment_within_reach": "X-27: an ambition is within reach once this share of its goal is met (replaces the warmth bands of D-HER-13).",
    "pool_max": 7,
-   "$comment_pool": "D-HER-10: a pool holds pool_min_* to pool_max entries; age ambitions join on top and do not count."
+   "$comment_pool": "D-HER-10: the heritage build gives each country pool_min_* to pool_max entries; age ambitions, the ambitions file's own and the common ones join on top and do not count (X-27)."
   },
   "burden": {
    "per_country_max": 1,

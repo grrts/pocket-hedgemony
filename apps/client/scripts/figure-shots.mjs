@@ -14,6 +14,7 @@ await page.goto("http://localhost:4183/");
 await page.waitForSelector(".map-layer", { timeout: 60000 });
 await page.waitForSelector("[data-nation=castile]", { timeout: 60000 });
 await page.click("[data-nation=castile]");
+await page.click("[data-begin]");
 await page.waitForSelector(".hud [data-news]", { timeout: 60000 });
 await page.click(".panel .close").catch(() => {});
 await page.evaluate(() => document.querySelector("[data-hint=stop]")?.click());

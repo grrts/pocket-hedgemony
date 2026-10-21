@@ -15,6 +15,7 @@ await page.waitForSelector("[data-nation=castile]", { timeout: 60000 });
 // "none" stays on the start screen, where the whole map is charted.
 if (nation !== "none") {
   await page.click(`[data-nation=${nation}]`);
+  await page.click("[data-begin]");
   await page.waitForSelector(".hud [data-news]", { timeout: 60000 });
 }
 await page.evaluate(() => document.querySelectorAll(".panel .close").forEach((b) => b.click()));

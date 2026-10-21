@@ -108,11 +108,10 @@ export function monthlyHeritage(world: World, news: News[]): void {
   for (let n = 0; n < g.realms.length; n++) {
     const h = g.realms[n];
     if (!h || world.nationGone[n]) continue;
-    const before = h.ambitions.length;
     for (const a of ageBeginnings(h, facts)) ns.ageBegins(h, a);
     const happened = ns.monthTick(h, facts, rngFor(world, n));
     if (n !== world.player) while (h.ask) ns.aiAnswer(h);
-    if (n === world.player) tellPlayer(world, n, h, happened, before, news);
+    if (n === world.player) tellPlayer(world, n, h, happened, news);
     h.digest = [];
     // The log is the library's record for tests; the game keeps only the month's.
     h.log = [];
@@ -131,9 +130,16 @@ const NEWS_LINE: Record<string, (h: ns.Heritage, id: string) => string | null> =
   MarkGranted: (h, id) => `${h.legacies.find((l) => l.id === id)?.name ?? "A golden age"} stays with you as a legacy.`,
   AmbitionDone: (h, id) => {
     const a = h.ambitions.find((x) => x.item.id === id)!.item;
-    return `Ambition fulfilled: ${a.text} You gain ${a.legacy.name}.`;
+    return `Ambition fulfilled: ${a.name}. ${a.legacy.name} is yours: ${a.legacy.text}`;
   },
-  AmbitionLost: (h, id) => `Ambition lost: ${h.ambitions.find((x) => x.item.id === id)!.item.text}`,
+  AmbitionLost: (h, id) => {
+    const a = h.ambitions.find((x) => x.item.id === id)!.item;
+    return `Ambition lost: ${a.name}. ${a.legacy.name} will not be yours.`;
+  },
+  AmbitionDrawn: (h, id) => {
+    const a = h.ambitions.find((x) => x.item.id === id)?.item;
+    return a ? `A new ambition: ${a.name}. ${a.text}` : null;
+  },
   BurdenShed: (h) => `${h.burden!.item.name} is overcome: ${h.burden!.item.turned.name} takes its place.`,
   BirthrightDormant: (h, id) => `${h.birthrights.find((b) => b.item.id === id)!.item.name} lies dormant.`,
   BirthrightWoke: (h, id) => `${h.birthrights.find((b) => b.item.id === id)!.item.name} wakes again.`,
@@ -142,13 +148,12 @@ const NEWS_LINE: Record<string, (h: ns.Heritage, id: string) => string | null> =
 const heydayName = (h: ns.Heritage, id: string) => h.heydays.find((x) => x.item.id === id)?.item.name ?? id;
 
 /** One dispatch line for each change the player should hear of (HER-071), and one when a choice waits. */
-function tellPlayer(world: World, n: number, h: ns.Heritage, happened: ns.HeritageEvent[], before: number, news: News[]): void {
+function tellPlayer(world: World, n: number, h: ns.Heritage, happened: ns.HeritageEvent[], news: News[]): void {
   const lines = [...h.digest];
   for (const e of happened) {
     const line = e.id ? NEWS_LINE[e.type]?.(h, e.id) : null;
     if (line) lines.push(line);
   }
-  if (h.ambitions.length > before && happened.some((e) => e.type === "AmbitionDone" || e.type === "AmbitionLost")) lines.push("A new ambition is drawn, hidden.");
   if (h.ask) lines.push(h.ask.kind === "sleep_heyday" ? "A third golden age would begin: choose which one becomes inactive." : "A sixth legacy is earned: choose which one to let go.");
   for (const text of lines) news.push({ kind: "heritage", text, nations: [n] });
 }
@@ -299,6 +304,7 @@ export function worldFacts(world: World, g: GameHeritage): ns.WorldFacts {
   const a = world.armies;
   for (let i = 0; i < a.count; i++) if (a.alive[i] && a.owner[i]! >= 0) counts[a.owner[i]!]!.soldiers! += a.men[i]!;
   for (const l of world.lords) {
+    if (l.gone) continue;
     counts[l.nation]!.lords!++;
     if (l.loyalty === "Loyal") counts[l.nation]!.loyal_lords!++;
   }
@@ -461,13 +467,20 @@ export function heritageTaxReach(world: World, p: number): number {
 
 // ---------------------------------------------------------------- the player's choices
 
-/** Counsel (HER-024): the court reads one sealed ambition for gold by era, once every ten years. */
+/** Counsel (HER-024, X-27): for gold by era, once every ten years, one open ambition is set aside and a new one drawn. */
 export function payCounsel(world: World, n: number, ambition: string): string | null {
   const h = world.heritage?.realms[n];
   if (!h) return "this realm has no heritage recorded";
   const treasury = { gold: world.nationTreasury[n]! };
-  const r = ns.payCounsel(h, ambition, worldFacts(world, world.heritage!), eraOf({ year: world.date.year, month: world.date.month, day: world.date.day ?? 1 }), treasury);
-  if (!r.ok) return r.reason === "too_soon" ? `the court can be asked again in ${h.counselYear! + ns.RULES.ambitions.counsel.cooldown_years}` : r.reason === "gold" ? "not enough gold" : "no such open ambition";
+  const r = ns.payCounsel(h, ambition, worldFacts(world, world.heritage!), eraOf({ year: world.date.year, month: world.date.month, day: world.date.day ?? 1 }), treasury, rngFor(world, n));
+  if (!r.ok)
+    return r.reason === "too_soon"
+      ? `the court can be asked again in ${h.counselYear! + ns.RULES.ambitions.counsel.cooldown_years}`
+      : r.reason === "gold"
+        ? "not enough gold"
+        : r.reason === "none_left"
+          ? "no other ambition is left to draw"
+          : "no such open ambition";
   world.nationTreasury[n] = treasury.gold;
   h.digest = [];
   h.log = [];
@@ -504,10 +517,11 @@ export interface SavedRealmHeritage {
   dormant?: number[];
   /** [id, state, years awake, forced until]. */
   heydays: [string, ns.HeydayState, number, number?][];
+  /** Read from saves before X-27 only: the pool is now whatever of the realm's ambitions is neither drawn nor waiting for its age. */
   pool?: string[];
   waiting?: string[];
-  /** [id, state, warmth, band]. */
-  ambitions: [string, ns.AmbitionState, number, ns.Band][];
+  /** [id, state, share met, within reach]; saves before X-27 hold "sealed" or "stirred" and a warmth band. */
+  ambitions: [string, ns.AmbitionState, number, (boolean | string)?][];
   legacies?: string[];
   burden?: { state: "held" | "shed"; armed?: boolean };
   counselYear?: number;
@@ -529,12 +543,10 @@ export function saveHeritage(world: World): Record<string, SavedRealmHeritage> |
     const ids = (xs: string[]): string[] | undefined => (xs.length ? xs.map(short) : undefined);
     const r: SavedRealmHeritage = {
       heydays: h.heydays.map((x) => (x.forcedUntil !== undefined ? [short(x.item.id), x.state, round4(x.yearsAwake), x.forcedUntil] : [short(x.item.id), x.state, round4(x.yearsAwake)])),
-      ambitions: h.ambitions.map((a) => [short(a.item.id), a.state, round4(a.warmth), a.band]),
+      ambitions: h.ambitions.map((a) => (a.near ? [short(a.item.id), a.state, round4(a.share), true] : [short(a.item.id), a.state, round4(a.share)])),
     };
     const dormant = h.birthrights.flatMap((b, k) => (b.dormant ? [k] : []));
     if (dormant.length) r.dormant = dormant;
-    const pool = ids(h.pool.map((a) => a.id));
-    if (pool) r.pool = pool;
     const waiting = ids(h.waitingForAge.map((a) => a.id));
     if (waiting) r.waiting = waiting;
     const legacies = ids(h.legacies.map((l) => l.id));
@@ -572,9 +584,14 @@ export function restoreHeritage(world: World, saved: Record<string, SavedRealmHe
       if (forcedUntil !== undefined) hd.forcedUntil = forcedUntil;
     }
     const pick = (ids: string[] = []) => ids.map(long).flatMap((id) => (ambitions.has(id) ? [ambitions.get(id)!] : []));
-    h.pool = pick(s.pool);
     h.waitingForAge = pick(s.waiting);
-    h.ambitions = s.ambitions.flatMap(([id, state, warmth, band]) => (ambitions.has(long(id)) ? [{ item: ambitions.get(long(id))!, state, warmth, band }] : []));
+    // Before X-27 an open ambition was "sealed" or "stirred", and "hot" was within reach.
+    h.ambitions = s.ambitions.flatMap(([id, state, share, near]) =>
+      ambitions.has(long(id)) ? [{ item: ambitions.get(long(id))!, state: (state as string) === "sealed" || (state as string) === "stirred" ? "open" : state, share, near: near === true || near === "hot" }] : [],
+    );
+    // The pool is every ambition of the realm neither drawn nor waiting for its age, so ambitions written later join old saves too.
+    const taken = new Set([...h.waitingForAge, ...h.ambitions.map((a) => a.item)].map((a) => a.id));
+    h.pool = d.ambitions.filter((a) => !taken.has(a.id));
     h.legacies = (s.legacies ?? []).map(long).flatMap((id) => (legacies.has(id) ? [legacies.get(id)!] : []));
     if (h.burden) {
       h.burden.state = s.burden?.state ?? "held";
@@ -597,7 +614,7 @@ export function restoreHeritage(world: World, saved: Record<string, SavedRealmHe
 
 // ---------------------------------------------------------------- what the Heritage tab shows
 
-/** One realm's heritage as the Heritage tab shows it; ambitions only for the player's own realm (HER-016). */
+/** One realm's heritage as the Heritage tab shows it; ambitions only for the player's own realm (HER-016, X-27). */
 export interface HeritageView {
   /** Each birthright held: the realm's own first; dormant ones are greyed (HER-006). */
   birthrights: { id: string; dormant: boolean }[];
@@ -606,7 +623,7 @@ export interface HeritageView {
   burden: { state: "held" | "shed"; turned: { name: string; text: string } } | null;
   legacies: { id: string; name: string; text: string; great: boolean; effects: ns.Effect[] }[];
   /** Open ambitions, counted for any realm (HER-073). */
-  sealed: number;
+  open: number;
   ambitions?: (ns.AmbitionView & { id: string })[];
   ask?: { kind: "sleep_heyday" | "let_go_legacy"; options: { id: string; name: string }[] };
   /** Counsel's price now and the year it can next be asked, null when it can be asked now (HER-024). */
@@ -624,10 +641,11 @@ export function heritageView(world: World, n: number): HeritageView | null {
     heydays: h.heydays.map((x) => ({ id: x.item.id, state: x.state, months: months(x.yearsAwake) })),
     burden: h.burden ? { state: h.burden.state, turned: { name: h.burden.item.turned.name, text: h.burden.item.turned.text } } : null,
     legacies: h.legacies.map((l) => ({ id: l.id, name: l.name, text: l.text, great: !!l.great, effects: l.effects })),
-    sealed: ns.openAmbitions(h).length,
+    open: ns.openAmbitions(h).length,
   };
   if (n !== world.player) return v;
-  v.ambitions = h.ambitions.map((a) => ({ id: a.item.id, ...ns.ambitionView(a) }));
+  const facts = worldFacts(world, world.heritage!);
+  v.ambitions = h.ambitions.map((a) => ({ id: a.item.id, ...ns.ambitionView(a, facts, h.country) }));
   if (h.ask?.kind === "sleep_heyday") v.ask = { kind: "sleep_heyday", options: [h.ask.waking, ...h.ask.awake].map((id) => ({ id, name: heydayName(h, id) })) };
   else if (h.ask) v.ask = { kind: "let_go_legacy", options: [...h.legacies, h.ask.legacy].map((l) => ({ id: l.id, name: l.name })) };
   const era = eraOf({ year: world.date.year, month: world.date.month, day: world.date.day ?? 1 });
@@ -642,7 +660,8 @@ const views = new WeakMap<GameHeritage, { key: string; out: (HeritageView | null
 export function heritageViews(world: World): (HeritageView | null)[] {
   const g = world.heritage;
   if (!g) return [];
-  const key = `${g.version}:${world.player}:${world.date.year}`;
+  // Progress moves with the world, so the player's view is worked out again each week.
+  const key = `${g.version}:${world.player}:${world.date.year}:${world.date.month}:${world.date.day ?? 1}`;
   const hit = views.get(g);
   if (hit?.key === key) return hit.out;
   const out = g.realms.map((_, n) => heritageView(world, n));

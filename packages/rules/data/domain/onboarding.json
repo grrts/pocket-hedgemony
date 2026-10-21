@@ -1,5 +1,5 @@
 {
-  "$comment": "Onboarding (domain/onboarding/spec.md, tutorial/tutorial-design.md v5). Chapters, the tutorial scenario file's world rules and scripted events, step script entries the design writes out, Needs attention checks, goals, Almanac sections, inputs and measuring. Numbers are the design's placeholders unless the spec says otherwise.",
+  "$comment": "Onboarding (domain/onboarding/spec.md, tutorial/tutorial-design.md v5; the 1378 tutorial \"Murad's Frontier\" under X-25, start-date/plan-1378.md step 7, research in start-date/research/east.md). Chapters, the tutorial scenario file's world rules and scripted events, step script entries, Needs attention checks, goals, Almanac sections, inputs and measuring. Numbers are the design's placeholders unless the spec says otherwise.",
   "tutorial_nation": "Ottomans",
   "free_tier": [
     "Ottomans",
@@ -16,7 +16,7 @@
     {
       "n": 0,
       "name": "The map",
-      "date": "November 1444",
+      "date": "September 1378",
       "turns": 0,
       "topic": "map",
       "done_when": [
@@ -27,19 +27,19 @@
     },
     {
       "n": 1,
-      "name": "A month at a time",
-      "date": "November 1444",
+      "name": "A week at a time",
+      "date": "September 1378",
       "turns": 3,
       "topic": "turns",
       "done_when": [
-        "Manisa event answered",
+        "tribute event answered",
         "turn report read"
       ]
     },
     {
       "n": 2,
-      "name": "A boy on the throne",
-      "date": "February 1445",
+      "name": "The bey and his lords",
+      "date": "December 1378",
       "turns": 3,
       "topic": "lords",
       "done_when": [
@@ -49,8 +49,45 @@
     },
     {
       "n": 3,
+      "name": "Schools and inventions",
+      "date": "March 1379",
+      "turns": 2,
+      "advance": true,
+      "topic": "research",
+      "done_when": [
+        "invention chosen",
+        "recruit pool shrink seen"
+      ]
+    },
+    {
+      "n": 4,
+      "name": "Two emperors",
+      "date": "June 1379",
+      "turns": 3,
+      "topic": "armies",
+      "done_when": [
+        "emperor chosen",
+        "army of levies, riders and Janissaries with a commander"
+      ]
+    },
+    {
+      "n": 5,
+      "name": "The walls of Pera",
+      "date": "July 1379",
+      "turns": [
+        4,
+        6
+      ],
+      "advance": true,
+      "topic": "battles",
+      "done_when": [
+        "peace signed"
+      ]
+    },
+    {
+      "n": 6,
       "name": "Bread and castles",
-      "date": "May 1445",
+      "date": "June 1381",
       "turns": 1,
       "advance": true,
       "topic": "food",
@@ -61,44 +98,9 @@
       ]
     },
     {
-      "n": 4,
-      "name": "Men under arms",
-      "date": "September 1445",
-      "turns": 3,
-      "topic": "armies",
-      "done_when": [
-        "army of levies, riders and Janissaries with a commander"
-      ]
-    },
-    {
-      "n": 5,
-      "name": "The Danube frontier",
-      "date": "October 1445",
-      "turns": [
-        4,
-        6
-      ],
-      "topic": "battles",
-      "done_when": [
-        "peace signed"
-      ]
-    },
-    {
-      "n": 6,
-      "name": "Schools and inventions",
-      "date": "early 1446",
-      "turns": 2,
-      "advance": true,
-      "topic": "research",
-      "done_when": [
-        "invention chosen",
-        "recruit pool shrink seen"
-      ]
-    },
-    {
       "n": 7,
-      "name": "The Janissaries' pay",
-      "date": "1446",
+      "name": "The soldiers' pay",
+      "date": "1382",
       "turns": [
         3,
         4
@@ -110,21 +112,21 @@
     },
     {
       "n": 8,
-      "name": "The wall at Corinth",
-      "date": "November 1446",
+      "name": "The road to Serres",
+      "date": "August 1383",
       "turns": [
         4,
         6
       ],
       "topic": "sieges",
       "done_when": [
-        "Hexamilion fallen or terms agreed"
+        "Serres fallen or terms agreed"
       ]
     },
     {
       "n": 9,
       "name": "Your realm now",
-      "date": "1447",
+      "date": "late 1383",
       "turns": 0,
       "topic": null,
       "done_when": [
@@ -132,78 +134,152 @@
       ]
     }
   ],
+  "playable_now": [
+    0
+  ],
+  "playable_now_comment": "D-TUT-19: the chapters the game can play today, from the normal 1378 start: their steps' anchors and Done-when conditions exist on the real screens. The others wait for their chapter saves and scripted events (TUT-012, TUT-024).",
   "scripted_events": [
     {
-      "id": "tut_murad_to_manisa",
-      "name": "Murad goes back to Manisa",
-      "date": "November 1444",
+      "id": "tut_byzantine_tribute",
+      "name": "Tribute from Constantinople",
+      "date": "autumn 1378",
       "tutorial_only": true,
       "chapter": 1,
       "history": {
-        "summary": "After Varna, Murad II goes back to his retirement at Manisa and leaves the twelve-year-old Mehmed II on the throne.",
+        "summary": "Andronikos IV, who seized Constantinople on 12 August 1376 with Genoese and Ottoman help, pays Murad tribute and has handed back Gallipoli. His father John V and brother Manuel II are in his prison.",
         "sources": [
-          "country-catalogue: ottoman"
+          "start-date research: east, Ottoman 1378 opening (Murad's Frontier)"
         ]
       },
       "options": [
-        "Let him go",
-        "Ask him to stay this winter"
+        "Take the tribute",
+        "Ask after John V"
       ]
     },
     {
-      "id": "tut_danube_fleet",
-      "name": "The crusaders' fleet on the Danube",
-      "date": "summer 1445",
+      "id": "tut_john_escapes",
+      "name": "John V and Manuel reach Murad",
+      "date": "June 1379",
       "tutorial_only": true,
       "chapter": 4,
       "history": {
-        "summary": "A crusader fleet of Burgundian and Venetian galleys sails up the Danube to join the Wallachians and Hunyadi.",
+        "summary": "John V and Manuel II escape from prison in June 1379 and go to Murad, offering more tribute and service for his help against Andronikos IV.",
         "sources": [
-          "country-catalogue: ottoman"
+          "start-date research: east, Ottoman 1378 opening (Murad's Frontier)"
         ]
       },
-      "line": "The crusaders' fleet is on the Danube"
+      "line": "John V and Manuel have escaped to Murad",
+      "options": [
+        "Back John V",
+        "Keep Andronikos IV"
+      ]
     },
     {
-      "id": "tut_janissary_pay_rising",
-      "name": "The Janissary pay rising and Murad's return",
-      "date": "1446",
+      "id": "tut_city_retaken",
+      "name": "John V back in Constantinople",
+      "date": "1 July 1379",
+      "tutorial_only": true,
+      "chapter": 5,
+      "history": {
+        "summary": "John V retakes Constantinople on 1 July 1379 with Ottoman troops and Venetian ships; Andronikos IV flees to Genoese Pera with hostages, and the siege of Pera follows (1379-1381).",
+        "sources": [
+          "start-date research: east, Ottoman 1378 opening (Murad's Frontier)"
+        ]
+      },
+      "line": "John V is back in Constantinople; Andronikos holds out in Pera"
+    },
+    {
+      "id": "tut_settlement_1381",
+      "name": "The settlement of 1381",
+      "date": "May 1381",
+      "tutorial_only": true,
+      "chapter": 5,
+      "history": {
+        "summary": "In May 1381 Andronikos IV is made heir again and given Selymbria and Thracian towns; John V's tribute and service to Murad are raised (medium confidence).",
+        "sources": [
+          "start-date research: east, Ottoman 1378 opening (Murad's Frontier)"
+        ]
+      }
+    },
+    {
+      "id": "tut_germiyan_marriage",
+      "name": "A bride for Bayezid",
+      "date": "1381",
+      "tutorial_only": true,
+      "chapter": 6,
+      "history": {
+        "summary": "Prince Bayezid marries Devlet Hatun, daughter of Süleyman Şah of Germiyan; her dowry is Kütahya, Simav, Eğrigöz and Tavşanlı. Dated 1381 by the Ottoman chronicles (Aşıkpaşazade, Neşri), 1378 by some modern works; the 1378 start keeps Kütahya with Germiyan, so the tutorial uses 1381.",
+        "sources": [
+          "start-date research: east, Ottoman 1378 opening (Murad's Frontier)"
+        ]
+      },
+      "options": [
+        "Accept the marriage",
+        "Press Germiyan by war"
+      ]
+    },
+    {
+      "id": "tut_hamid_towns",
+      "name": "The Hamid towns for sale",
+      "date": "1381",
+      "tutorial_only": true,
+      "chapter": 6,
+      "history": {
+        "summary": "Kemaleddin Hüseyin of Hamid, pressed by Karaman, sells Akşehir, Beyşehir, Seydişehir, Yalvaç and Karaağaç to Murad. Dated 1381 by the chronicles, c.1374-75 by some; the 1378 start leaves the sale ahead, so the tutorial uses 1381.",
+        "sources": [
+          "start-date research: east, Ottoman 1378 opening (Murad's Frontier)"
+        ]
+      },
+      "options": [
+        "Buy the towns",
+        "Leave them to Hamid"
+      ]
+    },
+    {
+      "id": "tut_manuel_thessaloniki",
+      "name": "Manuel goes to Thessaloniki",
+      "date": "1382",
       "tutorial_only": true,
       "chapter": 7,
       "history": {
-        "summary": "The Janissaries revolt at Edirne (Buçuktepe) in 1446, and Murad takes the throne back.",
+        "summary": "In 1382 Manuel II takes Thessaloniki as his own base, to resist Murad in Macedonia.",
         "sources": [
-          "country-catalogue: ottoman"
+          "start-date research: east, Ottoman 1378 opening (Murad's Frontier)"
         ]
-      }
+      },
+      "line": "Manuel has made Thessaloniki his own base"
     }
   ],
   "historical_dates": {
-    "battle of Varna": "10 November 1444",
-    "tutorial start": "11 November 1444",
-    "Murad goes back to Manisa": "November 1444",
-    "the crusaders' fleet on the Danube": "summer 1445",
-    "storming of the Hexamilion": "December 1446",
-    "crusaders cross the Danube at Giurgiu": "autumn 1445"
+    "tutorial start": "20 September 1378",
+    "Andronikos IV takes Constantinople": "12 August 1376",
+    "tribute from Constantinople": "autumn 1378",
+    "John V and Manuel escape": "June 1379",
+    "John V retakes Constantinople": "1 July 1379",
+    "the settlement of 1381": "May 1381",
+    "the Germiyan marriage": "1381",
+    "the Hamid sale": "1381",
+    "Manuel goes to Thessaloniki": "1382",
+    "fall of Serres": "19 September 1383"
   },
   "scenario": {
-    "base": "the normal 11 November 1444 setup",
+    "base": "the normal 20 September 1378 setup",
     "overrides": {
-      "grand_vizier": "Çandarlı Halil",
+      "grand_vizier": "Çandarlı Kara Halil",
       "lords": [
         {
           "house": "Evrenos",
-          "loyalty": "Loyal"
+          "name": "Evrenos Bey",
+          "loyalty": "Wavering",
+          "want": "a march on Serres"
         },
         {
           "house": "Mihal",
           "loyalty": "Loyal"
         },
         {
-          "house": "Turahan",
-          "name": "Turahan Bey",
-          "loyalty": "Wavering",
-          "want": "a war on the Morea"
+          "house": "Timurtaş",
+          "loyalty": "Loyal"
         }
       ],
       "royal_province_without_official": {
@@ -219,8 +295,7 @@
           "faith": "Orthodox"
         }
       ],
-      "seed": "fixed",
-      "crusade_war_open": true
+      "seed": "fixed"
     },
     "quiet_world": {
       "protected": "Ottomans",
@@ -230,28 +305,32 @@
       ],
       "countries_in_regions": {
         "Karaman": "western Anatolia",
+        "Germiyan": "western Anatolia",
         "Serbia": "the Balkans"
       },
       "lifts_at_chapter": 9
     },
     "forced_ai": {
-      "Hungary": {
+      "Andronikos IV": {
         "chapter": 5,
-        "marches_on": "Giurgiu",
-        "commander": "Hunyadi",
-        "offers_terms_after_failing_castle_months": 2,
-        "crosses": "the Danube"
+        "realm": "Byzantium",
+        "holds": "Pera",
+        "with": "Genoa",
+        "commander": "Andronikos IV",
+        "offers_terms_after_failing_castle_months": 2
       },
-      "the Morea": {
+      "Manuel II": {
         "chapter": 8,
-        "accepts_terms_when": "wall fallen"
+        "realm": "Byzantium",
+        "holds": "Serres",
+        "accepts_terms_when": "Serres fallen"
       }
     },
     "scripted_wars": [
-      "the crusade"
+      "the war for John V's throne"
     ],
     "watch_speed": {
-      "battle": "Giurgiu",
+      "battle": "Pera",
       "seconds_per_bell": 3,
       "opens_battle_screen": true
     },
@@ -259,21 +338,45 @@
       "Genoese",
       "Venetian"
     ],
-    "league": {
-      "against": "Ottomans",
-      "members": [
-        "Hungary",
-        "Wallachia",
-        "Papal States"
+    "civil_war": {
+      "emperor": "Andronikos IV",
+      "since": "12 August 1376",
+      "prisoners": [
+        "John V",
+        "Manuel II"
       ],
-      "fleets": [
-        "Venice",
-        "Burgundy"
-      ],
-      "soldiers": 24000,
-      "regardless_of_threshold": true,
-      "war_aim": "Defend the faith",
-      "aim_granted_by": "the start state"
+      "partners_at_war": {
+        "a": "Venice",
+        "b": "Genoa",
+        "over": "Tenedos",
+        "since": "spring 1378"
+      },
+      "card_line": "Two emperors: Andronikos IV (Genoa) and John V (Venice)",
+      "sides": {
+        "Back John V": {
+          "emperor": "John V",
+          "partner": "Venice",
+          "partner_brings": "Venetian galleys",
+          "war_aim": "Seat a pretender",
+          "aim_granted_by": "John V at your court",
+          "enemy": "Andronikos IV",
+          "enemy_partner": "Genoa",
+          "closed_strait": "Bosporus",
+          "historical": true
+        },
+        "Keep Andronikos IV": {
+          "emperor": "Andronikos IV",
+          "partner": "Genoa",
+          "partner_brings": "Genoese galleys from Pera",
+          "war_aim": null,
+          "aim_granted_by": null,
+          "enemy": "John V",
+          "enemy_partner": "Venice",
+          "closed_strait": "Dardanelles",
+          "historical": false
+        }
+      },
+      "open_crossing": "Gallipoli"
     },
     "faith_choice": {
       "Keep it Restricted": {
@@ -289,7 +392,7 @@
     },
     "persecute": {
       "dimmed": true,
-      "note": "Persecuting would give every Orthodox neighbour the Defend the faith aim, and the crusade would only grow."
+      "note": "Persecuting would give every Orthodox neighbour the Defend the faith aim, and turn both emperors against you."
     },
     "faith_lens": {
       "hatch_share": 0.3,
@@ -310,14 +413,15 @@
         ]
       }
     },
-    "devshirme": {
-      "recruits_line": "Boys taken from Christian families in Rumelia (the devshirme), and war captives.",
-      "camera_to": "the Rumelian provinces the corps drew from",
+    "pencik": {
+      "recruits_line": "War captives: the bey's fifth of every haul (the pençik), trained as the new troops (yeniçeri).",
+      "dating": "the pençik and the first yeniçeri under Murad, c.1360s-1380s (medium confidence)",
+      "camera_to": "the border lands the raids took captives from",
       "vignette": {
         "depiction": "narrative_only",
         "panels": [
-          "the officials arriving in a village",
-          "the boy's years of training",
+          "the captives brought back from a raid",
+          "the young man's years of training",
           "the soldier he becomes"
         ],
         "buttons": [
@@ -327,7 +431,7 @@
         "gives": []
       },
       "province_card": {
-        "people_line": "boys taken",
+        "people_line": "captives taken",
         "grievance": "Sons taken",
         "orthodox_lords_step_down": 1
       },
@@ -337,26 +441,28 @@
         "standard histories"
       ]
     },
-    "chapter6_faith_line": {
+    "chapter3_faith_line": {
       "province": "a Rumelian province",
       "community": "Orthodox",
       "line": "served, Restricted, protected: no grievance",
       "why_links_to": "religion",
       "madrasa": {
-        "province": "Edirne",
+        "province": "Bursa",
         "faith": "Sunni"
       }
     },
     "catalogue_court": {
-      "ruler": "Mehmed II",
-      "ruler_age": 12,
-      "retired": "Murad II",
-      "retired_at": "Manisa"
+      "ruler": "Murad I",
+      "ruler_age": 52,
+      "heir": "Bayezid",
+      "heir_age": 18,
+      "capital": "Edirne",
+      "second_seat": "Bursa"
     },
     "off_script": {
-      "murad_stays": {
+      "asked_after_john": {
         "chapter": 1,
-        "murad": "stays at Edirne as a commander",
+        "effect": "Andronikos's envoy leaves cold",
         "until": "the end of chapter 1"
       },
       "ignored_lord": {
@@ -444,17 +550,43 @@
         "lens": "Faith"
       }
     ],
-    "3": [
+    "4": [
       {
-        "id": "ch3.open_food_policy",
+        "id": "ch4.choose_emperor",
+        "kind": "choose",
+        "text": "tut.ch4.choose_emperor",
+        "anchor": "event.tut_john_escapes",
+        "allow": [
+          "event.tut_john_escapes"
+        ],
+        "done": "choice(tut_john_escapes)",
+        "guide_face": "vizier",
+        "max_chars": 140
+      }
+    ],
+    "6": [
+      {
+        "id": "ch6.open_food_policy",
         "kind": "do",
-        "text": "tut.ch3.open_food_policy",
+        "text": "tut.ch6.open_food_policy",
         "anchor": "ui.country_card.food",
         "allow": [
           "ui.country_card.food",
           "camera"
         ],
         "done": "screen_open(food_policy)",
+        "guide_face": "vizier",
+        "max_chars": 140
+      },
+      {
+        "id": "ch6.choose_marriage",
+        "kind": "choose",
+        "text": "tut.ch6.choose_marriage",
+        "anchor": "event.tut_germiyan_marriage",
+        "allow": [
+          "event.tut_germiyan_marriage"
+        ],
+        "done": "choice(tut_germiyan_marriage)",
         "guide_face": "vizier",
         "max_chars": 140
       }
@@ -471,11 +603,23 @@
   ],
   "strings": {
     "en": {
-      "tut.ch3.open_food_policy": "Your castles feed the land around them. Open {ui:food_policy}.",
-      "tut.ch0.faith_lens": "Most of your people in Rumelia are Orthodox Christians. You rule them as a Sunni sultan.",
-      "tut.idle.stuck": "Stuck? {btn:skip_step} to skip this step.",
+      "tut.ch0.pan": "Murad's lands lie on both shores of the straits. Move the map to look around.",
+      "tut.ch0.find_edirne": "{place:edirne} is your capital. {place:bursa}, across the water, keeps the tombs of your house.",
+      "tut.ch0.zoom": "Zoom in on {place:gallipoli}. Its crossing joins Anatolia to Thrace, and it is yours again.",
+      "tut.ch0.open_card": "Open the card of {place:edirne} to see its people, food and garrison.",
+      "tut.ch0.food_lens": "Switch to the Food lens. Hungry provinces carry a hunger icon.",
+      "tut.ch0.faith_lens": "Most of your people in Rumelia are Orthodox Christians. You rule them as a Sunni bey.",
+      "tut.ch4.choose_emperor": "John V has escaped and asks for your help. Back him, or keep Andronikos IV on the throne?",
+      "tut.ch4.vizier_pencik": "The corps is strong. This is what it costs the villages that fill it.",
       "tut.ch5.lost_clash": "Your army broke. Fall back behind the walls of Edirne and call the levy.",
-      "tut.ch4.vizier_devshirme": "The corps is strong. This is what it costs the villages that fill it."
+      "tut.ch6.open_food_policy": "Your castles feed the land around them. Open {ui:food_policy}.",
+      "tut.ch6.choose_marriage": "Germiyan offers a bride for Bayezid, with {place:kutahya} as her dowry. Its castles would join your reach.",
+      "tut.idle.stuck": "Stuck? {btn:skip_step} to skip this step.",
+      "tut.end.playable_done": "That is your land, my bey. The chapters after this one are not ready yet: rule on as the Ottomans, or begin a campaign of your own.",
+      "tut.end.keep_ruling": "Keep ruling the Ottomans",
+      "tut.end.new_campaign": "New campaign",
+      "tut.note.next": "Next",
+      "tut.note.leave": "Leave the tutorial"
     }
   },
   "step_kinds": {
@@ -524,7 +668,7 @@
     "style": "parchment strip"
   },
   "guide_face": {
-    "name": "Çandarlı Halil",
+    "name": "Çandarlı Kara Halil",
     "title": "grand vizier",
     "tutorial_only": true,
     "label": "The Grand Vizier"
@@ -554,15 +698,30 @@
     },
     "place": {
       "edirne": "Edirne",
-      "sofia": "Sofia",
       "bursa": "Bursa",
-      "varna": "Varna",
-      "giurgiu": "Giurgiu"
+      "gallipoli": "Gallipoli",
+      "constantinople": "Constantinople",
+      "pera": "Pera",
+      "plovdiv": "Plovdiv",
+      "sofia": "Sofia",
+      "komotini": "Komotini",
+      "serres": "Serres",
+      "thessaloniki": "Thessaloniki",
+      "kutahya": "Kütahya"
+    },
+    "place_province": {
+      "edirne": "Edirne",
+      "bursa": "Bursa",
+      "gallipoli": "Çanakkale",
+      "constantinople": "Istanbul",
+      "pera": "Istanbul",
+      "plovdiv": "Plovdiv",
+      "kutahya": "Kütahya"
     },
     "lord": {
-      "turahan": "Turahan",
       "evrenos": "Evrenos",
-      "mihal": "Mihal"
+      "mihal": "Mihal",
+      "timurtas": "Timurtaş"
     }
   },
   "inputs": {
@@ -687,7 +846,7 @@
       "screen": "food_policy",
       "done": "chosen",
       "steps": [
-        "ch3.open_food_policy"
+        "ch6.open_food_policy"
       ]
     },
     {
@@ -727,8 +886,23 @@
   "first_hints": [
     {
       "id": "realm",
-      "line": "Choose a realm to rule: tap one here, or any realm on the map.",
+      "line": "Choose a realm to rule. The Ottomans under Murad I make a good first realm: tap them, or any realm you like.",
       "done": "realm chosen"
+    },
+    {
+      "id": "province",
+      "line": "Open your capital's card: tap its name at the bottom left. Every province you hold has a card like it.",
+      "done": "province opened"
+    },
+    {
+      "id": "realm_book",
+      "line": "Open your realm's book: tap your banner in the top bar. It holds your government, money, lands, army and envoys.",
+      "done": "realm opened"
+    },
+    {
+      "id": "lens",
+      "line": "Change what the map shows: tap Map mode, then pick Wealth.",
+      "done": "lens"
     },
     {
       "id": "move",
@@ -741,6 +915,16 @@
       "done": "turn ended"
     },
     {
+      "id": "news",
+      "line": "See what happened this week: tap the scroll in the top bar.",
+      "done": "news opened"
+    },
+    {
+      "id": "study",
+      "line": "Choose what your scholars study: in your realm's book, open Research and tap Study now on an invention.",
+      "done": "setStudy"
+    },
+    {
       "id": "recruit",
       "line": "Recruit men: in a province's Garrison tab, tap Recruit.",
       "done": "recruit"
@@ -749,6 +933,16 @@
       "id": "build",
       "line": "Build a work: in a province's Build tab, tap Build on one.",
       "done": "build"
+    },
+    {
+      "id": "lords",
+      "line": "Meet your lords, who hold land for you and want things in return: in your realm's book, open Lands, then Lords.",
+      "done": "lords opened"
+    },
+    {
+      "id": "treasury",
+      "line": "See where your gold comes from and goes: tap your gold in the top bar.",
+      "done": "treasury opened"
     },
     {
       "id": "envoy",
@@ -894,7 +1088,7 @@
       "ribbons",
       "pixel icons"
     ],
-    "devshirme_entry": {
+    "pencik_entry": {
       "sources": [
         "the catalogue's Ottoman record",
         "standard histories"
@@ -913,13 +1107,13 @@
     "offline_retention_days": 30,
     "consent_item": "tutorial step counts"
   },
-  "start_date": "11 November 1444",
+  "start_date": "20 September 1378",
   "ottoman_examples": {
     "janissaries": 1000,
     "levies": 4000,
     "lords_riders": 2000,
-    "crusader_army": 16000,
-    "hexamilion_months": 2
+    "pera_army": 6000,
+    "serres_months": 2
   },
   "sounds": {
     "step shown": "ui_hint",
@@ -948,7 +1142,6 @@
   "_provisional": [
     "chapter_minutes",
     "chapters",
-    "scenario.league.soldiers",
     "ottoman_examples",
     "idle",
     "goals_months",

@@ -166,6 +166,10 @@ Any official can be **commissioned** to lead an army or stand in one as a captai
 | Schoolmaster | 0 | 2 | 1 | Old soldier |
 | Marshal | 2 | 2 | 2 | Any |
 
+**General or admiral.** The official's screen offers two commissions side by side: **Commission as general** and **Commission as admiral**, each showing the Might, Cunning and Logistics he would start with. A general leads only armies; an admiral leads only fleets and starts with his type's sea skills (see [Naval](Naval)), his years in a port province counting double. He stays a general or an admiral until released. The 1444 commanders and mercenary captains are generals, a hired fleet's captain an admiral. An AI fleet that needs an admiral and has none commissions one, from its own port's official first.
+
+**When a commander dies.** Commanders age and die like everyone else (see [Your Realm](Your-Realm)). When a general dies, his men stand as the garrison of the crown province they are in; in a lord's land, in enemy land or in your own land held by an enemy, they walk to the nearest crown province you hold and garrison it there. When an admiral dies, his ships sail for the nearest port of your own. On the way they take no orders and can't be caught. Zoomed out you see no banner or fleet token for them; close in, you see the men walking and the ships sailing home.
+
 At 5 years served the type's highest skill gains +1, and +1 more at 10, and no skill goes past 5. When skills tie, Logistics gains first, then Cunning, then Might, so a Marshal with 5 years served has Logistics 3. You pick the offered trait or keep the one rolled. A commander gets the realm's current style for their era and country; a Marshal may take any style your realm has seen in a battle it fought. Years served count where the official was assigned.
 
 **The costs.** A commission costs 50 gold once (a provisional number, raised from 10 so commanders are not handed out freely). In the field an official earns their wage ×3 as commander or ×2 as captain. They bring a staff of 100 (commander) or 50 (captain) who eat 2 rations each a month from the army's reserve, and their horses (30 for a commander, 15 for a captain) eat 3 each. Staff eat but are not soldiers: they do not count toward foraging or the column size.
@@ -201,7 +205,7 @@ Other leaders: the ruler and heirs can lead, lords lead only their own retinues 
 
 ### Names and ranks
 
-Every commander is named the way his own people name someone: a Castilian is "Rodrigo Manrique", a Hungarian "Hunyadi János" and a Japanese "Hosokawa Katsumoto", family name first where the language puts it first. The great commanders of 1444 go by their own names too: Hunyadi János, Gjergj Kastrioti, Konstantinos Palaiologos. He also carries the rank of his post in that language: a Portuguese commander leading an army is "Marechal Fernão Coutinho" and the same man at the head of a fleet is "Almirante Fernão Coutinho"; an Ottoman admiral is "Kapudan Mehmed Pasha", a Japanese general "Hosokawa Katsumoto Taishō". The rank changes with the post, so an admiral sent back to court is a general again. A mercenary company's captain is named and ranked in the language of the land the company gathers in ("Hauptmann Ulrich von Hallwyl", "Condottiero Niccolò Piccinino") and keeps that name in your service. A people with no word for a post in the game's data shows the name alone.
+Every commander is named the way his own people name someone: a Castilian is "Rodrigo Manrique", a Hungarian "Hunyadi János" and a Japanese "Hosokawa Katsumoto", family name first where the language puts it first. The great commanders of the start go by their own names too: Bertrand du Guesclin, Gazi Evrenos Bey, Vettor Pisani, Xu Da. He also carries the rank of his post in that language: a Portuguese commander leading an army is "Marechal Fernão Coutinho" and the same man at the head of a fleet is "Almirante Fernão Coutinho"; an Ottoman admiral is "Kapudan Mehmed Pasha", a Japanese general "Hosokawa Katsumoto Taishō". The rank changes with the post, so an admiral sent back to court is a general again. A mercenary company's captain is named and ranked in the language of the land the company gathers in ("Hauptmann Ulrich von Hallwyl", "Condottiero Niccolò Piccinino") and keeps that name in your service. A people with no word for a post in the game's data shows the name alone.
 
 The ranked name is used on the army row of a province card, the commander screen, the Military tab's Commanders list, the army picker, fleet names on the Navy tab and in port, and the Mercenaries tab. Under it, the small line with his skills starts with his post in plain English (commander, admiral or hired captain), so you never need to know the word. Dispatches and short buttons use the plain name.
 
@@ -240,6 +244,8 @@ Each province is updated once a month: training months tick down and finished re
 - [Diplomacy](Diplomacy): war aims (a lord's Want) and exiles asking to serve.
 
 ## Numbers
+
+Every value the game uses, made from its config so it always matches the game: [Recruiting data](Data-Recruiting). How they combine: [Formulas](Formulas).
 
 The numbers live in the recruiting config file. Most are **provisional** and waiting for a balancing pass.
 

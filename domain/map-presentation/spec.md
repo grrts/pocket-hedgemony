@@ -34,6 +34,7 @@ rule of the system that owns the stat.
 
 Newest decision first.
 
+1. `visuals/particles-and-animations-design.md` v1 (19 Oct): moments, living world, cost.
 1. `settings/settings-design.md` v2 (16 Oct) §3.1, §4.3 (parchment toggle), §5.1 (Graphics), §5.5
    (Accessibility), §7 (performance knobs), §8.
 2. `screen-flow/screen-flow-design.md` v1 §1, §4.2, §4.3, §4.6 (G5), §7 (layout by window shape), §8.2.
@@ -169,6 +170,12 @@ Newest decision first.
 - VIEW-050 (Ubiquitous): Route food colours shall also carry a pattern (solid, dashed, dotted); day counts stay at least 10 points tall at region zoom and hide rather than shrink when the map is too zoomed out. [troop-movement §10.7]
 - VIEW-051 (Ubiquitous): Every lens the tutorial teaches shall read without telling colours apart (for example hungry provinces also carry the hunger icon on the Food lens). [tutorial §10; gap-lists List 2 item 10]
 
+#### How the player uses it: colour vision and patterns
+1. Where: Settings → Accessibility (from the game menu or the start screen), the Colour vision row: one button per mode (Default, Red-weak (protan), Green-weak (deutan), Blue-weak (tritan), No colour), and under it a sample of four neighbouring realms and a lens ramp drawn in the chosen mode, so the player sees the change before closing Settings; Patterns on lenses is the next row. A tap applies at once: the map behind the dimmed Settings, the armies and routes in realm colours, the open lens and its key all redraw; nothing restarts, and the choice is saved with the other personal settings.
+2. Grouping: both rows sit in the one Accessibility section; on the map nothing new appears, as each lens keeps its own key under the map mode buttons, which now shows each band's colour and pattern as the map draws them (the People, Wealth, Food and Walls lenses gain a key of their bands so a pattern can be read).
+3. Overview: the map itself, and each lens's key; the Colour vision row's sample shows which mode is on at a glance.
+4. Phone: five modes are too many for one row of buttons, so they wrap into a grid under the row's name, each button at least 44 points tall and wide enough for its name, in the Wide and Tall layouts and inside the safe areas; patterns are drawn in map-anchored marks of about three screen pixels at every zoom so they read on a phone at arm's length; nothing needs hover.
+
 ### 5.8 Performance budgets
 
 - VIEW-052 (Ubiquitous): The map shall hold 60 fps while panning and zooming (16.7 ms a frame). [performance.md]
@@ -260,7 +267,7 @@ Moving pieces
 - VIEW-120 (State-driven): While an army besieges a town, its figures shall stand in a ring round the walls among tents; rebels are the same figures in the rebel colour with no banner; and in the living band the commander's token is replaced by the banner-bearer, whose name shows on selection, or always at street level. [living-map-design §4.1]
 - VIEW-121 (State-driven): While a fleet is at sea in the living band, it shall be drawn as one hull per `shipsPerHull` ships (5 living, 1 street), at most 8 or 24 hulls, sailing in a loose formation round the fleet's point with wakes while it moves, in the ship types of the naval design once they exist and a generic sailing ship until then. [living-map-design §4.2]
 - VIEW-122 (State-driven): While a fleet is in port, its hulls shall lie at the docks' berths, one berth for every `berthSpacing` (2) water pixels along the town's waterfront, from the docks out, with the rest waiting off the docks; a naval battle shows the hulls facing off on the zone with smoke. [living-map-design §4.2]
-- VIEW-123 (State-driven): While a trade path is busy, the living band shall show up to 3 movers on it (a caravan of mules and carts on land, a barge on a navigable river, a trading ship at sea), spaced evenly and moving with the game clock from a start seeded by the path, so they never jump between frames or turns. [living-map-design §4.3]
+- VIEW-123 (State-driven): While a trader walks, the living band shall draw it where the daily walk has it (TRADE-132): a caravan of a mule and cart on land, a barge on a navigable river, a trading ship at sea, on the leg from the province it stands in to the next of its loop at the share of the way walked; over land it steps along the leg's tiles from one province's centre to the next as an army walks, at sea it sails from zone to zone, and over each played day it walks on smoothly from where the day before left it, so it never jumps between frames or turns (F-129). [living-map-design §4.3]
 - VIEW-124 (Ubiquitous): In the living band, envoys shall ride in the band's art pixels, explorers sail as a single ship along the voyage path, colonists' carts head for the colony site, and life (people in town streets and at the market at street level, chimney smoke, flags on keeps) shall be decoration only. [living-map-design §4.4]
 
 How the player uses it
@@ -271,7 +278,7 @@ How the player uses it
 - VIEW-129 (Optional): Where Animations is Off, every figure shall be drawn still; where Reduced, only marching and battles move; Battery saver sets Map detail Medium with still figures. [living-map-design §6]
 - VIEW-130 (Ubiquitous): The overlay shall animate at most `maxAnimated` (60) figures at about 10 frames a second, the nearest the screen's centre first, from sprite caches keyed by piece, colour and whole `u` with least-recently-used eviction; towns cost the tiled tiers one extra texture read, and the budgets do not change (VIEW-054). [living-map-design §1.5, §6]
 - VIEW-131 (Ubiquitous): Town buildings shall take their culture group's style (`townStyles`: roof and wall colours from the 32-colour palette and a house variant set), with one generic set until a group has its own, and a hand-made landmark (`landmarks`, per province) replaces the generic keep or worship cell where one exists. [living-map-design §3.4]
-- VIEW-132 (Ubiquitous): The snapshot shall carry the busy trade paths the player may see for the living map: traders sharing a loop and a way of going (land, river or sea) are one path, with its loop province by province, its trader count, the realm of its first trader for the colours and one of the player's traders on it; a path is kept where its loop enters a province whose trade the player sees (D-TRADE-13), busiest first, at most `livingMap.traders.maxPaths` (200). A tap on a mover of a path the player has a trader on opens that trader's card in the Trade tab; others give way to the province beneath, as there is no card for another realm's trader. [living-map-design §4.3, §7]
+- VIEW-132 (Ubiquitous): The snapshot shall carry every trader the player may see for the living map: its realm, how it goes (land, river or sea), the province it stands in and the next of its loop, the share of the way walked, the leg's tiles over land and whether it is the player's; a trader is kept while its leg enters a province whose trade the player sees (D-TRADE-13), the player's own first, at most `livingMap.traders.maxTraders` (300). A tap on one of the player's opens its card in the Trade tab; another realm's gives way to the province beneath, as there is no card for another realm's trader. [living-map-design §4.3, §7]
 - VIEW-134 (Ubiquitous): In the living band, the figures, hulls, traders and tents, and the town tiles with their keeps, walls, markets and houses of worship, shall be drawn at twice the ground's art density (two by two of their pixels to each art pixel of the ground, 16 × 16 to a map pixel for town tiles), so castles, towns, boats and commanders show their detail at the size VIEW-102 sets; roads stay in the ground's own art pixels so they meet it, and the coarser sprites remain the icons further out (feedback 126, Leroy).
 
 #### How the player uses it: the living map
@@ -290,6 +297,32 @@ Leroy's playtest: zoomed out, Portugal's name lay over Castile's and the Livonia
 2. Grouping: a realm's name sits on its own land, on its middle province or one near it, never on a neighbour's name.
 3. Overview: the zoomed-out map is the overview of who holds what; every name on it can be read whole, and the player's own realm is always named.
 4. Phone: the same rule in the Wide and Tall layouts and at every zoom; names stay at least 9 pixels tall; nothing needs hover.
+
+### Particles and animations (19 October 2026)
+Leroy found the game's effects and animations underwhelming (19 Oct). The map now reacts when something happens and the land moves between turns, in the pieces' own art pixels and the 32-colour palette. Battles and sieges keep their own design (`battles/battle-visuals-design.md`). Every number is a starting value in `effects` in `map-presentation.json`. [particles-and-animations-design.md]
+
+Moments
+- VIEW-140 (Event-driven): When a played day leaves a province held by another realm than before (its occupier while occupied, else its owner), and the province is on screen at Region zoom (2) or closer, the map shall throw a burst of pixel confetti in the new holder's colour from the province's centre, falling, with a ring of dust on the ground (`moments.flip`, 24 particles, 1.8 s). [particles-and-animations-design §3]
+- VIEW-141 (Event-driven): When a work of the player's is finished on screen, the map shall raise dust puffs at its town and then gold sparkles rising from it (`moments.built`, 20 particles, 2 s). [particles-and-animations-design §3]
+- VIEW-142 (Event-driven): When a rising begins on screen, the map shall send up dark smoke and red embers from the province (`moments.rising`, 24 particles, 3 s). [particles-and-animations-design §3]
+- VIEW-143 (Event-driven): When the player's realm has a new ruler, reform, invention or heritage (`gloryNews`) and its capital is on screen, the map shall drop one gold shower over the capital (`moments.glory`, 20 particles, 2 s), however many such news the day brings. [particles-and-animations-design §3]
+- VIEW-144 (Event-driven): When plague breaks out in a province on screen (its step rises to outbreak), the map shall let pale motes drift up from it (`moments.plague`, 14 particles, 3 s). [particles-and-animations-design §3]
+- VIEW-145 (Optional): Where Animations is Full, moments shall play in full and the looping effects run; where Reduced, moments play with half their particles (`reducedShare`) and no looping effects; where Off, nothing plays; Battery saver stops the looping effects only. A moment off screen, at World zoom, or on the first snapshot of a session plays nothing. [particles-and-animations-design §3, §6]
+
+Living world
+- VIEW-146 (State-driven): While a town is on screen in the living band, grey smoke shall rise and drift from its core, one chimney per `coreCellsPerChimney` (5) core cells, at most `maxPerTown` (3) (extends VIEW-124). [particles-and-animations-design §4]
+- VIEW-147 (State-driven): While a province on screen at Region zoom or closer is below `snow.belowCelsius` (0 °C), white flakes shall drift down over it, at most `snow.maxFlakes` (80) on screen. [particles-and-animations-design §4]
+- VIEW-148 (State-driven): While the map is at Region zoom or closer, a flock of `flockMin` to `flockMax` (3 to 5) birds shall now and then fly across the land on screen, gulls along the coast, at most `flocksOnScreen` (1) at a time. [particles-and-animations-design §4]
+- VIEW-149 (State-driven): While a rising stands in a province on screen, a thicker dark smoke column shall rise over it (extends VIEW-128). [particles-and-animations-design §4]
+
+Cost
+- VIEW-150 (Ubiquitous): Every particle shall be a square of whole art pixels in one pooled field of at most `maxParticles` (240), the oldest giving its slot to the newest, fading in no more than four steps; the field asks for frames at `frameRate` (20) a second only while particles live, so a still map stays idle, and the overlay budget (VIEW-054) does not change. [particles-and-animations-design §7]
+
+#### How the player uses it: particles and animations
+1. Where: nothing to tap. Moments play on the map where the player is already looking while the week plays out; the looping effects are part of the land.
+2. Grouping: each effect belongs to the thing it shows, the province that changed hands, the town that finished a work, the rising; no new screen or control beyond Settings → Animations.
+3. Overview: the dispatches log and alerts stay the record of every moment (VIEW-127); a moment only draws the eye to it.
+4. Phone: effects are drawn in the pieces' art pixels, so they read at arm's length in the Wide and Tall layouts; nothing needs hover; they are drawn on the map canvas under the top bar and the safe areas; Settings → Animations and Battery saver turn them down or off.
 
 ## 6. Commands
 
@@ -359,8 +392,7 @@ re-renders only open panels.
 | `livingMap.hamlets` | Hamlets and tracks | 40 thousand rural per hamlet, at most 6, 4 apart, tracks within 8 | Yes | `map-presentation.json` |
 | `livingMap.figures` | Figures | 1,000 / 250 men a figure, 12 / 40 at most, 60 animated at 10 fps | Yes | `map-presentation.json` |
 | `livingMap.hulls` | Hulls | 5 / 1 ships a hull, 8 / 24 at most, a berth every 2 water pixels along the waterfront | Yes | `map-presentation.json` |
-| `livingMap.traders.maxMovers` | Movers per trade path | 3 | Yes | `map-presentation.json` |
-| `livingMap.traders.maxPaths` | Trade paths in the snapshot feed | 200 | Yes | `map-presentation.json` |
+| `livingMap.traders.maxTraders` | Traders in the snapshot feed | 300 | Yes | `map-presentation.json` |
 | `livingMap.byDetail` | Bands and life by Map detail | Low off, Medium living, High living and street | Yes | `map-presentation.json` |
 | `livingMap.townStyles`, `landmarks` | Culture styles and landmarks | generic set; Toledo, Constantinople, Rome, Paris, Venice, Cairo, Beijing, Cuzco | Yes | `map-presentation.json` |
 
@@ -532,7 +564,7 @@ None. AI nations run in the same worker turn, which the turn budgets cover (VIEW
 | VIEW-120 | living-map.feature | Rebels carry no banner |
 | VIEW-121 | living-map.feature | Fleets as hulls |
 | VIEW-122 | living-map.feature | Hulls in port fill the berths |
-| VIEW-123 | living-map.feature | Traders move steadily along their path |
+| VIEW-123 | living-map.feature | A trader stands on its leg as an army steps |
 | VIEW-124 | — | presentation only: envoys, explorers, colonists and life are decoration |
 | VIEW-125 | living-map.feature | A tap goes to the piece before the province; Every piece has a 44-point tap box |
 | VIEW-126 | living-map.feature | Markers bring back the plates |
@@ -541,6 +573,17 @@ None. AI nations run in the same worker turn, which the turn budgets cover (VIEW
 | VIEW-129 | living-map.feature | Animations set which figures move |
 | VIEW-130 | living-map.feature | At most 60 figures move at once |
 | VIEW-131 | — | presentation only: culture styles and landmarks are art |
-| VIEW-132 | living-map.feature | The snapshot feeds the busy trade paths |
+| VIEW-132 | living-map.feature | The snapshot carries each trader where it walks |
 | VIEW-133 | zoom-content.feature | Realm names never overlap |
 | VIEW-134 | — | presentation only: detailed figures and town tiles are art |
+| VIEW-140 | effects.feature | A province changing hands throws confetti in the new holder's colour |
+| VIEW-141 | effects.feature | A finished work raises dust and sparkles |
+| VIEW-142 | effects.feature | A rising sends up smoke and embers |
+| VIEW-143 | effects.feature | One gold shower over the capital for the realm's news |
+| VIEW-144 | effects.feature | Plague breaking out lets motes drift up |
+| VIEW-145 | effects.feature | Animations decides how much plays |
+| VIEW-146 | effects.feature | Bigger towns smoke from more chimneys |
+| VIEW-147 | effects.feature | Snow falls below freezing |
+| VIEW-148 | — | presentation only: birds are decoration |
+| VIEW-149 | — | presentation only: riot smoke is decoration |
+| VIEW-150 | — | presentation only: checked by the client's particle tests and the perf overlay budget |

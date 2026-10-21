@@ -41,6 +41,7 @@ for (const [name, device] of [
   await page.evaluate(() => window.__phSelect("p2148"));
   await page.waitForTimeout(300);
   await tap("[data-nation=creek]");
+  await tap("[data-begin]");
   await page.waitForSelector(".hud [data-news]", { timeout: 60000 });
   await page.waitForTimeout(500);
   await page.evaluate(() => document.querySelector("[data-hint=stop]")?.click());
@@ -130,6 +131,7 @@ for (const [name, device] of [
   await page.goto("http://localhost:4183/");
   await page.waitForSelector("[data-nation=castile]", { timeout: 60000 });
   await tap("[data-nation=castile]");
+  await tap("[data-begin]");
   await page.waitForSelector(".hud [data-news]", { timeout: 60000 });
   await page.waitForTimeout(500);
   await page.evaluate(() => document.querySelector("[data-hint=stop]")?.click());

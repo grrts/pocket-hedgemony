@@ -11,6 +11,7 @@ import { officialBonus } from "./officials.ts";
 import { moodIndex } from "./moods.ts";
 import { knows, withoutOf } from "./research.ts";
 import { realmAssessment } from "./realmStrengths.ts";
+import { planTilePath } from "./march.ts";
 
 /**
  * Trade in the game (TRADE-129 to TRADE-146, D-TRADE-20): every province's
@@ -23,6 +24,8 @@ import { realmAssessment } from "./realmStrengths.ts";
  */
 
 const G = config.game;
+/** Home slots, upkeep and founding gold (D-TRADE-23). */
+const H = G.homes;
 
 /** The kinds a realm can found in this slice: caravans and barges by land, the 1444 trade ship by sea. */
 export const TRADER_KINDS = ["pack_caravan", "camel_caravan", "river_barge", "cog_junk_dhow"] as const;
@@ -57,6 +60,21 @@ export interface GameTrader {
   chosen: boolean;
   /** Its loop as planned, province by province; empty until planned again. */
   path: number[];
+  /** Provinces it was counted as passing this month (once each, TRADE-033); cleared when the month turns. */
+  marked: number[];
+  /** Where its gold came from on this trip there and back and on the last whole one: province and gold kept, in pairs; and the market fees paid (TRADE-146). */
+  src: number[];
+  srcLast: number[];
+  fees: number;
+  feesLast: number;
+}
+
+/** A trader's collection or deposit, for the map to show as it happens (TRADE-152). */
+export interface TradeFeedItem {
+  trader: number;
+  province: number;
+  gold: number;
+  deposit: boolean;
 }
 
 export interface TradeState {
@@ -67,8 +85,9 @@ export interface TradeState {
   /** Traders passing this month (ships in a lane count half in its ports), and visits for crowding. */
   provincePassing: Float32Array;
   provinceVisits: Uint16Array;
-  /** Traders that passed last month, for the screens. */
+  /** Traders that passed last month, for the screens, and last month's visits, for the estimate's crowding (TRADE-147). */
   provincePassed: Float32Array;
+  provinceVisitsLast: Uint16Array;
   /** Goods value a year (gold, before the trade scale) and the land and sea building weights, worked out each January. */
   provinceGoodsValue: Float32Array;
   provinceWeight: Float32Array;
@@ -77,8 +96,12 @@ export interface TradeState {
   provinceTradeCity: Uint8Array;
   /** Last month's deposits, market fees received and traders' upkeep, by realm: 3 per realm. */
   nationTrade: Float64Array;
+  /** This month's deposits and market fees so far, by realm: 2 per realm; last month's when the month turns. */
+  nationTradeNow: Float64Array;
   /** The player's route being drawn, with its preview; never saved. */
   tradeDraft: { trader: number; stops: number[] } | null;
+  /** The player's traders' collections and deposits since the map last looked; never saved. */
+  tradeFeed: TradeFeedItem[];
 }
 
 export function createTradeState(P: number, N: number): TradeState {
@@ -89,12 +112,15 @@ export function createTradeState(P: number, N: number): TradeState {
     provincePassing: new Float32Array(P),
     provinceVisits: new Uint16Array(P),
     provincePassed: new Float32Array(P),
+    provinceVisitsLast: new Uint16Array(P),
     provinceGoodsValue: new Float32Array(P),
     provinceWeight: new Float32Array(P),
     provinceGoods: Array.from({ length: P }, () => []),
     provinceTradeCity: new Uint8Array(P),
     nationTrade: new Float64Array(N * 3),
+    nationTradeNow: new Float64Array(N * 2),
     tradeDraft: null,
+    tradeFeed: [],
   };
 }
 
@@ -259,10 +285,10 @@ const goldScale = (world: World) => world.rules.defines.works.goldScale;
 export function kindRow(world: World, kind: GameTraderKind): KindRow {
   if (isShip(kind)) {
     const s = config.sea_traders.cog_junk_dhow;
-    return { kind, name: KIND_NAME[kind], gold: COG.gold * goldScale(world), upkeep: COG.upkeep * goldScale(world), hold: s.hold, purse: s.purse * G.purse_scale, crew: COG.crew, crewClass: "seafolk" };
+    return { kind, name: KIND_NAME[kind], gold: COG.gold * goldScale(world) * H.found_factor, upkeep: COG.upkeep * goldScale(world) * H.upkeep_factor, hold: s.hold, purse: s.purse * G.purse_scale, crew: COG.crew, crewClass: "seafolk" };
   }
   const k = config.land_traders[kind];
-  return { kind, name: KIND_NAME[kind], gold: k.found * goldScale(world), upkeep: k.upkeep * goldScale(world), hold: k.hold, purse: k.purse * G.purse_scale, crew: k.crew.count, crewClass: "market folk" };
+  return { kind, name: KIND_NAME[kind], gold: k.found * goldScale(world) * H.found_factor, upkeep: k.upkeep * goldScale(world) * H.upkeep_factor, hold: k.hold, purse: k.purse * G.purse_scale, crew: k.crew.count, crewClass: "market folk" };
 }
 
 const DESERT = config.land_traders.camel_caravan.desert_grounds as string[];
@@ -489,23 +515,23 @@ function depositsAt(world: World, t: GameTrader, q: number): boolean {
   return occ < 0 || occ === t.owner;
 }
 
-let stampSeq = 0;
-let stamp = new Int32Array(0);
-
-/** A trader's month on the road: it enters province after province, collecting, paying fees and depositing (TRADE-033, TRADE-043 to TRADE-048, TRADE-060). */
-function walk(world: World, t: GameTrader, collect: boolean): void {
+/**
+ * A trader's days on the road, walked a day at a time as armies march: it enters province after province,
+ * collecting, paying fees and depositing (TRADE-033, TRADE-043 to TRADE-048, TRADE-060, TRADE-132).
+ */
+function walk(world: World, t: GameTrader, collect: boolean, days: number): void {
   const path = pathOf(world, t);
-  const token = ++stampSeq;
   const row = kindRow(world, t.kind);
   const ship = isShip(t.kind);
+  // Each province counts the trader once a month, however often it passes (TRADE-033).
   const mark = (q: number, weight: number) => {
-    if (stamp[q] === token) return;
-    stamp[q] = token;
+    if (t.marked.includes(q)) return;
+    t.marked.push(q);
     world.provincePassing[q] = world.provincePassing[q]! + weight;
   };
   mark(path[t.at]!, 1);
   if (path.length < 2) return;
-  let budget = world.rules.defines.march.daysPerMonth + t.days;
+  let budget = days + t.days;
   for (;;) {
     const next = (t.at + 1) % path.length;
     const q = path[next]!;
@@ -525,6 +551,13 @@ function walk(world: World, t: GameTrader, collect: boolean): void {
     if (budget < cost) break;
     budget -= cost;
     t.at = next;
+    // Back where it set out: a whole trip there and back is done, and where its gold came from starts afresh.
+    if (next === 0 && collect) {
+      t.srcLast = t.src;
+      t.feesLast = t.fees;
+      t.src = [];
+      t.fees = 0;
+    }
     if (world.provinceWater[q]) {
       for (const port of lanePorts(world, q)) mark(port, config.ratio.sea_lane_trader_weight);
       continue;
@@ -540,23 +573,47 @@ function walk(world: World, t: GameTrader, collect: boolean): void {
       if (owner < 0 || world.provinceOccupier[q]! >= 0) gold = 0;
       else if (owner !== t.owner) {
         const fee = gold * config.collect.foreign_market_fee;
-        world.nationTrade[owner * 3 + 1] = world.nationTrade[owner * 3 + 1]! + fee;
+        world.nationTradeNow[owner * 2 + 1] = world.nationTradeNow[owner * 2 + 1]! + fee;
+        if (t.owner === world.player) t.fees += fee;
         gold -= fee;
       }
-      t.purse = Math.min(row.purse, t.purse + gold);
+      const took = Math.min(row.purse - t.purse, gold);
+      t.purse += took;
+      // Only the player's traders keep where their gold came from: no screen shows another realm's, and saves stay small.
+      if (took > 0 && t.owner === world.player) {
+        addSource(t.src, q, took);
+        feed(world, { trader: t.id, province: q, gold: took, deposit: false });
+      }
     }
     if (depositsAt(world, t, q) && t.purse > 0) {
       if (collect) {
-        world.nationTrade[t.owner * 3] = world.nationTrade[t.owner * 3]! + t.purse;
+        world.nationTradeNow[t.owner * 2] = world.nationTradeNow[t.owner * 2]! + t.purse;
         t.thisMonth += t.purse;
         t.lastDeposit = t.purse;
         t.lastDepositCity = q;
+        if (t.owner === world.player) feed(world, { trader: t.id, province: q, gold: t.purse, deposit: true });
       }
       t.purse = 0;
     }
   }
   t.days = budget;
   if (t.blocked >= 0 && t.path.length) t.blocked = -1;
+}
+
+/** Adds gold from province q to a trader's sources (province and gold in pairs). */
+function addSource(src: number[], q: number, gold: number): void {
+  for (let i = 0; i < src.length; i += 2)
+    if (src[i] === q) {
+      src[i + 1] = src[i + 1]! + gold;
+      return;
+    }
+  src.push(q, gold);
+}
+
+/** Keeps a collection or deposit for the map; the oldest go once the map has not looked for a while. */
+function feed(world: World, item: TradeFeedItem): void {
+  world.tradeFeed.push(item);
+  if (world.tradeFeed.length > G.feed_max) world.tradeFeed.splice(0, world.tradeFeed.length - G.feed_max);
 }
 
 /** Each province's ratio after the month: gain from traders passing, with its modifiers added, less a tenth (TRADE-031, TRADE-118). */
@@ -572,22 +629,43 @@ function updateRatios(world: World): void {
       const share = enemy ? 0 : Math.max(0, officialBonus(world, p, "Customs officer", "trade_ratio_gain") + (moodIndex(world, p) >= 2 ? config.ratio.modifiers.riots : 0) + (world.navy.guarded[p] ? COMMODORE_GAIN : 0));
       gain = config.ratio.gain_per_trader * passing * (1 - ratio / config.ratio.max) * share;
     }
-    r[p] = Math.max(0, Math.min(config.ratio.max, ratio + gain - ratio * config.ratio.decay_share));
+    // A province closed against plague trades nothing while the quarantine lasts (TRADE-040, PROV-357).
+    r[p] = world.provinceQuarantine[p] ? config.ratio.modifiers.quarantine.set_ratio : Math.max(0, Math.min(config.ratio.max, ratio + gain - ratio * config.ratio.decay_share));
     world.provincePassed[p] = passing;
+    world.provinceVisitsLast[p] = world.provinceVisits[p]!;
   }
   world.provincePassing.fill(0);
   world.provinceVisits.fill(0);
 }
 
-/** One month of trade for every trader, with or without gold (the warm-up runs without). */
-export function tradeMonth(world: World, collect: boolean): void {
-  if (stamp.length < world.provinceCount) stamp = new Int32Array(world.provinceCount);
+/** Every trader walks one day on, as the armies march (TRADE-132). */
+export function tradeDay(world: World): void {
+  for (const t of world.traders) walk(world, t, true, 1);
+}
+
+/**
+ * The month turns for trade: what traders deposited and realms took in fees becomes last month's,
+ * ratios move with the traders that passed, and every trader starts counting provinces afresh.
+ */
+function closeMonth(world: World): void {
+  for (let n = 0; n < world.nationCount; n++) {
+    world.nationTrade[n * 3] = world.nationTradeNow[n * 2]!;
+    world.nationTrade[n * 3 + 1] = world.nationTradeNow[n * 2 + 1]!;
+    world.nationTrade[n * 3 + 2] = 0;
+  }
+  world.nationTradeNow.fill(0);
   for (const t of world.traders) {
     t.lastMonth = t.thisMonth;
     t.thisMonth = 0;
-    walk(world, t, collect);
+    t.marked = [];
   }
   updateRatios(world);
+}
+
+/** A whole month of trade for every trader at once, with or without gold (the warm-up runs without), then the month turns. */
+export function tradeMonth(world: World, collect: boolean): void {
+  for (const t of world.traders) walk(world, t, collect, world.rules.defines.march.daysPerMonth);
+  closeMonth(world);
 }
 
 /**
@@ -597,8 +675,7 @@ export function tradeMonth(world: World, collect: boolean): void {
  */
 export function monthlyTrade(world: World, news: News[]): void {
   legCache.delete(world);
-  world.nationTrade.fill(0);
-  tradeMonth(world, true);
+  closeMonth(world);
   const lost: GameTrader[] = [];
   for (const t of world.traders) {
     const up = kindRow(world, t.kind).upkeep;
@@ -638,37 +715,77 @@ export interface RouteEstimate {
   deposits: number;
 }
 
+/** The share of full value a visit gets on average where a month brings `visits` and the province serves `served` in full (TRADE-048). */
+function crowding(served: number, visits: number): number {
+  return visits <= served ? 1 : (served * (1 + Math.log(visits / served))) / visits;
+}
+
 /**
- * What a loop brings: the planned collections over one loop at this month's ratios, less fees, capped by the
- * purse between deposits, divided by the loop's months (TRADE-055). `floor` counts ratios below it as the
- * floor (the AI's guess at what its own trader will make of a quiet road).
+ * What a loop brings, walked as a trader walks it (TRADE-055, TRADE-147): from its start, collecting in each
+ * province it enters at this month's ratios, crowded by last month's visits (its own old loop's taken away
+ * and this one's added), less market fees, while its purse has room, and depositing in each city of its own;
+ * the second time round is the loop as walked, divided by the loop's months. `floor` counts ratios below it
+ * as the floor (the AI's guess at what its own trader will make of a quiet road); `self` is the loop the
+ * trader walks now, whose visits are already in last month's.
  */
-export function estimateLoop(world: World, n: number, kind: GameTraderKind, path: readonly number[], floor = 0): RouteEstimate {
+export function estimateLoop(world: World, n: number, kind: GameTraderKind, path: readonly number[], floor = 0, self: readonly number[] = []): RouteEstimate {
   const row = kindRow(world, kind);
   const ship = isShip(kind);
-  let days = 0, gross = 0, fees = 0, deposits = 0, collectIn = 0;
-  const per = new Map<number, number>();
-  for (let i = 0; i < path.length; i++) {
-    const q = path[(i + 1) % path.length]!;
-    days += stepDays(world, kind, q);
+  const L = path.length;
+  const dpm = world.rules.defines.march.daysPerMonth;
+  const step = new Float64Array(L);
+  let days = 0;
+  for (let i = 0; i < L; i++) days += step[i] = stepDays(world, kind, path[(i + 1) % L]!);
+  const months = Math.max(days, 1) / dpm;
+  // Visits a month each loop makes in a province.
+  const visitsOf = (loop: readonly number[], loopDays: number) => {
+    const m = new Map<number, number>();
+    for (const q of loop) m.set(q, (m.get(q) ?? 0) + dpm / Math.max(loopDays, 1));
+    return m;
+  };
+  const mine = visitsOf(path, days);
+  let selfDays = 0;
+  for (let i = 0; i < self.length; i++) selfDays += stepDays(world, kind, self[(i + 1) % self.length]!);
+  const before = visitsOf(self, selfDays);
+  const gold = new Float64Array(L), fee = new Float64Array(L), dep = new Uint8Array(L);
+  let collectIn = 0, deposits = 0;
+  for (let i = 0; i < L; i++) {
+    const q = path[(i + 1) % L]!;
     if (world.provinceWater[q]) continue;
     const owner = world.provinceOwner[q]!;
     const occupied = world.provinceOccupier[q]! >= 0;
-    if (owner === n && world.provinceTradeCity[q]! > 0 && !occupied) deposits++;
+    if (owner === n && world.provinceTradeCity[q]! > 0 && !occupied) ((dep[i] = 1), deposits++);
     // Unclaimed and occupied land pay nothing, as on the road (walk).
     if (owner < 0 || occupied) continue;
-    let gold = tradeValueAt(world, q, ship) * (Math.max(floor, world.provinceTradeRatio[q]!) / 100) * row.hold * config.collect.visit_share;
-    if (gold <= 0) continue;
+    const visits = Math.max(0, world.provinceVisitsLast[q]! - (before.get(q) ?? 0)) + mine.get(q)!;
+    let g = tradeValueAt(world, q, ship) * (Math.max(floor, world.provinceTradeRatio[q]!) / 100) * row.hold * config.collect.visit_share * crowding(served(world, q), visits);
+    if (g <= 0) continue;
     collectIn++;
     if (owner !== n) {
-      fees += gold * config.collect.foreign_market_fee;
-      gold *= 1 - config.collect.foreign_market_fee;
+      fee[i] = g * config.collect.foreign_market_fee;
+      g -= fee[i]!;
     }
-    gross += gold;
-    per.set(q, (per.get(q) ?? 0) + gold);
+    gold[i] = g;
   }
-  const months = Math.max(days, 1) / world.rules.defines.march.daysPerMonth;
-  const kept = deposits === 0 ? 0 : Math.min(gross, row.purse * deposits);
+  // Twice round: the first fills the purse from empty, the second is the loop as it is walked.
+  let purse = 0, kept = 0, fees = 0;
+  const per = new Map<number, number>();
+  for (let round = 0; round < 2; round++)
+    for (let i = 0; i < L; i++) {
+      if (gold[i]! > 0 && purse < row.purse) {
+        const took = Math.min(row.purse - purse, gold[i]!);
+        purse += took;
+        if (round) {
+          fees += fee[i]!;
+          const q = path[(i + 1) % L]!;
+          per.set(q, (per.get(q) ?? 0) + took);
+        }
+      }
+      if (dep[i]) {
+        if (round) kept += purse;
+        purse = 0;
+      }
+    }
   const best = [...per].sort((a, b) => b[1] - a[1]).slice(0, 3).map(([province, gold]) => ({ province, gold: gold / months }));
   return { loopDays: Math.round(days), collectIn, best, expected: kept / months, fees: fees / months, deposits };
 }
@@ -686,27 +803,84 @@ export function routeProblem(world: World, n: number, kind: GameTraderKind, stop
   return null;
 }
 
+/** A route a trader could take from a city: where it goes, its loop, and what it brings. */
+export interface RouteOption {
+  stops: number[];
+  path: number[];
+  estimate: RouteEstimate;
+}
+
+/**
+ * The routes a trader of this kind could take from `from`: to each of the likeliest cities within reach (those
+ * with the most to trade), there and back along the planned way, best first (TRADE-113, TRADE-148). `floor` and
+ * `self` are estimateLoop's.
+ */
+export function routeOptions(world: World, n: number, kind: GameTraderKind, from: number, floor = 0, self: readonly number[] = []): RouteOption[] {
+  const ship = isShip(kind);
+  // Reach is the land's in a pack caravan's days: a quicker kind goes no further in provinces.
+  const reach = ship ? G.ai_reach_days_sea : (G.ai_reach_days_land * (kind === "pack_caravan" ? 1 : config.land_traders[kind].step_factor)) / config.land_traders.pack_caravan.step_factor;
+  const around = plan(world, n, kind, from, reach);
+  const ways = around.reached
+    .filter((c) => c !== from && isTradeStop(world, c, kind))
+    .sort((a, b) => tradeValueAt(world, b, ship) - tradeValueAt(world, a, ship))
+    .slice(0, G.ai_candidates * 3)
+    .map((c) => ({ c, way: pathTo(around, c)! }));
+  return ways
+    .map(({ c, way }) => {
+      const path = [...way, ...way.slice(1, -1).reverse()];
+      return { stops: [from, c], path, estimate: estimateLoop(world, n, kind, path, floor, self) };
+    })
+    .filter((o) => o.estimate.expected > 0)
+    .sort((x, y) => y.estimate.expected - x.estimate.expected);
+}
+
 /**
  * The best route the AI finds for a trader from `home`: the city within reach whose way there and back, through the
  * most populated land, brings the most gold; a city another of the realm's traders already runs to counts half (TRADE-113, D-TRADE-21).
  */
-export function bestRoute(world: World, n: number, kind: GameTraderKind, home: number, taken: ReadonlySet<number> = new Set()): number[] | null {
-  const ship = isShip(kind);
-  // Reach is the land's in a pack caravan's days: a quicker kind goes no further in provinces.
-  const reach = ship ? G.ai_reach_days_sea : (G.ai_reach_days_land * (kind === "pack_caravan" ? 1 : config.land_traders[kind].step_factor)) / config.land_traders.pack_caravan.step_factor;
-  const around = plan(world, n, kind, home, reach);
-  // The likeliest cities first: those with the most to trade; then there and back to each along the planned way.
-  const ways = around.reached
-    .filter((c) => c !== home && isTradeStop(world, c, kind))
-    .sort((a, b) => tradeValueAt(world, b, ship) - tradeValueAt(world, a, ship))
-    .slice(0, G.ai_candidates * 3)
-    .map((c) => ({ c, way: pathTo(around, c)! }));
+export function bestRoute(world: World, n: number, kind: GameTraderKind, home: number, taken: ReadonlySet<number> = new Set(), self: readonly number[] = []): number[] | null {
   let best: { c: number; s: number } | null = null;
-  for (const { c, way } of ways) {
-    const s = estimateLoop(world, n, kind, [...way, ...way.slice(1, -1).reverse()], G.ai_ratio_floor).expected * (taken.has(c) ? 0.5 : 1);
-    if (s > 0 && (!best || s > best.s)) best = { c, s };
+  for (const o of routeOptions(world, n, kind, home, G.ai_ratio_floor, self)) {
+    const s = o.estimate.expected * (taken.has(o.stops[1]!) ? 0.5 : 1);
+    if (!best || s > best.s) best = { c: o.stops[1]!, s };
   }
   return best ? [home, best.c] : null;
+}
+
+/** Better routes for a trader, from where its route starts and from its home, cached for the month (TRADE-148). */
+const suggestCache = new WeakMap<World, Map<number, { key: string; list: RouteSuggestion[] }>>();
+
+export interface RouteSuggestion {
+  stops: number[];
+  expected: number;
+  loopDays: number;
+  /** Gold a month more than its route now. */
+  gain: number;
+}
+
+export function suggestRoutes(world: World, t: GameTrader, now: number): RouteSuggestion[] {
+  const g = world.diplomacy;
+  const key = `${world.date.year * 12 + world.date.month}|${g.wars.length}|${g.seq}|${t.stops.join()}|${t.home}|${now.toFixed(3)}`;
+  let m = suggestCache.get(world);
+  if (!m) suggestCache.set(world, (m = new Map()));
+  const hit = m.get(t.id);
+  if (hit?.key === key) return hit.list;
+  const self = peekPath(world, t);
+  const froms = [...new Set([t.stops[0] ?? t.home, t.home])];
+  const seen = new Set([t.stops.join()]);
+  const list: RouteSuggestion[] = [];
+  const S = G.suggest;
+  for (const o of froms.flatMap((f) => routeOptions(world, t.owner, t.kind, f, 0, self)).sort((x, y) => y.estimate.expected - x.estimate.expected)) {
+    const k = o.stops.join(), back = [...o.stops].reverse().join();
+    if (seen.has(k) || seen.has(back)) continue;
+    seen.add(k);
+    const gain = o.estimate.expected - now;
+    if (gain < S.min_gain || gain < now * S.min_gain_share) break;
+    list.push({ stops: o.stops, expected: o.estimate.expected, loopDays: o.estimate.loopDays, gain });
+    if (list.length >= S.count) break;
+  }
+  m.set(t.id, { key, list });
+  return list;
 }
 
 // ---------------------------------------------------------------- founding and orders
@@ -726,12 +900,26 @@ export function foundProblem(world: World, n: number, city: number, kind: GameTr
   if (kind === "river_barge" && !world.provinceRiver[city]) return "needs a river";
   const cls = isShip(kind) ? SEAFOLK : MARKET_FOLK;
   if (world.provinceClasses[city * CLASS_COUNT + cls]! * 1000 < row.crew) return `needs ${row.crew} ${row.crewClass}`;
+  const slots = homeSlots(world, city);
+  if (homedAt(world, city) >= slots) return slots === 0 ? "needs a market" : `home to ${slots} already; a bigger market homes more`;
   if (world.nationTreasury[n]! < row.gold) return `needs ${Math.ceil(row.gold * 10) / 10} gold`;
   return null;
 }
 
+/** How many traders a city can be home to: by its market step, and more for a port (TRADE-159). */
+export function homeSlots(world: World, city: number): number {
+  return (H.by_market_step[Math.min(marketStep(world, city), 3)] ?? 0) + (isPort(world, city) ? H.port : 0);
+}
+
+/** How many traders are at home in a city now. */
+export function homedAt(world: World, city: number): number {
+  let k = 0;
+  for (const t of world.traders) if (t.home === city) k++;
+  return k;
+}
+
 function addTrader(world: World, n: number, home: number, kind: GameTraderKind, stops: number[]): GameTrader {
-  const t: GameTrader = { id: ++world.traderSeq, kind, owner: n, home, stops, purse: 0, at: 0, days: 0, lastMonth: 0, thisMonth: 0, lastDeposit: 0, lastDepositCity: -1, unpaid: 0, blocked: -1, chosen: false, path: [] };
+  const t: GameTrader = { id: ++world.traderSeq, kind, owner: n, home, stops, purse: 0, at: 0, days: 0, lastMonth: 0, thisMonth: 0, lastDeposit: 0, lastDepositCity: -1, unpaid: 0, blocked: -1, chosen: false, path: [], marked: [], src: [], srcLast: [], fees: 0, feesLast: 0 };
   world.traders.push(t);
   return t;
 }
@@ -768,6 +956,11 @@ export function setTradeRoute(world: World, n: number, id: number, stops: number
   const at = path.indexOf(here);
   t.at = at >= 0 ? at : 0;
   t.days = 0;
+  // A new route starts a new trip: where its gold comes from is counted afresh.
+  t.src = [];
+  t.srcLast = [];
+  t.fees = 0;
+  t.feesLast = 0;
   if (world.tradeDraft?.trader === id) world.tradeDraft = null;
   return null;
 }
@@ -815,10 +1008,11 @@ function aiTrade(world: World): void {
     if (t.owner === world.player || t.id % 12 !== turn) continue;
     // A loop that pays well enough is kept; the AI looks for another when it pays little or is broken.
     const row = kindRow(world, t.kind);
-    if (t.blocked < 0 && t.stops.length >= 2 && estimateLoop(world, t.owner, t.kind, pathOf(world, t)).expected >= row.upkeep * G.ai_keep_route_over_upkeep) continue;
+    const self = pathOf(world, t);
+    if (t.blocked < 0 && t.stops.length >= 2 && estimateLoop(world, t.owner, t.kind, self, 0, self).expected >= row.upkeep * G.ai_keep_route_over_upkeep) continue;
     const taken = new Set<number>();
     for (const o of world.traders) if (o.owner === t.owner && o !== t) o.stops.forEach((x) => taken.add(x));
-    const stops = bestRoute(world, t.owner, t.kind, t.home, taken);
+    const stops = bestRoute(world, t.owner, t.kind, t.home, taken, self);
     if (stops && stops.join() !== t.stops.join()) {
       t.stops = stops;
       t.path = [];
@@ -829,7 +1023,8 @@ function aiTrade(world: World): void {
     // A realm the catalogue gives no trade access founds none in this slice (D-TRADE-20).
     const start = startCount(world, n);
     if (n % 12 !== turn || n === world.player || world.nationGone[n] || start === 0 || count[n]! >= G.ai_max_traders_per_start * start + 1) continue;
-    const home = homes(world, n)[0];
+    // The first of its cities with a slot free (TRADE-160).
+    const home = homes(world, n).find((p) => homedAt(world, p) < homeSlots(world, p));
     if (home === undefined) continue;
     const kind = kindFor(world, n, home, count[n]!);
     const row = kindRow(world, kind);
@@ -942,10 +1137,24 @@ export interface TraderView {
   lastDeposit: number;
   lastDepositCity: number;
   problem: string | null;
+  /** The stop it walks toward and the days left to it, the next province and the days left to that (TRADE-146). */
+  heading: number;
+  headingDays: number;
+  next: number;
+  nextDays: number;
+  /** Where its gold came from on its last whole trip there and back (this one's so far until then), gold kept, best first; and the market fees it paid. */
+  sources: { province: number; gold: number }[];
+  sourcesTrip: "last" | "this";
+  fees: number;
+  /** Better routes, best first (TRADE-148). */
+  better: RouteSuggestion[];
 }
 
 export interface FoundOption {
   city: number;
+  /** Traders at home there and how many it can be home to (TRADE-159). */
+  homed: number;
+  slots: number;
   kinds: { kind: GameTraderKind; name: string; gold: number; upkeep: number; why: string | null }[];
 }
 
@@ -960,22 +1169,80 @@ export interface TradeView {
   found: FoundOption[];
   /** The realm's busiest trade cities: value, ratio and traders passing. */
   centres: { province: number; value: number; ratio: number; passing: number }[];
-  /** The route being drawn: its stops, whether it can be set, and its preview. */
-  draft: ({ trader: number; stops: number[]; why: string | null; path: number[] } & RouteEstimate) | null;
+  /** The route being drawn: its stops, whether it can be set, and its preview; with where it starts chosen, the cities it could go to and what each brings (TRADE-149). */
+  draft: ({ trader: number; stops: number[]; why: string | null; path: number[]; options: { city: number; expected: number; loopDays: number }[] } & RouteEstimate) | null;
+  /** This month so far: gold deposited and market fees taken; gold carried in the traders' purses (TRADE-150). */
+  depositsNow: number;
+  feesNow: number;
+  onRoad: number;
+  /** Where the realm's trade gold comes from: each province's gold a month over its traders' last trips, best first, and their total and the market fees paid a month (TRADE-150). */
+  sources: { province: number; gold: number }[];
+  sourcesTotal: number;
+  sourcesFees: number;
+}
+
+/** Gold-and-province pairs as a list, best first. */
+const pairs = (src: readonly number[]) => {
+  const out: { province: number; gold: number }[] = [];
+  for (let i = 0; i < src.length; i += 2) out.push({ province: src[i]!, gold: src[i + 1]! });
+  return out.sort((a, b) => b.gold - a.gold);
+};
+
+/** Days a trader has left to walk to path index `to` from where it stands. */
+function daysTo(world: World, t: GameTrader, path: readonly number[], to: number): number {
+  let d = -t.days;
+  for (let i = t.at; i !== to; i = (i + 1) % path.length) d += stepDays(world, t.kind, path[(i + 1) % path.length]!);
+  return Math.max(0, Math.round(d));
+}
+
+/** Options a route being drawn offers from where it starts, cached while the month and the start stay (TRADE-149). */
+const optionCache = new WeakMap<World, { key: string; list: { city: number; expected: number; loopDays: number }[] }>();
+function draftOptions(world: World, t: GameTrader, from: number): { city: number; expected: number; loopDays: number }[] {
+  const key = `${world.date.year * 12 + world.date.month}|${world.diplomacy.seq}|${t.id}|${from}`;
+  const hit = optionCache.get(world);
+  if (hit?.key === key) return hit.list;
+  const list = routeOptions(world, t.owner, t.kind, from, 0, peekPath(world, t))
+    .slice(0, G.suggest.draft_options)
+    .map((o) => ({ city: o.stops[1]!, expected: o.estimate.expected, loopDays: o.estimate.loopDays }));
+  optionCache.set(world, { key, list });
+  return list;
 }
 
 export function tradeView(world: World, n: number): TradeView {
+  const dpm = world.rules.defines.march.daysPerMonth;
+  const realmSrc = new Map<number, number>();
+  let realmFees = 0, onRoad = 0;
   const traders = world.traders
     .filter((t) => t.owner === n)
     .map((t): TraderView => {
       const path = peekPath(world, t);
       const row = kindRow(world, t.kind);
-      const est = estimateLoop(world, n, t.kind, path);
+      const est = estimateLoop(world, n, t.kind, path, 0, path);
+      const at = Math.min(t.at, path.length - 1);
+      const turn = t.stops.length >= 2 ? path.indexOf(t.stops[1]!) : -1;
+      const toward = turn < 0 ? 0 : at < turn ? turn : 0;
+      const last = t.srcLast.length > 0;
+      const sources = pairs(last ? t.srcLast : t.src);
+      const fees = last ? t.feesLast : t.fees;
+      // The realm's sources are each trader's last trip as gold a month, or this one so far while it is on its first.
+      if (sources.length && est.loopDays > 0) {
+        const months = Math.max(est.loopDays, 1) / dpm;
+        for (const x of sources) realmSrc.set(x.province, (realmSrc.get(x.province) ?? 0) + x.gold / months);
+        realmFees += fees / months;
+      }
+      onRoad += t.purse;
       return {
         id: t.id, kind: t.kind, name: row.name, home: t.home, stops: t.stops.slice(), purse: t.purse, purseMax: row.purse,
-        at: path[t.at] ?? t.home, path: path.slice(), pathAt: t.at, expected: est.expected, upkeep: row.upkeep, loopDays: est.loopDays,
-        lastMonth: t.thisMonth, lastDeposit: t.lastDeposit, lastDepositCity: t.lastDepositCity,
+        at: path[at] ?? t.home, path: path.slice(), pathAt: at, expected: est.expected, upkeep: row.upkeep, loopDays: est.loopDays,
+        lastMonth: t.lastMonth, lastDeposit: t.lastDeposit, lastDepositCity: t.lastDepositCity,
         problem: t.blocked >= 0 ? `the way to ${world.rules.provinces[t.blocked]!.name} is closed` : (t.stops.length < 2 ? "no route: it waits at home" : est.deposits === 0 ? "no city of yours on its route to deposit in" : null),
+        heading: path.length > 1 ? path[toward]! : t.home,
+        headingDays: path.length > 1 ? daysTo(world, t, path, toward) : 0,
+        next: path.length > 1 ? path[(at + 1) % path.length]! : t.home,
+        nextDays: path.length > 1 ? daysTo(world, t, path, (at + 1) % path.length) : 0,
+        sources, sourcesTrip: last ? "last" : "this", fees,
+        // A trader with no route or a shut way is offered any route that pays.
+        better: suggestRoutes(world, t, t.stops.length < 2 || t.blocked >= 0 ? 0 : est.expected),
       };
     })
     .sort((a, b) => b.expected - a.expected);
@@ -985,7 +1252,7 @@ export function tradeView(world: World, n: number): TradeView {
     if (world.provinceOwner[p] !== n || world.provinceTradeCity[p] === 0) continue;
     centres.push({ province: p, value: tradeValueAt(world, p), ratio: world.provinceTradeRatio[p]!, passing: world.provincePassed[p]! });
     if (marketStep(world, p) === 0 && !isPort(world, p)) continue;
-    found.push({ city: p, kinds: TRADER_KINDS.map((kind) => ({ kind, name: KIND_NAME[kind], gold: kindRow(world, kind).gold, upkeep: kindRow(world, kind).upkeep, why: foundProblem(world, n, p, kind) })) });
+    found.push({ city: p, homed: homedAt(world, p), slots: homeSlots(world, p), kinds: TRADER_KINDS.map((kind) => ({ kind, name: KIND_NAME[kind], gold: kindRow(world, kind).gold, upkeep: kindRow(world, kind).upkeep, why: foundProblem(world, n, p, kind) })) });
   }
   centres.sort((a, b) => b.value * (b.ratio + 1) - a.value * (a.ratio + 1));
   found.sort((a, b) => tradeValueAt(world, b.city) - tradeValueAt(world, a.city));
@@ -995,10 +1262,16 @@ export function tradeView(world: World, n: number): TradeView {
   if (d && dt) {
     const why = d.stops.length >= 2 ? routeProblem(world, n, dt.kind, d.stops) : null;
     const path = !why && d.stops.length >= 2 ? loopPath(world, n, dt.kind, d.stops, false) : null;
-    const est = path ? estimateLoop(world, n, dt.kind, path) : { loopDays: 0, collectIn: 0, best: [], expected: 0, fees: 0, deposits: 0 };
-    draft = { trader: d.trader, stops: d.stops.slice(), why: why ?? (d.stops.length >= 2 && !path ? "no way between those cities" : null), path: path ?? [], ...est };
+    const est = path ? estimateLoop(world, n, dt.kind, path, 0, peekPath(world, dt)) : { loopDays: 0, collectIn: 0, best: [], expected: 0, fees: 0, deposits: 0 };
+    const options = d.stops.length >= 1 && isTradeStop(world, d.stops[0]!, dt.kind) ? draftOptions(world, dt, d.stops[0]!) : [];
+    draft = { trader: d.trader, stops: d.stops.slice(), why: why ?? (d.stops.length >= 2 && !path ? "no way between those cities" : null), path: path ?? [], options, ...est };
   }
-  return { deposits: world.nationTrade[n * 3]!, fees: world.nationTrade[n * 3 + 1]!, upkeep: world.nationTrade[n * 3 + 2]!, net: tradeLine(world, n), traders, found, centres: centres.slice(0, 8), draft };
+  const sources = [...realmSrc].map(([province, gold]) => ({ province, gold })).sort((a, b) => b.gold - a.gold);
+  return {
+    deposits: world.nationTrade[n * 3]!, fees: world.nationTrade[n * 3 + 1]!, upkeep: world.nationTrade[n * 3 + 2]!, net: tradeLine(world, n), traders, found, centres: centres.slice(0, 8), draft,
+    depositsNow: world.nationTradeNow[n * 2]!, feesNow: world.nationTradeNow[n * 2 + 1]!, onRoad,
+    sources: sources.slice(0, 8), sourcesTotal: sources.reduce((a, x) => a + x.gold, 0), sourcesFees: realmFees,
+  };
 }
 
 /** What every realm's map may show of trade: provinces it sees (its own and those on its traders' loops, D-TRADE-13). */
@@ -1010,64 +1283,97 @@ export function tradeSeen(world: World, n: number): Uint8Array {
   return seen;
 }
 
-/** A busy trade path for the living map: its loop province by province, how it goes and the traders on it (VIEW-132). */
-export interface TradePath {
-  /** Seeded from the loop, so its movers keep their places between snapshots. */
+/** A trader as the map draws it: the leg it walks and how far along, from the daily walk (VIEW-132). */
+export interface TraderWalk {
   id: number;
-  medium: "land" | "river" | "sea";
-  path: number[];
-  traders: number;
-  /** The realm of its first trader, for the colours. */
   owner: number;
-  /** One of the player's traders on it, whose card a tap opens; -1 if none. */
-  mine: number;
+  medium: "land" | "river" | "sea";
+  /** The province it stands in and the next on its loop (the same while it waits at home). */
+  from: number;
+  to: number;
+  /** Share of the way to the next province walked, 0 to 1. */
+  progress: number;
+  /** The tiles of the leg over land, from the centre of one province to the next, as an army walks it; empty at sea. */
+  tiles: Int32Array;
+  /** Whether it is the realm's own trader, whose card a tap opens. */
+  mine: boolean;
+}
+
+/** The pace a trader's leg is drawn at: a small company, no commander. */
+const LEG_COMPANY = { men: 1, horse: 0, logistics: 0 };
+const NO_TILES = new Int32Array(0);
+const legTilesCache = new WeakMap<World, Map<number, Int32Array>>();
+
+/** The tiles of a land leg between two provinces' centres, as an army walks it province by province; cached, since the map does not change. */
+function legTiles(world: World, a: number, b: number): Int32Array {
+  if (a === b || world.provinceWater[a] || world.provinceWater[b]) return NO_TILES;
+  let m = legTilesCache.get(world);
+  if (!m) legTilesCache.set(world, (m = new Map()));
+  const key = a * world.provinceCount + b;
+  let tiles = m.get(key);
+  if (!tiles) {
+    const g = world.tiles;
+    const from = g.centre[a]!, to = g.centre[b]!;
+    if (from < 0 || to < 0) tiles = NO_TILES;
+    else if (g.coarse) tiles = Int32Array.of(from, to);
+    else {
+      const allowed = new Uint8Array(world.provinceCount);
+      allowed[a] = 1;
+      allowed[b] = 1;
+      const march = { d: world.rules.defines.march, grid: g, population: world.provincePopulation, temperature: world.provinceTemperature, rowWidth: world.rowWidth, roadHours: world.provinceRoadHours };
+      const walk = planTilePath(march, from, to, allowed, LEG_COMPANY, 1.6);
+      tiles = walk ? Int32Array.from([from, ...walk.tiles]) : Int32Array.of(from, to);
+    }
+    m.set(key, tiles);
+  }
+  return tiles;
 }
 
 /**
- * The busy trade paths realm n may see on the map: traders sharing a loop and
- * a way of going are one path, kept where the loop enters a province the realm
- * sees (D-TRADE-13), busiest first, at most `max`. With no realm, every path.
- * Planned without keeping, so looking never changes the game.
+ * Where realm n may see traders walk on the map: every trader on a leg that enters a province whose trade
+ * the realm sees (D-TRADE-13), its own first, at most `max`; with no realm, every trader. Read from the daily
+ * walk, so a trader is drawn where the game has it. Planned without keeping, so looking never changes the game.
  */
-export function tradePaths(world: World, n: number, max: number, seen: Uint8Array | null = n >= 0 ? tradeSeen(world, n) : null): TradePath[] {
-  const byKey = new Map<string, TradePath>();
-  for (const t of world.traders) {
+export function traderWalks(world: World, n: number, max: number, seen: Uint8Array | null = n >= 0 ? tradeSeen(world, n) : null): TraderWalk[] {
+  const out: TraderWalk[] = [];
+  const order = n >= 0 ? [...world.traders.filter((t) => t.owner === n), ...world.traders.filter((t) => t.owner !== n)] : world.traders;
+  for (const t of order) {
+    if (out.length >= max) break;
     const path = peekPath(world, t);
-    if (path.length < 2) continue;
+    const at = Math.min(t.at, path.length - 1);
+    const from = path[at]!;
+    const to = path.length > 1 ? path[(at + 1) % path.length]! : from;
+    if (seen && !seen[from] && !seen[to]) continue;
+    const cost = to === from ? Infinity : stepDays(world, t.kind, to);
+    const progress = Number.isFinite(cost) && cost > 0 ? Math.min(1, t.days / cost) : 0;
     const medium = isShip(t.kind) ? "sea" : t.kind === "river_barge" ? "river" : "land";
-    const key = `${medium} ${path.join(",")}`;
-    let e = byKey.get(key);
-    if (!e) {
-      if (seen && !path.some((p) => seen[p])) continue;
-      let h = medium.length;
-      for (const p of path) h = Math.imul(h ^ p, 0x9e3779b1) >>> 0;
-      byKey.set(key, (e = { id: h, medium, path: path.slice(), traders: 0, owner: t.owner, mine: -1 }));
-    }
-    e.traders++;
-    if (t.owner === n && e.mine < 0) e.mine = t.id;
+    out.push({ id: t.id, owner: t.owner, medium, from, to, progress, tiles: medium === "sea" ? NO_TILES : legTiles(world, from, to), mine: t.owner === n });
   }
-  return [...byKey.values()].sort((a, b) => b.traders - a.traders || a.id - b.id).slice(0, max);
+  return out;
 }
 
 // ---------------------------------------------------------------- saves
 
 /** A trader as saved: its kind by number, so no build text reaches the save. */
-export type SavedTrader = Omit<GameTrader, "kind"> & { kind: number };
+export type SavedTrader = Omit<GameTrader, "kind" | "marked" | "src" | "srcLast" | "fees" | "feesLast"> & { kind: number; marked?: number[]; src?: number[]; srcLast?: number[]; fees?: number; feesLast?: number };
 
 export interface SavedTrade {
   traders: SavedTrader[];
   traderSeq: number;
+  /** This month's deposits and fees so far, by realm (2 per realm); absent in saves from before traders walked daily. */
+  now?: number[];
 }
 
-/** By province: trade ratio, goods value a year, weight and trade stop as counted last January. */
-export function tradeProvinceArrays(world: World): Record<string, Float32Array | Uint8Array> {
-  return { tradeRatio: world.provinceTradeRatio, tradeGoods: world.provinceGoodsValue, tradeWeight: world.provinceWeight, tradeCity: world.provinceTradeCity };
+/** By province: trade ratio, goods value a year, weight and trade stop as counted last January, and this month's traders passing and visits so far. */
+export function tradeProvinceArrays(world: World): Record<string, Float32Array | Uint8Array | Int16Array | Int32Array> {
+  return { tradeRatio: world.provinceTradeRatio, tradeGoods: world.provinceGoodsValue, tradeWeight: world.provinceWeight, tradeCity: world.provinceTradeCity, tradePassing: world.provincePassing, tradeVisits: Int16Array.from(world.provinceVisits, (v) => Math.min(32767, v)), tradeVisitsLast: Uint8Array.from(world.provinceVisitsLast, (v) => Math.min(255, v)) };
 }
 
 export function saveTrade(world: World): SavedTrade {
   return {
-    traders: world.traders.map((t) => ({ ...t, kind: TRADER_KINDS.indexOf(t.kind), stops: t.stops.slice(), path: t.path.slice() })),
+    traders: world.traders.map((t) => ({ ...t, kind: TRADER_KINDS.indexOf(t.kind), stops: t.stops.slice(), path: t.path.slice(), marked: t.marked.slice(), src: t.src.slice(), srcLast: t.srcLast.slice() })),
     traderSeq: world.traderSeq,
+    now: Array.from(world.nationTradeNow),
   };
 }
 
@@ -1080,7 +1386,11 @@ export function restoreTrade(world: World, s: SavedTrade, prov: Partial<Record<s
   world.provinceGoods = new Array(world.provinceCount);
   world.provinceTradeRatio.fill(0);
   const filled = new Uint8Array(world.provinceCount);
-  const { tradeRatio: ratio, tradeGoods: goods, tradeWeight: weight, tradeCity: city } = prov;
+  const { tradeRatio: ratio, tradeGoods: goods, tradeWeight: weight, tradeCity: city, tradePassing: passing, tradeVisits: visits, tradeVisitsLast: visitsLast } = prov;
+  world.provincePassing.fill(0);
+  world.provinceVisits.fill(0);
+  world.provinceVisitsLast.fill(0);
+  world.tradeFeed = [];
   if (ratio) for (let old = 0; old < ratio.length; old++) {
     const p = mapP(old);
     if (p < 0) continue;
@@ -1088,6 +1398,9 @@ export function restoreTrade(world: World, s: SavedTrade, prov: Partial<Record<s
     if (goods) world.provinceGoodsValue[p] = goods[old]!;
     if (weight) world.provinceWeight[p] = weight[old]!;
     if (city) world.provinceTradeCity[p] = city[old]!;
+    if (passing) world.provincePassing[p] = passing[old]!;
+    if (visits) world.provinceVisits[p] = visits[old]!;
+    if (visitsLast) world.provinceVisitsLast[p] = visitsLast[old]!;
     filled[p] = 1;
   }
   // A province the save did not know is counted now.
@@ -1096,6 +1409,11 @@ export function restoreTrade(world: World, s: SavedTrade, prov: Partial<Record<s
   if (last) for (let old = 0; old * 3 < last.length; old++) {
     const n = mapN(old);
     if (n >= 0) for (let k = 0; k < 3; k++) world.nationTrade[n * 3 + k] = last[old * 3 + k]!;
+  }
+  world.nationTradeNow.fill(0);
+  if (s.now) for (let old = 0; old * 2 < s.now.length; old++) {
+    const n = mapN(old);
+    if (n >= 0) for (let k = 0; k < 2; k++) world.nationTradeNow[n * 2 + k] = s.now[old * 2 + k]!;
   }
   world.traders = [];
   for (const t of s.traders) {
@@ -1107,9 +1425,19 @@ export function restoreTrade(world: World, s: SavedTrade, prov: Partial<Record<s
     const ok = stops.every((x) => x >= 0) && path.every((x) => x >= 0);
     const kind = TRADER_KINDS[t.kind];
     if (!kind) continue;
-    world.traders.push({ ...t, kind, blocked: t.blocked >= 0 ? mapP(t.blocked) : -1, owner, home, stops: ok ? stops : [], path: ok ? path : [], at: ok ? t.at : 0, lastDepositCity: t.lastDepositCity >= 0 ? mapP(t.lastDepositCity) : -1 });
+    world.traders.push({ ...t, kind, blocked: t.blocked >= 0 ? mapP(t.blocked) : -1, owner, home, stops: ok ? stops : [], path: ok ? path : [], at: ok ? t.at : 0, marked: (t.marked ?? []).map(mapP).filter((q) => q >= 0), src: srcOf(t.src, mapP), srcLast: srcOf(t.srcLast, mapP), fees: t.fees ?? 0, feesLast: t.feesLast ?? 0, lastDepositCity: t.lastDepositCity >= 0 ? mapP(t.lastDepositCity) : -1 });
   }
   world.traderSeq = s.traderSeq;
+}
+
+/** Saved sources with their provinces mapped; a pair whose province is gone is dropped. */
+function srcOf(src: readonly number[] | undefined, mapP: (old: number) => number): number[] {
+  const out: number[] = [];
+  if (src) for (let i = 0; i + 1 < src.length; i += 2) {
+    const p = mapP(src[i]!);
+    if (p >= 0) out.push(p, src[i + 1]!);
+  }
+  return out;
 }
 
 /** Numbers for the world's hash: ratios and every trader. */

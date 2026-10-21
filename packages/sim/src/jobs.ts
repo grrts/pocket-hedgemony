@@ -2,13 +2,14 @@ import { Worker, isMainThread, parentPort, workerData } from "node:worker_thread
 import { runBreaker, type BreakerOptions, type BreakerResult } from "./breaker.ts";
 import { runAiCampaign, type CampaignOptions, type CampaignResult } from "./campaign.ts";
 import { runProbe, type ProbeOptions, type ProbeResult } from "./probe.ts";
+import { runHistory, type HistoryOptions, type HistoryResult } from "./history.ts";
 
 /** One run, as data a worker thread can be handed. */
-export type Job = { kind: "campaign"; options: CampaignOptions } | { kind: "breaker"; options: BreakerOptions } | { kind: "probe"; options: ProbeOptions };
-export type JobResult = CampaignResult | BreakerResult | ProbeResult;
+export type Job = { kind: "campaign"; options: CampaignOptions } | { kind: "breaker"; options: BreakerOptions } | { kind: "probe"; options: ProbeOptions } | { kind: "history"; options: HistoryOptions };
+export type JobResult = CampaignResult | BreakerResult | ProbeResult | HistoryResult;
 
 export function runJob(job: Job): JobResult {
-  return job.kind === "campaign" ? runAiCampaign(job.options) : job.kind === "breaker" ? runBreaker(job.options) : runProbe(job.options);
+  return job.kind === "campaign" ? runAiCampaign(job.options) : job.kind === "breaker" ? runBreaker(job.options) : job.kind === "history" ? runHistory(job.options) : runProbe(job.options);
 }
 
 /**

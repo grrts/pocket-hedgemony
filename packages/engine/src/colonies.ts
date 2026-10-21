@@ -346,6 +346,7 @@ function founded(world: World, c: ColonyFounding, news: News[]): void {
   world.provinceOfficialSeed[p] = p;
   world.provinceOfficialSince[p] = world.day;
   world.provinceOfficialFrom[p] = -1;
+  world.provinceOfficialAge[p] = 0;
   e.founded[p] = n;
   chartAround(world, n, p);
   addBorders(world, n);
@@ -387,7 +388,7 @@ export function dailyExploration(world: World): void {
   });
 }
 
-/** The month (EXPL-041 … EXPL-048): each colony being founded gains, loses to the locals and eats; governors age in January. */
+/** The month (EXPL-041 … EXPL-048): each colony being founded gains, loses to the locals and eats (governors age with everyone, people.ts). */
 export function monthlyColonies(world: World, news: News[]): void {
   const e = world.explore;
   e.colonies = e.colonies.filter((c) => {
@@ -402,7 +403,6 @@ export function monthlyColonies(world: World, news: News[]): void {
     if (end === "lost") return lost(world, c, hungry ? "its people starved" : "the locals drove the settlers off", news), false;
     return true;
   });
-  if (world.date.month === 1) for (const g of e.governors) g.age++;
   aiExploration(world, news);
 }
 

@@ -1,6 +1,6 @@
 # Warfare
 
-Warfare is everything that happens once your soldiers are under arms: how they are organised into companies and armies, what they cost, how they are fed, who leads them and in what style, how a battle is fought bell by bell, how castles fall, what holding enemy land means, and how a war drifts toward peace. It runs from era I (1444) to the end of the campaign on 31 August 1939, changing as inventions arrive.
+Warfare is everything that happens once your soldiers are under arms: how they are organised into companies and armies, what they cost, how they are fed, who leads them and in what style, how a battle is fought bell by bell, how castles fall, what holding enemy land means, and how a war drifts toward peace. It runs from era I (from the start on 20 September 1378) to the end of the campaign on 31 August 1939, changing as inventions arrive.
 
 ## How it works
 
@@ -13,7 +13,7 @@ Every army is made of **companies** of usually 500 to 1,000 men. Each company ha
 - **Loads of arms** come from the store at raising and from won fields, and are lost with killed and fled men, on a lost field, or sold at disbanding. A company short of the loads its troop type needs fights as the next troop type down (heavy infantry as levy infantry).
 - Men join by raising, refilling from recruits, wounded coming back and enlisted prisoners, and leave by being killed, wounded, fleeing, deserting, falling sick, going hungry or being disbanded.
 
-**Troop level** is read from drill and scars: 1 Raw, 2 Drilled, 3 Seasoned, 4 Veteran, 5 Elite. In eras I and II, Drilled comes at 3 months of drill, Seasoned at 6 months and 1 scar, Veteran at 3 scars, and Elite at 5 scars and 12 months of drill. Levels drop when new men dilute a company, after 5 years without a battle, when hungry, and all at once on disbanding. Standing regiments (W12) never drop below level 2.
+**Troop level** is read from drill and scars: 1 Raw, 2 Drilled, 3 Seasoned, 4 Veteran, 5 Elite. In era I, Drilled comes at 2 months of drill, Seasoned at 4 months and 1 scar, Veteran at 3 scars, and Elite at 5 scars and 8 months of drill; later eras need longer (see **Levels by era** below). Levels drop when new men dilute a company, after 5 years without a battle, when hungry, and all at once on disbanding. Standing regiments (W12) never drop below level 2.
 
 **The troop types of eras I to IV:**
 
@@ -68,13 +68,15 @@ The **troop cap** is the most soldiers your realm may keep: 2 % of the people in
 
 Lords' retinues don't count: each lord has his own cap by the same rule on his lands (2 % with one of his officials, 1 % without), and allies count only against their own. Over the cap you can't raise or hire, every soldier over it costs double pay, and levies desert 5 % a month until you are back under. There is no cap on the size of one army; food is its limit.
 
-**France, 1444.** With 4,000,000 people in royal provinces with an official, 1,500,000 without and 31 castles, France's cap is 95,000 plus the garrison room of the 31 castles. The Duke of Burgundy's 6 provinces of about 430,000 people, all with his officials, give him a retinue cap of about 9,000, outside France's cap.
+**France, 1444** (on the 1444 checkpoint world). With 4,000,000 people in royal provinces with an official, 1,500,000 without and 31 castles, France's cap is 95,000 plus the garrison room of the 31 castles. The Duke of Burgundy's 6 provinces of about 430,000 people, all with his officials, give him a retinue cap of about 9,000, outside France's cap.
 
 ### Raising and keeping an army
 
 Levies come from [Recruiting](Recruiting) as levy-kind companies of levy infantry, gathered a thousand at a time in their province, where they wait as its garrison until a commander picks them up. **No army exists without a commander**: soldiers without one are a province's garrison. An army that loses its commander with no captain to step up halts; in your own land it becomes that province's garrison, abroad it waits for a commander to join it.
 
 **Calling the lords.** Each lord answers by his loyalty. A loyal lord brings his whole retinue in 3 weeks and may lead it as a captain. A wavering lord brings half, after 6 weeks, and goes home after 6 months unless the war aim is his Want. A disloyal lord refuses, and calling him again makes him angrier. A lord in revolt's retinue is a rebel army. When the war aim is his Want, a lord comes even when wavering and stays to the end, and a lord whose lands are occupied leaves to defend them.
+
+**Lords' men in play.** A lord's lands' recruits are his retinue, not your levy: your levies and troop cap count only royal provinces, and each lord's retinue can grow to his own cap. At war, open your country card's **Army** tab: the *Lords' men* section sums what your lords have ready, gathering, in the field and refusing, with **Call the lords** to call them all; you can also call one from his own screen (Lords tab), where *Retinue* shows his men and **Call him**. A called retinue gathers at the lord's seat (his most peopled province) and takes the field as its own army, led by the lord himself. You march it like any army, but it is his: it can't be split, trained, joined to another army or handed to another commander, and he leads no other army. It costs you no pay and doesn't count toward your cap. It goes home to his lands when peace comes, when he turns disloyal, when a wavering lord has served 6 months (unless the war is for his Want), or when you tap **Send him home**. Every battle his men help win raises his loyalty a step. AI realms call their lords whenever they are at war. Not yet in play: a lord leaving to defend his occupied lands.
 
 **Mercenary companies.** Named companies with a captain are offered in the regions where they historically gathered (Swiss and German foot, Italian condottieri, Scottish and Irish gallowglass, Turkic and Afghan horse, Javanese and Japanese sword bands and others). Each shows men, troop type, drill, scars and price. A contract brings the company for the agreed months for gold up front plus monthly pay, using no recruits. The company isn't there at once: it marches from where it gathers to your capital, and the hire screen shows how many days that takes. It always comes led by its own captain as its commander, and he leaves with it. It leaves when the contract ends, when pay is owed as above, or when an enemy outbids you.
 
@@ -283,7 +285,7 @@ Each realm fights by the inventions it knows, with no world clock, so armies of 
 
 | Era | Years | A bell | Longest battle | Sector room | Hits per bell |
 |---|---|---|---|---|---|
-| I to IV | 1444 to 1800 | 2 hours | 3 days | as the table | 4 % |
+| I to IV | 1378 to 1800 | 2 hours | 3 days | as the table | 4 % |
 | V | 1800 to 1870 | 2 hours | 3 days | as the table | 5 % with W16, 6 % with W17 |
 | VI | 1870 to 1914 | half a day | 10 days | halved | 6 % (8 % with W19) |
 | VII | 1914 to 1939 | a day | 30 days | a quarter | 8 % |
@@ -337,6 +339,18 @@ An AI garrison accepts honours when it has a breach or under a month of food and
 
 A siege shows its progress on the map: how long the castle has held, its breaches, and the garrison and food left inside.
 
+#### Castles starve besiegers
+
+*Leroy, 19 October:* castles should help smaller realms hold out longer and make the attacker's food run out faster. A castle its owner still holds has gathered the land's food in behind its walls, so an invader living off that land goes hungry sooner:
+
+- **Foragers find less.** An army foraging on the land of a realm it is at war with finds less in a province with that realm's castle: 30 % less beside an earthwork ring fort, 45 % beside a stone castle (a capital counts as at least one), 60 % a bastion fort, 70 % a star fort and 80 % a concrete fortress. In the provinces the castle reaches (1 ring, 2 with a road at the castle, as for its food) foragers find half that cut: 23 % less near a stone castle. Where several castles reach, the biggest cut counts. The food they miss stays in the province.
+- **Besiegers eat more.** An army besieging a castle eats more from camp fevers and sallies against its foragers: a quarter more round a stone castle (15 % an earthwork, 30 % a bastion fort, 35 % a star fort, 40 % a concrete fortress), on top of its campaign rations. Its wagons hold no more, so they empty sooner.
+- **Only against the enemy.** Your own armies, an ally's and anyone not at war with the castle's owner forage as before, and a castle the enemy has taken or occupies gathers nothing in. A besieged castle still does.
+
+**Example.** A Castilian army of 10,000 lays siege to Setúbal, Portugal's capital. Foragers there find 45 % less than on open land, and the men eat a quarter more, so wagons holding two months of campaign food empty in about 1.6 months once there is nothing left to forage. The army card says so: *foragers find 45 % less: Setúbal's castle has gathered the food in · besieging: men eat 25 % more from camp fevers and sallies*.
+
+**Where you see it.** Your army's food line, on its row in the province card and on its commander screen, gives the reasons in words whenever they apply, and its months of food already count them. A province card's Walls line says what its castle keeps from enemy foragers, and the castle row of the build sheet says it for the step you would build, so you know what a castle adds to your defence. The numbers are provisional (`warfare.castle_supply`).
+
 ### Occupation and raids
 
 Taking a province's castle, or holding a province with no castle for a season, **occupies** it: you get its tax, recruits, food and trade, and its lord wavers toward the side holding his land. A horse-only army set to **Raid** can't besiege or occupy; each week it burns one tile and takes loot (gold from market and town, herds and horses from pasture) up to 1 load per 50 riders, then moves on, and castles there may sally.
@@ -364,7 +378,7 @@ With over half saying peace, the ruler must accept a peace asking only for provi
 
 Every war costs gold, men, people and your lords' patience, and one peace takes only part of a realm, so war is a choice with a price and not the best answer to everything.
 
-- **The declare sheet.** *Declare war* on a realm's Diplomacy tab no longer acts at once: it opens a sheet with the **Price of war** above *Confirm*. It lists who will be called against you (each realm with its soldiers and how it comes in: an ally, a protection pledge, a league against you or a subject), your allies who will come to your side, both sides' soldiers, the neighbours who will hold *Threatened us* for a war with no aim, how many of your lords (or boyars, beys, daimyo: your realm's own word) will waver, a truce you would break and when it would have ended, the monthly pay of your armies at war, and the most one peace can take ("at most 5 of their 14 provinces"). Lines that hurt are red with a "!" mark, and every line opens its reason when you tap it. A faith head's censure warning sits above *Confirm*, and a button opens your *Your name abroad* card. On a phone held sideways the price sits on the left and the terms on the right; in the Tall layout it is one scrolling column. *Confirm* stays pinned at the foot; with a truce it reads *Break the truce and declare war*.
+- **The declare sheet.** *Declare war* on a realm's Diplomacy tab no longer acts at once: it opens a sheet with the **Price of war** above *Confirm*. It lists who will be called against you (each realm with its soldiers and how it comes in: an ally, a protection pledge, a league against you or a subject), your allies who will come to your side, both sides' soldiers, for a war with no aim its whole cost at the head of the sheet in a red frame (your lords lose two steps of loyalty at once, notoriety, *Unjust war* in every province, peace voices, allies who stay out; see [Diplomacy](Diplomacy)) and the neighbours who will hold *Threatened us*, how many of your lords (or boyars, beys, daimyo: your realm's own word) will waver, a truce you would break and when it would have ended, the monthly pay of your armies at war, and the most one peace can take ("at most 5 of their 14 provinces"). Beside it, the terms name the **aim** the war will be declared with: the best fitting aim you hold against them (Take land first), with the province it names and why you hold it, for example *Take land: Normandy*, held within 50 years. *Confirm* declares with that aim. Only when you hold no fitting aim (or your regency may not use it) does it read *No aim* in red, and only then does the price list the neighbours alarmed and the lords who will waver. Lines that hurt are red with a "!" mark, and every line opens its reason when you tap it. A faith head's censure warning sits above *Confirm*, and a button opens your *Your name abroad* card. On a phone held sideways the price sits on the left and the terms on the right; in the Tall layout it is one scrolling column. *Confirm* stays pinned at the foot; with a truce it reads *Break the truce and declare war*.
 - **Levies at war are paid from their first month** (in peace they serve three months free), and occupied provinces pay their occupier only half their tax and no trade, so occupation doesn't pay for the war.
 - **The dead are missed at home**: men killed in a levy are lost from their province's peasants and counted among its fallen.
 - **One peace takes at most a third** of the loser's provinces, rounded up, and the capital only with the last one. Swallowing a realm takes several wars.
@@ -387,6 +401,7 @@ During the turn, inside the day loop: contacts, the withdraw check and battles; 
 - **The battle report**: who fought, where, the result, the losses and a one-line reason. Any battle can be replayed later from its notice.
 - **The battle playback**: the tile row, companies as blocks with level chevrons, the camps, and a one-line action per bell ("Dunois commits his knights to the pastures").
 - **The forage limit**, shown when you drag an army over a province.
+- **Why an army goes hungry**: its food line names an enemy castle that has gathered the food in and the extra eating while besieging; a province's Walls line says what its castle keeps from enemy foragers.
 - **Rumours** of unseen armies.
 - **Notifications** for battle won or lost (with the reason), a breach, terms offered, peace voices passing half, pay owed and an army hungry.
 - **The war aim**, shown to everyone.
@@ -408,19 +423,21 @@ During the turn, inside the day loop: contacts, the withdraw check and battles; 
 - [Culture](Culture): homeland language, culture group for style fallback, a captain's language for bribes.
 - [Religion](Religion): persecution for the Defend the faith aim.
 - [Historical-Events](Historical-Events): prestige from victories, war weariness from Fallen and peace voices, throne offers to generals.
-- [The-1444-Start](The-1444-Start): starting styles, capture warfare realms, starting castles and inventions.
+- [The 1378 Start](The-1378-Start): starting styles, capture warfare realms, starting castles and inventions.
 - [Map and Map Modes](Map-and-Lenses) and [Screens-and-Navigation](Screens-and-Navigation): army cards, battle playback, reports and notifications.
 - [Trade](Trade): occupiers take trade; the Open the roads term.
 - [Time-and-Turns](Time-and-Turns): the weekly turn, the day loop and the order battles resolve in.
 
 ## Numbers
 
+Every value the game uses, made from its config so it always matches the game: [Warfare data](Data-Warfare). How they combine: [Formulas](Formulas).
+
 All warfare values live in `packages/rules/data/domain/warfare.json`; most are provisional and tuned in balancing. Amounts the designs left out are set as: a wagon costs 10 gold, a hired company costs twice standing pay, a season is 3 months, a ransom is 100 gold for a commander and 25 for a captain, and fever land doubles sickness. Key values:
 
 | Key | Value |
 |---|---|
 | `warfare.company_size_min` / `max` | 500 / 1,000 |
-| `warfare.drill_max`, `warfare.scars_max`, `warfare.scar_fade_years` | 12, 5, 5 |
+| `warfare.drill_max`, `warfare.scars_max`, `warfare.scar_fade_years` | 24, 5, 5 |
 | `warfare.kinds.<kind>.break_point` | levy 25 %, retinue 35 %, hired 35 %, standing 30 %, garrison 40 %, rebel 20 % |
 | `warfare.kinds.levy.free_months` | 3 (levies no longer go home on their own) |
 | `warfare.kinds.hired.pay_multiplier`, `warfare.kinds.standing.pay_multiplier` | 3, 1.5 |
@@ -452,6 +469,8 @@ All warfare values live in `packages/rules/data/domain/warfare.json`; most are p
 | `warfare.siege.close_ratio`, `shot_per_month`, `b7_multiplier` | 3; bombard 2, field gun 1; ×1.5 |
 | `warfare.siege.repair_men`, `sally_share`, `fever_after_months` | 200, a third, 3 |
 | `warfare.storm.room_per_breach` / `losses` / `scaling` | 500 / ×1.5 / ×2 |
+| `warfare.castle_supply.forage_cut_by_step` / `reach_share` | 30 / 45 / 60 / 70 / 80 %; half in the castle's reach |
+| `warfare.castle_supply.besieger_eat_by_step` | ×1.15 / 1.25 / 1.3 / 1.35 / 1.4 |
 | `warfare.raid.loot_per_riders` | 1 load per 50 riders |
 | `warfare.peace.capital_share` / `warlike_ignore` / `half` / `three_quarters` | a third / a quarter / 50 % / 75 % |
 | `warfare.peace.tribute_years` / `open_roads_years`, `warfare.raid_war_months` | 20 / 10, 12 |
