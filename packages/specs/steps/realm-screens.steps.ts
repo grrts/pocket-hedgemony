@@ -68,12 +68,17 @@ Then("the Treasury tab of the country card opens", (s) => {
   expect(s.opened).toEqual({ card: "realm", tab: "treasury" });
 });
 
-Then("the top bar shows the realm, the date, gold, stability, the war plaque while at war and the News button", (s) => {
-  expect(bar(s).map((p) => p.key)).toEqual(["realm", "date", "gold", "stability", "dispatches"]);
+Then("the top bar shows the realm, the date, gold, stability, research, the war plaque while at war and the News button", (s) => {
+  expect(bar(s).map((p) => p.key)).toEqual(["realm", "date", "gold", "stability", "research", "dispatches"]);
+  // Research shows the study's progress and opens the Research screen; with nothing studied it is marked (RSCH-117).
+  const research = bar(s).find((p) => p.key === "research")!;
+  expect(research.opens).toEqual({ card: "realm", tab: "learning" });
+  const idle = topBar({ ...s.snap, research: { ...s.snap.research!, study: null } }, 0).find((p) => p.key === "research")!;
+  expect(idle.key === "research" && idle.study).toBe(null);
   // While at war the war plaque stands between stability and News, and opens Diplomacy.
   const atWar = { ...s.snap, wars: [{ id: "w", attackers: [s.me], defenders: [s.me === 0 ? 1 : 0], start: "1444-11-11" }] };
   const warBar = topBar(atWar, 0);
-  expect(warBar.map((p) => p.key)).toEqual(["realm", "date", "gold", "stability", "war", "dispatches"]);
+  expect(warBar.map((p) => p.key)).toEqual(["realm", "date", "gold", "stability", "research", "war", "dispatches"]);
   expect(warBar.find((p) => p.key === "war")!.opens).toEqual({ card: "realm", tab: "diplomacy" });
   // A war between others puts no plaque up.
   const others = { ...s.snap, wars: [{ id: "w", attackers: [s.me + 1], defenders: [s.me + 2], start: "1444-11-11" }] };

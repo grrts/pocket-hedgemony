@@ -552,6 +552,8 @@ document.addEventListener("click", (e) => {
   lordView = -1;
   declareFor = -1;
   realmTab = (b.dataset.realmOpen as typeof realmTab | undefined) ?? "general";
+  // Research opened from outside starts on Next: what to study (RSCH-116).
+  if (realmTab === "learning") learningUi.part = "next";
   newsView = false;
   panelCollapsed = false;
   renderPanel();
@@ -3358,6 +3360,8 @@ function renderHud(): void {
           return `<button class="plaque gold" data-realm="${me}"${open(p.opens)} title="Treasury: gold, and change per month. Opens the ledger">${icon("coin", 1)}<span class="gold-n${goldShown() === p.gold ? "" : p.gold > hudShot.goldFrom ? " up" : " down"}">${fmt(goldShown())}</span> <small class="${p.falling ? "down" : ""}">${p.perMonth >= 0 ? "+" : ""}${p.perMonth.toFixed(1)}</small><i ${shotClass("gold-pop", p.gold > hudShot.goldFrom ? "up" : "down", hudShot.goldAt, 600)} aria-hidden="true">${icon("coin", 1)}</i></button>`;
         case "stability":
           return stabilityPlaque(s.stability!, me, s.revolution);
+        case "research":
+          return `<button class="plaque research-plaque${p.study ? "" : " idle"}" data-realm="${me}"${open(p.opens)} title="${p.study ? `Research: studying ${esc(p.study)}, ${p.pct} %` : "Research: nothing studied, choose a study"}">${icon("scroll", 1)}<span class="plaque-text">${p.study ? `${p.pct}%` : "Study!"}</span></button>`;
         case "war":
           return `<button class="plaque at-war" data-realm="${me}"${open(p.opens)} data-war-focus title="Your wars: your side's peace voices, amber past a third, red past half">${icon("swords", 1)}At war${warPlaqueBars(myWarsRaw(), me)}</button>`;
         case "dispatches":
@@ -4263,8 +4267,8 @@ function showPanel(open: boolean, reopenIcon: "scroll" | "crown" = "scroll"): vo
     armyList.hidden = true;
   }
   panel.classList.toggle("chooser", reopenIcon === "crown");
-  // The Research tab's one screen takes a wider card on a desktop (RSCH-107).
-  panel.classList.toggle("research", open && !!panel.querySelector(".learn-screen:not(.schools-part)"));
+  // Research is a screen of its own: it fills the screen under the top bar (RSCH-118).
+  panel.classList.toggle("research", open && !!panel.querySelector(".learn-screen"));
   panel.hidden = !open || panelCollapsed;
   // While a course is drawn the voyage bar stands in for the folded card (EXPL-074).
   reopen.hidden = !open || !panelCollapsed || !!exploring;
@@ -6548,7 +6552,15 @@ function realmBookNav(r: number, answerWaits: boolean): string {
   // Hunting grounds is a page only for a tribal realm, marked while settlers or asks wait (TRIBE).
   const pages = tabHolds(open).filter((p) => p !== HUNT_TAB.label || tribe);
   const waits = (p: string) => p === HUNT_TAB.label && !!tribe && (tribe.settlers.length > 0 || tribe.asks.length > 0);
-  const row = pages.length > 1 ? `<nav class="tabs pages">${pages.map((p) => `<button class="tab${p === page ? " on" : ""}${waits(p) ? " marked" : ""}" data-realm-tab="${PAGE_KEYS[p]}">${label(p)}</button>`).join("")}</nav>` : "";
+  // In Research the Research page's own parts, Next, Tree and Schools, stand in the row in its place (RSCH-116).
+  const research = snapshot!.research;
+  const pageButton = (p: string) =>
+    p === "Research" && research
+      ? (["next", "tree", "schools"] as const)
+          .map((part) => `<button class="tab${realmTab === "learning" && learningUi.part === part ? " on" : ""}" data-learn-part="${part}">${part === "next" ? "Next" : part === "tree" ? "Tree" : `Schools · ${research.schools.length + research.founding.length}`}</button>`)
+          .join("")
+      : `<button class="tab${p === page ? " on" : ""}${waits(p) ? " marked" : ""}" data-realm-tab="${PAGE_KEYS[p]}">${label(p)}</button>`;
+  const row = pages.length > 1 ? `<nav class="tabs pages">${pages.map(pageButton).join("")}</nav>` : "";
   return `<nav class="sections" aria-label="Your realm">${sections}</nav>${row}`;
 }
 
@@ -6738,6 +6750,15 @@ function renderRealm(r: number): void {
       realmTab = b.dataset.realmOpenTab as typeof realmTab;
       // A line naming an invention opens the tree on it (GOV-078).
       if (b.dataset.learnPick) Object.assign(learningUi, { part: "tree", pick: b.dataset.learnPick, center: b.dataset.learnPick, slide: true });
+      else if (realmTab === "learning") learningUi.part = "next";
+      renderPanel();
+    }),
+  );
+  // Next, Tree and Schools: the Research page's parts, in the Realm book's pages row (RSCH-116).
+  panel.querySelectorAll<HTMLButtonElement>("[data-learn-part]").forEach((b) =>
+    b.addEventListener("click", () => {
+      realmTab = "learning";
+      learningUi.part = b.dataset.learnPart as typeof learningUi.part;
       renderPanel();
     }),
   );
@@ -7023,14 +7044,17 @@ function bindLearning(): void {
     if (center) learningUi.center = id;
     renderPanel();
   };
-  on("[data-learn-part]", (b) => {
-    learningUi.part = b.dataset.learnPart as typeof learningUi.part;
-    renderPanel();
-  });
   on("[data-inv]", (b) => pick(b.dataset.inv!, !b.closest(".tree-view")));
+  // Next names an invention: the Tree opens on it with its sheet.
+  on("[data-learn-pick]", (b) => {
+    learningUi.part = "tree";
+    learningUi.zoom = "close";
+    pick(b.dataset.learnPick!, true);
+  });
   on("[data-jump]", (b) => {
     const id = jumpTarget(r, b.dataset.jump!, learningUi.pick);
     if (!id) return;
+    learningUi.part = "tree";
     learningUi.zoom = "close";
     pick(id, true);
   });
@@ -7066,7 +7090,7 @@ function bindLearning(): void {
   });
   // The tree frame: Close up keeps its scroll, or brings what was asked for into the middle.
   const frame = screen.querySelector<HTMLElement>(".tree-view");
-  if (frame?.classList.contains("close")) {
+  if (frame?.classList.contains("near")) {
     const want = learningUi.center ?? (learningUi.scroll ? null : firstShown(r));
     learningUi.center = null;
     if (want) {
