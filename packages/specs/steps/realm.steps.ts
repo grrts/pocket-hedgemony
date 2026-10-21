@@ -1480,8 +1480,46 @@ When("the scores are worked out", (s) => {
   if (s.power) s.powerOut = M.powerScore(s.power);
   if (s.domination) s.dominates = M.dominationWin(s.domination.share, 100, s.domination.month);
 });
-Then("its Economy score is built from {int} yearly income and a bank of {int}", (s, income: number, bank: number) => {
-  expect(s.economy).toEqual({ income, bank, score: income + bank });
+Then("its Economy score is built from {int} yearly income and a bank of {int}, of which {int} counts", (s, income: number, bank: number, counted: number) => {
+  expect(s.economy).toEqual({ income, bank, counted, score: income + counted });
+});
+Then("its Economy score is {int}", (s, score: number) => {
+  expect(s.economy.score).toBe(score);
+});
+Given("the country {string} had an Economy score of {int} in each of {int} Januaries before this one", (s, _c: string, v: number, years: number) => {
+  s.januaries = Array.from({ length: years }, () => v);
+});
+Given("its Economy score is {int} in this January", (s, v: number) => {
+  s.januaries.push(v);
+  s.judged = M.averagedScore(s.januaries);
+});
+Then("its Economy score is judged as {int}", (s, v: number) => {
+  expect(s.judged).toBe(v);
+});
+Given("the realms' Power scores are:", (s, table: string[][]) => {
+  s.growthRows = table.slice(1).map(([realm, start, now]) => ({ realm: realm!, start: num(start!), now: num(now!) }));
+});
+Then(/^the Power growth of "([^"]+)" is ([\d.]+)(?:, measured from the floor of (\d+))?$/, (s, realm: string, g: string, floor?: string) => {
+  const rows = s.growthRows as { realm: string; start: number; now: number }[];
+  const f = M.startFloor(rows.map((r) => r.start));
+  if (floor) expect(f).toBe(Number(floor));
+  const r = rows.find((x) => x.realm === realm)!;
+  expect(M.growth(r.now, r.start, f)).toBe(Number(g));
+});
+Then("{string} leads the Power score", (s, realm: string) => {
+  const rows = s.growthRows as { realm: string; start: number; now: number }[];
+  const f = M.startFloor(rows.map((r) => r.start));
+  expect(M.scoreWinners(Object.fromEntries(rows.map((r) => [r.realm, M.growth(r.now, r.start, f)])))).toEqual([realm]);
+});
+Given("a campaign that starts in {int} and ends on 31 August {int}", (s, from: number, to: number) => {
+  s.chapters = { from, to };
+});
+Then("a chapter closes in the January turns of {int}, {int}, {int} and {int}", (s, a: number, b: number, c: number, d: number) => {
+  expect(M.chapterEnds(s.chapters.from, s.chapters.to)).toEqual([a, b, c, d]);
+});
+Then("the last chapter closes with the campaign on 31 August {int}", (s, y: number) => {
+  expect(M.chapterEnds(s.chapters.from, s.chapters.to)).not.toContain(y);
+  expect(M.realmConfig.campaign_end).toEqual({ year: y, month: 8, day: 31 });
 });
 
 Given("the country {string} knows {int} inventions of era I and {int} of era II", (s, country: string, one: number, two: number) => {
@@ -1530,9 +1568,13 @@ Given(re(`it has ${NUM} foot, ${NUM} horse, ${NUM} guns, (\\d+) warships and (\\
 Then("its Power score counts {int} provinces", (s, n: number) => {
   expect(s.powerOut.provinces).toBe(n);
 });
-Then("adds its army power from soldiers weighted by kind, warships and commanders", (s) => {
+Then("adds its army power from soldiers weighted by kind and warships", (s) => {
   expect(s.powerOut.score).toBe(s.powerOut.provinces + s.powerOut.army);
   expect(M.powerScore({ ...s.power, horse: 0 }).army).toBeLessThan(s.powerOut.army);
+});
+Then("its commanders add nothing", (s) => {
+  expect(s.power.commanders).toBeGreaterThan(0);
+  expect(M.powerScore({ ...s.power, commanders: 0 } as never).army).toBe(s.powerOut.army);
 });
 Then("its army power is {int}", (s, n: number) => {
   expect(s.powerOut.army).toBe(n);
@@ -2660,10 +2702,15 @@ When("the month ends", (s) => {
   const w = s.game as GW;
   s.recruitsBefore = w.provinceRecruits[s.province];
   s.news = [];
-  // A rising takes a neighbour at a tenth a month (rebellions provisional.spread_chance_per_month): play on a year at most.
-  for (let m = 0; m < 12 && !s.news.some((n: G.News) => n.text.startsWith("The rising spreads")); m++) {
+  // A rising takes a neighbour at a tenth a month (rebellions provisional.spread_chance_per_month): play on three years at most,
+  // sparking it again should it end, until a month in which it spreads and still holds the province, so the scenario does not
+  // hang on one run of the dice.
+  for (let m = 0; m < 36; m++) {
     restless(w, s.province);
-    s.news.push(...playMonth(w));
+    if (!w.provinceRebels[s.province]) G.spark(w, s.province, "the tax rate of the province is raised");
+    const month = playMonth(w);
+    s.news.push(...month);
+    if (w.provinceRebels[s.province] && month.some((n: G.News) => n.text.startsWith("The rising spreads"))) break;
   }
 });
 Then("its neighbours may be drawn into revolt", (s) => {

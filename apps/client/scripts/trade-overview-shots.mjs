@@ -18,6 +18,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   await page.goto("http://localhost:4185/");
   await page.waitForSelector("[data-nation=france]", { timeout: 60000 });
   await page.click("[data-nation=france]");
+  await page.click("[data-begin]");
   await page.waitForSelector(".hud [data-news]", { timeout: 60000 });
   await page.waitForTimeout(500);
   const stopHints = page.locator(".hint-note button", { hasText: "Stop hints" });
@@ -46,6 +47,16 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
     return { rows: p?.querySelectorAll(".trader-row").length ?? 0, sources: p?.querySelectorAll(".source-row").length ?? 0, small, sideways: p ? p.scrollWidth > p.clientWidth + 1 : false };
   });
   console.log(name, JSON.stringify(check));
+  // Found a trader: each city says how many traders it is home to (TRADE-161).
+  await page.locator('[data-page-fold="trade-found"] > summary').click();
+  await page.waitForTimeout(300);
+  await page.locator('[data-page-fold="trade-found"]').scrollIntoViewIfNeeded();
+  await shot("found");
+  console.log(name, "found", JSON.stringify(await page.evaluate(() => {
+    const p = document.querySelector("#panel");
+    const f = p?.querySelector('[data-page-fold="trade-found"]');
+    return { homes: [...(f?.querySelectorAll(".found-name small") ?? [])].slice(0, 3).map((x) => x.textContent), small: [...(f?.querySelectorAll("button") ?? [])].filter((b) => b.getBoundingClientRect().height < 43.5).length, sideways: p ? p.scrollWidth > p.clientWidth + 1 : false };
+  })));
   // A row opens the trader's card.
   await page.locator(".trader-row").first().click();
   await page.waitForTimeout(400);

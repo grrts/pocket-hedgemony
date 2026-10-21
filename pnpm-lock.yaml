@@ -51,6 +51,10 @@ importers:
       electron:
         specifier: 44.7.2
         version: 44.7.2
+    optionalDependencies:
+      steamworks.js:
+        specifier: 0.4.0
+        version: 0.4.0
 
   apps/mobile:
     dependencies:
@@ -860,6 +864,10 @@ packages:
 
   std-env@4.3.0:
     resolution: {integrity: sha512-OtU/EgQ1kIm5KwqQpBC6ZEMXrZRui11w8zgfTWp8cdO9B8OaPsbA8bTHO2P+HNo1VlUTGMVBwPhydu6poeXiag==}
+
+  steamworks.js@0.4.0:
+    resolution: {integrity: sha512-O5TTRs7ucCRql4IA/kYUIQYeghTsXqf3rAm81sC22RDId264LQYqQjuaMEUSqL60I5LdULiGu0W2/A+ZDcKBKA==}
+    engines: {node: '>= 14'}
 
   stream-buffers@2.2.0:
     resolution: {integrity: sha512-uyQK/mx5QjHun80FLJTfaWE7JtwfRMKBLkMne6udYOmvH0CawotVa7TfgYHzAnpphn4+TweIx1QKMnRIbipmUg==}
@@ -1708,6 +1716,11 @@ snapshots:
   split2@4.2.0: {}
 
   std-env@4.3.0: {}
+
+  steamworks.js@0.4.0:
+    dependencies:
+      '@types/node': 22.20.5
+    optional: true
 
   stream-buffers@2.2.0: {}
 

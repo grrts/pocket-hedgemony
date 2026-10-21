@@ -68,6 +68,7 @@ try {
   await page.goto("http://localhost:4179/");
   await page.waitForSelector("[data-nation=castile]", { timeout: 60000 });
   await page.tap("[data-nation=castile]");
+  await page.tap("[data-begin]");
   await page.waitForSelector(".hud [data-news]", { timeout: 60000 });
   await page.waitForTimeout(600);
 

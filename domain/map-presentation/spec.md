@@ -170,6 +170,12 @@ Newest decision first.
 - VIEW-050 (Ubiquitous): Route food colours shall also carry a pattern (solid, dashed, dotted); day counts stay at least 10 points tall at region zoom and hide rather than shrink when the map is too zoomed out. [troop-movement §10.7]
 - VIEW-051 (Ubiquitous): Every lens the tutorial teaches shall read without telling colours apart (for example hungry provinces also carry the hunger icon on the Food lens). [tutorial §10; gap-lists List 2 item 10]
 
+#### How the player uses it: colour vision and patterns
+1. Where: Settings → Accessibility (from the game menu or the start screen), the Colour vision row: one button per mode (Default, Red-weak (protan), Green-weak (deutan), Blue-weak (tritan), No colour), and under it a sample of four neighbouring realms and a lens ramp drawn in the chosen mode, so the player sees the change before closing Settings; Patterns on lenses is the next row. A tap applies at once: the map behind the dimmed Settings, the armies and routes in realm colours, the open lens and its key all redraw; nothing restarts, and the choice is saved with the other personal settings.
+2. Grouping: both rows sit in the one Accessibility section; on the map nothing new appears, as each lens keeps its own key under the map mode buttons, which now shows each band's colour and pattern as the map draws them (the People, Wealth, Food and Walls lenses gain a key of their bands so a pattern can be read).
+3. Overview: the map itself, and each lens's key; the Colour vision row's sample shows which mode is on at a glance.
+4. Phone: five modes are too many for one row of buttons, so they wrap into a grid under the row's name, each button at least 44 points tall and wide enough for its name, in the Wide and Tall layouts and inside the safe areas; patterns are drawn in map-anchored marks of about three screen pixels at every zoom so they read on a phone at arm's length; nothing needs hover.
+
 ### 5.8 Performance budgets
 
 - VIEW-052 (Ubiquitous): The map shall hold 60 fps while panning and zooming (16.7 ms a frame). [performance.md]

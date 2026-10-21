@@ -116,7 +116,7 @@ Two world-wide counts from [Your-Realm](Your-Realm) also act as reasons. Each **
 
 ### The reasons count
 
-Every yes or no is decided the same way: the asked country lists its reasons, each with a number, and answers yes only when the total is over zero. There is no prediction before asking, and the answer arrives as a **letter** a month after it is given, yes or no with the full reasons list. Beforehand you can judge only from what you can see: the ledger, the stance, and the other side's soldiers (exact with a resident, otherwise an estimate).
+Every yes or no is decided the same way: the asked country lists its reasons, each with a number, and answers yes only when the total is over zero. The answer arrives as a **letter** a month after it is given, yes or no with the full reasons list. Before you send, each ask the reasons decide shows one word on its button: **Likely** when its count as it stands this month is +15 or more, **Unlikely** at −15 or less, and **Unsure** between. No numbers are shown, and the count is made again when the envoy arrives, so much can change on the way. A courtesy visit and a gift always land and show no word. Beyond the word you can judge from what you can see: the ledger, the stance, and the other side's soldiers (exact with a resident, otherwise an estimate).
 
 Every count holds:
 
@@ -231,6 +231,19 @@ You declare war, and offer or ask for peace, from the **Diplomacy tab** of the o
 
 A declaration needs a target and exactly one aim you hold. Any Alliance, Truce or Pledge with the target must be broken first, each an Oath broken. The same turn, offensive calls go to your allies, defensive calls to the target's allies and pledgers, both sides' subjects come in by their kind (a Union joins at once, a Vassal or Protectorate is called and answers by its loyalty, a March joins when the enemy borders it, a Tributary or Colony stays out), and members of a league against you are brought in; answers arrive a month later. The aim is shown to every country, and for a war with no aim every neighbour of yours records *Threatened us*. A Union, Colony or Protectorate can't declare war, and a Vassal can't declare war on its overlord's allies; they join their overlord's wars or start an independence war. A realm under a regency may fight only defensive wars and Raids.
 
+#### A war with no aim
+
+You may always declare war with no aim, but it costs you dearly from the day you declare:
+
+- **Your lords turn.** Every lord, Warlike or not, loses two steps of loyalty at once: a Loyal lord becomes Disloyal. A Disloyal lord pays no tax, refuses your call to arms and may go over to a neighbour, and your stability falls with them.
+- **Your name abroad darkens.** You gain 15 notoriety, and every realm that knows you holds the wrong *Notorious deed* toward you, fading over 30 years. Notoriety makes realms refuse your alliances and marriages and band into leagues against you.
+- **Your people call it unjust.** Every province of yours holds the grievance *Unjust war* until the war ends, a step nearer to riots everywhere.
+- **Your realm wants peace.** Your peace voices count 25 in 100 more for peace in that war, so you may soon be bound to take a fair peace.
+- **Your allies stay out.** No ally owes you a war with no aim; they refuse the call without breaking the alliance.
+- **Your neighbours are alarmed** (*Threatened us*), and when you take land your lords who aren't Warlike waver again.
+
+The AI never declares a war with no aim unless its ruler is Warlike or it seeks hegemony. A subject rising for its freedom pays none of this. The way out is a demand: if they refuse it, you hold an aim. The declare sheet heads its *Price of war* with this whole cost in a red frame, and *Confirm* reads *Declare war with no aim*. The numbers are in `diplomacy.war_aims.no_aim_penalty`.
+
 **Hungary prepares to declare war on the Ottomans.** Hungary holds the aim Take land for Nikopol from the Want of its lord John Hunyadi. The declaration sheet shows the aim "Take land: Nikopol" and its source, Wallachia and the Papal States as called on Hungary's side, Serbia as an Ottoman tributary that does not join, and how many of Hungary's voices lean to peace. It does not show how the called countries will answer. It offers *Send a demand first* and *Declare*.
 
 ### Peace and truces
@@ -289,6 +302,16 @@ The AI decides with exactly the same counts, adding rows for its **posture** and
 
 Negotiation level adds very high +15 (and gifts count 25 % more), high +10, moderate 0, low −10, very low −20. Each month an AI with a free seat scores up to 5 candidate actions per free seat toward countries in its horizon (neighbours, neighbours' neighbours, anyone it has a relation or fact with, its rivals' enemies), estimates the other side's count with only what a player could see, sends the best one over zero, and sends a gift first when the best is a close no (−20 or better). It tries a demand before war unless it is an Opportunist and the target's armies are away. Opportunists and hegemon seekers fund rebels in a rival's provinces that already have two or more grievances.
 
+### Arms and fear
+
+Every month each country weighs each neighbour it does not count as a friend (friends are its allies, its overlord and its subjects) against its own side: its men under arms, the levies it can still call and its lords' men, with its friends counting half. A neighbour 1.5 times as strong makes it **Wary**; 2.5 times as strong makes it **Threatened**. There is no rivalry: fear is measured again each month and goes as soon as the balance changes.
+
+A computer country at peace keeps a **standing army**: a quarter of its troop cap, or half the largest force of an unfriendly neighbour if that is more, times 1.5 when Wary and 2 when Threatened. It never keeps more than a share of its cap (a half, 0.7 Wary, 0.9 Threatened) or more than a share of its income can pay. Under that it calls up to 3,000 men a month where its garrisons already stand; over it, levies whose free months are over go home, smallest first. At war it calls men in every royal province it holds, up to a quarter of its cap a month, within three quarters of its income. At war or Threatened it borrows up to three months of its army's pay, and counts what lenders would give toward its war chest.
+
+You see who fears you under **Name abroad** (*Neighbours who fear you*, with how many times their side you are), and on a country's diplomacy card a line says whether it is Wary or Threatened of you and whom else it fears. When a neighbour comes to feel Threatened by you, the news says so once.
+
+Fear also makes countries act. Two countries that fear the same realm draw together: an alliance count holds *We fear the same realm* +15, or +30 when the country asked is Threatened, and it shows in the **Why?** of the answer. A Threatened computer country weighs its envoys every 3 months instead of once a year and looks for allies among the other neighbours of the realm it fears, even ones it does not border. A Wary country walls the province on its border with the realm it fears most with earthworks, a Threatened one with stone, before its other works; and both study warfare and fortification inventions sooner (they weigh 0.8 and 0.6 of their cost). When neighbours who fear you ally, the news tells you. Countries also take their chances: a neighbour already at war elsewhere draws their eye, and they need only three quarters of their usual strength edge to attack it; and now and then (one month in ten that they look for a war) they gamble on four fifths of it. All of this is measured each month: none of it is a lasting rivalry.
+
 ### Each month
 
 Answer letters from last month are delivered; envoys arriving this month have their asks counted; rebel funding is charged and the caught chance rolled; at each season's end resident ties grow and courting rolls happen; truces, passages and timed war aims expire and envoys return; the AI acts. Once a year ledgers fade, leagues are checked and relations decay.
@@ -299,7 +322,7 @@ Answer letters from last month are delivered; envoys arriving this month have th
 - **The country diplomacy card**: their standing toward you and your stance, ties and wrongs, relations, your war aims on them, the last answer with a *Why?* button for the full reasons, and action buttons that show no prediction. In landscape it sits to the right of the map.
 - **The envoy picker**: which official goes, the days on the road, and which province loses its official meanwhile.
 - **The envoys strip**: each seat as free, on the road (destination and days) or resident (court).
-- **The declare sheet**: the *Price of war* (who is called against you and how, the neighbours alarmed, the lords who will waver, a truce broken, your pay at war, the most one peace can take) above *Confirm*; see [Warfare](Warfare#the-price-of-war).
+- **The declare sheet**: the *Price of war* (who is called against you and how, the neighbours alarmed, the lords who will waver, a truce broken, your pay at war, the most one peace can take), and the aim the war is declared with (the best fitting aim you hold, or *No aim* in red), above *Confirm*; see [Warfare](Warfare#the-price-of-war).
 - **Your name abroad**: your own Diplomacy tab opens with it. Any league against you comes first, with each member and its soldiers; then your **notoriety** as a word (*Trusted* under 25, *Watched* from 25, *Feared* from 50, *Hated* from 75), and your **Lands taken** in the last 20 years as a bar against the era's league threshold ("6 of 8 before a league"). Notoriety is 5 for each land taken plus notorious deeds, fading over 30 years; courts trust you less for it (less willing to ally, marry or pledge) and are readier to join a league against you. Land taken also leaves the wrong *Grabbed land near us* with the realms that border it. Every row opens its reason on a tap.
 - **The war card** for each war you fight, with both sides' peace voices; see [Warfare](Warfare#the-price-of-war).
 - **Answer letters**, and the country card line "Envoys n of m abroad" and "Leagues against you".
@@ -379,6 +402,7 @@ All numbers live in `diplomacy-rules.json` (or `relation-rules.json` for relatio
 | `truce.*` | 60 + 60 months; white 60 |
 | `leagues.*` | yearly; thresholds 8/8/8/6/6/4/4; count rows above; 2 members; dissolves below half |
 | `answers.delay_months` / `preview_before_sending` | 1 / false (decided) |
+| `answers.hint.likely_from` / `answers.hint.unlikely_to` | +15 / −15 (the one-word hint before asking) |
 | `types.friendly.duration.decay_months` | 240 |
 | `types.rival.duration.min_months_before_change` | 120 |
 | `types.hostile.duration.decay_months` | 120 |

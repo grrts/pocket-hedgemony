@@ -147,8 +147,19 @@ export function chartFleets(world: World): void {
 /** Each day: every army charts what is next to it (EXPL-013). */
 export function chartArmies(world: World): void {
   const a = world.armies;
-  for (let i = 0; i < a.count; i++) if (a.alive[i]) chartAround(world, a.owner[i]!, a.location[i]!);
+  // Charting never comes undone (EXPL-014), so an army still where its realm last charted from charts nothing new, as a fleet lying still.
+  let last = chartedFrom.get(world);
+  if (!last || last.length !== a.alive.length) chartedFrom.set(world, (last = new Float64Array(a.alive.length).fill(-1)));
+  for (let i = 0; i < a.count; i++) {
+    if (!a.alive[i]) continue;
+    const at = a.owner[i]! * world.provinceCount + a.location[i]!;
+    if (last[i] === at) continue;
+    last[i] = at;
+    chartAround(world, a.owner[i]!, a.location[i]!);
+  }
 }
+/** Where each army slot last charted from, as realm × provinces + province; not saved, so a loaded game charts once again. */
+const chartedFrom = new WeakMap<World, Float64Array>();
 
 // ---------------------------------------------------------------- the exploration unlock
 

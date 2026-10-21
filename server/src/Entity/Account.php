@@ -17,8 +17,9 @@ class Account implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'uuid')]
     private Uuid $id;
 
-    #[ORM\Column(length: 180)]
-    private string $email;
+    /** Null for an account made with a store sign-in (Steam …) until the player adds an email. */
+    #[ORM\Column(length: 180, nullable: true)]
+    private ?string $email;
 
     #[ORM\Column(length: 40)]
     private string $displayName;
@@ -39,10 +40,10 @@ class Account implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: Types::JSON, nullable: true)]
     private ?array $roles = null;
 
-    public function __construct(string $email, string $displayName)
+    public function __construct(?string $email, string $displayName)
     {
         $this->id = Uuid::v7();
-        $this->email = mb_strtolower(trim($email));
+        $this->email = null === $email ? null : mb_strtolower(trim($email));
         $this->displayName = trim($displayName);
         $this->createdAt = new \DateTimeImmutable();
     }
@@ -52,9 +53,22 @@ class Account implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->id;
     }
 
-    public function getEmail(): string
+    public function getEmail(): ?string
     {
         return $this->email;
+    }
+
+    /** Adds email and password sign-in to an account that has none (SAVE-112). */
+    public function setEmail(string $email): void
+    {
+        $this->email = mb_strtolower(trim($email));
+    }
+
+    /** Removes email and password sign-in (SAVE-193), or hands it on when two accounts are combined (SAVE-187). */
+    public function removeEmail(): void
+    {
+        $this->email = null;
+        $this->password = '';
     }
 
     public function getDisplayName(): string
@@ -77,9 +91,10 @@ class Account implements UserInterface, PasswordAuthenticatedUserInterface
         $this->password = $hash;
     }
 
+    /** The website signs in by email; an account without one is known by its id. */
     public function getUserIdentifier(): string
     {
-        return $this->email;
+        return $this->email ?? $this->id->toRfc4122();
     }
 
     public function getRoles(): array

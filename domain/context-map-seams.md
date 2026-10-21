@@ -839,7 +839,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 |---|---|---|---|
 | events | downstream (they extend this) | Customer–Supplier | Ages for golden ages; condition language; adopted (D-EVT-11) effects grant_legacy, wake_heyday, stir_ambition, shed_burden and condition heritage; requested missing events, areas, hubs and sea ids |
 | national-strengths | upstream | Conformist | Ages (`ages.yaml`) and their start/end, the condition language, event ids for event_weight/event_option; the `stat` lever lands through the events mapping (D-EVT-4, D-HER-6); heritage runs right after the event tree each turn |
-| national-strengths | downstream | Published Language | Four effects (grant_legacy, wake_heyday, stir_ambition, shed_burden) and the `heritage` condition (adopted, D-EVT-11) |
+| national-strengths | downstream | Published Language | Effects grant_legacy, wake_heyday and shed_burden (stir_ambition retired, X-27) and the `heritage` condition (adopted, D-EVT-11), which lets an event require an ambition done |
 
 ## events ↔ naval (one-sided)
 
@@ -1117,7 +1117,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | game-shell | upstream | Customer–Supplier | Newest save and its header summary (Continue label, title background), Load list (flat, newest first), the Resume save and orders journal (closed at End turn, written on backgrounding), ironman flag, Needs attention mutes and tutorial progress in the save (X-16), locked-nation check, damaged-save failures |
-| saves | downstream | Customer–Supplier | Continue target and label, Load list (campaigns, saves, devices), Save slots, toasts and messages, lifecycle events (background, resume, quit), unlock screen on locked saves, ironman split prompt |
+| saves | downstream | Customer–Supplier | Continue target and label, Load list (campaigns, saves, devices), Save slots, toasts and messages, lifecycle events (background, resume, quit), unlock screen on locked saves, ironman split prompt; whether the full game is unlocked on this store (`FullGameUnlocked` / `FullGameLocked`) for the ribbon, the Unlock card and the realm picker |
 
 ## game-shell ↔ scenario-setup
 
@@ -1330,7 +1330,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
 | map-presentation | upstream | Published Language | Ambition shimmer |
-| national-strengths | downstream | Published Language | Shimmer over hot ambition regions |
+| national-strengths | downstream | Published Language | Shimmer over the regions of ambitions within reach |
 
 ## map-presentation ↔ naval
 
@@ -1444,7 +1444,7 @@ Each pair lists what both sides say. A pair named by only one side is marked **o
 
 | Said by | Other side is | Pattern | What crosses |
 |---|---|---|---|
-| national-strengths | downstream | Customer–Supplier | Tutorial ambition with a plain hint |
+| national-strengths | downstream | Customer–Supplier | Tutorial ambition, its goal and progress shown |
 | onboarding | upstream | Conformist | *Kapıkulu household* birthright; Realms Almanac strengths |
 
 ## national-strengths ↔ province

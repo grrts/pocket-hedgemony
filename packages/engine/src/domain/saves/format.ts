@@ -83,6 +83,14 @@ export interface SaveHeader {
   parent?: string;
   /** The start the campaign began from (X-25, SAVE-111); a save without one began in 1444. */
   start?: string;
+  /** Where a copy of a shared save came from: the share code and the author's display name (SAVE-128). */
+  sharedFrom?: SharedFrom;
+}
+
+/** The shared save a campaign began as a copy of (SAVE-128). */
+export interface SharedFrom {
+  code: string;
+  author: string;
 }
 
 /** One chunk before compression. */

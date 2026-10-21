@@ -3,7 +3,9 @@ import { loadMapTiles } from "../src/node/mapTiles.ts";
 import { loadDefaultRuleset } from "@ph/rules";
 import { createWorld, processTurn, type World } from "../src/index.ts";
 import { restoreWorld, worldChunks } from "../src/domain/saves/world-chunks.ts";
-import { answerEveryday, everydayCards, fireEverydayNow, monthlyEveryday } from "../src/everyday.ts";
+import { answerEveryday, everydayCards, fireEverydayNow, fits, monthlyEveryday } from "../src/everyday.ts";
+import data from "../../rules/data/domain/events-everyday.json" with { type: "json" };
+import geography from "../../rules/data/domain/exploration-regions.json" with { type: "json" };
 import { lordLands } from "../src/lords.ts";
 import type { News } from "../src/war.ts";
 import { startOutbreak } from "../src/plague.ts";
@@ -33,12 +35,12 @@ function months(w: World, count: number, answer: boolean, news: News[] = []): nu
 }
 
 describe("everyday events (EVT-115 to EVT-128)", () => {
-  it("draw a small choice every 3 to 6 months for the player, and answer the AI's at once (EVT-115, EVT-116)", () => {
+  it("draw a small choice every 2 to 4 months for the player, and answer the AI's at once (EVT-115, EVT-116)", () => {
     const w = france();
     const seen = months(w, 60, true);
-    // 5 years at one every 3 to 6 months.
-    expect(seen).toBeGreaterThanOrEqual(8);
-    expect(seen).toBeLessThanOrEqual(21);
+    // 5 years at one every 2 to 4 months.
+    expect(seen).toBeGreaterThanOrEqual(12);
+    expect(seen).toBeLessThanOrEqual(31);
     // The AI's never wait.
     expect(w.everyday!.pending).toEqual([]);
     expect(w.everyday!.seq).toBeGreaterThan(seen * 10);
@@ -253,5 +255,70 @@ describe("everyday events (EVT-115 to EVT-128)", () => {
     expect(answerEveryday(w, n, card.event, "second", [])).toBeNull();
     expect(f.admiral).toBeGreaterThan(c);
     expect(f.fleeing).toBe(false);
+  });
+
+  type Def = { weight: number; needs: string; where?: string[]; from?: number; to?: number; options: { needs?: string; effects: { gold?: number }[] }[] };
+  const DEFS = data.events as unknown as Record<string, Def>;
+
+  it("holds about fifty events, each with two or three options and one that costs nothing, its regions known (EVT-119, EVT-133)", () => {
+    const drawn = Object.keys(DEFS).filter((k) => DEFS[k]!.weight > 0);
+    expect(drawn.length).toBeGreaterThanOrEqual(45);
+    for (const [k, d] of Object.entries(DEFS)) {
+      expect(d.options.length, k).toBeGreaterThanOrEqual(2);
+      expect(d.options.length, k).toBeLessThanOrEqual(3);
+      expect(d.options.some((o) => !o.needs && o.effects.every((e) => (e.gold ?? 0) >= 0)), k).toBe(true);
+      for (const r of d.where ?? []) expect(r in geography.parents, `${k}: ${r}`).toBe(true);
+      if (d.from !== undefined && d.to !== undefined) expect(d.from, k).toBeLessThan(d.to);
+    }
+  });
+
+  it("comes only to realms of its region and era (EVT-133)", () => {
+    const w = france();
+    const n = w.player;
+    // France is in Europe: a tournament in 1444, no railway yet, no monsoon.
+    expect(fits(w, DEFS.tournament as never, n)).toBe(true);
+    expect(fits(w, DEFS.railway as never, n)).toBe(false);
+    expect(fits(w, DEFS.monsoon_fails as never, n)).toBe(false);
+    w.date = { ...w.date, year: 1850 };
+    expect(fits(w, DEFS.railway as never, n)).toBe(true);
+    expect(fits(w, DEFS.tournament as never, n)).toBe(false);
+    const delhi = w.nationIndex.get("delhi");
+    if (delhi !== undefined) expect(fits(w, DEFS.monsoon_fails as never, delhi)).toBe(true);
+  });
+
+  it("never brings the player the same event again within 20 years, and keeps that through a save (EVT-134)", () => {
+    const w = france();
+    w.nationTreasury[w.player] = 100000;
+    const at = new Map<string, number>();
+    for (let k = 0; k < 20 * 12; k++) {
+      w.date = { ...w.date, month: (w.date.month % 12) + 1, year: w.date.year + (w.date.month === 12 ? 1 : 0) };
+      monthlyEveryday(w, []);
+      for (const ev of [...w.everyday!.pending]) {
+        if (ev.def.endsWith("_dies") || ev.def === "plague_reaches") continue;
+        const was = at.get(ev.def);
+        expect(was === undefined, `${ev.def} again after ${was === undefined ? 0 : ev.at - was} months`).toBe(true);
+        at.set(ev.def, ev.at);
+      }
+      for (const c of everydayCards(w, w.player)) answerEveryday(w, w.player, c.event, c.options[0]!.id, []);
+    }
+    expect(at.size).toBeGreaterThan(15);
+    const back = restoreWorld(new Map(worldChunks(w, { playerNation: "france", options: {} as never }).map((c) => [c.id, c])), rules, {}, tiles).world;
+    expect(back.everyday!.last).toEqual(w.everyday!.last);
+  });
+
+  it("a rich harvest fills the store, and hail lightens the tax (EVT-135)", () => {
+    const w = france();
+    const news: News[] = [];
+    const ev = fireEverydayNow(w, "good_harvest", w.player, news)!;
+    const p = ev.province!;
+    const before = w.provinceStore[p]!;
+    const card = everydayCards(w, w.player)[0]!;
+    expect(card.options.find((o) => o.id === "store")!.effects).toContain(`${rules.provinces[p]!.name}: +2 months of food in store`);
+    expect(answerEveryday(w, w.player, card.event, "store", news)).toBeNull();
+    expect(w.provinceStore[p]).toBeCloseTo(before + 2 * w.provincePopulation[p]!, 3);
+    const hail = fireEverydayNow(w, "hail", w.player, news)!;
+    const c2 = everydayCards(w, w.player)[0]!;
+    expect(answerEveryday(w, w.player, c2.event, "remit", news)).toBeNull();
+    expect(w.provinceLightTax[hail.province!]).toBe(w.date.year + 1);
   });
 });

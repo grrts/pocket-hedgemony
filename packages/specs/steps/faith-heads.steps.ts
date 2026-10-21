@@ -359,6 +359,8 @@ Given("the country {string} is censured by the Pope in its war on {string}", (s,
   const w = at(s);
   const x = N(w, a), y = N(w, b);
   s.fhLords = w.lords.filter((l) => l.nation === x).map((l) => l.loyalty);
+  // A Tribute aim, censured as well, so only the censure moves the lords (a war with no aim costs more, F-167).
+  DIP.grantAim(w.diplomacy, { holder: w.nationIds[x]!, target: w.nationIds[y]!, aim: "tribute", source: "test" });
   declare(w, x, y);
   expect(FH.censuresOf(w, x)).toHaveLength(1);
   s.fhMe = x;

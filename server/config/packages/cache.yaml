@@ -15,5 +15,15 @@ framework:
         #app: cache.adapter.apcu
 
         # Namespaced pools use the above "app" backend by default
-        #pools:
-            #my.dedicated.cache: null
+        pools:
+            # Apple's and Google's public keys for ID tokens (App\Account\IdToken\KeySets).
+            cache.sign_in_keys:
+                adapter: cache.app
+
+when@test:
+    framework:
+        cache:
+            pools:
+                # Each test starts with no keys fetched (tests make their own keys).
+                cache.sign_in_keys:
+                    adapter: cache.adapter.array

@@ -1858,8 +1858,8 @@ Then("the army has no commander until the player commissions an official or one 
   expect(generalsOf(w, n)).toBe(s.commanders + 1);
 });
 Then("no commander is attached to an army by default", (s) => {
-  const { w } = gameFrance(s);
-  for (let i = s.armies; i < w.armies.count; i++) if (w.armies.alive[i]) expect(w.armies.commander[i]).toBe(-1);
+  const { w, n } = gameFrance(s);
+  for (let i = s.armies; i < w.armies.count; i++) if (w.armies.alive[i] && w.armies.owner[i] === n) expect(w.armies.commander[i]).toBe(-1);
 });
 Given('the country "France" has 60 gold', (s) => {
   const { w, n } = gameFrance(s);

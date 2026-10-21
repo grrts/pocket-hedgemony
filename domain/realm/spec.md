@@ -76,7 +76,9 @@ Newest decision first.
 | Lands taken | Provinces seized in the last 20 years | |
 | Envoy | An official sent abroad on one mission; the card counts Envoy seats | Trader |
 | Score | Economy, Power or Technology | |
-| World domination | Owning or holding as subjects half of the world's settled land provinces, checked each January | Score victory |
+| World domination | Owning or holding as subjects every settled land province of the world, checked each January (X-28) | Score victory |
+| Growth | A score's 25-year average divided by the realm's own start, floored at the median start; what is ranked and wins (X-28) | The score itself |
+| Chapter | A hundred years of the campaign, closed in a January turn with its own standings (X-28) | Age, era |
 
 ## 4. Domain model
 
@@ -255,18 +257,18 @@ Holds: castle store, granary size, reach, overrides of food policy.
 
 ### 5.15 Win scores
 - REALM-150: A campaign shall be won by world domination or by leading one of three scores (Economy, Power, Technology), each built only from realm stats. [§12, gap-lists A.1]
-- REALM-151: Economy shall be yearly income (taxes, lords' share, trade, tribute) plus the bank (gold minus debt). [§12]
-- REALM-152: Power shall be provinces held (subjects count half) plus army power (soldiers weighted by kind, warships, commanders), as REALM-160 states. [§12, D-REALM-6]
+- REALM-151: Economy shall be yearly income (taxes, lords' share, trade, tribute) plus the bank (gold minus debt). [§12] *Changed by REALM-310 (X-28): the bank counts up to a year's income.*
+- REALM-152: Power shall be provinces held (subjects count half) plus army power (soldiers weighted by kind, warships, commanders), as REALM-160 states. [§12, D-REALM-6] *Changed by REALM-314 (X-28): commanders add nothing.*
 - REALM-153: Technology shall be inventions known, each weighted by its era cost in the research tree; nothing removes a known invention. [§12]
-- REALM-154: When a realm owns or holds as subjects half of the world's settled land provinces (land provinces with people) in the turn in which 1 January falls, it shall win by world domination at once. [§12, X-12, D-REALM-6]
-- REALM-155: When the campaign's end date (31 August 1939) arrives, every realm that leads the Economy, Power or Technology score shall win in that score, with no margin; leading earlier wins nothing. [§12, gap-lists, X-12, D-REALM-6]
+- REALM-154: When a realm owns or holds as subjects every one of the world's settled land provinces (land provinces with people) in the turn in which 1 January falls, it shall win by world domination at once. [§12, X-12, D-REALM-6; X-28: the whole world, no longer half]
+- REALM-155: When the campaign's end date (31 August 1939) arrives, every realm that leads the Economy, Power or Technology score shall win in that score, with no margin; leading earlier wins nothing. [§12, gap-lists, X-12, D-REALM-6] *Changed by REALM-311 and REALM-312 (X-28): the lead is in growth of the 25-year average.*
 - REALM-156: The country card shall show the country's rank in each score. [§12]
 
 ### 5.16 Decided rules (17 October 2026)
 - REALM-157: The card shall show **Traders** and **Trade ships** instead of Merchants; Gold's trade income shall be deposits from traders, market fees and tolls; `trade_access` shall set starting traders; surplus grain shall be sold to the realm's own treasury and bought from it at the fixed grain price (0.5 gold a food), with no market. [trade §14, X-6, D-REALM-1]
 - REALM-158: The card shall also show Envoy seats (and envoys abroad), Leagues against you, Pretenders at court, Arms store, Powder store, Prisoners, Victories / Defeats, Troop cap, Peace voices on the Enemies line, Preachers in Abroad, and the Subjects row "Vassals, tributaries, unions, marches, colonies and protectorates"; Faith counts the state faith or a faith layered with it; Language counts related languages as half; building upkeep is a loss of Gold. [diplomacy §18, warfare §18, religion §18, culture, subjects §12, buildings §18, D-REALM-2, D-REALM-3, D-REALM-9]
 - REALM-159: Events shall read `war_weariness` as Fallen and peace voices, `prestige` as victories and lands taken, `admin_capacity` as the officials cap (government), `trade_access` as starting traders, and `opinion`, `trust` and `notoriety` from diplomacy. [warfare §18, government, diplomacy §11, D-REALM-3, D-REALM-4]
-- REALM-160: Army power shall be (foot × 1 + horse × 2 + guns × 3 + warships × 100 + commanders × 1,000) ÷ 1,000. [D-REALM-6]
+- REALM-160: Army power shall be (foot × 1 + horse × 2 + guns × 3 + warships × 100 + commanders × 1,000) ÷ 1,000. [D-REALM-6] *Changed by REALM-314 (X-28): commanders add nothing.*
 - REALM-161: The throne law shall follow the government form's succession: eldest heir and named heir give eldest son (eldest child where the country's history lets a daughter inherit the crown), strongest son gives strongest claimant, eldest of the house and the chief's lineage give eldest of the house, and every form where a body chooses gives election. [government §3, D-REALM-4, D-REALM-5]
 - REALM-162: A lord with 4 to 7 provinces shall have one *Great lord* reason and one with 8 or more two; each reason means one more loyalty-raising cause is needed for each step up. [government §2, D-REALM-4]
 - REALM-163: A generated character shall be a woman with a chance per role: lord 5 %, commander 2 %, official 2 %, scholar 5 % (a ruler only by succession), per country where the data says otherwise, times the age multiplier and the reform multiplier; students are men taken from recruits. [§8.1, D-REALM-7, D-RSCH-15]
@@ -279,7 +281,7 @@ Holds: castle store, granary size, reach, overrides of food policy.
 - REALM-170: A child ruler (under 16) shall have the queen mother as regent where she lives, otherwise the most loyal lord, then the one with most provinces, then by name. [§8, §8.1, D-REALM-17]
 - REALM-171: The AI shall use the food preset Feed the people in peace and War footing at war, set the tax default normal in peace and heavy at war, take a loan only when its gold is below zero, give a gift to a disloyal lord when it has 20 gold, and grant as fiefs the royal provinces its officials cannot run. [D-REALM-16]
 - REALM-172: The default army refill shall be "Castles hand out first". [warfare §18, D-REALM-3]
-- REALM-173: Scores shall be worked out each January for the realm book; world domination is checked in the turn in which 1 January falls and the player may keep playing after it; at the end date tied leaders share the win, and a campaign without a win shows the final scores and the player's rank. [X-12, D-REALM-6]
+- REALM-173: Scores shall be worked out each January for the realm book; world domination is checked in the turn in which 1 January falls and the player may keep playing after it; at the end date tied leaders share the win, and a campaign without a win shows the final scores and the player's rank. [X-12, D-REALM-6] *Added to by REALM-311 to REALM-313 (X-28): what is judged is growth of the 25-year average, and a chapter closes every 100 years.*
 - REALM-174: The tax steps shall be none, light, normal, heavy and crushing; a revolt forces light down to none. [province §8, D-REALM-8]
 - REALM-175: Commanders shall come from the origins warfare §4 gives (ruler or heir, lord, hired captain, risen from the ranks, academy graduate, exile, commissioned official), each with Might, Cunning and Logistics. [warfare §4, X-7, D-REALM-18]
 
@@ -327,14 +329,20 @@ Leroy's milestone 3 playtest (feedback 59, 61, 71). It is the latest decision, s
 ### 5.19 Stability (playtest feedback, 17 October)
 Leroy's feedback F-75: stability is a meaningful reading of the state of lords, subjects and officials. It stays a reading, not a stored number (D-AUD-2: there is no stability stat); events keep reading stability as REALM-140 maps it.
 
-- REALM-199: A realm's stability shall be read from four pillars, lords, subjects, officials and provinces, each on one of the steps Steady, Uneasy, Troubled and Crumbling (`stability.steps`); the realm stands at the step of its weakest pillar. [F-75, REALM-140, D-AUD-2]
+- REALM-199: A realm's stability shall be read from its pillars, lords, subjects, officials, provinces and (X-29) treasury, each on one of the steps Steady, Uneasy, Troubled and Crumbling (`stability.steps`); the realm stands at the step of its weakest pillar. [F-75, REALM-140, D-AUD-2]
 - REALM-200: The lords pillar shall count the realm's lords who hold land, and the subjects pillar its subjects, by loyalty: Crumbling while any is In revolt, Troubled while any is Disloyal, Uneasy while fewer than half are Loyal (`stability.loyal_share_for_steady`), else Steady; no lords or no subjects is Steady. Until the subjects context's seasonal count is built, a subject's loyalty is its 1444 starting step (SUBJ-036). [F-75, REALM-086, SUBJ-026, SUBJ-036]
 - REALM-201: The officials pillar shall count the realm's royal provinces whose official's post stands empty (REALM-064): none Steady, up to a quarter Uneasy, up to a half Troubled, more Crumbling (`stability.empty_posts_share`, provisional). A lord's provinces are run by his own officials (PROV-202) and are not counted. Officials over the officials cap reach stability through the *Grasping officials* grievance (GOV-005) and a judge through the riot bar (PROV-236), both in the provinces pillar. [F-75, REALM-063, REALM-064]
+- REALM-298: The treasury pillar shall be Troubled for `debt.default.troubled_years` (2) after the realm defaults on its debts (REALM-301), Uneasy while it is broke and heading for a default, else Steady. [X-29]
+- REALM-299: Low stability shall cost the realm (`stability.effects`, provisional): while Troubled, its provinces send the crown 10 % less tax and recruit refill and its plotting provinces rise half as often again; while Crumbling, 25 % less and twice as often. Steady and Uneasy cost nothing. The step is read once a month in the monthly step, after the moods. [X-29]
+- REALM-300: A realm shall be broke while it owes lenders, its gold is below zero and they would not lend enough to cover it; a realm that owes nothing has nothing to default on. [X-29]
+- REALM-301: When a realm has been broke for `debt.default.broke_months` (3) monthly steps in a row, it shall default on its debts: what it owes is gone and its gold set to nothing; each of its lords takes the *crown defaulted* loyalty cause twice (`debt.default.lord_steps`; none below Disloyal); and lenders refuse it for `debt.default.lenders_refuse_years` (5). The AI defaults by the same rule, after its own borrowing. [X-29]
 - REALM-202: The provinces pillar shall count the realm's provinces rioting or plotting (PROV-230 to PROV-236): none Steady, any rioting Uneasy, any plotting or a tenth of the provinces Troubled, a quarter Crumbling (`stability.restless_share`, provisional; a quarter as D-AUD-2's unrest). [F-75, REALM-067, D-AUD-2]
 
 #### How the player uses it: stability and the top bar
 - REALM-203: The stability plaque in the top bar is stability's overview: it shows the step in words with the crown icon, plain at Steady, amber at Uneasy, in red cloth at Troubled and blinking at Crumbling, and tapping it opens the General tab of the player's country card. [F-75, X-19]
 - REALM-204: The General tab of the player's country card shall open with a Stability section: the step, one line on what it means, and one row per pillar (Lords and Subjects by loyalty, Officials as royal posts filled or standing empty, Provinces by mood) with that pillar's step; tapping a row opens the tab that mends it: Lords, Diplomacy, Officials or Provinces. [F-75, X-19]
+- REALM-302: The Stability section shall say, under the step's line, what the step costs (for example "The crown gets 10 % less tax and 10 % fewer recruits, and plotting provinces rise 50 % more often"), or for a step that costs nothing what the first costly step would; a Treasury row (opening the Treasury tab) says "Paying its way", the months left before a default, or the default's year and when it stops weighing. A province's Tax line on its card names each cut with its share: the realm's stability, and far from the throne (PROV-176). [X-29, X-19]
+- REALM-303: While the player is broke, each monthly step brings a warning to the news, and the Treasury tab shows under the purse that the crown defaults in so many months unless gold comes in, and what a default costs; after a default it says until when lenders refuse. The ledger has a *Holding new land* line for newly taken provinces (PROV-178). The stability plaque stays the overview: it turns amber once broke and red cloth after a default. [X-29, X-19]
 - REALM-205: The top bar shall show, in this order, the realm's flag and name, the date, gold with its change a month, stability, the war plaque while at war, and the News button; every plaque is the same height (36 px drawn, 44 px to tap) and type, and the troop count moves off the bar to the Military tab, where it is already shown. On a phone the game plays in landscape (the turn-your-phone notice covers portrait), and the bar fits the width of a landscape phone. [F-74, X-19]
 
 ### 5.20 Castles share food, surplus and granaries (feedback 84, 85)
@@ -440,6 +448,15 @@ Some lords of a start were real people whom history remembers: John of Gaunt, He
 #### How the player uses it: historical lords
 - REALM-294: Nothing new is tapped. On the Lords tab a historical lord's row shows a small *History* tag after his name and his title in place of his house; his screen shows the tag, his title, his house, a short *In history* line on who he was, and his two traits with his age and heir. A figure who comes later arrives on the event card over the map like any bridge event (EVT-076): his name, history year and who he was, *Welcome* as in history and *Refuse* as 44-point buttons with their effects in words ("Zhu Di becomes your lord as Prince of Yan"); the News keeps a line when he joins or takes a lord's lands. The tag is a word, not a colour, and needs no hover. Grouping and overview: lords stay on the Lords tab and their own screens, and the Stability plaque's Lords pillar counts them like any lord. On a phone in landscape the tag sits inline after the name and wraps with it in the Wide and Tall layouts; the history line is one short paragraph. [X-19; REALM-243]
 
+### 5.28 A fair score and chapters (Leroy, 19 October)
+Leroy's decision X-28: the whole world for domination, a score that can't be won by hoarding gold or a last-year burst, every realm judged against its own start, and a scored chapter every 100 years. The player-facing parts are game-shell SHELL-182 to SHELL-184.
+
+- REALM-310: The bank in Economy shall count gold less debt, but gold above debt only up to one year's income (`win.bank_cap_years_income`, provisional); debt counts in full. [X-28]
+- REALM-311: Each score that is ranked or judged shall be the average of the realm's scores in its last 25 January turns (`win.average_years`), the scores worked out at the start counting as the first; a realm with fewer Januaries averages the ones it has. [X-28]
+- REALM-312: Each score shall be ranked and judged as growth: the realm's average (REALM-311) divided by its average at the start of the campaign, or when it was first scored if it came into being later, that start floored at the median of every realm's start in that score (`win.start_floor_quantile`, provisional) and at 1; growth is rounded to two decimals, as it is shown (×1.84), and equal growth shares a place and a win. [X-28]
+- REALM-313: A chapter shall close in the January turn of every 100th year from the campaign's start year (`win.chapter_years`; 1544, 1644, 1744 and 1844 from 1444) before the end date's year, and the last chapter at the end date. A chapter's growth is each realm's average at its close divided by its average when the chapter began, floored as REALM-312 at the median of those; the realm that has grown most leads, ties sharing; a chapter wins nothing. When a chapter closes the player's growth and place in each score, the leaders and the five leading realms are kept, and the next chapter begins from every realm's average then. [X-28]
+- REALM-314: Army power in Power shall count the men under arms (foot × 1, horse × 2, guns × 3) and warships × 100, over 1,000; commanders add nothing (`win.commander_men` is dropped). [X-28; replaces the commanders part of REALM-160]
+
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
@@ -528,6 +545,11 @@ All numbers are placeholders ("Numbers are placeholders for config"). The file i
 | food.surplus.options | Surplus | keep, sell to the treasury, send to capital castle, send to subjects or allies | no | realm.json |
 | food.lords_castles | Following by loyalty | loyal all, wavering half, disloyal none | yes | realm config |
 | food.presets | Presets | Feed the people; Fortress realm; War footing; Merchant (see REALM-049) | yes | realm config |
+| stability.effects | Tax and recruit share and rising factor at Troubled and Crumbling | 0.9 / 0.9 / ×1.5; 0.75 / 0.75 / ×2 (X-29) | yes | realm.json |
+| debt.default.broke_months | Monthly steps broke before a default | 3 (X-29) | yes | realm.json |
+| debt.default.lord_steps | Loyalty steps each lord falls at a default | 2 (X-29) | yes | realm.json |
+| debt.default.troubled_years | Years the treasury pillar reads Troubled after a default | 2 (X-29) | yes | realm.json |
+| debt.default.lenders_refuse_years | Years lenders refuse after a default | 5 (X-29) | yes | realm.json |
 | food.campaign_eat | Soldiers on campaign eat | ×2 | yes | realm config |
 | food.horse_eats | A horse eats like | 3 men | yes | realm config |
 | food_year.transfer_loss_per_province | Loss moving food between castles | 2 % per province | yes | realm.json |
@@ -540,8 +562,12 @@ All numbers are placeholders ("Numbers are placeholders for config"). The file i
 | lands_taken.window_years | Lands taken window | 20 | yes | realm config |
 | women_in_roles | Chance per country or culture per role (ruler, lord, commander, official, scholar) | lord 5 %, commander 2 %, official 2 %, scholar 5 % | yes | realm.json |
 | age_multipliers | Factor per event-tree age | 1.5, 2, 3 | yes | realm.json |
-| win.domination_share | World domination share of settled land provinces | 50 % (X-12) | no | realm.json |
-| win.army_weights, warship_men, commander_men | Army power weights | foot 1, horse 2, guns 3; warship 100; commander 1,000 | yes | realm.json |
+| win.domination_share | World domination share of settled land provinces | the whole world, 1 (X-28) | no | realm.json |
+| win.army_weights, warship_men | Army power weights | foot 1, horse 2, guns 3; warship 100 (commanders count nothing, X-28) | yes | realm.json |
+| win.bank_cap_years_income | Years of income the bank counts for at most (REALM-310) | 1 | yes | realm.json |
+| win.average_years | Januaries averaged in a score (REALM-311) | 25 (X-28) | no | realm.json |
+| win.start_floor_quantile | Floor under a realm's start, as a share of the realms' starts in order (REALM-312) | median, 0.5 | yes | realm.json |
+| win.chapter_years | Years in a chapter (REALM-313) | 100 (X-28) | no | realm.json |
 | win.subject_province_weight | Subjects' provinces in Power | ½ | yes | realm config |
 | campaign.end_date | End date (one setting) | 31 August 1939 | no (decided) | time-and-turns / settings |
 | grain_price_gold_per_food | Fixed grain price | 0.5 gold a food | yes | realm.json |
@@ -601,7 +627,7 @@ All numbers are placeholders ("Numbers are placeholders for config"). The file i
 - **D-REALM-3** (was OQ-REALM-3) Warfare's card edits and army refill: adopted; the card shows Arms store, Powder store, Prisoners, Victories / Defeats, Troop cap and Peace voices, soldiers are counted by kind, `war_weariness` reads Fallen and peace voices and `prestige` victories and lands taken; the default army refill becomes "Castles hand out first". Warfare is the later design and already runs these counts.
 - **D-REALM-4** (was OQ-REALM-4) Succession, Great lord, admin capacity: the throne law follows the government form's succession (with daughters inheriting where the country's history allows); a lord with 4–7 provinces has one *Great lord* reason and 8+ two, each needing one more raising cause per step up; `admin_capacity` reads the officials cap. Government is the later design and says it settles inheritance.
 - **D-REALM-5** (was OQ-REALM-5) Inheritance law: §8.2 stands as the decision for daughters and lords' land, with the throne law taken from the government form (D-REALM-4). The gap-list item is closed.
-- **D-REALM-6** (was OQ-REALM-6) Win scores: two ways to win as X-12 says; army power is (foot × 1 + horse × 2 + guns × 3 + warships × 100 + commanders × 1,000) ÷ 1,000; settled provinces are land provinces with people; allies-by-marriage do not count; scores are worked out each January, domination wins at once and play may go on, at the end date the leader of each score wins with no margin and ties share. X-12 settles the rules; the weights are provisional.
+- **D-REALM-6** (was OQ-REALM-6) Win scores: two ways to win as X-12 says; army power is (foot × 1 + horse × 2 + guns × 3 + warships × 100 + commanders × 1,000) ÷ 1,000; settled provinces are land provinces with people; allies-by-marriage do not count; scores are worked out each January, domination wins at once and play may go on, at the end date the leader of each score wins with no margin and ties share. X-12 settles the rules; the weights are provisional. *X-28 (Leroy, 19 Oct) changes it: world domination is the whole world, scores are judged as growth of a 25-year average against the realm's own start, the bank counts up to a year's income, commanders add nothing, and a chapter closes every 100 years.*
 - **D-REALM-7** (was OQ-REALM-7) Women in roles: base chances lord 5 %, commander 2 %, official 2 %, scholar 5 % (rulers only by succession), age multipliers ×1.5, ×2 and ×3 for the Ages of Revolutions, Industrialization and World Wars, and ×2 for a country an event or reform has raised; the Age of Decolonization is never reached; students stay men from recruits and scholars named to a role use the scholar chance. Provisional numbers that follow the 16 October decision's shape.
 - **D-REALM-8** (was OQ-REALM-8) Tax scale: five steps, none, light, normal, heavy and crushing, set per province with a realm default. Province §8 is the later design and says it replaces the country rate.
 - **D-REALM-9** (was OQ-REALM-9) Other designs' edits: all adopted: Faith counts the state faith or a faith layered with it, Preachers appear in Abroad and faith steps count in loyalty; Language counts related languages as half; the Subjects row names the six kinds (X-8); commanders can come from commissioned officials (X-7); building upkeep is a loss of Gold on the treasury card. Each is a later design's change to text this spec already holds.
@@ -835,4 +861,15 @@ Every requirement has at least one scenario. REALM-005 and REALM-156 are also pr
 | REALM-295 | — | Covered by engine test (packages/engine/test/historicalLordEvents.test.ts: one event per figure, the player's card) |
 | REALM-296 | — | Covered by engine test (packages/engine/test/historicalLordEvents.test.ts: joins, takes over, never another historical lord's land, only once) |
 | REALM-297 | — | Covered by engine test (packages/engine/test/historicalLordEvents.test.ts: one event per later figure) |
+| REALM-298 | stability.feature | A default troubles the realm |
+| REALM-299 | stability.feature | Low stability costs tax, recruits and risings |
+| REALM-300 | treasury-ledger.feature | Broke and heading for a default |
+| REALM-301 | treasury-ledger.feature | Broke and heading for a default |
+| REALM-302 | — | Presentation; the words are covered by engine test (packages/engine/test/stabilityCosts.test.ts: says what each step costs) |
+| REALM-303 | — | Presentation; the warning and the state behind it are covered by engine test (packages/engine/test/default.test.ts) |
+| REALM-310 | win-scores.feature | The bank counts up to a year's income |
+| REALM-311 | win-scores.feature | A score is the average of its last 25 Januaries |
+| REALM-312 | win-scores.feature | Growth against the realm's own start |
+| REALM-313 | win-scores.feature | A chapter closes every 100 years |
+| REALM-314 | win-scores.feature | The Power score counts subjects at half |
 | REALM-294 | — | Presentation only: checked on phone screenshots in landscape (apps/client/scripts/historical-lords-shots.mjs) |

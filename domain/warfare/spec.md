@@ -683,7 +683,7 @@ rules are the latest decision and replace what they name; the balance model (BAL
 - WAR-228 The AI shall declare war only when all of these hold: its side's strength, with the allies that would answer its calls, beats the target's side, with the target's allies, pledgers and every league member against the AI, by `warfare.ai.declare_strength_ratio`; its treasury covers `warfare.ai.war_chest_months` (6, provisional) of the pay its armies would draw at war; its own peace voices would not say peace on the day it declares; and its notoriety is under `diplomacy.ai.notoriety_restraint` (50, provisional) unless its personality is Warlike or a hegemon seeker. [X-21; WAR-196; DIPL-174]
 
 #### How the player uses it: the price of war
-- WAR-229 Where: Declare war on another realm's Diplomacy tab opens the declare sheet, which shows a *Price of war* block above Confirm: who will be called against you (allies, pledgers, league members, each with soldiers), the neighbours who will hold *Threatened us* and how many, your lords who will waver, a truce you would break, the monthly pay of your armies at war, and the most land one peace can take ("at most 4 of their 11 provinces"). Lines that hurt are marked in red with an icon, and each opens its reason on tap. [X-21; X-19]
+- WAR-229 Where: Declare war on another realm's Diplomacy tab opens the declare sheet, which shows a *Price of war* block above Confirm: who will be called against you (allies, pledgers, league members, each with soldiers), the neighbours who will hold *Threatened us* and how many, your lords who will waver, a truce you would break, the monthly pay of your armies at war, and the most land one peace can take ("at most 4 of their 11 provinces"). Lines that hurt are marked in red with an icon, and each opens its reason on tap. Beside the price, the sheet's terms name the aim the war will be declared with, in the player's words with the province it names and why it is held ("Take land: Champagne", held within 50 years): the best fitting aim the declarer holds against the target (Take land first), the same aim Confirm declares with. Only when no fitting aim is held (or a regency may not use it, DIPL-153) does it read *No aim*, marked red, and only then does the block list the neighbours alarmed and the lords who will waver. [X-21; X-19; DIPL-148; DIPL-189]
 - WAR-230 Grouping: everything about a running war sits on its war card in the Diplomacy tab, reached also from the war plaque: the aim, both sides' peace voices as a bar with the half mark, months at war and the long-war mark, provinces occupied each way, and the most one peace can take now. No war fact is spread over other tabs. [X-21; X-19; F-11]
 - WAR-231 Overview: the war plaque in the top bar (REALM-205) shows each war's peace voices for your side as a small bar that turns amber past a third and red past half, when a peace becomes obliged; tapping it opens the war card. [X-21; X-19]
 - WAR-232 Phone: in landscape the declare sheet is two columns in the Wide layout (price on the left, terms on the right) and one scrolling column in the Tall layout, with Confirm pinned inside the safe area; every line and button is at least 44 points tall, bars carry their number as text so colour is never the only sign, and nothing needs hover. [X-21; X-19]
@@ -800,6 +800,48 @@ second call, and a retinue's losses in the peace voices (WAR-180).
 - WAR-262 Phone: in the Wide and Tall layouts the rows are one column across the panel, Call the lords is a full-width
   button, every row button is at least 44 × 44 points, states are words and not colour alone, and nothing needs hover.
   [X-26; X-19]
+
+### 5.27 Castles starve besiegers (Leroy 19 Oct)
+Leroy, 19 October: "Defensive buildings should help smaller countries survive longer and should deteriorate food of
+the attacker faster." A castle its owner still holds has gathered the land's food in behind its walls, so an invader
+living off that land runs short sooner, and an army camped round the walls eats more. Both rules only make the
+attacker's food run out faster: they never feed the defender and never touch an army on its own or a friendly realm's
+land. All numbers are `warfare.castle_supply.*` and provisional (DECISIONS rule 4; F-164).
+
+- WAR-263 While an army forages on the land of a realm it is at war with (F-83: enemy land keeps no reserve), the
+  warfare system shall cut what its foragers find in a province with a castle that province's owner holds (not occupied
+  or taken) by `warfare.castle_supply.forage_cut_by_step` for the castle's step (earthwork ring fort 30 %, stone castle
+  45 %, bastion fort 60 %, star fort 70 %, concrete fortress 80 %; a capital counts as at least a stone castle, as for its
+  walls). The food the foragers miss stays in the province's store. Armies on their own realm's land, an ally's or a
+  realm's they are not at war with forage as before. [F-164; F-83; WAR-159]
+- WAR-264 In a province within a held castle's reach (REALM-206: rings over its owner's land, 1 without a road, 2 with
+  a road), the warfare system shall cut enemy foragers' finds by `warfare.castle_supply.reach_share` (half) of that
+  castle's own cut; where several castles reach a province, the largest cut counts, never a sum. A castle the enemy
+  has taken or occupies cuts nothing; a besieged castle still does. [F-164; REALM-206]
+- WAR-265 While an army stands in a province under siege, at war with the realm that holds the walls, the warfare system
+  shall have it eat `warfare.castle_supply.besieger_eat_by_step` times its rations for the castle's step (earthwork
+  ×1.15, stone ×1.25, bastion ×1.3, star ×1.35, concrete ×1.4), from camp fevers and sallies against its foragers. This
+  comes on top of WAR-163 and WAR-168 and does not change what its wagons hold. [F-164; WAR-163; WAR-166]
+
+Not yet in the game: the AI choosing where to build castles by this rule (it builds castles by its existing works plan),
+and a besieger weighing the extra hunger before it lays siege.
+
+#### How the player uses it: castles starve besiegers
+- WAR-266 Where: an army's food line, on its row in the province card and on its commander screen, adds the reason
+  when it applies, in words: *foragers find 45 % less: Setúbal's castle has gathered the food in* (*Setúbal's castle
+  nearby* when the castle stands in another province) and *besieging: men eat 25 % more from camp fevers and sallies*.
+  Its months of food already count the extra eating and the smaller finds, so the player sees how long the army lasts
+  before deciding to stay or march on. [F-164; X-19]
+- WAR-267 Grouping: the defender learns it where castles are built and kept: the castle row of the build sheet says,
+  for its step, how much less enemy foragers find in the province and in the land it reaches and how much more
+  besiegers eat; the Walls line of any province card with walls its owner holds says the same for those walls, so the
+  attacker can read it on an enemy province before marching in. Nothing new is added to other panels. [F-164; X-19]
+- WAR-268 Overview: an army's months of food on its row (the Armies list of the province card and the commander
+  screen) is the at-a-glance state; a hungry army already shows there, and the reason sits in the same line. A
+  province's Walls line shows what its castle keeps from enemy foragers. [F-164; X-19]
+- WAR-269 Phone: the reasons are plain text inside the existing food line and Walls line, wrapping in the Wide and
+  Tall layouts; no new button or tap target is added (the army row's Move and Command buttons keep their 44-point
+  size), and nothing needs hover: the reasons are read, never shown only as a tooltip. [F-164; X-19]
 
 ## 6. Commands
 
@@ -983,6 +1025,9 @@ file `packages/rules/data/domain/warfare.json` (D-WAR-17).
 | warfare.siege.sally_share | Sally | a third | yes | warfare |
 | warfare.siege.hunger_loss / hunger_break | Garrison hunger | 10 % / −10 % | yes | warfare |
 | warfare.siege.fever_after_months | Camp fever | 3 (×2 sickness) | yes | warfare |
+| warfare.castle_supply.forage_cut_by_step | Share enemy foragers lose in a held castle's province, by castle step (WAR-263) | 30 / 45 / 60 / 70 / 80 % (Leroy 19 Oct, numbers provisional) | yes | warfare |
+| warfare.castle_supply.reach_share | Share of that cut in the provinces the castle reaches (WAR-264) | half | yes | warfare |
+| warfare.castle_supply.besieger_eat_by_step | Besiegers' eating, by castle step (WAR-265) | ×1.15 / 1.25 / 1.3 / 1.35 / 1.4 | yes | warfare |
 | warfare.storm.room_per_breach / losses / scaling | Storm | 500 / ×1.5 / ×2 | yes | warfare |
 | warfare.sack.plunder | Plunder | 1 year tax, 1 in 3 town buildings, 10 % townsfolk | yes | warfare |
 | warfare.relief_bonus | Relieved garrison | +10 % | yes | warfare |
@@ -1344,6 +1389,7 @@ Decided on 17 October 2026 (domain/DECISIONS.md). None of warfare's questions is
 | WAR-213 | features/raising-and-keeping.feature | Mercenary companies of the age, each its own size and mix |
 | WAR-214 to 217 | features/raising-and-keeping.feature | The mercenary companies page |
 | WAR-221 … WAR-228 | features/price-of-war.feature | Peace voices in the game; Refusing an obliged peace costs the ruler; A war with no fitting aim in the game; Lords tire of a long war; Occupation does not pay for the war; Levies at war are paid at once; The dead are missed at home; One peace cannot swallow a realm; The AI counts the price before declaring |
-| WAR-229 … WAR-232 | features/price-of-war.feature | The declare sheet shows the price of war; The war card |
+| WAR-229 … WAR-232 | features/price-of-war.feature | The declare sheet shows the price of war; The declare sheet names the aim the war is declared with; The war card |
 | WAR-240 … WAR-251 | features/peace-settlement.feature | What a province costs to demand; Capacity comes from what was won; Combining demands within the rules; The AI answers a demand; The AI asks by the same counts; A beaten AI surrenders; The peace table |
 | WAR-252 … WAR-262 | features/lords-retinues.feature | A lord's lands fill his retinue; Calling the lords; A lord leads his own retinue; A retinue goes home; A victory wins a lord's loyalty; The AI calls its lords; The Lords' men section |
+| WAR-263 … WAR-269 | features/castles-starve-besiegers.feature | Foragers find less in a castle's province; Foragers find less in the land a castle reaches; A castle the enemy holds gathers nothing in; The owner's and other realms' armies forage as before; Besiegers eat more; The army's food line says why; The castle says what it keeps from foragers |

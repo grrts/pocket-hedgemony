@@ -157,7 +157,8 @@ Every tap target is at least 44 × 44 points with 8 points between neighbours (5
 ### Map accessibility
 
 - **Colour vision modes** swap nation colours to a second assignment from the same 32-colour palette, chosen so neighbours stay distinguishable, and switch each map mode to a safe ramp (blue to orange instead of red to green). "No colour" uses greys with patterns.
-- **Patterns on map modes** add hatching, dots and stripes by band so every map mode reads without colour.
+- **Patterns on map modes** add hatching, dots and stripes by band so every map mode reads without colour. The key under the map mode buttons shows each band's colour and pattern as the map draws them; People, Wealth, Food and Walls have a key of their bands too.
+- Both are in Settings → Accessibility, and a change shows on the map at once.
 - **High contrast borders** draw nation borders in black and white ink two art pixels wide.
 - Route food colours also carry a pattern (solid, dashed, dotted). Day counts stay at least 10 points tall at region zoom and hide rather than shrink when you zoom too far out.
 - Every map mode the tutorial teaches reads without telling colours apart; for example, hungry provinces also carry the hunger icon on the Food map mode.

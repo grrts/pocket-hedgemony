@@ -1,4 +1,5 @@
 import data from "../../rules/data/domain/events-everyday.json" with { type: "json" };
+import geography from "../../rules/data/domain/exploration-regions.json" with { type: "json" };
 import type { World } from "./world.ts";
 import type { News } from "./war.ts";
 import type { EventCard } from "./events.ts";
@@ -15,6 +16,9 @@ import { halt } from "./turn.ts";
 import { setCourse, type NavyFleet } from "./navy.ts";
 import { personName, rankedName } from "./names.ts";
 import * as wf from "./domain/warfare/index.ts";
+import { treeView } from "./events.ts";
+import { lightTax } from "./rebels.ts";
+import { CLASS_COUNT } from "./living.ts";
 
 /**
  * Everyday events (events §5.22, EVT-115 to EVT-128; feedback 152): small
@@ -29,16 +33,30 @@ import * as wf from "./domain/warfare/index.ts";
  * his men or ships in the field.
  */
 
-type Effect = { command?: boolean; home?: "army" | "fleet"; quarantine?: boolean; care?: boolean; gold?: number; loyalty?: string; who?: string; count?: number; official?: "new" | "seasoned"; lands?: "crown"; heir?: "child"; heir_risk?: number; food_back?: number; new_lord?: boolean };
+type Effect = { command?: boolean; home?: "army" | "fleet"; food?: number; people?: number; recruits?: number; light_tax?: number; quarantine?: boolean; care?: boolean; gold?: number; loyalty?: string; who?: string; count?: number; official?: "new" | "seasoned"; lands?: "crown"; heir?: "child"; heir_risk?: number; food_back?: number; new_lord?: boolean };
 type OptionDef = { id: string; name: string; needs?: "lord2" | "leaderless"; ai: number; effects: Effect[] };
-type EventDef = { weight: number; needs: string; loss?: number; title: string; text: string; options: OptionDef[] };
+/** `where`: the regions (or wider regions) a realm must lie in; `from` and `to`: the years it can come in (EVT-133). */
+type EventDef = { weight: number; needs: string; loss?: number; where?: string[]; from?: number; to?: number; title: string; text: string; options: OptionDef[] };
 
 const DEFS = data.events as Record<string, EventDef>;
 const IDS = Object.keys(DEFS);
 /** The events a month may draw (plague comes only when it reaches a province), and their weights together. */
 const DRAWN = IDS.filter((d) => DEFS[d]!.weight > 0);
-const DRAWN_WEIGHT = DRAWN.reduce((a, d) => a + DEFS[d]!.weight, 0);
 const UP = new Set(realmConfig.loyalty.up as string[]);
+const PARENTS = geography.parents as Record<string, string | null>;
+
+/** Whether a realm in `region` lies in one of `where`: its region or any wider one it belongs to. */
+function inRegions(region: string | undefined, where: readonly string[]): boolean {
+  for (let r = region, guard = 0; r && guard < 16; r = PARENTS[r] ?? undefined, guard++) if (where.includes(r)) return true;
+  return false;
+}
+
+/** The event can come to realm n this year, by its region and era (EVT-133). */
+export function fits(world: World, d: EventDef, n: number): boolean {
+  const y = world.date.year;
+  if ((d.from !== undefined && y < d.from) || (d.to !== undefined && y > d.to)) return false;
+  return !d.where || inRegions(world.events ? treeView(world, n).region : undefined, d.where);
+}
 const R = realmConfig.ruler;
 
 /** What an event fired for: the realm and who and where it is about. */
@@ -76,6 +94,8 @@ export interface EverydayState {
   seq: number;
   /** Its own dice, so everyday events never shift the rest of the month's rolls. */
   rng: Rng;
+  /** Month each event last came to the player's realm, so none comes again within `rest_years` (EVT-134). */
+  last: Record<string, number>;
 }
 
 const monthIndex = (world: World) => world.date.year * 12 + world.date.month - 1;
@@ -86,7 +106,7 @@ function createEveryday(world: World): EverydayState {
   const now = monthIndex(world);
   // Realms start at different months, so their events don't all come at once.
   const due = Int32Array.from({ length: world.nationCount }, () => now + 1 + Math.floor(rng.next() * data.first_within_months));
-  return { due, pending: [], seq: 0, rng };
+  return { due, pending: [], seq: 0, rng, last: {} };
 }
 
 const stateOf = (world: World): EverydayState => (world.everyday ??= createEveryday(world));
@@ -168,6 +188,45 @@ function bind(world: World, s: EverydayState, m: Month, def: string, n: number):
     case "young_heir":
       if (!ruler?.heir || ruler.heir.age >= R.child_under) return null;
       break;
+    case "official": {
+      // A living official at his post on crown land (exam_scandal, skimming_official).
+      const posts = (m.provinces.get(n) ?? []).filter((p) => world.provinceLord[p]! < 0 && world.provinceOfficial[p]! >= 0 && world.provinceOccupier[p]! < 0);
+      const p = pick(rng, posts);
+      if (p === undefined) return null;
+      ev.province = p;
+      break;
+    }
+    case "province":
+    case "coastal": {
+      const ok = (m.provinces.get(n) ?? []).filter((p) => world.provinceOccupier[p]! < 0 && (d.needs === "province" || world.rules.provinces[p]!.coastal === true));
+      const p = pick(rng, ok);
+      if (p === undefined) return null;
+      ev.province = p;
+      // The province's own lord, else the least loyal of the realm, for the options that ask one.
+      const own = world.provinceLord[p]!;
+      if (own >= 0 && lords.includes(own)) {
+        ev.lord2 = own;
+        return ev;
+      }
+      break;
+    }
+    case "capital": {
+      const p = world.provinceIndex.get(world.rules.nations[n]!.capital);
+      if (p === undefined || world.provinceOwner[p] !== n || world.provinceOccupier[p]! >= 0) return null;
+      ev.province = p;
+      break;
+    }
+    case "lord_land": {
+      // A landed lord and one of his provinces.
+      const k = pick(rng, lords);
+      if (k === undefined) return null;
+      const held = (m.provinces.get(n) ?? []).filter((p) => world.provinceLord[p] === k && world.provinceOccupier[p]! < 0);
+      const p = pick(rng, held);
+      if (p === undefined) return null;
+      ev.lord = k;
+      ev.province = p;
+      break;
+    }
     case "store": {
       const f = data.food;
       const full = (m.provinces.get(n) ?? []).filter((p) => world.provinceStore[p]! >= f.min_store && storeMonths(world, p) >= f.min_store_months);
@@ -225,8 +284,10 @@ export function monthlyEveryday(world: World, news: News[]): void {
     // Draw by weight among the events this realm could have now. One that has nothing to be
     // about is set aside and the draw is made again among the rest, which picks with the same
     // odds as weighing only those that could come, while binding just the one or two drawn.
-    const left = DRAWN.slice();
-    let total = DRAWN_WEIGHT;
+    // Only events of the realm's region and era; the player's realm sees none again within `rest_years` (EVT-133, EVT-134).
+    const rest = n === world.player ? now - data.rest_years * 12 : -Infinity;
+    const left = DRAWN.filter((d) => fits(world, DEFS[d]!, n) && !((s.last[d] ?? -Infinity) > rest));
+    let total = left.reduce((a, d) => a + DEFS[d]!.weight, 0);
     while (left.length) {
       let roll = s.rng.next() * total;
       let k = 0;
@@ -253,6 +314,7 @@ export function fireEverydayNow(world: World, def: string, n: number, news: News
 
 function fire(world: World, s: EverydayState, ev: EverydayEvent, news: News[]): void {
   ev.id = `everyday:${++s.seq}`;
+  if (ev.nation === world.player) s.last[ev.def] = ev.at;
   // What happens whatever is chosen lands at once: the grain is gone.
   if (ev.province !== undefined && ev.loss) world.provinceStore[ev.province] = Math.max(0, world.provinceStore[ev.province]! - ev.loss);
   if (ev.nation !== world.player) {
@@ -443,6 +505,22 @@ function choose(world: World, s: EverydayState, ev: EverydayEvent, o: OptionDef,
       }
     }
     if (e.food_back && ev.province !== undefined && ev.loss) world.provinceStore[ev.province] = world.provinceStore[ev.province]! + ev.loss * e.food_back;
+    // What an event about a province does to it (EVT-135): months of food, a share of its people or recruits, a lighter tax.
+    const p = ev.province;
+    if (p !== undefined && world.provinceOwner[p] === n) {
+      if (e.food) world.provinceStore[p] = Math.max(0, world.provinceStore[p]! + world.provincePopulation[p]! * e.food);
+      if (e.people) {
+        let total = 0;
+        for (let c = 0; c < CLASS_COUNT; c++) {
+          const i = p * CLASS_COUNT + c;
+          world.provinceClasses[i] = world.provinceClasses[i]! * (1 + e.people);
+          total += world.provinceClasses[i]!;
+        }
+        world.provincePopulation[p] = total;
+      }
+      if (e.recruits) world.provinceRecruits[p] = Math.max(0, Math.min(world.provinceRecruitCeiling[p]!, world.provinceRecruits[p]! * (1 + e.recruits)));
+      if (e.light_tax) lightTax(world, [p], world.date.year + e.light_tax);
+    }
   }
   if (mine) {
     const d = DEFS[ev.def]!;
@@ -472,6 +550,7 @@ function fill(world: World, ev: EverydayEvent, text: string): string {
       return k === 1 ? "one province" : `${k} provinces`;
     },
     province: () => (p === undefined ? "" : world.rules.provinces[p]!.name),
+    official: () => (p === undefined ? "Your official" : (officialAt(world, p) ?? "Your official")),
     type: () => OFFICIALS[ev.type ?? (p === undefined ? -1 : world.provinceOfficial[p]!)]?.toLowerCase() ?? "official",
     years: () => String(Math.max(1, Math.round(ev.since !== undefined ? (world.day - ev.since) / 365 : p === undefined ? 0 : yearsServed(world, p)))),
     loss: () => (p === undefined || !ev.loss ? "0" : String(Math.max(1, Math.round(ev.loss / Math.max(1e-6, world.provincePopulation[p]!))))),
@@ -516,6 +595,12 @@ function describe(world: World, ev: EverydayEvent, e: Effect, o: OptionDef): str
   if (e.home === "army") return "The men stand as a garrison on crown land; a general can take them up from its Garrison tab";
   if (e.home === "fleet") return "The ships wait in port for an admiral, on the Navy tab";
   if (e.food_back) return `${e.food_back === 0.5 ? "Half" : `${Math.round(e.food_back * 100)}%`} of the lost grain is made good`;
+  const where = ev.province === undefined ? "" : world.rules.provinces[ev.province]!.name;
+  const share = (x: number) => `${Math.round(Math.abs(x) * 1000) / 10} in 100`;
+  if (e.food) return `${where}: ${e.food > 0 ? "+" : "−"}${Math.abs(e.food)} month${Math.abs(e.food) === 1 ? "" : "s"} of food in store`;
+  if (e.people) return e.people > 0 ? `${where}: ${share(e.people)} more people` : `${where}: ${share(e.people)} of its people lost`;
+  if (e.recruits) return `${where}: recruits ${e.recruits > 0 ? "+" : "−"}${share(e.recruits)}`;
+  if (e.light_tax) return `${where}: light tax for ${e.light_tax === 1 ? "a year" : `${e.light_tax} years`}`;
   return null;
 }
 
@@ -556,12 +641,14 @@ export interface SavedEveryday {
   pending: EverydayEvent[];
   seq: number;
   rng: number[];
+  /** Month each event last came to the player's realm (EVT-134); missing in older saves and left out while empty. */
+  last?: Record<string, number>;
 }
 
 export function saveEveryday(world: World): SavedEveryday | undefined {
   const s = world.everyday;
   if (!s) return undefined;
-  return { due: Object.fromEntries(world.nationIds.map((id, n) => [id, s.due[n]!])), pending: s.pending, seq: s.seq, rng: [...s.rng.state] };
+  return { due: Object.fromEntries(world.nationIds.map((id, n) => [id, s.due[n]!])), pending: s.pending, seq: s.seq, rng: [...s.rng.state], ...(Object.keys(s.last).length ? { last: s.last } : {}) };
 }
 
 /** Puts saved everyday events back; a save from before them starts the draws afresh. */
@@ -578,5 +665,6 @@ export function restoreEveryday(world: World, saved: SavedEveryday | undefined):
   s.pending = saved.pending;
   s.seq = saved.seq;
   s.rng = new Rng(Uint32Array.from(saved.rng));
+  s.last = { ...saved.last };
   world.everyday = s;
 }

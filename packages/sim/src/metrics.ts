@@ -44,6 +44,8 @@ export interface RealmYear {
   subjectsPower: number;
   treasury: number;
   debt: number;
+  /** It defaulted on its debts since the last row (REALM-301, X-29). */
+  defaulted?: boolean;
   /** Net income over the months since the last row (a year, after the first). */
   income: number;
   /** Gold by ledger line over the same months (+ in, − out). */
@@ -326,8 +328,6 @@ export function createRecorder(run: string, w: Readonly<World>, c: BalanceConfig
     }
     const ships = new Int32Array(N);
     for (const f of w.navy.fleets) if (f.owner >= 0 && !f.hire) ships[f.owner]! += f.ships.length;
-    const commanders = new Int32Array(N);
-    for (const o of w.commanderOwner) if (o >= 0) commanders[o]!++;
     const neighbours = Array.from({ length: N }, () => new Set<number>());
     for (let p = 0; p < P; p++) {
       const o = w.provinceOwner[p]!;
@@ -347,7 +347,7 @@ export function createRecorder(run: string, w: Readonly<World>, c: BalanceConfig
       if (settledAll && settled[n]! / settledAll > largest.share) largest = { realm: id, share: settled[n]! / settledAll };
       const yearIncome = start ? 12 * w.nationMonthlyIncome[n]! : income[n]!;
       const debt = w.nationDebt[n]!;
-      const power = powerScore({ provinces: owned[n]!, subjectProvinces: subjectProvinces[n]!, foot: soldiers[n]! - horse[n]!, horse: horse[n]!, guns: 0, warships: ships[n]!, commanders: commanders[n]! });
+      const power = powerScore({ provinces: owned[n]!, subjectProvinces: subjectProvinces[n]!, foot: soldiers[n]! - horse[n]!, horse: horse[n]!, guns: 0, warships: ships[n]! });
       const known = w.research[n]?.known ?? new Set<string>();
       const country = dd.countries[id];
       const near = [...neighbours[n]!].map((m) => dip.standing(dd, ids[m]!, id));
@@ -370,6 +370,7 @@ export function createRecorder(run: string, w: Readonly<World>, c: BalanceConfig
         subjectsPower: round(subjectProvinces[n]! * realmConfig.win.subject_province_weight),
         treasury: round(w.nationTreasury[n]!),
         debt: round(debt),
+        defaulted: w.nationDefaultYear[n]! >= 0 && w.nationDefaultYear[n]! >= year - 1 && w.nationDefaultYear[n]! <= year,
         income: round(start ? 0 : income[n]!),
         ledger: lines,
         soldiers: soldiers[n]!,

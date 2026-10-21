@@ -34,7 +34,7 @@ Each trader is one unit on the map with a kind, a home city, a crew, a route, a 
 
 **Losing traders:** dismissing one removes it and its crew overflow into the emptiest slots of its home. If a trader's or trade ship's upkeep is unpaid for 6 months, it is lost and its crew leave. A trade ship pressed into war stops trading and keeps its purse until it next reaches one of your ports.
 
-Upkeep is charged every month, even with an empty purse and no route. There is **no cap** on how many traders you run.
+Upkeep is charged every month, even with an empty purse and no route. **Each city homes a few traders**: 1 with a weekly market, 2 with a yearly fair, 4 with a trading house, and 1 more with a harbour. To run more, found them in more cities or build up the market.
 
 **Lords** run their own traders from their own cities with their own wealth. They deposit into the lord's wealth, and you can see them but not steer them.
 
@@ -276,6 +276,7 @@ Trade runs in the game as a first slice: traders you own walk there and back bet
 - **Traders.** Pack caravans, camel caravans (from desert or drylands, or with Caravanserai networks), river barges (on rivers only) and the cog. Each walks its way there and back a month at a time: every province it stands in gets busier, it collects as it enters (10 % to the owner of a foreign province, nothing on unclaimed land) and it empties its purse in every city of yours it reaches. Its upkeep is paid each month; six months unpaid and it is given up.
 - **Trade ratio.** Each month a province's ratio rises with the traders passing (a customs officer helps, riots hurt, an enemy or a siege stops it) and loses a tenth. Every 4 points of ratio raise the tax the province owes by 1 %.
 - **Your Trade line** is last month's deposits plus market fees paid to you, less your traders' upkeep.
+- **Home slots.** A city is home to 1 trader with a weekly market, 2 with a yearly fair, 4 with a trading house, and 1 more with a harbour; Found a trader shows "home to x of y" for each city. Founding costs three times the table's gold and upkeep is four times its figure, so a poor long route loses money: check its card's Route line and its better routes, or dismiss it. Traders from the 1444 start stay even where a city has more than its slots.
 - **At the start** every realm gets its traders by its trade access (Venice six, France four), on hand-made routes where their cities are on the map and otherwise on the best route from each of its best cities, and two years of their walking set the starting ratios.
 - **The AI** looks at each trader once a year and finds it a better route when its own pays little or is broken, and founds one more a year where a route pays well, up to twice its starting traders.
 

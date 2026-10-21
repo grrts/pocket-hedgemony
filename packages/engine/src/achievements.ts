@@ -133,8 +133,12 @@ function startKindOf(world: World, n: number): string {
   }
 }
 
-/** A new campaign for the player: every campaign of this build counts as ironman (ACH-083). */
-export function startAchievements(world: World): void {
+/**
+ * A new campaign for the player. Only an ironman campaign earns achievements
+ * (ACH-034, SET-032); a world started without the options step (tests, the
+ * probes) counts as ironman, as the first slice did (ACH-083).
+ */
+export function startAchievements(world: World, o: { ironman?: boolean } = {}): void {
   const n = world.player;
   if (n < 0) {
     delete world.achievements;
@@ -144,7 +148,14 @@ export function startAchievements(world: World): void {
   const id = world.nationIds[n]!;
   world.achievements = {
     // Days on or before the start are never reached (ACH-088): The Old Start is not won by starting in 1444.
-    campaign: A.newCampaign({ ironman: true, realm: id, start: isoOf(world) }),
+    campaign: A.newCampaign({
+      ironman: o.ironman ?? true,
+      realm: id,
+      start: isoOf(world),
+      ...(world.options ? { difficulty: world.campaign.difficulty } : {}),
+      // Any events choice counts (ACH-038); plausible is filed as free, the history not followed.
+      ...(world.options?.events ? { events: world.options.events === "historical" ? ("historical" as const) : ("free" as const) } : {}),
+    }),
     profile: A.newProfile(),
     // Lifetime rows add up across campaigns, so the device tests them (ACH-028).
     catalogue: { list: A.ACHIEVEMENTS.filter((d) => !NOT_YET.has(d.id) && d.scope === "campaign"), retired: [] },

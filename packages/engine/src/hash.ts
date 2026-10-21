@@ -82,7 +82,8 @@ export function hashWorld(world: World): string {
   feed(live(a.home));
   feed(live(a.drill));
   feed(live(a.mix, a.mix.length / a.alive.length));
-  feed(new Int32Array(world.commanders.flatMap((c) => [c.might, c.cunning, c.logistics, c.victories, c.defeats, c.age])));
+  // Commanders in service: one who died or left after joining in the game is not saved, and counts for nothing.
+  feed(new Int32Array(world.commanders.flatMap((c, k) => (world.commanderOwner[k]! >= 0 ? [c.might, c.cunning, c.logistics, c.victories, c.defeats, c.age] : []))));
   feed(new Float64Array(world.musters.flatMap((m) => [m.nation, m.province, m.men, m.daysLeft])));
   feed(new Float64Array(world.mercs.flatMap((m) => [m.nation, m.company.id, m.weeksLeft])));
   feed(new Float64Array(world.freeCompanies.flatMap((c) => [c.id, c.home, ...c.byArm])));
@@ -115,6 +116,9 @@ export function hashWorld(world: World): string {
   feed(world.provinceOfficialFrom);
   feed(world.provinceOfficialAge);
   feed(world.provinceNewLand);
+  feed(world.provinceTakenYear);
+  feed(world.nationBrokeMonths);
+  feed(world.nationDefaultYear);
   feed(world.nationManualPosts);
   feed(live(a.trainArm));
   feed(live(a.trainMen));

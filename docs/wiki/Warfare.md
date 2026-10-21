@@ -339,6 +339,18 @@ An AI garrison accepts honours when it has a breach or under a month of food and
 
 A siege shows its progress on the map: how long the castle has held, its breaches, and the garrison and food left inside.
 
+#### Castles starve besiegers
+
+*Leroy, 19 October:* castles should help smaller realms hold out longer and make the attacker's food run out faster. A castle its owner still holds has gathered the land's food in behind its walls, so an invader living off that land goes hungry sooner:
+
+- **Foragers find less.** An army foraging on the land of a realm it is at war with finds less in a province with that realm's castle: 30 % less beside an earthwork ring fort, 45 % beside a stone castle (a capital counts as at least one), 60 % a bastion fort, 70 % a star fort and 80 % a concrete fortress. In the provinces the castle reaches (1 ring, 2 with a road at the castle, as for its food) foragers find half that cut: 23 % less near a stone castle. Where several castles reach, the biggest cut counts. The food they miss stays in the province.
+- **Besiegers eat more.** An army besieging a castle eats more from camp fevers and sallies against its foragers: a quarter more round a stone castle (15 % an earthwork, 30 % a bastion fort, 35 % a star fort, 40 % a concrete fortress), on top of its campaign rations. Its wagons hold no more, so they empty sooner.
+- **Only against the enemy.** Your own armies, an ally's and anyone not at war with the castle's owner forage as before, and a castle the enemy has taken or occupies gathers nothing in. A besieged castle still does.
+
+**Example.** A Castilian army of 10,000 lays siege to Setúbal, Portugal's capital. Foragers there find 45 % less than on open land, and the men eat a quarter more, so wagons holding two months of campaign food empty in about 1.6 months once there is nothing left to forage. The army card says so: *foragers find 45 % less: Setúbal's castle has gathered the food in · besieging: men eat 25 % more from camp fevers and sallies*.
+
+**Where you see it.** Your army's food line, on its row in the province card and on its commander screen, gives the reasons in words whenever they apply, and its months of food already count them. A province card's Walls line says what its castle keeps from enemy foragers, and the castle row of the build sheet says it for the step you would build, so you know what a castle adds to your defence. The numbers are provisional (`warfare.castle_supply`).
+
 ### Occupation and raids
 
 Taking a province's castle, or holding a province with no castle for a season, **occupies** it: you get its tax, recruits, food and trade, and its lord wavers toward the side holding his land. A horse-only army set to **Raid** can't besiege or occupy; each week it burns one tile and takes loot (gold from market and town, herds and horses from pasture) up to 1 load per 50 riders, then moves on, and castles there may sally.
@@ -366,7 +378,7 @@ With over half saying peace, the ruler must accept a peace asking only for provi
 
 Every war costs gold, men, people and your lords' patience, and one peace takes only part of a realm, so war is a choice with a price and not the best answer to everything.
 
-- **The declare sheet.** *Declare war* on a realm's Diplomacy tab no longer acts at once: it opens a sheet with the **Price of war** above *Confirm*. It lists who will be called against you (each realm with its soldiers and how it comes in: an ally, a protection pledge, a league against you or a subject), your allies who will come to your side, both sides' soldiers, the neighbours who will hold *Threatened us* for a war with no aim, how many of your lords (or boyars, beys, daimyo: your realm's own word) will waver, a truce you would break and when it would have ended, the monthly pay of your armies at war, and the most one peace can take ("at most 5 of their 14 provinces"). Lines that hurt are red with a "!" mark, and every line opens its reason when you tap it. A faith head's censure warning sits above *Confirm*, and a button opens your *Your name abroad* card. On a phone held sideways the price sits on the left and the terms on the right; in the Tall layout it is one scrolling column. *Confirm* stays pinned at the foot; with a truce it reads *Break the truce and declare war*.
+- **The declare sheet.** *Declare war* on a realm's Diplomacy tab no longer acts at once: it opens a sheet with the **Price of war** above *Confirm*. It lists who will be called against you (each realm with its soldiers and how it comes in: an ally, a protection pledge, a league against you or a subject), your allies who will come to your side, both sides' soldiers, for a war with no aim its whole cost at the head of the sheet in a red frame (your lords lose two steps of loyalty at once, notoriety, *Unjust war* in every province, peace voices, allies who stay out; see [Diplomacy](Diplomacy)) and the neighbours who will hold *Threatened us*, how many of your lords (or boyars, beys, daimyo: your realm's own word) will waver, a truce you would break and when it would have ended, the monthly pay of your armies at war, and the most one peace can take ("at most 5 of their 14 provinces"). Beside it, the terms name the **aim** the war will be declared with: the best fitting aim you hold against them (Take land first), with the province it names and why you hold it, for example *Take land: Normandy*, held within 50 years. *Confirm* declares with that aim. Only when you hold no fitting aim (or your regency may not use it) does it read *No aim* in red, and only then does the price list the neighbours alarmed and the lords who will waver. Lines that hurt are red with a "!" mark, and every line opens its reason when you tap it. A faith head's censure warning sits above *Confirm*, and a button opens your *Your name abroad* card. On a phone held sideways the price sits on the left and the terms on the right; in the Tall layout it is one scrolling column. *Confirm* stays pinned at the foot; with a truce it reads *Break the truce and declare war*.
 - **Levies at war are paid from their first month** (in peace they serve three months free), and occupied provinces pay their occupier only half their tax and no trade, so occupation doesn't pay for the war.
 - **The dead are missed at home**: men killed in a levy are lost from their province's peasants and counted among its fallen.
 - **One peace takes at most a third** of the loser's provinces, rounded up, and the capital only with the last one. Swallowing a realm takes several wars.
@@ -389,6 +401,7 @@ During the turn, inside the day loop: contacts, the withdraw check and battles; 
 - **The battle report**: who fought, where, the result, the losses and a one-line reason. Any battle can be replayed later from its notice.
 - **The battle playback**: the tile row, companies as blocks with level chevrons, the camps, and a one-line action per bell ("Dunois commits his knights to the pastures").
 - **The forage limit**, shown when you drag an army over a province.
+- **Why an army goes hungry**: its food line names an enemy castle that has gathered the food in and the extra eating while besieging; a province's Walls line says what its castle keeps from enemy foragers.
 - **Rumours** of unseen armies.
 - **Notifications** for battle won or lost (with the reason), a breach, terms offered, peace voices passing half, pay owed and an army hungry.
 - **The war aim**, shown to everyone.
@@ -456,6 +469,8 @@ All warfare values live in `packages/rules/data/domain/warfare.json`; most are p
 | `warfare.siege.close_ratio`, `shot_per_month`, `b7_multiplier` | 3; bombard 2, field gun 1; ×1.5 |
 | `warfare.siege.repair_men`, `sally_share`, `fever_after_months` | 200, a third, 3 |
 | `warfare.storm.room_per_breach` / `losses` / `scaling` | 500 / ×1.5 / ×2 |
+| `warfare.castle_supply.forage_cut_by_step` / `reach_share` | 30 / 45 / 60 / 70 / 80 %; half in the castle's reach |
+| `warfare.castle_supply.besieger_eat_by_step` | ×1.15 / 1.25 / 1.3 / 1.35 / 1.4 |
 | `warfare.raid.loot_per_riders` | 1 load per 50 riders |
 | `warfare.peace.capital_share` / `warlike_ignore` / `half` / `three_quarters` | a third / a quarter / 50 % / 75 % |
 | `warfare.peace.tribute_years` / `open_roads_years`, `warfare.raid_war_months` | 20 / 10, 12 |

@@ -20,6 +20,7 @@ import {
   type RawChunk,
   type SaveHeader,
   type SaveKind,
+  type SharedFrom,
 } from "./format.ts";
 import { migrate, validateChunks, type Migration } from "./migrations.ts";
 import { mapHash, restoreWorld, rulesHash, thumbnail, worldChunks, type MappingTables, type SavedGame } from "./world-chunks.ts";
@@ -179,6 +180,8 @@ export interface Campaign {
   beganAsTutorial?: boolean;
   /** The app that writes its saves; full when not given (D-SAVE-13). */
   app?: AppTier;
+  /** The campaign began as a copy of a shared save; every save of it says so (SAVE-128). */
+  sharedFrom?: SharedFrom;
 }
 
 export const DEFAULT_OPTIONS: CampaignOptions = { difficulty: "normal", events: "historical", endDate: "1939-08-31" };
@@ -362,6 +365,7 @@ export function buildSave(ctx: SaveContext, campaign: Campaign, world: World, ki
     start: START_ID,
   };
   if (kind === "ironman" && campaign.ironmanHead) header.parent = campaign.ironmanHead;
+  if (campaign.sharedFrom) header.sharedFrom = { ...campaign.sharedFrom };
   return { header, bytes: encodeSave(header, chunks) };
 }
 
@@ -734,6 +738,50 @@ export function importSave(ctx: SaveContext, bytes: Uint8Array, online = true): 
   const path = fileName(header);
   writeFileSafely(ctx.storage, path, out);
   return { kind: "imported", entry: { path, header } };
+}
+
+// ---------------------------------------------------------------- shared saves
+
+/**
+ * A copy of a shared save as a new campaign of the player's own (SAVE-128,
+ * SAVE-129): new campaign and save ids, a Manual save made on this device,
+ * `sharedFrom` naming the code and the author, and never ironman, so it earns
+ * no achievements. The chunks are kept as they are; opening it runs the usual
+ * checks (nation lock, format version, hash).
+ */
+export function sharedCopy(
+  bytes: Uint8Array,
+  ctx: Pick<SaveContext, "rng" | "now" | "device" | "platform">,
+  from: SharedFrom,
+): { header: SaveHeader; bytes: Uint8Array; path: string } {
+  const decoded = decodeSave(bytes);
+  const original = decoded.header;
+  const header: SaveHeader = {
+    ...original,
+    saveId: randomId(ctx.rng),
+    campaignId: randomId(ctx.rng),
+    kind: "manual",
+    savedAt: ctx.now,
+    device: ctx.device,
+    platform: ctx.platform,
+    ironman: false,
+    flags: { ...original.flags, ironman_unbroken: false },
+    sharedFrom: { code: from.code, author: from.author },
+  };
+  delete header.parent;
+  const out = encodeSave(header, [...decoded.chunks.values()]);
+  return { header, bytes: out, path: fileName(header) };
+}
+
+/** "From Leroy's campaign" on the Load line of a copy (SAVE-134). */
+export function sharedFromLine(header: Pick<SaveHeader, "sharedFrom">): string {
+  return header.sharedFrom ? fill(M.shared_from, { author: header.sharedFrom.author }) : "";
+}
+
+/** A share code as typed (any case, with a dash or spaces) in its stored form, or undefined when it cannot be one. */
+export function shareCode(typed: string): string | undefined {
+  const code = typed.toUpperCase().replace(/[\s-]+/g, "");
+  return code.length === C.cloud.shared.code_length && /^[A-HJ-NP-Z2-9]+$/.test(code) ? code : undefined;
 }
 
 // ---------------------------------------------------------------- ironman lines

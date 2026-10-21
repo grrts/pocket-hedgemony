@@ -1,6 +1,9 @@
 import { expect } from "vitest";
 import { loadDefaultRuleset } from "@ph/rules";
-import { createEngineHost, createWorld, Rng } from "@ph/engine";
+import { aiWarChanceFactor, campaignView, createEngineHost, createWorld, incomePaidIn, risingChanceByDifficulty, risingChanceIn, Rng, runLedger, setDifficulty, setPlayer } from "@ph/engine";
+import { restoreCampaignEnd, saveCampaignEnd } from "../../engine/src/campaignEnd.ts";
+import { aiDeclarations } from "../../engine/src/war.ts";
+import { GRIEVANCES } from "../../engine/src/moods.ts";
 import * as T from "@ph/engine/domain/trade";
 import * as TIME from "@ph/engine/domain/time-and-turns";
 import * as S from "@ph/engine/domain/scenario-setup";
@@ -917,4 +920,123 @@ When("the AI reads it", (s) => {
 });
 Then("its risk tolerance is {string}", (s, read: string) => {
   expect(s.risk).toBe(read);
+});
+
+// ---------------------------------------------------------------- difficulty (SETUP-099 to SETUP-103)
+
+/** A new game through the engine host, as the client starts one. */
+function hostGame(s: Scenario, nation: string, difficulty?: string): void {
+  s.host = createEngineHost(loadDefaultRuleset);
+  s.nation = realmId(nation);
+  const r = s.host({ id: 1, type: "newGame", seed: 7, playerNation: s.nation, ...(difficulty === undefined ? {} : { difficulty }) }).response;
+  if (r.type !== "snapshot") throw new Error(r.type);
+  s.snapshot = r.snapshot;
+  s.difficulty = difficulty;
+  // The same new game as a world of its own, for the rules the host does not show.
+  const w = createWorld(loadDefaultRuleset(), 7);
+  setPlayer(w, w.nationIndex.get(s.nation)!);
+  setDifficulty(w, difficulty);
+  s.game = w;
+}
+
+function saveAndOpen(s: Scenario): void {
+  const campaign = { campaignId: "c1", playerNation: s.nation, nationName: s.nation, ironman: false, options: { difficulty: s.difficulty ?? "normal", events: "historical", endDate: "1939-08-31" }, modified: false, playSeconds: 60 };
+  const saved = s.host({ id: 2, type: "save", kind: "manual", campaign, device: "test", platform: "web", gameVersion: "0", listing: [], now: 1000 }).response;
+  if (saved.type !== "saved") throw new Error(saved.type === "error" ? saved.message : saved.type);
+  const back = s.host({ id: 3, type: "load", bytes: saved.bytes }).response;
+  if (back.type !== "snapshot") throw new Error(back.type === "error" || back.type === "refused" ? back.message : back.type);
+  s.snapshot = back.snapshot;
+}
+
+Given("a new campaign as {string} on {string} difficulty", (s, nation: string, level: string) => hostGame(s, nation, level));
+Given("a new campaign as {string} saved before difficulty was kept", (s, nation: string) => {
+  hostGame(s, nation, "hard");
+  // A world from before difficulty was kept: its campaign record had no difficulty.
+  const { difficulty: _, ...old } = saveCampaignEnd(s.game);
+  s.oldSave = old;
+});
+When("the campaign is saved and opened again", (s) => saveAndOpen(s));
+When("the campaign is opened from that save", (s) => {
+  restoreCampaignEnd(s.game, s.oldSave, (n) => n);
+  s.snapshot = { campaign: campaignView(s.game) };
+});
+Then("the campaign plays on {string} difficulty", (s, level: string) => {
+  expect(s.snapshot.campaign.difficulty).toBe(level);
+});
+
+Then("the AI's war chance, AI income paid in and the player's rising chance are each multiplied by 1", (s) => {
+  expect(S.difficultyEffects(s.game.campaign.difficulty)).toEqual({ ai_war_chance: 1, ai_income: 1, player_rising_chance: 1 });
+  const ai = s.game.nationIndex.get("castile")!;
+  expect(aiWarChanceFactor(s.game)).toBe(1);
+  expect(incomePaidIn(s.game, ai, 37.5)).toBe(37.5);
+  expect(risingChanceByDifficulty(s.game, s.game.campaign.playerLands[0]!, 0.05)).toBe(0.05);
+});
+
+/** New wars the AI declares in one monthly look when every roll comes out at `roll`. */
+function warsAtRoll(s: Scenario, roll: number): number {
+  const w = createWorld(loadDefaultRuleset(), 7);
+  setPlayer(w, w.nationIndex.get(s.nation)!);
+  setDifficulty(w, s.game.campaign.difficulty);
+  w.rng.next = () => roll;
+  const before = w.diplomacy.wars.length;
+  aiDeclarations(w, []);
+  return w.diplomacy.wars.length - before;
+}
+Then("the AI's monthly chance to look for a war is {float} times the balanced chance", (s, factor: number) => {
+  const balanced = loadDefaultRuleset().defines.war.aiDeclareChancePerMonth;
+  expect(aiWarChanceFactor(s.game)).toBe(factor);
+  // A roll just under the scaled chance starts more wars than one just over it, so the chance is where the factor puts it.
+  expect(warsAtRoll(s, balanced * factor * 0.999)).toBeGreaterThan(warsAtRoll(s, balanced * factor * 1.001));
+});
+
+When("a new month pays each realm's income into its treasury", (s) => {
+  s.before = Float64Array.from(s.game.nationTreasury);
+  runLedger(s.game, true);
+});
+const gained = (s: Scenario, realm: string) => {
+  const n = s.game.nationIndex.get(realmId(realm))!;
+  return { gain: s.game.nationTreasury[n] - s.before[n], income: s.game.nationMonthlyIncome[n] as number };
+};
+Then("the treasury of {string} gains {float} times its monthly income", (s, realm: string, factor: number) => {
+  const { gain, income } = gained(s, realm);
+  expect(income).toBeGreaterThan(0);
+  expect(gain).toBeCloseTo(income * factor, 6);
+});
+Then("the treasury of {string} gains its monthly income", (s, realm: string) => {
+  const { gain, income } = gained(s, realm);
+  expect(gain).toBeCloseTo(income, 6);
+});
+
+Given("a province of {string} and a province of {string} each have {int} grievances", (s, mine: string, theirs: string, count: number) => {
+  const w = s.game;
+  const first = (realm: string) => {
+    const n = w.nationIndex.get(realmId(realm));
+    return w.provinceOwner.findIndex((o: number, p: number) => o === n && !w.provinceWater[p]);
+  };
+  const plain = GRIEVANCES.filter((g) => g !== "Heavy taxes" && g !== "Persecuted").slice(0, count);
+  const bits = plain.reduce((g, name) => g | (1 << GRIEVANCES.indexOf(name)), 0);
+  s.plotting = new Map<string, number>();
+  for (const realm of [mine, theirs]) {
+    const p = first(realm);
+    w.provinceGrievances[p] = bits;
+    s.plotting.set(realm, p);
+  }
+});
+/** The province's chance as the same world plays it on normal. */
+function balancedChance(s: Scenario, p: number): number {
+  const level = s.game.campaign.difficulty;
+  setDifficulty(s.game, "normal");
+  const chance = risingChanceIn(s.game, p);
+  setDifficulty(s.game, level);
+  return chance;
+}
+Then("the province of {string} rises with {float} times its balanced chance", (s, realm: string, factor: number) => {
+  const p = s.plotting.get(realm);
+  const balanced = balancedChance(s, p);
+  expect(balanced).toBeGreaterThan(0);
+  expect(risingChanceIn(s.game, p)).toBeCloseTo(Math.min(1, balanced * factor), 9);
+});
+Then("the province of {string} rises with its balanced chance", (s, realm: string) => {
+  const p = s.plotting.get(realm);
+  expect(risingChanceIn(s.game, p)).toBe(balancedChance(s, p));
 });

@@ -488,7 +488,7 @@ export function riseUp(world: World, s: number, news: News[], backer?: number): 
   rel.setStance(g, t.r.source, t.r.target, "hostile");
   rel.setStance(g, t.r.target, t.r.source, "hostile");
   bondsChanged(world);
-  const why = declareWar(world, s, t.o, news);
+  const why = declareWar(world, s, t.o, news, { rising: true });
   if (why) return why;
   const war = world.diplomacy.wars[world.diplomacy.wars.length - 1] as IndependenceWar;
   war.independence = { subject: t.r.source, overlord: t.r.target, kind };

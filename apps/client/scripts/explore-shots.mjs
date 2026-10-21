@@ -34,6 +34,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
     continue;
   }
   await tap("[data-nation=portugal]");
+  await tap("[data-begin]");
   await page.waitForSelector(".hud [data-news]", { timeout: 60000 });
   await page.waitForTimeout(500);
   const endTurn = async () => {

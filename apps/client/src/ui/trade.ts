@@ -77,7 +77,7 @@ export function tradeTab(v: TradeView, s: Snapshot, name: (p: number) => string)
     ? `${cities
         .map(
           (f) => `<div class="found-city">
-          <p class="found-name">${icon("castle", 1)}<b>${esc(name(f.city))}</b></p>
+          <p class="found-name">${icon("castle", 1)}<b>${esc(name(f.city))}</b> <small class="${f.homed >= f.slots ? "why" : "sub"}">home to ${f.homed} of ${f.slots}</small></p>
           <div class="found-kinds">${f.kinds
             .map(
               (k) => `<button class="paper" data-found-city="${f.city}" data-found-kind="${k.kind}"${k.why ? " disabled" : ""}>
@@ -106,7 +106,7 @@ export function tradeTab(v: TradeView, s: Snapshot, name: (p: number) => string)
   return `<h3 class="sub">This month</h3>${month}
     <h3 class="sub">Where the gold comes from</h3>${sources}
     <h3 class="sub">Traders</h3>${traders}
-    ${fold("trade-found", "Found a trader", v.found.length ? `${plural(v.found.length, "city", "cities")} can found one` : "No city can found one", `<p class="hint">Its crew leave the city; it starts on the best route from there.</p>${found}`, !v.traders.length)}
+    ${fold("trade-found", "Found a trader", v.found.length ? `${plural(v.found.length, "city", "cities")} can found one` : "No city can found one", `<p class="hint">Its crew leave the city; it starts on the best route from there. Homes: 1 for a weekly market, 2 a fair, 4 a trading house, +1 a harbour.</p>${found}`, !v.traders.length)}
     ${fold("trade-cities", "Busiest cities", strongest ? `${esc(name(strongest.province))} ${gold(strongest.value)} a month` : "None yet", `<p class="hint">Value a month and trade ratio: traders passing raise the ratio, and the ratio raises tax.</p>${busiest}`)}`;
 }
 

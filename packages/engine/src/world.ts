@@ -44,9 +44,13 @@ import { createExplorationState, seedCharts, seedRegions, type ExplorationState 
 import { seedStartingPosts, seedStartingPurse } from "./startingCounts.ts";
 import { createCampaignEndState, seedCampaign, type CampaignEndState } from "./campaignEnd.ts";
 import type { AchievementLog } from "./achievements.ts";
+import type { WorldOptions } from "./domain/scenario-setup/campaign.ts";
 import { createInstitutionsState, seedInstitutions, type InstitutionsState } from "./institutions.ts";
 import { createTribesState, seedTribes, type TribesState } from "./tribes.ts";
 import { createPlagueState, type PlagueState } from "./plague.ts";
+import { createThroneState, monthlyThrone, type ThroneState } from "./throne.ts";
+import { createStabilityState, monthlyStability, type StabilityState } from "./stability.ts";
+import { createNewlyTakenState, type NewlyTakenState } from "./newlyTaken.ts";
 
 /**
  * Simulation state stored as parallel typed arrays (one array per field,
@@ -54,7 +58,7 @@ import { createPlagueState, type PlagueState } from "./plague.ts";
  * cache-friendly to iterate every turn and lets whole arrays be copied or
  * transferred to the UI thread without serialising objects.
  */
-export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState, RebelState, RevolutionState, PeoplesState, TradeState, RulerState, FallenState, BeliefState, InstitutionsState, TribesState, PlagueState {
+export interface World extends LivingState, TreasuryState, FoodState, MoodState, LordState, ResearchState, WorksState, LandState, CastleFoodState, ConversionState, GovernmentState, RebelState, RevolutionState, PeoplesState, TradeState, RulerState, FallenState, BeliefState, InstitutionsState, TribesState, PlagueState, ThroneState, StabilityState, NewlyTakenState {
   /** Heads of the faith: patrons, the Caliph, the conclave, censures (faithHeads.ts). */
   faithHeads: FaithHeadsState;
   /** Faiths a realm serves as the patron of their head while of another faith (RELG-145). */
@@ -189,6 +193,13 @@ export interface World extends LivingState, TreasuryState, FoodState, MoodState,
   heritage?: GameHeritage;
   /** The player's campaign as achievements see it (achievements.ts). */
   achievements?: AchievementLog;
+  /**
+   * The campaign rules chosen at new game that the world reads (SETUP-054,
+   * D-SAVE-8): the events choice, fog of war and the end date. Difficulty is
+   * `campaign.difficulty` (SETUP-099). Absent in a world made without them
+   * (tests, balance runs), which plays as before: the plausible event preset.
+   */
+  options?: WorldOptions;
 }
 
 export interface ArmyPool {
@@ -376,8 +387,8 @@ function growArmyPool(old: ArmyPool): ArmyPool {
  * one the world gets a stand-in with one tile per province, where armies
  * can't march (enough for a probe that only runs a turn).
  */
-/** `seedTrade: false` leaves trade empty, for a world a save is about to fill. */
-export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = pointTileGrid(rules), opts: { seedTrade?: boolean } = {}): World {
+/** `seedTrade: false` leaves trade empty, for a world a save is about to fill; `options` are the campaign rules of a new game. */
+export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = pointTileGrid(rules), opts: { seedTrade?: boolean; options?: WorldOptions } = {}): World {
   const provinceIds = rules.provinces.map((p) => p.id);
   const provinceIndex = new Map(provinceIds.map((id, i) => [id, i]));
   const nationIds = rules.nations.map((n) => n.id);
@@ -500,6 +511,9 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
     ...createInstitutionsState(),
     ...createTribesState(P),
     ...createPlagueState(P, seed),
+    ...createThroneState(P),
+    ...createStabilityState(N),
+    ...createNewlyTakenState(P),
   };
   world.diplomacy = createWarState(world);
   seedClasses(world);
@@ -571,6 +585,8 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   // Envoy seats and AI answers read each realm's provinces, gold and soldiers from the start.
   syncCountries(world);
 
+  // The campaign rules come first: the event tree and the goals read the events choice (SETUP-054).
+  if (opts.options) world.options = { ...opts.options };
   // The event tree starts with the campaign, so its first month costs no more than any other.
   world.events = createGameEvents(world);
   // Realms' historical goals, shaken by the seed and the Events preset (EVT-101).
@@ -578,6 +594,10 @@ export function createWorld(rules: Ruleset, seed: number, tiles: TileGrid = poin
   monthlyGoals(world, false);
   // Heritage reads the tree's ages, so it starts after it: three ambitions drawn, the birthright in force.
   world.heritage = createGameHeritage(world);
+  // Days to each capital, for Far from the throne (X-29).
+  monthlyThrone(world);
+  // Each realm's stability, for what it costs (X-29).
+  monthlyStability(world);
   // Worked out again with heritage's tax in force, so lenders and the treasury card know the income the realm will have.
   runLedger(world, false);
   // Lords, officials and commanders of 1444 get their ages (REALM-274).

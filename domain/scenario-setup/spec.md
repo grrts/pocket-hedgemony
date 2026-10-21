@@ -20,7 +20,7 @@ world; it does not run anything after the first turn.
   (gap item 26).
 - The relations snapshot used at start (country-relations, 1444 data).
 - Playable realms, the free tier (the Ottomans and France), and the realm picker's data.
-- Campaign rules chosen at new game (difficulty, AI temper, fog, events, ironman, end date) as setup data.
+- Campaign rules chosen at new game (difficulty, AI temper, fog, events, ironman, end date) as setup data, and what each difficulty level changes in play (SETUP-099 to SETUP-103).
 
 **Not in scope (owned by …)**
 - How government forms behave, reforms (government); lords, rulers and loyalty rules (realm).
@@ -115,7 +115,7 @@ Newest decision first.
 - INV-SETUP-10: The same seed and the same campaign rules give the same starting world.
 
 **Campaign rules** (value object saved with the campaign)
-- difficulty, AI temper (aggression), fog, events (historical or free), ironman, end date (default
+- difficulty, AI temper (aggression), fog, events (historical, plausible or free, D-SETUP-21), ironman, end date (default
   31 August 1939).
 - INV-SETUP-11: Campaign rules can't be changed after the campaign starts (read-only under Campaign rules).
 
@@ -227,7 +227,7 @@ Newest decision first.
 - SETUP-051 (Ubiquitous): The free tier shall offer the Ottomans and France; the tutorial is played as the Ottomans. [gap-lists decisions, item 2, List 3 item 2; tutorial §3.1]
 - SETUP-052 (State-driven): While the full game is not owned, the realm picker shall show other realms with a padlock and a button to the Unlock screen; returning from a purchase keeps the realm chosen. [screen-flow S5]
 - SETUP-053 (Ubiquitous): The realm picker shall offer realms on the map at world zoom, with filters by region, difficulty and free or locked, and a short list of suggested realms. [screen-flow S5]
-- SETUP-054 (Ubiquitous): New game shall set the campaign rules difficulty, AI temper, fog, historical or free events, ironman and end date (default 31 August 1939), with presets that fill the whole step. [screen-flow S5; settings §4.3]
+- SETUP-054 (Ubiquitous): New game shall set the campaign rules difficulty, AI temper, fog, historical, plausible or free events (D-SETUP-21), ironman and end date (default 31 August 1939), with presets that fill the whole step. [screen-flow S5; settings §4.3]
 - SETUP-055 (Ubiquitous): Campaign rules shall be saved with the campaign and shown read-only under Pause → Campaign rules. [settings §4.3]
 - SETUP-056 (Ubiquitous): A new game shall start from a seed, the player's nation and the options, and get a random campaign id. [save-system §2.1, §9]
 - SETUP-057 (Ubiquitous): Each save header shall record the player's nation and whether it needs the full game. [save-system §4.2, §6.1]
@@ -398,6 +398,77 @@ with `?start=1444` in the address (or `#start=1444`).
 - SETUP-098 (Ubiquitous): Until each rule is moved to the 1378 map's own data, rules that name 1444 provinces shall read,
   in the 1378 start, the province of the 1378 map under each 1444 province's centre. [X-25] @placeholder `world/from-1444.json`
 
+### 5.11 Difficulty (Leroy, 19 October)
+
+Difficulty was a campaign rule the game kept and showed but nothing played by. It now changes three things, each a
+factor on a rule that already exists, applied at one point, with no new random draw: how readily the AI looks for a
+war, how much gold AI realms' income pays in, and how often the player's plotting provinces rise. On **normal** every
+factor is 1, so the game plays exactly as balanced. The numbers are provisional, in
+`scenario-setup.json` `campaign_rules.difficulty.effects`:
+
+| Level | AI looks for a war (`ai_war_chance`) | AI income paid in (`ai_income`) | Player's provinces rise (`player_rising_chance`) |
+|---|---|---|---|
+| easy | × 0.5 | × 0.8 | × 0.75 |
+| normal | × 1 | × 1 | × 1 |
+| hard | × 1.5 | × 1.25 | × 1.25 |
+
+**How the player uses it.** The player picks Easy, Normal or Hard on the new game options step (step 2, SHELL-033),
+where Normal is chosen and a line under the rules says what the chosen level changes ("AI realms fight and earn as balanced";
+"AI realms are slower to war and poorer, your provinces calmer"; "AI realms are quicker to war and richer, your
+provinces more restless"); a preset fills it with the rest of the step. It is one row of three buttons among the
+campaign rules, not a card of its own, since it is chosen once. Afterwards it is fixed: the save library shows it on
+each campaign's row with the realm and date (SAVE header `options.difficulty`), and Settings → Campaign rules shows it
+read-only (SET-032). Nothing in play names it: the AI's wars, its treasury and the player's rising chances read as
+they always do, the rising chance on a province card already including the factor. On a phone in landscape the row
+is three 44-point buttons with their line under them in the options step's column, Wide and Tall alike, inside the
+safe areas, and nothing needs hover.
+
+- SETUP-099 (Ubiquitous): A campaign shall keep its difficulty, easy, normal or hard (the save library's names), in
+  the world from new game on and in every save; a save from before difficulty was kept, or an unknown level, plays
+  on normal. [Leroy 19 Oct; SETUP-054, SETUP-055]
+- SETUP-100 (Ubiquitous): On normal every difficulty factor shall be 1, so the game plays as balanced. [Leroy 19 Oct]
+  @placeholder `campaign_rules.difficulty.effects`
+- SETUP-101 (Ubiquitous): The AI's monthly chance to look for a war (`war.aiDeclareChancePerMonth`, with its goals'
+  pull) shall be multiplied by the difficulty's `ai_war_chance`: 0.5 on easy, 1.5 on hard. The price of war (WAR-228)
+  still decides whether it declares. [Leroy 19 Oct; WAR-228] @placeholder
+- SETUP-102 (Ubiquitous): When a new month pays each realm's income into its treasury, an AI realm's income shall be
+  multiplied by the difficulty's `ai_income` (0.8 on easy, 1.25 on hard); the player's income, and a realm's
+  deficit, shall be paid as they are. The ledger lines are not changed. [Leroy 19 Oct; REALM ledger] @placeholder
+- SETUP-103 (Ubiquitous): The monthly chance that a plotting province of the player's realm rises (X-9, with faith and
+  tongue, REALM-238) shall be multiplied by the difficulty's `player_rising_chance` (0.75 on easy, 1.25 on hard), at
+  most 1; AI realms' provinces rise as balanced. [Leroy 19 Oct; X-9] @placeholder
+
+### 5.12 The options step: how the player uses it (X-19)
+
+- SETUP-104 Where: choosing a realm, by tapping a suggested realm on the *Choose your realm* sheet or **Rule** on a
+  realm's card, turns the sheet into one card, **Rules of the campaign**: the realm's banner, name and start day at the
+  top, then one row per rule, then one big **Begin as …** button. Close on the card goes back to the realms with the
+  choices kept. The options step and the Begin step of SHELL-030 are this one card, so a new game is still two taps
+  from the suggested realms (realm, Begin). [X-19; SETUP-054; SHELL-033, SHELL-034]
+- SETUP-105 The rules on the card and their defaults: **Difficulty** Easy, Normal or Hard (Normal); **Events**
+  Historical, Plausible or Free (Plausible); **Fog of war** On or Off (On); **Ironman** Off or On (Off); **Ends** 31 August of a
+  year from 1494 to 1939 (1939, D-SHELL-14). The card starts from the choices of the player's last new game on this
+  device, or these defaults (SETUP-058). Under the rows, a few short lines say what the chosen rules mean (Ironman: one
+  save after every week, achievements count; not ironman: achievements are earned only in ironman campaigns), since a
+  phone has no hover; the first says what the chosen difficulty changes (5.11). AI temper and the presets are not on the card yet (OQ-SETUP-22). [SETUP-054; D-SETUP-20;
+  D-SETUP-21]
+- SETUP-106 What each rule does once the campaign begins: difficulty is saved as the campaign option `difficulty`
+  (`easy`, `normal`, `hard`) in every save header and kept on the world as `campaign.difficulty`, where it plays
+  as SETUP-099 to SETUP-103 say; Events picks the event tree's
+  preset (historical, plausible or divergent, EVT-036, D-SETUP-21), which also shakes the realms' goals; Fog of war off
+  shows every land from the start and the map mode menu's *Hide unexplored lands* switch gives way to a line saying
+  so (the AI's information is the same either way, SET-033); Ironman keeps one save line written after every week and
+  on exit, with no Save in the game menu and no earlier point of the campaign in Load (SAVE-010, SAVE-087), and only
+  an ironman campaign earns achievements (ACH-034); the end date ends the campaign (SHELL-100). [SETUP-055, SETUP-056]
+- SETUP-107 Overview: the game menu shows the campaign's rules read-only in one line under the date (*Hard · historical
+  events · no fog · ironman · ends 31 Aug 1800*), with a reminder in ironman that it saves after every week. The rules
+  cannot be changed in the campaign (SETUP-055, SET-032). [X-19; D-SET-11]
+- SETUP-108 The phone: on a phone held sideways (Wide) the card is a side sheet about two thirds of the width, the rules
+  two to a row with each label above its buttons, so every rule and Begin fit on 390 points without scrolling; on a
+  tall screen the sheet rises from the bottom, one rule per row. Every button and the end-year select are 44 points
+  tall, Begin stays at the foot of the sheet however far the lines above it scroll, the sheet keeps clear of the safe
+  areas like the realm picker, and nothing needs hover. [X-19; SHELL-146]
+
 ## 6. Commands
 
 | Command | Who issues it | Preconditions | Result | Events emitted |
@@ -455,6 +526,8 @@ Nothing after the start. Before the first turn: build the starting world, then t
 | `scenario_setup.africa.size_by_manpower` | Provinces a new African nation takes by `manpower_potential` | very low 1, low 2, moderate 3, high 5, very high 8, unknown 2 (X-20) | Yes | `scenario-setup.json` |
 | `balance.africa.*` | Balance targets of African starts | SETUP-070 (X-20) | Yes | balancing model |
 | free realms | Free tier | Ottomans, France | No | store config |
+| `campaign_rules.difficulty.levels`, `.default` | Difficulty levels and the default | easy, normal, hard; normal | No | `scenario-setup.json` |
+| `campaign_rules.difficulty.effects` | Factors per level on the AI's war chance, AI income paid in, the player's rising chance (SETUP-100 to SETUP-103) | easy 0.5, 0.8, 0.75; normal 1, 1, 1; hard 1.5, 1.25, 1.25 | Yes | `scenario-setup.json` |
 
 ## 11. Seams
 
@@ -487,6 +560,8 @@ Nothing after the start. Before the first turn: build the starting world, then t
 - Each record's AI personality (tendencies, not scripts) is data the AI contexts read (country-catalogue
   README §5; `build/ai-personalities.md`).
 - Background-only records have no AI; playable subjects have their own AI under an overlord (schema).
+- The campaign's difficulty scales how readily AI realms look for a war and how much of their income pays in
+  (SETUP-101, SETUP-102); the AI's rules are otherwise the same at every level.
 
 ## 13. Decisions and open questions
 
@@ -496,7 +571,7 @@ Nothing after the start. Before the first turn: build the starting world, then t
 - **D-SETUP-4** (was OQ-SETUP-4) Start date: every campaign and the tutorial start on 11 November 1444, so the catalogue's and relations' rulers, wars and unions apply as they stand that day (Mehmed II rules the Ottomans, the Poland–Hungary union has lapsed). X-5 settles it.
 - **D-SETUP-5** (was OQ-SETUP-5) Province starting values: the map build's people, wealth and castles are the start values, marked provisional for balancing. They are the only complete set.
 - **D-SETUP-6** (was OQ-SETUP-6) Assessment levels: each level becomes a factor on the base start value (very low 0.5, low 0.75, medium 1, high 1.25, very high 1.5), `unknown` counts as medium, and low confidence widens the random range to ±20 % (all provisional in `scenario-setup.json`). Missing numbers get provisional values.
-- **D-SETUP-7** (was OQ-SETUP-7) Events option: "historical" uses the `historical` preset and "free" the `plausible` preset; `divergent` is not offered. Two options map onto two presets with the least change.
+- **D-SETUP-7** (was OQ-SETUP-7) Events option: "historical" uses the `historical` preset and "free" the `plausible` preset; `divergent` is not offered. Two options map onto two presets with the least change. *Replaced by D-SETUP-21: three choices, as the events spec has them.*
 - **D-SETUP-8** (was OQ-SETUP-8) Collective institutions: they are not realms unless a map nation is matched to them (`switzerland` → `swiss_confederation`, `aztecs` → `triple_alliance`), in which case that realm takes the record's start form; the rest are reference data. X-13 settles it.
 - **D-SETUP-9** (was OQ-SETUP-9) Group records: a group record is reference data; its provinces belong to whatever map nation owns them. X-13 settles it.
 - **D-SETUP-10** (was OQ-SETUP-10) Two relationship sets: the relations dataset wins at start, and the catalogue's edges are reference only. Country stats 10 already reads the relations dataset, and it is the curated, later set.
@@ -510,6 +585,10 @@ Nothing after the start. Before the first turn: build the starting world, then t
 - **D-SETUP-19** Sleeping realms (Leroy, 18 Oct; X-24): realms founded after 1444 are listed from the start and asleep until they wake (SETUP-080 to SETUP-094). D-SETUP-2's "only a representation that owns map provinces is a realm" now reads "is a realm on the map in 1444"; a record that owns no province may be a sleeping realm.
 - **D-SETUP-18** African starts (Leroy, 18 Oct; X-20): in the four African regions, D-SETUP-2's "only a representation that owns map provinces is a realm" now applies after the catalogue's playable countries, subjects and peoples are given the unowned land around their capitals (SETUP-060 to SETUP-065); elsewhere D-SETUP-2 stands. Leroy asked for more of the historical states and tribes, even very small ones, and as little change to the rules of play as possible.
 - **D-SETUP-19** Added realms and the province grid (18 Oct; X-20, D-TRIBE-3): realms added from the catalogue (`grows` in the map nations data) take provinces as the map already cuts them, and never keep a piece of land apart the way the hand-placed capitals do, so every province keeps its id and every file that names provinces (ports, event places, anchors) stays valid. Sub-Saharan provinces are large (about 50,000 km² each), so where two capitals fall in one province the first in nation order keeps it and the other stays reference data (Kayor, Baol and Waalo in Jolof's province; Lamu and Pate in Mombasa's). The build lists them in `scenario-setup-report.json`. A finer African grid is a map change of its own. The start-date plan (1378) extends the same rows: a realm's capital, its own owner rules and `grows`.
+- **OQ-SETUP-22** AI temper and presets: SETUP-054 also asks for AI temper and presets that fill the whole step, but no design gives AI temper's values or what it does, nor the presets' names and values. They are left off the options step until the AI difficulty work defines them; the save header already has room for `aiTemper` (D-SAVE-8).
+
+- **D-SETUP-20** Difficulty (Leroy, 19 Oct): difficulty changes the AI's readiness for war, the gold AI realms' income pays in and the player's rising chances, each as a provisional factor at one point, 1 on normal (SETUP-099 to SETUP-103). The rising factor is the player's only, since difficulty is about the player's game and AI realms' unrest shapes the world's history; the income factor is the AI's only, so the player's treasury always reads as its ledger. The war factor applies to every AI realm's monthly look for a war, not only toward the player, as no design names the player as a special target. This is the one place where the AI's numbers differ from the player's (DECISIONS rule 3), chosen by the player at new game.
+- **D-SETUP-21** (was OQ-SETUP-21; confirmed by Leroy, 20 Oct 2026) Events choice: this spec and game shell offered "historical or free" (D-SETUP-7, SHELL-033) while events offers Historical, Plausible and Free with Plausible the default (EVT-036, D-EVT-9). The options step follows the events spec, the owner of the presets: three choices, Historical → historical, Plausible → plausible, Free → divergent (`events_presets` in `scenario-setup.json`), Plausible by default, so a default game plays as before; this replaces D-SETUP-7's two-choice mapping. A world made without the options step (tests, balance runs) keeps the plausible preset.
 
 ## 14. Traceability
 
@@ -609,3 +688,14 @@ Nothing after the start. Before the first turn: build the starting world, then t
 | SETUP-096 | — | rules unit test `scenario-1378.test.ts` (the regions checked together) |
 | SETUP-097 | — | rules unit test `start-1378.test.ts` (sleeping realms and ports on 1378 provinces) |
 | SETUP-098 | — | start.ts (no scenario yet) |
+| SETUP-099 | difficulty.feature | A new campaign keeps its difficulty |
+| SETUP-099 | difficulty.feature | A save from before difficulty was kept plays on normal |
+| SETUP-100 | difficulty.feature | Normal plays as balanced |
+| SETUP-101 | difficulty.feature | The AI looks for a war by the difficulty |
+| SETUP-102 | difficulty.feature | AI income pays in by the difficulty, the player's never |
+| SETUP-103 | difficulty.feature | The player's plotting provinces rise by the difficulty |
+| SETUP-104 | — | How the player uses it; checked by `apps/client/scripts/new-game-options-shots.mjs` and `apps/client/src/ui/newGame.test.ts` |
+| SETUP-105 | — | engine unit test `newGameOptions.test.ts` (the choices and defaults) and `newGame.test.ts` (the card) |
+| SETUP-106 | — | engine unit test `newGameOptions.test.ts` (options on the world and in saves, events preset, end date, achievements only in ironman) |
+| SETUP-107 | — | checked by `apps/client/scripts/new-game-options-shots.mjs` (the game menu's rules line, no Save in ironman) |
+| SETUP-108 | — | Presentation and phone layout (checked by screenshots) |

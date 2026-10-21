@@ -22,6 +22,30 @@
             <button class="btn paper" type="submit">Sign out</button>
         </form>
     </div>
+    <h2 class="c-h2">Your shared saves</h2>
+    {% if shared %}
+    <ol class="topics compact shared-list">
+        {% for save in shared %}
+        <li class="topic-row">
+            <a class="topic-title" href="{{ path('community_post', {id: save.post.id}) }}">{{ save.title }}</a>
+            <p class="topic-meta"><span>{{ save.realm }} · {{ save.dateText }}</span> <span>code {{ save.shownCode }}</span></p>
+            <div class="topic-last">
+                <span class="replies">Played <strong>{{ save.plays }}</strong> {{ save.plays == 1 ? 'time' : 'times' }}</span>
+                <details class="shared-remove">
+                    <summary class="btn paper">Remove</summary>
+                    <form method="post" action="{{ path('community_shared_remove', {code: save.code}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('community-post') }}">
+                        <span>Remove this shared save? Its topic stays.</span>
+                        <button class="btn wax" type="submit">Remove it</button>
+                    </form>
+                </details>
+            </div>
+        </li>
+        {% endfor %}
+    </ol>
+    {% else %}
+    <p class="empty">You have not shared a save yet. In the game, open a save under Load and tap Share.</p>
+    {% endif %}
     <h2 class="c-h2">Your topics</h2>
     {% if topics %}
     <ol class="topics compact">
