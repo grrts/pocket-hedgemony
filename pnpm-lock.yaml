@@ -61,12 +61,24 @@ importers:
       '@capacitor/android':
         specifier: 8.5.3
         version: 8.5.3(@capacitor/core@8.5.3)
+      '@capacitor/app':
+        specifier: 8.1.2
+        version: 8.1.2(@capacitor/core@8.5.3)
+      '@capacitor/browser':
+        specifier: 8.0.5
+        version: 8.0.5(@capacitor/core@8.5.3)
       '@capacitor/core':
         specifier: 8.5.3
         version: 8.5.3
       '@capacitor/ios':
         specifier: 8.5.3
         version: 8.5.3(@capacitor/core@8.5.3)
+      '@capgo/capacitor-social-login':
+        specifier: 8.7.5
+        version: 8.7.5(@capacitor/core@8.5.3)
+      '@capgo/native-purchases':
+        specifier: 8.9.6
+        version: 8.9.6(@capacitor/core@8.5.3)
     devDependencies:
       '@capacitor/cli':
         specifier: 8.5.3
@@ -115,6 +127,16 @@ packages:
     peerDependencies:
       '@capacitor/core': ^8.5.0
 
+  '@capacitor/app@8.1.2':
+    resolution: {integrity: sha512-uKBlsrXH0IdvUn69e/KKYbZ32A06pcrUdG8LWuZ/6y33YMXZXLEEdNSwl+jKS/SrsTWqnePs8EqSWaiQM3mUGA==}
+    peerDependencies:
+      '@capacitor/core': '>=8.0.0'
+
+  '@capacitor/browser@8.0.5':
+    resolution: {integrity: sha512-qqcEjUqs9kG1naF+tsD8rERuZ3wuIfXzvoIJEERHI4RNWwNSUqAHHduaKhkyb+t01VyVPa0ydx0mZ/eOskk2Ug==}
+    peerDependencies:
+      '@capacitor/core': '>=8.0.0'
+
   '@capacitor/cli@8.5.3':
     resolution: {integrity: sha512-/G6xwna+p4GS3lthSdWN3OThCH2F85O0Ukdy8rv3oAXvgEMeyFgPEIA3PMAS++IkHwUuBYBAKOQJnZfcrh1n0w==}
     engines: {node: '>=22.0.0'}
@@ -127,6 +149,16 @@ packages:
     resolution: {integrity: sha512-HnnV92Jl8+3x0JUloXUMjFcUsQI8wHFVsKwkLn72DfRZXYGZW11tQbmNOWOnRTljaU18FdI1b9ipT09SzzPDNw==}
     peerDependencies:
       '@capacitor/core': ^8.5.0
+
+  '@capgo/capacitor-social-login@8.7.5':
+    resolution: {integrity: sha512-1Qd0l4AZ/ch3ILdSOa7UwrWoENFXb+/gOo1P7w/yTKENy0561JXIXWy+VhUx17E/FBMyx8DVgbrALiuCByKZ3A==}
+    peerDependencies:
+      '@capacitor/core': '>=8.0.0'
+
+  '@capgo/native-purchases@8.9.6':
+    resolution: {integrity: sha512-HOK8C9FKVN8FOdZHmF32Uss1IDqB71ADYiWcJ5a4Gqvnho6Jtc8RtIr1Yg8I86YMm4W/nj7TZ54q7Z72Hlau3Q==}
+    peerDependencies:
+      '@capacitor/core': '>=8.0.0'
 
   '@cucumber/cucumber-expressions@20.1.0':
     resolution: {integrity: sha512-KXQJChHTyHdg6HI7fHy3zpjfoS205vV1B/aJQKB82VFgMGbdVdiaSy7sTtap/5Q787anLmZt25Tg0FqQ2n4fqw==}
@@ -1072,6 +1104,14 @@ snapshots:
     dependencies:
       '@capacitor/core': 8.5.3
 
+  '@capacitor/app@8.1.2(@capacitor/core@8.5.3)':
+    dependencies:
+      '@capacitor/core': 8.5.3
+
+  '@capacitor/browser@8.0.5(@capacitor/core@8.5.3)':
+    dependencies:
+      '@capacitor/core': 8.5.3
+
   '@capacitor/cli@8.5.3':
     dependencies:
       '@ionic/cli-framework-output': 2.2.8
@@ -1100,6 +1140,15 @@ snapshots:
       tslib: 2.8.1
 
   '@capacitor/ios@8.5.3(@capacitor/core@8.5.3)':
+    dependencies:
+      '@capacitor/core': 8.5.3
+
+  '@capgo/capacitor-social-login@8.7.5(@capacitor/core@8.5.3)':
+    dependencies:
+      '@capacitor/core': 8.5.3
+      tslib: 2.8.1
+
+  '@capgo/native-purchases@8.9.6(@capacitor/core@8.5.3)':
     dependencies:
       '@capacitor/core': 8.5.3
 
