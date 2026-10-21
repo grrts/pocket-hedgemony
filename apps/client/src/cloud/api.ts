@@ -429,6 +429,16 @@ export class CloudApi {
     return this.json<AccountCard>("GET", "/api/account");
   }
 
+  /**
+   * `DELETE /api/account` (SAVE-198): deletes the account with its cloud and
+   * shared saves, signing every device out; this one forgets its tokens and
+   * its cloud lines, and keeps the saves on the device (SAVE-206).
+   */
+  async deleteAccount(): Promise<void> {
+    await this.call("DELETE", "/api/account");
+    this.forget();
+  }
+
   /** `DELETE /api/devices/{id}`; signing this device out forgets its tokens even when the server can't be reached. */
   async signOutDevice(id: string): Promise<void> {
     const self = id === this.tokens?.deviceId;

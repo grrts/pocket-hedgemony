@@ -240,12 +240,14 @@ final class Entitlements
      */
     private function record(Account $account, StorePurchase $purchase): ?Entitlement
     {
+        $held = $this->entitlements->findOneBy(['store' => $purchase->store, 'reference' => $purchase->reference]);
+        // A record whose account was deleted is free to restore, whatever the old account's tag says (SAVE-202).
+        $orphan = null !== $held && null === $held->getAccount();
         $expected = $this->accountTag($account, $purchase->store);
-        if (null !== $purchase->accountTag && null !== $expected && !hash_equals($expected, $purchase->accountTag)) {
+        if (!$orphan && null !== $purchase->accountTag && null !== $expected && !hash_equals($expected, $purchase->accountTag)) {
             throw new PurchaseRefused('other_account', PurchaseRefused::OTHER_ACCOUNT);
         }
-        $held = $this->entitlements->findOneBy(['store' => $purchase->store, 'reference' => $purchase->reference]);
-        if (null !== $held && $held->getAccount() !== $account) {
+        if (null !== $held && !$orphan && $held->getAccount() !== $account) {
             throw new PurchaseRefused('other_account', PurchaseRefused::OTHER_ACCOUNT);
         }
         $mine = $this->find($account, $purchase->store);
@@ -253,6 +255,22 @@ final class Entitlements
             return $mine;
         }
         $now = $this->clock->now();
+        if ($orphan) {
+            if (null === $mine) {
+                $held->claim($account);
+                $mine = $held;
+            } elseif ($mine->isActive()) {
+                // The account holds an active purchase on this store already; the record stays as it is (SAVE-190).
+                $mine->checked($now);
+                $this->em->flush();
+
+                return $mine;
+            } else {
+                // A purchase that unlocks takes the place of one that does not; its record moves into the account's row.
+                $this->em->remove($held);
+                $this->em->flush();
+            }
+        }
         if (null === $mine) {
             $mine = new Entitlement($account, $purchase->store, $purchase->product, $purchase->reference, $purchase->status, $now);
             $mine->confirm($purchase->reference, $purchase->status, $purchase->tokenHash, $purchase->environment, $now);
