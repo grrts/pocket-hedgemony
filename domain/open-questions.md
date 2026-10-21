@@ -612,6 +612,7 @@ Every gap or contradiction the domain specs found in the designs, collected from
 - **D-SET-20**: Turn playback speed is a Gameplay row of its own beside Battle playback speed: the week's playback after End turn is the speed players notice most, and like Battle playback speed it only changes how fast the week is shown (X-15). Leroy asked for a speed setting (17 October 2026 brief).
 - **D-SET-21**: On the web and on phones without a low-power signal the game can read, Auto counts a battery under the 20 % threshold and not charging as the device saving battery, as for the Steam Deck. Same threshold, one rule.
 - **D-SET-22**: The client builds the Settings screen from settings.json but lists only the rows whose effect it has built, so no row promises something the game does not do; rows join as their effects are built. A row that does nothing is a poor experience (X-19).
+- **D-SET-23**: Crash reports and usage statistics go to our own server, beside the statistics it already took (`/api/metrics`), rather than to a third party such as Sentry: every crash in this game is a JavaScript error (web, Electron and Capacitor run the same client), our server can store and group those, and the privacy page keeps naming one company. Moderators read the numbers on the server's Stats page. Sentry can be added later behind the same Crash reports row if native crashes or source-mapped stacks are needed. Production readiness item 7 (21 October 2026); provider pending Leroy's pick.
 
 ### Subjects and overlords (subjects)
 

@@ -106,6 +106,7 @@ Run each from one machine only (a cron job on one app server, or the host's sche
 | When | Command | What it does |
 |---|---|---|
 | Daily | `php bin/console app:saves:purge` | Deletes the files of cloud saves removed over 30 days ago (SAVE-062). |
+| Daily | `php bin/console app:crashes:purge` | Deletes crash reports over 90 days old and usage statistics over 13 months old, as the privacy page promises (SET-141). |
 | Daily | `php bin/console app:stores:google-voided` | Marks refunded the Google Play purchases a missed notification didn't ([purchases.md](purchases.md)). |
 | Daily | `php bin/console cache:pool:prune` | Removes expired rate-limit counts and keys from `cache_items`. |
 | Nightly | `bin/backup-database` | The database backup below. |

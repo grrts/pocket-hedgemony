@@ -1,7 +1,7 @@
 {% extends 'site/layout.html.twig' %}
 
 {% block title %}Privacy · Pocket Hegemony{% endblock %}
-{% block description %}What Pocket Hegemony stores about you, and why: the game, the optional account, usage statistics and this website.{% endblock %}
+{% block description %}What Pocket Hegemony stores about you, and why: the game, the optional account, usage statistics, crash reports and this website.{% endblock %}
 
 {% block content %}
 <article class="framed sheet">
@@ -24,7 +24,7 @@
     <p>Purchases themselves go through the App Store, Google Play or Steam, under their own privacy policies. We don't see or store your payment details.</p>
 
     <h2 id="statistics">Usage statistics</h2>
-    <p>The game can send us short records of what happens in play, such as a campaign starting or a turn ending, so we can see how the game is played and fix what goes wrong. Where the law asks for your consent, the game asks first and sends nothing until you agree, and you can turn it off in Settings. Each record holds:</p>
+    <p>The game can send us short records of what happens in play, such as a campaign starting, a turn ending or a tutorial step reached, so we can see how the game is played and where players stop. The first time you open the game it asks, and it sends nothing unless you say yes. You can turn it off any time in Settings, under Privacy, and what was waiting to be sent is then thrown away. Each record holds:</p>
     <ul>
         <li>what happened (for example "campaign started") and when;</li>
         <li>a few details about the event itself;</li>
@@ -33,7 +33,19 @@
         <li>your account's number, only if you are signed in;</li>
         <li>the time our server received it.</li>
     </ul>
-    <p>The records never hold your email address or your name.</p>
+    <p>The records never hold your email address or your name. We keep them for 13 months, then delete them.</p>
+
+    <h2 id="crashes">Crash reports</h2>
+    <p>When the game breaks, it can send us a report so we can fix it. Like the statistics, it asks first, sends nothing unless you say yes, and can be turned off in Settings, under Privacy. Crash reports go to our own server and nowhere else. Each report holds:</p>
+    <ul>
+        <li>the error's message and where in the game's code it happened, with file names only, never the folders on your device;</li>
+        <li>what was open, such as the map, the tutorial or Settings;</li>
+        <li>your browser's name and main version number (for example "Safari 17"), not the whole browser description;</li>
+        <li>the game's version, and whether it is the web, desktop, iPhone or Android version;</li>
+        <li>the same random install number the statistics use;</li>
+        <li>when it happened, and when our server received it.</li>
+    </ul>
+    <p>Crash reports never hold your account, email address or name, or anything from your campaigns. We keep them for 90 days, then delete them.</p>
 
     <h2 id="community">The community</h2>
     <p>When you post in the community, we store what you write, your display name with it, and when you posted or edited it. Everyone can read posts, unless a moderator hides one. If you report a post, we store the report and the reason you give, which only moderators see.</p>
@@ -46,7 +58,7 @@
     {% if support_email %}Write to <a href="mailto:{{ support_email }}">{{ support_email }}</a>.{% else %}Use the contact details on the game's store page.{% endif %}</p>
 
     <h2 id="changes">Changes</h2>
-    <p>If what we store changes, this page changes first. Last updated 19 October 2026.</p>
+    <p>If what we store changes, this page changes first. Last updated 21 October 2026.</p>
 </div>
 </article>
 {% endblock %}

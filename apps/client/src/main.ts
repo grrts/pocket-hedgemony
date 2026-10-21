@@ -132,9 +132,9 @@ import { autosaveDue, continueTarget, gate, longDate, newCampaign, newManualSave
 import { SaveStore, type StoredSave } from "./saves/store.ts";
 import { FileSaveStore, moveIntoFolder, type SaveStoreLike } from "./saves/fileStore.ts";
 import { desktopBridge } from "./desktop.ts";
-import { animationsPref, autosaveEvery, env as settingsEnv, autosavesKept, battleStepMs, batteryOn, dayMs, lensPatternsOn, livingPrefs, longPressMs, mapDetail, mapPower, onPrefs, setPref, textZoom, visionPref } from "./settings/prefs.ts";
+import { animationsPref, autosaveEvery, env as settingsEnv, autosavesKept, battleStepMs, batteryOn, dayMs, lensPatternsOn, livingPrefs, longPressMs, mapDetail, mapPower, onPrefs, pref, setPref, textZoom, visionPref } from "./settings/prefs.ts";
 import { bandPattern, lensRamp, lensSet, nationColours, PATTERN_COUNT, patternCss, rgbHex, shown, visionIndex, type Vision } from "./map/colourVision.ts";
-import { openSettingsAt, renderSettings, setHintsRows, setOwnSection } from "./ui/settingsScreen.ts";
+import { openSettingsAt, renderSettings, setHintsRows, setOwnSection, showRows } from "./ui/settingsScreen.ts";
 import { CloudApi, CloudError, cloudBase, desktopTokenStore, webKeyValue, webTokenStore } from "./cloud/api.ts";
 import { SteamSignIn } from "./cloud/steam.ts";
 import { CLOUD_PATH, CloudSync } from "./cloud/sync.ts";
@@ -143,6 +143,8 @@ import { capacitorBridge, noBridge, webBridge, type CapacitorLike } from "./clou
 import { APP_RETURN, StoreSignIn } from "./cloud/storeSignIn.ts";
 import { bindShareSheet, fetchSharedCopy, openError, shareSheetHtml, shareView, type ShareView } from "./cloud/share.ts";
 import { bindUnlock, Purchases, purchasesApi, shellStoreBridge, steamStoreBridge, unlockHtml } from "./cloud/purchases.ts";
+import { setTelemetryHooks, telemetry } from "./telemetry/install.ts";
+import { GAME_VERSION } from "./version.ts";
 
 const rules = loadDefaultRuleset();
 // ?engine=main-thread forces the fallback path, for testing it.
@@ -151,6 +153,8 @@ const forceMainThread = new URLSearchParams(location.search).get("engine") === "
 const previewMonth = Number(new URLSearchParams(location.search).get("month")) || 0;
 const previewDay = Number(new URLSearchParams(location.search).get("day")) || 15;
 const engine = new EngineClient({ forceMainThread });
+// The engine failing is a crash too: the worker dying, or a request that throws inside it.
+engine.onFailure = (kind, message, stack) => telemetry.crash(kind === "worker" ? "worker" : "error", message, stack);
 
 const diagnostics: Diagnostics = {
   runtime: detectRuntime(),
@@ -957,6 +961,7 @@ async function boot(): Promise<void> {
       if (i >= 0) view.lookAt(provinces[i]!.x!, provinces[i]!.y!, Math.max(view.camera.zoom, 4));
     },
     end: endTutorial,
+    step: (chapter, step) => telemetry.track("tutorial_step", { chapter, step }),
   });
 }
 
@@ -1459,12 +1464,12 @@ function restyleProvinces(): void {
 }
 
 // ---- overlay: nation names, cities, armies ----
-let nationLabels = computeNationLabels();
-
 /** How many of a realm's provinces, nearest its middle, its name may sit on. */
 const LABEL_ANCHORS = 6;
 /** The smallest realm name drawn, in pixels. */
 const LABEL_MIN_PX = 9;
+// After the constants it reads: unbundled (the dev server) a const is not there before its line runs.
+let nationLabels = computeNationLabels();
 
 function computeNationLabels() {
   const acc = nations.map(() => ({ x: 0, y: 0, n: 0, ref: -1, owned: [] as number[] }));
@@ -3742,6 +3747,7 @@ function watchEnding(): void {
   const key = `${e.kind}/${e.date}/${e.realm}`;
   if (key === endShown) return;
   endShown = key;
+  telemetry.track("campaign_ended", { realm: nations[snapshot!.playerNation]!.id, kind: e.kind, turn: snapshot!.turn, year: snapshot!.date.year });
   // Alerts over the map would cover the end card; everything they said is in the Dispatches.
   clearAlerts();
   endView = true;
@@ -7575,6 +7581,7 @@ async function startGame(nation: string, picked: NewGameChoices, seed = Date.now
   mapSent = true;
   // One new game is one campaign (SAVE-012); ironman is chosen here and kept (SAVE-086), the rules travel in every save (SETUP-055).
   campaign = newCampaign(new Rng(Date.now() >>> 0), { playerNation: nation, nationName: name, ironman: picked.ironman, options: campaignOptionsOf(picked) });
+  telemetry.track("campaign_started", { realm: nation, ironman: picked.ironman, difficulty: String(picked.difficulty), tutorial: coach.running });
   enterGame(snap);
 }
 
@@ -7844,7 +7851,15 @@ async function endTurn(): Promise<void> {
   renderPanel();
   renderActions();
   renderDiagnostics();
+  turnEnded();
   afterWeekInAuto();
+}
+
+/** Where players stop (usage statistics): every week of the first season, then one week in thirteen, so a long campaign sends a few hundred, not thousands. */
+function turnEnded(): void {
+  const s = snapshot!;
+  if (s.turn > 12 && s.turn % 13) return;
+  telemetry.track("turn_ended", { turn: s.turn, year: s.date.year, realm: nations[s.playerNation]!.id, auto: auto.state === "on", ironman: !!campaign?.ironman });
 }
 
 /** The player's armies on the march, by id. */
@@ -7972,7 +7987,6 @@ const savePlatform: SavePlatform = runtimeNow === "capacitor-ios" ? "ios" : runt
 const DEVICE = desktop?.steamDeck ? "Steam Deck" : { ios: "iPhone", android: "Android", desktop: "Desktop", web: "Browser" }[savePlatform];
 /** How this device names itself to the server: the platform `steam` while Steam runs (SAVE-142). */
 const SERVER_DEVICE = { name: DEVICE, platform: desktop?.steam ? "steam" : savePlatform };
-const GAME_VERSION = "0.1.0";
 const SM = savesConfig.messages;
 
 /**
@@ -8103,6 +8117,11 @@ async function refreshSaves(): Promise<void> {
 // ?new skips it for anyone.
 const startParams = new URLSearchParams(location.search);
 let startOn = !startParams.has("new") && !(navigator.webdriver && !startParams.has("start"));
+// Crash reports say what was open; statistics name the account only while signed in (the privacy page).
+setTelemetryHooks({
+  account: () => cloud?.api.account?.id,
+  where: () => shell.view ?? (startOn ? "start" : coach.running ? "tutorial" : snapshot ? "map" : "loading"),
+});
 const startEl = document.createElement("div");
 startEl.className = "start-screen";
 startEl.hidden = true;
@@ -8143,11 +8162,12 @@ function showStart(): void {
         .join("")}</div>
     </div>
     ${startMore ? startMoreHtml() : ""}
-    ${startAsk ? startAskHtml() : ""}
+    ${startAsk ? startAskHtml() : consentAsked() ? startConsentHtml() : ""}
     <span class="start-version">v${GAME_VERSION}</span>`;
   startEl.hidden = false;
   document.body.classList.add("starting");
-  startEl.querySelector<HTMLButtonElement>(".start-play")!.focus({ preventScroll: true });
+  // The consent card takes the focus while it waits for an answer, so a controller or keyboard answers it first.
+  (startEl.querySelector<HTMLButtonElement>(".start-consent button") ?? startEl.querySelector<HTMLButtonElement>(".start-play")!).focus({ preventScroll: true });
   panStart(cont ? cont.entry.header.playerNation : SHELL_RULES.start.regions[Math.floor(Math.random() * SHELL_RULES.start.regions.length)]!);
 }
 
@@ -8172,6 +8192,38 @@ function startAskHtml(): string {
     ${q.choices.map((c) => `<button class="${c === q.focus ? "wax" : "paper"}" data-start="ask" data-choice="${esc(c)}"><b>${esc(c)}</b><small>${esc(notes[c] ?? "")}</small></button>`).join("")}
   </div>`;
 }
+
+/**
+ * The consent card (SHELL-014, SET-010, SET-114): in a build that can send
+ * anything, one card over the start screen asks for crash reports and usage
+ * statistics together, both off until the player says yes, and does not come
+ * back once answered. The Privacy rows in Settings change either later.
+ */
+function consentAsked(): boolean {
+  return telemetry.available && (pref("privacy.crash_reports") === "ask" || pref("privacy.usage_stats") === "ask");
+}
+
+function startConsentHtml(): string {
+  const choices: [string, string, string][] = [
+    ["both", "Send both", "Crash reports, and anonymous records of play such as a turn ending"],
+    ["crashes", "Crash reports only", "What failed and where, when the game breaks"],
+    ["none", "No thanks", "Nothing is sent"],
+  ];
+  return `<div class="start-more start-ask start-consent framed" role="dialog" aria-label="Help us improve">
+    <header><h2 class="ribbon">Help us improve</h2></header>
+    <p>May the game tell us when it breaks, and how it is played? Nothing holds your name or email, and you can change this in Settings, under Privacy.</p>
+    ${choices.map(([v, name, note], i) => `<button class="${i === 0 ? "wax" : "paper"}" data-start="consent" data-choice="${v}"><b>${esc(name)}</b><small>${esc(note)}</small></button>`).join("")}
+    ${cloudUrl ? `<a class="paper-link" href="${esc(cloudUrl)}/privacy" target="_blank" rel="noopener">What is sent</a>` : ""}
+  </div>`;
+}
+
+function answerConsent(choice: string): void {
+  setPref("privacy.crash_reports", choice !== "none");
+  setPref("privacy.usage_stats", choice === "both");
+  showStart();
+}
+
+if (telemetry.available) showRows("privacy.crash_reports", "privacy.usage_stats");
 
 const FIRST_LAUNCH_KEY = "ph-first-launch-asked";
 function firstLaunchAsked(): boolean {
@@ -8254,7 +8306,7 @@ startEl.addEventListener("click", (e) => {
     }
     hideStart();
     renderPanel();
-  } else if (what === "ask") answerFirstLaunch(b.dataset.choice!); else if (what === "load") openShell("load", true);
+  } else if (what === "ask") answerFirstLaunch(b.dataset.choice!); else if (what === "consent") answerConsent(b.dataset.choice!); else if (what === "load") openShell("load", true);
   else if (what === "unlock") {
     startMore = false;
     openUnlock();
@@ -8712,6 +8764,7 @@ async function loadSave(path: string, acceptModified = false, keepCurrent = true
   campaign = { campaignId: h.campaignId, playerNation: h.playerNation, nationName: nationNameOf(h.playerNation), ironman: h.ironman, options: h.options, modified: h.modified || acceptModified, playSeconds: h.playSeconds, ...(h.sharedFrom ? { sharedFrom: h.sharedFrom } : {}), ...(h.kind === "ironman" ? { ironmanHead: h.saveId } : {}) };
   closeShell();
   enterGame(r.snapshot);
+  telemetry.track("campaign_loaded", { realm: h.playerNation, turn: r.snapshot.turn, kind: h.kind });
   // Loading an earlier point makes it where the player left off; an ironman save already is.
   if (h.kind !== "resume" && h.kind !== "ironman") void writeGameSave("resume");
 }

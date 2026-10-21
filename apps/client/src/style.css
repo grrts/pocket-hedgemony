@@ -7938,6 +7938,18 @@ p.fear.threatened {
   opacity: 0.85;
 }
 
+/* The consent card (SHELL-014): the same frame, a short paragraph above the three answers. */
+/* On a phone the card scrolls rather than squeezing its answers. */
+.start-consent > * {
+  flex-shrink: 0;
+}
+
+.start-consent p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.3;
+}
+
 /* ---- The tutorial "Murad's Frontier" (onboarding TUT-131 … TUT-134, D-TUT-19) ----
    One parchment note with the Grand Vizier's label and the step counter, placed like the hints'
    note so it never covers what it points at; a spotlight that takes no taps rings the thing to tap
