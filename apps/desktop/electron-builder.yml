@@ -1,0 +1,89 @@
+# Packaging the desktop game with electron-builder (docs/steam.md "Packaging").
+#
+# `pnpm --filter @ph/desktop package` makes a plain folder for this OS (what a
+# Steam depot takes), `dist` the installers, `dist:steam` the store folder with
+# the Steam app id built in. scripts/package.mjs runs electron-builder.
+#
+# productName names the userData folder, "Pocket Hegemony", where the saves and
+# Steam Auto-Cloud live (SAVE-144, SAVE-145): do not change it.
+appId: com.pockethegemony.app
+productName: Pocket Hegemony
+
+directories:
+  output: release
+  buildResources: build
+
+# Not the package name: "@ph/desktop" would make a folder of the file name.
+artifactName: pocket-hegemony-${version}-${os}-${arch}.${ext}
+
+# The main process and preload; the client build goes in as a resource.
+files:
+  - package.json
+  - src/**
+  - "!**/node_modules/{@types,undici-types}/**"
+  - "!**/node_modules/steamworks.js/*.d.ts"
+  - "!**/node_modules/steamworks.js/README.md"
+  - "!**/node_modules/steamworks.js/dist/**/*.lib"
+
+# apps/client/dist, found by main.mjs at `process.resourcesPath/client`.
+extraResources:
+  - from: ../client/dist
+    to: client
+    filter: ["**/*"]
+
+asar: true
+# steamworks.js loads its .node file, and that loads libsteam_api next to it:
+# both have to be real files on disk, outside app.asar.
+asarUnpack:
+  - "**/node_modules/steamworks.js/dist/**"
+
+# Steam updates the game: no electron-updater feed.
+publish: null
+
+# steamworks.js ships prebuilt Node-API binaries: nothing to rebuild.
+npmRebuild: false
+nodeGypRebuild: false
+
+win:
+  target:
+    - nsis
+    - zip
+  # Unsigned until CSC_LINK and CSC_KEY_PASSWORD are set (docs/steam.md).
+  # Only this OS's Steamworks binaries (a platform list replaces the include, so it is repeated).
+  files:
+    - package.json
+    - src/**
+    - "!**/node_modules/steamworks.js/dist/{linux64,osx}/**"
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+
+mac:
+  category: public.app-category.strategy-games
+  target:
+    - dmg
+    - zip
+  hardenedRuntime: true
+  entitlements: build/entitlements.mac.plist
+  entitlementsInherit: build/entitlements.mac.plist
+  # Signed and notarized only when CSC_LINK (or a keychain identity) and the
+  # APPLE_* variables are set; without them the build is unsigned.
+  # Only this OS's Steamworks binaries (a platform list replaces the include, so it is repeated).
+  files:
+    - package.json
+    - src/**
+    - "!**/node_modules/steamworks.js/dist/{linux64,win64}/**"
+
+linux:
+  target:
+    - tar.gz
+    - AppImage
+  category: Game
+  executableName: pocket-hegemony
+  synopsis: A turn-based, 8-bit grand strategy game
+  # Only this OS's Steamworks binaries (a platform list replaces the include, so it is repeated).
+  files:
+    - package.json
+    - src/**
+    - "!**/node_modules/steamworks.js/dist/{win64,osx}/**"

@@ -1192,8 +1192,10 @@ Then("they go through the scheduler in step with the animation", (s) => {
 const AUDIO_FILE = /\.(mp3|wav|ogg|oga|m4a|aac|flac|opus|caf|aiff?)$/i;
 function audioFiles(dir: string, out: string[] = []): string[] {
   for (const name of readdirSync(dir)) {
-    if (name === "node_modules" || name.startsWith(".") || name === "dist") continue;
+    if (name === "node_modules" || name.startsWith(".") || name === "dist" || name === "release") continue;
     const full = join(dir, name);
+    // The phone projects' copy of the client build (`pnpm --filter @ph/mobile sync`, not in git).
+    if (name === "public" && full.includes("/apps/mobile/")) continue;
     const st = statSync(full);
     if (st.isDirectory()) audioFiles(full, out);
     else if (AUDIO_FILE.test(name)) out.push(full);

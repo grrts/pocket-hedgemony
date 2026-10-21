@@ -1,6 +1,7 @@
 {
   "name": "@ph/desktop",
   "productName": "Pocket Hegemony",
+  "description": "A turn-based, 8-bit grand strategy game, starting in spring 1444.",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -9,12 +10,16 @@
     "start": "electron .",
     "steam": "electron . --steam-app-id=480",
     "smoke": "PH_SMOKE=1 electron . --no-sandbox",
-    "test": "node --test \"test/*.test.mjs\""
+    "test": "node --test \"test/*.test.mjs\"",
+    "package": "node scripts/package.mjs --dir",
+    "dist": "node scripts/package.mjs",
+    "dist:steam": "node scripts/package.mjs --steam"
   },
   "optionalDependencies": {
     "steamworks.js": "0.4.0"
   },
   "devDependencies": {
-    "electron": "44.7.2"
+    "electron": "44.7.2",
+    "electron-builder": "26.18.0"
   }
 }

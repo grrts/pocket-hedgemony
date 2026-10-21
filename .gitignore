@@ -1,11 +1,10 @@
 node_modules/
 dist/
 out/
+apps/desktop/release/
 *.log
 .DS_Store
 .vite/
-apps/mobile/android/
-apps/mobile/ios/
 server/var/
 server/vendor/
 server/.env.local
