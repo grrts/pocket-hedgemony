@@ -35,6 +35,15 @@ parameters:
     env(GOOGLE_PLAY_PRODUCT_ID): 'full_game'
     env(GOOGLE_PUBSUB_PUSH_TOKEN): ''
     env(SAVES_DIR): '%kernel.project_dir%/var/saves/%kernel.environment%'
+    # S3-compatible storage for save bytes (docs/deploy.md); empty S3_BUCKET keeps them in SAVES_DIR.
+    env(S3_BUCKET): ''
+    env(S3_PREFIX): ''
+    env(S3_REGION): ''
+    env(S3_ENDPOINT): ''
+    env(S3_ACCESS_KEY_ID): ''
+    env(S3_SECRET_ACCESS_KEY): ''
+    env(S3_PATH_STYLE): '0'
+    env(TRUSTED_PROXIES): ''
 
 framework:
     rate_limiter:

@@ -22,7 +22,19 @@ services:
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
+    # Where save bytes live: S3-compatible storage once S3_BUCKET is set, else SAVES_DIR (App\Saves\SaveObjectsFactory).
+    App\Saves\SaveObjects:
+        factory: ['@App\Saves\SaveObjectsFactory', 'create']
+
+    # Website sessions in the database (config/packages/framework.yaml). Its own connection, not
+    # Doctrine's, because the handler holds a transaction open while a request reads the session.
+    Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler:
+        arguments:
+            - '%env(resolve:DATABASE_URL)%'
+            - { db_table: sessions }
+
 when@test:
     services:
         App\Tests\SteamMock: ~
         App\Tests\StoreMock: ~
+

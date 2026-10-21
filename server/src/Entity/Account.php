@@ -33,7 +33,7 @@ class Account implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * Roles beyond ROLE_PLAYER, such as ROLE_MODERATOR (granted by app:community:moderator).
-     * Nullable so adding the column to a filled table needs nothing but doctrine:schema:update.
+     * Nullable so adding the column to a filled table needs no default.
      *
      * @var list<string>|null
      */
