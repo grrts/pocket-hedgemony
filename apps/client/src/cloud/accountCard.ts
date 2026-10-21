@@ -13,8 +13,9 @@ import type { CloudSync } from "./sync.ts";
  * overview), Sign-ins with Add buttons (SAVE-147, SAVE-156), Remove on each
  * while there are two or more (SAVE-195), the question whether to combine
  * when an Add brings another account's sign-in (SAVE-194), Storage, Devices
- * with Sign out on each, Shared saves with Remove on each (SAVE-135), and Sign
- * out. Sync on Wi-Fi only joins when it is built.
+ * with Sign out on each, Shared saves with Remove on each (SAVE-135), Sign
+ * out, and at the very bottom Delete account, which asks first and names
+ * what goes (SAVE-205). Sync on Wi-Fi only joins when it is built.
  */
 
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
@@ -37,6 +38,28 @@ export interface AccountView {
 }
 
 export const accountView = (): AccountView => ({ form: "sign_in", email: "", busy: false, error: "", card: undefined, cardError: "", confirm: "", shared: undefined, notice: "" });
+
+/** The line the signed-out card shows once the account is deleted (SAVE-206). */
+export const DELETED = "The account is deleted. The saves on this device stay.";
+
+const plural = (n: number, one: string) => `${n} ${one}${n === 1 ? "" : "s"}`;
+
+/**
+ * Delete account's question, in the card in place of the button (SAVE-205,
+ * SAVE-207): what goes, read from Storage and the Shared saves row, and what
+ * stays. Offline it waits for a connection (SAVE-206).
+ */
+export function deleteHtml(name: string, saves: number | undefined, shared: number | undefined, offline: boolean, busy: boolean): string {
+  const goes = [saves === undefined ? "Its cloud saves" : `Its ${plural(saves, "cloud save")}`, shared ? plural(shared, "shared save") : ""].filter(Boolean).join(" and ");
+  return `<div class="cloud-delete" role="group" aria-label="Delete account">
+    <p><b>Delete the account "${esc(name)}"?</b> ${esc(goes)} ${saves === 1 && !shared ? "is" : "are"} deleted, and every device is signed out.</p>
+    <p>The saves on this device stay. Purchases stay with the store: Restore purchases unlocks the full game again.</p>
+    <p><b>This cannot be undone.</b></p>
+    ${offline ? `<p class="note" role="status">Connect to delete the account.</p>` : ""}
+    <button class="wax cloud-delete-yes" data-cloud-delete${busy || offline ? " disabled" : ""}>Delete account</button>
+    <button class="paper cloud-delete-no" data-cloud-cancel>Keep</button>
+  </div>`;
+}
 
 const times = (n: number) => `Played ${n} time${n === 1 ? "" : "s"}`;
 
@@ -115,6 +138,7 @@ export function accountHtml(sync: CloudSync, v: AccountView, now = Date.now(), s
       <p class="hint">Or use email instead:</p>`
         : "";
     return `<div class="cloud-card">
+      ${v.notice ? `<p class="note cloud-notice" role="status">${esc(v.notice)}</p>` : ""}
       <p class="hint">Sign in to keep your saves on every device. The game plays fully without an account.</p>
       ${steamPart}
       ${error}
@@ -178,6 +202,11 @@ export function accountHtml(sync: CloudSync, v: AccountView, now = Date.now(), s
       )
       .join("")}
     <button class="paper cloud-sign-out" data-cloud-sign-out${v.busy ? " disabled" : ""}>Sign out of this device</button>
+    ${
+      v.confirm === "delete-account"
+        ? deleteHtml(api.account?.displayName ?? "", u?.saves, v.shared?.length, state === "offline", v.busy)
+        : `<button class="paper cloud-delete-ask" data-cloud-ask="delete-account"${v.busy ? " disabled" : ""}>Delete account</button>`
+    }
   </div>`;
 }
 
@@ -314,6 +343,17 @@ export function bindAccount(card: HTMLElement, sync: CloudSync, v: AccountView, 
         v.shared = v.shared?.filter((s) => s.code !== b.dataset.cloudUnshare);
       }),
     ),
+  );
+  // Deleting the account (SAVE-198, SAVE-206): the server deletes it, this device signs out and keeps its own saves.
+  card.querySelector("[data-cloud-delete]")?.addEventListener("click", () =>
+    void act(async () => {
+      await api.deleteAccount();
+      v.confirm = "";
+      v.card = undefined;
+      v.shared = undefined;
+      v.form = "sign_in";
+      v.notice = DELETED;
+    }),
   );
   card.querySelector("[data-cloud-sign-out]")?.addEventListener("click", () =>
     void act(async () => {

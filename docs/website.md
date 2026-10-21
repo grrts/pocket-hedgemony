@@ -73,13 +73,7 @@ php -S localhost:8000 -t public   # http://localhost:8000/wiki
 php bin/phpunit
 ```
 
-The site is part of the same Symfony app as the API, so it deploys with it: point the web server's document root at `server/public/`. After deploying a version that changes the entities (the community added its tables and an `account.roles` column), update the database schema; there are no migrations:
-
-```sh
-php bin/console doctrine:schema:update --force
-```
-
-Sessions are files in `server/var/sessions/`, and the rate limits are kept in the app cache (`server/var/cache/`), so the web server needs to write there. Settings in `server/.env.local`:
+The site is part of the same Symfony app as the API, so it deploys with it, migrations and all: [deploy.md](deploy.md). Sessions sit in the database's `sessions` table and the rate limits in its `cache_items` table, so any number of app servers share them. The website's own settings:
 
 | Setting | What it does |
 |---|---|

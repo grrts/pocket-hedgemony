@@ -2,7 +2,9 @@
 
 namespace App\Tests;
 
+use App\Account\AppleTokens;
 use App\Account\IdToken\AppleIdTokens;
+use App\Purchases\Apple\AppleJws;
 use App\Account\IdToken\GoogleIdTokens;
 use App\Account\Steam\SteamOpenId;
 use App\Account\Steam\SteamWebApi;
@@ -18,6 +20,12 @@ final class StoreMock
     /** @var list<array{string, string}> every call made, for the tests to look at */
     public static array $calls = [];
 
+    /** @var list<array<string, string>> the bodies of the calls to Apple's token and revoke endpoints (SAVE-203, SAVE-204) */
+    public static array $apple = [];
+
+    /** While true, Apple's revoke endpoint fails. */
+    public static bool $appleDown = false;
+
     public function __invoke(string $method, string $url, array $options = []): MockResponse
     {
         self::$calls[] = [$method, $url];
@@ -27,6 +35,9 @@ final class StoreMock
         }
         if (str_starts_with($url, SteamWebApi::URL)) {
             return (new SteamMock())($method, $url);
+        }
+        if (AppleTokens::TOKEN === $url || AppleTokens::REVOKE === $url) {
+            return self::apple($url, self::form($options['body'] ?? ''));
         }
         if (AppleIdTokens::KEYS === $url) {
             return self::json(TestKeys::jwks('apple-1'));
@@ -41,6 +52,27 @@ final class StoreMock
             return new MockResponse("ns:http://specs.openid.net/auth/2.0\nis_valid:".($valid ? 'true' : 'false')."\n");
         }
         throw new \LogicException("Unexpected HTTP call in a test: {$method} {$url}");
+    }
+
+    /** Apple's token and revoke endpoints: the client secret must be signed with the server's key for its client id. */
+    private static function apple(string $url, array $body): MockResponse
+    {
+        self::$apple[] = ['url' => $url] + $body;
+        [$h, $p, $sig] = explode('.', $body['client_secret'] ?? '..') + ['', '', ''];
+        $claims = json_decode((string) base64_decode(strtr($p, '-_', '+/')), true) ?? [];
+        $public = openssl_pkey_get_details(StoreKeys::appleSignInKey())['key'];
+        $signed = 1 === openssl_verify($h.'.'.$p, AppleJws::derSignature((string) base64_decode(strtr($sig, '-_', '+/'))), $public, \OPENSSL_ALGO_SHA256);
+        if (!$signed || 'TEAM123456' !== ($claims['iss'] ?? null) || ($claims['sub'] ?? null) !== ($body['client_id'] ?? '')) {
+            return new MockResponse('{"error":"invalid_client"}', ['http_code' => 400]);
+        }
+        if (AppleTokens::REVOKE === $url) {
+            return new MockResponse('', ['http_code' => self::$appleDown ? 503 : 200]);
+        }
+        if ('apple-code-good' !== ($body['code'] ?? null)) {
+            return new MockResponse('{"error":"invalid_grant"}', ['http_code' => 400]);
+        }
+
+        return self::json(['access_token' => 'a', 'token_type' => 'Bearer', 'expires_in' => 3600, 'refresh_token' => 'apple-refresh-1', 'id_token' => 'x']);
     }
 
     private static function json(array $data): MockResponse

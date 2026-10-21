@@ -11,6 +11,8 @@ use Doctrine\ORM\Mapping as ORM;
  * kept as one row per account and store. The store reference (SteamID and app id, Apple's original
  * transaction id, Google's order id) belongs to one account only, so one purchase is never claimed twice.
  * Cross-buy is per store: a row unlocks the full game only on its own store (SAVE-170).
+ * When its account is deleted the row stays as the record of the sale, with no account (SAVE-199),
+ * until a new account restores the purchase and takes it (SAVE-202).
  */
 #[ORM\Entity(repositoryClass: EntitlementRepository::class)]
 #[ORM\UniqueConstraint(name: 'uniq_entitlement_account_store', fields: ['account', 'store'])]
@@ -33,8 +35,8 @@ class Entitlement
     private ?int $id = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-    private Account $account;
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?Account $account;
 
     #[ORM\Column(length: 16)]
     private string $store;
@@ -73,9 +75,16 @@ class Entitlement
         $this->lastCheckedAt = $now;
     }
 
-    public function getAccount(): Account
+    /** Null once the account was deleted: the purchase record that stays (SAVE-199). */
+    public function getAccount(): ?Account
     {
         return $this->account;
+    }
+
+    /** A purchase record without an account goes to the account that restores the purchase (SAVE-202). */
+    public function claim(Account $account): void
+    {
+        $this->account = $account;
     }
 
     public function getStore(): string
