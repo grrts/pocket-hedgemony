@@ -60,6 +60,10 @@ Between the 1378 start and 1444, the West meets its history as 54 events. Like e
 
 Deaths, child kings and the Emperor come from the game itself: an event that needs "the king has died" waits until the realm's ruler really changes. A campaign that starts in 1444 counts these events as history already, with their historical choice, so it plays as before. Some 1444 events now need them: the end of the Hundred Years' War needs Agincourt or Troyes first, the Wars of the Roses need Richard II's fall, and the union of Castile and Aragon needs Caspe.
 
+### From 1378 to 1444: Asia, Africa and the Americas
+
+Between the 1378 start and 1444 about a hundred events carry the south's history: Timur's sack of Delhi and the breakup of the Delhi sultanate, the Ming taking Yunnan and beating the Mongols at Buir Lake, Joseon's founding, Japan's two courts reunited, the treasure voyages, the Ming conquest of Đại Việt and the Lam Sơn uprising, Malacca founded after Singapura falls, Ayutthaya sacking Angkor, Songhai breaking from Mali, Kongo and Mutapa founded, the Tuareg taking Timbuktu, the Tepanec war that makes the Triple Alliance, the fall of Mayapan and the Inca's Chanka war. None of them waits for its year. Each happens when the reason it had in history holds: Delhi falls apart once Firuz Shah is dead and his heirs fight, the Inca expand once they have beaten the Chanka, and the Triple Alliance rises once Maxtla turns on the Mexica. If the reason never comes, neither does the event. A campaign that starts in 1444 finds them fought as history had them.
+
 ### Everyday events
 
 Between the great events, your own realm asks for small choices. About every two to four months something happens to your officials, lords, family, stores or one of your provinces, and an event card asks what you will do. No new one comes while another card waits for your answer, so they never pile up, and the same event never comes to you twice within 20 years. Officials, lords and commanders die of their age, in battle or by an event, never by a roll of their own here: when one of yours dies, his card comes in place of the next one.

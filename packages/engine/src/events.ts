@@ -3,6 +3,7 @@ import bridge from "../../rules/data/domain/events-places.json" with { type: "js
 import rules from "../../rules/data/domain/events.json" with { type: "json" };
 import geography from "../../rules/data/domain/exploration-regions.json" with { type: "json" };
 import west from "../../rules/data/domain/events-bridge-west.json" with { type: "json" };
+import bridgeSouth from "../../rules/data/domain/events-bridge-south.json" with { type: "json" };
 import lordEvents from "../../rules/data/domain/events-bridge-lords.json" with { type: "json" };
 import sequels from "../../rules/data/domain/events-ambitions.json" with { type: "json" };
 import setup from "../../rules/data/domain/scenario-setup.json" with { type: "json" };
@@ -36,7 +37,7 @@ import { heritageStates } from "./domain/national-strengths/index.ts";
 type Campaign = Pick<evt.Tree, "ages" | "periods" | "events" | "modifiers" | "localization"> & { entities: Record<string, string> };
 /** A region's bridge events of 1378 to 1444, with the places, names and words they bring (EVT-085). */
 type Bridge = { events: Record<string, evt.EventDef>; places: Record<string, string[]>; entities: Record<string, string>; localization: Record<string, string> };
-const BRIDGES = [west, lordEvents] as unknown as Bridge[];
+const BRIDGES = [west, bridgeSouth, lordEvents] as unknown as Bridge[];
 /** Events that follow a realm's fulfilled ambition (HER-093). */
 const SEQUELS = sequels as unknown as Pick<Bridge, "events" | "localization">;
 const base = campaign as unknown as Campaign;
