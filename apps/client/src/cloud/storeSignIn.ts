@@ -124,7 +124,7 @@ export class StoreSignIn {
       let name: string | undefined;
       if (store === "apple") {
         const r = await this.bridge.apple(hash);
-        proof = { appleIdentityToken: r.identityToken, nonce };
+        proof = { appleIdentityToken: r.identityToken, nonce, ...(r.authorizationCode ? { appleAuthorizationCode: r.authorizationCode } : {}) };
         name = r.name;
       } else {
         const r = await this.bridge.google(hash);

@@ -124,7 +124,7 @@ export interface DeviceRow {
  * ID token with the nonce whose SHA-256 the store signed into it, or the one-time code Steam in the
  * browser came back with.
  */
-export type StoreProof = { appleIdentityToken: string; nonce: string } | { googleIdToken: string; nonce: string } | { steamOpenIdCode: string };
+export type StoreProof = { appleIdentityToken: string; nonce: string; appleAuthorizationCode?: string } | { googleIdToken: string; nonce: string } | { steamOpenIdCode: string };
 
 export interface AccountCard extends AccountInfo {
   signIns: { provider: string; label: string }[];

@@ -13,12 +13,15 @@ use App\Entity\PostReport;
 use App\Entity\SharedSave;
 use App\Entity\Topic;
 use App\Tests\SaveBuilder;
+use App\Account\AppleTokens;
 use App\Tests\StoreKeys;
+use App\Tests\StoreMock;
+use App\Tests\TestKeys;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Uid\Uuid;
 
 /**
- * Deleting the account: domain/saves/features/delete-account.feature (SAVE-198 … SAVE-202). "Leroy" signs
+ * Deleting the account: domain/saves/features/delete-account.feature (SAVE-198 … SAVE-204). "Leroy" signs
  * in with Steam on the Deck and with email on the phone, keeps cloud saves, shares one, buys the full game
  * on the App Store and writes in the community; then deletes the account.
  */
@@ -28,6 +31,25 @@ final class DeleteAccountTest extends StoreTestCase
     {
         parent::setUp();
         (new Filesystem())->remove($this->savesDir());
+        StoreMock::$apple = [];
+        StoreMock::$appleDown = false;
+    }
+
+    /** Signs in with Apple on an iPhone, with Apple's authorization code; returns the access token and the account id. */
+    private function applePlayer(string $code = 'apple-code-good'): array
+    {
+        $nonce = 'nonce-from-the-game-0001';
+        $token = TestKeys::token(TestKeys::apple('001234.abcd', $nonce, $this->clock->now()->getTimestamp()), 'apple-1');
+        $r = $this->call('POST', '/api/sessions', ['appleIdentityToken' => $token, 'nonce' => $nonce, 'appleAuthorizationCode' => $code, 'device' => ['name' => 'iPhone', 'platform' => 'ios']]);
+        self::assertResponseIsSuccessful();
+
+        return [$r['accessToken'], $r['account']['id']];
+    }
+
+    /** @return list<string> the calls made to Apple's token and revoke endpoints, as "token <client id>" or "revoke <token>" */
+    private static function appleCalls(): array
+    {
+        return array_map(fn (array $c) => AppleTokens::TOKEN === $c['url'] ? 'token '.$c['client_id'] : 'revoke '.$c['token'], StoreMock::$apple);
     }
 
     private function savesDir(): string
@@ -199,5 +221,52 @@ final class DeleteAccountTest extends StoreTestCase
         self::assertResponseIsSuccessful();
         self::assertSame('2000000999', $this->row($id, 'apple')->getReference());
         self::assertSame(2, $this->rows(Entitlement::class), 'the old record stays as it was');
+    }
+
+    public function testSignInWithAppleKeepsAppleTokenAndDeletingRevokesIt(): void
+    {
+        [$token, $id] = $this->applePlayer();
+        self::assertSame(['token com.pockethegemony.app'], self::appleCalls());
+        $identity = $this->em->getRepository(Identity::class)->findOneBy(['provider' => 'apple']);
+        self::assertSame('apple-refresh-1', $identity->getAppleRefreshToken());
+
+        $this->call('DELETE', '/api/account', null, $token);
+        self::assertResponseStatusCodeSame(204);
+        self::assertSame(['token com.pockethegemony.app', 'revoke apple-refresh-1'], self::appleCalls());
+        $this->em->clear();
+        self::assertNull($this->em->find(Account::class, $id));
+    }
+
+    public function testTheAccountIsDeletedEvenWhenAppleCannotBeReached(): void
+    {
+        [$token, $id] = $this->applePlayer();
+        StoreMock::$appleDown = true;
+
+        $this->call('DELETE', '/api/account', null, $token);
+        self::assertResponseStatusCodeSame(204);
+        $this->em->clear();
+        self::assertNull($this->em->find(Account::class, $id));
+    }
+
+    public function testACodeAppleRefusesStillSignsIn(): void
+    {
+        [$token] = $this->applePlayer('apple-code-bad');
+        self::assertNull($this->em->getRepository(Identity::class)->findOneBy(['provider' => 'apple'])->getAppleRefreshToken());
+
+        // Nothing to revoke: the account goes all the same, with no call to Apple's revoke.
+        $this->call('DELETE', '/api/account', null, $token);
+        self::assertResponseStatusCodeSame(204);
+        self::assertSame(['token com.pockethegemony.app'], self::appleCalls());
+    }
+
+    public function testRemovingTheAppleSignInRevokesItsToken(): void
+    {
+        [$token] = $this->applePlayer();
+        $this->call('POST', '/api/account/sign-ins', ['email' => 'leroy@example.org', 'password' => 'correct horse'], $token);
+        self::assertResponseStatusCodeSame(201);
+
+        $this->call('DELETE', '/api/account/sign-ins/apple', null, $token);
+        self::assertResponseIsSuccessful();
+        self::assertSame(['token com.pockethegemony.app', 'revoke apple-refresh-1'], self::appleCalls());
     }
 }

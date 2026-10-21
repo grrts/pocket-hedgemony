@@ -24,7 +24,7 @@ use Symfony\Component\Uid\Uuid;
 /**
  * Deleting an account (domain/saves SAVE-198 … SAVE-201, D-SAVE-25): its cloud saves, shared saves,
  * sign-ins and devices go in one transaction, and the bytes after it commits, so a failure leaves the
- * account whole. What stays names no one: the purchase records, without the account, and the community
+ * account whole; Apple's token for a Sign in with Apple is revoked first. What stays names no one: the purchase records, without the account, and the community
  * posts, under "Deleted player".
  */
 final class AccountDeletion
@@ -35,12 +35,18 @@ final class AccountDeletion
         private readonly CloudSaveRepository $saves,
         private readonly SharedSaveRepository $shared,
         private readonly SaveObjects $objects,
+        private readonly AppleTokens $apple,
     ) {
     }
 
     /** @return array<string, int> what went, by kind, for the log */
     public function delete(Account $account): array
     {
+        // Apple asks that the Sign in with Apple token goes with the account (SAVE-204); a refusal stops nothing.
+        $apple = $this->em->getRepository(Identity::class)->findOneBy(['account' => $account, 'provider' => Identity::APPLE]);
+        if (null !== $apple) {
+            $this->apple->revoke($apple);
+        }
         $keys = [];
         $gone = $this->em->wrapInTransaction(function () use ($account, &$keys) {
             return $this->remove($account, $keys);

@@ -20,6 +20,11 @@ parameters:
     env(STEAM_APP_ID): ''
     # Without these the sign-in answers "… is not available" (SAVE-154).
     env(APPLE_CLIENT_IDS): ''
+    # Sign in with Apple's key, for taking and revoking Apple's refresh token (SAVE-203, SAVE-204); off while empty.
+    env(APPLE_TEAM_ID): ''
+    env(APPLE_SIGN_IN_KEY_ID): ''
+    env(APPLE_SIGN_IN_KEY): ''
+    env(APPLE_SIGN_IN_REDIRECT_URI): ''
     env(GOOGLE_CLIENT_IDS): ''
     env(SIGN_IN_RETURN_URLS): ''
     # Purchases (purchases in saves.json; domain/saves SAVE-170 … SAVE-178, docs/purchases.md). A store
