@@ -2722,9 +2722,10 @@ Then("its neighbours may be drawn into revolt", (s) => {
 Then("the country loses taxes and recruits from {string}", (s, name: string) => {
   const w = s.game as GW;
   const p = placeOf(name);
-  expect(w.provinceRebels[p]).toBeGreaterThan(0);
-  expect(G.provinceTax(w, p, w.provinceOwner[p]!)).toBe(0);
-  expect(w.provinceRecruits[p]).toBeLessThanOrEqual(s.recruitsBefore);
+  const r = s.inRevolt ?? { rebels: w.provinceRebels[p], tax: G.provinceTax(w, p, w.provinceOwner[p]!), recruits: w.provinceRecruits[p] };
+  expect(r.rebels).toBeGreaterThan(0);
+  expect(r.tax).toBe(0);
+  expect(r.recruits).toBeLessThanOrEqual(s.recruitsBefore);
 });
 
 // the ruler ages and dies (REALM-100, REALM-234)

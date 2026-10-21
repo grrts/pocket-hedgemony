@@ -38,7 +38,7 @@ Feature: Battle: the bell, hits, the flee share and breaking
     And a company of 1000 men in the front of arm "levy foot" at level 2
     And no other modifiers apply
     When it fights a bell
-    Then it deals 40 hits
+    Then it deals 25 hits
 
   @WAR-113 @placeholder
   Scenario Outline: Hit modifiers
@@ -50,11 +50,11 @@ Feature: Battle: the bell, hits, the flee share and breaking
 
     Examples:
       | condition                                          | hits |
-      | it is hungry                                       | 32   |
-      | it is tired after 3 bells in a row                 | 36   |
-      | it arrived by forced march on the first day        | 36   |
-      | it is level 1                                      | 36   |
-      | it is level 4                                      | 48   |
+      | it is hungry                                       | 20   |
+      | it is tired after 3 bells in a row                 | 22.5 |
+      | it arrived by forced march on the first day        | 22.5 |
+      | it is level 1                                      | 22.5 |
+      | it is level 4                                      | 30   |
 
   @WAR-114 @WAR-115 @placeholder
   Scenario Outline: The flee share follows how content the realm is

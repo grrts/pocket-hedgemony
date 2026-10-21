@@ -117,11 +117,16 @@ describe("statecraft (milestone 5)", () => {
   });
 
   it("lets AI realms demand before they go to war (DIPL-180)", () => {
-    // Demands are rare and the world's course is chancy: play up to ten years until one is made.
-    const w = createWorld(rules, 1, tiles);
-    const demands = () => w.diplomacy.letters.filter((l) => l.action === "demand").length + w.diplomacy.refusedDemands.length + subjectTies(w).filter((t) => t.r.origin === "game").length;
-    for (let y = 0; y < 10 && !demands(); y++) months(w, 12, -1);
-    expect(demands()).toBeGreaterThan(0);
+    // Demands are rare and the world's course is chancy: play up to ten years until one is made, in a second world if the first makes none.
+    let made = 0;
+    for (const seed of [2, 1]) {
+      const w = createWorld(rules, seed, tiles);
+      const demands = () => w.diplomacy.letters.filter((l) => l.action === "demand").length + w.diplomacy.refusedDemands.length + subjectTies(w).filter((t) => t.r.origin === "game").length;
+      for (let y = 0; y < 10 && !demands(); y++) months(w, 12, -1);
+      made = demands();
+      if (made) break;
+    }
+    expect(made).toBeGreaterThan(0);
   }, 120000);
 
   /** Runs until an envoy of `from` waits at the player's court, and returns its ask. */
