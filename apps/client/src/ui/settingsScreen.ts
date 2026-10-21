@@ -69,6 +69,11 @@ export function setOwnSection(section: string, own: OwnSection): void {
   ownSections.set(section, own);
 }
 
+/** Rows that show only in some builds, such as the Privacy rows in a build with a server to send to (D-SET-22). */
+export function showRows(...ids: string[]): void {
+  for (const id of ids) BUILT.add(id);
+}
+
 const rowsOf = (section: string) => sectionRows(prefs, section, env).filter((id) => BUILT.has(id));
 const sections = () => prefs.cat.sections.filter((s) => ownSections.has(s) || rowsOf(s).length);
 const nameOf = (id: string) => STRINGS[`settings.${id}.name`] ?? id;
@@ -200,7 +205,9 @@ function rowHtml(id: string): string {
   if (def.type === "slider") {
     control = `<input type="range" min="${def.min}" max="${def.max}" step="${def.step ?? 5}" value="${v}" data-slide="${id}" aria-label="${esc(nameOf(id))}"${on ? "" : " disabled"}><output>${v} %</output>`;
   } else if (def.type === "toggle") {
-    control = `<button class="paper toggle${v ? " on" : ""}" data-set="${id}" data-v="${!v}" aria-pressed="${!!v}" data-sfx="${v ? "ui_toggle_off" : "ui_toggle_on"}">${v ? "On" : "Off"}</button>`;
+    // A consent row not answered yet ("ask") is off (SET-114).
+    const t = v === true;
+    control = `<button class="paper toggle${t ? " on" : ""}" data-set="${id}" data-v="${!t}" aria-pressed="${t}" data-sfx="${t ? "ui_toggle_off" : "ui_toggle_on"}">${t ? "On" : "Off"}</button>`;
   } else {
     control = `<div class="seg${optionsOf(def).length > 4 ? " many" : ""}" role="radiogroup" aria-label="${esc(nameOf(id))}">${optionsOf(def)
       .map((o) => `<button class="paper${o === v ? " on" : ""}" role="radio" aria-checked="${o === v}" data-set="${id}" data-v='${JSON.stringify(o)}'>${esc(label(prefs.cat, id, o))}</button>`)

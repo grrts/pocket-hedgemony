@@ -123,7 +123,7 @@ export type EngineResponse =
   | { id: number; type: "saved"; path: string; header: SaveHeader; bytes: Uint8Array; removed: string[]; ironmanHead?: string }
   /** A save that did not open, and why, in the player's words; `canAccept` when opening anyway is allowed. */
   | { id: number; type: "refused"; message: string; canAccept: boolean }
-  | { id: number; type: "error"; message: string };
+  | { id: number; type: "error"; message: string; stack?: string };
 
 /**
  * Read-only copy of the state the UI draws from. Arrays are fresh copies so
@@ -813,7 +813,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         }
       }
     } catch (e) {
-      return { response: { id: req.id, type: "error", message: e instanceof Error ? e.message : String(e) }, transfer: [] };
+      return { response: { id: req.id, type: "error", message: e instanceof Error ? e.message : String(e), ...(e instanceof Error && e.stack ? { stack: e.stack } : {}) }, transfer: [] };
     }
   }
 
