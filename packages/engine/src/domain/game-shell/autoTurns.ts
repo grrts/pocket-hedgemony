@@ -22,7 +22,8 @@ export type AutoStop =
   | "study"
   | "arrived"
   | "revolution"
-  | "new lands";
+  | "new lands"
+  | "chapter";
 
 export interface AutoTurns {
   state: AutoState;

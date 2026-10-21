@@ -386,8 +386,8 @@ export function oathAnswerCard(v: ShogunateView | null, ui: InstitutionsUi): str
 export const shogunateAsks = (v: ShogunateView | null): number => (v?.oath && !v.ended ? 1 : 0);
 
 /** INST-084: the Institutions map mode's key, each colour with its pattern in words. */
-export function institutionsKey(colours: Record<string, string>): string {
-  const sw = (k: (typeof INSTITUTIONS_KEY)[number]) => `<i class="swatch${k.pattern === "hatched" ? " hatched" : k.pattern === "seat mark" ? " seat" : k.pattern === "house border" ? " house" : ""}" style="background:${colours[k.colour] ?? "#ccc"}"></i>`;
+export function institutionsKey(colours: Record<string, string>, pattern: (colour: string) => string = () => ""): string {
+  const sw = (k: (typeof INSTITUTIONS_KEY)[number]) => `<i class="swatch${k.pattern === "hatched" ? " hatched" : k.pattern === "seat mark" ? " seat" : k.pattern === "house border" ? " house" : ""}" style="background:${colours[k.colour] ?? "#ccc"};${pattern(k.colour)}"></i>`;
   return `<div class="lens-key">
     ${INSTITUTIONS_KEY.map((k) => `<span>${sw(k)}${k.what} <small>(${k.colour}, ${k.pattern})</small></span>`).join("")}
     <p>Electors and the Shogun carry a crown mark when zoomed in; a dashed border and a pattern of small crosses set each great house of Japan apart. Tap a member for the Empire card, Japan for the Shogunate card.</p>

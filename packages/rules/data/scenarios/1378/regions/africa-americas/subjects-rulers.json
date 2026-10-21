@@ -1,0 +1,56 @@
+{
+ "$comment": "Rulers of the subjects above on 20 September 1378. From start-date/research/africa-americas.md and research/decisions.md; built by tools/domain-data/start-1378-africa-americas.py from the 1444 files.",
+ "rulers": {
+  "dotawo": {
+   "ruler": "King of Makuria at Daw",
+   "house": "Makurian royal house"
+  },
+  "hadiya": {
+   "ruler": "Garad of Hadiya",
+   "house": "Hadiya garads"
+  },
+  "hilali_sulaymi_arabs": {
+   "ruler": "Tribal shaykhs"
+  },
+  "kaabu": {
+   "ruler": "Kaabu Mansaba",
+   "house": "Nyancho"
+  },
+  "medri_bahri": {
+   "ruler": "Chiefs of Hamasien and Serae",
+   "house": "Highland chiefs"
+  },
+  "sine": {
+   "ruler": "Maad a Sinig",
+   "house": "Guelowar matrilineage"
+  },
+  "songhai": {
+   "ruler": "A Sunni of Kukiya",
+   "house": "Sunni (Sonni) dynasty"
+  },
+  "tenochtitlan": {
+   "ruler": "Tlatoani Acamapichtli",
+   "house": "Mexica royal house (Culhua descent)"
+  },
+  "timbuktu": {
+   "ruler": "Timbuktu-koi",
+   "house": "Appointed by Mali"
+  },
+  "tlatelolco": {
+   "ruler": "Tlatoani Cuacuauhpitzahuac",
+   "house": "Tepanec royal house"
+  },
+  "tripoli_regency": {
+   "ruler": "Lord of Tripoli",
+   "house": "Banu Ammar (to be checked)"
+  },
+  "tubu_teda": {
+   "ruler": "Clan heads",
+   "house": "Teda clans"
+  },
+  "walata": {
+   "ruler": "Farba of Walata",
+   "house": "Appointed by Mali"
+  }
+ }
+}

@@ -138,6 +138,13 @@ Newest decision first.
   central Asia in the current data), then the exploration system shall not give it the exploration unlock until the
   first age that starts later than the gating age and covers its region begins there: `age_of_atlantic_empires` for
   north_america, `age_of_reformations` for middle_east and central_asia (D-EXPL-3). [exploration §2]
+- EXPL-076: The age gate shall follow the event tree's own ages while the tree runs: a region's gate opens when its
+  opening age starts by its conditions (the Age of Exploration from 1415 when Portugal or Castile sails the ocean
+  ships, forced on in 1445; EVT-082) and stays open after it ends; only without the tree does the gate fall back to
+  the age's forced year. At a 1444 start Portugal and Castile know S4, so the gate opens at the start as before.
+  An age that starts later than the gating age (EXPL-004) is one whose window opens after the gating age's
+  forced start, so Gunpowder Empires, under way before it, never opens a gate.
+  [plan-1378 §3.1; D-EVT-19]
 - EXPL-005: If a country lacks the exploration unlock, then the exploration system shall not let it buy
   exploration ships (the caravel without S4, the voyaging canoe without S3); the age gate applies to S3 realms and
   their voyaging canoes too (D-EXPL-4, D-EXPL-18). [exploration §2; naval §3.2, §3.3]
@@ -545,3 +552,4 @@ provisional numbers in `exploration.json`). None stays open.
 | EXPL-068 | founding-a-colony.feature | A people with no country keep their tiles |
 | EXPL-069 … EXPL-074 | — | Client screens; checked by apps/client/scripts/explore-shots.mjs |
 | EXPL-075 | — | packages/engine/test/exploration.test.ts (the game's first slice) |
+| EXPL-076 | — | packages/engine/test/exploration.test.ts (North America waits for the Age of Atlantic Empires to begin in the tree); packages/engine/test/events.test.ts (Exploration waits for the ocean ships) |

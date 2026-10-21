@@ -15,7 +15,8 @@ In scope:
 - Cloud saves on the Pocket Hegemony (Symfony) server: accounts and sign-in, storage, API, sync timing,
   server checks, quotas; store backups (Steam Auto-Cloud, Android Auto Backup, iOS device backup, web
   IndexedDB); Export and Import.
-- Free tier and full game: locked-nation saves, refunds, Steam demo carry-over.
+- Free tier and full game: locked-nation saves, refunds, Steam demo carry-over; the purchase of the full game on
+  each store, the server's checks of it and the stores' refund notifications, and the game's unlock state.
 - Ironman: one line per campaign, ironman-head check, the offline split conflict.
 - Integrity: CRCs, `worldHash`, the "modified" mark; bug-report attachments; release tests; the engine
   worker's save and load requests.
@@ -35,16 +36,26 @@ Not in scope (owned by …):
 
 Newest decision first.
 
-1. `save-system/README.md`, second draft 2026-10-16, §8 Decisions (settled by Leroy on 16 Oct: Export and
+1. `accounts/accounts-design.md`, draft 1, 19 October 2026 (agreed by Leroy on 19 Oct: one account with several
+   sign-ins, store sign-ins at launch, purchases per store), §4 and §5; §7 for sharing saves with the community
+   (Leroy, 19 Oct: "I want them exportable, so other people could actually load in the save files … an active
+   community thing").
+   §9 and §11 step 4 for the desktop: Steamworks, Steam sign-in, saves as files and Auto-Cloud.
+   §3, §4, §8 and §11 step 5 for phones and the web: Sign in with Apple, Google, and Steam in the browser sheet.
+   §6, §8, §10 and §11 step 6 for purchases: the unlock, the server's checks and the store webhooks (Leroy, 19 Oct:
+   cross-buy is per store; Steam is a paid app with a demo; the phones are a free download with a `full_game`
+   in-app purchase).
+   §5, §8 and §11 step 7 for linking and combining accounts and removing a sign-in.
+2. `save-system/README.md`, second draft 2026-10-16, §8 Decisions (settled by Leroy on 16 Oct: Export and
    Import yes; cloud saves on our Symfony server with optional accounts; default autosave every 12 months plus
    the Resume save every turn; cross-store cloud saves at launch, purchases stay per store), and all of §1–§7, §9.
-2. `save-system/save-config.example.yaml` (the configuration the rules describe).
-3. `planning/gap-lists.md` "Decisions already made" (campaign to 31 August 1939; business model: paid full
+3. `save-system/save-config.example.yaml` (the configuration the rules describe).
+4. `planning/gap-lists.md` "Decisions already made" (campaign to 31 August 1939; business model: paid full
    game, Steam demo, free mobile download with in-app purchases), List 2 item 3, List 3 items 2, 3, 7, 9, 13, 14.
-4. Read for seams only: `achievements/achievements-design.md` v1.1 (16 Oct: every achievement is ironman-only;
+5. Read for seams only: `achievements/achievements-design.md` v1.1 (16 Oct: every achievement is ironman-only;
    flags `ironman_unbroken`, `cheat_marked`, `switched_country`), `settings/settings-design.md` v2 §4, §5.3,
    §5.7, `screen-flow/screen-flow-design.md` §3 S4, S6, §4.5, §4.6, §6, `tutorial/tutorial-design.md` §9, §12.
-5. Today's code: `packages/engine/src/protocol.ts` (`newGame` with seed and player nation only; `endTurn`
+6. Today's code: `packages/engine/src/protocol.ts` (`newGame` with seed and player nation only; `endTurn`
    with `Order[]`), `hashWorld`, `createEngineHost`; the server can only register accounts (`POST /api/accounts`).
 
 ## 3. Ubiquitous language
@@ -79,6 +90,18 @@ Newest decision first.
 | Needs full game | The header flag saying a save's nation is locked without the full game | — |
 | Account | An optional Pocket Hegemony account on our server; needed only for cloud saves | A store account |
 | Device token | Long-lived sign-in token kept in the platform's secure storage | Access token |
+| Steam build | The desktop game started with a Steam app id, from the build's `PH_STEAM_APP_ID` or from Steam itself, with the Steam client running | The desktop game without Steam |
+| Web API ticket | The ticket Steamworks gives for the identity `pockethegemony` (`GetAuthTicketForWebApi`), which the server checks with Steam | A Steam session ticket |
+| Save folder | `<Electron userData>/saves` on the desktop, one `.phsave` file per save, the folder Steam Auto-Cloud syncs | IndexedDB |
+| Shared save | A public copy of one save, uploaded once and attached to a community post, that anyone can play | A cloud save (private, synced) |
+| Share code | The eight letters and digits that name a shared save (`K7QX-M2PA`), in its link `/s/<code>` | Save id |
+| Copy of a shared save | The new campaign a player starts from a shared save, with its own campaign id and `sharedFrom` | The shared save itself |
+| Full game purchase | The one thing each store sells: the paid app on Steam, the non-consumable in-app product `full_game` on the App Store and Google Play | The Steam demo (a separate app) |
+| Entitlement | The server's record of one account's full game purchase on one store: the store's reference for it and its status (`active`, `refunded`, `revoked`) | A sign-in (identity) |
+| Store bridge | The small interface each platform's shell gives the game for its own store: owned or not, the proof, the price, Buy, Restore purchases | The cloud API |
+| Store proof | What the store hands the game for a purchase and the server checks: a StoreKit 2 signed transaction, a Play purchase token, or (Steam) the SteamID of the sign-in | A receipt shown to the player |
+| Combining accounts | Moving everything of a second account (sign-ins, devices, saves, shared saves, purchases, community posts) into the account the player is in, then closing the emptied one; offered when an added sign-in already has its own account | Adding a sign-in (SAVE-153), which moves nothing |
+| Combine token | The server's signed, short-lived proof that the player just passed the other account's sign-in, naming the account that stays and the one that goes | A device token |
 
 ## 4. Domain model
 
@@ -114,9 +137,26 @@ Newest decision first.
 - INV-SAVE-13: An upload whose `saveId` exists is rejected unless its bytes match.
 - INV-SAVE-14: The server never drops a save on its own; at quota it refuses and the game asks the player.
 - INV-SAVE-15: The server accepts an ironman save only if its parent is the campaign's current ironman head.
+- INV-SAVE-21: An account holds at most one sign-in per store and at most one email, and always at least one
+  sign-in; combining two accounts never drops a save.
 
 **UploadQueue** (one per device)
 - INV-SAVE-16: The queue survives restarts and empties oldest first when online, retrying with back-off.
+
+**Entitlement** (on the server; identity: account and store)
+- Holds: the product, the store's reference for the purchase (SteamID and app id; Apple original transaction id;
+  Google order id, and the token's hash), status, environment, first verified, last checked.
+- INV-SAVE-19: An account has at most one entitlement per store, and a store reference belongs to at most one
+  account.
+- INV-SAVE-20: An entitlement unlocks the full game only on its own store (cross-buy is per store).
+
+**SharedSave** (on the server; identity: share code)
+- Holds: the account that shared it, the community topic and post it came with, the header fields its card
+  shows, size, play count, removed at; the bytes under `shared/<code>.phsave`.
+- INV-SAVE-17: A shared save never carries the device name of the save it was made from, and never counts
+  toward the cloud quota.
+- INV-SAVE-18: A copy of a shared save is a new campaign: it never shares a campaign id with the author's saves
+  and is never ironman.
 
 ### Entities and value objects
 
@@ -125,7 +165,7 @@ Newest decision first.
   `formatVersion`, `rulesHash`, `mapHash`, `turn`, `date {y, m}`, `playerNation`, `ironman`, `playSeconds`,
   `options {difficulty, events, endDate, aiTemper, fogOfWar, musicEra}` (D-SAVE-8), `tier {nation, needsFullGame, app}`
   (D-SAVE-13), `flags {ironman_unbroken, cheat_marked, switched_country, began_as_tutorial}` (D-SAVE-1), `worldHash`,
-  `thumbnail` (base64 PNG 96 × 64), and a modified mark (§6.3).
+  `thumbnail` (base64 PNG 96 × 64), a modified mark (§6.3), and on a copy of a shared save `sharedFrom {code, author}`.
 - **Chunk** (value): id, version, offset, length, CRC-32, deflate bytes. Ids: `core`, `ids`, `provinces`,
   `nations`, `armies`, `events`, `history`, `orders`, later `diplomacy`, `subjects`, `religion`, `culture`,
   `government`, `trade`, `ai` ….
@@ -214,6 +254,10 @@ Newest decision first.
 - SAVE-049: If a save's `formatVersion` is newer than the build's, then the save system shall not open it and shall say "This save is from a newer version of Pocket Hegemony. Update the game to open it." [save-system §4.4, §2.5]
 - SAVE-050: Each release shall add at least two saves from that build (one early game, one late game) to `packages/engine/test/saves/`; every test run shall load every save from every earlier release and run one turn; a release shall not ship if any old save fails; the changelog shall say when a release changes the format. [save-system §4.4]
 - SAVE-051: When a save is loaded into a build with changed rules, the rule changes shall apply from the next turn on, with the saved `Rng` state, so a balance patch changes outcomes from then on but never corrupts the save. [save-system §4.4]
+- SAVE-111: A save shall record the start its campaign began from (`start` in the header; a save without one began in
+  1444, before campaigns moved to 1378). When the player opens a save from another start, the game shall reopen in that
+  start's world and load the save there, without asking; the save system shall never open a save in another start's
+  world. Exit to main menu shall return to the default start, so new campaigns begin in 1378. [X-25; SETUP-095]
 
 ### 5.8 Cloud saves
 
@@ -224,7 +268,7 @@ Newest decision first.
 - SAVE-056: When the player deletes a campaign, the save system shall delete it from the cloud too. [save-system §5.1]
 - SAVE-057: When the player signs in with email and password (`POST /api/sessions`), the server shall return a short-lived access token and a long-lived device token, kept in the platform's secure storage (Keychain on iOS, Keystore on Android, `safeStorage` in Electron); each device shall show in the account's device list and can be signed out from any other. [save-system §5.2]
 - SAVE-058: The server shall offer password reset by email, and account deletion that also deletes every save. [save-system §5.2]
-- SAVE-059: The save system shall launch with email and password sign-in only; Sign in with Apple, Google and a Steam session ticket come later, and if Google sign-in is offered on iOS, Sign in with Apple shall be offered too. [save-system §5.2, §8.7]
+- SAVE-059: The save system shall launch with these sign-ins, the ones that need no typing first: on Steam, Steam and email; on iOS and iPadOS, Sign in with Apple, Steam and email; on Android, Google, Steam and email; on the web, Steam, Google, Sign in with Apple and email; wherever another third-party sign-in is offered on iOS, Sign in with Apple shall be offered too. [accounts-design §4; D-SAVE-18]
 - SAVE-060: The save system shall offer sign-in from a Cloud saves row in Settings and a "Sign in to sync" prompt on the Load screen, never as a wall before playing. [save-system §5.2]
 - SAVE-061: The server shall keep a `Save` table of the header fields the Load screen needs (account, campaign, save id, kind, name, saved at, device, platform, game version, format version, turn, date, nation, ironman, size, deleted at) and put the file bytes in S3-compatible object storage under `<accountId>/<campaignId>/<saveId>.phsave`, not in the database. [save-system §5.2]
 - SAVE-062: When a save is removed, the server shall mark it deleted with a tombstone so other devices learn of it, and purge the bytes after 30 days. [save-system §5.2; config `cloud.server.tombstone_purge_days`]
@@ -239,9 +283,59 @@ Newest decision first.
 - SAVE-071: Where the server later needs to trust a save (for example before it counts toward a leaderboard), it may load it with the engine (`createEngineHost`) and check `worldHash`. [save-system §5.2]
 - SAVE-072: The server shall sync saves, not purchases: a campaign synced from one store opens on another device only if its nation is unlocked there. [save-system §5.2, §8.4]
 
+#### Sign-ins and devices
+
+- SAVE-112: One account shall hold one or more sign-ins (Steam, Sign in with Apple, Google, email and password), and each Steam account, Apple id, Google id or email address shall belong to at most one account. [accounts-design §4, §5]
+- SAVE-113: When the player signs in with Steam, the game shall send a Steam Web API ticket for the identity `pockethegemony`; the server shall check it with Steam (`ISteamUserAuth/AuthenticateUserTicket`), open the account that holds that SteamID, or make one with the player's Steam name as display name when none does. [accounts-design §4]
+- SAVE-114: The server shall return the same pair for every way of signing in: an access token that lasts 15 minutes and a device token that lasts until the device is signed out, and shall store both only as hashes. [accounts-design §4; config `cloud.server.access_token_minutes`; placeholder]
+- SAVE-115: When a device refreshes its access token with its device token, the server shall give it a new device token and refuse the old one from then on. [accounts-design §4]
+- SAVE-116: When a device is signed out, from itself or from another device of the account, the server shall refuse its device token and its access token at once. [save-system §5.2; accounts-design §3]
+- SAVE-117: If email sign-in fails 5 times within 15 minutes for one address from one place, then the server shall refuse further tries until the 15 minutes have passed, as the website's sign-in does. [save-system §5.2 rate limits; config `cloud.server.sign_in_throttle`]
+- SAVE-118: Where the server has no Steam key configured, Steam sign-in shall answer "Steam sign-in is not available" and email sign-in shall keep working. [accounts-design §10]
+
+#### Combining accounts and removing a sign-in
+
+- SAVE-186: When the player adds a sign-in that already belongs to another account (`POST /api/account/sign-ins`), the server shall check it as for signing in and answer `linked_to_another_account` with an offer to combine: the other account's display name, how many cloud saves and shared saves it holds, the stores it holds an active purchase on, whether the two together go over the storage quota, and a combine token that names the account the player is in and the other account and lasts 10 minutes. Passing the other account's sign-in is the proof that the player owns it, so nothing else is asked. For email and password the offer shall come only when the password is that account's (otherwise the refusal stays as it was), and those tries shall count toward the email sign-in limit (SAVE-117). [accounts-design §5; config `sign_in.combine_minutes`; placeholder; D-SAVE-24]
+- SAVE-187: When the game sends the combine token to `POST /api/account/merge`, from a device of the account the token names as staying, the server shall move to that account, in one transaction, everything of the other: its sign-ins (and its email and password), its devices, its cloud saves with their bytes, change log entries and ironman heads, its shared saves, its entitlements, and its community topics, posts and reports; then it shall delete the emptied account. The account the player is in keeps its id and display name. If the token has expired, was altered or names another account, then the server shall refuse with `combine_expired`; if the other account is gone already, with `nothing_to_combine`. [accounts-design §5, §8; D-SAVE-24]
+- SAVE-188: If both accounts hold a sign-in of the same store, or both an email, then the offer shall say so and the server shall refuse to combine with `both_have_steam`, `both_have_apple`, `both_have_google` or `both_have_email`, because an account holds one sign-in per store (SAVE-153, INV-SAVE-21); the player removes one of the two first (SAVE-193) and adds the sign-in again. [accounts-design §5; D-SAVE-24]
+- SAVE-189: When both accounts hold saves of the same campaign, every save of both shall be kept, as two lines of play (SAVE-054). A save id both accounts hold is the same write-once file (INV-SAVE-5) and shall be kept once: the copy that is not removed wins, and when both or neither are removed, the copy of the account that stays. When both hold an ironman head for the campaign, the head whose save is the newer shall stay (the staying account's on a tie), and the other device meets SAVE-089 on its next ironman upload. [accounts-design §5; INV-SAVE-5, INV-SAVE-15; D-SAVE-24]
+- SAVE-190: When both accounts hold an entitlement for the same store, the account shall keep one (INV-SAVE-19): an active one before a refunded one before a revoked one, and on a tie the staying account's; the other row is dropped, which frees its store reference. [accounts-design §5, §6; D-SAVE-23, D-SAVE-24]
+- SAVE-191: Combining shall never drop a save to fit the quota (INV-SAVE-14): when the two together hold more than the quota (SAVE-069) or more than 50 shared saves (SAVE-126), the accounts shall be combined all the same, the offer saying so first, and from then on uploads (and new shares) are refused until the player deletes some, as at any full account. [save-system §5.2; accounts-design §5; D-SAVE-24]
+- SAVE-192: The other account's devices shall stay signed in, now in the staying account: on their next token refresh the server shall name the staying account (id and display name) as theirs, and on their next `GET /api/saves` it shall answer from the start of the staying account's change log with `reset`, so the device replaces the cloud lines it held with the staying account's. Each save that moved shall get a new change entry, so the staying account's own devices receive it on their next sync. [accounts-design §5; SAVE-064]
+- SAVE-193: `DELETE /api/account/sign-ins/{provider}` (`steam`, `apple`, `google` or `email`) shall remove that sign-in from the signed-in account while at least one other remains, and refuse the last with `last_sign_in`; removing email removes the password with it. The devices stay signed in; the removed sign-in can be added again later, and signing in with it alone makes a new account. [accounts-design §5; INV-SAVE-21]
+
+#### Store sign-ins on phones and the web
+
+- SAVE-149: When the player signs in with Apple, the game shall make a random nonce, open Apple's own sign-in sheet with the nonce's SHA-256 (in hex), and send the identity token, the nonce and the device to `POST /api/sessions` (`appleIdentityToken`, `nonce`). The server shall accept the token only when it is signed with RS256 by a key in Apple's key set (`https://appleid.apple.com/auth/keys`), its issuer is `https://appleid.apple.com`, its audience is one of the server's Apple client ids (the app's bundle id, the website's Services ID), it has not expired (with 60 seconds' leeway for clocks), and its `nonce` is the SHA-256 of the nonce sent; then it shall open the account that holds that Apple id (the token's `sub`), or make one named with the name Apple gives the game on the first sign-in, else "Player". [accounts-design §4, §8; config `sign_in.token_leeway_seconds`; placeholder; D-SAVE-22]
+- SAVE-150: When the player signs in with Google (Android's Credential Manager, or Google's sign-in on the web), the game shall do the same with Google's ID token (`googleIdToken`, `nonce`), and the server shall check it the same way against Google's key set (`https://www.googleapis.com/oauth2/v3/certs`), with the issuer `https://accounts.google.com` or `accounts.google.com` and the audience one of the server's Google client ids (the web client that the Android app names as its server client); the account it makes is named with the token's `name`. [accounts-design §4, §8; config `sign_in.token_leeway_seconds`; placeholder; D-SAVE-22]
+- SAVE-151: When the player signs in with Steam on a phone or the web, the game shall ask the server for Steam's sign-in address (`POST /api/sessions/steam-openid` with the address to come back to) and open it in the system's browser sheet on a phone, or in the same tab on the web; Steam's OpenID 2.0 sign-in shall come back to `GET /auth/steam/return`. The server shall accept Steam's answer only when its mode is `id_res`, it names Steam's endpoint and the server's own return address, its claimed id is a Steam community id, Steam confirms it in a `check_authentication` round trip (`is_valid:true`), and its response nonce is less than 5 minutes old and was never used before. Then it shall send the browser back to the game's address with a one-time code (`steamCode`) that lasts 5 minutes, and the game shall exchange it at `POST /api/sessions` (`steamOpenIdCode`), which opens or makes the account as a Steam ticket does (SAVE-113, named "Player"). A code shall work once. If the answer fails a check, then the browser shall go back to the game with `steamError` and no code. [accounts-design §4, §8; config `sign_in.browser_code_minutes`; placeholder; D-SAVE-22]
+- SAVE-152: The server shall send the browser back only to an address on its list of the game's return addresses (`SIGN_IN_RETURN_URLS`: the phone app's `pockethegemony://auth/steam` and the web game's page), and shall carry that address in a state it signs, so nothing on the way can change where the code goes. If the game asks for another address, then the server shall refuse with `return_not_allowed`. [accounts-design §4; config `sign_in.app_return`]
+- SAVE-153: `POST /api/account/sign-ins` shall take each store sign-in as well (a Steam ticket, a Steam browser code, an Apple identity token with its nonce, a Google ID token with its nonce), checked as for signing in, and add it to the signed-in account. If that Steam account, Apple id or Google id belongs to another account, then the server shall refuse with `linked_to_another_account` and offer to combine the two accounts (SAVE-186), and if the account already holds a sign-in of that store, with `already_has_steam`, `already_has_apple` or `already_has_google`. [accounts-design §5; SAVE-112]
+- SAVE-154: Where the server has no Apple client ids, Sign in with Apple shall answer "Sign in with Apple is not available."; where it has no Google client ids, Google sign-in shall answer "Google sign-in is not available."; where it has no return addresses, Steam in the browser shall answer "Steam sign-in is not available."; and where a store's key set or Steam cannot be reached, the sign-in shall give the same answer, never a refusal. Every other sign-in shall keep working, as SAVE-118 says for the Steam key. [accounts-design §10; SAVE-118]
+
+#### Steam on the desktop
+
+- SAVE-140: Where the desktop game has a Steam app id (`--steam-app-id`, the build's `PH_STEAM_APP_ID`, or the `SteamAppId` Steam sets when it starts the game) and the Steam client is running, the game shall start Steamworks through `steamworks.js`, loaded only then; if there is no app id, the library or its native part cannot load, or Steam is not running, then the game shall run as the desktop game without Steam (email sign-in, the same save folder), with no error shown to the player. [accounts-design §4, §9; D-SAVE-21]
+- SAVE-141: When the Steam build starts and the device is signed out, the game shall sign in with Steam by itself: it gets a Web API ticket for the identity in `sign_in.steam_ticket_identity` and sends it with the player's Steam name to `POST /api/sessions` (SAVE-113), so the player types nothing. If the player signed out on this device, then the game shall not sign in by itself again until they tap Sign in with Steam. If the silent sign-in fails (offline, Steam refused the ticket, the server has no Steam key), then the game shall say nothing at launch, keep playing, and show the reason on the Account and cloud saves card. [accounts-design §3, §4; SAVE-113, SAVE-118]
+- SAVE-142: Where the game runs on Steam, the device shall name itself to the server with the platform `steam`, and on a Steam Deck (where Steam sets `SteamDeck=1`) the device and its saves shall be named "Steam Deck", so another device's Load card and Continue say "from Steam Deck" (SAVE-014). [accounts-design §3; SAVE-014, SAVE-053]
+- SAVE-143: On the desktop the device token shall be kept encrypted with Electron's `safeStorage` in the userData folder (SAVE-057); if `safeStorage` cannot encrypt on this computer, then it shall stay in the game's web storage as on the web, and a token kept there before shall move into `safeStorage` once it can. [accounts-design §4, §9; SAVE-057]
+
+#### Shared saves
+
+- SAVE-124: A shared save shall be a copy of one save, uploaded once, public, and attached to a community post under a share code; it shall be separate from cloud sync, so sharing exposes none of the player's other saves and deleting a cloud save leaves the shared copy, while removing the shared save or a moderator hiding its topic takes it away. [accounts-design §7]
+- SAVE-125: When the player posts a share (`POST /api/shared-saves` with the file, a title, an optional note and what it is for), the server shall check the file as it checks an upload (SAVE-068), drop the device name from the copy's header, keep the bytes under `shared/<code>.phsave`, open a topic on the board the purpose picks ("Show my campaign": Strategy and campaign stories; "Help me with this": Saves to try; "Something broke": Bug reports) as the player, with the note, or a line naming the save, as its opening post, and return the code and the link `/s/<code>`. [accounts-design §7; config `cloud.shared.boards`]
+- SAVE-126: Sharing shall need the account (it posts as the player); shared saves shall not count toward the cloud quota, an account shall keep at most 50 of them, and each share shall count toward the community's limit on new topics. [accounts-design §7; config `cloud.shared.max_per_account`; placeholder]
+- SAVE-127: The server shall answer `GET /api/shared-saves/{code}` with the save card (title, author, realm, in-game date, turn, play time, game version, whether it was ironman, the modified mark, the map crop, plays) and `GET /api/shared-saves/{code}/file` with the bytes, counting a play; `/s/<code>` shall lead to the post with the save and `/s/<code>.phsave` download the file. If the save was removed or its topic or post is hidden, then each shall answer "There is no shared save with this code." [accounts-design §7]
+- SAVE-128: When the player opens a shared save, the save system shall start a new campaign of the player's own from it: a new campaign id and save id, kept as a Manual save on this device, with `sharedFrom` (the share code and the author's display name) in its header and in every later save of the campaign; the locked-nation check (SAVE-081), the newer-version check (SAVE-049) and the hash check (SAVE-094) shall apply as for any save. [accounts-design §7]
+- SAVE-129: If a shared save was ironman, then its copy shall open as a normal campaign, not ironman, with `ironman_unbroken` off, so it earns no achievements and sharing cannot carry an ironman run past a mistake. [accounts-design §7; X-16]
+- SAVE-130: When the player shares a save of a campaign that began as a copy of a shared save, the server shall accept "Reply in the original topic": the save goes up as a reply in the topic the original came from, with its own save card, unless that topic is locked or hidden. [accounts-design §7]
+- SAVE-131: When the player who shared a save removes it, the server shall refuse it from then on and delete its bytes; the topic stays, its card saying the save was removed. [accounts-design §7]
+
 ### 5.9 Store backups, Export and Import
 
 - SAVE-073: Where the game runs on Steam, the save folder (`<Electron userData>/saves`) shall be covered by Steam Auto-Cloud with root overrides mapping the Windows, macOS and Linux paths to one cloud folder, a quota of 500 MB and 2,000 files for the synced set only, and Dynamic Cloud Sync on so a suspended Deck uploads its saves. [save-system §5.3; config `store_backups.steam`]
+- SAVE-144: Where the game runs on the desktop, with or without Steam, the save system shall keep each save as its own `.phsave` file in the save folder under the same name as in the cloud, `<campaignId>/<savedAt>-<saveId>.phsave` (SAVE-053): written to a `.tmp` file beside it, flushed and renamed into place before the saves it replaces are removed (SAVE-032); the Load card shall read only each file's header (SAVE-036), and a file that is not a readable save shall be left alone and not listed. Saves an earlier desktop build kept in IndexedDB shall move into the folder once, on the first launch that has it. [accounts-design §9; SAVE-032, SAVE-036, SAVE-053]
+- SAVE-145: Steam Auto-Cloud shall be set in the Steamworks partner site (App Admin → Steam Cloud) as: byte quota 500 MB and 2,000 files; one root path, root `WinAppDataRoaming`, subdirectory `Pocket Hegemony/saves`, pattern `*.phsave`, OS all, recursive; root overrides `WinAppDataRoaming` → `MacAppSupport` on macOS with the path unchanged, and `WinAppDataRoaming` → `LinuxHome` on Linux with the path replaced by `.config/Pocket Hegemony/saves`; Dynamic Cloud Sync on. The desktop app's product name "Pocket Hegemony" makes the userData folder these paths name. [save-system §5.3; config `cloud.store_backups.steam`; D-SAVE-21]
 - SAVE-074: Where the game runs on Android, Auto Backup shall include the synced set through the backup rules file (within its 25 MB per-app limit) and exclude the orders journal. [save-system §5.3]
 - SAVE-075: Where the game runs on iOS or iPadOS, the device's own iCloud backup shall include the save folder. [save-system §5.3]
 - SAVE-076: Where the game runs on the web, saves shall live in IndexedDB, the game shall ask for persistent storage (`navigator.storage.persist()`), and signing in shall be the only way a web player keeps saves beyond the browser. [save-system §5.3]
@@ -257,6 +351,21 @@ Newest decision first.
 - SAVE-083: Where the player has the Steam demo and the full game on the same computer, the full game shall find the demo's saves (same save folder name on disk) on first launch and copy them into its own folder, and Steam Cloud shall keep them from then on. [save-system §6.1]
 - SAVE-084: Where a demo player is signed in, their saves shall sync through our server to the full game on any computer or phone; without an account, Export and Import shall do the same. [save-system §6.1]
 - SAVE-085: The save system shall store in the header's `tier` the app that wrote the save (`free`, `demo` or `full`) and no list of limits, and the full game shall open such a save with no limits. [save-system §6.1; D-SAVE-13]
+
+#### Purchases and the server's checks
+
+- SAVE-170: The full game shall be one purchase per store, and it shall unlock the full game only on the store where it was bought: on Steam the paid app (the demo is a separate app id and unlocks nothing), on the App Store and Google Play the non-consumable in-app product `full_game` in the free download. The account carries the saves across stores, never a purchase. [accounts-design §6 (cross-buy per store, Leroy 19 Oct); SAVE-072; config `purchases.product_id`]
+- SAVE-171: The server shall keep one entitlement per account and store: the product, the store's reference for the purchase (SteamID and app id; the Apple original transaction id; the Google order id with the purchase token's hash), its status (`active`, `refunded` or `revoked`), the store's environment, when it was first verified and when last checked. One store reference shall belong to at most one account: a purchase already held by another account shall be refused with "This purchase is on another Pocket Hegemony account." [accounts-design §6, §8; D-SAVE-22]
+- SAVE-172: The server shall answer `GET /api/entitlements/{store}` (`steam`, `apple` or `google`) for the signed-in account with whether the full game is unlocked on that store, the status (`active`, `refunded`, `revoked` or `none`), when it was last checked, and the tag the store's purchase should carry for this account: on the App Store the `appAccountToken`, which is the account id; on Google Play the `obfuscatedAccountId`, a SHA-256 hash of it. [accounts-design §6]
+- SAVE-173: When the Steam entitlement is asked for and the last check is older than 24 hours or there is none, or `POST /api/purchases` asks for Steam, the server shall check `ISteamUser/CheckAppOwnership` with the publisher key for the full game's app id and the account's SteamID; it shall record the entitlement active when Steam says the app is owned, mark it refunded when Steam says it no longer is, and, while Steam cannot be reached, answer what it last recorded. An account without a Steam sign-in shall have no Steam entitlement. [accounts-design §6; config `purchases.steam_recheck_hours`; D-SAVE-22]
+- SAVE-174: When the game sends an App Store purchase (`POST /api/purchases` with the StoreKit 2 signed transaction), the server shall accept it only if the JWS is signed with ES256, its `x5c` chain runs leaf, intermediate, root with each certificate signed by the next, the root is the Apple Root CA - G3 the server is configured with, the intermediate and the leaf carry Apple's marker extensions (`1.2.840.113635.100.6.2.1`, `1.2.840.113635.100.6.11.1`), every certificate was valid at the transaction's `signedDate`, the signature checks with the leaf's key, and the transaction names our bundle id, the product `full_game`, the Production environment (Sandbox only where the server is set to accept it) and no `appAccountToken` but this account's. A transaction with a `revocationDate` shall be recorded as revoked. [accounts-design §6; D-SAVE-22]
+- SAVE-175: When the game sends a Google Play purchase token, the server shall read it with the Play Developer API `purchases.products.get` for our package and `full_game`, signed in as its service account; it shall record the entitlement active only when the purchase state is purchased, refuse a token Play does not know, answer a pending purchase as pending without unlocking, refuse a purchase whose `obfuscatedExternalAccountId` names another account, and acknowledge a purchased one that is not acknowledged yet, so Play does not refund it after 3 days. [accounts-design §6]
+- SAVE-176: The server shall listen for App Store Server Notifications V2 at `POST /api/stores/apple/notifications`: it shall check the signed payload and the transaction inside it as in SAVE-174, mark the entitlement refunded on `REFUND`, revoked on `REVOKE` (Family Sharing ended) and active again on `REFUND_REVERSED`, record a `ONE_TIME_CHARGE` whose `appAccountToken` names an account, answer 200 to every notification that passes the check (also one about a purchase it does not hold), and refuse one that does not. [accounts-design §6]
+- SAVE-177: The server shall listen for Google Play real-time developer notifications, pushed by Pub/Sub to `POST /api/stores/google/notifications?token=<push token>`: it shall refuse a push without the configured push token or for another package, mark refunded the entitlement whose purchase token or order a `voidedPurchaseNotification` names, read a purchase again with `purchases.products.get` on a `oneTimeProductNotification`, and accept every other push it could read (a test notification, a purchase it does not hold) so Pub/Sub does not send it again. A daily command, `app:stores:google-voided`, shall read Play's voided purchases list as well. [accounts-design §6; D-SAVE-22]
+- SAVE-178: Where a store's settings are not set on the server, that store shall be unavailable: its entitlement, purchase and notification calls shall answer 503 with `store_unavailable` and a message that names it ("App Store purchases are not available on this server."), while the other stores, sign-in and saves keep working. [accounts-design §10; SAVE-118]
+- SAVE-179: The game shall ask its own store first, through the store bridge its platform's shell gives it, which works offline and needs no account. Where the build names a cloud server and the player is signed in, the game shall also ask the server for this store's entitlement and decide from both: on Steam the running paid app is the full game whatever the server answers, as Steam keeps its own licences; on the App Store and Google Play an active entitlement unlocks the full game, a refunded or revoked one locks it again even while the store's own answer still says owned, and with no answer (offline, signed out, the store unavailable on the server) or no entitlement yet, the store's answer decides. When the store says owned and the server holds no active entitlement, the game shall first send the store's proof and then decide from the answer. [accounts-design §6]
+- SAVE-180: Where the build names no cloud server, or its shell gives no store bridge (the web game, the desktop game without Steam), the game shall stay the full game as it is today, with no unlock state, ribbon or Restore purchases. [accounts-design §9; D-SET-22]
+- SAVE-181: While the full game is locked on this store, the game shall open the Unlock card in place of loading a save of a locked nation (with the message of SAVE-081) and in place of starting a new campaign of a realm that needs the full game; when it locks again after a refund or revocation every save shall stay (SAVE-082), and once it unlocks, the save or realm the player asked for shall be one tap away. [accounts-design §6; SAVE-081, SAVE-082; SHELL-032, SHELL-105]
 
 ### 5.11 Ironman
 
@@ -294,6 +403,46 @@ Newest decision first.
 - SAVE-108: The autosave choices shall live in Settings → Gameplay (Autosave, Autosaves kept), and a toast "Saved." shall show over the map whenever the player saves, never a dialog; autosaves and the Resume save are written quietly after End turn. [X-19; SAVE-022, SET-061, SET-062]
 - SAVE-109: Exit to main menu shall keep the campaign's Resume save current and return to the start screen, where Continue opens it again. [X-19; SAVE-007]
 - SAVE-110: On a phone in landscape the Save and Load cards shall be one scrolling column inside the safe areas, with every button and save line at least 44 points high and nothing that needs hover; on the web the saves shall live in the browser's IndexedDB, one transaction per save written. [X-19; SAVE-032, SAVE-077]
+- SAVE-119: The player shall find everything about the account and cloud saves in one card, Settings → Account and cloud saves, and a "Sign in to keep your saves on every device" line at the bottom of the Load card shall open it while signed out; there shall be no other way in and never a wall before playing. Where the build names no cloud server, neither the section nor the line shall show. [X-19; accounts-design §3; SAVE-060; D-SET-22]
+- SAVE-120: While signed out, the card shall hold the email sign-in (email, password, Sign in) and "Make an account" (email, display name, password), which signs the new account in on this device; a failed try shall say why in the card ("Wrong email or password.", "Too many tries. Wait 15 minutes and try again.") and keep the email typed. The store sign-ins (Steam, Sign in with Apple, Google; SAVE-059) shall sit above the email form (SAVE-146, SAVE-155). [accounts-design §3, §4; SAVE-057, SAVE-117]
+- SAVE-121: While signed in, the card shall show the display name and email, the cloud's status line as the overview of cloud state ("Up to date", "3 saves waiting to upload", "Offline, will sync when connected", "Storage full"), Storage (saves and megabytes used against the quota), Devices (name, platform, last seen, and Sign out on each, which asks first) and Sign out of this device; signing in sends up the synced set the device already holds. "Sync on Wi-Fi only" (SAVE-067), Sign-ins and Delete account shall join the card when they are built. [accounts-design §3; SAVE-055, SAVE-069, SAVE-116]
+- SAVE-122: The Load card shall list the saves other devices put in the cloud with this device's own, each line from another device marked "from <device>", and download a save's bytes only when it is opened ("Connect to open this save from the cloud." while offline); Continue shall name the device of a save from another device (SAVE-014), and a campaign played on two devices shall show where each left off. Deleting a save on the Load card shall delete it in the cloud too. [accounts-design §3; SAVE-053, SAVE-054, SAVE-062, SAVE-064]
+- SAVE-123: On a phone in landscape the Account and cloud saves card shall be one scrolling column inside the safe areas in both the Wide and Tall layouts, with full-width fields and buttons at least 44 points high (Sign in and Sign out 48), and nothing that needs hover. [X-19; accounts-design §3]
+
+#### Sharing saves with the community
+
+- SAVE-132: The player shall find sharing where the saves already are: **Share** beside Load and Delete on an open Load line, **Share this campaign** in the game menu over the map (it shares where the player is now, the campaign's Resume save), and **Open a shared save** at the bottom of the Load card, where a share code is typed; on the website a topic's save card holds **Play this save**, which opens the web game with the code, and **Download**. Where the build names no cloud server, none of these shall show in the game. [X-19; accounts-design §7]
+- SAVE-133: The Share sheet shall be one card for the subject: the title, filled in with the save's name ("Castile, May 1492") and changeable; a short note; what it is for, as three large choices that pick the board (**Show my campaign**, **Help me with this**, **Something broke**), with **Reply in the original topic** first and chosen for a copy of a shared save (SAVE-130); then **Post to the community**. Signed out, the sheet shall say that sharing posts as the player and offer Sign in, which opens the Account and cloud saves card. When the save is posted, the sheet shall say "Shared. Your topic is on the community." with **Copy link**, **Share link** (the system share sheet, where the device has one) and **Open the topic**. [X-19; accounts-design §7; D-SAVE-19]
+- SAVE-134: The topic shall show the save card above the post it came with: the map crop, the save's title, the realm, the in-game date, the week, the play time, the game version, "Was ironman: opens as a normal campaign" and "Modified" when they apply, the share code to type in the game, and Play this save and Download; on the Load card a copy's lines shall say "From <author>'s campaign". [X-19; accounts-design §7]
+- SAVE-135: The overview of what the player shared shall be a **Shared saves** row on the Account and cloud saves card and a Shared saves list on the community's You page: each shared save with its title, how many times it was played, a link to its topic, and **Remove**, which asks first. [X-19; accounts-design §7]
+- SAVE-136: On a phone in landscape the Share sheet shall be one scrolling column inside the safe areas in both the Wide and Tall layouts, the three choices rows at least 64 points high, every other button and field at least 44, and no typing needed because the title has a default; on the website Play this save and Download shall fill the width on a narrow phone, and nothing shall need hover. [X-19; accounts-design §7]
+- SAVE-137: Where the phone and desktop builds register app links, the link `https://<domain>/s/<code>` shall open the game on that shared save, and fall back to the download and the store pages. [accounts-design §7]
+- SAVE-138: The website's new-topic form shall also take a `.phsave` attachment, so a player who never signs in from the game can share an exported file (SAVE-078). [accounts-design §7]
+- SAVE-139: Where a save needs Workshop mods (the header's `mods` list), its card shall say "Needs N Workshop mods (Steam only)" with links to them; saves shall never be put on the Workshop. [accounts-design §7; steam-design §4]
+
+#### Signing in with Steam
+
+- SAVE-146: The player shall find Steam sign-in where every sign-in is, on the Account and cloud saves card in Settings (SAVE-119); in the Steam build most players never look, because the game signs in by itself (SAVE-141). While signed out, the card shall hold **Sign in with Steam** above the email form, with the reason under it when the silent sign-in failed; on the desktop without Steam it shall not show (on phones and the web Steam signs in through the browser, SAVE-155). [X-19; accounts-design §3, §4; SAVE-120]
+- SAVE-147: While signed in, the card shall show the account's sign-ins in one **Sign-ins** row, Steam first (with the Steam name on this computer) and email with its address, and under the display name "Signed in with Steam" in place of the email for an account that has none; together with the status line (SAVE-121) this is the overview of the account at a glance. Everything about the account stays on this one card. [X-19; accounts-design §3; SAVE-121]
+- SAVE-148: On a Steam Deck (1280 × 800, held in landscape, touch or controller) and on a phone in landscape the card shall stay one scrolling column inside the safe areas in the Wide and Tall layouts, with Sign in with Steam full width and 48 points high and nothing that needs hover (SAVE-123). [X-19; accounts-design §3]
+
+#### Signing in on phones and the web
+
+- SAVE-155: The player shall find the phone and web sign-ins where every sign-in is, on the Account and cloud saves card (SAVE-119). While signed out, the card shall hold one full-width button per store sign-in this platform offers, in SAVE-059's order: on an iPhone or iPad **Sign in with Apple** then **Sign in with Steam**; on Android **Sign in with Google** then **Sign in with Steam**; on the web **Sign in with Steam**, **Sign in with Google**, **Sign in with Apple**; then "Or use email instead:" and the email form (SAVE-120). Tapping Apple or Google shall open the system's own sheet over the game; tapping Steam shall open Steam's page in the browser sheet, which closes and comes back to the game by itself (on the web the page goes to Steam and back to the game). While a sign-in runs, the buttons shall wait; a failed or cancelled try shall say why under the buttons and leave the card as it was. A button shall show only where this build can start that sign-in, and on iOS, if Sign in with Apple cannot be started, no other store sign-in shall show either (SAVE-059). [X-19; accounts-design §3, §4; SAVE-059, SAVE-146]
+- SAVE-156: While signed in, the **Sign-ins** row (SAVE-147) shall list Apple and Google with Steam and email, and under the display name the card shall say "Signed in with Apple", "Signed in with Google" or "Signed in with Steam" for an account that has no email. Under the row, one **Add** button per store sign-in this platform offers and the account does not hold yet ("Add Sign in with Apple", "Add Sign in with Google", "Add Sign in with Steam") shall run the same sign-in and add it (SAVE-153); one that belongs to another account shall ask whether to combine the two accounts, in the card (SAVE-194). Everything about the account stays on this one card, and the Sign-ins row with the status line (SAVE-121) is its overview at a glance. [X-19; accounts-design §3, §5; SAVE-147]
+- SAVE-157: On a phone in landscape the store sign-in buttons shall be full width and 48 points high, the Add buttons at least 44, inside the safe areas in the Wide and Tall layouts; the Apple and Google sheets and the browser sheet are the system's own and need no typing, only the email fallback does, and nothing shall need hover. [X-19; accounts-design §3; SAVE-123]
+#### Combining accounts and removing a sign-in
+
+- SAVE-194: The player shall meet combining where sign-ins are added, on the Sign-ins row of the Account and cloud saves card, and nowhere else: when an Add (SAVE-156) brings a sign-in of another account, the card shall ask once, in place of the Add buttons: "This Sign in with Apple has its own Pocket Hegemony account, "Bertrand", with 4 saves." (with its shared saves and "the full game on the App Store" where it has them), "Combine the two accounts?", and under it what happens: "Everything moves to this account, "Leroy": saves, shared saves, purchases, sign-ins and devices. All saves are kept. "Bertrand" is then closed.", "Your storage will be full; delete old saves to keep uploading." when SAVE-191 applies, then **Combine accounts** and **Keep apart**. After Combine accounts the card shall say "Accounts combined. Everything from "Bertrand" is now in this account." and the Load card shows the moved saves after the sync that follows. When SAVE-188 blocks it, the card shall give the reason ("Both accounts have a Steam sign-in. Remove one of them, then add this sign-in again.") with only **OK**. Keep apart, OK, closing the card and a token that ran out ("The offer to combine ran out. Add the sign-in again.") leave both accounts as they were. [X-19; accounts-design §3, §5]
+- SAVE-195: Removing a sign-in shall sit on the same row: each sign-in has **Remove** while the account holds two or more, and the last has none; Remove asks first in the row ("Remove Steam? This device stays signed in.") with **Remove** and **Keep**, as Sign out does on a device. Everything about the account stays on this one card. [X-19; accounts-design §3, §5]
+- SAVE-196: The Sign-ins row with the status line (SAVE-121) shall stay the overview of the account at a glance: after combining it lists the sign-ins of both, Devices lists both accounts' devices, Storage shows what they use together, and the status line says "Storage full" when they are over the quota. [X-19; accounts-design §3]
+- SAVE-197: On a phone in landscape the combine question shall sit inside the card's one scrolling column, within the safe areas in the Wide and Tall layouts, with Combine accounts full width and 48 points high, Keep apart, OK, Remove and Keep at least 44, no typing, and nothing that needs hover. [X-19; accounts-design §3; SAVE-123]
+#### Buying the full game
+
+- SAVE-182: The player shall find buying in one place, the **Unlock** card: opened from the small "Full game" ribbon on the start screen (SHELL-029) and from More → Unlock (SHELL-154) while the full game is locked on this store, and in place of a locked realm's new campaign or a locked nation's save (SAVE-181); never as a pop-up and never before playing. [X-19; accounts-design §3]
+- SAVE-183: The Unlock card shall hold everything about the purchase in one card: what it unlocks ("The full game: every realm"), **Buy** with the store's own price, **Restore purchases** on phones, and the result in the card itself ("The full game is unlocked on this device.", "Waiting for the store to confirm the payment.", "No purchase of the full game was found for this store account.", "This purchase is on another Pocket Hegemony account."); it shall name no other store and no other way to pay, within Apple's and Google's rules. A cancelled purchase shall add no message (SHELL-105). [X-19; accounts-design §3, §6; SHELL-135]
+- SAVE-184: The start screen shall be the overview of the unlock at a glance: the "Full game" ribbon shows while the full game is locked on this store, goes once it is unlocked, and comes back after a refund. [X-19; SHELL-029]
+- SAVE-185: On a phone in landscape the Unlock card shall be one scrolling column inside the safe areas in both the Wide and Tall layouts, with Buy full width and 48 points high, Restore purchases at least 44 points high, the store's own sheet doing the paying, and nothing that needs hover. [X-19; accounts-design §3]
 
 ## 6. Commands
 
@@ -316,6 +465,16 @@ Newest decision first.
 | ClaimIronmanHead | system | Ironman upload | Accepted or split detected | `IronmanLineSplit` |
 | ResolveIronmanSplit | player | Split detected | One line kept, the other removed | `IronmanLineChosen` |
 | ImportDemoSaves | system (full game first launch) | Demo saves in the shared folder | Copied into the full game folder | — |
+| ShareSave | player | Signed in; online; under 50 shared saves | Shared save and its topic (or reply) made; code and link back | `SaveShared` |
+| OpenSharedSave | player | Online; the code names a shared save | A copy joins the Manual saves as a new campaign and opens | `SaveWritten(manual)`, `SaveLoaded` |
+| RemoveSharedSave | player (who shared it) | Confirmed | Shared save refused from then on; bytes deleted | — |
+| BuyFullGame | player (Unlock card) | Store bridge; online | The store's sheet; the proof sent to the server when signed in | `FullGameUnlocked` |
+| RestorePurchases | player (Unlock card, phones) | Store bridge; online | The store's past purchase found and sent to the server | `FullGameUnlocked`, or nothing found |
+| CheckEntitlement | system (launch, sign-in) | Store bridge; cloud server named | The store's and the server's answers decide the unlock | `FullGameUnlocked` / `FullGameLocked` |
+| AddSignIn | player (Account card) | Signed in; online; the store's or email's check passes | Sign-in added, or the offer to combine (SAVE-186) | — |
+| CombineAccounts | player (Account card) | A combine token under 10 minutes old for this account; no store held by both | Everything of the other account moved here; the other deleted | `AccountsCombined` |
+| RemoveSignIn | player (Account card) | Confirmed; another sign-in remains | Sign-in removed | — |
+| RecordStoreNotification | store (App Store, Pub/Sub) | Signed, or carrying the push token | Entitlement marked refunded, revoked or active | — |
 
 Save commands are local to one player's device and never change the simulation; they carry no game orders.
 
@@ -332,6 +491,9 @@ Save commands are local to one player's device and never change the simulation; 
 | `SavesArrived` | Cloud headers fetched | headers, device names | game-shell (Load list, Continue "from Steam Deck") |
 | `IronmanLineSplit` | Server rejected an ironman upload | both lines' device and date | game-shell (the one prompt) |
 | `AccountSignedIn` / `AccountSignedOut` / `AccountDeleted` | Account changes | account id | settings (Account row, personal settings sync) |
+| `SaveShared` | A shared save was posted | code, link, topic | game-shell (the Share sheet's result) |
+| `AccountsCombined` | Two accounts became one | staying account id, the closed account id, what moved | settings (Account card), game-shell (Load list after the sync) |
+| `FullGameUnlocked` / `FullGameLocked` | The unlock on this store changed (purchase, restore, refund, revocation) | store | game-shell (ribbon, Unlock card, realm picker, locked saves) |
 
 ## 8. Policies (reactions to other contexts)
 
@@ -391,6 +553,13 @@ From `save-system/save-config.example.yaml` ("numbers here are the defaults the 
 | `cloud.server.wifi_only_default` | Wi-Fi only default | false | no | save-config.yaml |
 | `cloud.server.ironman_head_check` | Ironman head check | true | no | save-config.yaml |
 | `cloud.store_backups.steam` | Steam | auto_cloud, 500 MB, 2000 files, dynamic cloud sync | platform | save-config.yaml |
+| `cloud.store_backups.steam.partner_site` | Auto-Cloud root path, pattern and overrides to enter in Steamworks (SAVE-145) | root `WinAppDataRoaming`, `Pocket Hegemony/saves`, `*.phsave`, recursive; macOS `MacAppSupport`; Linux `LinuxHome` `.config/Pocket Hegemony/saves` | no | saves.json |
+| `cloud.store_backups.steam.app_id_env` | Where the build's Steam app id comes from (SAVE-140) | `PH_STEAM_APP_ID`, else Steam's `SteamAppId` | no | saves.json |
+| `cloud.store_backups.steam.dev_app_id` | Valve's test app, for trying Steam out only (D-SAVE-21) | 480 (Spacewar) | no | saves.json |
+| `sign_in.token_leeway_seconds` | Clock leeway when the server checks an Apple or Google token's expiry (SAVE-149, SAVE-150) | 60 | yes (provisional) | saves.json |
+| `sign_in.browser_code_minutes` | How old Steam's browser answer may be, and how long the one-time code lasts (SAVE-151) | 5 | yes (provisional) | saves.json |
+| `sign_in.app_return` | Where the browser sheet comes back to the phone app (SAVE-152) | `pockethegemony://auth/steam` | no | saves.json |
+| `sign_in.combine_minutes` | How long the offer to combine two accounts lasts (SAVE-186) | 10 | yes (provisional) | saves.json |
 | `cloud.store_backups.android` | Android | auto_backup (25 MB limit, journal excluded) | platform | save-config.yaml |
 | `cloud.store_backups.ios` | iOS | device_backup | platform | save-config.yaml |
 | `cloud.store_backups.web` | Web | indexeddb_persist | platform | save-config.yaml |
@@ -405,13 +574,22 @@ From `save-system/save-config.example.yaml` ("numbers here are the defaults the 
 | `kinds.autosave.every_6_months` | Months of "every 6 months" | January, July | yes | D-SAVE-9 |
 | `cloud.synced_files` | Files beside saves in the account sync | `settings-personal.json` | no | D-SAVE-6 |
 | `messages.ironman_import_offline` | Offline ironman import | "Connect to import an ironman save." | no | D-SAVE-15 |
+| `cloud.shared.max_per_account` | Shared saves an account keeps | 50 | yes (provisional) | saves.json |
+| `cloud.shared.boards` | Board each purpose posts to | show: strategy, help: saves, broke: bugs | no | saves.json |
+| `cloud.shared.code_length` | Letters and digits in a share code | 8 | no | saves.json |
+| `messages.shared` | After posting a share | "Shared. Your topic is on the community." | no | saves.json |
+| `messages.no_shared_save` | A code that names no shared save | "There is no shared save with this code." | no | saves.json |
+| `purchases.product_id` | The full game's product on the App Store and Google Play (SAVE-170) | `full_game` | no | saves.json |
+| `purchases.stores` | The stores that sell the full game, each unlocking only itself (SAVE-170) | steam, apple, google | no | saves.json |
+| `purchases.steam_recheck_hours` | How old the Steam check may be before it runs again (SAVE-173) | 24 (design: at most daily) | no | saves.json |
+| `purchases.messages` | The Unlock card's results (SAVE-183) and the server's refusals (SAVE-171, SAVE-178) | see saves.json | no | saves.json |
 
 ## 11. Seams
 
 | Other context | Direction | Pattern | What crosses |
 |---|---|---|---|
 | time-and-turns | upstream | Conformist | Deterministic `processTurn`, `Rng` state, turn number and date, `Order` values, the turn boundary |
-| game-shell | downstream | Customer–Supplier | Continue target and label, Load list (campaigns, saves, devices), Save slots, toasts and messages, lifecycle events (background, resume, quit), unlock screen on locked saves, ironman split prompt |
+| game-shell | downstream | Customer–Supplier | Continue target and label, Load list (campaigns, saves, devices), Save slots, toasts and messages, lifecycle events (background, resume, quit), unlock screen on locked saves, ironman split prompt; whether the full game is unlocked on this store (`FullGameUnlocked` / `FullGameLocked`) for the ribbon, the Unlock card and the realm picker |
 | settings | partnership | Partnership | Autosave interval and count values, Cloud saves row, Wi-Fi only, account sign-in; personal settings ride the same account sync and store backups |
 | achievements | downstream | Customer–Supplier | `ironman` flag, modified mark and the header flags `ironman_unbroken`, `cheat_marked`, `switched_country`, `began_as_tutorial` (X-16, D-SAVE-1); lifetime counters and the demo list live in the player profile |
 | onboarding | downstream | Customer–Supplier | Tutorial progress and Needs attention mutes live in the player profile and sync with it, not in the save (X-16, D-SAVE-1); chapter saves shipped read-only; the `began_as_tutorial` flag |
@@ -456,6 +634,15 @@ None. AI countries' state is saved like any other (later an `ai` chunk); no AI d
 - **D-SAVE-15** (was OQ-SAVE-15) Importing an ironman save needs a connection: offline, the import is refused with "Connect to import an ironman save", so the head check always runs. It closes the split with no new state.
 - **D-SAVE-16** (was OQ-SAVE-16) Every way out of an ironman campaign is an exit: "Save and quit", "Exit to main menu" and the app being closed write the ironman save; a kill mid-turn resumes from the Resume save and journal like any campaign. One rule for all exits.
 - **D-SAVE-17** The Load card lists each campaign's Resume save as its first line, "Where you left off", although SAVE-013 keeps Resume saves out of Load: with several campaigns and no manual saves, Continue alone reaches only the newest, and the player would have no way back to the others. One line per campaign, so the list stays short (X-19).
+- **D-SAVE-18** (Leroy, 19 Oct) Store sign-ins at launch, replacing "email and password only" in SAVE-059: on a Steam Deck or a phone a password is the step most players skip, and Steam sign-in on the phone links a Steam account to the phone with no email. One account gathers several sign-ins (SAVE-112), and purchases stay per store (SAVE-072, decided again on 19 Oct). Source: `accounts/accounts-design.md`.
+- **D-SAVE-19** (accounts-design §7, X-19) After Post to the community, the Share sheet itself turns into the result ("Shared. Your topic is on the community." with Copy link, Share link and Open the topic) instead of a toast with buttons: the game's toasts go after two seconds, too soon for a thumb on a phone held sideways, and the sheet is where the player's eyes already are. Until app links exist (SAVE-137), the website's Play this save opens the web game (`PLAY_URL?shared=<code>`), and Open a shared save on the Load card takes the code in any build.
+- **D-SAVE-20** The server answers the share with the code, not the bytes back, and makes the post itself, so a share is one call; the file travels base64 in the JSON body with the title and note, inside the 2 MB cap (SAVE-068). The shared copy's header has an empty `device`; the copy a player opens names their own device. Simplest single request.
+- **D-SAVE-21** (accounts-design §9, step 4) Steam on the desktop: the app id comes from `--steam-app-id`, the build's `PH_STEAM_APP_ID` or Steam's own `SteamAppId`, never from a constant in the code, so a build without either is the plain desktop game; Valve's test app 480 (Spacewar) is used only by `pnpm --filter @ph/desktop steam` for trying it out. Auto-Cloud takes every `.phsave` file in the save folder (SAVE-145), not only the synced set of SAVE-073: the files on disk are already bounded by the kept counts (2 Resume, 3 autosaves per campaign, 100 manual), an Auto-Cloud pattern cannot tell the kinds apart without a second folder, and the extra files are the older autosaves and the backup Resume save, which are harmless on the other computer. The orders journal is not a `.phsave` file, so it stays local. Simpler rule (DECISIONS rule 2).
+- **D-SAVE-22** (accounts-design §4, §8, §11 step 5) Phones and the web: (1) the game hands Apple and Google the SHA-256 of its nonce and sends the server the nonce itself, for both stores, so one rule checks both tokens and a token copied on its own cannot be used without the nonce; (2) the game asks `POST /api/sessions/steam-openid` for Steam's address instead of opening a bare `/auth/steam/start`, so "Steam sign-in is not available." shows on the card as SAVE-118 does instead of on a browser error page; (3) the one-time code is a row the server marks used in one update, so two exchanges of the same code cannot both win, and the row keeps Steam's response nonce so the same answer is never taken twice; (4) the tokens are checked with PHP's own OpenSSL against the stores' key sets, with no new library; (5) on phones the bridge starts the stores through small Capacitor plugins (`SignInWithApple`, `SocialLogin` for Google's Credential Manager, `Browser` and `App` for the browser sheet and the return link), shown only when the build has them, and on the web through Apple's and Google's own sign-in scripts, shown only when the build names its Apple Services ID and Google client id. Revoking the Apple token on account deletion (accounts-design §8) comes with Delete account. Fewest moving parts that keep each check on the server.
+
+- **D-SAVE-23** (accounts-design §6, §8, §11 step 6) Purchases. The design's `purchase` table is kept as one **entitlement per account and store**: a player buys the full game once per store, so a second purchase on the same store after a refund takes the place of the first (its reference changes) instead of adding a row; the store reference stays unique, so one purchase is never claimed by two accounts. Steam ownership is checked when the game asks for the Steam entitlement (at most daily) rather than inside sign-in and token refresh, so sign-in stays as it is and the answer is the same. On Steam the server never locks the running paid app, because Steam itself keeps the licence and a refunded app does not start. The Pub/Sub push is checked with a secret token in the push URL, which Google's push subscriptions support, rather than Google's signed OIDC token, so the server fetches no Google keys; a notification never creates an entitlement the server cannot match to a purchase it holds. The App Store Server API confirmation (design §6) is left for later: the signed transaction's chain to Apple's root is Apple's own way to check it offline. Sandbox transactions are refused unless the server is set to accept them (`APPLE_ACCEPT_SANDBOX`), so a production server never unlocks a test purchase. Simplest rules that keep the design's guarantees (DECISIONS rule 2).
+
+- **D-SAVE-24** (accounts-design §5, §8, §11 step 7) Combining accounts. (1) The account the player is in stays, as the design says, keeping its id and display name, so the device doing it never signs in again. (2) The proof is the sign-in the player just passed: the refusal carries a combine token, an HMAC with the server's secret over both account ids and its expiry (10 minutes, provisional), so no new table is needed and a token is useless to anyone else; replaying it after the merge finds nothing to combine. (3) Two sign-ins of one store (or two emails) refuse the merge instead of dropping one: dropping would leave a way in that opens a new, empty account, and an account holds one per store everywhere else; removing a sign-in (SAVE-193) is the way out. (4) The quota never blocks combining: the design promises "All saves are kept" and INV-SAVE-14 says the server never drops a save, so the account is combined and the usual full-account refusal applies. (5) The same save id on both is the same file; the live copy wins, so combining never loses a save. Ironman: the newer head stays, and the existing one-line rule (SAVE-089) settles the rest. (6) Entitlements: the one that unlocks wins; per store either unlocks the same full game. (7) Devices move rather than sign out, as the design says; each moved device is marked so its next `GET /api/saves` starts the change log over with `reset`, and moved saves get new change entries above every cursor. The bytes are copied to the staying account's keys before the transaction commits and the old keys removed after it, so a failure leaves the other account whole. (8) The endpoints are the design's `POST /api/account/merge`, and `DELETE /api/account/sign-ins/{provider}` in place of `/identities/{id}`: sign-ins are already one per store and email is not an identity row. (9) The card has no "Add email" yet, so combining through an email sign-in works on the server only. Simplest rules that keep every save (DECISIONS rule 2).
 
 ## 14. Traceability
 
@@ -586,3 +773,48 @@ None. AI countries' state is saved like any other (later an `ai` chunk); no AI d
 | SAVE-103 | resume-and-orders-journal.feature | A choice at a before-the-battle stop goes into the journal |
 | SAVE-104 | cloud-sync.feature | Personal settings ride the account sync |
 | SAVE-105 … SAVE-110 | — | Client screens; checked by apps/client/scripts/saves-shots.mjs |
+| SAVE-111 | — | engine unit test `saves-start.test.ts` (the header names the start; a save from another start is refused); the client reopens in the save's start (main.ts `loadSave`) |
+| SAVE-112 … SAVE-118 | sign-in.feature | Server sign-in; checked by `server/tests/Controller/SessionTest.php` |
+| SAVE-061 … SAVE-070 | cloud-sync.feature | The server's side as well: `server/tests/Controller/SavesTest.php` (`App\Controller\SavesController`) |
+| SAVE-119 … SAVE-123 | — | Client screens; checked by `apps/client/src/cloud/sync.test.ts` (the card) and `api.test.ts` (sign-in messages) |
+| SAVE-124 … SAVE-131 | shared-saves.feature | Server: `server/tests/Controller/SharedSavesTest.php`; the copy (SAVE-128, SAVE-129) also by engine steps |
+| SAVE-132 … SAVE-136 | shared-saves.feature | Client screens; checked by `apps/client/src/cloud/share.test.ts` (the sheet, the copy) and the website's `SharedSavesTest.php` (the save card) |
+| SAVE-137 … SAVE-139 | shared-saves.feature | Not built yet: app links, the website's attachment and Workshop mods come later (todo) |
+| SAVE-140 | steam-desktop.feature | Without Steam the desktop game plays as before |
+| SAVE-140 | — | Also `apps/desktop/test/steam.test.mjs` (no app id, missing library, Steam not running) |
+| SAVE-141 | steam-desktop.feature | The Steam build signs in by itself |
+| SAVE-141 | steam-desktop.feature | A player who signed out is not signed in again |
+| SAVE-141 | steam-desktop.feature | A silent sign-in that fails says nothing at launch |
+| SAVE-141 | — | Also `apps/client/src/cloud/steam.test.ts` |
+| SAVE-142 | steam-desktop.feature | A Steam Deck names itself |
+| SAVE-143 | steam-desktop.feature | The device token on the desktop |
+| SAVE-144 | steam-desktop.feature | Saves are files in the save folder |
+| SAVE-144 | steam-desktop.feature | Saves kept in IndexedDB move into the folder once |
+| SAVE-144 | — | Also `apps/desktop/test/saves.test.mjs` and `apps/client/src/saves/fileStore.test.ts` |
+| SAVE-145 | steam-desktop.feature | The Auto-Cloud settings in the partner site |
+| SAVE-146 … SAVE-148 | steam-desktop.feature | Client screens; checked by `apps/client/src/cloud/steam.test.ts` (the card) |
+| SAVE-149 … SAVE-154 | store-sign-in.feature | Server: `server/tests/Controller/StoreSignInTest.php`, `server/tests/IdTokensTest.php` and `server/tests/SteamOpenIdTest.php` (local keys, mocked HTTP) |
+| SAVE-155 … SAVE-157 | store-sign-in.feature | Client screens; checked by `apps/client/src/cloud/storeSignIn.test.ts` (the card, the bridge) |
+| SAVE-170 | purchases.feature | A purchase unlocks only its own store |
+| SAVE-171 | purchases.feature | One purchase, one account |
+| SAVE-172 … SAVE-178 | purchases.feature | The server's side; checked by `server/tests/Controller/PurchasesTest.php`, `server/tests/Controller/StoreNotificationsTest.php` and `server/tests/Purchases/*Test.php`, every store call mocked and every key and certificate made in the test |
+| SAVE-179 | purchases.feature | The game decides from its store and the server |
+| SAVE-179 | purchases.feature | The store's proof goes up first |
+| SAVE-180 | purchases.feature | Without a cloud server or a store bridge nothing changes |
+| SAVE-181 | purchases.feature | A locked realm or save opens the Unlock card |
+| SAVE-179 … SAVE-181 | — | Also `apps/client/src/cloud/purchases.test.ts` (the bridge, the decision, the card) |
+| SAVE-182 … SAVE-185 | — | Client screens; checked by `apps/client/src/cloud/purchases.test.ts` (the Unlock card's lines, buttons and messages) |
+| SAVE-186 | combine-accounts.feature | A sign-in of another account offers to combine |
+| SAVE-186 | combine-accounts.feature | An email of another account offers to combine only with its password |
+| SAVE-187 | combine-accounts.feature | Combining moves everything to the account the player is in |
+| SAVE-187 | combine-accounts.feature | An old or altered offer combines nothing |
+| SAVE-188 | combine-accounts.feature | Two sign-ins of one store are not combined |
+| SAVE-189 | combine-accounts.feature | The same campaign on both accounts keeps every save |
+| SAVE-189 | combine-accounts.feature | Two ironman heads for one campaign |
+| SAVE-190 | combine-accounts.feature | Two purchases on one store |
+| SAVE-191 | combine-accounts.feature | Combining over the quota keeps every save |
+| SAVE-192 | combine-accounts.feature | The other account's devices learn of it on their next sync |
+| SAVE-193 | combine-accounts.feature | Removing a sign-in, never the last |
+| SAVE-186 … SAVE-193 | — | Also `server/tests/Controller/CombineAccountsTest.php` (Steam tickets and email, the bytes on disk, every conflict) |
+| SAVE-194 … SAVE-197 | combine-accounts.feature | The card asks once what combining does |
+| SAVE-194 … SAVE-197 | — | Client screens; checked by `apps/client/src/cloud/combine.test.ts` (the question, its buttons, Remove on the Sign-ins row) |

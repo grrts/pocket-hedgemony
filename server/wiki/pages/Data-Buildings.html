@@ -1,0 +1,396 @@
+<h1>Buildings data</h1>
+<p>Every value in the game&#39;s buildings config, exactly as the game reads it. This page is made from <code>packages/rules/data/domain/buildings.json</code> each time the config changes, so it always matches the game. How these values are used is explained on <a href="/wiki/Buildings">Buildings</a>.</p>
+<p>Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and values marked (provisional) are placeholders that may still change in balancing. Inventions are shown by id and name; see <a href="/wiki/Data-Research#inventions">Research data</a>.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>town_sizes</code></td><td>hamlet, village, market_town, town, city, great_city</td></tr>
+<tr><td><code>loyalty_steps</code></td><td>wavering, loyal</td></tr>
+<tr><td><code>company_output_share</code></td><td>0.5</td></tr>
+<tr><td><code>clergy_order</code></td><td>house of worship, monastery, almshouse, hospital, school</td></tr>
+<tr><td><code>town_order</code></td><td>market, town walls, bridge, craft</td></tr>
+<tr><td><code>company_order</code></td><td>warehouse, market, mine, plantation</td></tr>
+<tr><td><code>materials_no_route_multiplier</code> (provisional)</td><td>1.25</td></tr>
+<tr><td><code>starting_ports_file</code></td><td>scenarios/1444/ports.json</td></tr>
+<tr><td><code>lord_province_counts_as_yours</code></td><td>yes</td></tr>
+<tr><td><code>caravanserai_land_trader_weight</code></td><td>0.25</td></tr>
+</tbody></table></div>
+<h2 id="materials"><a class="anchor" href="#materials" aria-label="Link to this section">#</a>Materials</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>made by</th><th>price</th><th>far price multiplier</th><th>far after rings</th><th>counts as</th><th>grounds</th><th>upkeep multiplier</th><th>from era</th></tr></thead>
+<tbody>
+<tr><td>timber</td><td>lumber camp</td><td>0.5</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>stone</td><td>quarry</td><td>0.5</td><td>2</td><td>3</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>bricks</td><td>kiln</td><td>0.8</td><td></td><td></td><td>stone</td><td></td><td></td><td></td></tr>
+<tr><td>earth</td><td>anywhere</td><td>0</td><td></td><td></td><td>stone</td><td>drylands, desert, savanna</td><td>2</td><td></td></tr>
+<tr><td>iron</td><td>mine</td><td>2</td><td></td><td></td><td></td><td></td><td></td><td>4</td></tr>
+<tr><td>steel</td><td>factory</td><td>3</td><td></td><td></td><td></td><td></td><td></td><td>6</td></tr>
+<tr><td>concrete</td><td>factory</td><td>3</td><td></td><td></td><td></td><td></td><td></td><td>6</td></tr>
+</tbody></table></div>
+<h2 id="ground-multiplier"><a class="anchor" href="#ground-multiplier" aria-label="Link to this section">#</a>Ground multiplier</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>farmland</code></td><td>1</td></tr>
+<tr><td><code>hills</code></td><td>1.25</td></tr>
+<tr><td><code>mountains</code></td><td>2</td></tr>
+<tr><td><code>jungle</code></td><td>2</td></tr>
+</tbody></table></div>
+<h2 id="town-slots"><a class="anchor" href="#town-slots" aria-label="Link to this section">#</a>Town slots</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>hamlet</code></td><td>1</td></tr>
+<tr><td><code>village</code></td><td>2</td></tr>
+<tr><td><code>market_town</code></td><td>4</td></tr>
+<tr><td><code>town</code></td><td>6</td></tr>
+<tr><td><code>city</code></td><td>9</td></tr>
+<tr><td><code>great_city</code></td><td>12</td></tr>
+<tr><td><code>capital_extra</code></td><td>1</td></tr>
+</tbody></table></div>
+<h2 id="sites"><a class="anchor" href="#sites" aria-label="Link to this section">#</a>Sites</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>half_crew_months_multiplier</code></td><td>2</td></tr>
+<tr><td><code>cancel_refund</code></td><td>0.5</td></tr>
+<tr><td><code>queue_max</code></td><td>10</td></tr>
+</tbody></table></div>
+<h3 id="per-province"><a class="anchor" href="#per-province" aria-label="Link to this section">#</a>Per province</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>land</code></td><td>1</td></tr>
+<tr><td><code>town</code></td><td>1</td></tr>
+</tbody></table></div>
+<h3 id="master-of-works"><a class="anchor" href="#master-of-works" aria-label="Link to this section">#</a>Master of works</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>extra_sites</code></td><td>1</td></tr>
+<tr><td><code>months_multiplier</code></td><td>0.5</td></tr>
+<tr><td><code>gold_multiplier</code></td><td>0.75</td></tr>
+</tbody></table></div>
+<h3 id="stop-months-by-climate"><a class="anchor" href="#stop-months-by-climate" aria-label="Link to this section">#</a>Stop months by climate</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>cold</code></td><td>1</td></tr>
+<tr><td><code>monsoon</code></td><td>7</td></tr>
+</tbody></table></div>
+<h2 id="condition"><a class="anchor" href="#condition" aria-label="Link to this section">#</a>Condition</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>neglected_output</code></td><td>0.5</td></tr>
+<tr><td><code>damaged_output</code></td><td>0.5</td></tr>
+<tr><td><code>years_neglected_to_lose_step</code></td><td>10</td></tr>
+<tr><td><code>repair_cost_share</code></td><td>0.5</td></tr>
+<tr><td><code>rebuild_cost_share</code></td><td>0.5</td></tr>
+<tr><td><code>demolish_material_refund</code></td><td>0.25</td></tr>
+<tr><td><code>neglect_recovery_months</code></td><td>3</td></tr>
+</tbody></table></div>
+<h2 id="damage"><a class="anchor" href="#damage" aria-label="Link to this section">#</a>Damage</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>plunder_share</code></td><td>0.333333</td></tr>
+<tr><td><code>plunder_share_with_walls</code></td><td>0.166667</td></tr>
+<tr><td><code>earthquake_share</code></td><td>0.333333</td></tr>
+<tr><td><code>fire_buildings</code></td><td>1, 3</td></tr>
+<tr><td><code>plunder_share_with_walls_from_step</code></td><td>1</td></tr>
+<tr><td><code>quake_chance_per_year</code> (provisional)</td><td>0.002</td></tr>
+<tr><td><code>big_raid_men</code> (provisional)</td><td>2000</td></tr>
+</tbody></table></div>
+<h3 id="town-fire-provisional"><a class="anchor" href="#town-fire-provisional" aria-label="Link to this section">#</a>Town fire (provisional)</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>chance_per_year</code></td><td>0.01</td></tr>
+<tr><td><code>per_size_above_town</code></td><td>0.005</td></tr>
+</tbody></table></div>
+<h2 id="village-works"><a class="anchor" href="#village-works" aria-label="Link to this section">#</a>Village works</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>chance_per_year</code> (provisional)</td><td>0.2</td></tr>
+<tr><td><code>owner</code></td><td>commons</td></tr>
+</tbody></table></div>
+<h3 id="needs"><a class="anchor" href="#needs" aria-label="Link to this section">#</a>Needs</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>years_at_peace</code></td><td>5</td></tr>
+<tr><td><code>food_store_months_over</code></td><td>3</td></tr>
+<tr><td><code>homeless_or_full_slots</code></td><td>yes</td></tr>
+</tbody></table></div>
+<h3 id="builds"><a class="anchor" href="#builds" aria-label="Link to this section">#</a>Builds</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>fields</code></td><td>farm</td></tr>
+<tr><td><code>pasture</code></td><td>ranch</td></tr>
+<tr><td><code>shore</code></td><td>fishery</td></tr>
+<tr><td><code>woods</code></td><td>lumber camp</td></tr>
+</tbody></table></div>
+<h2 id="crafts-appearing"><a class="anchor" href="#crafts-appearing" aria-label="Link to this section">#</a>Crafts appearing</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>builds</code></td><td>loom house, tannery, kiln, brewery</td></tr>
+<tr><td><code>owners</code></td><td>town, commons</td></tr>
+<tr><td><code>trade_ratio_at_least</code></td><td>0.3</td></tr>
+<tr><td><code>chance_per_year</code> (provisional)</td><td>0.1</td></tr>
+</tbody></table></div>
+<h3 id="raw"><a class="anchor" href="#raw" aria-label="Link to this section">#</a>Raw</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>loom house</code></td><td>wool</td></tr>
+<tr><td><code>tannery</code></td><td>hides</td></tr>
+<tr><td><code>kiln</code></td><td>clay</td></tr>
+<tr><td><code>brewery</code></td><td>grain</td></tr>
+</tbody></table></div>
+<h2 id="upkeep-groups"><a class="anchor" href="#upkeep-groups" aria-label="Link to this section">#</a>Upkeep groups</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>land</code></td><td>0, 0.5</td></tr>
+<tr><td><code>extraction</code></td><td>0.5, 2</td></tr>
+<tr><td><code>crafts</code></td><td>0.5, 2</td></tr>
+<tr><td><code>learning</code></td><td>2, 6</td></tr>
+<tr><td><code>castle</code></td><td>3, 20</td></tr>
+<tr><td><code>palace</code></td><td>5, 30</td></tr>
+<tr><td><code>worship</code></td><td>clergy</td></tr>
+</tbody></table></div>
+<h2 id="arsenal"><a class="anchor" href="#arsenal" aria-label="Link to this section">#</a>Arsenal</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>spoil_share_without</code></td><td>0.1</td></tr>
+</tbody></table></div>
+<h2 id="ai"><a class="anchor" href="#ai" aria-label="Link to this section">#</a>Ai</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>reserve_years_of_upkeep</code></td><td>1</td></tr>
+<tr><td><code>homeless_share_trigger</code></td><td>0.05</td></tr>
+<tr><td><code>food_months_trigger</code></td><td>3</td></tr>
+<tr><td><code>busy_sites</code> (provisional)</td><td>3</td></tr>
+</tbody></table></div>
+<h2 id="advice"><a class="anchor" href="#advice" aria-label="Link to this section">#</a>Advice</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>max_lines</code></td><td>5</td></tr>
+</tbody></table></div>
+<h2 id="owners-may-build"><a class="anchor" href="#owners-may-build" aria-label="Link to this section">#</a>Owners may build</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>clergy</code></td><td>house of worship, monastery, almshouse, hospital, school</td></tr>
+<tr><td><code>town</code></td><td>market, town walls, guild hall, bridge</td></tr>
+<tr><td><code>company</code></td><td>mine, warehouse, market, plantation, trading post</td></tr>
+<tr><td><code>commons</code></td><td>farm, ranch, fishery, lumber camp</td></tr>
+</tbody></table></div>
+<h2 id="lord-traits"><a class="anchor" href="#lord-traits" aria-label="Link to this section">#</a>Lord traits</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>Builder</code></td><td>any</td></tr>
+<tr><td><code>Greedy</code></td><td>market, mine</td></tr>
+<tr><td><code>Pious</code></td><td>house of worship, monastery</td></tr>
+<tr><td><code>Warlike</code></td><td>castle, drill yard</td></tr>
+</tbody></table></div>
+<h2 id="ai-personality"><a class="anchor" href="#ai-personality" aria-label="Link to this section">#</a>Ai personality</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>mercantile</code></td><td>market, harbour</td></tr>
+<tr><td><code>isolationist</code></td><td>school</td></tr>
+<tr><td><code>hegemon_seeker</code></td><td>castle, drill yard</td></tr>
+</tbody></table></div>
+<h2 id="map-wealth"><a class="anchor" href="#map-wealth" aria-label="Link to this section">#</a>Map wealth</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>built tile share</th><th>buildings</th><th>town step</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>0.333333</td><td>farm, ranch</td><td></td></tr>
+<tr><td>10</td><td>1</td><td></td><td>2</td></tr>
+</tbody></table></div>
+<h2 id="templates"><a class="anchor" href="#templates" aria-label="Link to this section">#</a>Templates</h2>
+<h3 id="european-market-town"><a class="anchor" href="#european-market-town" aria-label="Link to this section">#</a>European market town</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>type</th><th>name</th><th>faith</th></tr></thead>
+<tbody>
+<tr><td>market</td><td>market</td><td></td></tr>
+<tr><td>house of worship</td><td>church</td><td>catholic</td></tr>
+<tr><td>loom house</td><td>loom house</td><td></td></tr>
+</tbody></table></div>
+<h3 id="sahel-trade-town"><a class="anchor" href="#sahel-trade-town" aria-label="Link to this section">#</a>Sahel trade town</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>type</th><th>name</th><th>faith</th></tr></thead>
+<tbody>
+<tr><td>market</td><td>market</td><td></td></tr>
+<tr><td>house of worship</td><td>mosque</td><td>sunni</td></tr>
+<tr><td>caravanserai</td><td>caravanserai</td><td></td></tr>
+</tbody></table></div>
+<h2 id="variants"><a class="anchor" href="#variants" aria-label="Link to this section">#</a>Variants</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>Catholic Europe</th><th>Sunni Maghreb</th><th>Ottoman lands</th><th>Mexico</th><th>Andes</th><th>Sahel</th><th>steppe</th></tr></thead>
+<tbody>
+<tr><td>house of worship</td><td>church</td><td>mosque</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>market</td><td></td><td></td><td>bazaar</td><td>tianguis</td><td></td><td></td><td></td></tr>
+<tr><td>caravanserai</td><td></td><td></td><td></td><td></td><td>tambo</td><td></td><td></td></tr>
+<tr><td>castle</td><td></td><td></td><td></td><td></td><td></td><td>tata</td><td></td></tr>
+<tr><td>palace</td><td></td><td></td><td></td><td></td><td></td><td></td><td>ordu</td></tr>
+<tr><td>granary</td><td></td><td></td><td></td><td></td><td>qollqa</td><td></td><td></td></tr>
+</tbody></table></div>
+<h2 id="landmarks"><a class="anchor" href="#landmarks" aria-label="Link to this section">#</a>Landmarks</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>id</th><th>province</th><th>present 1444</th><th>building</th><th>step</th><th>converts by event</th><th>effect</th><th>material</th><th>founded by event</th><th>more</th></tr></thead>
+<tbody>
+<tr><td>Hagia Sophia</td><td>Constantinople</td><td>yes</td><td>house of worship</td><td>3</td><td>1453</td><td>its faith&#39;s houses of worship in reach of the capital turn the faith mix twice as fast</td><td></td><td></td><td></td></tr>
+<tr><td>Forbidden City</td><td>Beijing</td><td>yes</td><td>palace</td><td>3</td><td></td><td>+24 officials; lords at court never waver</td><td></td><td></td><td></td></tr>
+<tr><td>Alhambra</td><td>Granada</td><td>yes</td><td>palace</td><td>3</td><td></td><td>Granada&#39;s castle counts one step higher</td><td></td><td></td><td></td></tr>
+<tr><td>Great Mosque of Djenné</td><td>Djenné</td><td>yes</td><td>house of worship</td><td>3</td><td></td><td>no grievance from earth upkeep; traders passing +20 % in the replastering season</td><td>earth</td><td></td><td></td></tr>
+<tr><td>Sankore Mosque</td><td>Timbuktu</td><td>yes</td><td>school</td><td>3</td><td></td><td>scholars from any Muslim realm may settle here</td><td></td><td></td><td></td></tr>
+<tr><td>Masjid al-Haram</td><td>Mecca</td><td>yes</td><td>pilgrimage shrine</td><td>1</td><td></td><td>the largest pilgrims passing in the world</td><td></td><td></td><td></td></tr>
+<tr><td>St Peter&#39;s Basilica</td><td>Rome</td><td>no</td><td>house of worship</td><td>3</td><td></td><td></td><td></td><td>1506</td><td>asks gifts while built: yes</td></tr>
+<tr><td>Topkapı Palace</td><td>Constantinople</td><td>no</td><td>palace</td><td>3</td><td></td><td>+20 officials; the capital&#39;s seat runs two provinces</td><td></td><td>1459</td><td></td></tr>
+<tr><td>Ulugh Beg Observatory</td><td>Samarkand</td><td>yes</td><td>observatory</td><td>1</td><td></td><td>Boats and Counting inventions 20 % cheaper for its owner</td><td></td><td></td><td></td></tr>
+<tr><td>Kremlin</td><td>Moscow</td><td>yes</td><td>castle</td><td>3</td><td></td><td>the palace and the castle share one tile</td><td></td><td></td><td></td></tr>
+<tr><td>Templo Mayor</td><td>Tenochtitlan</td><td>yes</td><td>house of worship</td><td>3</td><td></td><td>Triple Alliance lords gain loyalty when the realm wins a war</td><td></td><td></td><td></td></tr>
+<tr><td>Coricancha</td><td>Cusco</td><td>yes</td><td>house of worship</td><td>3</td><td></td><td>every province linked to Cusco by road counts one day closer</td><td></td><td></td><td></td></tr>
+<tr><td>Angkor</td><td>Angkor</td><td>yes</td><td>house of worship</td><td>3</td><td></td><td></td><td></td><td></td><td>condition: neglected; restoring is decision: yes</td></tr>
+<tr><td>Venetian Arsenal</td><td>Venice</td><td>yes</td><td>shipyard</td><td>3</td><td></td><td>3 slipways</td><td></td><td></td><td>slipways: 3</td></tr>
+<tr><td>Taj Mahal</td><td>Agra</td><td>no</td><td>landmark tomb</td><td>1</td><td></td><td>traders passing in Agra +30 %</td><td></td><td>1632</td><td></td></tr>
+</tbody></table></div>
+<h2 id="anchors"><a class="anchor" href="#anchors" aria-label="Link to this section">#</a>Anchors</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>id</th><th>province</th><th>building</th><th>from year</th><th>by event</th><th>town</th></tr></thead>
+<tbody>
+<tr><td>Kutná Hora mine</td><td>Kutná Hora</td><td>mine</td><td>1444</td><td></td><td></td></tr>
+<tr><td>Falun mine</td><td>Falun</td><td>mine</td><td>1444</td><td></td><td></td></tr>
+<tr><td>Bruges market</td><td>Bruges</td><td>market</td><td>1444</td><td></td><td></td></tr>
+<tr><td>Champagne fairs</td><td>Troyes</td><td>market</td><td>1444</td><td></td><td></td></tr>
+<tr><td>Malacca market</td><td>Malacca</td><td>market</td><td>1444</td><td></td><td></td></tr>
+<tr><td>Potosí mine</td><td>Potosí</td><td>mine</td><td>1545</td><td>yes</td><td></td></tr>
+<tr><td>Timbuktu market</td><td>Southeast Timbuktu</td><td>market</td><td>1444</td><td></td><td>Sahel trade town</td></tr>
+<tr><td>Djenné market</td><td>Mopti</td><td>market</td><td>1444</td><td></td><td>Sahel trade town</td></tr>
+<tr><td>Gao market</td><td>Gao</td><td>market</td><td>1444</td><td></td><td>Sahel trade town</td></tr>
+<tr><td>Kano market</td><td>Kano</td><td>market</td><td>1444</td><td></td><td>Sahel trade town</td></tr>
+<tr><td>Agadez market</td><td>Southwest Agadez</td><td>market</td><td>1444</td><td></td><td>Sahel trade town</td></tr>
+<tr><td>Kilwa market</td><td>Lindi</td><td>market</td><td>1444</td><td></td><td>Swahili coast town</td></tr>
+<tr><td>Mombasa market</td><td>Coast</td><td>market</td><td>1444</td><td></td><td>Swahili coast town</td></tr>
+<tr><td>Mogadishu market</td><td>Shabeellaha Hoose</td><td>market</td><td>1444</td><td></td><td>Swahili coast town</td></tr>
+</tbody></table></div>
+<h2 id="inventions"><a class="anchor" href="#inventions" aria-label="Link to this section">#</a>Inventions</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>F5</code></td><td>Water and wind mills</td></tr>
+<tr><td><code>W3</code></td><td>Bombards</td></tr>
+<tr><td><code>C16</code></td><td>railways</td></tr>
+<tr><td><code>G14</code></td><td>Written constitution</td></tr>
+<tr><td><code>T3</code></td><td>Bills of exchange</td></tr>
+<tr><td><code>L1</code></td><td><a href="/wiki/Data-Research#inventions">L1 Temple and monastery schools</a></td></tr>
+<tr><td><code>F8</code></td><td><a href="/wiki/Data-Research#inventions">F8 Polder drainage</a></td></tr>
+</tbody></table></div>
+<h2 id="buildings"><a class="anchor" href="#buildings" aria-label="Link to this section">#</a>Buildings</h2>
+<ul>
+<li>id: farm; place: fields; class: farmers; limit: per_place; group: land; steps: ((name: farm; cost: (gold: 30; months: 6; timber: 10; crew: 500); unlocked_by: start; jobs: 12000; upkeep: 0; makes: (grain: 1.5)), (name: mill farm; cost: (gold: 40; months: 8; timber: 20; crew: 500); unlocked_by: <a href="/wiki/Data-Research#inventions">F5 Water and wind mills</a>; jobs: 12000; upkeep: 0.5; needs: (any_of: river, windy_ground)), (name: enclosed farm; cost: (gold: 60; months: 12; timber: 20; crew: 500); unlocked_by: <a href="/wiki/Data-Research#inventions">F15 Four-field rotation</a>; jobs: 9000; upkeep: 0.5)); crops: grain, flax, hemp, cotton, dye_plants, tobacco; food_crop: grain</li>
+<li>id: rice paddy; place: fields; class: farmers; limit: per_place; group: land; steps: ((name: rice paddy; cost: (gold: 40; months: 12; timber: 10); unlocked_by: <a href="/wiki/Data-Research#inventions">F2 Wet-rice terracing</a>; jobs: 18000; needs: (any_of: shore, irrigation)))</li>
+<li>id: terrace; place: fields; class: farmers; limit: per_place; group: land; steps: ((name: terrace; cost: (gold: 50; months: 24; stone: 20); unlocked_by: <a href="/wiki/Data-Research#inventions">F2 Wet-rice terracing</a>; jobs: 12000))</li>
+<li>id: raised fields; place: marsh; class: farmers; limit: per_place; group: land; steps: ((name: raised fields; cost: (gold: 40; months: 18; timber: 10); unlocked_by: <a href="/wiki/Data-Research#inventions">F6 Chinampa and raised fields</a>; jobs: 12000))</li>
+<li>id: plantation; place: fields; class: farmers; limit: per_place; group: land; steps: ((name: plantation; cost: (gold: 80; months: 24; timber: 20); unlocked_by: <a href="/wiki/Data-Research#inventions">F10 Sugar and spice plantations</a>; jobs: 12000)); forced_labour_bonus: no</li>
+<li>id: grove; place: fields; class: farmers; limit: per_place; group: land; steps: ((name: grove; cost: (gold: 40; months: 12; timber: 10; crew: 500); unlocked_by: start; jobs: 6000; upkeep: 0.5)); years_to_bear: 3; aliases: vineyard</li>
+<li>id: ranch; place: pasture; class: herders; limit: per_place; group: land; steps: ((name: ranch; cost: (gold: 20; months: 4; timber: 10); unlocked_by: start; jobs: 3000))</li>
+<li>id: horse stud; place: pasture; class: herders; limit: per_place; group: land; steps: ((name: horse stud; cost: (gold: 60; months: 12; timber: 20); unlocked_by: <a href="/wiki/Data-Research#inventions">F11 Horse breeding studs</a>; jobs: 3000))</li>
+<li>id: irrigation works; place: waste; class: farmers; limit: per_place; group: land; steps: ((name: irrigation works; cost: (gold: 60; months: 24; stone: 20); unlocked_by: <a href="/wiki/Data-Research#inventions">F3 Qanat and canal irrigation</a>; jobs: 1500))</li>
+<li>id: monastery; place: fields; class: clergy; limit: per_place; group: none; steps: ((name: monastery; cost: (gold: 90; months: 36; stone: 40); unlocked_by: start; jobs: 6300; student_seats_with_L1: 20)); outside_town: yes; makes_clergy: yes; grain_at_farm_rate: yes; jobs_text: 300 clergy + 6,000 farmers</li>
+<li>id: lumber camp; place: woods; class: woodsmen; limit: per_place; group: land; steps: ((name: lumber camp; cost: (gold: 10; months: 4); unlocked_by: start; jobs: 1500))</li>
+<li>id: hunting lodge; place: woods; class: woodsmen; limit: per_place; group: land; steps: ((name: hunting lodge; cost: (gold: 8; months: 3); unlocked_by: start; jobs: 1500))</li>
+<li>id: mine; place: waste, hills, mountains; class: miners; limit: per_place; group: extraction; steps: ((name: mine; cost: (gold: 60; months: 12; timber: 20); unlocked_by: start; jobs: 6000), (name: shaft mine; cost: (gold: none; months: none); unlocked_by: <a href="/wiki/Data-Research#inventions">C6 Mining pumps and shafts</a>; jobs: 6000), (name: steam-pumped mine; cost: (gold: none; months: none); unlocked_by: <a href="/wiki/Data-Research#inventions">C13 steam_power</a>; jobs: 6000))</li>
+<li>id: quarry; place: waste, hills, mountains; class: miners; limit: per_place; group: extraction; steps: ((name: quarry; cost: (gold: 20; months: 6; timber: 10; crew: 500); unlocked_by: start; jobs: 3000; upkeep: 0.5; makes: (stone: 40)))</li>
+<li>id: saltworks; place: shore; class: miners; limit: per_place; group: extraction; steps: ((name: saltworks; cost: (gold: 20; months: 6; timber: 10); unlocked_by: start; jobs: 1500))</li>
+<li>id: saltpetre works; place: town; class: craftsmen; limit: per_place; group: crafts; steps: ((name: saltpetre works; cost: (gold: 30; months: 6; timber: 10); unlocked_by: <a href="/wiki/Data-Research#inventions">W3 Bombards</a>; jobs: 900; needs: (building_in_province_any: ranch, horse stud)))</li>
+<li>id: loom house; place: town; class: craftsmen; limit: per_place; group: crafts; steps: ((name: loom house; cost: (gold: 35; months: 6; timber: 10; crew: 1000); unlocked_by: start; jobs: 1500; upkeep: 1; makes: (cloth: 30); eats: (wool: 30)), (name: draper&#39;s hall; cost: (gold: 80; months: 8; bricks: 20; crew: 1000); unlocked_by: start; jobs: 2400; upkeep: 1.5; eats: (dyes: 5)), (name: weaving manufactory; cost: (gold: 160; months: 18; stone: 40; crew: 2000); unlocked_by: <a href="/wiki/Data-Research#inventions">C11 Manufactories</a>; jobs: 3900; upkeep: 3; needs: (official_in_province: yes))); craft: yes; converts_to: forge, kiln, tannery, brewery</li>
+<li>id: forge; place: town; class: craftsmen; limit: per_place; group: crafts; steps: ((name: forge; cost: (gold: none; months: none); unlocked_by: start; jobs: 1500)); craft: yes</li>
+<li>id: kiln; place: town; class: craftsmen; limit: per_place; group: crafts; steps: ((name: kiln; cost: (gold: none; months: none); unlocked_by: start; jobs: 1500)); craft: yes</li>
+<li>id: tannery; place: town; class: craftsmen; limit: per_place; group: crafts; steps: ((name: tannery; cost: (gold: none; months: none); unlocked_by: start; jobs: 1500)); craft: yes</li>
+<li>id: brewery; place: town; class: craftsmen; limit: per_place; group: crafts; steps: ((name: brewery; cost: (gold: none; months: none); unlocked_by: start; jobs: 900)); craft: yes</li>
+<li>id: press; place: town; class: craftsmen; limit: per_place; group: crafts; steps: ((name: press; cost: (gold: none; months: none); unlocked_by: <a href="/wiki/Data-Research#inventions">L4 Metal movable type</a>; jobs: 900), (name: printing house; cost: (gold: none; months: none); unlocked_by: start; effect: schools_in_reach_cost_less)); craft: yes</li>
+<li>id: paper mill; place: town; class: craftsmen; limit: per_place; group: crafts; steps: ((name: paper mill; cost: (gold: none; months: none); unlocked_by: <a href="/wiki/Data-Research#inventions">C1 Paper making</a>; jobs: 900)); craft: yes</li>
+<li>id: powder mill; place: town; class: craftsmen; limit: per_place; group: crafts; steps: ((name: powder mill; cost: (gold: none; months: none); unlocked_by: <a href="/wiki/Data-Research#inventions">W3 Bombards</a>; jobs: 900), (name: gunpowder mills; cost: (gold: none; months: none); unlocked_by: <a href="/wiki/Data-Research#inventions">C10 Gunpowder mills</a>; jobs: 900)); craft: yes</li>
+<li>id: gun foundry; place: town; class: craftsmen; limit: per_place; group: crafts; steps: ((name: gun foundry; cost: (gold: none; months: none); unlocked_by: <a href="/wiki/Data-Research#inventions">W3 Bombards</a>; jobs: 900), (name: cannon works; cost: (gold: none; months: none); unlocked_by: <a href="/wiki/Data-Research#inventions">C2 Blast furnace</a>; jobs: 900)); craft: yes</li>
+<li>id: factory; place: town; class: craftsmen; limit: per_place; group: crafts; steps: ((name: factory; cost: (gold: none; months: none); unlocked_by: <a href="/wiki/Data-Research#inventions">C14 mechanized_textiles</a>; jobs: 6000), (name: powered factory; cost: (gold: none; months: none); unlocked_by: <a href="/wiki/Data-Research#inventions">C19 electrification</a>; jobs: 6000; needs: (building_in_province: power station)), (name: assembly plant; cost: (gold: none; months: none); unlocked_by: <a href="/wiki/Data-Research#inventions">C21 Assembly line</a>; jobs: 6000)); makes_smoke: yes; products: textile mill, iron and steel works, engine works, cannery, chemical works, cement works</li>
+<li>id: power station; place: town; class: craftsmen; limit: per_province; group: none; steps: ((name: power station; cost: (gold: none; months: none); unlocked_by: <a href="/wiki/Data-Research#inventions">C19 electrification</a>; jobs: 900))</li>
+<li>id: market; place: town; class: market_folk; limit: per_province; group: crafts; steps: ((name: weekly market; cost: (gold: 40; months: 6; timber: 10; crew: 1000); unlocked_by: start; jobs: 1500; upkeep: 1; needs: (min_town: village); flags: trade_endpoint), (name: yearly fair; cost: (gold: 100; months: 12; stone: 30; crew: 2000); unlocked_by: <a href="/wiki/Data-Research#inventions">T6 Merchant fairs and exchanges</a>; jobs: 2400; upkeep: 2; needs: (charter: market charter; min_town: market_town); flags: trade_endpoint, hires_traders; stands_in_1444: yes), (name: trading house; cost: (gold: 200; months: 18; stone: 40; crew: 2000); unlocked_by: <a href="/wiki/Data-Research#inventions">T3 Bills of exchange</a>; jobs: 3000; upkeep: 3; needs: (min_town: town); flags: trade_endpoint, hires_traders, traders_start_stocked, bills_of_exchange)); loot_first: yes</li>
+<li>id: caravanserai; place: town; class: market_folk; limit: per_place; group: crafts; steps: ((name: caravanserai; cost: (gold: 40; months: 12; stone: 20); unlocked_by: start; jobs: 900; needs: (ring_work: road); flags: rest_stop))</li>
+<li>id: warehouse; place: town; class: market_folk; limit: per_place; group: crafts; steps: ((name: warehouse; cost: (gold: 30; months: 6; timber: 20); unlocked_by: start; jobs: 900; needs: (building_in_province: market); flags: storage))</li>
+<li>id: counting house; place: town; class: market_folk; limit: per_place; group: crafts; steps: ((name: counting house; cost: (gold: 60; months: 6; stone: 10); unlocked_by: <a href="/wiki/Data-Research#inventions">T2 Double-entry bookkeeping</a>; jobs: 600; flags: counting_house))</li>
+<li>id: trading post; place: shore; class: market_folk; limit: per_place; group: crafts; steps: ((name: trading post; cost: (gold: 60; months: 6; timber: 20); unlocked_by: start; jobs: 300; flags: trade_endpoint))</li>
+<li>id: bank; place: town; class: market_folk; limit: per_province; group: crafts; steps: ((name: bank; cost: (gold: 150; months: 12; stone: 30); unlocked_by: <a href="/wiki/Data-Research#inventions">T7 Deposit banks</a>; jobs: 900; needs: (min_town: city); flags: bank))</li>
+<li>id: house of worship; place: town; class: clergy; limit: per_faith_per_town; group: worship; steps: ((name: step1; cost: (gold: 40; months: 12; stone: 20; crew: 1000); unlocked_by: start; jobs: 600; upkeep: 1), (name: step2; cost: (gold: 120; months: 36; stone: 80; crew: 2000); unlocked_by: start; jobs: 1200; upkeep: 2), (name: step3; cost: (gold: 300; months: 120; stone: 200; crew: 2000); unlocked_by: start; jobs: 2000; upkeep: 4; needs: (min_town: city))); owner_default: clergy; faith_effect: pulls</li>
+<li>id: minority house of worship; place: town; class: clergy; limit: per_place; group: worship; steps: ((name: minority house of worship; cost: (gold: 40; months: 12; stone: 20); unlocked_by: start; jobs: 300; needs: (any_of: ((faith_share_at_least: 0.1), (charter: Faith tolerance))))); owner_default: clergy; faith_effect: calms</li>
+<li>id: pilgrimage shrine; place: holy_place; class: clergy; limit: per_place; group: worship; steps: ((name: pilgrimage shrine; cost: (gold: none; months: none); unlocked_by: start; jobs: 600)); never_on_build_sheet: yes; pilgrims_count_as_traders: yes</li>
+<li>id: school; place: town; class: scholars; limit: per_province; group: learning; steps: ((name: temple school; cost: (gold: 60; months: 12; stone: 20); unlocked_by: <a href="/wiki/Data-Research#inventions">L1 Temple and monastery schools</a>; needs: (min_town: market_town); seats: 20; upkeep: 2), (name: madrasa or university; cost: (gold: none; months: none); unlocked_by: <a href="/wiki/Data-Research#inventions">L2 Madrasa networks</a>; seats: (madrasa: 30; university: 60); upkeep: 4), (name: academy; cost: (gold: none; months: none); unlocked_by: <a href="/wiki/Data-Research#inventions">L12 Academies of science</a>; seats: 100; upkeep: 6))</li>
+<li>id: library; place: town; class: scholars; limit: per_place; group: learning; steps: ((name: library; cost: (gold: 80; months: 12; stone: 20); unlocked_by: <a href="/wiki/Data-Research#inventions">L5 printing</a>; jobs: 300; needs: (building_step: school, 2))); effects: graduate_a_year_sooner, sacked_scholars_not_all_flee</li>
+<li>id: observatory; place: outside; class: scholars; limit: per_place; group: learning; steps: ((name: observatory; cost: (gold: 120; months: 24; stone: 40); unlocked_by: <a href="/wiki/Data-Research#inventions">L3 Observatories</a>; jobs: 300; needs: (building_in_province: school))); effects: boats_inventions_double_rate</li>
+<li>id: hospital; place: town; class: clergy; limit: per_province; group: learning; steps: ((name: hospital; cost: (gold: 60; months: 12; stone: 20); unlocked_by: start; jobs: 600)); town_death_rate_slower: 0.005; effects: plague_spreads_slower</li>
+<li>id: wells and drains; place: ring; class: none; limit: per_place; group: none; steps: ((name: wells and drains; cost: (gold: 200; months: 36; stone: 60); unlocked_by: <a href="/wiki/Data-Research#inventions">B11 Sewers and clean water</a>)); town_plague_deaths_factor: 0.5; town_size_bonus: 1</li>
+<li>id: almshouse; place: town; class: clergy; limit: per_place; group: learning; steps: ((name: almshouse; cost: (gold: 30; months: 6; stone: 10); unlocked_by: start; jobs: 600)); shelters_homeless: 3000</li>
+<li>id: palace; place: capital_extra; class: clerks; limit: per_realm; group: palace; steps: ((name: palace; cost: (gold: 100; months: 24; stone: 60; crew: 2000); unlocked_by: start; jobs: 600; upkeep: 5; officials: 6; lords: 2), (name: great palace; cost: (gold: 300; months: 60; stone: 150; crew: 3000); unlocked_by: start; jobs: 1200; upkeep: 10; officials: 10; lords: 4), (name: royal city; cost: (gold: 700; months: 120; stone: 300; crew: 4000); unlocked_by: <a href="/wiki/Data-Research#inventions">G9 Professional bureaucracy</a>; jobs: 2000; upkeep: 20; officials: 16; lords: 6))</li>
+<li>id: seat; place: town; class: clerks; limit: per_province; group: none; steps: ((name: seat; cost: (gold: 60; months: 12; stone: 20); unlocked_by: start; jobs: 300; officials: 2), (name: seat step 2; cost: (gold: none; months: none); unlocked_by: <a href="/wiki/Data-Research#inventions">G11 Postal service</a>; officials: 4))</li>
+<li>id: chancery; place: town; class: clerks; limit: per_realm; group: none; steps: ((name: chancery; cost: (gold: 80; months: 12; stone: 20); unlocked_by: <a href="/wiki/Data-Research#inventions">G3 Tax registers</a>; jobs: 300; officials: 4)); enables: <a href="/wiki/Data-Research#inventions">G3 Tax registers</a>, <a href="/wiki/Data-Research#inventions">G10 Census</a></li>
+<li>id: court of law; place: town; class: clerks; limit: per_place; group: none; steps: ((name: court of law; cost: (gold: 50; months: 12; stone: 20); unlocked_by: <a href="/wiki/Data-Research#inventions">G1 Written law codes</a>; jobs: 300; lords: 2))</li>
+<li>id: diet hall; place: town; class: clerks; limit: per_realm; group: none; steps: ((name: diet hall; cost: (gold: 100; months: 18; stone: 40); unlocked_by: start; jobs: 300; lords: 3))</li>
+<li>id: hostage residence; place: town; class: clerks; limit: per_realm; group: none; steps: ((name: hostage residence; cost: (gold: 60; months: 12; stone: 20); unlocked_by: start; jobs: 300; lords: 3))</li>
+<li>id: examination hall; place: town; class: scholars; limit: per_place; group: none; steps: ((name: examination hall; cost: (gold: 120; months: 18; stone: 40); unlocked_by: <a href="/wiki/Data-Research#inventions">G4 Examination system</a>; jobs: 300; officials: 4))</li>
+<li>id: parliament house; place: town; class: clerks; limit: per_realm; group: none; steps: ((name: parliament house; cost: (gold: 250; months: 36; stone: 100); unlocked_by: <a href="/wiki/Data-Research#inventions">G14 Written constitution</a>; jobs: 600; officials: 6))</li>
+<li>id: mint; place: town; class: craftsmen; limit: per_province; group: none; steps: ((name: mint; cost: (gold: 80; months: 12; stone: 20); unlocked_by: start; jobs: 300)); coins: silver, gold</li>
+<li>id: castle; place: castle; class: garrison; limit: per_province; group: castle; steps: ((name: earthwork ring fort; cost: (gold: 60; months: 12; timber: 40; crew: 2000); unlocked_by: <a href="/wiki/Data-Research#inventions">B4 Earthwork ring forts</a>; upkeep: 3), (name: stone castle; cost: (gold: 300; months: 36; stone: 200; crew: 3000); unlocked_by: <a href="/wiki/Data-Research#inventions">B1 Stone castles</a>; upkeep: 6), (name: bastion fort; cost: (gold: 600; months: 48; stone: 400; crew: 4000); unlocked_by: <a href="/wiki/Data-Research#inventions">B5 bastion_fortification</a>; upkeep: 12), (name: star fort; cost: (gold: 900; months: 60; stone: 600; crew: 5000); unlocked_by: <a href="/wiki/Data-Research#inventions">B6 Star forts</a>; upkeep: 20), (name: concrete fortress; cost: (gold: 1200; months: 36; concrete: 300; crew: 4000); unlocked_by: <a href="/wiki/Data-Research#inventions">B13 Reinforced concrete</a>; upkeep: 25))</li>
+<li>id: granary; place: part_of_castle; class: none; limit: per_place; group: none; steps: ((name: granary; cost: (gold: 30; months: 6; timber: 20); unlocked_by: start)); needs_castle: yes</li>
+<li>id: town walls; place: ring; class: none; limit: per_place; group: none; steps: ((name: palisade; cost: (gold: 30; months: 6; timber: 40); unlocked_by: start), (name: stone walls; cost: (gold: 200; months: 36; stone: 150); unlocked_by: start), (name: bastioned walls; cost: (gold: none; months: none); unlocked_by: <a href="/wiki/Data-Research#inventions">B5 bastion_fortification</a>))</li>
+<li>id: drill yard; place: town; class: none; limit: per_province; group: none; steps: ((name: drill yard; cost: (gold: 40; months: 6; timber: 20; crew: 500); unlocked_by: start; upkeep: 1; needs: (min_town: town); training_room: 1500), (name: barracks; cost: (gold: 120; months: 18; stone: 60; crew: 1500); unlocked_by: <a href="/wiki/Data-Research#inventions">W12 Standing regiments</a>; upkeep: 3; training_room: 4000; no_soldiers_quartered: yes))</li>
+<li>id: arsenal; place: town; class: craftsmen; limit: per_province; group: none; steps: ((name: arsenal; cost: (gold: 60; months: 12; stone: 30); unlocked_by: start; jobs: 300)); stores_keep: yes</li>
+<li>id: watchtower line; place: ring; class: none; limit: per_place; group: none; steps: ((name: watchtower line; cost: (gold: 20; months: 6; stone: 20); unlocked_by: start)); effects: enemy_armies_seen_one_province_further, raids_spotted_a_season_ahead</li>
+<li>id: airfield; place: fields; class: none; limit: per_place; group: none; steps: ((name: airfield; cost: (gold: 150; months: 6; concrete: 40); unlocked_by: <a href="/wiki/Data-Research#inventions">B16 Airfields</a>))</li>
+<li>id: harbour; place: shore; class: seafolk; limit: per_province; group: none; steps: ((name: harbour; cost: (gold: 40; months: 12; timber: 20; crew: 1000); unlocked_by: start; jobs: 1500; upkeep: 1; berths: 10), (name: port; cost: (gold: 120; months: 24; stone: 60; crew: 2000); unlocked_by: start; jobs: 3000; upkeep: 3; needs: (min_town: market_town); berths: 25), (name: great port; cost: (gold: 300; months: 36; stone: 120; crew: 3000); unlocked_by: <a href="/wiki/Data-Research#inventions">S13 Steamships</a>; jobs: 4500; upkeep: 6; berths: 50)); port: yes; raises_sailors: yes</li>
+<li>id: shipyard; place: shore; class: seafolk; limit: per_province; group: none; steps: ((name: slipway yard; cost: (gold: 60; months: 12; timber: 40; crew: 1000); unlocked_by: start; jobs: 3000; upkeep: 2; slipways: 1), (name: shipyard; cost: (gold: 150; months: 18; timber: 80; crew: 2000); unlocked_by: <a href="/wiki/Data-Research#inventions">S4 Carrack and caravel</a>; jobs: 4500; upkeep: 4; slipways: 2), (name: naval dockyard; cost: (gold: 400; months: 36; stone: 120; crew: 3000); unlocked_by: <a href="/wiki/Data-Research#inventions">S10 Naval dockyards</a>; jobs: 6000; upkeep: 8; slipways: 2)); needs_building: harbour</li>
+<li>id: fishery; place: shore; class: seafolk; limit: per_place; group: land; steps: ((name: fishery; cost: (gold: 15; months: 4; timber: 10); unlocked_by: start; jobs: 3000))</li>
+<li>id: lighthouse; place: shore; class: seafolk; limit: per_province; group: none; steps: ((name: lighthouse; cost: (gold: 60; months: 18; stone: 40); unlocked_by: start; jobs: 100)); next_zone_storm_loss_factor: 0.5</li>
+<li>id: naval base; place: shore; class: seafolk; limit: per_place; group: none; steps: ((name: naval base; cost: (gold: 200; months: 24; stone: 100); unlocked_by: <a href="/wiki/Data-Research#inventions">S10 Naval dockyards</a>; jobs: 600; needs: (building_step: harbour, 3))); effects: based_crews_kept_in_peace_without_pay, reinforces_sea_battles_next_to_it</li>
+<li>id: road; place: ring; class: none; limit: per_place; group: none; steps: ((name: track; cost: (gold: 20; months: 6; stone: 10); unlocked_by: start), (name: road; cost: (gold: 40; months: 12; stone: 20); unlocked_by: <a href="/wiki/Data-Research#inventions">B2 Roads and post stations</a>), (name: paved road; cost: (gold: 120; months: 24; stone: 80); unlocked_by: <a href="/wiki/Data-Research#inventions">B2 Roads and post stations</a>), (name: turnpike; cost: (gold: 180; months: 36; stone: 120); unlocked_by: <a href="/wiki/Data-Research#inventions">B9 Turnpike roads</a>), (name: railway; cost: (gold: 300; months: 24; steel: 100); unlocked_by: <a href="/wiki/Data-Research#inventions">C16 railways</a>))</li>
+<li>id: bridge; place: shore; class: none; limit: per_place; group: none; steps: ((name: bridge; cost: (gold: 40; months: 18; stone: 40); unlocked_by: start)); toll_point: yes</li>
+<li>id: canal; place: ring; class: none; limit: per_place; group: none; steps: ((name: canal; cost: (gold: 400; months: 60; stone: 100; crew: 6000); unlocked_by: <a href="/wiki/Data-Research#inventions">B3 Grand canals</a>)); adds_river: yes</li>
+<li>id: dykes; place: ring; class: none; limit: per_place; group: none; steps: ((name: dykes; cost: (gold: 100; months: 36; stone: 60); unlocked_by: start)); stops_floods_to_marsh: yes; drain_marsh_with: <a href="/wiki/Data-Research#inventions">F8 Polder drainage</a></li>
+<li>id: rail station; place: town; class: none; limit: per_province; group: none; steps: ((name: rail station; cost: (gold: 150; months: 12; steel: 40); unlocked_by: <a href="/wiki/Data-Research#inventions">C16 railways</a>))</li>
+<li>id: telegraph office; place: town; class: none; limit: per_place; group: none; steps: ((name: telegraph office; cost: (gold: 60; months: 6; iron: 10); unlocked_by: <a href="/wiki/Data-Research#inventions">T14 telegraphy</a>)); days_to_capital: 1</li>
+</ul>
+<h2 id="burned-rebuild-provisional"><a class="anchor" href="#burned-rebuild-provisional" aria-label="Link to this section">#</a>Burned rebuild (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>free_per_year_in_peace</code></td><td>1</td></tr>
+<tr><td><code>paid_share_of_farm_cost</code></td><td>0.5</td></tr>
+<tr><td><code>paid_months</code></td><td>3</td></tr>
+</tbody></table></div>
+<h2 id="troyes-1444"><a class="anchor" href="#troyes-1444" aria-label="Link to this section">#</a>Troyes 1444</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>town_size</code></td><td>town</td></tr>
+<tr><td><code>slots</code></td><td>6</td></tr>
+</tbody></table></div>
+<h2 id="unique-variants"><a class="anchor" href="#unique-variants" aria-label="Link to this section">#</a>Unique variants</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>id</th><th>who</th><th>change</th></tr></thead>
+<tbody>
+<tr><td>Külliye</td><td>Ottoman</td><td>a great mosque that holds an almshouse, a school and a hospital in one slot</td></tr>
+<tr><td>Kontor</td><td>Hanseatic towns</td><td>a warehouse abroad in a foreign town by treaty</td></tr>
+<tr><td>Qollqa line</td><td>Inca</td><td>granaries along roads without a castle</td></tr>
+<tr><td>Polder mill</td><td>Low Countries</td><td>dykes drain one marsh tile every 5 years by themselves</td></tr>
+<tr><td>Ever-normal granary</td><td>Ming, Korea</td><td>granaries in towns as well as castles</td></tr>
+<tr><td>Funduq quarter</td><td>Mamluk and Maghrebi ports</td><td>foreign traders passing pay market fees here</td></tr>
+</tbody></table></div>

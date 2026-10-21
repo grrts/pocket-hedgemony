@@ -12,6 +12,7 @@ page.on("pageerror", (e) => console.log("pageerror:", e.message));
 await page.goto("http://localhost:4179/");
 await page.waitForSelector(".map-layer", { timeout: 60000 });
 await page.click("[data-nation=castile]");
+await page.click("[data-begin]");
 await page.waitForTimeout(500);
 await page.evaluate(() => {
   const b = document.createElement("button");

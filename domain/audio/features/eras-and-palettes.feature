@@ -11,6 +11,7 @@ Feature: Music eras and regional palettes
 
     Examples:
       | date | era |
+      | 1378-09-20 | I |
       | 1444-11-11 | I |
       | 1519-12-01 | I |
       | 1520-01-01 | II |

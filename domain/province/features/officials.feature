@@ -205,6 +205,58 @@ Feature: Officials and their types
   @PROV-340
   Scenario: A province just taken waits for a decision
     Given the player plays the country "Castile"
+    And the player has turned Auto-fill posts off
     When a neighbour hands the country "Castile" one of its provinces
     Then the province's post stands empty
     And End turn waits until the player fills the post, grants it to a lord or keeps it royal
+
+  @PROV-342 @PROV-347 @placeholder
+  Scenario: The crown fills its empty posts each month
+    # config: province.officials.auto_fill.reserve_gold
+    Given the player plays the country "Castile"
+    And 3 of its royal posts stand empty and its officials cap has room for them
+    And it has gold for two hires and the 20 gold kept back
+    When a new month begins
+    Then the two posts with the most people are filled by their best fit
+    And the treasury keeps at least 20 gold
+    And the player reads one line of news naming both hires
+
+  @PROV-342
+  Scenario: Auto-fill stays under the officials cap
+    Given the player plays the country "Castile"
+    And 2 of its royal posts stand empty and its officials cap has room for 1
+    When a new month begins
+    Then 1 of the two posts is filled
+
+  @PROV-343
+  Scenario: The best fit for a province
+    Given the player plays the country "Castile"
+    And a royal province of "Castile" that is calm, fed, unwalled or inland, and no trade city
+    Then its best fit is a tax collector, for its tax a month
+    When the province riots
+    Then its best fit is a judge, for the riots
+
+  @PROV-344
+  Scenario: Land just taken is filled, not waited on
+    Given the player plays the country "Castile"
+    And it has gold and room under its officials cap
+    When a neighbour hands the country "Castile" one of its provinces
+    Then the province's post is filled by its best fit
+    And End turn does not wait on it
+
+  @PROV-345
+  Scenario: Dismissing and replacing an official
+    Given the player plays the country "Castile"
+    And it has 100 gold
+    When the player replaces an official with a native hire of another type serving elsewhere
+    Then the new official holds the post in his first year and 25 gold are paid
+    When the player dismisses an official
+    Then his post stands empty
+
+  @PROV-346
+  Scenario: A released commander takes another post
+    Given the player plays the country "Castile"
+    And an official was commissioned and his post filled since
+    When the player releases him with another post empty
+    Then he takes that post in his first year
+

@@ -25,7 +25,7 @@ Each ship takes one **berth**; a ship of the line or larger takes two. Galleys, 
 
 A harbour burned in a raid or sacked with the town falls a step, and one whose slots are under half filled goes fallow with half its berths. A shipyard that is burned, has no timber in reach or has its slots under half filled stops its slipways.
 
-**Ports in 1444.** 317 historical port towns (32 great ports, 110 ports, 162 small harbours and 13 canoe landings, 53 with a shipyard) are placed into the province under them, or the nearest coastal province within about 80 km. Each province takes the highest tier among its towns and a shipyard if any town had one. At the start a great port gets harbour 2; a port gets harbour 2, or harbour 1 where the town is smaller than the market town harbour 2 needs; a small harbour gets harbour 1; and a **canoe landing** (the trading towns of the Americas, Atlantic Africa and Mozambique) gets no harbour, extra seafolk and small craft only. A shipyard starts at step 1, or step 2 where its holder knows S4 Carrack and caravel, and Venice has the Arsenal. Melos and Malé fall on no land of the current map and wait until the map gains small islands.
+**Ports at the start.** The port list holds 317 historical port towns (32 great ports, 110 ports, 162 small harbours and 13 canoe landings, 53 with a shipyard). Each is placed into the province under it, or the nearest coastal province within about 80 km. In the 1378 start each town takes its holder of 20 September 1378, and a town whose holder doesn't own that coast on the start day is left out. Each province takes the highest tier among its towns and a shipyard if any town had one. At the start a great port gets harbour 2; a port gets harbour 2, or harbour 1 where the town is smaller than the market town harbour 2 needs; a small harbour gets harbour 1; and a **canoe landing** (the trading towns of the Americas, Atlantic Africa and Mozambique) gets no harbour, extra seafolk and small craft only. A shipyard starts at step 1, or step 2 where its holder knows S4 Carrack and caravel, and Venice has the Arsenal. Melos and Malé fall on no land of the current map and wait until the map gains small islands.
 
 ### Sailors
 
@@ -203,7 +203,7 @@ The first slice of ships is playable:
 - **Sea battles.** Enemy fleets in one zone fight round by round, every four hours, until one side has lost half its strength; the loser's ships take a hull step and it runs for port. The battle is said over the map with Go there.
 - **Navy tab.** Your realm card's Navy tab is the overview: ships, sailors, the month's cost, battles, every fleet and every port. The cost is also the *Ships and sailors* line of the Treasury.
 - **The AI** keeps one ship for every two ports (at most four), puts a commander at their head, and at war hunts enemy fleets it outnumbers near by.
-- **Starting fleets.** The realms that had ships in 1444 start with them: one fleet in their best port, by how strong a sea power they were (very low none, low a transport, moderate a warship and a transport, high 3 warships and 2 transports, very high 6 and 3). Warships are galleys where the port has a shipyard, transports its sea's cog, junk or dhow. Venice, Genoa, Aragon, Portugal and Naples start with real fleets; the Americas, with canoes and rafts, start with none. A starting fleet has no admiral: appoint one before it sails.
+- **Starting fleets.** The realms that had ships at the start start with them: one fleet in their best port, by how strong a sea power they were (very low none, low a transport, moderate a warship and a transport, high 3 warships and 2 transports, very high 6 and 3). Warships are galleys where the port has a shipyard, transports its sea's cog, junk or dhow. Venice, Genoa, Aragon, Portugal and Naples start with real fleets; the Americas, with canoes and rafts, start with none. A starting fleet has no admiral: appoint one before it sails.
 - **Hired fleets.** The Navy tab's *Hired fleets* line opens the *Hire a fleet* screen. Free fleets gather in the seas their people sailed (Genoese galley masters, Basque shipmasters, Hanseatic peace ships, Barbary and Aegean corsairs, Dalmatian ship-owners, Japanese sea clans, Fujian traders, the Orang Laut, Gujarati and Malabar ship-owners); four are for hire at once and some move on each month. Sea powers at peace with everyone also lend an idle fleet of their own; the gold goes to them, and they call it home if they go to war. Each card shows the ships, what they fight and carry, the captain, the port it would reach and the days, and its pay. A hired fleet sails at once for your nearest port under its own captain, costs three times its ships' upkeep and wages a month (a lent fleet twice), keeps its ships together, and leaves when you dismiss it or can't pay. At war and outgunned at sea, the AI hires one too.
 
 Prices are the design's scaled to the game's treasury (ships ×0.1, wages ×0.01), and timber is bought in, so any shipyard can build. Winds, storms and piracy come in later slices.
@@ -212,7 +212,9 @@ Prices are the design's scaled to the game's treasury (ships ×0.1, wages ×0.01
 
 These rules come from Leroy's afternoon playtest of 18 October.
 
-**Sailing tile by tile.** A fleet stands on one water tile of its sea zone. In port it lies at the port's anchorage, the water tile beside the port. A voyage is still planned zone by zone, with the same winds, reach, charts and ice. The ship then sails over the water tiles, one leg per zone, toward the next zone's centre, the port it puts into or the shore where its army lands. Each leg takes as many days as the zone always did, spread over its tiles. So the ship glides across the sea as the days pass instead of jumping. You can tap any spot of the sea and the fleet sails to that spot, with its course drawn through the water.
+**Sailing tile by tile.** A fleet stands on one water tile of its sea zone. In port it lies at the port's anchorage, the water tile beside the port. A voyage is still planned zone by zone, with the same winds, reach, charts and ice. When you give the order, the fleet plans its whole course over the water tiles at once, as an army plans its march: the shortest way through the zones of its voyage to the spot you tapped, the port it puts into or the shore where its army lands. It never cuts across land from one zone's centre to the next; where a strait is too narrow for the map's tiles, like the Bosporus, it passes through it. Each zone still takes as many days as it always did, spread over the course's tiles in that zone, and the ship sails a little every few hours. So it glides along the coast as the days pass instead of jumping. You can tap any spot of the sea and the fleet sails to that spot, with its whole course drawn through the water and the days to sail at its end.
+
+**Choosing a fleet.** A fleet takes taps as an army does. Its tap box is at least 44 points, fitted to its ship or hulls. Where it overlaps an army, such as a fleet in port beside the town's army, the one nearer your finger is chosen. With a fleet chosen, tapping one of your armies chooses that army instead of sailing.
 
 **Sighting range.** Enemy fleets meet only when they are in the same sea zone, just as armies only meet in the same province. Even then they must come within sight of each other. A fleet sees 20 tiles, plus 1 tile for each point of its leader's Cunning, up to 30 tiles. Armies see only 10 to 15. Choose a fleet and its sighting ring shows on the map. A fleet that comes within range of a sea battle in its zone joins its side. The battle is fought where the defender stands. Fleets in port, fleets running for port after a defeat and fleets of realms not at war never meet.
 
@@ -244,13 +246,15 @@ These rules come from Leroy's afternoon playtest of 18 October.
 - [Diplomacy](Diplomacy): war, peace, rivals and allies set docking rights; consent to sell hulls; privateers.
 - [Subjects](Subjects): subject ports are friendly docking.
 - [World-Map](World-Map): about 4,700 sea zones, shore tiles and adjacency.
-- [The-1444-Start](The-1444-Start): starting harbours and shipyards, canoe landings.
+- [The 1378 Start](The-1378-Start): starting harbours and shipyards, canoe landings.
 - [Map and Map Modes](Map-and-Lenses): ports, fleets and the Sea map mode.
 - [Time-and-Turns](Time-and-Turns): the day loop and monthly steps.
 - [Historical-Events](Historical-Events): ships from events.
 - [Government](Government): realms with no officials lead fleets by chiefs or elders.
 
 ## Numbers
+
+Every value the game uses, made from its config so it always matches the game: [Naval data](Data-Naval). How they combine: [Formulas](Formulas).
 
 All values are **placeholders** in one naval config file (keys proposed by the spec; the design names only the file).
 
@@ -306,7 +310,7 @@ Ports data: `naval/data/ports-1444.tsv` (hand-edited) and the generated `ports-1
 - **Ships of the line** need S9 and a step 3 shipyard (which needs S10), or the Arsenal.
 - **Harbour step 3** only adds coaling and berths; ocean ships don't need it. A naval base saves wages only while ships are in port. A half-crewed ship takes twice the days.
 - **Small craft** count as trade ships with 15 days of supply and can be built on any shore with seafolk. Canoe landings start with 100 extra seafolk and 5 small craft.
-- **Junks and dhows** may cross their own monsoon seas (the Indian Ocean seas, the South China Sea and the Java Sea) once their realm knows T5, which its home regions know in 1444.
+- **Junks and dhows** may cross their own monsoon seas (the Indian Ocean seas, the South China Sea and the Java Sea) once their realm knows T5, which its home regions know from the start.
 - **Foreign crews**: a port can hire up to 100 sailors a year from realms whose trade ships call there.
 - **Pirates**: each pirate fleet starts with 2 ships, a season lasts 3 months, and each pirate coast has one base province (Algiers for the Barbary corsairs). Burning it ends the fleet until trade brings it back.
 - **Sea-power AIs** keep a quarter of the seafolk they can call at sea.

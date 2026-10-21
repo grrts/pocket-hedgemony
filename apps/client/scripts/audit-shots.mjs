@@ -33,6 +33,7 @@ for (const [name, device] of [
   await page.goto("http://localhost:4191/");
   await page.waitForSelector("[data-nation=castile]", { timeout: 60000 });
   await page.click("[data-nation=castile]");
+  await page.click("[data-begin]");
   await page.waitForSelector(".hud [data-news]", { timeout: 60000 });
   await page.waitForTimeout(600);
   await page.click("[data-hint=stop]").catch(() => {});

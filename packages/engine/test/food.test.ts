@@ -25,6 +25,14 @@ describe("a living realm: food", () => {
     expect(yearlyFood(w, p)).toBeGreaterThan(w.provincePopulation[p]!);
   });
 
+  it("waits a whole year for the first harvest when the game starts after the 1st of the harvest month (20 September 1378)", () => {
+    const w = createWorld({ ...rules, defines: { ...rules.defines, startDate: { ...rules.defines.startDate, month: 9, day: 20 } } }, 1, tiles);
+    const p = capitalOf(w, "castile");
+    expect(w.date.month).toBe(9);
+    // The September harvest came in on the 1st: twelve months to the next, and four more.
+    expect(storeMonths(w, p)).toBeCloseTo(16, 3);
+  });
+
   it("brings the harvest in each September in the north, and stores rise after it", () => {
     const w = createWorld(rules, 1, tiles);
     const p = capitalOf(w, "castile");
@@ -64,8 +72,10 @@ describe("a living realm: food", () => {
       // Two years with nothing in the store, the realm's or the castles': the harvests fail and nobody can help.
       for (const q of realm) w.provinceStore[q] = 0;
       w.castleStore.fill(0);
+      const starvedBefore = w.provinceStarved[p]!;
       processTurn(w, [], -1);
-      worst = Math.max(worst, w.provinceStarved[p]! / (w.provincePopulation[p]! + w.provinceStarved[p]!));
+      // Judged in the weeks people starve: afterwards levies and moves shift the province while the starved stay counted.
+      if (w.provinceStarved[p]! > starvedBefore) worst = Math.max(worst, w.provinceStarved[p]! / (w.provincePopulation[p]! + w.provinceStarved[p]!));
     }
     expect(worst).toBeGreaterThan(0.1);
     // People who come and go after the famine (refugees, births) move the share by a hair.

@@ -1,0 +1,4916 @@
+{
+ "$comment": "Historical goals with their reasons for Africa and the Americas (plan-1378 §2), from start-date/research/africa-americas.md. Weighed by the AI (EVT-100 to EVT-106); never forced.",
+ "goals": [
+  {
+   "realm": "tunis",
+   "goal": "Bring the Jarid and Zab towns under Tunis",
+   "reason": "Their lords kept the taxes and the date trade; a reunited realm needs that revenue",
+   "ends_when": "The towns pay Tunis, or the Hafsid line splits again",
+   "window": [
+    1378,
+    1399
+   ],
+   "weight": "strong",
+   "deviation": "Settle for tribute and grants to local lords",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Tozeur",
+      "at": [
+       8.13,
+       33.92
+      ]
+     },
+     {
+      "name": "Biskra",
+      "at": [
+       5.73,
+       34.85
+      ]
+     }
+    ],
+    "target": "jarid_oasis_lords"
+   },
+   "alternative": {
+    "kind": "subject",
+    "target": "jarid_oasis_lords"
+   }
+  },
+  {
+   "realm": "tunis",
+   "goal": "Retake Tripoli",
+   "reason": "The last big Ifriqiyan port outside Tunis; customs and the eastern route",
+   "ends_when": "Tripoli has a Hafsid governor",
+   "window": [
+    1390,
+    1401
+   ],
+   "weight": "normal",
+   "deviation": "Accept nominal recognition",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Tripoli",
+      "at": [
+       13.19,
+       32.89
+      ]
+     }
+    ],
+    "target": "tripoli_regency"
+   },
+   "alternative": {
+    "kind": "subject",
+    "target": "tripoli_regency"
+   }
+  },
+  {
+   "realm": "tunis",
+   "goal": "Defend the coast and Djerba against Christian fleets",
+   "reason": "Corsairs and trade rivalry bring Sicilian, Aragonese and Franco-Genoese attacks (1388, 1390, 1432)",
+   "ends_when": "Never fully; drops while no fleet threatens",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "Fortify, answer with corsair raids",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Djerba",
+      "at": [
+       10.86,
+       33.88
+      ]
+     },
+     {
+      "name": "Mahdia",
+      "at": [
+       11.06,
+       35.5
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "tunis",
+   "goal": "Curb the Arab tribes",
+   "reason": "They extort grants and back rival princes",
+   "ends_when": "Tribes serve for pay without revolt",
+   "window": [
+    1378,
+    1434
+   ],
+   "weight": "normal",
+   "deviation": "Co-opt chiefs with grants",
+   "aim": {
+    "kind": "subject",
+    "target": "hilali_sulaymi_arabs"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "hilali_sulaymi_arabs"
+   }
+  },
+  {
+   "realm": "tunis",
+   "goal": "Dominate the central Maghreb: Algiers, then Tlemcen",
+   "reason": "Secures the western flank; prestige as heir of the Almohads",
+   "ends_when": "Tlemcen takes a Hafsid nominee, or Tunis weakens",
+   "window": [
+    1405,
+    1431
+   ],
+   "weight": "normal",
+   "deviation": "Fall back to Ifriqiya if Tlemcen or Morocco grow strong",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Algiers",
+      "at": [
+       3.06,
+       36.75
+      ]
+     }
+    ],
+    "target": "tlemcen"
+   },
+   "alternative": {
+    "kind": "subject",
+    "target": "tlemcen"
+   }
+  },
+  {
+   "realm": "tunis",
+   "goal": "Keep Italian and Aragonese trade",
+   "reason": "Customs revenue",
+   "ends_when": "Never; treaties renew",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "Shift partners among Genoa, Venice, Pisa and Aragon",
+   "aim": null
+  },
+  {
+   "realm": "morocco",
+   "goal": "Reunite Morocco by taking Marrakesh",
+   "reason": "A rival Marinid sultan splits the realm and its tax base",
+   "ends_when": "Marrakesh taken or Abd al-Rahman dead",
+   "window": [
+    1378,
+    1386
+   ],
+   "weight": "strong",
+   "deviation": "Accept the partition for a time",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Marrakesh",
+      "at": [
+       -7.99,
+       31.63
+      ]
+     }
+    ],
+    "target": "marinid_marrakesh"
+   }
+  },
+  {
+   "realm": "morocco",
+   "goal": "Escape Granadan tutelage",
+   "reason": "Muhammad V makes and unmakes Marinid sultans by releasing pretenders",
+   "ends_when": "Granada stops intervening (Muhammad V dies 1391)",
+   "window": [
+    1378,
+    1393
+   ],
+   "weight": "normal",
+   "deviation": "Stay Granada's ally",
+   "aim": {
+    "kind": "free",
+    "target": "granada"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "granada"
+   }
+  },
+  {
+   "realm": "morocco",
+   "goal": "Dominate Tlemcen",
+   "reason": "Old Marinid aim to rule the central Maghreb and its trade",
+   "ends_when": "Tlemcen tributary (1389–1390s), or the Hafsids dominate it",
+   "window": [
+    1384,
+    1393
+   ],
+   "weight": "normal",
+   "deviation": "Back Zayyanid pretenders",
+   "aim": {
+    "kind": "subject",
+    "target": "tlemcen"
+   }
+  },
+  {
+   "realm": "morocco",
+   "goal": "Hold the Strait ports",
+   "reason": "Link to al-Andalus and trade; later the Portuguese threat",
+   "ends_when": "Port lost (Ceuta 1415)",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "Holy war in the interior; sharifian mobilisation",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Ceuta",
+      "at": [
+       -5.32,
+       35.89
+      ]
+     },
+     {
+      "name": "Tangier",
+      "at": [
+       -5.81,
+       35.77
+      ]
+     }
+    ]
+   },
+   "toward": [
+    "conquest_of_ceuta"
+   ]
+  },
+  {
+   "realm": "morocco",
+   "goal": "Keep the Saharan route through Sijilmasa",
+   "reason": "Gold and caravan revenue",
+   "ends_when": "Sijilmasa abandoned (1393)",
+   "window": [
+    1378,
+    1393
+   ],
+   "weight": "normal",
+   "deviation": "Let local lords and the Hintata run the south",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Sijilmasa",
+      "at": [
+       -4.27,
+       31.28
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "morocco",
+   "goal": "Keep the Wattasid regency in power",
+   "reason": "The Wattasid regent rules for a child sultan",
+   "ends_when": "Regent dies (1448) or a sultan purges them",
+   "window": [
+    1420,
+    1458
+   ],
+   "weight": "normal",
+   "deviation": "A Wattasid strongman or sharifian movement takes over",
+   "aim": null
+  },
+  {
+   "realm": "marinid_marrakesh",
+   "goal": "Hold Marrakesh and the south",
+   "reason": "His base and revenue as a rival sultan",
+   "ends_when": "Marrakesh taken",
+   "window": [
+    1378,
+    1386
+   ],
+   "weight": "strong",
+   "deviation": "Accept Fez's suzerainty for a truce",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Marrakesh",
+      "at": [
+       -7.99,
+       31.63
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "marinid_marrakesh",
+   "goal": "Claim the whole Marinid throne",
+   "reason": "He is a Marinid prince with a claim",
+   "ends_when": "He dies",
+   "window": [
+    1378,
+    1386
+   ],
+   "weight": "normal",
+   "deviation": "Ally with Granada or the Hintata",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Fez",
+      "at": [
+       -4.98,
+       34.06
+      ]
+     }
+    ],
+    "target": "morocco"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "granada"
+   }
+  },
+  {
+   "realm": "tlemcen",
+   "goal": "Survive Marinid and Hafsid pressure",
+   "reason": "Tlemcen was occupied three times since 1337",
+   "ends_when": "Abu Hammu falls (1389) or a protector is accepted",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "strong",
+   "deviation": "Accept Marinid (1389) or Hafsid (1424) suzerainty",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Tlemcen",
+      "at": [
+       -1.32,
+       34.88
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "tlemcen",
+   "goal": "Crush the rival Zayyanid prince Abu Zayyan",
+   "reason": "A rival prince with Arab backing threatens the throne",
+   "ends_when": "The rival is dead or gone",
+   "window": [
+    1378,
+    1389
+   ],
+   "weight": "normal",
+   "deviation": "Buy off his Arab allies",
+   "aim": null
+  },
+  {
+   "realm": "tlemcen",
+   "goal": "Hold Algiers, Tenes and the coast",
+   "reason": "Ports and customs",
+   "ends_when": "Lost to the Hafsids (c.1410)",
+   "window": [
+    1378,
+    1410
+   ],
+   "weight": "normal",
+   "deviation": "Let local notables govern under nominal rule",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Algiers",
+      "at": [
+       3.06,
+       36.75
+      ]
+     },
+     {
+      "name": "Tenes",
+      "at": [
+       1.31,
+       36.51
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "tlemcen",
+   "goal": "Keep the Saharan trade",
+   "reason": "Gold via Tuat and Sijilmasa pays the state",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "Seek Aragonese trade treaties",
+   "aim": null,
+   "alternative": {
+    "kind": "ally",
+    "target": "aragon"
+   }
+  },
+  {
+   "realm": "tripoli_regency",
+   "goal": "Keep Tripoli autonomous",
+   "reason": "Local lords hold the port's revenue",
+   "ends_when": "Abu Faris takes Tripoli (c.1401)",
+   "window": [
+    1378,
+    1401
+   ],
+   "weight": "strong",
+   "deviation": "Pay nominal homage to Tunis",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Tripoli",
+      "at": [
+       13.19,
+       32.89
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "beni_hassan_maqil",
+   "goal": "Take pasture and tribute in the Dra, Tafilalt and western Sahara",
+   "reason": "They are pushing south",
+   "ends_when": "A strong state settles them",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "Serve Fez or Tlemcen for pay when they are strong",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Dra valley",
+      "at": [
+       -5.84,
+       30.33
+      ]
+     },
+     {
+      "name": "Tafilalt",
+      "at": [
+       -4.27,
+       31.28
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "hilali_sulaymi_arabs",
+   "goal": "Keep their grants and pasture",
+   "reason": "Grants are their income",
+   "ends_when": "A strong sultan (Abu Faris) curbs them",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "Back rival princes when Tunis is weak",
+   "aim": null
+  },
+  {
+   "realm": "atlas_berbers",
+   "goal": "Keep local self-rule and control of routes and wells",
+   "reason": "Their livelihood rests on them; defensive only",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Tinmel",
+      "at": [
+       -8.23,
+       30.99
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "kabyle",
+   "goal": "Keep local self-rule and control of routes and wells",
+   "reason": "Their livelihood rests on them; defensive only",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Djurdjura",
+      "at": [
+       4.15,
+       36.45
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "mzab",
+   "goal": "Keep local self-rule and control of routes and wells",
+   "reason": "Their livelihood rests on them; defensive only",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Ghardaïa",
+      "at": [
+       3.67,
+       32.49
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "tuat",
+   "goal": "Keep local self-rule and control of routes and wells",
+   "reason": "Their livelihood rests on them; defensive only",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Tamentit",
+      "at": [
+       -0.26,
+       27.77
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "fezzan",
+   "goal": "Keep local self-rule and control of routes and wells",
+   "reason": "Their livelihood rests on them; defensive only",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Murzuq",
+      "at": [
+       13.92,
+       25.92
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "siwa",
+   "goal": "Keep local self-rule and control of routes and wells",
+   "reason": "Their livelihood rests on them; defensive only",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Siwa",
+      "at": [
+       25.52,
+       29.2
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "tuareg_kel_ajjer",
+   "goal": "Keep local self-rule and control of routes and wells",
+   "reason": "Their livelihood rests on them; defensive only",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Ghat",
+      "at": [
+       10.17,
+       24.96
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "tubu_teda",
+   "goal": "Keep local self-rule and control of routes and wells",
+   "reason": "Their livelihood rests on them; defensive only",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Bilma",
+      "at": [
+       12.92,
+       18.69
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "sanhaja_zenaga",
+   "goal": "Keep local self-rule and control of routes and wells",
+   "reason": "Their livelihood rests on them; defensive only",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Ouadane",
+      "at": [
+       -11.62,
+       20.93
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "gran_canaria",
+   "goal": "Resist slavers and conquest",
+   "reason": "Raiders and conquerors come from Europe",
+   "ends_when": "Conquered",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Gáldar",
+      "at": [
+       -15.65,
+       28.14
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "la_palma",
+   "goal": "Resist slavers and conquest",
+   "reason": "Raiders and conquerors come from Europe",
+   "ends_when": "Conquered",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Caldera de Taburiente",
+      "at": [
+       -17.86,
+       28.72
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "tenerife_menceyatos",
+   "goal": "Resist slavers and conquest",
+   "reason": "Raiders and conquerors come from Europe",
+   "ends_when": "Conquered",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Taoro",
+      "at": [
+       -16.52,
+       28.39
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "eastern_canary_chiefdoms",
+   "goal": "Resist slavers and conquest",
+   "reason": "Raiders and conquerors come from Europe",
+   "ends_when": "Conquered (eastern islands 1402–05)",
+   "window": [
+    1378,
+    1405
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Lanzarote",
+      "at": [
+       -13.56,
+       29.06
+      ]
+     },
+     {
+      "name": "Fuerteventura",
+      "at": [
+       -14.06,
+       28.43
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "mali",
+   "goal": "Hold Timbuktu, Gao and Walata",
+   "reason": "Saharan trade revenue and prestige",
+   "ends_when": "Each is lost (Gao c.1400, Timbuktu and Walata c.1433)",
+   "window": [
+    1378,
+    1433
+   ],
+   "weight": "strong",
+   "deviation": "Turn west to the Gambia and Atlantic trade",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Timbuktu",
+      "at": [
+       -3.0,
+       16.77
+      ]
+     },
+     {
+      "name": "Gao",
+      "at": [
+       -0.04,
+       16.27
+      ]
+     },
+     {
+      "name": "Walata",
+      "at": [
+       -7.03,
+       17.3
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "subject",
+    "target": "gambia_mandinka_kingdoms"
+   },
+   "toward": [
+    "tuareg_take_timbuktu"
+   ]
+  },
+  {
+   "realm": "mali",
+   "goal": "Subdue Takedda and the Tuareg",
+   "reason": "Copper, the Aïr route, and Tuareg raids",
+   "ends_when": "Campaign ends, or Mari Djata dies",
+   "window": [
+    1378,
+    1389
+   ],
+   "weight": "normal",
+   "deviation": "Pay off Tuareg chiefs",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Takedda",
+      "at": [
+       6.67,
+       17.43
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "mali",
+   "goal": "Keep the throne under court control",
+   "reason": "A weak mansa; viziers rule",
+   "ends_when": "A strong mansa or a usurper (Sandaki, 1389)",
+   "window": [
+    1378,
+    1390
+   ],
+   "weight": "normal",
+   "deviation": "A vizier takes the throne",
+   "aim": null
+  },
+  {
+   "realm": "mali",
+   "goal": "Hold the gold fields and western provinces",
+   "reason": "Bambuk and Bure gold, Kaabu and Gambia tribute",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Bambuk",
+      "at": [
+       -11.3,
+       13.6
+      ]
+     },
+     {
+      "name": "Bure",
+      "at": [
+       -9.17,
+       11.42
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "mali",
+   "goal": "Fend off Mossi raids",
+   "reason": "Raids on the Niger bend and Masina",
+   "ends_when": "A strong Niger state takes over",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "Abandon the Niger bend",
+   "aim": {
+    "kind": "fight",
+    "target": "mossi"
+   }
+  },
+  {
+   "realm": "songhai",
+   "goal": "Throw off Mali and take Gao",
+   "reason": "Claim to the old Gao kingdom and its river trade",
+   "ends_when": "Gao independent (c.1400, approximate)",
+   "window": [
+    1380,
+    1400
+   ],
+   "weight": "strong",
+   "deviation": "Stay tributary and raid",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Gao",
+      "at": [
+       -0.04,
+       16.27
+      ]
+     }
+    ],
+    "target": "mali"
+   },
+   "alternative": {
+    "kind": "fight",
+    "target": "mali"
+   }
+  },
+  {
+   "realm": "songhai",
+   "goal": "Raid west toward Mema and the inland delta",
+   "reason": "Captives and plunder from a weakening Mali",
+   "ends_when": "A strong Mali or Tuareg block",
+   "window": [
+    1400,
+    1430
+   ],
+   "weight": "normal",
+   "deviation": "Consolidate on the river",
+   "aim": {
+    "kind": "fight",
+    "target": "mali"
+   }
+  },
+  {
+   "realm": "songhai",
+   "goal": "Drive the Tuareg from Timbuktu",
+   "reason": "The city's trade and scholars",
+   "ends_when": "Taken (1468)",
+   "window": [
+    1433,
+    1468
+   ],
+   "weight": "normal",
+   "deviation": "Accept the Tuareg as a buffer",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Timbuktu",
+      "at": [
+       -3.0,
+       16.77
+      ]
+     }
+    ],
+    "target": "timbuktu_tuareg"
+   },
+   "toward": [
+    "sonni_ali_takes_timbuktu"
+   ]
+  },
+  {
+   "realm": "jolof",
+   "goal": "Keep the Wolof and Serer kingdoms paying",
+   "reason": "Tribute and horses",
+   "ends_when": "Kayor breaks away (1549)",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "strong",
+   "deviation": "Fall back on the interior",
+   "aim": {
+    "kind": "subject",
+    "target": "kayor"
+   }
+  },
+  {
+   "realm": "jolof",
+   "goal": "Stay free of Mali",
+   "reason": "Mali's crises opened the way to independence",
+   "ends_when": "Mali can no longer press a claim",
+   "window": [
+    1378,
+    1400
+   ],
+   "weight": "normal",
+   "deviation": "Pay token tribute",
+   "aim": {
+    "kind": "free",
+    "target": "mali"
+   }
+  },
+  {
+   "realm": "jolof",
+   "goal": "Control the horse trade",
+   "reason": "Saharan (later Portuguese) horses make its cavalry",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "kanem_bornu",
+   "goal": "Hold Kanem and Njimi against the Bulala",
+   "reason": "The dynastic homeland",
+   "ends_when": "Withdrawal to Bornu (c.1380s)",
+   "window": [
+    1378,
+    1385
+   ],
+   "weight": "strong",
+   "deviation": "Withdraw early",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Njimi",
+      "at": [
+       15.3,
+       14.25
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "kanem_bornu",
+   "goal": "Rebuild in Bornu and end the branch feuds",
+   "reason": "Survival; rival Idrisid and Dawudid branches",
+   "ends_when": "Ali Gaji restores order (c.1470s)",
+   "window": [
+    1385,
+    1479
+   ],
+   "weight": "strong",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "kanem_bornu",
+   "goal": "Keep the Saharan route to Fezzan and Egypt safe",
+   "reason": "Trade and pilgrimage; Arab raiders (letter to Barquq, c.1391)",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": null,
+   "alternative": {
+    "kind": "ally",
+    "target": "mamluks"
+   }
+  },
+  {
+   "realm": "kanem_bornu",
+   "goal": "Take tribute from the Hausa states",
+   "reason": "Revenue; Kano lies close to Bornu",
+   "ends_when": "Kano pays (1420s–30s)",
+   "window": [
+    1420,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "subject",
+    "target": "kano"
+   }
+  },
+  {
+   "realm": "kanem_bornu",
+   "goal": "Retake Kanem",
+   "reason": "The homeland",
+   "ends_when": "Taken (c.1507)",
+   "window": [
+    1490,
+    1507
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Njimi",
+      "at": [
+       15.3,
+       14.25
+      ]
+     }
+    ],
+    "target": "bulala"
+   }
+  },
+  {
+   "realm": "bulala",
+   "goal": "Take Kanem",
+   "reason": "Pasture, the Saharan route and Njimi",
+   "ends_when": "Kanem held (1380s)",
+   "window": [
+    1378,
+    1385
+   ],
+   "weight": "strong",
+   "deviation": "Raid without settling",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Njimi",
+      "at": [
+       15.3,
+       14.25
+      ]
+     }
+    ],
+    "target": "kanem_bornu"
+   },
+   "alternative": {
+    "kind": "fight",
+    "target": "kanem_bornu"
+   }
+  },
+  {
+   "realm": "bulala",
+   "goal": "Hold Kanem",
+   "reason": "Their new seat of power",
+   "ends_when": "Bornu retakes it (c.1507)",
+   "window": [
+    1385,
+    1507
+   ],
+   "weight": "normal",
+   "deviation": "Defensive when Bornu revives",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Njimi",
+      "at": [
+       15.3,
+       14.25
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "kano",
+   "goal": "Lead the neighbouring Hausa chiefdoms",
+   "reason": "Tribute and land; the Kano Chronicle records Yaji's wars (Santolo, Rano)",
+   "ends_when": "Neighbours submit or a peer blocks",
+   "window": [
+    1378,
+    1410
+   ],
+   "weight": "strong",
+   "deviation": "Trade instead of war",
+   "aim": {
+    "kind": "subject",
+    "target": "rano"
+   }
+  },
+  {
+   "realm": "kano",
+   "goal": "Grow trade with Wangara merchants",
+   "reason": "Muslim traders bring the Saharan and Mande routes",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "kano",
+   "goal": "Keep peace with Bornu",
+   "reason": "Bornu's strength after it settles west of Lake Chad",
+   "ends_when": "Accepts tribute (1420s–30s)",
+   "window": [
+    1420,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "Resist and raid south",
+   "aim": {
+    "kind": "ally",
+    "target": "kanem_bornu"
+   },
+   "alternative": {
+    "kind": "fight",
+    "target": "middle_belt_societies"
+   }
+  },
+  {
+   "realm": "katsina",
+   "goal": "Grow trade with Aïr and rival Kano",
+   "reason": "Both compete for the same caravans",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "fight",
+    "target": "kano"
+   }
+  },
+  {
+   "realm": "biram",
+   "goal": "Hold their land and raid the Middle Belt for captives",
+   "reason": "Captives and land",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": {
+    "kind": "fight",
+    "target": "middle_belt_societies"
+   }
+  },
+  {
+   "realm": "daura",
+   "goal": "Hold their land and raid the Middle Belt for captives",
+   "reason": "Captives and land",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": {
+    "kind": "fight",
+    "target": "middle_belt_societies"
+   }
+  },
+  {
+   "realm": "gobir",
+   "goal": "Hold their land and raid the Middle Belt for captives",
+   "reason": "Captives and land",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": {
+    "kind": "fight",
+    "target": "middle_belt_societies"
+   }
+  },
+  {
+   "realm": "rano",
+   "goal": "Hold their land and raid the Middle Belt for captives",
+   "reason": "Captives and land",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": {
+    "kind": "fight",
+    "target": "middle_belt_societies"
+   }
+  },
+  {
+   "realm": "zamfara",
+   "goal": "Hold their land and raid the Middle Belt for captives",
+   "reason": "Captives and land",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": {
+    "kind": "fight",
+    "target": "middle_belt_societies"
+   }
+  },
+  {
+   "realm": "zazzau",
+   "goal": "Hold their land and raid the Middle Belt for captives",
+   "reason": "Captives and land",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": {
+    "kind": "fight",
+    "target": "middle_belt_societies"
+   }
+  },
+  {
+   "realm": "gobir",
+   "goal": "Resist Aïr Tuareg pressure",
+   "reason": "Tuareg confederations press from the north",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "fight",
+    "target": "air_tuareg"
+   }
+  },
+  {
+   "realm": "kaabu",
+   "goal": "Rule the Southern Rivers as Mali's western province",
+   "reason": "Slaves and cloth",
+   "ends_when": "Grows autonomous as Mali weakens",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "Break from Mali",
+   "aim": {
+    "kind": "subject",
+    "target": "southern_rivers_peoples"
+   },
+   "alternative": {
+    "kind": "free",
+    "target": "mali"
+   }
+  },
+  {
+   "realm": "mossi",
+   "goal": "Raid the Niger bend and Masina",
+   "reason": "Captives and plunder",
+   "ends_when": "A strong Niger state (Songhai, 1480s) blocks them",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "fight",
+    "target": "mali"
+   }
+  },
+  {
+   "realm": "air_tuareg",
+   "goal": "Found a sultanate and control the caravans",
+   "reason": "To settle quarrels between the confederations",
+   "ends_when": "Sultanate founded (c.1405)",
+   "window": [
+    1400,
+    1410
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Agadez",
+      "at": [
+       7.99,
+       16.97
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "timbuktu_tuareg",
+   "goal": "Raid the Malian Sahel and take Timbuktu",
+   "reason": "The city's trade and Mali's weakness",
+   "ends_when": "Songhai takes Timbuktu (1468)",
+   "window": [
+    1378,
+    1468
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Timbuktu",
+      "at": [
+       -3.0,
+       16.77
+      ]
+     }
+    ],
+    "target": "mali"
+   },
+   "toward": [
+    "tuareg_take_timbuktu"
+   ]
+  },
+  {
+   "realm": "benin",
+   "goal": "Strengthen the oba against the uzama chiefs",
+   "reason": "The old chiefs limit royal power",
+   "ends_when": "Ewuare's reforms and expansion (c.1440)",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "ife",
+   "goal": "Keep ritual primacy over Yoruba and Benin kingship",
+   "reason": "Its sacred authority as the source of kingship",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "oyo",
+   "goal": "Hold their land",
+   "reason": "Local security",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "owu",
+   "goal": "Hold their land",
+   "reason": "Local security",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "ijebu",
+   "goal": "Hold their land",
+   "reason": "Local security",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "igala",
+   "goal": "Hold their land",
+   "reason": "Local security",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "nupe",
+   "goal": "Hold their land",
+   "reason": "Local security",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "borgu",
+   "goal": "Hold their land",
+   "reason": "Local security",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "djenne",
+   "goal": "Keep the gold and kola trade open",
+   "reason": "Trade is their wealth",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "begho",
+   "goal": "Keep the gold and kola trade open",
+   "reason": "Trade is their wealth",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "bono",
+   "goal": "Keep the gold and kola trade open",
+   "reason": "Trade is their wealth",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "ethiopia",
+   "goal": "Crush Ifat and restore Walashma tribute",
+   "reason": "Ifat's revolt threatens tribute, the Shewan frontier and the Zeila route; royal prestige",
+   "ends_when": "Ifat destroyed or submits (its sultan killed, Zeila taken)",
+   "window": [
+    1378,
+    1415
+   ],
+   "weight": "strong",
+   "deviation": "Accept a loyal Walashma prince as tributary",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Ifat heartland",
+      "at": [
+       39.9,
+       10.0
+      ]
+     },
+     {
+      "name": "Zeila",
+      "at": [
+       43.47,
+       11.35
+      ]
+     }
+    ],
+    "target": "ifat"
+   },
+   "alternative": {
+    "kind": "subject",
+    "target": "ifat"
+   }
+  },
+  {
+   "realm": "ethiopia",
+   "goal": "Keep the Muslim principalities tributary",
+   "reason": "Gold, slaves and goods from Hadiya, Dawaro, Bale and Damot fund the mobile court",
+   "ends_when": "They become governed provinces, or are lost",
+   "window": [
+    1378,
+    1459
+   ],
+   "weight": "strong",
+   "deviation": "Turn them into governed provinces",
+   "aim": {
+    "kind": "subject",
+    "target": "hadiya"
+   },
+   "alternative": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Hadiya",
+      "at": [
+       37.9,
+       7.6
+      ]
+     },
+     {
+      "name": "Dawaro",
+      "at": [
+       40.0,
+       8.0
+      ]
+     },
+     {
+      "name": "Bale",
+      "at": [
+       39.9,
+       7.0
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "ethiopia",
+   "goal": "Protect the Copts and secure a metropolitan from Alexandria",
+   "reason": "The church needs a bishop sent by the patriarch in Mamluk Cairo",
+   "ends_when": "The church no longer depends on Alexandria, or the Mamluks are gone",
+   "window": [
+    1380,
+    1449
+   ],
+   "weight": "normal",
+   "deviation": "Pressure Egypt by threatening the Nile",
+   "aim": null
+  },
+  {
+   "realm": "ethiopia",
+   "goal": "Seek Latin Christian allies and craftsmen",
+   "reason": "Muslim neighbours on every side; firearms and artisans wanted",
+   "ends_when": "A strong ally is found, or the Muslim threat ends",
+   "window": [
+    1400,
+    1450
+   ],
+   "weight": "normal",
+   "deviation": "Rely on its own armies if Ifat or Adal is crushed",
+   "aim": {
+    "kind": "ally",
+    "target": "aragon"
+   }
+  },
+  {
+   "realm": "ethiopia",
+   "goal": "Bring Semien and Dembiya under the crown and unify the church",
+   "reason": "Legitimacy of the Solomonic line, church controversies, land for the church",
+   "ends_when": "Semien governed and baptised, and doctrine settled",
+   "window": [
+    1400,
+    1450
+   ],
+   "weight": "normal",
+   "deviation": "Leave Semien tributary under a weak king",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Semien",
+      "at": [
+       38.2,
+       13.2
+      ]
+     },
+     {
+      "name": "Dembiya",
+      "at": [
+       37.3,
+       12.2
+      ]
+     }
+    ],
+    "target": "beta_israel"
+   }
+  },
+  {
+   "realm": "ifat",
+   "goal": "Throw off Ethiopian overlordship and hold the Ifat heartland",
+   "reason": "Walashma legitimacy, holy war, and an end to tribute",
+   "ends_when": "Heartland lost, or Ethiopia recognises its autonomy",
+   "window": [
+    1378,
+    1415
+   ],
+   "weight": "strong",
+   "deviation": "Return to tribute and trade like the loyalist branch",
+   "aim": {
+    "kind": "free",
+    "target": "ethiopia"
+   }
+  },
+  {
+   "realm": "ifat",
+   "goal": "Hold Zeila and the Red Sea trade",
+   "reason": "Customs and a link to Arabia for arms and refuge",
+   "ends_when": "Zeila lost",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "Move the centre east to the Harar plateau (becomes Adal)",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Zeila",
+      "at": [
+       43.47,
+       11.35
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Dakkar",
+      "at": [
+       42.12,
+       9.31
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "ifat",
+   "goal": "Rally Hadiya, Dawaro and Bale",
+   "reason": "Shared faith; a coalition is the only way to match Ethiopia",
+   "ends_when": "They are lost to Ethiopia or join Ifat",
+   "window": [
+    1378,
+    1415
+   ],
+   "weight": "normal",
+   "deviation": "Raid them instead of rallying them",
+   "aim": {
+    "kind": "ally",
+    "target": "hadiya"
+   }
+  },
+  {
+   "realm": "ifat",
+   "goal": "Win support from Yemen and Egypt",
+   "reason": "Arms, money and refuge",
+   "ends_when": "Support won, or the dynasty destroyed",
+   "window": [
+    1390,
+    1415
+   ],
+   "weight": "weak",
+   "deviation": "Heirs flee to Yemen and refound the state in Adal",
+   "aim": {
+    "kind": "ally",
+    "target": "rasulid_yemen"
+   }
+  },
+  {
+   "realm": "adal",
+   "goal": "Refound the Walashma state in the east",
+   "reason": "Survival of the dynasty after losing Ifat",
+   "ends_when": "Formed",
+   "window": [
+    1410,
+    1420
+   ],
+   "weight": "strong",
+   "deviation": "Remain exiles in Yemen",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Dakkar",
+      "at": [
+       42.12,
+       9.31
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "adal",
+   "goal": "Recover Ifat and the Muslim tributaries",
+   "reason": "Lost heartland and dynastic honour",
+   "ends_when": "Ifat recovered, or a lasting defeat (Gomit 1445)",
+   "window": [
+    1420,
+    1445
+   ],
+   "weight": "normal",
+   "deviation": "Accept tribute status and focus on trade",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Ifat heartland",
+      "at": [
+       39.9,
+       10.0
+      ]
+     }
+    ],
+    "target": "ethiopia"
+   }
+  },
+  {
+   "realm": "adal",
+   "goal": "Keep Zeila trade flowing",
+   "reason": "It is the economic base",
+   "ends_when": "Zeila lost",
+   "window": [
+    1415,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Zeila",
+      "at": [
+       43.47,
+       11.35
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "mogadishu",
+   "goal": "Keep Indian Ocean and Red Sea trade",
+   "reason": "City wealth rests on cloth, ivory and gold",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "mogadishu",
+   "goal": "Stay free of the inland clans",
+   "reason": "Hinterland pressure on caravans and water",
+   "ends_when": "An inland power (Ajuran) offers protection",
+   "window": [
+    1400,
+    1499
+   ],
+   "weight": "normal",
+   "deviation": "Accept Ajuran protection",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Mogadishu",
+      "at": [
+       45.34,
+       2.04
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "ajuran"
+   }
+  },
+  {
+   "realm": "ajuran",
+   "goal": "Control the Shabelle water and caravan routes",
+   "reason": "Pastoral and farming base, and taxes on movement",
+   "ends_when": "Routes held",
+   "window": [
+    1378,
+    1499
+   ],
+   "weight": "normal",
+   "deviation": "Stay a clan confederacy",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Afgooye",
+      "at": [
+       45.12,
+       2.14
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "ajuran",
+   "goal": "Dominate the Benadir ports: Merca, then Mogadishu's hinterland",
+   "reason": "Port revenue",
+   "ends_when": "Ports held or allied",
+   "window": [
+    1400,
+    1599
+   ],
+   "weight": "normal",
+   "deviation": "Trade alliance with Mogadishu instead of control",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Merca",
+      "at": [
+       44.77,
+       1.71
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "mogadishu"
+   }
+  },
+  {
+   "realm": "kilwa",
+   "goal": "Hold Sofala and the gold trade",
+   "reason": "Kilwa's wealth since Abu'l-Mawahib rests on plateau gold",
+   "ends_when": "Sofala lost",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "strong",
+   "deviation": "Compete in ivory if gold is lost",
+   "aim": {
+    "kind": "subject",
+    "target": "sofala"
+   }
+  },
+  {
+   "realm": "kilwa",
+   "goal": "Restore prosperity after the 14th-century slump",
+   "reason": "Revenue fell and building stopped",
+   "ends_when": "Revival achieved (the Great Mosque rebuilt)",
+   "window": [
+    1380,
+    1429
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "kilwa",
+   "goal": "Keep Mafia, the Comoros links and Mozambique Island",
+   "reason": "Control of the southern coast",
+   "ends_when": "Lost to rivals",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "subject",
+    "target": "mafia"
+   }
+  },
+  {
+   "realm": "mombasa",
+   "goal": "Lead the northern coast",
+   "reason": "Trade dominance",
+   "ends_when": "Malindi subdued",
+   "window": [
+    1400,
+    1499
+   ],
+   "weight": "normal",
+   "deviation": "Ally with Kilwa against Malindi",
+   "aim": {
+    "kind": "subject",
+    "target": "malindi"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "kilwa"
+   }
+  },
+  {
+   "realm": "malindi",
+   "goal": "Balance Mombasa and find outside allies",
+   "reason": "Weaker than Mombasa",
+   "ends_when": "Mombasa no threat",
+   "window": [
+    1410,
+    1499
+   ],
+   "weight": "normal",
+   "deviation": "Submit to Mombasa",
+   "aim": {
+    "kind": "ally",
+    "target": "ming"
+   }
+  },
+  {
+   "realm": "dotawo",
+   "goal": "Recover Dongola",
+   "reason": "It lost its old capital in 1365",
+   "ends_when": "Dongola retaken, or the claim lapses",
+   "window": [
+    1378,
+    1400
+   ],
+   "weight": "normal",
+   "deviation": "Settle in Lower Nubia as a Mamluk tributary",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Old Dongola",
+      "at": [
+       30.75,
+       18.22
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "dotawo",
+   "goal": "Survive between the Mamluks, the Kanz and the Arab tribes",
+   "reason": "Small and pressed on all sides",
+   "ends_when": "Absorbed",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Gebel Adda",
+      "at": [
+       31.62,
+       22.3
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "great_zimbabwe",
+   "goal": "Keep the gold and ivory trade to Sofala",
+   "reason": "The basis of elite wealth and prestige",
+   "ends_when": "Trade shifts away",
+   "window": [
+    1378,
+    1450
+   ],
+   "weight": "strong",
+   "deviation": "Recover the trade",
+   "aim": null
+  },
+  {
+   "realm": "great_zimbabwe",
+   "goal": "Keep the plateau's chiefs in tribute",
+   "reason": "Hegemony over the Zimbabwe culture",
+   "ends_when": "The elite splits north or west",
+   "window": [
+    1378,
+    1450
+   ],
+   "weight": "normal",
+   "deviation": "The elite moves north (Mutapa) or west (Torwa) rather than fight",
+   "aim": {
+    "kind": "subject",
+    "target": "manyika"
+   }
+  },
+  {
+   "realm": "mutapa",
+   "goal": "Move north and take the Dande and the Zambezi valley",
+   "reason": "Salt and land were short around Great Zimbabwe (tradition); the Zambezi trade",
+   "ends_when": "Formed and holding the valley",
+   "window": [
+    1420,
+    1450
+   ],
+   "weight": "strong",
+   "deviation": "Stay part of Great Zimbabwe if it stays strong",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Dande",
+      "at": [
+       30.75,
+       -15.95
+      ]
+     },
+     {
+      "name": "Mount Fura",
+      "at": [
+       31.58,
+       -16.77
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "mutapa",
+   "goal": "Bring the chiefs, then the eastern kingdoms, into tribute",
+   "reason": "Gold and control of trade with the coast",
+   "ends_when": "Tribute established",
+   "window": [
+    1440,
+    1499
+   ],
+   "weight": "normal",
+   "deviation": "Play outside traders off against each other",
+   "aim": {
+    "kind": "subject",
+    "target": "manyika"
+   }
+  },
+  {
+   "realm": "torwa",
+   "goal": "Inherit Great Zimbabwe's western domains",
+   "reason": "Great Zimbabwe is declining",
+   "ends_when": "Formed, or Great Zimbabwe holds and it stays a province",
+   "window": [
+    1400,
+    1450
+   ],
+   "weight": "normal",
+   "deviation": "Stay a province",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Khami",
+      "at": [
+       28.42,
+       -20.16
+      ]
+     }
+    ],
+    "target": "great_zimbabwe"
+   }
+  },
+  {
+   "realm": "kongo",
+   "goal": "Lukeni lua Nimi takes the Mbanza Kongo area",
+   "reason": "A younger lineage seeks land and the Mbanza Kongo market, allied with Mbata",
+   "ends_when": "Formed",
+   "window": [
+    1378,
+    1400
+   ],
+   "weight": "strong",
+   "deviation": "No conquest; the chiefdoms stay separate",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Mbanza Kongo",
+      "at": [
+       14.24,
+       -6.27
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "kongo",
+   "goal": "Incorporate Mpangu, Nsundi, Mbamba and Soyo",
+   "reason": "Tribute, Luanda shell money, salt and copper",
+   "ends_when": "Provinces held",
+   "window": [
+    1400,
+    1480
+   ],
+   "weight": "normal",
+   "deviation": "Provinces act as separate polities if the succession fails",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Nsundi",
+      "at": [
+       14.9,
+       -5.3
+      ]
+     },
+     {
+      "name": "Mbamba",
+      "at": [
+       13.5,
+       -7.3
+      ]
+     },
+     {
+      "name": "Soyo",
+      "at": [
+       12.35,
+       -6.13
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "kongo",
+   "goal": "Hold the Malebo Pool against the Tio",
+   "reason": "Copper and cloth trade upriver",
+   "ends_when": "Pool controlled, or a settled frontier",
+   "window": [
+    1400,
+    1499
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Malebo Pool",
+      "at": [
+       15.4,
+       -4.3
+      ]
+     }
+    ],
+    "target": "tio"
+   }
+  },
+  {
+   "realm": "loango",
+   "goal": "Unite the Vili polities and stay free of Kongo",
+   "reason": "Coastal salt and cloth",
+   "ends_when": "Unified",
+   "window": [
+    1400,
+    1499
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "tio",
+   "goal": "Hold Malebo Pool",
+   "reason": "River trade",
+   "ends_when": "Pool lost",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Malebo Pool",
+      "at": [
+       15.4,
+       -4.3
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "kakongo",
+   "goal": "Survive between larger neighbours",
+   "reason": "Small size, under Vungu's ritual seniority",
+   "ends_when": "Absorbed",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Kinguele",
+      "at": [
+       12.13,
+       -5.22
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "ngoyo",
+   "goal": "Survive between larger neighbours",
+   "reason": "Small size, under Vungu's ritual seniority",
+   "ends_when": "Absorbed",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Mbanza Ngoyo",
+      "at": [
+       12.2,
+       -5.55
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "hadiya",
+   "goal": "Reduce Ethiopian tribute and survive",
+   "reason": "Tribute to the Christian crown",
+   "ends_when": "Joins Ifat if it wins, accepts tribute if Ethiopia wins",
+   "window": [
+    1378,
+    1415
+   ],
+   "weight": "normal",
+   "deviation": "Accept Ethiopian tribute",
+   "aim": {
+    "kind": "free",
+    "target": "ethiopia"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "ifat"
+   }
+  },
+  {
+   "realm": "dawaro",
+   "goal": "Reduce Ethiopian tribute and survive",
+   "reason": "Tribute to the Christian crown",
+   "ends_when": "Joins Ifat if it wins, accepts tribute if Ethiopia wins",
+   "window": [
+    1378,
+    1415
+   ],
+   "weight": "normal",
+   "deviation": "Accept Ethiopian tribute",
+   "aim": {
+    "kind": "free",
+    "target": "ethiopia"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "ifat"
+   }
+  },
+  {
+   "realm": "bale",
+   "goal": "Reduce Ethiopian tribute and survive",
+   "reason": "Tribute to the Christian crown",
+   "ends_when": "Joins Ifat if it wins, accepts tribute if Ethiopia wins",
+   "window": [
+    1378,
+    1415
+   ],
+   "weight": "normal",
+   "deviation": "Accept Ethiopian tribute",
+   "aim": {
+    "kind": "free",
+    "target": "ethiopia"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "ifat"
+   }
+  },
+  {
+   "realm": "damot",
+   "goal": "Keep its autonomy by paying gold",
+   "reason": "Gold buys self-rule",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "Stop paying when Ethiopia is distracted",
+   "aim": null,
+   "alternative": {
+    "kind": "free",
+    "target": "ethiopia"
+   }
+  },
+  {
+   "realm": "beta_israel",
+   "goal": "Preserve their faith and land",
+   "reason": "Royal campaigns press Semien and Dembiya",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "Revolt when Ethiopia is weak",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Semien",
+      "at": [
+       38.2,
+       13.2
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "fight",
+    "target": "ethiopia"
+   }
+  },
+  {
+   "realm": "medri_bahri",
+   "goal": "Keep local autonomy under Ethiopian allegiance",
+   "reason": "Local chiefs rule the north",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Debarwa",
+      "at": [
+       38.83,
+       15.1
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "dahlak",
+   "goal": "Trade, and pay whoever dominates",
+   "reason": "A small island trade sultanate",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "banu_kanz",
+   "goal": "Hold Aswan against the Mamluks",
+   "reason": "Their seat on the Egyptian frontier",
+   "ends_when": "Aswan lost (1412)",
+   "window": [
+    1378,
+    1412
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Aswan",
+      "at": [
+       32.9,
+       24.09
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "alodia",
+   "goal": "Survive the Arab migrations",
+   "reason": "Arab tribes push into the Nile valley",
+   "ends_when": "Absorbed",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Soba",
+      "at": [
+       32.68,
+       15.52
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "darfur_tunjur",
+   "goal": "Hold Jebel Marra",
+   "reason": "The Daju heartland",
+   "ends_when": "The Tunjur take over (15th century)",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Jebel Marra",
+      "at": [
+       24.27,
+       13.0
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "kaffa",
+   "goal": "Form the Kaffa kingdom under the Minjo dynasty",
+   "reason": "Tradition places the founding c.1390",
+   "ends_when": "Formed",
+   "window": [
+    1385,
+    1395
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Bonga",
+      "at": [
+       36.24,
+       7.27
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "barawa",
+   "goal": "Keep trade and autonomy",
+   "reason": "Trade is their wealth",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "Accept the strongest nearby patron",
+   "aim": null
+  },
+  {
+   "realm": "lamu",
+   "goal": "Keep trade and autonomy",
+   "reason": "Trade is their wealth",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "Accept the strongest nearby patron",
+   "aim": null
+  },
+  {
+   "realm": "pate",
+   "goal": "Keep trade and autonomy",
+   "reason": "Trade is their wealth",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "Accept the strongest nearby patron",
+   "aim": null
+  },
+  {
+   "realm": "zanzibar",
+   "goal": "Keep trade and autonomy",
+   "reason": "Trade is their wealth",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "Accept the strongest nearby patron",
+   "aim": null
+  },
+  {
+   "realm": "mafia",
+   "goal": "Keep trade and autonomy",
+   "reason": "Trade is their wealth",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "Accept the strongest nearby patron",
+   "aim": null
+  },
+  {
+   "realm": "sofala",
+   "goal": "Keep trade and autonomy",
+   "reason": "Trade is their wealth",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "Accept the strongest nearby patron",
+   "aim": null
+  },
+  {
+   "realm": "mozambique_island",
+   "goal": "Keep trade and autonomy",
+   "reason": "Trade is their wealth",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "Accept the strongest nearby patron",
+   "aim": null
+  },
+  {
+   "realm": "kitara",
+   "goal": "Hold grazing land and grow",
+   "reason": "Little is known",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "buganda",
+   "goal": "Hold grazing land and grow",
+   "reason": "Little is known",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "afar_dankali",
+   "goal": "Guard pasture and herds, and join Ifat's wars when it wins",
+   "reason": "Local needs and shared faith",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": {
+    "kind": "ally",
+    "target": "ifat"
+   }
+  },
+  {
+   "realm": "warsangali",
+   "goal": "Guard pasture and herds, and join Ifat's wars when it wins",
+   "reason": "Local needs and shared faith",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": {
+    "kind": "ally",
+    "target": "ifat"
+   }
+  },
+  {
+   "realm": "oromo",
+   "goal": "Guard pasture, herds and trade",
+   "reason": "Local and defensive needs",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "sidama_omotic_kingdoms",
+   "goal": "Guard pasture, herds and trade",
+   "reason": "Local and defensive needs",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "nilotic_pastoralists",
+   "goal": "Guard pasture, herds and trade",
+   "reason": "Local and defensive needs",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "maasai_kenya_highlands",
+   "goal": "Guard pasture, herds and trade",
+   "reason": "Local and defensive needs",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "beja",
+   "goal": "Guard pasture, herds and trade",
+   "reason": "Local and defensive needs",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "juhayna_arabs",
+   "goal": "Push south against Makuria and Alodia",
+   "reason": "Pasture and plunder in the Nile valley",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "fight",
+    "target": "alodia"
+   },
+   "alternative": {
+    "kind": "fight",
+    "target": "dotawo"
+   }
+  },
+  {
+   "realm": "tepanecs",
+   "goal": "Rule the Basin of Mexico",
+   "reason": "Lake-town tribute pays the court, and Tezozómoc claims the Toltec-Chichimec inheritance",
+   "ends_when": "Azcapotzalco is defeated, or no rival remains in the Basin",
+   "window": [
+    1378,
+    1426
+   ],
+   "weight": "strong",
+   "deviation": "Indirect hegemony through marriages instead of conquest",
+   "aim": null,
+   "toward": [
+    "tepanec_war"
+   ]
+  },
+  {
+   "realm": "tepanecs",
+   "goal": "Subdue the Acolhua of Texcoco",
+   "reason": "Texcoco is the only rival for Basin leadership and claims the Chichimec title",
+   "ends_when": "Texcoco is conquered (1418)",
+   "window": [
+    1400,
+    1418
+   ],
+   "weight": "strong",
+   "deviation": "Marriage alliance with Ixtlilxochitl",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Texcoco",
+      "at": [
+       -98.88,
+       19.51
+      ]
+     }
+    ],
+    "target": "texcoco"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "texcoco"
+   }
+  },
+  {
+   "realm": "tepanecs",
+   "goal": "Take Xaltocan",
+   "reason": "A rich Otomi lake domain and the enemy of his ally Cuauhtitlan",
+   "ends_when": "Xaltocan is taken (c.1395)",
+   "window": [
+    1380,
+    1395
+   ],
+   "weight": "normal",
+   "deviation": "Make Xaltocan a tributary",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Xaltocan",
+      "at": [
+       -99.04,
+       19.71
+      ]
+     }
+    ],
+    "target": "xaltocan"
+   },
+   "alternative": {
+    "kind": "subject",
+    "target": "xaltocan"
+   }
+  },
+  {
+   "realm": "tepanecs",
+   "goal": "Use the Mexica as soldiers",
+   "reason": "Cheap expansion; the Mexica take a share",
+   "ends_when": "The Mexica grow too strong (Maxtla turns on them, 1426–27)",
+   "window": [
+    1378,
+    1426
+   ],
+   "weight": "normal",
+   "deviation": "Squeeze or destroy the Mexica if they defy him",
+   "aim": {
+    "kind": "subject",
+    "target": "aztecs"
+   },
+   "alternative": {
+    "kind": "fight",
+    "target": "aztecs"
+   }
+  },
+  {
+   "realm": "tepanecs",
+   "goal": "Press Chalco",
+   "reason": "The last large free power of the southern Basin",
+   "ends_when": "Chalco is subdued or Azcapotzalco falls",
+   "window": [
+    1378,
+    1429
+   ],
+   "weight": "normal",
+   "deviation": "Accept ritual war only",
+   "aim": {
+    "kind": "subject",
+    "target": "chalco"
+   }
+  },
+  {
+   "realm": "aztecs",
+   "goal": "Win status as Tepanec allies",
+   "reason": "A small island people need land, tribute shares and noble marriages",
+   "ends_when": "Independence is won or the Tepanecs turn on them",
+   "window": [
+    1378,
+    1426
+   ],
+   "weight": "strong",
+   "deviation": "Seek Acolhua protection instead",
+   "aim": {
+    "kind": "ally",
+    "target": "tepanecs"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "texcoco"
+   }
+  },
+  {
+   "realm": "aztecs",
+   "goal": "Royal legitimacy through Culhua and Tepanec marriages",
+   "reason": "A Toltec-descended dynasty and a Tepanec queen ease tribute",
+   "ends_when": "It is secured",
+   "window": [
+    1378,
+    1419
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "aztecs",
+   "goal": "Throw off Azcapotzalco",
+   "reason": "Tired of tribute, and after Chimalpopoca's killing they fear destruction",
+   "ends_when": "Azcapotzalco is defeated (1428) or the Mexica are crushed",
+   "window": [
+    1426,
+    1428
+   ],
+   "weight": "strong",
+   "deviation": "Submit to Maxtla",
+   "aim": {
+    "kind": "free",
+    "target": "tepanecs"
+   },
+   "toward": [
+    "tepanec_war"
+   ]
+  },
+  {
+   "realm": "aztecs",
+   "goal": "Secure fresh water and chinampa land",
+   "reason": "The island depends on the mainland",
+   "ends_when": "It is secured (Chapultepec water)",
+   "window": [
+    1410,
+    1439
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Chapultepec",
+      "at": [
+       -99.19,
+       19.42
+      ]
+     }
+    ],
+    "target": "tepanecs"
+   }
+  },
+  {
+   "realm": "texcoco",
+   "goal": "Lead the Acolhua",
+   "reason": "Its kings claim the Chichimec title of Xolotl's line",
+   "ends_when": "Texcoco is conquered (1418) or the Acolhua are united",
+   "window": [
+    1378,
+    1418
+   ],
+   "weight": "strong",
+   "deviation": "Share power with Coatlinchan",
+   "aim": null
+  },
+  {
+   "realm": "texcoco",
+   "goal": "Resist Tepanec domination",
+   "reason": "Tezozómoc wants its land and title",
+   "ends_when": "Texcoco falls, or Azcapotzalco falls",
+   "window": [
+    1400,
+    1418
+   ],
+   "weight": "strong",
+   "deviation": "Accept a Tepanec marriage and junior status",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Texcoco",
+      "at": [
+       -98.88,
+       19.51
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "tepanecs"
+   }
+  },
+  {
+   "realm": "texcoco",
+   "goal": "Restore Nezahualcoyotl to his father's throne",
+   "reason": "His claim while the realm sleeps (1418–1431)",
+   "ends_when": "Restored (1431)",
+   "window": [
+    1426,
+    1431
+   ],
+   "weight": "normal",
+   "deviation": "Exile at Huexotzinco or Tlaxcala",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Texcoco",
+      "at": [
+       -98.88,
+       19.51
+      ]
+     }
+    ],
+    "target": "tepanecs"
+   },
+   "toward": [
+    "tepanec_war"
+   ]
+  },
+  {
+   "realm": "tlatelolco",
+   "goal": "Grow its market under Tepanec favour",
+   "reason": "Its ruler is a Tepanec prince and its merchants profit",
+   "ends_when": "Azcapotzalco falls",
+   "window": [
+    1378,
+    1428
+   ],
+   "weight": "normal",
+   "deviation": "Side with Tenochtitlan early",
+   "aim": {
+    "kind": "ally",
+    "target": "tepanecs"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "aztecs"
+   }
+  },
+  {
+   "realm": "chalco",
+   "goal": "Keep independence from the Mexica and Tepanecs",
+   "reason": "Its fertile chinampa and forest land draws them",
+   "ends_when": "Conquered (c.1465)",
+   "window": [
+    1378,
+    1465
+   ],
+   "weight": "strong",
+   "deviation": "Truce and ritual war only",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Chalco",
+      "at": [
+       -98.9,
+       19.26
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "xaltocan",
+   "goal": "Hold the Otomi lake domain against Cuauhtitlan",
+   "reason": "A long blood feud over land",
+   "ends_when": "Conquered (c.1395)",
+   "window": [
+    1378,
+    1395
+   ],
+   "weight": "strong",
+   "deviation": "Seek Acolhua or Metztitlan help",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Xaltocan",
+      "at": [
+       -99.04,
+       19.71
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "metztitlan"
+   }
+  },
+  {
+   "realm": "southern_basin_altepetl",
+   "goal": "Keep local rule and pay as little tribute as possible",
+   "reason": "Their cotton and chinampa wealth draws the Basin powers",
+   "ends_when": "Conquered (1380s, firmly after 1428)",
+   "window": [
+    1378,
+    1428
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Cuauhnahuac",
+      "at": [
+       -99.23,
+       18.92
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "huexotzinco",
+   "goal": "Lead the Puebla–Tlaxcala valley",
+   "reason": "The strongest eastern altepetl, with sway over Cholula",
+   "ends_when": "Tlaxcala outgrows it, or the alliance encircles it",
+   "window": [
+    1378,
+    1459
+   ],
+   "weight": "strong",
+   "deviation": "Ally with Tlaxcala against a Basin power",
+   "aim": {
+    "kind": "subject",
+    "target": "cholula"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "tlaxcala"
+   }
+  },
+  {
+   "realm": "huexotzinco",
+   "goal": "Back Basin exiles against Azcapotzalco",
+   "reason": "To weaken the Tepanec hegemon in the east",
+   "ends_when": "Azcapotzalco falls",
+   "window": [
+    1418,
+    1428
+   ],
+   "weight": "normal",
+   "deviation": "Stay neutral",
+   "aim": {
+    "kind": "fight",
+    "target": "tepanecs"
+   },
+   "toward": [
+    "tepanec_war"
+   ]
+  },
+  {
+   "realm": "tlaxcala",
+   "goal": "Stay independent and stop Huexotzinco's dominance",
+   "reason": "A smaller, newer confederation",
+   "ends_when": "Huexotzinco no longer leads",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "Ally with Huexotzinco against the Basin",
+   "aim": {
+    "kind": "fight",
+    "target": "huexotzinco"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "huexotzinco"
+   }
+  },
+  {
+   "realm": "cholula",
+   "goal": "Keep neutrality and trade",
+   "reason": "A pilgrimage and market city",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "Side with the strongest neighbour",
+   "aim": null
+  },
+  {
+   "realm": "purepecha",
+   "goal": "Unite the Pátzcuaro basin",
+   "reason": "Curicaueri's cult demands land and sacrifice; Curínguaro and the island lords are rivals",
+   "ends_when": "The basin is united",
+   "window": [
+    1378,
+    1400
+   ],
+   "weight": "strong",
+   "deviation": "Marriage alliance with Curínguaro",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Pátzcuaro",
+      "at": [
+       -101.61,
+       19.51
+      ]
+     },
+     {
+      "name": "Tzintzuntzan",
+      "at": [
+       -101.58,
+       19.63
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "purepecha",
+   "goal": "Settle the succession among three heirs",
+   "reason": "Hiquíngare, Hiripan and Tangáxoan all have claims",
+   "ends_when": "The realm is divided (Pátzcuaro, Ihuatzio, Tzintzuntzan)",
+   "window": [
+    1400,
+    1430
+   ],
+   "weight": "normal",
+   "deviation": "A single heir rules alone",
+   "aim": null
+  },
+  {
+   "realm": "purepecha",
+   "goal": "Expand to the Tierra Caliente and the Balsas",
+   "reason": "Copper, cotton, cacao and salt",
+   "ends_when": "The frontier meets the Triple Alliance",
+   "window": [
+    1400,
+    1479
+   ],
+   "weight": "normal",
+   "deviation": "Expand west toward Jalisco",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Huetamo",
+      "at": [
+       -100.89,
+       18.63
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "zapotec",
+   "goal": "Lead the Valley of Oaxaca",
+   "reason": "Rival Zapotec lords and Mixtec settlers contest the valley",
+   "ends_when": "It is secured or Zaachila is broken",
+   "window": [
+    1378,
+    1449
+   ],
+   "weight": "strong",
+   "deviation": "A Mixtec marriage alliance",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Zaachila",
+      "at": [
+       -96.75,
+       16.95
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "mixteca_alta"
+   }
+  },
+  {
+   "realm": "zapotec",
+   "goal": "Reach Tehuantepec",
+   "reason": "Isthmus trade and salt",
+   "ends_when": "It is held (late 15th century)",
+   "window": [
+    1440,
+    1499
+   ],
+   "weight": "normal",
+   "deviation": "Hold the valley only",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Tehuantepec",
+      "at": [
+       -95.24,
+       16.32
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "mixteca_alta",
+   "goal": "Make dynastic alliances among the royal couples",
+   "reason": "Marriage carries title and land in Mixtec politics",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "coixtlahuaca",
+   "goal": "Protect its market and merchants",
+   "reason": "They are its wealth",
+   "ends_when": "Conquered (1458)",
+   "window": [
+    1378,
+    1458
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Coixtlahuaca",
+      "at": [
+       -97.32,
+       17.71
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "tututepec",
+   "goal": "Rule the Pacific coast",
+   "reason": "Coastal tribute held since Eight Deer",
+   "ends_when": "Zaachila or the alliance breaks it",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Tututepec",
+      "at": [
+       -97.6,
+       16.13
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "totonacapan",
+   "goal": "Stay prosperous and independent",
+   "reason": "Its wealth draws the highland powers",
+   "ends_when": "Forced to submit or ally (1450s–60s)",
+   "window": [
+    1378,
+    1469
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Cempoala",
+      "at": [
+       -96.4,
+       19.44
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "metztitlan",
+   "goal": "Stay independent of any highland power",
+   "reason": "Its mountain valley is a refuge",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "Take in Otomi refugees after Xaltocan falls (c.1395)",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Metztitlan",
+      "at": [
+       -98.76,
+       20.6
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "huastec",
+   "goal": "Stay independent of any highland power",
+   "reason": "Highland powers want its land and goods",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Huejutla",
+      "at": [
+       -98.42,
+       21.14
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "potonchan",
+   "goal": "Keep the coastal trade with Yucatán",
+   "reason": "Trade is its wealth",
+   "ends_when": "Mayapan and its successors stop trading",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": null,
+   "alternative": {
+    "kind": "ally",
+    "target": "maya"
+   }
+  },
+  {
+   "realm": "acalan",
+   "goal": "Keep the river trade with Yucatán",
+   "reason": "Trade is its wealth",
+   "ends_when": "Mayapan and its successors stop trading",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": null,
+   "alternative": {
+    "kind": "ally",
+    "target": "maya"
+   }
+  },
+  {
+   "realm": "cuzcatlan",
+   "goal": "Hold its cacao land",
+   "reason": "Cacao makes it rich and a target",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Cuzcatlan",
+      "at": [
+       -89.24,
+       13.67
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "soconusco",
+   "goal": "Hold its cacao land",
+   "reason": "Cacao makes it rich and a target",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Soconusco",
+      "at": [
+       -92.38,
+       15.0
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "tzutujil",
+   "goal": "Hold the Atitlán basin and its Pacific cacao against the K'iche'",
+   "reason": "Its land and cacao",
+   "ends_when": "The land is lost (c.1420s–1440s)",
+   "window": [
+    1378,
+    1449
+   ],
+   "weight": "strong",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Chuitinamit",
+      "at": [
+       -91.24,
+       14.64
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "maya",
+   "goal": "Keep Cocom rule over the league",
+   "reason": "Tribute from member lords living at Mayapan",
+   "ends_when": "The revolt succeeds (c.1441; disputed)",
+   "window": [
+    1378,
+    1441
+   ],
+   "weight": "strong",
+   "deviation": "Share power with the Xiu",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Mayapan",
+      "at": [
+       -89.46,
+       20.63
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "maya_mani_xiu"
+   },
+   "toward": [
+    "fall_of_mayapan"
+   ]
+  },
+  {
+   "realm": "maya",
+   "goal": "Hold the lords with foreign mercenaries",
+   "reason": "Canul troops from Tabasco keep rivals in check",
+   "ends_when": "The lords revolt",
+   "window": [
+    1378,
+    1441
+   ],
+   "weight": "normal",
+   "deviation": "Rule by marriage ties",
+   "aim": {
+    "kind": "subject",
+    "target": "maya_mani_xiu"
+   }
+  },
+  {
+   "realm": "maya",
+   "goal": "Keep the coastal trade",
+   "reason": "Salt, cotton and slaves for cacao",
+   "ends_when": "Mayapan falls",
+   "window": [
+    1378,
+    1441
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "maya_mani_xiu",
+   "goal": "Overthrow the Cocom",
+   "reason": "They resent Cocom tyranny and the mercenaries",
+   "ends_when": "Mayapan is destroyed",
+   "window": [
+    1378,
+    1441
+   ],
+   "weight": "strong",
+   "deviation": "",
+   "aim": {
+    "kind": "fight",
+    "target": "maya"
+   },
+   "toward": [
+    "fall_of_mayapan"
+   ]
+  },
+  {
+   "realm": "kiche",
+   "goal": "Build a capital and centralise the lineages",
+   "reason": "Kotuja and Q'ukumatz want Kaweq lineage dominance",
+   "ends_when": "Q'umarkaj is established (c.1400)",
+   "window": [
+    1378,
+    1409
+   ],
+   "weight": "strong",
+   "deviation": "",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Q'umarkaj",
+      "at": [
+       -91.17,
+       15.02
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "kiche",
+   "goal": "Conquer the Mam and the Pacific slope",
+   "reason": "Cacao lands and tribute",
+   "ends_when": "Achieved (c.1420s–1440s) or the Kaqchikel defect",
+   "window": [
+    1400,
+    1479
+   ],
+   "weight": "strong",
+   "deviation": "Expand east to Rabinal and the Verapaz",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Zaculeu",
+      "at": [
+       -91.5,
+       15.34
+      ]
+     }
+    ],
+    "target": "mam"
+   }
+  },
+  {
+   "realm": "kiche",
+   "goal": "Keep the Kaqchikel as junior partners",
+   "reason": "They are the backbone of K'iche' armies",
+   "ends_when": "The Kaqchikel break (c.1470s)",
+   "window": [
+    1378,
+    1479
+   ],
+   "weight": "normal",
+   "deviation": "Grant them more land",
+   "aim": {
+    "kind": "subject",
+    "target": "kaqchikel"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "kaqchikel"
+   }
+  },
+  {
+   "realm": "kaqchikel",
+   "goal": "Gain land and rank by serving the K'iche', then autonomy",
+   "reason": "Service brings land and rank",
+   "ends_when": "They break away (c.1470)",
+   "window": [
+    1378,
+    1470
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "ally",
+    "target": "kiche"
+   },
+   "alternative": {
+    "kind": "free",
+    "target": "kiche"
+   }
+  },
+  {
+   "realm": "mam",
+   "goal": "Stay independent of the K'iche'",
+   "reason": "K'iche' expansion toward the Pacific slope",
+   "ends_when": "Conquered (c.1420s–1440s)",
+   "window": [
+    1378,
+    1449
+   ],
+   "weight": "strong",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Zaculeu",
+      "at": [
+       -91.5,
+       15.34
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "itza",
+   "goal": "Hold the lake island in isolation",
+   "reason": "Far from every power",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Nojpetén",
+      "at": [
+       -89.89,
+       16.93
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "cuba_taino",
+   "goal": "Chiefly marriages, ball-court alliances and defence against raids",
+   "reason": "Local politics of the cacicazgos",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "jamaica_taino",
+   "goal": "Chiefly marriages, ball-court alliances and defence against raids",
+   "reason": "Local politics of the cacicazgos",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "boriken",
+   "goal": "Chiefly marriages, ball-court alliances and defence against raids",
+   "reason": "Local politics of the cacicazgos",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": {
+    "kind": "fight",
+    "target": "kalinago"
+   }
+  },
+  {
+   "realm": "lucayan",
+   "goal": "Chiefly marriages, ball-court alliances and defence against raids",
+   "reason": "Local politics of the cacicazgos",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "magua",
+   "goal": "Chiefly marriages, ball-court alliances and defence against raids",
+   "reason": "Local politics of the cacicazgos",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "maguana",
+   "goal": "Chiefly marriages, ball-court alliances and defence against raids",
+   "reason": "Local politics of the cacicazgos",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "marien",
+   "goal": "Chiefly marriages, ball-court alliances and defence against raids",
+   "reason": "Local politics of the cacicazgos",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "higuey",
+   "goal": "Chiefly marriages, ball-court alliances and defence against raids",
+   "reason": "Local politics of the cacicazgos",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "inca",
+   "goal": "Master the Cusco basin: Ayarmaca, Pinahua, Mohina, Cuyo",
+   "reason": "Land, labour and herds near Cusco; the basin lords compete for the same valleys",
+   "ends_when": "The basin lordships are absorbed or bound by marriage",
+   "window": [
+    1378,
+    1439
+   ],
+   "weight": "strong",
+   "deviation": "Marriage alliances in place of war",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Chinchero",
+      "at": [
+       -72.05,
+       -13.39
+      ]
+     }
+    ],
+    "target": "ayarmaca"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "ayarmaca"
+   }
+  },
+  {
+   "realm": "inca",
+   "goal": "Hold the Apurímac line against the Chanka",
+   "reason": "Chanka expansion toward Cusco threatens the heartland",
+   "ends_when": "The Chanka are defeated or the Inca submit",
+   "window": [
+    1420,
+    1438
+   ],
+   "weight": "strong",
+   "deviation": "Pay off or ally with the Chanka",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Cusco",
+      "at": [
+       -71.97,
+       -13.53
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "chanka"
+   },
+   "toward": [
+    "chanka_war"
+   ]
+  },
+  {
+   "realm": "inca",
+   "goal": "Enter the Titicaca basin",
+   "reason": "Collao herds and wealth; an invitation from Lupaca or Colla in their war",
+   "ends_when": "The Colla are conquered",
+   "window": [
+    1440,
+    1469
+   ],
+   "weight": "normal",
+   "deviation": "Back the Lupaca as a client against the Colla",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Hatuncolla",
+      "at": [
+       -70.2,
+       -15.63
+      ]
+     }
+    ],
+    "target": "colla"
+   },
+   "alternative": {
+    "kind": "subject",
+    "target": "lupaca"
+   }
+  },
+  {
+   "realm": "inca",
+   "goal": "Later, take the coast and Chimor",
+   "reason": "Rich irrigated valleys once highland rivals are subdued",
+   "ends_when": "Chimor falls",
+   "window": [
+    1460,
+    1470
+   ],
+   "weight": "weak",
+   "deviation": "Consolidate roads and storehouses first",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Chan Chan",
+      "at": [
+       -79.07,
+       -8.11
+      ]
+     }
+    ],
+    "target": "chimu"
+   },
+   "toward": [
+    "inca_conquest_of_chimor"
+   ]
+  },
+  {
+   "realm": "chanka",
+   "goal": "Push east across the Apurímac toward Cusco",
+   "reason": "Prestige and land for a warlike confederation; Cusco is the rising rival",
+   "ends_when": "Defeated at Cusco",
+   "window": [
+    1420,
+    1438
+   ],
+   "weight": "strong",
+   "deviation": "Raid without conquest; accept alliance",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Cusco",
+      "at": [
+       -71.97,
+       -13.53
+      ]
+     }
+    ],
+    "target": "inca"
+   },
+   "alternative": {
+    "kind": "fight",
+    "target": "inca"
+   },
+   "toward": [
+    "chanka_war"
+   ]
+  },
+  {
+   "realm": "chanka",
+   "goal": "Hold Andahuaylas against the Quichua",
+   "reason": "Recently won land",
+   "ends_when": "Secure or lost",
+   "window": [
+    1378,
+    1439
+   ],
+   "weight": "normal",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Andahuaylas",
+      "at": [
+       -73.39,
+       -13.66
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "chanka",
+   "goal": "After defeat, keep autonomy and wait",
+   "reason": "Unwilling subjects",
+   "ends_when": "Inca weakness",
+   "window": [
+    1438,
+    1470
+   ],
+   "weight": "weak",
+   "deviation": "Serve as auxiliaries, then rebel or flee",
+   "aim": {
+    "kind": "free",
+    "target": "inca"
+   }
+  },
+  {
+   "realm": "chimu",
+   "goal": "Consolidate Lambayeque and the north coast",
+   "reason": "Irrigated valleys, Sicán metalwork and labour; dynastic prestige",
+   "ends_when": "Lambayeque secure; Piura taken or given up",
+   "window": [
+    1378,
+    1400
+   ],
+   "weight": "strong",
+   "deviation": "Rule through local lords instead of governors",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Túcume",
+      "at": [
+       -79.71,
+       -6.51
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "chimu",
+   "goal": "Extend south along the coast: Casma, Huarmey, toward the Chillón",
+   "reason": "More valleys and irrigation; the southern frontier",
+   "ends_when": "Reaches the central coast lordships or meets a strong power",
+   "window": [
+    1400,
+    1449
+   ],
+   "weight": "normal",
+   "deviation": "Stay at the Santa if the north needs troops",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Casma",
+      "at": [
+       -78.3,
+       -9.47
+      ]
+     },
+     {
+      "name": "Huarmey",
+      "at": [
+       -78.15,
+       -10.07
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "chimu",
+   "goal": "Keep highland neighbours friendly (Cajamarca)",
+   "reason": "Water comes from the highlands; an enemy can cut canals",
+   "ends_when": "A highland power threatens; then fortify and ally",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "Fortify the highland edge",
+   "aim": {
+    "kind": "ally",
+    "target": "cajamarca"
+   }
+  },
+  {
+   "realm": "chimu",
+   "goal": "Defend against the Inca",
+   "reason": "The Inca reach the coast",
+   "ends_when": "Conquest (c.1470)",
+   "window": [
+    1460,
+    1470
+   ],
+   "weight": "strong",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Chan Chan",
+      "at": [
+       -79.07,
+       -8.11
+      ]
+     }
+    ]
+   },
+   "toward": [
+    "inca_conquest_of_chimor"
+   ]
+  },
+  {
+   "realm": "chincha",
+   "goal": "Protect sea and land trade",
+   "reason": "Wealth from exchange with the north coast and the altiplano",
+   "ends_when": "Absorbed by a large state",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "Negotiate a privileged submission",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Chincha",
+      "at": [
+       -76.17,
+       -13.45
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "colla",
+   "goal": "Dominate the Titicaca basin",
+   "reason": "Rivalry with the Lupaca for the lake's herds and fields",
+   "ends_when": "Inca conquest",
+   "window": [
+    1378,
+    1449
+   ],
+   "weight": "strong",
+   "deviation": "Lead an anti-Inca coalition",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Chucuito",
+      "at": [
+       -69.89,
+       -15.89
+      ]
+     }
+    ],
+    "target": "lupaca"
+   },
+   "alternative": {
+    "kind": "fight",
+    "target": "inca"
+   }
+  },
+  {
+   "realm": "lupaca",
+   "goal": "Gain against the Colla and keep lowland colonies",
+   "reason": "Herds and access to coastal valleys (Cari's campaigns)",
+   "ends_when": "Inca incorporation",
+   "window": [
+    1378,
+    1449
+   ],
+   "weight": "strong",
+   "deviation": "Seek a strong outside ally (Cusco)",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Hatuncolla",
+      "at": [
+       -70.2,
+       -15.63
+      ]
+     }
+    ],
+    "target": "colla"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "inca"
+   }
+  },
+  {
+   "realm": "muisca",
+   "goal": "Win cacique allegiance on the savanna",
+   "reason": "Paramount power rests on chiefs' loyalty and tribute",
+   "ends_when": "A paramountcy is built, or rivals win",
+   "window": [
+    1400,
+    1450
+   ],
+   "weight": "strong",
+   "deviation": "Guatavita, not Bacatá, unites the south",
+   "aim": null
+  },
+  {
+   "realm": "muisca",
+   "goal": "Defend the Panche frontier",
+   "reason": "Raids on the western edge",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "Hire or settle border warriors (güecha)",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Bacatá",
+      "at": [
+       -74.21,
+       4.72
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "muisca_hunza",
+   "goal": "Keep local chiefly power and ritual centres",
+   "reason": "Chiefly rule of the northern plateau",
+   "ends_when": "The north plateau unites (zaque, c.1470)",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "muisca_iraca",
+   "goal": "Keep local chiefly power and ritual centres",
+   "reason": "Chiefly rule of the northern plateau",
+   "ends_when": "The north plateau unites (zaque, c.1470)",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "muisca_tundama",
+   "goal": "Keep local chiefly power and ritual centres",
+   "reason": "Chiefly rule of the northern plateau",
+   "ends_when": "The north plateau unites (zaque, c.1470)",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "iroquois",
+   "goal": "End the feuds among the five nations and found the League",
+   "reason": "Blood feud and mourning war exhaust the nations (the Peacemaker tradition)",
+   "ends_when": "The League is founded",
+   "window": [
+    1378,
+    1460
+   ],
+   "weight": "normal",
+   "deviation": "No League; separate nations fight on",
+   "aim": null
+  },
+  {
+   "realm": "iroquois",
+   "goal": "Take captives in mourning war",
+   "reason": "Replace the dead and keep up prestige",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "Adopt more and raid less",
+   "aim": null
+  },
+  {
+   "realm": "iroquois",
+   "goal": "Secure hunting and fishing grounds",
+   "reason": "A growing farming population in larger towns",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "Move towns",
+   "aim": null
+  },
+  {
+   "realm": "huron",
+   "goal": "Ally the Attignawantan and Attigneenongnahac",
+   "reason": "Defence in a time of endemic raiding",
+   "ends_when": "The alliance is made",
+   "window": [
+    1435,
+    1445
+   ],
+   "weight": "normal",
+   "deviation": "Stay separate villages",
+   "aim": null
+  },
+  {
+   "realm": "huron",
+   "goal": "Defend villages and trade corn north",
+   "reason": "Raids from the south; exchange with Algonquian hunters",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "Move villages north",
+   "aim": null
+  },
+  {
+   "realm": "coosa",
+   "goal": "Gather the chiefdoms left after Etowah's fall",
+   "reason": "Chiefly prestige; a vacuum after c.1375",
+   "ends_when": "A paramountcy forms (Little Egypt) or fails",
+   "window": [
+    1400,
+    1500
+   ],
+   "weight": "normal",
+   "deviation": "Another centre leads",
+   "aim": null
+  },
+  {
+   "realm": "apalachee",
+   "goal": "Keep Lake Jackson's chiefly order and hold the Red Hills",
+   "reason": "Prestige and fertile land",
+   "ends_when": "The centre declines (c.1500)",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "Move the centre",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Lake Jackson",
+      "at": [
+       -84.31,
+       30.5
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "calusa",
+   "goal": "Take tribute from estuary neighbours",
+   "reason": "Fishing wealth supports a chiefly class",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "Stay local",
+   "aim": null
+  },
+  {
+   "realm": "pueblo",
+   "goal": "Keep harvest and ritual, and trade with Plains hunters",
+   "reason": "Drought, town rivalries, and bison products",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "normal",
+   "deviation": "Towns unite briefly under outside threat",
+   "aim": null
+  },
+  {
+   "realm": "cherokee",
+   "goal": "Defend towns and fill the space left by declining centres",
+   "reason": "Mississippian chiefdoms stand in at the start",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "creek",
+   "goal": "Defend towns and fill the space left by declining centres",
+   "reason": "Mississippian chiefdoms stand in at the start",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "ayarmaca",
+   "goal": "Hold its plain against Cusco",
+   "reason": "It was Cusco's equal and rival",
+   "ends_when": "Absorbed by Cusco",
+   "window": [
+    1378,
+    1439
+   ],
+   "weight": "strong",
+   "deviation": "Marriage alliance with Cusco",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Chinchero",
+      "at": [
+       -72.05,
+       -13.39
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "inca"
+   }
+  },
+  {
+   "realm": "cusco_basin_lordships",
+   "goal": "Keep autonomy by balancing Cusco and Ayarmaca",
+   "reason": "Small lords between two stronger ones",
+   "ends_when": "Absorbed",
+   "window": [
+    1378,
+    1439
+   ],
+   "weight": "weak",
+   "deviation": "Submit early for privileged status",
+   "aim": null
+  },
+  {
+   "realm": "ychsma",
+   "goal": "Defend its valleys and protect Pachacamac's oracle",
+   "reason": "The oracle is its prestige and wealth",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Pachacamac",
+      "at": [
+       -76.9,
+       -12.26
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "realm": "huanca",
+   "goal": "Defend its towns; the Wanka towns fight each other",
+   "reason": "Local rivalries",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "cajamarca",
+   "goal": "Defend towns and valleys",
+   "reason": "Local and defensive needs",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "central_coast_lordships",
+   "goal": "Defend towns and valleys",
+   "reason": "Local and defensive needs",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "central_highland_chiefdoms",
+   "goal": "Defend towns and valleys",
+   "reason": "Local and defensive needs",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "chachapoya",
+   "goal": "Defend towns and valleys",
+   "reason": "Local and defensive needs",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "quitu_cara",
+   "goal": "Defend towns and valleys",
+   "reason": "Local and defensive needs",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "canari",
+   "goal": "Defend towns and valleys",
+   "reason": "Local and defensive needs",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "puruha",
+   "goal": "Defend towns and valleys",
+   "reason": "Local and defensive needs",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "manta_huancavilca",
+   "goal": "Defend towns and valleys",
+   "reason": "Local and defensive needs",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "altiplano_lordships",
+   "goal": "Keep herds and valleys; local wars",
+   "reason": "Local and defensive needs",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "charcas_qaraqara",
+   "goal": "Keep herds and valleys; local wars",
+   "reason": "Local and defensive needs",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "atacameno",
+   "goal": "Keep herds and valleys; local wars",
+   "reason": "Local and defensive needs",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "diaguita",
+   "goal": "Keep herds and valleys; local wars",
+   "reason": "Local and defensive needs",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "tairona",
+   "goal": "Keep local chiefly power",
+   "reason": "Local and defensive needs",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "zenu",
+   "goal": "Keep local chiefly power",
+   "reason": "Local and defensive needs",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "quimbaya",
+   "goal": "Keep local chiefly power",
+   "reason": "Local and defensive needs",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "cauca_chiefdoms",
+   "goal": "Keep local chiefly power",
+   "reason": "Local and defensive needs",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "chibcha_other",
+   "goal": "Keep local chiefly power",
+   "reason": "Local and defensive needs",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "timoto_cuica",
+   "goal": "Keep local chiefly power",
+   "reason": "Local and defensive needs",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  },
+  {
+   "realm": "caquetio",
+   "goal": "Keep local chiefly power",
+   "reason": "Local and defensive needs",
+   "ends_when": "Never",
+   "window": [
+    1378,
+    1444
+   ],
+   "weight": "weak",
+   "deviation": "",
+   "aim": null
+  }
+ ]
+}

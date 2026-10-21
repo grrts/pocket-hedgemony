@@ -20,7 +20,10 @@ Feature: Achievements in the free tier and the Steam demo
     Examples:
       | id |
       | independence_won |
+      | kulikovo_free |
+      | kosovo_free |
       | walls_held_1453 |
+      | timurid_heirs |
       | four_quarters_hold |
       | from_one_hall |
       | decentralised_1500 |

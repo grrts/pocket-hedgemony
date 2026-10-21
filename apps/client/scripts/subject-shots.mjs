@@ -32,6 +32,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
     await page.waitForSelector("[data-nation]", { timeout: 60000 });
     await open(page, who);
     await page.click(`[data-nation=${who}]`);
+    await page.click("[data-begin]");
     await page.waitForSelector(".hud [data-news]", { timeout: 60000 });
     await page.waitForTimeout(500);
     await page.click("[data-hint=stop]").catch(() => {});

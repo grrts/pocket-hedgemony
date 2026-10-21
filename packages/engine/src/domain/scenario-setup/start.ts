@@ -107,12 +107,16 @@ export function knowsAtStart(inventionId: string, countryName: string): boolean 
   return invention(inventionId).start_regions.includes(countryName);
 }
 
-/** Whether a country can explore on the first turn: S4 at start and the Age of Exploration in its region (SETUP-027). */
+/**
+ * Whether a country can explore on the first turn: S4 at start and the Age of Exploration in its region (SETUP-027).
+ * The age has begun at the start when Portugal or Castile sails the ocean ships (EXPL-076).
+ */
 export function exploresAtStart(countryName: string, year = START_YEAR): boolean {
   const region = polityRegion(countryName.toLowerCase());
   if (!region) return false;
   const knows = new Set(["S1", "S2", "S3", "S4"].filter((i) => knowsAtStart(i, countryName)));
-  return hasExplorationUnlock({ knows, region }, gateAtStart(year));
+  const begun = knowsAtStart("S4", "Portugal") || knowsAtStart("S4", "Castile");
+  return hasExplorationUnlock({ knows, region }, gateAtStart(year, begun));
 }
 
 // ---------------------------------------------------------------------------
@@ -162,7 +166,7 @@ export function startValue(base: number, level: Level, confidence: Confidence, r
 }
 
 /** The event-tree preset behind the new-game events option (D-SETUP-7). */
-export function eventsPreset(option: "historical" | "free"): string {
+export function eventsPreset(option: "historical" | "plausible" | "free"): string {
   return (config.events_presets as Record<string, string>)[option]!;
 }
 

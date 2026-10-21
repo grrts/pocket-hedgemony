@@ -5,18 +5,18 @@ Feature: When the player goes off script
   So that my choices count as in a real campaign
 
   @TUT-030
-  Scenario: Murad was asked to stay in chapter 1
-    Given the player picked "Ask him to stay this winter" on the event "Murad goes back to Manisa"
-    Then Murad stays at Edirne as a commander until the end of chapter 1
+  Scenario: The player asked after John V in chapter 1
+    Given the player picked "Ask after John V" on the event "Tribute from Constantinople"
+    Then Andronikos's envoy leaves cold until the end of chapter 1
     When the player starts chapter 2
-    Then chapter 2 starts from its chapter save with Murad at Manisa
+    Then chapter 2 starts from its chapter save with the tribute taken as in history
 
   @TUT-031 @placeholder
-  Scenario: Lost the border clash
-    Given the player's army lost the border clash at "Giurgiu"
+  Scenario: Lost the clash before Pera
+    Given the player's army lost the clash at "Pera"
     Then the step reads "Your army broke. Fall back behind the walls of Edirne and call the levy."
-    When the country "Hungary" fails to take one castle in two months
-    Then Hungary offers terms
+    When Andronikos IV's side fails to take one castle in two months
+    Then Andronikos IV's side offers terms
     And chapter 5 ends in peace
 
   @TUT-032
@@ -39,14 +39,14 @@ Feature: When the player goes off script
 
   @TUT-034
   Scenario: A short treasury is filled by a loan
-    Given chapter 6 needs a minimum of gold at its start
+    Given chapter 3 needs a minimum of gold at its start
     And the player has less than that minimum
-    When chapter 6 starts
+    When chapter 3 starts
     Then a scripted loan from a Genoese or Venetian banking house fills the gap
     And it is shown as a real debt line
 
   @TUT-035
   Scenario: The storm fails in chapter 8
-    Given the storm of the Hexamilion has failed
+    Given the storm of Serres has failed
     Then the siege carries on month by month
-    And the chapter ends when the wall is breached or the Morea offers terms
+    And the chapter ends when the walls are breached or Manuel II offers terms

@@ -50,3 +50,29 @@ Feature: Skipping, leaving and returning
     Given the tutorial is running
     When the first harvest is brought in
     Then no achievement unlocks
+
+  @TUT-138
+  Scenario: Finishing a chapter
+    Given the tutorial is running
+    When the player finishes every step of chapter 0
+    Then chapter 0 is done
+    And the tutorial keeps no step to resume
+
+  @TUT-137
+  Scenario: The end of the chapters that can be played today
+    Given only chapter 0 can be played today
+    When the player finishes every step of chapter 0
+    Then no further chapter follows
+    And the tutorial counts as finished
+
+  @TUT-140
+  Scenario Outline: A place in a step points at a province of the map
+    Given the place token "<place>"
+    Then it points at the map province "<province>"
+
+    Examples:
+      | place | province |
+      | edirne | Edirne |
+      | bursa | Bursa |
+      | gallipoli | Çanakkale |
+      | constantinople | Istanbul |

@@ -4,7 +4,7 @@ The peoples of North America cannot colonise, so a tribe starts with two or thre
 
 ## Which realms are tribes
 
-A realm is a **tribal realm** while its form is a clan council, a chiefdom or a confederation and its capital lies in North America. In 1444 that is the Iroquois, the Huron, the Cherokee and the Creek. The Pueblo are a city commune: their towns grew by farming, so they walk no grounds unless a reform makes them a tribal form. A realm that reforms out of a tribal form loses its grounds at once.
+A realm is a **tribal realm** while its form is a clan council, a chiefdom or a confederation and its capital lies in North America. At the 1378 start that includes the Iroquois and the Huron; the Cherokee and the Creek are not born yet and form later (see [The 1378 start](The-1378-Start)). The Pueblo are a city commune: their towns grew by farming, so they walk no grounds unless a reform makes them a tribal form. A realm that reforms out of a tribal form loses its grounds at once.
 
 ## The range
 
@@ -61,3 +61,7 @@ On the map, grounds are a light diagonal hatch in the tribe's colour at every zo
 ## The computer's tribes
 
 Each month a tribe of the computer with a free place claims the most peopled province it may; each January it takes in every ground it may, oldest first, while within its officials cap. A colonial power of the computer that holds twice the price asks for the land before settling on a ground, and founds there only after the answer.
+
+## Numbers
+
+Every value the game uses, made from its config so it always matches the game: [Tribes data](Data-Tribes). How they combine: [Formulas](Formulas).

@@ -1,5 +1,5 @@
 import { createEngineHost, type EngineRequest, type EngineResponse, type Snapshot } from "@ph/engine";
-import { loadDefaultRuleset } from "@ph/rules";
+import { loadDefaultRuleset, START_ID } from "@ph/rules";
 
 type WithoutId<T> = T extends unknown ? Omit<T, "id"> : never;
 type Request = WithoutId<EngineRequest>;
@@ -28,7 +28,8 @@ export class EngineClient {
       return;
     }
     try {
-      this.worker = new Worker(new URL("./engine.worker.ts", import.meta.url), { type: "module" });
+      // The worker can't see the page's address, so its name carries the start (?start=1378, rules/src/start.ts).
+      this.worker = new Worker(new URL("./engine.worker.ts", import.meta.url), { type: "module", name: `start=${START_ID}` });
     } catch {
       this.fallBackToMainThread();
       return;

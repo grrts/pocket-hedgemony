@@ -1,0 +1,91 @@
+{% extends 'community/layout.html.twig' %}
+{% import 'community/_parts.html.twig' as parts %}
+
+{% block title %}{{ topic.title }}{{ page > 1 ? ', page ' ~ page }} · Pocket Hegemony community{% endblock %}
+{% block description %}{{ posts ? (posts|first).body|slice(0, 150) : topic.title }}{% endblock %}
+{% block meta %}{% if topic.hidden %}<meta name="robots" content="noindex">{% endif %}{% endblock %}
+
+{% block community %}
+{% set mod = is_granted('ROLE_MODERATOR') %}
+{% set here = path('community_topic', {id: topic.id, slug: topic.slug}) ~ (page > 1 ? '?page=' ~ page : '') %}
+<article class="framed sheet topic">
+    <p class="crumbs"><a href="{{ path('community') }}">Community</a> › <a href="{{ path('community_board', {board: board.slug}) }}">{{ board.name }}</a></p>
+    <header class="topic-head">
+        <h1>{{ topic.title }}{{ parts.badges(topic) }}</h1>
+        <p class="muted">Started by {{ topic.author.displayName }}, {{ parts.when(topic.createdAt) }} · {{ replies }} {{ replies == 1 ? 'reply' : 'replies' }}</p>
+        {% if mod %}
+        <div class="mod-tools" aria-label="Moderator tools">
+            <form method="post" action="{{ path('community_lock_topic', {id: topic.id}) }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('community-moderate') }}">
+                <input type="hidden" name="locked" value="{{ topic.locked ? 0 : 1 }}">
+                <button class="btn paper" type="submit">{{ topic.locked ? 'Unlock topic' : 'Lock topic' }}</button>
+            </form>
+            <form method="post" action="{{ path('community_hide_topic', {id: topic.id}) }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('community-moderate') }}">
+                <input type="hidden" name="hidden" value="{{ topic.hidden ? 0 : 1 }}">
+                <button class="btn paper" type="submit">{{ topic.hidden ? 'Unhide topic' : 'Hide topic' }}</button>
+            </form>
+        </div>
+        {% endif %}
+    </header>
+
+    {{ parts.pager(page, pages, 'community_topic', {id: topic.id, slug: topic.slug}) }}
+
+    <ol class="posts">
+        {% for post in posts %}
+        <li class="post{% if post.hidden %} is-hidden{% endif %}" id="p{{ post.id }}">
+            <header class="post-head">
+                {{ parts.seal(post.author) }}
+                <span class="post-who">
+                    <strong>{{ post.author.displayName }}</strong>
+                    {% if post.author.moderator %}<span class="tag">Moderator</span>{% endif %}
+                    {% if post.id != opening_id and post.author.id == topic.author.id %}<span class="tag">Topic starter</span>{% endif %}
+                </span>
+                <a class="post-when" href="{{ path('community_post', {id: post.id}) }}" title="Link to this post">{{ parts.when(post.createdAt) }}</a>
+            </header>
+            {% if post.hidden %}<p class="hidden-note">Hidden by a moderator: only moderators see this post.</p>{% endif %}
+            {% if shared[post.id] is defined %}{{ parts.save_card(shared[post.id]) }}{% endif %}
+            <div class="post-body">{{ post.body|plain_text }}</div>
+            {% if post.editedAt %}<p class="edited">Edited {{ parts.when(post.editedAt) }}</p>{% endif %}
+            {% if app.user %}
+            <footer class="post-tools">
+                {% if post.canBeEditedBy(app.user) %}<a class="btn paper" href="{{ path('community_edit', {id: post.id}) }}">Edit</a>{% endif %}
+                {% if post.author.id != app.user.id and not post.hidden %}<a class="btn paper" href="{{ path('community_report', {id: post.id}) }}">Report</a>{% endif %}
+                {% if mod %}
+                <form method="post" action="{{ path('community_hide_post', {id: post.id}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('community-moderate') }}">
+                    <input type="hidden" name="hidden" value="{{ post.hidden ? 0 : 1 }}">
+                    <input type="hidden" name="back" value="{{ here }}#p{{ post.id }}">
+                    <button class="btn paper" type="submit">{{ post.hidden ? 'Unhide' : 'Hide' }}</button>
+                </form>
+                {% endif %}
+            </footer>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ol>
+
+    {{ parts.pager(page, pages, 'community_topic', {id: topic.id, slug: topic.slug}) }}
+
+    <section class="reply" id="reply" aria-labelledby="reply-h">
+        <h2 id="reply-h" class="c-h2">Reply</h2>
+        {% if topic.locked and not mod %}
+            <p class="locked-note">This topic is locked: nobody can reply to it any more.</p>
+        {% elseif app.user %}
+            <form method="post" action="{{ path('community_reply', {id: topic.id}) }}#reply" class="c-form">
+                <input type="hidden" name="_token" value="{{ csrf_token('community-post') }}">
+                <label class="visually-hidden" for="reply-body">Your reply</label>
+                <textarea id="reply-body" name="body" rows="5" maxlength="{{ constant('App\\Entity\\Post::BODY_MAX') }}" required placeholder="Write a reply as {{ app.user.displayName }}"{% if errors.body is defined %} aria-invalid="true" aria-describedby="body-error" autofocus{% endif %}>{{ draft }}</textarea>
+                {{ parts.error(errors, 'body') }}
+                <div class="form-row">
+                    <p class="hint">Plain text. Links start with http:// or https://.</p>
+                    <button class="btn wax" type="submit">Post reply</button>
+                </div>
+            </form>
+        {% else %}
+            <p>Join or sign in to reply. Reading needs no account.</p>
+            {{ parts.guest(here ~ '#reply') }}
+        {% endif %}
+    </section>
+</article>
+{% endblock %}

@@ -6,9 +6,10 @@ that breaks one fails CI on main. Two scripts check them, on pushes to main
 
 - `pnpm bench` (packages/engine/bench/turn.bench.ts) times the engine itself.
 - `pnpm --filter @ph/client perf` (apps/client/scripts/perf.mjs) runs the
-  built game in mobile Chromium, pans the map at five zooms, plays one
-  warm-up turn and then ends three turns (21 days). CI runners share their
-  CPUs with the software GPU, so a day now and then stalls for a CPU: the day
+  built game in mobile Chromium, pans the map at five zooms, plays three
+  warm-up turns and then ends three turns (21 days); when the week stops for
+  an event or a revolution it takes the first answer, as a player would. CI
+  runners share their CPUs with the software GPU, so a day now and then stalls for a CPU: the day
   budgets are judged on the third slowest of the 21 days (about the 90th
   percentile), and when those turns break a budget it plays three more, up to
   three attempts; one attempt must meet every budget. `--report` prints the
@@ -66,6 +67,9 @@ one worker answer and one apply.
 Rules:
 
 - The worker sends typed arrays and transfers them; no JSON of the world.
+  The snapshot is copied to the main thread every day, in one task, so a
+  per-province field is a typed array (bits for a small set, such as the
+  harvest months), never an array of numbers or arrays.
 - Applying a day updates textures and redraws once; panels re-render only
   what is open. Seasons change once a week, worked out ahead while the
   player looks at the map.
@@ -88,8 +92,38 @@ Dragging an army plans a route each time the target changes.
 - Applying a turn: 4 to 6 ms (was 14 to 26 ms, from converting every
   province's season on the main thread; before that 4.3 s, from re-encoding
   sprite images on every panel render).
-- Worker answer: about 50 ms.
+- Worker answer: about 50 ms. The 1378 start's 315 realms took it to about
+  75 ms (most of it the Diplomacy tab's view of every realm, whose lookups
+  scanned every relation in the world); with the relations indexed by realm
+  it is about 55 ms.
 - Engine turn: 0.2 ms at 5,000 provinces, 0.4 ms at 20,000.
+- Engine turn bench (`pnpm bench`, 5,000 provinces and 500 nations): about
+  13.5 ms on this container, was 17 to 19 ms and over budget on CI (25.7 ms of
+  25). The daily occupation pass looked every province up in a map of the
+  armies and tried to lift a siege in each; each 4-hour step with no fleets
+  scanned every province for a blockade, and refreshing blockades cleared
+  and copied the whole map; the yearly technology score threw an exception
+  for the root and the boughs of every realm. Now only marked provinces are
+  touched. At 20,000 provinces: about 80 ms, was about 90.
+- Standing armies (DIPL-232, F-165): until then the AI sent its levies home
+  before their pay began, so the bench's realms held no armies after the first
+  weeks; now some 900 stand at 5,000 provinces and the turn is about 18 to
+  21 ms on this container (main without them about 10 to 12). Engage walks
+  only the armies of realms at war and skips a province with one army in it,
+  garrisons join a battle from a list by province, armies eat without a
+  throwaway object, the AI calls men without a recount per province and
+  gathers its standing army where its garrisons stand.
+- Main failed the timing checks twice after the standing armies (zoom 4
+  overlay 2.7 ms of 2.5, then the 5,000-province turn 26.1 ms of 25), both on
+  runners about twice as slow as usual (map shading 357 to 523 ms a frame,
+  usually about 166). The overlay was unchanged; the turn had lost its
+  headroom. Engage now returns at once when no two realms' armies at war
+  share a province and no battle is fought (most steps), and builds its cells
+  only where armies can meet; an army still where it last charted from
+  charts nothing more; realms at peace share one empty enemy set; pay is
+  counted without an array per army; the AI's weekly marches list armies by
+  province without copying. About 5 % off the turn on this container (14.6
+  ms, was 15.8), the same world to the bit.
 - Animation: every frame (was one in five, so marching armies moved at
   5 fps: the redraw request made while drawing was wiped right after).
 - Route: about 4 ms at 5,000 and 20,000 provinces (was about 8 ms).

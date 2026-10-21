@@ -36,7 +36,7 @@ Feature: New campaign
   Scenario: Options step
     Given the player has chosen the realm "Ottomans"
     When the player moves to step 2
-    Then the options offered are difficulty, AI aggression, fog, historical or free events, ironman, and the end date
+    Then the options offered are difficulty, AI aggression, fog, historical, plausible or free events, ironman, and the end date
     And the end date can be 31 August of any year from 1494 to 1939, 31 August 1939 by default
     When the player picks a preset
     Then the preset fills the whole step

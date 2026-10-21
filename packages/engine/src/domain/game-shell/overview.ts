@@ -12,12 +12,16 @@ export interface OverviewInput {
   /** Provinces with less than a month of food, and those running low. */
   hungry: number;
   low: number;
+  /** Provinces whose normal year's food falls short of what they eat (D-PROV-36). */
+  short: number;
   provinces: number;
   people: number;
   /** Taken provinces still to fill (PROV-340), risings in the realm, beaten risings waiting for a verdict. */
   newLands: number;
   risings: number;
   verdicts: number;
+  /** Provinces with plague (PROV-362). */
+  sick?: number;
   /** Settlers or asks waiting on a tribal realm's Hunting grounds (TRIBE-027). */
   huntWaits: number;
   armies: number;
@@ -52,10 +56,10 @@ function tile(section: string, v: OverviewInput): OverviewTile {
     case "Economy":
       return {
         section,
-        page: v.hungry || v.low ? "Food" : "Treasury",
+        page: v.hungry || v.low || v.short ? "Food" : "Treasury",
         line: `${num(v.gold)} gold · ${signed(v.perMonth)} a month`,
-        note: v.low ? `${plural(v.low, "province")} running low on food` : v.hungry ? "" : "All provinces fed",
-        needs: v.hungry ? `${plural(v.hungry, "province")} hungry` : v.perMonth < 0 ? "Losing gold each month" : null,
+        note: v.low ? `${plural(v.low, "province")} running low on food` : v.hungry || v.short ? "" : "All provinces fed",
+        needs: v.hungry ? `${plural(v.hungry, "province")} hungry` : v.short ? `${plural(v.short, "province")} short of food` : v.perMonth < 0 ? "Losing gold each month" : null,
       };
     case "Lands": {
       const needs = v.newLands
@@ -64,12 +68,14 @@ function tile(section: string, v: OverviewInput): OverviewTile {
           ? `${plural(v.verdicts, "beaten rising")} to judge`
           : v.risings
             ? `${plural(v.risings, "uprising")}`
-            : v.huntWaits
+            : v.sick
+              ? `Plague in ${plural(v.sick, "province")}`
+              : v.huntWaits
               ? "Settlers wait on your grounds"
               : null;
       return {
         section,
-        page: v.newLands ? "Officials" : v.verdicts || v.risings ? "Provinces" : v.huntWaits ? "Hunting grounds" : "Provinces",
+        page: v.newLands ? "Officials" : v.verdicts || v.risings || v.sick ? "Provinces" : v.huntWaits ? "Hunting grounds" : "Provinces",
         line: plural(v.provinces, "province"),
         note: `${num(v.people)} people`,
         needs,

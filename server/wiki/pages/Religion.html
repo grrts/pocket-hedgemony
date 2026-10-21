@@ -1,0 +1,344 @@
+<h1>Religion</h1>
+<p>Religion decides which faiths exist, how the faith mix of every province slowly changes, and how you rule a realm where people pray in different ways. Faiths spread through things you can point at on the map: houses of worship, preachers, schools, traders, rulers and lords. You set a policy for each faith, from Established to Persecuted, and every choice has a price in grievances, lords&#39; loyalty, tax and people.</p>
+<p>There is no faith meter, piety, fervour or unity score, and no &quot;convert province&quot; button. Every change on the Faith line comes with a named reason.</p>
+<h2 id="how-it-works"><a class="anchor" href="#how-it-works" aria-label="Link to this section">#</a>How it works</h2>
+<h3 id="faiths-and-families"><a class="anchor" href="#faiths-and-families" aria-label="Link to this section">#</a>Faiths and families</h3>
+<p>The game uses the event tree&#39;s list of faiths plus three added ones: hussite, jain and asian_traditional. Each faith belongs to one family:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Family</th><th>Faiths</th></tr></thead>
+<tbody>
+<tr><td>christian</td><td>catholic, protestant, anglican, orthodox, oriental_christian, hussite</td></tr>
+<tr><td>islamic</td><td>sunni, shia, ibadi</td></tr>
+<tr><td>indic</td><td>hindu, sikh, jain</td></tr>
+<tr><td>buddhist</td><td>theravada, mahayana, vajrayana</td></tr>
+<tr><td>east_asian</td><td>shinto, confucian_ritual, daoist</td></tr>
+<tr><td>jewish</td><td>jewish</td></tr>
+<tr><td>traditional</td><td>indigenous_american, african_traditional, pacific_traditional, siberian_steppe_traditional, asian_traditional</td></tr>
+<tr><td>none</td><td>secular</td></tr>
+</tbody></table></div>
+<p>Each faith shows by its local name from the catalogue, while the rules use the faith id. Yazidi, Druze and Zoroastrian communities stay as named minorities in the catalogue rather than faiths of their own.</p>
+<p>Faiths relate to each other in three ways:</p>
+<ul>
+<li><strong>Layered.</strong> Some faiths live in the same people at once. Shinto, mahayana, confucian_ritual and daoist are layered with each other, and a traditional faith becomes layered with any faith once they have shared a province for 100 years. Layered faiths don&#39;t pull against each other, and a layered community gets no <em>Wrong faith</em> under a ruler of a faith it layers with. So Ming, with a confucian_ritual court and Beijing 30 % mahayana and 30 % daoist with no houses of their own, has no <em>Wrong faith</em> there.</li>
+<li><strong>Rooted.</strong> The five traditional faiths need no house to be served, hold twice as hard (see below), and where they are a quarter or more of the people, their sacred places count as one house of worship (pull 1).</li>
+<li><strong>Kin.</strong> Faiths of the same family are kin. A kin faith&#39;s house can serve a community under 20 %.</li>
+</ul>
+<h3 id="the-faith-mix"><a class="anchor" href="#the-faith-mix" aria-label="Link to this section">#</a>The faith mix</h3>
+<p>Each province holds up to three faiths, as shares of its people. Once a year, every faith&#39;s <strong>pull</strong> is added up from the sources present:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Source</th><th>Pull</th></tr></thead>
+<tbody>
+<tr><td>A house of worship at step 1 / 2 / 3 (at least half filled with clergy)</td><td>1 / 1.5 / 2</td></tr>
+<tr><td>The same house when fallow (short of clergy)</td><td>half</td></tr>
+<tr><td>Each preacher of the faith stationed there</td><td>2</td></tr>
+<tr><td>Each school of the faith (temple school, madrasa, monastery or cathedral school, seminary)</td><td>0.5</td></tr>
+<tr><td>The ruler&#39;s faith in the ruler&#39;s capital</td><td>1</td></tr>
+<tr><td>A lord&#39;s faith in a province he holds</td><td>0.5</td></tr>
+<tr><td>Sunni, shia and ibadi: per 100 traders passing from markets of that faith</td><td>0.5, up to 2</td></tr>
+<tr><td>A faith wave covering the province</td><td>the wave&#39;s pull per carrier</td></tr>
+<tr><td>The ruler&#39;s faith where another faith is Restricted</td><td>+1</td></tr>
+<tr><td>The ruler&#39;s faith where a Chaplain official serves</td><td>pull from houses and preachers doubled</td></tr>
+<tr><td>The ruler&#39;s faith where another faith is Persecuted</td><td>doubled</td></tr>
+</tbody></table></div>
+<p>Each faith also has a <strong>hold</strong>, its resistance to change: its share times 4, or times 8 for a rooted faith.</p>
+<p>At the end of the year each faith gets a <strong>target share</strong>: its hold plus its pull, divided by all holds and all pulls in the province. Its share then moves 3 % of the way toward that target. If no faith has any pull, nothing moves.</p>
+<p><em>Worked example: one year.</em> A province is half catholic and half protestant. Catholic has 3 pull and protestant 1. Both have a hold of 0.5 × 4 = 2. Catholic&#39;s target is (2 + 3) ÷ (2 + 2 + 3 + 1) = 0.625, and its share moves 3 % of the way there, from 0.5 to 0.50375.</p>
+<p>Hold slows change but never stops it. A province where one faith has three houses and another has one, with nothing else pulling, ends up about three to one after many years.</p>
+<p><em>Worked example: East Bengal, 1444 to 1700.</em> East Bengal is 70 % hindu, 25 % asian_traditional and 5 % sunni, with 2 hindu temples and a sunni lord, under a sunni ruler. The forest is cleared and a mosque is granted on each of 3 new field tiles. Now sunni has 3.5 pull (three mosques and the lord), hindu 2 (two temples) and asian_traditional 1 (its sacred places). The mix settles toward sunni 54 %, hindu 31 % and asian_traditional 15 %. Once asian_traditional falls below a quarter it loses its sacred-places pull, and by about 1700 East Bengal is mostly sunni.</p>
+<p><strong>Small and new faiths.</strong> A faith under 1 % with no house of its own is removed. A fourth faith arriving gets in only if it is larger than the smallest of the three. Then the smallest of the four joins the province&#39;s majority faith, so nobody simply vanishes. Languages work the same way.</p>
+<p><strong>Hidden believers.</strong> For 100 years after a Persecuted faith&#39;s houses in a province are closed, that faith stays at 2 % or more there, unless an Inquisition removes the floor. If catholic is Persecuted in Japan and its houses in Nagasaki were closed 40 years ago, it stays at 2 %; after 100 years, or with an Inquisition, it may fall lower.</p>
+<p><strong>People on the move.</strong> Refugees, settlers, migrants and soldiers settling at home shift the mix by their headcount at once, outside the pulls.</p>
+<h3 id="faith-buildings"><a class="anchor" href="#faith-buildings" aria-label="Link to this section">#</a>Faith buildings</h3>
+<p>The buildings themselves are described on <a href="/wiki/Buildings">Buildings</a>. Religion decides what they do for the mix:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Building</th><th>Pull</th><th>Serves its community</th></tr></thead>
+<tbody>
+<tr><td>House of worship, step 1 / 2 / 3</td><td>1 / 1.5 / 2</td><td>yes</td></tr>
+<tr><td>Landmark house (step 4)</td><td>3 in its province, 0.5 in every province of the owner&#39;s realm within 3 rings</td><td>yes</td></tr>
+<tr><td>Minority house of worship</td><td>0.5</td><td>yes</td></tr>
+<tr><td>Monastery</td><td>1, plus 0.5 as a school once it has seats</td><td>yes</td></tr>
+<tr><td>Religious school</td><td>0.5</td><td>no</td></tr>
+<tr><td>Pilgrimage shrine (holy places only)</td><td>1</td><td>yes</td></tr>
+</tbody></table></div>
+<p>A house of worship can be built for any faith present, not only yours. A minority house needs a community of a tenth of the people, or a <em>Faith tolerance</em> charter.</p>
+<p><strong>Taking over a house.</strong> You can convert a house to another faith at any time. It costs half of building it, its pull flips to the new faith, its clergy&#39;s property gold goes to your treasury (twice over for monastic land), an &quot;insult to faith&quot; spark is raised in the province, and lords of the old faith waver one step.</p>
+<p><em>Worked example.</em> Anglican England converts a catholic monastery with monastic land in Yorkshire. England pays half its building cost, the pull goes to anglican, the property gold is paid twice over, an &quot;insult to faith&quot; spark rises in Yorkshire, and the catholic lord Percy wavers a step.</p>
+<p><strong>Tithes.</strong> Each year the clergy of each faith get 1 gold for every 10,000 people of that faith into their own purse, which they spend on a house in every town of their faith first. A Restricted faith&#39;s clergy keep their houses but can&#39;t build new ones. When a faith becomes Persecuted, its purse is seized.</p>
+<p><strong>Preachers found houses.</strong> A preacher who spends 10 years in a province with no house of his faith founds a step-1 house there.</p>
+<p><strong>Losing pull.</strong> A house loses its pull when it is burned or sacked with its town, or closed or converted under a Persecuted policy or a change of state faith. It gives half while it lacks clergy.</p>
+<p><strong>Clergy.</strong> Faith buildings, almshouses and hospitals are where the clergy work, and the clergy are the pool for preachers and Chaplains. Whether clergy marry follows the faith.</p>
+<h3 id="communities-and-the-faith-policy-screen"><a class="anchor" href="#communities-and-the-faith-policy-screen" aria-label="Link to this section">#</a>Communities and the Faith policy screen</h3>
+<p>Any faith with at least 10 % of a province&#39;s people is a <strong>community</strong> there. A community of a faith other than yours is <strong>served</strong> when its faith is Tolerated or Restricted and it has a house of its own faith in the province (or of a kin faith if it is under 20 %), or needs none because it is rooted or layered. Otherwise it is <strong>unserved</strong>, and a Persecuted community is always unserved.</p>
+<p>You keep one policy row for each faith in your realm. Exactly one is <strong>Established</strong>: your state faith. The others are set to one of:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Policy</th><th>What happens</th></tr></thead>
+<tbody>
+<tr><td>Tolerated</td><td>Keeps its houses, its clergy may build new ones, normal tax. If the faith is 10 % or more of the realm, Pious and clergy lords of the state faith waver once.</td></tr>
+<tr><td>Restricted</td><td>Keeps its houses, no new ones. Its share of tax is 25 % higher (faith tax). The state faith gets +1 pull wherever it lives. Its lords waver one step.</td></tr>
+<tr><td>Persecuted</td><td>Its houses are closed or handed to the state faith (your choice for the realm). No tax from it. The grievance <em>Persecuted</em>, counting as two, in every province where it is 10 % or more. The state faith&#39;s pull is doubled where it lives. 2 % of its people flee each year as refugees, craftsmen and scholars first. Its lords waver two steps. Every ruler of that faith on your border gets the <em>Defend the faith</em> war aim against you. The flag <code>religious_persecution_active</code> is set.</td></tr>
+</tbody></table></div>
+<p>A policy change takes effect at the next New Year. Each step toward Persecuted raises a spark for faith risings where that faith lives; a step back is not a spark. A <em>Faith tolerance</em> charter makes a faith Tolerated in that province whatever the realm row says. When a faith stops being Persecuted, the <em>Persecuted</em> grievance ends.</p>
+<p><strong>Wrong faith.</strong> A province gets <em>Wrong faith</em> when a community of another faith is a third or more of the people and unserved, or is Restricted where it is the majority (unless protected; see Islam below).</p>
+<p><em>Worked example: La Rochelle under catholic France.</em></p>
+<div class="table-scroll"><table>
+<thead><tr><th>Protestant share</th><th>Policy</th><th>House</th><th><em>Wrong faith</em>?</th></tr></thead>
+<tbody>
+<tr><td>40 %</td><td>Tolerated</td><td>none</td><td>yes</td></tr>
+<tr><td>20 %</td><td>Tolerated</td><td>none</td><td>no</td></tr>
+<tr><td>40 %</td><td>Tolerated</td><td>a protestant church</td><td>no</td></tr>
+<tr><td>60 %</td><td>Restricted</td><td>a protestant church</td><td>yes</td></tr>
+<tr><td>40 %</td><td>Restricted</td><td>a protestant church</td><td>no</td></tr>
+</tbody></table></div>
+<p><em>Wrong faith</em> ends when the community&#39;s house is built and its faith is Tolerated or Restricted, when it converts, or when a <em>Faith tolerance</em> charter is granted.</p>
+<h3 id="expulsion-and-the-inquisition"><a class="anchor" href="#expulsion-and-the-inquisition" aria-label="Link to this section">#</a>Expulsion and the Inquisition</h3>
+<p><strong>Expel</strong> is a one-off decision, offered only on a Persecuted faith. Within a year, 70 % of its people leave as refugees for the nearest realm where it is Established or Tolerated, keeping their class where a slot is free; the rest convert or hide, and the hidden-believer floor still applies. The expelling realm gets the faith&#39;s houses and the gold of its property, the <em>Persecuted</em> grievance ends, and every province where they lived gets <em>Bloodshed</em>. Harm is never rewarded: an expulsion can never leave the expelling realm better off in people or skills; the host realm gains both.</p>
+<p><em>Worked example: the Alhambra decree.</em> In 1492, with jewish Persecuted in Castile and the Ottomans the nearest realm that tolerates it, Castile expels the jewish faith. Within a year 70 % leave for the Ottomans, Castile takes their houses and property gold, the <em>Persecuted</em> grievance ends, and every province where they lived gets <em>Bloodshed</em>.</p>
+<p><strong>The Inquisition</strong> is a decision only for realms ruled by a house (feudal realm, diet monarchy, household realm, bureaucratic empire, elective monarchy, absolute monarchy or constitutional monarchy) whose Established faith is catholic. While it runs it costs gold upkeep each year, removes the hidden-believer floor, adds +1 state-faith pull in every province with a Restricted or Persecuted community, and makes 1 % of the scholars and craftsmen in those provinces leave each year. It sets the flag <code>inquisition_established</code>, and you can close it again.</p>
+<h3 id="lords-and-faith"><a class="anchor" href="#lords-and-faith" aria-label="Link to this section">#</a>Lords and faith</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>A lord loses one step when</th><th>A lord gains one step when</th></tr></thead>
+<tbody>
+<tr><td>His faith is set to Restricted (two steps for Persecuted)</td><td>The ruler builds or pays for a house of his faith in his land</td></tr>
+<tr><td>He is Pious or clergy of the state faith and the realm tolerates a faith of 10 % or more of the realm</td><td>He is Pious or clergy of the state faith and the ruler takes over another faith&#39;s houses</td></tr>
+<tr><td>The state faith changes away from his</td><td>The state faith changes to his</td></tr>
+</tbody></table></div>
+<h3 id="preachers"><a class="anchor" href="#preachers" aria-label="Link to this section">#</a>Preachers</h3>
+<p>Preachers are named agents of your state faith. You get one for each monastery or religious school of the state faith, one for every 5 houses of the state faith, one for each holy place of your faith you hold, plus any granted by events and some inventions.</p>
+<p><em>Worked example.</em> Catholic Castile has 2 monasteries, 1 religious school and 10 houses of worship, and holds Santiago de Compostela. That is 3 + 2 + 1 = 6 preachers.</p>
+<p>A preacher travels like an envoy and, once there, adds 2 pull for the state faith each year. He can go to your own provinces, to a subject&#39;s provinces without asking, to a foreign realm whose ruler has given leave (<em>Allow preachers</em>, a diplomacy action), or to a foreign realm without leave. Without leave, that ruler may expel or execute him each year; if so, the flag <code>missionary_persecution</code> is set and you get the <em>Defend the faith</em> war aim.</p>
+<p>You lose a preacher when he is killed or expelled abroad, when you recall him, or when your state faith changes (then all of them go). A preacher of a Persecuted faith inside the realm can lead a faith rising, which then spreads twice as fast.</p>
+<h3 id="changing-the-state-faith"><a class="anchor" href="#changing-the-state-faith" aria-label="Link to this section">#</a>Changing the state faith</h3>
+<p>The decision <strong>Adopt a faith</strong> is offered when that faith is at least 30 % of your capital province, or 40 % or more of the realm, or when an event offers it. When you adopt:</p>
+<ul>
+<li>The old Established faith becomes Tolerated at once (you can change it from the next New Year).</li>
+<li>Every preacher of the old faith is gone, and you have none of the new faith until its houses exist.</li>
+<li>Lords&#39; loyalty moves as in the table above.</li>
+<li>You choose to keep the old faith&#39;s houses (serving it as a community) or take them over (pull flips, property gold paid, twice for catholic and orthodox monastic land, and an &quot;insult to faith&quot; spark where each is taken).</li>
+<li>You choose to close the other faith&#39;s schools or keep them.</li>
+</ul>
+<p><em>Worked example.</em> Catholic Sweden with 3 catholic preachers adopts protestant, takes over the catholic houses and closes catholic schools. Catholic becomes Tolerated, Sweden has no preachers at all until protestant houses exist, the houses become protestant with their pull, the property gold is paid (twice for monastic land), sparks rise where houses were taken, catholic schools close, catholic lords lose a step and protestant lords gain one.</p>
+<p>You can&#39;t adopt by decision again within 30 years; events aren&#39;t limited. After the event <code>peace_of_augsburg</code>, rulers inside the Empire can switch between catholic and protestant without the capital test (cuius regio).</p>
+<h3 id="holy-places"><a class="anchor" href="#holy-places" aria-label="Link to this section">#</a>Holy places</h3>
+<p>Holy places are a fixed list of named provinces, each with its faiths and its holder on 20 September 1378:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Holy place</th><th>Faiths</th><th>Held at the start by</th></tr></thead>
+<tbody>
+<tr><td>Rome</td><td>catholic</td><td>Papal States</td></tr>
+<tr><td>Jerusalem</td><td>catholic, orthodox, oriental_christian, jewish, sunni, shia</td><td>Mamluk Sultanate</td></tr>
+<tr><td>Mecca and Medina</td><td>sunni, shia, ibadi</td><td>Hejaz (the Sharifs, not their Mamluk overlord)</td></tr>
+<tr><td>Karbala and Najaf</td><td>shia</td><td>Jalayirids</td></tr>
+<tr><td>Constantinople</td><td>orthodox</td><td>Byzantium</td></tr>
+<tr><td>Echmiadzin</td><td>oriental_christian</td><td>Jalayirids</td></tr>
+<tr><td>Aksum</td><td>oriental_christian</td><td>Ethiopia</td></tr>
+<tr><td>Varanasi</td><td>hindu</td><td>Delhi (Jaunpur is not yet born)</td></tr>
+<tr><td>Lhasa</td><td>vajrayana</td><td>Tibet</td></tr>
+<tr><td>Temple of the Tooth</td><td>theravada</td><td>Gampola, then Kandy from 1592</td></tr>
+<tr><td>Mount Wutai</td><td>mahayana</td><td>Ming</td></tr>
+<tr><td>Qufu</td><td>confucian_ritual</td><td>Ming</td></tr>
+<tr><td>Ise</td><td>shinto</td><td>Japan</td></tr>
+<tr><td>Santiago de Compostela</td><td>catholic</td><td>Castile</td></tr>
+<tr><td>Bodh Gaya</td><td>theravada, mahayana, vajrayana</td><td>Delhi</td></tr>
+</tbody></table></div>
+<p>Amritsar appears as a holy place only once the founding of the Sikh Panth has happened, not before 1577. A holy place is always held by whoever owns its province.</p>
+<p>Holding a holy place of your own faith gives +1 preacher, the pilgrimage shrine there and 200 more traders passing through each year. Holding one of a faith you don&#39;t share lets every ruler of that faith use <em>Defend the faith</em> against you with that province as the prize. Pilgrims still come if you tolerate their faith and keep a house of it there. The holy places where church heads sit (the Pope, the Ecumenical Patriarch, a Caliph&#39;s claim, the Dalai Lama from 1578) are marked, and the heads have rules of their own, below.</p>
+<h3 id="heads-of-the-faith"><a class="anchor" href="#heads-of-the-faith" aria-label="Link to this section">#</a>Heads of the faith</h3>
+<p>Five faiths have a head with a seat. Nothing here is a meter: a head works through ties, wrongs, preachers, lords, war aims and calls to arms.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Head</th><th>Faith</th><th>Seat</th><th>How the patron is chosen</th></tr></thead>
+<tbody>
+<tr><td>The Pope</td><td>catholic</td><td>Rome</td><td>A conclave when the Pope dies, or whoever holds Rome if the Papal States lose it</td></tr>
+<tr><td>The Ecumenical Patriarch</td><td>orthodox</td><td>Constantinople</td><td>Whoever holds the seat, or its overlord</td></tr>
+<tr><td>The Catholicos</td><td>oriental_christian</td><td>Echmiadzin</td><td>Whoever holds the seat, or its overlord</td></tr>
+<tr><td>The Caliph</td><td>sunni</td><td>Mecca and Medina</td><td>A Sunni ruler who holds both, directly or as overlord, and takes <em>Claim the caliphate</em></td></tr>
+<tr><td>The Dalai Lama (from 1578)</td><td>vajrayana</td><td>Lhasa</td><td>Whoever chose him in <em>Altan Khan and the Dalai Lama</em>, until Lhasa changes hands</td></tr>
+</tbody></table></div>
+<p>Anglican and Protestant churches are headed by their own crowns, and every other faith has no head.</p>
+<ul>
+<li><strong>The patron</strong> of a head who shares his faith gets the tie <em>The Pope favours us</em> (+15) with every realm of the faith and 1 more preacher. He owes them help: when a ruler of another faith attacks a fellow believer who holds a holy place, the patron gets a call to arms, and refusing it is an oath broken. A patron who changes faith loses the patronage and is <em>Betrayed the faith</em> (−30, fading over 30 years) with all of them.</li>
+<li><strong>A patron of another faith</strong> (the Ottomans in Constantinople, say) gets nothing but this: every community of the head&#39;s faith in his realm counts as served.</li>
+<li><strong>Taking a seat</strong> by war from a fellow believer of the head is <em>Seized the seat</em> (−20) with his faith; taking it from a ruler of another faith is <em>Freed the seat</em> (+20).</li>
+<li><strong>The conclave</strong> sits for one month when the Pope dies. Each Catholic realm casts a vote per cardinal and may send gold, 20 gold a vote, up to as many gold votes as it has cardinals. Rome casts 10 votes; if Rome wins or ties, the Pope is Italian and has no patron.</li>
+<li><strong>Censure.</strong> Declaring war on a ruler of your own faith, to take land, for tribute, to raid or with no aim, brings the head&#39;s censure: <em>Censured by the Pope</em> (−25) with every realm of the faith while the war lasts and fading over 10 years after, your lords of the faith waver once, and every fellow believer holds the <em>Punish</em> aim against you. A peace that gives back everything you took ends it at once. Crown-headed churches are never censured.</li>
+<li><strong>Raise our own patriarch</strong>, once, for an Orthodox realm with a great Orthodox house in its capital while Constantinople is held by another faith, for 40 gold: its church becomes crown-headed and it gets 1 more preacher.</li>
+</ul>
+<p><strong>The Schism.</strong> On the start day there are two Popes: Urban VI in Rome, and Clement VII, elected at Fondi that day, who goes to Avignon. Each Catholic realm holds an <strong>obedience</strong> to one of them, and its Pope is the one whose censure, patronage and calls count for it. On 20 September 1378, 150 realms and lords follow Rome (the Empire, England, Hungary and Poland, Scandinavia, most of Italy), 30 follow Avignon (France and its great fiefs, Scotland, Naples, Savoy, Cyprus) and 22 have not chosen, among them Castile, Aragon, Portugal and Navarre. The Council of Pisa (1409) can add a third Pope and the Council of Constance (1414 to 1418) can end the Schism; both are events. At the start Byzantium is the Ecumenical Patriarch&#39;s patron, the Jalayirids the Catholicos&#39;s, and the Mamluks hold the Caliph&#39;s claim as overlord of the Hejaz.</p>
+<h3 id="what-each-faith-does-differently"><a class="anchor" href="#what-each-faith-does-differently" aria-label="Link to this section">#</a>What each faith does differently</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Faith</th><th>Its own rule</th></tr></thead>
+<tbody>
+<tr><td>Catholic</td><td>Clergy don&#39;t marry; taking over monastic land pays double; the Inquisition</td></tr>
+<tr><td>Protestant</td><td>+0.5 pull for each press and each school in the province; clergy marry</td></tr>
+<tr><td>Anglican (state faith)</td><td>The crown heads the church: clergy lords never waver over faith policy</td></tr>
+<tr><td>Hussite</td><td>Kin of protestant once the Reformation starts; at the end of the Reformation period or in 1620, whichever comes first, its shares merge into protestant, or into catholic where there is no protestant house</td></tr>
+<tr><td>Sunni, shia, ibadi (ruler)</td><td>Protected communities: a served Restricted community gets no <em>Wrong faith</em> even as the majority</td></tr>
+<tr><td>Hindu</td><td>A step-3 temple draws 150 traders a year</td></tr>
+<tr><td>Sikh</td><td>Each gurdwara shelters 1,000 homeless, like an almshouse</td></tr>
+<tr><td>Theravada</td><td>Each house of worship gives 20 student seats, like a small temple school</td></tr>
+<tr><td>Vajrayana</td><td>A step-3 house or monastery can be granted as a lord&#39;s land, its abbot being the lord</td></tr>
+<tr><td>Orthodox</td><td>Taking over monastic land pays double</td></tr>
+<tr><td>Secular</td><td>No houses; a secular state may only Tolerate or Restrict other faiths; after 1850, +0.5 pull from each school in a town with a factory, once the realm has mass schooling</td></tr>
+</tbody></table></div>
+<h3 id="faith-waves-and-events"><a class="anchor" href="#faith-waves-and-events" aria-label="Link to this section">#</a>Faith waves and events</h3>
+<p>A <strong>faith wave</strong> is a temporary source of pull started by an event. It starts from a place, grows outward each year by its reach in rings of provinces, never past its limit, and ends after a number of years or with a period. In each province it reaches, it adds its pull for each <strong>carrier</strong> there:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Carrier</th><th>Counts</th></tr></thead>
+<tbody>
+<tr><td>Presses</td><td>per press</td></tr>
+<tr><td>Schools</td><td>per school</td></tr>
+<tr><td>Towns</td><td>per town of market-town size or bigger</td></tr>
+<tr><td>Traders</td><td>per 100 passing</td></tr>
+<tr><td>Rule</td><td>the province is owned by the wave&#39;s starting country</td></tr>
+<tr><td>Army</td><td>an army of that country stands or passed there this year</td></tr>
+<tr><td>Preachers</td><td>per preacher of that faith, on top of his usual pull</td></tr>
+</tbody></table></div>
+<p>A wave never converts anyone by itself; it only adds pull.</p>
+<p><em>Worked example: the Reformation.</em> When <code>protestant_reformation</code> fires with the option to protect the reformer and the reform centre in Saxony, a protestant wave starts from Saxony. It gives 1.5 pull per press, school and market town or bigger in each province reached, spreads half a ring a year, never leaves Europe, and ends with the Reformation period.</p>
+<p>Other events also start waves: the catholic renewal after <code>council_of_trent</code>, Safavid shiism after <code>safavid_rise</code>, the Sikh Panth, the Futa Jallon and Sokoto jihads, and the Mongol conversion to vajrayana after Altan Khan meets the Dalai Lama.</p>
+<p>Religion adds ten new events: the princes adopting the Reformation (1525 to 1563), the expulsion of the Moriscos (1609 to 1614), Altan Khan and the Dalai Lama (1578), the jizya reimposed (1679), the Raskol and the Old Believers (1653 to 1667), the revolution and the church (1790 to 1801), the separation of church and state (1905 to 1928), the missionary societies (1792 onward), court conversion to Islam (1444 to 1750) and court conversion to Christianity (1790 to 1914).</p>
+<p>For event writers, religion provides the conditions <code>faith_policy</code>, <code>holds_holy_place</code> and <code>faith_wave_active</code>, and the effects <code>faith_wave</code>, <code>faith_policy</code> (Tolerated, Restricted or Persecuted; Established is set only by <code>religion</code>) and <code>preachers</code> (extra preachers for some years, or for good with 0). The <code>religion</code> and <code>religion_share</code> conditions read the mix and the state faith directly, and <code>spread</code> still shifts a share at once.</p>
+<h3 id="the-start"><a class="anchor" href="#the-start" aria-label="Link to this section">#</a>The start</h3>
+<p>Each country gets its ruler&#39;s faith from the catalogue, and each province the mix of the record that owns it, adjusted by region overrides. Where the people&#39;s majority differs from the ruler&#39;s faith, the ruler&#39;s faith starts at 15 % (court, garrison and town), as for sunni Delhi over a hindu people, pagan Lithuania over orthodox people, or sunni Mali over african_traditional people. A community not otherwise sized starts at 5 %.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Region override</th><th>Starting mix</th></tr></thead>
+<tbody>
+<tr><td>The Balkans under the Ottomans</td><td>orthodox 85 %, sunni 15 %</td></tr>
+<tr><td>Granada</td><td>sunni 95 %, jewish 3 %, catholic 2 %</td></tr>
+<tr><td>The north Java coast</td><td>hindu 55 %, sunni 25 %, asian_traditional 20 %</td></tr>
+<tr><td>Punjab</td><td>hindu 55 %, sunni 45 %</td></tr>
+<tr><td>Persia</td><td>sunni 80 %, shia 20 %</td></tr>
+<tr><td>Egypt</td><td>sunni 88 %, oriental_christian 10 %, jewish 2 %</td></tr>
+<tr><td>Polish towns</td><td>5 % more jewish</td></tr>
+</tbody></table></div>
+<p>There are no Hussites at the start: Bohemia is Catholic until Hus is burned (1415) and the Defenestration of Prague (1419), and only then does the Hussite mix (hussite 70 %, catholic 27 %, jewish 3 %) come in by event. Lithuania and Samogitia keep their own <strong>Baltic traditional</strong> faith until their baptisms (Jogaila&#39;s in 1386 and 1387, Samogitia&#39;s in 1413), which are events.</p>
+<h3 id="what-religion-gives-other-systems"><a class="anchor" href="#what-religion-gives-other-systems" aria-label="Link to this section">#</a>What religion gives other systems</h3>
+<ul>
+<li>Faith risings demand that their faith be Tolerated in the provinces they hold, or a house of worship there (a smaller demand rebels accept in a Talk).</li>
+<li><em>Defend the faith</em> also opens when a neighbour persecutes your faith in a province bordering yours, when your preacher is killed or expelled, and when a holy place of your faith is held by another faith.</li>
+<li>Schools have a faith, and persecution drives scholars abroad.</li>
+<li>Diplomacy gets the fact &quot;same faith&quot; (better starting opinion) and the <em>Allow preachers</em> leave.</li>
+<li>Faith and language stay two separate mixes with two separate grievances.</li>
+</ul>
+<h3 id="the-computer-players"><a class="anchor" href="#the-computer-players" aria-label="Link to this section">#</a>The computer players</h3>
+<ul>
+<li>They build a house of the state faith wherever it is below half, if gold allows, and a minority&#39;s house when that community has <em>Wrong faith</em> and its lords are wavering.</li>
+<li>They tolerate any faith above 20 % of the realm unless zealous. A zealous ruler restricts, and persecutes only after an event or a war of religion. With jewish at 25 % of the realm, a mercantile AI tolerates it, a zealot restricts it, and a zealot after a war of religion persecutes it.</li>
+<li>They send preachers first to their own provinces where the state faith is under half, then abroad where they have leave.</li>
+<li>They adopt a new faith only when an event offers it or it is above 60 % of the realm.</li>
+</ul>
+<h3 id="when-it-happens"><a class="anchor" href="#when-it-happens" aria-label="Link to this section">#</a>When it happens</h3>
+<p>Once a year, alongside traders and the trade balance: pulls, hold and the 3 % move, small shares, hidden-believer timers, tithes, persecution flight (2 %), Inquisition flight (1 %), wave growth, preachers founding houses and the Hussite merge check. At New Year, pending policy changes take effect. Each month, preachers travel and expulsions progress.</p>
+<h2 id="what-you-see"><a class="anchor" href="#what-you-see" aria-label="Link to this section">#</a>What you see</h2>
+<ul>
+<li><strong>Province card, Faith line</strong>: each faith&#39;s share and whether it is rising or falling. Tap it to see this year&#39;s pulls for each faith with their sources, each community&#39;s state, and how fast the mix is moving and toward which faith. For example, Rouen at catholic 61 % falling, protestant 37 % rising and jewish 2 % shows the protestant community served by its own church and Tolerated, and the jewish 2 % as below a community with no grievance.</li>
+<li><strong>Country card, Faith row</strong>: for example &quot;Catholic · 78 % of people · 3 more faiths · 2 preachers · holds no holy place&quot;. Tap it to open the <strong>Faith policy screen</strong>, with one row per faith. Preachers are also listed under Abroad.</li>
+<li><strong>Faith %</strong> is the share of people of the state faith or a faith layered with it. Ming, with 10 % confucian_ritual, 50 % mahayana, 30 % daoist and 10 % asian_traditional not yet layered, has a Faith % of 90.</li>
+<li><strong>The Faith map mode</strong>: at world zoom, provinces coloured by majority faith, hatched where another faith&#39;s community is 30 % or more, with holy-place icons. At region zoom, houses as town sprites, preachers as walking figures and waves as a spreading tint. At local zoom, the Faith line.</li>
+</ul>
+<h3 id="in-the-game-now"><a class="anchor" href="#in-the-game-now" aria-label="Link to this section">#</a>In the game now</h3>
+<p>Every province starts with up to three faiths from its realm&#39;s start mix, with area overrides (such as the Orthodox Balkans under the Ottomans). Communities of a tenth or more start with a house of worship where their faith has one.</p>
+<ul>
+<li><p><strong>Province card, Faith line</strong>: each faith&#39;s share with ↑ or ↓. Tap it for this year&#39;s pulls per faith and their sources (houses, your capital, your policy), each community&#39;s state, any grievance, and how many points a year the mix moves toward which faith.</p>
+</li>
+<li><p><strong>Your realm card, Peoples tab</strong>: the state faith, Faith %, and a card per faith in your realm with its share, people and provinces. The state faith is Established; every other faith has three buttons, <strong>Tolerated</strong>, <strong>Restricted</strong> and <strong>Persecuted</strong>, which are your tolerance for that faith. A change is shown as pending and takes effect at New Year; tap the current policy to cancel it.</p>
+<ul>
+<li>Tolerated: houses stand, normal tax.</li>
+<li>Restricted: a quarter more tax from its people, no new houses, your faith pulls harder; <em>Wrong faith</em> where it is the majority.</li>
+<li>Persecuted: its houses close at New Year and its people pay no tax, your faith pulls twice as hard; <em>Persecuted</em>, which counts as two grievances, wherever it is a tenth or more.</li>
+</ul>
+</li>
+<li><p><strong>The Faiths map mode</strong>: provinces coloured by majority faith, hatched where a second faith holds 30 % or more.</p>
+</li>
+<li><p>Faiths move each New Year, a fraction of a point at a time.</p>
+</li>
+<li><p><strong>Head of the faith card</strong>, on the Peoples tab under the faith cards: the head, his seat and who holds it, the patron, what the patron gets and owes, and the one action open now (<em>Send gold to the conclave</em> with − and +, <em>Claim the caliphate</em>, <em>Raise our own patriarch</em>), or why it is not open. The Faith line on every realm&#39;s General tab carries a badge: <em>Patron of the Pope</em>, <em>Caliph</em>, <em>Heads its church</em> or a red <em>Censured</em>. Before you declare war, the Diplomacy tab warns you if the head will censure it and what it costs. The Faiths map mode marks each seat; tap one, or its button in the key, to open that head&#39;s card.</p>
+</li>
+<li><p>For now a cardinal is a Catholic house in a province of 300,000 people or more, and a great Orthodox house is any Orthodox house in the capital.</p>
+</li>
+</ul>
+<p>Not in yet: building or paying for houses, preachers, expulsion and the Inquisition, changing the state faith, holy places, lords&#39; faith, faith waves, and the computer players changing their policy.</p>
+<h2 id="how-it-connects"><a class="anchor" href="#how-it-connects" aria-label="Link to this section">#</a>How it connects</h2>
+<ul>
+<li><a href="/wiki/Provinces">Provinces</a>: stores the faith mix, the clergy class, the Chaplain, the <em>Faith tolerance</em> charter, <em>Wrong faith</em> and <em>Persecuted</em>, refugees and settlers.</li>
+<li><a href="/wiki/Buildings">Buildings</a>: the faith buildings themselves, converting, burning and who builds; religion supplies their pull and serving.</li>
+<li><a href="/wiki/Your-Realm">Your-Realm</a>: Faith % and preachers on the country card, lords&#39; faith loyalty, the faith tax and take-over gold.</li>
+<li><a href="/wiki/Rebellions">Rebellions</a>: sparks from harsher policies and take-overs, faith risings&#39; demands, preachers as leaders, <em>Bloodshed</em>.</li>
+<li><a href="/wiki/Warfare">Warfare</a>: the <em>Defend the faith</em> openings.</li>
+<li><a href="/wiki/Diplomacy">Diplomacy</a>: <em>Allow preachers</em>, same-faith opinion, preachers travelling like envoys.</li>
+<li><a href="/wiki/Historical-Events">Historical-Events</a>: faith ids, conditions and effects, waves, flags, the ten new events and the patches.</li>
+<li><a href="/wiki/Government">Government</a>: the state faith, clergy lords, holy places, &quot;a reformed faith&quot; and which forms may found an Inquisition.</li>
+<li><a href="/wiki/Culture">Culture</a>: trading peoples of another faith, and expulsions moving them; mixes stay separate.</li>
+<li><a href="/wiki/Trade">Trade</a>: traders feed Islamic pull; pilgrims add 200 traders; Hindu temples add 150.</li>
+<li><a href="/wiki/Research">Research</a>: schools have a faith; presses feed Protestant pull and waves; persecuted scholars leave.</li>
+<li><a href="/wiki/Recruiting">Recruiting</a>: a Chaplain commander&#39;s &quot;Beloved&quot; trait reads the army&#39;s faith share.</li>
+<li><a href="/wiki/Subjects">Subjects</a>: preachers enter subjects without permission.</li>
+<li><a href="/wiki/Revolutions">Revolutions</a>: faith revolutions use waves; regimes may lead to the church events.</li>
+<li><a href="/wiki/The-1378-Start">The 1378 Start</a>: the ruler&#39;s faith and each province&#39;s starting mix.</li>
+<li><a href="/wiki/Map-and-Lenses">Map and Map Modes</a>: the Faith map mode, house sprites, preachers and wave tint.</li>
+<li><a href="/wiki/Time-and-Turns">Time-and-Turns</a>: the yearly slot and New Year policy changes.</li>
+</ul>
+<h2 id="numbers"><a class="anchor" href="#numbers" aria-label="Link to this section">#</a>Numbers</h2>
+<p>Every value the game uses, made from its config so it always matches the game: <a href="/wiki/Data-Religion">Religion data</a>. How they combine: <a href="/wiki/Formulas">Formulas</a>.</p>
+<p>All numbers are <strong>first-pass placeholders</strong> in <code>religion.yaml</code>. Four defaults were kept on 16 October (still config values): communities at 10 %, <em>Wrong faith</em> at a third, the 25 % faith tax and the 3 % yearly move. The three-faith limit is a storage limit, not a balance number.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>relations.layered_group</code></td><td>shinto, mahayana, confucian_ritual, daoist</td></tr>
+<tr><td><code>relations.traditional_layers_after_years</code></td><td>100</td></tr>
+<tr><td><code>relations.kin_serves_community_below</code></td><td>0.20</td></tr>
+<tr><td><code>mix.max_faiths_per_province</code></td><td>3 (storage)</td></tr>
+<tr><td><code>mix.drift_per_year</code></td><td>0.03 (kept)</td></tr>
+<tr><td><code>mix.hold_per_share</code> / <code>rooted_hold_per_share</code></td><td>4 / 8</td></tr>
+<tr><td><code>mix.rooted_sacred_places_pull</code> / <code>_min_share</code></td><td>1 / 0.25</td></tr>
+<tr><td><code>mix.vanish_below</code></td><td>0.01</td></tr>
+<tr><td><code>mix.hidden_believers_floor</code> / <code>_years</code></td><td>0.02 / 100</td></tr>
+<tr><td><code>pull.house_steps</code></td><td>1, 1.5, 2</td></tr>
+<tr><td><code>pull.landmark_house</code></td><td>3 here, 0.5 within 3 rings</td></tr>
+<tr><td><code>pull.minority_house</code>, <code>monastery</code>, <code>pilgrimage_shrine</code></td><td>0.5, 1, 1</td></tr>
+<tr><td><code>pull.fallow_multiplier</code></td><td>0.5</td></tr>
+<tr><td><code>pull.preacher</code>, <code>school_of_faith</code>, <code>capital</code>, <code>lord_of_faith</code></td><td>2, 0.5, 1, 0.5</td></tr>
+<tr><td><code>pull.traders_per_100</code> / <code>traders_max</code></td><td>0.5 / 2</td></tr>
+<tr><td><code>pull.restricted_escape_tax</code>, <code>chaplain_multiplier</code>, <code>persecution_multiplier</code>, <code>inquisition</code></td><td>1, 2, 2, 1</td></tr>
+<tr><td><code>houses.minority_house_needs_share</code></td><td>0.10</td></tr>
+<tr><td><code>houses.tithe_gold_per_10000_people</code></td><td>1</td></tr>
+<tr><td><code>houses.community_founds_own_house</code></td><td>share 0.20, every 20 years (no design rule)</td></tr>
+<tr><td><code>houses.preacher_founds_house_after_years</code></td><td>10</td></tr>
+<tr><td><code>houses.convert_cost_share_of_build</code></td><td>0.5</td></tr>
+<tr><td><code>houses.take_over_gold</code></td><td>20 per step, monastic land × 2</td></tr>
+<tr><td><code>communities.min_share</code></td><td>0.10 (kept)</td></tr>
+<tr><td><code>communities.wrong_faith_min_share</code></td><td>0.33 (kept)</td></tr>
+<tr><td><code>policies.restricted</code></td><td>faith tax 0.25 (kept), no new houses, lords −1</td></tr>
+<tr><td><code>policies.persecuted</code></td><td>close or take over, flee 0.02, grievance weight 2, lords −2</td></tr>
+<tr><td><code>policies.change_takes_effect</code></td><td>next New Year</td></tr>
+<tr><td><code>expulsion</code></td><td>70 % leave within 12 months, <em>Bloodshed</em></td></tr>
+<tr><td><code>inquisition</code></td><td>catholic monarchies, 10 gold a year, 1 % skilled leave</td></tr>
+<tr><td><code>preachers</code></td><td>1 per 5 houses, 1 per holy place, 1 gold a year upkeep, 25 % yearly expel chance abroad</td></tr>
+<tr><td><code>state_faith_change</code></td><td>capital 0.30, realm 0.40, cooldown 30 years</td></tr>
+<tr><td><code>faith_rules.*</code></td><td>Protestant 0.5 per press and school, Hussite merge by 1620, temple 150 traders, gurdwara 1,000 homeless, 20 seats, secular after 1850 at 0.5</td></tr>
+<tr><td><code>holy_places[]</code></td><td>16 places</td></tr>
+<tr><td><code>holy_place_effects</code></td><td>same faith: 1 preacher, 200 pilgrims</td></tr>
+<tr><td><code>waves</code></td><td>carriers list, towns from market-town size, at most 8 active</td></tr>
+<tr><td><code>ai</code></td><td>build below 0.5, tolerate above 0.20, adopt above 0.60</td></tr>
+<tr><td><code>start</code></td><td>ruler&#39;s faith 0.15, community 0.05, 8 region overrides</td></tr>
+</tbody></table></div>
+<h2 id="settled-details"><a class="anchor" href="#settled-details" aria-label="Link to this section">#</a>Settled details</h2>
+<ul>
+<li>A community of another faith only takes the <em>Wrong faith</em> grievance once it is a third of the province or more.</li>
+<li>Expelling a faith moves 70 % of its people, and the expulsion of the Moriscos does the same.</li>
+<li>Court conversion to Islam is offered when your capital province is a third Sunni. Conversion to a Christian faith is offered when 15 % of the realm is Protestant.</li>
+<li>The province card shows exactly what the rules give. In Rouen that is Catholic 3.5, Protestant 5 and Jewish 1, moving about 0.3 points a year toward Protestant.</li>
+<li>Changing to Protestant, Anglican or Hussite from any other faith counts as &quot;the ruler takes a reformed faith&quot;.</li>
+<li>When a faith is Persecuted, you choose once for the whole realm whether its houses are closed or taken over.</li>
+<li>Lords of a faith you tolerate waver once, when you set Tolerated while the faith is 10 % or more of the realm. Later growth moves no lord.</li>
+<li>After you adopt a faith, all old-faith preachers leave. New preachers come from the new faith&#39;s houses as they appear, while its holy places and events count at once.</li>
+<li>Preachers come from houses, monasteries, religious schools, holy places and events. No invention gives them.</li>
+<li>A few records with no faith start with a fixed one: the Wokou are Mahayana, the Guanahatabey follow an indigenous faith, and the Druze of the Maan and the Yazidi communities count as Sunni.</li>
+<li>Some numbers are provisional and may still be tuned: Inquisition upkeep 10 gold a year, preacher upkeep 1 gold a year, an unwelcome preacher expelled with a 25 % chance a year, take-over cost 20 gold per step, and at most 8 waves at once.</li>
+</ul>
+<h2 id="still-open"><a class="anchor" href="#still-open" aria-label="Link to this section">#</a>Still open</h2>
+<p>Nothing. Every question about religion has been decided.</p>
+<h2 id="for-developers"><a class="anchor" href="#for-developers" aria-label="Link to this section">#</a>For developers</h2>
+<ul>
+<li>Spec: <code>domain/religion/spec.md</code> in the game repository.</li>
+<li>Features: <code>domain/religion/features/</code>: <code>faiths.feature</code>, <code>faith-mix.feature</code> (one year&#39;s move, East Bengal), <code>faith-buildings.feature</code>, <code>communities-and-policy.feature</code>, <code>expulsion-and-inquisition.feature</code> (the Alhambra decree), <code>preachers.feature</code>, <code>state-faith.feature</code>, <code>holy-places.feature</code>, <code>faith-rules.feature</code>, <code>faith-waves-and-events.feature</code>, <code>religion-uses.feature</code>, <code>religion-view.feature</code> and <code>religion-ai.feature</code>.</li>
+<li>Code: <code>packages/engine/src/domain/religion/</code>, with its numbers in <code>packages/rules/data/domain/religion.json</code>. The game wiring is <code>packages/engine/src/peoples.ts</code>; the panels are <code>apps/client/src/ui/belief.ts</code>.</li>
+</ul>

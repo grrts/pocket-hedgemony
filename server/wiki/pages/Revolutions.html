@@ -1,0 +1,341 @@
+<h1>Revolutions</h1>
+<p>Revolutions are the great upheavals that change how a country plays: the Dutch Revolt, the Glorious Revolution, the French Revolution, the Meiji Restoration and 32 more. You see one coming on a card that lists its warning signs and how to ease them, you choose how your ruler answers when it breaks out, and the outcome leaves behind a regime: a package of new rules, new buttons and actions you can no longer take.</p>
+<h2 id="how-it-works"><a class="anchor" href="#how-it-works" aria-label="Link to this section">#</a>How it works</h2>
+<p>A revolution is not a separate event system. It is an ordinary <a href="/wiki/Historical-Events">historical event</a> with one extra block that holds its requirements, signs, sparks, stances and regimes. The fighting itself, when there is any, is a tagged rising handled by <a href="/wiki/Rebellions">Rebellions</a>.</p>
+<h3 id="requirements-signs-and-sparks"><a class="anchor" href="#requirements-signs-and-sparks" aria-label="Link to this section">#</a>Requirements, signs and sparks</h3>
+<ul>
+<li><strong>Requirements</strong> are hard conditions: who, when, and what kind of state. The French Revolution requires a monarchy. Requirements are never shown as signs. If they do not hold, you never see the card, so you are never shown a revolution that cannot happen to you. Venice, a merchant republic, never sees the French Revolution card even with debt above 2,000 gold.</li>
+<li><strong>Signs</strong> are visible conditions, each with a label and an ease hint. A revolution needs a number of them lit to break out (<code>need</code>) and turns its card amber at a lower number (<code>warn_at</code>). The French Revolution breaks out at 4 of 6 signs and warns at 3.</li>
+<li><strong>Sparks</strong> multiply the monthly chance once the revolution is ready. For France these are a volcanic winter (×2) and a revolution abroad that won (×1.5). Every revolution also gets the spark &quot;Foreign gold backs the movement&quot; (×2) while a rival is funding it.</li>
+</ul>
+<p>Signs read numbers you already read elsewhere: grievances in provinces, class shares, your lords&#39; loyalty and land, debt, stability, faith and ideology shares, and lost wars. Four conditions were added for this:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Condition</th><th>What it measures</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td>grievance</td><td>The share of a country&#39;s (or area&#39;s or region&#39;s) provinces that have a given grievance</td><td>France has 10 provinces; 2 are hungry, so &quot;hungry at least 0.2&quot; is true, 1 would not be</td></tr>
+<tr><td>class_share</td><td>The share of a country&#39;s people in one class (farmers, herders, woodsmen, miners, seafolk, craftsmen, market folk, clergy, clerks, scholars, homeless)</td><td>12 % of Russians are craftsmen, so &quot;craftsmen at least 0.1&quot; is true</td></tr>
+<tr><td>lords</td><td>Land share held by lords rather than officials, the number of lords Wavering or worse, Disloyal or worse, or the count</td><td>France with 10 provinces, 4 held by lords: land share 0.4</td></tr>
+<tr><td>war_lost</td><td>Whether a country made peace on the losing side (gave land, paid, or was made a subject) within a number of years</td><td>Russia lost and gave land 1 year ago: true within 3 years; 5 years ago: false</td></tr>
+</tbody></table></div>
+<p>The game compiles each revolution&#39;s trigger as &quot;all requirements, plus at least <code>need</code> of the signs&quot;, and adds one selection modifier per spark, so the card and the trigger always agree. A revolution keeps the availability window of the event it extends and never happens outside its era or period window: with every sign lit in 1890, the French Revolution (available 1750 to 1880) still cannot break out. The armistices of 1918 keep their existing trigger instead of a sign checklist.</p>
+<h3 id="stages"><a class="anchor" href="#stages" aria-label="Link to this section">#</a>Stages</h3>
+<p>Each revolution moves through stages for each country.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Stage</th><th>What it means</th></tr></thead>
+<tbody>
+<tr><td>Quiet</td><td>Requirements unmet, or no sign lit</td></tr>
+<tr><td>Brewing</td><td>Requirements met, fewer than <code>need</code> signs lit</td></tr>
+<tr><td>Ready</td><td>The trigger is true. The event rolls each month by its mean wait times its sparks. The card is red: &quot;may break out any month&quot;</td></tr>
+<tr><td>Outbreak</td><td>The event fires with its text and stance options</td></tr>
+<tr><td>Struggle</td><td>The option&#39;s effects apply. For Fight, a tagged rising appears on the map with its camps</td></tr>
+<tr><td>Settlement</td><td>A banner says who won, and the won or crushed effects apply</td></tr>
+<tr><td>Aftermath</td><td>The regime applies; waves, émigrés and reactions abroad follow</td></tr>
+</tbody></table></div>
+<p>A revolution never fires in the same month its last needed sign lights. It rolls through the normal selection from the next month on, so you always get at least a month with a red card to act. If you ease a sign so that fewer than <code>need</code> are lit, the roll stops: opening the castle stores in France so that &quot;Bread is short in a fifth of the realm&quot; goes dark drops it back to Brewing.</p>
+<h3 id="stances"><a class="anchor" href="#stances" aria-label="Link to this section">#</a>Stances</h3>
+<p>Every revolution event offers two to four options, each tagged with a stance.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Stance</th><th>What happens</th></tr></thead>
+<tbody>
+<tr><td>Lead</td><td>The regime applies at once with no rising. The lords and clergy the regime hurts may rise as the old order camp.</td></tr>
+<tr><td>Bend</td><td>A milder regime or a set of reforms applies and some signs end. If enough stay lit, the revolution comes back.</td></tr>
+<tr><td>Fight</td><td>A rising tagged with the revolution is raised. If it wins, the option&#39;s &quot;rising won&quot; effects apply; if it is crushed, its &quot;rising crushed&quot; effects apply. A crushed rising leaves <em>Bloodshed</em> grievances and the signs stay lit, so it comes back unless you ease them.</td></tr>
+<tr><td>Path</td><td>The event&#39;s chooser picks a path, and its regimes apply to the countries the option names.</td></tr>
+</tbody></table></div>
+<p>A regime on an option can be delayed by a number of years. Each family gives the options their labels; the liberal and national family uses &quot;Proclaim the new order&quot;, &quot;Grant a constitution&quot; and &quot;Restore order&quot;. Before the French Revolution breaks out you can open &quot;What happens if it breaks out&quot;: &quot;Proclaim the new order&quot; leads to the revolutionary republic, &quot;Grant a constitution&quot; to crown and assembly plus emancipation, and &quot;Restore order&quot; to a rising that ends in the revolutionary republic if it wins or in reaction if it is crushed.</p>
+<h3 id="camps"><a class="anchor" href="#camps" aria-label="Link to this section">#</a>Camps</h3>
+<p>When a Fight stance raises a rising, the family&#39;s camps decide who joins each side, replacing the rebellions join table for that rising only. The revolution camp draws from classes by a monthly join share, plus the lords and the army desertion its family names. In the old order camp, loyal lords send retinues to the ruler and clergy calm their provinces. While the revolution camp holds a province&#39;s castle, that province counts as risen. Strength, marching, sieges and melting away follow <a href="/wiki/Rebellions">Rebellions</a> unchanged.</p>
+<p>Revolution camp join shares per class, per month:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Family</th><th>Who joins</th></tr></thead>
+<tbody>
+<tr><td>Faith</td><td>homeless 0.30, farmers 0.10, clergy 0.30, craftsmen 0.08, market folk 0.08, only of the movement&#39;s faith</td></tr>
+<tr><td>Estates and towns</td><td>homeless 0.20, market folk 0.15, craftsmen 0.12, clerks 0.10, scholars 0.05, farmers 0.03</td></tr>
+<tr><td>Liberal and national</td><td>homeless 0.30, scholars 0.25, clerks 0.15, craftsmen 0.12, market folk 0.10, farmers 0.04 (0.10 if hungry)</td></tr>
+<tr><td>Freedom</td><td>homeless 0.30, farmers 0.30, craftsmen 0.10, market folk 0.10</td></tr>
+<tr><td>Peasant and agrarian</td><td>homeless 0.30, farmers 0.15, herders 0.10, woodsmen 0.08, miners 0.08, craftsmen 0.04</td></tr>
+<tr><td>From above</td><td>none (old order: clergy 0.10, farmers 0.02)</td></tr>
+<tr><td>Homeland</td><td>homeless 0.20, herders 0.10, woodsmen 0.08, farmers 0.06, only of the region&#39;s culture</td></tr>
+<tr><td>War and want</td><td>homeless 0.30, craftsmen 0.20, seafolk 0.10, miners 0.15, farmers 0.08, scholars 0.10, clerks 0.05</td></tr>
+<tr><td>Restorations</td><td>none (the returning pretender&#39;s backers)</td></tr>
+</tbody></table></div>
+<p>Each family also has its own lords and army rules. In the faith family, lords of the movement&#39;s faith who are Wavering or worse join, and soldiers of that faith desert at 5 % a month. In war and want, soldiers mutiny at 10 % a month while war weariness is above 14.</p>
+<h3 id="stopped-not-solved"><a class="anchor" href="#stopped-not-solved" aria-label="Link to this section">#</a>Stopped, not solved</h3>
+<p>A revolution stopped by Bend, by a crushed rising, or by a Path that applies no regime is re-armed. Its card stays up marked &quot;Stopped, not solved&quot;. For a grace period of 3 years it cannot break out. After that, whenever <code>need</code> signs are lit again it can break out through the normal selection with its sparks. If the lit signs fall below <code>need</code>, it is disarmed; there is no fixed cooldown to wait out. When it returns it is the same event with the same stances, so a ruler who bent once may fight or lead the second time. A revolution that applied a regime (that won) never re-arms. A re-arming revolution may fire again even if its event is otherwise one-time.</p>
+<h3 id="regimes"><a class="anchor" href="#regimes" aria-label="Link to this section">#</a>Regimes</h3>
+<p>A regime is the package of rules an outcome leaves behind: form of rule, ruler, lords, church, faith, language, levy, land, towns, trade, research, decrees, locks, grievances ended and added, flags, reactions abroad, risks and a one-line &quot;loop&quot; that sums up how it plays.</p>
+<ul>
+<li><strong>Form.</strong> The regime sets the form of rule from the <a href="/wiki/Government">Government</a> forms. <code>keep</code> leaves the form as it is; <code>old_form</code> restores the form held before the last revolutionary regime, which the game remembers. A revolution can grant a form before its era. Crown and assembly gives a constitutional monarchy, or a diet monarchy if the country lacks G14 Written constitution.</li>
+<li><strong>Numbers come from the form.</strong> A regime never sets its own caps on officials or lords.</li>
+<li><strong>One at a time.</strong> A country holds one regime, plus add-on regimes that stack on top (emancipation).</li>
+<li><strong>Ruler.</strong> Kept; deposed (the ruler and heirs go abroad as pretenders); replaced (the rising&#39;s leader rules); or elected.</li>
+<li><strong>Locks.</strong> An action the regime takes away shows greyed out with &quot;Locked by the revolution&quot;. The lockable actions are grant fief, sell title, seize land, call the lords, hire companies, crushing taxes, revoke charter, massacre and persecute.</li>
+<li><strong>Grievances.</strong> A regime ends some grievances and adds others. A revolutionary republic ends <em>Harsh lord</em> and <em>Wrong faith</em> and adds <em>Broken charter</em>.</li>
+<li><strong>Flags.</strong> <code>revolutionary_regime</code>, <code>emigre_court</code> and <code>reaction_regime</code> are set by regimes; the first is cleared when another regime replaces it.</li>
+<li><strong>Reaction.</strong> While a country holds the reaction regime, the revolution needs one sign fewer for 20 years.</li>
+</ul>
+<p>The 33 regimes:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Regime</th><th>Form</th><th>Ruler</th><th>Decrees</th><th>Risk in short</th></tr></thead>
+<tbody>
+<tr><td>League of the faithful</td><td>holy rule</td><td>replaced</td><td>call the faithful</td><td>wars of conquest need half the temple elders</td></tr>
+<tr><td>Order state</td><td>holy rule</td><td>replaced</td><td>convert by decree</td><td>a lost battle the ruler leads makes every chief waver</td></tr>
+<tr><td>Reformist caliphate</td><td>holy rule</td><td>replaced</td><td>appoint a governor, call the faithful</td><td>far governors drift after 30 years</td></tr>
+<tr><td>Heavenly kingdom</td><td>holy rule</td><td>replaced</td><td>sacred treasury, open the granaries</td><td>a split roll each decade</td></tr>
+<tr><td>Mahdiyya</td><td>holy rule</td><td>replaced</td><td>call the faithful, sacred treasury, gather the tribes</td><td>the Mahdi may die; famine risk doubles</td></tr>
+<tr><td>Town league</td><td>diet monarchy</td><td>kept</td><td>ask the towns, call the assembly</td><td>towns refuse far wars</td></tr>
+<tr><td>Estates republic</td><td>merchant republic</td><td>elected</td><td>sell bonds, charter a company, ask the towns</td><td>a stadholder event</td></tr>
+<tr><td>Commonwealth</td><td>constitutional republic</td><td>deposed</td><td>army council, sell church lands</td><td>generals ×2; the Protector may end it</td></tr>
+<tr><td>Crown and assembly</td><td>constitutional monarchy (diet monarchy before G14)</td><td>kept</td><td>call the assembly, sell bonds</td><td>3 refused votes in 10 years: a coup</td></tr>
+<tr><td>Court absolutism</td><td>absolute monarchy</td><td>kept</td><td>summon to court, intendants</td><td>a child ruler or regency sparks a lords&#39; rising</td></tr>
+<tr><td>Princes&#39; compact</td><td>elective monarchy</td><td>kept</td><td>none</td><td>any crisis is a lords&#39; rising</td></tr>
+<tr><td>Federal republic</td><td>constitutional republic</td><td>elected</td><td>call the assembly, open the frontier</td><td>a separatist sign from one region&#39;s wares</td></tr>
+<tr><td>Revolutionary republic</td><td>constitutional republic</td><td>deposed</td><td>levy en masse, sell church lands, revolutionary tribunal</td><td>generals ×2</td></tr>
+<tr><td>Free republic</td><td>constitutional republic</td><td>replaced</td><td>arm the people, divide the estates</td><td>trade income halves while unrecognised</td></tr>
+<tr><td>Creole republic</td><td>constitutional republic</td><td>elected</td><td>general&#39;s pact, call the assembly</td><td>a general seizes the presidency</td></tr>
+<tr><td>Parliamentary republic</td><td>constitutional republic</td><td>deposed</td><td>call the assembly, sell bonds</td><td>extremist risings in a crisis</td></tr>
+<tr><td>Committee rule</td><td>constitutional monarchy with an army power base</td><td>kept</td><td>officers to the provinces, call the assembly</td><td>other languages&#39; separatist signs come faster</td></tr>
+<tr><td>Warlord republic</td><td>constitutional republic</td><td>elected</td><td>buy a warlord, general&#39;s pact</td><td>warlords fight each other</td></tr>
+<tr><td>Secular republic</td><td>party state</td><td>elected</td><td>script and schools, sell church lands</td><td>a faith rising sign for 20 years</td></tr>
+<tr><td>Agrarian reform</td><td>keep</td><td>kept</td><td>divide the estates</td><td>landowners fund risings for 20 years</td></tr>
+<tr><td>New dynasty</td><td>keep</td><td>replaced</td><td>open the granaries</td><td>old heirs are pretenders for 50 years</td></tr>
+<tr><td>Peasant directorates</td><td>keep</td><td>kept</td><td>local directorates</td><td>dissolving leaves <em>Broken charter</em> in every risen province</td></tr>
+<tr><td>Emancipation (add-on)</td><td>none</td><td>none</td><td>none</td><td>lords waver one step at once</td></tr>
+<tr><td>Swarajya</td><td>household realm</td><td>replaced</td><td>protection tribute, garrison hill forts</td><td>may become a confederation</td></tr>
+<tr><td>Khalsa raj</td><td>absolute monarchy</td><td>replaced</td><td>hire drill masters, summon to court</td><td>councils may rule at the ruler&#39;s death</td></tr>
+<tr><td>Misl confederacy</td><td>confederation</td><td>elected</td><td>protection tribute</td><td>10 years without war: a chief may turn Disloyal</td></tr>
+<tr><td>Service state</td><td>absolute monarchy</td><td>kept</td><td>ranks for service, missions abroad</td><td>an old-order rising within 10 years</td></tr>
+<tr><td>Restoration state</td><td>constitutional monarchy</td><td>kept</td><td>abolish domains, missions abroad</td><td>retainers rise once within 10 years</td></tr>
+<tr><td>Military kingdom</td><td>keep</td><td>kept</td><td>call the age regiment</td><td>discontent in a long peace</td></tr>
+<tr><td>Regional armies</td><td>keep</td><td>kept</td><td>raise a provincial army</td><td>governors become warlords</td></tr>
+<tr><td>Soviet state</td><td>party state</td><td>deposed</td><td>requisition grain, revolutionary tribunal, levy en masse, divide the estates</td><td>civil war; famine if requisition meets a failed harvest</td></tr>
+<tr><td>Reaction</td><td>keep</td><td>kept</td><td>censorship</td><td>revolution needs one sign fewer for 20 years</td></tr>
+<tr><td>Restored monarchy</td><td>the old form</td><td>replaced</td><td>none</td><td>revoking charters can re-fire the revolution</td></tr>
+</tbody></table></div>
+<p>The locks, grievance changes, flags, reactions abroad and the full lords, church, faith, language, levy, land, towns, trade and research lines of each regime are in the data.</p>
+<h3 id="decrees"><a class="anchor" href="#decrees" aria-label="Link to this section">#</a>Decrees</h3>
+<p>Each decree a regime unlocks becomes one button on the country card or a province card, with a cost and a limit. Every decree costs something you feel (stability, a grievance, a lord turning Disloyal, scholars fleeing). A decree is a trade-off, not a free bonus.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Decree</th><th>Card</th><th>Cost</th><th>Limit</th></tr></thead>
+<tbody>
+<tr><td>Call the faithful</td><td>country</td><td>1 stability</td><td>once every 5 years</td></tr>
+<tr><td>Convert by decree</td><td>province</td><td>gold by the province&#39;s people</td><td>one province at a time</td></tr>
+<tr><td>Appoint a governor</td><td>province</td><td>a gold gift</td><td>when a governor dies or is removed</td></tr>
+<tr><td>Sacred treasury</td><td>country</td><td>each province&#39;s surplus food</td><td>each harvest</td></tr>
+<tr><td>Open the granaries</td><td>province</td><td>castle store food</td><td>any time</td></tr>
+<tr><td>Ask the towns</td><td>country</td><td>a town charter promise</td><td>once every 3 years</td></tr>
+<tr><td>Call the assembly</td><td>country</td><td>one season</td><td>any time</td></tr>
+<tr><td>Sell bonds</td><td>country</td><td>interest each year</td><td>up to the loan limit</td></tr>
+<tr><td>Charter a company</td><td>country</td><td>gold and two merchants</td><td>one per ocean</td></tr>
+<tr><td>Army council</td><td>country</td><td>none</td><td>any time</td></tr>
+<tr><td>Sell church lands</td><td>country</td><td>clergy and Pious lords waver</td><td>once</td></tr>
+<tr><td>Levy en masse</td><td>country</td><td><em>Conscription</em> everywhere for 3 years</td><td>while at war</td></tr>
+<tr><td>Revolutionary tribunal</td><td>country</td><td><em>Bloodshed</em> in the provinces of those tried</td><td>any time</td></tr>
+<tr><td>Arm the people</td><td>country</td><td>tools and old weapons only</td><td>defensive wars</td></tr>
+<tr><td>Divide the estates</td><td>province</td><td>the lord or owner turns Disloyal</td><td>one province a season</td></tr>
+<tr><td>Open the frontier</td><td>country</td><td>Indigenous homelands get <em>Foreign rule</em> and a resistance</td><td>any time</td></tr>
+<tr><td>General&#39;s pact</td><td>country</td><td>provinces granted</td><td>any time</td></tr>
+<tr><td>Summon to court</td><td>country</td><td>gold for the court each year</td><td>any time</td></tr>
+<tr><td>Intendants</td><td>province</td><td>an official&#39;s wage</td><td>one per lord</td></tr>
+<tr><td>Censorship</td><td>country</td><td>scholars −10 % a year while on</td><td>toggle</td></tr>
+<tr><td>Local directorates</td><td>province</td><td>no tax rise there</td><td>risen provinces only</td></tr>
+<tr><td>Abolish domains</td><td>country</td><td>pensions: each lord&#39;s yearly income for 20 years</td><td>once</td></tr>
+<tr><td>Missions abroad</td><td>country</td><td>gold and two scholars</td><td>once every 10 years</td></tr>
+<tr><td>Ranks for service</td><td>country</td><td>none</td><td>toggle</td></tr>
+<tr><td>Call the age regiment</td><td>country</td><td>births −10 % while serving</td><td>one age set at a time</td></tr>
+<tr><td>Officers to the provinces</td><td>country</td><td>commanders taken from the army</td><td>any time</td></tr>
+<tr><td>Buy a warlord</td><td>country</td><td>gold by the warlord&#39;s army</td><td>any time</td></tr>
+<tr><td>Requisition grain</td><td>country</td><td><em>Requisitioned</em> in every farming province</td><td>each harvest</td></tr>
+<tr><td>Script and schools</td><td>country</td><td>research −25 % for 5 years</td><td>once</td></tr>
+<tr><td>Raise a provincial army</td><td>province</td><td>the official becomes a lord with a retinue</td><td>any time</td></tr>
+<tr><td>Gather the tribes</td><td>province</td><td>the province loses a third of its people; its lord&#39;s retinue moves</td><td>once every 5 years</td></tr>
+<tr><td>Protection tribute</td><td>province</td><td>the owner&#39;s opinion −20</td><td>neighbouring provinces only</td></tr>
+<tr><td>Garrison hill forts</td><td>province</td><td>gold for each fort&#39;s three officers</td><td>hill and mountain provinces</td></tr>
+<tr><td>Hire drill masters</td><td>country</td><td>gold each year; Proud lords waver</td><td>up to 3 at once</td></tr>
+</tbody></table></div>
+<h3 id="aftermath"><a class="anchor" href="#aftermath" aria-label="Link to this section">#</a>Aftermath</h3>
+<p><strong>Waves.</strong> A won revolution spreads its family&#39;s idea.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Family</th><th>Wave</th></tr></thead>
+<tbody>
+<tr><td>Estates and towns</td><td>parliamentarism +0.03 to neighbours</td></tr>
+<tr><td>Liberal and national</td><td>liberalism +0.05 to neighbours</td></tr>
+<tr><td>Freedom</td><td>abolitionism +0.10 to the region</td></tr>
+<tr><td>Faith</td><td>a faith wave (0.05, neighbours) through <a href="/wiki/Religion">Religion</a></td></tr>
+<tr><td>War and want</td><td>socialism +0.05 to the region</td></tr>
+<tr><td>Peasant and agrarian</td><td><em>Neighbour in revolt</em> grievances in neighbours</td></tr>
+<tr><td>Homeland</td><td><em>Foreign rule</em> grievances in neighbouring provinces held by distant empires</td></tr>
+<tr><td>From above, Restorations</td><td>none</td></tr>
+</tbody></table></div>
+<p><strong>Émigré courts.</strong> When a regime deposes the ruler, the old dynasty lives on abroad as a pretender. Rivals can fund it, and it is who the restoration event looks for.</p>
+<p><strong>Counter-revolution.</strong> When a regime&#39;s reaction abroad names it, monarchies get an opinion malus and a reason to fight for a number of years (revolutionary republic: −50 and 25 years), through <a href="/wiki/Diplomacy">Diplomacy</a>&#39;s &quot;Different form of rule −20&quot; reason and a counter-revolution war reason.</p>
+<p><strong>Generals.</strong> In a republic born in revolution whose risk says so, the chance of a general growing too big doubles (<a href="/wiki/Warfare">Warfare</a>). A winning general can switch the regime to court absolutism or a military kingdom.</p>
+<p><strong>Restoration.</strong> When signs such as a lost war, broken charters or a weak regime add up in a country with an émigré court, the restoration of the old order can fire, bringing back the old form and clearing the revolutionary flags.</p>
+<h3 id="funding-a-revolution-abroad"><a class="anchor" href="#funding-a-revolution-abroad" aria-label="Link to this section">#</a>Funding a revolution abroad</h3>
+<p>You can secretly fund a revolution in another country when its card there is at least Brewing; you only see that card where you have a diplomat. While you fund it:</p>
+<ul>
+<li>you pay gold every month, 1 % of the target&#39;s yearly income;</li>
+<li>the target gets the &quot;Foreign gold backs the movement&quot; spark (×2), and if it becomes a rising, its camp&#39;s join shares are multiplied by 1.5;</li>
+<li>each month there is a 3 % chance you are caught, plus 1 % while the target is at peace and 1 % more if officials run at least half of its provinces.</li>
+</ul>
+<p>This is the same <em>Fund rebels</em> action diplomacy offers; there is only one.</p>
+<p>If you are caught, the funding ends, the target gets the opinion reason &quot;Funded a revolution against us&quot; and a reason to fight you, and the card names you. If a funded revolution wins, the new regime starts at +25 opinion of you, unless it is hostile to your form of rule.</p>
+<h3 id="the-36-revolutions"><a class="anchor" href="#the-36-revolutions" aria-label="Link to this section">#</a>The 36 revolutions</h3>
+<p>Each revolution belongs to one of 9 families and inherits its cause, camps, stance labels and wave, which it can override. Its country is bound through the event&#39;s role selector, so another country that fits can get the card instead. If its signs never light within its window, it never fires: history is not forced. Ordinary peasant risings, pretender wars and separatist revolts stay in <a href="/wiki/Rebellions">Rebellions</a>, reforms without a struggle are ordinary events, and coups belong to <a href="/wiki/Warfare">Warfare</a>.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Revolution</th><th>Years</th><th>Family</th><th>Breaks out at</th></tr></thead>
+<tbody>
+<tr><td>The Kaga league</td><td>1488 to 1580</td><td>Faith</td><td>3 of 5</td></tr>
+<tr><td>Rise of the Safavids</td><td>1501 to 1510</td><td>Faith</td><td>3 of 5</td></tr>
+<tr><td>Founding of the Khalsa</td><td>1699</td><td>Faith</td><td>2 of 5</td></tr>
+<tr><td>Futa Jallon jihad</td><td>1725 to 1750</td><td>Faith</td><td>2 of 3</td></tr>
+<tr><td>Sokoto jihad</td><td>1804 to 1812</td><td>Faith</td><td>3 of 5</td></tr>
+<tr><td>Taiping Rebellion</td><td>1850 to 1864</td><td>Faith</td><td>3 of 5</td></tr>
+<tr><td>Mahdist state in Sudan</td><td>1881 to 1898</td><td>Faith</td><td>3 of 5</td></tr>
+<tr><td>Revolt of the Comuneros</td><td>1520 to 1521</td><td>Estates and towns</td><td>3 of 5</td></tr>
+<tr><td>Dutch Revolt</td><td>1568 to 1648</td><td>Estates and towns</td><td>2 of 5</td></tr>
+<tr><td>Wars of the Three Kingdoms</td><td>1639 to 1651</td><td>Estates and towns</td><td>3 of 5</td></tr>
+<tr><td>The Fronde</td><td>1648 to 1653</td><td>Estates and towns</td><td>3 of 6</td></tr>
+<tr><td>Glorious Revolution</td><td>1688 to 1689</td><td>Estates and towns</td><td>2 of 3</td></tr>
+<tr><td>Restoration of the Stuart monarchy</td><td>1660</td><td>Restorations</td><td>2 of 3</td></tr>
+<tr><td>American Revolution</td><td>1775 to 1783</td><td>Liberal and national</td><td>3 of 6</td></tr>
+<tr><td>French Revolution</td><td>1789 to 1799</td><td>Liberal and national</td><td>4 of 6</td></tr>
+<tr><td>Spanish American wars of independence</td><td>1810 to 1826</td><td>Liberal and national</td><td>1 of 4</td></tr>
+<tr><td>Revolutions of 1848</td><td>1848 to 1849</td><td>Liberal and national</td><td>2 of 4</td></tr>
+<tr><td>Iranian constitutional revolution</td><td>1905 to 1911</td><td>Liberal and national</td><td>3 of 5</td></tr>
+<tr><td>Young Turk Revolution</td><td>1908</td><td>Liberal and national</td><td>1 of 3</td></tr>
+<tr><td>Xinhai Revolution</td><td>1911 to 1912</td><td>Liberal and national</td><td>3 of 4</td></tr>
+<tr><td>Egyptian revolution of 1919</td><td>1919 to 1922</td><td>Liberal and national</td><td>3 of 5</td></tr>
+<tr><td>Haitian Revolution</td><td>1791 to 1804</td><td>Freedom</td><td>1 of 4</td></tr>
+<tr><td>Shivaji&#39;s coronation</td><td>1674</td><td>Homeland</td><td>2 of 5</td></tr>
+<tr><td>Ranjit Singh&#39;s Sikh Empire</td><td>1799 to 1849</td><td>Homeland</td><td>2 of 5</td></tr>
+<tr><td>Fall of Beijing and the Qing conquest</td><td>1644</td><td>Peasant and agrarian</td><td>3 of 5</td></tr>
+<tr><td>The Tay Son uprising</td><td>1771 to 1802</td><td>Peasant and agrarian</td><td>3 of 5</td></tr>
+<tr><td>The Donghak peasant revolution</td><td>1894 to 1895</td><td>Peasant and agrarian</td><td>3 of 5</td></tr>
+<tr><td>Mexican Revolution</td><td>1910 to 1920</td><td>Peasant and agrarian</td><td>2 of 3</td></tr>
+<tr><td>Petrine reforms</td><td>1689 to 1725</td><td>From above</td><td>1 of 4</td></tr>
+<tr><td>Rise of the Zulu kingdom</td><td>1816 to 1828</td><td>From above</td><td>1 of 2</td></tr>
+<tr><td>Meiji Restoration</td><td>1867 to 1871</td><td>From above</td><td>3 of 4</td></tr>
+<tr><td>The Kemalist reforms</td><td>1922 to 1934</td><td>From above</td><td>2 of 3</td></tr>
+<tr><td>The revolution of 1905</td><td>1905 to 1907</td><td>War and want</td><td>3 of 6</td></tr>
+<tr><td>Russian Revolution</td><td>1917</td><td>War and want</td><td>3 of 5</td></tr>
+<tr><td>Armistices of 1918</td><td>1918</td><td>War and want</td><td>its existing trigger</td></tr>
+<tr><td>Restoration of the old dynasty</td><td>1660 to 1815</td><td>Restorations</td><td>2 of 5</td></tr>
+</tbody></table></div>
+<p>Ten of these are new events (the Kaga league, the Comuneros, the Fronde, the Iranian and Egyptian revolutions, Tay Son, Donghak, the Kemalist reforms, 1905 and the restoration of the old dynasty); the other 26 extend events already in the tree.</p>
+<p>The family stance labels (lead / bend / fight):</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Family</th><th>Labels</th></tr></thead>
+<tbody>
+<tr><td>Faith</td><td>Take up the new teaching / Tolerate the movement / Suppress it</td></tr>
+<tr><td>Estates and towns</td><td>Share power / Grant charters / Break them</td></tr>
+<tr><td>Liberal and national</td><td>Proclaim the new order / Grant a constitution / Restore order</td></tr>
+<tr><td>Freedom</td><td>Abolish and free / Grant autonomy / Send an army</td></tr>
+<tr><td>Peasant and agrarian</td><td>Divide the land / Cut taxes and open the granaries / Crush the bands</td></tr>
+<tr><td>From above</td><td>Start the reforms / Reform the army only / Keep the old ways</td></tr>
+<tr><td>Homeland</td><td>Grant the region its own crown / Give its leader high rank / Send the imperial army</td></tr>
+<tr><td>War and want</td><td>Hand power to the councils / Promise an assembly / Send in the troops</td></tr>
+<tr><td>Restorations</td><td>Recall the dynasty / Restore with a charter / Defend the revolution</td></tr>
+</tbody></table></div>
+<h3 id="the-computer"><a class="anchor" href="#the-computer" aria-label="Link to this section">#</a>The computer</h3>
+<ul>
+<li>When its card is amber or red, a computer country eases signs using their ease hints, choosing by personality: a pious ruler eases faith signs first, a miserly one avoids cutting taxes.</li>
+<li>When a revolution fires, it weights historical options ×3, Fight by its army strength against the rising&#39;s expected size, and Lead higher when the ruler&#39;s ideology matches the cause.</li>
+<li>A computer country with an émigré court that is a rival of the revolutionary state funds its pretender abroad.</li>
+<li>A computer monarchy stronger than a revolutionary state uses the counter-revolution reason.</li>
+<li>It funds revolutions in non-allied rivals whose cards are amber or red.</li>
+</ul>
+<h2 id="what-you-see"><a class="anchor" href="#what-you-see" aria-label="Link to this section">#</a>What you see</h2>
+<ul>
+<li><strong>The revolution card</strong> on the country screen, about 40 characters wide to fit a phone. For France in 1789 it reads &quot;FRENCH REVOLUTION&quot;, brewing, &quot;Breaks out at 4 of 6 signs&quot;, with the lit signs first (&quot;Debt above 2,000 gold&quot;, &quot;A quarter want a constitution&quot;, &quot;The crown is distrusted&quot;), each with how to ease it (&quot;Cut court and army; tax lords&quot;), and the sparks with their multipliers. The bar is neutral, amber at <code>warn_at</code> and red at <code>need</code>.</li>
+<li><strong>&quot;What happens if it breaks out&quot;</strong> opens the stances and the regime each leads to.</li>
+<li><strong>Banners.</strong> When a revolution breaks out or ends in another country, a one-line banner (&quot;Revolution in France: the Bastille has fallen&quot;) appears, but only for neighbours, rivals and Great Powers. Tapping it opens that country&#39;s card.</li>
+<li><strong>The revolution map mode</strong> shades provinces by how many of the revolution&#39;s province-level signs they meet and hatches risen provinces in the revolution&#39;s colour.</li>
+<li><strong>The regime card</strong> on the government screen shows the regime&#39;s loop line, its decrees as buttons and its locks greyed out.</li>
+</ul>
+<h3 id="in-the-game-today"><a class="anchor" href="#in-the-game-today" aria-label="Link to this section">#</a>In the game today</h3>
+<p>The 36 historical revolutions read ideologies, legitimacy and ages the game does not track yet, so the first slice gives every realm one revolution of its own, built from the two oldest families. A monarchy with no hunger has an <strong>Estates and towns</strong> revolution (as the Fronde and the Comuneros); a realm that is hungry, or not a monarchy, has a <strong>Peasant and agrarian</strong> one (as the Tay Son and Donghak risings).</p>
+<ul>
+<li><strong>Signs</strong> (3 of 6 to break out, amber at 2): <em>Heavy taxes</em> in a quarter of the realm; <em>Hungry</em> in a fifth; a tenth rioting or plotting; two or more lords Wavering or worse; debt above a year&#39;s income; rebels holding your land, or rebels who won against you in the last 5 years. Under the reaction regime one sign fewer is enough, for 20 years.</li>
+<li><strong>Breaking out</strong>: a red card breaks out on a roll of 1 in 12 a month, 1 in 6 while two or more lords are Disloyal, never in the month it turned red and never within 3 years of the last revolution, Bend or crushed rising.</li>
+<li><strong>Where you see it</strong>: the Stability plaque in the top bar carries a mark while a revolution brews (amber) or may break out (red); tap it for your Realm book&#39;s Overview, where the Revolution block under the four pillars lists the lit signs first, each with a button to the tab that eases it, and folds out what each answer would do.</li>
+<li><strong>When it breaks out</strong>: a full-screen card asks how you answer, and End turn waits for it.<ul>
+<li>Estates: <strong>Share power</strong> makes you a diet monarchy (League of towns, crushing taxes locked); <strong>Grant charters</strong> fixes the tax at light for 10 years wherever it is heavy, and the revolution is stopped, not solved; <strong>Break them</strong> raises a town rising in your most restless province.</li>
+<li>Agrarian: <strong>Divide the land</strong> (Land to the villages: no more fiefs granted, every lord loses a loyalty step); <strong>Cut taxes and open the granaries</strong> (light tax for 10 years where it is heavy, castle granaries opened where people are hungry; stopped, not solved); <strong>Crush the bands</strong> raises a hunger rising.</li>
+</ul>
+</li>
+<li><strong>The struggle</strong>: the rising plays as any other on the map. If it wins, an estates revolution makes you a merchant republic with an elected ruler; an agrarian one puts the rising&#39;s leader on your throne, your house goes abroad as pretenders, every lord wavers and tax stays light for 10 years. If it is beaten, starves or is bribed away, the Reaction follows: bloodshed where they rose, and the revolution comes back sooner. If you grant or talk out its demand, it is stopped, not solved.</li>
+<li><strong>Rebels who win</strong>: an ordinary rising that wins against you lights the rebels sign, and if your card is then red, or the rebels took your capital&#39;s castle, the revolution has won at once.</li>
+<li><strong>Government tab</strong>: the regime under your form, its loop line and since when, your ruler, the form before the revolution, and its locks greyed out. Locked orders are refused with &quot;locked by the revolution&quot;.</li>
+<li><strong>Other realms</strong>: computer realms go through the same rules and pick Fight, Bend or Lead by weight, Fight more often when their armies outnumber the rising. A neighbour&#39;s revolution is a line in your News.</li>
+</ul>
+<h2 id="how-it-connects"><a class="anchor" href="#how-it-connects" aria-label="Link to this section">#</a>How it connects</h2>
+<ul>
+<li><a href="/wiki/Historical-Events">Historical events</a>: revolutions are events; this adds four conditions, the regime and lock effects, two new effect tiers and four flags (not merged yet).</li>
+<li><a href="/wiki/Rebellions">Rebellions</a>: Fight raises a tagged rising; camps replace the join table; won and crushed hooks.</li>
+<li><a href="/wiki/Government">Government</a>: regimes set forms, in any era, and restore the old form.</li>
+<li><a href="/wiki/Diplomacy">Diplomacy</a>: &quot;Different form of rule&quot;, the counter-revolution reason, and the funding action.</li>
+<li><a href="/wiki/Subjects">Subjects</a>: settler colonies going independent through a Disloyal colony.</li>
+<li><a href="/wiki/Culture">Culture</a>: nationalism thresholds read by liberal and national signs; regimes can set the court language.</li>
+<li><a href="/wiki/Religion">Religion</a>: the faith wave, and church events that follow a revolutionary regime.</li>
+<li><a href="/wiki/National-Strengths">National strengths</a>: a won revolution may overcome a weakness or grant a legacy (a hook only).</li>
+<li><a href="/wiki/Warfare">Warfare</a>: generals growing too big, and a winning general switching the regime.</li>
+<li><a href="/wiki/Provinces">Provinces</a>: grievances and class shares feed the signs; regimes end and add grievances.</li>
+<li><a href="/wiki/Your-Realm">Your realm</a>: lords&#39; loyalty and land, stability and debt; locks on fiefs and titles.</li>
+<li><a href="/wiki/Research">Research</a>: G14 Written constitution decides the crown and assembly form.</li>
+<li><a href="/wiki/Map-and-Lenses">Map and Map Modes</a>: the revolution map mode.</li>
+<li><a href="/wiki/Screens-and-Navigation">Screens and navigation</a>: banner, card and regime card.</li>
+<li><a href="/wiki/Music-and-Sound">Music and sound</a>: the revolution music tag.</li>
+</ul>
+<h3 id="each-month"><a class="anchor" href="#each-month" aria-label="Link to this section">#</a>Each month</h3>
+<p>The game evaluates requirements and signs for every revolution and country and sets stages and card colours; for Ready revolutions the events system rolls the selection; re-arm grace periods tick; funding is charged and the caught chance is rolled; delayed regimes apply; decree limits tick.</p>
+<h2 id="numbers"><a class="anchor" href="#numbers" aria-label="Link to this section">#</a>Numbers</h2>
+<p>Every value the game uses, made from its config so it always matches the game: <a href="/wiki/Data-Revolutions">Revolutions data</a>. How they combine: <a href="/wiki/Formulas">Formulas</a>.</p>
+<p>Every balance value here is a provisional placeholder.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>revolutions.&lt;id&gt;.signs.need</code></td><td>per revolution (the &quot;breaks out at&quot; column)</td></tr>
+<tr><td><code>revolutions.&lt;id&gt;.signs.warn_at</code></td><td>per revolution</td></tr>
+<tr><td><code>revolutions.&lt;id&gt;.sparks[].mult</code></td><td>per revolution</td></tr>
+<tr><td>Event <code>selection.mean_years</code></td><td>per event</td></tr>
+<tr><td><code>rearm.grace_years</code></td><td>3 years</td></tr>
+<tr><td><code>families.&lt;id&gt;.camps.revolution.joins</code></td><td>the join table above</td></tr>
+<tr><td><code>families.&lt;id&gt;.wave.amount</code></td><td>the wave table above</td></tr>
+<tr><td><code>counter_revolution.years</code></td><td>25 years (proposed)</td></tr>
+<tr><td><code>counter_revolution.opinion</code></td><td>−50 (proposed)</td></tr>
+<tr><td><code>generals.too_big_mult</code></td><td>×2 (proposed)</td></tr>
+<tr><td><code>emigre.funding_per_year</code></td><td>not given yet</td></tr>
+<tr><td><code>foreign_backing.mult</code></td><td>2</td></tr>
+<tr><td><code>foreign_backing.joins_mult</code></td><td>1.5</td></tr>
+<tr><td><code>foreign_backing.cost</code></td><td>1 % of the target&#39;s yearly income a month</td></tr>
+<tr><td><code>foreign_backing.catch_chance</code></td><td>3 % a month</td></tr>
+<tr><td><code>foreign_backing.win_opinion</code></td><td>+25</td></tr>
+<tr><td><code>reaction.need_reduction</code></td><td>1 sign for 20 years</td></tr>
+</tbody></table></div>
+<h2 id="settled-details"><a class="anchor" href="#settled-details" aria-label="Link to this section">#</a>Settled details</h2>
+<ul>
+<li>A revolution&#39;s rising starts as a rising, not a great revolt. Its size comes from the event and the province&#39;s recruits, split between the camps.</li>
+<li>Signs read real numbers: debt in gold, grievance counts, lords&#39; loyalty and school seats. &quot;Integration strain&quot; is the share of your provinces with <em>Foreign rule</em>.</li>
+<li>American-style colony revolutions read whether the colony is disloyal to its overlord.</li>
+<li>Regimes do not grant or remove national strengths.</li>
+<li>Counter-revolution: monarchies&#39; opinion falls by 50 and they hold a reason to fight for 25 years, unless the regime sets its own values. It replaces the usual &quot;different form of rule&quot; penalty instead of adding to it.</li>
+<li>Restorations happen only through their own events: the restoration of the old order (1660 to 1815) and the émigré events.</li>
+<li>A wave is a one-off change in the realms bordering the revolution&#39;s country and in its region. Faith waves use religion&#39;s faith wave.</li>
+<li>When a revolution sets a regime, the regime decides the form of rule. Crown and assembly keeps its form later on.</li>
+<li>The armistices of 1918 are one-time events with no revolution card.</li>
+<li>A decree whose cost is part of its effect shows that effect as its cost.</li>
+<li>Revolutions &quot;from above&quot; are decisions you are offered; nobody rises.</li>
+<li>The catch-chance additions for peace and officials are provisional and may still be tuned.</li>
+</ul>
+<h2 id="still-open"><a class="anchor" href="#still-open" aria-label="Link to this section">#</a>Still open</h2>
+<ul>
+<li>Seven new historical sources still need to be checked by a person.</li>
+</ul>
+<h2 id="for-developers"><a class="anchor" href="#for-developers" aria-label="Link to this section">#</a>For developers</h2>
+<ul>
+<li>Spec: <a href="https://github.com/grrts/pocket-hedgemony/blob/claude/domain-specs-bdd-ebdpmx/domain/revolutions/spec.md" rel="noopener"><code>domain/revolutions/spec.md</code></a>.</li>
+<li>Features: <code>domain/revolutions/features/</code> (revolution-card, stages, signs-and-trigger, stances, camps, rearm, regimes, decrees, aftermath, funding-abroad, catalogue, revolution-ai, revolution-ui, data-build).</li>
+<li>Code: <code>packages/engine/src/domain/revolutions/</code>, with its numbers in <code>packages/rules/data/domain/revolutions.json</code>.</li>
+<li>Data lives in the revolutions design (<code>revolutions/data/</code>: families, reference, decrees, regimes, revolutions, additions). The offline build validates the layer, merges it into a scratch copy of the event tree, runs the event tree validator, and writes the catalogue, runtime JSON and the event tree patch without ever editing the tree itself. Current result: 0 layer errors; the merged tree has 0 errors and the same 21 warnings.</li>
+</ul>

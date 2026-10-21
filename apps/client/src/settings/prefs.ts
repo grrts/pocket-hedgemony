@@ -19,6 +19,7 @@ import {
 } from "@ph/engine/domain/settings";
 import { sound } from "../audio/sound.ts";
 import { detectRuntime } from "../platform.ts";
+import { visionOf, type Vision } from "../map/colourVision.ts";
 
 /**
  * The player's settings in the client (domain/settings): read from the two
@@ -48,8 +49,8 @@ const profile = detectProfile({ runtime: runtime.startsWith("capacitor") ? "capa
 const firstLaunch = store.read("settings-device.json") === undefined;
 export const prefs: SettingsState = readSettings(store, profile).state;
 
-/** Where the game runs, for which rows show (SET-035 …). */
-export const env = { platform: runtime === "web" ? ("web" as const) : runtime === "electron" ? ("desktop" as const) : ("mobile" as const), touch: matchMedia("(pointer: coarse)").matches };
+/** Where the game runs, for which rows show (SET-035 …); `ironman` is set while an ironman campaign is played, which hides the autosave rows (SAVE-087). */
+export const env: { platform: "web" | "desktop" | "mobile"; touch: boolean; ironman?: boolean } = { platform: runtime === "web" ? "web" : runtime === "electron" ? "desktop" : "mobile", touch: matchMedia("(pointer: coarse)").matches };
 
 // The Sound card's choices from before Settings existed carry over once.
 if (firstLaunch) {
@@ -59,7 +60,20 @@ if (firstLaunch) {
   prefs.values["audio.effects_volume"] = Math.round(s.effects * 20) * 5;
   prefs.values["audio.music"] = s.musicOn;
   prefs.values["audio.interface_sounds"] = s.uiSounds;
+  prefs.values["audio.ambience"] = s.ambienceOn;
+  prefs.values["audio.ambience_volume"] = Math.round(s.ambience * 20) * 5;
   saveSettings(prefs, store);
+}
+
+// Ambience became on by default (D-AUD-17); a device that saved the old default gets it on once.
+try {
+  if (!firstLaunch && localStorage.getItem("ph-ambience-on") === null) {
+    prefs.values["audio.ambience"] = true;
+    saveSettings(prefs, store);
+  }
+  localStorage.setItem("ph-ambience-on", "1");
+} catch {
+  // Storage refused: the saved setting stands.
 }
 
 type Listener = (ids: string[]) => void;
@@ -99,6 +113,8 @@ function applySound(): void {
     effects: Number(pref("audio.effects_volume")) / 100,
     musicOn: pref("audio.music") === true,
     uiSounds: pref("audio.interface_sounds") === true,
+    ambienceOn: pref("audio.ambience") === true,
+    ambience: Number(pref("audio.ambience_volume")) / 100,
   });
 }
 applySound();
@@ -154,6 +170,11 @@ export function livingPrefs(): { detail: "Low" | "Medium" | "High"; animations: 
   if (!batteryOn()) return { detail, animations: animationsPref() };
   return { detail: detail === "High" ? "Medium" : detail, animations: "Off" };
 }
+
+/** Colour vision (SET-095): the plan map-presentation's colourVision() gives for the chosen mode. */
+export const visionPref = (): Vision => visionOf(pref("accessibility.colour_vision"));
+/** Patterns on lenses (SET-096): On by hand, or set by Colour vision "No colour". */
+export const lensPatternsOn = (): boolean => pref("accessibility.lens_patterns") === true;
 
 /** Body text 17, 20 or 24 px as a zoom on the interface text (SET-098, SET-137). */
 export function textZoom(): number {

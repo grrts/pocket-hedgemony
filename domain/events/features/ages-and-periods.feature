@@ -4,7 +4,7 @@ Feature: Ages and periods
   I want ages and periods to start and end from the simulated world, within windows and forced dates
   So that history's framing follows play and a stalled game still advances
 
-  @EVT-011 @EVT-013 @placeholder
+  @EVT-011 @EVT-013 @EVT-082 @placeholder
   Scenario Outline: Forced dates start and end an age
     Given the start condition of the age "<age>" has never held
     When the date reaches <force_start>
@@ -14,8 +14,9 @@ Feature: Ages and periods
 
     Examples:
       | age                          | force_start | force_end |
-      | age_of_gunpowder_empires     | 1444        | 1760      |
-      | age_of_exploration           | 1444        | 1680      |
+      | age_of_schism_and_conquerors | 1378        | 1460      |
+      | age_of_gunpowder_empires     | 1453        | 1760      |
+      | age_of_exploration           | 1445        | 1680      |
       | age_of_reformations          | 1530        | 1700      |
       | age_of_atlantic_empires      | 1520        | 1880      |
       | age_of_crisis_and_absolutism | 1640        | 1790      |
@@ -76,3 +77,91 @@ Feature: Ages and periods
     Given the event "french_revolution" has the effect "start_period p_atlantic_revolutions"
     When the event fires
     Then the condition "period_active p_atlantic_revolutions" is true
+
+  @EVT-082
+  Scenario: Bombards among three great powers start the Age of Gunpowder Empires
+    Given the date is 1425
+    And 3 of the 8 realms with the most provinces know bombards
+    When the yearly age check runs
+    Then the age "age_of_gunpowder_empires" is active
+
+  @EVT-082
+  Scenario: Two great powers with bombards are not yet enough
+    Given the date is 1425
+    And 2 of the 8 realms with the most provinces know bombards
+    And a small realm knows bombards too
+    When the yearly age check runs
+    Then the age "age_of_gunpowder_empires" is not active
+
+  @EVT-082
+  Scenario: The fall of Constantinople starts the Age of Gunpowder Empires
+    Given the date is 1430
+    And the event "fall_of_constantinople" has happened
+    When the yearly age check runs
+    Then the age "age_of_gunpowder_empires" is active
+
+  @EVT-082
+  Scenario: Portugal's ocean ships start the Age of Exploration
+    Given the date is 1416
+    And "portugal" knows the ocean ships
+    When the yearly age check runs
+    Then the age "age_of_exploration" is active
+
+  @EVT-082
+  Scenario: Exploration cannot start before its window
+    Given the date is 1410
+    And "portugal" knows the ocean ships
+    When the yearly age check runs
+    Then the age "age_of_exploration" is not active, because its window opens in 1415
+
+  @EVT-081
+  Scenario Outline: The periods under way at the 1378 start
+    When the campaign starts in 1378
+    Then the period "<period>" is <state>
+
+    Examples:
+      | period                            | state      |
+      | p_western_schism                  | active     |
+      | p_timurs_conquests                | active     |
+      | p_hundred_years_war_caroline      | active     |
+      | p_ottoman_expansion               | active     |
+      | p_muscovite_consolidation         | active     |
+      | p_southeast_asian_maritime_states | active     |
+      | p_timurid_fragmentation           | not active |
+      | p_late_ming                       | not active |
+      | p_portuguese_oceanic_expansion    | not active |
+
+  @EVT-081
+  Scenario: Timur's death opens the Timurid fragmentation
+    Given the campaign started in 1378
+    When the years pass to 1406
+    Then the period "p_timurs_conquests" has ended
+    And the period "p_timurid_fragmentation" is active
+
+  @EVT-081
+  Scenario: A new war of England and France after the truce is the Lancastrian phase
+    Given the campaign started in 1378
+    And "england" and "france" are not at war
+    When the years pass to 1397
+    Then the period "p_hundred_years_war_caroline" has ended
+    Given "england" and "france" are at war
+    When the years pass to 1415
+    Then the period "p_hundred_years_war_lancastrian" is active
+
+  @EVT-081
+  Scenario: The Ottoman Interregnum comes only if Timur breaks the Ottomans
+    Given the campaign started in 1378
+    When the years pass to 1410
+    Then the period "p_ottoman_interregnum" is not active
+    Given "ottoman" is a subject of "timurid_empire"
+    When the years pass to 1411
+    Then the period "p_ottoman_interregnum" is active
+
+  @EVT-081
+  Scenario: From a 1444 start the periods that closed before it never start
+    Given the campaign started in 1444
+    When the years pass to 1445
+    Then the period "p_ottoman_expansion" is active
+    And the period "p_western_schism" is not active
+    And the period "p_timurs_conquests" is not active
+    And the period "p_hussite_wars" is not active

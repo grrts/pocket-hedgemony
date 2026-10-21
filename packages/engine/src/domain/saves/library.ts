@@ -1,4 +1,4 @@
-import type { Ruleset } from "@ph/rules";
+import { CHECKPOINT_START, START_ID, type Ruleset } from "@ph/rules";
 import { hashWorld } from "../../hash.ts";
 import type { Rng } from "../../rng.ts";
 import type { Order } from "../../turn.ts";
@@ -20,6 +20,7 @@ import {
   type RawChunk,
   type SaveHeader,
   type SaveKind,
+  type SharedFrom,
 } from "./format.ts";
 import { migrate, validateChunks, type Migration } from "./migrations.ts";
 import { mapHash, restoreWorld, rulesHash, thumbnail, worldChunks, type MappingTables, type SavedGame } from "./world-chunks.ts";
@@ -179,6 +180,8 @@ export interface Campaign {
   beganAsTutorial?: boolean;
   /** The app that writes its saves; full when not given (D-SAVE-13). */
   app?: AppTier;
+  /** The campaign began as a copy of a shared save; every save of it says so (SAVE-128). */
+  sharedFrom?: SharedFrom;
 }
 
 export const DEFAULT_OPTIONS: CampaignOptions = { difficulty: "normal", events: "historical", endDate: "1939-08-31" };
@@ -359,8 +362,10 @@ export function buildSave(ctx: SaveContext, campaign: Campaign, world: World, ki
     worldHash: hashWorld(restoreWorld(new Map(chunks.map((c) => [c.id, c])), world.rules, {}, world.tiles).world),
     thumbnail: thumbnail(world, campaign.playerNation),
     modified: campaign.modified,
+    start: START_ID,
   };
   if (kind === "ironman" && campaign.ironmanHead) header.parent = campaign.ironmanHead;
+  if (campaign.sharedFrom) header.sharedFrom = { ...campaign.sharedFrom };
   return { header, bytes: encodeSave(header, chunks) };
 }
 
@@ -631,10 +636,13 @@ export type Opened = {
 
 export type OpenResult =
   | Opened
-  | { kind: "rejected"; problem: "damaged" | "wrong-magic" | "newer-version"; message: string }
+  | { kind: "rejected"; problem: "damaged" | "wrong-magic" | "newer-version" | "other-start"; message: string }
   | { kind: "locked"; nation: string; message: string }
   | { kind: "hash warning"; message: string }
   | { kind: "refused"; reason: "ironman save failed the hash check" };
+
+/** The start a save's campaign began from (SAVE-111): saves from before the 1378 switch began in 1444. */
+export const saveStart = (header: Pick<SaveHeader, "start">): string => header.start ?? CHECKPOINT_START;
 
 /**
  * Opens a save (SaveLoader): CRCs, format version, the nation lock, format
@@ -652,6 +660,8 @@ export function openSave(bytes: Uint8Array, opts: OpenOptions, nationName: (id: 
   const header = { ...decoded.header };
   const buildVersion = opts.buildFormatVersion ?? FORMAT_VERSION;
   if (header.formatVersion > buildVersion) return { kind: "rejected", problem: "newer-version", message: M.newer_version };
+  // A campaign plays on in the world it began in (SAVE-111): the client reopens in that start first.
+  if (saveStart(header) !== START_ID) return { kind: "rejected", problem: "other-start", message: `This campaign began in ${saveStart(header)}.` };
   if (header.tier.needsFullGame && !opts.fullGame) {
     return { kind: "locked", nation: header.tier.nation, message: fill(M.locked_nation, { nation: nationName(header.tier.nation) }) };
   }
@@ -728,6 +738,50 @@ export function importSave(ctx: SaveContext, bytes: Uint8Array, online = true): 
   const path = fileName(header);
   writeFileSafely(ctx.storage, path, out);
   return { kind: "imported", entry: { path, header } };
+}
+
+// ---------------------------------------------------------------- shared saves
+
+/**
+ * A copy of a shared save as a new campaign of the player's own (SAVE-128,
+ * SAVE-129): new campaign and save ids, a Manual save made on this device,
+ * `sharedFrom` naming the code and the author, and never ironman, so it earns
+ * no achievements. The chunks are kept as they are; opening it runs the usual
+ * checks (nation lock, format version, hash).
+ */
+export function sharedCopy(
+  bytes: Uint8Array,
+  ctx: Pick<SaveContext, "rng" | "now" | "device" | "platform">,
+  from: SharedFrom,
+): { header: SaveHeader; bytes: Uint8Array; path: string } {
+  const decoded = decodeSave(bytes);
+  const original = decoded.header;
+  const header: SaveHeader = {
+    ...original,
+    saveId: randomId(ctx.rng),
+    campaignId: randomId(ctx.rng),
+    kind: "manual",
+    savedAt: ctx.now,
+    device: ctx.device,
+    platform: ctx.platform,
+    ironman: false,
+    flags: { ...original.flags, ironman_unbroken: false },
+    sharedFrom: { code: from.code, author: from.author },
+  };
+  delete header.parent;
+  const out = encodeSave(header, [...decoded.chunks.values()]);
+  return { header, bytes: out, path: fileName(header) };
+}
+
+/** "From Leroy's campaign" on the Load line of a copy (SAVE-134). */
+export function sharedFromLine(header: Pick<SaveHeader, "sharedFrom">): string {
+  return header.sharedFrom ? fill(M.shared_from, { author: header.sharedFrom.author }) : "";
+}
+
+/** A share code as typed (any case, with a dash or spaces) in its stored form, or undefined when it cannot be one. */
+export function shareCode(typed: string): string | undefined {
+  const code = typed.toUpperCase().replace(/[\s-]+/g, "");
+  return code.length === C.cloud.shared.code_length && /^[A-HJ-NP-Z2-9]+$/.test(code) ? code : undefined;
 }
 
 // ---------------------------------------------------------------- ironman lines

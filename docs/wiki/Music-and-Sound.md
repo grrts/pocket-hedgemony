@@ -46,7 +46,7 @@ The era is taken from the game year (the calendar). A technology basis (the aver
 
 | Era | Years | Ages that open in it | Style |
 |---|---|---|---|
-| I | 1444 to 1519 | Gunpowder Empires, Exploration | Drones, modal melody with a second voice, frame drums, 60 to 90 bpm |
+| I | the start (1378) to 1519 | Schism and Conquerors, Gunpowder Empires, Exploration | Drones, modal melody with a second voice, frame drums, 60 to 90 bpm |
 | II | 1520 to 1649 | Reformations, Atlantic Empires | Two-part counterpoint, dance rhythms in 3, plucked-string wavetables |
 | III | 1650 to 1789 | Crisis and Absolutism | Walking bass, ornamented leads, harpsichord-like arpeggios, formal marches |
 | IV | 1790 to 1869 | Revolutions, Industrialization | Bigger dynamics, dotted marches, folk-song melodies, first syncopation |
@@ -244,7 +244,7 @@ Audio has its own visuals only where they partner a sound: captions at the scree
 - [How a turn works](Time-and-Turns): turn end, turn ready, the game year and January.
 - [Map and Map Modes](Map-and-Lenses): camera position, region and zoom, what is on screen, terrain under the camera.
 - [Culture](Culture): your primary culture group, its changes and culture mix.
-- [The 1444 start](The-1444-Start): capital longitude for the turkic split, colonial founding dates.
+- [The 1378 start](The-1378-Start): capital longitude for the turkic split, colonial founding dates.
 - [Warfare](Warfare): war declared, war trend, occupied capital, battles, bells, routs, sieges, army eras and troop types.
 - [Naval](Naval): sea battles, broadsides, sinkings, blockades, landings, fleet orders.
 - [Troop movement](Troop-Movement): march orders, arrivals, winter quarters.
@@ -274,7 +274,7 @@ From `music.yaml` and `sfx.yaml`. Almost all are provisional placeholders; the e
 | Key | Value |
 |---|---|
 | `eras.basis` | calendar (decided) |
-| `eras.bands` | I 1444, II 1520, III 1650, IV 1790, V 1870 |
+| `eras.bands` | I 1378, II 1520, III 1650, IV 1790, V 1870 |
 | `eras.campaign_end` | 1939-08-31 (fixed) |
 | `palettes.split.turkic` | west of longitude 55 → Middle East, else steppe |
 | `states.war_losing` | more than half your peace voices would accept the enemy's terms, or capital occupied |

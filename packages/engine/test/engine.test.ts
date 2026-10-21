@@ -101,6 +101,8 @@ describe("turns", () => {
     w.player = fra;
     const army = Array.from(w.armies.owner.subarray(0, w.armies.count)).indexOf(fra);
     const madrid = farFrench(w, fra, army);
+    // A young general, so no January death sends his men home mid-test (RECR-135).
+    w.commanders[w.armies.commander[army]!]!.age = 20;
     expect(applyNow(w, { type: "move", army, to: madrid }, fra).rejectedOrders).toEqual([]);
     const path = w.armies.path[army]!;
     expect(path.at(-1)).toBe(w.tiles.centre[madrid]);

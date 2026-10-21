@@ -1,0 +1,44 @@
+{
+ "$comment": "Western Europe's realms born after 20 September 1378, asleep until they form (X-24, X-25).",
+ "realms": [
+  {
+   "id": "wales_glyndwr",
+   "name": "Wales",
+   "color": "#c8102e",
+   "capital": [
+    -4.11,
+    52.86
+   ],
+   "tree": [
+    "wales_glyndwr"
+   ],
+   "home": []
+  },
+  {
+   "id": "dutch_republic",
+   "name": "Dutch Republic",
+   "color": "#e8772e",
+   "capital": [
+    4.9,
+    52.37
+   ],
+   "tree": [
+    "dutch_republic"
+   ],
+   "home": []
+  },
+  {
+   "id": "spain",
+   "name": "Spain",
+   "color": "#d4a017",
+   "capital": [
+    -3.7,
+    40.42
+   ],
+   "tree": [
+    "spain"
+   ],
+   "home": []
+  }
+ ]
+}

@@ -1,0 +1,3333 @@
+{
+  "date": "1600-01-01",
+  "label": "Era III begins",
+  "why": "Era III begins: the Spanish and Ottoman empires at their height, Akbar's Mughal Empire, Abbas's Safavid revival, and Japan on the eve of Sekigahara.",
+  "realms": [
+    {
+      "id": "castile",
+      "name": "Spanish Monarchy (Crown of Castile)",
+      "rank": "great_power",
+      "capital": {
+        "name": "Madrid",
+        "at": [
+          -3.7,
+          40.42
+        ]
+      },
+      "overlord": null,
+      "ruler": "Philip III",
+      "catalogue_id": "castile",
+      "note": "Composite monarchy of Castile, Aragon, Portugal, Italian and Burgundian dominions; Indies governed through the viceroyalties of New Spain and Peru. Court moves to Valladolid in 1601."
+    },
+    {
+      "id": "aragon",
+      "name": "Crown of Aragon",
+      "rank": "minor",
+      "capital": {
+        "name": "Zaragoza",
+        "at": [
+          -0.88,
+          41.65
+        ]
+      },
+      "overlord": "castile",
+      "ruler": "Philip III (viceroys)",
+      "catalogue_id": "aragon",
+      "note": "Kept its own Cortes and fueros; dynastic union with Castile."
+    },
+    {
+      "id": "portugal",
+      "name": "Kingdom of Portugal",
+      "rank": "major",
+      "capital": {
+        "name": "Lisbon",
+        "at": [
+          -9.14,
+          38.72
+        ]
+      },
+      "overlord": "castile",
+      "ruler": "Philip III (Philip II of Portugal)",
+      "catalogue_id": "portugal",
+      "note": "Iberian Union since 1580 (Cortes of Tomar 1581): own institutions and empire (Brazil, Estado da India, Angola)."
+    },
+    {
+      "id": "naples",
+      "name": "Kingdom of Naples",
+      "rank": "minor",
+      "capital": {
+        "name": "Naples",
+        "at": [
+          14.27,
+          40.85
+        ]
+      },
+      "overlord": "castile",
+      "ruler": "Philip III (viceroy Fernando Ruiz de Castro, Count of Lemos)",
+      "catalogue_id": "naples"
+    },
+    {
+      "id": "sicily",
+      "name": "Kingdom of Sicily",
+      "rank": "minor",
+      "capital": {
+        "name": "Palermo",
+        "at": [
+          13.36,
+          38.12
+        ]
+      },
+      "overlord": "castile",
+      "ruler": "Philip III (viceroy Bernardino de Cárdenas, Duke of Maqueda)",
+      "catalogue_id": "sicily"
+    },
+    {
+      "id": "milan",
+      "name": "Duchy of Milan",
+      "rank": "minor",
+      "capital": {
+        "name": "Milan",
+        "at": [
+          9.19,
+          45.46
+        ]
+      },
+      "overlord": "castile",
+      "ruler": "Philip III (governor Juan Fernández de Velasco, Constable of Castile)",
+      "catalogue_id": "milan",
+      "note": "Spanish since 1535; imperial fief."
+    },
+    {
+      "id": "burgundy",
+      "name": "Habsburg Netherlands (the Archdukes)",
+      "rank": "minor",
+      "capital": {
+        "name": "Brussels",
+        "at": [
+          4.35,
+          50.85
+        ]
+      },
+      "overlord": "castile",
+      "ruler": "Archdukes Albert and Isabella",
+      "catalogue_id": "burgundy",
+      "note": "Ceded by Philip II in 1598; reverts to Spain if they die childless; Spanish army stays."
+    },
+    {
+      "id": "netherlands",
+      "name": "United Provinces of the Netherlands",
+      "rank": "major",
+      "capital": {
+        "name": "The Hague",
+        "at": [
+          4.3,
+          52.08
+        ]
+      },
+      "overlord": null,
+      "ruler": "States General; stadtholder Maurice of Nassau, Land's Advocate Johan van Oldenbarnevelt",
+      "catalogue_id": "holland",
+      "note": "In revolt against Spain since 1568; Union of Utrecht 1579, Act of Abjuration 1581."
+    },
+    {
+      "id": "england",
+      "name": "Kingdom of England (and Ireland)",
+      "rank": "major",
+      "capital": {
+        "name": "London",
+        "at": [
+          -0.12,
+          51.5
+        ]
+      },
+      "overlord": null,
+      "ruler": "Elizabeth I",
+      "catalogue_id": "england",
+      "note": "Holds the Kingdom of Ireland (1542); Nine Years' War with Tyrone under way."
+    },
+    {
+      "id": "tyrone",
+      "name": "O'Neill lordship of Tyrone",
+      "rank": "minor",
+      "capital": {
+        "name": "Dungannon",
+        "at": [
+          -6.77,
+          54.5
+        ]
+      },
+      "overlord": null,
+      "ruler": "Hugh O'Neill, Earl of Tyrone",
+      "catalogue_id": "tyrone",
+      "note": "Leading the Irish confederacy in the Nine Years' War (1593-1603)."
+    },
+    {
+      "id": "scotland",
+      "name": "Kingdom of Scotland",
+      "rank": "minor",
+      "capital": {
+        "name": "Edinburgh",
+        "at": [
+          -3.19,
+          55.95
+        ]
+      },
+      "overlord": null,
+      "ruler": "James VI",
+      "catalogue_id": "scotland"
+    },
+    {
+      "id": "france",
+      "name": "Kingdom of France",
+      "rank": "major",
+      "capital": {
+        "name": "Paris",
+        "at": [
+          2.35,
+          48.86
+        ]
+      },
+      "overlord": null,
+      "ruler": "Henri IV",
+      "catalogue_id": "france",
+      "note": "Wars of Religion ended 1598 (Edict of Nantes, Peace of Vervins); Henri also King of (Lower) Navarre."
+    },
+    {
+      "id": "lorraine",
+      "name": "Duchy of Lorraine",
+      "rank": "minor",
+      "capital": {
+        "name": "Nancy",
+        "at": [
+          6.18,
+          48.69
+        ]
+      },
+      "overlord": null,
+      "ruler": "Charles III",
+      "catalogue_id": "lorraine"
+    },
+    {
+      "id": "savoy",
+      "name": "Duchy of Savoy",
+      "rank": "minor",
+      "capital": {
+        "name": "Turin",
+        "at": [
+          7.69,
+          45.07
+        ]
+      },
+      "overlord": null,
+      "ruler": "Charles Emmanuel I",
+      "catalogue_id": "savoy",
+      "note": "Dispute with France over Saluzzo (war in 1600)."
+    },
+    {
+      "id": "genoa",
+      "name": "Republic of Genoa",
+      "rank": "minor",
+      "capital": {
+        "name": "Genoa",
+        "at": [
+          8.93,
+          44.41
+        ]
+      },
+      "overlord": null,
+      "ruler": "Doge Lorenzo Sauli",
+      "catalogue_id": "genoa",
+      "note": "Aligned with Spain; holds Corsica."
+    },
+    {
+      "id": "venice",
+      "name": "Republic of Venice",
+      "rank": "major",
+      "capital": {
+        "name": "Venice",
+        "at": [
+          12.33,
+          45.44
+        ]
+      },
+      "overlord": null,
+      "ruler": "Doge Marino Grimani",
+      "catalogue_id": "venice",
+      "note": "Lost Cyprus 1571; keeps Crete, Ionian islands, Dalmatia."
+    },
+    {
+      "id": "florence",
+      "name": "Grand Duchy of Tuscany",
+      "rank": "minor",
+      "capital": {
+        "name": "Florence",
+        "at": [
+          11.26,
+          43.77
+        ]
+      },
+      "overlord": null,
+      "ruler": "Ferdinando I de' Medici",
+      "catalogue_id": "florence",
+      "note": "Grand duchy since 1569; includes Pisa and Siena."
+    },
+    {
+      "id": "papal_states",
+      "name": "Papal States",
+      "rank": "minor",
+      "capital": {
+        "name": "Rome",
+        "at": [
+          12.5,
+          41.9
+        ]
+      },
+      "overlord": null,
+      "ruler": "Pope Clement VIII",
+      "catalogue_id": "papal_states",
+      "note": "Annexed Ferrara in 1598."
+    },
+    {
+      "id": "mantua",
+      "name": "Duchy of Mantua (and Montferrat)",
+      "rank": "minor",
+      "capital": {
+        "name": "Mantua",
+        "at": [
+          10.79,
+          45.16
+        ]
+      },
+      "overlord": null,
+      "ruler": "Vincenzo I Gonzaga",
+      "catalogue_id": "mantua"
+    },
+    {
+      "id": "modena",
+      "name": "Duchy of Modena and Reggio",
+      "rank": "minor",
+      "capital": {
+        "name": "Modena",
+        "at": [
+          10.93,
+          44.65
+        ]
+      },
+      "overlord": null,
+      "ruler": "Cesare d'Este",
+      "catalogue_id": "ferrara",
+      "note": "Este moved here after losing Ferrara 1598."
+    },
+    {
+      "id": "parma",
+      "name": "Duchy of Parma and Piacenza",
+      "rank": "minor",
+      "capital": {
+        "name": "Parma",
+        "at": [
+          10.33,
+          44.8
+        ]
+      },
+      "overlord": null,
+      "ruler": "Ranuccio I Farnese",
+      "catalogue_id": null,
+      "note": "Created 1545."
+    },
+    {
+      "id": "urbino",
+      "name": "Duchy of Urbino",
+      "rank": "minor",
+      "capital": {
+        "name": "Pesaro",
+        "at": [
+          12.91,
+          43.91
+        ]
+      },
+      "overlord": null,
+      "ruler": "Francesco Maria II della Rovere",
+      "catalogue_id": "urbino"
+    },
+    {
+      "id": "knights_of_rhodes",
+      "name": "Order of St John (Malta)",
+      "rank": "minor",
+      "capital": {
+        "name": "Valletta",
+        "at": [
+          14.51,
+          35.9
+        ]
+      },
+      "overlord": null,
+      "ruler": "Grand Master Martín Garzez",
+      "catalogue_id": "knights_hospitaller",
+      "note": "Lost Rhodes 1522; Malta since 1530."
+    },
+    {
+      "id": "ragusa",
+      "name": "Republic of Ragusa",
+      "rank": "minor",
+      "capital": {
+        "name": "Ragusa (Dubrovnik)",
+        "at": [
+          18.09,
+          42.65
+        ]
+      },
+      "overlord": "ottomans",
+      "ruler": "Rector and Senate",
+      "catalogue_id": "ragusa",
+      "note": "Ottoman tributary."
+    },
+    {
+      "id": "austria",
+      "name": "Habsburg Austria (Archduchy)",
+      "rank": "major",
+      "capital": {
+        "name": "Vienna",
+        "at": [
+          16.37,
+          48.21
+        ]
+      },
+      "overlord": null,
+      "ruler": "Emperor Rudolf II (Archduke Matthias governing Austria; Archduke Ferdinand in Inner Austria)",
+      "catalogue_id": "austria",
+      "note": "Rudolf resides in Prague; Long Turkish War with the Ottomans since 1593."
+    },
+    {
+      "id": "hre",
+      "name": "Holy Roman Empire",
+      "rank": "major",
+      "capital": {
+        "name": "Prague (imperial court)",
+        "at": [
+          14.42,
+          50.09
+        ]
+      },
+      "overlord": null,
+      "ruler": "Emperor Rudolf II",
+      "catalogue_id": "hre",
+      "note": "Listed for the emperor's title; the realms below hold the land."
+    },
+    {
+      "id": "bohemia",
+      "name": "Kingdom of Bohemia",
+      "rank": "minor",
+      "capital": {
+        "name": "Prague",
+        "at": [
+          14.42,
+          50.09
+        ]
+      },
+      "overlord": "austria",
+      "ruler": "Rudolf II",
+      "catalogue_id": "bohemia",
+      "note": "Habsburg crown land; Rudolf's residence."
+    },
+    {
+      "id": "hungary",
+      "name": "Royal Hungary",
+      "rank": "minor",
+      "capital": {
+        "name": "Pressburg (Pozsony)",
+        "at": [
+          17.11,
+          48.15
+        ]
+      },
+      "overlord": "austria",
+      "ruler": "Rudolf II",
+      "catalogue_id": "hungary",
+      "note": "Habsburg-held north and west of Hungary; the centre is Ottoman."
+    },
+    {
+      "id": "transylvania",
+      "name": "Principality of Transylvania",
+      "rank": "minor",
+      "capital": {
+        "name": "Alba Iulia",
+        "at": [
+          23.58,
+          46.07
+        ]
+      },
+      "overlord": "wallachia",
+      "ruler": "Michael the Brave (as Rudolf II's governor)",
+      "catalogue_id": "transylvania",
+      "note": "Taken by Michael at Șelimbăr, Oct 1599; Báthory princes gone."
+    },
+    {
+      "id": "wallachia",
+      "name": "Principality of Wallachia",
+      "rank": "minor",
+      "capital": {
+        "name": "Târgoviște",
+        "at": [
+          25.46,
+          44.93
+        ]
+      },
+      "overlord": "austria",
+      "ruler": "Michael the Brave",
+      "catalogue_id": "wallachia",
+      "note": "Broke with the Ottomans 1594; accepted Rudolf II's suzerainty 1598; takes Moldavia May 1600."
+    },
+    {
+      "id": "moldavia",
+      "name": "Principality of Moldavia",
+      "rank": "minor",
+      "capital": {
+        "name": "Iași",
+        "at": [
+          27.59,
+          47.16
+        ]
+      },
+      "overlord": "poland",
+      "ruler": "Ieremia Movilă",
+      "catalogue_id": "moldavia",
+      "note": "Polish protégé, still paying Ottoman tribute."
+    },
+    {
+      "id": "bavaria",
+      "name": "Duchy of Bavaria",
+      "rank": "minor",
+      "capital": {
+        "name": "Munich",
+        "at": [
+          11.58,
+          48.14
+        ]
+      },
+      "overlord": null,
+      "ruler": "Maximilian I",
+      "catalogue_id": "bavaria_munich"
+    },
+    {
+      "id": "saxony",
+      "name": "Electorate of Saxony",
+      "rank": "minor",
+      "capital": {
+        "name": "Dresden",
+        "at": [
+          13.74,
+          51.05
+        ]
+      },
+      "overlord": null,
+      "ruler": "Christian II (regent Frederick William of Saxe-Weimar)",
+      "catalogue_id": "saxony"
+    },
+    {
+      "id": "brandenburg",
+      "name": "Electorate of Brandenburg",
+      "rank": "minor",
+      "capital": {
+        "name": "Berlin-Cölln",
+        "at": [
+          13.4,
+          52.52
+        ]
+      },
+      "overlord": null,
+      "ruler": "Joachim Frederick",
+      "catalogue_id": "brandenburg"
+    },
+    {
+      "id": "palatinate",
+      "name": "Electoral Palatinate",
+      "rank": "minor",
+      "capital": {
+        "name": "Heidelberg",
+        "at": [
+          8.69,
+          49.4
+        ]
+      },
+      "overlord": null,
+      "ruler": "Frederick IV",
+      "catalogue_id": "palatinate"
+    },
+    {
+      "id": "wurttemberg",
+      "name": "Duchy of Württemberg",
+      "rank": "minor",
+      "capital": {
+        "name": "Stuttgart",
+        "at": [
+          9.18,
+          48.78
+        ]
+      },
+      "overlord": null,
+      "ruler": "Frederick I",
+      "catalogue_id": "wurttemberg_stuttgart"
+    },
+    {
+      "id": "hesse",
+      "name": "Landgraviate of Hesse-Kassel",
+      "rank": "minor",
+      "capital": {
+        "name": "Kassel",
+        "at": [
+          9.48,
+          51.31
+        ]
+      },
+      "overlord": null,
+      "ruler": "Maurice",
+      "catalogue_id": "hesse"
+    },
+    {
+      "id": "cologne",
+      "name": "Electorate of Cologne",
+      "rank": "minor",
+      "capital": {
+        "name": "Bonn",
+        "at": [
+          7.1,
+          50.73
+        ]
+      },
+      "overlord": null,
+      "ruler": "Archbishop Ernest of Bavaria",
+      "catalogue_id": "cologne",
+      "note": "The city of Cologne itself is a free imperial city."
+    },
+    {
+      "id": "cologne_city",
+      "name": "Free Imperial City of Cologne",
+      "rank": "minor",
+      "capital": {
+        "name": "Cologne",
+        "at": [
+          6.96,
+          50.94
+        ]
+      },
+      "overlord": null,
+      "ruler": "City council",
+      "catalogue_id": "cologne_city"
+    },
+    {
+      "id": "mainz",
+      "name": "Electorate of Mainz",
+      "rank": "minor",
+      "capital": {
+        "name": "Mainz",
+        "at": [
+          8.27,
+          50.0
+        ]
+      },
+      "overlord": null,
+      "ruler": "Archbishop Wolfgang von Dalberg",
+      "catalogue_id": "mainz"
+    },
+    {
+      "id": "salzburg",
+      "name": "Prince-Archbishopric of Salzburg",
+      "rank": "minor",
+      "capital": {
+        "name": "Salzburg",
+        "at": [
+          13.04,
+          47.8
+        ]
+      },
+      "overlord": null,
+      "ruler": "Wolf Dietrich von Raitenau",
+      "catalogue_id": "salzburg"
+    },
+    {
+      "id": "brunswick",
+      "name": "Duchy of Brunswick-Wolfenbüttel",
+      "rank": "minor",
+      "capital": {
+        "name": "Wolfenbüttel",
+        "at": [
+          10.54,
+          52.16
+        ]
+      },
+      "overlord": null,
+      "ruler": "Henry Julius",
+      "catalogue_id": "brunswick_wolfenbuttel"
+    },
+    {
+      "id": "pomerania",
+      "name": "Duchy of Pomerania (Stettin)",
+      "rank": "minor",
+      "capital": {
+        "name": "Stettin",
+        "at": [
+          14.55,
+          53.43
+        ]
+      },
+      "overlord": null,
+      "ruler": "Johann Friedrich",
+      "catalogue_id": "pomerania_stettin",
+      "note": "Pomerania-Wolgast under Philip Julius."
+    },
+    {
+      "id": "hamburg",
+      "name": "Free City of Hamburg",
+      "rank": "minor",
+      "capital": {
+        "name": "Hamburg",
+        "at": [
+          9.99,
+          53.55
+        ]
+      },
+      "overlord": null,
+      "ruler": "City council",
+      "catalogue_id": "hamburg"
+    },
+    {
+      "id": "lubeck",
+      "name": "Free Imperial City of Lübeck",
+      "rank": "minor",
+      "capital": {
+        "name": "Lübeck",
+        "at": [
+          10.69,
+          53.87
+        ]
+      },
+      "overlord": null,
+      "ruler": "City council",
+      "catalogue_id": "lubeck",
+      "note": "The Hanse is in decline."
+    },
+    {
+      "id": "switzerland",
+      "name": "Old Swiss Confederacy",
+      "rank": "minor",
+      "capital": {
+        "name": "Baden (Diet)",
+        "at": [
+          8.31,
+          47.47
+        ]
+      },
+      "overlord": null,
+      "ruler": "Federal Diet (Tagsatzung) of the Thirteen Cantons",
+      "catalogue_id": "swiss_confederation"
+    },
+    {
+      "id": "denmark",
+      "name": "Denmark-Norway",
+      "rank": "major",
+      "capital": {
+        "name": "Copenhagen",
+        "at": [
+          12.57,
+          55.68
+        ]
+      },
+      "overlord": null,
+      "ruler": "Christian IV",
+      "catalogue_id": "denmark",
+      "note": "Norway ruled from Copenhagen since 1537; holds Gotland, Scania, Schleswig-Holstein shares."
+    },
+    {
+      "id": "sweden",
+      "name": "Kingdom of Sweden",
+      "rank": "major",
+      "capital": {
+        "name": "Stockholm",
+        "at": [
+          18.07,
+          59.33
+        ]
+      },
+      "overlord": null,
+      "ruler": "Duke Charles (regent; crowned Charles IX 1604)",
+      "catalogue_id": "sweden",
+      "note": "Riksdag deposed Sigismund III in July 1599; holds Estonia."
+    },
+    {
+      "id": "poland",
+      "name": "Polish-Lithuanian Commonwealth (Crown of Poland)",
+      "rank": "major",
+      "capital": {
+        "name": "Kraków",
+        "at": [
+          19.94,
+          50.06
+        ]
+      },
+      "overlord": null,
+      "ruler": "Sigismund III Vasa",
+      "catalogue_id": "poland",
+      "note": "Union of Lublin 1569; court moving to Warsaw since 1596; Livonia joint since 1561/1582."
+    },
+    {
+      "id": "lithuania",
+      "name": "Grand Duchy of Lithuania",
+      "rank": "minor",
+      "capital": {
+        "name": "Vilnius",
+        "at": [
+          25.28,
+          54.69
+        ]
+      },
+      "overlord": "poland",
+      "ruler": "Sigismund III Vasa",
+      "catalogue_id": "lithuania",
+      "note": "Constituent of the Commonwealth (real union 1569)."
+    },
+    {
+      "id": "ducal_prussia",
+      "name": "Duchy of Prussia",
+      "rank": "minor",
+      "capital": {
+        "name": "Königsberg",
+        "at": [
+          20.51,
+          54.71
+        ]
+      },
+      "overlord": "poland",
+      "ruler": "Albert Frederick (administrator George Frederick of Brandenburg-Ansbach)",
+      "catalogue_id": "teutonic_order",
+      "note": "Secularized Teutonic state, Polish fief since 1525."
+    },
+    {
+      "id": "courland",
+      "name": "Duchy of Courland and Semigallia",
+      "rank": "minor",
+      "capital": {
+        "name": "Mitau",
+        "at": [
+          23.72,
+          56.65
+        ]
+      },
+      "overlord": "poland",
+      "ruler": "Frederick and Wilhelm Kettler",
+      "catalogue_id": "livonian_order",
+      "note": "Polish-Lithuanian fief since 1561."
+    },
+    {
+      "id": "muscovy",
+      "name": "Tsardom of Russia",
+      "rank": "major",
+      "capital": {
+        "name": "Moscow",
+        "at": [
+          37.62,
+          55.75
+        ]
+      },
+      "overlord": null,
+      "ruler": "Boris Godunov",
+      "catalogue_id": "muscovy",
+      "note": "Holds Kazan, Astrakhan and western Siberia; Rurikids ended 1598."
+    },
+    {
+      "id": "nogai",
+      "name": "Nogai Horde",
+      "rank": "minor",
+      "capital": {
+        "name": "Saray-Jük",
+        "at": [
+          51.75,
+          47.5
+        ]
+      },
+      "overlord": null,
+      "ruler": "Biy Ishterek (contested)",
+      "catalogue_id": "nogai",
+      "note": "Under growing Russian influence; Lesser Nogai west of the Volga under Crimea."
+    },
+    {
+      "id": "crimea",
+      "name": "Crimean Khanate",
+      "rank": "minor",
+      "capital": {
+        "name": "Bakhchisaray",
+        "at": [
+          33.86,
+          44.75
+        ]
+      },
+      "overlord": "ottomans",
+      "ruler": "Gazi II Giray",
+      "catalogue_id": "crimea"
+    },
+    {
+      "id": "kazakh_khanate",
+      "name": "Kazakh Khanate",
+      "rank": "minor",
+      "capital": {
+        "name": "Turkistan",
+        "at": [
+          68.27,
+          43.3
+        ]
+      },
+      "overlord": null,
+      "ruler": "Esim Khan",
+      "catalogue_id": null,
+      "note": "Took Tashkent region in the 1590s."
+    },
+    {
+      "id": "ottomans",
+      "name": "Ottoman Empire",
+      "rank": "great_power",
+      "capital": {
+        "name": "Constantinople",
+        "at": [
+          28.98,
+          41.01
+        ]
+      },
+      "overlord": null,
+      "ruler": "Mehmed III",
+      "catalogue_id": "ottoman",
+      "note": "At war with the Habsburgs (Long Turkish War); Celali revolts in Anatolia."
+    },
+    {
+      "id": "algiers",
+      "name": "Regency of Algiers",
+      "rank": "minor",
+      "capital": {
+        "name": "Algiers",
+        "at": [
+          3.06,
+          36.75
+        ]
+      },
+      "overlord": "ottomans",
+      "ruler": "Ottoman pasha (triennial)",
+      "catalogue_id": "tlemcen",
+      "note": "Ottoman since 1518-29; Zayyanid Tlemcen absorbed 1554."
+    },
+    {
+      "id": "tunis",
+      "name": "Regency of Tunis",
+      "rank": "minor",
+      "capital": {
+        "name": "Tunis",
+        "at": [
+          10.18,
+          36.8
+        ]
+      },
+      "overlord": "ottomans",
+      "ruler": "Uthman Dey",
+      "catalogue_id": "hafsid",
+      "note": "Ottoman since 1574; deys rule from 1591."
+    },
+    {
+      "id": "tripoli",
+      "name": "Regency of Tripoli",
+      "rank": "minor",
+      "capital": {
+        "name": "Tripoli",
+        "at": [
+          13.18,
+          32.89
+        ]
+      },
+      "overlord": "ottomans",
+      "ruler": "Ottoman beylerbey",
+      "catalogue_id": "tripoli_regency"
+    },
+    {
+      "id": "hejaz",
+      "name": "Sharifate of Mecca",
+      "rank": "minor",
+      "capital": {
+        "name": "Mecca",
+        "at": [
+          39.83,
+          21.42
+        ]
+      },
+      "overlord": "ottomans",
+      "ruler": "Sharif Hasan ibn Abi Numayy",
+      "catalogue_id": "mecca"
+    },
+    {
+      "id": "yemen",
+      "name": "Zaydi Imamate of Yemen",
+      "rank": "minor",
+      "capital": {
+        "name": "Shahara",
+        "at": [
+          43.7,
+          16.18
+        ]
+      },
+      "overlord": null,
+      "ruler": "Imam al-Mansur al-Qasim",
+      "catalogue_id": "zaydi_imamate",
+      "note": "Revolt against Ottoman Yemen since 1597."
+    },
+    {
+      "id": "oman",
+      "name": "Oman (Nabhani imamate interior)",
+      "rank": "minor",
+      "capital": {
+        "name": "Bahla",
+        "at": [
+          57.3,
+          22.97
+        ]
+      },
+      "overlord": null,
+      "ruler": "Nabhani maliks (fragmented)",
+      "catalogue_id": "oman_nabhani",
+      "note": "Coast (Muscat) held by Portugal."
+    },
+    {
+      "id": "hormuz",
+      "name": "Kingdom of Hormuz",
+      "rank": "minor",
+      "capital": {
+        "name": "Hormuz",
+        "at": [
+          56.46,
+          27.1
+        ]
+      },
+      "overlord": "portugal",
+      "ruler": "King Firuz Shah (under Portuguese captain)",
+      "catalogue_id": "hormuz",
+      "note": "Portuguese vassal since 1515."
+    },
+    {
+      "id": "persia",
+      "name": "Safavid Iran",
+      "rank": "great_power",
+      "capital": {
+        "name": "Isfahan",
+        "at": [
+          51.67,
+          32.65
+        ]
+      },
+      "overlord": null,
+      "ruler": "Shah Abbas I",
+      "catalogue_id": "safaviyya",
+      "note": "Capital moved to Isfahan 1598; Herat and Mashhad retaken 1598; Tabriz still Ottoman."
+    },
+    {
+      "id": "kartli",
+      "name": "Kingdom of Kartli",
+      "rank": "minor",
+      "capital": {
+        "name": "Gori",
+        "at": [
+          44.11,
+          41.98
+        ]
+      },
+      "overlord": null,
+      "ruler": "George X (Simon I captured by the Ottomans, 1599)",
+      "catalogue_id": "georgia"
+    },
+    {
+      "id": "kakheti",
+      "name": "Kingdom of Kakheti",
+      "rank": "minor",
+      "capital": {
+        "name": "Gremi",
+        "at": [
+          45.67,
+          42.0
+        ]
+      },
+      "overlord": null,
+      "ruler": "Alexander II",
+      "catalogue_id": "georgia"
+    },
+    {
+      "id": "imereti",
+      "name": "Kingdom of Imereti",
+      "rank": "minor",
+      "capital": {
+        "name": "Kutaisi",
+        "at": [
+          42.7,
+          42.27
+        ]
+      },
+      "overlord": null,
+      "ruler": "Rostom",
+      "catalogue_id": "imereti_odishi"
+    },
+    {
+      "id": "uzbek_khanate",
+      "name": "Khanate of Bukhara",
+      "rank": "minor",
+      "capital": {
+        "name": "Bukhara",
+        "at": [
+          64.42,
+          39.77
+        ]
+      },
+      "overlord": null,
+      "ruler": "Baqi Muhammad (Janid; father Jani Muhammad as nominal khan)",
+      "catalogue_id": "uzbek_khanate",
+      "note": "Shaybanids ended 1598-99 after Abdullah Khan II."
+    },
+    {
+      "id": "khiva",
+      "name": "Khanate of Khwarazm (Khiva)",
+      "rank": "minor",
+      "capital": {
+        "name": "Urgench",
+        "at": [
+          59.15,
+          42.33
+        ]
+      },
+      "overlord": null,
+      "ruler": "Hajim Muhammad Khan",
+      "catalogue_id": "uzbek_khanate",
+      "note": "Arabshahids restored after Bukharan occupation 1593-98."
+    },
+    {
+      "id": "moghulistan",
+      "name": "Yarkent Khanate",
+      "rank": "minor",
+      "capital": {
+        "name": "Yarkand",
+        "at": [
+          77.24,
+          38.42
+        ]
+      },
+      "overlord": null,
+      "ruler": "Muhammad Sultan",
+      "catalogue_id": "moghulistan",
+      "note": "Chagatayid successor of Moghulistan (1514); also holds Kashgar."
+    },
+    {
+      "id": "mughals",
+      "name": "Mughal Empire",
+      "rank": "great_power",
+      "capital": {
+        "name": "Agra",
+        "at": [
+          78.01,
+          27.18
+        ]
+      },
+      "overlord": null,
+      "ruler": "Akbar",
+      "catalogue_id": "delhi",
+      "note": "Akbar campaigning in the Deccan (Asirgarh, Ahmadnagar)."
+    },
+    {
+      "id": "ahmadnagar",
+      "name": "Ahmadnagar Sultanate",
+      "rank": "minor",
+      "capital": {
+        "name": "Ahmadnagar",
+        "at": [
+          74.74,
+          19.09
+        ]
+      },
+      "overlord": null,
+      "ruler": "Bahadur Nizam Shah (Chand Bibi defending)",
+      "catalogue_id": "bahmani",
+      "note": "Under Mughal siege; city falls Aug 1600."
+    },
+    {
+      "id": "khandesh",
+      "name": "Khandesh Sultanate",
+      "rank": "minor",
+      "capital": {
+        "name": "Burhanpur",
+        "at": [
+          76.23,
+          21.31
+        ]
+      },
+      "overlord": null,
+      "ruler": "Bahadur Khan Faruqi",
+      "catalogue_id": "khandesh",
+      "note": "Asirgarh falls to Akbar Jan 1601."
+    },
+    {
+      "id": "bijapur",
+      "name": "Bijapur Sultanate",
+      "rank": "major",
+      "capital": {
+        "name": "Bijapur",
+        "at": [
+          75.71,
+          16.83
+        ]
+      },
+      "overlord": null,
+      "ruler": "Ibrahim Adil Shah II",
+      "catalogue_id": "bahmani",
+      "note": "Adil Shahi successor of the Bahmanis."
+    },
+    {
+      "id": "golconda",
+      "name": "Golconda Sultanate",
+      "rank": "minor",
+      "capital": {
+        "name": "Hyderabad",
+        "at": [
+          78.47,
+          17.37
+        ]
+      },
+      "overlord": null,
+      "ruler": "Muhammad Quli Qutb Shah",
+      "catalogue_id": "bahmani"
+    },
+    {
+      "id": "vijayanagar",
+      "name": "Vijayanagara Empire (Aravidu)",
+      "rank": "minor",
+      "capital": {
+        "name": "Chandragiri",
+        "at": [
+          79.31,
+          13.58
+        ]
+      },
+      "overlord": null,
+      "ruler": "Venkatapati Raya",
+      "catalogue_id": "vijayanagara",
+      "note": "Rump state after Talikota 1565; Hampi abandoned."
+    },
+    {
+      "id": "madurai",
+      "name": "Madurai Nayaks",
+      "rank": "minor",
+      "capital": {
+        "name": "Madurai",
+        "at": [
+          78.12,
+          9.93
+        ]
+      },
+      "overlord": "vijayanagar",
+      "ruler": "Muttu Krishnappa Nayak (?)",
+      "catalogue_id": "vijayanagara_subordinate_chiefs",
+      "note": "Nominal Vijayanagara subordinate."
+    },
+    {
+      "id": "mysore",
+      "name": "Kingdom of Mysore",
+      "rank": "minor",
+      "capital": {
+        "name": "Mysore",
+        "at": [
+          76.64,
+          12.3
+        ]
+      },
+      "overlord": "vijayanagar",
+      "ruler": "Raja Wodeyar I",
+      "catalogue_id": "vijayanagara_subordinate_chiefs"
+    },
+    {
+      "id": "calicut",
+      "name": "Zamorin of Calicut",
+      "rank": "minor",
+      "capital": {
+        "name": "Calicut",
+        "at": [
+          75.78,
+          11.25
+        ]
+      },
+      "overlord": null,
+      "ruler": "Zamorin (Manavikraman line)",
+      "catalogue_id": "calicut",
+      "note": "Allied with the Portuguese against the Kunjali Marakkars (1599-1600)."
+    },
+    {
+      "id": "kandy",
+      "name": "Kingdom of Kandy",
+      "rank": "minor",
+      "capital": {
+        "name": "Kandy",
+        "at": [
+          80.63,
+          7.29
+        ]
+      },
+      "overlord": null,
+      "ruler": "Vimaladharmasuriya I",
+      "catalogue_id": null
+    },
+    {
+      "id": "jaffna",
+      "name": "Jaffna Kingdom",
+      "rank": "minor",
+      "capital": {
+        "name": "Nallur",
+        "at": [
+          80.03,
+          9.67
+        ]
+      },
+      "overlord": "portugal",
+      "ruler": "Ethirimanna Cinkam",
+      "catalogue_id": "jaffna",
+      "note": "Portuguese tributary."
+    },
+    {
+      "id": "mewar",
+      "name": "Mewar",
+      "rank": "minor",
+      "capital": {
+        "name": "Chavand",
+        "at": [
+          73.95,
+          24.25
+        ]
+      },
+      "overlord": null,
+      "ruler": "Amar Singh I",
+      "catalogue_id": "mewar",
+      "note": "Holding out against Akbar."
+    },
+    {
+      "id": "ahom",
+      "name": "Ahom Kingdom",
+      "rank": "minor",
+      "capital": {
+        "name": "Garhgaon",
+        "at": [
+          94.73,
+          26.94
+        ]
+      },
+      "overlord": null,
+      "ruler": "Sukhaamphaa (Khora Raja)",
+      "catalogue_id": "ahom"
+    },
+    {
+      "id": "koch_bihar",
+      "name": "Koch Bihar",
+      "rank": "minor",
+      "capital": {
+        "name": "Cooch Behar",
+        "at": [
+          89.45,
+          26.32
+        ]
+      },
+      "overlord": "mughals",
+      "ruler": "Lakshmi Narayan",
+      "catalogue_id": "kamata",
+      "note": "Allied to and dependent on the Mughals."
+    },
+    {
+      "id": "nepal_malla",
+      "name": "Kantipur (Malla Nepal)",
+      "rank": "minor",
+      "capital": {
+        "name": "Kathmandu",
+        "at": [
+          85.32,
+          27.72
+        ]
+      },
+      "overlord": null,
+      "ruler": "Shivasimha Malla",
+      "catalogue_id": "nepal_malla",
+      "note": "Also holds Lalitpur."
+    },
+    {
+      "id": "tibet",
+      "name": "Phagmodrupa (Ü)",
+      "rank": "minor",
+      "capital": {
+        "name": "Nedong",
+        "at": [
+          91.77,
+          29.24
+        ]
+      },
+      "overlord": null,
+      "ruler": "Phagmodrupa desi (nominal)",
+      "catalogue_id": "phagmodrupa",
+      "note": "Waning; Tsangpa rulers of Shigatse rising."
+    },
+    {
+      "id": "tsangpa",
+      "name": "Tsangpa dynasty",
+      "rank": "minor",
+      "capital": {
+        "name": "Shigatse",
+        "at": [
+          88.88,
+          29.27
+        ]
+      },
+      "overlord": null,
+      "ruler": "Karma Tensung",
+      "catalogue_id": "rinpungpa",
+      "note": "Successor of Rinpungpa in Tsang (1565)."
+    },
+    {
+      "id": "khalkha",
+      "name": "Khalkha Mongols",
+      "rank": "minor",
+      "capital": {
+        "name": "Erdene Zuu",
+        "at": [
+          102.83,
+          47.2
+        ]
+      },
+      "overlord": null,
+      "ruler": "Tüsheet Khan line (Abtai's heirs)",
+      "catalogue_id": "northern_yuan",
+      "note": "Nominally under the Chahar Great Khan."
+    },
+    {
+      "id": "mongols",
+      "name": "Northern Yuan (Chahar)",
+      "rank": "minor",
+      "capital": {
+        "name": "Chahar pastures",
+        "at": [
+          117.0,
+          43.0
+        ]
+      },
+      "overlord": null,
+      "ruler": "Buyan Sechen Khan",
+      "catalogue_id": "northern_yuan"
+    },
+    {
+      "id": "oirat",
+      "name": "Oirat Confederation",
+      "rank": "minor",
+      "capital": {
+        "name": "Dzungaria (nomadic)",
+        "at": [
+          86.0,
+          45.0
+        ]
+      },
+      "overlord": null,
+      "ruler": "Oirat tayishis (no single ruler)",
+      "catalogue_id": "oirat"
+    },
+    {
+      "id": "jurchens",
+      "name": "Jianzhou Jurchens",
+      "rank": "minor",
+      "capital": {
+        "name": "Fe Ala",
+        "at": [
+          124.85,
+          41.66
+        ]
+      },
+      "overlord": "ming",
+      "ruler": "Nurhaci",
+      "catalogue_id": "jianzhou",
+      "note": "Nominal Ming commandery; creating the Manchu script 1599."
+    },
+    {
+      "id": "ming",
+      "name": "Ming dynasty",
+      "rank": "great_power",
+      "capital": {
+        "name": "Beijing",
+        "at": [
+          116.4,
+          39.9
+        ]
+      },
+      "overlord": null,
+      "ruler": "Wanli Emperor",
+      "catalogue_id": "ming",
+      "note": "After the Imjin War (ended 1598) and Bozhou revolt (1599-1600)."
+    },
+    {
+      "id": "korea",
+      "name": "Joseon",
+      "rank": "major",
+      "capital": {
+        "name": "Hanseong (Seoul)",
+        "at": [
+          126.98,
+          37.57
+        ]
+      },
+      "overlord": null,
+      "ruler": "Seonjo",
+      "catalogue_id": "joseon",
+      "note": "Recovering from the Japanese invasions 1592-98."
+    },
+    {
+      "id": "japan",
+      "name": "Japan (Toyotomi regime)",
+      "rank": "major",
+      "capital": {
+        "name": "Osaka",
+        "at": [
+          135.52,
+          34.69
+        ]
+      },
+      "overlord": null,
+      "ruler": "Toyotomi Hideyori (minor) under the Five Elders led by Tokugawa Ieyasu; Emperor Go-Yōzei",
+      "catalogue_id": "japan_imperial_court",
+      "note": "Hideyoshi died Sept 1598; Sekigahara Oct 1600."
+    },
+    {
+      "id": "tokugawa",
+      "name": "Tokugawa domain",
+      "rank": "major",
+      "capital": {
+        "name": "Edo",
+        "at": [
+          139.76,
+          35.68
+        ]
+      },
+      "overlord": "japan",
+      "ruler": "Tokugawa Ieyasu",
+      "catalogue_id": null,
+      "note": "Largest daimyo, holding the Kanto since 1590."
+    },
+    {
+      "id": "ryukyu",
+      "name": "Ryukyu Kingdom",
+      "rank": "minor",
+      "capital": {
+        "name": "Shuri",
+        "at": [
+          127.72,
+          26.22
+        ]
+      },
+      "overlord": null,
+      "ruler": "Shō Nei",
+      "catalogue_id": "ryukyu",
+      "note": "Ming tributary; Satsuma invasion 1609."
+    },
+    {
+      "id": "dai_viet",
+      "name": "Đại Việt (Restored Lê)",
+      "rank": "major",
+      "capital": {
+        "name": "Thăng Long",
+        "at": [
+          105.85,
+          21.03
+        ]
+      },
+      "overlord": null,
+      "ruler": "Lê Kính Tông (lord Trịnh Tùng governs)",
+      "catalogue_id": "dai_viet",
+      "note": "Nguyễn Hoàng governs the south (Thuận Hóa, Quảng Nam) in Lê name."
+    },
+    {
+      "id": "mac",
+      "name": "Mạc remnant (Cao Bằng)",
+      "rank": "minor",
+      "capital": {
+        "name": "Cao Bằng",
+        "at": [
+          106.25,
+          22.67
+        ]
+      },
+      "overlord": null,
+      "ruler": "Mạc Kính Cung",
+      "catalogue_id": "dai_viet",
+      "note": "Under Ming protection after losing Thăng Long 1592."
+    },
+    {
+      "id": "champa",
+      "name": "Champa (Panduranga)",
+      "rank": "minor",
+      "capital": {
+        "name": "Phan Rang",
+        "at": [
+          108.99,
+          11.56
+        ]
+      },
+      "overlord": null,
+      "ruler": "Po At (?)",
+      "catalogue_id": "champa"
+    },
+    {
+      "id": "khmer",
+      "name": "Cambodia",
+      "rank": "minor",
+      "capital": {
+        "name": "Srei Santhor",
+        "at": [
+          105.1,
+          11.75
+        ]
+      },
+      "overlord": null,
+      "ruler": "Kaev Hua I / Barom Reachea (contested)",
+      "catalogue_id": "cambodia",
+      "note": "Lovek sacked by Ayutthaya 1594; Spanish-Portuguese adventurers killed 1599."
+    },
+    {
+      "id": "lan_xang",
+      "name": "Lan Xang",
+      "rank": "minor",
+      "capital": {
+        "name": "Vientiane",
+        "at": [
+          102.6,
+          17.97
+        ]
+      },
+      "overlord": null,
+      "ruler": "Voravongsa II",
+      "catalogue_id": "lan_xang"
+    },
+    {
+      "id": "lan_na",
+      "name": "Lan Na",
+      "rank": "minor",
+      "capital": {
+        "name": "Chiang Mai",
+        "at": [
+          98.99,
+          18.79
+        ]
+      },
+      "overlord": "ava",
+      "ruler": "Nawrahta Minsaw",
+      "catalogue_id": "lan_na",
+      "note": "Burmese-installed prince; drifting to Ayutthaya (1602)."
+    },
+    {
+      "id": "ayutthaya",
+      "name": "Ayutthaya",
+      "rank": "major",
+      "capital": {
+        "name": "Ayutthaya",
+        "at": [
+          100.57,
+          14.35
+        ]
+      },
+      "overlord": null,
+      "ruler": "Naresuan",
+      "catalogue_id": "ayutthaya",
+      "note": "Independent from Burma since 1584; invading Lower Burma 1600."
+    },
+    {
+      "id": "ava",
+      "name": "Ava (Restored Toungoo)",
+      "rank": "minor",
+      "capital": {
+        "name": "Ava",
+        "at": [
+          95.98,
+          21.86
+        ]
+      },
+      "overlord": null,
+      "ruler": "Nyaungyan Min",
+      "catalogue_id": "ava",
+      "note": "Upper Burma after Toungoo collapse."
+    },
+    {
+      "id": "toungoo",
+      "name": "Toungoo",
+      "rank": "minor",
+      "capital": {
+        "name": "Toungoo",
+        "at": [
+          96.43,
+          18.94
+        ]
+      },
+      "overlord": null,
+      "ruler": "Minye Thihathu II",
+      "catalogue_id": "toungoo",
+      "note": "With Arakan took Pegu Dec 1599; Nanda Bayin killed."
+    },
+    {
+      "id": "mrauk_u",
+      "name": "Arakan (Mrauk U)",
+      "rank": "minor",
+      "capital": {
+        "name": "Mrauk U",
+        "at": [
+          93.19,
+          20.59
+        ]
+      },
+      "overlord": null,
+      "ruler": "Min Razagyi",
+      "catalogue_id": "mrauk_u",
+      "note": "Holds Syriam (Thanlyin) after sacking Pegu."
+    },
+    {
+      "id": "aceh",
+      "name": "Aceh Sultanate",
+      "rank": "minor",
+      "capital": {
+        "name": "Banda Aceh",
+        "at": [
+          95.32,
+          5.55
+        ]
+      },
+      "overlord": null,
+      "ruler": "Alauddin Riayat Shah Sayyid al-Mukammal",
+      "catalogue_id": "samudra_pasai"
+    },
+    {
+      "id": "johor",
+      "name": "Johor Sultanate",
+      "rank": "minor",
+      "capital": {
+        "name": "Batu Sawar",
+        "at": [
+          103.88,
+          1.73
+        ]
+      },
+      "overlord": null,
+      "ruler": "Alauddin Riayat Shah III",
+      "catalogue_id": "malacca",
+      "note": "Successor of Malacca sultanate (1528)."
+    },
+    {
+      "id": "banten",
+      "name": "Banten Sultanate",
+      "rank": "minor",
+      "capital": {
+        "name": "Banten",
+        "at": [
+          106.15,
+          -6.04
+        ]
+      },
+      "overlord": null,
+      "ruler": "Abu al-Mafakhir (child; regency)",
+      "catalogue_id": "sunda"
+    },
+    {
+      "id": "mataram",
+      "name": "Mataram Sultanate",
+      "rank": "minor",
+      "capital": {
+        "name": "Kotagede",
+        "at": [
+          110.4,
+          -7.83
+        ]
+      },
+      "overlord": null,
+      "ruler": "Panembahan Senopati",
+      "catalogue_id": null,
+      "note": "Founded c.1586."
+    },
+    {
+      "id": "surabaya",
+      "name": "Surabaya",
+      "rank": "minor",
+      "capital": {
+        "name": "Surabaya",
+        "at": [
+          112.75,
+          -7.25
+        ]
+      },
+      "overlord": null,
+      "ruler": "Pangeran of Surabaya (name uncertain)",
+      "catalogue_id": null,
+      "note": "Leading East Javanese coastal power."
+    },
+    {
+      "id": "brunei",
+      "name": "Brunei Sultanate",
+      "rank": "minor",
+      "capital": {
+        "name": "Brunei",
+        "at": [
+          114.94,
+          4.89
+        ]
+      },
+      "overlord": null,
+      "ruler": "Abdul Jalilul Akbar",
+      "catalogue_id": "brunei"
+    },
+    {
+      "id": "gowa",
+      "name": "Gowa (Makassar)",
+      "rank": "minor",
+      "capital": {
+        "name": "Somba Opu",
+        "at": [
+          119.41,
+          -5.19
+        ]
+      },
+      "overlord": null,
+      "ruler": "I Mangarangi (Sultan Alauddin from 1605)",
+      "catalogue_id": "gowa"
+    },
+    {
+      "id": "ternate",
+      "name": "Ternate Sultanate",
+      "rank": "minor",
+      "capital": {
+        "name": "Ternate",
+        "at": [
+          127.38,
+          0.79
+        ]
+      },
+      "overlord": null,
+      "ruler": "Said Barakat",
+      "catalogue_id": "ternate",
+      "note": "Expelled the Portuguese 1575."
+    },
+    {
+      "id": "tidore",
+      "name": "Tidore Sultanate",
+      "rank": "minor",
+      "capital": {
+        "name": "Tidore",
+        "at": [
+          127.4,
+          0.68
+        ]
+      },
+      "overlord": null,
+      "ruler": "Sultan Gapi Baguna (?)",
+      "catalogue_id": "tidore",
+      "note": "Portuguese fort since 1578."
+    },
+    {
+      "id": "morocco",
+      "name": "Saadi Sultanate of Morocco",
+      "rank": "major",
+      "capital": {
+        "name": "Marrakesh",
+        "at": [
+          -7.99,
+          31.63
+        ]
+      },
+      "overlord": null,
+      "ruler": "Ahmad al-Mansur",
+      "catalogue_id": "morocco",
+      "note": "Conquered Songhay 1591; Pashalik of Timbuktu."
+    },
+    {
+      "id": "songhai",
+      "name": "Songhay of Dendi",
+      "rank": "minor",
+      "capital": {
+        "name": "Lulami",
+        "at": [
+          3.5,
+          12.6
+        ]
+      },
+      "overlord": null,
+      "ruler": "Askia Harun (?)",
+      "catalogue_id": "songhai",
+      "note": "Rump state after Tondibi 1591."
+    },
+    {
+      "id": "mali",
+      "name": "Mali (rump)",
+      "rank": "minor",
+      "capital": {
+        "name": "Niani",
+        "at": [
+          -8.4,
+          11.37
+        ]
+      },
+      "overlord": null,
+      "ruler": "Mansa Mahmud IV",
+      "catalogue_id": "mali",
+      "note": "Failed attack on Djenné 1599."
+    },
+    {
+      "id": "kano",
+      "name": "Kano Sultanate",
+      "rank": "minor",
+      "capital": {
+        "name": "Kano",
+        "at": [
+          8.52,
+          12.0
+        ]
+      },
+      "overlord": null,
+      "ruler": "Muhammad Zaki",
+      "catalogue_id": "kano"
+    },
+    {
+      "id": "kanem_bornu",
+      "name": "Bornu Sultanate",
+      "rank": "major",
+      "capital": {
+        "name": "Ngazargamu",
+        "at": [
+          12.3,
+          13.0
+        ]
+      },
+      "overlord": null,
+      "ruler": "Mai Idris Alooma or successor (chronology disputed)",
+      "catalogue_id": "bornu",
+      "note": "Holds Kanem after Alooma's campaigns."
+    },
+    {
+      "id": "oyo",
+      "name": "Oyo",
+      "rank": "minor",
+      "capital": {
+        "name": "Oyo-Ile",
+        "at": [
+          4.2,
+          8.95
+        ]
+      },
+      "overlord": null,
+      "ruler": "Alaafin (name uncertain)",
+      "catalogue_id": "oyo"
+    },
+    {
+      "id": "benin",
+      "name": "Kingdom of Benin",
+      "rank": "minor",
+      "capital": {
+        "name": "Benin City",
+        "at": [
+          5.62,
+          6.34
+        ]
+      },
+      "overlord": null,
+      "ruler": "Oba Ehengbuda",
+      "catalogue_id": "benin"
+    },
+    {
+      "id": "kongo",
+      "name": "Kingdom of Kongo",
+      "rank": "minor",
+      "capital": {
+        "name": "São Salvador (Mbanza Kongo)",
+        "at": [
+          14.25,
+          -6.27
+        ]
+      },
+      "overlord": null,
+      "ruler": "Álvaro II",
+      "catalogue_id": "kongo",
+      "note": "Christian kingdom; diocese 1596."
+    },
+    {
+      "id": "ndongo",
+      "name": "Kingdom of Ndongo",
+      "rank": "minor",
+      "capital": {
+        "name": "Kabasa",
+        "at": [
+          15.1,
+          -9.3
+        ]
+      },
+      "overlord": null,
+      "ruler": "Mbandi Ngola Kiluanji",
+      "catalogue_id": "mbundu_chiefdoms",
+      "note": "At war with Portuguese Angola (Luanda 1575)."
+    },
+    {
+      "id": "ethiopia",
+      "name": "Ethiopian Empire",
+      "rank": "major",
+      "capital": {
+        "name": "Mobile court (Dembiya)",
+        "at": [
+          37.4,
+          12.3
+        ]
+      },
+      "overlord": null,
+      "ruler": "Yaqob (minor)",
+      "catalogue_id": "ethiopia",
+      "note": "Oromo migrations; Ottoman Habesh on the coast."
+    },
+    {
+      "id": "adal",
+      "name": "Imamate of Aussa (Adal)",
+      "rank": "minor",
+      "capital": {
+        "name": "Aussa",
+        "at": [
+          41.4,
+          11.5
+        ]
+      },
+      "overlord": null,
+      "ruler": "Imam of Aussa (name uncertain)",
+      "catalogue_id": "adal",
+      "note": "Adal capital moved from Harar 1577."
+    },
+    {
+      "id": "funj",
+      "name": "Funj Sultanate of Sennar",
+      "rank": "minor",
+      "capital": {
+        "name": "Sennar",
+        "at": [
+          33.63,
+          13.55
+        ]
+      },
+      "overlord": null,
+      "ruler": "Abd al-Qadir II (?)",
+      "catalogue_id": null,
+      "note": "Founded 1504."
+    },
+    {
+      "id": "mogadishu",
+      "name": "Mogadishu",
+      "rank": "minor",
+      "capital": {
+        "name": "Mogadishu",
+        "at": [
+          45.34,
+          2.05
+        ]
+      },
+      "overlord": null,
+      "ruler": "Muzaffar sultans (fading Ajuran)",
+      "catalogue_id": "mogadishu"
+    },
+    {
+      "id": "kilwa",
+      "name": "Kilwa Sultanate",
+      "rank": "minor",
+      "capital": {
+        "name": "Kilwa",
+        "at": [
+          39.51,
+          -8.96
+        ]
+      },
+      "overlord": "portugal",
+      "ruler": "Sultan (name uncertain)",
+      "catalogue_id": "kilwa",
+      "note": "Sacked by the Zimba 1587; Portuguese-dominated coast."
+    },
+    {
+      "id": "mutapa",
+      "name": "Mutapa",
+      "rank": "minor",
+      "capital": {
+        "name": "Masapa",
+        "at": [
+          31.3,
+          -16.4
+        ]
+      },
+      "overlord": null,
+      "ruler": "Gatsi Rusere",
+      "catalogue_id": "mutapa"
+    },
+    {
+      "id": "torwa",
+      "name": "Butua (Torwa)",
+      "rank": "minor",
+      "capital": {
+        "name": "Khami",
+        "at": [
+          28.4,
+          -20.15
+        ]
+      },
+      "overlord": null,
+      "ruler": "Torwa mambo (name uncertain)",
+      "catalogue_id": "torwa"
+    },
+    {
+      "id": "mapuche",
+      "name": "Mapuche (Araucanía)",
+      "rank": "minor",
+      "capital": {
+        "name": "Araucanía (no capital)",
+        "at": [
+          -72.6,
+          -38.7
+        ]
+      },
+      "overlord": null,
+      "ruler": "Toqui Pelantaro",
+      "catalogue_id": "mapuche",
+      "note": "Destroying the Spanish towns south of the Biobío after Curalaba 1598."
+    },
+    {
+      "id": "itza",
+      "name": "Itza kingdom",
+      "rank": "minor",
+      "capital": {
+        "name": "Nojpetén",
+        "at": [
+          -89.89,
+          16.93
+        ]
+      },
+      "overlord": null,
+      "ruler": "Ajaw Kan Ek'",
+      "catalogue_id": "itza",
+      "note": "Independent until 1697."
+    },
+    {
+      "id": "powhatan",
+      "name": "Powhatan Paramount Chiefdom",
+      "rank": "minor",
+      "capital": {
+        "name": "Werowocomoco",
+        "at": [
+          -76.65,
+          37.41
+        ]
+      },
+      "overlord": null,
+      "ruler": "Wahunsenacawh",
+      "catalogue_id": "powhatan_precursors"
+    },
+    {
+      "id": "iroquois",
+      "name": "Haudenosaunee Confederacy",
+      "rank": "minor",
+      "capital": {
+        "name": "Onondaga",
+        "at": [
+          -76.1,
+          42.95
+        ]
+      },
+      "overlord": null,
+      "ruler": "Grand Council",
+      "catalogue_id": "haudenosaunee"
+    },
+    {
+      "id": "huron",
+      "name": "Wendat Confederacy",
+      "rank": "minor",
+      "capital": {
+        "name": "Wendake (Huronia)",
+        "at": [
+          -79.9,
+          44.6
+        ]
+      },
+      "overlord": null,
+      "ruler": "Council of the Wendat nations",
+      "catalogue_id": "wendat"
+    },
+    {
+      "id": "luneburg",
+      "name": "Duchy of Brunswick-Lüneburg (Celle)",
+      "rank": "minor",
+      "capital": {
+        "name": "Celle",
+        "at": [
+          10.08,
+          52.62
+        ]
+      },
+      "overlord": null,
+      "ruler": "Ernest II",
+      "catalogue_id": "luneburg",
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    },
+    {
+      "id": "marwar",
+      "name": "Kingdom of Marwar",
+      "rank": "minor",
+      "capital": {
+        "name": "Jodhpur",
+        "at": [
+          73.02,
+          26.29
+        ]
+      },
+      "overlord": "mughals",
+      "ruler": "Sur Singh",
+      "catalogue_id": "marwar",
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    },
+    {
+      "id": "mecklenburg",
+      "name": "Duchy of Mecklenburg",
+      "rank": "minor",
+      "capital": {
+        "name": "Schwerin",
+        "at": [
+          11.41,
+          53.63
+        ]
+      },
+      "overlord": null,
+      "ruler": "Ulrich (Güstrow); Adolf Frederick I and John Albert II minors in Schwerin",
+      "catalogue_id": "mecklenburg",
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    },
+    {
+      "id": "navarre",
+      "name": "Kingdom of Navarre (Lower Navarre and Béarn)",
+      "rank": "minor",
+      "capital": {
+        "name": "Pau",
+        "at": [
+          -0.37,
+          43.3
+        ]
+      },
+      "overlord": "france",
+      "ruler": "Henry IV of France",
+      "catalogue_id": "navarre",
+      "note": "Still standing; carried forward when realm ids were harmonised. Personal union with France; merged 1620."
+    },
+    {
+      "id": "ireland",
+      "name": "Kingdom of Ireland",
+      "rank": "minor",
+      "capital": {
+        "name": "Dublin",
+        "at": [
+          -6.26,
+          53.35
+        ]
+      },
+      "overlord": "england",
+      "ruler": "Elizabeth I",
+      "catalogue_id": null,
+      "note": "Still standing; carried forward when realm ids were harmonised. Kingdom since 1542 under the English crown; Gaelic lords under Tyrone in revolt (Nine Years' War)."
+    },
+    {
+      "id": "lucca",
+      "name": "Republic of Lucca",
+      "rank": "minor",
+      "capital": {
+        "name": "Lucca",
+        "at": [
+          10.5,
+          43.84
+        ]
+      },
+      "overlord": null,
+      "ruler": "Republic (Anziani)",
+      "catalogue_id": "lucca",
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    },
+    {
+      "id": "ajuran",
+      "name": "Ajuran",
+      "rank": "minor",
+      "capital": {
+        "name": "Merca",
+        "at": [
+          44.77,
+          1.71
+        ]
+      },
+      "overlord": null,
+      "ruler": "Garen ruler (name uncertain)",
+      "catalogue_id": "ajuran",
+      "note": "Still standing; carried forward when realm ids were harmonised. In decline."
+    },
+    {
+      "id": "mossi",
+      "name": "Mossi kingdoms",
+      "rank": "minor",
+      "capital": {
+        "name": "Ouagadougou",
+        "at": [
+          -1.53,
+          12.37
+        ]
+      },
+      "overlord": null,
+      "ruler": "Mogho Naba (name uncertain)",
+      "catalogue_id": null,
+      "note": "Still standing; carried forward when realm ids were harmonised."
+    }
+  ],
+  "great_powers": [
+    "castile",
+    "ottomans",
+    "persia",
+    "mughals",
+    "ming"
+  ],
+  "key_places": {
+    "london": {
+      "holder": "england",
+      "confidence": "high"
+    },
+    "calais": {
+      "holder": "france",
+      "confidence": "high",
+      "note": "French since 1558."
+    },
+    "bordeaux": {
+      "holder": "france",
+      "confidence": "high"
+    },
+    "paris": {
+      "holder": "france",
+      "confidence": "high"
+    },
+    "rouen": {
+      "holder": "france",
+      "confidence": "high"
+    },
+    "nantes": {
+      "holder": "france",
+      "confidence": "high",
+      "note": "Mercoeur submitted 1598."
+    },
+    "dijon": {
+      "holder": "france",
+      "confidence": "high"
+    },
+    "marseille": {
+      "holder": "france",
+      "confidence": "high",
+      "note": "Submitted to Henri IV 1596."
+    },
+    "edinburgh": {
+      "holder": "scotland",
+      "confidence": "high"
+    },
+    "dublin": {
+      "holder": "england",
+      "confidence": "high",
+      "note": "Kingdom of Ireland under the English crown (Lord Deputy); Nine Years' War."
+    },
+    "bruges": {
+      "holder": "burgundy",
+      "confidence": "high"
+    },
+    "amsterdam": {
+      "holder": "netherlands",
+      "confidence": "high"
+    },
+    "brussels": {
+      "holder": "burgundy",
+      "confidence": "high"
+    },
+    "lisbon": {
+      "holder": "portugal",
+      "confidence": "high",
+      "note": "Iberian Union under Philip III."
+    },
+    "toledo": {
+      "holder": "castile",
+      "confidence": "high"
+    },
+    "barcelona": {
+      "holder": "aragon",
+      "confidence": "high",
+      "note": "Crown of Aragon under the Spanish king."
+    },
+    "granada": {
+      "holder": "castile",
+      "confidence": "high"
+    },
+    "ceuta": {
+      "holder": "portugal",
+      "confidence": "high",
+      "note": "Portuguese; stays with Spain after 1640."
+    },
+    "fez": {
+      "holder": "morocco",
+      "confidence": "high"
+    },
+    "tunis": {
+      "holder": "tunis",
+      "confidence": "high",
+      "note": "Ottoman regency."
+    },
+    "algiers": {
+      "holder": "algiers",
+      "confidence": "high",
+      "note": "Ottoman regency."
+    },
+    "milan": {
+      "holder": "milan",
+      "confidence": "high",
+      "note": "Spanish-ruled duchy."
+    },
+    "venice": {
+      "holder": "venice",
+      "confidence": "high"
+    },
+    "genoa": {
+      "holder": "genoa",
+      "confidence": "high"
+    },
+    "florence": {
+      "holder": "florence",
+      "confidence": "high"
+    },
+    "pisa": {
+      "holder": "florence",
+      "confidence": "high"
+    },
+    "rome": {
+      "holder": "papal_states",
+      "confidence": "high"
+    },
+    "naples": {
+      "holder": "naples",
+      "confidence": "high"
+    },
+    "palermo": {
+      "holder": "sicily",
+      "confidence": "high"
+    },
+    "vienna": {
+      "holder": "austria",
+      "confidence": "high"
+    },
+    "prague": {
+      "holder": "bohemia",
+      "confidence": "high",
+      "note": "Rudolf II's residence."
+    },
+    "munich": {
+      "holder": "bavaria",
+      "confidence": "high"
+    },
+    "berlin": {
+      "holder": "brandenburg",
+      "confidence": "high"
+    },
+    "dresden": {
+      "holder": "saxony",
+      "confidence": "high"
+    },
+    "cologne": {
+      "holder": "cologne_city",
+      "confidence": "high",
+      "note": "Free imperial city."
+    },
+    "lubeck": {
+      "holder": "lubeck",
+      "confidence": "high"
+    },
+    "bern": {
+      "holder": "switzerland",
+      "confidence": "high",
+      "note": "Canton of Bern."
+    },
+    "copenhagen": {
+      "holder": "denmark",
+      "confidence": "high"
+    },
+    "stockholm": {
+      "holder": "sweden",
+      "confidence": "high"
+    },
+    "oslo": {
+      "holder": "denmark",
+      "confidence": "high",
+      "note": "Norway governed from Copenhagen."
+    },
+    "visby": {
+      "holder": "denmark",
+      "confidence": "high",
+      "note": "Gotland Danish until 1645."
+    },
+    "konigsberg": {
+      "holder": "ducal_prussia",
+      "confidence": "high"
+    },
+    "riga": {
+      "holder": "poland",
+      "confidence": "medium",
+      "note": "Duchy of Livonia, held jointly by Poland and Lithuania; Swedish attack 1600-01."
+    },
+    "krakow": {
+      "holder": "poland",
+      "confidence": "high"
+    },
+    "vilnius": {
+      "holder": "lithuania",
+      "confidence": "high"
+    },
+    "kyiv": {
+      "holder": "poland",
+      "confidence": "high",
+      "note": "Transferred to the Crown of Poland 1569."
+    },
+    "novgorod": {
+      "holder": "muscovy",
+      "confidence": "high"
+    },
+    "moscow": {
+      "holder": "muscovy",
+      "confidence": "high"
+    },
+    "kazan": {
+      "holder": "muscovy",
+      "confidence": "high"
+    },
+    "astrakhan": {
+      "holder": "muscovy",
+      "confidence": "high"
+    },
+    "sarai": {
+      "holder": "muscovy",
+      "confidence": "low",
+      "note": "Lower Volga steppe: Russian forts (Tsaritsyn 1589) but Nogai pastures."
+    },
+    "caffa": {
+      "holder": "ottomans",
+      "confidence": "high"
+    },
+    "buda": {
+      "holder": "ottomans",
+      "confidence": "high",
+      "note": "Budin eyalet; under Habsburg siege attempts in the Long Turkish War."
+    },
+    "belgrade": {
+      "holder": "ottomans",
+      "confidence": "high"
+    },
+    "sofia": {
+      "holder": "ottomans",
+      "confidence": "high"
+    },
+    "tarnovo": {
+      "holder": "ottomans",
+      "confidence": "high"
+    },
+    "bucharest": {
+      "holder": "wallachia",
+      "confidence": "high"
+    },
+    "suceava": {
+      "holder": "moldavia",
+      "confidence": "high"
+    },
+    "athens": {
+      "holder": "ottomans",
+      "confidence": "high"
+    },
+    "thessaloniki": {
+      "holder": "ottomans",
+      "confidence": "high"
+    },
+    "edirne": {
+      "holder": "ottomans",
+      "confidence": "high"
+    },
+    "constantinople": {
+      "holder": "ottomans",
+      "confidence": "high"
+    },
+    "bursa": {
+      "holder": "ottomans",
+      "confidence": "high"
+    },
+    "konya": {
+      "holder": "ottomans",
+      "confidence": "high"
+    },
+    "trebizond": {
+      "holder": "ottomans",
+      "confidence": "high"
+    },
+    "rhodes": {
+      "holder": "ottomans",
+      "confidence": "high"
+    },
+    "nicosia": {
+      "holder": "ottomans",
+      "confidence": "high",
+      "note": "Ottoman since 1570."
+    },
+    "tbilisi": {
+      "holder": "ottomans",
+      "confidence": "low",
+      "note": "Ottoman garrison since 1578; Kartli princes contest the area."
+    },
+    "tabriz": {
+      "holder": "ottomans",
+      "confidence": "high",
+      "note": "Ottoman 1585-1603."
+    },
+    "baghdad": {
+      "holder": "ottomans",
+      "confidence": "high"
+    },
+    "damascus": {
+      "holder": "ottomans",
+      "confidence": "high"
+    },
+    "jerusalem": {
+      "holder": "ottomans",
+      "confidence": "high"
+    },
+    "cairo": {
+      "holder": "ottomans",
+      "confidence": "high"
+    },
+    "mecca": {
+      "holder": "hejaz",
+      "confidence": "high",
+      "note": "Sharifate under Ottoman suzerainty."
+    },
+    "aden": {
+      "holder": "ottomans",
+      "confidence": "medium",
+      "note": "Ottoman Yemen; Zaydi revolt inland."
+    },
+    "hormuz": {
+      "holder": "hormuz",
+      "confidence": "high",
+      "note": "Portuguese vassal kingdom."
+    },
+    "shiraz": {
+      "holder": "persia",
+      "confidence": "high"
+    },
+    "isfahan": {
+      "holder": "persia",
+      "confidence": "high"
+    },
+    "herat": {
+      "holder": "persia",
+      "confidence": "high",
+      "note": "Retaken from the Uzbeks 1598."
+    },
+    "samarkand": {
+      "holder": "uzbek_khanate",
+      "confidence": "high"
+    },
+    "urgench": {
+      "holder": "khiva",
+      "confidence": "medium"
+    },
+    "kabul": {
+      "holder": "mughals",
+      "confidence": "high"
+    },
+    "kashgar": {
+      "holder": "moghulistan",
+      "confidence": "high"
+    },
+    "lahore": {
+      "holder": "mughals",
+      "confidence": "high"
+    },
+    "delhi": {
+      "holder": "mughals",
+      "confidence": "high"
+    },
+    "jaunpur": {
+      "holder": "mughals",
+      "confidence": "high"
+    },
+    "gaur": {
+      "holder": "mughals",
+      "confidence": "medium",
+      "note": "Bengal Subah; Bara-Bhuyan chiefs resist in the east."
+    },
+    "ahmedabad": {
+      "holder": "mughals",
+      "confidence": "high"
+    },
+    "mandu": {
+      "holder": "mughals",
+      "confidence": "high"
+    },
+    "gulbarga": {
+      "holder": "bijapur",
+      "confidence": "medium"
+    },
+    "vijayanagara": {
+      "holder": "bijapur",
+      "confidence": "low",
+      "note": "Hampi ruined after 1565; local nayaks between Bijapur and the Aravidu rump."
+    },
+    "calicut": {
+      "holder": "calicut",
+      "confidence": "high"
+    },
+    "colombo": {
+      "holder": "portugal",
+      "confidence": "high",
+      "note": "Portuguese since Dharmapala's bequest (1597)."
+    },
+    "kathmandu": {
+      "holder": "nepal_malla",
+      "confidence": "high"
+    },
+    "lhasa": {
+      "holder": "tibet",
+      "confidence": "low",
+      "note": "Ü under fading Phagmodrupa; Tsangpa expanding."
+    },
+    "karakorum": {
+      "holder": "khalkha",
+      "confidence": "medium"
+    },
+    "beijing": {
+      "holder": "ming",
+      "confidence": "high"
+    },
+    "nanjing": {
+      "holder": "ming",
+      "confidence": "high"
+    },
+    "guangzhou": {
+      "holder": "ming",
+      "confidence": "high"
+    },
+    "kunming": {
+      "holder": "ming",
+      "confidence": "high"
+    },
+    "shenyang": {
+      "holder": "ming",
+      "confidence": "high"
+    },
+    "seoul": {
+      "holder": "korea",
+      "confidence": "high"
+    },
+    "kyoto": {
+      "holder": "japan",
+      "confidence": "high"
+    },
+    "kamakura": {
+      "holder": "tokugawa",
+      "confidence": "high"
+    },
+    "hakata": {
+      "holder": "japan",
+      "confidence": "low",
+      "note": "Chikuzen: Kobayakawa Hideaki's restored fief or Toyotomi direct land."
+    },
+    "shuri": {
+      "holder": "ryukyu",
+      "confidence": "high"
+    },
+    "hanoi": {
+      "holder": "dai_viet",
+      "confidence": "high"
+    },
+    "vijaya": {
+      "holder": "dai_viet",
+      "confidence": "medium",
+      "note": "Quảng Nam, governed by the Nguyễn in the Lê name."
+    },
+    "angkor": {
+      "holder": "khmer",
+      "confidence": "low",
+      "note": "Cambodian, under Ayutthaya pressure."
+    },
+    "ayutthaya": {
+      "holder": "ayutthaya",
+      "confidence": "high"
+    },
+    "pegu": {
+      "holder": "toungoo",
+      "confidence": "low",
+      "note": "Sacked Dec 1599 by Toungoo and Arakan; largely abandoned."
+    },
+    "ava": {
+      "holder": "ava",
+      "confidence": "high"
+    },
+    "malacca": {
+      "holder": "portugal",
+      "confidence": "high"
+    },
+    "trowulan": {
+      "holder": "surabaya",
+      "confidence": "low",
+      "note": "East Java between Surabaya and other princes; Mataram not yet there."
+    },
+    "manila": {
+      "holder": "castile",
+      "confidence": "high",
+      "note": "Philippines under New Spain."
+    },
+    "ternate": {
+      "holder": "ternate",
+      "confidence": "high"
+    },
+    "timbuktu": {
+      "holder": "morocco",
+      "confidence": "high",
+      "note": "Pashalik of Timbuktu."
+    },
+    "gao": {
+      "holder": "morocco",
+      "confidence": "medium",
+      "note": "Moroccan garrison."
+    },
+    "niani": {
+      "holder": "mali",
+      "confidence": "low"
+    },
+    "kano": {
+      "holder": "kano",
+      "confidence": "high"
+    },
+    "kanem": {
+      "holder": "kanem_bornu",
+      "confidence": "medium"
+    },
+    "benin_city": {
+      "holder": "benin",
+      "confidence": "high"
+    },
+    "mbanza_kongo": {
+      "holder": "kongo",
+      "confidence": "high"
+    },
+    "great_zimbabwe": {
+      "holder": "torwa",
+      "confidence": "low",
+      "note": "Abandoned site; Karanga chiefdoms between Torwa and Mutapa."
+    },
+    "kilwa": {
+      "holder": "kilwa",
+      "confidence": "low",
+      "note": "Under Portuguese domination."
+    },
+    "mogadishu": {
+      "holder": "mogadishu",
+      "confidence": "medium"
+    },
+    "zeila": {
+      "holder": "ottomans",
+      "confidence": "low",
+      "note": "Dependent on Ottoman Mocha/Habesh."
+    },
+    "gondar": {
+      "holder": "ethiopia",
+      "confidence": "high"
+    },
+    "cape": {
+      "holder": null,
+      "confidence": "high",
+      "note": "Khoikhoi herders; no state."
+    },
+    "tenochtitlan": {
+      "holder": "castile",
+      "confidence": "high",
+      "note": "Mexico City, New Spain."
+    },
+    "azcapotzalco": {
+      "holder": "castile",
+      "confidence": "high"
+    },
+    "tzintzuntzan": {
+      "holder": "castile",
+      "confidence": "high"
+    },
+    "mayapan": {
+      "holder": "castile",
+      "confidence": "high",
+      "note": "Yucatán."
+    },
+    "havana": {
+      "holder": "castile",
+      "confidence": "high"
+    },
+    "santo_domingo": {
+      "holder": "castile",
+      "confidence": "high"
+    },
+    "cusco": {
+      "holder": "castile",
+      "confidence": "high",
+      "note": "Viceroyalty of Peru."
+    },
+    "chan_chan": {
+      "holder": "castile",
+      "confidence": "high",
+      "note": "Trujillo."
+    },
+    "quito": {
+      "holder": "castile",
+      "confidence": "high"
+    },
+    "bogota": {
+      "holder": "castile",
+      "confidence": "high",
+      "note": "New Granada."
+    },
+    "salvador": {
+      "holder": "portugal",
+      "confidence": "high",
+      "note": "Capital of Brazil."
+    },
+    "buenos_aires": {
+      "holder": "castile",
+      "confidence": "high",
+      "note": "Refounded 1580."
+    },
+    "boston": {
+      "holder": null,
+      "confidence": "high",
+      "note": "Massachusett; no European state."
+    },
+    "quebec": {
+      "holder": null,
+      "confidence": "high",
+      "note": "Innu/Montagnais land; Tadoussac post only from mid-1600."
+    },
+    "new_orleans": {
+      "holder": null,
+      "confidence": "high",
+      "note": "Chitimacha and other chiefdoms; no state."
+    },
+    "sydney": {
+      "holder": null,
+      "confidence": "high",
+      "note": "Eora country; no state."
+    },
+    "singapore": {
+      "holder": "johor",
+      "confidence": "medium"
+    }
+  },
+  "since_previous": {
+    "formed": [
+      "netherlands",
+      "parma",
+      "transylvania",
+      "ducal_prussia",
+      "courland",
+      "algiers",
+      "tripoli",
+      "khiva",
+      "mughals",
+      "golconda",
+      "madurai",
+      "koch_bihar",
+      "tsangpa",
+      "khalkha",
+      "tokugawa",
+      "mac",
+      "johor",
+      "banten",
+      "mataram",
+      "surabaya",
+      "ndongo",
+      "funj",
+      "powhatan"
+    ],
+    "ended": [
+      "brittany",
+      "pisa",
+      "siena",
+      "bavaria_landshut",
+      "albertine_saxony",
+      "norway",
+      "teutonic_order",
+      "livonian_order",
+      "pskov",
+      "ryazan",
+      "kazan",
+      "great_horde",
+      "astrakhan",
+      "dughlat_kashgar",
+      "timurids",
+      "timurid_samarkand",
+      "timurid_kabul",
+      "fergana",
+      "dulkadir",
+      "aq_qoyunlu",
+      "shirvan",
+      "mamluks",
+      "delhi",
+      "multan",
+      "sindh",
+      "kashmir",
+      "gujarat",
+      "malwa",
+      "bengal",
+      "orissa",
+      "bahmanis",
+      "berar",
+      "kotte",
+      "rinpungpa",
+      "ouchi",
+      "uesugi",
+      "later_hojo",
+      "pegu",
+      "malacca",
+      "majapahit",
+      "demak",
+      "maynila",
+      "tlemcen",
+      "jolof",
+      "bulala",
+      "aztecs",
+      "purepecha",
+      "zapotec",
+      "maya",
+      "inca",
+      "muisca",
+      "tondo",
+      "montferrat",
+      "riga",
+      "samudra_pasai",
+      "kiche"
+    ],
+    "first_listed": [
+      "tyrone",
+      "urbino",
+      "hre",
+      "mainz",
+      "salzburg",
+      "brunswick",
+      "mysore",
+      "kandy",
+      "aceh",
+      "gowa",
+      "tidore",
+      "oyo",
+      "mapuche",
+      "itza",
+      "huron"
+    ],
+    "events": [
+      {
+        "key": "safavid_rise",
+        "name": "Ismail I founds the Safavid state",
+        "date": "1501",
+        "event_tree_id": "safavid_rise"
+      },
+      {
+        "key": "portuguese_goa",
+        "name": "Portuguese take Goa",
+        "date": "1510-11-25",
+        "event_tree_id": "portuguese_goa"
+      },
+      {
+        "key": "portuguese_capture_of_malacca",
+        "name": "Portuguese capture Malacca",
+        "date": "1511-08-24",
+        "event_tree_id": "portuguese_capture_of_malacca"
+      },
+      {
+        "key": "battle_of_chaldiran",
+        "name": "Battle of Chaldiran",
+        "date": "1514-08-23",
+        "event_tree_id": "battle_of_chaldiran"
+      },
+      {
+        "key": "ottoman_conquest_of_mamluks",
+        "name": "Ottoman conquest of the Mamluk Sultanate",
+        "date": "1516-08-24/1517-04",
+        "event_tree_id": "ottoman_conquest_of_mamluks"
+      },
+      {
+        "key": "protestant_reformation",
+        "name": "Luther's theses",
+        "date": "1517-10-31",
+        "event_tree_id": "protestant_reformation"
+      },
+      {
+        "key": "spanish_conquest_of_the_aztecs",
+        "name": "Spanish conquest of the Aztecs",
+        "date": "1519-04/1521-08-13",
+        "event_tree_id": "spanish_conquest_of_the_aztecs"
+      },
+      {
+        "key": "siege_of_rhodes",
+        "name": "Ottomans take Rhodes",
+        "date": "1522-12-20",
+        "event_tree_id": null
+      },
+      {
+        "key": "german_peasants_war",
+        "name": "German Peasants' War",
+        "date": "1524/1525",
+        "event_tree_id": "german_peasants_war"
+      },
+      {
+        "key": "first_battle_of_panipat",
+        "name": "First Battle of Panipat: Babur founds the Mughal Empire",
+        "date": "1526-04-21",
+        "event_tree_id": "first_battle_of_panipat"
+      },
+      {
+        "key": "battle_of_mohacs",
+        "name": "Battle of Mohács",
+        "date": "1526-08-29",
+        "event_tree_id": "battle_of_mohacs"
+      },
+      {
+        "key": "siege_of_vienna_1529",
+        "name": "First siege of Vienna",
+        "date": "1529-09-27",
+        "event_tree_id": "siege_of_vienna_1529"
+      },
+      {
+        "key": "spanish_conquest_of_the_inca",
+        "name": "Spanish conquest of the Inca",
+        "date": "1532-11-16/1536",
+        "event_tree_id": "spanish_conquest_of_the_inca"
+      },
+      {
+        "key": "english_reformation",
+        "name": "English Reformation (Act of Supremacy)",
+        "date": "1534-11",
+        "event_tree_id": "english_reformation"
+      },
+      {
+        "key": "battle_of_wayna_daga",
+        "name": "Battle of Wayna Daga ends Adal's conquest of Ethiopia",
+        "date": "1543-02-21",
+        "event_tree_id": "battle_of_wayna_daga"
+      },
+      {
+        "key": "peace_of_augsburg",
+        "name": "Peace of Augsburg",
+        "date": "1555-09-25",
+        "event_tree_id": "peace_of_augsburg"
+      },
+      {
+        "key": "peace_of_amasya",
+        "name": "Peace of Amasya",
+        "date": "1555-05-29",
+        "event_tree_id": "peace_of_amasya"
+      },
+      {
+        "key": "conquest_of_kazan",
+        "name": "Muscovy conquers Kazan (and Astrakhan 1556)",
+        "date": "1552-10-13",
+        "event_tree_id": "conquest_of_kazan"
+      },
+      {
+        "key": "akbar_consolidation",
+        "name": "Akbar's accession and expansion",
+        "date": "1556",
+        "event_tree_id": "akbar_consolidation"
+      },
+      {
+        "key": "peace_of_cateau_cambresis",
+        "name": "Peace of Cateau-Cambrésis ends the Italian Wars",
+        "date": "1559-04-03",
+        "event_tree_id": "peace_of_cateau_cambresis"
+      },
+      {
+        "key": "battle_of_talikota",
+        "name": "Battle of Talikota",
+        "date": "1565-01-23",
+        "event_tree_id": "battle_of_talikota"
+      },
+      {
+        "key": "dutch_revolt",
+        "name": "Dutch Revolt begins",
+        "date": "1568",
+        "event_tree_id": "dutch_revolt"
+      },
+      {
+        "key": "union_of_lublin",
+        "name": "Union of Lublin",
+        "date": "1569-07-01",
+        "event_tree_id": "union_of_lublin"
+      },
+      {
+        "key": "battle_of_lepanto",
+        "name": "Battle of Lepanto",
+        "date": "1571-10-07",
+        "event_tree_id": "battle_of_lepanto"
+      },
+      {
+        "key": "spanish_philippines",
+        "name": "Spanish found Manila",
+        "date": "1571-06-24",
+        "event_tree_id": "spanish_philippines"
+      },
+      {
+        "key": "fall_of_vilcabamba",
+        "name": "Fall of Vilcabamba, last Inca state",
+        "date": "1572-06-24",
+        "event_tree_id": "fall_of_vilcabamba"
+      },
+      {
+        "key": "ottoman_conquest_of_tunis",
+        "name": "Ottomans take Tunis; Hafsids end",
+        "date": "1574-09-13",
+        "event_tree_id": null
+      },
+      {
+        "key": "battle_of_alcacer_quibir",
+        "name": "Battle of Alcácer Quibir",
+        "date": "1578-08-04",
+        "event_tree_id": "battle_of_alcacer_quibir"
+      },
+      {
+        "key": "iberian_union",
+        "name": "Iberian Union",
+        "date": "1580",
+        "event_tree_id": "iberian_union"
+      },
+      {
+        "key": "yermak_conquest_of_sibir",
+        "name": "Yermak's conquest of Sibir",
+        "date": "1581/1585",
+        "event_tree_id": "yermak_conquest_of_sibir"
+      },
+      {
+        "key": "spanish_armada",
+        "name": "Spanish Armada",
+        "date": "1588-07",
+        "event_tree_id": "spanish_armada"
+      },
+      {
+        "key": "siege_of_odawara",
+        "name": "Hideyoshi completes unification of Japan at Odawara",
+        "date": "1590-08-04",
+        "event_tree_id": null
+      },
+      {
+        "key": "treaty_of_constantinople_1590",
+        "name": "Ottoman-Safavid peace of Constantinople",
+        "date": "1590-03-21",
+        "event_tree_id": null
+      },
+      {
+        "key": "battle_of_tondibi",
+        "name": "Battle of Tondibi: Morocco defeats Songhay",
+        "date": "1591-03-13",
+        "event_tree_id": "battle_of_tondibi"
+      },
+      {
+        "key": "imjin_war",
+        "name": "Japanese invasions of Korea",
+        "date": "1592-05-23/1598-12-16",
+        "event_tree_id": "imjin_war"
+      },
+      {
+        "key": "long_turkish_war",
+        "name": "Long Turkish War begins",
+        "date": "1593-07-29",
+        "event_tree_id": null
+      },
+      {
+        "key": "nine_years_war_ireland",
+        "name": "Nine Years' War in Ireland",
+        "date": "1593",
+        "event_tree_id": null
+      },
+      {
+        "key": "time_of_troubles",
+        "name": "Rurikids end; Boris Godunov tsar (Time of Troubles era)",
+        "date": "1598-01-17",
+        "event_tree_id": "time_of_troubles"
+      },
+      {
+        "key": "edict_of_nantes",
+        "name": "Edict of Nantes ends the French Wars of Religion",
+        "date": "1598-04-13",
+        "event_tree_id": "french_wars_of_religion"
+      },
+      {
+        "key": "peace_of_vervins",
+        "name": "Peace of Vervins",
+        "date": "1598-05-02",
+        "event_tree_id": null
+      },
+      {
+        "key": "death_of_hideyoshi",
+        "name": "Death of Toyotomi Hideyoshi",
+        "date": "1598-09-18",
+        "event_tree_id": null
+      },
+      {
+        "key": "battle_of_curalaba",
+        "name": "Battle of Curalaba: Mapuche rising",
+        "date": "1598-12-23",
+        "event_tree_id": null
+      },
+      {
+        "key": "deposition_of_sigismund",
+        "name": "Swedish Riksdag deposes Sigismund",
+        "date": "1599-07-24",
+        "event_tree_id": null
+      },
+      {
+        "key": "battle_of_selimbar",
+        "name": "Michael the Brave takes Transylvania at Șelimbăr",
+        "date": "1599-10-28",
+        "event_tree_id": null
+      },
+      {
+        "key": "sack_of_pegu",
+        "name": "Toungoo and Arakan sack Pegu; Nanda Bayin's fall",
+        "date": "1599-12",
+        "event_tree_id": null
+      }
+    ]
+  },
+  "tolerance": {
+    "key_places_match_share": 0.5
+  },
+  "sources": [
+    "Geoffrey Parker, The Grand Strategy of Philip II (1998) and Europe in Crisis 1598-1648",
+    "Colin Imber, The Ottoman Empire 1300-1650",
+    "John F. Richards, The Mughal Empire (New Cambridge History of India)",
+    "Roger Savory, Iran under the Safavids",
+    "Frederick Mote and Denis Twitchett (eds), Cambridge History of China vol. 7 (Ming)",
+    "Mary Elizabeth Berry, Hideyoshi",
+    "Victor Lieberman, Strange Parallels vol. 1",
+    "Norman Davies, God's Playground vol. 1",
+    "Cambridge History of Africa vol. 4 (c.1600-c.1790)",
+    "Yuri Bregel, An Historical Atlas of Central Asia"
+  ],
+  "open_questions": [
+    "How to model the Spanish composite monarchy: Aragon, Portugal, Naples, Sicily, Milan and the Archdukes' Netherlands are listed as separate realms with overlord castile (personal union), while American and Philippine holdings are held by castile directly.",
+    "Wallachia's overlord: Michael the Brave recognized Rudolf II (1598) while Ottoman suzerainty was disputed; recorded as austria.",
+    "Tbilisi: Ottoman garrison (since 1578, confirmed 1590) versus Kartli control in 1599-1600 is uncertain.",
+    "Pegu on 1 Jan 1600: sacked and burned by Toungoo and Arakan in Dec 1599; who governed the ruins is unclear.",
+    "Hakata (Chikuzen): Kobayakawa Hideaki's fief or Toyotomi direct land in late 1599.",
+    "Bornu: Idris Alooma's reign is dated 1564-1596 or 1571-1603; the ruler in 1600 is disputed.",
+    "Bukhara: the Janid succession (Jani Muhammad, Baqi Muhammad) in 1599-1601 is variously dated.",
+    "Cambodian kingship in 1599-1600 is disputed in the chronicles.",
+    "Great Zimbabwe, Trowulan, Lhasa and Hampi lie in areas with no clear governing state; holders are best guesses.",
+    "Resolved in the id harmonisation: the ended list is recomputed against 1500.json (astrakhan_khanate is astrakhan; sibir_khanate dropped as never listed).",
+    "Kyoto/Japan holder 'japan' stands for the Toyotomi regency; Tokugawa Ieyasu was the de facto leader from Osaka Castle.",
+    "Id harmonisation: the Habsburg Netherlands of the Archdukes use burgundy (continuation of the Burgundian Netherlands), the United Provinces use netherlands (the same state as the 1815 kingdom), the Zaydi imamate uses yemen, Phagmodrupa uses tibet, Brunswick-Wolfenbüttel uses brunswick and the Regency of Tunis keeps tunis (Hafsid Tunis continued as an Ottoman regency, so neither formed nor ended).",
+    "The id ireland follows the island's polity: Gaelic lordships to 1500, the Kingdom of Ireland under the English crown from 1542 (added here); Tyrone is first_listed, not formed. Norway is counted as ended in 1536 (Danish province) and formed again in 1814; the Albertine duchy as merged when it took the Saxon electorate (1547).",
+    "Added as still standing: Brunswick-Lüneburg, Marwar, Mecklenburg, Navarre (personal union with France until 1620), Ireland, Lucca, Ajuran, Mossi. The Jolof empire is counted as ended at its break-up (1549); the rump kingdom of Jolof is not tracked."
+  ]
+}

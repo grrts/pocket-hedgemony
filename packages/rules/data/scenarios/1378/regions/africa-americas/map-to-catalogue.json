@@ -1,0 +1,19 @@
+{
+ "$comment": "Map nations of this fragment whose id is not their 1378 catalogue record.",
+ "map_to_catalogue": {
+  "tunis": "hafsid",
+  "mossi": "mossi_ouagadougou",
+  "kanem_bornu": "bornu",
+  "aztecs": "tenochtitlan",
+  "zapotec": "zaachila",
+  "maya": "maya",
+  "chimu": "chimor",
+  "muisca": "muisca_bacata",
+  "iroquois": "haudenosaunee",
+  "huron": "wendat",
+  "pueblo": "pueblo_rio_grande",
+  "tepanecs": "tepanecs",
+  "ifat": "ifat",
+  "marinid_marrakesh": "marinid_marrakesh"
+ }
+}

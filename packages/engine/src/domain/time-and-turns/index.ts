@@ -338,16 +338,26 @@ export function orderShape(order: Order): string {
       return "repay a loan";
     case "gift":
       return "give a lord gold";
+    case "callLords":
+      return "call the lords to war";
     case "grantFief":
       return "grant a fief";
     case "seizeFief":
       return "seize a fief";
+    case "assassinateLord":
+      return "send an assassin after a lord";
     case "swapOfficials":
       return "move an official to another province";
     case "hireOfficial":
       return "hire an official";
     case "settleLand":
       return "keep new land as royal land";
+    case "dismissOfficial":
+      return "dismiss an official";
+    case "autoFillPosts":
+      return "turn auto-fill of posts on or off";
+    case "fillPosts":
+      return "fill every empty post";
     case "answerRevolution":
       return "answer the revolution";
     case "setStudy":
@@ -444,6 +454,8 @@ export function orderShape(order: Order): string {
       return "act in the Shogunate";
     case "tribes":
       return "act on a hunting ground";
+    case "quarantine":
+      return "close or open province against plague";
     case "keepPlaying":
       return "keep playing after a win";
     case "playOn":
@@ -1306,7 +1318,7 @@ export function agesRunning(year: number): Age[] {
 
 export type Era = "I" | "II" | "III" | "IV" | "V" | "VI" | "VII";
 
-/** Eras follow the calendar: I 1444–1500 … VII 1914 to the end date (X-14, D-TIME-9). */
+/** Eras follow the calendar: I from the start (1378 at the earliest) to 1500 … VII 1914 to the end date (X-14, D-TIME-9, TIME-065). */
 export function eraOf(date: GameDate): Era {
   let era: Era = "I";
   for (const e of config.eras) if (date.year >= e.from) era = e.era as Era;

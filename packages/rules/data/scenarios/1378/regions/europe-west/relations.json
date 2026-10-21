@@ -1,0 +1,3640 @@
+{
+ "schema_version": "1.0",
+ "reference_date": "1378-09-20",
+ "description": "Relations and facts on 20 September 1378 whose source is a western European realm, from research/europe-west.md. obedience: the Pope each Catholic realm follows in the Western Schism on the start day (plan-1378 4.4); null means it has not chosen yet.",
+ "relations": [
+  {
+   "id": "r_lordship_of_ireland__england__subject",
+   "type": "subject",
+   "source": "lordship_of_ireland",
+   "target": "england",
+   "direction": "directed",
+   "subject_kind": "personal_union",
+   "autonomy": "moderate",
+   "start_date": "1177",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Richard II is Lord of Ireland; James Butler, Earl of Ormond, governs as justiciar until Edmund Mortimer arrives as lieutenant (1379).",
+   "confidence": "high",
+   "source_ids": [
+    "src_bi_lydon_lordship",
+    "src_bi_nicholls_gaelic"
+   ]
+  },
+  {
+   "id": "r_isle_of_man__england__subject",
+   "type": "subject",
+   "source": "isle_of_man",
+   "target": "england",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1333",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "William Montagu, Earl of Salisbury, holds Man of the English crown (sold to William le Scrope in 1392).",
+   "confidence": "high",
+   "source_ids": [
+    "src_bi_duffy_man"
+   ]
+  },
+  {
+   "id": "r_english_france__england__subject",
+   "type": "subject",
+   "source": "english_france",
+   "target": "england",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "low",
+   "start_date": "1152",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Calais, coastal Gascony, and the leased fortresses of Brest (1378-97) and Cherbourg (1378-94) under the Captain of Calais and the Seneschal of Gascony.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_sumption_hyw3",
+    "src_bi_allmand_hyw"
+   ]
+  },
+  {
+   "id": "r_ormond__lordship_of_ireland__subject",
+   "type": "subject",
+   "source": "ormond",
+   "target": "lordship_of_ireland",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1328",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Butler earldom of Kilkenny and Tipperary; the earl is also the king's justiciar.",
+   "confidence": "high",
+   "source_ids": [
+    "src_bi_lydon_lordship",
+    "src_bi_nicholls_gaelic"
+   ]
+  },
+  {
+   "id": "r_desmond__lordship_of_ireland__subject",
+   "type": "subject",
+   "source": "desmond",
+   "target": "lordship_of_ireland",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "very_high",
+   "start_date": "1329",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "FitzGerald earldom of Kerry and Limerick, largely independent and Gaelicised under Gearóid Iarla.",
+   "confidence": "high",
+   "source_ids": [
+    "src_bi_lydon_lordship",
+    "src_bi_nicholls_gaelic"
+   ]
+  },
+  {
+   "id": "r_kildare__lordship_of_ireland__subject",
+   "type": "subject",
+   "source": "kildare",
+   "target": "lordship_of_ireland",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1316",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Pale earldom of Maynooth, loyal to the colony's government.",
+   "confidence": "high",
+   "source_ids": [
+    "src_bi_lydon_lordship",
+    "src_bi_nicholls_gaelic"
+   ]
+  },
+  {
+   "id": "r_gaelic_munster_minor__desmond__subject",
+   "type": "subject",
+   "source": "gaelic_munster_minor",
+   "target": "desmond",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Lesser Munster lords render dues to the Earl of Desmond.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_bi_lydon_lordship",
+    "src_bi_nicholls_gaelic"
+   ]
+  },
+  {
+   "id": "r_lordship_of_the_isles__scotland__subject",
+   "type": "subject",
+   "source": "lordship_of_the_isles",
+   "target": "scotland",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "very_high",
+   "start_date": "1369",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "John of Islay submitted to David II in 1369 and is Robert II's son-in-law; a semi-royal Gaelic lordship.",
+   "confidence": "high",
+   "source_ids": [
+    "src_bi_munro_isles"
+   ]
+  },
+  {
+   "id": "r_douglas_earldom__scotland__subject",
+   "type": "subject",
+   "source": "douglas_earldom",
+   "target": "scotland",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "high",
+   "start_date": "1358",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "William, 1st Earl of Douglas and Mar, the greatest border magnate; Galloway is held apart by Archibald the Grim.",
+   "confidence": "high",
+   "source_ids": [
+    "src_bi_brown_douglases",
+    "src_ncmh6"
+   ]
+  },
+  {
+   "id": "r_orkney__norway__subject",
+   "type": "subject",
+   "source": "orkney",
+   "target": "norway",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Norwegian earldom, vacant on the start day under a royal captain; Henry Sinclair is invested at Marstrand on 2 Aug 1379.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_bi_grohse_orkney"
+   ]
+  },
+  {
+   "id": "r_burgundy__france__subject",
+   "type": "subject",
+   "source": "burgundy",
+   "target": "france",
+   "direction": "directed",
+   "subject_kind": "appanage",
+   "autonomy": "moderate",
+   "start_date": "1363",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Philip the Bold holds the duchy as an apanage and peerage; heir by marriage to Flanders, Artois, Nevers, Rethel and the County of Burgundy.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_autrand_charles_v",
+    "src_ncmh6"
+   ]
+  },
+  {
+   "id": "r_anjou__france__subject",
+   "type": "subject",
+   "source": "anjou",
+   "target": "france",
+   "direction": "directed",
+   "subject_kind": "appanage",
+   "autonomy": "moderate",
+   "start_date": "1360",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Louis I, the king's eldest brother, holds Anjou, Maine and Touraine and is lieutenant in Languedoc.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_autrand_charles_v",
+    "src_ncmh6"
+   ]
+  },
+  {
+   "id": "r_berry__france__subject",
+   "type": "subject",
+   "source": "berry",
+   "target": "france",
+   "direction": "directed",
+   "subject_kind": "appanage",
+   "autonomy": "moderate",
+   "start_date": "1360",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "John of Berry holds Berry and Auvergne, with Poitou since its reconquest (1372).",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_autrand_charles_v",
+    "src_ncmh6"
+   ]
+  },
+  {
+   "id": "r_bourbon__france__subject",
+   "type": "subject",
+   "source": "bourbon",
+   "target": "france",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "moderate",
+   "start_date": "1327",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Peerage duchy of Louis II, the dauphin's maternal uncle.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_autrand_charles_v",
+    "src_ncmh6"
+   ]
+  },
+  {
+   "id": "r_alencon__france__subject",
+   "type": "subject",
+   "source": "alencon",
+   "target": "france",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "moderate",
+   "start_date": "1325",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Valois-Alençon county of Peter II, with Perche.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_autrand_charles_v",
+    "src_ncmh6"
+   ]
+  },
+  {
+   "id": "r_armagnac__france__subject",
+   "type": "subject",
+   "source": "armagnac",
+   "target": "france",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "low",
+   "start_date": "1368",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "On the French side since its appeal against the Black Prince (1368); its lands border English Gascony.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_autrand_charles_v",
+    "src_ncmh6"
+   ]
+  },
+  {
+   "id": "r_foix__france__subject",
+   "type": "subject",
+   "source": "foix",
+   "target": "france",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Foix is held of the crown, but Gaston Fébus holds Béarn 'of God alone' and keeps a careful neutrality.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_tucoo_chala_febus"
+   ]
+  },
+  {
+   "id": "r_albret__france__subject",
+   "type": "subject",
+   "source": "albret",
+   "target": "france",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "moderate",
+   "start_date": "1368",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Arnaud-Amanieu VIII went over to France in 1368 and married the queen's sister Margaret of Bourbon.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_autrand_charles_v",
+    "src_ncmh6"
+   ]
+  },
+  {
+   "id": "r_brittany__france__subject",
+   "type": "subject",
+   "source": "brittany",
+   "target": "france",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "very_high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Homage disputed; John IV has been in English exile since 1373, royal garrisons hold much of the duchy, and Charles V's court confiscates it in Dec 1378.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_jones_brittany",
+    "src_fr_sumption_hyw3"
+   ]
+  },
+  {
+   "id": "r_dauphine__france__subject",
+   "type": "subject",
+   "source": "dauphine",
+   "target": "france",
+   "direction": "directed",
+   "subject_kind": "appanage",
+   "autonomy": "low",
+   "start_date": "1349",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The heir's principality, held by the nine-year-old dauphin Charles and run by a royal governor.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_autrand_charles_v",
+    "src_ncmh6"
+   ]
+  },
+  {
+   "id": "r_franche_comte__france__subject",
+   "type": "subject",
+   "source": "franche_comte",
+   "target": "france",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "moderate",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Margaret of France holds Artois of the crown (and the County of Burgundy of the Empire) until her death on 9 May 1382.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_autrand_charles_v",
+    "src_ncmh6"
+   ]
+  },
+  {
+   "id": "r_french_minor_lordships__france__subject",
+   "type": "subject",
+   "source": "french_minor_lordships",
+   "target": "france",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "moderate",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Vendôme, Eu, La Marche, Comminges, Penthièvre, Laval, Valentinois and other lesser fiefs of the crown.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_fr_autrand_charles_v",
+    "src_ncmh6"
+   ]
+  },
+  {
+   "id": "r_provence__naples__subject",
+   "type": "subject",
+   "source": "provence",
+   "target": "naples",
+   "direction": "directed",
+   "subject_kind": "personal_union",
+   "autonomy": "moderate",
+   "start_date": "1343",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Joanna I of Naples is Countess of Provence and Forcalquier, governed by a seneschal at Aix.",
+   "confidence": "high",
+   "source_ids": [
+    "src_ncmh6"
+   ]
+  },
+  {
+   "id": "r_comtat_venaissin__papal_states__subject",
+   "type": "subject",
+   "source": "comtat_venaissin",
+   "target": "papal_states",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "low",
+   "start_date": "1274",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Papal Comtat and Avignon under rectors and the cardinals left behind; it goes over to Clement VII in the autumn.",
+   "confidence": "high",
+   "source_ids": [
+    "src_ncmh6"
+   ]
+  },
+  {
+   "id": "r_england__france__at_war",
+   "type": "at_war",
+   "source": "england",
+   "target": "france",
+   "direction": "mutual",
+   "start_date": "1369",
+   "historical_end": {
+    "date": "1389-06-18",
+    "how": "Truce of Leulinghem."
+   },
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Caroline war: the Truce of Bruges expired in June 1377; French raids on the English coast and Gaunt's failed siege of Saint-Malo (Aug-Sep 1378) follow.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_sumption_hyw3",
+    "src_bi_allmand_hyw"
+   ]
+  },
+  {
+   "id": "r_england__france__rival",
+   "type": "rival",
+   "source": "england",
+   "target": "france",
+   "direction": "mutual",
+   "start_date": "1337",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Richard II holds Edward III's claim to the French crown and the remnants of Aquitaine that Charles V's reconquest left.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_sumption_hyw3",
+    "src_bi_allmand_hyw"
+   ]
+  },
+  {
+   "id": "r_england__scotland__truce",
+   "type": "truce",
+   "source": "england",
+   "target": "scotland",
+   "direction": "mutual",
+   "start_date": "1369",
+   "expires_on": "1384-02-02",
+   "expiration_condition": "Original fourteen-year term.",
+   "historical_end": {
+    "date": "1384-02",
+    "how": "War resumed on the March; Lochmaben taken by the Scots (1384)."
+   },
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Fourteen-year truce of 1369, with constant raiding on the March; the Scots seize Berwick castle briefly in Nov 1378.",
+   "confidence": "high",
+   "source_ids": [
+    "src_bi_brown_douglases",
+    "src_ncmh6"
+   ]
+  },
+  {
+   "id": "r_england__scotland__rival",
+   "type": "rival",
+   "source": "england",
+   "target": "scotland",
+   "direction": "mutual",
+   "start_date": "1296",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Scotland claims Berwick, Roxburgh, Jedburgh, Lochmaben and Annandale, still in English hands.",
+   "confidence": "high",
+   "source_ids": [
+    "src_bi_brown_douglases",
+    "src_ncmh6"
+   ]
+  },
+  {
+   "id": "r_england__castile__at_war",
+   "type": "at_war",
+   "source": "england",
+   "target": "castile",
+   "direction": "mutual",
+   "start_date": "1369",
+   "historical_end": {
+    "date": "1388-07-08",
+    "how": "Treaty of Bayonne: Gaunt gave up his claim for a marriage and a pension."
+   },
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Castile is France's naval ally and its galleys raid the English coast; John of Gaunt claims the Castilian throne.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_sumption_hyw3",
+    "src_bi_allmand_hyw"
+   ]
+  },
+  {
+   "id": "r_england__portugal__alliance",
+   "type": "alliance",
+   "source": "england",
+   "target": "portugal",
+   "direction": "mutual",
+   "start_date": "1373-06-16",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Treaty of London (1373), renewed at Windsor in 1386.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_sumption_hyw3",
+    "src_bi_allmand_hyw"
+   ]
+  },
+  {
+   "id": "r_england__navarre__alliance",
+   "type": "alliance",
+   "source": "england",
+   "target": "navarre",
+   "direction": "mutual",
+   "start_date": "1378-06",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Charles the Bad leases Cherbourg to England for English help; Thomas Trivet's troops go to Navarre.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_fr_sumption_hyw3",
+    "src_bi_allmand_hyw"
+   ]
+  },
+  {
+   "id": "r_brittany__england__alliance",
+   "type": "alliance",
+   "source": "brittany",
+   "target": "england",
+   "direction": "mutual",
+   "start_date": "1372",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "John IV's treaty with Edward III; the duke lives in England and Brest is leased to the English.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_jones_brittany",
+    "src_fr_sumption_hyw3"
+   ]
+  },
+  {
+   "id": "r_france__scotland__alliance",
+   "type": "alliance",
+   "source": "france",
+   "target": "scotland",
+   "direction": "mutual",
+   "start_date": "1295",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Auld Alliance, renewed by Robert II at Vincennes in 1371.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_autrand_charles_v",
+    "src_ncmh6"
+   ]
+  },
+  {
+   "id": "r_france__castile__alliance",
+   "type": "alliance",
+   "source": "france",
+   "target": "castile",
+   "direction": "mutual",
+   "start_date": "1368",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Treaty of Toledo: Castilian galleys serve France and Castile invades Navarre on France's side.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_autrand_charles_v",
+    "src_ncmh6"
+   ]
+  },
+  {
+   "id": "r_france__navarre__at_war",
+   "type": "at_war",
+   "source": "france",
+   "target": "navarre",
+   "direction": "mutual",
+   "start_date": "1378-04",
+   "historical_end": {
+    "date": "1379-03-31",
+    "how": "Peace of Briones ended the Castilian war; France kept the seized lands until the exchange of 1404."
+   },
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "After Jacques de Rue's confession Charles V seized Charles the Bad's Norman counties and Montpellier (Apr-Jun 1378) and holds his son; Castile fights the field war in Navarre.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_fr_sumption_hyw3",
+    "src_bi_allmand_hyw"
+   ]
+  },
+  {
+   "id": "r_france__navarre__rival",
+   "type": "rival",
+   "source": "france",
+   "target": "navarre",
+   "direction": "mutual",
+   "start_date": "1354",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Charles the Bad's long feud with the Valois over his Norman and Champagne claims.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_autrand_charles_v",
+    "src_ncmh6"
+   ]
+  },
+  {
+   "id": "r_french_minor_lordships__brittany__hostile",
+   "type": "hostile",
+   "source": "french_minor_lordships",
+   "target": "brittany",
+   "direction": "mutual",
+   "start_date": "1341",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Joan of Penthièvre and her sons keep the Blois claim to the duchy (John of Blois a captive in England until 1387).",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_jones_brittany",
+    "src_fr_sumption_hyw3"
+   ]
+  },
+  {
+   "id": "r_foix__armagnac__rival",
+   "type": "rival",
+   "source": "foix",
+   "target": "armagnac",
+   "direction": "mutual",
+   "start_date": "1290",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Béarn inheritance feud; Launac (1362) is recent, but a peace in 1377 and a marriage in 1379 settle it for a time.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_fr_tucoo_chala_febus"
+   ]
+  },
+  {
+   "id": "r_free_companies__france__hostile",
+   "type": "hostile",
+   "source": "free_companies",
+   "target": "france",
+   "direction": "mutual",
+   "start_date": "1360",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Routier captains holding Ventadour, Carlat and other castles in Auvergne, the Limousin and Rouergue live by ransoms on the countryside.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_autrand_charles_v",
+    "src_ncmh6"
+   ]
+  },
+  {
+   "id": "r_burgundy__flanders__friendly",
+   "type": "friendly",
+   "source": "burgundy",
+   "target": "flanders",
+   "direction": "mutual",
+   "start_date": "1369-06-19",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Philip the Bold married Margaret of Male, heiress of Flanders, at Ghent.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_autrand_charles_v",
+    "src_ncmh6"
+   ]
+  },
+  {
+   "id": "r_franche_comte__flanders__friendly",
+   "type": "friendly",
+   "source": "franche_comte",
+   "target": "flanders",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Margaret of France is the mother of Louis of Male, her heir.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_autrand_charles_v",
+    "src_ncmh6"
+   ]
+  },
+  {
+   "id": "r_tyrone__lordship_of_ireland__hostile",
+   "type": "hostile",
+   "source": "tyrone",
+   "target": "lordship_of_ireland",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Niall Mór Ó Néill presses on the earldom of Ulster and Louth.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_bi_nicholls_gaelic",
+    "src_bi_irish_annals"
+   ]
+  },
+  {
+   "id": "r_leinster_kavanagh__lordship_of_ireland__hostile",
+   "type": "hostile",
+   "source": "leinster_kavanagh",
+   "target": "lordship_of_ireland",
+   "direction": "mutual",
+   "start_date": "1375",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Art Mór MacMurrough Kavanagh raids the Pale and takes crown fees and black rent.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_bi_lydon_lordship",
+    "src_bi_nicholls_gaelic"
+   ]
+  },
+  {
+   "id": "r_gaelic_leinster_midlands__lordship_of_ireland__hostile",
+   "type": "hostile",
+   "source": "gaelic_leinster_midlands",
+   "target": "lordship_of_ireland",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "O'Connor Faly, O'More, O'Byrne and O'Toole raid the colony and draw black rent.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_bi_lydon_lordship",
+    "src_bi_nicholls_gaelic"
+   ]
+  },
+  {
+   "id": "r_tyrconnell__tyrone__rival",
+   "type": "rival",
+   "source": "tyrconnell",
+   "target": "tyrone",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "O'Donnell and O'Neill contest the supremacy of Ulster.",
+   "confidence": "high",
+   "source_ids": [
+    "src_bi_nicholls_gaelic",
+    "src_bi_irish_annals"
+   ]
+  },
+  {
+   "id": "r_desmond__thomond__rival",
+   "type": "rival",
+   "source": "desmond",
+   "target": "thomond",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "FitzGerald and O'Brien contest the supremacy of Munster.",
+   "confidence": "high",
+   "source_ids": [
+    "src_bi_nicholls_gaelic",
+    "src_bi_irish_annals"
+   ]
+  },
+  {
+   "id": "r_connacht_burkes__gaelic_connacht_minor__rival",
+   "type": "rival",
+   "source": "connacht_burkes",
+   "target": "gaelic_connacht_minor",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Burkes against the O'Connor kingship of Connacht (one kingship under Ruaidrí until the split of 1384).",
+   "confidence": "medium",
+   "source_ids": [
+    "src_bi_nicholls_gaelic",
+    "src_bi_irish_annals"
+   ]
+  },
+  {
+   "id": "r_castile__navarre__at_war",
+   "type": "at_war",
+   "source": "castile",
+   "target": "navarre",
+   "direction": "mutual",
+   "start_date": "1378",
+   "historical_end": {
+    "date": "1379-03-31",
+    "how": "Peace of Briones; Castile holds Navarrese fortresses as pledges."
+   },
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Infante John invades Navarre and besieges Pamplona after Charles II's dealings with England.",
+   "confidence": "high"
+  },
+  {
+   "id": "r_aragon__castile__rival",
+   "type": "rival",
+   "source": "aragon",
+   "target": "castile",
+   "direction": "mutual",
+   "start_date": "1356",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Wary peace after the War of the Two Peters, sealed at Almazán (1375).",
+   "confidence": "medium"
+  },
+  {
+   "id": "r_castile__portugal__truce",
+   "type": "truce",
+   "source": "castile",
+   "target": "portugal",
+   "direction": "mutual",
+   "start_date": "1373-03-19",
+   "historical_end": {
+    "date": "1381",
+    "how": "Ferdinand reopened war with English help (third Fernandine war, 1381-82)."
+   },
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Treaty of Santarém ended the second Fernandine war.",
+   "confidence": "high"
+  },
+  {
+   "id": "r_castile__granada__truce",
+   "type": "truce",
+   "source": "castile",
+   "target": "granada",
+   "direction": "mutual",
+   "start_date": "1370",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Muhammad V keeps peace with Henry II through renewed truces; no regular tribute found.",
+   "confidence": "medium"
+  },
+  {
+   "id": "r_granada__morocco__friendly",
+   "type": "friendly",
+   "source": "granada",
+   "target": "morocco",
+   "direction": "mutual",
+   "start_date": "1374",
+   "historical_end": {
+    "date": "1386",
+    "how": "Abu al-Abbas lost and regained the throne; Granadan control lapsed."
+   },
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Granada raises and controls the Marinid sultan Abu al-Abbas Ahmad at Fez and received Gibraltar from him.",
+   "confidence": "medium"
+  },
+  {
+   "id": "r_aragon__genoa__rival",
+   "type": "rival",
+   "source": "aragon",
+   "target": "genoa",
+   "direction": "mutual",
+   "start_date": "1330s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Sardinia, Corsica and the western Mediterranean trade.",
+   "confidence": "high"
+  },
+  {
+   "id": "r_aragon__oristano__at_war",
+   "type": "at_war",
+   "source": "aragon",
+   "target": "oristano",
+   "direction": "mutual",
+   "start_date": "1365",
+   "historical_end": {
+    "date": "1388",
+    "how": "Peace made by Eleanor of Arborea (renewed war 1391)."
+   },
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Arborea's war to drive the Crown of Aragon from Sardinia; Hugh III holds most of the island.",
+   "confidence": "high"
+  },
+  {
+   "id": "r_castilian_magnates__castile__subject",
+   "type": "subject",
+   "source": "castilian_magnates",
+   "target": "castile",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "high",
+   "start_date": "1369",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The new Trastámara nobility of Henry II's grants (Enríquez, Villena, Guzmán, Manrique, Mendoza, Velasco).",
+   "confidence": "medium"
+  },
+  {
+   "id": "r_castilian_military_orders__castile__subject",
+   "type": "subject",
+   "source": "castilian_military_orders",
+   "target": "castile",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "moderate",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Santiago, Calatrava and Alcántara.",
+   "confidence": "medium"
+  },
+  {
+   "id": "r_aragon_kingdom__aragon__subject",
+   "type": "subject",
+   "source": "aragon_kingdom",
+   "target": "aragon",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "moderate",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Constituent kingdom with its Cortes and the Justicia.",
+   "confidence": "high"
+  },
+  {
+   "id": "r_catalonia__aragon__subject",
+   "type": "subject",
+   "source": "catalonia",
+   "target": "aragon",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "moderate",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Principality with its Corts and the Generalitat; the king lives here.",
+   "confidence": "high"
+  },
+  {
+   "id": "r_valencia__aragon__subject",
+   "type": "subject",
+   "source": "valencia",
+   "target": "aragon",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "moderate",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Constituent kingdom.",
+   "confidence": "high"
+  },
+  {
+   "id": "r_sardinia__aragon__subject",
+   "type": "subject",
+   "source": "sardinia",
+   "target": "aragon",
+   "direction": "directed",
+   "subject_kind": "personal_union",
+   "autonomy": "low",
+   "start_date": "1324",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Aragonese kingdom of Sardinia, reduced to Cagliari, Alghero and some castles.",
+   "confidence": "high"
+  },
+  {
+   "id": "r_andorra__foix__subject",
+   "type": "subject",
+   "source": "andorra",
+   "target": "foix",
+   "direction": "directed",
+   "subject_kind": "fief",
+   "autonomy": "high",
+   "start_date": "1278",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Co-principality under the Pariatges: Gaston Fébus of Foix and the Bishop of Urgell.",
+   "confidence": "high"
+  },
+  {
+   "id": "r_genoa__venice__at_war",
+   "type": "at_war",
+   "source": "genoa",
+   "target": "venice",
+   "direction": "mutual",
+   "start_date": "1378-05-30",
+   "historical_end": {
+    "date": "1381-08-08",
+    "how": "Peace of Turin."
+   },
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "War of Chioggia over Tenedos and the straits trade (battle of Antium, 30 May 1378).",
+   "confidence": "high"
+  },
+  {
+   "id": "r_genoa__venice__rival",
+   "type": "rival",
+   "source": "genoa",
+   "target": "venice",
+   "direction": "mutual",
+   "start_date": "1250s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The two maritime republics contest the Levant and Black Sea trade.",
+   "confidence": "high"
+  },
+  {
+   "id": "r_padua__venice__at_war",
+   "type": "at_war",
+   "source": "padua",
+   "target": "venice",
+   "direction": "mutual",
+   "start_date": "1378",
+   "historical_end": {
+    "date": "1381-08-08",
+    "how": "Peace of Turin."
+   },
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Francesco da Carrara joins Genoa and Hungary; fighting around Mestre and Treviso.",
+   "confidence": "medium"
+  },
+  {
+   "id": "r_padua__venice__rival",
+   "type": "rival",
+   "source": "padua",
+   "target": "venice",
+   "direction": "mutual",
+   "start_date": "1356",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Carrara-Venetian enmity (wars of 1372-73 and 1378-81).",
+   "confidence": "high"
+  },
+  {
+   "id": "r_venice__hungary__at_war",
+   "type": "at_war",
+   "source": "venice",
+   "target": "hungary",
+   "direction": "mutual",
+   "start_date": "1378",
+   "historical_end": {
+    "date": "1381-08-08",
+    "how": "Peace of Turin: Venice pays Hungary yearly and confirms Dalmatia."
+   },
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Louis I joins the league against Venice.",
+   "confidence": "medium"
+  },
+  {
+   "id": "r_aquileia__venice__at_war",
+   "type": "at_war",
+   "source": "aquileia",
+   "target": "venice",
+   "direction": "mutual",
+   "start_date": "1378",
+   "historical_end": {
+    "date": "1381-08-08",
+    "how": "Peace of Turin."
+   },
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Patriarch Marquard joins the anti-Venetian league and takes Istrian towns.",
+   "confidence": "medium"
+  },
+  {
+   "id": "r_genoa__hungary__alliance",
+   "type": "alliance",
+   "source": "genoa",
+   "target": "hungary",
+   "direction": "mutual",
+   "start_date": "1378",
+   "historical_end": {
+    "date": "1381-08-08",
+    "how": "Peace of Turin."
+   },
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "League against Venice.",
+   "confidence": "high"
+  },
+  {
+   "id": "r_genoa__padua__alliance",
+   "type": "alliance",
+   "source": "genoa",
+   "target": "padua",
+   "direction": "mutual",
+   "start_date": "1378",
+   "historical_end": {
+    "date": "1381-08-08",
+    "how": "Peace of Turin."
+   },
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "League against Venice.",
+   "confidence": "high"
+  },
+  {
+   "id": "r_aquileia__genoa__alliance",
+   "type": "alliance",
+   "source": "aquileia",
+   "target": "genoa",
+   "direction": "mutual",
+   "start_date": "1378",
+   "historical_end": {
+    "date": "1381-08-08",
+    "how": "Peace of Turin."
+   },
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "League against Venice.",
+   "confidence": "high"
+  },
+  {
+   "id": "r_padua__hungary__alliance",
+   "type": "alliance",
+   "source": "padua",
+   "target": "hungary",
+   "direction": "mutual",
+   "start_date": "1356",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Carrara are Hungary's allies against Venice.",
+   "confidence": "high"
+  },
+  {
+   "id": "r_milan__venice__alliance",
+   "type": "alliance",
+   "source": "milan",
+   "target": "venice",
+   "direction": "mutual",
+   "start_date": "1378",
+   "historical_end": {
+    "date": "1381-08-08",
+    "how": "Peace of Turin."
+   },
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Bernabò Visconti allied with Venice; attacks Genoese lands.",
+   "confidence": "high"
+  },
+  {
+   "id": "r_venice__cyprus__alliance",
+   "type": "alliance",
+   "source": "venice",
+   "target": "cyprus",
+   "direction": "mutual",
+   "start_date": "1378",
+   "historical_end": {
+    "date": "1381-08-08",
+    "how": "Peace of Turin."
+   },
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Peter II of Cyprus joins Venice against Genoa over Famagusta.",
+   "confidence": "high"
+  },
+  {
+   "id": "r_genoa__milan__at_war",
+   "type": "at_war",
+   "source": "genoa",
+   "target": "milan",
+   "direction": "mutual",
+   "start_date": "1378",
+   "historical_end": {
+    "date": "1381-08-08",
+    "how": "Peace of Turin."
+   },
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Bernabò, as Venice's ally, backs Genoese exiles and attacks the Riviera.",
+   "confidence": "medium"
+  },
+  {
+   "id": "r_genoa__cyprus__rival",
+   "type": "rival",
+   "source": "genoa",
+   "target": "cyprus",
+   "direction": "mutual",
+   "start_date": "1373",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Genoa has held Famagusta since 1374.",
+   "confidence": "high"
+  },
+  {
+   "id": "r_milan__verona__at_war",
+   "type": "at_war",
+   "source": "milan",
+   "target": "verona",
+   "direction": "mutual",
+   "start_date": "1378",
+   "historical_end": {
+    "date": "1379",
+    "how": "Truce and payment to Bernabò."
+   },
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Bernabò presses his wife Regina della Scala's claim to the Scaliger inheritance; Jacopo dal Verme serves Verona.",
+   "confidence": "medium"
+  },
+  {
+   "id": "r_milan__visconti_pavia__rival",
+   "type": "rival",
+   "source": "milan",
+   "target": "visconti_pavia",
+   "direction": "mutual",
+   "start_date": "1378-08-04",
+   "historical_end": {
+    "date": "1385-05-06",
+    "how": "Gian Galeazzo seized Bernabò and reunited the state."
+   },
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Visconti state divided at Galeazzo II's death; Milan city held jointly; Bernabò's sons threaten Gian Galeazzo.",
+   "confidence": "high"
+  },
+  {
+   "id": "r_savoy__visconti_pavia__friendly",
+   "type": "friendly",
+   "source": "savoy",
+   "target": "visconti_pavia",
+   "direction": "mutual",
+   "start_date": "1350",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Gian Galeazzo's mother is Bianca of Savoy, Amadeus VI's sister.",
+   "confidence": "high"
+  },
+  {
+   "id": "r_visconti_pavia__france__friendly",
+   "type": "friendly",
+   "source": "visconti_pavia",
+   "target": "france",
+   "direction": "mutual",
+   "start_date": "1360",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Gian Galeazzo married Isabelle of Valois (d. 1373) and holds the county of Vertus.",
+   "confidence": "high"
+  },
+  {
+   "id": "r_montferrat__visconti_pavia__hostile",
+   "type": "hostile",
+   "source": "montferrat",
+   "target": "visconti_pavia",
+   "direction": "mutual",
+   "start_date": "1378",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Galeazzo II's troops took Asti; the 1377 marriage alliance is breaking; Secondotto blames the Visconti.",
+   "confidence": "low"
+  },
+  {
+   "id": "r_montferrat__savoy__rival",
+   "type": "rival",
+   "source": "montferrat",
+   "target": "savoy",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Piedmont border; Savoy-Achaea.",
+   "confidence": "medium"
+  },
+  {
+   "id": "r_saluzzo__savoy__hostile",
+   "type": "hostile",
+   "source": "saluzzo",
+   "target": "savoy",
+   "direction": "mutual",
+   "start_date": "1363",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Savoy demands Saluzzo's homage; Frederick II swore homage to the Dauphin instead (1375).",
+   "confidence": "high"
+  },
+  {
+   "id": "r_florence__papal_states__rival",
+   "type": "rival",
+   "source": "florence",
+   "target": "papal_states",
+   "direction": "mutual",
+   "start_date": "1375",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The War of the Eight Saints has just ended (Tivoli, July 1378); distrust remains.",
+   "confidence": "high"
+  },
+  {
+   "id": "r_florence__siena__rival",
+   "type": "rival",
+   "source": "florence",
+   "target": "siena",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Tuscan rivalry (Montepulciano).",
+   "confidence": "high"
+  },
+  {
+   "id": "r_bologna__florence__alliance",
+   "type": "alliance",
+   "source": "bologna",
+   "target": "florence",
+   "direction": "mutual",
+   "start_date": "1376",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Allies in the war against the papal legates.",
+   "confidence": "medium"
+  },
+  {
+   "id": "r_rimini__urbino__rival",
+   "type": "rival",
+   "source": "rimini",
+   "target": "urbino",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Malatesta-Montefeltro feud.",
+   "confidence": "high"
+  },
+  {
+   "id": "r_forli__papal_states__hostile",
+   "type": "hostile",
+   "source": "forli",
+   "target": "papal_states",
+   "direction": "mutual",
+   "start_date": "1376",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Ordelaffi retook Forlì by revolt against the Church.",
+   "confidence": "medium"
+  },
+  {
+   "id": "r_papal_states__urbino__hostile",
+   "type": "hostile",
+   "source": "papal_states",
+   "target": "urbino",
+   "direction": "mutual",
+   "start_date": "1375",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Antonio da Montefeltro retook Urbino by revolt; no vicariate yet.",
+   "confidence": "medium"
+  },
+  {
+   "id": "r_naples__papal_states__subject",
+   "type": "subject",
+   "source": "naples",
+   "target": "papal_states",
+   "direction": "directed",
+   "subject_kind": "fief",
+   "autonomy": "very_high",
+   "start_date": "1265",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Kingdom of Naples is a papal fief; Urban VI deposes Joanna in 1380.",
+   "confidence": "high"
+  },
+  {
+   "id": "r_ferrara__papal_states__subject",
+   "type": "subject",
+   "source": "ferrara",
+   "target": "papal_states",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "very_high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Este are papal vicars of Ferrara (Modena is an imperial fief).",
+   "confidence": "high"
+  },
+  {
+   "id": "r_rimini__papal_states__subject",
+   "type": "subject",
+   "source": "rimini",
+   "target": "papal_states",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Galeotto I Malatesta holds Rimini, Fano, Fossombrone, Pesaro and Cesena as papal vicar.",
+   "confidence": "medium"
+  },
+  {
+   "id": "r_camerino__papal_states__subject",
+   "type": "subject",
+   "source": "camerino",
+   "target": "papal_states",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Varano papal vicariate.",
+   "confidence": "medium"
+  },
+  {
+   "id": "r_romagna_minor_signorie__papal_states__subject",
+   "type": "subject",
+   "source": "romagna_minor_signorie",
+   "target": "papal_states",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Polenta of Ravenna, the Alidosi of Imola and Hawkwood's Bagnacavallo and Cotignola.",
+   "confidence": "medium"
+  },
+  {
+   "id": "r_ancona__papal_states__subject",
+   "type": "subject",
+   "source": "ancona",
+   "target": "papal_states",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "moderate",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Commune under direct papal government, with Albornoz's citadel.",
+   "confidence": "medium"
+  },
+  {
+   "id": "r_roman_baronial_houses__papal_states__subject",
+   "type": "subject",
+   "source": "roman_baronial_houses",
+   "target": "papal_states",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Colonna, Orsini, Savelli, Caetani of Fondi and the Prefetti di Vico; the Caetani and the Prefetti back Clement.",
+   "confidence": "medium"
+  },
+  {
+   "id": "r_bologna__papal_states__subject",
+   "type": "subject",
+   "source": "bologna",
+   "target": "papal_states",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "very_high",
+   "start_date": "1377",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Free commune since the 1376 revolt, under nominal papal sovereignty after the 1377 settlement.",
+   "confidence": "medium"
+  },
+  {
+   "id": "r_perugia__papal_states__subject",
+   "type": "subject",
+   "source": "perugia",
+   "target": "papal_states",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "very_high",
+   "start_date": "1375",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Autonomous commune under the Raspanti since expelling the papal governor (Dec 1375); papal sovereignty not enforced.",
+   "confidence": "medium"
+  },
+  {
+   "id": "r_saluzzo__dauphine__subject",
+   "type": "subject",
+   "source": "saluzzo",
+   "target": "dauphine",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "very_high",
+   "start_date": "1375-04",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Frederick II swore homage to the Dauphin of France against Savoy's claim.",
+   "confidence": "medium"
+  },
+  {
+   "id": "r_flanders__france__subject",
+   "type": "subject",
+   "source": "flanders",
+   "target": "france",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "very_high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Crown Flanders is a French peerage; Louis of Male does homage but balances France against England.",
+   "confidence": "high",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_ghent__flanders__subject",
+   "type": "subject",
+   "source": "ghent",
+   "target": "flanders",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Ghent leads the Four Members of Flanders; its great revolt against the count begins in September 1379.",
+   "confidence": "high",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_hainaut__holland__subject",
+   "type": "subject",
+   "source": "hainaut",
+   "target": "holland",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "moderate",
+   "start_date": "1345",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Hainaut is held with Holland and Zeeland by the Wittelsbachs; Albert governs it as regent for William V.",
+   "confidence": "high",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_arkel__holland__subject",
+   "type": "subject",
+   "source": "arkel",
+   "target": "holland",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "very_high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The lords of Arkel hold part of their land of the count of Holland and are independent-minded; the Arkel war comes in 1401.",
+   "confidence": "medium",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_bar__france__subject",
+   "type": "subject",
+   "source": "bar",
+   "target": "france",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1301",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Barrois mouvant west of the Meuse is a French fief since the Treaty of Bruges (1301); Robert I is John II's son-in-law.",
+   "confidence": "high",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_vaudemont__lorraine__subject",
+   "type": "subject",
+   "source": "vaudemont",
+   "target": "lorraine",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Vaudémont is a Lorraine fief, held by Margaret of Joinville and Peter of Geneva.",
+   "confidence": "medium",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_soest__cologne__subject",
+   "type": "subject",
+   "source": "soest",
+   "target": "cologne",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Soest is the leading town of the archbishop of Cologne's Duchy of Westphalia.",
+   "confidence": "high",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_schwarzburg__saxony__subject",
+   "type": "subject",
+   "source": "schwarzburg",
+   "target": "saxony",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Many Schwarzburg lands are Wettin fiefs.",
+   "confidence": "medium",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_harz_thuringian_counties__saxony__subject",
+   "type": "subject",
+   "source": "harz_thuringian_counties",
+   "target": "saxony",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1357",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "After the Vogtland war the Vögte and many Thuringian counts hold Wettin fiefs.",
+   "confidence": "medium",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_brandenburg__bohemia__subject",
+   "type": "subject",
+   "source": "brandenburg",
+   "target": "bohemia",
+   "direction": "directed",
+   "subject_kind": "appanage",
+   "autonomy": "high",
+   "start_date": "1373",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Bought by Charles IV in 1373 and joined to the Bohemian crown lands at Tangermünde (1374); assigned to his son Sigismund. It keeps its electoral vote.",
+   "confidence": "medium",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_guelders__julich__alliance",
+   "type": "alliance",
+   "source": "guelders",
+   "target": "julich",
+   "direction": "mutual",
+   "start_date": "1377",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "William II of Jülich acts for his son William I, invested with Guelders by Charles IV in 1377.",
+   "confidence": "high",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_guelders__french_minor_lordships__at_war",
+   "type": "at_war",
+   "source": "guelders",
+   "target": "french_minor_lordships",
+   "direction": "mutual",
+   "start_date": "1371",
+   "historical_end": {
+    "date": "1379-03-24",
+    "how": "Mathilda renounced her claim."
+   },
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "First Guelders succession war: William of Jülich's party against Mathilda of Guelders and her husband John of Blois-Châtillon (here inside french_minor_lordships). Mathilda renounces on 24 Mar 1379.",
+   "confidence": "medium",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_cleves__french_minor_lordships__alliance",
+   "type": "alliance",
+   "source": "cleves",
+   "target": "french_minor_lordships",
+   "direction": "mutual",
+   "start_date": "1377",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Cleves backed Mathilda's party in Guelders (relief army at Hönnepel, 1378).",
+   "confidence": "low",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_cleves__guelders__hostile",
+   "type": "hostile",
+   "source": "cleves",
+   "target": "guelders",
+   "direction": "mutual",
+   "start_date": "1377",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Cleves opposes a Jülich-Guelders block around it.",
+   "confidence": "low",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_julich__brabant__rival",
+   "type": "rival",
+   "source": "julich",
+   "target": "brabant",
+   "direction": "mutual",
+   "start_date": "1371",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Baesweiler (22 Aug 1371): Jülich and Guelders defeated and captured Wenceslaus of Brabant.",
+   "confidence": "high",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_brabant__guelders__hostile",
+   "type": "hostile",
+   "source": "brabant",
+   "target": "guelders",
+   "direction": "mutual",
+   "start_date": "1371",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Brabant holds Grave and the Meuse against Guelders since Baesweiler.",
+   "confidence": "medium",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_cleves__mark__friendly",
+   "type": "friendly",
+   "source": "cleves",
+   "target": "mark",
+   "direction": "mutual",
+   "start_date": "1368",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Adolf of Cleves and Engelbert III of the Mark are brothers.",
+   "confidence": "high",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_julich__berg__friendly",
+   "type": "friendly",
+   "source": "julich",
+   "target": "berg",
+   "direction": "mutual",
+   "start_date": "1360",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Both branches of the house of Jülich.",
+   "confidence": "high",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_holland__friesland__hostile",
+   "type": "hostile",
+   "source": "holland",
+   "target": "friesland",
+   "direction": "directed",
+   "start_date": "1300",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The counts of Holland claim lordship over Frisia; invasion 1396-1401.",
+   "confidence": "high",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_holland__utrecht__hostile",
+   "type": "hostile",
+   "source": "holland",
+   "target": "utrecht",
+   "direction": "mutual",
+   "start_date": "1350",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Border feuds over the Sticht and the Lek.",
+   "confidence": "low",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_holland__bavaria__friendly",
+   "type": "friendly",
+   "source": "holland",
+   "target": "bavaria",
+   "direction": "mutual",
+   "start_date": "1353",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Albert is a Wittelsbach co-duke of Bavaria; the Straubing share is held with Holland.",
+   "confidence": "high",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_mainz__saxony__hostile",
+   "type": "hostile",
+   "source": "mainz",
+   "target": "saxony",
+   "direction": "mutual",
+   "start_date": "1373",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Mainz schism: Louis of Meissen, a Wettin brother and Charles IV's and Gregory XI's choice, disputes the see with Adolf of Nassau until 1381.",
+   "confidence": "high",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_mainz__bohemia__hostile",
+   "type": "hostile",
+   "source": "mainz",
+   "target": "bohemia",
+   "direction": "mutual",
+   "start_date": "1373",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Charles IV opposed Adolf of Nassau, who had stood against Wenceslaus's election.",
+   "confidence": "medium",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_hesse__mainz__rival",
+   "type": "rival",
+   "source": "hesse",
+   "target": "mainz",
+   "direction": "mutual",
+   "start_date": "1300",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Mainz enclaves (Fritzlar, Amöneburg) lie in Hesse; a Mainz-led coalition besieges Kassel in 1385.",
+   "confidence": "high",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_hesse__saxony__alliance",
+   "type": "alliance",
+   "source": "hesse",
+   "target": "saxony",
+   "direction": "mutual",
+   "start_date": "1373",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Hesse-Wettin inheritance pact (Erbverbrüderung) of 1373.",
+   "confidence": "medium",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_cologne_city__cologne__hostile",
+   "type": "hostile",
+   "source": "cologne_city",
+   "target": "cologne",
+   "direction": "mutual",
+   "start_date": "1288",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The city has fought its archbishop since Worringen; the last war ended in 1377.",
+   "confidence": "high",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_palatinate__rhenish_imperial_cities__hostile",
+   "type": "hostile",
+   "source": "palatinate",
+   "target": "rhenish_imperial_cities",
+   "direction": "mutual",
+   "start_date": "1376",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Princes against the city leagues; war in 1388-89.",
+   "confidence": "medium",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_lorraine__france__friendly",
+   "type": "friendly",
+   "source": "lorraine",
+   "target": "france",
+   "direction": "mutual",
+   "start_date": "1346",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Duke John I serves the French crown.",
+   "confidence": "medium",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_metz__bar__hostile",
+   "type": "hostile",
+   "source": "metz",
+   "target": "bar",
+   "direction": "mutual",
+   "start_date": "1368",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Metz captured Robert of Bar in 1368; border feuds.",
+   "confidence": "low",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_westphalian_counties__osnabruck__hostile",
+   "type": "hostile",
+   "source": "westphalian_counties",
+   "target": "osnabruck",
+   "direction": "directed",
+   "start_date": "1376",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Otto VI of Tecklenburg holds most of Osnabrück's castles.",
+   "confidence": "medium",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_magdeburg__bohemia__alliance",
+   "type": "alliance",
+   "source": "magdeburg",
+   "target": "bohemia",
+   "direction": "mutual",
+   "start_date": "1371",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Archbishop Peter Gelyto is Charles IV's man.",
+   "confidence": "medium",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_saxe_wittenberg__luneburg__alliance",
+   "type": "alliance",
+   "source": "saxe_wittenberg",
+   "target": "luneburg",
+   "direction": "mutual",
+   "start_date": "1373",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Elector Wenceslaus I and his nephew Albert hold Lüneburg for the Ascanians under the Peace of Hanover (1373).",
+   "confidence": "high",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_brunswick_wolfenbuttel__luneburg__truce",
+   "type": "truce",
+   "source": "brunswick_wolfenbuttel",
+   "target": "luneburg",
+   "direction": "mutual",
+   "start_date": "1373",
+   "historical_end": {
+    "date": "1388-05-28",
+    "how": "The Welfs won at Winsen an der Aller."
+   },
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Peace of Hanover: alternating Ascanian and Welf rule sealed by marriages; Henry of Brunswick refused it. The war flares again and ends at Winsen (28 May 1388).",
+   "confidence": "medium",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_wendish_hanse_towns__saxe_wittenberg__alliance",
+   "type": "alliance",
+   "source": "wendish_hanse_towns",
+   "target": "saxe_wittenberg",
+   "direction": "mutual",
+   "start_date": "1371",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Lüneburg town backs the Ascanians after expelling the Welf dukes in 1371.",
+   "confidence": "medium",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_bremen__brunswick_wolfenbuttel__friendly",
+   "type": "friendly",
+   "source": "bremen",
+   "target": "brunswick_wolfenbuttel",
+   "direction": "mutual",
+   "start_date": "1373",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Archbishop Albert II is a Welf, uncle of Magnus II's sons.",
+   "confidence": "high",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_brunswick_wolfenbuttel__brunswick_gottingen__rival",
+   "type": "rival",
+   "source": "brunswick_wolfenbuttel",
+   "target": "brunswick_gottingen",
+   "direction": "mutual",
+   "start_date": "1373",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Otto the Evil holds the Brunswick lands as self-made guardian; Frederick drives him out in 1381 or 1384.",
+   "confidence": "medium",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_hildesheim__brunswick_wolfenbuttel__hostile",
+   "type": "hostile",
+   "source": "hildesheim",
+   "target": "brunswick_wolfenbuttel",
+   "direction": "mutual",
+   "start_date": "1367",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Dinklar (1367); the see and the Welfs feud over the Leine-Oker lands.",
+   "confidence": "medium",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_mecklenburg__denmark__hostile",
+   "type": "hostile",
+   "source": "mecklenburg",
+   "target": "denmark",
+   "direction": "mutual",
+   "start_date": "1375",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Albert II claims Denmark for his grandson Albert IV against Olaf II, chosen in 1376.",
+   "confidence": "medium",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_mecklenburg__sweden__alliance",
+   "type": "alliance",
+   "source": "mecklenburg",
+   "target": "sweden",
+   "direction": "mutual",
+   "start_date": "1364",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Albert II's son Albert is King of Sweden; Mecklenburg knights hold Swedish castles.",
+   "confidence": "high",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_mecklenburg__mecklenburg_stargard__friendly",
+   "type": "friendly",
+   "source": "mecklenburg",
+   "target": "mecklenburg_stargard",
+   "direction": "mutual",
+   "start_date": "1352",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Junior Mecklenburg line.",
+   "confidence": "high",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_holstein__denmark__rival",
+   "type": "rival",
+   "source": "holstein",
+   "target": "denmark",
+   "direction": "mutual",
+   "start_date": "1375",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Rendsburg counts hold most of Schleswig by pledge during Olaf II's minority; Denmark refuses them the fief until Nyborg (1386).",
+   "confidence": "medium",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_holstein__dithmarschen__hostile",
+   "type": "hostile",
+   "source": "holstein",
+   "target": "dithmarschen",
+   "direction": "mutual",
+   "start_date": "1319",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Enmity since Wöhrden (1319).",
+   "confidence": "high",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_saxe_lauenburg__saxe_wittenberg__hostile",
+   "type": "hostile",
+   "source": "saxe_lauenburg",
+   "target": "saxe_wittenberg",
+   "direction": "directed",
+   "start_date": "1356",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Lauenburg contests the Saxon electoral vote the Golden Bull gave to Wittenberg.",
+   "confidence": "medium",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_lubeck__hamburg__alliance",
+   "type": "alliance",
+   "source": "lubeck",
+   "target": "hamburg",
+   "direction": "mutual",
+   "start_date": "1241",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Wendish leaders guard the Lübeck-Hamburg road together.",
+   "confidence": "high",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_erfurt__thuringian_imperial_cities__alliance",
+   "type": "alliance",
+   "source": "erfurt",
+   "target": "thuringian_imperial_cities",
+   "direction": "mutual",
+   "start_date": "1304",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Three-city league of Erfurt, Mühlhausen and Nordhausen.",
+   "confidence": "medium",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_hanseatic_league__brunswick_city__hostile",
+   "type": "hostile",
+   "source": "hanseatic_league",
+   "target": "brunswick_city",
+   "direction": "directed",
+   "start_date": "1375",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Hanse expelled Brunswick after the Great Schicht (1374); readmitted in 1380.",
+   "confidence": "high",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "r_moravia__bohemia__subject",
+   "type": "subject",
+   "source": "moravia",
+   "target": "bohemia",
+   "direction": "directed",
+   "subject_kind": "appanage",
+   "autonomy": "high",
+   "start_date": "1375",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Margrave Jobst holds Moravia as a fief of the Bohemian crown (from 1375); his brothers Prokop and John Sobieslaus hold appanages inside it.",
+   "confidence": "high",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "r_silesia__bohemia__subject",
+   "type": "subject",
+   "source": "silesia",
+   "target": "bohemia",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1335",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Silesian dukes (Legnica, Brzeg, Opole, Oleśnica, Głogów-Żagań, Cieszyn, Opava-Racibórz) are vassals of the Bohemian crown since Trenčín (1335); Świdnica-Jawor is held for life by the dowager Agnes.",
+   "confidence": "high",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "r_breslau__bohemia__subject",
+   "type": "subject",
+   "source": "breslau",
+   "target": "bohemia",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "high",
+   "start_date": "1335",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Crown duchy of Breslau, governed by the city for the king.",
+   "confidence": "high",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "r_upper_lusatia__bohemia__subject",
+   "type": "subject",
+   "source": "upper_lusatia",
+   "target": "bohemia",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "high",
+   "start_date": "1329",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Bohemian crown land with the Six Towns League (1346); Görlitz carved out for John of Görlitz in 1377.",
+   "confidence": "high",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "r_lower_lusatia__bohemia__subject",
+   "type": "subject",
+   "source": "lower_lusatia",
+   "target": "bohemia",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "high",
+   "start_date": "1367",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Bought by Charles IV in 1367 and joined to the Bohemian crown; held directly by the king, not yet pledged.",
+   "confidence": "medium",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "r_gorlitz_duchy__bohemia__subject",
+   "type": "subject",
+   "source": "gorlitz_duchy",
+   "target": "bohemia",
+   "direction": "directed",
+   "subject_kind": "appanage",
+   "autonomy": "moderate",
+   "start_date": "1377",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Görlitz and its district made an appanage duchy for John of Görlitz (born 1370), Charles IV's third son; back to the crown on his death (1396).",
+   "confidence": "medium",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "r_rosenberg__bohemia__subject",
+   "type": "subject",
+   "source": "rosenberg",
+   "target": "bohemia",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Rosenberg (Rožmberk) brothers Jan I and Oldřich I hold the greatest magnate lordship of south Bohemia under the crown.",
+   "confidence": "medium",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "r_cilli__austria__subject",
+   "type": "subject",
+   "source": "cilli",
+   "target": "austria",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The counts of Cilli (Hermann I with his nephew William) hold their lands under the Habsburg dukes of Styria; princes of the Empire only in 1436.",
+   "confidence": "medium",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "r_fribourg__austria__subject",
+   "type": "subject",
+   "source": "fribourg",
+   "target": "austria",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1277",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Self-governing Habsburg town since the Kyburg inheritance (1277), with a Burgrecht with Bern.",
+   "confidence": "high",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "r_schaffhausen__austria__subject",
+   "type": "subject",
+   "source": "schaffhausen",
+   "target": "austria",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "moderate",
+   "start_date": "1330",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Pledged to Habsburg by Louis the Bavarian in 1330; regains imperial status in 1415.",
+   "confidence": "high",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "r_glarus__austria__subject",
+   "type": "subject",
+   "source": "glarus",
+   "target": "austria",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "moderate",
+   "start_date": "1355",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Valley under a Habsburg bailiff (Peter von Thorberg) since the 1355 peace undid its confederate pact; frees itself in 1387-88 (Näfels).",
+   "confidence": "medium",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "r_brixen__austria__subject",
+   "type": "subject",
+   "source": "brixen",
+   "target": "austria",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1363",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Prince-bishopric under Tyrolean, now Habsburg, advocacy.",
+   "confidence": "medium",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "r_trent__austria__subject",
+   "type": "subject",
+   "source": "trent",
+   "target": "austria",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1363",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Prince-bishopric bound to the Habsburg counts of Tyrol by the compacts of 1363 with Rudolf IV.",
+   "confidence": "medium",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "r_zug__schwyz__subject",
+   "type": "subject",
+   "source": "zug",
+   "target": "schwyz",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "moderate",
+   "start_date": "1365",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Schwyz names the Ammann of Zug since 1365; Habsburg keeps rights and revenues under the Thorberg peace; the other places force Schwyz back in 1404.",
+   "confidence": "medium",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "r_iceland__norway__subject",
+   "type": "subject",
+   "source": "iceland",
+   "target": "norway",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "high",
+   "start_date": "1264",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Iceland under the Norwegian crown since the Old Covenant (1262-64), with its own law (Jónsbók) and Althing, ruled through a royal governor.",
+   "confidence": "high",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "r_faroes__norway__subject",
+   "type": "subject",
+   "source": "faroes",
+   "target": "norway",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Norwegian crown land with the Løgting at Tinganes; trade through Bergen.",
+   "confidence": "high",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "r_norse_greenland__norway__subject",
+   "type": "subject",
+   "source": "norse_greenland",
+   "target": "norway",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "very_high",
+   "start_date": "1261",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Eastern Settlement under the Norwegian crown since 1261; trade a royal monopoly from Bergen, but the royal ship is lost c.1367-69 and contact is lapsing.",
+   "confidence": "high",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "r_austria__swiss_confederation__truce",
+   "type": "truce",
+   "source": "austria",
+   "target": "swiss_confederation",
+   "direction": "mutual",
+   "start_date": "1368-03",
+   "expires_on": "1387-03",
+   "expiration_condition": "Original eleven-year term from March 1376.",
+   "historical_end": {
+    "date": "1386-07-09",
+    "how": "Lucerne seized Habsburg towns in winter 1385-86; Leopold III invaded and fell at Sempach."
+   },
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Thorberg peace between the Habsburgs and the confederates, extended in March 1376 for eleven years.",
+   "confidence": "high",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "r_austria__swiss_confederation__rival",
+   "type": "rival",
+   "source": "austria",
+   "target": "swiss_confederation",
+   "direction": "mutual",
+   "start_date": "1315",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Habsburg claims rights over Lucerne, Zug and the Waldstätte countryside; the confederates take Habsburg towns whenever they can. Renounced in the twenty-year peace of 1394.",
+   "confidence": "high",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "r_wurttemberg__swabian_league_cities__hostile",
+   "type": "hostile",
+   "source": "wurttemberg",
+   "target": "swabian_league_cities",
+   "direction": "mutual",
+   "start_date": "1377-05-14",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Open feud between Eberhard II and the Swabian City League since the league's victory at Reutlingen (14 May 1377); the Town War follows in 1387-89 (Döffingen, 23 Aug 1388).",
+   "confidence": "high",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "r_bavaria__swabian_league_cities__rival",
+   "type": "rival",
+   "source": "bavaria",
+   "target": "swabian_league_cities",
+   "direction": "mutual",
+   "start_date": "1377",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Duke Frederick holds the Lower Swabian Landvogtei after the Peace of Nuremberg (Aug 1378) and presses the imperial cities; war again in 1388.",
+   "confidence": "medium",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "r_salzburg__bavaria__rival",
+   "type": "rival",
+   "source": "salzburg",
+   "target": "bavaria",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Salt trade and borders; the Bavarian dukes seize Archbishop Pilgrim II in 1387 for his league with the cities.",
+   "confidence": "medium",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "r_burgraviate_of_nuremberg__nuremberg__rival",
+   "type": "rival",
+   "source": "burgraviate_of_nuremberg",
+   "target": "nuremberg",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Hohenzollern burgraves hold the castle and burgravial rights inside the imperial city until the city buys them out (1427).",
+   "confidence": "high",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "r_denmark__sweden__rival",
+   "type": "rival",
+   "source": "denmark",
+   "target": "sweden",
+   "direction": "mutual",
+   "start_date": "1360",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Valdemar IV took back Scania and Gotland (1360-61); Albert of Sweden treats Gotland as Swedish and backs his nephew's claim to the Danish throne. No open war on the start day.",
+   "confidence": "high",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "r_norway__sweden__rival",
+   "type": "rival",
+   "source": "norway",
+   "target": "sweden",
+   "direction": "mutual",
+   "start_date": "1364",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Haakon VI was deposed as Swedish co-king in 1364; the war against Albert (1364-71) ended in a peace that left his claim alive.",
+   "confidence": "medium",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "r_sweden__novgorod__rival",
+   "type": "rival",
+   "source": "sweden",
+   "target": "novgorod",
+   "direction": "mutual",
+   "start_date": "1293",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Karelian border after Nöteborg (1323); Novgorod raids Finland and both tax the Karelians and Sámi.",
+   "confidence": "medium",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "r_denmark__mecklenburg__rival",
+   "type": "rival",
+   "source": "denmark",
+   "target": "mecklenburg",
+   "direction": "mutual",
+   "start_date": "1375",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Albert II of Mecklenburg claims the Danish throne for his grandson Albert IV, son of Valdemar's elder daughter Ingeborg, against Olaf.",
+   "confidence": "high",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "r_norway__denmark__friendly",
+   "type": "friendly",
+   "source": "norway",
+   "target": "denmark",
+   "direction": "mutual",
+   "start_date": "1363",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Haakon VI married Margaret (1363); their son Olaf is King of Denmark and Haakon's heir in Norway. A personal union on Haakon's death (1380).",
+   "confidence": "high",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "r_sweden__mecklenburg__friendly",
+   "type": "friendly",
+   "source": "sweden",
+   "target": "mecklenburg",
+   "direction": "mutual",
+   "start_date": "1364",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Albert of Sweden is the son of Duke Albert II of Mecklenburg; Mecklenburg men hold Swedish castles.",
+   "confidence": "high",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "r_denmark__hanseatic_league__friendly",
+   "type": "friendly",
+   "source": "denmark",
+   "target": "hanseatic_league",
+   "direction": "mutual",
+   "start_date": "1370-05-24",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Peace of Stralsund left the Hanse its Scanian castles for 15 years, and the Hanse backed Olaf's election against Mecklenburg (1376). They cooperate until the 1420s.",
+   "confidence": "medium",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "r_bavaria__milan__friendly",
+   "type": "friendly",
+   "source": "bavaria",
+   "target": "milan",
+   "direction": "mutual",
+   "start_date": "1364",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Stephen III married Taddea Visconti, Bernabò's daughter; the dukes are Visconti allies (Frederick marries Maddalena Visconti in 1381).",
+   "confidence": "high",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "r_bavaria__palatinate__friendly",
+   "type": "friendly",
+   "source": "bavaria",
+   "target": "palatinate",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Wittelsbach kin; the house treaty of Pavia (1329) shares claims between the Bavarian and Palatine lines.",
+   "confidence": "high",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "r_austria__hungary__friendly",
+   "type": "friendly",
+   "source": "austria",
+   "target": "hungary",
+   "direction": "mutual",
+   "start_date": "1378-06-15",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Sponsalia at Hainburg: Leopold III's son William betrothed to Hedwig, daughter of Louis I.",
+   "confidence": "high",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "r_austria__gorizia__friendly",
+   "type": "friendly",
+   "source": "austria",
+   "target": "gorizia",
+   "direction": "mutual",
+   "start_date": "1374",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Habsburg took Gorizian Istria and the Windic March on Albert III of Gorizia's death (1374); inheritance links with Count Meinhard VI continue.",
+   "confidence": "medium",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "r_bohemia__hungary__friendly",
+   "type": "friendly",
+   "source": "bohemia",
+   "target": "hungary",
+   "direction": "mutual",
+   "start_date": "1372",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Sigismund, Charles IV's son, is betrothed to Mary, heiress of Louis I.",
+   "confidence": "high",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "r_bern__solothurn__alliance",
+   "type": "alliance",
+   "source": "bern",
+   "target": "solothurn",
+   "direction": "mutual",
+   "start_date": "1345",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Defensive alliance between Bern and the imperial city of Solothurn.",
+   "confidence": "high",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "r_bern__fribourg__friendly",
+   "type": "friendly",
+   "source": "bern",
+   "target": "fribourg",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Burgrecht between Bern and Habsburg Fribourg.",
+   "confidence": "medium",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "r_ulm__swabian_league_cities__alliance",
+   "type": "alliance",
+   "source": "ulm",
+   "target": "swabian_league_cities",
+   "direction": "mutual",
+   "start_date": "1376-07-04",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Member of the Swabian City League of 4 Jul 1376 and its leading city; the league is banned at Eger in 1389.",
+   "confidence": "high",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "r_augsburg__swabian_league_cities__alliance",
+   "type": "alliance",
+   "source": "augsburg",
+   "target": "swabian_league_cities",
+   "direction": "mutual",
+   "start_date": "1377",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Member of the Swabian City League of 4 Jul 1376; the league is banned at Eger in 1389.",
+   "confidence": "medium",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "r_constance__swabian_league_cities__alliance",
+   "type": "alliance",
+   "source": "constance",
+   "target": "swabian_league_cities",
+   "direction": "mutual",
+   "start_date": "1377",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Member of the Swabian City League of 4 Jul 1376; the league is banned at Eger in 1389.",
+   "confidence": "medium",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  }
+ ],
+ "facts": [
+  {
+   "id": "f_england__france__dynastic_claim",
+   "fact": "dynastic_claim",
+   "source": "england",
+   "target": "france",
+   "direction": "directed",
+   "start_date": "1340",
+   "explanation": "Richard II holds Edward III's claim to the French crown.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_sumption_hyw3",
+    "src_bi_allmand_hyw"
+   ]
+  },
+  {
+   "id": "f_england__castile__dynastic_claim",
+   "fact": "dynastic_claim",
+   "source": "england",
+   "target": "castile",
+   "direction": "directed",
+   "start_date": "1372",
+   "explanation": "John of Gaunt, the king's uncle, styles himself King of Castile as husband of Constance, daughter of Peter I.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_sumption_hyw3",
+    "src_bi_allmand_hyw"
+   ]
+  },
+  {
+   "id": "f_french_minor_lordships__brittany__dynastic_claim",
+   "fact": "dynastic_claim",
+   "source": "french_minor_lordships",
+   "target": "brittany",
+   "direction": "directed",
+   "start_date": "1341",
+   "explanation": "The Penthièvre (Blois) claim to Brittany, carried by Joan of Penthièvre.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_jones_brittany",
+    "src_fr_sumption_hyw3"
+   ]
+  },
+  {
+   "id": "f_lordship_of_the_isles__scotland__royal_marriage",
+   "fact": "royal_marriage",
+   "source": "lordship_of_the_isles",
+   "target": "scotland",
+   "direction": "mutual",
+   "start_date": "1350",
+   "explanation": "John of Islay married Margaret, daughter of Robert Stewart (now Robert II).",
+   "confidence": "high",
+   "source_ids": [
+    "src_bi_munro_isles"
+   ]
+  },
+  {
+   "id": "f_burgundy__flanders__royal_marriage",
+   "fact": "royal_marriage",
+   "source": "burgundy",
+   "target": "flanders",
+   "direction": "mutual",
+   "start_date": "1369-06-19",
+   "explanation": "Philip the Bold married Margaret of Male, heiress of Flanders, Artois, Nevers, Rethel and the County of Burgundy.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_autrand_charles_v",
+    "src_ncmh6"
+   ]
+  },
+  {
+   "id": "f_albret__bourbon__royal_marriage",
+   "fact": "royal_marriage",
+   "source": "albret",
+   "target": "bourbon",
+   "direction": "mutual",
+   "start_date": "1368",
+   "explanation": "Arnaud-Amanieu VIII married Margaret of Bourbon.",
+   "confidence": "high",
+   "source_ids": [
+    "src_fr_autrand_charles_v",
+    "src_ncmh6"
+   ]
+  },
+  {
+   "id": "f_provence__naples__shared_ruler",
+   "fact": "shared_ruler",
+   "source": "provence",
+   "target": "naples",
+   "direction": "mutual",
+   "start_date": "1343",
+   "explanation": "Joanna I is Queen of Naples and Countess of Provence.",
+   "confidence": "high",
+   "source_ids": [
+    "src_ncmh6"
+   ]
+  },
+  {
+   "id": "f_england__lordship_of_ireland__shared_ruler",
+   "fact": "shared_ruler",
+   "source": "england",
+   "target": "lordship_of_ireland",
+   "direction": "mutual",
+   "start_date": "1177",
+   "explanation": "Richard II is King of England and Lord of Ireland.",
+   "confidence": "high",
+   "source_ids": [
+    "src_bi_lydon_lordship",
+    "src_bi_nicholls_gaelic"
+   ]
+  },
+  {
+   "id": "f_lordship_of_ireland__leinster_kavanagh__secondary_tribute",
+   "fact": "secondary_tribute",
+   "source": "lordship_of_ireland",
+   "target": "leinster_kavanagh",
+   "direction": "directed",
+   "start_date": "1375",
+   "explanation": "The colony pays crown fees and black rent to Art Mór MacMurrough.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_bi_lydon_lordship",
+    "src_bi_nicholls_gaelic"
+   ]
+  },
+  {
+   "id": "f_lordship_of_ireland__gaelic_leinster_midlands__secondary_tribute",
+   "fact": "secondary_tribute",
+   "source": "lordship_of_ireland",
+   "target": "gaelic_leinster_midlands",
+   "direction": "directed",
+   "start_date": null,
+   "explanation": "Black rent to the Midland lords for protection of the Pale borders.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_bi_lydon_lordship",
+    "src_bi_nicholls_gaelic"
+   ]
+  },
+  {
+   "id": "f_england__flanders__trade_agreement",
+   "fact": "trade_agreement",
+   "source": "england",
+   "target": "flanders",
+   "direction": "mutual",
+   "start_date": null,
+   "explanation": "English wool feeds the Flemish cloth towns through the Calais staple.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_fr_sumption_hyw3",
+    "src_bi_allmand_hyw"
+   ]
+  },
+  {
+   "id": "f_england__hanseatic_league__trade_agreement",
+   "fact": "trade_agreement",
+   "source": "england",
+   "target": "hanseatic_league",
+   "direction": "mutual",
+   "start_date": null,
+   "explanation": "The Hanse trades from the London Steelyard under royal privileges.",
+   "confidence": "high",
+   "source_ids": [
+    "src_hn_dollinger"
+   ]
+  },
+  {
+   "id": "f_aragon__castile__royal_marriage",
+   "fact": "royal_marriage",
+   "source": "aragon",
+   "target": "castile",
+   "direction": "mutual",
+   "start_date": "1375",
+   "explanation": "The Infante John of Castile married Eleanor of Aragon (Peace of Almazán).",
+   "confidence": "high"
+  },
+  {
+   "id": "f_castile__navarre__royal_marriage",
+   "fact": "royal_marriage",
+   "source": "castile",
+   "target": "navarre",
+   "direction": "mutual",
+   "start_date": "1375",
+   "explanation": "Charles of Navarre married Eleanor of Castile.",
+   "confidence": "high"
+  },
+  {
+   "id": "f_portugal__castile__dynastic_claim",
+   "fact": "dynastic_claim",
+   "source": "portugal",
+   "target": "castile",
+   "direction": "directed",
+   "start_date": "1369",
+   "explanation": "Ferdinand I claims Castile as Sancho IV's great-grandson against the Trastámara.",
+   "confidence": "high"
+  },
+  {
+   "id": "f_aragon__sicily__dynastic_claim",
+   "fact": "dynastic_claim",
+   "source": "aragon",
+   "target": "sicily",
+   "direction": "directed",
+   "start_date": "1377-07-27",
+   "explanation": "Peter IV claims Sicily after Frederick IV's death.",
+   "confidence": "high"
+  },
+  {
+   "id": "f_aragon__athens__dynastic_claim",
+   "fact": "dynastic_claim",
+   "source": "aragon",
+   "target": "athens",
+   "direction": "directed",
+   "start_date": "1377-07-27",
+   "explanation": "Peter IV claims the Catalan duchies of Athens and Neopatras; they accept him in 1379-80.",
+   "confidence": "high"
+  },
+  {
+   "id": "f_genoa__granada__trade_agreement",
+   "fact": "trade_agreement",
+   "source": "genoa",
+   "target": "granada",
+   "direction": "mutual",
+   "start_date": null,
+   "explanation": "Genoese merchants run Granada's export trade (silk, sugar, fruit).",
+   "confidence": "high"
+  },
+  {
+   "id": "f_milan__verona__dynastic_claim",
+   "fact": "dynastic_claim",
+   "source": "milan",
+   "target": "verona",
+   "direction": "directed",
+   "start_date": "1375",
+   "explanation": "Regina della Scala, Bernabò's wife, claims the Scaliger inheritance.",
+   "confidence": "medium"
+  },
+  {
+   "id": "f_montferrat__visconti_pavia__royal_marriage",
+   "fact": "royal_marriage",
+   "source": "montferrat",
+   "target": "visconti_pavia",
+   "direction": "mutual",
+   "start_date": "1377-08-02",
+   "explanation": "Secondotto married Violante Visconti, Gian Galeazzo's sister.",
+   "confidence": "high"
+  },
+  {
+   "id": "f_austria__milan__royal_marriage",
+   "fact": "royal_marriage",
+   "source": "austria",
+   "target": "milan",
+   "direction": "mutual",
+   "start_date": "1365",
+   "explanation": "Bernabò's daughter Viridis married Leopold III of Austria.",
+   "confidence": "high"
+  },
+  {
+   "id": "f_bavaria__milan__royal_marriage",
+   "fact": "royal_marriage",
+   "source": "bavaria",
+   "target": "milan",
+   "direction": "mutual",
+   "start_date": "1364",
+   "explanation": "Bernabò's daughter Taddea married Stephen III of Bavaria.",
+   "confidence": "high"
+  },
+  {
+   "id": "f_florence__pisa__trade_agreement",
+   "fact": "trade_agreement",
+   "source": "florence",
+   "target": "pisa",
+   "direction": "mutual",
+   "start_date": "1369",
+   "explanation": "Gambacorta's Pisa is Florence's port and partner.",
+   "confidence": "medium"
+  },
+  {
+   "id": "f_brabant__luxembourg__shared_ruler",
+   "fact": "shared_ruler",
+   "source": "brabant",
+   "target": "luxembourg",
+   "direction": "mutual",
+   "start_date": "1355",
+   "explanation": "Wenceslaus I is duke of Luxembourg in his own right and of Brabant through Joanna; the union ends on his death (1383).",
+   "confidence": "medium",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "f_holland__bohemia__royal_marriage",
+   "fact": "royal_marriage",
+   "source": "holland",
+   "target": "bohemia",
+   "direction": "mutual",
+   "start_date": "1370",
+   "explanation": "Wenceslaus married Joanna of Bavaria-Straubing, Albert's daughter (d. 1386).",
+   "confidence": "high",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "f_saxe_wittenberg__brunswick_wolfenbuttel__royal_marriage",
+   "fact": "royal_marriage",
+   "source": "saxe_wittenberg",
+   "target": "brunswick_wolfenbuttel",
+   "direction": "mutual",
+   "start_date": "1373",
+   "explanation": "Frederick and Bernard of Brunswick married daughters of Elector Wenceslaus I.",
+   "confidence": "medium",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "f_brunswick_wolfenbuttel__luneburg__dynastic_claim",
+   "fact": "dynastic_claim",
+   "source": "brunswick_wolfenbuttel",
+   "target": "luneburg",
+   "direction": "directed",
+   "start_date": "1369",
+   "explanation": "The Welf sons of Magnus II claim Lüneburg under Welf house law.",
+   "confidence": "high",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "f_brunswick_gottingen__brunswick_wolfenbuttel__shared_ruler",
+   "fact": "shared_ruler",
+   "source": "brunswick_gottingen",
+   "target": "brunswick_wolfenbuttel",
+   "direction": "directed",
+   "start_date": "1373",
+   "explanation": "Otto the Evil of Göttingen rules the Brunswick lands as guardian of Magnus II's sons under the 1370 pact.",
+   "confidence": "medium",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "f_mecklenburg__denmark__dynastic_claim",
+   "fact": "dynastic_claim",
+   "source": "mecklenburg",
+   "target": "denmark",
+   "direction": "directed",
+   "start_date": "1375",
+   "explanation": "Albert II claims the Danish crown for his grandson Albert IV, son of Ingeborg, daughter of Valdemar IV.",
+   "confidence": "medium",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "f_pomerania_stolp__bohemia__royal_marriage",
+   "fact": "royal_marriage",
+   "source": "pomerania_stolp",
+   "target": "bohemia",
+   "direction": "mutual",
+   "start_date": "1363",
+   "explanation": "Empress Elizabeth, Sigismund's mother, is the daughter of Bogislaw V of Stolp.",
+   "confidence": "high",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "f_hanseatic_league__denmark__trade_agreement",
+   "fact": "trade_agreement",
+   "source": "hanseatic_league",
+   "target": "denmark",
+   "direction": "mutual",
+   "start_date": "1370-05-24",
+   "explanation": "Peace of Stralsund: free trade, toll rights and the Scanian castles held by the towns until 1385.",
+   "confidence": "high",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "f_hanseatic_league__flanders__trade_agreement",
+   "fact": "trade_agreement",
+   "source": "hanseatic_league",
+   "target": "flanders",
+   "direction": "mutual",
+   "start_date": "1360",
+   "explanation": "Bruges Kontor privileges after the 1358-60 blockade.",
+   "confidence": "high",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "f_hanseatic_league__norway__trade_agreement",
+   "fact": "trade_agreement",
+   "source": "hanseatic_league",
+   "target": "norway",
+   "direction": "mutual",
+   "start_date": "1343",
+   "explanation": "The Bergen Kontor.",
+   "confidence": "high",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "f_hanseatic_league__novgorod__trade_agreement",
+   "fact": "trade_agreement",
+   "source": "hanseatic_league",
+   "target": "novgorod",
+   "direction": "mutual",
+   "start_date": "1259",
+   "explanation": "The Peterhof Kontor.",
+   "confidence": "high",
+   "source_ids": [
+    "research_1378_europe_west"
+   ]
+  },
+  {
+   "id": "f_norway__denmark__royal_marriage",
+   "fact": "royal_marriage",
+   "source": "norway",
+   "target": "denmark",
+   "direction": "mutual",
+   "start_date": "1363-04-09",
+   "explanation": "Haakon VI married Margaret, daughter of Valdemar IV of Denmark.",
+   "confidence": "high",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "f_norway__sweden__dynastic_claim",
+   "fact": "dynastic_claim",
+   "source": "norway",
+   "target": "sweden",
+   "direction": "directed",
+   "start_date": "1364",
+   "explanation": "Haakon VI, deposed in 1364, keeps the Swedish title; Olaf takes up the claim.",
+   "confidence": "medium",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "f_bohemia__hungary__royal_marriage",
+   "fact": "royal_marriage",
+   "source": "bohemia",
+   "target": "hungary",
+   "direction": "mutual",
+   "start_date": "1372",
+   "explanation": "Sigismund of Luxembourg betrothed to Mary, heiress of Louis I; married 1385.",
+   "confidence": "high",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "f_bohemia__hungary__dynastic_claim",
+   "fact": "dynastic_claim",
+   "source": "bohemia",
+   "target": "hungary",
+   "direction": "directed",
+   "start_date": "1372",
+   "explanation": "Through Sigismund's betrothal to Mary; Sigismund becomes King of Hungary in 1387.",
+   "confidence": "medium",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "f_bohemia__silesia__dynastic_claim",
+   "fact": "dynastic_claim",
+   "source": "bohemia",
+   "target": "silesia",
+   "direction": "directed",
+   "start_date": "1368",
+   "explanation": "Świdnica-Jawor: the dowager Agnes rules for life and the crown inherits on her death (through Anne of Świdnica, Wenceslaus's mother); falls in 1392.",
+   "confidence": "high",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "f_austria__hungary__royal_marriage",
+   "fact": "royal_marriage",
+   "source": "austria",
+   "target": "hungary",
+   "direction": "mutual",
+   "start_date": "1378-06-15",
+   "explanation": "William, son of Leopold III, betrothed to Hedwig (Jadwiga), daughter of Louis I, at Hainburg.",
+   "confidence": "high",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "f_austria__poland__dynastic_claim",
+   "fact": "dynastic_claim",
+   "source": "austria",
+   "target": "poland",
+   "direction": "directed",
+   "start_date": "1378-06-15",
+   "explanation": "William's claim through Hedwig; ends with her marriage to Jogaila (1386).",
+   "confidence": "medium",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "f_burgraviate_of_nuremberg__austria__royal_marriage",
+   "fact": "royal_marriage",
+   "source": "burgraviate_of_nuremberg",
+   "target": "austria",
+   "direction": "mutual",
+   "start_date": "1375",
+   "explanation": "Albert III married Beatrix, daughter of Burgrave Frederick V.",
+   "confidence": "high",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "f_bavaria__gorizia__royal_marriage",
+   "fact": "royal_marriage",
+   "source": "bavaria",
+   "target": "gorizia",
+   "direction": "mutual",
+   "start_date": "1372",
+   "explanation": "John II married Catherine of Gorizia.",
+   "confidence": "medium",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  },
+  {
+   "id": "f_sweden__hanseatic_league__trade_agreement",
+   "fact": "trade_agreement",
+   "source": "sweden",
+   "target": "hanseatic_league",
+   "direction": "mutual",
+   "start_date": null,
+   "explanation": "German burghers dominate Stockholm and the towns; Lübeck carries Swedish copper and iron.",
+   "confidence": "medium",
+   "source_ids": [
+    "res_europe_west_1378"
+   ]
+  }
+ ],
+ "entities": [
+  {
+   "id": "arkel",
+   "name": "Lordship of Arkel"
+  },
+  {
+   "id": "berg",
+   "name": "County of Berg"
+  },
+  {
+   "id": "julich",
+   "name": "Duchy of Jülich"
+  },
+  {
+   "id": "free_companies",
+   "name": "The Free Companies"
+  },
+  {
+   "id": "gorlitz_duchy",
+   "name": "Duchy of Görlitz"
+  }
+ ],
+ "obedience": {
+  "england": "rome",
+  "ireland": "rome",
+  "lordship_of_ireland": "rome",
+  "ormond": "rome",
+  "desmond": "rome",
+  "kildare": "rome",
+  "isle_of_man": "rome",
+  "english_france": "rome",
+  "tyrone": "rome",
+  "tyrconnell": "rome",
+  "thomond": "rome",
+  "leinster_kavanagh": "rome",
+  "maccarthy_mor": "rome",
+  "breifne": "rome",
+  "connacht_burkes": "rome",
+  "gaelic_connacht_minor": "rome",
+  "gaelic_leinster_midlands": "rome",
+  "gaelic_munster_minor": "rome",
+  "ulster_minor": "rome",
+  "orkney": "rome",
+  "scotland": "avignon",
+  "lordship_of_the_isles": "avignon",
+  "douglas_earldom": "avignon",
+  "france": "avignon",
+  "burgundy": "avignon",
+  "anjou": "avignon",
+  "berry": "avignon",
+  "bourbon": "avignon",
+  "alencon": "avignon",
+  "armagnac": "avignon",
+  "albret": "avignon",
+  "dauphine": "avignon",
+  "brittany": "avignon",
+  "french_minor_lordships": "avignon",
+  "franche_comte": "avignon",
+  "provence": "avignon",
+  "orange": "avignon",
+  "comtat_venaissin": "avignon",
+  "foix": null,
+  "castile": null,
+  "aragon": null,
+  "navarre": null,
+  "portugal": null,
+  "savoy": "avignon",
+  "naples": "avignon",
+  "milan": "rome",
+  "visconti_pavia": "rome",
+  "venice": "rome",
+  "genoa": "rome",
+  "florence": "rome",
+  "modena": "rome",
+  "papal_states": "rome",
+  "verona": "rome",
+  "padua": "rome",
+  "pisa": "rome",
+  "aquileia": "rome",
+  "bologna": "rome",
+  "siena": "rome",
+  "perugia": "rome",
+  "sicily": null,
+  "oristano": null,
+  "montferrat": null,
+  "saluzzo": "avignon",
+  "mantua": "rome",
+  "lucca": "rome",
+  "rimini": "rome",
+  "urbino": "rome",
+  "forli": "rome",
+  "camerino": "rome",
+  "ancona": "rome",
+  "san_marino": "rome",
+  "romagna_minor_signorie": "rome",
+  "sardinia": null,
+  "andorra": null,
+  "castilian_magnates": null,
+  "castilian_military_orders": null,
+  "aragon_kingdom": null,
+  "catalonia": null,
+  "valencia": null,
+  "flanders": "rome",
+  "holland": "rome",
+  "guelders": "rome",
+  "liege": "rome",
+  "utrecht": "rome",
+  "friesland": "rome",
+  "cologne": "rome",
+  "trier": "rome",
+  "munster": "rome",
+  "palatinate": "rome",
+  "hesse": "rome",
+  "saxony": "rome",
+  "saxe_wittenberg": "rome",
+  "brandenburg": "rome",
+  "luneburg": "rome",
+  "brunswick_gottingen": "rome",
+  "bremen": "rome",
+  "hamburg": "rome",
+  "holstein": "rome",
+  "mecklenburg": "rome",
+  "pomerania": "rome",
+  "ghent": "rome",
+  "julich": "rome",
+  "berg": "rome",
+  "cleves": "rome",
+  "mark": "rome",
+  "arkel": "rome",
+  "cologne_city": "rome",
+  "osnabruck": "rome",
+  "paderborn": "rome",
+  "aachen": "rome",
+  "frankfurt": "rome",
+  "dortmund": "rome",
+  "rhenish_imperial_cities": "rome",
+  "groningen": "rome",
+  "east_frisia": "rome",
+  "nassau": "rome",
+  "katzenelnbogen": "rome",
+  "waldeck": "rome",
+  "wetterau_counties": "rome",
+  "westphalian_counties": "rome",
+  "rhineland_minor_counties": "rome",
+  "lr_minor_ecclesiastical_estates": "rome",
+  "soest": "rome",
+  "hainaut": "rome",
+  "hre": "rome",
+  "brunswick_wolfenbuttel": "rome",
+  "brunswick_grubenhagen": "rome",
+  "mecklenburg_stargard": "rome",
+  "werle": "rome",
+  "pomerania_stettin": "rome",
+  "pomerania_wolgast": "rome",
+  "pomerania_stolp": "rome",
+  "oldenburg": "rome",
+  "saxe_lauenburg": "rome",
+  "anhalt": "rome",
+  "magdeburg": "rome",
+  "verden": "rome",
+  "hildesheim": "rome",
+  "halberstadt": "rome",
+  "minden": "rome",
+  "meissen": "rome",
+  "ratzeburg": "rome",
+  "north_german_minor_bishoprics": "rome",
+  "lubeck": "rome",
+  "bremen_city": "rome",
+  "brunswick_city": "rome",
+  "goslar": "rome",
+  "dithmarschen": "rome",
+  "thuringian_imperial_cities": "rome",
+  "hoya": "rome",
+  "lippe": "rome",
+  "schwarzburg": "rome",
+  "mansfeld": "rome",
+  "harz_thuringian_counties": "rome",
+  "lower_saxon_minor_counties": "rome",
+  "hanseatic_league": "rome",
+  "wendish_hanse_towns": "rome",
+  "saxon_hanse_towns": "rome",
+  "lorraine": "avignon",
+  "bar": "avignon",
+  "vaudemont": "avignon",
+  "metz": "avignon",
+  "toul_verdun": "avignon",
+  "brabant": null,
+  "luxembourg": null,
+  "mainz": null,
+  "namur": null,
+  "cambrai": null,
+  "erfurt": null,
+  "austria": "rome",
+  "bohemia": "rome",
+  "moravia": "rome",
+  "bavaria": "rome",
+  "wurttemberg": "rome",
+  "burgraviate_of_nuremberg": "rome",
+  "salzburg": "rome",
+  "switzerland": "rome",
+  "denmark": "rome",
+  "norway": "rome",
+  "sweden": "rome"
+ }
+}

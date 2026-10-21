@@ -170,8 +170,9 @@ threshold) or fail.
   the 1444 count, provisional). [X-21]
 - BAL-020 *Every path is open to every size.* For the small band, the best strategy's mean score growth shall be at
   least `balance.checks.small_floor` (70 %, provisional) of the large band's best, so small realms are playable. [X-21]
-- BAL-021 *No collapse without cause.* No realm shall go bankrupt (debt over two years' income) at peace with no
-  rebels in more than `balance.checks.bankrupt_share` (5 %, provisional) of realm-runs. [X-21]
+- BAL-021 *No collapse without cause.* No realm shall go bankrupt (default on its debts, REALM-301, or owe more than two
+  years' income) at peace with no rebels in more than `balance.checks.bankrupt_share` (5 %, provisional) of realm-runs.
+  [X-21, X-29: with lenders capped at a year's income, a default is how a realm goes bankrupt]
 
 ### 5.5 Lever sweeps
 
@@ -205,6 +206,29 @@ threshold) or fail.
   command line (for example `pnpm --filter @ph/sim strategies --years 50 --seeds 1,2,3` and `--sweep`); Claude
   copies the run folder to the project files under `balance-runs/<date>/` and links `report.md` in the thread.
   [X-21; feedback 130]
+
+### 5.8 The history check (milestone 10, 19 October 2026)
+
+A headless run from the start compares the world with the history checkpoints, to measure how far a campaign moves
+from history (plan-1378 §2). It is reference only: the game never pulls a realm back toward history.
+
+- BAL-031 The history check shall play AI-only campaigns from the bundled start, as the balance runs do (BAL-005),
+  over the seeds asked, and on each checkpoint date after the start that a run reaches (18 Feb 1405, 21 May 1420,
+  11 Nov 1444, 1 Jan 1500, 1 Jan 1600, 1 Jan 1715, 9 Jun 1815, 28 Jun 1914), compare the world with that
+  checkpoint (`packages/sim/data/checkpoints/`). [plan-1378 §2]
+- BAL-032 The history check shall count four things at each checkpoint: the share of the 146 key places whose
+  holder matches (each place bound to the nearest land province, a holder matching by its id or an alias in
+  `ids.json`, and a place nobody held as a state left out); the share of the checkpoint's listed realms that
+  exist; how many of its great powers are among the 8 realms with the most provinces (EVT-083); and the share of
+  its turning points the event tree holds that have happened. [plan-1378 §2; checkpoints/README.md]
+- BAL-033 The history check shall mark a checkpoint *within history* when its key-place share is at least the
+  checkpoint's `tolerance.key_places_match_share` (1405 0.8, 1420 0.75, 1444 0.7, 1500 0.6, 1600 0.5, 1715 0.4,
+  1815 0.35, 1914 0.3), and *apart* otherwise; it never fails the command, since realms are meant to go their own
+  way. @placeholder [plan-1378 §2]
+- BAL-034 The history check shall write `history.md` (read this first: one row per checkpoint with the four counts,
+  the tolerance and the mark, then the places that differ most often, with who held them instead) and
+  `history.json`, and start only when Leroy asks (`pnpm --filter @ph/sim history --seeds 1,2,3 --years 70`), as
+  BAL-029. [plan-1378 §2, §6 step 8]
 
 ### How the player uses it
 
@@ -263,6 +287,7 @@ turn, after the turn, it records the metrics.
 | balance.sweep.targets | Target metric per lever | per lever | yes | packages/sim/config.json |
 | balance.sweep.dead | BAL-023 | 2 % | yes | packages/sim/config.json |
 | balance.sweep.sensitive | BAL-024 | 25 % | yes | packages/sim/config.json |
+| checkpoint `tolerance.key_places_match_share` | BAL-033 | 0.8 to 0.3 by checkpoint | yes | packages/sim/data/checkpoints/<year>.json |
 
 ## 11. Seams
 
@@ -303,4 +328,5 @@ strategies of BAL-008 with ordinary commands. The Court strategy is the AI itsel
 | BAL-013 … BAL-021 | features/balance-checks.feature | No strategy dominates; War is not the best path; War is paid for; Conquest is answered; Wars end; No snowball; Believable pace; Small realms are playable; No collapse without cause |
 | BAL-022 … BAL-024 | features/lever-sweeps.feature | A sweep scales one lever at a time; A dead lever; A sensitive lever |
 | BAL-025 … BAL-029 | features/balance-report.feature | The report's files; War-price checks come first; A failed check fails the command; CI tests the tools without a campaign; Runs start when Leroy asks |
+| BAL-031 … BAL-034 | features/history-check.feature | The start matches its own checkpoint; A checkpoint within history; A place held by an alias; The command never fails on history |
 | BAL-030 | — | Not player-facing; the player-facing price of war is WAR-229 to WAR-232 and DIPL-225 to DIPL-226 |

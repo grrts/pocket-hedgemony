@@ -1,0 +1,2140 @@
+{
+ "schema_version": "1.0",
+ "reference_date": "1378-09-20",
+ "description": "Historically supported relations between South, East and Southeast Asian entities on 20 September 1378, keyed by country-catalogue ids (new records by their research ids), from start-date/research/asia.md. A missing pair means nothing is recorded, not Neutral. Relations naming a realm outside these regions (hormuz, mamluk) are this region's half of a cross-region pair. entities: 1378 realms that are neither map nations nor catalogue records yet.",
+ "rules_file": "../config/relation-rules.json",
+ "relations": [
+  {
+   "id": "r_sindh__delhi__subject",
+   "type": "subject",
+   "source": "sindh",
+   "target": "delhi",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": "1367",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Samma Jams submitted after Firuz Shah's Thatta campaign of 1365-67.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_punjab_hill_states__delhi__subject",
+   "type": "subject",
+   "source": "punjab_hill_states",
+   "target": "delhi",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": "1361",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Kangra (Nagarkot) submitted to Firuz Shah in 1361.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_mithila__delhi__subject",
+   "type": "subject",
+   "source": "mithila",
+   "target": "delhi",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "high",
+   "start_date": "1350s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Tughlaqs installed the Oiniwar line in Tirhut; the line was broken by Ganeshwara's murder c.1371.",
+   "confidence": "low",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_gajapati__delhi__subject",
+   "type": "subject",
+   "source": "gajapati",
+   "target": "delhi",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": "1360",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Firuz Shah's raid on Jajnagar (1360) forced the Eastern Ganga king to promise elephant tribute; how far it was still paid in 1378 is unclear.",
+   "confidence": "low",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_bengal__delhi__truce",
+   "type": "truce",
+   "source": "bengal",
+   "target": "delhi",
+   "direction": "mutual",
+   "start_date": "1359",
+   "expiration_condition": "The peace held for the rest of Firuz Shah's reign (to 1388).",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Peace after Firuz Shah's second Bengal campaign: gifts exchanged and Bengal's independence accepted in practice.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_bahmani__vijayanagara__rival",
+   "type": "rival",
+   "source": "bahmani",
+   "target": "vijayanagara",
+   "direction": "mutual",
+   "start_date": "1350s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Raichur doab wars; Mujahid Shah's war of 1375-78 ended with his murder in April 1378.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_bahmani__rachakonda__friendly",
+   "type": "friendly",
+   "source": "bahmani",
+   "target": "rachakonda",
+   "direction": "mutual",
+   "start_date": "1370s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Recherla Velamas generally sided with the Bahmanis against the Reddis and Vijayanagara in these years.",
+   "confidence": "low",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_rachakonda__kondavidu_reddi__rival",
+   "type": "rival",
+   "source": "rachakonda",
+   "target": "kondavidu_reddi",
+   "direction": "mutual",
+   "start_date": "1360s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The contest for the Kakatiya inheritance in Andhra.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_kondavidu_reddi__vijayanagara__rival",
+   "type": "rival",
+   "source": "kondavidu_reddi",
+   "target": "vijayanagara",
+   "direction": "mutual",
+   "start_date": "1360s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The contest over the Srisailam and Addanki country; it ends with Vijayanagara's annexation of Kondavidu in 1424.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_gajapati__kondavidu_reddi__rival",
+   "type": "rival",
+   "source": "gajapati",
+   "target": "kondavidu_reddi",
+   "direction": "mutual",
+   "start_date": "1360s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Reddi campaigns into Kalinga toward Simhachalam.",
+   "confidence": "low",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_vijayanagara_subordinate_chiefs__vijayanagara__subject",
+   "type": "subject",
+   "source": "vijayanagara_subordinate_chiefs",
+   "target": "vijayanagara",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1340s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Nayakas and governors, now including the Tamil country taken from the Madurai Sultanate.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_tulu_canara_chiefs__vijayanagara__subject",
+   "type": "subject",
+   "source": "tulu_canara_chiefs",
+   "target": "vijayanagara",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1340s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The coast chiefs governed from Barkur and Mangalore.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_tenkasi_pandyas__vijayanagara__subject",
+   "type": "subject",
+   "source": "tenkasi_pandyas",
+   "target": "vijayanagara",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": "1378",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Pandya remnants in Tirunelveli after the fall of Madurai.",
+   "confidence": "low",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_calicut__cochin__rival",
+   "type": "rival",
+   "source": "calicut",
+   "target": "cochin",
+   "direction": "mutual",
+   "start_date": "1340s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Carried from 1444; its state in the 14th century is undocumented.",
+   "confidence": "low",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_kerala_minor_swaroopams__calicut__subject",
+   "type": "subject",
+   "source": "kerala_minor_swaroopams",
+   "target": "calicut",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": "1340s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Carried from 1444.",
+   "confidence": "low",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_malabar_muslim_merchants__calicut__subject",
+   "type": "subject",
+   "source": "malabar_muslim_merchants",
+   "target": "calicut",
+   "direction": "directed",
+   "subject_kind": "estate",
+   "autonomy": "high",
+   "start_date": "1340s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The merchants live under their own qadis in the Samutiri's ports (Ibn Battuta).",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_calicut__valluvanad__rival",
+   "type": "rival",
+   "source": "calicut",
+   "target": "valluvanad",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Mamankam feud; when it began is disputed.",
+   "confidence": "low",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_lakshadweep__kolathunadu__subject",
+   "type": "subject",
+   "source": "lakshadweep",
+   "target": "kolathunadu",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Carried from 1444.",
+   "confidence": "low",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_jaffna__kotte__rival",
+   "type": "rival",
+   "source": "jaffna",
+   "target": "kotte",
+   "direction": "mutual",
+   "start_date": "1360s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Jaffna collects dues on the Sinhala west coast; Alagakkonara fortifies Kotte against it.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_vanni__jaffna__subject",
+   "type": "subject",
+   "source": "vanni",
+   "target": "jaffna",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": "1340s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The northern Vanni chiefs pay Jaffna.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_ahom__chutia__hostile",
+   "type": "hostile",
+   "source": "ahom",
+   "target": "chutia",
+   "direction": "mutual",
+   "start_date": "1376",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Chutia king had the Ahom king Sutuphaa killed in 1376.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_ahom__kachari__rival",
+   "type": "rival",
+   "source": "ahom",
+   "target": "kachari",
+   "direction": "mutual",
+   "start_date": "1340s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Dhansiri border.",
+   "confidence": "low",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_ahom__naga_societies__hostile",
+   "type": "hostile",
+   "source": "ahom",
+   "target": "naga_societies",
+   "direction": "one_way",
+   "start_date": "1340s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Ahom raids into the Naga hills; carried from 1444.",
+   "confidence": "low",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_garhwal__kumaon__rival",
+   "type": "rival",
+   "source": "garhwal",
+   "target": "kumaon",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Carried from 1444.",
+   "confidence": "low",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_baltistan__ladakh__rival",
+   "type": "rival",
+   "source": "baltistan",
+   "target": "ladakh",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Carried from 1444.",
+   "confidence": "low",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_bengal__kamata__rival",
+   "type": "rival",
+   "source": "bengal",
+   "target": "kamata",
+   "direction": "mutual",
+   "start_date": "1340s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Bengal's frontier pressure on Kamarupa and Kamata.",
+   "confidence": "low",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_champa__dai_viet__at_war",
+   "type": "at_war",
+   "source": "champa",
+   "target": "dai_viet",
+   "direction": "mutual",
+   "start_date": "1371",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Chế Bồng Nga's raids: Trần Duệ Tông was killed before Vijaya in February 1377, and Thăng Long was sacked in 1377 and 1378.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_sukhothai__ayutthaya__subject",
+   "type": "subject",
+   "source": "sukhothai",
+   "target": "ayutthaya",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1378",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Maha Thammaracha II submitted after the Kamphaeng Phet (Chakangrao) campaigns.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_ayutthaya__lan_na__rival",
+   "type": "rival",
+   "source": "ayutthaya",
+   "target": "lan_na",
+   "direction": "mutual",
+   "start_date": "1370s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Lan Na backs Sukhothai's nobles; Ayutthaya's campaigns against Lampang and Chiang Mai come c.1386-90. No open war is attested on the start day.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_ayutthaya__cambodia__rival",
+   "type": "rival",
+   "source": "ayutthaya",
+   "target": "cambodia",
+   "direction": "mutual",
+   "start_date": "1350s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Ayutthaya has attacked Angkor since the 1350s (dates disputed).",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_malay_peninsula_minor_polities__ayutthaya__subject",
+   "type": "subject",
+   "source": "malay_peninsula_minor_polities",
+   "target": "ayutthaya",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": "1340s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Claims through Nakhon Si Thammarat over its southern neighbours; enforcement is uncertain.",
+   "confidence": "low",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_singapura__majapahit__subject",
+   "type": "subject",
+   "source": "singapura",
+   "target": "majapahit",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": "1365",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Tumasik is listed among Majapahit's tributaries in the Nagarakretagama.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_palembang__majapahit__subject",
+   "type": "subject",
+   "source": "palembang",
+   "target": "majapahit",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "low",
+   "start_date": "1377",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Majapahit's punitive expedition after Palembang's ruler sought Ming investiture; Majapahit killed the Ming envoys.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_bali__majapahit__subject",
+   "type": "subject",
+   "source": "bali",
+   "target": "majapahit",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "moderate",
+   "start_date": "1343",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Kepakisan dynasty installed by Majapahit.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_lombok_sumbawa__majapahit__subject",
+   "type": "subject",
+   "source": "lombok_sumbawa",
+   "target": "majapahit",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1357",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "After the Dompu expedition.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_samudra_pasai__majapahit__subject",
+   "type": "subject",
+   "source": "samudra_pasai",
+   "target": "majapahit",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": "1365",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "An attack recorded in the Hikayat Raja Pasai; Pasai is listed in 1365.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_jambi__majapahit__subject",
+   "type": "subject",
+   "source": "jambi",
+   "target": "majapahit",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": "1365",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Malayu is listed in 1365.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_pagaruyung__majapahit__subject",
+   "type": "subject",
+   "source": "pagaruyung",
+   "target": "majapahit",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": "1340s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Adityawarman was a Majapahit-raised prince; ties after 1375 are unclear.",
+   "confidence": "low",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_pahang__majapahit__subject",
+   "type": "subject",
+   "source": "pahang",
+   "target": "majapahit",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": "1365",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Listed in 1365.",
+   "confidence": "low",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_kedah__majapahit__subject",
+   "type": "subject",
+   "source": "kedah",
+   "target": "majapahit",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": "1365",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Listed in 1365.",
+   "confidence": "low",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_tanjungpura__majapahit__subject",
+   "type": "subject",
+   "source": "tanjungpura",
+   "target": "majapahit",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": "1365",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Listed in 1365.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_kutai__majapahit__subject",
+   "type": "subject",
+   "source": "kutai",
+   "target": "majapahit",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": "1365",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Listed in 1365.",
+   "confidence": "low",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_buton__majapahit__subject",
+   "type": "subject",
+   "source": "buton",
+   "target": "majapahit",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": "1365",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Listed in 1365.",
+   "confidence": "low",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_aru__majapahit__subject",
+   "type": "subject",
+   "source": "aru",
+   "target": "majapahit",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": "1365",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Listed in 1365.",
+   "confidence": "low",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_majapahit__sunda__hostile",
+   "type": "hostile",
+   "source": "majapahit",
+   "target": "sunda",
+   "direction": "mutual",
+   "start_date": "1357",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Bubat incident: Sunda's royal party was killed at Majapahit's court.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_champa__ming__subject",
+   "type": "subject",
+   "source": "champa",
+   "target": "ming",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": "1369",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Missions; Champa appeals to the Ming against Đại Việt.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_dai_viet__ming__subject",
+   "type": "subject",
+   "source": "dai_viet",
+   "target": "ming",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": "1369",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Trần missions as Annam.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_ayutthaya__ming__subject",
+   "type": "subject",
+   "source": "ayutthaya",
+   "target": "ming",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": "1371",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Xianluo missions.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_cambodia__ming__subject",
+   "type": "subject",
+   "source": "cambodia",
+   "target": "ming",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": "1371",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Zhenla missions.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_majapahit__ming__subject",
+   "type": "subject",
+   "source": "majapahit",
+   "target": "ming",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": "1370",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Ritual missions; the killing of the Ming envoys at Palembang (1377) strains the tie.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_brunei__ming__subject",
+   "type": "subject",
+   "source": "brunei",
+   "target": "ming",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": "1371",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "After Shen Zhi's embassy of 1370.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_tondo__ming__subject",
+   "type": "subject",
+   "source": "tondo",
+   "target": "ming",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": "1372",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "A Luzon mission came in 1372; that it was Tondo is inference.",
+   "confidence": "low",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_mrauk_u__ava__subject",
+   "type": "subject",
+   "source": "mrauk_u",
+   "target": "ava",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "high",
+   "start_date": "1374",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Ava installed Saw Mon II at Launggyet.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_prome__ava__subject",
+   "type": "subject",
+   "source": "prome",
+   "target": "ava",
+   "direction": "directed",
+   "subject_kind": "appanage",
+   "autonomy": "low",
+   "start_date": "1360s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "An Ava governorship.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_toungoo__ava__subject",
+   "type": "subject",
+   "source": "toungoo",
+   "target": "ava",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1360s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "An autonomous lordship owing allegiance to Ava.",
+   "confidence": "low",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_ava__hanthawaddy__rival",
+   "type": "rival",
+   "source": "ava",
+   "target": "hanthawaddy",
+   "direction": "mutual",
+   "start_date": "1360s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Rival heirs of Pagan; open war only from 1385.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_luchuan__ava__hostile",
+   "type": "hostile",
+   "source": "luchuan",
+   "target": "ava",
+   "direction": "one_way",
+   "start_date": "1360s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Möng Mao and Mohnyin raid the dry zone; Sagaing was sacked in 1364.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_hanthawaddy__martaban__at_war",
+   "type": "at_war",
+   "source": "hanthawaddy",
+   "target": "martaban",
+   "direction": "mutual",
+   "start_date": "1360s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Byattaba's revolt; Binnya U cannot retake Martaban.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_hanthawaddy__myaungmya__rival",
+   "type": "rival",
+   "source": "hanthawaddy",
+   "target": "myaungmya",
+   "direction": "mutual",
+   "start_date": "1360s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Laukpya holds the western delta de facto independent.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_phuan__lan_xang__subject",
+   "type": "subject",
+   "source": "phuan",
+   "target": "lan_xang",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "high",
+   "start_date": "1350s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "A dependency since Fa Ngum.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_kengtung__lan_na__subject",
+   "type": "subject",
+   "source": "kengtung",
+   "target": "lan_na",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "high",
+   "start_date": "1340s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "A Mangrai-related line.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_sulu__brunei__hostile",
+   "type": "hostile",
+   "source": "sulu",
+   "target": "brunei",
+   "direction": "one_way",
+   "start_date": "1369",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Sulu sacked Brunei c.1369 (Chinese record).",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_ternate__tidore__rival",
+   "type": "rival",
+   "source": "ternate",
+   "target": "tidore",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The clove rivalry of north Maluku.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_bone__luwu__rival",
+   "type": "rival",
+   "source": "bone",
+   "target": "luwu",
+   "direction": "mutual",
+   "start_date": "1340s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Cenrana valley; uncertain this early.",
+   "confidence": "low",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_ming__northern_yuan__at_war",
+   "type": "at_war",
+   "source": "ming",
+   "target": "northern_yuan",
+   "direction": "mutual",
+   "start_date": "1368",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Ming drove the Yuan from Dadu in 1368; Ming lost on the Tula in 1372, burns Karakorum in 1380 and wins at Buir Lake in 1388.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_yunnan_yuan__northern_yuan__subject",
+   "type": "subject",
+   "source": "yunnan_yuan",
+   "target": "northern_yuan",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "very_high",
+   "start_date": "1368",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Basalawarmi holds Yunnan for the khan and refuses Ming.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_naghachu__northern_yuan__subject",
+   "type": "subject",
+   "source": "naghachu",
+   "target": "northern_yuan",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "very_high",
+   "start_date": "1368",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Naghachu acknowledges the khan but acts on his own.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_dali_duan__northern_yuan__subject",
+   "type": "subject",
+   "source": "dali_duan",
+   "target": "northern_yuan",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": "1253",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Dali's Duan governors are Yuan officials in name.",
+   "confidence": "low",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_hami__northern_yuan__subject",
+   "type": "subject",
+   "source": "hami",
+   "target": "northern_yuan",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": "1368",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Prince of Weiwu at Hami is a Yuan appanage prince.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_ming__yunnan_yuan__hostile",
+   "type": "hostile",
+   "source": "ming",
+   "target": "yunnan_yuan",
+   "direction": "mutual",
+   "start_date": "1370s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Prince of Liang killed Ming's envoys in the 1370s.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_ming__naghachu__at_war",
+   "type": "at_war",
+   "source": "ming",
+   "target": "naghachu",
+   "direction": "mutual",
+   "start_date": "1371",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Naghachu raided Liaodong (1372) and attacked Gaizhou (1375); no peace until 1387.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_dali_duan__yunnan_yuan__rival",
+   "type": "rival",
+   "source": "dali_duan",
+   "target": "yunnan_yuan",
+   "direction": "mutual",
+   "start_date": "1360s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Prince of Liang had killed the Duan governor Duan Gong; Dali stays apart.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_joseon__ming__subject",
+   "type": "subject",
+   "source": "joseon",
+   "target": "ming",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": "1369",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Contested: Ming refuses King U investiture until 1385 and demands heavy tribute; Goryeo takes up the Hongwu era name again in 1378.",
+   "confidence": "low",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_wokou__joseon__hostile",
+   "type": "hostile",
+   "source": "wokou",
+   "target": "joseon",
+   "direction": "one_way",
+   "start_date": "1350",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Raids at their peak: Choe Yeong won at Hongsan in 1376 and Goryeo set up a gunpowder office in 1377.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_wokou__ming__hostile",
+   "type": "hostile",
+   "source": "wokou",
+   "target": "ming",
+   "direction": "one_way",
+   "start_date": "1350s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Ming answers with the sea ban (1371) and coastal guards.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_so__shoni__subject",
+   "type": "subject",
+   "source": "so",
+   "target": "shoni",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1240s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Sō are the Shōni's deputies on Tsushima.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_ryukyu__ming__subject",
+   "type": "subject",
+   "source": "ryukyu",
+   "target": "ming",
+   "direction": "directed",
+   "subject_kind": "tributary",
+   "autonomy": "very_high",
+   "start_date": "1372",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Satto of Chūzan has sent tribute since 1372.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_hokuzan__ryukyu__rival",
+   "type": "rival",
+   "source": "hokuzan",
+   "target": "ryukyu",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The three Okinawan kingdoms compete for Ming trade and land.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_nanzan__ryukyu__rival",
+   "type": "rival",
+   "source": "nanzan",
+   "target": "ryukyu",
+   "direction": "mutual",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The three Okinawan kingdoms compete for Ming trade and land.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_japan_southern_court__ming__friendly",
+   "type": "friendly",
+   "source": "japan_southern_court",
+   "target": "ming",
+   "direction": "mutual",
+   "start_date": "1371",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Ming recognised Prince Kaneyoshi as King of Japan and refused Yoshimitsu's missions (1374, 1380).",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_ashikaga__japan_southern_court__at_war",
+   "type": "at_war",
+   "source": "ashikaga",
+   "target": "japan_southern_court",
+   "direction": "mutual",
+   "start_date": "1336",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The war of the two courts; the Southern Court is now weak.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_ashikaga__japan_imperial_court__friendly",
+   "type": "friendly",
+   "source": "ashikaga",
+   "target": "japan_imperial_court",
+   "direction": "mutual",
+   "start_date": "1338",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The shogunate protects and funds the Northern Court.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_kikuchi__japan_southern_court__subject",
+   "type": "subject",
+   "source": "kikuchi",
+   "target": "japan_southern_court",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1330s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Kikuchi hold Higo for the Southern Court and shelter Prince Kaneyoshi.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_kitabatake__japan_southern_court__subject",
+   "type": "subject",
+   "source": "kitabatake",
+   "target": "japan_southern_court",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1336",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Kitabatake govern Ise for the Southern Court.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_imagawa__kikuchi__at_war",
+   "type": "at_war",
+   "source": "imagawa",
+   "target": "kikuchi",
+   "direction": "mutual",
+   "start_date": "1371",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Ryōshun's Kyushu campaign; Mizushima (1375); he takes the Kikuchi heartland in 1381.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_imagawa__shimazu__rival",
+   "type": "rival",
+   "source": "imagawa",
+   "target": "shimazu",
+   "direction": "mutual",
+   "start_date": "1375",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Shimazu Ujihisa left the tandai's camp after the Mizushima killing and fights him in the south.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_imagawa__shoni__hostile",
+   "type": "hostile",
+   "source": "imagawa",
+   "target": "shoni",
+   "direction": "mutual",
+   "start_date": "1375",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Ryōshun had Shōni Fuyusuke killed at Mizushima.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_hosokawa__ashikaga__subject",
+   "type": "subject",
+   "source": "hosokawa",
+   "target": "ashikaga",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1336",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Shugo appointment by the shogun.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_shiba__ashikaga__subject",
+   "type": "subject",
+   "source": "shiba",
+   "target": "ashikaga",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1336",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Shugo appointment by the shogun.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_hatakeyama__ashikaga__subject",
+   "type": "subject",
+   "source": "hatakeyama",
+   "target": "ashikaga",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1336",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Shugo appointment by the shogun.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_yamana__ashikaga__subject",
+   "type": "subject",
+   "source": "yamana",
+   "target": "ashikaga",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1336",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Shugo appointment by the shogun.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_ouchi__ashikaga__subject",
+   "type": "subject",
+   "source": "ouchi",
+   "target": "ashikaga",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "very_high",
+   "start_date": "1336",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Shugo appointment by the shogun.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_akamatsu__ashikaga__subject",
+   "type": "subject",
+   "source": "akamatsu",
+   "target": "ashikaga",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1336",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Shugo appointment by the shogun.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_toki__ashikaga__subject",
+   "type": "subject",
+   "source": "toki",
+   "target": "ashikaga",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1336",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Shugo appointment by the shogun.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_kyogoku__ashikaga__subject",
+   "type": "subject",
+   "source": "kyogoku",
+   "target": "ashikaga",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1336",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Shugo appointment by the shogun.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_rokkaku__ashikaga__subject",
+   "type": "subject",
+   "source": "rokkaku",
+   "target": "ashikaga",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1336",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Shugo appointment by the shogun.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_isshiki__ashikaga__subject",
+   "type": "subject",
+   "source": "isshiki",
+   "target": "ashikaga",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1336",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Shugo appointment by the shogun.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_imagawa__ashikaga__subject",
+   "type": "subject",
+   "source": "imagawa",
+   "target": "ashikaga",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1336",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Shugo appointment by the shogun.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_takeda__ashikaga__subject",
+   "type": "subject",
+   "source": "takeda",
+   "target": "ashikaga",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1336",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Shugo appointment by the shogun.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_otomo__ashikaga__subject",
+   "type": "subject",
+   "source": "otomo",
+   "target": "ashikaga",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "very_high",
+   "start_date": "1336",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Shugo appointment by the shogun.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_togashi__ashikaga__subject",
+   "type": "subject",
+   "source": "togashi",
+   "target": "ashikaga",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1336",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Shugo appointment by the shogun.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_kono__ashikaga__subject",
+   "type": "subject",
+   "source": "kono",
+   "target": "ashikaga",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1336",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Shugo appointment by the shogun. The Kōno are in revolt against Hosokawa Yoriyuki.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_shimazu__ashikaga__subject",
+   "type": "subject",
+   "source": "shimazu",
+   "target": "ashikaga",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "very_high",
+   "start_date": "1336",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Shugo appointment by the shogun.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_kamakura_kubo__ashikaga__subject",
+   "type": "subject",
+   "source": "kamakura_kubo",
+   "target": "ashikaga",
+   "direction": "directed",
+   "subject_kind": "appanage",
+   "autonomy": "high",
+   "start_date": "1349",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Kantō government under Ashikaga Ujimitsu, who nearly marches on Kyoto during the 1379 coup.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_uesugi__kamakura_kubo__subject",
+   "type": "subject",
+   "source": "uesugi",
+   "target": "kamakura_kubo",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1363",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Uesugi serve as Kantō kanrei.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_satake__kamakura_kubo__subject",
+   "type": "subject",
+   "source": "satake",
+   "target": "kamakura_kubo",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1349",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Kantō houses under the kubo; Oyama revolts in 1380.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_chiba__kamakura_kubo__subject",
+   "type": "subject",
+   "source": "chiba",
+   "target": "kamakura_kubo",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1349",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Kantō houses under the kubo; Oyama revolts in 1380.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_kanto_minor_houses__kamakura_kubo__subject",
+   "type": "subject",
+   "source": "kanto_minor_houses",
+   "target": "kamakura_kubo",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1349",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Kantō houses under the kubo; Oyama revolts in 1380.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_hosokawa__shiba__rival",
+   "type": "rival",
+   "source": "hosokawa",
+   "target": "shiba",
+   "direction": "mutual",
+   "start_date": "1360s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Rivalry over the kanrei office; it leads to the Kōryaku coup of April 1379 that ousts Yoriyuki.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_hosokawa__kono__at_war",
+   "type": "at_war",
+   "source": "hosokawa",
+   "target": "kono",
+   "direction": "mutual",
+   "start_date": "1360s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Yoriyuki's Shikoku campaigns; Kōno Michitaka is killed in 1379.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_ming__phagmodrupa__friendly",
+   "type": "friendly",
+   "source": "ming",
+   "target": "phagmodrupa",
+   "direction": "mutual",
+   "start_date": "1373",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Ming granted the gongma the title Chanhua wang; what the tie meant is disputed.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_sakya__phagmodrupa__subject",
+   "type": "subject",
+   "source": "sakya",
+   "target": "phagmodrupa",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1354",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Phagmodrupa overlordship of Ü-Tsang since Changchub Gyaltsen.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_tibetan_minor_lords__phagmodrupa__subject",
+   "type": "subject",
+   "source": "tibetan_minor_lords",
+   "target": "phagmodrupa",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1354",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Phagmodrupa overlordship of Ü-Tsang since Changchub Gyaltsen.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_gyantse__phagmodrupa__subject",
+   "type": "subject",
+   "source": "gyantse",
+   "target": "phagmodrupa",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": "1354",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Phagmodrupa overlordship of Ü-Tsang since Changchub Gyaltsen.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_bozhou__ming__subject",
+   "type": "subject",
+   "source": "bozhou",
+   "target": "ming",
+   "direction": "directed",
+   "subject_kind": "frontier_commandery",
+   "autonomy": "very_high",
+   "start_date": "1372",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "A hereditary native office confirmed by Ming.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_shuixi__ming__subject",
+   "type": "subject",
+   "source": "shuixi",
+   "target": "ming",
+   "direction": "directed",
+   "subject_kind": "frontier_commandery",
+   "autonomy": "very_high",
+   "start_date": "1372",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "A hereditary native office confirmed by Ming.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_tibetan_kham_amdo__ming__subject",
+   "type": "subject",
+   "source": "tibetan_kham_amdo",
+   "target": "ming",
+   "direction": "directed",
+   "subject_kind": "frontier_commandery",
+   "autonomy": "very_high",
+   "start_date": "1370s",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "Ming titles and tea-horse markets (Hezhou).",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_western_guards__ming__subject",
+   "type": "subject",
+   "source": "western_guards",
+   "target": "ming",
+   "direction": "directed",
+   "subject_kind": "frontier_commandery",
+   "autonomy": "very_high",
+   "start_date": "1374",
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Anding and Quxian guards only.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "r_lijiang__yunnan_yuan__subject",
+   "type": "subject",
+   "source": "lijiang",
+   "target": "yunnan_yuan",
+   "direction": "directed",
+   "subject_kind": "vassal",
+   "autonomy": "high",
+   "start_date": null,
+   "origin": "historical_start",
+   "locked": false,
+   "explanation": "The Lijiang chief serves the Yuan Prince of Liang until 1382.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  }
+ ],
+ "facts": [
+  {
+   "id": "f_delhi__mamluk__religious_authority",
+   "fact": "religious_authority",
+   "source": "delhi",
+   "target": "mamluk",
+   "direction": "directed",
+   "start_date": "1356",
+   "explanation": "Firuz Shah received investiture from the Abbasid caliph in Cairo, under Mamluk protection.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "f_vijayanagara__hormuz__trade_agreement",
+   "fact": "trade_agreement",
+   "source": "vijayanagara",
+   "target": "hormuz",
+   "direction": "mutual",
+   "start_date": "1340s",
+   "explanation": "Warhorses come to the west coast ports from Hormuz.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "f_bahmani__konkan_chiefs__territorial_claim",
+   "fact": "territorial_claim",
+   "source": "bahmani",
+   "target": "konkan_chiefs",
+   "direction": "directed",
+   "start_date": "1350s",
+   "explanation": "The Bahmanis hold Goa and the coast forts; the inland chiefs resist.",
+   "confidence": "low",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "f_nepal_malla__phagmodrupa__trade_agreement",
+   "fact": "trade_agreement",
+   "source": "nepal_malla",
+   "target": "phagmodrupa",
+   "direction": "mutual",
+   "start_date": "1340s",
+   "explanation": "Kathmandu's trade with Tibet through Kuti and Kerung.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "f_champa__dai_viet__territorial_claim",
+   "fact": "territorial_claim",
+   "source": "champa",
+   "target": "dai_viet",
+   "direction": "directed",
+   "start_date": "1306",
+   "explanation": "The Ô and Lý lands (Thuận and Hóa), given to Đại Việt as a marriage gift in 1306.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "f_ayutthaya__singapura__territorial_claim",
+   "fact": "territorial_claim",
+   "source": "ayutthaya",
+   "target": "singapura",
+   "direction": "directed",
+   "start_date": "1330s",
+   "explanation": "A Siamese attack on Temasek is recorded by Wang Dayuan; Ayutthaya claims the southern peninsula.",
+   "confidence": "low",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "f_brunei__majapahit__secondary_tribute",
+   "fact": "secondary_tribute",
+   "source": "brunei",
+   "target": "majapahit",
+   "direction": "directed",
+   "start_date": "1365",
+   "explanation": "Listed among Majapahit's tributaries in 1365; Majapahit helped Brunei against Sulu c.1369.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "f_banda__majapahit__trade_agreement",
+   "fact": "trade_agreement",
+   "source": "banda",
+   "target": "majapahit",
+   "direction": "mutual",
+   "start_date": "1340s",
+   "explanation": "Javanese traders carry Banda's nutmeg and mace.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "f_jambi__ming__secondary_tribute",
+   "fact": "secondary_tribute",
+   "source": "jambi",
+   "target": "ming",
+   "direction": "directed",
+   "start_date": "1371",
+   "explanation": "Sanfoqi missions came to the Ming in 1371-77; which port sent them is uncertain.",
+   "confidence": "low",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "f_cambodia__lan_xang__royal_marriage",
+   "fact": "royal_marriage",
+   "source": "cambodia",
+   "target": "lan_xang",
+   "direction": "mutual",
+   "start_date": "1353",
+   "explanation": "Fa Ngum was raised at Angkor and married a Khmer princess.",
+   "confidence": "low",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "f_ming__yunnan_yuan__territorial_claim",
+   "fact": "territorial_claim",
+   "source": "ming",
+   "target": "yunnan_yuan",
+   "direction": "directed",
+   "start_date": "1368",
+   "explanation": "Ming claims all the former Yuan provinces.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "f_joseon__northern_yuan__secondary_tribute",
+   "fact": "secondary_tribute",
+   "source": "joseon",
+   "target": "northern_yuan",
+   "direction": "directed",
+   "start_date": "1377",
+   "explanation": "The Northern Yuan invested King U in 1377; the pro-Yuan faction at court is strong.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "f_joseon__ming__territorial_claim",
+   "fact": "territorial_claim",
+   "source": "joseon",
+   "target": "ming",
+   "direction": "directed",
+   "start_date": "1370",
+   "explanation": "Goryeo claims land in Liaodong (expedition of 1370); Ming's Cheolryeong claim leads to the expedition of 1388.",
+   "confidence": "medium",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  },
+  {
+   "id": "f_japan_southern_court__japan_imperial_court__dynastic_claim",
+   "fact": "dynastic_claim",
+   "source": "japan_southern_court",
+   "target": "japan_imperial_court",
+   "direction": "directed",
+   "start_date": "1336",
+   "explanation": "Two imperial lines each claim the throne; the South holds the regalia.",
+   "confidence": "high",
+   "source_ids": [
+    "src_research_asia_1378"
+   ]
+  }
+ ],
+ "entities": [
+  {
+   "id": "hokuzan",
+   "name": "Hokuzan"
+  },
+  {
+   "id": "nanzan",
+   "name": "Nanzan"
+  }
+ ]
+}
