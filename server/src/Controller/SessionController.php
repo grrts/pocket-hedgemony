@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Account\AccountCombiner;
+use App\Account\AccountDeletion;
 use App\Account\CombineTokens;
 use App\Account\IdToken\AppleIdTokens;
 use App\Account\IdToken\GoogleIdTokens;
@@ -38,7 +39,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  * Signing the game in (domain/saves/spec.md SAVE-057, SAVE-112 … SAVE-118, SAVE-149 … SAVE-154):
  * with email and password, a Steam ticket, a Steam browser code, an Apple identity token or a
  * Google ID token; refreshing the tokens, the account's sign-ins and devices, signing a device out, and
- * combining two accounts and removing a sign-in (SAVE-186 … SAVE-193).
+ * combining two accounts and removing a sign-in (SAVE-186 … SAVE-193), and deleting the account
+ * (SAVE-198 … SAVE-202).
  */
 final class SessionController
 {
@@ -80,6 +82,7 @@ final class SessionController
         private readonly RateLimiterFactoryInterface $apiSignInLimiter,
         private readonly AccountCombiner $combiner,
         private readonly CombineTokens $combineTokens,
+        private readonly AccountDeletion $deletion,
     ) {
     }
 
@@ -309,6 +312,19 @@ final class SessionController
         $this->em->flush();
 
         return new JsonResponse(['signIns' => $this->signIns($account)]);
+    }
+
+    /**
+     * Deletes the account the device is signed in to (SAVE-198): its saves, shared saves, sign-ins and
+     * devices go; its purchase records stay without it, its posts under "Deleted player".
+     */
+    #[Route('/api/account', name: 'account_delete', methods: ['DELETE'])]
+    #[IsGranted('ROLE_PLAYER')]
+    public function delete(#[CurrentUser] Account $account): Response
+    {
+        $this->deletion->delete($account);
+
+        return new Response(status: Response::HTTP_NO_CONTENT);
     }
 
     /** Signs a device out, this one or another of the account's (SAVE-116). */
