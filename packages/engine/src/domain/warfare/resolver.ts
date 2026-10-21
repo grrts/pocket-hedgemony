@@ -220,6 +220,8 @@ export interface BattleResult {
   brokenCompanies: string[];
   pursuitShare: number;
   ordersGiven: Record<string, number>;
+  /** After each bell, each side's losses so far (killed, wounded, fled) and morale left, 0..1: how far it still is from breaking (WAR-233). */
+  curve: { loss: [number, number]; morale: [number, number] }[];
 }
 
 const short = (name: string): string => name.split(" ").slice(-1)[0]!;
@@ -319,6 +321,7 @@ function* fightRounds(input: BattleInput, ctl: RoundControl): Generator<void, Ba
   const campTaken: [boolean, boolean] = [false, false];
   let townFought = false;
   const brokenAt: (number | null)[] = [null, null];
+  const curve: BattleResult["curve"] = [];
   let bells = 0;
   let days = 1;
   const lossMul = (approaches[0]!.approach === "Assault" || approaches[1]!.approach === "Assault" ? W.assault_losses : 1) * sides.reduce((m, s) => m * (s.army.commander?.traits.includes("Reckless") ? W.traits.Reckless.losses : 1), 1);
@@ -468,6 +471,7 @@ function* fightRounds(input: BattleInput, ctl: RoundControl): Generator<void, Ba
         const broke = armyBreaks({ startedSectors: started, lostSectors: lost, losses: lossOf(i), men: menAtStart[i]!, breakPoint: avg, campTaken: campTaken[i] === true }) || units.filter((u) => u.side === i).every((u) => u.broken || u.c.men <= 0);
         return { broke, past: Math.max(lossOf(i) / Math.max(1, menAtStart[i]! * avg), lost / Math.max(1, started / 2)) };
       });
+      curve.push({ loss: [lossOf(0), lossOf(1)], morale: [Math.max(0, 1 - breaks[0]!.past), Math.max(0, 1 - breaks[1]!.past)] });
       // 6. depth and rotation (WAR-093, WAR-108, WAR-109).
       for (const u of units) if (!u.broken && u.sector !== null && !u.hidden) u.bellsInRow += 1;
       for (let i = 0; i < 2; i++) {
@@ -541,6 +545,7 @@ function* fightRounds(input: BattleInput, ctl: RoundControl): Generator<void, Ba
       brokenCompanies: units.filter((u) => u.broken).map((u) => u.c.id),
       pursuitShare: how === "broke" ? 1 : pursuit,
       ordersGiven,
+      curve,
     };
   }
 }

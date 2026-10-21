@@ -90,7 +90,8 @@ try {
       () => page.tap("[data-declare]"),
     ),
   );
-  await check("official",then(realm("officials"), () => page.tap("[data-official]")));
+  // The officials in post sit in a fold (SHELL-172): open it, then tap the first official.
+  await check("official", then(realm("officials"), () => page.evaluate(() => document.querySelector("[data-page-fold=officials-in-post]")?.setAttribute("open", "")), () => page.tap("[data-official]")));
   await check("commander", then(realm("military"), () => page.tap("[data-command]")));
   await check("realm after a commander", realm(null));
   await check("province after a commander", then(realm("military"), () => page.tap("[data-command]"), () => page.evaluate(() => window.__phSelect("p1601"))));

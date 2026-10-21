@@ -104,23 +104,25 @@
  "scouting": { "base_range": 1, "riders_per_province": 500, "careful_range": 2, "w22_range": 4 },
  "rumour_error": 0.3333333333333333,
  "battle": {
-  "bells_per_day": 6,
-  "max_days": 3,
+  "bells_per_day": 3,
+  "first_bell_hour": 8,
+  "contact_days": 1,
+  "max_days": 5,
   "max_sectors": 7,
   "max_sectors_sea": 3,
   "bell_order": ["orders", "shooting", "charges", "melee", "breaking", "depth and rotation"],
   "locals_rough": 0.10
  },
  "era_scale": {
-  "I": { "bell": "2 hours", "max_days": 3, "room": 1 },
-  "II": { "bell": "2 hours", "max_days": 3, "room": 1 },
-  "III": { "bell": "2 hours", "max_days": 3, "room": 1 },
-  "IV": { "bell": "2 hours", "max_days": 3, "room": 1 },
-  "V": { "bell": "2 hours", "max_days": 3, "room": 1 },
+  "I": { "bell": "4 hours", "max_days": 5, "room": 1 },
+  "II": { "bell": "4 hours", "max_days": 5, "room": 1 },
+  "III": { "bell": "4 hours", "max_days": 5, "room": 1 },
+  "IV": { "bell": "4 hours", "max_days": 5, "room": 1 },
+  "V": { "bell": "4 hours", "max_days": 5, "room": 1 },
   "VI": { "bell": "half a day", "max_days": 10, "room": 0.5 },
   "VII": { "bell": "a day", "max_days": 30, "room": 0.25 }
  },
- "hits_per_bell": { "base": 0.04, "by_invention": [{ "needs": "W19", "share": 0.08 }, { "needs": "W17", "share": 0.06 }, { "needs": "W16", "share": 0.05 }], "era_VI": 0.06, "era_VII": 0.08 },
+ "hits_per_bell": { "base": 0.025, "by_invention": [{ "needs": "W19", "share": 0.05 }, { "needs": "W17", "share": 0.04 }, { "needs": "W16", "share": 0.03 }], "era_VI": 0.04, "era_VII": 0.05 },
  "sectors": {
   "Fields": { "room": 3000, "charge": true },
   "Pasture": { "room": 3000, "charge": true, "horse": 0.10 },

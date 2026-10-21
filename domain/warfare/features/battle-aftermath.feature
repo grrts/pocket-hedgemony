@@ -9,7 +9,7 @@ Feature: Battle: night, aftermath, prisoners, standing orders and reports
 
   @WAR-123 @placeholder
   Scenario Outline: Withdrawing at night
-    Given no army has broken after 6 bells
+    Given no army has broken after 3 bells
     And the army of "Burgundy" withdraws by its standing orders
     And its commander has Cunning <burgundy> and the enemy commander Cunning <france>
     When the battle is resolved

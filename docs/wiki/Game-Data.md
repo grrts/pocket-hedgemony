@@ -6,7 +6,7 @@ Keys are written as in the config. Shares are fractions (0.25 is 25 %). A value 
 
 | System | Values | Config file | Explained on |
 |---|---|---|---|
-| [Core values](Data-Defines) | 321 | `defines.json` |  |
+| [Core values](Data-Defines) | 320 | `defines.json` |  |
 | [Time and turns](Data-Time-and-Turns) | 373 | `domain/time-and-turns.json` | [Time and Turns](Time-and-Turns) |
 | [Realm](Data-Realm) | 905 | `domain/realm.json` | [Your Realm](Your-Realm) |
 | [Province](Data-Province) | 927 | `domain/province.json` | [Provinces](Provinces) |
@@ -14,7 +14,7 @@ Keys are written as in the config. Shares are fractions (0.25 is 25 %). A value 
 | [Trade](Data-Trade) | 323 | `domain/trade.json` | [Trade](Trade) |
 | [Research](Data-Research) | 2138 | `domain/research.json` | [Research](Research) |
 | [Institutions](Data-Institutions) | 161 | `domain/institutions.json` | [Institutions](Institutions) |
-| [Warfare](Data-Warfare) | 1685 | `domain/warfare.json` | [Warfare](Warfare) |
+| [Warfare](Data-Warfare) | 1687 | `domain/warfare.json` | [Warfare](Warfare) |
 | [Recruiting](Data-Recruiting) | 266 | `domain/recruiting.json` | [Recruiting](Recruiting) |
 | [Troop movement](Data-Troop-Movement) | 112 | `domain/troop-movement.json` | [Troop Movement](Troop-Movement) |
 | [Naval](Data-Naval) | 664 | `domain/naval.json` | [Naval](Naval) |

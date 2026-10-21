@@ -11,7 +11,7 @@ import * as wf from "./domain/warfare/index.ts";
 import navalData from "../../rules/data/domain/naval.json" with { type: "json" };
 import { planRoute } from "./march.ts";
 import { GROUNDS } from "./tiles.ts";
-import { halt, marchTo, routeBars } from "./turn.ts";
+import { halt, HOURS_PER_STEP, marchTo, routeBars, STEPS_PER_DAY } from "./turn.ts";
 import { marchMap, NO_PATH, type World } from "./world.ts";
 import { battleWon } from "./campaignEnd.ts";
 import { retinueScatters, retinuesWon } from "./retinues.ts";
@@ -366,7 +366,11 @@ export function armyBreak(world: World, slot: number): number {
   return wf.armyBreakPoint(battleArmy(world, [slot], "")[0].companies);
 }
 
-/** A battle fought over time, a round each 4-hour step, between two sides' armies (by slot). */
+/**
+ * A battle fought over time, between two sides' armies (by slot): a contact
+ * day of scouting and deploying, then a bell each daylight 4-hour step, the
+ * nights resting (WAR-233, WAR-234).
+ */
 export interface Battle {
   id: number;
   /** Where it is fought: the defenders' tile, and its province. */
@@ -382,8 +386,27 @@ export interface Battle {
   /** Losses dealt so far. */
   attDealt: number;
   defDealt: number;
+  /** Steps played so far, and the steps the battle is expected to last in all. */
   rounds: number;
   round: number;
+  /** Steps of the contact day still to pass before the first bell. */
+  contact: number;
+  /** Bells fought so far; the bell the current result was worked out from, and how many it lasts. */
+  bell: number;
+  from: number;
+  bells: number;
+  /** Losses dealt when the current result was worked out, and its losses and morale after each of its bells. */
+  attBase: number;
+  defBase: number;
+  curve: wf.BattleResult["curve"];
+  /** Morale left, 0..1, after the bells fought so far. */
+  attMorale: number;
+  defMorale: number;
+  /** Days on which bells have been fought, and the last of them (world.day). */
+  day: number;
+  bellDay: number;
+  /** Fleeing men the winner's horse catch in the pursuit, dealt with the last bell (WAR-127). */
+  caught: number;
   /** The worked-out result: the winning side, the reason and the two sides' leading commanders. */
   attackerWins: boolean;
   reason: string;
@@ -533,6 +556,18 @@ function startBattle(world: World, att: number[], def: number[], news: News[]): 
     defDealt: 0,
     rounds: 1,
     round: 0,
+    contact: contactSteps(world),
+    bell: 0,
+    from: 0,
+    bells: 1,
+    attBase: 0,
+    defBase: 0,
+    curve: [],
+    attMorale: 1,
+    defMorale: 1,
+    caught: 0,
+    day: 0,
+    bellDay: -1,
     attackerWins: false,
     reason: "",
     attLead: -1,
@@ -609,13 +644,62 @@ function resolve(world: World, b: Battle): void {
   b.attDead = deadOf(an);
   b.defDead = deadOf(dn);
   // What is still to be lost is what this result costs on top of what has been dealt.
+  b.attBase = b.attDealt;
+  b.defBase = b.defDealt;
   b.attLoss = b.attDealt + lostOf(an, attMen);
   b.defLoss = b.defDealt + lostOf(dn, defMen);
   b.attackerWins = r.winner === an;
   b.reason = r.reason;
   b.attLead = attLead;
   b.defLead = defLead;
-  b.rounds = b.round + Math.max(1, Math.ceil((attMen + defMen) / world.rules.defines.war.menPerBattleRound));
+  // The pursuit (WAR-127): the winner's Shock and Light men who stand catch 1 in 4 of the fleeing men who would have come back.
+  const winArmy = b.attackerWins ? attArmy : defArmy;
+  const winLoss = r.losses[r.winner]!;
+  const winMen = b.attackerWins ? attMen : defMen;
+  const standing = winMen > 0 ? Math.max(0, 1 - (winLoss.killed + winLoss.wounded + winLoss.fled) / winMen) : 0;
+  const riders = winArmy.companies.filter((c) => wf.armDef(c.arm).roles.some((x) => x === "Shock" || x === "Light")).reduce((t, c) => t + c.men, 0);
+  const back = wf.fledAfter(r.losses[r.loser]!.fled, false).back;
+  const loseLeft = (b.attackerWins ? defMen : attMen) - (b.attackerWins ? b.defLoss - b.defDealt : b.attLoss - b.attDealt);
+  b.caught = Math.round(Math.max(0, Math.min(back, loseLeft, wf.pursuit(riders * standing, back, r.pursuitShare))));
+  b.from = b.bell;
+  b.bells = Math.max(1, r.bells);
+  b.curve = r.curve;
+  b.rounds = b.round + stepsLeft(world, b);
+}
+
+/** Steps from now to the first bell: at least the contact days, then until the morning's first bell (WAR-234). */
+function contactSteps(world: World): number {
+  const B = wf.W.battle as { contact_days: number; first_bell_hour: number };
+  const first = Math.round(B.first_bell_hour / HOURS_PER_STEP);
+  let k = B.contact_days * STEPS_PER_DAY;
+  while ((world.step + k) % STEPS_PER_DAY !== first) k++;
+  return k;
+}
+
+/** Whether a step of the day (0 = midnight to 4 o'clock) is one in which a bell is fought: daylight (WAR-233). */
+export function isBellStep(step: number): boolean {
+  const B = wf.W.battle as { bells_per_day: number; first_bell_hour: number };
+  const first = Math.round(B.first_bell_hour / HOURS_PER_STEP);
+  return step >= first && step < first + B.bells_per_day;
+}
+
+/** Steps a battle still needs: the contact left, then a daylight step for each bell left. */
+function stepsLeft(world: World, b: Battle): number {
+  let bells = b.from + b.bells - b.bell;
+  let k = 0;
+  let contact = b.contact;
+  while (bells > 0) {
+    if (contact > 0) contact--;
+    else if (isBellStep((world.step + k) % STEPS_PER_DAY)) bells--;
+    k++;
+  }
+  return Math.max(1, k);
+}
+
+/** The phase a battle is in at a step: contact (scouting, deploying), a bell, or night. */
+export function battlePhase(world: World, b: Battle): "contact" | "fighting" | "night" {
+  if ((b.contact ?? 0) > 0) return "contact";
+  return isBellStep(world.step) ? "fighting" : "night";
 }
 
 /** A round of every battle: each side loses its share of the result's losses; the last round ends it. */
@@ -624,6 +708,11 @@ export function fightRound(world: World, news: News[]): void {
   const a = world.armies;
   const enemies = enemyTable(world);
   for (const b of [...world.battles]) {
+    // A battle from a save made before battles had a contact day and bells is worked out again.
+    if (!b.curve) {
+      Object.assign(b, { contact: 0, bell: 0, from: 0, bells: 1, curve: [], attMorale: 1, defMorale: 1, caught: 0, day: 0, bellDay: -1 });
+      resolve(world, b);
+    }
     b.attackers = b.attackers.filter((s) => a.alive[s]);
     b.defenders = b.defenders.filter((s) => a.alive[s]);
     if (!b.attackers.length || !b.defenders.length) {
@@ -631,14 +720,30 @@ export function fightRound(world: World, news: News[]): void {
       continue;
     }
     b.round++;
-    const share = Math.min(1, b.round / b.rounds);
-    const attNow = Math.round(b.attLoss * share) - b.attDealt;
-    const defNow = Math.round(b.defLoss * share) - b.defDealt;
+    // The contact day: the armies scout and deploy; then a bell each daylight step, and the camps rest at night.
+    if (b.contact > 0) {
+      b.contact--;
+      continue;
+    }
+    if (!isBellStep(world.step)) continue;
+    b.bell++;
+    if (b.bellDay !== world.day) [b.day, b.bellDay] = [b.day + 1, world.day];
+    const k = Math.min(b.curve.length, b.bell - b.from);
+    const last = b.bell - b.from >= b.bells;
+    const end = b.curve[b.curve.length - 1];
+    const now = b.curve[k - 1];
+    const shareOf = (i: 0 | 1) => (last || !end || !now ? 1 : end.loss[i] > 0 ? Math.min(1, now.loss[i] / end.loss[i]) : 1);
+    const caughtA = last && !b.attackerWins ? b.caught : 0;
+    const caughtD = last && b.attackerWins ? b.caught : 0;
+    const attNow = Math.max(0, b.attBase + Math.round((b.attLoss - b.attBase) * shareOf(0)) + caughtA - b.attDealt);
+    const defNow = Math.max(0, b.defBase + Math.round((b.defLoss - b.defBase) * shareOf(1)) + caughtD - b.defDealt);
     shareLosses(world, b.attackers, attNow, b.attDead ?? 1);
     shareLosses(world, b.defenders, defNow, b.defDead ?? 1);
     b.attDealt += attNow;
     b.defDealt += defNow;
-    if (b.round < b.rounds) continue;
+    if (now) [b.attMorale, b.defMorale] = now.morale;
+    if (!last) continue;
+    b.rounds = b.round;
     const winSlots = b.attackerWins ? b.attackers : b.defenders;
     const loseSlots = b.attackerWins ? b.defenders : b.attackers;
     const winner = a.owner[winSlots[0]!]!;
