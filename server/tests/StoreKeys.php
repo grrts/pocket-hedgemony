@@ -19,6 +19,7 @@ final class StoreKeys
     /** @var array<string, array{key: \OpenSSLAsymmetricKey, x5c: list<string>}> */
     private static array $chains = [];
     private static ?\OpenSSLAsymmetricKey $google = null;
+    private static ?\OpenSSLAsymmetricKey $appleSignIn = null;
 
     /** Writes the trusted root and the service account file for the kernel to read. */
     public static function install(string $projectDir): void
@@ -27,6 +28,8 @@ final class StoreKeys
         if (!is_dir($dir)) {
             mkdir($dir, 0777, true);
         }
+        openssl_pkey_export(self::appleSignInKey(), $p8);
+        file_put_contents($dir.'/apple-sign-in.p8', $p8);
         file_put_contents($dir.'/apple-root.cer', base64_decode(self::chain('apple')['x5c'][2], true));
         openssl_pkey_export(self::googleKey(), $pem);
         file_put_contents($dir.'/google-service-account.json', json_encode([
@@ -37,6 +40,12 @@ final class StoreKeys
             'client_email' => self::CLIENT_EMAIL,
             'token_uri' => 'https://oauth2.googleapis.com/token',
         ]));
+    }
+
+    /** The server's Sign in with Apple key (SAVE-203), which signs the client secret. */
+    public static function appleSignInKey(): \OpenSSLAsymmetricKey
+    {
+        return self::$appleSignIn ??= openssl_pkey_new(['private_key_type' => \OPENSSL_KEYTYPE_EC, 'curve_name' => 'prime256v1']);
     }
 
     public static function rootDer(string $which = 'apple'): string

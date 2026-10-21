@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# A logical backup of the production database (docs/deploy.md, "Backups"): pg_dump in custom format,
+# checked by listing it back, then copied off the host with rclone when BACKUP_REMOTE is set.
+# Run nightly from one machine. Needs pg_dump of the server's major version (16) or newer.
+#
+#   DATABASE_URL   the app's setting (its ?serverVersion=… query is dropped for pg_dump)
+#   BACKUP_DIR     where dumps are written, default var/backups
+#   BACKUP_KEEP_DAYS  local dumps older than this are removed, default 7
+#   BACKUP_REMOTE  optional rclone destination, e.g. offsite:ph-db-backups
+set -euo pipefail
+
+: "${DATABASE_URL:?DATABASE_URL is not set}"
+dir="${BACKUP_DIR:-$(dirname "$0")/../var/backups}"
+keep="${BACKUP_KEEP_DAYS:-7}"
+url="${DATABASE_URL%%\?*}"
+case "$url" in postgres://*|postgresql://*) ;; *) echo "DATABASE_URL is not PostgreSQL" >&2; exit 1 ;; esac
+
+mkdir -p "$dir"
+file="$dir/pocket-hegemony-$(date -u +%Y%m%dT%H%M%SZ).dump"
+pg_dump --format=custom --no-owner --no-privileges --file="$file.part" "$url"
+# A dump that pg_restore can't list is not a backup.
+pg_restore --list "$file.part" > /dev/null
+mv "$file.part" "$file"
+echo "Wrote $file ($(du -h "$file" | cut -f1))"
+
+if [ -n "${BACKUP_REMOTE:-}" ]; then
+    rclone copy "$file" "$BACKUP_REMOTE"
+    echo "Copied to $BACKUP_REMOTE"
+fi
+
+find "$dir" -name 'pocket-hegemony-*.dump' -mtime +"$keep" -delete
