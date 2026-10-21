@@ -2,15 +2,24 @@
 framework:
     secret: '%env(APP_SECRET)%'
 
+    # Behind a load balancer: the addresses it sends from (e.g. "REMOTE_ADDR" when only it can reach
+    # the app servers, or "10.0.0.0/8"), so client IPs, which the rate limits count, and https are
+    # read from its X-Forwarded-* headers (docs/deploy.md). Empty trusts no proxy.
+    trusted_proxies: '%env(TRUSTED_PROXIES)%'
+    trusted_headers: ['x-forwarded-for', 'x-forwarded-proto', 'x-forwarded-port', 'x-forwarded-host']
+
     # The website's sign-in (the community) keeps a session. It only starts once a page
     # writes to it, so guests reading the wiki or the forum, and the JSON API, get none.
+    # Sessions sit in the database's `sessions` table, so every app server sees them (docs/deploy.md).
     session:
-        handler_id: session.handler.native_file
-        save_path: '%kernel.project_dir%/var/sessions/%kernel.environment%'
+        handler_id: Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler
         name: ph_session
         cookie_secure: auto
         cookie_samesite: lax
         cookie_httponly: true
+        # Removes expired sessions on about 1 in 100 session starts (Debian's php.ini never does).
+        gc_probability: 1
+        gc_divisor: 100
 
     # Every form on the website carries a CSRF token (csrf_token() in Twig).
     csrf_protection: true

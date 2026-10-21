@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Restores a dump from bin/backup-database into an EMPTY database (docs/deploy.md, "Restoring").
+# It refuses a database that already has tables, so it can't write over the live one by mistake:
+# restore into a new database, check it, then point DATABASE_URL at it.
+#
+#   bin/restore-database <file.dump> <postgresql://user:pass@host:5432/new_db>
+set -euo pipefail
+
+dump="${1:?usage: bin/restore-database <file.dump> <target database url>}"
+url="${2:?usage: bin/restore-database <file.dump> <target database url>}"
+url="${url%%\?*}"
+
+tables=$(psql "$url" -tAc "select count(*) from information_schema.tables where table_schema = 'public'")
+if [ "$tables" != "0" ]; then
+    echo "The target database has $tables table(s); restore into an empty one." >&2
+    exit 1
+fi
+
+pg_restore --no-owner --no-privileges --exit-on-error --single-transaction --dbname="$url" "$dump"
+echo "Restored. Rows now in the target:"
+psql "$url" -c "select 'accounts' as what, count(*) from account union all select 'cloud saves', count(*) from cloud_save union all select 'migrations', count(*) from doctrine_migration_versions"
