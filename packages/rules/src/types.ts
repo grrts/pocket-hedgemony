@@ -71,8 +71,6 @@ export interface WarDefines {
   engageBase: number;
   engageMin: number;
   engageMax: number;
-  /** Men a side fields for each 4-hour round a battle lasts. */
-  menPerBattleRound: number;
   /** Men behind the walls of a capital, a stone castle and an earthwork ring fort. */
   garrison: { capital: number; castle: number; fort: number };
   /** Share of a full garrison that returns each month while not besieged. */

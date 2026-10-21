@@ -27,8 +27,8 @@ Feature: Inventions' effects in war
       | W12 Standing regiments          | its standing regiments never drop below level 2                              |
       | W13 Light field artillery       | its guns can Shift with the line and Bombardment keeps the line back only 1 bell |
       | W14 Army divisions              | every commander gets +1 order per bell                                       |
-      | W16 Rifled musket               | its riflemen hit 5 % of the front per bell                                   |
-      | W17 Breech-loading rifle        | its riflemen hit 6 % of the front per bell                                   |
+      | W16 Rifled musket               | its riflemen hit 3 % of the front per bell                                   |
+      | W17 Breech-loading rifle        | its riflemen hit 4 % of the front per bell                                   |
       | W19 Machine gun                 | shooting from its dug-in sectors is x2 and charges into them always fail     |
       | W20 Smokeless powder            | its Ambush companies can shoot from woods without being spotted              |
       | W21 Tanks                       | it has a Shock arm that ignores dug-in sectors and machine guns              |

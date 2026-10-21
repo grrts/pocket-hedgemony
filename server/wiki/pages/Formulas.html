@@ -38,7 +38,7 @@ level 5 when level 4, scars &gt;= 5 and drill &gt;= Elite months
        × (1 + sector and ground) × inventions × tired × hungry × forced march
 </code></pre>
 <ul>
-<li><code>share</code> is <code>warfare.hits_per_bell.base</code> (0.04), at least <code>era_VI</code> (0.06) in era VI and <code>era_VII</code> (0.08) in era VII.</li>
+<li><code>share</code> is <code>warfare.hits_per_bell.base</code> (0.025), at least <code>era_VI</code> (0.04) in era VI and <code>era_VII</code> (0.05) in era VII.</li>
 <li><code>strength</code> is <code>warfare.arms.&lt;arm&gt;.strength</code>, for example levy foot (1.0), knights and lancers (3.5), bombards (5).</li>
 <li><code>obsolete</code> is 0.5 when the enemy knows the invention that made the arm obsolete, else 1.</li>
 <li><code>level hits</code> is <code>warfare.levels_by_era.&lt;era&gt;.hits</code> at the company&#39;s level (era I and II: −0.10, 0, +0.10, +0.20, +0.30).</li>
@@ -102,18 +102,16 @@ every company broken
 <h3 id="orders-rotation-and-night"><a class="anchor" href="#orders-rotation-and-night" aria-label="Link to this section">#</a>Orders, rotation and night</h3>
 <pre><code>orders per bell = warfare.cunning_by_era.&lt;era&gt;.orders[Cunning]
 </code></pre>
-<p>The table runs from Cunning 0 to 5: era I (1, 1, 2, 2, 2, 2), eras II to V (1, 1, 2, 2, 3, 3). The commander with less Cunning gives his orders first. Each bell a side swaps up to Logistics tired companies (3 bells or more in a row) for fresh ones from reserve. After <code>warfare.battle.bells_per_day</code> (6) bells, night falls: half of each unbroken company&#39;s fled men come back (<code>warfare.after.fled_return</code>, 0.5). After <code>warfare.era_scale.&lt;era&gt;.max_days</code> (3 in eras I to V) days with no break, the attacker pulls back and the defender holds the field.</p>
+<p>The table runs from Cunning 0 to 5: era I (1, 1, 2, 2, 2, 2), eras II to V (1, 1, 2, 2, 3, 3). The commander with less Cunning gives his orders first. Each bell a side swaps up to Logistics tired companies (3 bells or more in a row) for fresh ones from reserve. After <code>warfare.battle.bells_per_day</code> (3) bells, night falls: half of each unbroken company&#39;s fled men come back (<code>warfare.after.fled_return</code>, 0.5). After <code>warfare.era_scale.&lt;era&gt;.max_days</code> (5 in eras I to V) days with no break, the attacker pulls back and the defender holds the field.</p>
 <p>Source: <code>packages/engine/src/domain/warfare/battle.ts</code> (ordersPerBell, overnight); <code>packages/engine/src/domain/warfare/resolver.ts</code> (fightRounds)</p>
 <h3 id="losses-on-the-map"><a class="anchor" href="#losses-on-the-map" aria-label="Link to this section">#</a>Losses on the map</h3>
-<p>The battle&#39;s result is dealt out over rounds of 4 hours:</p>
-<pre><code>rounds = max(1, ceil((attacker men + defender men) ÷ war.menPerBattleRound))
-</code></pre>
-<p><code>war.menPerBattleRound</code> (defines.json) is (6000). Each round a side loses its share of its final losses. The final loss of a side is:</p>
+<p>A battle first passes a contact day: at least <code>warfare.battle.contact_days</code> (1) day and until the next morning&#39;s first bell, the armies scout and deploy and nobody is lost. Then a bell is fought in each daylight 4-hour step, from <code>warfare.battle.first_bell_hour</code> (8 o&#39;clock) for <code>warfare.battle.bells_per_day</code> (3) steps; the night steps rest.</p>
+<p>Each bell a side loses what the resolver&#39;s own bells dealt it so far, so the losses come as they were fought, and its morale is how far it still is from breaking (1 untouched, 0 broken). With the last bell the winner&#39;s riders catch part of the loser&#39;s fled men who would have come back (the pursuit). The final loss of a side is:</p>
 <pre><code>side that holds the field: killed + wounded × (1 − 2/3) + fled × (1 − 0.5)
 side that loses:           killed + wounded + fled × (1 − 0.5)
 </code></pre>
 <p>The field-holder&#39;s wounded come back at <code>warfare.after.wounded_return</code> (2/3); the loser&#39;s wounded become prisoners. Half of the fled (<code>warfare.after.fled_return</code>, 0.5) come back. A beaten army with fewer than <code>war.disperseBelow</code> (100) men scatters; half its men go home to the recruit pools.</p>
-<p>Source: <code>packages/engine/src/war.ts</code> (resolve, fightRound, shareLosses, fallBack, disperse); <code>packages/engine/src/domain/warfare/battle.ts</code> (woundedAfter, fledAfter)</p>
+<p>Source: <code>packages/engine/src/war.ts</code> (resolve, contactSteps, isBellStep, fightRound, shareLosses, fallBack, disperse); <code>packages/engine/src/domain/warfare/battle.ts</code> (woundedAfter, fledAfter)</p>
 <h2 id="sieges-and-storming"><a class="anchor" href="#sieges-and-storming" aria-label="Link to this section">#</a>Sieges and storming</h2>
 <p>Sieges are explained in <a href="/wiki/Warfare">Warfare</a>. In the game today a siege has no guns: the besiegers always mine.</p>
 <h3 id="walls-and-garrison"><a class="anchor" href="#walls-and-garrison" aria-label="Link to this section">#</a>Walls and garrison</h3>
