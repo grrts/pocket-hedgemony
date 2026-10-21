@@ -596,6 +596,54 @@ the Horn of Africa (Barquq to Zara Yaqob). Timur in India is the South file's `s
   history*; every one has its name, summary and option labels in the localization. Grouping and overview: each
   event is one card, and the News keeps the line; the Chronicle card (plan-1378 §4.6) is the overview of the
   bridge events and comes with the history check. Phone: as EVT-076. [X-19; EVT-061, EVT-076]
+### 5.19 Bridge events of 1378 to 1444: Asia, Africa and the Americas (milestone 10, 19 October 2026)
+
+The south's turning points between the 1378 start and 1444 (plan-1378 §5, rows South Asia, East Asia, Southeast
+Asia and the Americas, and the African events of the research), in `events-bridge-south.json`. Each is conditional:
+its trigger is the reason the realms had (a weak Delhi after Firuz Shah, Timur's strength, a Ming emperor who needs
+prestige, a Hồ usurper on the Trần throne, Maxtla's usurpation), and its date only makes it likelier near its year
+(`approximate`, EVT-019). History is the reference, not the script (plan-1378 §2).
+
+- EVT-095 The game shall load the region bridge files beside the campaign's events, with their names, the realms
+  they name and the places they add. At the start, each bridge event whose history began before the start day has
+  already happened, with its historical option and its historical realms and without its effects, since the start's
+  map already shows them; so a 1444 start finds Chanka's war fought and Malacca founded, and plays on as before. No
+  bridge event is `mandatory`, and each belongs to the Age of Schism and Conquerors. [plan-1378 §2, §5; D-EVT-23]
+- EVT-096 The south's events with a 1444 floor shall open by their reason instead: the Inca expand once they have
+  beaten the Chanka, or once no Chanka stand (from 1400); the Triple Alliance's height follows its founding (from
+  1430); Majapahit's collapse follows the Paregreg war (from 1420); Songhai expands once free of Mali (from 1400);
+  the Ōnin war needs the courts of Japan reunited (from 1400); the Tumu crisis needs the Oirat (from 1424). Iwami's
+  silver, Elmina, the Cape route, Columbus, Tordesillas and the Tongan chiefdom keep 1444: their conditions name
+  realms, techs and ages that come later anyway. A bridge event with a campaign event's id replaces it.
+  [plan-1378 §5; decisions.md, Africa and the Americas 1]
+- EVT-097 Asia's bridge events shall be these (★ the turning points the history check watches):
+
+| Region | Events |
+|---|---|
+| South Asia (22) | Katehar's revolt, Vijayanagara takes Goa, the Faruqi grant of Thalner, Jayasthiti Malla, death of Firuz Shah, the Tughlaq succession war, Azam Shah in Bengal, Jaunpur's independence, the Tomars take Gwalior, the Rathores take Mandore, the Reddi kingdom splits, Sack of Delhi ★, Khandesh breaks away, Malwa's and Gujarat's independence, the Ming in Ceylon, Kotte founded, the Sayyids take Delhi ★, the Vijayanagara–Bahmani wars (recurring), Vijayanagara annexes Kondavidu, the Bahmanis take the Velama forts, Kapilendra's usurpation |
+| East Asia (26) | Kōryaku coup, Hu Weiyong purge, Yellow Registers, Ming takes Yunnan ★, Naghachu surrenders, Buir Lake ★, death of Tögüs Temür, Wihwado retreat, Goryeo raids Tsushima, Meitoku rebellion, Joseon founded ★, courts of Japan reunited ★, death of Hongwu, Ōei rebellion, Jingnan war ★, Yoshimitsu king of Japan, the Jurchen guards, treasure voyages ★, Ming conquest of Đại Việt ★, Lam Sơn uprising ★, Gelug founded, the southern line passed over, Hokuzan falls, Ōei invasion, Ming capital to Beijing, Ryukyu united ★ |
+| Southeast Asia (14) | Death of Chế Bồng Nga, death of Hayam Wuruk, Hồ dynasty, Hồ takes Amaravati, Majapahit sacks Singapura, Malacca founded ★, Paregreg war, Ayutthaya sacks Angkor ★, the Forty Years' War (recurring), Razadarit reunites Hanthawaddy, Ava takes Arakan, Arakan restored at Mrauk U, Suphannaphum takes Ayutthaya, Sukhothai absorbed |
+
+  [plan-1378 §5; research/asia.md]
+- EVT-098 Africa's and the Americas' bridge events shall be these:
+
+| Region | Events |
+|---|---|
+| Maghreb and Sahel (13) | Fez retakes Marrakesh, the Marinids against Tlemcen, the Hafsids retake Tripoli, the Hafsid–Zayyanid war, the Sayfawa flee to Bornu, Kano pays Bornu, Mali's succession crisis, Songhai breaks from Mali ★, Masina settled, the Aïr sultanate, the Tuareg take Timbuktu ★, Ewuare in Benin, the treasure fleet on the Swahili coast |
+| Central and southern Africa (4) | Kongo founded ★, Kongo's provinces joined, Mutapa formed ★, Khami rises |
+| Mesoamerica (8) | Tepanec expansion, fall of Xaltocan, a Tepanec queen for Tenochtitlan, the Tepanec war on Texcoco, death of Tezozómoc, the Tepanec war and the Triple Alliance ★, Tariácuri unites the Pátzcuaro basin, fall of Mayapan ★ |
+| Andes and North America (6) | Cusco masters its basin, the Colla–Lupaca war, the Chanka war ★, Chimor reaches south, the Great Law of Peace, the Wendat alliance |
+
+  The Horn (Ifat and Adal, Dawit, Zara Yaqob) and the Mamluk court are in the East bridge file. Where a
+  checkpoint names a turning point (`start-date/checkpoints`), the event takes its key as id, so the history check
+  finds it. [plan-1378 §5; research/africa-americas.md; decisions.md]
+
+#### How the player uses it
+- EVT-099 Nothing new is tapped: a bridge event reaches the player as every event does, on the event card over the
+  map (EVT-076), with its year in history, its summary and two to four options, the historical one marked *As in
+  history*; the News keeps its line. Grouping and overview: one card per event; what history has done so far shows
+  in the News and, with the history check, on the Chronicle card (plan-1378 §4.6). Phone: the card is the same
+  sheet in the Wide and Tall layouts, 44-point options, nothing that needs hover. [X-19; EVT-076]
 
 ### 5.20 Realms' historical goals (milestone 10, 19 October 2026)
 
@@ -1044,6 +1092,13 @@ before achievements and the autosave. The age and period checks run in the event
   Schism keeps 1449 as Basel's end. Tests run the events on today's map set back to 1378 until the 1378 map is
   joined. Provisional. Effects stay small (prestige, legitimacy, a share of the treasury) where the game cannot
   yet land the real thing.
+- **D-EVT-23** Bridge events for Asia, Africa and the Americas (milestone 10, step 6; 19 Oct 2026): the region
+  files share one shape (the campaign's events, names, entities and places as lists of map provinces) and one
+  loader, and a bridge event that has an id of the campaign replaces it, so a 1444 floor gives way to its reason.
+  At the start the events whose history began earlier count as fought as in history, which keeps a 1444 start
+  playing as before. Effects use only the tree's existing modifiers; realms the game does not know yet are named
+  in `entities` and bind once they exist. Starting statistics for 1378 are not yet set, so the stability,
+  legitimacy and army thresholds in the triggers are provisional.
 
 ## 14. Traceability
 
@@ -1073,6 +1128,11 @@ before achievements and the autosave. The age and period checks run in the event
 | EVT-085 – 089 | bridge-west.feature | A 1444 campaign already has the West's history; a 1378 campaign has none yet; France declares for Clement, then the realms choose; the tree sees a regent and the Emperor; Troyes gives Paris to England; the end of the Hundred Years' War needs the Lancastrian conquest. Engine: packages/engine/test/bridgeWest.test.ts (build checks, places and modifiers, the uncles' regency on the player's card, rebels as sparks) |
 | EVT-090 – 093 | bridge-east.feature | The East's bridge events and turning points; build checks, tree ids and places; the re-dated campaign events; the Crusade of Varna waits for a war on the Ottoman border |
 | EVT-094 | bridge-east.feature | Every East event reads on the card: name, summary, two or three options, one historical |
+| EVT-095 | bridge-south.feature | The southern events are well formed and never forced; from 1444 the earlier ones have happened as in history |
+| EVT-096 | bridge-south.feature | The Inca expand after beating the Chanka; a fled court does not; the 1444 floors give way to their reasons |
+| EVT-097 | bridge-south.feature | Malacca is founded only after Singapura falls |
+| EVT-098 | bridge-south.feature | The Triple Alliance forms after Maxtla's usurpation |
+| EVT-099 | — | Presentation: the event card, nothing new on screen |
 | EVT-100 – 108 | historical-goals.feature | A goal ends with its reason; the seed shakes the goals; a goal's pull fades after its window; a goal draws the AI's war but not past its price; an ally goal sends an envoy; the player is never steered. Engine: packages/engine/test/goals.test.ts; data: packages/rules/test/goals-1378.test.ts |
 | EVT-109 – 111 | chronicle.feature | A turning point happened as in history; late; bent when its goals are gone; gone when invalidated. Engine: packages/engine/test/goals.test.ts |
 | EVT-112 – 114 | — | Presentation: apps/client/src/ui/chronicle.ts, the History tab and the Aims fold; apps/client/scripts/chronicle-shots.mjs |
