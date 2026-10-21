@@ -30,7 +30,36 @@ describe("historical events (milestone 6)", () => {
       w.date = { ...w.date, month: (m % 12) + 1, year: 1445 + Math.floor(m / 12) };
       monthlyEvents(w, news);
     }
-    expect(w.events!.state.world.history.every((h) => h.year >= 1445)).toBe(true);
+    // The bridge events of 1378 to 1444 are history already (EVT-087); nothing fires before the months played.
+    expect(w.events!.state.world.history.filter((h) => h.year >= 1444).every((h) => h.year >= 1445)).toBe(true);
+  });
+
+  it("at the 1444 start the ages and periods of 1378 that still hold are under way, the rest are over (EVT-013, EVT-015, EVT-081)", () => {
+    const w = createWorld(rules, 1, tiles);
+    const s = w.events!.state;
+    // Bombards among the great powers and Portugal's ocean ships start the two ages at once (D-EVT-19).
+    expect(s.world.ages).toEqual(expect.arrayContaining(["age_of_schism_and_conquerors", "age_of_gunpowder_empires", "age_of_exploration"]));
+    expect(s.world.periods).toEqual(expect.arrayContaining(["p_ottoman_expansion", "p_late_ming", "p_portuguese_oceanic_expansion", "p_muscovite_consolidation"]));
+    // Periods whose window closed before 1444 never start.
+    for (const p of ["p_western_schism", "p_timurs_conquests", "p_hundred_years_war_caroline", "p_hussite_wars", "p_ming_treasure_voyages"]) expect(s.world.periods).not.toContain(p);
+  });
+
+  it("without bombards among the great powers or ocean ships in Iberia, Gunpowder Empires and Exploration wait for their conditions (EVT-082, D-EVT-19)", () => {
+    const w = createWorld(rules, 1, tiles);
+    for (const r of w.research) r?.known.delete("W3");
+    for (const id of ["portugal", "castile"]) w.research[nation(w, id)]!.known.delete("S4");
+    const g = createGameEvents(w);
+    expect(g.state.world.ages).toContain("age_of_schism_and_conquerors");
+    expect(g.state.world.ages).not.toContain("age_of_gunpowder_empires");
+    expect(g.state.world.ages).not.toContain("age_of_exploration");
+    expect(g.state.world.periods).not.toContain("p_portuguese_oceanic_expansion");
+    // Portugal learns the ocean ships: the Age of Exploration starts in the next year's check.
+    w.research[nation(w, "portugal")]!.known.add("S4");
+    for (const id of ["france", "ming", "ottomans"]) w.research[nation(w, id)]!.known.add("W3");
+    const news: News[] = [];
+    w.date = { ...w.date, year: 1445, month: 1 };
+    monthlyEvents(w, news);
+    expect(w.events!.state.world.ages).toEqual(expect.arrayContaining(["age_of_gunpowder_empires", "age_of_exploration"]));
   });
 
   it("the AI conqueror answers the Fall of Constantinople at once and the city passes to it (EVT-029, EVT-040)", () => {

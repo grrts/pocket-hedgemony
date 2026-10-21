@@ -1,5 +1,5 @@
 /**
- * Onboarding (domain/onboarding/spec.md): the tutorial "The Year of Varna" as
+ * Onboarding (domain/onboarding/spec.md): the tutorial "Murad's Frontier" as
  * data and a pure step machine, guided first turns, what needs attention,
  * tooltips and "Why?", the Almanac, starting, skipping and returning, and
  * measuring. Balance numbers and script data live in

@@ -3,7 +3,8 @@
   "_provisional": [
     "assessment_factors",
     "confidence_spread",
-    "africa.size_by_manpower"
+    "africa.size_by_manpower",
+    "campaign_rules.difficulty.effects"
   ],
   "reference_day": "1444-11-11",
   "catalogue": {
@@ -168,7 +169,7 @@
     }
   },
   "africa": {
-    "$comment": "African starts (SETUP-060 to SETUP-067, X-20): the catalogue's playable countries and subjects, decentralised polities and peoples with a homeland in these regions are map realms (tools/mapgen/nations-1444.json, grows). Each takes only land no realm owns and grows from its capital to its size by manpower potential (provisional). Migrations, raiders and background records stay reference data.",
+    "$comment": "African starts (SETUP-060 to SETUP-067, X-20): the catalogue's playable countries and subjects, decentralised polities and peoples with a homeland in these regions are map realms (packages/rules/data/scenarios/1444/map-nations.json, grows). Each takes only land no realm owns and grows from its capital to its size by manpower potential (provisional). Migrations, raiders and background records stay reference data.",
     "regions": [
       "af_west",
       "af_central_south",
@@ -237,7 +238,24 @@
       "ironman",
       "end_date"
     ],
-    "default_end_date": "1939-08-31"
+    "default_end_date": "1939-08-31",
+    "difficulty": {
+      "$comment": "SETUP-099 to SETUP-103: what each difficulty changes. A factor on the AI's monthly chance to look for a war (war.ts aiDeclarations), on the gold an AI realm's monthly income pays into its treasury (treasury.ts runLedger; never the player's), and on the monthly chance a plotting province of the player's realm rises (rebels.ts risingChanceIn). Normal is 1 everywhere, the game as balanced. Provisional.",
+      "levels": ["easy", "normal", "hard"],
+      "default": "normal",
+      "effects": {
+        "easy": { "ai_war_chance": 0.5, "ai_income": 0.8, "player_rising_chance": 0.75 },
+        "normal": { "ai_war_chance": 1, "ai_income": 1, "player_rising_chance": 1 },
+        "hard": { "ai_war_chance": 1.5, "ai_income": 1.25, "player_rising_chance": 1.25 }
+      }
+    },
+    "events": {
+      "$comment": "SETUP-054, D-SETUP-21: the events choice of the options step, as the events spec offers it (EVT-036, D-EVT-9); each maps to an event-tree preset through events_presets. Plausible by default, the game as balanced. Provisional pending Leroy.",
+      "values": ["historical", "plausible", "free"],
+      "default": "plausible"
+    },
+    "fog_default": true,
+    "ironman_default": false
   },
   "map_to_catalogue": {
     "$comment": "X-13, D-SETUP-1: the 37 map ids that are not catalogue ids. A record id, or null where no record matches and the map's own data is kept.",
@@ -294,7 +312,8 @@
   },
   "events_presets": {
     "historical": "historical",
-    "free": "plausible"
+    "plausible": "plausible",
+    "free": "divergent"
   },
   "risk_tolerance_levels": {
     "very_low": "low",

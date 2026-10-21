@@ -55,7 +55,7 @@ Feature: Which campaigns earn achievements
 
   @ACH-039
   Scenario: The tutorial earns nothing
-    Given the player is playing the tutorial "The Year of Varna"
+    Given the player is playing the tutorial "Murad's Frontier"
     When the moment "harvest" occurs for the first time
     Then no achievement unlocks
 

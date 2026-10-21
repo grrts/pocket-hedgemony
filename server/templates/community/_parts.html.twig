@@ -1,0 +1,82 @@
+{# Pieces the community pages share. #}
+
+{% macro seal(account) %}<span class="seal seal-{{ account|seal }}" aria-hidden="true">{{ account.displayName|first|upper }}</span>{% endmacro %}
+
+{# A game icon from public/site/art, scaled by whole steps so its pixels stay square. #}
+{% macro icon(name, scale = 2) %}
+{%- set sizes = {castle: [12, 9], swords: [10, 10], scroll: [10, 11], hammer: [10, 10], crown: [10, 8], trophy: [10, 11], map: [11, 10], anchor: [9, 10]} -%}
+{%- set size = sizes[name] ?? [10, 10] -%}
+<img class="px" src="/site/art/icon-{{ name }}.png" width="{{ size[0] * scale }}" height="{{ size[1] * scale }}" alt="">
+{%- endmacro %}
+
+{% macro when(date) %}<time datetime="{{ date|date('c') }}">{{ date|ago }}</time>{% endmacro %}
+
+{% macro badges(topic) %}
+    {%- if topic.locked %} <span class="badge lock">Locked</span>{% endif -%}
+    {%- if topic.hidden %} <span class="badge hide">Hidden</span>{% endif -%}
+{% endmacro %}
+
+{# One topic in a list: title, who started it, replies, and the latest post. #}
+{% macro topic_row(topic, posts, board = null) %}
+{% set replies = max(0, (posts ?? 1) - 1) %}
+<li class="topic-row{% if topic.hidden %} is-hidden{% endif %}">
+    <a class="topic-title" href="{{ path('community_topic', {id: topic.id, slug: topic.slug}) }}">{{ topic.title }}</a>{{ _self.badges(topic) }}
+    <p class="topic-meta">
+        {% if board %}<span class="board-tag">{{ board.name }}</span>{% endif %}
+        <span>by {{ topic.author.displayName }}</span>
+    </p>
+    <p class="topic-last">
+        <span class="replies"><strong>{{ replies }}</strong> {{ replies == 1 ? 'reply' : 'replies' }}</span>
+        <span>{{ replies ? 'last by ' ~ topic.lastPoster.displayName : 'posted' }}, {{ _self.when(topic.lastActivityAt) }}</span>
+    </p>
+</li>
+{% endmacro %}
+
+{# Page links: previous, numbers around the current page, next. #}
+{% macro pager(page, pages, route, params) %}
+{% if pages > 1 %}
+<nav class="pager" aria-label="Pages">
+    {% if page > 1 %}<a class="btn paper" rel="prev" href="{{ path(route, params|merge(page > 2 ? {page: page - 1} : {})) }}">‹ Previous</a>{% endif %}
+    {% for p in 1..pages %}
+        {% if p == 1 or p == pages or (p >= page - 2 and p <= page + 2) %}
+            {% if p == page %}<span class="pg on" aria-current="page">{{ p }}</span>
+            {% else %}<a class="pg" href="{{ path(route, params|merge(p > 1 ? {page: p} : {})) }}">{{ p }}</a>{% endif %}
+        {% elseif p == page - 3 or p == page + 3 %}<span class="pg gap">…</span>{% endif %}
+    {% endfor %}
+    {% if page < pages %}<a class="btn paper" rel="next" href="{{ path(route, params|merge({page: page + 1})) }}">Next ›</a>{% endif %}
+</nav>
+{% endif %}
+{% endmacro %}
+
+{% macro error(errors, field) %}{% if errors[field] is defined %}<p class="field-error" id="{{ field }}-error">{{ errors[field] }}</p>{% endif %}{% endmacro %}
+
+{% macro guest(next) %}
+<p class="guest-actions">
+    <a class="btn wax" href="{{ path('community_join', {next: next}) }}">Join</a>
+    <a class="btn paper" href="{{ path('community_signin', {next: next}) }}">Sign in</a>
+</p>
+{% endmacro %}
+
+{# A shared save's card, above the post it came with (domain/saves SAVE-134). #}
+{% macro save_card(save) %}
+<section class="save-card{% if not save.playable %} is-removed{% endif %}" aria-label="Shared save: {{ save.title }}">
+    <span class="save-crop">{% if save.thumbnail %}<img src="data:image/png;base64,{{ save.thumbnail }}" width="96" height="64" alt="The map around {{ save.realm }}">{% else %}{{ _self.icon('map', 4) }}{% endif %}</span>
+    <div class="save-about">
+        <h2 class="save-title">{{ save.title }}</h2>
+        <p class="save-facts">{{ save.realm }} · {{ save.dateText }} · week {{ save.turn + 1 }} · {{ save.playTimeText }} played · version {{ save.gameVersion }}{% if save.plays %} · played {{ save.plays }} {{ save.plays == 1 ? 'time' : 'times' }}{% endif %}</p>
+        {% if save.ironman or save.modified %}<p class="save-marks">
+            {%- if save.ironman %}<span class="badge">Was ironman: opens as a normal campaign</span>{% endif -%}
+            {%- if save.modified %} <span class="badge">Modified</span>{% endif -%}
+        </p>{% endif %}
+        {% if save.playable %}
+        <p class="save-code">Code <strong>{{ save.shownCode }}</strong>: type it in the game under Load, Open a shared save.</p>
+        <p class="save-actions">
+            {% if play_url %}<a class="btn wax" href="{{ play_url }}{{ '?' in play_url ? '&' : '?' }}shared={{ save.code }}">{{ _self.icon('swords') }}Play this save</a>{% endif %}
+            <a class="btn paper" href="{{ path('shared_save_download', {code: save.code}) }}" download>Download</a>
+        </p>
+        {% else %}
+        <p class="save-code">The player who shared this save removed it.</p>
+        {% endif %}
+    </div>
+</section>
+{% endmacro %}

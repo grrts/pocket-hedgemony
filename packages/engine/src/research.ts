@@ -1,6 +1,7 @@
 import warfareData from "../../rules/data/domain/warfare.json" with { type: "json" };
 import buildingsData from "../../rules/data/domain/buildings.json" with { type: "json" };
 import * as rs from "./domain/research/index.ts";
+import * as dip from "./domain/diplomacy/index.ts";
 import type { World } from "./world.ts";
 import type { News } from "./war.ts";
 import { controller } from "./war.ts";
@@ -76,15 +77,22 @@ const ARM_UNLOCK = warfareData.arms as Record<string, { unlock?: string }>;
 /** Whether realm n may train an arm: one its realm had at the start, or whose invention it knows (warfare arms' `unlock`). */
 export function armUnlocked(world: World, n: number, arm: string): boolean {
   // Without F03 *Riding and pack animals* a realm raises no horse regiments (RSCH-094).
-  if (rs.without(knownSet(world, n)).noArms.includes(arm)) return false;
+  if (withoutOf(world, n).noArms.includes(arm)) return false;
   const unlock = ARM_UNLOCK[arm]?.unlock ?? "start";
   return unlock === "start" || knows(world, n, unlock);
 }
 
 /** What lacking past inventions costs realm n now (RSCH-094): the other systems read it. */
 export function withoutOf(world: World, n: number): rs.Without {
-  return rs.without(knownSet(world, n));
+  // Read for every army every day: worked out again only when the realm learns something (a known set only grows; a new one replaces it).
+  const known = knownSet(world, n);
+  const hit = withoutCache.get(known);
+  if (hit && hit.size === known.size) return hit.without;
+  const without = rs.without(known);
+  withoutCache.set(known, { size: known.size, without });
+  return without;
 }
+const withoutCache = new WeakMap<ReadonlySet<string>, { size: number; without: rs.Without }>();
 
 /** The school a realm founds: a madrasa where it knows L2, else a temple or monastery school (RSCH-003). */
 function schoolTypeFor(p: rs.Programme): rs.SchoolType | null {
@@ -103,7 +111,8 @@ export function schoolsOf(world: World, n: number): { province: number; type: rs
 // ---------------------------------------------------------------- the start
 
 /**
- * What each realm knows in 1444 (RSCH-076), and its first school: one in its
+ * What each realm knows at the start (RSCH-098; the start date's block and
+ * Era I pacing, RSCH-113, RSCH-114), and its first school: one in its
  * capital, a madrasa where it knows L2, else a temple or monastery school
  * (founded by the clergy where the realm knows neither, RSCH-001), half its
  * seats filled from recruits in cohorts of the last five years, and a few
@@ -113,7 +122,7 @@ export function seedResearch(world: World): void {
   const year = world.date.year;
   const land = landOf(world);
   world.research = world.rules.nations.map((def, n) => {
-    const p = rs.startingProgramme(def.id);
+    const p = rs.startingProgramme(def.id, rs.tree(), world.date);
     p.country = world.nationIds[n]!;
     const capital = world.provinceIndex.get(def.capital);
     const type = schoolTypeFor(p);
@@ -141,7 +150,7 @@ export function seedResearch(world: World): void {
  */
 export function wakeResearch(world: World, n: number, donor: number): void {
   const id = world.nationIds[n]!;
-  const p = rs.startingProgramme(donor >= 0 ? world.nationIds[donor]! : id);
+  const p = rs.startingProgramme(donor >= 0 ? world.nationIds[donor]! : id, rs.tree(), { year: world.campaign.startYear });
   p.country = id;
   if (donor >= 0) {
     const d = world.research[donor]!;
@@ -166,13 +175,14 @@ function landOf(world: World): number[][] {
 }
 
 /**
- * Takes up to `men` recruits from realm n's held provinces, each giving the
+ * Takes up to `men` recruits from realm n's held royal provinces, each giving the
  * same share of its pool; returns how many. `land` lists the realm's
  * provinces when the caller has it.
  */
 function takeRecruits(world: World, n: number, men: number, land?: readonly number[]): number {
   if (men <= 0) return 0;
-  const held = (land ?? landOf(world)[n]!).filter((p) => world.provinceOwner[p] === n && controller(world, p) === n);
+  // The crown's recruits: a lord's land fills his own retinue (WAR-252).
+  const held = (land ?? landOf(world)[n]!).filter((p) => world.provinceOwner[p] === n && world.provinceLord[p]! < 0 && controller(world, p) === n);
   let pool = 0;
   for (const p of held) pool += world.provinceRecruits[p]!;
   const take = Math.min(men, Math.floor(pool));
@@ -326,9 +336,14 @@ function aiResearch(world: World, n: number, date: rs.Day): void {
   aiChoose(world, n, date);
 }
 
+/** The inventions that unlock a castle step (buildings data): the fortification inventions a realm in fear studies sooner (DIPL-241). */
+export const FORTIFICATION = new Set((buildingsData.buildings as { id: string; steps: { unlocked_by?: string }[] }[]).find((b) => b.id === "castle")!.steps.flatMap((s) => (s.unlocked_by && s.unlocked_by !== "start" ? [s.unlocked_by] : [])));
+
 function aiChoose(world: World, n: number, date: rs.Day): void {
   const p = world.research[n]!;
   if (p.studies.length > 0) return;
+  // A realm in fear weighs warfare and fortification studies lighter (DIPL-241).
+  const fear = dip.fearLevel(dip.country(world.diplomacy, world.nationIds[n]!).fears);
   // rs.aiChooseStudy's rule (cheapest now, ties by id) in one pass over the ids sorted once.
   let pick: string | null = null;
   let best = Infinity;
@@ -338,7 +353,7 @@ function aiChoose(world: World, n: number, date: rs.Day): void {
   for (const k of p.known) for (const c of children.get(k) ?? []) if (!p.known.has(c)) tried.add(c);
   for (const id of [...tried].sort()) {
     if (!rs.eligibility(p, id, date).ok) continue;
-    const cost = rs.studyCostFor(p, id, date, partnersKnowing(world, n, id));
+    const cost = rs.studyCostFor(p, id, date, partnersKnowing(world, n, id)) * (fear === "calm" ? 1 : dip.studyCostWeight(id, fear, FORTIFICATION));
     if (cost < best) [pick, best] = [id, cost];
   }
   if (pick) rs.setStudy(p, pick, date);
@@ -646,6 +661,8 @@ interface SavedProgramme {
   seats: number;
   /** The study queue (RSCH-108); older saves have none. */
   queue?: string[];
+  /** The campaign's start year for Era I pacing (RSCH-113); older saves have none and keep the world's own. */
+  startYear?: number;
 }
 
 export interface SavedResearch {
@@ -656,7 +673,7 @@ export interface SavedResearch {
 
 export function saveResearch(world: World): SavedResearch {
   return {
-    realms: world.research.map((p, n) => ({ known: [...p.known], contacts: [...p.contacts], studies: p.studies, schools: p.schools, scholars: p.scholars, stopped: p.stopped, seats: world.researchSeats[n]!, queue: [...p.queue] })),
+    realms: world.research.map((p, n) => ({ known: [...p.known], contacts: [...p.contacts], studies: p.studies, schools: p.schools, scholars: p.scholars, stopped: p.stopped, seats: world.researchSeats[n]!, queue: [...p.queue], ...(p.startYear !== undefined ? { startYear: p.startYear } : {}) })),
     founding: world.researchFounding,
   };
 }
@@ -674,6 +691,7 @@ export function restoreResearch(world: World, saved: SavedResearch, mapNation: (
     p.scholars = s.scholars;
     p.stopped = s.stopped;
     p.queue = (s.queue ?? []).filter((id) => rs.tree().inventions.has(id));
+    if (s.startYear !== undefined) p.startYear = s.startYear;
     world.researchSeats[n] = s.seats;
   });
   world.researchFounding = saved.founding.map((f) => ({ ...f, nation: mapNation(f.nation), province: mapProvince(f.province) })).filter((f) => f.nation >= 0 && f.province >= 0);

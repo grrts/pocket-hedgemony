@@ -1,0 +1,492 @@
+<h1>Naval data</h1>
+<p>Every value in the game&#39;s naval config, exactly as the game reads it. This page is made from <code>packages/rules/data/domain/naval.json</code> each time the config changes, so it always matches the game. How these values are used is explained on <a href="/wiki/Naval">Naval</a>.</p>
+<p>Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and values marked (provisional) are placeholders that may still change in balancing. Inventions are shown by id and name; see <a href="/wiki/Data-Research#inventions">Research data</a>.</p>
+<blockquote>
+<p>Naval (domain/naval/spec.md, naval design v1). The design names one naval config file; keys follow spec section 10. Every number is a design placeholder. Not given by the design (left out): bounty per sailor, muster time, fish-lost formula (OQ-NAVY-14), wind calendars, storm and freeze seasons, pirate season length (OQ-NAVY-23).</p>
+<p><code>decided</code>: 17 October: D-NAVY-1..29. Numbers below are provisional where listed in _provisional.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>arsenalStep</code></td><td>4</td></tr>
+<tr><td><code>arsenalBuildsAsStep</code></td><td>3</td></tr>
+<tr><td><code>arsenalTown</code></td><td>Venice</td></tr>
+<tr><td><code>berthsPerLargeShip</code></td><td>2</td></tr>
+<tr><td><code>largeShips</code></td><td>ship of the line</td></tr>
+<tr><td><code>drawnUp</code></td><td>galley, cog, junk, dhow, small craft</td></tr>
+<tr><td><code>fallowBelow</code></td><td>0.5</td></tr>
+<tr><td><code>smallTownHarbour</code></td><td>1</td></tr>
+<tr><td><code>fightingAgeShare</code></td><td>0.25</td></tr>
+<tr><td><code>wageInPort</code></td><td>0.1</td></tr>
+<tr><td><code>wageAtSea</code></td><td>0.2</td></tr>
+<tr><td><code>rationInPort</code></td><td>1</td></tr>
+<tr><td><code>foreignWageMultiplier</code></td><td>2</td></tr>
+<tr><td><code>foreignCrewsFromHarbourStep</code></td><td>2</td></tr>
+<tr><td><code>prizeCrewDesertion</code></td><td>0.25</td></tr>
+<tr><td><code>wagesSpentAshore</code></td><td>0.2</td></tr>
+<tr><td><code>harbourBuildMonthsMultiplier</code></td><td>1.5</td></tr>
+<tr><td><code>abroadPriceMultiplier</code></td><td>1.5</td></tr>
+<tr><td><code>explorationUnlock</code></td><td>exploration unlock</td></tr>
+<tr><td><code>refitFromHarbourStep</code></td><td>2</td></tr>
+<tr><td><code>hullSteps</code></td><td>sound, worn, leaking, wrecked</td></tr>
+<tr><td><code>laidUpWreckYears</code></td><td>10</td></tr>
+<tr><td><code>laidUpUpkeepShare</code></td><td>0.1</td></tr>
+<tr><td><code>fitOutMonths</code></td><td>1</td></tr>
+<tr><td><code>minCrewToSail</code></td><td>0.25</td></tr>
+<tr><td><code>resupplyFoodPerZone</code></td><td>0.1</td></tr>
+<tr><td><code>resupplyGoldPerZone</code></td><td>0.01</td></tr>
+<tr><td><code>refitCostForeignMultiplier</code></td><td>1.5</td></tr>
+<tr><td><code>leakingDaysMultiplier</code></td><td>2</td></tr>
+<tr><td><code>oceanReachWithS1</code></td><td>3</td></tr>
+<tr><td><code>prizeCrewShare</code></td><td>0.25</td></tr>
+<tr><td><code>sunkSurvivorsShare</code></td><td>0.333333</td></tr>
+<tr><td><code>pirateGrowthPerSeason</code></td><td>1</td></tr>
+<tr><td><code>pirateReach</code></td><td>1</td></tr>
+<tr><td><code>lighthouseStormFactor</code></td><td>0.5</td></tr>
+<tr><td><code>seaBattleMaxSectors</code></td><td>3</td></tr>
+<tr><td><code>battleHullStepsLost</code></td><td>1</td></tr>
+<tr><td><code>foreignCrewsPerPortPerYear</code> (provisional)</td><td>100</td></tr>
+<tr><td><code>coalPerMonthAtSea</code> (provisional)</td><td>1</td></tr>
+<tr><td><code>powderPerVoyage</code> (provisional)</td><td>1</td></tr>
+</tbody></table></div>
+<h2 id="berths-by-harbour-step-provisional"><a class="anchor" href="#berths-by-harbour-step-provisional" aria-label="Link to this section">#</a>Berths by harbour step (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>1</code></td><td>10</td></tr>
+<tr><td><code>2</code></td><td>25</td></tr>
+<tr><td><code>3</code></td><td>50</td></tr>
+</tbody></table></div>
+<h2 id="slipways-by-shipyard-step-provisional"><a class="anchor" href="#slipways-by-shipyard-step-provisional" aria-label="Link to this section">#</a>Slipways by shipyard step (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>1</code></td><td>1</td></tr>
+<tr><td><code>2</code></td><td>2</td></tr>
+<tr><td><code>3</code></td><td>2</td></tr>
+<tr><td><code>4</code></td><td>3</td></tr>
+</tbody></table></div>
+<h2 id="harbour-allows"><a class="anchor" href="#harbour-allows" aria-label="Link to this section">#</a>Harbour allows</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>1</code></td><td>muster, buy, resupply</td></tr>
+<tr><td><code>2</code></td><td>muster, buy, resupply, refit, foreign crews</td></tr>
+<tr><td><code>3</code></td><td>muster, buy, resupply, refit, foreign crews, coaling</td></tr>
+</tbody></table></div>
+<h2 id="tier-rank"><a class="anchor" href="#tier-rank" aria-label="Link to this section">#</a>Tier rank</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>landing</code></td><td>0</td></tr>
+<tr><td><code>small</code></td><td>1</td></tr>
+<tr><td><code>port</code></td><td>2</td></tr>
+<tr><td><code>great</code></td><td>3</td></tr>
+</tbody></table></div>
+<h2 id="start-harbour-by-tier"><a class="anchor" href="#start-harbour-by-tier" aria-label="Link to this section">#</a>Start harbour by tier</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>great</code></td><td>2</td></tr>
+<tr><td><code>port</code></td><td>2</td></tr>
+<tr><td><code>small</code></td><td>1</td></tr>
+<tr><td><code>landing</code></td><td>0</td></tr>
+</tbody></table></div>
+<h2 id="start-shipyard"><a class="anchor" href="#start-shipyard" aria-label="Link to this section">#</a>Start shipyard</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>marked</code></td><td>1</td></tr>
+<tr><td><code>withInvention</code></td><td>2</td></tr>
+<tr><td><code>invention</code></td><td><a href="/wiki/Data-Research#inventions">S4 Carrack and caravel</a></td></tr>
+</tbody></table></div>
+<h2 id="muster-share-provisional"><a class="anchor" href="#muster-share-provisional" aria-label="Link to this section">#</a>Muster share (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>seafolk</code></td><td>0.666667</td></tr>
+<tr><td><code>homeless</code></td><td>0.333333</td></tr>
+<tr><td><code>other</code></td><td>0.05</td></tr>
+</tbody></table></div>
+<h2 id="drift-home"><a class="anchor" href="#drift-home" aria-label="Link to this section">#</a>Drift home</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>afterMonths</code></td><td>6</td></tr>
+<tr><td><code>share</code></td><td>0.1</td></tr>
+</tbody></table></div>
+<h2 id="pressing"><a class="anchor" href="#pressing" aria-label="Link to this section">#</a>Pressing</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>invention</code></td><td><a href="/wiki/Data-Research#inventions">S9 Line-of-battle tactics</a></td></tr>
+<tr><td><code>grievance</code></td><td>Pressed</td></tr>
+<tr><td><code>years</code></td><td>1</td></tr>
+</tbody></table></div>
+<h2 id="skilled-service"><a class="anchor" href="#skilled-service" aria-label="Link to this section">#</a>Skilled service</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>years</code></td><td>2</td></tr>
+<tr><td><code>fishBonus</code></td><td>0.1</td></tr>
+<tr><td><code>tradersBonus</code></td><td>0.1</td></tr>
+<tr><td><code>lastsYears</code></td><td>10</td></tr>
+</tbody></table></div>
+<h2 id="widows"><a class="anchor" href="#widows" aria-label="Link to this section">#</a>Widows</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>share</code></td><td>0.1</td></tr>
+<tr><td><code>windowYears</code></td><td>5</td></tr>
+<tr><td><code>birthsYears</code></td><td>10</td></tr>
+<tr><td><code>grievance</code></td><td>Lost at sea</td></tr>
+<tr><td><code>grievanceYears</code></td><td>2</td></tr>
+</tbody></table></div>
+<h2 id="ships"><a class="anchor" href="#ships" aria-label="Link to this section">#</a>Ships</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>family</th><th>unlock</th><th>built at</th><th>crew</th><th>gold</th><th>timber</th><th>months</th><th>upkeep</th><th>step days</th><th>more</th></tr></thead>
+<tbody>
+<tr><td>small craft</td><td>small craft</td><td>none</td><td>any shore</td><td>6</td><td>2</td><td>0</td><td>1</td><td>0</td><td>sea: 1; ocean: 2</td><td>ocean needs: <a href="/wiki/Data-Research#inventions">S3 Outrigger voyaging</a></td></tr>
+<tr><td>war canoe fleet</td><td>military</td><td><a href="/wiki/Data-Research#inventions">S3 Outrigger voyaging</a></td><td>any shore</td><td>100</td><td>10</td><td>2</td><td>2</td><td>0.5</td><td>sea: 1; ocean: 2</td><td>ocean needs: <a href="/wiki/Data-Research#inventions">S3 Outrigger voyaging</a></td></tr>
+<tr><td>voyaging canoe</td><td>exploration</td><td><a href="/wiki/Data-Research#inventions">S3 Outrigger voyaging</a></td><td>any shore</td><td>20</td><td>5</td><td>1</td><td>1</td><td>0.5</td><td>sea: 1; ocean: 2</td><td>ocean needs: <a href="/wiki/Data-Research#inventions">S3 Outrigger voyaging</a>; colony stores: 100</td></tr>
+<tr><td>cog</td><td>trade</td><td>none</td><td>harbour</td><td>30</td><td>25</td><td>6</td><td>3</td><td>1</td><td>sea: 2; ocean: 3</td><td>hold: 2; purse: 30</td></tr>
+<tr><td>junk</td><td>trade</td><td>none</td><td>harbour</td><td>30</td><td>25</td><td>6</td><td>3</td><td>1</td><td>sea: 2; ocean: 3</td><td>hold: 2; purse: 30</td></tr>
+<tr><td>dhow</td><td>trade</td><td>none</td><td>harbour</td><td>30</td><td>25</td><td>6</td><td>3</td><td>1</td><td>sea: 2; ocean: 3</td><td>hold: 2; purse: 30</td></tr>
+<tr><td>caravel</td><td>exploration</td><td><a href="/wiki/Data-Research#inventions">S4 Carrack and caravel</a></td><td>harbour</td><td>25</td><td>25</td><td>4</td><td>3</td><td>1</td><td>sea: 1.5; ocean: 2</td><td>colony stores: 300; needs exploration unlock: yes</td></tr>
+<tr><td>galley</td><td>military</td><td>none</td><td>1</td><td>180</td><td>40</td><td>6</td><td>4</td><td>2</td><td>sea: 1; ocean: none</td><td>hold: 2; purse: 25; galley: yes</td></tr>
+<tr><td>carrack</td><td>trade</td><td><a href="/wiki/Data-Research#inventions">S4 Carrack and caravel</a></td><td>2</td><td>60</td><td>60</td><td>12</td><td>6</td><td>3</td><td>sea: 2; ocean: 2</td><td>hold: 3; purse: 50</td></tr>
+<tr><td>armed carrack</td><td>military</td><td><a href="/wiki/Data-Research#inventions">S6 Ship-mounted cannon</a></td><td>2</td><td>120</td><td>120</td><td>14</td><td>7</td><td>5</td><td>sea: 2; ocean: 2</td><td>shoots: yes</td></tr>
+<tr><td>galleon</td><td>military</td><td><a href="/wiki/Data-Research#inventions">S7 Galleon</a></td><td>2</td><td>200</td><td>200</td><td>20</td><td>9</td><td>8</td><td>sea: 2; ocean: 2</td><td>hold: 3; purse: 60; shoots: yes</td></tr>
+<tr><td>fluyt</td><td>trade</td><td><a href="/wiki/Data-Research#inventions">S7 Galleon</a></td><td>2</td><td>20</td><td>40</td><td>10</td><td>4</td><td>1.5</td><td>sea: 2; ocean: 2</td><td>hold: 4; purse: 70</td></tr>
+<tr><td>turtle ship</td><td>military</td><td><a href="/wiki/Data-Research#inventions">S8 Turtle and armoured ships</a></td><td>2</td><td>120</td><td>150</td><td>12</td><td>8</td><td>6</td><td>sea: 2; ocean: 2</td><td>shoots: yes</td></tr>
+<tr><td>ship of the line</td><td>military</td><td><a href="/wiki/Data-Research#inventions">S9 Line-of-battle tactics</a></td><td>3</td><td>600</td><td>600</td><td>60</td><td>18</td><td>25</td><td>sea: 2; ocean: 2</td><td>shoots: yes</td></tr>
+<tr><td>steamer</td><td>trade</td><td><a href="/wiki/Data-Research#inventions">S13 Steamships</a></td><td>3</td><td>40</td><td>200</td><td>20</td><td>8</td><td>3</td><td>sea: 1; ocean: 1</td><td>hold: 6; purse: 150; iron: 40; steam: yes</td></tr>
+</tbody></table></div>
+<h2 id="trade-ship-by-sea"><a class="anchor" href="#trade-ship-by-sea" aria-label="Link to this section">#</a>Trade ship by sea</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>coasts of Europe</code></td><td>cog</td></tr>
+<tr><td><code>East and Southeast Asia</code></td><td>junk</td></tr>
+<tr><td><code>Indian Ocean and Red Sea</code></td><td>dhow</td></tr>
+</tbody></table></div>
+<h2 id="supply-by-family"><a class="anchor" href="#supply-by-family" aria-label="Link to this section">#</a>Supply by family</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>trade</code></td><td>15</td></tr>
+<tr><td><code>military</code></td><td>15</td></tr>
+<tr><td><code>galley</code></td><td>6</td></tr>
+<tr><td><code>exploration</code></td><td>60</td></tr>
+</tbody></table></div>
+<h2 id="refit-months"><a class="anchor" href="#refit-months" aria-label="Link to this section">#</a>Refit months</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>worn</code></td><td>1</td></tr>
+<tr><td><code>leaking</code></td><td>3</td></tr>
+<tr><td><code>shipyardFactor</code></td><td>0.5</td></tr>
+</tbody></table></div>
+<h2 id="rot-months"><a class="anchor" href="#rot-months" aria-label="Link to this section">#</a>Rot months</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>at sea</code></td><td>6</td></tr>
+<tr><td><code>in port</code></td><td>36</td></tr>
+<tr><td><code>laid up</code></td><td>24</td></tr>
+<tr><td><code>anchorage</code></td><td>6</td></tr>
+</tbody></table></div>
+<h2 id="out-of-supply"><a class="anchor" href="#out-of-supply" aria-label="Link to this section">#</a>Out of supply</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>crewLossPerZone</code></td><td>0.1</td></tr>
+<tr><td><code>strengthCap</code></td><td>0.5</td></tr>
+</tbody></table></div>
+<h2 id="wind-multiplier"><a class="anchor" href="#wind-multiplier" aria-label="Link to this section">#</a>Wind multiplier</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>with</code></td><td>0.5</td></tr>
+<tr><td><code>against</code></td><td>2</td></tr>
+<tr><td><code>none</code></td><td>1</td></tr>
+</tbody></table></div>
+<h2 id="sea-inventions"><a class="anchor" href="#sea-inventions" aria-label="Link to this section">#</a>Sea inventions</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>compass</code></td><td><a href="/wiki/Data-Research#inventions">S1 Magnetic compass and sea charts</a></td></tr>
+<tr><td><code>ocean</code></td><td><a href="/wiki/Data-Research#inventions">S5 ocean_navigation</a></td></tr>
+<tr><td><code>outrigger</code></td><td><a href="/wiki/Data-Research#inventions">S3 Outrigger voyaging</a></td></tr>
+</tbody></table></div>
+<h2 id="admiral"><a class="anchor" href="#admiral" aria-label="Link to this section">#</a>Admiral</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>mightHits</code></td><td>0.05</td></tr>
+<tr><td><code>mightBoarding</code></td><td>0.1</td></tr>
+<tr><td><code>cunningDays</code></td><td>0.05</td></tr>
+<tr><td><code>cunningSightZones</code></td><td>1</td></tr>
+<tr><td><code>logisticsStorm</code></td><td>0.1</td></tr>
+<tr><td><code>supplyFreeEveryZones</code></td><td>10</td></tr>
+<tr><td><code>supplyFreeFromLogistics</code></td><td>3</td></tr>
+<tr><td><code>logisticsGainYears</code></td><td>3</td></tr>
+<tr><td><code>portYearsMultiplier</code></td><td>2</td></tr>
+<tr><td><code>viceAdmiralsMax</code></td><td>2</td></tr>
+</tbody></table></div>
+<h2 id="admirals-by-official"><a class="anchor" href="#admirals-by-official" aria-label="Link to this section">#</a>Admirals by official</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>might</th><th>cunning</th><th>logistics</th><th>trait</th></tr></thead>
+<tbody>
+<tr><td>customs officer</td><td>0</td><td>3</td><td>1</td><td>Careful</td></tr>
+<tr><td>warden</td><td>2</td><td>1</td><td>1</td><td>Steady</td></tr>
+<tr><td>steward</td><td>0</td><td>1</td><td>3</td><td>Careful</td></tr>
+<tr><td>muster master</td><td>1</td><td>1</td><td>2</td><td>Beloved</td></tr>
+<tr><td>tax collector</td><td>0</td><td>2</td><td>1</td><td>Greedy</td></tr>
+<tr><td>judge</td><td>1</td><td>2</td><td>0</td><td>Cruel</td></tr>
+<tr><td>master of works</td><td>0</td><td>1</td><td>2</td><td>none</td></tr>
+<tr><td>chaplain</td><td>0</td><td>1</td><td>1</td><td>none</td></tr>
+<tr><td>schoolmaster</td><td>0</td><td>1</td><td>1</td><td>none</td></tr>
+<tr><td>marshal</td><td>2</td><td>2</td><td>1</td><td>any</td></tr>
+</tbody></table></div>
+<h2 id="pirate-coasts"><a class="anchor" href="#pirate-coasts" aria-label="Link to this section">#</a>Pirate coasts</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>sea</th><th>catalogue record</th></tr></thead>
+<tbody>
+<tr><td>wokou</td><td>East China Sea</td><td>yes</td></tr>
+<tr><td>Barbary corsairs</td><td>Barbary coast</td><td>no</td></tr>
+<tr><td>Aegean corsairs</td><td>Aegean</td><td>no</td></tr>
+<tr><td>Orang Laut</td><td>Malacca strait</td><td>yes</td></tr>
+</tbody></table></div>
+<h2 id="small-craft"><a class="anchor" href="#small-craft" aria-label="Link to this section">#</a>Small craft</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>crew</code></td><td>6</td></tr>
+<tr><td><code>carriesMen</code></td><td>10</td></tr>
+<tr><td><code>carriesLoads</code></td><td>1</td></tr>
+</tbody></table></div>
+<h2 id="room"><a class="anchor" href="#room" aria-label="Link to this section">#</a>Room</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>horse</code></td><td>4</td></tr>
+<tr><td><code>gun</code></td><td>20</td></tr>
+</tbody></table></div>
+<h2 id="ai"><a class="anchor" href="#ai" aria-label="Link to this section">#</a>Ai</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>fleetAiRadiusZones</code></td><td>10</td></tr>
+<tr><td><code>seaPowerSeafolkAtSea</code> (provisional)</td><td>0.25</td></tr>
+</tbody></table></div>
+<h2 id="muster"><a class="anchor" href="#muster" aria-label="Link to this section">#</a>Muster</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>bountyPerSailor</code> (provisional)</td><td>0.05</td></tr>
+<tr><td><code>days</code> (provisional)</td><td>14</td></tr>
+<tr><td><code>fishingShareOfSeafolk</code> (provisional)</td><td>0.333333</td></tr>
+<tr><td><code>byShare</code></td><td>yes</td></tr>
+</tbody></table></div>
+<h2 id="admiral-commission"><a class="anchor" href="#admiral-commission" aria-label="Link to this section">#</a>Admiral commission</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>gold</code></td><td>10</td></tr>
+<tr><td><code>wageAtSeaMultiplier</code></td><td>3</td></tr>
+<tr><td><code>notCommissioned</code></td><td>colonial governor</td></tr>
+</tbody></table></div>
+<h2 id="storm"><a class="anchor" href="#storm" aria-label="Link to this section">#</a>Storm</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>chancePerMonth</code> (provisional)</td><td>0.05</td></tr>
+<tr><td><code>hullStepsLost</code></td><td>1</td></tr>
+</tbody></table></div>
+<h2 id="canoe-landing-provisional"><a class="anchor" href="#canoe-landing-provisional" aria-label="Link to this section">#</a>Canoe landing (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>extraSeafolk</code></td><td>100</td></tr>
+<tr><td><code>smallCraft</code></td><td>5</td></tr>
+</tbody></table></div>
+<h2 id="monsoon"><a class="anchor" href="#monsoon" aria-label="Link to this section">#</a>Monsoon</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>needs</code></td><td><a href="/wiki/Data-Research#inventions">T5 Monsoon sailing calendars</a></td></tr>
+<tr><td><code>ships</code></td><td>junk, dhow</td></tr>
+<tr><td><code>seas</code></td><td>Arabian Sea, Bay of Bengal, Gulf of Aden, Red Sea, Persian Gulf, Indian Ocean, South China Sea, Java Sea</td></tr>
+</tbody></table></div>
+<h2 id="pirates-provisional"><a class="anchor" href="#pirates-provisional" aria-label="Link to this section">#</a>Pirates (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>seasonMonths</code></td><td>3</td></tr>
+<tr><td><code>startShips</code></td><td>2</td></tr>
+</tbody></table></div>
+<h3 id="bases"><a class="anchor" href="#bases" aria-label="Link to this section">#</a>Bases</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>wokou</code></td><td>Tsushima</td></tr>
+<tr><td><code>Barbary corsairs</code></td><td>Algiers</td></tr>
+<tr><td><code>Aegean corsairs</code></td><td>Mani</td></tr>
+<tr><td><code>Orang Laut</code></td><td>Riau</td></tr>
+</tbody></table></div>
+<h2 id="later-ships-provisional"><a class="anchor" href="#later-ships-provisional" aria-label="Link to this section">#</a>Later ships (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>family</th><th>crew</th><th>gold</th><th>iron</th><th>months</th><th>upkeep</th></tr></thead>
+<tbody>
+<tr><td>ironclad</td><td>military</td><td>300</td><td>300</td><td>80</td><td>12</td><td>6</td></tr>
+<tr><td>dreadnought</td><td>military</td><td>800</td><td>1200</td><td>300</td><td>24</td><td>20</td></tr>
+<tr><td>submarine</td><td>military</td><td>40</td><td>250</td><td>40</td><td>12</td><td>4</td></tr>
+<tr><td>aircraft carrier</td><td>military</td><td>1500</td><td>1500</td><td>300</td><td>30</td><td>25</td></tr>
+</tbody></table></div>
+<h2 id="frozen-seas-provisional"><a class="anchor" href="#frozen-seas-provisional" aria-label="Link to this section">#</a>Frozen seas (provisional)</h2>
+<blockquote>
+<p>X-17: provisional until world-map&#39;s frozen lookup exists</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>months</code></td><td>12, 1, 2, 3</td></tr>
+<tr><td><code>zones</code></td><td>Gulf of Bothnia, Bay of Bothnia, Gulf of Finland, White Sea, Barents Sea, Kara Sea</td></tr>
+</tbody></table></div>
+<h2 id="sea-engage-provisional"><a class="anchor" href="#sea-engage-provisional" aria-label="Link to this section">#</a>Sea engage (provisional)</h2>
+<blockquote>
+<p>Feedback 127: hostile fleets meet only in the same sea zone, once their tiles come within the seeking fleet&#39;s sighting range: base tiles plus perCunning per point of its leader&#39;s Cunning, at most max (armies 10 to 15).</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>base</code></td><td>20</td></tr>
+<tr><td><code>perCunning</code></td><td>1</td></tr>
+<tr><td><code>max</code></td><td>30</td></tr>
+</tbody></table></div>
+<h2 id="admiral-posts-provisional"><a class="anchor" href="#admiral-posts-provisional" aria-label="Link to this section">#</a>Admiral posts (provisional)</h2>
+<blockquote>
+<p>Feedback 124: a fleet&#39;s leader holds one post. mightShare is the share of his Might counted in sea battles.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>name</th><th>does</th><th>might share</th><th>trade gain</th><th>prize factor</th><th>chart rings</th><th>colony start</th></tr></thead>
+<tbody>
+<tr><td>admiral</td><td>Admiral</td><td>War: his Might and Cunning count in full in sea battles.</td><td>1</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>commodore</td><td>Commodore</td><td>Trade: his realm&#39;s trade ships pass enemy blockades where his fleet lies, ports beside it gain trade 25 % faster, and his blockades take 1.5 times the prize money.</td><td>0.5</td><td>0.25</td><td>1.5</td><td></td><td></td></tr>
+<tr><td>viceroy</td><td>Viceroy</td><td>Exploration and colonies: his fleet charts two rings of sea around it, and a colony founded from it starts 10 points ahead.</td><td>0.5</td><td></td><td></td><td>2</td><td>10</td></tr>
+</tbody></table></div>
+<h2 id="blockade-provisional"><a class="anchor" href="#blockade-provisional" aria-label="Link to this section">#</a>Blockade (provisional)</h2>
+<blockquote>
+<p>Feedback 123: a fleet with a warship and a leader lying still in a sea zone at war closes the enemy&#39;s coastal provinces beside it, and the zone to the enemy&#39;s trade ships. Each month its realm takes prizeShare of each closed port&#39;s sea trade value (its value to ships times its trade ratio); each closed port counts peaceWeight as if occupied when the blocked side weighs peace.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>prizeShare</code></td><td>0.5</td></tr>
+<tr><td><code>peaceWeight</code></td><td>0.5</td></tr>
+</tbody></table></div>
+<h2 id="starting-fleets-provisional"><a class="anchor" href="#starting-fleets-provisional" aria-label="Link to this section">#</a>Starting fleets (provisional)</h2>
+<blockquote>
+<p>F-115: realms that had ships in 1444 start with them, by the catalogue&#39;s naval_capability (very_low, low, moderate, high, very_high). Warships are the strongest the realm could order in its best port; transports are its sea&#39;s trade ship. Ages are drawn up to maxAgeYears. Ports west of noShipsWestOfLon (the Americas, whose 1444 realms had canoes and rafts, not cogs, junks or dhows) start with none. Provisional.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>levels</code></td><td>very_low, low, moderate, high, very_high</td></tr>
+<tr><td><code>warships</code></td><td>0, 0, 1, 3, 6</td></tr>
+<tr><td><code>transports</code></td><td>0, 1, 1, 2, 3</td></tr>
+<tr><td><code>maxAgeYears</code></td><td>15</td></tr>
+<tr><td><code>noShipsWestOfLon</code></td><td>-30</td></tr>
+</tbody></table></div>
+<h2 id="hired-fleets-provisional"><a class="anchor" href="#hired-fleets-provisional" aria-label="Link to this section">#</a>Hired fleets (provisional)</h2>
+<blockquote>
+<p>F-115: fleets for hire, as free companies are for the land (WAR-213). forHire free fleets at once, each moving on at moveOnChance a month; one comes when it can reach a port of the hirer within reachDays. Pay a month is the ships&#39; upkeep and crews&#39; wages at sea times payMultiplier (free) or lentPayMultiplier (a realm&#39;s own fleet, the gold going to that realm). Realms whose naval_capability is in lenderLevels lend an idle fleet in port with at least lenderMinWarships warships. The AI hires when at war and outgunned, keeping reserveMonths of pay. Captains bring skills of 1 to captainSkillMax. Provisional.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>forHire</code></td><td>4</td></tr>
+<tr><td><code>moveOnChance</code></td><td>0.1667</td></tr>
+<tr><td><code>reachDays</code></td><td>112</td></tr>
+<tr><td><code>payMultiplier</code></td><td>3</td></tr>
+<tr><td><code>lentPayMultiplier</code></td><td>2</td></tr>
+<tr><td><code>lenderLevels</code></td><td>high, very_high</td></tr>
+<tr><td><code>lenderMinWarships</code></td><td>2</td></tr>
+<tr><td><code>captainSkillMax</code></td><td>3</td></tr>
+<tr><td><code>aiReserveMonths</code></td><td>6</td></tr>
+</tbody></table></div>
+<h3 id="groups"><a class="anchor" href="#groups" aria-label="Link to this section">#</a>Groups</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>group</th><th>seas</th><th>ships</th><th>names</th><th>captains</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Genoese galley masters</td><td>Northwest Tyrrhenian Sea</td><td>galley: 2, 4; cog: 0, 1</td><td>Doria galleys, Grimaldi galleys, Spinola galleys, Fieschi galleys, Lomellini galleys</td><td>Antonio Doria, Giovanni Grimaldi, Battista Spinola, Luca Fieschi, Napoleone Lomellini</td></tr>
+<tr><td>2</td><td>Catalan corsairs</td><td>Northeast Balearic Sea, East Balearic Sea</td><td>galley: 1, 3</td><td>Corsairs of Mallorca, Barcelona privateers, Valencian corsairs</td><td>Bernat de Vilamarí, Galceran de Requesens, Joan de Montpalau, Pere Joan Sala</td></tr>
+<tr><td>3</td><td>Basque shipmasters</td><td>Bay of Biscay</td><td>cog: 2, 5</td><td>Bilbao shipmasters, Bermeo ships, San Sebastián ships, Ships of the Brotherhood of the Marshes</td><td>Juan de Arteaga, Martín de Zarauz, Pedro de Larrea, Íñigo de Mendoza</td></tr>
+<tr><td>4</td><td>English West Country privateers</td><td>West English Channel</td><td>cog: 1, 3</td><td>Fowey gallants, Dartmouth privateers, Plymouth privateers</td><td>Hankyn Seelander, Thomas Treffry, John Hawley, Robert Wenyngton</td></tr>
+<tr><td>5</td><td>Holland and Zeeland shipmasters</td><td>North Sea</td><td>cog: 2, 4</td><td>Veere ships, Amsterdam ships, Zierikzee ships</td><td>Hendrik van Borselen, Jan Adriaensz, Claes Pietersz, Willem Florisz</td></tr>
+<tr><td>6</td><td>Hanseatic peace ships</td><td>Baltic Sea</td><td>cog: 2, 5</td><td>Lübeck peace ships, Danzig convoy, Stralsund cogs, Wismar cogs</td><td>Bernd Pawest, Paul Beneke, Eler Bokelmann, Bartholomäus Voet</td></tr>
+<tr><td>7</td><td>Barbary corsairs</td><td>Southwest Balearic Sea, West Alboran Sea</td><td>galley: 1, 3</td><td>Corsairs of Bougie, Corsairs of Algiers, Corsairs of Oran</td><td>Rais Hasan, Rais Ali, Rais Murad, Rais Mustafa</td></tr>
+<tr><td>8</td><td>Aegean corsairs</td><td>Aegean Sea</td><td>galley: 1, 2</td><td>Corsairs of Naxos, Corsairs of Mani, Corsairs of Chios</td><td>Nikolaos Kalergis, Giorgio Sanudo, Manuel Notaras, Ioannis Laskaris</td></tr>
+<tr><td>9</td><td>Dalmatian ship-owners</td><td>Adriatic Sea</td><td>galley: 1, 2; cog: 1, 2</td><td>Ragusan ships, Zara galleys, Sebenico ships, Spalato ships</td><td>Marin Gundulić, Nikola Sorkočević, Ivan Menčetić, Pavao Gučetić</td></tr>
+<tr><td>10</td><td>Japanese sea clans</td><td>East Korea Strait, Southwest Korea Strait</td><td>junk: 2, 4</td><td>Noshima band, Kurushima band, Matsura band, Gotō band</td><td>Murakami Yoshimitsu, Kurushima Michiyasu, Matsura Shigenobu, Gotō Morinao</td></tr>
+<tr><td>11</td><td>Fujian sea traders</td><td>South Taiwan Strait, North Taiwan Strait</td><td>junk: 2, 5</td><td>Zhangzhou junks, Quanzhou junks, Yuegang junks</td><td>Lin Daoqian, Chen Zuyi, Xu Dong, Wang Zhi</td></tr>
+<tr><td>12</td><td>Orang Laut</td><td>Southeast Strait of Malacca</td><td>war canoe fleet: 2, 4</td><td>Orang Laut of Bintan, Orang Laut of Lingga, Orang Laut of Riau</td><td>Batin Sekam, Batin Ali, Batin Daud, Batin Hitam</td></tr>
+<tr><td>13</td><td>Gujarati ship-owners</td><td>Gulf of Khambhät</td><td>dhow: 2, 4</td><td>Cambay ships, Diu ships, Rander ships</td><td>Nakhuda Ali, Nakhuda Hasan, Nakhuda Ibrahim, Nakhuda Yusuf</td></tr>
+<tr><td>14</td><td>Malabar sea captains</td><td>Laccadive Sea</td><td>dhow: 2, 3</td><td>Calicut ships, Ponnani ships, Kollam ships</td><td>Marakkar Ali, Marakkar Kunhi, Koya Pakki, Marakkar Musa</td></tr>
+</tbody></table></div>
+<h2 id="game-provisional"><a class="anchor" href="#game-provisional" aria-label="Link to this section">#</a>Game (provisional)</h2>
+<blockquote>
+<p>Fits naval&#39;s numbers to this game&#39;s treasury, as defines&#39; goldScale does for recruiting and works: ship gold and upkeep times goldScale, sailors&#39; wages and bounty times wageScale, so a sailor costs about what a soldier does (D-NAVY-30). Sea battles (D-NAVY-31): each 4-hour round (X-1) a side deals its ships&#39; strength times roundHits, the first ship of the other side&#39;s line taking them; a side whose strength falls to breakShare of its start runs for port. Docking takes dockDays; landing an army a day per menLandedPerDay men (warfare 11.3). All provisional.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>goldScale</code></td><td>0.1</td></tr>
+<tr><td><code>wageScale</code></td><td>0.01</td></tr>
+<tr><td><code>roundHits</code></td><td>0.08</td></tr>
+<tr><td><code>roundSpread</code></td><td>0.25</td></tr>
+<tr><td><code>breakShare</code></td><td>0.5</td></tr>
+<tr><td><code>maxRounds</code></td><td>18</td></tr>
+<tr><td><code>dockDays</code></td><td>0.5</td></tr>
+<tr><td><code>menLandedPerDay</code></td><td>5000</td></tr>
+</tbody></table></div>
+<h3 id="ai-1"><a class="anchor" href="#ai-1" aria-label="Link to this section">#</a>Ai</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>reserveGold</code></td><td>20</td></tr>
+<tr><td><code>portsPerShip</code></td><td>2</td></tr>
+<tr><td><code>maxShips</code></td><td>4</td></tr>
+<tr><td><code>huntZones</code></td><td>8</td></tr>
+<tr><td><code>huntEdge</code></td><td>1.2</td></tr>
+</tbody></table></div>
+<h3 id="queues"><a class="anchor" href="#queues" aria-label="Link to this section">#</a>Queues</h3>
+<blockquote>
+<p>Build queues in a port (D-NAVY-33): sailors are mustered a batch at a time, each batch muster.days after the one before, at most musterQueueMax batches waiting; ships ordered wait in the port&#39;s queue, paid when ordered, and are laid down in turn when a slipway is free and their crew waits in port, at most shipQueueMax waiting. Provisional.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>musterBatch</code></td><td>50</td></tr>
+<tr><td><code>musterQueueMax</code></td><td>10</td></tr>
+<tr><td><code>shipQueueMax</code></td><td>5</td></tr>
+</tbody></table></div>
+<h2 id="upgrades-provisional"><a class="anchor" href="#upgrades-provisional" aria-label="Link to this section">#</a>Upgrades (provisional)</h2>
+<blockquote>
+<p>The upgrade path (D-NAVY-33): a port no longer offers a ship type once it can build the type that replaces it, or any type further along. Trade: the sea&#39;s cog, junk or dhow, then carrack, fluyt, steamer. War: galley or war canoe fleet, then armed carrack, galleon, ship of the line; the turtle ship gives way to the ship of the line. Exploration ships have no successor yet. Provisional.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>cog</code></td><td>carrack</td></tr>
+<tr><td><code>junk</code></td><td>carrack</td></tr>
+<tr><td><code>dhow</code></td><td>carrack</td></tr>
+<tr><td><code>carrack</code></td><td>fluyt</td></tr>
+<tr><td><code>fluyt</code></td><td>steamer</td></tr>
+<tr><td><code>galley</code></td><td>armed carrack</td></tr>
+<tr><td><code>war canoe fleet</code></td><td>armed carrack</td></tr>
+<tr><td><code>armed carrack</code></td><td>galleon</td></tr>
+<tr><td><code>galleon</code></td><td>ship of the line</td></tr>
+<tr><td><code>turtle ship</code></td><td>ship of the line</td></tr>
+</tbody></table></div>

@@ -1,0 +1,886 @@
+{
+ "$comment": "Historical figures who come to a realm as lords after the 1378 start (realm REALM-295 to REALM-297; Leroy, 19 October 2026). One event per figure in scenarios/1378/lords.json `later`, which holds who he was and his sources. Bridge-shaped (EVT-085): likeliest near his history year while the realm holds his seat, never forced; the `historical_lord` effect seats him (a new lord, or he takes over the lord who holds his seat). places: each seat as an event-tree place.",
+ "events": {
+  "lord_nuno_alvares_pereira": {
+   "id": "lord_nuno_alvares_pereira",
+   "name": "The Holy Constable",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [],
+   "regions": [
+    "europe"
+   ],
+   "importance": "minor",
+   "roles": {
+    "realm": {
+     "historical": [
+      "portugal"
+     ],
+     "select": "fixed",
+     "as": [
+      "affected"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1385,
+    "latest": 1400,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "portugal"
+     },
+     {
+      "owns": {
+       "who": "portugal",
+       "where": "area:seat_nuno_alvares_pereira"
+      }
+     },
+     {
+      "flag": {
+       "who": "portugal",
+       "id": "avis_dynasty"
+      }
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 0.5
+   },
+   "options": [
+    {
+     "id": "welcome",
+     "chooser": "$realm",
+     "historical": true,
+     "ai": {
+      "base": 85
+     },
+     "effects": {
+      "immediate": [
+       {
+        "historical_lord": {
+         "id": "nuno_alvares_pereira",
+         "on": "portugal"
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "refuse",
+     "chooser": "$realm",
+     "ai": {
+      "base": 15
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "portugal",
+        "stat": {
+         "prestige": -2
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "history": {
+    "date": "1385",
+    "confidence": "high"
+   }
+  },
+  "lord_john_hunyadi": {
+   "id": "lord_john_hunyadi",
+   "name": "The White Knight",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [],
+   "regions": [
+    "europe"
+   ],
+   "importance": "minor",
+   "roles": {
+    "realm": {
+     "historical": [
+      "hungary"
+     ],
+     "select": "fixed",
+     "as": [
+      "affected"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1439,
+    "latest": 1454,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "hungary"
+     },
+     {
+      "owns": {
+       "who": "hungary",
+       "where": "area:seat_john_hunyadi"
+      }
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 0.5
+   },
+   "options": [
+    {
+     "id": "welcome",
+     "chooser": "$realm",
+     "historical": true,
+     "ai": {
+      "base": 85
+     },
+     "effects": {
+      "immediate": [
+       {
+        "historical_lord": {
+         "id": "john_hunyadi",
+         "on": "hungary"
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "refuse",
+     "chooser": "$realm",
+     "ai": {
+      "base": 15
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "hungary",
+        "stat": {
+         "prestige": -2
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "history": {
+    "date": "1439",
+    "confidence": "high"
+   }
+  },
+  "lord_skirgaila": {
+   "id": "lord_skirgaila",
+   "name": "Skirgaila takes Trakai",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [],
+   "regions": [
+    "eastern_europe"
+   ],
+   "importance": "minor",
+   "roles": {
+    "realm": {
+     "historical": [
+      "lithuania"
+     ],
+     "select": "fixed",
+     "as": [
+      "affected"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1382,
+    "latest": 1397,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "lithuania"
+     },
+     {
+      "owns": {
+       "who": "lithuania",
+       "where": "area:seat_skirgaila"
+      }
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 0.5
+   },
+   "options": [
+    {
+     "id": "welcome",
+     "chooser": "$realm",
+     "historical": true,
+     "ai": {
+      "base": 85
+     },
+     "effects": {
+      "immediate": [
+       {
+        "historical_lord": {
+         "id": "skirgaila",
+         "on": "lithuania"
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "refuse",
+     "chooser": "$realm",
+     "ai": {
+      "base": 15
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "lithuania",
+        "stat": {
+         "prestige": -2
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "history": {
+    "date": "1382",
+    "confidence": "medium"
+   }
+  },
+  "lord_jan_zizka": {
+   "id": "lord_jan_zizka",
+   "name": "The one-eyed captain",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [],
+   "regions": [
+    "europe"
+   ],
+   "importance": "minor",
+   "roles": {
+    "realm": {
+     "historical": [
+      "bohemia"
+     ],
+     "select": "fixed",
+     "as": [
+      "affected"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1421,
+    "latest": 1436,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "bohemia"
+     },
+     {
+      "owns": {
+       "who": "bohemia",
+       "where": "area:seat_jan_zizka"
+      }
+     },
+     {
+      "event": {
+       "id": "first_defenestration_of_prague"
+      }
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 0.5
+   },
+   "options": [
+    {
+     "id": "welcome",
+     "chooser": "$realm",
+     "historical": true,
+     "ai": {
+      "base": 85
+     },
+     "effects": {
+      "immediate": [
+       {
+        "historical_lord": {
+         "id": "jan_zizka",
+         "on": "bohemia"
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "refuse",
+     "chooser": "$realm",
+     "ai": {
+      "base": 15
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "bohemia",
+        "stat": {
+         "prestige": -2
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "history": {
+    "date": "1421",
+    "confidence": "medium"
+   }
+  },
+  "lord_manuel_ii_palaiologos": {
+   "id": "lord_manuel_ii_palaiologos",
+   "name": "Manuel holds Thessalonica",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [],
+   "regions": [
+    "europe"
+   ],
+   "importance": "minor",
+   "roles": {
+    "realm": {
+     "historical": [
+      "byzantium"
+     ],
+     "select": "fixed",
+     "as": [
+      "affected"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1382,
+    "latest": 1397,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "byzantium"
+     },
+     {
+      "owns": {
+       "who": "byzantium",
+       "where": "area:seat_manuel_ii_palaiologos"
+      }
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 0.5
+   },
+   "options": [
+    {
+     "id": "welcome",
+     "chooser": "$realm",
+     "historical": true,
+     "ai": {
+      "base": 85
+     },
+     "effects": {
+      "immediate": [
+       {
+        "historical_lord": {
+         "id": "manuel_ii_palaiologos",
+         "on": "byzantium"
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "refuse",
+     "chooser": "$realm",
+     "ai": {
+      "base": 15
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "byzantium",
+        "stat": {
+         "prestige": -2
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "history": {
+    "date": "1382",
+    "confidence": "high"
+   }
+  },
+  "lord_aleksandras_olelka": {
+   "id": "lord_aleksandras_olelka",
+   "name": "Olelka restored in Kiev",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [],
+   "regions": [
+    "eastern_europe"
+   ],
+   "importance": "minor",
+   "roles": {
+    "realm": {
+     "historical": [
+      "lithuania"
+     ],
+     "select": "fixed",
+     "as": [
+      "affected"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1443,
+    "latest": 1458,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "lithuania"
+     },
+     {
+      "owns": {
+       "who": "lithuania",
+       "where": "area:seat_aleksandras_olelka"
+      }
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 0.5
+   },
+   "options": [
+    {
+     "id": "welcome",
+     "chooser": "$realm",
+     "historical": true,
+     "ai": {
+      "base": 85
+     },
+     "effects": {
+      "immediate": [
+       {
+        "historical_lord": {
+         "id": "aleksandras_olelka",
+         "on": "lithuania"
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "refuse",
+     "chooser": "$realm",
+     "ai": {
+      "base": 15
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "lithuania",
+        "stat": {
+         "prestige": -2
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "history": {
+    "date": "1443",
+    "confidence": "medium"
+   }
+  },
+  "lord_zhu_di": {
+   "id": "lord_zhu_di",
+   "name": "The Prince of Yan",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [],
+   "regions": [
+    "east_asia"
+   ],
+   "importance": "minor",
+   "roles": {
+    "realm": {
+     "historical": [
+      "ming"
+     ],
+     "select": "fixed",
+     "as": [
+      "affected"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1380,
+    "latest": 1395,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "ming"
+     },
+     {
+      "owns": {
+       "who": "ming",
+       "where": "area:seat_zhu_di"
+      }
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 0.5
+   },
+   "options": [
+    {
+     "id": "welcome",
+     "chooser": "$realm",
+     "historical": true,
+     "ai": {
+      "base": 85
+     },
+     "effects": {
+      "immediate": [
+       {
+        "historical_lord": {
+         "id": "zhu_di",
+         "on": "ming"
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "refuse",
+     "chooser": "$realm",
+     "ai": {
+      "base": 15
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "ming",
+        "stat": {
+         "prestige": -2
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "history": {
+    "date": "1380",
+    "confidence": "high"
+   }
+  },
+  "lord_zafar_khan": {
+   "id": "lord_zafar_khan",
+   "name": "A governor for Gujarat",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [],
+   "regions": [
+    "south_asia"
+   ],
+   "importance": "minor",
+   "roles": {
+    "realm": {
+     "historical": [
+      "delhi"
+     ],
+     "select": "fixed",
+     "as": [
+      "affected"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1391,
+    "latest": 1406,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "delhi"
+     },
+     {
+      "owns": {
+       "who": "delhi",
+       "where": "area:seat_zafar_khan"
+      }
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 0.5
+   },
+   "options": [
+    {
+     "id": "welcome",
+     "chooser": "$realm",
+     "historical": true,
+     "ai": {
+      "base": 85
+     },
+     "effects": {
+      "immediate": [
+       {
+        "historical_lord": {
+         "id": "zafar_khan",
+         "on": "delhi"
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "refuse",
+     "chooser": "$realm",
+     "ai": {
+      "base": 15
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "delhi",
+        "stat": {
+         "prestige": -2
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "history": {
+    "date": "1391",
+    "confidence": "high"
+   }
+  },
+  "lord_dilawar_khan_ghuri": {
+   "id": "lord_dilawar_khan_ghuri",
+   "name": "A governor for Malwa",
+   "ages": [
+    "age_of_schism_and_conquerors"
+   ],
+   "periods": [],
+   "regions": [
+    "south_asia"
+   ],
+   "importance": "minor",
+   "roles": {
+    "realm": {
+     "historical": [
+      "delhi"
+     ],
+     "select": "fixed",
+     "as": [
+      "affected"
+     ]
+    }
+   },
+   "availability": {
+    "earliest": 1392,
+    "latest": 1407,
+    "mode": "approximate",
+    "repeat": "one_time"
+   },
+   "trigger": {
+    "all": [
+     {
+      "exists": "delhi"
+     },
+     {
+      "owns": {
+       "who": "delhi",
+       "where": "area:seat_dilawar_khan_ghuri"
+      }
+     }
+    ]
+   },
+   "selection": {
+    "mode": "pool",
+    "mean_years": 0.5
+   },
+   "options": [
+    {
+     "id": "welcome",
+     "chooser": "$realm",
+     "historical": true,
+     "ai": {
+      "base": 85
+     },
+     "effects": {
+      "immediate": [
+       {
+        "historical_lord": {
+         "id": "dilawar_khan_ghuri",
+         "on": "delhi"
+        }
+       }
+      ]
+     }
+    },
+    {
+     "id": "refuse",
+     "chooser": "$realm",
+     "ai": {
+      "base": 15
+     },
+     "effects": {
+      "immediate": [
+       {
+        "on": "delhi",
+        "stat": {
+         "prestige": -2
+        }
+       }
+      ]
+     }
+    }
+   ],
+   "effects": {},
+   "history": {
+    "date": "1392",
+    "confidence": "medium"
+   }
+  }
+ },
+ "places": {
+  "area:seat_nuno_alvares_pereira": [
+   "p1589"
+  ],
+  "area:seat_john_hunyadi": [
+   "p1422"
+  ],
+  "area:seat_skirgaila": [
+   "p596"
+  ],
+  "area:seat_jan_zizka": [
+   "p834"
+  ],
+  "area:seat_manuel_ii_palaiologos": [
+   "p1648"
+  ],
+  "area:seat_aleksandras_olelka": [
+   "p879"
+  ],
+  "area:seat_zhu_di": [
+   "p1809"
+  ],
+  "area:seat_zafar_khan": [
+   "p2763"
+  ],
+  "area:seat_dilawar_khan_ghuri": [
+   "p2772"
+  ]
+ },
+ "entities": {
+  "area:seat_nuno_alvares_pereira": "The Holy Constable",
+  "area:seat_john_hunyadi": "The White Knight",
+  "area:seat_skirgaila": "Skirgaila takes Trakai",
+  "area:seat_jan_zizka": "The one-eyed captain",
+  "area:seat_manuel_ii_palaiologos": "Manuel holds Thessalonica",
+  "area:seat_aleksandras_olelka": "Olelka restored in Kiev",
+  "area:seat_zhu_di": "The Prince of Yan",
+  "area:seat_zafar_khan": "A governor for Gujarat",
+  "area:seat_dilawar_khan_ghuri": "A governor for Malwa"
+ },
+ "localization": {
+  "event.lord_nuno_alvares_pereira.name": "The Holy Constable",
+  "event.lord_nuno_alvares_pereira.desc": "Nuno Álvares Pereira, a young knight who stood for the Master of Aviz in the crisis, asks for his reward: the constable's staff and the county of Ourém.",
+  "event.lord_nuno_alvares_pereira.option.welcome": "Make him Constable",
+  "event.lord_nuno_alvares_pereira.option.refuse": "Keep him at court",
+  "event.lord_john_hunyadi.name": "The White Knight",
+  "event.lord_john_hunyadi.desc": "John Hunyadi, a knight of Wallachian blood who has fought for the king in Italy and on the Danube, is named Ban of Severin to hold the border against the Turks.",
+  "event.lord_john_hunyadi.option.welcome": "Give him the banate",
+  "event.lord_john_hunyadi.option.refuse": "Keep the border in the crown's hands",
+  "event.lord_skirgaila.name": "Skirgaila takes Trakai",
+  "event.lord_skirgaila.desc": "Kęstutis's line has lost the Grand Duke's favour. Jogaila's brother Skirgaila asks for the duchy of Trakai.",
+  "event.lord_skirgaila.option.welcome": "Give Trakai to Skirgaila",
+  "event.lord_skirgaila.option.refuse": "Leave Trakai to its old line",
+  "event.lord_jan_zizka.name": "The one-eyed captain",
+  "event.lord_jan_zizka.desc": "Jan Žižka, a one-eyed knight of small estate, has become the Hussites' first captain and holds the castle he calls Kalich.",
+  "event.lord_jan_zizka.option.welcome": "Recognise his lordship",
+  "event.lord_jan_zizka.option.refuse": "Refuse him",
+  "event.lord_manuel_ii_palaiologos.name": "Manuel holds Thessalonica",
+  "event.lord_manuel_ii_palaiologos.desc": "Prince Manuel, freed after his years in prison, sails to Thessalonica and rules the city as despot, defying the Turks.",
+  "event.lord_manuel_ii_palaiologos.option.welcome": "Let Manuel rule Thessalonica",
+  "event.lord_manuel_ii_palaiologos.option.refuse": "Order him back to the capital",
+  "event.lord_aleksandras_olelka.name": "Olelka restored in Kiev",
+  "event.lord_aleksandras_olelka.desc": "Aleksandras Olelka, son of Vladimir Olgerdovich, asks for Kiev, the principality his father held.",
+  "event.lord_aleksandras_olelka.option.welcome": "Restore him in Kiev",
+  "event.lord_aleksandras_olelka.option.refuse": "Keep Kiev as it is",
+  "event.lord_zhu_di.name": "The Prince of Yan",
+  "event.lord_zhu_di.desc": "The emperor's fourth son, Zhu Di, Prince of Yan, comes of age and goes to his fief at Beiping on the northern frontier.",
+  "event.lord_zhu_di.option.welcome": "Send him to Beiping",
+  "event.lord_zhu_di.option.refuse": "Keep him at Nanjing",
+  "event.lord_zafar_khan.name": "A governor for Gujarat",
+  "event.lord_zafar_khan.desc": "Zafar Khan, son of a convert who rose at the Sultan's court, is sent to govern Gujarat.",
+  "event.lord_zafar_khan.option.welcome": "Send Zafar Khan",
+  "event.lord_zafar_khan.option.refuse": "Keep Gujarat under the court",
+  "event.lord_dilawar_khan_ghuri.name": "A governor for Malwa",
+  "event.lord_dilawar_khan_ghuri.desc": "Dilawar Khan Ghuri is given Malwa to govern from Dhar.",
+  "event.lord_dilawar_khan_ghuri.option.welcome": "Give him Malwa",
+  "event.lord_dilawar_khan_ghuri.option.refuse": "Keep Malwa under the court"
+ }
+}

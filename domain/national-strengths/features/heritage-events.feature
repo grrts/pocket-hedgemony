@@ -2,7 +2,7 @@
 Feature: Heritage in events
   As the event tree
   I want effects and a condition for heritage
-  So that events can reward, begin golden ages, reveal ambitions and overcome weaknesses
+  So that events can reward, begin golden ages and overcome weaknesses, and require ambitions fulfilled
 
   @HER-064
   Scenario: grant_legacy
@@ -15,13 +15,6 @@ Feature: Heritage in events
     Given the golden age "portugal_carreira_da_india" is inactive because "Portugal" lacks "S4"
     When an event applies wake_heyday on "Portugal" with years 5
     Then the golden age is active for 5 years even though its condition fails
-
-  @HER-066
-  Scenario: stir_ambition
-    Given the country "Venice" has a hidden ambition
-    When an event applies stir_ambition on it
-    Then the ambition is hinted and shows its warmth
-    And its words stay a hint
 
   @HER-067
   Scenario: shed_burden

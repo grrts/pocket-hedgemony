@@ -8,7 +8,7 @@ import * as G from "@ph/engine";
 import * as DIP from "@ph/engine/domain/diplomacy";
 import * as EVT from "@ph/engine/domain/events";
 import diplomacyConfig from "../../rules/data/domain/diplomacy.json" with { type: "json" };
-import relations1444 from "../../rules/data/domain/diplomacy-relations-1444.json" with { type: "json" };
+import { startRelations as relations1444 } from "@ph/rules/start";
 
 const { Given, When, Then } = steps("realm");
 
@@ -1480,8 +1480,46 @@ When("the scores are worked out", (s) => {
   if (s.power) s.powerOut = M.powerScore(s.power);
   if (s.domination) s.dominates = M.dominationWin(s.domination.share, 100, s.domination.month);
 });
-Then("its Economy score is built from {int} yearly income and a bank of {int}", (s, income: number, bank: number) => {
-  expect(s.economy).toEqual({ income, bank, score: income + bank });
+Then("its Economy score is built from {int} yearly income and a bank of {int}, of which {int} counts", (s, income: number, bank: number, counted: number) => {
+  expect(s.economy).toEqual({ income, bank, counted, score: income + counted });
+});
+Then("its Economy score is {int}", (s, score: number) => {
+  expect(s.economy.score).toBe(score);
+});
+Given("the country {string} had an Economy score of {int} in each of {int} Januaries before this one", (s, _c: string, v: number, years: number) => {
+  s.januaries = Array.from({ length: years }, () => v);
+});
+Given("its Economy score is {int} in this January", (s, v: number) => {
+  s.januaries.push(v);
+  s.judged = M.averagedScore(s.januaries);
+});
+Then("its Economy score is judged as {int}", (s, v: number) => {
+  expect(s.judged).toBe(v);
+});
+Given("the realms' Power scores are:", (s, table: string[][]) => {
+  s.growthRows = table.slice(1).map(([realm, start, now]) => ({ realm: realm!, start: num(start!), now: num(now!) }));
+});
+Then(/^the Power growth of "([^"]+)" is ([\d.]+)(?:, measured from the floor of (\d+))?$/, (s, realm: string, g: string, floor?: string) => {
+  const rows = s.growthRows as { realm: string; start: number; now: number }[];
+  const f = M.startFloor(rows.map((r) => r.start));
+  if (floor) expect(f).toBe(Number(floor));
+  const r = rows.find((x) => x.realm === realm)!;
+  expect(M.growth(r.now, r.start, f)).toBe(Number(g));
+});
+Then("{string} leads the Power score", (s, realm: string) => {
+  const rows = s.growthRows as { realm: string; start: number; now: number }[];
+  const f = M.startFloor(rows.map((r) => r.start));
+  expect(M.scoreWinners(Object.fromEntries(rows.map((r) => [r.realm, M.growth(r.now, r.start, f)])))).toEqual([realm]);
+});
+Given("a campaign that starts in {int} and ends on 31 August {int}", (s, from: number, to: number) => {
+  s.chapters = { from, to };
+});
+Then("a chapter closes in the January turns of {int}, {int}, {int} and {int}", (s, a: number, b: number, c: number, d: number) => {
+  expect(M.chapterEnds(s.chapters.from, s.chapters.to)).toEqual([a, b, c, d]);
+});
+Then("the last chapter closes with the campaign on 31 August {int}", (s, y: number) => {
+  expect(M.chapterEnds(s.chapters.from, s.chapters.to)).not.toContain(y);
+  expect(M.realmConfig.campaign_end).toEqual({ year: y, month: 8, day: 31 });
 });
 
 Given("the country {string} knows {int} inventions of era I and {int} of era II", (s, country: string, one: number, two: number) => {
@@ -1530,9 +1568,13 @@ Given(re(`it has ${NUM} foot, ${NUM} horse, ${NUM} guns, (\\d+) warships and (\\
 Then("its Power score counts {int} provinces", (s, n: number) => {
   expect(s.powerOut.provinces).toBe(n);
 });
-Then("adds its army power from soldiers weighted by kind, warships and commanders", (s) => {
+Then("adds its army power from soldiers weighted by kind and warships", (s) => {
   expect(s.powerOut.score).toBe(s.powerOut.provinces + s.powerOut.army);
   expect(M.powerScore({ ...s.power, horse: 0 }).army).toBeLessThan(s.powerOut.army);
+});
+Then("its commanders add nothing", (s) => {
+  expect(s.power.commanders).toBeGreaterThan(0);
+  expect(M.powerScore({ ...s.power, commanders: 0 } as never).army).toBe(s.powerOut.army);
 });
 Then("its army power is {int}", (s, n: number) => {
   expect(s.powerOut.army).toBe(n);
@@ -2660,10 +2702,15 @@ When("the month ends", (s) => {
   const w = s.game as GW;
   s.recruitsBefore = w.provinceRecruits[s.province];
   s.news = [];
-  // A rising takes a neighbour at a tenth a month (rebellions provisional.spread_chance_per_month): play on a year at most.
-  for (let m = 0; m < 12 && !s.news.some((n: G.News) => n.text.startsWith("The rising spreads")); m++) {
+  // A rising takes a neighbour at a tenth a month (rebellions provisional.spread_chance_per_month): play on three years at most,
+  // sparking it again should it end, until a month in which it spreads and still holds the province, so the scenario does not
+  // hang on one run of the dice.
+  for (let m = 0; m < 36; m++) {
     restless(w, s.province);
-    s.news.push(...playMonth(w));
+    if (!w.provinceRebels[s.province]) G.spark(w, s.province, "the tax rate of the province is raised");
+    const month = playMonth(w);
+    s.news.push(...month);
+    if (w.provinceRebels[s.province] && month.some((n: G.News) => n.text.startsWith("The rising spreads"))) break;
   }
 });
 Then("its neighbours may be drawn into revolt", (s) => {
@@ -2693,6 +2740,7 @@ When("a year passes", (s) => {
   const w = s.game as GW;
   w.date.year++;
   w.date.month = 1;
+  G.yearlyPeople(w, []);
   G.yearlyCrowns(w, []);
 });
 Then(/^(?:he|she) is (\d+)$/, (s, age: string) => {
@@ -2709,7 +2757,7 @@ Then("an old ruler may die", (s) => {
   old.age = 90;
   for (let y = 0; y < 40 && w.rulers[n]!.name === old.name && w.rulers[n]!.age >= 90; y++) {
     w.date.year++;
-    G.yearlyCrowns(w, []);
+    G.yearlyPeople(w, []);
   }
   expect(w.rulers[n]!.age < 90 || w.rulers[n]!.name !== old.name).toBe(true);
   expect(w.rulers[n]!.years).toBe(0);
@@ -2756,4 +2804,163 @@ Then("he gets small bonuses from those traits", (s) => {
   for (const t of s.traits as string[]) for (const v of Object.values(pct(t))) expect(Math.abs(v)).toBeLessThanOrEqual(25);
   if (s.traits.includes("Builder")) expect(G.heritageFactor(w, n, "building_cost_pct")).toBeLessThan(1);
   if (s.traits.includes("Pious")) expect(G.beliefRevoltFactor(w, n, "Faith")).toBeLessThan(1);
+});
+
+// people age and die (REALM-270 to REALM-276)
+const FR = (s: S) => (s.game as GW).nationIndex.get("france")!;
+const royalPost = (w: GW, n: number) => [...w.provinceOwner.keys()].find((p) => w.provinceOwner[p] === n && w.provinceLord[p]! < 0 && w.provinceOfficial[p]! >= 0)!;
+const lordWithLand = (w: GW, n: number) => w.lords.findIndex((l, k) => l.nation === n && !l.gone && w.provinceLord.includes(k));
+Then("a person of 75 is likelier to die this year than one of 45", () => {
+  expect(G.personDeathChance(75, "official")).toBeGreaterThan(G.personDeathChance(45, "official"));
+});
+Then("a lord and a ruler of 55 are as likely to die", () => {
+  expect(G.personDeathChance(55, "lord")).toBe(G.personDeathChance(55, "ruler"));
+});
+Given("a new game", (s) => void freshGame(s));
+Given("nobody dies this year", (s) => {
+  (s.game as GW).rulerRng.next = () => 0.999;
+});
+When("a January passes", (s) => {
+  const w = s.game as GW;
+  const n = FR(s);
+  s.before = { lords: w.lords.map((_, k) => G.lordAge(w, k).age), officials: [...w.provinceOwner.keys()].filter((p) => w.provinceOwner[p] === n && w.provinceOfficial[p]! >= 0).map((p) => [p, G.officialAge(w, p)]) };
+  w.date.year++;
+  w.date.month = 1;
+  G.yearlyPeople(w, []);
+});
+Then(/^every lord and official of "([^"]+)" is a year older$/, (s, realm: string) => {
+  const w = s.game as GW;
+  const n = realmOf(s, realm);
+  w.lords.forEach((l, k) => l.nation === n && expect(G.lordAge(w, k).age).toBe(s.before.lords[k] + 1));
+  for (const [p, age] of s.before.officials) expect(G.officialAge(w, p)).toBe(age + 1);
+});
+Given(/^a lord of "([^"]+)" with (an|no) heir$/, (s, realm: string, has: string) => {
+  const w = freshGame(s);
+  const k = lordWithLand(w, realmOf(s, realm));
+  G.lordAge(w, k);
+  w.lords[k]!.heir = has === "an" ? { name: "Jean", age: 20 } : null;
+  // No kinsman steps in either.
+  if (has === "no") w.rulerRng.next = () => 0.999;
+  s.lord = k;
+  s.lands = [...w.provinceLord.keys()].filter((p) => w.provinceLord[p] === k);
+});
+When("the lord dies", (s) => G.personDies(s.game as GW, { kind: "lord", lord: s.lord }, "old age", []));
+Then("his heir holds his lands under his own name", (s) => {
+  const w = s.game as GW;
+  expect(w.lords[s.lord]!.name).toBe("Jean");
+  for (const p of s.lands) expect(w.provinceLord[p]).toBe(s.lord);
+});
+Then("his lands return to the crown with their posts empty", (s) => {
+  const w = s.game as GW;
+  expect(w.lords[s.lord]!.gone).toBe(true);
+  for (const p of s.lands) {
+    expect(w.provinceLord[p]).toBe(-1);
+    expect(w.provinceOfficial[p]).toBe(-1);
+  }
+});
+When(/^the official of a royal province of "([^"]+)" dies$/, (s, realm: string) => {
+  const w = s.game as GW;
+  s.post = royalPost(w, realmOf(s, realm));
+  G.personDies(w, { kind: "official", p: s.post }, "old age", []);
+});
+Then("that post stands empty", (s) => expect((s.game as GW).provinceOfficial[s.post]).toBe(-1));
+Given(/^an army of "([^"]+)" with a commander$/, (s, realm: string) => {
+  const w = freshGame(s);
+  const n = realmOf(s, realm);
+  s.slot = [...w.armies.owner.keys()].find((i) => w.armies.alive[i] && w.armies.owner[i] === n && w.armies.commander[i]! >= 0);
+});
+When("its commander dies", (s) => {
+  const w = s.game as GW;
+  G.personDies(w, { kind: "commander", c: w.armies.commander[s.slot]! }, "battle", []);
+});
+Then("the army has no commander", (s) => expect((s.game as GW).armies.commander[s.slot]).toBe(-1));
+Given("a ruler with an heir", (s) => {
+  const w = freshGame(s);
+  s.n = w.rulers.findIndex((r, k) => r.heir && !w.nationGone[k]);
+});
+When("the heir dies", (s) => G.personDies(s.game as GW, { kind: "heir", n: s.n }, "illness", []));
+Then("the ruler has no heir", (s) => expect((s.game as GW).rulers[s.n]!.heir).toBeNull());
+Given(/^the player plays "([^"]+)"$/, (s, realm: string) => {
+  const w = freshGame(s);
+  w.player = realmOf(s, realm);
+});
+
+
+// ------------------------------------------------------------ sending an assassin after a lord (REALM-280 to REALM-283)
+// These run against the game: a fresh world, the realm's own lords, and the order the player gives.
+
+const landed = (s: S, realm: string): number[] => lordsOf(s, realm).filter((k) => G.lordLands(s.game, k).length > 0);
+/** Sends the assassin after lord k: he succeeds or is caught as the scenario says, else the seeded draw decides. */
+function sendAssassin(s: S, realm: string, k: number, outcome?: string): void {
+  s.target = k;
+  s.targetLands = G.lordLands(s.game, k);
+  s.targetName = (s.game as GW).lords[k]!.name;
+  s.targetHouse = (s.game as GW).lords[k]!.house;
+  if (outcome === undefined) return void (s.refused = G.applyNow(s.game, { type: "assassinateLord", lord: k }, realmOf(s, realm)).rejectedOrders[0]?.reason ?? null);
+  s.refused = G.assassinate(s.game, realmOf(s, realm), k, [], outcome === "he succeeds" ? 0 : 0.999999);
+}
+
+Given("the treasury of {string} holds {int} gold", (s, realm: string, gold: number) => {
+  s.game.nationTreasury[realmOf(s, realm)] = gold;
+});
+Then("the treasury of {string} is down to {int} gold", (s, realm: string, gold: number) => {
+  expect(s.game.nationTreasury[realmOf(s, realm)]).toBeCloseTo(gold, 6);
+});
+When(/^"([^"]+)" sends an assassin after one of its lords(?: and (he succeeds|he is caught))?$/, (s, realm: string, outcome?: string) => {
+  const lords = landed(s, realm);
+  expect(lords.length).toBeGreaterThan(1);
+  sendAssassin(s, realm, lords[0]!, outcome);
+});
+When(/^"([^"]+)" sends an assassin after one of them and (he succeeds|he is caught)$/, (s, realm: string, outcome: string) => {
+  sendAssassin(s, realm, s.pair[0], outcome);
+});
+Given("one of its lords has an heir", (s) => {
+  const w = s.game as GW;
+  s.heirOf = landed(s, "France")[0]!;
+  G.lordAge(w, s.heirOf);
+  w.lords[s.heirOf]!.heir = { name: "Bernard", age: 20 };
+});
+When(/^"([^"]+)" sends an assassin after him and (he succeeds|he is caught)$/, (s, realm: string, outcome: string) => {
+  sendAssassin(s, realm, s.heirOf, outcome);
+});
+When("{string} sends an assassin after a lord of another realm", (s, realm: string) => {
+  const n = realmOf(s, realm);
+  const other = (s.game as GW).lords.findIndex((l, k) => l.nation !== n && G.lordLands(s.game, k).length > 0);
+  expect(other).toBeGreaterThanOrEqual(0);
+  sendAssassin(s, realm, other);
+});
+Then("the order is refused as {string}", (s, reason: string) => {
+  expect(s.refused).toBe(reason);
+});
+Given("a lord holds {int} provinces", (s, n: number) => {
+  s.chance = M.assassinationChance({ provinces: Array.from({ length: n }, (_, i) => `p${i}`) });
+});
+Then("an assassin sent after him succeeds {int} % of the time", (s, pct: number) => {
+  expect(s.chance * 100).toBeCloseTo(pct, 6);
+});
+Given("two lords of {string} are of one house", (s, realm: string) => {
+  const [a, b] = landed(s, realm);
+  (s.game as GW).lords[b!]!.house = (s.game as GW).lords[a!]!.house;
+  s.pair = [a, b];
+});
+Then("that lord is dead and his heir holds his lands, {string}", (s, loyalty: string) => {
+  expect(s.refused).toBe(null);
+  const l = (s.game as GW).lords[s.target]!;
+  expect(l.name).toBe("Bernard");
+  expect(l.house).toBe(s.targetHouse);
+  expect(l.loyalty).toBe(loyalty);
+  expect(G.lordLands(s.game, s.target)).toEqual(s.targetLands);
+});
+Then("every other lord of {string} is {string}", (s, realm: string, loyalty: string) => {
+  const others = landed(s, realm).filter((k) => k !== s.target && (s.game as GW).lords[k]!.house !== s.targetHouse);
+  expect(others.length).toBeGreaterThan(0);
+  for (const k of others) expect((s.game as GW).lords[k]!.loyalty).toBe(loyalty);
+});
+Then("the other lord of his house is {string}", (s, loyalty: string) => {
+  expect((s.game as GW).lords[s.pair[1]]!.loyalty).toBe(loyalty);
+});
+Then("that lord is {string}", (s, loyalty: string) => {
+  expect(s.refused).toBe(null);
+  expect((s.game as GW).lords[s.target]!.loyalty).toBe(loyalty);
+  expect((s.game as GW).lords[s.target]!.name).toBe(s.targetName);
 });

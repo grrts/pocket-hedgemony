@@ -4,7 +4,7 @@ import { eraIndex, eraName, isPast, newProgramme, outOfScope, pathTo, standing, 
 import { icon } from "../art/ui.ts";
 
 /**
- * Research on screen (research RSCH-084 to RSCH-090, RSCH-100 to RSCH-114).
+ * Research on screen (research RSCH-084 to RSCH-090, RSCH-100 to RSCH-111, RSCH-116 to RSCH-118).
  * Research is its own screen over the map, opened from the top bar's research
  * plaque, the General tab's line or an alert. It has three parts: Next (what
  * is studied, the queue and the inventions that can be started, best first),
@@ -56,15 +56,14 @@ const monthsFor = (sy: number, pace: number): number | null => (pace > 0 ? Math.
 
 const pct = (r: Research) => (r.study ? Math.min(100, (r.study.progress / r.study.cost) * 100) : 0);
 
-/** The General tab's line: the study, how far along and the scholars, opening the Research screen (RSCH-088). */
-export function learningLine(r: Research): string {
-  const what = r.study ? `Studying <b>${esc(nice(r.study.name))}</b> · ${Math.floor(pct(r))} % · scholars ${fmt(r.scholars)}` : `<b>Nothing studied</b> · choose what to study`;
-  return `<dt>Research</dt><dd><button class="paper learning-line${r.study ? "" : " idle"}" data-realm-open-tab="learning" title="Open Research">${icon("scroll", 1)}<span>${what}</span></button></dd>`;
-}
-
 /** The standing in a few words for the Research screen's header: "Abreast of the times", "Behind by 2 eras" (RSCH-103). */
 export function standingShort(behind: number): string {
   return behind ? `Behind by ${behind} era${behind === 1 ? "" : "s"}` : "Abreast of the times";
+}
+
+/** What is studied and how far it has come, for the Realm overview's tile (SHELL-170). */
+export function studyNow(r: Research): { name: string; pct: number } | null {
+  return r.study ? { name: nice(r.study.name), pct: pct(r) } : null;
 }
 
 /** "Era I · abreast of the times", "Ancient · behind the times by 2 eras" (RSCH-103, RSCH-104). */
@@ -485,7 +484,7 @@ function schoolsPart(rules: Ruleset, r: Research, gold: number, open: ReadonlySe
 
 // ---------------------------------------------------------------- the Next part
 
-/** The inventions to offer in Next, best first: past ones to catch up, then the cheapest (RSCH-113). */
+/** The inventions to offer in Next, best first: past ones to catch up, then the cheapest (RSCH-116). */
 export function nextPicks(r: Research): { option: Option; catchUp: boolean; cheapest: boolean }[] {
   const t = tree();
   const ids = new Set(openIds(r));
@@ -504,7 +503,7 @@ const doesOf = (id: string) => cap(tree().inventions.get(id)?.unlocks ?? "");
 /** "4 years", "7 months": the time an invention takes at the realm's pace. */
 const timeText = (months: number | null) => (months === null ? "no progress" : months <= 24 ? `${months} month${months === 1 ? "" : "s"}` : `${Math.round(months / 12)} years`);
 
-/** Next: the study with its bar, the queue in order, and the inventions that can be started, best first (RSCH-113). */
+/** Next: the study with its bar, the queue in order, and the inventions that can be started, best first (RSCH-116). */
 function nextPart(r: Research): string {
   const now = r.study
     ? `<button class="paper next-now" data-learn-pick="${r.study.id}" aria-label="Studying ${esc(nice(r.study.name))}, ${Math.floor(pct(r))} %: show it in the tree">
@@ -561,7 +560,7 @@ function nextPart(r: Research): string {
 
 // ---------------------------------------------------------------- the screen
 
-/** The line every part starts with: the standing, the era and the pace (RSCH-103, RSCH-113); the parts themselves are the Realm book's pages row. */
+/** The line every part starts with: the standing, the era and the pace (RSCH-103, RSCH-116); the parts themselves are the Realm book's pages row. */
 function screenHead(r: Research): string {
   const missing = r.pastMissing.length;
   const stand = `${esc(standingShort(r.behind))}${missing ? ` · ${missing} to catch up` : ""}`;
@@ -569,7 +568,7 @@ function screenHead(r: Research): string {
   return `<p class="learn-standing">${standing}<small>${esc(eraName(r.era as TreeEra))} · ${fmt(r.scholars)} scholars · ${years(r.perYear || r.pace)} scholar-years a year</small></p>`;
 }
 
-/** The Research screen: Next, Tree or Schools under one header (RSCH-107, RSCH-113). */
+/** The Research screen: Next, Tree or Schools under one header (RSCH-107, RSCH-116). */
 export function learningTab(rules: Ruleset, r: Research, gold: number, ui: LearningUi = newLearningUi()): string {
   const head = `${screenHead(r)}${r.stopped ? `<p class="warn">Research has stopped: the students were called to arms. Fill seats again in Schools.</p>` : ""}`;
   if (ui.part === "schools") return `<div class="learn-screen schools-part">${head}${schoolsPart(rules, r, gold, ui.open)}</div>`;

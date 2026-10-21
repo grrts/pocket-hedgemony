@@ -1,12 +1,18 @@
 {
   "name": "@ph/desktop",
+  "productName": "Pocket Hegemony",
   "version": "0.0.0",
   "private": true,
   "type": "module",
   "main": "src/main.mjs",
   "scripts": {
     "start": "electron .",
-    "smoke": "PH_SMOKE=1 electron . --no-sandbox"
+    "steam": "electron . --steam-app-id=480",
+    "smoke": "PH_SMOKE=1 electron . --no-sandbox",
+    "test": "node --test \"test/*.test.mjs\""
+  },
+  "optionalDependencies": {
+    "steamworks.js": "0.4.0"
   },
   "devDependencies": {
     "electron": "44.7.2"

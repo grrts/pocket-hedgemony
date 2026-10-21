@@ -11,7 +11,7 @@ What the game has built so far:
 - **Gameplay**: Tutorial hints (with how many of the six are done) and Reset tutorial and hints; Achievement toasts; Autosave and Autosaves kept per campaign; Turn playback speed (1×, 2×, 4×: how fast the week plays out after End turn) and Battle playback speed.
 - **Graphics**: Battery saver (Off, Auto, On) and the knobs it moves: Frame rate cap, Sharpness and Animations. Rows it moves say "Set by Battery saver". Auto follows your device's battery where the browser reports it.
 - **Audio**: Master, Music on or off and its volume, Effects volume and Interface sounds. The speaker button's Sound card changes the same settings.
-- **Accessibility**: Text size (Normal, Large, Larger) for the cards, menus and alerts.
+- **Accessibility**: Colour vision (Default, Red-weak, Green-weak, Blue-weak, No colour), with a sample of four neighbouring realms and a map mode's ramp in the chosen mode under it; Patterns on map modes; Text size (Normal, Large, Larger) for the cards, menus and alerts. A colour vision change redraws the map, the armies and routes and the map mode's key at once.
 
 Other rows join the screen as the game builds what they do.
 
@@ -89,15 +89,17 @@ The files are kept in the app's user data folder on desktop and Steam, in the mo
 
 These are chosen on the new game screen, saved in the campaign, and shown read-only in Settings, under Campaign rules:
 
-- difficulty;
+- difficulty (Easy, Normal or Hard; what each changes is in [The 1378 start](The-1378-Start#difficulty));
 - AI temper;
 - fog of war;
-- historical or free events;
+- historical, plausible or free events (plausible by default);
 - ironman (achievements only count in ironman);
 - the campaign end date (default 31 August 1939);
 - whether music eras follow the calendar or technology.
 
 The map mode menu's "Hide unexplored lands" stays a display switch, because it only hides unknown lands visually. It would become a campaign rule only if fog ever hid information the computer uses.
+
+In this build the campaign rules are difficulty, events, fog of war, ironman and the end date, chosen on the *Rules of the campaign* card ([The 1378 start](The-1378-Start#campaign-rules)), and the game menu shows them read-only in one line under the date. With fog of war off, "Hide unexplored lands" gives way to a line saying every land is shown. While an ironman campaign is played, Settings hides Autosave and Autosaves kept.
 
 ### Graphics
 
@@ -170,7 +172,7 @@ Some switches appear in two sections but are one setting, so changing one change
 | Tutorial hints, and the action "Reset tutorial and hints" | On, Off | On |
 | Achievement toasts (Off hides the toast; achievements still unlock) | On, Off | On |
 | Place names | Historical, Modern | Historical |
-| Date format | 16 October 1444, 16 Oct 1444, 16.10.1444, 1444-10-16 | follows the language |
+| Date format | 20 September 1378, 20 Sep 1378, 20.09.1378, 1378-09-20 | follows the language |
 
 Autosave Off stops only the rotating autosaves, never the Resume save (see [Saving](Saving)). In an ironman campaign both autosave rows are hidden. When Confirm End turn asks, the question names the count ("3 warnings, 2 events wait for you · Look · End turn anyway"). Your battles never stop the turn and can't be skipped; they slow the week to 4-hour steps while they run, and that is not a setting. Turns are weeks, so the autosave goes by the calendar, never more than once a month. When events are still unanswered, End turn opens the first one instead of asking. There is no advisor row; muting a kind of warning happens on the Attention screen. Historical place names change with date and owner (Constantinople becomes Istanbul in Ottoman hands); no historical name list is planned, so both options show today's region names.
 
@@ -266,6 +268,7 @@ The official Steam Input configuration for the Steam Controller and Steam Deck a
 
 - **Colour vision** swaps nation colours to a second assignment from the same 32-colour palette, chosen so neighbours stay distinguishable for that vision type, and each map mode's colour ramp to a safe one (blue to orange instead of red to green). No colour uses greys with patterns. Every mode keeps the map's season colours (snow, spring green, autumn gold, the wet season) apart: the colour-blind modes shift them with the safe ramp and No colour uses tile patterns. Seasons cannot be switched off.
 - **Patterns on map modes** adds hatching, dots and stripes by band, so a map mode reads without colour.
+- In the colour-blind modes the realms keep a colour near their own where they can, but never one their neighbours can't be told from by that kind of colour vision. Map modes that ran red to green (Food, Diplomacy, Subjects, Exploration) run orange for bad or hostile and blue for good or friendly, and the ramps (People, Wealth, Trade) run pale orange to dark blue, lighter to darker, so they also read in grey. With No colour every realm is a grey with a pattern of its own beside its neighbours.
 - **High contrast borders** draw nation borders in black and white ink two art pixels wide.
 - **Text size**: panels reflow and cards grow taller, not smaller.
 - **Plain font** replaces the pixel font and the blackletter titles with a clear, openly licensed sans such as Atkinson Hyperlegible.
@@ -320,7 +323,7 @@ The Settings screen with its nine sections, the changed dot, per-row and per-sec
 - [Map and Map Modes](Map-and-Lenses): sharpness, map detail, animations, frame cap, colour vision, borders, patterns, place names and the parchment switch.
 - [Tutorial and help](Tutorial-and-Help): tutorial hints and their reset, tooltips and their delay, detailed tooltips.
 - [Achievements](Achievements): the toast switch; achievements only count in ironman.
-- [The 1444 start](The-1444-Start): the campaign rules shown read-only.
+- [The 1378 start](The-1378-Start): the campaign rules shown read-only.
 - [How a turn works](Time-and-Turns): Keep screen awake during the computer players' turn.
 - [Warfare](Warfare): battle playback speed and battle view controls.
 - [Historical events](Historical-Events): Jump to events.

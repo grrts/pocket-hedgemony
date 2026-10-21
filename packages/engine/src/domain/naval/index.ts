@@ -1,5 +1,5 @@
 import config from "../../../../rules/data/domain/naval.json" with { type: "json" };
-import ports1444 from "../../../../rules/data/domain/naval-ports-1444.json" with { type: "json" };
+import { startPorts as ports1444 } from "../../../../rules/src/start.ts";
 import { workingShare } from "../province/index.ts";
 import { yearsServedBonus, type CommanderSkills } from "../recruiting/index.ts";
 import {

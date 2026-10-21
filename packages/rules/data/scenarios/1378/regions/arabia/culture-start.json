@@ -1,0 +1,42 @@
+{
+ "$comment": "Court tongues, province tongues and faiths on 20 September 1378 (CULT-094), carried from the 1444 start until the research pass.",
+ "realms": {
+  "hejaz": {
+   "court": "hejazi_arabic",
+   "mix": [
+    [
+     "hejazi_arabic",
+     0.6
+    ],
+    [
+     "bedouin_arabic",
+     0.4
+    ]
+   ],
+   "local": {},
+   "faith": "sunni"
+  },
+  "yemen": {
+   "court": "yemeni_arabic",
+   "mix": [
+    [
+     "yemeni_arabic",
+     1
+    ]
+   ],
+   "local": {},
+   "faith": "shia"
+  },
+  "oman": {
+   "court": "omani_arabic",
+   "mix": [
+    [
+     "omani_arabic",
+     1
+    ]
+   ],
+   "local": {},
+   "faith": "ibadi"
+  }
+ }
+}

@@ -70,7 +70,7 @@ Then("the Treasury tab of the country card opens", (s) => {
 
 Then("the top bar shows the realm, the date, gold, stability, research, the war plaque while at war and the News button", (s) => {
   expect(bar(s).map((p) => p.key)).toEqual(["realm", "date", "gold", "stability", "research", "dispatches"]);
-  // Research shows the study's progress and opens the Research screen; with nothing studied it is marked (RSCH-113).
+  // Research shows the study's progress and opens the Research screen; with nothing studied it is marked (RSCH-117).
   const research = bar(s).find((p) => p.key === "research")!;
   expect(research.opens).toEqual({ card: "realm", tab: "learning" });
   const idle = topBar({ ...s.snap, research: { ...s.snap.research!, study: null } }, 0).find((p) => p.key === "research")!;
@@ -116,7 +116,7 @@ Then("it shows the stability step, what it means and one row for each pillar wit
   expect(v.step).toBe(s.snap.stability!.step);
   expect(v.words).toBe(STABILITY[v.step]);
   expect(v.note.length).toBeGreaterThan(0);
-  expect(v.pillars.map((p: any) => p.key)).toEqual(["lords", "subjects", "officials", "provinces"]);
+  expect(v.pillars.map((p: any) => p.key)).toEqual(["lords", "subjects", "officials", "provinces", "treasury"]);
   for (const [k, p] of v.pillars.entries()) {
     expect(p.step).toBe(s.snap.stability!.pillars[k]!.step);
     expect(p.words).toBe(STABILITY[p.step]);
@@ -128,8 +128,8 @@ Then("it shows the stability step, what it means and one row for each pillar wit
   expect(row.line).toMatch(new RegExp(`^All ${provinces} calm$|grumbling|rioting|plotting`));
 });
 
-Then("tapping a pillar opens the Lords, Diplomacy, Officials or Provinces tab", (s) => {
-  expect(Object.fromEntries(s.section.pillars.map((p: any) => [p.label, p.opens]))).toEqual({ Lords: "lords", Subjects: "diplomacy", Officials: "officials", Provinces: "provinces" });
+Then("tapping a pillar opens the Lords, Diplomacy, Officials, Provinces or Treasury tab", (s) => {
+  expect(Object.fromEntries(s.section.pillars.map((p: any) => [p.label, p.opens]))).toEqual({ Lords: "lords", Subjects: "diplomacy", Officials: "officials", Provinces: "provinces", Treasury: "treasury" });
 });
 
 // ------------------------------------------------------------ a province's Tax line (REALM-183)

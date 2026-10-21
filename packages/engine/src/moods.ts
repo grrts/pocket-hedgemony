@@ -6,6 +6,9 @@ import { provinceConfig } from "./domain/province/model.ts";
 import { storeMonths } from "./food.ts";
 import { OFFICIALS } from "./recruit.ts";
 import { BELIEF_GRIEVANCES, hasBelief } from "./peoples.ts";
+import { farFromThrone } from "./throne.ts";
+import { newlyTaken } from "./newlyTaken.ts";
+import { aimlessDeclarers } from "./aimlessWar.ts";
 
 /**
  * Moods (milestone 3): each province holds grievances, and their count sets
@@ -15,9 +18,12 @@ import { BELIEF_GRIEVANCES, hasBelief } from "./peoples.ts";
  */
 
 /** The grievances this game tracks so far, one bit each (province §5.22). */
-export const GRIEVANCES = ["Hungry", "Conscription", "Soldiers quartered", "Ungoverned", "Foreign rule", "Bloodshed", "Heavy taxes", "Grasping officials", "Banned language", "Wrong faith", "Persecuted"] as const;
+export const GRIEVANCES = ["Hungry", "Conscription", "Soldiers quartered", "Ungoverned", "Foreign rule", "Bloodshed", "Heavy taxes", "Grasping officials", "Banned language", "Wrong faith", "Persecuted", "Plague", "Far from the throne", "Newly taken", "Unjust war"] as const;
 export type GrievanceName = (typeof GRIEVANCES)[number];
 const bit = (g: GrievanceName) => 1 << GRIEVANCES.indexOf(g);
+const FAR = bit("Far from the throne");
+const NEWLY = bit("Newly taken");
+const UNJUST = bit("Unjust war");
 
 export const MOODS: readonly DecidedMood[] = ["calm", "grumbling", "rioting", "plotting"];
 
@@ -101,6 +107,8 @@ export function monthlyMoods(world: World, news: News[]): void {
   const here = new Uint8Array(world.provinceCount);
   const a = world.armies;
   for (let i = 0; i < a.count; i++) if (a.alive[i]) here[a.location[i]!] = 1;
+  // Realms fighting a war they declared with no aim (F-167).
+  const aimless = aimlessDeclarers(world);
   for (let p = 0; p < world.provinceCount; p++) {
     if (world.provinceWater[p]) continue;
     const owner = world.provinceOwner[p]!;
@@ -126,6 +134,14 @@ export function monthlyMoods(world: World, news: News[]): void {
     if (battle >= 0 && world.date.year - battle < g.bloodshed_years) now |= bit("Bloodshed");
     if (taxWeight(world, p) > 0) now |= bit("Heavy taxes");
     if (world.provinceGrasping[p]) now |= bit("Grasping officials");
+    // An outbreak raging here is a grievance (PROV-356).
+    if (world.provincePlague[p] === 2) now |= bit("Plague");
+    // Royal land too far from the capital (PROV-174, X-29).
+    if (farFromThrone(world, p)) now |= FAR;
+    // Land taken from another realm in the last ten years (X-29).
+    if (world.provinceTakenYear[p]! >= 0 && newlyTaken(world, p)) now |= NEWLY;
+    // Its realm fights a war it declared with no aim (F-167).
+    if (aimless.has(owner)) now |= UNJUST;
     const before = MOODS.indexOf(moodOf(grievanceCount(world, p), isJudge(world.provinceOfficial[p]!)).mood);
     world.provinceGrievances[p] = now;
     const after = moodIndex(world, p);

@@ -47,7 +47,7 @@ describe("the Research tab's one tree (RSCH-100)", () => {
   });
 });
 
-describe("Next lists what can be started, best first (RSCH-113)", () => {
+describe("Next lists what can be started, best first (RSCH-116)", () => {
   const opt = (id: string, cost: number) => ({ id, name: id, cost, months: 12, partners: 0, ahead: false });
   const r = {
     study: { id: "B4", name: "B4", progress: 0, cost: 10, months: 12 },

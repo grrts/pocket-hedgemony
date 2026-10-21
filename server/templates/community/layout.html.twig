@@ -1,0 +1,13 @@
+{% extends 'site/layout.html.twig' %}
+
+{% block title %}Community · Pocket Hegemony{% endblock %}
+{% block stylesheets %}<link rel="stylesheet" href="/site/community.css">{% endblock %}
+
+{% block content %}
+<div class="community">
+    {% if app.request.hasPreviousSession %}
+    {% for message in app.flashes('notice') %}<p class="c-notice" role="status">{{ message }}</p>{% endfor %}
+    {% endif %}
+    {% block community %}{% endblock %}
+</div>
+{% endblock %}

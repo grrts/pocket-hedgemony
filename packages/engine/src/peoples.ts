@@ -1,6 +1,6 @@
 import type { World } from "./world.ts";
 import type { News } from "./war.ts";
-import start from "../../rules/data/domain/culture-start-1444.json" with { type: "json" };
+import { START_YEAR, startCulture as start } from "../../rules/src/start.ts";
 import * as cult from "./domain/culture/index.ts";
 import * as relg from "./domain/religion/index.ts";
 import { catalogueIdOf } from "./domain/scenario-setup/index.ts";
@@ -658,7 +658,7 @@ export function tongueLine(d: PeoplesData, p: number): TongueLine | null {
     rows: Object.entries(pt.people).map(([t, sh]) => ({ tongue: t, name: tongueName(t), share: sh, relation: cult.relationTo(cc.court, t, pt.nationalism), homeland: pt.homelandOf.includes(t) })),
     pull: ex.pull,
     pullName: tongueName(ex.pull),
-    why: ex.pull === cc.court ? (held === HELD_BEFORE_START ? "held from before 1444 and governed for the court" : `held since ${held} and governed for the court`) : held !== HELD_BEFORE_START && d.year - held < cult.cultureConfig.drift.court_pull_needs_years_held ? `the majority language; the court's pulls after ${cult.cultureConfig.drift.court_pull_needs_years_held} years held (since ${held})` : "the majority language; the court's pulls only where an official or a lord governs",
+    why: ex.pull === cc.court ? (held === HELD_BEFORE_START ? `held from before ${START_YEAR} and governed for the court` : `held since ${held} and governed for the court`) : held !== HELD_BEFORE_START && d.year - held < cult.cultureConfig.drift.court_pull_needs_years_held ? `the majority language; the court's pulls after ${cult.cultureConfig.drift.court_pull_needs_years_held} years held (since ${held})` : "the majority language; the court's pulls only where an official or a lord governs",
     groups: ex.groups.map((g) => ({ name: tongueName(g.tongue), rate: g.rate, reasons: g.multipliers })),
     heldSince: held === HELD_BEFORE_START ? null : held,
   };
@@ -691,20 +691,25 @@ export interface SavedPeoples {
   tongues: string[];
   faiths: string[];
   arrays: Record<string, number[]>;
-  nations: string[];
-  provinces: string[];
+  /** Only in saves from before the `ids` chunk was used for them: the same lists, written twice. */
+  nations?: string[];
+  provinces?: string[];
 }
 
-/** The peoples arrays for a save, with tongue and faith ids so a later build with other tables still reads them. */
+/**
+ * The peoples arrays for a save, with tongue and faith ids so a later build with other tables still reads them.
+ * They go in the save's province and realm order, whose ids the `ids` chunk already holds.
+ */
 export function savePeoples(world: World): SavedPeoples {
   const arrays: Record<string, number[]> = {};
   for (const [k, v] of Object.entries(pick(world))) if (k !== "provinceBelief" && k !== "provinceFaithTax") arrays[k] = Array.from(v as ArrayLike<number>);
-  return { tongues: [...TONGUE_IDS], faiths: [...FAITH_IDS], arrays, nations: [...world.nationIds], provinces: [...world.provinceIds] };
+  return { tongues: [...TONGUE_IDS], faiths: [...FAITH_IDS], arrays };
 }
 
-/** Restores the peoples arrays; a save from before them keeps the 1444 start. */
-export function restorePeoples(world: World, s: SavedPeoples | undefined): void {
-  if (s) {
+/** Restores the peoples arrays, indexed by the save's ids; a save from before them keeps the 1444 start. */
+export function restorePeoples(world: World, saved: SavedPeoples | undefined, ids: { provinces: readonly string[]; nations: readonly string[] }): void {
+  if (saved) {
+    const s = { ...saved, provinces: saved.provinces ?? ids.provinces, nations: saved.nations ?? ids.nations };
     const t = (k: number) => (k === NO_TONGUE ? NO_TONGUE : (TONGUE_INDEX.get(s.tongues[k]!) ?? NO_TONGUE));
     const f = (k: number) => (k === NO_FAITH ? NO_FAITH : (FAITH_INDEX.get(s.faiths[k]!) ?? NO_FAITH));
     const pIdx = s.provinces.map((id) => world.provinceIndex.get(id) ?? -1);

@@ -38,8 +38,12 @@ export function groundOf(terrain: Terrain): Ground | null {
  * a thousand rations are one unit of a province's store (feedback 83).
  */
 export function monthlyRations(d: MarchDefines, a: MarchingArmy): number {
-  const men = a.men * d.rationsPerSoldier * (a.campaigning ? realmConfig.food.campaign_eat : 1);
-  return (men + a.horse * d.rationsPerHorse) * Math.max(0, 1 - a.logistics * d.logisticsRationCut);
+  return rations(d, a.men, a.horse, a.logistics, !!a.campaigning);
+}
+
+/** monthlyRations without building an army, for the daily pass over every army. */
+export function rations(d: MarchDefines, men: number, horse: number, logistics: number, campaigning: boolean): number {
+  return (men * d.rationsPerSoldier * (campaigning ? realmConfig.food.campaign_eat : 1) + horse * d.rationsPerHorse) * Math.max(0, 1 - logistics * d.logisticsRationCut);
 }
 
 /** Rations an army's wagons hold: its months carried of eating on campaign. */
@@ -103,14 +107,20 @@ export function planRoute(d: MarchDefines, map: MarchMap, from: number, to: numb
   const n = map.ground.length;
   // stepDays(p, q) = (half[p] + enter[q]) * pace + river[q], split per province.
   const pace = d.daysPerCrossing / (1 + d.horseSpeedBonus * (a.men > 0 ? Math.min(1, a.horse / a.men) : 0));
-  const half = new Float64Array(n);
-  const enter = new Float64Array(n).fill(Infinity);
-  for (let p = 0; p < n; p++) {
+  // Each province's costs are worked out when the search first reaches it: most searches stop long before the far side of the map.
+  const half = new Float64Array(n).fill(NaN);
+  const enter = new Float64Array(n);
+  const reach = (p: number) => {
+    if (half[p] === half[p]) return;
     const g = map.ground[p];
-    if (!g) continue;
+    if (!g) {
+      half[p] = 0;
+      enter[p] = Infinity;
+      return;
+    }
     half[p] = (d.daysToCross[g] / 2) * pace;
     enter[p] = half[p]! + (a.men > forageLimit(d, map, p) ? d.bigArmyExtraCrossings * pace : 0) + (map.river[p] ? d.riverCrossingDays : 0);
-  }
+  };
   const dist = new Float64Array(n).fill(Infinity);
   const prev = new Int32Array(n).fill(-1);
   // Binary heap of (cost, province); a province may sit in it more than once.
@@ -165,10 +175,12 @@ export function planRoute(d: MarchDefines, map: MarchMap, from: number, to: numb
     if (done[p]) continue;
     done[p] = 1;
     if (p === to) break;
+    reach(p);
     const base = dist[p]! + half[p]!;
     for (let k = map.adjStart[p]!, end = map.adjStart[p + 1]!; k < end; k++) {
       const q = map.adjList[k]!;
       if (barred?.(p, q)) continue;
+      reach(q);
       const c = base + enter[q]!;
       if (c < dist[q]!) {
         dist[q] = c;
@@ -346,9 +358,10 @@ export function planTilePath(m: TileMarch, from: number, to: number, allowed: Ui
  * Shortest sail over water tiles from one tile to another (A* on distance,
  * eight ways round), only through tiles of the sea zones marked in `zones`;
  * null when there is none. Fleets sail a zone at a time, so the search spans
- * two zones (feedback 122).
+ * two zones (feedback 122). With `landCost`, it may cross land at that many
+ * times the cost of water: a strait too narrow for the map's tiles.
  */
-export function planSeaPath(grid: TileGrid, rowWidth: Float32Array, from: number, to: number, zones: Uint8Array): Int32Array | null {
+export function planSeaPath(grid: TileGrid, rowWidth: Float32Array, from: number, to: number, zones: Uint8Array, landCost = 0): Int32Array | null {
   const W = grid.width;
   if (from === to || grid.cell[to] !== WATER) return null;
   let x0 = W;
@@ -400,10 +413,12 @@ export function planSeaPath(grid: TileGrid, rowWidth: Float32Array, from: number
         if (nx < x0 || nx > x1) continue;
         const n = ny * W + nx;
         const ln = (ny - y0) * bw + nx - x0;
-        if (s.closed[ln] || grid.cell[n] !== WATER) continue;
+        if (s.closed[ln]) continue;
+        const wet = grid.cell[n] === WATER;
+        if (!wet && !landCost) continue;
         const z = grid.province[n]! - 1;
-        if (n !== to && (z < 0 || !zones[z])) continue;
-        const c = base + (dx === 0 ? 1 : dy === 0 ? rowWidth[ny]! : Math.hypot(1, rowWidth[ny]!));
+        if (wet && n !== to && (z < 0 || !zones[z])) continue;
+        const c = base + (dx === 0 ? 1 : dy === 0 ? rowWidth[ny]! : Math.hypot(1, rowWidth[ny]!)) * (wet ? 1 : landCost);
         if (c >= s.g[ln]!) continue;
         s.g[ln] = c;
         s.prev[ln] = t;

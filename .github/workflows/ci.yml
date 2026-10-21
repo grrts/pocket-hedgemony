@@ -24,6 +24,10 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
+      # The wiki's data pages are made from the rules config, and the website's wiki from docs/wiki:
+      # make both again and fail if anything changed or a page appeared.
+      - name: Wiki matches the config and docs/wiki (run `pnpm wiki` and commit if this fails)
+        run: pnpm wiki && git add --intent-to-add docs/wiki server/wiki && git diff --exit-code --stat -- docs/wiki server/wiki
       - run: pnpm test
       - run: pnpm --filter @ph/client build
       - name: Engine worker in a mobile Chromium browser

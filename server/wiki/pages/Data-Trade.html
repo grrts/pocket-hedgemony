@@ -1,0 +1,366 @@
+<h1>Trade data</h1>
+<p>Every value in the game&#39;s trade config, exactly as the game reads it. This page is made from <code>packages/rules/data/domain/trade.json</code> each time the config changes, so it always matches the game. How these values are used is explained on <a href="/wiki/Trade">Trade</a>.</p>
+<p>Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and values marked (provisional) are placeholders that may still change in balancing. Inventions are shown by id and name; see <a href="/wiki/Data-Research#inventions">Research data</a>.</p>
+<blockquote>
+<p><code>comment\_sea\_traders</code>: D-TRADE-5: a ship trades only if naval gives its type a hold and purse (the caravel does not); its upkeep is naval&#39;s ship upkeep.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>s2_hold_bonus</code> (provisional)</td><td>0.5</td></tr>
+</tbody></table></div>
+<h2 id="ratio"><a class="anchor" href="#ratio" aria-label="Link to this section">#</a>Ratio</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>gain_per_trader</code> (provisional)</td><td>3</td></tr>
+<tr><td><code>decay_share</code> (provisional)</td><td>0.1</td></tr>
+<tr><td><code>max</code></td><td>100</td></tr>
+<tr><td><code>sea_lane_trader_weight</code> (provisional)</td><td>0.5</td></tr>
+<tr><td><code>modifiers_combine</code></td><td>add</td></tr>
+<tr><td><code>better_road_than</code></td><td>every_neighbour</td></tr>
+<tr><td><code>shrine_pilgrims_passing</code> (provisional)</td><td>1</td></tr>
+</tbody></table></div>
+<h3 id="modifiers-provisional"><a class="anchor" href="#modifiers-provisional" aria-label="Link to this section">#</a>Modifiers (provisional)</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>customs_officer</code></td><td>0.15</td></tr>
+<tr><td><code>better_road_than_neighbours</code></td><td>0.1</td></tr>
+<tr><td><code>peace_10_years</code></td><td>0.1</td></tr>
+<tr><td><code>riots</code></td><td>-0.5</td></tr>
+<tr><td><code>homeless_per_5pct_over_5pct</code></td><td>-0.05</td></tr>
+<tr><td><code>enemy_army_or_siege</code></td><td>-1</td></tr>
+</tbody></table></div>
+<h4 id="quarantine"><a class="anchor" href="#quarantine" aria-label="Link to this section">#</a>Quarantine</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>set_ratio</code></td><td>0</td></tr>
+<tr><td><code>closed</code></td><td>yes</td></tr>
+</tbody></table></div>
+<h2 id="value"><a class="anchor" href="#value" aria-label="Link to this section">#</a>Value</h2>
+<blockquote>
+<p><code>comment\_food\_surplus</code>: D-TRADE-19: food surplus = food made − food the province&#39;s people eat that year, never below 0; a full store does not change it.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>months_per_year</code></td><td>12</td></tr>
+<tr><td><code>traded_food</code></td><td>surplus_only</td></tr>
+<tr><td><code>food_wares</code></td><td>grain, rice, fish</td></tr>
+<tr><td><code>craft_buildings</code></td><td>loom_house, forge, kiln, tannery, press, brewery</td></tr>
+<tr><td><code>serves_without_market</code> (provisional)</td><td>2</td></tr>
+<tr><td><code>city_size_is_city</code></td><td>city, great_city</td></tr>
+<tr><td><code>trading_post_is_city</code></td><td>yes</td></tr>
+<tr><td><code>silver_after_flood</code> (provisional)</td><td>6</td></tr>
+</tbody></table></div>
+<h3 id="price-per-load-provisional"><a class="anchor" href="#price-per-load-provisional" aria-label="Link to this section">#</a>Price per load (provisional)</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>price</th><th>wares</th></tr></thead>
+<tbody>
+<tr><td>staples</td><td>1</td><td>grain, rice, fish, salt, timber, hides, pottery</td></tr>
+<tr><td>raw</td><td>2</td><td>wool, flax, cotton, iron, copper, tin, horses, saltpetre, dyes</td></tr>
+<tr><td>finished</td><td>5</td><td>cloth, linen, leather, tools, arms, beer_wine, paper, powder</td></tr>
+<tr><td>luxury</td><td>10</td><td>silk, silk_cloth, spices, pepper, sugar, tea, coffee, cocoa, tobacco, incense, ivory, porcelain, furs, gems, books</td></tr>
+<tr><td>precious</td><td>12</td><td>silver, gold</td></tr>
+</tbody></table></div>
+<h3 id="building-weights-provisional"><a class="anchor" href="#building-weights-provisional" aria-label="Link to this section">#</a>Building weights (provisional)</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>weight</th><th>serves</th><th>is city</th><th>applies to</th><th>stops bandits</th><th>foreign deposits</th><th>each</th></tr></thead>
+<tbody>
+<tr><td>weekly_market</td><td>0.25</td><td>4</td><td>yes</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>yearly_fair</td><td>0.5</td><td>8</td><td>yes</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>trading_house</td><td>1</td><td>16</td><td>yes</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>caravanserai</td><td>0.25</td><td></td><td></td><td>land</td><td>yes</td><td></td><td></td></tr>
+<tr><td>warehouse</td><td>0.25</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>harbour</td><td>0.25</td><td></td><td></td><td>sea</td><td></td><td></td><td></td></tr>
+<tr><td>counting_house</td><td>0.1</td><td></td><td></td><td></td><td></td><td>yes</td><td></td></tr>
+<tr><td>bank</td><td>0.25</td><td></td><td></td><td></td><td></td><td>yes</td><td></td></tr>
+<tr><td>craft_building</td><td>0.05</td><td></td><td></td><td></td><td></td><td></td><td>yes</td></tr>
+</tbody></table></div>
+<h2 id="collect"><a class="anchor" href="#collect" aria-label="Link to this section">#</a>Collect</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>when</code></td><td>on_enter</td></tr>
+<tr><td><code>visit_share</code> (provisional)</td><td>0.2</td></tr>
+<tr><td><code>ships_collect_at_sea</code></td><td>no</td></tr>
+<tr><td><code>foreign_market_fee</code> (provisional)</td><td>0.1</td></tr>
+<tr><td><code>trade_pact_fee</code></td><td>0</td></tr>
+</tbody></table></div>
+<h2 id="deposit"><a class="anchor" href="#deposit" aria-label="Link to this section">#</a>Deposit</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>own_royal_city</code></td><td>1</td></tr>
+<tr><td><code>bills_of_exchange_fee</code> (provisional)</td><td>0.1</td></tr>
+<tr><td><code>needs_invention_for_abroad</code></td><td><a href="/wiki/Data-Research#inventions">T3 Bills of exchange</a></td></tr>
+</tbody></table></div>
+<h3 id="lord-city"><a class="anchor" href="#lord-city" aria-label="Link to this section">#</a>Lord city</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>to_treasury</code></td><td>1</td></tr>
+</tbody></table></div>
+<h2 id="route"><a class="anchor" href="#route" aria-label="Link to this section">#</a>Route</h2>
+<blockquote>
+<p>D-TRADE-21: a route is a start and an end, walked there and back; the planner finds the way, drawn toward the most populated land: a province&#39;s days count divided by 1 + busy_weight x its people over the world&#39;s average, at most busy_cap times the average.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>min_stops</code></td><td>2</td></tr>
+<tr><td><code>max_stops</code></td><td>2</td></tr>
+<tr><td><code>default_mode</code></td><td>there_and_back</td></tr>
+<tr><td><code>toll_counts_as_days</code> (provisional)</td><td>2</td></tr>
+<tr><td><code>busy_weight</code> (provisional)</td><td>1</td></tr>
+<tr><td><code>busy_cap</code> (provisional)</td><td>3</td></tr>
+</tbody></table></div>
+<h2 id="tolls"><a class="anchor" href="#tolls" aria-label="Link to this section">#</a>Tolls</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>none</code></td><td>0</td></tr>
+<tr><td><code>low</code> (provisional)</td><td>0.2</td></tr>
+<tr><td><code>high</code> (provisional)</td><td>0.5</td></tr>
+</tbody></table></div>
+<h2 id="danger-provisional"><a class="anchor" href="#danger-provisional" aria-label="Link to this section">#</a>Danger (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>bandit_chance_per_month</code></td><td>0.05</td></tr>
+<tr><td><code>raid_trader_escapes</code></td><td>0.5</td></tr>
+<tr><td><code>t1_bandit_chance_factor</code></td><td>0.5</td></tr>
+<tr><td><code>t11_lost_purse_refund</code></td><td>0.5</td></tr>
+</tbody></table></div>
+<h3 id="bandit-when"><a class="anchor" href="#bandit-when" aria-label="Link to this section">#</a>Bandit when</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>riots</code></td><td>yes</td></tr>
+<tr><td><code>rebels</code></td><td>yes</td></tr>
+<tr><td><code>homeless_share_over</code></td><td>0.2</td></tr>
+</tbody></table></div>
+<h2 id="upkeep"><a class="anchor" href="#upkeep" aria-label="Link to this section">#</a>Upkeep</h2>
+<blockquote>
+<p>D-TRADE-11: land traders and trade ships alike are lost after 6 unpaid months.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>unpaid_months_to_lose</code> (provisional)</td><td>6</td></tr>
+</tbody></table></div>
+<h2 id="land-traders-provisional"><a class="anchor" href="#land-traders-provisional" aria-label="Link to this section">#</a>Land traders (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>era</th><th>step factor</th><th>hold</th><th>purse</th><th>crew</th><th>found</th><th>upkeep</th><th>desert step factor</th><th>needs</th><th>more</th></tr></thead>
+<tbody>
+<tr><td>pack_caravan</td><td>1</td><td>0.75</td><td>1</td><td>10</td><td>class: market_folk; count: 50</td><td>15</td><td>0.5</td><td></td><td></td><td></td></tr>
+<tr><td>camel_caravan</td><td>1</td><td>0.75</td><td>1.5</td><td>15</td><td>class: market_folk; count: 50</td><td>20</td><td>0.6</td><td>0.5</td><td>T1_or_desert_home</td><td>desert grounds: desert, drylands</td></tr>
+<tr><td>river_barge</td><td>1</td><td>0.4</td><td>1.5</td><td>15</td><td>class: market_folk; count: 50</td><td>15</td><td>0.4</td><td></td><td></td><td>river only: yes</td></tr>
+<tr><td>wagon_train</td><td>4</td><td>0.6</td><td>2</td><td>25</td><td>class: market_folk; count: 80</td><td>30</td><td>0.8</td><td></td><td><a href="/wiki/Data-Research#inventions">B9 Turnpike roads</a></td><td></td></tr>
+<tr><td>rail_freight</td><td>5</td><td></td><td>6</td><td>80</td><td>class: craftsmen; count: 120</td><td>80</td><td>2</td><td></td><td>rail_station_both_ends</td><td>step: rail</td></tr>
+</tbody></table></div>
+<h2 id="sea-traders-provisional"><a class="anchor" href="#sea-traders-provisional" aria-label="Link to this section">#</a>Sea traders (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>naval type</th><th>hold</th><th>purse</th><th>enclosed seas only</th><th>needs coal port</th></tr></thead>
+<tbody>
+<tr><td>cog_junk_dhow</td><td>cog</td><td>2</td><td>30</td><td></td><td></td></tr>
+<tr><td>galley</td><td>galley</td><td>2</td><td>25</td><td>yes</td><td></td></tr>
+<tr><td>carrack</td><td>carrack</td><td>3</td><td>50</td><td></td><td></td></tr>
+<tr><td>galleon</td><td>galleon</td><td>3</td><td>60</td><td></td><td></td></tr>
+<tr><td>fluyt</td><td>fluyt</td><td>4</td><td>70</td><td></td><td></td></tr>
+<tr><td>steamer</td><td>steamer</td><td>6</td><td>150</td><td></td><td>yes</td></tr>
+</tbody></table></div>
+<h2 id="research-provisional"><a class="anchor" href="#research-provisional" aria-label="Link to this section">#</a>Research (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>t2_collect_bonus</code></td><td>0.1</td></tr>
+<tr><td><code>t6_extra_served_visits</code></td><td>2</td></tr>
+<tr><td><code>t9_ship_cost_factor</code></td><td>0.75</td></tr>
+<tr><td><code>t5_indian_ocean_storm_factor</code></td><td>0.5</td></tr>
+<tr><td><code>t6_unlocks_yearly_fair</code></td><td>yes</td></tr>
+<tr><td><code>t5_indian_ocean_zones</code></td><td>Arabian Sea, Bay of Bengal, Gulf of Aden, Red Sea, Persian Gulf, Indian Ocean</td></tr>
+</tbody></table></div>
+<h2 id="peace-terms"><a class="anchor" href="#peace-terms" aria-label="Link to this section">#</a>Peace terms</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>open_the_roads_years</code> (provisional)</td><td>10</td></tr>
+</tbody></table></div>
+<h2 id="effects-provisional"><a class="anchor" href="#effects-provisional" aria-label="Link to this section">#</a>Effects (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>crafts_appear_min_ratio</code></td><td>30</td></tr>
+<tr><td><code>missing_input_output</code></td><td>0.5</td></tr>
+</tbody></table></div>
+<h3 id="tax-per-ratio-points"><a class="anchor" href="#tax-per-ratio-points" aria-label="Link to this section">#</a>Tax per ratio points</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>points</code></td><td>4</td></tr>
+<tr><td><code>tax</code></td><td>0.01</td></tr>
+</tbody></table></div>
+<h2 id="start"><a class="anchor" href="#start" aria-label="Link to this section">#</a>Start</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>warmup_months</code> (provisional)</td><td>24</td></tr>
+</tbody></table></div>
+<h3 id="traders-by-trade-access-provisional"><a class="anchor" href="#traders-by-trade-access-provisional" aria-label="Link to this section">#</a>Traders by trade access (provisional)</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>very_high</code></td><td>6</td></tr>
+<tr><td><code>high</code></td><td>4</td></tr>
+<tr><td><code>moderate</code></td><td>2</td></tr>
+<tr><td><code>low</code></td><td>1</td></tr>
+<tr><td><code>very_low</code></td><td>0</td></tr>
+<tr><td><code>unknown</code></td><td>0</td></tr>
+</tbody></table></div>
+<h3 id="routes"><a class="anchor" href="#routes" aria-label="Link to this section">#</a>Routes</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>country</th><th>label</th><th>stops</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Venice</td><td>galley line</td><td>Venice, Alexandria</td></tr>
+<tr><td>2</td><td>Venice</td><td></td><td>Constantinople, Tana</td></tr>
+<tr><td>3</td><td>Genoa</td><td></td><td>Genoa, Caffa</td></tr>
+<tr><td>4</td><td>Lübeck</td><td></td><td>Lübeck, Bergen</td></tr>
+<tr><td>5</td><td>Lübeck</td><td></td><td>Lübeck, Bruges</td></tr>
+<tr><td>6</td><td>Lübeck</td><td>caravan</td><td>Lübeck, Novgorod</td></tr>
+<tr><td>7</td><td>Florence</td><td>caravan</td><td>Florence, Venice</td></tr>
+<tr><td>8</td><td>Mali</td><td>camel caravan</td><td>Timbuktu, Sijilmasa</td></tr>
+<tr><td>9</td><td>Kilwa</td><td>dhow</td><td>Kilwa, Sofala</td></tr>
+<tr><td>10</td><td>Kilwa</td><td>dhow</td><td>Kilwa, Malindi</td></tr>
+<tr><td>11</td><td>Calicut</td><td>dhow</td><td>Calicut, Aden</td></tr>
+<tr><td>12</td><td>Malacca</td><td>junk</td><td>Malacca, Ayutthaya</td></tr>
+<tr><td>13</td><td>Malacca</td><td></td><td>Malacca, Calicut</td></tr>
+<tr><td>14</td><td>Ryukyu</td><td>junk</td><td>Naha, Fuzhou</td></tr>
+<tr><td>15</td><td>Ryukyu</td><td>junk</td><td>Naha, Hakata</td></tr>
+</tbody></table></div>
+<h2 id="ai-provisional"><a class="anchor" href="#ai-provisional" aria-label="Link to this section">#</a>Ai (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>caravan_reach_provinces</code></td><td>12</td></tr>
+<tr><td><code>ship_reach_sea_zones</code></td><td>40</td></tr>
+<tr><td><code>found_margin</code></td><td>1.25</td></tr>
+<tr><td><code>reroute_every_months</code></td><td>12</td></tr>
+<tr><td><code>dismiss_after_losing_months</code></td><td>12</td></tr>
+<tr><td><code>near_front_provinces</code></td><td>2</td></tr>
+</tbody></table></div>
+<h2 id="found"><a class="anchor" href="#found" aria-label="Link to this section">#</a>Found</h2>
+<blockquote>
+<p>D-TRADE-2: an own city with any market step (weekly market or better), or a trading post once T8 is known.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>needs</code></td><td>market_or_trading_post_with_T8</td></tr>
+</tbody></table></div>
+<h2 id="visibility"><a class="anchor" href="#visibility" aria-label="Link to this section">#</a>Visibility</h2>
+<blockquote>
+<p>D-TRADE-13: a country sees the trade value and ratio of its own provinces and of every province its traders entered (last seen values); with T13 every known province, current values. The route preview counts unseen provinces as 0.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>t13_sees_all</code></td><td>yes</td></tr>
+</tbody></table></div>
+<h2 id="hubs-provisional"><a class="anchor" href="#hubs-provisional" aria-label="Link to this section">#</a>Hubs (provisional)</h2>
+<blockquote>
+<p>D-TRADE-17: a hub is the province or sea zone it is named after (two for bruges_antwerp, the lower Volga for volga); labels for event triggers only. Provisional.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>provinces</th><th>sea zones</th></tr></thead>
+<tbody>
+<tr><td>alexandria</td><td>Alexandria</td><td>none</td></tr>
+<tr><td>amsterdam</td><td>Amsterdam</td><td>none</td></tr>
+<tr><td>malacca_strait</td><td>Malacca</td><td>Strait of Malacca</td></tr>
+<tr><td>venice</td><td>Venice</td><td>none</td></tr>
+<tr><td>genoa</td><td>Genoa</td><td>none</td></tr>
+<tr><td>seville</td><td>Seville</td><td>none</td></tr>
+<tr><td>bruges_antwerp</td><td>Bruges, Antwerp</td><td>none</td></tr>
+<tr><td>tabriz</td><td>Tabriz</td><td>none</td></tr>
+<tr><td>aleppo</td><td>Aleppo</td><td>none</td></tr>
+<tr><td>volga</td><td>Astrakhan, Kazan</td><td>none</td></tr>
+</tbody></table></div>
+<h2 id="event-mapping"><a class="anchor" href="#event-mapping" aria-label="Link to this section">#</a>Event mapping</h2>
+<blockquote>
+<p>D-TRADE-17: trade_index = trade income over the last 12 months ÷ 100 gold × 100 for every country (provisional).</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>trade_index_reference_per_year</code> (provisional)</td><td>100</td></tr>
+<tr><td><code>hub_window_months</code></td><td>12</td></tr>
+</tbody></table></div>
+<h2 id="heritage-levers"><a class="anchor" href="#heritage-levers" aria-label="Link to this section">#</a>Heritage levers</h2>
+<blockquote>
+<p>X-6: trade_balance_pct and traders_passing_pct are a percentage on ratio gain in the realm&#39;s provinces; trader_gain_pct a percentage on each deposit; trader_count extra starting traders.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>trade_balance_pct</code></td><td>ratio_gain</td></tr>
+<tr><td><code>traders_passing_pct</code></td><td>ratio_gain</td></tr>
+<tr><td><code>trader_gain_pct</code></td><td>deposit</td></tr>
+<tr><td><code>trader_count</code></td><td>starting_traders</td></tr>
+</tbody></table></div>
+<h2 id="materials"><a class="anchor" href="#materials" aria-label="Link to this section">#</a>Materials</h2>
+<blockquote>
+<p>X-6: materials at the ware&#39;s price per load, 25 % dearer where no trade route touches the province: no trader route has it as a stop and no trader passed it in the last 12 months.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>no_route_markup</code> (provisional)</td><td>0.25</td></tr>
+<tr><td><code>route_memory_months</code></td><td>12</td></tr>
+</tbody></table></div>
+<h2 id="game-provisional"><a class="anchor" href="#game-provisional" aria-label="Link to this section">#</a>Game (provisional)</h2>
+<blockquote>
+<p>D-TRADE-20, the game&#39;s first slice of trade (provisional). value_scale turns goods gold into the treasury&#39;s gold so the world&#39;s trade income in 1444 is about what the old flat trade line paid; purse_scale does the same for purses. Craftsmen make crafts (finished goods) and the food surplus is grain until the craft and food buildings make their own wares. The AI looks for loops within its reach in days, counts a quiet road as this ratio, and founds at most one trader a year while it has fewer than this many times its starting traders, plus one. A loop bringing at least ai_keep_route_over_upkeep times its upkeep is kept at the yearly look.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>value_scale</code></td><td>0.08</td></tr>
+<tr><td><code>purse_scale</code></td><td>0.2</td></tr>
+<tr><td><code>food_loads_per_thousand_fed</code></td><td>1</td></tr>
+<tr><td><code>crafts_loads_per_thousand</code></td><td>1</td></tr>
+<tr><td><code>leg_max_days</code></td><td>150</td></tr>
+<tr><td><code>ai_reach_days_land</code></td><td>60</td></tr>
+<tr><td><code>ai_reach_days_sea</code></td><td>60</td></tr>
+<tr><td><code>ai_ratio_floor</code></td><td>20</td></tr>
+<tr><td><code>ai_candidates</code></td><td>8</td></tr>
+<tr><td><code>ai_max_traders_per_start</code></td><td>2</td></tr>
+<tr><td><code>ai_found_reserve</code></td><td>3</td></tr>
+<tr><td><code>ai_keep_route_over_upkeep</code></td><td>1</td></tr>
+<tr><td><code>feed_max</code></td><td>256</td></tr>
+</tbody></table></div>
+<h3 id="homes"><a class="anchor" href="#homes" aria-label="Link to this section">#</a>Homes</h3>
+<blockquote>
+<p>D-TRADE-23, home slots (trade rework, 19 October, Leroy chose A): a city is home to at most by_market_step[its market step] traders, and a port to port more; traders over that from the 1444 start stay but none more is founded there until one is gone. Upkeep and founding gold are the kind&#39;s times upkeep_factor and found_factor, so a poor route loses money; ai_keep_route_over_upkeep was 4 at the old upkeep, now 1.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>by_market_step</code></td><td>0, 1, 2, 4</td></tr>
+<tr><td><code>port</code></td><td>1</td></tr>
+<tr><td><code>upkeep_factor</code></td><td>4</td></tr>
+<tr><td><code>found_factor</code></td><td>3</td></tr>
+</tbody></table></div>
+<h3 id="suggest"><a class="anchor" href="#suggest" aria-label="Link to this section">#</a>Suggest</h3>
+<blockquote>
+<p>Better routes offered on a trader&#39;s card (trade rework, 19 October): at most count, each worth at least min_gain_share more than the route now and min_gain gold a month more; while a route is chosen, up to draft_options cities it could go to carry their estimate on the map.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>count</code></td><td>3</td></tr>
+<tr><td><code>min_gain_share</code></td><td>0.2</td></tr>
+<tr><td><code>min_gain</code></td><td>0.2</td></tr>
+<tr><td><code>draft_options</code></td><td>12</td></tr>
+</tbody></table></div>

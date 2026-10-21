@@ -8,7 +8,7 @@
   "controllerEndTurnHoldSeconds": 0.5,
   "campaignEndDateDefault": "1939-08-31",
   "endDateEarliestYear": 1494,
-  "dominationShare": 0.5,
+  "dominationShare": 1,
   "dominationCheckMonth": 1,
   "ledgerLeaders": 5,
   "scores": [
@@ -257,7 +257,7 @@
     "difficulty",
     "AI aggression",
     "fog",
-    "historical or free events",
+    "historical, plausible or free events",
     "ironman",
     "end date"
   ],
@@ -276,7 +276,7 @@
     "Credits"
   ],
   "start": {
-    "$comment": "The start screen (SHELL-149..158): shell.start_zoom, shell.start_pan_speed (map pixels per second at that zoom), shell.start_regions (the 1444 realms whose land the map pans over when no campaign is in progress, one per start), shell.wiki_url (placeholder until the wiki is published).",
+    "$comment": "The start screen (SHELL-149..158): shell.start_zoom, shell.start_pan_speed (map pixels per second at that zoom), shell.start_regions (realms on the start map whose land the map pans over when no campaign is in progress, one per start), shell.wiki_url (placeholder until the wiki is published).",
     "zoom": "Region",
     "zoomLevel": 3,
     "panSpeed": 6,
@@ -352,6 +352,15 @@
     "Research": [
       "Research",
       "Peoples"
+    ]
+  },
+  "realmOverview": {
+    "tiles": [
+      "Economy",
+      "Lands",
+      "Military",
+      "Diplomacy",
+      "Research"
     ]
   },
   "attention": {

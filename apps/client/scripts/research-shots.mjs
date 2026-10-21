@@ -1,4 +1,4 @@
-// Research as its own screen (RSCH-084 to RSCH-113): the nation picker's standing, the "choose what to study"
+// Research as its own screen (RSCH-084 to RSCH-111, RSCH-116 to RSCH-118): the nation picker's standing, the "choose what to study"
 // alert, the top bar's research plaque, Next (the study, the queue and what can be started, best first),
 // Study and ＋ from Next, the Tree (jump chips, the one tree with its four branch bands, the sheet beside it
 // or sliding up from the bottom), Queue the path, the Whole tree zoom and tapping a place in it, moving and
@@ -60,6 +60,7 @@ for (const [size, device, realms] of sizes) {
     if (!/^Starts in (Ancient|Medieval|Era I)$/.test(starts ?? "")) fail(name, "picker standing reads", starts);
     if (realm === "france") await shot("picker");
     await page.click(`[data-nation=${realm}]`);
+    await page.click("[data-begin]");
     await page.waitForSelector(".hud [data-news]", { timeout: 60000 });
     await page.waitForTimeout(800);
     // First-campaign hints would cover the shots: stop them.
@@ -78,7 +79,7 @@ for (const [size, device, realms] of sizes) {
     await page.waitForSelector(".learn-screen.next");
     await page.waitForTimeout(300);
     await shot("research");
-    // Research takes the screen; its parts stand in the Realm book's pages row, and the top bar's plaque asks for a study (RSCH-113).
+    // Research takes the screen; its parts stand in the Realm book's pages row, and the top bar's plaque asks for a study (RSCH-116).
     const parts = await page.locator(".tabs.pages .tab").allTextContents();
     if (!/^Next,Tree,Schools · \d+,Peoples$/.test(parts.join(","))) fail(name, "the pages row reads", parts);
     if (!(await page.locator(".hud .research-plaque.idle").count())) fail(name, "the top bar has no research plaque asking for a study");
@@ -90,7 +91,7 @@ for (const [size, device, realms] of sizes) {
     if (!(await page.locator(".next-card").count())) fail(name, "Next offers nothing to start");
     await checkTargets("at the start");
     if (realm === "mali") {
-      // Behind the times: the standing and Catch up first in Next (RSCH-103, RSCH-113).
+      // Behind the times: the standing and Catch up first in Next (RSCH-103, RSCH-116).
       const standing = await page.locator(".learn-stand").textContent();
       if (!/Behind by/.test(standing)) fail(name, "standing reads", standing);
       if (!(await page.locator(".next-card").first().locator(".tag.catch").count())) fail(name, "Next does not put a past invention first");
@@ -100,7 +101,7 @@ for (const [size, device, realms] of sizes) {
       await page.close();
       continue;
     }
-    // Study the first pick, then queue the next two from Next (RSCH-113).
+    // Study the first pick, then queue the next two from Next (RSCH-116).
     await press(page.locator(".next-card [data-study]").first());
     await page.waitForSelector("button.next-now");
     if (!(await page.locator(".hud .research-plaque:not(.idle)").count())) fail(name, "the plaque does not show the study");

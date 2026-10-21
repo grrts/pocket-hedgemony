@@ -1,0 +1,33 @@
+{
+  "$comment": "The 1378 start scenario (X-25), milestone 10. The regions' data lives in regions/<key>/; tools/domain-data/build-1378.py joins them into the files beside this one, and tools/mapgen/mapgen.ts 1378 builds world/ from those. New campaigns start here (step 7, the switch-over); the 1444 checkpoint runs behind ?start=1444 (PH_START=1444 in Node), read through packages/rules/src/start.ts. suggested: the realm picker's suggested realms, the great powers of each part of the world and one start per part of Africa (SETUP-074).",
+  "id": "1378",
+  "name": "Autumn 1378",
+  "date": {
+    "year": 1378,
+    "month": 9,
+    "day": 20
+  },
+  "suggested": ["france", "england", "castile", "portugal", "venice", "hungary", "ottomans", "byzantium", "muscovy", "great_horde", "timurids", "delhi", "ming", "aztecs", "inca", "mali", "benin", "tio", "ethiopia", "kilwa"],
+  "eras": {
+    "$comment": "Era I is stretched back to the start (X-25), so the start falls in Era I as in 1444.",
+    "start": "I",
+    "before_start": [
+      "A",
+      "M"
+    ]
+  },
+  "regions": [
+    "europe-west",
+    "east",
+    "asia",
+    "africa-americas",
+    "arabia"
+  ],
+  "files": {
+    "regions/<key>/": "each region's part, in the shapes of the 1444 folder (see regions/README.md); the source of every joined file",
+    "map-nations.json, map-owners.json, rulers.json, culture-start.json, relations.json, subjects.json, subjects-rulers.json, goals.json": "the regions joined in the order of regions (generated; fix the region and re-run build-1378.py); relations and subjects read a map id whose record has another id as that record (SETUP-049)",
+    "map-to-catalogue.json": "map nations whose 1378 catalogue record has another id, over scenario-setup.json's map_to_catalogue (generated)",
+    "sleeping-realms.json, ports.json": "sleeping realms and port towns by [lon, lat] or owner-rule selector (generated); mapgen places them in world/",
+    "world/": "the generated map (map, nations, provinces, sleeping realms, ports, the build report, and from-1444.json mapping each 1444 province to this map's) built by tools/mapgen"
+  }
+}

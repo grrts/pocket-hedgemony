@@ -1,5 +1,5 @@
 {
- "$comment": "Achievements (domain/achievements/spec.md). tiers and achievements copied from achievements/achievements.yaml (config v1; the YAML key 'on' renamed 'moment', D-ACH-6; every test number is a placeholder). limits, moments, progress, stores, icons and toast from achievements-design.md sections 2, 5, 6, 7, 8 and 9. narrative_only_events: event ids marked depiction narrative_only in event-tree/data/events (read for ACH-005).",
+ "$comment": "Achievements (domain/achievements/spec.md). tiers and achievements copied from achievements/achievements.yaml, with the harvest ladder (D-ACH-16) and the 1378 start's rows (D-ACH-17) (config v1; the YAML key 'on' renamed 'moment', D-ACH-6; every test number is a placeholder). limits, moments, progress, stores, icons and toast from achievements-design.md sections 2, 5, 6, 7, 8 and 9. narrative_only_events: event ids marked depiction narrative_only in event-tree/data/events (read for ACH-005).",
  "limits": {
   "max_achievements": 100,
   "max_points_each": 40,
@@ -9,8 +9,8 @@
   "reserve_points_min": 100,
   "name_max": 24,
   "text_max": 100,
-  "launch_count": 75,
-  "launch_points": 755
+  "launch_count": 80,
+  "launch_points": 810
  },
  "moments": [
   "turn_end",
@@ -1112,6 +1112,73 @@
    ]
   },
   {
+   "id": "kulikovo_free",
+   "name": "Free of the Khan",
+   "text": "Face the khan's horde at Kulikovo and be no one's subject on 1 January 1400.",
+   "category": "history",
+   "tier": "silver",
+   "scope": "campaign",
+   "moment": "date",
+   "test": {
+    "date": "1400-01-01",
+    "event_role": {
+     "event": "battle_of_kulikovo",
+     "role": "prince"
+    },
+    "subject_of_anyone": false
+   },
+   "full_game": true,
+   "refs": [
+    "event-tree battle_of_kulikovo",
+    "event-tree tokhtamysh_burns_moscow",
+    "relation-types Subject"
+   ]
+  },
+  {
+   "id": "kosovo_free",
+   "name": "Blackbird Field",
+   "text": "Face the sultan at Kosovo and be no one's subject on 1 January 1400.",
+   "category": "history",
+   "tier": "silver",
+   "scope": "campaign",
+   "moment": "date",
+   "test": {
+    "date": "1400-01-01",
+    "event_role": {
+     "event": "battle_of_kosovo",
+     "role": "prince"
+    },
+    "subject_of_anyone": false
+   },
+   "full_game": true,
+   "refs": [
+    "event-tree battle_of_kosovo",
+    "relation-types Subject"
+   ]
+  },
+  {
+   "id": "ankara_weathered",
+   "name": "The Storm Passes",
+   "text": "Meet the conqueror's army at Ankara and be no one's subject at the end of 1405.",
+   "category": "history",
+   "tier": "silver",
+   "scope": "campaign",
+   "moment": "date",
+   "test": {
+    "date": "1405-12-31",
+    "event_role": {
+     "event": "battle_of_ankara",
+     "role": "sultan"
+    },
+    "subject_of_anyone": false
+   },
+   "refs": [
+    "event-tree battle_of_ankara",
+    "event-tree death_of_timur",
+    "relation-types Subject"
+   ]
+  },
+  {
    "id": "walls_held_1453",
    "name": "The Walls Held",
    "text": "Hold Constantinople through 1460 as the realm that defends it.",
@@ -1130,6 +1197,28 @@
    "full_game": true,
    "refs": [
     "event-tree fall_of_constantinople"
+   ]
+  },
+  {
+   "id": "timurid_heirs",
+   "name": "The Conqueror's Heirs",
+   "text": "As the realm the conqueror leaves behind, keep Samarkand through 1507.",
+   "category": "history",
+   "tier": "gold",
+   "scope": "campaign",
+   "moment": "date",
+   "test": {
+    "date": "1507-12-31",
+    "event_role": {
+     "event": "death_of_timur",
+     "role": "empire"
+    },
+    "owns": "city:samarkand"
+   },
+   "full_game": true,
+   "refs": [
+    "event-tree death_of_timur",
+    "event-tree shaybanid_conquest_of_transoxiana"
    ]
   },
   {
@@ -1276,6 +1365,21 @@
    ]
   },
   {
+   "id": "reach_1444",
+   "name": "The Old Start",
+   "text": "Reach 11 November 1444, the day after Varna, where the game once began.",
+   "category": "campaign",
+   "tier": "copper",
+   "scope": "campaign",
+   "moment": "date",
+   "test": {
+    "date": "1444-11-11"
+   },
+   "refs": [
+    "decisions X-25"
+   ]
+  },
+  {
    "id": "reach_1500",
    "name": "New Century",
    "text": "Reach the year 1500.",
@@ -1290,7 +1394,7 @@
   },
   {
    "id": "reach_1700",
-   "name": "Halfway Through Time",
+   "name": "Three Centuries On",
    "text": "Reach the year 1700.",
    "category": "campaign",
    "tier": "copper",

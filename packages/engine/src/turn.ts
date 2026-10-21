@@ -3,7 +3,8 @@ import { W as WARFARE } from "./domain/warfare/index.ts";
 import { monthlyPeople } from "./living.ts";
 import { monthlyBelief } from "./belief.ts";
 import { setFood, setFoodPreset } from "./castleFood.ts";
-import { aiTreasury, repayLoan, runLedger, setTax, takeLoan } from "./treasury.ts";
+import { monthlyFear } from "./arms.ts";
+import { aiTreasury, monthlyDebts, repayLoan, runLedger, setTax, takeLoan } from "./treasury.ts";
 import { monthlyFood } from "./food.ts";
 import { callStudentsToArms, foundSchool, monthlyResearch, moveQueued as moveQueuedStudy, queuePath, queueStudy, setSeats, setStudy, unqueue } from "./research.ts";
 import { aiChanges, monthlyChanges, orderChange, stopChange } from "./conversion.ts";
@@ -13,26 +14,34 @@ import { backersOf, bondOf, riseUp, subjectAction, subjectChoice } from "./subje
 import { court, recallCourting } from "./courting.ts";
 import { aiWorks, cancelWork, judgeNeglect, mineYear, monthlyWorks, moveQueued, orderWork } from "./works.ts";
 import { monthlyMoods } from "./moods.ts";
+import { monthlyThrone } from "./throne.ts";
+import { monthlyStability } from "./stability.ts";
 import { answerRebels, dailyRebels, monthlyRebels, verdictOrder } from "./rebels.ts";
 import { answerRevolution, lockedOrder, monthlyRevolutions } from "./revolutions.ts";
 import { answerEvent, monthlyEvents } from "./events.ts";
+import { answerEveryday, monthlyEveryday } from "./everyday.ts";
+import { monthlyGoals } from "./goals.ts";
 import { heritageChoice, monthlyHeritage, payCounsel } from "./heritage.ts";
 import { monthlyGovernment, reform } from "./government.ts";
-import { dismissTrader, draftTradeRoute, foundTrader, monthlyTrade, setTradeRoute, type GameTraderKind } from "./trade.ts";
+import { dismissTrader, draftTradeRoute, foundTrader, monthlyTrade, setTradeRoute, tradeDay, type GameTraderKind } from "./trade.ts";
 import { monthlyNavy, navyOrder, stepNavy, type NavyOrder } from "./navy.ts";
 import { hiredFleetOrder, monthlyHiredFleets, type HireOrder } from "./hiredFleets.ts";
 import { dailyExploration, exploreOrder, monthlyColonies, stepVoyages, type ExploreOrder } from "./colonies.ts";
 import { monthlyPeoples, setFaithPolicy, setTonguePolicy } from "./peoples.ts";
 import { claimCaliphate, faithHeadsWars, monthlyFaithHeads, raiseOwnPatriarch, sendConclaveGold } from "./faithHeads.ts";
-import { hireOfficial, settleLand, swapOfficials } from "./officials.ts";
+import { dismissOfficial, fillAllPosts, hireOfficial, monthlyPosts, setAutoFill, settleLand, swapOfficials } from "./officials.ts";
+import { assassinate } from "./assassination.ts";
 import { giveGift, grantFief, inAnyWar, lordGetsBuilding, monthlyLords, seizeFief } from "./lords.ts";
+import { callLord, callLords, monthlyRetinues, weeklyRetinues } from "./retinues.ts";
 import { clockStopped, dailyEndCheck, keepPlaying, playOn, weeklyEndCheck, yearlyScores } from "./campaignEnd.ts";
 import { noteMoment, turnEndAchievements } from "./achievements.ts";
 import { empireOrder, monthlyInstitutions, type EmpireOrder } from "./institutions.ts";
 import { shogunateOrder, type ShogunateOrder } from "./shogunate.ts";
 import { huntOf, monthlyTribes, tribesOrder, type TribesOrder } from "./tribes.ts";
+import { isPlagueWeek, setQuarantine, weeklyPlague } from "./plague.ts";
+import { besiegerEat, castleCutAt, type CastleCut } from "./castleSupply.ts";
 import { addDays, DAYS_PER_RATION_MONTH, DAYS_PER_TURN } from "./calendar.ts";
-import { corridor, monthlyRations, refillRations, wagonRations, planRoute, planTilePath, tileStepHours, type MarchingArmy } from "./march.ts";
+import { corridor, monthlyRations, rations, refillRations, wagonRations, planRoute, planTilePath, tileStepHours, type MarchingArmy } from "./march.ts";
 import { foodCarriedPct, marchMap, NO_PATH, tileMarch, updateWeather, type World } from "./world.ts";
 import {
   aiCollect,
@@ -46,6 +55,7 @@ import {
   nationPay,
   pickUp,
   recount,
+  recountLordsMen,
   cancelRecruit,
   recruit,
   releaseCommander,
@@ -98,7 +108,8 @@ export type Order =
   /** The army's commander takes in the garrison troops where it stands. */
   | { type: "pickUp"; army: number; men?: number }
   /** Commission a province's official as a commander; release one back to his post. */
-  | { type: "commission"; province: number }
+  /** Commission the province's official as a general, or as an admiral when `sea` (RECR-128). */
+  | { type: "commission"; province: number; sea?: boolean }
   | { type: "release"; commander: number }
   /** Train levy foot of an army as another arm. */
   | { type: "train"; army: number; arm: string; men: number }
@@ -118,14 +129,23 @@ export type Order =
   | { type: "repay"; gold: number }
   /** Give a lord gold, grant him a royal province, or take a province back from its lord. */
   | { type: "gift"; lord: number }
+  /** Call the lords' retinues to war: every lord, or one (WAR-253). */
+  | { type: "callLords"; lord?: number }
   | { type: "grantFief"; province: number; lord: number }
   | { type: "seizeFief"; province: number }
+  /** Send an assassin after one of the realm's lords (REALM-280). */
+  | { type: "assassinateLord"; lord: number }
   /** Move officials between two royal provinces: they swap posts, or one takes the other's empty post (AssignOfficial). */
   | { type: "swapOfficials"; a: number; b: number }
   /** Hire an official of a type (an OFFICIALS index) into an empty royal post; a foreign specialist costs more (HireOfficial). */
   | { type: "hireOfficial"; province: number; official: number; foreign: boolean }
   /** Keep a province just taken as royal land with its post empty for now (SettleLand, PROV-340). */
   | { type: "settleLand"; province: number }
+  /** Dismiss a royal post's official, or replace him with a hire of another type (PROV-345). */
+  | { type: "dismissOfficial"; province: number; hire?: { official: number; foreign: boolean } }
+  /** Auto-fill posts on or off (PROV-342); fill every empty post now (PROV-348). */
+  | { type: "autoFillPosts"; on: boolean }
+  | { type: "fillPosts" }
   /** Research: choose the invention to study, how many students to keep, empty the schools into recruits, found a school in a town. */
   | { type: "setStudy"; invention: string }
   /** The study queue (RSCH-108 to RSCH-110): add one, queue the path to one, take one out, move one a place earlier (-1) or later (1). */
@@ -193,6 +213,8 @@ export type Order =
   | ShogunateOrder
   /** Hunting grounds: claim, leave, take in, ask for the land, answer an ask (tribes.ts). */
   | TribesOrder
+  /** Close a province of the realm against plague (quarantine), or open it again (QuarantineProvince, PROV-357). */
+  | { type: "quarantine"; province: number; on: boolean }
   /** After world domination, play on to the end date; after game over, play on as another realm (SHELL-164). */
   | { type: "keepPlaying" }
   | { type: "playOn"; nation: number };
@@ -273,7 +295,11 @@ function startDay(world: World, news: News[]): void {
     monthlyPeoples(world, news);
     monthlyFaithHeads(world, news);
     monthlyBelief(world, news);
+    // Days to each capital, if land changed hands, before the grievances read them (X-29).
+    monthlyThrone(world);
     monthlyMoods(world, news);
+    // Each realm's stability, read once for the month: low stability costs tax, recruits and risings (X-29).
+    monthlyStability(world);
     monthlyRebels(world, news);
     monthlyRevolutions(world, news);
     monthlyLords(world, (n) => !inAnyWar(world, n), news);
@@ -281,33 +307,46 @@ function startDay(world: World, news: News[]): void {
     monthlyResearch(world, news);
     monthlyTrade(world, news);
     runLedger(world, true);
+    // With the month's gold in, realms fill their empty posts (PROV-342).
+    monthlyPosts(world, news);
     monthlyNavy(world, news);
     monthlyHiredFleets(world, news);
     monthlyColonies(world, news);
     judgeNeglect(world);
     if (world.date.month === 1) mineYear(world, news);
     monthlyWorks(world, news);
+    // Each realm weighs its neighbours' strength before the AI builds, borrows, declares and calls men (DIPL-231).
+    monthlyFear(world, news);
     aiWorks(world, news);
     monthlyChanges(world, news);
     aiChanges(world);
     aiTreasury(world, news);
+    // A realm broke for months defaults on its debts (X-29).
+    monthlyDebts(world, news);
     monthlyDiplomacy(world, news);
     monthlyStatecraft(world, news);
     // Lands taken over the last 20 years each month; the league check each January (DIPL-221).
     monthlyConquest(world, news);
     // Institutions read standing and forms and add war aims, so they come after diplomacy and before the wars (INST §9).
     monthlyInstitutions(world, news);
+    // Goals end with their reasons and pull their realms before the AI looks for wars (EVT-103 to EVT-105).
+    monthlyGoals(world);
     aiDeclarations(world, news);
     // A war just declared may be censured, or call a patron to a holy place (RELG-147, RELG-149).
     faithHeadsWars(world, news);
     // A demand made before war may reach the player's court this month (DIPL-213).
     libraryEvents(world, news);
     aiRaise(world, news);
+    // Retinues go home at peace or when their lord no longer serves; the AI calls its lords (WAR-256, WAR-258).
+    monthlyRetinues(world, news);
     // Events come last in the month, after every other system (X-2).
+    monthlyEveryday(world, news);
     monthlyEvents(world, news);
     if (world.date.month === 1) yearlyScores(world, news);
     monthlyHeritage(world, news);
   }
+  // The plague week, on days 7, 14, 21 and 28 of the month (D-PROV-4): only the sick provinces are visited.
+  if (world.day > 0 && isPlagueWeek(world.date.day ?? 1)) weeklyPlague(world, news);
   if (world.day % DAYS_PER_TURN === 0) aiMarches(world);
 }
 
@@ -315,6 +354,8 @@ function endDay(world: World, news: News[]): void {
   feedArmies(world);
   dailyExploration(world);
   runOccupation(world, world.date.day === 1, news);
+  // Traders walk a day on, as the armies march (TRADE-132).
+  tradeDay(world);
   dailyRebels(world, news);
   world.date = addDays(world.date, 1);
   world.day++;
@@ -323,8 +364,10 @@ function endDay(world: World, news: News[]): void {
   dailyEndCheck(world, news);
   if (world.day % DAYS_PER_TURN === 0) {
     weeklyMusters(world, news);
+    weeklyRetinues(world, news);
     aiCollect(world, news);
     recount(world);
+    recountLordsMen(world);
     // The player's ledger is kept current each week; every realm's is worked out when the month turns.
     if (world.player >= 0) runLedger(world, false, world.player);
     answerAiCalls(world, news);
@@ -369,7 +412,7 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
     case "pickUp":
       return pickUp(world, actingNation, order.army, order.men);
     case "commission":
-      return commissionOfficial(world, actingNation, order.province, news);
+      return commissionOfficial(world, actingNation, order.province, news, !!order.sea);
     case "release":
       return releaseCommander(world, actingNation, order.commander);
     case "train":
@@ -394,10 +437,17 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
       return repayLoan(world, actingNation, order.gold);
     case "gift":
       return giveGift(world, actingNation, order.lord);
+    case "callLords": {
+      const refused = order.lord === undefined ? callLords(world, actingNation, news) : callLord(world, actingNation, order.lord, news);
+      if (!refused) recountLordsMen(world);
+      return refused;
+    }
     case "grantFief":
       return grantFief(world, actingNation, order.province, order.lord);
     case "seizeFief":
       return seizeFief(world, actingNation, order.province, news);
+    case "assassinateLord":
+      return assassinate(world, actingNation, order.lord, news);
     case "swapOfficials": {
       const reason = swapOfficials(world, actingNation, order.a, order.b, news);
       // The ledger shows the new sums at once.
@@ -406,6 +456,18 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
     }
     case "settleLand":
       return settleLand(world, actingNation, order.province);
+    case "dismissOfficial": {
+      const reason = dismissOfficial(world, actingNation, order.province, order.hire ? { type: order.hire.official, foreign: !!order.hire.foreign } : null, news);
+      if (!reason) runLedger(world, false);
+      return reason;
+    }
+    case "autoFillPosts":
+      return setAutoFill(world, actingNation, !!order.on);
+    case "fillPosts": {
+      const reason = fillAllPosts(world, actingNation, news);
+      if (!reason) runLedger(world, false);
+      return reason;
+    }
     case "hireOfficial": {
       const reason = hireOfficial(world, actingNation, order.province, order.official, !!order.foreign, news);
       if (!reason) runLedger(world, false);
@@ -487,7 +549,7 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
     case "heritageChoice":
       return heritageChoice(world, actingNation, order.id);
     case "answerEvent":
-      return answerEvent(world, actingNation, order.event, order.option, news);
+      return order.event.startsWith("everyday:") ? answerEveryday(world, actingNation, order.event, order.option, news) : answerEvent(world, actingNation, order.event, order.option, news);
     case "makeDemand":
       syncCountries(world);
       return makeDemand(world, actingNation, order.target, order.kind, order.province ?? -1);
@@ -534,6 +596,8 @@ function applyOrder(world: World, order: Order, actingNation: number, news: News
       return order.do === "hire" || order.do === "dismiss" ? hiredFleetOrder(world, order, actingNation, news) : navyOrder(world, order, actingNation, news);
     case "explore":
       return exploreOrder(world, order, actingNation, news);
+    case "quarantine":
+      return setQuarantine(world, actingNation, order.province, order.on, news);
   }
 }
 
@@ -602,7 +666,17 @@ export function refillHere(world: World, slot: number, map = marchMap(world)): n
   const owner = world.provinceOwner[p]! >= 0 ? world.provinceOwner[p]! : huntOf(world, p);
   const enemy = owner >= 0 && atWar(world, owner, world.armies.owner[slot]!);
   const reserve = enemy ? 0 : world.provincePopulation[p]! * 1000 * d.homeReserveMonths;
-  return refillRations(d, map.ground[p]!, Math.max(0, world.provinceStore[p]!) * 1000, reserve);
+  const found = refillRations(d, map.ground[p]!, Math.max(0, world.provinceStore[p]!) * 1000, reserve);
+  // On enemy land, the owner's castles have gathered the food in behind their walls (WAR-263, WAR-264).
+  return enemy && found > 0 ? found * (1 - castleCutAt(world, p).share) : found;
+}
+
+/** The castle keeping food from an army's foragers where it stands, and how much (WAR-266); none off enemy land. */
+export function forageCut(world: World, slot: number): CastleCut {
+  const p = world.armies.location[slot]!;
+  if (p < 0 || world.provinceWater[p]) return { castle: -1, share: 0 };
+  const owner = world.provinceOwner[p]!;
+  return owner >= 0 && atWar(world, owner, world.armies.owner[slot]!) ? castleCutAt(world, p) : { castle: -1, share: 0 };
 }
 
 /** An army is on campaign while its realm is at war or it stands outside its own land (REALM-054). */
@@ -806,10 +880,13 @@ function feedArmies(world: World): void {
     if (!a.alive[i]) continue;
     const n = a.owner[i]!;
     if (carried[n]! < 0) carried[n] = foodCarriedPct(world, n);
-    const army = { ...marching(world, i), campaigning: campaigning(world, i), foodCarriedPct: carried[n]! };
-    const need = monthlyRations(d, army) * day;
+    const c = a.commander[i]!;
+    const logistics = c >= 0 ? world.commanderLogistics[c]! : 0;
+    // Besiegers eat more, from camp fevers and sallies against their foragers (WAR-265).
+    const need = rations(d, a.men[i]!, a.horse[i]!, logistics, campaigning(world, i)) * day * besiegerEat(world, i);
     a.food[i] = a.food[i]! - need;
-    const room = wagonRations(d, army) - a.food[i]!;
+    // wagonRations: the months carried of eating on campaign.
+    const room = rations(d, a.men[i]!, a.horse[i]!, logistics, true) * d.monthsCarried * (carried[n]! / 100) - a.food[i]!;
     if (room > 0) {
       const take = Math.min(room, refillHere(world, i, map) * day);
       a.food[i] = a.food[i]! + take;

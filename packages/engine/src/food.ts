@@ -46,12 +46,16 @@ export function createFoodState(P: number): FoodState {
   return { provinceStore: new Float32Array(P), provinceHarvest: new Int8Array(P).fill(-1), provinceWeather: new Int8Array(P), provinceStarved: new Float32Array(P) };
 }
 
-/** Every land province starts with food to last until its first harvest, and a few months more. */
+/**
+ * Every land province starts with food to last until its first harvest, and a few months more.
+ * The harvest comes in on the 1st, so a start in the harvest month itself (20 September 1378)
+ * waits a whole year for the next one.
+ */
 export function seedStores(world: World): void {
   const months = world.rules.defines.living.startingStoreMonths;
   for (let p = 0; p < world.provinceCount; p++) {
     if (world.provinceWater[p]) continue;
-    const toHarvest = (harvestMonth(world.provincePlace[p]!.lat) - world.date.month + 12) % 12;
+    const toHarvest = ((harvestMonth(world.provincePlace[p]!.lat) - world.date.month - 1 + 12) % 12) + 1;
     world.provinceStore[p] = world.provincePopulation[p]! * (toHarvest + months);
   }
 }
@@ -63,6 +67,9 @@ export function yearlyFood(world: World, p: number, roll: HarvestRoll = "normal"
   for (const c of FOOD_CLASSES) if (crops || !atHarvest(c)) food += worksFood(world, p, c) * (atHarvest(c) ? harvestMultiplier(roll) : 1);
   return food;
 }
+
+/** Where a normal year's food is short (the province grows less than it eats) and where it is tight (a poor harvest brings famine; D-PROV-36). */
+export const FOOD_BALANCE: { short: number; tight: number } = provinceConfig.food.balance;
 
 /** A province's longitude, from its place on the map (0 without a map). */
 function lonOf(world: World, p: number): number {

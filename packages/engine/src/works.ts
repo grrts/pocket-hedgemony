@@ -1,6 +1,7 @@
 import type { World } from "./world.ts";
 import type { News } from "./war.ts";
 import { controller } from "./war.ts";
+import { START_YEAR } from "../../rules/src/start.ts";
 import { inAnyWar } from "./lords.ts";
 import { LEDGER, LEDGER_LINES } from "./treasury.ts";
 import { buildingType, buildingsConfig, siteKind, townAtLeast, type TownSize } from "./domain/buildings/index.ts";
@@ -12,11 +13,13 @@ import { yearlyFood } from "./food.ts";
 import { provinceConfig } from "./domain/province/model.ts";
 import { tradeConfig } from "./domain/trade/index.ts";
 import { heritageFactor } from "./heritage.ts";
+import { wallsFoodText } from "./castleSupply.ts";
+import * as dip from "./domain/diplomacy/index.ts";
 
 const provinceMines = provinceConfig.mines;
 const MINE_ANCHORS = new Set(Object.keys(provinceMines.anchors));
 /** The trade towns the geography anchors name keep their market in 1444, however poor the province (SETUP-068). */
-const MARKET_ANCHORS = new Set(buildingsConfig.anchors.filter((a) => a.building === "market" && a.from_year <= 1444).map((a) => a.province));
+const MARKET_ANCHORS = new Set(buildingsConfig.anchors.filter((a) => a.building === "market" && a.from_year <= START_YEAR).map((a) => a.province));
 
 /**
  * Works (milestone 4, first slice of the buildings context): the crown builds
@@ -551,6 +554,8 @@ export function aiWorks(world: World, news: News[]): void {
       continue;
     }
     if (busy[n]! >= AI_BUSY_SITES) continue;
+    // A realm afraid of a neighbour walls its border with it first (DIPL-240).
+    if (fearCastle(world, n, land, reserve, news, pend)) continue;
     const p = land[(month + n) % land.length]!;
     for (const name of AI_ORDER) {
       const work = W[name];
@@ -563,6 +568,40 @@ export function aiWorks(world: World, news: News[]): void {
       break;
     }
   }
+}
+
+/**
+ * Walls against the realm a realm fears most (DIPL-240, F-166): a Wary or
+ * Threatened realm orders a castle, or its next step, in the province
+ * bordering that realm whose castle stands lowest (counting one on order),
+ * the most people first, until each stands at `defences.castle_step` for its
+ * fear. It keeps `defences.reserve_share` of its usual reserve for these
+ * walls. Only realms that fear someone look, once a month.
+ */
+function fearCastle(world: World, n: number, land: readonly number[], reserve: number, news: News[], pend: Pending): boolean {
+  const fears = dip.country(world.diplomacy, world.nationIds[n]!).fears;
+  if (!fears?.length) return false;
+  const fear = dip.fearLevel(fears);
+  const want = dip.defenceCastleStep(fear);
+  const x = world.nationIndex.get(fears[0]!.of);
+  if (want <= 0 || x === undefined) return false;
+  let best = -1;
+  let bestStep = Infinity;
+  for (const p of land) {
+    const step = nextStep(world, p, W.castle, pend);
+    if (step > want || step > bestStep || !bordersRealm(world, p, x)) continue;
+    if (step === bestStep && world.provincePopulation[p]! <= world.provincePopulation[best]!) continue;
+    if (whyNot(world, n, p, W.castle, pend)) continue;
+    best = p;
+    bestStep = step;
+  }
+  if (best < 0 || world.nationTreasury[n]! - workCost(world, best, W.castle, bestStep).gold < reserve * dip.AF.defences.reserve_share[fear]) return false;
+  return !orderWork(world, n, best, W.castle, news, pend);
+}
+
+function bordersRealm(world: World, p: number, x: number): boolean {
+  for (let k = world.adjStart[p]!, end = world.adjStart[p + 1]!; k < end; k++) if (world.provinceOwner[world.adjList[k]!] === x) return true;
+  return false;
 }
 
 /** Sites a realm of the AI keeps open at most (buildings ai.busy_sites). */
@@ -617,8 +656,11 @@ export function workEffect(world: World, work: number, step: number): string {
       const f = world.rules.defines.castleFood;
       return `The castle store holds ${f.granaryStoreMonths} months instead of ${f.castleStoreMonths}, and rots half as fast`;
     }
-    case "castle":
-      return step >= 2 ? "Stone walls: armies must besiege it, and enemies can't march past" : "Earthwork walls: a smaller garrison holds out against a siege";
+    case "castle": {
+      const walls = step >= 2 ? "Stone walls: armies must besiege it, and enemies can't march past" : "Earthwork walls: a smaller garrison holds out against a siege";
+      // The castle gathers the land's food in: enemy foragers find less, besiegers eat more (WAR-267).
+      return `${walls}. ${wallsFoodText(step)}`;
+    }
   }
 }
 

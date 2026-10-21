@@ -6,6 +6,7 @@ import type { Lord } from "./domain/realm/index.ts";
 import { GRIEVANCES } from "./moods.ts";
 import { fallenEffect } from "./fallen.ts";
 import { TRAITS } from "./rulers.ts";
+import { aimless, NO_AIM } from "./aimlessWar.ts";
 
 /**
  * The price of war, peace part (X-21): each side's peace voices counted in the
@@ -236,7 +237,9 @@ function countRealm(world: World, n: number, war: dip.War, day: Day): Omit<Peace
     };
   });
   const c = wf.countVoices({ lords, royal: r.royal, capitalPeace: r.capitalPeace, warlikeRuler: world.rulers[n]?.traits.includes("Warlike") ?? false });
-  const share = Math.min(1, c.peaceShare + fallenEffect(world, n).peace);
+  // A war its realm declared with no aim: its people want peace sooner (F-167).
+  const unjust = id === war.declarer && aimless(war) ? NO_AIM.peace_share : 0;
+  const share = Math.min(1, c.peaceShare + fallenEffect(world, n).peace + unjust);
   const obligation = wf.obligation(share);
   return { nation: n, peace: c.peace, war: c.war, none: c.none, total: c.total, share, obligation, obliged: obligation !== "free" };
 }
@@ -296,7 +299,7 @@ const LOYALTY_RANK = ["Loyal", "Wavering", "Disloyal", "In revolt"];
 /** Runs a warfare rule over realm n's lords as the rule library sees them, and keeps the loyalty it gives them. */
 function withLords(world: World, n: number, rule: (lords: (Lord & { warlike?: boolean })[]) => void, why: string, news: News[]): number {
   const ks: number[] = [];
-  world.lords.forEach((l, k) => l.nation === n && ks.push(k));
+  world.lords.forEach((l, k) => l.nation === n && !l.gone && ks.push(k));
   const views = ks.map((k) => {
     const l = world.lords[k]!;
     return { name: l.name, house: l.house, provinces: [], retinue: 0, wealth: 0, traits: lordTraits(world, k), loyalty: l.loyalty, sons: [] } as Lord & { warlike?: boolean };

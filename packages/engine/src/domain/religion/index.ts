@@ -1,5 +1,6 @@
 import config from "../../../../rules/data/domain/religion.json" with { type: "json" };
 import catalogueFaiths from "../../../../rules/data/domain/religion-catalogue-faiths.json" with { type: "json" };
+import { START_YEAR } from "../../../../rules/src/start.ts";
 
 /**
  * Religion (domain/religion/spec.md): the faiths and their relations, the
@@ -1005,9 +1006,9 @@ export interface HolyPlace {
  * Holy places, as config lists them (RELG-080, RELG-084, D-RELG-16): Amritsar only
  * once `sikh_panth_founded` has fired and not before 1577; a place that follows
  * a relic (the Temple of the Tooth) sits in its later province from that year.
- * With no year given, the 1444 places are returned.
+ * With no year given, the places at the start are returned.
  */
-export function holyPlaces(firedEvents: string[] = [], year = 1444): HolyPlace[] {
+export function holyPlaces(firedEvents: string[] = [], year = START_YEAR): HolyPlace[] {
   const names = config.holy_place_names as Record<string, string>;
   const holders = config.holder_names as Record<string, string>;
   type Row = { id: string; faiths: string[]; province: string; holder_1444: string | null; appears_with_event?: string; earliest?: number; moves?: { from_year: number; province: string }[] };
@@ -1020,7 +1021,7 @@ export function holyPlaces(firedEvents: string[] = [], year = 1444): HolyPlace[]
 }
 
 /** Church heads are marked at their holy place, their seat (RELG-085); the heads of the faith rules are RELG-139 onward. */
-export function churchHeads(year = 1444): { id: string; name: string; place: string }[] {
+export function churchHeads(year = START_YEAR): { id: string; name: string; place: string }[] {
   const heads = config.church_heads as unknown as Record<string, { name: string; place: string; from?: number } | string>;
   const out: { id: string; name: string; place: string }[] = [];
   for (const [id, h] of Object.entries(heads)) if (typeof h !== "string" && year >= (h.from ?? 0)) out.push({ id, name: h.name, place: h.place });

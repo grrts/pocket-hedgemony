@@ -6,6 +6,7 @@
 import type { GameDate } from "@ph/rules";
 import { agesRunning, formatMonthYear } from "../time-and-turns/index.ts";
 import { SHELL, campaignLabel, enterCampaign, hasQuit, isFreeTier, openStartScreen, pop, push, replaceAll, top, topId, type Edition, type Frame, type Platform, type Shell } from "./stack.ts";
+import { START_YEAR } from "../../../../rules/src/start.ts";
 
 // ---------------------------------------------------------------------------
 // Boot and first run (SHELL-008..015)
@@ -144,7 +145,7 @@ export interface StartBackground {
 export function startScreen(o: { platform: Platform; edition: Edition; summary: CampaignSummary | null; start?: number }): { background: StartBackground; icons: string[]; version: "lower right"; ribbon: boolean } {
   const regions = SHELL.start.regions;
   const over = o.summary ? o.summary.realm : regions[(o.start ?? 0) % regions.length]!;
-  const background: StartBackground = { renderer: "map", zoom: SHELL.start.zoom, pan: "slow", over, bordersFrom: o.summary ? "the latest save's summary" : "1444", input: false, simulation: false };
+  const background: StartBackground = { renderer: "map", zoom: SHELL.start.zoom, pan: "slow", over, bordersFrom: o.summary ? "the latest save's summary" : String(START_YEAR), input: false, simulation: false };
   return { background, icons: startIcons(o.platform), version: "lower right", ribbon: isFreeTier(o.edition) };
 }
 

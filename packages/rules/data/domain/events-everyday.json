@@ -1,0 +1,586 @@
+{
+  "$comment": "Everyday events (domain/events/spec.md §5.22, EVT-115 to EVT-128; feedback 152). Small choices about the realm's own people and stores, drawn from what the game already holds: its officials, lords, ruler and heir, and food stores, and plague reaching a province of the player's (EVT-130: not drawn; plague fires it). Each realm draws one every `months_between` months (a range), never while the player has an event waiting; the player's realm never draws the same event again within `rest_years` (EVT-134). `where` limits an event to realms in those regions or wider regions (exploration-regions.json), `from` and `to` to those years (EVT-133). `weight` is how often an event is drawn among the ones that can happen; `needs` names what it is about. Options list their effects in the engine's small vocabulary (gold, loyalty, official, lands, heir, heir_risk, food_back, new_lord, quarantine, care; and for an event about a province, EVT-135: food in months of eating, people and recruits as a share, light_tax in years); `ai` weights the AI's pick; `needs` on an option hides it when the realm lacks what it asks. `{words}` in braces are filled with the names of who and where. Every number is a placeholder for balance.",
+  "months_between": [2, 4],
+  "rest_years": 20,
+  "first_within_months": 4,
+  "food": { "min_store_months": 3, "min_store": 2 },
+  "events": {
+    "official_dies": {
+      "weight": 2,
+      "needs": "official",
+      "title": "Death of {official}",
+      "text": "{official}, your {type} at {province}, has died after {years} years in the post. His clerks wait to hear who will take his seat.",
+      "options": [
+        { "id": "deputy", "name": "Raise his deputy", "ai": 3, "effects": [{ "official": "new" }] },
+        { "id": "seasoned", "name": "Send for a seasoned man", "ai": 1, "effects": [{ "gold": -25 }, { "official": "seasoned" }] },
+        { "id": "kin", "name": "Give the post to {lord2}'s kinsman", "needs": "lord2", "ai": 2, "effects": [{ "official": "new" }, { "loyalty": "office_at_court", "who": "lord2" }] }
+      ]
+    },
+    "lord_dies": {
+      "weight": 2,
+      "needs": "lord",
+      "title": "Death of {lord}",
+      "text": "{lord} of the house of {house} has died. His son {son} asks you to confirm him in his father's lands ({lands}).",
+      "options": [
+        { "id": "confirm", "name": "Confirm {son}", "ai": 4, "effects": [{ "new_lord": true }] },
+        { "id": "relief", "name": "Ask a fee for his lands", "ai": 2, "effects": [{ "new_lord": true }, { "gold": 20 }, { "loyalty": "heavy_taxes", "who": "lord" }] },
+        { "id": "take", "name": "Take his lands for the crown", "ai": 1, "effects": [{ "lands": "crown" }, { "loyalty": "land_seized_from_another", "who": "other_lords" }] }
+      ]
+    },
+    "lord_slighted": {
+      "weight": 2,
+      "needs": "lord_not_disloyal",
+      "title": "{lord} feels slighted",
+      "text": "{lord} of the house of {house} was seated below a lesser man at your table, and talks against you in his hall.",
+      "options": [
+        { "id": "gift", "name": "Send him a gift", "ai": 2, "effects": [{ "gold": -10 }] },
+        { "id": "office", "name": "Give him an office at court", "needs": "lord2", "ai": 2, "effects": [{ "loyalty": "land_seized_from_another", "who": "lord2" }] },
+        { "id": "ignore", "name": "Let him sulk", "ai": 1, "effects": [{ "loyalty": "slighted_at_court", "who": "lord" }] }
+      ]
+    },
+    "lord_praises": {
+      "weight": 2,
+      "needs": "lord_not_loyal",
+      "title": "{lord} speaks well of you",
+      "text": "{lord} of the house of {house} has been heard praising your rule in his hall. A word from you now could win him over.",
+      "options": [
+        { "id": "reward", "name": "Reward him with gold", "ai": 3, "effects": [{ "gold": -10 }, { "loyalty": "gift_of_gold", "who": "lord" }] },
+        { "id": "thank", "name": "Thank him", "ai": 1, "effects": [] }
+      ]
+    },
+    "lords_quarrel": {
+      "weight": 2,
+      "needs": "two_lords",
+      "title": "{lord} and {lord2} quarrel",
+      "text": "{lord} and {lord2} both claim a mill and its meadows on the edge of their lands, and each asks you to judge for him.",
+      "options": [
+        { "id": "first", "name": "Judge for {lord}", "ai": 2, "effects": [{ "loyalty": "want_granted", "who": "lord" }, { "loyalty": "land_seized_from_him", "who": "lord2" }] },
+        { "id": "second", "name": "Judge for {lord2}", "ai": 2, "effects": [{ "loyalty": "want_granted", "who": "lord2" }, { "loyalty": "land_seized_from_him", "who": "lord" }] },
+        { "id": "fine", "name": "Fine them both and keep the mill", "ai": 1, "effects": [{ "gold": 15 }, { "loyalty": "heavy_taxes", "who": "lord" }, { "loyalty": "heavy_taxes", "who": "lord2" }] }
+      ]
+    },
+    "lord_hurt": {
+      "weight": 1,
+      "needs": "lord",
+      "title": "{lord} is hurt",
+      "text": "{lord} of the house of {house} fell from his horse while hunting and lies in his hall with a broken leg.",
+      "options": [
+        { "id": "physician", "name": "Send your own physician", "ai": 2, "effects": [{ "gold": -10 }, { "loyalty": "gift_of_gold", "who": "lord" }] },
+        { "id": "prayers", "name": "Send your prayers", "ai": 2, "effects": [] }
+      ]
+    },
+    "child_born": {
+      "weight": 2,
+      "needs": "ruler_fertile",
+      "title": "A child is born",
+      "text": "A {child} is born to {ruler}, and named {childName}. The bells ring in every town of the realm.",
+      "options": [
+        { "id": "feast", "name": "Hold a great feast", "ai": 2, "effects": [{ "heir": "child" }, { "gold": -15 }, { "loyalty": "gift_of_gold", "who": "least_loyal_lords", "count": 2 }] },
+        { "id": "match", "name": "Promise the child to {lord2}'s house", "needs": "lord2", "ai": 2, "effects": [{ "heir": "child" }, { "loyalty": "marriage_into_ruling_house", "who": "lord2" }] },
+        { "id": "quiet", "name": "Give thanks quietly", "ai": 1, "effects": [{ "heir": "child" }] }
+      ]
+    },
+    "heir_ill": {
+      "weight": 1,
+      "needs": "young_heir",
+      "title": "{heir} falls ill",
+      "text": "Your heir {heir}, aged {heirAge}, is burning with fever. The court physicians shake their heads.",
+      "options": [
+        { "id": "doctors", "name": "Pay the best physicians", "ai": 3, "effects": [{ "gold": -20 }] },
+        { "id": "pray", "name": "Trust in prayer", "ai": 1, "effects": [{ "heir_risk": 0.3 }] }
+      ]
+    },
+    "grain_rots": {
+      "weight": 2,
+      "needs": "store",
+      "loss": 0.4,
+      "title": "Grain rots at {province}",
+      "text": "Damp has got into the granaries at {province}. The keepers have thrown out {loss} months of grain.",
+      "options": [
+        { "id": "buy", "name": "Buy grain from merchants", "ai": 2, "effects": [{ "gold": -15 }, { "food_back": 0.5 }] },
+        { "id": "requisition", "name": "Take grain from {lord2}'s barns", "needs": "lord2", "ai": 1, "effects": [{ "food_back": 0.5 }, { "loyalty": "grain_requisitioned", "who": "lord2" }] },
+        { "id": "bear", "name": "Bear the loss", "ai": 2, "effects": [] }
+      ]
+    },
+    "granary_fire": {
+      "weight": 1,
+      "needs": "store",
+      "loss": 0.5,
+      "title": "Fire in the granary at {province}",
+      "text": "A fire in the night has burned half of {province}'s granary: {loss} months of grain are lost.",
+      "options": [
+        { "id": "buy", "name": "Buy grain from merchants", "ai": 2, "effects": [{ "gold": -20 }, { "food_back": 0.5 }] },
+        { "id": "requisition", "name": "Take grain from {lord2}'s barns", "needs": "lord2", "ai": 1, "effects": [{ "food_back": 0.5 }, { "loyalty": "grain_requisitioned", "who": "lord2" }] },
+        { "id": "bear", "name": "Bear the loss", "ai": 2, "effects": [] }
+      ]
+    },
+    "plague_reaches": {
+      "weight": 0,
+      "needs": "plague",
+      "title": "Plague at {province}",
+      "text": "Men are falling sick at {province}: fever, black swellings, death in three days. The townsfolk die first. What will you do?",
+      "options": [
+        { "id": "close", "name": "Close the province", "ai": 1, "effects": [{ "quarantine": true }] },
+        { "id": "physicians", "name": "Send physicians and burn the sick houses", "ai": 1, "effects": [{ "gold": -20 }, { "care": true }] },
+        { "id": "open", "name": "Keep the roads open", "ai": 1, "effects": [] }
+      ]
+    },
+    "rats": {
+      "weight": 1,
+      "needs": "store",
+      "loss": 0.3,
+      "title": "Rats in the stores at {province}",
+      "text": "Rats have overrun the stores at {province} and spoiled {loss} months of grain.",
+      "options": [
+        { "id": "buy", "name": "Buy grain from merchants", "ai": 2, "effects": [{ "gold": -10 }, { "food_back": 0.5 }] },
+        { "id": "bear", "name": "Bear the loss", "ai": 2, "effects": [] }
+      ]
+    },
+    "good_harvest": {
+      "weight": 2, "needs": "province",
+      "title": "A rich harvest at {province}",
+      "text": "The barns at {province} are full to the rafters, and the reeves say they have not seen such a year in living memory.",
+      "options": [
+        { "id": "store", "name": "Fill the granaries", "ai": 2, "effects": [{ "food": 2 }] },
+        { "id": "sell", "name": "Sell the surplus", "ai": 2, "effects": [{ "gold": 15 }] },
+        { "id": "feast", "name": "Give a harvest feast", "needs": "lord2", "ai": 1, "effects": [{ "food": 1 }, { "loyalty": "gift_of_gold", "who": "lord2" }] }
+      ]
+    },
+    "hail": {
+      "weight": 1, "needs": "province",
+      "title": "Hail at {province}",
+      "text": "A storm of hail has flattened the standing corn at {province}. The villagers ask how they are to pay this year's tax.",
+      "options": [
+        { "id": "remit", "name": "Lighten their tax for a year", "ai": 2, "effects": [{ "light_tax": 1 }] },
+        { "id": "grain", "name": "Send them grain", "ai": 1, "effects": [{ "gold": -15 }, { "food": 1 }] },
+        { "id": "nothing", "name": "The tax stands", "ai": 1, "effects": [{ "people": -0.01 }] }
+      ]
+    },
+    "bandits": {
+      "weight": 2, "needs": "province",
+      "title": "Bandits near {province}",
+      "text": "A band of outlaws holds the woods on the road to {province}. Carters go armed, and some no longer go at all.",
+      "options": [
+        { "id": "hunt", "name": "Send men to hunt them down", "ai": 2, "effects": [{ "gold": -10 }, { "recruits": -0.1 }] },
+        { "id": "lord", "name": "Ask {lord2} to clear the road", "needs": "lord2", "ai": 2, "effects": [{ "loyalty": "want_granted", "who": "lord2" }, { "people": -0.005 }] },
+        { "id": "ignore", "name": "Leave them be", "ai": 1, "effects": [{ "people": -0.015 }] }
+      ]
+    },
+    "bridge_falls": {
+      "weight": 1, "needs": "province",
+      "title": "The bridge at {province} falls",
+      "text": "Spring floods have carried away the old bridge at {province}. Traders now wait days for the ferry.",
+      "options": [
+        { "id": "stone", "name": "Build it again in stone", "ai": 2, "effects": [{ "gold": -25 }, { "people": 0.01 }] },
+        { "id": "ferry", "name": "Make do with the ferry", "ai": 1, "effects": [{ "people": -0.01 }] }
+      ]
+    },
+    "town_fire": {
+      "weight": 1, "needs": "province",
+      "title": "Fire in {province}",
+      "text": "A fire that began in a baker's oven has burned a whole quarter of the town of {province}.",
+      "options": [
+        { "id": "stone", "name": "Rebuild in stone, at your cost", "ai": 1, "effects": [{ "gold": -25 }, { "people": 0.005 }] },
+        { "id": "relief", "name": "Feed the homeless", "ai": 2, "effects": [{ "gold": -10 }, { "people": -0.01 }] },
+        { "id": "leave", "name": "Let the townsfolk rebuild", "ai": 1, "effects": [{ "people": -0.02 }] }
+      ]
+    },
+    "flood": {
+      "weight": 1, "needs": "province",
+      "title": "The river floods at {province}",
+      "text": "The river has burst its banks at {province}, drowning fields and filling cellars with mud.",
+      "options": [
+        { "id": "dykes", "name": "Pay for new dykes", "ai": 2, "effects": [{ "gold": -20 }, { "food": -0.5 }] },
+        { "id": "wait", "name": "Wait for the waters to fall", "ai": 2, "effects": [{ "food": -1 }, { "people": -0.005 }] }
+      ]
+    },
+    "scholar": {
+      "weight": 1, "needs": "capital",
+      "title": "A scholar comes to court",
+      "text": "A learned man, driven from his own land, asks leave to teach at {province} under your protection.",
+      "options": [
+        { "id": "patron", "name": "Become his patron", "ai": 1, "effects": [{ "gold": -20 }, { "people": 0.01 }] },
+        { "id": "refuse", "name": "Send him on his way", "ai": 2, "effects": [] }
+      ]
+    },
+    "market_charter": {
+      "weight": 2, "needs": "lord_land",
+      "title": "{lord} asks for a market",
+      "text": "{lord} of the house of {house} asks your leave to hold a weekly market at {province}, and to take its tolls.",
+      "options": [
+        { "id": "grant", "name": "Grant the charter", "ai": 3, "effects": [{ "loyalty": "want_granted", "who": "lord" }, { "people": 0.01 }] },
+        { "id": "crown", "name": "Hold the market for the crown", "ai": 1, "effects": [{ "gold": 10 }, { "loyalty": "slighted_at_court", "who": "lord" }] },
+        { "id": "refuse", "name": "Refuse", "ai": 1, "effects": [{ "loyalty": "slighted_at_court", "who": "lord" }] }
+      ]
+    },
+    "walls_without_leave": {
+      "weight": 1, "needs": "lord_land",
+      "title": "{lord} raises walls",
+      "text": "{lord} of the house of {house} is building walls and towers at {province} without asking your leave.",
+      "options": [
+        { "id": "allow", "name": "Let him build", "ai": 2, "effects": [{ "loyalty": "want_granted", "who": "lord" }] },
+        { "id": "fine", "name": "Fine him for it", "ai": 1, "effects": [{ "gold": 15 }, { "loyalty": "heavy_taxes", "who": "lord" }] },
+        { "id": "pull_down", "name": "Order them pulled down", "ai": 1, "effects": [{ "loyalty": "slighted_at_court", "who": "lord" }] }
+      ]
+    },
+    "skimming_official": {
+      "weight": 1, "needs": "official",
+      "title": "Your official at {province} is skimming",
+      "text": "Merchants complain that {official}, your {type} at {province}, keeps back part of the tolls for himself.",
+      "options": [
+        { "id": "dismiss", "name": "Dismiss him", "ai": 1, "effects": [{ "official": "new" }] },
+        { "id": "fine", "name": "Make him pay it back", "ai": 2, "effects": [{ "gold": 15 }] },
+        { "id": "ignore", "name": "Look the other way", "ai": 1, "effects": [{ "people": -0.01 }] }
+      ]
+    },
+    "veterans": {
+      "weight": 1, "needs": "province",
+      "title": "Old soldiers at {province}",
+      "text": "Old soldiers with nowhere to go have gathered at {province}, asking for land to farm.",
+      "options": [
+        { "id": "land", "name": "Give them land", "ai": 2, "effects": [{ "gold": -10 }, { "recruits": 0.15 }] },
+        { "id": "send_away", "name": "Send them away", "ai": 1, "effects": [{ "people": -0.005 }] }
+      ]
+    },
+    "wolves": {
+      "weight": 1, "needs": "province",
+      "title": "Wolves at {province}",
+      "text": "A hard winter has driven wolves down from the hills at {province}. They take sheep, and a shepherd boy is missing.",
+      "options": [
+        { "id": "bounty", "name": "Pay a bounty on every pelt", "ai": 2, "effects": [{ "gold": -5 }] },
+        { "id": "hunt", "name": "Ask {lord2} to hunt them", "needs": "lord2", "ai": 2, "effects": [{ "loyalty": "want_granted", "who": "lord2" }] },
+        { "id": "ignore", "name": "Let the shepherds deal with it", "ai": 1, "effects": [{ "food": -0.5 }] }
+      ]
+    },
+    "tutor": {
+      "weight": 1, "needs": "young_heir",
+      "title": "A tutor for {heir}",
+      "text": "Your heir {heir}, aged {heirAge}, is old enough for lessons. Who shall teach the child?",
+      "options": [
+        { "id": "learned", "name": "Hire the most learned man you can find", "ai": 2, "effects": [{ "gold": -20 }] },
+        { "id": "lord", "name": "Send the child to {lord2}'s household", "needs": "lord2", "ai": 2, "effects": [{ "loyalty": "office_at_court", "who": "lord2" }] },
+        { "id": "priests", "name": "Leave it to the priests", "ai": 1, "effects": [] }
+      ]
+    },
+    "omen": {
+      "weight": 1, "needs": "capital",
+      "title": "A comet over {province}",
+      "text": "A star with a burning tail hangs over {province} night after night. The people whisper that it foretells the death of kings.",
+      "options": [
+        { "id": "good", "name": "Proclaim it a good omen", "ai": 2, "effects": [{ "gold": -10 }, { "loyalty": "want_granted", "who": "least_loyal_lords", "count": 1 }] },
+        { "id": "silence", "name": "Say nothing", "ai": 2, "effects": [] }
+      ]
+    },
+    "silver_found": {
+      "weight": 1, "needs": "province",
+      "title": "Silver at {province}",
+      "text": "A shepherd at {province} has found a seam of silver ore in a gully. Miners are already gathering.",
+      "options": [
+        { "id": "crown", "name": "Open a crown mine", "ai": 2, "effects": [{ "gold": -20 }, { "people": 0.025 }] },
+        { "id": "lord", "name": "Grant it to {lord2}", "needs": "lord2", "ai": 2, "effects": [{ "loyalty": "want_granted", "who": "lord2" }, { "people": 0.01 }] },
+        { "id": "leave", "name": "Let the miners dig as they will", "ai": 1, "effects": [{ "people": 0.005 }] }
+      ]
+    },
+    "pilgrims": {
+      "weight": 1, "needs": "province",
+      "title": "Pilgrims at {province}",
+      "text": "Word of a holy relic at {province} has spread, and pilgrims crowd the roads. The innkeepers grow rich.",
+      "options": [
+        { "id": "shrine", "name": "Build a shrine", "ai": 2, "effects": [{ "gold": -15 }, { "people": 0.015 }] },
+        { "id": "toll", "name": "Toll the pilgrims", "ai": 1, "effects": [{ "gold": 10 }] },
+        { "id": "nothing", "name": "Let them come", "ai": 1, "effects": [{ "people": 0.005 }] }
+      ]
+    },
+    "tournament": {
+      "weight": 1, "needs": "lord", "where": ["europe"], "to": 1600,
+      "title": "A tournament",
+      "text": "{lord} and the young men of your lords' houses beg you to hold a tournament, with jousting and a feast.",
+      "options": [
+        { "id": "hold", "name": "Hold a great tournament", "ai": 2, "effects": [{ "gold": -20 }, { "loyalty": "gift_of_gold", "who": "least_loyal_lords", "count": 2 }] },
+        { "id": "refuse", "name": "There are better uses for gold", "ai": 1, "effects": [{ "loyalty": "slighted_at_court", "who": "lord" }] }
+      ]
+    },
+    "guilds_quarrel": {
+      "weight": 1, "needs": "province", "where": ["europe", "middle_east", "north_africa"], "to": 1800,
+      "title": "Guilds quarrel at {province}",
+      "text": "The weavers' and dyers' guilds of {province} have come to blows over who may sell cloth in the market.",
+      "options": [
+        { "id": "weavers", "name": "Judge for the weavers", "ai": 2, "effects": [{ "people": 0.005 }] },
+        { "id": "fine", "name": "Fine both guilds", "ai": 1, "effects": [{ "gold": 15 }, { "people": -0.01 }] },
+        { "id": "free", "name": "Let anyone sell", "ai": 1, "effects": [{ "people": 0.01 }, { "people": -0.002 }] }
+      ]
+    },
+    "printer": {
+      "weight": 1, "needs": "capital", "where": ["europe"], "from": 1460, "to": 1600,
+      "title": "A printer at {province}",
+      "text": "A printer with a press of movable letters asks leave to set up shop at {province}. The scribes say it is the devil's work.",
+      "options": [
+        { "id": "welcome", "name": "Grant him a privilege", "ai": 2, "effects": [{ "gold": -10 }, { "people": 0.015 }] },
+        { "id": "refuse", "name": "Keep to the scribes", "ai": 1, "effects": [] }
+      ]
+    },
+    "witch_trials": {
+      "weight": 1, "needs": "province", "where": ["europe"], "from": 1560, "to": 1700,
+      "title": "Accusations at {province}",
+      "text": "After a bad harvest, the people of {province} accuse an old widow of witchcraft, and name others besides.",
+      "options": [
+        { "id": "stop", "name": "Stop the trials", "ai": 1, "effects": [{ "loyalty": "slighted_at_court", "who": "lord2" }] },
+        { "id": "courts", "name": "Let the courts decide", "ai": 2, "effects": [{ "people": -0.002 }] }
+      ]
+    },
+    "enclosure": {
+      "weight": 1, "needs": "lord_land", "where": ["europe"], "from": 1550, "to": 1850,
+      "title": "{lord} fences the commons",
+      "text": "{lord} is fencing the common fields at {province} for his sheep. The villagers who grazed them there have nowhere to go.",
+      "options": [
+        { "id": "allow", "name": "Allow it", "ai": 2, "effects": [{ "loyalty": "want_granted", "who": "lord" }, { "people": 0.015 }, { "people": -0.01 }] },
+        { "id": "forbid", "name": "Forbid it", "ai": 1, "effects": [{ "loyalty": "slighted_at_court", "who": "lord" }] }
+      ]
+    },
+    "coffee_house": {
+      "weight": 1, "needs": "capital", "where": ["europe", "middle_east"], "from": 1550, "to": 1800,
+      "title": "Coffee houses at {province}",
+      "text": "Coffee houses have sprung up all over {province}. Men sit in them for hours, talking of trade and of your government.",
+      "options": [
+        { "id": "license", "name": "License and tax them", "ai": 2, "effects": [{ "gold": 10 }] },
+        { "id": "ban", "name": "Close them", "ai": 1, "effects": [{ "people": -0.005 }] },
+        { "id": "let", "name": "Let them be", "ai": 1, "effects": [{ "people": 0.005 }] }
+      ]
+    },
+    "railway": {
+      "weight": 2, "needs": "province", "from": 1830,
+      "title": "A railway through {province}",
+      "text": "Surveyors ask leave to lay a railway line through {province}, and a grant to help pay for it.",
+      "options": [
+        { "id": "fund", "name": "Pay part of the cost", "ai": 2, "effects": [{ "gold": -40 }, { "people": 0.03 }] },
+        { "id": "private", "name": "Let the company pay its own way", "ai": 2, "effects": [{ "people": 0.01 }] },
+        { "id": "refuse", "name": "Refuse", "ai": 1, "effects": [] }
+      ]
+    },
+    "strike": {
+      "weight": 1, "needs": "province", "from": 1820,
+      "title": "A strike at {province}",
+      "text": "The mill hands of {province} have walked out, asking for shorter hours and higher pay.",
+      "options": [
+        { "id": "concede", "name": "Press the owners to give way", "ai": 1, "effects": [{ "gold": -15 }] },
+        { "id": "troops", "name": "Send soldiers", "ai": 2, "effects": [{ "people": -0.002 }, { "recruits": -0.05 }] },
+        { "id": "wait", "name": "Wait them out", "ai": 1, "effects": [{ "people": -0.015 }] }
+      ]
+    },
+    "cholera": {
+      "weight": 1, "needs": "province", "from": 1817, "to": 1910,
+      "title": "Cholera at {province}",
+      "text": "Cholera has broken out in the poor streets of {province}. Doctors blame the bad air; one says it is the water.",
+      "options": [
+        { "id": "wells", "name": "Close the foul wells", "ai": 1, "effects": [{ "gold": -20 }, { "people": -0.003 }] },
+        { "id": "air", "name": "Burn tar against the bad air", "ai": 2, "effects": [{ "people": -0.015 }] }
+      ]
+    },
+    "newspaper": {
+      "weight": 1, "needs": "capital", "from": 1780,
+      "title": "A newspaper attacks your ministers",
+      "text": "A newspaper at {province} prints, week after week, that your ministers are fools and thieves. It sells very well.",
+      "options": [
+        { "id": "buy", "name": "Buy the editor", "ai": 2, "effects": [{ "gold": -15 }] },
+        { "id": "close", "name": "Close the paper", "ai": 1, "effects": [{ "loyalty": "slighted_at_court", "who": "least_loyal_lords", "count": 1 }] },
+        { "id": "let", "name": "Let it print", "ai": 1, "effects": [] }
+      ]
+    },
+    "caravan_raided": {
+      "weight": 2, "needs": "province", "where": ["middle_east", "north_africa", "central_asia", "sahel"],
+      "title": "A caravan raided near {province}",
+      "text": "Raiders fell on a caravan a day's ride from {province}, and the merchants want to know what you will do.",
+      "options": [
+        { "id": "escort", "name": "Give the caravans an escort", "ai": 2, "effects": [{ "gold": -15 }, { "people": 0.01 }] },
+        { "id": "pay", "name": "Pay the tribes to keep the peace", "ai": 1, "effects": [{ "gold": -10 }] },
+        { "id": "ignore", "name": "The desert is the desert", "ai": 1, "effects": [{ "people": -0.015 }] }
+      ]
+    },
+    "qanat": {
+      "weight": 1, "needs": "province", "where": ["persia", "middle_east", "central_asia", "north_africa"],
+      "title": "The water channels at {province} fail",
+      "text": "The underground channels that bring water to the fields of {province} have caved in, and the wells are falling.",
+      "options": [
+        { "id": "repair", "name": "Send diggers to repair them", "ai": 2, "effects": [{ "gold": -20 }] },
+        { "id": "leave", "name": "Leave it to the villages", "ai": 1, "effects": [{ "food": -1 }, { "people": -0.01 }] }
+      ]
+    },
+    "locusts": {
+      "weight": 1, "needs": "store", "loss": 0.3, "where": ["middle_east", "north_africa", "sub_saharan_africa", "south_asia"],
+      "title": "Locusts at {province}",
+      "text": "A cloud of locusts darkened the sky over {province} for a day. When it lifted, {loss} months of grain were gone from the fields and stores.",
+      "options": [
+        { "id": "buy", "name": "Buy grain from merchants", "ai": 2, "effects": [{ "gold": -15 }, { "food_back": 0.5 }] },
+        { "id": "bear", "name": "Bear the loss", "ai": 2, "effects": [] }
+      ]
+    },
+    "endowment": {
+      "weight": 1, "needs": "province", "where": ["middle_east", "north_africa", "south_asia", "central_asia"],
+      "title": "An endowment at {province}",
+      "text": "A rich merchant of {province} wishes to leave his shops to a school and a fountain for ever, free of tax.",
+      "options": [
+        { "id": "approve", "name": "Approve the endowment", "ai": 2, "effects": [{ "people": 0.01 }] },
+        { "id": "tax", "name": "Insist the shops pay tax", "ai": 1, "effects": [{ "gold": 15 }] }
+      ]
+    },
+    "gold_traders": {
+      "weight": 2, "needs": "province", "where": ["west_africa", "sahel"],
+      "title": "Gold traders at {province}",
+      "text": "Traders from the north have come to {province} with salt and cloth, seeking gold dust.",
+      "options": [
+        { "id": "welcome", "name": "Welcome them", "ai": 2, "effects": [{ "gold": 10 }, { "people": 0.01 }] },
+        { "id": "tax", "name": "Tax them heavily", "ai": 1, "effects": [{ "gold": 25 }, { "people": -0.01 }] }
+      ]
+    },
+    "cattle_raid": {
+      "weight": 2, "needs": "province", "where": ["east_africa", "southern_africa", "sahel", "central_africa"],
+      "title": "Cattle raided at {province}",
+      "text": "Raiders from beyond the border have driven off the herds of {province}. The young men want to go after them.",
+      "options": [
+        { "id": "raid", "name": "Send the young men", "ai": 2, "effects": [{ "recruits": -0.1 }, { "food": 0.5 }] },
+        { "id": "repay", "name": "Give the herders cattle of your own", "ai": 1, "effects": [{ "gold": -10 }] },
+        { "id": "let", "name": "Let it go", "ai": 1, "effects": [{ "food": -1 }] }
+      ]
+    },
+    "rains_late": {
+      "weight": 1, "needs": "province", "where": ["sub_saharan_africa", "south_asia", "southeast_asia", "andes", "mesoamerica"],
+      "title": "The rains are late at {province}",
+      "text": "The rains have not come to {province}, and the sown fields are turning to dust. The priests ask for offerings.",
+      "options": [
+        { "id": "offer", "name": "Make great offerings", "ai": 2, "effects": [{ "gold": -10 }, { "loyalty": "want_granted", "who": "least_loyal_lords", "count": 1 }, { "food": -0.5 }] },
+        { "id": "grain", "name": "Send grain from your stores", "ai": 1, "effects": [{ "gold": -15 }] },
+        { "id": "wait", "name": "Wait for the rain", "ai": 1, "effects": [{ "food": -1 }] }
+      ]
+    },
+    "monsoon_fails": {
+      "weight": 1, "needs": "store", "loss": 0.4, "where": ["south_asia", "southeast_asia"],
+      "title": "The monsoon fails at {province}",
+      "text": "The monsoon has failed at {province}. The rice withers in dry paddies, and {loss} months of grain are already eaten.",
+      "options": [
+        { "id": "buy", "name": "Buy rice from merchants", "ai": 2, "effects": [{ "gold": -20 }, { "food_back": 0.5 }] },
+        { "id": "requisition", "name": "Take grain from {lord2}'s barns", "needs": "lord2", "ai": 1, "effects": [{ "food_back": 0.5 }, { "loyalty": "grain_requisitioned", "who": "lord2" }] },
+        { "id": "bear", "name": "Bear the loss", "ai": 2, "effects": [] }
+      ]
+    },
+    "temple_festival": {
+      "weight": 1, "needs": "province", "where": ["south_asia", "southeast_asia", "east_asia"],
+      "title": "A festival at {province}",
+      "text": "The great temple festival at {province} draws crowds from far away. The priests ask the crown to pay for the procession.",
+      "options": [
+        { "id": "fund", "name": "Pay for a splendid procession", "ai": 2, "effects": [{ "gold": -15 }, { "loyalty": "gift_of_gold", "who": "least_loyal_lords", "count": 2 }] },
+        { "id": "modest", "name": "Send your blessings", "ai": 2, "effects": [] }
+      ]
+    },
+    "revenue_survey": {
+      "weight": 1, "needs": "province", "where": ["south_asia", "east_asia"], "from": 1500,
+      "title": "A survey of {province}",
+      "text": "Your revenue clerks say the land registers of {province} are a generation out of date, and much land pays nothing.",
+      "options": [
+        { "id": "survey", "name": "Survey every field", "ai": 2, "effects": [{ "gold": -20 }, { "people": 0.015 }, { "loyalty": "heavy_taxes", "who": "lord2" }] },
+        { "id": "leave", "name": "Leave the old registers", "ai": 1, "effects": [] }
+      ]
+    },
+    "river_dykes": {
+      "weight": 1, "needs": "province", "where": ["china"],
+      "title": "The dykes at {province} weaken",
+      "text": "The river officials report that the dykes at {province} are rotten, and the next flood may break through.",
+      "options": [
+        { "id": "repair", "name": "Call out labour to repair them", "ai": 2, "effects": [{ "gold": -25 }] },
+        { "id": "wait", "name": "Hope the river stays low", "ai": 1, "effects": [{ "people": -0.01 }, { "food": -1 }] }
+      ]
+    },
+    "exam_scandal": {
+      "weight": 1, "needs": "official", "where": ["china", "korea", "east_asia"], "to": 1905,
+      "title": "Cheating at the examinations",
+      "text": "Candidates at {province} were found with answers sewn into their sleeves, and your {type}, {official}, is said to have sold the questions.",
+      "options": [
+        { "id": "punish", "name": "Dismiss {official}", "ai": 2, "effects": [{ "official": "new" }] },
+        { "id": "retake", "name": "Hold the examinations again", "ai": 1, "effects": [{ "gold": -10 }] },
+        { "id": "hush", "name": "Hush it up", "ai": 1, "effects": [{ "people": -0.01 }] }
+      ]
+    },
+    "pirates": {
+      "weight": 1, "needs": "coastal", "where": ["east_asia", "southeast_asia", "north_africa", "caribbean", "europe"], "to": 1850,
+      "title": "Pirates off {province}",
+      "text": "Pirates have burned fishing boats off {province} and carried away the crews to sell.",
+      "options": [
+        { "id": "garrison", "name": "Garrison the coast", "ai": 2, "effects": [{ "gold": -15 }, { "recruits": -0.05 }] },
+        { "id": "pay", "name": "Pay them to sail elsewhere", "ai": 1, "effects": [{ "gold": -10 }] },
+        { "id": "ignore", "name": "The sea is wide", "ai": 1, "effects": [{ "people": -0.02 }] }
+      ]
+    },
+    "tea_master": {
+      "weight": 1, "needs": "capital", "where": ["japan", "korea", "china"], "from": 1450,
+      "title": "A tea master at {province}",
+      "text": "A famous master of tea and poetry has come to {province}. Your lords would give much to sit at his gatherings.",
+      "options": [
+        { "id": "patron", "name": "Become his patron", "ai": 2, "effects": [{ "gold": -15 }, { "loyalty": "gift_of_gold", "who": "least_loyal_lords", "count": 2 }] },
+        { "id": "polite", "name": "Receive him politely", "ai": 1, "effects": [] }
+      ]
+    },
+    "spice_merchants": {
+      "weight": 2, "needs": "coastal", "where": ["southeast_asia", "south_asia", "east_africa"],
+      "title": "Spice ships at {province}",
+      "text": "Ships heavy with pepper and cloves have put in at {province}, and their captains ask what dues they must pay.",
+      "options": [
+        { "id": "low", "name": "Light dues, to bring more ships", "ai": 2, "effects": [{ "people": 0.015 }] },
+        { "id": "high", "name": "Heavy dues", "ai": 1, "effects": [{ "gold": 20 }] }
+      ]
+    },
+    "ball_game": {
+      "weight": 1, "needs": "lord", "where": ["mesoamerica", "central_america", "caribbean"], "to": 1550,
+      "title": "The great ball game",
+      "text": "{lord} challenges your court's team to the ball game, with feathers, jade and honour wagered on it.",
+      "options": [
+        { "id": "host", "name": "Host it at your court", "ai": 2, "effects": [{ "gold": -10 }, { "loyalty": "gift_of_gold", "who": "lord" }] },
+        { "id": "decline", "name": "Decline", "ai": 1, "effects": [{ "loyalty": "slighted_at_court", "who": "lord" }] }
+      ]
+    },
+    "maize_blight": {
+      "weight": 1, "needs": "store", "loss": 0.3, "where": ["americas"],
+      "title": "Blight in the maize at {province}",
+      "text": "A blight has blackened the maize at {province}, and {loss} months of grain have rotted on the cob.",
+      "options": [
+        { "id": "buy", "name": "Buy grain from elsewhere", "ai": 2, "effects": [{ "gold": -15 }, { "food_back": 0.5 }] },
+        { "id": "bear", "name": "Bear the loss", "ai": 2, "effects": [] }
+      ]
+    },
+    "voyagers": {
+      "weight": 1, "needs": "coastal", "where": ["oceania", "southeast_asia"],
+      "title": "Voyagers at {province}",
+      "text": "Great canoes have come in to {province} from islands far away, bringing new plants and stories.",
+      "options": [
+        { "id": "feast", "name": "Feast them and trade", "ai": 2, "effects": [{ "gold": -10 }, { "people": 0.015 }] },
+        { "id": "watch", "name": "Watch them warily", "ai": 1, "effects": [] }
+      ]
+    },
+    "horse_fair": {
+      "weight": 1, "needs": "province", "where": ["central_asia", "eastern_europe", "russia", "persia"],
+      "title": "A horse fair at {province}",
+      "text": "Herders from the steppe have brought thousands of horses to sell at {province}.",
+      "options": [
+        { "id": "buy", "name": "Buy remounts for your riders", "ai": 2, "effects": [{ "gold": -15 }, { "recruits": 0.1 }] },
+        { "id": "tax", "name": "Tax the sales", "ai": 1, "effects": [{ "gold": 10 }] }
+      ]
+    },
+    "hard_winter": {
+      "weight": 1, "needs": "province", "where": ["central_asia", "siberia", "russia", "eastern_europe", "denmark"],
+      "title": "A hard winter at {province}",
+      "text": "Ice and deep snow have lain on {province} since autumn. Animals die in the byres, and the fodder is nearly gone.",
+      "options": [
+        { "id": "fodder", "name": "Send fodder and grain", "ai": 2, "effects": [{ "gold": -15 }] },
+        { "id": "slaughter", "name": "Slaughter the weak animals", "ai": 1, "effects": [{ "food": 0.5 }, { "people": -0.01 }] },
+        { "id": "endure", "name": "Endure", "ai": 1, "effects": [{ "food": -1 }, { "people": -0.005 }] }
+      ]
+    },
+    "fur_tribute": {
+      "weight": 1, "needs": "province", "where": ["russia", "siberia", "north_america"], "from": 1450,
+      "title": "Furs from {province}",
+      "text": "Trappers bring sable and fox to {province}, more than any year before. The merchants want to buy the whole lot.",
+      "options": [
+        { "id": "crown", "name": "Take the best for the crown", "ai": 2, "effects": [{ "gold": 15 }] },
+        { "id": "free", "name": "Let the merchants trade freely", "ai": 1, "effects": [{ "people": 0.015 }] }
+      ]
+    }
+  }
+}

@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
-import nations from "../../../../packages/rules/data/world/nations.json" with { type: "json" };
-import sleeping from "../../../../packages/rules/data/world/sleeping-realms.json" with { type: "json" };
+import nations from "../../../../packages/rules/data/scenarios/1444/world/nations.json" with { type: "json" };
+import sleeping from "../../../../packages/rules/data/scenarios/1444/world/sleeping-realms.json" with { type: "json" };
 import { FLAG_H, FLAG_W, flagGrid } from "./flags.ts";
 import { NATION_FLAGS } from "./nationFlags.ts";
 
