@@ -40,7 +40,10 @@ final class AppleIdTokens
         $claims = $this->verifier->verify($token, self::KEYS, [self::ISSUER], $this->clientIds, $nonce);
 
         // Apple puts no name in the token; the game passes the one Apple gives it on the first sign-in.
-        return new StoreIdentity(Identity::APPLE, $claims['sub']);
+        // The client id the token was for: Apple's refresh token is taken and revoked under it (SAVE-203).
+        $clientId = array_values(array_intersect((array) ($claims['aud'] ?? []), $this->clientIds))[0] ?? null;
+
+        return new StoreIdentity(Identity::APPLE, $claims['sub'], clientId: $clientId);
     }
 
     /** @return list<string> */
