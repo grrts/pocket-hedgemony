@@ -81,4 +81,4 @@ The game sets `obfuscatedAccountId` on the purchase to the `accountTag` from `GE
 | `GOOGLE_PLAY_PRODUCT_ID` | Google Play | `full_game` (the default) |
 | `GOOGLE_PUBSUB_PUSH_TOKEN` | Google Play | the push URL's secret |
 
-After deploying, update the database for the new `entitlement` table: `php bin/console doctrine:schema:update --force`.
+The `entitlement` table comes with the database migrations ([deploy.md](deploy.md)).
