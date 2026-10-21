@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Account\AccountCombiner;
+use App\Account\AccountDeletion;
+use App\Account\AppleTokens;
 use App\Account\CombineTokens;
 use App\Account\IdToken\AppleIdTokens;
 use App\Account\IdToken\GoogleIdTokens;
@@ -38,7 +40,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  * Signing the game in (domain/saves/spec.md SAVE-057, SAVE-112 … SAVE-118, SAVE-149 … SAVE-154):
  * with email and password, a Steam ticket, a Steam browser code, an Apple identity token or a
  * Google ID token; refreshing the tokens, the account's sign-ins and devices, signing a device out, and
- * combining two accounts and removing a sign-in (SAVE-186 … SAVE-193).
+ * combining two accounts and removing a sign-in (SAVE-186 … SAVE-193), and deleting the account
+ * (SAVE-198 … SAVE-202).
  */
 final class SessionController
 {
@@ -80,6 +83,8 @@ final class SessionController
         private readonly RateLimiterFactoryInterface $apiSignInLimiter,
         private readonly AccountCombiner $combiner,
         private readonly CombineTokens $combineTokens,
+        private readonly AccountDeletion $deletion,
+        private readonly AppleTokens $appleTokens,
     ) {
     }
 
@@ -143,11 +148,12 @@ final class SessionController
                 // The account is named with the name the store gives (Google), else the one the game passes (Steam, Apple).
                 $account = new Account(null, self::displayNameOr($who->name ?? $data['displayName'] ?? null));
                 $this->em->persist($account);
-                $this->em->persist(new Identity($account, $who->provider, $who->subject, $this->clock->now()));
+                $this->em->persist($identity = new Identity($account, $who->provider, $who->subject, $this->clock->now()));
                 $created = true;
             } else {
                 $account = $identity->getAccount();
             }
+            $this->keepAppleToken($identity, $who, $data);
         } else {
             $email = mb_strtolower(trim($data['email']));
             $limiter = $this->apiSignInLimiter->create($email.'|'.($request->getClientIp() ?? 'unknown'));
@@ -221,14 +227,19 @@ final class SessionController
             }
             $existing = $this->identities->findOneBy(['provider' => $who->provider, 'subject' => $who->subject]);
             if (null !== $existing) {
-                return $existing->getAccount() === $account
-                    ? new JsonResponse(['signIns' => $this->signIns($account)])
-                    : $this->offer($account, $existing->getAccount(), $who->provider);
+                if ($existing->getAccount() !== $account) {
+                    return $this->offer($account, $existing->getAccount(), $who->provider);
+                }
+                $this->keepAppleToken($existing, $who, $data);
+                $this->em->flush();
+
+                return new JsonResponse(['signIns' => $this->signIns($account)]);
             }
             if (null !== $this->identities->findOneBy(['account' => $account, 'provider' => $who->provider])) {
                 return new JsonResponse(['error' => 'already_has_'.$who->provider], Response::HTTP_CONFLICT);
             }
-            $this->em->persist(new Identity($account, $who->provider, $who->subject, $this->clock->now()));
+            $this->em->persist($identity = new Identity($account, $who->provider, $who->subject, $this->clock->now()));
+            $this->keepAppleToken($identity, $who, $data);
         } else {
             $constraint = Registration::constraint();
             unset($constraint->fields['displayName']);
@@ -304,11 +315,27 @@ final class SessionController
         if ('email' === $provider) {
             $account->removeEmail();
         } else {
-            $this->em->remove($this->identities->findOneBy(['account' => $account, 'provider' => $provider]));
+            $identity = $this->identities->findOneBy(['account' => $account, 'provider' => $provider]);
+            // Apple asks that a sign-in the game lets go of is revoked with it (SAVE-204).
+            $this->appleTokens->revoke($identity);
+            $this->em->remove($identity);
         }
         $this->em->flush();
 
         return new JsonResponse(['signIns' => $this->signIns($account)]);
+    }
+
+    /**
+     * Deletes the account the device is signed in to (SAVE-198): its saves, shared saves, sign-ins and
+     * devices go; its purchase records stay without it, its posts under "Deleted player".
+     */
+    #[Route('/api/account', name: 'account_delete', methods: ['DELETE'])]
+    #[IsGranted('ROLE_PLAYER')]
+    public function delete(#[CurrentUser] Account $account): Response
+    {
+        $this->deletion->delete($account);
+
+        return new Response(status: Response::HTTP_NO_CONTENT);
     }
 
     /** Signs a device out, this one or another of the account's (SAVE-116). */
@@ -323,6 +350,22 @@ final class SessionController
         $this->tokens->signOut($device);
 
         return new Response(status: Response::HTTP_NO_CONTENT);
+    }
+
+    /**
+     * Sign in with Apple: Apple's refresh token, from the authorization code the game sends with the
+     * identity token, kept so deleting the account can revoke it (SAVE-203). A failed exchange changes nothing.
+     */
+    private function keepAppleToken(Identity $identity, StoreIdentity $who, array $data): void
+    {
+        $code = $data['appleAuthorizationCode'] ?? null;
+        if (Identity::APPLE !== $who->provider || !\is_string($code) || '' === $code || null === $who->clientId) {
+            return;
+        }
+        $token = $this->appleTokens->exchange($code, $who->clientId);
+        if (null !== $token) {
+            $identity->keepAppleToken($token, $who->clientId);
+        }
     }
 
     /** The store sign-in a request carries, by its proof's field, or null for email and password. */
@@ -343,7 +386,8 @@ final class SessionController
         $text = [new Assert\NotBlank(), new Assert\Type('string'), new Assert\Length(max: 8192)];
 
         return match ($proof) {
-            'appleIdentityToken', 'googleIdToken' => [$proof => $text, 'nonce' => [new Assert\NotBlank(), new Assert\Type('string'), new Assert\Length(max: 200)]],
+            'appleIdentityToken' => [$proof => $text, 'nonce' => [new Assert\NotBlank(), new Assert\Type('string'), new Assert\Length(max: 200)], 'appleAuthorizationCode' => new Assert\Optional([new Assert\Type('string'), new Assert\Length(max: 2048)])],
+            'googleIdToken' => [$proof => $text, 'nonce' => [new Assert\NotBlank(), new Assert\Type('string'), new Assert\Length(max: 200)]],
             default => [$proof => $text],
         };
     }

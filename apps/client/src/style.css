@@ -5651,6 +5651,38 @@ button.link {
   min-height: 44px;
 }
 
+/* Delete account (SAVE-205, SAVE-208): set apart below Sign out so neither is tapped for the other; the
+   question sits in the card's one column, Delete account full width and 48 points high, Keep 44. */
+.cloud-delete-ask {
+  margin-top: 24px;
+  min-height: 44px;
+}
+
+.cloud-delete {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 24px;
+  padding: 8px;
+  border: 3px solid var(--cloth);
+  background: var(--paper-light);
+}
+
+.cloud-delete p {
+  margin: 0;
+}
+
+.cloud-delete-yes {
+  width: 100%;
+  min-height: 48px;
+  font-weight: 600;
+}
+
+.cloud-delete-no {
+  width: 100%;
+  min-height: 44px;
+}
+
 .cloud-invite {
   flex: none;
   margin-top: 6px;

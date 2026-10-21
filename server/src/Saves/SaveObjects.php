@@ -4,8 +4,9 @@ namespace App\Saves;
 
 /**
  * Where save bytes live, never in the database (SAVE-061): keys are
- * `<accountId>/<campaignId>/<saveId>.phsave`. Development and tests use a folder on disk;
- * the hosted server will put the same keys in S3-compatible storage.
+ * `<accountId>/<campaignId>/<saveId>.phsave`. Development and tests use a folder on disk
+ * (FolderSaveObjects); the hosted server puts the same keys in S3-compatible storage
+ * (S3SaveObjects). SaveObjectsFactory picks one from the settings (docs/deploy.md).
  */
 interface SaveObjects
 {
