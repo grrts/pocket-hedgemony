@@ -16,6 +16,7 @@ const C = config.chronicle;
 export interface TurningPoint {
   key: string;
   name: string;
+  /** ISO date, or "c. 1438" when history gives only a rough year. */
   date: string;
   /** The tree event, when its id is not the key. */
   event?: string;
@@ -77,11 +78,12 @@ export function chronicleView(world: World): ChronicleView {
   for (const g of goals?.list ?? []) for (const k of goals!.defs[g.def]!.toward ?? []) toward.set(k, [...(toward.get(k) ?? []), g]);
   for (const t of TURNING_POINTS) {
     // What happened before the start is the start itself, not the campaign's history.
-    if (t.date < startDate) continue;
+    const date = t.date.replace(/^c\.\s*/, "");
+    if (date < startDate) continue;
     const id = treeEventOf(world, t);
     if (!id) continue;
     const def = ev.events[id]!;
-    const hist = Number(t.date.slice(0, 4));
+    const hist = Number(date.slice(0, 4));
     const leading = toward.get(t.key) ?? [];
     const heading = leading.filter((g) => isLive(g) && !world.nationGone[g.realm]).map((g) => ({ realm: g.realm, goal: g.def }));
     const fired = ev.world.history.find((o) => o.event === id);
