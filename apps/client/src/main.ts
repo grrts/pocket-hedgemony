@@ -5278,6 +5278,9 @@ function realmLords(r: number): string {
 
 /** Sort orders of the Provinces overview. */
 let provinceSort: "trouble" | "people" | "food" | "tax" | "short" | "sick" = "trouble";
+/** The Provinces page shows the first few rows and every one that needs the player; the rest behind All (SHELL-172). */
+let provincesAll = false;
+const PROVINCES_SHOWN = 8;
 
 /**
  * The realm's provinces at a glance (milestone 3 overview, richer for
@@ -5319,7 +5322,11 @@ function provincesTab(r: number): string {
   const color = nations[r]!.color;
   // Short of food (feedback 86): only the provinces whose land feeds under all their people in a normal year; the counts above stay the realm's.
   const shown = provinceSort === "short" ? list.filter((p) => landShare(p) < 1) : provinceSort === "sick" ? list.filter((p) => s.provincePlague[p]! > 0 || s.provinceQuarantine[p]) : list;
+  // A province needs the player when it is held by rebels, rioting or plotting, hungry, or royal with no official.
+  const needs = (p: number) => s.provinceRebels[p]! > 0 || s.provinceMood[p]! >= 2 || s.provinceFoodMonths[p]! < 1 || (s.provinceLord[p]! < 0 && !s.provinceOfficial[p]);
+  const limit = provincesAll ? shown.length : Math.max(PROVINCES_SHOWN, shown.filter(needs).length);
   const rows = shown
+    .slice(0, limit)
     .map((p) => {
       const months = s.provinceFoodMonths[p]!;
       const l = s.provinceLord[p]!;
@@ -5345,7 +5352,8 @@ function provincesTab(r: number): string {
     <nav class="tabs small">${sortButton("trouble", "Trouble first")}${sortButton("people", "Most people")}${sortButton("food", "Least food")}${sortButton("tax", "Most tax")}${sortButton("short", "Short of food")}${sortButton("sick", sickList.length ? `Sick (${sickList.length})` : "Sick")}</nav>
     ${provinceSort === "short" && !shown.length ? `<p class="hint">Every province's land feeds its people in a normal year.</p>` : ""}
     ${provinceSort === "sick" && !shown.length ? `<p class="hint">No plague in your land, and no province closed.</p>` : ""}
-    <div class="province-list">${rows}</div>`;
+    <div class="province-list">${rows}</div>
+    ${shown.length > PROVINCES_SHOWN && (provincesAll || shown.length > limit) ? `<button class="paper more" data-provinces-all>${provincesAll ? "Fewer provinces" : `All ${shown.length} provinces`}</button>` : ""}`;
 }
 
 /** Order of plague steps by how bad they are: outbreak, rumour, burning out, none. */
@@ -5400,6 +5408,10 @@ function bindLords(): void {
       renderPanel();
     }),
   );
+  panel.querySelector<HTMLButtonElement>("[data-provinces-all]")?.addEventListener("click", () => {
+    provincesAll = !provincesAll;
+    renderPanel();
+  });
   panel.querySelectorAll<HTMLElement>("[data-open-province]").forEach((row) => row.addEventListener("click", () => goToProvince(Number(row.dataset.openProvince), false)));
   panel.querySelectorAll<HTMLElement>("[data-open-land]").forEach((row) =>
     row.addEventListener("click", () => {
