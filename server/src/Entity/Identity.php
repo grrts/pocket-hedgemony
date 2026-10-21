@@ -38,6 +38,14 @@ class Identity
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private \DateTimeImmutable $createdAt;
 
+    /** Sign in with Apple only: Apple's refresh token, kept so it can be revoked (SAVE-203, SAVE-204). */
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $appleRefreshToken = null;
+
+    /** The client id Apple issued that token to: the app's bundle id or the website's Services ID. */
+    #[ORM\Column(length: 191, nullable: true)]
+    private ?string $appleClientId = null;
+
     public function __construct(Account $account, string $provider, string $subject, \DateTimeImmutable $now)
     {
         $this->account = $account;
@@ -69,5 +77,21 @@ class Identity
     public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
+    }
+
+    public function getAppleRefreshToken(): ?string
+    {
+        return $this->appleRefreshToken;
+    }
+
+    public function getAppleClientId(): ?string
+    {
+        return $this->appleClientId;
+    }
+
+    public function keepAppleToken(string $refreshToken, string $clientId): void
+    {
+        $this->appleRefreshToken = $refreshToken;
+        $this->appleClientId = $clientId;
     }
 }

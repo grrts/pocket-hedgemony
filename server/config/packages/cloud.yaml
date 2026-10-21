@@ -20,6 +20,11 @@ parameters:
     env(STEAM_APP_ID): ''
     # Without these the sign-in answers "… is not available" (SAVE-154).
     env(APPLE_CLIENT_IDS): ''
+    # Sign in with Apple's key, for taking and revoking Apple's refresh token (SAVE-203, SAVE-204); off while empty.
+    env(APPLE_TEAM_ID): ''
+    env(APPLE_SIGN_IN_KEY_ID): ''
+    env(APPLE_SIGN_IN_KEY): ''
+    env(APPLE_SIGN_IN_REDIRECT_URI): ''
     env(GOOGLE_CLIENT_IDS): ''
     env(SIGN_IN_RETURN_URLS): ''
     # Purchases (purchases in saves.json; domain/saves SAVE-170 … SAVE-178, docs/purchases.md). A store
@@ -35,6 +40,15 @@ parameters:
     env(GOOGLE_PLAY_PRODUCT_ID): 'full_game'
     env(GOOGLE_PUBSUB_PUSH_TOKEN): ''
     env(SAVES_DIR): '%kernel.project_dir%/var/saves/%kernel.environment%'
+    # S3-compatible storage for save bytes (docs/deploy.md); empty S3_BUCKET keeps them in SAVES_DIR.
+    env(S3_BUCKET): ''
+    env(S3_PREFIX): ''
+    env(S3_REGION): ''
+    env(S3_ENDPOINT): ''
+    env(S3_ACCESS_KEY_ID): ''
+    env(S3_SECRET_ACCESS_KEY): ''
+    env(S3_PATH_STYLE): '0'
+    env(TRUSTED_PROXIES): ''
 
 framework:
     rate_limiter:

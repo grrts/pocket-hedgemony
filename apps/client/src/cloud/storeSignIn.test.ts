@@ -28,7 +28,7 @@ function fakeBridge(can: Store[] = ["apple", "google", "steam"], steam: SignInBr
     can: (s) => can.includes(s),
     apple: async (hash) => {
       asked.apple.push(hash);
-      return { identityToken: "apple.jwt", name: "Bertrand" };
+      return { identityToken: "apple.jwt", authorizationCode: "apple.code", name: "Bertrand" };
     },
     google: async (hash) => {
       asked.google.push(hash);
@@ -91,7 +91,8 @@ describe("Sign in with Apple and Google (SAVE-149, SAVE-150)", () => {
     const { store, calls, api } = setup("ios", bridge);
     expect(await store.signIn("apple")).toBe(true);
     const sent = calls.find((c) => c.path === "/api/sessions")!.body;
-    expect(sent).toMatchObject({ appleIdentityToken: "apple.jwt", displayName: "Bertrand", device: { name: "iPhone", platform: "ios" } });
+    // Apple's authorization code goes with it, so the server can revoke the sign-in later (SAVE-203).
+    expect(sent).toMatchObject({ appleIdentityToken: "apple.jwt", appleAuthorizationCode: "apple.code", displayName: "Bertrand", device: { name: "iPhone", platform: "ios" } });
     expect(sent.nonce).toMatch(/^[0-9a-f]{64}$/);
     expect(asked.apple).toEqual([sha256(sent.nonce as string)]);
     expect(api.signedIn).toBe(true);
