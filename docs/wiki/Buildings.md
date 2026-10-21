@@ -466,6 +466,8 @@ Costs and months are already multiplied by the ground. A grey row says what is m
 
 ## Numbers
 
+Every value the game uses, made from its config so it always matches the game: [Buildings data](Data-Buildings). How they combine: [Formulas](Formulas).
+
 Everything lives in one buildings config file, and every value is a placeholder.
 
 | Value | Config key | Design value |

@@ -50,6 +50,12 @@ The treasury keeps a **ledger** for the month: Tax and Trade coming in, Army pay
 
 Lenders let you owe up to **one year's tax and trade**. A loan costs at once: the gold you borrow **plus 10 % interest** goes onto your debt the moment you take it, and the debt keeps costing **10 % a year** while you owe it. Borrowing also makes the crown look weak: **every lord falls a step in loyalty**, at most once a year. You can repay any part at any time.
 
+**Default.** If you owe lenders, your gold stays below zero and they will give no more for three months in a row, the crown defaults: what you owe is gone and your gold is set to nothing, but every lord falls two steps in loyalty (none below Disloyal), your treasury pillar reads Troubled for two years and lenders refuse you for five. You are warned in the news each month before, and the Treasury tab says how many months are left. AI realms default by the same rule.
+
+**New land.** For ten years after you take a province from another realm, by a peace or a demand, it holds the *Newly taken* grievance and costs half its tax again in garrisons and clerks, on the ledger's *Holding new land* line. Taken land with a foreign language and the wrong faith riots until it settles.
+
+**Far from the throne.** Royal land more than 30 days from your capital sends less tax and recruits; see [Provinces](Provinces). Granting it to a lord avoids the cut.
+
 AI realms tax at normal in peace and heavy at war, borrow only when their gold falls below zero, and repay once they hold a year's army pay and wages.
 
 Where to find it: the gold plaque at the top of the screen shows your gold and change a month; tap it for the **Treasury** tab of your country card: your purse with how long the gold lasts, the month's gold in and out as bars, the realm tax default, and your debt as a meter against what lenders allow, with Borrow buttons that say what you will owe before you tap. To tax one province differently, open it: its Overview tab has a Tax line and a row of rate buttons, from *Realm default* to *Crushing*.
@@ -76,7 +82,7 @@ A province outside every castle's reach lives on its own harvest.
 
 ### The Food policy screen
 
-One **Food policy** sets realm-wide defaults on the realm's **Food** tab, and a castle can have its own collection and siege reserve. Set those on the castle's own province, under **Castle food** on its Overview; tapping a castle on the Food tab takes you there, and **Realm** puts it back on the realm's setting. The Food page shows how many provinces are hungry or running low and the presets; the five settings sit in a **Customise** fold whose line reads your current choices, and the castles in a **Castles** fold that opens by itself while one is besieged or its roads are cut.
+One **Food policy** sets realm-wide defaults on the realm's **Food** tab, and a castle can have its own collection and siege reserve. Set those on the castle's own province, under **Castle food** on its Overview; tapping a castle on the Food tab takes you there, and **Realm** puts it back on the realm's setting. The Food page shows how many provinces are hungry, running low or short of food, then a **Short of food** list: your own provinces whose land doesn't feed their people in a normal year, worst first, each naming the fix (build a farm, improve it, clear woods) and opening its Land tab. People keep having children through hard years, so a short province shrinks by famine until you build. Then come the presets; the five settings sit in a **Customise** fold whose line reads your current choices, and the castles in a **Castles** fold that opens by itself while one is besieged or its roads are cut.
 
 | Setting | Options |
 |---|---|
@@ -174,7 +180,8 @@ The lord card is the same in every society; only the label changes: nobles, merc
 - **Marriage** can bring a foreign or local house in as a lord with its land.
 - When a lord dies with several sons, his lands pass by the realm's inheritance law, possibly split between them.
 - A disloyal lord across the border can **defect to you** with his land.
-- At the start, major countries have their historical great houses from the catalogue, and smaller countries a few generated lords sized to their realm.
+- At the start, some lords are **real people of history**: in 1378 John of Gaunt and Henry Percy in England, the Wolf of Badenoch in Scotland, Kęstutis and Vytautas in Lithuania, Gazi Evrenos among the Ottomans, Yi Seong-gye in Korea and about forty more, each on his own lands with his real title, traits, age and heir. Every other lord is generated, about one per 4 provinces, and never takes a historical lord's family name. A historical lord carries a small **History** tag on the Lords tab, and his screen says in one line who he was. History is where he starts, not a script: he ages and dies by the game's rules, and his heir keeps his title but not his story.
+- Some figures **come later**: Nuno Álvares Pereira, John Hunyadi, Jan Žižka, Zhu Di and a few others can arrive by event around the years they rose in history, if you still hold their home province. Welcome one and he becomes the lord there, taking the place of a generated lord (Skirgaila and Aleksandras Olelka take over from whoever holds the seat); refuse and you lose a little prestige.
 
 **How you lose lords:**
 
@@ -207,7 +214,7 @@ The words show on the country card's tabs, the Stability pillars, the Lords map 
 
 ### Stability
 
-Stability tells you at a glance how well your realm holds together. It is not a hidden number: it reads four pillars, and your realm is only as steady as the weakest of them.
+Stability tells you at a glance how well your realm holds together. It is not a hidden number: it reads five pillars, and your realm is only as steady as the weakest of them.
 
 | Pillar | What it reads | Steady | Uneasy | Troubled | Crumbling |
 |---|---|---|---|---|---|
@@ -215,10 +222,13 @@ Stability tells you at a glance how well your realm holds together. It is not a 
 | Subjects | Your subjects by loyalty (their standing at the start for now) | Half or more Loyal, none Disloyal | Fewer than half Loyal | Any Disloyal | Any In revolt |
 | Officials | Royal provinces whose official's post stands empty | None | Up to a quarter | Up to a half | More |
 | Provinces | Provinces rioting or plotting | None | Any rioting | Any plotting, or a tenth | A quarter |
+| Treasury | Your debts | Paying its way | Broke: a default is coming | For 2 years after a default | — |
+
+Low stability costs you. While **Troubled**, your provinces send 10 % less tax and recruits and plotting provinces rise half as often again; while **Crumbling**, 25 % less and twice as often. Steady and Uneasy cost nothing. The Stability section says what your step costs, and each province's Tax line names the cut.
 
 Officials matter twice: an empty post shows in the officials pillar, and the *Ungoverned* grievance it brings (and *Grasping officials* over the cap) pushes provinces toward riots. A judge holds riots off one grievance longer. Lords' own provinces are run by their own officials and do not count.
 
-The stability plaque in the top bar shows the step (amber when Uneasy, red when Troubled, blinking when Crumbling). Tap it to open your Realm book's Overview, where each pillar has a row; tap a row to open the Lords, Diplomacy, Officials or Provinces tab and mend it.
+The stability plaque in the top bar shows the step (amber when Uneasy, red when Troubled, blinking when Crumbling). Tap it to open your Realm book's Overview, where each pillar has a row; tap a row to open the Lords, Diplomacy, Officials, Provinces or Treasury tab and mend it.
 
 ### Army and navy at a glance
 
@@ -293,16 +303,20 @@ You win by **world domination** or by **leading one of three scores**, each buil
 
 | Score | Built from |
 |---|---|
-| **Economy** | Yearly income (taxes, lords' share, trade, tribute) plus the bank (gold minus debt) |
-| **Power** | Provinces held (subjects' provinces count half) plus army power (soldiers weighted by kind, warships, commanders) |
+| **Economy** | Yearly income (taxes, lords' share, trade, tribute) plus the bank (gold minus debt); gold in the bank counts only up to a year's income, debt counts in full |
+| **Power** | Provinces held (subjects' provinces count half) plus army power (soldiers weighted by kind, and warships); commanders add nothing |
 | **Technology** | Inventions known, each weighted by its era cost; nothing removes a known invention |
 
-- **World domination**: you and your subjects hold half of the world's settled land provinces (land with people) in the turn in which 1 January falls. Allies by marriage do not count.
-- **Score victory**: lead a score when the campaign's end date (default 31 August 1939) arrives. Leading earlier wins nothing, however wide the margin.
+- **World domination**: you and your subjects hold every settled land province of the world (land with people) in the turn in which 1 January falls. Allies by marriage do not count.
+- **Score victory**: lead a score's growth when the campaign's end date (default 31 August 1939) arrives. Leading earlier wins nothing, however wide the margin.
 
-Army power counts foot as 1, horse as 2, guns as 3, a warship as 100 men and a commander as 1,000, all over 1,000; the weights are provisional. Scores are worked out at the start and every January. A domination win happens at once and you may keep playing. At the end date the leader of each score wins, and ties share the win.
+**A fair score.** What is ranked and what wins is not a score on one day. Each score is the **average of your last 25 Januaries**, so a burst in the final year moves it little. It is judged as **growth against your own start**: the average divided by your score at the start of the campaign, shown as ×1.84. Brittany doubling its Power beats France standing still. So that a speck of a realm can't win by tripling almost nothing, every start is counted as at least the median start of all realms in that score.
 
-**Where you see it.** Every realm's General tab has a **Score** line: its Economy, Power and Technology with its rank in each. On your own card the line opens the **Score** tab: how each of your scores is made (income and bank; provinces and army power; inventions), your rank of how many realms still stand, and the five leading realms beside you. When the campaign ends the clock stops and the end card opens by itself (see [Screens and navigation](Screens-and-Navigation)).
+**Chapters.** Every 100 years a chapter closes, in the January turn of 1544, 1644, 1744 and 1844 (from a 1444 start). The chapter card opens by itself: how your realm grew over those hundred years in each score and its place, who led each, and the leading realms; then **Play on**. A chapter wins nothing, but it is a payoff on the way, and every chapter is a fresh race, measured from each realm's score when it began. The last chapter closes with the campaign, on the end card. Past chapters stay listed on the Score tab.
+
+Army power counts foot as 1, horse as 2, guns as 3 and a warship as 100 men, all over 1,000; the weights are provisional. Scores are worked out at the start and every January. A domination win happens at once and you may keep playing. At the end date the realm that has grown most in each score wins it, and ties (to two decimals) share the win.
+
+**Where you see it.** Every realm's General tab has a **Score** line: its growth in Economy, Power and Technology with its rank in each ("Economy ×1.84 · 3rd"). On your own card the line opens the **Score** tab: how each of your scores is made now (income and the bank as it counts; provinces and army power; inventions), its 25-year average against your start, your growth and rank this chapter, when the chapter closes, the five leading realms beside you, and the chapters closed so far, each opening its card again. When the campaign ends the clock stops and the end card opens by itself (see [Screens and navigation](Screens-and-Navigation)).
 
 ### Each month
 
@@ -351,6 +365,8 @@ Things you can do: set food policy, override a castle, apply a food preset; take
 
 ## Numbers
 
+Every value the game uses, made from its config so it always matches the game: [Realm data](Data-Realm). How they combine: [Formulas](Formulas).
+
 All realm numbers are placeholders, kept in one realm data file.
 
 | Value | Config key | Design value | Provisional? |
@@ -379,9 +395,11 @@ All realm numbers are placeholders, kept in one realm data file.
 | Lands taken window | `lands_taken.window_years` | 20 years | Yes |
 | Women in roles | `women_in_roles` | not given | Yes |
 | Age multipliers | `age_multipliers` | not given | Yes |
-| World domination | `win.domination_share` | 60 % | Yes |
-| Score lead | `win.score_margin` | 50 % | Yes |
-| Years leading | `win.score_years` | 25 | Yes |
+| World domination | `win.domination_share` | the whole world | No |
+| Bank counted | `win.bank_cap_years_income` | 1 year's income | Yes |
+| Januaries averaged | `win.average_years` | 25 | No |
+| Floor under a start | `win.start_floor_quantile` | the median start | Yes |
+| Chapter length | `win.chapter_years` | 100 years | No |
 | Subjects in Power | `win.subject_province_weight` | ½ | Yes |
 | End date | `campaign.end_date` | 31 August 1939 | No (decided) |
 

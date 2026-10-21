@@ -4,7 +4,7 @@ import { loadDefaultRuleset } from "@ph/rules";
 import { createWorld, processTurn, type World } from "../src/index.ts";
 import { restoreWorld, worldChunks } from "../src/domain/saves/world-chunks.ts";
 import { subjectPayments, subjectTies } from "../src/subjects.ts";
-import { demandableProvinces, giftGold, makeDemand, monthlyStatecraft, sendEnvoy, seatsOf, standingOf, statecraftView, whyNotDemand, whyNotEnvoy } from "../src/statecraft.ts";
+import { ENVOY_ACTIONS, demandableProvinces, giftGold, makeDemand, monthlyStatecraft, sendEnvoy, seatsOf, standingOf, statecraftView, whyNotDemand, whyNotEnvoy } from "../src/statecraft.ts";
 import * as dip from "../src/domain/diplomacy/index.ts";
 
 const rules = loadDefaultRuleset();
@@ -202,5 +202,30 @@ describe("statecraft (milestone 5)", () => {
     const back = restoreWorld(new Map(worldChunks(w, { playerNation: "castile", options: {} as never }).map((c) => [c.id, c])), rules, {}, tiles).world;
     expect(back.diplomacy.envoys.length).toBe(w.diplomacy.envoys.length);
     expect(back.diplomacy.graph.relations.length).toBe(w.diplomacy.graph.relations.length);
+  });
+
+  it("shows a word for how likely a yes is before sending, never the numbers, from the count as it stands this month (DIPL-229)", () => {
+    const w = createWorld(rules, 1, tiles);
+    const me = nation(w, "castile");
+    const them = nation(w, "aragon");
+    w.player = me;
+    const realm = statecraftView(w, me)!.realms[them]!;
+    const k = (a: string) => ENVOY_ACTIONS.indexOf(a as never);
+    // A visit and a gift always land, so they carry no hint.
+    expect(realm.hints[k("courtesy_visit")]).toBeNull();
+    expect(realm.hints[k("send_gift")]).toBeNull();
+    const total = dip.countAsk(w.diplomacy, { action: "propose_alliance", asker: "castile", asked: "aragon" }).total;
+    expect(realm.hints[k("propose_alliance")]).toBe(dip.askHint(total));
+    expect(dip.askHint(dip.config.answers.hint.likely_from)).toBe("Likely");
+    expect(dip.askHint(dip.config.answers.hint.unlikely_to)).toBe("Unlikely");
+    expect(dip.askHint(0)).toBe("Unsure");
+    // A mission that cannot be sent shows why, not a hint.
+    processTurn(w, [{ type: "sendEnvoy", target: them, action: "courtesy_visit" }], me);
+    expect(statecraftView(w, me)!.realms[them]!.hints.every((h) => h === null)).toBe(true);
+    // Much warmer feelings show next month, when the hints are counted again.
+    dip.addEntry(w.diplomacy, "aragon", "castile", { key: "test", name: "Old friends", weight: 400, fadeYears: 50 });
+    months(w, 2, me);
+    const after = statecraftView(w, me)!.realms[them]!;
+    expect(after.hints[k("propose_alliance")]).toBe("Likely");
   });
 });

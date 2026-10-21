@@ -131,6 +131,8 @@ On a phone in landscape the voyage bar sits between the overview button and End 
 
 ## Numbers
 
+Every value the game uses, made from its config so it always matches the game: [Exploration data](Data-Exploration). How they combine: [Formulas](Formulas).
+
 One exploration config file; only `exploration.unlock_age` is named by the design, the other keys are proposed. Everything except the age is **provisional** and still being balanced.
 
 | Key | Value |

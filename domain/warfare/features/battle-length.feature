@@ -6,7 +6,7 @@ Feature: Battle length: a contact day, bells by daylight, losses bell by bell
 
   # Config keys: warfare.battle.contact_days, warfare.battle.first_bell_hour, warfare.battle.bells_per_day,
   # warfare.battle.max_days, warfare.hits_per_bell, warfare.after.pursuit
-  # F-158 (Leroy, 19 Oct): battles passed in under a day and armies broke too fast.
+  # F-168 (Leroy, 19 Oct): battles passed in under a day and armies broke too fast.
 
   Background:
     Given Castile's army of 12000 men meets Portugal's army of 6000 men in a Castilian province

@@ -1,0 +1,6168 @@
+{
+  "$comment": "New ambitions for the realms of Central, East, South and Southeast Asia and the Americas (national-strengths spec 5.4), keyed by map realm id. Each ambition's goal is shown plainly with its progress; its legacy shows only its name until earned. requires: what must hold before the ambition can be drawn (a chain on an earlier ambition done, a campaign event, or fitness). Conditions name other realms by catalogue id. Wired into the engine elsewhere.",
+  "realms": {
+    "moghulistan": [
+      {
+        "id": "moghulistan_tarim_cities",
+        "name": "The Tarim cities",
+        "theme": "land",
+        "text": "Own nine-tenths of Altishahr.",
+        "historical": true,
+        "goal": {
+          "owns": {
+            "who": "this",
+            "where": "area:altishahr",
+            "min_share": 0.9
+          }
+        },
+        "legacy": {
+          "id": "moghulistan_kashgar_caravanserai",
+          "name": "Caravanserai of Kashgar",
+          "text": "Tax reaching the treasury +10 %, and new works cost 15 % less.",
+          "effects": [
+            {
+              "lever": "tax_reach_pct",
+              "value": 10
+            },
+            {
+              "lever": "building_cost_pct",
+              "value": -15
+            }
+          ]
+        }
+      },
+      {
+        "id": "moghulistan_ili_pastures",
+        "name": "Back to the Ili",
+        "theme": "land",
+        "text": "Own two-thirds of Dzungaria.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "moghulistan_tarim_cities",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "owns": {
+            "who": "this",
+            "where": "area:dzungaria",
+            "min_share": 0.67
+          }
+        },
+        "legacy": {
+          "id": "moghulistan_ili_herds",
+          "name": "Horses of the Ili",
+          "text": "Recruits refill 20 % faster, and herds grow 20 % faster.",
+          "effects": [
+            {
+              "lever": "recruit_refill_pct",
+              "value": 20
+            },
+            {
+              "lever": "herd_growth_pct",
+              "value": 20
+            }
+          ]
+        }
+      },
+      {
+        "id": "moghulistan_turfan",
+        "name": "Khan of Turfan",
+        "theme": "trade",
+        "text": "Hold Hami.",
+        "historical": true,
+        "goal": {
+          "holds_place": {
+            "who": "this",
+            "place": "Hami"
+          }
+        },
+        "legacy": {
+          "id": "moghulistan_jade_gate",
+          "name": "Toll of the Jade Gate",
+          "text": "Tax reaching the treasury +10 %, and gold at your toll points +20 %.",
+          "effects": [
+            {
+              "lever": "tax_reach_pct",
+              "value": 10
+            },
+            {
+              "lever": "toll_gold_pct",
+              "value": 20
+            }
+          ]
+        }
+      },
+      {
+        "id": "moghulistan_yunus_khan",
+        "name": "A khan who read Persian",
+        "theme": "learning",
+        "text": "Keep 3 schools and 4 more scholars than at the start.",
+        "historical": true,
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "schools",
+                "op": ">=",
+                "value": 3
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "scholars",
+                "op": ">=",
+                "value": "start+4"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "moghulistan_tashkent_scribes",
+          "name": "Scribes of Tashkent",
+          "text": "Officials' wages 15 % lower, and each scholar's research +10 %.",
+          "effects": [
+            {
+              "lever": "official_wage_pct",
+              "value": -15
+            },
+            {
+              "lever": "scholar_output_pct",
+              "value": 10
+            }
+          ]
+        }
+      },
+      {
+        "id": "moghulistan_chagatai_inheritance",
+        "name": "The Chagatai inheritance",
+        "theme": "crown",
+        "text": "Hold Samarkand.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "moghulistan_tarim_cities",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "owns": {
+            "who": "this",
+            "where": "province:samarkand"
+          }
+        },
+        "legacy": {
+          "id": "moghulistan_throne_of_chagatai",
+          "name": "Throne of Chagatai",
+          "text": "Tax reaching the treasury +12 %, recruits refill 15 % faster, and new works cost 20 % less.",
+          "effects": [
+            {
+              "lever": "tax_reach_pct",
+              "value": 12
+            },
+            {
+              "lever": "recruit_refill_pct",
+              "value": 15
+            },
+            {
+              "lever": "building_cost_pct",
+              "value": -20
+            }
+          ],
+          "great": true
+        }
+      }
+    ],
+    "oirat": [
+      {
+        "id": "oirat_four_tumens",
+        "name": "The Four Oirat",
+        "theme": "crown",
+        "text": "Own four-fifths of Dzungaria.",
+        "historical": true,
+        "goal": {
+          "owns": {
+            "who": "this",
+            "where": "area:dzungaria",
+            "min_share": 0.8
+          }
+        },
+        "legacy": {
+          "id": "oirat_choros_banners",
+          "name": "Choros banners",
+          "text": "Recruits refill 20 % faster, and herds grow 20 % faster.",
+          "effects": [
+            {
+              "lever": "recruit_refill_pct",
+              "value": 20
+            },
+            {
+              "lever": "herd_growth_pct",
+              "value": 20
+            }
+          ]
+        }
+      },
+      {
+        "id": "oirat_horse_fairs",
+        "name": "Esen's horse fairs",
+        "theme": "trade",
+        "text": "Build 3 more markets than at the start and be at peace with the Ming.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "oirat_tumu",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:market",
+                "op": ">=",
+                "value": "start+3"
+              }
+            },
+            {
+              "not": {
+                "at_war": {
+                  "who": "this",
+                  "other": "ming"
+                }
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "oirat_border_markets",
+          "name": "Markets at Datong",
+          "text": "Tax reaching the treasury +10 %, population grows 5 % faster, and gold at toll points +10 %.",
+          "effects": [
+            {
+              "lever": "tax_reach_pct",
+              "value": 10
+            },
+            {
+              "lever": "growth_pct",
+              "value": 5
+            },
+            {
+              "lever": "toll_gold_pct",
+              "value": 10
+            }
+          ]
+        }
+      },
+      {
+        "id": "oirat_dzungar_banner",
+        "name": "The Dzungar khanate",
+        "theme": "land",
+        "text": "Own nine-tenths of Altishahr.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "oirat_four_tumens",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "owns": {
+            "who": "this",
+            "where": "area:altishahr",
+            "min_share": 0.9
+          }
+        },
+        "legacy": {
+          "id": "oirat_yarkand_tribute",
+          "name": "Tribute of the six cities",
+          "text": "Tax reaching the treasury +10 %, and garrisons stand 20 % stronger.",
+          "effects": [
+            {
+              "lever": "tax_reach_pct",
+              "value": 10
+            },
+            {
+              "lever": "garrison_pct",
+              "value": 20
+            }
+          ]
+        }
+      },
+      {
+        "id": "oirat_kazakh_steppe",
+        "name": "West of the Altai",
+        "theme": "land",
+        "text": "Own a third of Kazakhstan.",
+        "historical": true,
+        "goal": {
+          "owns": {
+            "who": "this",
+            "where": "area:kazakhstan",
+            "min_share": 0.33
+          }
+        },
+        "legacy": {
+          "id": "oirat_sighnaq_raid",
+          "name": "The rout on the Syr Darya",
+          "text": "Recruits refill 15 % faster, and hired companies cost 20 % less.",
+          "effects": [
+            {
+              "lever": "recruit_refill_pct",
+              "value": 15
+            },
+            {
+              "lever": "hired_company_cost_pct",
+              "value": -20
+            }
+          ]
+        }
+      },
+      {
+        "id": "oirat_patrons_of_lhasa",
+        "name": "Patrons of Lhasa",
+        "theme": "faith",
+        "text": "Make Tibet your subject.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "oirat_yellow_hat",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "relation": {
+            "who": "tibet",
+            "other": "this",
+            "type": "subject"
+          }
+        },
+        "legacy": {
+          "id": "oirat_gushri_seal",
+          "name": "Gushri's seal",
+          "text": "Officials' wages 15 % lower, population grows 3 % faster, and neighbours think one step better of you.",
+          "effects": [
+            {
+              "lever": "official_wage_pct",
+              "value": -15
+            },
+            {
+              "lever": "growth_pct",
+              "value": 3
+            },
+            {
+              "lever": "opinion_steps",
+              "value": 1,
+              "of": "neighbours"
+            }
+          ]
+        }
+      }
+    ],
+    "ming": [
+      {
+        "id": "ming_grand_canal",
+        "name": "The Grand Canal reopened",
+        "theme": "wealth",
+        "text": "Build 4 more roads and 3 more granaries than at the start before 1450.",
+        "historical": true,
+        "window": [
+          1378,
+          1450
+        ],
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:road",
+                "op": ">=",
+                "value": "start+4"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:granary",
+                "op": ">=",
+                "value": "start+3"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "ming_song_li_locks",
+          "name": "Song Li's locks",
+          "text": "Harvests roll one step better, and tax reaching the treasury +8 %.",
+          "effects": [
+            {
+              "lever": "harvest_steps",
+              "value": 1
+            },
+            {
+              "lever": "tax_reach_pct",
+              "value": 8
+            }
+          ]
+        }
+      },
+      {
+        "id": "ming_beyond_the_gobi",
+        "name": "Beyond the Gobi",
+        "theme": "land",
+        "text": "Hold Karakorum before 1450.",
+        "historical": true,
+        "window": [
+          1378,
+          1450
+        ],
+        "goal": {
+          "holds_place": {
+            "who": "this",
+            "place": "Karakorum"
+          }
+        },
+        "legacy": {
+          "id": "ming_five_campaigns",
+          "name": "The five northern campaigns",
+          "text": "Recruits refill 15 % faster, and 20 % more horses are bred each year.",
+          "effects": [
+            {
+              "lever": "recruit_refill_pct",
+              "value": 15
+            },
+            {
+              "lever": "horses_pct",
+              "value": 20
+            }
+          ]
+        }
+      },
+      {
+        "id": "ming_jiaozhi",
+        "name": "The Jiaozhi commandery",
+        "theme": "land",
+        "text": "Hold Thăng Long before 1430.",
+        "historical": true,
+        "window": [
+          1400,
+          1430
+        ],
+        "goal": {
+          "holds_place": {
+            "who": "this",
+            "place": "Thăng Long (Đông Kinh, modern Hanoi)"
+          }
+        },
+        "legacy": {
+          "id": "ming_jiaozhi_registers",
+          "name": "Registers of Jiaozhi",
+          "text": "Foreign rule fades a quarter faster, and garrisons stand 20 % stronger.",
+          "effects": [
+            {
+              "lever": "integration_years_pct",
+              "value": -25
+            },
+            {
+              "lever": "garrison_pct",
+              "value": 20
+            }
+          ]
+        }
+      },
+      {
+        "id": "ming_kings_in_nanjing",
+        "name": "Kings who came to Nanjing",
+        "theme": "crown",
+        "text": "Have 5 more subjects than at the start.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "ming_tribute_order",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "count": {
+            "who": "this",
+            "thing": "subjects",
+            "op": ">=",
+            "value": "start+5"
+          }
+        },
+        "legacy": {
+          "id": "ming_southern_tribute",
+          "name": "Tribute of the southern seas",
+          "text": "Tribute from subjects +20 %, and tax reaching the treasury +10 %.",
+          "effects": [
+            {
+              "lever": "tribute_pct",
+              "value": 20
+            },
+            {
+              "lever": "tax_reach_pct",
+              "value": 10
+            }
+          ]
+        }
+      },
+      {
+        "id": "ming_kilns_of_jingdezhen",
+        "name": "Kilns of Jingdezhen",
+        "theme": "trade",
+        "text": "Build 4 more markets and 3 more harbours than at the start.",
+        "historical": false,
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:market",
+                "op": ">=",
+                "value": "start+4"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:harbour",
+                "op": ">=",
+                "value": "start+3"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "ming_imperial_kilns",
+          "name": "The imperial kilns",
+          "text": "New works cost 20 % less, and the trade ratio gain +10 %.",
+          "effects": [
+            {
+              "lever": "building_cost_pct",
+              "value": -20
+            },
+            {
+              "lever": "trade_balance_pct",
+              "value": 10
+            }
+          ]
+        }
+      },
+      {
+        "id": "ming_hanlin",
+        "name": "Scholars of the Hanlin",
+        "theme": "learning",
+        "text": "Keep 3 more schools and 20 more officials than at the start.",
+        "historical": true,
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "schools",
+                "op": ">=",
+                "value": "start+3"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "officials",
+                "op": ">=",
+                "value": "start+20"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "ming_hanlin_academy",
+          "name": "The Hanlin Academy",
+          "text": "Officials' wages 20 % lower, and each scholar's research +8 %.",
+          "effects": [
+            {
+              "lever": "official_wage_pct",
+              "value": -20
+            },
+            {
+              "lever": "scholar_output_pct",
+              "value": 8
+            }
+          ]
+        }
+      },
+      {
+        "id": "ming_nine_garrisons",
+        "name": "The wall rebuilt",
+        "theme": "survival",
+        "text": "Build 6 more castles than at the start and be at peace with the Mongols and the Oirat.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "ming_hold_beijing",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:castle",
+                "op": ">=",
+                "value": "start+6"
+              }
+            },
+            {
+              "not": {
+                "at_war": {
+                  "who": "this",
+                  "other": "mongols"
+                }
+              }
+            },
+            {
+              "not": {
+                "at_war": {
+                  "who": "this",
+                  "other": "oirat"
+                }
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "ming_nine_border_garrisons",
+          "name": "The Nine Border Garrisons",
+          "text": "Garrisons stand 30 % stronger, recruits refill 15 % faster, and new works cost 10 % less.",
+          "effects": [
+            {
+              "lever": "garrison_pct",
+              "value": 30
+            },
+            {
+              "lever": "recruit_refill_pct",
+              "value": 15
+            },
+            {
+              "lever": "building_cost_pct",
+              "value": -10
+            }
+          ],
+          "great": true
+        }
+      },
+      {
+        "id": "ming_ricci_maps",
+        "name": "A map of ten thousand countries",
+        "theme": "learning",
+        "text": "Know Spectacles and telescopes and Observatories.",
+        "historical": true,
+        "requires": {
+          "event": {
+            "id": "jesuits_at_the_ming_court"
+          }
+        },
+        "goal": {
+          "all": [
+            {
+              "knows": {
+                "who": "this",
+                "invention": "L10"
+              }
+            },
+            {
+              "knows": {
+                "who": "this",
+                "invention": "L3"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "ming_kunyu_wanguo",
+          "name": "Kunyu Wanguo Quantu",
+          "text": "Each scholar's research +10 %, officials' wages 10 % lower, and new works cost 10 % less.",
+          "effects": [
+            {
+              "lever": "scholar_output_pct",
+              "value": 10
+            },
+            {
+              "lever": "official_wage_pct",
+              "value": -10
+            },
+            {
+              "lever": "building_cost_pct",
+              "value": -10
+            }
+          ]
+        }
+      }
+    ],
+    "korea": [
+      {
+        "id": "korea_fire_ships",
+        "name": "Choe Mu-seon's fire ships",
+        "theme": "sea",
+        "text": "Know Ship-mounted cannon and build 2 more harbours than at the start before 1450.",
+        "historical": true,
+        "window": [
+          1378,
+          1450
+        ],
+        "goal": {
+          "all": [
+            {
+              "knows": {
+                "who": "this",
+                "invention": "S6"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:harbour",
+                "op": ">=",
+                "value": "start+2"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "korea_jinpo_powder",
+          "name": "Powder of Jinpo",
+          "text": "Garrisons stand 20 % stronger, ships deal 10 % more hits, and 6 % more sailors per thousand seafolk.",
+          "effects": [
+            {
+              "lever": "garrison_pct",
+              "value": 20
+            },
+            {
+              "lever": "ship_hits_pct",
+              "value": 10
+            },
+            {
+              "lever": "crew_pct",
+              "value": 6
+            }
+          ]
+        }
+      },
+      {
+        "id": "korea_turtle_ships",
+        "name": "Ships with iron backs",
+        "theme": "sea",
+        "text": "Know Turtle and armoured ships.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "korea_fire_ships",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "knows": {
+            "who": "this",
+            "invention": "S8"
+          }
+        },
+        "legacy": {
+          "id": "korea_hansando",
+          "name": "Crane-wing at Hansan",
+          "text": "Garrisons stand 15 % stronger, ships deal 15 % more hits, and recruits refill 5 % faster.",
+          "effects": [
+            {
+              "lever": "garrison_pct",
+              "value": 15
+            },
+            {
+              "lever": "ship_hits_pct",
+              "value": 15
+            },
+            {
+              "lever": "recruit_refill_pct",
+              "value": 5
+            }
+          ]
+        }
+      },
+      {
+        "id": "korea_whole_peninsula",
+        "name": "From Jeju to the Tumen",
+        "theme": "land",
+        "text": "Own 95 % of Korea.",
+        "historical": true,
+        "goal": {
+          "owns": {
+            "who": "this",
+            "where": "region:korea",
+            "min_share": 0.95
+          }
+        },
+        "legacy": {
+          "id": "korea_eight_provinces",
+          "name": "The eight provinces",
+          "text": "Population grows 8 % faster, and tax reaching the treasury +10 %.",
+          "effects": [
+            {
+              "lever": "growth_pct",
+              "value": 8
+            },
+            {
+              "lever": "tax_reach_pct",
+              "value": 10
+            }
+          ]
+        }
+      },
+      {
+        "id": "korea_rain_gauge",
+        "name": "Measuring the rain",
+        "theme": "learning",
+        "text": "Build 4 more farms and 3 more granaries than at the start.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "joseon_correct_sounds",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:farm",
+                "op": ">=",
+                "value": "start+4"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:granary",
+                "op": ">=",
+                "value": "start+3"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "korea_cheugugi",
+          "name": "Cheugugi",
+          "text": "Harvests roll one step better, and each scholar's research +8 %.",
+          "effects": [
+            {
+              "lever": "harvest_steps",
+              "value": 1
+            },
+            {
+              "lever": "scholar_output_pct",
+              "value": 8
+            }
+          ]
+        }
+      },
+      {
+        "id": "korea_namhan_fortress",
+        "name": "The mountain fortress at Namhan",
+        "theme": "survival",
+        "text": "Be independent and hold Hanseong in 1650 or later.",
+        "historical": true,
+        "window": [
+          1627,
+          1700
+        ],
+        "requires": {
+          "event": {
+            "id": "manchu_invasions_of_korea"
+          }
+        },
+        "goal": {
+          "all": [
+            {
+              "date": {
+                "min": 1650
+              }
+            },
+            {
+              "independent": {
+                "who": "this"
+              }
+            },
+            {
+              "holds_place": {
+                "who": "this",
+                "place": "Hanseong"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "korea_namhansanseong",
+          "name": "Namhansanseong",
+          "text": "Garrisons stand 20 % stronger, debt interest 20 % lower, and population grows 3 % faster.",
+          "effects": [
+            {
+              "lever": "garrison_pct",
+              "value": 20
+            },
+            {
+              "lever": "loan_interest_pct",
+              "value": -20
+            },
+            {
+              "lever": "growth_pct",
+              "value": 3
+            }
+          ]
+        }
+      }
+    ],
+    "dai_viet": [
+      {
+        "id": "dai_viet_ho_notes",
+        "name": "The Hồ paper notes",
+        "theme": "wealth",
+        "text": "Know Paper money and keep 5 more officials than at the start before 1410.",
+        "historical": true,
+        "window": [
+          1378,
+          1410
+        ],
+        "goal": {
+          "all": [
+            {
+              "knows": {
+                "who": "this",
+                "invention": "T4"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "officials",
+                "op": ">=",
+                "value": "start+5"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "dai_viet_thong_bao",
+          "name": "Thông bảo hội sao",
+          "text": "Debt interest 30 % lower, and tax reaching the treasury +10 %.",
+          "effects": [
+            {
+              "lever": "loan_interest_pct",
+              "value": -30
+            },
+            {
+              "lever": "tax_reach_pct",
+              "value": 10
+            }
+          ]
+        }
+      },
+      {
+        "id": "dai_viet_lam_son",
+        "name": "Ten years at Lam Sơn",
+        "theme": "survival",
+        "text": "Win 4 more battles than at the start and be at peace with the Ming, between 1406 and 1430.",
+        "historical": true,
+        "window": [
+          1400,
+          1430
+        ],
+        "goal": {
+          "all": [
+            {
+              "date": {
+                "min": 1406,
+                "max": 1430
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "victories",
+                "op": ">=",
+                "value": "start+4"
+              }
+            },
+            {
+              "not": {
+                "at_war": {
+                  "who": "this",
+                  "other": "ming"
+                }
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "dai_viet_returned_sword",
+          "name": "The returned sword",
+          "text": "Recruits refill 20 % faster, and garrisons stand 10 % stronger.",
+          "effects": [
+            {
+              "lever": "recruit_refill_pct",
+              "value": 20
+            },
+            {
+              "lever": "garrison_pct",
+              "value": 10
+            }
+          ]
+        }
+      },
+      {
+        "id": "dai_viet_hong_duc",
+        "name": "The Hồng Đức code",
+        "theme": "crown",
+        "text": "Keep 12 more officials than at the start and 3 schools.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "dai_viet_child_throne",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "officials",
+                "op": ">=",
+                "value": "start+12"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "schools",
+                "op": ">=",
+                "value": 3
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "dai_viet_quoc_trieu_hinh_luat",
+          "name": "Quốc triều hình luật",
+          "text": "Officials' wages 20 % lower, and population grows 6 % faster.",
+          "effects": [
+            {
+              "lever": "official_wage_pct",
+              "value": -20
+            },
+            {
+              "lever": "growth_pct",
+              "value": 6
+            }
+          ]
+        }
+      },
+      {
+        "id": "dai_viet_southward",
+        "name": "The march to the south",
+        "theme": "land",
+        "text": "Own all of South Vietnam.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "dai_viet_vijaya",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "owns": {
+            "who": "this",
+            "where": "area:south_vietnam",
+            "min_share": 1
+          }
+        },
+        "legacy": {
+          "id": "dai_viet_don_dien",
+          "name": "Đồn điền colonies",
+          "text": "Population grows 10 % faster, tax reaching the treasury +5 %, and foreign rule fades 15 % faster.",
+          "effects": [
+            {
+              "lever": "growth_pct",
+              "value": 10
+            },
+            {
+              "lever": "tax_reach_pct",
+              "value": 5
+            },
+            {
+              "lever": "integration_years_pct",
+              "value": -15
+            }
+          ]
+        }
+      }
+    ],
+    "champa": [
+      {
+        "id": "champa_red_king",
+        "name": "The Red King's raids",
+        "theme": "land",
+        "text": "Hold Hóa Châu before 1390.",
+        "historical": true,
+        "window": [
+          1378,
+          1390
+        ],
+        "goal": {
+          "holds_place": {
+            "who": "this",
+            "place": "Hóa Châu / Thuận Hóa"
+          }
+        },
+        "legacy": {
+          "id": "champa_che_bong_nga",
+          "name": "Chế Bồng Nga's war-boats",
+          "text": "Gold from sacks and raids +30 %, and recruits refill 15 % faster.",
+          "effects": [
+            {
+              "lever": "loot_pct",
+              "value": 30
+            },
+            {
+              "lever": "recruit_refill_pct",
+              "value": 15
+            }
+          ]
+        }
+      },
+      {
+        "id": "champa_sack_of_the_capital",
+        "name": "Sails up the Red River",
+        "theme": "land",
+        "text": "Hold Thăng Long.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "champa_red_king",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "holds_place": {
+            "who": "this",
+            "place": "Thăng Long (Đông Kinh, modern Hanoi)"
+          }
+        },
+        "legacy": {
+          "id": "champa_spoils_of_thang_long",
+          "name": "Spoils of Thăng Long",
+          "text": "Gold from sacks +20 %, garrisons stand 20 % stronger, and tribute +10 %.",
+          "effects": [
+            {
+              "lever": "loot_pct",
+              "value": 20
+            },
+            {
+              "lever": "garrison_pct",
+              "value": 20
+            },
+            {
+              "lever": "tribute_pct",
+              "value": 10
+            }
+          ]
+        }
+      },
+      {
+        "id": "champa_panduranga",
+        "name": "The southern principalities",
+        "theme": "land",
+        "text": "Own all of South Vietnam.",
+        "historical": false,
+        "goal": {
+          "owns": {
+            "who": "this",
+            "where": "area:south_vietnam",
+            "min_share": 1
+          }
+        },
+        "legacy": {
+          "id": "champa_panduranga_fisheries",
+          "name": "Salt pans of Panduranga",
+          "text": "Population grows 8 % faster, fisheries give 20 % more food, and tax reaching the treasury +6 %.",
+          "effects": [
+            {
+              "lever": "growth_pct",
+              "value": 8
+            },
+            {
+              "lever": "fish_pct",
+              "value": 20
+            },
+            {
+              "lever": "tax_reach_pct",
+              "value": 6
+            }
+          ]
+        }
+      },
+      {
+        "id": "champa_eaglewood",
+        "name": "Eaglewood for the junks",
+        "theme": "trade",
+        "text": "Build 3 more harbours and 2 more markets than at the start, and ally with the Ming.",
+        "historical": true,
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:harbour",
+                "op": ">=",
+                "value": "start+3"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:market",
+                "op": ">=",
+                "value": "start+2"
+              }
+            },
+            {
+              "relation": {
+                "who": "this",
+                "other": "ming",
+                "type": "alliance"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "champa_kalambak",
+          "name": "Kalambak of the hills",
+          "text": "Tax reaching the treasury +10 %, and the trade ratio gain +10 %.",
+          "effects": [
+            {
+              "lever": "tax_reach_pct",
+              "value": 10
+            },
+            {
+              "lever": "trade_balance_pct",
+              "value": 10
+            }
+          ]
+        }
+      },
+      {
+        "id": "champa_vijaya_stands",
+        "name": "Vijaya stands",
+        "theme": "survival",
+        "text": "Be independent and hold Vijaya in 1475 or later.",
+        "historical": true,
+        "window": [
+          1440,
+          1500
+        ],
+        "goal": {
+          "all": [
+            {
+              "date": {
+                "min": 1475
+              }
+            },
+            {
+              "independent": {
+                "who": "this"
+              }
+            },
+            {
+              "holds_place": {
+                "who": "this",
+                "place": "Vijaya"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "champa_towers_of_vijaya",
+          "name": "Towers of Vijaya",
+          "text": "Garrisons stand 20 % stronger, conquerors' rule lasts 20 % longer in your homeland, and population grows 4 % faster.",
+          "effects": [
+            {
+              "lever": "garrison_pct",
+              "value": 20
+            },
+            {
+              "lever": "homeland_resistance_pct",
+              "value": 20
+            },
+            {
+              "lever": "growth_pct",
+              "value": 4
+            }
+          ]
+        }
+      }
+    ],
+    "lan_xang": [
+      {
+        "id": "lan_xang_million_elephants",
+        "name": "A million elephants",
+        "theme": "land",
+        "text": "Own all of Laos.",
+        "historical": true,
+        "goal": {
+          "owns": {
+            "who": "this",
+            "where": "area:laos",
+            "min_share": 1
+          }
+        },
+        "legacy": {
+          "id": "lan_xang_white_parasol",
+          "name": "The white parasol",
+          "text": "Recruits refill 20 % faster, and garrisons stand 10 % stronger.",
+          "effects": [
+            {
+              "lever": "recruit_refill_pct",
+              "value": 20
+            },
+            {
+              "lever": "garrison_pct",
+              "value": 10
+            }
+          ]
+        }
+      },
+      {
+        "id": "lan_xang_vientiane",
+        "name": "A new seat at Vientiane",
+        "theme": "crown",
+        "text": "Build 3 more castles and 3 more markets than at the start.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "lan_xang_million_elephants",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:castle",
+                "op": ">=",
+                "value": "start+3"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:market",
+                "op": ">=",
+                "value": "start+3"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "lan_xang_that_luang",
+          "name": "Pha That Luang",
+          "text": "Garrisons stand 20 % stronger, and tax reaching the treasury +8 %.",
+          "effects": [
+            {
+              "lever": "garrison_pct",
+              "value": 20
+            },
+            {
+              "lever": "tax_reach_pct",
+              "value": 8
+            }
+          ]
+        }
+      },
+      {
+        "id": "lan_xang_emerald_buddha",
+        "name": "The jewel from Chiang Mai",
+        "theme": "faith",
+        "text": "Make Lan Na your subject or rule it in union.",
+        "historical": true,
+        "goal": {
+          "any": [
+            {
+              "relation": {
+                "who": "lan_na",
+                "other": "this",
+                "type": "subject"
+              }
+            },
+            {
+              "relation": {
+                "who": "lan_na",
+                "other": "this",
+                "type": "personal_union"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "lan_xang_phra_kaeo",
+          "name": "Phra Kaeo Morakot",
+          "text": "Officials' wages 15 % lower, the faith spreads 15 % faster, and population grows 4 % faster.",
+          "effects": [
+            {
+              "lever": "official_wage_pct",
+              "value": -15
+            },
+            {
+              "lever": "faith_shift_pct",
+              "value": 15
+            },
+            {
+              "lever": "growth_pct",
+              "value": 4
+            }
+          ]
+        }
+      },
+      {
+        "id": "lan_xang_after_1479",
+        "name": "Out of the burnt city",
+        "theme": "survival",
+        "text": "Be independent and hold Muang Sua in 1490 or later.",
+        "historical": true,
+        "window": [
+          1479,
+          1530
+        ],
+        "goal": {
+          "all": [
+            {
+              "date": {
+                "min": 1490
+              }
+            },
+            {
+              "independent": {
+                "who": "this"
+              }
+            },
+            {
+              "holds_place": {
+                "who": "this",
+                "place": "Muang Sua"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "lan_xang_hills_of_muang_sua",
+          "name": "Hills of Muang Sua",
+          "text": "Garrisons stand 20 % stronger, recruits refill 10 % faster, and population grows 2 % faster.",
+          "effects": [
+            {
+              "lever": "garrison_pct",
+              "value": 20
+            },
+            {
+              "lever": "recruit_refill_pct",
+              "value": 10
+            },
+            {
+              "lever": "growth_pct",
+              "value": 2
+            }
+          ]
+        }
+      }
+    ],
+    "lan_na": [
+      {
+        "id": "lan_na_tilokarat",
+        "name": "Tilokarat's wars",
+        "theme": "land",
+        "text": "Hold Phitsanulok before 1490.",
+        "historical": true,
+        "window": [
+          1440,
+          1490
+        ],
+        "goal": {
+          "holds_place": {
+            "who": "this",
+            "place": "Phitsanulok"
+          }
+        },
+        "legacy": {
+          "id": "lan_na_yuan_spears",
+          "name": "Spears of the Yuan",
+          "text": "Recruits refill 15 % faster, and garrisons stand 15 % stronger.",
+          "effects": [
+            {
+              "lever": "recruit_refill_pct",
+              "value": 15
+            },
+            {
+              "lever": "garrison_pct",
+              "value": 15
+            }
+          ]
+        }
+      },
+      {
+        "id": "lan_na_eighth_council",
+        "name": "The council at the Seven Spires",
+        "theme": "faith",
+        "text": "Keep 3 more schools and 4 more scholars than at the start.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "lan_na_tilokarat",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "schools",
+                "op": ">=",
+                "value": "start+3"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "scholars",
+                "op": ">=",
+                "value": "start+4"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "lan_na_wat_chet_yot",
+          "name": "Wat Chet Yot",
+          "text": "Each scholar's research +10 %, and officials' wages 15 % lower.",
+          "effects": [
+            {
+              "lever": "scholar_output_pct",
+              "value": 10
+            },
+            {
+              "lever": "official_wage_pct",
+              "value": -15
+            }
+          ]
+        }
+      },
+      {
+        "id": "lan_na_tai_uplands",
+        "name": "The upland muang",
+        "theme": "land",
+        "text": "Own half of Laos.",
+        "historical": false,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "lan_na_take_muang_sua",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "owns": {
+            "who": "this",
+            "where": "area:laos",
+            "min_share": 0.5
+          }
+        },
+        "legacy": {
+          "id": "lan_na_muang_oaths",
+          "name": "Oaths of the muang",
+          "text": "Tax reaching the treasury +10 %, population grows 5 % faster, and recruits refill 5 % faster.",
+          "effects": [
+            {
+              "lever": "tax_reach_pct",
+              "value": 10
+            },
+            {
+              "lever": "growth_pct",
+              "value": 5
+            },
+            {
+              "lever": "recruit_refill_pct",
+              "value": 5
+            }
+          ]
+        }
+      },
+      {
+        "id": "lan_na_rice_valleys",
+        "name": "Rice of the Ping valley",
+        "theme": "wealth",
+        "text": "Build 4 more farms and 2 more granaries than at the start.",
+        "historical": false,
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:farm",
+                "op": ">=",
+                "value": "start+4"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:granary",
+                "op": ">=",
+                "value": "start+2"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "lan_na_muang_fai",
+          "name": "Muang fai weirs",
+          "text": "Harvests roll one step better, and population grows 5 % faster.",
+          "effects": [
+            {
+              "lever": "harvest_steps",
+              "value": 1
+            },
+            {
+              "lever": "growth_pct",
+              "value": 5
+            }
+          ]
+        }
+      }
+    ],
+    "ayutthaya": [
+      {
+        "id": "ayutthaya_sakdina",
+        "name": "The ranks of the realm",
+        "theme": "crown",
+        "text": "Keep 10 more officials and 4 more loyal lords than at the start.",
+        "historical": true,
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "officials",
+                "op": ">=",
+                "value": "start+10"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "loyal_lords",
+                "op": ">=",
+                "value": "start+4"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "ayutthaya_palatine_law",
+          "name": "Trailok's palatine law",
+          "text": "Officials' wages 20 % lower, the government supports one more lord, and tax reaching the treasury +3 %.",
+          "effects": [
+            {
+              "lever": "official_wage_pct",
+              "value": -20
+            },
+            {
+              "lever": "lord_capacity",
+              "value": 1
+            },
+            {
+              "lever": "tax_reach_pct",
+              "value": 3
+            }
+          ]
+        }
+      },
+      {
+        "id": "ayutthaya_khmer_court",
+        "name": "The Khmer under the parasol",
+        "theme": "crown",
+        "text": "Make the Khmer your subject.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "ayutthaya_angkor",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "relation": {
+            "who": "khmer",
+            "other": "this",
+            "type": "subject"
+          }
+        },
+        "legacy": {
+          "id": "ayutthaya_lovek_tribute",
+          "name": "Tribute of Lovek",
+          "text": "Tribute from subjects +20 %, and tax reaching the treasury +8 %.",
+          "effects": [
+            {
+              "lever": "tribute_pct",
+              "value": 20
+            },
+            {
+              "lever": "tax_reach_pct",
+              "value": 8
+            }
+          ]
+        }
+      },
+      {
+        "id": "ayutthaya_junks",
+        "name": "Junks of the Chao Phraya",
+        "theme": "trade",
+        "text": "Build 4 more harbours and 4 more markets than at the start.",
+        "historical": false,
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:harbour",
+                "op": ">=",
+                "value": "start+4"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:market",
+                "op": ">=",
+                "value": "start+4"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "ayutthaya_phra_khlang",
+          "name": "The Phra Khlang",
+          "text": "Tax reaching the treasury +10 %, and new works cost 15 % less.",
+          "effects": [
+            {
+              "lever": "tax_reach_pct",
+              "value": 10
+            },
+            {
+              "lever": "building_cost_pct",
+              "value": -15
+            }
+          ]
+        }
+      },
+      {
+        "id": "ayutthaya_naresuan",
+        "name": "The black prince rides west",
+        "theme": "land",
+        "text": "Hold Toungoo.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "ayutthaya_hostage_prince",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "holds_place": {
+            "who": "this",
+            "place": "Toungoo"
+          }
+        },
+        "legacy": {
+          "id": "ayutthaya_nong_sarai_elephants",
+          "name": "The duel at Nong Sarai",
+          "text": "Recruits refill 20 % faster, garrisons stand 20 % stronger, and gold from sacks +25 %.",
+          "effects": [
+            {
+              "lever": "recruit_refill_pct",
+              "value": 20
+            },
+            {
+              "lever": "garrison_pct",
+              "value": 20
+            },
+            {
+              "lever": "loot_pct",
+              "value": 25
+            }
+          ],
+          "great": true
+        }
+      }
+    ],
+    "ava": [
+      {
+        "id": "ava_forty_years_war",
+        "name": "The Forty Years' War",
+        "theme": "land",
+        "text": "Make Pegu your subject or see it gone, before 1425.",
+        "historical": true,
+        "window": [
+          1385,
+          1425
+        ],
+        "goal": {
+          "any": [
+            {
+              "relation": {
+                "who": "pegu",
+                "other": "this",
+                "type": "subject"
+              }
+            },
+            {
+              "not": {
+                "exists": {
+                  "who": "pegu"
+                }
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "ava_minkhaung_host",
+          "name": "Minkhaung's host",
+          "text": "Recruits refill 15 % faster, gold from sacks +20 %, and garrisons stand 10 % stronger.",
+          "effects": [
+            {
+              "lever": "recruit_refill_pct",
+              "value": 15
+            },
+            {
+              "lever": "loot_pct",
+              "value": 20
+            },
+            {
+              "lever": "garrison_pct",
+              "value": 10
+            }
+          ]
+        }
+      },
+      {
+        "id": "ava_kyaukse_canals",
+        "name": "The Kyaukse canals",
+        "theme": "wealth",
+        "text": "Build 4 more farms and 3 more granaries than at the start.",
+        "historical": true,
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:farm",
+                "op": ">=",
+                "value": "start+4"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:granary",
+                "op": ">=",
+                "value": "start+3"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "ava_eleven_villages",
+          "name": "The eleven villages",
+          "text": "Harvests roll one step better, and population grows 6 % faster.",
+          "effects": [
+            {
+              "lever": "harvest_steps",
+              "value": 1
+            },
+            {
+              "lever": "growth_pct",
+              "value": 6
+            }
+          ]
+        }
+      },
+      {
+        "id": "ava_whole_delta",
+        "name": "The delta and its ports",
+        "theme": "land",
+        "text": "Own all of Lower Burma.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "ava_forty_years_war",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "owns": {
+            "who": "this",
+            "where": "area:lower_burma",
+            "min_share": 1
+          }
+        },
+        "legacy": {
+          "id": "ava_shwedagon_bells",
+          "name": "Bells of the Shwedagon",
+          "text": "Tax reaching the treasury +10 %, and new works cost 20 % less.",
+          "effects": [
+            {
+              "lever": "tax_reach_pct",
+              "value": 10
+            },
+            {
+              "lever": "building_cost_pct",
+              "value": -20
+            }
+          ]
+        }
+      },
+      {
+        "id": "ava_sawbwa_court",
+        "name": "The sawbwas at court",
+        "theme": "crown",
+        "text": "Have 3 more subjects than at the start.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "ava_shan_hills",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "count": {
+            "who": "this",
+            "thing": "subjects",
+            "op": ">=",
+            "value": "start+3"
+          }
+        },
+        "legacy": {
+          "id": "ava_hill_tribute",
+          "name": "Tribute of the hills",
+          "text": "Tribute from subjects +25 %, and recruits refill 10 % faster.",
+          "effects": [
+            {
+              "lever": "tribute_pct",
+              "value": 25
+            },
+            {
+              "lever": "recruit_refill_pct",
+              "value": 10
+            }
+          ]
+        }
+      }
+    ],
+    "majapahit": [
+      {
+        "id": "majapahit_regreg",
+        "name": "After the Regreg war",
+        "theme": "survival",
+        "text": "Hold Daha and Trowulan and be at peace, between 1406 and 1420.",
+        "historical": true,
+        "window": [
+          1400,
+          1420
+        ],
+        "goal": {
+          "all": [
+            {
+              "date": {
+                "min": 1406,
+                "max": 1420
+              }
+            },
+            {
+              "holds_place": {
+                "who": "this",
+                "place": "Daha (Kediri)"
+              }
+            },
+            {
+              "holds_place": {
+                "who": "this",
+                "place": "Trowulan (Majapahit)"
+              }
+            },
+            {
+              "not": {
+                "at_war": {
+                  "who": "this"
+                }
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "majapahit_eastern_court",
+          "name": "The eastern court reconciled",
+          "text": "Officials' wages 15 % lower, and lords start one step more loyal.",
+          "effects": [
+            {
+              "lever": "official_wage_pct",
+              "value": -15
+            },
+            {
+              "lever": "lord_loyalty_start_steps",
+              "value": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "majapahit_nusantara",
+        "name": "All of Nusantara",
+        "theme": "sea",
+        "text": "Have 6 more subjects and 4 more harbours than at the start.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "majapahit_palapa",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "subjects",
+                "op": ">=",
+                "value": "start+6"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:harbour",
+                "op": ">=",
+                "value": "start+4"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "majapahit_gajah_mada_oath",
+          "name": "Gajah Mada's oath fulfilled",
+          "text": "Tribute from subjects +20 %, tax reaching the treasury +10 %, and recruits refill 15 % faster.",
+          "effects": [
+            {
+              "lever": "tribute_pct",
+              "value": 20
+            },
+            {
+              "lever": "tax_reach_pct",
+              "value": 10
+            },
+            {
+              "lever": "recruit_refill_pct",
+              "value": 15
+            }
+          ],
+          "great": true
+        }
+      },
+      {
+        "id": "majapahit_pepper",
+        "name": "Pepper of the archipelago",
+        "theme": "trade",
+        "text": "Build 4 more harbours and 3 more markets than at the start.",
+        "historical": false,
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:harbour",
+                "op": ">=",
+                "value": "start+4"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:market",
+                "op": ">=",
+                "value": "start+3"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "majapahit_bandar_of_gresik",
+          "name": "The bandar of Gresik",
+          "text": "Tax reaching the treasury +10 %, and new works cost 15 % less.",
+          "effects": [
+            {
+              "lever": "tax_reach_pct",
+              "value": 10
+            },
+            {
+              "lever": "building_cost_pct",
+              "value": -15
+            }
+          ]
+        }
+      },
+      {
+        "id": "majapahit_subak",
+        "name": "Water for the sawah",
+        "theme": "wealth",
+        "text": "Build 5 more farms and 3 more granaries than at the start.",
+        "historical": false,
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:farm",
+                "op": ">=",
+                "value": "start+5"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:granary",
+                "op": ">=",
+                "value": "start+3"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "majapahit_brantas_dams",
+          "name": "Dams of the Brantas",
+          "text": "Harvests roll one step better, and population grows 5 % faster.",
+          "effects": [
+            {
+              "lever": "harvest_steps",
+              "value": 1
+            },
+            {
+              "lever": "growth_pct",
+              "value": 5
+            }
+          ]
+        }
+      }
+    ],
+    "malacca": [
+      {
+        "id": "malacca_across_the_strait",
+        "name": "Across the strait",
+        "theme": "land",
+        "text": "Have 3 more subjects than at the start.",
+        "historical": true,
+        "goal": {
+          "count": {
+            "who": "this",
+            "thing": "subjects",
+            "op": ">=",
+            "value": "start+3"
+          }
+        },
+        "legacy": {
+          "id": "malacca_kampar_and_siak",
+          "name": "Kampar and Siak",
+          "text": "Tax reaching the treasury +8 %, garrisons stand 10 % stronger, and gold at toll points +10 %.",
+          "effects": [
+            {
+              "lever": "tax_reach_pct",
+              "value": 8
+            },
+            {
+              "lever": "garrison_pct",
+              "value": 10
+            },
+            {
+              "lever": "toll_gold_pct",
+              "value": 10
+            }
+          ]
+        }
+      },
+      {
+        "id": "malacca_peninsula",
+        "name": "Sultan of the peninsula",
+        "theme": "land",
+        "text": "Own a fifth of Malaya and Borneo.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "malacca_across_the_strait",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "owns": {
+            "who": "this",
+            "where": "area:malaya_and_borneo",
+            "min_share": 0.2
+          }
+        },
+        "legacy": {
+          "id": "malacca_raja_muda",
+          "name": "The raja muda's seat",
+          "text": "Population grows 6 % faster, tribute from subjects +15 %, and tax reaching the treasury +4 %.",
+          "effects": [
+            {
+              "lever": "growth_pct",
+              "value": 6
+            },
+            {
+              "lever": "tribute_pct",
+              "value": 15
+            },
+            {
+              "lever": "tax_reach_pct",
+              "value": 4
+            }
+          ]
+        }
+      },
+      {
+        "id": "malacca_undang_undang",
+        "name": "The laws of Malacca",
+        "theme": "crown",
+        "text": "Keep 6 more officials and 3 more loyal lords than at the start.",
+        "historical": true,
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "officials",
+                "op": ">=",
+                "value": "start+6"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "loyal_lords",
+                "op": ">=",
+                "value": "start+3"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "malacca_hukum_kanun",
+          "name": "Hukum Kanun",
+          "text": "Officials' wages 20 % lower, and tax reaching the treasury +6 %.",
+          "effects": [
+            {
+              "lever": "official_wage_pct",
+              "value": -20
+            },
+            {
+              "lever": "tax_reach_pct",
+              "value": 6
+            }
+          ]
+        }
+      },
+      {
+        "id": "malacca_johor",
+        "name": "The court on the Johor river",
+        "theme": "survival",
+        "text": "After the Portuguese take Malacca, hold it again.",
+        "historical": true,
+        "requires": {
+          "event": {
+            "id": "portuguese_capture_of_malacca"
+          }
+        },
+        "goal": {
+          "all": [
+            {
+              "event": {
+                "id": "portuguese_capture_of_malacca"
+              }
+            },
+            {
+              "holds_place": {
+                "who": "this",
+                "place": "Malacca (Melaka)"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "malacca_kota_tinggi",
+          "name": "Kota Tinggi",
+          "text": "Garrisons stand 20 % stronger, and recruits refill 15 % faster.",
+          "effects": [
+            {
+              "lever": "garrison_pct",
+              "value": 20
+            },
+            {
+              "lever": "recruit_refill_pct",
+              "value": 15
+            }
+          ]
+        }
+      },
+      {
+        "id": "malacca_the_laksamana",
+        "name": "The laksamana's fleet",
+        "theme": "sea",
+        "text": "Build 5 more harbours than at the start.",
+        "historical": true,
+        "requires": {
+          "coastal": {
+            "who": "this"
+          }
+        },
+        "goal": {
+          "count": {
+            "who": "this",
+            "thing": "building:harbour",
+            "op": ">=",
+            "value": "start+5"
+          }
+        },
+        "legacy": {
+          "id": "malacca_orang_laut",
+          "name": "Oaths of the Orang Laut",
+          "text": "Hired companies cost 20 % less, 10 % more sailors per thousand seafolk, and tax reaching the treasury +5 %.",
+          "effects": [
+            {
+              "lever": "hired_company_cost_pct",
+              "value": -20
+            },
+            {
+              "lever": "crew_pct",
+              "value": 10
+            },
+            {
+              "lever": "tax_reach_pct",
+              "value": 5
+            }
+          ]
+        }
+      }
+    ],
+    "brunei": [
+      {
+        "id": "brunei_bolkiah",
+        "name": "Nakhoda Ragam's fleets",
+        "theme": "land",
+        "text": "Own a quarter of Malaya and Borneo and build 3 more harbours than at the start.",
+        "historical": true,
+        "goal": {
+          "all": [
+            {
+              "owns": {
+                "who": "this",
+                "where": "area:malaya_and_borneo",
+                "min_share": 0.25
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:harbour",
+                "op": ">=",
+                "value": "start+3"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "brunei_singing_captain",
+          "name": "The singing captain",
+          "text": "Tax reaching the treasury +10 %, 10 % more sailors per thousand seafolk, and gold at toll points +10 %.",
+          "effects": [
+            {
+              "lever": "tax_reach_pct",
+              "value": 10
+            },
+            {
+              "lever": "crew_pct",
+              "value": 10
+            },
+            {
+              "lever": "toll_gold_pct",
+              "value": 10
+            }
+          ]
+        }
+      },
+      {
+        "id": "brunei_castilian_war",
+        "name": "The Castilian war",
+        "theme": "survival",
+        "text": "After the Spanish reach the Philippines, be independent in 1580 or later with at least the provinces you started with.",
+        "historical": true,
+        "requires": {
+          "all": [
+            {
+              "heritage": {
+                "who": "this",
+                "id": "brunei_bolkiah",
+                "state": "done"
+              }
+            },
+            {
+              "event": {
+                "id": "spanish_philippines"
+              }
+            }
+          ]
+        },
+        "goal": {
+          "all": [
+            {
+              "event": {
+                "id": "spanish_philippines"
+              }
+            },
+            {
+              "date": {
+                "min": 1580
+              }
+            },
+            {
+              "independent": {
+                "who": "this"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "provinces",
+                "op": ">=",
+                "value": "start+0"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "brunei_kota_batu",
+          "name": "Walls of Kota Batu",
+          "text": "Garrisons stand 25 % stronger, and recruits refill 10 % faster.",
+          "effects": [
+            {
+              "lever": "garrison_pct",
+              "value": 25
+            },
+            {
+              "lever": "recruit_refill_pct",
+              "value": 10
+            }
+          ]
+        }
+      },
+      {
+        "id": "brunei_camphor",
+        "name": "Camphor for the China junks",
+        "theme": "trade",
+        "text": "Build 3 more harbours and 3 more markets than at the start.",
+        "historical": false,
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:harbour",
+                "op": ">=",
+                "value": "start+3"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:market",
+                "op": ">=",
+                "value": "start+3"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "brunei_water_village",
+          "name": "The water village",
+          "text": "Tax reaching the treasury +10 %, and new works cost 15 % less.",
+          "effects": [
+            {
+              "lever": "tax_reach_pct",
+              "value": 10
+            },
+            {
+              "lever": "building_cost_pct",
+              "value": -15
+            }
+          ]
+        }
+      },
+      {
+        "id": "brunei_jawi_scribes",
+        "name": "The jawi scribes",
+        "theme": "learning",
+        "text": "Keep 2 more schools and 3 more scholars than at the start.",
+        "historical": true,
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "schools",
+                "op": ">=",
+                "value": "start+2"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "scholars",
+                "op": ">=",
+                "value": "start+3"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "brunei_silsilah",
+          "name": "The Silsilah Raja-Raja",
+          "text": "Officials' wages 15 % lower, and each scholar's research +8 %.",
+          "effects": [
+            {
+              "lever": "official_wage_pct",
+              "value": -15
+            },
+            {
+              "lever": "scholar_output_pct",
+              "value": 8
+            }
+          ]
+        }
+      }
+    ],
+    "delhi": [
+      {
+        "id": "delhi_after_timur",
+        "name": "The ashes of Timur's sack",
+        "theme": "survival",
+        "text": "Own all of the Delhi Doab and of Punjab in 1405 or later.",
+        "historical": true,
+        "window": [
+          1398,
+          1460
+        ],
+        "goal": {
+          "all": [
+            {
+              "date": {
+                "min": 1405
+              }
+            },
+            {
+              "owns": {
+                "who": "this",
+                "where": "area:delhi_doab",
+                "min_share": 1
+              }
+            },
+            {
+              "owns": {
+                "who": "this",
+                "where": "area:punjab",
+                "min_share": 1
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "delhi_khizr_khan",
+          "name": "Khizr Khan's banner",
+          "text": "Population grows 8 % faster, recruits refill 10 % faster, and tax reaching the treasury +4 %.",
+          "effects": [
+            {
+              "lever": "growth_pct",
+              "value": 8
+            },
+            {
+              "lever": "recruit_refill_pct",
+              "value": 10
+            },
+            {
+              "lever": "tax_reach_pct",
+              "value": 4
+            }
+          ]
+        }
+      },
+      {
+        "id": "delhi_agra",
+        "name": "A new seat at Agra",
+        "theme": "crown",
+        "text": "Build 4 more castles and 4 more markets than at the start.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "delhi_after_timur",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:castle",
+                "op": ">=",
+                "value": "start+4"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:market",
+                "op": ">=",
+                "value": "start+4"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "delhi_sikandra",
+          "name": "Sikandar's city",
+          "text": "Tax reaching the treasury +10 %, and garrisons stand 15 % stronger.",
+          "effects": [
+            {
+              "lever": "tax_reach_pct",
+              "value": 10
+            },
+            {
+              "lever": "garrison_pct",
+              "value": 15
+            }
+          ]
+        }
+      },
+      {
+        "id": "delhi_hindustan",
+        "name": "Sultan of Hindustan",
+        "theme": "land",
+        "text": "Own half of North India.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "delhi_outlast_jaunpur_sultanate",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "owns": {
+            "who": "this",
+            "where": "region:north_india",
+            "min_share": 0.5
+          }
+        },
+        "legacy": {
+          "id": "delhi_lodi_throne",
+          "name": "The Lodi throne",
+          "text": "Tax reaching the treasury +12 %, recruits refill 15 % faster, and officials' wages 10 % lower.",
+          "effects": [
+            {
+              "lever": "tax_reach_pct",
+              "value": 12
+            },
+            {
+              "lever": "recruit_refill_pct",
+              "value": 15
+            },
+            {
+              "lever": "official_wage_pct",
+              "value": -10
+            }
+          ],
+          "great": true
+        }
+      },
+      {
+        "id": "delhi_keys_of_malwa",
+        "name": "Keys of Malwa",
+        "theme": "land",
+        "text": "Hold Chanderi and Mandu and build 3 more castles than at the start.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "delhi_take_shadiabad_mandu",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "all": [
+            {
+              "holds_place": {
+                "who": "this",
+                "place": "Chanderi"
+              }
+            },
+            {
+              "holds_place": {
+                "who": "this",
+                "place": "Mandu"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:castle",
+                "op": ">=",
+                "value": "start+3"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "delhi_chanderi_gate",
+          "name": "The cut gate of Chanderi",
+          "text": "Garrisons stand 20 % stronger, and recruits refill 10 % faster.",
+          "effects": [
+            {
+              "lever": "garrison_pct",
+              "value": 20
+            },
+            {
+              "lever": "recruit_refill_pct",
+              "value": 10
+            }
+          ]
+        }
+      },
+      {
+        "id": "delhi_firuz_canals",
+        "name": "The Western Yamuna canal",
+        "theme": "wealth",
+        "text": "Build 4 more farms and 3 more granaries than at the start before 1420.",
+        "historical": true,
+        "window": [
+          1378,
+          1420
+        ],
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:farm",
+                "op": ">=",
+                "value": "start+4"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:granary",
+                "op": ">=",
+                "value": "start+3"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "delhi_firuz_shahi_nahr",
+          "name": "Firuz Shah's nahr",
+          "text": "Harvests roll one step better, and population grows 6 % faster.",
+          "effects": [
+            {
+              "lever": "harvest_steps",
+              "value": 1
+            },
+            {
+              "lever": "growth_pct",
+              "value": 6
+            }
+          ]
+        }
+      },
+      {
+        "id": "delhi_panipat",
+        "name": "The field of Panipat",
+        "theme": "survival",
+        "text": "After the battle at Panipat, be independent and win 3 more battles than at the start.",
+        "historical": true,
+        "requires": {
+          "event": {
+            "id": "first_battle_of_panipat"
+          }
+        },
+        "goal": {
+          "all": [
+            {
+              "event": {
+                "id": "first_battle_of_panipat"
+              }
+            },
+            {
+              "independent": {
+                "who": "this"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "victories",
+                "op": ">=",
+                "value": "start+3"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "delhi_afghan_horse",
+          "name": "The Afghan horse",
+          "text": "Recruits refill 20 % faster, garrisons stand 20 % stronger, and hired companies cost 20 % less.",
+          "effects": [
+            {
+              "lever": "recruit_refill_pct",
+              "value": 20
+            },
+            {
+              "lever": "garrison_pct",
+              "value": 20
+            },
+            {
+              "lever": "hired_company_cost_pct",
+              "value": -20
+            }
+          ],
+          "great": true
+        }
+      }
+    ],
+    "jaunpur": [
+      {
+        "id": "jaunpur_atala",
+        "name": "The Atala mosque",
+        "theme": "faith",
+        "text": "Build 3 more markets and keep 2 more schools than at the start.",
+        "historical": true,
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:market",
+                "op": ">=",
+                "value": "start+3"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "schools",
+                "op": ">=",
+                "value": "start+2"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "jaunpur_sharqi_arches",
+          "name": "Sharqi arches",
+          "text": "New works cost 20 % less, the faith spreads 10 % faster, and officials' wages 10 % lower.",
+          "effects": [
+            {
+              "lever": "building_cost_pct",
+              "value": -20
+            },
+            {
+              "lever": "faith_shift_pct",
+              "value": 10
+            },
+            {
+              "lever": "official_wage_pct",
+              "value": -10
+            }
+          ]
+        }
+      },
+      {
+        "id": "jaunpur_shiraz_of_hind",
+        "name": "The Shiraz of Hind",
+        "theme": "learning",
+        "text": "Keep 4 schools and 8 more scholars than at the start.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "jaunpur_atala",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "schools",
+                "op": ">=",
+                "value": 4
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "scholars",
+                "op": ">=",
+                "value": "start+8"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "jaunpur_ibrahim_madrasa",
+          "name": "Ibrahim's madrasas",
+          "text": "Each scholar's research +12 %, and officials' wages 12 % lower.",
+          "effects": [
+            {
+              "lever": "scholar_output_pct",
+              "value": 12
+            },
+            {
+              "lever": "official_wage_pct",
+              "value": -12
+            }
+          ]
+        }
+      },
+      {
+        "id": "jaunpur_before_delhi",
+        "name": "Before the walls of Delhi",
+        "theme": "land",
+        "text": "Own half of the Delhi Doab.",
+        "historical": true,
+        "goal": {
+          "owns": {
+            "who": "this",
+            "where": "area:delhi_doab",
+            "min_share": 0.5
+          }
+        },
+        "legacy": {
+          "id": "jaunpur_husain_host",
+          "name": "Husain Shah's host",
+          "text": "Recruits refill 15 % faster, gold from sacks +20 %, and tax reaching the treasury +5 %.",
+          "effects": [
+            {
+              "lever": "recruit_refill_pct",
+              "value": 15
+            },
+            {
+              "lever": "loot_pct",
+              "value": 20
+            },
+            {
+              "lever": "tax_reach_pct",
+              "value": 5
+            }
+          ]
+        }
+      },
+      {
+        "id": "jaunpur_sharqi_in_delhi",
+        "name": "Sharqi in Delhi",
+        "theme": "crown",
+        "text": "Own all of the Delhi Doab and hold Sirhind.",
+        "historical": false,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "jaunpur_before_delhi",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "all": [
+            {
+              "owns": {
+                "who": "this",
+                "where": "area:delhi_doab",
+                "min_share": 1
+              }
+            },
+            {
+              "holds_place": {
+                "who": "this",
+                "place": "Sirhind"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "jaunpur_eastern_sultanate",
+          "name": "Malik-us-Sharq",
+          "text": "Tax reaching the treasury +12 %, garrisons stand 15 % stronger, and recruits refill 15 % faster.",
+          "effects": [
+            {
+              "lever": "tax_reach_pct",
+              "value": 12
+            },
+            {
+              "lever": "garrison_pct",
+              "value": 15
+            },
+            {
+              "lever": "recruit_refill_pct",
+              "value": 15
+            }
+          ],
+          "great": true
+        }
+      }
+    ],
+    "bengal": [
+      {
+        "id": "bengal_whole_delta",
+        "name": "All the delta",
+        "theme": "land",
+        "text": "Own nine-tenths of Bengal and build 4 more farms than at the start.",
+        "historical": true,
+        "goal": {
+          "all": [
+            {
+              "owns": {
+                "who": "this",
+                "where": "area:bengal",
+                "min_share": 0.9
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:farm",
+                "op": ">=",
+                "value": "start+4"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "bengal_bhati",
+          "name": "The Bhati country",
+          "text": "Population grows 10 % faster, and tax reaching the treasury +8 %.",
+          "effects": [
+            {
+              "lever": "growth_pct",
+              "value": 10
+            },
+            {
+              "lever": "tax_reach_pct",
+              "value": 8
+            }
+          ]
+        }
+      },
+      {
+        "id": "bengal_raja_ganesha",
+        "name": "Raja Ganesha's son",
+        "theme": "crown",
+        "text": "Keep 5 more loyal lords than at the start and stay Steady, before 1440.",
+        "historical": true,
+        "window": [
+          1400,
+          1440
+        ],
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "loyal_lords",
+                "op": ">=",
+                "value": "start+5"
+              }
+            },
+            {
+              "stat": {
+                "who": "this",
+                "stat": "stability",
+                "op": ">=",
+                "value": 2
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "bengal_jalaluddin",
+          "name": "Jalaluddin's court",
+          "text": "Officials' wages 15 % lower, and lords start one step more loyal.",
+          "effects": [
+            {
+              "lever": "official_wage_pct",
+              "value": -15
+            },
+            {
+              "lever": "lord_loyalty_start_steps",
+              "value": 1
+            }
+          ]
+        }
+      },
+      {
+        "id": "bengal_husain_shah",
+        "name": "Husain Shah's wars",
+        "theme": "land",
+        "text": "Make Orissa your subject.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "bengal_gate_of_kamatapur",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "relation": {
+            "who": "orissa",
+            "other": "this",
+            "type": "subject"
+          }
+        },
+        "legacy": {
+          "id": "bengal_gajapati_tribute",
+          "name": "Tribute of the Gajapati",
+          "text": "Tribute from subjects +20 %, and recruits refill 10 % faster.",
+          "effects": [
+            {
+              "lever": "tribute_pct",
+              "value": 20
+            },
+            {
+              "lever": "recruit_refill_pct",
+              "value": 10
+            }
+          ]
+        }
+      },
+      {
+        "id": "bengal_muslin",
+        "name": "Looms of Sonargaon",
+        "theme": "wealth",
+        "text": "Build 5 more markets than at the start.",
+        "historical": false,
+        "goal": {
+          "count": {
+            "who": "this",
+            "thing": "building:market",
+            "op": ">=",
+            "value": "start+5"
+          }
+        },
+        "legacy": {
+          "id": "bengal_mulmul",
+          "name": "Mulmul khas",
+          "text": "Tax reaching the treasury +10 %, the trade ratio gain +5 %, and new works cost 10 % less.",
+          "effects": [
+            {
+              "lever": "tax_reach_pct",
+              "value": 10
+            },
+            {
+              "lever": "trade_balance_pct",
+              "value": 5
+            },
+            {
+              "lever": "building_cost_pct",
+              "value": -10
+            }
+          ]
+        }
+      },
+      {
+        "id": "bengal_up_the_brahmaputra",
+        "name": "Up the Brahmaputra",
+        "theme": "land",
+        "text": "Make Ahom your subject or see it gone.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "bengal_whole_delta",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "any": [
+            {
+              "relation": {
+                "who": "ahom",
+                "other": "this",
+                "type": "subject"
+              }
+            },
+            {
+              "not": {
+                "exists": {
+                  "who": "ahom"
+                }
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "bengal_turbak_flotilla",
+          "name": "Turbak's flotilla",
+          "text": "Recruits refill 15 % faster, and garrisons stand 15 % stronger.",
+          "effects": [
+            {
+              "lever": "recruit_refill_pct",
+              "value": 15
+            },
+            {
+              "lever": "garrison_pct",
+              "value": 15
+            }
+          ]
+        }
+      }
+    ],
+    "bahmanis": [
+      {
+        "id": "bahmanis_bidar",
+        "name": "The move to Bidar",
+        "theme": "crown",
+        "text": "Hold Bidar and build 3 more castles than at the start.",
+        "historical": true,
+        "goal": {
+          "all": [
+            {
+              "holds_place": {
+                "who": "this",
+                "place": "Bidar"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:castle",
+                "op": ">=",
+                "value": "start+3"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "bahmanis_bidar_fort",
+          "name": "Walls of Muhammadabad",
+          "text": "Garrisons stand 15 % stronger, and officials' wages 15 % lower.",
+          "effects": [
+            {
+              "lever": "garrison_pct",
+              "value": 15
+            },
+            {
+              "lever": "official_wage_pct",
+              "value": -15
+            }
+          ]
+        }
+      },
+      {
+        "id": "bahmanis_gawan_madrasa",
+        "name": "Mahmud Gawan's madrasa",
+        "theme": "learning",
+        "text": "Keep 4 schools and 6 more scholars than at the start.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "bahmanis_bidar",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "schools",
+                "op": ">=",
+                "value": 4
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "scholars",
+                "op": ">=",
+                "value": "start+6"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "bahmanis_madrasa_of_bidar",
+          "name": "The tiles of the Bidar madrasa",
+          "text": "Each scholar's research +10 %, and officials' wages 15 % lower.",
+          "effects": [
+            {
+              "lever": "scholar_output_pct",
+              "value": 10
+            },
+            {
+              "lever": "official_wage_pct",
+              "value": -15
+            }
+          ]
+        }
+      },
+      {
+        "id": "bahmanis_eight_tarafs",
+        "name": "Eight tarafs",
+        "theme": "crown",
+        "text": "Keep 15 more officials than at the start and stay Steady.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "bahmanis_gawan_madrasa",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "officials",
+                "op": ">=",
+                "value": "start+15"
+              }
+            },
+            {
+              "stat": {
+                "who": "this",
+                "stat": "stability",
+                "op": ">=",
+                "value": 2
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "bahmanis_khwaja_jahan",
+          "name": "Khwaja-i-Jahan's ledgers",
+          "text": "Officials' wages 20 % lower, and tax reaching the treasury +8 %.",
+          "effects": [
+            {
+              "lever": "official_wage_pct",
+              "value": -20
+            },
+            {
+              "lever": "tax_reach_pct",
+              "value": 8
+            }
+          ]
+        }
+      },
+      {
+        "id": "bahmanis_whole_tungabhadra",
+        "name": "Both banks of the Tungabhadra",
+        "theme": "land",
+        "text": "Own all of the Tungabhadra country.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "bahmani_between_two_rivers",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "owns": {
+            "who": "this",
+            "where": "area:tungabhadra",
+            "min_share": 1
+          }
+        },
+        "legacy": {
+          "id": "bahmanis_lord_of_the_deccan",
+          "name": "Lord of the Deccan",
+          "text": "Tax reaching the treasury +10 %, recruits refill 15 % faster, and garrisons stand 15 % stronger.",
+          "effects": [
+            {
+              "lever": "tax_reach_pct",
+              "value": 10
+            },
+            {
+              "lever": "recruit_refill_pct",
+              "value": 15
+            },
+            {
+              "lever": "garrison_pct",
+              "value": 15
+            }
+          ],
+          "great": true
+        }
+      },
+      {
+        "id": "bahmanis_kondavidu",
+        "name": "East to the Godavari",
+        "theme": "land",
+        "text": "Make Orissa your subject.",
+        "historical": true,
+        "goal": {
+          "relation": {
+            "who": "orissa",
+            "other": "this",
+            "type": "subject"
+          }
+        },
+        "legacy": {
+          "id": "bahmanis_coast_of_masulipatam",
+          "name": "The Coromandel shore",
+          "text": "Tribute from subjects +20 %, and recruits refill 10 % faster.",
+          "effects": [
+            {
+              "lever": "tribute_pct",
+              "value": 20
+            },
+            {
+              "lever": "recruit_refill_pct",
+              "value": 10
+            }
+          ]
+        }
+      },
+      {
+        "id": "bahmanis_five_sultans",
+        "name": "Five sultans sworn",
+        "theme": "survival",
+        "text": "Keep 6 more loyal lords than at the start and be independent in 1500 or later.",
+        "historical": true,
+        "window": [
+          1480,
+          1540
+        ],
+        "goal": {
+          "all": [
+            {
+              "date": {
+                "min": 1500
+              }
+            },
+            {
+              "independent": {
+                "who": "this"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "loyal_lords",
+                "op": ">=",
+                "value": "start+6"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "bahmanis_dakhni_oath",
+          "name": "The Dakhni oath",
+          "text": "Lords start one step more loyal, and officials' wages 15 % lower.",
+          "effects": [
+            {
+              "lever": "lord_loyalty_start_steps",
+              "value": 1
+            },
+            {
+              "lever": "official_wage_pct",
+              "value": -15
+            }
+          ]
+        }
+      },
+      {
+        "id": "bahmanis_dabhol_horses",
+        "name": "Horses at Dabhol",
+        "theme": "trade",
+        "text": "Build 4 more harbours than at the start.",
+        "historical": true,
+        "requires": {
+          "coastal": {
+            "who": "this"
+          }
+        },
+        "goal": {
+          "count": {
+            "who": "this",
+            "thing": "building:harbour",
+            "op": ">=",
+            "value": "start+4"
+          }
+        },
+        "legacy": {
+          "id": "bahmanis_arab_mares",
+          "name": "Mares from Hormuz",
+          "text": "Recruits refill 10 % faster, tax reaching the treasury +8 %, and 10 % more horses bred each year.",
+          "effects": [
+            {
+              "lever": "recruit_refill_pct",
+              "value": 10
+            },
+            {
+              "lever": "tax_reach_pct",
+              "value": 8
+            },
+            {
+              "lever": "horses_pct",
+              "value": 10
+            }
+          ]
+        }
+      }
+    ],
+    "vijayanagar": [
+      {
+        "id": "vijayanagar_madurai",
+        "name": "Kampana's southern war",
+        "theme": "land",
+        "text": "Own all of the Carnatic before 1400.",
+        "historical": true,
+        "window": [
+          1378,
+          1400
+        ],
+        "goal": {
+          "owns": {
+            "who": "this",
+            "where": "area:carnatic",
+            "min_share": 1
+          }
+        },
+        "legacy": {
+          "id": "vijayanagar_madhura_vijayam",
+          "name": "Madhura Vijayam",
+          "text": "The faith spreads 15 % faster, population grows 6 % faster, and tax reaching the treasury +5 %.",
+          "effects": [
+            {
+              "lever": "faith_shift_pct",
+              "value": 15
+            },
+            {
+              "lever": "growth_pct",
+              "value": 6
+            },
+            {
+              "lever": "tax_reach_pct",
+              "value": 5
+            }
+          ]
+        }
+      },
+      {
+        "id": "vijayanagar_turkic_bowmen",
+        "name": "Bowmen of Deva Raya",
+        "theme": "land",
+        "text": "Have twice the soldiers you began with.",
+        "historical": true,
+        "goal": {
+          "count": {
+            "who": "this",
+            "thing": "soldiers",
+            "op": ">=",
+            "value": "start*2"
+          }
+        },
+        "legacy": {
+          "id": "vijayanagar_devaraya_archers",
+          "name": "Deva Raya's mosque for archers",
+          "text": "Hired companies cost 25 % less, and recruits refill 15 % faster.",
+          "effects": [
+            {
+              "lever": "hired_company_cost_pct",
+              "value": -25
+            },
+            {
+              "lever": "recruit_refill_pct",
+              "value": 15
+            }
+          ]
+        }
+      },
+      {
+        "id": "vijayanagar_tungabhadra",
+        "name": "Both banks of the river",
+        "theme": "land",
+        "text": "Own all of the Tungabhadra country.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "vijayanagara_raichur_held",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "owns": {
+            "who": "this",
+            "where": "area:tungabhadra",
+            "min_share": 1
+          }
+        },
+        "legacy": {
+          "id": "vijayanagar_raichur_doab_held",
+          "name": "The doab made whole",
+          "text": "Garrisons stand 20 % stronger, recruits refill 15 % faster, and tax reaching the treasury +8 %.",
+          "effects": [
+            {
+              "lever": "garrison_pct",
+              "value": 20
+            },
+            {
+              "lever": "recruit_refill_pct",
+              "value": 15
+            },
+            {
+              "lever": "tax_reach_pct",
+              "value": 8
+            }
+          ],
+          "great": true
+        }
+      },
+      {
+        "id": "vijayanagar_bidar_gulbarga",
+        "name": "Into the Bahmani heartland",
+        "theme": "land",
+        "text": "Hold Bidar and Gulbarga.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "vijayanagar_tungabhadra",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "all": [
+            {
+              "holds_place": {
+                "who": "this",
+                "place": "Bidar"
+              }
+            },
+            {
+              "holds_place": {
+                "who": "this",
+                "place": "Gulbarga"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "vijayanagar_yavanarajya",
+          "name": "Yavanarajya-sthapanacharya",
+          "text": "Gold from sacks +20 %, and tax reaching the treasury +10 %.",
+          "effects": [
+            {
+              "lever": "loot_pct",
+              "value": 20
+            },
+            {
+              "lever": "tax_reach_pct",
+              "value": 10
+            }
+          ]
+        }
+      },
+      {
+        "id": "vijayanagar_tanks",
+        "name": "Tanks and channels",
+        "theme": "wealth",
+        "text": "Build 5 more farms and 3 more granaries than at the start.",
+        "historical": true,
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:farm",
+                "op": ">=",
+                "value": "start+5"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:granary",
+                "op": ">=",
+                "value": "start+3"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "vijayanagar_korragal",
+          "name": "The Korragal dam",
+          "text": "Harvests roll one step better, and population grows 5 % faster.",
+          "effects": [
+            {
+              "lever": "harvest_steps",
+              "value": 1
+            },
+            {
+              "lever": "growth_pct",
+              "value": 5
+            }
+          ]
+        }
+      },
+      {
+        "id": "vijayanagar_goa",
+        "name": "Horses through Goa",
+        "theme": "trade",
+        "text": "Hold Goa.",
+        "historical": true,
+        "goal": {
+          "owns": {
+            "who": "this",
+            "where": "province:goa"
+          }
+        },
+        "legacy": {
+          "id": "vijayanagar_madhava_port",
+          "name": "Madhava's harbour",
+          "text": "Recruits refill 15 % faster, hired companies cost 15 % less, and tax reaching the treasury +5 %.",
+          "effects": [
+            {
+              "lever": "recruit_refill_pct",
+              "value": 15
+            },
+            {
+              "lever": "hired_company_cost_pct",
+              "value": -15
+            },
+            {
+              "lever": "tax_reach_pct",
+              "value": 5
+            }
+          ]
+        }
+      },
+      {
+        "id": "vijayanagar_chandragiri",
+        "name": "The court at Chandragiri",
+        "theme": "survival",
+        "text": "After the battle of Talikota, hold Tirupati and Udayagiri and stay independent.",
+        "historical": true,
+        "requires": {
+          "event": {
+            "id": "battle_of_talikota"
+          }
+        },
+        "goal": {
+          "all": [
+            {
+              "event": {
+                "id": "battle_of_talikota"
+              }
+            },
+            {
+              "holds_place": {
+                "who": "this",
+                "place": "Tirupati"
+              }
+            },
+            {
+              "holds_place": {
+                "who": "this",
+                "place": "Udayagiri"
+              }
+            },
+            {
+              "independent": {
+                "who": "this"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "vijayanagar_aravidu",
+          "name": "The Aravidu banner",
+          "text": "Garrisons stand 20 % stronger, population grows 5 % faster, and officials' wages 5 % lower.",
+          "effects": [
+            {
+              "lever": "garrison_pct",
+              "value": 20
+            },
+            {
+              "lever": "growth_pct",
+              "value": 5
+            },
+            {
+              "lever": "official_wage_pct",
+              "value": -5
+            }
+          ]
+        }
+      }
+    ],
+    "gujarat": [
+      {
+        "id": "gujarat_chaul",
+        "name": "The fight at Chaul",
+        "theme": "sea",
+        "text": "After the Portuguese reach India, win 3 more battles than at the start and still hold Diu.",
+        "historical": true,
+        "requires": {
+          "event": {
+            "id": "portuguese_cape_route"
+          }
+        },
+        "goal": {
+          "all": [
+            {
+              "event": {
+                "id": "portuguese_cape_route"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "victories",
+                "op": ">=",
+                "value": "start+3"
+              }
+            },
+            {
+              "holds_place": {
+                "who": "this",
+                "place": "Diu"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "gujarat_malik_ayaz",
+          "name": "Malik Ayaz's galleys",
+          "text": "Garrisons stand 20 % stronger, and recruits refill 10 % faster.",
+          "effects": [
+            {
+              "lever": "garrison_pct",
+              "value": 20
+            },
+            {
+              "lever": "recruit_refill_pct",
+              "value": 10
+            }
+          ]
+        }
+      },
+      {
+        "id": "gujarat_chittor",
+        "name": "Bahadur Shah's guns",
+        "theme": "land",
+        "text": "Hold Chittor.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "gujarat_mandu_annexed",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "holds_place": {
+            "who": "this",
+            "place": "Chittor"
+          }
+        },
+        "legacy": {
+          "id": "gujarat_rumi_khan",
+          "name": "Rumi Khan's battery",
+          "text": "Recruits refill 15 % faster, gold from sacks +20 %, and garrisons stand 10 % stronger.",
+          "effects": [
+            {
+              "lever": "recruit_refill_pct",
+              "value": 15
+            },
+            {
+              "lever": "loot_pct",
+              "value": 20
+            },
+            {
+              "lever": "garrison_pct",
+              "value": 10
+            }
+          ]
+        }
+      },
+      {
+        "id": "gujarat_konkan",
+        "name": "Down the Konkan coast",
+        "theme": "land",
+        "text": "Own half of the Konkan.",
+        "historical": true,
+        "goal": {
+          "owns": {
+            "who": "this",
+            "where": "area:konkan",
+            "min_share": 0.5
+          }
+        },
+        "legacy": {
+          "id": "gujarat_bassein",
+          "name": "Customs of Bassein",
+          "text": "Tax reaching the treasury +10 %, and 10 % more sailors per thousand seafolk.",
+          "effects": [
+            {
+              "lever": "tax_reach_pct",
+              "value": 10
+            },
+            {
+              "lever": "crew_pct",
+              "value": 10
+            }
+          ]
+        }
+      },
+      {
+        "id": "gujarat_cambay_looms",
+        "name": "Looms of Cambay",
+        "theme": "wealth",
+        "text": "Build 5 more markets and 3 more harbours than at the start.",
+        "historical": false,
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:market",
+                "op": ">=",
+                "value": "start+5"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:harbour",
+                "op": ">=",
+                "value": "start+3"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "gujarat_patola",
+          "name": "Patola of Patan",
+          "text": "Tax reaching the treasury +10 %, and new works cost 15 % less.",
+          "effects": [
+            {
+              "lever": "tax_reach_pct",
+              "value": 10
+            },
+            {
+              "lever": "building_cost_pct",
+              "value": -15
+            }
+          ]
+        }
+      },
+      {
+        "id": "gujarat_begada",
+        "name": "Begada's peace",
+        "theme": "crown",
+        "text": "Keep 8 more officials and 4 more loyal lords than at the start.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "gujarat_girnar",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "officials",
+                "op": ">=",
+                "value": "start+8"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "loyal_lords",
+                "op": ">=",
+                "value": "start+4"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "gujarat_mahmudabad",
+          "name": "Mahmudabad",
+          "text": "Officials' wages 20 % lower, and tax reaching the treasury +8 %.",
+          "effects": [
+            {
+              "lever": "official_wage_pct",
+              "value": -20
+            },
+            {
+              "lever": "tax_reach_pct",
+              "value": 8
+            }
+          ]
+        }
+      }
+    ],
+    "malwa": [
+      {
+        "id": "malwa_lord_of_rajputana",
+        "name": "Over the Rajput hills",
+        "theme": "land",
+        "text": "Make Mewar your subject or see it gone.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "malwa_chittors_walls",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "any": [
+            {
+              "relation": {
+                "who": "mewar",
+                "other": "this",
+                "type": "subject"
+              }
+            },
+            {
+              "not": {
+                "exists": {
+                  "who": "mewar"
+                }
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "malwa_khalji_banner",
+          "name": "The Khalji banner",
+          "text": "Recruits refill 15 % faster, tribute from subjects +15 %, and garrisons stand 5 % stronger.",
+          "effects": [
+            {
+              "lever": "recruit_refill_pct",
+              "value": 15
+            },
+            {
+              "lever": "tribute_pct",
+              "value": 15
+            },
+            {
+              "lever": "garrison_pct",
+              "value": 5
+            }
+          ]
+        }
+      },
+      {
+        "id": "malwa_lakes_of_mandu",
+        "name": "Lakes of Mandu",
+        "theme": "wealth",
+        "text": "Build 4 more farms and 2 more granaries than at the start.",
+        "historical": false,
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:farm",
+                "op": ">=",
+                "value": "start+4"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:granary",
+                "op": ">=",
+                "value": "start+2"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "malwa_jahaz_mahal",
+          "name": "The ship palace",
+          "text": "Harvests roll one step better, and population grows 5 % faster.",
+          "effects": [
+            {
+              "lever": "harvest_steps",
+              "value": 1
+            },
+            {
+              "lever": "growth_pct",
+              "value": 5
+            }
+          ]
+        }
+      },
+      {
+        "id": "malwa_gond_tribute",
+        "name": "The Gond rajas",
+        "theme": "crown",
+        "text": "Make Gondwana your subject.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "malwa_kherla",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "relation": {
+            "who": "gondwana",
+            "other": "this",
+            "type": "subject"
+          }
+        },
+        "legacy": {
+          "id": "malwa_forest_tribute",
+          "name": "Elephants of the forest",
+          "text": "Tribute from subjects +20 %, and recruits refill 10 % faster.",
+          "effects": [
+            {
+              "lever": "tribute_pct",
+              "value": 20
+            },
+            {
+              "lever": "recruit_refill_pct",
+              "value": 10
+            }
+          ]
+        }
+      },
+      {
+        "id": "malwa_ghiyath_peace",
+        "name": "Ghiyath's long peace",
+        "theme": "crown",
+        "text": "Be at peace and Steady in 1480 or later, with 6 more officials than at the start.",
+        "historical": true,
+        "window": [
+          1469,
+          1520
+        ],
+        "goal": {
+          "all": [
+            {
+              "date": {
+                "min": 1480
+              }
+            },
+            {
+              "not": {
+                "at_war": {
+                  "who": "this"
+                }
+              }
+            },
+            {
+              "stat": {
+                "who": "this",
+                "stat": "stability",
+                "op": ">=",
+                "value": 2
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "officials",
+                "op": ">=",
+                "value": "start+6"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "malwa_nimatnama",
+          "name": "The Ni'matnama",
+          "text": "Officials' wages 15 % lower, population grows 6 % faster, and debt interest 10 % lower.",
+          "effects": [
+            {
+              "lever": "official_wage_pct",
+              "value": -15
+            },
+            {
+              "lever": "growth_pct",
+              "value": 6
+            },
+            {
+              "lever": "loan_interest_pct",
+              "value": -10
+            }
+          ]
+        }
+      }
+    ],
+    "mewar": [
+      {
+        "id": "mewar_kumbha_forts",
+        "name": "Kumbha's hill forts",
+        "theme": "survival",
+        "text": "Build 6 more castles than at the start.",
+        "historical": true,
+        "goal": {
+          "count": {
+            "who": "this",
+            "thing": "building:castle",
+            "op": ">=",
+            "value": "start+6"
+          }
+        },
+        "legacy": {
+          "id": "mewar_kumbhalgarh_wall",
+          "name": "The long wall of Kumbhalgarh",
+          "text": "Garrisons stand 25 % stronger, and new works cost 10 % less.",
+          "effects": [
+            {
+              "lever": "garrison_pct",
+              "value": 25
+            },
+            {
+              "lever": "building_cost_pct",
+              "value": -10
+            }
+          ]
+        }
+      },
+      {
+        "id": "mewar_sanga",
+        "name": "Into Malwa",
+        "theme": "land",
+        "text": "Hold Mandu and Chanderi.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "mewar_captive_sultan",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "all": [
+            {
+              "holds_place": {
+                "who": "this",
+                "place": "Mandu"
+              }
+            },
+            {
+              "holds_place": {
+                "who": "this",
+                "place": "Chanderi"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "mewar_eighty_wounds",
+          "name": "Sanga's eighty wounds",
+          "text": "Recruits refill 15 % faster, gold from sacks +20 %, and tax reaching the treasury +5 %.",
+          "effects": [
+            {
+              "lever": "recruit_refill_pct",
+              "value": 15
+            },
+            {
+              "lever": "loot_pct",
+              "value": 20
+            },
+            {
+              "lever": "tax_reach_pct",
+              "value": 5
+            }
+          ]
+        }
+      },
+      {
+        "id": "mewar_haldighati",
+        "name": "The pass at Haldighati",
+        "theme": "survival",
+        "text": "After the battle at Panipat, hold Chittor and be independent in 1580 or later.",
+        "historical": true,
+        "requires": {
+          "event": {
+            "id": "first_battle_of_panipat"
+          }
+        },
+        "goal": {
+          "all": [
+            {
+              "event": {
+                "id": "first_battle_of_panipat"
+              }
+            },
+            {
+              "date": {
+                "min": 1580
+              }
+            },
+            {
+              "holds_place": {
+                "who": "this",
+                "place": "Chittor"
+              }
+            },
+            {
+              "independent": {
+                "who": "this"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "mewar_chetak",
+          "name": "Chetak's leap",
+          "text": "Garrisons stand 20 % stronger, and conquerors' rule lasts 30 % longer in your homeland.",
+          "effects": [
+            {
+              "lever": "garrison_pct",
+              "value": 20
+            },
+            {
+              "lever": "homeland_resistance_pct",
+              "value": 30
+            }
+          ]
+        }
+      },
+      {
+        "id": "mewar_zawar_silver",
+        "name": "Silver of Zawar",
+        "theme": "wealth",
+        "text": "Build 3 more markets than at the start and hold three times the gold you began with.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "mewar_zawar_white_metal",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:market",
+                "op": ">=",
+                "value": "start+3"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "gold",
+                "op": ">=",
+                "value": "start*3"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "mewar_udaipur_lake",
+          "name": "The lake at Udaipur",
+          "text": "Debt interest 20 % lower, and tax reaching the treasury +10 %.",
+          "effects": [
+            {
+              "lever": "loan_interest_pct",
+              "value": -20
+            },
+            {
+              "lever": "tax_reach_pct",
+              "value": 10
+            }
+          ]
+        }
+      }
+    ],
+    "gondwana": [
+      {
+        "id": "gondwana_garha_katanga",
+        "name": "The fifty-two forts",
+        "theme": "survival",
+        "text": "Build 5 more castles than at the start.",
+        "historical": true,
+        "goal": {
+          "count": {
+            "who": "this",
+            "thing": "building:castle",
+            "op": ">=",
+            "value": "start+5"
+          }
+        },
+        "legacy": {
+          "id": "gondwana_sangram_shah",
+          "name": "Sangram Shah's forts",
+          "text": "Garrisons stand 20 % stronger, and recruits refill 10 % faster.",
+          "effects": [
+            {
+              "lever": "garrison_pct",
+              "value": 20
+            },
+            {
+              "lever": "recruit_refill_pct",
+              "value": 10
+            }
+          ]
+        }
+      },
+      {
+        "id": "gondwana_durgavati",
+        "name": "The queen at Narrai",
+        "theme": "survival",
+        "text": "Win 3 more battles than at the start and be independent in 1550 or later.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "gondwana_garha_katanga",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "all": [
+            {
+              "date": {
+                "min": 1550
+              }
+            },
+            {
+              "independent": {
+                "who": "this"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "victories",
+                "op": ">=",
+                "value": "start+3"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "gondwana_durgavati_stand",
+          "name": "Durgavati's stand",
+          "text": "Garrisons stand 15 % stronger, recruits refill 15 % faster, and conquerors' rule lasts 15 % longer in your homeland.",
+          "effects": [
+            {
+              "lever": "garrison_pct",
+              "value": 15
+            },
+            {
+              "lever": "recruit_refill_pct",
+              "value": 15
+            },
+            {
+              "lever": "homeland_resistance_pct",
+              "value": 15
+            }
+          ]
+        }
+      },
+      {
+        "id": "gondwana_tanks",
+        "name": "Tanks of Garha",
+        "theme": "wealth",
+        "text": "Build 3 more farms and 3 more fisheries than at the start.",
+        "historical": false,
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:farm",
+                "op": ">=",
+                "value": "start+3"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:fishery",
+                "op": ">=",
+                "value": "start+3"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "gondwana_ranital",
+          "name": "Ranital",
+          "text": "Harvests roll one step better, and fisheries give 20 % more food.",
+          "effects": [
+            {
+              "lever": "harvest_steps",
+              "value": 1
+            },
+            {
+              "lever": "fish_pct",
+              "value": 20
+            }
+          ]
+        }
+      },
+      {
+        "id": "gondwana_down_from_the_hills",
+        "name": "Down from the hills",
+        "theme": "land",
+        "text": "Hold Mandu.",
+        "historical": false,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "gondwana_outlast_malwa_sultanate",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "holds_place": {
+            "who": "this",
+            "place": "Mandu"
+          }
+        },
+        "legacy": {
+          "id": "gondwana_plateau_road",
+          "name": "The plateau road",
+          "text": "Tax reaching the treasury +8 %, recruits refill 10 % faster, and garrisons stand 5 % stronger.",
+          "effects": [
+            {
+              "lever": "tax_reach_pct",
+              "value": 8
+            },
+            {
+              "lever": "recruit_refill_pct",
+              "value": 10
+            },
+            {
+              "lever": "garrison_pct",
+              "value": 5
+            }
+          ]
+        }
+      }
+    ],
+    "kashmir": [
+      {
+        "id": "kashmir_budshah",
+        "name": "The great king",
+        "theme": "crown",
+        "text": "Keep 3 more schools and 6 more officials than at the start.",
+        "historical": true,
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "schools",
+                "op": ">=",
+                "value": "start+3"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "officials",
+                "op": ">=",
+                "value": "start+6"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "kashmir_zain_ul_abidin",
+          "name": "Bud Shah",
+          "text": "Officials' wages 15 % lower, and each scholar's research +8 %.",
+          "effects": [
+            {
+              "lever": "official_wage_pct",
+              "value": -15
+            },
+            {
+              "lever": "scholar_output_pct",
+              "value": 8
+            }
+          ]
+        }
+      },
+      {
+        "id": "kashmir_shawls",
+        "name": "Weavers from Samarkand",
+        "theme": "wealth",
+        "text": "Build 4 more markets than at the start.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "kashmir_budshah",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "count": {
+            "who": "this",
+            "thing": "building:market",
+            "op": ">=",
+            "value": "start+4"
+          }
+        },
+        "legacy": {
+          "id": "kashmir_kani",
+          "name": "Kani of Srinagar",
+          "text": "Tax reaching the treasury +10 %, new works cost 10 % less, and 10 % more fleeing craftsmen choose you.",
+          "effects": [
+            {
+              "lever": "tax_reach_pct",
+              "value": 10
+            },
+            {
+              "lever": "building_cost_pct",
+              "value": -10
+            },
+            {
+              "lever": "migrants_pct",
+              "value": 10,
+              "class": "craftsmen"
+            }
+          ]
+        }
+      },
+      {
+        "id": "kashmir_punjab",
+        "name": "Down to the Punjab",
+        "theme": "land",
+        "text": "Own half of Punjab.",
+        "historical": true,
+        "goal": {
+          "owns": {
+            "who": "this",
+            "where": "area:punjab",
+            "min_share": 0.5
+          }
+        },
+        "legacy": {
+          "id": "kashmir_shihab_raids",
+          "name": "Shihab-ud-Din's raids",
+          "text": "Recruits refill 15 % faster, gold from sacks +20 %, and tax reaching the treasury +3 %.",
+          "effects": [
+            {
+              "lever": "recruit_refill_pct",
+              "value": 15
+            },
+            {
+              "lever": "loot_pct",
+              "value": 20
+            },
+            {
+              "lever": "tax_reach_pct",
+              "value": 3
+            }
+          ]
+        }
+      },
+      {
+        "id": "kashmir_valley_held",
+        "name": "The valley held",
+        "theme": "survival",
+        "text": "Build 4 more castles than at the start and be independent in 1590 or later.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "kashmir_endure",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "all": [
+            {
+              "date": {
+                "min": 1590
+              }
+            },
+            {
+              "independent": {
+                "who": "this"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:castle",
+                "op": ">=",
+                "value": "start+4"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "kashmir_chak_passes",
+          "name": "Passes of the Chaks",
+          "text": "Garrisons stand 20 % stronger, and conquerors' rule lasts 20 % longer in your homeland.",
+          "effects": [
+            {
+              "lever": "garrison_pct",
+              "value": 20
+            },
+            {
+              "lever": "homeland_resistance_pct",
+              "value": 20
+            }
+          ]
+        }
+      }
+    ],
+    "multan": [
+      {
+        "id": "multan_langah",
+        "name": "The Langah turban",
+        "theme": "crown",
+        "text": "Keep 4 more loyal lords than at the start before 1500.",
+        "historical": true,
+        "window": [
+          1444,
+          1500
+        ],
+        "goal": {
+          "count": {
+            "who": "this",
+            "thing": "loyal_lords",
+            "op": ">=",
+            "value": "start+4"
+          }
+        },
+        "legacy": {
+          "id": "multan_rai_sahra",
+          "name": "Rai Sahra's council",
+          "text": "Lords start one step more loyal, and officials' wages 15 % lower.",
+          "effects": [
+            {
+              "lever": "lord_loyalty_start_steps",
+              "value": 1
+            },
+            {
+              "lever": "official_wage_pct",
+              "value": -15
+            }
+          ]
+        }
+      },
+      {
+        "id": "multan_punjab",
+        "name": "The five rivers",
+        "theme": "land",
+        "text": "Own half of Punjab.",
+        "historical": false,
+        "goal": {
+          "owns": {
+            "who": "this",
+            "where": "area:punjab",
+            "min_share": 0.5
+          }
+        },
+        "legacy": {
+          "id": "multan_chenab_fords",
+          "name": "Fords of the Chenab",
+          "text": "Recruits refill 15 % faster, and tax reaching the treasury +8 %.",
+          "effects": [
+            {
+              "lever": "recruit_refill_pct",
+              "value": 15
+            },
+            {
+              "lever": "tax_reach_pct",
+              "value": 8
+            }
+          ]
+        }
+      },
+      {
+        "id": "multan_road_to_delhi",
+        "name": "The road to Delhi",
+        "theme": "land",
+        "text": "Hold Sirhind.",
+        "historical": false,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "multan_punjab",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "holds_place": {
+            "who": "this",
+            "place": "Sirhind"
+          }
+        },
+        "legacy": {
+          "id": "multan_sirhind_serai",
+          "name": "The serai at Sirhind",
+          "text": "Garrisons stand 15 % stronger, tax reaching the treasury +8 %, and recruits refill 5 % faster.",
+          "effects": [
+            {
+              "lever": "garrison_pct",
+              "value": 15
+            },
+            {
+              "lever": "tax_reach_pct",
+              "value": 8
+            },
+            {
+              "lever": "recruit_refill_pct",
+              "value": 5
+            }
+          ]
+        }
+      },
+      {
+        "id": "multan_saints",
+        "name": "City of saints",
+        "theme": "faith",
+        "text": "Keep 2 more schools and 4 more scholars than at the start.",
+        "historical": true,
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "schools",
+                "op": ">=",
+                "value": "start+2"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "scholars",
+                "op": ">=",
+                "value": "start+4"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "multan_rukn_e_alam",
+          "name": "Shrine of Rukn-e-Alam",
+          "text": "The faith spreads 15 % faster, and officials' wages 15 % lower.",
+          "effects": [
+            {
+              "lever": "faith_shift_pct",
+              "value": 15
+            },
+            {
+              "lever": "official_wage_pct",
+              "value": -15
+            }
+          ]
+        }
+      }
+    ],
+    "sindh": [
+      {
+        "id": "sindh_jam_nizamuddin",
+        "name": "Jam Nindo's age",
+        "theme": "crown",
+        "text": "Keep 6 more officials and 3 more markets than at the start.",
+        "historical": true,
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "officials",
+                "op": ">=",
+                "value": "start+6"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:market",
+                "op": ">=",
+                "value": "start+3"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "sindh_samma_court",
+          "name": "The Samma court at Thatta",
+          "text": "Officials' wages 15 % lower, and tax reaching the treasury +8 %.",
+          "effects": [
+            {
+              "lever": "official_wage_pct",
+              "value": -15
+            },
+            {
+              "lever": "tax_reach_pct",
+              "value": 8
+            }
+          ]
+        }
+      },
+      {
+        "id": "sindh_makli",
+        "name": "The hill of Makli",
+        "theme": "faith",
+        "text": "Keep 3 more schools and 5 more scholars than at the start.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "sindh_jam_nizamuddin",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "schools",
+                "op": ">=",
+                "value": "start+3"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "scholars",
+                "op": ">=",
+                "value": "start+5"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "sindh_makli_tombs",
+          "name": "Tombs of Makli",
+          "text": "Each scholar's research +8 %, the faith spreads 10 % faster, population grows 2 % faster, and officials' wages 5 % lower.",
+          "effects": [
+            {
+              "lever": "scholar_output_pct",
+              "value": 8
+            },
+            {
+              "lever": "faith_shift_pct",
+              "value": 10
+            },
+            {
+              "lever": "growth_pct",
+              "value": 2
+            },
+            {
+              "lever": "official_wage_pct",
+              "value": -5
+            }
+          ]
+        }
+      },
+      {
+        "id": "sindh_indus_floods",
+        "name": "Floods of the Indus",
+        "theme": "wealth",
+        "text": "Build 4 more farms and 3 more fisheries than at the start.",
+        "historical": false,
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:farm",
+                "op": ">=",
+                "value": "start+4"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:fishery",
+                "op": ">=",
+                "value": "start+3"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "sindh_kalri_canals",
+          "name": "Canals of Kalri",
+          "text": "Harvests roll one step better, and fisheries give 20 % more food.",
+          "effects": [
+            {
+              "lever": "harvest_steps",
+              "value": 1
+            },
+            {
+              "lever": "fish_pct",
+              "value": 20
+            }
+          ]
+        }
+      },
+      {
+        "id": "sindh_up_the_river",
+        "name": "Up the river",
+        "theme": "land",
+        "text": "Own half of Punjab.",
+        "historical": false,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "sindh_outlast_multan",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "owns": {
+            "who": "this",
+            "where": "area:punjab",
+            "min_share": 0.5
+          }
+        },
+        "legacy": {
+          "id": "sindh_bukkur_ferries",
+          "name": "Ferries of Bukkur",
+          "text": "Recruits refill 15 % faster, and tax reaching the treasury +8 %.",
+          "effects": [
+            {
+              "lever": "recruit_refill_pct",
+              "value": 15
+            },
+            {
+              "lever": "tax_reach_pct",
+              "value": 8
+            }
+          ]
+        }
+      },
+      {
+        "id": "sindh_arghun",
+        "name": "Before the Arghun",
+        "theme": "survival",
+        "text": "Be independent in 1525 or later with at least the provinces you started with.",
+        "historical": true,
+        "window": [
+          1500,
+          1560
+        ],
+        "goal": {
+          "all": [
+            {
+              "date": {
+                "min": 1525
+              }
+            },
+            {
+              "independent": {
+                "who": "this"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "provinces",
+                "op": ">=",
+                "value": "start+0"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "sindh_thatta_walls",
+          "name": "Walls of Thatta",
+          "text": "Garrisons stand 20 % stronger, and recruits refill 10 % faster.",
+          "effects": [
+            {
+              "lever": "garrison_pct",
+              "value": 20
+            },
+            {
+              "lever": "recruit_refill_pct",
+              "value": 10
+            }
+          ]
+        }
+      }
+    ],
+    "ahom": [
+      {
+        "id": "ahom_paik",
+        "name": "Every man a paik",
+        "theme": "crown",
+        "text": "Have twice the soldiers you began with.",
+        "historical": true,
+        "goal": {
+          "count": {
+            "who": "this",
+            "thing": "soldiers",
+            "op": ">=",
+            "value": "start*2"
+          }
+        },
+        "legacy": {
+          "id": "ahom_khel",
+          "name": "The khel rolls",
+          "text": "Recruits refill 20 % faster, and population grows 5 % faster.",
+          "effects": [
+            {
+              "lever": "recruit_refill_pct",
+              "value": 20
+            },
+            {
+              "lever": "growth_pct",
+              "value": 5
+            }
+          ]
+        }
+      },
+      {
+        "id": "ahom_saraighat",
+        "name": "The river at Saraighat",
+        "theme": "survival",
+        "text": "Win 4 more battles than at the start and be independent in 1670 or later.",
+        "historical": true,
+        "window": [
+          1615,
+          1700
+        ],
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "ahom_paik",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "all": [
+            {
+              "date": {
+                "min": 1670
+              }
+            },
+            {
+              "independent": {
+                "who": "this"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "victories",
+                "op": ">=",
+                "value": "start+4"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "ahom_lachit",
+          "name": "Lachit's oath",
+          "text": "Garrisons stand 20 % stronger, recruits refill 20 % faster, and conquerors' rule lasts 25 % longer in your homeland.",
+          "effects": [
+            {
+              "lever": "garrison_pct",
+              "value": 20
+            },
+            {
+              "lever": "recruit_refill_pct",
+              "value": 20
+            },
+            {
+              "lever": "homeland_resistance_pct",
+              "value": 25
+            }
+          ],
+          "great": true
+        }
+      },
+      {
+        "id": "ahom_buranji",
+        "name": "The buranjis",
+        "theme": "learning",
+        "text": "Keep 2 more schools and 3 more scholars than at the start.",
+        "historical": true,
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "schools",
+                "op": ">=",
+                "value": "start+2"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "scholars",
+                "op": ">=",
+                "value": "start+3"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "ahom_bark_chronicles",
+          "name": "Chronicles on bark",
+          "text": "Officials' wages 15 % lower, and each scholar's research +8 %.",
+          "effects": [
+            {
+              "lever": "official_wage_pct",
+              "value": -15
+            },
+            {
+              "lever": "scholar_output_pct",
+              "value": 8
+            }
+          ]
+        }
+      },
+      {
+        "id": "ahom_kamatapur",
+        "name": "West to the Koch",
+        "theme": "land",
+        "text": "Hold Kamatapur.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "ahom_outlast_chutia",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "holds_place": {
+            "who": "this",
+            "place": "Kamatapur"
+          }
+        },
+        "legacy": {
+          "id": "ahom_gate_of_the_koch",
+          "name": "Gate of the Koch",
+          "text": "Tax reaching the treasury +8 %, population grows 6 % faster, and recruits refill 5 % faster.",
+          "effects": [
+            {
+              "lever": "tax_reach_pct",
+              "value": 8
+            },
+            {
+              "lever": "growth_pct",
+              "value": 6
+            },
+            {
+              "lever": "recruit_refill_pct",
+              "value": 5
+            }
+          ]
+        }
+      },
+      {
+        "id": "ahom_rice_fields",
+        "name": "Fields of the Brahmaputra",
+        "theme": "wealth",
+        "text": "Build 5 more farms than at the start.",
+        "historical": false,
+        "goal": {
+          "count": {
+            "who": "this",
+            "thing": "building:farm",
+            "op": ">=",
+            "value": "start+5"
+          }
+        },
+        "legacy": {
+          "id": "ahom_wet_rice",
+          "name": "The Tai rice",
+          "text": "Harvests roll one step better, and population grows 5 % faster.",
+          "effects": [
+            {
+              "lever": "harvest_steps",
+              "value": 1
+            },
+            {
+              "lever": "growth_pct",
+              "value": 5
+            }
+          ]
+        }
+      }
+    ],
+    "purepecha": [
+      {
+        "id": "purepecha_copper",
+        "name": "Copper of the west",
+        "theme": "wealth",
+        "text": "Build 3 more mines than at the start.",
+        "historical": true,
+        "goal": {
+          "count": {
+            "who": "this",
+            "thing": "building:mine",
+            "op": ">=",
+            "value": "start+3"
+          }
+        },
+        "legacy": {
+          "id": "purepecha_curicaueri",
+          "name": "Fire of Curicaueri",
+          "text": "New works cost 20 % less, recruits refill 10 % faster, and tax reaching the treasury +5 %.",
+          "effects": [
+            {
+              "lever": "building_cost_pct",
+              "value": -20
+            },
+            {
+              "lever": "recruit_refill_pct",
+              "value": 10
+            },
+            {
+              "lever": "tax_reach_pct",
+              "value": 5
+            }
+          ]
+        }
+      },
+      {
+        "id": "purepecha_lands_of_the_irecha",
+        "name": "Lands of the irecha",
+        "theme": "land",
+        "text": "Have twice the provinces you began with.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "purepecha_hot_lands",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "count": {
+            "who": "this",
+            "thing": "provinces",
+            "op": ">=",
+            "value": "start*2"
+          }
+        },
+        "legacy": {
+          "id": "purepecha_four_quarters",
+          "name": "The four quarters of Michhuacan",
+          "text": "Recruits refill 15 % faster, and tax reaching the treasury +8 %.",
+          "effects": [
+            {
+              "lever": "recruit_refill_pct",
+              "value": 15
+            },
+            {
+              "lever": "tax_reach_pct",
+              "value": 8
+            }
+          ]
+        }
+      },
+      {
+        "id": "purepecha_frontier_forts",
+        "name": "Forts on the Mexica frontier",
+        "theme": "survival",
+        "text": "Build 4 more castles than at the start.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "purepecha_hold_the_east",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "count": {
+            "who": "this",
+            "thing": "building:castle",
+            "op": ">=",
+            "value": "start+4"
+          }
+        },
+        "legacy": {
+          "id": "purepecha_cutzamala",
+          "name": "Walls of Cutzamala",
+          "text": "Garrisons stand 25 % stronger, and recruits refill 5 % faster.",
+          "effects": [
+            {
+              "lever": "garrison_pct",
+              "value": 25
+            },
+            {
+              "lever": "recruit_refill_pct",
+              "value": 5
+            }
+          ]
+        }
+      },
+      {
+        "id": "purepecha_after_tenochtitlan",
+        "name": "Tangaxuan's refusal",
+        "theme": "survival",
+        "text": "After Tenochtitlan falls, win 3 more battles than at the start.",
+        "historical": true,
+        "requires": {
+          "event": {
+            "id": "spanish_conquest_of_the_aztecs"
+          }
+        },
+        "goal": {
+          "all": [
+            {
+              "event": {
+                "id": "spanish_conquest_of_the_aztecs"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "victories",
+                "op": ">=",
+                "value": "start+3"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "purepecha_lake_archers",
+          "name": "Archers of the lake",
+          "text": "Garrisons stand 15 % stronger, recruits refill 15 % faster, and hired companies cost 10 % less.",
+          "effects": [
+            {
+              "lever": "garrison_pct",
+              "value": 15
+            },
+            {
+              "lever": "recruit_refill_pct",
+              "value": 15
+            },
+            {
+              "lever": "hired_company_cost_pct",
+              "value": -10
+            }
+          ]
+        }
+      }
+    ],
+    "inca": [
+      {
+        "id": "inca_chanka_war",
+        "name": "The Chanka war",
+        "theme": "survival",
+        "text": "Own all of Cusco and win 2 more battles than at the start.",
+        "historical": true,
+        "goal": {
+          "all": [
+            {
+              "owns": {
+                "who": "this",
+                "where": "area:cusco",
+                "min_share": 1
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "victories",
+                "op": ">=",
+                "value": "start+2"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "inca_yawar_pampa",
+          "name": "Yawar Pampa",
+          "text": "Recruits refill 20 % faster, and garrisons stand 10 % stronger.",
+          "effects": [
+            {
+              "lever": "recruit_refill_pct",
+              "value": 20
+            },
+            {
+              "lever": "garrison_pct",
+              "value": 10
+            }
+          ]
+        }
+      },
+      {
+        "id": "inca_puma_city",
+        "name": "The puma city",
+        "theme": "crown",
+        "text": "Build 4 more roads and 3 more granaries than at the start.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "inca_chanka_war",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:road",
+                "op": ">=",
+                "value": "start+4"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:granary",
+                "op": ">=",
+                "value": "start+3"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "inca_coricancha",
+          "name": "The Qurikancha",
+          "text": "Harvests roll one step better, and recruits refill 10 % faster.",
+          "effects": [
+            {
+              "lever": "harvest_steps",
+              "value": 1
+            },
+            {
+              "lever": "recruit_refill_pct",
+              "value": 10
+            }
+          ]
+        }
+      },
+      {
+        "id": "inca_qhapaq_nan",
+        "name": "The royal road",
+        "theme": "land",
+        "text": "Build 8 more roads than at the start.",
+        "historical": true,
+        "goal": {
+          "count": {
+            "who": "this",
+            "thing": "building:road",
+            "op": ">=",
+            "value": "start+8"
+          }
+        },
+        "legacy": {
+          "id": "inca_chaski",
+          "name": "Chaski runners",
+          "text": "Recruits refill 15 % faster, garrisons stand 10 % stronger, and tax reaching the treasury +5 %.",
+          "effects": [
+            {
+              "lever": "recruit_refill_pct",
+              "value": 15
+            },
+            {
+              "lever": "garrison_pct",
+              "value": 10
+            },
+            {
+              "lever": "tax_reach_pct",
+              "value": 5
+            }
+          ]
+        }
+      },
+      {
+        "id": "inca_four_parts",
+        "name": "The four parts together",
+        "theme": "land",
+        "text": "Have three times the provinces you began with.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "inca_quito",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "count": {
+            "who": "this",
+            "thing": "provinces",
+            "op": ">=",
+            "value": "start*3"
+          }
+        },
+        "legacy": {
+          "id": "inca_huayna_capac",
+          "name": "Huayna Capac's mummy",
+          "text": "Tax reaching the treasury +10 %, recruits refill 15 % faster, and population grows 6 % faster.",
+          "effects": [
+            {
+              "lever": "tax_reach_pct",
+              "value": 10
+            },
+            {
+              "lever": "recruit_refill_pct",
+              "value": 15
+            },
+            {
+              "lever": "growth_pct",
+              "value": 6
+            }
+          ],
+          "great": true
+        }
+      },
+      {
+        "id": "inca_mitmaq",
+        "name": "Peoples moved and settled",
+        "theme": "crown",
+        "text": "Keep 10 more officials and 5 more loyal lords than at the start.",
+        "historical": true,
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "officials",
+                "op": ">=",
+                "value": "start+10"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "loyal_lords",
+                "op": ">=",
+                "value": "start+5"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "inca_mitmaqkuna",
+          "name": "Mitmaqkuna",
+          "text": "Officials' wages 20 % lower, and the ruler's tongue spreads 15 % faster.",
+          "effects": [
+            {
+              "lever": "official_wage_pct",
+              "value": -20
+            },
+            {
+              "lever": "tongue_shift_pct",
+              "value": 15
+            }
+          ]
+        }
+      },
+      {
+        "id": "inca_manco",
+        "name": "Manco's return",
+        "theme": "survival",
+        "text": "After the Spanish conquest begins, own all of Cusco in 1560 or later.",
+        "historical": true,
+        "requires": {
+          "event": {
+            "id": "spanish_conquest_of_the_inca"
+          }
+        },
+        "goal": {
+          "all": [
+            {
+              "event": {
+                "id": "spanish_conquest_of_the_inca"
+              }
+            },
+            {
+              "date": {
+                "min": 1560
+              }
+            },
+            {
+              "owns": {
+                "who": "this",
+                "where": "area:cusco",
+                "min_share": 1
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "inca_sacsayhuaman",
+          "name": "Saqsaywaman",
+          "text": "Garrisons stand 20 % stronger, and conquerors' rule lasts 30 % longer in your homeland.",
+          "effects": [
+            {
+              "lever": "garrison_pct",
+              "value": 20
+            },
+            {
+              "lever": "homeland_resistance_pct",
+              "value": 30
+            }
+          ]
+        }
+      },
+      {
+        "id": "inca_terraces",
+        "name": "Rings of terraces",
+        "theme": "wealth",
+        "text": "Build 6 more farms than at the start.",
+        "historical": true,
+        "goal": {
+          "count": {
+            "who": "this",
+            "thing": "building:farm",
+            "op": ">=",
+            "value": "start+6"
+          }
+        },
+        "legacy": {
+          "id": "inca_moray",
+          "name": "Moray",
+          "text": "Harvests roll one step better, and population grows 6 % faster.",
+          "effects": [
+            {
+              "lever": "harvest_steps",
+              "value": 1
+            },
+            {
+              "lever": "growth_pct",
+              "value": 6
+            }
+          ]
+        }
+      }
+    ],
+    "chimu": [
+      {
+        "id": "chimu_minchancaman",
+        "name": "Minchançaman's conquests",
+        "theme": "land",
+        "text": "Have half again as many provinces as you began with, before 1470.",
+        "historical": true,
+        "window": [
+          1378,
+          1470
+        ],
+        "goal": {
+          "count": {
+            "who": "this",
+            "thing": "provinces",
+            "op": ">=",
+            "value": "start*1.5"
+          }
+        },
+        "legacy": {
+          "id": "chimu_lord_of_the_coast",
+          "name": "Lord of the north coast",
+          "text": "Recruits refill 15 % faster, and tax reaching the treasury +8 %.",
+          "effects": [
+            {
+              "lever": "recruit_refill_pct",
+              "value": 15
+            },
+            {
+              "lever": "tax_reach_pct",
+              "value": 8
+            }
+          ]
+        }
+      },
+      {
+        "id": "chimu_canals",
+        "name": "Water across the valleys",
+        "theme": "wealth",
+        "text": "Build 5 more farms than at the start.",
+        "historical": true,
+        "goal": {
+          "count": {
+            "who": "this",
+            "thing": "building:farm",
+            "op": ">=",
+            "value": "start+5"
+          }
+        },
+        "legacy": {
+          "id": "chimu_la_cumbre",
+          "name": "La Cumbre",
+          "text": "Harvests roll one step better, and population grows 5 % faster.",
+          "effects": [
+            {
+              "lever": "harvest_steps",
+              "value": 1
+            },
+            {
+              "lever": "growth_pct",
+              "value": 5
+            }
+          ]
+        }
+      },
+      {
+        "id": "chimu_smiths",
+        "name": "Smiths of the ciudadela",
+        "theme": "trade",
+        "text": "Build 3 more markets and 2 more mines than at the start.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "chimu_canals",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:market",
+                "op": ">=",
+                "value": "start+3"
+              }
+            },
+            {
+              "count": {
+                "who": "this",
+                "thing": "building:mine",
+                "op": ">=",
+                "value": "start+2"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "chimu_sican_gold",
+          "name": "Gold of Sicán",
+          "text": "Tax reaching the treasury +10 %, and new works cost 15 % less.",
+          "effects": [
+            {
+              "lever": "tax_reach_pct",
+              "value": 10
+            },
+            {
+              "lever": "building_cost_pct",
+              "value": -15
+            }
+          ]
+        }
+      },
+      {
+        "id": "chimu_paramonga",
+        "name": "Walls of Paramonga",
+        "theme": "survival",
+        "text": "Win 3 more battles than at the start and be independent, before 1500.",
+        "historical": true,
+        "window": [
+          1440,
+          1500
+        ],
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "chimu_minchancaman",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "victories",
+                "op": ">=",
+                "value": "start+3"
+              }
+            },
+            {
+              "independent": {
+                "who": "this"
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "chimu_fortress_of_the_south",
+          "name": "The southern fortress",
+          "text": "Garrisons stand 20 % stronger, and recruits refill 10 % faster.",
+          "effects": [
+            {
+              "lever": "garrison_pct",
+              "value": 20
+            },
+            {
+              "lever": "recruit_refill_pct",
+              "value": 10
+            }
+          ]
+        }
+      }
+    ],
+    "iroquois": [
+      {
+        "id": "iroquois_great_law",
+        "name": "The Great Law of Peace",
+        "theme": "crown",
+        "text": "Keep 4 more loyal lords than at the start and stay Steady.",
+        "historical": true,
+        "goal": {
+          "all": [
+            {
+              "count": {
+                "who": "this",
+                "thing": "loyal_lords",
+                "op": ">=",
+                "value": "start+4"
+              }
+            },
+            {
+              "stat": {
+                "who": "this",
+                "stat": "stability",
+                "op": ">=",
+                "value": 2
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "iroquois_tree_of_peace",
+          "name": "The Tree of Peace",
+          "text": "Lords start one step more loyal, and officials' wages 10 % lower.",
+          "effects": [
+            {
+              "lever": "lord_loyalty_start_steps",
+              "value": 1
+            },
+            {
+              "lever": "official_wage_pct",
+              "value": -10
+            }
+          ]
+        }
+      },
+      {
+        "id": "iroquois_covenant_chain",
+        "name": "The Covenant Chain",
+        "theme": "crown",
+        "text": "Have 3 more allies than at the start.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "iroquois_great_law",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "count": {
+            "who": "this",
+            "thing": "allies",
+            "op": ">=",
+            "value": "start+3"
+          }
+        },
+        "legacy": {
+          "id": "iroquois_silver_chain",
+          "name": "The silver chain",
+          "text": "Neighbours think one step better of you, and recruits refill 15 % faster.",
+          "effects": [
+            {
+              "lever": "opinion_steps",
+              "value": 1,
+              "of": "neighbours"
+            },
+            {
+              "lever": "recruit_refill_pct",
+              "value": 15
+            }
+          ]
+        }
+      },
+      {
+        "id": "iroquois_beaver_wars",
+        "name": "The beaver wars",
+        "theme": "land",
+        "text": "Make the Huron your subject or see them gone.",
+        "historical": true,
+        "requires": {
+          "event": {
+            "id": "quebec_founded"
+          }
+        },
+        "goal": {
+          "any": [
+            {
+              "relation": {
+                "who": "huron",
+                "other": "this",
+                "type": "subject"
+              }
+            },
+            {
+              "not": {
+                "exists": {
+                  "who": "huron"
+                }
+              }
+            }
+          ]
+        },
+        "legacy": {
+          "id": "iroquois_mourning_war",
+          "name": "The mourning war",
+          "text": "Recruits refill 15 % faster, gold from raids +20 %, and garrisons stand 5 % stronger.",
+          "effects": [
+            {
+              "lever": "recruit_refill_pct",
+              "value": 15
+            },
+            {
+              "lever": "loot_pct",
+              "value": 20
+            },
+            {
+              "lever": "garrison_pct",
+              "value": 5
+            }
+          ]
+        }
+      },
+      {
+        "id": "iroquois_three_sisters",
+        "name": "The three sisters",
+        "theme": "wealth",
+        "text": "Build 4 more farms than at the start.",
+        "historical": false,
+        "goal": {
+          "count": {
+            "who": "this",
+            "thing": "building:farm",
+            "op": ">=",
+            "value": "start+4"
+          }
+        },
+        "legacy": {
+          "id": "iroquois_longhouse_fields",
+          "name": "Fields by the longhouse",
+          "text": "Harvests roll one step better, and population grows 6 % faster.",
+          "effects": [
+            {
+              "lever": "harvest_steps",
+              "value": 1
+            },
+            {
+              "lever": "growth_pct",
+              "value": 6
+            }
+          ]
+        }
+      },
+      {
+        "id": "iroquois_st_lawrence",
+        "name": "Down the great river",
+        "theme": "land",
+        "text": "Own half of the St. Lawrence country.",
+        "historical": true,
+        "requires": {
+          "heritage": {
+            "who": "this",
+            "id": "iroquois_great_law",
+            "state": "done"
+          }
+        },
+        "goal": {
+          "owns": {
+            "who": "this",
+            "where": "area:st_lawrence",
+            "min_share": 0.5
+          }
+        },
+        "legacy": {
+          "id": "iroquois_hochelaga",
+          "name": "Hochelaga",
+          "text": "Tax reaching the treasury +8 %, recruits refill 10 % faster, and population grows 3 % faster.",
+          "effects": [
+            {
+              "lever": "tax_reach_pct",
+              "value": 8
+            },
+            {
+              "lever": "recruit_refill_pct",
+              "value": 10
+            },
+            {
+              "lever": "growth_pct",
+              "value": 3
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

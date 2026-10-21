@@ -73,7 +73,7 @@ uniform sampler2D uInfo;     // per-province: rgb = fill colour, a = flags
 uniform sampler2D uOwner;    // per-province: rg = owner index + 1, b = 255 for sea zones (else +64 faded, +16 closed to the moving armies), a = lord tag (0 = royal land)
 uniform sampler2D uSeason;   // per-province season, see seasonal()
 uniform sampler2D uSubject;  // per-province, for subjects (SUBJ-093): rgb = direct overlord's colour, a = 255 when a subject
-uniform sampler2D uSubjectOf; // per-province: rg = direct overlord's owner index + 1 (0 = nobody's subject)
+uniform sampler2D uSubjectOf; // per-province: rg = direct overlord's owner index + 1 (0 = nobody's subject); b = the pattern its lens band or realm carries (VIEW-048): 0 none, 1 hatching, 2 dots, 3 stripes, 4 to 6 the same twice as dense
 uniform sampler2D uHunt;     // per-province, for hunting grounds (TRIBE-028): rgb = the tribe's colour, a = 255 a ground, 110 a claim under way, 0 none
 uniform int uInfoWidth;
 uniform float uZoom;
@@ -90,6 +90,7 @@ uniform sampler2D uTownAtlas; // town tiles: ${TOWN_VARIANTS} variants across, o
 uniform float uLiving;       // 0..1: how far the living map has faded in (VIEW-101)
 uniform bool uFiefs;         // a data lens that draws fief borders and patterns too (the Institutions lens's great houses, INST-084)
 uniform vec3 uRoad[3];       // track, road, paved road
+uniform int uVision;         // colour vision (SET-095, SET-130): 0 normal, 1 red-weak, 2 green-weak, 3 blue-weak, 4 no colour
 out vec4 outColor;
 
 const vec3 SEA_BASE = ${glsl(WATER_BASE.sea)};
@@ -234,11 +235,14 @@ vec3 seasonal(vec3 c, int t, int id, float grain) {
   bool trees = t == ${T.forest} || t == ${T.broadleaf} || t == ${T.jungle} || t == ${T.highlands};
   bool green = t == ${T.grassland} || t == ${T.farmland} || t == ${T.broadleaf} || t == ${T.forest} || t == ${T.mediterranean} || t == ${T.paddies} || t == ${T.steppe} || t == ${T.hills} || t == ${T.marsh};
   bool gold = t == ${T.grassland} || t == ${T.farmland} || t == ${T.broadleaf} || t == ${T.paddies} || t == ${T.steppe} || t == ${T.hills} || t == ${T.mediterranean};
-  // Wet season on tropical dry lands, fresh spring green, autumn gold.
-  c = mix(c, clamp(vec3(0.62, 1.15, 0.5) * l, 0.0, 1.0), 0.45 * s.a);
-  if (green) c = mix(c, clamp(c * vec3(0.92, 1.12, 0.86) + vec3(0.0, 0.02, 0.0), 0.0, 1.0), s.b);
-  if (gold) c = mix(c, vec3(1.4, 0.95, 0.38) * l, (t == ${T.broadleaf} ? 0.75 : 0.55) * s.g);
-  else if (t == ${T.forest}) c = mix(c, vec3(1.25, 0.9, 0.45) * l, 0.25 * s.g);
+  // Wet season on tropical dry lands, fresh spring green, autumn gold. A weak
+  // colour vision shifts them along its safe ramp (SET-130): the wet and the
+  // spring toward blue, the autumn toward orange, so they stay apart.
+  bool safe = uVision >= 1 && uVision <= 3;
+  c = mix(c, clamp((safe ? vec3(0.5, 0.95, 1.25) : vec3(0.62, 1.15, 0.5)) * l, 0.0, 1.0), 0.45 * s.a);
+  if (green) c = mix(c, clamp(c * (safe ? vec3(0.84, 1.02, 1.16) : vec3(0.92, 1.12, 0.86)) + vec3(0.0, 0.02, 0.0), 0.0, 1.0), s.b);
+  if (gold) c = mix(c, (safe ? vec3(1.55, 0.82, 0.24) : vec3(1.4, 0.95, 0.38)) * l, (t == ${T.broadleaf} ? 0.75 : 0.55) * s.g);
+  else if (t == ${T.forest}) c = mix(c, (safe ? vec3(1.4, 0.8, 0.3) : vec3(1.25, 0.9, 0.45)) * l, 0.25 * s.g);
   // The small white caps of the mountain tiles are snow too: where it is warm
   // up there (the tropics, or any summer low enough) they turn to bare rock.
   if (t == ${T.mountains} && l > 0.72) c = mix(c, vec3(0.56, 0.54, 0.52), smoothstep(-1.0, 5.0, temp - 6.5));
@@ -306,6 +310,43 @@ vec3 icedSea(vec3 water, vec2 m) {
 // Rivers freeze a few degrees below zero, the small ones first.
 bool riverFrozen(int id, int t, float grain) { return smoothstep(-3.0, -8.0, tempAt(id, t)) > grain * 0.9 + 0.05; }
 // Snow lies over the realm's colour too, so winter reads from far out.
+// With no colour the seasons also show as marks on the tiles (SET-130): fallen
+// leaves in autumn, blossom in spring, rain in the wet season; snow is
+// already the lightest land.
+vec3 seasonMarks(vec3 c, int t, int id, ivec2 a) {
+#if LITE >= 1
+  return c;
+#endif
+  if (uVision != 4) return c;
+  vec4 s = seasonAt(id);
+  float h = hash(a + ivec2(31, 17));
+  bool green = t == ${T.grassland} || t == ${T.farmland} || t == ${T.broadleaf} || t == ${T.forest} || t == ${T.mediterranean} || t == ${T.paddies} || t == ${T.steppe} || t == ${T.hills} || t == ${T.marsh};
+  if (green && s.g > 0.25 && h > 0.9) return mix(c, uInk, 0.55);
+  if (green && s.b > 0.25 && h < 0.07) return mix(c, vec3(1.0), 0.6);
+  if (s.a > 0.25 && (a.x & 3) == 0 && ((a.y >> 1) % 3) == 0) return mix(c, uInk, 0.35);
+  return c;
+}
+int patternOf(int id) { return int(texelFetch(uSubjectOf, ivec2(id % uInfoWidth, id / uInfoWidth), 0).b * 255.0 + 0.5); }
+// A lens band's or a realm's pattern (VIEW-048), drawn in pattern pixels of
+// about three screen pixels at every zoom, anchored to the map; the marks are
+// dark on light colours and light on dark ones, so they read on every grey.
+vec3 lensPattern(vec3 c, int id, vec2 m) {
+#if LITE >= 1
+  return c;
+#endif
+  if (uMode == 1) return c;
+  int k = patternOf(id);
+  if (k == 0) return c;
+  float ps = exp2(floor(log2(3.0 / uZoom) + 0.5));
+  ivec2 q = ivec2(floor(m / ps)) + ivec2(65536);
+  bool on = k == 1 ? ((q.x - q.y) & 3) == 0
+    : k == 2 ? (q.x & 3) == 1 && (q.y & 3) == 1
+    : k == 3 ? (q.y & 3) == 0
+    : k == 4 ? ((q.x - q.y) & 3) == 0 || ((q.x + q.y) & 3) == 0
+    : k == 5 ? (q.x & 1) == 0 && (q.y & 1) == 0
+    : (q.x & 3) == 0 || (q.y & 3) == 0;
+  return on ? mix(c, lum(c) > 0.42 ? uInk : vec3(0.96), 0.6) : c;
+}
 vec3 snowOver(vec3 c, int id, int t, float grain) { return mix(c, vec3(0.94, 0.96, 1.0), 0.32 * snowAt(id, t, grain)); }
 
 vec3 tileAt(bool mini, int row, int variant, ivec2 local) {
@@ -354,6 +395,9 @@ float segment(vec2 f, vec2 s0, vec2 s1) {
   return length(f - s0 - d * clamp(dot(f - s0, d) / dot(d, d), 0.0, 1.0));
 }
 vec3 livingRoad(vec3 c, ivec2 a, ivec2 q, int links, int grade) {
+#if LITE >= 2
+  return c;
+#endif
   const float H = ${TOWN_TILE / 2}.0;
   vec2 f = vec2(q) + 0.5;
   vec2 side[4] = vec2[4](vec2(H, 0.0), vec2(2.0 * H, H), vec2(H, 2.0 * H), vec2(0.0, H));
@@ -381,6 +425,9 @@ vec3 livingRoad(vec3 c, ivec2 a, ivec2 q, int links, int grade) {
   return c;
 }
 vec3 livingTown(vec3 c, ivec2 p, ivec2 a, int id, int terrain, vec3 realm) {
+#if LITE >= 2
+  return c;
+#endif
   int b = settlementAt(p);
   if (b == 0) return c;
   int kind = b & 15;
@@ -492,11 +539,11 @@ vec3 tiled(bool mini) {
     variant = (q.x >> shift) + 2 * (q.y >> shift);
     local = q & (size - 1);
   }
-  vec3 c = seasonal(tileAt(mini, terrain, variant, local), terrain, id, hash(a));
+  vec3 c = seasonMarks(seasonal(tileAt(mini, terrain, variant, local), terrain, id, hash(a)), terrain, id, a >> (mini ? 1 : 2));
   int owner = ownerOf(id);
   bool political = uMode != 1 && (owner >= 0 || lensWashed(id));
   if (political) {
-    c = snowOver(realmWash(c, inf.rgb), id, terrain, hash(a));
+    c = lensPattern(snowOver(realmWash(c, inf.rgb), id, terrain, hash(a)), id, m);
     // A wider band of the owner's colour along its borders.
     bool edge = false;
     for (int k = 0; k < 4; k++) {
@@ -588,7 +635,7 @@ vec3 far() {
 
   vec4 inf = info(id);
   int t = terrainAt(p);
-  vec3 c = seasonal(uTerrain[t], t, id, bayer(p));
+  vec3 c = seasonMarks(seasonal(uTerrain[t], t, id, bayer(p)), t, id, p);
 
   // Texture: a few darker pixels in fixed patterns, like old tile sets.
   float h = hash(p);
@@ -613,7 +660,7 @@ vec3 far() {
   vec4 sub = subjectInfo(id);
   bool subject = political && uMode == 0 && sub.a > 0.5;
   vec3 realm = subject && ((p.x + p.y) % ${SUBJECT_HATCH_PX * 3}) >= ${SUBJECT_HATCH_PX} ? sub.rgb : inf.rgb;
-  if (political) c = snowOver(realmWash(c, realm), id, t, bayer(p));
+  if (political) c = lensPattern(snowOver(realmWash(c, realm), id, t, bayer(p)), id, vMap);
   // Great rivers always, the rest once zoomed in a little.
   int rs = riverAt(p);
   if (rs == 2 && uZoom > 0.9 || rs == 1 && uZoom > 2.2) c = mix(c, riverFrozen(id, t, bayer(p)) ? iceColor(vec2(p)) : uDepth[0], 0.8);
@@ -681,13 +728,21 @@ vec3 forbidden(vec3 c, vec2 m) {
 }
 
 void main() {
+#if LITE >= 4
+  outColor = vec4(0.25, 0.55, 0.3, 1.0);
+  return;
+#endif
   vec2 m = vMap;
   int id = idAt(ivec2(floor(m)));
   if (unknown(id)) {
     outColor = vec4(parchment(m), 1.0);
     return;
   }
+#if LITE >= 3
+  vec3 c = far();
+#else
   vec3 c = uZoom >= ${DETAIL_ZOOM}.0 ? tiled(false) : uZoom >= ${MID_ZOOM}.0 ? tiled(true) : far();
+#endif
   c = forbidden(c, m);
   // A dark seam where the known world meets the unknown.
   ivec2 p = ivec2(floor(m));
@@ -720,7 +775,9 @@ export function seasonBytes(out: Uint8Array, i: number, temperature: number, aut
 }
 
 export class MapRenderer {
-  readonly gl: WebGL2RenderingContext;
+  /** The context; checked call by call until stopWatching, then the bare context. */
+  gl: WebGL2RenderingContext;
+  private bare: WebGL2RenderingContext;
   private program: WebGLProgram;
   private tiles: Tile[] = [];
   private infoTex: WebGLTexture;
@@ -735,6 +792,8 @@ export class MapRenderer {
   private huntTex: WebGLTexture;
   private huntData: Uint8Array;
   private huntDirty = true;
+  /** Colour vision as the shader numbers it (SET-095, SET-130): 0 normal, 1 to 3 the weak types, 4 no colour. */
+  vision = 0;
   private atlasTex: WebGLTexture;
   private miniTex: WebGLTexture;
   private terrainColors: number[];
@@ -754,13 +813,12 @@ export class MapRenderer {
   constructor(canvas: HTMLCanvasElement, map: MapImage, provinceCount: number) {
     this.canvas = canvas;
     this.map = map;
-    const gl = canvas.getContext("webgl2", { antialias: false, alpha: false, preserveDrawingBuffer: false });
-    if (!gl) throw new Error("WebGL2 is not available");
-    this.gl = gl;
-    this.program = link(gl, VERT, FRAG);
-    for (const name of ["uCenter", "uZoom", "uView", "uIds", "uTileOrigin", "uTileSize", "uInfo", "uOwner", "uInfoWidth", "uTime", "uMode", "uParchment", "uParchmentDark", "uTerrain", "uDepth", "uFoam", "uInk", "uHighlight", "uSand", "uForbid", "uAtlas", "uMini", "uLand", "uSeason", "uTown", "uTownAtlas", "uLiving", "uFiefs", "uRoad", "uSubject", "uSubjectOf", "uHunt"]) {
-      this.u[name] = gl.getUniformLocation(this.program, name);
-    }
+    const bare = canvas.getContext("webgl2", { antialias: false, alpha: false, preserveDrawingBuffer: false });
+    if (!bare) throw new Error("WebGL2 is not available");
+    this.bare = bare;
+    // Start-up goes through the checked context too, so a texture an iPhone rejects is named.
+    const gl = (this.gl = this.watched(bare));
+    this.program = this.linkMap(0);
 
     // Split the id image into tiles the GPU can hold, with 1px overlap for border checks.
     const maxTex = Math.min(gl.getParameter(gl.MAX_TEXTURE_SIZE) as number, 4096);
@@ -805,6 +863,91 @@ export class MapRenderer {
     this.terrainColors = rowColors(atlas).slice(0, TERRAINS.length * 3);
   }
 
+  /**
+   * How much of the map shader is left out, for a device that rejects the
+   * full one (an iPhone answering 1282 to the draw): 0 all of it; 1 without
+   * the colour-vision marks; 2 also without the living map's towns and roads;
+   * 3 only the far view at every zoom; 4 one flat colour, to tell the shader
+   * from everything else.
+   */
+  lite = 0;
+
+  /** Links the map shader at a level of `lite` and looks up its uniforms. */
+  private linkMap(lite: number): WebGLProgram {
+    const gl = this.gl;
+    const program = link(gl, VERT, FRAG.replace("#version 300 es\n", `#version 300 es\n#define LITE ${lite}\n`));
+    for (const name of ["uCenter", "uZoom", "uView", "uIds", "uTileOrigin", "uTileSize", "uInfo", "uOwner", "uInfoWidth", "uTime", "uMode", "uParchment", "uParchmentDark", "uTerrain", "uDepth", "uFoam", "uInk", "uHighlight", "uSand", "uForbid", "uAtlas", "uMini", "uLand", "uSeason", "uTown", "uTownAtlas", "uLiving", "uFiefs", "uRoad", "uSubject", "uSubjectOf", "uHunt", "uVision"]) {
+      this.u[name] = gl.getUniformLocation(program, name);
+    }
+    return program;
+  }
+
+  /**
+   * Swaps in the next simpler map shader after the device rejected a draw,
+   * and starts checking again; false once there is nothing simpler left.
+   */
+  simplify(): boolean {
+    while (this.lite < 4) {
+      this.lite++;
+      try {
+        const program = this.linkMap(this.lite);
+        this.bare.deleteProgram(this.program);
+        this.program = program;
+        while (this.bare.getError() !== this.bare.NO_ERROR);
+        this.firstError = null;
+        this.gl = this.watched(this.bare);
+        return true;
+      } catch {
+        // This level does not even link here; try the next.
+      }
+    }
+    return false;
+  }
+
+  /** The first WebGL call that raised an error while starting up, with the error code; null while none has. */
+  firstError: string | null = null;
+
+  /** Whether calls are still checked one by one (start-up and the first frames). */
+  get watching(): boolean {
+    return this.gl !== this.bare;
+  }
+
+  /**
+   * Goes back to the bare context once the first frames drew (or one failed):
+   * a getError after every call stalls the GPU pipeline, which cost the main
+   * thread whole seconds while the turns played.
+   */
+  stopWatching(): void {
+    this.gl = this.bare;
+  }
+
+  /**
+   * The context with every call checked for an error during start-up and the
+   * first frames, so a device that rejects one (an iPhone with 1282, say)
+   * names the call on the map instead of only the code.
+   */
+  private watched(gl: WebGL2RenderingContext): WebGL2RenderingContext {
+    return new Proxy(gl, {
+      get: (target, key) => {
+        const v = Reflect.get(target, key, target) as unknown;
+        if (typeof v !== "function") return v;
+        if (key === "getError") return (v as (...a: unknown[]) => unknown).bind(target);
+        return (...args: unknown[]) => {
+          const r = (v as (...a: unknown[]) => unknown).apply(target, args);
+          if (this.firstError === null) {
+            const err = target.getError();
+            if (err !== target.NO_ERROR) {
+              const arg = (a: unknown) => (typeof a === "number" ? String(a) : typeof a === "string" ? JSON.stringify(a.slice(0, 20)) : a === null ? "null" : ArrayBuffer.isView(a) ? `bytes[${a.byteLength}]` : typeof a);
+              const uniform = typeof key === "string" && key.startsWith("uniform") ? Object.entries(this.u).find(([, l]) => l !== null && l === args[0])?.[0] : undefined;
+              this.firstError = `${err} at ${String(key)}(${uniform ?? args.map(arg).join(", ")})`;
+            }
+          }
+          return r;
+        };
+      },
+    });
+  }
+
   private makeTile(x: number, y: number, w: number, h: number, texW: number, texH: number): Tile {
     const gl = this.gl;
     const pixels = new Uint8Array(texW * texH * 4);
@@ -835,7 +978,7 @@ export class MapRenderer {
     const buf = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buf);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([x, y, x + w, y, x, y + h, x + w, y + h]), gl.STATIC_DRAW);
-    const loc = gl.getAttribLocation(this.program, "aPos");
+    const loc = 0; // aPos, bound by link() for every level of the shader
     gl.enableVertexAttribArray(loc);
     gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
     gl.bindVertexArray(null);
@@ -949,6 +1092,17 @@ export class MapRenderer {
     this.huntDirty = true;
   }
 
+  /**
+   * The pattern a province carries (VIEW-048): its lens band's or, with no
+   * colour, its realm's; 0 none. It rides in the subject texture's spare
+   * channel, which keeps the map at the twelve textures it ran on iPhones with.
+   */
+  setProvincePattern(i: number, code: number): void {
+    if (this.subjectOfData[i * 4 + 2] === code) return;
+    this.subjectOfData[i * 4 + 2] = code;
+    this.subjectDirty = true;
+  }
+
   /** Every province's season for this turn, four bytes each, as seasonBytes() packs them. */
   setProvinceSeasons(bytes: Uint8Array): void {
     this.seasonData.set(bytes);
@@ -1045,6 +1199,7 @@ export class MapRenderer {
     gl.activeTexture(gl.TEXTURE11);
     gl.bindTexture(gl.TEXTURE_2D, this.huntTex);
     gl.uniform1i(this.u.uHunt!, 11);
+    gl.uniform1i(this.u.uVision!, this.vision);
     gl.activeTexture(gl.TEXTURE0);
     gl.uniform1i(this.u.uIds!, 0);
 
@@ -1096,6 +1251,7 @@ function link(gl: WebGL2RenderingContext, vs: string, fs: string): WebGLProgram 
   const p = gl.createProgram()!;
   gl.attachShader(p, compile(gl.VERTEX_SHADER, vs));
   gl.attachShader(p, compile(gl.FRAGMENT_SHADER, fs));
+  gl.bindAttribLocation(p, 0, "aPos");
   gl.linkProgram(p);
   if (!gl.getProgramParameter(p, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p) ?? "link error");
   return p;

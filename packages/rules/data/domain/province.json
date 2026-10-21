@@ -126,6 +126,7 @@
   },
   "almshouse": { "shelters": 3000 },
   "food": {
+    "balance": { "$comment": "D-PROV-36: a normal year's food against what the people eat. Under short the province grows less than it eats and the card and the Food tab ask for a farm; under tight one poor harvest brings famine.", "short": 1.0, "tight": 1.05 },
     "bare_per_worker": 0.67,
     "harvest": { "bumper": 1.3, "good": 1.15, "normal": 1.0, "poor": 0.7, "failed": 0.3 },
     "harvest_order": ["failed", "poor", "normal", "good", "bumper"],
@@ -154,7 +155,7 @@
     "food": ["farmers", "herders", "woodsmen", "seafolk"],
     "no_overflow": ["scholars"]
   },
-  "births": { "farmers": 0.04, "herders": 0.04, "woodsmen": 0.04, "seafolk": 0.04, "miners": 0.035, "craftsmen": 0.03, "market folk": 0.03, "clerks": 0.03, "clergy_celibate": 0.005, "scholars": 0.01, "homeless": 0.04 },
+  "births": { "farmers": 0.036, "herders": 0.036, "woodsmen": 0.036, "seafolk": 0.036, "miners": 0.035, "craftsmen": 0.03, "market folk": 0.03, "clerks": 0.03, "clergy_celibate": 0.005, "scholars": 0.01, "homeless": 0.04 },
   "deaths": { "farmers": 0.03, "herders": 0.03, "woodsmen": 0.03, "seafolk": 0.03, "miners": 0.04, "craftsmen": 0.035, "market folk": 0.035, "clerks": 0.035, "clergy": 0.03, "scholars": 0.03, "homeless": 0.05 },
   "death_modifiers": {
     "plague": { "rumour": 0.05, "outbreak": 0.15, "worst": 0.30 },
@@ -200,7 +201,8 @@
   },
   "tolls": { "rates": ["none", "low", "high"], "points": ["bridge", "ford", "pass", "river mouth", "strait"] },
   "roads": { "steps": ["none", "track", "road", "paved road", "turnpike", "railway"], "canal_inventions": ["B3", "Canal locks"], "travel": { "$comment": "D-PROV-34: winter slows roads and rivers; an enemy army on the road or a broken road forces a detour; a sea route closed in war is no route.", "winter": 1.5, "enemy_army": 2, "broken_road": 2 } },
-  "far_from_throne": { "days": 30 },
+  "newly_taken": { "$comment": "X-29: for years after a province is taken from another realm by a peace or a demand, it has Newly taken (one grievance) and costs its owner upkeep_share_of_tax of its tax at the normal rate again each month, on the ledger's New land line. Provisional.", "years": 10, "upkeep_share_of_tax": 0.5, "provisional": true },
+  "far_from_throne": { "$comment": "PROV-173, PROV-174, X-29: days from a royal province to the capital over the realm's own land (the march's crossing days) and the sea (sea_zone_days a zone). Past days it has Far from the throne and sends the crown cut_per_10_days less tax and recruits for every 10 days beyond, down to least_share. A lord's province is run from his seat and is never far. Provisional.", "days": 30, "cut_per_10_days": 0.1, "least_share": 0.5, "sea_zone_days": 8, "provisional": true },
   "officials": {
     "full_effect_years": 5,
     "first_year_share": 0.5,
@@ -355,7 +357,7 @@
       "Schools, Students, Scholars": "school buildings, students here and scholars here",
       "Officials": "your officials in royal provinces and seats"
     },
-    "birth_points": { "food over 6 months": 0.5, "10 years of peace": 0.5, "food under 3 months": -1, "Hungry": -2, "war": -1, "plague": -1 },
+    "birth_points": { "10 years of peace": 0.5, "war": -1, "plague": -1 },
     "tax_travel_loss_per_day": 0.05,
     "tax_collector_bonus": 0.2,
     "town_size_floors": { "hamlet": 0, "village": 1000, "market town": 3000, "town": 8000, "city": 20000, "great city": 40000 },

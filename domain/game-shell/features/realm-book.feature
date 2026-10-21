@@ -83,6 +83,7 @@ Feature: Realm book
     Examples:
       | what        | count | tile      | needs                         | page            |
       | hungry      | 2     | Economy   | 2 provinces hungry            | Food            |
+      | short       | 3     | Economy   | 3 provinces short of food     | Food            |
       | perMonth    | -3    | Economy   | Losing gold each month        | Treasury        |
       | newLands    | 1     | Lands     | 1 new land to fill            | Officials       |
       | verdicts    | 2     | Lands     | 2 beaten risings to judge     | Provinces       |

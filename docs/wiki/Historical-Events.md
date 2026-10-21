@@ -62,7 +62,7 @@ Deaths, child kings and the Emperor come from the game itself: an event that nee
 
 ### Everyday events
 
-Between the great events, your own realm asks for small choices. About every three to six months (two or three times a year) something happens to your officials, lords, family or stores, and an event card asks what you will do. No new one comes while another card waits for your answer, so they never pile up.
+Between the great events, your own realm asks for small choices. About every two to four months something happens to your officials, lords, family, stores or one of your provinces, and an event card asks what you will do. No new one comes while another card waits for your answer, so they never pile up, and the same event never comes to you twice within 20 years.
 
 | What happens | Your choices |
 |---|---|
@@ -76,6 +76,8 @@ Between the great events, your own realm asks for small choices. About every thr
 | Your young heir falls ill | Pay the best physicians (gold) or trust in prayer (3 in 10 that the heir dies) |
 | Grain rots, burns or is eaten by rats in a store | The grain is lost whatever you choose; buy grain (gold) or take it from a lord's barns (he grows less loyal) to make half of it good, or bear the loss |
 | Plague reaches one of your provinces | Close the province (its trade stops and its tax halves while closed), send physicians (gold: half as many die and it is over sooner), or keep the roads open. Only one plague card waits at a time; the News tells of the rest |
+
+About forty more are about one of your provinces, a lord's land or an official, and many belong to a part of the world or a span of years. Anywhere you may get a rich harvest (fill the granaries, sell the surplus, or feast a lord), hail (lighten the province's tax for a year), bandits, a fallen bridge, a town fire, a flood, a lord asking for a market or raising walls, an official skimming the tolls, old soldiers asking for land, wolves, a comet, silver or pilgrims. Europe has tournaments until 1600, a printer from 1460 to 1600, witch trials from 1560 to 1700, coffee houses and the fencing of the commons. Railways, strikes, cholera and newspapers come in the 1800s. Caravans are raided in the Middle East and North Africa, the monsoon fails in India, pirates raid the coasts of East Asia, and gold traders reach the Sahel. Their choices can add or take months of food, a share of a province's people or recruits, or lighten its tax, each said in words on the card. The full list with every option is on the [Everyday events data](Data-Events-Everyday) page.
 
 An option you can't pay for isn't offered, and at least one choice always costs nothing. Other realms get the same events and answer them at once, so their lords die, quarrel and change their minds too. *Look at the map* on a card about a province opens that province.
 
@@ -238,12 +240,14 @@ Turns are a week long, so this runs in the turn in which a new month begins. Eac
 
 ## Numbers
 
+Every value the game uses, made from its config so it always matches the game: [Events data](Data-Events) and [Everyday events data](Data-Events-Everyday). How they combine: [Formulas](Formulas).
+
 All of these are provisional values still being balanced, unless noted.
 
 | Key | Value |
 |---|---|
 | `selection.pool_roll_interval_months` | 1 |
-| `selection.max_pool_events_per_country_year` | 2 |
+| `selection.max_pool_events_per_country_year` | 3 |
 | `selection.decision_expiry_years` | 10 |
 | `date_binding` (approximate events) | ×2.0 in the history year, fading over 10 years |
 | `selection.alternate_history_mode.historical` | 1.5, 2.0, 0.8 |

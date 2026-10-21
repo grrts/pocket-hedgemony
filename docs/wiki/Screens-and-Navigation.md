@@ -29,7 +29,7 @@ The menu has two groups:
 | Column | **Play** (large, wax-red, focused first) | Always | With a campaign in progress it shows the realm's banner, name and date ("France · May 1503") and loads the newest save; otherwise New campaign |
 | Column | New campaign | While a campaign is in progress | New campaign |
 | Column | Load | While any save exists | Load |
-| Column | Tutorial | Until the tutorial is finished, then under More | The tutorial's chapter list |
+| Column | Tutorial | Until every chapter you can play is done, then under More | Murad's Frontier at the step you left off (its chapter list once more than one chapter can be played) |
 | Icon row | Settings | Always | Settings, over the start screen |
 | Icon row | Achievements | Always | Achievements |
 | Icon row | Wiki | Always | This wiki, in your browser; the game stays where it was |
@@ -40,7 +40,7 @@ The version number sits small in the lower right corner. Back on the start scree
 
 On a phone in landscape the logo sits top left, the column and icon row fill the left third on a parchment band, and the map pans across the rest; on a tablet held upright the map fills the top half and the menu sits below it. Play is at least 56 points tall, everything else at least 44, and each icon has its name under it.
 
-**New to Pocket Hegemony?** The very first time you press Play, with no campaign yet, the game asks once: Play the tutorial (focused), Guided campaign, or I know the way. The tutorial starts at its first chapter; Guided campaign opens New campaign with the goals list for your first year switched on; I know the way opens New campaign without it. See [Tutorial and help](Tutorial-and-Help).
+**New to Pocket Hegemony?** The very first time you press Play, with no campaign yet, the game asks once: Play the tutorial (focused), Guided campaign, or I know the way. The tutorial starts at its first chapter, as the Ottomans in 1378; Guided campaign opens New campaign with the first-campaign hints switched on (they stand in for the goals list for now); I know the way opens New campaign with them off. While the tutorial runs, the game menu adds Skip this chapter and Leave the tutorial under Return to the map. See [Tutorial and help](Tutorial-and-Help).
 
 **The free tier.** The free mobile download and the Steam demo let you play the Ottomans and France, with nothing else held back. They show a small "Full game" ribbon beside the logo on the start screen that leads to Unlock, never as a pop-up. No version of the game shows ads. The Unlock screen offers one purchase, the full game, which unlocks every realm; it shows the store's price and a Buy button, and on phones also Restore purchases.
 
@@ -49,8 +49,10 @@ On a phone in landscape the logo sits top left, the column and icon row fill the
 One screen in three steps, with a strip at the top ("Realm · Options · Begin"). Back moves one step back, and from step 1 returns to the start screen without asking. The nation select music plays, its lead voice changing with the highlighted realm.
 
 1. **Realm.** Choose a realm on the map at world zoom, with filters (region, difficulty, free or locked) and a short list of suggested realms. Choosing a region frames it on the map and lists every realm there by name, one row each. Tapping a realm shows its card with its strengths at a glance and one line, Ways to grow ([The 1378 start](The-1378-Start)). A locked realm shows a padlock and a button to Unlock; coming back from a purchase returns you to step 1 with that realm still chosen. Quick start skips straight to Begin with the last options used and the realm you last tapped (or the first suggested one).
-2. **Options.** Difficulty, AI aggression, fog, historical or free events, ironman, and the end date, with presets that fill the whole step. The end date is 31 August of any year from 1494 to 1939; 31 August 1939 is the default.
+2. **Options.** Difficulty, AI aggression, fog, historical, plausible or free events, ironman, and the end date, with presets that fill the whole step. Difficulty is a row of Easy, Normal (chosen) and Hard, each with one line on what it changes ([The 1378 start](The-1378-Start#difficulty)). The end date is 31 August of any year from 1494 to 1939; 31 August 1939 is the default.
 3. **Begin.** A summary card (banner, ruler, capital, start date, options) and one big Begin button.
+
+**In this build** steps 2 and 3 are one card, *Rules of the campaign*, opened by tapping a suggested realm or Rule on a realm's card: the realm's banner and start day, one row of buttons per rule (Difficulty Easy, Normal or Hard; Events Historical, Plausible or Free (Plausible by default); Fog of war On or Off; Ironman Off or On), the end year, a few lines on what the chosen rules mean, and **Begin as …**. It starts from your last new game's choices. AI aggression, presets and Quick start are not in yet. What each rule does is in [The 1378 start](The-1378-Start#campaign-rules).
 
 ### Load and loading
 
@@ -150,8 +152,10 @@ Lines are listed most urgent first. Each has an icon, one sentence and a Show bu
 
 **Winning.** There are two ways to win.
 
-- **World domination:** you own, or hold as subjects, at least half of the world's settled land provinces. It is checked every January, and reaching it wins at once: the campaign end sequence plays straight away, and the final result offers Keep playing, which takes you back to the map until the end date.
-- **Best at the end:** when the end date comes, the realm that leads the Economy, Power or Technology score wins in that score. No margin is needed, and a tie shares the win. The scores are worked out every January for the Realm book; see [Your realm](Your-Realm).
+- **World domination:** you own, or hold as subjects, every settled land province of the world. It is checked every January, and reaching it wins at once: the campaign end sequence plays straight away, and the final result offers Keep playing, which takes you back to the map until the end date.
+- **Best at the end:** when the end date comes, the realm that has grown most in the Economy, Power or Technology score wins in that score: each score's 25-year average against the realm's own start. No margin is needed, and a tie shares the win. The scores are worked out every January for the Realm book; see [Your realm](Your-Realm).
+
+**Chapters.** Every 100 years (January 1544, 1644, 1744 and 1844) a chapter closes and the chapter card opens by itself in the panel: the hundred years it covers, one line on how your realm did ("France led Power"), your growth and place in each score beside who led it, and the leading realms. **Play on** closes it and the next chapter begins; **Score** opens the Score tab, where every closed chapter stays listed and opens its card again. Auto turns stop at the end of that week. The last chapter closes with the campaign, on the end card.
 
 **Campaign end.** When the end date is reached (31 August 1939 by default, or the date chosen at the start) or you win by world domination, the final wrap-up events appear as normal event cards, then a closing sequence steps through your borders era by era at world zoom with the campaign end music, then the final result. There is no playing on past the end date.
 
@@ -268,7 +272,7 @@ All are provisional values, unless marked, kept in the game shell's and the map'
 | `shell.tap_target_gap` | 8 points |
 | `shell.controller_end_turn_hold` | 0.5 s (Menu on a controller, Enter on a keyboard) |
 | `shell.end_date_earliest_year` | 1494 |
-| `shell.domination_share` | half of the world's settled land provinces (decided) |
+| `shell.domination_share` | every settled land province of the world (decided) |
 | `shell.ledger_leaders` | 5 realms beside yours on the final result |
 | `shell.campaign_end_date_default` | 31 August 1939 (decided) |
 | `attention.*` | one table of warnings and thresholds |

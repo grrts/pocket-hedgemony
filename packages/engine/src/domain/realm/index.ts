@@ -864,10 +864,14 @@ export function aiPlan(personality: Personality, neighbour: { name: string; wave
 
 // ---------------------------------------------------------------- scores
 
-/** Economy: yearly income plus the bank, gold minus debt (REALM-151). */
-export function economyScore(income: number, gold: number, debtOwed: number): { income: number; bank: number; score: number } {
+/**
+ * Economy: yearly income plus the bank, gold minus debt (REALM-151); gold in
+ * the bank counts up to a year's income, debt counts in full (REALM-310, X-28).
+ */
+export function economyScore(income: number, gold: number, debtOwed: number): { income: number; bank: number; counted: number; score: number } {
   const bank = gold - debtOwed;
-  return { income, bank, score: income + bank };
+  const counted = bank > 0 ? Math.min(bank, Math.max(0, income) * config.win.bank_cap_years_income) : bank;
+  return { income, bank, counted, score: income + counted };
 }
 
 /** Technology: inventions known, each weighted by its era cost (REALM-153). */
@@ -900,23 +904,49 @@ export function scoreWinners(scores: Record<string, number>): string[] {
     .sort();
 }
 
-/** Power (REALM-152, REALM-160): provinces held, subjects' at half, plus army power. */
-export function powerScore(p: { provinces: number; subjectProvinces: number; foot?: number; horse?: number; guns?: number; warships?: number; commanders?: number }): { provinces: number; army: number; score: number } {
+/** Power (REALM-152, REALM-160): provinces held, subjects' at half, plus army power from the men under arms and warships; commanders add nothing (X-28). */
+export function powerScore(p: { provinces: number; subjectProvinces: number; foot?: number; horse?: number; guns?: number; warships?: number }): { provinces: number; army: number; score: number } {
   const w = config.win;
   const provinces = p.provinces + p.subjectProvinces * w.subject_province_weight;
-  const men = (p.foot ?? 0) * w.army_weights.foot + (p.horse ?? 0) * w.army_weights.horse + (p.guns ?? 0) * w.army_weights.guns + (p.warships ?? 0) * w.warship_men + (p.commanders ?? 0) * w.commander_men;
+  const men = (p.foot ?? 0) * w.army_weights.foot + (p.horse ?? 0) * w.army_weights.horse + (p.guns ?? 0) * w.army_weights.guns + (p.warships ?? 0) * w.warship_men;
   const army = men / w.army_power_per_men;
   return { provinces, army, score: provinces + army };
 }
 
 /**
- * World domination (REALM-154, X-12): owning or holding as subjects at least
- * half of the world's settled land provinces (land provinces with people),
- * checked once a year, in the turn in which 1 January falls (X-18): `month`
- * is the month that begins in this turn. The win comes at once.
+ * World domination (REALM-154, X-28): owning or holding as subjects every one
+ * of the world's settled land provinces (land provinces with people), checked
+ * once a year, in the turn in which 1 January falls (X-18): `month` is the
+ * month that begins in this turn. The win comes at once.
  */
 export function dominationWin(ownedOrSubject: number, settledLand: number, month: number): boolean {
   return month === config.win.checked_month && settledLand > 0 && ownedOrSubject >= settledLand * config.win.domination_share;
+}
+
+/** A score as judged: the average of its last Januaries, at most `win.average_years` of them (REALM-311). */
+export function averagedScore(januaries: readonly number[]): number {
+  const last = januaries.slice(-config.win.average_years);
+  return last.length ? last.reduce((a, b) => a + b, 0) / last.length : 0;
+}
+
+/** The floor under every realm's start in one score: the `win.start_floor_quantile` of all realms' starts, at least 1 (REALM-312). */
+export function startFloor(starts: readonly number[]): number {
+  if (!starts.length) return 1;
+  const sorted = [...starts].sort((a, b) => a - b);
+  const q = sorted[Math.min(sorted.length - 1, Math.floor(config.win.start_floor_quantile * sorted.length))]!;
+  return Math.max(1, q);
+}
+
+/** Growth against the realm's own start, the start floored (REALM-312), to two decimals as it is shown and ranked. */
+export function growth(averaged: number, start: number, floor: number): number {
+  return Math.round((averaged / Math.max(start, floor, 1)) * 100) / 100;
+}
+
+/** The years in whose January turn a chapter closes: every `win.chapter_years` from the start, before the end date's year (REALM-313). */
+export function chapterEnds(startYear: number, endYear: number, every: number = config.win.chapter_years): number[] {
+  const out: number[] = [];
+  for (let y = startYear + every; y < endYear; y += Math.max(1, every)) out.push(y);
+  return out;
 }
 
 // ---------------------------------------------------------------- the card

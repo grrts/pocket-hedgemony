@@ -311,11 +311,20 @@ Leroy's playtest feedback (DECISIONS.md, F-1 to F-22). It is the latest decision
 - RECR-129 When an official is commissioned as admiral, the recruiting system shall start him with the sea skills of his type (NAVY-073), his years served in a port province counting double; as general, with the skills of his type (RECR-070). Both cost the same commission (RECR-114) and leave the post the same way (RECR-083). [Leroy 19 Oct; NAVY-073]
 - RECR-130 When an AI fleet that needs an admiral (NAVY-065) has none and no admiral waits at court, the recruiting system shall commission one if the AI keeps its reserve after the commission: the official of the fleet's own port if it has one, else a customs officer, else any official of a royal province. [Leroy 19 Oct; naval §11]
 
+- RECR-135 When a general dies (REALM-276), the recruiting system shall leave his army as the garrison of the province it stands in if that is crown land of the realm that the realm holds; otherwise (a lord's land, an enemy's land, or its own land held by an enemy) it shall march the army to the nearest such crown province, where it stands as that province's garrison. An army fighting a battle leaves it by the battle's rules instead (WAR-062). [Leroy 19 Oct]
+- RECR-136 While an army whose general died walks home, the recruiting system shall let it take no orders and not be caught, as an army falling back. [Leroy 19 Oct]
+- RECR-137 When an admiral dies, the recruiting system shall sail his fleet, if it is not in battle and not already in a port of the realm, to the nearest port the realm owns and holds, taking no orders and not caught on the way. [Leroy 19 Oct]
+
 #### How the player uses it: general or admiral
 - RECR-131 Where: the official's screen (from his province card or the Officials tab) ends with a Command section of two buttons, "Commission as general" and "Commission as admiral", each with the cost and, under it, what he leads and the might, cunning and logistics he would start with; in a port it adds that his years there count double at sea. A general then shows in the Military tab's Commanders list, an admiral on the Navy tab. Army pickers ("Lead: …", split off under a commander) offer only generals, a fleet's Admiral block only admirals; a fleet with no admiral at court says so and opens the Officials tab. [Leroy 19 Oct; X-19]
 - RECR-132 Grouping: both choices sit side by side in the one Command section, with the skills to compare, so the choice is made once, where the official is. [Leroy 19 Oct; X-19]
 - RECR-133 Overview: the Military tab's Commanders list shows every general and admiral with his post in plain English and what he does now ("leads 8,000 men at Paris", "leads a fleet", "waits at court"). [Leroy 19 Oct; X-19]
 - RECR-134 Phone: in landscape the two buttons are full width in the Wide and Tall layouts, at least 44 points high with the skills line inside, and nothing needs hover. [Leroy 19 Oct; X-19]
+
+#### How the player uses it: when a commander dies
+- RECR-138 Where: a dispatch says the commander died and where his men march or his ships sail. On the map, zoomed out, the army's commander banner and the fleet's token are gone; close in, the men are drawn walking and the hulls sailing home, with no name and nothing to tap until they arrive. [Leroy 19 Oct; X-19]
+- RECR-139 Grouping and overview: once home, the men are on that province's Garrison tab under "Troops without a commander", where a general can pick them up (RECR-122), and the ships are a fleet without an admiral in the port, on the Navy tab. [Leroy 19 Oct; X-19]
+- RECR-140 Phone: nothing new to tap on the way; the dispatch's province opens with a 44-point button as every dispatch's does. [Leroy 19 Oct; X-19]
 
 ## 6. Commands
 
@@ -530,3 +539,5 @@ Decided on 17 October 2026 (domain/DECISIONS.md). None of recruiting's questions
 | RECR-128, 129 | commissioning-officials.feature | A general for the armies, an admiral for the fleets |
 | RECR-130 | — | Engine test: hiredFleets.test.ts (an AI fleet commissions its admiral) |
 | RECR-131–134 | — | Presentation only (client UI) |
+| RECR-135–137 | — | Engine test: leaderless.test.ts (a dead general's army stays or walks to crown land; a dead admiral's fleet sails home) |
+| RECR-138–140 | — | Presentation only (client UI) |

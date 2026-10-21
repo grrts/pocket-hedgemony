@@ -10,6 +10,7 @@ use App\Entity\PostReport;
 use App\Entity\Topic;
 use App\Repository\PostReportRepository;
 use App\Repository\PostRepository;
+use App\Repository\SharedSaveRepository;
 use App\Repository\TopicRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -23,7 +24,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
- * The community forum at /community: four fixed boards (App\Community\Boards), their
+ * The community forum at /community: fixed boards (App\Community\Boards), their
  * topics and posts. Guests read everything that is not hidden; posting needs an account,
  * and moderators (ROLE_MODERATOR) hide and lock things and answer reports.
  */
@@ -40,6 +41,7 @@ final class CommunityController extends AbstractController
         private readonly TopicRepository $topics,
         private readonly PostRepository $posts,
         private readonly PostReportRepository $reports,
+        private readonly SharedSaveRepository $sharedSaves,
         private readonly EntityManagerInterface $em,
         private readonly RateLimiterFactoryInterface $communityTopicLimiter,
         private readonly RateLimiterFactoryInterface $communityPostLimiter,
@@ -334,10 +336,14 @@ final class CommunityController extends AbstractController
             throw new NotFoundHttpException('No such page');
         }
 
+        $posts = $this->posts->inTopic($topic, $mod, ($page - 1) * self::POSTS_PER_PAGE, self::POSTS_PER_PAGE);
+
         return $this->render('community/topic.html.twig', [
             'topic' => $topic,
             'board' => $this->boards->get($topic->getBoard()),
-            'posts' => $this->posts->inTopic($topic, $mod, ($page - 1) * self::POSTS_PER_PAGE, self::POSTS_PER_PAGE),
+            'posts' => $posts,
+            // The save each post came with, shown as its card above the post (SAVE-134).
+            'shared' => $this->sharedSaves->byPost($posts),
             'opening_id' => $this->posts->openingPost($topic)?->getId(),
             'page' => $page,
             'pages' => $pages,

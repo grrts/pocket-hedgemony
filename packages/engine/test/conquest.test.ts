@@ -6,7 +6,8 @@ import { declareWar, offerPeace, relationState, syncDate, type News } from "../s
 import { monthlyConquest, nameAbroadView } from "../src/conquest.ts";
 import { libraryEvents, statecraftView, syncCountries } from "../src/statecraft.ts";
 import { foldInRealm, makeSubject } from "../src/subjects.ts";
-import { maxCededProvinces, priceOfWar, whyAiWontDeclare, wouldSayPeaceAtDeclaration, aiWarPay } from "../src/priceOfWar.ts";
+import { canBorrow } from "../src/treasury.ts";
+import { atWarElsewhere, maxCededProvinces, priceOfWar, whyAiWontDeclare, wouldSayPeaceAtDeclaration, aiWarPay } from "../src/priceOfWar.ts";
 import * as dip from "../src/domain/diplomacy/index.ts";
 
 const rules = loadDefaultRuleset();
@@ -193,7 +194,7 @@ describe("the price of war (WAR-228, WAR-229)", () => {
   function scene() {
     const w = createWorld(rules, 1, tiles);
     const n = nation(w, "castile");
-    const t = dip.neighbours(w.diplomacy, "castile").map((c) => nation(w, c)).find((x) => relationState(w, n, x).state === null && !w.nationGone[x])!;
+    const t = dip.neighbours(w.diplomacy, "castile").map((c) => nation(w, c)).find((x) => relationState(w, n, x).state === null && !w.nationGone[x] && !atWarElsewhere(w, x, n))!;
     alone(w, t);
     alone(w, n);
     for (let k = 0; k < w.nationCount; k++) setStrength(w, k, 0);
@@ -230,12 +231,14 @@ describe("the price of war (WAR-228, WAR-229)", () => {
     expect(whyAiWontDeclare(w, n, t)).toBe("their side is too strong");
   });
 
-  it("does not declare holding gold for 3 months of war pay", () => {
+  it("does not declare holding gold and loans for 3 months of war pay", () => {
     const { w, n, t } = scene();
-    w.nationTreasury[n] = 3 * aiWarPay(w, n);
+    const loans = canBorrow(w, n);
+    w.nationTreasury[n] = 3 * aiWarPay(w, n) - loans;
     expect(aiWarPay(w, n)).toBeGreaterThan(0);
     expect(whyAiWontDeclare(w, n, t)).toBe("no war chest");
-    w.nationTreasury[n] = 6 * aiWarPay(w, n);
+    // What lenders would give counts toward the chest (DIPL-234).
+    w.nationTreasury[n] = 6 * aiWarPay(w, n) - loans;
     expect(whyAiWontDeclare(w, n, t)).toBeNull();
   });
 
@@ -273,5 +276,28 @@ describe("the price of war (WAR-228, WAR-229)", () => {
     expect(price.monthlyPay).toBeGreaterThanOrEqual(0);
     for (const c of price.against) expect(c.soldiers).toBeGreaterThanOrEqual(0);
     expect(JSON.stringify(price)).toBe(JSON.stringify(priceOfWar(w, england, france)));
+  });
+
+  it("prices a war with the fitting aim the declarer holds, and the war is declared with that aim (WAR-229)", () => {
+    const w = createWorld(rules, 1, tiles);
+    const england = nation(w, "england");
+    const france = nation(w, "france");
+    w.player = england;
+    // England and France start under a truce; lift it so the war can be declared.
+    w.diplomacy.graph.relations = w.diplomacy.graph.relations.filter((r) => !(r.type === "truce" && [r.source, r.target].includes("england") && [r.source, r.target].includes("france")));
+    expect(priceOfWar(w, england, france).noAim).toBe(true);
+    const p = provincesOf(w, france)[0]!;
+    dip.grantAim(w.diplomacy, { holder: "england", target: "france", aim: "take_land", province: w.provinceIds[p]!, source: "a lord's Want" });
+    const price = statecraftView(w, england)!.realms[france]!.price!;
+    expect(price.noAim).toBe(false);
+    expect(price.aim).toEqual({ aim: "take_land", province: p, source: "a lord's Want" });
+    // A regency may not declare with it: the war would be declared with no aim.
+    dip.country(w.diplomacy, "england").regency = true;
+    expect(priceOfWar(w, england, france).noAim).toBe(true);
+    dip.country(w.diplomacy, "england").regency = false;
+    expect(declareWar(w, england, france, [])).toBeNull();
+    const war = w.diplomacy.wars.find((x) => x.declarer === "england" && x.target === "france")!;
+    expect(war.aim).toBe("take_land");
+    expect((war as { aimProvince?: string }).aimProvince).toBe(w.provinceIds[p]);
   });
 });

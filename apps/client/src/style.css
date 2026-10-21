@@ -87,6 +87,19 @@ img,
   text-shadow: 3px 3px 0 var(--outline);
 }
 
+/* The map's own failure line (mapView drawFailed): low on the map, under the cards, so a screenshot shows it. */
+.map-failed {
+  position: absolute;
+  left: max(16px, env(safe-area-inset-left));
+  right: max(16px, env(safe-area-inset-right));
+  bottom: 16px;
+  margin: 0;
+  text-align: center;
+  color: var(--paper-light);
+  text-shadow: 2px 2px 0 var(--outline);
+  pointer-events: none;
+}
+
 /* ---- Frames ---- */
 
 .framed {
@@ -163,7 +176,7 @@ button {
 
 button:active:not(:disabled) {
   border-image-source: var(--ui-btn-down);
-  transform: translateY(2px);
+  translate: 0 2px;
 }
 
 button:disabled {
@@ -779,6 +792,174 @@ button.icon-only {
   color: #3a2414;
 }
 
+/* ---- The options step of a new game (SETUP-054): one card, a row of 44-point buttons per rule, Begin always in reach ---- */
+
+/* On a tall phone the sheet may rise higher than the realm picker's: the map matters less here. */
+.panel.chooser.ng-step {
+  max-height: 78vh;
+  padding-bottom: 0;
+}
+
+/* A phone held sideways: a wider side sheet with the rules two to a row, label above, so every rule shows with Begin. */
+@media (max-height: 500px) {
+  .panel.chooser.ng-step {
+    width: min(540px, 64vw);
+    max-height: none;
+  }
+
+  .ng-step .ng-rules {
+    grid-template-columns: 1fr 1fr;
+    gap: 2px 10px;
+  }
+
+  .ng-step .ng-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ng-step .ng-label,
+  .ng-step .ng-seg,
+  .ng-step .ng-row select {
+    flex: none;
+  }
+
+  .ng-step .ng-label,
+  .ng-step .ng-seg button {
+    font-size: 17px;
+  }
+
+  .ng-step .ng-rules {
+    margin: 0;
+  }
+
+  .ng-step .ng-row {
+    gap: 0;
+  }
+
+  .ng-step .ng-label {
+    line-height: 1;
+    padding-top: 2px;
+  }
+
+  .ng-step .ng-realm {
+    margin: -2px 0 0;
+  }
+
+  .ng-step .ng-realm .flag {
+    height: 22px;
+    width: auto;
+  }
+
+  .ng-step .ng-begin {
+    margin-top: 6px;
+  }
+}
+
+.ng-realm {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.ng-realm small {
+  overflow: hidden;
+  color: var(--ink-soft);
+  font-size: 17px;
+  text-overflow: ellipsis;
+}
+
+.ng-rules {
+  display: grid;
+  gap: 4px;
+  margin: 4px 0;
+}
+
+.ng-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 8px;
+}
+
+.ng-label {
+  flex: 0 0 5.6em;
+  font: 600 19px/1.1 var(--body);
+}
+
+.ng-seg {
+  display: flex;
+  flex: 1 1 200px;
+  gap: 4px;
+  min-width: 0;
+}
+
+/* Each button grows from its own label, so "● Plausible" keeps room beside "Free". */
+.ng-seg button {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0 2px;
+  font-size: 19px;
+  white-space: nowrap;
+}
+
+/* The chosen value stays pressed in, marked with a dot, like a tax rate. */
+.ng-seg button.paper.on {
+  border-image-source: var(--ui-btn-paper-down);
+}
+
+.ng-seg button.on::before {
+  content: "●";
+  margin-right: 4px;
+  font-size: 0.7em;
+  vertical-align: 0.1em;
+}
+
+.ng-row select {
+  flex: 1 1 200px;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 8px;
+  border-style: solid;
+  border-width: 8px;
+  border-image: var(--ui-btn-paper) 4 fill / 8px stretch;
+  background: none;
+  border-radius: 0;
+  color: var(--ink);
+  font: 600 19px/1 var(--body);
+}
+
+.ng-row select option {
+  background: #f1e3c0;
+  color: #3a2414;
+}
+
+.ng-meaning {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  color: var(--ink-soft);
+  font-size: 17px;
+  line-height: 1.15;
+}
+
+/* Begin stays at the foot of the sheet however far the rules scroll. */
+.ng-begin {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  margin: 8px 0 max(6px, env(safe-area-inset-bottom));
+}
+
+.menu-rules {
+  margin: 0 0 6px;
+  font-size: 18px;
+}
+
+.menu-rules small {
+  color: var(--ink-soft);
+}
+
 .pick-count {
   margin: 0 0 4px;
 }
@@ -1340,7 +1521,7 @@ button.small {
   flex-direction: column;
   padding: 4px 8px 8px;
   z-index: 9;
-  animation: alert-in 0.2s steps(4);
+  animation: unroll 0.24s steps(4);
 }
 
 /* Long event names wrap rather than lose their end. */
@@ -1462,6 +1643,13 @@ button.small {
   }
 }
 
+/* Event and revolution cards unroll from the top like a scroll (SHELL-176). */
+@keyframes unroll {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+}
+
 /* Every plaque in the top bar is the same height, type and padding (feedback 74). */
 .hud .plaque {
   position: relative;
@@ -1472,6 +1660,100 @@ button.small {
   border-width: 4px;
   font: 600 20px/1 var(--body);
   text-shadow: none;
+}
+
+/* A pressed plaque stays paper and sinks a pixel (SHELL-173). */
+.hud button.plaque:active:not(:disabled) {
+  border-image-source: var(--ui-btn-paper-down);
+  translate: 0 1px;
+}
+
+/* The gold counts to its new value, tinted green when it rose and red when it fell (SHELL-174). */
+.hud .gold-n.up {
+  color: #3d6b2a;
+}
+
+.hud .gold-n.down {
+  color: var(--cloth);
+}
+
+/* A coin pops up from the plaque and fades out in steps. */
+.hud .gold-pop {
+  display: none;
+  position: absolute;
+  left: 2px;
+  top: 8px;
+  pointer-events: none;
+}
+
+.hud .gold-pop.up,
+.hud .gold-pop.down {
+  display: block;
+  animation: coin-pop 0.6s steps(6) both;
+}
+
+.hud .gold-pop.up img {
+  filter: drop-shadow(1px 0 0 #3d6b2a) drop-shadow(-1px 0 0 #3d6b2a) drop-shadow(0 1px 0 #3d6b2a) drop-shadow(0 -1px 0 #3d6b2a);
+}
+
+.hud .gold-pop.down img {
+  filter: drop-shadow(1px 0 0 var(--cloth)) drop-shadow(-1px 0 0 var(--cloth)) drop-shadow(0 1px 0 var(--cloth)) drop-shadow(0 -1px 0 var(--cloth));
+}
+
+@keyframes coin-pop {
+  to {
+    transform: translateY(-12px);
+    opacity: 0;
+  }
+}
+
+/* The day drops into place in two steps when the date changes (SHELL-175). */
+.hud .turn-label {
+  overflow: hidden;
+}
+
+.hud .day.flip {
+  display: inline-block;
+  animation: day-flip 0.2s steps(2);
+}
+
+@keyframes day-flip {
+  from {
+    transform: translateY(-10px);
+  }
+}
+
+/* The dispatches plaque bounces once when news comes in (SHELL-177). */
+.hud .dispatches.bounce {
+  animation: plaque-bounce 0.3s steps(2);
+}
+
+@keyframes plaque-bounce {
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+/* None of these play with Animations Off or reduced motion. */
+:root[data-animations="off"] :is(.event-card, .revolution-card, .hud .day, .hud .dispatches.bounce) {
+  animation: none;
+}
+
+:root[data-animations="off"] .hud .gold-pop {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .event-card,
+  .revolution-card,
+  .hud .day,
+  .hud .dispatches.bounce {
+    animation: none;
+  }
+
+  .hud .gold-pop {
+    display: none;
+  }
 }
 
 /* The plaques draw 36 px high but take taps over the bar's full 44 px. */
@@ -1567,7 +1849,7 @@ button.small {
 }
 
 .tabs .tab:active:not(:disabled) {
-  transform: none;
+  translate: none;
 }
 
 /* Something waits for an answer here (a peace offer, an envoy): a red seal beside the name (SHELL-141). */
@@ -2440,6 +2722,27 @@ table.provinces td:first-child {
 .loyalty-wavering { background: #c08a2e; }
 .loyalty-disloyal { background: #a8323e; }
 .loyalty-in-revolt { background: #5a1420; }
+
+/* A real person of history: a small tag after his name, and the line on who he was on his screen (REALM-283). */
+.history-mark {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 0 4px;
+  border: 2px solid var(--outline);
+  background: var(--paper-light);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.2;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.lord-note {
+  margin: 4px 0 8px;
+  padding: 4px 8px;
+  border-left: 4px solid var(--outline);
+  color: var(--ink);
+}
 
 /* Who governs the province, first on its overview. */
 .governance {
@@ -3838,6 +4141,11 @@ button[data-break-alliance] {
   line-height: 1.25;
 }
 
+/* How likely a yes is (DIPL-229): the word itself says it, the colour only backs it up. */
+.odds.likely { color: #3f6b2a; }
+.odds.unsure { color: var(--ink-soft); }
+.odds.unlikely { color: var(--cloth); }
+
 .diplomacy-tab .hint {
   font-size: 17px;
 }
@@ -4117,7 +4425,7 @@ button.paper.over {
   background: #b13e53;
 }
 
-/* ---- Heritage in play: states, seals, warmth and the choice waiting (HER-084, HER-085) ---- */
+/* ---- Heritage in play: states, ambitions with progress and the choice waiting (HER-084, HER-085, X-27) ---- */
 
 .heritage-line .dormant {
   opacity: 0.6;
@@ -4126,8 +4434,7 @@ button.paper.over {
 .heritage-part.off {
   opacity: 0.7;
 }
-.heritage-part .chip,
-.seal .chip {
+.heritage-part .chip {
   display: inline-block;
   padding: 0 6px;
   border: 2px solid var(--outline);
@@ -4169,60 +4476,56 @@ button.paper.over {
   gap: 6px;
 }
 .heritage-ask button,
-.seal .counsel {
+.aim .counsel {
   min-height: 44px;
 }
-.seals {
+.aims {
   list-style: none;
   margin: 0;
   padding: 0;
 }
-.seal {
+/* One ambition: its theme, name, goal and progress; the New aim button sits under the words, so it fits a Tall panel too (X-27). */
+.aim {
   display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
+  grid-template-columns: auto 1fr;
+  align-items: start;
   gap: 4px 8px;
-  min-height: 44px;
   margin: 6px 0;
-  padding: 4px 8px;
+  padding: 6px 8px;
   border: 2px solid var(--outline);
   background: var(--paper-light);
 }
-.seal.sealed .what i {
-  color: var(--ink-soft);
+.aim.near {
+  background: var(--brass-light);
 }
-.seal .what small {
+.aim .what > * {
   display: block;
+}
+.aim .what small {
   color: var(--ink-soft);
 }
-.seal .counsel {
-  padding: 0 8px;
-  white-space: nowrap;
+.aim .progress {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 2px 0;
 }
-.seal .later {
-  color: var(--ink-soft);
-  white-space: nowrap;
-}
-.seal .warmth {
-  display: inline-flex;
-  gap: 2px;
-}
-.seal .warmth i {
-  width: 10px;
-  height: 14px;
+.aim .meter {
+  display: inline-block;
+  flex: 0 1 120px;
+  height: 10px;
   border: 2px solid var(--outline);
 }
-.seal .warmth.cold i.on {
-  background: var(--sea);
-}
-.seal .warmth.warm i.on {
+.aim .meter i {
+  display: block;
+  height: 100%;
   background: var(--brass);
 }
-.seal .warmth.hot i.on {
-  background: var(--cloth);
-}
-.seal .warm-box small {
-  color: var(--ink-soft);
+.aim .counsel {
+  grid-column: 2;
+  justify-self: start;
+  padding: 0 8px;
+  white-space: nowrap;
 }
 .heritage-part .past-list {
   margin: 0;
@@ -4324,6 +4627,175 @@ button.paper.over {
   padding: 0 2px;
   gap: 2px;
   font-size: 19px;
+}
+/* A trader's own card (TRADE-153): Now, Route, Better routes with Use, where its gold comes from, its buttons. */
+.trader-card p {
+  margin: 0 0 4px;
+  overflow-wrap: anywhere;
+}
+.trader-card small {
+  color: var(--ink-soft);
+}
+.trader-card .route-ends {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0 0 4px;
+}
+.trader-card .trader-buttons,
+.trader-card .confirm-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  margin-top: 8px;
+}
+.trader-card .trader-buttons button,
+.trader-card .confirm-row button {
+  min-height: 44px;
+  padding: 0 4px;
+  gap: 2px;
+}
+.trader-card .better {
+  list-style: none;
+  margin: 0 0 4px;
+  padding: 0;
+}
+.trader-card .better li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0;
+  border-bottom: 1px dashed var(--ink-soft);
+}
+.trader-card .better li span {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.trader-card .better button {
+  min-height: 44px;
+  min-width: 64px;
+}
+.sources {
+  margin: 0 0 4px;
+}
+.source-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+}
+.source-row button.link {
+  justify-content: flex-start;
+  gap: 4px;
+  border: 0;
+  border-image: none;
+  padding: 0;
+  min-height: 44px;
+  font: inherit;
+  color: var(--ink);
+  text-shadow: none;
+  text-decoration: underline;
+  text-align: left;
+}
+.src-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--paper-light);
+  border: 1px solid var(--ink-soft);
+}
+.src-bar i {
+  display: block;
+  height: 100%;
+  background: var(--brass);
+}
+.trader-card .foreign,
+.better-mark {
+  color: var(--cloth);
+}
+.better-mark {
+  color: #a8741a;
+}
+button.link {
+  background: none;
+  border: 0;
+  padding: 0;
+  min-height: 44px;
+  font: inherit;
+  color: inherit;
+  text-decoration: underline;
+  text-align: left;
+  cursor: pointer;
+}
+/* The best cities from where a route starts, as buttons in the route bar (TRADE-155). */
+.route-picks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+.route-picks button {
+  min-height: 44px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 2px 8px;
+}
+/* The Trade tab's traders, one row each, opening the trader's card (TRADE-156). */
+.trader-rows {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+  gap: 4px;
+}
+.trader-row {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+  min-height: 44px;
+  padding: 4px 8px;
+  text-align: left;
+  color: var(--ink);
+  text-shadow: none;
+}
+.trader-row .row-top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.trader-row .row-gold {
+  margin-left: auto;
+}
+.trader-row .row-route {
+  color: var(--ink-soft);
+  overflow-wrap: anywhere;
+}
+.trader-row .mark {
+  font-style: normal;
+}
+.trader-row .mark.bad {
+  color: var(--cloth);
+}
+.trader-row .mark.better {
+  color: #a8741a;
+}
+.trader-row.bad {
+  outline: 2px solid var(--cloth);
+}
+.use-all {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 6px;
+}
+.use-all p {
+  margin: 0;
+  flex: 1 1 200px;
+}
+.use-all button {
+  min-height: 44px;
 }
 /* Found a trader: a city, then one button per kind with its gold and upkeep, greyed with the reason. */
 .found-city {
@@ -4662,6 +5134,16 @@ button.paper.over {
   background: var(--sea);
 }
 
+/* A save in the cloud only: no map crop until it comes down. */
+.save-thumb:not(:has(img)) {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 48px;
+  border: 2px solid var(--outline);
+  background: var(--paper-light);
+}
+
 .save-text {
   display: flex;
   flex-direction: column;
@@ -4894,8 +5376,300 @@ button.paper.over {
   font-size: 19px;
 }
 
+/* A choice of more than four values (Colour vision): a grid of buttons under the name, each a full tap target. */
+.set-control.wide {
+  flex-basis: 100%;
+}
+
+.seg.many {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 168px), 1fr));
+  width: 100%;
+}
+
+/* What Colour vision draws: sample realms and a lens ramp in the chosen mode (SET-095). */
+.vision-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  flex-basis: 100%;
+}
+
+.vision-sample {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.vision-sample small {
+  margin-right: 4px;
+  font-size: 16px;
+  color: var(--ink-soft);
+}
+
+.vision-sample .swatch {
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--ink);
+}
+
 .reset-section {
   margin: 10px 0 4px;
+}
+
+/* Account and cloud saves: one column of full-width fields and buttons, the status line on top (SAVE-119 …). */
+.cloud-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  zoom: var(--text-zoom, 1);
+}
+
+.cloud-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cloud-form label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+  font-size: 17px;
+}
+
+.cloud-form input {
+  min-height: 44px;
+  padding: 0 8px;
+  border: 3px solid var(--outline);
+  background: var(--paper-light);
+  font: 400 21px/1 var(--body);
+  color: var(--ink);
+}
+
+.cloud-form button,
+.cloud-sign-out,
+.cloud-steam {
+  min-height: 48px;
+}
+
+/* Sign in with Steam fills the column, above the email form (SAVE-146, SAVE-148). */
+.cloud-steam {
+  width: 100%;
+}
+
+/* Apple, Google and Steam in the browser: full width, 48 points high (SAVE-155, SAVE-157). */
+.cloud-store {
+  width: 100%;
+  min-height: 48px;
+}
+
+/* Apple asks for its button in black with white text (Human Interface Guidelines, Sign in with Apple). */
+.cloud-store.cloud-apple {
+  background: #000;
+  color: #fff;
+}
+
+/* Add a sign-in, under the Sign-ins row (SAVE-156): 44 points high, wrapping on a narrow phone. */
+.cloud-add-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.cloud-add {
+  flex: 1 1 auto;
+  min-height: 44px;
+}
+
+/* The Unlock card: one scrolling column, Buy full width and 48 high, Restore purchases 44 (SAVE-185). */
+.unlock-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+}
+
+.unlock-what,
+.unlock-done {
+  margin: 4px 0;
+  font-size: 19px;
+}
+
+.unlock-buy {
+  width: 100%;
+  min-height: 48px;
+}
+
+.unlock-restore {
+  width: 100%;
+  min-height: 44px;
+}
+
+/* The start screen's small Full game ribbon while the full game is locked here (SHELL-029, SAVE-184). */
+.start-ribbon {
+  align-self: center;
+  min-height: 44px;
+  padding: 0 14px;
+}
+
+.cloud-status {
+  margin: 2px 0;
+  font-weight: 600;
+}
+
+.cloud-status.warn {
+  color: var(--cloth);
+}
+
+.cloud-device .set-control,
+.cloud-sign-in .set-control {
+  flex-wrap: wrap;
+}
+
+.cloud-sign-in .set-control button {
+  min-height: 44px;
+}
+
+/* The question when an Add brings a sign-in of another account (SAVE-194, SAVE-197): in the card's one
+   column, Combine accounts full width and 48 points high, Keep apart and OK 44. */
+.cloud-combine {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  border: 3px solid var(--outline);
+  background: var(--paper-light);
+}
+
+.cloud-combine p {
+  margin: 0;
+}
+
+.cloud-combine-yes {
+  width: 100%;
+  min-height: 48px;
+  font-weight: 600;
+}
+
+.cloud-combine-no {
+  width: 100%;
+  min-height: 44px;
+}
+
+.cloud-invite {
+  flex: none;
+  margin-top: 6px;
+}
+
+/* The Share sheet (SAVE-133, SAVE-136): one scrolling column, the three choices 64 points high. */
+.share-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 0;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.share-sheet label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+  font-size: 17px;
+}
+
+.share-sheet label small {
+  font-weight: 400;
+  color: var(--ink-soft);
+}
+
+.share-sheet input,
+.share-sheet textarea,
+.open-shared input {
+  min-height: 44px;
+  padding: 4px 8px;
+  border: 3px solid var(--outline);
+  background: var(--paper-light);
+  font: 400 21px/1.1 var(--body);
+  color: var(--ink);
+  resize: vertical;
+}
+
+.share-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 2px 0;
+  padding: 0;
+  border: 0;
+}
+
+.share-choices legend {
+  padding: 0;
+  font-weight: 600;
+  font-size: 17px;
+}
+
+.share-choice {
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 64px;
+  padding: 4px 10px;
+  border-image-source: var(--ui-btn-paper);
+  color: var(--ink);
+  text-shadow: none;
+  text-align: left;
+}
+
+.share-choice small {
+  font-weight: 400;
+  font-size: 16px;
+  color: var(--ink-soft);
+}
+
+.share-choice.on {
+  outline: 3px solid var(--brass);
+}
+
+.share-post,
+.share-links > * {
+  min-height: 48px;
+}
+
+.share-links {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cloud-shared .set-control {
+  flex-wrap: wrap;
+}
+
+/* Open a shared save, at the bottom of the Load card (SAVE-132). */
+.open-shared {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 6px;
+  flex: none;
+  margin-top: 6px;
+}
+
+.open-shared label {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 180px;
+  font-weight: 600;
+  font-size: 17px;
+}
+
+.open-shared input {
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 /* A tall window: the sections first, a section full screen with Back (SET-012). */
@@ -5763,7 +6537,11 @@ small.why {
   width: min(720px, 100%);
   max-height: 100%;
   padding: 4px 8px 8px;
-  animation: alert-in 0.2s steps(4);
+}
+
+/* It unrolls only when it first shows, not on each re-render (SHELL-176). */
+.revolution-card.unroll {
+  animation: unroll 0.24s steps(4);
 }
 
 .revolution-card .ribbon {
@@ -6670,7 +7448,7 @@ button[data-call-lords] {
   box-shadow: inset 0 4px 0 var(--brass), inset 0 6px 0 var(--brass-light);
 }
 .panel .sections .section:active:not(:disabled) {
-  transform: none;
+  translate: none;
 }
 /* Something waits for an answer in Diplomacy: the red seal of SHELL-141, in the section's corner. */
 .panel .sections .section.marked::after {
@@ -6938,6 +7716,24 @@ div.chron-row {
   color: var(--ink-soft);
 }
 
+/* The treasury lifts when a trader banks gold (TRADE-157). */
+.plaque.gold.banked {
+  animation: banked 0.6s steps(4) 1;
+}
+@keyframes banked {
+  0% {
+    transform: translateY(0);
+    filter: brightness(1);
+  }
+  40% {
+    transform: translateY(-3px);
+    filter: brightness(1.25);
+  }
+  100% {
+    transform: translateY(0);
+    filter: brightness(1);
+  }
+}
 /* Sending an assassin after a lord (REALM-284): the confirm card on his screen, two 44-point buttons side by side. */
 .assassin-ask {
   padding: 6px 8px;
@@ -6953,4 +7749,233 @@ div.chron-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 6px;
+}
+/* ---- Fear of a stronger neighbour (DIPL-235): a line under what a realm thinks of you ---- */
+p.fear {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+  min-height: 44px;
+  margin: 4px 0;
+}
+p.fear.threatened {
+  color: var(--cloth);
+}
+
+/* ---- Chapters (SHELL-183, SHELL-184) ---- */
+
+.score-part .made.chapter {
+  grid-column: 1 / -1;
+}
+
+.chapter-due {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  margin: 6px 0;
+}
+
+.chapter-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 6px 0;
+}
+
+.chapter-list button {
+  min-height: 44px;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+
+/* ---- First-launch question (SHELL-131, TUT-104) ----
+   Over the start screen, in More's frame: three ways in, each with one line on what it is. */
+.start-ask {
+  width: min(360px, calc(100% - 32px));
+  max-height: calc(100% - 16px);
+  overflow-y: auto;
+}
+
+.start-ask button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-height: 52px;
+  padding: 6px 12px;
+  text-align: left;
+}
+
+.start-ask button small {
+  font-size: 15px;
+  opacity: 0.85;
+}
+
+/* ---- The tutorial "Murad's Frontier" (onboarding TUT-131 … TUT-134, D-TUT-19) ----
+   One parchment note with the Grand Vizier's label and the step counter, placed like the hints'
+   note so it never covers what it points at; a spotlight that takes no taps rings the thing to tap
+   and dims the rest of the screen to half (TUT-060, TUT-061). */
+.coach-note {
+  position: fixed;
+  left: 50%;
+  bottom: max(8px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  z-index: 11;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 10px;
+  width: min(480px, calc(100vw - 2 * max(10px, env(safe-area-inset-left), env(safe-area-inset-right)) - 150px));
+  max-height: 33vh;
+  overflow: auto;
+  padding: 2px 4px 4px 6px;
+  border-width: 8px;
+  border-image-width: 8px;
+  font-size: 18px;
+  line-height: 1.15;
+  animation: hint-in 0.2s steps(4);
+}
+
+.coach-note.top {
+  bottom: auto;
+  top: calc(env(safe-area-inset-top) + 50px);
+}
+
+.coach-note[hidden] {
+  display: none;
+}
+
+.coach-face {
+  flex: 1 1 100%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink);
+}
+
+.coach-face b {
+  font: 600 16px/1 var(--body);
+}
+
+.coach-face small {
+  margin-left: 6px;
+  font: 600 15px/1 var(--body);
+  color: var(--ink-soft);
+}
+
+.coach-note p {
+  flex: 1 1 14em;
+  margin: 0;
+  color: var(--ink);
+}
+
+/* A place named in the step moves the camera there; its tap area reaches 44 points without moving the line. */
+.coach-place {
+  display: inline;
+  min-height: 0;
+  margin: -13px -2px;
+  padding: 13px 2px;
+  border: 0;
+  border-image: none;
+  background: none;
+  font: inherit;
+  font-weight: 700;
+  color: var(--ink);
+  text-shadow: none;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.coach-buttons {
+  flex: none;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.coach-buttons button {
+  min-height: 44px;
+  padding: 0 10px;
+  font-size: 17px;
+}
+
+.coach-buttons .leave {
+  width: 44px;
+  padding: 0;
+}
+
+.coach-note.end .coach-buttons {
+  flex-wrap: wrap;
+}
+
+.coach-spot {
+  position: fixed;
+  z-index: 10;
+  pointer-events: none;
+  border: 3px solid var(--brass-light);
+  box-shadow:
+    0 0 0 3px var(--outline),
+    inset 0 0 0 2px var(--outline);
+}
+
+.coach-dim {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  background: rgb(0 0 0 / 0.5);
+}
+
+.coach-spot[hidden],
+.coach-dim[hidden] {
+  display: none;
+}
+
+/* Idle on a do step: the ring pulses again (TUT-033); never under reduced motion (TUT-111). */
+.coach-spot.pulse {
+  animation: hint-pulse 1s steps(2) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .coach-spot.pulse {
+    animation: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .coach-note {
+    width: calc(100vw - 2 * max(8px, env(safe-area-inset-left), env(safe-area-inset-right)));
+    bottom: calc(max(10px, env(safe-area-inset-bottom)) + 72px);
+  }
+}
+
+/* A phone held upright shows only its turn-sideways notice; the step waits (TUT-134). */
+@media (orientation: portrait) and (pointer: coarse) {
+  .coach-note,
+  .coach-dim,
+  .coach-spot {
+    display: none !important;
+  }
+}
+
+/* A war with no aim (F-167): its costs sit framed in red at the head of the Price of war. */
+.aimless-warn {
+  margin: 4px 0 8px;
+  padding: 6px 8px;
+  border-color: var(--cloth);
+}
+.aimless-warn > .warn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 2px;
+  font-weight: 700;
+  color: var(--cloth);
+}
+.aimless-warn > .hint {
+  margin: 6px 0 0;
 }

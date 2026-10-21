@@ -33,8 +33,9 @@ for (const [name, view] of Object.entries(VIEWS)) {
 }
 await open();
 await page.click("[data-nation=france]");
+await page.click("[data-begin]");
 await page.click(".end-turn");
-await page.waitForSelector(".turn-label:text('18 Nov 1444')");
+await page.waitForSelector(".turn-label .day:text('18 Nov 1444')");
 await page.waitForTimeout(500);
 await page.screenshot({ path: `${out}/6-france.png` });
 await page.goto("http://localhost:4174/style.html");

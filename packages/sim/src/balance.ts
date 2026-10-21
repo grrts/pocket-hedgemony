@@ -286,7 +286,7 @@ export function checkSmallPlayable(small: number | null, large: number | null, c
   return { id: "BAL-020", name, verdict: atLeast(share, c.small_floor, c.warn_within), value: share, shown: pct(share), line, text: `The small band's best strategy grows ${pct(share)} as much as the large band's best.`, warPrice: false, target: "score_growth" };
 }
 
-/** BAL-021: realm-runs that went bankrupt (debt over two years' income) at peace with no rebels. */
+/** BAL-021: realm-runs that went bankrupt (defaulted, or debt over two years' income) at peace with no rebels. */
 export function checkCollapse(bankrupt: number, realmRuns: number, c: Cc): CheckResult {
   const name = "No collapse without cause";
   const line = `≤ ${pct(c.bankrupt_share)}`;
@@ -400,8 +400,8 @@ export function runChecks(set: RunSet, c: BalanceConfig): CheckResult[] {
   return out;
 }
 
-/** Debt over `years` years' income (any debt with no income). */
-export const isBankrupt = (r: Pick<RealmYear, "debt" | "income">, years: number) => r.debt > 0 && (r.income <= 0 || r.debt > years * r.income);
+/** Defaulted on its debts (X-29), or debt over `years` years' income (any debt with no income). */
+export const isBankrupt = (r: Pick<RealmYear, "debt" | "income" | "defaulted">, years: number) => !!r.defaulted || (r.debt > 0 && (r.income <= 0 || r.debt > years * r.income));
 
 export function runWars(r: ProbeResult, longMonths: number): RunWars {
   const long = r.recording.wars.filter((w) => w.months > longMonths);

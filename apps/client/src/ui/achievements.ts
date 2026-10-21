@@ -193,7 +193,7 @@ export function achievementsCard(p: DeviceProfile, s: Snapshot | null, filter: F
   const show = (d: AchievementDefinition) => (filter === "earned" ? d.id in p.unlocked : filter === "reach" ? !(d.id in p.unlocked) && !ACHIEVEMENTS_NOT_YET.has(d.id) && !ruledOut(d, date) : true);
   // A ladder shows while any level passes the filter: Within reach while a level is left, Earned once one is (ACH-086).
   const showTile = (t: Tile) => t.levels.some(show);
-  const eligible = s?.achievements ? (s.achievements.eligible ? "This campaign can earn achievements." : "This campaign cannot earn achievements.") : "Every new campaign can earn achievements.";
+  const eligible = s?.achievements ? (s.achievements.eligible ? "This campaign can earn achievements." : "This campaign cannot earn achievements: only an ironman campaign, played as the realm it began with, earns them.") : "An ironman campaign can earn achievements; choose Ironman on before you begin.";
   const picked = chosen ? tileOf(chosen) : undefined;
   const sections = CATEGORIES.map((c) => {
     const tiles = TILES.filter((t) => t.key.category === c.id);

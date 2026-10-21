@@ -15,7 +15,9 @@ const price = (over: Partial<PriceOfWar> = {}): PriceOfWar => ({
   friends: [],
   threatened: [3, 4],
   waveringLords: 3,
+  aim: { aim: "no_aim" },
   noAim: true,
+  aimless: null,
   truce: null,
   monthlyPay: 12.4,
   maxCeded: 4,
@@ -42,6 +44,37 @@ const war = (share: number, over: Partial<NonNullable<Snapshot["wars"][number]["
     cede: { attacker: { max: 3, of: 9, now: 0 }, defender: { max: 4, of: 11, now: 2 } },
     ...over,
   },
+});
+
+describe("a war with no aim on the declare sheet (F-167)", () => {
+  const aimless = { lords: 5, lordSteps: 2, notoriety: 15, provinces: 12, peaceShare: 0.25, alliesStayOut: [6] };
+  const p = price({ aimless });
+  const base = { target: 1, name, provinceName: () => "Champagne", titles, income: 20, me: 0, censure: "", nameAbroad: null };
+
+  it("heads the Price of war with every cost, each a red row that opens its reason", () => {
+    const html = priceOfWarHtml(p, { name, titles, income: 20 });
+    expect(html.indexOf("aimless-warn")).toBeLessThan(html.indexOf("Against you"));
+    expect(html).toContain("5 lose 2 steps of loyalty at once");
+    expect(html).toContain("Warlike or not");
+    expect(html).toContain("+15 notoriety");
+    expect(html).toContain("<em>Unjust war</em> in 12 provinces");
+    expect(html).toContain("+25 in 100 say peace");
+    expect(html).toContain("1 ally stay out");
+    expect(html).toContain("Castile");
+    expect(html).toContain("2 realms will hold <em>Threatened us</em>");
+    // Neighbours alarmed shows once, inside the block.
+    expect(html.split("Neighbours alarmed").length).toBe(2);
+    // The lords show once too: the wavering on taking land is told inside the block.
+    expect(html).not.toContain("will waver");
+    expect(html.match(/class="pow-line hurt"/g)!.length).toBeGreaterThanOrEqual(6);
+  });
+
+  it("names Confirm for what it is, and shows nothing of it for a war with an aim", () => {
+    expect(declareSheetHtml({ ...base, price: p })).toContain("Declare war with no aim");
+    const held = declareSheetHtml({ ...base, price: price({ aim: { aim: "take_land", province: 7 }, noAim: false }) });
+    expect(held).not.toContain("aimless-warn");
+    expect(held).toContain("Declare war on Burgundy");
+  });
 });
 
 describe("the declare sheet's Price of war (WAR-229, WAR-232)", () => {
@@ -73,7 +106,7 @@ describe("the declare sheet's Price of war (WAR-229, WAR-232)", () => {
   });
 
   it("puts Confirm at the foot, breaking the truce when one holds, with the censure and the name abroad link above it", () => {
-    const base = { target: 1, name, titles, income: 20, me: 0, censure: '<div class="censure-warn">x</div>', nameAbroad: { notoriety: 30, word: "Watched", landsTaken: 2, threshold: 8, leagues: [] } as NameAbroadView };
+    const base = { target: 1, name, provinceName: () => "Champagne", titles, income: 20, me: 0, censure: '<div class="censure-warn">x</div>', nameAbroad: { notoriety: 30, word: "Watched", landsTaken: 2, threshold: 8, leagues: [], fearful: [], fearRatios: { wary: 1.5, threatened: 2.5 } } as NameAbroadView };
     const plain = declareSheetHtml({ ...base, price: price() });
     expect(plain).toContain('data-declare-confirm="1"');
     expect(plain).not.toContain("data-break-truce");
@@ -83,6 +116,26 @@ describe("the declare sheet's Price of war (WAR-229, WAR-232)", () => {
     const truce = declareSheetHtml({ ...base, price: price({ truce: { until: null } }) });
     expect(truce).toContain('data-break-truce="1"');
     expect(truce).toContain("Break the truce and declare war");
+  });
+
+  it("names the aim the war will be declared with, or No aim as a hurt when none is held", () => {
+    const base = { target: 1, name, provinceName: () => "Champagne", titles, income: 20, me: 0, censure: "", nameAbroad: null };
+    const none = declareSheetHtml({ ...base, price: price() });
+    expect(none).toContain('<span class="what">Aim</span><span class="value">No aim</span>');
+    expect(none).toMatch(/pow-line hurt"><summary><span class="hurt-mark"[^>]*>!<\/span><span class="what">Aim/);
+    const held = declareSheetHtml({ ...base, price: price({ aim: { aim: "take_land", province: 7, source: "held within 50 years" }, noAim: false }) });
+    expect(held).toContain('<span class="what">Aim</span><span class="value">Take land: Champagne</span>');
+    expect(held).toContain("You hold it because: held within 50 years.");
+    expect(held).not.toMatch(/pow-line hurt"><summary><span class="hurt-mark"[^>]*>!<\/span><span class="what">Aim/);
+    const punish = declareSheetHtml({ ...base, price: price({ aim: { aim: "punish", source: "refused hand_over_province" }, noAim: false }) });
+    expect(punish).toContain('<span class="value">Punish</span>');
+    expect(punish).toContain("refused hand over province");
+  });
+
+  it("leaves out the neighbours alarmed and the wavering lords when a fitting aim is held", () => {
+    const h = priceOfWarHtml(price({ aim: { aim: "take_land", province: 7 }, noAim: false }), { name, titles, income: 20 });
+    expect(h).not.toContain("Threatened us");
+    expect(h).not.toContain("will waver");
   });
 });
 
@@ -118,7 +171,7 @@ describe("the war card and the war plaque (WAR-230, WAR-231)", () => {
 });
 
 describe("Your name abroad (DIPL-225, DIPL-226)", () => {
-  const v: NameAbroadView = { notoriety: 55, word: "Feared", landsTaken: 6, threshold: 8, leagues: [{ target: 5, members: [{ nation: 2, soldiers: 20000 }, { nation: 3, soldiers: 5000 }, { nation: 4, soldiers: 8000 }] }] };
+  const v: NameAbroadView = { notoriety: 55, word: "Feared", landsTaken: 6, threshold: 8, leagues: [{ target: 5, members: [{ nation: 2, soldiers: 20000 }, { nation: 3, soldiers: 5000 }, { nation: 4, soldiers: 8000 }] }], fearful: [], fearRatios: { wary: 1.5, threatened: 2.5 } };
   const html = nameAbroadHtml(v, name);
 
   it("shows the notoriety word, Lands taken against the threshold and the league with its members and soldiers first", () => {
@@ -138,5 +191,25 @@ describe("Your name abroad (DIPL-225, DIPL-226)", () => {
 
   it("says when a league may form", () => {
     expect(nameAbroadHtml({ ...v, landsTaken: 9, leagues: [] }, name)).toContain("9 of 8: a league may form");
+  });
+});
+
+describe("Neighbours who fear you (DIPL-236)", () => {
+  const v: NameAbroadView = { notoriety: 10, word: "Trusted", landsTaken: 0, threshold: 8, leagues: [], fearful: [{ nation: 2, level: "threatened", ratio: 3.2 }, { nation: 3, level: "wary", ratio: 1.6 }], fearRatios: { wary: 1.5, threatened: 2.5 } };
+  const html = nameAbroadHtml(v, name);
+
+  it("lists each neighbour who fears you with how much stronger you are, before notoriety", () => {
+    expect(html).toContain("Neighbours who fear you");
+    expect(html).toContain("2 realms · 1 threatened");
+    expect(html).toContain("Threatened · you are 3.2 times their side");
+    expect(html).toContain("Wary · you are 1.6 times their side");
+    expect(html).toContain('data-realm="2" data-realm-open="diplomacy"');
+    expect(html.indexOf("Neighbours who fear you")).toBeLessThan(html.indexOf("Notoriety"));
+  });
+
+  it("marks the row as hurting only when someone is threatened, and leaves it out when no one fears you", () => {
+    expect(html).toContain('class="pow-line fearful hurt"');
+    expect(nameAbroadHtml({ ...v, fearful: [v.fearful[1]!] }, name)).toContain('class="pow-line fearful"><summary><span class="calm-mark"');
+    expect(nameAbroadHtml({ ...v, fearful: [] }, name)).not.toContain("Neighbours who fear you");
   });
 });

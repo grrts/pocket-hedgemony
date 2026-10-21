@@ -56,7 +56,7 @@ A campaign earns achievements only while all three hold:
 | `cheat_marked` | false: no debug, editor or "free play" cheat was used, even once |
 | `switched_country` | false: you still play the realm you started with |
 
-A campaign that is not ironman earns nothing, for good. A cheat marks the save for good, and nothing from it is awarded, in-game or on any store. Playing on as another country after game over stops achievements from that moment. Any difficulty counts, with historical or free events. The tutorial earns none, and its last card tells you achievements start in a real campaign. Lifetime counters only count campaigns that pass all three flags. The pause menu and the new game screen show whether the campaign can earn achievements, and you are warned once before an action that would end eligibility (turning on a cheat, switching country after game over).
+A campaign that is not ironman earns nothing, for good. A cheat marks the save for good, and nothing from it is awarded, in-game or on any store. Playing on as another country after game over stops achievements from that moment. Any difficulty counts, with historical, plausible or free events. The tutorial earns none, and its last card tells you achievements start in a real campaign. Lifetime counters only count campaigns that pass all three flags. The pause menu and the new game screen show whether the campaign can earn achievements, and you are warned once before an action that would end eligibility (turning on a cheat, switching country after game over).
 
 ### Progress bars
 
@@ -232,7 +232,7 @@ All thresholds are provisional placeholders for balancing. Every campaign starts
 - Open the game menu (the three-line button at the top left) and tap **Achievements**, or *Achievements* on the start screen. The Achievements card opens in the side panel: earned of 80 and points of 810 at the top, the eligibility line, a filter (*All*, *Within reach*, *Earned*), then one row of badges per category with its own count. Tap a badge for its text, tier and points, this campaign's progress bar, and the date you earned it. The harvest ladder is one badge in First steps with its level in the corner (3/5); its detail lists every level with its target and date and a bar to the next level, counted across all your campaigns.
 - A badge is the tier's frame round the category's sign (a coin for Realm, swords for War, an anchor for Sea…) until the icons are drawn. Grey means locked; a dashed frame means **Not in the game yet**: 23 rows read systems the build does not have yet (charters, rulers and succession, trade hubs, winter quarters, marshals, styles, voyages and colonies, rebellions, regions of the world), and they stay locked until those land. The four History rows of the decades after 1378 read the bridge events (Kulikovo, Kosovo, Ankara, Timur's death); they can be earned once those events run in your campaign.
 - When you earn one, a banner slides in under the date bar for three seconds and a line goes into the News; tap the banner to open the card at it. The game menu button (and the Achievements line in it) carries a red dot until you have looked. *Achievement toasts* in Settings → Gameplay turns the banner off; achievements still unlock.
-- Tests run at the end of each week's turn, after everything else. What you earn is kept on this device, apart from any campaign, so it stays when you start again or reload. The build has no saves yet, so every campaign counts as ironman.
+- Tests run at the end of each week's turn, after everything else. What you earn is kept on this device, apart from any campaign, so it stays when you start again or reload. Only a campaign begun with **Ironman** on earns achievements: you choose it on the *Rules of the campaign* card before Begin ([The 1378 start](The-1378-Start#campaign-rules)), which says whether the chosen rules count.
 
 ## How it connects
 
@@ -258,6 +258,8 @@ All thresholds are provisional placeholders for balancing. Every campaign starts
 Computer players have no part here; achievements are only for your realm.
 
 ## Numbers
+
+Every value the game uses, made from its config so it always matches the game: [Achievements data](Data-Achievements). How they combine: [Formulas](Formulas).
 
 | Key | Value | Status |
 |---|---|---|

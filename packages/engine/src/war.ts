@@ -1,4 +1,5 @@
 import { lordsLoseWar } from "./lords.ts";
+import { markTaken } from "./newlyTaken.ts";
 import { battleDeath } from "./people.ts";
 import { armyDead, garrisonDead } from "./fallen.ts";
 import { castleStep } from "./works.ts";
@@ -14,7 +15,8 @@ import { halt, HOURS_PER_STEP, marchTo, routeBars, STEPS_PER_DAY } from "./turn.
 import { marchMap, NO_PATH, type World } from "./world.ts";
 import { battleWon } from "./campaignEnd.ts";
 import { retinueScatters, retinuesWon } from "./retinues.ts";
-import { aiRecruits, ARMS, canCall, commanderBattle, KIND, KIND_NAMES, menByArm, sendHome } from "./recruit.ts";
+import { aiRecruits } from "./arms.ts";
+import { ARMS, canCall, commanderBattle, KIND, KIND_NAMES, menByArm, sendHome } from "./recruit.ts";
 import { withoutOf } from "./research.ts";
 import { officialBonus, provinceTaken } from "./officials.ts";
 import { noteBattle, notePeace, noteSiege } from "./achievements.ts";
@@ -22,12 +24,14 @@ import { demandableProvinces, makeDemand, whyNotDemand } from "./statecraft.ts";
 import { heritageFactor } from "./heritage.ts";
 import { lostBattle } from "./rebels.ts";
 import { bestTerms, markSurrender, noteWarBattle, settlementTable } from "./settlement.ts";
-import { priceContext, priceOfWar, whyAiWontDeclare } from "./priceOfWar.ts";
+import { heedsNoNotoriety, priceContext, priceOfWar, whyAiWontDeclare } from "./priceOfWar.ts";
 import { grabbedLand } from "./conquest.ts";
 import { goalPlacesHeldBy, goalPulls } from "./goals.ts";
 import goalsConfig from "../../rules/data/domain/events.json" with { type: "json" };
 import { cededProvinces, fittingAim, landTakenWithoutAim, monthlyRefusals, noteWarVictory, peaceVoices, refusedPeace, truceBroken, type GameWar } from "./peace.ts";
 import { aiAnswersDefence, defenceCalls, dissolveEmpire, whyNotDissolveTerm } from "./institutions.ts";
+import { aiWarChanceFactor } from "./difficulty.ts";
+import { aimless, aimlessWarDeclared, NO_AIM } from "./aimlessWar.ts";
 
 /**
  * Milestone 1, war and conquest: wires the diplomacy context (who is at war,
@@ -120,26 +124,30 @@ export function atWar(world: World, a: number, b: number): boolean {
 }
 
 /** Enemies of each nation, by index, for the phases that test many pairs; worked out again when the wars change. */
-const enemyCache = new WeakMap<World, { key: string; table: Set<number>[] }>();
+const enemyCache = new WeakMap<World, { relations: number; wars: number; seq: number; day: number; table: Set<number>[] }>();
 function enemyTable(world: World): Set<number>[] {
-  const g = world.diplomacy.graph;
-  const key = `${g.relations.length}|${world.diplomacy.wars.length}|${world.diplomacy.seq}|${world.day}`;
+  const d = world.diplomacy;
+  const relations = d.graph.relations.length;
   const hit = enemyCache.get(world);
-  if (hit && hit.key === key) return hit.table;
+  if (hit && hit.relations === relations && hit.wars === d.wars.length && hit.seq === d.seq && hit.day === world.day) return hit.table;
   const table = buildEnemyTable(world);
-  enemyCache.set(world, { key, table });
+  enemyCache.set(world, { relations, wars: d.wars.length, seq: d.seq, day: world.day, table });
   return table;
 }
 
+/** The enemies of a realm at peace: one set shared by them all, never written to. */
+const NO_ENEMIES: ReadonlySet<number> = new Set<number>();
+
 function buildEnemyTable(world: World): Set<number>[] {
-  const t = world.nationIds.map(() => new Set<number>());
+  const t: Set<number>[] = new Array(world.nationIds.length).fill(NO_ENEMIES);
+  const own = (n: number) => (t[n] === NO_ENEMIES ? (t[n] = new Set<number>()) : t[n]!);
   for (const r of world.diplomacy.graph.relations) {
     if (r.type !== "at_war") continue;
     const a = world.nationIndex.get(r.source);
     const b = world.nationIndex.get(r.target);
     if (a === undefined || b === undefined) continue;
-    t[a]!.add(b);
-    t[b]!.add(a);
+    own(a).add(b);
+    own(b).add(a);
   }
   return t;
 }
@@ -169,6 +177,8 @@ export interface DeclareOptions {
   /** The province a Take land aim names. */
   province?: string;
   breakTruce?: boolean;
+  /** A subject rising for its freedom (SUBJ-077): its war has no aim but pays no price for it (F-167). */
+  rising?: boolean;
 }
 
 /**
@@ -205,6 +215,8 @@ export function declareWar(world: World, a: number, b: number, news: News[], o: 
   }
   if (aim.province) (war as GameWar).aimProvince = aim.province;
   news.push({ kind: "war", text: `${name(world, a)} declares war on ${name(world, b)}.`, nations: [a, b] });
+  // A war with no aim costs its declarer dearly from the first day (F-167).
+  if (aimless(war) && !o.rising) aimlessWarDeclared(world, a, news);
   for (const id of [...war.attackers, ...war.defenders]) {
     const n = world.nationIndex.get(id)!;
     if (n !== a && n !== b) news.push({ kind: "joined", text: `${name(world, n)} joins the war on the side of ${name(world, war.attackers.includes(id) ? a : b)}.`, nations: [n, a, b] });
@@ -219,9 +231,22 @@ export function declareWar(world: World, a: number, b: number, news: News[], o: 
 const AIM_ORDER = ["take_land", "seat_pretender", "break_subject", "free_people", "defend_faith", "punish", "tribute"];
 
 /** The aim a declaration of a on b takes when none is named: the best fitting aim a holds, else "no aim". */
-export function defaultAim(world: World, a: number, b: number): { aim: string; province?: string } | undefined {
+export function defaultAim(world: World, a: number, b: number): { aim: string; province?: string; source?: string } | undefined {
   const held = dip.warAimsOf(world.diplomacy, world.nationIds[a]!, world.nationIds[b]!);
   return AIM_ORDER.map((k) => held.find((h) => h.aim === k)).find((h) => h) ?? held.find((h) => h.aim === "no_aim");
+}
+
+/**
+ * The aim a declaration of a on b with none named is made with (WAR-229): the
+ * best fitting aim a holds, else "no aim"; a regency falls back to no aim for
+ * an aim it may not use, as declareWithAim does. The declare sheet names it,
+ * and the price of war reads "no aim" from it.
+ */
+export function declaringAim(world: World, a: number, b: number): { aim: string; province?: string; source?: string } {
+  const held = defaultAim(world, a, b);
+  if (!held || held.aim === "no_aim") return { aim: "no_aim" };
+  if (dip.country(world.diplomacy, world.nationIds[a]!).regency && !dip.config.war_aims.regency_allows.includes(held.aim)) return { aim: "no_aim" };
+  return held;
 }
 
 /** A regency may fight only some wars: an aim it may not use falls back to no aim. */
@@ -241,6 +266,12 @@ export function answerAiCalls(world: World, news: News[]): void {
     const n = world.nationIndex.get(call.called)!;
     if (n === world.player) continue;
     const enemy = world.nationIndex.get(call.against)!;
+    // An ally need not join a war with no aim, and the AI stays out of it (F-167, D-DIPL-9).
+    const war = d.wars.find((w) => w.id === call.war);
+    if (NO_AIM.allies_refuse && call.via === "alliance" && call.kind === "offensive" && war && aimless(war)) {
+      answerCall(world, call, false, news);
+      continue;
+    }
     // A subject answers its overlord by its loyalty and kind (SUBJ-028, SUBJ-038).
     const yes = call.via === "subject" ? subjectAnswersCall(world, n) : call.via === "empire" ? aiAnswersDefence(world, call) : call.kind === "defensive" || (!dip.warOf(d, call.called) && strength(world, n) * 2 >= strength(world, enemy));
     answerCall(world, call, yes, news);
@@ -420,12 +451,42 @@ export function engage(world: World, news: News[]): void {
   const cols = Math.ceil(W / CELL);
   const cells = new Map<number, number[]>();
   const cellOf = (t: number) => Math.floor((t % W) / CELL) + Math.floor(t / W / CELL) * cols;
+  // The realm whose armies at war stand in each province, MIXED where two realms' do: only armies in the
+  // same province meet, so a province with one realm's armies alone looks no further.
+  const MIXED = -2;
+  const inProvince = new Map<number, number>();
+  // The armies of realms at war, the only ones that can meet, and their garrisons.
+  const atWar: number[] = [];
+  const held: number[] = [];
+  let crowded = false;
   for (let i = 0; i < a.count; i++) {
-    if (!a.alive[i] || a.retreating[i] || !enemies[a.owner[i]!]!.size) continue;
+    if (!a.alive[i] || !enemies[a.owner[i]!]?.size) continue;
+    if (a.commander[i]! < 0) held.push(i);
+    if (a.retreating[i]) continue;
+    atWar.push(i);
+    const was = inProvince.get(a.location[i]!);
+    if (was === undefined) inProvince.set(a.location[i]!, a.owner[i]!);
+    else if (was !== a.owner[i] && was !== MIXED) (inProvince.set(a.location[i]!, MIXED), (crowded = true));
+  }
+  // Most steps no two realms' armies at war share a province and no battle is fought: nobody meets.
+  if (!crowded && !world.battles.length) return;
+  const fought = new Set(world.battles.map((b) => b.province));
+  const mixed = (p: number) => inProvince.get(p) === MIXED;
+  const meets = (p: number) => mixed(p) || fought.has(p);
+  for (const i of atWar) {
+    if (!meets(a.location[i]!)) continue;
     const k = cellOf(a.tile[i]!);
     const list = cells.get(k);
     if (list) list.push(i);
     else cells.set(k, [i]);
+  }
+  // Garrisons of realms at war by province, for joinGarrisons.
+  const garrisons = new Map<number, number[]>();
+  for (const i of held) {
+    if (!meets(a.location[i]!)) continue;
+    const g = garrisons.get(a.location[i]!);
+    if (g) g.push(i);
+    else garrisons.set(a.location[i]!, [i]);
   }
   const near = (t: number, range: number, visit: (j: number) => void) => {
     const x = Math.floor((t % W) / CELL);
@@ -446,12 +507,12 @@ export function engage(world: World, news: News[]): void {
       if (foeOfAtt === foeOfDef || a.commander[j]! < 0 || a.location[j] !== b.province || tileDistance(world, a.tile[j]!, b.tile) > engageRange(world, j)) return;
       joinBattle(world, b, j, foeOfAtt ? "defenders" : "attackers");
     });
-    joinGarrisons(world, b, enemies);
+    joinGarrisons(world, b, enemies, garrisons);
   }
-  for (let i = 0; i < a.count; i++) {
+  for (const i of atWar) {
     if (!a.alive[i] || a.battle[i]! >= 0 || a.retreating[i] || a.commander[i]! < 0) continue;
     const n = a.owner[i]!;
-    if (!enemies[n]!.size) continue;
+    if (!mixed(a.location[i]!)) continue;
     const range = engageRange(world, i);
     let foe = -1;
     let best = Infinity;
@@ -461,15 +522,15 @@ export function engage(world: World, news: News[]): void {
       const d = tileDistance(world, a.tile[i]!, a.tile[j]!);
       if (d <= range && d < best) ((best = d), (foe = j));
     });
-    if (foe >= 0) joinGarrisons(world, startBattle(world, [i], [foe], news), enemies);
+    if (foe >= 0) joinGarrisons(world, startBattle(world, [i], [foe], news), enemies, garrisons);
   }
 }
 
 /** Garrison troops fight in any battle in their own province, wherever in it they stand (RECR-107). */
-function joinGarrisons(world: World, b: Battle, enemies: Set<number>[]): void {
+function joinGarrisons(world: World, b: Battle, enemies: Set<number>[], garrisons: Map<number, number[]>): void {
   const a = world.armies;
   const sideOwners = [b.attackers.map((s) => a.owner[s]!), b.defenders.map((s) => a.owner[s]!)];
-  for (let j = 0; j < a.count; j++) {
+  for (const j of garrisons.get(b.province) ?? []) {
     if (!a.alive[j] || a.commander[j]! >= 0 || a.battle[j]! >= 0 || a.location[j] !== b.province || !enemies[a.owner[j]!]!.size) continue;
     const n = a.owner[j]!;
     const foeOfAtt = sideOwners[0]!.some((o) => enemies[n]!.has(o));
@@ -799,8 +860,9 @@ export function runOccupation(world: World, newMonth: boolean, news: News[]): vo
   const enemies = enemyTable(world);
   const present = new Map<number, number[]>();
   for (let i = 0; i < a.count; i++) {
-    // Armies marching through or fighting a battle don't hold the land.
-    if (!a.alive[i] || a.battle[i]! >= 0 || a.retreating[i] || a.pathAt[i]! < a.path[i]!.length) continue;
+    // Armies marching through or fighting a battle don't hold the land. A realm at war with no one neither takes nor
+    // defends land against anyone (its own land's attacker is its enemy), so its standing armies are passed over.
+    if (!a.alive[i] || a.battle[i]! >= 0 || a.retreating[i] || a.pathAt[i]! < a.path[i]!.length || !enemies[a.owner[i]!]?.size) continue;
     const list = present.get(a.location[i]!) ?? [];
     list.push(i);
     present.set(a.location[i]!, list);
@@ -1051,6 +1113,7 @@ function makePeace(world: World, war: dip.War, whole: boolean, a: number, b: num
     world.provinceOwner[p] = world.provinceOccupier[p]!;
     world.provinceLord[p] = -1;
     provinceTaken(world, p, news);
+    markTaken(world, p);
   }
   // Every other occupation between the realms making peace ends.
   const set = new Set(involved);
@@ -1105,6 +1168,7 @@ export function cedeProvince(world: World, p: number, to: number, news: News[]):
   world.provinceOwner[p] = to;
   world.provinceLord[p] = -1;
   provinceTaken(world, p, news);
+  markTaken(world, p);
   world.provinceOccupier[p] = -1;
   world.provinceHold[p] = 0;
   world.sieges.delete(p);
@@ -1278,26 +1342,40 @@ export function monthlyDiplomacy(world: World, news: News[]): void {
  * truce, alliance or subject tie with (rare, set in defines), only when it has
  * counted the price (WAR-228): its side beats the target's with everyone
  * called against it, it holds a war chest, its people don't want peace and it
- * isn't too notorious.
+ * isn't too notorious. It takes its chances (DIPL-242, DIPL-243): a neighbour
+ * already at war elsewhere makes it look more often, needs a smaller edge and
+ * is likelier picked, and now and then it gambles on a smaller edge.
  */
 export function aiDeclarations(world: World, news: News[]): void {
   const d = world.diplomacy;
-  const chance = world.rules.defines.war.aiDeclareChancePerMonth;
+  // The campaign's difficulty scales how readily the AI looks for a war (SETUP-101).
+  const chance = world.rules.defines.war.aiDeclareChancePerMonth * aiWarChanceFactor(world);
   const G = goalsConfig.goals;
+  const O = dip.AF.opportunity;
+  // Realms at war this month: a neighbour already fighting another is an opportunity (DIPL-242).
+  const fighting = new Set<string>();
+  for (const w of d.wars) for (const id of [...w.attackers, ...w.defenders]) fighting.add(id);
   for (let n = 0; n < world.nationCount; n++) {
-    if (n === world.player || world.nationGone[n] || dip.warOf(d, world.nationIds[n]!)) continue;
+    if (n === world.player || world.nationGone[n] || fighting.has(world.nationIds[n]!)) continue;
     // A realm's goals make it look for a war more often (EVT-105).
     const pulls = goalPulls(world, n);
-    const neighbours = () => dip.neighbours(d, world.nationIds[n]!).map((id) => world.nationIndex.get(id)!);
-    let near = pulls?.size ? neighbours() : null;
-    const most = near ? Math.max(0, ...near.map((t) => pulls!.get(t) ?? 0)) : 0;
-    if (world.rng.next() >= chance * (1 + G.war_chance_per_pull * most)) continue;
-    near ??= neighbours();
+    const near = dip.neighbours(d, world.nationIds[n]!).map((id) => world.nationIndex.get(id)!);
+    const busy = (t: number) => t !== undefined && fighting.has(world.nationIds[t]!);
+    const most = pulls?.size ? Math.max(0, ...near.map((t) => pulls.get(t) ?? 0)) : 0;
+    // A neighbour at war elsewhere makes it look for a war more often (DIPL-242).
+    const opening = near.some(busy) ? O.at_war_chance_factor : 1;
+    if (world.rng.next() >= chance * opening * (1 + G.war_chance_per_pull * most)) continue;
+    // Now and then a realm gambles on a little less than its usual edge (DIPL-243); a hash of the day and the realm decides,
+    // so it stays deterministic without drawing on the world's dice.
+    const gamble = gambleRoll(world.day, n) < O.gamble_chance;
     const ctx = priceContext(world, n);
-    const targets = near.filter((t) => t !== undefined && !world.nationGone[t] && relationState(world, n, t).state === null && !whyAiWontDeclare(world, n, t, priceOfWar(world, n, t, ctx)));
+    const targets = near.filter((t) => t !== undefined && !world.nationGone[t] && relationState(world, n, t).state === null && !whyAiWontDeclare(world, n, t, priceOfWar(world, n, t, ctx), gamble));
     if (!targets.length) continue;
-    const t = most > 0 ? weightedPick(world, targets, (x) => 1 + G.target_weight_per_pull * (pulls!.get(x) ?? 0)) : targets[world.rng.int(targets.length)]!;
+    const weight = (x: number) => (1 + G.target_weight_per_pull * (pulls?.get(x) ?? 0)) * (busy(x) ? O.at_war_target_weight : 1);
+    const t = most > 0 || targets.some(busy) ? weightedPick(world, targets, weight) : targets[world.rng.int(targets.length)]!;
     if (demandFirst(world, n, t)) continue;
+    // A war with no aim costs too much for any but a reckless realm (F-167).
+    if (NO_AIM.ai_only_if_reckless && declaringAim(world, n, t).aim === "no_aim" && !heedsNoNotoriety(world, n)) continue;
     // A Take land aim on a place one of its goals names is the war's aim (EVT-105).
     const place = goalPlacesHeldBy(world, n, t).map((p) => world.provinceIds[p]!).find((p) => dip.warAimsOf(d, world.nationIds[n]!, world.nationIds[t]!).some((h) => h.aim === "take_land" && h.province === p));
     declareWar(world, n, t, news, place ? { aim: "take_land", province: place } : {});
@@ -1332,7 +1410,7 @@ function demandFirst(world: World, n: number, t: number): boolean {
   return false;
 }
 
-/** AI realms at war raise levies they can pay for; at peace they send levies home before their pay begins. */
+/** AI realms keep their standing armies at peace and call men across the realm at war (DIPL-232, DIPL-233). */
 export function aiRaise(world: World, news: News[]): void {
   aiRecruits(world, news, (n) => !!dip.warOf(world.diplomacy, world.nationIds[n]!));
 }
@@ -1346,7 +1424,12 @@ export function aiMarches(world: World): void {
   const a = world.armies;
   const enemies = enemyTable(world);
   const armiesAt = new Map<number, number[]>();
-  for (let i = 0; i < a.count; i++) if (a.alive[i]) armiesAt.set(a.location[i]!, [...(armiesAt.get(a.location[i]!) ?? []), i]);
+  for (let i = 0; i < a.count; i++) {
+    if (!a.alive[i]) continue;
+    const list = armiesAt.get(a.location[i]!);
+    if (list) list.push(i);
+    else armiesAt.set(a.location[i]!, [i]);
+  }
   for (let i = 0; i < a.count; i++) {
     if (!a.alive[i]) continue;
     const n = a.owner[i]!;
@@ -1386,4 +1469,11 @@ export function aiMarches(world: World): void {
       a.pathAt[i] = 0;
     }
   }
+}
+
+/** A deterministic roll in [0,1) from the day and the realm, which leaves the world's dice untouched. */
+function gambleRoll(day: number, n: number): number {
+  let h = Math.imul(day ^ 0x9e3779b9, 0x85ebca6b) ^ Math.imul(n + 1, 0xc2b2ae35);
+  h ^= h >>> 16; h = Math.imul(h, 0x7feb352d); h ^= h >>> 15; h = Math.imul(h, 0x846ca68b); h ^= h >>> 16;
+  return (h >>> 0) / 4294967296;
 }

@@ -104,7 +104,7 @@ Feature: Calendar and campaign span
   @TIME-010
   Scenario: World domination wins at once in a January turn and play goes on
     Given the date is "January 1720"
-    And the country "Castile" owns or holds as subjects 610 of the world's 1200 settled land provinces
+    And the country "Castile" owns or holds as subjects 1200 of the world's 1200 settled land provinces
     When the turn is processed
     Then "Castile" wins by world domination in "January 1720"
     And the campaign does not end
@@ -119,9 +119,9 @@ Feature: Calendar and campaign span
 
     Examples:
       | date         | held | outcome                                                |
-      | June 1720    | 610  | no win is declared                                     |
-      | January 1721 | 600  | "Castile" wins by world domination in "January 1721"   |
-      | January 1721 | 599  | no win is declared                                     |
+      | June 1720    | 1200 | no win is declared                                     |
+      | January 1721 | 1200 | "Castile" wins by world domination in "January 1721"   |
+      | January 1721 | 1199 | no win is declared                                     |
 
   @TIME-069
   Scenario: The leader in each score wins at the end date, and ties share the win

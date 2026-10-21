@@ -30,6 +30,7 @@ for (const [name, device] of [
   await page.waitForTimeout(300);
   await page.waitForSelector("[data-nation=saxony]", { timeout: 10000 }).catch(() => console.log("no Rule Saxony button"));
   await tap("[data-nation=saxony]");
+  await tap("[data-begin]");
   await page.waitForSelector(".hud [data-news]", { timeout: 60000 });
   await page.waitForTimeout(500);
   await page.evaluate(() => document.querySelector("[data-hint=stop]")?.click());
@@ -100,6 +101,7 @@ for (const [name, device] of [
   await page.evaluate(() => window.__phSelect("p829"));
   await page.waitForTimeout(300);
   await tap("[data-nation=saxony]");
+  await tap("[data-begin]");
   await page.waitForSelector(".hud [data-news]", { timeout: 60000 });
   await page.waitForTimeout(500);
   await page.evaluate(() => document.querySelector("[data-hint=stop]")?.click());

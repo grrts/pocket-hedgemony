@@ -642,6 +642,21 @@
     "ai_candidates": 8,
     "ai_max_traders_per_start": 2,
     "ai_found_reserve": 3,
-    "ai_keep_route_over_upkeep": 4
+    "ai_keep_route_over_upkeep": 1,
+    "homes": {
+      "$comment": "D-TRADE-23, home slots (trade rework, 19 October, Leroy chose A): a city is home to at most by_market_step[its market step] traders, and a port to port more; traders over that from the 1444 start stay but none more is founded there until one is gone. Upkeep and founding gold are the kind's times upkeep_factor and found_factor, so a poor route loses money; ai_keep_route_over_upkeep was 4 at the old upkeep, now 1.",
+      "by_market_step": [0, 1, 2, 4],
+      "port": 1,
+      "upkeep_factor": 4,
+      "found_factor": 3
+    },
+    "suggest": {
+      "$comment": "Better routes offered on a trader's card (trade rework, 19 October): at most count, each worth at least min_gain_share more than the route now and min_gain gold a month more; while a route is chosen, up to draft_options cities it could go to carry their estimate on the map.",
+      "count": 3,
+      "min_gain_share": 0.2,
+      "min_gain": 0.2,
+      "draft_options": 12
+    },
+    "feed_max": 256
   }
 }

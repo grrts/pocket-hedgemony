@@ -1,0 +1,800 @@
+<h1>Diplomacy data</h1>
+<p>Every value in the game&#39;s diplomacy config, exactly as the game reads it. This page is made from <code>packages/rules/data/domain/diplomacy.json</code> each time the config changes, so it always matches the game. How these values are used is explained on <a href="/wiki/Diplomacy">Diplomacy</a>.</p>
+<p>Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and values marked (provisional) are placeholders that may still change in balancing. Inventions are shown by id and name; see <a href="/wiki/Data-Research#inventions">Research data</a>.</p>
+<blockquote>
+<p>Diplomacy context config. &#39;relations&#39; is copied from country-relations/config/relation-rules.json (relation model, matrix, actions, durations); the rest from diplomacy/diplomacy-rules.json. Every number is a placeholder balancing knob owned by game design. Subject kinds: the engine reads relations.subject_kinds only for labels; joining wars and own diplomacy follow the six kinds of subjects.json (X-8, D-DIPL-10).</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>schema_version</code></td><td>1.0</td></tr>
+<tr><td><code>campaign_end</code></td><td>1939-08-31</td></tr>
+<tr><td><code>oaths_broken_years</code></td><td>30</td></tr>
+<tr><td><code>lands_taken_years</code></td><td>20</td></tr>
+</tbody></table></div>
+<h2 id="relations"><a class="anchor" href="#relations" aria-label="Link to this section">#</a>Relations</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>default_stance</code></td><td>neutral</td></tr>
+<tr><td><code>autonomy_levels</code></td><td>very_low, low, moderate, high, very_high</td></tr>
+<tr><td><code>reference_date</code></td><td>1444-11-11</td></tr>
+</tbody></table></div>
+<h3 id="layers"><a class="anchor" href="#layers" aria-label="Link to this section">#</a>Layers</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>types</th><th>rule</th></tr></thead>
+<tbody>
+<tr><td>hierarchy</td><td>subject</td><td>A country has at most one direct overlord. Chains are allowed (a subject may have subjects); cycles are not.</td></tr>
+<tr><td>state</td><td>at_war, truce, alliance</td><td>At most one state relation per unordered pair.</td></tr>
+<tr><td>stance</td><td>friendly, neutral, rival, hostile</td><td>At most one stance per perspective (A towards B). A mutual stance record fills both perspectives; a one-way record fills only source towards target. With no stance stored, the game uses the default stance, which is not a historical claim.</td></tr>
+</tbody></table></div>
+<h3 id="implied-stance"><a class="anchor" href="#implied-stance" aria-label="Link to this section">#</a>Implied stance</h3>
+<blockquote>
+<p>Effective stance when none is stored for a perspective: at war reads as hostile, allies read as friendly, everything else falls back to default_stance.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>at_war</code></td><td>hostile</td></tr>
+<tr><td><code>alliance</code></td><td>friendly</td></tr>
+</tbody></table></div>
+<h3 id="types"><a class="anchor" href="#types" aria-label="Link to this section">#</a>Types</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>label</th><th>layer</th><th>direction</th><th>stored</th><th>definition</th><th>applies when</th><th>duration</th><th>establish actions</th><th>terminate actions</th><th>more</th></tr></thead>
+<tbody>
+<tr><td>alliance</td><td>Alliance</td><td>state</td><td>mutual</td><td>yes</td><td>A formal, mutual commitment to support one another in war.</td><td>There is a treaty, sworn league or documented joint war effort binding both sides. Friendship, marriage or a shared enemy alone is not enough.</td><td>kind: open_ended; default_months: none; expires_on_end_date: no</td><td>form_alliance, peace_term_force_alliance</td><td>break_alliance, declare_war, make_subject, country_destroyed</td><td>ai: (call_to_arms_weight: 1; attack_ally_weight: -1); modifiers: alliance</td></tr>
+<tr><td>friendly</td><td>Friendly</td><td>stance</td><td>mutual_or_one_way</td><td>yes</td><td>Active cooperation or warm diplomatic relations without a binding war commitment.</td><td>Documented cooperation: a peace treaty kept in good faith, dynastic or political partnership, joint diplomacy, or protection without formal subjection.</td><td>kind: open_ended; decay_months: 240</td><td>improve_relations, royal_marriage, gift, event_outcome</td><td>insult, declare_war, set_rival, event_outcome, decay</td><td>ai: (alliance_candidate_weight: 0.5); modifiers: friendly</td></tr>
+<tr><td>neutral</td><td>Neutral</td><td>stance</td><td>mutual_or_one_way</td><td>yes</td><td>No significant alignment or hostility.</td><td>Store it only when neutrality is itself a documented, meaningful fact (a declared neutrality, a deliberate abstention from a war both sides tried to draw the country into). Otherwise leave the pair empty and let the game apply the default stance.</td><td>kind: open_ended</td><td>declare_neutrality, decay</td><td>any_stance_change</td><td>ai: (none); modifiers: neutral</td></tr>
+<tr><td>rival</td><td>Rival</td><td>stance</td><td>mutual_or_one_way</td><td>yes</td><td>Competition for territory, power, a throne, influence or trade.</td><td>A documented contested object: a disputed province, crown, trade route, sphere or office. Neighbourhood alone never makes a rivalry.</td><td>kind: open_ended; min_months_before_change: 120</td><td>set_rival, event_outcome, peace_term_claim_left_open</td><td>drop_rival, country_destroyed, contested_object_resolved</td><td>ai: (war_target_weight: 0.6; ally_against_weight: 0.5); modifiers: rival</td></tr>
+<tr><td>hostile</td><td>Hostile</td><td>stance</td><td>mutual_or_one_way</td><td>yes</td><td>Serious antagonism or an ongoing dispute that may lead to war: raiding, feuds, a revolt-in-waiting, a broken treaty.</td><td>Documented raids, open disputes, recent betrayal, or a subject openly working against its overlord. Stronger than rivalry; the two never coexist in one perspective.</td><td>kind: open_ended; decay_months: 120; decays_to: rival</td><td>insult, border_raid, break_truce, event_outcome, war_ends_without_reconciliation</td><td>improve_relations, peace_with_reconciliation, decay</td><td>ai: (war_target_weight: 1; border_fort_weight: 0.5); modifiers: hostile</td></tr>
+<tr><td>at_war</td><td>At War</td><td>state</td><td>mutual</td><td>yes</td><td>The two countries are actively fighting.</td><td>A declared war or campaign is in progress on the reference date, or a state of war continues with no peace or truce concluded.</td><td>kind: until_peace; war_exhaustion_peace_months: 60</td><td>declare_war, join_war_as_ally, join_war_as_subject, independence_war, event_outcome</td><td>make_peace, white_peace, country_destroyed</td><td>ai: (none); modifiers: at_war</td></tr>
+<tr><td>subject</td><td>Subject</td><td>hierarchy</td><td>directed</td><td>yes</td><td>The source country is politically subordinate to the target and owes defined obligations (tribute, troops, homage, investiture).</td><td>A documented obligation exists: tribute actually owed, fief held, investiture received, estate within a composite crown. Influence, protection or cultural sway is not subjection.</td><td>kind: open_ended</td><td>peace_term_vassalize, diplomatic_vassalize, inheritance_union, event_outcome</td><td>independence_war_won, release_subject, annex_subject, overlord_destroyed, event_outcome</td><td>ai: (none); modifiers: subject; source role: subject; target role: overlord; kinds: subject_kinds</td></tr>
+<tr><td>overlord</td><td>Overlord</td><td>hierarchy</td><td>directed</td><td>no</td><td>The country that holds authority over a subject. Always derived by reading a subject record from the other end; never stored.</td><td>Exactly when a subject record names this country as target.</td><td></td><td></td><td></td><td>derived from: subject</td></tr>
+<tr><td>truce</td><td>Truce</td><td>state</td><td>mutual</td><td>yes</td><td>A temporary agreement not to resume hostilities after a conflict.</td><td>A truce or peace treaty concluded after a conflict is in force on the reference date. Use the treaty&#39;s own term as expires_on when one is recorded.</td><td>kind: fixed; default_months: 60; historical_term_overrides_default: yes</td><td>make_peace, white_peace, negotiate_truce, event_outcome</td><td>expires, break_truce, form_alliance, make_subject</td><td>ai: (break_truce_weight: -1); modifiers: truce</td></tr>
+</tbody></table></div>
+<h3 id="subject-kinds"><a class="anchor" href="#subject-kinds" aria-label="Link to this section">#</a>Subject kinds</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>label</th><th>obligations</th><th>can conduct own diplomacy</th><th>joins overlord wars</th><th>note</th></tr></thead>
+<tbody>
+<tr><td>vassal</td><td>Vassal</td><td>military_service, homage</td><td>yes</td><td>defensive</td><td></td></tr>
+<tr><td>tributary</td><td>Tributary</td><td>tribute</td><td>yes</td><td>never</td><td></td></tr>
+<tr><td>personal_union</td><td>Junior partner in a personal union</td><td>shared_ruler</td><td>no</td><td>always</td><td></td></tr>
+<tr><td>estate</td><td>Constituent estate of a composite realm</td><td>taxes, military_service</td><td>no</td><td>always</td><td>Kingdoms, principalities, magnate blocs or leagues inside a larger crown that the catalogue records as separate actors.</td></tr>
+<tr><td>appanage</td><td>Appanage or princely apanage</td><td>homage, military_service</td><td>no</td><td>always</td><td></td></tr>
+<tr><td>fief</td><td>Fief held from a sovereign suzerain</td><td>homage, census_or_investiture</td><td>yes</td><td>never</td><td>For example a kingdom held as a papal fief: real legal obligation, very high autonomy.</td></tr>
+<tr><td>colony</td><td>Overseas or colonial dependency</td><td>governor_appointed, trade_monopoly</td><td>no</td><td>always</td><td></td></tr>
+<tr><td>frontier_commandery</td><td>Frontier commandery or guard under imperial titles</td><td>tribute_missions, border_service</td><td>yes</td><td>never</td><td></td></tr>
+</tbody></table></div>
+<h3 id="compatibility"><a class="anchor" href="#compatibility" aria-label="Link to this section">#</a>Compatibility</h3>
+<blockquote>
+<p>Pair-level rules, read regardless of direction. Pairs not listed are allowed. &#39;forbidden&#39; is a validation error; &#39;redundant&#39; is a warning (store only the stronger relation); &#39;allowed_with_note&#39; must carry a note in the record.</p>
+</blockquote>
+<h4 id="rules"><a class="anchor" href="#rules" aria-label="Link to this section">#</a>Rules</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>a</th><th>b</th><th>result</th><th>note</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>alliance</td><td>at_war</td><td>forbidden</td><td></td></tr>
+<tr><td>2</td><td>alliance</td><td>truce</td><td>forbidden</td><td></td></tr>
+<tr><td>3</td><td>at_war</td><td>truce</td><td>forbidden</td><td></td></tr>
+<tr><td>4</td><td>subject</td><td>at_war</td><td>forbidden</td><td>A subject that fights its overlord has left the hierarchy: record the independence war, not both.</td></tr>
+<tr><td>5</td><td>subject</td><td>truce</td><td>forbidden</td><td></td></tr>
+<tr><td>6</td><td>subject</td><td>alliance</td><td>forbidden</td><td>The subject&#39;s obligations already cover what an alliance would.</td></tr>
+<tr><td>7</td><td>subject</td><td>neutral</td><td>forbidden</td><td></td></tr>
+<tr><td>8</td><td>alliance</td><td>hostile</td><td>forbidden</td><td></td></tr>
+<tr><td>9</td><td>alliance</td><td>neutral</td><td>forbidden</td><td></td></tr>
+<tr><td>10</td><td>alliance</td><td>friendly</td><td>redundant</td><td>Alliance already implies a friendly stance.</td></tr>
+<tr><td>11</td><td>alliance</td><td>rival</td><td>allowed_with_note</td><td>Allies may compete over a contested object (for example a throne or a frontier).</td></tr>
+<tr><td>12</td><td>at_war</td><td>friendly</td><td>forbidden</td><td></td></tr>
+<tr><td>13</td><td>at_war</td><td>neutral</td><td>forbidden</td><td></td></tr>
+<tr><td>14</td><td>subject</td><td>friendly</td><td>redundant</td><td>A loyal subject is the default; store friendly only if it says more than loyalty.</td></tr>
+<tr><td>15</td><td>subject</td><td>hostile</td><td>allowed_with_note</td><td>A disloyal subject; feeds the revolt risk.</td></tr>
+<tr><td>16</td><td>subject</td><td>rival</td><td>allowed_with_note</td><td>A subject competing with its overlord for power.</td></tr>
+</tbody></table></div>
+<h3 id="precedence"><a class="anchor" href="#precedence" aria-label="Link to this section">#</a>Precedence</h3>
+<blockquote>
+<p>When gameplay creates a relation that is incompatible with an existing one, the newer relation wins and ends the older one, except where an action is blocked by &#39;requires&#39;. When two stored historical records conflict, validation fails: precedence never silently fixes data.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>order</code></td><td>at_war, truce, subject, alliance, hostile, rival, friendly, neutral</td></tr>
+</tbody></table></div>
+<h3 id="actions"><a class="anchor" href="#actions" aria-label="Link to this section">#</a>Actions</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>requires</th><th>ends</th><th>sets stance if missing</th><th>note</th><th>actor</th><th>creates</th><th>sets stance</th><th>stance after</th><th>penalty</th><th>more</th></tr></thead>
+<tbody>
+<tr><td>declare_war</td><td>no_relation: alliance, truce; not_subject_of_target: yes</td><td>friendly, neutral</td><td>hostile</td><td>Breaking an alliance or truce first is a separate action with its own cost.</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>independence_war</td><td></td><td>subject</td><td></td><td></td><td>subject</td><td>at_war</td><td>hostile</td><td></td><td></td><td>on overlord victory: restore_subject</td></tr>
+<tr><td>make_peace</td><td></td><td>at_war</td><td></td><td></td><td></td><td>truce</td><td></td><td>keep_or_hostile</td><td></td><td>truce months from: truce.duration.default_months; may create: subject</td></tr>
+<tr><td>white_peace</td><td></td><td>at_war</td><td></td><td></td><td></td><td>truce</td><td></td><td>rival_if_hostile</td><td></td><td></td></tr>
+<tr><td>extend_truce</td><td>relation: truce</td><td></td><td></td><td>Prolongs an existing truce; history did this repeatedly (England-France 1444-49).</td><td></td><td></td><td></td><td></td><td></td><td>sets: expires_on</td></tr>
+<tr><td>break_truce</td><td></td><td>truce</td><td></td><td></td><td></td><td></td><td>hostile</td><td></td><td>truce_breaking</td><td></td></tr>
+<tr><td>form_alliance</td><td>stance_not: hostile; no_relation: at_war; not_subject_pair: yes</td><td>truce, neutral</td><td></td><td></td><td></td><td>alliance</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>break_alliance</td><td></td><td>alliance</td><td></td><td></td><td></td><td></td><td></td><td></td><td>alliance_breaking</td><td></td></tr>
+<tr><td>make_subject</td><td></td><td>alliance, truce, at_war, neutral</td><td></td><td></td><td></td><td>subject</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>release_subject</td><td></td><td>subject</td><td></td><td></td><td></td><td></td><td>friendly</td><td></td><td></td><td></td></tr>
+<tr><td>set_rival</td><td>contested_object: yes</td><td>friendly, neutral</td><td></td><td></td><td></td><td>rival</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>insult</td><td></td><td>friendly</td><td></td><td></td><td></td><td>hostile</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>improve_relations</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>steps: hostile, rival, neutral, friendly</td></tr>
+<tr><td>truce_expires</td><td></td><td>truce</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>country_destroyed</td><td></td><td>all</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+</tbody></table></div>
+<h3 id="fact-types"><a class="anchor" href="#fact-types" aria-label="Link to this section">#</a>Fact types</h3>
+<blockquote>
+<p>Diplomatic facts are optional context attached to a pair. They are not relations, never block or imply a relation type, and feed modifiers only.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>direction</th><th>source role</th><th>target role</th><th>note</th></tr></thead>
+<tbody>
+<tr><td>royal_marriage</td><td>mutual</td><td></td><td></td><td></td></tr>
+<tr><td>dynastic_claim</td><td>directed</td><td>claimant</td><td>claimed</td><td></td></tr>
+<tr><td>territorial_claim</td><td>directed</td><td>claimant</td><td>holder</td><td></td></tr>
+<tr><td>trade_agreement</td><td>mutual_or_one_way</td><td></td><td></td><td></td></tr>
+<tr><td>secondary_tribute</td><td>directed</td><td>payer</td><td>receiver</td><td>Tribute paid to a power other than the single direct overlord (dual tributaries), or protection money.</td></tr>
+<tr><td>shared_ruler</td><td>mutual</td><td></td><td></td><td>Same ruler, no subordination recorded (or subordination recorded elsewhere).</td></tr>
+<tr><td>membership</td><td>directed</td><td>member</td><td>institution</td><td></td></tr>
+<tr><td>religious_authority</td><td>directed</td><td>follower</td><td>authority</td><td></td></tr>
+</tbody></table></div>
+<h3 id="confidence-levels"><a class="anchor" href="#confidence-levels" aria-label="Link to this section">#</a>Confidence levels</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>high</code></td><td>Stated in standard scholarship; dates and parties secure.</td></tr>
+<tr><td><code>medium</code></td><td>Supported by scholarship, but the exact status, date or classification is debated or simplified for the game.</td></tr>
+<tr><td><code>low</code></td><td>Plausible and attested, but thinly or indirectly; listed in the uncertainty report.</td></tr>
+</tbody></table></div>
+<h3 id="origin-values"><a class="anchor" href="#origin-values" aria-label="Link to this section">#</a>Origin values</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>historical_start</code></td><td>Present at the start date from the historical dataset. Mutable in play unless locked.</td></tr>
+<tr><td><code>gameplay</code></td><td>Created during play. Never written back to the historical dataset.</td></tr>
+</tbody></table></div>
+<h3 id="modifiers"><a class="anchor" href="#modifiers" aria-label="Link to this section">#</a>Modifiers</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>border raid chance per month</th><th>trade access</th></tr></thead>
+<tbody>
+<tr><td>hostile</td><td>0.02</td><td></td></tr>
+<tr><td>at_war</td><td></td><td>-1</td></tr>
+</tbody></table></div>
+<h3 id="proposed-fact-types"><a class="anchor" href="#proposed-fact-types" aria-label="Link to this section">#</a>Proposed fact types</h3>
+<h4 id="protection-pledge"><a class="anchor" href="#protection-pledge" aria-label="Link to this section">#</a>Protection pledge</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>direction</code></td><td>directed</td></tr>
+<tr><td><code>source_role</code></td><td>protector</td></tr>
+<tr><td><code>target_role</code></td><td>protected</td></tr>
+<tr><td><code>note</code></td><td>Proposed by diplomacy 6.6 (OQ-DIPL-7).</td></tr>
+</tbody></table></div>
+<h2 id="envoys"><a class="anchor" href="#envoys" aria-label="Link to this section">#</a>Envoys</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>source</code></td><td>official</td></tr>
+<tr><td><code>source_without_officials</code></td><td>lord</td></tr>
+<tr><td><code>lord_loyalty_step_lost_if_mission_months_over</code></td><td>12</td></tr>
+<tr><td><code>days_per_crossing_unit</code> (provisional)</td><td>2</td></tr>
+<tr><td><code>months_at_court</code></td><td>1</td></tr>
+<tr><td><code>instant_if_both_know</code></td><td><a href="/wiki/Data-Research#inventions">T14 telegraphy</a></td></tr>
+<tr><td><code>instant_excludes</code></td><td>arrange_marriage, make_resident</td></tr>
+<tr><td><code>passage_denied_blocks_months</code> (provisional)</td><td>24</td></tr>
+</tbody></table></div>
+<h3 id="seats"><a class="anchor" href="#seats" aria-label="Link to this section">#</a>Seats</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>base</code></td><td>1</td></tr>
+<tr><td><code>inventions_never_lost</code></td><td>yes</td></tr>
+</tbody></table></div>
+<h4 id="extra-if-provinces-over"><a class="anchor" href="#extra-if-provinces-over" aria-label="Link to this section">#</a>Extra if provinces over</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>provinces</code></td><td>10</td></tr>
+<tr><td><code>seats</code></td><td>1</td></tr>
+</tbody></table></div>
+<h4 id="inventions"><a class="anchor" href="#inventions" aria-label="Link to this section">#</a>Inventions</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>G5</code></td><td>1</td></tr>
+<tr><td><code>G8</code></td><td>1</td></tr>
+</tbody></table></div>
+<h3 id="official-type-bonus"><a class="anchor" href="#official-type-bonus" aria-label="Link to this section">#</a>Official type bonus</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>actions</th><th>reason</th><th>only if</th><th>gift multiplier</th></tr></thead>
+<tbody>
+<tr><td>judge</td><td>peace_offer, demand, swear_peace</td><td>10</td><td></td><td></td></tr>
+<tr><td>customs_officer</td><td>trade_pact, ask_passage</td><td>10</td><td></td><td></td></tr>
+<tr><td>chaplain</td><td>*</td><td>10</td><td>same_faith</td><td></td></tr>
+<tr><td>steward</td><td>send_gift</td><td></td><td></td><td>1.25</td></tr>
+<tr><td>tax_collector</td><td>send_gift</td><td></td><td></td><td>1.25</td></tr>
+<tr><td>marshal</td><td>propose_alliance, call_to_arms</td><td>10</td><td></td><td></td></tr>
+<tr><td>warden</td><td>propose_alliance, call_to_arms</td><td>10</td><td></td><td></td></tr>
+<tr><td>muster_master</td><td>propose_alliance, call_to_arms</td><td>10</td><td></td><td></td></tr>
+<tr><td>schoolmaster</td><td>arrange_marriage, court_lord</td><td>10</td><td></td><td></td></tr>
+<tr><td>master_of_works</td><td>none</td><td>0</td><td></td><td></td></tr>
+</tbody></table></div>
+<h3 id="years-served-bonus"><a class="anchor" href="#years-served-bonus" aria-label="Link to this section">#</a>Years served bonus</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>at_years</code></td><td>10</td></tr>
+<tr><td><code>reason</code></td><td>5</td></tr>
+</tbody></table></div>
+<h3 id="resident-years-bonus"><a class="anchor" href="#resident-years-bonus" aria-label="Link to this section">#</a>Resident years bonus</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>at_years</code></td><td>5</td></tr>
+<tr><td><code>reason</code></td><td>5</td></tr>
+</tbody></table></div>
+<h3 id="resident"><a class="anchor" href="#resident" aria-label="Link to this section">#</a>Resident</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>requires_invention</code></td><td><a href="/wiki/Data-Research#inventions">G8 Resident ambassadors</a></td></tr>
+<tr><td><code>reveals</code></td><td>soldiers, treasury_rounded_100, lord_loyalty</td></tr>
+<tr><td><code>war_warning_months</code></td><td>1</td></tr>
+</tbody></table></div>
+<h3 id="held"><a class="anchor" href="#held" aria-label="Link to this section">#</a>Held</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>on_war_with_host</code></td><td>yes</td></tr>
+<tr><td><code>peace_envoy_never_held</code></td><td>yes</td></tr>
+<tr><td><code>refused_demand_by_hostile_chance</code></td><td>0.1</td></tr>
+</tbody></table></div>
+<h2 id="ledger"><a class="anchor" href="#ledger" aria-label="Link to this section">#</a>Ledger</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>max_entries_per_pair</code></td><td>12</td></tr>
+<tr><td><code>fade</code></td><td>linear_yearly</td></tr>
+<tr><td><code>merged_entry_name</code></td><td>Old matters</td></tr>
+<tr><td><code>standing_limit</code> (provisional)</td><td>200</td></tr>
+<tr><td><code>resident_envoy_season_months</code></td><td>3</td></tr>
+</tbody></table></div>
+<h3 id="stance-lines"><a class="anchor" href="#stance-lines" aria-label="Link to this section">#</a>Stance lines</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>alliance</code></td><td>50</td></tr>
+<tr><td><code>friendly</code></td><td>30</td></tr>
+<tr><td><code>neutral</code></td><td>0</td></tr>
+<tr><td><code>rival</code></td><td>-30</td></tr>
+<tr><td><code>hostile</code></td><td>-75</td></tr>
+<tr><td><code>at_war</code></td><td>-100</td></tr>
+<tr><td><code>truce</code></td><td>-10</td></tr>
+</tbody></table></div>
+<h3 id="ties"><a class="anchor" href="#ties" aria-label="Link to this section">#</a>Ties</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>weight</th><th>max</th><th>lasts</th><th>name</th><th>weight per gold</th><th>fade years</th><th>weight per season</th><th>fade years after</th><th>owner</th></tr></thead>
+<tbody>
+<tr><td>married_houses</td><td>15</td><td>30</td><td>while_marriage</td><td>Married houses</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>gift</td><td></td><td>30</td><td></td><td>Gift</td><td>0.2</td><td>10</td><td></td><td></td><td></td></tr>
+<tr><td>courtesy_visit</td><td>15</td><td></td><td></td><td>Courtesy visit</td><td></td><td>5</td><td></td><td></td><td></td></tr>
+<tr><td>resident_envoy</td><td></td><td>30</td><td>while_resident</td><td>Resident envoy</td><td></td><td></td><td>5</td><td>5</td><td></td></tr>
+<tr><td>fought_side_by_side</td><td>15</td><td></td><td></td><td>Fought side by side</td><td></td><td>20</td><td></td><td></td><td></td></tr>
+<tr><td>answered_our_call</td><td>20</td><td></td><td></td><td>Answered our call</td><td></td><td>20</td><td></td><td></td><td></td></tr>
+<tr><td>share_a_rival</td><td>15</td><td></td><td>while_true</td><td>Share a rival</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>same_faith</td><td>10</td><td></td><td>while_true</td><td>Same faith</td><td></td><td></td><td></td><td></td><td>religion</td></tr>
+<tr><td>same_culture_group</td><td>5</td><td></td><td>while_true</td><td>Same culture group</td><td></td><td></td><td></td><td></td><td>culture</td></tr>
+<tr><td>trade_pact</td><td>10</td><td></td><td>while_true</td><td>Trade pact</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>pledged_to_protect_us</td><td>15</td><td></td><td>while_true</td><td>Pledged to protect us</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>freed_us</td><td>40</td><td></td><td></td><td>Freed us</td><td></td><td>30</td><td></td><td></td><td></td></tr>
+<tr><td>backed_our_revolution (provisional)</td><td>25</td><td></td><td></td><td>Backed our revolution</td><td></td><td>30</td><td></td><td></td><td></td></tr>
+</tbody></table></div>
+<h3 id="wrongs"><a class="anchor" href="#wrongs" aria-label="Link to this section">#</a>Wrongs</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>weight per province</th><th>fade years</th><th>name</th><th>weight</th><th>names</th><th>lasts</th><th>weight range</th><th>owner</th><th>weight per notoriety</th></tr></thead>
+<tbody>
+<tr><td>took_our_land</td><td>-10</td><td>20</td><td>Took our land</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>broke_truce_or_alliance</td><td></td><td>30</td><td>Broke a truce with us / broke our alliance</td><td>-40</td><td>truce: Broke a truce with us; alliance: Broke our alliance</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>abandoned_us</td><td></td><td>30</td><td>Abandoned us</td><td>-30</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>insulted_us</td><td></td><td>10</td><td>Insulted us</td><td>-20</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>threatened_us</td><td></td><td>10</td><td>Threatened us</td><td>-15</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>holds_claim_on_us</td><td></td><td></td><td>Holds a claim on our land or throne</td><td>-20</td><td></td><td>while_true</td><td></td><td></td><td></td></tr>
+<tr><td>courted_our_lord</td><td></td><td>10</td><td>Courted our lord</td><td>-25</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>embargo_against_us</td><td></td><td></td><td>Embargo against us</td><td>-15</td><td></td><td>while_true</td><td></td><td></td><td></td></tr>
+<tr><td>hostile_faith</td><td></td><td></td><td>Different faith</td><td></td><td></td><td>while_true</td><td>-25, -10</td><td>religion</td><td></td></tr>
+<tr><td>notorious_deed</td><td></td><td>30</td><td>Notorious deed</td><td></td><td></td><td></td><td></td><td></td><td>-10</td></tr>
+<tr><td>stirred_revolt_in_our_land</td><td></td><td>20</td><td>Stirred revolt in our land</td><td>-50</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>grabbed_land_near_us (provisional)</td><td>-5</td><td>20</td><td>Grabbed land near us</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+</tbody></table></div>
+<h3 id="standing-words"><a class="anchor" href="#standing-words" aria-label="Link to this section">#</a>Standing words</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>min</th><th>word</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>100</td><td>close</td></tr>
+<tr><td>2</td><td>30</td><td>warm</td></tr>
+<tr><td>3</td><td>-29</td><td>cool</td></tr>
+<tr><td>4</td><td>-99</td><td>cold</td></tr>
+<tr><td>5</td><td>-200</td><td>bitter</td></tr>
+</tbody></table></div>
+<h2 id="reasons"><a class="anchor" href="#reasons" aria-label="Link to this section">#</a>Reasons</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>standing_divisor</code></td><td>4</td></tr>
+<tr><td><code>per_oath_broken</code></td><td>-10</td></tr>
+<tr><td><code>relies_on_word</code></td><td>propose_alliance, swear_peace, arrange_marriage, trade_pact, offer_overlordship</td></tr>
+<tr><td><code>share_an_enemy</code></td><td>25</td></tr>
+<tr><td><code>frontier_threat_per_province</code></td><td>-5</td></tr>
+</tbody></table></div>
+<h3 id="strength"><a class="anchor" href="#strength" aria-label="Link to this section">#</a>Strength</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>allies_counted_at</code></td><td>0.5</td></tr>
+<tr><td><code>binding_asks</code></td><td>propose_alliance, pledge_protection, offer_overlordship, ask_protection</td></tr>
+<tr><td><code>you_are_stronger_per_multiple</code></td><td>10</td></tr>
+<tr><td><code>you_are_stronger_max</code></td><td>40</td></tr>
+<tr><td><code>we_are_stronger_per_multiple</code></td><td>-10</td></tr>
+<tr><td><code>we_are_stronger_max</code></td><td>-40</td></tr>
+<tr><td><code>cannot_beat_you_per_multiple_beyond_1</code></td><td>15</td></tr>
+<tr><td><code>cannot_beat_you_max</code></td><td>60</td></tr>
+<tr><td><code>strong_friends_factor</code></td><td>-0.5</td></tr>
+<tr><td><code>already_at_war_new_commitment</code></td><td>-30</td></tr>
+</tbody></table></div>
+<h3 id="distance"><a class="anchor" href="#distance" aria-label="Link to this section">#</a>Distance</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>no_shared_border_or_neighbour</code></td><td>-15</td></tr>
+</tbody></table></div>
+<h4 id="envoy-days-over"><a class="anchor" href="#envoy-days-over" aria-label="Link to this section">#</a>Envoy days over</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>days</code></td><td>60</td></tr>
+<tr><td><code>reason</code></td><td>-15</td></tr>
+</tbody></table></div>
+<h3 id="allies-beyond-free"><a class="anchor" href="#allies-beyond-free" aria-label="Link to this section">#</a>Allies beyond free</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>free</code></td><td>2</td></tr>
+<tr><td><code>per_extra</code></td><td>-10</td></tr>
+</tbody></table></div>
+<h3 id="ruler-traits"><a class="anchor" href="#ruler-traits" aria-label="Link to this section">#</a>Ruler traits</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>pious_same_faith</code></td><td>10</td></tr>
+<tr><td><code>warlike_vs_swear_peace</code></td><td>-10</td></tr>
+<tr><td><code>greedy_with_gift</code></td><td>10</td></tr>
+</tbody></table></div>
+<h2 id="actions-1"><a class="anchor" href="#actions-1" aria-label="Link to this section">#</a>Actions</h2>
+<h3 id="propose-alliance"><a class="anchor" href="#propose-alliance" aria-label="Link to this section">#</a>Propose alliance</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>envoy</code></td><td>yes</td></tr>
+<tr><td><code>base</code></td><td>-40</td></tr>
+<tr><td><code>relations_action</code></td><td>form_alliance</td></tr>
+</tbody></table></div>
+<h3 id="call-to-arms"><a class="anchor" href="#call-to-arms" aria-label="Link to this section">#</a>Call to arms</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>envoy</code></td><td>no</td></tr>
+<tr><td><code>aim_is_our_concern</code></td><td>30</td></tr>
+<tr><td><code>enemy_stronger_per_multiple</code></td><td>-10</td></tr>
+<tr><td><code>enemy_stronger_max</code></td><td>-40</td></tr>
+<tr><td><code>separate_peace_when_peace_voices_over</code></td><td>0.5</td></tr>
+</tbody></table></div>
+<h4 id="defensive"><a class="anchor" href="#defensive" aria-label="Link to this section">#</a>Defensive</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>base</code></td><td>-20</td></tr>
+<tr><td><code>refusal.ends</code></td><td>alliance</td></tr>
+<tr><td><code>refusal.oath_broken</code></td><td>yes</td></tr>
+<tr><td><code>refusal.wrong</code></td><td>abandoned_us</td></tr>
+</tbody></table></div>
+<h4 id="offensive"><a class="anchor" href="#offensive" aria-label="Link to this section">#</a>Offensive</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>base</code></td><td>-50</td></tr>
+<tr><td><code>refusal.ends</code></td><td>none</td></tr>
+</tbody></table></div>
+<h3 id="break-alliance"><a class="anchor" href="#break-alliance" aria-label="Link to this section">#</a>Break alliance</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>envoy</code></td><td>no</td></tr>
+<tr><td><code>relations_action</code></td><td>break_alliance</td></tr>
+<tr><td><code>oath_broken</code></td><td>yes</td></tr>
+<tr><td><code>wrong</code></td><td>broke_truce_or_alliance</td></tr>
+</tbody></table></div>
+<h3 id="arrange-marriage"><a class="anchor" href="#arrange-marriage" aria-label="Link to this section">#</a>Arrange marriage</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>envoy</code></td><td>yes</td></tr>
+<tr><td><code>base</code></td><td>-15</td></tr>
+<tr><td><code>their_house_greater</code></td><td>10</td></tr>
+<tr><td><code>per_existing_marriage</code></td><td>-10</td></tr>
+<tr><td><code>claim_chance_per_heirless_death</code></td><td>0.1</td></tr>
+</tbody></table></div>
+<h3 id="demand"><a class="anchor" href="#demand" aria-label="Link to this section">#</a>Demand</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>envoy</code></td><td>yes</td></tr>
+<tr><td><code>base</code></td><td>-60</td></tr>
+<tr><td><code>heartland_province</code></td><td>-30</td></tr>
+<tr><td><code>wrong_to_target</code></td><td>threatened_us</td></tr>
+</tbody></table></div>
+<h4 id="kinds"><a class="anchor" href="#kinds" aria-label="Link to this section">#</a>Kinds</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>grants aim</th></tr></thead>
+<tbody>
+<tr><td>hand_over_province</td><td>take_land</td></tr>
+<tr><td>pay_tribute</td><td>tribute</td></tr>
+<tr><td>recognise_pretender</td><td>seat_pretender</td></tr>
+<tr><td>release_subject</td><td>break_subject</td></tr>
+<tr><td>tolerate_faith</td><td>defend_faith</td></tr>
+<tr><td>apologise_and_pay</td><td>punish</td></tr>
+<tr><td>expel_envoy_or_cut_alliance</td><td>punish</td></tr>
+</tbody></table></div>
+<h4 id="on-refusal"><a class="anchor" href="#on-refusal" aria-label="Link to this section">#</a>On refusal</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>aim_years</code></td><td>5</td></tr>
+<tr><td><code>provoked_by_target</code></td><td>yes</td></tr>
+<tr><td><code>our_offensive_call_bonus</code></td><td>20</td></tr>
+<tr><td><code>lords_not_warlike_waver</code></td><td>no</td></tr>
+</tbody></table></div>
+<h3 id="ask-passage"><a class="anchor" href="#ask-passage" aria-label="Link to this section">#</a>Ask passage</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>envoy</code></td><td>yes</td></tr>
+<tr><td><code>base</code></td><td>-10</td></tr>
+<tr><td><code>months</code></td><td>24</td></tr>
+<tr><td><code>revocable</code></td><td>yes</td></tr>
+<tr><td><code>marching_on_our_friend</code></td><td>-40</td></tr>
+<tr><td><code>marching_on_our_enemy</code></td><td>20</td></tr>
+<tr><td><code>requires_invention</code></td><td><a href="/wiki/Data-Research#inventions">G8 Resident ambassadors</a></td></tr>
+<tr><td><code>before_invention</code></td><td>closed_except_allies_and_subjects</td></tr>
+</tbody></table></div>
+<h4 id="entering-without"><a class="anchor" href="#entering-without" aria-label="Link to this section">#</a>Entering without</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>grants_aim_to_owner</code></td><td>punish</td></tr>
+</tbody></table></div>
+<h3 id="trade-pact"><a class="anchor" href="#trade-pact" aria-label="Link to this section">#</a>Trade pact</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>envoy</code></td><td>yes</td></tr>
+<tr><td><code>base</code></td><td>-10</td></tr>
+<tr><td><code>relations_fact</code></td><td>trade_agreement</td></tr>
+<tr><td><code>tolls_waived</code></td><td>yes</td></tr>
+</tbody></table></div>
+<h3 id="embargo"><a class="anchor" href="#embargo" aria-label="Link to this section">#</a>Embargo</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>envoy</code></td><td>no</td></tr>
+<tr><td><code>closes_paths</code></td><td>yes</td></tr>
+</tbody></table></div>
+<h3 id="pledge-protection"><a class="anchor" href="#pledge-protection" aria-label="Link to this section">#</a>Pledge protection</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>envoy</code></td><td>no</td></tr>
+<tr><td><code>relations_fact</code></td><td>protection_pledge</td></tr>
+<tr><td><code>refusal_is_oath_broken</code></td><td>yes</td></tr>
+</tbody></table></div>
+<h3 id="swear-peace"><a class="anchor" href="#swear-peace" aria-label="Link to this section">#</a>Swear peace</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>envoy</code></td><td>yes</td></tr>
+<tr><td><code>base</code></td><td>-20</td></tr>
+<tr><td><code>truce_months</code></td><td>120</td></tr>
+<tr><td><code>we_fear_you_per_multiple</code></td><td>10</td></tr>
+<tr><td><code>we_want_your_land</code></td><td>-30</td></tr>
+</tbody></table></div>
+<h3 id="offer-overlordship"><a class="anchor" href="#offer-overlordship" aria-label="Link to this section">#</a>Offer overlordship</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>envoy</code></td><td>yes</td></tr>
+<tr><td><code>base</code></td><td>-80</td></tr>
+<tr><td><code>need_protector_per_threat</code></td><td>20</td></tr>
+<tr><td><code>already_pledged</code></td><td>20</td></tr>
+<tr><td><code>proud_per_castle_beyond_2</code></td><td>-10</td></tr>
+<tr><td><code>owner</code></td><td>subject_management</td></tr>
+</tbody></table></div>
+<h3 id="ask-protection"><a class="anchor" href="#ask-protection" aria-label="Link to this section">#</a>Ask protection</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>envoy</code></td><td>yes</td></tr>
+<tr><td><code>base</code></td><td>-10</td></tr>
+<tr><td><code>owner</code></td><td>subject_management</td></tr>
+</tbody></table></div>
+<h3 id="court-lord"><a class="anchor" href="#court-lord" aria-label="Link to this section">#</a>Court lord</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>envoy</code></td><td>yes</td></tr>
+<tr><td><code>requires_lord_loyalty</code></td><td>wavering, disloyal</td></tr>
+<tr><td><code>loyalty_steps_per_season</code></td><td>1</td></tr>
+<tr><td><code>defect_after_months</code></td><td>12</td></tr>
+<tr><td><code>defect_needs_border</code></td><td>yes</td></tr>
+<tr><td><code>discovery_chance_per_season</code></td><td>0.25</td></tr>
+</tbody></table></div>
+<h3 id="send-gift"><a class="anchor" href="#send-gift" aria-label="Link to this section">#</a>Send gift</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>envoy</code></td><td>yes</td></tr>
+</tbody></table></div>
+<h3 id="courtesy-visit"><a class="anchor" href="#courtesy-visit" aria-label="Link to this section">#</a>Courtesy visit</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>envoy</code></td><td>yes</td></tr>
+</tbody></table></div>
+<h3 id="make-resident"><a class="anchor" href="#make-resident" aria-label="Link to this section">#</a>Make resident</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>envoy</code></td><td>yes</td></tr>
+<tr><td><code>requires_invention</code></td><td><a href="/wiki/Data-Research#inventions">G8 Resident ambassadors</a></td></tr>
+</tbody></table></div>
+<h3 id="insult"><a class="anchor" href="#insult" aria-label="Link to this section">#</a>Insult</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>envoy</code></td><td>no</td></tr>
+<tr><td><code>relations_action</code></td><td>insult</td></tr>
+<tr><td><code>grants_target_aim</code></td><td>punish</td></tr>
+</tbody></table></div>
+<h3 id="declare-rival"><a class="anchor" href="#declare-rival" aria-label="Link to this section">#</a>Declare rival</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>envoy</code></td><td>no</td></tr>
+<tr><td><code>relations_action</code></td><td>set_rival</td></tr>
+<tr><td><code>requires_contested_object</code></td><td>yes</td></tr>
+</tbody></table></div>
+<h3 id="fund-rebels"><a class="anchor" href="#fund-rebels" aria-label="Link to this section">#</a>Fund rebels</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>envoy</code></td><td>yes</td></tr>
+<tr><td><code>secret</code></td><td>yes</td></tr>
+<tr><td><code>target</code></td><td>a revolution card in the target realm</td></tr>
+<tr><td><code>needs_revolution_signs</code></td><td>1</td></tr>
+<tr><td><code>gold_share_of_target_yearly_income</code> (provisional)</td><td>0.01</td></tr>
+<tr><td><code>flag</code></td><td>revolution_funded</td></tr>
+<tr><td><code>caught_chance_per_month</code> (provisional)</td><td>0.03</td></tr>
+</tbody></table></div>
+<h4 id="on-caught"><a class="anchor" href="#on-caught" aria-label="Link to this section">#</a>On caught</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>envoy</code></td><td>held</td></tr>
+<tr><td><code>wrong</code></td><td>stirred_revolt_in_our_land</td></tr>
+<tr><td><code>grants_target_aim</code></td><td>punish</td></tr>
+<tr><td><code>aim_years</code></td><td>5</td></tr>
+</tbody></table></div>
+<h4 id="if-revolution-wins"><a class="anchor" href="#if-revolution-wins" aria-label="Link to this section">#</a>If revolution wins</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>tie</code></td><td>backed_our_revolution</td></tr>
+<tr><td><code>unless_regime_hostile_to_funder_form</code></td><td>yes</td></tr>
+</tbody></table></div>
+<h2 id="war-aims"><a class="anchor" href="#war-aims" aria-label="Link to this section">#</a>War aims</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>held_province_years</code></td><td>50</td></tr>
+<tr><td><code>refused_demand_years</code></td><td>5</td></tr>
+<tr><td><code>punish_years</code></td><td>5</td></tr>
+<tr><td><code>tribute_by_strength_multiple</code></td><td>3</td></tr>
+<tr><td><code>no_aim_wrong_to_neighbours</code></td><td>threatened_us</td></tr>
+<tr><td><code>regency_allows</code></td><td>defensive, raid</td></tr>
+</tbody></table></div>
+<h3 id="no-aim-penalty"><a class="anchor" href="#no-aim-penalty" aria-label="Link to this section">#</a>No aim penalty</h3>
+<blockquote>
+<p>F-167 (Leroy, 20 Oct): a war declared with no aim punishes the declarer hugely, the moment it is declared. Every lord, Warlike or not, takes the aimless_war loyalty cause lord_steps times; the declarer gains notoriety (the Notorious deed wrong with every realm that knows it, DIPL-174); each of its provinces holds the Unjust war grievance while the war lasts; its peace voices count peace_share more for peace; its allies may refuse the call with no oath broken (allies_refuse); the AI declares one only when Warlike or a hegemon seeker (ai_only_if_reckless). A subject rising for its freedom pays none of it. Provisional.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>lord_steps</code></td><td>2</td></tr>
+<tr><td><code>notoriety</code></td><td>15</td></tr>
+<tr><td><code>peace_share</code></td><td>0.25</td></tr>
+<tr><td><code>allies_refuse</code></td><td>yes</td></tr>
+<tr><td><code>ai_only_if_reckless</code></td><td>yes</td></tr>
+<tr><td><code>provisional</code></td><td>yes</td></tr>
+</tbody></table></div>
+<h2 id="truce"><a class="anchor" href="#truce" aria-label="Link to this section">#</a>Truce</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>base_months</code></td><td>60</td></tr>
+<tr><td><code>extra_months_if_land_or_subject</code></td><td>60</td></tr>
+<tr><td><code>white_peace_months</code></td><td>60</td></tr>
+</tbody></table></div>
+<h2 id="leagues"><a class="anchor" href="#leagues" aria-label="Link to this section">#</a>Leagues</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>check</code></td><td>yearly</td></tr>
+<tr><td><code>base</code></td><td>-30</td></tr>
+<tr><td><code>standing_divisor</code></td><td>-4</td></tr>
+<tr><td><code>took_our_land_per_province</code></td><td>10</td></tr>
+<tr><td><code>lands_taken_per_province</code></td><td>3</td></tr>
+<tr><td><code>per_member</code></td><td>5</td></tr>
+<tr><td><code>same_faith</code></td><td>-10</td></tr>
+<tr><td><code>min_members</code></td><td>2</td></tr>
+<tr><td><code>refusal_leaves_league</code></td><td>yes</td></tr>
+<tr><td><code>dissolve_below_share_of_threshold</code></td><td>0.5</td></tr>
+</tbody></table></div>
+<h3 id="threshold-by-era"><a class="anchor" href="#threshold-by-era" aria-label="Link to this section">#</a>Threshold by era</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>I</code></td><td>8</td></tr>
+<tr><td><code>II</code></td><td>8</td></tr>
+<tr><td><code>III</code></td><td>8</td></tr>
+<tr><td><code>IV</code></td><td>6</td></tr>
+<tr><td><code>V</code></td><td>6</td></tr>
+<tr><td><code>VI</code></td><td>4</td></tr>
+<tr><td><code>VII</code></td><td>4</td></tr>
+</tbody></table></div>
+<h3 id="could-crush-us-per-multiple"><a class="anchor" href="#could-crush-us-per-multiple" aria-label="Link to this section">#</a>Could crush us per multiple</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>balancer</code></td><td>10</td></tr>
+<tr><td><code>bandwagoner</code></td><td>-10</td></tr>
+</tbody></table></div>
+<h2 id="eras"><a class="anchor" href="#eras" aria-label="Link to this section">#</a>Eras</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>unlocks</th><th>or event</th><th>ties</th><th>envoy instant invention</th><th>mobilisation pact auto answers defensive call</th><th>mobilisation pact delivered as</th><th>mobilisation event</th><th>pact offensive call bonus</th></tr></thead>
+<tbody>
+<tr><td>III</td><td>many_sided_peace</td><td>peace_of_westphalia</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>IV</td><td></td><td></td><td>married_houses: (weight: 10)</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>V</td><td></td><td></td><td></td><td><a href="/wiki/Data-Research#inventions">T14 telegraphy</a></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>VI</td><td>mobilisation_pact</td><td></td><td></td><td></td><td>yes</td><td>event</td><td>Our pact partner is attacked: we mobilise</td><td>10</td></tr>
+<tr><td>VII</td><td></td><td></td><td>gift: (weight_per_gold: 0.1)</td><td></td><td></td><td></td><td></td><td></td></tr>
+</tbody></table></div>
+<h2 id="ai"><a class="anchor" href="#ai" aria-label="Link to this section">#</a>Ai</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>horizon</code></td><td>neighbours, neighbours_of_neighbours, relation_or_fact_holders, enemies_of_rivals</td></tr>
+<tr><td><code>candidates_per_free_seat</code></td><td>5</td></tr>
+<tr><td><code>gift_first_if_total_at_least</code></td><td>-20</td></tr>
+<tr><td><code>demand_before_war</code></td><td>yes</td></tr>
+<tr><td><code>estimates_counts_with_player_limits</code></td><td>yes</td></tr>
+<tr><td><code>notoriety_per_reason</code></td><td>5</td></tr>
+<tr><td><code>notoriety_restraint</code> (provisional)</td><td>50</td></tr>
+</tbody></table></div>
+<h3 id="posture"><a class="anchor" href="#posture" aria-label="Link to this section">#</a>Posture</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>alliance with stronger</th><th>ask protection</th><th>league vs strong per multiple</th><th>join war on stronger side</th><th>defensive call vs stronger</th><th>own view per oath broken</th><th>courts lords</th><th>funds rebels if grievances at least</th><th>propose alliance</th><th>more</th></tr></thead>
+<tbody>
+<tr><td>mixed</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>bandwagoner</td><td>20</td><td>20</td><td>-10</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>opportunist</td><td></td><td></td><td></td><td>20</td><td>-20</td><td>-5</td><td>yes</td><td>2</td><td></td><td></td></tr>
+<tr><td>isolationist</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>-30</td><td>call to arms: -30; swear peace: 20; trade pact: 20; ask passage: -20</td></tr>
+<tr><td>balancer</td><td></td><td></td><td>10</td><td></td><td></td><td></td><td></td><td></td><td></td><td>alliance vs strongest neighbour: 20</td></tr>
+<tr><td>client_seeker</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>offer overlordship from stronger warm: 30; pledge from stronger warm: 30; asks protection when threatened: yes</td></tr>
+<tr><td>hegemon_seeker</td><td>-20</td><td></td><td></td><td></td><td></td><td></td><td></td><td>2</td><td></td><td>makes demands: yes; offers pledges and overlordship: yes</td></tr>
+</tbody></table></div>
+<h3 id="negotiation"><a class="anchor" href="#negotiation" aria-label="Link to this section">#</a>Negotiation</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>very_high</code></td><td>15</td></tr>
+<tr><td><code>high</code></td><td>10</td></tr>
+<tr><td><code>moderate</code></td><td>0</td></tr>
+<tr><td><code>low</code></td><td>-10</td></tr>
+<tr><td><code>very_low</code></td><td>-20</td></tr>
+<tr><td><code>unknown</code></td><td>0</td></tr>
+<tr><td><code>very_high_gift_multiplier</code></td><td>1.25</td></tr>
+</tbody></table></div>
+<h2 id="event-tree-mapping"><a class="anchor" href="#event-tree-mapping" aria-label="Link to this section">#</a>Event tree mapping</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>new_effects</code></td><td>war_aim, league, pretender</td></tr>
+</tbody></table></div>
+<h3 id="opinion"><a class="anchor" href="#opinion" aria-label="Link to this section">#</a>Opinion</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>becomes</code></td><td>event_tie_or_wrong</td></tr>
+<tr><td><code>default_fade_years</code></td><td>10</td></tr>
+</tbody></table></div>
+<h3 id="trust"><a class="anchor" href="#trust" aria-label="Link to this section">#</a>Trust</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>derived</code></td><td>100 - 10 * oaths_broken</td></tr>
+<tr><td><code>write</code></td><td>adds_oath_broken</td></tr>
+</tbody></table></div>
+<h3 id="notoriety"><a class="anchor" href="#notoriety" aria-label="Link to this section">#</a>Notoriety</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>derived</code></td><td>5 * lands_taken + notorious_deeds</td></tr>
+<tr><td><code>cap</code></td><td>100</td></tr>
+<tr><td><code>write</code></td><td>notorious_deed_with_all_known</td></tr>
+</tbody></table></div>
+<h3 id="relation"><a class="anchor" href="#relation" aria-label="Link to this section">#</a>Relation</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>alliance</code></td><td>form_alliance</td></tr>
+<tr><td><code>truce</code></td><td>swear_peace</td></tr>
+<tr><td><code>rivalry</code></td><td>set_rival</td></tr>
+<tr><td><code>war</code></td><td>declare_war</td></tr>
+<tr><td><code>trade_pact</code></td><td>trade_pact</td></tr>
+<tr><td><code>embargo</code></td><td>embargo</td></tr>
+<tr><td><code>guarantee</code></td><td>pledge_protection</td></tr>
+<tr><td><code>non_aggression</code></td><td>swear_peace</td></tr>
+<tr><td><code>subject</code></td><td>subject_management</td></tr>
+<tr><td><code>overlord</code></td><td>subject_management</td></tr>
+<tr><td><code>personal_union</code></td><td>subject_management</td></tr>
+</tbody></table></div>
+<h2 id="answers"><a class="anchor" href="#answers" aria-label="Link to this section">#</a>Answers</h2>
+<blockquote>
+<p>No preview of the count: the asker learns yes or no, with the full reasons list, a month after the answer is given. Before sending, an ask the reasons decide shows one word (DIPL-229): Likely when the count as it stands now is at least `hint.likely_from`, Unlikely when it is at most `hint.unlikely_to`, else Unsure. Placeholders for balance.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>delay_months</code></td><td>1</td></tr>
+<tr><td><code>preview_before_sending</code></td><td>no</td></tr>
+</tbody></table></div>
+<h3 id="hint"><a class="anchor" href="#hint" aria-label="Link to this section">#</a>Hint</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>likely_from</code></td><td>15</td></tr>
+<tr><td><code>unlikely_to</code></td><td>-15</td></tr>
+</tbody></table></div>
+<h2 id="eras-by-year"><a class="anchor" href="#eras-by-year" aria-label="Link to this section">#</a>Eras by year</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>era</th><th>from</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>I</td><td>1378</td></tr>
+<tr><td>2</td><td>II</td><td>1500</td></tr>
+<tr><td>3</td><td>III</td><td>1600</td></tr>
+<tr><td>4</td><td>IV</td><td>1700</td></tr>
+<tr><td>5</td><td>V</td><td>1800</td></tr>
+<tr><td>6</td><td>VI</td><td>1870</td></tr>
+<tr><td>7</td><td>VII</td><td>1914</td></tr>
+</tbody></table></div>
+<h2 id="arms-and-fear"><a class="anchor" href="#arms-and-fear" aria-label="Link to this section">#</a>Arms and fear</h2>
+<blockquote>
+<p>Leroy, 19 Oct (DIPL-231 to DIPL-237, F-165): every AI realm keeps a standing army sized against its neighbours, calls men across the whole realm at war and borrows for it, and feels Wary or Threatened beside a much stronger neighbour. There is no rivalry: fear is measured from the armies each month and leaves no lasting tie. Every number is provisional, for the balance model to tune.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>wary ratio</th><th>threatened ratio</th><th>ally weight</th><th>share of cap</th><th>match neighbour</th><th>multiplier</th><th>max share of cap</th><th>pay share of income</th><th>raise per month</th><th>more</th></tr></thead>
+<tbody>
+<tr><td>fear (provisional)</td><td>1.5</td><td>2.5</td><td>0.5</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>standing (provisional)</td><td></td><td></td><td></td><td>0.25</td><td>0.5</td><td>calm: 1; wary: 1.5; threatened: 2</td><td>calm: 0.5; wary: 0.7; threatened: 0.9</td><td>calm: 0.4; wary: 0.5; threatened: 0.65</td><td>3</td><td>slack: 1000</td></tr>
+<tr><td>war (provisional)</td><td></td><td></td><td></td><td>0.25</td><td></td><td></td><td></td><td>0.75</td><td></td><td>per province: 3</td></tr>
+<tr><td>borrow (provisional)</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>months of pay: 3</td></tr>
+<tr><td>allies (provisional)</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>same fear: (calm: 0; wary: 15; threatened: 30); envoy every months: 3; partners: 3</td></tr>
+<tr><td>defences (provisional)</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>castle step: (calm: 0; wary: 1; threatened: 2); reserve share: (calm: 1; wary: 1; threatened: 0.5)</td></tr>
+<tr><td>technology (provisional)</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>warfare prefix: W; cost weight: (calm: 1; wary: 0.8; threatened: 0.6)</td></tr>
+<tr><td>opportunity (provisional)</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>at war ratio factor: 0.75; at war chance factor: 2; at war target weight: 3; gamble chance: 0.1; gamble ratio factor: 0.8; min ratio: 1.2</td></tr>
+</tbody></table></div>

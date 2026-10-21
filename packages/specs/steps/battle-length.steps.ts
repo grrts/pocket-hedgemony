@@ -7,7 +7,7 @@ import { loadMapTiles } from "@ph/engine/node";
 import { battlePhase, type Battle } from "../../engine/src/war.ts";
 
 /**
- * Battle length (warfare §5.25, battle-length.feature, F-158): one battle on
+ * Battle length (warfare §5.28, battle-length.feature, F-168): one battle on
  * the 1444 map played step by step, each step's clock, phase, bells and men
  * recorded.
  */

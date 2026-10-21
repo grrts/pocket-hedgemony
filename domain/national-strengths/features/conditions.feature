@@ -2,7 +2,7 @@
 Feature: Heritage conditions
   As the heritage system
   I want conditions in the event tree's language plus six of my own
-  So that needs, wakes, stir, goal and shed can be tested
+  So that needs, wakes, requirements, goal and shed can be tested
 
   @HER-040 @HER-041
   Scenario Outline: Heritage condition types

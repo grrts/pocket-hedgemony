@@ -1,5 +1,6 @@
 import { monthsBetween } from "./dates.ts";
 import { config } from "./rules.ts";
+import { sameFear } from "./fear.ts";
 import { alliesOf, enemiesOf, hasFact, overlord, stance } from "./relations.ts";
 import { borders, country, neighbours, notorietyPoints, oathsBroken, standing, strength, type Ask, type Count, type Diplomacy, type Reason } from "./model.ts";
 
@@ -155,6 +156,11 @@ function common(d: Diplomacy, ask: Ask, days?: DaysFn, known?: number): Reason[]
   }
   const shared = enemiesOf(d.graph, asker).filter((e) => enemiesOf(d.graph, asked).includes(e));
   if (shared.length) out.push({ name: `We share an enemy (${shared.join(", ")})`, number: R.share_an_enemy });
+  // Two realms that fear the same realm draw together, the more when the asked is Threatened (DIPL-238, F-166).
+  if (ask.action === "propose_alliance") {
+    const fear = sameFear(country(d, asker).fears, country(d, asked).fears);
+    if (fear) out.push({ name: `We fear the same realm (${fear.of})`, number: fear.number });
+  }
   const frontier = d.taken.filter((t) => t.by === asker && d.provinces[t.province]?.borders.includes(asked)).length;
   if (frontier) out.push({ name: "You threaten our frontier", number: R.frontier_threat_per_province * frontier });
   out.push(...notorietyReasons(d, ask.action, asker, asked));
@@ -325,3 +331,11 @@ export function ownTotal(c: Count): number {
 }
 
 export { overlord };
+
+/** The one word shown before an ask is sent (DIPL-229): how the count stands now, with no numbers. */
+export type AskHint = "Likely" | "Unsure" | "Unlikely";
+
+export function askHint(total: number): AskHint {
+  const h = config.answers.hint;
+  return total >= h.likely_from ? "Likely" : total <= h.unlikely_to ? "Unlikely" : "Unsure";
+}

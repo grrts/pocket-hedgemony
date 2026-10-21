@@ -90,9 +90,11 @@ Feature: Cloud saves on the Pocket Hegemony server
     Then "<options>" are offered
 
     Examples:
-      | platform | options               |
-      | iOS      | email and password    |
-      | Steam    | email and password    |
+      | platform | options                                          |
+      | Steam    | Steam, email and password                        |
+      | iOS      | Sign in with Apple, Steam, email and password    |
+      | Android  | Google, Steam, email and password                |
+      | web      | Steam, Google, Sign in with Apple, email and password |
 
   @SAVE-059
   Scenario: Google on iOS needs Apple too

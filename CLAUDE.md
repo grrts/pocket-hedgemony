@@ -8,5 +8,5 @@
   4. How it looks and works on a phone in landscape: Wide and Tall layouts, safe areas, 44-point tap targets, nothing that needs hover.
   If an answer makes for a poor experience, change the design first.
 - Run `pnpm --filter @ph/specs test` after changing `domain/`, and `pnpm --filter @ph/specs context-map` to refresh the generated files.
-- The website serves the wiki from `server/wiki/`, made from `docs/wiki/`: after changing `docs/wiki/`, run `pnpm wiki` and commit the result (CI fails otherwise). See `docs/website.md`.
+- The website serves the wiki from `server/wiki/`, made from `docs/wiki/`, whose `Data-*.md` pages are made from `packages/rules/data/`: after changing either, run `pnpm wiki` and commit the result (CI fails otherwise). See `docs/website.md`.
 - Balance runs (`packages/sim`, `docs/balance-runs.md`) play whole campaigns without a player; start one only when Leroy asks.

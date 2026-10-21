@@ -3,7 +3,8 @@ import { W as WARFARE } from "./domain/warfare/index.ts";
 import { monthlyPeople } from "./living.ts";
 import { monthlyBelief } from "./belief.ts";
 import { setFood, setFoodPreset } from "./castleFood.ts";
-import { aiTreasury, repayLoan, runLedger, setTax, takeLoan } from "./treasury.ts";
+import { monthlyFear } from "./arms.ts";
+import { aiTreasury, monthlyDebts, repayLoan, runLedger, setTax, takeLoan } from "./treasury.ts";
 import { monthlyFood } from "./food.ts";
 import { callStudentsToArms, foundSchool, monthlyResearch, moveQueued as moveQueuedStudy, queuePath, queueStudy, setSeats, setStudy, unqueue } from "./research.ts";
 import { aiChanges, monthlyChanges, orderChange, stopChange } from "./conversion.ts";
@@ -13,6 +14,8 @@ import { backersOf, bondOf, riseUp, subjectAction, subjectChoice } from "./subje
 import { court, recallCourting } from "./courting.ts";
 import { aiWorks, cancelWork, judgeNeglect, mineYear, monthlyWorks, moveQueued, orderWork } from "./works.ts";
 import { monthlyMoods } from "./moods.ts";
+import { monthlyThrone } from "./throne.ts";
+import { monthlyStability } from "./stability.ts";
 import { answerRebels, dailyRebels, monthlyRebels, verdictOrder } from "./rebels.ts";
 import { answerRevolution, lockedOrder, monthlyRevolutions } from "./revolutions.ts";
 import { answerEvent, monthlyEvents } from "./events.ts";
@@ -20,7 +23,7 @@ import { answerEveryday, monthlyEveryday } from "./everyday.ts";
 import { monthlyGoals } from "./goals.ts";
 import { heritageChoice, monthlyHeritage, payCounsel } from "./heritage.ts";
 import { monthlyGovernment, reform } from "./government.ts";
-import { dismissTrader, draftTradeRoute, foundTrader, monthlyTrade, setTradeRoute, type GameTraderKind } from "./trade.ts";
+import { dismissTrader, draftTradeRoute, foundTrader, monthlyTrade, setTradeRoute, tradeDay, type GameTraderKind } from "./trade.ts";
 import { monthlyNavy, navyOrder, stepNavy, type NavyOrder } from "./navy.ts";
 import { hiredFleetOrder, monthlyHiredFleets, type HireOrder } from "./hiredFleets.ts";
 import { dailyExploration, exploreOrder, monthlyColonies, stepVoyages, type ExploreOrder } from "./colonies.ts";
@@ -36,8 +39,9 @@ import { empireOrder, monthlyInstitutions, type EmpireOrder } from "./institutio
 import { shogunateOrder, type ShogunateOrder } from "./shogunate.ts";
 import { huntOf, monthlyTribes, tribesOrder, type TribesOrder } from "./tribes.ts";
 import { isPlagueWeek, setQuarantine, weeklyPlague } from "./plague.ts";
+import { besiegerEat, castleCutAt, type CastleCut } from "./castleSupply.ts";
 import { addDays, DAYS_PER_RATION_MONTH, DAYS_PER_TURN } from "./calendar.ts";
-import { corridor, monthlyRations, refillRations, wagonRations, planRoute, planTilePath, tileStepHours, type MarchingArmy } from "./march.ts";
+import { corridor, monthlyRations, rations, refillRations, wagonRations, planRoute, planTilePath, tileStepHours, type MarchingArmy } from "./march.ts";
 import { foodCarriedPct, marchMap, NO_PATH, tileMarch, updateWeather, type World } from "./world.ts";
 import {
   aiCollect,
@@ -291,7 +295,11 @@ function startDay(world: World, news: News[]): void {
     monthlyPeoples(world, news);
     monthlyFaithHeads(world, news);
     monthlyBelief(world, news);
+    // Days to each capital, if land changed hands, before the grievances read them (X-29).
+    monthlyThrone(world);
     monthlyMoods(world, news);
+    // Each realm's stability, read once for the month: low stability costs tax, recruits and risings (X-29).
+    monthlyStability(world);
     monthlyRebels(world, news);
     monthlyRevolutions(world, news);
     monthlyLords(world, (n) => !inAnyWar(world, n), news);
@@ -307,10 +315,14 @@ function startDay(world: World, news: News[]): void {
     judgeNeglect(world);
     if (world.date.month === 1) mineYear(world, news);
     monthlyWorks(world, news);
+    // Each realm weighs its neighbours' strength before the AI builds, borrows, declares and calls men (DIPL-231).
+    monthlyFear(world, news);
     aiWorks(world, news);
     monthlyChanges(world, news);
     aiChanges(world);
     aiTreasury(world, news);
+    // A realm broke for months defaults on its debts (X-29).
+    monthlyDebts(world, news);
     monthlyDiplomacy(world, news);
     monthlyStatecraft(world, news);
     // Lands taken over the last 20 years each month; the league check each January (DIPL-221).
@@ -342,6 +354,8 @@ function endDay(world: World, news: News[]): void {
   feedArmies(world);
   dailyExploration(world);
   runOccupation(world, world.date.day === 1, news);
+  // Traders walk a day on, as the armies march (TRADE-132).
+  tradeDay(world);
   dailyRebels(world, news);
   world.date = addDays(world.date, 1);
   world.day++;
@@ -652,7 +666,17 @@ export function refillHere(world: World, slot: number, map = marchMap(world)): n
   const owner = world.provinceOwner[p]! >= 0 ? world.provinceOwner[p]! : huntOf(world, p);
   const enemy = owner >= 0 && atWar(world, owner, world.armies.owner[slot]!);
   const reserve = enemy ? 0 : world.provincePopulation[p]! * 1000 * d.homeReserveMonths;
-  return refillRations(d, map.ground[p]!, Math.max(0, world.provinceStore[p]!) * 1000, reserve);
+  const found = refillRations(d, map.ground[p]!, Math.max(0, world.provinceStore[p]!) * 1000, reserve);
+  // On enemy land, the owner's castles have gathered the food in behind their walls (WAR-263, WAR-264).
+  return enemy && found > 0 ? found * (1 - castleCutAt(world, p).share) : found;
+}
+
+/** The castle keeping food from an army's foragers where it stands, and how much (WAR-266); none off enemy land. */
+export function forageCut(world: World, slot: number): CastleCut {
+  const p = world.armies.location[slot]!;
+  if (p < 0 || world.provinceWater[p]) return { castle: -1, share: 0 };
+  const owner = world.provinceOwner[p]!;
+  return owner >= 0 && atWar(world, owner, world.armies.owner[slot]!) ? castleCutAt(world, p) : { castle: -1, share: 0 };
 }
 
 /** An army is on campaign while its realm is at war or it stands outside its own land (REALM-054). */
@@ -856,10 +880,13 @@ function feedArmies(world: World): void {
     if (!a.alive[i]) continue;
     const n = a.owner[i]!;
     if (carried[n]! < 0) carried[n] = foodCarriedPct(world, n);
-    const army = { ...marching(world, i), campaigning: campaigning(world, i), foodCarriedPct: carried[n]! };
-    const need = monthlyRations(d, army) * day;
+    const c = a.commander[i]!;
+    const logistics = c >= 0 ? world.commanderLogistics[c]! : 0;
+    // Besiegers eat more, from camp fevers and sallies against their foragers (WAR-265).
+    const need = rations(d, a.men[i]!, a.horse[i]!, logistics, campaigning(world, i)) * day * besiegerEat(world, i);
     a.food[i] = a.food[i]! - need;
-    const room = wagonRations(d, army) - a.food[i]!;
+    // wagonRations: the months carried of eating on campaign.
+    const room = rations(d, a.men[i]!, a.horse[i]!, logistics, true) * d.monthsCarried * (carried[n]! / 100) - a.food[i]!;
     if (room > 0) {
       const take = Math.min(room, refillHere(world, i, map) * day);
       a.food[i] = a.food[i]! + take;

@@ -7,7 +7,7 @@ import { regentOf, rulerLabel, yearlyRulers } from "./rulers.ts";
 import { rulerDies } from "./crowns.ts";
 import { hireGold, officialAt, OFFICIALS } from "./officials.ts";
 import { realmTitles } from "./government.ts";
-import { lordOfCommander } from "./lords.ts";
+import { lordOfCommander, newHolder } from "./lords.ts";
 
 /**
  * People in play (REALM-270 to REALM-279): every person the game names, the
@@ -40,6 +40,8 @@ export interface PersonDeath {
   name: string;
   age: number;
   cause: DeathCause;
+  /** A commander's army slot and fleet id the moment before he died, -1 for none: what is left without a leader (leaderless.ts). */
+  led?: { army: number; fleet: number };
 }
 
 export type DeathListener = (world: World, death: PersonDeath, news: News[]) => void;
@@ -162,6 +164,7 @@ function lordDies(world: World, k: number, d: Omit<PersonDeath, "who">, news: Ne
     l.heir = null;
     l.upCredit = 0;
     delete l.traits;
+    newHolder(l);
     if (n === world.player) news.push({ kind: "ruler", text: `${d.name}, ${title} of the house of ${l.house}, ${how(d.cause, d.age)}. His ${heir === son ? "heir" : "kinsman"} ${l.name}, ${l.age}, holds his lands now.`, nations: [n] });
   } else {
     l.gone = true;
@@ -258,7 +261,7 @@ export function personDies(world: World, who: PersonRef, cause: DeathCause, news
   if (lord >= 0) return personDies(world, { kind: "lord", lord }, cause, news);
   const d = describe(world, who);
   if (!d) return;
-  const death: PersonDeath = { who, cause, ...d };
+  const death: PersonDeath = { who, cause, ...d, ...(who.kind === "commander" ? { led: ledBy(world, who.c) } : {}) };
   switch (who.kind) {
     case "ruler":
       rulerDies(world, who.n, news);
@@ -280,6 +283,14 @@ export function personDies(world: World, who: PersonRef, cause: DeathCause, news
       break;
   }
   for (const fn of [...listeners]) fn(world, death, news);
+}
+
+/** The army and fleet a commander leads, -1 for none. */
+function ledBy(world: World, c: number): { army: number; fleet: number } {
+  const a = world.armies;
+  let army = -1;
+  for (let i = 0; i < a.count && army < 0; i++) if (a.alive[i] && a.commander[i] === c) army = i;
+  return { army, fleet: world.navy.fleets.find((f) => f.admiral === c)?.id ?? -1 };
 }
 
 /** The losing commander of a battle may fall (WAR-062, REALM-276): 1 in 20, twice that when Reckless. */

@@ -17,6 +17,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   await page.goto("http://localhost:4183/");
   await page.waitForSelector("[data-nation=france]", { timeout: 60000 });
   await page.click("[data-nation=france]");
+  await page.click("[data-begin]");
   await page.waitForSelector(".hud [data-news]", { timeout: 60000 });
   await page.waitForTimeout(500);
   const stopHints = page.locator(".hint-note button", { hasText: "Stop hints" });
@@ -38,7 +39,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
     console.log(name, "tap box", Math.round(box.w), Math.round(box.h));
     await page.mouse.click(box.x + box.w / 2, box.y + box.h / 2);
     await page.waitForTimeout(400);
-    console.log(name, "trade tab open", await page.evaluate(() => !!document.querySelector("#panel:not([hidden]) .traders")));
+    console.log(name, "trader card open", await page.evaluate(() => !!document.querySelector("#panel:not([hidden]) .trader-card")));
     await shot("tapped");
   } else console.log(name, "no French mover on screen to tap");
   await page.evaluate(() => document.querySelector("#panel .close")?.click());

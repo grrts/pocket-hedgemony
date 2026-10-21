@@ -8,7 +8,7 @@
   "controllerEndTurnHoldSeconds": 0.5,
   "campaignEndDateDefault": "1939-08-31",
   "endDateEarliestYear": 1494,
-  "dominationShare": 0.5,
+  "dominationShare": 1,
   "dominationCheckMonth": 1,
   "ledgerLeaders": 5,
   "scores": [
@@ -257,7 +257,7 @@
     "difficulty",
     "AI aggression",
     "fog",
-    "historical or free events",
+    "historical, plausible or free events",
     "ironman",
     "end date"
   ],

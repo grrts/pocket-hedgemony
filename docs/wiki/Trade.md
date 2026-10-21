@@ -34,7 +34,7 @@ Each trader is one unit on the map with a kind, a home city, a crew, a route, a 
 
 **Losing traders:** dismissing one removes it and its crew overflow into the emptiest slots of its home. If a trader's or trade ship's upkeep is unpaid for 6 months, it is lost and its crew leave. A trade ship pressed into war stops trading and keeps its purse until it next reaches one of your ports.
 
-Upkeep is charged every month, even with an empty purse and no route. There is **no cap** on how many traders you run.
+Upkeep is charged every month, even with an empty purse and no route. **Each city homes a few traders**: 1 with a weekly market, 2 with a yearly fair, 4 with a trading house, and 1 more with a harbour. To run more, found them in more cities or build up the market.
 
 **Lords** run their own traders from their own cities with their own wealth. They deposit into the lord's wealth, and you can see them but not steer them.
 
@@ -276,13 +276,17 @@ Trade runs in the game as a first slice: traders you own walk there and back bet
 - **Traders.** Pack caravans, camel caravans (from desert or drylands, or with Caravanserai networks), river barges (on rivers only) and the cog. Each walks its way there and back a month at a time: every province it stands in gets busier, it collects as it enters (10 % to the owner of a foreign province, nothing on unclaimed land) and it empties its purse in every city of yours it reaches. Its upkeep is paid each month; six months unpaid and it is given up.
 - **Trade ratio.** Each month a province's ratio rises with the traders passing (a customs officer helps, riots hurt, an enemy or a siege stops it) and loses a tenth. Every 4 points of ratio raise the tax the province owes by 1 %.
 - **Your Trade line** is last month's deposits plus market fees paid to you, less your traders' upkeep.
+- **Home slots.** A city is home to 1 trader with a weekly market, 2 with a yearly fair, 4 with a trading house, and 1 more with a harbour; Found a trader shows "home to x of y" for each city. Founding costs three times the table's gold and upkeep is four times its figure, so a poor long route loses money: check its card's Route line and its better routes, or dismiss it. Traders from the 1444 start stay even where a city has more than its slots.
 - **At the start** every realm gets its traders by its trade access (Venice six, France four), on hand-made routes where their cities are on the map and otherwise on the best route from each of its best cities, and two years of their walking set the starting ratios.
 - **The AI** looks at each trader once a year and finds it a better route when its own pays little or is broken, and founds one more a year where a route pays well, up to twice its starting traders.
 
 Where you find it:
 
-- **The Trade tab** of your realm card, next to Treasury: last month's deposits, fees and upkeep; your traders, best first, each with its route ("Paris → Lyon and back"), its days there and back, a purse bar, about what it brings a month, what it deposited last month and what is wrong, with **Route**, **Show** and **Dismiss**; then two folds you open with a tap: **Found a trader** (its line says how many cities can; it starts open while you have no trader), with one button per kind with its gold and upkeep in each city, greyed with the reason when it can't; and **Busiest cities** (its line names the busiest).
-- **Setting a route**: tap **Route** on a trader. The map switches to the Trade map mode and a bar along the bottom asks you to tap where it starts, then where it goes; a third city moves where it goes. You never draw the way: it is found through the most populated land and drawn on the map, with the preview (days there and back, provinces collected in, about how much a month, the best provinces). Then **Confirm** (or tap the end again), **Undo** or **Cancel**.
+- **The Trade tab** of your realm card, next to Treasury, is the overview of all your trade. **This month**: gold banked so far, gold on the road in your traders' purses, market fees taken, and last month's Trade line after upkeep. **Where the gold comes from**: the provinces your traders collected in, each with its gold a month and a bar, those abroad marked, with the share from abroad and the fees you paid. **Traders**: one row each with its route, purse bar and gold a month after upkeep, a red ! when something is wrong and a gold ★ when it has a better route; a row opens the trader's card. When some could earn more, **Use all better routes** moves each to its best route at once. Then two folds: **Found a trader** and **Busiest cities**.
+- **A trader's card**: tap one of your caravans, barges or cogs on the map (close in), or its row in the Trade tab. **Now** says what it is doing ("Walking to Lyon, 3 days") with its purse; **Route** gives From → To, days there and back and about how much it brings a month after upkeep; **Better routes** lists up to three routes from its start or its home that bring at least a fifth more, each with **Use**; **Where its gold comes from** shows the provinces of its last trip there and back; **Last month** what it banked and where. While the card is open its whole way is drawn on the map under any map mode, the way ahead as a trail, the trader in gold brackets and a coin where its gold came from. **Find** centres the map on it.
+- **Changing a route**: **Change destination** keeps where it starts; the bar along the bottom of the map offers the three best cities as buttons, and every likely city on the map shows its gold a month over it (the best three starred). Tap a city or a button, check the preview, then **Confirm**. **New route** starts from scratch: tap where it starts, then where it goes. You never draw the way: it is found through the most populated land and drawn on the map, with the preview (days there and back, provinces collected in, about how much a month, the best provinces). **Undo** and **Cancel** are there too.
+- **Gold being banked**: from regional zoom in, whatever the map mode, when one of your traders banks its purse in a city a coin drops into the city and its gold rises over it ("+2.4"), a coin clinks and your treasury lifts; a trader collecting glints a little coin. Under the Trade map mode your busiest trade cities twinkle. All of it follows the Animations setting.
+- **About how much a month** is worked out as the trader walks: it fills its purse province by province, can't carry more than its purse between your cities, and gets less where many traders already call. It lands close to what traders really bank.
 - **The Trade map mode**: provinces coloured by trade ratio, what you don't see in parchment; zoomed in, your traders' ways there and back as dotted lines with each trader and its purse, and a coin on every trade stop.
 - **The province card** has a Trade line: value a month, ratio, traders passing and its top goods.
 - **The Overview** of your Realm book has an Economy tile with your gold and gold a month; the Trade page sits beside Treasury and Food in the Economy section.
@@ -309,6 +313,8 @@ Not yet: tolls, trade pacts and embargoes, bandits and capture on the road, lord
 - [Time and Turns](Time-and-Turns): day loop, month end, year.
 
 ## Numbers
+
+Every value the game uses, made from its config so it always matches the game: [Trade data](Data-Trade). How they combine: [Formulas](Formulas).
 
 Every trade number is a placeholder, all in the trade config file.
 
@@ -338,7 +344,7 @@ Every trade number is a placeholder, all in the trade config file.
 | Tax from ratio | `effects.tax_per_ratio_points` | +1 % per 4 points |
 | Crafts floor | `effects.crafts_appear_min_ratio` | 30 % |
 | Missing input | `effects.missing_input_output` | half |
-| Unpaid upkeep before a trader is lost | not yet in config | 6 months |
+| Unpaid upkeep before a trader is lost | `upkeep.unpaid_months_to_lose` | 6 months |
 | Starting traders | `start.traders_by_trade_access` | 6, 4, 2, 1, 0, 0 |
 | Warm-up | `start.warmup_months` | 24 |
 | AI reach | `ai.caravan_reach_provinces`, `ai.ship_reach_sea_zones` | 12 / 40 |

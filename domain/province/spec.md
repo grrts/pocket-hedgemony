@@ -232,12 +232,18 @@ settlement, settlers, local people's tiles.
 
 ### 5.9 People: births, deaths and famine
 - PROV-100: Each month, every class shall gain births (people × birth rate) and lose deaths (people × death rate), from the yearly base rates in config. [§6.1]
-- PROV-101: Birth rates shall go up with a food store above 6 months (+0.5) and 10 years of peace in the province (+0.5), and down with a store under 3 months (−1), the *Hungry* grievance (−2), war in the province (−1), plague (−1) and, in later eras, in towns by era. [§6.1] (units: D-PROV-8)
+- PROV-101: Birth rates shall go up with 10 years of peace in the province (+0.5), and down with war in the province (−1), plague (−1) and, in later eras, in towns by era. Food does not change births: people go on having children through hard years, and famine is what a shortage costs (D-PROV-36). [§6.1] (units: D-PROV-8)
 - PROV-102: Death rates shall go up with plague (+5 % rumour, +15 % outbreak, +30 % at its worst), war in the province (+1 %), each burned tile (+0.5 %), fever land for people born elsewhere, and smoke (+1 % for town classes); and down with hospitals, wells and drains (−0.5 % in town) and sanitation and vaccination (each −0.5 %). [§6.1]
 - PROV-103: Clergy birth rate shall be 0.5 % where the faith's clergy don't marry, otherwise as townsfolk. [§6.1]
 - PROV-104: Each season, the province shall compare the food it has (its share of the harvest, its local store and castle deliveries) with the people who must eat. [§6.2]
 - PROV-105: When there is enough food, everyone shall eat and what is left goes to the store. [§6.2]
 - PROV-106: If there is not enough food, then the people the food cannot feed shall die that season, spread over the classes by size, except that a quarter of them flee as refugees if a neighbouring province has food. The turn engine eats month by month, and a month without food is a third of a season, so a third of each month's unfed are lost that month and the rest go hungry into the next. A year's famine shall kill at most a fifth of the people the province had in January; past that the unfed go hungry, so two failed harvests in a row cost at most about a third of a province. [§6.2, feedback 93, D-PROV-28]
+- PROV-107: A province whose land feeds less than its people in a normal year (what its tiles bring in over its people, under `province.food.balance.short`, 1.0) shall be *short of food*, and one under `tight` (1.05) shall be *tight*: a poor harvest starves it. Births don't fall with food (PROV-101), so a short province shrinks through famine until the realm builds farms, clears land or feeds it from a castle. [D-PROV-36]
+
+#### How the player uses it: short of food
+- PROV-364: Where: the province card's Overview has a **Land feeds** line under Food: "92 % of its people · short: it shrinks · build a farm". On the player's own royal province that is short or tight the line is a button that opens the Land tab, where the farm, the better farm or the clearing is one tap away. The Food tab of the realm book starts with a **Short of food** list under its counts, worst first, each row naming the fix and opening that province's Land tab; the Provinces tab keeps its Short of food sort for every province, lords' included. [X-19, D-PROV-36]
+- PROV-365: Grouping and overview: the food of a province sits in its Food lines; the realm's food sits on the Food tab, whose counts read hungry, running low, short of food and fed by castles. The Economy tile of the realm's Overview says "N provinces short of food" when none is hungry and opens the Food tab (SHELL-171). A lord's province is his to build on, so it is listed under Provinces but never counted as waiting on the player. [X-19]
+- PROV-366: Phone: the line, the rows and the button fit the side panel in landscape in the Wide and Tall layouts and the bottom sheet in portrait, within the safe areas; every row and button is at least 44 points tall, short and tight are written in words, and nothing needs hover. [X-19]
 
 ### 5.10 Classes and job slots
 - PROV-110: The province shall place every person in one class and give each class its slots in the buildings and tiles listed in the class table. [§6.3]
@@ -296,6 +302,20 @@ settlement, settlers, local people's tiles.
 - PROV-172: A navigable river shall be fixed, shown as shore tiles; canals add one (*Grand canals*, *Canal locks*); a wrecked canal or silting removes it. River provinces count one ring closer for castle food spread. [§9]
 - PROV-173: Days to capital shall be the travel time to the capital or nearest seat by the fastest road, river or sea route, longer in winter and with enemy armies, broken roads or a sea route closed in war. [§9]
 - PROV-174: While days to capital are above a limit (example 30), the province shall have *Far from the throne*. [§9, §12.1]
+- PROV-175: Days to capital shall be counted from the realm's capital over its own land (each step the march's days to cross both grounds, plus a day for a river) and the sea (`far_from_throne.sea_zone_days` a sea zone); a realm that has lost its capital counts from its most populous province, and a province it can't reach over its land or the sea is as far as can be. They are worked out again in the monthly step whenever land has changed hands. [X-29]
+- PROV-176: While royal land is far from the throne, it shall send the crown `far_from_throne.cut_per_10_days` (0.1) less of its tax and recruit refill for every 10 days past the limit, down to `far_from_throne.least_share` (half, at 80 days). A province a lord holds is run from his seat: it is never far from the throne. [X-29]
+
+- PROV-177: For `newly_taken.years` (10) after a province is taken from another realm by a peace or handed over by a demand, it shall have *Newly taken*, one grievance (so foreign rule and the wrong faith together riot), whose rebels rise for their homeland. Land taken in from tribes, colonies and land held since the start are not newly taken. [X-29]
+- PROV-178: While newly taken, a province shall cost its owner `newly_taken.upkeep_share_of_tax` (half) of its tax at the normal rate again each month, on the ledger's *Holding new land* line. [X-29]
+
+#### How the player uses it: newly taken land
+- The province card's Overview shows *Newly taken* with the year it was taken and the year it ends, and that it costs garrisons and clerks; *Newly taken* is listed with its grievances. The Treasury tab's ledger shows the whole cost as *Holding new land*, so the price of conquest reads at a glance. Works by tap on a phone in either layout. [X-29]
+
+#### How the player uses it: far from the throne
+- The province card's Overview shows *To capital* with the days, and for far royal land the share it loses (for example "far from the throne: −20 % tax and recruits"); its Tax line says the same under the gold, so the player sees why it pays less. A lord's land far away says its lord runs it from his seat. [X-29]
+- *Far from the throne* is listed with the province's grievances and counts toward its mood like the rest. [X-29]
+- The *Days to capital* lens colours the player's royal land: green within the limit, amber to red as the cut grows, a lord's land in grey, other realms faded; its key says what each colour costs. This is the overview at a glance. [X-29]
+- The choice it brings: grant far land to a lord (no cut, but he keeps his share and may turn) or keep it royal and accept the cut. Nothing needs hover; the lens and the card work by tap on a phone in either layout. [X-29]
 
 ### 5.17 Governance
 - PROV-180: Each province shall have an owner, gained by conquest, inheritance, purchase, a lord joining with his land or a colony, and lost by losing a war, a lord defecting, rebels breaking away or ceding it. [§10.1]
@@ -618,8 +638,8 @@ province config file but no file name or keys; keys below are proposed by this s
 | province.harvest.multipliers | Harvest roll | bumper 1.3, good 1.15, normal 1, poor 0.7, failed 0.3 | yes | province config |
 | province.wares.list | Wares | grain, rice, wine, olive oil, wool, cloth, flax, linen, silk, cotton, salt, fish, timber, furs, hides, leather, horses, iron, tools, arms, copper, tin, silver, gold, gems, spices, pepper, sugar, tea, coffee, cocoa, tobacco, incense, ivory, pottery, porcelain, dyes, paper, books, saltpetre, powder; later coal, rubber, oil | yes | province config |
 | province.wares.craft_value | Finished vs raw | ×3 (wool to cloth) | yes | province config |
-| province.births / deaths | Base yearly rates per class | land classes 4.0/3.0; miners 3.5/4.0; craftsmen, market folk, clerks 3.0/3.5; clergy 0.5 (celibate) or as townsfolk /3.0; scholars 1.0/3.0; homeless 4.0/5.0 | yes | province config |
-| province.births.modifiers | Birth modifiers are percentage points | store >6 months +0.5; peace 10 years +0.5; store <3 months −1; *Hungry* −2; war −1; plague −1; towns by era | yes | province config |
+| province.births / deaths | Base yearly rates per class | land classes 3.6/3.0; miners 3.5/4.0; craftsmen, market folk, clerks 3.0/3.5; clergy 0.5 (celibate) or as townsfolk /3.0; scholars 1.0/3.0; homeless 4.0/5.0 | yes | province config |
+| province.births.modifiers | Birth modifiers are percentage points | peace 10 years +0.5; war −1; plague −1; towns by era (food does not count, D-PROV-36) | yes | province config |
 | province.deaths.modifiers | Death modifiers | plague +5/+15/+30 %; war +1 %; burned tile +0.5 % each; smoke +1 % town; hospitals −0.5 % town; sanitation, vaccination −0.5 % each | yes | province config |
 | province.famine.flee_share | Share of the unfed who flee | a quarter | yes | province config |
 | province.homeless.drift_share | Homeless moving each month | not given | yes | province config |
@@ -633,7 +653,12 @@ province config file but no file name or keys; keys below are proposed by this s
 | province.tax.no_official | Share without official | half | yes | province config |
 | province.tax.lord_share | Lord keeps | half | yes | province config |
 | province.tax.free_travel_days | Days before travel losses | 5 | yes | province config |
+| province.newly_taken.years | Years a taken province stays newly taken | 10 (X-29) | yes | province config |
+| province.newly_taken.upkeep_share_of_tax | Upkeep of newly taken land, as a share of its tax at the normal rate | 0.5 (X-29) | yes | province config |
 | province.far_from_throne.days | Days to capital limit | 30 (example) | yes | province config |
+| province.far_from_throne.cut_per_10_days | Share of tax and recruits lost every 10 days past the limit | 0.1 (X-29) | yes | province config |
+| province.far_from_throne.least_share | Least share a far province still sends | 0.5 (X-29) | yes | province config |
+| province.far_from_throne.sea_zone_days | Days to cross a sea zone toward the capital | 8 (X-29) | yes | province config |
 | province.officials.full_effect_years | Years to full effect | 5 (half in first year) | yes | province config |
 | province.officials.hire.gold | Gold up front to hire a native official | 25 (PROV-333) | yes | province config |
 | province.officials.hire.foreign_multiplier | A foreign specialist's price against a native's | 2 (PROV-334) | yes | province config |
@@ -732,6 +757,7 @@ province config file but no file name or keys; keys below are proposed by this s
 - **D-PROV-32** (18 Oct) Fever land: ground first (jungle 2, marsh and savanna 1), one more in the tropics, one more per two marsh tiles, one less per quinine and sanitation known; mild, harsh and deadly add 5, 15 and 30 % a year to the death rate of people born elsewhere, the same steps as plague, and locals take a tenth. Quinine and sanitation are not in the research tree yet, so the game's fever land falls only with draining. Provisional numbers.
 - **D-PROV-33** (18 Oct) Tax owed is 0.12 gold a year per 1,000 workers in working land buildings and 0.5 per 1,000 townsfolk at the normal rate, scaled by the realm's tax steps (0, ½, 1, 1½, 2), less the homeless cut (D-PROV-1) and half under riots. Burned and fallow tiles make nothing and so owe nothing. Troyes's 61,500 workers and 6,900 townsfolk owe about 11 gold, as its card says. Tolls are trade's and never counted here. Provisional numbers.
 - **D-PROV-34** (18 Oct) Travel: winter makes roads and rivers half as slow again, an enemy army on the road or a broken road doubles the road's days (the detour), and a sea route closed in war is no route. Days to capital is the fastest of the routes to the capital or a seat as things stand. Provisional numbers.
+- **D-PROV-36** (19 Oct, Leroy: "Birthrates should not reflect food", "You can lower birthrates to 3.6") Land classes are born at 3.6 % a year against 3.0 % deaths, so a fed, peaceful province grows about 0.6 % a year (it was 1 %). Births do not follow the food store or the *Hungry* grievance: people go on having children through hard years, and feeding them is the realm's task, with farms, ranches, fisheries and castles. The province card and the Food tab show where a normal year's food falls short so the player can build before famine comes.
 - **D-PROV-35** (18 Oct) Sickness: men born on the ground lose half its monthly rate and are spared fever land; everyone else takes the full rate and fever land counts as High (D-PROV-15). People made homeless by a burned tile who stay in the province join the homeless.
 
 ## 14. Traceability
@@ -820,7 +846,7 @@ Every requirement has at least one scenario. PROV-292 (card layout) is also pres
 | PROV-093 | wares.feature | The ware list lives in config and grows in later eras |
 | PROV-094 | wares.feature | Enslaved people are never a ware |
 | PROV-100 | births-deaths-famine.feature | Base yearly birth and death rates by class |
-| PROV-100 | births-deaths-famine.feature | Troyes grows by 720 a year with no modifiers |
+| PROV-100 | births-deaths-famine.feature | Troyes grows by 432 a year with no modifiers |
 | PROV-101 | births-deaths-famine.feature | Birth modifiers are percentage points |
 | PROV-102 | births-deaths-famine.feature | Death modifiers |
 | PROV-102 | births-deaths-famine.feature | Fever land kills people born elsewhere |
@@ -885,6 +911,10 @@ Every requirement has at least one scenario. PROV-292 (card layout) is also pres
 | PROV-172 | roads-and-travel.feature | Canals add a river, war wrecks it |
 | PROV-173 | roads-and-travel.feature | Days to capital follow the fastest route |
 | PROV-174 | roads-and-travel.feature | Far from the throne |
+| PROV-175 | roads-and-travel.feature | Days to capital are counted over the realm's land and the sea |
+| PROV-176 | roads-and-travel.feature | Far royal land sends less; a lord's land is never far |
+| PROV-177 | — | Covered by engine test (packages/engine/test/newlyTaken.test.ts: holds the grievance for ten years) |
+| PROV-178 | — | Covered by engine test (packages/engine/test/newlyTaken.test.ts: costs upkeep on the New land line) |
 | PROV-180 | governance.feature | A province changes owner |
 | PROV-181 | governance.feature | What governance gives |
 | PROV-181 | governance.feature | A subject ruler governs a subject's province |
@@ -988,6 +1018,8 @@ Every requirement has at least one scenario. PROV-292 (card layout) is also pres
 | PROV-360 | health.feature | Plague is kept in the save |
 | PROV-352 … PROV-360 | — | Engine: packages/engine/test/plague.test.ts |
 | PROV-361 … PROV-363 | — | Presentation: apps/client/src/ui/plague.ts plague card and map mark, the Provinces tab's Sick list; checked on phone screenshots in landscape and portrait |
+| PROV-107 | — | Engine config: province.food.balance; client: apps/client/src/ui/food.ts shortProvinces |
+| PROV-364 … PROV-366 | — | Presentation: apps/client/src/ui/food.ts Short of food list, the province card's Land feeds line; checked on phone screenshots in landscape and portrait |
 | PROV-250 | colonies.feature | Only unowned provinces can be colonised |
 | PROV-251 | colonies.feature | A colony takes only the free tiles |
 | PROV-252 | colonies.feature | Settlement steps are gained |
@@ -1016,7 +1048,7 @@ Every requirement has at least one scenario. PROV-292 (card layout) is also pres
 | PROV-296 | recruits-students-scholars.feature | Recruits refill from every class except clergy and scholars |
 | PROV-296 | recruits-students-scholars.feature | Homeless drift and refugees settle |
 | PROV-297 | births-deaths-famine.feature | Birth modifiers are percentage points |
-| PROV-297 | births-deaths-famine.feature | Troyes grows by 720 a year with no modifiers |
+| PROV-297 | births-deaths-famine.feature | Troyes grows by 432 a year with no modifiers |
 | PROV-298 | colonies.feature | Only unowned provinces can be colonised |
 | PROV-298 | colonies.feature | Settlement steps are the subjects design's colony stages |
 | PROV-299 | officials.feature | Officials learn by language |

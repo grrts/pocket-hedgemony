@@ -237,7 +237,7 @@ Troyes, at normal tax, owes 11 gold a year and all 11 reach you: it is 3 days fr
 
 - Each province has **one road step**: track, road, paved road, turnpike, railway. Each step is unlocked by an invention and built for gold × the ground's build cost. Roads are lost by neglect without upkeep, fighting and floods.
 - A **navigable river** is fixed and shown as shore tiles; canals add one (*Grand canals*, *Canal locks*), and a wrecked canal or silting removes it. River provinces count one ring closer for castle food spread.
-- **Days to capital** is the travel time to the capital or nearest seat by the fastest road, river or sea route, longer in winter, with enemy armies, broken roads or a sea route closed in war. Above a limit (for example 30 days), the province has *Far from the throne*.
+- **Days to capital** is the travel time to the capital or nearest seat by the fastest road, river or sea route, longer in winter, with enemy armies, broken roads or a sea route closed in war. Above a limit (30 days), the province has *Far from the throne*. Days count from the capital over the realm's own land and the sea, and are worked out again whenever land changes hands; a realm that lost its capital counts from its largest province. Royal land far from the throne sends a tenth less tax and recruits for every 10 days past the limit, down to half at 80 days. A lord's province is run from his seat and is never far, so granting distant land is one answer. The province card shows *To capital* and the share lost, and the *Days to capital* lens colours your royal land from green to red.
 
 ### Who owns and governs it
 
@@ -334,7 +334,8 @@ There is no anger meter. A province has a list of **grievances**, each a named c
 | Ungoverned | No official (a royal province without yours, or a lord's without his) | An official is assigned |
 | Harsh lord | The lord is Cruel or Greedy, or hostile to the people's faith or language | The lord changes |
 | Broken charter | A charter revoked in the last 20 years | Time |
-| Far from the throne | Days to capital above the limit | A seat nearby; roads; moving the capital |
+| Far from the throne | Royal land with days to capital above the limit | Granting it to a lord; land nearer the capital |
+| Newly taken | Taken from another realm in the last 10 years | Time |
 | Plague | An outbreak here | It burns out |
 | Bloodshed | A rising of the same faith or language was massacred in the last 20 years | Time |
 | Requisitioned | An army, yours or anyone's, takes food from the store | A season after the last taking |
@@ -421,7 +422,7 @@ Every province is laid out in **4 to 16 tiles** from the map: bigger provinces h
 
 **Fever land.** Every province has a fever land of none, mild, harsh or deadly: jungle is harsh and marsh and savanna mild, a step worse in the tropics and for every two marsh tiles. By the rules, soldiers and settlers born elsewhere die there at 5, 15 or 30 % a year and the people born there at a tenth of that; the game shows it on the Land tab now, and armies and colonies will count it when their sickness is played. Draining the marsh lowers it.
 
-**How you use it.** Tap one of your provinces, then its **Land** tab. The first line says how much of its people the land feeds in a normal year, in red under 100 %; under it, a line names the province's fever land, if it has any. Below is the grid of tiles; a worn field is striped and marked "worn", and its sheet says how long it has rested, each coloured by its use and naming the building that works it. Tap a tile to see who works it, what it feeds or gives a year, and the building that would work it better, with its **Build** button or why it can't be built yet. Under the sheet are the one to three changes that tile allows, each with its gold and time. On the country card, **Provinces → Short of food** lists the provinces whose land doesn't feed them and what would fix each; tap one to open its Land tab.
+**How you use it.** Tap one of your provinces, then its **Land** tab. The first line says how much of its people the land feeds in a normal year, in red under 100 %; under it, a line names the province's fever land, if it has any. Below is the grid of tiles; a worn field is striped and marked "worn", and its sheet says how long it has rested, each coloured by its use and naming the building that works it. Tap a tile to see who works it, what it feeds or gives a year, and the building that would work it better, with its **Build** button or why it can't be built yet. Under the sheet are the one to three changes that tile allows, each with its gold and time. On the country card, **Provinces → Short of food** lists the provinces whose land doesn't feed them and what would fix each; tap one to open its Land tab. The province's Overview shows the same as a **Land feeds** line under Food, and on your own short province the line opens the Land tab.
 
 ## Plague in the game
 
@@ -506,6 +507,8 @@ The tile row is the province: tap a tile to see its building, its workers and wh
 
 ## Numbers
 
+Every value the game uses, made from its config so it always matches the game: [Province data](Data-Province). How they combine: [Formulas](Formulas).
+
 All province numbers are placeholders, kept in one province data file.
 
 | Value | Config key | Design value |
@@ -548,6 +551,9 @@ All province numbers are placeholders, kept in one province data file.
 | Tax without official / lord's share | `province.tax.no_official`, `province.tax.lord_share` | half / half |
 | Free travel days for tax | `province.tax.free_travel_days` | 5 |
 | Far from the throne | `province.far_from_throne.days` | 30 (example) |
+| Far from the throne: cut per 10 days past the limit | `province.far_from_throne.cut_per_10_days` | 0.1 |
+| Far from the throne: least share sent | `province.far_from_throne.least_share` | 0.5 |
+| Days to cross a sea zone toward the capital | `province.far_from_throne.sea_zone_days` | 8 |
 | Official full effect | `province.officials.full_effect_years` | 5 years (half in the first) |
 | Official effects | `province.officials.effects` | table above |
 | Homeland | `province.homeland.years` | 100 years |

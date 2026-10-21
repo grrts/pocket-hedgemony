@@ -258,6 +258,7 @@
  },
  "castle_ground": { "hills": 0.25, "mountains": 0.50 },
  "siege": { "close_ratio": 3, "b7_multiplier": 1.5, "repair_men": 200, "sally_share": 0.3333333333333333, "hunger_loss": 0.10, "hunger_break": -0.10, "fever_after_months": 3, "fever_mul": 2, "ration": 1 },
+ "castle_supply": { "$comment": "Castles starve besiegers (Leroy, 19 Oct; WAR-263 to WAR-269): a held castle gathers the land's food behind its walls, so enemy foragers find less in its province (by castle step: earthwork, stone, bastion, star, concrete) and reach_share of that in the provinces it reaches by road; armies besieging it eat more by its step.", "provisional": true, "forage_cut_by_step": [0.3, 0.45, 0.6, 0.7, 0.8], "reach_share": 0.5, "besieger_eat_by_step": [1.15, 1.25, 1.3, 1.35, 1.4] },
  "storm": { "room_per_breach": 500, "losses": 1.5, "scaling": 2, "bells": 6 },
  "sack": { "plunder_tax_years": 1, "town_buildings": 0.3333333333333333, "townsfolk": 0.10, "cruel": 1.5 },
  "relief_bonus": 0.10,

@@ -26,7 +26,16 @@ export interface LordView {
   /** His age and the heir who takes his lands when he dies (REALM-273); unset in an older snapshot. */
   age?: number;
   heir?: { name: string; age: number } | null;
+  /** His two traits (REALM-070); unset in an older snapshot. */
+  traits?: string[];
+  /** What his lands make him ("Earl of Northumberland"), and for a real person of history one line on who he was (REALM-290, REALM-294). */
+  title?: string;
+  note?: string;
+  historical?: boolean;
 }
+
+/** The mark after a real person's name: he lived, and his card says who he was (REALM-294). */
+const HISTORY_MARK = ` <span class="history-mark" title="A real person of history">History</span>`;
 
 /** What each loyalty step means for the crown. */
 export const LOYALTY_NOTE: Record<string, string> = {
@@ -69,7 +78,7 @@ export function lordsTab(rules: Ruleset, lords: LordView[], lands: Map<number, L
       const ll = lands.get(l.k)!;
       return `<button class="paper lord-row" data-lord-open="${l.k}">
         ${lordPortrait(rules, l, 2)}
-        <span class="lord-who"><b>${esc(l.name)}</b><small>House ${esc(l.house)}${l.age ? ` · ${l.age}` : ""} · ${l.lands} province${l.lands === 1 ? "" : "s"} · ${fmt(ll.people * 1000)} people</small></span>
+        <span class="lord-who"><b>${esc(l.name)}${l.historical ? HISTORY_MARK : ""}</b><small>${l.title ? esc(l.title) : `House ${esc(l.house)}`}${l.age ? ` · ${l.age}` : ""} · ${l.lands} province${l.lands === 1 ? "" : "s"} · ${fmt(ll.people * 1000)} people</small></span>
         <span class="lord-state">${loyaltyBadge(l.loyalty)}<small>${gold2(ll.crownGold)} gold a month${retinues.has(l.k) ? ` · ${RETINUE_SHORT[retinues.get(l.k)!.state]}` : ""}</small></span>
       </button>`;
     })
@@ -151,8 +160,9 @@ export function lordScreen(
         <img class="thumb" src="${r.thumb}" alt="" width="48" height="48"><span><b>${esc(r.name)}</b><small>${esc(r.note)}</small></span>
       </button>${button}</div>`;
   return `<div class="person-card">${lordPortrait(rules, l, 5)}
-      <div><p><b>${esc(l.name)}</b></p><p>House ${esc(l.house)}</p><p>${loyaltyBadge(l.loyalty)}</p><p class="hint">He ${esc(LOYALTY_NOTE[l.loyalty] ?? "")}.</p></div>
+      <div><p><b>${esc(l.name)}${l.historical ? HISTORY_MARK : ""}</b></p>${l.title ? `<p>${esc(l.title)}</p>` : ""}<p>House ${esc(l.house)}</p><p>${loyaltyBadge(l.loyalty)}</p><p class="hint">He ${esc(LOYALTY_NOTE[l.loyalty] ?? "")}.</p></div>
     </div>
+    ${l.historical && l.note ? `<p class="lord-note"><b>In history.</b> ${esc(l.note)}</p>` : ""}
     <div class="choices">
       <button class="wax" data-lord-light="${l.k}" aria-pressed="${o.lit}">${o.lit ? "Stop showing his lands" : "Show his lands on the map"}</button>
       ${o.mine && l.loyalty !== "Loyal" ? `<button class="paper" data-gift="${l.k}" ${o.treasury < o.gift ? "disabled" : ""} title="A gift of gold raises his loyalty a step">Gift · ${o.gift} gold</button>` : ""}
@@ -164,6 +174,7 @@ export function lordScreen(
     <dl class="facts">
       ${l.age ? `<dt>Age</dt><dd>${l.age}</dd>
       <dt>Heir</dt><dd>${l.heir ? `${esc(l.heir.name)}, ${l.heir.age}` : `None: if he dies, his line dies out and his lands return to the crown`}</dd>` : ""}
+      ${l.traits?.length ? `<dt>Traits</dt><dd>${l.traits.map(esc).join(", ")}</dd>` : ""}
       <dt>Lands</dt><dd>${ll.provinces.length} province${ll.provinces.length === 1 ? "" : "s"}, ${fmt(ll.people * 1000)} people</dd>
       <dt>To you</dt><dd>${gold2(ll.crownGold)} gold a month${l.loyalty === "Loyal" || l.loyalty === "Wavering" ? " (half of their tax)" : ""}</dd>
       <dt>${esc(cap(t.officials))}</dt><dd>His own run his lands; you can't commission them.</dd>

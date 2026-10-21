@@ -1,68 +1,56 @@
 /**
- * Traders on the living map (VIEW-123, VIEW-132): each busy trade path the
- * snapshot feeds carries up to three movers, a caravan on land, a barge on a
- * river and a trading ship at sea, walking its loop of province centres with
- * the game clock. Decoration only: the Trade tab and lenses keep the numbers.
+ * Traders on the living map (VIEW-123, VIEW-132): each trader is drawn where
+ * the game's daily walk has it, on the leg from the province it stands in to
+ * the next of its loop. Over land it steps along the leg's tiles as an army
+ * does; at sea it sails from zone to zone. Between days it walks on smoothly
+ * over the step, as armies walk their trail.
  */
-import type { GameDate } from "@ph/rules";
-import { traderMovers } from "@ph/engine/domain/map-presentation";
+import type { TraderWalk } from "@ph/engine";
+import { traderFigure, traderOnLeg } from "@ph/engine/domain/map-presentation";
 import type { FigureName } from "../art/sprites.ts";
 
-export interface MoverPath {
-  id: number;
-  medium: "land" | "river" | "sea";
-  path: readonly number[];
-  traders: number;
-}
-
-export interface PlacedMover {
-  /** Map position, and whether it heads right (the sprites face left). */
+export interface PlacedTrader {
+  /** Map position, and the way it heads, one map pixel long (the sprites face left). */
   x: number;
   y: number;
-  right: boolean;
-  /** The leg's direction, one map pixel long, so traders keep to their side of the way and meet without overlapping. */
   ux: number;
   uy: number;
-  /** The provinces of the leg it is on. */
-  from: number;
-  to: number;
   sprite: FigureName;
 }
 
 const SPRITE: Record<string, FigureName> = { caravan: "caravanTrain", barge: "barge", "trading ship": "cog" };
 
-/** Days since year 0 at a date and hour, so the movers' clock runs smoothly over months and years. */
-export function clockDays(date: GameDate, hour: number): number {
-  return Date.UTC(date.year, date.month - 1, date.day ?? 1) / 86_400_000 + hour / 24;
+type XY = readonly [number, number];
+
+/** The points of a leg: its tiles over land, else the centres of the two provinces. */
+function legPoints(w: Pick<TraderWalk, "from" | "to" | "tiles">, tileAt: (tile: number) => XY, centre: (province: number) => XY): XY[] {
+  return w.tiles.length >= 2 ? Array.from(w.tiles, tileAt) : [centre(w.from), centre(w.to)];
 }
 
-/** The point a share `at` of the way round a closed loop, by length, with the leg it is on. */
-export function alongLoop(pts: readonly (readonly [number, number])[], at: number): { x: number; y: number; leg: number; dx: number; dy: number } {
-  const n = pts.length;
-  const len = (k: number) => Math.hypot(pts[(k + 1) % n]![0] - pts[k]![0], pts[(k + 1) % n]![1] - pts[k]![1]);
-  let total = 0;
-  for (let k = 0; k < n; k++) total += len(k);
-  let left = (((at % 1) + 1) % 1) * total;
-  for (let k = 0; k < n; k++) {
-    const l = len(k);
-    if (left <= l || k === n - 1) {
-      const [ax, ay] = pts[k]!;
-      const [bx, by] = pts[(k + 1) % n]!;
-      const t = l > 0 ? Math.min(1, left / l) : 0;
-      return { x: ax + (bx - ax) * t, y: ay + (by - ay) * t, leg: k, dx: bx - ax, dy: by - ay };
-    }
-    left -= l;
-  }
-  return { x: pts[0]![0], y: pts[0]![1], leg: 0, dx: 0, dy: 0 };
+/** The point a share of the way along a leg, stepping tile to tile, and the way it heads there. */
+export function onLeg(pts: readonly XY[], progress: number): { x: number; y: number; ux: number; uy: number } {
+  if (pts.length < 2) return { x: pts[0]![0], y: pts[0]![1], ux: -1, uy: 0 };
+  const { index, frac } = traderOnLeg(pts.length, progress);
+  const [ax, ay] = pts[index]!;
+  const [bx, by] = pts[index + 1]!;
+  const l = Math.hypot(bx - ax, by - ay) || 1;
+  return { x: ax + (bx - ax) * frac, y: ay + (by - ay) * frac, ux: (bx - ax) / l, uy: (by - ay) / l };
 }
 
-/** Where a path's movers stand at a game clock, in map pixels, from the provinces' centre points. */
-export function placeMovers(p: MoverPath, days: number, centre: (province: number) => readonly [number, number]): PlacedMover[] {
-  if (p.path.length < 2) return [];
-  const pts = p.path.map(centre);
-  return traderMovers(p, days).map((m) => {
-    const a = alongLoop(pts, m.at);
-    const l = Math.hypot(a.dx, a.dy) || 1;
-    return { x: a.x, y: a.y, right: a.dx > 0, ux: a.dx / l, uy: a.dy / l, from: p.path[a.leg]!, to: p.path[(a.leg + 1) % p.path.length]!, sprite: SPRITE[m.kind] ?? "caravanTrain" };
-  });
+/**
+ * Where a trader is drawn a share `t` of the way through the step from the
+ * previous day's walk to this one's: on along the same leg, or finishing the
+ * last leg and starting the next when it entered a province; anything else
+ * (a new route, a lost save) puts it straight where the game has it.
+ */
+export function placeTrader(now: TraderWalk, before: TraderWalk | undefined, t: number, tileAt: (tile: number) => XY, centre: (province: number) => XY): PlacedTrader {
+  const sprite = SPRITE[traderFigure(now.medium)] ?? "caravanTrain";
+  const k = Math.min(1, Math.max(0, t));
+  let at: { x: number; y: number; ux: number; uy: number };
+  if (before && before.from === now.from && before.to === now.to) at = onLeg(legPoints(now, tileAt, centre), before.progress + (now.progress - before.progress) * k);
+  else if (before && before.to === now.from && before.from !== before.to) {
+    const v = before.progress - 1 + (now.progress - (before.progress - 1)) * k;
+    at = v < 0 ? onLeg(legPoints(before, tileAt, centre), 1 + v) : onLeg(legPoints(now, tileAt, centre), v);
+  } else at = onLeg(legPoints(now, tileAt, centre), now.progress);
+  return { ...at, sprite };
 }

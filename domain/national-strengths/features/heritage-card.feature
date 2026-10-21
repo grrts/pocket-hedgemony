@@ -8,7 +8,7 @@ Feature: Heritage card
   Scenario: The heritage card of Venice
     Given the country "Venice" has the birthright "Lagoon and Arsenal"
     And the golden age "The mude to Alexandria" is active in the "Age of Gunpowder Empires"
-    And "Venice" has 3 active ambitions, one of them hinted and warm
+    And "Venice" has 3 open ambitions, one of them within reach
     And "Venice" has the weakness "The feared lion" and no legacies
     When the player opens the heritage card of "Venice"
     Then the card shows the rows Birthright, Golden age, Ambitions, Weakness and Legacies and no more

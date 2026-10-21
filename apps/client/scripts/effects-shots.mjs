@@ -12,6 +12,7 @@ page.on("pageerror", (e) => console.log("pageerror:", e.message));
 await page.goto("http://localhost:4181/");
 await page.waitForSelector(".map-layer", { timeout: 30000 });
 await page.click("[data-nation=france]");
+await page.click("[data-begin]");
 await page.waitForFunction(() => window.__phTurn() >= 0, null, { timeout: 60000 });
 await page.waitForTimeout(2000);
 await page.click(".panel .close").catch(() => {});
@@ -33,5 +34,19 @@ for (const [kind, zoom] of [["flip", 6], ["built", 6], ["rising", 6], ["glory", 
   console.log(kind, zoom, p);
   await page.waitForTimeout(1500);
 }
+// The living world: chimney smoke close in, then snow and birds at Region zoom (VIEW-146 to VIEW-148).
+await page.evaluate(() => {
+  const at = window.__phCapitalOf(window.__phNation("france"));
+  window.__phMap.lookAt(at.x, at.y, 24);
+});
+await page.waitForTimeout(4000);
+await page.screenshot({ path: `${out}/living-smoke.png` });
+await page.evaluate(() => {
+  window.__phStageCelsius(-8);
+  const at = window.__phCapitalOf(window.__phNation("france"));
+  window.__phMap.lookAt(at.x, at.y, 6);
+});
+await page.waitForTimeout(4000);
+await page.screenshot({ path: `${out}/living-snow.png` });
 await browser.close();
 server.httpServer.close();
