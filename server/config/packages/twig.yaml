@@ -1,0 +1,15 @@
+twig:
+    file_name_pattern: '*.twig'
+    globals:
+        # The playable game's address; the site's Play buttons are hidden while it is empty.
+        play_url: '%env(PLAY_URL)%'
+        # The game's store pages; each store button is hidden while its address is empty.
+        store_app_store_url: '%env(STORE_APP_STORE_URL)%'
+        store_google_play_url: '%env(STORE_GOOGLE_PLAY_URL)%'
+        store_steam_url: '%env(STORE_STEAM_URL)%'
+        # Where players write to; the site shows it only when it is set.
+        support_email: '%env(SUPPORT_EMAIL)%'
+
+when@test:
+    twig:
+        strict_variables: true

@@ -737,11 +737,11 @@ When(/^the player moves to step (\d)$/, (s, step: string) => {
   acted(s);
 });
 
-Then("the options offered are difficulty, AI aggression, fog, historical or free events, ironman, and the end date", (_s) => {
-  expect(campaignOptions()).toEqual(["difficulty", "AI aggression", "fog", "historical or free events", "ironman", "end date"]);
+Then("the options offered are difficulty, AI aggression, fog, historical, plausible or free events, ironman, and the end date", (_s) => {
+  expect(campaignOptions()).toEqual(["difficulty", "AI aggression", "fog", "historical, plausible or free events", "ironman", "end date"]);
 });
 
-const PRESET = { difficulty: "normal", "AI aggression": "calm", fog: "on", "historical or free events": "historical", ironman: "off", "end date": "1939-08-31" };
+const PRESET = { difficulty: "normal", "AI aggression": "calm", fog: "on", "historical, plausible or free events": "historical", ironman: "off", "end date": "1939-08-31" };
 
 When("the player picks a preset", (s) => {
   s.filled = applyPreset(s.nc, PRESET);
@@ -2766,7 +2766,7 @@ Then("no win fires", (s) => {
 
 Given("a campaign as {string} has won by world domination in January 1700", (s, realm: string) => {
   const shell = loadCampaign(s, realm, { year: 1700, month: 1 });
-  expect(checkDomination(shell, 1, 1100, 2000)).toBe(true);
+  expect(checkDomination(shell, 1, 2000, 2000)).toBe(true);
   startCampaignEnd(shell, [], "world domination");
   closingSequence(shell, ["1444", "1700"]);
   s.final = finalResult(shell, { ledger: ["Ottomans"], outcome: "Victory: World domination", achievements: [] });
@@ -3661,7 +3661,7 @@ Then("the page {string} sits in the section {string}", (_s, page: string, sectio
 
 // The Realm overview (SHELL-170, SHELL-171)
 
-const OVERVIEW_BASE: OverviewInput = { gold: 0, perMonth: 0, hungry: 0, low: 0, provinces: 1, people: 0, newLands: 0, risings: 0, verdicts: 0, huntWaits: 0, armies: 0, men: 0, fleets: 0, wars: 0, allies: 0, subjects: 0, answerWaits: false, study: { name: "Plough", pct: 10 }, beliefLow: false };
+const OVERVIEW_BASE: OverviewInput = { gold: 0, perMonth: 0, hungry: 0, low: 0, short: 0, provinces: 1, people: 0, newLands: 0, risings: 0, verdicts: 0, huntWaits: 0, armies: 0, men: 0, fleets: 0, wars: 0, allies: 0, subjects: 0, answerWaits: false, study: { name: "Plough", pct: 10 }, beliefLow: false };
 
 Given("the realm stands as:", (s, table: Table) => {
   const v: OverviewInput = { ...OVERVIEW_BASE };

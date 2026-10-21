@@ -1,5 +1,5 @@
 {
- "$comment": "D-EVT-22, plan-1378 §5: the bridge events of 1378 to 1444 for South, East and Southeast Asia, Africa and the Americas. Same shape as events-campaign.json; they join only a campaign that starts before 1444 (EVT-095). An event whose id is already in events-campaign.json replaces it there (a 1444 event re-dated to its conditions, EVT-096). entities names realms the game does not know yet; places maps new place keys to map provinces. Sources: start-date/research/asia.md and africa-americas.md (section F of each part).",
+ "$comment": "D-EVT-23, plan-1378 §5: the bridge events of 1378 to 1444 for South, East and Southeast Asia, Africa and the Americas. Same shape as events-campaign.json; they join only a campaign that starts before 1444 (EVT-095). An event whose id is already in events-campaign.json replaces it there (a 1444 event re-dated to its conditions, EVT-096). entities names realms the game does not know yet; places maps new place keys to map provinces. Sources: start-date/research/asia.md and africa-americas.md (section F of each part).",
  "events": {
   "air_sultanate_founded": {
    "id": "air_sultanate_founded",

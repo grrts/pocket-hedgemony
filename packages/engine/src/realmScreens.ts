@@ -1,5 +1,5 @@
 import type { Snapshot } from "./protocol.ts";
-import { STABILITY, type Stability, type StabilityPillar } from "./stability.ts";
+import { STABILITY, STABILITY_EFFECTS, type Stability, type StabilityPillar } from "./stability.ts";
 import { TAX_RATES } from "./treasury.ts";
 
 /**
@@ -79,9 +79,9 @@ export const STABILITY_NOTE = [
 ] as const;
 
 /** The tab that mends each pillar. */
-export const PILLAR_TAB: Record<StabilityPillar["key"], RealmTab> = { lords: "lords", subjects: "diplomacy", officials: "officials", provinces: "provinces" };
+export const PILLAR_TAB: Record<StabilityPillar["key"], RealmTab> = { lords: "lords", subjects: "diplomacy", officials: "officials", provinces: "provinces", treasury: "treasury" };
 
-const PILLAR_LABEL: Record<StabilityPillar["key"], string> = { lords: "Lords", subjects: "Subjects", officials: "Officials", provinces: "Provinces" };
+const PILLAR_LABEL: Record<StabilityPillar["key"], string> = { lords: "Lords", subjects: "Subjects", officials: "Officials", provinces: "Provinces", treasury: "Treasury" };
 
 const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
 
@@ -95,6 +95,7 @@ export function pillarLine(p: StabilityPillar): string {
   const c = p.counts;
   if (p.key === "lords") return loyaltyLine(c, "No lords: all royal land");
   if (p.key === "subjects") return loyaltyLine(c, "No subjects");
+  if (p.key === "treasury") return c.defaulted! >= 0 ? `Defaulted in ${c.defaulted}: troubled until ${c.until}` : c.monthsLeft ? `Empty, nothing left to borrow: default in ${c.monthsLeft === 1 ? "a month" : `${c.monthsLeft} months`}` : "Paying its way";
   if (p.key === "officials") return c.empty ? `${plural(c.empty!, "royal post")} of ${c.posts} standing empty` : `All ${plural(c.posts!, "royal post")} filled`;
   if (c.rioting || c.plotting) return [c.plotting && `${c.plotting} plotting`, c.rioting && `${c.rioting} rioting`, c.grumbling && `${c.grumbling} grumbling`].filter(Boolean).join(", ");
   return c.grumbling ? `${c.grumbling} grumbling, the rest calm` : `All ${c.all} calm`;
@@ -114,7 +115,24 @@ export interface StabilitySectionView {
   step: number;
   words: string;
   note: string;
+  /** What this step costs the realm, or what the first costly step would (X-29). */
+  cost: string;
   pillars: PillarRow[];
+}
+
+const RISING_WORDS = (x: number) => (x >= 2 ? `${x === 2 ? "twice" : `${x} times`} as often` : `${Math.round((x - 1) * 100)} % more often`);
+
+/** What a step costs in words (X-29): less tax and recruits, plotting provinces rising more often; for a step that costs nothing, what the first costly one would. */
+export function stabilityCost(step: number): string {
+  const say = (e: (typeof STABILITY_EFFECTS)[number], gets: string) => {
+    const take = [e.tax < 1 && `${Math.round((1 - e.tax) * 100)} % less tax`, e.recruits < 1 && `${Math.round((1 - e.recruits) * 100)} % fewer recruits`].filter(Boolean).join(" and ");
+    const rise = e.rising > 1 ? `plotting provinces rise ${RISING_WORDS(e.rising)}` : "";
+    return [take && `the crown ${gets} ${take}`, rise].filter(Boolean).join(", and ");
+  };
+  const now = say(STABILITY_EFFECTS[step]!, "gets");
+  if (now) return `${now[0]!.toUpperCase()}${now.slice(1)}.`;
+  const next = STABILITY_EFFECTS.findIndex((e, k) => k > step && say(e, "gets"));
+  return next < 0 ? "" : `No cost yet; at ${STABILITY[next]} ${say(STABILITY_EFFECTS[next]!, "would get")}.`;
 }
 
 /** The General tab's Stability section: the step, what it means and one row per pillar, each opening the tab that mends it. */
@@ -123,6 +141,7 @@ export function stabilitySection(s: Stability): StabilitySectionView {
     step: s.step,
     words: STABILITY[s.step]!,
     note: STABILITY_NOTE[s.step]!,
+    cost: stabilityCost(s.step),
     pillars: s.pillars.map((p) => ({ key: p.key, label: PILLAR_LABEL[p.key], line: pillarLine(p), step: p.step, words: STABILITY[p.step]!, opens: PILLAR_TAB[p.key] })),
   };
 }
@@ -177,7 +196,7 @@ export function taxLine(s: Pick<Snapshot, "provinceTax" | "taxDefault" | "provin
 
 // ------------------------------------------------------------ the Treasury tab (REALM-184, REALM-198)
 
-const LEDGER_LABEL: Record<string, string> = { grain: "Grain sold", tax: "Tax", trade: "Trade", "army pay": "Army pay", officials: "Officials' wages", interest: "Debt interest", schools: "Schools", tribute: "Tribute", navy: "Ships and sailors", furs: "Furs and hides" };
+const LEDGER_LABEL: Record<string, string> = { grain: "Grain sold", tax: "Tax", trade: "Trade", "army pay": "Army pay", officials: "Officials' wages", interest: "Debt interest", schools: "Schools", tribute: "Tribute", navy: "Ships and sailors", furs: "Furs and hides", "new land": "Holding new land" };
 
 export interface LedgerRow {
   line: string;

@@ -59,6 +59,7 @@ for (const [size, device, realms] of sizes) {
     if (!/^Starts in (Ancient|Medieval|Era I)$/.test(starts ?? "")) fail(name, "picker standing reads", starts);
     if (realm === "france") await shot("picker");
     await page.click(`[data-nation=${realm}]`);
+    await page.click("[data-begin]");
     await page.waitForSelector(".hud [data-news]", { timeout: 60000 });
     await page.waitForTimeout(800);
     // First-campaign hints would cover the shots: stop them.

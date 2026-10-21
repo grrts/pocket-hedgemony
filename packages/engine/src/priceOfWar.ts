@@ -1,5 +1,5 @@
 import type { World } from "./world.ts";
-import { defaultAim, relationState, strength } from "./war.ts";
+import { declaringAim, relationState, strength } from "./war.ts";
 import { censureOf } from "./faithHeads.ts";
 import { maxCeded, peaceShare } from "./peace.ts";
 import * as dip from "./domain/diplomacy/index.ts";
@@ -8,6 +8,9 @@ import * as rc from "./domain/recruiting/index.ts";
 import { kindFights } from "./domain/subjects/index.ts";
 import { ARMS, armyPay, canCall, KIND, KIND_NAMES, menByArm } from "./recruit.ts";
 import { LOYALTY } from "./lords.ts";
+import { lordsWhoTurn, NO_AIM } from "./aimlessWar.ts";
+import { warRaise } from "./arms.ts";
+import { canBorrow } from "./treasury.ts";
 
 /**
  * The price of war (X-21): what a declaration costs before it is made. The
@@ -37,8 +40,20 @@ export interface PriceOfWar {
   threatened: number[];
   /** The declarer's lords who will waver when it takes land in a war with no fitting aim (WAR-222). */
   waveringLords: number;
-  /** The game declares every war with no aim for now. */
+  /**
+   * The aim the declaration will be made with (declaringAim: the best fitting
+   * aim the declarer holds against the target, else "no_aim"), as diplomacy
+   * names it, with the province a Take land aim names and why it is held.
+   */
+  aim: { aim: string; province?: number; source?: string };
+  /** The declarer holds no fitting aim against the target: the war is declared with no aim. */
   noAim: boolean;
+  /**
+   * What a war with no aim costs the declarer the day it is declared (F-167), null for a war with
+   * an aim: its lords who lose loyalty and by how many steps, the notoriety it gains, its provinces
+   * that will hold Unjust war, what its peace voices gain, and its allies who stay out.
+   */
+  aimless: { lords: number; lordSteps: number; notoriety: number; provinces: number; peaceShare: number; alliesStayOut: number[] } | null;
   /** A truce the declaration breaks, and the month it would have lasted to. */
   truce: { until: string | null } | null;
   /** Gold a month the declarer's armies draw at war, levies paid from their first month (WAR-225). */
@@ -98,13 +113,10 @@ export function warPay(world: World, n: number): number {
 
 /**
  * Gold a month an AI realm would pay at war: its armies at war pay, and the
- * levies it would raise (as aiRecruits does: what it can call, up to half its
- * income's worth and 10,000 men).
+ * levies it would call in its first month (as aiRecruits does, DIPL-233).
  */
 export function aiWarPay(world: World, n: number): number {
-  const per = levyPer1000(world);
-  const raise = per > 0 ? Math.min(canCall(world, n), ((Math.max(0, world.nationMonthlyIncome[n]!) * 0.5) / per) * 1000, 10000) : 0;
-  return warPay(world, n) + (raise / 1000) * per;
+  return warPay(world, n) + (warRaise(world, n) / 1000) * levyPer1000(world);
 }
 
 /**
@@ -129,6 +141,8 @@ export interface PriceContext {
   threatened: number[];
   waveringLords: number;
   monthlyPay: number;
+  /** Lords who would lose loyalty in a war with no aim (F-167). */
+  lordsWhoTurn: number;
   leagueAgainstA: string[];
   allies: Map<string, string[]>;
   pledgers: Map<string, string[]>;
@@ -164,6 +178,7 @@ export function priceContext(world: World, a: number): PriceContext {
     threatened,
     waveringLords,
     monthlyPay: warPay(world, a),
+    lordsWhoTurn: lordsWhoTurn(world, a),
     leagueAgainstA: dip.leagueAgainst(d, aid)?.members ?? [],
     allies,
     pledgers,
@@ -211,14 +226,21 @@ export function priceOfWar(world: World, a: number, b: number, ctx: PriceContext
     const fights = kindFights(dip.subjectKind(d, id));
     if (fights === "always_if_loyal_or_wavering" || fights === "when_called_by_loyalty" || (fights === "own_frontier_only" && dip.borders(d, id, aid))) add(against, id, "subject");
   }
+  const held = declaringAim(world, a, b);
+  const noAim = held.aim === "no_aim";
   const friends: PriceOfWarCall[] = [];
+  const alliesStayOut: number[] = [];
   const target = strengthOf(world, ctx, b);
   for (const id of ctx.allies.get(aid) ?? []) {
     const n = world.nationIndex.get(id);
     if (n === undefined || n === world.player || seen.has(n) || dip.warOf(d, id)) continue;
-    if (strengthOf(world, ctx, n) * 2 >= target) add(friends, id, "alliance");
+    // An AI ally stays out of a war with no aim (F-167).
+    if (noAim && NO_AIM.allies_refuse) alliesStayOut.push(n);
+    else if (strengthOf(world, ctx, n) * 2 >= target) add(friends, id, "alliance");
   }
   const st = relationState(world, a, b);
+  const aimProvince = held.province === undefined ? undefined : world.provinceIndex.get(held.province);
+  const aim: PriceOfWar["aim"] = { aim: held.aim, ...(aimProvince !== undefined ? { province: aimProvince } : {}), ...(held.source && held.aim !== "no_aim" ? { source: held.source } : {}) };
   const ourSide = strengthOf(world, ctx, a) + friends.reduce((t, c) => t + c.soldiers, 0);
   let theirSide = target + against.reduce((t, c) => t + c.soldiers, 0);
   // A league against a may join any later war: the AI counts every member (WAR-228).
@@ -232,7 +254,11 @@ export function priceOfWar(world: World, a: number, b: number, ctx: PriceContext
     friends,
     threatened: ctx.threatened.filter((n) => n !== b),
     waveringLords: ctx.waveringLords,
-    noAim: true,
+    aim,
+    noAim,
+    aimless: noAim
+      ? { lords: ctx.lordsWhoTurn, lordSteps: NO_AIM.lord_steps, notoriety: NO_AIM.notoriety, provinces: ctx.counts[a]!, peaceShare: NO_AIM.peace_share, alliesStayOut }
+      : null,
     truce: st.state === "truce" ? { until: st.until ?? null } : null,
     monthlyPay: ctx.monthlyPay,
     maxCeded: maxCededProvinces(world, b, ctx.counts),
@@ -242,22 +268,31 @@ export function priceOfWar(world: World, a: number, b: number, ctx: PriceContext
   };
 }
 
+/** Whether realm t is at war with a realm other than n (DIPL-242). */
+export function atWarElsewhere(world: World, t: number, n: number): boolean {
+  const nid = world.nationIds[n]!;
+  return rel.enemiesOf(world.diplomacy.graph, world.nationIds[t]!).some((e) => e !== nid);
+}
+
 /**
  * Why the AI realm n would not declare on t now, or null when it may (WAR-228):
  * its side must beat t's side, with everyone called against it, by
- * `warfare.ai.declare_strength_ratio`; its treasury must hold
+ * `warfare.ai.declare_strength_ratio`, less against a target already at war
+ * elsewhere and in a month it gambles (DIPL-242, DIPL-243); its treasury must hold
  * `warfare.ai.war_chest_months` of its pay at war; its own peace voices must
  * not say peace on the day; and its notoriety must be under
  * `diplomacy.ai.notoriety_restraint` unless it is Warlike or a hegemon seeker.
  */
-export function whyAiWontDeclare(world: World, n: number, t: number, price: PriceOfWar = priceOfWar(world, n, t)): string | null {
-  const ratio = world.rules.defines.war.aiDeclareStrengthRatio;
+export function whyAiWontDeclare(world: World, n: number, t: number, price: PriceOfWar = priceOfWar(world, n, t), gamble = false): string | null {
+  // A target already at war with another realm is an opportunity; a month's gamble accepts a little less (DIPL-242, DIPL-243).
+  const ratio = dip.declareRatio(world.rules.defines.war.aiDeclareStrengthRatio, atWarElsewhere(world, t, n), gamble);
   if (!(price.ourSide > price.theirSide * ratio)) return "their side is too strong";
+  // What lenders would give counts toward the chest: an AI realm borrows for its wars (DIPL-234).
   const chest = wf.W.ai.war_chest_months * aiWarPay(world, n);
-  if (world.nationTreasury[n]! < chest) return "no war chest";
+  if (world.nationTreasury[n]! + canBorrow(world, n) < chest) return "no war chest";
   if (wouldSayPeaceAtDeclaration(world, n)) return "its people want peace";
   if (!heedsNoNotoriety(world, n) && dip.notoriety(world.diplomacy, world.nationIds[n]!) >= dip.config.ai.notoriety_restraint) return "too notorious";
   // A war its faith's head would censure costs a wrong with every fellow believer and a Punish aim for all (RELG-156).
-  if (!heedsNoNotoriety(world, n) && censureOf(world, n, t, defaultAim(world, n, t)?.aim ?? "no_aim")) return "the faith would censure it";
+  if (!heedsNoNotoriety(world, n) && censureOf(world, n, t, price.aim.aim)) return "the faith would censure it";
   return null;
 }

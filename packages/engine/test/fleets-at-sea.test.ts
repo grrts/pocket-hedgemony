@@ -26,12 +26,17 @@ function fleet(w: World, who: number, at: number, type: string, count = 1): Navy
   return f;
 }
 
-/** A commander of realm `who` made from an official, free of any army. */
+/** An admiral of realm `who` made from an official, free of any fleet (RECR-128). */
 function commander(w: World, who: number): number {
   w.nationTreasury[who] = 1000;
   const post = w.provinceOfficial.findIndex((o, q) => o >= 0 && w.provinceOwner[q] === who && w.provinceLord[q]! < 0);
-  expect(act(w, { type: "commission", province: post }, who)).toEqual([]);
+  expect(act(w, { type: "commission", province: post, sea: true }, who)).toEqual([]);
   return w.commanderIds.length - 1;
+}
+
+/** Gives fleet f a leader, so warships may sail. */
+function commanderFor(w: World, who: number, f: NavyFleet): void {
+  f.admiral = commander(w, who);
 }
 
 /** Water tiles of zone z, as [tile, x, y]. */
@@ -67,6 +72,61 @@ describe("fleets sail tile by tile (NAVY-147..134)", () => {
     expect(f.tile).toBe(w.tiles.centre[far]);
     // Many tiles on the way, not a jump from zone to zone.
     expect(seen.size).toBeGreaterThan(10);
+  });
+
+  /** A fleet sails from realm `id`'s capital to a zone `rings` zones out: its whole course is planned over water tiles, each beside the last, and sailed in order. */
+  function sailsItsCourse(seed: number, id: string, type: string, rings: number, maxDry = 0): void {
+    const w = createWorld(rules, seed, tiles);
+    const me = n(w, id);
+    w.player = me;
+    const port = capital(w, id);
+    const f = fleet(w, me, port, type, 2);
+    commanderFor(w, me, f);
+    const near = seaBeside(w, port);
+    const seen = new Set(near);
+    let ring = near;
+    for (let i = 0; i < rings; i++) ring = ring.flatMap((z) => seaBeside(w, z)).filter((z) => !w.navy.ocean[z] && !seen.has(z) && (seen.add(z), true));
+    const far = ring.find((z) => act(w, { type: "navy", do: "sail", fleet: f.id, to: z }, me).length === 0 && f.route.length >= 3)!;
+    expect(far).toBeDefined();
+    // Planned when the order is given, so the map draws it at once (NAVY-149).
+    const view = navyView(w, me).fleets.find((x) => x.id === f.id)!;
+    expect(view.whole).toBe(true);
+    expect(view.path.at(-1)).toBe(w.tiles.centre[far]);
+    const W = w.tiles.width;
+    // Over water, but for a strait narrower than the map's tiles: a handful of land tiles at most where it closes (the Bosporus).
+    let prev = f.tile;
+    let dry = 0;
+    for (const t of view.path) {
+      dry = w.tiles.cell[t] === WATER ? 0 : dry + 1;
+      expect(dry).toBeLessThanOrEqual(6);
+      expect(Math.max(Math.abs((t % W) - (prev % W)), Math.abs(Math.floor(t / W) - Math.floor(prev / W)))).toBe(1);
+      prev = t;
+    }
+    expect(view.path.filter((t) => w.tiles.cell[t] !== WATER).length).toBeLessThanOrEqual(maxDry);
+    // It sails that course a little each step: every tile it stands on is the next of them, in order.
+    const course = [f.tile, ...view.path];
+    let at = 0;
+    let moves = 0;
+    for (let s = 0; s < STEPS_PER_DAY * 90 && f.route.length; s++) {
+      advance(w, 1);
+      const k = course.indexOf(f.tile, at);
+      expect(k).toBeGreaterThanOrEqual(at);
+      if (k > at) moves++;
+      at = k;
+      expect(w.tiles.cell[f.tile]).toBe(WATER);
+      if (w.provinceWater[f.at]) expect(zoneOf(w, f.tile)).toBe(f.at);
+    }
+    expect(f.route).toEqual([]);
+    expect(f.tile).toBe(w.tiles.centre[far]);
+    expect(moves).toBeGreaterThan(5);
+  }
+
+  it("plans the whole voyage over the water at once and sails it a step at a time, as an army its march", () => {
+    sailsItsCourse(14, "portugal", "cog", 3);
+  });
+
+  it("finds its way through a strait, beside its route or narrower than a tile, and never stands on land", () => {
+    sailsItsCourse(15, "ottomans", "galley", 2, 6);
   });
 
   it("sails to the spot of a zone the player tapped", () => {

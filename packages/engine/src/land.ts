@@ -5,7 +5,7 @@ import { CLASS_COUNT, CLASS_NAMES } from "./living.ts";
 import { GROUNDS, groundOfCell, WATER } from "./tiles.ts";
 import { buildingOutput, groundStartMix, peopleOutput, shareOut } from "./domain/province/land.ts";
 import { knownSet } from "./research.ts";
-import { provinceConfig } from "./domain/province/model.ts";
+import { CLASSES, provinceConfig } from "./domain/province/model.ts";
 
 /**
  * Land (feedback 80 and 87; province PROV-010, PROV-011, PROV-068, PROV-080,
@@ -148,7 +148,12 @@ export function seedLand(world: World): void {
  * design's (median 46,000, a tenth over 300,000), so a tile holds more (D-PROV-25).
  */
 let slotScale = 1;
-const slots = (name: string): number => (((provinceConfig.buildings.land as Record<string, { slots: number }>)[name]?.slots ?? 0) / 1000) * slotScale;
+const slotsK = new Map<string, number>();
+const slots = (name: string): number => {
+  let k = slotsK.get(name);
+  if (k === undefined) slotsK.set(name, (k = ((provinceConfig.buildings.land as Record<string, { slots: number }>)[name]?.slots ?? 0) / 1000));
+  return k * slotScale;
+};
 const perWorker = (name: string): number => (provinceConfig.buildings.land as Record<string, { food_per_worker?: number }>)[name]?.food_per_worker ?? 0;
 const BARE = provinceConfig.food.bare_per_worker;
 
@@ -164,6 +169,8 @@ export const FOOD_CLASSES = Object.keys(FOOD_WORK) as FoodClass[];
 
 /** The tile use each food class works. */
 const CLASS_USE: Record<FoodClass, UseName> = { farmers: "fields", herders: "pasture", seafolk: "shore", woodsmen: "woods" };
+/** Each food class's place in a province's classes. */
+const CLASS_AT: Record<FoodClass, number> = { farmers: CLASSES.indexOf("farmers"), herders: CLASSES.indexOf("herders"), seafolk: CLASSES.indexOf("seafolk"), woodsmen: CLASSES.indexOf("woodsmen") };
 
 /**
  * People a food class feeds in a year, in thousands, at a normal harvest
@@ -176,13 +183,14 @@ const CLASS_USE: Record<FoodClass, UseName> = { farmers: "fields", herders: "pas
  */
 export function classFood(world: World, p: number, cls: FoodClass, step: number, share = 1): number {
   const work = FOOD_WORK[cls];
-  const workers = world.provinceClasses[p * CLASS_COUNT + CLASS_NAMES.indexOf(cls)]!;
+  const workers = world.provinceClasses[p * CLASS_COUNT + CLASS_AT[cls]]!;
   const ground = world.provinceGround[p] ?? "grassland";
   const bareRate = BARE * peopleOutput(ground, work.activity);
   if (cls === "woodsmen") return huntingFood(world, p, workers, bareRate, step > 0 ? share : 0);
-  const room = tilesOf(world, p, CLASS_USE[cls]) * slots(work.building);
-  // Farmers fill the sound fields first; those on worn fields bring in half (PROV-034).
-  const onWorn = cls === "farmers" ? Math.max(0, Math.min(workers, room) - (room - wornFields(world, p) * slots(work.building))) : 0;
+  const tiles = tilesOf(world, p, CLASS_USE[cls]);
+  const room = tiles * slots(work.building);
+  // Farmers fill the sound fields first; those on worn fields bring in half (PROV-034, wornFields).
+  const onWorn = cls === "farmers" ? Math.max(0, Math.min(workers, room) - (room - Math.min(world.provinceWorn[p]!, tiles) * slots(work.building))) : 0;
   const wornLoss = 1 - WORN.output;
   if (!work.building || step <= 0) return (workers - onWorn * wornLoss) * bareRate;
   const inside = Math.min(workers, room);

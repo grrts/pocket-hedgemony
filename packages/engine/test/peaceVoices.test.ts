@@ -51,11 +51,18 @@ function foeOf(w: World, a: number): number {
   return n(w, foe1444!);
 }
 
-/** At war: `a` declares on `b` (the aim given, else no aim), and the war. */
+/**
+ * At war: `a` declares on `b` (the aim given, else no aim), and the war. A war
+ * with no aim is declared on a Punish aim and then made aimless, so the
+ * declaration's own price (F-167, aimlessWar.test.ts) leaves the lords be.
+ */
 function war(w: World, a: number, b: number, aim = "no_aim") {
-  const r = applyNow(w, { type: "declareWar", target: b, aim }, a);
+  if (aim === "no_aim") w.diplomacy.aims.push({ holder: w.nationIds[a]!, target: w.nationIds[b]!, aim: "punish", source: "test" });
+  const r = applyNow(w, { type: "declareWar", target: b, aim: aim === "no_aim" ? "punish" : aim }, a);
   expect(r.rejectedOrders).toEqual([]);
-  return warBetween(w, a, b)! as GameWar;
+  const x = warBetween(w, a, b)! as GameWar;
+  if (aim === "no_aim") x.aim = "no_aim";
+  return x;
 }
 
 describe("the price of war: peace voices in the game (WAR-221)", () => {
@@ -217,6 +224,8 @@ describe("the price of war: no fitting aim and broken truces (WAR-222)", () => {
     expect(relationState(w, fr, en).state).toBe("truce");
     expect(applyNow(w, { type: "declareWar", target: en }, fr).rejectedOrders[0]?.reason).toMatch(/truce/);
     for (const k of lordsOf(w, fr)) expect(w.lords[k]!.loyalty).toBe("Loyal");
+    // On a Punish aim, so only the broken truce moves the lords (a war with no aim costs more, F-167).
+    w.diplomacy.aims.push({ holder: "france", target: "england", aim: "punish", source: "test" });
     expect(applyNow(w, { type: "declareWar", target: en, breakTruce: true }, fr).rejectedOrders).toEqual([]);
     expect(relationState(w, fr, en).state).toBe("war");
     for (const k of lordsOf(w, fr)) expect(w.lords[k]!.loyalty).toBe("Wavering");

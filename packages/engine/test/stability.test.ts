@@ -12,7 +12,7 @@ describe("stability: the weakest of lords, subjects, officials and provinces", (
     const w = createWorld(rules, 1, tiles);
     const me = w.nationIndex.get("france")!;
     const s = stabilityOf(w, me);
-    expect(s.pillars.map((p) => p.key)).toEqual(["lords", "subjects", "officials", "provinces"]);
+    expect(s.pillars.map((p) => p.key)).toEqual(["lords", "subjects", "officials", "provinces", "treasury"]);
     expect(s.step).toBe(Math.max(...s.pillars.map((p) => p.step)));
     const lords = s.pillars[0]!.counts;
     expect(lords.Loyal! + lords.Wavering! + lords.Disloyal! + lords["In revolt"]!).toBe(new Set(w.lords.flatMap((l, k) => (l.nation === me && w.provinceLord.includes(k) ? [k] : []))).size);

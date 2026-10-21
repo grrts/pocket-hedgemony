@@ -29,6 +29,8 @@ export interface MapViewEvents {
   onLongPress?(screenX: number, screenY: number, province: number): void;
   longPressMs?(): number;
   drawOverlay(o: OverlayContext): void;
+  /** The player moved the camera by hand: a drag that pans, or a pinch, wheel or double tap that zooms (the tutorial's camera steps, TUT-103). */
+  onCamera?(action: "pan" | "zoom"): void;
 }
 
 /**
@@ -56,6 +58,9 @@ export class MapView {
   private viewH = 0;
   readonly map: MapImage;
   private events: MapViewEvents;
+  /** The first error the map shader drew with, while simpler ones are tried; frames drawn cleanly since the last one. */
+  private mapError: string | null = null;
+  private cleanFrames = 0;
   readonly stats: FrameStats = { frames: 0, mapMs: [], overlayMs: [] };
   private readonly waitForGpu = new URLSearchParams(location.search).has("perf");
 
@@ -70,6 +75,7 @@ export class MapView {
       root.append(c);
     }
     this.renderer = new MapRenderer(gl, map, provinceCount);
+    gl.addEventListener("webglcontextlost", () => this.drawFailed("The map could not be drawn on this device: the graphics context was lost"));
     this.octx = this.overlay.getContext("2d")!;
     this.bindInput();
     new ResizeObserver(() => this.resize()).observe(root);
@@ -95,6 +101,15 @@ export class MapView {
   }
 
   readonly maxZoom = 40;
+
+  /** The view's size in CSS pixels, as last measured. */
+  get width(): number {
+    return this.viewW;
+  }
+
+  get height(): number {
+    return this.viewH;
+  }
 
   invalidate(): void {
     this.dirty = true;
@@ -143,6 +158,23 @@ export class MapView {
     const t0 = performance.now();
     this.renderer.draw(cam, t / 1000);
     if (this.waitForGpu) this.renderer.gl.finish();
+    if (this.renderer.watching) {
+      // A device that cannot run the map shader draws nothing and says so only here.
+      const late = this.renderer.gl.getError();
+      const err = this.renderer.firstError ?? (late ? `${late} outside any call` : null);
+      if (err !== null) {
+        // Try a simpler map before giving up, and say on the map which one drew (or that none did).
+        this.mapError ??= `WebGL error ${err}`;
+        this.cleanFrames = 0;
+        if (!this.renderer.simplify()) {
+          this.drawFailed(`The map could not be drawn on this device: ${this.mapError}`);
+          this.renderer.stopWatching();
+        }
+      } else if (++this.cleanFrames >= 2) {
+        if (this.mapError) this.drawFailed(`The map is drawn in simple mode ${this.renderer.lite} on this device after ${this.mapError}`);
+        this.renderer.stopWatching();
+      }
+    }
     const t1 = performance.now();
     const ctx = this.octx;
     ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
@@ -162,6 +194,17 @@ export class MapView {
     if (st.mapMs.length > 240) (st.mapMs.shift(), st.overlayMs.shift());
   }
 
+  /** Says on the map that it could not be drawn (or only simply), with what the device reports, so a player's screenshot names the cause. */
+  private drawFailed(what: string): void {
+    if (this.root.querySelector(".map-failed")) return;
+    const gl = this.renderer.gl;
+    const info = gl.isContextLost() ? "" : ` · ${gl.getParameter(gl.RENDERER)} · ${gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS)} textures`;
+    const p = document.createElement("p");
+    p.className = "map-failed";
+    p.textContent = `${what}${info}.`;
+    this.root.append(p);
+  }
+
   toScreen(x: number, y: number): [number, number] {
     const W = this.map.width;
     let dx = x - this.camera.x;
@@ -174,6 +217,11 @@ export class MapView {
     const x = this.camera.x + (sx - this.viewW / 2) / this.camera.zoom;
     const y = this.camera.y + (sy - this.viewH / 2) / this.camera.zoom;
     return [((x % this.map.width) + this.map.width) % this.map.width, y];
+  }
+
+  /** The province under the middle of the view (what the ambience hears, AUD-079). */
+  provinceAtCentre(): number {
+    return this.provinceAt(this.viewW / 2, this.viewH / 2);
   }
 
   provinceAt(sx: number, sy: number): number {
@@ -243,6 +291,7 @@ export class MapView {
         const dist = Math.hypot(a!.x - b!.x, a!.y - b!.y);
         const mid = { x: (a!.x + b!.x) / 2, y: (a!.y + b!.y) / 2 };
         this.zoomAt(mid.x, mid.y, (this.gesture.startZoom * dist) / this.gesture.pinchDist);
+        this.events.onCamera?.("zoom");
       }
     });
 
@@ -253,6 +302,8 @@ export class MapView {
       this.pointers.delete(e.pointerId);
       if (p && this.gesture && this.pointers.size === 0) {
         if (this.gesture.moved < 8 && e.type === "pointerup") this.events.onTap(p.x, p.y, this.provinceAt(p.x, p.y));
+        // A one-finger drag of some length pans; a pinch or a long-press is marked 99 and is not one.
+        else if (this.gesture.moved >= 40 && this.gesture.moved !== 99 && this.gesture.pinchDist === 0) this.events.onCamera?.("pan");
         this.gesture = null;
       }
       if (this.pointers.size === 1 && this.gesture) this.gesture.moved = 99;
@@ -266,12 +317,14 @@ export class MapView {
         e.preventDefault();
         const { x, y } = local(e as unknown as PointerEvent);
         this.zoomAt(x, y, this.camera.zoom * Math.exp(-e.deltaY * 0.0015));
+        this.events.onCamera?.("zoom");
       },
       { passive: false },
     );
     el.addEventListener("dblclick", (e) => {
       const { x, y } = local(e as unknown as PointerEvent);
       this.zoomAt(x, y, this.camera.zoom * 2);
+      this.events.onCamera?.("zoom");
     });
   }
 }

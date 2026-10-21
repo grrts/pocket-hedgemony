@@ -1,0 +1,367 @@
+<h1>Events data</h1>
+<p>Every value in the game&#39;s events config, exactly as the game reads it. This page is made from <code>packages/rules/data/domain/events.json</code> each time the config changes, so it always matches the game. How these values are used is explained on <a href="/wiki/Historical-Events">Historical Events</a>.</p>
+<p>Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and values marked (provisional) are placeholders that may still change in balancing. Inventions are shown by id and name; see <a href="/wiki/Data-Research#inventions">Research data</a>.</p>
+<blockquote>
+<p>Event tree rules (domain/events/spec.md). balance = event-tree/data/balance.yaml; vocabulary, enums and statistics are the event tree&#39;s closed lists. All balance values are placeholders.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>effect_tiers</code></td><td>immediate, delayed, ongoing, long_term, rising_won, rising_crushed</td></tr>
+<tr><td><code>layers</code></td><td>history_reference, ages, periods, event_definitions, triggers, selection, execution, choices, ai, effects, modifiers, statistics, balance, localization.en</td></tr>
+<tr><td><code>system_flags</code></td><td>ruler_died, succession_crisis, succession_dispute, regency, female_succession, ruler_led_campaign, emperor, empire_member, atlantic_island_bases, potato_blight, commercial_crisis, claim_on_spain, claim_on_milan, claim_on_naples, catholic_heir, church_corruption_scandal, inquisition_established, religious_persecution_active, missionary_persecution, colonial_dispute, confederation_policy, cotton_famine_or_sugar_boom, doctrine_of_lapse, forced_cash_crops, french_pacific_claims, opium_ban_enforced, penal_transport_needed, rubber_boom, sepoy_grievance, settler_land_pressure, transit_of_venus, witwatersrand_gold</td></tr>
+<tr><td><code>rebel_size_stat</code></td><td>recruit_pool</td></tr>
+</tbody></table></div>
+<h2 id="campaign"><a class="anchor" href="#campaign" aria-label="Link to this section">#</a>Campaign</h2>
+<blockquote>
+<p>D-EVT-1: events whose history starts after end_date are dropped when a campaign loads; out_of_scope_ages never start (X-14).</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>end_date</code></td><td>1939-08-31</td></tr>
+<tr><td><code>out_of_scope_ages</code></td><td>age_of_decolonization, cold_war, age_of_globalization</td></tr>
+</tbody></table></div>
+<h3 id="events-choice"><a class="anchor" href="#events-choice" aria-label="Link to this section">#</a>Events choice</h3>
+<blockquote>
+<p>D-EVT-9: the new-game &#39;Events&#39; choice; its value picks the alternate history preset.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>default</code></td><td>Plausible</td></tr>
+</tbody></table></div>
+<h4 id="values"><a class="anchor" href="#values" aria-label="Link to this section">#</a>Values</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>Historical</code></td><td>historical</td></tr>
+<tr><td><code>Plausible</code></td><td>plausible</td></tr>
+<tr><td><code>Free</code></td><td>divergent</td></tr>
+</tbody></table></div>
+<h2 id="balance"><a class="anchor" href="#balance" aria-label="Link to this section">#</a>Balance</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>validation_checks</code></td><td>Every referenced id (age, period, event, entity, region, area, province, modifier, source, stat, flag) exists., Every condition and effect type is declared in vocabulary.yaml with known parameters., Roles referenced as $role are declared in the event; every event has at least one role., Each event has 2+ options, exactly one historical option, and unique option ids., narrative_only events offer no option with a positive stat or prestige payoff to the perpetrator., Mandatory prerequisite graph (requires / event conditions in triggers) has no cycles (Tarjan SCC)., Earliest possible date propagated through prerequisites never exceeds an event&#39;s latest date (no impossible triggers)., Mutually exclusive events are never both mandatory prerequisites of a third event., Entities referenced in a trigger exist at the event&#39;s date or are created by a reachable earlier event., Flags read by triggers are set by some effect or declared as system flags., Ages and periods have start and end conditions; periods lie inside at least one of their ages., Coverage: events per macro-region per age, and agency share per region.</td></tr>
+</tbody></table></div>
+<h3 id="selection"><a class="anchor" href="#selection" aria-label="Link to this section">#</a>Selection</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>pool_roll_interval_months</code></td><td>1</td></tr>
+<tr><td><code>max_pool_events_per_country_year</code></td><td>3</td></tr>
+<tr><td><code>decision_expiry_years</code></td><td>10</td></tr>
+</tbody></table></div>
+<h4 id="alternate-history-mode"><a class="anchor" href="#alternate-history-mode" aria-label="Link to this section">#</a>Alternate history mode</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>follow up boost mult</th><th>historical option mult</th><th>mean years mult</th></tr></thead>
+<tbody>
+<tr><td>historical</td><td>1.5</td><td>2</td><td>0.8</td></tr>
+<tr><td>plausible</td><td>1</td><td>1</td><td>1</td></tr>
+<tr><td>divergent</td><td>0.6</td><td>0.5</td><td>1.3</td></tr>
+</tbody></table></div>
+<h3 id="follow-ups"><a class="anchor" href="#follow-ups" aria-label="Link to this section">#</a>Follow ups</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>max_boost</code></td><td>5</td></tr>
+<tr><td><code>boost_decay_years</code></td><td>10</td></tr>
+</tbody></table></div>
+<h3 id="ai-factors"><a class="anchor" href="#ai-factors" aria-label="Link to this section">#</a>Ai factors</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>at_war</code></td><td>Country is at war.</td></tr>
+<tr><td><code>low_treasury</code></td><td>Treasury below one year of expenses.</td></tr>
+<tr><td><code>high_unrest</code></td><td>More than half the country&#39;s provinces have 4 or more grievances (Plotting).</td></tr>
+<tr><td><code>same_religion</code></td><td>Other party shares state religion.</td></tr>
+<tr><td><code>rival</code></td><td>Other party is a rival.</td></tr>
+<tr><td><code>great_power</code></td><td>Country ranks in the top 8 by great_power_score.</td></tr>
+<tr><td><code>threatened</code></td><td>A hostile neighbour has more than 1.5x army_strength.</td></tr>
+</tbody></table></div>
+<h3 id="rebel-sizes-provisional"><a class="anchor" href="#rebel-sizes-provisional" aria-label="Link to this section">#</a>Rebel sizes (provisional)</h3>
+<blockquote>
+<p>D-EVT-5: share of the province&#39;s recruit pool that rises (X-9). Same 1:2:4:8 steps as the tree&#39;s sizes.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>small</code></td><td>0.125</td></tr>
+<tr><td><code>medium</code></td><td>0.25</td></tr>
+<tr><td><code>large</code></td><td>0.5</td></tr>
+<tr><td><code>huge</code></td><td>1</td></tr>
+</tbody></table></div>
+<h3 id="modifier-rules"><a class="anchor" href="#modifier-rules" aria-label="Link to this section">#</a>Modifier rules</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>default_stacking</code></td><td>refresh</td></tr>
+<tr><td><code>max_stacks</code></td><td>3</td></tr>
+<tr><td><code>exponential_half_life_share</code></td><td>0.5</td></tr>
+</tbody></table></div>
+<h3 id="coverage"><a class="anchor" href="#coverage" aria-label="Link to this section">#</a>Coverage</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>min_events_per_region_age</code></td><td>2</td></tr>
+<tr><td><code>min_agency_share</code></td><td>0.35</td></tr>
+</tbody></table></div>
+<h3 id="date-binding"><a class="anchor" href="#date-binding" aria-label="Link to this section">#</a>Date binding</h3>
+<blockquote>
+<p>EVT-019: approximate events weigh their pool chance toward the history date; mandatory events fire in their last year if the trigger holds.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>approximate_peak_mult</code> (provisional)</td><td>2</td></tr>
+<tr><td><code>approximate_spread_years</code> (provisional)</td><td>10</td></tr>
+</tbody></table></div>
+<h3 id="options"><a class="anchor" href="#options" aria-label="Link to this section">#</a>Options</h3>
+<blockquote>
+<p>D-EVT-7</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>min</code></td><td>2</td></tr>
+<tr><td><code>max</code> (provisional)</td><td>4</td></tr>
+</tbody></table></div>
+<h2 id="enums"><a class="anchor" href="#enums" aria-label="Link to this section">#</a>Enums</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>religions</code></td><td>catholic, protestant, anglican, orthodox, oriental_christian, sunni, shia, ibadi, jewish, hindu, sikh, theravada, mahayana, vajrayana, shinto, confucian_ritual, daoist, indigenous_american, african_traditional, pacific_traditional, siberian_steppe_traditional, secular</td></tr>
+<tr><td><code>governments</code></td><td>monarchy, elective_monarchy, theocracy, republic, merchant_republic, tribal, confederation, nomadic_empire, company, colonial_administration, constitutional_monarchy, liberal_democracy, one_party_state, communist, fascist, military_junta</td></tr>
+<tr><td><code>innovations</code></td><td>printing, bombards, humanist_learning, bastion_fortification, gunpowder_infantry, ocean_navigation, joint_stock_finance, public_debt_markets, experimental_science, steam_power, mechanized_textiles, railways, telegraphy, vaccination_and_sanitation, electrification, mass_literacy_schooling, chemical_industry, motor_and_air_transport</td></tr>
+<tr><td><code>ideologies</code></td><td>humanism, devotional_reform, religious_zeal, religious_tolerance, qizilbash_messianism, islamic_reformism, sinocentric_order, parliamentarism, liberalism, nationalism, abolitionism, humanitarianism, militarism, socialism, communism, fascism, anticolonialism, pan_africanism, pan_arabism, pan_islamism</td></tr>
+<tr><td><code>culture_groups</code></td><td>latin, germanic, slavic, hellenic, turkic, iranian, arab, berber, cushitic, semitic_ethiopian, mande, akan, yoruba_edo, hausa_fulani, bantu, khoisan, nilotic, indo_aryan, dravidian, tibeto_burman, tai, austroasiatic, austronesian, sinitic, japonic, koreanic, mongolic, tungusic, uralic, nahua, maya, andean, tupi_guarani, algonquian, iroquoian, creole_atlantic, polynesian, melanesian, aboriginal_australian, celtic, baltic, caucasian, hebrew</td></tr>
+<tr><td><code>rebel_types</code></td><td>peasant, religious, noble, separatist, revolutionary, independence, anticolonial, any</td></tr>
+<tr><td><code>relation_types</code></td><td>alliance, rivalry, subject, overlord, truce, trade_pact, guarantee, personal_union, embargo, non_aggression</td></tr>
+<tr><td><code>period_kinds</code></td><td>political, war, religious, economic, colonial, demographic, environmental, intellectual</td></tr>
+<tr><td><code>entity_kinds</code></td><td>polity, company, movement, population_group, organization</td></tr>
+</tbody></table></div>
+<h2 id="statistics"><a class="anchor" href="#statistics" aria-label="Link to this section">#</a>Statistics</h2>
+<h3 id="province"><a class="anchor" href="#province" aria-label="Link to this section">#</a>Province</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>kind</th><th>unit</th><th>range</th></tr></thead>
+<tbody>
+<tr><td>population</td><td>stored</td><td>thousands of people</td><td></td></tr>
+<tr><td>culture_share</td><td>stored</td><td>map culture_id -&gt; share 0-1</td><td>0, 1</td></tr>
+<tr><td>religion_share</td><td>stored</td><td>map religion_id -&gt; share 0-1</td><td>0, 1</td></tr>
+<tr><td>prosperity</td><td>stored</td><td>integer level 1-60</td><td>1, 60</td></tr>
+<tr><td>infrastructure</td><td>stored</td><td>level 0-10</td><td>0, 10</td></tr>
+<tr><td>industry</td><td>stored</td><td>level 0-10</td><td>0, 10</td></tr>
+<tr><td>trade_good</td><td>stored</td><td>id (grain, fish, wool, cloth, sugar, spices, silver, gold, cotton, coal, iron, oil, rubber, ...); enslaved people are never a trade good, see redundancy_notes</td><td></td></tr>
+<tr><td>trade_access</td><td>derived</td><td>0-1</td><td>0, 1</td></tr>
+<tr><td>resource_output</td><td>derived</td><td>goods units / year</td><td></td></tr>
+<tr><td>devastation</td><td>stored</td><td>0-100</td><td>0, 100</td></tr>
+<tr><td>unrest</td><td>stored</td><td>0-100</td><td>0, 100</td></tr>
+<tr><td>control</td><td>stored</td><td>0-100</td><td>0, 100</td></tr>
+<tr><td>colonial_status</td><td>stored</td><td>enum none | trading_post | settlement | plantation | protectorate | colony | occupied | mandate</td><td></td></tr>
+<tr><td>disease_burden</td><td>stored</td><td>0-100</td><td>0, 100</td></tr>
+<tr><td>fort_level</td><td>stored</td><td>0-5</td><td>0, 5</td></tr>
+<tr><td>terrain</td><td>stored (static)</td><td>enum</td><td></td></tr>
+<tr><td>local_supply</td><td>derived</td><td>regiments supportable</td><td></td></tr>
+<tr><td>manpower_yield</td><td>derived</td><td>men / year</td><td></td></tr>
+<tr><td>urbanization</td><td>derived</td><td>0-1</td><td>0, 1</td></tr>
+<tr><td>food_security</td><td>derived</td><td>0-1</td><td>0, 1</td></tr>
+<tr><td>innovation_presence</td><td>stored</td><td>map institution_id -&gt; 0-1</td><td>0, 1</td></tr>
+<tr><td>environmental_degradation</td><td>stored</td><td>0-100</td><td>0, 100</td></tr>
+</tbody></table></div>
+<h3 id="country"><a class="anchor" href="#country" aria-label="Link to this section">#</a>Country</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>kind</th><th>unit</th><th>range</th><th>owner</th><th>lands as</th></tr></thead>
+<tbody>
+<tr><td>treasury</td><td>stored</td><td>gold (era-normalized currency)</td><td></td><td></td><td></td></tr>
+<tr><td>debt</td><td>stored</td><td>gold</td><td></td><td></td><td></td></tr>
+<tr><td>income</td><td>derived</td><td>gold / year</td><td></td><td></td><td></td></tr>
+<tr><td>expenses</td><td>derived</td><td>gold / year</td><td></td><td></td><td></td></tr>
+<tr><td>economic_output</td><td>derived</td><td>index</td><td></td><td></td><td></td></tr>
+<tr><td>trade_power</td><td>derived</td><td>share per trade node</td><td></td><td></td><td></td></tr>
+<tr><td>industrial_capacity</td><td>derived</td><td>index</td><td></td><td></td><td></td></tr>
+<tr><td>manpower</td><td>stored pool with derived max</td><td>men</td><td></td><td></td><td></td></tr>
+<tr><td>army_strength</td><td>derived</td><td>index</td><td></td><td></td><td></td></tr>
+<tr><td>military_quality</td><td>derived</td><td>0-100</td><td>0, 100</td><td></td><td></td></tr>
+<tr><td>navy_strength</td><td>derived</td><td>index</td><td></td><td></td><td></td></tr>
+<tr><td>naval_reach</td><td>derived</td><td>sea zones</td><td></td><td></td><td></td></tr>
+<tr><td>admin_capacity</td><td>stored</td><td>0-100</td><td>0, 100</td><td></td><td></td></tr>
+<tr><td>integration_strain</td><td>derived</td><td>0-200 %</td><td>0, 200</td><td></td><td></td></tr>
+<tr><td>stability</td><td>stored</td><td>integer -3..+3</td><td>-3, 3</td><td></td><td></td></tr>
+<tr><td>legitimacy</td><td>stored</td><td>0-100</td><td>0, 100</td><td></td><td></td></tr>
+<tr><td>war_weariness</td><td>stored</td><td>0-20</td><td>0, 20</td><td></td><td></td></tr>
+<tr><td>prestige</td><td>stored</td><td>-100..100</td><td>-100, 100</td><td></td><td></td></tr>
+<tr><td>notoriety</td><td>derived</td><td>0-100</td><td>0, 100</td><td>diplomacy</td><td>notorious_deed</td></tr>
+<tr><td>great_power_score</td><td>derived</td><td>index</td><td></td><td></td><td></td></tr>
+<tr><td>tech_state</td><td>stored</td><td>level 1-40</td><td>1, 40</td><td></td><td></td></tr>
+<tr><td>tech_economy</td><td>stored</td><td>level 1-40</td><td>1, 40</td><td></td><td></td></tr>
+<tr><td>tech_military</td><td>stored</td><td>level 1-40</td><td>1, 40</td><td></td><td></td></tr>
+<tr><td>innovations</td><td>stored</td><td>set of institution ids</td><td></td><td></td><td></td></tr>
+<tr><td>literacy</td><td>stored</td><td>0-100</td><td>0, 100</td><td></td><td></td></tr>
+<tr><td>ideology_support</td><td>stored</td><td>map ideology_id -&gt; 0-1</td><td>0, 1</td><td></td><td></td></tr>
+<tr><td>cohesion</td><td>derived</td><td>0-1</td><td>0, 1</td><td></td><td></td></tr>
+<tr><td>separatism_risk</td><td>derived</td><td>0-1</td><td>0, 1</td><td></td><td></td></tr>
+<tr><td>public_health</td><td>derived</td><td>0-1</td><td>0, 1</td><td></td><td></td></tr>
+<tr><td>resource_dependency</td><td>derived</td><td>0-1</td><td>0, 1</td><td></td><td></td></tr>
+<tr><td>government</td><td>stored</td><td>enum</td><td></td><td></td><td></td></tr>
+<tr><td>state_religion</td><td>stored</td><td>id</td><td></td><td></td><td></td></tr>
+<tr><td>primary_culture</td><td>stored</td><td>id</td><td></td><td></td><td></td></tr>
+</tbody></table></div>
+<h3 id="global"><a class="anchor" href="#global" aria-label="Link to this section">#</a>Global</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>kind</th><th>unit</th><th>range</th></tr></thead>
+<tbody>
+<tr><td>global_tension</td><td>stored</td><td>0-100</td><td>0, 100</td></tr>
+<tr><td>climate_anomaly</td><td>stored</td><td>degrees C relative to 1850-1900 baseline (scenario values)</td><td>1850, 1900</td></tr>
+<tr><td>world_trade_index</td><td>derived</td><td>index</td><td></td></tr>
+<tr><td>innovation_spread</td><td>derived</td><td>map institution_id -&gt; share of world prosperity</td><td></td></tr>
+</tbody></table></div>
+<h3 id="relationships"><a class="anchor" href="#relationships" aria-label="Link to this section">#</a>Relationships</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>kind</th><th>unit</th><th>range</th><th>owner</th><th>lands as</th></tr></thead>
+<tbody>
+<tr><td>opinion</td><td>stored</td><td>-200..200</td><td>-200, 200</td><td></td><td></td></tr>
+<tr><td>trust</td><td>derived</td><td>0-100</td><td>0, 100</td><td>diplomacy</td><td>oath_broken</td></tr>
+</tbody></table></div>
+<h2 id="ai-factor-rules"><a class="anchor" href="#ai-factor-rules" aria-label="Link to this section">#</a>Ai factor rules</h2>
+<blockquote>
+<p>The numbers in balance.yaml ai_factors&#39; descriptions. high_unrest (D-EVT-5): more than high_unrest_share of the chooser&#39;s provinces have high_unrest_grievances or more grievances.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>great_power_top</code></td><td>8</td></tr>
+<tr><td><code>threatened_ratio</code></td><td>1.5</td></tr>
+<tr><td><code>low_treasury_years_of_expenses</code></td><td>1</td></tr>
+<tr><td><code>high_unrest_share</code> (provisional)</td><td>0.5</td></tr>
+<tr><td><code>high_unrest_grievances</code></td><td>4</td></tr>
+</tbody></table></div>
+<h2 id="modifier-changes"><a class="anchor" href="#modifier-changes" aria-label="Link to this section">#</a>Modifier changes</h2>
+<blockquote>
+<p>modifiers.yaml header: plain numbers hold on level stats and apply per year on accumulating stats.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>accumulating</code></td><td>prestige, literacy, prosperity, tech_state, tech_economy, tech_military</td></tr>
+</tbody></table></div>
+<h2 id="rise-is-cost"><a class="anchor" href="#rise-is-cost" aria-label="Link to this section">#</a>Rise is cost</h2>
+<blockquote>
+<p>Statistics whose rise is a burden in statistics.yaml (narrative_only payoff check).</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>stats</code></td><td>unrest, devastation, war_weariness, debt, notoriety, integration_strain, disease_burden, environmental_degradation, separatism_risk, expenses</td></tr>
+</tbody></table></div>
+<h2 id="system-flag-owners"><a class="anchor" href="#system-flag-owners" aria-label="Link to this section">#</a>System flag owners</h2>
+<blockquote>
+<p>D-EVT-16: flags other contexts set by their own rules; the rest are set by the engine or the scenario.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>religious_persecution_active</code></td><td>religion</td></tr>
+<tr><td><code>missionary_persecution</code></td><td>religion</td></tr>
+<tr><td><code>inquisition_established</code></td><td>religion</td></tr>
+</tbody></table></div>
+<h2 id="stat-mapping"><a class="anchor" href="#stat-mapping" aria-label="Link to this section">#</a>Stat mapping</h2>
+<blockquote>
+<p>D-EVT-4: the anti-corruption mapping. Event data keeps the tree&#39;s names; each change lands as the owning context&#39;s concrete change. per_point: amount per point of change; fixed: amount for any rise; scale: multiplies a fractional change.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>owner</th><th>lands as</th><th>per point</th><th>fixed</th><th>scale</th><th>per tenth</th><th>read as</th></tr></thead>
+<tbody>
+<tr><td>population</td><td>province</td><td>people_pct</td><td>1</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>prosperity</td><td>province</td><td>fitting_buildings</td><td>1</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>devastation</td><td>province</td><td>burned_tiles_pct</td><td>1</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>unrest</td><td>province</td><td>named_grievance</td><td></td><td>1</td><td></td><td></td><td></td></tr>
+<tr><td>control</td><td>province</td><td>official_flees_or_road_breaks</td><td></td><td>1</td><td></td><td></td><td></td></tr>
+<tr><td>fort_level</td><td>province</td><td>castle_steps</td><td>1</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>infrastructure</td><td>province</td><td>road_steps</td><td>1</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>industry</td><td>province</td><td>factories</td><td>1</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>trade_access</td><td>trade</td><td>trade_ratio_gain_pct</td><td></td><td></td><td>100</td><td></td><td></td></tr>
+<tr><td>food_security</td><td>province</td><td>harvest_steps_worse</td><td></td><td></td><td></td><td>0.67</td><td></td></tr>
+<tr><td>disease_burden</td><td>province</td><td>plague_outbreak</td><td></td><td>1</td><td></td><td></td><td></td></tr>
+<tr><td>legitimacy</td><td>realm</td><td>lord_loyalty_points</td><td>1</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>stability</td><td>realm</td><td>lord_loyalty_and_revolt</td><td>1</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>war_weariness</td><td>realm</td><td>fallen</td><td>1</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>trade_index</td><td>trade</td><td>trade_ratio_pct</td><td>1</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>trust</td><td>diplomacy</td><td>oath_broken</td><td></td><td>1</td><td></td><td></td><td></td></tr>
+<tr><td>notoriety</td><td>diplomacy</td><td>notorious_deed</td><td>1</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>integration_strain</td><td>events</td><td>read_only</td><td></td><td></td><td></td><td></td><td>share of the realm&#39;s provinces with one or more grievances, in %</td></tr>
+</tbody></table></div>
+<h2 id="derived-formulas"><a class="anchor" href="#derived-formulas" aria-label="Link to this section">#</a>Derived formulas</h2>
+<blockquote>
+<p>EVT-054: derived province values the tree recomputes each tick (statistics.yaml), with provisional k values.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>k_supply</code> (provisional)</td><td>1</td></tr>
+<tr><td><code>good_base_yield</code> (provisional)</td><td>1</td></tr>
+<tr><td><code>tech_economy_bonus</code> (provisional)</td><td>0</td></tr>
+<tr><td><code>terrain_supply_mult</code> (provisional)</td><td>1</td></tr>
+</tbody></table></div>
+<h2 id="innovations-from-research"><a class="anchor" href="#innovations-from-research" aria-label="Link to this section">#</a>Innovations from research</h2>
+<blockquote>
+<p>D-EVT-19: the tree&#39;s innovations a realm has adopted include the research inventions it knows, by this table (tree innovation -&gt; research invention).</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>bombards</code></td><td><a href="/wiki/Data-Research#inventions">W3 Bombards</a></td></tr>
+<tr><td><code>gunpowder_infantry</code></td><td><a href="/wiki/Data-Research#inventions">W5 gunpowder_infantry</a></td></tr>
+<tr><td><code>ocean_navigation</code></td><td><a href="/wiki/Data-Research#inventions">S4 Carrack and caravel</a></td></tr>
+<tr><td><code>printing</code></td><td><a href="/wiki/Data-Research#inventions">L5 printing</a></td></tr>
+<tr><td><code>humanist_learning</code></td><td><a href="/wiki/Data-Research#inventions">L6 humanist_learning</a></td></tr>
+</tbody></table></div>
+<h2 id="goals"><a class="anchor" href="#goals" aria-label="Link to this section">#</a>Goals</h2>
+<blockquote>
+<p>Realms&#39; historical goals (EVT-100 to EVT-108). Provisional (plan-1378 §2).</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>shake_low</code></td><td>0.5</td></tr>
+<tr><td><code>shake_high</code></td><td>1.5</td></tr>
+<tr><td><code>lead_years</code></td><td>5</td></tr>
+<tr><td><code>lapse_years</code></td><td>10</td></tr>
+<tr><td><code>war_chance_per_pull</code></td><td>1</td></tr>
+<tr><td><code>target_weight_per_pull</code></td><td>4</td></tr>
+<tr><td><code>envoy_points_per_pull</code></td><td>10</td></tr>
+</tbody></table></div>
+<h3 id="weights"><a class="anchor" href="#weights" aria-label="Link to this section">#</a>Weights</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>weak</code></td><td>0.5</td></tr>
+<tr><td><code>normal</code></td><td>1</td></tr>
+<tr><td><code>strong</code></td><td>2</td></tr>
+</tbody></table></div>
+<h3 id="deviate-share"><a class="anchor" href="#deviate-share" aria-label="Link to this section">#</a>Deviate share</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>historical</code></td><td>0.1</td></tr>
+<tr><td><code>plausible</code></td><td>0.25</td></tr>
+<tr><td><code>divergent</code></td><td>0.5</td></tr>
+</tbody></table></div>
+<h3 id="preset-mult"><a class="anchor" href="#preset-mult" aria-label="Link to this section">#</a>Preset mult</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>historical</code></td><td>1.5</td></tr>
+<tr><td><code>plausible</code></td><td>1</td></tr>
+<tr><td><code>divergent</code></td><td>0.5</td></tr>
+</tbody></table></div>
+<h2 id="chronicle"><a class="anchor" href="#chronicle" aria-label="Link to this section">#</a>Chronicle</h2>
+<blockquote>
+<p>The Chronicle card (EVT-109 to EVT-111). Provisional.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>on_course_years</code></td><td>10</td></tr>
+<tr><td><code>horizon_years</code></td><td>25</td></tr>
+</tbody></table></div>

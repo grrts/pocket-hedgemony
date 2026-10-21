@@ -25,7 +25,7 @@ Feature: What needs attention
       | condition | kind | line |
       | the local store of "Sofia" will reach zero before the next harvest | warning | Sofia will run out of bread by March. |
       | Murad's army has 12 days of food in reserve | warning | Murad's army has twelve days of food left. |
-      | the lord "Turahan Bey" turns Wavering | warning | Turahan Bey grows cold toward you. He wants a war on the Morea. |
+      | the lord "Evrenos Bey" turns Wavering | warning | Evrenos Bey grows cold toward you. He wants a march on Serres. |
       | the soldiers have not been paid for two months | warning | Your soldiers have not been paid for two months. |
       | gold will run out in under three months at this rate | warning | At this pace the treasury is empty by June. |
       | 5000 farmers are levied with the harvest three weeks away | warning | Five thousand farmers are under arms with the harvest three weeks away. |

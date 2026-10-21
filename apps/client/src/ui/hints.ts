@@ -11,6 +11,8 @@ import { icon } from "../art/ui.ts";
 /** Where a hint points now: the element to tap, a line for this moment, and how to bring the target on screen. */
 export interface HintTarget {
   el?: Element | null;
+  /** A spot on the map to tap (a province), in screen pixels, when the target is not a button. */
+  at?: [number, number] | null;
   line?: string;
   show?: () => void;
 }
@@ -74,6 +76,8 @@ export class Hints {
       if (records.some((r) => !this.note.contains(r.target) && r.target !== this.ring)) this.refresh();
     }).observe(document.querySelector("#app")!, { childList: true, subtree: true, attributes: true, attributeFilter: ["hidden", "class"] });
     addEventListener("resize", () => this.refresh());
+    // Some taps change only what the game holds, not the page (an army chosen): look again after each.
+    document.addEventListener("click", () => this.refresh(), { capture: true });
     document.addEventListener("scroll", () => this.refresh(), { capture: true, passive: true });
     this.refresh();
   }
@@ -132,9 +136,9 @@ export class Hints {
     }
     const t = this.host!.target(hint);
     const el = t.el ?? null;
-    const box = el ? visibleBox(el) : null;
+    const box = el ? visibleBox(el) : t.at ? mapSpot(t.at) : null;
     // A target inside a card that scrolls is brought into view once.
-    if (el && !box && el !== this.scrolledTo && el.closest("#panel") && !(el as HTMLElement).closest("[hidden]")) {
+    if (el && !box && el !== this.scrolledTo && el.closest("#panel, .lens-menu") && !(el as HTMLElement).closest("[hidden]")) {
       this.scrolledTo = el;
       el.scrollIntoView({ block: "nearest" });
       this.refresh();
@@ -156,15 +160,7 @@ export class Hints {
         </span>`;
     }
     this.note.hidden = false;
-    // The note keeps clear of what it points at: under the top bar only when the target is where the note would sit (TUT-130).
-    const w = this.note.offsetWidth;
-    const low = !!box && box.bottom > innerHeight - this.note.offsetHeight - 16 && box.right > (innerWidth - w) / 2 && box.left < (innerWidth + w) / 2;
-    this.note.classList.toggle("top", low);
-    // Under the top bar it keeps beside an open side panel, so the panel's close button stays reachable.
-    const panel = low ? document.querySelector<HTMLElement>("#panel:not([hidden])")?.getBoundingClientRect() : undefined;
-    const beside = !!panel && panel.width < innerWidth / 2 && panel.left < 8;
-    this.note.style.left = beside ? `${(panel!.right + innerWidth) / 2}px` : "";
-    this.note.style.width = beside ? `${Math.min(460, innerWidth - panel!.right - 16)}px` : "";
+    placeNote(this.note, box);
     this.ring.hidden = !box;
     if (box) {
       const pad = 4;
@@ -173,16 +169,88 @@ export class Hints {
   }
 }
 
+/**
+ * Puts a note where it covers neither what it points at nor an open card
+ * or button (TUT-130, TUT-134): along the bottom, in the widest free stretch
+ * beside an open card, else under the top bar. The tutorial's coach note
+ * uses it too.
+ */
+export function placeNote(n: HTMLElement, target: DOMRect | null): void {
+  const reset = () => {
+    n.classList.remove("top");
+    n.style.left = "";
+    n.style.width = "";
+  };
+  reset();
+  const boxes = COVERS.flatMap((q) => [...document.querySelectorAll<HTMLElement>(q)])
+    .filter((el) => !el.hidden && !el.closest("[hidden]") && el.offsetParent !== null)
+    .map((el) => el.getBoundingClientRect())
+    .filter((r) => r.width && r.height);
+  if (target) boxes.push(target);
+  const clear = () => !boxes.some((b) => overlaps(b, n.getBoundingClientRect()));
+  if (clear()) return;
+  for (const top of [false, true]) {
+    reset();
+    n.classList.toggle("top", top);
+    const r = n.getBoundingClientRect();
+    const gap = widestGap({ top: r.top, bottom: r.bottom }, boxes);
+    if (gap.right - gap.left < 280) continue;
+    n.style.left = `${(gap.left + gap.right) / 2}px`;
+    n.style.width = `${Math.min(460, gap.right - gap.left - 16)}px`;
+    if (clear()) return;
+  }
+  // Nowhere is wholly clear: keep at least the target uncovered.
+  reset();
+  if (target && overlaps(target, n.getBoundingClientRect())) n.classList.add("top");
+}
+
+/** The cards and buttons the note must not cover: open side cards and menus, the overview button, End turn and Auto. */
+const COVERS = ["#panel", "#army-list", "#lenses", "#sound-menu", "#reopen", "#fab", "#auto-turns", ".tools", ".alerts > .alert"];
+
+const overlaps = (a: DOMRect, b: DOMRect) => a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
+
+/** The widest free stretch of a band across the screen, between the boxes standing in it. */
+function widestGap(band: { top: number; bottom: number }, boxes: DOMRect[]): { left: number; right: number } {
+  const edge = 8;
+  const inBand = boxes.filter((b) => b.top < band.bottom && band.top < b.bottom).sort((a, b) => a.left - b.left);
+  let best = { left: 0, right: 0 };
+  let x = edge;
+  for (const b of [...inBand, new DOMRect(innerWidth - edge, 0, 0, 0)]) {
+    if (b.left - x > best.right - best.left) best = { left: x, right: b.left };
+    x = Math.max(x, b.right);
+  }
+  return best;
+}
+
+/** A tap-sized box round a spot on the map, when the map is what is there to tap. */
+export function mapSpot([x, y]: [number, number]): DOMRect | null {
+  // The whole ring must sit on open map, clear of the top bar, the cards and the buttons.
+  for (const [dx, dy] of [[0, 0], [-22, -22], [22, -22], [-22, 22], [22, 22]] as const) {
+    const px = x + dx;
+    const py = y + dy;
+    if (px < 0 || py < 0 || px > innerWidth || py > innerHeight) return null;
+    const hit = document.elementFromPoint(px, py);
+    if (!hit || !(hit.closest("#map") || hit.closest(".hint-note, .hint-ring, .coach-note, .coach-spot"))) return null;
+  }
+  return new DOMRect(x - 24, y - 24, 48, 48);
+}
+
 /** The target's box when the player can see and tap it, else null: on screen, not hidden, and not under another card. */
-function visibleBox(el: Element): DOMRect | null {
+export function visibleBox(el: Element): DOMRect | null {
   const r = el.getBoundingClientRect();
   if (!r.width || !r.height) return null;
+  // Half cut off by the edge of a card that scrolls: not yet, it is scrolled into view first.
+  for (let box = el.parentElement; box && box.closest("#panel, .lens-menu"); box = box.parentElement) {
+    if (!/auto|scroll/.test(getComputedStyle(box).overflowY)) continue;
+    const frame = box.getBoundingClientRect();
+    if (r.top < frame.top - 1 || r.bottom > frame.bottom + 1) return null;
+  }
   const x = r.left + r.width / 2;
   const y = r.top + r.height / 2;
   if (x < 0 || y < 0 || x > innerWidth || y > innerHeight) return null;
   const hit = document.elementFromPoint(x, y);
   if (!hit) return null;
   // The hint note itself may sit over it for a moment; it moves out of the way.
-  if (hit.closest(".hint-note") || el.contains(hit) || hit.contains(el)) return r;
+  if (hit.closest(".hint-note, .coach-note") || el.contains(hit) || hit.contains(el)) return r;
   return null;
 }

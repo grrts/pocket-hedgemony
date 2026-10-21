@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { loadDefaultRuleset } from "@ph/rules";
 import { createWorld, hashWorld, processTurn, Rng } from "@ph/engine";
 import * as A from "@ph/engine/domain/audio";
+import { INSTRUMENTS } from "../../../apps/client/src/audio/instruments.ts";
 import { steps, type Scenario } from "../src/registry.ts";
 
 const ALL: A.RotationContext = { variety: "all_palettes" };
@@ -53,9 +54,9 @@ Given("{string} plays", (s, id: string) => {
 Given("a fresh install", (s) => {
   s.settings = A.defaultSettings();
 });
-Then("the ambience setting is off", (s) => {
-  expect(s.settings.ambienceOn).toBe(false);
-  expect(cfg.music.defaults.ambience).toBe(false);
+Then("the ambience setting is on", (s) => {
+  expect(s.settings.ambienceOn).toBe(true);
+  expect(cfg.music.defaults.ambience).toBe(true);
 });
 Given("ambience is on", (s) => {
   s.ambienceOn = true;
@@ -815,7 +816,7 @@ Then("the ambience ducks by {int} dB", (s, db: number) => {
 When("a music track starts", (s) => {
   s.fade = A.ambienceFadeOnTrackStart();
 });
-Then("the ambience fades out over {int} seconds", (s, sec: number) => {
+Then("the ambience dips under the track over {int} seconds", (s, sec: number) => {
   expect(s.fade).toBe(sec);
 });
 Given("music and effects are playing at default volumes", (s) => {
@@ -1202,11 +1203,12 @@ function audioFiles(dir: string, out: string[] = []): string[] {
 Given("the game is installed", (s) => {
   s.root = new URL("../../../", import.meta.url).pathname;
 });
-Then("it ships no recorded audio files for music or effects", (s) => {
-  expect(audioFiles(join(s.root, "apps"))).toEqual([]);
+Then("the only audio files it ships are the music's instrument packs", (s) => {
+  const packs = Object.keys(INSTRUMENTS).map((name) => join(s.root, "apps/client/public/music", `${name}.mp3`)).sort();
+  expect(audioFiles(join(s.root, "apps")).sort()).toEqual(packs);
   expect(audioFiles(join(s.root, "packages"))).toEqual([]);
 });
-Then("every sound is synthesized at runtime on the PH-5 chip", () => {
+Then("every effect is synthesized at runtime on the PH-5 chip", () => {
   expect(A.allSynthesized()).toBe(true);
 });
 Then("the music may use at most {int} voices at once", (s, n: number) => {
@@ -1215,7 +1217,7 @@ Then("the music may use at most {int} voices at once", (s, n: number) => {
 Then(/^W2 is (not available|available for brass and string sections)$/, (s, w: string) => {
   expect(A.voiceBudget(s.era).w2).toBe(w !== "not available");
 });
-When(/^a track asks for (a sample of a real instrument|a reverb tail|a chord on one voice|a sixth voice in Era III)$/, (s, thing: string) => {
+When(/^a track asks for (a sample outside the instrument packs|a reverb tail|a chord on one voice|a sixth voice in Era III)$/, (s, thing: string) => {
   const t = goodTrack();
   if (thing.startsWith("a sample")) t.voices[0]!.sample = true;
   if (thing === "a reverb tail") t.reverb = true;
@@ -1525,8 +1527,8 @@ Then(/^music volume is ([\d.]+), effects volume ([\d.]+) and ambience volume ([\
 Then(/^the variety is "own palette only"$/, () => {
   expect(cfg.music.defaults.variety).toBe("own_palette");
 });
-Then("interface sounds are on, haptics are on, ambience is off", (s) => {
-  expect([s.settings.uiSounds, s.settings.haptics, s.settings.ambienceOn]).toEqual([true, true, false]);
+Then("interface sounds are on, haptics are on, ambience is on", (s) => {
+  expect([s.settings.uiSounds, s.settings.haptics, s.settings.ambienceOn]).toEqual([true, true, true]);
 });
 Then("mono, sound captions and reduced intensity are off", (s) => {
   expect([s.settings.mono, A.captionsOn(s.settings), s.settings.reducedIntensity]).toEqual([false, false, false]);

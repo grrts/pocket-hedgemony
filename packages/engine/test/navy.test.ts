@@ -127,8 +127,12 @@ describe("ports and fleets", () => {
     expect(f.ships).toHaveLength(2);
     // An army in the port boards: it needs an admiral first.
     const post = w.provinceOfficial.findIndex((o, q) => o >= 0 && w.provinceOwner[q] === me && q !== port && w.provinceLord[q]! < 0);
-    expect(act(w, { type: "commission", province: post }, me)).toEqual([]);
+    // A general can't lead a fleet: the official is commissioned as admiral (RECR-128).
+    expect(act(w, { type: "commission", province: post, sea: true }, me)).toEqual([]);
     const c = w.commanderIds.length - 1;
+    expect(w.commanderSea[c]).toBe(1);
+    const general = w.commanderIds.findIndex((_, k) => w.commanderOwner[k] === me && !w.commanderSea[k]);
+    expect(act(w, { type: "navy", do: "admiral", fleet: f.id, commander: general }, me)[0]).toMatch(/general leads armies/);
     let slot = -1;
     for (let i = 0; i < w.armies.count; i++) if (w.armies.alive[i] && w.armies.owner[i] === me && w.armies.commander[i]! >= 0) slot = i;
     w.armies.location[slot] = port;
@@ -142,12 +146,17 @@ describe("ports and fleets", () => {
     expect(act(w, { type: "navy", do: "admiral", fleet: f.id, commander: c }, me)).toEqual([]);
     expect(act(w, { type: "navy", do: "sail", fleet: f.id, to: target }, me)[0]).toMatch(/right to land/);
     expect(act(w, { type: "declareWar", target: n(w, "brittany") }, me)).toEqual([]);
-    // No enemy fleet on the way: this is about the crossing and the landing.
+    // No enemy fleet on the way and no Breton levy mustering on the shore: this is about the crossing and the landing.
     w.navy.fleets = w.navy.fleets.filter((x) => x.owner === me);
+    w.musters = w.musters.filter((m) => m.province !== target);
+    const clearShore = () => {
+      for (let i = 0; i < w.armies.count; i++) if (w.armies.owner[i] === n(w, "brittany") && w.armies.location[i] === target) w.armies.alive[i] = 0;
+    };
     expect(act(w, { type: "navy", do: "sail", fleet: f.id, to: target }, me)).toEqual([]);
     expect(f.landAt).toBe(target);
     // At sea the army stands in the fleet's zone, out of reach on land.
     for (let t = 0; t < 12 && w.armies.location[slot] !== target; t++) {
+      clearShore();
       processTurn(w, [], me);
       if (fleetById(w, f.id)!.army === slot) expect(w.armies.retreating[slot]).toBe(1);
     }

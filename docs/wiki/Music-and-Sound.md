@@ -244,7 +244,7 @@ Audio has its own visuals only where they partner a sound: captions at the scree
 - [How a turn works](Time-and-Turns): turn end, turn ready, the game year and January.
 - [Map and Map Modes](Map-and-Lenses): camera position, region and zoom, what is on screen, terrain under the camera.
 - [Culture](Culture): your primary culture group, its changes and culture mix.
-- [The 1444 start](The-1444-Start): capital longitude for the turkic split, colonial founding dates.
+- [The 1378 start](The-1378-Start): capital longitude for the turkic split, colonial founding dates.
 - [Warfare](Warfare): war declared, war trend, occupied capital, battles, bells, routs, sieges, army eras and troop types.
 - [Naval](Naval): sea battles, broadsides, sinkings, blockades, landings, fleet orders.
 - [Troop movement](Troop-Movement): march orders, arrivals, winter quarters.

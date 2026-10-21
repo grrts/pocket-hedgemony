@@ -1,0 +1,692 @@
+<h1>Religion data</h1>
+<p>Every value in the game&#39;s religion config, exactly as the game reads it. This page is made from <code>packages/rules/data/domain/religion.json</code> each time the config changes, so it always matches the game. How these values are used is explained on <a href="/wiki/Religion">Religion</a>.</p>
+<p>Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and values marked (provisional) are placeholders that may still change in balancing. Inventions are shown by id and name; see <a href="/wiki/Data-Research#inventions">Research data</a>.</p>
+<blockquote>
+<p>Religion config (domain/religion/spec.md §10), from religion/config/religion.yaml version 1; every number is a first-pass placeholder. &#39;patches&#39; and &#39;event_options&#39; are copied from religion/event-tree-additions (patches.yaml, religion-events.yaml). &#39;holy_place_names&#39; and &#39;holder_names&#39; are the display names the feature files use.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>event_tree_religions</code></td><td>catholic, protestant, anglican, orthodox, oriental_christian, sunni, shia, ibadi, jewish, hindu, sikh, theravada, mahayana, vajrayana, shinto, confucian_ritual, daoist, indigenous_american, african_traditional, pacific_traditional, siberian_steppe_traditional, secular</td></tr>
+<tr><td><code>catalogue_minorities_not_faiths</code></td><td>Yazidi, Druze, Zoroastrian</td></tr>
+</tbody></table></div>
+<h2 id="added-faiths"><a class="anchor" href="#added-faiths" aria-label="Link to this section">#</a>Added faiths</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>religions</code></td><td>hussite, jain, asian_traditional, baltic_traditional</td></tr>
+</tbody></table></div>
+<h2 id="faiths"><a class="anchor" href="#faiths" aria-label="Link to this section">#</a>Faiths</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>family</th><th>house</th><th>clergy marry</th><th>rules</th><th>carried by trade</th><th>layered</th><th>rooted</th></tr></thead>
+<tbody>
+<tr><td>catholic</td><td>christian</td><td>church, cathedral</td><td>no</td><td>monastic_land, inquisition</td><td></td><td></td><td></td></tr>
+<tr><td>protestant</td><td>christian</td><td>church, minster</td><td>yes</td><td>print_and_school_pull</td><td></td><td></td><td></td></tr>
+<tr><td>anglican</td><td>christian</td><td>church, cathedral</td><td>yes</td><td>crown_heads_church</td><td></td><td></td><td></td></tr>
+<tr><td>hussite</td><td>christian</td><td>church, cathedral</td><td>no</td><td>merges_into_protestant</td><td></td><td></td><td></td></tr>
+<tr><td>orthodox</td><td>christian</td><td>church, cathedral</td><td>yes</td><td>monastic_land</td><td></td><td></td><td></td></tr>
+<tr><td>oriental_christian</td><td>christian</td><td>church, cathedral</td><td>yes</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>sunni</td><td>islamic</td><td>mosque, great mosque</td><td>yes</td><td>protected_communities</td><td>yes</td><td></td><td></td></tr>
+<tr><td>shia</td><td>islamic</td><td>mosque, great mosque</td><td>yes</td><td>protected_communities</td><td>yes</td><td></td><td></td></tr>
+<tr><td>ibadi</td><td>islamic</td><td>mosque, great mosque</td><td>yes</td><td>protected_communities</td><td>yes</td><td></td><td></td></tr>
+<tr><td>jewish</td><td>jewish</td><td>synagogue, great synagogue</td><td>yes</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>hindu</td><td>indic</td><td>temple, great temple</td><td>yes</td><td>temple_town</td><td></td><td></td><td></td></tr>
+<tr><td>sikh</td><td>indic</td><td>gurdwara, great gurdwara</td><td>yes</td><td>langar</td><td></td><td></td><td></td></tr>
+<tr><td>jain</td><td>indic</td><td>temple, great temple</td><td>no</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>theravada</td><td>buddhist</td><td>monastery, great stupa</td><td>no</td><td>monastery_school</td><td></td><td></td><td></td></tr>
+<tr><td>mahayana</td><td>buddhist</td><td>temple, great temple</td><td>no</td><td></td><td></td><td>yes</td><td></td></tr>
+<tr><td>vajrayana</td><td>buddhist</td><td>monastery, great monastery</td><td>no</td><td>lama_lords</td><td></td><td></td><td></td></tr>
+<tr><td>shinto</td><td>east_asian</td><td>shrine, grand shrine</td><td>yes</td><td></td><td></td><td>yes</td><td></td></tr>
+<tr><td>confucian_ritual</td><td>east_asian</td><td>ancestral hall, temple of Confucius</td><td>yes</td><td></td><td></td><td>yes</td><td></td></tr>
+<tr><td>daoist</td><td>east_asian</td><td>temple, great temple</td><td>yes</td><td></td><td></td><td>yes</td><td></td></tr>
+<tr><td>indigenous_american</td><td>traditional</td><td>shrine, great temple</td><td>yes</td><td></td><td></td><td></td><td>yes</td></tr>
+<tr><td>african_traditional</td><td>traditional</td><td>shrine, great shrine</td><td>yes</td><td></td><td></td><td></td><td>yes</td></tr>
+<tr><td>pacific_traditional</td><td>traditional</td><td>marae, great marae</td><td>yes</td><td></td><td></td><td></td><td>yes</td></tr>
+<tr><td>siberian_steppe_traditional</td><td>traditional</td><td>shrine, great shrine</td><td>yes</td><td></td><td></td><td></td><td>yes</td></tr>
+<tr><td>asian_traditional</td><td>traditional</td><td>shrine, great shrine</td><td>yes</td><td></td><td></td><td></td><td>yes</td></tr>
+<tr><td>baltic_traditional</td><td>traditional</td><td>shrine, great shrine</td><td>yes</td><td></td><td></td><td></td><td>yes</td></tr>
+<tr><td>secular</td><td>none</td><td>none</td><td></td><td>secular_state</td><td></td><td></td><td></td></tr>
+</tbody></table></div>
+<h2 id="relations"><a class="anchor" href="#relations" aria-label="Link to this section">#</a>Relations</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>layered_group</code></td><td>shinto, mahayana, confucian_ritual, daoist</td></tr>
+<tr><td><code>traditional_layers_after_years</code> (provisional)</td><td>100</td></tr>
+<tr><td><code>kin_serves_community_below</code> (provisional)</td><td>0.2</td></tr>
+</tbody></table></div>
+<h2 id="mix-provisional"><a class="anchor" href="#mix-provisional" aria-label="Link to this section">#</a>Mix (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>max_faiths_per_province</code></td><td>3</td></tr>
+<tr><td><code>drift_per_year</code></td><td>0.03</td></tr>
+<tr><td><code>hold_per_share</code></td><td>4</td></tr>
+<tr><td><code>rooted_hold_per_share</code></td><td>8</td></tr>
+<tr><td><code>rooted_sacred_places_pull</code></td><td>1</td></tr>
+<tr><td><code>rooted_sacred_places_min_share</code></td><td>0.25</td></tr>
+<tr><td><code>vanish_below</code></td><td>0.01</td></tr>
+<tr><td><code>hidden_believers_floor</code></td><td>0.02</td></tr>
+<tr><td><code>hidden_believers_years</code></td><td>100</td></tr>
+<tr><td><code>update</code></td><td>yearly</td></tr>
+</tbody></table></div>
+<h2 id="pull-provisional"><a class="anchor" href="#pull-provisional" aria-label="Link to this section">#</a>Pull (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>house_steps</code></td><td>1, 1.5, 2</td></tr>
+<tr><td><code>minority_house</code></td><td>0.5</td></tr>
+<tr><td><code>monastery</code></td><td>1</td></tr>
+<tr><td><code>pilgrimage_shrine</code></td><td>1</td></tr>
+<tr><td><code>fallow_multiplier</code></td><td>0.5</td></tr>
+<tr><td><code>preacher</code></td><td>2</td></tr>
+<tr><td><code>school_of_faith</code></td><td>0.5</td></tr>
+<tr><td><code>capital</code></td><td>1</td></tr>
+<tr><td><code>lord_of_faith</code></td><td>0.5</td></tr>
+<tr><td><code>traders_per_100</code></td><td>0.5</td></tr>
+<tr><td><code>traders_max</code></td><td>2</td></tr>
+<tr><td><code>restricted_escape_tax</code></td><td>1</td></tr>
+<tr><td><code>chaplain_multiplier</code></td><td>2</td></tr>
+<tr><td><code>persecution_multiplier</code></td><td>2</td></tr>
+<tr><td><code>inquisition</code></td><td>1</td></tr>
+</tbody></table></div>
+<h3 id="landmark-house"><a class="anchor" href="#landmark-house" aria-label="Link to this section">#</a>Landmark house</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>here</code></td><td>3</td></tr>
+<tr><td><code>realm_within_rings</code></td><td>3</td></tr>
+<tr><td><code>there</code></td><td>0.5</td></tr>
+</tbody></table></div>
+<h2 id="houses-provisional"><a class="anchor" href="#houses-provisional" aria-label="Link to this section">#</a>Houses (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>minority_house_needs_share</code></td><td>0.1</td></tr>
+<tr><td><code>preacher_per_monastery_or_religious_school</code></td><td>1</td></tr>
+<tr><td><code>tithe_gold_per_10000_people</code></td><td>1</td></tr>
+<tr><td><code>preacher_founds_house_after_years</code></td><td>10</td></tr>
+<tr><td><code>convert_cost_share_of_build</code></td><td>0.5</td></tr>
+<tr><td><code>take_over_spark</code></td><td>insult_to_faith</td></tr>
+<tr><td><code>take_over_old_faith_lords</code></td><td>-1</td></tr>
+</tbody></table></div>
+<h3 id="take-over-gold"><a class="anchor" href="#take-over-gold" aria-label="Link to this section">#</a>Take over gold</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>per_step</code></td><td>20</td></tr>
+<tr><td><code>monastic_land_multiplier</code></td><td>2</td></tr>
+</tbody></table></div>
+<h2 id="communities-provisional"><a class="anchor" href="#communities-provisional" aria-label="Link to this section">#</a>Communities (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>min_share</code></td><td>0.1</td></tr>
+<tr><td><code>wrong_faith_min_share</code></td><td>0.33</td></tr>
+</tbody></table></div>
+<h2 id="policies-provisional"><a class="anchor" href="#policies-provisional" aria-label="Link to this section">#</a>Policies (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>established</code></td><td>none</td></tr>
+<tr><td><code>change_takes_effect</code></td><td>next_new_year</td></tr>
+<tr><td><code>harsher_step_is_spark</code></td><td>yes</td></tr>
+</tbody></table></div>
+<h3 id="tolerated"><a class="anchor" href="#tolerated" aria-label="Link to this section">#</a>Tolerated</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>pious_lords_waver_if_faith_share_of_realm</code></td><td>0.1</td></tr>
+</tbody></table></div>
+<h3 id="restricted"><a class="anchor" href="#restricted" aria-label="Link to this section">#</a>Restricted</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>faith_tax</code></td><td>0.25</td></tr>
+<tr><td><code>new_houses</code></td><td>no</td></tr>
+<tr><td><code>wrong_faith_where_majority</code></td><td>yes</td></tr>
+<tr><td><code>their_lords_loyalty_steps</code></td><td>-1</td></tr>
+</tbody></table></div>
+<h3 id="persecuted"><a class="anchor" href="#persecuted" aria-label="Link to this section">#</a>Persecuted</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>houses</code></td><td>close_or_take_over</td></tr>
+<tr><td><code>flee_per_year</code></td><td>0.02</td></tr>
+<tr><td><code>grievance</code></td><td>persecuted</td></tr>
+<tr><td><code>grievance_weight</code></td><td>2</td></tr>
+<tr><td><code>their_lords_loyalty_steps</code></td><td>-2</td></tr>
+<tr><td><code>sets_flag</code></td><td>religious_persecution_active</td></tr>
+<tr><td><code>gives_war_aim_to_bordering_rulers_of_faith</code></td><td>defend_the_faith</td></tr>
+</tbody></table></div>
+<h2 id="expulsion-provisional"><a class="anchor" href="#expulsion-provisional" aria-label="Link to this section">#</a>Expulsion (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>leave_share</code></td><td>0.7</td></tr>
+<tr><td><code>within_months</code></td><td>12</td></tr>
+<tr><td><code>bloodshed_grievance</code></td><td>yes</td></tr>
+</tbody></table></div>
+<h2 id="inquisition"><a class="anchor" href="#inquisition" aria-label="Link to this section">#</a>Inquisition</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>upkeep_gold_per_year</code> (provisional)</td><td>10</td></tr>
+<tr><td><code>skilled_leave_per_year</code> (provisional)</td><td>0.01</td></tr>
+<tr><td><code>sets_flag</code></td><td>inquisition_established</td></tr>
+<tr><td><code>removes_hidden_believers_floor</code></td><td>yes</td></tr>
+</tbody></table></div>
+<h3 id="allowed-for"><a class="anchor" href="#allowed-for" aria-label="Link to this section">#</a>Allowed for</h3>
+<blockquote>
+<p>D-RELG-8: the government forms of the family &quot;rule by a house&quot;</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>state_faith</code></td><td>catholic</td></tr>
+<tr><td><code>forms</code></td><td>feudal_realm, diet_monarchy, household_realm, bureaucratic_empire, elective_monarchy, absolute_monarchy, constitutional_monarchy</td></tr>
+</tbody></table></div>
+<h2 id="preachers"><a class="anchor" href="#preachers" aria-label="Link to this section">#</a>Preachers</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>per_houses_of_state_faith</code> (provisional)</td><td>5</td></tr>
+<tr><td><code>per_holy_place_held</code> (provisional)</td><td>1</td></tr>
+<tr><td><code>upkeep_gold_per_year</code> (provisional)</td><td>1</td></tr>
+<tr><td><code>foreign_without_leave_expel_chance_per_year</code> (provisional)</td><td>0.25</td></tr>
+<tr><td><code>sets_flag_when_expelled</code></td><td>missionary_persecution</td></tr>
+</tbody></table></div>
+<h2 id="state-faith-change"><a class="anchor" href="#state-faith-change" aria-label="Link to this section">#</a>State faith change</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>capital_share_min</code> (provisional)</td><td>0.3</td></tr>
+<tr><td><code>realm_share_min</code> (provisional)</td><td>0.4</td></tr>
+<tr><td><code>cooldown_years</code> (provisional)</td><td>30</td></tr>
+<tr><td><code>cuius_regio_after_event</code></td><td>peace_of_augsburg</td></tr>
+<tr><td><code>cuius_regio_faiths</code></td><td>catholic, protestant</td></tr>
+<tr><td><code>reformed_faiths</code></td><td>protestant, anglican, hussite</td></tr>
+</tbody></table></div>
+<h2 id="lords-provisional"><a class="anchor" href="#lords-provisional" aria-label="Link to this section">#</a>Lords (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>build_or_pay_house_of_his_faith</code></td><td>1</td></tr>
+<tr><td><code>pious_or_clergy_on_toleration</code></td><td>-1</td></tr>
+<tr><td><code>pious_or_clergy_on_take_over</code></td><td>1</td></tr>
+<tr><td><code>state_faith_changes_away</code></td><td>-1</td></tr>
+<tr><td><code>state_faith_changes_to_his</code></td><td>1</td></tr>
+</tbody></table></div>
+<h2 id="faith-rules-provisional"><a class="anchor" href="#faith-rules-provisional" aria-label="Link to this section">#</a>Faith rules (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>per press</th><th>per school</th><th>take over gold multiplier</th><th>clergy lords ignore faith policy</th><th>kin of</th><th>from event</th><th>merge at end of</th><th>merge latest year</th><th>else into</th><th>more</th></tr></thead>
+<tbody>
+<tr><td>print_and_school_pull</td><td>0.5</td><td>0.5</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>monastic_land</td><td></td><td></td><td>2</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>crown_heads_church</td><td></td><td></td><td></td><td>yes</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>merges_into_protestant</td><td></td><td></td><td></td><td></td><td>protestant</td><td>protestant_reformation</td><td>p_protestant_reformation</td><td>1620</td><td>catholic</td><td>merge when: the end of p_protestant_reformation or merge_latest_year, whichever comes first (D-RELG-14)</td></tr>
+<tr><td>protected_communities</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>restricted served no wrong faith: yes</td></tr>
+<tr><td>temple_town</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>step3 temple traders per year: 150</td></tr>
+<tr><td>langar</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>homeless sheltered per house: 1000</td></tr>
+<tr><td>monastery_school</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>student seats per house: 20</td></tr>
+<tr><td>lama_lords</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>step3 house or monastery can be fief: yes</td></tr>
+<tr><td>secular_state</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>allowed policies: tolerated, restricted; town school pull after year: 1850; town school pull: 0.5; needs innovation: mass_literacy_schooling; needs building: factory</td></tr>
+</tbody></table></div>
+<h2 id="holy-places"><a class="anchor" href="#holy-places" aria-label="Link to this section">#</a>Holy places</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>id</th><th>faiths</th><th>province</th><th>holder 1444</th><th>note</th><th>appears with event</th><th>earliest</th><th>moves</th></tr></thead>
+<tbody>
+<tr><td>rome</td><td>catholic</td><td>Rome</td><td>papal_states</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>jerusalem</td><td>catholic, orthodox, oriental_christian, jewish, sunni, shia</td><td>Jerusalem</td><td>mamluk</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>mecca_medina</td><td>sunni, shia, ibadi</td><td>Hejaz</td><td>hejaz</td><td>Held by the Sharifs (Hejaz), who own the province; the Mamluk overlord does not hold it (D-RELG-23)</td><td></td><td></td><td></td></tr>
+<tr><td>karbala_najaf</td><td>shia</td><td>Karbala</td><td>qara_qoyunlu</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>constantinople</td><td>orthodox</td><td>Constantinople</td><td>byzantium</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>echmiadzin</td><td>oriental_christian</td><td>Yerevan</td><td>qara_qoyunlu</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>aksum</td><td>oriental_christian</td><td>Aksum</td><td>ethiopia</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>varanasi</td><td>hindu</td><td>Varanasi</td><td>jaunpur</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>amritsar</td><td>sikh</td><td>Amritsar</td><td>none</td><td></td><td>sikh_panth_founded</td><td>1577</td><td></td></tr>
+<tr><td>lhasa</td><td>vajrayana</td><td>Lhasa</td><td>tibet</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>temple_of_the_tooth</td><td>theravada</td><td>Kotte</td><td>kotte</td><td>Follows the relic: Kandy from 1592 (D-RELG-16, provisional year)</td><td></td><td></td><td>(from_year: 1592; province: Kandy)</td></tr>
+<tr><td>mount_wutai</td><td>mahayana</td><td>Shanxi</td><td>ming</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>qufu</td><td>confucian_ritual</td><td>Shandong</td><td>ming</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>santiago</td><td>catholic</td><td>Galicia</td><td>castile</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>bodh_gaya</td><td>theravada, mahayana, vajrayana</td><td>Gaya</td><td>jaunpur</td><td>Contested with Bengal in 1444; in decline until restoration from 1880</td><td></td><td></td><td></td></tr>
+<tr><td>ise</td><td>shinto</td><td>Ise</td><td>japan</td><td></td><td></td><td></td><td></td></tr>
+</tbody></table></div>
+<h2 id="holy-place-effects-provisional"><a class="anchor" href="#holy-place-effects-provisional" aria-label="Link to this section">#</a>Holy place effects (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>preachers</th><th>pilgrim traders per year</th><th>war aim for rulers of faith</th><th>policy</th><th>house of faith in province</th></tr></thead>
+<tbody>
+<tr><td>same_faith</td><td>1</td><td>200</td><td></td><td></td><td></td></tr>
+<tr><td>other_faith</td><td></td><td></td><td>defend_the_faith</td><td></td><td></td></tr>
+<tr><td>pilgrims_still_come_if</td><td></td><td></td><td></td><td>tolerated</td><td>yes</td></tr>
+</tbody></table></div>
+<h2 id="waves"><a class="anchor" href="#waves" aria-label="Link to this section">#</a>Waves</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>carriers</code></td><td>presses, schools, towns, traders, rule, army, preachers</td></tr>
+<tr><td><code>town_min_size</code></td><td>market_town</td></tr>
+<tr><td><code>max_active</code> (provisional)</td><td>8</td></tr>
+</tbody></table></div>
+<h2 id="ai-provisional"><a class="anchor" href="#ai-provisional" aria-label="Link to this section">#</a>Ai (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>build_state_house_where_state_share_below</code></td><td>0.5</td></tr>
+<tr><td><code>tolerate_faith_above_realm_share</code></td><td>0.2</td></tr>
+<tr><td><code>zealous_personalities_restrict</code></td><td>yes</td></tr>
+<tr><td><code>persecute_only_after_event_or_religious_war</code></td><td>yes</td></tr>
+<tr><td><code>adopt_faith_without_event_above_realm_share</code></td><td>0.6</td></tr>
+</tbody></table></div>
+<h2 id="start-provisional"><a class="anchor" href="#start-provisional" aria-label="Link to this section">#</a>Start (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>source</code></td><td>../build/catalogue-faiths.json</td></tr>
+<tr><td><code>ruler_faith_share_where_people_majority_differs</code></td><td>0.15</td></tr>
+<tr><td><code>community_default_share</code></td><td>0.05</td></tr>
+</tbody></table></div>
+<h3 id="overrides"><a class="anchor" href="#overrides" aria-label="Link to this section">#</a>Overrides</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>where</th><th>owner</th><th>mix</th><th>towns only</th><th>mix add</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>region:balkans</td><td>ottoman</td><td>orthodox: 0.85; sunni: 0.15</td><td></td><td></td></tr>
+<tr><td>2</td><td>area:bohemia</td><td></td><td>hussite: 0.7; catholic: 0.27; jewish: 0.03</td><td></td><td></td></tr>
+<tr><td>3</td><td>area:granada</td><td></td><td>sunni: 0.95; jewish: 0.03; catholic: 0.02</td><td></td><td></td></tr>
+<tr><td>4</td><td>area:poland</td><td></td><td></td><td>yes</td><td>jewish: 0.05</td></tr>
+<tr><td>5</td><td>area:north_java_coast</td><td></td><td>hindu: 0.55; sunni: 0.25; asian_traditional: 0.2</td><td></td><td></td></tr>
+<tr><td>6</td><td>area:punjab</td><td></td><td>hindu: 0.55; sunni: 0.45</td><td></td><td></td></tr>
+<tr><td>7</td><td>region:persia</td><td></td><td>sunni: 0.8; shia: 0.2</td><td></td><td></td></tr>
+<tr><td>8</td><td>area:egypt</td><td></td><td>sunni: 0.88; oriental_christian: 0.1; jewish: 0.02</td><td></td><td></td></tr>
+</tbody></table></div>
+<h3 id="record-faith-overrides"><a class="anchor" href="#record-faith-overrides" aria-label="Link to this section">#</a>Record faith overrides</h3>
+<blockquote>
+<p>D-RELG-12: records with no faith id of their own; the named minority stays in the catalogue</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>wokou</code></td><td>mahayana</td></tr>
+<tr><td><code>guanahatabey</code></td><td>indigenous_american</td></tr>
+<tr><td><code>yazidi_communities</code></td><td>sunni</td></tr>
+<tr><td><code>druze_maan</code></td><td>sunni</td></tr>
+</tbody></table></div>
+<h2 id="patches"><a class="anchor" href="#patches" aria-label="Link to this section">#</a>Patches</h2>
+<ul>
+<li>event: protestant_reformation; option: protect_the_reformer; tier: immediate; add: ((faith_wave: (id: reformation; faith: protestant; from: $reform_centre; carriers: presses, schools, towns; pull: 1.5; reach_per_year: 0.5; limit: region:europe; until_period: p_protestant_reformation)))</li>
+<li>event: council_of_trent; option: confessional_reform; tier: immediate; add: ((preachers: (on: $catholic_powers; faith: catholic; amount: 2; years: 80)), (faith_wave: (id: catholic_renewal; faith: catholic; from: $papacy; carriers: schools, preachers; pull: 1; reach_per_year: 1; limit: region:europe; until_period: p_catholic_reformation)))</li>
+<li>event: safavid_rise; option: impose_twelver_shiism; tier: immediate; add: ((faith_wave: (id: safavid_shiism; faith: shia; from: $order; carriers: rule, preachers; pull: 2; reach_per_year: 1; limit: region:middle_east; years: 150)))</li>
+<li>event: sikh_panth_founded; option: new_panth; tier: immediate; add: ((faith_wave: (id: sikh_panth; faith: sikh; from: area:punjab; carriers: preachers, towns; pull: 0.5; reach_per_year: 0.2; limit: region:north_india; years: 200)))</li>
+<li>event: futa_jallon_jihad; option: almamate; tier: immediate; add: ((faith_wave: (id: futa_jallon; faith: sunni; from: $movement; carriers: rule, army; pull: 1.5; reach_per_year: 0.5; limit: region:west_africa; years: 80)))</li>
+<li>event: sokoto_jihad; option: caliphate; tier: immediate; add: ((faith_wave: (id: sokoto; faith: sunni; from: $reformers; carriers: rule, army, preachers; pull: 1.5; reach_per_year: 0.5; limit: region:sub_saharan_africa; years: 100)))</li>
+</ul>
+<h2 id="event-options"><a class="anchor" href="#event-options" aria-label="Link to this section">#</a>Event options</h2>
+<h3 id="princes-adopt-the-reformation"><a class="anchor" href="#princes-adopt-the-reformation" aria-label="Link to this section">#</a>Princes adopt the reformation</h3>
+<h4 id="adopt-and-take-church-lands"><a class="anchor" href="#adopt-and-take-church-lands" aria-label="Link to this section">#</a>Adopt and take church lands</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>religion</th><th>on</th><th>modifier</th><th>faith policy</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>on: $prince; set: protestant</td><td></td><td></td><td></td></tr>
+<tr><td>2</td><td></td><td>$prince</td><td>dissolution_of_monasteries</td><td></td></tr>
+<tr><td>3</td><td></td><td></td><td></td><td>on: $prince; faith: catholic; set: restricted</td></tr>
+</tbody></table></div>
+<h4 id="adopt-and-keep-church-lands"><a class="anchor" href="#adopt-and-keep-church-lands" aria-label="Link to this section">#</a>Adopt and keep church lands</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>religion</th><th>faith policy</th><th>on</th><th>stat</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>on: $prince; set: protestant</td><td></td><td></td><td></td></tr>
+<tr><td>2</td><td></td><td>on: $prince; faith: catholic; set: tolerated</td><td></td><td></td></tr>
+<tr><td>3</td><td></td><td></td><td>$prince</td><td>stability: -1</td></tr>
+</tbody></table></div>
+<h4 id="stay-with-rome"><a class="anchor" href="#stay-with-rome" aria-label="Link to this section">#</a>Stay with rome</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>preachers</th><th>faith policy</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>on: $prince; faith: catholic; amount: 1; years: 30</td><td></td></tr>
+<tr><td>2</td><td></td><td>on: $prince; faith: protestant; set: restricted</td></tr>
+</tbody></table></div>
+<h3 id="expulsion-of-the-moriscos"><a class="anchor" href="#expulsion-of-the-moriscos" aria-label="Link to this section">#</a>Expulsion of the moriscos</h3>
+<h4 id="expel"><a class="anchor" href="#expel" aria-label="Link to this section">#</a>Expel</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>move population</th><th>on</th><th>modifier</th><th>set flag</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>group: mudejar_morisco_population; from: $crown; to: $host; amount: 70%</td><td></td><td></td><td></td></tr>
+<tr><td>2</td><td></td><td>$crown</td><td>loss_of_skilled_minority</td><td></td></tr>
+<tr><td>3</td><td></td><td>$host</td><td>skilled_refugees</td><td></td></tr>
+<tr><td>4</td><td></td><td></td><td></td><td>on: $crown; id: religious_persecution_active; years: 20</td></tr>
+</tbody></table></div>
+<h4 id="leave-them-be"><a class="anchor" href="#leave-them-be" aria-label="Link to this section">#</a>Leave them be</h4>
+<ul>
+<li>on: $crown; stat: (stability: -1)</li>
+</ul>
+<h3 id="altan-khan-and-the-dalai-lama"><a class="anchor" href="#altan-khan-and-the-dalai-lama" aria-label="Link to this section">#</a>Altan khan and the dalai lama</h3>
+<h4 id="patron-of-the-gelug"><a class="anchor" href="#patron-of-the-gelug" aria-label="Link to this section">#</a>Patron of the gelug</h4>
+<ul>
+<li>religion: (on: $khan; set: vajrayana)</li>
+<li>on: $khan; modifier: lama_patronage</li>
+<li>faith_wave: (id: mongol_conversion; faith: vajrayana; from: $khan; carriers: rule, preachers; pull: 1.5; reach_per_year: 0.5; limit: region:central_asia; years: 70)</li>
+</ul>
+<h4 id="keep-the-old-rites"><a class="anchor" href="#keep-the-old-rites" aria-label="Link to this section">#</a>Keep the old rites</h4>
+<ul>
+<li>on: $khan; stat: (stability: 1)</li>
+</ul>
+<h3 id="jizya-reimposed"><a class="anchor" href="#jizya-reimposed" aria-label="Link to this section">#</a>Jizya reimposed</h3>
+<h4 id="reimpose-the-tax"><a class="anchor" href="#reimpose-the-tax" aria-label="Link to this section">#</a>Reimpose the tax</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>faith policy</th><th>on</th><th>modifier</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>on: $emperor; faith: hindu; set: restricted</td><td></td><td></td></tr>
+<tr><td>2</td><td></td><td>$emperor</td><td>faith_tax_revenue</td></tr>
+</tbody></table></div>
+<h4 id="keep-akbars-settlement"><a class="anchor" href="#keep-akbars-settlement" aria-label="Link to this section">#</a>Keep akbars settlement</h4>
+<ul>
+<li>on: $emperor; modifier: religious_tolerance_policy</li>
+</ul>
+<h3 id="raskol-old-believers"><a class="anchor" href="#raskol-old-believers" aria-label="Link to this section">#</a>Raskol old believers</h3>
+<h4 id="enforce-the-new-rites"><a class="anchor" href="#enforce-the-new-rites" aria-label="Link to this section">#</a>Enforce the new rites</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>on</th><th>modifier</th><th>rebels</th><th>move population</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>$state</td><td>church_schism</td><td></td><td></td></tr>
+<tr><td>2</td><td></td><td></td><td>on: $state; type: religious; size: medium</td><td></td></tr>
+<tr><td>3</td><td></td><td></td><td></td><td>group: old_believers; from: $state; to: region:siberia; amount: 5%</td></tr>
+</tbody></table></div>
+<h4 id="allow-both-rites"><a class="anchor" href="#allow-both-rites" aria-label="Link to this section">#</a>Allow both rites</h4>
+<ul>
+<li>on: $state; stat: (legitimacy: -5)</li>
+</ul>
+<h3 id="revolution-and-the-church"><a class="anchor" href="#revolution-and-the-church" aria-label="Link to this section">#</a>Revolution and the church</h3>
+<h4 id="concordat"><a class="anchor" href="#concordat" aria-label="Link to this section">#</a>Concordat</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>on</th><th>modifier</th><th>faith policy</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>$realm</td><td>concordat_settlement</td><td></td></tr>
+<tr><td>2</td><td></td><td></td><td>on: $realm; faith: protestant; set: tolerated</td></tr>
+<tr><td>3</td><td></td><td></td><td>on: $realm; faith: jewish; set: tolerated</td></tr>
+</tbody></table></div>
+<h4 id="civic-religion"><a class="anchor" href="#civic-religion" aria-label="Link to this section">#</a>Civic religion</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>religion</th><th>faith policy</th><th>rebels</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>on: $realm; set: secular</td><td></td><td></td></tr>
+<tr><td>2</td><td></td><td>on: $realm; faith: catholic; set: restricted</td><td></td></tr>
+<tr><td>3</td><td></td><td></td><td>on: $realm; type: religious; size: large</td></tr>
+</tbody></table></div>
+<h3 id="separation-of-church-and-state"><a class="anchor" href="#separation-of-church-and-state" aria-label="Link to this section">#</a>Separation of church and state</h3>
+<h4 id="separate"><a class="anchor" href="#separate" aria-label="Link to this section">#</a>Separate</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>religion</th><th>on</th><th>modifier</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>on: $state; set: secular</td><td></td><td></td></tr>
+<tr><td>2</td><td></td><td>$state</td><td>secular_state</td></tr>
+</tbody></table></div>
+<h4 id="keep-the-established-church"><a class="anchor" href="#keep-the-established-church" aria-label="Link to this section">#</a>Keep the established church</h4>
+<ul>
+<li>on: $state; stat: (stability: 1)</li>
+</ul>
+<h3 id="missionary-societies"><a class="anchor" href="#missionary-societies" aria-label="Link to this section">#</a>Missionary societies</h3>
+<h4 id="found-societies"><a class="anchor" href="#found-societies" aria-label="Link to this section">#</a>Found societies</h4>
+<ul>
+<li>preachers: (on: $sender; amount: 3; years: 60)</li>
+</ul>
+<h4 id="no-state-support"><a class="anchor" href="#no-state-support" aria-label="Link to this section">#</a>No state support</h4>
+<ul>
+<li>preachers: (on: $sender; amount: 1; years: 60)</li>
+</ul>
+<h3 id="court-conversion-islam"><a class="anchor" href="#court-conversion-islam" aria-label="Link to this section">#</a>Court conversion islam</h3>
+<h4 id="embrace-islam"><a class="anchor" href="#embrace-islam" aria-label="Link to this section">#</a>Embrace islam</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>religion</th><th>on</th><th>modifier</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>on: $ruler; set: sunni</td><td></td><td></td></tr>
+<tr><td>2</td><td></td><td>$ruler</td><td>muslim_trade_network</td></tr>
+</tbody></table></div>
+<h4 id="keep-the-old-faith"><a class="anchor" href="#keep-the-old-faith" aria-label="Link to this section">#</a>Keep the old faith</h4>
+<ul>
+<li>on: $ruler; stat: (legitimacy: 5)</li>
+</ul>
+<h3 id="court-conversion-christian"><a class="anchor" href="#court-conversion-christian" aria-label="Link to this section">#</a>Court conversion christian</h3>
+<h4 id="embrace-christianity"><a class="anchor" href="#embrace-christianity" aria-label="Link to this section">#</a>Embrace christianity</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>religion</th><th>on</th><th>modifier</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>on: $ruler; set: protestant</td><td></td><td></td></tr>
+<tr><td>2</td><td></td><td>$ruler</td><td>mission_schools</td></tr>
+</tbody></table></div>
+<h4 id="expel-the-missionaries"><a class="anchor" href="#expel-the-missionaries" aria-label="Link to this section">#</a>Expel the missionaries</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>set flag</th><th>on</th><th>stat</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>on: $ruler; id: missionary_persecution; years: 20</td><td></td><td></td></tr>
+<tr><td>2</td><td></td><td>$ruler</td><td>legitimacy: 5</td></tr>
+</tbody></table></div>
+<h2 id="event-dates"><a class="anchor" href="#event-dates" aria-label="Link to this section">#</a>Event dates</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>princes_adopt_the_reformation</code></td><td>1525, 1563</td></tr>
+<tr><td><code>expulsion_of_the_moriscos</code></td><td>1609, 1614</td></tr>
+<tr><td><code>altan_khan_and_the_dalai_lama</code></td><td>1578</td></tr>
+<tr><td><code>jizya_reimposed</code></td><td>1679</td></tr>
+<tr><td><code>raskol_old_believers</code></td><td>1653, 1667</td></tr>
+<tr><td><code>revolution_and_the_church</code></td><td>1790, 1802</td></tr>
+<tr><td><code>separation_of_church_and_state</code></td><td>1905, 1928</td></tr>
+<tr><td><code>missionary_societies</code></td><td>1792, 1914</td></tr>
+<tr><td><code>court_conversion_islam</code></td><td>1460, 1605</td></tr>
+<tr><td><code>court_conversion_christian</code></td><td>1815, 1869</td></tr>
+</tbody></table></div>
+<h2 id="holy-place-names"><a class="anchor" href="#holy-place-names" aria-label="Link to this section">#</a>Holy place names</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>rome</code></td><td>Rome</td></tr>
+<tr><td><code>jerusalem</code></td><td>Jerusalem</td></tr>
+<tr><td><code>mecca_medina</code></td><td>Mecca and Medina</td></tr>
+<tr><td><code>karbala_najaf</code></td><td>Karbala and Najaf</td></tr>
+<tr><td><code>constantinople</code></td><td>Constantinople</td></tr>
+<tr><td><code>echmiadzin</code></td><td>Echmiadzin</td></tr>
+<tr><td><code>aksum</code></td><td>Aksum</td></tr>
+<tr><td><code>varanasi</code></td><td>Varanasi</td></tr>
+<tr><td><code>amritsar</code></td><td>Amritsar</td></tr>
+<tr><td><code>lhasa</code></td><td>Lhasa</td></tr>
+<tr><td><code>temple_of_the_tooth</code></td><td>Temple of the Tooth</td></tr>
+<tr><td><code>mount_wutai</code></td><td>Mount Wutai</td></tr>
+<tr><td><code>qufu</code></td><td>Qufu</td></tr>
+<tr><td><code>santiago</code></td><td>Santiago de Compostela</td></tr>
+<tr><td><code>bodh_gaya</code></td><td>Bodh Gaya</td></tr>
+<tr><td><code>ise</code></td><td>Ise</td></tr>
+</tbody></table></div>
+<h2 id="holder-names"><a class="anchor" href="#holder-names" aria-label="Link to this section">#</a>Holder names</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>papal_states</code></td><td>Papal States</td></tr>
+<tr><td><code>mamluk</code></td><td>Mamluk Sultanate</td></tr>
+<tr><td><code>qara_qoyunlu</code></td><td>Qara Qoyunlu</td></tr>
+<tr><td><code>byzantium</code></td><td>Byzantium</td></tr>
+<tr><td><code>ethiopia</code></td><td>Ethiopia</td></tr>
+<tr><td><code>jaunpur</code></td><td>Jaunpur</td></tr>
+<tr><td><code>tibet</code></td><td>Tibet</td></tr>
+<tr><td><code>kotte</code></td><td>Kotte</td></tr>
+<tr><td><code>ming</code></td><td>Ming</td></tr>
+<tr><td><code>japan</code></td><td>Japan</td></tr>
+<tr><td><code>castile</code></td><td>Castile</td></tr>
+<tr><td><code>hejaz</code></td><td>Hejaz</td></tr>
+</tbody></table></div>
+<h2 id="lens"><a class="anchor" href="#lens" aria-label="Link to this section">#</a>Lens</h2>
+<blockquote>
+<p>religion §12</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>colour by</th><th>hatched at community share</th><th>holy place icons</th><th>houses</th><th>preachers</th><th>waves</th><th>faith line with pulls</th></tr></thead>
+<tbody>
+<tr><td>world</td><td>majority faith</td><td>0.3</td><td>yes</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>region</td><td></td><td></td><td></td><td>town sprites</td><td>walking figures</td><td>spreading tint</td><td></td></tr>
+<tr><td>local</td><td></td><td></td><td></td><td></td><td></td><td></td><td>yes</td></tr>
+</tbody></table></div>
+<h2 id="event-triggers-provisional"><a class="anchor" href="#event-triggers-provisional" aria-label="Link to this section">#</a>Event triggers (provisional)</h2>
+<blockquote>
+<p>D-RELG-5: what offers the court-conversion events</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>faith</th><th>capital share min</th><th>realm share min</th></tr></thead>
+<tbody>
+<tr><td>court_conversion_islam</td><td>sunni</td><td>0.3</td><td></td></tr>
+<tr><td>court_conversion_christian</td><td>protestant</td><td></td><td>0.15</td></tr>
+</tbody></table></div>
+<h2 id="church-heads"><a class="anchor" href="#church-heads" aria-label="Link to this section">#</a>Church heads</h2>
+<blockquote>
+<p>RELG-085: marked only, no rules (big institutions gap)</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>name</th><th>place</th><th>from</th></tr></thead>
+<tbody>
+<tr><td>pope</td><td>the Pope</td><td>rome</td><td></td></tr>
+<tr><td>ecumenical_patriarch</td><td>the Ecumenical Patriarch</td><td>constantinople</td><td></td></tr>
+<tr><td>caliph</td><td>a Caliph&#39;s claim</td><td>mecca_medina</td><td></td></tr>
+<tr><td>dalai_lama</td><td>the Dalai Lama</td><td>lhasa</td><td>1578</td></tr>
+</tbody></table></div>
+<h2 id="faith-heads"><a class="anchor" href="#faith-heads" aria-label="Link to this section">#</a>Faith heads</h2>
+<blockquote>
+<p>Heads of the faith (RELG-135 to RELG-156, D-RELG-26; design religion/faith-heads-design.md). All numbers provisional. Gold is the design&#39;s; the game multiplies it by defines works.goldScale. seat_provinces and holy_place_provinces are the map provinces nearest each place (the map&#39;s provinces are finer than the holy place list&#39;s regions).</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>crown_headed</code></td><td>anglican, protestant</td></tr>
+</tbody></table></div>
+<h3 id="heads"><a class="anchor" href="#heads" aria-label="Link to this section">#</a>Heads</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>id</th><th>name</th><th>faith</th><th>seat</th><th>way</th><th>seat realm</th><th>from</th><th>created by event</th></tr></thead>
+<tbody>
+<tr><td>pope</td><td>the Pope</td><td>catholic</td><td>rome</td><td>chosen</td><td>papal_states</td><td></td><td></td></tr>
+<tr><td>ecumenical_patriarch</td><td>the Ecumenical Patriarch</td><td>orthodox</td><td>constantinople</td><td>held</td><td></td><td></td><td></td></tr>
+<tr><td>catholicos</td><td>the Catholicos</td><td>oriental_christian</td><td>echmiadzin</td><td>held</td><td></td><td></td><td></td></tr>
+<tr><td>caliph</td><td>the Caliph</td><td>sunni</td><td>mecca_medina</td><td>claimed</td><td></td><td></td><td></td></tr>
+<tr><td>dalai_lama</td><td>the Dalai Lama</td><td>vajrayana</td><td>lhasa</td><td>held</td><td></td><td>1578</td><td>altan_khan_and_the_dalai_lama</td></tr>
+</tbody></table></div>
+<h3 id="no-head-reasons"><a class="anchor" href="#no-head-reasons" aria-label="Link to this section">#</a>No head reasons</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>shia</code></td><td>Twelvers wait for the hidden Imam; the learned guide them</td></tr>
+<tr><td><code>ibadi</code></td><td>its imam is the ruler of Oman</td></tr>
+<tr><td><code>hindu</code></td><td>many orders and teachers, no single head</td></tr>
+<tr><td><code>jain</code></td><td>many orders and teachers, no single head</td></tr>
+<tr><td><code>sikh</code></td><td>the scripture and the Khalsa lead it</td></tr>
+<tr><td><code>theravada</code></td><td>kings protect the monks; no single head</td></tr>
+<tr><td><code>mahayana</code></td><td>kings protect the monks; no single head</td></tr>
+<tr><td><code>shinto</code></td><td>the Emperor in Kyoto belongs to the shogunate</td></tr>
+<tr><td><code>default</code></td><td>no single head leads it</td></tr>
+</tbody></table></div>
+<h3 id="seat-provinces"><a class="anchor" href="#seat-provinces" aria-label="Link to this section">#</a>Seat provinces</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>rome</code></td><td>p1624</td></tr>
+<tr><td><code>constantinople</code></td><td>p1662</td></tr>
+<tr><td><code>echmiadzin</code></td><td>p1705</td></tr>
+<tr><td><code>mecca_medina</code></td><td>p2932, p2721</td></tr>
+<tr><td><code>lhasa</code></td><td>p2614</td></tr>
+</tbody></table></div>
+<h3 id="holy-place-provinces"><a class="anchor" href="#holy-place-provinces" aria-label="Link to this section">#</a>Holy place provinces</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>rome</code></td><td>p1624</td></tr>
+<tr><td><code>jerusalem</code></td><td>p2237</td></tr>
+<tr><td><code>mecca_medina</code></td><td>p2932</td></tr>
+<tr><td><code>karbala_najaf</code></td><td>p2262</td></tr>
+<tr><td><code>constantinople</code></td><td>p1662</td></tr>
+<tr><td><code>echmiadzin</code></td><td>p1705</td></tr>
+<tr><td><code>aksum</code></td><td>p3258</td></tr>
+<tr><td><code>varanasi</code></td><td>p2786</td></tr>
+<tr><td><code>amritsar</code></td><td>p2323</td></tr>
+<tr><td><code>lhasa</code></td><td>p2614</td></tr>
+<tr><td><code>temple_of_the_tooth</code></td><td>p3433</td></tr>
+<tr><td><code>mount_wutai</code></td><td>p1799</td></tr>
+<tr><td><code>qufu</code></td><td>p2083</td></tr>
+<tr><td><code>santiago</code></td><td>p1325</td></tr>
+<tr><td><code>bodh_gaya</code></td><td>p2789</td></tr>
+<tr><td><code>ise</code></td><td>p2110</td></tr>
+</tbody></table></div>
+<h3 id="start-1444"><a class="anchor" href="#start-1444" aria-label="Link to this section">#</a>Start 1444</h3>
+<blockquote>
+<p>RELG-153, D-RELG-25: the Pope has no patron; the held seats follow their owners; the Mamluks hold the Caliph&#39;s claim as if they had taken the decision.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>caliph</code></td><td>mamluks</td></tr>
+</tbody></table></div>
+<h3 id="conclave"><a class="anchor" href="#conclave" aria-label="Link to this section">#</a>Conclave</h3>
+<blockquote>
+<p><code>cardinals\_stand\_in</code>: Houses of worship have no steps in the game yet: a Catholic house counts as step 3 or more where its province has at least this many thousand people.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>months</code></td><td>1</td></tr>
+<tr><td><code>cardinals_per_house_step3</code></td><td>1</td></tr>
+<tr><td><code>cardinal_stand_in_min_people</code></td><td>300</td></tr>
+<tr><td><code>gold_per_vote</code></td><td>100</td></tr>
+<tr><td><code>gold_votes_max_share_of_cardinals</code></td><td>1</td></tr>
+<tr><td><code>rome_votes</code></td><td>10</td></tr>
+<tr><td><code>ai_spare_months_of_income</code></td><td>6</td></tr>
+</tbody></table></div>
+<h3 id="patron"><a class="anchor" href="#patron" aria-label="Link to this section">#</a>Patron</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>tie</code></td><td>15</td></tr>
+<tr><td><code>tie_name</code></td><td>{head} favours us</td></tr>
+<tr><td><code>preachers</code></td><td>1</td></tr>
+</tbody></table></div>
+<h3 id="betrayed"><a class="anchor" href="#betrayed" aria-label="Link to this section">#</a>Betrayed</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>weight</code></td><td>-30</td></tr>
+<tr><td><code>fade_years</code></td><td>30</td></tr>
+<tr><td><code>name</code></td><td>Betrayed the faith</td></tr>
+</tbody></table></div>
+<h3 id="seized"><a class="anchor" href="#seized" aria-label="Link to this section">#</a>Seized</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>weight</code></td><td>-20</td></tr>
+<tr><td><code>fade_years</code></td><td>20</td></tr>
+<tr><td><code>name</code></td><td>Seized the seat</td></tr>
+</tbody></table></div>
+<h3 id="freed"><a class="anchor" href="#freed" aria-label="Link to this section">#</a>Freed</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>weight</code></td><td>20</td></tr>
+<tr><td><code>fade_years</code></td><td>20</td></tr>
+<tr><td><code>name</code></td><td>Freed the seat</td></tr>
+</tbody></table></div>
+<h3 id="censure"><a class="anchor" href="#censure" aria-label="Link to this section">#</a>Censure</h3>
+<blockquote>
+<p><code>aims</code>: D-RELG-26: No aim is censured too, since it is the plainest war for gain and the only aim the game declares with until the declare sheet offers aims.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>aims</code></td><td>take_land, tribute, raid, no_aim</td></tr>
+<tr><td><code>weight</code></td><td>-25</td></tr>
+<tr><td><code>fade_years</code></td><td>10</td></tr>
+<tr><td><code>name</code></td><td>Censured by {head}</td></tr>
+<tr><td><code>lord_cause</code></td><td>censured_by_head</td></tr>
+</tbody></table></div>
+<h3 id="own-patriarch"><a class="anchor" href="#own-patriarch" aria-label="Link to this section">#</a>Own patriarch</h3>
+<blockquote>
+<p><code>step4\_stand\_in</code>: Houses of worship have no steps yet: an Orthodox house in the capital stands for the step-4 house.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>gold</code></td><td>200</td></tr>
+<tr><td><code>preachers</code></td><td>1</td></tr>
+</tbody></table></div>

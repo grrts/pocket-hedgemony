@@ -5,6 +5,7 @@ import ports1444 from "../data/scenarios/1444/ports.json" with { type: "json" };
 import rulers1444 from "../data/scenarios/1444/rulers.json" with { type: "json" };
 import subjects1444 from "../data/scenarios/1444/subjects.json" with { type: "json" };
 import subjectsRulers1444 from "../data/scenarios/1444/subjects-rulers.json" with { type: "json" };
+import goals1444 from "../data/scenarios/1444/goals.json" with { type: "json" };
 import map1444 from "../data/scenarios/1444/world/map.json" with { type: "json" };
 import nations1444 from "../data/scenarios/1444/world/nations.json" with { type: "json" };
 import provinces1444 from "../data/scenarios/1444/world/provinces.json" with { type: "json" };
@@ -16,6 +17,8 @@ import ports1378 from "../data/scenarios/1378/world/ports.json" with { type: "js
 import rulers1378 from "../data/scenarios/1378/rulers.json" with { type: "json" };
 import subjects1378 from "../data/scenarios/1378/subjects.json" with { type: "json" };
 import subjectsRulers1378 from "../data/scenarios/1378/subjects-rulers.json" with { type: "json" };
+import goals1378 from "../data/scenarios/1378/goals.json" with { type: "json" };
+import lords1378 from "../data/scenarios/1378/lords.json" with { type: "json" };
 import mapNations1378 from "../data/scenarios/1378/map-nations.json" with { type: "json" };
 import mapToCatalogue1378 from "../data/scenarios/1378/map-to-catalogue.json" with { type: "json" };
 import map1378 from "../data/scenarios/1378/world/map.json" with { type: "json" };
@@ -32,22 +35,38 @@ import worldMap from "../data/domain/world-map.json" with { type: "json" };
 import realm from "../data/domain/realm.json" with { type: "json" };
 import religion from "../data/domain/religion.json" with { type: "json" };
 import institutions from "../data/domain/institutions.json" with { type: "json" };
-import type { GameDate } from "./types.ts";
+import type { GameDate, GoalDef, HistoricalLords } from "./types.ts";
 
-/** The bundled start (X-25). New campaigns start here unless a dev switch picks another. */
-export const DEFAULT_START = "1444";
+/** The bundled start (X-25): new campaigns start on 20 September 1378. */
+export const DEFAULT_START = "1378";
+
+/** The main history checkpoint, kept as a playable start for tests and the history check (X-25). */
+export const CHECKPOINT_START = "1444";
 
 /**
- * The start the game runs from. 1444 is the bundled start until the switch-over
- * (milestone 10, step 7); the 1378 scenario can be tried behind a dev switch:
- * `?start=1378` (or `#start=1378`) on the page, which the client hands its
- * engine worker as the worker's name `start=1378`, or `PH_START=1378` in Node.
+ * The start the game runs from. New campaigns start in 1378; the 1444
+ * checkpoint can be opened behind a dev switch: `?start=1444` (or
+ * `#start=1444`) on the page, which the client hands its engine worker as the
+ * worker's name `start=1444`, or `PH_START=1444` in Node. The test configs
+ * pin `PH_START=1444`, so tests written against the 1444 world keep reading it.
  */
 function chosenStart(): string {
-  const g = globalThis as { name?: unknown; location?: { search?: string; hash?: string }; process?: { env?: Record<string, string | undefined> }; WorkerGlobalScope?: unknown };
+  const g = globalThis as { name?: unknown; location?: { search?: string; hash?: string }; sessionStorage?: Storage; process?: { env?: Record<string, string | undefined> }; WorkerGlobalScope?: unknown };
   const pick = (s: unknown) => (typeof s === "string" ? new URLSearchParams(s.replace(/^[?#]/, "")).get("start") : null);
-  const id = (g.WorkerGlobalScope !== undefined ? pick(g.name) : (pick(g.location?.search) ?? pick(g.location?.hash))) ?? g.process?.env?.PH_START ?? DEFAULT_START;
-  return id === "1378" ? "1378" : DEFAULT_START;
+  const id = (g.WorkerGlobalScope !== undefined ? pick(g.name) : (pick(g.location?.search) ?? pick(g.location?.hash) ?? sessionStart(g))) ?? g.process?.env?.PH_START ?? DEFAULT_START;
+  return id === CHECKPOINT_START ? CHECKPOINT_START : DEFAULT_START;
+}
+
+/** The page's key for a start picked by a save from another start (SAVE-111): the page reopens in it to load that save. */
+export const SESSION_START_KEY = "ph-start";
+
+/** Reading `sessionStorage` itself throws in a sandboxed frame without allow-same-origin, so the read is inside the try. */
+function sessionStart(g: { sessionStorage?: Storage }): string | null {
+  try {
+    return g.sessionStorage?.getItem(SESSION_START_KEY) ?? null;
+  } catch {
+    return null;
+  }
 }
 
 /** The id of the scenario this run starts from: "1444" or "1378". */
@@ -57,8 +76,7 @@ const is1378 = START_ID === "1378";
 /**
  * The start scenario (X-25): the one place that names the folder the game
  * starts from. Everything that describes the world on the start day is read
- * through here, so moving the start (to 1378, milestone 10) changes this
- * file and its folder, not the engine.
+ * through here, so the engine never names a year.
  */
 export const START_SCENARIO = is1378 ? scenario1378 : scenario1444;
 
@@ -79,6 +97,12 @@ export const startRulers = (is1378 ? rulers1378 : rulers1444) as typeof rulers14
 export const startSubjects = (is1378 ? subjects1378 : subjects1444) as unknown as typeof subjects1444;
 export const startSubjectsRulers = (is1378 ? subjectsRulers1378 : subjectsRulers1444) as typeof subjectsRulers1444;
 
+/** Realms' historical goals on the start day (EVT-100); the 1444 start has none. */
+export const startGoals: readonly GoalDef[] = (is1378 ? goals1378 : goals1444).goals as unknown as GoalDef[];
+
+/** Historical lords seated on the start day and the figures events may bring in later (REALM-280); the 1444 start has none. */
+export const startLords: HistoricalLords = is1378 ? (lords1378 as unknown as HistoricalLords) : { realms: {}, later: {} };
+
 /** The generated map of the start (tools/mapgen): image metadata, nations, provinces and sleeping realms. */
 export const startWorld = {
   map: is1378 ? map1378 : map1444,
@@ -88,10 +112,9 @@ export const startWorld = {
 };
 
 // The domain rules were written against the 1444 map: some name 1444 provinces,
-// and the setup data mirrors the 1444 map nations. Another start rewrites those
+// and the setup data mirrors the 1444 map nations. The 1378 start rewrites those
 // tables in place once, here, before any rule reads them, so the engine keeps
-// reading one set of tables whichever start it runs (a dev-switch bridge until
-// the switch-over moves the rules to the start's own data).
+// reading one set of tables whichever start it runs (SETUP-098).
 if (is1378) {
   const ids = from1444.provinces as Record<string, string>;
   const remap = (v: unknown): unknown => {

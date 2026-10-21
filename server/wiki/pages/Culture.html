@@ -1,0 +1,261 @@
+<h1>Culture</h1>
+<p>Culture in Pocket Hegemony is about <strong>language</strong>: the people a person belongs to, the speech they share and the land they see as their own. Every person has a language, every country has one court language, and everyone in your realm is of the same language, related, foreign or a trading people to that court. Each year languages slowly drift, and you steer that drift with your Language policy, your schools and your officials.</p>
+<h2 id="how-it-works"><a class="anchor" href="#how-it-works" aria-label="Link to this section">#</a>How it works</h2>
+<h3 id="languages-and-families"><a class="anchor" href="#languages-and-families" aria-label="Link to this section">#</a>Languages and families</h3>
+<p>Every person has a language, and every language belongs to exactly one family. There are only these two levels, family and language, with no sub-languages. The game has about 600 languages in 43 families. The families are the event tree&#39;s 39 culture groups plus four added ones: celtic, baltic, caucasian and hebrew.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Language</th><th>Family</th></tr></thead>
+<tbody>
+<tr><td>French</td><td>latin</td></tr>
+<tr><td>Occitan</td><td>latin</td></tr>
+<tr><td>Breton</td><td>celtic</td></tr>
+<tr><td>Mandinka</td><td>mande</td></tr>
+<tr><td>Swahili</td><td>bantu</td></tr>
+<tr><td>Lithuanian</td><td>baltic</td></tr>
+<tr><td>Georgian, Armenian</td><td>caucasian</td></tr>
+<tr><td>Jewish</td><td>hebrew</td></tr>
+<tr><td>Criollo</td><td>creole_atlantic</td></tr>
+</tbody></table></div>
+<p>The world&#39;s catalogue has 1,468 culture strings. They are mapped onto languages once, folding only near-duplicates (so &quot;Jews&quot; and &quot;Jewish communities&quot; both become Jewish, &quot;Swabians&quot; become High German and &quot;Westphalians&quot; Low German). The original string stays as the language&#39;s local name in tooltips, and any string that can&#39;t be mapped goes on a review list. Languages are kept apart where history turns on the split: French and Occitan, Castilian and Catalan, Great Russian and Ruthenian, High German and Low German. Regional peoples stay separate until a nation-building event merges them.</p>
+<p>Each language has an id, a name, a family, a homeland (the provinces it sees as its own), a way of life (settled, herding, forest, seafaring or trading) and a diaspora flag. Some also have a language they merge into or split into. For example, Castilian is a settled latin language that splits to Criollo, Dyula is a trading diaspora, and Tuscan merges into Italian.</p>
+<p>There is no culture meter, no &quot;cultural power&quot; and no list of accepted cultures. What matters is simply who your people are and how they relate to your court.</p>
+<h3 id="the-court-language"><a class="anchor" href="#the-court-language" aria-label="Link to this section">#</a>The court language</h3>
+<p>Every country has one court language: the language of the ruler&#39;s house and court. At the start it is the first culture in the country&#39;s catalogue record, so France starts with French.</p>
+<p>When a dynasty of another language takes the throne, by conquest, inheritance, marriage or a lord&#39;s revolt, the court language becomes that dynasty&#39;s language. If a French dynasty took England, French would become England&#39;s court language and French people would share England&#39;s court language. The game then works out again who is kin and which lords share the court language, and the music palette changes from the next track.</p>
+<h3 id="same-language-related-foreign-and-trading-peoples"><a class="anchor" href="#same-language-related-foreign-and-trading-peoples" aria-label="Link to this section">#</a>Same language, related, foreign and trading peoples</h3>
+<p>Everyone in your realm has one relation to your court:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Relation</th><th>Who</th><th>Counts toward Language %</th><th>Dot</th></tr></thead>
+<tbody>
+<tr><td>Same language</td><td>People of your court language</td><td>1</td><td>green</td></tr>
+<tr><td>Related</td><td>Another language of the same family</td><td>0.5</td><td>yellow</td></tr>
+<tr><td>Foreign</td><td>A language of another family</td><td>0</td><td>red</td></tr>
+<tr><td>Trading people</td><td>A diaspora language</td><td>0</td><td>grey</td></tr>
+</tbody></table></div>
+<p>For France, French people share the court language, Occitans are related, and Bretons and Flemings are foreign.</p>
+<p><strong>Language %</strong> on your country card is the share of the realm&#39;s people of the same language, plus half of those of a related one. It is worked out whenever you open the card and is never stored.</p>
+<p><em>Worked example.</em> France holds 6.9 million French, 1.6 million Occitan, 0.5 million Breton, 0.4 million Flemish, 0.1 million Basque and 0.02 million Jewish people. That is 6.9 of the same language plus half of 1.6 related, so 7.7 out of 9.52 million, and the Language % is 81.</p>
+<p>A trading people is never foreign when grievances are worked out: a Jewish community in Paris gives no <em>Foreign rule</em>. They don&#39;t count toward Language % either. Before nationalism rises, <em>Foreign rule</em> only comes from homelands of foreign languages, never from related ones. While nationalism in a province is under 0.3, French-ruled Brittany has <em>Foreign rule</em> but Toulouse, the Occitan homeland, does not.</p>
+<h3 id="drift"><a class="anchor" href="#drift" aria-label="Link to this section">#</a>Drift</h3>
+<p>Once a year, after births and deaths, people in every province drift a little toward one language: the court&#39;s, or the local majority&#39;s.</p>
+<p><strong>Which language pulls.</strong> The court language pulls if the province has been held 20 years or more and is governed by any of your officials (whatever his own language) or by a lord of the court language. Otherwise the province&#39;s majority language pulls.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Rennes (mostly Breton) held</th><th>Governed by</th><th>Drifts toward</th></tr></thead>
+<tbody>
+<tr><td>20 years</td><td>a royal official</td><td>French</td></tr>
+<tr><td>25 years</td><td>a French lord</td><td>French</td></tr>
+<tr><td>25 years</td><td>a Breton lord</td><td>Breton</td></tr>
+<tr><td>19 years</td><td>a royal official</td><td>Breton</td></tr>
+</tbody></table></div>
+<p>So in a province held only 5 years, like Kent with its English majority, a Norman minority melts into English.</p>
+<p><strong>How fast.</strong> People who already speak that language don&#39;t move. Everyone else moves toward it at a base rate of 0.5 % a year, times every multiplier that applies:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Condition</th><th>Multiplier</th></tr></thead>
+<tbody>
+<tr><td>Town classes (craftsmen, market folk, clerks, scholars)</td><td>× 2</td></tr>
+<tr><td>Related to the language it drifts toward</td><td>× 2</td></tr>
+<tr><td>A school teaching in the language it drifts toward</td><td>× 1.5</td></tr>
+<tr><td>A Schoolmaster official serving in the province</td><td>× 2</td></tr>
+<tr><td>Language policy Let be / Teach / Impose</td><td>× 0.5 / × 1 / × 2</td></tr>
+<tr><td>The province is the drifting language&#39;s homeland</td><td>× 0.5</td></tr>
+<tr><td>A herding, forest or seafaring language in its own kind of land (see below)</td><td>× 0.5</td></tr>
+<tr><td>A trading people</td><td>× 0.25</td></tr>
+<tr><td>The province&#39;s nationalism is 0.3 or more</td><td>× 0.25</td></tr>
+<tr><td>Each of printing, mass schooling, newspapers and railways</td><td>× 1.25</td></tr>
+<tr><td>An <em>Own language</em> charter (drift toward the court language)</td><td>stops it</td></tr>
+</tbody></table></div>
+<p>A school of another language counts for that language instead. A school teaching a learned language, Latin or Classical Arabic, speeds no one&#39;s drift, because nobody grows up speaking it.</p>
+<p><strong>Own kind of land.</strong> Herding peoples are at home on grassland and drylands (the steppe), forest peoples in forest and jungle, and seafaring peoples in any province on the sea. There they drift at half speed.</p>
+<p>So if France has printing and railways, Flemish farmers drift at 0.5 % × 1.25 × 1.25, which is 1.5625 times the base.</p>
+<p><em>Worked example: Troyes.</em> France has the court language French and the policy Teach. Troyes is 94 % French and 6 % Flemish, has been French for 200 years, is run by a royal official, and has a school teaching in French. At the end of the year French pulls. The Flemish drift at 0.5 % × 1.5 for the school × 1 for Teach = 0.75 %, about 32 people. No French people move. If a Schoolmaster also served there, the rate would double to 1.5 %.</p>
+<p><strong>Small and new languages.</strong> A province holds at most three languages. A language that falls below 1 % is removed (if Troyes ends a year with 0.9 % Flemish, Flemish is gone). When a fourth language arrives, it gets in only if it is larger than the smallest of the three; whichever group is smallest then joins the majority. If Riga is Latvian 60 %, German 30 % and Russian 10 % and Swedes as many as 15 % of Riga arrive, Swedish replaces Russian and the Russians join the Latvians. If only 5 % arrive, the Swedes join the Latvians instead. Faiths work the same way.</p>
+<h3 id="people-on-the-move"><a class="anchor" href="#people-on-the-move" aria-label="Link to this section">#</a>People on the move</h3>
+<p>When people move, they carry their language into the new province&#39;s mix. That covers settlers, refugees, the homeless, soldiers coming home and event migrations.</p>
+<ul>
+<li>Settlers can carry the court language into any of your own provinces with free tiles, not only colonies. Castilian settlers can go to Toledo.</li>
+<li>Refugees count in the mix once they have stayed 2 years, like Andalusi refugees in Fez.</li>
+<li>Homeless people drifting next door bring their language, like Galicians into Leon.</li>
+<li>Soldiers coming home rejoin their home language.</li>
+</ul>
+<h3 id="language-policy"><a class="anchor" href="#language-policy" aria-label="Link to this section">#</a>Language policy</h3>
+<p>Each country has one realm-wide <strong>Language policy</strong>: Let be, Teach or Impose. Teach is the default, and you can override it for any single province. For example, France can keep Teach but set Bayonne to Let be, so drift toward French there is halved.</p>
+<ul>
+<li><strong>Let be</strong> halves drift toward the court.</li>
+<li><strong>Teach</strong> keeps drift at its base and makes schools teaching in the court language cost 10 % more upkeep.</li>
+<li><strong>Impose</strong> doubles drift. It gives the grievance <em>Banned language</em> in every province where most people speak a foreign language, and in provinces where most speak a related language once nationalism there is 0.3 or more. When you switch to it, lords of the affected languages waver one step, foreign-language lords first. That happens once: keeping Impose costs no more loyalty.</li>
+</ul>
+<p>Impose needs the <em>Printing</em> invention, unless your country has the <strong>chancery tradition</strong>. At the 1378 start that is Ming, Goryeo, Castile and the Ottomans, who can Impose from the start. Your form of government doesn&#39;t matter: a confederation can Impose and an absolute monarchy can Let be.</p>
+<p><em>Worked example.</em> Castile has the chancery tradition. Granada is mostly Andalusi Arabic (foreign) and Barcelona mostly Catalan (related) with nationalism 0.1. When Castile sets Impose, Granada gets <em>Banned language</em> and Barcelona does not, and the Andalusi lord Zegri wavers a step, just this once. If nationalism in Barcelona later reaches 0.3, Barcelona gets <em>Banned language</em> too.</p>
+<p><em>Banned language</em> ends in a province when the policy there becomes Let be or Teach, when an <em>Own language</em> charter is granted, or when the majority comes to speak the court language.</p>
+<h3 id="the-own-language-charter-and-other-levers"><a class="anchor" href="#the-own-language-charter-and-other-levers" aria-label="Link to this section">#</a>The Own-language charter and other levers</h3>
+<p>The <strong>Own language</strong> charter means the local language is used in courts and schools. Where it stands:</p>
+<ul>
+<li><em>Foreign rule</em> and <em>Banned language</em> end in that province.</li>
+<li>Officials there must be of the local language.</li>
+<li>Drift toward the court language stops (Basque people in Bayonne stay Basque).</li>
+</ul>
+<p>The ruler can grant it, or the province&#39;s lords, its towns or a homeland rising can demand it. Revoking it gives <em>Broken charter</em>, as for any charter.</p>
+<p>Two other levers help. A lord of the local language holding a homeland province ends <em>Foreign rule</em> there, because his language is the people&#39;s. And when the ruler marries into a local house, that house&#39;s lords count as the same language for loyalty.</p>
+<h3 id="officials-and-lords"><a class="anchor" href="#officials-and-lords" aria-label="Link to this section">#</a>Officials and lords</h3>
+<p>Officials have a language too: the language of the province where they were hired (an official hired in Breton Rennes is Breton), or of the school they graduated from. You can hire officials of any language in your realm.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Official serving among</th><th>Years to full effect</th></tr></thead>
+<tbody>
+<tr><td>Same language</td><td>5</td></tr>
+<tr><td>Related</td><td>7</td></tr>
+<tr><td>Foreign</td><td>10</td></tr>
+<tr><td>His own language</td><td>5</td></tr>
+</tbody></table></div>
+<p>An official of the local language in a foreign-language province keeps <em>Banned language</em> away there, even under Impose; <em>Foreign rule</em> stays. A Breton official in Rennes spares it the <em>Banned language</em>.</p>
+<p>A province&#39;s language doesn&#39;t change how many officials and lords your government can support. A foreign-language province costs you only through the longer time your officials need there.</p>
+<p>Lords: a same-language lord (or a lord of a house your ruler married into) has &quot;shares your language&quot; among his reasons to grow loyal, a foreign-language lord starts one step lower, and a related-language lord has neither.</p>
+<h3 id="order-and-war"><a class="anchor" href="#order-and-war" aria-label="Link to this section">#</a>Order and war</h3>
+<ul>
+<li>A homeland rising draws 8 % of everyone of that language. While nationalism in the homeland is under 0.5 it demands self-rule; at 0.5 or more it demands a new country.</li>
+<li>Defenders of the homeland language, rebels included, get +10 % in rough ground: locals know the land.</li>
+<li>A garrison captain of another language than his ruler can be bribed. A Breton captain serving a French king can be bribed; an Occitan one can&#39;t until nationalism rises.</li>
+<li>The war aim <strong>Free a people</strong> opens on a foreign homeland, or on a related homeland once nationalism there is 0.3 or more. Rennes (Breton, foreign) is open at nationalism 0; Toulouse (Occitan, related) opens only at 0.3.</li>
+<li>From the age of revolutions, the war aim <strong>Gather our kin</strong> (a diplomacy war aim) is offered on a province whose majority is your court language but held by another country, and taking it gives no <em>Foreign rule</em>. In 1820, Piedmont with the court language Italian can take Italian Venetia from Austria this way. In 1700 the war aim isn&#39;t offered yet.</li>
+<li>From the age of revolutions, the <strong>National levy</strong>: same-language provinces with nationalism 0.5 or more refill recruits 25 % faster, and foreign-language provinces 25 % slower.</li>
+</ul>
+<h3 id="trade-research-and-diplomacy"><a class="anchor" href="#trade-research-and-diplomacy" aria-label="Link to this section">#</a>Trade, research and diplomacy</h3>
+<ul>
+<li>Where a trading people is at least 2 % of a province with a market, trade value there rises 10 % and you may have one extra trader from that language. If they are persecuted or expelled, the bonus ends and they go as refugees to a neighbour, who gains it.</li>
+<li>A neighbour of the same family counts double toward the 60 % research cap for inventions known by neighbours and trade partners.</li>
+<li>Foreign scholars settle first in realms of their own family.</li>
+<li>Rulers of the same family start one step warmer, and of the same court language two. After nationalism, a country holding many people of your court language is a natural rival.</li>
+</ul>
+<h3 id="languages-through-history"><a class="anchor" href="#languages-through-history" aria-label="Link to this section">#</a>Languages through history</h3>
+<p><strong>Spread.</strong> When an event spreads a family into some provinces, the leading language of that family rises there, or a language set per region in config. If Valencia has Catalan 60 % and Castilian 10 % and an event spreads the latin family there, Catalan rises. The Oromo migrations spread the cushitic family into the Ethiopian highlands, so Oromo rises in each province there.</p>
+<p>Every 5 years the game runs three checks of its own.</p>
+<p><strong>The court goes native.</strong> If your court language has been under 20 % of your people for 50 years and one other language is over half, the event <em>The court goes native</em> is raised. For example, Qing with the Manchu court and a Han majority. You choose:</p>
+<ul>
+<li><em>Take their language</em>: the majority language becomes the court language, lords of the old language waver a step, and the old language&#39;s people become related or foreign (Manchu people become foreign to Qing).</li>
+<li><em>Keep ours</em>: nothing changes and the check runs again in 25 years (raised in 1700, it comes back in 1725).</li>
+</ul>
+<p>France, with French at 72 % of its people, never sees it.</p>
+<p><strong>New languages abroad.</strong> When settlers of one language have been the majority for 100 years in a map region on another continent than their court, their language there splits into a new creole language, which counts as related to the old court and gets no <em>Foreign rule</em> at once. Settlers on the court&#39;s own continent, or for fewer than 100 years, keep their language.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Settlers</th><th>Region</th><th>Court</th><th>New language</th></tr></thead>
+<tbody>
+<tr><td>Castilian</td><td>Mesoamerica</td><td>Castile</td><td>Criollo</td></tr>
+<tr><td>Portuguese</td><td>Brazil</td><td>Portugal</td><td>Brazilian</td></tr>
+<tr><td>English</td><td>North America</td><td>England</td><td>Anglo-American</td></tr>
+<tr><td>Dutch</td><td>Southern Africa</td><td>Holland</td><td>Afrikaans</td></tr>
+</tbody></table></div>
+<p><strong>Nationalism.</strong> Culture reads each province&#39;s nationalism support from the event tree and never sets it.</p>
+<ul>
+<li>At 0.3 or more, related languages there count as foreign: <em>Foreign rule</em> in their homeland, all drift there × 0.25, and <em>Free a people</em> opens. With Piedmont&#39;s Tuscan court, Neapolitans in Naples at 0.3 become foreign.</li>
+<li>At 0.5 or more, homeland risings demand a new country, and a released country takes the catalogue record for that people. If none fits, a new country is made, named after the language, with that language at court and the same form of government as the country it broke from. A winning Breton rising in Rennes releases a country with the catalogue&#39;s Breton record.</li>
+</ul>
+<p><strong>Merging languages.</strong> A nation-building event can merge named languages into their national language. A nation state, meaning a country whose court language is a national language such as Italian or German, that has kept Impose for 50 years merges the regional languages that belong to its national language, without an event. Italy with an Italian court merges Tuscan and Lombard after 50 years; after 45 it hasn&#39;t yet, and Savoy with its French court never does.</p>
+<p><strong>For event writers.</strong> Culture provides the event effects <code>tongue_spread</code>, <code>set_court_tongue</code>, <code>merge_tongues</code> and <code>move_people</code> (people of the language leave as refugees and settle elsewhere), and the triggers <code>court_tongue</code>, <code>tongue_share</code>, <code>kin_of</code>, <code>cousin_of</code> and <code>stranger_to</code>.</p>
+<h3 id="the-computer-players"><a class="anchor" href="#the-computer-players" aria-label="Link to this section">#</a>The computer players</h3>
+<p>AI countries pick their Language policy by personality, using the same rules as you:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Personality</th><th>Language policy</th><th>Levers</th></tr></thead>
+<tbody>
+<tr><td>Hegemon seeker, expansionist</td><td>Teach, then Impose once they have printing</td><td>Settlers into conquered border provinces; <em>Gather our kin</em> after 1789</td></tr>
+<tr><td>Isolationist, mercantile</td><td>Let be</td><td><em>Own language</em> charters; welcome trading peoples</td></tr>
+<tr><td>Opportunist</td><td>Teach</td><td><em>Free a people</em> against neighbours with foreign homelands in revolt</td></tr>
+<tr><td>Zealot</td><td>Teach</td><td>Expel trading peoples of another faith</td></tr>
+</tbody></table></div>
+<h3 id="when-it-happens"><a class="anchor" href="#when-it-happens" aria-label="Link to this section">#</a>When it happens</h3>
+<p>Culture doesn&#39;t run monthly. Drift runs once a year in every province after births and deaths. The three history checks run every 5 years. Language % and the Peoples screen are worked out when you open them. Policy changes, charters and event effects happen at once.</p>
+<h2 id="what-you-see"><a class="anchor" href="#what-you-see" aria-label="Link to this section">#</a>What you see</h2>
+<ul>
+<li><strong>Province card, Language line</strong>: up to three languages with shares, each with a coloured dot (green same language, yellow related, red foreign, grey trading people), for example &quot;Language French 94 % · Flemish 6 %&quot;. Tap it to see this year&#39;s drift, which way it pulls and why.</li>
+<li><strong>Country card, Language line</strong>: your Language %. Tap it to open the Peoples screen.</li>
+<li><strong>The Peoples screen</strong>: one row per language in your realm, largest first, with its people, relation, provinces, and notes such as homeland, grievances, lords, charter and drift. The Language policy selector sits on top. A big realm (the Ottomans hold 40 languages in 9 families) groups the rows by family, folded shut. Tap a row to light its provinces on the map; long-press to see its lords, its officials and any rising.</li>
+</ul>
+<p>For France the screen reads:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Language</th><th>People</th><th>Relation</th><th>Where</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>French</td><td>6.9 m</td><td>same language</td><td>38 prov</td><td></td></tr>
+<tr><td>Occitan</td><td>1.6 m</td><td>related</td><td>9 prov</td><td>homeland, 2 grievances, drifting to French</td></tr>
+<tr><td>Breton</td><td>0.5 m</td><td>foreign</td><td>3 prov</td><td>homeland, Foreign rule, 1 lord</td></tr>
+<tr><td>Flemish</td><td>0.4 m</td><td>foreign</td><td>4 prov</td><td>homeland, Foreign rule</td></tr>
+<tr><td>Basque</td><td>0.1 m</td><td>foreign</td><td>1 prov</td><td>homeland, Own-language charter</td></tr>
+<tr><td>Jewish</td><td>0.02 m</td><td>trading</td><td>6 towns</td><td>+10 % trade in Paris, Lyon</td></tr>
+</tbody></table></div>
+<ul>
+<li><strong>The Language map mode</strong>: provinces coloured by family at far zoom and by language at regional zoom, with a toggle to same language, related and foreign colours for your realm. Homelands of peoples without a country are outlined.</li>
+</ul>
+<h3 id="in-the-game-now"><a class="anchor" href="#in-the-game-now" aria-label="Link to this section">#</a>In the game now</h3>
+<p>Every province starts with up to three languages from its realm&#39;s start record: the court language, the realm&#39;s main peoples, and and, in some areas, a local language set by the area rather than the realm. The language most people speak at the start is the province&#39;s homeland.</p>
+<ul>
+<li><strong>Province card, Language line</strong>: the three languages with their dots. Tap it to open this year&#39;s drift: the language it drifts toward, why (yours where you have held it 20 years and govern it through an official or lord, else the local majority) and each group&#39;s rate with its reasons. Tap again to close it.</li>
+<li><strong>Your realm card, Peoples tab</strong> (next to Government): the court language, Language % (the same language plus half of the related ones), one fold per family with a row per language (share, people, relation, provinces, where it is the majority, aggrieved provinces) and the <strong>Language policy</strong> buttons: Let be, Teach (the default at the start) and Impose. Impose needs Printing or a chancery tradition; until then its button is greyed out and says so. The General tab&#39;s Language line opens the tab.</li>
+<li><strong>Grievances</strong>: <em>Foreign rule</em> where most people speak a language foreign to the court in their own homeland, on land taken after the start (land you held at the start never has it, or 394 provinces in 13 realms would start aggrieved in 1444); <em>Banned language</em> where you Impose and most people speak a foreign language.</li>
+<li><strong>The Languages map mode</strong>: each province coloured by the family of the language most speak, with a key of the largest families.</li>
+<li>Drift runs each New Year, so a share moves by a fraction of a point a year: a generation, not a season. There is no list of accepted cultures: who counts as yours comes from same language, related and foreign.</li>
+</ul>
+<p>Not in yet: per-province homelands, officials&#39; and lords&#39; own languages, schools and town classes speeding drift, people fleeing, charters, and the computer players changing their policy.</p>
+<h2 id="how-it-connects"><a class="anchor" href="#how-it-connects" aria-label="Link to this section">#</a>How it connects</h2>
+<ul>
+<li><a href="/wiki/Provinces">Provinces</a>: stores the language mix, homeland, years held, officials, the <em>Own language</em> charter and the grievances; moves settlers, refugees and soldiers.</li>
+<li><a href="/wiki/Your-Realm">Your-Realm</a>: Language % on the country card, lords&#39; loyalty steps, and dynasty changes.</li>
+<li><a href="/wiki/Government">Government</a>: no form limits your Language policy, and a province&#39;s language doesn&#39;t weigh on the caps; a released country keeps the form of the country it left.</li>
+<li><a href="/wiki/Religion">Religion</a>: the same shapes (mix, buildings, charter) and the persecution or expulsion of trading peoples.</li>
+<li><a href="/wiki/Buildings">Buildings</a>: schools carry a teaching language; Teach raises their upkeep 10 %.</li>
+<li><a href="/wiki/Research">Research</a>: printing for Impose, four inventions speeding drift, family neighbours and scholars.</li>
+<li><a href="/wiki/Historical-Events">Historical-Events</a>: families, spread, nationalism support, the new effects and triggers, migrations.</li>
+<li><a href="/wiki/Rebellions">Rebellions</a>: homeland risings and demands for <em>Own language</em> charters.</li>
+<li><a href="/wiki/Warfare">Warfare</a>: garrison bribes and locals know the land.</li>
+<li><a href="/wiki/Diplomacy">Diplomacy</a>: family warmth, natural rivals, marriages, and the war aims <em>Free a people</em> and <em>Gather our kin</em>.</li>
+<li><a href="/wiki/Recruiting">Recruiting</a>: the National levy refill.</li>
+<li><a href="/wiki/Trade">Trade</a>: trading peoples&#39; trade value and extra trader.</li>
+<li><a href="/wiki/Subjects">Subjects</a>: a subject of your court language folds in faster; a foreign-language subject&#39;s independence war draws its people.</li>
+<li><a href="/wiki/National-Strengths">National-Strengths</a>: language-based strengths such as the chancery tradition.</li>
+<li><a href="/wiki/Revolutions">Revolutions</a>: creole languages and nationalism as signs; regimes set the court language.</li>
+<li><a href="/wiki/Naval">Naval</a>: seafaring languages drift slowly on the coast; sailors keep their language.</li>
+<li><a href="/wiki/Music-and-Sound">Music-and-Sound</a>: the music palette follows the court language&#39;s family.</li>
+<li><a href="/wiki/Map-and-Lenses">Map and Map Modes</a>: the Language map mode, dots and outlines.</li>
+<li><a href="/wiki/The-1378-Start">The 1378 Start</a>: court languages and each province&#39;s starting languages.</li>
+<li><a href="/wiki/Time-and-Turns">Time-and-Turns</a>: the yearly drift slot and the 5-yearly checks.</li>
+</ul>
+<h2 id="numbers"><a class="anchor" href="#numbers" aria-label="Link to this section">#</a>Numbers</h2>
+<p>Every value the game uses, made from its config so it always matches the game: <a href="/wiki/Data-Culture">Culture data</a>. How they combine: <a href="/wiki/Formulas">Formulas</a>.</p>
+<p>All numbers are <strong>provisional</strong> and still being balanced, except the four added families, the chancery-tradition list and the learned languages, which are decided.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>families_added</code></td><td>celtic, baltic, caucasian, hebrew (decided)</td></tr>
+<tr><td><code>relation.*.tongue_share_weight</code></td><td>kin 1.0, cousin 0.5, stranger 0.0, trading 0.0</td></tr>
+<tr><td><code>relation.*.foreign_rule</code></td><td>cousin false, stranger true, trading false</td></tr>
+<tr><td><code>relation.cousin.drift_multiplier</code></td><td>2.0</td></tr>
+<tr><td><code>drift.base_rate_per_year</code></td><td>0.005</td></tr>
+<tr><td><code>drift.court_pull_needs_years_held</code></td><td>20</td></tr>
+<tr><td><code>drift.court_pull_needs</code></td><td>own official, lord of the court language</td></tr>
+<tr><td><code>drift.drop_below_share</code></td><td>0.01</td></tr>
+<tr><td><code>drift.multipliers.*</code></td><td>town 2.0, school 1.5, schoolmaster 2.0, homeland 0.5, way of life 0.5, diaspora 0.25, nationalism 0.25, own-language charter 0.0, each invention 1.25</td></tr>
+<tr><td><code>policy.let_be/teach/impose.drift</code></td><td>0.5 / 1.0 / 2.0</td></tr>
+<tr><td><code>policy.teach.school_upkeep</code></td><td>1.10</td></tr>
+<tr><td><code>policy.impose</code></td><td><em>Banned language</em>, foreign-language lords waver 1, needs printing or chancery tradition</td></tr>
+<tr><td><code>start_flag_chancery_tradition</code></td><td>ming, joseon, castile, ottoman (decided)</td></tr>
+<tr><td><code>officials.years_to_full_effect</code></td><td>kin 5, cousin 7, stranger 10, local language 5</td></tr>
+<tr><td><code>effects.trading_people</code></td><td>min share 0.02, needs a market, trade value 0.10, 1 extra trader</td></tr>
+<tr><td><code>effects.family_neighbour_research_weight</code></td><td>2.0</td></tr>
+<tr><td><code>effects.national_levy</code></td><td>nationalism 0.5, kin 1.25, stranger 0.75, from the age of revolutions</td></tr>
+<tr><td><code>nationalism.cousins_become_strangers_at</code></td><td>0.3</td></tr>
+<tr><td><code>nationalism.homeland_demands_country_at</code></td><td>0.5</td></tr>
+<tr><td><code>engine_events.court_goes_native</code></td><td>court share below 0.20 for 50 years, other language above 0.5, recheck 25 years</td></tr>
+<tr><td><code>engine_events.new_tongue_abroad</code></td><td>100 years of settler majority, on another continent</td></tr>
+<tr><td><code>engine_events.merge_without_event</code></td><td>Impose for 50 years, nation states only</td></tr>
+<tr><td><code>engine_events.check_every_years</code></td><td>5</td></tr>
+<tr><td><code>risings.homeland_draw</code></td><td>0.08</td></tr>
+<tr><td><code>refugees.settle_after_years</code></td><td>2</td></tr>
+<tr><td><code>drift.way_of_life_lands</code></td><td>herding: grassland, drylands; forest: forest, jungle; seafaring: on the sea</td></tr>
+<tr><td><code>schools.learned_tongues</code></td><td>Latin, Classical Arabic (decided)</td></tr>
+<tr><td><code>family_default_by_region</code></td><td>sample: cushitic in the Ethiopian highlands to Oromo; latin in Iberia and the Americas to Castilian</td></tr>
+<tr><td><code>tongues[]</code></td><td>a sample of 28 so far; the full list is about 600</td></tr>
+</tbody></table></div>
+<h2 id="still-open"><a class="anchor" href="#still-open" aria-label="Link to this section">#</a>Still open</h2>
+<p>Nothing about culture is waiting on a design decision. The numbers above are still being balanced.</p>
+<h2 id="for-developers"><a class="anchor" href="#for-developers" aria-label="Link to this section">#</a>For developers</h2>
+<ul>
+<li>Spec: <code>domain/culture/spec.md</code> in the game repository; its section 13 lists every decision with its reason.</li>
+<li>Features: <code>domain/culture/features/</code>: <code>tongues-and-relations.feature</code> (families, court language, Language % for France), <code>drift.feature</code> (Troyes, the language it drifts toward, multipliers, lands, the fourth language), <code>tongue-policy.feature</code>, <code>culture-effects.feature</code>, <code>culture-history.feature</code>, <code>peoples-screen.feature</code> and <code>culture-ai.feature</code>.</li>
+<li>Code: <code>packages/engine/src/domain/culture/</code>, with its numbers in <code>packages/rules/data/domain/culture.json</code> and the start in <code>packages/rules/data/scenarios/1378/culture-start.json</code> (the 1444 checkpoint&#39;s in <code>scenarios/1444/culture-start.json</code>). The game wiring (province arrays, New Year drift, grievances, the snapshot) is <code>packages/engine/src/peoples.ts</code>; the panels are <code>apps/client/src/ui/belief.ts</code>.</li>
+</ul>

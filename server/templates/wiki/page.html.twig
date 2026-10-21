@@ -1,0 +1,22 @@
+{% extends 'wiki/layout.html.twig' %}
+
+{% block title %}{{ slug == 'Home' ? 'Pocket Hegemony wiki' : page.title ~ ' · Pocket Hegemony wiki' }}{% endblock %}
+{% block description %}{{ page.summary }}{% endblock %}
+
+{% block wiki %}
+{% set sections = page.headings|filter(h => h.level == 2) %}
+<article class="framed sheet">
+    {% if slug != 'Home' %}<p class="crumbs"><a href="{{ path('wiki') }}">Wiki</a> › {{ page.title }}</p>{% endif %}
+    {% if sections|length > 2 %}
+    <details class="toc" data-open-wide>
+        <summary>On this page</summary>
+        <ol>
+            {% for h in sections %}<li><a href="#{{ h.id }}">{{ h.text }}</a></li>{% endfor %}
+        </ol>
+    </details>
+    {% endif %}
+    <div class="prose">
+        {{ html|raw }}
+    </div>
+</article>
+{% endblock %}

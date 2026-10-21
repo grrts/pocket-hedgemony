@@ -40,7 +40,7 @@ An age is a broad frame over the world with a window, start and end conditions a
 
 Each age also lists its regions, so systems that care whether "the age has begun in your region" (exploration, national strengths, music) can read it. There are 13 ages in the data and these 10 are inside the campaign.
 
-The campaign is moving to a start on 20 September 1378, the day the Western Schism begins. The **Age of Schism and Conquerors** covers the years from then to the fall of Constantinople: two popes, Timur's campaigns, the early Ming fleets. It is under way from the first day in every region and ends once the Schism and the Council of Basel are over and Constantinople has fallen. **Gunpowder Empires** starts when three of the eight great powers (the realms with the most provinces) know Bombards, or when Constantinople falls. **Exploration** starts when Portugal or Castile has the ocean ships (Carrack and caravel) or holds the Atlantic islands. A fast world starts them early and a slow one waits for 1453 and 1445. A campaign that starts in 1444 has all three under way from the start, as before.
+The campaign starts on 20 September 1378, the day the Western Schism begins. The **Age of Schism and Conquerors** covers the years from then to the fall of Constantinople: two popes, Timur's campaigns, the early Ming fleets. It is under way from the first day in every region and ends once the Schism and the Council of Basel are over and Constantinople has fallen. **Gunpowder Empires** starts when three of the eight great powers (the realms with the most provinces) know Bombards, or when Constantinople falls. **Exploration** starts when Portugal or Castile has the ocean ships (Carrack and caravel) or holds the Atlantic islands. A fast world starts them early and a slow one waits for 1453 and 1445. The 1444 checkpoint world, opened with `?start=1444`, has all three under way from the start.
 
 ### Periods
 
@@ -63,6 +63,27 @@ Deaths, child kings and the Emperor come from the game itself: an event that nee
 ### From 1378 to 1444: Asia, Africa and the Americas
 
 Between the 1378 start and 1444 about a hundred events carry the south's history: Timur's sack of Delhi and the breakup of the Delhi sultanate, the Ming taking Yunnan and beating the Mongols at Buir Lake, Joseon's founding, Japan's two courts reunited, the treasure voyages, the Ming conquest of Đại Việt and the Lam Sơn uprising, Malacca founded after Singapura falls, Ayutthaya sacking Angkor, Songhai breaking from Mali, Kongo and Mutapa founded, the Tuareg taking Timbuktu, the Tepanec war that makes the Triple Alliance, the fall of Mayapan and the Inca's Chanka war. None of them waits for its year. Each happens when the reason it had in history holds: Delhi falls apart once Firuz Shah is dead and his heirs fight, the Inca expand once they have beaten the Chanka, and the Triple Alliance rises once Maxtla turns on the Mexica. If the reason never comes, neither does the event. A campaign that starts in 1444 finds them fought as history had them.
+
+### Everyday events
+
+Between the great events, your own realm asks for small choices. About every two to four months something happens to your officials, lords, family, stores or one of your provinces, and an event card asks what you will do. No new one comes while another card waits for your answer, so they never pile up, and the same event never comes to you twice within 20 years.
+
+| What happens | Your choices |
+|---|---|
+| An official dies in a royal province | Raise his deputy (free, starts at half the post's effect), send for a seasoned man (25 gold, keeps the full effect), or give the post to a lord's kinsman (starts at half, that lord grows more loyal) |
+| A lord dies | Confirm his son (as loyal as his father), ask a fee for the lands (gold, the son less loyal), or take the lands for the crown (they become royal land, your other lords grow less loyal) |
+| A lord feels slighted at court | Send him a gift (gold), give him an office (another lord grows jealous), or let him sulk (he grows less loyal) |
+| A lord speaks well of you | Reward him (gold, he grows more loyal) or thank him |
+| Two lords quarrel over a mill | Judge for one (he grows more loyal, the other less), or fine them both (gold, both less loyal) |
+| A lord is hurt hunting | Send your physician (gold, he grows more loyal) or your prayers |
+| A child is born to your ruler | Hold a feast (gold, your two least loyal lords grow more loyal), promise the child to a lord's house (that lord grows more loyal), or give thanks quietly. With no heir, the child becomes your heir |
+| Your young heir falls ill | Pay the best physicians (gold) or trust in prayer (3 in 10 that the heir dies) |
+| Grain rots, burns or is eaten by rats in a store | The grain is lost whatever you choose; buy grain (gold) or take it from a lord's barns (he grows less loyal) to make half of it good, or bear the loss |
+| Plague reaches one of your provinces | Close the province (its trade stops and its tax halves while closed), send physicians (gold: half as many die and it is over sooner), or keep the roads open. Only one plague card waits at a time; the News tells of the rest |
+
+About forty more are about one of your provinces, a lord's land or an official, and many belong to a part of the world or a span of years. Anywhere you may get a rich harvest (fill the granaries, sell the surplus, or feast a lord), hail (lighten the province's tax for a year), bandits, a fallen bridge, a town fire, a flood, a lord asking for a market or raising walls, an official skimming the tolls, old soldiers asking for land, wolves, a comet, silver or pilgrims. Europe has tournaments until 1600, a printer from 1460 to 1600, witch trials from 1560 to 1700, coffee houses and the fencing of the commons. Railways, strikes, cholera and newspapers come in the 1800s. Caravans are raided in the Middle East and North Africa, the monsoon fails in India, pirates raid the coasts of East Asia, and gold traders reach the Sahel. Their choices can add or take months of food, a share of a province's people or recruits, or lighten its tax, each said in words on the card. The full list with every option is on the [Everyday events data](Data-Events-Everyday) page.
+
+An option you can't pay for isn't offered, and at least one choice always costs nothing. Other realms get the same events and answer them at once, so their lords die, quarrel and change their minds too. *Look at the map* on a card about a province opens that province.
 
 ### When an event can happen
 
@@ -175,6 +196,17 @@ The event data is checked offline before it ships. The build splits it into runt
 
 The build checks that every id exists, every condition and effect type is declared, every event has its roles, two to four options with one historical, that narrative-only events pay no perpetrator, that there are no mandatory prerequisite cycles, impossible triggers or jointly required exclusive pairs, that entities exist at the event's date, that flags read are set or declared, and that ages and periods have start and end conditions. It also reports coverage: any region with fewer than 2 events in an age that lists it, and an agency share (initiator, beneficiary and resister slots over all slots in a region) below 0.35. An error fails the build; warnings do not. The current result is 0 errors and 21 warnings; the anachronism warnings are corrected when a historian checks the sources before release.
 
+### Realms' historical goals
+
+History is a guide, not a script. Realms follow its normal course because each one pursues the goals it really had, for the reasons it had them: the Ottomans want the Balkans for their frontier lords, Florence wants Pisa because it needs a port. Each goal has a window of years, a weight (weak, normal or strong) and an aim the game can read: **take** some places, **hold** some places, make a realm a **subject**, **ally** with a realm, **fight** a realm, or **free** itself from an overlord. Goals about faith, trade or a succession are shown but not weighed.
+
+- **A goal ends with its reason.** A take goal ends once its realm holds every place it names, a hold goal once one of them is lost, an ally goal once the two are allied, and any goal once its target or its realm is gone. A goal pulls from five years before its window and fades over ten years after it.
+- **The AI weighs goals like any other wish.** A goal makes its realm look for a war more often, pick the realm holding its places as the target, and ask for those places first; an ally or subject goal sends envoys toward its target. A goal never lets a war past its price: a weak realm does not march however much it wants to.
+- **Every campaign differs.** At the start the seed shakes every goal: its weight varies by half either way, and a share of goals goes another way (10 % on Historical, 25 % on Plausible, 50 % on Free), taking the plausible alternative where there is one and dropping out where there is none. Historical also weighs goals ×1.5 and Free ×0.5.
+- **You are never steered.** Your realm's goals weigh nothing you do.
+
+The 1378 scenario holds about 760 goals, written region by region from the start-date research. The 1444 start has none.
+
 ### Hooks for other systems
 
 An event can carry a music tag (good event, bad event, major event, crisis, revolution) that moves the soundtrack. Events marked tutorial only never fire in a real campaign.
@@ -184,7 +216,8 @@ An event can carry a music tag (good event, bad event, major event, crisis, revo
 - **The event card.** A fired event opens as a modal card with its options. Events open one at a time, queued in date order.
 - **End turn waits for you.** Unanswered events block End turn until you choose.
 - **The "Events" choice** (Historical, Plausible or Free) is offered among the new game options.
-- **The chronicle** records events that were invalidated.
+- **The Chronicle.** The News has a **History** tab. Its first line counts the turning points ahead: on course, bent or gone. Under it, *Ahead* lists the turning points of history due within 25 years, soonest first, each with its history year. Tap one to see who is heading there: each realm with its goal and why it wants it. *Happened* lists those that happened, with the year and whether it was as in history (within ten years), early or late. A turning point is **bent** when it is more than ten years overdue, or when every realm heading there went another way; it is **gone** when it can no longer happen. At the foot, the closed fold *History's plan for your realm* holds your own realm's goals as hints, if you want them.
+- **Aims on a realm's card.** Another realm's General tab has an **Aims** fold with its live goals, each with its reason and its years.
 - **The end of the campaign** shows the final scores; there is no separate wrap-up event.
 
 ## How it connects
@@ -202,7 +235,7 @@ An event can carry a music tag (good event, bad event, major event, crisis, revo
 - [Screens and navigation](Screens-and-Navigation): the event card, the queue and blocking End turn.
 - [Music and sound](Music-and-Sound): music tags on events.
 - [Achievements](Achievements): your roles and historical or non-historical choices.
-- [Tutorial and help](Tutorial-and-Help): tutorial-only scripted events such as the Varna crusade.
+- [Tutorial and help](Tutorial-and-Help): tutorial-only scripted events.
 - [How a turn works](Time-and-Turns): events run after every other system's monthly, seasonal and yearly steps, just before achievements and the autosave.
 
 ### Each month
@@ -211,12 +244,14 @@ Turns are a week long, so this runs in the turn in which a new month begins. Eac
 
 ## Numbers
 
+Every value the game uses, made from its config so it always matches the game: [Events data](Data-Events) and [Everyday events data](Data-Events-Everyday). How they combine: [Formulas](Formulas).
+
 All of these are provisional values still being balanced, unless noted.
 
 | Key | Value |
 |---|---|
 | `selection.pool_roll_interval_months` | 1 |
-| `selection.max_pool_events_per_country_year` | 2 |
+| `selection.max_pool_events_per_country_year` | 3 |
 | `selection.decision_expiry_years` | 10 |
 | `date_binding` (approximate events) | ×2.0 in the history year, fading over 10 years |
 | `selection.alternate_history_mode.historical` | 1.5, 2.0, 0.8 |

@@ -1,0 +1,919 @@
+<h1>Warfare data</h1>
+<p>Every value in the game&#39;s warfare config, exactly as the game reads it. This page is made from <code>packages/rules/data/domain/warfare.json</code> each time the config changes, so it always matches the game. How these values are used is explained on <a href="/wiki/Warfare">Warfare</a>.</p>
+<p>Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and values marked (provisional) are placeholders that may still change in balancing. Inventions are shown by id and name; see <a href="/wiki/Data-Research#inventions">Research data</a>.</p>
+<blockquote>
+<p>Warfare (domain/warfare/spec.md). One warfare config file (WAR-199). Every value is a placeholder from warfare-design v5, warfare-eras and warfare-styles (spec §10); key names follow spec §10. Era VIII and the part of era VII after 31 August 1939 are out of scope.</p>
+<p><code>decisions</code>: D-WAR-1..21 (spec §13). Standing regiments break at 30 % (D-WAR-15), the Shore sector costs -20 % across a river (D-WAR-5), drill runs to 24 (D-WAR-9).</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>battle_step_choices</code></td><td>change standing orders, retreat, switch battle</td></tr>
+<tr><td><code>drill_max</code> (provisional)</td><td>24</td></tr>
+<tr><td><code>scars_max</code></td><td>5</td></tr>
+<tr><td><code>scar_fade_years</code></td><td>5</td></tr>
+<tr><td><code>days_per_week</code></td><td>7</td></tr>
+<tr><td><code>days_per_month</code></td><td>30</td></tr>
+<tr><td><code>arms_rust</code></td><td>0.02</td></tr>
+<tr><td><code>powder_damp</code></td><td>0.05</td></tr>
+<tr><td><code>victories_window_years</code></td><td>20</td></tr>
+<tr><td><code>levy_gather_days</code></td><td>14</td></tr>
+<tr><td><code>reserve_sizes</code></td><td>1, 2, 3</td></tr>
+<tr><td><code>forage_limit_rations</code></td><td>2</td></tr>
+<tr><td><code>season_months</code></td><td>3</td></tr>
+<tr><td><code>rumour_error</code></td><td>0.333333</td></tr>
+<tr><td><code>levels</code></td><td>Raw, Drilled, Seasoned, Veteran, Elite</td></tr>
+<tr><td><code>w10_ammo</code></td><td>1</td></tr>
+<tr><td><code>hunger_hits</code></td><td>-0.2</td></tr>
+<tr><td><code>assault_losses</code></td><td>1.25</td></tr>
+<tr><td><code>capture_chance</code></td><td>0.1</td></tr>
+<tr><td><code>might_victories_per_point</code></td><td>2</td></tr>
+<tr><td><code>second_trait_victories</code></td><td>10</td></tr>
+<tr><td><code>second_style_victories</code></td><td>10</td></tr>
+<tr><td><code>captain_learns_style_wins</code></td><td>3</td></tr>
+<tr><td><code>max_captains</code></td><td>2</td></tr>
+<tr><td><code>prisoner_enlist_level</code></td><td>1</td></tr>
+<tr><td><code>relief_bonus</code></td><td>0.1</td></tr>
+<tr><td><code>raid_war_months</code></td><td>12</td></tr>
+<tr><td><code>style_learn_years</code></td><td>3</td></tr>
+</tbody></table></div>
+<h2 id="arms"><a class="anchor" href="#arms" aria-label="Link to this section">#</a>Arms</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>label</th><th>strength</th><th>unit</th><th>needs</th><th>roles</th><th>unlock</th><th>foot</th><th>shoots</th><th>horse</th><th>more</th></tr></thead>
+<tbody>
+<tr><td>levy foot</td><td>Levy infantry (spears, bows, farm tools)</td><td>1</td><td>man</td><td>none</td><td>Line</td><td>start</td><td>yes</td><td></td><td></td><td></td></tr>
+<tr><td>armoured foot</td><td></td><td>1.3</td><td>man</td><td>arms: 1</td><td>Line, Heavy</td><td>start</td><td>yes</td><td></td><td></td><td>next down: levy foot</td></tr>
+<tr><td>archers</td><td></td><td>1.1</td><td>man</td><td>arms: 1</td><td>Shot</td><td>start</td><td>yes</td><td>arrows</td><td></td><td></td></tr>
+<tr><td>pikes</td><td></td><td>1.2</td><td>man</td><td>arms: 1</td><td>Brace</td><td><a href="/wiki/Data-Research#inventions">W6 Pike squares</a></td><td>yes</td><td></td><td></td><td>spears: yes</td></tr>
+<tr><td>hand gunners</td><td></td><td>1.4</td><td>man</td><td>arms: 1; powder: 1; powder_per: battle</td><td>Shot</td><td><a href="/wiki/Data-Research#inventions">W5 gunpowder_infantry</a></td><td>yes</td><td>hand guns</td><td></td><td></td></tr>
+<tr><td>pike and shot</td><td></td><td>1.6</td><td>man</td><td>arms: 2; powder: 1; powder_per: battle</td><td>Brace, Shot</td><td><a href="/wiki/Data-Research#inventions">W7 Pike and shot</a></td><td>yes</td><td>hand guns</td><td></td><td></td></tr>
+<tr><td>musketeers</td><td>Musketeers (volley)</td><td>2</td><td>man</td><td>arms: 2; powder: 2; powder_per: battle</td><td>Shot</td><td><a href="/wiki/Data-Research#inventions">W9 Volley fire drill</a></td><td>yes</td><td>hand guns</td><td></td><td></td></tr>
+<tr><td>line infantry</td><td>Line infantry (flintlock)</td><td>2.6</td><td>man</td><td>arms: 2; powder: 2; powder_per: battle</td><td>Line, Brace, Shot</td><td><a href="/wiki/Data-Research#inventions">W11 Flintlock and bayonet</a></td><td>yes</td><td>hand guns</td><td></td><td></td></tr>
+<tr><td>riflemen</td><td></td><td>3.5</td><td>man</td><td>arms: 3; powder: 3; powder_per: battle</td><td>Shot, Light</td><td><a href="/wiki/Data-Research#inventions">W16 Rifled musket</a></td><td>yes</td><td>rifles</td><td></td><td>strength with: (W17: 5)</td></tr>
+<tr><td>light horse</td><td></td><td>2</td><td>man</td><td>horses: 100</td><td>Shock, Light</td><td>start</td><td></td><td></td><td>yes</td><td>rider: yes</td></tr>
+<tr><td>horse archers</td><td></td><td>2.5</td><td>man</td><td>horses: 100; arms: 1</td><td>Shot, Light</td><td><a href="/wiki/Data-Research#inventions">W1 Composite-bow horse archery</a></td><td></td><td>arrows</td><td>yes</td><td>rider: yes; shock against broken: yes</td></tr>
+<tr><td>knights and lancers</td><td></td><td>3.5</td><td>man</td><td>horses: 100; remounts: 50; arms: 2</td><td>Shock, Heavy</td><td><a href="/wiki/Data-Research#inventions">W2 Heavy armoured cavalry</a></td><td></td><td></td><td>yes</td><td>spears: yes</td></tr>
+<tr><td>camel riders</td><td></td><td>2</td><td>man</td><td>camels: 100</td><td>Shock, Light</td><td>start</td><td></td><td></td><td>yes</td><td>rider: yes; start regions: desert, Sahel; no desert penalty: yes</td></tr>
+<tr><td>war elephants</td><td></td><td>6</td><td>man</td><td>elephants: from studs</td><td>Shock, Heavy</td><td>start</td><td></td><td></td><td></td><td>start regions: South Asia, Southeast Asia; men per animal: 8; ground: (forest: -0.5; jungle: -0.5); panic: 0.1</td></tr>
+<tr><td>bombards</td><td></td><td>5</td><td>gun</td><td>crew: 20; horses: 8; oxen_instead: yes; powder: 1; powder_per: month firing</td><td>Guns</td><td><a href="/wiki/Data-Research#inventions">W3 Bombards</a></td><td></td><td></td><td></td><td>siege shot: 2; no mountains without road: yes</td></tr>
+<tr><td>field guns</td><td></td><td>25</td><td>gun</td><td>crew: 15; horses: 6; powder: 2; powder_per: battle</td><td>Guns</td><td><a href="/wiki/Data-Research#inventions">W8 Field artillery</a></td><td></td><td></td><td></td><td>siege shot: 1</td></tr>
+<tr><td>light field guns</td><td></td><td>25</td><td>gun</td><td>crew: 10; horses: 4; powder: 2; powder_per: battle</td><td>Guns</td><td><a href="/wiki/Data-Research#inventions">W13 Light field artillery</a></td><td></td><td></td><td></td><td>no march penalty: yes</td></tr>
+</tbody></table></div>
+<h2 id="later-arms-provisional"><a class="anchor" href="#later-arms-provisional" aria-label="Link to this section">#</a>Later arms (provisional)</h2>
+<blockquote>
+<p>Machine guns, tanks and aircraft follow the arms table; their strength and needs are provisional (D-WAR-17), and tanks and aircraft draw on the powder store (D-WAR-20).</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>strength</th><th>unit</th><th>needs</th><th>roles</th><th>unlock</th></tr></thead>
+<tbody>
+<tr><td>machine guns</td><td>30</td><td>gun</td><td>crew: 6; powder: 4; powder_per: battle</td><td>Brace, Shot</td><td><a href="/wiki/Data-Research#inventions">W19 Machine gun</a></td></tr>
+<tr><td>tanks</td><td>60</td><td>tank</td><td>crew: 6; arms: 10; powder: 10; powder_per: battle</td><td>Shock</td><td><a href="/wiki/Data-Research#inventions">W21 Tanks</a></td></tr>
+<tr><td>aircraft</td><td>40</td><td>plane</td><td>crew: 4; arms: 10; powder: 10; powder_per: battle</td><td>Air</td><td><a href="/wiki/Data-Research#inventions">W22 Military aircraft</a></td></tr>
+</tbody></table></div>
+<h2 id="kinds-provisional"><a class="anchor" href="#kinds-provisional" aria-label="Link to this section">#</a>Kinds (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>break point</th><th>pay</th><th>counts toward cap</th><th>needs</th><th>min level</th><th>on walls</th></tr></thead>
+<tbody>
+<tr><td>levy</td><td>0.25</td><td>by: treasury; multiplier: 1; free_months: 3</td><td>yes</td><td></td><td></td><td></td></tr>
+<tr><td>retinue</td><td>0.35</td><td>by: lord; multiplier: 0</td><td>no</td><td></td><td></td><td></td></tr>
+<tr><td>hired company</td><td>0.35</td><td>by: treasury; multiplier: 3</td><td>yes</td><td></td><td></td><td></td></tr>
+<tr><td>standing regiment</td><td>0.3</td><td>by: treasury; multiplier: 1.5; all_year: yes</td><td>yes</td><td><a href="/wiki/Data-Research#inventions">W12 Standing regiments</a></td><td>2</td><td></td></tr>
+<tr><td>garrison</td><td>0.4</td><td>by: treasury; multiplier: 1</td><td>above room</td><td></td><td></td><td>yes</td></tr>
+<tr><td>rebel band</td><td>0.2</td><td>by: loot; multiplier: 0</td><td>no</td><td></td><td></td><td></td></tr>
+</tbody></table></div>
+<h2 id="battle"><a class="anchor" href="#battle" aria-label="Link to this section">#</a>Battle</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>bells_per_day</code></td><td>6</td></tr>
+<tr><td><code>max_days</code></td><td>3</td></tr>
+<tr><td><code>max_sectors</code></td><td>7</td></tr>
+<tr><td><code>max_sectors_sea</code></td><td>3</td></tr>
+<tr><td><code>bell_order</code></td><td>orders, shooting, charges, melee, breaking, depth and rotation</td></tr>
+<tr><td><code>locals_rough</code></td><td>0.1</td></tr>
+</tbody></table></div>
+<h2 id="hits-per-bell-provisional"><a class="anchor" href="#hits-per-bell-provisional" aria-label="Link to this section">#</a>Hits per bell (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>base</code></td><td>0.04</td></tr>
+<tr><td><code>era_VI</code></td><td>0.06</td></tr>
+<tr><td><code>era_VII</code></td><td>0.08</td></tr>
+</tbody></table></div>
+<h3 id="by-invention"><a class="anchor" href="#by-invention" aria-label="Link to this section">#</a>By invention</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>needs</th><th>share</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><a href="/wiki/Data-Research#inventions">W19 Machine gun</a></td><td>0.08</td></tr>
+<tr><td>2</td><td><a href="/wiki/Data-Research#inventions">W17 Breech-loading rifle</a></td><td>0.06</td></tr>
+<tr><td>3</td><td><a href="/wiki/Data-Research#inventions">W16 Rifled musket</a></td><td>0.05</td></tr>
+</tbody></table></div>
+<h2 id="skill-growth"><a class="anchor" href="#skill-growth" aria-label="Link to this section">#</a>Skill growth</h2>
+<blockquote>
+<p>WAR-158, D-WAR-13: the staff college is the academy of eras VI-VII.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>III</th><th>IV</th><th>V</th><th>VI</th><th>VII</th><th>eras</th><th>min cunning</th><th>skill</th><th>max</th><th>every</th></tr></thead>
+<tbody>
+<tr><td>academy</td><td>Might, Cunning</td><td>Might, Cunning</td><td>Might, Cunning</td><td>Might, Cunning, Logistics</td><td>Might, Cunning, Logistics</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>captain under</td><td></td><td></td><td></td><td></td><td></td><td>III, IV, V</td><td>4</td><td>Cunning</td><td></td><td></td></tr>
+<tr><td>wargames</td><td></td><td></td><td></td><td></td><td></td><td>VI, VII</td><td></td><td>Cunning</td><td></td><td></td></tr>
+<tr><td>peace command year</td><td></td><td></td><td></td><td></td><td></td><td>VI, VII</td><td></td><td>Logistics</td><td>3</td><td></td></tr>
+<tr><td>victories</td><td></td><td></td><td></td><td></td><td></td><td>VI, VII</td><td></td><td>Might</td><td></td><td>4</td></tr>
+</tbody></table></div>
+<h2 id="origins"><a class="anchor" href="#origins" aria-label="Link to this section">#</a>Origins</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>the ruler or an heir</code></td><td>his death or capture can start a succession crisis</td></tr>
+<tr><td><code>a lord</code></td><td>he may refuse to serve under a lower-born commander</td></tr>
+<tr><td><code>a hired captain</code></td><td>he leaves when unpaid, like his company</td></tr>
+<tr><td><code>risen from the ranks</code></td><td>Proud lords waver when he commands them</td></tr>
+<tr><td><code>an academy graduate</code></td><td>he starts with +1 Cunning or Logistics and no victories</td></tr>
+<tr><td><code>an exile</code></td><td>his old ruler sees it as an insult</td></tr>
+<tr><td><code>a commissioned official</code></td><td>he counts as an academy graduate: +1 Cunning or Logistics and no victories</td></tr>
+</tbody></table></div>
+<h2 id="amounts-provisional"><a class="anchor" href="#amounts-provisional" aria-label="Link to this section">#</a>Amounts (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>wagon_gold</code></td><td>10</td></tr>
+<tr><td><code>hired_pay_multiplier</code></td><td>2</td></tr>
+<tr><td><code>season_months</code></td><td>3</td></tr>
+<tr><td><code>fever_sickness</code></td><td>2</td></tr>
+<tr><td><code>levy_gold_per_1000</code></td><td>20</td></tr>
+</tbody></table></div>
+<h3 id="ransom"><a class="anchor" href="#ransom" aria-label="Link to this section">#</a>Ransom</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>commander</code></td><td>100</td></tr>
+<tr><td><code>captain</code></td><td>25</td></tr>
+</tbody></table></div>
+<h2 id="company-size"><a class="anchor" href="#company-size" aria-label="Link to this section">#</a>Company size</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>min</code></td><td>500</td></tr>
+<tr><td><code>max</code></td><td>1000</td></tr>
+</tbody></table></div>
+<h2 id="obsolete"><a class="anchor" href="#obsolete" aria-label="Link to this section">#</a>Obsolete</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>arm</th><th>by</th><th>what</th><th>keeps</th><th>field only</th><th>role</th><th>keeps role</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>armoured foot</td><td><a href="/wiki/Data-Research#inventions">W5 gunpowder_infantry</a></td><td>Plate armour (Heavy role on foot)</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>2</td><td>knights and lancers</td><td><a href="/wiki/Data-Research#inventions">W9 Volley fire drill</a></td><td>Knights and gendarmes</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>3</td><td>pikes</td><td><a href="/wiki/Data-Research#inventions">W11 Flintlock and bayonet</a></td><td>Pikes</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>4</td><td>archers</td><td><a href="/wiki/Data-Research#inventions">W9 Volley fire drill</a></td><td>Bows and crossbows</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>5</td><td>horse archers</td><td><a href="/wiki/Data-Research#inventions">W11 Flintlock and bayonet</a></td><td>Horse archers</td><td>scouting, raiding</td><td></td><td></td><td></td></tr>
+<tr><td>6</td><td>bombards</td><td><a href="/wiki/Data-Research#inventions">W8 Field artillery</a></td><td>Bombards in the field</td><td></td><td>yes</td><td></td><td></td></tr>
+<tr><td>7</td><td>line infantry</td><td><a href="/wiki/Data-Research#inventions">W17 Breech-loading rifle</a></td><td>Close-order line infantry</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>8</td><td>light horse</td><td><a href="/wiki/Data-Research#inventions">W19 Machine gun</a></td><td>Cavalry as Shock</td><td></td><td></td><td>Shock</td><td>Light</td></tr>
+<tr><td>9</td><td>knights and lancers</td><td><a href="/wiki/Data-Research#inventions">W19 Machine gun</a></td><td>Cavalry as Shock</td><td></td><td></td><td>Shock</td><td></td></tr>
+<tr><td>10</td><td>camel riders</td><td><a href="/wiki/Data-Research#inventions">W19 Machine gun</a></td><td>Cavalry as Shock</td><td></td><td></td><td>Shock</td><td>Light</td></tr>
+</tbody></table></div>
+<h2 id="break"><a class="anchor" href="#break" aria-label="Link to this section">#</a>Break</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>homeland</code></td><td>0.05</td></tr>
+<tr><td><code>hungry</code></td><td>-0.1</td></tr>
+<tr><td><code>pay_owed</code></td><td>-0.05</td></tr>
+</tbody></table></div>
+<h2 id="levy"><a class="anchor" href="#levy" aria-label="Link to this section">#</a>Levy</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>free_months</code></td><td>3</td></tr>
+<tr><td><code>go_home_after</code></td><td>6</td></tr>
+<tr><td><code>go_home_rate</code></td><td>0.05</td></tr>
+<tr><td><code>w15_go_home_after</code></td><td>12</td></tr>
+</tbody></table></div>
+<h2 id="hired"><a class="anchor" href="#hired" aria-label="Link to this section">#</a>Hired</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>no_fight_owed</code></td><td>1</td></tr>
+<tr><td><code>loot_owed</code></td><td>2</td></tr>
+</tbody></table></div>
+<h2 id="troop-cap-provisional"><a class="anchor" href="#troop-cap-provisional" aria-label="Link to this section">#</a>Troop cap (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>with_official</code></td><td>0.02</td></tr>
+<tr><td><code>muster_master</code></td><td>0.03</td></tr>
+<tr><td><code>without</code></td><td>0.01</td></tr>
+<tr><td><code>w12</code></td><td>0.005</td></tr>
+<tr><td><code>w15</code></td><td>2</td></tr>
+<tr><td><code>w18</code></td><td>0.01</td></tr>
+</tbody></table></div>
+<h2 id="over-cap"><a class="anchor" href="#over-cap" aria-label="Link to this section">#</a>Over cap</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>pay</code></td><td>2</td></tr>
+<tr><td><code>desertion</code></td><td>0.05</td></tr>
+</tbody></table></div>
+<h2 id="lords"><a class="anchor" href="#lords" aria-label="Link to this section">#</a>Lords</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>loyal_days</code></td><td>21</td></tr>
+<tr><td><code>wavering_days</code></td><td>42</td></tr>
+<tr><td><code>wavering_stay_months</code></td><td>6</td></tr>
+<tr><td><code>wavering_share</code></td><td>0.5</td></tr>
+<tr><td><code>min_men</code> (provisional)</td><td>100</td></tr>
+<tr><td><code>retinue_horse_share</code> (provisional)</td><td>0.2</td></tr>
+<tr><td><code>retinue_horse_arm</code> (provisional)</td><td>knights and lancers</td></tr>
+</tbody></table></div>
+<h2 id="free-companies"><a class="anchor" href="#free-companies" aria-label="Link to this section">#</a>Free companies</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>group</th><th>people</th><th>regions</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Swiss and German foot</td><td>Swiss Confederacy</td><td>Swiss Confederacy, the Empire</td></tr>
+<tr><td>2</td><td>Italian condottieri</td><td>Italian states</td><td>Italy</td></tr>
+<tr><td>3</td><td>Scottish and Irish gallowglass</td><td>Scottish Highland clans</td><td>Scotland, Ireland</td></tr>
+<tr><td>4</td><td>Turkic and Afghan horse</td><td>Afghan</td><td>Central Asia, Afghanistan</td></tr>
+<tr><td>5</td><td>Javanese and Japanese sword bands</td><td>Japanese clans</td><td>Java, Japan</td></tr>
+</tbody></table></div>
+<h2 id="rations"><a class="anchor" href="#rations" aria-label="Link to this section">#</a>Rations</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>soldier_campaign</code></td><td>2</td></tr>
+<tr><td><code>horse</code></td><td>3</td></tr>
+<tr><td><code>prisoner</code></td><td>1</td></tr>
+<tr><td><code>winter_field</code></td><td>2.5</td></tr>
+<tr><td><code>quarters</code></td><td>1</td></tr>
+</tbody></table></div>
+<h2 id="logistics"><a class="anchor" href="#logistics" aria-label="Link to this section">#</a>Logistics</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>food_cut</code></td><td>0.05</td></tr>
+<tr><td><code>sickness_cut</code></td><td>0.1</td></tr>
+<tr><td><code>dig_speed</code></td><td>0.1</td></tr>
+</tbody></table></div>
+<h2 id="reserve"><a class="anchor" href="#reserve" aria-label="Link to this section">#</a>Reserve</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>rot</code></td><td>0.05</td></tr>
+<tr><td><code>rot_slow_logistics</code></td><td>3</td></tr>
+<tr><td><code>rot_slow_factor</code></td><td>0.5</td></tr>
+</tbody></table></div>
+<h2 id="wagon"><a class="anchor" href="#wagon" aria-label="Link to this section">#</a>Wagon</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>rations</code></td><td>1000</td></tr>
+<tr><td><code>horses</code></td><td>2</td></tr>
+<tr><td><code>w10_load</code></td><td>1.5</td></tr>
+</tbody></table></div>
+<h2 id="foraging-rating"><a class="anchor" href="#foraging-rating" aria-label="Link to this section">#</a>Foraging rating</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>Rich</code></td><td>1</td></tr>
+<tr><td><code>Fair</code></td><td>0.6</td></tr>
+<tr><td><code>Poor</code></td><td>0.3</td></tr>
+<tr><td><code>Almost none</code></td><td>0.1</td></tr>
+</tbody></table></div>
+<h2 id="hunger"><a class="anchor" href="#hunger" aria-label="Link to this section">#</a>Hunger</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>desert</code></td><td>0.05</td></tr>
+<tr><td><code>die</code></td><td>0.02</td></tr>
+<tr><td><code>horses</code></td><td>0.1</td></tr>
+<tr><td><code>strength</code></td><td>-0.2</td></tr>
+<tr><td><code>break</code></td><td>-0.1</td></tr>
+<tr><td><code>desert_order</code></td><td>levy, hired company, retinue, garrison, rebel band, standing regiment</td></tr>
+</tbody></table></div>
+<h2 id="sickness"><a class="anchor" href="#sickness" aria-label="Link to this section">#</a>Sickness</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>Low</code></td><td>0.005</td></tr>
+<tr><td><code>Medium</code></td><td>0.01</td></tr>
+<tr><td><code>High</code></td><td>0.03</td></tr>
+<tr><td><code>Heat</code></td><td>0.02</td></tr>
+<tr><td><code>Cold</code></td><td>0.02</td></tr>
+<tr><td><code>cold_only_in_winter</code></td><td>yes</td></tr>
+</tbody></table></div>
+<h2 id="forced-march"><a class="anchor" href="#forced-march" aria-label="Link to this section">#</a>Forced march</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>sickness</code></td><td>2</td></tr>
+<tr><td><code>levy_desertion_week</code></td><td>0.02</td></tr>
+<tr><td><code>first_day_strength</code></td><td>-0.1</td></tr>
+</tbody></table></div>
+<h2 id="requisition"><a class="anchor" href="#requisition" aria-label="Link to this section">#</a>Requisition</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>hungry_below_months</code></td><td>1</td></tr>
+</tbody></table></div>
+<h2 id="scouting"><a class="anchor" href="#scouting" aria-label="Link to this section">#</a>Scouting</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>base_range</code></td><td>1</td></tr>
+<tr><td><code>riders_per_province</code></td><td>500</td></tr>
+<tr><td><code>careful_range</code></td><td>2</td></tr>
+<tr><td><code>w22_range</code></td><td>4</td></tr>
+</tbody></table></div>
+<h2 id="era-scale-provisional"><a class="anchor" href="#era-scale-provisional" aria-label="Link to this section">#</a>Era scale (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>bell</th><th>max days</th><th>room</th></tr></thead>
+<tbody>
+<tr><td>I</td><td>2 hours</td><td>3</td><td>1</td></tr>
+<tr><td>II</td><td>2 hours</td><td>3</td><td>1</td></tr>
+<tr><td>III</td><td>2 hours</td><td>3</td><td>1</td></tr>
+<tr><td>IV</td><td>2 hours</td><td>3</td><td>1</td></tr>
+<tr><td>V</td><td>2 hours</td><td>3</td><td>1</td></tr>
+<tr><td>VI</td><td>half a day</td><td>10</td><td>0.5</td></tr>
+<tr><td>VII</td><td>a day</td><td>30</td><td>0.25</td></tr>
+</tbody></table></div>
+<h2 id="sectors"><a class="anchor" href="#sectors" aria-label="Link to this section">#</a>Sectors</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>room</th><th>charge</th><th>horse</th><th>cover</th><th>hide</th><th>all</th><th>open grounds</th><th>rough grounds</th><th>attack across</th><th>more</th></tr></thead>
+<tbody>
+<tr><td>Fields</td><td>3000</td><td>yes</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Pasture</td><td>3000</td><td>yes</td><td>0.1</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Burned</td><td>3000</td><td>yes</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Woods</td><td>1000</td><td>no</td><td></td><td>0.5</td><td>yes</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Marsh</td><td>500</td><td>no</td><td></td><td></td><td>yes</td><td>-0.25</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Waste</td><td>1500</td><td>by ground</td><td></td><td></td><td></td><td></td><td>drylands, desert</td><td>hills, mountains</td><td></td><td></td></tr>
+<tr><td>Shore</td><td>1000</td><td>yes</td><td></td><td></td><td></td><td></td><td></td><td></td><td>-0.2</td><td></td></tr>
+<tr><td>Town</td><td>1500</td><td>no</td><td></td><td>0.5</td><td>yes</td><td></td><td></td><td></td><td></td><td>defender: 0.5; burns town: yes</td></tr>
+<tr><td>Castle</td><td>garrison</td><td>no</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>walls: yes</td></tr>
+</tbody></table></div>
+<h2 id="roles"><a class="anchor" href="#roles" aria-label="Link to this section">#</a>Roles</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>chargers take</th><th>chargers deal</th><th>shot taken</th><th>first contact</th><th>open only</th><th>halves</th><th>reach</th><th>melee</th></tr></thead>
+<tbody>
+<tr><td>brace</td><td>2</td><td>0.5</td><td>1.5</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>shock</td><td></td><td></td><td></td><td>2</td><td>yes</td><td></td><td></td><td></td></tr>
+<tr><td>heavy</td><td></td><td></td><td></td><td></td><td></td><td>arrows, spears</td><td></td><td></td></tr>
+<tr><td>guns</td><td></td><td></td><td></td><td></td><td></td><td></td><td>1</td><td>no</td></tr>
+</tbody></table></div>
+<h2 id="level-scars"><a class="anchor" href="#level-scars" aria-label="Link to this section">#</a>Level scars</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>Seasoned</code></td><td>1</td></tr>
+<tr><td><code>Veteran</code></td><td>3</td></tr>
+<tr><td><code>Elite</code></td><td>5</td></tr>
+</tbody></table></div>
+<h2 id="levels-by-era-provisional"><a class="anchor" href="#levels-by-era-provisional" aria-label="Link to this section">#</a>Levels by era (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>drill</th><th>hits</th><th>break</th></tr></thead>
+<tbody>
+<tr><td>I</td><td>2, 4, 8</td><td>-0.1, 0, 0.1, 0.2, 0.3</td><td>0.05, 0.1, 0.15</td></tr>
+<tr><td>II</td><td>3, 6, 12</td><td>-0.1, 0, 0.1, 0.2, 0.3</td><td>0.05, 0.1, 0.15</td></tr>
+<tr><td>III</td><td>4, 8, 12</td><td>-0.15, 0, 0.15, 0.25, 0.35</td><td>0.05, 0.1, 0.15</td></tr>
+<tr><td>IV</td><td>6, 12, 18</td><td>-0.2, 0, 0.15, 0.3, 0.45</td><td>0.05, 0.1, 0.2</td></tr>
+<tr><td>V</td><td>3, 6, 18</td><td>-0.15, 0, 0.15, 0.25, 0.4</td><td>0.05, 0.1, 0.2</td></tr>
+<tr><td>VI</td><td>6, 12, 24</td><td>-0.25, 0, 0.2, 0.35, 0.5</td><td>0.1, 0.15, 0.2</td></tr>
+<tr><td>VII</td><td>6, 12, 24</td><td>-0.3, 0, 0.25, 0.45, 0.7</td><td>0.1, 0.15, 0.25</td></tr>
+</tbody></table></div>
+<h2 id="level-abilities"><a class="anchor" href="#level-abilities" aria-label="Link to this section">#</a>Level abilities</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>fall back breaks</th><th>fall back</th><th>light step back</th><th>shift same bell</th><th>line half brace</th><th>free orders</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>yes</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>2</td><td></td><td>yes</td><td>yes</td><td></td><td></td><td></td></tr>
+<tr><td>3</td><td></td><td>yes</td><td></td><td>yes</td><td></td><td></td></tr>
+<tr><td>4</td><td></td><td>yes</td><td></td><td>yes</td><td>yes</td><td></td></tr>
+<tr><td>5</td><td></td><td>yes</td><td></td><td>yes</td><td>yes</td><td>1</td></tr>
+</tbody></table></div>
+<h2 id="era-notes"><a class="anchor" href="#era-notes" aria-label="Link to this section">#</a>Era notes</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>knights and lancers</th><th>armoured foot</th><th>era</th><th>level</th><th>fights as</th><th>needs</th><th>shot</th></tr></thead>
+<tbody>
+<tr><td>start_level</td><td>era: I; level: 3</td><td>era: I; level: 3</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>levy_cap</td><td></td><td></td><td>I</td><td>3</td><td></td><td></td><td></td></tr>
+<tr><td>pike_and_shot_below</td><td></td><td></td><td>II</td><td>2</td><td>levy foot</td><td></td><td></td></tr>
+<tr><td>musketeers_below</td><td></td><td></td><td>III</td><td>2</td><td></td><td><a href="/wiki/Data-Research#inventions">W9 Volley fire drill</a></td><td>0.5</td></tr>
+<tr><td>linear_shift_level</td><td></td><td></td><td>IV</td><td>2</td><td></td><td></td><td></td></tr>
+<tr><td>reservists</td><td></td><td></td><td>VI</td><td>2</td><td></td><td><a href="/wiki/Data-Research#inventions">W18 Railway mobilization</a></td><td></td></tr>
+<tr><td>infiltrate</td><td></td><td></td><td>VII</td><td>4</td><td></td><td></td><td></td></tr>
+</tbody></table></div>
+<h2 id="might-by-era"><a class="anchor" href="#might-by-era" aria-label="Link to this section">#</a>Might by era</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>hits</th><th>break</th><th>scope</th><th>risk</th><th>risk if</th><th>drive</th></tr></thead>
+<tbody>
+<tr><td>I</td><td>0.08</td><td>0.03</td><td>sector</td><td>0.2</td><td></td><td></td></tr>
+<tr><td>II</td><td>0.07</td><td>0.03</td><td>sector</td><td>0.2</td><td></td><td></td></tr>
+<tr><td>III</td><td>0.05</td><td>0.02</td><td>sector</td><td>0.2</td><td></td><td></td></tr>
+<tr><td>IV</td><td>0.05</td><td>0.02</td><td>sector</td><td>0.2</td><td></td><td></td></tr>
+<tr><td>V</td><td>0.04</td><td>0.02</td><td>sector</td><td>0.1</td><td></td><td></td></tr>
+<tr><td>VI</td><td>0.03</td><td>0.01</td><td>army</td><td></td><td>camp taken</td><td></td></tr>
+<tr><td>VII</td><td>0.02</td><td>0.01</td><td>army</td><td></td><td>camp taken</td><td>0.1</td></tr>
+</tbody></table></div>
+<h2 id="cunning-by-era"><a class="anchor" href="#cunning-by-era" aria-label="Link to this section">#</a>Cunning by era</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>orders</th><th>messenger from</th><th>captains order</th></tr></thead>
+<tbody>
+<tr><td>I</td><td>1, 1, 2, 2, 2, 2</td><td>1</td><td></td></tr>
+<tr><td>II</td><td>1, 1, 2, 2, 3, 3</td><td>3</td><td></td></tr>
+<tr><td>III</td><td>1, 1, 2, 2, 3, 3</td><td></td><td></td></tr>
+<tr><td>IV</td><td>1, 1, 2, 2, 3, 3</td><td></td><td></td></tr>
+<tr><td>V</td><td>1, 1, 2, 2, 3, 3</td><td></td><td></td></tr>
+<tr><td>VI</td><td>2, 2, 2, 2, 3, 3</td><td></td><td>yes</td></tr>
+<tr><td>VII</td><td>2, 2, 3, 3, 4, 4</td><td></td><td>yes</td></tr>
+</tbody></table></div>
+<h2 id="order-inventions"><a class="anchor" href="#order-inventions" aria-label="Link to this section">#</a>Order inventions</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>W14</code></td><td>1</td></tr>
+<tr><td><code>W23</code></td><td>1</td></tr>
+</tbody></table></div>
+<h2 id="logistics-by-era"><a class="anchor" href="#logistics-by-era" aria-label="Link to this section">#</a>Logistics by era</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>ammo base</th><th>who</th><th>rotation</th><th>powder wagons</th><th>without ammo</th><th>fuel</th><th>depth per point</th></tr></thead>
+<tbody>
+<tr><td>I</td><td>4</td><td>bows</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>II</td><td>3</td><td>Shot</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>III</td><td>3</td><td>Shot and guns</td><td>1</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>IV</td><td>3</td><td>Shot and guns</td><td>1</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>V</td><td>2</td><td>Shot and guns</td><td>1</td><td>yes</td><td></td><td></td><td></td></tr>
+<tr><td>VI</td><td>1</td><td>all</td><td>2</td><td></td><td>0.5</td><td></td><td></td></tr>
+<tr><td>VII</td><td>1</td><td>tanks and aircraft</td><td>1</td><td></td><td></td><td>yes</td><td>0.1</td></tr>
+</tbody></table></div>
+<h2 id="role-changing-inventions"><a class="anchor" href="#role-changing-inventions" aria-label="Link to this section">#</a>Role changing inventions</h2>
+<h3 id="w11"><a class="anchor" href="#w11" aria-label="Link to this section">#</a>W11</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>foot</code></td><td>yes</td></tr>
+<tr><td><code>becomes</code></td><td>Brace</td></tr>
+</tbody></table></div>
+<h2 id="tired"><a class="anchor" href="#tired" aria-label="Link to this section">#</a>Tired</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>after_bells</code></td><td>3</td></tr>
+<tr><td><code>penalty</code></td><td>0.1</td></tr>
+</tbody></table></div>
+<h2 id="dug-in"><a class="anchor" href="#dug-in" aria-label="Link to this section">#</a>Dug in</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>defender</code></td><td>0.5</td></tr>
+</tbody></table></div>
+<h2 id="orders"><a class="anchor" href="#orders" aria-label="Link to this section">#</a>Orders</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>reserve enters</th><th>to neighbour</th><th>same bell level</th><th>from won</th><th>into</th><th>hits</th><th>enemy break</th><th>takes</th><th>frees prisoners</th><th>more</th></tr></thead>
+<tbody>
+<tr><td>Commit reserve</td><td>yes</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Shift</td><td></td><td>yes</td><td>3</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Turn</td><td></td><td></td><td></td><td>yes</td><td>neighbour</td><td>1.5</td><td>-0.1</td><td></td><td></td><td></td></tr>
+<tr><td>Drive</td><td></td><td></td><td></td><td>yes</td><td>camp</td><td></td><td></td><td>wagons, food reserve</td><td>yes</td><td>spikes guns: yes; enemy army break: -0.1</td></tr>
+<tr><td>Fall back</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>no hits: yes; raw breaks: yes</td></tr>
+<tr><td>Rally</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>fled return: 0.5</td></tr>
+<tr><td>Spring</td><td></td><td></td><td></td><td></td><td></td><td>1.5</td><td>-0.1</td><td></td><td></td><td>ambush only: yes; reveals: yes</td></tr>
+<tr><td>Rotate</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>swap tired: yes; beyond free: yes</td></tr>
+</tbody></table></div>
+<h2 id="approaches"><a class="anchor" href="#approaches" aria-label="Link to this section">#</a>Approaches</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>orders</th><th>needs</th><th>shines</th><th>struggles</th><th>reserve</th><th>min sectors</th><th>centre level</th><th>hidden</th><th>attacking as</th><th>line back bells</th></tr></thead>
+<tbody>
+<tr><td>Breakthrough</td><td>Turn, Drive, Commit reserve</td><td>Shock; an open sector</td><td>Against Line and Shot in open fields</td><td>Against Brace; narrow, wooded fields</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Steadfast</td><td>Commit reserve, Rotate, Rally</td><td>Plenty of Line; Logistics</td><td>Defending; against Breakthrough and Assault</td><td>Slow to win</td><td>0.25</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Envelopment</td><td>Fall back, Turn</td><td>Level 2+ in the centre; at least 5 sectors</td><td>Against Breakthrough and Assault</td><td>Against Skirmish and Bombardment</td><td></td><td>5</td><td>2</td><td></td><td></td><td></td></tr>
+<tr><td>Skirmish</td><td>Fall back, Drive</td><td>Light troops; open sectors with room</td><td>Against Line and Brace in open country</td><td>Against Shock; woods, marsh, towns</td><td>0</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Ambush</td><td>Spring, Turn, Fall back</td><td>Cover sectors; Cunning higher than the enemy&#39;s</td><td>Broken, wooded or swampy fields</td><td>Open plains</td><td></td><td></td><td></td><td>0.5</td><td></td><td></td></tr>
+<tr><td>Entrenchment</td><td>Rotate, Commit reserve, Rally</td><td>Shot or guns; being attacked</td><td>Dug-in sectors</td><td>Attacking (fights as Steadfast)</td><td></td><td></td><td></td><td></td><td>Steadfast</td><td></td></tr>
+<tr><td>Bombardment</td><td>Shift, Commit reserve</td><td>Guns</td><td>Against Brace, Entrenchment, any army that stands still</td><td>Before W8; against Skirmish and Assault</td><td></td><td></td><td></td><td></td><td></td><td>2</td></tr>
+<tr><td>Assault</td><td>Drive, Turn</td><td>Many men</td><td>Against Shot and Bombardment</td><td>Against Brace and Steadfast; losses x1.25 for both sides</td><td>0</td><td></td><td></td><td></td><td></td><td></td></tr>
+</tbody></table></div>
+<h2 id="flee-provisional"><a class="anchor" href="#flee-provisional" aria-label="Link to this section">#</a>Flee (provisional)</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>base</code></td><td>0.5</td></tr>
+<tr><td><code>content_factor</code></td><td>0.3</td></tr>
+<tr><td><code>hired</code></td><td>0.3</td></tr>
+<tr><td><code>per_month_owed</code></td><td>0.1</td></tr>
+<tr><td><code>rebel</code></td><td>0.5</td></tr>
+</tbody></table></div>
+<h2 id="traits"><a class="anchor" href="#traits" aria-label="Link to this section">#</a>Traits</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>army break</th><th>strength</th><th>losses</th><th>wound mul</th><th>never retreats</th><th>death more</th><th>never ambushed careful</th><th>spot bonus</th><th>retreat</th><th>more</th></tr></thead>
+<tbody>
+<tr><td>Steady</td><td>0.05</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Reckless</td><td>-0.05</td><td>0.1</td><td>1.3</td><td>2</td><td>yes</td><td>yes</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>Careful</td><td></td><td></td><td></td><td></td><td></td><td></td><td>yes</td><td>1</td><td>3 to 2</td><td></td></tr>
+<tr><td>Beloved</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>desertion: 0.5; levy extra months: 3</td></tr>
+<tr><td>Cruel</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>sack: 1.5; burned homes faster: yes; terms refused: yes</td></tr>
+<tr><td>Siege master</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>breach speed: 1.25</td></tr>
+<tr><td>Horse lord</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>shock: 0.1; turn shock hits: 2</td></tr>
+<tr><td>Old soldier</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>drill per month: 2</td></tr>
+<tr><td>Greedy</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>loot share: 0.1; takes bribes: yes</td></tr>
+<tr><td>Ambitious</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>their man throne: yes</td></tr>
+</tbody></table></div>
+<h2 id="wound-chance"><a class="anchor" href="#wound-chance" aria-label="Link to this section">#</a>Wound chance</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>lost</code></td><td>0.1</td></tr>
+<tr><td><code>won</code></td><td>0.05</td></tr>
+</tbody></table></div>
+<h2 id="death-chance"><a class="anchor" href="#death-chance" aria-label="Link to this section">#</a>Death chance</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>loser</code></td><td>0.05</td></tr>
+</tbody></table></div>
+<h2 id="age"><a class="anchor" href="#age" aria-label="Link to this section">#</a>Age</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>might_from</code></td><td>60</td></tr>
+<tr><td><code>cunning_from</code></td><td>65</td></tr>
+<tr><td><code>logistics_from</code></td><td>65</td></tr>
+<tr><td><code>step_years</code></td><td>5</td></tr>
+</tbody></table></div>
+<h2 id="their-man"><a class="anchor" href="#their-man" aria-label="Link to this section">#</a>Their man</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>victories</code></td><td>8</td></tr>
+<tr><td><code>years</code></td><td>5</td></tr>
+</tbody></table></div>
+<h2 id="named-commanders"><a class="anchor" href="#named-commanders" aria-label="Link to this section">#</a>Named commanders</h2>
+<h3 id="jean-de-dunois"><a class="anchor" href="#jean-de-dunois" aria-label="Link to this section">#</a>Jean de Dunois</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>country</code></td><td>France</td></tr>
+<tr><td><code>might</code></td><td>3</td></tr>
+<tr><td><code>cunning</code></td><td>4</td></tr>
+<tr><td><code>logistics</code></td><td>2</td></tr>
+<tr><td><code>styles</code></td><td>Three battles</td></tr>
+<tr><td><code>traits</code></td><td>Careful</td></tr>
+<tr><td><code>victories</code></td><td>6</td></tr>
+<tr><td><code>defeats</code></td><td>1</td></tr>
+<tr><td><code>wounds</code></td><td>1</td></tr>
+<tr><td><code>age</code></td><td>47</td></tr>
+<tr><td><code>origin</code></td><td>a lord</td></tr>
+</tbody></table></div>
+<h2 id="after"><a class="anchor" href="#after" aria-label="Link to this section">#</a>After</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>wounded_return</code></td><td>0.666667</td></tr>
+<tr><td><code>wounded_weeks</code></td><td>5</td></tr>
+<tr><td><code>fled_return</code></td><td>0.5</td></tr>
+<tr><td><code>fled_weeks</code></td><td>2</td></tr>
+<tr><td><code>pursuit</code></td><td>0.25</td></tr>
+<tr><td><code>camp_share</code></td><td>0.5</td></tr>
+</tbody></table></div>
+<h2 id="capture-warfare"><a class="anchor" href="#capture-warfare" aria-label="Link to this section">#</a>Capture warfare</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>share</code></td><td>0.5</td></tr>
+<tr><td><code>regions</code></td><td>Mesoamerica, forest zone</td></tr>
+</tbody></table></div>
+<h2 id="castles"><a class="anchor" href="#castles" aria-label="Link to this section">#</a>Castles</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>invention</th><th>walls</th><th>shot per breach</th><th>mining months</th><th>room</th><th>scaling</th><th>bombards nearly useless</th></tr></thead>
+<tbody>
+<tr><td>earthwork ring fort</td><td><a href="/wiki/Data-Research#inventions">B4 Earthwork ring forts</a></td><td>0.5</td><td>30</td><td>2</td><td>1000</td><td>yes</td><td></td></tr>
+<tr><td>stone castle</td><td><a href="/wiki/Data-Research#inventions">B1 Stone castles</a></td><td>1</td><td>20</td><td>4</td><td>2000</td><td></td><td></td></tr>
+<tr><td>bastion fort</td><td><a href="/wiki/Data-Research#inventions">B5 bastion_fortification</a></td><td>1</td><td>80</td><td>6</td><td>3000</td><td></td><td>yes</td></tr>
+<tr><td>star fort</td><td><a href="/wiki/Data-Research#inventions">B6 Star forts</a></td><td>1.5</td><td>150</td><td>8</td><td>5000</td><td></td><td>yes</td></tr>
+</tbody></table></div>
+<h2 id="castle-ground"><a class="anchor" href="#castle-ground" aria-label="Link to this section">#</a>Castle ground</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>hills</code></td><td>0.25</td></tr>
+<tr><td><code>mountains</code></td><td>0.5</td></tr>
+</tbody></table></div>
+<h2 id="siege"><a class="anchor" href="#siege" aria-label="Link to this section">#</a>Siege</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>close_ratio</code></td><td>3</td></tr>
+<tr><td><code>b7_multiplier</code></td><td>1.5</td></tr>
+<tr><td><code>repair_men</code></td><td>200</td></tr>
+<tr><td><code>sally_share</code></td><td>0.333333</td></tr>
+<tr><td><code>hunger_loss</code></td><td>0.1</td></tr>
+<tr><td><code>hunger_break</code></td><td>-0.1</td></tr>
+<tr><td><code>fever_after_months</code></td><td>3</td></tr>
+<tr><td><code>fever_mul</code></td><td>2</td></tr>
+<tr><td><code>ration</code></td><td>1</td></tr>
+</tbody></table></div>
+<h2 id="castle-supply"><a class="anchor" href="#castle-supply" aria-label="Link to this section">#</a>Castle supply</h2>
+<blockquote>
+<p>Castles starve besiegers (Leroy, 19 Oct; WAR-263 to WAR-269): a held castle gathers the land&#39;s food behind its walls, so enemy foragers find less in its province (by castle step: earthwork, stone, bastion, star, concrete) and reach_share of that in the provinces it reaches by road; armies besieging it eat more by its step.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>provisional</code></td><td>yes</td></tr>
+<tr><td><code>forage_cut_by_step</code></td><td>0.3, 0.45, 0.6, 0.7, 0.8</td></tr>
+<tr><td><code>reach_share</code></td><td>0.5</td></tr>
+<tr><td><code>besieger_eat_by_step</code></td><td>1.15, 1.25, 1.3, 1.35, 1.4</td></tr>
+</tbody></table></div>
+<h2 id="storm"><a class="anchor" href="#storm" aria-label="Link to this section">#</a>Storm</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>room_per_breach</code></td><td>500</td></tr>
+<tr><td><code>losses</code></td><td>1.5</td></tr>
+<tr><td><code>scaling</code></td><td>2</td></tr>
+<tr><td><code>bells</code></td><td>6</td></tr>
+</tbody></table></div>
+<h2 id="sack"><a class="anchor" href="#sack" aria-label="Link to this section">#</a>Sack</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>plunder_tax_years</code></td><td>1</td></tr>
+<tr><td><code>town_buildings</code></td><td>0.333333</td></tr>
+<tr><td><code>townsfolk</code></td><td>0.1</td></tr>
+<tr><td><code>cruel</code></td><td>1.5</td></tr>
+</tbody></table></div>
+<h2 id="ai-honours"><a class="anchor" href="#ai-honours" aria-label="Link to this section">#</a>Ai honours</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>relief_days</code></td><td>10</td></tr>
+<tr><td><code>food_months</code></td><td>1</td></tr>
+</tbody></table></div>
+<h2 id="bribe"><a class="anchor" href="#bribe" aria-label="Link to this section">#</a>Bribe</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>pay_owed_months</code></td><td>2</td></tr>
+<tr><td><code>greedy_outside_share</code></td><td>0.1</td></tr>
+</tbody></table></div>
+<h2 id="raid"><a class="anchor" href="#raid" aria-label="Link to this section">#</a>Raid</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>riders_per_load</code></td><td>50</td></tr>
+<tr><td><code>tiles_per_week</code></td><td>1</td></tr>
+</tbody></table></div>
+<h2 id="occupation"><a class="anchor" href="#occupation" aria-label="Link to this section">#</a>Occupation</h2>
+<blockquote>
+<p>WAR-224 (X-21): an occupier gets this share of an occupied province&#39;s tax and none of its trade; the rest is lost to the war.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>hold_months</code></td><td>3</td></tr>
+<tr><td><code>tax_share</code> (provisional)</td><td>0.5</td></tr>
+</tbody></table></div>
+<h2 id="peace"><a class="anchor" href="#peace" aria-label="Link to this section">#</a>Peace</h2>
+<blockquote>
+<p>X-21 (Leroy, 18 Oct): long_war_years (WAR-223) and max_ceded_share (WAR-227) are provisional, for the balance model to tune.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>capital_share</code></td><td>0.333333</td></tr>
+<tr><td><code>warlike_ignore</code></td><td>0.25</td></tr>
+<tr><td><code>half</code></td><td>0.5</td></tr>
+<tr><td><code>three_quarters</code></td><td>0.75</td></tr>
+<tr><td><code>tribute_years</code></td><td>20</td></tr>
+<tr><td><code>open_roads_years</code></td><td>10</td></tr>
+<tr><td><code>royal_grievances</code></td><td>Conscription, Soldiers quartered, Burned homes, Hungry, Heavy taxes</td></tr>
+<tr><td><code>royal_grievances_needed</code></td><td>2</td></tr>
+<tr><td><code>refuse_desertion</code></td><td>2</td></tr>
+<tr><td><code>long_war_years</code> (provisional)</td><td>2</td></tr>
+<tr><td><code>max_ceded_share</code> (provisional)</td><td>0.333333</td></tr>
+</tbody></table></div>
+<h2 id="settlement"><a class="anchor" href="#settlement" aria-label="Link to this section">#</a>Settlement</h2>
+<blockquote>
+<p>Peace settlement scoring (WAR-240..WAR-251, Leroy X-23). Each province has a demand cost; the war&#39;s outcome gives the winner a capacity in the same points; demands that fit are signed, the AI counters or refuses the rest. All values provisional.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>gold_per_point</code></td><td>25</td></tr>
+</tbody></table></div>
+<h3 id="province-cost"><a class="anchor" href="#province-cost" aria-label="Link to this section">#</a>Province cost</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>base</code></td><td>2</td></tr>
+<tr><td><code>per_sqrt_thousand_people</code></td><td>0.5</td></tr>
+<tr><td><code>per_wealth</code></td><td>1</td></tr>
+<tr><td><code>castle</code></td><td>2</td></tr>
+<tr><td><code>coastal</code></td><td>1</td></tr>
+<tr><td><code>river</code></td><td>0.5</td></tr>
+<tr><td><code>capital_multiplier</code></td><td>1.5</td></tr>
+<tr><td><code>not_bordering_multiplier</code></td><td>1.25</td></tr>
+</tbody></table></div>
+<h3 id="capacity-weights"><a class="anchor" href="#capacity-weights" aria-label="Link to this section">#</a>Capacity weights</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>land_held</code></td><td>0.5</td></tr>
+<tr><td><code>capital_held</code></td><td>0.15</td></tr>
+<tr><td><code>battles</code></td><td>0.15</td></tr>
+<tr><td><code>armies</code></td><td>0.1</td></tr>
+<tr><td><code>will_to_fight</code></td><td>0.25</td></tr>
+</tbody></table></div>
+<h3 id="surrender"><a class="anchor" href="#surrender" aria-label="Link to this section">#</a>Surrender</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>peace_share</code></td><td>0.75</td></tr>
+<tr><td><code>army_ratio</code></td><td>0.25</td></tr>
+<tr><td><code>land_share</code></td><td>0.5</td></tr>
+</tbody></table></div>
+<h2 id="notifications"><a class="anchor" href="#notifications" aria-label="Link to this section">#</a>Notifications</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>battle lost</code></td><td>battle lost, with its one-line reason</td></tr>
+<tr><td><code>breach</code></td><td>a breach</td></tr>
+<tr><td><code>terms offered</code></td><td>terms offered</td></tr>
+<tr><td><code>peace voices passing half</code></td><td>peace voices passing half</td></tr>
+<tr><td><code>pay owed</code></td><td>pay owed</td></tr>
+<tr><td><code>army hungry</code></td><td>an army hungry</td></tr>
+</tbody></table></div>
+<h2 id="war-aims"><a class="anchor" href="#war-aims" aria-label="Link to this section">#</a>War aims</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>Take land</code></td><td>those provinces</td></tr>
+<tr><td><code>Seat a pretender</code></td><td>their ruler replaced, realm your ally or subject</td></tr>
+<tr><td><code>Tribute</code></td><td>yearly gold or grain</td></tr>
+<tr><td><code>Free a people</code></td><td>a new country released</td></tr>
+<tr><td><code>Break a subject</code></td><td>it becomes independent</td></tr>
+<tr><td><code>Defend the faith</code></td><td>a faith tolerance charter there, or the province</td></tr>
+<tr><td><code>Punish</code></td><td>gold and a humbled ruler</td></tr>
+<tr><td><code>Raid</code></td><td>ends after 12 months, raids only</td></tr>
+</tbody></table></div>
+<h2 id="inventions-outside-battle"><a class="anchor" href="#inventions-outside-battle" aria-label="Link to this section">#</a>Inventions outside battle</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>castle</th><th>siege</th><th>road</th><th>wagon load</th><th>magazines</th><th>ammo</th><th>standing min level</th><th>split join days</th><th>orders</th><th>more</th></tr></thead>
+<tbody>
+<tr><td>B1</td><td>stone castle</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>B4</td><td>earthwork ring fort</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>B5</td><td>bastion fort</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>B6</td><td>star fort</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>B7</td><td></td><td>1.5</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>B2</td><td></td><td></td><td>road</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>B9</td><td></td><td></td><td>turnpike</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>W10</td><td></td><td></td><td></td><td>1.5</td><td>yes</td><td>1</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>W12</td><td></td><td></td><td></td><td></td><td></td><td></td><td>2</td><td></td><td></td><td></td></tr>
+<tr><td>W14</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>1</td><td>1</td><td></td></tr>
+<tr><td>W15</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>levy months: 12</td></tr>
+<tr><td>W18</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>levy gather: days</td></tr>
+<tr><td>W22</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>scout range: 4; bomb: castles, wagons</td></tr>
+</tbody></table></div>
+<h2 id="ai"><a class="anchor" href="#ai" aria-label="Link to this section">#</a>Ai</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>raids_at</code> (provisional)</td><td>high</td></tr>
+<tr><td><code>war_chest_months</code> (provisional)</td><td>6</td></tr>
+</tbody></table></div>
+<h3 id="kinds-raised"><a class="anchor" href="#kinds-raised" aria-label="Link to this section">#</a>Kinds raised</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>Castile</code></td><td>noble retinues, frontier light horse</td></tr>
+<tr><td><code>city republic</code></td><td>hired companies</td></tr>
+</tbody></table></div>
+<h3 id="peace-at"><a class="anchor" href="#peace-at" aria-label="Link to this section">#</a>Peace at</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>low risk</code></td><td>0.333333</td></tr>
+<tr><td><code>hegemon seeker</code></td><td>forced</td></tr>
+</tbody></table></div>
+<h3 id="standing-orders-provisional"><a class="anchor" href="#standing-orders-provisional" aria-label="Link to this section">#</a>Standing orders (provisional)</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>order</th><th>retreat</th></tr></thead>
+<tbody>
+<tr><td>low</td><td>wait</td><td>1 to 1</td></tr>
+<tr><td>medium</td><td>attack</td><td>3 to 2</td></tr>
+<tr><td>high</td><td>attack</td><td>2 to 1</td></tr>
+</tbody></table></div>
+<h2 id="style-region-fallback"><a class="anchor" href="#style-region-fallback" aria-label="Link to this section">#</a>Style region fallback</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>Sahel</code></td><td>Furusiyya</td></tr>
+<tr><td><code>Andes</code></td><td>Three battles</td></tr>
+</tbody></table></div>
+<h2 id="adoption"><a class="anchor" href="#adoption" aria-label="Link to this section">#</a>Adoption</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>officers</code></td><td>3</td></tr>
+<tr><td><code>years</code></td><td>5</td></tr>
+<tr><td><code>lessons</code></td><td>3</td></tr>
+<tr><td><code>lessons_years</code></td><td>10</td></tr>
+<tr><td><code>alliance_battles</code></td><td>3</td></tr>
+<tr><td><code>first_battle_strength</code></td><td>0.5</td></tr>
+</tbody></table></div>
+<h2 id="styles"><a class="anchor" href="#styles" aria-label="Link to this section">#</a>Styles</h2>
+<div class="table-scroll"><table>
+<thead><tr><th>era</th><th>name</th><th>from</th><th>needs</th><th>approach</th><th>rule</th><th>effects</th><th>stale</th><th>kind</th><th>more</th></tr></thead>
+<tbody>
+<tr><td>I</td><td>Charge en haie</td><td>France, Burgundy, England, Castile, Aragon, Portugal, the Empire&#39;s princes, Hungary, Naples</td><td><a href="/wiki/Data-Research#inventions">W2 Heavy armoured cavalry</a></td><td>Breakthrough</td><td>Shock charges x2.5 instead of x2</td><td>charge: 2.5</td><td>(pikes in sector), (<a href="/wiki/Data-Research#inventions">W9 Volley fire drill</a>)</td><td>horse</td><td></td></tr>
+<tr><td>I</td><td>Three battles</td><td>Most settled realms of Europe and the Mediterranean</td><td>none</td><td>Steadfast</td><td>The reserve adds +5 % break point to the whole army, not only while waiting</td><td>reserve_army_break: 0.05</td><td>(W3 field), (<a href="/wiki/Data-Research#inventions">W8 Field artillery</a>)</td><td>foot</td><td></td></tr>
+<tr><td>I</td><td>Herse</td><td>England, Wales</td><td>none</td><td>Entrenchment</td><td>Dug sectors also double the first bell&#39;s Shot</td><td>dug_first_bell_shot: 2</td><td>(W3 field), (W8 field)</td><td>foot</td><td></td></tr>
+<tr><td>I</td><td>Gewalthaufen</td><td>Swiss Confederacy; Landsknechte of the Empire from 1490</td><td><a href="/wiki/Data-Research#inventions">W6 Pike squares</a></td><td>Assault</td><td>Pikes advance in the first bell without their charge being reversed by Shock</td><td>pikes_advance_first_bell: yes; pikes_not_reversed: yes</td><td>(W8 massed), (Shot behind field works)</td><td>foot</td><td></td></tr>
+<tr><td>I</td><td>Wagenburg</td><td>Bohemia, Hungary, Poland-Lithuania</td><td><a href="/wiki/Data-Research#inventions">W4 Wagon fort</a></td><td>Entrenchment</td><td>Can dig in even on a day it marched; dug sectors block Turn and Drive</td><td>dig_after_march: yes; dug_block_turn_drive: yes</td><td>(<a href="/wiki/Data-Research#inventions">W8 Field artillery</a>)</td><td>foot</td><td></td></tr>
+<tr><td>I</td><td>Braccesca</td><td>Italian states</td><td>none</td><td>Breakthrough</td><td>Rotates Shock for free: a charged-out company is replaced by a fresh one each bell</td><td>free_shock_rotation: yes</td><td>(<a href="/wiki/Data-Research#inventions">W7 Pike and shot</a>)</td><td>horse</td><td></td></tr>
+<tr><td>I</td><td>Sforzesca</td><td>Milan, Italian states</td><td>none</td><td>Steadfast</td><td>Commit reserve gives x1.5 hits in the bell it arrives</td><td>commit_reserve_hits: 1.5</td><td>(<a href="/wiki/Data-Research#inventions">W9 Volley fire drill</a>)</td><td>foot</td><td></td></tr>
+<tr><td>I</td><td>A la jineta</td><td>Castile, Granada, Portugal</td><td>none</td><td>Skirmish</td><td>Light horse can Drive into the camp from any won sector</td><td>light_drive_any_won: yes</td><td>(<a href="/wiki/Data-Research#inventions">W11 Flintlock and bayonet</a>)</td><td>horse</td><td></td></tr>
+<tr><td>I</td><td>Furusiyya</td><td>Mamluk Sultanate</td><td><a href="/wiki/Data-Research#inventions">W1 Composite-bow horse archery</a></td><td>Skirmish</td><td>Horse archers can also charge as Shock in the same battle</td><td>horse_archers_shock: yes</td><td>(W5 massed, W3 field)</td><td>horse</td><td></td></tr>
+<tr><td>I</td><td>Feigned flight</td><td>Great Horde, Crimea, Kazan, Uzbeks, Timurids, Oirats, Kazakhs, Nogais</td><td><a href="/wiki/Data-Research#inventions">W1 Composite-bow horse archery</a></td><td>Skirmish</td><td>Shock that charges horse archers and misses is -25 % next bell</td><td>missed_charge_penalty: -0.25</td><td>(<a href="/wiki/Data-Research#inventions">W11 Flintlock and bayonet</a>)</td><td>horse</td><td></td></tr>
+<tr><td>I</td><td>Tabur cengi</td><td>Ottomans</td><td><a href="/wiki/Data-Research#inventions">W3 Bombards</a></td><td>Bombardment</td><td>The centre counts as dug in</td><td>centre_dug: yes</td><td>(<a href="/wiki/Data-Research#inventions">W9 Volley fire drill</a>)</td><td>foot</td><td></td></tr>
+<tr><td>I</td><td>Chezhan</td><td>Ming China, Joseon Korea</td><td><a href="/wiki/Data-Research#inventions">W4 Wagon fort</a></td><td>Entrenchment</td><td>Guns may stand in dug sectors and Shift with them</td><td>guns_in_dug: yes</td><td>(<a href="/wiki/Data-Research#inventions">W8 Field artillery</a>)</td><td>foot</td><td></td></tr>
+<tr><td>I</td><td>Shenjiying</td><td>Ming China</td><td><a href="/wiki/Data-Research#inventions">W5 gunpowder_infantry</a></td><td>Bombardment</td><td>Shot fire in rotation: no ammunition limit for the first 6 bells</td><td>unlimited_ammo_bells: 6</td><td>(<a href="/wiki/Data-Research#inventions">W9 Volley fire drill</a>)</td><td>foot</td><td></td></tr>
+<tr><td>I</td><td>Gyorin and Hōshi</td><td>Japanese clans</td><td>none</td><td>Breakthrough</td><td>Turn hits x2 instead of x1.5</td><td>turn_hits: 2</td><td>(W5 massed)</td><td>horse</td><td></td></tr>
+<tr><td>I</td><td>Kakuyoku</td><td>Japanese clans</td><td>none</td><td>Envelopment</td><td>End sectors get +25 % room</td><td>end_room: 1.25</td><td>(<a href="/wiki/Data-Research#inventions">W9 Volley fire drill</a>)</td><td>foot</td><td></td></tr>
+<tr><td>I</td><td>Saka</td><td>Rajput states</td><td>none</td><td>Assault</td><td>When the army would break, it fights one more bell at x1.5 instead</td><td>last_stand_bells: 1; last_stand_hits: 1.5</td><td>(W5 massed, <a href="/wiki/Data-Research#inventions">W3 Bombards</a>)</td><td>foot</td><td></td></tr>
+<tr><td>I</td><td>Xochiyaoyotl</td><td>Aztec Triple Alliance, Tlaxcala and neighbours</td><td>none</td><td>Assault</td><td>Half of the enemy&#39;s killed are taken as prisoners instead</td><td>killed_to_prisoners: 0.5</td><td>(<a href="/wiki/Data-Research#inventions">W5 gunpowder_infantry</a>, <a href="/wiki/Data-Research#inventions">W2 Heavy armoured cavalry</a>)</td><td>foot</td><td></td></tr>
+<tr><td>II</td><td>Tercio</td><td>Spain, the Habsburg lands, Spanish Italy</td><td><a href="/wiki/Data-Research#inventions">W7 Pike and shot</a></td><td>Steadfast</td><td>Brace and Shot in one company; it can&#39;t Shift</td><td>brace_and_shot: yes; no_shift: yes</td><td>(<a href="/wiki/Data-Research#inventions">W9 Volley fire drill</a>, <a href="/wiki/Data-Research#inventions">W8 Field artillery</a>)</td><td>foot</td><td></td></tr>
+<tr><td>II</td><td>Coronelía and field works</td><td>Spain</td><td><a href="/wiki/Data-Research#inventions">W5 gunpowder_infantry</a></td><td>Entrenchment</td><td>Dug sectors double Shot</td><td>dug_shot: 2</td><td>(W8 massed)</td><td>foot</td><td></td></tr>
+<tr><td>II</td><td>Caracole</td><td>Protestant German princes, Huguenot France</td><td><a href="/wiki/Data-Research#inventions">W5 gunpowder_infantry</a></td><td>Skirmish</td><td>Horse acts as Shot as well as Shock</td><td>horse_shoots: yes</td><td>(pikes in sector), (<a href="/wiki/Data-Research#inventions">W9 Volley fire drill</a>)</td><td>horse</td><td></td></tr>
+<tr><td>II</td><td>Countermarch</td><td>Dutch Republic, England, Sweden, German Protestant states</td><td><a href="/wiki/Data-Research#inventions">W9 Volley fire drill</a></td><td>Steadfast</td><td>Shot keeps its first-bell bonus every bell</td><td>first_bell_bonus_every_bell: yes</td><td>(W8 massed)</td><td>foot</td><td></td></tr>
+<tr><td>II</td><td>Szarża husarii</td><td>Poland-Lithuania</td><td><a href="/wiki/Data-Research#inventions">W2 Heavy armoured cavalry</a></td><td>Breakthrough</td><td>Charges not reversed by Brace in the first contact; can charge a second time without a bell out of contact</td><td>first_contact_not_reversed: yes; second_charge: yes</td><td>(<a href="/wiki/Data-Research#inventions">W11 Flintlock and bayonet</a>)</td><td>horse</td><td></td></tr>
+<tr><td>II</td><td>Hussar raiding</td><td>Hungary, Croatia, the Military Frontier</td><td>none</td><td>Skirmish</td><td>Light can Drive into the camp from any sector</td><td>light_drive_any: yes</td><td>(<a href="/wiki/Data-Research#inventions">W11 Flintlock and bayonet</a>)</td><td>horse</td><td></td></tr>
+<tr><td>II</td><td>Gulyay-gorod</td><td>Muscovy</td><td><a href="/wiki/Data-Research#inventions">W4 Wagon fort</a></td><td>Entrenchment</td><td>Dug sectors take half from Shot too</td><td>dug_half_shot: yes</td><td>(<a href="/wiki/Data-Research#inventions">W8 Field artillery</a>)</td><td>foot</td><td></td></tr>
+<tr><td>II</td><td>Rumi dastur and tulughma</td><td>Mughals, Timurid princes</td><td><a href="/wiki/Data-Research#inventions">W3 Bombards</a></td><td>Envelopment</td><td>Centre counts as dug in; end-sector horse Turn also hits the enemy reserve</td><td>centre_dug: yes; turn_hits_reserve: yes</td><td>(<a href="/wiki/Data-Research#inventions">W9 Volley fire drill</a>)</td><td>horse</td><td></td></tr>
+<tr><td>II</td><td>Qizilbash charge</td><td>Safavid Persia</td><td><a href="/wiki/Data-Research#inventions">W2 Heavy armoured cavalry</a></td><td>Breakthrough</td><td>Charges into Raw companies x3</td><td>charge_raw: 3</td><td>(<a href="/wiki/Data-Research#inventions">W5 gunpowder_infantry</a>, <a href="/wiki/Data-Research#inventions">W3 Bombards</a>)</td><td>horse</td><td></td></tr>
+<tr><td>II</td><td>Sandan-uchi</td><td>Oda, Japanese clans</td><td><a href="/wiki/Data-Research#inventions">W5 gunpowder_infantry</a></td><td>Entrenchment</td><td>Shot fires every bell at first-bell strength</td><td>first_bell_bonus_every_bell: yes</td><td>(<a href="/wiki/Data-Research#inventions">W8 Field artillery</a>)</td><td>foot</td><td></td></tr>
+<tr><td>II</td><td>Yuanyang zhen</td><td>Ming China</td><td>none</td><td>Steadfast</td><td>Its companies take no extra hits from Turn and can&#39;t be Sprung on</td><td>turn_proof: yes; spring_proof: yes</td><td>(W9 massed)</td><td>foot</td><td></td></tr>
+<tr><td>II</td><td>Hwacha battery</td><td>Joseon Korea</td><td><a href="/wiki/Data-Research#inventions">W3 Bombards</a></td><td>Bombardment</td><td>Guns hit every sector within 2 in the first bell</td><td>guns_reach_first_bell: 2</td><td>(<a href="/wiki/Data-Research#inventions">W8 Field artillery</a>)</td><td>foot</td><td></td></tr>
+<tr><td>II</td><td>Skulking way of war</td><td>Haudenosaunee, peoples of the eastern woodlands</td><td>none</td><td>Ambush</td><td>Hidden companies can Spring in any sector with woods, not only next to cover</td><td>spring_any_woods: yes</td><td>(<a href="/wiki/Data-Research#inventions">W22 Military aircraft</a>)</td><td>foot</td><td></td></tr>
+<tr><td>II</td><td>Malón</td><td>Mapuche</td><td>none</td><td>Skirmish</td><td>After a won battle, the pursuit takes horses and food reserve as well</td><td>pursuit_takes_horses_food: yes</td><td>(<a href="/wiki/Data-Research#inventions">W17 Breech-loading rifle</a>)</td><td>horse</td><td></td></tr>
+<tr><td>III</td><td>Swedish brigade</td><td>Sweden</td><td><a href="/wiki/Data-Research#inventions">W8 Field artillery</a>, <a href="/wiki/Data-Research#inventions">W9 Volley fire drill</a></td><td>Breakthrough</td><td>Horse may charge in the same bell Shot fires; regimental guns stand with Line</td><td>charge_with_shot: yes; guns_with_line: yes</td><td>(<a href="/wiki/Data-Research#inventions">W11 Flintlock and bayonet</a>)</td><td>horse</td><td></td></tr>
+<tr><td>III</td><td>Highland charge</td><td>Scottish Highland clans, Jacobites, Irish armies</td><td>none</td><td>Assault</td><td>The defender&#39;s Shot fires only once before contact</td><td>defender_shot_once: yes</td><td>(<a href="/wiki/Data-Research#inventions">W11 Flintlock and bayonet</a>, level3+)</td><td>foot</td><td></td></tr>
+<tr><td>III</td><td>Tabor</td><td>Zaporozhian Cossacks</td><td><a href="/wiki/Data-Research#inventions">W4 Wagon fort</a></td><td>Entrenchment</td><td>Can dig in on a day it marched</td><td>dig_after_march: yes</td><td>(<a href="/wiki/Data-Research#inventions">W8 Field artillery</a>)</td><td>foot</td><td></td></tr>
+<tr><td>III</td><td>Ganimi kava</td><td>Marathas</td><td>none</td><td>Ambush</td><td>Hidden companies can also attack enemy armies marching through, outside battle (raiding their food reserve)</td><td>raid_marching: yes</td><td>(<a href="/wiki/Data-Research#inventions">W13 Light field artillery</a>)</td><td>horse</td><td></td></tr>
+<tr><td>III</td><td>Eight Banners</td><td>Manchu Later Jin, Qing</td><td><a href="/wiki/Data-Research#inventions">W1 Composite-bow horse archery</a>, <a href="/wiki/Data-Research#inventions">W2 Heavy armoured cavalry</a></td><td>Breakthrough</td><td>Horse archers and Shock in the same company</td><td>horse_archers_shock: yes</td><td>(<a href="/wiki/Data-Research#inventions">W11 Flintlock and bayonet</a>)</td><td>horse</td><td></td></tr>
+<tr><td>III</td><td>Attaque en règle</td><td>France</td><td><a href="/wiki/Data-Research#inventions">B7 Siege parallels</a></td><td>Bombardment</td><td>Sieges: breaches x1.5; storming losses halved</td><td>breaches: 1.5; storm_losses: 0.5</td><td>(<a href="/wiki/Data-Research#inventions">B6 Star forts</a>, relief army)</td><td>siege</td><td></td></tr>
+<tr><td>III</td><td>Kuruc raiding</td><td>Hungarian kuruc rebels</td><td>none</td><td>Skirmish</td><td>Light can fight dismounted as Shot</td><td>light_dismount: yes</td><td>(<a href="/wiki/Data-Research#inventions">W13 Light field artillery</a>)</td><td>horse</td><td></td></tr>
+<tr><td>IV</td><td>Schiefe Schlachtordnung</td><td>Prussia</td><td><a href="/wiki/Data-Research#inventions">W11 Flintlock and bayonet</a></td><td>Breakthrough</td><td>One end sector gets double room for one bell; Turn from it x2</td><td>end_room_one_bell: 2; turn_from_end: 2</td><td>(<a href="/wiki/Data-Research#inventions">W14 Army divisions</a>)</td><td>foot</td><td></td></tr>
+<tr><td>IV</td><td>Platoon fire</td><td>Britain, Dutch Republic</td><td><a href="/wiki/Data-Research#inventions">W11 Flintlock and bayonet</a></td><td>Steadfast</td><td>Line companies rotate for free</td><td>line_free_rotation: yes</td><td>(<a href="/wiki/Data-Research#inventions">W16 Rifled musket</a>)</td><td>foot</td><td></td></tr>
+<tr><td>IV</td><td>Redoubt line</td><td>Russia under Peter I</td><td><a href="/wiki/Data-Research#inventions">W11 Flintlock and bayonet</a>, <a href="/wiki/Data-Research#inventions">B4 Earthwork ring forts</a></td><td>Entrenchment</td><td>Dug sectors break Turn and Drive</td><td>dug_block_turn_drive: yes</td><td>(<a href="/wiki/Data-Research#inventions">W13 Light field artillery</a>)</td><td>foot</td><td></td></tr>
+<tr><td>IV</td><td>Nauka pobezhdat</td><td>Russia</td><td><a href="/wiki/Data-Research#inventions">W11 Flintlock and bayonet</a></td><td>Assault</td><td>Line charging with bayonets: first contact x1.5</td><td>bayonet_first_contact: 1.5</td><td>(<a href="/wiki/Data-Research#inventions">W16 Rifled musket</a>)</td><td>foot</td><td></td></tr>
+<tr><td>IV</td><td>Grenzer</td><td>Habsburg Military Frontier</td><td><a href="/wiki/Data-Research#inventions">W11 Flintlock and bayonet</a></td><td>Skirmish</td><td>Light foot in rough sectors: enemy Shot against them halved</td><td>light_rough_shot_taken: 0.5</td><td>(<a href="/wiki/Data-Research#inventions">W16 Rifled musket</a>)</td><td>foot</td><td></td></tr>
+<tr><td>IV</td><td>Zamburak</td><td>Durrani Afghanistan, Persia under Nader Shah</td><td><a href="/wiki/Data-Research#inventions">W5 gunpowder_infantry</a></td><td>Skirmish</td><td>Light can carry guns: they Shift and shoot like Guns</td><td>light_guns: yes</td><td>(<a href="/wiki/Data-Research#inventions">W13 Light field artillery</a>)</td><td>horse</td><td></td></tr>
+<tr><td>IV</td><td>Mysorean rocket corps</td><td>Mysore</td><td><a href="/wiki/Data-Research#inventions">W8 Field artillery</a></td><td>Bombardment</td><td>Guns hit the enemy camp from the first bell</td><td>guns_hit_camp: yes</td><td>(W13 massed)</td><td>foot</td><td></td></tr>
+<tr><td>IV</td><td>Asante war formation</td><td>Asante</td><td><a href="/wiki/Data-Research#inventions">W5 gunpowder_infantry</a></td><td>Envelopment</td><td>End sectors move through woods without losing a bell</td><td>ends_through_woods: yes</td><td>(<a href="/wiki/Data-Research#inventions">W17 Breech-loading rifle</a>)</td><td>foot</td><td></td></tr>
+<tr><td>IV</td><td>Nizam-ı Cedid</td><td>Ottomans</td><td><a href="/wiki/Data-Research#inventions">W11 Flintlock and bayonet</a></td><td>Steadfast</td><td>Levels rise one step faster</td><td>levels_faster: yes</td><td>(<a href="/wiki/Data-Research#inventions">W16 Rifled musket</a>)</td><td>foot</td><td>adopted only: yes</td></tr>
+<tr><td>V</td><td>Ordre mixte</td><td>France</td><td><a href="/wiki/Data-Research#inventions">W14 Army divisions</a></td><td>Breakthrough</td><td>Line can Shift two sectors a bell; one sector may advance in the first bell</td><td>line_shift_two: yes</td><td>(<a href="/wiki/Data-Research#inventions">W16 Rifled musket</a>)</td><td>foot</td><td></td></tr>
+<tr><td>V</td><td>Grande batterie</td><td>France</td><td><a href="/wiki/Data-Research#inventions">W13 Light field artillery</a></td><td>Bombardment</td><td>All guns fire into one sector for two bells: its defenders -15 % break point</td><td>massed_fire_bells: 2; target_break: -0.15</td><td>(<a href="/wiki/Data-Research#inventions">W16 Rifled musket</a>)</td><td>foot</td><td></td></tr>
+<tr><td>V</td><td>Thin red line</td><td>Britain</td><td><a href="/wiki/Data-Research#inventions">W11 Flintlock and bayonet</a></td><td>Steadfast</td><td>Line attacked by Shock becomes Brace for that bell; enemy guns -50 % in the first two bells</td><td>line_brace_vs_shock: yes; enemy_guns_first_bells: -0.5</td><td>(<a href="/wiki/Data-Research#inventions">W17 Breech-loading rifle</a>)</td><td>foot</td><td></td></tr>
+<tr><td>V</td><td>La guerrilla</td><td>Spain, Portugal, Haiti</td><td>none</td><td>Ambush</td><td>In occupied homeland provinces, hidden bands raid the occupier&#39;s food reserve each month</td><td>raid_occupier_food: yes</td><td>none</td><td>foot</td><td>weakened by: <a href="/wiki/Data-Research#inventions">W18 Railway mobilization</a></td></tr>
+<tr><td>V</td><td>Impondo zankomo</td><td>Zulu kingdom, the Nguni peoples it drew in</td><td>none</td><td>Envelopment</td><td>From the second bell, both enemy end sectors count as Turned on</td><td>ends_turned_from_bell: 2</td><td>(<a href="/wiki/Data-Research#inventions">W17 Breech-loading rifle</a>, <a href="/wiki/Data-Research#inventions">W19 Machine gun</a>)</td><td>foot</td><td></td></tr>
+<tr><td>V</td><td>Pā warfare</td><td>Māori</td><td><a href="/wiki/Data-Research#inventions">W5 gunpowder_infantry</a></td><td>Entrenchment</td><td>Dug sectors halve all hits, guns included</td><td>dug_halve_all: yes</td><td>(<a href="/wiki/Data-Research#inventions">W19 Machine gun</a>)</td><td>foot</td><td></td></tr>
+<tr><td>V</td><td>Khalsa drill</td><td>Sikh Empire</td><td><a href="/wiki/Data-Research#inventions">W11 Flintlock and bayonet</a>, <a href="/wiki/Data-Research#inventions">W13 Light field artillery</a></td><td>Steadfast</td><td>Guns rotate for free</td><td>guns_free_rotation: yes</td><td>(<a href="/wiki/Data-Research#inventions">W17 Breech-loading rifle</a>)</td><td>foot</td><td></td></tr>
+<tr><td>V</td><td>Rifle pit and entrenchment</td><td>United States, Confederate States, Russia</td><td><a href="/wiki/Data-Research#inventions">W16 Rifled musket</a></td><td>Entrenchment</td><td>Shot from dug sectors x1.5</td><td>dug_shot: 1.5</td><td>(<a href="/wiki/Data-Research#inventions">W19 Machine gun</a>)</td><td>foot</td><td></td></tr>
+<tr><td>VI</td><td>Auftragstaktik</td><td>Prussia, Germany</td><td><a href="/wiki/Data-Research#inventions">W17 Breech-loading rifle</a>, <a href="/wiki/Data-Research#inventions">W18 Railway mobilization</a></td><td>Breakthrough</td><td>Captains give their own orders in their sectors (+1 order per captain)</td><td>captain_orders: 1</td><td>(W19 entrenched)</td><td>foot</td><td></td></tr>
+<tr><td>VI</td><td>Kesselschlacht</td><td>Germany</td><td><a href="/wiki/Data-Research#inventions">W18 Railway mobilization</a></td><td>Envelopment</td><td>An army whose two end sectors are lost can&#39;t withdraw; when it breaks, all its men become prisoners</td><td>ends_lost_no_withdraw: yes; all_prisoners: yes</td><td>(<a href="/wiki/Data-Research#inventions">W22 Military aircraft</a>)</td><td>foot</td><td></td></tr>
+<tr><td>VI</td><td>Offensive à outrance</td><td>France, Russia</td><td><a href="/wiki/Data-Research#inventions">W17 Breech-loading rifle</a></td><td>Assault</td><td>Flee share halved for the attacker</td><td>attacker_flee: 0.5</td><td>(<a href="/wiki/Data-Research#inventions">W19 Machine gun</a>)</td><td>foot</td><td></td></tr>
+<tr><td>VI</td><td>Osman Pasha&#39;s redoubts</td><td>Ottomans</td><td><a href="/wiki/Data-Research#inventions">W17 Breech-loading rifle</a></td><td>Entrenchment</td><td>Shot from dug sectors x1.5; the line can be held by half the men</td><td>dug_shot: 1.5; half_men_hold: yes</td><td>(W20 massed)</td><td>foot</td><td></td></tr>
+<tr><td>VI</td><td>Commando</td><td>Boer republics</td><td><a href="/wiki/Data-Research#inventions">W17 Breech-loading rifle</a></td><td>Skirmish</td><td>Light fight dismounted as Shot and remount to step back two sectors</td><td>light_dismount: yes; step_back: 2</td><td>(<a href="/wiki/Data-Research#inventions">W22 Military aircraft</a>)</td><td>horse</td><td></td></tr>
+<tr><td>VI</td><td>Ansar charge</td><td>Mahdist Sudan</td><td>none</td><td>Assault</td><td>+25 % hits in the first contact</td><td>first_contact_hits: 1.25</td><td>(<a href="/wiki/Data-Research#inventions">W19 Machine gun</a>)</td><td>foot</td><td></td></tr>
+<tr><td>VII</td><td>Creeping barrage and bite and hold</td><td>Britain, the Dominions, France</td><td><a href="/wiki/Data-Research#inventions">W20 Smokeless powder</a>, <a href="/wiki/Data-Research#inventions">W23 Field radio</a></td><td>Bombardment</td><td>Before an attack the defender&#39;s first-bell hits are halved; won sectors can&#39;t be counter-attacked for a bell</td><td>defender_first_bell: 0.5</td><td>(style:Elastische Verteidigung)</td><td>foot</td><td></td></tr>
+<tr><td>VII</td><td>Stoßtrupptaktik</td><td>Germany</td><td><a href="/wiki/Data-Research#inventions">W19 Machine gun</a></td><td>Breakthrough</td><td>Level 4+ companies can Drive through a sector that is still held</td><td>drive_through_level: 4</td><td>(style:Elastische Verteidigung), (<a href="/wiki/Data-Research#inventions">W21 Tanks</a>)</td><td>foot</td><td></td></tr>
+<tr><td>VII</td><td>Elastische Verteidigung</td><td>Germany</td><td><a href="/wiki/Data-Research#inventions">W19 Machine gun</a></td><td>Steadfast</td><td>Front sector held lightly; when lost, Turn and Drive from it don&#39;t work for a bell, and the reserve counter-attacks x1.5</td><td>counter_attack: 1.5</td><td>(<a href="/wiki/Data-Research#inventions">W21 Tanks</a>, <a href="/wiki/Data-Research#inventions">W22 Military aircraft</a>, <a href="/wiki/Data-Research#inventions">W23 Field radio</a>)</td><td>foot</td><td></td></tr>
+<tr><td>VII</td><td>Bataille conduite</td><td>France</td><td><a href="/wiki/Data-Research#inventions">W19 Machine gun</a>, <a href="/wiki/Data-Research#inventions">W20 Smokeless powder</a></td><td>Bombardment</td><td>Every sector dug in; no order can be given to more than one sector per bell</td><td>all_dug: yes</td><td>(<a href="/wiki/Data-Research#inventions">W21 Tanks</a>, <a href="/wiki/Data-Research#inventions">W23 Field radio</a>)</td><td>foot</td><td>after 1939: yes</td></tr>
+<tr><td>VII</td><td>Bewegungskrieg</td><td>Germany</td><td><a href="/wiki/Data-Research#inventions">W21 Tanks</a>, <a href="/wiki/Data-Research#inventions">W22 Military aircraft</a>, <a href="/wiki/Data-Research#inventions">W23 Field radio</a></td><td>Breakthrough</td><td>Tanks that win a sector can Drive two sectors deep in one bell</td><td>tank_drive_deep: 2</td><td>(deep defence, <a href="/wiki/Data-Research#inventions">W22 Military aircraft</a>)</td><td>foot</td><td>after 1939: yes</td></tr>
+<tr><td>VII</td><td>Glubokiy boy</td><td>Soviet Union</td><td><a href="/wiki/Data-Research#inventions">W21 Tanks</a>, <a href="/wiki/Data-Research#inventions">W22 Military aircraft</a>, <a href="/wiki/Data-Research#inventions">W23 Field radio</a></td><td>Breakthrough</td><td>After a breakthrough, a second wave enters from depth: Drive orders cost no order</td><td>free_drive: yes</td><td>(air superiority)</td><td>foot</td><td>after 1939: yes</td></tr>
+<tr><td>VII</td><td>Motti</td><td>Finland</td><td>none</td><td>Ambush</td><td>Sprung companies split an enemy sector in two: each half fights alone</td><td>split_sector: yes</td><td>(<a href="/wiki/Data-Research#inventions">W22 Military aircraft</a>)</td><td>foot</td><td>after 1939: yes</td></tr>
+<tr><td>VII</td><td>People&#39;s war</td><td>Chinese communists, Yugoslav partisans, other partisans</td><td>none</td><td>Ambush</td><td>In occupied homeland provinces, rebel bands form for you each month</td><td>rebel_bands_occupied: yes</td><td>none</td><td>foot</td><td>after 1939: yes</td></tr>
+<tr><td>VII</td><td>Banzai charge</td><td>Japan</td><td>none</td><td>Assault</td><td>Breaks are delayed by one bell; losses x2 for both sides</td><td>break_delay_bells: 1; losses: 2</td><td>(<a href="/wiki/Data-Research#inventions">W19 Machine gun</a>)</td><td>foot</td><td>after 1939: yes</td></tr>
+</tbody></table></div>
+<h2 id="ships"><a class="anchor" href="#ships" aria-label="Link to this section">#</a>Ships</h2>
+<blockquote>
+<p>Warfare 11.1 (warfare owns ships&#39; fighting strength and room, D-NAVY-5): what each ship fights with and how many men it carries. Turtle ships fight 80 near their home coast and 20 at sea; until home coasts exist they count 20. Caravel and fluyt are naval&#39;s proposal (naval §10); steamer, small craft and voyaging canoe are provisional.</p>
+</blockquote>
+<div class="table-scroll"><table>
+<thead><tr><th>Name</th><th>fights</th><th>carries</th></tr></thead>
+<tbody>
+<tr><td>galley</td><td>20</td><td>200</td></tr>
+<tr><td>cog</td><td>5</td><td>300</td></tr>
+<tr><td>junk</td><td>5</td><td>300</td></tr>
+<tr><td>dhow</td><td>5</td><td>300</td></tr>
+<tr><td>war canoe fleet</td><td>8</td><td>100</td></tr>
+<tr><td>carrack</td><td>15</td><td>400</td></tr>
+<tr><td>armed carrack</td><td>40</td><td>300</td></tr>
+<tr><td>galleon</td><td>60</td><td>500</td></tr>
+<tr><td>turtle ship</td><td>20</td><td>0</td></tr>
+<tr><td>ship of the line</td><td>150</td><td>0</td></tr>
+<tr><td>caravel</td><td>8</td><td>60</td></tr>
+<tr><td>fluyt</td><td>2</td><td>300</td></tr>
+<tr><td>steamer</td><td>5</td><td>600</td></tr>
+<tr><td>small craft</td><td>0</td><td>10</td></tr>
+<tr><td>voyaging canoe</td><td>0</td><td>20</td></tr>
+</tbody></table></div>

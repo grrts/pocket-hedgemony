@@ -40,6 +40,7 @@ for (const [name, device] of [
   await page.waitForSelector("[data-nation=castile]", { timeout: 60000 });
   check(!(await page.$("[data-continue]")), `${name}: no Continue before any save`);
   await tap("[data-nation=castile]");
+  await tap("[data-begin]");
   await page.waitForSelector(".hud [data-news]", { timeout: 60000 });
   await page.waitForTimeout(800);
 

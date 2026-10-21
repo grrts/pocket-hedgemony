@@ -11,7 +11,64 @@
     1390
    ],
    "weight": "strong",
-   "deviation": "Turn to Anatolia first (Germiyan, Hamid, Karaman)"
+   "deviation": "Turn to Anatolia first (Germiyan, Hamid, Karaman)",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Sofia",
+      "at": [
+       23.32,
+       42.7
+      ]
+     },
+     {
+      "name": "Serres",
+      "at": [
+       23.55,
+       41.09
+      ]
+     },
+     {
+      "name": "Niš",
+      "at": [
+       21.9,
+       43.32
+      ]
+     }
+    ],
+    "target": "bulgaria_tarnovo"
+   },
+   "alternative": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Kütahya",
+      "at": [
+       29.98,
+       39.42
+      ]
+     },
+     {
+      "name": "Isparta",
+      "at": [
+       30.55,
+       37.76
+      ]
+     },
+     {
+      "name": "Beyşehir",
+      "at": [
+       31.72,
+       37.68
+      ]
+     }
+    ]
+   },
+   "toward": [
+    "battle_of_kosovo",
+    "fall_of_tarnovo"
+   ]
   },
   {
    "realm": "ottomans",
@@ -23,7 +80,28 @@
     1390
    ],
    "weight": "strong",
-   "deviation": "Besiege Constantinople early"
+   "deviation": "Besiege Constantinople early",
+   "aim": {
+    "kind": "subject",
+    "target": "byzantium"
+   },
+   "alternative": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Constantinople",
+      "at": [
+       28.98,
+       41.01
+      ]
+     }
+    ],
+    "target": "byzantium"
+   },
+   "toward": [
+    "siege_of_constantinople_1422",
+    "fall_of_constantinople"
+   ]
   },
   {
    "realm": "ottomans",
@@ -35,7 +113,40 @@
     1381
    ],
    "weight": "normal",
-   "deviation": "Annex Germiyan by force"
+   "deviation": "Annex Germiyan by force",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Kütahya",
+      "at": [
+       29.98,
+       39.42
+      ]
+     },
+     {
+      "name": "Isparta",
+      "at": [
+       30.55,
+       37.76
+      ]
+     }
+    ],
+    "target": "germiyan"
+   },
+   "alternative": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Kütahya",
+      "at": [
+       29.98,
+       39.42
+      ]
+     }
+    ],
+    "target": "germiyan"
+   }
   },
   {
    "realm": "ottomans",
@@ -47,7 +158,36 @@
     1387
    ],
    "weight": "normal",
-   "deviation": "Push into Albania via Savra"
+   "deviation": "Push into Albania via Savra",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Thessaloniki",
+      "at": [
+       22.94,
+       40.64
+      ]
+     }
+    ],
+    "target": "byzantium"
+   },
+   "alternative": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Berat",
+      "at": [
+       19.95,
+       40.7
+      ]
+     }
+    ],
+    "target": "albania"
+   },
+   "toward": [
+    "fall_of_thessaloniki"
+   ]
   },
   {
    "realm": "ottomans",
@@ -59,7 +199,14 @@
     1389
    ],
    "weight": "strong",
-   "deviation": "Accept Serbian tribute and peace"
+   "deviation": "Accept Serbian tribute and peace",
+   "aim": {
+    "kind": "subject",
+    "target": "serbia"
+   },
+   "toward": [
+    "battle_of_kosovo"
+   ]
   },
   {
    "realm": "byzantium",
@@ -71,7 +218,32 @@
     1381
    ],
    "weight": "strong",
-   "deviation": "Flee to Pera and bargain for an appanage"
+   "deviation": "Flee to Pera and bargain for an appanage",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Constantinople",
+      "at": [
+       28.98,
+       41.01
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Pera",
+      "at": [
+       28.97,
+       41.03
+      ]
+     }
+    ],
+    "target": "genoa"
+   }
   },
   {
    "realm": "byzantium",
@@ -83,7 +255,32 @@
     1379
    ],
    "weight": "strong",
-   "deviation": "Rule from Thessaloniki"
+   "deviation": "Rule from Thessaloniki",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Constantinople",
+      "at": [
+       28.98,
+       41.01
+      ]
+     }
+    ],
+    "target": "byzantium"
+   },
+   "alternative": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Thessaloniki",
+      "at": [
+       22.94,
+       40.64
+      ]
+     }
+    ]
+   }
   },
   {
    "realm": "byzantium",
@@ -95,7 +292,16 @@
     1400
    ],
    "weight": "normal",
-   "deviation": "Full submission to the Ottomans"
+   "deviation": "Full submission to the Ottomans",
+   "aim": {
+    "kind": "fight",
+    "target": "ottomans"
+   },
+   "toward": [
+    "battle_of_nicopolis",
+    "council_of_florence_union",
+    "battle_of_varna"
+   ]
   },
   {
    "realm": "byzantium",
@@ -107,7 +313,19 @@
     1387
    ],
    "weight": "normal",
-   "deviation": "Join his father's tributary line"
+   "deviation": "Join his father's tributary line",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Thessaloniki",
+      "at": [
+       22.94,
+       40.64
+      ]
+     }
+    ]
+   }
   },
   {
    "realm": "morea",
@@ -119,7 +337,31 @@
     1430
    ],
    "weight": "normal",
-   "deviation": "Ally with the Navarrese against the Ottomans"
+   "deviation": "Ally with the Navarrese against the Ottomans",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Glarentza",
+      "at": [
+       21.27,
+       37.92
+      ]
+     },
+     {
+      "name": "Patras",
+      "at": [
+       21.73,
+       38.25
+      ]
+     }
+    ],
+    "target": "achaea"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "navarrese_company"
+   }
   },
   {
    "realm": "bulgaria_tarnovo",
@@ -131,7 +373,26 @@
     1393
    ],
    "weight": "strong",
-   "deviation": "Revolt with Lazar or Hungary"
+   "deviation": "Revolt with Lazar or Hungary",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Tarnovo",
+      "at": [
+       25.63,
+       43.08
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "free",
+    "target": "ottomans"
+   },
+   "toward": [
+    "fall_of_tarnovo"
+   ]
   },
   {
    "realm": "bulgaria_vidin",
@@ -143,7 +404,26 @@
     1396
    ],
    "weight": "normal",
-   "deviation": "Join a crusade (Nikopolis)"
+   "deviation": "Join a crusade (Nikopolis)",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Vidin",
+      "at": [
+       22.88,
+       43.99
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "fight",
+    "target": "ottomans"
+   },
+   "toward": [
+    "battle_of_nicopolis"
+   ]
   },
   {
    "realm": "dobruja",
@@ -155,7 +435,15 @@
     1387
    ],
    "weight": "normal",
-   "deviation": "Seek Wallachian protection"
+   "deviation": "Seek Wallachian protection",
+   "aim": {
+    "kind": "fight",
+    "target": "genoa"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "wallachia"
+   }
   },
   {
    "realm": "serbia",
@@ -167,7 +455,23 @@
     1389
    ],
    "weight": "strong",
-   "deviation": "Accept Ottoman tribute and peace"
+   "deviation": "Accept Ottoman tribute and peace",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Braničevo",
+      "at": [
+       21.55,
+       44.7
+      ]
+     }
+    ],
+    "target": "hungary"
+   },
+   "toward": [
+    "battle_of_kosovo"
+   ]
   },
   {
    "realm": "serbia",
@@ -179,7 +483,18 @@
     1389
    ],
    "weight": "strong",
-   "deviation": "Seek Hungarian protection"
+   "deviation": "Seek Hungarian protection",
+   "aim": {
+    "kind": "fight",
+    "target": "ottomans"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "hungary"
+   },
+   "toward": [
+    "battle_of_kosovo"
+   ]
   },
   {
    "realm": "brankovic",
@@ -191,7 +506,29 @@
     1392
    ],
    "weight": "normal",
-   "deviation": "Become an Ottoman vassal early"
+   "deviation": "Become an Ottoman vassal early",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Priština",
+      "at": [
+       21.16,
+       42.66
+      ]
+     },
+     {
+      "name": "Skopje",
+      "at": [
+       21.43,
+       42.0
+      ]
+     }
+    ]
+   },
+   "toward": [
+    "battle_of_kosovo"
+   ]
   },
   {
    "realm": "zeta",
@@ -203,7 +540,24 @@
     1385
    ],
    "weight": "strong",
-   "deviation": "Seek Venetian protection"
+   "deviation": "Seek Venetian protection",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Durrës",
+      "at": [
+       19.45,
+       41.32
+      ]
+     }
+    ],
+    "target": "albania"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "venice"
+   }
   },
   {
    "realm": "albania",
@@ -215,7 +569,19 @@
     1392
    ],
    "weight": "strong",
-   "deviation": "Call in the Ottomans (1385) or sell to Venice"
+   "deviation": "Call in the Ottomans (1385) or sell to Venice",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Durrës",
+      "at": [
+       19.45,
+       41.32
+      ]
+     }
+    ]
+   }
   },
   {
    "realm": "bosnia",
@@ -227,7 +593,20 @@
     1391
    ],
    "weight": "strong",
-   "deviation": "Intervene in Hungary after Louis's death"
+   "deviation": "Intervene in Hungary after Louis's death",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Kotor",
+      "at": [
+       18.77,
+       42.42
+      ]
+     }
+    ],
+    "target": "zeta"
+   }
   },
   {
    "realm": "ragusa",
@@ -239,7 +618,8 @@
     1444
    ],
    "weight": "strong",
-   "deviation": "Pivot to shipping"
+   "deviation": "Pivot to shipping",
+   "aim": null
   },
   {
    "realm": "wallachia",
@@ -251,7 +631,31 @@
     1395
    ],
    "weight": "normal",
-   "deviation": "Take Dobruja (Mircea, c.1388)"
+   "deviation": "Take Dobruja (Mircea, c.1388)",
+   "aim": {
+    "kind": "free",
+    "target": "hungary"
+   },
+   "alternative": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Silistra",
+      "at": [
+       27.26,
+       44.12
+      ]
+     },
+     {
+      "name": "Kaliakra",
+      "at": [
+       28.47,
+       43.36
+      ]
+     }
+    ],
+    "target": "dobruja"
+   }
   },
   {
    "realm": "athens",
@@ -263,7 +667,30 @@
     1388
    ],
    "weight": "normal",
-   "deviation": "Hire the Navarrese"
+   "deviation": "Hire the Navarrese",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Athens",
+      "at": [
+       23.73,
+       37.97
+      ]
+     },
+     {
+      "name": "Thebes",
+      "at": [
+       23.32,
+       38.32
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "navarrese_company"
+   }
   },
   {
    "realm": "achaea",
@@ -275,7 +702,8 @@
     1381
    ],
    "weight": "weak",
-   "deviation": "Hire the Navarrese as rulers"
+   "deviation": "Hire the Navarrese as rulers",
+   "aim": null
   },
   {
    "realm": "arta",
@@ -287,7 +715,20 @@
     1399
    ],
    "weight": "normal",
-   "deviation": "Ransom diplomacy with the West"
+   "deviation": "Ransom diplomacy with the West",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Ioannina",
+      "at": [
+       20.85,
+       39.67
+      ]
+     }
+    ],
+    "target": "ioannina"
+   }
   },
   {
    "realm": "ioannina",
@@ -299,7 +740,19 @@
     1384
    ],
    "weight": "normal",
-   "deviation": "Seek Florentine (Buondelmonti) ties"
+   "deviation": "Seek Florentine (Buondelmonti) ties",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Ioannina",
+      "at": [
+       20.85,
+       39.67
+      ]
+     }
+    ]
+   }
   },
   {
    "realm": "epirus",
@@ -311,7 +764,27 @@
     1416
    ],
    "weight": "weak",
-   "deviation": "Stay in the islands under Venice"
+   "deviation": "Stay in the islands under Venice",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Ioannina",
+      "at": [
+       20.85,
+       39.67
+      ]
+     },
+     {
+      "name": "Arta",
+      "at": [
+       20.98,
+       39.16
+      ]
+     }
+    ],
+    "target": "arta"
+   }
   },
   {
    "realm": "cyprus",
@@ -323,7 +796,23 @@
     1464
    ],
    "weight": "strong",
-   "deviation": "Accept Genoese terms (1383) to free James I"
+   "deviation": "Accept Genoese terms (1383) to free James I",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Famagusta",
+      "at": [
+       33.94,
+       35.12
+      ]
+     }
+    ],
+    "target": "genoa"
+   },
+   "toward": [
+    "venice_takes_cyprus"
+   ]
   },
   {
    "realm": "knights_of_rhodes",
@@ -335,7 +824,49 @@
     1444
    ],
    "weight": "strong",
-   "deviation": "Expand in Greece (Achaea, Corinth)"
+   "deviation": "Expand in Greece (Achaea, Corinth)",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Rhodes",
+      "at": [
+       28.23,
+       36.44
+      ]
+     },
+     {
+      "name": "Smyrna",
+      "at": [
+       27.14,
+       38.42
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Glarentza",
+      "at": [
+       21.27,
+       37.92
+      ]
+     },
+     {
+      "name": "Corinth",
+      "at": [
+       22.93,
+       37.91
+      ]
+     }
+    ],
+    "target": "achaea"
+   },
+   "toward": [
+    "siege_of_rhodes"
+   ]
   },
   {
    "realm": "knights_of_rhodes",
@@ -347,7 +878,8 @@
     1379
    ],
    "weight": "normal",
-   "deviation": ""
+   "deviation": "",
+   "aim": null
   },
   {
    "realm": "lesbos",
@@ -359,7 +891,11 @@
     1381
    ],
    "weight": "weak",
-   "deviation": "Pay the Ottomans"
+   "deviation": "Pay the Ottomans",
+   "aim": {
+    "kind": "ally",
+    "target": "john_v"
+   }
   },
   {
    "realm": "naxos",
@@ -371,7 +907,19 @@
     1444
    ],
    "weight": "weak",
-   "deviation": ""
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Naxos",
+      "at": [
+       25.38,
+       37.1
+      ]
+     }
+    ]
+   }
   },
   {
    "realm": "chios",
@@ -383,7 +931,19 @@
     1444
    ],
    "weight": "weak",
-   "deviation": "Pay the Ottomans"
+   "deviation": "Pay the Ottomans",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Chios",
+      "at": [
+       26.14,
+       38.37
+      ]
+     }
+    ]
+   }
   },
   {
    "realm": "thessaly",
@@ -395,7 +955,19 @@
     1393
    ],
    "weight": "weak",
-   "deviation": "Ottoman vassal"
+   "deviation": "Ottoman vassal",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Trikala",
+      "at": [
+       21.77,
+       39.56
+      ]
+     }
+    ]
+   }
   },
   {
    "realm": "karaman",
@@ -407,7 +979,18 @@
     1397
    ],
    "weight": "strong",
-   "deviation": "Accept Ottoman marriage and peace"
+   "deviation": "Accept Ottoman marriage and peace",
+   "aim": {
+    "kind": "fight",
+    "target": "ottomans"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "ottomans"
+   },
+   "toward": [
+    "battle_of_ankara"
+   ]
   },
   {
    "realm": "karaman",
@@ -419,7 +1002,33 @@
     1390
    ],
    "weight": "normal",
-   "deviation": "Expand east to Kayseri"
+   "deviation": "Expand east to Kayseri",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Beyşehir",
+      "at": [
+       31.72,
+       37.68
+      ]
+     }
+    ],
+    "target": "hamid"
+   },
+   "alternative": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Kayseri",
+      "at": [
+       35.48,
+       38.72
+      ]
+     }
+    ],
+    "target": "eretnids"
+   }
   },
   {
    "realm": "germiyan",
@@ -431,7 +1040,15 @@
     1381
    ],
    "weight": "normal",
-   "deviation": "Ally with Karaman"
+   "deviation": "Ally with Karaman",
+   "aim": {
+    "kind": "ally",
+    "target": "ottomans"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "karaman"
+   }
   },
   {
    "realm": "aydin",
@@ -443,7 +1060,19 @@
     1390
    ],
    "weight": "normal",
-   "deviation": "Raid the Aegean"
+   "deviation": "Raid the Aegean",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Ayasoluk",
+      "at": [
+       27.37,
+       37.95
+      ]
+     }
+    ]
+   }
   },
   {
    "realm": "aydin",
@@ -455,7 +1084,20 @@
     1402
    ],
    "weight": "weak",
-   "deviation": ""
+   "deviation": "",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Smyrna",
+      "at": [
+       27.14,
+       38.42
+      ]
+     }
+    ],
+    "target": "knights_of_rhodes"
+   }
   },
   {
    "realm": "mentese",
@@ -467,7 +1109,30 @@
     1391
    ],
    "weight": "weak",
-   "deviation": "Raid Rhodes and the islands"
+   "deviation": "Raid Rhodes and the islands",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Balat",
+      "at": [
+       27.28,
+       37.53
+      ]
+     },
+     {
+      "name": "Milas",
+      "at": [
+       27.78,
+       37.32
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "fight",
+    "target": "knights_of_rhodes"
+   }
   },
   {
    "realm": "saruhan",
@@ -479,7 +1144,19 @@
     1390
    ],
    "weight": "weak",
-   "deviation": "Ottoman vassal"
+   "deviation": "Ottoman vassal",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Manisa",
+      "at": [
+       27.43,
+       38.61
+      ]
+     }
+    ]
+   }
   },
   {
    "realm": "hamid",
@@ -491,7 +1168,15 @@
     1381
    ],
    "weight": "normal",
-   "deviation": "Ally with Karaman"
+   "deviation": "Ally with Karaman",
+   "aim": {
+    "kind": "ally",
+    "target": "ottomans"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "karaman"
+   }
   },
   {
    "realm": "teke",
@@ -503,7 +1188,19 @@
     1391
    ],
    "weight": "weak",
-   "deviation": ""
+   "deviation": "",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Antalya",
+      "at": [
+       30.71,
+       36.89
+      ]
+     }
+    ]
+   }
   },
   {
    "realm": "candar",
@@ -515,7 +1212,26 @@
     1392
    ],
    "weight": "normal",
-   "deviation": "Ottoman vassal under Süleyman"
+   "deviation": "Ottoman vassal under Süleyman",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Kastamonu",
+      "at": [
+       33.78,
+       41.38
+      ]
+     },
+     {
+      "name": "Sinop",
+      "at": [
+       35.15,
+       42.03
+      ]
+     }
+    ]
+   }
   },
   {
    "realm": "eretnids",
@@ -527,7 +1243,8 @@
     1381
    ],
    "weight": "strong",
-   "deviation": "Stay vizier under Mehmed Çelebi"
+   "deviation": "Stay vizier under Mehmed Çelebi",
+   "aim": null
   },
   {
    "realm": "eretnids",
@@ -539,7 +1256,37 @@
     1398
    ],
    "weight": "strong",
-   "deviation": "Ally with the Mamluks"
+   "deviation": "Ally with the Mamluks",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Sivas",
+      "at": [
+       37.02,
+       39.75
+      ]
+     },
+     {
+      "name": "Kayseri",
+      "at": [
+       35.48,
+       38.72
+      ]
+     },
+     {
+      "name": "Amasya",
+      "at": [
+       35.83,
+       40.65
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "mamluk"
+   }
   },
   {
    "realm": "erzincan",
@@ -551,7 +1298,19 @@
     1403
    ],
    "weight": "weak",
-   "deviation": "Accept Timur (1387)"
+   "deviation": "Accept Timur (1387)",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Erzincan",
+      "at": [
+       39.49,
+       39.75
+      ]
+     }
+    ]
+   }
   },
   {
    "realm": "dulkadir",
@@ -563,7 +1322,11 @@
     1386
    ],
    "weight": "normal",
-   "deviation": "Loyal buffer"
+   "deviation": "Loyal buffer",
+   "aim": {
+    "kind": "free",
+    "target": "mamluk"
+   }
   },
   {
    "realm": "ramadanids",
@@ -575,7 +1338,23 @@
     1444
    ],
    "weight": "weak",
-   "deviation": "Ally with Karaman"
+   "deviation": "Ally with Karaman",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Adana",
+      "at": [
+       35.32,
+       37.0
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "karaman"
+   }
   },
   {
    "realm": "trebizond",
@@ -587,7 +1366,15 @@
     1444
    ],
    "weight": "strong",
-   "deviation": "Seek Georgian protection"
+   "deviation": "Seek Georgian protection",
+   "aim": null,
+   "alternative": {
+    "kind": "ally",
+    "target": "georgia"
+   },
+   "toward": [
+    "fall_of_trebizond"
+   ]
   },
   {
    "realm": "trebizond",
@@ -599,7 +1386,8 @@
     1444
    ],
    "weight": "normal",
-   "deviation": ""
+   "deviation": "",
+   "aim": null
   },
   {
    "realm": "georgia",
@@ -611,7 +1399,8 @@
     1386
    ],
    "weight": "strong",
-   "deviation": "Push against the Turkmen in Armenia"
+   "deviation": "Push against the Turkmen in Armenia",
+   "aim": null
   },
   {
    "realm": "georgia",
@@ -623,7 +1412,22 @@
     1405
    ],
    "weight": "strong",
-   "deviation": "Submit and convert (as Bagrat in 1386)"
+   "deviation": "Submit and convert (as Bagrat in 1386)",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Tbilisi",
+      "at": [
+       44.79,
+       41.69
+      ]
+     }
+    ]
+   },
+   "toward": [
+    "death_of_timur"
+   ]
   },
   {
    "realm": "samtskhe",
@@ -635,7 +1439,12 @@
     1391
    ],
    "weight": "weak",
-   "deviation": "Seek autonomy"
+   "deviation": "Seek autonomy",
+   "aim": null,
+   "alternative": {
+    "kind": "free",
+    "target": "georgia"
+   }
   },
   {
    "realm": "qara_qoyunlu",
@@ -647,7 +1456,27 @@
     1410
    ],
    "weight": "normal",
-   "deviation": "Ally with the Jalayirids against Timur"
+   "deviation": "Ally with the Jalayirids against Timur",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Tabriz",
+      "at": [
+       46.29,
+       38.08
+      ]
+     }
+    ],
+    "target": "jalayirids"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "jalayirids"
+   },
+   "toward": [
+    "battle_of_sardrud"
+   ]
   },
   {
    "realm": "aq_qoyunlu",
@@ -659,7 +1488,23 @@
     1402
    ],
    "weight": "weak",
-   "deviation": "Serve Timur or Burhan al-Din"
+   "deviation": "Serve Timur or Burhan al-Din",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Diyarbakır",
+      "at": [
+       40.22,
+       37.91
+      ]
+     }
+    ],
+    "target": "artuqids"
+   },
+   "toward": [
+    "battle_of_otlukbeli"
+   ]
   },
   {
    "realm": "shirvan",
@@ -671,7 +1516,8 @@
     1382
    ],
    "weight": "weak",
-   "deviation": "Submit to Tokhtamysh or Timur"
+   "deviation": "Submit to Tokhtamysh or Timur",
+   "aim": null
   },
   {
    "realm": "kazikumukh",
@@ -683,7 +1529,19 @@
     1444
    ],
    "weight": "weak",
-   "deviation": "Raid lowlands"
+   "deviation": "Raid lowlands",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Kumukh",
+      "at": [
+       47.12,
+       42.17
+      ]
+     }
+    ]
+   }
   },
   {
    "realm": "hungary",
@@ -695,7 +1553,13 @@
     1385
    ],
    "weight": "strong",
-   "deviation": "Give Poland to Jadwiga alone and keep Hungary for Mary (what the Poles forced)"
+   "deviation": "Give Poland to Jadwiga alone and keep Hungary for Mary (what the Poles forced)",
+   "aim": null,
+   "toward": [
+    "death_of_louis_the_great",
+    "jadwiga_crowned",
+    "sigismund_king_of_hungary"
+   ]
   },
   {
    "realm": "hungary",
@@ -707,7 +1571,14 @@
     1381
    ],
    "weight": "strong",
-   "deviation": "Settle early with Venice to free troops for Naples"
+   "deviation": "Settle early with Venice to free troops for Naples",
+   "aim": {
+    "kind": "fight",
+    "target": "venice"
+   },
+   "toward": [
+    "peace_of_turin"
+   ]
   },
   {
    "realm": "hungary",
@@ -719,7 +1590,23 @@
     1382
    ],
    "weight": "normal",
-   "deviation": "Claim Naples for Louis himself or for Mary"
+   "deviation": "Claim Naples for Louis himself or for Mary",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Naples",
+      "at": [
+       14.25,
+       40.85
+      ]
+     }
+    ],
+    "target": "naples"
+   },
+   "toward": [
+    "durazzo_takes_naples"
+   ]
   },
   {
    "realm": "hungary",
@@ -731,7 +1618,18 @@
     1399
    ],
    "weight": "normal",
-   "deviation": "Turn to an anti-Ottoman league once the Ottomans reach the Danube (Sigismund's course, 1390s)"
+   "deviation": "Turn to an anti-Ottoman league once the Ottomans reach the Danube (Sigismund's course, 1390s)",
+   "aim": {
+    "kind": "subject",
+    "target": "wallachia"
+   },
+   "alternative": {
+    "kind": "fight",
+    "target": "ottomans"
+   },
+   "toward": [
+    "battle_of_nicopolis"
+   ]
   },
   {
    "realm": "hungary",
@@ -743,7 +1641,19 @@
     1387
    ],
    "weight": "weak",
-   "deviation": "Hand it to Poland as the price of the succession deal"
+   "deviation": "Hand it to Poland as the price of the succession deal",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Lviv",
+      "at": [
+       24.03,
+       49.84
+      ]
+     }
+    ]
+   }
   },
   {
    "realm": "poland",
@@ -755,7 +1665,11 @@
     1384
    ],
    "weight": "strong",
-   "deviation": "Elect a Piast: Siemowit IV of Mazovia was the lesser nobles' candidate (1382-83)"
+   "deviation": "Elect a Piast: Siemowit IV of Mazovia was the lesser nobles' candidate (1382-83)",
+   "aim": null,
+   "toward": [
+    "jadwiga_crowned"
+   ]
   },
   {
    "realm": "poland",
@@ -767,7 +1681,18 @@
     1386
    ],
    "weight": "strong",
-   "deviation": "Marriage with the Habsburg William, allied with Hungary instead"
+   "deviation": "Marriage with the Habsburg William, allied with Hungary instead",
+   "aim": {
+    "kind": "ally",
+    "target": "lithuania"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "austria"
+   },
+   "toward": [
+    "union_of_krewo"
+   ]
   },
   {
    "realm": "poland",
@@ -779,7 +1704,40 @@
     1394
    ],
    "weight": "normal",
-   "deviation": "Accept Lithuanian Volhynia for peace and look to Pomerania"
+   "deviation": "Accept Lithuanian Volhynia for peace and look to Pomerania",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Lviv",
+      "at": [
+       24.03,
+       49.84
+      ]
+     },
+     {
+      "name": "Chełm",
+      "at": [
+       23.47,
+       51.13
+      ]
+     },
+     {
+      "name": "Belz",
+      "at": [
+       24.01,
+       50.38
+      ]
+     },
+     {
+      "name": "Kamianets",
+      "at": [
+       26.58,
+       48.68
+      ]
+     }
+    ]
+   }
   },
   {
    "realm": "poland",
@@ -791,7 +1749,30 @@
     1419
    ],
    "weight": "weak",
-   "deviation": "Keep the peace of Kalisz"
+   "deviation": "Keep the peace of Kalisz",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Danzig",
+      "at": [
+       18.65,
+       54.35
+      ]
+     },
+     {
+      "name": "Dobrzyń",
+      "at": [
+       19.32,
+       52.64
+      ]
+     }
+    ],
+    "target": "teutonic_order"
+   },
+   "toward": [
+    "battle_of_grunwald"
+   ]
   },
   {
    "realm": "lithuania",
@@ -803,7 +1784,29 @@
     1422
    ],
    "weight": "strong",
-   "deviation": "Buy peace by ceding Samogitia (Dubysa 1382, Salynas 1398)"
+   "deviation": "Buy peace by ceding Samogitia (Dubysa 1382, Salynas 1398)",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Samogitia",
+      "at": [
+       22.35,
+       55.75
+      ]
+     },
+     {
+      "name": "Trakai",
+      "at": [
+       24.93,
+       54.64
+      ]
+     }
+    ]
+   },
+   "toward": [
+    "battle_of_grunwald"
+   ]
   },
   {
    "realm": "lithuania",
@@ -815,7 +1818,8 @@
     1384
    ],
    "weight": "strong",
-   "deviation": "Keep the diarchy until Kęstutis dies naturally"
+   "deviation": "Keep the diarchy until Kęstutis dies naturally",
+   "aim": null
   },
   {
    "realm": "lithuania",
@@ -827,7 +1831,28 @@
     1408
    ],
    "weight": "normal",
-   "deviation": "Seek an Orthodox marriage and baptism with Moscow (the draft treaty with Dmitry, 1384)"
+   "deviation": "Seek an Orthodox marriage and baptism with Moscow (the draft treaty with Dmitry, 1384)",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Smolensk",
+      "at": [
+       32.05,
+       54.78
+      ]
+     }
+    ],
+    "target": "smolensk"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "muscovy"
+   },
+   "toward": [
+    "battle_of_kulikovo",
+    "battle_of_vorskla"
+   ]
   },
   {
    "realm": "lithuania",
@@ -839,7 +1864,11 @@
     1387
    ],
    "weight": "normal",
-   "deviation": "Orthodox baptism with a Muscovite bride"
+   "deviation": "Orthodox baptism with a Muscovite bride",
+   "aim": null,
+   "toward": [
+    "union_of_krewo"
+   ]
   },
   {
    "realm": "lithuania",
@@ -851,7 +1880,14 @@
     1380
    ],
    "weight": "weak",
-   "deviation": "Stay out and watch Moscow and the Horde wear each other down (what happened in effect)"
+   "deviation": "Stay out and watch Moscow and the Horde wear each other down (what happened in effect)",
+   "aim": {
+    "kind": "ally",
+    "target": "great_horde"
+   },
+   "toward": [
+    "battle_of_kulikovo"
+   ]
   },
   {
    "realm": "teutonic_order",
@@ -863,7 +1899,36 @@
     1422
    ],
    "weight": "strong",
-   "deviation": "Turn from war to trade and land purchase (Gotland, Neumark)"
+   "deviation": "Turn from war to trade and land purchase (Gotland, Neumark)",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Samogitia",
+      "at": [
+       22.35,
+       55.75
+      ]
+     }
+    ],
+    "target": "lithuania"
+   },
+   "alternative": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Gotland",
+      "at": [
+       18.3,
+       57.64
+      ]
+     }
+    ],
+    "target": "sweden"
+   },
+   "toward": [
+    "battle_of_grunwald"
+   ]
   },
   {
    "realm": "teutonic_order",
@@ -875,7 +1940,11 @@
     1384
    ],
    "weight": "normal",
-   "deviation": "Back Kęstutis and Vytautas instead of Jogaila"
+   "deviation": "Back Kęstutis and Vytautas instead of Jogaila",
+   "aim": {
+    "kind": "fight",
+    "target": "lithuania"
+   }
   },
   {
    "realm": "teutonic_order",
@@ -887,7 +1956,8 @@
     1385
    ],
    "weight": "normal",
-   "deviation": "Stir Poland's succession quarrel"
+   "deviation": "Stir Poland's succession quarrel",
+   "aim": null
   },
   {
    "realm": "livonian_order",
@@ -899,7 +1969,24 @@
     1394
    ],
    "weight": "strong",
-   "deviation": "Accept a split lordship and turn on Pskov"
+   "deviation": "Accept a split lordship and turn on Pskov",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Riga",
+      "at": [
+       24.11,
+       56.95
+      ]
+     }
+    ],
+    "target": "riga"
+   },
+   "alternative": {
+    "kind": "fight",
+    "target": "pskov"
+   }
   },
   {
    "realm": "livonian_order",
@@ -911,7 +1998,15 @@
     1387
    ],
    "weight": "normal",
-   "deviation": "Raid Pskov and Novgorod's lands"
+   "deviation": "Raid Pskov and Novgorod's lands",
+   "aim": {
+    "kind": "fight",
+    "target": "lithuania"
+   },
+   "alternative": {
+    "kind": "fight",
+    "target": "pskov"
+   }
   },
   {
    "realm": "riga",
@@ -923,7 +2018,11 @@
     1394
    ],
    "weight": "strong",
-   "deviation": "Accept the Order's terms in return for the city"
+   "deviation": "Accept the Order's terms in return for the city",
+   "aim": {
+    "kind": "free",
+    "target": "livonian_order"
+   }
   },
   {
    "realm": "riga_city",
@@ -935,7 +2034,12 @@
     null
    ],
    "weight": "normal",
-   "deviation": "Side with the archbishop against the Order"
+   "deviation": "Side with the archbishop against the Order",
+   "aim": null,
+   "alternative": {
+    "kind": "ally",
+    "target": "riga"
+   }
   },
   {
    "realm": "dorpat",
@@ -947,7 +2051,19 @@
     null
    ],
    "weight": "weak",
-   "deviation": "Seek a Lithuanian or Hanse protector"
+   "deviation": "Seek a Lithuanian or Hanse protector",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Dorpat",
+      "at": [
+       26.72,
+       58.38
+      ]
+     }
+    ]
+   }
   },
   {
    "realm": "osel_wiek",
@@ -959,7 +2075,19 @@
     null
    ],
    "weight": "weak",
-   "deviation": "Seek papal protection"
+   "deviation": "Seek papal protection",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Haapsalu",
+      "at": [
+       23.54,
+       58.94
+      ]
+     }
+    ]
+   }
   },
   {
    "realm": "moldavia",
@@ -971,7 +2099,11 @@
     1387
    ],
    "weight": "strong",
-   "deviation": "Accept Hungarian overlordship if Hungary is strong"
+   "deviation": "Accept Hungarian overlordship if Hungary is strong",
+   "aim": {
+    "kind": "free",
+    "target": "hungary"
+   }
   },
   {
    "realm": "moldavia",
@@ -983,7 +2115,46 @@
     1409
    ],
    "weight": "normal",
-   "deviation": "Expand north into Pokuttya and Shypyntsi"
+   "deviation": "Expand north into Pokuttya and Shypyntsi",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Chilia",
+      "at": [
+       29.27,
+       45.42
+      ]
+     },
+     {
+      "name": "Cetatea Albă",
+      "at": [
+       30.35,
+       46.2
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Kolomyia",
+      "at": [
+       25.04,
+       48.53
+      ]
+     },
+     {
+      "name": "Shypyntsi",
+      "at": [
+       25.79,
+       48.37
+      ]
+     }
+    ],
+    "target": "poland"
+   }
   },
   {
    "realm": "moldavia",
@@ -995,7 +2166,8 @@
     1401
    ],
    "weight": "weak",
-   "deviation": "Keep the Latin bishopric of Siret as a link to the West"
+   "deviation": "Keep the Latin bishopric of Siret as a link to the West",
+   "aim": null
   },
   {
    "realm": "smolensk",
@@ -1007,7 +2179,11 @@
     1404
    ],
    "weight": "normal",
-   "deviation": "Accept Lithuanian overlordship for protection from Moscow"
+   "deviation": "Accept Lithuanian overlordship for protection from Moscow",
+   "aim": {
+    "kind": "free",
+    "target": "lithuania"
+   }
   },
   {
    "realm": "volhynia",
@@ -1019,7 +2195,26 @@
     1387
    ],
    "weight": "weak",
-   "deviation": "Submit to the Polish crown for Lutsk"
+   "deviation": "Submit to the Polish crown for Lutsk",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Volodymyr",
+      "at": [
+       24.33,
+       50.85
+      ]
+     },
+     {
+      "name": "Lutsk",
+      "at": [
+       25.33,
+       50.75
+      ]
+     }
+    ]
+   }
   },
   {
    "realm": "mazovia",
@@ -1031,7 +2226,11 @@
     1384
    ],
    "weight": "weak",
-   "deviation": "Follow the Polish court"
+   "deviation": "Follow the Polish court",
+   "aim": null,
+   "toward": [
+    "jadwiga_crowned"
+   ]
   },
   {
    "realm": "muscovy",
@@ -1043,7 +2242,15 @@
     1380
    ],
    "weight": "strong",
-   "deviation": "Pay off Mamai and build strength first"
+   "deviation": "Pay off Mamai and build strength first",
+   "aim": {
+    "kind": "free",
+    "target": "great_horde"
+   },
+   "toward": [
+    "battle_of_kulikovo",
+    "moscow_burned"
+   ]
   },
   {
    "realm": "muscovy",
@@ -1055,7 +2262,32 @@
     1392
    ],
    "weight": "strong",
-   "deviation": "Strike Ryazan directly to settle the Oka border"
+   "deviation": "Strike Ryazan directly to settle the Oka border",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Vladimir",
+      "at": [
+       40.41,
+       56.13
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Pereyaslavl-Ryazansky",
+      "at": [
+       39.74,
+       54.63
+      ]
+     }
+    ],
+    "target": "ryazan"
+   }
   },
   {
    "realm": "muscovy",
@@ -1067,7 +2299,8 @@
     1390
    ],
    "weight": "normal",
-   "deviation": "Accept Cyprian early for church unity"
+   "deviation": "Accept Cyprian early for church unity",
+   "aim": null
   },
   {
    "realm": "muscovy",
@@ -1079,7 +2312,37 @@
     1384
    ],
    "weight": "normal",
-   "deviation": "A marriage alliance with Jogaila and his Orthodox baptism (draft of 1384)"
+   "deviation": "A marriage alliance with Jogaila and his Orthodox baptism (draft of 1384)",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Bryansk",
+      "at": [
+       34.37,
+       53.25
+      ]
+     },
+     {
+      "name": "Trubchevsk",
+      "at": [
+       33.07,
+       52.58
+      ]
+     },
+     {
+      "name": "Smolensk",
+      "at": [
+       32.05,
+       54.78
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "lithuania"
+   }
   },
   {
    "realm": "muscovy",
@@ -1091,7 +2354,24 @@
     1392
    ],
    "weight": "weak",
-   "deviation": "Keep it as an allied buffer"
+   "deviation": "Keep it as an allied buffer",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Nizhny Novgorod",
+      "at": [
+       44.0,
+       56.33
+      ]
+     }
+    ],
+    "target": "suzdal_nizhny"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "suzdal_nizhny"
+   }
   },
   {
    "realm": "tver",
@@ -1103,7 +2383,24 @@
     1383
    ],
    "weight": "weak",
-   "deviation": "Stay quiet and look to Lithuania for protection"
+   "deviation": "Stay quiet and look to Lithuania for protection",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Vladimir",
+      "at": [
+       40.41,
+       56.13
+      ]
+     }
+    ],
+    "target": "muscovy"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "lithuania"
+   }
   },
   {
    "realm": "tver",
@@ -1115,7 +2412,15 @@
     1399
    ],
    "weight": "normal",
-   "deviation": "Side with Moscow against the Tatars (1375 treaty terms)"
+   "deviation": "Side with Moscow against the Tatars (1375 treaty terms)",
+   "aim": {
+    "kind": "ally",
+    "target": "lithuania"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "muscovy"
+   }
   },
   {
    "realm": "tver",
@@ -1127,7 +2432,19 @@
     1399
    ],
    "weight": "normal",
-   "deviation": "Leave Kashin and seek gains at Novgorod's expense"
+   "deviation": "Leave Kashin and seek gains at Novgorod's expense",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Kashin",
+      "at": [
+       37.61,
+       57.36
+      ]
+     }
+    ]
+   }
   },
   {
    "realm": "ryazan",
@@ -1139,7 +2456,15 @@
     1402
    ],
    "weight": "strong",
-   "deviation": "Join Moscow fully against the Tatars"
+   "deviation": "Join Moscow fully against the Tatars",
+   "aim": null,
+   "alternative": {
+    "kind": "ally",
+    "target": "muscovy"
+   },
+   "toward": [
+    "battle_of_kulikovo"
+   ]
   },
   {
    "realm": "ryazan",
@@ -1151,7 +2476,27 @@
     1386
    ],
    "weight": "normal",
-   "deviation": "Expand into the empty steppe to the south"
+   "deviation": "Expand into the empty steppe to the south",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Kolomna",
+      "at": [
+       38.78,
+       55.1
+      ]
+     },
+     {
+      "name": "Lopasnya",
+      "at": [
+       37.48,
+       55.15
+      ]
+     }
+    ],
+    "target": "muscovy"
+   }
   },
   {
    "realm": "ryazan",
@@ -1163,7 +2508,11 @@
     1400
    ],
    "weight": "weak",
-   "deviation": "Partition the house with Moscow's blessing"
+   "deviation": "Partition the house with Moscow's blessing",
+   "aim": {
+    "kind": "subject",
+    "target": "pronsk"
+   }
   },
   {
    "realm": "suzdal_nizhny",
@@ -1175,7 +2524,23 @@
     1392
    ],
    "weight": "strong",
-   "deviation": "Strike first at Bulgar with Moscow (as in 1376)"
+   "deviation": "Strike first at Bulgar with Moscow (as in 1376)",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Nizhny Novgorod",
+      "at": [
+       44.0,
+       56.33
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "fight",
+    "target": "volga_bulgaria"
+   }
   },
   {
    "realm": "suzdal_nizhny",
@@ -1187,7 +2552,11 @@
     1392
    ],
    "weight": "normal",
-   "deviation": "Back the Horde's khan against Moscow (1382) to win his patent"
+   "deviation": "Back the Horde's khan against Moscow (1382) to win his patent",
+   "aim": {
+    "kind": "free",
+    "target": "muscovy"
+   }
   },
   {
    "realm": "novgorod",
@@ -1199,7 +2568,11 @@
     1478
    ],
    "weight": "strong",
-   "deviation": "Take a Lithuanian service prince as protector (Patrikii 1383, Lengvenis 1389)"
+   "deviation": "Take a Lithuanian service prince as protector (Patrikii 1383, Lengvenis 1389)",
+   "aim": null,
+   "toward": [
+    "fall_of_novgorod"
+   ]
   },
   {
    "realm": "novgorod",
@@ -1211,7 +2584,29 @@
     1479
    ],
    "weight": "normal",
-   "deviation": "Push the ushkuiniki down the Volga for plunder"
+   "deviation": "Push the ushkuiniki down the Volga for plunder",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Kholmogory",
+      "at": [
+       41.97,
+       64.22
+      ]
+     },
+     {
+      "name": "Ust-Vym",
+      "at": [
+       50.62,
+       62.23
+      ]
+     }
+    ]
+   },
+   "toward": [
+    "fall_of_novgorod"
+   ]
   },
   {
    "realm": "novgorod",
@@ -1223,7 +2618,26 @@
     null
    ],
    "weight": "weak",
-   "deviation": "Keep peace and focus on trade"
+   "deviation": "Keep peace and focus on trade",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Oreshek",
+      "at": [
+       31.04,
+       59.95
+      ]
+     },
+     {
+      "name": "Korela",
+      "at": [
+       30.13,
+       61.03
+      ]
+     }
+    ]
+   }
   },
   {
    "realm": "pskov",
@@ -1235,7 +2649,15 @@
     1510
    ],
    "weight": "strong",
-   "deviation": "Seek Lithuanian help instead"
+   "deviation": "Seek Lithuanian help instead",
+   "aim": {
+    "kind": "fight",
+    "target": "livonian_order"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "lithuania"
+   }
   },
   {
    "realm": "pskov",
@@ -1247,7 +2669,11 @@
     1510
    ],
    "weight": "normal",
-   "deviation": "Take a Lithuanian prince"
+   "deviation": "Take a Lithuanian prince",
+   "aim": {
+    "kind": "free",
+    "target": "novgorod"
+   }
   },
   {
    "realm": "gazaria",
@@ -1259,7 +2685,30 @@
     1387
    ],
    "weight": "normal",
-   "deviation": "Pay the khan and stay inside the walls"
+   "deviation": "Pay the khan and stay inside the walls",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Alushta",
+      "at": [
+       34.41,
+       44.67
+      ]
+     },
+     {
+      "name": "Yalta",
+      "at": [
+       34.16,
+       44.5
+      ]
+     }
+    ],
+    "target": "theodoro"
+   },
+   "toward": [
+    "fall_of_caffa"
+   ]
   },
   {
    "realm": "gazaria",
@@ -1271,7 +2720,14 @@
     1381
    ],
    "weight": "normal",
-   "deviation": "Trade truce at Tana"
+   "deviation": "Trade truce at Tana",
+   "aim": {
+    "kind": "fight",
+    "target": "venice"
+   },
+   "toward": [
+    "peace_of_turin"
+   ]
   },
   {
    "realm": "theodoro",
@@ -1283,7 +2739,30 @@
     1439
    ],
    "weight": "weak",
-   "deviation": "Ally with the Tatars against Genoa"
+   "deviation": "Ally with the Tatars against Genoa",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Alushta",
+      "at": [
+       34.41,
+       44.67
+      ]
+     },
+     {
+      "name": "Yalta",
+      "at": [
+       34.16,
+       44.5
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "great_horde"
+   }
   },
   {
    "realm": "timurids",
@@ -1295,7 +2774,27 @@
     1379
    ],
    "weight": "weak",
-   "deviation": "Back an Urusid instead, or annex Sighnaq and the Syr Darya towns outright."
+   "deviation": "Back an Urusid instead, or annex Sighnaq and the Syr Darya towns outright.",
+   "aim": {
+    "kind": "ally",
+    "target": "white_horde"
+   },
+   "alternative": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Sighnaq",
+      "at": [
+       68.2,
+       43.78
+      ]
+     }
+    ],
+    "target": "white_horde"
+   },
+   "toward": [
+    "tokhtamysh_takes_white_horde"
+   ]
   },
   {
    "realm": "timurids",
@@ -1307,7 +2806,24 @@
     1388
    ],
    "weight": "strong",
-   "deviation": "Accept Sufid tribute and turn to Khorasan first."
+   "deviation": "Accept Sufid tribute and turn to Khorasan first.",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Urgench",
+      "at": [
+       59.15,
+       42.32
+      ]
+     }
+    ],
+    "target": "sufids"
+   },
+   "alternative": {
+    "kind": "subject",
+    "target": "sufids"
+   }
   },
   {
    "realm": "timurids",
@@ -1319,7 +2835,11 @@
     1392
    ],
    "weight": "normal",
-   "deviation": "Leave Moghulistan alone and go east to China early."
+   "deviation": "Leave Moghulistan alone and go east to China early.",
+   "aim": {
+    "kind": "subject",
+    "target": "moghulistan"
+   }
   },
   {
    "realm": "timurids",
@@ -1331,7 +2851,38 @@
     1384
    ],
    "weight": "strong",
-   "deviation": "Turn west to the Jalayirids and Muzaffarids first."
+   "deviation": "Turn west to the Jalayirids and Muzaffarids first.",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Herat",
+      "at": [
+       62.2,
+       34.35
+      ]
+     },
+     {
+      "name": "Sabzevar",
+      "at": [
+       57.68,
+       36.21
+      ]
+     },
+     {
+      "name": "Astarabad",
+      "at": [
+       54.43,
+       36.84
+      ]
+     }
+    ],
+    "target": "kartids"
+   },
+   "alternative": {
+    "kind": "fight",
+    "target": "jalayirids"
+   }
   },
   {
    "realm": "timurids",
@@ -1343,7 +2894,15 @@
     1396
    ],
    "weight": "strong",
-   "deviation": "Make peace and split the steppe, and turn to India or China."
+   "deviation": "Make peace and split the steppe, and turn to India or China.",
+   "aim": {
+    "kind": "fight",
+    "target": "white_horde"
+   },
+   "toward": [
+    "battle_of_kondurcha",
+    "battle_of_the_terek"
+   ]
   },
   {
    "realm": "moghulistan",
@@ -1355,7 +2914,15 @@
     1392
    ],
    "weight": "strong",
-   "deviation": "Make peace with Timur by marriage."
+   "deviation": "Make peace with Timur by marriage.",
+   "aim": {
+    "kind": "free",
+    "target": "timurids"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "timurids"
+   }
   },
   {
    "realm": "moghulistan",
@@ -1367,7 +2934,15 @@
     1390
    ],
    "weight": "normal",
-   "deviation": "Ally with Tokhtamysh against Timur (history 1387-88)."
+   "deviation": "Ally with Tokhtamysh against Timur (history 1387-88).",
+   "aim": {
+    "kind": "fight",
+    "target": "timurids"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "white_horde"
+   }
   },
   {
    "realm": "moghulistan",
@@ -1379,7 +2954,8 @@
     1389
    ],
    "weight": "weak",
-   "deviation": "Accept Khizr Khoja as figurehead khan."
+   "deviation": "Accept Khizr Khoja as figurehead khan.",
+   "aim": null
   },
   {
    "realm": "jalayirids",
@@ -1391,7 +2967,31 @@
     1386
    ],
    "weight": "strong",
-   "deviation": "Withdraw to Baghdad and build Iraq."
+   "deviation": "Withdraw to Baghdad and build Iraq.",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Tabriz",
+      "at": [
+       46.29,
+       38.08
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Baghdad",
+      "at": [
+       44.36,
+       33.31
+      ]
+     }
+    ]
+   }
   },
   {
    "realm": "jalayirids",
@@ -1403,7 +3003,15 @@
     1390
    ],
    "weight": "normal",
-   "deviation": "Ally with the Qara Qoyunlu as equals against Timur."
+   "deviation": "Ally with the Qara Qoyunlu as equals against Timur.",
+   "aim": {
+    "kind": "subject",
+    "target": "qara_qoyunlu"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "qara_qoyunlu"
+   }
   },
   {
    "realm": "jalayirids",
@@ -1415,7 +3023,8 @@
     1384
    ],
    "weight": "normal",
-   "deviation": "Grant a brother a permanent subject realm."
+   "deviation": "Grant a brother a permanent subject realm.",
+   "aim": null
   },
   {
    "realm": "muzaffarids",
@@ -1427,7 +3036,39 @@
     1384
    ],
    "weight": "normal",
-   "deviation": "Expand toward Khuzistan and lower Iraq."
+   "deviation": "Expand toward Khuzistan and lower Iraq.",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Tabriz",
+      "at": [
+       46.29,
+       38.08
+      ]
+     }
+    ],
+    "target": "jalayirids"
+   },
+   "alternative": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Shushtar",
+      "at": [
+       48.85,
+       32.05
+      ]
+     },
+     {
+      "name": "Basra",
+      "at": [
+       47.78,
+       30.51
+      ]
+     }
+    ]
+   }
   },
   {
    "realm": "muzaffarids",
@@ -1439,7 +3080,8 @@
     1393
    ],
    "weight": "normal",
-   "deviation": "Grant Yazd as a hereditary subject."
+   "deviation": "Grant Yazd as a hereditary subject.",
+   "aim": null
   },
   {
    "realm": "muzaffarids",
@@ -1451,7 +3093,12 @@
     1387
    ],
    "weight": "weak",
-   "deviation": "Ally with the Jalayirids against Timur."
+   "deviation": "Ally with the Jalayirids against Timur.",
+   "aim": null,
+   "alternative": {
+    "kind": "ally",
+    "target": "jalayirids"
+   }
   },
   {
    "realm": "kartids",
@@ -1463,7 +3110,24 @@
     1381
    ],
    "weight": "normal",
-   "deviation": "Combine with the Sarbadars against Timur."
+   "deviation": "Combine with the Sarbadars against Timur.",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Nishapur",
+      "at": [
+       58.8,
+       36.21
+      ]
+     }
+    ],
+    "target": "sarbadars"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "sarbadars"
+   }
   },
   {
    "realm": "kartids",
@@ -1475,7 +3139,19 @@
     1381
    ],
    "weight": "strong",
-   "deviation": "Accept Timur as overlord and keep the throne."
+   "deviation": "Accept Timur as overlord and keep the throne.",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Herat",
+      "at": [
+       62.2,
+       34.35
+      ]
+     }
+    ]
+   }
   },
   {
    "realm": "sarbadars",
@@ -1487,7 +3163,23 @@
     1381
    ],
    "weight": "strong",
-   "deviation": "Seek Timur's protection early (history 1381)."
+   "deviation": "Seek Timur's protection early (history 1381).",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Sabzevar",
+      "at": [
+       57.68,
+       36.21
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "timurids"
+   }
   },
   {
    "realm": "sufids",
@@ -1499,7 +3191,31 @@
     1380
    ],
    "weight": "strong",
-   "deviation": "Seek Jochid protection (Tokhtamysh; history 1387)."
+   "deviation": "Seek Jochid protection (Tokhtamysh; history 1387).",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Kath",
+      "at": [
+       60.75,
+       41.99
+      ]
+     },
+     {
+      "name": "Khiva",
+      "at": [
+       60.36,
+       41.38
+      ]
+     }
+    ],
+    "target": "timurids"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "white_horde"
+   }
   },
   {
    "realm": "astarabad",
@@ -1511,7 +3227,24 @@
     1381
    ],
    "weight": "normal",
-   "deviation": "Combine with the Sarbadars against Timur."
+   "deviation": "Combine with the Sarbadars against Timur.",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Sabzevar",
+      "at": [
+       57.68,
+       36.21
+      ]
+     }
+    ],
+    "target": "sarbadars"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "sarbadars"
+   }
   },
   {
    "realm": "astarabad",
@@ -1523,7 +3256,19 @@
     1384
    ],
    "weight": "normal",
-   "deviation": "Submit and serve as a Timurid amir."
+   "deviation": "Submit and serve as a Timurid amir.",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Astarabad",
+      "at": [
+       54.43,
+       36.84
+      ]
+     }
+    ]
+   }
   },
   {
    "realm": "lur_buzurg",
@@ -1535,7 +3280,8 @@
     1385
    ],
    "weight": "weak",
-   "deviation": "Seek a Muzaffarid or Jalayirid patron."
+   "deviation": "Seek a Muzaffarid or Jalayirid patron.",
+   "aim": null
   },
   {
    "realm": "lur_kuchak",
@@ -1547,7 +3293,19 @@
     1390
    ],
    "weight": "weak",
-   "deviation": "Nominal submission to the strongest."
+   "deviation": "Nominal submission to the strongest.",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Khorramabad",
+      "at": [
+       48.36,
+       33.49
+      ]
+     }
+    ]
+   }
   },
   {
    "realm": "mazandaran",
@@ -1559,7 +3317,24 @@
     1392
    ],
    "weight": "normal",
-   "deviation": "Expand into Rustamdar outright."
+   "deviation": "Expand into Rustamdar outright.",
+   "aim": {
+    "kind": "subject",
+    "target": "rustamdar"
+   },
+   "alternative": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Nur",
+      "at": [
+       52.02,
+       36.57
+      ]
+     }
+    ],
+    "target": "rustamdar"
+   }
   },
   {
    "realm": "gilan",
@@ -1571,7 +3346,27 @@
     1389
    ],
    "weight": "normal",
-   "deviation": "Switch allegiance to the strongest plateau power."
+   "deviation": "Switch allegiance to the strongest plateau power.",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Rasht",
+      "at": [
+       49.58,
+       37.28
+      ]
+     },
+     {
+      "name": "Fuman",
+      "at": [
+       49.31,
+       37.22
+      ]
+     }
+    ],
+    "target": "biya_pas"
+   }
   },
   {
    "realm": "rustamdar",
@@ -1583,7 +3378,19 @@
     1392
    ],
    "weight": "normal",
-   "deviation": "Hold out in the mountains."
+   "deviation": "Hold out in the mountains.",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Nur",
+      "at": [
+       52.02,
+       36.57
+      ]
+     }
+    ]
+   }
   },
   {
    "realm": "sistan",
@@ -1595,7 +3402,19 @@
     1383
    ],
    "weight": "weak",
-   "deviation": "Seek a new overlord."
+   "deviation": "Seek a new overlord.",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Zaranj",
+      "at": [
+       61.86,
+       30.96
+      ]
+     }
+    ]
+   }
   },
   {
    "realm": "badakhshan",
@@ -1607,7 +3426,19 @@
     1465
    ],
    "weight": "weak",
-   "deviation": "Submit."
+   "deviation": "Submit.",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Faizabad",
+      "at": [
+       70.58,
+       37.12
+      ]
+     }
+    ]
+   }
   },
   {
    "realm": "great_horde",
@@ -1619,7 +3450,18 @@
     1380
    ],
    "weight": "strong",
-   "deviation": "Leave Rus and turn first on Tokhtamysh."
+   "deviation": "Leave Rus and turn first on Tokhtamysh.",
+   "aim": {
+    "kind": "subject",
+    "target": "muscovy"
+   },
+   "alternative": {
+    "kind": "fight",
+    "target": "white_horde"
+   },
+   "toward": [
+    "battle_of_kulikovo"
+   ]
   },
   {
    "realm": "great_horde",
@@ -1631,7 +3473,18 @@
     1380
    ],
    "weight": "normal",
-   "deviation": "Raid Lithuania and Poland instead."
+   "deviation": "Raid Lithuania and Poland instead.",
+   "aim": {
+    "kind": "ally",
+    "target": "lithuania"
+   },
+   "alternative": {
+    "kind": "fight",
+    "target": "lithuania"
+   },
+   "toward": [
+    "battle_of_kulikovo"
+   ]
   },
   {
    "realm": "great_horde",
@@ -1643,7 +3496,26 @@
     1380
    ],
    "weight": "normal",
-   "deviation": "Accept a division of the steppe."
+   "deviation": "Accept a division of the steppe.",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Sarai",
+      "at": [
+       45.26,
+       48.69
+      ]
+     },
+     {
+      "name": "Hajji Tarkhan",
+      "at": [
+       48.03,
+       46.35
+      ]
+     }
+    ]
+   }
   },
   {
    "realm": "great_horde",
@@ -1655,7 +3527,24 @@
     1381
    ],
    "weight": "weak",
-   "deviation": "Make Caffa a full ally and rely on Genoese loans."
+   "deviation": "Make Caffa a full ally and rely on Genoese loans.",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Soldaia",
+      "at": [
+       34.97,
+       44.85
+      ]
+     }
+    ],
+    "target": "gazaria"
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "genoa"
+   }
   },
   {
    "realm": "great_horde",
@@ -1667,7 +3556,11 @@
     1381
    ],
    "weight": "strong",
-   "deviation": "Recognise Tokhtamysh as khan and stay beylerbey."
+   "deviation": "Recognise Tokhtamysh as khan and stay beylerbey.",
+   "aim": {
+    "kind": "fight",
+    "target": "white_horde"
+   }
   },
   {
    "realm": "great_horde",
@@ -1679,7 +3572,14 @@
     1382
    ],
    "weight": "strong",
-   "deviation": "Use Lithuania against Moscow instead."
+   "deviation": "Use Lithuania against Moscow instead.",
+   "aim": {
+    "kind": "subject",
+    "target": "muscovy"
+   },
+   "toward": [
+    "moscow_burned"
+   ]
   },
   {
    "realm": "great_horde",
@@ -1691,7 +3591,34 @@
     1395
    ],
    "weight": "normal",
-   "deviation": "Stay Timur's loyal client and turn on Lithuania and the Rus."
+   "deviation": "Stay Timur's loyal client and turn on Lithuania and the Rus.",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Tabriz",
+      "at": [
+       46.29,
+       38.08
+      ]
+     },
+     {
+      "name": "Urgench",
+      "at": [
+       59.15,
+       42.32
+      ]
+     }
+    ]
+   },
+   "alternative": {
+    "kind": "ally",
+    "target": "timurids"
+   },
+   "toward": [
+    "battle_of_kondurcha",
+    "battle_of_the_terek"
+   ]
   },
   {
    "realm": "white_horde",
@@ -1703,7 +3630,22 @@
     1379
    ],
    "weight": "strong",
-   "deviation": "Stay in Timur's service and wait."
+   "deviation": "Stay in Timur's service and wait.",
+   "aim": {
+    "kind": "hold",
+    "places": [
+     {
+      "name": "Sighnaq",
+      "at": [
+       68.2,
+       43.78
+      ]
+     }
+    ]
+   },
+   "toward": [
+    "tokhtamysh_takes_white_horde"
+   ]
   },
   {
    "realm": "white_horde",
@@ -1715,7 +3657,20 @@
     1381
    ],
    "weight": "strong",
-   "deviation": "Content himself with the eastern ulus and raid."
+   "deviation": "Content himself with the eastern ulus and raid.",
+   "aim": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Sarai",
+      "at": [
+       45.26,
+       48.69
+      ]
+     }
+    ],
+    "target": "great_horde"
+   }
   },
   {
    "realm": "white_horde",
@@ -1727,7 +3682,24 @@
     1383
    ],
    "weight": "normal",
-   "deviation": "Break with Timur early and claim Khwarazm."
+   "deviation": "Break with Timur early and claim Khwarazm.",
+   "aim": {
+    "kind": "ally",
+    "target": "timurids"
+   },
+   "alternative": {
+    "kind": "take",
+    "places": [
+     {
+      "name": "Urgench",
+      "at": [
+       59.15,
+       42.32
+      ]
+     }
+    ],
+    "target": "sufids"
+   }
   },
   {
    "realm": "arab_shah_horde",
@@ -1739,7 +3711,11 @@
     1380
    ],
    "weight": "weak",
-   "deviation": "Join Tokhtamysh (history)."
+   "deviation": "Join Tokhtamysh (history).",
+   "aim": {
+    "kind": "fight",
+    "target": "suzdal_nizhny"
+   }
   },
   {
    "realm": "volga_bulgaria",
@@ -1751,7 +3727,11 @@
     1382
    ],
    "weight": "normal",
-   "deviation": "Return to the Horde's protection (history: under Tokhtamysh)."
+   "deviation": "Return to the Horde's protection (history: under Tokhtamysh).",
+   "aim": {
+    "kind": "free",
+    "target": "muscovy"
+   }
   }
  ]
 }

@@ -6,7 +6,7 @@ import { groundOfCell, landGrid, LandGridScan, WATER } from "../src/tiles.ts";
 import {
   animatedFigures, bandFade, detailBands, figureArms, figureCount, figuresLeft, formation, hamletCount, hamletSpots, hullCount, hullsInPort, berthSpots,
   kindOfByte, linksOfByte, livingBand, neighbours4, pieceLabels, pieceUnit, roadGrade, roadLines, roadPath, settlementBytes, tapBox, tapTarget,
-  tileDistance, townCells, townFootprint, townGrowthOrder, townPeopleThousands, townPlan, townsToRefresh, traderMovers, wallEdges, worksSpot, changedBox,
+  tileDistance, townCells, townFootprint, townGrowthOrder, townPeopleThousands, townPlan, townsToRefresh, traderFigure, traderOnLeg, wallEdges, worksSpot, changedBox,
 } from "../src/domain/map-presentation/index.ts";
 
 const rules = loadDefaultRuleset();
@@ -225,14 +225,16 @@ describe("living map: figures, hulls and movers", () => {
     if (plan.piers.length) expect(plan.piers).toContain(berths[0]);
   });
 
-  it("moves up to three traders along a path, evenly spaced and steady from turn to turn", () => {
-    const m = traderMovers({ id: 7, medium: "river", traders: 9 }, 100);
-    expect(m.length).toBe(3);
-    expect(m.every((x) => x.kind === "barge")).toBe(true);
-    const gaps = [(m[1]!.at - m[0]!.at + 1) % 1, (m[2]!.at - m[1]!.at + 1) % 1];
-    for (const g of gaps) expect(g).toBeCloseTo(1 / 3, 6);
-    const later = traderMovers({ id: 7, medium: "river", traders: 9 }, 100.01);
-    expect(Math.abs(later[0]!.at - m[0]!.at)).toBeLessThan(0.001);
+  it("stands a trader on its leg's tiles by the share of the way walked, as an army steps", () => {
+    expect(traderFigure("land")).toBe("caravan");
+    expect(traderFigure("river")).toBe("barge");
+    expect(traderFigure("sea")).toBe("trading ship");
+    expect(traderOnLeg(5, 0)).toEqual({ index: 0, frac: 0 });
+    expect(traderOnLeg(5, 0.5)).toEqual({ index: 2, frac: 0 });
+    expect(traderOnLeg(5, 0.6).index).toBe(2);
+    expect(traderOnLeg(5, 0.6).frac).toBeCloseTo(0.4, 9);
+    expect(traderOnLeg(5, 1)).toEqual({ index: 3, frac: 1 });
+    expect(traderOnLeg(1, 0.7)).toEqual({ index: 0, frac: 0 });
   });
 });
 

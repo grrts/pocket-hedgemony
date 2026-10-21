@@ -141,7 +141,7 @@ export interface DiplomacyConfig {
       flag: string;
     };
   };
-  war_aims: { held_province_years: number; refused_demand_years: number; punish_years: number; tribute_by_strength_multiple: number; regency_allows: string[] };
+  war_aims: { held_province_years: number; refused_demand_years: number; punish_years: number; tribute_by_strength_multiple: number; regency_allows: string[]; no_aim_penalty: { lord_steps: number; notoriety: number; peace_share: number; allies_refuse: boolean; ai_only_if_reckless: boolean } };
   truce: { base_months: number; extra_months_if_land_or_subject: number; white_peace_months: number };
   leagues: {
     threshold_by_era: Record<string, number>;
@@ -172,10 +172,31 @@ export interface DiplomacyConfig {
     relation: Record<string, string>;
     new_effects: string[];
   };
-  answers: { delay_months: number; preview_before_sending: boolean };
+  answers: { delay_months: number; preview_before_sending: boolean; hint: { likely_from: number; unlikely_to: number } };
   eras_by_year: { era: string; from: number }[];
   oaths_broken_years: number;
   lands_taken_years: number;
+  /** AI arms and fear (DIPL-231 to DIPL-237): standing armies, mobilising at war, borrowing for war, fear of a much stronger neighbour. */
+  arms_and_fear: ArmsAndFearRule;
+}
+
+/** A value for each fear level. */
+export type ByFear = Record<FearWord, number>;
+export type FearWord = "calm" | "wary" | "threatened";
+
+export interface ArmsAndFearRule {
+  fear: { wary_ratio: number; threatened_ratio: number; ally_weight: number };
+  standing: { share_of_cap: number; match_neighbour: number; multiplier: ByFear; max_share_of_cap: ByFear; pay_share_of_income: ByFear; raise_per_month: number; slack: number };
+  war: { share_of_cap: number; per_province: number; pay_share_of_income: number };
+  borrow: { months_of_pay: number };
+  /** F-166: allies against a common fear (DIPL-238, DIPL-239). */
+  allies: { same_fear: ByFear; envoy_every_months: number; partners: number };
+  /** F-166: walls on the border with the feared realm (DIPL-240). */
+  defences: { castle_step: ByFear; reserve_share: ByFear };
+  /** F-166: warfare and fortification studies weigh less when afraid (DIPL-241). */
+  technology: { warfare_prefix: string; cost_weight: ByFear };
+  /** F-166: opportunities and gambles before a declaration (DIPL-242, DIPL-243). */
+  opportunity: { at_war_ratio_factor: number; at_war_chance_factor: number; at_war_target_weight: number; gamble_chance: number; gamble_ratio_factor: number; min_ratio: number };
 }
 
 export const config = raw as unknown as DiplomacyConfig;

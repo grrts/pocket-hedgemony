@@ -1,0 +1,365 @@
+<h1>Diplomacy</h1>
+<p>Diplomacy is how countries deal with each other short of fighting, and how they get into and out of wars. You send envoys (your own officials) to other courts, and every request is answered by a plain list of reasons with numbers that the other side adds up: over zero is yes. There is no preview and no hidden score; the answer arrives a month after it is given, with every reason spelled out, so you can see why and try again differently.</p>
+<h2 id="how-it-works"><a class="anchor" href="#how-it-works" aria-label="Link to this section">#</a>How it works</h2>
+<h3 id="how-two-countries-stand"><a class="anchor" href="#how-two-countries-stand" aria-label="Link to this section">#</a>How two countries stand</h3>
+<p>Two countries stand toward each other in one of <strong>nine relation types</strong>: Alliance, Friendly, Neutral, Rival, Hostile, At War, Subject, Overlord and Truce. Overlord is never stored; it is read from the other end of a Subject record. Each pair has three independent <strong>slots</strong>:</p>
+<ul>
+<li><strong>Hierarchy</strong>: Subject (and so Overlord).</li>
+<li><strong>State</strong>: at most one of At War, Truce or Alliance per pair.</li>
+<li><strong>Stance</strong>: one of Friendly, Neutral, Rival or Hostile for each direction, so A can be Friendly toward B while B is Rival toward A.</li>
+</ul>
+<p>When no stance is stored, the <strong>implied stance</strong> applies: Hostile at war, Friendly when allied, otherwise Neutral. A missing pair just means nothing is recorded; it is never read as a historical claim of neutrality, and no alliance, subject or rivalry is guessed from friendliness, influence or neighbourhood. A country has at most one direct overlord; chains of subjects are allowed, cycles are not. Every Rival names a <strong>contested object</strong> (a throne, province, trade city, route, sphere or office).</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Type</th><th>Effects</th><th>Ends by</th></tr></thead>
+<tbody>
+<tr><td>Alliance</td><td>+50 line; an ally can&#39;t be attacked until the alliance is broken</td><td>breaking, declaring war, making a subject, a country destroyed; never expires</td></tr>
+<tr><td>Friendly</td><td>+30 line</td><td>insult, rivalry, war, decay after 240 months unrefreshed</td></tr>
+<tr><td>Neutral</td><td>none</td><td>any stance change</td></tr>
+<tr><td>Rival</td><td>−30 line; AI war target; wars against it please your lords</td><td>dropping it, the object resolved; lasts at least 120 months</td></tr>
+<tr><td>Hostile</td><td>−75 line; blocks alliances; border-raid events (0.02 a month)</td><td>improving relations, decay to Rival after 120 months</td></tr>
+<tr><td>At War</td><td>−100 line; trade between the pair stops</td><td>peace</td></tr>
+<tr><td>Subject</td><td>owned by <a href="/wiki/Subjects">Subjects</a></td><td>independence won, release, annexation</td></tr>
+<tr><td>Truce</td><td>−10 line; no war until it expires</td><td>expiry, breaking it, an alliance, making a subject</td></tr>
+</tbody></table></div>
+<p>Some combinations can&#39;t exist together: for example an Alliance can&#39;t sit with a Neutral, Hostile, At War, Subject or Truce, and At War can&#39;t sit with Friendly, Neutral, Alliance, Subject or Truce. A few are allowed only with a note (allies who compete over a contested object, a disloyal subject, a subject competing with its overlord). When effects happen together the order is At War, Truce, Subject, Alliance, Hostile, Rival, Friendly, Neutral, and a newer relation made in play wins over an older one unless the action&#39;s own conditions block it. Relations made in play are marked <code>gameplay</code> and never written back into the start data. <strong>Diplomatic facts</strong> (royal marriage, dynastic claim, territorial claim, trade agreement, secondary tribute, shared ruler, membership, religious authority, and the new protection pledge) only feed reasons; they never create or block a relation.</p>
+<p><strong>The relation actions</strong> move a pair between types:</p>
+<ul>
+<li><strong>Declare war</strong> needs no Alliance and no Truce with the target, and you can&#39;t declare on your own overlord (a subject uses an independence war) or on your own subject (an overlord annexes or releases). It ends Friendly and Neutral stances, creates At War, and sets Hostile where no stance was stored.</li>
+<li><strong>Independence war</strong> ends the Subject relation, makes both Hostile, and restores the subject if the overlord wins.</li>
+<li><strong>Make peace</strong> ends the war, makes implied Hostile stances real, and creates a Truce (or a Subject when that is a term). <strong>White peace</strong> creates a Truce and turns Hostile into Rival, the contested object still open.</li>
+<li><strong>Extend truce</strong> needs both sides; <strong>break truce</strong> ends it and makes both Hostile; at expiry a truce ends silently, leaving any stance.</li>
+<li><strong>Form alliance</strong> needs no Hostile stance either way, no war and no subject tie, and ends any Truce or Neutral. <strong>Break alliance</strong> ends it with a penalty.</li>
+<li><strong>Make subject</strong> ends any Alliance, Truce, war and Neutral; <strong>release subject</strong> makes both Friendly.</li>
+<li><strong>Set rival</strong> needs a contested object; <strong>insult</strong> makes the stance Hostile; <strong>improve relations</strong> moves one step from Hostile to Rival to Neutral to Friendly.</li>
+<li>A war between other countries never rewrites a subject relation. A destroyed country loses all its relations.</li>
+</ul>
+<p>The start dataset holds 503 relations and 128 facts (reference date 20 September 1378), with each Catholic realm&#39;s obedience to the Pope in Rome or the Pope in Avignon, and is checked before play. Wars already under way include England against France, Venice against Genoa and its allies, Mamai&#39;s Horde against Moscow, Lithuania against the Teutonic and Livonian Orders, Champa against Dai Viet and Ming against the Northern Yuan. The 1444 checkpoint keeps its own 280 relations and 19 facts.</p>
+<h3 id="envoys"><a class="anchor" href="#envoys" aria-label="Link to this section">#</a>Envoys</h3>
+<p>Every envoy is an <strong>official</strong> sent abroad, and the province he ran is run as if it had no official until he comes back. Countries without officials (chiefdoms, stateless societies) send a lord or elder instead, and a lord away over 12 months loses a step of loyalty.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Envoy seats</th><th></th></tr></thead>
+<tbody>
+<tr><td>Start</td><td>1</td></tr>
+<tr><td>Realm of more than 10 provinces</td><td>+1 (lost at 10 or fewer; residents beyond your seats are then recalled, newest first, while missions finish)</td></tr>
+<tr><td>G5 Royal chancery</td><td>+1 (never lost)</td></tr>
+<tr><td>G8 Resident ambassadors</td><td>+1 (never lost)</td></tr>
+<tr><td>A national strength</td><td>may add 1</td></tr>
+</tbody></table></div>
+<p>Seats are a hard limit on envoys abroad. An envoy&#39;s official type helps with what it suits:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Official type</th><th>Better at</th><th>Bonus</th></tr></thead>
+<tbody>
+<tr><td>Judge</td><td>peace offers, demands, sworn peace</td><td>+10</td></tr>
+<tr><td>Customs officer</td><td>trade pacts, passage</td><td>+10</td></tr>
+<tr><td>Chaplain</td><td>marriages with a ruler of the same faith; anything asked of a same-faith country</td><td>+10</td></tr>
+<tr><td>Steward, Tax collector</td><td>gifts and loans</td><td>the gift counts 25 % more</td></tr>
+<tr><td>Marshal, Warden, Muster master</td><td>alliances and calls to arms</td><td>+10</td></tr>
+<tr><td>Schoolmaster</td><td>marriages; courting a foreign lord</td><td>+10</td></tr>
+<tr><td>Master of works</td><td>nothing extra</td><td>0</td></tr>
+</tbody></table></div>
+<p>An envoy with 10 years served adds +5 more, and one resident at a court for 5 years adds +5 to anything asked of it.</p>
+<p><strong>The road.</strong> Envoys travel the army route graph at 2 days per crossing unit (three times march pace), using naval sea times for sea legs. Arrival, one month at court and return are worked out once when sent. A land route through a country at war with you, or one that denied you passage, goes by sea or not at all. Once both countries know T14 telegraphy, a mission is decided the turn it is sent without the envoy leaving home (the answer still comes a month later); marriages and residents still travel.</p>
+<p><strong>Missions and residents.</strong> An envoy carries exactly one task: a <strong>mission</strong> (one action to one court, decided on arrival, then home) or a <strong>residence</strong>. With G8 an envoy can stay <strong>resident</strong> at one court until recalled. A resident adds the tie <em>Resident envoy</em> +5 each season up to +30 (fading over 5 years after he leaves), shows you that country&#39;s soldiers, its treasury to the nearest 100 gold and its lords&#39; loyalty, carries any mission there with no travel, and warns you a month ahead when that country is about to declare war on you or your allies. A <strong>courtesy visit</strong> goes, stays a month, comes back, and leaves the tie <em>Courtesy visit</em> +15 fading over 5 years.</p>
+<p><strong>Envoys held or lost.</strong> If host and sender go to war, the envoy is held until the peace returns him. A demand refused by a Hostile country holds the envoy 1 time in 10, which gives you the war aim <em>Punish</em>. A resident flees home if the country falls to rebels. If the official dies of old age on the road, the seat frees and the mission fails. The envoy carrying a peace is never held.</p>
+<h3 id="the-ledger-and-standing"><a class="anchor" href="#the-ledger-and-standing" aria-label="Link to this section">#</a>The ledger and standing</h3>
+<p>For each country you have dealt with, your realm keeps a <strong>ledger</strong> of named ties and wrongs, each with a weight and a fade time or condition. Its total is your <strong>standing</strong> on a scale of −200 to +200, the same number the event tree calls <code>opinion</code>. The stance or state counts as one line (Alliance +50, Friendly +30, Neutral 0, Rival −30, Hostile −75, At War −100, Truce −10). A ledger holds at most 12 entries; beyond that the smallest merge into &quot;Old matters&quot;. A fading entry shrinks in equal yearly steps to zero.</p>
+<p><strong>Ties:</strong></p>
+<div class="table-scroll"><table>
+<thead><tr><th>Tie</th><th>Weight</th><th>Lasts</th></tr></thead>
+<tbody>
+<tr><td>Married houses</td><td>+15 each, up to +30 (era IV: +10)</td><td>while the marriage lives</td></tr>
+<tr><td>Gift</td><td>+1 per 5 gold, up to +30 per gift (era VII: half)</td><td>fades over 10 years</td></tr>
+<tr><td>Courtesy visit</td><td>+15</td><td>fades over 5 years</td></tr>
+<tr><td>Resident envoy</td><td>+5 a season, up to +30</td><td>while resident, then fades over 5 years</td></tr>
+<tr><td>Fought side by side</td><td>+15</td><td>fades over 20 years</td></tr>
+<tr><td>Answered our call</td><td>+20</td><td>fades over 20 years</td></tr>
+<tr><td>Share a rival</td><td>+15</td><td>while true</td></tr>
+<tr><td>Same faith</td><td>+10</td><td>while true</td></tr>
+<tr><td>Same culture group</td><td>+5</td><td>while true</td></tr>
+<tr><td>Trade pact</td><td>+10</td><td>while in force</td></tr>
+<tr><td>Pledged to protect us</td><td>+15</td><td>while in force</td></tr>
+<tr><td>Freed us</td><td>+40</td><td>fades over 30 years</td></tr>
+<tr><td>Event ties</td><td>as the event says</td><td>default 10-year fade</td></tr>
+</tbody></table></div>
+<p><strong>Wrongs:</strong></p>
+<div class="table-scroll"><table>
+<thead><tr><th>Wrong</th><th>Weight</th><th>Lasts</th></tr></thead>
+<tbody>
+<tr><td>Took our land</td><td>−10 per province</td><td>fades over 20 years</td></tr>
+<tr><td>Broke a truce with us / broke our alliance</td><td>−40</td><td>fades over 30 years</td></tr>
+<tr><td>Abandoned us (refused a defensive call)</td><td>−30</td><td>fades over 30 years</td></tr>
+<tr><td>Insulted us</td><td>−20</td><td>fades over 10 years</td></tr>
+<tr><td>Threatened us</td><td>−15</td><td>fades over 10 years</td></tr>
+<tr><td>Holds a claim on our land or throne</td><td>−20</td><td>while the claim stands</td></tr>
+<tr><td>Courted our lord (if discovered)</td><td>−25</td><td>fades over 10 years</td></tr>
+<tr><td>Embargo against us</td><td>−15</td><td>while in force</td></tr>
+<tr><td>Different faith, where the faiths are hostile</td><td>−10 to −25</td><td>while true</td></tr>
+<tr><td>Notorious deed</td><td>−10 × notoriety added</td><td>fades over 30 years</td></tr>
+<tr><td>Stirred revolt in our land</td><td>−50</td><td>fades over 20 years</td></tr>
+</tbody></table></div>
+<p>Standing shows as a word: <strong>Close</strong> (+100 or more), <strong>Warm</strong> (+30 to +99), <strong>Cool</strong> (−29 to +29), <strong>Cold</strong> (−30 to −99), <strong>Bitter</strong> (−100 or less), with the ledger one tap away.</p>
+<p>Two world-wide counts from <a href="/wiki/Your-Realm">Your-Realm</a> also act as reasons. Each <strong>Oath broken</strong> in the last 30 years is −10 in every count that relies on your word (alliances, pacts, sworn peace, pledges, marriages). <strong>Lands taken</strong> in the last 20 years drives leagues and is a reason in your neighbours&#39; alliance counts.</p>
+<h3 id="the-reasons-count"><a class="anchor" href="#the-reasons-count" aria-label="Link to this section">#</a>The reasons count</h3>
+<p>Every yes or no is decided the same way: the asked country lists its reasons, each with a number, and answers yes only when the total is over zero. The answer arrives as a <strong>letter</strong> a month after it is given, yes or no with the full reasons list. Before you send, each ask the reasons decide shows one word on its button: <strong>Likely</strong> when its count as it stands this month is +15 or more, <strong>Unlikely</strong> at −15 or less, and <strong>Unsure</strong> between. No numbers are shown, and the count is made again when the envoy arrives, so much can change on the way. A courtesy visit and a gift always land and show no word. Beyond the word you can judge from what you can see: the ledger, the stance, and the other side&#39;s soldiers (exact with a resident, otherwise an estimate).</p>
+<p>Every count holds:</p>
+<ul>
+<li>the action&#39;s negative <strong>base</strong>, which says how big the ask is;</li>
+<li>standing ÷ 4;</li>
+<li>−10 per Oath broken if the action relies on your word;</li>
+<li>the envoy&#39;s type and years-served reason;</li>
+<li>the asked country&#39;s personality (−30 to +30 by action);</li>
+<li>its ruler&#39;s traits (Pious +10 to anything asked by the same faith, Warlike −10 to sworn peace, Greedy +10 to anything with a gift);</li>
+<li>a national strength where it says so.</li>
+</ul>
+<p><strong>Strength</strong> is soldiers under arms, with allies who would come counted at half. An ask that binds them to you (alliance, pledge, protection) adds <em>You are stronger than us</em> +10 per full multiple up to +40, or <em>We are stronger than you</em> −10 per full multiple up to −40. A demand adds <em>We cannot beat you</em> +15 per full multiple beyond 1 up to +60, and <em>We have strong friends</em> minus half of that when their allies would defend them. A country already at war adds −30 to any new commitment unless it is against the same enemy.</p>
+<p><strong>Other common reasons:</strong> <em>Too far to matter</em> −15 with no shared border and no shared neighbour, and <em>Very far</em> −15 more when an envoy needs over 60 days; <em>We share an enemy</em> +25 when both are at war with the same country; <em>You threaten our frontier</em> −5 for each province in your Lands taken that borders them; <em>We already have allies</em> −10 for each of their alliances beyond two. Each action adds at most two reasons of its own.</p>
+<p><strong>Hungary asks Venice, 11 November 1444</strong> (on the 1444 checkpoint world). Hungary and Venice are both at war with the Ottomans; Venice is allied with Florence, a hegemon seeker with high negotiation. Venice&#39;s standing toward Hungary is +10 (Same faith). Venice with half its allies has between 1 and 2 times Hungary&#39;s soldiers. Hungary&#39;s envoy is a Judge with 7 years served.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Reason</th><th>Number</th></tr></thead>
+<tbody>
+<tr><td>Base (alliance)</td><td>−40</td></tr>
+<tr><td>Standing ÷ 4</td><td>+2</td></tr>
+<tr><td>We share an enemy (Ottomans)</td><td>+25</td></tr>
+<tr><td>We are stronger than you</td><td>−10</td></tr>
+<tr><td>We already have allies</td><td>0</td></tr>
+<tr><td>Hegemon seeker: alliance with a stronger</td><td>0</td></tr>
+<tr><td>Negotiation high</td><td>+10</td></tr>
+<tr><td><strong>Total</strong></td><td><strong>−13: no</strong></td></tr>
+</tbody></table></div>
+<p>Hungary then sends Venice a gift of 100 gold, raising standing to +30, and sends a Marshal instead. The total becomes +2, the answer is yes, and Hungary and Venice are allied.</p>
+<h3 id="the-actions"><a class="anchor" href="#the-actions" aria-label="Link to this section">#</a>The actions</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Action</th><th>How</th><th>Needs</th><th>Base</th><th>What happens</th></tr></thead>
+<tbody>
+<tr><td>Propose alliance</td><td>envoy</td><td>no war; neither side Hostile; no subject tie</td><td>−40</td><td>Alliance (replaces a Truce)</td></tr>
+<tr><td>Call to arms</td><td>instant, answer a month later</td><td>an Alliance, Pledge or League</td><td>−20 defensive / −50 offensive</td><td>they join your war, or refuse</td></tr>
+<tr><td>Break alliance</td><td>instant</td><td>an Alliance</td><td></td><td>ends it; Oath broken; <em>Broke our alliance</em></td></tr>
+<tr><td>Arrange marriage</td><td>envoy</td><td>an unmarried heir or child on each side</td><td>−15</td><td>marriage fact; <em>Married houses</em>; a chance at a claim</td></tr>
+<tr><td>Demand</td><td>envoy</td><td>a war aim against them, or a Rival or Hostile stance</td><td>−60</td><td>they give it, or you gain a war aim</td></tr>
+<tr><td>Ask for passage</td><td>envoy</td><td>G8; no war</td><td>−10</td><td>your armies may cross for 2 years</td></tr>
+<tr><td>Trade pact</td><td>envoy</td><td>no war</td><td>−10</td><td>their border opens to your traders</td></tr>
+<tr><td>Embargo</td><td>instant</td><td>no war</td><td></td><td>their border closes to your traders</td></tr>
+<tr><td>Pledge protection</td><td>instant</td><td>not at war; not your subject</td><td></td><td>you promise to defend them</td></tr>
+<tr><td>Swear peace</td><td>envoy</td><td>no war</td><td>−20</td><td>a Truce of 10 years without a war</td></tr>
+<tr><td>Offer overlordship</td><td>envoy</td><td>see below</td><td>−80</td><td>a subject by agreement</td></tr>
+<tr><td>Ask for protection</td><td>envoy</td><td>see below</td><td>−10</td><td>a subject by agreement</td></tr>
+<tr><td>Court a lord</td><td>envoy</td><td>a foreign Wavering or Disloyal lord</td><td></td><td>his loyalty drops; he may defect with his land</td></tr>
+<tr><td>Send gift</td><td>envoy</td><td>gold</td><td></td><td>tie <em>Gift</em></td></tr>
+<tr><td>Courtesy visit</td><td>envoy</td><td></td><td></td><td>tie <em>Courtesy visit</em></td></tr>
+<tr><td>Make resident</td><td>envoy</td><td>G8</td><td></td><td>tie <em>Resident envoy</em>; sight of their court</td></tr>
+<tr><td>Insult</td><td>instant</td><td></td><td></td><td><em>Insulted us</em>; Hostile</td></tr>
+<tr><td>Declare rival</td><td>instant</td><td>a contested object</td><td></td><td>Rival stance</td></tr>
+<tr><td>Fund rebels</td><td>envoy, secret</td><td>1 % of their yearly income each month; not your ally or subject; a revolution brewing there</td><td></td><td>their revolution breaks out sooner</td></tr>
+<tr><td>Lift embargo, stop funding, mark or unmark a mobilisation pact</td><td>instant</td><td></td><td></td><td>free</td></tr>
+<tr><td>Withdraw a pledge</td><td>instant</td><td>a pledge</td><td></td><td>Oath broken</td></tr>
+<tr><td>Drop a rival</td><td>instant</td><td>the rival has stood 10 years</td><td></td><td>Rival ends</td></tr>
+<tr><td>Recall a resident</td><td>instant</td><td>a resident (an envoy on a mission can&#39;t be recalled)</td><td></td><td>he comes home</td></tr>
+</tbody></table></div>
+<p><strong>Alliances and calls to arms.</strong> When war is declared on you, your allies get defensive calls, except in your own independence war or a war you provoked by a refused demand. An ally who <strong>refuses a defensive call</strong> breaks the alliance, takes an Oath broken, and gets <em>Abandoned us</em> in your ledger. Refusing an <strong>offensive call</strong> breaks nothing; the ally just stays out. A call&#39;s count adds <em>Our ally&#39;s war aim is our concern</em> +30 (the target is their Rival or Hostile, or the aim frees their people or faith), <em>We are at war already</em> −30, and <em>The enemy is far stronger</em> −10 per full multiple up to −40. Calls go out instantly and are answered a month later. An ally keeps its own armies and its own peace voices and is named in the peace so it gets the truce too. When over half its own peace voices say peace it may make a <strong>separate peace</strong>; that is no Oath broken, but you lose the tie <em>Answered our call</em>. Joining when asked gives <em>Answered our call</em> +20; fighting on the same side gives <em>Fought side by side</em> +15.</p>
+<p><strong>Marriages and pretenders.</strong> A marriage needs an unmarried heir, son or daughter on each side, and for houses of hostile faiths the religion rule on tolerance. Its count adds <em>Their house is greater</em> +10 (your realm has more people) and <em>A marriage already binds us</em> −10 per existing marriage. While a marriage lives, when either ruler dies without a direct heir the other house gets a 1 in 10 chance per marriage of a claim: a dynastic claim fact and a <strong>pretender</strong> at that court. Pretenders also come from exiles of a lost succession war or revolt, and from events; a pretender gives the war aim <em>Seat a pretender</em>, and his claim passes to his heir or lapses. When a ruler dies with no heir at all and your house holds the strongest claim (most marriages, then the closest), the realm passes to your ruler as a personal union for <a href="/wiki/Subjects">Subjects</a>, and each Wavering or Disloyal lord of the inherited realm rolls to rise for a local claimant.</p>
+<p><strong>Demands</strong> are the step before war. Each names exactly one demand with its need met:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Demand</th><th>Needs</th><th>War aim on refusal</th></tr></thead>
+<tbody>
+<tr><td>Hand over a province</td><td>a border with it, or a claim</td><td>Take land (that province)</td></tr>
+<tr><td>Pay tribute</td><td>a border</td><td>Tribute</td></tr>
+<tr><td>Recognise our pretender</td><td>a pretender at your court</td><td>Seat a pretender</td></tr>
+<tr><td>Release a subject</td><td>they have a subject</td><td>Break a subject</td></tr>
+<tr><td>Tolerate our faith in a named province</td><td>the persecution flag on a province bordering you</td><td>Defend the faith</td></tr>
+<tr><td>Apologise and pay</td><td>they broke an oath to you or insulted you</td><td>Punish</td></tr>
+<tr><td>Expel an envoy / cut an alliance</td><td>they host your enemy&#39;s resident, or are allied with your Rival</td><td>Punish</td></tr>
+</tbody></table></div>
+<p>A demand&#39;s count adds <em>We cannot beat you</em>, <em>We have strong friends</em>, and <em>It&#39;s our heartland</em> −30 for a province with their capital or of their own culture. If they give in you get exactly what was asked with no war and no truce, and they record <em>Threatened us</em>. If they refuse you gain the matching war aim for 5 years, and the war that follows counts as <strong>provoked</strong> by them: your non-Warlike lords don&#39;t waver, your allies&#39; offensive calls get <em>They refused a fair demand</em> +20, and their allies get no defensive call at all.</p>
+<p><strong>Passage.</strong> Your armies may enter a foreign country only if you are at war, it is your subject or ally, or it granted passage. From G8 you can ask for passage by envoy (base −10, <em>You are marching on our friend</em> −40, <em>You are marching on our enemy</em> +20); before G8 a country at peace is closed to your armies unless it is an ally or subject. Passage lasts 2 years and the granting side can revoke it any time without an Oath broken. A country that refused or revoked your passage blocks your envoys over its land for 2 years. An army that enters without passage commits an act of war: the owner may declare with the aim <em>Punish</em> that turn, and its allies&#39; defensive calls count as answered to a war started by the intruder.</p>
+<p><strong>Trade pacts and embargoes.</strong> A trade pact waives tolls and extra fees for both sides&#39; traders, records the trade agreement fact and adds <em>Trade pact</em> +10 both ways, ending with war or when either side cancels. An embargo (instant) bars both sides&#39; traders from each other&#39;s land and ports, closes paths through the embargoing country, and adds <em>Embargo against us</em> −15.</p>
+<p><strong>Pledges and sworn peace.</strong> A pledge is a one-way promise to defend a country; it gives them <em>Pledged to protect us</em> +15. If they are attacked you get a defensive call as if allied, and refusing is an Oath broken. <strong>Swear peace</strong> (base −20, <em>We fear you</em> +10 per multiple, <em>We want your land</em> −30 if they claim your land) creates a 10-year Truce without a war; breaking it is an Oath broken and <em>Broke a truce with us</em>.</p>
+<p><strong>Subjects by agreement.</strong> <em>Offer overlordship</em> (base −80) adds <em>We need a protector</em> +20 per neighbour Hostile toward them or claiming them, <em>You already protect us</em> +20 with a pledge, and <em>We are proud</em> −10 per castle of theirs beyond two; on yes, <a href="/wiki/Subjects">Subjects</a> makes them a Tributary. <em>Ask for protection</em> (base −10) asks a stronger country to take you as a subject; on yes you become a Tributary, or a Vassal if you asked for that.</p>
+<p><strong>Courting a foreign lord.</strong> An envoy can work on a foreign Wavering or Disloyal lord: each season he stays, the lord&#39;s loyalty to his own ruler drops a step, unless his ruler pays him more or wins a battle he fought in. A Disloyal lord who borders you and has been courted for a year defects with his lands, and his old ruler gains <em>Take land</em> for them. Each season there is a 1 in 4 chance of discovery, which adds <em>Courted our lord</em> and sends the envoy home.</p>
+<p><strong>Gifts, insults and rivals.</strong> A gift of any amount adds <em>Gift</em> (+1 per 5 gold, up to +30, fading over 10 years). An insult makes the insulted side Hostile toward you (ending any friendship between you), adds <em>Insulted us</em>, raises a loyalty step for each of your Warlike lords whose Want is a war with them, and gives them <em>Punish</em>. Declaring a rival needs a named contested object.</p>
+<p><strong>Funding rebels</strong> pays for a revolution that is already brewing in another country (its revolution card shows at least one sign). It needs a free envoy seat and a target that is not your ally or subject, and costs 1 % of the target&#39;s yearly income every month. Nobody is told, not even when you stop. While you pay, that country&#39;s revolution breaks out sooner. You can also fund an émigré pretender court the same way. Each month there is a 3 in 100 chance of being caught: the envoy is held and funding stops, the target records <em>Stirred revolt in our land</em> −50 (fading over 20 years) and gains <em>Punish</em> against you for 5 years, and you learn it a month later. If the revolution wins, the new regime records <em>Backed our revolution</em> +25 toward you, unless it hates your form of rule.</p>
+<h3 id="war-aims"><a class="anchor" href="#war-aims" aria-label="Link to this section">#</a>War aims</h3>
+<p>A war aim is held from things in the world:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>War aim</th><th>Held when</th><th>Lasts</th></tr></thead>
+<tbody>
+<tr><td>Take land (named provinces)</td><td>you held them in the last 50 years; a pretender of yours claims them; they are a homeland of your culture; a lord&#39;s Want names them; they refused your demand for them; a lord defected from you with them</td><td>while the reason holds; a refused demand gives 5 years</td></tr>
+<tr><td>Seat a pretender</td><td>a pretender to their throne is at your court, including an émigré court</td><td>while the pretender lives</td></tr>
+<tr><td>Tribute</td><td>you border them and they refused a tribute demand; or you border them and have 3 times their soldiers</td><td>5 years / while true</td></tr>
+<tr><td>Free a people</td><td>their land holds a homeland of a culture with no country, yours or accepted by you</td><td>while true</td></tr>
+<tr><td>Break a subject (the war is on the overlord)</td><td>they have a subject Hostile toward them or that asked you for help</td><td>while true</td></tr>
+<tr><td>Defend the faith</td><td>the persecution flag on a province bordering you; or they refused your tolerance demand</td><td>while true</td></tr>
+<tr><td>Punish</td><td>they broke an oath to you, insulted you, held your envoy, entered without passage, refused <em>Apologise and pay</em>, or were caught funding rebels in your land</td><td>5 years</td></tr>
+<tr><td>Raid</td><td>nothing</td><td>always</td></tr>
+<tr><td>No aim</td><td>nothing</td><td>always</td></tr>
+</tbody></table></div>
+<p>Events and national strengths can grant other aims for a stated time. What each aim wins at the peace is set by <a href="/wiki/Warfare">Warfare</a>.</p>
+<h3 id="declaring-war"><a class="anchor" href="#declaring-war" aria-label="Link to this section">#</a>Declaring war</h3>
+<p>You declare war, and offer or ask for peace, from the <strong>Diplomacy tab</strong> of the other country&#39;s card.</p>
+<p>A declaration needs a target and exactly one aim you hold. Any Alliance, Truce or Pledge with the target must be broken first, each an Oath broken. The same turn, offensive calls go to your allies, defensive calls to the target&#39;s allies and pledgers, both sides&#39; subjects come in by their kind (a Union joins at once, a Vassal or Protectorate is called and answers by its loyalty, a March joins when the enemy borders it, a Tributary or Colony stays out), and members of a league against you are brought in; answers arrive a month later. The aim is shown to every country, and for a war with no aim every neighbour of yours records <em>Threatened us</em>. A Union, Colony or Protectorate can&#39;t declare war, and a Vassal can&#39;t declare war on its overlord&#39;s allies; they join their overlord&#39;s wars or start an independence war. A realm under a regency may fight only defensive wars and Raids.</p>
+<h4 id="a-war-with-no-aim"><a class="anchor" href="#a-war-with-no-aim" aria-label="Link to this section">#</a>A war with no aim</h4>
+<p>You may always declare war with no aim, but it costs you dearly from the day you declare:</p>
+<ul>
+<li><strong>Your lords turn.</strong> Every lord, Warlike or not, loses two steps of loyalty at once: a Loyal lord becomes Disloyal. A Disloyal lord pays no tax, refuses your call to arms and may go over to a neighbour, and your stability falls with them.</li>
+<li><strong>Your name abroad darkens.</strong> You gain 15 notoriety, and every realm that knows you holds the wrong <em>Notorious deed</em> toward you, fading over 30 years. Notoriety makes realms refuse your alliances and marriages and band into leagues against you.</li>
+<li><strong>Your people call it unjust.</strong> Every province of yours holds the grievance <em>Unjust war</em> until the war ends, a step nearer to riots everywhere.</li>
+<li><strong>Your realm wants peace.</strong> Your peace voices count 25 in 100 more for peace in that war, so you may soon be bound to take a fair peace.</li>
+<li><strong>Your allies stay out.</strong> No ally owes you a war with no aim; they refuse the call without breaking the alliance.</li>
+<li><strong>Your neighbours are alarmed</strong> (<em>Threatened us</em>), and when you take land your lords who aren&#39;t Warlike waver again.</li>
+</ul>
+<p>The AI never declares a war with no aim unless its ruler is Warlike or it seeks hegemony. A subject rising for its freedom pays none of this. The way out is a demand: if they refuse it, you hold an aim. The declare sheet heads its <em>Price of war</em> with this whole cost in a red frame, and <em>Confirm</em> reads <em>Declare war with no aim</em>. The numbers are in <code>diplomacy.war_aims.no_aim_penalty</code>.</p>
+<p><strong>Hungary prepares to declare war on the Ottomans.</strong> Hungary holds the aim Take land for Nikopol from the Want of its lord John Hunyadi. The declaration sheet shows the aim &quot;Take land: Nikopol&quot; and its source, Wallachia and the Papal States as called on Hungary&#39;s side, Serbia as an Ottoman tributary that does not join, and how many of Hungary&#39;s voices lean to peace. It does not show how the called countries will answer. It offers <em>Send a demand first</em> and <em>Declare</em>.</p>
+<h3 id="peace-and-truces"><a class="anchor" href="#peace-and-truces" aria-label="Link to this section">#</a>Peace and truces</h3>
+<p>Computer players offer you peace by the same rules they use among themselves: when over half their peace voices want it, or when they are worn out. Their offer arrives in your turn report, waits under Waiting for you and marks their Diplomacy tab until you answer it or put it off.</p>
+<p>A signed peace starts a truce of <strong>5 years, plus 5 more</strong> if it moved provinces or made a subject; a white peace gives 5 years. Both sides may agree to extend a truce. From era III, when three or more countries are on each side, one envoy can carry a single <strong>many-sided peace</strong> that every warring country signs at once, each by its own peace voices; before that each pair makes its own peace.</p>
+<h3 id="leagues-against-a-conqueror"><a class="anchor" href="#leagues-against-a-conqueror" aria-label="Link to this section">#</a>Leagues against a conqueror</h3>
+<p>Once a year, for each country X whose Lands taken (last 20 years) reaches the era&#39;s <strong>league threshold</strong> (8 in eras I to III, 6 in IV and V, 4 in VI and VII), every country that borders X or a province X took in the last 20 years, and is not X&#39;s ally, subject or overlord and not at war with X, makes the count <em>Join a league against X</em>:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Reason</th><th>Number</th></tr></thead>
+<tbody>
+<tr><td>Base</td><td>−30</td></tr>
+<tr><td>Their standing toward X</td><td>− standing ÷ 4</td></tr>
+<tr><td>X took our land</td><td>+10 per province</td></tr>
+<tr><td>X&#39;s Lands taken</td><td>+3 per province</td></tr>
+<tr><td>X could crush us alone</td><td>balancers +10 per multiple; bandwagoners −10 per multiple</td></tr>
+<tr><td>Others already in the league</td><td>+5 per member</td></tr>
+<tr><td>Same faith as X</td><td>−10</td></tr>
+</tbody></table></div>
+<p>When at least two say yes, the league forms, named after X (&quot;League against Venice&quot;). If X declares war on any member, every member gets a defensive call; a member who refuses leaves with no Oath broken. Members owe nothing else and are protected against nobody but X. X sees the league, its members and their soldiers on its country card. The league dissolves when X&#39;s Lands taken falls below half the threshold, or X makes a peace that gives provinces back to members. Events can also start a league regardless of the threshold; such a league ends only by event or by a peace that gives provinces back.</p>
+<h3 id="eras"><a class="anchor" href="#eras" aria-label="Link to this section">#</a>Eras</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Era</th><th>Change</th></tr></thead>
+<tbody>
+<tr><td>I the start (1378) to 1500</td><td>envoys only travel; residents only with G8 (the Italian states start with it); marriages the strongest tie</td></tr>
+<tr><td>II 1500 to 1600</td><td>G8 spreads; residents give sight of other courts</td></tr>
+<tr><td>III 1600 to 1700</td><td>many-sided peace, or earlier if the event <code>peace_of_westphalia</code> fires</td></tr>
+<tr><td>IV 1700 to 1800</td><td>league threshold 8 to 6; <em>Married houses</em> +10</td></tr>
+<tr><td>V 1800 to 1870</td><td>T14 telegraphy makes missions instant between telegraph countries (marriages and residents still travel)</td></tr>
+<tr><td>VI 1870 to 1914</td><td><strong>mobilisation pacts</strong>: either ally can mark or unmark an alliance as a pact: a defensive call is then answered automatically, shown to the player as an event, and offensive calls between the partners get +10; league threshold 4</td></tr>
+<tr><td>VII 1914 to 1939</td><td>gifts count half; the campaign ends 31 August 1939</td></tr>
+</tbody></table></div>
+<p>A revolution can add its own reason row, for example <em>Different form of rule</em> −20 with monarchies in every count for a set time.</p>
+<h3 id="events"><a class="anchor" href="#events" aria-label="Link to this section">#</a>Events</h3>
+<p>An event&#39;s <code>opinion</code> effect adds an event tie or wrong named after the event, fading over 10 years unless it says otherwise. <code>trust</code> is read as 100 − 10 × Oaths broken (never below 0), and an effect lowering it adds an Oath broken. <code>notoriety</code> is 5 × Lands taken plus the notoriety events added that has not yet faded (each point fades over 30 years), capped at 100; adding notoriety n adds <em>Notorious deed</em> −10 × n with every country that shares a border, a sea zone or a trade pact with the actor. A league started by an event needs no minimum number of members and ends only by event or by a peace that gives provinces back. An event setting a <code>relation</code> (alliance, truce, rivalry, war, trade pact, embargo, guarantee, non-aggression) runs the matching action with its conditions. Three new effects are asked for: <code>war_aim</code>, <code>league</code> and <code>pretender</code>.</p>
+<h3 id="the-computer-players"><a class="anchor" href="#the-computer-players" aria-label="Link to this section">#</a>The computer players</h3>
+<p>The AI decides with exactly the same counts, adding rows for its <strong>posture</strong> and <strong>negotiation level</strong>:</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Posture</th><th>Seeks</th><th>Reason rows</th></tr></thead>
+<tbody>
+<tr><td>Mixed</td><td>nothing in particular</td><td>none</td></tr>
+<tr><td>Bandwagoner</td><td>alliance with the strongest neighbour</td><td>+20 alliances with a stronger country; +20 <em>Ask for protection</em>; −10 per multiple to leagues against the strong</td></tr>
+<tr><td>Opportunist</td><td>gains when others are weak</td><td>+20 joining the side with more soldiers; −20 defensive calls against a stronger enemy; courts lords; Oaths broken count −5 in its own reckoning</td></tr>
+<tr><td>Isolationist</td><td>to be left alone</td><td>−30 alliances and calls; +20 sworn peace and trade pacts; −20 passage</td></tr>
+<tr><td>Balancer</td><td>stop any one power growing</td><td>+10 per multiple to leagues against the strong; +20 alliances against the strongest neighbour</td></tr>
+<tr><td>Client seeker</td><td>a protector</td><td>+30 <em>Offer overlordship</em> and pledges from a stronger, Warm country</td></tr>
+<tr><td>Hegemon seeker</td><td>domination</td><td>makes demands; −20 alliances with a stronger country; offers pledges and overlordship to small neighbours</td></tr>
+</tbody></table></div>
+<p>Negotiation level adds very high +15 (and gifts count 25 % more), high +10, moderate 0, low −10, very low −20. Each month an AI with a free seat scores up to 5 candidate actions per free seat toward countries in its horizon (neighbours, neighbours&#39; neighbours, anyone it has a relation or fact with, its rivals&#39; enemies), estimates the other side&#39;s count with only what a player could see, sends the best one over zero, and sends a gift first when the best is a close no (−20 or better). It tries a demand before war unless it is an Opportunist and the target&#39;s armies are away. Opportunists and hegemon seekers fund rebels in a rival&#39;s provinces that already have two or more grievances.</p>
+<h3 id="arms-and-fear"><a class="anchor" href="#arms-and-fear" aria-label="Link to this section">#</a>Arms and fear</h3>
+<p>Every month each country weighs each neighbour it does not count as a friend (friends are its allies, its overlord and its subjects) against its own side: its men under arms, the levies it can still call and its lords&#39; men, with its friends counting half. A neighbour 1.5 times as strong makes it <strong>Wary</strong>; 2.5 times as strong makes it <strong>Threatened</strong>. There is no rivalry: fear is measured again each month and goes as soon as the balance changes.</p>
+<p>A computer country at peace keeps a <strong>standing army</strong>: a quarter of its troop cap, or half the largest force of an unfriendly neighbour if that is more, times 1.5 when Wary and 2 when Threatened. It never keeps more than a share of its cap (a half, 0.7 Wary, 0.9 Threatened) or more than a share of its income can pay. Under that it calls up to 3,000 men a month where its garrisons already stand; over it, levies whose free months are over go home, smallest first. At war it calls men in every royal province it holds, up to a quarter of its cap a month, within three quarters of its income. At war or Threatened it borrows up to three months of its army&#39;s pay, and counts what lenders would give toward its war chest.</p>
+<p>You see who fears you under <strong>Name abroad</strong> (<em>Neighbours who fear you</em>, with how many times their side you are), and on a country&#39;s diplomacy card a line says whether it is Wary or Threatened of you and whom else it fears. When a neighbour comes to feel Threatened by you, the news says so once.</p>
+<p>Fear also makes countries act. Two countries that fear the same realm draw together: an alliance count holds <em>We fear the same realm</em> +15, or +30 when the country asked is Threatened, and it shows in the <strong>Why?</strong> of the answer. A Threatened computer country weighs its envoys every 3 months instead of once a year and looks for allies among the other neighbours of the realm it fears, even ones it does not border. A Wary country walls the province on its border with the realm it fears most with earthworks, a Threatened one with stone, before its other works; and both study warfare and fortification inventions sooner (they weigh 0.8 and 0.6 of their cost). When neighbours who fear you ally, the news tells you. Countries also take their chances: a neighbour already at war elsewhere draws their eye, and they need only three quarters of their usual strength edge to attack it; and now and then (one month in ten that they look for a war) they gamble on four fifths of it. All of this is measured each month: none of it is a lasting rivalry.</p>
+<h3 id="each-month"><a class="anchor" href="#each-month" aria-label="Link to this section">#</a>Each month</h3>
+<p>Answer letters from last month are delivered; envoys arriving this month have their asks counted; rebel funding is charged and the caught chance rolled; at each season&#39;s end resident ties grow and courting rolls happen; truces, passages and timed war aims expire and envoys return; the AI acts. Once a year ledgers fade, leagues are checked and relations decay.</p>
+<h2 id="what-you-see"><a class="anchor" href="#what-you-see" aria-label="Link to this section">#</a>What you see</h2>
+<ul>
+<li><strong>The diplomacy map mode</strong>: every country coloured by its relation to you: your colour for you and your subjects; blue for allies and light blue for pledges; green and pale green for Close and Warm; grey for Cool or nothing recorded; orange for Cold or Rival; red for Hostile, Bitter or at war (hatched at war); a red border for a league against you. Envoys on the road appear as small riders with a dotted line, and a crossed-sword icon marks countries you hold a war aim against (regional zoom only).</li>
+<li><strong>The country diplomacy card</strong>: their standing toward you and your stance, ties and wrongs, relations, your war aims on them, the last answer with a <em>Why?</em> button for the full reasons, and action buttons that show no prediction. In landscape it sits to the right of the map.</li>
+<li><strong>The envoy picker</strong>: which official goes, the days on the road, and which province loses its official meanwhile.</li>
+<li><strong>The envoys strip</strong>: each seat as free, on the road (destination and days) or resident (court).</li>
+<li><strong>The declare sheet</strong>: the <em>Price of war</em> (who is called against you and how, the neighbours alarmed, the lords who will waver, a truce broken, your pay at war, the most one peace can take), and the aim the war is declared with (the best fitting aim you hold, or <em>No aim</em> in red), above <em>Confirm</em>; see <a href="/wiki/Warfare#the-price-of-war">Warfare</a>.</li>
+<li><strong>Your name abroad</strong>: your own Diplomacy tab opens with it. Any league against you comes first, with each member and its soldiers; then your <strong>notoriety</strong> as a word (<em>Trusted</em> under 25, <em>Watched</em> from 25, <em>Feared</em> from 50, <em>Hated</em> from 75), and your <strong>Lands taken</strong> in the last 20 years as a bar against the era&#39;s league threshold (&quot;6 of 8 before a league&quot;). Notoriety is 5 for each land taken plus notorious deeds, fading over 30 years; courts trust you less for it (less willing to ally, marry or pledge) and are readier to join a league against you. Land taken also leaves the wrong <em>Grabbed land near us</em> with the realms that border it. Every row opens its reason on a tap.</li>
+<li><strong>The war card</strong> for each war you fight, with both sides&#39; peace voices; see <a href="/wiki/Warfare#the-price-of-war">Warfare</a>.</li>
+<li><strong>Answer letters</strong>, and the country card line &quot;Envoys n of m abroad&quot; and &quot;Leagues against you&quot;.</li>
+</ul>
+<h3 id="envoys-in-the-game-today"><a class="anchor" href="#envoys-in-the-game-today" aria-label="Link to this section">#</a>Envoys in the game today</h3>
+<p>The first part of statecraft is in the playable build: envoys, alliances, marriages, courtesy visits and gifts. Demands, subjects and passage come next.</p>
+<ul>
+<li><strong>Where</strong>: open another realm&#39;s card and its <strong>Diplomacy</strong> tab. At the top is what they think of you: the word (Warm, Cool and so on), the number, and every line of their ledger with its weight. Below that is your envoy on the way there, if any, and their last answer; tap <strong>Why?</strong> to see every reason they counted and the total.</li>
+<li><strong>Sending an envoy</strong>: under <em>Send an envoy</em> you see how many of your envoys are free, then four missions. Each is a button with one line on what it does, or a greyed button that says why not: you are at war, an envoy is already on the way, every seat is taken, you are already allies, a subject tie, they are hostile, your houses are married already, or you lack the gold.<ul>
+<li><em>Propose an alliance</em>: they say yes only if their reasons add up above nothing.</li>
+<li><em>Arrange a marriage</em>: married houses think better of each other (+15), and a marriage can bring a claim on their throne or their whole crown (see <a href="/wiki/Subjects">Subjects</a>, personal unions).</li>
+<li><em>Courtesy visit</em>: always welcome, +15 fading over 5 years.</li>
+<li><em>Send a gift</em>: 30 gold, +30 fading over 10 years.</li>
+</ul>
+</li>
+<li><strong>How long it takes</strong>: the envoy rides to their capital (two days per unit of distance), stays at court a month, and the answer reaches you the month after. While he is away his seat is taken. Most realms have one seat, and one more with over 10 provinces.</li>
+<li><strong>Your own overview</strong>: your realm card&#39;s Diplomacy tab lists your envoys abroad (where, why, and when they arrive or come home) and the last eight answers, each with its <em>Why?</em>. Answers also arrive in the News with a scroll.</li>
+<li><strong>Ending an alliance</strong>: <em>End the alliance</em> on an ally&#39;s tab. It is an Oath broken: they remember it (−40, fading over 20 years), and other courts trust you less.</li>
+<li><strong>Courting a lord</strong>: tap a province of another realm, open its lord from <em>Governed by</em> (<em>Lord</em>), and if he is Wavering or Disloyal, <em>Court him</em>. One of your envoys stays at his court: each season he loses a step unless his ruler wins him back, and once Disloyal for a year with land next to yours he comes over with it (his old ruler remembers <em>Took our land</em>). Each season there is 1 in 4 they find out: <em>Courted our lord</em> (−25, fading over 10 years) and your envoy comes home. Your courting envoys are listed with your envoys abroad, and <em>Recall your envoy</em> frees the seat. Realms court the lords and subjects of neighbours they hold as rivals or hostile.</li>
+<li><strong>The other realms</strong> send envoys too: once a year each court picks the neighbour that thinks best of it and weighs an alliance and a marriage there, and sends the best ask its count says yes to, or a gift first when it is close. You see the alliances and marriages they make in the News.</li>
+<li><strong>For now</strong> an envoy is not a named official, so no province loses its official while he is away; every realm counts two unmarried children; and the royal marriages already made on the start day count from the start. Envoys, letters and alliances are kept in your save.</li>
+</ul>
+<h3 id="demands-in-the-game-today"><a class="anchor" href="#demands-in-the-game-today" aria-label="Link to this section">#</a>Demands in the game today</h3>
+<ul>
+<li><strong>Where</strong>: under the envoys on another realm&#39;s <strong>Diplomacy</strong> tab, <em>Make a demand</em> (not while you are at war with them).</li>
+<li><strong>What you can demand</strong>: <em>Demand tribute</em>, or <em>Demand</em> a province of theirs on your border (one button each, their capital marked). A demand needs a reason: a war aim on them (for example, sharing a border with three times their soldiers gives you <em>Tribute</em>) or a Rival or Hostile stance toward them. If you can&#39;t, the tab says why.</li>
+<li><strong>How they answer</strong>: your envoy carries it like any mission, and their answer comes back with a <em>Why?</em>. They start at −60 and give in only when they cannot beat you (+15 for each time over their soldiers, up to +60), minus half that if their allies would defend them, and −30 if you ask for their capital. What they think of you counts too, so a gift first can tip it.</li>
+<li><strong>If they give in</strong>: the province is yours at once, with no war and no truce; or they become your <strong>tributary</strong> and send you 15 in 100 of their tax and trade every month, shown as <em>Tribute</em> in your Treasury tab and on their card. A tributary stays out of your wars; see <a href="/wiki/Subjects">Subjects</a> for its loyalty and the tribute level.</li>
+<li><strong>If they refuse</strong>: you hold a war aim on them for 5 years, and a war you start over it brings their allies no call to arms. Either way they remember the threat (−15, fading over 10 years).</li>
+<li><strong>The other realms</strong> demand too: before a realm goes to war on a neighbour it first demands tribute or a border province, and fights only if refused. For now they make demands only of each other, not of you.</li>
+</ul>
+<h2 id="how-it-connects"><a class="anchor" href="#how-it-connects" aria-label="Link to this section">#</a>How it connects</h2>
+<ul>
+<li><a href="/wiki/Your-Realm">Your-Realm</a>: officials, ruler, heirs, marriages, lords and their loyalty and Wants, soldiers, Oaths broken and Lands taken.</li>
+<li><a href="/wiki/Provinces">Provinces</a>: a province loses its official while he is an envoy.</li>
+<li><a href="/wiki/Research">Research</a>: G5, G8 and T14.</li>
+<li><a href="/wiki/Warfare">Warfare</a>: war aims, calls, declarations, peace voices, peace terms, truce length and held envoys.</li>
+<li><a href="/wiki/Subjects">Subjects</a>: subject records and kinds, subjects by agreement, inherited unions.</li>
+<li><a href="/wiki/Troop-Movement">Troop-Movement</a>: passage per pair and the route graph envoys travel.</li>
+<li><a href="/wiki/Naval">Naval</a>: sea travel times for envoys.</li>
+<li><a href="/wiki/World-Map">World-Map</a>: borders, neighbours and routes.</li>
+<li><a href="/wiki/Trade">Trade</a>: trade pacts, embargoes, and war stopping trade.</li>
+<li><a href="/wiki/Rebellions">Rebellions</a>: Foreign agitators and Foreign meddling, armed rebels, countries fallen to rebels.</li>
+<li><a href="/wiki/Revolutions">Revolutions</a>: funding as a revolution sign, émigré pretenders, the <em>Different form of rule</em> row.</li>
+<li><a href="/wiki/Religion">Religion</a>: same faith, hostile faiths, tolerance for marriages, persecution.</li>
+<li><a href="/wiki/Culture">Culture</a>: culture groups, homelands, accepted cultures.</li>
+<li><a href="/wiki/Government">Government</a>: the officials cap and regencies.</li>
+<li><a href="/wiki/National-Strengths">National-Strengths</a>: extra reasons, seats and unique war aims.</li>
+<li><a href="/wiki/Historical-Events">Historical-Events</a>: opinion, trust, notoriety, relations, and the new effects.</li>
+<li><a href="/wiki/The-1378-Start">The 1378 Start</a>: the 1378 relations, AI personalities, Italian states with G8.</li>
+<li><a href="/wiki/Time-and-Turns">Time-and-Turns</a>, <a href="/wiki/Map-and-Lenses">Map and Map Modes</a>, <a href="/wiki/Screens-and-Navigation">Screens-and-Navigation</a>: turn order, the map mode, cards and letters.</li>
+</ul>
+<h2 id="numbers"><a class="anchor" href="#numbers" aria-label="Link to this section">#</a>Numbers</h2>
+<p>Every value the game uses, made from its config so it always matches the game: <a href="/wiki/Data-Diplomacy">Diplomacy data</a>. How they combine: <a href="/wiki/Formulas">Formulas</a>.</p>
+<p>All numbers live in <code>diplomacy-rules.json</code> (or <code>relation-rules.json</code> for relation types) and are <strong>placeholders</strong>, except the answer rules, which are decided.</p>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>envoys.seats.*</code></td><td>base 1; +1 above 10 provinces; G5 +1, G8 +1</td></tr>
+<tr><td><code>envoys.lord_loyalty_step_lost_if_mission_months_over</code></td><td>12</td></tr>
+<tr><td><code>envoys.days_per_crossing_unit</code>, <code>months_at_court</code></td><td>2, 1</td></tr>
+<tr><td><code>envoys.instant_if_both_know</code> / <code>instant_excludes</code></td><td>T14; marriage, resident</td></tr>
+<tr><td><code>envoys.official_type_bonus.*</code>, <code>years_served_bonus</code>, <code>resident_years_bonus</code></td><td>+10 (gift ×1.25); +5 at 10 years; +5 at 5 years</td></tr>
+<tr><td><code>envoys.held.refused_demand_by_hostile_chance</code></td><td>0.1</td></tr>
+<tr><td><code>ledger.max_entries_per_pair</code>, <code>ledger.stance_lines</code>, <code>ledger.standing_words</code></td><td>12; +50 … −100, −10; 100 / 30 / −29 / −99</td></tr>
+<tr><td><code>ledger.ties.*</code> / <code>ledger.wrongs.*</code></td><td>the tables above</td></tr>
+<tr><td><code>reasons.standing_divisor</code>, <code>per_oath_broken</code></td><td>4, −10</td></tr>
+<tr><td><code>reasons.strength.*</code>, <code>distance.*</code>, <code>share_an_enemy</code>, <code>frontier_threat_per_province</code>, <code>allies_beyond_free</code></td><td>as above</td></tr>
+<tr><td><code>actions.*.base</code></td><td>alliance −40, calls −20/−50, marriage −15, demand −60, passage −10, trade pact −10, sworn peace −20, overlordship −80, protection −10</td></tr>
+<tr><td><code>actions.arrange_marriage</code> claim chance</td><td>0.1</td></tr>
+<tr><td><code>actions.court_lord.*</code></td><td>a step a season; 12 months; discovery 0.25</td></tr>
+<tr><td><code>actions.fund_rebels.*</code></td><td>10/25/50 gold; caught 0.1 / 0.2 / 0.05; Punish 5 years; meddling 12 months</td></tr>
+<tr><td><code>actions.ask_passage</code></td><td>24 months</td></tr>
+<tr><td><code>actions.swear_peace.truce_months</code></td><td>120</td></tr>
+<tr><td><code>war_aims.*</code></td><td>50 years; 5 years; ×3 soldiers; regency defensive and raid</td></tr>
+<tr><td><code>truce.*</code></td><td>60 + 60 months; white 60</td></tr>
+<tr><td><code>leagues.*</code></td><td>yearly; thresholds 8/8/8/6/6/4/4; count rows above; 2 members; dissolves below half</td></tr>
+<tr><td><code>answers.delay_months</code> / <code>preview_before_sending</code></td><td>1 / false (decided)</td></tr>
+<tr><td><code>answers.hint.likely_from</code> / <code>answers.hint.unlikely_to</code></td><td>+15 / −15 (the one-word hint before asking)</td></tr>
+<tr><td><code>types.friendly.duration.decay_months</code></td><td>240</td></tr>
+<tr><td><code>types.rival.duration.min_months_before_change</code></td><td>120</td></tr>
+<tr><td><code>types.hostile.duration.decay_months</code></td><td>120</td></tr>
+<tr><td><code>types.at_war.duration.war_exhaustion_peace_months</code></td><td>60 (the AI is forced to accept peace)</td></tr>
+<tr><td><code>types.truce.duration.default_months</code></td><td>60</td></tr>
+<tr><td><code>modifiers.hostile.border_raid_chance_per_month</code></td><td>0.02</td></tr>
+</tbody></table></div>
+<h2 id="still-open"><a class="anchor" href="#still-open" aria-label="Link to this section">#</a>Still open</h2>
+<p>Nothing. Every question is decided; numbers marked as placeholders in the data may still be tuned.</p>
+<h2 id="for-developers"><a class="anchor" href="#for-developers" aria-label="Link to this section">#</a>For developers</h2>
+<ul>
+<li>Spec: <code>domain/diplomacy/spec.md</code> in the game repository, requirement code <strong>DIPL</strong> (DIPL-001 to DIPL-194).</li>
+<li>Features: <code>domain/diplomacy/features/</code>, 23 files including <code>relation-model.feature</code>, <code>relation-actions.feature</code>, <code>envoys.feature</code>, <code>reasons-count.feature</code> (Hungary and Venice), <code>declaring-war.feature</code>, <code>leagues.feature</code> and <code>funding-rebels.feature</code>.</li>
+<li>Reference implementation of relation actions: <code>country-relations/tools/relations_engine.py</code>, with <code>country-relations/tests/test_rules.py</code> (27 tests) as the shared contract; config in <code>diplomacy-rules.json</code> and <code>country-relations/config/relation-rules.json</code>.</li>
+<li>Code: <code>packages/engine/src/domain/diplomacy/</code> (<code>rules.ts</code>, <code>dates.ts</code>), with numbers in <code>packages/rules/data/domain/diplomacy.json</code> and the relations at the start in <code>packages/rules/data/scenarios/1378/relations.json</code> (the 1444 checkpoint&#39;s in <code>scenarios/1444/relations.json</code>).</li>
+</ul>

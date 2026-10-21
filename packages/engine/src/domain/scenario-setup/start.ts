@@ -166,7 +166,7 @@ export function startValue(base: number, level: Level, confidence: Confidence, r
 }
 
 /** The event-tree preset behind the new-game events option (D-SETUP-7). */
-export function eventsPreset(option: "historical" | "free"): string {
+export function eventsPreset(option: "historical" | "plausible" | "free"): string {
   return (config.events_presets as Record<string, string>)[option]!;
 }
 

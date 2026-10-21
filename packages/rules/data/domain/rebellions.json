@@ -94,7 +94,9 @@
     "Persecuted": "Hunger",
     "Ungoverned": "Tax",
     "Grasping officials": "Tax",
-    "Banned language": "Homeland"
+    "Banned language": "Homeland",
+    "Newly taken": "Homeland",
+    "Unjust war": "Tax"
   },
   "faith_or_tongue_causes": ["Faith", "Homeland"],
   "clergy_scholars_causes": ["Faith", "New ideas"],

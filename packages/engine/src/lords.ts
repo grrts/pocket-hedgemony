@@ -2,13 +2,14 @@ import type { World } from "./world.ts";
 import type { News } from "./war.ts";
 import { houseMemberName, personName } from "./names.ts";
 import { loyaltyCause, realmConfig, startingLords, type Lord, type Loyalty } from "./domain/realm/index.ts";
+import { startLords, type HistoricalLordDef, type LaterLordDef } from "@ph/rules";
 
 /**
  * Lords (milestone 3): each realm starts with lords who hold some of its
  * provinces (realm REALM-166: the great houses where the data names them,
  * else one lord per 4 provinces). A lord's province gives the crown half its
- * tax and recruits while he is loyal or wavering, and nothing once he is
- * disloyal. Loyalty moves a step at a time with the realm context's causes:
+ * tax while he is loyal or wavering, and nothing once he is disloyal; its
+ * recruits are his retinue (retinues.ts). Loyalty moves a step at a time with the realm context's causes:
  * gifts, fiefs and quiet years raise it; lost wars and seized land lower it.
  */
 
@@ -26,8 +27,23 @@ export interface RealmLord {
   traits?: string[];
   /** His Want, a province id (REALM-070); unset, it is worked out from his lands' borders (lordWant). */
   want?: string;
+  /** Himself as a commander (index into the commanders), once he has first led his retinue out (WAR-254). */
+  commander?: number;
+  /** His retinue on its way to his seat after a call: men and days until it stands there (WAR-253). */
+  call?: { men: number; daysLeft: number };
   /** His wealth as a share of what he had, in percent; unset is 100 (a summoned house's falls, INST-063). */
   wealth?: number;
+  /** His age (REALM-273); unset, people.ts draws it from his index the first time it is needed. */
+  age?: number;
+  /** The son who takes his lands when he dies, null for none (REALM-070, REALM-079). */
+  heir?: { name: string; age: number } | null;
+  /** His line died out: his lands went back to the crown (REALM-082). */
+  gone?: boolean;
+  /** What his lands make him: "Earl of Northumberland" (REALM-291); passes to whoever holds them after him. */
+  title?: string;
+  /** A real person of history: his id in the start's historical lords, and one line on who he was (REALM-290). His heir is not. */
+  historical?: string;
+  note?: string;
 }
 
 export interface LordState {
@@ -71,23 +87,29 @@ export function seedLords(world: World): void {
     const def = world.rules.nations[n]!;
     const capital = world.provinceIndex.get(def.capital);
     if (capital === undefined) continue;
+    const history = startLords.realms[def.id] ?? [];
     if (seated[def.id]) {
       seatHouses(world, n, seated[def.id]!);
+      // The head of a seated house in history is that house's lord (REALM-292); the others are seated on their own land.
+      seatHistorical(world, n, capital, history.filter((h) => !world.lords.some((l) => l.nation === n && l.house === h.house && (asHistorical(world, l, h), true))));
       continue;
     }
+    const historical = seatHistorical(world, n, capital, history);
+    const reserved = reservedNames(def.id);
     const land = byDistance(world, n, capital);
-    const start = startingLords(land.length, great[def.id] ?? []);
-    const count = start.names.length || start.generated;
+    // The historical lords stand for the realm's great houses: the catalogue's list is for a later start (REALM-292).
+    const start = startingLords(land.length, history.length ? [] : (great[def.id] ?? []));
+    const count = Math.max(0, (start.names.length || start.generated) - historical);
     if (count === 0) continue;
     const royal = Math.max(1, Math.ceil(land.length * royalShare));
-    const rest = land.slice(royal);
+    const rest = land.slice(royal).filter((p) => world.provinceLord[p]! < 0);
     if (rest.length === 0) continue;
     const seats = Array.from({ length: Math.min(count, rest.length) }, (_, k) => rest[Math.floor((k * rest.length) / Math.min(count, rest.length))]!);
     const first = world.lords.length;
     seats.forEach((seat, k) => {
       const place = world.rules.provinces[seat]!.name;
       const house = start.names[k] ? capitalize(start.names[k]!) : place;
-      world.lords.push({ name: personName(world.rules, n, seat * 7 + k, house), house, nation: n, loyalty: "Loyal", upCredit: 0 });
+      world.lords.push({ name: generatedName(world, n, seat * 7 + k, house, reserved), house, nation: n, loyalty: "Loyal", upCredit: 0 });
       world.provinceLord[seat] = first + k;
     });
     // Each lord's lands grow outward from his seat over the land no one else holds.
@@ -111,6 +133,129 @@ export function seedLords(world: World): void {
   }
 }
 
+/**
+ * Seats a realm's historical lords on the land history gave them, where the
+ * realm holds it at the start: never its capital, never land another lord
+ * already holds (REALM-290). Returns how many were seated.
+ */
+function seatHistorical(world: World, n: number, capital: number, history: readonly HistoricalLordDef[]): number {
+  let seated = 0;
+  for (const h of history) {
+    const land = h.provinces.map((id) => world.provinceIndex.get(id)).filter((p): p is number => p !== undefined && p !== capital && world.provinceOwner[p] === n && world.provinceLord[p]! < 0);
+    if (!land.length) continue;
+    const k = world.lords.length;
+    const l: RealmLord = { name: h.name, house: h.house, nation: n, loyalty: "Loyal", upCredit: 0 };
+    asHistorical(world, l, h);
+    world.lords.push(l);
+    for (const p of land) world.provinceLord[p] = k;
+    seated++;
+  }
+  return seated;
+}
+
+/** Words of rank, not family: a historical "Lala Şahin Pasha" leaves other pashas their name. */
+const RANKS = new Set(["pasha", "bey", "beg", "khan", "mirza", "shah", "malik", "ağa", "the", "grim", "bold"]);
+
+/**
+ * The houses and family names of a realm's historical lords, now and later:
+ * no generated lord of the start takes them (REALM-291), so 1378 Hungary has
+ * no generated Hunyadi beside the one an event brings in.
+ */
+function reservedNames(realm: string): RegExp | null {
+  const people = [...(startLords.realms[realm] ?? []), ...Object.values(startLords.later).filter((h) => h.realm === realm)];
+  const words = new Set<string>();
+  for (const h of people) {
+    for (const part of h.house.split(/[(),]/)) if (part.trim()) words.add(part.trim());
+    const last = h.name.split(/\s+/).at(-1)!;
+    if (h.name.includes(" ") && !RANKS.has(last.toLowerCase())) words.add(last);
+  }
+  // A long family name also catches its forms (Rožmberk, z Rožmberka); a short one must stand alone.
+  const word = (w: string) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + (w.length >= 5 ? "" : "(?=$|[\\s'-])");
+  return words.size ? new RegExp(`(^|[\\s'-])(${[...words].map(word).join("|")})`, "iu") : null;
+}
+
+/** A generated lord's name, drawn again (a few times at most) while it is a historical lord's house or name. */
+function generatedName(world: World, n: number, seed: number, place: string, reserved: RegExp | null): string {
+  let name = personName(world.rules, n, seed, place);
+  for (let i = 1; reserved && reserved.test(name) && i <= 8; i++) name = personName(world.rules, n, seed + i * 7919, place);
+  return name;
+}
+
+/** Makes a lord the historical person: his name, house, title, traits, age and heir by the start year (where the sources give his birth; else the game draws them), and the line on who he was. */
+export function asHistorical(world: World, l: RealmLord, h: HistoricalLordDef): void {
+  const year = world.date.year;
+  l.name = h.name;
+  l.house = h.house;
+  l.title = h.title;
+  l.traits = [...h.traits];
+  if (h.born !== null) {
+    l.age = Math.max(16, year - h.born);
+    l.heir = h.heir && year >= h.heir.born ? { name: h.heir.name, age: year - h.heir.born } : null;
+  }
+  l.historical = h.id;
+  l.note = h.note;
+  if (h.loyalty) l.loyalty = h.loyalty;
+}
+
+/**
+ * A historical figure comes to a realm by an event (REALM-295, REALM-296).
+ * Where a generated lord holds his seat, or his data says he takes over and
+ * any lord holds it, he takes that lord's place: the lands, loyalty and men
+ * are now his. Otherwise he joins as a new loyal lord. Either way he also
+ * takes the rest of his lands that are royal or a generated lord's (who keeps
+ * at least one province), never another historical lord's and never the
+ * capital. Nothing happens if he is already a lord or the realm holds none of
+ * his lands. Returns his index, or -1.
+ */
+export function historicalLordComes(world: World, n: number, h: LaterLordDef, news: News[] = []): number {
+  if (world.lords.some((l) => l.historical === h.id && !l.gone)) return -1;
+  const capital = world.provinceIndex.get(world.rules.nations[n]!.capital);
+  const land = h.provinces.map((id) => world.provinceIndex.get(id)).filter((p): p is number => p !== undefined && p !== capital && world.provinceOwner[p] === n);
+  if (!land.length) return -1;
+  const holder = world.provinceLord[land[0]!]!;
+  let k: number;
+  let line: string;
+  if (holder >= 0 && (h.takes_over || !world.lords[holder]!.historical)) {
+    k = holder;
+    const l = world.lords[k]!;
+    const was = l.name;
+    asHistorical(world, l, h);
+    l.upCredit = 0;
+    delete l.want;
+    // His men follow their new lord (WAR-252).
+    const c = l.commander;
+    if (c !== undefined && world.commanders[c]) Object.assign(world.commanders[c]!, { name: l.name, ...(l.age === undefined ? {} : { age: l.age }) });
+    line = `${h.name} takes the lands of ${was}: he is ${h.title} now.`;
+  } else {
+    k = world.lords.length;
+    const l: RealmLord = { name: h.name, house: h.house, nation: n, loyalty: "Loyal", upCredit: 0 };
+    asHistorical(world, l, h);
+    world.lords.push(l);
+    line = `${h.name} joins your realm as ${h.title}.`;
+  }
+  for (const p of land) {
+    const was = world.provinceLord[p]!;
+    if (was === k) continue;
+    if (was < 0 || (!world.lords[was]!.historical && lordLands(world, was).length > 1)) world.provinceLord[p] = k;
+  }
+  // A new lord who got none of his lands (all held by others) has no place after all.
+  if (!lordLands(world, k).length) {
+    world.lords.pop();
+    return -1;
+  }
+  if (n === world.player) news.push({ kind: "ruler", text: line, nations: [n], province: land[0]! });
+  return k;
+}
+
+/** The historical figure an event names, by id (REALM-295). */
+export const laterLord = (id: string): LaterLordDef | undefined => startLords.later[id];
+
+/** Someone new holds a lord's lands (an heir, a kinsman, a confirmed son): the title stays with the lands, the history was the man's. */
+export function newHolder(l: RealmLord): void {
+  delete l.historical;
+  delete l.note;
+}
+
 /** Great houses the realm data seats on named land (D-INST-1): each holds its listed provinces that the realm owns; the rest is royal. */
 function seatHouses(world: World, n: number, houses: Record<string, { name: string; provinces: string[] }>): void {
   for (const h of Object.values(houses)) {
@@ -129,7 +274,7 @@ export function lordLands(world: World, lord: number): number[] {
   return out;
 }
 
-/** Share of a province's tax and recruits that reaches the crown: all of royal land, half of a lord's, none of a disloyal lord's. */
+/** Share of a province's tax that reaches the crown: all of royal land, half of a lord's, none of a disloyal lord's. */
 export function crownShare(world: World, p: number): number {
   const l = world.provinceLord[p]!;
   if (l < 0) return 1;
@@ -137,11 +282,34 @@ export function crownShare(world: World, p: number): number {
   return loyalty === "Loyal" || loyalty === "Wavering" ? 1 - realmConfig.lords.tax_share : 0;
 }
 
-/** Moves a lord one step by a realm-context cause (REALM-088, REALM-089, great lords REALM-162). */
-export function loyaltyStep(world: World, lord: number, cause: string, news: News[] = []): void {
+/** The lord a commander is, or -1: a lord leads only his own retinue (RECR-111, WAR-255). */
+export function lordOfCommander(world: World, c: number): number {
+  // Only a lord's own command has his origin: the common case answers without a search.
+  if (c < 0 || world.commanders[c]?.origin !== "a lord") return -1;
+  return world.lords.findIndex((l) => l.commander === c);
+}
+
+/** Men coming home to a lord's lands fill their recruit pools, by each one's gap (WAR-256). */
+export function lordSendHome(world: World, lord: number, men: number): void {
+  if (men <= 0 || lord < 0) return;
+  const lands = lordLands(world, lord);
+  const gap = lands.reduce((t, p) => t + Math.max(0, world.provinceRecruitCeiling[p]! - world.provinceRecruits[p]!), 0);
+  if (gap <= 0) return;
+  const share = Math.min(1, men / gap);
+  for (const p of lands) world.provinceRecruits[p] = world.provinceRecruits[p]! + Math.max(0, world.provinceRecruitCeiling[p]! - world.provinceRecruits[p]!) * share;
+}
+
+/**
+ * Moves a lord one step by a realm-context cause (REALM-088, REALM-089, great
+ * lords REALM-162). A caller stepping many lords passes each one's number of
+ * provinces, counted in one pass, instead of a search of the map per lord.
+ */
+export function loyaltyStep(world: World, lord: number, cause: string, news: News[] = [], lands?: number): void {
   const l = world.lords[lord]!;
   const before = l.loyalty;
-  const view: Lord = { name: l.name, house: l.house, provinces: lordLands(world, lord).map(String), retinue: 0, wealth: 0, traits: [], loyalty: l.loyalty, upCredit: l.upCredit, sons: [] };
+  // A great lord is known by how many provinces he holds (greatLordReasons).
+  const provinces = lands === undefined ? lordLands(world, lord).map(String) : Array.from({ length: lands }, (_, i) => String(i));
+  const view: Lord = { name: l.name, house: l.house, provinces, retinue: 0, wealth: 0, traits: [], loyalty: l.loyalty, upCredit: l.upCredit, sons: [] };
   l.loyalty = loyaltyCause(view, cause);
   l.upCredit = view.upCredit ?? 0;
   if (l.nation === world.player && l.loyalty !== before && LOYALTY.indexOf(l.loyalty) > LOYALTY.indexOf(before)) {
@@ -157,7 +325,7 @@ export function inAnyWar(world: World, n: number): boolean {
 
 /** A realm lost a war: its lords think less of the crown. */
 export function lordsLoseWar(world: World, n: number, news: News[]): void {
-  world.lords.forEach((l, k) => l.nation === n && loyaltyStep(world, k, "war_lost", news));
+  world.lords.forEach((l, k) => l.nation === n && !l.gone && loyaltyStep(world, k, "war_lost", news));
 }
 
 /** Gold a gift to a lord costs. */
@@ -179,6 +347,7 @@ export function giveGift(world: World, n: number, lord: number): string | null {
 /** Grants a royal province to a lord as a fief: the want granted raises his loyalty. */
 export function grantFief(world: World, n: number, province: number, lord: number): string | null {
   const l = world.lords[lord];
+  if (l?.gone) return "his line has died out";
   if (!l || l.nation !== n) return "not your lord";
   if (world.provinceOwner[province] !== n) return "not your province";
   if (world.provinceLord[province]! >= 0) return "a lord holds it already";
@@ -194,7 +363,7 @@ export function seizeFief(world: World, n: number, province: number, news: News[
   if (world.provinceOwner[province] !== n || lord < 0) return "no lord of yours holds it";
   world.provinceLord[province] = -1;
   loyaltyStep(world, lord, "land_seized_from_him", news);
-  world.lords.forEach((l, k) => k !== lord && l.nation === n && loyaltyStep(world, k, "land_seized_from_another", news));
+  world.lords.forEach((l, k) => k !== lord && l.nation === n && !l.gone && loyaltyStep(world, k, "land_seized_from_another", news));
   return null;
 }
 
@@ -208,9 +377,13 @@ export function monthlyLords(world: World, atPeace: (n: number) => boolean, news
     const l = world.provinceLord[p]!;
     if (l >= 0 && world.lords[l]!.nation !== world.provinceOwner[p]) world.provinceLord[p] = -1;
   }
-  if (world.date.month === 1) world.lords.forEach((l, k) => l.loyalty !== "Loyal" && atPeace(l.nation) && loyaltyStep(world, k, "long_secure_reign", news));
+  if (world.date.month === 1) {
+    const lands = new Int32Array(world.lords.length);
+    for (let p = 0; p < world.provinceCount; p++) if (world.provinceLord[p]! >= 0) lands[world.provinceLord[p]!]! += 1;
+    world.lords.forEach((l, k) => !l.gone && l.loyalty !== "Loyal" && atPeace(l.nation) && loyaltyStep(world, k, "long_secure_reign", news, lands[k]!));
+  }
   world.lords.forEach((l, k) => {
-    if (l.nation === world.player || (l.loyalty !== "Disloyal" && l.loyalty !== "Wavering")) return;
+    if (l.gone || l.nation === world.player || (l.loyalty !== "Disloyal" && l.loyalty !== "Wavering")) return;
     // REALM-171 gives when it has 20 domain gold; here, when the treasury holds two gifts.
     if (world.nationTreasury[l.nation]! >= giftGold(world) * 2) giveGift(world, l.nation, k);
   });
