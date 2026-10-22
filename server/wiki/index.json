@@ -1326,12 +1326,32 @@
      "level": 4
     },
     {
+     "id": "general-dies",
+     "text": "General dies",
+     "level": 3
+    },
+    {
+     "id": "options-2",
+     "text": "Options",
+     "level": 4
+    },
+    {
+     "id": "admiral-dies",
+     "text": "Admiral dies",
+     "level": 3
+    },
+    {
+     "id": "options-3",
+     "text": "Options",
+     "level": 4
+    },
+    {
      "id": "lord-slighted",
      "text": "Lord slighted",
      "level": 3
     },
     {
-     "id": "options-2",
+     "id": "options-4",
      "text": "Options",
      "level": 4
     },
@@ -1341,7 +1361,7 @@
      "level": 3
     },
     {
-     "id": "options-3",
+     "id": "options-5",
      "text": "Options",
      "level": 4
     },
@@ -1351,7 +1371,7 @@
      "level": 3
     },
     {
-     "id": "options-4",
+     "id": "options-6",
      "text": "Options",
      "level": 4
     },
@@ -1361,7 +1381,7 @@
      "level": 3
     },
     {
-     "id": "options-5",
+     "id": "options-7",
      "text": "Options",
      "level": 4
     },
@@ -1371,7 +1391,7 @@
      "level": 3
     },
     {
-     "id": "options-6",
+     "id": "options-8",
      "text": "Options",
      "level": 4
     },
@@ -1381,7 +1401,7 @@
      "level": 3
     },
     {
-     "id": "options-7",
+     "id": "options-9",
      "text": "Options",
      "level": 4
     },
@@ -1391,7 +1411,7 @@
      "level": 3
     },
     {
-     "id": "options-8",
+     "id": "options-10",
      "text": "Options",
      "level": 4
     },
@@ -1401,7 +1421,7 @@
      "level": 3
     },
     {
-     "id": "options-9",
+     "id": "options-11",
      "text": "Options",
      "level": 4
     },
@@ -1411,7 +1431,7 @@
      "level": 3
     },
     {
-     "id": "options-10",
+     "id": "options-12",
      "text": "Options",
      "level": 4
     },
@@ -1421,7 +1441,7 @@
      "level": 3
     },
     {
-     "id": "options-11",
+     "id": "options-13",
      "text": "Options",
      "level": 4
     },
@@ -1431,7 +1451,7 @@
      "level": 3
     },
     {
-     "id": "options-12",
+     "id": "options-14",
      "text": "Options",
      "level": 4
     },
@@ -1441,7 +1461,7 @@
      "level": 3
     },
     {
-     "id": "options-13",
+     "id": "options-15",
      "text": "Options",
      "level": 4
     },
@@ -1451,7 +1471,7 @@
      "level": 3
     },
     {
-     "id": "options-14",
+     "id": "options-16",
      "text": "Options",
      "level": 4
     },
@@ -1461,7 +1481,7 @@
      "level": 3
     },
     {
-     "id": "options-15",
+     "id": "options-17",
      "text": "Options",
      "level": 4
     },
@@ -1471,7 +1491,7 @@
      "level": 3
     },
     {
-     "id": "options-16",
+     "id": "options-18",
      "text": "Options",
      "level": 4
     },
@@ -1481,7 +1501,7 @@
      "level": 3
     },
     {
-     "id": "options-17",
+     "id": "options-19",
      "text": "Options",
      "level": 4
     },
@@ -1491,7 +1511,7 @@
      "level": 3
     },
     {
-     "id": "options-18",
+     "id": "options-20",
      "text": "Options",
      "level": 4
     },
@@ -1501,7 +1521,7 @@
      "level": 3
     },
     {
-     "id": "options-19",
+     "id": "options-21",
      "text": "Options",
      "level": 4
     },
@@ -1511,7 +1531,7 @@
      "level": 3
     },
     {
-     "id": "options-20",
+     "id": "options-22",
      "text": "Options",
      "level": 4
     },
@@ -1521,7 +1541,7 @@
      "level": 3
     },
     {
-     "id": "options-21",
+     "id": "options-23",
      "text": "Options",
      "level": 4
     },
@@ -1531,7 +1551,7 @@
      "level": 3
     },
     {
-     "id": "options-22",
+     "id": "options-24",
      "text": "Options",
      "level": 4
     },
@@ -1541,7 +1561,7 @@
      "level": 3
     },
     {
-     "id": "options-23",
+     "id": "options-25",
      "text": "Options",
      "level": 4
     },
@@ -1551,7 +1571,7 @@
      "level": 3
     },
     {
-     "id": "options-24",
+     "id": "options-26",
      "text": "Options",
      "level": 4
     },
@@ -1561,7 +1581,7 @@
      "level": 3
     },
     {
-     "id": "options-25",
+     "id": "options-27",
      "text": "Options",
      "level": 4
     },
@@ -1571,7 +1591,7 @@
      "level": 3
     },
     {
-     "id": "options-26",
+     "id": "options-28",
      "text": "Options",
      "level": 4
     },
@@ -1581,7 +1601,7 @@
      "level": 3
     },
     {
-     "id": "options-27",
+     "id": "options-29",
      "text": "Options",
      "level": 4
     },
@@ -1591,7 +1611,7 @@
      "level": 3
     },
     {
-     "id": "options-28",
+     "id": "options-30",
      "text": "Options",
      "level": 4
     },
@@ -1601,7 +1621,7 @@
      "level": 3
     },
     {
-     "id": "options-29",
+     "id": "options-31",
      "text": "Options",
      "level": 4
     },
@@ -1611,7 +1631,7 @@
      "level": 3
     },
     {
-     "id": "options-30",
+     "id": "options-32",
      "text": "Options",
      "level": 4
     },
@@ -1621,7 +1641,7 @@
      "level": 3
     },
     {
-     "id": "options-31",
+     "id": "options-33",
      "text": "Options",
      "level": 4
     },
@@ -1631,7 +1651,7 @@
      "level": 3
     },
     {
-     "id": "options-32",
+     "id": "options-34",
      "text": "Options",
      "level": 4
     },
@@ -1641,7 +1661,7 @@
      "level": 3
     },
     {
-     "id": "options-33",
+     "id": "options-35",
      "text": "Options",
      "level": 4
     },
@@ -1651,7 +1671,7 @@
      "level": 3
     },
     {
-     "id": "options-34",
+     "id": "options-36",
      "text": "Options",
      "level": 4
     },
@@ -1661,7 +1681,7 @@
      "level": 3
     },
     {
-     "id": "options-35",
+     "id": "options-37",
      "text": "Options",
      "level": 4
     },
@@ -1671,7 +1691,7 @@
      "level": 3
     },
     {
-     "id": "options-36",
+     "id": "options-38",
      "text": "Options",
      "level": 4
     },
@@ -1681,7 +1701,7 @@
      "level": 3
     },
     {
-     "id": "options-37",
+     "id": "options-39",
      "text": "Options",
      "level": 4
     },
@@ -1691,7 +1711,7 @@
      "level": 3
     },
     {
-     "id": "options-38",
+     "id": "options-40",
      "text": "Options",
      "level": 4
     },
@@ -1701,7 +1721,7 @@
      "level": 3
     },
     {
-     "id": "options-39",
+     "id": "options-41",
      "text": "Options",
      "level": 4
     },
@@ -1711,7 +1731,7 @@
      "level": 3
     },
     {
-     "id": "options-40",
+     "id": "options-42",
      "text": "Options",
      "level": 4
     },
@@ -1721,7 +1741,7 @@
      "level": 3
     },
     {
-     "id": "options-41",
+     "id": "options-43",
      "text": "Options",
      "level": 4
     },
@@ -1731,7 +1751,7 @@
      "level": 3
     },
     {
-     "id": "options-42",
+     "id": "options-44",
      "text": "Options",
      "level": 4
     },
@@ -1741,7 +1761,7 @@
      "level": 3
     },
     {
-     "id": "options-43",
+     "id": "options-45",
      "text": "Options",
      "level": 4
     },
@@ -1751,7 +1771,7 @@
      "level": 3
     },
     {
-     "id": "options-44",
+     "id": "options-46",
      "text": "Options",
      "level": 4
     },
@@ -1761,7 +1781,7 @@
      "level": 3
     },
     {
-     "id": "options-45",
+     "id": "options-47",
      "text": "Options",
      "level": 4
     },
@@ -1771,7 +1791,7 @@
      "level": 3
     },
     {
-     "id": "options-46",
+     "id": "options-48",
      "text": "Options",
      "level": 4
     },
@@ -1781,7 +1801,7 @@
      "level": 3
     },
     {
-     "id": "options-47",
+     "id": "options-49",
      "text": "Options",
      "level": 4
     },
@@ -1791,7 +1811,7 @@
      "level": 3
     },
     {
-     "id": "options-48",
+     "id": "options-50",
      "text": "Options",
      "level": 4
     },
@@ -1801,7 +1821,7 @@
      "level": 3
     },
     {
-     "id": "options-49",
+     "id": "options-51",
      "text": "Options",
      "level": 4
     },
@@ -1811,7 +1831,7 @@
      "level": 3
     },
     {
-     "id": "options-50",
+     "id": "options-52",
      "text": "Options",
      "level": 4
     },
@@ -1821,7 +1841,7 @@
      "level": 3
     },
     {
-     "id": "options-51",
+     "id": "options-53",
      "text": "Options",
      "level": 4
     },
@@ -1831,7 +1851,7 @@
      "level": 3
     },
     {
-     "id": "options-52",
+     "id": "options-54",
      "text": "Options",
      "level": 4
     },
@@ -1841,7 +1861,7 @@
      "level": 3
     },
     {
-     "id": "options-53",
+     "id": "options-55",
      "text": "Options",
      "level": 4
     },
@@ -1851,7 +1871,7 @@
      "level": 3
     },
     {
-     "id": "options-54",
+     "id": "options-56",
      "text": "Options",
      "level": 4
     },
@@ -1861,7 +1881,7 @@
      "level": 3
     },
     {
-     "id": "options-55",
+     "id": "options-57",
      "text": "Options",
      "level": 4
     },
@@ -1871,7 +1891,7 @@
      "level": 3
     },
     {
-     "id": "options-56",
+     "id": "options-58",
      "text": "Options",
      "level": 4
     },
@@ -1881,7 +1901,7 @@
      "level": 3
     },
     {
-     "id": "options-57",
+     "id": "options-59",
      "text": "Options",
      "level": 4
     },
@@ -1891,7 +1911,7 @@
      "level": 3
     },
     {
-     "id": "options-58",
+     "id": "options-60",
      "text": "Options",
      "level": 4
     }

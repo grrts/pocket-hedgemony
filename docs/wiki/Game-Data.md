@@ -29,5 +29,5 @@ Keys are written as in the config. Shares are fractions (0.25 is 25 %). A value 
 | [Revolutions](Data-Revolutions) | 3186 | `domain/revolutions.json` | [Revolutions](Revolutions) |
 | [National strengths](Data-National-Strengths) | 2436 | `domain/national-strengths.json` | [National Strengths](National-Strengths) |
 | [Events](Data-Events) | 560 | `domain/events.json` | [Historical Events](Historical-Events) |
-| [Everyday events](Data-Events-Everyday) | 1051 | `domain/events-everyday.json` | [Historical Events](Historical-Events) |
+| [Everyday events](Data-Events-Everyday) | 1079 | `domain/events-everyday.json` | [Historical Events](Historical-Events) |
 | [Achievements](Data-Achievements) | 952 | `domain/achievements.json` | [Achievements](Achievements) |

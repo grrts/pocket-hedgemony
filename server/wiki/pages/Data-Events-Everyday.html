@@ -2,7 +2,7 @@
 <p>Every value in the game&#39;s everyday events config, exactly as the game reads it. This page is made from <code>packages/rules/data/domain/events-everyday.json</code> each time the config changes, so it always matches the game. How these values are used is explained on <a href="/wiki/Historical-Events">Historical Events</a>.</p>
 <p>Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and values marked (provisional) are placeholders that may still change in balancing. Inventions are shown by id and name; see <a href="/wiki/Data-Research#inventions">Research data</a>.</p>
 <blockquote>
-<p>Everyday events (domain/events/spec.md §5.22, EVT-115 to EVT-128; feedback 152). Small choices about the realm&#39;s own people and stores, drawn from what the game already holds: its officials, lords, ruler and heir, and food stores, and plague reaching a province of the player&#39;s (EVT-130: not drawn; plague fires it). Each realm draws one every `months_between` months (a range), never while the player has an event waiting; the player&#39;s realm never draws the same event again within `rest_years` (EVT-134). `where` limits an event to realms in those regions or wider regions (exploration-regions.json), `from` and `to` to those years (EVT-133). `weight` is how often an event is drawn among the ones that can happen; `needs` names what it is about. Options list their effects in the engine&#39;s small vocabulary (gold, loyalty, official, lands, heir, heir_risk, food_back, new_lord, quarantine, care; and for an event about a province, EVT-135: food in months of eating, people and recruits as a share, light_tax in years); `ai` weights the AI&#39;s pick; `needs` on an option hides it when the realm lacks what it asks. `{words}` in braces are filled with the names of who and where. Every number is a placeholder for balance.</p>
+<p>Everyday events (domain/events/spec.md §5.22, EVT-115 to EVT-128; feedback 152). Small choices about the realm&#39;s own people and stores, drawn from what the game already holds: its officials, lords, ruler and heir, and food stores, plague reaching a province of the player&#39;s (EVT-130: not drawn; plague fires it), and the death of one of the player&#39;s officials, lords, generals or admirals (EVT-122, EVT-123, EVT-132: not drawn; the death of people fires it). Each realm draws one every `months_between` months (a range), never while the player has an event waiting; the player&#39;s realm never draws the same event again within `rest_years` (EVT-134). `where` limits an event to realms in those regions or wider regions (exploration-regions.json), `from` and `to` to those years (EVT-133). `weight` is how often an event is drawn among the ones that can happen; `needs` names what it is about. Options list their effects in the engine&#39;s small vocabulary (gold, loyalty, official, lands, heir, heir_risk, food_back, new_lord, quarantine, care, command, home; and for an event about a province, EVT-135: food in months of eating, people and recruits as a share, light_tax in years); `ai` weights the AI&#39;s pick; `needs` on an option hides it when the realm lacks what it asks (`lord2`: a second lord; `leaderless`: the dead commander&#39;s men or ships still without a leader). `{words}` in braces are filled with the names of who and where. Every number is a placeholder for balance.</p>
 </blockquote>
 <div class="table-scroll"><table>
 <thead><tr><th>Key</th><th>Value</th></tr></thead>
@@ -23,10 +23,10 @@
 <div class="table-scroll"><table>
 <thead><tr><th>Key</th><th>Value</th></tr></thead>
 <tbody>
-<tr><td><code>weight</code></td><td>2</td></tr>
-<tr><td><code>needs</code></td><td>official</td></tr>
-<tr><td><code>title</code></td><td>Death of {official}</td></tr>
-<tr><td><code>text</code></td><td>{official}, your {type} at {province}, has died after {years} years in the post. His clerks wait to hear who will take his seat.</td></tr>
+<tr><td><code>weight</code></td><td>0</td></tr>
+<tr><td><code>needs</code></td><td>death</td></tr>
+<tr><td><code>title</code></td><td>Death of {dead}</td></tr>
+<tr><td><code>text</code></td><td>{dead}, your {type} at {province}, has died after {years} years in the post. The seat stands empty, and his clerks wait to hear who will take it.</td></tr>
 </tbody></table></div>
 <h4 id="options"><a class="anchor" href="#options" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
@@ -40,10 +40,10 @@
 <div class="table-scroll"><table>
 <thead><tr><th>Key</th><th>Value</th></tr></thead>
 <tbody>
-<tr><td><code>weight</code></td><td>2</td></tr>
-<tr><td><code>needs</code></td><td>lord</td></tr>
-<tr><td><code>title</code></td><td>Death of {lord}</td></tr>
-<tr><td><code>text</code></td><td>{lord} of the house of {house} has died. His son {son} asks you to confirm him in his father&#39;s lands ({lands}).</td></tr>
+<tr><td><code>weight</code></td><td>0</td></tr>
+<tr><td><code>needs</code></td><td>death</td></tr>
+<tr><td><code>title</code></td><td>Death of {dead}</td></tr>
+<tr><td><code>text</code></td><td>{dead} of the house of {house} has died. His heir {son} has taken his lands ({lands}) and asks you to confirm him in them.</td></tr>
 </tbody></table></div>
 <h4 id="options-1"><a class="anchor" href="#options-1" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
@@ -52,6 +52,38 @@
 <tr><td>confirm</td><td>Confirm {son}</td><td>4</td><td>(new_lord: yes)</td></tr>
 <tr><td>relief</td><td>Ask a fee for his lands</td><td>2</td><td>(new_lord: yes), (gold: 20), (loyalty: heavy_taxes; who: lord)</td></tr>
 <tr><td>take</td><td>Take his lands for the crown</td><td>1</td><td>(lands: crown), (loyalty: land_seized_from_another; who: other_lords)</td></tr>
+</tbody></table></div>
+<h3 id="general-dies"><a class="anchor" href="#general-dies" aria-label="Link to this section">#</a>General dies</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>weight</code></td><td>0</td></tr>
+<tr><td><code>needs</code></td><td>death</td></tr>
+<tr><td><code>title</code></td><td>Death of {dead}</td></tr>
+<tr><td><code>text</code></td><td>{dead}, your general, has died at {province}. Without him his men take no orders and make for crown land, to stand there as a garrison. His second in command, {second}, asks to lead them in his place.</td></tr>
+</tbody></table></div>
+<h4 id="options-2"><a class="anchor" href="#options-2" aria-label="Link to this section">#</a>Options</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>id</th><th>name</th><th>needs</th><th>ai</th><th>effects</th></tr></thead>
+<tbody>
+<tr><td>second</td><td>Give {second} the command</td><td>leaderless</td><td>2</td><td>(gold: -15), (command: yes)</td></tr>
+<tr><td>home</td><td>Let them go home</td><td></td><td>1</td><td>(home: army)</td></tr>
+</tbody></table></div>
+<h3 id="admiral-dies"><a class="anchor" href="#admiral-dies" aria-label="Link to this section">#</a>Admiral dies</h3>
+<div class="table-scroll"><table>
+<thead><tr><th>Key</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><code>weight</code></td><td>0</td></tr>
+<tr><td><code>needs</code></td><td>death</td></tr>
+<tr><td><code>title</code></td><td>Death of {dead}</td></tr>
+<tr><td><code>text</code></td><td>{dead}, your admiral, has died at {province}. Without him his ships take no orders and make for the nearest port of yours. His flag captain, {second}, asks to keep the fleet at sea under his own flag.</td></tr>
+</tbody></table></div>
+<h4 id="options-3"><a class="anchor" href="#options-3" aria-label="Link to this section">#</a>Options</h4>
+<div class="table-scroll"><table>
+<thead><tr><th>id</th><th>name</th><th>needs</th><th>ai</th><th>effects</th></tr></thead>
+<tbody>
+<tr><td>second</td><td>Give {second} the fleet</td><td>leaderless</td><td>2</td><td>(gold: -15), (command: yes)</td></tr>
+<tr><td>home</td><td>Let them sail home</td><td></td><td>1</td><td>(home: fleet)</td></tr>
 </tbody></table></div>
 <h3 id="lord-slighted"><a class="anchor" href="#lord-slighted" aria-label="Link to this section">#</a>Lord slighted</h3>
 <div class="table-scroll"><table>
@@ -62,7 +94,7 @@
 <tr><td><code>title</code></td><td>{lord} feels slighted</td></tr>
 <tr><td><code>text</code></td><td>{lord} of the house of {house} was seated below a lesser man at your table, and talks against you in his hall.</td></tr>
 </tbody></table></div>
-<h4 id="options-2"><a class="anchor" href="#options-2" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-4"><a class="anchor" href="#options-4" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th><th>needs</th></tr></thead>
 <tbody>
@@ -79,7 +111,7 @@
 <tr><td><code>title</code></td><td>{lord} speaks well of you</td></tr>
 <tr><td><code>text</code></td><td>{lord} of the house of {house} has been heard praising your rule in his hall. A word from you now could win him over.</td></tr>
 </tbody></table></div>
-<h4 id="options-3"><a class="anchor" href="#options-3" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-5"><a class="anchor" href="#options-5" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -95,7 +127,7 @@
 <tr><td><code>title</code></td><td>{lord} and {lord2} quarrel</td></tr>
 <tr><td><code>text</code></td><td>{lord} and {lord2} both claim a mill and its meadows on the edge of their lands, and each asks you to judge for him.</td></tr>
 </tbody></table></div>
-<h4 id="options-4"><a class="anchor" href="#options-4" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-6"><a class="anchor" href="#options-6" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -112,7 +144,7 @@
 <tr><td><code>title</code></td><td>{lord} is hurt</td></tr>
 <tr><td><code>text</code></td><td>{lord} of the house of {house} fell from his horse while hunting and lies in his hall with a broken leg.</td></tr>
 </tbody></table></div>
-<h4 id="options-5"><a class="anchor" href="#options-5" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-7"><a class="anchor" href="#options-7" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -128,7 +160,7 @@
 <tr><td><code>title</code></td><td>A child is born</td></tr>
 <tr><td><code>text</code></td><td>A {child} is born to {ruler}, and named {childName}. The bells ring in every town of the realm.</td></tr>
 </tbody></table></div>
-<h4 id="options-6"><a class="anchor" href="#options-6" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-8"><a class="anchor" href="#options-8" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th><th>needs</th></tr></thead>
 <tbody>
@@ -145,7 +177,7 @@
 <tr><td><code>title</code></td><td>{heir} falls ill</td></tr>
 <tr><td><code>text</code></td><td>Your heir {heir}, aged {heirAge}, is burning with fever. The court physicians shake their heads.</td></tr>
 </tbody></table></div>
-<h4 id="options-7"><a class="anchor" href="#options-7" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-9"><a class="anchor" href="#options-9" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -162,7 +194,7 @@
 <tr><td><code>title</code></td><td>Grain rots at {province}</td></tr>
 <tr><td><code>text</code></td><td>Damp has got into the granaries at {province}. The keepers have thrown out {loss} months of grain.</td></tr>
 </tbody></table></div>
-<h4 id="options-8"><a class="anchor" href="#options-8" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-10"><a class="anchor" href="#options-10" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th><th>needs</th></tr></thead>
 <tbody>
@@ -180,7 +212,7 @@
 <tr><td><code>title</code></td><td>Fire in the granary at {province}</td></tr>
 <tr><td><code>text</code></td><td>A fire in the night has burned half of {province}&#39;s granary: {loss} months of grain are lost.</td></tr>
 </tbody></table></div>
-<h4 id="options-9"><a class="anchor" href="#options-9" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-11"><a class="anchor" href="#options-11" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th><th>needs</th></tr></thead>
 <tbody>
@@ -197,7 +229,7 @@
 <tr><td><code>title</code></td><td>Plague at {province}</td></tr>
 <tr><td><code>text</code></td><td>Men are falling sick at {province}: fever, black swellings, death in three days. The townsfolk die first. What will you do?</td></tr>
 </tbody></table></div>
-<h4 id="options-10"><a class="anchor" href="#options-10" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-12"><a class="anchor" href="#options-12" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -215,7 +247,7 @@
 <tr><td><code>title</code></td><td>Rats in the stores at {province}</td></tr>
 <tr><td><code>text</code></td><td>Rats have overrun the stores at {province} and spoiled {loss} months of grain.</td></tr>
 </tbody></table></div>
-<h4 id="options-11"><a class="anchor" href="#options-11" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-13"><a class="anchor" href="#options-13" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -231,7 +263,7 @@
 <tr><td><code>title</code></td><td>A rich harvest at {province}</td></tr>
 <tr><td><code>text</code></td><td>The barns at {province} are full to the rafters, and the reeves say they have not seen such a year in living memory.</td></tr>
 </tbody></table></div>
-<h4 id="options-12"><a class="anchor" href="#options-12" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-14"><a class="anchor" href="#options-14" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th><th>needs</th></tr></thead>
 <tbody>
@@ -248,7 +280,7 @@
 <tr><td><code>title</code></td><td>Hail at {province}</td></tr>
 <tr><td><code>text</code></td><td>A storm of hail has flattened the standing corn at {province}. The villagers ask how they are to pay this year&#39;s tax.</td></tr>
 </tbody></table></div>
-<h4 id="options-13"><a class="anchor" href="#options-13" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-15"><a class="anchor" href="#options-15" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -265,7 +297,7 @@
 <tr><td><code>title</code></td><td>Bandits near {province}</td></tr>
 <tr><td><code>text</code></td><td>A band of outlaws holds the woods on the road to {province}. Carters go armed, and some no longer go at all.</td></tr>
 </tbody></table></div>
-<h4 id="options-14"><a class="anchor" href="#options-14" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-16"><a class="anchor" href="#options-16" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th><th>needs</th></tr></thead>
 <tbody>
@@ -282,7 +314,7 @@
 <tr><td><code>title</code></td><td>The bridge at {province} falls</td></tr>
 <tr><td><code>text</code></td><td>Spring floods have carried away the old bridge at {province}. Traders now wait days for the ferry.</td></tr>
 </tbody></table></div>
-<h4 id="options-15"><a class="anchor" href="#options-15" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-17"><a class="anchor" href="#options-17" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -298,7 +330,7 @@
 <tr><td><code>title</code></td><td>Fire in {province}</td></tr>
 <tr><td><code>text</code></td><td>A fire that began in a baker&#39;s oven has burned a whole quarter of the town of {province}.</td></tr>
 </tbody></table></div>
-<h4 id="options-16"><a class="anchor" href="#options-16" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-18"><a class="anchor" href="#options-18" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -315,7 +347,7 @@
 <tr><td><code>title</code></td><td>The river floods at {province}</td></tr>
 <tr><td><code>text</code></td><td>The river has burst its banks at {province}, drowning fields and filling cellars with mud.</td></tr>
 </tbody></table></div>
-<h4 id="options-17"><a class="anchor" href="#options-17" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-19"><a class="anchor" href="#options-19" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -331,7 +363,7 @@
 <tr><td><code>title</code></td><td>A scholar comes to court</td></tr>
 <tr><td><code>text</code></td><td>A learned man, driven from his own land, asks leave to teach at {province} under your protection.</td></tr>
 </tbody></table></div>
-<h4 id="options-18"><a class="anchor" href="#options-18" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-20"><a class="anchor" href="#options-20" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -347,7 +379,7 @@
 <tr><td><code>title</code></td><td>{lord} asks for a market</td></tr>
 <tr><td><code>text</code></td><td>{lord} of the house of {house} asks your leave to hold a weekly market at {province}, and to take its tolls.</td></tr>
 </tbody></table></div>
-<h4 id="options-19"><a class="anchor" href="#options-19" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-21"><a class="anchor" href="#options-21" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -364,7 +396,7 @@
 <tr><td><code>title</code></td><td>{lord} raises walls</td></tr>
 <tr><td><code>text</code></td><td>{lord} of the house of {house} is building walls and towers at {province} without asking your leave.</td></tr>
 </tbody></table></div>
-<h4 id="options-20"><a class="anchor" href="#options-20" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-22"><a class="anchor" href="#options-22" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -381,7 +413,7 @@
 <tr><td><code>title</code></td><td>Your official at {province} is skimming</td></tr>
 <tr><td><code>text</code></td><td>Merchants complain that {official}, your {type} at {province}, keeps back part of the tolls for himself.</td></tr>
 </tbody></table></div>
-<h4 id="options-21"><a class="anchor" href="#options-21" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-23"><a class="anchor" href="#options-23" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -398,7 +430,7 @@
 <tr><td><code>title</code></td><td>Old soldiers at {province}</td></tr>
 <tr><td><code>text</code></td><td>Old soldiers with nowhere to go have gathered at {province}, asking for land to farm.</td></tr>
 </tbody></table></div>
-<h4 id="options-22"><a class="anchor" href="#options-22" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-24"><a class="anchor" href="#options-24" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -414,7 +446,7 @@
 <tr><td><code>title</code></td><td>Wolves at {province}</td></tr>
 <tr><td><code>text</code></td><td>A hard winter has driven wolves down from the hills at {province}. They take sheep, and a shepherd boy is missing.</td></tr>
 </tbody></table></div>
-<h4 id="options-23"><a class="anchor" href="#options-23" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-25"><a class="anchor" href="#options-25" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th><th>needs</th></tr></thead>
 <tbody>
@@ -431,7 +463,7 @@
 <tr><td><code>title</code></td><td>A tutor for {heir}</td></tr>
 <tr><td><code>text</code></td><td>Your heir {heir}, aged {heirAge}, is old enough for lessons. Who shall teach the child?</td></tr>
 </tbody></table></div>
-<h4 id="options-24"><a class="anchor" href="#options-24" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-26"><a class="anchor" href="#options-26" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th><th>needs</th></tr></thead>
 <tbody>
@@ -448,7 +480,7 @@
 <tr><td><code>title</code></td><td>A comet over {province}</td></tr>
 <tr><td><code>text</code></td><td>A star with a burning tail hangs over {province} night after night. The people whisper that it foretells the death of kings.</td></tr>
 </tbody></table></div>
-<h4 id="options-25"><a class="anchor" href="#options-25" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-27"><a class="anchor" href="#options-27" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -464,7 +496,7 @@
 <tr><td><code>title</code></td><td>Silver at {province}</td></tr>
 <tr><td><code>text</code></td><td>A shepherd at {province} has found a seam of silver ore in a gully. Miners are already gathering.</td></tr>
 </tbody></table></div>
-<h4 id="options-26"><a class="anchor" href="#options-26" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-28"><a class="anchor" href="#options-28" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th><th>needs</th></tr></thead>
 <tbody>
@@ -481,7 +513,7 @@
 <tr><td><code>title</code></td><td>Pilgrims at {province}</td></tr>
 <tr><td><code>text</code></td><td>Word of a holy relic at {province} has spread, and pilgrims crowd the roads. The innkeepers grow rich.</td></tr>
 </tbody></table></div>
-<h4 id="options-27"><a class="anchor" href="#options-27" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-29"><a class="anchor" href="#options-29" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -500,7 +532,7 @@
 <tr><td><code>title</code></td><td>A tournament</td></tr>
 <tr><td><code>text</code></td><td>{lord} and the young men of your lords&#39; houses beg you to hold a tournament, with jousting and a feast.</td></tr>
 </tbody></table></div>
-<h4 id="options-28"><a class="anchor" href="#options-28" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-30"><a class="anchor" href="#options-30" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -518,7 +550,7 @@
 <tr><td><code>title</code></td><td>Guilds quarrel at {province}</td></tr>
 <tr><td><code>text</code></td><td>The weavers&#39; and dyers&#39; guilds of {province} have come to blows over who may sell cloth in the market.</td></tr>
 </tbody></table></div>
-<h4 id="options-29"><a class="anchor" href="#options-29" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-31"><a class="anchor" href="#options-31" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -538,7 +570,7 @@
 <tr><td><code>title</code></td><td>A printer at {province}</td></tr>
 <tr><td><code>text</code></td><td>A printer with a press of movable letters asks leave to set up shop at {province}. The scribes say it is the devil&#39;s work.</td></tr>
 </tbody></table></div>
-<h4 id="options-30"><a class="anchor" href="#options-30" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-32"><a class="anchor" href="#options-32" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -557,7 +589,7 @@
 <tr><td><code>title</code></td><td>Accusations at {province}</td></tr>
 <tr><td><code>text</code></td><td>After a bad harvest, the people of {province} accuse an old widow of witchcraft, and name others besides.</td></tr>
 </tbody></table></div>
-<h4 id="options-31"><a class="anchor" href="#options-31" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-33"><a class="anchor" href="#options-33" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -576,7 +608,7 @@
 <tr><td><code>title</code></td><td>{lord} fences the commons</td></tr>
 <tr><td><code>text</code></td><td>{lord} is fencing the common fields at {province} for his sheep. The villagers who grazed them there have nowhere to go.</td></tr>
 </tbody></table></div>
-<h4 id="options-32"><a class="anchor" href="#options-32" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-34"><a class="anchor" href="#options-34" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -595,7 +627,7 @@
 <tr><td><code>title</code></td><td>Coffee houses at {province}</td></tr>
 <tr><td><code>text</code></td><td>Coffee houses have sprung up all over {province}. Men sit in them for hours, talking of trade and of your government.</td></tr>
 </tbody></table></div>
-<h4 id="options-33"><a class="anchor" href="#options-33" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-35"><a class="anchor" href="#options-35" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -613,7 +645,7 @@
 <tr><td><code>title</code></td><td>A railway through {province}</td></tr>
 <tr><td><code>text</code></td><td>Surveyors ask leave to lay a railway line through {province}, and a grant to help pay for it.</td></tr>
 </tbody></table></div>
-<h4 id="options-34"><a class="anchor" href="#options-34" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-36"><a class="anchor" href="#options-36" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -631,7 +663,7 @@
 <tr><td><code>title</code></td><td>A strike at {province}</td></tr>
 <tr><td><code>text</code></td><td>The mill hands of {province} have walked out, asking for shorter hours and higher pay.</td></tr>
 </tbody></table></div>
-<h4 id="options-35"><a class="anchor" href="#options-35" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-37"><a class="anchor" href="#options-37" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -650,7 +682,7 @@
 <tr><td><code>title</code></td><td>Cholera at {province}</td></tr>
 <tr><td><code>text</code></td><td>Cholera has broken out in the poor streets of {province}. Doctors blame the bad air; one says it is the water.</td></tr>
 </tbody></table></div>
-<h4 id="options-36"><a class="anchor" href="#options-36" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-38"><a class="anchor" href="#options-38" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -667,7 +699,7 @@
 <tr><td><code>title</code></td><td>A newspaper attacks your ministers</td></tr>
 <tr><td><code>text</code></td><td>A newspaper at {province} prints, week after week, that your ministers are fools and thieves. It sells very well.</td></tr>
 </tbody></table></div>
-<h4 id="options-37"><a class="anchor" href="#options-37" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-39"><a class="anchor" href="#options-39" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -685,7 +717,7 @@
 <tr><td><code>title</code></td><td>A caravan raided near {province}</td></tr>
 <tr><td><code>text</code></td><td>Raiders fell on a caravan a day&#39;s ride from {province}, and the merchants want to know what you will do.</td></tr>
 </tbody></table></div>
-<h4 id="options-38"><a class="anchor" href="#options-38" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-40"><a class="anchor" href="#options-40" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -703,7 +735,7 @@
 <tr><td><code>title</code></td><td>The water channels at {province} fail</td></tr>
 <tr><td><code>text</code></td><td>The underground channels that bring water to the fields of {province} have caved in, and the wells are falling.</td></tr>
 </tbody></table></div>
-<h4 id="options-39"><a class="anchor" href="#options-39" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-41"><a class="anchor" href="#options-41" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -721,7 +753,7 @@
 <tr><td><code>title</code></td><td>Locusts at {province}</td></tr>
 <tr><td><code>text</code></td><td>A cloud of locusts darkened the sky over {province} for a day. When it lifted, {loss} months of grain were gone from the fields and stores.</td></tr>
 </tbody></table></div>
-<h4 id="options-40"><a class="anchor" href="#options-40" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-42"><a class="anchor" href="#options-42" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -738,7 +770,7 @@
 <tr><td><code>title</code></td><td>An endowment at {province}</td></tr>
 <tr><td><code>text</code></td><td>A rich merchant of {province} wishes to leave his shops to a school and a fountain for ever, free of tax.</td></tr>
 </tbody></table></div>
-<h4 id="options-41"><a class="anchor" href="#options-41" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-43"><a class="anchor" href="#options-43" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -755,7 +787,7 @@
 <tr><td><code>title</code></td><td>Gold traders at {province}</td></tr>
 <tr><td><code>text</code></td><td>Traders from the north have come to {province} with salt and cloth, seeking gold dust.</td></tr>
 </tbody></table></div>
-<h4 id="options-42"><a class="anchor" href="#options-42" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-44"><a class="anchor" href="#options-44" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -772,7 +804,7 @@
 <tr><td><code>title</code></td><td>Cattle raided at {province}</td></tr>
 <tr><td><code>text</code></td><td>Raiders from beyond the border have driven off the herds of {province}. The young men want to go after them.</td></tr>
 </tbody></table></div>
-<h4 id="options-43"><a class="anchor" href="#options-43" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-45"><a class="anchor" href="#options-45" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -790,7 +822,7 @@
 <tr><td><code>title</code></td><td>The rains are late at {province}</td></tr>
 <tr><td><code>text</code></td><td>The rains have not come to {province}, and the sown fields are turning to dust. The priests ask for offerings.</td></tr>
 </tbody></table></div>
-<h4 id="options-44"><a class="anchor" href="#options-44" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-46"><a class="anchor" href="#options-46" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -809,7 +841,7 @@
 <tr><td><code>title</code></td><td>The monsoon fails at {province}</td></tr>
 <tr><td><code>text</code></td><td>The monsoon has failed at {province}. The rice withers in dry paddies, and {loss} months of grain are already eaten.</td></tr>
 </tbody></table></div>
-<h4 id="options-45"><a class="anchor" href="#options-45" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-47"><a class="anchor" href="#options-47" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th><th>needs</th></tr></thead>
 <tbody>
@@ -827,7 +859,7 @@
 <tr><td><code>title</code></td><td>A festival at {province}</td></tr>
 <tr><td><code>text</code></td><td>The great temple festival at {province} draws crowds from far away. The priests ask the crown to pay for the procession.</td></tr>
 </tbody></table></div>
-<h4 id="options-46"><a class="anchor" href="#options-46" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-48"><a class="anchor" href="#options-48" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -845,7 +877,7 @@
 <tr><td><code>title</code></td><td>A survey of {province}</td></tr>
 <tr><td><code>text</code></td><td>Your revenue clerks say the land registers of {province} are a generation out of date, and much land pays nothing.</td></tr>
 </tbody></table></div>
-<h4 id="options-47"><a class="anchor" href="#options-47" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-49"><a class="anchor" href="#options-49" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -862,7 +894,7 @@
 <tr><td><code>title</code></td><td>The dykes at {province} weaken</td></tr>
 <tr><td><code>text</code></td><td>The river officials report that the dykes at {province} are rotten, and the next flood may break through.</td></tr>
 </tbody></table></div>
-<h4 id="options-48"><a class="anchor" href="#options-48" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-50"><a class="anchor" href="#options-50" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -880,7 +912,7 @@
 <tr><td><code>title</code></td><td>Cheating at the examinations</td></tr>
 <tr><td><code>text</code></td><td>Candidates at {province} were found with answers sewn into their sleeves, and your {type}, {official}, is said to have sold the questions.</td></tr>
 </tbody></table></div>
-<h4 id="options-49"><a class="anchor" href="#options-49" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-51"><a class="anchor" href="#options-51" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -899,7 +931,7 @@
 <tr><td><code>title</code></td><td>Pirates off {province}</td></tr>
 <tr><td><code>text</code></td><td>Pirates have burned fishing boats off {province} and carried away the crews to sell.</td></tr>
 </tbody></table></div>
-<h4 id="options-50"><a class="anchor" href="#options-50" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-52"><a class="anchor" href="#options-52" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -918,7 +950,7 @@
 <tr><td><code>title</code></td><td>A tea master at {province}</td></tr>
 <tr><td><code>text</code></td><td>A famous master of tea and poetry has come to {province}. Your lords would give much to sit at his gatherings.</td></tr>
 </tbody></table></div>
-<h4 id="options-51"><a class="anchor" href="#options-51" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-53"><a class="anchor" href="#options-53" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -935,7 +967,7 @@
 <tr><td><code>title</code></td><td>Spice ships at {province}</td></tr>
 <tr><td><code>text</code></td><td>Ships heavy with pepper and cloves have put in at {province}, and their captains ask what dues they must pay.</td></tr>
 </tbody></table></div>
-<h4 id="options-52"><a class="anchor" href="#options-52" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-54"><a class="anchor" href="#options-54" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -953,7 +985,7 @@
 <tr><td><code>title</code></td><td>The great ball game</td></tr>
 <tr><td><code>text</code></td><td>{lord} challenges your court&#39;s team to the ball game, with feathers, jade and honour wagered on it.</td></tr>
 </tbody></table></div>
-<h4 id="options-53"><a class="anchor" href="#options-53" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-55"><a class="anchor" href="#options-55" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -971,7 +1003,7 @@
 <tr><td><code>title</code></td><td>Blight in the maize at {province}</td></tr>
 <tr><td><code>text</code></td><td>A blight has blackened the maize at {province}, and {loss} months of grain have rotted on the cob.</td></tr>
 </tbody></table></div>
-<h4 id="options-54"><a class="anchor" href="#options-54" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-56"><a class="anchor" href="#options-56" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -988,7 +1020,7 @@
 <tr><td><code>title</code></td><td>Voyagers at {province}</td></tr>
 <tr><td><code>text</code></td><td>Great canoes have come in to {province} from islands far away, bringing new plants and stories.</td></tr>
 </tbody></table></div>
-<h4 id="options-55"><a class="anchor" href="#options-55" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-57"><a class="anchor" href="#options-57" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -1005,7 +1037,7 @@
 <tr><td><code>title</code></td><td>A horse fair at {province}</td></tr>
 <tr><td><code>text</code></td><td>Herders from the steppe have brought thousands of horses to sell at {province}.</td></tr>
 </tbody></table></div>
-<h4 id="options-56"><a class="anchor" href="#options-56" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-58"><a class="anchor" href="#options-58" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -1022,7 +1054,7 @@
 <tr><td><code>title</code></td><td>A hard winter at {province}</td></tr>
 <tr><td><code>text</code></td><td>Ice and deep snow have lain on {province} since autumn. Animals die in the byres, and the fodder is nearly gone.</td></tr>
 </tbody></table></div>
-<h4 id="options-57"><a class="anchor" href="#options-57" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-59"><a class="anchor" href="#options-59" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
@@ -1041,7 +1073,7 @@
 <tr><td><code>title</code></td><td>Furs from {province}</td></tr>
 <tr><td><code>text</code></td><td>Trappers bring sable and fox to {province}, more than any year before. The merchants want to buy the whole lot.</td></tr>
 </tbody></table></div>
-<h4 id="options-58"><a class="anchor" href="#options-58" aria-label="Link to this section">#</a>Options</h4>
+<h4 id="options-60"><a class="anchor" href="#options-60" aria-label="Link to this section">#</a>Options</h4>
 <div class="table-scroll"><table>
 <thead><tr><th>id</th><th>name</th><th>ai</th><th>effects</th></tr></thead>
 <tbody>
