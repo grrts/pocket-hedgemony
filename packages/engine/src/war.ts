@@ -1420,9 +1420,20 @@ export function aiRaise(world: World, news: News[]): void {
  * army they outnumber, besiege the nearest enemy province, or fall back home
  * when a much stronger army is near.
  */
+/** AI marches that found no route, by army, place and target (cleared each month and when a war begins or ends). */
+const noRouteCache = new WeakMap<World, { key: string; failed: Set<string> }>();
+function noRoutes(world: World): Set<string> {
+  const g = world.diplomacy;
+  const key = `${world.date.year}-${world.date.month}|${g.graph.relations.length}|${g.wars.length}|${g.seq}`;
+  let c = noRouteCache.get(world);
+  if (!c || c.key !== key) noRouteCache.set(world, (c = { key, failed: new Set() }));
+  return c.failed;
+}
+
 export function aiMarches(world: World): void {
   const a = world.armies;
   const enemies = enemyTable(world);
+  const failed = noRoutes(world);
   const armiesAt = new Map<number, number[]>();
   for (let i = 0; i < a.count; i++) {
     if (!a.alive[i]) continue;
@@ -1461,7 +1472,11 @@ export function aiMarches(world: World): void {
     // Already on its way there: the route it walks stands (planning one is most of this step's cost).
     const walking = a.route[i]!;
     if (walking.length && walking[walking.length - 1] === target) continue;
+    // A march that found no way this month is not planned again until the month or the wars change.
+    const failKey = `${i} ${here} ${target}`;
+    if (failed.has(failKey)) continue;
     const route = planRoute(world.rules.defines.march, marchMap(world), here, target, { men, horse: a.horse[i]!, logistics: 0 }, routeBars(world, i));
+    if (!route) failed.add(failKey);
     if (route) {
       // Walked a province at a time: each stretch is planned over the tiles as the army gets there.
       a.route[i] = route.path;
