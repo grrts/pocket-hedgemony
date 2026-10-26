@@ -86,6 +86,7 @@ All lines the checks draw, the bot's play and the balance model's settings are i
 
 ```
 pnpm --filter @ph/sim campaign --years 50 --seeds 1,2,3
+pnpm --filter @ph/sim campaign --years 50 --seeds 1,2 --difficulty hard
 pnpm --filter @ph/sim breaker --realms france,castile --years 50
 pnpm --filter @ph/sim breaker --all --years 50 --jobs 4
 pnpm --filter @ph/sim strategies --years 50 --seeds 1,2,3
@@ -93,7 +94,8 @@ pnpm --filter @ph/sim strategies --years 50 --seeds 1,2,3 --probes france,mali -
 pnpm --filter @ph/sim strategies --years 20 --seeds 1,2 --sweep --levers warfare.troop_cap,diplomacy.leagues
 ```
 
-`--map synthetic` tries the tools on a small made-up world in seconds. `--jobs` runs that many at once,
+`--difficulty easy|hard` plays campaign and bot runs on that difficulty (SETUP-099 to SETUP-103: the AI's war
+chance and income, the player's risings); left out, they play on normal. `--map synthetic` tries the tools on a small made-up world in seconds. `--jobs` runs that many at once,
 each on its own thread (each real-map engine needs a few hundred MB). `--no-baseline` skips the AI-only
 campaign a bot run is measured against. On the real map a 50-year campaign is minutes of work and `--all`
 (137 realms, each against the AI) is hours; the command line prints each run as it ends. A full strategy run

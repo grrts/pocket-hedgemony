@@ -15,6 +15,8 @@ export interface BreakerOptions {
   map: MapKind;
   sampleMonths?: number;
   config?: SimConfig;
+  /** The campaign's difficulty (easy, normal, hard; SETUP-099); normal when left out. */
+  difficulty?: string;
   /** The same realm's end in an AI-only campaign of the same seed and length, to measure the bot against. */
   baseline?: RealmSample | null;
 }
@@ -63,7 +65,7 @@ export function runBreaker(o: BreakerOptions): BreakerResult {
   let weeksAtWar = 0;
   let end: WorldSample | null = null;
 
-  const play = playThroughHost(rules, o.map, o.seed, o.realm);
+  const play = playThroughHost(rules, o.map, o.seed, o.realm, o.difficulty);
   let s = play.s;
   const bot = createBot(rules, config.bot, o.seed * 7919 + me);
   const startYear = s.date.year;

@@ -11,6 +11,8 @@ export interface CampaignOptions {
   /** Months between samples. */
   sampleMonths?: number;
   config?: SimConfig;
+  /** The campaign's difficulty (easy, normal, hard; SETUP-099); normal when left out. */
+  difficulty?: string;
   /** Called after each sample, for progress on the command line. */
   onSample?: (s: WorldSample) => void;
 }
@@ -39,7 +41,7 @@ export function runAiCampaign(o: CampaignOptions): CampaignResult {
   const config = o.config ?? simConfig();
   const every = o.sampleMonths ?? config.run.sample_months;
   const t0 = performance.now();
-  const world = newWorld(o.map, o.seed, rulesFor(o.map));
+  const world = newWorld(o.map, o.seed, rulesFor(o.map), o.difficulty);
   const startYear = world.date.year;
   const endYear = startYear + o.years;
   const end = dayKey({ ...world.date, year: endYear });
