@@ -16,7 +16,7 @@ import { aiWorks, cancelWork, judgeNeglect, mineYear, monthlyWorks, moveQueued, 
 import { monthlyMoods } from "./moods.ts";
 import { monthlyThrone } from "./throne.ts";
 import { monthlyStability } from "./stability.ts";
-import { answerRebels, dailyRebels, monthlyRebels, verdictOrder } from "./rebels.ts";
+import { aiRestoreTax, answerRebels, dailyRebels, monthlyRebels, verdictOrder } from "./rebels.ts";
 import { answerRevolution, lockedOrder, monthlyRevolutions } from "./revolutions.ts";
 import { answerEvent, monthlyEvents } from "./events.ts";
 import { answerEveryday, monthlyEveryday } from "./everyday.ts";
@@ -309,6 +309,8 @@ function startDay(world: World, news: News[]): void {
     runLedger(world, true);
     // With the month's gold in, realms fill their empty posts (PROV-342).
     monthlyPosts(world, news);
+    // Each January the AI raises taxes a rising lowered back to its rate once nothing keeps them light (REBL-072).
+    if (world.date.month === 1) aiRestoreTax(world);
     monthlyNavy(world, news);
     monthlyHiredFleets(world, news);
     monthlyColonies(world, news);

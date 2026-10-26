@@ -24,7 +24,7 @@ export interface HostPlay {
   readonly rejected: Record<string, { count: number; reason: string }>;
 }
 
-export function playThroughHost(rules: Ruleset, map: MapKind, seed: number, realm: string): HostPlay {
+export function playThroughHost(rules: Ruleset, map: MapKind, seed: number, realm: string, difficulty?: string): HostPlay {
   const host = createEngineHost(() => rules);
   let id = 0;
   const send = (req: Request): Snapshot => {
@@ -34,7 +34,7 @@ export function playThroughHost(rules: Ruleset, map: MapKind, seed: number, real
     return r.snapshot;
   };
   const images = mapImagesFor(map);
-  let s = send({ type: "newGame", seed, playerNation: realm, ...(images ? { map: images } : {}) });
+  let s = send({ type: "newGame", seed, playerNation: realm, ...(difficulty ? { difficulty } : {}), ...(images ? { map: images } : {}) });
   let ordersSent = 0;
   const rejected: HostPlay["rejected"] = {};
   return {

@@ -1,5 +1,5 @@
 import { loadDefaultRuleset, type Ruleset } from "@ph/rules";
-import { createWorld, generateSyntheticRuleset, type MapTiles, type World } from "@ph/engine";
+import { createWorld, generateSyntheticRuleset, setDifficulty, type MapTiles, type World } from "@ph/engine";
 import { decodeRgb, loadMapTiles } from "@ph/engine/node";
 
 /** "real": the 1444 scenario on the real map; "synthetic": a small made-up world (tests, trying the tools). */
@@ -23,11 +23,13 @@ export function mapImagesFor(kind: MapKind): MapTiles | undefined {
 /**
  * A new world for an AI-only run: nobody plays it (player -1), so every realm
  * is the AI's. A synthetic world gets the engine's one-tile-a-province grid,
- * as the engine host gives the bot's world without map images.
+ * as the engine host gives the bot's world without map images. The
+ * difficulty is the campaign's (SETUP-099); left out, it plays on normal.
  */
-export function newWorld(kind: MapKind, seed: number, rules: Ruleset = rulesFor(kind)): World {
+export function newWorld(kind: MapKind, seed: number, rules: Ruleset = rulesFor(kind), difficulty?: string): World {
   const world = kind === "real" ? createWorld(rules, seed, loadMapTiles(rules)) : createWorld(rules, seed);
   world.player = -1;
+  if (difficulty !== undefined) setDifficulty(world, difficulty);
   return world;
 }
 

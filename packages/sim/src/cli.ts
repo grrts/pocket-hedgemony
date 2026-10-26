@@ -1,8 +1,8 @@
 // Balance runs from the command line (feedback 130). Nothing here runs on its
 // own: CI only tests the tools on a few weeks of a made-up world.
 //
-//   pnpm --filter @ph/sim campaign [--years 50] [--seeds 1,2,3] [--map real|synthetic] [--jobs 4] [--out DIR]
-//   pnpm --filter @ph/sim breaker  (--realms france,castile | --all) [--years 50] [--seed 1] [--map real] [--jobs 4] [--out DIR]
+//   pnpm --filter @ph/sim campaign [--years 50] [--seeds 1,2,3] [--difficulty easy|normal|hard] [--map real|synthetic] [--jobs 4] [--out DIR]
+//   pnpm --filter @ph/sim breaker  (--realms france,castile | --all) [--years 50] [--seed 1] [--difficulty easy|normal|hard] [--map real] [--jobs 4] [--out DIR]
 //   pnpm --filter @ph/sim history [--years 70] [--seeds 1,2,3] [--jobs 4] [--out DIR]   (the history check, BAL-031)
 //   pnpm --filter @ph/sim strategies [--years 50] [--seeds 1,2,3] [--probes france,mali] [--strategies conqueror,builder,diplomat,court]
 //                                    [--sweep [--levers a.b,c.d | provisional]] [--map real|synthetic] [--jobs 4] [--out DIR]
@@ -46,6 +46,7 @@ const { values: a } = parseArgs({
     strategies: { type: "string" },
     sweep: { type: "boolean" },
     levers: { type: "string" },
+    difficulty: { type: "string" },
   },
 });
 
@@ -55,6 +56,10 @@ const map = (a.map ?? config.run.map) as MapKind;
 const threads = Number(a.jobs ?? Math.max(1, Math.min(4, availableParallelism() - 1)));
 if (map !== "real" && map !== "synthetic") fail(`--map is real or synthetic, not ${map}`);
 if (!(years > 0)) fail("--years must be a number above 0");
+const difficulty = a.difficulty;
+if (difficulty !== undefined && !["easy", "normal", "hard"].includes(difficulty)) fail(`--difficulty is easy, normal or hard, not ${difficulty}`);
+const level = difficulty ? { difficulty } : {};
+const onLevel = difficulty && difficulty !== "normal" ? ` on ${difficulty}` : "";
 
 const stamp = new Date().toISOString().slice(0, 16).replace(/[:T]/g, "-");
 const out = a.out ?? join(new URL("..", import.meta.url).pathname, "out", `${stamp}-${command}`);
@@ -79,10 +84,10 @@ async function history(): Promise<void> {
 
 async function campaigns(): Promise<void> {
   const seeds = (a.seeds ?? config.run.seeds.join(",")).split(",").map(Number);
-  const jobs: Job[] = seeds.map((seed) => ({ kind: "campaign", options: { seed, years, map, config } }));
-  console.log(`${jobs.length} AI-only campaign(s) of ${years} years on the ${map} map, ${threads} at a time → ${out}`);
+  const jobs: Job[] = seeds.map((seed) => ({ kind: "campaign", options: { seed, years, map, config, ...level } }));
+  console.log(`${jobs.length} AI-only campaign(s) of ${years} years${onLevel} on the ${map} map, ${threads} at a time → ${out}`);
   const results = (await runJobs(jobs, threads, progress)) as CampaignResult[];
-  write(`AI-only campaigns, ${years} years`, results.sort((x, y) => x.seed - y.seed), []);
+  write(`AI-only campaigns, ${years} years${onLevel}`, results.sort((x, y) => x.seed - y.seed), []);
 }
 
 async function breakers(): Promise<void> {
@@ -94,13 +99,13 @@ async function breakers(): Promise<void> {
   let baseline: CampaignResult | null = null;
   if (!a["no-baseline"]) {
     console.log(`The AI's own campaign first (seed ${seed}, ${years} years), to measure the bot against.`);
-    baseline = ((await runJobs([{ kind: "campaign", options: { seed, years, map, config } }], 1, progress)) as CampaignResult[])[0] ?? null;
+    baseline = ((await runJobs([{ kind: "campaign", options: { seed, years, map, config, ...level } }], 1, progress)) as CampaignResult[])[0] ?? null;
   }
   const end = baseline?.samples[baseline.samples.length - 1];
-  const jobs: Job[] = realms.map((realm) => ({ kind: "breaker", options: { realm, seed, years, map, config, baseline: end?.realms[realm] ?? null } }));
-  console.log(`${jobs.length} bot run(s) of ${years} years on the ${map} map, ${threads} at a time → ${out}`);
+  const jobs: Job[] = realms.map((realm) => ({ kind: "breaker", options: { realm, seed, years, map, config, ...level, baseline: end?.realms[realm] ?? null } }));
+  console.log(`${jobs.length} bot run(s) of ${years} years${onLevel} on the ${map} map, ${threads} at a time → ${out}`);
   const results = (await runJobs(jobs, threads, progress)) as BreakerResult[];
-  write(`The bot against the game, ${years} years`, baseline ? [baseline] : [], results);
+  write(`The bot against the game, ${years} years${onLevel}`, baseline ? [baseline] : [], results);
 }
 
 async function strategies(): Promise<void> {

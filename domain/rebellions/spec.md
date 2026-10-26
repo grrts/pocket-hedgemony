@@ -282,6 +282,11 @@ Newest decision first.
   for 20 years; *Bloodshed* across every province of the same faith or language; lords of that faith or language
   waver). [rebellions §5.1]
 
+- REBL-072 Each January an AI realm shall raise a province whose own tax was lowered below the realm's rate back to
+  that rate, once no light-tax charter or self-rule keeps it light and no rising holds it, as the player may with
+  Tax; the rise is a new burden there (REBL-010), as the player's is. [balance runs of 26 Oct 2026: without it the
+  AI's taxes only ever fell, and by 1408 its provinces paid at three quarters of their rate]
+
 ### 5.7 Preventing risings
 
 - REBL-051 When a grievance ends (province stats 12.1), the game shall count it no longer toward a rising.

@@ -44,7 +44,7 @@ export type Posts = Snapshot["posts"];
 /** The best fit for one post: type (index in OFFICIALS), why, and its price. */
 export type PostFit = Posts["fit"][number];
 
-/** One tap to hire the best fit for an empty post (PROV-348): "Tax collector · best here: 2.1 gold tax a month", Hire · 25 gold. */
+/** One tap to hire the best fit for an empty post (PROV-348): "Tax collector · best here: 2.1 gold tax a month", Hire · 10 gold. */
 function bestFitRow(province: number, f: PostFit, treasury: number, verb: "Hire" | "Replace with"): string {
   const post = OFFICIALS[f.type]!;
   const short = f.gold > treasury;

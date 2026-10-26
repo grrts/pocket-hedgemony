@@ -576,7 +576,7 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 
 | Key | Value |
 |---|---|
-| `gold` | 25 |
+| `gold` | 10 |
 | `foreign_multiplier` | 2 |
 | `provisional` | yes |
 
@@ -586,7 +586,7 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 
 | Key | Value |
 |---|---|
-| `reserve_gold` | 20 |
+| `reserve_gold` | 10 |
 | `hungry_months` | 1 |
 | `traders_passing` | 3 |
 | `provisional` | yes |

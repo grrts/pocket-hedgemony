@@ -57,7 +57,7 @@ export { beliefRevoltFactor, lowFaith, lowTongue, monthlyBelief, officialPace, r
 export { rulerDies, succeed, yearlyCrowns } from "./crowns.ts";
 export { battleDeath, lordAge, officialAge, onPersonDeath, personDies, yearlyPeople, type DeathCause, type DeathListener, type PersonDeath, type PersonRef } from "./people.ts";
 export { deathChance as personDeathChance, type PersonKind } from "./mortality.ts";
-export { risingChanceIn, spark } from "./rebels.ts";
+export { aiRestoreTax, risingChanceIn, spark } from "./rebels.ts";
 export { PILLAR_TAB, pillarLine, RATE_LABELS, stabilityCost, rateButtons, STABILITY_NOTE, stabilityPlaque, stabilitySection, taxLine, TOP_BAR_PLAQUE, topBar, treasuryView, type LedgerRow, type Opens, type PillarRow, type RateButton, type RealmTab, type StabilitySectionView, type TaxLineView, type TopBarInput, type TopBarItem, type TreasuryInput, type TreasuryView } from "./realmScreens.ts";
 export { FOOD_BALANCE, reportFailedHarvests } from "./food.ts";
 export { grabbedLand, joinsLeague, leagueView, monthlyConquest, nameAbroadView, notorietyWord, type LeagueView, type NameAbroadView, type NotorietyWord } from "./conquest.ts";
