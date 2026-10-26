@@ -189,7 +189,7 @@ Feature: Officials and their types
     And the country "France" has 60 gold
     When the country "France" hires a "steward" for "Rouen"
     Then the "steward" runs "Rouen" at half his effect
-    And the country "France" has 35 gold left
+    And the country "France" has 50 gold left
     When the country "France" tries to hire a "judge" for "Angers", held by the lord "Anjou"
     Then it is refused because he serves the lord, not the crown
 
@@ -215,10 +215,10 @@ Feature: Officials and their types
     # config: province.officials.auto_fill.reserve_gold
     Given the player plays the country "Castile"
     And 3 of its royal posts stand empty and its officials cap has room for them
-    And it has gold for two hires and the 20 gold kept back
+    And it has gold for two hires and the 10 gold kept back
     When a new month begins
     Then the two posts with the most people are filled by their best fit
-    And the treasury keeps at least 20 gold
+    And the treasury keeps at least 10 gold
     And the player reads one line of news naming both hires
 
   @PROV-342
@@ -249,7 +249,7 @@ Feature: Officials and their types
     Given the player plays the country "Castile"
     And it has 100 gold
     When the player replaces an official with a native hire of another type serving elsewhere
-    Then the new official holds the post in his first year and 25 gold are paid
+    Then the new official holds the post in his first year and 10 gold are paid
     When the player dismisses an official
     Then his post stands empty
 

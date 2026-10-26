@@ -186,7 +186,7 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 |---|---|
 | `no_revolt` | 3 |
 | `per_revolt` | -5 |
-| `no_heir` | -10 |
+| `no_heir` | -2 |
 | `unhappy_war` | -3 |
 | `summoned` | 1 |
 

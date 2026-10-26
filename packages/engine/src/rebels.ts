@@ -937,6 +937,21 @@ export function rebelsView(world: World): RebelsView {
   };
 }
 
+/**
+ * Each January every AI realm raises a province whose own tax a rising lowered back to the realm's rate,
+ * once no light-tax charter or self-rule keeps it light and no rising holds it, as the player may with Tax;
+ * it is a new burden there, as the player's rise is (REBL-072). Without it the AI's taxes only ever fell.
+ */
+export function aiRestoreTax(world: World): void {
+  for (let p = 0; p < world.provinceCount; p++) {
+    const n = world.provinceOwner[p]!;
+    if (n < 0 || n === world.player || world.provinceTax[p]! < 0 || world.provinceTax[p]! >= world.nationTaxDefault[n]!) continue;
+    if (world.provinceLightTax[p]! > world.date.year || world.provinceRebels[p]) continue;
+    world.provinceTax[p] = -1;
+    taxRaised(world, n, p);
+  }
+}
+
 /** Whether province p's tax may be raised to `rate` (a won tax rising or self-rule keeps it light). */
 export function taxCapped(world: World, p: number, rate: number): string | null {
   const until = world.provinceLightTax[p]!;
