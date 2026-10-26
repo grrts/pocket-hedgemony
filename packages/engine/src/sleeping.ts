@@ -105,7 +105,8 @@ function landOf(world: World, n: number, w: Waking): number[] {
   for (const p of named) {
     if (p < 0 || world.provinceWater[p]) continue;
     const o = world.provinceOwner[p]!;
-    if (o === n || (w.subjectOf !== undefined && o === w.subjectOf)) continue;
+    // Its overlord keeps its land, unless it is the realm it breaks away from (a release as a subject).
+    if (o === n || (w.subjectOf !== undefined && o === w.subjectOf && o !== w.breakFrom)) continue;
     if (w.breakFrom !== undefined && o !== w.breakFrom) continue;
     out.push(p);
   }

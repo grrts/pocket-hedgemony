@@ -25,6 +25,14 @@ Feature: Founding events wake realms
     Then "Ottomans" is the overlord of "Transylvania"
     And "Hungary" no longer holds "Cluj"
 
+  @EVT-077 @SETUP-084
+  Scenario: A breakaway with a home land of its own takes only that land
+    Given a new campaign starts on 11 November 1444
+    When an event founds "transylvania" from "hungary"
+    Then "Transylvania" holds its home land
+    And "Hungary" keeps every other province it held
+    And "Transylvania" and "Hungary" hold a truce
+
   @EVT-077 @EVT-078
   Scenario: A realm the list does not hold takes a spare
     Given a new campaign starts on 11 November 1444

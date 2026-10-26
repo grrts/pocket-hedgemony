@@ -43,6 +43,7 @@ const found = (s: S, id: string, values: Record<string, unknown>) => {
 
 Given("a new campaign starts on 11 November 1444", (s) => expect(world(s).date).toMatchObject({ year: 1444, month: 11 }));
 When(/^an event founds "([^"]+)" from "([^"]+)" and "([^"]+)"$/, (s, id: string, a: string, b: string) => found(s, id, { from: [a, b] }));
+When(/^an event founds "([^"]+)" from "([^"]+)"$/, (s, id: string, from: string) => found(s, id, { from: [from] }));
 When(/^an event founds "([^"]+)" on "([^"]+)" from "([^"]+)"$/, (s, id: string, where: string, from: string) => found(s, id, { where, from: [from] }));
 When(/^an event founds "([^"]+)" on "([^"]+)" as a subject of "([^"]+)"$/, (s, id: string, where: string, over: string) => found(s, id, { where, subject_of: over }));
 When(/^an event founds "([^"]+)" on "([^"]+)"$/, (s, id: string, where: string) => found(s, id, { where }));
@@ -58,6 +59,25 @@ Then(/^"([^"]+)" holds every province "([^"]+)" and "([^"]+)" held$/, (s, name: 
     expect(w.provinceOwner[p]).toBe(n);
   });
   expect(count).toBeGreaterThan(0);
+});
+Then("{string} holds its home land", (s, name: string) => {
+  const w = world(s);
+  const n = realm(s, name);
+  const home = w.rules.nations[n]!.home!.map((id) => w.provinceIndex.get(id)!);
+  expect(home.length).toBeGreaterThan(0);
+  for (const p of home) expect(w.provinceOwner[p]).toBe(n);
+  s.fdHome = home;
+});
+Then("{string} keeps every other province it held", (s, name: string) => {
+  const w = world(s);
+  const n = realm(s, name);
+  let kept = 0;
+  s.fdBefore.forEach((o: number, p: number) => {
+    if (o !== n || s.fdHome.includes(p)) return;
+    kept++;
+    expect(w.provinceOwner[p]).toBe(n);
+  });
+  expect(kept).toBeGreaterThan(0);
 });
 Then("a dispatch reads {string}", (s, text: string) => expect((s.fdNews as E.News[]).some((x) => x.kind === "founded" && x.text === `${text}.`)).toBe(true));
 Then("{string} holds {string}", (s, name: string, p: string) => expect(world(s).provinceOwner[province(s, p)]).toBe(realm(s, name)));

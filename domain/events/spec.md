@@ -430,7 +430,9 @@ a bridge shows it the game as the tree's own world, and lands what the game alre
 - EVT-077 When a `create_country` effect fires, the game shall found the realm on the map (SETUP-083 to
   SETUP-090): the realm's sleeping realm wakes, or a gone map realm wakes again; a realm the list does not hold
   takes the first spare sleeper under the tree's name for it. With no `where` and realms named in `from`, those
-  realms form it (a union); with a `where`, it takes the map provinces of that place, only those the `from` realms
+  realms form it (a union), unless the realm has a home land of its own: then it breaks away on its home land from
+  them, as with a `where` (SETUP-084; balance runs of 26 Oct 2026 saw Delhi end whole in Jaunpur and Mali in
+  Masina); with a `where`, it takes the map provinces of that place, only those the `from` realms
   hold when it names them, and holds a truce with the realm it broke from; a place the map does not know yet
   gives it its home land; `subject_of` makes it that realm's subject. With no land to give, nothing wakes and the
   effect stays in the tree's world. [EVT-045; X-24; D-EVT-18]

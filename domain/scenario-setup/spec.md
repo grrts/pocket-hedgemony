@@ -338,7 +338,10 @@ ahead (a homeland that breaks away, a house of a broken Shogunate) are in every 
   standing at neutral with every realm, and from then on it is an ordinary realm. [X-24]
 - SETUP-084 (Event-driven): When a realm wakes, its land shall be, in this order: the land of the realms it is
   formed from, when it is formed from realms (a union); else the provinces the waking names; else its home land.
-  Only land a realm that is not the waking one's overlord holds is taken; a province taken leaves its old owner's
+  A realm with a home land of its own that wakes from named realms with no place named breaks away on its home
+  land from them (Jaunpur from Delhi), and is no union: only a realm with no home land of its own (Spain, Russia)
+  is formed from them. Only land a realm that is not the waking one's overlord holds is taken, unless it breaks
+  away from that overlord (a release as a subject); a province taken leaves its old owner's
   lord and siege as a province handed over without a war does. [X-24; DIPL-113]
 - SETUP-085 (Event-driven): When a realm is formed from other realms (a union), every one of them shall end in it:
   their land passes to it, their subjects and allies become its own, and they are gone. If the player's realm is

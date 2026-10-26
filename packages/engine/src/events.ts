@@ -541,8 +541,9 @@ const KIND_WORDS: Record<subj.Kind, string> = { vassal: "a vassal", tributary: "
  * An event founds a realm (SETUP-083 to SETUP-090): its sleeping realm wakes,
  * or a gone map realm wakes again, or the first spare takes the name for one
  * the list does not hold. With no `where`, the realms it is made from form it
- * (a union); with one, it takes that place's land, only from those realms when
- * it names them. A place the map does not know falls back to its home land;
+ * (a union), unless it has a home land of its own: then it breaks away on that
+ * land from them; with a `where`, it takes that place's land, only from those
+ * realms when it names them. A place the map does not know falls back to its home land;
  * with no land at all it stays asleep.
  */
 /** A `create_country` effect as the tree hands it to the game, for the specs (EVT-077). */
@@ -563,9 +564,13 @@ function foundRealm(world: World, g: GameEvents, id: string, v: Record<string, u
     return f !== undefined && f !== n && !world.nationGone[f] ? [f] : [];
   });
   const over = v.subject_of === undefined ? undefined : g.nationOf.get(String(v.subject_of));
-  const where = v.where === undefined ? undefined : g.places.find(([k]) => k === String(v.where))?.[1];
+  // With no place named, a realm with a home land of its own breaks away on it from the realms named (Jaunpur from
+  // Delhi); one without forms from them (a union: Spain from Castile and Aragon).
+  const home = n === undefined || v.where !== undefined || !from.length ? undefined : world.rules.nations[n]!.home;
+  const breaksAway = !!home?.length;
+  const where = breaksAway ? home!.flatMap((id) => world.provinceIndex.get(id) ?? []) : v.where === undefined ? undefined : g.places.find(([k]) => k === String(v.where))?.[1];
   const waking: Waking = {};
-  if (v.where === undefined && from.length) waking.from = from;
+  if (v.where === undefined && from.length && !breaksAway) waking.from = from;
   else if (where) {
     waking.provinces = from.length ? where.filter((p) => from.includes(world.provinceOwner[p]!)) : where;
     const held = from.map((f) => waking.provinces!.filter((p) => world.provinceOwner[p] === f).length);
