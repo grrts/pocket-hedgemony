@@ -4,14 +4,18 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "sync": "pnpm --filter @ph/client build && cap sync && node scripts/landscape.mjs",
+    "sync": "pnpm --filter @ph/client build && cap sync && node scripts/native.mjs",
     "android": "pnpm sync && cap open android",
     "ios": "pnpm sync && cap open ios"
   },
   "dependencies": {
     "@capacitor/android": "8.5.3",
+    "@capacitor/app": "8.1.2",
+    "@capacitor/browser": "8.0.5",
     "@capacitor/core": "8.5.3",
-    "@capacitor/ios": "8.5.3"
+    "@capacitor/ios": "8.5.3",
+    "@capgo/capacitor-social-login": "8.7.5",
+    "@capgo/native-purchases": "8.9.6"
   },
   "devDependencies": {
     "@capacitor/cli": "8.5.3"

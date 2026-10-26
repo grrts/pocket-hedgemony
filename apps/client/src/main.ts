@@ -142,7 +142,7 @@ import { accountHtml, accountView, bindAccount, loadCard } from "./cloud/account
 import { capacitorBridge, noBridge, webBridge, type CapacitorLike } from "./cloud/bridge.ts";
 import { APP_RETURN, StoreSignIn } from "./cloud/storeSignIn.ts";
 import { bindShareSheet, fetchSharedCopy, openError, shareSheetHtml, shareView, type ShareView } from "./cloud/share.ts";
-import { bindUnlock, Purchases, purchasesApi, shellStoreBridge, steamStoreBridge, unlockHtml } from "./cloud/purchases.ts";
+import { bindUnlock, capacitorStoreBridge, Purchases, purchasesApi, shellStoreBridge, steamStoreBridge, unlockHtml } from "./cloud/purchases.ts";
 import { setTelemetryHooks, telemetry } from "./telemetry/install.ts";
 import { GAME_VERSION } from "./version.ts";
 
@@ -8055,7 +8055,6 @@ const signInBridge =
         googleClientId: env.VITE_GOOGLE_CLIENT_ID?.trim() || undefined,
         // The app's bundle id (apps/mobile/capacitor.config.json); iOS uses it whatever is passed.
         appleClientId: "com.pockethegemony.app",
-        appleRedirectUri: env.VITE_APPLE_REDIRECT_URI?.trim() || undefined,
         appReturn: APP_RETURN,
       })
     : runtimeNow === "electron"
@@ -8068,10 +8067,13 @@ const signInBridge =
 const storeSignIn = cloud ? new StoreSignIn(cloud, signInBridge, webKeyValue(), SERVER_DEVICE, desktop?.steam ? "steam" : savePlatform) : undefined;
 /**
  * Buying the full game (SAVE-179 … SAVE-185): only in a build with a cloud server whose shell gives a
- * store bridge (the Steam build, or a phone shell's `phStore`); everywhere else the game stays the full
+ * store bridge (the Steam build, or a phone app's `phStore` or its NativePurchases plugin); everywhere else the game stays the full
  * game as before (SAVE-180).
  */
-const storeBridge = desktop?.steam ? steamStoreBridge() : shellStoreBridge();
+const storeBridge = desktop?.steam
+  ? steamStoreBridge()
+  : (shellStoreBridge() ??
+    (runtimeNow === "capacitor-ios" || runtimeNow === "capacitor-android" ? capacitorStoreBridge((globalThis as { Capacitor?: CapacitorLike }).Capacitor ?? {}) : undefined));
 const purchases = cloud && storeBridge ? new Purchases(storeBridge, purchasesApi(cloud.api), webKeyValue()) : undefined;
 /** Whether the full game is unlocked on this store. */
 const fullGame = () => purchases?.unlocked ?? true;

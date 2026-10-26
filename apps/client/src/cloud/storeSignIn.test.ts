@@ -270,14 +270,35 @@ describe("the platform bridges (D-SAVE-22)", () => {
         addListener: async (name: string, cb: (e: unknown) => void) => ((listeners[`browser:${name}`] = cb), handle),
       },
       App: { addListener: async (name: string, cb: (e: unknown) => void) => ((listeners[name] = cb), handle) },
-      SignInWithApple: { authorize: async () => ({ response: { identityToken: "apple.jwt", givenName: "Ana", familyName: "Paz" } }) },
+      SocialLogin: {
+        initialize: async (o: Record<string, unknown>) => void inits.push(Object.keys(o)),
+        login: async ({ provider, options }: { provider: string; options: { nonce: string } }) => {
+          logins.push(`${provider} ${options.nonce}`);
+          return provider === "apple"
+            ? { provider, result: { idToken: "apple.jwt", accessToken: { token: "apple.code" }, profile: { givenName: "Ana", familyName: "Paz" } } }
+            : { provider, result: { idToken: "google.jwt", profile: { name: "Ana Paz" } } };
+        },
+      },
     };
-    const cap = { isPluginAvailable: (n: string) => n in plugins, Plugins: plugins as unknown as Record<string, unknown> };
+    const inits: string[][] = [];
+    const logins: string[] = [];
+    const cap = { getPlatform: () => "ios", isPluginAvailable: (n: string) => n in plugins, Plugins: plugins as unknown as Record<string, unknown> };
     const bridge = capacitorBridge(cap, { appleClientId: "com.pockethegemony.app", appReturn: APP_RETURN });
     expect(bridge.can("apple")).toBe(true);
     expect(bridge.can("steam")).toBe(true);
     expect(bridge.can("google")).toBe(false);
-    expect(await bridge.apple("h")).toEqual({ identityToken: "apple.jwt", name: "Ana Paz" });
+    // The authorization code comes back unspent, for the server to revoke on Delete account.
+    expect(await bridge.apple("h")).toEqual({ identityToken: "apple.jwt", authorizationCode: "apple.code", name: "Ana Paz" });
+    expect(await bridge.apple("h2")).toEqual({ identityToken: "apple.jwt", authorizationCode: "apple.code", name: "Ana Paz" });
+    // Apple's provider is started once, with only its own settings.
+    expect(inits).toEqual([["apple"]]);
+    expect(logins).toEqual(["apple h", "apple h2"]);
+    // On Android the same plugin gives Google, and Apple is not offered.
+    const android = capacitorBridge({ ...cap, getPlatform: () => "android" }, { googleClientId: "web-id", appleClientId: "com.pockethegemony.app", appReturn: APP_RETURN });
+    expect(android.can("apple")).toBe(false);
+    expect(android.can("google")).toBe(true);
+    expect(await android.google("g")).toEqual({ idToken: "google.jwt", name: "Ana Paz" });
+    expect(inits).toEqual([["apple"], ["google"]]);
     expect(await bridge.steam("https://steamcommunity.com/openid/login?x=1")).toEqual({ code: "phs_9" });
     expect(opened).toEqual(["https://steamcommunity.com/openid/login?x=1"]);
     expect(closed).toBe(1);

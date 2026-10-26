@@ -3,9 +3,16 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
-import { onSteamDeck, startSteam, steamAppId } from "../src/steam.mjs";
+import {
+  builtInAppId,
+  onSteamDeck,
+  relaunchAppId,
+  relaunchThroughSteam,
+  startSteam,
+  steamAppId,
+} from "../src/steam.mjs";
 
-test("the app id comes from the switch, the build, or Steam, and is never built in", () => {
+test("the app id comes from the switch, the build, or Steam, and is never in the code", () => {
   assert.equal(steamAppId({}, []), undefined);
   assert.equal(steamAppId({ PH_STEAM_APP_ID: "480" }, []), 480);
   assert.equal(steamAppId({ SteamAppId: "3141590" }, []), 3141590);
@@ -14,6 +21,66 @@ test("the app id comes from the switch, the build, or Steam, and is never built 
   assert.equal(steamAppId({ PH_STEAM_APP_ID: "off" }, []), undefined);
   assert.equal(steamAppId({ PH_STEAM_APP_ID: "0" }, []), undefined);
   assert.equal(steamAppId({ PH_STEAM_APP_ID: "48x" }, []), undefined);
+  const source = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
+  assert.equal(builtInAppId(source), undefined);
+});
+
+test("a store build's built-in app id comes last, and 0 or off still turns Steam off", () => {
+  // `dist:steam` writes it into the packaged package.json (extraMetadata).
+  assert.equal(builtInAppId({ steamAppId: "3141590" }), 3141590);
+  assert.equal(builtInAppId({ steamAppId: 3141590 }), 3141590);
+  assert.equal(builtInAppId({ steamAppId: "off" }), undefined);
+  assert.equal(builtInAppId(undefined), undefined);
+  assert.equal(steamAppId({}, [], 3141590), 3141590);
+  assert.equal(steamAppId({ SteamAppId: "3141600" }, [], 3141590), 3141600);
+  assert.equal(steamAppId({}, ["--steam-app-id=480"], 3141590), 480);
+  assert.equal(steamAppId({ PH_STEAM_APP_ID: "off" }, [], 3141590), undefined);
+  assert.equal(steamAppId({}, ["--steam-app-id=0"], 3141590), undefined);
+});
+
+test("only a store build started outside Steam relaunches through Steam", () => {
+  assert.equal(relaunchAppId({}, [], 3141590), 3141590);
+  // Steam started it: SteamAppId is set.
+  assert.equal(relaunchAppId({ SteamAppId: "3141590" }, [], 3141590), undefined);
+  // A dev run or a build without an id.
+  assert.equal(relaunchAppId({}, ["--steam-app-id=480"], undefined), undefined);
+  assert.equal(relaunchAppId({}, [], undefined), undefined);
+  // Steam turned off by hand.
+  assert.equal(relaunchAppId({ PH_STEAM_APP_ID: "off" }, [], 3141590), undefined);
+});
+
+test("relaunching asks Steam with the built-in id and quits only when Steam says so", () => {
+  const asked = [];
+  const lib = (answer) => () => ({
+    init() {},
+    restartAppIfNecessary(id) {
+      asked.push(id);
+      return answer;
+    },
+  });
+  assert.equal(relaunchThroughSteam({ appId: 3141590, load: lib(true) }), true);
+  assert.equal(relaunchThroughSteam({ appId: 3141590, load: lib(false) }), false);
+  assert.deepEqual(asked, [3141590, 3141590]);
+  let loaded = false;
+  assert.equal(relaunchThroughSteam({ appId: undefined, load: () => ((loaded = true), {}) }), false);
+  assert.equal(loaded, false);
+});
+
+test("a relaunch that cannot be asked leaves the plain desktop game", () => {
+  const log = [];
+  const missing = () => {
+    throw new Error("Cannot find module 'steamworks.js'");
+  };
+  assert.equal(relaunchThroughSteam({ appId: 3141590, load: missing, log: (l) => log.push(l) }), false);
+  assert.match(log[0], /relaunch/);
+  const broken = () => ({
+    init() {},
+    restartAppIfNecessary() {
+      throw new Error("libsteam_api.so: cannot open shared object file");
+    },
+  });
+  assert.equal(relaunchThroughSteam({ appId: 3141590, load: broken }), false);
+  assert.equal(relaunchThroughSteam({ appId: 3141590, load: () => ({ init() {} }) }), false);
 });
 
 test("a Steam Deck is told by Steam's SteamDeck=1", () => {
@@ -75,6 +142,36 @@ test("with Steam, a Web API ticket comes back as hex for the server", async () =
   steam.close();
   assert.deepEqual(calls.at(-1), ["cancel"]);
   await assert.rejects(() => steam.webTicket("../bad identity"));
+});
+
+test("the Steam overlay is turned on once Steam is on, and only when asked", async () => {
+  const calls = [];
+  const withOverlay = (lib) => ({ ...lib.default, electronEnableSteamOverlay: (...args) => calls.push(["overlay", ...args]) });
+  const steam = await startSteam({ appId: 480, load: () => withOverlay(fakeLib(calls)), overlay: true });
+  assert.ok(steam);
+  assert.deepEqual(calls.slice(0, 2), [["init", 480], ["overlay"]]);
+
+  calls.length = 0;
+  await startSteam({ appId: 480, load: () => withOverlay(fakeLib(calls)) });
+  assert.deepEqual(calls, [["init", 480]]);
+
+  calls.length = 0;
+  const notRunning = { init() { throw new Error("Steam is not running"); }, electronEnableSteamOverlay: () => calls.push(["overlay"]) };
+  assert.equal(await startSteam({ appId: 480, load: () => notRunning, overlay: true }), undefined);
+  assert.deepEqual(calls, []);
+});
+
+test("an overlay that fails to turn on leaves Steam on", async () => {
+  const log = [];
+  const lib = {
+    ...fakeLib([]).default,
+    electronEnableSteamOverlay() {
+      throw new Error("Electron module not found");
+    },
+  };
+  const steam = await startSteam({ appId: 480, load: () => lib, overlay: true, log: (l) => log.push(l) });
+  assert.equal(steam.name, "Bertrand");
+  assert.match(log[0], /overlay off/);
 });
 
 test("the ticket identity the game asks for is the one the server checks", () => {

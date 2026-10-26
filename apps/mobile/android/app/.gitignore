@@ -1,0 +1,7 @@
+/build/*
+!/build/.npmkeep
+
+# Release signing (docs/mobile.md)
+keystore.properties
+*.jks
+*.keystore
