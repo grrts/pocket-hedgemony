@@ -6922,6 +6922,16 @@ small.why {
 .inst-fold.small {
   background: var(--paper);
 }
+/* A section folded on the province card says its name on the fold's line already (SHELL-187). */
+.inst-body > .governance > h3.sub:first-child,
+.inst-body > .castle-own > h3.sub:first-child {
+  display: none;
+}
+.inst-body > .governance {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
 .seat-reasons {
   margin: 4px 0 8px;
   padding: 6px 8px;

@@ -12,7 +12,7 @@ Each subject has one home: one card, one tab or one screen. The country card, fo
 
 ## Give the important things an overview
 
-Anything the player has to keep track of gets one place that shows its state at a glance and leads to the detail. The Army list shows every commander and their army, a province's Garrison tab shows its troops without a commander, and Needs attention lists every warning and everything waiting for an answer. A new important feature either adds itself to such an overview or gets its own.
+Anything the player has to keep track of gets one place that shows its state at a glance and leads to the detail. The Army list shows every commander and their army, a province's Troops tab shows its troops without a commander, and Needs attention lists every warning and everything waiting for an answer. A new important feature either adds itself to such an overview or gets its own.
 
 ## Check it on a phone
 

@@ -173,10 +173,11 @@ Feature: Map and cards
     When the player selects an army on the map
     Then the camera neither moves nor zooms
 
-  @SHELL-139 @SHELL-140 @feedback-11 @feedback-12
+  @SHELL-139 @SHELL-140 @SHELL-186 @feedback-11 @feedback-12 @feedback-150
   Scenario: The country card's tabs
     When the player opens a country card
-    Then it has the tabs General, Diplomacy, Trade and Army in that order
+    Then it has the tabs General, Diplomacy and Army in that order
+    And its trade lines are on General
     And it opens on General
     And the peace table and declare war open from the Diplomacy tab
 

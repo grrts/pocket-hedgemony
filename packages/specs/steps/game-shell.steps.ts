@@ -3307,9 +3307,13 @@ When("the player opens a country card", (s) => {
   s.card = openCountryCard(sh(s), "Burgundy");
 });
 
-Then("it has the tabs General, Diplomacy, Trade and Army in that order", (s) => {
-  expect(countryCardTabs(sh(s), "Burgundy").map((t) => t.name)).toEqual(["General", "Diplomacy", "Trade", "Army"]);
-  expect(COUNTRY_CARD_TABS).toEqual(["General", "Diplomacy", "Trade", "Army"]);
+Then("it has the tabs General, Diplomacy and Army in that order", (s) => {
+  expect(countryCardTabs(sh(s), "Burgundy").map((t) => t.name)).toEqual(["General", "Diplomacy", "Army"]);
+  expect(COUNTRY_CARD_TABS).toEqual(["General", "Diplomacy", "Army"]);
+});
+
+Then("its trade lines are on General", () => {
+  for (const item of ["wealth", "trade income", "trade pacts", "embargoes"]) expect(homeOf(item)).toBe("General");
 });
 
 Then("it opens on General", (s) => {

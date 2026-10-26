@@ -33,7 +33,7 @@ Sailors are people, counted one by one. Recruiting turns people of a port provin
 
 **Recruiting sailors.** *Recruit sailors* is offered on a port, or on the country card for several ports at once, with one slider, only for provinces with a harbour. Of a province's fighting-age men (a quarter of its people), a muster can call 2 in 3 of the seafolk, 1 in 3 of the homeless and 1 in 20 of every other class, each class by its share. Sailors come from the same people as the levy, so a man at sea can't be levied and the levy pool shows the sailors already gone. A muster pays a bounty of 0.05 gold a sailor, lowers the province's fish for the seafolk away, and has the sailors ready in that port after 14 days.
 
-**The muster queue.** Sailors come in batches of 50, each batch two weeks after the one before, like the recruit queue on the Garrison tab: a crew of 200 takes eight weeks. A port holds at most 10 batches on their way, and the last one can be taken off the queue with its bounty and men back.
+**The muster queue.** Sailors come in batches of 50, each batch two weeks after the one before, like the recruit queue on the Troops tab: a crew of 200 takes eight weeks. A port holds at most 10 batches on their way, and the last one can be taken off the queue with its bounty and men back.
 
 **Waiting in port.** Each sailor in port eats 1 ration a month from the province store and is paid 0.1 gold. After 6 months with no ship being built for them, 1 in 10 drift back to their slots each month.
 
@@ -196,7 +196,7 @@ Each day of the day loop (7 days a turn) fleets take their step and use supply, 
 
 The first slice of ships is playable:
 
-- **Port tab.** Tap a coastal province of yours and open its Port tab: its harbour and shipyard, berths and slipways, sailors ready, on their way and still callable. *Recruit 30, 100 or 300* calls sailors from the levy pool, ready in two weeks. *Order a ship* lists every ship the yard can build with its gold, crew, months, fights and carries, or why it can't yet (crew not in port, no slipway, an invention). A hull on the slipway is launched into the port's fleet when its months are up.
+- **Port tab.** Tap a coastal province of yours, open its Troops tab and then **Port**: its harbour and shipyard, berths and slipways, sailors ready, on their way and still callable. *Recruit 30, 100 or 300* calls sailors from the levy pool, ready in two weeks. *Order a ship* lists every ship the yard can build with its gold, crew, months, fights and carries, or why it can't yet (crew not in port, no slipway, an invention). A hull on the slipway is launched into the port's fleet when its months are up.
 - **Fleets on the map.** Every fleet shows as a ship in its realm's colours with its ship count, in its sea zone or just off its port. Tap one of yours to choose it, then tap a sea zone, a port or a shore: it sets sail at once along a dotted course. Tap it again to open its card.
 - **Fleet card.** Where it is, Sail, its admiral (a fleet needs one to sail: appoint a commander waiting at court), the army aboard, every ship with its crew, hull and supply, *Part off*, *Join another fleet here* and *Lay up*.
 - **Carrying armies.** An army standing in a port shows *Board ships*; aboard, it stands off the map and moves with its ships. Sail to a shore you may march into and it lands there; sail into a friend's port and it goes ashore.

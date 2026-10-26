@@ -93,7 +93,17 @@ How a card sits depends on the shape:
 | Tall | A bottom sheet at 55 % height, dragged up to full height or down to a peek strip |
 | Large | A side sheet 380 px wide at UI scale 1 |
 
-A **country card** has the tabs General, Diplomacy, Trade and Army, and opens on General. A **province card** has a **Garrison** tab for the troops there without a commander.
+Another realm's **country card** has three tabs, General, Diplomacy and Army, and opens on General. Its trade (wealth, richest lands, Show wealth on the map) is a **Trade** fold on General, and its Heritage line opens its heritage as a page with **Back to General**. Before a campaign the picker's card has no tabs at all.
+
+One of your **province cards** has three tabs too, one per question:
+
+| Tab | Pages | What it answers |
+|---|---|---|
+| Overview | | What is this province like? The owner, then folds for **Governed by** (the lord or royal land and the official; it opens by itself while a royal post is empty), **Food** (harvest, what the land feeds, the castle store; open by itself while the land is short), **People** by class, **Tax** and its rates, and a castle's own **Castle food** |
+| Troops | Garrison, Port (in a port) | What can I raise here? Levies, the troops without a commander, sailors and ships |
+| Build | Buildings, Land | What can I change here? Works, and the land's tiles |
+
+Each fold's line says what it holds ("Normal · 3.66 gold a month", "694,000 · 18 % in town"), so most of the time you read the Overview without opening anything. Troops and Build show an hourglass while men gather, hulls build or a site is open.
 
 ### The Realm book
 
@@ -110,9 +120,9 @@ Your own realm's card is the Realm book. Tap your banner or a plaque in the top 
 
 **The Overview** (Realm's first page) is the whole realm on one screen: your capital, then one tile for each other section with its key line (gold and gold a month, provinces and people, armies and men, war or peace, what you study), then your ruler and heir, the score and Stability's four pillars. A tile with a red edge says what waits on you ("2 provinces hungry", "1 new land to fill", "An answer waits", "Choose what to study"), and tapping it opens the page that holds it. What the old General tab repeated from other pages (government form, faiths and languages, lands by ground, heritage, the fallen, neighbours) now lives only on its own page.
 
-Each page keeps what you act on most at the top. Settings and long lists you open now and then sit in folds whose line says what they hold: Food's settings and castles, Trade's Found a trader and Busiest cities, and the officials in post. The Provinces page lists the first eight provinces, and every one that needs you (held by rebels, rioting or plotting, hungry, or royal with no official), with **All provinces** for the rest.
+Each page keeps what you act on most at the top. Settings and long lists you open now and then sit in folds whose line says what they hold: Food's settings and castles, Trade's Found a trader and Busiest cities, and the officials in post. The Provinces page lists the first eight provinces, and every one that needs you (held by rebels, rioting or plotting, hungry, or royal with no official), with **All provinces** for the rest. The Army page opens on your troops against the cap and **Call the lords**; the lords one by one and your commanders sit in folds.
 
-The six sections are one row of icons with their names under the card's title, in every shape; a section with several pages shows them in a second, lower row. Tapping a section opens the page you last looked at there. A red seal on Diplomacy means an offer or an envoy waits for your answer. Turn reports and battle replays live in the News (the scroll button in the top bar), which took the place of the old Chronicle. Another realm's card keeps its own tabs: General, Diplomacy, Trade, Army and Heritage. Show on map (on a screen that points at an army or province) closes the book, moves the camera and opens that card; Back returns to the book on the same tab and scroll position. A book screen opened from a card (Levy from a province card) stacks on the card, and Back returns to the card.
+The six sections are one row of icons with their names under the card's title, in every shape; a section with several pages shows them in a second, lower row. Tapping a section opens the page you last looked at there. A red seal on Diplomacy means an offer or an envoy waits for your answer. Turn reports and battle replays live in the News (the scroll button in the top bar), which took the place of the old Chronicle. Show on map (on a screen that points at an army or province) closes the book, moves the camera and opens that card; Back returns to the book on the same tab and scroll position. A book screen opened from a card (Levy from a province card) stacks on the card, and Back returns to the card.
 
 ### The game menu
 
