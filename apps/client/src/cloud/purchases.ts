@@ -9,8 +9,9 @@ import { CloudError, type CloudApi, type KeyValue } from "./api.ts";
  * store: only this store is ever asked about.
  *
  * Each platform's shell gives the bridge: the Steam build makes one from
- * Steamworks (the paid app is the full game), and a phone shell sets
- * `globalThis.phStore` from its StoreKit 2 or Play Billing plugin. Without a
+ * Steamworks (the paid app is the full game), and the phone apps make one over
+ * their StoreKit 2 or Play Billing plugin (`capacitorStoreBridge`), unless a
+ * shell sets its own in `globalThis.phStore`. Without a
  * bridge, or without a cloud server, the game stays the full game (SAVE-180).
  */
 
@@ -49,6 +50,85 @@ export interface StoreBridge {
 export function shellStoreBridge(): StoreBridge | undefined {
   const b = (globalThis as { phStore?: StoreBridge }).phStore;
   return b && (b.store === "apple" || b.store === "google") ? b : undefined;
+}
+
+/** The parts of a Capacitor runtime the phone store needs (as in bridge.ts). */
+export interface CapacitorStoreLike {
+  getPlatform?(): string;
+  isPluginAvailable?(name: string): boolean;
+  registerPlugin?(name: string): unknown;
+  Plugins?: Record<string, unknown>;
+}
+
+/** A purchase as `@capgo/native-purchases` reports it. */
+interface NativeTransaction {
+  productIdentifier?: string;
+  /** StoreKit 2's signed transaction (iOS). */
+  jwsRepresentation?: string;
+  /** Play's purchase token (Android). */
+  purchaseToken?: string;
+  /** Play's state: "1" bought, "0" waiting for payment (Android). */
+  purchaseState?: string;
+}
+type NativePlugin = Record<string, ((options?: Record<string, unknown>) => Promise<unknown>) | undefined>;
+
+/**
+ * The phone's store, over the `NativePurchases` plugin (`@capgo/native-purchases`, apps/mobile):
+ * StoreKit 2 on iOS and Play Billing on Android, for the one non-consumable `full_game`. Undefined
+ * when the app has no such plugin, so the game stays the full game (SAVE-180). The plugin finishes
+ * and acknowledges the purchase itself, so it holds even when the server never sees it.
+ */
+export function capacitorStoreBridge(cap: CapacitorStoreLike): StoreBridge | undefined {
+  const platform = cap.getPlatform?.();
+  const store: Store | undefined = platform === "ios" ? "apple" : platform === "android" ? "google" : undefined;
+  if (!store || (cap.isPluginAvailable && !cap.isPluginAvailable("NativePurchases"))) return undefined;
+  const plugin = (cap.Plugins?.NativePurchases ?? cap.registerPlugin?.("NativePurchases")) as NativePlugin | undefined;
+  if (!plugin?.getPurchases || !plugin.purchaseProduct) return undefined;
+  const product = savesConfig.purchases.product_id;
+  const inapp = { productType: "inapp" };
+  const proofOf = (t: NativeTransaction | undefined): StoreProof | null => {
+    if (!t) return null;
+    if (store === "apple") return t.jwsRepresentation ? { signedTransaction: t.jwsRepresentation } : null;
+    return t.purchaseToken ? { purchaseToken: t.purchaseToken } : null;
+  };
+  /** The full game among this store account's purchases now: StoreKit's current entitlements, or Play's bought purchases. */
+  const current = async (): Promise<NativeTransaction | undefined> => {
+    const r = (await plugin.getPurchases!({ ...inapp, onlyCurrentEntitlements: true })) as { purchases?: NativeTransaction[] };
+    return (r.purchases ?? []).find((t) => t.productIdentifier === product && (store === "apple" || t.purchaseState === undefined || t.purchaseState === "1"));
+  };
+  return {
+    store,
+    sells: true,
+    owned: async () => !!(await current()),
+    proof: async () => proofOf(await current()),
+    async price() {
+      const r = (await plugin.getProducts?.({ productIdentifiers: [product], ...inapp })) as { products?: { priceString?: string }[] } | undefined;
+      return r?.products?.[0]?.priceString || null;
+    },
+    async buy(accountTag) {
+      let t: NativeTransaction;
+      try {
+        t = (await plugin.purchaseProduct!({ productIdentifier: product, ...inapp, ...(accountTag ? { appAccountToken: accountTag } : {}) })) as NativeTransaction;
+      } catch (e) {
+        const why = `${(e as { code?: string })?.code ?? ""} ${(e as Error)?.message ?? e}`;
+        if (/cancel/i.test(why)) return { outcome: "cancelled" };
+        if (/pending/i.test(why)) return { outcome: "pending" };
+        // Bought before (another device, or a sheet that closed early): what the store holds counts.
+        if (/ALREADY_OWNED/.test(why)) {
+          const proof = proofOf(await current());
+          if (proof) return { outcome: "bought", proof };
+        }
+        throw e;
+      }
+      if (t.purchaseState === "0") return { outcome: "pending" };
+      const proof = proofOf(t) ?? proofOf(await current());
+      return proof ? { outcome: "bought", proof } : { outcome: "pending" };
+    },
+    async restore() {
+      await plugin.restorePurchases?.();
+      return proofOf(await current());
+    },
+  };
 }
 
 /**

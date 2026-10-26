@@ -11,26 +11,57 @@
 // (SAVE-143); and in the Steam build Steamworks gives the Web API ticket the
 // game signs in with (SAVE-140, SAVE-141). The game reaches all three through
 // preload.cjs. Without Steam everything but the ticket works the same.
+//
+// Packaged (electron-builder, docs/steam.md "Packaging") the client build is
+// in `<resources>/client`, and a store build carries its Steam app id in its
+// package.json: started outside Steam, it relaunches through Steam.
 import { app, BrowserWindow, ipcMain, net, protocol, safeStorage } from "electron";
+import { readFileSync } from "node:fs";
 import { dirname, join, normalize, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { saveFolder } from "./saves.mjs";
 import { secretFile } from "./secret.mjs";
-import { onSteamDeck, startSteam, steamAppId } from "./steam.mjs";
+import { builtInAppId, onSteamDeck, relaunchAppId, relaunchThroughSteam, startSteam, steamAppId } from "./steam.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const distDir = normalize(process.env.PH_CLIENT_DIST ?? join(here, "../../client/dist"));
+const distDir = normalize(
+  process.env.PH_CLIENT_DIST ?? (app.isPackaged ? join(process.resourcesPath, "client") : join(here, "../../client/dist")),
+);
 const smoke = process.env.PH_SMOKE === "1";
 const GAME_ORIGIN = "app://game";
+const log = (line) => console.log(line);
 
 protocol.registerSchemesAsPrivileged([
   { scheme: "app", privileges: { standard: true, secure: true, supportFetchAPI: true } },
 ]);
 
-app.whenReady().then(async () => {
-  const steam = await startSteam({ appId: steamAppId(), log: (line) => console.log(line) });
-  if (steam) console.log(`Steam on: app ${steam.appId}`);
+// Only a packaged build has a built-in app id, so `pnpm desktop` and
+// `pnpm --filter @ph/desktop steam` never relaunch.
+const builtIn = app.isPackaged ? packagedAppId() : undefined;
+
+if (relaunchThroughSteam({ appId: relaunchAppId(process.env, process.argv, builtIn), log })) {
+  log("Steam is starting the game itself; this copy quits");
+  app.exit(0);
+} else {
+  // Awaited at the top level, so Electron holds its ready event until
+  // Steamworks has started and the overlay's switches are in.
+  const steam = await startSteam({ appId: steamAppId(process.env, process.argv, builtIn), log, overlay: true });
+  if (steam) log(`Steam on: app ${steam.appId}`);
   app.on("will-quit", () => steam?.close());
+  app.on("window-all-closed", () => app.quit());
+  app.whenReady().then(() => openGame(steam));
+}
+
+/** The Steam app id the packaged build was made with (`dist:steam`), if any. */
+function packagedAppId() {
+  try {
+    return builtInAppId(JSON.parse(readFileSync(join(app.getAppPath(), "package.json"), "utf8")));
+  } catch {
+    return undefined;
+  }
+}
+
+async function openGame(steam) {
   const userData = app.getPath("userData");
   bridge({
     steam,
@@ -57,9 +88,7 @@ app.whenReady().then(async () => {
   await win.loadURL(`${GAME_ORIGIN}/index.html`);
 
   if (smoke) await runSmokeTest(win);
-});
-
-app.on("window-all-closed", () => app.quit());
+}
 
 /** The calls preload.cjs makes, answered only for the game's own pages. */
 function bridge({ steam, saves, secret }) {

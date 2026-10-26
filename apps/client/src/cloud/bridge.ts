@@ -6,9 +6,9 @@ import { CloudError } from "./api.ts";
  * nonce and the server calls live in storeSignIn.ts; this file only talks to the platform.
  *
  * - On a phone (Capacitor) each store goes through a small plugin, used only when the app has it:
- *   `SignInWithApple` (`@capacitor-community/apple-sign-in`), `SocialLogin` for Google's Credential
- *   Manager (`@capgo/capacitor-social-login`), and `Browser` with `App` (`@capacitor/browser`,
- *   `@capacitor/app`) for Steam's page and the return link `pockethegemony://auth/steam`.
+ *   `SocialLogin` (`@capgo/capacitor-social-login`) for Sign in with Apple on iOS and Google's
+ *   Credential Manager on Android, and `Browser` with `App` (`@capacitor/browser`, `@capacitor/app`)
+ *   for Steam's page and the return link `pockethegemony://auth/steam` (apps/mobile, docs/mobile.md).
  * - On the web, Apple's and Google's own sign-in scripts, used only when the build names its Apple
  *   Services ID and redirect address (`VITE_APPLE_SERVICES_ID`, `VITE_APPLE_REDIRECT_URI`) and its
  *   Google client id (`VITE_GOOGLE_CLIENT_ID`); Steam goes to Steam in the same tab and comes back.
@@ -67,43 +67,52 @@ export interface CapacitorLike {
 
 /**
  * The phone's bridge. `googleClientId` is the web client id Google's tokens are made for (the
- * Android app names it as its server client); `appleClientId` is the app's bundle id.
+ * Android app names it as its server client); `appleClientId` is the app's bundle id. Sign in with
+ * Apple is offered on iOS only, where the sheet is the system's own (the stores per platform are
+ * `sign_in.options`).
  */
-export function capacitorBridge(cap: CapacitorLike, config: { googleClientId?: string | undefined; appleClientId: string; appleRedirectUri?: string | undefined; appReturn: string }): SignInBridge {
+export function capacitorBridge(cap: CapacitorLike, config: { googleClientId?: string | undefined; appleClientId: string; appReturn: string }): SignInBridge {
   const plugin = (name: string): Plugin | undefined => {
     if (cap.isPluginAvailable && !cap.isPluginAvailable(name)) return undefined;
     return (cap.Plugins?.[name] ?? cap.registerPlugin?.(name)) as Plugin | undefined;
   };
-  let googleReady: Promise<unknown> | undefined;
+  // SocialLogin starts each provider once, with only that provider's settings.
+  const ready = new Map<string, Promise<unknown>>();
+  const start = (p: Plugin, provider: "apple" | "google", options: Record<string, unknown>) => {
+    if (!ready.has(provider)) ready.set(provider, p.initialize!({ [provider]: options }));
+    return ready.get(provider)!;
+  };
   return {
     steamReturn: config.appReturn,
     can: (store) =>
       store === "apple"
-        ? !!plugin("SignInWithApple")
+        ? !!plugin("SocialLogin") && cap.getPlatform?.() === "ios"
         : store === "google"
           ? !!plugin("SocialLogin") && !!config.googleClientId
           : !!plugin("Browser") && !!plugin("App"),
     async apple(nonceHash) {
-      const p = plugin("SignInWithApple");
-      if (!p?.authorize) throw failed();
-      let r: { response?: { identityToken?: string; authorizationCode?: string; givenName?: string | null; familyName?: string | null } };
+      const p = plugin("SocialLogin");
+      if (!p?.initialize || !p.login) throw failed();
+      let r: { result?: { idToken?: string | null; accessToken?: { token?: string | null } | null; profile?: { givenName?: string | null; familyName?: string | null } } };
       try {
-        // On iOS the plugin asks for the app's own bundle id; the client id and redirect matter only off iOS.
-        r = (await p.authorize({ clientId: config.appleClientId, redirectURI: config.appleRedirectUri ?? "", scopes: "name", nonce: nonceHash })) as typeof r;
+        // On iOS Apple's sheet signs for the app's own bundle id; the client id only names the provider.
+        await start(p, "apple", { clientId: config.appleClientId });
+        r = (await p.login({ provider: "apple", options: { scopes: ["name"], nonce: nonceHash } })) as typeof r;
       } catch {
         throw cancelled();
       }
-      const token = r.response?.identityToken;
+      const token = r.result?.idToken;
       if (!token) throw failed();
-      return { identityToken: token, authorizationCode: r.response?.authorizationCode || undefined, name: nameOf(r.response?.givenName, r.response?.familyName) };
+      // Left in its default mode the plugin hands back Apple's one-time authorization code as accessToken.token,
+      // unspent, so the server can trade it for the refresh token it revokes on Delete account.
+      return { identityToken: token, authorizationCode: r.result?.accessToken?.token || undefined, name: nameOf(r.result?.profile?.givenName, r.result?.profile?.familyName) };
     },
     async google(nonceHash) {
       const p = plugin("SocialLogin");
       if (!p?.initialize || !p.login || !config.googleClientId) throw failed();
-      googleReady ??= p.initialize({ google: { webClientId: config.googleClientId } });
       let r: { result?: { idToken?: string | null; profile?: { name?: string | null } } };
       try {
-        await googleReady;
+        await start(p, "google", { webClientId: config.googleClientId });
         r = (await p.login({ provider: "google", options: { scopes: ["profile"], nonce: nonceHash } })) as typeof r;
       } catch {
         throw cancelled();

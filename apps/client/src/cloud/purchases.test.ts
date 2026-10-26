@@ -3,7 +3,7 @@ import "@ph/engine";
 import { describe, expect, it } from "vitest";
 import { savesConfig } from "@ph/engine/domain/saves";
 import { CloudApi, CloudError, webTokenStore, type KeyValue } from "./api.ts";
-import { Purchases, purchasesApi, shellStoreBridge, steamStoreBridge, unlockHtml, type BuyOutcome, type EntitlementAnswer, type PurchasesApi, type StoreBridge, type StoreProof } from "./purchases.ts";
+import { capacitorStoreBridge, Purchases, purchasesApi, shellStoreBridge, steamStoreBridge, unlockHtml, type BuyOutcome, type EntitlementAnswer, type PurchasesApi, type StoreBridge, type StoreProof } from "./purchases.ts";
 
 const PM = savesConfig.purchases.messages;
 
@@ -103,6 +103,81 @@ describe("the game decides from its store and the server (SAVE-179)", () => {
     (globalThis as { phStore?: unknown }).phStore = { ...fakeStore().bridge };
     expect(shellStoreBridge()?.store).toBe("apple");
     delete (globalThis as { phStore?: unknown }).phStore;
+  });
+});
+
+/** The NativePurchases plugin as a phone app has it: the purchases the store holds, and what its sheet does. */
+function fakeNative(platform: "ios" | "android", o: { held?: Record<string, unknown>[]; sheet?: () => Promise<unknown>; plugin?: boolean } = {}) {
+  const calls: string[] = [];
+  let held = o.held ?? [];
+  const NativePurchases = {
+    getPurchases: async (opts: Record<string, unknown>) => (calls.push(`getPurchases ${JSON.stringify(opts)}`), { purchases: held }),
+    getProducts: async (opts: Record<string, unknown>) => (calls.push(`getProducts ${JSON.stringify(opts)}`), { products: [{ identifier: "full_game", priceString: "€9.99" }] }),
+    purchaseProduct: async (opts: Record<string, unknown>) => {
+      calls.push(`purchaseProduct ${JSON.stringify(opts)}`);
+      return o.sheet ? o.sheet() : platform === "ios" ? { productIdentifier: "full_game", jwsRepresentation: "jws.1" } : { productIdentifier: "full_game", purchaseToken: "tok.1", purchaseState: "1" };
+    },
+    restorePurchases: async () => {
+      calls.push("restorePurchases");
+      held = [{ productIdentifier: "full_game", jwsRepresentation: "jws.old", purchaseToken: "tok.old", purchaseState: "1" }];
+    },
+  };
+  const cap = { getPlatform: () => platform, isPluginAvailable: (n: string) => o.plugin !== false && n === "NativePurchases", Plugins: { NativePurchases } };
+  return { cap, calls };
+}
+
+describe("the phone's store over its purchases plugin (SAVE-179 … SAVE-185)", () => {
+  it("is there only in a phone app that has the plugin", () => {
+    expect(capacitorStoreBridge({})).toBeUndefined();
+    expect(capacitorStoreBridge(fakeNative("ios", { plugin: false }).cap)).toBeUndefined();
+    expect(capacitorStoreBridge({ ...fakeNative("ios").cap, getPlatform: () => "web" })).toBeUndefined();
+    expect(capacitorStoreBridge(fakeNative("ios").cap)).toMatchObject({ store: "apple", sells: true });
+    expect(capacitorStoreBridge(fakeNative("android").cap)).toMatchObject({ store: "google", sells: true });
+  });
+
+  it("reads ownership and the proof from the store's current purchases, without a sheet", async () => {
+    const ios = fakeNative("ios", { held: [{ productIdentifier: "other" }, { productIdentifier: "full_game", jwsRepresentation: "jws.0" }] });
+    const apple = capacitorStoreBridge(ios.cap)!;
+    expect(await apple.owned()).toBe(true);
+    expect(await apple.proof()).toEqual({ signedTransaction: "jws.0" });
+    expect(await apple.price()).toBe("€9.99");
+    expect(ios.calls[0]).toBe(`getPurchases {"productType":"inapp","onlyCurrentEntitlements":true}`);
+    expect(ios.calls.some((c) => c.startsWith("purchaseProduct"))).toBe(false);
+    // A Play purchase still waiting for payment is not owned yet.
+    const google = capacitorStoreBridge(fakeNative("android", { held: [{ productIdentifier: "full_game", purchaseToken: "tok.0", purchaseState: "0" }] }).cap)!;
+    expect(await google.owned()).toBe(false);
+    expect(await google.proof()).toBeNull();
+  });
+
+  it("buys full_game with the account's tag and hands over the store's proof", async () => {
+    const ios = fakeNative("ios");
+    expect(await capacitorStoreBridge(ios.cap)!.buy("0f8fad5b-d9cb-469f-a165-70867728950e")).toEqual({ outcome: "bought", proof: { signedTransaction: "jws.1" } });
+    expect(ios.calls).toContain(`purchaseProduct {"productIdentifier":"full_game","productType":"inapp","appAccountToken":"0f8fad5b-d9cb-469f-a165-70867728950e"}`);
+    const android = fakeNative("android");
+    expect(await capacitorStoreBridge(android.cap)!.buy(null)).toEqual({ outcome: "bought", proof: { purchaseToken: "tok.1" } });
+    expect(android.calls).toContain(`purchaseProduct {"productIdentifier":"full_game","productType":"inapp"}`);
+  });
+
+  it("tells a cancelled sheet and a pending payment apart from a failure", async () => {
+    const reject = (message: string, code?: string) => () => Promise.reject(Object.assign(new Error(message), code ? { code } : {}));
+    expect(await capacitorStoreBridge(fakeNative("ios", { sheet: reject("User cancelled") }).cap)!.buy(null)).toEqual({ outcome: "cancelled" });
+    expect(await capacitorStoreBridge(fakeNative("android", { sheet: reject("Purchase cancelled", "USER_CANCELED") }).cap)!.buy(null)).toEqual({ outcome: "cancelled" });
+    expect(await capacitorStoreBridge(fakeNative("ios", { sheet: reject("Transaction pending") }).cap)!.buy(null)).toEqual({ outcome: "pending" });
+    expect(await capacitorStoreBridge(fakeNative("android", { sheet: reject("Purchase is pending") }).cap)!.buy(null)).toEqual({ outcome: "pending" });
+    await expect(capacitorStoreBridge(fakeNative("android", { sheet: reject("Billing unavailable", "BILLING_UNAVAILABLE") }).cap)!.buy(null)).rejects.toThrow();
+    // Already bought on this Play account: the purchase it holds counts.
+    const owned = fakeNative("android", { sheet: reject("Item already owned", "ITEM_ALREADY_OWNED"), held: [{ productIdentifier: "full_game", purchaseToken: "tok.0", purchaseState: "1" }] });
+    expect(await capacitorStoreBridge(owned.cap)!.buy(null)).toEqual({ outcome: "bought", proof: { purchaseToken: "tok.0" } });
+  });
+
+  it("Restore purchases asks the store again, then reads what it holds", async () => {
+    const ios = fakeNative("ios");
+    expect(await capacitorStoreBridge(ios.cap)!.restore()).toEqual({ signedTransaction: "jws.old" });
+    expect(ios.calls[0]).toBe("restorePurchases");
+    // Nothing to restore.
+    const none = fakeNative("android");
+    none.cap.Plugins.NativePurchases.restorePurchases = async () => {};
+    expect(await capacitorStoreBridge(none.cap)!.restore()).toBeNull();
   });
 });
 
