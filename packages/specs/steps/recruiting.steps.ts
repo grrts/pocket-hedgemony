@@ -1518,8 +1518,8 @@ Given("its commander {string}", (s, name: string) => {
   s.commander = name;
 });
 
-When(re("he leads (a fleet|an army)"), (s, post: string) => {
-  s.ranked = rankedName(nameRules, s.realm, s.commander, post === "a fleet" ? "admiral" : "general");
+When(re("he leads (a fleet|a fleet as commodore|a fleet as viceroy|an army)"), (s, post: string) => {
+  s.ranked = rankedName(nameRules, s.realm, s.commander, post === "an army" ? "general" : post === "a fleet" ? "admiral" : post === "a fleet as commodore" ? "commodore" : "viceroy");
 });
 
 Then("he is called {string}", (s, ranked: string) => {
