@@ -161,9 +161,10 @@ Not in scope (owned by …):
 - INST-060 At the start, the Shogunate's holder shall be Japan, its members Japan's great houses, and its hold 30.
   The great houses are the shogun's lords who hold land; the Court's province is the province holding Kyoto, and
   Japan's land is the shogun's provinces of 1444. [institutions §4; D-INST-1]
-- INST-061 The yearly hold count shall add +3 when no house is In revolt, −5 for each house In revolt, −10 while the
+- INST-061 The yearly hold count shall add +3 when no house is In revolt, −5 for each house In revolt, −2 while the
   realm has no adult heir, −3 while the shogun is at war and over half his houses are Wavering or worse, and +1 for
-  each summoned house. [institutions §4]
+  each summoned house. [institutions §4; −2 from −10 after the balance runs of 26 Oct 2026: from 1378 the shogun has no
+  adult heir and the hold fell 7 a year, so the Shogunate broke in 1383 in every run]
 - INST-062 Each season, every great house shall count *The shogun's hold* in its loyalty: +1 step at Firm or Strong,
   none at Weak, −1 at Hollow. [institutions §4]
 - INST-063 While hold is Firm or better, the shogun may summon a house: its lord's wealth falls by 10 % a year and he
