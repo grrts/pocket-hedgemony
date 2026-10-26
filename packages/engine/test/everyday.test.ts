@@ -9,6 +9,7 @@ import geography from "../../rules/data/domain/exploration-regions.json" with { 
 import { lordLands } from "../src/lords.ts";
 import type { News } from "../src/war.ts";
 import { startOutbreak } from "../src/plague.ts";
+import { personDies } from "../src/people.ts";
 
 const rules = loadDefaultRuleset();
 const tiles = loadMapTiles(rules);
@@ -51,29 +52,48 @@ describe("everyday events (EVT-115 to EVT-128)", () => {
     expect(everydayCards(w, w.player)).toHaveLength(1);
   });
 
-  it("an official's death: the deputy starts afresh, a seasoned man costs gold and keeps the post's years (EVT-122)", () => {
+  /** A royal post of the player's with an official in it. */
+  const royalPost = (w: World) => [...Array(w.provinceCount).keys()].find((p) => w.provinceOwner[p] === w.player && w.provinceLord[p]! < 0 && w.provinceOfficial[p]! >= 0 && w.provinceOccupier[p]! < 0)!;
+
+  it("an official's death empties his seat; the deputy starts afresh, a seasoned man costs gold and keeps the post's years (EVT-122)", () => {
     const w = france();
     const news: News[] = [];
-    const ev = fireEverydayNow(w, "official_dies", w.player, news)!;
-    const p = ev.province!;
+    const p = royalPost(w);
+    const type = w.provinceOfficial[p]!;
+    w.provinceOfficialSince[p] = w.day - 3 * 365;
     const since = w.provinceOfficialSince[p]!;
+    personDies(w, { kind: "official", p }, "old age", news);
+    expect(w.provinceOfficial[p]).toBe(-1);
     const gold = w.nationTreasury[w.player]!;
     const card = everydayCards(w, w.player)[0]!;
     expect(card.title).toMatch(/^Death of /);
+    expect(card.text).toMatch(/3 years in the post/);
     expect(card.options.map((o) => o.id)).toContain("seasoned");
-    expect(answerEveryday(w, w.player, ev.id, "seasoned", news)).toBeNull();
+    expect(answerEveryday(w, w.player, card.event, "seasoned", news)).toBeNull();
     expect(w.nationTreasury[w.player]).toBe(gold - 25);
+    expect(w.provinceOfficial[p]).toBe(type);
     expect(w.provinceOfficialSince[p]).toBe(since);
-    const ev2 = fireEverydayNow(w, "official_dies", w.player, news)!;
     w.day += 400;
-    expect(answerEveryday(w, w.player, ev2.id, "deputy", news)).toBeNull();
-    expect(w.provinceOfficialSince[ev2.province!]).toBe(w.day);
+    personDies(w, { kind: "official", p }, "old age", news);
+    const next = everydayCards(w, w.player)[0]!;
+    expect(answerEveryday(w, w.player, next.event, "deputy", news)).toBeNull();
+    expect(w.provinceOfficial[p]).toBe(type);
+    expect(w.provinceOfficialSince[p]).toBe(w.day);
+  });
+
+  it("a death while an everyday event waits brings no second card, and a death is never drawn (EVT-117, EVT-122)", () => {
+    const w = france();
+    const p = royalPost(w);
+    fireEverydayNow(w, "lords_quarrel", w.player, []);
+    personDies(w, { kind: "official", p }, "old age", []);
+    expect(everydayCards(w, w.player)).toHaveLength(1);
+    expect(fireEverydayNow(w, "official_dies", w.player, [])).toBeNull();
   });
 
   it("an option that costs more gold than the realm holds is not offered (EVT-120)", () => {
     const w = france();
     w.nationTreasury[w.player] = 5;
-    fireEverydayNow(w, "official_dies", w.player, []);
+    personDies(w, { kind: "official", p: royalPost(w) }, "old age", []);
     expect(everydayCards(w, w.player)[0]!.options.map((o) => o.id)).not.toContain("seasoned");
   });
 
@@ -88,20 +108,50 @@ describe("everyday events (EVT-115 to EVT-128)", () => {
     expect(w.provinceStore[p]).toBeCloseTo(after + ev.loss! / 2, 3);
   });
 
-  it("a lord's death: his son follows him, or the crown takes his lands and the other lords fear for theirs (EVT-123)", () => {
+  it("a lord's death: his heir holds the lands, or the crown takes them and the other lords fear for theirs (EVT-123)", () => {
     const w = france();
-    const ev = fireEverydayNow(w, "lord_dies", w.player, [])!;
-    const k = ev.lord!;
+    const mine = () => w.lords.flatMap((l, j) => (l.nation === w.player && !l.gone && lordLands(w, j).length ? [j] : []));
+    const k = mine()[0]!;
+    const l = w.lords[k]!;
+    const dead = l.name;
+    l.heir = { name: "Jean Testard", age: 20 };
     const lands = lordLands(w, k);
-    expect(lands.length).toBeGreaterThan(0);
-    const others = w.lords.flatMap((l, j) => (j !== k && l.nation === w.player ? [j] : []));
-    expect(answerEveryday(w, w.player, ev.id, "take", [])).toBeNull();
+    personDies(w, { kind: "lord", lord: k }, "old age", []);
+    expect(l.name).toBe("Jean Testard");
+    const card = everydayCards(w, w.player)[0]!;
+    expect(card.title).toBe(`Death of ${dead}`);
+    expect(answerEveryday(w, w.player, card.event, "take", [])).toBeNull();
     expect(lordLands(w, k)).toEqual([]);
     for (const p of lands) expect(w.provinceLord[p]).toBe(-1);
-    expect(others.some((j) => w.lords[j]!.loyalty !== "Loyal")).toBe(true);
-    const ev2 = fireEverydayNow(w, "lord_dies", w.player, [])!;
-    expect(answerEveryday(w, w.player, ev2.id, "confirm", [])).toBeNull();
-    expect(w.lords[ev2.lord!]!.name).toBe(ev2.name);
+    expect(w.lords.some((x, j) => j !== k && x.nation === w.player && x.loyalty !== "Loyal")).toBe(true);
+    const k2 = mine()[0]!;
+    w.lords[k2]!.heir = { name: "Pierre Testard", age: 30 };
+    personDies(w, { kind: "lord", lord: k2 }, "battle", []);
+    const next = everydayCards(w, w.player)[0]!;
+    expect(answerEveryday(w, w.player, next.event, "confirm", [])).toBeNull();
+    expect(w.lords[k2]!.name).toBe("Pierre Testard");
+    expect(lordLands(w, k2).length).toBeGreaterThan(0);
+  });
+
+  it("a lord whose line dies out brings no card: his lands are the crown's already (EVT-123)", () => {
+    const w = france();
+    const k = w.lords.findIndex((l, j) => l.nation === w.player && !l.gone && lordLands(w, j).length > 0);
+    personDies(w, { kind: "lord", lord: k }, "old age", []);
+    if (w.lords[k]!.gone) expect(everydayCards(w, w.player)).toEqual([]);
+    else expect(everydayCards(w, w.player)).toHaveLength(1);
+  });
+
+  it("the heir trusted to prayer dies through the death of people (EVT-127)", () => {
+    const w = france();
+    const r = w.rulers[w.player]!;
+    r.heir = { name: "Charles", age: 8, sex: "m", relation: "child" };
+    const news: News[] = [];
+    for (let k = 0; k < 40 && w.rulers[w.player]!.heir; k++) {
+      const ev = fireEverydayNow(w, "heir_ill", w.player, news)!;
+      expect(answerEveryday(w, w.player, ev.id, "pray", news)).toBeNull();
+    }
+    expect(w.rulers[w.player]!.heir).toBeNull();
+    expect(news.some((x) => /Your heir, Charles, dies of a fever/.test(x.text))).toBe(true);
   });
 
   it("a child born to an heirless ruler becomes the heir (EVT-124)", () => {
@@ -148,6 +198,63 @@ describe("everyday events (EVT-115 to EVT-128)", () => {
     const next = everydayCards(w, w.player)[0]!;
     expect(answerEveryday(w, w.player, next.event, "close", [])).toBeNull();
     expect(w.provinceQuarantine[mine[2]!]).toBe(1);
+  });
+
+  it("a general's death: his second may keep the men in the field, or they go home (EVT-132)", () => {
+    const w = france();
+    const n = w.player;
+    w.nationTreasury[n] = 1000;
+    const a = w.armies;
+    let i = -1;
+    for (let k = 0; k < a.count && i < 0; k++) if (a.alive[k] && a.owner[k] === n && a.commander[k]! >= 0 && a.battle[k]! < 0) i = k;
+    const lordLand = [...w.provinceLord.keys()].find((p) => w.provinceOwner[p] === n && w.provinceLord[p]! >= 0)!;
+    a.location[i] = lordLand;
+    a.tile[i] = w.tiles.centre[lordLand]!;
+    const news: News[] = [];
+    personDies(w, { kind: "commander", c: a.commander[i]! }, "old age", news);
+    // The men are on their way home (RECR-135) and a card asks about them.
+    expect(a.retreating[i]).toBe(1);
+    const card = everydayCards(w, n)[0]!;
+    expect(card.text).toMatch(/your general, has died at .*His second in command, .*, asks to lead them/);
+    expect(card.options.map((o) => o.id)).toEqual(["second", "home"]);
+    expect(card.options[0]!.effects).toEqual(["You: gold −15", expect.stringMatching(/leads them: Might [1-3], Cunning [1-3], Logistics [1-3]/)]);
+    expect(answerEveryday(w, n, card.event, "second", news)).toBeNull();
+    const c = a.commander[i]!;
+    expect(c).toBeGreaterThanOrEqual(0);
+    expect(w.commanderOwner[c]).toBe(n);
+    expect(a.retreating[i]).toBe(0);
+    expect(a.route[i]).toEqual([]);
+    expect(a.location[i]).toBe(lordLand);
+  });
+
+  it("a general's second is not offered once another commander has taken the men (EVT-132)", () => {
+    const w = france();
+    const n = w.player;
+    const a = w.armies;
+    let i = -1;
+    for (let k = 0; k < a.count && i < 0; k++) if (a.alive[k] && a.owner[k] === n && a.commander[k]! >= 0 && a.battle[k]! < 0) i = k;
+    personDies(w, { kind: "commander", c: a.commander[i]! }, "old age", []);
+    a.commander[i] = 0;
+    const card = everydayCards(w, n)[0]!;
+    expect(card.options.map((o) => o.id)).toEqual(["home"]);
+  });
+
+  it("an admiral's death: his flag captain may keep the fleet at sea (EVT-132)", () => {
+    const w = createWorld(rules, 1, tiles);
+    const n = w.nationIndex.get("venice")!;
+    w.player = n;
+    w.nationTreasury[n] = 1000;
+    const f = w.navy.fleets.find((x) => x.owner === n && x.ships.length)!;
+    const post = w.provinceOfficial.findIndex((o, q) => o >= 0 && w.provinceOwner[q] === n && w.provinceLord[q]! < 0);
+    expect(processTurn(w, [{ type: "commission", province: post, sea: true }], n).rejectedOrders).toEqual([]);
+    const c = w.commanderIds.length - 1;
+    f.admiral = c;
+    personDies(w, { kind: "commander", c }, "at sea", []);
+    const card = everydayCards(w, n)[0]!;
+    expect(card.text).toMatch(/your admiral, has died/);
+    expect(answerEveryday(w, n, card.event, "second", [])).toBeNull();
+    expect(f.admiral).toBeGreaterThan(c);
+    expect(f.fleeing).toBe(false);
   });
 
   type Def = { weight: number; needs: string; where?: string[]; from?: number; to?: number; options: { needs?: string; effects: { gold?: number }[] }[] };

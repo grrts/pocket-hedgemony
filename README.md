@@ -11,7 +11,7 @@ A turn-based, 8-bit grand strategy game for phones, desktop and the web, startin
 | `apps/client` | The web game (Vite). Runs the engine in a Web Worker. |
 | `apps/desktop` | Electron wrapper around the client build. |
 | `apps/mobile` | Capacitor wrapper (iOS and Android) around the client build. |
-| `server` | Symfony 7.4 app: the API for accounts and metrics, and the website with the wiki at `/wiki` ([docs/website.md](docs/website.md)). |
+| `server` | Symfony 7.4 app: the API for accounts and metrics, and the website with the wiki at `/wiki` ([docs/website.md](docs/website.md)); deploying it: [docs/deploy.md](docs/deploy.md). |
 | `tools/mapgen` | Builds the world map and the 1444 setup from Natural Earth (public domain) data and the Köppen-Geiger climate map (CC BY 4.0). |
 
 ## Running it
@@ -27,7 +27,7 @@ cd apps/mobile && pnpm sync && npx cap add android   # then: npx cap open androi
 # phones play in landscape: `pnpm sync` patches the generated Android and iOS projects to lock it
 
 cd server && composer install
-php bin/console doctrine:schema:update --force   # SQLite in var/ for local dev
+php bin/console doctrine:schema:update --force   # SQLite in var/ for local dev; production uses migrations (docs/deploy.md)
 php -S localhost:8000 -t public
 php bin/phpunit
 ```

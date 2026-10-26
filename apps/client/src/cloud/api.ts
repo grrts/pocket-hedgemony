@@ -124,7 +124,7 @@ export interface DeviceRow {
  * ID token with the nonce whose SHA-256 the store signed into it, or the one-time code Steam in the
  * browser came back with.
  */
-export type StoreProof = { appleIdentityToken: string; nonce: string } | { googleIdToken: string; nonce: string } | { steamOpenIdCode: string };
+export type StoreProof = { appleIdentityToken: string; nonce: string; appleAuthorizationCode?: string } | { googleIdToken: string; nonce: string } | { steamOpenIdCode: string };
 
 export interface AccountCard extends AccountInfo {
   signIns: { provider: string; label: string }[];
@@ -427,6 +427,16 @@ export class CloudApi {
   /** `GET /api/account`: sign-ins and devices for the account card. */
   getAccount(): Promise<AccountCard> {
     return this.json<AccountCard>("GET", "/api/account");
+  }
+
+  /**
+   * `DELETE /api/account` (SAVE-198): deletes the account with its cloud and
+   * shared saves, signing every device out; this one forgets its tokens and
+   * its cloud lines, and keeps the saves on the device (SAVE-206).
+   */
+  async deleteAccount(): Promise<void> {
+    await this.call("DELETE", "/api/account");
+    this.forget();
   }
 
   /** `DELETE /api/devices/{id}`; signing this device out forgets its tokens even when the server can't be reached. */

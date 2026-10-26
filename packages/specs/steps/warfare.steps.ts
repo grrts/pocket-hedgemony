@@ -1702,7 +1702,7 @@ Given("it is level {int}", (s, level: number) => {
 When("it fights a bell", (s) => {
   s.hits = R.hitsOf(company(s), s.hitCtx);
 });
-Then("it deals {int} hits", (s, n: number) => close(s.hits, n));
+Then(/^it deals ([\d.]+) hits$/, (s, n: string) => close(s.hits, Number(n)));
 
 Given("the country {string} has {int} % of its people in calm provinces", (s, _c: string, content: number) => {
   s.content = pct(content);
@@ -1876,7 +1876,7 @@ Then("each of them has a 1 in 10 chance of capture, more if pursued", (s) => {
 
 /** A finished battle's result, for the record. */
 function resultOf(winner: string, loser: string, init: Partial<R.BattleResult> = {}): R.BattleResult {
-  return { winner, loser, how: "broke", bells: 6, days: 1, losses: {}, sectorsLost: {}, campTaken: false, townFought: false, lines: [], reason: "", brokenCompanies: [], pursuitShare: 1, ordersGiven: {}, ...init };
+  return { winner, loser, how: "broke", bells: 6, days: 1, losses: {}, sectorsLost: {}, campTaken: false, townFought: false, lines: [], reason: "", brokenCompanies: [], pursuitShare: 1, ordersGiven: {}, curve: [], ...init };
 }
 Given("the army of {string} under {string} holds the field against {string}", (s, winner: string, name: string, loser: string) => {
   s.armies = {
@@ -3230,11 +3230,11 @@ Given(/^a battle fought in era (\w+) by realms that know (.+)$/, (s, era: string
   s.era = era as R.Era;
   s.known = ids(inv);
 });
-const BELL: Record<string, string> = { "2 hours": "2 hours", "half a day": "half a day", "a day": "a day" };
-Then(/^a bell is (2 hours|half a day|a day)$/, (s, bell: string) => expect(R.battleScale(s.era).bell).toBe(BELL[bell]));
+const BELL: Record<string, string> = { "4 hours": "4 hours", "half a day": "half a day", "a day": "a day" };
+Then(/^a bell is (4 hours|half a day|a day)$/, (s, bell: string) => expect(R.battleScale(s.era).bell).toBe(BELL[bell]));
 Then("the longest battle is {int} days", (s, d: number) => expect(R.battleScale(s.era).maxDays).toBe(d));
 Then(/^sector room is (all|half|a quarter) of the sector table$/, (s, r: string) => expect(R.battleScale(s.era).room).toBe({ all: 1, half: 0.5, "a quarter": 0.25 }[r]));
-Then("hits per bell are {int} % of the front", (s, h: number) => close(R.hitsShare(s.known, s.era), pct(h)));
+Then(/^hits per bell are ([\d.]+) % of the front$/, (s, h: string) => close(R.hitsShare(s.known, s.era), pct(Number(h))));
 
 // D-WAR-13: skills grow by era; the staff college is the academy of eras VI–VII.
 Given("a commander in era {word}", (s, era: string) => {

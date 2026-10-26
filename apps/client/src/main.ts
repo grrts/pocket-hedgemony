@@ -132,9 +132,9 @@ import { autosaveDue, continueTarget, gate, longDate, newCampaign, newManualSave
 import { SaveStore, type StoredSave } from "./saves/store.ts";
 import { FileSaveStore, moveIntoFolder, type SaveStoreLike } from "./saves/fileStore.ts";
 import { desktopBridge } from "./desktop.ts";
-import { animationsPref, autosaveEvery, env as settingsEnv, autosavesKept, battleStepMs, batteryOn, dayMs, lensPatternsOn, livingPrefs, longPressMs, mapDetail, mapPower, onPrefs, setPref, textZoom, visionPref } from "./settings/prefs.ts";
+import { animationsPref, autosaveEvery, env as settingsEnv, autosavesKept, battleStepMs, batteryOn, dayMs, lensPatternsOn, livingPrefs, longPressMs, mapDetail, mapPower, onPrefs, pref, setPref, textZoom, visionPref } from "./settings/prefs.ts";
 import { bandPattern, lensRamp, lensSet, nationColours, PATTERN_COUNT, patternCss, rgbHex, shown, visionIndex, type Vision } from "./map/colourVision.ts";
-import { openSettingsAt, renderSettings, setHintsRows, setOwnSection } from "./ui/settingsScreen.ts";
+import { openSettingsAt, renderSettings, setHintsRows, setOwnSection, showRows } from "./ui/settingsScreen.ts";
 import { CloudApi, CloudError, cloudBase, desktopTokenStore, webKeyValue, webTokenStore } from "./cloud/api.ts";
 import { SteamSignIn } from "./cloud/steam.ts";
 import { CLOUD_PATH, CloudSync } from "./cloud/sync.ts";
@@ -143,6 +143,8 @@ import { capacitorBridge, noBridge, webBridge, type CapacitorLike } from "./clou
 import { APP_RETURN, StoreSignIn } from "./cloud/storeSignIn.ts";
 import { bindShareSheet, fetchSharedCopy, openError, shareSheetHtml, shareView, type ShareView } from "./cloud/share.ts";
 import { bindUnlock, capacitorStoreBridge, Purchases, purchasesApi, shellStoreBridge, steamStoreBridge, unlockHtml } from "./cloud/purchases.ts";
+import { setTelemetryHooks, telemetry } from "./telemetry/install.ts";
+import { GAME_VERSION } from "./version.ts";
 
 const rules = loadDefaultRuleset();
 // ?engine=main-thread forces the fallback path, for testing it.
@@ -151,6 +153,8 @@ const forceMainThread = new URLSearchParams(location.search).get("engine") === "
 const previewMonth = Number(new URLSearchParams(location.search).get("month")) || 0;
 const previewDay = Number(new URLSearchParams(location.search).get("day")) || 15;
 const engine = new EngineClient({ forceMainThread });
+// The engine failing is a crash too: the worker dying, or a request that throws inside it.
+engine.onFailure = (kind, message, stack) => telemetry.crash(kind === "worker" ? "worker" : "error", message, stack);
 
 const diagnostics: Diagnostics = {
   runtime: detectRuntime(),
@@ -552,6 +556,8 @@ document.addEventListener("click", (e) => {
   lordView = -1;
   declareFor = -1;
   realmTab = (b.dataset.realmOpen as typeof realmTab | undefined) ?? "general";
+  // Research opened from outside starts on Next: what to study (RSCH-116).
+  if (realmTab === "learning") learningUi.part = "next";
   newsView = false;
   panelCollapsed = false;
   renderPanel();
@@ -955,6 +961,7 @@ async function boot(): Promise<void> {
       if (i >= 0) view.lookAt(provinces[i]!.x!, provinces[i]!.y!, Math.max(view.camera.zoom, 4));
     },
     end: endTutorial,
+    step: (chapter, step) => telemetry.track("tutorial_step", { chapter, step }),
   });
 }
 
@@ -1457,12 +1464,12 @@ function restyleProvinces(): void {
 }
 
 // ---- overlay: nation names, cities, armies ----
-let nationLabels = computeNationLabels();
-
 /** How many of a realm's provinces, nearest its middle, its name may sit on. */
 const LABEL_ANCHORS = 6;
 /** The smallest realm name drawn, in pixels. */
 const LABEL_MIN_PX = 9;
+// After the constants it reads: unbundled (the dev server) a const is not there before its line runs.
+let nationLabels = computeNationLabels();
 
 function computeNationLabels() {
   const acc = nations.map(() => ({ x: 0, y: 0, n: 0, ref: -1, owned: [] as number[] }));
@@ -3358,6 +3365,8 @@ function renderHud(): void {
           return `<button class="plaque gold" data-realm="${me}"${open(p.opens)} title="Treasury: gold, and change per month. Opens the ledger">${icon("coin", 1)}<span class="gold-n${goldShown() === p.gold ? "" : p.gold > hudShot.goldFrom ? " up" : " down"}">${fmt(goldShown())}</span> <small class="${p.falling ? "down" : ""}">${p.perMonth >= 0 ? "+" : ""}${p.perMonth.toFixed(1)}</small><i ${shotClass("gold-pop", p.gold > hudShot.goldFrom ? "up" : "down", hudShot.goldAt, 600)} aria-hidden="true">${icon("coin", 1)}</i></button>`;
         case "stability":
           return stabilityPlaque(s.stability!, me, s.revolution);
+        case "research":
+          return `<button class="plaque research-plaque${p.study ? "" : " idle"}" data-realm="${me}"${open(p.opens)} title="${p.study ? `Research: studying ${esc(p.study)}, ${p.pct} %` : "Research: nothing studied, choose a study"}">${icon("scroll", 1)}<span class="plaque-text">${p.study ? `${p.pct}%` : "Study!"}</span></button>`;
         case "war":
           return `<button class="plaque at-war" data-realm="${me}"${open(p.opens)} data-war-focus title="Your wars: your side's peace voices, amber past a third, red past half">${icon("swords", 1)}At war${warPlaqueBars(myWarsRaw(), me)}</button>`;
         case "dispatches":
@@ -3738,6 +3747,7 @@ function watchEnding(): void {
   const key = `${e.kind}/${e.date}/${e.realm}`;
   if (key === endShown) return;
   endShown = key;
+  telemetry.track("campaign_ended", { realm: nations[snapshot!.playerNation]!.id, kind: e.kind, turn: snapshot!.turn, year: snapshot!.date.year });
   // Alerts over the map would cover the end card; everything they said is in the Dispatches.
   clearAlerts();
   endView = true;
@@ -4020,6 +4030,12 @@ function watchBattle(province: number): void {
   }
 }
 
+/** Where a battle stands: the contact day, a day's fighting, or the night between (WAR-233, WAR-234). */
+function battlePhaseText(b: { phase: "contact" | "fighting" | "night"; day: number }): string {
+  if (b.phase === "contact") return "In contact, deploying";
+  return b.phase === "fighting" ? `Day ${Math.max(1, b.day)}, fighting` : `Night after day ${Math.max(1, b.day)}, the camps rest`;
+}
+
 /** The battle being watched: both hosts, men left of men at the start, and the round; then how it ended. */
 function renderBattleWatch(): void {
   const b = watching && snapshot?.battles.find((x) => x.province === watching!.province);
@@ -4030,7 +4046,7 @@ function renderBattleWatch(): void {
   const side = (n: number, men: number, start: number, morale: number) => `<div class="side">${pennant(nations[n]!)}<b>${esc(nations[n]!.name)}</b>
     <span class="bars"><span class="bar" title="Men left"><i style="width:${start ? pct(men / start) : 0}%;background:${nations[n]!.color}"></i></span><span class="bar morale" title="Morale left: ${pct(morale)}%"><i style="width:${pct(morale)}%"></i></span></span><span class="men">${fmt(men)}</span></div>`;
   battleWatch.innerHTML = `
-    <header><b>${icon("swords", 1)} Battle of ${esc(provinces[watching.province]!.name)}</b>${b ? `<small>Round ${Math.min(b.round + 1, b.rounds)} of ${b.rounds}</small>` : ""}
+    <header><b>${icon("swords", 1)} Battle of ${esc(provinces[watching.province]!.name)}</b>${b ? `<small>${battlePhaseText(b)}</small>` : ""}
       <button class="paper dismiss" aria-label="Stop watching">${icon("close", 1)}</button></header>
     ${b ? side(b.attacker, b.attMen, b.attStart, b.attMorale) + side(b.defender, b.defMen, b.defStart, b.defMorale) : `<p>${esc(watching.result ?? "The battle is over.")}</p>`}`;
   battleWatch.querySelector(".dismiss")!.addEventListener("click", () => {
@@ -4263,8 +4279,8 @@ function showPanel(open: boolean, reopenIcon: "scroll" | "crown" = "scroll"): vo
     armyList.hidden = true;
   }
   panel.classList.toggle("chooser", reopenIcon === "crown");
-  // The Research tab's one screen takes a wider card on a desktop (RSCH-107).
-  panel.classList.toggle("research", open && !!panel.querySelector(".learn-screen:not(.schools-part)"));
+  // Research is a screen of its own: it fills the screen under the top bar (RSCH-118).
+  panel.classList.toggle("research", open && !!panel.querySelector(".learn-screen"));
   panel.hidden = !open || panelCollapsed;
   // While a course is drawn the voyage bar stands in for the folded card (EXPL-074).
   reopen.hidden = !open || !panelCollapsed || !!exploring;
@@ -5268,6 +5284,9 @@ function realmLords(r: number): string {
 
 /** Sort orders of the Provinces overview. */
 let provinceSort: "trouble" | "people" | "food" | "tax" | "short" | "sick" = "trouble";
+/** The Provinces page shows the first few rows and every one that needs the player; the rest behind All (SHELL-172). */
+let provincesAll = false;
+const PROVINCES_SHOWN = 8;
 
 /**
  * The realm's provinces at a glance (milestone 3 overview, richer for
@@ -5309,7 +5328,11 @@ function provincesTab(r: number): string {
   const color = nations[r]!.color;
   // Short of food (feedback 86): only the provinces whose land feeds under all their people in a normal year; the counts above stay the realm's.
   const shown = provinceSort === "short" ? list.filter((p) => landShare(p) < 1) : provinceSort === "sick" ? list.filter((p) => s.provincePlague[p]! > 0 || s.provinceQuarantine[p]) : list;
+  // A province needs the player when it is held by rebels, rioting or plotting, hungry, or royal with no official.
+  const needs = (p: number) => s.provinceRebels[p]! > 0 || s.provinceMood[p]! >= 2 || s.provinceFoodMonths[p]! < 1 || (s.provinceLord[p]! < 0 && !s.provinceOfficial[p]);
+  const limit = provincesAll ? shown.length : Math.max(PROVINCES_SHOWN, shown.filter(needs).length);
   const rows = shown
+    .slice(0, limit)
     .map((p) => {
       const months = s.provinceFoodMonths[p]!;
       const l = s.provinceLord[p]!;
@@ -5335,7 +5358,8 @@ function provincesTab(r: number): string {
     <nav class="tabs small">${sortButton("trouble", "Trouble first")}${sortButton("people", "Most people")}${sortButton("food", "Least food")}${sortButton("tax", "Most tax")}${sortButton("short", "Short of food")}${sortButton("sick", sickList.length ? `Sick (${sickList.length})` : "Sick")}</nav>
     ${provinceSort === "short" && !shown.length ? `<p class="hint">Every province's land feeds its people in a normal year.</p>` : ""}
     ${provinceSort === "sick" && !shown.length ? `<p class="hint">No plague in your land, and no province closed.</p>` : ""}
-    <div class="province-list">${rows}</div>`;
+    <div class="province-list">${rows}</div>
+    ${shown.length > PROVINCES_SHOWN && (provincesAll || shown.length > limit) ? `<button class="paper more" data-provinces-all>${provincesAll ? "Fewer provinces" : `All ${shown.length} provinces`}</button>` : ""}`;
 }
 
 /** Order of plague steps by how bad they are: outbreak, rumour, burning out, none. */
@@ -5390,6 +5414,10 @@ function bindLords(): void {
       renderPanel();
     }),
   );
+  panel.querySelector<HTMLButtonElement>("[data-provinces-all]")?.addEventListener("click", () => {
+    provincesAll = !provincesAll;
+    renderPanel();
+  });
   panel.querySelectorAll<HTMLElement>("[data-open-province]").forEach((row) => row.addEventListener("click", () => goToProvince(Number(row.dataset.openProvince), false)));
   panel.querySelectorAll<HTMLElement>("[data-open-land]").forEach((row) =>
     row.addEventListener("click", () => {
@@ -6548,7 +6576,15 @@ function realmBookNav(r: number, answerWaits: boolean): string {
   // Hunting grounds is a page only for a tribal realm, marked while settlers or asks wait (TRIBE).
   const pages = tabHolds(open).filter((p) => p !== HUNT_TAB.label || tribe);
   const waits = (p: string) => p === HUNT_TAB.label && !!tribe && (tribe.settlers.length > 0 || tribe.asks.length > 0);
-  const row = pages.length > 1 ? `<nav class="tabs pages">${pages.map((p) => `<button class="tab${p === page ? " on" : ""}${waits(p) ? " marked" : ""}" data-realm-tab="${PAGE_KEYS[p]}">${label(p)}</button>`).join("")}</nav>` : "";
+  // In Research the Research page's own parts, Next, Tree and Schools, stand in the row in its place (RSCH-116).
+  const research = snapshot!.research;
+  const pageButton = (p: string) =>
+    p === "Research" && research
+      ? (["next", "tree", "schools"] as const)
+          .map((part) => `<button class="tab${realmTab === "learning" && learningUi.part === part ? " on" : ""}" data-learn-part="${part}">${part === "next" ? "Next" : part === "tree" ? "Tree" : `Schools · ${research.schools.length + research.founding.length}`}</button>`)
+          .join("")
+      : `<button class="tab${p === page ? " on" : ""}${waits(p) ? " marked" : ""}" data-realm-tab="${PAGE_KEYS[p]}">${label(p)}</button>`;
+  const row = pages.length > 1 ? `<nav class="tabs pages">${pages.map(pageButton).join("")}</nav>` : "";
   return `<nav class="sections" aria-label="Your realm">${sections}</nav>${row}`;
 }
 
@@ -6738,6 +6774,15 @@ function renderRealm(r: number): void {
       realmTab = b.dataset.realmOpenTab as typeof realmTab;
       // A line naming an invention opens the tree on it (GOV-078).
       if (b.dataset.learnPick) Object.assign(learningUi, { part: "tree", pick: b.dataset.learnPick, center: b.dataset.learnPick, slide: true });
+      else if (realmTab === "learning") learningUi.part = "next";
+      renderPanel();
+    }),
+  );
+  // Next, Tree and Schools: the Research page's parts, in the Realm book's pages row (RSCH-116).
+  panel.querySelectorAll<HTMLButtonElement>("[data-learn-part]").forEach((b) =>
+    b.addEventListener("click", () => {
+      realmTab = "learning";
+      learningUi.part = b.dataset.learnPart as typeof learningUi.part;
       renderPanel();
     }),
   );
@@ -7023,14 +7068,17 @@ function bindLearning(): void {
     if (center) learningUi.center = id;
     renderPanel();
   };
-  on("[data-learn-part]", (b) => {
-    learningUi.part = b.dataset.learnPart as typeof learningUi.part;
-    renderPanel();
-  });
   on("[data-inv]", (b) => pick(b.dataset.inv!, !b.closest(".tree-view")));
+  // Next names an invention: the Tree opens on it with its sheet.
+  on("[data-learn-pick]", (b) => {
+    learningUi.part = "tree";
+    learningUi.zoom = "close";
+    pick(b.dataset.learnPick!, true);
+  });
   on("[data-jump]", (b) => {
     const id = jumpTarget(r, b.dataset.jump!, learningUi.pick);
     if (!id) return;
+    learningUi.part = "tree";
     learningUi.zoom = "close";
     pick(id, true);
   });
@@ -7066,7 +7114,7 @@ function bindLearning(): void {
   });
   // The tree frame: Close up keeps its scroll, or brings what was asked for into the middle.
   const frame = screen.querySelector<HTMLElement>(".tree-view");
-  if (frame?.classList.contains("close")) {
+  if (frame?.classList.contains("near")) {
     const want = learningUi.center ?? (learningUi.scroll ? null : firstShown(r));
     learningUi.center = null;
     if (want) {
@@ -7533,6 +7581,7 @@ async function startGame(nation: string, picked: NewGameChoices, seed = Date.now
   mapSent = true;
   // One new game is one campaign (SAVE-012); ironman is chosen here and kept (SAVE-086), the rules travel in every save (SETUP-055).
   campaign = newCampaign(new Rng(Date.now() >>> 0), { playerNation: nation, nationName: name, ironman: picked.ironman, options: campaignOptionsOf(picked) });
+  telemetry.track("campaign_started", { realm: nation, ironman: picked.ironman, difficulty: String(picked.difficulty), tutorial: coach.running });
   enterGame(snap);
 }
 
@@ -7754,7 +7803,10 @@ async function endTurn(): Promise<void> {
       continue;
     }
     const battle = snapshot.battles.some((b) => b.player);
-    const ms = battle ? (watching && !watching.result ? (WATCH_STEP_MS * battleStepMs()) / BATTLE_STEP_MS : battleStepMs()) : dayMs();
+    // The contact day and the nights pass no slower than a day does; the bells play at battle speed.
+    const fighting = snapshot.battles.some((b) => b.player && b.phase === "fighting");
+    const stepMs = watching && !watching.result ? (WATCH_STEP_MS * battleStepMs()) / BATTLE_STEP_MS : battleStepMs();
+    const ms = battle ? (fighting ? stepMs : Math.min(stepMs, dayMs())) : dayMs();
     const t0 = performance.now();
     // Armies of the player's on the march, to tell when one arrives while Auto turns run (SHELL-161).
     const marching = auto.state === "on" ? marchingArmies() : null;
@@ -7799,7 +7851,15 @@ async function endTurn(): Promise<void> {
   renderPanel();
   renderActions();
   renderDiagnostics();
+  turnEnded();
   afterWeekInAuto();
+}
+
+/** Where players stop (usage statistics): every week of the first season, then one week in thirteen, so a long campaign sends a few hundred, not thousands. */
+function turnEnded(): void {
+  const s = snapshot!;
+  if (s.turn > 12 && s.turn % 13) return;
+  telemetry.track("turn_ended", { turn: s.turn, year: s.date.year, realm: nations[s.playerNation]!.id, auto: auto.state === "on", ironman: !!campaign?.ironman });
 }
 
 /** The player's armies on the march, by id. */
@@ -7927,7 +7987,6 @@ const savePlatform: SavePlatform = runtimeNow === "capacitor-ios" ? "ios" : runt
 const DEVICE = desktop?.steamDeck ? "Steam Deck" : { ios: "iPhone", android: "Android", desktop: "Desktop", web: "Browser" }[savePlatform];
 /** How this device names itself to the server: the platform `steam` while Steam runs (SAVE-142). */
 const SERVER_DEVICE = { name: DEVICE, platform: desktop?.steam ? "steam" : savePlatform };
-const GAME_VERSION = "0.1.0";
 const SM = savesConfig.messages;
 
 /**
@@ -8060,6 +8119,11 @@ async function refreshSaves(): Promise<void> {
 // ?new skips it for anyone.
 const startParams = new URLSearchParams(location.search);
 let startOn = !startParams.has("new") && !(navigator.webdriver && !startParams.has("start"));
+// Crash reports say what was open; statistics name the account only while signed in (the privacy page).
+setTelemetryHooks({
+  account: () => cloud?.api.account?.id,
+  where: () => shell.view ?? (startOn ? "start" : coach.running ? "tutorial" : snapshot ? "map" : "loading"),
+});
 const startEl = document.createElement("div");
 startEl.className = "start-screen";
 startEl.hidden = true;
@@ -8100,11 +8164,12 @@ function showStart(): void {
         .join("")}</div>
     </div>
     ${startMore ? startMoreHtml() : ""}
-    ${startAsk ? startAskHtml() : ""}
+    ${startAsk ? startAskHtml() : consentAsked() ? startConsentHtml() : ""}
     <span class="start-version">v${GAME_VERSION}</span>`;
   startEl.hidden = false;
   document.body.classList.add("starting");
-  startEl.querySelector<HTMLButtonElement>(".start-play")!.focus({ preventScroll: true });
+  // The consent card takes the focus while it waits for an answer, so a controller or keyboard answers it first.
+  (startEl.querySelector<HTMLButtonElement>(".start-consent button") ?? startEl.querySelector<HTMLButtonElement>(".start-play")!).focus({ preventScroll: true });
   panStart(cont ? cont.entry.header.playerNation : SHELL_RULES.start.regions[Math.floor(Math.random() * SHELL_RULES.start.regions.length)]!);
 }
 
@@ -8129,6 +8194,38 @@ function startAskHtml(): string {
     ${q.choices.map((c) => `<button class="${c === q.focus ? "wax" : "paper"}" data-start="ask" data-choice="${esc(c)}"><b>${esc(c)}</b><small>${esc(notes[c] ?? "")}</small></button>`).join("")}
   </div>`;
 }
+
+/**
+ * The consent card (SHELL-014, SET-010, SET-114): in a build that can send
+ * anything, one card over the start screen asks for crash reports and usage
+ * statistics together, both off until the player says yes, and does not come
+ * back once answered. The Privacy rows in Settings change either later.
+ */
+function consentAsked(): boolean {
+  return telemetry.available && (pref("privacy.crash_reports") === "ask" || pref("privacy.usage_stats") === "ask");
+}
+
+function startConsentHtml(): string {
+  const choices: [string, string, string][] = [
+    ["both", "Send both", "Crash reports, and anonymous records of play such as a turn ending"],
+    ["crashes", "Crash reports only", "What failed and where, when the game breaks"],
+    ["none", "No thanks", "Nothing is sent"],
+  ];
+  return `<div class="start-more start-ask start-consent framed" role="dialog" aria-label="Help us improve">
+    <header><h2 class="ribbon">Help us improve</h2></header>
+    <p>May the game tell us when it breaks, and how it is played? Nothing holds your name or email, and you can change this in Settings, under Privacy.</p>
+    ${choices.map(([v, name, note], i) => `<button class="${i === 0 ? "wax" : "paper"}" data-start="consent" data-choice="${v}"><b>${esc(name)}</b><small>${esc(note)}</small></button>`).join("")}
+    ${cloudUrl ? `<a class="paper-link" href="${esc(cloudUrl)}/privacy" target="_blank" rel="noopener">What is sent</a>` : ""}
+  </div>`;
+}
+
+function answerConsent(choice: string): void {
+  setPref("privacy.crash_reports", choice !== "none");
+  setPref("privacy.usage_stats", choice === "both");
+  showStart();
+}
+
+if (telemetry.available) showRows("privacy.crash_reports", "privacy.usage_stats");
 
 const FIRST_LAUNCH_KEY = "ph-first-launch-asked";
 function firstLaunchAsked(): boolean {
@@ -8211,7 +8308,7 @@ startEl.addEventListener("click", (e) => {
     }
     hideStart();
     renderPanel();
-  } else if (what === "ask") answerFirstLaunch(b.dataset.choice!); else if (what === "load") openShell("load", true);
+  } else if (what === "ask") answerFirstLaunch(b.dataset.choice!); else if (what === "consent") answerConsent(b.dataset.choice!); else if (what === "load") openShell("load", true);
   else if (what === "unlock") {
     startMore = false;
     openUnlock();
@@ -8669,6 +8766,7 @@ async function loadSave(path: string, acceptModified = false, keepCurrent = true
   campaign = { campaignId: h.campaignId, playerNation: h.playerNation, nationName: nationNameOf(h.playerNation), ironman: h.ironman, options: h.options, modified: h.modified || acceptModified, playSeconds: h.playSeconds, ...(h.sharedFrom ? { sharedFrom: h.sharedFrom } : {}), ...(h.kind === "ironman" ? { ironmanHead: h.saveId } : {}) };
   closeShell();
   enterGame(r.snapshot);
+  telemetry.track("campaign_loaded", { realm: h.playerNation, turn: r.snapshot.turn, kind: h.kind });
   // Loading an earlier point makes it where the player left off; an ironman save already is.
   if (h.kind !== "resume" && h.kind !== "ironman") void writeGameSave("resume");
 }

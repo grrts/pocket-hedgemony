@@ -45,6 +45,8 @@ export interface CoachHost {
   goTo: (place: string) => void;
   /** The tutorial ends on the end card's choice, or is left (TUT-005, TUT-107). */
   end: (how: "keep ruling" | "new campaign" | "left") => void;
+  /** A step was reached (the tutorial's step counts, SHELL-014); "end" when a chapter's end card shows. */
+  step?: (chapter: number, step: string) => void;
 }
 
 const STORE = "ph-tutorial";
@@ -62,6 +64,7 @@ export class Coach {
   private queued = 0;
   private idleTimer = 0;
   private shownKey = "";
+  private stepKey = "";
   private show: (() => void) | undefined;
   private lastInput: Input = matchMedia("(pointer: coarse)").matches ? "touch" : "mouse and keyboard";
 
@@ -226,6 +229,10 @@ export class Coach {
   }
 
   private save(): void {
+    const run = this.t?.run;
+    const key = run ? `${run.chapter}|${run.ended ? "end" : run.step.id}` : "";
+    if (run && key !== this.stepKey) this.host?.step?.(run.chapter, run.ended ? "end" : run.step.id);
+    this.stepKey = key;
     try {
       localStorage.setItem(STORE, saveProgress(this.progress));
     } catch {

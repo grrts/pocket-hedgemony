@@ -111,6 +111,40 @@ describe("war and conquest", () => {
     expect(w.armies.battle[troops]).toBe(w.armies.battle[army]);
   });
 
+  it("fights a battle after a contact day, a bell each daylight step, the loser losing more (WAR-233 … WAR-236)", () => {
+    const w = createWorld(rules, 7, tiles);
+    const me = n(w, "castile");
+    const foe = n(w, "portugal");
+    applyNow(w, { type: "declareWar", target: foe }, me);
+    const p = Array.from({ length: w.provinceCount }, (_, i) => i).find((i) => w.provinceOwner[i] === me && w.provinceIndex.get(rules.nations[me]!.capital) !== i)!;
+    const army = spawnArmy(w, me, p, 12000, w.commanderOwner.indexOf(me));
+    const enemy = spawnArmy(w, foe, p, 6000, w.commanderOwner.indexOf(foe));
+    advance(w, 1);
+    const b = w.battles.find((x) => x.attackers.includes(army) || x.defenders.includes(army))!;
+    expect(b).toBeDefined();
+    const men = [w.armies.men[army]!, w.armies.men[enemy]!];
+    // The contact day: a whole day of scouting and deploying, nobody lost.
+    advance(w, 5);
+    expect(b.bell).toBe(0);
+    expect([w.armies.men[army], w.armies.men[enemy]]).toEqual(men);
+    // Then bells are fought only in daylight steps, and the battle lasts beyond the first day.
+    let steps = 6;
+    let nightBells = 0;
+    while (w.battles.includes(b) && steps < 6 * 10) {
+      const before = b.bell;
+      const step = w.step;
+      advance(w, 1);
+      steps++;
+      if (b.bell > before && (step < 2 || step > 4)) nightBells++;
+    }
+    expect(w.battles.includes(b)).toBe(false);
+    expect(nightBells).toBe(0);
+    expect(steps).toBeGreaterThan(6 + 3);
+    const lost = (i: number, k: number) => (men[k]! - w.armies.men[i]!) / men[k]!;
+    const [mine, theirs] = [lost(army, 0), lost(enemy, 1)];
+    expect(Math.max(mine, theirs)).toBeGreaterThan(Math.min(mine, theirs));
+  }, 60000);
+
   it("stops armies at a garrisoned enemy castle until it falls (warfare 5.5)", () => {
     const w = createWorld(rules, 7, tiles);
     const me = n(w, "castile");

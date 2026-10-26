@@ -12,6 +12,7 @@ What the game has built so far:
 - **Graphics**: Battery saver (Off, Auto, On) and the knobs it moves: Frame rate cap, Sharpness and Animations. Rows it moves say "Set by Battery saver". Auto follows your device's battery where the browser reports it.
 - **Audio**: Master, Music on or off and its volume, Effects volume and Interface sounds. The speaker button's Sound card changes the same settings.
 - **Accessibility**: Colour vision (Default, Red-weak, Green-weak, Blue-weak, No colour), with a sample of four neighbouring realms and a map mode's ramp in the chosen mode under it; Patterns on map modes; Text size (Normal, Large, Larger) for the cards, menus and alerts. A colour vision change redraws the map, the armies and routes and the map mode's key at once.
+- **Privacy** (in a build that has a server): Send crash reports and Send anonymous usage statistics. The first time the start screen opens, one card, "Help us improve", asks for both: Send both, Crash reports only, or No thanks. Both stay off until you say yes.
 
 Other rows join the screen as the game builds what they do.
 
@@ -290,6 +291,8 @@ When a setting drives others (Battery saver, Reduced motion, Colour vision "No c
 - **Account:** Sign in or Create account; when signed in, your email and Sign out. Default signed out, never a wall before playing. The Load screen's "Sign in to sync" opens the same flow.
 - While signed in: **Cloud saves** (On by default, syncing saves and personal settings), **Sync on Wi-Fi only** (Off by default), the list of signed-in devices each with Sign out, and **Delete account and saves** with a confirmation (also reachable from Privacy).
 - **Privacy:** Send crash reports and Send anonymous usage statistics (asked on first launch), and, in the free mobile tier only if the ad stays, Ad consent, which reopens the consent form.
+
+**What is sent.** Nothing goes anywhere unless you turned the row on, and turning it off throws away whatever was still waiting. Usage statistics are short records such as a campaign starting, a turn ending (every week of the first season, then one week in thirteen) or a tutorial step reached, with a random install number; they wait on your device while you play offline and go to our own server every few minutes. A crash report says what failed and where in the game's code (file names only), what was open, your browser's name and main version, and the game's version, and never names your account. Both go to Pocket Hegemony's own server and nowhere else; the website's Privacy page lists every field and how long each is kept.
 - **About:** version and build number, Restore purchases (which Apple requires to be reachable), Credits and licences, Reset all settings, and Copy diagnostics (the diagnostics line and your settings on the clipboard for support).
 
 ### Platform notes

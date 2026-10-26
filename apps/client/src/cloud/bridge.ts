@@ -19,8 +19,8 @@ export type Store = "apple" | "google" | "steam";
 export interface SignInBridge {
   /** Whether this build can start the store's sign-in; a store it cannot start shows no button. */
   can(store: Store): boolean;
-  /** Apple's sheet, asked to sign `nonceHash` into the identity token. */
-  apple(nonceHash: string): Promise<{ identityToken: string; name?: string | undefined }>;
+  /** Apple's sheet, asked to sign `nonceHash` into the identity token; the authorization code lets the server revoke the sign-in later (SAVE-203). */
+  apple(nonceHash: string): Promise<{ identityToken: string; authorizationCode?: string | undefined; name?: string | undefined }>;
   /** Google's sheet (Credential Manager, or Google's web sign-in), likewise. */
   google(nonceHash: string): Promise<{ idToken: string; name?: string | undefined }>;
   /** Where Steam's sign-in comes back to: the app's link, or this page on the web. */
@@ -93,7 +93,7 @@ export function capacitorBridge(cap: CapacitorLike, config: { googleClientId?: s
     async apple(nonceHash) {
       const p = plugin("SocialLogin");
       if (!p?.initialize || !p.login) throw failed();
-      let r: { result?: { idToken?: string | null; profile?: { givenName?: string | null; familyName?: string | null } } };
+      let r: { result?: { idToken?: string | null; accessToken?: { token?: string | null } | null; profile?: { givenName?: string | null; familyName?: string | null } } };
       try {
         // On iOS Apple's sheet signs for the app's own bundle id; the client id only names the provider.
         await start(p, "apple", { clientId: config.appleClientId });
@@ -103,7 +103,9 @@ export function capacitorBridge(cap: CapacitorLike, config: { googleClientId?: s
       }
       const token = r.result?.idToken;
       if (!token) throw failed();
-      return { identityToken: token, name: nameOf(r.result?.profile?.givenName, r.result?.profile?.familyName) };
+      // Left in its default mode the plugin hands back Apple's one-time authorization code as accessToken.token,
+      // unspent, so the server can trade it for the refresh token it revokes on Delete account.
+      return { identityToken: token, authorizationCode: r.result?.accessToken?.token || undefined, name: nameOf(r.result?.profile?.givenName, r.result?.profile?.familyName) };
     },
     async google(nonceHash) {
       const p = plugin("SocialLogin");
@@ -151,7 +153,7 @@ export function capacitorBridge(cap: CapacitorLike, config: { googleClientId?: s
 interface AppleJs {
   auth: {
     init(o: Record<string, unknown>): void;
-    signIn(): Promise<{ authorization?: { id_token?: string }; user?: { name?: { firstName?: string; lastName?: string } } }>;
+    signIn(): Promise<{ authorization?: { id_token?: string; code?: string }; user?: { name?: { firstName?: string; lastName?: string } } }>;
   };
 }
 interface GoogleJs {
@@ -211,7 +213,7 @@ export function webBridge(config: WebConfig, page: { location: Location; history
       }
       const token = r.authorization?.id_token;
       if (!token) throw failed();
-      return { identityToken: token, name: nameOf(r.user?.name?.firstName, r.user?.name?.lastName) };
+      return { identityToken: token, authorizationCode: r.authorization?.code || undefined, name: nameOf(r.user?.name?.firstName, r.user?.name?.lastName) };
     },
     async google(nonceHash) {
       if (!config.googleClientId) throw failed();

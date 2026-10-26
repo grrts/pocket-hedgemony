@@ -44,7 +44,7 @@ import { advance, applyNow, campaigning, forageCut, HOURS_PER_STEP, mayMarchInto
 import { supplyNotes } from "./castleSupply.ts";
 import { createWorld, tileMarch, type World } from "./world.ts";
 import { settlementsView, type SettlementView } from "./settlement.ts";
-import { armyBreak, controller, relationState, SIEGE_MONTH_DAYS, type News } from "./war.ts";
+import { armyBreak, battlePhase, controller, relationState, SIEGE_MONTH_DAYS, type News } from "./war.ts";
 import { foodMonths } from "./domain/warfare/index.ts";
 import { battleSides } from "./domain/map-presentation/index.ts";
 import { tileStepHours } from "./march.ts";
@@ -123,7 +123,7 @@ export type EngineResponse =
   | { id: number; type: "saved"; path: string; header: SaveHeader; bytes: Uint8Array; removed: string[]; ironmanHead?: string }
   /** A save that did not open, and why, in the player's words; `canAccept` when opening anyway is allowed. */
   | { id: number; type: "refused"; message: string; canAccept: boolean }
-  | { id: number; type: "error"; message: string };
+  | { id: number; type: "error"; message: string; stack?: string };
 
 /**
  * Read-only copy of the state the UI draws from. Arrays are fresh copies so
@@ -190,7 +190,7 @@ export interface Snapshot {
   sieges: { province: number; by: number; days: number; months: number; progress: number; breaches: number; garrison: number; foodMonths: number | null }[];
   /** Battles being fought: where, each side's leading realm with its men now and at the start, and rounds fought of all. */
   /** Battles being fought, with each side's men and morale left after the rounds so far (WAR-207, VIEW-077). */
-  battles: { id: number; tile: number; province: number; attacker: number; defender: number; attMen: number; defMen: number; attStart: number; defStart: number; attMorale: number; defMorale: number; round: number; rounds: number; player: boolean }[];
+  battles: { id: number; tile: number; province: number; attacker: number; defender: number; attMen: number; defMen: number; attStart: number; defStart: number; attMorale: number; defMorale: number; round: number; rounds: number; phase: "contact" | "fighting" | "night"; day: number; player: boolean }[];
   /** Width of the tile grid (tile = y * width + x, in map pixels). */
   tileWidth: number;
   nationTreasury: Float64Array;
@@ -517,10 +517,13 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
           defMen: men(b.defenders),
           attStart: b.attStart,
           defStart: b.defStart,
-          attMorale: att.moraleLeft,
-          defMorale: def.moraleLeft,
+          attMorale: b.attMorale ?? att.moraleLeft,
+          defMorale: b.defMorale ?? def.moraleLeft,
           round: b.round,
           rounds: b.rounds,
+          phase: battlePhase(w, b),
+          // Fighting days so far, 0 on the contact day.
+          day: b.day ?? 0,
           player: [...b.attackers, ...b.defenders].some((s) => a.owner[s] === player),
         };
       }),
@@ -813,7 +816,7 @@ export function createEngineHost(loadRules: () => Ruleset, now: () => number = (
         }
       }
     } catch (e) {
-      return { response: { id: req.id, type: "error", message: e instanceof Error ? e.message : String(e) }, transfer: [] };
+      return { response: { id: req.id, type: "error", message: e instanceof Error ? e.message : String(e), ...(e instanceof Error && e.stack ? { stack: e.stack } : {}) }, transfer: [] };
     }
   }
 

@@ -4,7 +4,7 @@ Every value in the game's everyday events config, exactly as the game reads it. 
 
 Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and values marked (provisional) are placeholders that may still change in balancing. Inventions are shown by id and name; see [Research data](Data-Research#inventions).
 
-> Everyday events (domain/events/spec.md §5.22, EVT-115 to EVT-128; feedback 152). Small choices about the realm's own people and stores, drawn from what the game already holds: its officials, lords, ruler and heir, and food stores, and plague reaching a province of the player's (EVT-130: not drawn; plague fires it). Each realm draws one every \`months\_between\` months (a range), never while the player has an event waiting; the player's realm never draws the same event again within \`rest\_years\` (EVT-134). \`where\` limits an event to realms in those regions or wider regions (exploration-regions.json), \`from\` and \`to\` to those years (EVT-133). \`weight\` is how often an event is drawn among the ones that can happen; \`needs\` names what it is about. Options list their effects in the engine's small vocabulary (gold, loyalty, official, lands, heir, heir\_risk, food\_back, new\_lord, quarantine, care; and for an event about a province, EVT-135: food in months of eating, people and recruits as a share, light\_tax in years); \`ai\` weights the AI's pick; \`needs\` on an option hides it when the realm lacks what it asks. \`{words}\` in braces are filled with the names of who and where. Every number is a placeholder for balance.
+> Everyday events (domain/events/spec.md §5.22, EVT-115 to EVT-128; feedback 152). Small choices about the realm's own people and stores, drawn from what the game already holds: its officials, lords, ruler and heir, and food stores, plague reaching a province of the player's (EVT-130: not drawn; plague fires it), and the death of one of the player's officials, lords, generals or admirals (EVT-122, EVT-123, EVT-132: not drawn; the death of people fires it). Each realm draws one every \`months\_between\` months (a range), never while the player has an event waiting; the player's realm never draws the same event again within \`rest\_years\` (EVT-134). \`where\` limits an event to realms in those regions or wider regions (exploration-regions.json), \`from\` and \`to\` to those years (EVT-133). \`weight\` is how often an event is drawn among the ones that can happen; \`needs\` names what it is about. Options list their effects in the engine's small vocabulary (gold, loyalty, official, lands, heir, heir\_risk, food\_back, new\_lord, quarantine, care, command, home; and for an event about a province, EVT-135: food in months of eating, people and recruits as a share, light\_tax in years); \`ai\` weights the AI's pick; \`needs\` on an option hides it when the realm lacks what it asks (\`lord2\`: a second lord; \`leaderless\`: the dead commander's men or ships still without a leader). \`{words}\` in braces are filled with the names of who and where. Every number is a placeholder for balance.
 
 | Key | Value |
 |---|---|
@@ -25,10 +25,10 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 
 | Key | Value |
 |---|---|
-| `weight` | 2 |
-| `needs` | official |
-| `title` | Death of {official} |
-| `text` | {official}, your {type} at {province}, has died after {years} years in the post. His clerks wait to hear who will take his seat. |
+| `weight` | 0 |
+| `needs` | death |
+| `title` | Death of {dead} |
+| `text` | {dead}, your {type} at {province}, has died after {years} years in the post. The seat stands empty, and his clerks wait to hear who will take it. |
 
 #### Options
 
@@ -42,10 +42,10 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 
 | Key | Value |
 |---|---|
-| `weight` | 2 |
-| `needs` | lord |
-| `title` | Death of {lord} |
-| `text` | {lord} of the house of {house} has died. His son {son} asks you to confirm him in his father's lands ({lands}). |
+| `weight` | 0 |
+| `needs` | death |
+| `title` | Death of {dead} |
+| `text` | {dead} of the house of {house} has died. His heir {son} has taken his lands ({lands}) and asks you to confirm him in them. |
 
 #### Options
 
@@ -54,6 +54,38 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 | confirm | Confirm {son} | 4 | (new\_lord: yes) |
 | relief | Ask a fee for his lands | 2 | (new\_lord: yes), (gold: 20), (loyalty: heavy\_taxes; who: lord) |
 | take | Take his lands for the crown | 1 | (lands: crown), (loyalty: land\_seized\_from\_another; who: other\_lords) |
+
+### General dies
+
+| Key | Value |
+|---|---|
+| `weight` | 0 |
+| `needs` | death |
+| `title` | Death of {dead} |
+| `text` | {dead}, your general, has died at {province}. Without him his men take no orders and make for crown land, to stand there as a garrison. His second in command, {second}, asks to lead them in his place. |
+
+#### Options
+
+| id | name | needs | ai | effects |
+|---|---|---|---|---|
+| second | Give {second} the command | leaderless | 2 | (gold: -15), (command: yes) |
+| home | Let them go home |  | 1 | (home: army) |
+
+### Admiral dies
+
+| Key | Value |
+|---|---|
+| `weight` | 0 |
+| `needs` | death |
+| `title` | Death of {dead} |
+| `text` | {dead}, your admiral, has died at {province}. Without him his ships take no orders and make for the nearest port of yours. His flag captain, {second}, asks to keep the fleet at sea under his own flag. |
+
+#### Options
+
+| id | name | needs | ai | effects |
+|---|---|---|---|---|
+| second | Give {second} the fleet | leaderless | 2 | (gold: -15), (command: yes) |
+| home | Let them sail home |  | 1 | (home: fleet) |
 
 ### Lord slighted
 

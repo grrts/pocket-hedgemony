@@ -346,7 +346,7 @@ describe("the Account and cloud saves card (SAVE-119 … SAVE-123)", () => {
     expect(html).toContain("Up to date");
     expect(html).toContain("1 of 300 saves");
     expect(html).toContain("Browser (this device)");
-    expect(html.match(/data-cloud-ask=/g)?.length).toBe(2);
+    expect(html.match(/data-cloud-ask="(?!delete-account)/g)?.length).toBe(2);
     expect(html).toContain("Sign out of this device");
   });
 });

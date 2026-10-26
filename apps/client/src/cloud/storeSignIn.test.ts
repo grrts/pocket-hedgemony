@@ -28,7 +28,7 @@ function fakeBridge(can: Store[] = ["apple", "google", "steam"], steam: SignInBr
     can: (s) => can.includes(s),
     apple: async (hash) => {
       asked.apple.push(hash);
-      return { identityToken: "apple.jwt", name: "Bertrand" };
+      return { identityToken: "apple.jwt", authorizationCode: "apple.code", name: "Bertrand" };
     },
     google: async (hash) => {
       asked.google.push(hash);
@@ -91,7 +91,8 @@ describe("Sign in with Apple and Google (SAVE-149, SAVE-150)", () => {
     const { store, calls, api } = setup("ios", bridge);
     expect(await store.signIn("apple")).toBe(true);
     const sent = calls.find((c) => c.path === "/api/sessions")!.body;
-    expect(sent).toMatchObject({ appleIdentityToken: "apple.jwt", displayName: "Bertrand", device: { name: "iPhone", platform: "ios" } });
+    // Apple's authorization code goes with it, so the server can revoke the sign-in later (SAVE-203).
+    expect(sent).toMatchObject({ appleIdentityToken: "apple.jwt", appleAuthorizationCode: "apple.code", displayName: "Bertrand", device: { name: "iPhone", platform: "ios" } });
     expect(sent.nonce).toMatch(/^[0-9a-f]{64}$/);
     expect(asked.apple).toEqual([sha256(sent.nonce as string)]);
     expect(api.signedIn).toBe(true);
@@ -274,7 +275,7 @@ describe("the platform bridges (D-SAVE-22)", () => {
         login: async ({ provider, options }: { provider: string; options: { nonce: string } }) => {
           logins.push(`${provider} ${options.nonce}`);
           return provider === "apple"
-            ? { provider, result: { idToken: "apple.jwt", profile: { givenName: "Ana", familyName: "Paz" } } }
+            ? { provider, result: { idToken: "apple.jwt", accessToken: { token: "apple.code" }, profile: { givenName: "Ana", familyName: "Paz" } } }
             : { provider, result: { idToken: "google.jwt", profile: { name: "Ana Paz" } } };
         },
       },
@@ -286,8 +287,9 @@ describe("the platform bridges (D-SAVE-22)", () => {
     expect(bridge.can("apple")).toBe(true);
     expect(bridge.can("steam")).toBe(true);
     expect(bridge.can("google")).toBe(false);
-    expect(await bridge.apple("h")).toEqual({ identityToken: "apple.jwt", name: "Ana Paz" });
-    expect(await bridge.apple("h2")).toEqual({ identityToken: "apple.jwt", name: "Ana Paz" });
+    // The authorization code comes back unspent, for the server to revoke on Delete account.
+    expect(await bridge.apple("h")).toEqual({ identityToken: "apple.jwt", authorizationCode: "apple.code", name: "Ana Paz" });
+    expect(await bridge.apple("h2")).toEqual({ identityToken: "apple.jwt", authorizationCode: "apple.code", name: "Ana Paz" });
     // Apple's provider is started once, with only its own settings.
     expect(inits).toEqual([["apple"]]);
     expect(logins).toEqual(["apple h", "apple h2"]);

@@ -124,7 +124,6 @@ Keys are written as in the config file. Shares are fractions (0.25 is 25 %), and
 | `engageBase` | 9 |
 | `engageMin` | 10 |
 | `engageMax` | 15 |
-| `menPerBattleRound` | 6000 |
 | `garrisonRecoveryPerMonth` | 0.1 |
 | `castleStoreMonths` | 6 |
 | `stormRatio` | 4 |

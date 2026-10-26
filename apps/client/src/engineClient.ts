@@ -20,6 +20,8 @@ export class EngineClient {
   private workerAnswered = false;
   private nextId = 1;
   private sent: EngineRequest[] = [];
+  /** Told when the engine fails: the worker dies, or a request throws inside it (crash reports). */
+  onFailure: ((kind: "worker" | "error", message: string, stack?: string) => void) | undefined;
   private pending = new Map<number, { resolve: (r: EngineResponse) => void; reject: (e: Error) => void }>();
 
   constructor(opts: { forceMainThread?: boolean } = {}) {
@@ -47,6 +49,7 @@ export class EngineClient {
         return;
       }
       const err = new Error(`engine worker crashed: ${event.message}`);
+      this.onFailure?.("worker", err.message, `at ${event.filename}:${event.lineno}:${event.colno}`);
       for (const p of this.pending.values()) p.reject(err);
       this.pending.clear();
     };
@@ -95,7 +98,10 @@ export class EngineClient {
     const p = this.pending.get(msg.id);
     if (!p) return;
     this.pending.delete(msg.id);
-    if (msg.type === "error") p.reject(new Error(msg.message));
+    if (msg.type === "error") {
+      this.onFailure?.("error", msg.message, msg.stack);
+      p.reject(new Error(msg.message));
+    }
     else p.resolve(msg);
   }
 }

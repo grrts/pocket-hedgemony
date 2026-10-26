@@ -62,7 +62,7 @@ hits = share × men × strength × obsolete × (1 + level hits) × (1 + Might bo
        × (1 + sector and ground) × inventions × tired × hungry × forced march
 ```
 
-- `share` is `warfare.hits_per_bell.base` (0.04), at least `era_VI` (0.06) in era VI and `era_VII` (0.08) in era VII.
+- `share` is `warfare.hits_per_bell.base` (0.025), at least `era_VI` (0.04) in era VI and `era_VII` (0.05) in era VII.
 - `strength` is `warfare.arms.<arm>.strength`, for example levy foot (1.0), knights and lancers (3.5), bombards (5).
 - `obsolete` is 0.5 when the enemy knows the invention that made the arm obsolete, else 1.
 - `level hits` is `warfare.levels_by_era.<era>.hits` at the company's level (era I and II: −0.10, 0, +0.10, +0.20, +0.30).
@@ -160,19 +160,15 @@ Source: `packages/engine/src/domain/warfare/companies.ts` (breakPoint); `package
 orders per bell = warfare.cunning_by_era.<era>.orders[Cunning]
 ```
 
-The table runs from Cunning 0 to 5: era I (1, 1, 2, 2, 2, 2), eras II to V (1, 1, 2, 2, 3, 3). The commander with less Cunning gives his orders first. Each bell a side swaps up to Logistics tired companies (3 bells or more in a row) for fresh ones from reserve. After `warfare.battle.bells_per_day` (6) bells, night falls: half of each unbroken company's fled men come back (`warfare.after.fled_return`, 0.5). After `warfare.era_scale.<era>.max_days` (3 in eras I to V) days with no break, the attacker pulls back and the defender holds the field.
+The table runs from Cunning 0 to 5: era I (1, 1, 2, 2, 2, 2), eras II to V (1, 1, 2, 2, 3, 3). The commander with less Cunning gives his orders first. Each bell a side swaps up to Logistics tired companies (3 bells or more in a row) for fresh ones from reserve. After `warfare.battle.bells_per_day` (3) bells, night falls: half of each unbroken company's fled men come back (`warfare.after.fled_return`, 0.5). After `warfare.era_scale.<era>.max_days` (5 in eras I to V) days with no break, the attacker pulls back and the defender holds the field.
 
 Source: `packages/engine/src/domain/warfare/battle.ts` (ordersPerBell, overnight); `packages/engine/src/domain/warfare/resolver.ts` (fightRounds)
 
 ### Losses on the map
 
-The battle's result is dealt out over rounds of 4 hours:
+A battle first passes a contact day: at least `warfare.battle.contact_days` (1) day and until the next morning's first bell, the armies scout and deploy and nobody is lost. Then a bell is fought in each daylight 4-hour step, from `warfare.battle.first_bell_hour` (8 o'clock) for `warfare.battle.bells_per_day` (3) steps; the night steps rest.
 
-```
-rounds = max(1, ceil((attacker men + defender men) ÷ war.menPerBattleRound))
-```
-
-`war.menPerBattleRound` (defines.json) is (6000). Each round a side loses its share of its final losses. The final loss of a side is:
+Each bell a side loses what the resolver's own bells dealt it so far, so the losses come as they were fought, and its morale is how far it still is from breaking (1 untouched, 0 broken). With the last bell the winner's riders catch part of the loser's fled men who would have come back (the pursuit). The final loss of a side is:
 
 ```
 side that holds the field: killed + wounded × (1 − 2/3) + fled × (1 − 0.5)
@@ -181,7 +177,7 @@ side that loses:           killed + wounded + fled × (1 − 0.5)
 
 The field-holder's wounded come back at `warfare.after.wounded_return` (2/3); the loser's wounded become prisoners. Half of the fled (`warfare.after.fled_return`, 0.5) come back. A beaten army with fewer than `war.disperseBelow` (100) men scatters; half its men go home to the recruit pools.
 
-Source: `packages/engine/src/war.ts` (resolve, fightRound, shareLosses, fallBack, disperse); `packages/engine/src/domain/warfare/battle.ts` (woundedAfter, fledAfter)
+Source: `packages/engine/src/war.ts` (resolve, contactSteps, isBellStep, fightRound, shareLosses, fallBack, disperse); `packages/engine/src/domain/warfare/battle.ts` (woundedAfter, fledAfter)
 
 ## Sieges and storming
 

@@ -13,6 +13,8 @@ use Symfony\Component\Uid\Uuid;
  */
 #[ORM\Entity(repositoryClass: MetricEventRepository::class)]
 #[ORM\Index(name: 'idx_metric_name_time', fields: ['name', 'occurredAt'])]
+#[ORM\Index(name: 'idx_metric_time', fields: ['occurredAt'])]
+#[ORM\Index(name: 'idx_metric_received', fields: ['receivedAt'])]
 class MetricEvent
 {
     #[ORM\Id]

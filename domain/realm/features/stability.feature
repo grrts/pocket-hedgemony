@@ -57,7 +57,7 @@ Feature: Stability, read from lords, subjects, officials and provinces
   @REALM-205
   Scenario: A tidy top bar
     Given the player rules "France"
-    Then the top bar shows the realm, the date, gold, stability, the war plaque while at war and the News button
+    Then the top bar shows the realm, the date, gold, stability, research, the war plaque while at war and the News button
     And every plaque has the same height and type
 
   @REALM-299 @placeholder

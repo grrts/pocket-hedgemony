@@ -60,20 +60,25 @@ Between the 1378 start and 1444, the West meets its history as 54 events. Like e
 
 Deaths, child kings and the Emperor come from the game itself: an event that needs "the king has died" waits until the realm's ruler really changes. A campaign that starts in 1444 counts these events as history already, with their historical choice, so it plays as before. Some 1444 events now need them: the end of the Hundred Years' War needs Agincourt or Troyes first, the Wars of the Roses need Richard II's fall, and the union of Castile and Aragon needs Caspe.
 
+### From 1378 to 1444: Asia, Africa and the Americas
+
+Between the 1378 start and 1444 about a hundred events carry the south's history: Timur's sack of Delhi and the breakup of the Delhi sultanate, the Ming taking Yunnan and beating the Mongols at Buir Lake, Joseon's founding, Japan's two courts reunited, the treasure voyages, the Ming conquest of Đại Việt and the Lam Sơn uprising, Malacca founded after Singapura falls, Ayutthaya sacking Angkor, Songhai breaking from Mali, Kongo and Mutapa founded, the Tuareg taking Timbuktu, the Tepanec war that makes the Triple Alliance, the fall of Mayapan and the Inca's Chanka war. None of them waits for its year. Each happens when the reason it had in history holds: Delhi falls apart once Firuz Shah is dead and his heirs fight, the Inca expand once they have beaten the Chanka, and the Triple Alliance rises once Maxtla turns on the Mexica. If the reason never comes, neither does the event. A campaign that starts in 1444 finds them fought as history had them.
+
 ### Everyday events
 
-Between the great events, your own realm asks for small choices. About every two to four months something happens to your officials, lords, family, stores or one of your provinces, and an event card asks what you will do. No new one comes while another card waits for your answer, so they never pile up, and the same event never comes to you twice within 20 years.
+Between the great events, your own realm asks for small choices. About every two to four months something happens to your officials, lords, family, stores or one of your provinces, and an event card asks what you will do. No new one comes while another card waits for your answer, so they never pile up, and the same event never comes to you twice within 20 years. Officials, lords and commanders die of their age, in battle or by an event, never by a roll of their own here: when one of yours dies, his card comes in place of the next one.
 
 | What happens | Your choices |
 |---|---|
-| An official dies in a royal province | Raise his deputy (free, starts at half the post's effect), send for a seasoned man (25 gold, keeps the full effect), or give the post to a lord's kinsman (starts at half, that lord grows more loyal) |
-| A lord dies | Confirm his son (as loyal as his father), ask a fee for the lands (gold, the son less loyal), or take the lands for the crown (they become royal land, your other lords grow less loyal) |
+| An official of a royal province dies, of old age, in battle or in an event | His seat stands empty. Raise his deputy (free, starts at half the post's effect), send for a seasoned man (25 gold, keeps the full effect), or give the post to a lord's kinsman (starts at half, that lord grows more loyal). If you fill the post first, your answer leaves it as it is |
+| A lord dies and his heir takes his lands | Confirm the heir (as loyal as his father), ask a fee for the lands (gold, the heir less loyal), or take the lands for the crown (they become royal land, your other lords grow less loyal). A lord whose line dies out brings no card: his lands come back to the crown |
+| A general or admiral of yours dies, and his men or ships are not in a battle | They head home without him (see [Recruiting](Recruiting)), and his second in command or flag captain, with his skills on the card, asks to lead them instead. Give him the command (15 gold: he leads them where they are, and they take orders again) or let them go home. If someone else takes them up first, only going home is offered |
 | A lord feels slighted at court | Send him a gift (gold), give him an office (another lord grows jealous), or let him sulk (he grows less loyal) |
 | A lord speaks well of you | Reward him (gold, he grows more loyal) or thank him |
 | Two lords quarrel over a mill | Judge for one (he grows more loyal, the other less), or fine them both (gold, both less loyal) |
 | A lord is hurt hunting | Send your physician (gold, he grows more loyal) or your prayers |
 | A child is born to your ruler | Hold a feast (gold, your two least loyal lords grow more loyal), promise the child to a lord's house (that lord grows more loyal), or give thanks quietly. With no heir, the child becomes your heir |
-| Your young heir falls ill | Pay the best physicians (gold) or trust in prayer (3 in 10 that the heir dies) |
+| Your young heir falls ill | Pay the best physicians (gold) or trust in prayer (3 in 10 that the heir dies, leaving the ruler without one) |
 | Grain rots, burns or is eaten by rats in a store | The grain is lost whatever you choose; buy grain (gold) or take it from a lord's barns (he grows less loyal) to make half of it good, or bear the loss |
 | Plague reaches one of your provinces | Close the province (its trade stops and its tax halves while closed), send physicians (gold: half as many die and it is over sooner), or keep the roads open. Only one plague card waits at a time; the News tells of the rest |
 

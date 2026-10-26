@@ -2,12 +2,10 @@
 
 namespace App\Saves;
 
-use Symfony\Component\DependencyInjection\Attribute\AsAlias;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Filesystem\Filesystem;
 
-/** Save bytes in a folder (`SAVES_DIR`), written to a temporary file and renamed into place. */
-#[AsAlias(SaveObjects::class)]
+/** Save bytes in a folder (`SAVES_DIR`), written to a temporary file and renamed into place: development, tests and a single server. */
 final class FolderSaveObjects implements SaveObjects
 {
     private readonly Filesystem $fs;
@@ -36,10 +34,6 @@ final class FolderSaveObjects implements SaveObjects
 
     private function path(string $key): string
     {
-        if (1 !== preg_match('~^[A-Za-z0-9_-]+(/[A-Za-z0-9_-]+)*\.phsave$~', $key)) {
-            throw new \InvalidArgumentException("Not a save key: {$key}");
-        }
-
-        return rtrim($this->dir, '/').'/'.$key;
+        return rtrim($this->dir, '/').'/'.SaveObjectsFactory::checkKey($key);
     }
 }

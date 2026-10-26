@@ -45,16 +45,48 @@ Feature: Everyday events
 
   @EVT-123
   Scenario: The crown takes a dead lord's lands
-    Given a lord of France has died
+    Given a lord of France has died and his heir has taken his lands
     When France takes his lands for the crown
     Then his provinces are royal land
     And the other lords of France fear for their own
 
   @EVT-123
-  Scenario: The son follows his father
-    Given a lord of France has died
-    When France confirms his son
-    Then the son holds the lands under his own name
+  Scenario: The heir follows his father
+    Given a lord of France has died and his heir has taken his lands
+    When France confirms the heir
+    Then the heir holds the lands under his own name
+
+  @EVT-123
+  Scenario: A line that dies out brings no card
+    Given a lord of France with no heir and no kinsman has died
+    Then no everyday event waits for France
+    And his provinces are royal land
+
+  @EVT-132
+  Scenario: A general's second keeps his men in the field
+    Given a general of France has died while his army stands in a lord's land
+    Then his men march for crown land without him
+    And a card names his second in command and his skills
+    When France gives the second the command
+    Then the second leads the army where it stands and it takes orders again
+
+  @EVT-132
+  Scenario: The second is not offered once the men have a leader
+    Given a general of France has died
+    When another general takes up his men before France answers
+    Then the card offers only to let them go home
+
+  @EVT-132
+  Scenario: An admiral's flag captain keeps the fleet at sea
+    Given an admiral of Venice has died at sea
+    When Venice gives his flag captain the fleet
+    Then the fleet stops sailing for port under its new admiral
+
+  @EVT-131
+  Scenario: A death while an everyday event waits brings no second card
+    Given an everyday event waits for France
+    When one of France's officials dies
+    Then only that one everyday event waits
 
   @EVT-124
   Scenario: A child born to an heirless ruler is the heir
