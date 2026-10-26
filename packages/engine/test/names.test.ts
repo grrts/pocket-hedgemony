@@ -37,6 +37,16 @@ describe("ranks in the culture's language (feedback 125)", () => {
     expect(rankedName(rules, nation("japan"), "Hosokawa Katsumoto", "general")).toBe("Hosokawa Katsumoto Taishō");
   });
 
+  it("ranks a fleet leader by his post, and every culture with an admiral has a commodore or viceroy too", () => {
+    expect(rankedName(rules, nation("portugal"), "Fernão Coutinho", "commodore")).toBe("Capitão-mor Fernão Coutinho");
+    expect(rankedName(rules, nation("portugal"), "Fernão Coutinho", "viceroy")).toBe("Vice-Rei Fernão Coutinho");
+    expect(rankedName(rules, nation("japan"), "Hosokawa Katsumoto", "viceroy")).toBe("Hosokawa Katsumoto Tandai");
+    for (const [id, c] of Object.entries(rules.names!.cultures))
+      if (c.ranks?.admiral) for (const p of [c.ranks.commodore, c.ranks.viceroy]) if (p !== undefined) expect(p, id).toContain("{name}");
+    const seafaring = Object.entries(rules.names!.cultures).filter(([, c]) => c.ranks?.admiral);
+    expect(seafaring.filter(([, c]) => !c.ranks!.viceroy).map(([id]) => id)).toEqual(["ethiopian"]);
+  });
+
   it("names the map data's stand-in generals in their realm's culture", () => {
     const w = createWorld(rules, 3);
     expect(w.commanders.filter((c) => c.name.startsWith("General of ")).map((c) => c.name)).toEqual([]);
