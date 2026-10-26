@@ -118,7 +118,7 @@ export interface RealmScores {
   Technology: number;
 }
 
-/** World domination: owning or holding as subjects at least half of the world's settled land provinces. */
+/** World domination: owning or holding as subjects at least `dominationShare` of the world's settled land provinces (all of them, X-28). */
 export function dominationReached(held: number, settledLandProvinces: number): boolean {
   return settledLandProvinces > 0 && held / settledLandProvinces >= SHELL.dominationShare;
 }

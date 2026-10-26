@@ -247,7 +247,7 @@ export function dominationCheckDue(date: GameDate): boolean {
   return date.month === config.victory.checkMonth;
 }
 
-/** Owning or holding as subjects half of the world's settled land provinces. */
+/** Owning or holding as subjects the `dominationShare` of the world's settled land provinces (all of them, X-28). */
 export function dominationReached(held: number, settled: number): boolean {
   return settled > 0 && held >= settled * config.victory.dominationShare;
 }
