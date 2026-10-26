@@ -20,7 +20,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   await page.evaluate(() => window.__phSelect("p1601"));
   await page.waitForTimeout(200);
   await shot("overview");
-  await page.click("[data-tab=people]");
+  await page.click("[data-page-fold=prov-people] summary");
   await page.waitForTimeout(200);
   await shot("people");
   await page.click(".hud .realm");

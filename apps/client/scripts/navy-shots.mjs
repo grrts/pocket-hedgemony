@@ -38,6 +38,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   const lisbonId = await page.evaluate(() => window.__phCapital());
   await page.evaluate((id) => window.__phSelect(id), lisbonId);
   await page.waitForTimeout(300);
+  await page.click("[data-tab=garrison]");
   await page.click("[data-tab=port]");
   await page.waitForTimeout(300);
   await shot("1-port");
@@ -64,6 +65,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   for (let t = 0; t < 5; t++) await endTurn();
   await page.evaluate((id) => window.__phSelect(id), lisbonId);
   await page.waitForTimeout(200);
+  await page.click("[data-tab=garrison]");
   await page.click("[data-tab=port]");
   await page.waitForTimeout(200);
   await shot("2b-port-building");

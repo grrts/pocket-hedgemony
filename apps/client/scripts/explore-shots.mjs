@@ -54,6 +54,7 @@ for (const [name, device] of [["small", devices["iPhone SE landscape"]], ["lands
   const openPort = async () => {
     await page.evaluate((id) => window.__phSelect(id), lisbonId);
     await page.waitForTimeout(200);
+    await tap("[data-tab=garrison]");
     await tap("[data-tab=port]");
     await page.waitForTimeout(200);
   };

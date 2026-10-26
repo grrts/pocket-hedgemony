@@ -69,7 +69,7 @@ import { closeUpPoint, firstShown, jumpTarget, learningTab, newLearningUi, nodeA
 import { provinceWorks } from "./ui/works.ts";
 import { provinceLand } from "./ui/land.ts";
 import { castleFoodLine, castleFoodSettings, foodCounts, foodTab, landShare as landShareOf } from "./ui/food.ts";
-import { bindFolds } from "./ui/fold.ts";
+import { bindFolds, fold } from "./ui/fold.ts";
 import { aimsFoldHtml, chronicleHtml, type ChronicleUi } from "./ui/chronicle.ts";
 import { startGoals, type GoalDef } from "@ph/rules";
 import { commanderPortrait, officialCard, officialOf, officialScreen, officialsTab, paintSiege, postScreen, siegeView, type SiegeInfo } from "./ui/people.ts";
@@ -4647,10 +4647,8 @@ function renderPanelCard(): void {
     renderGarrison(selectedProvince);
     return;
   }
-  if (provinceTab === "people") {
-    renderPeople(selectedProvince);
-    return;
-  }
+  // People is a fold of the Overview now (SHELL-187).
+  if (provinceTab === "people") provinceTab = "overview";
   if (provinceTab === "build") {
     renderWorks(selectedProvince);
     return;
@@ -4669,29 +4667,27 @@ function renderPanelCard(): void {
   panel.innerHTML = `
     <header><h2 class="ribbon">${owner ? pennant(owner, 2) : ""}${esc(p.name)}</h2>${closeButton()}</header>
     ${mineHere ? provinceTabs() : ""}
-    <p class="owner">${owner ? `<button class="realm-link" data-realm="${own}" title="Open ${esc(owner.name)}"><b>${esc(owner.name)}</b></button>` : snapshot && !isWater[selectedProvince] ? groundHead(snapshot.tribes, selectedProvince, tribesUiOf()) : "<b>Unclaimed land</b>"}</p>
-    <p class="province-kind">${esc(provinceKind(p, selectedProvince, !!owner && owner.capital === p.id))}</p>
+    <p class="owner">${owner ? `<button class="realm-link" data-realm="${own}" title="Open ${esc(owner.name)}"><b>${esc(owner.name)}</b></button>` : snapshot && !isWater[selectedProvince] ? groundHead(snapshot.tribes, selectedProvince, tribesUiOf()) : "<b>Unclaimed land</b>"}${mineHere ? ` · <span class="province-kind">${esc(provinceKind(p, selectedProvince, !!owner && owner.capital === p.id))}</span>` : ""}</p>
+    ${mineHere ? "" : `<p class="province-kind">${esc(provinceKind(p, selectedProvince, !!owner && owner.capital === p.id))}</p>`}
     ${snapshot && !owner ? groundSection(snapshot.tribes, selectedProvince, tribesUiOf()) : ""}
     ${snapshot ? settleSection(selectedProvince) : ""}
     ${snapshot ? rebelsHere(selectedProvince) : ""}
     ${siege ? siegeView(rules, siege) : ""}
     ${snapshot && own >= 0 ? plagueHere(selectedProvince, mineHere) : ""}
-    ${snapshot && own >= 0 && official !== undefined ? governanceSection(selectedProvince, own, mineHere, official) : ""}
+    ${snapshot && own >= 0 && official !== undefined ? (mineHere ? governedFold(selectedProvince, own, official) : governanceSection(selectedProvince, own, mineHere, official)) : ""}
     <dl class="facts">
-      <dt>People</dt><dd>${fmt((snapshot ? snapshot.provincePeople[selectedProvince]! : p.population) * 1000)}</dd>
+      ${mineHere ? "" : `<dt>People</dt><dd>${fmt((snapshot ? snapshot.provincePeople[selectedProvince]! : p.population) * 1000)}</dd>`}
       <dt>Wealth</dt><dd>${icon("coin", 1).repeat(p.wealth)}</dd>
       ${snapshot ? provinceTradeLine(snapshot, selectedProvince) : ""}
-      ${snapshot ? foodFacts(selectedProvince) : ""}
+      ${snapshot ? foodFacts(selectedProvince, mineHere) : ""}
       ${snapshot && own >= 0 ? moodFacts(selectedProvince) : ""}
       ${snapshot ? beliefFacts(snapshot.peoples, selectedProvince) : ""}
       <dt>Walls</dt><dd>${wallsAt(selectedProvince) ? `${WALL_NAMES[wallsAt(selectedProvince)!]}${wallsFoodNote(selectedProvince)}` : "None"}</dd>
       ${occupiers[selectedProvince]! >= 0 ? `<dt>Occupied</dt><dd>by ${esc(nations[occupiers[selectedProvince]!]!.name)}</dd>` : ""}
       ${mineHere ? throneFact(selectedProvince) : ""}
       ${mineHere ? newLandFact(selectedProvince) : ""}
-      ${mineHere ? taxLine(selectedProvince) : ""}
     </dl>
-    ${mineHere ? rateButtons(snapshot!.provinceTax[selectedProvince]!, "province") : ""}
-    ${mineHere ? castleFoodSettings(snapshot!, selectedProvince) : ""}
+    ${mineHere ? provinceFolds(selectedProvince) : ""}
     ${armiesHere.length ? `<h3 class="sub">Armies</h3>` : ""}
     ${armiesHere
       .map((k) => {
@@ -4717,6 +4713,7 @@ function renderPanelCard(): void {
   );
   bindCommand();
   bindProvinceTabs();
+  bindFolds(panel);
   bindNationButtons();
   bindRebels();
   bindTax(selectedProvince);
@@ -5049,17 +5046,35 @@ function renderPost(pi: number): void {
   });
 }
 
-/** Tabs of the overview of one of the player's provinces. */
+/** The province card's tabs and the pages each holds (SHELL-187): the first page opens when the tab is tapped. */
+const PROVINCE_TABS: { label: string; pages: { key: ProvinceTab; label: string }[] }[] = [
+  { label: "Overview", pages: [{ key: "overview", label: "Overview" }] },
+  { label: "Troops", pages: [{ key: "garrison", label: "Garrison" }, { key: "port", label: "Port" }] },
+  { label: "Build", pages: [{ key: "build", label: "Buildings" }, { key: "land", label: "Land" }] },
+];
+
+/** Tabs of one of the player's provinces, and the open tab's pages in a lower row when it has more than one (SHELL-187). */
 function provinceTabs(): string {
-  const tab = (key: typeof provinceTab, label: string) => `<button class="tab${provinceTab === key ? " on" : ""}" data-tab="${key}">${label}</button>`;
   const building = snapshot?.sites.some((x) => x.province === selectedProvince) ? ` ${icon("hourglass", 1)}` : "";
   const port = snapshot?.navy.ports.find((x) => x.province === selectedProvince);
   const hulls = port?.building.length || port?.queue.length ? ` ${icon("hourglass", 1)}` : "";
-  return `<nav class="tabs">${tab("overview", "Overview")}${tab("people", "People")}${tab("garrison", "Garrison")}${tab("land", "Land")}${tab("build", `Build${building}`)}${port ? tab("port", `Port${hulls}`) : ""}</nav>`;
+  const gathering = snapshot?.garrisons.some((x) => x.province === selectedProvince && x.gathering.length) ? ` ${icon("hourglass", 1)}` : "";
+  const pagesOf = (t: (typeof PROVINCE_TABS)[number]) => t.pages.filter((p) => p.key !== "port" || port);
+  const open = PROVINCE_TABS.find((t) => t.pages.some((p) => p.key === provinceTab)) ?? PROVINCE_TABS[0]!;
+  const badge = (label: string) => (label === "Build" ? building : label === "Troops" ? gathering || hulls : "");
+  const tabs = PROVINCE_TABS.map((t) => `<button class="tab${t === open ? " on" : ""}" data-tab="${t.pages[0]!.key}"${t === open ? ' aria-current="page"' : ""}>${t.label}${badge(t.label)}</button>`).join("");
+  const pages = pagesOf(open);
+  const row = pages.length > 1 ? `<nav class="tabs pages">${pages.map((p) => `<button class="tab${p.key === provinceTab ? " on" : ""}" data-tab="${p.key}">${p.label}${p.key === "port" ? hulls : p.key === "build" ? building : ""}</button>`).join("")}</nav>` : "";
+  return `<nav class="tabs">${tabs}</nav>${row}`;
 }
 
-/** Food lines of a province's overview: months stored, the last harvest and anyone who starved this year. */
-function foodFacts(pi: number): string {
+/** A province's food lines; folded, only the store, with the rest returned for the Overview's Food fold (SHELL-187). */
+function foodFacts(pi: number, folded = false): string {
+  const [line, rest] = foodParts(pi);
+  return folded ? line : line + rest;
+}
+
+function foodParts(pi: number): [string, string] {
   const s = snapshot!;
   const months = s.provinceFoodMonths[pi]!;
   const starved = Math.round(s.provinceStarved[pi]! * 1000);
@@ -5080,12 +5095,12 @@ function foodFacts(pi: number): string {
   const land = fixable
     ? `<button class="paper" data-tab="land" title="Open the Land tab">${icon("hammer", 1)}${Math.round(share * 100)} % of its people${shortWord} · ${esc(foodFix(pi))}</button>`
     : `${Math.round(share * 100)} % of its people in a normal year${shortWord}`;
-  return `<dt>Food</dt><dd>${months.toFixed(1)} months stored${warn}</dd>
+  return [`<dt>Food</dt><dd>${months.toFixed(1)} months stored${warn}</dd>`, `
       <dt>Land feeds</dt><dd>${land}</dd>
       <dt>Harvest</dt><dd>${harvestText(pi)}</dd>
       ${men > 0 && people > 0 ? `<dt>Armies</dt><dd>${fmt(men)} men here eat ${(eaten / people).toFixed(1)} months of this store a month</dd>` : ""}
       ${castleFoodLine(s, pi, (p) => provinces[p]!.name)}
-      ${starved > 0 ? `<dt>Starved</dt><dd>${fmt(starved)} this year</dd>` : ""}`;
+      ${starved > 0 ? `<dt>Starved</dt><dd>${fmt(starved)} this year</dd>` : ""}`];
 }
 
 const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -5158,6 +5173,16 @@ function governanceSection(pi: number, own: number, mine: boolean, official: Ret
     ? officialCard(rules, official, own, false, true, -1, titlesOf(own))
     : officialCard(rules, official, own, mine, false, pi, titlesOf(own));
   return governanceCard(rules, { lord, mine, isCapital, province: pi, official: officialHtml, grantOpen, takers }, titlesOf(own));
+}
+
+/** Who governs one of the player's provinces, as a fold whose line names the lord or royal land and the official (SHELL-187); it opens by itself while a royal post is empty or a grant is being chosen. */
+function governedFold(pi: number, own: number, official: ReturnType<typeof officialOf>): string {
+  const l = snapshot!.provinceLord[pi]!;
+  const lord = l >= 0 ? lordViews()[l]! : null;
+  const t = titlesOf(own);
+  const summary = `${lord ? `${esc(lord.name)}'s fief` : "Royal land"} · ${official ? esc(official.name) : lord ? `his ${esc(t.official)}` : `<b>no ${esc(t.official)}</b>`}`;
+  const needs = (!lord && !official) || grantOpen;
+  return fold("prov-governed", "Governed by", summary, governanceSection(pi, own, true, official), needs);
 }
 
 /** A lord's screen (feedback 67): who he is, his lands and lighting them on the map, gifts, seizing and granting. */
@@ -5499,10 +5524,9 @@ const CLASS_NOTE: Record<string, string> = {
 };
 const TOWN_CLASSES = new Set(["craftsmen", "market folk", "clergy", "clerks", "scholars"]);
 
-/** A province's people by class: who they are, how many, and town against countryside. */
-function renderPeople(pi: number): void {
+/** A province's people by class: who they are, how many, and town against countryside; the Overview's People fold (SHELL-187). */
+function peopleFold(pi: number): string {
   const s = snapshot!;
-  const p = provinces[pi]!;
   const C = s.classNames.length;
   const row = s.provinceClasses.subarray(pi * C, (pi + 1) * C);
   const total = s.provincePeople[pi]!;
@@ -5515,15 +5539,28 @@ function renderPeople(pi: number): void {
     .sort((a, b) => b.n - a.n)
     .map(({ c, n }) => `<tr title="${esc(CLASS_NOTE[c] ?? "")}"><td><b>${esc(c[0]!.toUpperCase() + c.slice(1))}</b></td><td class="num">${fmt(Math.round(n * 1000))}</td><td class="bar"><span style="width:${share(n)}%"></span></td><td class="num"><small>${share(n)} %</small></td></tr>`)
     .join("");
-  panel.innerHTML = `
-    <header><h2 class="ribbon">${esc(p.name)}</h2>${closeButton()}</header>
-    ${provinceTabs()}
-    <p><b>${fmt(Math.round(total * 1000))}</b> people: ${fmt(Math.round(town * 1000))} in town (${share(town)} %), ${fmt(Math.round((total - town) * 1000))} in the countryside.</p>
+  return fold(
+    "prov-people",
+    "People",
+    `${fmt(Math.round(total * 1000))} · ${share(town)} % in town`,
+    `<p>${fmt(Math.round(town * 1000))} in town, ${fmt(Math.round((total - town) * 1000))} in the countryside.</p>
     <table class="troops classes"><tbody>${lines}</tbody></table>
-    <p class="hint">Each class is born and dies at its own rate, every month. War in the province adds deaths.</p>`;
-  bindClose();
-  showPanel(true);
-  bindProvinceTabs();
+    <p class="hint">Each class is born and dies at its own rate, every month. War in the province adds deaths.</p>`,
+  );
+}
+
+/** The folds under one of the player's provinces' facts (SHELL-187): its people by class, its tax rate and its castle's own food settings. */
+function provinceFolds(pi: number): string {
+  const s = snapshot!;
+  const t = taxLineOf(s, pi);
+  const castle = castleFoodSettings(s, pi);
+  const own = s.food?.castles.find((x) => x.province === pi)?.own ?? {};
+  const share = landShare(pi);
+  const short = share < FOOD_BALANCE.tight;
+  return `${fold("prov-food", "Food", `land feeds ${Math.round(share * 100)} %${short ? " · short" : ""}`, `<dl class="facts">${foodParts(pi)[1]}</dl>`, short)}
+    ${peopleFold(pi)}
+    ${fold("prov-tax", "Tax", `${t.rateLabel} · ${gold2(t.goldPerMonth)} gold a month`, `<dl class="facts">${taxLine(pi)}</dl>${rateButtons(s.provinceTax[pi]!, "province")}`)}
+    ${castle ? fold("prov-castle-food", "Castle food", Object.keys(own).length ? "own policy" : "realm defaults", castle) : ""}`;
 }
 
 /** The province's Build tab: what is being built and queued, what can be ordered, and what stands (milestone 4). */
@@ -6262,29 +6299,32 @@ function warRoomSection(): string {
   const gathering = s.musters.reduce((t, m) => t + m.men, 0);
   // Lords in the field show in the Lords' men rows; the rest wait at home, not at court.
   const mine = s.commanders.map((c, i) => ({ c, i })).filter(({ c }) => c.owner === me && c.lord < 0);
-  return `<h3 class="sub">Troops</h3>
-    <p>${fmt(s.nationCapUsed[me]!)} men under arms or gathering, of a troop cap of ${fmt(s.nationTroopCap[me]!)}. Pay: ${s.pay.toFixed(1)} gold a month.</p>
-    ${s.fallen ? `<dl class="facts">${fallenLine(s.fallen)}</dl>` : ""}
-    <p class="hint">Call men up from a province's Garrison tab, a thousand at a time.${gathering ? ` ${fmt(gathering)} men are gathering now.` : ""} Over the cap, pay doubles and levies desert.</p>
+  const leading = mine.filter(({ c }) => c.army >= 0 || c.fleet >= 0).length;
+  // One Troops line, then the lords' Call; the lords and the commanders one by one sit in folds (SHELL-185).
+  const commanders = `${mine
+    .map(({ c, i }) => {
+      const k = c.army;
+      const where = k >= 0 ? `leads ${fmt(s.armies.men[k]!)} men at ${esc(provinces[s.armies.location[k]!]!.name)}` : c.fleet >= 0 ? "leads a fleet" : "waits at court";
+      return `<div class="army">${commanderPortrait(rules, c.name, me)}<span class="who"><b>${esc(titledOf(c))}</b><br><small>${roleOf(c)} · ${skills(c)} · ${c.victories} won, ${c.defeats} lost</small><br><small>${where}</small></span>
+          <span class="army-buttons">${k >= 0 ? `<button class="paper small" data-command="${s.armies.id[k]!}">Command</button>` : c.home >= 0 ? `<button class="paper small" data-release="${i}" title="Back to his post in ${esc(provinces[c.home]!.name)}">Release</button>` : ""}</span></div>`;
+    })
+    .join("")}
+    <p class="hint">New generals and admirals are commissioned from a province's official, on his screen in the Officials tab.</p>`;
+  return `<dl class="facts">
+      <dt>Troops</dt><dd><b>${fmt(s.nationCapUsed[me]!)}</b> of ${fmt(s.nationTroopCap[me]!)} cap${gathering ? ` <small>${fmt(gathering)} gathering</small>` : ""}</dd>
+      <dt>Pay</dt><dd>${s.pay.toFixed(1)} gold a month <small>doubles over the cap</small></dd>
+      ${s.fallen ? fallenLine(s.fallen) : ""}
+    </dl>
     ${s.musters.length ? `<div class="queue-head"><span>Recruiting</span><span>${fmt(gathering)} men</span></div>
     <ol class="queue">${s.musters
       .map((m) => `<li><button class="paper small" data-garrison="${m.province}">${esc(provinces[m.province]!.name)}</button><span class="what"><small>${Math.ceil(m.men / 1000)} / ${rules.defines.recruit.queueMax} queued</small></span><span class="when">all ${days(m.daysAll)}</span></li>`)
-      .join("")}</ol>` : ""}
+      .join("")}</ol>` : `<p class="hint">Call men up from a province's Troops tab, a thousand at a time.</p>`}
     ${lordsMenSection(rules, s.retinues, lordViews(), retinueLook(), titlesOf(me))}
-    <h3 class="sub">Commanders</h3>
-    ${mine
-      .map(({ c, i }) => {
-        const k = c.army;
-        const where = k >= 0 ? `leads ${fmt(s.armies.men[k]!)} men at ${esc(provinces[s.armies.location[k]!]!.name)}` : c.fleet >= 0 ? "leads a fleet" : "waits at court";
-        return `<div class="army">${commanderPortrait(rules, c.name, me)}<span class="who"><b>${esc(titledOf(c))}</b><br><small>${roleOf(c)} · ${skills(c)} · ${c.victories} won, ${c.defeats} lost</small><br><small>${where}</small></span>
-          <span class="army-buttons">${k >= 0 ? `<button class="paper small" data-command="${s.armies.id[k]!}">Command</button>` : c.home >= 0 ? `<button class="paper small" data-release="${i}" title="Back to his post in ${esc(provinces[c.home]!.name)}">Release</button>` : ""}</span></div>`;
-      })
-      .join("")}
-    <p class="hint">New generals and admirals are commissioned from a province's official, on his screen in the Officials tab.</p>
+    ${fold("war-commanders", "Commanders", mine.length ? `${mine.length} · ${leading} leading` : "none yet", commanders)}
     ${mercenaryLine()}`;
 }
 
-/** One line in the Military tab that sums up the free companies and opens their tab. */
+/** One line on the Army page that sums up the free companies and opens their tab. */
 function mercenaryLine(): string {
   const s = snapshot!;
   const serving = hiredArmies().length;
@@ -6480,8 +6520,8 @@ function treasurySection(): string {
     </div>` : ""}`;
 }
 
-/** Every country card starts with these tabs, in this order (SHELL-139); the Army tab is the war room on your own card. */
-const COUNTRY_TAB_KEYS: Record<string, "general" | "diplomacy" | "trade" | "military"> = { General: "general", Diplomacy: "diplomacy", Trade: "trade", Army: "military" };
+/** Another realm's card has these tabs, in this order (SHELL-186); its trade is a fold on General and its heritage a page of General. */
+const COUNTRY_TAB_KEYS: Record<string, "general" | "diplomacy" | "military"> = { General: "general", Diplomacy: "diplomacy", Army: "military" };
 const COUNTRY_TABS = COUNTRY_CARD_TABS.map((label) => [COUNTRY_TAB_KEYS[label]!, label] as const);
 
 // ---- your realm's six sections (SHELL-165..167) ----
@@ -6643,10 +6683,13 @@ function renderRealm(r: number): void {
   const mine = !!s && s.playerNation === r;
   if ((!s && realmTab !== "heritage") || (s && (realmTab === "government" || realmTab === "peoples" || realmTab === "treasury" || realmTab === "food" || realmTab === "mercenaries" || realmTab === "officials" || realmTab === "lords" || realmTab === "provinces" || realmTab === "learning" || realmTab === "navy" || realmTab === "hireFleets" || realmTab === "colonies" || realmTab === "hunting" || realmTab === "score") && !mine)) realmTab = "general";
   if (realmTab === "hunting" && !s?.tribes.mine) realmTab = "general";
+  // Another realm's trade is a fold on its General tab (SHELL-186).
+  if (realmTab === "trade" && !mine) realmTab = "general";
   const strengths = realmStrengths(n.id);
   const peoples = s ? peoplesView(beliefData(s.peoples), r, s.provincePeople) : null;
   // Pages opened from a tab keep that tab lit: free companies under Military (feedback 114), the Hire a fleet screen under Navy (F-115).
-  const tab = (key: typeof realmTab, label: string, marked = false) => `<button class="tab${realmTab === key || (key === "military" && realmTab === "mercenaries") || (key === "navy" && realmTab === "hireFleets") ? " on" : ""}${marked ? " marked" : ""}" data-realm-tab="${key}"${marked ? ` aria-label="${label}: waits for your answer"` : ""}>${label}</button>`;
+  // Another realm's Heritage is a page of General (SHELL-186), so General stays lit there.
+  const tab = (key: typeof realmTab, label: string, marked = false) => `<button class="tab${realmTab === key || (key === "military" && realmTab === "mercenaries") || (key === "navy" && realmTab === "hireFleets") || (key === "general" && realmTab === "heritage") ? " on" : ""}${marked ? " marked" : ""}" data-realm-tab="${key}"${marked ? ` aria-label="${label}: waits for your answer"` : ""}>${label}</button>`;
   // A peace offer or an envoy waiting for an answer marks the Diplomacy tab, on that realm's card and on your own (SHELL-141).
   const answerWaits = !!s && (s.peaceOffers.some((o) => (mine || o.from === r) && !putOffOffers.has(o.id)) || asksOf(s).some((a) => mine || a.from === r));
   const general = mine ? realmOverviewHtml(r, own, people, armies.length, men, answerWaits) : `
@@ -6669,6 +6712,7 @@ function renderRealm(r: number): void {
       <dt>Lands</dt><dd>${topLands.map(([t, c]) => `${t} ${c}`).join(" · ")}</dd>
       ${heritageLine(strengths, s?.heritage[r] ?? null)}
     </dl>
+    ${s && !mine ? fold(`realm-trade-${r}`, "Trade", `wealth ${wealth} across ${own.length} province${own.length === 1 ? "" : "s"}`, realmTradeTab(r, own, wealth, false)) : ""}
     ${s && !mine ? aimsFoldHtml(r, s.history.goals, chronicleUi(), goalDefs) : ""}
     ${neighbours.size ? `<h3 class="sub">Neighbours</h3><div class="nations">${[...neighbours]
       .map((j) => `<button class="paper nation" data-realm="${j}">${pennant(nations[j]!)}${esc(nations[j]!.name)}</button>`)
@@ -6677,7 +6721,7 @@ function renderRealm(r: number): void {
     ${s && pickingPlayOn && s.campaign.ending?.kind === "game over" && !mine && s.campaign.ranks[r * 3] ? `<button class="wax play" data-play-on="${r}">${icon("crown", 2)}Rule ${esc(n.name)}<small>Achievements end for this campaign</small></button>` : ""}`;
   const content =
     realmTab === "score" && s ? scoreTab(s.campaign, r, (j) => nations[j]!.name)
-    : realmTab === "heritage" ? heritageTab(strengths, s?.heritage[r] ?? null, s ? s.nationTreasury[r]! : 0)
+    : realmTab === "heritage" ? `${mine ? "" : `<button class="paper small" data-realm-open-tab="general">${icon("scroll", 1)}Back to General</button>`}${heritageTab(strengths, s?.heritage[r] ?? null, s ? s.nationTreasury[r]! : 0)}`
     : realmTab === "diplomacy" ? `<div class="diplomacy-tab">${mine ? myDiplomacySection() : offersFrom(r) + relationsSection(r) + askRows(s!.tribes, r, tribesUiOf())}</div>`
     : realmTab === "government" && s?.government ? governmentTab(s.government, s.revolution)
     : realmTab === "peoples" && peoples ? peoplesTab(peoples) + headCardHtml(s?.faithHeads?.card ?? null, (n) => nations[n]!.name, true)
@@ -6698,7 +6742,7 @@ function renderRealm(r: number): void {
     : general;
   panel.innerHTML = `
     <header><h2 class="ribbon">${esc(n.name)}</h2>${closeButton()}</header>
-    ${s && mine ? realmBookNav(r, answerWaits) : s ? `<nav class="tabs">${COUNTRY_TABS.map(([key, label]) => tab(key, label, key === "diplomacy" && answerWaits)).join("")}${tab("heritage", "Heritage")}</nav>` : `<nav class="tabs">${tab("general", "General")}${tab("heritage", "Heritage")}</nav>`}
+    ${s && mine ? realmBookNav(r, answerWaits) : s ? `<nav class="tabs">${COUNTRY_TABS.map(([key, label]) => tab(key, label, key === "diplomacy" && answerWaits)).join("")}</nav>` : ""}
     ${content}`;
   bindClose();
   showPanel(true);
@@ -7507,7 +7551,7 @@ function hintTarget(h: Hint): HintTarget {
       const show = () => openProvinceTab(provinceOpen ? selectedProvince : capital, tab);
       if (provinceOpen && provinceTab === tab) return { el: panel.querySelector(`${button}:not([disabled])`) ?? panel.querySelector(button), show };
       if (provinceOpen) return { el: panel.querySelector(`[data-tab="${tab}"]`), show };
-      return provinceCardTarget(capital, `, then the ${h.id === "recruit" ? "Garrison" : "Build"} tab`, show);
+      return provinceCardTarget(capital, `, then the ${h.id === "recruit" ? "Troops" : "Build"} tab`, show);
     }
     case "lords": {
       const t = titlesOf(s!.playerNation);

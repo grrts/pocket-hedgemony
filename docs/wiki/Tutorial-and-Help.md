@@ -150,7 +150,7 @@ The first-campaign hints carry on where the tutorial's playable chapters stop. I
 | 6 | End the turn | End turn |
 | 7 | Read the news | The scroll in the top bar |
 | 8 | Choose a study | Your banner, Research, Can study, then Study now |
-| 9 | Recruit | Your capital's card, the Garrison tab, then Recruit |
+| 9 | Recruit | Your capital's card, the Troops tab, then Recruit |
 | 10 | Build | The Build tab, then Build |
 | 11 | Meet your lords | Your banner, Lands, then your lords' page |
 | 12 | See your gold | The gold in the top bar |
