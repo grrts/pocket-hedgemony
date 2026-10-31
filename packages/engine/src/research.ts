@@ -130,6 +130,7 @@ export function seedResearch(world: World): void {
     if (capital === undefined || world.provinceOwner[capital] !== n) return p;
     const school = rs.gainSchool(p, world.provinceIds[capital]!, type ?? "temple_or_monastery_school", type ? "build" : "clergy_founds");
     const want = Math.floor(rs.seatsOf(school.type) / 2);
+    // Enrolled before the start: the starting levy share already counts their cost, so each takes only himself (D-RSCH-25).
     const got = Math.floor(takeRecruits(world, n, want, land[n]));
     const years = rs.researchConfig.graduation_years;
     for (let k = 0; k < years; k++) {
@@ -177,15 +178,15 @@ function landOf(world: World): number[][] {
 /**
  * Takes up to `men` recruits from realm n's held royal provinces, each giving the
  * same share of its pool; returns how many. `land` lists the realm's
- * provinces when the caller has it.
+ * provinces when the caller has it; `step` takes only whole multiples of it.
  */
-function takeRecruits(world: World, n: number, men: number, land?: readonly number[]): number {
+function takeRecruits(world: World, n: number, men: number, land?: readonly number[], step = 1): number {
   if (men <= 0) return 0;
   // The crown's recruits: a lord's land fills his own retinue (WAR-252).
   const held = (land ?? landOf(world)[n]!).filter((p) => world.provinceOwner[p] === n && world.provinceLord[p]! < 0 && controller(world, p) === n);
   let pool = 0;
   for (const p of held) pool += world.provinceRecruits[p]!;
-  const take = Math.min(men, Math.floor(pool));
+  const take = Math.floor(Math.min(men, Math.floor(pool)) / step) * step;
   if (take <= 0) return 0;
   const share = take / pool;
   for (const p of held) world.provinceRecruits[p] = world.provinceRecruits[p]! * (1 - share);
@@ -197,13 +198,14 @@ function heldRecruits(world: World, n: number): number {
   return world.nationLevies[n]!;
 }
 
-/** Enrols students from recruits until the realm has as many as it wants (RSCH-004, RSCH-020). */
+/** Enrols students from recruits until the realm has as many as it wants, each taking `recruits_per_student` men (RSCH-004, RSCH-020). */
 function enrol(world: World, n: number, land?: readonly number[]): number {
   const p = world.research[n]!;
   const want = Math.min(world.researchSeats[n]!, rs.seats(p)) - rs.students(p);
   if (want <= 0) return 0;
-  const got = takeRecruits(world, n, want, land);
-  return rs.fillSeats(p, { recruits: got }, got, world.date.year);
+  const k = rs.recruitsPerStudent();
+  const got = takeRecruits(world, n, want * k, land, k);
+  return rs.fillSeats(p, { recruits: got }, got / k, world.date.year);
 }
 
 // ---------------------------------------------------------------- spread and effects
@@ -527,6 +529,8 @@ export interface ResearchView {
   seatsWanted: number;
   /** Recruits the realm holds now. */
   recruits: number;
+  /** Recruits each student takes when he enrols (RSCH-020). */
+  recruitsPerStudent: number;
   schools: { province: number; type: string; seats: number; students: number; open: boolean }[];
   founding: { province: number; type: string; monthsLeft: number }[];
   /** Gold a year the schools cost. */
@@ -608,6 +612,7 @@ export function researchView(world: World, n: number, arms: readonly string[]): 
     seats: rs.seats(p),
     seatsWanted: world.researchSeats[n]!,
     recruits: heldRecruits(world, n),
+    recruitsPerStudent: rs.recruitsPerStudent(),
     schools: schoolsOf(world, n).map((s) => ({ ...s, type: schoolName(s.type) })),
     founding: world.researchFounding.filter((f) => f.nation === n).map((f) => ({ province: f.province, type: schoolName(f.type), monthsLeft: f.monthsLeft })),
     upkeep: rs.schoolUpkeep(p),

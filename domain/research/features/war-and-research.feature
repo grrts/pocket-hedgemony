@@ -5,10 +5,11 @@ Feature: Why war and research don't mix
   So that peace and war each have a price in research
 
   @RSCH-020
-  Scenario: Every seat is a man the army can't raise
+  Scenario: Every seat costs men the army can't raise
+    # config: research.recruits_per_student (10)
     Given the country "France" has 48,000 recruits and 0 students
     When it fills 200 school seats
-    Then it can raise at most 47,800 recruits as soldiers
+    Then it can raise at most 46,000 recruits as soldiers
 
   @RSCH-021 @RSCH-070 @placeholder
   Scenario: Schools cost gold every year
